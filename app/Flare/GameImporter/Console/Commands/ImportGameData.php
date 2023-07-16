@@ -6,7 +6,7 @@ use App\Flare\Models\GameMap;
 use App\Flare\Models\InfoPage;
 use Illuminate\Console\Command;
 use App\Flare\Values\MapNameValue;
-use Illuminate\Support\Facades\File;
+use Illuminate\Http\File;
 use Illuminate\Support\Facades\Storage;
 use App\Flare\GameImporter\Values\ExcelMapper;
 
@@ -31,9 +31,11 @@ class ImportGameData extends Command {
      */
     public function handle(ExcelMapper $excelMapper) {
 
+        ini_set('memory_limit', '-1');
+
         $this->line('Fetching files ...');
 
-        $files    = $this->fetchFiles();
+        $files = $this->fetchFiles();
 
         $this->line('Importing non map speficic data ...');
 
@@ -45,13 +47,24 @@ class ImportGameData extends Command {
 
         $this->line('Importing maps ...');
         
-        // Import maps:
+        // // Import maps:
         $this->importGameMaps();
 
         $this->line('Importing map spefic data ...');
 
-        // This stuff depends on maps existing.
+        // // This stuff depends on maps existing.
         $this->import($excelMapper, $files['.'], '.');
+
+        // Update the game maps with specific modifiers and restrictions
+        // based on the locations, imported above.
+        $gameMaps = GameMap::all();
+
+        foreach($gameMaps as $map) {
+            $mapValue = new MapNameValue($map->name);
+
+            $map->update($mapValue->getMapModifers());
+        }
+
         $this->import($excelMapper, $files['Monsters'], 'Monsters');
         $this->import($excelMapper, $files['Admin Section'], 'Admin Section');
 
@@ -90,7 +103,7 @@ class ImportGameData extends Command {
             }
         }
 
-        array_reverse($result['Admin Section']);
+        $result['Kingdoms'] = array_reverse($result['Kingdoms']);
 
         return $result;
     }
@@ -117,7 +130,7 @@ class ImportGameData extends Command {
      * @return void
      */
     protected function importInformationSection(): void {
-        $data = Storage::disk('data-imports')->get('/Admin Section/information.json');
+        $data = Storage::disk('data-imports')->get('Admin Section/information.json');
 
         $data = json_decode(trim($data), true);
 
@@ -125,9 +138,17 @@ class ImportGameData extends Command {
             InfoPage::updateOrCreate(['id' => $modelEntry['id']], $modelEntry);
         }
 
-        $pathToBackup = resource_path('backup/info-sections-images');
+        $sourceDirectory      = resource_path('backup/info-sections-images');
+        $destinationDirectory = storage_path('app/public');
 
-        File::copyDirectory($pathToBackup, storage_path('app/public'));
+        $command = 'cp -R ' . escapeshellarg($sourceDirectory) . ' ' . escapeshellarg($destinationDirectory);
+        exec($command, $output, $exitCode);
+
+        if ($exitCode === 0) {
+            $this->line('Information section images directory copied to public successfully. Information section is now set up.');
+        } else {
+            $this->line('Failed to copy the information images directory over. You can do this manually from the resources/backup/information-sections-images. Copy the entire directory to app/public');
+        }
     }
 
     /**
@@ -136,12 +157,12 @@ class ImportGameData extends Command {
      * @return void
      */
     protected function importGameMaps(): void {
-        $files = File::files(resource_path('maps'));
+        $files = Storage::disk('data-maps')->allFiles();
 
         foreach ($files as $file) {
-            $fileName = pathinfo($file->getFilename(), PATHINFO_FILENAME);
+            $fileName = pathinfo($file, PATHINFO_FILENAME);
 
-            $path     = Storage::disk('maps')->putFile($fileName, $file);
+            $path     = Storage::disk('maps')->putFile($fileName, new File(resource_path('maps') . '/' . $file));
 
             $mapValue = new MapNameValue($fileName);
 
@@ -151,8 +172,6 @@ class ImportGameData extends Command {
                 'default'       => $mapValue->isSurface(),
                 'kingdom_color' => MapNameValue::$kingdomColors[$fileName],
             ];
-
-            $gameMapData = array_merge($gameMapData, $mapValue->getMapModifers());
 
             GameMap::create($gameMapData);
         }

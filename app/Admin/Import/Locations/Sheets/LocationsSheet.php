@@ -29,7 +29,7 @@ class LocationsSheet implements ToCollection {
         foreach ($locations as $key => $value) {
             if (!is_null($value)) {
                 if ($key === 'game_map_id') {
-                    $gameMap = GameMap::where('nanme', $value)->first();
+                    $gameMap = GameMap::where('name', $value)->first();
 
                     if (is_null($gameMap)) {
                         return [];

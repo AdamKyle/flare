@@ -34,10 +34,10 @@ class RaidSheet implements ToCollection {
 
     protected function cleanRaidData(array $raidData): array {
 
-        $raidBoss               = Monster::find($raidData['raid_boss_id']);
-        $raidMonsterIds         = Monster::whereIn('id', explode(',', $raidData['raid_monster_ids']))->pluck('id')->toArray();
-        $raidBossLocationId     = Location::find($raidData['raid_boss_location_id']);
-        $raidCorruptedLocations = Location::whereIn('id', explode(',', $raidData['corrupted_location_ids']))->pluck('id')->toArray();
+        $raidBoss               = Monster::where('name', $raidData['raid_boss_id'])->first();
+        $raidMonsterIds         = Monster::whereIn('name', explode(',', $raidData['raid_monster_ids']))->pluck('id')->toArray();
+        $raidBossLocationId     = Location::where('name', $raidData['raid_boss_location_id'])->first();
+        $raidCorruptedLocations = Location::whereIn('name', explode(',', $raidData['corrupted_location_ids']))->pluck('id')->toArray();
 
         if (is_null($raidBoss)) {
             return [];  

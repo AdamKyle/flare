@@ -34,11 +34,12 @@ class MapNameValue {
      * @var array $kingdomColors
      */
     public static $kingdomColors = [
-        self::SURFACE   => '#879bc2',
-        self::LABYRINTH => '#ff99c4',
-        self::DUNGEONS  => '#10eb2e',
-        self::HELL      => '#1194d1',
-        self::PURGATORY => '#000000',
+        self::SURFACE      => '#879bc2',
+        self::LABYRINTH    => '#ff99c4',
+        self::DUNGEONS     => '#10eb2e',
+        self::SHADOW_PLANE => '#000000',
+        self::HELL         => '#1194d1',
+        self::PURGATORY    => '#000000',
     ];
 
     /**
@@ -130,7 +131,7 @@ class MapNameValue {
                     'drop_chance_bonus'            => 0.30,
                     'enemy_stat_bonus'             => 0.30,
                     'character_attack_reduction'   => 0.25,
-                    'required_location_id'         => Location::where('type', LocationType::TEAR_FABRIC_TIME),
+                    'required_location_id'         => Location::where('type', LocationType::TEAR_FABRIC_TIME)->first()->id,
                 ];
             case self::SURFACE:
             case self::LABYRINTH:

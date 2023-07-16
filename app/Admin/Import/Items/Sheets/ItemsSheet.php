@@ -15,18 +15,21 @@ class ItemsSheet implements ToCollection {
     public function collection(Collection $rows) {
         foreach ($rows as $index => $row) {
             if ($index !== 0) {
-                $item = array_combine($rows[0]->toArray(), $row->toArray());
+                $item      = array_combine($rows[0]->toArray(), $row->toArray());
+                $gameClass = null;
 
-                $skill     = GameSkill::where('name', $item['skill_name'])->first();
+                if (isset($item['unlocks_class_id'])) {
+                    $skill     = GameSkill::where('name', $item['skill_name'])->first();
 
-                $gameClass = GameClass::where('name', $item['unlocks_class_id'])->first();
-
-                if (is_null($gameClass) && !is_null($item['unlocks_class_id'])) {
-                    continue;
-                }
-
-                if (is_null($skill) && !is_null($item['skill_name'])) {
-                    continue;
+                    $gameClass = GameClass::where('name', $item['unlocks_class_id'])->first();
+    
+                    if (is_null($gameClass) && !is_null($item['unlocks_class_id'])) {
+                        continue;
+                    }
+    
+                    if (is_null($skill) && !is_null($item['skill_name'])) {
+                        continue;
+                    }
                 }
 
                 $itemData = $this->returnCleanItem($item);

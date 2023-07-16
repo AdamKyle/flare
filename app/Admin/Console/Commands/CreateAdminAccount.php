@@ -68,9 +68,13 @@ class CreateAdminAccount extends Command
         // Token for password reset:
         $token = app('Password')::getRepository()->create($user);
 
-        // Mail the user their new credentials.
-        Mail::to($user->email)->send((new GeneratedAdmin($user, $token)));
+        if (is_null(config('mail.username'))) {
+            return $this->line('Please use the following link to reset your password: ' . route('password.reset', $token));
+        } else {
+             // Mail the user their new credentials.
+            Mail::to($user->email)->send((new GeneratedAdmin($user, $token)));
 
-        return $this->info('User created successfully. Email has been sent.');
+            return $this->info('User created successfully. Email has been sent.');
+        }
     }
 }

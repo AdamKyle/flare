@@ -43,6 +43,7 @@ class EventsSheet implements ToCollection {
 
             $scheduledEvent->update($eventData);
         } else {
+            
             ScheduledEvent::create($eventData);
         }
     }

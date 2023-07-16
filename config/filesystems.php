@@ -84,6 +84,12 @@ return [
             'visibility' => 'private',
         ],
 
+        'data-maps' => [
+            'driver' => 'local',
+            'root' => resource_path('maps'),
+            'visibility' => 'private',
+        ],
+
     ],
 
 ];

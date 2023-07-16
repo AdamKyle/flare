@@ -9,6 +9,8 @@ use App\Admin\Import\Events\EventsImport;
 use App\Admin\Import\GuideQuests\GuideQuests;
 use App\Admin\Import\Items\ItemsImport;
 use App\Admin\Import\ItemSkills\ItemSkillsImport;
+use App\Admin\Import\Kingdoms\KingdomsImport;
+use App\Admin\Import\Locations\LocationsImport;
 use App\Admin\Import\Monsters\MonstersImport;
 use App\Admin\Import\Npcs\NpcsImport;
 use App\Admin\Import\PassiveSkills\PassiveSkillsImport;
@@ -16,7 +18,6 @@ use App\Admin\Import\Quests\QuestsImport;
 use App\Admin\Import\Races\RacesImport;
 use App\Admin\Import\Raids\RaidsImport;
 use App\Admin\Import\Skills\SkillsImport;
-use App\Admin\Requests\KingdomImport;
 use Maatwebsite\Excel\Facades\Excel;
 
 class ExcelMapper {
@@ -42,11 +43,12 @@ class ExcelMapper {
             SkillsImport::class,
         ],
         'Kingdoms'      => [
-            KingdomImport::class,
             PassiveSkillsImport::class,
+            KingdomsImport::class,
         ],
         '.'             => [
             ClassSpecialsImport::class,
+            LocationsImport::class,
             NpcsImport::class,
             QuestsImport::class,
         ]

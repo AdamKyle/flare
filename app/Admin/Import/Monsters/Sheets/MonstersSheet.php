@@ -22,7 +22,7 @@ class MonstersSheet implements ToCollection {
                     continue;
                 }
 
-                if (isset($monster['is_raid_boss']) || isset($monster['is_raid_monster'])) {
+                if (isset($monster['is_raid_boss']) && isset($monster['is_raid_monster'])) {
                     continue;
                 }
 

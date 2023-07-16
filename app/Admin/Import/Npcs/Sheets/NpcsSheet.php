@@ -22,10 +22,10 @@ class NpcsSheet implements ToCollection {
         }
     }
 
-    protected function returnCleanData(array $buildingData): array {
+    protected function returnCleanData(array $npcData): array {
         $cleanData = [];
 
-        foreach ($buildingData as $key => $value) {
+        foreach ($npcData as $key => $value) {
             if (!is_null($value)) {
                 if ($key === 'game_map_id') {
                     $gameMap = GameMap::where('name', $value)->first();
