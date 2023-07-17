@@ -4,20 +4,6 @@
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
-DROP TABLE IF EXISTS `adventure_floor_descriptions`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `adventure_floor_descriptions` (
-  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `adventure_id` bigint unsigned NOT NULL,
-  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `adventure_floor_descriptions_adventure_id_foreign` (`adventure_id`),
-  CONSTRAINT `adventure_floor_descriptions_adventure_id_foreign` FOREIGN KEY (`adventure_id`) REFERENCES `adventures` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `adventure_location`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
@@ -32,29 +18,6 @@ CREATE TABLE `adventure_location` (
   KEY `adventure_location_location_id_foreign` (`location_id`),
   CONSTRAINT `adventure_location_adventure_id_foreign` FOREIGN KEY (`adventure_id`) REFERENCES `adventures` (`id`),
   CONSTRAINT `adventure_location_location_id_foreign` FOREIGN KEY (`location_id`) REFERENCES `locations` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `adventure_logs`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `adventure_logs` (
-  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `character_id` bigint unsigned NOT NULL,
-  `adventure_id` bigint unsigned NOT NULL,
-  `in_progress` tinyint(1) DEFAULT '0',
-  `complete` tinyint(1) DEFAULT '0',
-  `last_completed_level` int DEFAULT NULL,
-  `logs` json DEFAULT NULL,
-  `rewards` json DEFAULT NULL,
-  `took_to_long` tinyint(1) DEFAULT '0',
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `over_flow_set_id` bigint unsigned DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `adventure_logs_character_id_foreign` (`character_id`),
-  KEY `adventure_logs_over_flow_set_id_foreign` (`over_flow_set_id`),
-  CONSTRAINT `adventure_logs_character_id_foreign` FOREIGN KEY (`character_id`) REFERENCES `characters` (`id`),
-  CONSTRAINT `adventure_logs_over_flow_set_id_foreign` FOREIGN KEY (`over_flow_set_id`) REFERENCES `inventory_sets` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `adventure_monster`;
@@ -73,27 +36,19 @@ CREATE TABLE `adventure_monster` (
   CONSTRAINT `adventure_monster_monster_id_foreign` FOREIGN KEY (`monster_id`) REFERENCES `monsters` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `adventures`;
+DROP TABLE IF EXISTS `announcements`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `adventures` (
+CREATE TABLE `announcements` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `reward_item_id` bigint unsigned DEFAULT NULL,
-  `levels` int NOT NULL,
-  `time_per_level` int NOT NULL,
-  `gold_rush_chance` double(5,4) DEFAULT '0.0000',
-  `item_find_chance` double(5,4) DEFAULT '0.0000',
-  `skill_exp_bonus` double(5,4) DEFAULT '0.0000',
-  `exp_bonus` double(5,4) DEFAULT '0.0000',
-  `published` tinyint(1) DEFAULT '1',
+  `message` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `expires_at` datetime NOT NULL,
+  `event_id` bigint unsigned NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  `location_id` bigint unsigned DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `adventures_location_id_foreign` (`location_id`),
-  CONSTRAINT `adventures_location_id_foreign` FOREIGN KEY (`location_id`) REFERENCES `locations` (`id`)
+  KEY `announcements_event_id_foreign` (`event_id`),
+  CONSTRAINT `announcements_event_id_foreign` FOREIGN KEY (`event_id`) REFERENCES `events` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `audits`;
@@ -174,7 +129,7 @@ DROP TABLE IF EXISTS `character_automations`;
 CREATE TABLE `character_automations` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `character_id` bigint unsigned NOT NULL,
-  `monster_id` bigint unsigned NOT NULL,
+  `monster_id` bigint unsigned DEFAULT NULL,
   `type` int NOT NULL,
   `started_at` datetime NOT NULL,
   `completed_at` datetime NOT NULL,
@@ -197,33 +152,72 @@ DROP TABLE IF EXISTS `character_boons`;
 CREATE TABLE `character_boons` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `character_id` bigint unsigned DEFAULT NULL,
-  `type` int NOT NULL,
-  `stat_bonus` decimal(8,4) DEFAULT '0.0000',
-  `affect_skill_type` int DEFAULT NULL,
-  `skill_bonus` decimal(8,4) DEFAULT '0.0000',
-  `base_damage_mod_bonus` decimal(8,4) DEFAULT NULL,
-  `base_healing_mod_bonus` decimal(8,4) DEFAULT NULL,
-  `base_ac_mod_bonus` decimal(8,4) DEFAULT NULL,
-  `fight_time_out_mod_bonus` decimal(8,4) DEFAULT NULL,
-  `move_time_out_mod_bonus` decimal(8,4) DEFAULT NULL,
-  `skill_training_bonus` decimal(8,4) DEFAULT '0.0000',
   `started` datetime NOT NULL,
   `complete` datetime NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  `str_mod` decimal(8,4) DEFAULT '0.0000',
-  `dex_mod` decimal(8,4) DEFAULT '0.0000',
-  `dur_mod` decimal(8,4) DEFAULT '0.0000',
-  `int_mod` decimal(8,4) DEFAULT '0.0000',
-  `chr_mod` decimal(8,4) DEFAULT '0.0000',
-  `focus_mod` decimal(8,4) DEFAULT '0.0000',
-  `agi_mod` decimal(8,4) DEFAULT '0.0000',
-  `base_damage_mod` decimal(8,4) DEFAULT NULL,
-  `base_healing_mod` decimal(8,4) DEFAULT NULL,
-  `base_ac_mod` decimal(8,4) DEFAULT NULL,
+  `item_id` bigint unsigned NOT NULL,
   PRIMARY KEY (`id`),
   KEY `character_boons_character_id_foreign` (`character_id`),
-  CONSTRAINT `character_boons_character_id_foreign` FOREIGN KEY (`character_id`) REFERENCES `characters` (`id`)
+  KEY `character_boons_item_id_foreign` (`item_id`),
+  CONSTRAINT `character_boons_character_id_foreign` FOREIGN KEY (`character_id`) REFERENCES `characters` (`id`),
+  CONSTRAINT `character_boons_item_id_foreign` FOREIGN KEY (`item_id`) REFERENCES `items` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `character_class_ranks`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `character_class_ranks` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `character_id` bigint unsigned NOT NULL,
+  `game_class_id` bigint unsigned NOT NULL,
+  `current_xp` int NOT NULL,
+  `required_xp` int NOT NULL,
+  `level` int NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `character_class_ranks_character_id_foreign` (`character_id`),
+  KEY `character_class_ranks_game_class_id_foreign` (`game_class_id`),
+  CONSTRAINT `character_class_ranks_character_id_foreign` FOREIGN KEY (`character_id`) REFERENCES `characters` (`id`),
+  CONSTRAINT `character_class_ranks_game_class_id_foreign` FOREIGN KEY (`game_class_id`) REFERENCES `game_classes` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `character_class_ranks_weapon_masteries`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `character_class_ranks_weapon_masteries` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `character_class_rank_id` bigint unsigned NOT NULL,
+  `weapon_type` int NOT NULL,
+  `current_xp` int NOT NULL,
+  `required_xp` int NOT NULL,
+  `level` int NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ccrank_id` (`character_class_rank_id`),
+  CONSTRAINT `ccrank_id` FOREIGN KEY (`character_class_rank_id`) REFERENCES `character_class_ranks` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `character_class_specialties_equipped`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `character_class_specialties_equipped` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `character_id` bigint unsigned NOT NULL,
+  `game_class_special_id` bigint unsigned NOT NULL,
+  `level` int NOT NULL,
+  `current_xp` int NOT NULL,
+  `required_xp` int NOT NULL,
+  `equipped` tinyint(1) NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `cc_se_c_id` (`character_id`),
+  KEY `cc_se_gcs_id` (`game_class_special_id`),
+  CONSTRAINT `cc_se_c_id` FOREIGN KEY (`character_id`) REFERENCES `characters` (`id`),
+  CONSTRAINT `cc_se_gcs_id` FOREIGN KEY (`game_class_special_id`) REFERENCES `game_class_specials` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `character_in_celestial_fights`;
@@ -242,6 +236,27 @@ CREATE TABLE `character_in_celestial_fights` (
   KEY `character_in_celestial_fights_character_id_foreign` (`character_id`),
   CONSTRAINT `character_in_celestial_fights_celestial_fight_id_foreign` FOREIGN KEY (`celestial_fight_id`) REFERENCES `celestial_fights` (`id`),
   CONSTRAINT `character_in_celestial_fights_character_id_foreign` FOREIGN KEY (`character_id`) REFERENCES `characters` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `character_mercenaries`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `character_mercenaries` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `character_id` bigint unsigned NOT NULL,
+  `mercenary_type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `current_level` int NOT NULL,
+  `current_xp` int NOT NULL,
+  `xp_required` int NOT NULL,
+  `reincarnated_bonus` decimal(12,4) NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `xp_increase` decimal(12,4) DEFAULT NULL,
+  `times_reincarnated` int DEFAULT NULL,
+  `xp_buff` decimal(8,4) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `character_mercenaries_character_id_foreign` (`character_id`),
+  CONSTRAINT `character_mercenaries_character_id_foreign` FOREIGN KEY (`character_id`) REFERENCES `characters` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `character_passive_skills`;
@@ -282,7 +297,7 @@ CREATE TABLE `characters` (
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `damage_stat` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `level` bigint DEFAULT '1',
-  `xp` double(8,2) NOT NULL,
+  `xp` int NOT NULL,
   `xp_next` bigint NOT NULL,
   `str` bigint NOT NULL,
   `dur` bigint NOT NULL,
@@ -295,14 +310,12 @@ CREATE TABLE `characters` (
   `gold` bigint DEFAULT '250',
   `inventory_max` int DEFAULT '75',
   `can_attack` tinyint(1) DEFAULT '1',
-  `can_adventure` tinyint(1) DEFAULT '1',
   `can_move` tinyint(1) DEFAULT '1',
   `can_craft` tinyint(1) DEFAULT '1',
   `is_dead` tinyint(1) DEFAULT '0',
   `can_move_again_at` datetime DEFAULT NULL,
   `can_attack_again_at` datetime DEFAULT NULL,
   `can_craft_again_at` datetime DEFAULT NULL,
-  `can_adventure_again_at` datetime DEFAULT NULL,
   `force_name_change` tinyint(1) DEFAULT '0',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -314,6 +327,17 @@ CREATE TABLE `characters` (
   `is_mass_embezzling` tinyint(1) NOT NULL DEFAULT '0',
   `can_settle_again_at` datetime DEFAULT NULL,
   `copper_coins` bigint NOT NULL DEFAULT '0',
+  `killed_in_pvp` tinyint(1) NOT NULL DEFAULT '0',
+  `can_spin_again_at` datetime DEFAULT NULL,
+  `can_spin` tinyint(1) NOT NULL DEFAULT '1',
+  `is_mercenary_unlocked` tinyint(1) DEFAULT '0',
+  `can_engage_celestials_again_at` datetime DEFAULT NULL,
+  `can_engage_celestials` tinyint(1) DEFAULT '1',
+  `xp_penalty` decimal(20,2) DEFAULT '0.00',
+  `reincarnated_stat_increase` bigint DEFAULT '0',
+  `times_reincarnated` bigint DEFAULT '0',
+  `base_stat_mod` decimal(12,4) NOT NULL DEFAULT '0.0000',
+  `base_damage_stat_mod` decimal(12,4) NOT NULL DEFAULT '0.0000',
   PRIMARY KEY (`id`),
   UNIQUE KEY `characters_name_unique` (`name`),
   KEY `characters_game_race_id_foreign` (`game_race_id`),
@@ -322,6 +346,22 @@ CREATE TABLE `characters` (
   CONSTRAINT `characters_game_class_id_foreign` FOREIGN KEY (`game_class_id`) REFERENCES `game_classes` (`id`),
   CONSTRAINT `characters_game_race_id_foreign` FOREIGN KEY (`game_race_id`) REFERENCES `game_races` (`id`),
   CONSTRAINT `characters_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `events`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `events` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `type` int NOT NULL,
+  `started_at` datetime NOT NULL,
+  `ends_at` datetime NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `raid_id` bigint unsigned DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `events_raid_id_foreign` (`raid_id`),
+  CONSTRAINT `events_raid_id_foreign` FOREIGN KEY (`raid_id`) REFERENCES `raids` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `factions`;
@@ -397,6 +437,7 @@ CREATE TABLE `game_buildings` (
   `clay_cost` int NOT NULL DEFAULT '0',
   `stone_cost` int NOT NULL DEFAULT '0',
   `iron_cost` int NOT NULL DEFAULT '0',
+  `steel_cost` int DEFAULT '0',
   `time_to_build` double NOT NULL DEFAULT '1',
   `time_increase_amount` double NOT NULL DEFAULT '0',
   `decrease_morale_amount` double NOT NULL DEFAULT '0',
@@ -413,9 +454,41 @@ CREATE TABLE `game_buildings` (
   `is_locked` tinyint(1) NOT NULL DEFAULT '0',
   `passive_skill_id` bigint unsigned DEFAULT NULL,
   `level_required` int DEFAULT NULL,
+  `is_special` tinyint(1) DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `gb_psk` (`passive_skill_id`),
   CONSTRAINT `gb_psk` FOREIGN KEY (`passive_skill_id`) REFERENCES `passive_skills` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `game_class_specials`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `game_class_specials` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `game_class_id` bigint unsigned NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `requires_class_rank_level` int NOT NULL,
+  `specialty_damage` int DEFAULT '0',
+  `increase_specialty_damage_per_level` int DEFAULT '0',
+  `specialty_damage_uses_damage_stat_amount` decimal(8,4) DEFAULT '0.0000',
+  `base_damage_mod` decimal(8,4) DEFAULT '0.0000',
+  `base_ac_mod` decimal(8,4) DEFAULT '0.0000',
+  `base_healing_mod` decimal(8,4) DEFAULT '0.0000',
+  `base_spell_damage_mod` decimal(8,4) DEFAULT '0.0000',
+  `health_mod` decimal(8,4) DEFAULT '0.0000',
+  `base_damage_stat_increase` decimal(8,4) DEFAULT '0.0000',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `attack_type_required` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT 'any',
+  `spell_evasion` decimal(12,8) DEFAULT NULL,
+  `affix_damage_reduction` decimal(12,8) DEFAULT NULL,
+  `healing_reduction` decimal(12,8) DEFAULT NULL,
+  `skill_reduction` decimal(12,8) DEFAULT NULL,
+  `resistance_reduction` decimal(12,8) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `gc_specials` (`game_class_id`),
+  CONSTRAINT `gc_specials` FOREIGN KEY (`game_class_id`) REFERENCES `game_classes` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `game_classes`;
@@ -439,6 +512,10 @@ CREATE TABLE `game_classes` (
   `updated_at` timestamp NULL DEFAULT NULL,
   `agi_mod` int DEFAULT '0',
   `focus_mod` int DEFAULT '0',
+  `primary_required_class_id` bigint unsigned DEFAULT NULL,
+  `secondary_required_class_id` bigint unsigned DEFAULT NULL,
+  `primary_required_class_level` int DEFAULT NULL,
+  `secondary_required_class_level` int DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -501,7 +578,6 @@ CREATE TABLE `game_skills` (
   `move_time_out_mod_bonus_per_level` decimal(10,6) DEFAULT NULL,
   `can_train` tinyint(1) DEFAULT '1',
   `skill_bonus_per_level` decimal(5,4) DEFAULT NULL,
-  `can_monsters_have_skill` tinyint(1) DEFAULT '0',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `type` int DEFAULT NULL,
@@ -510,6 +586,7 @@ CREATE TABLE `game_skills` (
   `unit_time_reduction` decimal(8,4) DEFAULT '0.0000',
   `building_time_reduction` decimal(8,4) DEFAULT '0.0000',
   `unit_movement_time_reduction` decimal(8,4) DEFAULT '0.0000',
+  `class_bonus` decimal(12,6) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `game_skills_game_class_id_foreign` (`game_class_id`),
   CONSTRAINT `game_skills_game_class_id_foreign` FOREIGN KEY (`game_class_id`) REFERENCES `game_classes` (`id`)
@@ -524,27 +601,104 @@ CREATE TABLE `game_units` (
   `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `attack` int NOT NULL,
   `defence` int NOT NULL,
-  `can_not_be_healed` tinyint(1) NOT NULL DEFAULT '0',
-  `is_settler` tinyint(1) NOT NULL DEFAULT '0',
+  `can_not_be_healed` tinyint(1) DEFAULT '0',
+  `is_settler` tinyint(1) DEFAULT '0',
   `reduces_morale_by` double DEFAULT NULL,
-  `can_heal` tinyint(1) NOT NULL DEFAULT '0',
+  `can_heal` tinyint(1) DEFAULT '0',
   `heal_percentage` double DEFAULT NULL,
-  `siege_weapon` tinyint(1) NOT NULL DEFAULT '0',
-  `attacks_walls` tinyint(1) NOT NULL DEFAULT '0',
-  `attacks_buildings` tinyint(1) NOT NULL DEFAULT '0',
-  `defender` tinyint(1) NOT NULL DEFAULT '0',
-  `attacker` tinyint(1) NOT NULL DEFAULT '0',
-  `primary_target` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `fall_back` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `travel_time` int NOT NULL,
-  `wood_cost` int NOT NULL,
-  `clay_cost` int NOT NULL,
-  `stone_cost` int NOT NULL,
-  `iron_cost` int NOT NULL,
-  `required_population` int NOT NULL,
+  `siege_weapon` tinyint(1) DEFAULT '0',
+  `is_airship` tinyint(1) DEFAULT '0',
+  `defender` tinyint(1) DEFAULT '0',
+  `attacker` tinyint(1) DEFAULT '0',
+  `wood_cost` int DEFAULT '0',
+  `clay_cost` int DEFAULT '0',
+  `stone_cost` int DEFAULT '0',
+  `iron_cost` int DEFAULT '0',
+  `steel_cost` int DEFAULT '0',
+  `required_population` int DEFAULT '0',
   `time_to_recruit` int NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
+  `is_special` tinyint(1) DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `gem_bag_slots`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `gem_bag_slots` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `gem_bag_id` bigint unsigned NOT NULL,
+  `gem_id` bigint unsigned NOT NULL,
+  `amount` int NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `gem_bag_slots_gem_bag_id_foreign` (`gem_bag_id`),
+  KEY `gem_bag_slots_gem_id_foreign` (`gem_id`),
+  CONSTRAINT `gem_bag_slots_gem_bag_id_foreign` FOREIGN KEY (`gem_bag_id`) REFERENCES `gem_bags` (`id`),
+  CONSTRAINT `gem_bag_slots_gem_id_foreign` FOREIGN KEY (`gem_id`) REFERENCES `gems` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `gem_bags`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `gem_bags` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `character_id` bigint unsigned NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `gem_bags_character_id_foreign` (`character_id`),
+  CONSTRAINT `gem_bags_character_id_foreign` FOREIGN KEY (`character_id`) REFERENCES `characters` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `gems`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `gems` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `tier` int NOT NULL,
+  `primary_atonement_type` int NOT NULL,
+  `secondary_atonement_type` int NOT NULL,
+  `tertiary_atonement_type` int NOT NULL,
+  `primary_atonement_amount` decimal(12,8) NOT NULL,
+  `secondary_atonement_amount` decimal(12,8) NOT NULL,
+  `tertiary_atonement_amount` decimal(12,8) NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `guide_quests`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `guide_quests` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `intro_text` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `instructions` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `required_level` bigint DEFAULT NULL,
+  `required_skill` bigint DEFAULT NULL,
+  `required_skill_level` bigint DEFAULT NULL,
+  `required_faction_id` bigint DEFAULT NULL,
+  `required_faction_level` bigint DEFAULT NULL,
+  `required_game_map_id` bigint DEFAULT NULL,
+  `required_quest_id` bigint DEFAULT NULL,
+  `required_quest_item_id` bigint DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `reward_level` bigint NOT NULL,
+  `gold_dust_reward` bigint DEFAULT NULL,
+  `shards_reward` bigint DEFAULT NULL,
+  `required_kingdoms` int DEFAULT NULL,
+  `required_kingdom_level` int DEFAULT NULL,
+  `required_kingdom_units` int DEFAULT NULL,
+  `required_passive_skill` int DEFAULT NULL,
+  `required_passive_level` int DEFAULT NULL,
+  `faction_points_per_kill` int DEFAULT NULL,
+  `required_shards` int DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -561,6 +715,18 @@ CREATE TABLE `holy_stacks` (
   PRIMARY KEY (`id`),
   KEY `holy_stacks_item_id_foreign` (`item_id`),
   CONSTRAINT `holy_stacks_item_id_foreign` FOREIGN KEY (`item_id`) REFERENCES `items` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `info_pages`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `info_pages` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `page_name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `page_sections` json NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `inventories`;
@@ -639,15 +805,9 @@ CREATE TABLE `item_affixes` (
   `agi_mod` decimal(5,4) DEFAULT '0.0000',
   `focus_mod` decimal(5,4) DEFAULT '0.0000',
   `affects_skill_type` int DEFAULT NULL,
-  `base_damage_mod_bonus` decimal(8,4) DEFAULT '0.0000',
-  `base_healing_mod_bonus` decimal(8,4) DEFAULT '0.0000',
-  `base_ac_mod_bonus` decimal(8,4) DEFAULT '0.0000',
-  `fight_time_out_mod_bonus` decimal(8,4) DEFAULT '0.0000',
-  `move_time_out_mod_bonus` decimal(8,4) DEFAULT '0.0000',
   `damage` bigint DEFAULT '0',
   `damage_can_stack` tinyint(1) NOT NULL DEFAULT '0',
   `irresistible_damage` tinyint(1) NOT NULL DEFAULT '0',
-  `class_bonus` decimal(8,4) DEFAULT '0.0000',
   `str_reduction` decimal(5,4) DEFAULT '0.0000',
   `dur_reduction` decimal(5,4) DEFAULT '0.0000',
   `dex_reduction` decimal(5,4) DEFAULT '0.0000',
@@ -662,7 +822,69 @@ CREATE TABLE `item_affixes` (
   `skill_reduction` decimal(8,4) DEFAULT '0.0000',
   `resistance_reduction` decimal(8,4) DEFAULT '0.0000',
   `randomly_generated` tinyint(1) NOT NULL DEFAULT '0',
+  `affix_type` int NOT NULL,
   PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `item_skill_progressions`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `item_skill_progressions` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `item_id` bigint unsigned NOT NULL,
+  `item_skill_id` bigint unsigned NOT NULL,
+  `current_level` int NOT NULL,
+  `current_kill` int NOT NULL,
+  `is_training` tinyint(1) NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `item_skill_progressions_item_id_foreign` (`item_id`),
+  KEY `item_skill_progressions_item_skill_id_foreign` (`item_skill_id`),
+  CONSTRAINT `item_skill_progressions_item_id_foreign` FOREIGN KEY (`item_id`) REFERENCES `items` (`id`),
+  CONSTRAINT `item_skill_progressions_item_skill_id_foreign` FOREIGN KEY (`item_skill_id`) REFERENCES `item_skills` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `item_skills`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `item_skills` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `str_mod` decimal(12,8) DEFAULT '0.00000000',
+  `dex_mod` decimal(12,8) DEFAULT '0.00000000',
+  `dur_mod` decimal(12,8) DEFAULT '0.00000000',
+  `chr_mod` decimal(12,8) DEFAULT '0.00000000',
+  `focus_mod` decimal(12,8) DEFAULT '0.00000000',
+  `int_mod` decimal(12,8) DEFAULT '0.00000000',
+  `agi_mod` decimal(12,8) DEFAULT '0.00000000',
+  `base_damage_mod` decimal(12,8) DEFAULT '0.00000000',
+  `base_ac_mod` decimal(12,8) DEFAULT '0.00000000',
+  `base_healing_mod` decimal(12,8) DEFAULT '0.00000000',
+  `max_level` int NOT NULL,
+  `total_kills_needed` int NOT NULL,
+  `parent_level_needed` int DEFAULT NULL,
+  `parent_id` bigint unsigned DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `item_sockets`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `item_sockets` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `item_id` bigint unsigned NOT NULL,
+  `gem_id` bigint unsigned DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `item_sockets_item_id_foreign` (`item_id`),
+  KEY `item_sockets_gem_id_foreign` (`gem_id`),
+  CONSTRAINT `item_sockets_gem_id_foreign` FOREIGN KEY (`gem_id`) REFERENCES `gems` (`id`),
+  CONSTRAINT `item_sockets_item_id_foreign` FOREIGN KEY (`item_id`) REFERENCES `items` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `items`;
@@ -734,9 +956,25 @@ CREATE TABLE `items` (
   `can_use_on_other_items` tinyint(1) NOT NULL DEFAULT '0',
   `holy_level` int DEFAULT NULL,
   `holy_stacks` int DEFAULT '0',
+  `ambush_chance` decimal(8,4) DEFAULT '0.0000',
+  `ambush_resistance` decimal(8,4) DEFAULT '0.0000',
+  `counter_chance` decimal(8,4) DEFAULT '0.0000',
+  `counter_resistance` decimal(8,4) DEFAULT '0.0000',
+  `is_mythic` tinyint(1) NOT NULL DEFAULT '0',
+  `copper_coin_cost` int DEFAULT '0',
+  `specialty_type` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `gold_bars_cost` bigint DEFAULT NULL,
+  `can_stack` tinyint(1) NOT NULL DEFAULT '0',
+  `gains_additional_level` tinyint(1) NOT NULL DEFAULT '0',
+  `unlocks_class_id` bigint unsigned DEFAULT NULL,
+  `socket_count` int DEFAULT '0',
+  `has_gems_socketed` tinyint(1) NOT NULL DEFAULT '0',
+  `item_skill_id` bigint unsigned DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `items_drop_location_id_foreign` (`drop_location_id`),
-  CONSTRAINT `items_drop_location_id_foreign` FOREIGN KEY (`drop_location_id`) REFERENCES `locations` (`id`)
+  KEY `items_item_skill_id_foreign` (`item_skill_id`),
+  CONSTRAINT `items_drop_location_id_foreign` FOREIGN KEY (`drop_location_id`) REFERENCES `locations` (`id`),
+  CONSTRAINT `items_item_skill_id_foreign` FOREIGN KEY (`item_skill_id`) REFERENCES `item_skills` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `kingdom_buildings`;
@@ -769,15 +1007,20 @@ CREATE TABLE `kingdom_logs` (
   `character_id` bigint unsigned NOT NULL,
   `from_kingdom_id` bigint unsigned DEFAULT NULL,
   `to_kingdom_id` bigint unsigned DEFAULT NULL,
-  `status` enum('attacked kingdom','lost attack','taken kingdom','lost kingdom','kingdom attacked','units returning','bombs dropped') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `status` int NOT NULL,
   `units_sent` json DEFAULT NULL,
   `units_survived` json DEFAULT NULL,
-  `old_defender` json DEFAULT NULL,
-  `new_defender` json DEFAULT NULL,
   `published` tinyint(1) NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `opened` tinyint(1) NOT NULL DEFAULT '0',
+  `old_buildings` json NOT NULL,
+  `new_buildings` json NOT NULL,
+  `old_units` json NOT NULL,
+  `new_units` json NOT NULL,
+  `morale_loss` decimal(5,4) NOT NULL,
+  `item_damage` decimal(12,4) DEFAULT NULL,
+  `attacking_character_id` bigint DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `kl_character_id` (`character_id`),
   KEY `kl_from_king_id` (`from_kingdom_id`),
@@ -833,6 +1076,9 @@ CREATE TABLE `kingdoms` (
   `last_walked` timestamp NULL DEFAULT NULL,
   `npc_owned` tinyint(1) NOT NULL DEFAULT '0',
   `gold_bars` int DEFAULT '0',
+  `protected_until` date DEFAULT NULL,
+  `max_steel` bigint DEFAULT '0',
+  `current_steel` bigint DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `king_cid` (`character_id`),
   KEY `king_gmid` (`game_map_id`),
@@ -857,6 +1103,10 @@ CREATE TABLE `locations` (
   `enemy_strength_type` int DEFAULT NULL,
   `required_quest_item_id` bigint unsigned DEFAULT NULL,
   `type` int DEFAULT NULL,
+  `can_players_enter` tinyint(1) NOT NULL,
+  `raid_id` bigint DEFAULT NULL,
+  `has_raid_boss` tinyint(1) NOT NULL DEFAULT '0',
+  `is_corrupted` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `locations_game_map_id_foreign` (`game_map_id`),
   KEY `locations_required_quest_item_id_foreign` (`required_quest_item_id`),
@@ -908,7 +1158,7 @@ DROP TABLE IF EXISTS `market_history`;
 CREATE TABLE `market_history` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `item_id` bigint unsigned NOT NULL,
-  `sold_for` int NOT NULL,
+  `sold_for` bigint NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -944,6 +1194,7 @@ CREATE TABLE `messages` (
   `color` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
+  `hide_location` tinyint(1) DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `messages_user_id_foreign` (`user_id`),
   KEY `messages_from_user_foreign` (`from_user`),
@@ -1003,12 +1254,11 @@ CREATE TABLE `monsters` (
   `ac` bigint NOT NULL,
   `max_level` int DEFAULT '0',
   `damage_stat` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `xp` int NOT NULL,
+  `xp` bigint NOT NULL,
   `drop_check` decimal(5,4) NOT NULL,
-  `gold` int DEFAULT '10',
+  `gold` bigint DEFAULT '10',
   `health_range` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `attack_range` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `published` tinyint(1) DEFAULT '1',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `quest_item_id` bigint unsigned DEFAULT NULL,
@@ -1018,12 +1268,9 @@ CREATE TABLE `monsters` (
   `gold_cost` int DEFAULT NULL,
   `gold_dust_cost` int DEFAULT NULL,
   `can_cast` tinyint(1) NOT NULL DEFAULT '0',
-  `can_use_artifacts` tinyint(1) NOT NULL DEFAULT '0',
   `max_spell_damage` bigint DEFAULT '0',
-  `max_artifact_damage` bigint DEFAULT '0',
   `shards` int DEFAULT '0',
   `spell_evasion` decimal(8,4) DEFAULT '0.0000',
-  `artifact_annulment` decimal(8,4) DEFAULT '0.0000',
   `affix_resistance` decimal(8,4) DEFAULT '0.0000',
   `max_affix_damage` bigint DEFAULT '0',
   `healing_percentage` decimal(8,4) DEFAULT '0.0000',
@@ -1034,6 +1281,18 @@ CREATE TABLE `monsters` (
   `dodge` decimal(8,4) DEFAULT '0.0000',
   `criticality` decimal(8,4) DEFAULT '0.0000',
   `devouring_darkness_chance` decimal(8,4) DEFAULT '0.0000',
+  `ambush_chance` decimal(8,4) DEFAULT '0.0000',
+  `ambush_resistance` decimal(8,4) DEFAULT '0.0000',
+  `counter_chance` decimal(8,4) DEFAULT '0.0000',
+  `counter_resistance` decimal(8,4) DEFAULT '0.0000',
+  `celestial_type` int DEFAULT NULL,
+  `is_raid_monster` tinyint(1) NOT NULL DEFAULT '0',
+  `is_raid_boss` tinyint(1) NOT NULL DEFAULT '0',
+  `raid_special_attack_type` int DEFAULT NULL,
+  `fire_atonement` decimal(8,4) DEFAULT NULL,
+  `ice_atonement` decimal(8,4) DEFAULT NULL,
+  `water_atonement` decimal(8,4) DEFAULT NULL,
+  `life_stealing_resistance` decimal(8,4) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `monsters_quest_item_id_foreign` (`quest_item_id`),
   KEY `monsters_game_map_id_foreign` (`game_map_id`),
@@ -1041,42 +1300,18 @@ CREATE TABLE `monsters` (
   CONSTRAINT `monsters_quest_item_id_foreign` FOREIGN KEY (`quest_item_id`) REFERENCES `items` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `notifications`;
+DROP TABLE IF EXISTS `monthly_pvp_participants`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `notifications` (
+CREATE TABLE `monthly_pvp_participants` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `character_id` bigint unsigned NOT NULL,
-  `adventure_id` bigint unsigned DEFAULT NULL,
-  `title` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `message` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `status` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `read` tinyint(1) DEFAULT '0',
-  `url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
+  `attack_type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `notifications_character_id_foreign` (`character_id`),
-  KEY `notifications_adventure_id_foreign` (`adventure_id`),
-  CONSTRAINT `notifications_adventure_id_foreign` FOREIGN KEY (`adventure_id`) REFERENCES `adventures` (`id`),
-  CONSTRAINT `notifications_character_id_foreign` FOREIGN KEY (`character_id`) REFERENCES `characters` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `npc_commands`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `npc_commands` (
-  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `npc_id` bigint unsigned NOT NULL,
-  `command` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `command_type` int NOT NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `npc_commands_command_unique` (`command`),
-  KEY `npc_commands_npc_id_foreign` (`npc_id`),
-  CONSTRAINT `npc_commands_npc_id_foreign` FOREIGN KEY (`npc_id`) REFERENCES `npcs` (`id`)
+  KEY `m_pvp_p_ch` (`character_id`),
+  CONSTRAINT `m_pvp_p_ch` FOREIGN KEY (`character_id`) REFERENCES `characters` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `npcs`;
@@ -1088,9 +1323,6 @@ CREATE TABLE `npcs` (
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `real_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `type` int NOT NULL,
-  `moves_around_map` tinyint(1) NOT NULL DEFAULT '0',
-  `must_be_at_same_location` tinyint(1) NOT NULL DEFAULT '0',
-  `text_command_to_message` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `x_position` int NOT NULL,
   `y_position` int NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
@@ -1170,6 +1402,13 @@ CREATE TABLE `quests` (
   `required_faction_level` int DEFAULT NULL,
   `access_to_map_id` bigint unsigned DEFAULT NULL,
   `copper_coin_cost` bigint DEFAULT '0',
+  `before_completion_description` longtext COLLATE utf8mb4_unicode_ci,
+  `after_completion_description` longtext COLLATE utf8mb4_unicode_ci,
+  `unlocks_feature` int DEFAULT NULL,
+  `unlocks_passive_id` bigint DEFAULT NULL,
+  `raid_id` bigint unsigned DEFAULT NULL,
+  `required_quest_id` bigint unsigned DEFAULT NULL,
+  `reincarnated_times` int DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `quests_npc_id_foreign` (`npc_id`),
   KEY `quests_item_id_foreign` (`item_id`),
@@ -1177,10 +1416,12 @@ CREATE TABLE `quests` (
   KEY `quests_secondary_required_item_foreign` (`secondary_required_item`),
   KEY `gmid_gm` (`faction_game_map_id`),
   KEY `quests_access_to_map_id_foreign` (`access_to_map_id`),
+  KEY `quests_raid_id_foreign` (`raid_id`),
   CONSTRAINT `gmid_gm` FOREIGN KEY (`faction_game_map_id`) REFERENCES `game_maps` (`id`),
   CONSTRAINT `quests_access_to_map_id_foreign` FOREIGN KEY (`access_to_map_id`) REFERENCES `game_maps` (`id`),
   CONSTRAINT `quests_item_id_foreign` FOREIGN KEY (`item_id`) REFERENCES `items` (`id`),
   CONSTRAINT `quests_npc_id_foreign` FOREIGN KEY (`npc_id`) REFERENCES `npcs` (`id`),
+  CONSTRAINT `quests_raid_id_foreign` FOREIGN KEY (`raid_id`) REFERENCES `raids` (`id`),
   CONSTRAINT `quests_reward_item_foreign` FOREIGN KEY (`reward_item`) REFERENCES `items` (`id`),
   CONSTRAINT `quests_secondary_required_item_foreign` FOREIGN KEY (`secondary_required_item`) REFERENCES `items` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -1194,11 +1435,112 @@ CREATE TABLE `quests_completed` (
   `quest_id` bigint unsigned DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
+  `guide_quest_id` bigint DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `quests_completed_character_id_foreign` (`character_id`),
   KEY `quests_completed_quest_id_foreign` (`quest_id`),
   CONSTRAINT `quests_completed_character_id_foreign` FOREIGN KEY (`character_id`) REFERENCES `characters` (`id`),
   CONSTRAINT `quests_completed_quest_id_foreign` FOREIGN KEY (`quest_id`) REFERENCES `quests` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `raid_boss_participations`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `raid_boss_participations` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `character_id` bigint unsigned NOT NULL,
+  `raid_id` bigint unsigned NOT NULL,
+  `attacks_left` int NOT NULL,
+  `damage_dealt` bigint NOT NULL,
+  `killed_boss` tinyint(1) NOT NULL DEFAULT '0',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `raid_boss_participations_character_id_foreign` (`character_id`),
+  KEY `raid_boss_participations_raid_id_foreign` (`raid_id`),
+  CONSTRAINT `raid_boss_participations_character_id_foreign` FOREIGN KEY (`character_id`) REFERENCES `characters` (`id`),
+  CONSTRAINT `raid_boss_participations_raid_id_foreign` FOREIGN KEY (`raid_id`) REFERENCES `raids` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `raid_bosses`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `raid_bosses` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `raid_id` bigint unsigned NOT NULL,
+  `raid_boss_id` bigint unsigned NOT NULL,
+  `boss_max_hp` bigint DEFAULT NULL,
+  `boss_current_hp` bigint DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `raid_boss_deatils` json DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `raid_participations`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `raid_participations` (
+  `id` bigint NOT NULL,
+  `character_id` bigint unsigned NOT NULL,
+  `raid_boss_id` bigint unsigned NOT NULL,
+  `damage_dealt` bigint DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  KEY `raid_participations_character_id_foreign` (`character_id`),
+  KEY `raid_participations_raid_boss_id_foreign` (`raid_boss_id`),
+  CONSTRAINT `raid_participations_character_id_foreign` FOREIGN KEY (`character_id`) REFERENCES `characters` (`id`),
+  CONSTRAINT `raid_participations_raid_boss_id_foreign` FOREIGN KEY (`raid_boss_id`) REFERENCES `raid_bosses` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `raids`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `raids` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `story` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `raid_boss_id` bigint unsigned NOT NULL,
+  `raid_monster_ids` json NOT NULL,
+  `raid_boss_location_id` bigint unsigned NOT NULL,
+  `corrupted_location_ids` json NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `item_specialty_reward_type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `artifact_item_id` bigint unsigned DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `raids_raid_boss_id_foreign` (`raid_boss_id`),
+  KEY `raids_raid_boss_location_id_foreign` (`raid_boss_location_id`),
+  KEY `raids_artifact_item_id_foreign` (`artifact_item_id`),
+  CONSTRAINT `raids_artifact_item_id_foreign` FOREIGN KEY (`artifact_item_id`) REFERENCES `items` (`id`),
+  CONSTRAINT `raids_raid_boss_id_foreign` FOREIGN KEY (`raid_boss_id`) REFERENCES `monsters` (`id`),
+  CONSTRAINT `raids_raid_boss_location_id_foreign` FOREIGN KEY (`raid_boss_location_id`) REFERENCES `locations` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `rank_fight_tops`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `rank_fight_tops` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `character_id` bigint unsigned NOT NULL,
+  `current_rank` int NOT NULL,
+  `rank_achievement_date` datetime NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `rankft_ch_id` (`character_id`),
+  CONSTRAINT `rankft_ch_id` FOREIGN KEY (`character_id`) REFERENCES `characters` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `rank_fights`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `rank_fights` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `current_rank` int NOT NULL DEFAULT '10',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `release_notes`;
@@ -1238,6 +1580,24 @@ CREATE TABLE `roles` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `scheduled_events`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `scheduled_events` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `event_type` int NOT NULL,
+  `raid_id` bigint unsigned DEFAULT NULL,
+  `description` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `start_date` datetime NOT NULL,
+  `end_date` datetime NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `currently_running` tinyint(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `scheduled_events_raid_id_foreign` (`raid_id`),
+  CONSTRAINT `scheduled_events_raid_id_foreign` FOREIGN KEY (`raid_id`) REFERENCES `raids` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `sessions`;
@@ -1288,11 +1648,28 @@ CREATE TABLE `skills` (
   `updated_at` timestamp NULL DEFAULT NULL,
   `game_skill_id` bigint unsigned NOT NULL DEFAULT '0',
   `is_locked` tinyint(1) NOT NULL DEFAULT '0',
+  `skill_type` int DEFAULT NULL,
+  `is_hidden` tinyint(1) DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `skills_character_id_foreign` (`character_id`),
   KEY `skills_game_skill_id_foreign` (`game_skill_id`),
   CONSTRAINT `skills_character_id_foreign` FOREIGN KEY (`character_id`) REFERENCES `characters` (`id`),
   CONSTRAINT `skills_game_skill_id_foreign` FOREIGN KEY (`game_skill_id`) REFERENCES `game_skills` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `smelting_progress`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `smelting_progress` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `character_id` bigint NOT NULL,
+  `kingdom_id` bigint NOT NULL,
+  `started_at` datetime NOT NULL,
+  `completed_at` datetime NOT NULL,
+  `amount_to_smelt` bigint NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `unit_movement_queue`;
@@ -1355,7 +1732,8 @@ CREATE TABLE `user_site_access_statistics` (
   `amount_signed_in` int DEFAULT '0',
   `amount_registered` int DEFAULT '0',
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `invalid_ips` json DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `users`;
@@ -1375,11 +1753,9 @@ CREATE TABLE `users` (
   `timeout_until` datetime DEFAULT NULL,
   `banned_reason` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `un_ban_request` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `adventure_email` tinyint(1) NOT NULL DEFAULT '1',
   `upgraded_building_email` tinyint(1) NOT NULL DEFAULT '0',
   `rebuilt_building_email` tinyint(1) NOT NULL DEFAULT '0',
   `kingdom_attack_email` tinyint(1) NOT NULL DEFAULT '0',
-  `is_test` tinyint(1) NOT NULL DEFAULT '0',
   `remember_token` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -1390,8 +1766,9 @@ CREATE TABLE `users` (
   `auto_disenchant` tinyint(1) NOT NULL DEFAULT '0',
   `auto_disenchant_amount` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `last_logged_in` datetime DEFAULT NULL,
-  `disable_attack_type_popover` tinyint(1) NOT NULL DEFAULT '0',
   `will_be_deleted` tinyint(1) NOT NULL DEFAULT '0',
+  `ignored_unban_request` tinyint(1) NOT NULL DEFAULT '0',
+  `guide_enabled` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `users_email_unique` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -1569,3 +1946,112 @@ INSERT INTO `migrations` VALUES (149,'2022_02_15_112039_add_type_to_locations',2
 INSERT INTO `migrations` VALUES (150,'2022_02_15_122007_create_holy_stacks',22);
 INSERT INTO `migrations` VALUES (151,'2022_02_15_123223_add_holy_information_to_items',22);
 INSERT INTO `migrations` VALUES (152,'2022_02_18_130225_add_devouring_resistance_and_darkness_to_monsters',22);
+INSERT INTO `migrations` VALUES (153,'2022_02_25_111903_change_sold_for_in_market_history',23);
+INSERT INTO `migrations` VALUES (154,'2022_02_28_185545_remove_disable_attack_typ_popover_from_users',23);
+INSERT INTO `migrations` VALUES (155,'2022_03_01_212500_add_ips_to_user_site_access_statistics',23);
+INSERT INTO `migrations` VALUES (156,'2022_03_25_205939_add_additional_info_to_items',23);
+INSERT INTO `migrations` VALUES (157,'2022_03_28_114204_add_ambush_and_counter_chance_and_resistance_to_monsters',23);
+INSERT INTO `migrations` VALUES (158,'2022_04_23_101624_change_character_boons',23);
+INSERT INTO `migrations` VALUES (159,'2022_05_05_151046_add_ignored_un_ban_request_to_users',23);
+INSERT INTO `migrations` VALUES (160,'2022_05_07_193816_add_before_and_after_acceptance_descriptions_to_quests',23);
+INSERT INTO `migrations` VALUES (161,'2022_05_11_091709_drop_adventures_table',23);
+INSERT INTO `migrations` VALUES (162,'2022_05_12_200219_drop_columns_from_monsters',23);
+INSERT INTO `migrations` VALUES (163,'2022_05_14_104039_create_info_pages',23);
+INSERT INTO `migrations` VALUES (164,'2022_05_18_171857_drop_notifications_table',23);
+INSERT INTO `migrations` VALUES (165,'2022_05_18_181930_create_guide_quests',23);
+INSERT INTO `migrations` VALUES (166,'2022_05_18_182812_add_guide_quest_id_to_quests_completed',23);
+INSERT INTO `migrations` VALUES (167,'2022_05_19_134949_add_guide_enabled_to_users',23);
+INSERT INTO `migrations` VALUES (168,'2022_05_19_185726_add_reward_level_to_guide_quests',23);
+INSERT INTO `migrations` VALUES (169,'2022_05_22_102216_drop_adventure_email_from_users',23);
+INSERT INTO `migrations` VALUES (170,'2022_05_29_103505_add_killed_in_pvp_to_characters',23);
+INSERT INTO `migrations` VALUES (171,'2022_05_31_103016_add_is_mythic_to_items',23);
+INSERT INTO `migrations` VALUES (172,'2022_06_13_144016_add_is_location_locked_from_player_to_locations',23);
+INSERT INTO `migrations` VALUES (173,'2022_06_13_150652_create_events_table',23);
+INSERT INTO `migrations` VALUES (174,'2022_06_13_200001_monthly_pvp_participants',23);
+INSERT INTO `migrations` VALUES (175,'2022_06_14_150342_add_attack_type_to_monthly_pvp_participants',23);
+INSERT INTO `migrations` VALUES (176,'2022_06_15_145808_set_monster_id_to_null_on_character_automations',23);
+INSERT INTO `migrations` VALUES (177,'2022_06_16_124409_add_celestial_type_to_monsters',23);
+INSERT INTO `migrations` VALUES (178,'2022_06_18_132246_add_additional_rewards_to_guide_quests',23);
+INSERT INTO `migrations` VALUES (179,'2022_06_23_184907_add_required_kingdom_level_to_guide_quests',23);
+INSERT INTO `migrations` VALUES (180,'2022_07_06_160711_add_passive_skill_requirements_to_guide_quests',23);
+INSERT INTO `migrations` VALUES (181,'2022_07_09_113427_change_story_fields_for_quests',23);
+INSERT INTO `migrations` VALUES (182,'2022_07_12_102109_add_protection_until_to_kingdoms',23);
+INSERT INTO `migrations` VALUES (183,'2022_08_06_131338_drop_npc_commands_table',23);
+INSERT INTO `migrations` VALUES (184,'2022_08_06_131550_clean_up_characters',23);
+INSERT INTO `migrations` VALUES (185,'2022_08_15_180839_add_copper_coin_cost_to_items',23);
+INSERT INTO `migrations` VALUES (186,'2022_09_01_075321_add_skill_type_to_skills',23);
+INSERT INTO `migrations` VALUES (187,'2022_09_03_103252_change_kingdoms_logs',23);
+INSERT INTO `migrations` VALUES (188,'2022_09_04_090311_add_attacking_character_id_to_kingdom_logs',23);
+INSERT INTO `migrations` VALUES (189,'2022_09_04_094314_make_changes_to_kingdom_logs',23);
+INSERT INTO `migrations` VALUES (190,'2022_09_04_095037_change_status_on_kingdom_logs',23);
+INSERT INTO `migrations` VALUES (191,'2022_09_05_114115_add_specialty_type_to_items',23);
+INSERT INTO `migrations` VALUES (192,'2022_09_05_115411_change_specialty_type_on_items',23);
+INSERT INTO `migrations` VALUES (193,'2022_09_24_162553_add_faction_increase_to_guide_quests',23);
+INSERT INTO `migrations` VALUES (194,'2022_09_26_162529_add_required_shards_to_guide_quests',23);
+INSERT INTO `migrations` VALUES (195,'2022_10_10_094444_change_x_p_on_characters',23);
+INSERT INTO `migrations` VALUES (196,'2022_10_18_135340_add_is_locationhidden_to_messages',23);
+INSERT INTO `migrations` VALUES (197,'2022_11_05_205813_add_spin_info_to_character_sheet',23);
+INSERT INTO `migrations` VALUES (198,'2022_11_07_143308_add_is_mercenary_unlocked_to_characters',23);
+INSERT INTO `migrations` VALUES (199,'2022_11_07_150312_add_unlocks_feature_to_quests',23);
+INSERT INTO `migrations` VALUES (200,'2022_11_08_082906_create_character_mercenaries',23);
+INSERT INTO `migrations` VALUES (201,'2022_11_10_081755_add_xp_increase_and_reincarnated_times_to_mercenaries',23);
+INSERT INTO `migrations` VALUES (202,'2022_11_12_161617_add_can_engage_celestial_to_characters',23);
+INSERT INTO `migrations` VALUES (203,'2022_11_14_133054_change_the_item_damage_onkingdom_logs',23);
+INSERT INTO `migrations` VALUES (204,'2022_11_19_105822_add_unlocks_passive_id_to_quests',23);
+INSERT INTO `migrations` VALUES (205,'2022_11_19_112310_removetext_command_to_message_from_npcs',23);
+INSERT INTO `migrations` VALUES (206,'2022_11_21_203021_add_steel_to_kingdoms',23);
+INSERT INTO `migrations` VALUES (207,'2022_11_22_101426_create_table_smelting_progress',23);
+INSERT INTO `migrations` VALUES (208,'2022_11_22_142006_add_steel_cost_to_game_buildings',23);
+INSERT INTO `migrations` VALUES (209,'2022_11_22_142401_add_steel_cost_to_game_units',23);
+INSERT INTO `migrations` VALUES (210,'2022_11_24_133158_add_is_special_to_game_buildings',23);
+INSERT INTO `migrations` VALUES (211,'2022_11_24_133209_add_is_special_to_game_units',23);
+INSERT INTO `migrations` VALUES (212,'2022_11_24_163055_add_xp_buff_to_mercenaries',23);
+INSERT INTO `migrations` VALUES (213,'2022_11_24_204858_add_xp_penalty_to_characters',23);
+INSERT INTO `migrations` VALUES (214,'2022_11_24_225727_add_reincarnated_stat_increase_and_times_reincarnated_to_characters',23);
+INSERT INTO `migrations` VALUES (215,'2022_11_30_144137_create_class_ranks',23);
+INSERT INTO `migrations` VALUES (216,'2022_12_01_084448_create_class_ranks_weapon_masteries',23);
+INSERT INTO `migrations` VALUES (217,'2022_12_02_112412_create_class_specials',23);
+INSERT INTO `migrations` VALUES (218,'2022_12_02_172923_create_character_class_specialties_equipped',23);
+INSERT INTO `migrations` VALUES (219,'2022_12_14_183105_add_is_hidden_to_skills',23);
+INSERT INTO `migrations` VALUES (220,'2022_12_14_194155_add_required_attack_type_to_game_class_specials',23);
+INSERT INTO `migrations` VALUES (221,'2022_12_20_212448_add_stat_pools_to_characters',23);
+INSERT INTO `migrations` VALUES (222,'2022_12_27_125831_rank_fights',23);
+INSERT INTO `migrations` VALUES (223,'2022_12_27_132349_add_rank_fight_tops',23);
+INSERT INTO `migrations` VALUES (224,'2023_01_06_121304_add_gold_bars_cost_to_items',23);
+INSERT INTO `migrations` VALUES (225,'2023_01_17_181017_add_class_rank_requirements_to_game_classes',23);
+INSERT INTO `migrations` VALUES (226,'2023_01_17_182505_add_unlocks_class_id_to_items',23);
+INSERT INTO `migrations` VALUES (227,'2023_01_20_104203_add_reductions_to_class_specials',23);
+INSERT INTO `migrations` VALUES (228,'2023_03_14_093113_create_gems',23);
+INSERT INTO `migrations` VALUES (229,'2023_03_14_094116_create_gem_bags',23);
+INSERT INTO `migrations` VALUES (230,'2023_03_14_100511_create_item_sockets',23);
+INSERT INTO `migrations` VALUES (231,'2023_03_14_214841_create_gem_bag_slots',23);
+INSERT INTO `migrations` VALUES (232,'2023_03_18_121507_add_socket_amount_to_items',23);
+INSERT INTO `migrations` VALUES (233,'2023_04_18_204824_create_announcements',23);
+INSERT INTO `migrations` VALUES (234,'2023_04_18_204938_add_raid_id_to_events',23);
+INSERT INTO `migrations` VALUES (235,'2023_04_18_205143_add_raid_info_to_locations',23);
+INSERT INTO `migrations` VALUES (236,'2023_04_18_205614_add_raid_info_to_monsters',23);
+INSERT INTO `migrations` VALUES (237,'2023_04_18_210255_create_raids',23);
+INSERT INTO `migrations` VALUES (238,'2023_04_26_140838_create_scheduled_events',23);
+INSERT INTO `migrations` VALUES (239,'2023_05_02_122834_update_monster_gold_to_big_integer',23);
+INSERT INTO `migrations` VALUES (240,'2023_05_02_142223_add_raid_id_to_quests',23);
+INSERT INTO `migrations` VALUES (241,'2023_05_04_132726_create_raid_participations',23);
+INSERT INTO `migrations` VALUES (242,'2023_05_04_132750_create_raid_bosses',23);
+INSERT INTO `migrations` VALUES (243,'2023_05_04_133259_add_raid_boss_id_to_raid_participations',23);
+INSERT INTO `migrations` VALUES (244,'2023_05_08_093817_change_health_to_nullable_on_raid_bosses',23);
+INSERT INTO `migrations` VALUES (245,'2023_05_09_104028_change_raid_id_on_events',23);
+INSERT INTO `migrations` VALUES (246,'2023_05_10_110644_add_currently_running_to_scheduled_events',23);
+INSERT INTO `migrations` VALUES (247,'2023_05_10_192257_change_event_type_on_scheduled_events',23);
+INSERT INTO `migrations` VALUES (248,'2023_05_30_150733_add_raid_boss_details_to_raid_bosses',23);
+INSERT INTO `migrations` VALUES (249,'2023_05_31_135357_create_raid_boss_participations',23);
+INSERT INTO `migrations` VALUES (250,'2023_06_02_190403_add_recination_times_and_required_quest_id_to_quests',23);
+INSERT INTO `migrations` VALUES (251,'2023_06_05_190646_add_elemental_information_to_monsters',23);
+INSERT INTO `migrations` VALUES (252,'2023_06_14_105325_add_life_stealing_resistance_to_monsters',23);
+INSERT INTO `migrations` VALUES (253,'2023_06_15_202412_add_item_specialty_type_to_raids',23);
+INSERT INTO `migrations` VALUES (254,'2023_06_16_114248_create_item_skills',23);
+INSERT INTO `migrations` VALUES (255,'2023_06_16_150509_add_item_skill_id_to_items',23);
+INSERT INTO `migrations` VALUES (256,'2023_06_16_193432_create_item_skill_progressions',23);
+INSERT INTO `migrations` VALUES (257,'2023_06_21_110406_add_event_id_to_announcements',23);
+INSERT INTO `migrations` VALUES (258,'2023_06_22_135441_add_artifact_item_id_to_raids',23);
+INSERT INTO `migrations` VALUES (259,'2023_07_03_121434_remove_fields_from_item_affixes',23);
+INSERT INTO `migrations` VALUES (260,'2023_07_05_160947_remove_can_monster_have_skill_from_skills',23);
+INSERT INTO `migrations` VALUES (261,'2023_07_06_160047_add_affix_type_to_item_affixes',23);
