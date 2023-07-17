@@ -11,6 +11,8 @@
                 <x-core.form-wizard.tabs>
                     <x-core.form-wizard.tab target="tab-style-2-1" primaryTitle="Basic Info" secondaryTitle="Basic quest info." isActive="true"/>
                     <x-core.form-wizard.tab target="tab-style-2-2" primaryTitle="Requirements" secondaryTitle="Requirments" />
+                    <x-core.form-wizard.tab target="tab-style-2-3" primaryTitle="Bonuses" secondaryTitle="Bonuses" />
+                    <x-core.form-wizard.tab target="tab-style-2-4" primaryTitle="Rewards" secondaryTitle="Rewards" />
                 </x-core.form-wizard.tabs>
 
                 <x-core.form-wizard.contents>
@@ -31,6 +33,14 @@
                                 <x-core.forms.input :model="$guideQuest" label="Required (Skill) Level:" modelKey="required_skill_level" name="required_skill_level" />
                                 <x-core.forms.key-value-select :model="$guideQuest" label="Required Faction:" modelKey="required_faction_id" name="required_faction_id" :options="$gameMaps"/>
                                 <x-core.forms.input :model="$guideQuest" label="Required (Faction) Level:" modelKey="required_faction_level" name="required_faction_level" />
+
+                                <div class='border-b-2 block md:hidden border-b-gray-300 dark:border-b-gray-600 my-6'></div>
+                                <h3 class="mb-3">Kingdom Requirements</h3>
+                                <x-core.forms.input :model="$guideQuest" label="Required Kingdoms #:" modelKey="required_kingdoms" name="required_kingdoms" />
+                                <x-core.forms.input :model="$guideQuest" label="Required Kingdom Level:" modelKey="required_kingdom_level" name="required_kingdom_level" />
+                                <x-core.forms.input :model="$guideQuest" label="Required Kingdom Units:" modelKey="required_kingdom_units" name="required_kingdom_units" />
+                                <x-core.forms.key-value-select :model="$guideQuest" label="Required Passive:" modelKey="required_passive_skill" name="required_passive_skill" :options="$passives"/>
+                                <x-core.forms.input :model="$guideQuest" label="Required Passive Level:" modelKey="required_passive_level" name="required_passive_level" />
                             </div>
                             <div class='border-b-2 block md:hidden border-b-gray-300 dark:border-b-gray-600 my-6'></div>
                             <div>
@@ -41,28 +51,22 @@
 
                                 <div class='border-b-2 block md:hidden border-b-gray-300 dark:border-b-gray-600 my-6'></div>
                                 <h3 class="mb-3">Required Currency Amounts</h3>
+                                <x-core.forms.input :model="$guideQuest" label="Required Gold" modelKey="required_gold" name="required_gold" />
+                                <x-core.forms.input :model="$guideQuest" label="Required Gold Dust" modelKey="requried_gold_dust" name="requried_gold_dust" />
                                 <x-core.forms.input :model="$guideQuest" label="Required Shards" modelKey="required_shards" name="required_shards" />
-
-                                <div class='border-b-2 block md:hidden border-b-gray-300 dark:border-b-gray-600 my-6'></div>
-                                <h3 class="mb-3">Kingdom Requirements</h3>
-                                <x-core.forms.input :model="$guideQuest" label="Required Kingdoms #:" modelKey="required_kingdoms" name="required_kingdoms" />
-                                <x-core.forms.input :model="$guideQuest" label="Required Kingdom Level:" modelKey="required_kingdom_level" name="required_kingdom_level" />
-                                <x-core.forms.input :model="$guideQuest" label="Required Kingdom Units:" modelKey="required_kingdom_units" name="required_kingdom_units" />
-                                <x-core.forms.key-value-select :model="$guideQuest" label="Required Passive:" modelKey="required_passive_skill" name="required_passive_skill" :options="$passives"/>
-                                <x-core.forms.input :model="$guideQuest" label="Required Passive Level:" modelKey="required_passive_level" name="required_passive_level" />
-
-                                <div class='border-b-2 block md:hidden border-b-gray-300 dark:border-b-gray-600 my-6'></div>
-                                <h3 class="mb-3">Extra Faction Points Per Kill</h3>
-                                <x-core.forms.input :model="$guideQuest" label="Extra Faction Points Per Kill #:" modelKey="faction_points_per_kill" name="faction_points_per_kill" />
                             </div>
                         </div>
-
-                        <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
-
-                        <h3 class="mb-3">Currency Rewards</h3>
+                    </x-core.form-wizard.content>
+                    <x-core.form-wizard.content target="tab-style-2-3">
+                        <h3 class="mb-3">Extra Faction Points Per Kill</h3>
+                        <x-core.forms.input :model="$guideQuest" label="Extra Faction Points Per Kill #:" modelKey="faction_points_per_kill" name="faction_points_per_kill" />
+                    </x-core.form-wizard.content>
+                    <x-core.form-wizard.content target="tab-style-2-4">
+                        <h3 class="mb-3">Rewards</h3>
+                        <x-core.forms.input :model="$guideQuest" label="Gold Reward:" modelKey="gold_reward" name="gold_reward" />
                         <x-core.forms.input :model="$guideQuest" label="Gold Dust Reward:" modelKey="gold_dust_reward" name="gold_dust_reward" />
                         <x-core.forms.input :model="$guideQuest" label="Shards Reward:" modelKey="shards_reward" name="shards_reward" />
-
+                        <x-core.forms.input :model="$guideQuest" label="XP Reward:" modelKey="xp_reward" name="xp_reward" />
                     </x-core.form-wizard.content>
                 </x-core.form-wizard.contents>
             </x-core.form-wizard.container>

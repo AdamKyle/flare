@@ -30,9 +30,10 @@ class GuideQuest extends Model {
         'required_passive_level',
         'required_shards',
         'faction_points_per_kill',
-        'reward_level',
         'gold_dust_reward',
         'shards_reward',
+        'gold_reward',
+        'xp_reward'
     ];
 
     /**
@@ -54,10 +55,11 @@ class GuideQuest extends Model {
         'required_kingdom_units'  => 'integer',
         'required_passive_skill'  => 'integer',
         'required_passive_level'  => 'integer',
-        'reward_level'            => 'integer',
+        'gold_reward'             => 'integer',
         'gold_dust_reward'        => 'integer',
         'shards_reward'           => 'integer',
         'faction_points_per_kill' => 'integer',
+        'xp_reward'               => 'integer', 
     ];
 
     protected $appends = [

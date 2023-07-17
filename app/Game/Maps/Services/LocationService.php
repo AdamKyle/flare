@@ -3,25 +3,25 @@
 namespace App\Game\Maps\Services;
 
 use App\Flare\Models\Raid;
-use Storage;
-use Illuminate\Support\Collection;
-use App\Flare\Builders\Character\CharacterCacheData;
-use App\Flare\Handlers\UpdateCharacterAttackTypes;
-use App\Flare\Values\LocationEffectValue;
-use App\Flare\Values\LocationType;
-use App\Game\Battle\Events\UpdateCharacterStatus;
-use App\Game\Maps\Events\UpdateDuelAtPosition;
-use App\Game\Maps\Events\UpdateLocationBasedCraftingOptions;
-use App\Game\Maps\Events\UpdateLocationBasedSpecialShops;
-use App\Game\Maps\Events\UpdateRankFights;
-use App\Flare\Cache\CoordinatesCache;
-use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\Location;
+use App\Flare\Models\Character;
+use App\Flare\Values\LocationType;
+use Illuminate\Support\Collection;
 use App\Flare\Models\CelestialFight;
-use App\Game\Maps\Services\Common\CanPlayerMassEmbezzle;
-use App\Game\Maps\Services\Common\LiveCharacterCount;
+use App\Flare\Cache\CoordinatesCache;
 use App\Game\Core\Traits\KingdomCache;
+use Illuminate\Support\Facades\Storage;
+use App\Flare\Values\LocationEffectValue;
+use App\Game\Maps\Events\UpdateRankFights;
+use App\Game\Maps\Events\UpdateDuelAtPosition;
+use App\Game\Battle\Events\UpdateCharacterStatus;
+use App\Flare\Handlers\UpdateCharacterAttackTypes;
+use App\Flare\Builders\Character\CharacterCacheData;
+use App\Game\Maps\Services\Common\LiveCharacterCount;
+use App\Game\Maps\Services\Common\CanPlayerMassEmbezzle;
+use App\Game\Maps\Events\UpdateLocationBasedSpecialShops;
+use App\Game\Maps\Events\UpdateLocationBasedCraftingOptions;
 use App\Game\Maps\Services\Common\UpdateRaidMonstersForLocation;
 
 class LocationService {
@@ -152,8 +152,8 @@ class LocationService {
      * @return Collection
      */
     public function fetchLocationData(Character $character): Collection {
-        $locations = Location::with('questRewardItem')->where('game_map_id', $character->map->game_map_id)->get();
-
+        $locations = Location::where('game_map_id', $character->map->game_map_id)->get();
+        
         return $this->transformLocationData($locations);
     }
 

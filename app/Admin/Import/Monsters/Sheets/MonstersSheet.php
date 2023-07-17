@@ -59,7 +59,7 @@ class MonstersSheet implements ToCollection {
                         $value = $questItem->id;
                     }
                 } else if ($key === 'game_map_id') {
-                    $gameMap = GameMap::find($value);
+                    $gameMap = GameMap::where('name', $value)->first();
 
                     if (is_null($gameMap)) {
                         return null;

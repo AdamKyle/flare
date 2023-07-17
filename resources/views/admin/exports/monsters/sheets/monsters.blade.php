@@ -95,7 +95,7 @@
             <td>{{$monster->counter_resistance}}</td>
             <td>{{(!is_null($monster->questItem)) ? $monster->questItem->name : null}}</td>
             <td>{{$monster->quest_item_drop_chance}}</td>
-            <td>{{$monster->game_map_id}}</td>
+            <td>{{!is_null($monster->game_map_id) ? $monster->gameMap->name : null}}</td>
             <td>{{$monster->celestial_type}}</td>
             <td>{{$monster->fire_atonement}}</td>
             <td>{{$monster->ice_atonement}}</td>

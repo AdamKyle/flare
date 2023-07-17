@@ -2,25 +2,21 @@
 
 namespace App\Game\GuideQuests\Services;
 
-use App\Flare\Builders\RandomItemDropBuilder;
-use App\Flare\Models\Character;
-use App\Flare\Models\GameMap;
-use App\Flare\Models\GuideQuest;
 use App\Flare\Models\Item;
+use App\Flare\Models\GameMap;
+use App\Flare\Models\Character;
 use App\Flare\Models\ItemAffix;
-use App\Flare\Models\QuestsCompleted;
+use App\Flare\Models\GuideQuest;
 use App\Flare\Values\AutomationType;
+use App\Flare\Models\QuestsCompleted;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Core\Events\UpdateTopBarEvent;
+use App\Game\Core\Traits\HandleCharacterLevelUp;
 use App\Game\Messages\Events\ServerMessageEvent;
 
 class GuideQuestService {
 
-    private RandomItemDropBuilder $randomItemDropBuilder;
-
-    public function __construct(RandomItemDropBuilder $randomItemDropBuilder) {
-        $this->randomItemDropBuilder = $randomItemDropBuilder;
-    }
+    use HandleCharacterLevelUp;
 
     public function fetchQuestForCharacter(Character $character): GuideQuest | null {
         $lastCompletedGuideQuest = $character->questsCompleted()
@@ -47,12 +43,6 @@ class GuideQuestService {
             return false;
         }
 
-        if ($character->isInventoryFull()) {
-            event(new ServerMessageEvent($character->user, 'Your inventory is full. This item was given to you regardless.'));
-        }
-
-        $this->rewardItem($character, $quest->reward_level);
-
         $gold      = $character->gold + ($quest->reward_level * 1000);
         $goldDust  = $character->gold_dust + $quest->gold_dust_reward;
         $shards    = $character->shards + $quest->shards_reward;
@@ -71,6 +61,8 @@ class GuideQuestService {
 
         event(new ServerMessageEvent($character->user, 'Rewarded with: ' . number_format(($quest->reward_level * 1000)) . ' Gold.'));
 
+        $character = $this->giveXP($character, $quest);
+
         $character->update([
             'gold'      => $gold,
             'gold_dust' => $goldDust,
@@ -85,6 +77,18 @@ class GuideQuestService {
         event(new UpdateTopBarEvent($character->refresh()));
 
         return true;
+    }
+
+    public function giveXP(Character $character, GuideQuest $guideQuest): Character {
+        $character->update([
+            'xp' => $guideQuest->reward_xp
+        ]);
+
+        $character = $character->refresh();
+
+        $this->handlePossibleLevelUp($character);
+
+        return $character;
     }
 
     public function canHandInQuest(Character $character, GuideQuest $quest): bool {
@@ -228,51 +232,5 @@ class GuideQuestService {
         }
 
         return $requiredAttributes;
-    }
-
-    protected function rewardItem(Character $character, int $rewardLevel): Character {
-
-        $level = $character->level;
-
-        if ($level > 100) {
-            $level = 100;
-        }
-
-        $fetchItem = Item::whereNotIn('type', ['quest', 'alchemy', 'trinket'])
-                         ->whereNull('item_prefix_id')
-                         ->whereNull('item_suffix_id')
-                         ->where('skill_level_required', '<=', $level)
-                         ->inRandomOrder()
-                         ->first();
-
-        if (!is_null($fetchItem)) {
-            $fetchSuffix = ItemAffix::where('skill_level_required', '<=', $level)
-                ->where('type', 'suffix')
-                ->orderByDesc('skill_level_required')
-                ->first();
-
-            $fetchPrefix = ItemAffix::where('skill_level_required', '<=', $level)
-                ->where('type', 'prefix')
-                ->orderByDesc('skill_level_required')
-                ->first();
-
-            $fetchItem = $fetchItem->duplicate();
-
-            $fetchItem->update([
-                'item_suffix_id' => $fetchSuffix->id,
-                'item_prefix_id' => $fetchPrefix->id,
-            ]);
-
-            $character->inventory->slots()->create([
-                'inventory_id' => $character->inventory->id,
-                'item_id'      => $fetchItem->id,
-            ]);
-
-            $slot = $character->refresh()->inventory->slots()->where('item_id', $fetchItem->id)->first();
-
-            event(new ServerMessageEvent($character->user, 'The Guide rewarded you with: ' . $fetchItem->affix_name . '. "Here child, this might do something, or nothing."', $slot->id));
-        }
-
-        return $character->refresh();
     }
 }
