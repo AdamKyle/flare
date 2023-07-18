@@ -65,7 +65,7 @@ export const BuildInventoryTableColumns = (component?: ActionsInterface, clickAc
             selector: (row: any) => row.item_skill,
             cell: (row: any) => <span>
                 {
-                    row.item_skill_progressions !== null ?
+                    row.item_skill_progressions.length > 0 ?
                         <PrimaryLinkButton button_label={'Manage Skills'} on_click={() => manageSkills(row.slot_id, row.item_skills, row.item_skill_progressions)} />
                     : 'N/A'
                 }

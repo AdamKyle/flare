@@ -85,10 +85,62 @@
                             <dt>Required Shards</dt>
                             <dd>{{number_format($guideQuest->required_shards)}}</dd>
                         @endif
+                        @if (!is_null($guideQuest->required_stats))
+                            <dt>Required Stats</dt>
+                            <dd>{{number_format($guideQuest->required_stats)}}</dd>
+                        @endif
+                        @if (!is_null($guideQuest->required_str))
+                            <dt>Required Strengh</dt>
+                            <dd>{{number_format($guideQuest->required_str)}}</dd>
+                        @endif
+                        @if (!is_null($guideQuest->required_dex))
+                            <dt>Required Dexterity</dt>
+                            <dd>{{number_format($guideQuest->required_dex)}}</dd>
+                        @endif
+                        @if (!is_null($guideQuest->required_dur))
+                            <dt>Required Dexterity</dt>
+                            <dd>{{number_format($guideQuest->required_dur)}}</dd>
+                        @endif
+                        @if (!is_null($guideQuest->required_agi))
+                            <dt>Required Agility</dt>
+                            <dd>{{number_format($guideQuest->required_agi)}}</dd>
+                        @endif
+                        @if (!is_null($guideQuest->required_int))
+                            <dt>Required Intelligence</dt>
+                            <dd>{{number_format($guideQuest->required_int)}}</dd>
+                        @endif
+                        @if (!is_null($guideQuest->required_chr))
+                            <dt>Required Charisma</dt>
+                            <dd>{{number_format($guideQuest->required_chr)}}</dd>
+                        @endif
+                        @if (!is_null($guideQuest->required_focus))
+                            <dt>Required Focus</dt>
+                            <dd>{{number_format($guideQuest->required_focus)}}</dd>
+                        @endif
+                        @if (!is_null($guideQuest->required_gold))
+                        <dt>Required Gold</dt>
+                        <dd>{{number_format($guideQuest->required_gold)}}</dd>
+                        @endif
+                        @if (!is_null($guideQuest->required_gold_dust))
+                            <dt>Required Gold Dust</dt>
+                            <dd>{{number_format($guideQuest->required_gold_dust)}}</dd>
+                        @endif
+                        @if (!is_null($guideQuest->required_shards))
+                            <dt>Required Shards</dt>
+                            <dd>{{number_format($guideQuest->required_shards)}}</dd>
+                        @endif
+                        </dl>
+                    <h3 class="text-sky-600 dark:text-sky-500">XP Reward</h3>
+                    <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+                    <dl class='my-4'>
+                        <dt>XP Reward</dt>
+                        <dd>{{is_null($guideQuest->xp_reward) ? 0 : number_format($guideQuest->xp_reward)}}</dd>
                     </dl>
                     <h3 class="text-sky-600 dark:text-sky-500">Currency Rewards</h3>
                     <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
                     <dl>
+                        <dt>Gold Reward</dt>
+                        <dd>{{is_null($guideQuest->gold_reward) ? 0 : number_format($guideQuest->gold_reward)}}</dd>
                         <dt>Gold Dust Reward</dt>
                         <dd>{{is_null($guideQuest->gold_dust_reward) ? 0 : number_format($guideQuest->gold_dust_reward)}}</dd>
                         <dt>Shards Reward</dt>

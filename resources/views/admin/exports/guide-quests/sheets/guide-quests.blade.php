@@ -21,7 +21,14 @@
             <th>required_kingdom_units</th>
             <th>required_passive_skill</th>
             <th>required_passive_level</th>
-            <th>reward_level</th>
+            <th>required_stats</th>
+            <th>required_str</th>
+            <th>required_dex</th>
+            <th>required_agi</th>
+            <th>required_int</th>
+            <th>required_dur</th>
+            <th>required_chr</th>
+            <th>required_focus</th>
             <th>gold_dust_reward</th>
             <th>shards_reward</th>
             <th>gold_reward</th>
@@ -48,7 +55,14 @@
                 <td>{{$guideQuest->required_kingdom_units}}</td>
                 <td>{{!is_null($guideQuest->required_passive_skill) ? $guideQuest->passive_name : ''}}</td>
                 <td>{{$guideQuest->required_passive_level}}</td>
-                <td>{{$guideQuest->reward_level}}</td>
+                <td>{{$guideQuest->required_stats}}</td>
+                <td>{{$guideQuest->required_str}}</td>
+                <td>{{$guideQuest->required_dex}}</td>
+                <td>{{$guideQuest->required_agi}}</td>
+                <td>{{$guideQuest->required_int}}</td>
+                <td>{{$guideQuest->required_dur}}</td>
+                <td>{{$guideQuest->required_chr}}</td>
+                <td>{{$guideQuest->required_focus}}</td>
                 <td>{{$guideQuest->gold_dust_reward}}</td>
                 <td>{{$guideQuest->shards_reward}}</td>
                 <td>{{$guildQuest->gold_reward}}</td>

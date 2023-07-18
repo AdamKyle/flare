@@ -29,7 +29,7 @@ class GoldRushCheckListener {
             $gameMapBonus = $gameMap->drop_chance_bonus;
         }
 
-        $hasGoldRush    = GoldRushCheckCalculator::fetchGoldRushChance($event->monster, $gameMapBonus);
+        $hasGoldRush    = GoldRushCheckCalculator::fetchGoldRushChance($gameMapBonus);
 
         if ($hasGoldRush) {
             $goldRush = ceil($event->character->gold + $event->character->gold * 0.03);

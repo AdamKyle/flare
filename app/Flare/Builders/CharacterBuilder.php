@@ -127,7 +127,7 @@ class CharacterBuilder {
 
         $this->character->inventory->slots()->create([
             'inventory_id' => $this->character->inventory->id,
-            'item_id'      => Item::first()->id,
+            'item_id'      => Item::where('type', 'weapon')->orderBy('cost', 'asc')->first(),
             'equipped'     => true,
             'position'     => 'left-hand',
         ]);

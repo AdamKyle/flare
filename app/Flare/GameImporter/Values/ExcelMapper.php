@@ -27,7 +27,7 @@ class ExcelMapper {
      */
     private array $map = [
         'Admin Section' => [
-            GuideQuests::class,
+            // GuideQuests::class,
             RaidsImport::class,
             EventsImport::class,
         ],

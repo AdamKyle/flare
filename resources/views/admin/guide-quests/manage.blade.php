@@ -19,7 +19,6 @@
                     <x-core.form-wizard.content target="tab-style-2-1" isOpen="true">
                         <h3 class="mb-3">Basic Info</h3>
                         <x-core.forms.input :model="$guideQuest" label="Name:" modelKey="name" name="name" />
-                        <x-core.forms.input :model="$guideQuest" label="Reward Level:" modelKey="reward_level" name="reward_level" />
                         <x-core.forms.quill-editor type="normal" :model="$guideQuest" label="Guide Text:" modelKey="intro_text" name="intro_text" quillId="intro-text"/>
                         <x-core.forms.quill-editor type="html" :model="$guideQuest" label="Instructions:" modelKey="instructions" name="instructions" quillId="quest-instructions"/>
                     </x-core.form-wizard.content>
@@ -34,6 +33,17 @@
                                 <x-core.forms.key-value-select :model="$guideQuest" label="Required Faction:" modelKey="required_faction_id" name="required_faction_id" :options="$gameMaps"/>
                                 <x-core.forms.input :model="$guideQuest" label="Required (Faction) Level:" modelKey="required_faction_level" name="required_faction_level" />
 
+                                <div class='border-b-2 block md:hidden border-b-gray-300 dark:border-b-gray-600 my-6'></div>
+                                <h3 class="mb-3">Stat Requirmenets</h3>
+                                <x-core.forms.input :model="$guideQuest" label="Required Stats (Total):" modelKey="required_stats" name="required_stats" />
+                                <x-core.forms.input :model="$guideQuest" label="Required Strength (Total):" modelKey="required_str" name="required_str" />
+                                <x-core.forms.input :model="$guideQuest" label="Required Dexterity (Total):" modelKey="required_dex" name="required_dex" />
+                                <x-core.forms.input :model="$guideQuest" label="Required Intelligence (Total):" modelKey="required_int" name="required_int" />
+                                <x-core.forms.input :model="$guideQuest" label="Required Agility (Total):" modelKey="required_agi" name="required_agi" />
+                                <x-core.forms.input :model="$guideQuest" label="Required Charisma (Total):" modelKey="required_chr" name="required_chr" />
+                                <x-core.forms.input :model="$guideQuest" label="Required Durability (Total):" modelKey="required_dur" name="required_dur" />
+                                <x-core.forms.input :model="$guideQuest" label="Required Focus (Total):" modelKey="required_focus" name="required_focus" />
+                                
                                 <div class='border-b-2 block md:hidden border-b-gray-300 dark:border-b-gray-600 my-6'></div>
                                 <h3 class="mb-3">Kingdom Requirements</h3>
                                 <x-core.forms.input :model="$guideQuest" label="Required Kingdoms #:" modelKey="required_kingdoms" name="required_kingdoms" />
@@ -52,7 +62,7 @@
                                 <div class='border-b-2 block md:hidden border-b-gray-300 dark:border-b-gray-600 my-6'></div>
                                 <h3 class="mb-3">Required Currency Amounts</h3>
                                 <x-core.forms.input :model="$guideQuest" label="Required Gold" modelKey="required_gold" name="required_gold" />
-                                <x-core.forms.input :model="$guideQuest" label="Required Gold Dust" modelKey="requried_gold_dust" name="requried_gold_dust" />
+                                <x-core.forms.input :model="$guideQuest" label="Required Gold Dust" modelKey="required_gold_dust" name="required_gold_dust" />
                                 <x-core.forms.input :model="$guideQuest" label="Required Shards" modelKey="required_shards" name="required_shards" />
                             </div>
                         </div>
