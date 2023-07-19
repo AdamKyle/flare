@@ -42,13 +42,3 @@
         ])
     @endif
 </p>
-
-@if (!is_null($location->questRewardItem))
-    <x-core.alerts.info-alert title="Game Tip">
-        <p>
-            If a location has a quest reward associated with it, all you have to do is physically
-            visit the location to get the quest reward.
-        </p>
-    </x-core.alerts.info-alert>
-    @include('game.items.components.items-quest-details', ['item' => $location->questRewardItem])
-@endif

@@ -116,23 +116,54 @@ export default class GuideQuest extends React.Component<any, any> {
                                     : null
                             }
                             <div className={'mt-2'}>
-                                <h3 className='mb-2'>Required to complete</h3>
-                                <ul className='list-disc ml-[18px]'>
-                                    { this.state.quest_data.required_level !== null ? <li className={'text-orange-600 dark:text-orange-400'}>Level your character to: {this.state.quest_data.required_level}</li> : null }
-                                    { this.state.quest_data.quest_name !== null ? <li className={'text-orange-600 dark:text-orange-400'}>Complete the quest: {this.state.quest_data.quest_name}</li> : null }
-                                    { this.state.quest_data.skill_name !== null ? <li className={'text-orange-600 dark:text-orange-400'}>Get Skill: {this.state.quest_data.skill_name} to level: {this.state.quest_data.required_skill_level}</li> : null }
-                                    { this.state.quest_data.faction_name !== null ? <li className={'text-orange-600 dark:text-orange-400'}>Get Faction: {this.state.quest_data.faction_name} to level: {this.state.quest_data.required_faction_level}</li> : null }
-                                    { this.state.quest_data.required_game_map_id !== null ? <li className={'text-orange-600 dark:text-orange-400'}>Get Access to: {this.state.quest_data.game_map_name}</li> : null }
-                                    { this.state.quest_data.required_quest_item_id !== null ? <li className={'text-orange-600 dark:text-orange-400'}>Get Quest Item: {this.state.quest_data.quest_item_name}</li> : null }
-                                    { this.state.quest_data.required_kingdoms !== null ? <li className={'text-orange-600 dark:text-orange-400'}>Required Kingdom #: {this.state.quest_data.required_kingdoms}</li> : null }
-                                    { this.state.quest_data.required_kingdom_level !== null ? <li className={'text-orange-600 dark:text-orange-400'}>Required Buildings Level (Combined): {this.state.quest_data.required_kingdom_level}</li> : null }
-                                    { this.state.quest_data.required_kingdom_units !== null ? <li className={'text-orange-600 dark:text-orange-400'}>Required Units Amount (Combined): {this.state.quest_data.required_kingdom_units}</li> : null }
-                                    { this.state.quest_data.passive_name !== null ? <li className={'text-orange-600 dark:text-orange-400'}>Get Passive Skill: {this.state.quest_data.passive_name} to level: {this.state.quest_data.required_passive_skill}</li> : null }
-                                    { this.state.quest_data.required_shards !== null ? <li className={'text-orange-600 dark:text-orange-400'}>Obtain Shards Amount: {this.state.quest_data.required_shards}</li> : null }
-                                </ul>
+                                <div className="grid md:grid-cols-2 gap-2">
+                                    <div>
+                                        <h3 className='mb-2'>Required to complete</h3>
+                                        <ul className='list-disc ml-[18px]'>
+                                            { this.state.quest_data.required_level !== null ? <li className={'text-orange-600 dark:text-orange-400'}>Level your character to: {this.state.quest_data.required_level}</li> : null }
+                                            { this.state.quest_data.quest_name !== null ? <li className={'text-orange-600 dark:text-orange-400'}>Complete the quest: {this.state.quest_data.quest_name}</li> : null }
+                                            { this.state.quest_data.skill_name !== null ? <li className={'text-orange-600 dark:text-orange-400'}>Get Skill: {this.state.quest_data.skill_name} to level: {this.state.quest_data.required_skill_level}</li> : null }
+                                            { this.state.quest_data.faction_name !== null ? <li className={'text-orange-600 dark:text-orange-400'}>Get Faction: {this.state.quest_data.faction_name} to level: {this.state.quest_data.required_faction_level}</li> : null }
+                                            { this.state.quest_data.required_game_map_id !== null ? <li className={'text-orange-600 dark:text-orange-400'}>Get Access to: {this.state.quest_data.game_map_name}</li> : null }
+                                            { this.state.quest_data.required_quest_item_id !== null ? <li className={'text-orange-600 dark:text-orange-400'}>Get Quest Item: {this.state.quest_data.quest_item_name}</li> : null }
+                                            { this.state.quest_data.required_kingdoms !== null ? <li className={'text-orange-600 dark:text-orange-400'}>Required Kingdom #: {this.state.quest_data.required_kingdoms}</li> : null }
+                                            { this.state.quest_data.required_kingdom_level !== null ? <li className={'text-orange-600 dark:text-orange-400'}>Required Buildings Level (Combined): {this.state.quest_data.required_kingdom_level}</li> : null }
+                                            { this.state.quest_data.required_kingdom_units !== null ? <li className={'text-orange-600 dark:text-orange-400'}>Required Units Amount (Combined): {this.state.quest_data.required_kingdom_units}</li> : null }
+                                            { this.state.quest_data.passive_name !== null ? <li className={'text-orange-600 dark:text-orange-400'}>Get Passive Skill: {this.state.quest_data.passive_name} to level: {this.state.quest_data.required_passive_skill}</li> : null }
+                                            { this.state.quest_data.required_str !== null ? <li className={'text-orange-600 dark:text-orange-400'}>Get all stats to: {this.state.quest_data.required_str}</li> : null }
+                                            { this.state.quest_data.required_dex !== null ? <li className={'text-orange-600 dark:text-orange-400'}>Get all stats to: {this.state.quest_data.required_dex}</li> : null }
+                                            { this.state.quest_data.required_agi !== null ? <li className={'text-orange-600 dark:text-orange-400'}>Get all stats to: {this.state.quest_data.required_agi}</li> : null }
+                                            { this.state.quest_data.required_int !== null ? <li className={'text-orange-600 dark:text-orange-400'}>Get all stats to: {this.state.quest_data.required_int}</li> : null }
+                                            { this.state.quest_data.required_dur !== null ? <li className={'text-orange-600 dark:text-orange-400'}>Get all stats to: {this.state.quest_data.required_dur}</li> : null }
+                                            { this.state.quest_data.required_chr !== null ? <li className={'text-orange-600 dark:text-orange-400'}>Get all stats to: {this.state.quest_data.required_chr}</li> : null }
+                                            { this.state.quest_data.required_focus !== null ? <li className={'text-orange-600 dark:text-orange-400'}>Get all stats to: {this.state.quest_data.required_focus}</li> : null }
+                                            { this.state.quest_data.required_gold !== null ? <li className={'text-orange-600 dark:text-orange-400'}>Obtain Gold Amount: {this.state.quest_data.required_gold}</li> : null }
+                                            { this.state.quest_data.required_shards !== null ? <li className={'text-orange-600 dark:text-orange-400'}>Obtain Shards Amount: {this.state.quest_data.required_shards}</li> : null }
+                                            { this.state.quest_data.required_gold_dust !== null ? <li className={'text-orange-600 dark:text-orange-400'}>Obtain Gold Dust Amount: {this.state.quest_data.required_gold_dust}</li> : null }
+                                        </ul>
+                                    </div>
+                                    <div className='block md:hidden border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+                                    <div>
+                                        <h3 className='mb-2'>Rewards</h3>
+                                        <ul className='list-disc ml-[18px]'>
+                                            { this.state.quest_data.xp_reward !== null ? <li className={'text-green-600 dark:text-green-400'}>Xp Reward: {this.state.quest_data.xp_reward}</li> : null }
+                                            { this.state.quest_data.gold_reward !== null ? <li className={'text-green-600 dark:text-green-400'}>Xp Reward: {this.state.quest_data.gold_reward}</li> : null }
+                                            { this.state.quest_data.gold_dust_reward !== null ? <li className={'text-green-600 dark:text-green-400'}>Xp Reward: {this.state.quest_data.gold_dust_reward}</li> : null }
+                                            { this.state.quest_data.shards_reward !== null ? <li className={'text-green-600 dark:text-green-400'}>Xp Reward: {this.state.quest_data.shards_reward}</li> : null }
+                                        </ul>
+                                    </div>
+                                </div>
                             </div>
 
                             <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+
+                            {
+                                this.state.quest_data.faction_points_per_kill !== null ?
+                                    <p className="text-blue-700 dark:text-blue-400">
+                                        You have been given an additional {this.state.quest_data.faction_points_per_kill} Faction Points per kill for this quest.
+                                    </p>
+                                : null
+                            }
 
                             <Tabs tabs={this.tabs}>
                                 <TabPanel key={'story'}>

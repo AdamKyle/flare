@@ -3,15 +3,16 @@
 namespace App\Admin\Controllers;
 
 use Illuminate\Http\Request;
+use App\Flare\Models\Monster;
 use App\Flare\Models\Location;
 use App\Flare\Values\LocationType;
 use App\Http\Controllers\Controller;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Admin\Services\LocationService;
 use App\Flare\Values\LocationEffectValue;
-use App\Admin\Exports\Locations\LocationsExport;
-use App\Admin\Import\Locations\LocationsImport;
 use App\Admin\Requests\LocationsImportRequest;
+use App\Admin\Import\Locations\LocationsImport;
+use App\Admin\Exports\Locations\LocationsExport;
 
 class LocationsController extends Controller {
 
@@ -46,6 +47,7 @@ class LocationsController extends Controller {
         $increasesEnemyStrengthBy = null;
         $locationType             = null;
         $increasesDropChanceBy    = 0.0;
+        $monster                  = null;
 
         if (!is_null($location->enemy_strength_type)) {
             $increasesEnemyStrengthBy = LocationEffectValue::getIncreaseName($location->enemy_strength_type);
@@ -56,11 +58,16 @@ class LocationsController extends Controller {
             $locationType = (new LocationType($location->type));
         }
 
+        if (!is_null($location->questRewardItem)) {
+            $monster = Monster::where('quest_item_id', $location->quest_reward_item_id)->first();
+        }
+
         return view('admin.locations.location', [
             'location'                 => $location,
             'increasesEnemyStrengthBy' => $increasesEnemyStrengthBy,
             'increasesDropChanceBy'    => $increasesDropChanceBy,
             'locationType'             => $locationType,
+            'monster'                  => $monster,
         ]);
     }
 

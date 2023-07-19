@@ -115,6 +115,10 @@ class Quest extends Model {
         return $this->belongsTo(Item::class, 'secondary_required_item', 'id');
     }
 
+    public function passive() {
+        return $this->belongsTo(PassiveSkill::class, 'unlocks_passive_id', 'id');
+    }
+
     public function rewardItem() {
         return $this->belongsTo(Item::class, 'reward_item', 'id');
     }

@@ -35,8 +35,10 @@
         <tr>
             <td>{{$quest->id}}</td>
             <td>{{$quest->name}}</td>
-            <td>{{$quest->npc->id}}</td>
+            <td>{{!is_null($quest->npc) ? $quest->npc->name : ''}}</td>
             <td>{{!is_null($quest->raid) ? $quest->raid->name : ''}}</td>
+            <td>{{!is_null($quest->required_quest_id) ? $quest->requiredQuest->name : ''}}</td>
+            <td>{{$quest->reincarnated_times}}</td>
             <td>{{!is_null($quest->item) ? $quest->item->name : ''}}</td>
             <td>{{$quest->gold_dust_cost}}</td>
             <td>{{$quest->shard_cost}}</td>
@@ -50,17 +52,17 @@
             <td>{{!is_null($quest->unlocks_skill) ? $quest->unlocks_skill_name : ''}}</td>
             <td>{{$quest->unlocks_skill_type}}</td>
             <td>{{$quest->is_parent}}</td>
-            <td>{{!is_null($quest->parent_quest_id) ? $quest->parent_quest_id : ''}}</td>
+            <td>{{!is_null($quest->parent_quest_id) ? $quest->parent->name : ''}}</td>
             <td>{{!is_null($quest->secondary_required_item) ? $quest->secondaryItem->name : ''}}</td>
-            <td>{{!is_null($quest->faction_game_map_id) ? $quest->faction_game_map_id : ''}}</td>
+            <td>{{!is_null($quest->faction_game_map_id) ? $quest->factionMap->name : ''}}</td>
             <td>{{!is_null($quest->required_faction_level) ? $quest->required_faction_level : ''}}</td>
             <td>{{!is_null($quest->unlocks_feature) ? $quest->unlocks_feature : ''}}</td>
-            <td>{{!is_null($quest->unlocks_passive_id) ? $quest->unlocks_passive_id : ''}}</td>
+            <td>{{!is_null($quest->unlocks_passive_id) ? $quest->passive->name : ''}}</td>
             <td>{{nl2br($quest->before_completion_description)}}</td>
             <td>{{nl2br($quest->after_completion_description)}}</td>
             <td>{{!is_null($quest->raid_id) ? $quest->raid->name : ''}}</td>
             <td>{{!is_null($quest->required_quest_id) ? $quest->requiredQuest->name : ''}}</td>
-            <td>{{$quest->reincarnated_times}}</td>
+            
         </tr>
     @endforeach
     </tbody>

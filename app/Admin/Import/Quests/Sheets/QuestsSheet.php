@@ -89,7 +89,7 @@ class QuestsSheet implements ToCollection {
         if (!isset($quest['parent_quest_id'])) {
             $quest['parent_quest_id'] = null;
         } else {
-            $foundQuest = Quest::find($quest['parent_quest_id']);
+            $foundQuest = Quest::where('name', $quest['parent_quest_id'])->first();
 
             if (is_null($foundQuest)) {
                 $quest['parent_quest_id'] = null;
@@ -101,10 +101,12 @@ class QuestsSheet implements ToCollection {
         if (!isset($quest['faction_game_map_id'])) {
             $quest['faction_game_map_id'] = null;
         } else {
-            $map = GameMap::find($quest['faction_game_map_id']);
+            $map = GameMap::where('name', $quest['faction_game_map_id']);
 
             if (is_null($map)) {
                 $quest['faction_game_map_id'] = null;
+            } else {
+                $quest['faction_game_map_id'] = $map->id;
             }
         }
 
@@ -119,30 +121,37 @@ class QuestsSheet implements ToCollection {
         if (!isset($quest['required_passive_skill'])) {
             $quest['required_passive_level'] = null;
         } else {
-            $passive = PassiveSkill::find($quest['required_passive_skill']);
+            $passive = PassiveSkill::where('name', $quest['required_passive_skill'])->first();
 
             if (is_null($passive)) {
                 $quest['required_passive_level'] = null;
+                $quest['required_passive_skill'] = null;
+            } else {
+                $quest['required_passive_skill'] = $passive->id;
             }
         }
 
         if (!isset($quest['raid_id'])) {
             $quest['raid_id'] = null;
         } else {
-            $raid = Raid::find($quest['raid_id']);
+            $raid = Raid::where('name', $quest['raid_id'])->first();
 
             if (is_null($raid)) {
                 $quest['raid_id'] = null;
+            } else {
+                $quest['raid_id'] = $raid->id;
             }
         }
 
         if (!isset($quest['required_quest_id'])) {
             $quest['required_quest_id'] = null;
         } else {
-            $raid = Quest::find($quest['required_quest_id']);
+            $quest = Quest::where('name', $quest['required_quest_id'])->first();
 
-            if (is_null($raid)) {
+            if (is_null($quest)) {
                 $quest['required_quest_id'] = null;
+            } else {
+                $quest['required_quest_id'] = $quest->od;
             }
         }
 

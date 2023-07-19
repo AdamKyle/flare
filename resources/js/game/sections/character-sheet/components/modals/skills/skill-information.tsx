@@ -41,6 +41,7 @@ export default class SkillInformation extends React.Component<any, any> {
             'base_ac_mod',
             'fight_timeout_mod',
             'move_timeout_mod',
+            'class_bonus',
         ]
 
         return validFields.filter((field: string) => {
@@ -119,7 +120,7 @@ export default class SkillInformation extends React.Component<any, any> {
                                 {
                                     !this.iSkillDetailsEmpty() ?
                                         <div>{this.renderSkillDetails()}</div>
-                                        : null
+                                    : null
                                 }
                             </div>
                         </Fragment>

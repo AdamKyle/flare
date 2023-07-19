@@ -72,7 +72,7 @@ class Skill extends Model {
     public function getClassBonusAttribute() {
 
         if (is_null($this->baseSkill->class_bonus)) {
-             return null;
+             return 0;
         }
 
         return $this->baseSkill->class_bonus * $this->level;
@@ -348,6 +348,7 @@ class Skill extends Model {
 
         return $slots;
     }
+    
 
     protected static function newFactory() {
         return SkillFactory::new();

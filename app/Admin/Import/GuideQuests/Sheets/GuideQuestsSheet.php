@@ -38,38 +38,52 @@ class GuideQuestsSheet implements ToCollection {
 
     protected function returnCleanAffix(array $data) {
 
-        $gameMap      = GameMap::where('name', $data['game_map_id'])->first();
+        $gameMap      = GameMap::where('name', $data['required_game_map_id'])->first();
         $skill        = GameSkill::where('name', $data['required_skill'])->first();
         $passiveSkill = PassiveSkill::where('name', $data['required_passive_skill'])->first();
-        $faction      = Faction::where('name', $data['required_faction_id'])->first();
+        $faction      = Faction::whereHas('gameMap', function ($query) use ($data) {
+                            $query->where('name', $data['required_faction_id']);
+                        })->first();
         $requiredItem = Item::where('name', $data['required_quest_item_id'])->where('type', 'quest')->first();
         $quest        = Quest::where('name', $data['required_quest_id'])->first();
 
-        if (!is_null($data['required_skill_level']) && is_null($skill)) {
+        if (is_null($skill)) {
             $data['required_skill_level'] = null;
             $data['required_skill']       = null;
+        } else {
+            $data['required_skill'] = $skill->id;
         }
 
-        if (!is_null($data['required_passive_skill']) && is_null($passiveSkill)) {
+        if (is_null($passiveSkill)) {
             $data['required_passive_level'] = null;
             $data['required_passive_skill'] = null;
+        } else {
+            $data['required_passive_skill'] = $passiveSkill->id;
         }
 
-        if (!is_null($data['required_faction_level']) && is_null($faction)) {
-            $data['required_faction_id'] = null;
-            $data['required_faction_id'] = null;
+        if (is_null($faction)) {
+            $data['required_faction_id']    = null;
+            $data['required_faction_level'] = null;
+        } else {
+            $data['required_faction_id'] = $faction->id;
         }
 
         if (is_null($requiredItem)) {
             $data['required_quest_item_id'] = null;
+        } else {
+            $data['required_quest_item_id'] = $requiredItem->id;
         }
 
         if (is_null($quest)) {
             $data['required_quest_id'] = null;
+        } else {
+            $data['required_quest_id'] = $quest->id;
         }
 
         if (is_null($gameMap)) {
-            $data['game_map_id'] = null;
+            $data['required_game_map_id'] = null;
+        } else {
+            $data['required_game_map_id'] = $gameMap->id;
         }
 
         return $data;

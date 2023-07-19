@@ -38,6 +38,7 @@ class SkillsTransformer extends TransformerAbstract {
             'base_ac_mod'                  => $skill->base_ac_mod,
             'fight_timeout_mod'            => $skill->fight_timeout_mod,
             'move_timeout_mod'             => $skill->move_timeout_mod,
+            'class_bonus'                  => $skill->class_bonus
         ];
     }
 }

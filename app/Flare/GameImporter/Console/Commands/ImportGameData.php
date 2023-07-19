@@ -9,7 +9,6 @@ use App\Flare\Values\MapNameValue;
 use Illuminate\Http\File;
 use Illuminate\Support\Facades\Storage;
 use App\Flare\GameImporter\Values\ExcelMapper;
-use Illuminate\Support\Facades\Artisan;
 
 class ImportGameData extends Command {
 
@@ -71,11 +70,8 @@ class ImportGameData extends Command {
 
         $this->line('Importing Infromation section ...');
 
-        // Import the information wiki:
+        // Import the information wiki
         $this->importInformationSection();
-
-        // Generate the Monster Cache:
-        Artisan::call('generate:monster-cache');
 
         $this->line('Finished the import ...');
     }

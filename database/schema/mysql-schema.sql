@@ -1104,6 +1104,7 @@ CREATE TABLE `locations` (
   `required_quest_item_id` bigint unsigned DEFAULT NULL,
   `type` int DEFAULT NULL,
   `can_players_enter` tinyint(1) NOT NULL,
+  `can_auto_battle` tinyint(1) NOT NULL,
   `raid_id` bigint DEFAULT NULL,
   `has_raid_boss` tinyint(1) NOT NULL DEFAULT '0',
   `is_corrupted` tinyint(1) NOT NULL DEFAULT '0',

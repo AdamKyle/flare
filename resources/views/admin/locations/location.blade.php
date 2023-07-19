@@ -20,5 +20,9 @@
                 'location' => $location,
             ])
         </x-core.cards.card-with-title>
+
+        @if (!is_null($location->questRewardItem))
+            @include('game.items.components.items-quest-details', ['item' => $location->questRewardItem])
+        @endif
     </x-core.layout.info-container>
 @endsection

@@ -14,10 +14,10 @@ class MonstersSheet implements ToCollection {
 
         foreach ($rows as $index => $row) {
             if ($index !== 0) {
+
                 $originalMonster = array_combine($rows[0]->toArray(), $row->toArray());
-
-                $monster = $this->returnCleanMonster($originalMonster);
-
+                $monster         = $this->returnCleanMonster($originalMonster);
+                
                 if (is_null($monster) || !isset($monster['name'])) {
                     continue;
                 }

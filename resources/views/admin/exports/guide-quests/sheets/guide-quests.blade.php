@@ -65,8 +65,8 @@
                 <td>{{$guideQuest->required_focus}}</td>
                 <td>{{$guideQuest->gold_dust_reward}}</td>
                 <td>{{$guideQuest->shards_reward}}</td>
-                <td>{{$guildQuest->gold_reward}}</td>
-                <td>{{$guildQuest->xp_reward}}</td>+
+                <td>{{$guideQuest->gold_reward}}</td>
+                <td>{{$guideQuest->xp_reward}}</td>+
             </tr>
         @endforeach
     </tbody>
