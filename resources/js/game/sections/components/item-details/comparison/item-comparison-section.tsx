@@ -16,6 +16,10 @@ export default class ItemComparisonSection extends React.Component<ItemCompariso
 
     private tabs: {name: string, key: string}[];
 
+    private singleItemTabs: {name: string, key: string}[];
+
+    private invalidFields: string[];
+
     constructor(props: ItemComparisonSectionProps) {
         super(props);
 
@@ -29,6 +33,16 @@ export default class ItemComparisonSection extends React.Component<ItemCompariso
             key: 'gem-comparison',
             name: 'Gem Data',
         }]
+
+        this.singleItemTabs = [{
+            key: 'general',
+            name: 'General'
+        }, {
+            key: 'gem-comparison',
+            name: 'Gem Data',
+        }]
+
+        this.invalidFields = ['item_id', 'id', 'min_cost', 'skill_level_req', 'skill_level_trivial', 'reduces_enemy_stats', 'cost', 'shop_cost', 'slot_id', 'holy_level', 'affix_count', 'is_unique', 'is_mythic'];
     }
 
     renderWholeNumber(details: InventoryComparisonAdjustment, key: string) {
@@ -236,8 +250,16 @@ export default class ItemComparisonSection extends React.Component<ItemCompariso
 
     renderSingleComparison() {
         if (this.props.comparison_details !== null) {
+            const keyCount = Object.keys(this.props.comparison_details.itemToEquip)
+                                   .filter((key: string) => !this.invalidFields.includes(key))
+                                   .length;
+            
+
             return (
-                <div className='max-h-[400px] lg:max-h-[500px] overflow-y-auto'>
+                <div className={clsx({
+                    'max-h-[200px] overflow-y-auto md:max-h-[500px] lg:max-h-[600px] lg:overflow-visible': keyCount < 15,
+                    'max-h-[200px] overflow-y-auto': keyCount > 15,
+                })}>
                     <div className={'font-light pb-3'}>
                         <ItemNameColorationText item={this.fetchItemInfoForColorization(this.props.comparison_details.details[0])} />
                     </div>
@@ -254,12 +276,45 @@ export default class ItemComparisonSection extends React.Component<ItemCompariso
             return null;
         }
 
+        const keyCount = Object.keys(this.props.comparison_details.itemToEquip)
+                               .filter((key: string) => !this.invalidFields.includes(key))
+                               .filter((key: string) => this.props.comparison_details.itemToEquip[key] > 0)
+                               .filter((key: string) => this.props.comparison_details.itemToEquip[key] !== null)
+                               .filter((key: string) => typeof this.props.comparison_details.itemToEquip[key] !== 'boolean')
+                               .length;
+
+        if (this.props.comparison_details.itemToEquip.type === 'ring') {
+            return (
+                <div className={clsx({
+                    'max-h-[200px] overflow-y-auto md:max-h-[500px] lg:max-h-[600px] lg:overflow-visible': keyCount < 15,
+                    'max-h-[200px] overflow-y-auto': keyCount > 15,
+                })}>
+                    <dl>
+                        {this.renderItemToEquip(this.props.comparison_details.itemToEquip)}
+                    </dl>
+                </div>
+            )
+        }
+
         return (
-            <div className='max-h-[200px] md:max-h-[400px] lg:max-h-[500px] overflow-y-auto'>
-                <dl>
-                    {this.renderItemToEquip(this.props.comparison_details.itemToEquip)}
-                </dl>
-            </div>
+            <Tabs tabs={this.singleItemTabs}>
+                <TabPanel key={'general'}>
+                    <div className={clsx({
+                        'max-h-[200px] overflow-y-auto md:max-h-[500px] lg:max-h-[600px] lg:overflow-visible': keyCount < 15,
+                        'max-h-[200px] overflow-y-auto': keyCount > 15,
+                    })}>
+                        <dl>
+                            {this.renderItemToEquip(this.props.comparison_details.itemToEquip)}
+                        </dl>
+                    </div>
+                </TabPanel>
+                <TabPanel key={'gem-comparison'}>
+                    <InventoryItemGemDetails
+                        item_atonement={this.props.comparison_details.atonement.item_atonement}
+                        equipped_atonements={this.props.comparison_details.atonement.inventory_atonements}
+                    />
+                </TabPanel>
+            </Tabs>
         )
     }
 

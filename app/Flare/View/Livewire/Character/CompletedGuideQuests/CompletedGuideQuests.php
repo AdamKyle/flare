@@ -24,7 +24,10 @@ class CompletedGuideQuests extends DataTableComponent {
             Column::make('Name', 'guideQuest.name')->searchable()->format(
                 fn($value, $row, Column $column)  => '<a href="/game/completed-guide-quest/'.auth()->user()->character->id.'/'.$row->guide_quest_id.'">'.$value.'</a>'
             )->html(),
-            Column::make('Reward level', 'guideQuest.reward_level')->sortable(),
+            Column::make('Reward level', 'guideQuest.xp_reward')->sortable(),
+            Column::make('Reward level', 'guideQuest.gold_reward')->sortable(),
+            Column::make('Reward level', 'guideQuest.gold_dust_reward')->sortable(),
+            Column::make('Reward level', 'guideQuest.shards_reward')->sortable(),
         ];
     }
 }

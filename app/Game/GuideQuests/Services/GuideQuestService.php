@@ -43,7 +43,7 @@ class GuideQuestService {
             return false;
         }
 
-        $gold      = $character->gold + ($quest->reward_level * 1000);
+        $gold      = $character->gold + $quest->gold_reward;
         $goldDust  = $character->gold_dust + $quest->gold_dust_reward;
         $shards    = $character->shards + $quest->shards_reward;
 
@@ -59,7 +59,18 @@ class GuideQuestService {
             $shards = MaxCurrenciesValue::MAX_SHARDS;
         }
 
-        event(new ServerMessageEvent($character->user, 'Rewarded with: ' . number_format(($quest->reward_level * 1000)) . ' Gold.'));
+        if ($quest->gold_reward > 0) {
+            event(new ServerMessageEvent($character->user, 'Rewarded with: ' . number_format($quest->gold_reward) . ' Gold.'));
+        }
+
+        if ($quest->gold_dust_reward > 0) {
+            event(new ServerMessageEvent($character->user, 'Rewarded with: ' . number_format($quest->gold_reward) . ' Gold.'));
+        }
+
+        if ($quest->shards_reward > 0) {
+            event(new ServerMessageEvent($character->user, 'Rewarded with: ' . number_format($quest->gold_reward) . ' Gold.'));
+        }
+        
 
         $character = $this->giveXP($character, $quest);
 
@@ -80,13 +91,20 @@ class GuideQuestService {
     }
 
     public function giveXP(Character $character, GuideQuest $guideQuest): Character {
+
+        if ($guideQuest->xp_reward <= 0) {
+            return $character;
+        }
+
         $character->update([
-            'xp' => $guideQuest->reward_xp
+            'xp' => $character->xp + $guideQuest->xp_reward
         ]);
 
         $character = $character->refresh();
 
         $this->handlePossibleLevelUp($character);
+
+        event(new ServerMessageEvent($character->user, 'Rewarded with: ' . number_format($guideQuest->xp_reward) . ' XP.'));
 
         return $character;
     }
@@ -193,6 +211,23 @@ class GuideQuestService {
         if (!is_null($quest->required_shards)) {
             if ($character->shards >= $quest->required_shards) {
                 $attributes[] = 'required_shards';
+            }
+        }
+
+        if (!is_null($quest->required_stats)) {
+            $stats          = ['str', 'dex', 'dur', 'int', 'chr', 'agi', 'focus'];
+            $completedStats = [];
+
+            foreach ($stats as $stat) {
+                $value = $character->getInformation()->statMod($stat);
+
+                if ($value >= $quest->required_stats) {
+                    $completedStats[] = $stat;
+                }
+            }
+
+            if (count($completedStats) === count($stats)) {
+                $attributes[] = 'required_stats';
             }
         }
 

@@ -152,7 +152,7 @@ class LocationService {
      * @return Collection
      */
     public function fetchLocationData(Character $character): Collection {
-        $locations = Location::where('game_map_id', $character->map->game_map_id)->get();
+        $locations = Location::with('questRewardItem')->where('game_map_id', $character->map->game_map_id)->get();
         
         return $this->transformLocationData($locations);
     }

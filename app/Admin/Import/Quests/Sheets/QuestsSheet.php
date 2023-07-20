@@ -30,7 +30,7 @@ class QuestsSheet implements ToCollection {
 
     protected function returnCleanItem(array $quest) {
 
-        $npc = Npc::find($quest['npc_id']);
+        $npc = Npc::where('name', $quest['npc_id'])->first();
 
         if (is_null($npc)) {
             return [];
@@ -101,7 +101,7 @@ class QuestsSheet implements ToCollection {
         if (!isset($quest['faction_game_map_id'])) {
             $quest['faction_game_map_id'] = null;
         } else {
-            $map = GameMap::where('name', $quest['faction_game_map_id']);
+            $map = GameMap::where('name', $quest['faction_game_map_id'])->first();
 
             if (is_null($map)) {
                 $quest['faction_game_map_id'] = null;
@@ -118,16 +118,15 @@ class QuestsSheet implements ToCollection {
             $quest['is_parent'] = false;
         }
 
-        if (!isset($quest['required_passive_skill'])) {
+        if (!isset($quest['unlocks_passive_id'])) {
             $quest['required_passive_level'] = null;
         } else {
-            $passive = PassiveSkill::where('name', $quest['required_passive_skill'])->first();
+            $passive = PassiveSkill::where('name', $quest['unlocks_passive_id'])->first();
 
             if (is_null($passive)) {
-                $quest['required_passive_level'] = null;
-                $quest['required_passive_skill'] = null;
+                $quest['unlocks_passive_id'] = null;
             } else {
-                $quest['required_passive_skill'] = $passive->id;
+                $quest['unlocks_passive_id'] = $passive->id;
             }
         }
 

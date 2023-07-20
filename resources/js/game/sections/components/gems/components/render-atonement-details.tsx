@@ -7,7 +7,7 @@ export default class RenderAtonementDetails extends React.Component<any, any> {
     }
 
     renderAtonements(atonementData: any): JSX.Element[]|[] {
-
+        console.log(atonementData);
         const elements = [];
 
         for (const key in atonementData) {

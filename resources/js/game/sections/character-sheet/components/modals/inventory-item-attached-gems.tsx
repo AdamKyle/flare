@@ -1,5 +1,4 @@
 import React from "react";
-import ComponentLoading from "../../../../components/ui/loading/component-loading";
 import Dialogue from "../../../../components/ui/dialogue/dialogue";
 import {AxiosError, AxiosResponse} from "axios";
 import Ajax from "../../../../lib/ajax/ajax";

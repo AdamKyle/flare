@@ -159,6 +159,8 @@ class ImportGameData extends Command {
     protected function importGameMaps(): void {
         $files = Storage::disk('data-maps')->allFiles();
 
+        $files = array_reverse($files);
+
         foreach ($files as $file) {
             $fileName = pathinfo($file, PATHINFO_FILENAME);
 

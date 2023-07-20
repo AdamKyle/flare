@@ -3,7 +3,6 @@ import {formatNumber} from "../../../../../lib/game/format-number";
 import ItemAffixDetails from "./item-affix-details";
 import ItemHolyDetails from "./item-holy-details";
 import OrangeButton from "../../../../../components/ui/buttons/orange-button";
-import PrimaryButton from "../../../../../components/ui/buttons/primary-button";
 import InventoryItemAttachedGems from "../inventory-item-attached-gems";
 
 export default class ItemDetails extends React.Component<any, any> {
@@ -41,8 +40,6 @@ export default class ItemDetails extends React.Component<any, any> {
     }
 
     renderAtonementAmounts(): JSX.Element[]|[] {
-        console.log(this.props.item);
-
         const atonements = this.props.item.item_atonements.atonements;
         const atonementData = [];
 

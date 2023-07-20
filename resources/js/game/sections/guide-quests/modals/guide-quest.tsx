@@ -130,13 +130,14 @@ export default class GuideQuest extends React.Component<any, any> {
                                             { this.state.quest_data.required_kingdom_level !== null ? <li className={'text-orange-600 dark:text-orange-400'}>Required Buildings Level (Combined): {this.state.quest_data.required_kingdom_level}</li> : null }
                                             { this.state.quest_data.required_kingdom_units !== null ? <li className={'text-orange-600 dark:text-orange-400'}>Required Units Amount (Combined): {this.state.quest_data.required_kingdom_units}</li> : null }
                                             { this.state.quest_data.passive_name !== null ? <li className={'text-orange-600 dark:text-orange-400'}>Get Passive Skill: {this.state.quest_data.passive_name} to level: {this.state.quest_data.required_passive_skill}</li> : null }
-                                            { this.state.quest_data.required_str !== null ? <li className={'text-orange-600 dark:text-orange-400'}>Get all stats to: {this.state.quest_data.required_str}</li> : null }
-                                            { this.state.quest_data.required_dex !== null ? <li className={'text-orange-600 dark:text-orange-400'}>Get all stats to: {this.state.quest_data.required_dex}</li> : null }
-                                            { this.state.quest_data.required_agi !== null ? <li className={'text-orange-600 dark:text-orange-400'}>Get all stats to: {this.state.quest_data.required_agi}</li> : null }
-                                            { this.state.quest_data.required_int !== null ? <li className={'text-orange-600 dark:text-orange-400'}>Get all stats to: {this.state.quest_data.required_int}</li> : null }
-                                            { this.state.quest_data.required_dur !== null ? <li className={'text-orange-600 dark:text-orange-400'}>Get all stats to: {this.state.quest_data.required_dur}</li> : null }
-                                            { this.state.quest_data.required_chr !== null ? <li className={'text-orange-600 dark:text-orange-400'}>Get all stats to: {this.state.quest_data.required_chr}</li> : null }
-                                            { this.state.quest_data.required_focus !== null ? <li className={'text-orange-600 dark:text-orange-400'}>Get all stats to: {this.state.quest_data.required_focus}</li> : null }
+                                            { this.state.quest_data.required_stats !== null ? <li className={'text-orange-600 dark:text-orange-400'}>Get all stats to: {this.state.quest_data.required_stats}</li> : null }
+                                            { this.state.quest_data.required_str !== null ? <li className={'text-orange-600 dark:text-orange-400'}>Get STR to: {this.state.quest_data.required_str}</li> : null }
+                                            { this.state.quest_data.required_dex !== null ? <li className={'text-orange-600 dark:text-orange-400'}>Get DEX to: {this.state.quest_data.required_dex}</li> : null }
+                                            { this.state.quest_data.required_agi !== null ? <li className={'text-orange-600 dark:text-orange-400'}>Get AGIto: {this.state.quest_data.required_agi}</li> : null }
+                                            { this.state.quest_data.required_int !== null ? <li className={'text-orange-600 dark:text-orange-400'}>Get INT to: {this.state.quest_data.required_int}</li> : null }
+                                            { this.state.quest_data.required_dur !== null ? <li className={'text-orange-600 dark:text-orange-400'}>Get DUR to: {this.state.quest_data.required_dur}</li> : null }
+                                            { this.state.quest_data.required_chr !== null ? <li className={'text-orange-600 dark:text-orange-400'}>Get CHR to: {this.state.quest_data.required_chr}</li> : null }
+                                            { this.state.quest_data.required_focus !== null ? <li className={'text-orange-600 dark:text-orange-400'}>Get FOCUS to: {this.state.quest_data.required_focus}</li> : null }
                                             { this.state.quest_data.required_gold !== null ? <li className={'text-orange-600 dark:text-orange-400'}>Obtain Gold Amount: {this.state.quest_data.required_gold}</li> : null }
                                             { this.state.quest_data.required_shards !== null ? <li className={'text-orange-600 dark:text-orange-400'}>Obtain Shards Amount: {this.state.quest_data.required_shards}</li> : null }
                                             { this.state.quest_data.required_gold_dust !== null ? <li className={'text-orange-600 dark:text-orange-400'}>Obtain Gold Dust Amount: {this.state.quest_data.required_gold_dust}</li> : null }
@@ -147,9 +148,9 @@ export default class GuideQuest extends React.Component<any, any> {
                                         <h3 className='mb-2'>Rewards</h3>
                                         <ul className='list-disc ml-[18px]'>
                                             { this.state.quest_data.xp_reward !== null ? <li className={'text-green-600 dark:text-green-400'}>Xp Reward: {this.state.quest_data.xp_reward}</li> : null }
-                                            { this.state.quest_data.gold_reward !== null ? <li className={'text-green-600 dark:text-green-400'}>Xp Reward: {this.state.quest_data.gold_reward}</li> : null }
-                                            { this.state.quest_data.gold_dust_reward !== null ? <li className={'text-green-600 dark:text-green-400'}>Xp Reward: {this.state.quest_data.gold_dust_reward}</li> : null }
-                                            { this.state.quest_data.shards_reward !== null ? <li className={'text-green-600 dark:text-green-400'}>Xp Reward: {this.state.quest_data.shards_reward}</li> : null }
+                                            { this.state.quest_data.gold_reward !== null ? <li className={'text-green-600 dark:text-green-400'}>Gold Reward: {this.state.quest_data.gold_reward}</li> : null }
+                                            { this.state.quest_data.gold_dust_reward !== null ? <li className={'text-green-600 dark:text-green-400'}>Gold Dust Reward: {this.state.quest_data.gold_dust_reward}</li> : null }
+                                            { this.state.quest_data.shards_reward !== null ? <li className={'text-green-600 dark:text-green-400'}>Shards Reward: {this.state.quest_data.shards_reward}</li> : null }
                                         </ul>
                                     </div>
                                 </div>
