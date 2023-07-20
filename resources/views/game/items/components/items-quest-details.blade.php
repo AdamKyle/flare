@@ -9,15 +9,8 @@
             @endif
 
             <x-core.alerts.info-alert title="Info">
-                <p class="my-2">
-                    If a location has a quest reward associated with it, all you have to do is physically
-                    visit the location to get the quest reward.
-                </p>
-
-                <p>
-                    Quest items, like this one are used automatically. For example if the quest item gives bonuses to a crafting skill or enchanting, then the skill bonus and xp
-                    will be applied upon crafting or enchanting. If it's an item, like Flask of Fresh Air for example - then it gets used when you attempt to walk on water (on surface and labyrinth) for the first time.
-                </p>
+                Quest items, like this one are used automatically. For example if the quest item gives bonuses to a crafting skill or enchanting, then the skill bonus and xp
+                will be applied upon crafting or enchanting. If it's an item, like Flask of Fresh Air for example - then it gets used when you attempt to walk on water (on surface and labyrinth) for the first time.
             </x-core.alerts.info-alert>
 
             @if (!is_null($monster))
@@ -67,6 +60,75 @@
                     <dd>
                         {{$location->x}} / {{$location->y}}
                     </dd>
+                </dl>
+            @endif
+            @if (!is_null($quest))
+                <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+                <p class="mb-4">This quest item is used in the following quest:</p>
+                <dl>
+                    <dt>Quest Name: </dt>
+                    <dd>
+                        @guest
+                            <a href="{{route('info.page.quest', [
+                                                            'quest' => $quest->id
+                                                        ])}}" target="_blank"><i class="fas fa-external-link-alt"></i> {{$quest->name}}</a>
+                        @else
+                            @if (auth()->user()->hasRole('Admin'))
+                                <a href="{{route('quests.show', [
+                                                            'quest' => $quest->id
+                                                        ])}}" target="_blank"><i class="fas fa-external-link-alt"></i> {{$quest->name}}</a>
+                            @else
+                                <a href="{{route('info.page.quest', [
+                                                            'quest' => $quest->id
+                                                        ])}}" target="_blank"><i class="fas fa-external-link-alt"></i> {{$quest->name}}</a>
+                            @endif
+                        @endguest
+                    </dd>
+                </dl>
+            @endif
+            @if (!is_null($item->dropLocation))
+                <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+                <p class="mb-4">Players cannot be auto battling for this item to drop. Looting in this location is capped at 45%. All drop chances are 1/1,000,000. Players may also eed to do relevant quests to access this location.</p>
+
+                <dl>
+                    <dt>Drops only from<sup>*</sup>: </dt>
+                    <dd>{{$item->dropLocation->name}}</dd>
+                    <dt>At (X/Y):</dt>
+                    <dd>{{$item->dropLocation->x}}/{{$item->dropLocation->y}}</dd>
+                    <dt>Located on plane:</dt>
+                    <dd>{{$item->dropLocation->name}}</dd>
+                </dl>
+            @endif
+            @if (!is_null($item->xp_bonus))
+                <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+                <x-core.alerts.info-alert title="Info">
+                    <p class="mb-4">
+                        These quest items help players to gain levels faster. However, there are two aspects to them:
+                    </p>
+                    <ul class="mb-4 list-disc ml-[20px]">
+                        <li>
+                            How much of a boost % wise.
+                        </li>
+                        <li>
+                            Does it ignore caps?
+                        </li>
+                    </ul>
+                    <p class="mb-4">
+                        As most players know, there are three types of caps in this game when it comes to leveling: Soft (you get 50% of the remaining XP), Medium (You get 25% of the remaining XP)
+                        and Hard (You get 10% of the remaining XP) Cap.
+                        Soft cap starts at 1/2 the way to your max level, medium is 75% of the way and Hard is the last ten levels. If a quest item states
+                        it ignores caps, you will get all the XP + the bonus AFTER any relevant skill training deductions - regardless of level.
+                    </p>
+                    <p class="mb-4">
+                        If it does not say it ignores caps, You will NOT get the bonus once you hit soft cap which is 500 for those without the Sash of the Heavens, or half the current max level cap.
+                        At which point you will no longer get the XP bonus.
+                    </p>
+                </x-core.alerts.info-alert>
+                <dl>
+                    <dt>XP Bonus:</dt>
+                    <dd>{{$item->xp_bonus * 100}}%</dd>
+                    <dt>Ignores Caps:</dt>
+                    <dd>{{$item->ignores_caps ? 'Yes' : 'No'}}</dd>
                 </dl>
             @endif
         </x-core.cards.card-with-title>

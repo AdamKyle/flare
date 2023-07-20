@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Flare\Models\Quest;
 use Illuminate\Http\Request;
 use App\Flare\Models\Monster;
 use App\Flare\Models\Location;
@@ -47,7 +48,7 @@ class LocationsController extends Controller {
         $increasesEnemyStrengthBy = null;
         $locationType             = null;
         $increasesDropChanceBy    = 0.0;
-        $monster                  = null;
+        $usedInQuest              = null;
 
         if (!is_null($location->enemy_strength_type)) {
             $increasesEnemyStrengthBy = LocationEffectValue::getIncreaseName($location->enemy_strength_type);
@@ -59,7 +60,13 @@ class LocationsController extends Controller {
         }
 
         if (!is_null($location->questRewardItem)) {
-            $monster = Monster::where('quest_item_id', $location->quest_reward_item_id)->first();
+            
+            $usedInQuest = Quest::where('item_id', $location->quest_reward_item_id)->first();
+
+            if (is_null($usedInQuest)) {
+                $usedInQuest = Quest::where('secondary_required_item', $location->quest_reward_item_id)->first();
+            }
+
         }
 
         return view('admin.locations.location', [
@@ -67,7 +74,7 @@ class LocationsController extends Controller {
             'increasesEnemyStrengthBy' => $increasesEnemyStrengthBy,
             'increasesDropChanceBy'    => $increasesDropChanceBy,
             'locationType'             => $locationType,
-            'monster'                  => $monster,
+            'usedInQuest'              => $usedInQuest,
         ]);
     }
 
