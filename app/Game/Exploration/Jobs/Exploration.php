@@ -4,7 +4,6 @@ namespace App\Game\Exploration\Jobs;
 
 use App\Flare\Models\Faction;
 use App\Flare\Models\GameMap;
-use App\Flare\Models\GuideQuest;
 use App\Flare\ServerFight\MonsterPlayerFight;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Battle\Events\UpdateCharacterStatus;
@@ -14,8 +13,6 @@ use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Models\Monster;
 use App\Game\Exploration\Events\ExplorationTimeOut;
 use App\Game\Exploration\Events\ExplorationLogUpdate;
-use App\Game\Exploration\Handlers\RewardHandler;
-use App\Game\Exploration\Services\EncounterService;
 use App\Game\GuideQuests\Services\GuideQuestService;
 use App\Game\Maps\Events\UpdateDuelAtPosition;
 use Illuminate\Bus\Queueable;
@@ -25,6 +22,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use App\Flare\Models\CharacterAutomation;
 use App\Flare\Models\Character;
+use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 
 class Exploration implements ShouldQueue
 {
@@ -315,7 +313,7 @@ class Exploration implements ShouldQueue
 
         $character->update(['gold' => $gold]);
 
-        event(new UpdateTopBarEvent($character->refresh()));
+        event(new UpdateCharacterCurrenciesEvent($character->refresh()));
 
         event(new ExplorationLogUpdate($character->user, 'Gained 10k Gold for completing the exploration.', false, true));
     }

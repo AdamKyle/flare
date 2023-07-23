@@ -5,7 +5,6 @@ namespace App\Flare\View\Livewire\Admin\Items;
 use Illuminate\Database\Eloquent\Builder;
 use Rappasoft\LaravelLivewireTables\DataTableComponent;
 use Rappasoft\LaravelLivewireTables\Views\Column;
-use Rappasoft\LaravelLivewireTables\Views\Columns\LinkColumn;
 use Rappasoft\LaravelLivewireTables\Views\Filters\SelectFilter;
 use App\Flare\Models\Item;
 
@@ -37,7 +36,8 @@ class ItemsTable extends DataTableComponent {
             $query = $query->where('cost', '<=', 2000000000)
                            ->whereNotIn('type', ['quest', 'alchemy', 'trinket'])
                            ->whereNull('item_suffix_id')
-                           ->whereNull('item_prefix_id');
+                           ->whereNull('item_prefix_id')
+                           ->whereNull('specialty_type');
         }
 
         return $query;
@@ -48,11 +48,17 @@ class ItemsTable extends DataTableComponent {
             SelectFilter::make('Types')
                 ->options($this->buildOptions())
                 ->filter(function(Builder $builder, string $value) {
-                    return $builder->where('type', $value)
-                                   ->where('cost', '<=', 2000000000)
-                                   ->whereNull('item_suffix_id')
-                                   ->whereNull('item_prefix_id')
-                                   ->whereNotIn('type', ['quest', 'alchemy', 'trinket']);
+                    $builder = $builder->where('type', $value)
+                                       ->where('cost', '<=', 2000000000)
+                                       ->whereNull('item_suffix_id')
+                                       ->whereNull('item_prefix_id')
+                                       ->whereNotIn('type', ['quest', 'alchemy', 'trinket']);
+
+                    if ($this->isShop) {
+                        $builder->whereNull('specialty_type');
+                    }
+
+                    return $builder;
                 }),
         ];
     }

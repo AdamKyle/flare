@@ -2,7 +2,7 @@
 
 namespace App\Flare\Calculators;
 
-use Facades\App\Flare\RandomNumber\RandomNumberGenerator;
+use Facades\App\Flare\RandomNumber\LotteryRandomNumberGenerator;
 use App\Flare\Models\Monster;
 
 class GoldRushCheckCalculator {
@@ -21,9 +21,11 @@ class GoldRushCheckCalculator {
     public function fetchGoldRushChance(float $gameMapBonus = 0.0) {
         $bonus = $gameMapBonus;
 
-        $roll = RandomNumberGenerator::generateRandomNumber(40, 50 ,1 ,100);
+        $randomAmount = rand(1, 100);
+        $roll         = LotteryRandomNumberGenerator::generateNumber($randomAmount);
+
         $roll += ceil($roll * $bonus);
 
-        return $roll > 95;
+        return $roll > 99;
     }
 }

@@ -45,7 +45,7 @@ class ReBalanceMonsters extends Command
                                ->where('is_celestial_entity', false)
                                ->get();
 
-            $this->manageMonsters($monsters, $exponentialAttributeCurve, 1, 2000000000, 100000, 500);
+            $this->manageMonsters($monsters, $exponentialAttributeCurve, 8, 2000000000, 100000, 500);
         }
 
         // Purgatory Monsters:

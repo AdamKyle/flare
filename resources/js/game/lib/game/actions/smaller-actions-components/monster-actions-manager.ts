@@ -2,12 +2,13 @@ import MonsterActions from "../../../../sections/game-actions-section/components
 import MonsterType from "../../types/actions/monster/monster-type";
 import Ajax from "../../../ajax/ajax";
 import {AxiosError, AxiosResponse} from "axios";
+import Revive from "../../../../sections/game-actions-section/components/fight-section/revive";
 
 export default class MonsterActionsManager {
 
-    private component: MonsterActions;
+    private component: MonsterActions | Revive;
 
-    constructor(component: MonsterActions) {
+    constructor(component: MonsterActions | Revive) {
         this.component = component;
     }
 
@@ -17,6 +18,11 @@ export default class MonsterActionsManager {
      * @param monster
      */
     public setSelectedMonster(monster: MonsterType|null) {
+
+        if (this.component instanceof Revive) {
+            return;
+        }
+
         let isSameMonster = false;
 
         if (monster === null) {
@@ -37,6 +43,10 @@ export default class MonsterActionsManager {
      * Reset the is_same_monster state.
      */
     public resetSameMonster() {
+        if (this.component instanceof Revive) {
+            return;
+        }
+
         this.component.setState({
             is_same_monster: false,
         });
@@ -48,6 +58,10 @@ export default class MonsterActionsManager {
      * @param attackTimeOut
      */
     setAttackTimeOut(attackTimeOut: number) {
+        if (this.component instanceof Revive) {
+            return;
+        }
+        
         this.component.setState({
             attack_time_out: attackTimeOut
         });
@@ -58,12 +72,12 @@ export default class MonsterActionsManager {
      *
      * @param characterId
      */
-    revive(characterId: number | null) {
+    revive(characterId: number | null, callback?: () => void) {
         (new Ajax()).setRoute('battle-revive/' + characterId).doAjaxCall(
             'post', (result: AxiosResponse) => {
-                this.component.setState({
-                    character_revived: true,
-                })
+                if (typeof callback !== 'undefined') {
+                    callback();
+                }
             },
             (error: AxiosError) => {
                 console.error(error);
@@ -74,6 +88,10 @@ export default class MonsterActionsManager {
      * Reset the fact the character has revived.
      */
     resetRevived() {
+        if (this.component instanceof Revive) {
+            return;
+        }
+
         this.component.setState({
             character_revived: false
         });

@@ -16,6 +16,7 @@ use App\Flare\Models\Monster;
 use App\Flare\Services\CharacterRewardService;
 use App\Game\Battle\Handlers\FactionHandler;
 use App\Game\Battle\Jobs\BattleItemHandler;
+use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use App\Game\Core\Services\GoldRush;
 use App\Game\Core\Traits\MercenaryBonus;
 use Exception;
@@ -56,7 +57,7 @@ class BattleRewardProcessing {
 
         $character = $this->currencyEventReward($character, $monster);
 
-        event(new UpdateTopBarEvent($character));
+        event(new UpdateCharacterCurrenciesEvent($character->refresh()));
     }
 
     protected function currencyEventReward(Character $character, Monster $monster): Character {

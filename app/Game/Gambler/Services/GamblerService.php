@@ -7,7 +7,6 @@ use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
-use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\MercenaryBonus;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Gambler\Events\GamblerSlotTimeOut;

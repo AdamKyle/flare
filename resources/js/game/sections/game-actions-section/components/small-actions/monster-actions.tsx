@@ -1,6 +1,5 @@
-import React, {Fragment} from "react";
+import React from "react";
 import MonsterSelection from "../monster-selection";
-import PrimaryButton from "../../../../components/ui/buttons/primary-button";
 import FightSection from "../fight-section";
 import MonsterActionsManager from "../../../../lib/game/actions/smaller-actions-components/monster-actions-manager";
 import MonsterType from "../../../../lib/game/types/actions/monster/monster-type";
@@ -10,6 +9,7 @@ import {isEqual} from "lodash";
 import Select from "react-select";
 import Ajax from "../../../../lib/ajax/ajax";
 import {AxiosError, AxiosResponse} from "axios";
+import Revive from "../fight-section/revive";
 
 export default class MonsterActions extends React.Component<MonsterActionsProps, MonsterActionState> {
 
@@ -124,10 +124,6 @@ export default class MonsterActions extends React.Component<MonsterActionsProps,
         this.monsterActionManager.resetRevived();
     }
 
-    revive() {
-        this.monsterActionManager.revive(this.props.character.id);
-    }
-
     setRank(data: any) {
         this.setState({
             rank_selected: data.value,
@@ -186,21 +182,16 @@ export default class MonsterActions extends React.Component<MonsterActionsProps,
                                   character={this.props.character}
                                   close_monster_section={this.props.close_monster_section}
                 />
-
-                {
-                    this.props.character.is_dead ?
-                        <div className='text-center my-4 lg:ml-[-140px]'>
-                            <PrimaryButton button_label={'Revive'}
-                                           on_click={this.revive.bind(this)}
-                                           additional_css={'mb-4'}
-                                           disabled={!this.props.character_statuses.can_attack}
-                            />
-                            <p>
-                                You are dead. Please Revive.
-                            </p>
-                        </div>
-                    : null
-                }
+                
+                <Revive can_attack={this.props.character_statuses.can_attack}
+                        is_character_dead={this.props.character.is_dead}
+                        character_id={this.props.character.id}
+                        revive_call_back={() => {
+                            this.setState({
+                                character_revived: true,
+                            });
+                        }}
+                />
 
                 {this.props.children}
 

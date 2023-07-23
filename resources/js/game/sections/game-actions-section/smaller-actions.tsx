@@ -15,6 +15,7 @@ import CelestialFight from "./components/celestial-fight";
 import SmallerSpecialtyShop from "./components/small-actions/smaller-specialty-shop";
 import {removeCommas} from "../../lib/game/format-number";
 import GamblingSection from "./components/gambling-section";
+import Revive from "./components/fight-section/revive";
 
 export default class SmallerActions extends React.Component<SmallActionsProps, SmallActionsState> {
 
@@ -385,15 +386,21 @@ export default class SmallerActions extends React.Component<SmallActionsProps, S
                     this.state.selected_action !== null ?
                         this.buildSection()
                     :
-                        <Select
-                            onChange={this.showAction.bind(this)}
-                            options={this.smallActionsManager.buildOptions()}
-                            menuPosition={'absolute'}
-                            menuPlacement={'bottom'}
-                            styles={{menuPortal: (base: any) => ({...base, zIndex: 9999, color: '#000000'})}}
-                            menuPortalTarget={document.body}
-                            value={this.smallActionsManager.defaultSelectedAction()}
-                        />
+                        <Fragment>
+                            <Select
+                                onChange={this.showAction.bind(this)}
+                                options={this.smallActionsManager.buildOptions()}
+                                menuPosition={'absolute'}
+                                menuPlacement={'bottom'}
+                                styles={{menuPortal: (base: any) => ({...base, zIndex: 9999, color: '#000000'})}}
+                                menuPortalTarget={document.body}
+                                value={this.smallActionsManager.defaultSelectedAction()}
+                            />
+                            <Revive can_attack={this.props.character_status.can_attack}
+                                    is_character_dead={this.props.character.is_dead}
+                                    character_id={this.props.character.id}
+                            />
+                        </Fragment>
                 }
 
                 <div className='pb-5'>

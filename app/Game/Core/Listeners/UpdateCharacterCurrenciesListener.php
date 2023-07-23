@@ -9,8 +9,6 @@ use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Flare\Transformers\CharacterTopBarTransformer;
 use App\Game\Core\Events\UpdateCharacterCurrenciesBroadcastEvent;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
-use App\Game\Core\Events\UpdateTopBarEvent;
-use App\Game\Core\Events\UpdateTopBarBroadcastEvent;
 
 class UpdateCharacterCurrenciesListener {
 
@@ -37,7 +35,7 @@ class UpdateCharacterCurrenciesListener {
     /**
      * Handle the event.
      *
-     * @param UpdateTopBarEvent $event
+     * @param UpdateCharacterCurrenciesEvent $event
      * @return void
      */
     public function handle(UpdateCharacterCurrenciesEvent $event): void {

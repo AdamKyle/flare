@@ -2,17 +2,20 @@
 
 namespace App\Game\Battle\Controllers\Api;
 
+use Illuminate\Http\Request;
+use App\Flare\Models\Monster;
 use App\Flare\Models\Location;
-use App\Flare\Services\BuildMonsterCacheService;
-use App\Game\Battle\Events\UpdateCharacterStatus;
+use App\Flare\Models\Character;
+use Illuminate\Http\JsonResponse;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Cache;
 use App\Game\Battle\Jobs\BattleAttackHandler;
 use App\Game\Battle\Events\AttackTimeOutEvent;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
-use App\Http\Controllers\Controller;
+use App\Game\Battle\Request\AttackTypeRequest;
+use App\Flare\Services\BuildMonsterCacheService;
 use App\Game\Battle\Handlers\BattleEventHandler;
-use App\Flare\Models\Character;
+use App\Game\Battle\Events\UpdateCharacterStatus;
+use App\Game\Battle\Services\MonsterFightService;
 
 class BattleController extends Controller {
 
@@ -22,12 +25,19 @@ class BattleController extends Controller {
     private BattleEventHandler $battleEventHandler;
 
     /**
-     * @param BattleEventHandler $battleEventHandler
+     * @var MonsterFightService
      */
-    public function __construct(BattleEventHandler $battleEventHandler) {
+    private MonsterFightService $monsterFightService;
+
+    /**
+     * @param BattleEventHandler $battleEventHandler
+     * @param MonsterFightService $monsterFightService
+     */
+    public function __construct(BattleEventHandler $battleEventHandler, MonsterFightService $monsterFightService) {
         $this->middleware('is.character.dead')->except(['revive', 'index']);
 
-        $this->battleEventHandler = $battleEventHandler;
+        $this->battleEventHandler  = $battleEventHandler;
+        $this->monsterFightService = $monsterFightService;
     }
 
     /**
@@ -58,6 +68,38 @@ class BattleController extends Controller {
         return response()->json([
             'monsters'  => $monsters,
         ]);
+    }
+
+    /**
+     * @param Character $character
+     * @param Monster $monster
+     * @return JsonResponse
+     */
+    public function setupMonster(AttackTypeRequest $attackTypeRequest, Character $character, Monster $monster): JsonResponse {
+        $result = $this->monsterFightService->setupMonster($character, [
+            'attack_type'         => $attackTypeRequest->attack_type,
+            'selected_monster_id' => $monster->id,
+        ]);
+
+        $status = $result['status'];
+        unset($result['status']);
+
+        return response()->json($result, $status);
+    }
+
+    /**
+     * @param AttackTypeRequest $attackTypeRequest
+     * @param Character $character
+     * @param Monster $monster
+     * @return JsonResponse
+     */
+    public function fightMonster(AttackTypeRequest $attackTypeRequest, Character $character): JsonResponse {
+        $result = $this->monsterFightService->fightMonster($character, $attackTypeRequest->attack_type);
+
+        $status = $result['status'];
+        unset($result['status']);
+
+        return response()->json($result, $status);
     }
 
     /**

@@ -11,7 +11,6 @@ use App\Game\Battle\Values\CelestialConjureType;
 use App\Game\Core\Events\UpdateCharacterCelestialTimeOut;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\MercenaryBonus;
-use App\Game\Mercenaries\Values\MercenaryValue;
 use Facades\App\Flare\Cache\CoordinatesCache;
 use App\Flare\Models\CelestialFight;
 use App\Flare\Models\Character;

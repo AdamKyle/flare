@@ -10,10 +10,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use App\Flare\Models\Character;
-use App\Flare\Services\BuildCharacterAttackTypes;
-use App\Flare\Events\UpdateCharacterAttackEvent;
 use App\Game\Core\Traits\UpdateMarketBoard;
-use App\Game\Core\Events\UpdateCharacterAttacks;
 use App\Game\Exploration\Events\ExplorationLogUpdate;
 
 class CharacterAttackTypesCacheBuilder implements ShouldQueue

@@ -33,12 +33,13 @@
 
     .location-corrupted-pin {
         &:after {
-             font-family: 'Font Awesome\ 5 Free';
-             content: '\f714';
+             font-family: 'RPGAwesome';
+             content: "\e98c";
              font-size: 24px;
              color: #fff;
              top: -18px;
              left: -6px;
+             @apply border border-black border-2 rounded bg-black;
          }
     }
 

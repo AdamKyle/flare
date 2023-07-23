@@ -275,8 +275,10 @@ class MonsterPlayerFight {
 
         $health = $ambush->getHealthObject();
 
-        $health['max_character_health'] = $this->characterCacheData->getCachedCharacterData($this->character, 'health');
-        $health['max_monster_health']   = $monster->getHealth();
+        $health['max_character_health']     = $this->characterCacheData->getCachedCharacterData($this->character, 'health');
+        $health['current_character_health'] = $this->characterCacheData->getCachedCharacterData($this->character, 'health');
+        $health['max_monster_health']       = $monster->getHealth();
+        $health['current_monster_health']   = $monster->getHealth();
 
         $data = [
             'health'                => $health,
@@ -298,7 +300,9 @@ class MonsterPlayerFight {
      * Fight the monster.
      *
      * - Returns true if the character won.
-     * - Returns false if the character lost or took too long.
+     * - Returns false if the character lost or took too long or if neither side won.
+     * 
+     * Use the methods here to determine based on health who won.
      *
      * @param bool $onlyOnce
      * @param bool $isRankFight
@@ -324,7 +328,12 @@ class MonsterPlayerFight {
                 $this->monster = $data['monster']->getMonster();
             }
         } else {
-            $data = $this->fightSetUp();
+
+            if (Cache::has('monster-fight-' . $this->character->id)) {
+                $data = Cache::has('monster-fight-' . $this->character->id);
+            } else {
+                $data = $this->fightSetUp();
+            }
 
             $this->monster = $data['monster']->getMonster();
         }

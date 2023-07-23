@@ -158,6 +158,7 @@ class BattleDrop {
      */
     public function handleMonsterQuestDrop(Character $character, bool $returnItem = false): ?Item {
         if (!is_null($this->monster->quest_item_id)) {
+
             $canGetQuestItem = DropCheckCalculator::fetchQuestItemDropCheck($this->monster, $this->lootingChance, $this->gameMapBonus);
 
             if ($canGetQuestItem && !$returnItem) {
@@ -295,7 +296,6 @@ class BattleDrop {
             $this->autoDisenchantItem($character, $item);
         } else {
             if (!$character->isInventoryFull()) {
-
                 $this->giveItemToPlayer($character, $item);
             } else {
                 ServerMessageHandler::handleMessage($character->user, 'inventory_full');

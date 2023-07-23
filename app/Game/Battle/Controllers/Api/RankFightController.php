@@ -2,32 +2,16 @@
 
 namespace App\Game\Battle\Controllers\Api;
 
-use App\Flare\Models\Location;
 use App\Flare\Models\RankFight;
-use App\Flare\Services\BuildMonsterCacheService;
-use App\Game\Battle\Events\UpdateCharacterStatus;
-use App\Game\Battle\Jobs\BattleAttackHandler;
-use App\Game\Battle\Events\AttackTimeOutEvent;
 use App\Game\Battle\Request\AttackTypeRequest;
 use App\Game\Battle\Request\RankFightSetUpRequest;
 use App\Game\Battle\Services\RankFightService;
 use Exception;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
-use League\Fractal\Resource\Item;
-use League\Fractal\Manager;
-use League\Fractal\Resource\Collection;
 use App\Http\Controllers\Controller;
-use App\Game\Battle\Handlers\BattleEventHandler;
-use App\Game\Core\Events\CharacterIsDeadBroadcastEvent;
-use App\Flare\Handlers\CheatingCheck;
-use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\Monster;
-use App\Flare\Transformers\CharacterAttackTransformer;
-use App\Flare\Models\User;
-use App\Flare\Transformers\MonsterTransformer;
 
 class RankFightController extends Controller {
 

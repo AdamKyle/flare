@@ -218,11 +218,11 @@ export default class CharacterClassRanks extends React.Component<any, CharacterC
                                                 <dl className='mb-4'>
                                                     <dt>Primary Class Required:</dt>
                                                     <dd>{this.state.class_name_selected.primary_class_name}</dd>
-                                                    <dt>Primary Class Level Required:</dt>
+                                                    <dt>Primary Class Rank Level Required:</dt>
                                                     <dd>{this.state.class_name_selected.primary_class_required_level}</dd>
                                                     <dt>Secondary Class Required:</dt>
                                                     <dd>{this.state.class_name_selected.secondary_class_name}</dd>
-                                                    <dt>Secondary Class Level Required:</dt>
+                                                    <dt>Secondary Class Rank Level Required:</dt>
                                                     <dd>{this.state.class_name_selected.secondary_class_required_level}</dd>
                                                 </dl>
                                             </Fragment>
