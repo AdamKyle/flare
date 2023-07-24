@@ -69,14 +69,6 @@ export default class FightSection extends React.Component<FightSectionProps, Fig
             return;
         }
 
-        if (this.props.monster_to_fight.id !== this.state.monster_to_fight_id) {
-            this.setState({
-                battle_messages: [],
-            });
-
-            this.setUpBattle();
-        }
-
         if (this.props.is_same_monster) {
             this.setState({
                 battle_messages: [],
