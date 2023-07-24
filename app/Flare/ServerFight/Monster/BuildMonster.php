@@ -15,6 +15,10 @@ class BuildMonster extends BattleMessages {
         $this->serverMonster = $serverMonster;
     }
 
+    public function setServerMonster(array $monster): ServerMonster {
+        return $this->serverMonster->setMonster($monster);
+    }
+
     public function buildMonster(array $monster, array $characterStatReductionAffixes, float $skillReduction, float $resistanceReduction): ServerMonster {
 
         $monster = $this->reduceEnemySkills($monster, $skillReduction);

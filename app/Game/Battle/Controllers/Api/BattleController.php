@@ -65,8 +65,15 @@ class BattleController extends Controller {
 
         event(new UpdateCharacterStatus($character));
 
+        $monsters = collect($monsters);
+
         return response()->json([
-            'monsters'  => $monsters,
+            'monsters'  => $monsters->map(function($monster) {
+                return [
+                    'id'   => $monster['id'],
+                    'name' => $monster['name']
+                ];
+            }),
         ]);
     }
 
@@ -95,6 +102,8 @@ class BattleController extends Controller {
      */
     public function fightMonster(AttackTypeRequest $attackTypeRequest, Character $character): JsonResponse {
         $result = $this->monsterFightService->fightMonster($character, $attackTypeRequest->attack_type);
+
+        event(new AttackTimeOutEvent($character));
 
         $status = $result['status'];
         unset($result['status']);

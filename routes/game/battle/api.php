@@ -7,7 +7,7 @@ Route::middleware(['auth', 'is.character.who.they.say.they.are', 'throttle:150,2
     Route::middleware(['is.character.exploring'])->group(function() {
         Route::middleware(['is.character.dead'])->group(function() {
 
-            Route::get('/monster-fight/{character}/{monster}', ['uses' => 'Api\BattleController@setupMonster']);
+            Route::get('/setup-monster-fight/{character}/{monster}', ['uses' => 'Api\BattleController@setupMonster']);
             Route::post('/monster-fight/{character}', ['uses' => 'Api\BattleController@fightMonster']);
 
             Route::get('/celestial-fight/{character}/{celestialFight}', ['uses' => 'Api\CelestialBattleController@fetchCelestialFight']);

@@ -275,8 +275,8 @@ class MonsterPlayerFight {
 
         $health = $ambush->getHealthObject();
 
-        $health['max_character_health']     = $this->characterCacheData->getCachedCharacterData($this->character, 'health');
-        $health['current_character_health'] = $this->characterCacheData->getCachedCharacterData($this->character, 'health');
+        $health['max_character_health']     = (int) $this->characterCacheData->getCachedCharacterData($this->character, 'health');
+        $health['current_character_health'] = (int) $this->characterCacheData->getCachedCharacterData($this->character, 'health');
         $health['max_monster_health']       = $monster->getHealth();
         $health['current_monster_health']   = $monster->getHealth();
 
@@ -284,7 +284,7 @@ class MonsterPlayerFight {
             'health'                => $health,
             'player_voided'         => $isPlayerVoided,
             'enemy_voided'          => $isEnemyVoided,
-            'monster'               => $monster,
+            'monster'               => $monster->getMonster(),
             'opening_messages'      => $this->getBattleMessages(),
             'rank'                  => $rank,
         ];
@@ -327,13 +327,12 @@ class MonsterPlayerFight {
                 $this->rank    = $data['rank'];
                 $this->monster = $data['monster']->getMonster();
             }
-        } else {
+        } else if (Cache::has('monster-fight-' . $this->character->id)){
+            $data = Cache::get('monster-fight-' . $this->character->id);
 
-            if (Cache::has('monster-fight-' . $this->character->id)) {
-                $data = Cache::has('monster-fight-' . $this->character->id);
-            } else {
-                $data = $this->fightSetUp();
-            }
+            $this->monster = $data['monster'];
+        } else {
+            $data = $this->fightSetUp();
 
             $this->monster = $data['monster']->getMonster();
         }
@@ -351,7 +350,7 @@ class MonsterPlayerFight {
      */
     public function processAttack(array $data, bool $onlyOnce = false, $isRankFight = false): bool {
         $health         = $data['health'];
-        $monster        = $data['monster'];
+        $monster        = $this->buildMonster->setServerMonster($data['monster']);
         $isPlayerVoided = $data['player_voided'];
         $isEnemyVoided  = $data['enemy_voided'];
 

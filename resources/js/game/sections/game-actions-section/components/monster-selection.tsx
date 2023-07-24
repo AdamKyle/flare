@@ -22,7 +22,7 @@ export default class MonsterSelection extends React.Component<MonsterSelectionPr
         });
     }
 
-    componentDidUpdate(prevProps: Readonly<MonsterSelectionProps>, prevState: Readonly<MonsterSelectionState>, snapshot?: any) {
+    componentDidUpdate() {
         if (!isEqual(this.state.monsters, this.props.monsters)) {
             this.setState({
                 monster_to_fight: null,
@@ -67,10 +67,10 @@ export default class MonsterSelection extends React.Component<MonsterSelectionPr
     findMonster(monsterId: number): MonsterType|null {
         const foundMonster: MonsterType[]|[] = this.props.monsters.filter((monster: MonsterType) => {
             return monster.id === monsterId;
-        })
+        });
 
         if (foundMonster.length > 0) {
-            return foundMonster[0];
+            return foundMonster[0]
         }
 
         return null;
@@ -80,7 +80,7 @@ export default class MonsterSelection extends React.Component<MonsterSelectionPr
         if (this.props.character === null) {
             return false;
         }
-
+        
         return this.props.character.is_dead ||
             this.props.character.is_automation_running ||
             !this.props.character.can_attack ||

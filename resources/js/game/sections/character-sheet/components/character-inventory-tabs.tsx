@@ -107,7 +107,6 @@ export default class CharacterInventoryTabs extends React.Component<CharacterInv
             disable_tabs: !this.state.disable_tabs,
         }, () => {
             if (typeof this.props.update_disable_tabs !== 'undefined') {
-                console.log(this.state.inventory?.equipped);
                 this.props.update_disable_tabs();
             }
         })

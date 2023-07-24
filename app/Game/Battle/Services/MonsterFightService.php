@@ -23,17 +23,11 @@ class MonsterFightService {
 
     public function setupMonster(Character $character, array $params): array {
 
-        $cache = Cache::delete('monster-fight-' . $character->id);
-
-        if ($cache) {
-            return $cache;
-        }
+        Cache::delete('monster-fight-' . $character->id);
 
         $data = $this->monsterPlayerFight->setUpFight($character, $params)->fightSetUp();  
         
         Cache::put('monster-fight-' . $character->id, $data, 15);
-
-        $data['messages'] = $this->monsterPlayerFight->getBattleMessages();
 
         return $this->successResult($data);
     }
@@ -41,12 +35,14 @@ class MonsterFightService {
     public function fightMonster(Character $character, string $attackType): array {
         $cache = Cache::get('monster-fight-' . $character->id);
 
+        $this->monsterPlayerFight->setCharacter($character);
+
         if (is_null($cache)) {
             return $this->errorResult('There seems to be no monster here. Hmmm, maybe you waited too long and it fled. 
             Try attackig it again! (you have 15 minutes from selecting and clicking fight to kill it. Each attack resets this timer)');
         }
 
-        $this->monsterPlayerFight->fightMonster();
+        $this->monsterPlayerFight->fightMonster(true, false, $attackType);
 
         if ($this->monsterPlayerFight->getCharacterHealth() <= 0) {
             $this->battleEventHandler->processDeadCharacter($character);

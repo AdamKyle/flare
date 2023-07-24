@@ -92,7 +92,6 @@ export default class InventoryItemGemDetails extends React.Component<any, any> {
     }
 
     render() {
-        console.log(this.props.item_atonement.elemental_damage);
         return (
             <div className={clsx({
                 'grid lg:grid-cols-2 gap-2': typeof this.props.equipped_atonements[0] !== 'undefined'
