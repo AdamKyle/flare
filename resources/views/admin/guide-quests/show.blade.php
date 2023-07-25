@@ -49,6 +49,12 @@
                             <dt>Required Skill Level</dt>
                             <dd>{{$guideQuest->required_skill_level}}</dd>
                         @endif
+                        @if (!is_null($guideQuest->secondary_skill_name))
+                            <dt>Required Secondary Skill</dt>
+                            <dd>{{$guideQuest->secondary_skill_name}}</dd>
+                            <dt>Required Secondary Skill Level</dt>
+                            <dd>{{$guideQuest->required_secondary_skill_level}}</dd>
+                        @endif
                         @if (!is_null($guideQuest->faction_name))
                             <dt>Required Faction</dt>
                             <dd>{{$guideQuest->faction_name}}</dd>

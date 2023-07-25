@@ -38,20 +38,28 @@ class GuideQuestsSheet implements ToCollection {
 
     protected function returnCleanAffix(array $data) {
 
-        $gameMap      = GameMap::where('name', $data['required_game_map_id'])->first();
-        $skill        = GameSkill::where('name', $data['required_skill'])->first();
-        $passiveSkill = PassiveSkill::where('name', $data['required_passive_skill'])->first();
-        $faction      = Faction::whereHas('gameMap', function ($query) use ($data) {
+        $gameMap        = GameMap::where('name', $data['required_game_map_id'])->first();
+        $skill          = GameSkill::where('name', $data['required_skill'])->first();
+        $secondarySkill = GameSkill::where('name', $data['required_secondary_skill'])->first();
+        $passiveSkill   = PassiveSkill::where('name', $data['required_passive_skill'])->first();
+        $faction        = Faction::whereHas('gameMap', function ($query) use ($data) {
                             $query->where('name', $data['required_faction_id']);
                         })->first();
-        $requiredItem = Item::where('name', $data['required_quest_item_id'])->where('type', 'quest')->first();
-        $quest        = Quest::where('name', $data['required_quest_id'])->first();
+        $requiredItem   = Item::where('name', $data['required_quest_item_id'])->where('type', 'quest')->first();
+        $quest          = Quest::where('name', $data['required_quest_id'])->first();
 
         if (is_null($skill)) {
             $data['required_skill_level'] = null;
             $data['required_skill']       = null;
         } else {
             $data['required_skill'] = $skill->id;
+        }
+
+        if (is_null($secondarySkill)) {
+            $data['required_secondary_skill_level'] = null;
+            $data['required_secondary_skill']       = null;
+        } else {
+            $data['required_secondary_skill'] = $secondarySkill->id;
         }
 
         if (is_null($passiveSkill)) {

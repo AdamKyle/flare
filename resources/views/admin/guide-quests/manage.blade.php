@@ -30,6 +30,8 @@
                                 <x-core.forms.input :model="$guideQuest" label="Required (Player) Level:" modelKey="required_level" name="required_level" />
                                 <x-core.forms.key-value-select :model="$guideQuest" label="Required Skill:" modelKey="required_skill" name="required_skill" :options="$gameSkills"/>
                                 <x-core.forms.input :model="$guideQuest" label="Required (Skill) Level:" modelKey="required_skill_level" name="required_skill_level" />
+                                <x-core.forms.key-value-select :model="$guideQuest" label="Secondary Required Skill (optional):" modelKey="required_secondary_skill" name="required_secondary_skill" :options="$gameSkills"/>
+                                <x-core.forms.input :model="$guideQuest" label="Required (Secondary Skill) Level (Optional):" modelKey="required_secondary_skill_level" name="required_secondary_skill_level" />
                                 <x-core.forms.key-value-select :model="$guideQuest" label="Required Faction:" modelKey="required_faction_id" name="required_faction_id" :options="$gameMaps"/>
                                 <x-core.forms.input :model="$guideQuest" label="Required (Faction) Level:" modelKey="required_faction_level" name="required_faction_level" />
 

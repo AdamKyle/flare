@@ -18,6 +18,8 @@ class GuideQuest extends Model {
         'required_level',
         'required_skill',
         'required_skill_level',
+        'required_secondary_skill',
+        'required_secondary_skill_level',
         'required_faction_id',
         'required_faction_level',
         'required_game_map_id',
@@ -52,35 +54,37 @@ class GuideQuest extends Model {
      * @var array
      */
     protected $casts = [
-        'required_level'          => 'integer',
-        'required_skill'          => 'integer',
-        'required_skill_level'    => 'integer',
-        'required_faction_id'     => 'integer',
-        'required_faction_level'  => 'integer',
-        'required_game_map_id'    => 'integer',
-        'required_quest_id'       => 'integer',
-        'required_quest_item_id'  => 'integer',
-        'required_kingdoms'       => 'integer',
-        'required_kingdom_level'  => 'integer',
-        'required_kingdom_units'  => 'integer',
-        'required_passive_skill'  => 'integer',
-        'required_passive_level'  => 'integer',
-        'required_stats'          => 'integer',
-        'required_str'            => 'integer',
-        'required_dex'            => 'integer',
-        'required_int'            => 'integer',
-        'required_dur'            => 'integer',
-        'required_chr'            => 'integer',
-        'required_agi'            => 'integer',
-        'required_focus'          => 'integer',
-        'required_gold'           => 'integer',
-        'required_gold_dust'      => 'integer',
-        'required_shards'         => 'integer',
-        'gold_reward'             => 'integer',
-        'gold_dust_reward'        => 'integer',
-        'shards_reward'           => 'integer',
-        'faction_points_per_kill' => 'integer',
-        'xp_reward'               => 'integer', 
+        'required_level'                => 'integer',
+        'required_skill'                => 'integer',
+        'required_skill_level'          => 'integer',
+        'required_required_skill'       => 'integer',
+        'required_required_skill_level' => 'integer',
+        'required_faction_id'           => 'integer',
+        'required_faction_level'        => 'integer',
+        'required_game_map_id'          => 'integer',
+        'required_quest_id'             => 'integer',
+        'required_quest_item_id'        => 'integer',
+        'required_kingdoms'             => 'integer',
+        'required_kingdom_level'        => 'integer',
+        'required_kingdom_units'        => 'integer',
+        'required_passive_skill'        => 'integer',
+        'required_passive_level'        => 'integer',
+        'required_stats'                => 'integer',
+        'required_str'                  => 'integer',
+        'required_dex'                  => 'integer',
+        'required_int'                  => 'integer',
+        'required_dur'                  => 'integer',
+        'required_chr'                  => 'integer',
+        'required_agi'                  => 'integer',
+        'required_focus'                => 'integer',
+        'required_gold'                 => 'integer',
+        'required_gold_dust'            => 'integer',
+        'required_shards'               => 'integer',
+        'gold_reward'                   => 'integer',
+        'gold_dust_reward'              => 'integer',
+        'shards_reward'                 => 'integer',
+        'faction_points_per_kill'       => 'integer',
+        'xp_reward'                     => 'integer', 
     ];
 
     protected $appends = [
@@ -94,6 +98,16 @@ class GuideQuest extends Model {
 
     public function getSkillNameAttribute() {
         $skill = GameSkill::find($this->required_skill);
+
+        if (!is_null($skill)) {
+            return $skill->name;
+        }
+
+        return null;
+    }
+
+    public function getSecondarySkillNameAttribute() {
+        $skill = GameSkill::find($this->required_secondary_skill);
 
         if (!is_null($skill)) {
             return $skill->name;

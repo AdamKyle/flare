@@ -8,6 +8,8 @@
             <th>required_level</th>
             <th>required_skill</th>
             <th>required_skill_level</th>
+            <th>required_secondary_skill</th>
+            <th>required_secondary_skill_level</th>
             <th>required_faction_id</th>
             <th>required_faction_level</th>
             <th>required_game_map_id</th>
@@ -45,6 +47,8 @@
                 <td>{{$guideQuest->required_level}}</td>
                 <td>{{!is_null($guideQuest->required_skill) ? $guideQuest->skill_name : ''}}</td>
                 <td>{{$guideQuest->required_skill_level}}</td>
+                <td>{{!is_null($guideQuest->required_secondary_skill) ? $guideQuest->secondary_skill_name : ''}}</td>
+                <td>{{$guideQuest->required_secondary_skill_level}}</td>
                 <td>{{!is_null($guideQuest->required_faction_id) ? $guideQuest->faction_name : ''}}</td>
                 <td>{{$guideQuest->required_faction_level}}</td>
                 <td>{{!is_null($guideQuest->required_game_map_id) ? $guideQuest->game_map_name : ''}}</td>
