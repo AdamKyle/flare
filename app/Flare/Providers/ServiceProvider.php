@@ -60,6 +60,7 @@ use App\Flare\Middleware\IsCharacterLoggedInMiddleware;
 use App\Flare\ServerFight\Monster\MonsterSpecialAttack;
 use App\Flare\Transformers\KingdomAttackLogsTransformer;
 use App\Game\Kingdoms\Handlers\GiveKingdomsToNpcHandler;
+use App\Flare\Transformers\CharacterAttackDataTransformer;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Flare\ServerFight\Fight\CharacterAttacks\Types\Defend;
 use App\Flare\ServerFight\Fight\CharacterAttacks\PlayerHealing;
@@ -250,7 +251,7 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(CharacterCacheData::class, function($app) {
             return new CharacterCacheData(
                 $app->make(Manager::class),
-                $app->make(CharacterSheetBaseInfoTransformer::class),
+                $app->make(CharacterAttackDataTransformer::class),
                 $app->make(CharacterStatBuilder::class)
             );
         });

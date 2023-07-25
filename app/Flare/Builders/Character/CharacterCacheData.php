@@ -2,22 +2,22 @@
 
 namespace App\Flare\Builders\Character;
 
-use App\Flare\Builders\CharacterInformation\CharacterStatBuilder;
-use Illuminate\Support\Facades\Cache;
-use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
-use App\Flare\Models\Character;
 use League\Fractal\Manager;
+use App\Flare\Models\Character;
 use League\Fractal\Resource\Item;
+use Illuminate\Support\Facades\Cache;
+use App\Flare\Transformers\CharacterAttackDataTransformer;
+use App\Flare\Builders\CharacterInformation\CharacterStatBuilder;
 
 class CharacterCacheData extends CharacterPvpCacheData {
 
-    private CharacterSheetBaseInfoTransformer $characterSheetBaseInfoTransformer;
+    private CharacterAttackDataTransformer $characterSheetBaseInfoTransformer;
 
     private Manager $manager;
 
     private CharacterStatBuilder $characterStatBuilder;
 
-    public function __construct(Manager $manager, CharacterSheetBaseInfoTransformer $characterInformationBuilder, CharacterStatBuilder $characterStatBuilder) {
+    public function __construct(Manager $manager, CharacterAttackDataTransformer $characterInformationBuilder, CharacterStatBuilder $characterStatBuilder) {
         $this->manager                           = $manager;
         $this->characterSheetBaseInfoTransformer = $characterInformationBuilder;
         $this->characterStatBuilder              = $characterStatBuilder;

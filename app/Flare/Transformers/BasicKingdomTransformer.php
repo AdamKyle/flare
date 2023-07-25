@@ -3,17 +3,8 @@
 namespace App\Flare\Transformers;
 
 use App\Flare\Models\Character;
-use App\Flare\Models\GameBuilding;
-use App\Flare\Models\GameBuildingUnit;
-use App\Flare\Models\GameUnit;
-use App\Flare\Models\PassiveSkill;
-use App\Game\Kingdoms\Values\BuildingActions;
-use App\Game\Kingdoms\Values\KingdomMaxValue;
-use App\Game\Kingdoms\Values\UnitCosts;
-use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
 use League\Fractal\TransformerAbstract;
 use App\Flare\Models\Kingdom;
-use Illuminate\Support\Collection;
 
 class BasicKingdomTransformer extends TransformerAbstract {
 

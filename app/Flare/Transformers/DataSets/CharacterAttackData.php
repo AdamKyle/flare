@@ -9,41 +9,33 @@ use App\Flare\Values\ClassAttackValue;
 
 class CharacterAttackData {
 
+    private bool $includeReductions = false;
+
+    public function setIncludeReductions($includdeReductions = false) {
+        $this->includeReductions = $includdeReductions;
+    }
+
     public function attackData(Character $character, CharacterStatBuilder $characterStatBuilder): array {
 
         return [
+            'level'                       => $character->level,
             'attack'                      => $characterStatBuilder->buildTotalAttack(),
-            'health'                      => $characterStatBuilder->buildHealth(),
-            'ac'                          => $characterStatBuilder->buildDefence(),
-            'heal_for'                    => $characterStatBuilder->buildHealing(),
-            'damage_stat'                 => $character->damage_stat,
+            'health'                      => $characterStatBuilder->buildHealth($this->includeReductions),
+            'ac'                          => $characterStatBuilder->buildDefence($this->includeReductions),
+            'heal_for'                    => $characterStatBuilder->buildHealing($this->includeReductions),
             'to_hit_stat'                 => $character->class->to_hit_stat,
-            'base_stat'                   => $characterStatBuilder->statMod($character->class->damage_stat),
-            'str_modded'                  => $characterStatBuilder->statMod('str'),
-            'dur_modded'                  => $characterStatBuilder->statMod('dur'),
-            'dex_modded'                  => $characterStatBuilder->statMod('dex'),
-            'chr_modded'                  => $characterStatBuilder->statMod('chr'),
-            'int_modded'                  => $characterStatBuilder->statMod('int'),
-            'agi_modded'                  => $characterStatBuilder->statMod('agi'),
-            'focus_modded'                => $characterStatBuilder->statMod('focus'),
-            'weapon_attack'               => $characterStatBuilder->buildDamage('weapon'),
-            'voided_weapon_attack'        => $characterStatBuilder->buildDamage('weapon', true),
-            'ring_damage'                 => $characterStatBuilder->buildDamage('ring'),
-            'spell_damage'                => $characterStatBuilder->buildDamage('spell-damage'),
-            'voided_spell_damage'         => $characterStatBuilder->buildDamage('spell-damage', true),
-            'healing_amount'              => $characterStatBuilder->buildHealing(),
-            'voided_healing_amount'       => $characterStatBuilder->buildHealing(true),
+            'base_stat'                   => $characterStatBuilder->statMod($character->class->damage_stat, $this->includeReductions),
+            'str_modded'                  => $characterStatBuilder->statMod('str', $this->includeReductions),
+            'dur_modded'                  => $characterStatBuilder->statMod('dur', $this->includeReductions),
+            'dex_modded'                  => $characterStatBuilder->statMod('dex', $this->includeReductions),
+            'chr_modded'                  => $characterStatBuilder->statMod('chr', $this->includeReductions),
+            'int_modded'                  => $characterStatBuilder->statMod('int', $this->includeReductions),
+            'agi_modded'                  => $characterStatBuilder->statMod('agi', $this->includeReductions),
+            'focus_modded'                => $characterStatBuilder->statMod('focus', $this->includeReductions),
             'devouring_light'             => $characterStatBuilder->buildDevouring('devouring_light'),
             'devouring_darkness'          => $characterStatBuilder->buildDevouring('devouring_darkness'),
             'extra_action_chance'         => (new ClassAttackValue($character))->buildAttackData(),
-            'holy_bonus'                  => $characterStatBuilder->holyInfo()->fetchHolyBonus(),
             'devouring_resistance'        => $characterStatBuilder->holyInfo()->fetchDevouringResistanceBonus(),
-            'max_holy_stacks'             => $characterStatBuilder->holyInfo()->fetchTotalStacksForCharacter(),
-            'current_stacks'              => $characterStatBuilder->holyInfo()->getTotalAppliedStacks(),
-            'stat_increase_bonus'         => $characterStatBuilder->holyInfo()->fetchStatIncrease(),
-            'holy_attack_bonus'           => $characterStatBuilder->holyInfo()->fetchAttackBonus(),
-            'holy_ac_bonus'               => $characterStatBuilder->holyInfo()->fetchDefenceBonus(),
-            'holy_healing_bonus'          => $characterStatBuilder->holyInfo()->fetchHealingBonus(),
             'ambush_chance'               => $characterStatBuilder->buildAmbush(),
             'ambush_resistance_chance'    => $characterStatBuilder->buildAmbush('resistance'),
             'counter_chance'              => $characterStatBuilder->buildCounter(),
@@ -55,9 +47,6 @@ class CharacterAttackData {
             'healing_reduction'           => $characterStatBuilder->reductionInfo()->getRingReduction('healing_reduction'),
             'skill_reduction'             => $characterStatBuilder->reductionInfo()->getAffixReduction('skill_reduction'),
             'resistance_reduction'        => $characterStatBuilder->reductionInfo()->getAffixReduction('resistance_reduction'),
-            'reincarnated_times'          => $character->times_reincarnated,
-            'reincarnated_stat_increase'  => $character->reincarnated_stat_increase,
-            'xp_penalty'                  => $character->xp_penalty,
         ];
     }
 

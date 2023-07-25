@@ -2,15 +2,14 @@
 
 namespace App\Flare\Transformers;
 
-use Cache;
-use App\Flare\Builders\CharacterInformation\CharacterStatBuilder;
+use App\Flare\Models\Skill;
+use App\Flare\Models\Character;
 use App\Flare\Models\GameClass;
 use App\Flare\Models\GameSkill;
-use App\Flare\Models\Skill;
 use App\Flare\Values\AutomationType;
+use App\Flare\Values\ClassAttackValue;
 use App\Game\Skills\Values\SkillTypeValue;
-use App\Flare\Models\Character;
-use Facades\App\Flare\Transformers\DataSets\CharacterAttackData;
+use App\Flare\Builders\CharacterInformation\CharacterStatBuilder;
 
 class CharacterSheetBaseInfoTransformer extends BaseTransformer {
 
@@ -30,7 +29,7 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer {
         $characterStatBuilder         = resolve(CharacterStatBuilder::class)->setCharacter($character, $this->ignoreReductions);
         $gameClass                    = GameClass::find($character->game_class_id);
 
-        $baseStat = [
+        return [
             'id'                          => $character->id,
             'user_id'                     => $character->user_id,
             'name'                        => $character->name,
@@ -44,13 +43,17 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer {
             'max_level'                   => number_format($this->getMaxLevel($character)),
             'xp'                          => (int) $character->xp,
             'xp_next'                     => (int) $character->xp_next,
-            'str'                         => $character->str,
-            'dur'                         => $character->dur,
-            'dex'                         => $character->dex,
-            'chr'                         => $character->chr,
-            'int'                         => $character->int,
-            'agi'                         => $character->agi,
-            'focus'                       => $character->focus,
+            'str_modded'                  => $characterStatBuilder->statMod('str'),
+            'dur_modded'                  => $characterStatBuilder->statMod('dur'),
+            'dex_modded'                  => $characterStatBuilder->statMod('dex'),
+            'chr_modded'                  => $characterStatBuilder->statMod('chr'),
+            'int_modded'                  => $characterStatBuilder->statMod('int'),
+            'agi_modded'                  => $characterStatBuilder->statMod('agi'),
+            'focus_modded'                => $characterStatBuilder->statMod('focus'),
+            'attack'                      => $characterStatBuilder->buildTotalAttack(),
+            'health'                      => $characterStatBuilder->buildHealth(),
+            'ac'                          => $characterStatBuilder->buildDefence(),
+            'extra_action_chance'         => (new ClassAttackValue($character))->buildAttackData(),
             'gold'                        => number_format($character->gold),
             'gold_dust'                   => number_format($character->gold_dust),
             'shards'                      => number_format($character->shards),
@@ -79,17 +82,12 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer {
             'can_access_hell_forged'      => false,
             'can_access_purgatory_chains' => false,
             'is_in_timeout'               => !is_null($character->user->timeout_until),
-            'elemental_atonement'         => $character->getInformation()->buildElementalAtonement(),
-            'base_position' => [
-              'x' => $character->map->character_position_x,
-              'y' => $character->map->character_position_y,
-              'game_map_id' => $character->map->game_map_id,
-            ],
+            // 'base_position' => [
+            //   'x' => $character->map->character_position_x,
+            //   'y' => $character->map->character_position_y,
+            //   'game_map_id' => $character->map->game_map_id,
+            // ],
         ];
-
-        $attackData = CharacterAttackData::attackData($character, $characterStatBuilder);
-
-        return array_merge($baseStat, $attackData);
     }
 
     public function isAlchemyLocked(Character $character): bool {
