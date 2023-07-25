@@ -1,4 +1,4 @@
-import {BattleMessage} from "../../../../../lib/game/actions/battle/types/battle-message-type";
+import {BattleMessage} from "../../types/battle-message-type";
 
 export interface BattleMessageProps {
     battle_messages: BattleMessage[]|[];

@@ -3,7 +3,7 @@ import React from "react";
 import ComponentLoading from "../../../components/ui/loading/component-loading";
 import {AxiosError, AxiosResponse} from "axios";
 import Ajax from "../../../lib/ajax/ajax";
-import {BattleMessage} from "../../../lib/game/actions/battle/types/battle-message-type";
+import {BattleMessage} from "./types/battle-message-type";
 import ServerFight from './fight-section/server-fight';
 import BattleMesages from "./fight-section/battle-mesages";
 

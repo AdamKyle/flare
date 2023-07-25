@@ -1,24 +1,35 @@
 <?php
 
-namespace App\Flare\Transformers\DataSets;
+namespace App\Flare\Transformers;
 
-use Illuminate\Support\Facades\Cache;
 use App\Flare\Builders\CharacterInformation\CharacterStatBuilder;
 use App\Flare\Models\Character;
-use App\Flare\Values\ClassAttackValue;
 
-class CharacterAttackData {
+class CharacterStatDetailsTransformer extends BaseTransformer {
 
-    public function attackData(Character $character, CharacterStatBuilder $characterStatBuilder): array {
+    private bool $ignoreReductions = false;
+
+    public function setIgnoreReductions(bool $ignoreReductions): void {
+        $this->ignoreReductions = $ignoreReductions;
+    }
+
+    /**
+     * Gets the response data for the character sheet
+     *
+     * @param Character $character
+     * @return array
+     */
+    public function transform(Character $character): array {
+        $characterStatBuilder = resolve(CharacterStatBuilder::class)->setCharacter($character, $this->ignoreReductions);
 
         return [
-            'attack'                      => $characterStatBuilder->buildTotalAttack(),
-            'health'                      => $characterStatBuilder->buildHealth(),
-            'ac'                          => $characterStatBuilder->buildDefence(),
-            'heal_for'                    => $characterStatBuilder->buildHealing(),
-            'damage_stat'                 => $character->damage_stat,
-            'to_hit_stat'                 => $character->class->to_hit_stat,
-            'base_stat'                   => $characterStatBuilder->statMod($character->class->damage_stat),
+            'str'                         => $character->str,
+            'dur'                         => $character->dur,
+            'dex'                         => $character->dex,
+            'chr'                         => $character->chr,
+            'int'                         => $character->int,
+            'agi'                         => $character->agi,
+            'focus'                       => $character->focus,
             'str_modded'                  => $characterStatBuilder->statMod('str'),
             'dur_modded'                  => $characterStatBuilder->statMod('dur'),
             'dex_modded'                  => $characterStatBuilder->statMod('dex'),
@@ -35,9 +46,7 @@ class CharacterAttackData {
             'voided_healing_amount'       => $characterStatBuilder->buildHealing(true),
             'devouring_light'             => $characterStatBuilder->buildDevouring('devouring_light'),
             'devouring_darkness'          => $characterStatBuilder->buildDevouring('devouring_darkness'),
-            'extra_action_chance'         => (new ClassAttackValue($character))->buildAttackData(),
             'holy_bonus'                  => $characterStatBuilder->holyInfo()->fetchHolyBonus(),
-            'devouring_resistance'        => $characterStatBuilder->holyInfo()->fetchDevouringResistanceBonus(),
             'max_holy_stacks'             => $characterStatBuilder->holyInfo()->fetchTotalStacksForCharacter(),
             'current_stacks'              => $characterStatBuilder->holyInfo()->getTotalAppliedStacks(),
             'stat_increase_bonus'         => $characterStatBuilder->holyInfo()->fetchStatIncrease(),
@@ -50,24 +59,6 @@ class CharacterAttackData {
             'counter_resistance_chance'   => $characterStatBuilder->buildCounter('resistance'),
             'devouring_light_res'         => $characterStatBuilder->holyInfo()->fetchDevouringResistanceBonus(),
             'devouring_darkness_res'      => $characterStatBuilder->holyInfo()->fetchDevouringResistanceBonus(),
-            'spell_evasion'               => $characterStatBuilder->reductionInfo()->getRingReduction('spell_evasion'),
-            'affix_damage_reduction'      => $characterStatBuilder->reductionInfo()->getRingReduction('affix_damage_reduction'),
-            'healing_reduction'           => $characterStatBuilder->reductionInfo()->getRingReduction('healing_reduction'),
-            'skill_reduction'             => $characterStatBuilder->reductionInfo()->getAffixReduction('skill_reduction'),
-            'resistance_reduction'        => $characterStatBuilder->reductionInfo()->getAffixReduction('resistance_reduction'),
-            'reincarnated_times'          => $character->times_reincarnated,
-            'reincarnated_stat_increase'  => $character->reincarnated_stat_increase,
-            'xp_penalty'                  => $character->xp_penalty,
         ];
-    }
-
-    public function fetchAttackTypes(Character $character): array {
-        $cache = Cache::get('character-attack-data-' . $character->id);
-
-        if (is_null($cache)) {
-            return [];
-        }
-
-        return $cache['attack_types'];
     }
 }

@@ -14,6 +14,7 @@ use App\Flare\Models\Character;
 use App\Flare\Models\CharacterInCelestialFight;
 use App\Flare\Models\Monster;
 use App\Game\Battle\Services\BattleRewardProcessing;
+use App\Game\Core\Events\UpdateTopBarEvent;
 use Exception;
 
 class BattleEventHandler {
@@ -96,6 +97,8 @@ class BattleEventHandler {
         $this->classRankService->giveXpToEquippedClassSpecialties($character);
 
         $this->handleItemSkillUpdate($character);
+
+        event(new UpdateTopBarEvent($character->refresh()));
     }
 
     /**

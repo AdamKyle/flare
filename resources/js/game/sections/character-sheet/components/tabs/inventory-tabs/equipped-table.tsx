@@ -208,7 +208,7 @@ export default class EquippedTable extends React.Component<EquippedInventoryTabP
                 {
                     this.state.view_item && this.state.item_id !== null ?
                         <InventoryUseDetails character_id={this.props.character_id} item_id={this.state.item_id} is_open={this.state.view_item} manage_modal={this.viewItem.bind(this)} />
-                        : null
+                    : null
                 }
 
                 <div className={'max-w-[290px] sm:max-w-[100%] overflow-y-hidden'}>

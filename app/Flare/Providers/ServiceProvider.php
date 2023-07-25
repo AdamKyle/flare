@@ -251,6 +251,7 @@ class ServiceProvider extends ApplicationServiceProvider
             return new CharacterCacheData(
                 $app->make(Manager::class),
                 $app->make(CharacterSheetBaseInfoTransformer::class),
+                $app->make(CharacterStatBuilder::class)
             );
         });
 

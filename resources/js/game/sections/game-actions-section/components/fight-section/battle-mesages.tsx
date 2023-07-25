@@ -1,6 +1,6 @@
 import React from "react";
 import clsx from "clsx";
-import {BattleMessage, BattleMessageType} from "../../../../lib/game/actions/battle/types/battle-message-type";
+import {BattleMessage, BattleMessageType} from "../types/battle-message-type";
 import {BattleMessageProps} from "./types/battle-message-props";
 
 export default class BattleMesages extends React.Component<BattleMessageProps, {}> {

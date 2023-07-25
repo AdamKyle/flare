@@ -1,6 +1,5 @@
 import MonsterType from "../../../../lib/game/types/actions/monster/monster-type";
-import {BattleMessage} from "../../../../lib/game/actions/battle/types/battle-message-type";
-import FightSection from "../fight-section";
+import {BattleMessage} from "./battle-message-type";
 
 export default interface FightSectionState {
     battle_messages: BattleMessage[]|[];
@@ -24,4 +23,10 @@ export default interface FightSectionState {
     processing_rank_battle: boolean;
 
     setting_up_rank_fight: boolean;
+
+    setting_up_regular_fight: boolean;
+
+    processing_regular_fight: boolean;
+    
+    error_message: string;
 }

@@ -334,7 +334,7 @@ class MonsterPlayerFight {
         } else {
             $data = $this->fightSetUp();
 
-            $this->monster = $data['monster']->getMonster();
+            $this->monster = $data['monster'];
         }
 
         return $this->processAttack($data, $onlyOnce, $isRankFight);
@@ -350,7 +350,7 @@ class MonsterPlayerFight {
      */
     public function processAttack(array $data, bool $onlyOnce = false, $isRankFight = false): bool {
         $health         = $data['health'];
-        $monster        = $this->buildMonster->setServerMonster($data['monster']);
+        $monster        = $this->buildMonster->setServerMonster($data['monster'])->setHealth($health['current_monster_health']);
         $isPlayerVoided = $data['player_voided'];
         $isEnemyVoided  = $data['enemy_voided'];
 

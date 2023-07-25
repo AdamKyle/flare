@@ -8,7 +8,7 @@ import {AxiosError, AxiosResponse} from "axios";
 import FightSectionState from "./types/fight-section-state";
 import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
 import BattleMesages from "./fight-section/battle-mesages";
-import Messages from '../../chat/components/messages';
+import DangerAlert from "../../../components/ui/alerts/simple-alerts/danger-alert";
 
 export default class FightSection extends React.Component<FightSectionProps, FightSectionState> {
 
@@ -27,6 +27,9 @@ export default class FightSection extends React.Component<FightSectionProps, Fig
             monster_to_fight: null,
             processing_rank_battle: false,
             setting_up_rank_fight: false,
+            setting_up_regular_fight: false,
+            processing_regular_fight: false,
+            error_message: '',
         }
     }
 
@@ -69,6 +72,14 @@ export default class FightSection extends React.Component<FightSectionProps, Fig
             return;
         }
 
+        if (this.props.monster_to_fight.id !== this.state.monster_to_fight_id && this.state.monster_to_fight_id !== 0) {
+            this.setState({
+                monster_to_fight_id: this.props.monster_to_fight.id
+            });
+
+            this.setUpBattle();
+        }
+
         if (this.props.is_same_monster) {
             this.setState({
                 battle_messages: [],
@@ -96,7 +107,11 @@ export default class FightSection extends React.Component<FightSectionProps, Fig
             return;
         }
 
-        (new Ajax).setRoute('setup-monster-fight/'+this.props.character.id+'/' + this.props.monster_to_fight.id)
+        this.setState({
+            setting_up_regular_fight: true,
+            error_message: '',
+        }, () => {
+            (new Ajax).setRoute('setup-monster-fight/'+this.props.character.id+'/' + this.props.monster_to_fight.id)
                   .setParameters({attack_type: 'attack'})
                   .doAjaxCall('get', (result: AxiosResponse) => {
                     this.setState({
@@ -106,10 +121,12 @@ export default class FightSection extends React.Component<FightSectionProps, Fig
                         monster_current_health: result.data.health.current_monster_health,
                         monster_max_health: result.data.health.max_monster_health,
                         monster_to_fight_id: result.data.monster.id,
-                    })
+                        setting_up_regular_fight: false,
+                    });
                   }, (error: AxiosError) => {
                     console.log(error);
                   });
+        })
     }
 
     attack(attackType: string) {
@@ -118,18 +135,30 @@ export default class FightSection extends React.Component<FightSectionProps, Fig
             return this.props.process_rank_fight(this, attackType);
         }
 
-        (new Ajax).setRoute('monster-fight/'+this.props.character.id)
-                  .setParameters({attack_type: attackType})
-                  .doAjaxCall('post', (result: AxiosResponse) => {
-                    console.log(result);
-                    this.setState({
-                        battle_messages: result.data.messages,
-                        character_current_health: result.data.health.current_character_health < 0 ? 0 : result.data.health.current_character_health,
-                        monster_current_health: result.data.health.current_monster_health < 0 ? 0 : result.data.health.current_monster_health,
-                    })
-                  }, (error: AxiosError) => {
-                    console.log(error);
-                  });
+        this.setState({
+            processing_regular_fight: true,
+            error_message: '',
+        }, () => {
+            (new Ajax).setRoute('monster-fight/'+this.props.character.id)
+                      .setParameters({attack_type: attackType})
+                      .doAjaxCall('post', (result: AxiosResponse) => {
+                        this.setState({
+                            battle_messages: result.data.messages,
+                            character_current_health: result.data.health.current_character_health < 0 ? 0 : result.data.health.current_character_health,
+                            monster_current_health: result.data.health.current_monster_health < 0 ? 0 : result.data.health.current_monster_health,
+                            processing_regular_fight: false,
+                        })
+                      }, (error: AxiosError) => {
+                        if (typeof error.response !== 'undefined') {
+                            const response = error.response;
+
+                            this.setState({
+                                error_message: response.data.message,
+                                processing_regular_fight: false,
+                            })
+                        }
+                      });
+        });
     }
 
     attackButtonDisabled() {
@@ -162,12 +191,27 @@ export default class FightSection extends React.Component<FightSectionProps, Fig
     }
 
     render() {
+        if (this.state.setting_up_regular_fight) {
+            return <LoadingProgressBar />
+        }
+
+        if (this.state.error_message !== '') {
+            return (
+                <div className='ml-auto mr-auto my-4 md:max-w-[75%]'>
+                    <DangerAlert>
+                        {this.state.error_message}
+                    </DangerAlert>
+                </div>
+            );
+        }
+
         return (
             <div className={clsx({'ml-[-100px]': !this.props.is_small})}>
                 <div className={clsx('mt-4 mb-4 text-xs text-center', {
                     'hidden': this.attackButtonDisabled(),
                     'ml-[50px]': !this.props.is_small && !this.props.is_rank_fight
                 })}>
+
                     <AttackButton is_small={this.props.is_small} type={'Atk'} additional_css={'btn-attack'} icon_class={'ra ra-sword'} on_click={() => this.attack('attack')} disabled={this.attackButtonDisabled()}/>
                     <AttackButton is_small={this.props.is_small} type={'Cast'} additional_css={'btn-cast'} icon_class={'ra ra-burning-book'} on_click={() => this.attack('cast')} disabled={this.attackButtonDisabled()}/>
                     <AttackButton is_small={this.props.is_small} type={'Cast & Atk'} additional_css={'btn-cast-attack'} icon_class={'ra ra-lightning-sword'} on_click={() => this.attack('cast_and_attack')} disabled={this.attackButtonDisabled()}/>
@@ -190,7 +234,7 @@ export default class FightSection extends React.Component<FightSectionProps, Fig
                     <span className={'w-10 ml-2'}>Defend</span>
                 </div>
                 {
-                    this.state.processing_rank_battle ?
+                    this.state.processing_rank_battle || this.state.processing_regular_fight ?
                         <div className='w-1/2 mx-auto'>
                             <LoadingProgressBar />
                         </div>

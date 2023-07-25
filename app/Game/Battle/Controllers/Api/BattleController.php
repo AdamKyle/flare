@@ -112,35 +112,6 @@ class BattleController extends Controller {
     }
 
     /**
-     * @param Request $request
-     * @param Character $character
-     * @return JsonResponse
-     */
-    public function battleResults(Request $request, Character $character): JsonResponse {
-        if (!$character->can_attack) {
-            return response()->json(['message' => 'invalid input.'], 429);
-        }
-
-        if ($request->is_character_dead) {
-
-            $this->battleEventHandler->processDeadCharacter($character);
-
-            return response()->json([
-                'time_out' => 20,
-            ]);
-        }
-
-        if ($request->is_defender_dead) {
-
-            event(new AttackTimeOutEvent($character));
-
-            BattleAttackHandler::dispatch($character->id, $request->monster_id)->onQueue('default_long');
-        }
-
-        return response()->json();
-    }
-
-    /**
      * @param Character $character
      * @return JsonResponse
      */

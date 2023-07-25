@@ -1,4 +1,4 @@
-import {BattleMessage} from "../../../../actions/battle/types/battle-message-type";
+import {BattleMessage} from "../../../../../../sections/game-actions-section/components/types/battle-message-type";
 
 export default interface DuelData {
     attacker_id: number;

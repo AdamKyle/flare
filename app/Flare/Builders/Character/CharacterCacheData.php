@@ -2,6 +2,7 @@
 
 namespace App\Flare\Builders\Character;
 
+use App\Flare\Builders\CharacterInformation\CharacterStatBuilder;
 use Illuminate\Support\Facades\Cache;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Flare\Models\Character;
@@ -14,9 +15,12 @@ class CharacterCacheData extends CharacterPvpCacheData {
 
     private Manager $manager;
 
-    public function __construct(Manager $manager, CharacterSheetBaseInfoTransformer $characterInformationBuilder) {
+    private CharacterStatBuilder $characterStatBuilder;
+
+    public function __construct(Manager $manager, CharacterSheetBaseInfoTransformer $characterInformationBuilder, CharacterStatBuilder $characterStatBuilder) {
         $this->manager                           = $manager;
         $this->characterSheetBaseInfoTransformer = $characterInformationBuilder;
+        $this->characterStatBuilder              = $characterStatBuilder;
     }
 
     public function setCharacterDefendAc(Character $character, int $defence) {
@@ -83,11 +87,28 @@ class CharacterCacheData extends CharacterPvpCacheData {
 
         $this->characterSheetBaseInfoTransformer->setIgnoreReductions($ignoreReductions);
 
-        $character = new Item($character, $this->characterSheetBaseInfoTransformer);
-        $character = $this->manager->createData($character)->toArray();
+        $characterSheet = new Item($character, $this->characterSheetBaseInfoTransformer);
+        $characterSheet = $this->manager->createData($characterSheet)->toArray();
 
-        Cache::put('character-sheet-' . $characterId, $character);
+        $characterStatBuilder = $this->characterStatBuilder->setCharacter($character);
 
-        return $character;
+        $characterSheet['stat_affixes'] = [
+            'cant_be_resisted'   => $characterStatBuilder->canAffixesBeResisted(),
+            'all_stat_reduction' => $characterStatBuilder->getStatReducingPrefix(),
+            'stat_reduction'     => $characterStatBuilder->getStatReducingSuffixes(),
+        ];
+
+        $skills = $character->skills;
+
+        $characterSheet['skills'] = [
+            'accuracy'         => $skills->where('name', 'Accuracy')->first()->skill_bonus,
+            'casting_accuracy' => $skills->where('name', 'Casting Accuracy')->first()->skill_bonus,
+            'dodge'            => $skills->where('name', 'Dodge')->first()->skill_bonus,
+            'criticality'      => $skills->where('name', 'Criticality')->first()->skill_bonus,
+        ];
+
+        Cache::put('character-sheet-' . $characterId, $characterSheet);
+
+        return $characterSheet;
     }
 }

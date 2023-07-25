@@ -215,7 +215,7 @@ export default class CharacterSheet extends React.Component<CharacterSheetProps,
                                                 <dt>Damage Stat:</dt>
                                                 <dd>{this.props.character.damage_stat}</dd>
                                                 <dt>To Hit:</dt>
-                                                <dd>Accuracy, {this.props.character.to_hit_stat}</dd>
+                                                <dd>{this.props.character.to_hit_stat}</dd>
                                                 <dt>Class Bonus:</dt>
                                                 <dd>{(this.props.character.extra_action_chance.chance * 100).toFixed(2)}%</dd>
                                             </dl>

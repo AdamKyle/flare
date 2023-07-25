@@ -1,15 +1,43 @@
 import React from "react";
 import Dialogue from "../../../../components/ui/dialogue/dialogue";
 import {AdditionalInfoModalProps} from "../../../../lib/game/character-sheet/types/modal/additional-info-modal-props";
-import Tabs from "../../../../components/ui/tabs/tabs";
-import TabPanel from "../../../../components/ui/tabs/tab-panel";
-import {formatNumber} from "../../../../lib/game/format-number";
+import Ajax from "../../../../lib/ajax/ajax";
+import { AxiosError, AxiosResponse } from "axios";
+import ComponentLoading from "../../../../components/ui/loading/component-loading";
 
 export default class CharacterResistances extends React.Component<AdditionalInfoModalProps, any> {
 
 
     constructor(props: AdditionalInfoModalProps) {
         super(props);
+
+        this.state = {
+            is_loading: true,
+            error_message: '',
+            resistance_info: [],
+        }
+    }
+
+    componentDidMount(): void {
+
+        if (this.props.character === null) {
+            return;
+        }
+
+        (new Ajax).setRoute('character-sheet/' + this.props.character.id + '/resistance-info').doAjaxCall('get', (response: AxiosResponse) => {
+            this.setState({
+                is_loading: false,
+                resistance_info: response.data.resistance_info,
+            })
+        }, (error: AxiosError) => {
+            this.setState({is_loading: false});
+
+            if (typeof error.response !== 'undefined') {
+                this.setState({
+                    error_message: error.response.data.mmessage,
+                });
+            }
+        });
     }
 
     render() {
@@ -23,21 +51,26 @@ export default class CharacterResistances extends React.Component<AdditionalInfo
                       handle_close={this.props.manage_modal}
                       title={this.props.title}
             >
-                <div>
-                    <p className='mb-4'>
-                        Resistances come from a variety of places. Click Additional Info to see other resistances such as Devouring light,
-                        Ambush and counter.
-                    </p>
-                    <p className='mb-4'>
-                        Rings will increase these values.
-                    </p>
-                    <dl>
-                        <dt>Spell Evasions</dt>
-                        <dd>{(this.props.character.spell_evasion * 100).toFixed(2)}%</dd>
-                        <dt>Affix Damage Reduction</dt>
-                        <dd>{(this.props.character.affix_damage_reduction * 100).toFixed(2)}%</dd>
-                    </dl>
-                </div>
+                {
+                    this.state.is_loading ?
+                        <ComponentLoading />
+                    :
+                        <div>
+                            <p className='mb-4'>
+                                Resistances come from a variety of places. Click Additional Info to see other resistances such as Devouring light,
+                                Ambush and counter.
+                            </p>
+                            <p className='mb-4'>
+                                Rings will increase these values.
+                            </p>
+                            <dl>
+                                <dt>Spell Evasions</dt>
+                                <dd>{(this.state.resistance_info.spell_evasion * 100).toFixed(2)}%</dd>
+                                <dt>Affix Damage Reduction</dt>
+                                <dd>{(this.state.resistance_info.affix_damage_reduction * 100).toFixed(2)}%</dd>
+                            </dl>
+                        </div>
+                }
             </Dialogue>
         );
     }

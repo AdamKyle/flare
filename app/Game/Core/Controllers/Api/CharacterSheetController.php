@@ -2,39 +2,39 @@
 
 namespace App\Game\Core\Controllers\Api;
 
+use App\Flare\Models\User;
+use League\Fractal\Manager;
+use Illuminate\Http\Request;
+use App\Flare\Models\Character;
+use League\Fractal\Resource\Item;
+use App\Flare\Models\CharacterBoon;
+use App\Http\Controllers\Controller;
+use App\Game\Core\Events\GlobalTimeOut;
+use League\Fractal\Resource\Collection;
+use App\Game\Core\Jobs\EndGlobalTimeOut;
 use App\Admin\Events\UpdateAdminChatEvent;
-
-use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
-use App\Flare\Transformers\CharacterTopBarTransformer;
-use App\Flare\Transformers\ItemTransformer;
+use App\Flare\Transformers\CharacterElementalAtonementTransformer;
+use App\Game\Core\Services\UseItemService;
 use App\Flare\Transformers\SkillsTransformer;
 use App\Flare\Transformers\UsableItemTransformer;
-use App\Game\Core\Events\GlobalTimeOut;
-use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Services\CharacterPassiveSkills;
-use Illuminate\Http\Request;
-use League\Fractal\Resource\Collection;
-use League\Fractal\Resource\Item;
-use League\Fractal\Manager;
-use App\Http\Controllers\Controller;
-use App\Flare\Models\CharacterBoon;
-use App\Flare\Models\GameSkill;
-use App\Flare\Models\User;
-use App\Flare\Values\ItemUsabilityType;
-use App\Flare\Models\Character;
-use App\Game\Core\Jobs\EndGlobalTimeOut;
-use App\Game\Core\Services\UseItemService;
+use App\Flare\Transformers\CharacterStatDetailsTransformer;
+use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
+use App\Flare\Transformers\CharacterResistanceInfoTransformer;
+use App\Flare\Transformers\CharacterReincarnationInfoTransformer;
 
 class CharacterSheetController extends Controller {
 
-    private $manager;
+    /**
+     * @var Manager $manager
+     */
+    private Manager $manager;
 
-    private $characterTopBarTransformer;
-
-    public function __construct(Manager $manager, CharacterTopBarTransformer $characterTopBarTransformer) {
-
-        $this->manager                    = $manager;
-        $this->characterTopBarTransformer = $characterTopBarTransformer;
+    /**
+     * @param Manager $manager
+     */
+    public function __construct(Manager $manager) {
+        $this->manager = $manager;
     }
 
     public function sheet(Character $character, CharacterSheetBaseInfoTransformer $characterSheetBaseInfoTransformer) {
@@ -52,6 +52,42 @@ class CharacterSheetController extends Controller {
 
         return response()->json([
             'base_info' => $details,
+        ], 200);
+    }
+
+    public function statDetails(Character $character, CharacterStatDetailsTransformer $characterStatDetailsTransformer) {
+        $character = new Item($character, $characterStatDetailsTransformer);
+        $details   = $this->manager->createData($character)->toArray();
+
+        return response()->json([
+            'stat_details' => $details,
+        ], 200);
+    }
+
+    public function resistanceInfo(Character $character, CharacterResistanceInfoTransformer $characterResistanceInfoTransformer) {
+        $character = new Item($character, $characterResistanceInfoTransformer);
+        $details   = $this->manager->createData($character)->toArray();
+
+        return response()->json([
+            'resistance_info' => $details,
+        ], 200);
+    }
+
+    public function reincarnationInfo(Character $character, CharacterReincarnationInfoTransformer $characterReincarnationInfoTransformer) {
+        $character = new Item($character, $characterReincarnationInfoTransformer);
+        $details   = $this->manager->createData($character)->toArray();
+
+        return response()->json([
+            'reincarnation_details' => $details,
+        ], 200);
+    }
+
+    public function elementalAtonementInfo(Character $character, CharacterElementalAtonementTransformer $characterElementalAtonementTransformer) {
+        $character = new Item($character, $characterElementalAtonementTransformer);
+        $details   = $this->manager->createData($character)->toArray();
+
+        return response()->json([
+            'reincarnation_details' => $details,
         ], 200);
     }
 

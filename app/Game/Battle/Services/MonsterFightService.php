@@ -27,7 +27,7 @@ class MonsterFightService {
 
         $data = $this->monsterPlayerFight->setUpFight($character, $params)->fightSetUp();  
         
-        Cache::put('monster-fight-' . $character->id, $data, 15);
+        Cache::put('monster-fight-' . $character->id, $data, 900);
 
         return $this->successResult($data);
     }
@@ -35,12 +35,11 @@ class MonsterFightService {
     public function fightMonster(Character $character, string $attackType): array {
         $cache = Cache::get('monster-fight-' . $character->id);
 
-        $this->monsterPlayerFight->setCharacter($character);
-
         if (is_null($cache)) {
-            return $this->errorResult('There seems to be no monster here. Hmmm, maybe you waited too long and it fled. 
-            Try attackig it again! (you have 15 minutes from selecting and clicking fight to kill it. Each attack resets this timer)');
+            return $this->errorResult('The monster seems to have fled. Click attack again to start a new battle. You have 15 minutes from clicking attack to attack the creature before the cache resets.');
         }
+
+        $this->monsterPlayerFight->setCharacter($character);
 
         $this->monsterPlayerFight->fightMonster(true, false, $attackType);
 
@@ -48,13 +47,16 @@ class MonsterFightService {
             $this->battleEventHandler->processDeadCharacter($character);
         }
 
+        $monsterHealth   = $this->monsterPlayerFight->getMonsterHealth();
+        $characterHealth = $this->monsterPlayerFight->getCharacterHealth();
+
         $cache['health'] = [
-            'current_character_health' => $this->monsterPlayerFight->getCharacterHealth(),
-            'current_monster_health'   => $this->monsterPlayerFight->getMonsterHealth(),
+            'current_character_health' => $characterHealth,
+            'current_monster_health'   => $monsterHealth,
         ];
 
-        if ($this->monsterPlayerFight->getMonsterHealth() >= 0) {
-            Cache::put('monster-fight-' . $character->id, $cache, 15);
+        if ($monsterHealth >= 0) {
+            Cache::put('monster-fight-' . $character->id, $cache, 900);
         } else {
             Cache::delete('monster-fight-' . $character->id);
             

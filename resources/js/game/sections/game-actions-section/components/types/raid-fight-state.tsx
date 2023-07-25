@@ -1,4 +1,4 @@
-import { BattleMessage } from "../../../../lib/game/actions/battle/types/battle-message-type";
+import { BattleMessage } from "./battle-message-type";
 
 export default interface RaidFightState {
     is_attacking: boolean;

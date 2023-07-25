@@ -2,6 +2,7 @@
 
 namespace App\Game\Exploration\Jobs;
 
+use App\Flare\Builders\Character\CharacterCacheData;
 use App\Flare\Models\Faction;
 use App\Flare\Models\GameMap;
 use App\Flare\ServerFight\MonsterPlayerFight;
@@ -9,7 +10,6 @@ use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Battle\Handlers\FactionHandler;
-use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Models\Monster;
 use App\Game\Exploration\Events\ExplorationTimeOut;
 use App\Game\Exploration\Events\ExplorationLogUpdate;
@@ -60,15 +60,16 @@ class Exploration implements ShouldQueue
      * @param BattleEventHandler $battleEventHandler
      * @param FactionHandler $factionHandler
      * @param GuideQuestService $guideQuestService
+     * @param CharacterCacheData $characterCacheData
      * @return void
      * @throws \Exception
      */
-    public function handle(MonsterPlayerFight $monsterPlayerFight, BattleEventHandler $battleEventHandler, FactionHandler $factionHandler, GuideQuestService $guideQuestService): void {
+    public function handle(MonsterPlayerFight $monsterPlayerFight, BattleEventHandler $battleEventHandler, FactionHandler $factionHandler, GuideQuestService $guideQuestService, CharacterCacheData $characterCacheData): void {
 
         $automation = CharacterAutomation::where('character_id', $this->character->id)->where('id', $this->automationId)->first();
 
         if ($this->shouldBail($automation)) {
-            $this->endAutomation($automation);
+            $this->endAutomation($automation, $characterCacheData);
 
             event(new UpdateDuelAtPosition($this->character->user));
 
@@ -275,9 +276,11 @@ class Exploration implements ShouldQueue
      * @param CharacterAutomation|null $automation
      * @return void
      */
-    protected function endAutomation(?CharacterAutomation $automation): void {
+    protected function endAutomation(?CharacterAutomation $automation, CharacterCacheData $characterCacheData): void {
         if (!is_null($automation)) {
             $automation->delete();
+
+            $characterCacheData->deleteCharacterSheet($this->character);
 
             event(new ExplorationLogUpdate($this->character->user, '"Phew, child! I did not think we would survive all of your shenanigans.
                 So many times I could have died! Do you ever think about anyone other than yourself? No? Didn\'t think so." The Guide storms off and you follow him in silence.', true));

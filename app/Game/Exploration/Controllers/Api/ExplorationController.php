@@ -2,24 +2,21 @@
 
 namespace App\Game\Exploration\Controllers\Api;
 
+use Illuminate\Http\JsonResponse;
+use App\Http\Controllers\Controller;
 use App\Flare\Models\Location;
+use App\Flare\Models\Character;
 use App\Flare\Values\LocationType;
-use App\Game\Battle\Events\UpdateCharacterStatus;
-use App\Game\Core\Events\UpdateTopBarEvent;
-use App\Flare\Models\CharacterAutomation;
-use App\Flare\Values\AttackTypeValue;
-use App\Game\Exploration\Events\ExplorationLogUpdate;
-use App\Game\Exploration\Events\ExplorationStatus;
-use App\Game\Exploration\Services\AttackAutomationService;
 use App\Flare\Values\AutomationType;
+use App\Flare\Values\AttackTypeValue;
+use App\Flare\Models\CharacterAutomation;
+use App\Game\Battle\Events\UpdateCharacterStatus;
+use App\Game\Exploration\Events\ExplorationStatus;
 use App\Game\Exploration\Events\ExplorationTimeOut;
-use App\Game\Exploration\Events\UpdateAutomationsList;
+use App\Flare\Builders\Character\CharacterCacheData;
+use App\Game\Exploration\Events\ExplorationLogUpdate;
 use App\Game\Exploration\Requests\ExplorationRequest;
 use App\Game\Exploration\Services\ExplorationAutomationService;
-use App\Http\Controllers\Controller;
-use App\Flare\Models\Character;
-use App\Game\Automation\Request\AttackAutomationStartRequest;
-use Illuminate\Http\JsonResponse;
 
 class ExplorationController extends Controller {
 
@@ -29,10 +26,17 @@ class ExplorationController extends Controller {
     private  ExplorationAutomationService $explorationAutomationService;
 
     /**
-     * @param ExplorationAutomationService $explorationAutomationService
+     * @var CharacterCacheData $characterCacheData
      */
-    public function __construct(ExplorationAutomationService $explorationAutomationService) {
+    private CharacterCacheData $characterCacheData;
+
+    /**
+     * @param ExplorationAutomationService $explorationAutomationService
+     * @param CharacterCacheData $characterCacheData
+     */
+    public function __construct(ExplorationAutomationService $explorationAutomationService, CharacterCacheData $characterCacheData) {
         $this->explorationAutomationService = $explorationAutomationService;
+        $this->characterCacheData           = $characterCacheData;
     }
 
     /**
@@ -88,6 +92,8 @@ class ExplorationController extends Controller {
         }
 
         $characterAutomation->delete();
+
+        $this->characterCacheData->deleteCharacterSheet($character);
 
         $character = $character->refresh();
 

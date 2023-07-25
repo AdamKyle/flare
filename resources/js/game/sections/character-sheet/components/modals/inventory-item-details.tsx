@@ -30,7 +30,7 @@ export default class InventoryUseDetails extends React.Component<any, any> {
 
                 this.setState({
                     loading: false,
-                    error_message: response.data.message,
+                    error_message: response.data.hasOwnProperty('message') ? response.data.message : response.data.error,
                 })
             }
         })

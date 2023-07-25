@@ -9,7 +9,7 @@ import HealthMeters from "./health-meters";
 import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
 import DangerButton from "../../../components/ui/buttons/danger-button";
 import DangerAlert from "../../../components/ui/alerts/simple-alerts/danger-alert";
-import {BattleMessageType} from "../../../lib/game/actions/battle/types/battle-message-type";
+import {BattleMessageType} from "./types/battle-message-type";
 import DuelPlayerProps, {CharactersList} from "./types/duel-player-props";
 import DuelPlayerState from "./types/duel-player-state";
 import {DuelMessages} from "../../../lib/game/types/core/duel-player/definitions/duel-data";

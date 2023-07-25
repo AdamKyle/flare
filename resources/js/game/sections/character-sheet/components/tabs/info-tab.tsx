@@ -170,7 +170,7 @@ export default class InfoTab extends React.Component<InfoTabProps, InfoTabState>
                             elemental_atonement={this.props.character.elemental_atonement}
                             is_open={this.state.open_elemental_atonement}
                             manage_modal={this.manageElementalAtonement.bind(this)}
-
+                            character={this.props.character}
                         />
                     : null
                 }
