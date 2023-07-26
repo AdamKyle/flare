@@ -4,8 +4,6 @@ namespace App\Game\NpcActions\QueenOfHeartsActions\Services;
 
 use App\Flare\Models\Character;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
-use App\Game\Core\Events\UpdateCharacterEvent;
-use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;

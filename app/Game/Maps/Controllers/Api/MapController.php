@@ -99,7 +99,7 @@ class MapController extends Controller {
      * @return JsonResponse
      */
     public function traverseMaps(): JsonResponse {
-        return response()->json($this->movementService->getMapsToTraverse(auth()->user()->character));
+        return response()->json(array_values($this->movementService->getMapsToTraverse(auth()->user()->character)));
     }
 
     /**

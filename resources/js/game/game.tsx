@@ -148,6 +148,7 @@ export default class Game extends React.Component<GameProps, GameState> {
 
         // @ts-ignore
         this.characterTopBar.listen('Game.Core.Events.UpdateTopBarBroadcastEvent', (event: any) => {
+            console.log(this.state.character?.level, event.characterSheet.level);
             this.setState({
                 character: {...this.state.character, ...event.characterSheet}
             }, () => {

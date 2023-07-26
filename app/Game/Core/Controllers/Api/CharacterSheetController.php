@@ -87,7 +87,7 @@ class CharacterSheetController extends Controller {
         $details   = $this->manager->createData($character)->toArray();
 
         return response()->json([
-            'reincarnation_details' => $details,
+            'elemental_atonement_details' => $details,
         ], 200);
     }
 

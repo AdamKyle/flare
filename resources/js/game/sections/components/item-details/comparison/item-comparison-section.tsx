@@ -276,6 +276,8 @@ export default class ItemComparisonSection extends React.Component<ItemCompariso
             return null;
         }
 
+        console.log(this.props.comparison_details);
+
         const keyCount = Object.keys(this.props.comparison_details.itemToEquip)
                                .filter((key: string) => !this.invalidFields.includes(key))
                                .filter((key: string) => this.props.comparison_details.itemToEquip[key] > 0)
@@ -283,7 +285,7 @@ export default class ItemComparisonSection extends React.Component<ItemCompariso
                                .filter((key: string) => typeof this.props.comparison_details.itemToEquip[key] !== 'boolean')
                                .length;
 
-        if (this.props.comparison_details.itemToEquip.type === 'ring') {
+        if (this.props.comparison_details.itemToEquip.type === 'ring' || this.props.comparison_details.details.length !== 0) {
             return (
                 <div className={clsx({
                     'max-h-[200px] overflow-y-auto md:max-h-[500px] lg:max-h-[600px] lg:overflow-visible': keyCount < 15,

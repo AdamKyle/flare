@@ -18,7 +18,7 @@ class CharacterAttackData {
     public function attackData(Character $character, CharacterStatBuilder $characterStatBuilder): array {
 
         return [
-            'level'                       => $character->level,
+            'level'                       => number_format($character->level),
             'attack'                      => $characterStatBuilder->buildTotalAttack(),
             'health'                      => $characterStatBuilder->buildHealth($this->includeReductions),
             'ac'                          => $characterStatBuilder->buildDefence($this->includeReductions),

@@ -21,7 +21,7 @@
                         <h3 class="mb-3">Basic Item Info</h3>
                         <x-core.forms.input :model="$itemAffix" label="Name:" modelKey="name" name="name" />
                         <x-core.forms.select :model="$itemAffix" label="Type:" modelKey="type" name="type" :options="$types" />
-                        <x-core.forms.key-value-select :name="affix_type" :options="$affix_types" :label="Affix Type" />
+                        <x-core.forms.key-value-select name="affix_type" :model="$itemAffix" :options="$affixTypes" label="Affix Type" modelKey="affix_type" />
                         <x-core.forms.text-area :model="$itemAffix" label="Description:" modelKey="description" name="description" />
                         <x-core.forms.check-box :model="$itemAffix" label="Can Affix Drop?" modelKey="can_drop" name="can_drop" />
                     </x-core.form-wizard.content>

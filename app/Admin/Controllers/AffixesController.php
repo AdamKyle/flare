@@ -3,8 +3,6 @@
 namespace App\Admin\Controllers;
 
 use App\Admin\Import\Affixes\AffixesImport;
-use App\Admin\Import\Affixes\ClassSpecialsImport;
-use App\Admin\Import\Affixes\GuideQuests;
 use App\Admin\Requests\AffixManagementRequest;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -30,8 +28,8 @@ class AffixesController extends Controller {
     public function create() {
 
         return view('admin.affixes.manage', array_merge([
-            'itemAffix'  => null,
-            'affix_type' => ItemAffixType::$dropDownValues,
+            'itemAffix'   => null,
+            'affixTypes'  => ItemAffixType::$dropDownValues,
         ], $this->itemAffixService->getFormData()));
     }
 
@@ -44,8 +42,8 @@ class AffixesController extends Controller {
 
     public function edit(ItemAffix $affix) {
         return view('admin.affixes.manage', array_merge([
-            'itemAffix'  => $affix,
-            'affix_type' => ItemAffixType::$dropDownValues,
+            'itemAffix'   => $affix,
+            'affixTypes'  => ItemAffixType::$dropDownValues,
         ], $this->itemAffixService->getFormData()));
     }
 

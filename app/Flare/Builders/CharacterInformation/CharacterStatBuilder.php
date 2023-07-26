@@ -760,6 +760,26 @@ class CharacterStatBuilder {
     }
 
     /**
+     * Build Resistance Chance
+     *
+     * @param boolean $voided
+     * @return float
+     */
+    public function buildResistanceReductionChance(bool $voided = false): float {
+        if ($voided || is_null($this->equippedItems)) {
+            return 0;
+        }
+
+        $resistanceReduction = $this->equippedItems->pluck('item.itemPrefix.resistance_reduction')->toArray();
+
+        if ($resistanceReduction > 1) {
+            $resistanceReduction = 1.0;
+        }
+
+        return $resistanceReduction;
+    }
+
+    /**
      * Get stat reducing prefix.
      *
      * Takes the Highest one.

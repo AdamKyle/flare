@@ -146,7 +146,6 @@ class AffixCurveDTO {
         }
 
         if (!isset($this->{$curveName}[$index])) {
-            dd($this->{$curveName}, $index);
             throw new Exception('Invalid index for array: ' . $curveName);
         }
 

@@ -21,12 +21,12 @@ class CanHit {
         $characterAccuracy = $this->characterCacheData->getCachedCharacterData($character, 'skills')['accuracy'];
         $enemyDodge        = $monster->getMonsterStat('dodge');
 
-        if ($enemyDodge >= 1) {
-            return false;
-        }
-
         if ($characterAccuracy >= 1) {
             return true;
+        }
+
+        if ($enemyDodge >= 1) {
+            return false;
         }
 
         $playerToHit = $statValue * 0.20;

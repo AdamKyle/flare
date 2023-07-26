@@ -227,20 +227,31 @@ class CastType extends BattleBase
 
         $monsterSpellEvasion = $monster->getMonsterStat('spell_evasion');
 
+        $characterSpellEvasionReduction = $character->getInformation()->buildResistanceReductionChance();
+
+        $monsterSpellEvasion -= $characterSpellEvasionReduction;
+
         if (!$entranced) {
-            if ($monsterSpellEvasion > 1) {
-                $this->addMessage('The enemy evades your magic!', 'enemy-action');
 
-                return;
+            if ($monsterSpellEvasion > 0 && $characterSpellEvasionReduction < 1) {
+
+                if ($monsterSpellEvasion > 1) {
+                    $this->addMessage('The enemy evades your magic!', 'enemy-action');
+    
+                    return;
+                }
+    
+                $evasion = 100 - (100 - 100 * $monsterSpellEvasion);
+    
+                if (rand(1, 100) > $evasion) {
+                    $this->addMessage('The enemy evades your magic!', 'enemy-action');
+    
+                    return;
+                }
+            } else {
+                $this->addMessage('The enemy fails to evade your magics', 'player-action');
             }
 
-            $evasion = 100 - (100 - 100 * $monsterSpellEvasion);
-
-            if (rand(1, 100) > $evasion) {
-                $this->addMessage('The enemy evades your magic!', 'enemy-action');
-
-                return;
-            }
         }
 
         $criticality = $this->characterCacheData->getCachedCharacterData($character, 'skills')['criticality'];
