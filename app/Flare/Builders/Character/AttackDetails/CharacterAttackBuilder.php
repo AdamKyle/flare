@@ -84,7 +84,7 @@ class CharacterAttackBuilder {
      * @throws Exception
      */
     public function buildCastAndAttack(bool $voided = false): array {
-        return $this->castAndAttackPositionalDamage(AttackTypeValue::CAST_AND_ATTACK, 'spell-one', 'left-hand', $voided);
+        return $this->castAndAttackPositionalDamage(AttackTypeValue::CAST_AND_ATTACK, 'spell-one', 'right-hand', $voided);
     }
 
     /**
@@ -95,7 +95,7 @@ class CharacterAttackBuilder {
      * @throws Exception
      */
     public function buildAttackAndCast(bool $voided = false): array {
-        return $this->castAndAttackPositionalDamage(AttackTypeValue::ATTACK_AND_CAST, 'spell-two', 'right-hand', $voided);
+        return $this->castAndAttackPositionalDamage(AttackTypeValue::ATTACK_AND_CAST, 'spell-two', 'left-hand', $voided);
     }
 
     /**
@@ -189,7 +189,7 @@ class CharacterAttackBuilder {
         $weaponDamage = $this->characterStatBuilder->positionalWeaponDamage($weaponPosition, $voided);
         $spellDamage  = $this->characterStatBuilder->positionalSpellDamage($spellPosition, $voided);
         $spellHealing = $this->characterStatBuilder->positionalHealing($spellPosition, $voided);
-
+        
         $attack['spell_damage']  = $spellDamage;
         $attack['heal_for']      = $spellHealing;
         $attack['weapon_damage'] = $weaponDamage;

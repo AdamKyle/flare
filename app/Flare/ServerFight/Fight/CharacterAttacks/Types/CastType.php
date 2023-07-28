@@ -30,6 +30,15 @@ class CastType extends BattleBase
     public function setCharacterAttackData(Character $character, bool $isVoided): CastType{
 
         $this->attackData = $this->characterCacheData->getDataFromAttackCache($character, $isVoided ? 'voided_cast' : 'cast');
+        $this->isVoided   = $isVoided;
+
+        return $this;
+    }
+
+
+    public function setCharacterCastAndAttack(Character $character, bool $isVoided): CastType {
+
+        $this->attackData = $this->characterCacheData->getDataFromAttackCache($character, $isVoided ? 'voided_cast_and_attack' : 'cast_and_attack');
         $this->isVoided = $isVoided;
 
         return $this;
@@ -43,6 +52,16 @@ class CastType extends BattleBase
     public function pvpCastAttack(Character $attacker, Character $defender) {
 
         $spellDamage = $this->attackData['spell_damage'];
+
+        if ($spellDamage > 0) {
+            $this->heal($$attacker, $defender, true);
+
+            if ($this->allowSecondaryAttacks) {
+                $this->secondaryAttack($attacker, null, $this->characterCacheData->getCachedCharacterData($defender, 'affix_damage_reduction'), true);
+            }
+
+            return;
+        }
 
         if (!$this->isEnemyEntranced) {
             $this->doPvpEntrance($attacker, $this->entrance);
@@ -91,6 +110,19 @@ class CastType extends BattleBase
 
         $spellDamage = $this->attackData['spell_damage'];
 
+        if ($spellDamage <= 0) {
+
+            $this->heal($character);
+
+            if ($this->allowSecondaryAttacks) {
+                $this->secondaryAttack($character, $monster);
+
+                $this->elementalAttack($character, $monster);
+            }
+            
+            return;
+        }
+
         if (!$this->isEnemyEntranced) {
 
             //$this->doEnemyEntrance($character, $monster, $this->entrance);
@@ -133,11 +165,7 @@ class CastType extends BattleBase
     }
 
     public function doPvpSpellDamage(Character $attacker, Character $defender, int $spellDamage) {
-        if ($spellDamage > 0) {
-            $this->pvpSpellDamage($attacker, $defender, $spellDamage);
-        }
-
-        $this->heal($attacker, $defender, true);
+        $this->pvpSpellDamage($attacker, $defender, $spellDamage);
 
         if ($this->allowSecondaryAttacks) {
             $this->secondaryAttack($attacker, null, $this->characterCacheData->getCachedCharacterData($defender, 'affix_damage_reduction'), true);
@@ -145,9 +173,7 @@ class CastType extends BattleBase
     }
 
     public function doSpellDamage(Character $character, ServerMonster $monster, int $spellDamage, bool $entranced = false) {
-        if ($spellDamage > 0) {
-            $this->spellDamage($character, $monster, $spellDamage, $entranced);
-        }
+        $this->spellDamage($character, $monster, $spellDamage, $entranced);
 
         $this->doMonsterCounter($character, $monster);
 
@@ -156,8 +182,6 @@ class CastType extends BattleBase
 
             return;
         }
-
-        $this->heal($character);
 
         if ($this->allowSecondaryAttacks) {
             $this->secondaryAttack($character, $monster);
@@ -207,8 +231,6 @@ class CastType extends BattleBase
         if ($this->abortCharacterIsDead) {
             return;
         }
-
-        $this->heal($attacker, $defender, true);
 
         $this->specialAttacks->setCharacterHealth($this->characterHealth)
                              ->setMonsterHealth($this->monsterHealth)

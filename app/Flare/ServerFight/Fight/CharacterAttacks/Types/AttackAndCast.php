@@ -5,7 +5,6 @@ namespace App\Flare\ServerFight\Fight\CharacterAttacks\Types;
 use App\Flare\Builders\Character\CharacterCacheData;
 use App\Flare\Models\Character;
 use App\Flare\ServerFight\BattleBase;
-use App\Flare\ServerFight\Fight\Affixes;
 use App\Flare\ServerFight\Fight\CanHit;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SecondaryAttacks;
 use App\Flare\ServerFight\Fight\Entrance;
@@ -24,7 +23,12 @@ class AttackAndCast extends BattleBase
 
     private CastType $castType;
 
-    public function __construct(CharacterCacheData $characterCacheData, Entrance $entrance, CanHit $canHit, SecondaryAttacks $secondaryAttacks, WeaponType $weaponType, CastType $castType)
+    public function __construct(CharacterCacheData $characterCacheData, 
+                                Entrance $entrance, 
+                                CanHit $canHit, 
+                                SecondaryAttacks $secondaryAttacks, 
+                                WeaponType $weaponType, 
+                                CastType $castType) 
     {
         parent::__construct($characterCacheData);
 
@@ -35,17 +39,16 @@ class AttackAndCast extends BattleBase
         $this->castType              = $castType;
     }
 
-    public function setCharacterAttackData(Character $character, bool $isVoided): AttackAndCast
-    {
+    public function setCharacterAttackData(Character $character, bool $isVoided): AttackAndCast {
 
         $this->attackData = $this->characterCacheData->getDataFromAttackCache($character, $isVoided ? 'voided_attack_and_cast' : 'attack_and_cast');
-        $this->isVoided = $isVoided;
+        $this->isVoided   = $isVoided;
 
         return $this;
     }
 
-    public function resetMessages()
-    {
+
+    public function resetMessages() {
         $this->clearMessages();
         $this->entrance->clearMessages();
     }
@@ -72,8 +75,6 @@ class AttackAndCast extends BattleBase
         if ($this->characterHealth <= 0) {
             return $this;
         }
-
-        // $this->secondaryAttack($character, $monster);
 
         return $this;
     }
@@ -154,7 +155,7 @@ class AttackAndCast extends BattleBase
 
         $this->castType->setMonsterHealth($this->monsterHealth);
         $this->castType->setCharacterHealth($this->characterHealth);
-        $this->castType->setCharacterAttackData($character, $this->isVoided);
+        $this->castType->setCharacterCastAndAttack($character, $this->isVoided);
 
         if ($disableSecondaryAttacks) {
             $this->castType->doNotAllowSecondaryAttacks();

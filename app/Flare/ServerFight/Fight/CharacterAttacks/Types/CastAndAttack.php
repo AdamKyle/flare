@@ -16,6 +16,15 @@ class CastAndAttack extends AttackAndCast {
         parent::__construct($characterCacheData, $entrance, $canHit, $secondaryAttacks, $weaponType, $castType);
     }
 
+    public function setCharacterCastAndAttackkData(Character $character, bool $isVoided): AttackAndCast
+    {
+
+        $this->attackData = $this->characterCacheData->getDataFromAttackCache($character, $isVoided ? 'voided_cast_and_attack' : 'cast_and_attack');
+        $this->isVoided = $isVoided;
+
+        return $this;
+    }
+
     public function handlePvpAttack(Character $attacker, Character $defender) {
 
         $this->handlePvpCastAttack($attacker, $defender);
@@ -38,8 +47,6 @@ class CastAndAttack extends AttackAndCast {
         if ($this->characterHealth <= 0) {
             return $this;
         }
-
-        // $this->secondaryAttack($character, $monster);
 
         return $this;
     }

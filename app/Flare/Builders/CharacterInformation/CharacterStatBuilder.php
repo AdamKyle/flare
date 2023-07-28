@@ -547,7 +547,7 @@ class CharacterStatBuilder {
         $stat = $this->statMod($this->character->damage_stat, $voided);
 
         if (is_null($this->equippedItems)) {
-            if ($this->character->classType()->isCaster()) {
+            if ($this->character->classType()->isHeretic() || $this->character->classtype()->isArcaneAlchemist()) {
                 $value = $stat / 2;
 
                 return $value < 5 ? 5 : $value;
@@ -579,10 +579,8 @@ class CharacterStatBuilder {
         $stat = $this->statMod($this->character->damage_stat, $voided);
 
         if (is_null($this->equippedItems)) {
-
             if ($this->character->classType()->isProphet()) {
                 $value = $stat / 2;
-
                 return $value < 5 ? 5 : $value;
             }
 
@@ -612,7 +610,7 @@ class CharacterStatBuilder {
 
         if (is_null($this->equippedItems)) {
             if ($this->character->classType()->isProphet() || $this->character->classType()->isRanger()) {
-                $value = $stat * 0.15;
+                $value = $stat / 2;
 
                 return $value < 5 ? 5 : $value;
             }

@@ -90,7 +90,7 @@ class QuestsSheet implements ToCollection {
             $quest['parent_quest_id'] = null;
         } else {
             $foundQuest = Quest::where('name', $quest['parent_quest_id'])->first();
-
+            
             if (is_null($foundQuest)) {
                 $quest['parent_quest_id'] = null;
             } else {

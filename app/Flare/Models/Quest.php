@@ -76,6 +76,32 @@ class Quest extends Model {
         'belongs_to_map_name',
     ];
 
+    public static function getAllQuestsInOrder() {
+        $quests = self::where('is_parent', true)
+                      ->with('childQuests')
+                      ->get();
+
+        $result = collect();
+
+        foreach ($quests as $quest) {
+            $result->push($quest);
+            $result = $result->merge(self::flattenChildQuests($quest));
+        }
+
+        return $result;
+    }
+
+    private static function flattenChildQuests(Quest $quest) {
+        $flattened = collect();
+
+        foreach ($quest->childQuests as $child) {
+            $flattened->push($child);
+            $flattened = $flattened->merge(self::flattenChildQuests($child));
+        }
+
+        return $flattened;
+    }
+
     public function childQuests() {
         return $this->hasMany($this, 'parent_quest_id')
                     ->with(

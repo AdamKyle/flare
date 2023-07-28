@@ -16,7 +16,7 @@ class QuestsSheet implements FromView, WithTitle, ShouldAutoSize {
     public function view(): View {
 
         return view('admin.exports.quests.sheets.quests', [
-            'quests' => Quest::all(),
+            'quests' => Quest::getAllQuestsInOrder(),
         ]);
     }
 

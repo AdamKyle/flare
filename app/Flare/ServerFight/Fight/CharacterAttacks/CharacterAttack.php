@@ -107,7 +107,7 @@ class CharacterAttack {
     public function pvpCastAndAttack(Character $attacker, Character $defender, bool $isAttackerVoided, bool $isEnemyVoided, array $healthObject): CharacterAttack {
         $this->castAndAttack->setCharacterHealth($healthObject['attacker_health']);
         $this->castAndAttack->setMonsterHealth($healthObject['defender_health']);
-        $this->castAndAttack->setCharacterAttackData($attacker, $isAttackerVoided);
+        $this->castAndAttack->setCharacterCastAndAttackkData($attacker, $isAttackerVoided);
         $this->castAndAttack->setIsEnemyVoided($isEnemyVoided);
         $this->castAndAttack->setDefenderId($defender->id);
         $this->castAndAttack->handlePvpAttack($attacker, $defender);
@@ -120,7 +120,7 @@ class CharacterAttack {
     public function castAndAttack(Character $character, ServerMonster $monster, bool $isPlayerVoided, int $characterHealth, int $monsterHealth): CharacterAttack {
         $this->castAndAttack->setCharacterHealth($characterHealth);
         $this->castAndAttack->setMonsterHealth($monsterHealth);
-        $this->castAndAttack->setCharacterAttackData($character, $isPlayerVoided);
+        $this->castAndAttack->setCharacterCastAndAttackkData($character, $isPlayerVoided);
         $this->castAndAttack->handleAttack($character, $monster);
 
         $this->type = $this->castAndAttack;

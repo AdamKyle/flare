@@ -50,10 +50,10 @@ class MonsterFightService {
         $monsterHealth   = $this->monsterPlayerFight->getMonsterHealth();
         $characterHealth = $this->monsterPlayerFight->getCharacterHealth();
 
-        $cache['health'] = [
-            'current_character_health' => $characterHealth,
-            'current_monster_health'   => $monsterHealth,
-        ];
+        $cache['health']['current_character_health'] = $characterHealth;
+        $cache['health']['current_monster_health']   = $monsterHealth;
+        $cache['health']['character_health']         = $characterHealth;
+        $cache['health']['monster_health']           = $monsterHealth;
 
         if ($monsterHealth >= 0) {
             Cache::put('monster-fight-' . $character->id, $cache, 900);

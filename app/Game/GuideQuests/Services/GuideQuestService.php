@@ -214,6 +214,12 @@ class GuideQuestService {
             }
         }
 
+        if (!is_null($quest->required_gold_dust)) {
+            if ($character->gold_dust >= $quest->required_gold_dust) {
+                $attributes[] = 'required_gold_dust';
+            }
+        }
+
         if (!is_null($quest->required_stats)) {
             $stats          = ['str', 'dex', 'dur', 'int', 'chr', 'agi', 'focus'];
             $completedStats = [];

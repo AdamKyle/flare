@@ -2,14 +2,12 @@
 
 namespace App\Game\Battle\Controllers\Api;
 
-use Illuminate\Http\Request;
 use App\Flare\Models\Monster;
 use App\Flare\Models\Location;
 use App\Flare\Models\Character;
 use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Cache;
-use App\Game\Battle\Jobs\BattleAttackHandler;
 use App\Game\Battle\Events\AttackTimeOutEvent;
 use App\Game\Battle\Request\AttackTypeRequest;
 use App\Flare\Services\BuildMonsterCacheService;
@@ -103,7 +101,9 @@ class BattleController extends Controller {
     public function fightMonster(AttackTypeRequest $attackTypeRequest, Character $character): JsonResponse {
         $result = $this->monsterFightService->fightMonster($character, $attackTypeRequest->attack_type);
 
-        event(new AttackTimeOutEvent($character));
+        if ($result['health']['current_character_health'] <= 0 || $result['health']['current_monster_health'] <= 0) {
+            event(new AttackTimeOutEvent($character));
+        }
 
         $status = $result['status'];
         unset($result['status']);
