@@ -54,6 +54,9 @@
                 <td>{{!is_null($guideQuest->required_game_map_id) ? $guideQuest->game_map_name : ''}}</td>
                 <td>{{!is_null($guideQuest->required_quest_id) ? $guideQuest->quest_name : ''}}</td>
                 <td>{{!is_null($guideQuest->required_quest_item_id) ? $guideQuest->quest_item_name : ''}}</td>
+                <td>{{!is_null($guideQuest->required_quest_item_id) ? $guideQuest->required_gold : ''}}</td>
+                <td>{{!is_null($guideQuest->required_quest_item_id) ? $guideQuest->required_gold_dust : ''}}</td>
+                <td>{{!is_null($guideQuest->required_quest_item_id) ? $guideQuest->required_shards : ''}}</td>
                 <td>{{$guideQuest->required_kingdoms}}</td>
                 <td>{{$guideQuest->required_kingdom_level}}</td>
                 <td>{{$guideQuest->required_kingdom_units}}</td>
