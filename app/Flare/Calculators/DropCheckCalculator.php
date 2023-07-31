@@ -31,13 +31,13 @@ class DropCheckCalculator {
             return true;
         }
 
-        if ($characterLevel < 10 && $lootingChance < .10) {
-            $roll = RandomNumberGenerator::generateRandomNumber(100, 50, 1, 500);
+        if ($characterLevel < 12 && $lootingChance < .10) {
+            $roll = RandomNumberGenerator::generateRandomNumber(1, 500);
         } else {
-            $roll = RandomNumberGenerator::generateRandomNumber(1, 50, 1, 100);
+            $roll = RandomNumberGenerator::generateRandomNumber(1, 100);
         }
 
-        $dc   = round((100 - (100 * ($monster->drop_check + $bonus))));
+        $dc = round((100 - (100 * ($monster->drop_check + $bonus))));
 
         return $roll >= $dc;
     }
@@ -50,7 +50,7 @@ class DropCheckCalculator {
      * @return bool
      */
     public function fetchLocationDropChance(float $locationChance, float $lootingChance): bool {
-        $roll = RandomNumberGenerator::generateRandomNumber(1, 50 , 1, 100);
+        $roll = RandomNumberGenerator::generateRandomNumber(1, 100);
         $dc   = round((100 - (100 * ($locationChance + $lootingChance))));
 
         return $roll > $dc;
@@ -81,7 +81,7 @@ class DropCheckCalculator {
             return true;
         }
 
-        $roll = RandomNumberGenerator::generateRandomNumber(1, 50, 1, 100);;
+        $roll = RandomNumberGenerator::generateRandomNumber(1, 100);;
         $roll = round($roll + $roll * $totalBonus);
         $dc   = round((100 - (100 * $monster->drop_check)));
 

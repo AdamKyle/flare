@@ -187,7 +187,11 @@ class MonsterPlayerFight {
      * @return array
      */
     public function getBattleMessages(): array {
-        return $this->battleMessages;
+        $messages = $this->battleMessages;
+
+        $this->removeDuplicateMessages($messages);
+
+        return $messages;
     }
 
     /**
@@ -511,5 +515,23 @@ class MonsterPlayerFight {
      */
     protected function mergeMessages(array $messages) {
         $this->battleMessages = array_merge($this->battleMessages, $messages);
+    }
+
+    /**
+     * Remove duplicate messages.
+     *
+     * @param array $array
+     * @return void
+     */
+    protected function removeDuplicateMessages(array &$array) {
+        $uniqueMessages = [];
+    
+        $array = array_reduce($array, function ($result, $item) use (&$uniqueMessages) {
+            if (!in_array($item['message'], $uniqueMessages)) {
+                $uniqueMessages[] = $item['message'];
+                $result[] = $item;
+            }
+            return $result;
+        }, []);
     }
 }

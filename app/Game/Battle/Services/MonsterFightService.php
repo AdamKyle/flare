@@ -67,4 +67,6 @@ class MonsterFightService {
 
         return $this->successResult($cache);
     }
+
+
 }
