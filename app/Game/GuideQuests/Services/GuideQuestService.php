@@ -2,14 +2,15 @@
 
 namespace App\Game\GuideQuests\Services;
 
-use App\Flare\Models\Item;
+use Exception;
+use Illuminate\Support\Facades\Log;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Character;
-use App\Flare\Models\ItemAffix;
 use App\Flare\Models\GuideQuest;
 use App\Flare\Values\AutomationType;
 use App\Flare\Models\QuestsCompleted;
 use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\Skills\Values\SkillTypeValue;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\HandleCharacterLevelUp;
 use App\Game\Messages\Events\ServerMessageEvent;
@@ -136,6 +137,35 @@ class GuideQuestService {
             }
         }
 
+        if (!is_null($quest->required_secondary_skill)) {
+            $requiredSkill = $character->skills()->where('game_skill_id', $quest->required_secondary_skill)->first();
+
+            if ($requiredSkill->level >= $quest->required_secondary_skill_level) {
+                $attributes[] = 'required_secondary_skill_level';
+            }
+        }
+
+        if (!is_null($quest->required_skill_type)) {
+            try {
+                $skillType = new SkillTypeValue($quest->required_skill_type);
+
+                if ($skillType->effectsClassSkills()) {
+                    $classSkill = $character->skills()->whereHas('gameSkill', function ($query) use ($character) {
+                        $query->whereNotNull('game_class_id')
+                              ->where('game_class_id', $character->class->id);
+                    })->first();
+
+                    if (!is_null($classSkill)) {
+                        if ($classSkill->level >= $quest->required_skill_type_level) {
+                            $attributes[] = 'required_skill_type_level';
+                        }
+                    }
+                }
+            } catch (Exception $e) {
+                Log::info($e->getmessage());
+            }
+        }
+
         if (!is_null($quest->required_faction_id)) {
             $faction = $character->factions()->where('game_map_id', $quest->required_faction_id)->first();
 
@@ -239,8 +269,14 @@ class GuideQuestService {
 
         if (!empty($attributes)) {
             $requiredAttributes = $this->requiredAttributeNames($quest);
+            
+            $difference = array_diff($requiredAttributes, $attributes);
 
-            return $attributes === $requiredAttributes;
+            dump($requiredAttributes, $attributes, $difference);
+
+            if (empty($difference)) {
+                return true;
+            }
         }
 
         return false;
@@ -262,6 +298,14 @@ class GuideQuestService {
             }
 
             if ($key === 'required_faction_id') {
+                continue;
+            }
+
+            if ($key === 'required_secondary_skill') {
+                continue;
+            }
+
+            if ($key === 'required_skill_type') {
                 continue;
             }
 

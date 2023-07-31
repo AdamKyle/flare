@@ -11,6 +11,7 @@ import {AxiosError, AxiosResponse} from "axios";
 import Ajax from "../../../../../lib/ajax/ajax";
 import WarningAlert from "../../../../../components/ui/alerts/simple-alerts/warning-alert";
 import InfoAlert from "../../../../../components/ui/alerts/simple-alerts/info-alert";
+import clsx from "clsx";
 
 export default class Skills extends React.Component<SkillsProps, any> {
 
@@ -80,7 +81,9 @@ export default class Skills extends React.Component<SkillsProps, any> {
                 selector: (row: { name: string; }) => row.name,
                 sortable: true,
                 cell: (row: SkillType) => <span key={row.id + '-' + (Math.random() + 1).toString(36).substring(7)} className='m-auto'>
-                    <button onClick={() => this.manageSkillDetails(row)} className='underline'>{row.name}</button>
+                    <button onClick={() => this.manageSkillDetails(row)} className={clsx('underline', {
+                        'text-orange-600 dark:text-orange-300': row.is_class_skill
+                    })}><i className={clsx({'ra ra-player-pyromaniac': row.is_class_skill})}></i> {row.name}</button>
                 </span>
             },
             {

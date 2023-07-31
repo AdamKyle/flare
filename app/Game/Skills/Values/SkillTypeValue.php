@@ -57,7 +57,7 @@ class SkillTypeValue {
         self::EFFECTS_SPELL_EVASION           => 11,
         self::EFFECTS_KINGDOM                 => 12,
         self::EFFECTS_CLASS                   => 13,
-        self::GEM_CRAFTING                    => 14
+        self::GEM_CRAFTING                    => 14,
     ];
 
     public static $namedValues = [
@@ -210,6 +210,15 @@ class SkillTypeValue {
      */
     public function effectsKingdom(): bool {
         return $this->value === self::EFFECTS_KINGDOM;
+    }
+
+    /**
+     * Does this effect class skills?
+     *
+     * @return bool
+     */
+    public function effectsClassSkills(): bool {
+        return $this->value === self::EFFECTS_CLASS;
     }
 
     /**

@@ -28,4 +28,6 @@ export default interface SkillType extends DataTableBaseData {
 
     xp_towards: number | null;
 
+    is_class_skill: boolean;
+
 }

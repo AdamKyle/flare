@@ -3,16 +3,15 @@
 namespace App\Game\GuideQuests\Controllers\Api;
 
 
+use Illuminate\Http\JsonResponse;
+use App\Http\Controllers\Controller;
 use App\Flare\Models\Character;
 use App\Flare\Models\GuideQuest;
-use App\Flare\Models\QuestsCompleted;
 use App\Flare\Models\User;
 use App\Game\GuideQuests\Events\RemoveGuideQuestButton;
 use App\Game\GuideQuests\Services\GuideQuestService;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
-use App\Http\Controllers\Controller;
-use Illuminate\Http\JsonResponse;
 
 class GuideQuestsController extends Controller {
 

@@ -46,6 +46,7 @@ class GuideQuestsSheet implements ToCollection {
                             $query->where('name', $data['required_faction_id']);
                         })->first();
         $requiredItem   = Item::where('name', $data['required_quest_item_id'])->where('type', 'quest')->first();
+        $secondaryItem  = Item::where('name', $data['secondary_quest_item_id'])->where('type', 'quest')->first();
         $quest          = Quest::where('name', $data['required_quest_id'])->first();
 
         if (is_null($skill)) {
@@ -80,6 +81,12 @@ class GuideQuestsSheet implements ToCollection {
             $data['required_quest_item_id'] = null;
         } else {
             $data['required_quest_item_id'] = $requiredItem->id;
+        }
+
+        if (is_null($secondaryItem)) {
+            $data['secondary_quest_item_id'] = null;
+        } else {
+            $data['secondary_quest_item_id'] = $secondaryItem->id;
         }
 
         if (is_null($quest)) {

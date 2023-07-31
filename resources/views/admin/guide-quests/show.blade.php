@@ -55,6 +55,12 @@
                             <dt>Required Secondary Skill Level</dt>
                             <dd>{{$guideQuest->required_secondary_skill_level}}</dd>
                         @endif
+                        @if (!is_null($guideQuest->skill_type_name))
+                            <dt>Requireed Skill Type</dt>
+                            <dd>{{$guideQuest->skill_type_name}}</dd>
+                            <dt>Required Skill Type Level</dt>
+                            <dd>{{$guideQuest->required_skill_type_level}}</dd>
+                        @endif
                         @if (!is_null($guideQuest->faction_name))
                             <dt>Required Faction</dt>
                             <dd>{{$guideQuest->faction_name}}</dd>
@@ -68,6 +74,10 @@
                         @if (!is_null($guideQuest->required_quest_item_id))
                             <dt>Required Quest Item</dt>
                             <dd>{{$guideQuest->quest_item_name}}</dd>
+                        @endif
+                        @if (!is_null($guideQuest->secondary_quest_item_id))
+                            <dt>Secondary Required Quest Item</dt>
+                            <dd>{{$guideQuest->secondary_quest_item_name}}</dd>
                         @endif
                         @if (!is_null($guideQuest->required_kingdoms))
                             <dt>Required Kingdom Amount</dt>
@@ -87,9 +97,17 @@
                             <dt>Required Passive Level</dt>
                             <dd>{{$guideQuest->required_passive_level}}</dd>
                         @endif
-                        @if (!is_null($guideQuest->required_shards))
-                            <dt>Required Shards</dt>
-                            <dd>{{number_format($guideQuest->required_shards)}}</dd>
+                        @if (!is_null($guideQuest->mercenary_name))
+                            <dt>Required Mercenary Name</dt>
+                            <dd>{{$guideQuest->mercenary_name}}</dd>
+                            <dt>Required Mercenary Level</dt>
+                            <dd>{{$guideQuest->required_mercenary_level}}</dd>
+                        @endif
+                        @if (!is_null($guideQuest->secondary_mercenary_name))
+                            <dt>Required Secondary Mercenary Name</dt>
+                            <dd>{{$guideQuest->secondary_mercenary_name}}</dd>
+                            <dt>Required Secondary Mercenary Level</dt>
+                            <dd>{{$guideQuest->required_secondary_mercenary_level}}</dd>
                         @endif
                         @if (!is_null($guideQuest->required_stats))
                             <dt>Required Stats</dt>

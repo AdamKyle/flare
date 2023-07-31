@@ -32,6 +32,8 @@
                                 <x-core.forms.input :model="$guideQuest" label="Required (Skill) Level:" modelKey="required_skill_level" name="required_skill_level" />
                                 <x-core.forms.key-value-select :model="$guideQuest" label="Secondary Required Skill (optional):" modelKey="required_secondary_skill" name="required_secondary_skill" :options="$gameSkills"/>
                                 <x-core.forms.input :model="$guideQuest" label="Required (Secondary Skill) Level (Optional):" modelKey="required_secondary_skill_level" name="required_secondary_skill_level" />
+                                <x-core.forms.key-value-select :model="$guideQuest" label="Required Skill Type (optional):" modelKey="required_skill_type" name="required_skill_type" :options="$skillTypes"/>
+                                <x-core.forms.input :model="$guideQuest" label="Required Skill Type Level (Optional):" modelKey="required_skill_type_level" name="required_skill_type_level" />
                                 <x-core.forms.key-value-select :model="$guideQuest" label="Required Faction:" modelKey="required_faction_id" name="required_faction_id" :options="$gameMaps"/>
                                 <x-core.forms.input :model="$guideQuest" label="Required (Faction) Level:" modelKey="required_faction_level" name="required_faction_level" />
 
@@ -60,6 +62,14 @@
                                 <x-core.forms.key-value-select :model="$guideQuest" label="Required Plane Access:" modelKey="required_game_map_id" name="required_game_map_id" :options="$gameMaps"/>
                                 <x-core.forms.key-value-select :model="$guideQuest" label="Required Quest (Complete):" modelKey="required_quest_id" name="required_quest_id" :options="$quests"/>
                                 <x-core.forms.key-value-select :model="$guideQuest" label="Required Quest Item:" modelKey="required_quest_item_id" name="required_quest_item_id" :options="$questItems"/>
+                                <x-core.forms.key-value-select :model="$guideQuest" label="Secondary Quest Item:" modelKey="secondary_quest_item_id" name="secondary_quest_item_id" :options="$questItems"/>
+
+                                <div class='border-b-2 block md:hidden border-b-gray-300 dark:border-b-gray-600 my-6'></div>
+                                <h3 class="mb-3">Required Mercenary Info</h3>
+                                <x-core.forms.key-value-select :model="$guideQuest" label="Required Mercenary:" modelKey="required_mercenary_type" name="required_mercenary_type" :options="$mercenaryTypes"/>
+                                <x-core.forms.input :model="$guideQuest" label="Required (Mercenary) Level:" modelKey="required_mercenary_level" name="required_mercenary_level" />
+                                <x-core.forms.key-value-select :model="$guideQuest" label="Required Secondary Mercenary:" modelKey="required_secondary_mercenary_type" name="required_secondary_mercenary_type" :options="$mercenaryTypes"/>
+                                <x-core.forms.input :model="$guideQuest" label="Required (Secondary Mercenary) Level:" modelKey="required_secondary_mercenary_level" name="required_secondary_mercenary_level" />
 
                                 <div class='border-b-2 block md:hidden border-b-gray-300 dark:border-b-gray-600 my-6'></div>
                                 <h3 class="mb-3">Required Currency Amounts</h3>

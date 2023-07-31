@@ -26,6 +26,7 @@ class BasicSkillsTransformer extends TransformerAbstract {
             'can_train'                    => $skill->baseSkill->can_train,
             'is_training'                  => $skill->currently_training,
             'is_locked'                    => $skill->is_locked,
+            'is_class_skill'               => !is_null($skill->baseSkill->game_class_id) ? true : false,
         ];
     }
 }

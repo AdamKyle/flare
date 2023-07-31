@@ -26,10 +26,26 @@ class MercenaryValue {
         self::CHILD_OF_GAMBLING     => 'child-of-gambling'
     ];
 
+    protected static $selectionOptions = [
+        self::CHILD_OF_GOLD_DUST    => 'Child of Gold Dust',
+        self::CHILD_OF_SHARDS       => 'Child of Shards',
+        self::CHILD_OF_COPPER_COINS => 'Child of Copper Coins',
+        self::CHILD_OF_GAMBLING     => 'Child of Gambling'
+    ];
+
     /**
      * @var string $value
      */
     private string $value;
+
+    /**
+     * Get the mercenary list
+     *
+     * @return array
+     */
+    public static function mercenaryList(): array {
+        return self::$selectionOptions;
+    }
 
     /**
      * List of mercenaries.

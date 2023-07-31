@@ -10,11 +10,18 @@
             <th>required_skill_level</th>
             <th>required_secondary_skill</th>
             <th>required_secondary_skill_level</th>
+            <th>required_skill_type</th>
+            <th>required_skill_type_level</th>
+            <th>required_mercenary_type</th>
+            <th>required_secondary_mercenary_type</th>
+            <th>required_mercenary_level</th>
+            <th>required_secondary_mercenary_level</th>
             <th>required_faction_id</th>
             <th>required_faction_level</th>
             <th>required_game_map_id</th>
             <th>required_quest_id</th>
             <th>required_quest_item_id</th>
+            <th>secondary_quest_item_id</th>
             <th>required_gold</th>
             <th>required_gold_dust</th>
             <th>required_shards</th>
@@ -49,11 +56,18 @@
                 <td>{{$guideQuest->required_skill_level}}</td>
                 <td>{{!is_null($guideQuest->required_secondary_skill) ? $guideQuest->secondary_skill_name : ''}}</td>
                 <td>{{$guideQuest->required_secondary_skill_level}}</td>
+                <td>{{$guideQuest->required_skill_type}}</td>
+                <td>{{$guideQuest->required_skill_type_level}}</td>
+                <td>{{$guideQuest->required_mercenary_type}}</td>
+                <td>{{$guideQuest->required_secondary_mercenary_type}}</td>
+                <td>{{$guideQuest->required_mercenary_level}}</td>
+                <td>{{$guideQuest->required_secondary_mercenary_level}}</td>
                 <td>{{!is_null($guideQuest->required_faction_id) ? $guideQuest->faction_name : ''}}</td>
                 <td>{{$guideQuest->required_faction_level}}</td>
                 <td>{{!is_null($guideQuest->required_game_map_id) ? $guideQuest->game_map_name : ''}}</td>
                 <td>{{!is_null($guideQuest->required_quest_id) ? $guideQuest->quest_name : ''}}</td>
                 <td>{{!is_null($guideQuest->required_quest_item_id) ? $guideQuest->quest_item_name : ''}}</td>
+                <td>{{!is_null($guideQuest->secondary_quest_item_id) ? $guideQuest->secondary_quest_item_name : ''}}</td>
                 <td>{{!is_null($guideQuest->required_quest_item_id) ? $guideQuest->required_gold : ''}}</td>
                 <td>{{!is_null($guideQuest->required_quest_item_id) ? $guideQuest->required_gold_dust : ''}}</td>
                 <td>{{!is_null($guideQuest->required_quest_item_id) ? $guideQuest->required_shards : ''}}</td>
