@@ -2,10 +2,6 @@
 
 namespace App\Game\Skills\Controllers\Api;
 
-use App\Flare\Models\Item;
-use App\Game\Core\Events\CraftedItemTimeOutEvent;
-use App\Game\Skills\Jobs\ProcessCraft;
-use Composer\XdebugHandler\Process;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Flare\Models\Character;
@@ -31,7 +27,8 @@ class CraftingController extends Controller {
 
     public function fetchItemsToCraft(Request $request, Character $character) {
         return response()->json([
-            'items' => $this->craftingService->fetchCraftableItems($character, $request->all())
+            'items' => $this->craftingService->fetchCraftableItems($character, $request->all()),
+            'xp'    => $this->craftingService->getCraftingXP($character, $request->crafting_type),
         ], 200);
     }
 
@@ -44,6 +41,7 @@ class CraftingController extends Controller {
 
         return response()->json([
             'items' => $this->craftingService->fetchCraftableItems($character->refresh(), ['crafting_type' => $request->type], false),
+            'xp'    => $this->craftingService->getCraftingXP($character, $request->type),
         ], 200);
     }
 }

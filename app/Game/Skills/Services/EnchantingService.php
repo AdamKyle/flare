@@ -115,6 +115,17 @@ class EnchantingService {
             'character_inventory' => $newInventory,
         ];
     }
+    
+    public function getEnchantingXP(Character $character): array {
+        $skill = $this->getEnchantingSkill($character);
+
+        return [
+            'current_xp'    => $skill->xp,
+            'next_level_xp' => $skill->xp_max,
+            'skill_name'    => $skill->name,
+            'level'         => $skill->level
+        ];
+    }
 
     /**
      * Does the cost supplied actually match the actual cost?

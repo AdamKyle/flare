@@ -2,6 +2,6 @@
 
 namespace App\Game\Core\Exceptions;
 
-use RuntimeException;
+use Exception;
 
-class EquipItemException extends RuntimeException {}
+class EquipItemException extends Exception {}

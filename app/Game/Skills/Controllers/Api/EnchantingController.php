@@ -27,7 +27,10 @@ class  EnchantingController extends Controller {
     }
 
     public function fetchAffixes(Character $character) {
-        return response()->json($this->enchantingService->fetchAffixes($character, true));
+        return response()->json([
+            'affixes' => $this->enchantingService->fetchAffixes($character, true),
+            'skill_xp' => $this->enchantingService->getEnchantingXP($character),
+        ]);
     }
 
     public function enchant(EnchantingValidation $request, Character $character) {
@@ -55,6 +58,9 @@ class  EnchantingController extends Controller {
 
         $this->enchantingService->enchant($character, $request->all(), $slot, $cost);
 
-        return response()->json($this->enchantingService->fetchAffixes($character->refresh(), true, false));
+        return response()->json([
+            'affixes'  => $this->enchantingService->fetchAffixes($character->refresh(), true, false),
+            'skill_xp' => $this->enchantingService->getEnchantingXP($character),
+        ]);
     }
 }

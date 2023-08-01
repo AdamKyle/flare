@@ -16,6 +16,7 @@ import {
     ItemToEnchant
 } from "../../../../lib/game/actions/crafting-sections/enchanting-state";
 import EnchantingProps from "../../../../lib/game/actions/crafting-sections/enchanting-props";
+import CraftingXp from "../crafting-xp";
 
 export default class Enchanting extends React.Component<EnchantingProps, EnchantingState> {
 
@@ -29,6 +30,12 @@ export default class Enchanting extends React.Component<EnchantingProps, Enchant
             selected_suffix: null,
             enchantable_items: [],
             enchantments: [],
+            skill_xp: {
+                current_xp: 0,
+                next_level_xp: 0,
+                skill_name: 'Unknown',
+                level: 1,
+            }
         }
     }
 
@@ -38,8 +45,9 @@ export default class Enchanting extends React.Component<EnchantingProps, Enchant
         (new Ajax()).setRoute(url).doAjaxCall('get', (result: AxiosResponse) => {
             this.setState({
                 loading: false,
-                enchantable_items: result.data.character_inventory,
-                enchantments: result.data.affixes,
+                enchantable_items: result.data.affixes.character_inventory,
+                enchantments: result.data.affixes.affixes,
+                skill_xp: result.data.skill_xp,
             });
         });
     }
@@ -62,8 +70,9 @@ export default class Enchanting extends React.Component<EnchantingProps, Enchant
 
                 this.setState({
                     loading: false,
-                    enchantable_items: result.data.character_inventory,
-                    enchantments: result.data.affixes,
+                    enchantable_items: result.data.affixes.character_inventory,
+                    enchantments: result.data.affixes.affixes,
+                    skill_xp: result.data.skill_xp,
                 }, () => {
 
                     if (!isEqual(oldEnchantments, result.data.affixes)) {
@@ -269,6 +278,12 @@ export default class Enchanting extends React.Component<EnchantingProps, Enchant
                     {
                         this.state.loading ?
                             <LoadingProgressBar />
+                        : null
+                    }
+
+                    {
+                        this.state.enchantments.length > 0 ?
+                            <CraftingXp skill_xp={this.state.skill_xp} />
                         : null
                     }
                 </div>

@@ -272,8 +272,6 @@ class GuideQuestService {
             
             $difference = array_diff($requiredAttributes, $attributes);
 
-            dump($requiredAttributes, $attributes, $difference);
-
             if (empty($difference)) {
                 return true;
             }

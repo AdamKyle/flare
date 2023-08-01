@@ -78,6 +78,21 @@ class CraftingService {
         return $this->getItems($character, $skill, $params['crafting_type'], $merchantMessage);
     }
 
+    public function getCraftingXP(Character $character, string $type): array {
+        if ($type == 'hammer' || $type == 'bow' || $type == 'stave') {
+            $type = 'weapon';
+        }
+
+        $skill = $this->fetchCraftingSkill($character, $type);
+
+        return [
+            'current_xp'    => $skill->xp,
+            'next_level_xp' => $skill->xp_max,
+            'skill_name'    => $skill->name,
+            'level'         => $skill->level
+        ];
+    }
+
     /**
      * Attempts to craft the item.
      *

@@ -10,6 +10,7 @@ import DangerButton from "../../../../components/ui/buttons/danger-button";
 import {getCraftingType} from "../../../../lib/game/actions/crafting-types";
 import {isEqual} from "lodash";
 import {generateServerMessage} from "../../../../lib/ajax/generate-server-message";
+import CraftingXp from "../crafting-xp";
 
 export default class Crafting extends React.Component<any, any> {
 
@@ -21,6 +22,12 @@ export default class Crafting extends React.Component<any, any> {
             selected_type: null,
             loading: false,
             craftable_items: [],
+            skill_xp: {
+                curent_xp: 0,
+                next_level_xp: 0,
+                skill_name: 'Unknown',
+                level: 1,
+            }
         }
     }
 
@@ -50,6 +57,7 @@ export default class Crafting extends React.Component<any, any> {
                     this.setState({
                         loading: false,
                         craftable_items: result.data.items,
+                        skill_xp: result.data.xp
                     });
                 }, (error: AxiosError) => {
 
@@ -101,7 +109,8 @@ export default class Crafting extends React.Component<any, any> {
 
                 this.setState({
                    loading: false,
-                   craftable_items: result.data.items
+                   craftable_items: result.data.items,
+                   skill_xp: result.data.xp
                 }, () => {
                    if (!isEqual(oldCraftableItems, result.data.items)) {
                        generateServerMessage('new_items', 'You have new items to craft. Check the list!');
@@ -195,6 +204,11 @@ export default class Crafting extends React.Component<any, any> {
                                 : null
                         }
 
+                        {
+                            this.state.craftable_items.length > 0 ?
+                                <CraftingXp skill_xp={this.state.skill_xp} />
+                            : null
+                        }
                     </div>
                 </div>
                 <div className={'text-center lg:ml-[-100px] mt-3 mb-3'}>

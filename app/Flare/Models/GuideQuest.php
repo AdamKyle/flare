@@ -153,8 +153,6 @@ class GuideQuest extends Model {
             return null;
         }
 
-        dump($this->required_mercenary_type);
-
         try {
             return (new MercenaryValue($this->required_mercenary_type))->getName();
         } catch (Exception $e) {

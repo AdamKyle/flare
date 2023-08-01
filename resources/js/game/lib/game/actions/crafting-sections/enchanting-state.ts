@@ -1,3 +1,5 @@
+import SkillXP from "../../../../sections/game-actions-section/components/deffinitions/skill-xp";
+
 export interface EnchantingState {
 
     loading: boolean;
@@ -11,6 +13,8 @@ export interface EnchantingState {
     enchantable_items: Enchantment[];
 
     enchantments: ItemToEnchant[];
+
+    skill_xp: SkillXP
 }
 
 export type ItemToEnchant = {
