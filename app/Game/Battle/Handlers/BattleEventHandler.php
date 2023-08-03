@@ -2,20 +2,21 @@
 
 namespace App\Game\Battle\Handlers;
 
-use App\Flare\Builders\Character\Traits\FetchEquipped;
-use Facades\App\Game\Skills\Handlers\UpdateItemSkill;
+use Exception;
+use App\Flare\Models\Monster;
+use App\Flare\Models\Character;
+use Illuminate\Support\Facades\Cache;
 use App\Game\Battle\Events\CharacterRevive;
-use App\Game\Battle\Events\UpdateCharacterStatus;
+use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Battle\Events\AttackTimeOutEvent;
+use App\Flare\Models\CharacterInCelestialFight;
+use App\Game\Messages\Events\ServerMessageEvent;
+use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\ClassRanks\Services\ClassRankService;
 use App\Game\Mercenaries\Services\MercenaryService;
-use App\Game\Messages\Events\ServerMessageEvent;
-use App\Flare\Models\Character;
-use App\Flare\Models\CharacterInCelestialFight;
-use App\Flare\Models\Monster;
 use App\Game\Battle\Services\BattleRewardProcessing;
-use App\Game\Core\Events\UpdateTopBarEvent;
-use Exception;
+use Facades\App\Game\Skills\Handlers\UpdateItemSkill;
+use App\Flare\Builders\Character\Traits\FetchEquipped;
 
 class BattleEventHandler {
 
@@ -113,14 +114,24 @@ class BattleEventHandler {
         ]);
 
         $characterInCelestialFight = CharacterInCelestialFight::where('character_id', $character->id)->first();
+        $characterHealth           = $character->getInformation()->buildHealth();
 
         if (!is_null($characterInCelestialFight)) {
             $characterInCelestialFight->update([
-                'character_current_health' => $character->getInformation()->buildHealth(),
+                'character_current_health' => $characterHealth,
             ]);
         }
 
-        event(new CharacterRevive($character->user, $character->getInformation()->buildHealth()));
+        $monsterFightCache = Cache::get('monster-fight-' . $character->id);
+
+        if (!is_null($monsterFightCache)) {
+            $monsterFightCache['health']['character_health']         = $characterHealth;
+            $monsterFightCache['health']['current_character_health'] = $characterHealth;
+
+            Cache::put('monster-fight-' . $character->id, $monsterFightCache, 900);
+        }
+
+        event(new CharacterRevive($character->user, $characterHealth));
 
         event(new UpdateCharacterStatus($character));
 
