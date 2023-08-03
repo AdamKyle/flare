@@ -25,6 +25,6 @@ class GoldRushCheckCalculator {
 
         $roll += ceil($roll * $bonus);
 
-        return $roll > 90;
+        return $roll > 99;
     }
 }

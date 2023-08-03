@@ -276,8 +276,6 @@ export default class ItemComparisonSection extends React.Component<ItemCompariso
             return null;
         }
 
-        console.log(this.props.comparison_details);
-
         const keyCount = Object.keys(this.props.comparison_details.itemToEquip)
                                .filter((key: string) => !this.invalidFields.includes(key))
                                .filter((key: string) => this.props.comparison_details.itemToEquip[key] > 0)

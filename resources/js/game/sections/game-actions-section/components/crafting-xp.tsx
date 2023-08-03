@@ -16,7 +16,6 @@ export default class CraftingXp extends React.Component<CraftingXPProps, any> {
     }
 
     render() {
-        console.log(this.props);
         return (
             <div className='my-2'>
                 <div className="flex justify-between mb-1">

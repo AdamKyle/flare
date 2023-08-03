@@ -75,13 +75,13 @@ export default class Enchanting extends React.Component<EnchantingProps, Enchant
                     skill_xp: result.data.skill_xp,
                 }, () => {
 
-                    if (!isEqual(oldEnchantments, result.data.affixes)) {
+                    if (!isEqual(oldEnchantments, result.data.affixes.affixes)) {
                         generateServerMessage('new_items', 'You have new enchantments. Check the list(s)!');
                     }
 
-                    if (result.data.character_inventory.length > 0) {
+                    if (result.data.affixes.character_inventory.length > 0) {
                         this.setState({
-                            selected_item: result.data.character_inventory[0].slot_id
+                            selected_item: result.data.affixes.character_inventory[0].slot_id
                         });
                     }
                 });

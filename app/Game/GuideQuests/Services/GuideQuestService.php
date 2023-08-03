@@ -112,6 +112,7 @@ class GuideQuestService {
 
     public function canHandInQuest(Character $character, GuideQuest $quest): bool {
         $alreadyCompleted = $character->questsCompleted()->where('guide_quest_id', $quest->id)->first();
+        $stats            = ['str', 'dex', 'dur', 'int', 'chr', 'agi', 'focus'];
 
         if (!is_null($alreadyCompleted)) {
             return false;
@@ -251,7 +252,7 @@ class GuideQuestService {
         }
 
         if (!is_null($quest->required_stats)) {
-            $stats          = ['str', 'dex', 'dur', 'int', 'chr', 'agi', 'focus'];
+            
             $completedStats = [];
 
             foreach ($stats as $stat) {
@@ -267,10 +268,24 @@ class GuideQuestService {
             }
         }
 
+        foreach ($stats as $stat) {
+            $questStat = $quest->{'required_' . $stat};
+
+            if (!is_null($questStat)) {
+                $value = $character->getInformation()->statMod($stat);
+
+                if ($value >= $questStat) {
+                    $attributes[] = 'required_' . $stat;
+                }
+            }
+        }
+
         if (!empty($attributes)) {
             $requiredAttributes = $this->requiredAttributeNames($quest);
             
             $difference = array_diff($requiredAttributes, $attributes);
+
+            // dump($attributes, $requiredAttributes, $difference);
 
             if (empty($difference)) {
                 return true;
