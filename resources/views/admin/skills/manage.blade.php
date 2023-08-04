@@ -30,6 +30,11 @@
                                 <x-core.forms.input :model="$skill" label="Base AC Modifier % (per level):" modelKey="base_ac_mod_bonus_per_level" name="base_ac_mod_bonus_per_level" />
 
                                 <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
+                                <h3 class="mb-3">Class Bonus (Optional)</h3>
+
+                                <x-core.forms.input :model="$skill" label="Class Bonus (% Per Level):" modelKey="class_bonus" name="class_bonus" />
+
+                                <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
                                 <h3 class="mb-3">Timer Modifiers</h3>
 
                                 <x-core.forms.input :model="$skill" label="Fight Timeout Reduction % (per level):" modelKey="fight_time_out_mod_bonus_per_level" name="fight_time_out_mod_bonus_per_level" />

@@ -7,19 +7,12 @@
         route="{{route('home')}}"
         color="success" link="Home"
       >
-          <x-core.buttons.link-buttons.primary-button
-            href="{{route('admin.events.export-data')}}"
-            css="tw-ml-2"
-          >
-              <i class="fas fa-file-export"></i> Export
-          </x-core.buttons.link-buttons.primary-button>
-          <x-core.buttons.link-buttons.primary-button
-            href="{{route('admin.events.import-data')}}"
-            css="tw-ml-2"
-          >
-              <i class="fas fa-file-upload"></i> Import
-          </x-core.buttons.link-buttons.primary-button>
       </x-core.page-title>
+
+      <p class='my-4'>
+        Click any where in the calendar to create a new scheduled event. Players will be able to see this event
+        on their event calendar.
+      </p>
 
       <div id="event-calendar"></div>
     </x-core.layout.info-container>

@@ -223,9 +223,6 @@ Route::middleware(['auth', 'is.admin'])->group(function() {
     Route::get('/admin/statistics/dashboard', ['as' => 'admin.statistics', 'uses' => 'StatisticsController@index']);
     Route::get('/admin/events', ['as' => 'admin.events', 'uses' => 'EventScheduleController@index']);
 
-    Route::post('/admin/events/export', ['as' => 'admin.events.export', 'uses' => 'EventsController@exportInfo']);
-    Route::post('/admin/events/import', ['as' => 'admin.events.import', 'uses' => 'EventsController@importInfo']);
-
     Route::get('/admin/events/export-data', ['as' => 'admin.events.export-data', 'uses' => 'EventsController@exportEvents']);
     Route::get('/admin/events/import-data', ['as' => 'admin.events.import-data', 'uses' => 'EventsController@importEvents']);
 });
