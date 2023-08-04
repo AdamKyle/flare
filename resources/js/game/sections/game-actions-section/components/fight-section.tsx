@@ -29,6 +29,7 @@ export default class FightSection extends React.Component<FightSectionProps, Fig
             setting_up_rank_fight: false,
             setting_up_regular_fight: false,
             processing_regular_fight: false,
+            show_clear_message: true,
             error_message: '',
         }
     }
@@ -109,6 +110,7 @@ export default class FightSection extends React.Component<FightSectionProps, Fig
 
         this.setState({
             setting_up_regular_fight: true,
+            show_clear_message: true,
             error_message: '',
         }, () => {
             (new Ajax).setRoute('setup-monster-fight/'+this.props.character.id+'/' + this.props.monster_to_fight.id)
@@ -186,7 +188,8 @@ export default class FightSection extends React.Component<FightSectionProps, Fig
     clearBattleMessages() {
         this.setState({
             battle_messages: [],
-            monster_max_health: 0,
+            monster_max_health: this.state.monster_current_health <= 0 ? 0 : this.state.monster_max_health,
+            show_clear_message: this.state.monster_current_health <= 0 ? false : true,
         })
     }
 
@@ -241,7 +244,7 @@ export default class FightSection extends React.Component<FightSectionProps, Fig
                     : null
                 }
                 {
-                    this.attackButtonDisabled() ?
+                    this.attackButtonDisabled() && this.state.show_clear_message ?
                         <div className='text-center mt-4'>
                             <button onClick={this.clearBattleMessages.bind(this)}
                                     className='text-red-500 dark:text-red-400 underline hover:text-red-600 dark:hover:text-red-500'>

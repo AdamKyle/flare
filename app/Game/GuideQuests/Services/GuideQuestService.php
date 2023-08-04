@@ -151,7 +151,7 @@ class GuideQuestService {
                 $skillType = new SkillTypeValue($quest->required_skill_type);
 
                 if ($skillType->effectsClassSkills()) {
-                    $classSkill = $character->skills()->whereHas('gameSkill', function ($query) use ($character) {
+                    $classSkill = $character->skills()->whereHas('baseSkill', function ($query) use ($character) {
                         $query->whereNotNull('game_class_id')
                               ->where('game_class_id', $character->class->id);
                     })->first();

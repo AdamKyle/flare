@@ -1,4 +1,4 @@
-import React, {Fragment} from "react";
+import React from "react";
 import ActionsManager from "../../lib/game/actions/actions-manager";
 import ComponentLoading from "../../components/ui/loading/component-loading";
 import MonsterActions from "./components/small-actions/monster-actions";

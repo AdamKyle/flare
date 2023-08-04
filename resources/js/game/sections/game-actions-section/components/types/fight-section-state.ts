@@ -27,6 +27,8 @@ export default interface FightSectionState {
     setting_up_regular_fight: boolean;
 
     processing_regular_fight: boolean;
+
+    show_clear_message: boolean;
     
     error_message: string;
 }
