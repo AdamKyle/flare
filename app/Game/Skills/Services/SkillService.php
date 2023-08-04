@@ -131,18 +131,18 @@ class SkillService {
      *
      * @param Character $character
      * @param int $xp
-     * @return void
+     * @return int
      * @throws Exception
      */
-    public function assignXPToTrainingSkill(Character $character, int $xp): void {
+    public function assignXPToTrainingSkill(Character $character, int $xp): int {
         $skillInTraining = $character->skills()->where('currently_training', true)->first();
 
         if (is_null($skillInTraining)) {
-            return;
+            return $xp;
         }
 
         if ($skillInTraining->level === $skillInTraining->baseSkill->max_level) {
-            return;
+            return $xp;
         }
 
         $skillXp     = $xp + ($xp * $skillInTraining->xp_towards);
@@ -156,6 +156,8 @@ class SkillService {
         $skillInTraining = $skillInTraining->refresh();
 
         $this->levelUpSkill($skillInTraining);
+
+        return intVal($xp - ($xp * $skillInTraining->xp_towards));
     }
 
     /**

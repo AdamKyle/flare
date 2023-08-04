@@ -172,7 +172,17 @@ class CharacterRewardService {
     protected function distributeXP(Monster $monster) {
         $xpReduction  = 0.0;
 
+        // Reduce The XP from the monster if needed.
         $xp = XPCalculator::fetchXPFromMonster($monster, $this->character->level, $xpReduction);
+
+        // Assign Xp to the skill and return the amount left based on training amount.
+        $xp = $this->skillService->assignXPToTrainingSkill($this->character, $xp);
+
+        if ($xp === 0) {
+            return;
+        }
+
+        // Reduce XP from the skill
         $xp = $this->characterXpService->determineXPToAward($this->character, $xp);
 
         $guideEnabled              = $this->character->user->guide_enabled;
@@ -186,8 +196,6 @@ class CharacterRewardService {
 
             event(new ServerMessageEvent($this->character->user, 'Rewarded an extra 10XP while doing the first guide quest. This bonus will end after you reach level 2.'));
         }
-
-        $this->skillService->assignXPToTrainingSkill($this->character, $xp);
 
         if (!$this->characterXpService->canCharacterGainXP($this->character)) {
             return;
