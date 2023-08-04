@@ -159,7 +159,22 @@ class ImportGameData extends Command {
     protected function importGameMaps(): void {
         $files = Storage::disk('data-maps')->allFiles();
 
-        $files = array_reverse($files);
+        $corectOrder = [
+            "Surface.jpg", 
+            "Labyrinth.jpeg", 
+            "Dungeons.jpeg",
+            "Shadow Plane.jpeg",
+            "Hell.jpeg",
+            "Purgatory.jpeg",
+        ];
+
+        // Sort the array such that the maps are in the correct order.
+        usort($files, function ($a, $b) use ($corectOrder) {
+            $indexA = array_search($a, $corectOrder);
+            $indexB = array_search($b, $corectOrder);
+        
+            return $indexA - $indexB;
+        });
 
         foreach ($files as $file) {
             $fileName = pathinfo($file, PATHINFO_FILENAME);
