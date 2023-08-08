@@ -65,8 +65,10 @@ class ImportGameData extends Command {
             $map->update($mapValue->getMapModifers());
         }
 
+        // Finish Excel Imports
         $this->import($excelMapper, $files['Monsters'], 'Monsters');
         $this->import($excelMapper, $files['Admin Section'], 'Admin Section');
+        $this->import($excelMapper, $files['Quests'], 'Quests');
 
         $this->line('Importing Infromation section ...');
 

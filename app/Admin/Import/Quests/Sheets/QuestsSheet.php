@@ -22,7 +22,7 @@ class QuestsSheet implements ToCollection {
                 $questData = $this->returnCleanItem($quest);
 
                 if (!empty($questData)) {
-                    Quest::updateOrCreate(['id' => $questData['id']], $questData);
+                    Quest::updateOrCreate(['name' => $questData['name']], $questData);
                 }
             }
         }

@@ -51,6 +51,8 @@ class Skill extends Model {
 
     protected $appends = [
         'name',
+        'class_bonus',
+        'class_id',
     ];
 
     public function type(): SkillTypeValue {
@@ -76,6 +78,14 @@ class Skill extends Model {
         }
 
         return $this->baseSkill->class_bonus * $this->level;
+    }
+
+    public function getClassIdAttribute() {
+        if (is_null($this->baseSkill->game_class_id)) {
+            return null;
+        }
+
+        return $this->baseSkill->game_class_id;
     }
 
     public function getDescriptionAttribute() {

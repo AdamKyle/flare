@@ -41,6 +41,8 @@ class CreateTestCharacters extends Command {
      * @throws Exception
      */
     public function handle(CharacterBuilder $characterBuilder): void {
+        ini_set('memory_limit', -1);
+        
         $password  = $this->argument('password');
         $className = $this->argument('className');
         $races     = GameRace::all();

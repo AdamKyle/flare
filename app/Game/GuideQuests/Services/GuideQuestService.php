@@ -2,15 +2,11 @@
 
 namespace App\Game\GuideQuests\Services;
 
-use Exception;
-use Illuminate\Support\Facades\Log;
-use App\Flare\Models\GameMap;
 use App\Flare\Models\Character;
 use App\Flare\Models\GuideQuest;
 use App\Flare\Values\AutomationType;
 use App\Flare\Models\QuestsCompleted;
 use App\Flare\Values\MaxCurrenciesValue;
-use App\Game\Skills\Values\SkillTypeValue;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\HandleCharacterLevelUp;
 use App\Game\Messages\Events\ServerMessageEvent;
@@ -18,6 +14,12 @@ use App\Game\Messages\Events\ServerMessageEvent;
 class GuideQuestService {
 
     use HandleCharacterLevelUp;
+
+    private GuideQuestRequirementsService $guideQuestRequirementsService;
+
+    public function __construct(GuideQuestRequirementsService $guideQuestRequirementsService) {
+        $this->guideQuestRequirementsService = $guideQuestRequirementsService;
+    }
 
     public function fetchQuestForCharacter(Character $character): GuideQuest | null {
         $lastCompletedGuideQuest = $character->questsCompleted()
@@ -111,6 +113,7 @@ class GuideQuestService {
     }
 
     public function canHandInQuest(Character $character, GuideQuest $quest): bool {
+
         $alreadyCompleted = $character->questsCompleted()->where('guide_quest_id', $quest->id)->first();
         $stats            = ['str', 'dex', 'dur', 'int', 'chr', 'agi', 'focus'];
 
@@ -122,163 +125,25 @@ class GuideQuestService {
             return false;
         }
 
-        $attributes = [];
+        $attributes = $this->guideQuestRequirementsService->requiredLevelCheck($character, $quest)
+                                                          ->requiredSkillCheck($character, $quest)
+                                                          ->requiredSkillCheck($character, $quest, false)
+                                                          ->requiredSkillTypeCheck($character, $quest)
+                                                          ->requiredFactionLevel($character, $quest)
+                                                          ->requiredGameMapAccess($character, $quest)
+                                                          ->requiredQuestItem($character, $quest)
+                                                          ->requiredQuestItem($character, $quest, false)
+                                                          ->requiredKingdomCount($character, $quest)
+                                                          ->requiredKingdomBuildingLevel($character, $quest)
+                                                          ->requiredKingdomUnitCount($character, $quest)
+                                                          ->requiredKingdomPassibeLevel($character, $quest)
+                                                          ->requiredCurrency($character, $quest, 'gold')
+                                                          ->requiredCurrency($character, $quest, 'gold_dust')
+                                                          ->requiredCurrency($character, $quest, 'shards')
+                                                          ->requiredTotalStats($character, $quest, $stats)
+                                                          ->requiredStats($character, $quest, $stats)
+                                                          ->getFinishedRequirments();
 
-        if (!is_null($quest->required_level)) {
-            if ($character->level >= $quest->required_level) {
-                $attributes[] = 'required_level';
-            }
-        }
-
-        if (!is_null($quest->required_skill)) {
-            $requiredSkill = $character->skills()->where('game_skill_id', $quest->required_skill)->first();
-
-            if ($requiredSkill->level >= $quest->required_skill_level) {
-                $attributes[] = 'required_skill_level';
-            }
-        }
-
-        if (!is_null($quest->required_secondary_skill)) {
-            $requiredSkill = $character->skills()->where('game_skill_id', $quest->required_secondary_skill)->first();
-
-            if ($requiredSkill->level >= $quest->required_secondary_skill_level) {
-                $attributes[] = 'required_secondary_skill_level';
-            }
-        }
-
-        if (!is_null($quest->required_skill_type)) {
-            try {
-                $skillType = new SkillTypeValue($quest->required_skill_type);
-
-                if ($skillType->effectsClassSkills()) {
-                    $classSkill = $character->skills()->whereHas('baseSkill', function ($query) use ($character) {
-                        $query->whereNotNull('game_class_id')
-                              ->where('game_class_id', $character->class->id);
-                    })->first();
-
-                    if (!is_null($classSkill)) {
-                        if ($classSkill->level >= $quest->required_skill_type_level) {
-                            $attributes[] = 'required_skill_type_level';
-                        }
-                    }
-                }
-            } catch (Exception $e) {
-                Log::info($e->getmessage());
-            }
-        }
-
-        if (!is_null($quest->required_faction_id)) {
-            $faction = $character->factions()->where('game_map_id', $quest->required_faction_id)->first();
-
-            if ($faction->current_level >= $quest->required_faction_level) {
-                $attributes[] = 'required_faction_level';
-            }
-        }
-
-        if (!is_null($quest->required_game_map_id)) {
-            $gameMap = GameMap::find($quest->required_game_map_id);
-
-            $canHandIn = $character->inventory->slots->filter(function($slot) use($gameMap) {
-                return $slot->item->type === 'quest' && $slot->item->id === $gameMap->map_required_item->id;
-            })->isNotEmpty();
-
-            if ($canHandIn) {
-                $attributes[] = 'required_game_map_id';
-            }
-        }
-
-        if (!is_null($quest->required_quest_id)) {
-            $canHandIn = !is_null($character->questsCompleted()->where('quest_id', $quest->required_quest_id)->first());
-
-            if ($canHandIn) {
-                $attributes[] = 'required_quest_id';
-            }
-        }
-
-        if (!is_null($quest->required_quest_item_id)) {
-            $canHandIn = $character->inventory->slots->filter(function($slot) use($quest) {
-                return $slot->item->type === 'quest' && $slot->item->id === $quest->required_quest_item_id;
-            })->isNotEmpty();
-
-            if ($canHandIn) {
-                $attributes[] = 'required_quest_item_id';
-            }
-        }
-
-        if (!is_null($quest->required_kingdoms)) {
-            if ($character->kingdoms->count() >= $quest->required_kingdoms) {
-                $attributes[] = 'required_kingdoms';
-            }
-        }
-
-        if (!is_null($quest->required_kingdom_level)) {
-            foreach ($character->kingdoms as $kingdom) {
-                if ($kingdom->buildings->sum('level') >= $quest->required_kingdom_level) {
-                    $attributes[] = 'required_kingdom_level';
-
-                    break;
-                }
-            }
-        }
-
-        if (!is_null($quest->required_kingdom_units)) {
-            foreach ($character->kingdoms as $kingdom) {
-                if ($kingdom->units->sum('amount') >= $quest->required_kingdom_units) {
-                    $attributes[] = 'required_kingdom_units';
-
-                    break;
-                }
-            }
-        }
-
-        if (!is_null($quest->required_passive_skill) && !is_null($quest->required_passive_level)) {
-            $requiredSkill = $character->passiveSkills()->where('passive_skill_id', $quest->required_passive_skill)->first();
-
-            if ($requiredSkill->current_level >= $quest->required_passive_level) {
-                $attributes[] = 'required_passive_level';
-            }
-        }
-
-        if (!is_null($quest->required_shards)) {
-            if ($character->shards >= $quest->required_shards) {
-                $attributes[] = 'required_shards';
-            }
-        }
-
-        if (!is_null($quest->required_gold_dust)) {
-            if ($character->gold_dust >= $quest->required_gold_dust) {
-                $attributes[] = 'required_gold_dust';
-            }
-        }
-
-        if (!is_null($quest->required_stats)) {
-            
-            $completedStats = [];
-
-            foreach ($stats as $stat) {
-                $value = $character->getInformation()->statMod($stat);
-
-                if ($value >= $quest->required_stats) {
-                    $completedStats[] = $stat;
-                }
-            }
-
-            if (count($completedStats) === count($stats)) {
-                $attributes[] = 'required_stats';
-            }
-        }
-
-        foreach ($stats as $stat) {
-            $questStat = $quest->{'required_' . $stat};
-
-            if (!is_null($questStat)) {
-                $value = $character->getInformation()->statMod($stat);
-
-                if ($value >= $questStat) {
-                    $attributes[] = 'required_' . $stat;
-                }
-            }
-        }
 
         if (!empty($attributes)) {
             $requiredAttributes = $this->requiredAttributeNames($quest);

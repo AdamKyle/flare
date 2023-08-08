@@ -8,7 +8,6 @@ use App\Flare\Models\Character;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Item;
 use App\Flare\Models\Skill;
-use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Events\CharacterInventoryDetailsUpdate;
 use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
@@ -64,6 +63,17 @@ class TrinketCraftingService {
                      ->get();
 
         return $this->itemListCostTransformerService->reduceCostForTrinketryItems($character, $items, $showMerchantMessage)->toArray();
+    }
+
+    public function fetchSkillXP(Character $character): array {
+        $skill = $this->fetchCharacterSkill($character);
+
+        return [
+            'current_xp'    => $skill->xp,
+            'next_level_xp' => $skill->xp_max,
+            'skill_name'    => $skill->name,
+            'level'         => $skill->level
+        ];
     }
 
     /**

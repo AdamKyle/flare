@@ -29,7 +29,10 @@ class GemCraftingController extends Controller {
      * @throws Exception
      */
     public function getCraftableItems(Character $character): JsonResponse {
-        return response()->json($this->gemService->getCraftableTiers($character));
+        return response()->json([
+            'tiers'    => $this->gemService->getCraftableTiers($character),
+            'skill_xp' => $this->gemService->fetchSkillXP($character),
+        ]);
     }
 
     /**
@@ -45,6 +48,9 @@ class GemCraftingController extends Controller {
 
         $status = $result['status'];
         unset($result['status']);
+        
+        $result['tiers']    = $this->gemService->getCraftableTiers($character);
+        $result['skill_xp'] = $this->gemService->fetchSkillXP($character);
 
         return response()->json($result, $status);
     }

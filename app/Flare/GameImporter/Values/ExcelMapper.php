@@ -46,11 +46,11 @@ class ExcelMapper {
             PassiveSkillsImport::class,
             KingdomsImport::class,
         ],
+        'Quests'        => QuestsImport::class,
         '.'             => [
             ClassSpecialsImport::class,
             LocationsImport::class,
             NpcsImport::class,
-            QuestsImport::class,
         ]
     ];
 

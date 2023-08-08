@@ -19,7 +19,10 @@ class TrinketCraftingController extends Controller {
 
     public function fetchItemsToCraft(Character $character) {
 
-        return response()->json(['items' => $this->trinketCraftingService->fetchItemsToCraft($character)]);
+        return response()->json([
+            'items'    => $this->trinketCraftingService->fetchItemsToCraft($character),
+            'skill_xp' => $this->trinketCraftingService->fetchSkillXP($character),
+        ]);
     }
 
     public function craftTrinket(TrinketCraftingValidation $request, Character $character) {
@@ -27,6 +30,9 @@ class TrinketCraftingController extends Controller {
 
         $item = Item::find($request->item_to_craft);
 
-        return response()->json(['items' => $this->trinketCraftingService->craft($character, $item)]);
+        return response()->json([
+            'items'    => $this->trinketCraftingService->craft($character, $item),
+            'skill_xp' => $this->trinketCraftingService->fetchSkillXP($character),
+        ]);
     }
 }

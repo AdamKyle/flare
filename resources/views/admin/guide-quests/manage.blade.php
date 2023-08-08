@@ -72,6 +72,10 @@
                                 <x-core.forms.input :model="$guideQuest" label="Required (Secondary Mercenary) Level:" modelKey="required_secondary_mercenary_level" name="required_secondary_mercenary_level" />
 
                                 <div class='border-b-2 block md:hidden border-b-gray-300 dark:border-b-gray-600 my-6'></div>
+                                <h3 class="mb-3">Required Class Specials</h3>
+                                <x-core.forms.input :model="$guideQuest" label="Required # of class specials equipped:" modelKey="required_class_specials_equipped" name="required_class_specials_equipped" />
+
+                                <div class='border-b-2 block md:hidden border-b-gray-300 dark:border-b-gray-600 my-6'></div>
                                 <h3 class="mb-3">Required Currency Amounts</h3>
                                 <x-core.forms.input :model="$guideQuest" label="Required Gold" modelKey="required_gold" name="required_gold" />
                                 <x-core.forms.input :model="$guideQuest" label="Required Gold Dust" modelKey="required_gold_dust" name="required_gold_dust" />

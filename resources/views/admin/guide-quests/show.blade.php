@@ -92,6 +92,10 @@
                             <dt>Required Secondary Mercenary Level</dt>
                             <dd>{{$guideQuest->required_secondary_mercenary_level}}</dd>
                         @endif
+                        @if (!is_null($guideQuest->required_class_specials_equipped))
+                            <dt>Required Class Specials Equipped</dt>
+                            <dd>{{$guideQuest->required_class_specials_equipped}}</dd>
+                        @endif
                         @if (!is_null($guideQuest->required_stats))
                             <dt>Required Stats</dt>
                             <dd>{{number_format($guideQuest->required_stats)}}</dd>
@@ -125,8 +129,8 @@
                             <dd>{{number_format($guideQuest->required_focus)}}</dd>
                         @endif
                         @if (!is_null($guideQuest->required_gold))
-                        <dt>Required Gold</dt>
-                        <dd>{{number_format($guideQuest->required_gold)}}</dd>
+                            <dt>Required Gold</dt>
+                            <dd>{{number_format($guideQuest->required_gold)}}</dd>
                         @endif
                         @if (!is_null($guideQuest->required_gold_dust))
                             <dt>Required Gold Dust</dt>

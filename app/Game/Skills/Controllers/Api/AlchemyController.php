@@ -4,7 +4,6 @@ namespace App\Game\Skills\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Flare\Models\Character;
-use App\Game\Core\Events\CraftedItemTimeOutEvent;
 use App\Game\Skills\Services\AlchemyService;
 use App\Game\Skills\Requests\AlchemyValidation;
 
@@ -18,7 +17,8 @@ class AlchemyController extends Controller {
 
     public function alchemyItems(Character $character) {
         return response()->json([
-            'items' => $this->alchemyService->fetchAlchemistItems($character),
+            'items'    => $this->alchemyService->fetchAlchemistItems($character),
+            'skill_xp' => $this->alchemyService->fetchSkillXP($character),
         ]);
     }
 
@@ -30,7 +30,8 @@ class AlchemyController extends Controller {
         $this->alchemyService->transmute($character, $request->item_to_craft);
 
         return response()->json([
-            'items' => $this->alchemyService->fetchAlchemistItems($character, false),
+            'items'    => $this->alchemyService->fetchAlchemistItems($character, false),
+            'skill_xp' => $this->alchemyService->fetchSkillXP($character),
         ]);
     }
 }

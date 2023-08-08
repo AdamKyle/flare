@@ -44,6 +44,19 @@ class AlchemyService {
         return $this->itemListCostTransformerService->reduceCostOfAlchemyItems($character, $items, $showMerchantMessage);
     }
 
+    public function fetchSkillXP(Character $character): array {
+        $gameSkill = GameSkill::where('type', SkillTypeValue::ALCHEMY)->first();
+
+        $skill     = Skill::where('game_skill_id', $gameSkill->id)->where('character_id', $character->id)->first();
+
+        return [
+            'current_xp'    => $skill->xp,
+            'next_level_xp' => $skill->xp_max,
+            'skill_name'    => $skill->name,
+            'level'         => $skill->level
+        ];
+    }
+
 
     public function transmute(Character $character, int $itemId): void {
         $gameSkill = GameSkill::where('type', SkillTypeValue::ALCHEMY)->first();

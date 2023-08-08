@@ -111,9 +111,9 @@ export default class CelestialFight extends React.Component<any, any> {
                     character_max_health={this.state.character_max_health}
                     monster_name={this.state.monster_name}
                     preforming_action={this.state.preforming_action}
-                    character_name={this.state.character.name}
-                    is_dead={this.state.character.is_dead}
-                    can_attack={this.state.character.can_attack}
+                    character_name={this.props.character.name}
+                    is_dead={this.props.character.is_dead}
+                    can_attack={this.props.character.can_attack}
                     monster_id={this.props.celestial_id}
                     attack={this.attack.bind(this)}
                     manage_server_fight={this.props.manage_celestial_fight}

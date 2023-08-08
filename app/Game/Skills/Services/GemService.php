@@ -104,6 +104,17 @@ class GemService {
         return $craftableTiers;
     }
 
+    public function fetchSkillXP(Character $character): array {
+        $skill = $this->getCraftingSkill($character);
+
+        return [
+            'current_xp'    => $skill->xp,
+            'next_level_xp' => $skill->xp_max,
+            'skill_name'    => $skill->name,
+            'level'         => $skill->level
+        ];
+    }
+
     /**
      * Skill level too high.
      *

@@ -16,6 +16,7 @@
             <th>required_secondary_mercenary_type</th>
             <th>required_mercenary_level</th>
             <th>required_secondary_mercenary_level</th>
+            <th>required_class_specials_equipped</th>
             <th>required_faction_id</th>
             <th>required_faction_level</th>
             <th>required_game_map_id</th>
@@ -62,6 +63,7 @@
                 <td>{{$guideQuest->required_secondary_mercenary_type}}</td>
                 <td>{{$guideQuest->required_mercenary_level}}</td>
                 <td>{{$guideQuest->required_secondary_mercenary_level}}</td>
+                <td>{{$guideQuest->required_class_specials_equipped}}</td>
                 <td>{{!is_null($guideQuest->required_faction_id) ? $guideQuest->faction_name : ''}}</td>
                 <td>{{$guideQuest->required_faction_level}}</td>
                 <td>{{!is_null($guideQuest->required_game_map_id) ? $guideQuest->game_map_name : ''}}</td>

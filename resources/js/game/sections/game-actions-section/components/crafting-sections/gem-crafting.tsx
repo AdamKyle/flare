@@ -7,6 +7,7 @@ import Select from "react-select";
 import {formatNumber} from "../../../../lib/game/format-number";
 import DangerAlert from "../../../../components/ui/alerts/simple-alerts/danger-alert";
 import LoadingProgressBar from "../../../../components/ui/progress-bars/loading-progress-bar";
+import CraftingXp from "../crafting-xp";
 
 export default class GemCrafting extends React.Component<any, any> {
 
@@ -30,7 +31,8 @@ export default class GemCrafting extends React.Component<any, any> {
     componentDidMount() {
         (new Ajax()).setRoute('gem-crafting/craftable-tiers/' + this.props.character_id).doAjaxCall('get', (result: AxiosResponse) => {
             this.setState({
-                tiersForCrafting: result.data,
+                tiersForCrafting: result.data.tiers,
+                skill_xp: result.data.skill_xp,
                 loading: false,
             });
         }, (error: AxiosError) => {
@@ -47,7 +49,8 @@ export default class GemCrafting extends React.Component<any, any> {
                 tier: this.state.selectedTier,
             }).doAjaxCall('post', (result: AxiosResponse) => {
                 this.setState({
-                    tiersForCrafting: result.data,
+                    tiersForCrafting: result.data.tiers,
+                    skill_xp: result.data.skill_xp,
                     isCrafting: false,
                 });
             }, (error: AxiosError) => {
@@ -166,6 +169,12 @@ export default class GemCrafting extends React.Component<any, any> {
                                     {
                                         this.state.isCrafting ?
                                             <LoadingProgressBar />
+                                        : null
+                                    }
+
+                                    {
+                                        this.state.tiersForCrafting.length > 0 ?
+                                            <CraftingXp skill_xp={this.state.skill_xp} />
                                         : null
                                     }
                                 </Fragment>
