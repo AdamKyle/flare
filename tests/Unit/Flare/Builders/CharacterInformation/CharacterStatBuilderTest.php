@@ -2,18 +2,19 @@
 
 namespace Tests\Unit\Flare\Builders\CharacterInformation;
 
-use App\Flare\Builders\CharacterInformation\AttributeBuilders\HolyBuilder;
-use App\Flare\Builders\CharacterInformation\AttributeBuilders\ReductionsBuilder;
-use App\Flare\Values\ItemEffectsValue;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Flare\Builders\CharacterInformation\CharacterStatBuilder;
-use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateItem;
 use Tests\Traits\CreateClass;
+use App\Flare\Models\GameClass;
 use Tests\Traits\CreateGameMap;
 use Tests\Traits\CreateGameSkill;
-use Tests\Traits\CreateItem;
 use Tests\Traits\CreateItemAffix;
+use App\Flare\Values\ItemEffectsValue;
+use Tests\Setup\Character\CharacterFactory;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use App\Flare\Builders\CharacterInformation\CharacterStatBuilder;
+use App\Flare\Builders\CharacterInformation\AttributeBuilders\HolyBuilder;
+use App\Flare\Builders\CharacterInformation\AttributeBuilders\ReductionsBuilder;
 
 class CharacterStatBuilderTest extends TestCase {
 
@@ -57,12 +58,24 @@ class CharacterStatBuilderTest extends TestCase {
         $this->assertTrue($notEmpty);
     }
 
-    public function testClassBonusWithNoItemsEquipped() {
+    public function testClassBonusWithNoSkill() {
         $character = $this->character->getCharacter();
 
         $value = $this->characterStatBuilder->setCharacter($character)->classBonus();
 
-        $this->assertEquals(0.05, $value);
+        $this->assertEquals(0, $value);
+    }
+
+    public function testClassBonusWithSkill() {
+        $character = $this->character->assignSkill($this->createGameSkill([
+            'name'          => 'Class Skill',
+            'game_class_id' => GameClass::first()->id,
+            'class_bonus'   => 0.01
+        ]), 10)->getCharacter();
+
+        $value = $this->characterStatBuilder->setCharacter($character)->classBonus();
+
+        $this->assertEquals(0.1, $value);
     }
 
     public function testGetHolyInfo() {

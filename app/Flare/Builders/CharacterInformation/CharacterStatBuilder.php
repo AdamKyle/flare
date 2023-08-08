@@ -187,7 +187,13 @@ class CharacterStatBuilder {
      * @return float
      */
     public function classBonus(): float {
-        return $this->character->skills->where('class_id', $this->character->game_class_id)->first()->class_bonus;
+        $classBonusSkill = $this->character->skills->where('class_id', $this->character->game_class_id)->first();
+
+        if (is_null($classBonusSkill)) {
+            return 0;
+        }
+
+        return $classBonusSkill->class_bonus;
     }
 
     /**
