@@ -68,7 +68,7 @@ class SecondaryAttacks extends BattleBase {
             $resistance = $monster->getMonsterStat('affix_resistance');
         }
 
-        $damage = $this->affixes->getCharacterAffixDamage($character, $resistance, $this->attackData, $isPvp);
+        $damage = $this->affixes->getCharacterAffixDamage($this->attackData, $isPvp, $resistance);
 
         if (!$isPvp) {
             $this->mergeMessages($this->affixes->getMessages());
