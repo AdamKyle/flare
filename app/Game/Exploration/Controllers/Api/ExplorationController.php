@@ -101,7 +101,7 @@ class ExplorationController extends Controller {
         event(new ExplorationStatus($character->user, false));
         event(new UpdateCharacterStatus($character));
 
-        event(new ExplorationLogUpdate($character->user, 'Exploration has been stopped at player request.'));
+        event(new ExplorationLogUpdate($character->user->id, 'Exploration has been stopped at player request.'));
 
         return response()->json();
     }

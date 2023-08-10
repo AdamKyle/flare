@@ -12,7 +12,9 @@ export default interface GameChatState {
     message: string;
     is_silenced: boolean;
     can_talk_again_at: string | null;
-    tabs: TabsType[],
+    tabs: TabsType[];
+    selected_chat: string;
+    updated_tabs: string[]|[];
 }
 
 export interface AnnouncementType {

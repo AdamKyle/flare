@@ -5,18 +5,16 @@ namespace App\Game\Battle\Handlers;
 use Exception;
 use App\Flare\Models\Monster;
 use App\Flare\Models\Character;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;
 use App\Game\Battle\Events\CharacterRevive;
-use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Battle\Events\AttackTimeOutEvent;
 use App\Flare\Models\CharacterInCelestialFight;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Battle\Events\UpdateCharacterStatus;
-use App\Game\ClassRanks\Services\ClassRankService;
-use App\Game\Mercenaries\Services\MercenaryService;
 use App\Game\Battle\Services\BattleRewardProcessing;
-use Facades\App\Game\Skills\Handlers\UpdateItemSkill;
 use App\Flare\Builders\Character\Traits\FetchEquipped;
+use App\Game\Battle\Jobs\SecondaryBattleRewardHandler;
 
 class BattleEventHandler {
 
@@ -28,28 +26,10 @@ class BattleEventHandler {
     private BattleRewardProcessing $battleRewardProcessing;
 
     /**
-     * @var MercenaryService $mercenaryService
-     */
-    private MercenaryService $mercenaryService;
-
-    /**
-     * @var ClassRankService $classRankService
-     */
-    private ClassRankService $classRankService;
-
-
-    /**
      * @param BattleRewardProcessing $battleRewardProcessing
-     * @param MercenaryService $mercenaryService
-     * @param ClassRankService $classRankService
      */
-    public function __construct(BattleRewardProcessing $battleRewardProcessing,
-                                MercenaryService $mercenaryService,
-                                ClassRankService $classRankService,
-    ) {
+    public function __construct(BattleRewardProcessing $battleRewardProcessing) {
         $this->battleRewardProcessing = $battleRewardProcessing;
-        $this->mercenaryService       = $mercenaryService;
-        $this->classRankService       = $classRankService;
     }
 
     /**
@@ -82,24 +62,12 @@ class BattleEventHandler {
         $character = Character::find($characterId);
 
         if (is_null($monster)) {
-            \Log::error('Missing Monster for id: ' . $monsterId);
+            Log::error('Missing Monster for id: ' . $monsterId);
 
             return;
         }
 
-        $this->battleRewardProcessing->handleMonster($character, $monster);
-
-        $this->mercenaryService->giveXpToMercenaries($character);
-
-        $this->classRankService->giveXpToClassRank($character);
-
-        $this->classRankService->giveXpToMasteries($character);
-
-        $this->classRankService->giveXpToEquippedClassSpecialties($character);
-
-        $this->handleItemSkillUpdate($character);
-
-        event(new UpdateTopBarEvent($character->refresh()));
+        SecondaryBattleRewardHandler::dispatch($character);
     }
 
     /**
@@ -136,29 +104,5 @@ class BattleEventHandler {
         event(new UpdateCharacterStatus($character));
 
         return $character->refresh();
-    }
-
-    /**
-     * Handle item skill updates for artifacts that are equipped with skill trees.
-     *
-     * @param Character $character
-     * @return void
-     */
-    protected function handleItemSkillUpdate(Character $character): void {
-        $equippedItems = $this->fetchEquipped($character);
-
-        if (is_null($equippedItems)) {
-            return;
-        }
-
-        $equippedItem = $equippedItems->filter(function($slot) {
-            return $slot->item->type === 'artifact';
-        })->first();
-
-        if (is_null($equippedItem)) {
-            return;
-        }
-
-        UpdateItemSkill::updateItemSkill($character, $equippedItem->item);        
     }
 }

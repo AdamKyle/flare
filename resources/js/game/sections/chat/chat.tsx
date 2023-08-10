@@ -6,6 +6,7 @@ import {AxiosError, AxiosResponse} from "axios";
 import {generateServerMessage} from "../../lib/ajax/generate-server-message";
 import ChatComponentProps from "./types/components/chat-component-props";
 import ChatComponentState from "./types/components/chat-component-state";
+import clsx from 'clsx';
 
 export default class Chat extends React.Component<ChatComponentProps, ChatComponentState> {
 
@@ -158,6 +159,17 @@ export default class Chat extends React.Component<ChatComponentProps, ChatCompon
                     if (message.character_name === 'The Creator') {
                         return <li className='mb-2 break-all md:break-normal text-yellow-300 text-xl bold'>
                             The Creator: {message.message}
+                        </li>
+                    }
+
+                    if (message.chat_text_color !== null) {
+                        const color = message.chat_text_color;
+
+                        return <li className={clsx('mb-2 break-all md:break-normal ' + color, {
+                            'font-extrabold': message.chat_is_bold,
+                            'italic': message.chat_is_italic,
+                        })}>
+                            {self.renderLocation(message)} <button type='button' className='underline' onClick={() => self.privateMessage(message.character_name)}>{message.character_name}</button>: {message.message}
                         </li>
                     }
 

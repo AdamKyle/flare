@@ -44,7 +44,7 @@ class ExplorationAutomationService {
 
         event(new UpdateCharacterStatus($character));
 
-        event(new ExplorationLogUpdate($character->user, 'The exploration will begin in 5 minutes. Every 5 minutes you will encounter the enemy up to a maximum of 8 times in a single "encounter"'));
+        event(new ExplorationLogUpdate($character->user->id, 'The exploration will begin in 5 minutes. Every 5 minutes you will encounter the enemy up to a maximum of 8 times in a single "encounter"'));
 
         event(new ExplorationTimeOut($character->user, now()->diffInSeconds($automation->completed_at)));
 

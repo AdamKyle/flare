@@ -2,15 +2,16 @@
 
 namespace App\Game\Core\Controllers;
 
-use App\Flare\Events\UpdateCharacterAttackEvent;
-use App\Flare\Models\GameClass;
-use App\Flare\Models\GameRace;
-use Hash;
-use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 use App\Flare\Models\User;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
+use App\Flare\Models\Quest;
+use Illuminate\Http\Request;
+use App\Flare\Models\GameRace;
+use App\Flare\Models\GameClass;
+use App\Flare\Values\FeatureTypes;
+use App\Http\Controllers\Controller;
+use App\Flare\Models\QuestsCompleted;
+use App\Game\Core\Requests\CosmeticTextRequest;
+use App\Flare\Events\UpdateCharacterAttackEvent;
 
 class SettingsController extends Controller {
 
@@ -19,12 +20,21 @@ class SettingsController extends Controller {
     }
 
     public function index(User $user) {
+
+        $quest              = Quest::where('unlocks_feature', FeatureTypes::COSMETIC_TEXT)->first()->id;
+        $canUseCosmeticText = false;
+
+        if (is_null($quest)) {
+            $canUseCosmeticText = !is_null(QuestsCompleted::where('character_id', $user->character->id)->where('id', $quest->id)->first());
+        }
+
         return view('game.core.settings.settings', [
-            'user'    => $user,
-            'races'   => GameRace::pluck('name', 'id'),
-            'classes' => GameClass::whereNull('primary_required_class_id')
-                                  ->whereNull('secondary_required_class_id')
-                                  ->pluck('name', 'id'),
+            'user'         => $user,
+            'races'        => GameRace::pluck('name', 'id'),
+            'classes'      => GameClass::whereNull('primary_required_class_id')
+                                       ->whereNull('secondary_required_class_id')
+                                       ->pluck('name', 'id'),
+            'cosmeticText' => $canUseCosmeticText,
         ]);
     }
 
@@ -88,5 +98,11 @@ class SettingsController extends Controller {
         }
 
         return redirect()->back()->with('success', 'Updated character guide setting.');
+    }
+
+    public function cosmeticText(CosmeticTextRequest $request, User $user) {
+        $user->update($request->all());
+
+        return redirect()->back()->with('success', 'Updated Cosmetic Text options');
     }
 }

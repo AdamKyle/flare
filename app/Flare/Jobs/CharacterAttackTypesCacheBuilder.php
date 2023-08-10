@@ -48,7 +48,7 @@ class CharacterAttackTypesCacheBuilder implements ShouldQueue
         $updateCharacterAttackTypes->updateCache($this->character);
 
         if ($this->alertStatsUpdated) {
-            event(new ExplorationLogUpdate($this->character->user, 'Character stats have been updated.', false, true));
+            event(new ExplorationLogUpdate($this->character->user->id, 'Character stats have been updated.', false, true));
         }
     }
 }

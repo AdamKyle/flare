@@ -2,12 +2,13 @@
 
 namespace App\Game\Messages\Services;
 
-use App\Admin\Events\UpdateAdminChatEvent;
-use App\Flare\Models\Character;
 use App\Flare\Models\User;
+use App\Flare\Models\Character;
+use App\Game\Messages\Models\Message;
 use App\Flare\Values\ItemEffectsValue;
-use App\Game\Messages\Events\MessageSentEvent;
+use App\Admin\Events\UpdateAdminChatEvent;
 use App\Game\Messages\Values\MapChatColor;
+use App\Game\Messages\Events\MessageSentEvent;
 
 class PublicMessage {
 
@@ -32,7 +33,25 @@ class PublicMessage {
 
         $newMessage->map_name = $this->shortenedMapName($user);
 
+        $newMessage = $this->setUpCustomOverRides($user, $newMessage);
+
         broadcast(new MessageSentEvent($user, $newMessage))->toOthers();
+    }
+
+    /**
+     * Set the custom over rides on the text
+     *
+     * @param User $user
+     * @param Message $message
+     * @return Message
+     */
+    protected function setUpCustomOverRides(User $user, Message $message): Message {
+
+        $message->custom_class   = $user->chat_text_color;
+        $message->is_chat_bold   = $user->chat_is_bold;
+        $message->is_chat_italic = $user->chat_is_italic;
+
+        return $message;
     }
 
     /**

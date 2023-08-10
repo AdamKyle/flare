@@ -10,6 +10,17 @@ export default class DropDown extends React.Component<DropDownProps, any> {
         super(props);
     }
 
+    nameMatchesForAlert(name: string): boolean {
+
+        if (typeof this.props.alert_names === 'undefined') {
+            return false;
+        } 
+
+        console.log(this.props.alert_names.includes(name));
+
+        return this.props.alert_names.includes(name);
+    }
+
     renderMenuItems() {
         return this.props.menu_items.map((menuItem) => {
             return (
@@ -34,11 +45,20 @@ export default class DropDown extends React.Component<DropDownProps, any> {
                         >
                             {
                                 typeof menuItem.icon_class !== 'undefined' ?
-                                    <i className={menuItem.icon_class + " w-5 h-5 mr-2"} aria-hidden="true"></i>
+                                    <i className={clsx(menuItem.icon_class + " w-5 h-5 mr-2", {
+                                        'text-orange-700 dark:text-orange-500': this.props.show_alert && this.nameMatchesForAlert(menuItem.name)
+                                    })} aria-hidden="true"></i>
                                 : null
                             }
 
-                            {menuItem.name}
+                            {
+                                this.props.show_alert && this.nameMatchesForAlert(menuItem.name) ?
+                                    <span className="text-orange-700 dark:text-orange-500">{menuItem.name}</span>
+                                :
+                                    menuItem.name
+                            }
+                            
+                            
                         </button>
                     )}
                 </Menu.Item>
@@ -46,15 +66,23 @@ export default class DropDown extends React.Component<DropDownProps, any> {
         })
     }
 
+    showAlert(): boolean {
+        if (typeof this.props.alert_names !== 'undefined' && typeof this.props.show_alert !== 'undefined') {
+            return this.props.show_alert && this.props.alert_names.length > 0;
+        }
+
+        return false;
+    }
+
     render() {
         return (
-            <div className="my-4 text-center lg:text-left">
+            <div className="my-4 lg:text-left">
                 <Menu as="div" className="relative inline-block text-left">
-                    <div>
-                        <Menu.Button className="inline-flex justify-center w-full px-4 py-2 text-sm font-medium rounded-sm
-                        focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-200 dark:focus-visible:ring-white focus-visible:ring-opacity-75 hover:bg-blue-700
-                        hover:drop-shadow-md dark:text-white hover:text-gray-300 bg-blue-600 dark:bg-blue-700 text-white dark:hover:bg-blue-600
-                        dark:hover:text-white font-semibold py-2 px-4 rounded-sm drop-shadow-sm disabled:bg-blue-400 dark:disabled:bg-blue-400"
+                    <div className='my-4'>
+                        <Menu.Button className={clsx(
+                            "inline-flex justify-center w-full px-4 py-2 text-sm font-medium rounded-small focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-200 dark:focus-visible:ring-white focus-visible:ring-opacity-75 hover:bg-blue-700 hover:drop-shadow-md dark:text-white hover:text-gray-300 bg-blue-600 dark:bg-blue-700 text-white dark:hover:bg-blue-600 dark:hover:text-white font-semibold py-2 px-4 rounded-sm drop-shadow-sm disabled:bg-blue-400 dark:disabled:bg-blue-400",
+                            {"focus-visible:ring-orange-200 dark:focus-visible:ring-white focus-visible:ring-opacity-75 hover:bg-orange-700 hover:drop-shadow-md dark:text-white hover:text-gray-300 bg-orange-600 dark:bg-orange-700 text-white dark:hover:bg-orange-600 dark:hover:text-white font-semibold py-2 px-4 rounded-sm drop-shadow-sm disabled:bg-orange-400 dark:disabled:bg-orange-400" : this.showAlert()}
+                            )}
                                      disabled={this.props.disabled}
                         >
                             {this.props.button_title}

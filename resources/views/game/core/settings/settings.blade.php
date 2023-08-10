@@ -20,6 +20,11 @@
                 'user' => $user,
             ])
         @endif
+        @if ($cosmeticText)
+            @include('game.core.settings.partials.cosmetic-text', [
+                'uses' => $user,
+            ])
+        @endif
         @include('game.core.settings.partials.auto-disenchant-settings', [
             'user' => $user,
         ])

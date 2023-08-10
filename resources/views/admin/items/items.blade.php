@@ -7,10 +7,10 @@
         color="success" link="Home"
     >
         <x-core.buttons.link-buttons.primary-button
-            href="{{route('admin.items-skills.create')}}"
+            href="{{route('items.create')}}"
             css="tw-ml-2"
         >
-            Create Item Skill
+            Create Item
         </x-core.buttons.link-buttons.primary-button>
         <x-core.buttons.link-buttons.primary-button
             href="{{route('items.export')}}"

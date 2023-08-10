@@ -1,4 +1,4 @@
-import React from "react";
+import React, {Fragment} from "react";
 import Tabs from "../../components/ui/tabs/tabs";
 import TabPanel from "../../components/ui/tabs/tab-panel";
 import Ajax from "../../lib/ajax/ajax";
@@ -6,10 +6,11 @@ import ServerMessages from "./server-messages";
 import {AxiosError, AxiosResponse} from "axios";
 import Chat from "./chat";
 import GameChatProps from "./types/game-chat-props";
-import GameChatState, {AnnouncementType} from "./types/game-chat-state";
+import GameChatState from "./types/game-chat-state";
 import ExplorationMessages from "./exploration-messages";
 import {DateTime} from "luxon";
 import AnnouncementMessages from "./announcement-messages";
+import DropDown from "../../components/ui/drop-down/drop-down";
 
 export default class GameChat extends React.Component<GameChatProps, GameChatState> {
     private chat: any;
@@ -37,6 +38,8 @@ export default class GameChat extends React.Component<GameChatProps, GameChatSta
             message: '',
             is_silenced: false,
             can_talk_again_at: null,
+            selected_chat: 'Chat',
+            updated_tabs: [],
             tabs: [{
                 key: 'chat',
                 name: 'Chat',
@@ -108,6 +111,9 @@ export default class GameChat extends React.Component<GameChatProps, GameChatSta
                         type: 'chat',
                         hide_location: chat.hide_location,
                         time_stamp: (DateTime.fromISO(chat.created_at)).toLocaleString(DateTime.DATETIME_MED),
+                        chat_text_color: chat.custom_class,
+                        chat_is_bold: chat.is_chat_bold,
+                        chat_is_italic: chat.is_chat_italic,
                     }
                 }
             }).filter((chat: any) => typeof chat !== 'undefined');
@@ -116,6 +122,7 @@ export default class GameChat extends React.Component<GameChatProps, GameChatSta
             this.setState({
                 chat: [...this.state.chat, ...chats],
                 announcements: result.data.announcements,
+                updated_tabs: this.canUpdateTabs('Announcements') && result.data.announcements.length > 0 ? [...this.state.updated_tabs, 'Announcements'] : this.state.updated_tabs
             }, () => {
                 if (typeof this.props.update_finished_loading !== 'undefined') {
                     this.props.update_finished_loading();
@@ -141,7 +148,8 @@ export default class GameChat extends React.Component<GameChatProps, GameChatSta
             });
 
             this.setState({
-                exploration_messages: messages
+                exploration_messages: messages,
+                updated_tabs: this.canUpdateTabs('Exploration') ? [...this.state.updated_tabs, 'Exploration'] : this.state.updated_tabs
             },() => {
                 this.setTabToUpdated('exploration-messages');
             });
@@ -167,7 +175,8 @@ export default class GameChat extends React.Component<GameChatProps, GameChatSta
             });
 
             this.setState({
-                server_messages: messages
+                server_messages: messages,
+                updated_tabs: this.canUpdateTabs('Server Messages') ? [...this.state.updated_tabs, 'Server Messages'] : this.state.updated_tabs
             },() => {
                 this.setTabToUpdated('server-messages');
             });
@@ -184,6 +193,7 @@ export default class GameChat extends React.Component<GameChatProps, GameChatSta
 
             this.setState({
                 chat: chat,
+                updated_tabs: this.canUpdateTabs('Chat') ? [...this.state.updated_tabs, 'Chat'] : this.state.updated_tabs
             });
         });
 
@@ -211,11 +221,15 @@ export default class GameChat extends React.Component<GameChatProps, GameChatSta
                    hide_location: event.message.hide_location,
                    time_stamp: (DateTime.fromISO(event.message.created_at)).toLocaleString(DateTime.DATETIME_MED),
                    type: 'chat',
+                   chat_text_color: event.message.custom_class,
+                   chat_is_bold: event.message.is_chat_bold,
+                   chat_is_italic: event.message.is_chat_italic,
                });
            }
 
            this.setState({
                chat: chat,
+               updated_tabs: this.canUpdateTabs('Chat') ? [...this.state.updated_tabs, 'Chat'] : this.state.updated_tabs
            }, () => {
                this.setTabToUpdated('chat');
            })
@@ -236,6 +250,7 @@ export default class GameChat extends React.Component<GameChatProps, GameChatSta
 
             this.setState({
                 chat: chat,
+                updated_tabs: this.canUpdateTabs('Chat') ? [...this.state.updated_tabs, 'Chat'] : this.state.updated_tabs
             }, () => {
                 this.setTabToUpdated('chat');
             })
@@ -255,6 +270,7 @@ export default class GameChat extends React.Component<GameChatProps, GameChatSta
 
             this.setState({
                 chat: chat,
+                updated_tabs: this.canUpdateTabs('Chat') ? [...this.state.updated_tabs, 'Chat'] : this.state.updated_tabs
             }, () => {
                 this.setTabToUpdated('chat');
             })
@@ -274,13 +290,18 @@ export default class GameChat extends React.Component<GameChatProps, GameChatSta
 
             this.setState({
                 announcements: chat,
+                updated_tabs: this.canUpdateTabs('Announcements') ? [...this.state.updated_tabs, 'Announcements'] : this.state.updated_tabs
             }, () => {
                 this.setTabToUpdated('announcements-messages');
             })
         })
     }
 
-    componentDidUpdate(prevProps: Readonly<any>, prevState: Readonly<any>, snapshot?: any) {
+    canUpdateTabs(name: string) {
+        return this.state.selected_chat !== name && !(this.state.updated_tabs as string[]).includes(name);
+    }
+
+    componentDidUpdate(prevProps: Readonly<any>, prevState: Readonly<GameChatState>, snapshot?: any) {
 
         if (this.props.is_silenced === null) {
             return;
@@ -292,8 +313,8 @@ export default class GameChat extends React.Component<GameChatProps, GameChatSta
                 can_talk_again_at: this.props.can_talk_again_at,
             });
         }
-    }
 
+    }
 
     pushSilencedMethod() {
         if (this.state.is_silenced) {
@@ -369,6 +390,71 @@ export default class GameChat extends React.Component<GameChatProps, GameChatSta
         })
     }
 
+    switchChat(type: string) {
+        this.setState({
+            selected_chat: type,
+            updated_tabs: this.state.updated_tabs.filter((name: string) => name !== type),
+        });
+    }
+
+    renderDropDownOptions(): {name: string, icon_class: string, on_click: () => void}[] {
+        return [
+            {
+                name: 'Chat',
+                icon_class: 'fas fa-comments',
+                on_click: () => this.switchChat('Chat'),
+            },
+            {
+                name: 'Server Messages',
+                icon_class: 'fas fa-server',
+                on_click: () => this.switchChat('Server Messages'),
+            },
+            {
+                name: 'Exploration',
+                icon_class: 'fas fa-dragon',
+                on_click: () => this.switchChat('Exploration'),
+            },
+            {
+                name: 'Announcements',
+                icon_class: 'fas fa-scroll',
+                on_click: () => this.switchChat('Announcements'),
+            }
+        ];
+    }
+
+    renderSelectedTab(): JSX.Element {
+        switch(this.state.selected_chat) {
+            case 'Announcements':
+                return (
+                    <AnnouncementMessages announcements={this.state.announcements} />
+                );
+            case 'Exploration':
+                return (
+                    <ExplorationMessages exploration_messages={this.state.exploration_messages} />
+                )
+            case 'Server Messages':
+                return (
+                    <ServerMessages server_messages={this.state.server_messages}
+                        character_id={this.props.character_id}
+                        view_port={this.props.view_port}
+                        is_automation_running={this.props.is_automation_running}
+                    />
+                );
+            case 'Chat':
+            default:
+                return(
+                    <Chat is_silenced={this.props.is_silenced}
+                        can_talk_again_at={this.props.can_talk_again_at}
+                        chat={this.state.chat}
+                        set_tab_to_updated={this.setTabToUpdated.bind(this)}
+                        push_silenced_message={this.pushSilencedMethod.bind(this)}
+                        push_private_message_sent={this.pushPrivateMessageSent.bind(this)}
+                        push_error_message={this.pushErrorMessage.bind(this)}
+                    />
+                );
+        }
+    }
+
     render() {
         if (this.props.is_admin) {
             return <Chat is_silenced={this.props.is_silenced}
@@ -382,36 +468,49 @@ export default class GameChat extends React.Component<GameChatProps, GameChatSta
         }
 
         return (
-            <div className='mt-4 mb-4'>
-                <Tabs tabs={this.state.tabs} icon_key={'updated'} when_tab_changes={this.resetTabChange.bind(this)}>
-                    <TabPanel key={'chat'}>
-                        <Chat is_silenced={this.props.is_silenced}
-                              can_talk_again_at={this.props.can_talk_again_at}
-                              chat={this.state.chat}
-                              set_tab_to_updated={this.setTabToUpdated.bind(this)}
-                              push_silenced_message={this.pushSilencedMethod.bind(this)}
-                              push_private_message_sent={this.pushPrivateMessageSent.bind(this)}
-                              push_error_message={this.pushErrorMessage.bind(this)}
-                        />
-                    </TabPanel>
+            <Fragment>
+                <div className="mt-4 mb-4 lg:hidden">
+                    <DropDown menu_items={this.renderDropDownOptions()}
+                            button_title={'Chat Tabs'}
+                            selected_name={this.state.selected_chat}
+                            show_alert={true}
+                            alert_names={this.state.updated_tabs}
+                    />
+                    <div className="my-4">
+                        {this.renderSelectedTab()}
+                    </div>
+                </div>
+                <div className='mt-4 mb-4 hidden lg:block'>
+                    <Tabs tabs={this.state.tabs} icon_key={'updated'} when_tab_changes={this.resetTabChange.bind(this)}>
+                        <TabPanel key={'chat'}>
+                            <Chat is_silenced={this.props.is_silenced}
+                                can_talk_again_at={this.props.can_talk_again_at}
+                                chat={this.state.chat}
+                                set_tab_to_updated={this.setTabToUpdated.bind(this)}
+                                push_silenced_message={this.pushSilencedMethod.bind(this)}
+                                push_private_message_sent={this.pushPrivateMessageSent.bind(this)}
+                                push_error_message={this.pushErrorMessage.bind(this)}
+                            />
+                        </TabPanel>
 
-                    <TabPanel key={'server-messages'}>
-                        <ServerMessages server_messages={this.state.server_messages}
-                                        character_id={this.props.character_id}
-                                        view_port={this.props.view_port}
-                                        is_automation_running={this.props.is_automation_running}
-                        />
-                    </TabPanel>
+                        <TabPanel key={'server-messages'}>
+                            <ServerMessages server_messages={this.state.server_messages}
+                                            character_id={this.props.character_id}
+                                            view_port={this.props.view_port}
+                                            is_automation_running={this.props.is_automation_running}
+                            />
+                        </TabPanel>
 
-                    <TabPanel key={'exploration-messages'}>
-                        <ExplorationMessages exploration_messages={this.state.exploration_messages} />
-                    </TabPanel>
+                        <TabPanel key={'exploration-messages'}>
+                            <ExplorationMessages exploration_messages={this.state.exploration_messages} />
+                        </TabPanel>
 
-                    <TabPanel key={'announcements-messages'}>
-                        <AnnouncementMessages announcements={this.state.announcements} />
-                    </TabPanel>
-                </Tabs>
-            </div>
+                        <TabPanel key={'announcements-messages'}>
+                            <AnnouncementMessages announcements={this.state.announcements} />
+                        </TabPanel>
+                    </Tabs>
+                </div>
+            </Fragment>
         )
     }
 }

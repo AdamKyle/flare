@@ -46,7 +46,7 @@ export default class SmallCraftingSection extends React.Component<SmallCraftingS
                             cannot_craft={this.craftingSectionManager.cannotCraft()}
                         />
                     :
-                        <Fragment>
+                        <div className="text-center my-4">
                             <DropDown menu_items={this.craftingSectionManager.buildCraftingList(this.setCraftingType.bind(this))}
                                       button_title={'Craft/Enchant'}
                                       disabled={this.craftingSectionManager.cannotCraft()}
@@ -55,7 +55,7 @@ export default class SmallCraftingSection extends React.Component<SmallCraftingS
                                       close_button_action={this.props.close_crafting_section}
                             />
 
-                        </Fragment>
+                        </div>
                 }
             </div>
 

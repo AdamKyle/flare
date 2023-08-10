@@ -96,16 +96,16 @@ class Exploration implements ShouldQueue
                 Exploration::dispatch($this->character, $this->automationId, $this->attackType)->delay(now()->addMinutes($time >= 5 ? 5 : $time))->onQueue('default_long');
             }
 
+            $response->deleteCharacterCache($this->character);
+
             return;
         }
 
         $automation->delete();
 
-        $response->deleteCharacterCache($this->character);
-
         event(new UpdateDuelAtPosition($this->character->user));
 
-        event(new ExplorationLogUpdate($this->character->user, 'Something went wrong with automation. Could not process fight. Automation Canceled.'));
+        event(new ExplorationLogUpdate($this->character->user->id, 'Something went wrong with automation. Could not process fight. Automation Canceled.'));
 
         event(new ExplorationTimeOut($this->character->user, 0));
     }
@@ -123,14 +123,14 @@ class Exploration implements ShouldQueue
     protected function encounter(MonsterPlayerFight $response, CharacterAutomation $automation, BattleEventHandler $battleEventHandler, array $params): bool {
         $user = $this->character->user;
 
-        event(new ExplorationLogUpdate($user, 'While on your exploration of the area, you encounter a: ' . $response->getEnemyName()));
+        event(new ExplorationLogUpdate($user->id, 'While on your exploration of the area, you encounter a: ' . $response->getEnemyName()));
 
         if ($this->fightAutomationMonster($response, $automation, $battleEventHandler, $params)) {
-            event(new ExplorationLogUpdate($user, 'You search the corpse of you enemy for clues, where did they come from? None to be found. Upon searching the area further, you find the enemies friends.', true));
+            event(new ExplorationLogUpdate($user->id, 'You search the corpse of you enemy for clues, where did they come from? None to be found. Upon searching the area further, you find the enemies friends.', true));
 
             $enemies = rand(1, 7);
 
-            event(new ExplorationLogUpdate($user, '"Chirst, child there are: '.$enemies.' of them ..."
+            event(new ExplorationLogUpdate($user->id, '"Chirst, child there are: '.$enemies.' of them ..."
             The Guide hisses at you from the shadows. You ignore his words and prepare for battle. One right after the other ...', true));
 
             for ($i = 1; $i <= $enemies; $i++) {
@@ -139,7 +139,7 @@ class Exploration implements ShouldQueue
                 }
             }
 
-            event(new ExplorationLogUpdate($user, 'The last of the enemies fall. Covered in blood, exhausted, you look around for any signs of more of their friends. The area is silent. "Another day, another battle.
+            event(new ExplorationLogUpdate($user->id, 'The last of the enemies fall. Covered in blood, exhausted, you look around for any signs of more of their friends. The area is silent. "Another day, another battle.
             We managed to survive." The Guide states as he walks from the shadows. The pair of you set off in search of the next adventure ...
             (Exploration will begin again in 5 minutes)', true));
 
@@ -169,7 +169,7 @@ class Exploration implements ShouldQueue
 
             $response->deleteCharacterCache($this->character);
 
-            event(new ExplorationLogUpdate($this->character->user, 'You died during exploration. Exploration has ended.'));
+            event(new ExplorationLogUpdate($this->character->user->id, 'You died during exploration. Exploration has ended.'));
 
             event(new ExplorationTimeOut($this->character->user, 0));
 
@@ -265,7 +265,7 @@ class Exploration implements ShouldQueue
             $amount = 10;
         }
 
-        event(new ExplorationLogUpdate($this->character->user, 'Gained: ' . $amount . ' Additional ' . $map->name . ' Faction points', false, true));
+        event(new ExplorationLogUpdate($this->character->user->id, 'Gained: ' . $amount . ' Additional ' . $map->name . ' Faction points', false, true));
 
         $factionHandler->handleCustomFactionAmount($this->character, $amount);
     }
@@ -282,10 +282,10 @@ class Exploration implements ShouldQueue
 
             $characterCacheData->deleteCharacterSheet($this->character);
 
-            event(new ExplorationLogUpdate($this->character->user, '"Phew, child! I did not think we would survive all of your shenanigans.
+            event(new ExplorationLogUpdate($this->character->user->id, '"Phew, child! I did not think we would survive all of your shenanigans.
                 So many times I could have died! Do you ever think about anyone other than yourself? No? Didn\'t think so." The Guide storms off and you follow him in silence.', true));
 
-            event(new ExplorationLogUpdate($this->character->user, 'Your adventures over, you head to back to the nearest town. Upon arriving, you and The Guide spot the closest Inn. Soaked in the
+            event(new ExplorationLogUpdate($this->character->user->id, 'Your adventures over, you head to back to the nearest town. Upon arriving, you and The Guide spot the closest Inn. Soaked in the
             blood of your enemies, the sweat of the lingers on you like a bad smell. Entering the establishment and finding a table, you are greeted by a big busty women with shaggy long red hair messily tied in a pony tail.
             She leans down to the table, her cleavage close enough to your face that you can see the freckles and lines of age. Her grin missing a tooth, she states: "What can I get the both of ya?" You shutter on the inside.', true));
 
@@ -318,6 +318,6 @@ class Exploration implements ShouldQueue
 
         event(new UpdateCharacterCurrenciesEvent($character->refresh()));
 
-        event(new ExplorationLogUpdate($character->user, 'Gained 10k Gold for completing the exploration.', false, true));
+        event(new ExplorationLogUpdate($character->user->id, 'Gained 10k Gold for completing the exploration.', false, true));
     }
 }

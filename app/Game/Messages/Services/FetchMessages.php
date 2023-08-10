@@ -2,10 +2,11 @@
 
 namespace App\Game\Messages\Services;
 
+use App\Flare\Models\User;
 use App\Flare\Models\Announcement;
-use Illuminate\Support\Collection as SupportCollection;
-use Illuminate\Database\Eloquent\Collection;
 use App\Game\Messages\Models\Message;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Collection as SupportCollection;
 
 class FetchMessages {
 
@@ -42,6 +43,10 @@ class FetchMessages {
                 $message->map = $this->getMapNameFromColor($message->color);
             }
 
+            $user = auth()->user();
+
+            $message = $this->setUpCustomOverRides($message);
+
             return $this->setMessageName($message);
         });
     }
@@ -63,6 +68,15 @@ class FetchMessages {
         }
 
         $message->name = $message->user->character->name;
+
+        return $message;
+    }
+
+    protected function setUpCustomOverRides(Message $message): Message {
+
+        $message->custom_class   = $message->user->chat_text_color;
+        $message->is_chat_bold   = $message->user->chat_is_bold;
+        $message->is_chat_italic = $message->user->chat_is_italic;
 
         return $message;
     }

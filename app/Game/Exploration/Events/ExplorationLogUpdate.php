@@ -15,9 +15,9 @@ class ExplorationLogUpdate implements ShouldBroadcast
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     /**
-     * @var User $user
+     * @var int $userId
      */
-    private $user;
+    private int $userId;
 
     /**
      * @var string $message
@@ -32,9 +32,9 @@ class ExplorationLogUpdate implements ShouldBroadcast
      * @param User $user
      * @param string $message
      */
-    public function __construct(User $user, string $message, bool $makeItalic = false, bool $isReward = false)
+    public function __construct(int $userId, string $message, bool $makeItalic = false, bool $isReward = false)
     {
-        $this->user       = $user;
+        $this->userId     = $userId;
         $this->message    = $message;
         $this->makeItalic = $makeItalic;
         $this->isReward   = $isReward;
@@ -47,6 +47,6 @@ class ExplorationLogUpdate implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('exploration-log-update-' . $this->user->id);
+        return new PrivateChannel('exploration-log-update-' . $this->userId);
     }
 }

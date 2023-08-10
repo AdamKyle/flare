@@ -38,4 +38,5 @@ Route::middleware([
     Route::post('/settings/{user}/chat-settings', ['as' => 'user.settings.chat', 'uses' => 'SettingsController@chatSettings']);
     Route::post('/settings/{user}/character-name', ['as' => 'user.settings.character', 'uses' => 'SettingsController@characterSettings']);
     Route::post('/settings/{user}/enable-guide', ['as' => 'user.settings.enable-guide', 'uses' => 'SettingsController@guideSettings']);
+    Route::post('/settings/{user}/cosmetic-text', ['as' => 'user.settings.cosmetic-text', 'uses' => 'SettingsController@cosmeticText']);
 });

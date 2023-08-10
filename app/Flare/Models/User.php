@@ -41,7 +41,10 @@ class User extends Authenticatable {
         'auto_disenchant_amount',
         'timeout_until',
         'will_be_deleted',
-        'guide_enabled'
+        'guide_enabled',
+        'chat_text_color',
+        'chat_is_bold',
+        'chat_is_italic',
     ];
 
     /**
@@ -76,6 +79,8 @@ class User extends Authenticatable {
         'disable_attack_type_popover'    => 'boolean',
         'will_be_deleted'                => 'boolean',
         'guide_enabled'                  => 'boolean',
+        'chat_is_bold'                   => 'boolean',
+        'chat_is_italic'                 => 'boolean',
     ];
 
     public function character() {

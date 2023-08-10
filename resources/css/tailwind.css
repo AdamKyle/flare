@@ -6,6 +6,7 @@
 @import "./guide-quests-admin.css";
 @import "./chat-global-message-colors.css";
 @import "./calendar-override.css";
+@import "./cosmetic-text-colors.css";
 
 #perPage {
     width: 50px;

@@ -84,6 +84,13 @@ class NpcQuestRewardHandler {
                 you to set your character level back to level 1 and keep 20% of your base stats, but you are penalized by having 5% (that stacks per reincarnation)
                 added to your XP. You can now use this feature on your Character Sheet!'));
             }
+
+            if ($quest->unlocksFeature()->isCosmeticText()) {
+                event(new ServerMessageEvent($character->user, 'You can now use a new feature in your settings (Hover/Tap Top Right User Icon) to change your chat text 
+                to a color of your choice as well as italize or bold your text for public chat messages. How exciting!'));
+
+                event(new GlobalMessageEvent('HOLY CRAP!!!! ' . $character->name . ' Has unlocked an epic gift! Cosmetic Text! they can truly stand out from the rest of you now!'));
+            }
         }
 
         $this->createQuestLog($character, $quest);

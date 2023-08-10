@@ -10,6 +10,8 @@ class FeatureTypes {
 
     const REINCARNATION = 1;
 
+    const COSMETIC_TEXT = 2;
+
     /**
      * @var int $value
      */
@@ -21,11 +23,13 @@ class FeatureTypes {
     protected static array $values = [
         0 => self::MERCENARY,
         1 => self::REINCARNATION,
+        2 => self::COSMETIC_TEXT,
     ];
 
     protected static array $valueNames = [
         self::MERCENARY     => 'Mercenary',
         self::REINCARNATION => 'Reincarnation',
+        self::COSMETIC_TEXT => 'Cosmetic Text',
     ];
 
     /**
@@ -56,5 +60,9 @@ class FeatureTypes {
 
     public function isReincarnation(): bool {
         return $this->value === self::REINCARNATION;
+    }
+
+    public function isCosmeticText(): bool {
+        return $this->value === self::COSMETIC_TEXT;
     }
 }

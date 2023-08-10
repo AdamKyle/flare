@@ -17,4 +17,8 @@ export default interface DropDownProps {
     show_close_button?: boolean;
 
     close_button_action?: () => void;
+
+    show_alert?: boolean;
+
+    alert_names?: string[];
 }
