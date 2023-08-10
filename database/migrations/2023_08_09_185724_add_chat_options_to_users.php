@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string('chat_text_color')->nulable();
+            $table->string('chat_text_color')->nullable();
             $table->boolean('chat_is_bold')->default(false);
             $table->boolean('chat_is_italic')->default(false);
         });
