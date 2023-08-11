@@ -10,6 +10,7 @@ import Ajax from "../../../lib/ajax/ajax";
 import EventForm from "../types/deffinitions/components/event-form";
 import EventSchedulerEditorProps from "../types/components/event-scheduler-editor-props";
 import EventSchedulerEditorState from "../types/components/event-scheduler-editor-state";
+import format from "date-fns/format";
 
 export default class EventSchedulerEditor extends React.Component<EventSchedulerEditorProps, EventSchedulerEditorState> {
 
@@ -17,13 +18,17 @@ export default class EventSchedulerEditor extends React.Component<EventScheduler
         super(props);
 
         this.state = {
-            form_data: {},
+            form_data: null,
             error_message: null,
             is_saving: false,
         }
     }
 
     saveEvent() {
+
+        if (this.state.form_data === null) {
+            return;
+        }
 
         if (!this.state.form_data.hasOwnProperty('selected_start_date')) {
             this.setState({
@@ -51,7 +56,17 @@ export default class EventSchedulerEditor extends React.Component<EventScheduler
             route = 'admin/update-event/' + this.props.scheduler.edited.id;
         }
 
-        (new Ajax).setRoute(route).setParameters(this.state.form_data).doAjaxCall('post',
+        console.log('Form Data: ', this.state.form_data.selected_start_date);
+
+        const postData = {
+            selected_event_type: this.state.form_data.selected_event_type,
+            event_description: this.state.form_data.event_description,
+            selected_raid: this.state.form_data.selected_raid,
+            selected_start_date: format(this.state.form_data.selected_start_date, 'yyyy/MM/dd HH:mm:ss').toString(),
+            selected_end_date: this.state.form_data.selected_end_date !== null ? format(this.state.form_data.selected_end_date, 'yyyy/MM/dd HH:mm:ss').toString() : null,
+        };
+
+        (new Ajax).setRoute(route).setParameters(postData).doAjaxCall('post',
             (result: AxiosResponse) => {
                 this.props.scheduler.close();
             }, (error: AxiosError) => {
