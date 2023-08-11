@@ -48,8 +48,9 @@ class CharacterCacheData extends CharacterPvpCacheData {
             }
         } else {
             $cache = $this->characterSheetCache($character);
+            dump($cache);
         }
-
+        
         return $cache[$key];
     }
 
@@ -106,6 +107,10 @@ class CharacterCacheData extends CharacterPvpCacheData {
             'dodge'            => $skills->where('name', 'Dodge')->first()->skill_bonus,
             'criticality'      => $skills->where('name', 'Criticality')->first()->skill_bonus,
         ];
+
+        $characterSheet['elemental_atonement'] = $this->characterStatBuilder->buildElementalAtonement();
+
+        $characterSheet['weapon_attack'] = $this->characterStatBuilder->buildDamage('weapon');
 
         Cache::put('character-sheet-' . $characterId, $characterSheet);
 

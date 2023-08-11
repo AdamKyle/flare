@@ -16,6 +16,7 @@ import SmallerSpecialtyShop from "./components/small-actions/smaller-specialty-s
 import {removeCommas} from "../../lib/game/format-number";
 import GamblingSection from "./components/gambling-section";
 import Revive from "./components/fight-section/revive";
+import RaidSection from "./components/raid-section";
 
 export default class SmallerActions extends React.Component<SmallActionsProps, SmallActionsState> {
 
@@ -38,6 +39,8 @@ export default class SmallerActions extends React.Component<SmallActionsProps, S
     private celestialTimeout: any;
 
     private manageRankFights: any;
+
+    private raidMonsterUpdate: any;
 
     constructor(props: SmallActionsProps) {
         super(props);
@@ -90,6 +93,9 @@ export default class SmallerActions extends React.Component<SmallActionsProps, S
 
         // @ts-ignore
         this.manageRankFights = Echo.private('update-rank-fight-' + this.props.character.user_id);
+
+        // @ts-ignore
+        this.raidMonsterUpdate = Echo.private('update-raid-monsters-list-' + this.props.character.user_id);
 
         // @ts-ignore
         this.duelOptions = Echo.join('update-duel');
@@ -170,6 +176,12 @@ export default class SmallerActions extends React.Component<SmallActionsProps, S
         this.explorationTimeOut.listen('Game.Exploration.Events.ExplorationTimeOut', (event: any) => {
             this.setState({
                 automation_time_out: event.forLength,
+            });
+        });
+
+        this.raidMonsterUpdate.listen('Game.Maps.Events.UpdateRaidMonsters', (event: any) => {
+            this.setState({
+                raid_monsters: event.raidMonsters,
             });
         });
     }
@@ -260,6 +272,22 @@ export default class SmallerActions extends React.Component<SmallActionsProps, S
     }
 
     createMonster() {
+
+        if (this.state.raid_monsters.length > 0) {
+            return (
+                <RaidSection 
+                    raid_monsters={this.state.raid_monsters}
+                    character_id={this.props.character.id}
+                    can_attack={this.props.character.can_attack}
+                    is_dead={this.props.character.is_dead}
+                    is_small={false}
+                    character_name={this.props.character.name}
+                    user_id={this.props.character.user_id}
+                    character_current_health={this.props.character.health}
+                />
+            )
+        }
+
         return (
             <MonsterActions monsters={this.state.monsters}
                             character={this.props.character}

@@ -27,7 +27,8 @@ export default class TeleportComponent {
             return {
                 label: state.current_location.name + ' (X/Y): ' +
                     state.current_location.x + '/' +
-                    state.current_location.y,
+                    state.current_location.y +  
+                    (state.current_location.is_corrupted ? ' (Corrupted)' : ''),
                 value: state.current_location.id
             }
         }
@@ -268,7 +269,7 @@ export default class TeleportComponent {
 
         if (props.locations !== null) {
             return props.locations.map((location: LocationDetails) => {
-                return {label: location.name + ' (X/Y): ' + location.x + '/' + location.y, value: location.id}
+                return {label: location.name + ' (X/Y): ' + location.x + '/' + location.y + (location.is_corrupted ? ' (Corrupted)' : ''), value: location.id}
             });
         }
 

@@ -3,6 +3,7 @@
 namespace App\Game\Maps\Services;
 
 use App\Flare\Models\Raid;
+use App\Flare\Models\Event;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\Location;
 use App\Flare\Models\Character;
@@ -226,6 +227,18 @@ class LocationService {
 
             if (!is_null($location->required_quest_item_id)) {
                 $location->required_quest_item_name = $location->requiredQuestItem->name;
+            }
+
+            $location->is_corrupted = false;
+
+            $events = Event::whereNotNull('raid_id')->get();
+
+            foreach ($events as $event) {
+                if (in_array($location->id, $event->raid->corrupted_location_ids)) {
+                    $location->is_corrupted = true;
+
+                    break;
+                }
             }
 
             return $location;
