@@ -104,7 +104,9 @@ class RaidBossRewardHandler implements ShouldQueue
     }
 
     private function giveGearReward(Raid $raid) {
-        $raidParticipation = RaidBossParticipation::where('raid_id', $raid->id)->orderBy('damage_dealt', 'asc')->take(10);
+        $raidParticipation = RaidBossParticipation::where('raid_id', $raid->id)->orderBy('damage_dealt', 'asc')->take(10)->get();
+
+        dump($raidParticipation);
 
         foreach ($raidParticipation as $participator) {
 

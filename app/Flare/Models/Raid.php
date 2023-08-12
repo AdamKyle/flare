@@ -66,7 +66,7 @@ class Raid extends Model {
 
             $raidBossRecord = RaidBoss::where('raid_boss_id', $raidBoss['id'])->first();
 
-            if (!$raidBossRecord->boss_current_hp > 0) {
+            if ($raidBossRecord->boss_current_hp > 0) {
 
                 $raidBoss['name'] = $raidBoss['name'] . ' (RAID BOSS)';
 

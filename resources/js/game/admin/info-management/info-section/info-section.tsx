@@ -109,6 +109,18 @@ export default class InfoSection extends React.Component<any, any> {
             label: 'Craftable Items',
             value: 'info.items.craftable-items-table',
         },{
+            label: 'Hell Forged Items',
+            value: 'info.items.hell-forged',
+        },{
+            label: 'Purgatory Chains Items',
+            value: 'info.items.purgatory-chains',
+        },{
+            label: 'Pirate Lord Leather',
+            value: 'info.items.pirate-lord-leather',
+        },{
+            label: 'Ancestral Items',
+            value: 'info.items.ancestral-items',
+        },{
             label: 'Craftable Trinkets',
             value: 'info.items.craftable-trinkets',
         },{

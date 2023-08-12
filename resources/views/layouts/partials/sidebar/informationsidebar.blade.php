@@ -26,9 +26,14 @@
             <span class="title">Kingdoms</span>
         </a>
         <a href="#no-link" class="link" data-target="[data-menu=game-systems]" data-toggle="tooltip-menu"
-           data-tippy-content="Kingdom">
+           data-tippy-content="Game Systems">
             <span class="icon ra ra-tower"></span>
             <span class="title">Game Systems</span>
+        </a>
+        <a href="#no-link" class="link" data-target="[data-menu=gear-sets]" data-toggle="tooltip-menu"
+            data-tippy-content="Gear Sets">
+            <span class="icon ra ra-knight-helmet"></span>
+            <span class="title">Gear Sets</span>
         </a>
     </div>
 
@@ -305,6 +310,32 @@
             <a href="{{route('info.page', ['pageName' => 'quest-items'])}}">
                 <span class="ra ra-bat-sword"></span>
                 Quest Items
+            </a>
+        </div>
+    </div>
+
+    <!-- Gear Sets -->
+    <div class="menu-detail" data-menu="gear-sets">
+        <div class="menu-detail-wrapper">
+            <a href="{{route('info.page', ['pageName' => 'mythical-items'])}}">
+                <span class="ra ra-chain"></span>
+                Mythics
+            </a>
+            <a href="{{route('info.page', ['pageName' => 'hell-forged-set'])}}">
+                <span class="ra ra-axe"></span>
+                Hell Forged
+            </a>
+            <a href="{{route('info.page', ['pageName' => 'purgatory-chains-set'])}}">
+                <span class="ra ra-lightning-sword"></span>
+                Purgatory Chains
+            </a>
+            <a href="{{route('info.page', ['pageName' => 'pirate-lord-leather-set'])}}">
+                <span class="ra ra-dervish-swords"></span>
+                Pirate Lord Leather
+            </a>
+            <a href="{{route('info.page', ['pageName' => 'ancestral-items'])}}">
+                <span class="ra ra-crowned-heart"></span>
+                Ancestral Items
             </a>
         </div>
     </div>

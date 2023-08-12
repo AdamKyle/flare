@@ -251,140 +251,136 @@
             <div class="grid md:grid-cols-3 gap-3 w-full md:w-2/3 m-auto">
                 <x-core.cards.feature-card>
                     <x-slot:icon>
-                        <i class="fas fa-sign text-primary-600 relative top-[10px] right-[10px]"></i>
+                        <i class="ra ra-anvil text-primary-600 relative top-[10px] right-[10px]"></i>
                     </x-slot:icon>
                     <x-slot:title>
                         <a href="{{route('info.page', [
-                                    'pageName' => 'quests'
+                                    'pageName' => 'crafting'
                                 ])}}">Crafting</a>
                     </x-slot:title>
     
                     <p>
-                        Quests allow you to progress your character futrther and unlock features gated behind the quest system.
-                        You can also use quests to unlock the various planes!
+                        Players can craft items well beyond what they can purchase in the shop for even more power.
                     </p>
                 </x-core.cards.feature-card>
                 <x-core.cards.feature-card>
                     <x-slot:icon>
-                        <i class="ra ra-player-lift text-primary-600 relative top-[10px] right-[10px]"></i>
+                        <i class="ra ra-burning-embers text-primary-600 relative top-[10px] right-[10px]"></i>
                     </x-slot:icon>
                     <x-slot:title>
                         <a href="{{route('info.page', [
-                                    'pageName' => 'planes'
+                                    'pageName' => 'enchanting'
                                 ])}}">Enchanting</a>
                     </x-slot:title>
     
                     <p>
-                        Traverse from the Surface world to the various other planes and fight new and fearsome monsters! Advance your character 
-                        and the story with the various quests on each plane
+                        Enchant items to give your gear even more powers, boost your stats, deal damage and weaken your enemy
+                        all while trapping tehm in your web of magics!
                     </p>
                 </x-core.cards.feature-card>
                 <x-core.cards.feature-card>
                     <x-slot:icon>
-                        <i class="ra ra-death-skull text-primary-600 relative top-[10px] right-[10px]"></i>
+                        <i class="ra  ra-burning-book text-primary-600 relative top-[10px] right-[10px]"></i>
                     </x-slot:icon>
                     <x-slot:title>
                         <a href="{{route('info.page', [
-                                    'pageName' => 'raids'
+                                    'pageName' => 'random-enchants'
                                 ])}}">Uniques</a>
                     </x-slot:title>
     
                     <p>
-                        Specific events will corrupt locations on one plane causing a new list of super strong creatures and a special
-                        one for all players to try and take down together: Raid Bosses! Players gain epic loot and new Gear 
-                        peices you cant find anywhere!
+                        Earn Uniques through Factions, but also purchase them from the Queen of Hearts. These are more powerful then the best enchantment,
+                        and only get better the more gold spend!
                     </p>
                 </x-core.cards.feature-card>
                 <x-core.cards.feature-card>
                     <x-slot:icon>
-                        <i class="ra ra-death-skull text-primary-600 relative top-[10px] right-[10px]"></i>
+                        <i class="ra  ra-crystal-wand text-primary-600 relative top-[10px] right-[10px]"></i>
                     </x-slot:icon>
                     <x-slot:title>
                         <a href="{{route('info.page', [
-                                    'pageName' => 'raids'
+                                    'pageName' => 'mythical-items'
                                 ])}}">Mythics</a>
                     </x-slot:title>
     
                     <p>
-                        Specific events will corrupt locations on one plane causing a new list of super strong creatures and a special
-                        one for all players to try and take down together: Raid Bosses! Players gain epic loot and new Gear 
-                        peices you cant find anywhere!
+                       The most powerful of enchantments is the Mythic! Dwelve deep into the depths of purgatory dungeons or even participate in monthly PVP
+                       to have a chance to win one of these!
                     </p>
                 </x-core.cards.feature-card>
                 <x-core.cards.feature-card>
                     <x-slot:icon>
-                        <i class="fas fa-dungeon text-primary-600 relative top-[10px] right-[10px]"></i>
+                        <i class="ra ra-potion text-primary-600 relative top-[10px] right-[10px]"></i>
                     </x-slot:icon>
                     <x-slot:title>
                         <a href="{{route('info.page', [
-                                    'pageName' => 'races-and-classes'
+                                    'pageName' => 'alchemy'
                                 ])}}">Alchemy</a>
                     </x-slot:title>
     
                     <p>
-                        Visit tons of locations for quest items, fight harder monsters for specific quest items and drops!
+                        Craft usable items that you can drop on your enemies kingdoms or even use on  your self to make
+                        your self even stronger for a limited time!
                     </p>
                 </x-core.cards.feature-card>
                 <x-core.cards.feature-card>
                     <x-slot:icon>
-                        <i class="ra ra-batwings text-primary-600 relative top-[10px] right-[10px]"></i>
+                        <i class="ra ra-ball text-primary-600 relative top-[10px] right-[10px]"></i>
                     </x-slot:icon>
                     <x-slot:title>
                         <a href="{{route('info.page', [
-                                    'pageName' => 'monsters'
+                                    'pageName' => 'gems'
                                 ])}}">Gem Crafting/Sockets</a>
                     </x-slot:title>
     
                     <p>
-                        Fight monsters to find magical items, gain exp and currencies! Some locations have harder monsters, some planes
-                        while weakening you will buff the monster.
+                        Craft gems to then apply to gear you assign sockets to in order to increase your Elemental Atonement
+                        for Raids!
                     </p>
                 </x-core.cards.feature-card>
                 <x-core.cards.feature-card>
                     <x-slot:icon>
-                        <i class="ra ra-desert-skull text-primary-600 relative top-[10px] right-[10px]"></i>
+                        <i class="ra ra-fire-shield text-primary-600 relative top-[10px] right-[10px]"></i>
                     </x-slot:icon>
                     <x-slot:title>
                         <a href="{{route('info.page', [
-                                    'pageName' => 'celestials'
+                                    'pageName' => 'trinketry'
                                 ])}}">Trinketry</a>
                     </x-slot:title>
     
                     <p>
-                        Monsters stronger then the ones that roam the land! You can conjure them and they have a specific 
-                        times when they spawn more easily for players to hunt for valuable shards!
+                        The deeper you dwelve, the harder they hit. Protect your self child from ambushes and counters!
+                        help your self to counter and ambush the enemy! Crafting trinkets will help with this!
                     </p>
                 </x-core.cards.feature-card>
                 <x-core.cards.feature-card>
                     <x-slot:icon>
-                        <i class="ra ra-death-skull text-primary-600 relative top-[10px] right-[10px]"></i>
+                        <i class="ra ra-ankh text-primary-600 relative top-[10px] right-[10px]"></i>
                     </x-slot:icon>
                     <x-slot:title>
                         <a href="{{route('info.page', [
-                                    'pageName' => 'raids'
+                                    'pageName' => 'holy-items'
                                 ])}}">Holy Items</a>
                     </x-slot:title>
     
                     <p>
-                        Specific events will corrupt locations on one plane causing a new list of super strong creatures and a special
-                        one for all players to try and take down together: Raid Bosses! Players gain epic loot and new Gear 
-                        peices you cant find anywhere!
+                        Using the power of alchemy, you can create and then apply Holy Oils which help increase your damage,
+                        healing and other aspects of your character!
                     </p>
                 </x-core.cards.feature-card>
                 <x-core.cards.feature-card>
                     <x-slot:icon>
-                        <i class="ra ra-death-skull text-primary-600 relative top-[10px] right-[10px]"></i>
+                        <i class="ra ra-crowned-heart text-primary-600 relative top-[10px] right-[10px]"></i>
                     </x-slot:icon>
                     <x-slot:title>
                         <a href="{{route('info.page', [
-                                    'pageName' => 'raids'
+                                    'pageName' => 'ancestral-items'
                                 ])}}">Ancestral Items</a>
                     </x-slot:title>
     
                     <p>
-                        Specific events will corrupt locations on one plane causing a new list of super strong creatures and a special
-                        one for all players to try and take down together: Raid Bosses! Players gain epic loot and new Gear 
-                        peices you cant find anywhere!
+                        Particpta ein raids and kill the Raid Boss to earn your self the most powerful of legendary items! Ancestral items come with
+                        their own skill tree that con be leveled over time to give your character even more power!
                     </p>
                 </x-core.cards.feature-card>
             </div>

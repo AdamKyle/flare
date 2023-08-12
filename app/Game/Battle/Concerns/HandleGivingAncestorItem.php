@@ -5,6 +5,7 @@ use App\Flare\Models\Item;
 use App\Flare\Models\Character;
 use App\Flare\Models\ItemSkill;
 use App\Flare\Models\ItemSkillProgression;
+use App\Game\Messages\Events\ServerMessageEvent;
 
 trait HandleGivingAncestorItem {
 
@@ -17,10 +18,12 @@ trait HandleGivingAncestorItem {
 
         ItemSkillProgression::insert($progressionSkills);
 
-        $character->inventory->slots()->create([
+        $slot = $character->inventory->slots()->create([
             'item_id'      => $newItem->id,
             'inventory_id' => $character->inventory->id,
         ]);
+
+        event(new ServerMessageEvent($character->user, 'You recieved an Ancient Artifact: ' . $slot->item->name, $slot->id));
 
         return $character->refresh();
     }
