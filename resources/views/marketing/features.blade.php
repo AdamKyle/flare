@@ -385,6 +385,25 @@
                 </x-core.cards.feature-card>
             </div>
         </div>
+        <div class="my-4">
+            <div class="mt-10">
+                <img src="{{asset('promotion/guide-quest.png')}}" class="shadow rounded max-w-full h-auto align-middle border-none img-fluid lg:max-w-[60%] my-4 m-auto glightbox cursor-pointer"/>
+                <div class="text-sm text-center">
+                    Click to make larger.
+                </div>
+            </div>
+
+            <div class="text-center w-full lg:w-2/4 mx-auto mt-20">
+                <h2 class="mb-5 font-thin text-2xl lg:text-5xl dark:text-gray-300 text-gray-800">
+                    <i class="ra ra-wooden-sign"></i>
+                    And more features then you can count!
+                </h2>
+                <p class="mb-10 dark:text-gray-300 text-gray-800">
+                    Endless possiblilities, hours of fun, nothing but time, not even money can make you better, stronger or more prepared
+                    for the stronger challenges ahead.
+                </p>
+            </div>
+        </div>
     </div>
 @endsection
 
