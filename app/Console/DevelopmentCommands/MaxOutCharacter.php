@@ -132,6 +132,10 @@ class MaxOutCharacter extends Command
             if ($skill->baseSkill->type === SkillTypeValue::ALCHEMY) {
                 $skill->update(['level' => 200, 'is_hidden' => false, 'is_locked' => false]);
             }
+
+            if ($skill->baseSkill->type === SkillTypeValue::EFFECTS_CLASS) {
+                $skill->update(['level' => 400, 'is_hidden' => false, 'is_locked' => false]);
+            }
         }
 
         return $character->refresh();
