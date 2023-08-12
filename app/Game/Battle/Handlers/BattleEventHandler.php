@@ -67,6 +67,8 @@ class BattleEventHandler {
             return;
         }
 
+        $this->battleRewardProcessing->handleMonster($character, $monster);
+
         SecondaryBattleRewardHandler::dispatch($character);
     }
 

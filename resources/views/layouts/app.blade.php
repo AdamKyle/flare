@@ -120,7 +120,7 @@
         @if (auth()->user()->hasRole('Admin'))
             <main class="workspace mb-10 dark:bg-gray-900">
         @else
-            <main class="workspace dark:bg-gray-900">
+            <main class="workspace  dark:bg-gray-900">
         @endif
     @endauth
 

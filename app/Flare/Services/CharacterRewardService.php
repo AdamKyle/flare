@@ -3,28 +3,30 @@
 namespace App\Flare\Services;
 
 use Exception;
-use League\Fractal\Manager;
-use League\Fractal\Resource\Item;
-use App\Flare\Jobs\CharacterAttackTypesCacheBuilder;
-use App\Flare\Models\Character;
-use App\Flare\Models\GameMap;
-use App\Flare\Models\Inventory;
-use App\Flare\Models\InventorySlot;
-use App\Flare\Models\Location;
 use App\Flare\Models\Map;
+use League\Fractal\Manager;
+use App\Flare\Models\GameMap;
 use App\Flare\Models\Monster;
-use App\Flare\Models\Item as ItemModel;
-use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
-use App\Flare\Values\ItemEffectsValue;
+use App\Flare\Models\Location;
+use App\Flare\Models\Character;
+use App\Flare\Models\Inventory;
+use League\Fractal\Resource\Item;
 use App\Flare\Values\LocationType;
+use App\Flare\Models\InventorySlot;
+use App\Flare\Values\ItemEffectsValue;
+use App\Flare\Models\Item as ItemModel;
 use App\Flare\Values\MaxCurrenciesValue;
-use App\Game\Core\Events\UpdateBaseCharacterInformation;
-use App\Game\Core\Services\CharacterService;
 use App\Game\Core\Traits\MercenaryBonus;
-use App\Game\Messages\Events\ServerMessageEvent;
+use App\Flare\Models\CharacterAutomation;
 use App\Game\Skills\Services\SkillService;
+use App\Game\Core\Events\UpdateTopBarEvent;
+use App\Game\Core\Services\CharacterService;
 use Facades\App\Flare\Calculators\XPCalculator;
+use App\Game\Messages\Events\ServerMessageEvent;
+use App\Flare\Jobs\CharacterAttackTypesCacheBuilder;
+use App\Game\Core\Events\UpdateBaseCharacterInformation;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
+use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 
 class CharacterRewardService {
 
@@ -120,6 +122,13 @@ class CharacterRewardService {
         $this->distributeGold($monster);
 
         $this->distributeCopperCoins($monster);
+
+        $automation = CharacterAutomation::where('character_id', $this->character->id)->first();
+
+        if (!is_null($automation)) {
+            event(new UpdateTopBarEvent($this->character->refresh()));
+        }
+        
     }
 
     /**

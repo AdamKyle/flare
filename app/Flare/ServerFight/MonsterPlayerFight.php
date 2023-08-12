@@ -355,7 +355,7 @@ class MonsterPlayerFight {
     public function processAttack(array $data, bool $onlyOnce = false, $isRankFight = false): bool {
 
         $health         = $data['health'];
-        $monster        = $this->buildMonster->setServerMonster($data['monster']->getMonster())->setHealth($health['current_monster_health']);
+        $monster        = $this->buildMonster->setServerMonster(is_array($data['monster']) ? $data['monster'] : $data['monster']->getMonster())->setHealth($health['current_monster_health']);
         $isPlayerVoided = $data['player_voided'];
         $isEnemyVoided  = $data['enemy_voided'];
 
