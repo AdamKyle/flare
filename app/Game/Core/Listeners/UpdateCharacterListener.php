@@ -5,24 +5,8 @@ namespace App\Game\Core\Listeners;
 use App\Flare\Services\CharacterRewardService;
 use App\Game\Core\Events\CharacterLevelUpEvent;
 use App\Game\Core\Events\UpdateCharacterEvent;
-use App\Game\Core\Services\CharacterService;
 
 class UpdateCharacterListener {
-
-    /**
-     * @var CharacterService $characterService
-     */
-    private CharacterService $characterService;
-
-    /**
-     * Constructor
-     *
-     * @param CharacterService $characterService
-     * @return void
-     */
-    public function __construct(CharacterService $characterService) {
-        $this->characterService = $characterService;
-    }
 
     /**
      * Handle the event.

@@ -3,7 +3,7 @@
 </p>
 <p>It is suggested you do not equip weapons, but instead two shields with additional durability mods on them.</p>
 <p>Load yourself up with <a href="/information/enchanting">life stealing affixes</a> and <a href="/information/enchanting">durability affixes</a>,
-along with <a href="/information/enchanting">Class based affix</a> and <a href="/information/enchanting">Damage based affix</a></p>
+along with a <a href="/information/enchanting">Damage based affix</a></p>
 <p>
   There are two attack types you could do. One that involves purely attacking or one that involves purely casting. For vampires it is recommended you go with attacking.
   The reason for this, is because your life stealing affixes will not do enough damage to kill the enemy and, if the damage you do via attacking is strong enough

@@ -264,7 +264,7 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
                     <div className='md:col-start-1 md:col-span-1'>
                         {
                             !this.state.show_exploration && !this.state.show_duel_fight && !this.state.show_join_pvp && !this.state.show_celestial_fight && this.props.character !== null ?
-                                <div>
+                                <div className="max-w-[100px]">
                                     <DropDown menu_items={this.actionsManager.buildCraftingList(this.openCrafting.bind(this))}
                                               button_title={'Craft/Enchant'}
                                               disabled={this.actionsManager.cannotCraft()}
@@ -356,6 +356,7 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
                                                 character_id={this.props.character.id}
                                                 user_id={this.props.character.user_id}
                                                 cannot_craft={this.actionsManager.cannotCraft()}
+                                                is_small={false}
                                             />
                                         : null
                                     }

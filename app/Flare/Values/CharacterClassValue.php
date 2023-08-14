@@ -79,6 +79,10 @@ class CharacterClassValue {
         $this->value  = $value;
     }
 
+    public function getName(): string {
+        return self::$values[$this->value];
+    }
+
     /**
      * Are we a fighter?
      *

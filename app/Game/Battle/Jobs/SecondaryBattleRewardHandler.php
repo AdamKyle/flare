@@ -3,12 +3,13 @@
 namespace App\Game\Battle\Jobs;
 
 use Illuminate\Bus\Queueable;
+use App\Flare\Models\Character;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
+use App\Game\Core\Events\UpdateTopBarEvent;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use App\Flare\Models\Character;
-use App\Game\Core\Events\UpdateTopBarEvent;
+use App\Game\Battle\Jobs\CharacterUpdateJob;
 use App\Game\ClassRanks\Services\ClassRankService;
 use App\Game\Mercenaries\Services\MercenaryService;
 use Facades\App\Game\Skills\Handlers\UpdateItemSkill;
@@ -48,7 +49,13 @@ class SecondaryBattleRewardHandler implements ShouldQueue {
 
         $this->handleItemSkillUpdate($this->character);
 
-        event(new UpdateTopBarEvent($this->character->refresh()));
+        if (!$this->character->is_auto_battling) {
+            event (new UpdateTopBarEvent($this->character->refresh()));
+
+            return;   
+        }
+
+        CharacterUpdateJob::dispatch($this->character->refresh());
     }
 
     /**

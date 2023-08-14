@@ -28,13 +28,13 @@ class GuideQuestRequirementsService {
     }
 
     public function requiredSkillCheck(Character $character, GuideQuest $quest, bool $primary = true): GuideQuestRequirementsService {
-        if (!is_null($quest->required_skill)) {
-            $attribute = $primary ? 'required_skill' : 'required_secondary_skill_level';
-
+        $attribute = $primary ? 'required_skill' : 'required_secondary_skill';
+        
+        if (!is_null($quest->{$attribute})) {
             $requiredSkill = $character->skills()->where('game_skill_id', $quest->{$attribute})->first();
 
             if ($requiredSkill->level >= $quest->{$attribute}) {
-                $this->finishedRequirements[] = $attribute;
+                $this->finishedRequirements[] = $primary ? 'required_skill_level' : 'required_secondary_skill_level';
             }
         }
 
@@ -107,9 +107,9 @@ class GuideQuestRequirementsService {
     }
 
     public function requiredQuestItem(Character $character, GuideQuest $quest, bool $primary = true): GuideQuestRequirementsService {
-        if (!is_null($quest->required_quest_item_id)) {
-            $attribute = $primary ? 'required_quest_item_id' : 'secondary_quest_item_id';
+        $attribute = $primary ? 'required_quest_item_id' : 'secondary_quest_item_id';
 
+        if (!is_null($quest->{$attribute})) {
             $canHandIn = $character->inventory->slots->filter(function($slot) use($quest, $attribute) {
                 return $slot->item->type === 'quest' && $slot->item->id === $quest->{$attribute};
             })->isNotEmpty();

@@ -2,24 +2,18 @@
 
 namespace App\Game\Battle\Services;
 
-use App\Flare\Models\Event;
-use App\Flare\Models\Location;
-use App\Flare\Values\EventType;
-use App\Flare\Values\ItemEffectsValue;
-use App\Flare\Values\LocationType;
-use App\Flare\Values\MaxCurrenciesValue;
-use App\Game\Core\Events\UpdateTopBarEvent;
-use App\Flare\Models\Character;
-use App\Flare\Models\GameMap;
+use Exception;
 use App\Flare\Models\Map;
+use App\Flare\Models\GameMap;
 use App\Flare\Models\Monster;
-use App\Flare\Services\CharacterRewardService;
-use App\Game\Battle\Handlers\FactionHandler;
-use App\Game\Battle\Jobs\BattleItemHandler;
-use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
+use App\Flare\Models\Character;
+use Illuminate\Support\Facades\Log;
 use App\Game\Core\Services\GoldRush;
 use App\Game\Core\Traits\MercenaryBonus;
-use Exception;
+use App\Game\Battle\Jobs\BattleItemHandler;
+use App\Game\Battle\Handlers\FactionHandler;
+use App\Game\Battle\Jobs\CharacterUpdateJob;
+use App\Flare\Services\CharacterRewardService;
 
 class BattleRewardProcessing {
 
@@ -43,119 +37,34 @@ class BattleRewardProcessing {
 
         if (!$gameMap->mapType()->isPurgatory()) {
             $this->factionHandler->handleFaction($character, $monster);
+
+            $character = $character->refresh();
         }
 
-        $this->characterRewardService->setCharacter($character->refresh())->distributeGoldAndXp($monster);
+        $characterRewardService = $this->characterRewardService->setCharacter($character)
+                                       ->distributeCharacterXP($monster)
+                                       ->distributeSkillXP($monster)
+                                       ->giveCurrencies($monster);
+
+        try {
+            $characterRewardService = $characterRewardService->giveShards();
+        } catch (Exception $e) {
+            Log::error('[ERROR - Battle Reward Processsing]: Attmpting to give shards: ' . $e->getMessage());
+        }
+
+        $characterRewardService->currencyEventReward($monster);
 
         $character = $this->characterRewardService->getCharacter();
 
-        BattleItemHandler::dispatch($character, $monster);
-
         $this->goldRushService->processPotentialGoldRush($character, $monster);
 
-        $character = $this->giveShards($character);
+        if ($character->is_auto_battling) {
+            $character = $character->refresh();
 
-        $character = $this->currencyEventReward($character, $monster);
-
-        event(new UpdateCharacterCurrenciesEvent($character->refresh()));
-    }
-
-    protected function currencyEventReward(Character $character, Monster $monster): Character {
-        $event = Event::where('type', EventType::WEEKLY_CURRENCY_DROPS)->first();
-
-        if (!is_null($event) && !$monster->is_celestial_entity) {
-
-            $canHaveCopperCoins = $character->inventory->slots->filter(function($slot) {
-                return $slot->item->effect === ItemEffectsValue::GET_COPPER_COINS;
-            })->isNotEmpty();
-
-            $shards = rand(1,50);
-            $shards = $shards + $shards * $this->getShardBonus($character);
-
-            $goldDust = rand(1,50);
-            $goldDust = $goldDust + $goldDust * $this->getGoldDustBonus($character);
-
-            $characterShards      = $character->shards + $shards;
-            $characterGoldDust    = $character->gold_dust + $goldDust;
-
-            if ($canHaveCopperCoins) {
-                $copperCoins = rand(1,50);
-                $copperCoins = $copperCoins + $copperCoins * $this->getCopperCoinBonus($character);
-
-                $characterCopperCoins = $character->copper_coins + $copperCoins;
-            } else {
-                $characterCopperCoins = $character->copper_coins;
-            }
-
-            if ($characterShards > MaxCurrenciesValue::MAX_SHARDS) {
-                $characterShards = MaxCurrenciesValue::MAX_SHARDS;
-            }
-
-            if ($characterCopperCoins > MaxCurrenciesValue::MAX_COPPER) {
-                $characterCopperCoins = MaxCurrenciesValue::MAX_COPPER;
-            }
-
-            if ($characterGoldDust > MaxCurrenciesValue::MAX_GOLD_DUST) {
-                $characterGoldDust = MaxCurrenciesValue::MAX_GOLD_DUST;
-            }
-
-            $character->update([
-                'shards'       => $characterShards,
-                'copper_coins' => $characterCopperCoins,
-                'gold_dust'    => $characterGoldDust
-            ]);
+            CharacterUpdateJob::dispatch($character);
         }
 
-        return $character->refresh();
-    }
-
-    /**
-     * Give character shards.
-     *
-     * - Only if they are at a special location and in gold mines.
-     *
-     * @param Character $character
-     * @return Character
-     * @throws Exception
-     */
-    protected function giveShards(Character $character): Character {
-        $specialLocation = $this->findLocationWithEffect($character->map);
-
-        if (!is_null($specialLocation)) {
-            if (!is_null($specialLocation->type)) {
-                $locationType = new LocationType($specialLocation->type);
-
-                if ($locationType->isGoldMines()) {
-                    $shards = rand(1,25);
-
-                    $shards = $shards + $shards * $this->getShardBonus($character);
-
-                    $newShards = $character->shards + $shards;
-
-                    if ($newShards > MaxCurrenciesValue::MAX_SHARDS) {
-                        $newShards = MaxCurrenciesValue::MAX_SHARDS;
-                    }
-
-                    $character->update(['shards' => $newShards]);
-                }
-            }
-        }
-
-        return $character->refresh();
-    }
-
-    /**
-     * Are we at a location with an effect (special location)?
-     *
-     * @param Map $map
-     * @return void
-     */
-    protected function findLocationWithEffect(Map $map) {
-        return Location::whereNotNull('enemy_strength_type')
-                       ->where('x', $map->character_position_x)
-                       ->where('y', $map->character_position_y)
-                       ->where('game_map_id', $map->game_map_id)
-                       ->first();
+        BattleItemHandler::dispatch($character, $monster);
     }
 
 }

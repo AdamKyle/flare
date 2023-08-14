@@ -17,4 +17,6 @@ export default interface GamblingSectionState {
     error_message: string;
 
     timeoutFor: number;
+
+    cost: number;
 }

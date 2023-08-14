@@ -18,7 +18,7 @@ class CharacterXPService {
      *
      * - Calculate based on two things:
      *   - All quest items that ignore the caps
-     *   - All quest items that do not.
+     *   - All quest items that do no ignore caps
      *   - Add both together to get the XP.
      *
      * @param Character $character

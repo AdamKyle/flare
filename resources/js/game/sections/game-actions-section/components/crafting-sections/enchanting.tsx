@@ -274,7 +274,7 @@ export default class Enchanting extends React.Component<EnchantingProps, Enchant
                         <DangerLinkButton button_label={'Clear'} on_click={this.resetSuffixes.bind(this)} />
                     </div>
                 </div>
-                <div className='m-auto w-1/2 relative left-[-30px] lg:left-[-60px]'>
+                <div className='m-auto lg:w-1/2 relative left-[-30px] lg:left-[-60px]'>
                     {
                         this.state.loading ?
                             <LoadingProgressBar />
@@ -283,13 +283,15 @@ export default class Enchanting extends React.Component<EnchantingProps, Enchant
 
                     {
                         this.state.enchantments.length > 0 ?
-                            <CraftingXp skill_xp={this.state.skill_xp} />
+                            <div className="ml-[25px] lg:ml-0 mb-2 lg:mb-0">
+                                <CraftingXp skill_xp={this.state.skill_xp} />
+                            </div>
                         : null
                     }
                 </div>
                 <div className={'text-center md:ml-[-100px] mt-3 mb-3'}>
                     <PrimaryButton button_label={'Enchant'} on_click={this.enchant.bind(this)} disabled={this.cannotCraft()} />
-                    <DangerButton button_label={'Remove'}
+                    <DangerButton button_label={'Close'}
                                   on_click={this.clearCrafting.bind(this)}
                                   additional_css={'ml-2'}
                                   disabled={this.state.loading || this.props.cannot_craft} />

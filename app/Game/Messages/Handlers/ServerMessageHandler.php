@@ -31,7 +31,7 @@ class ServerMessageHandler {
      */
     public function handleMessage(User $user, string $type, string|int $forMessage = null, int $id = null): void {
         $message =  $this->serverMessageBuilder->buildWithAdditionalInformation($type, $forMessage);
-        dump($message);
+
         broadcast(new ServerMessageEvent($user, $message, $id));
     }
 

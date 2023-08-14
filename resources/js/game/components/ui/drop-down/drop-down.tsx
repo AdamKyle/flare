@@ -76,7 +76,7 @@ export default class DropDown extends React.Component<DropDownProps, any> {
 
     render() {
         return (
-            <div className="my-4 lg:text-left">
+            <div className="my-4 lg:text-left grid">
                 <Menu as="div" className="relative inline-block text-left">
                     <div className='my-4'>
                         <Menu.Button className={clsx(
@@ -110,7 +110,7 @@ export default class DropDown extends React.Component<DropDownProps, any> {
                 </Menu>
                 {
                     this.props.show_close_button && typeof this.props.close_button_action !== 'undefined' ?
-                        <DangerButton button_label={'Close Crafting'} on_click={this.props.close_button_action} additional_css={'ml-4 pb-[14px] pt-[8px]'} />
+                        <DangerButton button_label={'Close Crafting'} on_click={this.props.close_button_action} additional_css={'lg:ml-4 pb-[14px] pt-[8px]'} />
                     : null
                 }
             </div>

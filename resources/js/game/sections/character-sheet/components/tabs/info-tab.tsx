@@ -90,21 +90,21 @@ export default class InfoTab extends React.Component<InfoTabProps, InfoTabState>
                     </div>
                 </div>
                 <div className='border-b-2 block border-b-gray-300 dark:border-b-gray-600 my-3'></div>
-                <div className='flex flex-wrap justify-center gap-2'>
-                    <div className='mt-4'>
-                        <OrangeButton button_label={'Additional Information'} on_click={this.manageInfoDialogue.bind(this)} />
+                <div className='flex flex-wrap justify-center gap-2 lg:flex-nowrap'>
+                    <div className='mt-4 w-full lg:w-auto'>
+                        <OrangeButton button_label={'Additional Information'} on_click={this.manageInfoDialogue.bind(this)} additional_css="w-full lg:w-auto"/>
                     </div>
-                    <div className='mt-4'>
-                        <OrangeButton button_label={'Resistances'} on_click={this.manageResistancesDialogue.bind(this)}/>
+                    <div className='mt-4 w-full lg:w-auto'>
+                        <OrangeButton button_label={'Resistances'} on_click={this.manageResistancesDialogue.bind(this)} additional_css="w-full lg:w-auto"/>
                     </div>
-                    <div className='mt-4'>
-                        <OrangeButton button_label={'Reincarnation'} on_click={this.manageReincarnation.bind(this)}/>
+                    <div className='mt-4 w-full lg:w-auto'>
+                        <OrangeButton button_label={'Reincarnation'} on_click={this.manageReincarnation.bind(this)} additional_css="w-full lg:w-auto"/>
                     </div>
-                    <div className='mt-4'>
-                        <OrangeButton button_label={'Class Ranks'} on_click={this.manageClassRanks.bind(this)}/>
+                    <div className='mt-4 w-full lg:w-auto'>
+                        <OrangeButton button_label={'Class Ranks'} on_click={this.manageClassRanks.bind(this)} additional_css="w-full lg:w-auto"/>
                     </div>
-                    <div className='mt-4'>
-                        <OrangeButton button_label={'Elemental Atonement'} on_click={this.manageElementalAtonement.bind(this)}/>
+                    <div className='mt-4 w-full lg:w-auto'>
+                        <OrangeButton button_label={'Elemental Atonement'} on_click={this.manageElementalAtonement.bind(this)} additional_css="w-full lg:w-auto"/>
                     </div>
                 </div>
                 <div className='relative top-[24px]'>

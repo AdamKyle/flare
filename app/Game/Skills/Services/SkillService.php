@@ -134,15 +134,15 @@ class SkillService {
      * @return int
      * @throws Exception
      */
-    public function assignXPToTrainingSkill(Character $character, int $xp): int {
-        $skillInTraining = $character->skills()->where('currently_training', true)->first();
+    public function assignXPToTrainingSkill(Character $character, int $xp): void {
+        $skillInTraining = $character->skills->where('currently_training', true)->first();
 
         if (is_null($skillInTraining)) {
-            return $xp;
+            return;
         }
 
         if ($skillInTraining->level === $skillInTraining->baseSkill->max_level) {
-            return $xp;
+            return;
         }
 
         $skillXp     = $xp + ($xp * $skillInTraining->xp_towards);
@@ -153,9 +153,26 @@ class SkillService {
             'xp' => $skillInTraining->xp + $skillXp
         ]);
 
-        $skillInTraining = $skillInTraining->refresh();
+        $this->levelUpSkill($skillInTraining->refresh());
+    }
 
-        $this->levelUpSkill($skillInTraining);
+    /**
+     * Get the XP after being reduced from any skill in training.
+     *
+     * @param Character $character
+     * @param integer $xp
+     * @return integer
+     */
+    public function getXpWithSkillTrainingReduction(Character $character, int $xp): int {
+        $skillInTraining = $character->skills->where('currently_training', true)->first();
+
+        if (is_null($skillInTraining)) {
+            return $xp;
+        }
+
+        if ($skillInTraining->level === $skillInTraining->baseSkill->max_level) {
+            return $xp;
+        }
 
         return intVal($xp - ($xp * $skillInTraining->xp_towards));
     }

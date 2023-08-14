@@ -111,6 +111,10 @@ class Character extends Model {
         'base_damage_stat_mod'        => 'float',
     ];
 
+    protected $appends = [
+        'is_auto_battling',
+    ];
+
     public function race() {
         return $this->belongsTo(GameRace::class, 'game_race_id', 'id');
     }
@@ -205,6 +209,10 @@ class Character extends Model {
 
     public function classSpecialsEquipped() {
         return $this->hasMany(CharacterClassSpecialtiesEquipped::class);
+    }
+
+    public function getIsAutoBattlingAttribute() {
+        return !is_null(CharacterAutomation::where('character_id', $this->id)->first());
     }
 
     /**

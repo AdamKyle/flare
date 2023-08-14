@@ -231,7 +231,7 @@ export default class ExplorationSection extends React.Component<any, any> {
                             }
 
                             <div className='text-center'>
-                                <DangerButton button_label={'Stop Exploration'} on_click={this.stopExploration.bind(this)} disabled={this.state.loading} additional_css={'mr-2'}/>
+                                <DangerButton button_label={'Stop Exploration'} on_click={this.stopExploration.bind(this)} disabled={this.state.loading} additional_css={'mr-2 mb-4'}/>
                                 <PrimaryButton button_label={'Close Exploration'} on_click={this.props.manage_exploration} disabled={this.state.loading} />
                             </div>
                         </Fragment>
@@ -287,7 +287,7 @@ export default class ExplorationSection extends React.Component<any, any> {
                             </div>
 
                             <div className={'lg:text-center lg:ml-[-100px] mt-3 mb-3'}>
-                                <PrimaryButton button_label={'Explore'} on_click={this.startExploration.bind(this)} disabled={this.state.monster_selected === null || this.state.time_selected === null || this.state.attack_type === null || this.state.loading || this.props.character.is_dead || !this.props.character.can_attack} additional_css={'mr-2'}/>
+                                <PrimaryButton button_label={'Explore'} on_click={this.startExploration.bind(this)} disabled={this.state.monster_selected === null || this.state.time_selected === null || this.state.attack_type === null || this.state.loading || this.props.character.is_dead || !this.props.character.can_attack} additional_css={'mr-2 mb-4'}/>
                                 <DangerButton button_label={'Close'} on_click={this.props.manage_exploration} disabled={this.state.loading} />
 
                                 {

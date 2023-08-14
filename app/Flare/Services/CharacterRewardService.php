@@ -4,12 +4,14 @@ namespace App\Flare\Services;
 
 use Exception;
 use App\Flare\Models\Map;
+use App\Flare\Models\Event;
 use League\Fractal\Manager;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Monster;
 use App\Flare\Models\Location;
 use App\Flare\Models\Character;
 use App\Flare\Models\Inventory;
+use App\Flare\Values\EventType;
 use League\Fractal\Resource\Item;
 use App\Flare\Values\LocationType;
 use App\Flare\Models\InventorySlot;
@@ -17,7 +19,6 @@ use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Models\Item as ItemModel;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Core\Traits\MercenaryBonus;
-use App\Flare\Models\CharacterAutomation;
 use App\Game\Skills\Services\SkillService;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Services\CharacterService;
@@ -25,6 +26,7 @@ use Facades\App\Flare\Calculators\XPCalculator;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Flare\Jobs\CharacterAttackTypesCacheBuilder;
 use App\Game\Core\Events\UpdateBaseCharacterInformation;
+use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 
@@ -97,13 +99,12 @@ class CharacterRewardService {
     }
 
     /**
-     * Distribute the gold and xp to the character.
+     * Distribute the XP to the character based on the monster.
      *
      * @param Monster $monster
-     * @return void
-     * @throws Exception
+     * @return CharacterRewardService
      */
-    public function distributeGoldAndXp(Monster $monster): void {
+    public function distributeCharacterXP(Monster $monster): CharacterRewardService {
         $this->distributeXP($monster);
 
         if ($this->character->xp >= $this->character->xp_next) {
@@ -116,20 +117,159 @@ class CharacterRewardService {
             if ($leftOverXP <= 0) {
                 $this->handleCharacterLevelUp(0);
             }
-
         }
 
+        if (!$this->character->is_auto_battling) {
+            event(new UpdateTopBarEvent($this->character->refresh()));
+        }
+
+        return $this;
+    }
+
+    /**
+     * Distribute Skill Xp
+     *
+     * @param Monster $monster
+     * @return CharacterRewardService
+     */
+    public function distributeSkillXP(Monster $monster): CharacterRewardService {
+        $this->skillService->assignXPToTrainingSkill($this->character, $monster->xp);
+
+        return $this;
+    }
+
+    /**
+     * Give currencies.
+     *
+     * @param Monster $monster
+     * @return CharacterRewardService
+     */
+    public function giveCurrencies(Monster $monster): CharacterRewardService {
         $this->distributeGold($monster);
 
         $this->distributeCopperCoins($monster);
 
-        $automation = CharacterAutomation::where('character_id', $this->character->id)->first();
-
-        if (!is_null($automation)) {
-            event(new UpdateTopBarEvent($this->character->refresh()));
+        if (!$this->character->is_auto_battling) {
+            event(new UpdateCharacterCurrenciesEvent($this->character->refresh()));
         }
-        
+
+        return $this;
     }
+
+    /**
+     * Give character shards.
+     *
+     * - Only if they are at a special location and in gold mines.
+     *
+     * @param Character $character
+     * @return CharacterRewardService
+     * @throws Exception
+     */
+    public function giveShards(): CharacterRewardService {
+        $specialLocation = $this->findLocationWithEffect($this->character->map);
+
+        if (!is_null($specialLocation)) {
+            if (!is_null($specialLocation->type)) {
+                $locationType = new LocationType($specialLocation->type);
+
+                if ($locationType->isGoldMines()) {
+                    $shards = rand(1,25);
+
+                    $shards = $shards + $shards * $this->getShardBonus($this->character);
+
+                    $newShards = $this->character->shards + $shards;
+
+                    if ($newShards > MaxCurrenciesValue::MAX_SHARDS) {
+                        $newShards = MaxCurrenciesValue::MAX_SHARDS;
+                    }
+
+                    $this->character->update(['shards' => $newShards]);
+                }
+            }
+
+            if (!$this->character->is_auto_battling) {
+                event(new UpdateCharacterCurrenciesEvent($this->character->refresh()));
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Handles Currency Event Rewards when the event is running.
+     *
+     * @param Monster $monster
+     * @return CharacterRewardService
+     */
+    public function currencyEventReward(Monster $monster): CharacterRewardService {
+        $event = Event::where('type', EventType::WEEKLY_CURRENCY_DROPS)->first();
+
+        if (!is_null($event) && !$monster->is_celestial_entity) {
+
+            $canHaveCopperCoins = $this->character->inventory->slots->filter(function($slot) {
+                return $slot->item->effect === ItemEffectsValue::GET_COPPER_COINS;
+            })->isNotEmpty();
+
+            $shards = rand(1,50);
+            $shards = $shards + $shards * $this->getShardBonus($this->character);
+
+            $goldDust = rand(1,50);
+            $goldDust = $goldDust + $goldDust * $this->getGoldDustBonus($this->character);
+
+            $characterShards      = $this->character->shards + $shards;
+            $characterGoldDust    = $this->character->gold_dust + $goldDust;
+
+            if ($canHaveCopperCoins) {
+                $copperCoins = rand(1,50);
+                $copperCoins = $copperCoins + $copperCoins * $this->getCopperCoinBonus($this->character);
+
+                $characterCopperCoins = $this->character->copper_coins + $copperCoins;
+            } else {
+                $characterCopperCoins = $this->character->copper_coins;
+            }
+
+            if ($characterShards > MaxCurrenciesValue::MAX_SHARDS) {
+                $characterShards = MaxCurrenciesValue::MAX_SHARDS;
+            }
+
+            if ($characterCopperCoins > MaxCurrenciesValue::MAX_COPPER) {
+                $characterCopperCoins = MaxCurrenciesValue::MAX_COPPER;
+            }
+
+            if ($characterGoldDust > MaxCurrenciesValue::MAX_GOLD_DUST) {
+                $characterGoldDust = MaxCurrenciesValue::MAX_GOLD_DUST;
+            }
+
+            $this->character->update([
+                'shards'       => $characterShards,
+                'copper_coins' => $characterCopperCoins,
+                'gold_dust'    => $characterGoldDust
+            ]);
+
+            $this->character = $this->character->refresh();
+
+            if (!$this->character->is_auto_battling) {
+                event(new UpdateCharacterCurrenciesEvent($this->character->refresh()));
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Are we at a location with an effect (special location)?
+     *
+     * @param Map $map
+     * @return Location|null
+     */
+    protected function findLocationWithEffect(Map $map): ?Location {
+        return Location::whereNotNull('enemy_strength_type')
+                       ->where('x', $map->character_position_x)
+                       ->where('y', $map->character_position_y)
+                       ->where('game_map_id', $map->game_map_id)
+                       ->first();
+    }
+
 
     /**
      * Handle instances where we could have multiple level ups.
@@ -172,56 +312,6 @@ class CharacterRewardService {
     }
 
     /**
-     * Assigns XP to the character.
-     *
-     * @param Monster $monster
-     * @return void
-     * @throws Exception
-     */
-    protected function distributeXP(Monster $monster) {
-        $xpReduction  = 0.0;
-
-        // Reduce The XP from the monster if needed.
-        $xp = XPCalculator::fetchXPFromMonster($monster, $this->character->level, $xpReduction);
-
-        // Assign Xp to the skill and return the amount left based on training amount.
-        $xp = $this->skillService->assignXPToTrainingSkill($this->character, $xp);
-
-        if ($xp === 0) {
-            return;
-        }
-
-        // Reduce XP from the skill
-        $xp = $this->characterXpService->determineXPToAward($this->character, $xp);
-
-        $guideEnabled              = $this->character->user->guide_enabled;
-        $hasNoCompletedGuideQuests = $this->character->questsCompleted()
-                                                     ->whereNotNull('guide_quest_id')
-                                                     ->get()
-                                                     ->isEmpty();
-
-        if ($guideEnabled && $hasNoCompletedGuideQuests && $this->character->level < 2) {
-            $xp += 10;
-
-            event(new ServerMessageEvent($this->character->user, 'Rewarded an extra 10XP while doing the first guide quest. This bonus will end after you reach level 2.'));
-        }
-
-        if (!$this->characterXpService->canCharacterGainXP($this->character)) {
-            return;
-        }
-
-        $characterXp = (int) $this->character->xp;
-
-        $xp = $characterXp + $xp;
-
-        $this->character->update([
-            'xp' => $xp
-        ]);
-
-        $this->character = $this->character->refresh();
-    }
-
-    /**
      * Handle character level up.
      *
      * @param int $leftOverXP
@@ -237,6 +327,42 @@ class CharacterRewardService {
         }
 
         ServerMessageHandler::handleMessage($character->user, 'level_up', $character->level);
+    }
+
+    /**
+     * Assigns XP to the character.
+     *
+     * @param Monster $monster
+     * @return void
+     * @throws Exception
+     */
+    protected function distributeXP(Monster $monster) {
+
+        if (!$this->characterXpService->canCharacterGainXP($this->character)) {
+            return;
+        }
+        
+        // Reduce The XP from the monster if needed.
+        $xp = XPCalculator::fetchXPFromMonster($monster, $this->character->level);
+
+        // Get XP based on the skill in trainings training sacraficial amount, ie, give me back 85% of this xp.
+        $xp = $this->skillService->getXpWithSkillTrainingReduction($this->character, $xp);
+
+        if ($xp === 0) {
+            return;
+        }
+
+        $xp = $this->getXpWithBonuses($xp);
+
+        $characterXp = (int) $this->character->xp;
+
+        $xp = $characterXp + $xp;
+
+        $this->character->update([
+            'xp' => $xp
+        ]);
+
+        $this->character = $this->character->refresh();
     }
 
     /**
@@ -326,5 +452,32 @@ class CharacterRewardService {
                        ->where('game_map_id', $map->game_map_id)
                        ->where('type', LocationType::PURGATORY_DUNGEONS)
                        ->first();
+    }
+
+    /**
+     * Fetch XP with additional bonuses.
+     *
+     * - Applies Guide Quest XP (+10 while under level 2)
+     * - Applies Addional bonuses from items and quest items.
+     * 
+     * @param int $xp
+     * @return integer
+     */
+    private function getXpWithBonuses(int $xp): int {
+        $xp = $this->characterXpService->determineXPToAward($this->character, $xp);
+
+        $guideEnabled              = $this->character->user->guide_enabled;
+        $hasNoCompletedGuideQuests = $this->character->questsCompleted()
+                                                     ->whereNotNull('guide_quest_id')
+                                                     ->get()
+                                                     ->isEmpty();
+
+        if ($guideEnabled && $hasNoCompletedGuideQuests && $this->character->level < 2) {
+            $xp += 10;
+
+            event(new ServerMessageEvent($this->character->user, 'Rewarded an extra 10XP while doing the first guide quest. This bonus will end after you reach level 2.'));
+        }
+
+        return $xp;
     }
 }

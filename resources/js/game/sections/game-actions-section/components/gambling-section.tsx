@@ -9,6 +9,8 @@ import DangerButton from "../../../components/ui/buttons/danger-button";
 import GamblingSectionState from "../../../lib/game/types/actions/gambling/slots/types/gambling-section-state";
 import GamblingSectionProps from "../../../lib/game/types/actions/gambling/slots/types/gambling-section-props";
 import clsx from "clsx";
+import DangerAlert from "../../../components/ui/alerts/simple-alerts/danger-alert";
+import SuccessAlert from "../../../components/ui/alerts/simple-alerts/success-alert";
 
 export default class GamblingSection extends React.Component<GamblingSectionProps, GamblingSectionState> {
 
@@ -26,6 +28,7 @@ export default class GamblingSection extends React.Component<GamblingSectionProp
             roll_message: '',
             error_message: '',
             timeoutFor: 0,
+            cost: 1000000,
         };
 
         // @ts-ignore
@@ -51,9 +54,21 @@ export default class GamblingSection extends React.Component<GamblingSectionProp
     }
 
     spin() {
+
+        const gold: number = parseFloat(this.props.character.gold.replace(/,/g, ""));
+
+        if (gold < this.state.cost) {
+            this.setState({
+                error_message: 'You do not have the required gold to take a spin child.'
+            });
+
+            return;
+        }
+
         this.setState({
             spinning: true,
             roll_message: '',
+            error_message: '',
         }, () => {
             this.spinning();
 
@@ -112,6 +127,8 @@ export default class GamblingSection extends React.Component<GamblingSectionProp
 
     render() {
 
+        console.log(this.state.error_message);
+
         if (this.state.loading) {
             return <LoadingProgressBar />
         }
@@ -148,22 +165,18 @@ export default class GamblingSection extends React.Component<GamblingSectionProp
                 </div>
                 {
                     this.state.roll_message !== '' ?
-                        <div className='text-center text-green-500 dark:text-green-400 font-bold my-2'>
-                            <p>
-                                {this.state.roll_message}
-                            </p>
-                        </div>
+                        <SuccessAlert additional_css="mb-4">
+                            {this.state.roll_message}
+                        </SuccessAlert>
                     : null
                 }
 
                 {
                     this.state.error_message !== '' ?
-                        <div className='text-center text-red-500 dark:text-red-400 font-bold my-2'>
-                            <p>
-                                {this.state.roll_message}
-                            </p>
-                        </div>
-                        : null
+                        <DangerAlert additional_css="mb-4">
+                            {this.state.error_message}
+                        </DangerAlert>
+                    : null
                 }
                 <div className='text-center'>
                     <div className='flex justify-center mb-2'>

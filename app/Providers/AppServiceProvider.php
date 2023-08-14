@@ -13,6 +13,7 @@ use App\Console\DevelopmentCommands\ReincarnateCharacter;
 use App\Console\DevelopmentCommands\IncreaseRankFightToMax;
 use App\Console\DevelopmentCommands\AssignTopEndGearToPlayer;
 use App\Console\DevelopmentCommands\UpdateUsersForDevelopment;
+use App\Console\DevelopmentCommands\TestExploration;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -34,6 +35,7 @@ class AppServiceProvider extends ServiceProvider
             IncreaseRankFightToMax::class,
             GivePlayerAncenstorItem::class,
             GivePlayerMythicItem::class,
+            TestExploration::class,
         ]);
     }
 

@@ -139,7 +139,7 @@ export default class Trinketry extends React.Component<any, any> {
                 </div>
                 <div className={'text-center md:ml-[-100px] mt-3 mb-3'}>
                     <PrimaryButton button_label={'Craft'} on_click={this.craft.bind(this)} disabled={this.state.loading || this.state.selected_item === null || this.props.cannot_craft} />
-                    <DangerButton button_label={'Remove'}
+                    <DangerButton button_label={'Close'}
                                   on_click={this.clearCrafting.bind(this)}
                                   additional_css={'ml-2'}
                                   disabled={this.state.loading || this.props.cannot_craft} />
