@@ -33,8 +33,10 @@ class GuideQuestRequirementsService {
         if (!is_null($quest->{$attribute})) {
             $requiredSkill = $character->skills()->where('game_skill_id', $quest->{$attribute})->first();
 
+            $attribute = $primary ? 'required_skill_level' : 'required_secondary_skill_level';
+
             if ($requiredSkill->level >= $quest->{$attribute}) {
-                $this->finishedRequirements[] = $primary ? 'required_skill_level' : 'required_secondary_skill_level';
+                $this->finishedRequirements[] = $attribute;
             }
         }
 

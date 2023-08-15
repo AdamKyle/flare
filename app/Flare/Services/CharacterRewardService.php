@@ -119,7 +119,7 @@ class CharacterRewardService {
             }
         }
 
-        if (!$this->character->is_auto_battling) {
+        if (!$this->character->isLoggedIn()) {
             event(new UpdateTopBarEvent($this->character->refresh()));
         }
 

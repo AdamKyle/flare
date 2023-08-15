@@ -12,24 +12,30 @@ use App\Game\Battle\Events\AttackTimeOutEvent;
 use App\Flare\Models\CharacterInCelestialFight;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Battle\Events\UpdateCharacterStatus;
-use App\Game\Battle\Services\BattleRewardProcessing;
 use App\Flare\Builders\Character\Traits\FetchEquipped;
-use App\Game\Battle\Jobs\SecondaryBattleRewardHandler;
+use App\Game\BattleRewardProcessing\Services\BattleRewardService;
+use App\Game\BattleRewardProcessing\Services\SecondaryRewardService;
 
 class BattleEventHandler {
 
     use FetchEquipped;
 
     /**
-     * @var BattleRewardProcessing $battleRewardProcessing
+     * @var BattleRewardService $battleRewardService
      */
-    private BattleRewardProcessing $battleRewardProcessing;
+    private BattleRewardService $battleRewardService;
 
     /**
-     * @param BattleRewardProcessing $battleRewardProcessing
+     * @var SecondaryRewardService $secondaryRewardService
      */
-    public function __construct(BattleRewardProcessing $battleRewardProcessing) {
-        $this->battleRewardProcessing = $battleRewardProcessing;
+    private SecondaryRewardService $secondaryRewardService;
+
+    /**
+     * @param BattleRewardService $battleRewardService
+     */
+    public function __construct(BattleRewardService $battleRewardService, SecondaryRewardService $secondaryRewardService) {
+        $this->battleRewardService    = $battleRewardService;
+        $this->secondaryRewardService = $secondaryRewardService;
     }
 
     /**
@@ -67,9 +73,9 @@ class BattleEventHandler {
             return;
         }
 
-        $this->battleRewardProcessing->handleMonster($character, $monster);
+        $this->battleRewardService->setUp($monster, $character)->handleBaseRewards();
 
-        SecondaryBattleRewardHandler::dispatch($character);
+        $this->secondaryRewardService->handleSecondaryRewards($character);
     }
 
     /**

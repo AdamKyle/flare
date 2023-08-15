@@ -4,8 +4,6 @@ namespace App\Game\Battle\Providers;
 
 use App\Flare\Services\CharacterXPService;
 use App\Game\Battle\Services\RankFightService;
-use App\Game\ClassRanks\Services\ClassRankService;
-use App\Game\Mercenaries\Services\MercenaryService;
 use App\Game\Skills\Services\DisenchantService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use App\Flare\Builders\BuildMythicItem;
@@ -21,7 +19,6 @@ use App\Game\Battle\Console\Commands\ClearCelestials;
 use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Battle\Handlers\FactionHandler;
 use App\Game\Battle\Services\BattleDrop;
-use App\Game\Battle\Services\BattleRewardProcessing;
 use App\Game\Battle\Services\CelestialFightService;
 use App\Game\Battle\Services\MonthlyPvpFightService;
 use App\Game\Battle\Services\MonthlyPvpService;
@@ -30,6 +27,8 @@ use App\Game\Core\Services\GoldRush;
 use App\Game\Maps\Values\MapTileValue;
 use App\Game\Battle\Services\ConjureService;
 use App\Game\Battle\Services\RaidBattleService;
+use App\Game\BattleRewardProcessing\Services\BattleRewardService;
+use App\Game\BattleRewardProcessing\Services\SecondaryRewardService;
 use App\Game\Messages\Builders\NpcServerMessageBuilder;
 use App\Game\GuideQuests\Services\GuideQuestService;
 
@@ -66,17 +65,10 @@ class ServiceProvider extends ApplicationServiceProvider
             );
         });
 
-        $this->app->bind(BattleRewardProcessing::class, function($app) {
-            return new BattleRewardProcessing(
-                $app->make(FactionHandler::class),
-                $app->make(CharacterRewardService::class),
-                $app->make(GoldRush::class),
-            );
-        });
-
         $this->app->bind(BattleEventHandler::class, function($app) {
             return new BattleEventHandler(
-                $app->make(BattleRewardProcessing::class)
+                $app->make(BattleRewardService::class),
+                $app->make(SecondaryRewardService::class)
             );
         });
 

@@ -23,6 +23,7 @@ use Illuminate\Queue\SerializesModels;
 use App\Flare\Models\CharacterAutomation;
 use App\Flare\Models\Character;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
+use phpDocumentor\Reflection\PseudoTypes\True_;
 
 class Exploration implements ShouldQueue
 {
@@ -105,9 +106,15 @@ class Exploration implements ShouldQueue
 
         event(new UpdateDuelAtPosition($this->character->user));
 
-        event(new ExplorationLogUpdate($this->character->user->id, 'Something went wrong with automation. Could not process fight. Automation Canceled.'));
+        $this->sendOutEventLogUpdate('Something went wrong with automation. Could not process fight. Automation Canceled.');
 
         event(new ExplorationTimeOut($this->character->user, 0));
+    }
+
+    protected function sendOutEventLogUpdate(string $message, bool $makeItalic = false, bool $isReward = false): void {
+        if ($this->character->isLoggedIn()) {
+            event(new ExplorationLogUpdate($this->character->user->id, $message, $makeItalic, $isReward));
+        }
     }
 
     /**
@@ -121,17 +128,16 @@ class Exploration implements ShouldQueue
      * @throws \Exception
      */
     protected function encounter(MonsterPlayerFight $response, CharacterAutomation $automation, BattleEventHandler $battleEventHandler, array $params): bool {
-        $user = $this->character->user;
 
-        event(new ExplorationLogUpdate($user->id, 'While on your exploration of the area, you encounter a: ' . $response->getEnemyName()));
+        $this->sendOutEventLogUpdate('While on your exploration of the area, you encounter a: ' . $response->getEnemyName());
 
         if ($this->fightAutomationMonster($response, $automation, $battleEventHandler, $params)) {
-            event(new ExplorationLogUpdate($user->id, 'You search the corpse of you enemy for clues, where did they come from? None to be found. Upon searching the area further, you find the enemies friends.', true));
+            $this->sendOutEventLogUpdate('You search the corpse of you enemy for clues, where did they come from? None to be found. Upon searching the area further, you find the enemies friends.', true);
 
             $enemies = rand(1, 7);
 
-            event(new ExplorationLogUpdate($user->id, '"Chirst, child there are: '.$enemies.' of them ..."
-            The Guide hisses at you from the shadows. You ignore his words and prepare for battle. One right after the other ...', true));
+            $this->sendOutEventLogUpdate('"Chirst, child there are: '.$enemies.' of them ..."
+            The Guide hisses at you from the shadows. You ignore his words and prepare for battle. One right after the other ...', true);
 
             for ($i = 1; $i <= $enemies; $i++) {
                 if (!$this->fightAutomationMonster($response, $automation, $battleEventHandler, $params)) {
@@ -139,9 +145,9 @@ class Exploration implements ShouldQueue
                 }
             }
 
-            event(new ExplorationLogUpdate($user->id, 'The last of the enemies fall. Covered in blood, exhausted, you look around for any signs of more of their friends. The area is silent. "Another day, another battle.
+            $this->sendOutEventLogUpdate('The last of the enemies fall. Covered in blood, exhausted, you look around for any signs of more of their friends. The area is silent. "Another day, another battle.
             We managed to survive." The Guide states as he walks from the shadows. The pair of you set off in search of the next adventure ...
-            (Exploration will begin again in 5 minutes)', true));
+            (Exploration will begin again in 5 minutes)', true);
 
             return true;
         }
@@ -169,7 +175,7 @@ class Exploration implements ShouldQueue
 
             $response->deleteCharacterCache($this->character);
 
-            event(new ExplorationLogUpdate($this->character->user->id, 'You died during exploration. Exploration has ended.'));
+            $this->sendOutEventLogUpdate('You died during exploration. Exploration has ended.');
 
             event(new ExplorationTimeOut($this->character->user, 0));
 
@@ -265,7 +271,7 @@ class Exploration implements ShouldQueue
             $amount = 10;
         }
 
-        event(new ExplorationLogUpdate($this->character->user->id, 'Gained: ' . $amount . ' Additional ' . $map->name . ' Faction points', false, true));
+        $this->sendOutEventLogUpdate('Gained: ' . $amount . ' Additional ' . $map->name . ' Faction points', false, true);
 
         $factionHandler->handleCustomFactionAmount($this->character, $amount);
     }
@@ -282,13 +288,12 @@ class Exploration implements ShouldQueue
 
             $characterCacheData->deleteCharacterSheet($this->character);
 
-            event(new ExplorationLogUpdate($this->character->user->id, '"Phew, child! I did not think we would survive all of your shenanigans.
-                So many times I could have died! Do you ever think about anyone other than yourself? No? Didn\'t think so." The Guide storms off and you follow him in silence.', true));
+            $this->sendOutEventLogUpdate('"Phew, child! I did not think we would survive all of your shenanigans.
+            So many times I could have died! Do you ever think about anyone other than yourself? No? Didn\'t think so." The Guide storms off and you follow him in silence.', true);
 
-            event(new ExplorationLogUpdate($this->character->user->id, 'Your adventures over, you head to back to the nearest town. Upon arriving, you and The Guide spot the closest Inn. Soaked in the
+            $this->sendOutEventLogUpdate('Your adventures over, you head to back to the nearest town. Upon arriving, you and The Guide spot the closest Inn. Soaked in the
             blood of your enemies, the sweat of the lingers on you like a bad smell. Entering the establishment and finding a table, you are greeted by a big busty women with shaggy long red hair messily tied in a pony tail.
-            She leans down to the table, her cleavage close enough to your face that you can see the freckles and lines of age. Her grin missing a tooth, she states: "What can I get the both of ya?" You shutter on the inside.', true));
-
+            She leans down to the table, her cleavage close enough to your face that you can see the freckles and lines of age. Her grin missing a tooth, she states: "What can I get the both of ya?" You shutter on the inside.', true);
 
             $character = $this->character->refresh();
 
@@ -318,6 +323,6 @@ class Exploration implements ShouldQueue
 
         event(new UpdateCharacterCurrenciesEvent($character->refresh()));
 
-        event(new ExplorationLogUpdate($character->user->id, 'Gained 10k Gold for completing the exploration.', false, true));
+        $this->sendOutEventLogUpdate('Gained 10k Gold for completing the exploration.', false, true);
     }
 }

@@ -48,7 +48,6 @@ class CharacterCacheData extends CharacterPvpCacheData {
             }
         } else {
             $cache = $this->characterSheetCache($character);
-            dump($cache);
         }
         
         return $cache[$key];

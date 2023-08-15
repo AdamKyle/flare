@@ -144,7 +144,6 @@ class GuideQuestService {
                                                           ->requiredStats($character, $quest, $stats)
                                                           ->getFinishedRequirments();
 
-
         if (!empty($attributes)) {
             $requiredAttributes = $this->requiredAttributeNames($quest);
             

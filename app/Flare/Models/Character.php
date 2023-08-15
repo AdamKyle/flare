@@ -240,6 +240,15 @@ class Character extends Model {
     }
 
     /**
+     * Is the character logged in?
+     *
+     * @return boolean
+     */
+    public function isLoggedIn(): bool {
+        return Session::where('user_id', $this->user_id)->exists();
+    }
+
+    /**
      * Gets the inventory count.
      *
      * Excludes quest and equipped items.
