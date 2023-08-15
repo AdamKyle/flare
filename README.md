@@ -1,5 +1,5 @@
 # Flare
-
+Test
 Flare is intended to be a simple, old school game where you can chat, fight monsters and rule kingdoms.
 
 The goal of Flare is simple to replicate some of my favourite browser based games that I use to play when I was younger.
