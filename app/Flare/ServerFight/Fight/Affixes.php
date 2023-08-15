@@ -5,7 +5,6 @@ namespace App\Flare\ServerFight\Fight;
 use App\Flare\Builders\Character\CharacterCacheData;
 use App\Flare\Models\Character;
 use App\Flare\ServerFight\BattleBase;
-use App\Flare\ServerFight\Monster\ServerMonster;
 
 class Affixes extends BattleBase {
 

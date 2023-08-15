@@ -85,7 +85,7 @@ class SecondaryAttacks extends BattleBase {
         }
 
         if ($damage > 0) {
-            $this->monsterHealth -= $damage;
+            $this->monsterHealth = $this->monsterHealth - $damage;
         }
 
         $this->affixes->clearMessages();
