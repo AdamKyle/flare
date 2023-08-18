@@ -8,7 +8,8 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Database\Eloquent\Model;
 use App\Game\Skills\Values\SkillTypeValue;
 
-class GuideQuest extends Model {
+class GuideQuest extends Model
+{
 
     /**
      * The attributes that are mass assignable.
@@ -104,7 +105,7 @@ class GuideQuest extends Model {
         'gold_dust_reward'                   => 'integer',
         'shards_reward'                      => 'integer',
         'faction_points_per_kill'            => 'integer',
-        'xp_reward'                          => 'integer', 
+        'xp_reward'                          => 'integer',
     ];
 
     protected $appends = [
@@ -121,7 +122,8 @@ class GuideQuest extends Model {
         'secondary_mercenary_name',
     ];
 
-    public function getSkillNameAttribute() {
+    public function getSkillNameAttribute()
+    {
         $skill = GameSkill::find($this->required_skill);
 
         if (!is_null($skill)) {
@@ -131,7 +133,8 @@ class GuideQuest extends Model {
         return null;
     }
 
-    public function getSkillTypeNameAttribute() {
+    public function getSkillTypeNameAttribute()
+    {
         if (is_null($this->required_skill_type)) {
             return null;
         }
@@ -139,7 +142,8 @@ class GuideQuest extends Model {
         return SkillTypeValue::$namedValues[$this->required_skill_type];
     }
 
-    public function getSecondarySkillNameAttribute() {
+    public function getSecondarySkillNameAttribute()
+    {
         $skill = GameSkill::find($this->required_secondary_skill);
 
         if (!is_null($skill)) {
@@ -149,7 +153,8 @@ class GuideQuest extends Model {
         return null;
     }
 
-    public function getMercenaryNameAttribute() {
+    public function getMercenaryNameAttribute()
+    {
 
         if (is_null($this->required_mercenary_type)) {
             return null;
@@ -159,12 +164,13 @@ class GuideQuest extends Model {
             return (new MercenaryValue($this->required_mercenary_type))->getName();
         } catch (Exception $e) {
             Log::info('Invalid Mercenary for: ' . $this->required_mercenary_type);
-            
+
             return null;
         }
     }
 
-    public function getSecondaryMercenaryNameAttribute() {
+    public function getSecondaryMercenaryNameAttribute()
+    {
 
         if (is_null($this->required_mercenary_type)) {
             return null;
@@ -174,12 +180,13 @@ class GuideQuest extends Model {
             return (new MercenaryValue($this->required_secondary_mercenary_type))->getName();
         } catch (Exception $e) {
             Log::info('Invalid Mercenary for: ' . $this->required_secondary_mercenary_type);
-            
+
             return null;
         }
     }
 
-    public function getQuestNameAttribute() {
+    public function getQuestNameAttribute()
+    {
         $quest = Quest::find($this->required_quest_id);
 
         if (!is_null($quest)) {
@@ -189,7 +196,8 @@ class GuideQuest extends Model {
         return null;
     }
 
-    public function getPassiveNameAttribute() {
+    public function getPassiveNameAttribute()
+    {
         $passive = PassiveSkill::find($this->required_passive_skill);
 
         if (!is_null($passive)) {
@@ -199,7 +207,8 @@ class GuideQuest extends Model {
         return null;
     }
 
-    public function getQuestItemNameAttribute() {
+    public function getQuestItemNameAttribute()
+    {
         $questItem = Item::where('type', 'quest')->where('id', $this->required_quest_item_id)->first();
 
         if (!is_null($questItem)) {
@@ -209,7 +218,8 @@ class GuideQuest extends Model {
         return null;
     }
 
-    public function getSecondaryQuestItemNameAttribute() {
+    public function getSecondaryQuestItemNameAttribute()
+    {
         $questItem = Item::where('type', 'quest')->where('id', $this->secondary_quest_item_id)->first();
 
         if (!is_null($questItem)) {
@@ -219,12 +229,20 @@ class GuideQuest extends Model {
         return null;
     }
 
-    public function getFactionNameAttribute() {
-        return $this->getGameMapNameAttribute();
+    public function getFactionNameAttribute()
+    {
+        $gameMap = GameMap::find($this->required_faction_id);
+
+        if (!is_null($gameMap)) {
+            return $gameMap->name;
+        }
+
+        return null;
     }
 
-    public function getGameMapNameAttribute() {
-        $gameMap = GameMap::find($this->required_faction_id);
+    public function getGameMapNameAttribute()
+    {
+        $gameMap = GameMap::find($this->required_game_map_id);
 
         if (!is_null($gameMap)) {
             return $gameMap->name;
