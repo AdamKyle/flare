@@ -63,7 +63,9 @@ class GuideQuestsController extends Controller {
      * @return JsonResponse
      */
     protected function getNextQuest(Character $character, string $message = ''): JsonResponse {
-        $quest = $this->guideQuestService->fetchQuestForCharacter($character);
+        $data = $this->guideQuestService->fetchQuestForCharacter($character);
+
+        $quest = $data['quest'];
 
         if (!is_null($quest)) {
 
@@ -71,8 +73,9 @@ class GuideQuestsController extends Controller {
             $quest->instructions = nl2br($quest->instructions);
 
             $response =[
-                'quest'       => $quest,
-                'can_hand_in' => $this->guideQuestService->canHandInQuest($character, $quest),
+                'quest'                  => $quest,
+                'can_hand_in'            => $this->guideQuestService->canHandInQuest($character, $quest),
+                'completed_requirements' => $data['completed_requirements'],
             ];
 
             if ($message !== '') {

@@ -169,7 +169,7 @@ class GuideQuestRequirementsService
         return $this;
     }
 
-    public function requiredKingdomPassibeLevel(Character $character, GuideQuest $quest): GuideQuestRequirementsService
+    public function requiredKingdomPassiveLevel(Character $character, GuideQuest $quest): GuideQuestRequirementsService
     {
 
         if (!is_null($quest->required_passive_skill) && !is_null($quest->required_passive_level)) {

@@ -11,20 +11,19 @@ use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\HandleCharacterLevelUp;
 use App\Game\Messages\Events\ServerMessageEvent;
 
-class GuideQuestService
-{
+class GuideQuestService {
 
     use HandleCharacterLevelUp;
 
     private GuideQuestRequirementsService $guideQuestRequirementsService;
 
-    public function __construct(GuideQuestRequirementsService $guideQuestRequirementsService)
-    {
+    private array $completedAttributes = [];
+
+    public function __construct(GuideQuestRequirementsService $guideQuestRequirementsService) {
         $this->guideQuestRequirementsService = $guideQuestRequirementsService;
     }
 
-    public function fetchQuestForCharacter(Character $character): GuideQuest | null
-    {
+    public function fetchQuestForCharacter(Character $character): array | null {
         $lastCompletedGuideQuest = $character->questsCompleted()
             ->whereNotNull('guide_quest_id')
             ->orderByDesc('guide_quest_id')
@@ -41,11 +40,15 @@ class GuideQuestService
             return null;
         }
 
-        return $quest;
+        $this->canHandInQuest($character, $quest);
+
+        return [
+            'quest' => $quest,
+            'completed_requirements' => $this->completedAttributes,
+        ];
     }
 
-    public function handInQuest(Character $character, GuideQuest $quest)
-    {
+    public function handInQuest(Character $character, GuideQuest $quest) {
         if (!$this->canHandInQuest($character, $quest)) {
             return false;
         }
@@ -97,8 +100,7 @@ class GuideQuestService
         return true;
     }
 
-    public function giveXP(Character $character, GuideQuest $guideQuest): Character
-    {
+    public function giveXP(Character $character, GuideQuest $guideQuest): Character {
 
         if ($guideQuest->xp_reward <= 0) {
             return $character;
@@ -117,8 +119,7 @@ class GuideQuestService
         return $character;
     }
 
-    public function canHandInQuest(Character $character, GuideQuest $quest): bool
-    {
+    public function canHandInQuest(Character $character, GuideQuest $quest): bool {
 
         $alreadyCompleted = $character->questsCompleted()->where('guide_quest_id', $quest->id)->first();
         $stats            = ['str', 'dex', 'dur', 'int', 'chr', 'agi', 'focus'];
@@ -131,7 +132,8 @@ class GuideQuestService
             return false;
         }
 
-        $attributes = $this->guideQuestRequirementsService->requiredLevelCheck($character, $quest)
+        $this->completedAttributes = $this->guideQuestRequirementsService->requiredLevelCheck($character, $quest)
+            ->requiredQuest($character, $quest)
             ->requiredSkillCheck($character, $quest)
             ->requiredSkillCheck($character, $quest, false)
             ->requiredSkillTypeCheck($character, $quest)
@@ -142,7 +144,7 @@ class GuideQuestService
             ->requiredKingdomCount($character, $quest)
             ->requiredKingdomBuildingLevel($character, $quest)
             ->requiredKingdomUnitCount($character, $quest)
-            ->requiredKingdomPassibeLevel($character, $quest)
+            ->requiredKingdomPassiveLevel($character, $quest)
             ->requiredCurrency($character, $quest, 'gold')
             ->requiredCurrency($character, $quest, 'gold_dust')
             ->requiredCurrency($character, $quest, 'shards')
@@ -150,10 +152,10 @@ class GuideQuestService
             ->requiredStats($character, $quest, $stats)
             ->getFinishedRequirements();
 
-        if (!empty($attributes)) {
+        if (!empty($this->completedAttributes)) {
             $requiredAttributes = $this->requiredAttributeNames($quest);
 
-            $difference = array_diff($requiredAttributes, $attributes);
+            $difference = array_diff($requiredAttributes, $this->completedAttributes);
 
             if (empty($difference)) {
                 return true;
@@ -163,8 +165,7 @@ class GuideQuestService
         return false;
     }
 
-    protected function requiredAttributeNames(GuideQuest $quest): array
-    {
+    protected function requiredAttributeNames(GuideQuest $quest): array {
 
         $requiredAttributes = [];
 
