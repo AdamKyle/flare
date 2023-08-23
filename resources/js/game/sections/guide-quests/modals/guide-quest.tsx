@@ -14,6 +14,8 @@ import {
     buildValueLink,
 } from "../lib/guide-quest-label-builder";
 import RequiredListItem from "../components/required-list-item";
+import { questRewardKeys } from "../lib/guide-quests-rewards";
+import RewardListItem from "../components/reward-list-item";
 
 export default class GuideQuest extends React.Component<any, any> {
     private tabs: { name: string; key: string }[];
@@ -106,6 +108,8 @@ export default class GuideQuest extends React.Component<any, any> {
                                 quest_data: result.data.quest,
                                 can_hand_in: result.data.can_hand_in,
                                 success_message: result.data.message,
+                                completed_requirements:
+                                    result.data.completed_requirements,
                             });
                         },
                         (error: AxiosError) => {}
@@ -157,6 +161,28 @@ export default class GuideQuest extends React.Component<any, any> {
         return requirementsList;
     }
 
+    buildRewardsItems(): JSX.Element[] | [] {
+        const items: JSX.Element[] = [];
+
+        questRewardKeys().forEach((key: string) => {
+            if (this.state.quest_data[key] !== null) {
+                const label = key
+                    .split("_")
+                    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                    .join(" ");
+
+                items.push(
+                    <RewardListItem
+                        label={label}
+                        value={this.state.quest_data[key]}
+                    />
+                );
+            }
+        });
+
+        return items;
+    }
+
     render() {
         return (
             <Dialogue
@@ -192,435 +218,13 @@ export default class GuideQuest extends React.Component<any, any> {
                                 {this.state.error_message}
                             </DangerAlert>
                         ) : null}
+
                         <div className={"mt-2"}>
                             <div className="grid md:grid-cols-2 gap-2">
                                 <div>
                                     <h3 className="mb-2">
                                         Required to complete
                                     </h3>
-                                    <ul className="list-disc ml-[18px]">
-                                        {this.state.quest_data
-                                            .required_level !== null ? (
-                                            <li
-                                                className={
-                                                    "text-orange-600 dark:text-orange-400"
-                                                }
-                                            >
-                                                Level your character to:{" "}
-                                                {
-                                                    this.state.quest_data
-                                                        .required_level
-                                                }
-                                            </li>
-                                        ) : null}
-                                        {this.state.quest_data
-                                            .required_game_map_id !== null ? (
-                                            <li
-                                                className={
-                                                    "text-orange-600 dark:text-orange-400"
-                                                }
-                                            >
-                                                Get Access to:{" "}
-                                                {
-                                                    this.state.quest_data
-                                                        .game_map_name
-                                                }
-                                            </li>
-                                        ) : null}
-                                        {this.state.quest_data.quest_name !==
-                                        null ? (
-                                            <li
-                                                className={
-                                                    "text-orange-600 dark:text-orange-400"
-                                                }
-                                            >
-                                                Complete the quest:{" "}
-                                                {
-                                                    this.state.quest_data
-                                                        .quest_name
-                                                }
-                                            </li>
-                                        ) : null}
-                                        {this.state.quest_data
-                                            .required_quest_item_id !== null ? (
-                                            <li
-                                                className={
-                                                    "text-orange-600 dark:text-orange-400"
-                                                }
-                                            >
-                                                Get Quest Item:{" "}
-                                                {
-                                                    this.state.quest_data
-                                                        .quest_item_name
-                                                }
-                                            </li>
-                                        ) : null}
-                                        {this.state.quest_data
-                                            .secondary_quest_item_id !==
-                                        null ? (
-                                            <li
-                                                className={
-                                                    "text-orange-600 dark:text-orange-400"
-                                                }
-                                            >
-                                                Get Secondary Quest Item:{" "}
-                                                {
-                                                    this.state.quest_data
-                                                        .secondary_quest_item_name
-                                                }
-                                            </li>
-                                        ) : null}
-                                        {this.state.quest_data.skill_name !==
-                                        null ? (
-                                            <li
-                                                className={
-                                                    "text-orange-600 dark:text-orange-400"
-                                                }
-                                            >
-                                                Get Skill:{" "}
-                                                {
-                                                    this.state.quest_data
-                                                        .skill_name
-                                                }{" "}
-                                                to level:{" "}
-                                                {
-                                                    this.state.quest_data
-                                                        .required_skill_level
-                                                }
-                                            </li>
-                                        ) : null}
-                                        {this.state.quest_data
-                                            .required_secondary_skill !==
-                                        null ? (
-                                            <li
-                                                className={
-                                                    "text-orange-600 dark:text-orange-400"
-                                                }
-                                            >
-                                                Get Secondary Skill:{" "}
-                                                {
-                                                    this.state.quest_data
-                                                        .secondary_skill_name
-                                                }{" "}
-                                                to level:{" "}
-                                                {
-                                                    this.state.quest_data
-                                                        .required_secondary_skill_level
-                                                }
-                                            </li>
-                                        ) : null}
-                                        {this.state.quest_data
-                                            .skill_type_name !== null ? (
-                                            <li
-                                                className={
-                                                    "text-orange-600 dark:text-orange-400"
-                                                }
-                                            >
-                                                Get Skill Type:{" "}
-                                                {
-                                                    this.state.quest_data
-                                                        .skill_type_name
-                                                }{" "}
-                                                to level:{" "}
-                                                {
-                                                    this.state.quest_data
-                                                        .required_skill_type_level
-                                                }
-                                            </li>
-                                        ) : null}
-                                        {this.state.quest_data.faction_name !==
-                                        null ? (
-                                            <li
-                                                className={
-                                                    "text-orange-600 dark:text-orange-400"
-                                                }
-                                            >
-                                                Get Faction:{" "}
-                                                {
-                                                    this.state.quest_data
-                                                        .faction_name
-                                                }{" "}
-                                                to level:{" "}
-                                                {
-                                                    this.state.quest_data
-                                                        .required_faction_level
-                                                }
-                                            </li>
-                                        ) : null}
-                                        {this.state.quest_data
-                                            .required_mercenary_type !==
-                                        null ? (
-                                            <li
-                                                className={
-                                                    "text-orange-600 dark:text-orange-400"
-                                                }
-                                            >
-                                                Get Mercenary:{" "}
-                                                {
-                                                    this.state.quest_data
-                                                        .mercenary_name
-                                                }{" "}
-                                                to level{" "}
-                                                {
-                                                    this.state.quest_data
-                                                        .required_mercenary_level
-                                                }
-                                            </li>
-                                        ) : null}
-                                        {this.state.quest_data
-                                            .required_secondary_mercenary_type !==
-                                        null ? (
-                                            <li
-                                                className={
-                                                    "text-orange-600 dark:text-orange-400"
-                                                }
-                                            >
-                                                Get Secondary Mercenary:{" "}
-                                                {
-                                                    this.state.quest_data
-                                                        .secondary_mercenary_name
-                                                }{" "}
-                                                to level{" "}
-                                                {
-                                                    this.state.quest_data
-                                                        .required_secondary_mercenary_level
-                                                }
-                                            </li>
-                                        ) : null}
-                                        {this.state.quest_data
-                                            .required_class_specials_equipped !==
-                                        null ? (
-                                            <li
-                                                className={
-                                                    "text-orange-600 dark:text-orange-400"
-                                                }
-                                            >
-                                                Equip # of Class Specials:{" "}
-                                                {
-                                                    this.state.quest_data
-                                                        .required_class_specials_equipped
-                                                }
-                                            </li>
-                                        ) : null}
-                                        {this.state.quest_data
-                                            .required_kingdoms !== null ? (
-                                            <li
-                                                className={
-                                                    "text-orange-600 dark:text-orange-400"
-                                                }
-                                            >
-                                                Required Kingdom #:{" "}
-                                                {
-                                                    this.state.quest_data
-                                                        .required_kingdoms
-                                                }
-                                            </li>
-                                        ) : null}
-                                        {this.state.quest_data
-                                            .required_kingdom_level !== null ? (
-                                            <li
-                                                className={
-                                                    "text-orange-600 dark:text-orange-400"
-                                                }
-                                            >
-                                                Required Buildings Level
-                                                (Combined):{" "}
-                                                {
-                                                    this.state.quest_data
-                                                        .required_kingdom_level
-                                                }
-                                            </li>
-                                        ) : null}
-                                        {this.state.quest_data
-                                            .required_kingdom_units !== null ? (
-                                            <li
-                                                className={
-                                                    "text-orange-600 dark:text-orange-400"
-                                                }
-                                            >
-                                                Required Units Amount
-                                                (Combined):{" "}
-                                                {
-                                                    this.state.quest_data
-                                                        .required_kingdom_units
-                                                }
-                                            </li>
-                                        ) : null}
-                                        {this.state.quest_data.passive_name !==
-                                        null ? (
-                                            <li
-                                                className={
-                                                    "text-orange-600 dark:text-orange-400"
-                                                }
-                                            >
-                                                Get Passive Skill:{" "}
-                                                {
-                                                    this.state.quest_data
-                                                        .passive_name
-                                                }{" "}
-                                                to level:{" "}
-                                                {
-                                                    this.state.quest_data
-                                                        .required_passive_skill
-                                                }
-                                            </li>
-                                        ) : null}
-                                        {this.state.quest_data
-                                            .required_stats !== null ? (
-                                            <li
-                                                className={
-                                                    "text-orange-600 dark:text-orange-400"
-                                                }
-                                            >
-                                                Get all stats to:{" "}
-                                                {
-                                                    this.state.quest_data
-                                                        .required_stats
-                                                }
-                                            </li>
-                                        ) : null}
-                                        {this.state.quest_data.required_str !==
-                                        null ? (
-                                            <li
-                                                className={
-                                                    "text-orange-600 dark:text-orange-400"
-                                                }
-                                            >
-                                                Get STR to:{" "}
-                                                {
-                                                    this.state.quest_data
-                                                        .required_str
-                                                }
-                                            </li>
-                                        ) : null}
-                                        {this.state.quest_data.required_dex !==
-                                        null ? (
-                                            <li
-                                                className={
-                                                    "text-orange-600 dark:text-orange-400"
-                                                }
-                                            >
-                                                Get DEX to:{" "}
-                                                {
-                                                    this.state.quest_data
-                                                        .required_dex
-                                                }
-                                            </li>
-                                        ) : null}
-                                        {this.state.quest_data.required_agi !==
-                                        null ? (
-                                            <li
-                                                className={
-                                                    "text-orange-600 dark:text-orange-400"
-                                                }
-                                            >
-                                                Get AGIto:{" "}
-                                                {
-                                                    this.state.quest_data
-                                                        .required_agi
-                                                }
-                                            </li>
-                                        ) : null}
-                                        {this.state.quest_data.required_int !==
-                                        null ? (
-                                            <li
-                                                className={
-                                                    "text-orange-600 dark:text-orange-400"
-                                                }
-                                            >
-                                                Get INT to:{" "}
-                                                {
-                                                    this.state.quest_data
-                                                        .required_int
-                                                }
-                                            </li>
-                                        ) : null}
-                                        {this.state.quest_data.required_dur !==
-                                        null ? (
-                                            <li
-                                                className={
-                                                    "text-orange-600 dark:text-orange-400"
-                                                }
-                                            >
-                                                Get DUR to:{" "}
-                                                {
-                                                    this.state.quest_data
-                                                        .required_dur
-                                                }
-                                            </li>
-                                        ) : null}
-                                        {this.state.quest_data.required_chr !==
-                                        null ? (
-                                            <li
-                                                className={
-                                                    "text-orange-600 dark:text-orange-400"
-                                                }
-                                            >
-                                                Get CHR to:{" "}
-                                                {
-                                                    this.state.quest_data
-                                                        .required_chr
-                                                }
-                                            </li>
-                                        ) : null}
-                                        {this.state.quest_data
-                                            .required_focus !== null ? (
-                                            <li
-                                                className={
-                                                    "text-orange-600 dark:text-orange-400"
-                                                }
-                                            >
-                                                Get FOCUS to:{" "}
-                                                {
-                                                    this.state.quest_data
-                                                        .required_focus
-                                                }
-                                            </li>
-                                        ) : null}
-                                        {this.state.quest_data.required_gold !==
-                                        null ? (
-                                            <li
-                                                className={
-                                                    "text-orange-600 dark:text-orange-400"
-                                                }
-                                            >
-                                                Obtain Gold Amount:{" "}
-                                                {
-                                                    this.state.quest_data
-                                                        .required_gold
-                                                }
-                                            </li>
-                                        ) : null}
-                                        {this.state.quest_data
-                                            .required_shards !== null ? (
-                                            <li
-                                                className={
-                                                    "text-orange-600 dark:text-orange-400"
-                                                }
-                                            >
-                                                Obtain Shards Amount:{" "}
-                                                {
-                                                    this.state.quest_data
-                                                        .required_shards
-                                                }
-                                            </li>
-                                        ) : null}
-                                        {this.state.quest_data
-                                            .required_gold_dust !== null ? (
-                                            <li
-                                                className={
-                                                    "text-orange-600 dark:text-orange-400"
-                                                }
-                                            >
-                                                Obtain Gold Dust Amount:{" "}
-                                                {
-                                                    this.state.quest_data
-                                                        .required_gold_dust
-                                                }
-                                            </li>
-                                        ) : null}
-                                    </ul>
-                                    <h4 className="mt-4"> Testing </h4>
                                     <ul className="my-4 list-disc ml-[18px]">
                                         {this.buildRequirementsList()}
                                     </ul>
@@ -629,62 +233,7 @@ export default class GuideQuest extends React.Component<any, any> {
                                 <div>
                                     <h3 className="mb-2">Rewards</h3>
                                     <ul className="list-disc ml-[18px]">
-                                        {this.state.quest_data.xp_reward !==
-                                        null ? (
-                                            <li
-                                                className={
-                                                    "text-green-600 dark:text-green-400"
-                                                }
-                                            >
-                                                Xp Reward:{" "}
-                                                {
-                                                    this.state.quest_data
-                                                        .xp_reward
-                                                }
-                                            </li>
-                                        ) : null}
-                                        {this.state.quest_data.gold_reward !==
-                                        null ? (
-                                            <li
-                                                className={
-                                                    "text-green-600 dark:text-green-400"
-                                                }
-                                            >
-                                                Gold Reward:{" "}
-                                                {
-                                                    this.state.quest_data
-                                                        .gold_reward
-                                                }
-                                            </li>
-                                        ) : null}
-                                        {this.state.quest_data
-                                            .gold_dust_reward !== null ? (
-                                            <li
-                                                className={
-                                                    "text-green-600 dark:text-green-400"
-                                                }
-                                            >
-                                                Gold Dust Reward:{" "}
-                                                {
-                                                    this.state.quest_data
-                                                        .gold_dust_reward
-                                                }
-                                            </li>
-                                        ) : null}
-                                        {this.state.quest_data.shards_reward !==
-                                        null ? (
-                                            <li
-                                                className={
-                                                    "text-green-600 dark:text-green-400"
-                                                }
-                                            >
-                                                Shards Reward:{" "}
-                                                {
-                                                    this.state.quest_data
-                                                        .shards_reward
-                                                }
-                                            </li>
-                                        ) : null}
+                                        {this.buildRewardsItems()}
                                     </ul>
                                 </div>
                             </div>

@@ -156,7 +156,7 @@ class GuideQuestService {
             $requiredAttributes = $this->requiredAttributeNames($quest);
 
             $difference = array_diff($requiredAttributes, $this->completedAttributes);
-
+            dump($requiredAttributes, $difference);
             if (empty($difference)) {
                 return true;
             }

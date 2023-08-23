@@ -27,6 +27,8 @@ const guideQuestLabelBuilder = (
                     to level
                 </span>
             );
+        case "required_skill_type":
+            return `Get Skill Type: ${questData.skill_type_name} to level`;
         case "required_secondary_skill":
             return (
                 <span>
@@ -175,25 +177,37 @@ const buildValueLink = (
     switch (key) {
         case "required_quest_id":
             return (
-                <a href={"/information/quests/" + questData.required_quest_id}>
+                <a
+                    href={"/information/quests/" + questData.required_quest_id}
+                    target="_blank"
+                >
                     {name} <i className="fas fa-external-link-alt"></i>
                 </a>
             );
         case "required_game_map_id":
             return (
-                <a href={"/information/map/" + questData.required_game_map_id}>
+                <a
+                    href={"/information/map/" + questData.required_game_map_id}
+                    target="_blank"
+                >
                     {name} <i className="fas fa-external-link-alt"></i>
                 </a>
             );
         case "required_quest_item_id":
             return (
-                <a href={"/items/" + questData.required_quest_item_id}>
+                <a
+                    href={"/items/" + questData.required_quest_item_id}
+                    target="_blank"
+                >
                     {name} <i className="fas fa-external-link-alt"></i>
                 </a>
             );
         case "secondary_quest_item_id":
             return (
-                <a href={"/items/" + questData.secondary_quest_item_id}>
+                <a
+                    href={"/items/" + questData.secondary_quest_item_id}
+                    target="_blank"
+                >
                     {name} <i className="fas fa-external-link-alt"></i>
                 </a>
             );
