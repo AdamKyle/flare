@@ -39,7 +39,7 @@ class FactionHandler {
      * @param RandomAffixGenerator $randomAffixGenerator
      * @param GuideQuestService $guideQuestService
      */
-    public function __construct(RandomAffixGenerator $randomAffixGenerator, GuideQuestService $guideQuestService){
+    public function __construct(RandomAffixGenerator $randomAffixGenerator, GuideQuestService $guideQuestService) {
         $this->randomAffixGenerator = $randomAffixGenerator;
         $this->guideQuestService    = $guideQuestService;
     }
@@ -89,7 +89,6 @@ class FactionHandler {
             $this->handleFactionLevelUp($character, $faction, $map->name);
 
             return;
-
         } else if (FactionLevel::isMaxLevel($faction->current_level) && !$faction->maxed) {
             $this->handleFactionMaxedOut($character, $faction, $map->name);
 
@@ -97,7 +96,7 @@ class FactionHandler {
         }
 
         if ($character->user->guide_enabled) {
-            $guideQuest = $guideQuestService->fetchQuestForCharacter($character);
+            $guideQuest = $guideQuestService->fetchQuestForCharacter($character)['quest'];
 
             if (!is_null($guideQuest)) {
                 if (!is_null($guideQuest->faction_points_per_kill) && !is_null($guideQuest->required_faction_level)) {
@@ -147,7 +146,6 @@ class FactionHandler {
 
             $this->handleFactionLevelUp($character, $faction, $gameMap->name);
         }
-
     }
 
     /**
@@ -325,7 +323,7 @@ class FactionHandler {
         $item      = Item::where('effect', ItemEffectsValue::FACTION_POINTS)->first();
 
         if (is_null($item)) {
-             return false;
+            return false;
         }
 
         return !is_null(InventorySlot::where('inventory_id', $inventory->id)->where('item_id', $item->id)->first());
