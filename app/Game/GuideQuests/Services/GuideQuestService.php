@@ -40,7 +40,7 @@ class GuideQuestService {
             return null;
         }
 
-        $this->canHandInQuest($character, $quest);
+        $this->canHandInQuest($character, $quest, true);
 
         return [
             'quest' => $quest,
@@ -119,7 +119,7 @@ class GuideQuestService {
         return $character;
     }
 
-    public function canHandInQuest(Character $character, GuideQuest $quest): bool {
+    public function canHandInQuest(Character $character, GuideQuest $quest, bool $ignoreAutomation = false): bool {
 
         $alreadyCompleted = $character->questsCompleted()->where('guide_quest_id', $quest->id)->first();
         $stats            = ['str', 'dex', 'dur', 'int', 'chr', 'agi', 'focus'];
@@ -128,7 +128,7 @@ class GuideQuestService {
             return false;
         }
 
-        if ($character->currentAutomations()->where('type', AutomationType::EXPLORING)->get()->isNotEmpty()) {
+        if ($character->currentAutomations()->where('type', AutomationType::EXPLORING)->get()->isNotEmpty() && !$ignoreAutomation) {
             return false;
         }
 
@@ -156,7 +156,7 @@ class GuideQuestService {
             $requiredAttributes = $this->requiredAttributeNames($quest);
 
             $difference = array_diff($requiredAttributes, $this->completedAttributes);
-            dump($requiredAttributes, $difference);
+
             if (empty($difference)) {
                 return true;
             }

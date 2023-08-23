@@ -74,8 +74,10 @@ class NpcQuestRewardHandler {
 
                 event(new ServerMessageEvent($character->user, 'You have unlocked a new game feature: Mercenaries!
                 Go to your character sheet and click on the tab beside Factions to purchase mercenaries.
-                You can ream more about them by clicking on Help I\'m Stuck! and selecting Mercenary under Game Systems.
-                There is also a help link on the tab. mercenaries add new boons to those who farm currencies!'));
+                You can learn more about them by clicking on Help I\'m Stuck! and selecting Mercenary under Game Systems.
+                There is also a help link on the tab. Mercenaries add new boons to those who farm currencies!'));
+
+                GlobalMessageEvent::dispatch($character->name . ' has unlocked: Mercenaries! A powerful new feature!');
             }
 
             if ($quest->unlocksFeature()->isReincarnation()) {
@@ -83,13 +85,15 @@ class NpcQuestRewardHandler {
                 event(new ServerMessageEvent($character->user, 'You can now reincarnate your character for a cost of 50,000 Copper Coins per Reincarnation. This allows
                 you to set your character level back to level 1 and keep 20% of your base stats, but you are penalized by having 5% (that stacks per reincarnation)
                 added to your XP. You can now use this feature on your Character Sheet!'));
+
+                GlobalMessageEvent::dispatch($character->name . ' has unlocked: Reincarnation! A powerful new way to grow!');
             }
 
             if ($quest->unlocksFeature()->isCosmeticText()) {
-                event(new ServerMessageEvent($character->user, 'You can now use a new feature in your settings (Hover/Tap Top Right User Icon) to change your chat text 
+                event(new ServerMessageEvent($character->user, 'You can now use a new feature in your settings (Hover/Tap Top Right User Icon) to change your chat text
                 to a color of your choice as well as italize or bold your text for public chat messages. How exciting!'));
 
-                event(new GlobalMessageEvent('HOLY CRAP!!!! ' . $character->name . ' Has unlocked an epic gift! Cosmetic Text! they can truly stand out from the rest of you now!'));
+                event(new GlobalMessageEvent($character->name . ' Has unlocked an epic gift! Cosmetic Text! They can truly stand out from the rest of you now!'));
             }
         }
 

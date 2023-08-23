@@ -128,7 +128,7 @@ export default class GuideQuest extends React.Component<any, any> {
     }
 
     buildRequirementsList(): JSX.Element[] | [] {
-        console.log(this.state.completed_requirements);
+        console.log(this.state.quest_data, this.fetchRequiredKeys());
         const requirementsList: JSX.Element[] = [];
 
         this.fetchRequiredKeys().forEach((key: string) => {
@@ -138,6 +138,8 @@ export default class GuideQuest extends React.Component<any, any> {
                 const requiredKey = getRequirementKey(key);
                 const value = this.state.quest_data[requiredKey];
                 const completedRequirements = this.state.completed_requirements;
+
+                console.log(completedRequirements, key);
 
                 const isFinished =
                     completedRequirements.includes(key) ||
@@ -202,7 +204,7 @@ export default class GuideQuest extends React.Component<any, any> {
                         <ComponentLoading />
                     </div>
                 ) : (
-                    <Fragment>
+                    <div className="overflow-y-auto max-h-[450px] lg:max-h-none lg:overflow-visible">
                         {this.state.success_message !== null ? (
                             <SuccessAlert
                                 close_alert={this.closeMessage.bind(this)}
@@ -288,7 +290,7 @@ export default class GuideQuest extends React.Component<any, any> {
                         {this.state.is_handing_in ? (
                             <LoadingProgressBar />
                         ) : null}
-                    </Fragment>
+                    </div>
                 )}
             </Dialogue>
         );
