@@ -154,6 +154,7 @@ class GuideQuestService {
             ->requiredCurrency($character, $quest, 'shards')
             ->requiredTotalStats($character, $quest, $stats)
             ->requiredStats($character, $quest, $stats)
+            ->requiredClassRanksEquipped($character, $quest)
             ->getFinishedRequirements();
 
         if (!empty($this->completedAttributes)) {

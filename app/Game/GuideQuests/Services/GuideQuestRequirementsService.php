@@ -192,6 +192,17 @@ class GuideQuestRequirementsService {
         return $this;
     }
 
+    public function requiredClassRanksEquipped(Character $character, GuideQuest $quest): GuideQuestRequirementsService {
+
+        if (!is_null($quest->required_class_specials_equipped)) {
+            if ($character->classSpecialsEquipped()->count() >= $quest->required_class_specials_equipped) {
+                $this->finishedRequirements[] = 'required_class_specials_equipped';
+            }
+        }
+
+        return $this;
+    }
+
     public function requiredCurrency(Character $character, GuideQuest $quest, string $currency): GuideQuestRequirementsService {
         if (!is_null($quest->{'required_' . $currency})) {
             if ($character->{$currency} >= $quest->{'required_' . $currency}) {

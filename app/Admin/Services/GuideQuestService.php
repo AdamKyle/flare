@@ -9,7 +9,7 @@ class GuideQuestService {
             $params['required_skill_level'] = null;
         }
 
-        if (!is_null($params['required_passive_skill']) && is_null($params['required_skill'])) {
+        if (!is_null($params['required_passive_level']) && is_null($params['required_passive_skill'])) {
             $params['required_passive_level'] = null;
         }
 

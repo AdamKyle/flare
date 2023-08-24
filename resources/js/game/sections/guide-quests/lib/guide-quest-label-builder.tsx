@@ -162,8 +162,8 @@ const getRequirementKey = (labelKey: string): string => {
             return "required_mercenary_level";
         case "required_secondary_mercenary_type":
             return "required_secondary_mercenary_level";
-        case "passive_name":
-            return "required_passive_skill";
+        case "required_passive_skill":
+            return "required_passive_level";
         default:
             return labelKey;
     }

@@ -50,6 +50,9 @@ class UnitTransformer extends TransformerAbstract {
     protected function getRequiredBuildingLevel(GameUnit $unit): int {
         $gameBuilding = GameBuildingUnit::where('game_unit_id', $unit->id)->first();
 
+        if (is_null($gameBuilding)) {
+            throw new Exception('Missing Game Building for unit: ' . $unit->name);
+        }
 
         return $gameBuilding->required_level;
     }

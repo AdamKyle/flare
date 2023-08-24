@@ -40,11 +40,11 @@ class SellItemCalculator {
         $cost = $item->cost;
 
         if ($this->isItemUnique($item)) {
-            return $cost;
+            return self::MAX_AFFIX_COST;
         }
 
         if ($this->isItemHoly($item)) {
-            return $cost;
+            return self::MAX_AFFIX_COST;
         }
 
         if (!is_null($item->item_suffix_id)) {

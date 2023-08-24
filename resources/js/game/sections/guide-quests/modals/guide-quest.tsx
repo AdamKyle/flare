@@ -131,13 +131,13 @@ export default class GuideQuest extends React.Component<any, any> {
         const requirementsList: JSX.Element[] = [];
 
         this.fetchRequiredKeys().forEach((key: string) => {
-            const label = guideQuestLabelBuilder(key, this.state.quest_data);
+            let label = guideQuestLabelBuilder(key, this.state.quest_data);
 
             if (label !== null) {
                 const requiredKey = getRequirementKey(key);
                 const value = this.state.quest_data[requiredKey];
                 const completedRequirements = this.state.completed_requirements;
-                
+
                 const isFinished =
                     completedRequirements.includes(key) ||
                     completedRequirements.includes(requiredKey);
