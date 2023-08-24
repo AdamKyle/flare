@@ -56,8 +56,6 @@ export default class EventSchedulerEditor extends React.Component<EventScheduler
             route = 'admin/update-event/' + this.props.scheduler.edited.id;
         }
 
-        console.log('Form Data: ', this.state.form_data.selected_start_date);
-
         const postData = {
             selected_event_type: this.state.form_data.selected_event_type,
             event_description: this.state.form_data.event_description,
@@ -108,9 +106,9 @@ export default class EventSchedulerEditor extends React.Component<EventScheduler
                             <LoadingProgressBar />
                         </div>
                     :
-                        <EventSchedulerForm raids={this.props.raids} 
-                                            event_data={this.props.scheduler.edited} 
-                                            update_parent={this.updateParentData.bind(this)} 
+                        <EventSchedulerForm raids={this.props.raids}
+                                            event_data={this.props.scheduler.edited}
+                                            update_parent={this.updateParentData.bind(this)}
                                             event_types={this.props.event_types}
                         />
                 }

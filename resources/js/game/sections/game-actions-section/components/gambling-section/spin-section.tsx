@@ -24,7 +24,6 @@ export default class SpinSection extends React.Component<SpinSectionProps, {}> {
     }
 
     render() {
-        console.log(this.props);
         return (
             <div
                 className={clsx("max-w-[450px] m-auto lg:mr-auto", {

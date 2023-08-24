@@ -128,7 +128,6 @@ export default class GuideQuest extends React.Component<any, any> {
     }
 
     buildRequirementsList(): JSX.Element[] | [] {
-        console.log(this.state.quest_data, this.fetchRequiredKeys());
         const requirementsList: JSX.Element[] = [];
 
         this.fetchRequiredKeys().forEach((key: string) => {
@@ -138,9 +137,7 @@ export default class GuideQuest extends React.Component<any, any> {
                 const requiredKey = getRequirementKey(key);
                 const value = this.state.quest_data[requiredKey];
                 const completedRequirements = this.state.completed_requirements;
-
-                console.log(completedRequirements, key);
-
+                
                 const isFinished =
                     completedRequirements.includes(key) ||
                     completedRequirements.includes(requiredKey);
