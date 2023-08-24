@@ -33,14 +33,14 @@ class BattleRewardService {
         $this->character = $character;
         $this->monster   = $monster;
         $this->gameMap   = $monster->gameMap;
-        
+
         $this->characterRewardService->setCharacter($character);
 
         return $this;
     }
 
     public function handleBaseRewards() {
-        $this->handleFactionRwards();
+        $this->handleFactionRewards();
 
         $this->attemptToGiveShards();
 
@@ -67,7 +67,7 @@ class BattleRewardService {
         event(new UpdateCharacterCurrenciesEvent($this->character->refresh()));
     }
 
-    protected function handleFactionRwards() {
+    protected function handleFactionRewards() {
         if ($this->gameMap->mapType()->isPurgatory()) {
             return;
         }

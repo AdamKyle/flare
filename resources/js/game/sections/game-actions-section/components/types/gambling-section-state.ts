@@ -1,4 +1,4 @@
-import IconType from "../icon-type";
+import IconType from "./icon-type";
 
 export default interface GamblingSectionState {
 
@@ -12,9 +12,9 @@ export default interface GamblingSectionState {
 
     roll: number[]|[];
 
-    roll_message: string;
+    roll_message: string | null;
 
-    error_message: string;
+    error_message: string | null;
 
     timeoutFor: number;
 

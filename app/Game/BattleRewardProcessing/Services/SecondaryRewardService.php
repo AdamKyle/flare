@@ -40,7 +40,7 @@ class SecondaryRewardService {
      * - Give XP to class Rank
      * - Give XP to equipped class specials
      * - Handle character skill progression
-     * 
+     *
      * @param Character $character
      * @return void
      */
@@ -58,7 +58,7 @@ class SecondaryRewardService {
         if ($character->isLoggedIn()) {
             event (new UpdateTopBarEvent($character->refresh()));
 
-            return;   
+            return;
         }
     }
 
@@ -83,6 +83,6 @@ class SecondaryRewardService {
             return;
         }
 
-        UpdateItemSkill::updateItemSkill($character, $equippedItem->item);        
+        UpdateItemSkill::updateItemSkill($character, $equippedItem->item);
     }
 }

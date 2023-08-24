@@ -121,6 +121,8 @@ class GuideQuestService {
 
     public function canHandInQuest(Character $character, GuideQuest $quest, bool $ignoreAutomation = false): bool {
 
+        $this->completedAttributes = [];
+
         $alreadyCompleted = $character->questsCompleted()->where('guide_quest_id', $quest->id)->first();
         $stats            = ['str', 'dex', 'dur', 'int', 'chr', 'agi', 'focus'];
 
@@ -141,6 +143,8 @@ class GuideQuestService {
             ->requiredGameMapAccess($character, $quest)
             ->requiredQuestItem($character, $quest)
             ->requiredQuestItem($character, $quest, false)
+            ->requiredMercenaryCheck($character, $quest)
+            ->requiredMercenaryCheck($character, $quest, false)
             ->requiredKingdomCount($character, $quest)
             ->requiredKingdomBuildingLevel($character, $quest)
             ->requiredKingdomUnitCount($character, $quest)

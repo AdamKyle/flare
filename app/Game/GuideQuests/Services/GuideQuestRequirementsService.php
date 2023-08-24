@@ -9,18 +9,15 @@ use App\Flare\Models\GuideQuest;
 use Illuminate\Support\Facades\Log;
 use App\Game\Skills\Values\SkillTypeValue;
 
-class GuideQuestRequirementsService
-{
+class GuideQuestRequirementsService {
 
     private array $finishedRequirements = [];
 
-    public function getFinishedRequirements(): array
-    {
+    public function getFinishedRequirements(): array {
         return $this->finishedRequirements;
     }
 
-    public function requiredLevelCheck(Character $character, GuideQuest $quest): GuideQuestRequirementsService
-    {
+    public function requiredLevelCheck(Character $character, GuideQuest $quest): GuideQuestRequirementsService {
         if (!is_null($quest->required_level)) {
             if ($character->level >= $quest->required_level) {
                 $this->finishedRequirements[] = 'required_level';
@@ -30,8 +27,7 @@ class GuideQuestRequirementsService
         return $this;
     }
 
-    public function requiredSkillCheck(Character $character, GuideQuest $quest, bool $primary = true): GuideQuestRequirementsService
-    {
+    public function requiredSkillCheck(Character $character, GuideQuest $quest, bool $primary = true): GuideQuestRequirementsService {
         $attribute = $primary ? 'required_skill' : 'required_secondary_skill';
 
         if (!is_null($quest->{$attribute})) {
@@ -47,8 +43,29 @@ class GuideQuestRequirementsService
         return $this;
     }
 
-    public function requiredSkillTypeCheck(Character $character, GuideQuest $quest): GuideQuestRequirementsService
-    {
+    public function requiredMercenaryCheck(Character $character, GuideQuest $quest, bool $primary = true): GuideQuestRequirementsService {
+        $attribute = $primary ? 'required_mercenary_type' : 'required_secondary_mercenary_type';
+
+        if (!is_null($quest->{$attribute})) {
+            $requiredMercenary = $character->mercenaries()->where('mercenary_type', $quest->{$attribute})->first();
+
+            if (is_null($requiredMercenary)) {
+                return $this;
+            }
+
+            $this->finishedRequirements[] = $attribute;
+
+            $levelAttribute = $primary ? 'required_mercenary_level' : 'required_secondary_mercenary_level';
+
+            if ($requiredMercenary->current_level >= $quest->{$levelAttribute}) {
+                $this->finishedRequirements[] = $levelAttribute;
+            }
+        }
+
+        return $this;
+    }
+
+    public function requiredSkillTypeCheck(Character $character, GuideQuest $quest): GuideQuestRequirementsService {
         if (!is_null($quest->required_skill_type)) {
             try {
                 $skillType = new SkillTypeValue($quest->required_skill_type);
@@ -68,8 +85,7 @@ class GuideQuestRequirementsService
         return $this;
     }
 
-    public function requiredFactionLevel(Character $character, GuideQuest $quest): GuideQuestRequirementsService
-    {
+    public function requiredFactionLevel(Character $character, GuideQuest $quest): GuideQuestRequirementsService {
         if (!is_null($quest->required_faction_id)) {
             $faction = $character->factions()->where('game_map_id', $quest->required_faction_id)->first();
 
@@ -81,8 +97,7 @@ class GuideQuestRequirementsService
         return $this;
     }
 
-    public function requiredGameMapAccess(Character $character, GuideQuest $quest): GuideQuestRequirementsService
-    {
+    public function requiredGameMapAccess(Character $character, GuideQuest $quest): GuideQuestRequirementsService {
         if (!is_null($quest->required_game_map_id)) {
             $gameMap = GameMap::find($quest->required_game_map_id);
 
@@ -98,8 +113,7 @@ class GuideQuestRequirementsService
         return $this;
     }
 
-    public function requiredQuest(Character $character, GuideQuest $quest): GuideQuestRequirementsService
-    {
+    public function requiredQuest(Character $character, GuideQuest $quest): GuideQuestRequirementsService {
         if (!is_null($quest->required_quest_id)) {
             $canHandIn = !is_null($character->questsCompleted()->where('quest_id', $quest->required_quest_id)->first());
 
@@ -111,8 +125,7 @@ class GuideQuestRequirementsService
         return $this;
     }
 
-    public function requiredQuestItem(Character $character, GuideQuest $quest, bool $primary = true): GuideQuestRequirementsService
-    {
+    public function requiredQuestItem(Character $character, GuideQuest $quest, bool $primary = true): GuideQuestRequirementsService {
         $attribute = $primary ? 'required_quest_item_id' : 'secondary_quest_item_id';
 
         if (!is_null($quest->{$attribute})) {
@@ -128,8 +141,7 @@ class GuideQuestRequirementsService
         return $this;
     }
 
-    public function requiredKingdomCount(Character $character, GuideQuest $quest): GuideQuestRequirementsService
-    {
+    public function requiredKingdomCount(Character $character, GuideQuest $quest): GuideQuestRequirementsService {
         if (!is_null($quest->required_kingdoms)) {
             if ($character->kingdoms->count() >= $quest->required_kingdoms) {
                 $this->finishedRequirements[] = 'required_kingdoms';
@@ -139,8 +151,7 @@ class GuideQuestRequirementsService
         return $this;
     }
 
-    public function requiredKingdomBuildingLevel(Character $character, GuideQuest $quest): GuideQuestRequirementsService
-    {
+    public function requiredKingdomBuildingLevel(Character $character, GuideQuest $quest): GuideQuestRequirementsService {
         if (!is_null($quest->required_kingdom_level)) {
             foreach ($character->kingdoms as $kingdom) {
                 if ($kingdom->buildings->sum('level') >= $quest->required_kingdom_level) {
@@ -154,8 +165,7 @@ class GuideQuestRequirementsService
         return $this;
     }
 
-    public function requiredKingdomUnitCount(Character $character, GuideQuest $quest): GuideQuestRequirementsService
-    {
+    public function requiredKingdomUnitCount(Character $character, GuideQuest $quest): GuideQuestRequirementsService {
         if (!is_null($quest->required_kingdom_units)) {
             foreach ($character->kingdoms as $kingdom) {
                 if ($kingdom->units->sum('amount') >= $quest->required_kingdom_units) {
@@ -169,8 +179,7 @@ class GuideQuestRequirementsService
         return $this;
     }
 
-    public function requiredKingdomPassiveLevel(Character $character, GuideQuest $quest): GuideQuestRequirementsService
-    {
+    public function requiredKingdomPassiveLevel(Character $character, GuideQuest $quest): GuideQuestRequirementsService {
 
         if (!is_null($quest->required_passive_skill) && !is_null($quest->required_passive_level)) {
             $requiredSkill = $character->passiveSkills()->where('passive_skill_id', $quest->required_passive_skill)->first();
@@ -183,8 +192,7 @@ class GuideQuestRequirementsService
         return $this;
     }
 
-    public function requiredCurrency(Character $character, GuideQuest $quest, string $currency): GuideQuestRequirementsService
-    {
+    public function requiredCurrency(Character $character, GuideQuest $quest, string $currency): GuideQuestRequirementsService {
         if (!is_null($quest->{'required_' . $currency})) {
             if ($character->{$currency} >= $quest->{'required_' . $currency}) {
                 $this->finishedRequirements[] = 'required_' . $currency;
@@ -194,8 +202,7 @@ class GuideQuestRequirementsService
         return $this;
     }
 
-    public function requiredTotalStats(Character $character, GuideQuest $quest, array $stats): GuideQuestRequirementsService
-    {
+    public function requiredTotalStats(Character $character, GuideQuest $quest, array $stats): GuideQuestRequirementsService {
         if (!is_null($quest->required_stats)) {
 
             $completedStats = [];
@@ -216,8 +223,7 @@ class GuideQuestRequirementsService
         return $this;
     }
 
-    public function requiredStats(Character $character, GuideQuest $quest, array $stats): GuideQuestRequirementsService
-    {
+    public function requiredStats(Character $character, GuideQuest $quest, array $stats): GuideQuestRequirementsService {
         foreach ($stats as $stat) {
             $questStat = $quest->{'required_' . $stat};
 
@@ -233,8 +239,7 @@ class GuideQuestRequirementsService
         return $this;
     }
 
-    protected function classSkillCheck(Character $character, GuideQuest $quest): void
-    {
+    protected function classSkillCheck(Character $character, GuideQuest $quest): void {
         $classSkill = $character->skills()->whereHas('baseSkill', function ($query) use ($character) {
             $query->whereNotNull('game_class_id')
                 ->where('game_class_id', $character->class->id);
@@ -247,8 +252,7 @@ class GuideQuestRequirementsService
         }
     }
 
-    protected function craftingSkillTypeCheck(Character $character, GuideQuest $quest): void
-    {
+    protected function craftingSkillTypeCheck(Character $character, GuideQuest $quest): void {
         $classSkill = $character->skills()->whereHas('baseSkill', function ($query) use ($character) {
             $query->where('type', SkillTypeValue::CRAFTING);
         })->first();
