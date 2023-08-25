@@ -1,179 +1,48 @@
-# Flare
-Test
-Flare is intended to be a simple, old school game where you can chat, fight monsters and rule kingdoms.
+# Planes of Tlessa
 
-The goal of Flare is simple to replicate some of my favourite browser based games that I use to play when I was younger.
+Welcome to Planes of Tlessa!
 
-For example this game draws heavily on two games:
+Planes of Tlessa, code name: Flare, is a [PBBG](https://en.wikipedia.org/wiki/Browser_game#Persistence) where players can level their characters, find loot, settle kingdoms and so much more.
 
-- [Race War Kingdoms](http://www.glitchless.com/racewarkingdoms.html)
-- [Tribal Wars Two](https://www.innogames.com/games/tribal-wars-2/)
+Planes of Tlessa, also know as: Tlessa, is a completely free, no pay to win mechanics and no restrictions on how long you can play.
 
-If you have ideas for the game, please open a ticket with the appropriate template.
+All players are on the same level, working towards the same end game and getting the same gear, the only currency the game accepts is: Time.
+
+Looking to contribute to Tlessa? A completely open source, MIT licensed game? Checkout the [developer docs](https://github.com/AdamKyle/flare/wiki/Planes-of-Tlessa-Development-Documentation).
 
 ## Features
 
-- Crafting/Enchanting
-- Uniques
-- Faction Farming
-- Kingdom Passive Skill KingdomPassiveTree, Various Trainable Skills
-- Fighting Monsters including automation (Exploration)
-- Adventuring
-- Kingdom Management
-- Market (Player Trade)
-- Intractable map.
-- Real Time Chat.
-- Truly Persistent.
+-   Crafting
+-   Enchanting
+-   Alchemy
+-   Sockets/Gems
+-   Diablo Esque Gear
+-   Raids
+-   PVP
+-   Kingdoms
+-   Quests
+-   6 Planes to traverse
+-   Map where you can move around and interact with locations.
+-   Hundreds of monsters
+-   Final Fantasy Esque Job System
+-   Disgea Esque Reincarnation System
 
-## Common FAQ
+These are just some of the feature Tlessa has to offer. There are tons of more features in game that players can interact with. All for free.
 
-- Is this game pay to win? Cash shops? Ads?
+## No Cash Shop
 
-No, there is no way for you to spend any money in this game. You cannot buy levels, characters, items, nothing. You want it, you earn it.
+Tlessa does not make money from players at this time and has no intention of creating any kind of "pay wall" for progression.
 
-- How does this game make money if there is no cash shop or ads?
+Every feature, every system, every aspect of the game that you interact with in which progresses your character will always be 100% free.
 
-It doesn't. It's a completely free, open source game with no intentions to add any form of 
-monetization.
+Tlessa may, one day, offer cosmetic items in the shop, such as chat colors, titles, adventures in which you play through a text based story and are rewarded with a cosmetic item.
 
-- Are there clans, guilds or resets for the kingdoms or other aspects of the game?
+## No Energy Systems
 
-No. It's every person for themselves. There are also no resets.
+There is no energy system in Tlessa. Play as long as you want or as little as you want. Tlessa doe have timers that can ranges from seconds for crafting, fighting and so on - to hours for special skills, building upgrades and so on.
 
-- Are there energy systems or ways to slow the player down?
+## Quests Unlock Features
 
-No and yes. There are no energy systems, that is there is no feature in-game to prevent you from being as active as you want to be. 
-However, we do make use of timers, these can range from 10 seconds for successfully killing a monster to a few hours for an exploration to (at most) a couple of hours for upgrading buildings (at higher levels) for your kingdom.
+Since the entire game is completely free, A lot of content is gated behind quests. There are tone of quests including raid quests when raids spawn. Quests unlock new planes, abilities, classes, skills and other features of the game that allow your character to progress.
 
-The idea is to keep you engaged and playing.
-
-- I can't play all the time, how do I catch up?
-
-There are many ways you can catch up. You could be the type of player who runs adventures all the time - these are the most idle aspect of the game. Maybe you want to rule all the kingdoms on the map, or craft and enchant all the best items and sell them on the market to make a profit.
-
-# Development and Testing
-
-Planes of Tlessa does not use Docker or Vagrant. I run off the metal. This means you will need a few tabs open:
-
-- php artisan serve
-- php artisan websockets:serve
-- php artisan horizon
-- yarn watch
-
-These are all run through supervisor jobs (except the last one) on production. If you choose to docker-ize the app then you will need to make
-sure that these also run. Yarn watch should be converted to some command that refreshes the browser from docker.
-
-If you are not running docker, you need a Separate tab for each of these commands to be running, 
-not to mention you need redis running for websockets and horizon.
-
-## Getting started with Development:
-
-- `git clone ...`
-- cp .env.example .env (see below on websockets and redis)
-- `composer install && yarn && php artisan migrate --seed && php artisan create:admin email && yarn dev`
-- start redis: eg, `redis-server /usr/local/etc/redis.conf` (you need redis-server and php redis, `pecl install redis`)
-- start websockets: `php artisan websocket:serve`
-- listen for queues: `php artisan horizon`
-- Publish information section: `php artisan move:files` <sup>**</sup>
-- From there you can register as a new player.
-  - Or since you ran the `create:admin` command you can reset your admin password and login as admin to make changes to the game<sup>*</sup>.
-- Regular players, who sign up, will only see the game section.
-
-<sup>*</sup> See setting up an email below.
-
-<sup>**</sup> The information section is composed of mark down files. This is very experimental at the moment. It takes a series of mark down files, converts them into one document and displays it to the user. The information section is like a Help section.
-
-## Redis
-
-We use redis for jobs and queues within the system. To get started, make sure you have php redis installed, the redis server and that it's running.
-
-Next update the .env file with:
-
-```
-REDIS_HOST=127.0.0.1
-REDIS_PASSWORD=yourpassword
-REDIS_PORT=6379
-REDIS_CLIENT=phpredis
-REDIS_CLUSTER=phpredis
-```
-
-then run: `php artisan queue:work --queue=high,default --tries=1`
-
-## Websockets
-
-This game depends heavily on websockets for almost everything we do. With that said, to get started all you have to do is set the following in the env
-and then start the websocket server:
-
-```
-BROADCAST_DRIVER=pusher
-...
-PUSHER_APP_ID=test
-PUSHER_APP_KEY=test
-PUSHER_APP_SECRET=test
-PUSHER_APP_CLUSTER=mt1
-```
-
-## Horizon
-
-This game uses horizon to monitor its jobs. For local development, just go to /horizon.
-
-## Extra Config
-
-In the ENV example file is some extra bits you can set:
-
-- TIME_ZONE: The time zone name you want your game to run in, ie: America/Edmonton (mandatory)
-- GITHUB_TOKEN: The token which the app uses to fetch release information.
-- HORIZON_EMAIL: For prod, so you do not commit your email in the code base.
-- ALLOW_MUlTIPLE_SIGNIN: 1 or 0 only. 1 means yes, up to 10 per IP, 0 means no. 1 per ip. Great for dev.
-
-## Setting up Email:
-
-This game, for the admin section at the time of this writing, requires a way to send out emails.
-
-For example, you can read [here](https://medium.com/@agavitalis/how-to-send-an-email-in-laravel-using-gmail-smtp-server-53d962f01a0c) about setting up gmail with laravel.
-
-## Setting up the database
-
-When setting up the database you need to do things in order, or you can get unexpected results. Follow the steps below to get Tlessa up and running:
-
-- php artisan storage:link
-- php artisan migrate
-- php artisan migrate:seed
-- php artisan create:admin youremail@email.com (an email will be sent to you, so make sure email s configured properly.)
-- Maps must be imported first. (/resources/maps)
-
-The next set of steps requires you to use the excel sheets in resources/data-imports:
-
-- import passive skills
-- import skills
-- import kingdoms
-- import affixes
-- import items (from /resources/data-imports/items - import all these files in any order)
-- import npcs
-- import quests
-- import monsters
-
-There is no location export data, so your maps won't have locations or ports, you are free to set this up yourself. However, in the QuestItems excel there are specific locations
-for some quest items to drop. You can create locations with the same name before importing the quest items.
-
-## Caching Things
-
-Next we need to cache monsters for various maps, locations and so on.
-
-Finally, do `php artisan tinker` and run:
-
-- `resolve(App\Flare\Services\BuildMonsterCacheService::class)->buildCache()`
-
-This allows you to face off against monsters in special locations
-
-With that done. You have the game imported.
-
-## Testing
-
-- `composer phpunit` this will also generate code coverage report.
-- `./vendor/bin/phpunit` this will not generate code coverage but can be used for debugging specific tests via the `--filter=` option
-
-## Tip For Deploying
-
-- When it comes to the mjml emails you might get an error about how it could not find mjml in your directory where you deployed to.
-  All you have to do is install MJML (`npm -i -g mjml`) as a global package.
+For example, new players have a max level cap of 1000. However, players who complete a series of quests (laid out as a tree) will unlock a quest item to allow them to level to 5000.

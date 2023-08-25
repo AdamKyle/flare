@@ -147,7 +147,15 @@
 
     <script src={{mix('js/theme-vendor.js')}} type="text/javascript"></script>
     <script src={{mix('js/theme-script.js')}} type="text/javascript"></script>
-    <script src="{{ mix('js/app.js') }}"></script>
+
+    @if (!is_null(auth()->user()))
+        @if (!auth()->user()->hasRole('Admin'))
+            <script src="{{ mix('js/app.js') }}"></script>
+        @endif
+    @endif
+
+
+    <script src="{{ mix('js/admin-app.js') }}"></script>
 
     @stack('scripts')
 </body>

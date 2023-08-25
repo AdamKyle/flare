@@ -45,6 +45,7 @@ mix.webpackConfig({
     extensions: ["*", ".js", ".jsx", ".vue", ".ts", ".tsx"]
   }
 }).ts('resources/js/app.ts', 'public/js').react().extract()
+  .ts('resources/js/admin-app.ts', 'public/js').react().extract()
   .sass('resources/sass/app.scss', 'public/css')
   .postCss('resources/css/tailwind.css', 'public/css', [
     postCssImport(),
