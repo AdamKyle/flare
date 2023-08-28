@@ -35,7 +35,7 @@ class ElementalAtonementTest extends TestCase {
         $this->characterStatBuilder = resolve(CharacterStatBuilder::class);
     }
 
-    public function testCharacterHasMaxedOutElementalAtonement() {
+    public function testCharacterWithMaxedOutElementalAtonement() {
         $item = $this->createItem([
             'type' => 'weapon',
             'socket_count' => 1,
