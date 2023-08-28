@@ -320,7 +320,7 @@ class CharacterStatBuilder {
         if (!is_null($this->equippedItems)) {
             $itemSkillBonus = ItemSkillAttribute::fetchModifier($this->character, $this->equippedItems, 'base_ac');
         }
-        
+
 
         return $defence + ($defence * ($holyBonus + $classSpecialsBonus + $itemSkillBonus));
     }
@@ -425,7 +425,7 @@ class CharacterStatBuilder {
             return 0;
         }
 
-        $highestDamage = $this->getHighestElementDamage($this->buildElementalAtonement()); 
+        $highestDamage = $this->getHighestElementDamage($this->buildElementalAtonement());
 
         $attack = ceil($weaponAttack * $highestDamage);
 
@@ -439,7 +439,7 @@ class CharacterStatBuilder {
 
         return $attack;
     }
-    
+
 
     /**
      * Add bonus to spell damage.
@@ -635,7 +635,7 @@ class CharacterStatBuilder {
 
         if (!is_null($this->equippedItems)) {
             $itemSkillBonus = ItemSkillAttribute::fetchModifier($this->character, $this->equippedItems, 'base_healing');
-        }     
+        }
 
         return ceil($healing + ($healing * ($this->holyInfo()->fetchHealingBonus() + $classSpecialsBonus + $itemSkillBonus)));
     }
