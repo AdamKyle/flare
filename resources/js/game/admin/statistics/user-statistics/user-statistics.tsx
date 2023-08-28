@@ -1,4 +1,4 @@
-import React, {Fragment} from "react";
+import React, { Fragment } from "react";
 import LoginStatistics from "./components/login-statistics";
 import BasicCard from "../../../components/ui/cards/basic-card";
 import RegistrationStatistics from "./components/registration-statistics";
@@ -8,41 +8,43 @@ import CharacterReincarnationStatistics from "./components/character-reincarnati
 import CharacterTotalGold from "./components/character-total-gold";
 
 export default class UserStatistics extends React.Component<any, any> {
-
     constructor(props: any) {
         super(props);
     }
 
     render() {
-        return  (
-            <div className='pb-10'>
-                <div className='grid lg:grid-cols-2 gap-3 mb-5'>
+        return (
+            <div className="pb-10">
+                <div className="grid lg:grid-cols-2 gap-3 mb-5">
                     <BasicCard>
-                        <h3 className='mb-4'>Logins (Last 7 Days)</h3>
+                        <h3 className="mb-4">Logins (Last 7 Days)</h3>
                         <LoginStatistics />
                     </BasicCard>
                     <BasicCard>
-                        <h3 className='mb-4'>Registrations (Last 7 Days)</h3>
+                        <h3 className="mb-4">Registrations (Last 7 Days)</h3>
                         <RegistrationStatistics />
                     </BasicCard>
                 </div>
-                <div className='grid lg:grid-cols-2 gap-3 mb-5'>
-                    <BasicCard additionalClasses={'mb-5'}>
-                        <h3 className='mb-4'>Characters Who Reincarnated Once (or more)</h3>
+                <div className="grid lg:grid-cols-2 gap-3 mb-5">
+                    <BasicCard additionalClasses={"mb-5"}>
+                        <h3 className="mb-4">
+                            Characters Who Reincarnated Once (or more)
+                        </h3>
                         <CharacterReincarnationStatistics />
                     </BasicCard>
-                    <BasicCard additionalClasses={'mb-5'}>
-                        <h3 className='mb-4'>Character Gold (Over 1 Billion)</h3>
+                    <BasicCard additionalClasses={"mb-5"}>
+                        <h3 className="mb-4">
+                            Character Gold (Over 1 Billion)
+                        </h3>
                         <CharacterGoldStatistics />
                     </BasicCard>
                 </div>
-                <BasicCard additionalClasses={'my-4'}>
-                    <h3 className='mb-4'>Characters Gold</h3>
+                <BasicCard additionalClasses={"my-4"}>
+                    <h3 className="mb-4">Characters Gold</h3>
                     <CharacterTotalGold />
                 </BasicCard>
                 <OtherStatistics />
             </div>
         );
     }
-
 }

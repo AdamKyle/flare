@@ -73,6 +73,16 @@ export default class CharacterTotalGold extends React.Component<any, any> {
             data: this.state.data,
         }];
 
+        if (this.state.data.length === 0) {
+            return (
+                <div className="p-4 text-center">
+                    <p>
+                        There is no information to display at this time.
+                    </p>
+                </div>
+            )
+        }
+
         return (
             <Fragment>
                 <ResizableBox height={350}>

@@ -10,7 +10,6 @@ use App\Flare\Models\GameRace;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameClass;
 use Illuminate\Console\Command;
-use App\Flare\Values\MapNameValue;
 use Illuminate\Support\Facades\Hash;
 use App\Flare\Builders\CharacterBuilder;
 use Illuminate\Database\Eloquent\Collection;
@@ -44,7 +43,7 @@ class TestExploration extends Command
         $characters = $this->getTheCharacters($characterBuilder, $numberOfCharacters, $characterToIgnore);
 
         $this->line('Starting explorations for 1 hour, using default attack type, killing the first surface monster ...');
-        
+
         foreach ($characters as $character) {
             $explorationAutomationService->beginAutomation($character, [
                 'selected_monster_id'      => Monster::where('name', 'Sewer Rat')->first()->id,
@@ -59,7 +58,7 @@ class TestExploration extends Command
 
     /**
      * Get the collection of characters.
-     * 
+     *
      * - Will create a specfic amount to match the number of characters we want to use for exploration.
      * - Will ignore a specfic character from the list to return.
      *
