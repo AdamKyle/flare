@@ -2,9 +2,12 @@
 
 namespace App\Flare\Builders\CharacterInformation\AttributeBuilders;
 
+use App\Flare\Builders\Character\Traits\FetchEquipped;
+use App\Flare\Models\Character;
 use App\Flare\Models\Item;
 use App\Flare\Traits\ElementAttackData;
 use App\Game\Gems\Services\GemComparison;
+use Illuminate\Support\Collection;
 
 class ElementalAtonement extends BaseAttribute {
 
@@ -72,7 +75,7 @@ class ElementalAtonement extends BaseAttribute {
      * Calculates the average values for each key in the given atonement data.
      *
      * - Caps at 75%.
-     * 
+     *
      * @param array $atonements The atonement data.
      * @return array The array of average values.
      */
@@ -112,6 +115,6 @@ class ElementalAtonement extends BaseAttribute {
      * @return array
      */
     protected function buildPossibleAtonementDataWithDefaultValuesForItem(Item $item): array {
-       return $this->gemComparison->getElementAtonement($item)['atonements'];
+        return $this->gemComparison->getElementAtonement($item)['atonements'];
     }
 }

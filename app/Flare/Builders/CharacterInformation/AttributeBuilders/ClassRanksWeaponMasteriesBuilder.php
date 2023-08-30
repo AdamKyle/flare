@@ -89,10 +89,6 @@ class ClassRanksWeaponMasteriesBuilder extends BaseAttribute {
 
             $weaponMastery = $classRank->weaponMasteries->where('weapon_type', $weaponMasteryType)->where('character_class_rank_id', $classRank->id)->first();
 
-            if (is_null($weaponMastery)) {
-                return 0.0;
-            }
-
             return $weaponMastery->level / 100;
 
         } catch (Exception $e) {

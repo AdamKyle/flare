@@ -13,7 +13,7 @@ trait ElementAttackData {
      * @return integer
      */
     public function getHighestElementDamage(array $elementData): float {
-        return max(array_values($elementData)); 
+        return max(array_values($elementData));
     }
 
     /**
@@ -29,7 +29,7 @@ trait ElementAttackData {
 
     /**
      * Is the attacking element only going to do half damage?
-     * 
+     *
      * Example: Fire vs Water.
      *
      * @param array $elementData
@@ -39,13 +39,13 @@ trait ElementAttackData {
     public function isHalfDamage(array $elementData, string $attackingElementName): bool {
 
         $name = $this->getHighestElementName($elementData, $this->getHighestElementDamage($elementData));
-        
+
         return GemTypeValue::getOppsiteForHalfDamage($name)  === $attackingElementName;
     }
 
     /**
      * Is the attacking element going to do double damage?
-     * 
+     *
      * Example: Water vs Fire
      *
      * @param array $elementData
@@ -65,13 +65,13 @@ trait ElementAttackData {
      * @return array
      */
     public function getHighestElementalValue(array $elementData): array {
-        $highestValue = $this->getHighestElementDamage($elementData); 
+        $highestValue = $this->getHighestElementDamage($elementData);
         $key          = $this->getHighestElementName($elementData, $highestValue);
 
         $result = [
             substr($key, 0, strpos($key, '_')) => $highestValue
         ];
-    
+
         return $result;
     }
 }

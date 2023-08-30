@@ -1709,8 +1709,8 @@ class CharacterStatBuilderTest extends TestCase {
             ->equipStartingEquipment()
             ->getCharacter();
 
-        $alcoholicDamage = $this->characterStatBuilder->setCharacter($alcoholic)->buildDamage('weapon');
         $fighterDamage   = $this->characterStatBuilder->setCharacter($fighter)->buildDamage('weapon');
+        $alcoholicDamage = $this->characterStatBuilder->setCharacter($alcoholic)->buildDamage('weapon');
 
         $this->assertGreaterThan($alcoholicDamage, $fighterDamage);
     }
@@ -1740,8 +1740,8 @@ class CharacterStatBuilderTest extends TestCase {
             ->levelCharacterUp(25)
             ->getCharacter();
 
-        $alcoholicDamage = $this->characterStatBuilder->setCharacter($alcoholic)->buildDamage('weapon');
         $fighterDamage   = $this->characterStatBuilder->setCharacter($fighter)->buildDamage('weapon');
+        $alcoholicDamage = $this->characterStatBuilder->setCharacter($alcoholic)->buildDamage('weapon');
 
         $this->assertGreaterThan($fighterDamage, $alcoholicDamage);
     }
@@ -1791,8 +1791,59 @@ class CharacterStatBuilderTest extends TestCase {
             )
             ->getCharacter();
 
-        $alcoholicDamage = $this->characterStatBuilder->setCharacter($alcoholic)->buildDamage('spell-damage');
         $fighterDamage   = $this->characterStatBuilder->setCharacter($fighter)->buildDamage('spell-damage');
+        $alcoholicDamage = $this->characterStatBuilder->setCharacter($alcoholic)->buildDamage('spell-damage');
+
+        $this->assertGreaterThan($alcoholicDamage, $fighterDamage);
+    }
+
+    public function testSpellHealingShouldBeHalfDamageForAlcoHolics() {
+        $alcoholic = (new CharacterFactory())->createBaseCharacter([], $this->createClass([
+            'name'        => CharacterClassValue::ALCOHOLIC,
+            'damage_stat' => 'str'
+        ]))->assignSkill(
+            $this->createGameSkill([
+                'class_bonus' => 0.01
+            ]),
+            5
+        )->givePlayerLocation()
+            ->inventoryManagement()
+            ->giveItem(
+                $this->createItem(['type' => 'spell-healing', 'base_healing' => 10]),
+                true,
+                'spell-one'
+            )
+            ->giveItem(
+                $this->createItem(['type' => 'spell-healing', 'base_healing' => 10]),
+                true,
+                'spell-two'
+            )
+            ->getCharacter();
+
+        $fighter = (new CharacterFactory())->createBaseCharacter([], $this->createClass([
+            'name'        => CharacterClassValue::FIGHTER,
+            'damage_stat' => 'str'
+        ]))->assignSkill(
+            $this->createGameSkill([
+                'class_bonus' => 0.01
+            ]),
+            5
+        )->givePlayerLocation()
+            ->inventoryManagement()
+            ->giveItem(
+                $this->createItem(['type' => 'spell-healing', 'base_healing' => 10]),
+                true,
+                'spell-one'
+            )
+            ->giveItem(
+                $this->createItem(['type' => 'spell-healing', 'base_healing' => 10]),
+                true,
+                'spell-two'
+            )
+            ->getCharacter();
+
+        $fighterDamage   = $this->characterStatBuilder->setCharacter($fighter)->buildHealing();
+        $alcoholicDamage = $this->characterStatBuilder->setCharacter($alcoholic)->buildHealing();
 
         $this->assertGreaterThan($alcoholicDamage, $fighterDamage);
     }
@@ -1901,5 +1952,47 @@ class CharacterStatBuilderTest extends TestCase {
         $prophetHealing = $this->characterStatBuilder->setCharacter($prophet)->buildHealing();
 
         $this->assertGreaterThan($rangerHealing, $prophetHealing);
+    }
+
+    public function testNoResistanceReductionForCharacterWhenCharacterIsVoided() {
+        $character = $this->character->getCharacter();
+
+        $resistance = $this->characterStatBuilder->setCharacter($character)->buildResistanceReductionChance(true);
+
+        $this->assertEquals(0, $resistance);
+    }
+
+    public function testCharacterHasResistanceReductionOnPrefixBasedItems() {
+        $character = $this->character->inventoryManagement()->giveItem(
+            $this->createItem([
+                'item_prefix_id' => $this->createItemAffix([
+                    'resistance_reduction' => 0.10
+                ])->id,
+                'type' => 'weapon'
+            ]),
+            true,
+            'left_hand'
+        )->getCharacter();
+
+        $resistance = $this->characterStatBuilder->setCharacter($character)->buildResistanceReductionChance();
+
+        $this->assertEquals(0.10, $resistance);
+    }
+
+    public function testCharacterHasResistanceReductionOnPrefixBasedItemsThatDoesNotGoAboveOneHundredPercent() {
+        $character = $this->character->inventoryManagement()->giveItem(
+            $this->createItem([
+                'item_prefix_id' => $this->createItemAffix([
+                    'resistance_reduction' => 1.10
+                ])->id,
+                'type' => 'weapon'
+            ]),
+            true,
+            'left_hand'
+        )->getCharacter();
+
+        $resistance = $this->characterStatBuilder->setCharacter($character)->buildResistanceReductionChance();
+
+        $this->assertEquals(1, $resistance);
     }
 }

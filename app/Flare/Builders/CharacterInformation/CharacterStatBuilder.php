@@ -248,7 +248,7 @@ class CharacterStatBuilder {
 
         $baseStat =  $this->applyBoons($baseStat);
         $baseStat =  $this->applyBoons($baseStat, $stat . '_mod');
-        $baseStat += ItemSkillAttribute::fetchModifier($this->character, $this->equippedItems, $stat . '_mod');
+        $baseStat += ItemSkillAttribute::fetchModifier($this->character, $stat . '_mod');
 
         if ($stat === $this->character->damage_stat) {
             $classSpecialsBonus = $this->character->classSpecialsEquipped
@@ -319,7 +319,7 @@ class CharacterStatBuilder {
         $itemSkillBonus = 0;
 
         if (!is_null($this->equippedItems)) {
-            $itemSkillBonus = ItemSkillAttribute::fetchModifier($this->character, $this->equippedItems, 'base_ac');
+            $itemSkillBonus = ItemSkillAttribute::fetchModifier($this->character, 'base_ac');
         }
 
 
@@ -394,7 +394,7 @@ class CharacterStatBuilder {
         $itemSkillBonus = 0;
 
         if (!is_null($this->equippedItems)) {
-            $itemSkillBonus = ItemSkillAttribute::fetchModifier($this->character, $this->equippedItems, 'base_damage');
+            $itemSkillBonus = ItemSkillAttribute::fetchModifier($this->character, 'base_damage');
         }
 
         return ceil($damage + ($damage * ($this->holyInfo()->fetchAttackBonus() + $classSpecialsBonus + $itemSkillBonus)));
@@ -594,7 +594,7 @@ class CharacterStatBuilder {
         $itemSkillBonus = 0;
 
         if (!is_null($this->equippedItems)) {
-            $itemSkillBonus = ItemSkillAttribute::fetchModifier($this->character, $this->equippedItems, 'base_healing');
+            $itemSkillBonus = ItemSkillAttribute::fetchModifier($this->character, 'base_healing');
         }
 
         return ceil($healing + ($healing * ($this->holyInfo()->fetchHealingBonus() + $classSpecialsBonus + $itemSkillBonus)));
@@ -734,7 +734,7 @@ class CharacterStatBuilder {
             return 0;
         }
 
-        $resistanceReduction = $this->equippedItems->pluck('item.itemPrefix.resistance_reduction')->toArray();
+        $resistanceReduction = $this->equippedItems->sum('item.itemPrefix.resistance_reduction');
 
         if ($resistanceReduction > 1) {
             $resistanceReduction = 1.0;

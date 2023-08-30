@@ -3,7 +3,6 @@
 namespace App\Flare\Builders\CharacterInformation\AttributeBuilders;
 
 use App\Flare\Models\Character;
-use Illuminate\Support\Collection;
 use App\Flare\Builders\Character\Traits\FetchEquipped;
 
 class ItemSkillAttribute {
@@ -11,13 +10,15 @@ class ItemSkillAttribute {
     use FetchEquipped;
 
     /**
-     * Fetch the item skill atrribute based on the progression.
+     * Fetch the item skill attribute based on the progression.
      *
      * @param Character $character
      * @param string $attribute
      * @return float
      */
-    public function fetchModifier(Character $character, Collection $equippedItems, string $attribute): float {
+    public function fetchModifier(Character $character, string $attribute): float {
+        $equippedItems = $this->fetchEquipped($character);
+
         $slot = $equippedItems->filter(function($slot) {
             return $slot->item->type === 'artifact';
         })->first();

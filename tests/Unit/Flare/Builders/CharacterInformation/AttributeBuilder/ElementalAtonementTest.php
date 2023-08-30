@@ -2,7 +2,7 @@
 
 namespace Tests\Unit\Flare\Builders\CharacterInformation\AttributeBuilder;
 
-
+use App\Flare\Builders\CharacterInformation\AttributeBuilders\ElementalAtonement;
 use Tests\TestCase;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateClass;
@@ -22,6 +22,8 @@ class ElementalAtonementTest extends TestCase {
 
     private ?CharacterStatBuilder $characterStatBuilder;
 
+    private ?ElementalAtonement $elementalAtonement;
+
     public function setUp(): void {
         parent::setUp();
 
@@ -33,6 +35,16 @@ class ElementalAtonementTest extends TestCase {
         )->givePlayerLocation();
 
         $this->characterStatBuilder = resolve(CharacterStatBuilder::class);
+
+        $this->elementalAtonement = resolve(ElementalAtonement::class);
+    }
+
+    public function tearDown(): void {
+        parent::tearDown();
+
+        $this->character            = null;
+        $this->characterStatBuilder = null;
+        $this->elementalAtonement   = null;
     }
 
     public function testCharacterWithMaxedOutElementalAtonement() {
@@ -62,5 +74,18 @@ class ElementalAtonementTest extends TestCase {
         $this->assertEquals('Fire', $elementalData['highest_element']['name']);
         $this->assertEquals(0.75, $elementalData['highest_element']['damage']);
         $this->assertNotEmpty($elementalData['elemental_data']);
+    }
+
+    public function testCharacterGetsNothingBackForElementalAtonement() {
+
+        $character = $this->character->getCharacter();
+
+        $equipped = $this->characterStatBuilder->fetchEquipped($character);
+
+        $this->elementalAtonement->initialize($character, $character->skills, $equipped);
+
+        $value = $this->elementalAtonement->calculateAtonement();
+
+        $this->assertNull($value);
     }
 }

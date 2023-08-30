@@ -51,7 +51,7 @@ class DamageBuilder extends BaseAttribute {
         if ($this->character->class->type()->isFighter()) {
             $baseDamage = $damageStat * 0.15;
         } else if ($this->character->class->type()->isArcaneAlchemist()) {
-            $hasStaveEquipped = $this->inventory->filter(function($slot) {
+            $hasStaveEquipped = $this->inventory->filter(function ($slot) {
                 return $slot->item->type === WeaponTypes::STAVE;
             })->isNotEmpty();
 
@@ -65,7 +65,7 @@ class DamageBuilder extends BaseAttribute {
         $itemDamage      = $this->getDamageFromWeapons($position);
         $skillPercentage = 0;
 
-        if ($this->shouldIncludeSkillDamage($class,'weapon')) {
+        if ($this->shouldIncludeSkillDamage($class, 'weapon')) {
             $skillPercentage = $this->fetchBaseAttributeFromSkills('base_damage');
         }
 
@@ -111,7 +111,7 @@ class DamageBuilder extends BaseAttribute {
 
         $skillPercentage = 0;
 
-        if ($this->shouldIncludeSkillDamage($class,'spell')) {
+        if ($this->shouldIncludeSkillDamage($class, 'spell')) {
             $skillPercentage = $this->fetchBaseAttributeFromSkills('base_damage');
         }
 
@@ -183,11 +183,11 @@ class DamageBuilder extends BaseAttribute {
         }
 
         $itemSuffix = $this->inventory->where('item.itemSuffix.damage_can_stack', false)
-                                      ->where('item.itemSuffix.irresistible_damage', true)
-                                      ->sum('item.itemSuffix.damage');
+            ->where('item.itemSuffix.irresistible_damage', true)
+            ->sum('item.itemSuffix.damage');
         $itemPrefix = $this->inventory->where('item.itemPrefix.damage_can_stack', false)
-                                      ->where('item.itemPrefix.irresistible_damage', true)
-                                      ->sum('item.itemPrefix.damage');
+            ->where('item.itemPrefix.irresistible_damage', true)
+            ->sum('item.itemPrefix.damage');
 
         $amounts = array_filter([$itemPrefix, $itemSuffix]);
 
@@ -211,11 +211,11 @@ class DamageBuilder extends BaseAttribute {
         }
 
         $itemSuffix = $this->inventory->where('item.itemSuffix.damage_can_stack', true)
-                                      ->where('item.itemSuffix.irresistible_damage', true)
-                                      ->sum('item.itemSuffix.damage');
+            ->where('item.itemSuffix.irresistible_damage', true)
+            ->sum('item.itemSuffix.damage');
         $itemPrefix = $this->inventory->where('item.itemPrefix.damage_can_stack', true)
-                                      ->where('item.itemPrefix.irresistible_damage', true)
-                                      ->sum('item.itemPrefix.damage');
+            ->where('item.itemPrefix.irresistible_damage', true)
+            ->sum('item.itemPrefix.damage');
 
         return $itemPrefix + $itemSuffix;
     }
