@@ -471,7 +471,7 @@ class CharacterFactory {
         $characterService = new CharacterService();
 
         for ($i = 0; $i <= $levels; $i++) {
-            $characterService->levelUpCharacter($this->character);
+            $characterService->levelUpCharacter($this->character, 0);
 
             $this->character = $this->character->refresh();
         }

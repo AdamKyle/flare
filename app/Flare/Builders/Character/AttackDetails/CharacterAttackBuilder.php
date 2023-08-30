@@ -189,7 +189,7 @@ class CharacterAttackBuilder {
         $weaponDamage = $this->characterStatBuilder->positionalWeaponDamage($weaponPosition, $voided);
         $spellDamage  = $this->characterStatBuilder->positionalSpellDamage($spellPosition, $voided);
         $spellHealing = $this->characterStatBuilder->positionalHealing($spellPosition, $voided);
-        
+
         $attack['spell_damage']  = $spellDamage;
         $attack['heal_for']      = $spellHealing;
         $attack['weapon_damage'] = $weaponDamage;

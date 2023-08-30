@@ -97,12 +97,13 @@ class CharacterStatBuilder {
      * @param ReductionsBuilder $reductionsBuilder
      * @param ElementalAtonement $elementalAtonement
      */
-    public function __construct(DefenceBuilder $defenceBuilder,
-                                DamageBuilder $damageBuilder,
-                                HealingBuilder $healingBuilder,
-                                HolyBuilder $holyBuilder,
-                                ReductionsBuilder $reductionsBuilder,
-                                ElementalAtonement $elementalAtonement
+    public function __construct(
+        DefenceBuilder $defenceBuilder,
+        DamageBuilder $damageBuilder,
+        HealingBuilder $healingBuilder,
+        HolyBuilder $holyBuilder,
+        ReductionsBuilder $reductionsBuilder,
+        ElementalAtonement $elementalAtonement
     ) {
         $this->defenceBuilder     = $defenceBuilder;
         $this->damageBuilder      = $damageBuilder;
@@ -126,7 +127,7 @@ class CharacterStatBuilder {
 
         $this->equippedItems  = $this->fetchEquipped($character);
 
-        $this->questItems     = $character->inventory->slots->filter(function($slot) {
+        $this->questItems     = $character->inventory->slots->filter(function ($slot) {
             return $slot->item->type === 'quest';
         });
 
@@ -251,9 +252,9 @@ class CharacterStatBuilder {
 
         if ($stat === $this->character->damage_stat) {
             $classSpecialsBonus = $this->character->classSpecialsEquipped
-                                                  ->where('equipped', true)
-                                                  ->where('base_damage_stat_increase', '>', 0)
-                                                  ->sum('base_damage_stat_increase');
+                ->where('equipped', true)
+                ->where('base_damage_stat_increase', '>', 0)
+                ->sum('base_damage_stat_increase');
 
             $baseStat = $baseStat + $baseStat * ($classSpecialsBonus + $this->character->base_damage_stat_mod);
         } else {
@@ -275,9 +276,9 @@ class CharacterStatBuilder {
      */
     public function buildHealth(bool $voided = false): float {
         $classSpecialsBonus = $this->character->classSpecialsEquipped
-                                              ->where('equipped', true)
-                                              ->where('health_mod', '>', 0)
-                                              ->sum('health_mod');
+            ->where('equipped', true)
+            ->where('health_mod', '>', 0)
+            ->sum('health_mod');
 
         $health = $this->statMod('dur', $voided);
 
@@ -310,9 +311,9 @@ class CharacterStatBuilder {
         $holyBonus = $this->holyInfo()->fetchDefenceBonus();
 
         $classSpecialsBonus = $this->character->classSpecialsEquipped
-                                              ->where('equipped', true)
-                                              ->where('base_ac_mod', '>', 0)
-                                              ->sum('base_ac_mod');
+            ->where('equipped', true)
+            ->where('base_ac_mod', '>', 0)
+            ->sum('base_ac_mod');
 
 
         $itemSkillBonus = 0;
@@ -332,18 +333,7 @@ class CharacterStatBuilder {
      * @return float
      */
     public function buildTimeOutModifier(string $type): float {
-        $bonus     = 0;
-
-        if (!is_null($this->equippedItems)) {
-            $prefixes = $this->equippedItems->pluck('item.itemPrefix.' . $type . '_mod_bonus')->toArray();
-            $suffixes = $this->equippedItems->pluck('item.itemSuffix.' . $type . '_mod_bonus')->toArray();
-
-            $bonus = max(array_merge($prefixes, $suffixes));
-        }
-
-        $bonus += $this->damageBuilder->fetchBaseAttributeFromSkills($type);
-
-        return $bonus;
+        return $this->damageBuilder->fetchBaseAttributeFromSkills($type);
     }
 
     /**
@@ -359,7 +349,6 @@ class CharacterStatBuilder {
         $stat = $this->statMod($this->character->damage_stat, $voided);
 
         if (is_null($this->equippedItems)) {
-
             if ($type === 'weapon') {
 
                 if ($this->character->classType()->isAlcoholic()) {
@@ -384,7 +373,7 @@ class CharacterStatBuilder {
             return 0;
         }
 
-        switch($type) {
+        switch ($type) {
             case 'weapon':
                 $damage = $this->damageBuilder->buildWeaponDamage($stat, $voided);
                 break;
@@ -398,9 +387,9 @@ class CharacterStatBuilder {
         }
 
         $classSpecialsBonus = $this->character->classSpecialsEquipped
-                                              ->where('equipped', true)
-                                              ->where('base_damage_mod', '>', 0)
-                                              ->sum('base_damage_mod');
+            ->where('equipped', true)
+            ->where('base_damage_mod', '>', 0)
+            ->sum('base_damage_mod');
 
         $itemSkillBonus = 0;
 
@@ -409,35 +398,6 @@ class CharacterStatBuilder {
         }
 
         return ceil($damage + ($damage * ($this->holyInfo()->fetchAttackBonus() + $classSpecialsBonus + $itemSkillBonus)));
-    }
-
-    /**
-     * Build elemental Damage For the character.
-     *
-     * @param string $defendingElement
-     * @param boolean $isVoided
-     * @return integer
-     */
-    public function buildElementalDamage(int $weaponAttack, string $defendingElement): int {
-        $elementalData = $this->buildElementalAtonement();
-
-        if (is_null($elementalData)) {
-            return 0;
-        }
-
-        $highestDamage = $this->getHighestElementDamage($this->buildElementalAtonement());
-
-        $attack = ceil($weaponAttack * $highestDamage);
-
-        if ($this->isHalfDamage($elementalData, $defendingElement)) {
-            return floor ($attack / 2);
-        }
-
-        if ($this->isDoubleDamage($elementalData, $defendingElement)) {
-            return floor ($attack * 2);
-        }
-
-        return $attack;
     }
 
 
@@ -534,9 +494,9 @@ class CharacterStatBuilder {
         $damage = $this->damageBuilder->buildWeaponDamage($stat, $voided, $weaponPosition);
 
         $classSpecialsBonus = $this->character->classSpecialsEquipped
-                                              ->where('equipped', true)
-                                              ->where('base_damage_mod', '>', 0)
-                                              ->sum('base_damage_mod');
+            ->where('equipped', true)
+            ->where('base_damage_mod', '>', 0)
+            ->sum('base_damage_mod');
 
         return ceil($damage + ($damage * ($this->holyInfo()->fetchAttackBonus() + $classSpecialsBonus)));
     }
@@ -565,9 +525,9 @@ class CharacterStatBuilder {
         $damage = $this->spellDamageBonus($this->damageBuilder->buildSpellDamage($voided, $spellPosition), $voided);
 
         $classSpecialsBonus = $this->character->classSpecialsEquipped
-                                              ->where('equipped', true)
-                                              ->where('base_damage_mod', '>', 0)
-                                              ->sum('base_damage_mod');
+            ->where('equipped', true)
+            ->where('base_damage_mod', '>', 0)
+            ->sum('base_damage_mod');
 
         return ceil($damage + ($damage * ($this->holyInfo()->fetchAttackBonus() + $classSpecialsBonus)));
     }
@@ -596,9 +556,9 @@ class CharacterStatBuilder {
         $healing = $this->healingBonus($this->healingBuilder->buildHealing($voided, $spellPosition), $voided);
 
         $classSpecialsBonus = $this->character->classSpecialsEquipped
-                                              ->where('equipped', true)
-                                              ->where('base_healing_mod', '>', 0)
-                                              ->sum('base_healing_mod');
+            ->where('equipped', true)
+            ->where('base_healing_mod', '>', 0)
+            ->sum('base_healing_mod');
 
         return ceil($healing + ($healing * ($this->holyInfo()->fetchHealingBonus() + $classSpecialsBonus)));
     }
@@ -627,9 +587,9 @@ class CharacterStatBuilder {
         $healing = $this->healingBonus($this->healingBuilder->buildHealing($voided), $voided);
 
         $classSpecialsBonus = $this->character->classSpecialsEquipped
-                                              ->where('equipped', true)
-                                              ->where('base_healing_mod', '>', 0)
-                                              ->sum('base_healing_mod');
+            ->where('equipped', true)
+            ->where('base_healing_mod', '>', 0)
+            ->sum('base_healing_mod');
 
         $itemSkillBonus = 0;
 
@@ -723,7 +683,7 @@ class CharacterStatBuilder {
      * @return float|int
      */
     public function buildAffixDamage(string $type, bool $voided = false): float|int {
-        switch($type) {
+        switch ($type) {
             case 'affix-stacking-damage':
                 return $this->damageBuilder->buildAffixStackingDamage($voided);
             case 'affix-non-stacking':

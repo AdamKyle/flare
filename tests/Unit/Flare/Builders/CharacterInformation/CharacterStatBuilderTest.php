@@ -15,6 +15,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\Builders\CharacterInformation\CharacterStatBuilder;
 use App\Flare\Builders\CharacterInformation\AttributeBuilders\HolyBuilder;
 use App\Flare\Builders\CharacterInformation\AttributeBuilders\ReductionsBuilder;
+use App\Flare\Values\CharacterClassValue;
 
 class CharacterStatBuilderTest extends TestCase {
 
@@ -30,8 +31,10 @@ class CharacterStatBuilderTest extends TestCase {
         $this->character            = (new CharacterFactory())->createBaseCharacter()->assignSkill(
             $this->createGameSkill([
                 'class_bonus' => 0.01
-            ]), 5
+            ]),
+            5
         )->givePlayerLocation();
+
         $this->characterStatBuilder = resolve(CharacterStatBuilder::class);
     }
 
@@ -933,9 +936,9 @@ class CharacterStatBuilderTest extends TestCase {
         ]);
 
         $character = $this->character->inventoryManagement()
-                                     ->giveItem($item)
-                                     ->equipItem('spell-one', 'weapon')
-                                     ->getCharacter();
+            ->giveItem($item)
+            ->equipItem('spell-one', 'weapon')
+            ->getCharacter();
 
         $resChance = $this->characterStatBuilder->setCharacter($character)->buildResurrectionChance();
 
@@ -951,9 +954,9 @@ class CharacterStatBuilderTest extends TestCase {
         ]);
 
         $character = $this->character->inventoryManagement()
-                                     ->giveItem($item)
-                                     ->equipItem('spell-one', 'weapon')
-                                     ->getCharacter();
+            ->giveItem($item)
+            ->equipItem('spell-one', 'weapon')
+            ->getCharacter();
 
         $class = $this->createClass(['name' => 'Prophet']);
 
@@ -1653,9 +1656,250 @@ class CharacterStatBuilderTest extends TestCase {
     }
 
     public function testGetNoCounterInfoForNoInventory() {
-        $character = $this->character->inventoryManagement()->getCharacter();
+        $character = $this->character->getCharacter();
         $amount    = $this->characterStatBuilder->setCharacter($character)->buildCounter();
 
         $this->assertEquals(0, $amount);
+    }
+
+    public function testGetFightTimeOutModifier() {
+        $gameSkill = $this->createGameSkill([
+            'fight_time_out_mod_bonus_per_level' => 0.01,
+        ]);
+
+        $character    = $this->character->assignSkill($gameSkill, 25)->getCharacter();
+        $fightTimeOut = $this->characterStatBuilder->setCharacter($character)->buildTimeOutModifier('fight_time_out');
+
+        $this->assertEquals(0.25, $fightTimeOut);
+    }
+
+    public function testGetMovementOutModifier() {
+        $gameSkill = $this->createGameSkill([
+            'move_time_out_mod_bonus_per_level'  => 0.01,
+        ]);
+
+        $character       = $this->character->assignSkill($gameSkill, 25)->getCharacter();
+        $movementTimeOut = $this->characterStatBuilder->setCharacter($character)->buildTimeOutModifier('move_time_out');
+
+        $this->assertEquals(0.25, $movementTimeOut);
+    }
+
+    public function testWeaponDamageForAlcoholicShouldBeLowerThenFighter() {
+        $alcoholic = (new CharacterFactory())->createBaseCharacter([], $this->createClass([
+            'name'        => CharacterClassValue::ALCOHOLIC,
+            'damage_stat' => 'str'
+        ]))->assignSkill(
+            $this->createGameSkill([
+                'class_bonus' => 0.01
+            ]),
+            5
+        )->givePlayerLocation()
+            ->equipStartingEquipment()
+            ->getCharacter();
+
+        $fighter = (new CharacterFactory())->createBaseCharacter([], $this->createClass([
+            'name'        => CharacterClassValue::FIGHTER,
+            'damage_stat' => 'str'
+        ]))->assignSkill(
+            $this->createGameSkill([
+                'class_bonus' => 0.01
+            ]),
+            5
+        )->givePlayerLocation()
+            ->equipStartingEquipment()
+            ->getCharacter();
+
+        $alcoholicDamage = $this->characterStatBuilder->setCharacter($alcoholic)->buildDamage('weapon');
+        $fighterDamage   = $this->characterStatBuilder->setCharacter($fighter)->buildDamage('weapon');
+
+        $this->assertGreaterThan($alcoholicDamage, $fighterDamage);
+    }
+
+    public function testWeaponDamageForAlcoholicShouldBeHigherThenFighterWhenNoWeaponsEquipped() {
+        $alcoholic = (new CharacterFactory())->createBaseCharacter([], $this->createClass([
+            'name'        => CharacterClassValue::ALCOHOLIC,
+            'damage_stat' => 'str'
+        ]))->assignSkill(
+            $this->createGameSkill([
+                'class_bonus' => 0.01
+            ]),
+            5
+        )->givePlayerLocation()
+            ->levelCharacterUp(25)
+            ->getCharacter();
+
+        $fighter = (new CharacterFactory())->createBaseCharacter([], $this->createClass([
+            'name'        => CharacterClassValue::FIGHTER,
+            'damage_stat' => 'str'
+        ]))->assignSkill(
+            $this->createGameSkill([
+                'class_bonus' => 0.01
+            ]),
+            5
+        )->givePlayerLocation()
+            ->levelCharacterUp(25)
+            ->getCharacter();
+
+        $alcoholicDamage = $this->characterStatBuilder->setCharacter($alcoholic)->buildDamage('weapon');
+        $fighterDamage   = $this->characterStatBuilder->setCharacter($fighter)->buildDamage('weapon');
+
+        $this->assertGreaterThan($fighterDamage, $alcoholicDamage);
+    }
+
+    public function testSpellDamageShouldBeHalfDamageForAlcoHolics() {
+        $alcoholic = (new CharacterFactory())->createBaseCharacter([], $this->createClass([
+            'name'        => CharacterClassValue::ALCOHOLIC,
+            'damage_stat' => 'str'
+        ]))->assignSkill(
+            $this->createGameSkill([
+                'class_bonus' => 0.01
+            ]),
+            5
+        )->givePlayerLocation()
+            ->inventoryManagement()
+            ->giveItem(
+                $this->createItem(['type' => 'spell-damage']),
+                true,
+                'spell-one'
+            )
+            ->giveItem(
+                $this->createItem(['type' => 'spell-damage']),
+                true,
+                'spell-two'
+            )
+            ->getCharacter();
+
+        $fighter = (new CharacterFactory())->createBaseCharacter([], $this->createClass([
+            'name'        => CharacterClassValue::FIGHTER,
+            'damage_stat' => 'str'
+        ]))->assignSkill(
+            $this->createGameSkill([
+                'class_bonus' => 0.01
+            ]),
+            5
+        )->givePlayerLocation()
+            ->inventoryManagement()
+            ->giveItem(
+                $this->createItem(['type' => 'spell-damage']),
+                true,
+                'spell-one'
+            )
+            ->giveItem(
+                $this->createItem(['type' => 'spell-damage']),
+                true,
+                'spell-two'
+            )
+            ->getCharacter();
+
+        $alcoholicDamage = $this->characterStatBuilder->setCharacter($alcoholic)->buildDamage('spell-damage');
+        $fighterDamage   = $this->characterStatBuilder->setCharacter($fighter)->buildDamage('spell-damage');
+
+        $this->assertGreaterThan($alcoholicDamage, $fighterDamage);
+    }
+
+    public function testArcaneAlchemistHealingBonusIsLessThenProphets() {
+        $arcaneAlchemist = (new CharacterFactory())->createBaseCharacter([], $this->createClass([
+            'name'        => CharacterClassValue::ARCANE_ALCHEMIST,
+            'damage_stat' => 'str'
+        ]))->assignSkill(
+            $this->createGameSkill([
+                'class_bonus' => 0.01
+            ]),
+            5
+        )->givePlayerLocation()
+            ->levelCharacterUp(10)
+            ->inventoryManagement()
+            ->giveItem(
+                $this->createItem(['type' => 'spell-healing']),
+                true,
+                'spell-one'
+            )
+            ->giveItem(
+                $this->createItem(['type' => 'spell-healing']),
+                true,
+                'spell-two'
+            )
+            ->getCharacter();
+
+        $prophet = (new CharacterFactory())->createBaseCharacter([], $this->createClass([
+            'name'        => CharacterClassValue::PROPHET,
+            'damage_stat' => 'str'
+        ]))->assignSkill(
+            $this->createGameSkill([
+                'class_bonus' => 0.01
+            ]),
+            5
+        )->givePlayerLocation()
+            ->levelCharacterUp(10)
+            ->inventoryManagement()
+            ->giveItem(
+                $this->createItem(['type' => 'spell-healing']),
+                true,
+                'spell-one'
+            )
+            ->giveItem(
+                $this->createItem(['type' => 'spell-healing']),
+                true,
+                'spell-two'
+            )
+            ->getCharacter();
+
+        $arcaneHealing  = $this->characterStatBuilder->setCharacter($arcaneAlchemist)->buildHealing();
+        $prophetHealing = $this->characterStatBuilder->setCharacter($prophet)->buildHealing();
+
+        $this->assertGreaterThan($arcaneHealing, $prophetHealing);
+    }
+
+    public function testRangerHealingBonusIsLessThenProphets() {
+        $ranger = (new CharacterFactory())->createBaseCharacter([], $this->createClass([
+            'name'        => CharacterClassValue::RANGER,
+            'damage_stat' => 'str'
+        ]))->assignSkill(
+            $this->createGameSkill([
+                'class_bonus' => 0.01
+            ]),
+            5
+        )->givePlayerLocation()
+            ->levelCharacterUp(10)
+            ->inventoryManagement()
+            ->giveItem(
+                $this->createItem(['type' => 'spell-healing']),
+                true,
+                'spell-one'
+            )
+            ->giveItem(
+                $this->createItem(['type' => 'spell-healing']),
+                true,
+                'spell-two'
+            )
+            ->getCharacter();
+
+        $prophet = (new CharacterFactory())->createBaseCharacter([], $this->createClass([
+            'name'        => CharacterClassValue::PROPHET,
+            'damage_stat' => 'str'
+        ]))->assignSkill(
+            $this->createGameSkill([
+                'class_bonus' => 0.01
+            ]),
+            5
+        )->givePlayerLocation()
+            ->levelCharacterUp(10)
+            ->inventoryManagement()
+            ->giveItem(
+                $this->createItem(['type' => 'spell-healing']),
+                true,
+                'spell-one'
+            )
+            ->giveItem(
+                $this->createItem(['type' => 'spell-healing']),
+                true,
+                'spell-two'
+            )
+            ->getCharacter();
+
+        $rangerHealing  = $this->characterStatBuilder->setCharacter($ranger)->buildHealing();
+        $prophetHealing = $this->characterStatBuilder->setCharacter($prophet)->buildHealing();
+
+        $this->assertGreaterThan($rangerHealing, $prophetHealing);
     }
 }
