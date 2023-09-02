@@ -9,11 +9,9 @@ use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use Facades\App\Flare\Calculators\GoldRushCheckCalculator;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 
-class GoldRush
-{
+class GoldRush {
 
-    public function processPotentialGoldRush(Character $character, Monster $monster)
-    {
+    public function processPotentialGoldRush(Character $character, Monster $monster) {
         if ($character->gold === MaxCurrenciesValue::MAX_GOLD) {
             return;
         }
@@ -23,14 +21,13 @@ class GoldRush
         if (GoldRushCheckCalculator::fetchGoldRushChance($gameMapBonus)) {
             $this->giveGoldRush($character);
 
-            if (!$character->is_auto_battling) {
+            if (!$character->is_auto_battling && $character->isLoggedIn()) {
                 event(new UpdateCharacterCurrenciesEvent($character->refresh()));
             }
         }
     }
 
-    protected function giveGoldRush(Character $character)
-    {
+    protected function giveGoldRush(Character $character) {
         $goldRush      = $character->gold + ($character->gold * 0.05);
 
         $maxCurrencies = new MaxCurrenciesValue($goldRush, MaxCurrenciesValue::GOLD);
@@ -52,8 +49,7 @@ class GoldRush
         ServerMessageHandler::handleMessage($character->user, $type, number_format($character->gold));
     }
 
-    protected function getGameMapBonus(Character $character): float
-    {
+    protected function getGameMapBonus(Character $character): float {
         $gameMap        = $character->map->gameMap;
         $gameMapBonus   = 0.0;
 

@@ -502,13 +502,15 @@ class KingdomUpdateServiceTest extends TestCase {
 
         $kingdom = $kingdom->refresh();
 
+        DB::table('sessions')->truncate();
+
         DB::table('sessions')->insert([[
             'id'           => '1',
             'user_id'      => $character->refresh()->user->id,
             'ip_address'   => '1',
             'user_agent'   => '1',
             'payload'      => '1',
-            'last_activity'=> 1602801731,
+            'last_activity' => 1602801731,
         ]]);
 
         $this->kingdomUpdateService->setKingdom($kingdom)->updateKingdom();
@@ -627,8 +629,4 @@ class KingdomUpdateServiceTest extends TestCase {
 
         return $kingdom->refresh();
     }
-
-
-
-
 }

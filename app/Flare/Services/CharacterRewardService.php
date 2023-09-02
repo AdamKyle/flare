@@ -73,11 +73,12 @@ class CharacterRewardService {
      * @param Manager $manager
      * @param CharacterSheetBaseInfoTransformer $characterSheetBaseInfoTransformer
      */
-    public function __construct(CharacterXPService $characterXpService,
-                                CharacterService $characterService,
-                                SkillService $skillService,
-                                Manager $manager,
-                                CharacterSheetBaseInfoTransformer $characterSheetBaseInfoTransformer
+    public function __construct(
+        CharacterXPService $characterXpService,
+        CharacterService $characterService,
+        SkillService $skillService,
+        Manager $manager,
+        CharacterSheetBaseInfoTransformer $characterSheetBaseInfoTransformer
     ) {
         $this->characterXpService                = $characterXpService;
         $this->characterService                  = $characterService;
@@ -149,7 +150,9 @@ class CharacterRewardService {
 
         $this->distributeCopperCoins($monster);
 
-        if (!$this->character->is_auto_battling) {
+        $this->giveShards();
+
+        if (!$this->character->is_auto_battling && $this->character->isLoggedIn()) {
             event(new UpdateCharacterCurrenciesEvent($this->character->refresh()));
         }
 
@@ -173,7 +176,7 @@ class CharacterRewardService {
                 $locationType = new LocationType($specialLocation->type);
 
                 if ($locationType->isGoldMines()) {
-                    $shards = rand(1,25);
+                    $shards = rand(1, 25);
 
                     $shards = $shards + $shards * $this->getShardBonus($this->character);
 
@@ -185,10 +188,6 @@ class CharacterRewardService {
 
                     $this->character->update(['shards' => $newShards]);
                 }
-            }
-
-            if (!$this->character->is_auto_battling) {
-                event(new UpdateCharacterCurrenciesEvent($this->character->refresh()));
             }
         }
 
@@ -206,21 +205,21 @@ class CharacterRewardService {
 
         if (!is_null($event) && !$monster->is_celestial_entity) {
 
-            $canHaveCopperCoins = $this->character->inventory->slots->filter(function($slot) {
+            $canHaveCopperCoins = $this->character->inventory->slots->filter(function ($slot) {
                 return $slot->item->effect === ItemEffectsValue::GET_COPPER_COINS;
             })->isNotEmpty();
 
-            $shards = rand(1,50);
+            $shards = rand(1, 50);
             $shards = $shards + $shards * $this->getShardBonus($this->character);
 
-            $goldDust = rand(1,50);
+            $goldDust = rand(1, 50);
             $goldDust = $goldDust + $goldDust * $this->getGoldDustBonus($this->character);
 
             $characterShards      = $this->character->shards + $shards;
             $characterGoldDust    = $this->character->gold_dust + $goldDust;
 
             if ($canHaveCopperCoins) {
-                $copperCoins = rand(1,50);
+                $copperCoins = rand(1, 50);
                 $copperCoins = $copperCoins + $copperCoins * $this->getCopperCoinBonus($this->character);
 
                 $characterCopperCoins = $this->character->copper_coins + $copperCoins;
@@ -264,10 +263,10 @@ class CharacterRewardService {
      */
     protected function findLocationWithEffect(Map $map): ?Location {
         return Location::whereNotNull('enemy_strength_type')
-                       ->where('x', $map->character_position_x)
-                       ->where('y', $map->character_position_y)
-                       ->where('game_map_id', $map->game_map_id)
-                       ->first();
+            ->where('x', $map->character_position_x)
+            ->where('y', $map->character_position_y)
+            ->where('game_map_id', $map->game_map_id)
+            ->first();
     }
 
 
@@ -341,7 +340,7 @@ class CharacterRewardService {
         if (!$this->characterXpService->canCharacterGainXP($this->character)) {
             return;
         }
-        
+
         // Reduce The XP from the monster if needed.
         $xp = XPCalculator::fetchXPFromMonster($monster, $this->character->level);
 
@@ -446,12 +445,12 @@ class CharacterRewardService {
      * @return Location|null
      */
     protected function purgatoryDungeons(Map $map): ?Location {
-       return Location::whereNotNull('enemy_strength_type')
-                       ->where('x', $map->character_position_x)
-                       ->where('y', $map->character_position_y)
-                       ->where('game_map_id', $map->game_map_id)
-                       ->where('type', LocationType::PURGATORY_DUNGEONS)
-                       ->first();
+        return Location::whereNotNull('enemy_strength_type')
+            ->where('x', $map->character_position_x)
+            ->where('y', $map->character_position_y)
+            ->where('game_map_id', $map->game_map_id)
+            ->where('type', LocationType::PURGATORY_DUNGEONS)
+            ->first();
     }
 
     /**
@@ -459,7 +458,7 @@ class CharacterRewardService {
      *
      * - Applies Guide Quest XP (+10 while under level 2)
      * - Applies Addional bonuses from items and quest items.
-     * 
+     *
      * @param int $xp
      * @return integer
      */
@@ -468,9 +467,9 @@ class CharacterRewardService {
 
         $guideEnabled              = $this->character->user->guide_enabled;
         $hasNoCompletedGuideQuests = $this->character->questsCompleted()
-                                                     ->whereNotNull('guide_quest_id')
-                                                     ->get()
-                                                     ->isEmpty();
+            ->whereNotNull('guide_quest_id')
+            ->get()
+            ->isEmpty();
 
         if ($guideEnabled && $hasNoCompletedGuideQuests && $this->character->level < 2) {
             $xp += 10;
