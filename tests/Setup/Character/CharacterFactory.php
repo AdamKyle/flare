@@ -537,7 +537,7 @@ class CharacterFactory {
      * @return CharacterFactory
      */
     public function trainSkill(string $name): CharacterFactory {
-        $skill = $this->character->skills->filter(function($skill) {
+        $skill = $this->character->skills->filter(function ($skill) {
             return $skill->currently_training;
         })->first();
 
@@ -545,7 +545,7 @@ class CharacterFactory {
             throw new \Exception('Already have a skill in training.');
         }
 
-        $this->character->skills->each(function($skill) use($name) {
+        $this->character->skills->each(function ($skill) use ($name) {
             if ($skill->name === $name) {
                 $skill->update([
                     'currently_training' => true
@@ -626,14 +626,14 @@ class CharacterFactory {
      * Assign Base Skills
      */
     protected function assignBaseSkills() {
-        $accuracy        = $this->createGameSkill(['name' => 'Accuracy']);
-        $timeout         = $this->createGameSkill(['name' => 'Fighters Timeout', 'type' => SkillTypeValue::EFFECTS_BATTLE_TIMER]);
-        $castingAccuracy = $this->createGameSkill(['name' => 'Casting Accuracy']);
-        $criticality     = $this->createGameSkill(['name' => 'Criticality']);
-        $dodge           = $this->createGameSkill(['name' => 'Dodge']);
-        $looting         = $this->createGameSkill(['name' => 'Looting']);
-        $kingmanship     = $this->createGameSkill(['name' => 'Kingmanship', 'type' => SkillTypeValue::EFFECTS_KINGDOM]);
-        $alchemy         = $this->createGameSkill(['name' => 'Alchemy', 'type' => SkillTypeValue::ALCHEMY]);
+        $accuracy        = $this->returnGameSkill('Accuracy', SkillTypeValue::TRAINING);
+        $timeout         = $this->returnGameSkill('Fighters Timeout', SkillTypeValue::EFFECTS_BATTLE_TIMER);
+        $castingAccuracy = $this->returnGameSkill('Casting Accuracy', SkillTypeValue::TRAINING);
+        $criticality     = $this->returnGameSkill('Criticality', SkillTypeValue::TRAINING);
+        $dodge           = $this->returnGameSkill('Dodge', SkillTypeValue::TRAINING);
+        $looting         = $this->returnGameSkill('Looting', SkillTypeValue::TRAINING);
+        $kingmanship     = $this->returnGameSkill('Kingmanship', SkillTypeValue::EFFECTS_KINGDOM);
+        $alchemy         = $this->returnGameSkill('Alchemy', SkillTypeValue::ALCHEMY);
 
         $this->createSkill([
             'character_id'  => $this->character->id,
@@ -676,4 +676,13 @@ class CharacterFactory {
         ]);
     }
 
+    protected function returnGameSkill(string $name, int $type = null): GameSkill {
+        $gameSkill = GameSkill::where('name', $name)->where('type', $type)->first();
+
+        if (!is_null($gameSkill)) {
+            return $gameSkill;
+        }
+
+        return $this->createGameSkill(['name' => $name, 'type' => $type]);
+    }
 }

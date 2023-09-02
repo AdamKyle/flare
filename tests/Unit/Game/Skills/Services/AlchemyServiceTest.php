@@ -2,7 +2,6 @@
 
 namespace Tests\Unit\Game\Skills\Services;
 
-use App\Flare\Values\ItemUsabilityType;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Messages\Builders\ServerMessageBuilder;
 use App\Game\Skills\Services\SkillCheckService;
@@ -10,8 +9,6 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\Models\Item;
 use App\Flare\Values\CharacterClassValue;
-use App\Flare\Models\GameSkill;
-use App\Game\Skills\Values\SkillTypeValue;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Skills\Services\AlchemyService;
 use Mockery;
@@ -32,19 +29,10 @@ class AlchemyServiceTest extends TestCase {
 
     private ?Item $alchemyItem;
 
-    private ?GameSkill $alchemySkill;
-
     public function setUp(): void {
         parent::setUp();
 
-        $this->alchemySkill = $this->createGameSkill([
-            'name' => 'Alchemy',
-            'type' => SkillTypeValue::ALCHEMY,
-        ]);
-
-        $this->character = (new CharacterFactory())->createBaseCharacter()->assignSkill(
-            $this->alchemySkill
-        )->givePlayerLocation();
+        $this->character = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
 
         $this->alchemyService = resolve(AlchemyService::class);
 
@@ -64,7 +52,6 @@ class AlchemyServiceTest extends TestCase {
         $this->character = null;
         $this->alchemyService = null;
         $this->alchemyItem = null;
-        $this->alchemySkill = null;
     }
 
     public function testGetAlchemyItemsForCrafting() {
@@ -80,9 +67,7 @@ class AlchemyServiceTest extends TestCase {
 
         $character = (new CharacterFactory())->createBaseCharacter([], $this->createClass([
             'name' => CharacterClassValue::ARCANE_ALCHEMIST
-        ]))->assignSkill(
-            $this->alchemySkill
-        )->givePlayerLocation()->getCharacter();
+        ]))->givePlayerLocation()->getCharacter();
 
         $result = $this->alchemyService->fetchAlchemistItems($character);
 
@@ -98,10 +83,7 @@ class AlchemyServiceTest extends TestCase {
 
         $character = (new CharacterFactory())->createBaseCharacter([], $this->createClass([
             'name' => CharacterClassValue::MERCHANT
-        ]))->assignSkill(
-            $this->alchemySkill
-        )->givePlayerLocation()->getCharacter();
-
+        ]))->givePlayerLocation()->getCharacter();
 
         $result = $this->alchemyService->fetchAlchemistItems($character);
 
@@ -317,7 +299,7 @@ class AlchemyServiceTest extends TestCase {
 
         $character = (new CharacterFactory())->createBaseCharacter([], $this->createClass([
             'name' => CharacterClassValue::ARCANE_ALCHEMIST
-        ]))->assignSkill($this->alchemySkill)->givePlayerLocation()->getCharacter();
+        ]))->givePlayerLocation()->getCharacter();
 
         $character->update([
             'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
@@ -338,7 +320,6 @@ class AlchemyServiceTest extends TestCase {
         $this->assertCount(1, $character->inventory->slots);
         $this->assertGreaterThan($goldDustAfterOriginalCost, $character->gold_dust);
         $this->assertGreaterThan($shardsAfterOriginalCost, $character->shards);
-
     }
 
     public function testTransmuteAsMerchant() {
@@ -352,7 +333,7 @@ class AlchemyServiceTest extends TestCase {
 
         $character = (new CharacterFactory())->createBaseCharacter([], $this->createClass([
             'name' => CharacterClassValue::MERCHANT
-        ]))->assignSkill($this->alchemySkill)->givePlayerLocation()->getCharacter();
+        ]))->givePlayerLocation()->getCharacter();
 
         $character->update([
             'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
@@ -374,5 +355,4 @@ class AlchemyServiceTest extends TestCase {
         $this->assertGreaterThan($goldDustAfterOriginalCost, $character->gold_dust);
         $this->assertGreaterThan($shardsAfterOriginalCost, $character->shards);
     }
-
 }

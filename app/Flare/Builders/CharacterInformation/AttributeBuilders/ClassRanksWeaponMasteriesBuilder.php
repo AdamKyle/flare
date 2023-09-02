@@ -21,10 +21,6 @@ class ClassRanksWeaponMasteriesBuilder extends BaseAttribute {
         $slotFromRightHand = $this->inventory->where('position', 'right-hand')->first();
         $slotFromLeftHand  = $this->inventory->where('position', 'left-hand')->first();
 
-        if ($this->isTheSameTypeEquipped($slotFromLeftHand, $slotFromRightHand)) {
-            return $this->getPercentage($slotFromLeftHand);
-        }
-
         $percentageForLeftHand  = $this->getPercentage($slotFromLeftHand);
         $percentageForRightHand = $this->getPercentage($slotFromRightHand);
 
@@ -90,14 +86,15 @@ class ClassRanksWeaponMasteriesBuilder extends BaseAttribute {
             $weaponMastery = $classRank->weaponMasteries->where('weapon_type', $weaponMasteryType)->where('character_class_rank_id', $classRank->id)->first();
 
             return $weaponMastery->level / 100;
-
         } catch (Exception $e) {
             return 0.0;
         }
     }
 
-    protected function isTheSameTypeEquipped(InventorySlot|SetSlot $slotOne = null,
-                                             InventorySlot|SetSlot $slotTwo = null): bool {
+    protected function isTheSameTypeEquipped(
+        InventorySlot|SetSlot $slotOne = null,
+        InventorySlot|SetSlot $slotTwo = null
+    ): bool {
 
         if (is_null($slotOne)) {
             return false;

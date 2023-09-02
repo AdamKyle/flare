@@ -53,8 +53,8 @@ class RandomAffixGenerator {
         $details                     = (new RandomAffixDetails($this->amountPaid));
 
         $this->affixAttributeBuilder = $this->affixAttributeBuilder->setPercentageRange($details->getPercentageRange())
-                                                                   ->setCharacterSkills($this->character->skills)
-                                                                   ->setDamageRange($details->getDamageRange());
+            ->setCharacterSkills($this->character->skills)
+            ->setDamageRange($details->getDamageRange());
 
         return $this;
     }
@@ -68,8 +68,8 @@ class RandomAffixGenerator {
     public function generateAffix(string $type): ItemAffix {
         $attributes = $this->affixAttributeBuilder->buildAttributes($type, $this->amountPaid);
 
-        $foundMatchingPrefix = ItemAffix::where($attributes)->first();
-
+        $foundMatchingPrefix = $this->fetchMatchingAffix($attributes);
+        dump($foundMatchingPrefix);
         if (!is_null($foundMatchingPrefix)) {
             return $foundMatchingPrefix;
         }
@@ -77,5 +77,17 @@ class RandomAffixGenerator {
         $attributes['affix_type'] = ItemAffixType::RANDOMLY_GENERATED;
 
         return ItemAffix::create($attributes);
+    }
+
+    /**
+     * find a possible matching affix.
+     *
+     * Note: This is a wrapper so I can mock this in tests.
+     *
+     * @param array $attributes
+     * @return ItemAffix|null
+     */
+    protected function fetchMatchingAffix(array $attributes): ?ItemAffix {
+        return ItemAffix::where($attributes)->first();
     }
 }

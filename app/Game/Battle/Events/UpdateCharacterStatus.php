@@ -70,7 +70,18 @@ class UpdateCharacterStatus implements ShouldBroadcastNow {
     }
 
     protected function isAlchemyLocked(Character $character): bool {
-        return Skill::where('character_id', $character->id)->where('game_skill_id', GameSkill::where('type', SkillTypeValue::ALCHEMY)->first()->id)->first()->is_locked;
+
+        $alchemySkill = Skill::where('character_id', $character->id)
+            ->where('game_skill_id', GameSkill::where(
+                'type',
+                SkillTypeValue::ALCHEMY
+            )->first()->id)->first();
+
+        if (is_null($alchemySkill)) {
+            return true;
+        }
+
+        return $alchemySkill->is_locked;
     }
 
     /**
