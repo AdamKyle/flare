@@ -68,14 +68,14 @@ class SeerServiceTest extends TestCase {
         $this->createGameMap();
 
         $character = $this->character->givePlayerLocation()
-                                     ->inventoryManagement()
-                                     ->giveItem($item->refresh())
-                                     ->getCharacterFactory()
-                                     ->kingdomManagement()
-                                     ->assignKingdom([
-                                         'gold_bars' => 2000,
-                                     ])
-                                     ->getCharacter();
+            ->inventoryManagement()
+            ->giveItem($item->refresh())
+            ->getCharacterFactory()
+            ->kingdomManagement()
+            ->assignKingdom([
+                'gold_bars' => 2000,
+            ])
+            ->getCharacter();
 
         $slot   = $character->inventory->slots->first();
         $result = $this->seerService->createSockets($character, $slot->id);
@@ -129,12 +129,12 @@ class SeerServiceTest extends TestCase {
             ])
             ->getCharacter();
 
-        forEach ([1 => 1, 50 => 2, 60 => 3, 80 => 4, 95 => 5, 100 => 6] as $percent => $socketCount) {
+        foreach ([1 => 1, 50 => 2, 60 => 3, 80 => 4, 95 => 5, 100 => 6] as $percent => $socketCount) {
             $seerService = \Mockery::mock(SeerService::class)->makePartial();
 
             $seerService->shouldAllowMockingProtectedMethods()
-                        ->shouldReceive('getRandomType')
-                        ->andReturn($percent);
+                ->shouldReceive('getRandomType')
+                ->andReturn($percent);
 
             $slot = $character->inventory->slots->first();
             $result = $seerService->createSockets($character, $slot->id);
@@ -183,7 +183,7 @@ class SeerServiceTest extends TestCase {
 
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
 
-        $slot = $character->inventory->slots->filter(function($slot) use($item) {
+        $slot = $character->inventory->slots->filter(function ($slot) use ($item) {
             return $slot->item_id === $item->id;
         })->first();
 
@@ -200,7 +200,7 @@ class SeerServiceTest extends TestCase {
 
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
 
-        $slot = $character->inventory->slots->filter(function($slot) use($item) {
+        $slot = $character->inventory->slots->filter(function ($slot) use ($item) {
             return $slot->item_id === $item->id;
         })->first();
 
@@ -222,7 +222,7 @@ class SeerServiceTest extends TestCase {
 
         $character = $this->character->inventoryManagement()->giveItem($item->refresh())->getCharacter();
 
-        $slot = $character->inventory->slots->filter(function($slot) use($item) {
+        $slot = $character->inventory->slots->filter(function ($slot) use ($item) {
             return $slot->item_id === $item->id;
         })->first();
 
@@ -248,7 +248,7 @@ class SeerServiceTest extends TestCase {
 
         $character = $this->character->inventoryManagement()->giveItem($item->refresh())->getCharacter();
 
-        $slot = $character->inventory->slots->filter(function($slot) use($item) {
+        $slot = $character->inventory->slots->filter(function ($slot) use ($item) {
             return $slot->item_id === $item->id;
         })->first();
 
@@ -269,19 +269,19 @@ class SeerServiceTest extends TestCase {
         ]);
 
         $character = $this->character->inventoryManagement()
-                                     ->giveItem($item->refresh())
-                                     ->getCharacterFactory()
-                                     ->kingdomManagement()
-                                     ->assignKingdom([
-                                         'gold_bars' => 2000,
-                                     ])
-                                     ->getCharacter();
+            ->giveItem($item->refresh())
+            ->getCharacterFactory()
+            ->kingdomManagement()
+            ->assignKingdom([
+                'gold_bars' => 2000,
+            ])
+            ->getCharacter();
 
-        $slot = $character->inventory->slots->filter(function($slot) use($item) {
+        $slot = $character->inventory->slots->filter(function ($slot) use ($item) {
             return $slot->item_id === $item->id;
         })->first();
 
-        $result    = $this->seerService->removeGem($character, $slot->id, 10);
+        $result    = $this->seerService->removeGem($character, $slot->id, rand(1000, 50000));
 
         $this->assertEquals(422, $result['status']);
         $this->assertEquals('Item does not have specified gem.', $result['message']);
@@ -314,7 +314,7 @@ class SeerServiceTest extends TestCase {
             ])
             ->getCharacter();
 
-        $slot = $character->inventory->slots->filter(function($slot) use($item) {
+        $slot = $character->inventory->slots->filter(function ($slot) use ($item) {
             return $slot->item_id === $item->id;
         })->first();
 
@@ -423,8 +423,8 @@ class SeerServiceTest extends TestCase {
         ]);
 
         $character = $this->character->inventoryManagement()
-                                     ->giveItem($item->refresh())
-                                     ->getCharacter();
+            ->giveItem($item->refresh())
+            ->getCharacter();
 
         $slot = $character->inventory->slots->where('item_id', $item->id)->first();
 
@@ -450,13 +450,13 @@ class SeerServiceTest extends TestCase {
         ]);
 
         $character = $this->character->inventoryManagement()
-                                     ->giveItem($item->refresh())
-                                     ->getCharacterFactory()
-                                     ->kingdomManagement()
-                                     ->assignKingdom([
-                                         'gold_bars' => 2000,
-                                     ])
-                                     ->getCharacter();
+            ->giveItem($item->refresh())
+            ->getCharacterFactory()
+            ->kingdomManagement()
+            ->assignKingdom([
+                'gold_bars' => 2000,
+            ])
+            ->getCharacter();
 
         $slot = $character->inventory->slots->where('item_id', $item->id)->first();
 
@@ -481,8 +481,8 @@ class SeerServiceTest extends TestCase {
         ]);
 
         $character = $this->character->inventoryManagement()
-                                     ->giveItem($item)
-                                     ->getCharacter();
+            ->giveItem($item)
+            ->getCharacter();
 
         $slot = $character->inventory->slots->where('item_id', $item->id)->first();
 
@@ -490,7 +490,6 @@ class SeerServiceTest extends TestCase {
 
         $this->assertEquals(422, $result['status']);
         $this->assertEquals('The gem you want to use to replace the requested gem with, does not exist.', $result['message']);
-
     }
 
     public function testItemDoesntHaveSockets() {
@@ -501,8 +500,8 @@ class SeerServiceTest extends TestCase {
         $gem = $this->createGem();
 
         $character = $this->character->inventoryManagement()
-                                     ->giveItem($item)
-                                     ->getCharacter();
+            ->giveItem($item)
+            ->getCharacter();
 
         $character->gemBag()->create([
             'character_id' => $character->id,
@@ -579,8 +578,8 @@ class SeerServiceTest extends TestCase {
         $gem = $this->createGem();
 
         $character = $this->character->inventoryManagement()
-                                     ->giveItem($item)
-                                     ->getCharacter();
+            ->giveItem($item)
+            ->getCharacter();
 
         $character->gemBag()->create([
             'character_id' => $character->id,
@@ -619,13 +618,13 @@ class SeerServiceTest extends TestCase {
         $gem = $this->createGem();
 
         $character = $this->character->inventoryManagement()
-                                     ->giveItem($item)
-                                     ->getCharacterFactory()
-                                     ->kingdomManagement()
-                                     ->assignKingdom([
-                                         'gold_bars' => 2000,
-                                     ])
-                                     ->getCharacter();
+            ->giveItem($item)
+            ->getCharacterFactory()
+            ->kingdomManagement()
+            ->assignKingdom([
+                'gold_bars' => 2000,
+            ])
+            ->getCharacter();
 
         $character->gemBag()->create([
             'character_id' => $character->id,
@@ -711,13 +710,13 @@ class SeerServiceTest extends TestCase {
         $gem = $this->createGem();
 
         $character = $this->character->inventoryManagement()
-                                     ->giveItem($item->refresh())
-                                     ->getCharacterFactory()
-                                     ->kingdomManagement()
-                                     ->assignKingdom([
-                                         'gold_bars' => 2000,
-                                     ])
-                                     ->getCharacter();
+            ->giveItem($item->refresh())
+            ->getCharacterFactory()
+            ->kingdomManagement()
+            ->assignKingdom([
+                'gold_bars' => 2000,
+            ])
+            ->getCharacter();
 
         $character->gemBag()->create([
             'character_id' => $character->id,
@@ -809,8 +808,8 @@ class SeerServiceTest extends TestCase {
         ]);
 
         $character = $this->character->inventoryManagement()
-                                     ->giveItem($item)
-                                     ->getCharacter();
+            ->giveItem($item)
+            ->getCharacter();
 
         $slot = $character->inventory->slots->where('item_id', $item->id)->first();
 
@@ -826,8 +825,8 @@ class SeerServiceTest extends TestCase {
         $gemForAddition = $this->createGem();
 
         $character = $this->character->inventoryManagement()
-                                     ->giveItem($item)
-                                     ->getCharacter();
+            ->giveItem($item)
+            ->getCharacter();
 
         $character->gemBag()->create([
             'character_id' => $character->id,
@@ -861,8 +860,8 @@ class SeerServiceTest extends TestCase {
         $gemForAddition = $this->createGem();
 
         $character = $this->character->inventoryManagement()
-                                     ->giveItem($item->refresh())
-                                     ->getCharacter();
+            ->giveItem($item->refresh())
+            ->getCharacter();
 
         $character->gemBag()->create([
             'character_id' => $character->id,
@@ -891,8 +890,8 @@ class SeerServiceTest extends TestCase {
         $gemForAddition = $this->createGem();
 
         $character = $this->character->inventoryManagement()
-                                      ->giveItem($item->refresh())
-                                      ->getCharacter();
+            ->giveItem($item->refresh())
+            ->getCharacter();
 
         $character->gemBag()->create([
             'character_id' => $character->id,
@@ -984,8 +983,8 @@ class SeerServiceTest extends TestCase {
         $item = $this->createItem(['type' => WeaponTypes::BOW]);
 
         $character = $this->character->inventoryManagement()
-                                     ->giveItem($item)
-                                     ->getCharacter();
+            ->giveItem($item)
+            ->getCharacter();
 
         $result = $this->seerService->getItems($character, true);
 
@@ -996,8 +995,8 @@ class SeerServiceTest extends TestCase {
         $item = $this->createItem(['type' => SpellTypes::DAMAGE]);
 
         $character = $this->character->inventoryManagement()
-                                     ->giveItem($item)
-                                     ->getCharacter();
+            ->giveItem($item)
+            ->getCharacter();
 
         $result = $this->seerService->getItems($character);
 
@@ -1008,8 +1007,8 @@ class SeerServiceTest extends TestCase {
         $item = $this->createItem(['type' => WeaponTypes::BOW, 'socket_count' => 2]);
 
         $character = $this->character->inventoryManagement()
-                                     ->giveItem($item)
-                                     ->getCharacter();
+            ->giveItem($item)
+            ->getCharacter();
 
         $result = $this->seerService->getItems($character);
 

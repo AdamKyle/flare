@@ -3,9 +3,12 @@
 namespace Tests\Unit\Flare\Builders;
 
 use App\Flare\Builders\AffixAttributeBuilder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class AffixAttributeBuilderTest extends TestCase {
+
+    use RefreshDatabase;
 
     private ?AffixAttributeBuilder $affixAttributeBuilder;
 

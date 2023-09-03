@@ -69,7 +69,7 @@ class RandomAffixGenerator {
         $attributes = $this->affixAttributeBuilder->buildAttributes($type, $this->amountPaid);
 
         $foundMatchingPrefix = $this->fetchMatchingAffix($attributes);
-        dump($foundMatchingPrefix);
+
         if (!is_null($foundMatchingPrefix)) {
             return $foundMatchingPrefix;
         }

@@ -21,8 +21,7 @@ use App\Game\Battle\Concerns\HandleGivingAncestorItem;
 use App\Game\Maps\Services\Common\UpdateRaidMonstersForLocation;
 use App\Game\Messages\Events\ServerMessageEvent;
 
-class RaidBossRewardHandler implements ShouldQueue
-{
+class RaidBossRewardHandler implements ShouldQueue {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, UpdateRaidMonstersForLocation, HandleGivingAncestorItem;
 
     /**
@@ -56,7 +55,7 @@ class RaidBossRewardHandler implements ShouldQueue
      */
     public function handle(BattleEventHandler $battleEventHandler) {
         $character = Character::find($this->characterId);
-        
+
         $battleEventHandler->processMonsterDeath($this->characterId, $this->monsterId);
 
         if (!is_null($this->raidId)) {
@@ -73,7 +72,7 @@ class RaidBossRewardHandler implements ShouldQueue
 
     /**
      * Handle the raid boss when its killed.
-     * 
+     *
      * - No one can attack anymore. The attacks will not reset.
      * - Give ancestral item to winner.
      * - Give top 10 damage dealers a piece of gear.
@@ -84,14 +83,14 @@ class RaidBossRewardHandler implements ShouldQueue
      */
     private function handleWhenRaidBossIsKilled(Character $charater, Monster $raidBoss): void {
         event(new GlobalMessageEvent($charater->name . ' Has slaughted: ' . $raidBoss->name . ' and has recieved a special Ancient gift from The Poet him self!'));
-        
+
         $this->giveAncientReward($charater);
 
         $raid = Raid::find($this->raidId);
 
         $this->giveGearReward($raid);
 
-        RaidBossParticipation::chunkById(250, function($participationRecords) {
+        RaidBossParticipation::chunkById(250, function ($participationRecords) {
             foreach ($participationRecords as $record) {
                 $record->update([
                     'attacks_left' => 0,
@@ -100,13 +99,10 @@ class RaidBossRewardHandler implements ShouldQueue
                 event(new UpdateRaidAttacksLeft($record->character->user_id, 0));
             }
         });
-
     }
 
     private function giveGearReward(Raid $raid) {
         $raidParticipation = RaidBossParticipation::where('raid_id', $raid->id)->orderBy('damage_dealt', 'asc')->take(10)->get();
-
-        dump($raidParticipation);
 
         foreach ($raidParticipation as $participator) {
 
@@ -114,10 +110,10 @@ class RaidBossRewardHandler implements ShouldQueue
 
             if ($participator->character->isInventoryFull()) {
                 event(new ServerMessageEvent($participator->character->user, 'Your inventory was full. You got no item. Make sure to clear room next time!'));
-                
+
                 return;
             }
-            
+
             if (!is_null($item)) {
                 $validSocketTypes = [
                     'weapon', 'sleeves', 'gloves', 'feet', 'body', 'shield', 'helmet'
@@ -126,7 +122,7 @@ class RaidBossRewardHandler implements ShouldQueue
                 $duplicatedItem = $item->duplicate();
 
                 if (in_array($duplicatedItem->type, $validSocketTypes)) {
-                    
+
                     $duplicatedItem->update([
                         'socket_count' => rand(0, 6),
                     ]);

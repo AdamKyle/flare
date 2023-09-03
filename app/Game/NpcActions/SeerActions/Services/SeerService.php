@@ -466,6 +466,11 @@ class SeerService {
      * @return InventorySlot|null
      */
     protected function removeGemFromItem(Character $character, InventorySlot $slot, int $gemId): InventorySlot|null {
+
+        if ($slot->item->sockets->isEmpty()) {
+            return null;
+        }
+
         $newItem = DuplicateItemHandler::duplicateItem($slot->item);
 
         $socket = $newItem->sockets->where('gem_id', $gemId)->first();

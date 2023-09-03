@@ -8,8 +8,11 @@ use App\Flare\Values\RandomAffixDetails;
 use Tests\Setup\Character\CharacterFactory;
 use App\Flare\Builders\RandomAffixGenerator;
 use App\Flare\Builders\AffixAttributeBuilder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class RandomAffixGeneratorTest extends TestCase {
+
+    use RefreshDatabase;
 
     private ?RandomAffixGenerator $randomAffixGenerator;
 

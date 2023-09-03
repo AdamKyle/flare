@@ -85,11 +85,12 @@ class CharacterInventoryService {
      * @param UpdateCharacterSkillsService $updateCharacterSkillsService
      * @param Manager $manager
      */
-    public function __construct(InventoryTransformer  $inventoryTransformer,
-                                UsableItemTransformer $usableItemTransformer,
-                                MassDisenchantService $massDisenchantService,
-                                UpdateCharacterSkillsService $updateCharacterSkillsService,
-                                Manager               $manager,
+    public function __construct(
+        InventoryTransformer  $inventoryTransformer,
+        UsableItemTransformer $usableItemTransformer,
+        MassDisenchantService $massDisenchantService,
+        UpdateCharacterSkillsService $updateCharacterSkillsService,
+        Manager               $manager,
 
     ) {
         $this->inventoryTransformer         = $inventoryTransformer;
@@ -157,7 +158,7 @@ class CharacterInventoryService {
      * @return Collection|array
      */
     public function getInventoryForType(string $type): Collection|array {
-        switch($type) {
+        switch ($type) {
             case 'inventory':
                 return $this->fetchCharacterInventory();
             case 'usable_sets':
@@ -177,7 +178,6 @@ class CharacterInventoryService {
                 return $this->getUsableItems();
             default:
                 return $this->getInventoryForApi();
-
         }
     }
 
@@ -193,6 +193,10 @@ class CharacterInventoryService {
 
         if (is_null($slot)) {
             $slot = SetSlot::where('item_id', $item->id)->first();
+
+            if (is_null($slot)) {
+                return null;
+            }
 
             $characterInventorySet = InventorySet::find($slot->inventory_set_id)->where('character_id', $character->id)->first();
 
@@ -246,7 +250,7 @@ class CharacterInventoryService {
     public function getCharacterInventorySets(): array {
         $sets = [];
 
-        foreach($this->character->inventorySets as $index => $inventorySet) {
+        foreach ($this->character->inventorySets as $index => $inventorySet) {
 
             $slots = new LeagueCollection($inventorySet->slots, $this->inventoryTransformer);
 
@@ -303,7 +307,7 @@ class CharacterInventoryService {
     public function getUsableItems(): array {
         $inventory = Inventory::where('character_id', $this->character->id)->first();
 
-        $slots = InventorySlot::where('inventory_slots.inventory_id', $inventory->id)->join('items', function($join) {
+        $slots = InventorySlot::where('inventory_slots.inventory_id', $inventory->id)->join('items', function ($join) {
             $join->on('inventory_slots.item_id', '=', 'items.id')
                 ->where('items.type', 'alchemy');
         })->select('inventory_slots.*')->get();
@@ -321,7 +325,7 @@ class CharacterInventoryService {
     public function getQuestItems(): array {
         $inventory = Inventory::where('character_id', $this->character->id)->first();
 
-        $slots = InventorySlot::where('inventory_slots.inventory_id', $inventory->id)->join('items', function($join) {
+        $slots = InventorySlot::where('inventory_slots.inventory_id', $inventory->id)->join('items', function ($join) {
             $join->on('inventory_slots.item_id', '=', 'items.id')
                 ->where('items.type', 'quest');
         })->select('inventory_slots.*')->get();
@@ -372,7 +376,7 @@ class CharacterInventoryService {
             return collect();
         }
 
-        return InventorySlot::where('inventory_slots.inventory_id', $inventory->id)->join('items', function($join) {
+        return InventorySlot::where('inventory_slots.inventory_id', $inventory->id)->join('items', function ($join) {
             $join->on('inventory_slots.item_id', '=', 'items.id')
                 ->whereNotIn('items.type', ['quest', 'alchemy']);
         })->where('inventory_slots.equipped', false)->select('inventory_slots.*')->get();
@@ -398,7 +402,7 @@ class CharacterInventoryService {
     public function findCharacterInventorySlotIds(): array {
         $inventory = Inventory::where('character_id', $this->character->id)->first();
 
-        return InventorySlot::where('inventory_slots.inventory_id', $inventory->id)->join('items', function($join) {
+        return InventorySlot::where('inventory_slots.inventory_id', $inventory->id)->join('items', function ($join) {
             $join->on('inventory_slots.item_id', '=', 'items.id')
                 ->whereNotIn('items.type', ['quest', 'alchemy']);
         })->where('inventory_slots.equipped', false)->select('inventory_slots.*')->orderBy('inventory_slots.id', 'asc')->pluck('inventory_slots.id')->toArray();
@@ -432,7 +436,7 @@ class CharacterInventoryService {
         if (!is_null($inventorySet->name)) {
             $this->inventorySetEquippedName = $inventorySet->name;
         } else {
-            $index = $this->character->inventorySets->search(function ($set) use($inventorySet) {
+            $index = $this->character->inventorySets->search(function ($set) use ($inventorySet) {
                 return $set->id === $inventorySet->id;
             });
 
@@ -456,7 +460,7 @@ class CharacterInventoryService {
      */
     public function setInventory(string $type): CharacterInventoryService {
 
-        $useArray = !in_array($type, ['body','shield','leggings','feet','sleeves','helmet','gloves', 'artifact']);
+        $useArray = !in_array($type, ['body', 'shield', 'leggings', 'feet', 'sleeves', 'helmet', 'gloves', 'artifact']);
 
         $this->inventory = $this->getInventory($type, $useArray);
 
@@ -464,7 +468,7 @@ class CharacterInventoryService {
     }
 
     protected function getInventory(string $type, bool $useArray = false): Collection {
-        $inventory = $this->character->inventory->slots->filter(function($slot) use($type, $useArray) {
+        $inventory = $this->character->inventory->slots->filter(function ($slot) use ($type, $useArray) {
             if ($useArray) {
                 return in_array($slot->position, $this->positions) && $slot->equipped;
             }
@@ -475,7 +479,7 @@ class CharacterInventoryService {
         if ($inventory->isEmpty()) {
             $equippedSet = $this->character->inventorySets()->where('is_equipped', true)->first();
             if (!is_null($equippedSet)) {
-                $inventory = $equippedSet->slots->filter(function($slot) use($type, $useArray) {
+                $inventory = $equippedSet->slots->filter(function ($slot) use ($type, $useArray) {
                     if ($useArray) {
                         return in_array($slot->position, $this->positions) && $slot->equipped;
                     }
