@@ -32,6 +32,8 @@ class BattleRewardServiceTest extends TestCase {
         parent::tearDown();
 
         $this->battleRewardService = null;
+
+        $this->characterFactory = null;
     }
 
     public function testShouldNotUpdateCharacterCurrenciesWhenNotLoggedIn() {
