@@ -13,7 +13,16 @@ trait ElementAttackData {
      * @return integer
      */
     public function getHighestElementDamage(array $elementData): float {
-        return max(array_values($elementData));
+        $maxValue = 0;
+
+        foreach ($elementData as $name => $item) {
+            $value = floatval($item);
+            if ($value > $maxValue) {
+                $maxValue = $value;
+            }
+        }
+
+        return $maxValue;
     }
 
     /**

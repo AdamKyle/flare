@@ -89,6 +89,8 @@ class CharacterFactory {
 
         $this->createInventory();
 
+        $this->createGemBag();
+
         $this->assignBaseSkills();
 
         $this->assignPassiveSkills();
@@ -618,6 +620,12 @@ class CharacterFactory {
      */
     protected function createInventory() {
         $this->character->inventory()->create([
+            'character_id' => $this->character->id,
+        ]);
+    }
+
+    protected function createGemBag() {
+        $this->character->gemBag()->create([
             'character_id' => $this->character->id,
         ]);
     }
