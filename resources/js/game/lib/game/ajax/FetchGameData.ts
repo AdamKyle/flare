@@ -1,6 +1,8 @@
+import { setDefaultResultOrder } from "dns";
 import Game from "../../../game";
 import Ajax from "../../ajax/ajax";
 import {AxiosResponse} from "axios";
+import { calculateTimeLeft } from "../../helpers/time-calculator";
 
 export default class FetchGameData {
 
@@ -29,6 +31,8 @@ export default class FetchGameData {
                 switch(url.name) {
                     case 'character-sheet':
                         return this.setCharacterSheet(result);
+                    case 'actions':
+                        return this.setActionData(result);
                     case 'quests':
                         return this.setQuestData(result);
                     case 'kingdoms':
@@ -46,7 +50,7 @@ export default class FetchGameData {
 
         this.component.setState({
             character: result.data.sheet,
-            percentage_loaded: .33,
+            percentage_loaded: .20,
             secondary_loading_title: 'Fetching Quest Data ...',
             character_currencies: {
                 gold: result.data.sheet.gold,
@@ -76,7 +80,7 @@ export default class FetchGameData {
     setQuestData(result: AxiosResponse)  {
         this.component.setState({
             quests: result.data,
-            percentage_loaded: this.component.state.percentage_loaded + .33,
+            percentage_loaded: this.component.state.percentage_loaded + .20,
             secondary_loading_title: 'Fetching Kingdom Data ...',
         });
     }
@@ -87,6 +91,26 @@ export default class FetchGameData {
             kingdoms: result.data.kingdoms,
             kingdom_logs: result.data.logs,
             loading: false,
+            percentage_loaded: this.component.state.percentage_loaded + .20,
+            secondary_loading_title: 'Fetching Action Data ...',
+        });
+    }
+
+    setActionData(result: AxiosResponse) {
+        if (this.component.state.character === null) {
+            return;
+        }
+
+        this.component.setState({
+            percentage_loaded: this.component.state.percentage_loaded + .20,
+            secondary_loading_title: 'Fetching Map Data ...',
+            action_data: {
+                monsters: result.data.monsters,
+                attack_time_out: this.component.state.character.can_attack_again_at !== null ?
+                    calculateTimeLeft(this.component.state.character.can_attack_again_at) : 0,
+                crafting_time_out: this.component.state.character.can_craft_again_at !== null ?
+                    calculateTimeLeft(this.component.state.character.can_craft_again_at) : 0,
+            }
         });
     }
 }

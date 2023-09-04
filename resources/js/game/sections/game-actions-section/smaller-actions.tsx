@@ -1,4 +1,4 @@
-import React, {Fragment} from "react";
+import React, { Fragment } from "react";
 import Select from "react-select";
 import SmallActionsState from "./types/small-actions-state";
 import SmallActionsManager from "../../lib/game/actions/small-actions-manager";
@@ -13,13 +13,15 @@ import SmallMapMovementActions from "./components/small-actions/small-map-moveme
 import SmallActionsProps from "./types/small-actions-props";
 import CelestialFight from "./components/celestial-fight";
 import SmallerSpecialtyShop from "./components/small-actions/smaller-specialty-shop";
-import {removeCommas} from "../../lib/game/format-number";
+import { removeCommas } from "../../lib/game/format-number";
 import GamblingSection from "./components/gambling-section";
 import Revive from "./components/fight-section/revive";
 import RaidSection from "./components/raid-section";
 
-export default class SmallerActions extends React.Component<SmallActionsProps, SmallActionsState> {
-
+export default class SmallerActions extends React.Component<
+    SmallActionsProps,
+    SmallActionsState
+> {
     private attackTimeOut: any;
 
     private craftingTimeOut: any;
@@ -68,122 +70,197 @@ export default class SmallerActions extends React.Component<SmallActionsProps, S
             show_gambling_section: false,
             show_rank_fight: false,
             total_ranks: 0,
-        }
+        };
 
         // @ts-ignore
-        this.attackTimeOut = Echo.private('show-timeout-bar-' + this.props.character.user_id);
+        this.attackTimeOut = Echo.private(
+            "show-timeout-bar-" + this.props.character.user_id
+        );
 
         // @ts-ignore
-        this.craftingTimeOut = Echo.private('show-crafting-timeout-bar-' + this.props.character.user_id);
+        this.craftingTimeOut = Echo.private(
+            "show-crafting-timeout-bar-" + this.props.character.user_id
+        );
 
         // @ts-ignore
-        this.mapTimeOut     = Echo.private('show-timeout-move-' + this.props.character.user_id);
+        this.mapTimeOut = Echo.private(
+            "show-timeout-move-" + this.props.character.user_id
+        );
 
         // @ts-ignore
-        this.explorationTimeOut = Echo.private('exploration-timeout-' + this.props.character.user_id);
+        this.explorationTimeOut = Echo.private(
+            "exploration-timeout-" + this.props.character.user_id
+        );
 
         // @ts-ignore
-        this.monsterUpdate = Echo.private('update-monsters-list-' + this.props.character.user_id);
+        this.monsterUpdate = Echo.private(
+            "update-monsters-list-" + this.props.character.user_id
+        );
 
         // @ts-ignore
-        this.pvpUpdate = Echo.private('update-pvp-attack-' + this.props.character.user_id);
+        this.pvpUpdate = Echo.private(
+            "update-pvp-attack-" + this.props.character.user_id
+        );
 
         // @ts-ignore
-        this.celestialTimeout   = Echo.private('update-character-celestial-timeout-' + this.props.character.user_id);
+        this.celestialTimeout = Echo.private(
+            "update-character-celestial-timeout-" + this.props.character.user_id
+        );
 
         // @ts-ignore
-        this.manageRankFights = Echo.private('update-rank-fight-' + this.props.character.user_id);
+        this.manageRankFights = Echo.private(
+            "update-rank-fight-" + this.props.character.user_id
+        );
 
         // @ts-ignore
-        this.raidMonsterUpdate = Echo.private('update-raid-monsters-list-' + this.props.character.user_id);
+        this.raidMonsterUpdate = Echo.private(
+            "update-raid-monsters-list-" + this.props.character.user_id
+        );
 
         // @ts-ignore
-        this.duelOptions = Echo.join('update-duel');
+        this.duelOptions = Echo.join("update-duel");
 
         this.smallActionsManager = new SmallActionsManager(this);
     }
 
     componentDidMount() {
-
-        this.smallActionsManager.initialFetch();
-
-        // @ts-ignore
-        this.attackTimeOut.listen('Game.Core.Events.ShowTimeOutEvent', (event: any) => {
-            this.setState({
-                attack_time_out: event.forLength,
-            });
+        this.setState({
+            ...this.state,
+            ...this.props.action_data,
+            ...{ loading: false },
         });
 
         // @ts-ignore
-        this.craftingTimeOut.listen('Game.Core.Events.ShowCraftingTimeOutEvent', (event: any) => {
-            this.setState({
-                crafting_time_out: event.timeout,
-            });
-        });
+        this.attackTimeOut.listen(
+            "Game.Core.Events.ShowTimeOutEvent",
+            (event: any) => {
+                this.setState({
+                    attack_time_out: event.forLength,
+                });
+            }
+        );
 
         // @ts-ignore
-        this.manageRankFights.listen('Game.Maps.Events.UpdateRankFights', (event: any) => {
-            this.setState({
-                show_rank_fight: event.showRankSelection,
-                total_ranks: event.ranks,
-            });
-        });
+        this.craftingTimeOut.listen(
+            "Game.Core.Events.ShowCraftingTimeOutEvent",
+            (event: any) => {
+                this.setState({
+                    crafting_time_out: event.timeout,
+                });
+            }
+        );
 
         // @ts-ignore
-        this.mapTimeOut.listen('Game.Maps.Events.ShowTimeOutEvent', (event: any) => {
-            this.setState({
-                movement_time_left: event.forLength,
-            });
-        });
+        this.manageRankFights.listen(
+            "Game.Maps.Events.UpdateRankFights",
+            (event: any) => {
+                this.setState({
+                    show_rank_fight: event.showRankSelection,
+                    total_ranks: event.ranks,
+                });
+            }
+        );
 
         // @ts-ignore
-        this.monsterUpdate.listen('App.Game.Maps.Events.UpdateMonsterList', (event: any) => {
-            this.setState({
-                monsters: event.monster,
-            })
-        });
+        this.mapTimeOut.listen(
+            "Game.Maps.Events.ShowTimeOutEvent",
+            (event: any) => {
+                this.setState({
+                    movement_time_left: event.forLength,
+                });
+            }
+        );
 
         // @ts-ignore
-        this.celestialTimeout.listen('Game.Core.Events.UpdateCharacterCelestialTimeOut', (event: any) => {
-            this.setState({
-                celestial_time_out: event.timeOut,
-            });
-        });
+        this.monsterUpdate.listen(
+            "App.Game.Maps.Events.UpdateMonsterList",
+            (event: any) => {
+                this.setState({
+                    monsters: event.monster,
+                });
+            }
+        );
+
+        // @ts-ignore
+        this.celestialTimeout.listen(
+            "Game.Core.Events.UpdateCharacterCelestialTimeOut",
+            (event: any) => {
+                this.setState({
+                    celestial_time_out: event.timeOut,
+                });
+            }
+        );
 
         // // @ts-ignore
-        this.duelOptions.listen('Game.Maps.Events.UpdateDuelAtPosition', (event: any) => {
-            this.setState({
-                pvp_characters_on_map: event.characters,
-                characters_for_dueling: [],
-            }, () => {
-                const characterLevel = removeCommas(this.props.character.level);
+        this.duelOptions.listen(
+            "Game.Maps.Events.UpdateDuelAtPosition",
+            (event: any) => {
+                this.setState(
+                    {
+                        pvp_characters_on_map: event.characters,
+                        characters_for_dueling: [],
+                    },
+                    () => {
+                        const characterLevel = removeCommas(
+                            this.props.character.level
+                        );
 
-                if (characterLevel >= 301) {
-                    this.smallActionsManager.setCharactersForDueling(event.characters);
-                }
-            })
-        });
+                        if (characterLevel >= 301) {
+                            this.smallActionsManager.setCharactersForDueling(
+                                event.characters
+                            );
+                        }
+                    }
+                );
+            }
+        );
 
         // @ts-ignore
-        this.pvpUpdate.listen('Game.Battle.Events.UpdateCharacterPvpAttack', (event: any) => {
-            this.setState({
-                show_duel_fight: true,
-                duel_fight_info: event.data,
-            });
-        });
+        this.pvpUpdate.listen(
+            "Game.Battle.Events.UpdateCharacterPvpAttack",
+            (event: any) => {
+                this.setState({
+                    show_duel_fight: true,
+                    duel_fight_info: event.data,
+                });
+            }
+        );
 
         // // @ts-ignore
-        this.explorationTimeOut.listen('Game.Exploration.Events.ExplorationTimeOut', (event: any) => {
-            this.setState({
-                automation_time_out: event.forLength,
-            });
-        });
+        this.explorationTimeOut.listen(
+            "Game.Exploration.Events.ExplorationTimeOut",
+            (event: any) => {
+                this.setState({
+                    automation_time_out: event.forLength,
+                });
+            }
+        );
 
-        this.raidMonsterUpdate.listen('Game.Maps.Events.UpdateRaidMonsters', (event: any) => {
+        this.raidMonsterUpdate.listen(
+            "Game.Maps.Events.UpdateRaidMonsters",
+            (event: any) => {
+                this.setState({
+                    raid_monsters: event.raidMonsters,
+                });
+            }
+        );
+    }
+
+    componentDidUpdate(
+        prevProps: Readonly<SmallActionsProps>,
+        prevState: Readonly<SmallActionsState>,
+        snapshot?: any
+    ): void {
+        if (
+            this.props.action_data !== null &&
+            this.state.monsters.length === 0
+        ) {
             this.setState({
-                raid_monsters: event.raidMonsters,
+                ...this.state,
+                ...this.props.action_data,
+                ...{ loading: false },
             });
-        });
+        }
     }
 
     showAction(data: any) {
@@ -192,13 +269,13 @@ export default class SmallerActions extends React.Component<SmallActionsProps, S
 
     updateAttackTimer(timeLeft: number) {
         this.setState({
-            attack_time_out: timeLeft
+            attack_time_out: timeLeft,
         });
     }
 
     updateCraftingTimer(timeLeft: number) {
         this.setState({
-            crafting_time_out: timeLeft
+            crafting_time_out: timeLeft,
         });
     }
 
@@ -217,21 +294,20 @@ export default class SmallerActions extends React.Component<SmallActionsProps, S
     closeMapSection() {
         this.setState({
             selected_action: null,
-        })
+        });
     }
 
     closeExplorationSection() {
         this.setState({
             selected_action: null,
-        })
+        });
     }
 
     closeFightCelestialSection() {
         this.setState({
             selected_action: null,
-        })
+        });
     }
-
 
     manageDuel() {
         this.setState({
@@ -262,7 +338,7 @@ export default class SmallerActions extends React.Component<SmallActionsProps, S
     removeSlots() {
         this.setState({
             selected_action: null,
-        })
+        });
     }
 
     resetDuelData() {
@@ -272,10 +348,9 @@ export default class SmallerActions extends React.Component<SmallActionsProps, S
     }
 
     createMonster() {
-
         if (this.state.raid_monsters.length > 0) {
             return (
-                <RaidSection 
+                <RaidSection
                     raid_monsters={this.state.raid_monsters}
                     character_id={this.props.character.id}
                     can_attack={this.props.character.can_attack}
@@ -285,17 +360,18 @@ export default class SmallerActions extends React.Component<SmallActionsProps, S
                     user_id={this.props.character.user_id}
                     character_current_health={this.props.character.health}
                 />
-            )
+            );
         }
 
         return (
-            <MonsterActions monsters={this.state.monsters}
-                            character={this.props.character}
-                            is_rank_fights={this.state.show_rank_fight}
-                            total_ranks={this.state.total_ranks}
-                            close_monster_section={this.closeMonsterSection.bind(this)}
-                            character_statuses={this.props.character_status}
-                            is_small={true}
+            <MonsterActions
+                monsters={this.state.monsters}
+                character={this.props.character}
+                is_rank_fights={this.state.show_rank_fight}
+                total_ranks={this.state.total_ranks}
+                close_monster_section={this.closeMonsterSection.bind(this)}
+                character_statuses={this.props.character_status}
+                is_small={true}
             />
         );
     }
@@ -314,7 +390,9 @@ export default class SmallerActions extends React.Component<SmallActionsProps, S
     renderExploration() {
         return (
             <SmallExplorationSection
-                close_exploration_section={this.closeExplorationSection.bind(this)}
+                close_exploration_section={this.closeExplorationSection.bind(
+                    this
+                )}
                 character={this.props.character}
                 monsters={this.state.monsters}
             />
@@ -337,70 +415,83 @@ export default class SmallerActions extends React.Component<SmallActionsProps, S
 
     showCelestialFight() {
         return (
-            <CelestialFight character={this.props.character}
-                            manage_celestial_fight={this.closeFightCelestialSection.bind(this)}
-                            celestial_id={this.props.celestial_id}
-                            update_celestial={this.props.update_celestial}
+            <CelestialFight
+                character={this.props.character}
+                manage_celestial_fight={this.closeFightCelestialSection.bind(
+                    this
+                )}
+                celestial_id={this.props.celestial_id}
+                update_celestial={this.props.update_celestial}
             />
-        )
+        );
     }
 
     showDuelFight() {
         return (
-            <DuelPlayer characters={this.state.characters_for_dueling}
-                        duel_data={this.state.duel_fight_info}
-                        character={this.props.character}
-                        manage_pvp={this.manageDuel.bind(this)}
-                        reset_duel_data={this.resetDuelData.bind(this)}
-                        is_small={true}
+            <DuelPlayer
+                characters={this.state.characters_for_dueling}
+                duel_data={this.state.duel_fight_info}
+                character={this.props.character}
+                manage_pvp={this.manageDuel.bind(this)}
+                reset_duel_data={this.resetDuelData.bind(this)}
+                is_small={true}
             />
-        )
+        );
     }
 
     showSlots() {
         return (
-            <GamblingSection character={this.props.character} close_gambling_section={this.removeSlots.bind(this)} is_small={true}/>
-        )
+            <GamblingSection
+                character={this.props.character}
+                close_gambling_section={this.removeSlots.bind(this)}
+                is_small={true}
+            />
+        );
     }
 
     showJoinPVP() {
         return (
-            <JoinPvp manage_section={this.manageJoinPvp.bind(this)} character_id={this.props.character.id}/>
-        )
+            <JoinPvp
+                manage_section={this.manageJoinPvp.bind(this)}
+                character_id={this.props.character.id}
+            />
+        );
     }
 
     showSpecialtyShop(type: string) {
         return (
             <SmallerSpecialtyShop
-                show_hell_forged_section={type === 'hell-forged-gear'}
+                show_hell_forged_section={type === "hell-forged-gear"}
                 character={this.props.character}
                 manage_hell_forged_shop={this.manageHellForgedShop.bind(this)}
-                manage_purgatory_chain_shop={this.managePurgatoryChainShop.bind(this)}
+                manage_purgatory_chain_shop={this.managePurgatoryChainShop.bind(
+                    this
+                )}
             />
-        )
+        );
     }
 
     buildSection() {
-        switch(this.state.selected_action) {
-            case 'fight':
+        switch (this.state.selected_action) {
+            case "fight":
                 return this.createMonster();
-            case 'explore':
+            case "explore":
                 return this.renderExploration();
-            case 'craft':
+            case "craft":
                 return this.showCrafting();
-            case 'map-movement':
+            case "map-movement":
                 return this.showMapMovement();
-            case 'celestial-fight':
+            case "celestial-fight":
                 return this.showCelestialFight();
-            case 'pvp-fight':
+            case "pvp-fight":
                 return this.showDuelFight();
-            case 'join-monthly-pvp':
+            case "join-monthly-pvp":
                 return this.showJoinPVP();
-            case 'hell-forged-gear':
-                return this.showSpecialtyShop('hell-forged-gear')
-            case 'purgatory-chains-gear':
-                return this.showSpecialtyShop('purgatory-chains-gear')
-            case 'slots':
+            case "hell-forged-gear":
+                return this.showSpecialtyShop("hell-forged-gear");
+            case "purgatory-chains-gear":
+                return this.showSpecialtyShop("purgatory-chains-gear");
+            case "slots":
                 return this.showSlots();
             default:
                 return null;
@@ -408,37 +499,46 @@ export default class SmallerActions extends React.Component<SmallActionsProps, S
     }
 
     render() {
-        return(
+        return (
             <Fragment>
-                {
-                    this.state.selected_action !== null ?
-                        this.buildSection()
-                    :
-                        <Fragment>
-                            <Select
-                                onChange={this.showAction.bind(this)}
-                                options={this.smallActionsManager.buildOptions()}
-                                menuPosition={'absolute'}
-                                menuPlacement={'bottom'}
-                                styles={{menuPortal: (base: any) => ({...base, zIndex: 9999, color: '#000000'})}}
-                                menuPortalTarget={document.body}
-                                value={this.smallActionsManager.defaultSelectedAction()}
-                            />
-                            <Revive can_attack={this.props.character_status.can_attack}
-                                    is_character_dead={this.props.character.is_dead}
-                                    character_id={this.props.character.id}
-                            />
-                        </Fragment>
-                }
+                {this.state.selected_action !== null ? (
+                    this.buildSection()
+                ) : (
+                    <Fragment>
+                        <Select
+                            onChange={this.showAction.bind(this)}
+                            options={this.smallActionsManager.buildOptions()}
+                            menuPosition={"absolute"}
+                            menuPlacement={"bottom"}
+                            styles={{
+                                menuPortal: (base: any) => ({
+                                    ...base,
+                                    zIndex: 9999,
+                                    color: "#000000",
+                                }),
+                            }}
+                            menuPortalTarget={document.body}
+                            value={this.smallActionsManager.defaultSelectedAction()}
+                        />
+                        <Revive
+                            can_attack={this.props.character_status.can_attack}
+                            is_character_dead={this.props.character.is_dead}
+                            character_id={this.props.character.id}
+                        />
+                    </Fragment>
+                )}
 
-                <div className='pb-5'>
-                    <ActionsTimers attack_time_out={this.state.attack_time_out}
-                                   crafting_time_out={this.state.crafting_time_out}
-                                   update_attack_timer={this.updateAttackTimer.bind(this)}
-                                   update_crafting_timer={this.updateCraftingTimer.bind(this)}
+                <div className="pb-5">
+                    <ActionsTimers
+                        attack_time_out={this.state.attack_time_out}
+                        crafting_time_out={this.state.crafting_time_out}
+                        update_attack_timer={this.updateAttackTimer.bind(this)}
+                        update_crafting_timer={this.updateCraftingTimer.bind(
+                            this
+                        )}
                     />
                 </div>
-                <div className='mt-4'>
+                <div className="mt-4">
                     <MapTimer
                         time_left={this.state.movement_time_left}
                         automation_time_out={this.state.automation_time_out}

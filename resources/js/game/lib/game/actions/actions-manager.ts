@@ -24,26 +24,6 @@ export default class ActionsManager {
     }
 
     /**
-     * Initial Ajax call for the actions component.
-     *
-     * @param props
-     */
-    initialFetch() {
-        const props = this.component.props;
-
-        (new Ajax()).setRoute('map-actions/' + props.character.id).doAjaxCall('get', (result: AxiosResponse) => {
-            this.component.setState({
-                monsters: result.data.monsters,
-                attack_time_out: props.character.can_attack_again_at !== null ? this.calculateTimeLeft(props.character.can_attack_again_at) : 0,
-                crafting_time_out: props.character.can_craft_again_at !== null ? this.calculateTimeLeft(props.character.can_craft_again_at) : 0,
-                loading: false,
-            })
-        }, (error: AxiosError) => {
-            console.error(error);
-        });
-    }
-
-    /**
      * When the component updates let's update the state.
      */
     public updateStateOnComponentUpdate() {
