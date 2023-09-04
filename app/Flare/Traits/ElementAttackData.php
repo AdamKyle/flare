@@ -16,9 +16,14 @@ trait ElementAttackData {
         $maxValue = 0;
 
         foreach ($elementData as $name => $item) {
-            $value = floatval($item);
-            if ($value > $maxValue) {
-                $maxValue = $value;
+            if (is_array($item)) {
+                $value = floatval($item[$name]);
+
+                if ($value > $maxValue) {
+                    $maxValue = $value;
+                }
+            } else if ($item > $maxValue) {
+                $maxValue = $item;
             }
         }
 
@@ -33,7 +38,20 @@ trait ElementAttackData {
      * @return string
      */
     public function getHighestElementName(array $elementData, float $highestElementForAttack): string {
-        return array_search($highestElementForAttack, $elementData);
+        foreach ($elementData as $name => $item) {
+
+            if (is_array($item)) {
+                $innerValue = floatval($item[$name]);
+
+                if ($innerValue === floatval($highestElementForAttack)) {
+                    return $name;
+                }
+            } else if ($item === floatval($highestElementForAttack)) {
+                return $name;
+            }
+        }
+
+        return 'UNKNOWN';
     }
 
     /**

@@ -85,7 +85,7 @@ class GemComparison {
         }
 
         return $this->successResult([
-            'attached_gems'      => array_values($slot->item->sockets->map(function($itemSocket) {
+            'attached_gems'      => array_values($slot->item->sockets->map(function ($itemSocket) {
                 $gem = new Item($itemSocket->gem, $this->characterGemsTransformer);
 
                 return $this->manager->createData($gem)->toArray();
@@ -188,9 +188,6 @@ class GemComparison {
         if ($gemToCompare->{$type} === $gemYouHave->{$type}) {
             $comparisonOfAttribute[$type]               = (new GemTypeValue($gemToCompare->{$type}))->getNameOfAtonement();
             $comparisonOfAttribute[$attribute]          = $gemToCompare->{$attribute} - $gemYouHave->{$attribute};
-        } else {
-            $comparisonOfAttribute[$type]               = (new GemTypeValue($gemToCompare->{$type}))->getNameOfAtonement();
-            $comparisonOfAttribute[$attribute]          = $gemToCompare->{$attribute};
         }
 
         $comparisonOfAttribute['gem_you_have_id'] = $gemYouHave->id;

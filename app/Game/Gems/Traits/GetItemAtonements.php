@@ -71,9 +71,7 @@ trait GetItemAtonements {
 
         foreach ($gemData as $gem) {
             $atonementType =
-                $gem["primary_atonement_type"] == $type ? "primary_atonement_amount" :
-                    ($gem["secondary_atonement_type"] == $type ? "secondary_atonement_amount" :
-                        ($gem["tertiary_atonement_type"] == $type ? "tertiary_atonement_amount" : ""));
+                $gem["primary_atonement_type"] == $type ? "primary_atonement_amount" : ($gem["secondary_atonement_type"] == $type ? "secondary_atonement_amount" : ($gem["tertiary_atonement_type"] == $type ? "tertiary_atonement_amount" : ""));
 
             if ($atonementType) {
                 if (array_key_exists($name, $result)) {
@@ -84,7 +82,7 @@ trait GetItemAtonements {
             }
         }
 
-        return array_map(function($name, $total) {
+        return array_map(function ($name, $total) {
             return [$name => $total];
         }, array_keys($result), $result)[0];
     }
@@ -100,7 +98,7 @@ trait GetItemAtonements {
     protected function fetchSummedValue(Item $item, int $type, string $name): float {
         $value = $item->sockets()->join('gems', function ($join) use ($type) {
             $join->on('item_sockets.gem_id', '=', 'gems.id')
-                ->where(function ($query) use($type) {
+                ->where(function ($query) use ($type) {
                     $query->where('gems.primary_atonement_type', '=', $type)
                         ->orWhere('gems.secondary_atonement_type', '=', $type)
                         ->orWhere('gems.tertiary_atonement_type', '=', $type);
@@ -122,10 +120,11 @@ trait GetItemAtonements {
      * @return array
      */
     public function determineHighestValue(array $atonements): array {
-        
+
         $elementData = $atonements['atonements'];
 
         $highestElementalDamage = $this->getHighestElementDamage($elementData);
+
         $highestElementalName   = $this->getHighestElementName($elementData, $highestElementalDamage);
 
         if ($highestElementalDamage <= 0) {
