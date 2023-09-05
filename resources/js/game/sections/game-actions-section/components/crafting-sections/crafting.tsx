@@ -94,6 +94,7 @@ export default class Crafting extends React.Component<any, any> {
         ) {
             this.setState({
                 sorted_armour: [],
+                selected_item: null,
             });
         } else if (
             this.state.sorted_armour.length === 0 &&

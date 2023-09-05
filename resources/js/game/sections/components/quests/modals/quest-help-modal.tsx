@@ -1,6 +1,5 @@
 import React, {Fragment} from "react";
 import HelpDialogue from "../../../../components/ui/dialogue/help-dialogue";
-import AlchemyItemHoly from '../../../character-sheet/components/modals/components/alchemy-item-holy';
 
 export default class QuestHelpModal extends React.Component<any, any> {
     constructor(props: any) {
@@ -78,7 +77,7 @@ export default class QuestHelpModal extends React.Component<any, any> {
             <Fragment>
                 <p className='my-4 text-gray-700 dark:text-gray-200'>
                     You need to complete a quest before you can hand this one in. The quest you are looking for can be in the same tree as this quest.
-                    Take a look below to see what plane the quest is on, the name of the quest and if its a raid specific quest, which means it only 
+                    Take a look below to see what plane the quest is on, the name of the quest and if its a raid specific quest, which means it only
                     appears when that raid is running.
                 </p>
                 <dl>
