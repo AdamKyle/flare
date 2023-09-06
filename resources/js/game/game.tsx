@@ -72,6 +72,7 @@ export default class Game extends React.Component<GameProps, GameState> {
             disable_tabs: false,
             show_global_timeout: false,
             action_data: null,
+            map_data: null,
             tabs: [
                 {
                     key: "game",
@@ -187,6 +188,10 @@ export default class Game extends React.Component<GameProps, GameState> {
                     url: "player-kingdoms/" + this.props.characterId,
                     name: "kingdoms",
                 },
+                {
+                    url: "map/" + this.props.characterId,
+                    name: 'game-map'
+                }
             ])
             .doAjaxCalls();
 
@@ -578,6 +583,7 @@ export default class Game extends React.Component<GameProps, GameState> {
                                                     .can_engage_celestials
                                             }
                                             action_data={this.state.action_data}
+                                            map_data={this.state.map_data}
                                         />
                                     ) : (
                                         <Actions
@@ -644,6 +650,7 @@ export default class Game extends React.Component<GameProps, GameState> {
                                         this
                                     )}
                                     disable_bottom_timer={false}
+                                    map_data={this.state.map_data}
                                 />
                             </BasicCard>
                         </div>

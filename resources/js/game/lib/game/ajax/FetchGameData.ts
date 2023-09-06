@@ -3,6 +3,7 @@ import Game from "../../../game";
 import Ajax from "../../ajax/ajax";
 import {AxiosResponse} from "axios";
 import { calculateTimeLeft } from "../../helpers/time-calculator";
+import MapStateManager from "../map/state/map-state-manager";
 
 export default class FetchGameData {
 
@@ -33,6 +34,8 @@ export default class FetchGameData {
                         return this.setCharacterSheet(result);
                     case 'actions':
                         return this.setActionData(result);
+                    case 'game-map':
+                        return this.setMapData(result);
                     case 'quests':
                         return this.setQuestData(result);
                     case 'kingdoms':
@@ -111,6 +114,12 @@ export default class FetchGameData {
                 crafting_time_out: this.component.state.character.can_craft_again_at !== null ?
                     calculateTimeLeft(this.component.state.character.can_craft_again_at) : 0,
             }
+        });
+    }
+
+    setMapData(result: AxiosResponse) {
+        this.component.setState({
+            map_data: MapStateManager.buildCoreState(result.data, this.component),
         });
     }
 }

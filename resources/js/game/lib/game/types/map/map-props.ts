@@ -1,3 +1,4 @@
+import MapState from "../../../../sections/map/types/map-state";
 import CharacterCurrenciesDetails from "../character-currencies-details";
 import PositionType from "./position-type";
 
@@ -28,4 +29,6 @@ export default interface MapProps {
     disable_bottom_timer: boolean;
 
     can_engage_celestial: boolean;
+
+    map_data: MapState|null;
 }

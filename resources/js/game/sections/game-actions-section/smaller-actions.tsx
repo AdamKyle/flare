@@ -409,6 +409,7 @@ export default class SmallerActions extends React.Component<
                 character_currencies={this.props.character_currencies}
                 update_plane_quests={this.props.update_plane_quests}
                 update_character_position={this.props.update_character_position}
+                map_data={this.props.map_data}
             />
         );
     }

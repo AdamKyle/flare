@@ -1,4 +1,5 @@
 import {CharacterType} from "../../../../../lib/game/character/character-type";
+import MapState from "../../../../map/types/map-state";
 import CharacterCurrenciesDetails from "../../../../../lib/game/types/character-currencies-details";
 import PositionType from "../../../../../lib/game/types/map/position-type";
 
@@ -16,4 +17,6 @@ export default interface SmallMapSectionProps {
     update_plane_quests: (plane: string) => void;
 
     update_character_position: (position: PositionType) => void;
+
+    map_data: MapState|null;
 }

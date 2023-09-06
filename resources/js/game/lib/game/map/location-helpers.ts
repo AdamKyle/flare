@@ -1,5 +1,4 @@
-import MapState from "../types/map/map-state";
-import MapStateManager from './state/map-state';
+import MapState from "../../../sections/map/types/map-state";
 import LocationDetails from "./types/location-details";
 import PlayerKingdomsDetails from "../types/map/player-kingdoms-details";
 import NpcKingdomsDetails from "../types/map/npc-kingdoms-details";
@@ -12,7 +11,7 @@ import MapActions from "../../../sections/map/actions/map-actions";
  * @return location or null
  * @type [{mapState: MapState}]
  */
-export const getPortLocation = (mapState: MapState | MapStateManager): LocationDetails | null => {
+export const getPortLocation = (mapState: MapState): LocationDetails | null => {
 
     if (mapState.locations === null) {
         return null;
@@ -33,9 +32,14 @@ export const getPortLocation = (mapState: MapState | MapStateManager): LocationD
  * @param component
  */
 export const canSettleHere = (component: MapActions) => {
-    const locations = component.props.locations.filter((location: LocationDetails) => {
-        return location.x === component.props.character_position.x && location.y === component.props.character_position.y;
-    });
+
+    let locations = [];
+
+    if (component.props.locations !== null) {
+        locations = component.props.locations.filter((location: LocationDetails) => {
+            return location.x === component.props.character_position.x && location.y === component.props.character_position.y;
+        });
+    }
 
     const playerKingdom = component.props.player_kingdoms.filter((playerKingdom: PlayerKingdomsDetails) => {
         return playerKingdom.x_position === component.props.character_position.x && playerKingdom.y_position === component.props.character_position.y;

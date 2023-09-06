@@ -2,7 +2,6 @@ import SmallerActions from "../../../sections/game-actions-section/smaller-actio
 import {capitalize} from "lodash";
 import Ajax from "../../ajax/ajax";
 import {AxiosError, AxiosResponse} from "axios";
-import {getTimeLeftInSeconds} from "./convert-time";
 import PvpCharactersType from "../types/pvp-characters-type";
 import {DateTime} from "luxon";
 

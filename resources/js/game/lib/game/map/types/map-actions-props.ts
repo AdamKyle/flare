@@ -16,7 +16,7 @@ export default interface MapActionsProps {
 
     port_location: LocationDetails | null;
 
-    locations: LocationDetails[] | [];
+    locations: LocationDetails[] | null;
 
     character_position: {x: number, y: number};
 

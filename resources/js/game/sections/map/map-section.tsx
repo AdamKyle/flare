@@ -1,9 +1,6 @@
-import React, {Fragment} from "react";
-import {AxiosError, AxiosResponse} from "axios";
-import {dragMap, fetchLeftBounds} from "../../lib/game/map/map-position";
-import MapState from "../../lib/game/types/map/map-state";
-import MapProps from '../../lib/game/types/map/map-props';
-import Ajax from "../../lib/ajax/ajax";
+import React, { Fragment } from "react";
+import { dragMap, fetchLeftBounds } from "../../lib/game/map/map-position";
+import MapProps from "../../lib/game/types/map/map-props";
 import Location from "../components/locations/location";
 import Kingdoms from "../components/kingdoms/kingdoms";
 import EnemyKingdoms from "../components/kingdoms/enemy-kingdoms";
@@ -12,7 +9,10 @@ import MapStateManager from "../../lib/game/map/state/map-state-manager";
 import NpcKingdoms from "../components/kingdoms/npc-kingdoms";
 import ComponentLoading from "../../components/ui/loading/component-loading";
 import MapData from "../../lib/game/map/request-types/MapData";
-import {getStyle, playerIconPosition} from "../../lib/game/map/map-management";
+import {
+    getStyle,
+    playerIconPosition,
+} from "../../lib/game/map/map-management";
 import MapTimer from "./map-timer";
 import DirectionalMovement from "./actions/directional-movement";
 import MapActions from "./actions/map-actions";
@@ -20,12 +20,10 @@ import NpcKingdomsDetails from "../../lib/game/types/map/npc-kingdoms-details";
 import PlayerKingdomsDetails from "../../lib/game/types/map/player-kingdoms-details";
 import clsx from "clsx";
 // @ts-ignore
-import Draggable from 'react-draggable/build/web/react-draggable.min';
-
-
+import Draggable from "react-draggable/build/web/react-draggable.min";
+import MapState from "./types/map-state";
 
 export default class MapSection extends React.Component<MapProps, MapState> {
-
     private mapTimeOut: any;
 
     private traverseUpdate: any;
@@ -46,14 +44,16 @@ export default class MapSection extends React.Component<MapProps, MapState> {
         super(props);
 
         this.state = {
-            map_url: '',
+            map_url: "",
             map_id: 0,
-            map_name: '',
+            map_name: "",
             map_position: {
-                x: 0, y: 0
+                x: 0,
+                y: 0,
             },
             character_position: {
-                x: 0, y: 0
+                x: 0,
+                y: 0,
             },
             game_map_id: 0,
             bottom_bounds: 0,
@@ -70,212 +70,336 @@ export default class MapSection extends React.Component<MapProps, MapState> {
             time_left: 0,
             automation_time_out: 0,
             celestial_time_out: 0,
-        }
+        };
 
         // @ts-ignore
-        this.mapTimeOut         = Echo.private('show-timeout-move-' + this.props.user_id);
+        this.mapTimeOut = Echo.private(
+            "show-timeout-move-" + this.props.user_id
+        );
 
         // @ts-ignore
-        this.globalMapUpdate    = Echo.join('global-map-update');
+        this.globalMapUpdate = Echo.join("global-map-update");
 
         // @ts-ignore
-        this.kingdomsUpdate     = Echo.private('add-kingdom-to-map-' + this.props.user_id);
+        this.kingdomsUpdate = Echo.private(
+            "add-kingdom-to-map-" + this.props.user_id
+        );
 
         // @ts-ignore
-        this.explorationTimeOut = Echo.private('exploration-timeout-' + this.props.user_id);
+        this.explorationTimeOut = Echo.private(
+            "exploration-timeout-" + this.props.user_id
+        );
 
         // @ts-ignore
-        this.traverseUpdate     = Echo.private('update-plane-' + this.props.user_id);
+        this.traverseUpdate = Echo.private(
+            "update-plane-" + this.props.user_id
+        );
 
         // @ts-ignore
-        this.npcKingdomsUpdate  = Echo.join('npc-kingdoms-update');
+        this.npcKingdomsUpdate = Echo.join("npc-kingdoms-update");
 
         // @ts-ignore
-        this.celestialTimeout   = Echo.private('update-character-celestial-timeout-' + this.props.user_id);
+        this.celestialTimeout = Echo.private(
+            "update-character-celestial-timeout-" + this.props.user_id
+        );
 
         // @ts-ignore
-        this.corruptedLocations = Echo.join('corrupt-locations');
+        this.corruptedLocations = Echo.join("corrupt-locations");
     }
 
     componentDidMount() {
-        (new Ajax()).setRoute('map/' + this.props.character_id)
-                    .doAjaxCall('get', (result: AxiosResponse) => {
-            this.setStateFromData(result.data, () => {
+        if (this.props.map_data !== null) {
+            this.setState({ ...this.props.map_data }, () => {
                 this.setState({
-                    celestial_time_out: this.props.can_engage_celestials_again_at
+                    celestial_time_out:
+                        this.props.can_engage_celestials_again_at,
                 });
 
                 if (this.props.automation_completed_at !== 0) {
                     this.setState({
                         automation_time_out: this.props.automation_completed_at,
-                    })
+                    });
                 }
+
+                this.setState({ loading: false });
             });
-        }, (err: AxiosError) => {
+        }
 
-        });
-
-        this.mapTimeOut.listen('Game.Maps.Events.ShowTimeOutEvent', (event: any) => {
-            this.setState({
-                time_left: event.forLength,
-                can_player_move: event.canMove,
-            });
-        });
-
-        this.traverseUpdate.listen('Game.Maps.Events.UpdateMap', (event: any) => {
-            this.setStateFromData(event.mapDetails);
-
-            this.props.update_character_quests_plane(event.mapDetails.character_map.game_map.name)
-        });
-
-        this.globalMapUpdate.listen('Game.Kingdoms.Events.UpdateGlobalMap', (event: any) => {
-
-            const playerKingdomsFilter = this.state.player_kingdoms.filter((playerKingdom: PlayerKingdomsDetails) => {
-                if (!event.npcKingdoms.some((kingdom: NpcKingdomsDetails) => kingdom.id === playerKingdom.id)) {
-                    return playerKingdom;
-                }
-            });
-
-            this.setState({
-                enemy_kingdoms: event.otherKingdoms.filter((kingdom: PlayerKingdomsDetails) => kingdom.character_id !== this.props.character_id),
-                npc_kingdoms: event.npcKingdoms,
-                player_kingdoms: playerKingdomsFilter,
-            });
-        });
-
-        this.explorationTimeOut.listen('Game.Exploration.Events.ExplorationTimeOut', (event: any) => {
-            this.setState({
-                automation_time_out: event.forLength,
-            });
-        });
-
-        this.kingdomsUpdate.listen('Game.Kingdoms.Events.AddKingdomToMap', (event: any) => {
-            this.setState({
-                player_kingdoms: event.myKingdoms
-            });
-        });
-
-        this.npcKingdomsUpdate.listen('Game.Kingdoms.Events.UpdateNPCKingdoms', (event: {npcKingdoms: NpcKingdomsDetails[]|[], mapName: string}) => {
-            if (this.state.map_name === event.mapName) {
+        this.mapTimeOut.listen(
+            "Game.Maps.Events.ShowTimeOutEvent",
+            (event: any) => {
                 this.setState({
-                    npc_kingdoms: event.npcKingdoms
+                    time_left: event.forLength,
+                    can_player_move: event.canMove,
                 });
             }
-        });
+        );
 
-        this.celestialTimeout.listen('Game.Core.Events.UpdateCharacterCelestialTimeOut', (event: any) => {
-            this.setState({
-                celestial_time_out: event.timeLeft,
+        this.traverseUpdate.listen(
+            "Game.Maps.Events.UpdateMap",
+            (event: any) => {
+                this.setStateFromData(event.mapDetails);
+
+                this.props.update_character_quests_plane(
+                    event.mapDetails.character_map.game_map.name
+                );
+            }
+        );
+
+        this.globalMapUpdate.listen(
+            "Game.Kingdoms.Events.UpdateGlobalMap",
+            (event: any) => {
+                const playerKingdomsFilter = this.state.player_kingdoms.filter(
+                    (playerKingdom: PlayerKingdomsDetails) => {
+                        if (
+                            !event.npcKingdoms.some(
+                                (kingdom: NpcKingdomsDetails) =>
+                                    kingdom.id === playerKingdom.id
+                            )
+                        ) {
+                            return playerKingdom;
+                        }
+                    }
+                );
+
+                this.setState({
+                    enemy_kingdoms: event.otherKingdoms.filter(
+                        (kingdom: PlayerKingdomsDetails) =>
+                            kingdom.character_id !== this.props.character_id
+                    ),
+                    npc_kingdoms: event.npcKingdoms,
+                    player_kingdoms: playerKingdomsFilter,
+                });
+            }
+        );
+
+        this.explorationTimeOut.listen(
+            "Game.Exploration.Events.ExplorationTimeOut",
+            (event: any) => {
+                this.setState({
+                    automation_time_out: event.forLength,
+                });
+            }
+        );
+
+        this.kingdomsUpdate.listen(
+            "Game.Kingdoms.Events.AddKingdomToMap",
+            (event: any) => {
+                this.setState({
+                    player_kingdoms: event.myKingdoms,
+                });
+            }
+        );
+
+        this.npcKingdomsUpdate.listen(
+            "Game.Kingdoms.Events.UpdateNPCKingdoms",
+            (event: {
+                npcKingdoms: NpcKingdomsDetails[] | [];
+                mapName: string;
+            }) => {
+                if (this.state.map_name === event.mapName) {
+                    this.setState({
+                        npc_kingdoms: event.npcKingdoms,
+                    });
+                }
+            }
+        );
+
+        this.celestialTimeout.listen(
+            "Game.Core.Events.UpdateCharacterCelestialTimeOut",
+            (event: any) => {
+                this.setState({
+                    celestial_time_out: event.timeLeft,
+                });
+            }
+        );
+
+        this.corruptedLocations.listen(
+            "Game.Raids.Events.CorruptLocations",
+            (event: any) => {
+                let locations = JSON.parse(
+                    JSON.stringify(this.state.locations)
+                );
+
+                locations = [...locations, ...event.corruptedLocations];
+
+                this.setState({
+                    locations: locations,
+                });
+            }
+        );
+    }
+
+    componentDidUpdate(): void {
+        if (this.props.map_data !== null && this.state.loading) {
+            this.setState(this.props.map_data, () => {
+                this.setState({
+                    celestial_time_out:
+                        this.props.can_engage_celestials_again_at,
+                });
+
+                if (this.props.automation_completed_at !== 0) {
+                    this.setState({
+                        automation_time_out: this.props.automation_completed_at,
+                    });
+                }
             });
-        });
-
-        this.corruptedLocations.listen('Game.Raids.Events.CorruptLocations', (event: any) => {
-            let locations = JSON.parse(JSON.stringify(this.state.locations));
-
-            locations = [...locations, ...event.corruptedLocations];
-
-            this.setState({
-                locations: locations,
-            });
-        })
+        }
     }
 
     setStateFromData(data: MapData, callback?: () => void) {
-        MapStateManager.manageState(data, this, callback);
+        const state = MapStateManager.buildChangeState(data, this);
+
+        this.setState(state, () => {
+            if (typeof callback === "function") {
+                return callback();
+            }
+        });
     }
 
-    handleDrag(e: MouseEvent, position: {x: number, y: number}) {
-        this.setState(dragMap(
-            position, this.state.bottom_bounds, this.state.right_bounds
-        ));
+    handleDrag(e: MouseEvent, position: { x: number; y: number }) {
+        this.setState(
+            dragMap(position, this.state.bottom_bounds, this.state.right_bounds)
+        );
     }
 
-    handleTeleportPlayer(data: {x: number, y: number, cost: number, timeout: number}) {
-        (new MovePlayer(this)).teleportPlayer(data, this.props.character_id, this.setStateFromData.bind(this));
+    handleTeleportPlayer(data: {
+        x: number;
+        y: number;
+        cost: number;
+        timeout: number;
+    }) {
+        new MovePlayer(this).teleportPlayer(
+            data,
+            this.props.character_id,
+            this.setStateFromData.bind(this)
+        );
     }
 
     render() {
         if (this.state.loading) {
-            return <ComponentLoading />
+            return <ComponentLoading />;
         }
 
-        return(
+        return (
             <Fragment>
-                <div className='overflow-hidden max-h-[315px] sm:max-w-[75%] md:max-w-[44%] sm:border-2 lg:border-0 sm:mr-auto sm:ml-auto lg:max-w-full lg:mr-0 lg:ml-0'>
+                <div className="overflow-hidden max-h-[315px] sm:max-w-[75%] md:max-w-[44%] sm:border-2 lg:border-0 sm:mr-auto sm:ml-auto lg:max-w-full lg:mr-0 lg:ml-0">
                     <Draggable
                         position={this.state.map_position}
-                        bounds={{top: -200, left: fetchLeftBounds(this), right: this.state.right_bounds, bottom: this.state.bottom_bounds}}
+                        bounds={{
+                            top: -200,
+                            left: fetchLeftBounds(this),
+                            right: this.state.right_bounds,
+                            bottom: this.state.bottom_bounds,
+                        }}
                         handle=".handle"
-                        defaultPosition={{x: 0, y: 0}}
+                        defaultPosition={{ x: 0, y: 0 }}
                         grid={[16, 16]}
                         scale={1}
                         onDrag={this.handleDrag.bind(this)}
                     >
                         <div>
-                            <div className='handle game-map'
-                                 style={getStyle(this)}>
-
-                                <Location locations={this.state.locations}
-                                          character_position={this.state.character_position}
-                                          currencies={this.props.currencies}
-                                          teleport_player={this.handleTeleportPlayer.bind(this)}
-                                          can_move={this.state.can_player_move}
-                                          is_dead={this.props.is_dead}
-                                          is_automation_running={this.props.is_automaton_running}
+                            <div
+                                className="handle game-map"
+                                style={getStyle(this)}
+                            >
+                                <Location
+                                    locations={this.state.locations}
+                                    character_position={
+                                        this.state.character_position
+                                    }
+                                    currencies={this.props.currencies}
+                                    teleport_player={this.handleTeleportPlayer.bind(
+                                        this
+                                    )}
+                                    can_move={this.state.can_player_move}
+                                    is_dead={this.props.is_dead}
+                                    is_automation_running={
+                                        this.props.is_automaton_running
+                                    }
                                 />
 
-                                <Kingdoms kingdoms={this.state.player_kingdoms}
-                                          character_id={this.props.character_id}
-                                          character_position={this.state.character_position}
-                                          currencies={this.props.currencies}
-                                          teleport_player={this.handleTeleportPlayer.bind(this)}
-                                          can_move={this.state.can_player_move}
-                                          is_dead={this.props.is_dead}
-                                          is_automation_running={this.props.is_automaton_running}
+                                <Kingdoms
+                                    kingdoms={this.state.player_kingdoms}
+                                    character_id={this.props.character_id}
+                                    character_position={
+                                        this.state.character_position
+                                    }
+                                    currencies={this.props.currencies}
+                                    teleport_player={this.handleTeleportPlayer.bind(
+                                        this
+                                    )}
+                                    can_move={this.state.can_player_move}
+                                    is_dead={this.props.is_dead}
+                                    is_automation_running={
+                                        this.props.is_automaton_running
+                                    }
                                 />
 
-                                <EnemyKingdoms kingdoms={this.state.enemy_kingdoms}
-                                               character_id={this.props.character_id}
-                                               character_position={this.state.character_position}
-                                               currencies={this.props.currencies}
-                                               teleport_player={this.handleTeleportPlayer.bind(this)}
-                                               can_move={this.state.can_player_move}
-                                               is_dead={this.props.is_dead}
-                                               is_automation_running={this.props.is_automaton_running}
+                                <EnemyKingdoms
+                                    kingdoms={this.state.enemy_kingdoms}
+                                    character_id={this.props.character_id}
+                                    character_position={
+                                        this.state.character_position
+                                    }
+                                    currencies={this.props.currencies}
+                                    teleport_player={this.handleTeleportPlayer.bind(
+                                        this
+                                    )}
+                                    can_move={this.state.can_player_move}
+                                    is_dead={this.props.is_dead}
+                                    is_automation_running={
+                                        this.props.is_automaton_running
+                                    }
                                 />
 
-                                <NpcKingdoms kingdoms={this.state.npc_kingdoms}
-                                             character_id={this.props.character_id}
-                                             character_position={this.state.character_position}
-                                             currencies={this.props.currencies}
-                                             teleport_player={this.handleTeleportPlayer.bind(this)}
-                                             can_move={this.state.can_player_move}
-                                             is_dead={this.props.is_dead}
-                                             is_automation_running={this.props.is_automaton_running}
+                                <NpcKingdoms
+                                    kingdoms={this.state.npc_kingdoms}
+                                    character_id={this.props.character_id}
+                                    character_position={
+                                        this.state.character_position
+                                    }
+                                    currencies={this.props.currencies}
+                                    teleport_player={this.handleTeleportPlayer.bind(
+                                        this
+                                    )}
+                                    can_move={this.state.can_player_move}
+                                    is_dead={this.props.is_dead}
+                                    is_automation_running={
+                                        this.props.is_automaton_running
+                                    }
                                 />
 
-                                <div className="map-x-pin" style={playerIconPosition(this)}></div>
+                                <div
+                                    className="map-x-pin"
+                                    style={playerIconPosition(this)}
+                                ></div>
                             </div>
                         </div>
                     </Draggable>
                 </div>
-                <div className='mt-4'>
-                    <div className='my-4 grid grid-cols-2 gap-2'>
+                <div className="mt-4">
+                    <div className="my-4 grid grid-cols-2 gap-2">
                         <div>
-                            X/Y: {this.state.character_position.x} / {this.state.character_position.y}
+                            X/Y: {this.state.character_position.x} /{" "}
+                            {this.state.character_position.y}
                         </div>
                         <div>
-                            Plane: <a href={"/information/map/" + this.state.map_id}
-                                      target="_blank">
-                                        {this.state.map_name} <i className="fas fa-external-link-alt"></i>
-                                    </a>
+                            Plane:{" "}
+                            <a
+                                href={"/information/map/" + this.state.map_id}
+                                target="_blank"
+                            >
+                                {this.state.map_name}{" "}
+                                <i className="fas fa-external-link-alt"></i>
+                            </a>
                         </div>
                     </div>
-                    <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2'></div>
+                    <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2"></div>
                     <div>
                         Character on Plane: {this.state.characters_on_map}
                     </div>
-                    <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2'></div>
+                    <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2"></div>
                     <MapActions
                         character_id={this.props.character_id}
                         can_move={this.state.can_player_move}
@@ -294,9 +418,14 @@ export default class MapSection extends React.Component<MapProps, MapState> {
                         update_map_state={this.setStateFromData.bind(this)}
                         map_id={this.state.map_id}
                     />
-                    <div className={clsx('border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2', {
-                        'hidden' : this.props.view_port >= 1600
-                    })}></div>
+                    <div
+                        className={clsx(
+                            "border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2",
+                            {
+                                hidden: this.props.view_port >= 1600,
+                            }
+                        )}
+                    ></div>
                     <DirectionalMovement
                         character_position={this.state.character_position}
                         map_position={this.state.map_position}
@@ -309,15 +438,18 @@ export default class MapSection extends React.Component<MapProps, MapState> {
                         can_move={this.state.can_player_move}
                     />
                 </div>
-                <div className={clsx('mt-4', {
-                    'hidden': this.props.disable_bottom_timer,
-                })}>
-                    <MapTimer time_left={this.state.time_left}
-                              automation_time_out={this.state.automation_time_out}
-                              celestial_time_out={this.state.celestial_time_out}
+                <div
+                    className={clsx("mt-4", {
+                        hidden: this.props.disable_bottom_timer,
+                    })}
+                >
+                    <MapTimer
+                        time_left={this.state.time_left}
+                        automation_time_out={this.state.automation_time_out}
+                        celestial_time_out={this.state.celestial_time_out}
                     />
                 </div>
             </Fragment>
-        )
+        );
     }
 }

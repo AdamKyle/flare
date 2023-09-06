@@ -32,6 +32,7 @@ export default class SmallMapMovementActions extends React.Component<SmallMapSec
                     disable_bottom_timer={true}
                     can_engage_celestial={this.props.character.can_engage_celestials}
                     can_engage_celestials_again_at={this.props.character.can_engage_celestials_again_at}
+                    map_data={this.props.map_data}
                 />
             </div>
         )

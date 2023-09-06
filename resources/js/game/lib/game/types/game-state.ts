@@ -6,6 +6,7 @@ import KingdomDetails from "../kingdoms/kingdom-details";
 import PositionType from "./map/position-type";
 import KingdomLogDetails from "../kingdoms/kingdom-log-details";
 import MonsterType from "./actions/monster/monster-type";
+import MapState from "../../../sections/map/types/map-state";
 
 export type GameActionState = {
     monsters: MonsterType[];
@@ -48,4 +49,6 @@ export default interface GameState {
     tabs: {name: string, key: string, has_logs?: boolean}[]|[];
 
     action_data: GameActionState|null;
+
+    map_data: MapState|null;
 }
