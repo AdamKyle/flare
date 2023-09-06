@@ -107,6 +107,12 @@ export default class Actions extends React.Component<
     }
 
     componentDidMount() {
+        this.setState({
+            ...this.state,
+            ...this.props.action_data,
+            ...{ loading: false },
+        });
+
         // @ts-ignore
         this.attackTimeOut.listen(
             "Game.Core.Events.ShowTimeOutEvent",
@@ -215,10 +221,7 @@ export default class Actions extends React.Component<
         prevProps: Readonly<ActionsProps>,
         prevState: Readonly<ActionsState>
     ): void {
-        if (
-            this.props.action_data !== null &&
-            this.state.monsters.length === 0
-        ) {
+        if (this.props.action_data !== null && this.state.loading) {
             this.setState({
                 ...this.state,
                 ...this.props.action_data,
