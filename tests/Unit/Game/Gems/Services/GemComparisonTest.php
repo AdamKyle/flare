@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Game\Games\Services;
+namespace Tests\Unit\Game\Gems\Services;
 
 use Tests\TestCase;
 use App\Flare\Models\Gem;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Game\Games\Services;
+namespace Tests\Unit\Game\Gems\Services;
 
 use App\Flare\Models\Item;
 use App\Game\Gems\Services\AttachedGemService;
