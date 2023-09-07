@@ -76,13 +76,13 @@ class ExponentialAttributeCurve {
 
         return $this;
     }
-    
+
     /**
      * Generate values using the formula: y = YO - VO/k(i - e^kx)
-     * 
+     *
      * We handle situations where the number generated is greator the the max,
      * or less then the previous number generated.
-     * 
+     *
      * Can generated for integers or floats.
      *
      * @param integer $size
@@ -94,7 +94,7 @@ class ExponentialAttributeCurve {
         $this->previousY = 0;
 
         $numbers = array();
-    
+
         for ($x = 0; $x < $size; $x++) {
             $y = $this->calculateY($x, $size);
 
@@ -131,17 +131,17 @@ class ExponentialAttributeCurve {
             if (!$integer) {
 
                 if (!empty($numbers) && $y > $this->max) {
-                    $y = $numbers[count($numbers) - 1] + 0.02;                  
+                    $y = $numbers[count($numbers) - 1] + 0.02;
                 }
 
                 if (!empty($numbers) && $y < $numbers[count($numbers) - 1]) {
-                    $y = $numbers[count($numbers) - 1] + 0.02;                  
+                    $y = $numbers[count($numbers) - 1] + 0.02;
                 }
             }
 
             $numbers[] = $y;
         }
-    
+
         if ($integer) {
             if ($numbers[$size - 2] > $numbers[$size - 1]) {
                 $numbers[$size - 2] = ($numbers[$size - 3] + $numbers[$size - 1]) / 2;
@@ -160,13 +160,13 @@ class ExponentialAttributeCurve {
      */
     protected function calculateY(int $x, int $size): int|float {
         $growthRate = pow($this->max / $this->min, 1 / ($size - 1));
-    
+
         if ($x >= $size / 2) {
             $growthRate *= 1.0102;
         }
-    
+
         $y = $this->min * pow($growthRate, $x);
-    
+
         if ($x === $size - 1) {
             $y = $this->max;
         } elseif ($y > ($this->max - $this->range)) {
@@ -175,12 +175,12 @@ class ExponentialAttributeCurve {
             } else {
                 $this->previousY += $this->increase;
             }
-            
+
             $y = $this->previousY + $this->increase;
         }
 
 
-    
+
         return $y;
     }
 }

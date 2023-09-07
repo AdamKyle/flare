@@ -47,6 +47,7 @@ class ExcelMapper {
             KingdomsImport::class,
         ],
         'Quests'        => QuestsImport::class,
+        'Locations Give Items' => LocationsImport::class,
         '.'             => [
             ClassSpecialsImport::class,
             LocationsImport::class,

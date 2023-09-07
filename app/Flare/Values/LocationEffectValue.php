@@ -27,11 +27,11 @@ class LocationEffectValue {
      * @var string[] $values
      */
     protected static $namedValues = [
-        self::INCREASE_STATS_BY_TWO_HUNDRED_FIFTY => 'Increases monster stats by two hundred and fifty',
-        self::INCREASE_STATS_BY_FIVE_HUNDRED      => 'Increases monster stats by five hundred',
-        self::INCREASE_STATS_BY_ONE_THOUSAND      => 'Increases monster stats by one thousand',
-        self::INCREASE_STATS_BY_TWO_THOUSAND      => 'Increases monster stats by two thousand',
-        self::INCREASE_STATS_BY_THREE_THOUSAND    => 'Increases monster stats by three thousand',
+        self::INCREASE_STATS_BY_TWO_HUNDRED_FIFTY => '250pts and 2% towards resistances and skills.',
+        self::INCREASE_STATS_BY_FIVE_HUNDRED      => '500pts and 5% towards resistances and skills.',
+        self::INCREASE_STATS_BY_ONE_THOUSAND      => '1,000pts and 8% towards resistances and skills. ',
+        self::INCREASE_STATS_BY_TWO_THOUSAND      => '2,000pts and 10% towards resistances and skills.',
+        self::INCREASE_STATS_BY_THREE_THOUSAND    => '3,000pts and 14$ towards resistances and skills.',
     ];
 
     protected static $integerValues = [
@@ -50,8 +50,7 @@ class LocationEffectValue {
      * @param int $value
      * @throws \Exception
      */
-    public function __construct(int $value)
-    {
+    public function __construct(int $value) {
 
         if (!in_array($value, self::$values)) {
             throw new \Exception($value . ' does not exist.');

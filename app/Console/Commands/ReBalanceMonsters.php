@@ -66,7 +66,7 @@ class ReBalanceMonsters extends Command
                             ->where('is_raid_monster', true)
                             ->where('is_raid_boss', false)
                             ->get();
-        
+
         $this->manageMonsters($monsters, $exponentialAttributeCurve, 4000000000, 25000000000, 100000, 500);
     }
 

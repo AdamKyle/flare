@@ -4,7 +4,6 @@ namespace App\Admin\Controllers;
 
 use App\Flare\Models\Quest;
 use Illuminate\Http\Request;
-use App\Flare\Models\Monster;
 use App\Flare\Models\Location;
 use App\Flare\Values\LocationType;
 use App\Http\Controllers\Controller;
@@ -60,7 +59,7 @@ class LocationsController extends Controller {
         }
 
         if (!is_null($location->questRewardItem)) {
-            
+
             $usedInQuest = Quest::where('item_id', $location->quest_reward_item_id)->first();
 
             if (is_null($usedInQuest)) {

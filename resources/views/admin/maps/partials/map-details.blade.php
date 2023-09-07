@@ -125,7 +125,14 @@
                 @if (!is_null($walkOnWater))
                     <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2'></div>
                     <h3 class="my-4">Item required to walk on
-                        {{ $map->mapType()->isHell() ? 'Magma' : 'Water/Death Water' }}</h3>
+                        @if ($map->mapType()->isHell())
+                            Magma
+                        @elseif ($map->mapType()->isDungeons())
+                            Death Water
+                        @else
+                            Water
+                        @endif
+                    </h3>
                     <p class="mt-3 mb-2">
                         Some planes require you to have a special item to walk on that planes water. This is one such
                         plane.

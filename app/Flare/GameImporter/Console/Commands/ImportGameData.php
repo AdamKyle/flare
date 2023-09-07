@@ -37,6 +37,13 @@ class ImportGameData extends Command {
 
         $files = $this->fetchFiles();
 
+        $this->line('Importing maps ...');
+
+        // // Import maps:
+        $this->importGameMaps();
+
+        $this->import($excelMapper, $files['Locations Give Items'], 'Locations Give Items');
+
         $this->line('Importing non map speficic data ...');
 
         $this->import($excelMapper, $files['Core Imports'], 'Core Imports');
@@ -44,11 +51,6 @@ class ImportGameData extends Command {
         $this->import($excelMapper, $files['Items'], 'Items');
         $this->import($excelMapper, $files['Affixes'], 'Affixes');
         $this->import($excelMapper, $files['Kingdoms'], 'Kingdoms');
-
-        $this->line('Importing maps ...');
-        
-        // // Import maps:
-        $this->importGameMaps();
 
         $this->line('Importing map spefic data ...');
 
@@ -59,7 +61,7 @@ class ImportGameData extends Command {
         // based on the locations, imported above.
         $gameMaps = GameMap::all();
 
-        foreach($gameMaps as $map) {
+        foreach ($gameMaps as $map) {
             $mapValue = new MapNameValue($map->name);
 
             $map->update($mapValue->getMapModifers());
@@ -80,7 +82,7 @@ class ImportGameData extends Command {
 
     /**
      * Fetch the files.
-     * 
+     *
      * The mapper used to import these files expect the file list to be in a specific
      * order, in some instances, so we sort and make sure the admin section is reversed.
      *
@@ -88,7 +90,7 @@ class ImportGameData extends Command {
      */
     protected function fetchFiles(): array {
         $files   = Storage::disk('data-imports')->allFiles();
-        
+
         $result  = [];
 
         foreach ($files as $file) {
@@ -162,8 +164,8 @@ class ImportGameData extends Command {
         $files = Storage::disk('data-maps')->allFiles();
 
         $corectOrder = [
-            "Surface.jpg", 
-            "Labyrinth.jpeg", 
+            "Surface.jpg",
+            "Labyrinth.jpeg",
             "Dungeons.jpeg",
             "Shadow Plane.jpeg",
             "Hell.jpeg",
@@ -174,7 +176,7 @@ class ImportGameData extends Command {
         usort($files, function ($a, $b) use ($corectOrder) {
             $indexA = array_search($a, $corectOrder);
             $indexB = array_search($b, $corectOrder);
-        
+
             return $indexA - $indexB;
         });
 
