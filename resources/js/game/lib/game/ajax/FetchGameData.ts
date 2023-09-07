@@ -113,6 +113,8 @@ export default class FetchGameData {
                     calculateTimeLeft(this.component.state.character.can_attack_again_at) : 0,
                 crafting_time_out: this.component.state.character.can_craft_again_at !== null ?
                     calculateTimeLeft(this.component.state.character.can_craft_again_at) : 0,
+                attack_time_out_started: 0,
+                crafting_time_out_started: 0,
             }
         });
     }

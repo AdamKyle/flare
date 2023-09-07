@@ -12,6 +12,8 @@ export type GameActionState = {
     monsters: MonsterType[];
     attack_time_out: number;
     crafting_time_out: number;
+    attack_time_out_started: number;
+    crafting_time_out_started: number;
 }
 
 export default interface GameState {

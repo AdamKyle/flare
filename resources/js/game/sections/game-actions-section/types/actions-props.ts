@@ -17,4 +17,6 @@ export default interface ActionsProps {
     can_engage_celestial: boolean;
 
     action_data: GameActionState | null;
+
+    update_parent_state: (stateData: GameActionState) => void;
 }

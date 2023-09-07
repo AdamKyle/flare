@@ -18,6 +18,9 @@ import Shop from "./components/specialty-shops/shop";
 import { removeCommas } from "../../lib/game/format-number";
 import GamblingSection from "./components/gambling-section";
 import RaidSection from "./components/raid-section";
+import { DateTime } from "luxon";
+import GameState, { GameActionState } from "../../lib/game/types/game-state";
+import { getActionData } from "./helpers/get-action-data";
 
 export default class Actions extends React.Component<
     ActionsProps,
@@ -107,11 +110,7 @@ export default class Actions extends React.Component<
     }
 
     componentDidMount() {
-        this.setState({
-            ...this.state,
-            ...this.props.action_data,
-            ...{ loading: false },
-        });
+        this.setUpState();
 
         // @ts-ignore
         this.attackTimeOut.listen(
@@ -228,6 +227,34 @@ export default class Actions extends React.Component<
                 ...{ loading: false },
             });
         }
+    }
+
+    componentWillUnmount(): void {
+        this.props.update_parent_state({
+            monsters: this.state.monsters,
+            crafting_time_out: this.state.crafting_time_out,
+            attack_time_out: this.state.attack_time_out,
+            attack_time_out_started:
+                this.state.attack_time_out > 0
+                    ? DateTime.local().toSeconds()
+                    : 0,
+            crafting_time_out_started:
+                this.state.crafting_time_out > 0
+                    ? DateTime.local().toSeconds()
+                    : 0,
+        });
+    }
+
+    setUpState(): void {
+        if (this.props.action_data === null) {
+            return;
+        }
+
+        let actionData: GameActionState = this.props.action_data;
+
+        actionData = getActionData(actionData);
+
+        this.setState({ ...this.state, ...actionData, ...{ loading: false } });
     }
 
     openCrafting(type: CraftingOptions) {

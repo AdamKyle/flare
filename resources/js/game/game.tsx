@@ -5,7 +5,7 @@ import Tabs from "./components/ui/tabs/tabs";
 import TabPanel from "./components/ui/tabs/tab-panel";
 import BasicCard from "./components/ui/cards/basic-card";
 import MapSection from "./sections/map/map-section";
-import GameState from "./lib/game/types/game-state";
+import GameState, { GameActionState } from "./lib/game/types/game-state";
 import CharacterTopSection from "./sections/character-top-section/character-top-section";
 import Quests from "./sections/components/quests/quests";
 import ManualProgressBar from "./components/ui/progress-bars/manual-progress-bar";
@@ -480,6 +480,12 @@ export default class Game extends React.Component<GameProps, GameState> {
         });
     }
 
+    setActionState(stateData: GameActionState): void {
+        this.setState({
+            action_data: {...this.state.action_data, ...stateData}
+        })
+    }
+
     renderLoading() {
         return (
             <div className="flex h-screen justify-center items-center max-w-md m-auto mt-[-150px]">
@@ -584,6 +590,7 @@ export default class Game extends React.Component<GameProps, GameState> {
                                             }
                                             action_data={this.state.action_data}
                                             map_data={this.state.map_data}
+                                            update_parent_state={this.setActionState.bind(this)}
                                         />
                                     ) : (
                                         <Actions
@@ -605,6 +612,7 @@ export default class Game extends React.Component<GameProps, GameState> {
                                                     .can_engage_celestials
                                             }
                                             action_data={this.state.action_data}
+                                            update_parent_state={this.setActionState.bind(this)}
                                         />
                                     )}
                                 </BasicCard>

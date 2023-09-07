@@ -17,6 +17,9 @@ import { removeCommas } from "../../lib/game/format-number";
 import GamblingSection from "./components/gambling-section";
 import Revive from "./components/fight-section/revive";
 import RaidSection from "./components/raid-section";
+import { GameActionState } from "../../lib/game/types/game-state";
+import { DateTime } from "luxon";
+import { getActionData } from "./helpers/get-action-data";
 
 export default class SmallerActions extends React.Component<
     SmallActionsProps,
@@ -261,6 +264,28 @@ export default class SmallerActions extends React.Component<
                 ...{ loading: false },
             });
         }
+    }
+
+    componentWillUnmount(): void {
+        this.props.update_parent_state({
+            monsters: this.state.monsters,
+            crafting_time_out: this.state.crafting_time_out,
+            attack_time_out: this.state.attack_time_out,
+            crafting_time_out_started: this.state.crafting_time_out > 0 ? DateTime.local().toSeconds() : 0,
+            attack_time_out_started: this.state.attack_time_out > 0 ? DateTime.local().toSeconds() : 0,
+        });
+    }
+
+    setUpState(): void {
+        if (this.props.action_data === null) {
+            return;
+        }
+
+        let actionData: GameActionState = this.props.action_data;
+
+        actionData = getActionData(actionData);
+
+        this.setState({ ...this.state, ...actionData, ...{ loading: false } });
     }
 
     showAction(data: any) {
