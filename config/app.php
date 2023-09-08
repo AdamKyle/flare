@@ -195,6 +195,7 @@ return [
         App\Flare\MapGenerator\Providers\ServiceProvider::class,
         App\Flare\AffixGenerator\Providers\ServiceProvider::class,
         App\Flare\GameImporter\Providers\ServiceProvider::class,
+        App\Flare\ExponentialCurve\Providers\ServiceProvider::class,
 
         /**
          * Component Related
@@ -202,8 +203,8 @@ return [
         App\Flare\Github\Providers\ServiceProvider::class,
 
         /**
-        * Admin Related
-        */
+         * Admin Related
+         */
         App\Admin\Providers\ServiceProvider::class,
 
         /**
@@ -223,8 +224,8 @@ return [
         App\Game\NpcActions\SeerActions\Providers\ServiceProvider::class,
 
         /**
-        * Game Related
-        */
+         * Game Related
+         */
         App\Game\Exploration\Providers\ServiceProvider::class,
         App\Game\Core\Providers\ServiceProvider::class,
         App\Game\Battle\Providers\ServiceProvider::class,

@@ -22,7 +22,7 @@ class ItemsTable extends DataTableComponent {
         $item = $this->buildItemQuery();
 
         return $item->whereNull('item_prefix_id')
-                    ->whereNull('item_suffix_id');
+            ->whereNull('item_suffix_id');
     }
 
     protected function buildItemQuery(): Builder {
@@ -34,10 +34,10 @@ class ItemsTable extends DataTableComponent {
 
         if ($this->isShop) {
             $query = $query->where('cost', '<=', 2000000000)
-                           ->whereNotIn('type', ['quest', 'alchemy', 'trinket'])
-                           ->whereNull('item_suffix_id')
-                           ->whereNull('item_prefix_id')
-                           ->whereNull('specialty_type');
+                ->whereNotIn('type', ['quest', 'alchemy', 'trinket'])
+                ->whereNull('item_suffix_id')
+                ->whereNull('item_prefix_id')
+                ->whereNull('specialty_type');
         }
 
         return $query;
@@ -47,12 +47,22 @@ class ItemsTable extends DataTableComponent {
         return [
             SelectFilter::make('Types')
                 ->options($this->buildOptions())
-                ->filter(function(Builder $builder, string $value) {
-                    $builder = $builder->where('type', $value)
-                                       ->where('cost', '<=', 2000000000)
-                                       ->whereNull('item_suffix_id')
-                                       ->whereNull('item_prefix_id')
-                                       ->whereNotIn('type', ['quest', 'alchemy', 'trinket']);
+                ->filter(function (Builder $builder, string $value) {
+                    $builder = $builder->where('type', $value);
+
+                    if (in_array($value, ['quest', 'alchemy', 'trinket'])) {
+
+                        if ($value === 'alchemy') {
+                            return $builder->whereNotNull('skill_level_required');
+                        }
+
+                        return $builder;
+                    }
+
+                    $builder->where('cost', '<=', 2000000000)
+                        ->whereNull('item_suffix_id')
+                        ->whereNull('item_prefix_id')
+                        ->whereNotIn('type', ['quest', 'alchemy', 'trinket']);
 
                     if ($this->isShop) {
                         $builder->whereNull('specialty_type');
@@ -100,11 +110,11 @@ class ItemsTable extends DataTableComponent {
 
                 if (!is_null(auth()->user())) {
                     if (auth()->user()->hasRole('Admin')) {
-                        return '<a href="/admin/items/'. $itemId.'">'.$row->name . '</a>';
+                        return '<a href="/admin/items/' . $itemId . '">' . $row->name . '</a>';
                     }
                 }
 
-                return '<a href="/items/'. $itemId.'" >'.$row->name . '</a>';
+                return '<a href="/items/' . $itemId . '" >' . $row->name . '</a>';
             })->html(),
             Column::make('Type')->searchable()->format(function ($value) {
                 return ucfirst(str_replace('-', ' ', $value));
@@ -139,7 +149,7 @@ class ItemsTable extends DataTableComponent {
         if (!is_null(auth()->user())) {
             if (!auth()->user()->hasRole('Admin') && $this->isShop) {
                 $columns[] = Column::make('Actions')->label(
-                    fn($row, Column $column) => view('admin.items.table-components.shop-actions-section', [
+                    fn ($row, Column $column) => view('admin.items.table-components.shop-actions-section', [
                         'character' => auth()->user()->character
                     ])->withRow($row)
                 );

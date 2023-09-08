@@ -3,8 +3,8 @@
 namespace App\Flare\AffixGenerator\Generator;
 
 use App\Flare\AffixGenerator\Builders\AffixBuilder;
-use App\Flare\AffixGenerator\Curve\ExponentialAttributeCurve;
-use App\Flare\AffixGenerator\Curve\ExponentialLevelCurve;
+use App\Flare\ExponentialCurve\Curve\ExponentialAttributeCurve;
+use App\Flare\ExponentialCurve\Curve\ExponentialLevelCurve;
 use App\Flare\AffixGenerator\DTO\AffixCurveDTO;
 use App\Flare\AffixGenerator\DTO\AffixGeneratorDTO;
 use App\Flare\Models\ItemAffix;
@@ -39,7 +39,7 @@ class GenerateAffixes {
      * @param ExponentialLevelCurve $exponentialLevelCurve
      * @param AffixCurveDTO $affixCurveDTO
      */
-    public function __construct(ExponentialAttributeCurve $exponentialAttributeCurve, 
+    public function __construct(ExponentialAttributeCurve $exponentialAttributeCurve,
                                 ExponentialLevelCurve $exponentialLevelCurve,
                                 AffixCurveDTO $affixCurveDTO,
                                 AffixBuilder $affixBuilder,
@@ -133,7 +133,7 @@ class GenerateAffixes {
                                                  ->setIncrease(100000)
                                                  ->setRange(500);
 
-        
+
         $this->affixCurveDTO->setIntegerCurve($curve->generateValues($size, true));
     }
 

@@ -5,8 +5,8 @@ namespace App\Flare\AffixGenerator\Providers;
 use App\Flare\AffixGenerator\Builders\AffixBuilder;
 use App\Flare\AffixGenerator\DTO\AffixGeneratorDTO;
 use App\Flare\AffixGenerator\Generator\GenerateAffixes;
-use App\Flare\AffixGenerator\Curve\ExponentialLevelCurve;
-use App\Flare\AffixGenerator\Curve\ExponentialAttributeCurve;
+use App\Flare\ExponentialCurve\Curve\ExponentialLevelCurve;
+use App\Flare\ExponentialCurve\Curve\ExponentialAttributeCurve;
 use App\Flare\AffixGenerator\Console\Commands\MassGenerateAffixes;
 use App\Flare\AffixGenerator\DTO\AffixCurveDTO;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
@@ -38,7 +38,7 @@ class ServiceProvider extends ApplicationServiceProvider {
         $this->app->bind(AffixBuilder::class, function() {
             return new AffixBuilder();
         });
-        
+
         $this->app->bind(GenerateAffixes::class, function($app) {
             return new GenerateAffixes(
                 $app->make(ExponentialAttributeCurve::class),

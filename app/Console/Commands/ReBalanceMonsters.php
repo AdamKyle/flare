@@ -6,7 +6,7 @@ use App\Flare\Models\GameMap;
 use App\Flare\Models\Monster;
 use Illuminate\Console\Command;
 use App\Flare\Values\MapNameValue;
-use App\Flare\AffixGenerator\Curve\ExponentialAttributeCurve;
+use App\Flare\ExponentialCurve\Curve\ExponentialAttributeCurve;
 use Illuminate\Database\Eloquent\Collection;
 
 class ReBalanceMonsters extends Command

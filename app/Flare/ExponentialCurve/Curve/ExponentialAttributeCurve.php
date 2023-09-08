@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Flare\AffixGenerator\Curve;
+namespace App\Flare\ExponentialCurve\Curve;
 
 class ExponentialAttributeCurve {
 
