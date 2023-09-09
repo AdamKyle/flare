@@ -68,6 +68,14 @@ export default class CharacterTotalGold extends React.Component<any, any> {
             return <ComponentLoading />
         }
 
+        if (this.state.data.length === 0) {
+            return (
+                <p className="text-center p-4 text-red-700 dark:text-red-400">
+                    No Character Told Gold Data
+                </p>
+            );
+        }
+
         const dataForChart: Series[] = [{
             label: 'Character Total Gold',
             data: this.state.data,

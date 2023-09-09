@@ -67,6 +67,14 @@ export default class RegistrationStatistics extends React.Component<any, any> {
             return <ComponentLoading />
         }
 
+        if (this.state.data.length === 0) {
+            return (
+                <p className="text-center p-4 text-red-700 dark:text-red-400">
+                    No Registration data
+                </p>
+            );
+        }
+
         const dataForChart: Series[] = [{
             label: 'Registration Count',
             data: this.state.data,
