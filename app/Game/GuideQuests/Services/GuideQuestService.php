@@ -24,6 +24,8 @@ class GuideQuestService {
     }
 
     public function fetchQuestForCharacter(Character $character): array | null {
+        $this->completedAttributes = [];
+
         $lastCompletedGuideQuest = $character->questsCompleted()
             ->whereNotNull('guide_quest_id')
             ->orderByDesc('guide_quest_id')

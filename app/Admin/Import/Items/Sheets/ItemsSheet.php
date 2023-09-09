@@ -22,11 +22,11 @@ class ItemsSheet implements ToCollection {
                     $skill     = GameSkill::where('name', $item['skill_name'])->first();
 
                     $gameClass = GameClass::where('name', $item['unlocks_class_id'])->first();
-    
+
                     if (is_null($gameClass) && !is_null($item['unlocks_class_id'])) {
                         continue;
                     }
-    
+
                     if (is_null($skill) && !is_null($item['skill_name'])) {
                         continue;
                     }
@@ -117,7 +117,7 @@ class ItemsSheet implements ToCollection {
                         $value = false;
                     }
                 } else if ($key === 'drop_location_id') {
-                    $foundLocation = Location::find($value);
+                    $foundLocation = Location::where('name', $value)->first();
 
                     if (is_null($foundLocation)) {
                         $value = null;
