@@ -11,6 +11,7 @@ class AlchemyItemType {
     const INCREASE_ARMOUR = 'increase-armour';
     const INCREASE_HEALING = 'increase-healing';
     const INCREASE_SKILL_TYPE = 'increase-skill-type';
+    const DAMAGES_KINGDOMS = 'damages-kingdoms';
 
     /**
      * @var array $types
@@ -21,6 +22,7 @@ class AlchemyItemType {
         self::INCREASE_ARMOUR     => self::INCREASE_ARMOUR,
         self::INCREASE_HEALING    => self::INCREASE_HEALING,
         self::INCREASE_SKILL_TYPE => self::INCREASE_SKILL_TYPE,
+        self::DAMAGES_KINGDOMS    => self::DAMAGES_KINGDOMS,
     ];
 
     /**
@@ -83,5 +85,14 @@ class AlchemyItemType {
      */
     public function increasesSkillType(): bool {
         return $this->value === self::INCREASE_SKILL_TYPE;
+    }
+
+    /**
+     * Are we damaging kingdoms?
+     *
+     * @return boolean
+     */
+    public function damagesKingdoms(): bool {
+        return $this->value === self::DAMAGES_KINGDOMS;
     }
 }
