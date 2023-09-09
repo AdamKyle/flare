@@ -40,6 +40,10 @@ class GenerateAlchemyItem {
         if ($alchemyItemType->damagesKingdoms()) {
             $this->generateDamagesKingdoms($alchemyItemCurvesDTO);
         }
+
+        if ($alchemyItemType->isHolyOilType()) {
+            $this->generateHolyOils($alchemyItemCurvesDTO);
+        }
     }
 
     protected function generateStatIncreasingItems(AlchemyItemCurvesDTO $alchemyItemCurvesDTO) {
@@ -192,6 +196,33 @@ class GenerateAlchemyItem {
                     'usable'                           => false,
                     'damages_kingdoms'                 => true,
                     'kingdom_damage'                   => $modifierCurve[$i],
+                    'gold_dust_cost'                   => $goldDustCostCurve[$i],
+                    'shards_cost'                      => $shardsCostCurve[$i],
+                    'skill_level_required'             => $skillLevelCurve['required'][$i],
+                    'skill_level_trivial'              => $skillLevelCurve['trivial'][$i],
+                ]
+            ]);
+        }
+    }
+
+    protected function generateHolyOils(AlchemyItemCurvesDTO $alchemyItemCurvesDTO) {
+        $skillLevelCurve = $alchemyItemCurvesDTO->getCraftingLevelCurve();
+
+        $count = count($skillLevelCurve['trivial']) - 1;
+
+        $goldDustCostCurve = $alchemyItemCurvesDTO->getGoldDustCostCurve();
+        $shardsCostCurve   = $alchemyItemCurvesDTO->getShardsCostCurve();
+
+        for ($i = 0; $i <= $count; $i++) {
+            $baseAttributes = $this->createBaseAttributes();
+
+            Item::create([
+                ...$baseAttributes,
+                ...[
+                    'usable'                           => false,
+                    'can_use_on_other_items'           => true,
+                    'holy_level'                       => $i + 1,
+                    'holy_stacks'                      => ($i + 1) * 2,
                     'gold_dust_cost'                   => $goldDustCostCurve[$i],
                     'shards_cost'                      => $shardsCostCurve[$i],
                     'skill_level_required'             => $skillLevelCurve['required'][$i],

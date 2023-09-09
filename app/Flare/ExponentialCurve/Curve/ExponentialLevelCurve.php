@@ -12,7 +12,7 @@ class ExponentialLevelCurve {
      * @param int $sizeLimit (25)
      * @return array
      */
-    public function generateSkillLevels(int $min, int $max, int $sizeLimit = 25): array {
+    public function generateSkillLevels(int $min = 1, int $max = 400, int $sizeLimit = 25): array {
         $skillLevels = [
             'required' => [],
             'trivial'  => [],
@@ -30,7 +30,7 @@ class ExponentialLevelCurve {
             }
 
             if ($i == $min) {
-                $required = 1;
+                $required = $min;
             } else {
                 $required = $previousTrivial;
             }

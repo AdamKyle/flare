@@ -12,6 +12,7 @@ class AlchemyItemType {
     const INCREASE_HEALING = 'increase-healing';
     const INCREASE_SKILL_TYPE = 'increase-skill-type';
     const DAMAGES_KINGDOMS = 'damages-kingdoms';
+    const HOLY_OILS = 'holy-oils';
 
     /**
      * @var array $types
@@ -23,6 +24,7 @@ class AlchemyItemType {
         self::INCREASE_HEALING    => self::INCREASE_HEALING,
         self::INCREASE_SKILL_TYPE => self::INCREASE_SKILL_TYPE,
         self::DAMAGES_KINGDOMS    => self::DAMAGES_KINGDOMS,
+        self::HOLY_OILS           => self::HOLY_OILS,
     ];
 
     /**
@@ -94,5 +96,14 @@ class AlchemyItemType {
      */
     public function damagesKingdoms(): bool {
         return $this->value === self::DAMAGES_KINGDOMS;
+    }
+
+    /**
+     * Is this suppose to be a holy oil item?
+     *
+     * @return boolean
+     */
+    public function isHolyOilType(): bool {
+        return $this->value === self::HOLY_OILS;
     }
 }

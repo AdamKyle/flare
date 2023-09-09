@@ -19,7 +19,7 @@ class MassGenerateAlchemyItems extends Command {
      *
      * @var string
      */
-    protected $signature = 'generate:alchemy-items {amount=25}';
+    protected $signature = 'generate:alchemy-items {amount=25} {minLevel=1} {minCost=100}';
 
     /**
      * The console command description.
@@ -56,10 +56,10 @@ class MassGenerateAlchemyItems extends Command {
 
         $amount = $this->argument('amount');
 
-        $skillLevelsRequired = $exponentialLevelCurve->generateSkillLevels(1, 200, $amount);
+        $skillLevelsRequired = $exponentialLevelCurve->generateSkillLevels($this->argument('minLevel'), 200, $amount);
         $modifierCurve       = $exponentialAttributeCurve->setMin(0.15)->setMax(3.0)->setRange(1.0)->setIncrease(0.05)->generateValues($amount);
-        $goldDustCostCurve   = $exponentialAttributeCurve->setMin(100)->setMax(50000000)->setRange(250)->setIncrease(150)->generateValues($amount, true);
-        $shardCostCurve      = $exponentialAttributeCurve->setMin(100)->setMax(50000000)->setRange(250)->setIncrease(150)->generateValues($amount, true);
+        $goldDustCostCurve   = $exponentialAttributeCurve->setMin($this->argument('minCost'))->setMax(50000000)->setRange(250)->setIncrease(150)->generateValues($amount, true);
+        $shardCostCurve      = $exponentialAttributeCurve->setMin($this->argument('minCost'))->setMax(50000000)->setRange(250)->setIncrease(150)->generateValues($amount, true);
 
         $alchemyItemCurvesDTO = $alchemyItemCurvesDTO->setCraftingLevelCurve($skillLevelsRequired)
             ->setModifiersCurve($modifierCurve)
@@ -85,6 +85,8 @@ class MassGenerateAlchemyItems extends Command {
             AlchemyItemType::INCREASE_ARMOUR,
             AlchemyItemType::INCREASE_HEALING,
             AlchemyItemType::INCREASE_SKILL_TYPE,
+            AlchemyItemType::DAMAGES_KINGDOMS,
+            AlchemyItemType::HOLY_OILS,
         ]);
     }
 
