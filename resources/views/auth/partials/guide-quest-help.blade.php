@@ -8,12 +8,8 @@
         complete.
     </p>
     <p class="my-2">
-        When you enable The Guide you will see, when you log in, a popup appear once and only once. This will be your first Guide Quest.
-        After which you can access The Guide through a green button at the top right of the game. You can also see your completeed quests 
-        in the sidebar under Completed Quests -> Completed Guide Quests, where you can find the instructions and story if you need to review.
-    </p>
-    <p class="my-2">
-        <strong>Once enabled, The Guide, cannot be disabled.
+        Guide Quests will take roughly 1 hour to complete, sometimes much less - such as at the begining. If a quest should take longer
+        then it will explicitly state as such.
     </p>
     <p class="my-2">
         <a href="/information/settings" target="_blank">Players who reset their account</a> have the option to enable the guide quest system.
