@@ -29,7 +29,7 @@
             <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
             <dl>
                 <dt>All Stat increase %</dt>
-                <dd>{{ $item->stat_increase * 100, 2 }}%</dd>
+                <dd>{{ $item->increase_stat_by * 100, 2 }}%</dd>
             </dl>
         </div>
         <div class='block md:hidden border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>

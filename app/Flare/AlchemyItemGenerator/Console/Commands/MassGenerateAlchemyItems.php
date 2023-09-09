@@ -2,17 +2,24 @@
 
 namespace App\Flare\AlchemyItemGenerator\Console\Commands;
 
-use Illuminate\Console\Command;
-use App\Flare\Models\GameSkill;
 
-class MassGenerateAlchemyItems extends Command
-{
+use Exception;
+use Illuminate\Console\Command;
+use App\Flare\AlchemyItemGenerator\DTO\AlchemyItemCurvesDTO;
+use App\Flare\AlchemyItemGenerator\DTO\AlchemyItemDTO;
+use App\Flare\AlchemyItemGenerator\Generator\GenerateAlchemyItem;
+use App\Flare\AlchemyItemGenerator\Values\AlchemyItemType;
+use App\Flare\ExponentialCurve\Curve\ExponentialAttributeCurve;
+use App\Flare\ExponentialCurve\Curve\ExponentialLevelCurve;
+use App\Game\Skills\Values\SkillTypeValue;
+
+class MassGenerateAlchemyItems extends Command {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'generate:alchemy-items';
+    protected $signature = 'generate:alchemy-items {amount=25}';
 
     /**
      * The console command description.
@@ -24,108 +31,83 @@ class MassGenerateAlchemyItems extends Command
     /**
      * Execute the console command.
      */
-    public function handle(AffixGeneratorDTO $affixGeneratorDTO, GenerateAffixes $generateAffixes) {
-        $this->line('Hello and welcome. I will guide you through generating Affixes in mass. Please note all names and descriptions are randomly generated.');
-        $this->line('For this reason it is suggested you export the affixes you generate and rename the names and update descriptions.');
-        $this->newLine();
+    public function handle(
+        AlchemyItemDTO $alchemyItemDTO,
+        AlchemyItemCurvesDTO $alchemyItemCurvesDTO,
+        ExponentialAttributeCurve $exponentialAttributeCurve,
+        ExponentialLevelCurve $exponentialLevelCurve,
+        GenerateAlchemyItem $generateAlchemyItem
+    ) {
+        $this->line('Hello, today we are going to generate alchemical items based on a specific type.');
 
-        $type = $this->affixType();
+        $type = $this->alchemicalTypesChoice();
 
-        $affixGeneratorDTO->setAffixType($type);
+        $skillType = null;
 
-        $skill = $this->skillForAffixes();
-
-        if (!is_null($skill)) {
-            $affixGeneratorDTO->setSkillName($skill);
+        if ($this->increasesSkillType($type)) {
+            $skillType = $this->getSkillType();
         }
 
-        $attributes = $this->selectAttributesForAffixes();
+        $alchemyItemDTO = $alchemyItemDTO->setType($type)->setSkillType($skillType);
 
-        $attribues[] = 'int_required';
-        $atributes[] = 'cost';
+        $this->line('Generating Curves for items...');
 
-        if (in_array('damage', $attributes)) {
-            $this->isDamageIrresistable($affixGeneratorDTO);
+        $amount = $this->argument('amount');
 
-            $this->isDamageStackable($affixGeneratorDTO);
-        }
+        $skillLevelsRequired = $exponentialLevelCurve->generateSkillLevels(1, 200, $amount);
+        $modifierCurve       = $exponentialAttributeCurve->setMin(0.15)->setMax(3.0)->setRange(1.0)->setIncrease(0.05)->generateValues($amount);
+        $goldDustCostCurve   = $exponentialAttributeCurve->setMin(100)->setMax(50000000)->setRange(250)->setIncrease(150)->generateValues($amount, true);
+        $shardCostCurve      = $exponentialAttributeCurve->setMin(100)->setMax(50000000)->setRange(250)->setIncrease(150)->generateValues($amount, true);
 
-        $affixGeneratorDTO->setAttributes($attributes);
+        $alchemyItemCurvesDTO = $alchemyItemCurvesDTO->setCraftingLevelCurve($skillLevelsRequired)
+            ->setModifiersCurve($modifierCurve)
+            ->setGoldDustCurve($goldDustCostCurve)
+            ->setShardsCostCurve($shardCostCurve);
 
-        $sizeLimit = intVal($this->argument('amount'));
+        $this->line('Building alchemy items ...');
 
-        $generateAffixes->generate($affixGeneratorDTO, $sizeLimit);
+        $generateAlchemyItem->generateAlchemyItem($alchemyItemDTO, $alchemyItemCurvesDTO);
 
-    }
-
-    protected function isDamageIrresistable(AffixGeneratorDTO $affixGeneratorDTO) {
-        $choice = $this->choice('You selected damage as one of the attributes, would you like to make the damage irresistable?', [
-            'Y', 'N'
-        ]);
-
-        if ($choice === 'Y') {
-            $affixGeneratorDTO->setIsDamageIrresistible(true);
-        } else {
-            $affixGeneratorDTO->setIsDamageIrresistible(false);
-        }
-    }
-
-    protected function isDamageStackable(AffixGeneratorDTO $affixGeneratorDTO) {
-        $choice = $this->choice('You selected damage as one of the attributes, would you like to make the damage stack?', [
-            'Y', 'N'
-        ]);
-
-        if ($choice === 'Y') {
-            $affixGeneratorDTO->setDoesDamageStatck(true);
-        } else {
-            $affixGeneratorDTO->setDoesDamageStatck(false);
-        }
+        $this->line('All done :)');
     }
 
     /**
-     * What type of affix are we generatoring
+     * What type of alchemical items are we generating?
      *
      * @return string
      */
-    protected function affixType(): string {
-        return $this->choice('What type do these affixes have?', [
-            'prefix', 'suffix'
+    protected function alchemicalTypesChoice(): string {
+        return $this->choice('What type of alchemical items should we generate?', [
+            AlchemyItemType::INCREASE_STATS,
+            AlchemyItemType::INCREASE_DAMAGE,
+            AlchemyItemType::INCREASE_ARMOUR,
+            AlchemyItemType::INCREASE_HEALING,
+            AlchemyItemType::INCREASE_SKILL_TYPE,
         ]);
     }
 
     /**
-     * Does the batch of affixes effect a skill?
+     * What skill type should we effect?
      *
-     * @return string|null
+     * @return string
      */
-    protected function skillForAffixes(): ?string {
-        $effects = $this->choice('Do these affixes effect skills?', [
-            'Y', 'N'
-        ]);
+    protected function getSkillType(): string {
+        return $this->choice('Which skill type should this effect?', SkillTypeValue::$namedValues);
+    }
 
-        if ($effects === 'Y') {
-            $skill = $this->choice('Please select a skill', GameSkill::pluck('name')->toArray());
+    /**
+     * Does the type of alchemy item increase a skill type?
+     *
+     * @param string $type
+     * @return boolean
+     */
+    protected function increasesSkillType(string $type): bool {
+        try {
+            return (new AlchemyItemType($type))->increasesSkillType();
+        } catch (Exception $e) {
+            $this->error('Woah ERROR: ' . $e->getMessage());
 
-            return $skill;
+            $this->exit();
         }
-
-        return null;
-    }
-
-    /**
-     * Select attributes for the affixes
-     *
-     * @return array
-     */
-    protected function selectAttributesForAffixes(): array {
-        $this->newLine();
-        $this->line('Please select a set of attributes you want for these affixes. Keep in mind that if you choose any of the stat reducting attributes');
-        $this->line('then the logic states: ');
-        $this->line('The logic states that prefixes can reduce all stats and do not stack, while suffixes can reduce individual stats and do stack.');
-        $this->newLine();
-
-        $this->line('Note: To select multiple enter the numbers as such: 0,1,2,3 ...');
-
-        return $this->choice('Select one or more attributes for this set of affixes', AffixGeneratorTypes::getValuesForCommandSelection(), null, null, true);
     }
 }

@@ -8,8 +8,7 @@ use App\Flare\AffixGenerator\Generator\GenerateAffixes;
 use App\Flare\AffixGenerator\Values\AffixGeneratorTypes;
 use App\Flare\Models\GameSkill;
 
-class MassGenerateAffixes extends Command
-{
+class MassGenerateAffixes extends Command {
     /**
      * The name and signature of the console command.
      *
@@ -22,7 +21,7 @@ class MassGenerateAffixes extends Command
      *
      * @var string
      */
-    protected $description = 'Can generate a set of 56 enchantments based on user supplied input.';
+    protected $description = 'Can generate a set of enchantments based on user supplied input.';
 
     /**
      * Execute the console command.
@@ -58,7 +57,6 @@ class MassGenerateAffixes extends Command
         $sizeLimit = intVal($this->argument('amount'));
 
         $generateAffixes->generate($affixGeneratorDTO, $sizeLimit);
-        
     }
 
     protected function isDamageIrresistable(AffixGeneratorDTO $affixGeneratorDTO) {

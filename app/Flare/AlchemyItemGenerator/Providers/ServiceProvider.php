@@ -3,6 +3,9 @@
 namespace App\Flare\AlchemyItemGenerator\Providers;
 
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
+use App\Flare\AlchemyItemGenerator\Console\Commands\MassGenerateAlchemyItems;
+use App\Flare\AlchemyItemGenerator\DTO\AlchemyItemDTO;
+use App\Flare\AlchemyItemGenerator\Generator\GenerateAlchemyItem;
 
 class ServiceProvider extends ApplicationServiceProvider {
 
@@ -13,8 +16,16 @@ class ServiceProvider extends ApplicationServiceProvider {
      */
     public function register() {
 
+        $this->app->bind(AlchemyItemDTO::class, function () {
+            return new AlchemyItemDTO();
+        });
+
+        $this->app->bind(GenerateAlchemyItem::class, function () {
+            return new GenerateAlchemyItem();
+        });
+
         $this->commands([
-            MassGenerateAffixes::class,
+            MassGenerateAlchemyItems::class,
         ]);
     }
 
@@ -23,5 +34,6 @@ class ServiceProvider extends ApplicationServiceProvider {
      *
      * @return void
      */
-    public function boot() {}
+    public function boot() {
+    }
 }

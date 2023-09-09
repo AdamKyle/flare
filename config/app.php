@@ -194,6 +194,7 @@ return [
         App\Flare\Providers\EventsProvider::class,
         App\Flare\MapGenerator\Providers\ServiceProvider::class,
         App\Flare\AffixGenerator\Providers\ServiceProvider::class,
+        App\Flare\AlchemyItemGenerator\Providers\ServiceProvider::class,
         App\Flare\GameImporter\Providers\ServiceProvider::class,
         App\Flare\ExponentialCurve\Providers\ServiceProvider::class,
 

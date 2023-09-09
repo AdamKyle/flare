@@ -56,7 +56,7 @@ class ServiceProvider extends ApplicationServiceProvider {
     /**
      * Bootstrap any application services.
      *
-     * @return voiduse App\Flare\AffixGenerator\Console\Commands\GenerateAffixes;
+     * @return void
      */
     public function boot() {}
 }
