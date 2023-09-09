@@ -46,6 +46,8 @@ class MassGenerateAlchemyItems extends Command {
 
         if ($this->increasesSkillType($type)) {
             $skillType = $this->getSkillType();
+
+            $skillType = array_search($skillType, SkillTypeValue::$namedValues);
         }
 
         $alchemyItemDTO = $alchemyItemDTO->setType($type)->setSkillType($skillType);

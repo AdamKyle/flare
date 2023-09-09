@@ -32,6 +32,10 @@ class GenerateAlchemyItem {
         if ($alchemyItemType->increasesHealing()) {
             $this->generateHealingIncreaseItems($alchemyItemCurvesDTO);
         }
+
+        if ($alchemyItemType->increasesSkillType()){
+            $this->generateSkillTypeIncreaseItems($alchemyItemCurvesDTO, $alchemyItemDTO->getSkillType());
+        }
     }
 
     protected function generateStatIncreasingItems(AlchemyItemCurvesDTO $alchemyItemCurvesDTO) {
@@ -129,6 +133,34 @@ class GenerateAlchemyItem {
                 ...[
                     'lasts_for'            => self::INCREASE_BASE_MOD_LENGTH,
                     'base_healing_mod'     => $modifierCurve[$i],
+                    'gold_dust_cost'       => $goldDustCostCurve[$i],
+                    'shards_cost'          => $shardsCostCurve[$i],
+                    'skill_level_required' => $skillLevelCurve['required'][$i],
+                    'skill_level_trivial'  => $skillLevelCurve['trivial'][$i],
+                ]
+            ]);
+        }
+    }
+
+    protected function generateSkillTypeIncreaseItems(AlchemyItemCurvesDTO $alchemyItemCurvesDTO, int $skillType) {
+        $skillLevelCurve = $alchemyItemCurvesDTO->getCraftingLevelCurve();
+
+        $count = count($skillLevelCurve['trivial']) - 1;
+
+        $modifierCurve     = $alchemyItemCurvesDTO->getModifierCurve();
+        $goldDustCostCurve = $alchemyItemCurvesDTO->getGoldDustCostCurve();
+        $shardsCostCurve   = $alchemyItemCurvesDTO->getShardsCostCurve();
+
+        for ($i = 0; $i <= $count; $i++) {
+            $baseAttributes = $this->createBaseAttributes();
+
+            Item::create([
+                ...$baseAttributes,
+                ...[
+                    'lasts_for'            => self::INCREASE_BASE_MOD_LENGTH,
+                    'affects_skill_type'   => $skillType,
+                    'skill_training_bonus' => $modifierCurve[$i],
+                    'skill_bonus'          => $modifierCurve[$i],
                     'gold_dust_cost'       => $goldDustCostCurve[$i],
                     'shards_cost'          => $shardsCostCurve[$i],
                     'skill_level_required' => $skillLevelCurve['required'][$i],
