@@ -7,5 +7,6 @@ export default interface EventScheduleState {
     event_types: string[]|[];
     loading: boolean;
     deleting: boolean;
+    show_generate_event_modal: boolean;
 }
 

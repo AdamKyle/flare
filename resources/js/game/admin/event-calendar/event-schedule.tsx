@@ -7,7 +7,8 @@ import {AxiosError, AxiosResponse} from "axios";
 import LoadingProgressBar from "../../components/ui/progress-bars/loading-progress-bar";
 import EventScheduleState from "./types/event-schedule-state";
 import EventView from "../../components/ui/scheduler/event-view";
-import EventType from "./values/EventType";
+import PrimaryButton from '../../components/ui/buttons/primary-button';
+import GenerateEventType from "./modals/generate-event-type";
 
 export default class EventSchedule extends React.Component<{}, EventScheduleState> {
 
@@ -22,6 +23,7 @@ export default class EventSchedule extends React.Component<{}, EventScheduleStat
             event_types: [],
             loading: true,
             deleting: false,
+            show_generate_event_modal: false,
         }
 
         // @ts-ignore
@@ -92,13 +94,22 @@ export default class EventSchedule extends React.Component<{}, EventScheduleStat
         });
     }
 
+    manageGenerateModal() {
+        this.setState({
+            show_generate_event_modal: !this.state.show_generate_event_modal,
+        })
+    }
+
     render() {
 
         if (this.state.loading) {
             return <LoadingProgressBar />
         }
 
-        return <Calendar events={this.state.events}
+        return (
+            <div>
+                <PrimaryButton button_label="Generate Event Type" on_click={this.manageGenerateModal.bind(this)} additional_css='my-2'/>
+                <Calendar events={this.state.events}
                          view={'month'}
                          customEditor={(scheduler: SchedulerHelpers) =>
                              <EventSchedulerEditor scheduler={scheduler}
@@ -112,6 +123,13 @@ export default class EventSchedule extends React.Component<{}, EventScheduleStat
                          }
                          onDelete={this.deleteEvent.bind(this)}
                          can_edit={true}
-        />
+                />
+                {
+                    this.state.show_generate_event_modal ?
+                        <GenerateEventType is_open={this.state.show_generate_event_modal} handle_close={this.manageGenerateModal.bind(this)} />
+                    : null
+                }
+            </div>
+        )
     }
 }
