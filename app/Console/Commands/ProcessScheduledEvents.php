@@ -2,10 +2,13 @@
 
 namespace App\Console\Commands;
 
+use Illuminate\Console\Command;
 use App\Flare\Models\ScheduledEvent;
 use App\Flare\Values\EventType;
+use App\Game\Raids\Jobs\InitiateMonthlyPVPEvent;
 use App\Game\Raids\Jobs\InitiateRaid;
-use Illuminate\Console\Command;
+use App\Game\Raids\Jobs\InitiateWeeklyCelestialSpawnEvent;
+use App\Game\Raids\Jobs\InitiateWeeklyCurrencyDropEvent;
 
 class ProcessScheduledEvents extends Command
 {
@@ -37,6 +40,18 @@ class ProcessScheduledEvents extends Command
 
             if ($eventType->isRaidEvent()) {
                 InitiateRaid::dispatch($event->id, preg_split('/(?<=[.!?])\s+/', $event->raid->story))->delay(now()->addMinutes(5));
+            }
+
+            if ($eventType->isWeeklyCelestials()) {
+                InitiateWeeklyCelestialSpawnEvent::dispatch($event->id)->addMinutes(5);
+            }
+
+            if ($eventType->isWeeklyCurrencyDrops()) {
+                InitiateWeeklyCurrencyDropEvent::dispatch($event->id)->addMinutes(5);
+            }
+
+            if ($eventType->isMonthlyPVP()) {
+                InitiateMonthlyPVPEvent::dispatch($event->id)->addMinutes(5);
             }
          }
     }

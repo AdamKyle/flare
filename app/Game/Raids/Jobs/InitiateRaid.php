@@ -52,10 +52,11 @@ class InitiateRaid implements ShouldQueue {
      * @param LocationService $locationService
      * @return void
      */
-    public function handle(LocationService $locationService, 
-                           EventSchedulerService $eventSchedulerService, 
-                           UpdateRaidMonsters $updateRaidMonsters): void 
-    {
+    public function handle(
+        LocationService $locationService,
+        EventSchedulerService $eventSchedulerService,
+        UpdateRaidMonsters $updateRaidMonsters
+    ): void {
 
         $event = ScheduledEvent::find($this->eventId);
 
@@ -80,11 +81,12 @@ class InitiateRaid implements ShouldQueue {
      * @param LocationService $locationService
      * @return void
      */
-    protected function initializeRaid(Raid $raid, 
-                                    LocationService $locationService, 
-                                    EventSchedulerService $eventSchedulerService, 
-                                    UpdateRaidMonsters $updateRaidMonsters): void 
-    {
+    protected function initializeRaid(
+        Raid $raid,
+        LocationService $locationService,
+        EventSchedulerService $eventSchedulerService,
+        UpdateRaidMonsters $updateRaidMonsters
+    ): void {
         if (empty($raid->corrupted_location_ids)) {
             return;
         }
@@ -111,17 +113,17 @@ class InitiateRaid implements ShouldQueue {
      */
     private function updateMonstersForCharactersAtRaidLocations(Raid $raid, UpdateRaidMonsters $updateRaidMonsters): void {
         $corruptedLocationIds = $raid->corrupted_location_ids;
-        
+
         array_unshift($corruptedLocationIds, $raid->raid_boss_location_id);
-        
+
         $corruptedLocations = Location::whereIn('id', $corruptedLocationIds)->get();
 
         foreach ($corruptedLocations as $location) {
             $characters = Character::leftJoin('maps', 'characters.id', '=', 'maps.character_id')
-                                   ->where('maps.character_position_x', $location->x)
-                                   ->where('maps.character_position_y', $location->y)
-                                   ->where('maps.game_map_id', $location->game_map_id)
-                                   ->get();
+                ->where('maps.character_position_x', $location->x)
+                ->where('maps.character_position_y', $location->y)
+                ->where('maps.game_map_id', $location->game_map_id)
+                ->get();
 
             foreach ($characters as $character) {
                 $updateRaidMonsters->updateMonstersForRaidLocations($character, $location);
@@ -181,8 +183,8 @@ class InitiateRaid implements ShouldQueue {
             'has_raid_boss' => true,
         ]);
 
-        event(new GlobalMessageEvent('Location: ' . $locationOfRaidBoss->name . ' At (X/Y): '.$locationOfRaidBoss->x.
-            '/'.$locationOfRaidBoss->y.' on plane: ' . $locationOfRaidBoss->map->name . ' has become over run! The Raid boss: '.$raid->raidBoss->name.
+        event(new GlobalMessageEvent('Location: ' . $locationOfRaidBoss->name . ' At (X/Y): ' . $locationOfRaidBoss->x .
+            '/' . $locationOfRaidBoss->y . ' on plane: ' . $locationOfRaidBoss->map->name . ' has become over run! The Raid boss: ' . $raid->raidBoss->name .
             ' has set up shop!'));
 
         $this->updateCorruptLocations($raid, $locationService);
@@ -190,7 +192,7 @@ class InitiateRaid implements ShouldQueue {
 
     /**
      * Create the event.
-     * 
+     *
      * - Update the scheduled event to currently running.
      * - Create a new event record
      * - Update the calendar with the updated scheduled events.

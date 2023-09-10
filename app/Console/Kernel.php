@@ -53,9 +53,6 @@ class Kernel extends ConsoleKernel {
         // Update kingdoms every hour.
         $schedule->command('update:kingdoms')->hourly()->timezone(config('app.timezone'));
 
-        // Weekly Celestial Rate is increased to 80% spawn chance on Wednesdays at 1 pm America Edmonton time.
-        $schedule->command('weekly:celestial-spawn')->weeklyOn(3, '13:00')->timezone(config('app.timezone'));
-
         // Weekly Currency Drops on sundays at 8am.
         $schedule->command('weekly:currency-drop-event')->weeklyOn(7, '08:00')->timezone(config('app.timezone'));
 
