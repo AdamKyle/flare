@@ -7,12 +7,15 @@ import { setHours, setMinutes } from "date-fns";
 import DatePicker from "react-datepicker";
 import Select from "react-select";
 import Dialogue from "../../../components/ui/dialogue/dialogue";
+import InfoAlert from "../../../components/ui/alerts/simple-alerts/info-alert";
 
 export default class GenerateEventType extends React.Component<
     GenerateExtentTypeProps,
     GenerateExtentTypeState
 > {
     private type_options: { label: string; value: string }[] | [];
+
+    private generate_options: { label: string; value: string }[] | [];
 
     constructor(props: GenerateExtentTypeProps) {
         super(props);
@@ -22,6 +25,7 @@ export default class GenerateEventType extends React.Component<
             form_data: {
                 selected_event_type: null,
                 event_generation_times: null,
+                generate_every: null,
                 selected_start_date: setHours(setMinutes(new Date(), 0), 9),
             },
             error_message: null,
@@ -39,6 +43,17 @@ export default class GenerateEventType extends React.Component<
             {
                 label: "Weekly Currency Drops",
                 value: "2",
+            },
+        ];
+
+        this.generate_options = [
+            {
+                label: "Weekly",
+                value: "weekly",
+            },
+            {
+                label: "Monthly",
+                value: "monthly",
             },
         ];
     }
@@ -66,7 +81,7 @@ export default class GenerateEventType extends React.Component<
     isDataValid(): boolean {
         const formData = this.state.form_data;
 
-        return Object.values(formData).every(value => value !== null);
+        return Object.values(formData).every((value) => value !== null);
     }
 
     setTypeOfEvent(data: any): void {
@@ -87,6 +102,15 @@ export default class GenerateEventType extends React.Component<
         });
     }
 
+    setGenerateEveryType(data: any) {
+        this.setState({
+            form_data: {
+                ...this.state.form_data,
+                ...{ generate_every: data.value },
+            },
+        });
+    }
+
     setEventGenerationTimes(event: React.ChangeEvent<HTMLInputElement>) {
         this.setState({
             form_data: {
@@ -99,7 +123,10 @@ export default class GenerateEventType extends React.Component<
     selectedEventTypeValue(): { label: string; value: string }[] | [] {
         const foundType = this.type_options.filter(
             (type: { label: string; value: string }) => {
-                return parseInt(type.value) === this.state.form_data.selected_event_type;
+                return (
+                    parseInt(type.value) ===
+                    this.state.form_data.selected_event_type
+                );
             }
         );
 
@@ -108,6 +135,20 @@ export default class GenerateEventType extends React.Component<
         }
 
         return [{ label: "Please select event type", value: "" }];
+    }
+
+    selectedGenerateEveryType(): { label: string; value: string }[] | [] {
+        const foundGenerateType = this.generate_options.filter(
+            (item: { label: string; value: string }) => {
+                return item.value === this.state.form_data.generate_every;
+            }
+        );
+
+        if (foundGenerateType.length > 0) {
+            return foundGenerateType;
+        }
+
+        return [{ label: "Please select generate every", value: "" }];
     }
 
     render() {
@@ -122,6 +163,7 @@ export default class GenerateEventType extends React.Component<
                     secondary_button_label: "Generate",
                     handle_action: this.handleGenerate.bind(this),
                 }}
+                large_modal={true}
             >
                 <Fragment>
                     {this.state.error_message !== null ? (
@@ -141,22 +183,42 @@ export default class GenerateEventType extends React.Component<
                         and based on how far out.
                     </p>
 
+                    <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3"></div>
+
                     <div className="my-4">
-                        <div className="my-3 dark:text-gray-300">
-                            <strong>Start Date (and time)</strong>
+                        <div className="grid lg:grid-cols-2 gap-2">
+                            <div>
+                                <div className="my-3 dark:text-gray-300">
+                                    <strong>Start Date (and time)</strong>
+                                </div>
+                                <DatePicker
+                                    selected={
+                                        this.state.form_data.selected_start_date
+                                    }
+                                    onChange={(date) =>
+                                        date !== null
+                                            ? this.setStartDate(date)
+                                            : null
+                                    }
+                                    showTimeSelect
+                                    dateFormat="MMMM d, yyyy h:mm aa"
+                                    className={
+                                        "border-2 border-gray-300 rounded-md p-2 w-full"
+                                    }
+                                    withPortal
+                                />
+                            </div>
+                            <InfoAlert>
+                                <p className="my-4">
+                                    Future events will use this date + the time
+                                    that should pass, weekly or monthly and only
+                                    last for 24 hours. For example, an event
+                                    that starts on monday at noon will end on
+                                    Tuesday at noon and repeat the following
+                                    week.
+                                </p>
+                            </InfoAlert>
                         </div>
-                        <DatePicker
-                            selected={this.state.form_data.selected_start_date}
-                            onChange={(date) =>
-                                date !== null ? this.setStartDate(date) : null
-                            }
-                            showTimeSelect
-                            dateFormat="MMMM d, yyyy h:mm aa"
-                            className={
-                                "border-2 border-gray-300 rounded-md p-2"
-                            }
-                            withPortal
-                        />
                     </div>
                     <Select
                         onChange={this.setTypeOfEvent.bind(this)}
@@ -173,6 +235,23 @@ export default class GenerateEventType extends React.Component<
                         menuPortalTarget={document.body}
                         value={this.selectedEventTypeValue()}
                     />
+                    <div className="my-4">
+                        <Select
+                            onChange={this.setGenerateEveryType.bind(this)}
+                            options={this.generate_options}
+                            menuPosition={"absolute"}
+                            menuPlacement={"bottom"}
+                            styles={{
+                                menuPortal: (base: any) => ({
+                                    ...base,
+                                    zIndex: 9999,
+                                    color: "#000000",
+                                }),
+                            }}
+                            menuPortalTarget={document.body}
+                            value={this.selectedGenerateEveryType()}
+                        />
+                    </div>
                     <div className="my-5">
                         <div className="my-3 dark:text-gray-300">
                             <strong>

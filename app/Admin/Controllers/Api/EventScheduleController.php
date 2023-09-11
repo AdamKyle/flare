@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers\Api;
 
+use App\Admin\Requests\CreateMultipleEventsRequest;
 use App\Admin\Requests\DeleteEventRequest;
 use App\Flare\Models\Raid;
 use App\Flare\Models\ScheduledEvent;
@@ -38,7 +39,7 @@ class EventScheduleController extends Controller {
         return response()->json($result, $status);
     }
 
-    public function updateEvent(ManageEventRequest $request, ScheduledEvent $scheduledEvent)  {
+    public function updateEvent(ManageEventRequest $request, ScheduledEvent $scheduledEvent) {
         $result = $this->eventSchedulerService->updateEvent($request->all(), $scheduledEvent);
 
         $status = $result['status'];
@@ -54,5 +55,11 @@ class EventScheduleController extends Controller {
         unset($result['status']);
 
         return response()->json($result, $status);
+    }
+
+    public function createMultipleEvents(CreateMultipleEventsRequest $request) {
+        $this->eventSchedulerService->createMultipleEvents($request->all());
+
+        return response()->json();
     }
 }
