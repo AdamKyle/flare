@@ -5,13 +5,12 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use App\Flare\Models\ScheduledEvent;
 use App\Flare\Values\EventType;
-use App\Game\Raids\Jobs\InitiateMonthlyPVPEvent;
+use App\Game\Events\Jobs\InitiateMonthlyPVPEvent;
 use App\Game\Raids\Jobs\InitiateRaid;
-use App\Game\Raids\Jobs\InitiateWeeklyCelestialSpawnEvent;
-use App\Game\Raids\Jobs\InitiateWeeklyCurrencyDropEvent;
+use App\Game\Events\Jobs\InitiateWeeklyCelestialSpawnEvent;
+use App\Game\Events\Jobs\InitiateWeeklyCurrencyDropEvent;
 
-class ProcessScheduledEvents extends Command
-{
+class ProcessScheduledEvents extends Command {
     /**
      * The name and signature of the console command.
      *
@@ -29,13 +28,12 @@ class ProcessScheduledEvents extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
-    {
-         $targetEventStart = now()->copy()->addMinutes(5);
+    public function handle() {
+        $targetEventStart = now()->copy()->addMinutes(5);
 
-         $scheduledEvents = ScheduledEvent::whereBetween('start_date', [now(), $targetEventStart])->get();
+        $scheduledEvents = ScheduledEvent::whereBetween('start_date', [now(), $targetEventStart])->get();
 
-         foreach ($scheduledEvents as $event) {
+        foreach ($scheduledEvents as $event) {
             $eventType = new EventType($event->event_type);
 
             if ($eventType->isRaidEvent()) {
@@ -53,6 +51,6 @@ class ProcessScheduledEvents extends Command
             if ($eventType->isMonthlyPVP()) {
                 InitiateMonthlyPVPEvent::dispatch($event->id)->addMinutes(5);
             }
-         }
+        }
     }
 }

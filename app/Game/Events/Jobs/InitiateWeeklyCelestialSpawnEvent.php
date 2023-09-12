@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Game\Raids\Jobs;
+namespace App\Game\Events\Jobs;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Game\Raids\Jobs;
+namespace App\Game\Events\Jobs;
 
 use App\Flare\Models\Event;
 use Illuminate\Bus\Queueable;
