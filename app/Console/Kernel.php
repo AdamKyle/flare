@@ -43,6 +43,9 @@ class Kernel extends ConsoleKernel {
         // Clean up the items every day.
         $schedule->command('cleanup:unused-items')->dailyAt('03:00')->timezone(config('app.timezeon'));
 
+        // Generate new scheduled events based on the Scheduled event configuration
+        $schedule->command('generate:scheduled-events')->dailyAt('04:00')->timezone(config('app.timezeon'));
+
         // Fix Character Gold every 5 minutes.
         $schedule->command('fix:character-gold')->everyFiveMinutes();
 
@@ -52,12 +55,6 @@ class Kernel extends ConsoleKernel {
 
         // Update kingdoms every hour.
         $schedule->command('update:kingdoms')->hourly()->timezone(config('app.timezone'));
-
-        // Weekly Currency Drops on sundays at 8am.
-        $schedule->command('weekly:currency-drop-event')->weeklyOn(7, '08:00')->timezone(config('app.timezone'));
-
-        // Monthly PVP Alert at 8 am - Lets players sign up for pvp.
-        $schedule->command('monthly:pvp')->lastDayOfMonth('08:00')->timezone(config('app.timezone'));
 
         // Monthly Rank Fights Roll Ahead
         $schedule->command('update:rank-fights')->monthly()->timezone(config('app.timezone'));

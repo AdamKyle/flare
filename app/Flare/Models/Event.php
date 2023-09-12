@@ -32,4 +32,8 @@ class Event extends Model {
     public function raid() {
         return $this->hasOne(Raid::class, 'id', 'raid_id');
     }
+
+    public function announcement() {
+        return $this->hasOne(Announcement::class, 'id', 'event_id');
+    }
 }

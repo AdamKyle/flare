@@ -10,6 +10,9 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use App\Flare\Models\ScheduledEvent;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Flare\Jobs\WeeklyCurrencyEvent as WeeklyCurrencyEventJob;
+use App\Flare\Models\Event;
+use App\Flare\Values\EventType;
+use Facades\App\Game\Core\Handlers\AnnouncementHandler;
 
 class InitiateWeeklyCurrencyDropEvent implements ShouldQueue {
 
@@ -41,9 +44,17 @@ class InitiateWeeklyCurrencyDropEvent implements ShouldQueue {
             return;
         }
 
+        Event::create([
+            'type'       => EventType::WEEKLY_CURRENCY_DROPS,
+            'started_at' => now(),
+            'ends_at'    => now()->addDay()
+        ]);
+
         WeeklyCurrencyEventJob::dispatch()->delay(now()->addMinutes(15))->onConnection('weekly_spawn');
 
-        event(new GlobalMessageEvent('Currencies are dropping like crazy! Shards, Copper Coins and
+        event(new GlobalMessageEvent('Currencies are dropping like crazy! Shards, Copper Coins (for those with the quest item) and
         Gold Dust are falling off the enemies for one day only! At a rate of 1-50 per currency type.'));
+
+        AnnouncementHandler::createAnnouncement('weekly_currency_drop');
     }
 }

@@ -20,4 +20,5 @@ Route::middleware(['auth', 'is.admin'])->group(function() {
     Route::post('/admin/create-new-event', ['uses' => 'Api\EventScheduleController@createEvent']);
     Route::post('/admin/update-event/{scheduledEvent}', ['uses' => 'Api\EventScheduleController@updateEvent']);
     Route::post('/admin/delete-event', ['uses' => 'Api\EventScheduleController@deleteEvent']);
+    Route::post('/admin/create-multiple-events', ['uses' => 'Api\EventScheduleController@createMultipleEvents']);
 });

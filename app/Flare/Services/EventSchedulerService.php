@@ -4,6 +4,7 @@ namespace App\Flare\Services;
 
 use App\Flare\Events\UpdateScheduledEvents;
 use App\Flare\Models\ScheduledEvent;
+use App\Flare\Models\ScheduledEventConfiguration;
 use App\Flare\Values\EventType;
 use App\Game\Core\Traits\ResponseBuilder;
 use Carbon\Carbon;
@@ -11,6 +12,8 @@ use Carbon\Carbon;
 class EventSchedulerService {
 
     use ResponseBuilder;
+
+    const GENERATE_EVENT_AMOUNT = 5;
 
     public function fetchEvents(): array {
         return ScheduledEvent::all()->transform(function ($event) {
@@ -72,22 +75,61 @@ class EventSchedulerService {
     }
 
     public function createMultipleEvents(array $params): void {
+        $eventData = $this->createBaseScheduledEvent($params);
+
+        $eventType = new EventType($params['selected_event_type']);
+
+        ScheduledEvent::create($eventData);
+
+        $date = $this->createEvents($eventType, $eventData, self::GENERATE_EVENT_AMOUNT, $params['generate_every']);
+
+        ScheduledEventConfiguration::create([
+            'event_type'          => $params['selected_event_type'],
+            'start_date'          => $date,
+            'generate_every'      => $params['generate_every'],
+            'last_time_generated' => now(),
+        ]);
+
+        event(new UpdateScheduledEvents($this->fetchEvents()));
+    }
+
+    public function generateFutureEvents(ScheduledEventConfiguration $scheduledEventConfiguration): void {
+        $params = [
+            'selected_event_type' => $scheduledEventConfiguration->event_type,
+            'selected_start_date' => $scheduledEventConfiguration->start_date,
+        ];
+
+        $eventType = new EventType($scheduledEventConfiguration->event_type);
+
+        $eventData = $this->createBaseScheduledEvent($params);
+
+        $date = $this->createEvents($eventType, $eventData, self::GENERATE_EVENT_AMOUNT, $scheduledEventConfiguration->generate_every);
+
+        $scheduledEventConfiguration->update([
+            'start_date'          => $date,
+            'last_time_generated' => now(),
+        ]);
+
+        event(new UpdateScheduledEvents($this->fetchEvents()));
+    }
+
+    protected function createBaseScheduledEvent(array $params): array {
         $eventData = [
             'event_type' => $params['selected_event_type'],
         ];
 
+        $eventType = new EventType($params['selected_event_type']);
+
         $date = new Carbon($params['selected_start_date'], config('app.timezone'));
 
-        $eventData['start_date'] = $params['selected_start_date'];
-        $eventData['end_date'] = $date->clone()->addDay();
+        $eventData['start_date'] = $date;
 
-        $eventType = new EventType($params['selected_event_type']);
+        // If we are monthly pbp, then it always ends at 6pm regardless of when you set the start date.
+        $eventData['end_date'] = $eventType->isMonthlyPVP() ? $date->copy()->setHour(18) : $date->copy()->addDay();
 
         $eventData['description'] = $this->eventDescriptionForEventType($eventType);
 
-        ScheduledEvent::create($eventData);
-
-        $this->createEvents($eventData, $params['event_generation_times'], $params['generate_every']);
+        return $eventData;
     }
 
     protected function eventDescriptionForEventType(EventType $type): string {
@@ -99,8 +141,8 @@ class EventSchedulerService {
         }
 
         if ($type->isWeeklyCurrencyDrops()) {
-            return 'During this time for 24 hours currency rewards will be even more then you are use too! All you have to do is
-            fight monsters, head down to Purgatory Dungeons for Copper Coins or even disenchant items! It\'s raining currency!';
+            return 'For the next 24 hours you just have to kill creatures for Gold Dust,'.
+            'Shards and Copper Coins (provided you have the quest item) will drop at a rate of 1-50 per kill! How fun!';
         }
 
         if ($type->isMonthlyPVP()) {
@@ -110,26 +152,36 @@ class EventSchedulerService {
         }
     }
 
-    protected function createEvents(array $eventData, int $amount, string $type): void {
-        $date = new Carbon($eventData['start_date'], config('app.timezone'));
+    protected function createEvents(EventType $eventType, array $eventData, int $amount, string $type): Carbon {
+        $date    = new Carbon($eventData['start_date'], config('app.timezone'));
 
         for ($i = 1; $i <= $amount; $i++) {
 
             if ($type === 'weekly') {
-                $date = $date->clone()->addWeek();
+                $date = $date->copy()->addWeek();
 
-                $eventData['start_date'] = $date;
-                $eventDate['end_date']   = $date->clone()->addDay();
+                $endDate = $date->copy()->addDay();
+
+                $newEventData = $eventData;
+                $newEventData['start_date'] = $date;
+                $newEventData['end_date'] = $endDate;
+
+                ScheduledEvent::create($newEventData);
             }
 
             if ($type === 'monthly') {
-                $date = $date->clone()->addMonth();
+                $date = $date->copy()->addMonth();
 
-                $eventData['start_date'] = $date;
-                $eventDate['end_date']   = $date->clone()->addDay();
+                $endDate = $date->copy()->addDay();
+
+                $newEventData = $eventData;
+                $newEventData['start_date'] = $date;
+                $newEventData['end_date'] = $endDate;
+
+                ScheduledEvent::create($newEventData);
             }
-
-            ScheduledEvent::create($eventData);
         }
+
+        return $date;
     }
 }

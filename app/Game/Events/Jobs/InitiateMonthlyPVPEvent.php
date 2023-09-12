@@ -2,6 +2,7 @@
 
 namespace App\Game\Raids\Jobs;
 
+use App\Flare\Models\Event;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
@@ -9,9 +10,11 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use App\Flare\Models\ScheduledEvent;
 use App\Flare\Models\User;
+use App\Flare\Values\EventType;
 use App\Flare\Values\UserOnlineValue;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Messages\Events\GlobalMessageEvent;
+use Facades\App\Game\Core\Handlers\AnnouncementHandler;
 
 class InitiateMonthlyPVPEvent implements ShouldQueue {
 
@@ -43,9 +46,15 @@ class InitiateMonthlyPVPEvent implements ShouldQueue {
             return;
         }
 
+        $event = Event::create([
+            'type'       => EventType::MONTHLY_PVP,
+            'started_at' => now(),
+            'ends_at'    => now()->addHours(10)->addMinutes(30)
+        ]);
+
         event(new GlobalMessageEvent('Monthly pvp will begin tonight shortly after 6:30 GMT-6. Actions area has been updated to show a new button: Join PVP. Click this and follow the steps to be registered to participate. Registration will be open till 6:30pm GMT-6.'));
 
-        (new UserOnlineValue())->getUsersOnlineQuery()->chunkById(100, function($sessions) {
+        (new UserOnlineValue())->getUsersOnlineQuery()->chunkById(100, function ($sessions) {
             foreach ($sessions as $session) {
                 $user = User::find($session->user_id);
 
@@ -58,5 +67,7 @@ class InitiateMonthlyPVPEvent implements ShouldQueue {
                 }
             }
         });
+
+        AnnouncementHandler::createAnnouncement('monthly_php');
     }
 }

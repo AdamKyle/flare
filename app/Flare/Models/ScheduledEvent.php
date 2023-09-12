@@ -2,6 +2,7 @@
 
 namespace App\Flare\Models;
 
+use App\Flare\Values\EventType;
 use Illuminate\Database\Eloquent\Model;
 
 class ScheduledEvent extends Model {
@@ -35,6 +36,20 @@ class ScheduledEvent extends Model {
     public function getTitleOfEvent(): string {
         if (!is_null($this->raid)) {
             return $this->raid->name;
+        }
+
+        $type = new EventType($this->event_type);
+
+        if ($type->isWeeklyCelestials()) {
+            return 'Weekly Celestials';
+        }
+
+        if ($type->isWeeklyCurrencyDrops()) {
+            return 'Weekly Currency Drops';
+        }
+
+        if ($type->isMonthlyPVP()) {
+            return 'Monthly PVP';
         }
 
         return 'Event Name';

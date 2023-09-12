@@ -8,6 +8,9 @@ import DatePicker from "react-datepicker";
 import Select from "react-select";
 import Dialogue from "../../../components/ui/dialogue/dialogue";
 import InfoAlert from "../../../components/ui/alerts/simple-alerts/info-alert";
+import Ajax from "../../../lib/ajax/ajax";
+import { AxiosError, AxiosResponse } from "axios";
+import AjaxInterface from "../../../lib/ajax/ajax-interface";
 
 export default class GenerateEventType extends React.Component<
     GenerateExtentTypeProps,
@@ -24,7 +27,6 @@ export default class GenerateEventType extends React.Component<
             action_in_progress: false,
             form_data: {
                 selected_event_type: null,
-                event_generation_times: null,
                 generate_every: null,
                 selected_start_date: setHours(setMinutes(new Date(), 0), 9),
             },
@@ -62,6 +64,7 @@ export default class GenerateEventType extends React.Component<
         this.setState(
             {
                 error_message: null,
+                action_in_progress: true,
             },
             () => {
                 if (!this.isDataValid()) {
@@ -73,7 +76,30 @@ export default class GenerateEventType extends React.Component<
                     return;
                 }
 
-                console.log(this.state.form_data);
+                const ajax: AjaxInterface = new Ajax();
+
+                ajax.setRoute("admin/create-multiple-events")
+                    .setParameters(this.state.form_data)
+                    .doAjaxCall(
+                        "post",
+                        (result: AxiosResponse) => {
+                            this.props.handle_close();
+                        },
+                        (error: AxiosError) => {
+                            let response: AxiosResponse | null = null;
+
+                            if (typeof error.response !== "undefined") {
+                                response = error.response;
+
+                                this.setState({
+                                    error_message: "Something went wrong.",
+                                    action_in_progress: false,
+                                });
+
+                                console.error(response);
+                            }
+                        }
+                    );
             }
         );
     }
@@ -107,15 +133,6 @@ export default class GenerateEventType extends React.Component<
             form_data: {
                 ...this.state.form_data,
                 ...{ generate_every: data.value },
-            },
-        });
-    }
-
-    setEventGenerationTimes(event: React.ChangeEvent<HTMLInputElement>) {
-        this.setState({
-            form_data: {
-                ...this.state.form_data,
-                ...{ event_generation_times: parseInt(event.target.value) },
             },
         });
     }
@@ -181,6 +198,13 @@ export default class GenerateEventType extends React.Component<
                         Events generated this way will generate for ever based
                         on the amount you want generated from the date selected
                         and based on how far out.
+                    </p>
+                    <p className="my-4">
+                        All events will generate a max of 5 out. For example if
+                        you select monthly, all events will generate out up to 5
+                        months. At the half way mark to the last event for that
+                        type we will generate another 5 events after the last
+                        one that was generated.
                     </p>
 
                     <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3"></div>
@@ -250,21 +274,6 @@ export default class GenerateEventType extends React.Component<
                             }}
                             menuPortalTarget={document.body}
                             value={this.selectedGenerateEveryType()}
-                        />
-                    </div>
-                    <div className="my-5">
-                        <div className="my-3 dark:text-gray-300">
-                            <strong>
-                                How Far into the future should we generate? (Max
-                                is 15 Weeks/months)
-                            </strong>
-                        </div>
-                        <input
-                            type="number"
-                            className="form-control"
-                            min={1}
-                            max={15}
-                            onChange={this.setEventGenerationTimes.bind(this)}
                         />
                     </div>
                     {this.state.action_in_progress ? (

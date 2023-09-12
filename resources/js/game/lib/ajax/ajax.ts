@@ -1,6 +1,6 @@
-import {Component} from "react";
+import { Component } from "react";
 import AjaxInterface from "./ajax-interface";
-import axios, {AxiosError, AxiosResponse, Method} from 'axios';
+import axios, { AxiosError, AxiosResponse, Method } from 'axios';
 
 export default class Ajax implements AjaxInterface {
 
@@ -10,7 +10,7 @@ export default class Ajax implements AjaxInterface {
     private route: string = '';
 
     doAjaxCall(method: Method, successCallBack: (result: AxiosResponse) => void, errorCallBack: (error: AxiosError) => void): void {
-        if (method === 'get') {
+        if (method.toLowerCase() === 'get') {
             this.getRequest(this.route, this.params).then((result: AxiosResponse) => {
                 return successCallBack(result);
             }).catch((error: AxiosError) => {
@@ -30,7 +30,7 @@ export default class Ajax implements AjaxInterface {
             });
         }
 
-        if (method === 'post') {
+        if (method.toLowerCase() === 'post') {
             this.postRequest(this.route, this.params).then((result: AxiosResponse) => {
                 return successCallBack(result);
             }).catch((error: AxiosError) => {
@@ -64,7 +64,7 @@ export default class Ajax implements AjaxInterface {
     }
 
     getRequest(url: string, params?: any): Promise<AxiosResponse<any>> {
-        return axios.get('/api/' + url, {params: params});
+        return axios.get('/api/' + url, { params: params });
     }
 
     postRequest(url: string, params?: any): Promise<AxiosResponse<any>> {
@@ -72,7 +72,7 @@ export default class Ajax implements AjaxInterface {
     }
 
     initiateGlobalTimeOut() {
-        this.setRoute('character-timeout').doAjaxCall('post',  (result: AxiosResponse) => {}, (error: AxiosError) => {
+        this.setRoute('character-timeout').doAjaxCall('post', (result: AxiosResponse) => { }, (error: AxiosError) => {
             console.error(error);
         })
     }
