@@ -32,6 +32,14 @@ export default class GuideQuest extends React.Component<any, any> {
                 key: "instructions",
                 name: "Instructions",
             },
+            {
+                key: "desktop-instructions",
+                name: "Desktop Instructions",
+            },
+            {
+                key: "mobile-instructions",
+                name: "Mobile Instructions",
+            },
         ];
 
         this.state = {
@@ -193,7 +201,7 @@ export default class GuideQuest extends React.Component<any, any> {
                     secondary_button_disabled: !this.state.can_hand_in,
                     handle_action: this.handInQuest.bind(this),
                 }}
-                large_modal={false}
+                large_modal={true}
                 primary_button_disabled={this.state.action_loading}
             >
                 {this.state.loading && this.state.quest_data === null ? (
@@ -274,6 +282,34 @@ export default class GuideQuest extends React.Component<any, any> {
                                         dangerouslySetInnerHTML={{
                                             __html: this.state.quest_data
                                                 .instructions,
+                                        }}
+                                    />
+                                </div>
+                            </TabPanel>
+                            <TabPanel key={"desktop-instructions"}>
+                                 <div
+                                    className={
+                                        "border-1 rounded-sm p-3 bg-slate-300 dark:bg-slate-700 max-h-[250px] overflow-x-auto mb-4 guide-quest-instructions"
+                                    }
+                                >
+                                    <div
+                                        dangerouslySetInnerHTML={{
+                                            __html: this.state.quest_data
+                                                .desktop_instructions,
+                                        }}
+                                    />
+                                </div>
+                            </TabPanel>
+                            <TabPanel key={"mobile-instructions"}>
+                                <div
+                                    className={
+                                        "border-1 rounded-sm p-3 bg-slate-300 dark:bg-slate-700 max-h-[250px] overflow-x-auto mb-4 guide-quest-instructions"
+                                    }
+                                >
+                                    <div
+                                        dangerouslySetInnerHTML={{
+                                            __html: this.state.quest_data
+                                                .mobile_instructions,
                                         }}
                                     />
                                 </div>

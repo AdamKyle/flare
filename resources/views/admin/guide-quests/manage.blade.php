@@ -24,6 +24,10 @@
                             name="intro_text" quillId="intro-text" />
                         <x-core.forms.quill-editor type="html" :model="$guideQuest" label="Instructions:"
                             modelKey="instructions" name="instructions" quillId="quest-instructions" />
+                        <x-core.forms.quill-editor type="html" :model="$guideQuest" label="Desktop Instructions:"
+                            modelKey="desktop_instructions" name="desktop_instructions" quillId="desktop-instructions" />
+                        <x-core.forms.quill-editor type="html" :model="$guideQuest" label="Mobile Instructions:"
+                            modelKey="mobile_instructions" name="mobile_instructions" quillId="mobile-instructions" />
                     </x-core.form-wizard.content>
 
                     <x-core.form-wizard.content target="tab-style-2-2">
@@ -92,7 +96,8 @@
                                 <x-core.forms.key-value-select :model="$guideQuest" label="Required Quest Item:"
                                     modelKey="required_quest_item_id" name="required_quest_item_id" :options="$questItems" />
                                 <x-core.forms.key-value-select :model="$guideQuest" label="Secondary Quest Item:"
-                                    modelKey="secondary_quest_item_id" name="secondary_quest_item_id" :options="$questItems" />
+                                    modelKey="secondary_quest_item_id" name="secondary_quest_item_id"
+                                    :options="$questItems" />
 
                                 <div class='border-b-2 block md:hidden border-b-gray-300 dark:border-b-gray-600 my-6'>
                                 </div>

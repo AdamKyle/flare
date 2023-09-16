@@ -178,5 +178,26 @@
                 </div>
             </div>
         </x-core.cards.card>
+        <h2 class="mt-4">Platform Instructions</h2>
+        <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+        <x-core.cards.card>
+            <div class='grid grid-cols-2 gap-4'>
+                <div
+                    class="border-1 rounded-sm p-2 bg-slate-300 dark:bg-slate-700 min-h-[250px] max-h-[250px] overflow-x-auto mb-4">
+                    <h3 class="mb-4">Desktop Instructions</h3>
+                    <div>
+                        {!! nl2br($guideQuest->desktop_instructions) !!}
+                    </div>
+                </div>
+
+                <div
+                    class="border-1 rounded-sm p-2 bg-slate-300 dark:bg-slate-700 min-h-[250px] max-h-[250px] overflow-x-auto">
+                    <h3 class="mb-4">Mobile Instructuions</h3>
+                    <div class="guide-quest-instructions">
+                        {!! nl2br($guideQuest->mobile_instructions) !!}
+                    </div>
+                </div>
+            </div>
+        </x-core.cards.card>
     </x-core.layout.info-container>
 @endsection

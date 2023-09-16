@@ -19,6 +19,8 @@ class GuideQuest extends Model {
         'name',
         'intro_text',
         'instructions',
+        'desktop_instructions',
+        'mobile_instructions',
         'required_level',
         'required_skill',
         'required_skill_level',
