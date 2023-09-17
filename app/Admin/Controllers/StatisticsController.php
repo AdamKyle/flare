@@ -16,7 +16,7 @@ class StatisticsController extends Controller {
             'averageCharacterGold'        => number_format(Character::avg('gold')),
             'kingdomCount'                => number_format(Kingdom::count()),
             'richestCharacter'            => Character::orderBy('gold', 'desc')->first(),
-            'highestLevelCharacter'       => Character::orderBy('gold', 'desc')->first(),
+            'highestLevelCharacter'       => Character::orderBy('level', 'desc')->first(),
             'topTenKingdoms'              => $this->fetchTopKingdomHolders(),
             'lastLoggedInCount'           => User::whereDate('last_logged_in', now())->count(),
             'lastFiveMonthsLoggedInCount' => User::whereBetween('last_logged_in', [now()->subMonths(5), now()])->count(),
