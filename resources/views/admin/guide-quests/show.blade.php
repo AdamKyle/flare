@@ -185,8 +185,8 @@
                 <div
                     class="border-1 rounded-sm p-2 bg-slate-300 dark:bg-slate-700 min-h-[250px] max-h-[250px] overflow-x-auto mb-4">
                     <h3 class="mb-4">Desktop Instructions</h3>
-                    <div>
-                        {!! nl2br($guideQuest->desktop_instructions) !!}
+                    <div class="guide-quest-instructions">
+                        {!! $guideQuest->desktop_instructions !!}
                     </div>
                 </div>
 
@@ -194,7 +194,7 @@
                     class="border-1 rounded-sm p-2 bg-slate-300 dark:bg-slate-700 min-h-[250px] max-h-[250px] overflow-x-auto">
                     <h3 class="mb-4">Mobile Instructuions</h3>
                     <div class="guide-quest-instructions">
-                        {!! nl2br($guideQuest->mobile_instructions) !!}
+                        {!! $guideQuest->mobile_instructions !!}
                     </div>
                 </div>
             </div>

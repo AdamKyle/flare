@@ -29,8 +29,8 @@ export default class GuideQuest extends React.Component<any, any> {
                 name: "Story",
             },
             {
-                key: "instructions",
-                name: "Instructions",
+                key: "information",
+                name: "Information",
             },
             {
                 key: "desktop-instructions",
@@ -272,7 +272,7 @@ export default class GuideQuest extends React.Component<any, any> {
                                     />
                                 </div>
                             </TabPanel>
-                            <TabPanel key={"instructions"}>
+                            <TabPanel key={"information"}>
                                 <div
                                     className={
                                         "border-1 rounded-sm p-3 bg-slate-300 dark:bg-slate-700 max-h-[250px] overflow-x-auto mb-4 guide-quest-instructions"
@@ -287,7 +287,7 @@ export default class GuideQuest extends React.Component<any, any> {
                                 </div>
                             </TabPanel>
                             <TabPanel key={"desktop-instructions"}>
-                                 <div
+                                <div
                                     className={
                                         "border-1 rounded-sm p-3 bg-slate-300 dark:bg-slate-700 max-h-[250px] overflow-x-auto mb-4 guide-quest-instructions"
                                     }

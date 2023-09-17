@@ -74,6 +74,8 @@ class GuideQuestsController extends Controller {
         $params = $this->guideQuestService->cleanRequest($request->all());
 
         $params['instructions'] = str_replace('<p><br></p>', '', $params['instructions']);
+        $params['desktop_instructions'] = str_replace('<p><br></p>', '', $params['desktop_instructions']);
+        $params['mobile_instructions'] = str_replace('<p><br></p>', '', $params['mobile_instructions']);
 
         $guideQuest = GuideQuest::updateOrCreate(['id' => $params['id']], $params);
 
