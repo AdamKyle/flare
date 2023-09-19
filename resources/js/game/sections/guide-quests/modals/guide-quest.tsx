@@ -240,7 +240,7 @@ export default class GuideQuest extends React.Component<any, any> {
                             </p>
                         ) : null}
 
-                        {this.state.view_port < 1600 ? (
+                        <div className="lg:hidden block">
                             <DropDownLayout
                                 intro_text={this.state.quest_data.intro_text}
                                 instructions={
@@ -253,7 +253,9 @@ export default class GuideQuest extends React.Component<any, any> {
                                     this.state.quest_data.mobile_instructions
                                 }
                             />
-                        ) : (
+                        </div>
+
+                        <div className="lg:block hidden">
                             <TabLayout
                                 intro_text={this.state.quest_data.intro_text}
                                 instructions={
@@ -266,7 +268,7 @@ export default class GuideQuest extends React.Component<any, any> {
                                     this.state.quest_data.mobile_instructions
                                 }
                             />
-                        )}
+                        </div>
 
                         <p className={"mt-4 mb-4"}>
                             The Hand in button will become available when you
