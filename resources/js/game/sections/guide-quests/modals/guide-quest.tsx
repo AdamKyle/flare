@@ -3,8 +3,6 @@ import Dialogue from "../../../components/ui/dialogue/dialogue";
 import ComponentLoading from "../../../components/ui/loading/component-loading";
 import { AxiosError, AxiosResponse } from "axios";
 import Ajax from "../../../lib/ajax/ajax";
-import Tabs from "../../../components/ui/tabs/tabs";
-import TabPanel from "../../../components/ui/tabs/tab-panel";
 import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
 import SuccessAlert from "../../../components/ui/alerts/simple-alerts/success-alert";
 import DangerAlert from "../../../components/ui/alerts/simple-alerts/danger-alert";
@@ -16,31 +14,13 @@ import {
 import RequiredListItem from "../components/required-list-item";
 import { questRewardKeys } from "../lib/guide-quests-rewards";
 import RewardListItem from "../components/reward-list-item";
+import TabLayout from "../components/tab-labout";
+import { viewPortWatcher } from "../../../lib/view-port-watcher";
+import DropDownLayout from "../components/dropdown-layout";
 
 export default class GuideQuest extends React.Component<any, any> {
-    private tabs: { name: string; key: string }[];
-
     constructor(props: any) {
         super(props);
-
-        this.tabs = [
-            {
-                key: "story",
-                name: "Story",
-            },
-            {
-                key: "information",
-                name: "Information",
-            },
-            {
-                key: "desktop-instructions",
-                name: "Desktop Instructions",
-            },
-            {
-                key: "mobile-instructions",
-                name: "Mobile Instructions",
-            },
-        ];
 
         this.state = {
             loading: true,
@@ -50,10 +30,13 @@ export default class GuideQuest extends React.Component<any, any> {
             can_hand_in: false,
             is_handing_in: false,
             completed_requirements: [],
+            view_port: 0,
         };
     }
 
     componentDidMount() {
+        viewPortWatcher(this);
+
         new Ajax()
             .setRoute("character/guide-quest/" + this.props.user_id)
             .doAjaxCall(
@@ -257,64 +240,34 @@ export default class GuideQuest extends React.Component<any, any> {
                             </p>
                         ) : null}
 
-                        <Tabs tabs={this.tabs}>
-                            <TabPanel key={"story"}>
-                                <div
-                                    className={
-                                        "border-1 rounded-sm p-3 bg-slate-300 dark:bg-slate-700 max-h-[250px] overflow-x-auto mb-4"
-                                    }
-                                >
-                                    <div
-                                        dangerouslySetInnerHTML={{
-                                            __html: this.state.quest_data
-                                                .intro_text,
-                                        }}
-                                    />
-                                </div>
-                            </TabPanel>
-                            <TabPanel key={"information"}>
-                                <div
-                                    className={
-                                        "border-1 rounded-sm p-3 bg-slate-300 dark:bg-slate-700 max-h-[250px] overflow-x-auto mb-4 guide-quest-instructions"
-                                    }
-                                >
-                                    <div
-                                        dangerouslySetInnerHTML={{
-                                            __html: this.state.quest_data
-                                                .instructions,
-                                        }}
-                                    />
-                                </div>
-                            </TabPanel>
-                            <TabPanel key={"desktop-instructions"}>
-                                <div
-                                    className={
-                                        "border-1 rounded-sm p-3 bg-slate-300 dark:bg-slate-700 max-h-[250px] overflow-x-auto mb-4 guide-quest-instructions"
-                                    }
-                                >
-                                    <div
-                                        dangerouslySetInnerHTML={{
-                                            __html: this.state.quest_data
-                                                .desktop_instructions,
-                                        }}
-                                    />
-                                </div>
-                            </TabPanel>
-                            <TabPanel key={"mobile-instructions"}>
-                                <div
-                                    className={
-                                        "border-1 rounded-sm p-3 bg-slate-300 dark:bg-slate-700 max-h-[250px] overflow-x-auto mb-4 guide-quest-instructions"
-                                    }
-                                >
-                                    <div
-                                        dangerouslySetInnerHTML={{
-                                            __html: this.state.quest_data
-                                                .mobile_instructions,
-                                        }}
-                                    />
-                                </div>
-                            </TabPanel>
-                        </Tabs>
+                        {this.state.view_port < 1600 ? (
+                            <DropDownLayout
+                                intro_text={this.state.quest_data.intro_text}
+                                instructions={
+                                    this.state.quest_data.instructions
+                                }
+                                desktop_instructions={
+                                    this.state.quest_data.desktop_instructions
+                                }
+                                mobile_instructions={
+                                    this.state.quest_data.mobile_instructions
+                                }
+                            />
+                        ) : (
+                            <TabLayout
+                                intro_text={this.state.quest_data.intro_text}
+                                instructions={
+                                    this.state.quest_data.instructions
+                                }
+                                desktop_instructions={
+                                    this.state.quest_data.desktop_instructions
+                                }
+                                mobile_instructions={
+                                    this.state.quest_data.mobile_instructions
+                                }
+                            />
+                        )}
+
                         <p className={"mt-4 mb-4"}>
                             The Hand in button will become available when you
                             meet the requirements. Unless exploration is

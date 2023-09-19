@@ -69,8 +69,10 @@ class GuideQuestsController extends Controller {
 
         if (!is_null($quest)) {
 
-            $quest->intro_text   = nl2br($quest->intro_text);
-            $quest->instructions = nl2br($quest->instructions);
+            $quest->intro_text           = nl2br($quest->intro_text);
+            $quest->instructions         = nl2br($quest->instructions);
+            $quest->desktop_instructions = nl2br($quest->desktop_instructions);
+            $quest->mobile_instructions  = nl2br($quest->mobile_instructions);
 
             $response = [
                 'quest'                  => $quest,
