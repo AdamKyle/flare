@@ -28,7 +28,7 @@ export default class GuideButton extends React.Component<any, any> {
                     is_modal_open: true,
                 });
             }
-        }, 2500);
+        }, 500);
 
         // @ts-ignore
         this.guideQuestButton.listen(
