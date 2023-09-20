@@ -9,7 +9,7 @@
             backUrl="{{route('affixes.list')}}"
         >
             <div class="mt-4 mb-4">
-                <x-core.alerts.info-alert title="Attn!">
+                <x-core.alerts.info-alert title="ATTN!">
                     If an affix affects a skill that does not exist, the affix will be skipped.
                 </x-core.alerts.info-alert>
             </div>

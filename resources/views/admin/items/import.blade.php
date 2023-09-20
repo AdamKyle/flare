@@ -8,7 +8,7 @@
             backUrl="{{route('items.list')}}"
         >
             <div class="mt-4 mb-4">
-                <x-core.alerts.info-alert title="Attn!">
+                <x-core.alerts.info-alert title="ATTN!!">
                     If an item affects a skill that no doesn't exist, the item will be ignored.
                 </x-core.alerts.info-alert>
             </div>

@@ -12,6 +12,7 @@ use App\Http\Controllers\Controller;
 use App\Flare\Models\QuestsCompleted;
 use App\Game\Core\Requests\CosmeticTextRequest;
 use App\Flare\Events\UpdateCharacterAttackEvent;
+use Illuminate\Support\Facades\Cache;
 
 class SettingsController extends Controller {
 
@@ -32,8 +33,8 @@ class SettingsController extends Controller {
             'user'         => $user,
             'races'        => GameRace::pluck('name', 'id'),
             'classes'      => GameClass::whereNull('primary_required_class_id')
-                                       ->whereNull('secondary_required_class_id')
-                                       ->pluck('name', 'id'),
+                ->whereNull('secondary_required_class_id')
+                ->pluck('name', 'id'),
             'cosmeticText' => $canUseCosmeticText,
         ]);
     }
@@ -95,6 +96,8 @@ class SettingsController extends Controller {
             $user->update([
                 'guide_enabled' => $request->guide_enabled,
             ]);
+
+            Cache::put('user-show-guide-initial-message-' . $user->id, 'true');
         }
 
         return redirect()->back()->with('success', 'Updated character guide setting.');

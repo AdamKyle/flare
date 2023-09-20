@@ -9,7 +9,7 @@
             backUrl="{{route('admin.info-management')}}"
         >
             <div class="mt-4 mb-4">
-                <x-core.alerts.info-alert title="Attn!">
+                <x-core.alerts.info-alert title="ATTN!">
                     Make sure to copy the backup images over as well so the images are linked properly.
                 </x-core.alerts.info-alert>
             </div>

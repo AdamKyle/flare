@@ -8,8 +8,8 @@
             backUrl="{{route('admin.items-skills.list')}}"
         >
             <div class="mt-4 mb-4">
-                <x-core.alerts.info-alert title="Attn!">
-                    If a skill has a parent skill that cannot be found, the parent skill and the parent skill level required will be 
+                <x-core.alerts.info-alert title="ATTN!!">
+                    If a skill has a parent skill that cannot be found, the parent skill and the parent skill level required will be
                     set to null.
                 </x-core.alerts.info-alert>
             </div>

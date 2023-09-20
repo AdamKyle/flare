@@ -74,7 +74,7 @@
                             <div>
                                 <h3 class="mb-3">Enemy Stat Reduction</h3>
                                 <div class="mt-4 mb-4">
-                                    <x-core.alerts.info-alert title="Attn!">
+                                    <x-core.alerts.info-alert title="ATTN!">
                                         The logic states that prefixes can reduce all stats and do not stack, while suffixes can reduce individual stats and do stack.
                                     </x-core.alerts.info-alert>
                                 </div>

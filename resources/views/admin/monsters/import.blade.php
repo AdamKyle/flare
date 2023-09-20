@@ -9,7 +9,7 @@
             backUrl="{{route('monsters.list')}}"
         >
             <div class="mt-4 mb-4">
-                <x-core.alerts.info-alert title="Attn!">
+                <x-core.alerts.info-alert title="ATTN!">
                     If a quest item or game map does not exist, the monster will be skipped.
                 </x-core.alerts.info-alert>
             </div>

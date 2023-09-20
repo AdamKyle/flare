@@ -9,7 +9,7 @@
             backUrl="{{route('admin.guide-quests')}}"
         >
             <div class="mt-4 mb-4">
-                <x-core.alerts.info-alert title="Attn!">
+                <x-core.alerts.info-alert title="ATTN!">
                     Do not import guide quests after player shave registered unless it to fix spelling mistakes or add additional ones.
                     You cannot change the order or import a sheet with new quests in between potentially already completed quests.
                 </x-core.alerts.info-alert>
