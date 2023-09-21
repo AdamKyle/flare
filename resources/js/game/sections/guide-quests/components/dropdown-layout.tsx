@@ -37,11 +37,11 @@ export default class DropDownLayout extends React.Component<
                 icon_class: "fas fa-info-circle",
                 on_click: () => this.switchInformation("instructions"),
             },
-            {
-                name: "Desktop Instructions",
-                icon_class: "fas fa-desktop",
-                on_click: () => this.switchInformation("desktop_instructions"),
-            },
+            // {
+            //     name: "Desktop Instructions",
+            //     icon_class: "fas fa-desktop",
+            //     on_click: () => this.switchInformation("desktop_instructions"),
+            // },
             {
                 name: "Mobile Instructions",
                 icon_class: "fas fa-mobile",

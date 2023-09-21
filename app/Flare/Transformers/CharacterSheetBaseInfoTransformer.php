@@ -37,6 +37,8 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer {
             'class_id'                    => $gameClass->id,
             'race'                        => $character->race->name,
             'race_id'                     => $character->race->id,
+            'to_hit_stat'                 => $character->class->to_hit_stat,
+            'damage_stat'                 => $character->class->damage_stat,
             'inventory_max'               => $character->inventory_max,
             'inventory_count'             => $character->getInventoryCount(),
             'level'                       => number_format($character->level),

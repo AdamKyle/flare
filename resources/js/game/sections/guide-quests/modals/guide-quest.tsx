@@ -184,7 +184,7 @@ export default class GuideQuest extends React.Component<any, any> {
                     secondary_button_disabled: !this.state.can_hand_in,
                     handle_action: this.handInQuest.bind(this),
                 }}
-                large_modal={true}
+                medium_modal={true}
                 primary_button_disabled={this.state.action_loading}
             >
                 {this.state.loading && this.state.quest_data === null ? (

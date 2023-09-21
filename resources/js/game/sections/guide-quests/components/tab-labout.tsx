@@ -22,10 +22,10 @@ export default class TabLayout extends React.Component<GuideQuestLayoutProps, {}
                 key: "desktop-instructions",
                 name: "Desktop Instructions",
             },
-            {
-                key: "mobile-instructions",
-                name: "Mobile Instructions",
-            },
+            // {
+            //     key: "mobile-instructions",
+            //     name: "Mobile Instructions",
+            // },
         ];
     }
 
@@ -71,7 +71,7 @@ export default class TabLayout extends React.Component<GuideQuestLayoutProps, {}
                         />
                     </div>
                 </TabPanel>
-                <TabPanel key={"mobile-instructions"}>
+                {/* <TabPanel key={"mobile-instructions"}>
                     <div
                         className={
                             "border-1 rounded-sm p-3 bg-slate-300 dark:bg-slate-700 max-h-[250px] overflow-x-auto mb-4 guide-quest-instructions"
@@ -83,7 +83,7 @@ export default class TabLayout extends React.Component<GuideQuestLayoutProps, {}
                             }}
                         />
                     </div>
-                </TabPanel>
+                </TabPanel> */}
             </Tabs>
         );
     }
