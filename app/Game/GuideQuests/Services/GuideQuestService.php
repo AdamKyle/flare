@@ -50,7 +50,7 @@ class GuideQuestService {
         ];
     }
 
-    public function handInQuest(Character $character, GuideQuest $quest) {
+    public function handInQuest(Character $character, GuideQuest $quest): bool {
         if (!$this->canHandInQuest($character, $quest)) {
             return false;
         }

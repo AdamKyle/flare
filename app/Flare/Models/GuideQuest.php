@@ -2,13 +2,17 @@
 
 namespace App\Flare\Models;
 
-use App\Game\Mercenaries\Values\MercenaryValue;
 use Exception;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Database\Factories\GuideQuestFactory;
 use App\Game\Skills\Values\SkillTypeValue;
+use App\Game\Mercenaries\Values\MercenaryValue;
 
 class GuideQuest extends Model {
+
+    use HasFactory;
 
     /**
      * The attributes that are mass assignable.
@@ -239,5 +243,9 @@ class GuideQuest extends Model {
         }
 
         return null;
+    }
+
+    protected static function newFactory() {
+        return GuideQuestFactory::new();
     }
 }

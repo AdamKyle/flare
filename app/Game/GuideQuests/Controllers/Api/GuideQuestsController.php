@@ -76,8 +76,8 @@ class GuideQuestsController extends Controller {
 
             $response = [
                 'quest'                  => $quest,
-                'can_hand_in'            => $completedPrevious ? false : $this->guideQuestService->canHandInQuest($character, $quest),
-                'completed_requirements' => $completedPrevious ? [] : $data['completed_requirements'],
+                'can_hand_in'            => !$completedPrevious ? false : $this->guideQuestService->canHandInQuest($character, $quest),
+                'completed_requirements' => !$completedPrevious ? [] : $data['completed_requirements'],
             ];
 
             if ($message !== '') {
