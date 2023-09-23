@@ -251,21 +251,3 @@
     </div>
 
 </aside>
-
-@push('scripts')
-    <script>
-        const menuBar = document.querySelector(".menu-bar");
-
-        menuBar.classList.add("menu-hidden");
-
-        document.documentElement.classList.add("menu-hidden");
-
-        menuBar.querySelectorAll(".menu-detail.open").forEach((menuDetail) => {
-            hideOverlay();
-
-            if (!menuBar.classList.contains("menu-wide")) {
-                menuDetail.classList.remove("open");
-            }
-        });
-    </script>
-@endpush

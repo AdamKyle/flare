@@ -41,72 +41,14 @@ const setViewportWidth = () => {
   viewportWidth = window.innerWidth || document.documentElement.clientWidth;
 };
 
-// Watch the viewport width
-const watchWidth = () => {
-  const sm = 640;
-  const md = 768;
-  const lg = 1024;
-  const xl = 1280;
-
-  const menuBar = document.querySelector(".menu-bar");
-
-  // Hide Menu Detail
-  const hideMenuDetail = () => {
-    menuBar.querySelectorAll(".menu-detail.open").forEach((menuDetail) => {
-      hideOverlay();
-
-      if (!menuBar.classList.contains("menu-wide")) {
-        menuDetail.classList.remove("open");
-      }
-    });
-  };
-
-  // Hide Sidebar
-  const hideSidebar = () => {
-    const sidebar = document.querySelector(".sidebar");
-
-    if (!sidebar) return;
-
-    if (sidebar.classList.contains("open")) {
-      sidebar.classList.remove("open");
-      hideOverlay();
-    }
-  };
-
-  if (viewportWidth < sm) {
-    if (!menuBar) return;
-
-    const openMenu = menuBar.querySelector(".menu-detail.open");
-
-    if (!openMenu) {
-      menuBar.classList.add("menu-hidden");
-      document.documentElement.classList.add("menu-hidden");
-      hideMenuDetail();
-    }
-  }
-
-  if (viewportWidth > sm) {
-    if (!menuBar) return;
-
-    menuBar.classList.remove("menu-hidden");
-    document.documentElement.classList.remove("menu-hidden");
-  }
-
-  if (viewportWidth > lg) {
-    hideSidebar();
-  }
-};
-
 // Set our initial width
 setViewportWidth();
-watchWidth();
 
 // On resize events, recalculate
 window.addEventListener(
   "resize",
   () => {
     setViewportWidth();
-    watchWidth();
   },
   false
 );

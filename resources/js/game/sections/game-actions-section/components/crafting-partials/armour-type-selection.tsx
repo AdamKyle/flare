@@ -1,10 +1,12 @@
-import React, {Fragment} from "react";
+import React, { Fragment } from "react";
 import Select from "react-select";
 import ArmourSelectionTypeProps from "./types/armour-type-selection-props";
 
-export default class ArmourTypeSelection extends React.Component<ArmourSelectionTypeProps, any> {
-
-    private selectableTypes: {label: string, value: string}[]
+export default class ArmourTypeSelection extends React.Component<
+    ArmourSelectionTypeProps,
+    any
+> {
+    private selectableTypes: { label: string; value: string }[];
 
     constructor(props: ArmourSelectionTypeProps) {
         super(props);
@@ -60,11 +62,8 @@ export default class ArmourTypeSelection extends React.Component<ArmourSelection
                     value={this.defaultCraftingType()}
                 />
                 <p className="mt-3 text-sm">
-                    When it comes to weapons there are general
-                    "weapons" that any one can use, then there
-                    are specialty weapons: Hammers, Staves and
-                    Bows. For Weapon Crafting, you can craft ANY
-                    of these types to gain levels.
+                    Selecting any armour type will count towards Armour Crafting
+                    skill.
                 </p>
             </Fragment>
         );
