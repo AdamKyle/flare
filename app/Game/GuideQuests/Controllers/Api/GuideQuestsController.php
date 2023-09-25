@@ -76,7 +76,7 @@ class GuideQuestsController extends Controller {
 
             $response = [
                 'quest'                  => $quest,
-                'can_hand_in'            => $this->guideQuestService->canHandInQuest($character, $quest),
+                'can_hand_in'            => $data['can_hand_in'],
                 'completed_requirements' => $data['completed_requirements'],
             ];
 

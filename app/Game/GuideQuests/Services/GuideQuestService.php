@@ -42,11 +42,12 @@ class GuideQuestService {
             return null;
         }
 
-        $this->canHandInQuest($character, $quest, true);
+        $canHandIn = $this->canHandInQuest($character, $quest, true);
 
         return [
             'quest' => $quest,
             'completed_requirements' => $this->completedAttributes,
+            'can_hand_in' => $canHandIn,
         ];
     }
 
