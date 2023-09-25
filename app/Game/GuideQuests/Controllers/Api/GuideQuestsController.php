@@ -47,7 +47,7 @@ class GuideQuestsController extends Controller {
         $message = 'You have completed the quest: "' . $guideQuest->name . '". On to the next! Below is the next quest for you to do!';
 
         if ($response) {
-            return $this->getNextQuest($character->refresh(), $message, true);
+            return $this->getNextQuest($character->refresh(), $message);
         }
 
         return response()->json([
@@ -62,7 +62,7 @@ class GuideQuestsController extends Controller {
      * @param string $message
      * @return JsonResponse
      */
-    protected function getNextQuest(Character $character, string $message = '', bool $completedPrevious = false): JsonResponse {
+    protected function getNextQuest(Character $character, string $message = ''): JsonResponse {
         $data = $this->guideQuestService->fetchQuestForCharacter($character);
 
         $quest = $data['quest'];
@@ -76,8 +76,8 @@ class GuideQuestsController extends Controller {
 
             $response = [
                 'quest'                  => $quest,
-                'can_hand_in'            => !$completedPrevious ? false : $this->guideQuestService->canHandInQuest($character, $quest),
-                'completed_requirements' => !$completedPrevious ? [] : $data['completed_requirements'],
+                'can_hand_in'            => $this->guideQuestService->canHandInQuest($character, $quest),
+                'completed_requirements' => $data['completed_requirements'],
             ];
 
             if ($message !== '') {

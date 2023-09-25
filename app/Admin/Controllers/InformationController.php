@@ -25,7 +25,7 @@ class InformationController extends Controller {
     }
 
     public function export() {
-        return response()->attachment(InfoPage::all(), 'inforamtion');
+        return response()->attachment(InfoPage::all(), 'information');
     }
 
     public function import(InfoImport $request) {

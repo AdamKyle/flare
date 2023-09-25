@@ -6,8 +6,7 @@ use App\Flare\Models\Character;
 use App\Game\Battle\Concerns\HandleGivingAncestorItem;
 use Illuminate\Console\Command;
 
-class GivePlayerAncenstorItem extends Command
-{
+class GivePlayerAncenstorItem extends Command {
 
     use HandleGivingAncestorItem;
 
@@ -29,7 +28,7 @@ class GivePlayerAncenstorItem extends Command
      * Execute the console command.
      */
     public function handle() {
-        
+
         $character = Character::where('name', $this->argument('characterName'))->first();
 
         if (is_null($character)) {
