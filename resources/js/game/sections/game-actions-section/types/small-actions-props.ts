@@ -2,6 +2,7 @@ import CharacterCurrenciesDetails from "../../../lib/game/types/character-curren
 import ActionsProps from "./actions-props";
 import PositionType from "../../../lib/game/types/map/position-type";
 import MapState from "../../map/types/map-state";
+import { MapTimerData } from "../../../lib/game/types/game-state";
 
 export default interface SmallActionsProps extends ActionsProps {
     character_currencies: CharacterCurrenciesDetails;
@@ -12,5 +13,9 @@ export default interface SmallActionsProps extends ActionsProps {
 
     view_port: number;
 
-    map_data: MapState|null;
+    map_data: MapState | null;
+
+    map_timer_data: MapTimerData;
+
+    update_map_timer_data: (timerData: MapTimerData) => void;
 }

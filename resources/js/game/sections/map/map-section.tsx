@@ -22,6 +22,8 @@ import clsx from "clsx";
 // @ts-ignore
 import Draggable from "react-draggable/build/web/react-draggable.min";
 import MapState from "./types/map-state";
+import { DateTime } from "luxon";
+import { getRemainingTime } from "../../lib/helpers/time-left-seconds";
 
 export default class MapSection extends React.Component<MapProps, MapState> {
     private mapTimeOut: any;
@@ -110,16 +112,7 @@ export default class MapSection extends React.Component<MapProps, MapState> {
     componentDidMount() {
         if (this.props.map_data !== null) {
             this.setState({ ...this.props.map_data }, () => {
-                this.setState({
-                    celestial_time_out:
-                        this.props.can_engage_celestials_again_at,
-                });
-
-                if (this.props.automation_completed_at !== 0) {
-                    this.setState({
-                        automation_time_out: this.props.automation_completed_at,
-                    });
-                }
+                this.updateTimers();
 
                 this.setState({ loading: false });
             });
@@ -232,19 +225,48 @@ export default class MapSection extends React.Component<MapProps, MapState> {
 
     componentDidUpdate(): void {
         if (this.props.map_data !== null && this.state.loading) {
-            this.setState(this.props.map_data, () => {
-                this.setState({
-                    celestial_time_out:
-                        this.props.can_engage_celestials_again_at,
-                });
+            this.setState({ ...this.props.map_data }, () => {
+                this.updateTimers();
 
-                if (this.props.automation_completed_at !== 0) {
-                    this.setState({
-                        automation_time_out: this.props.automation_completed_at,
-                    });
-                }
+                this.setState({ loading: false });
             });
         }
+    }
+
+    componentWillUnmount(): void {
+        this.props.update_map_timer_data({
+            time_left: this.state.time_left,
+            automation_time_out: this.state.automation_time_out,
+            celestial_time_out: this.state.celestial_time_out,
+
+            time_left_started:
+                this.state.time_left > 0 ? DateTime.local().toSeconds() : 0,
+            automation_time_out_started:
+                this.state.automation_time_out > 0
+                    ? DateTime.local().toSeconds()
+                    : 0,
+            celestial_time_out_started:
+                this.state.celestial_time_out > 0
+                    ? DateTime.local().toSeconds()
+                    : 0,
+        });
+    }
+
+    updateTimers() {
+        this.setState({
+            celestial_time_out: getRemainingTime(
+                this.props.can_engage_celestials_again_at,
+                this.props.map_timer_data.celestial_time_out_started
+            ),
+            automation_time_out: getRemainingTime(
+                this.props.automation_completed_at,
+                this.props.map_timer_data.automation_time_out_started
+            ),
+            time_left: getRemainingTime(
+                this.props.map_timer_data.time_left,
+                this.props.map_timer_data.time_left_started
+            ),
+        });
     }
 
     setStateFromData(data: MapData, callback?: () => void) {

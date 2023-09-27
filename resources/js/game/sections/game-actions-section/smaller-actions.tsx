@@ -271,8 +271,14 @@ export default class SmallerActions extends React.Component<
             monsters: this.state.monsters,
             crafting_time_out: this.state.crafting_time_out,
             attack_time_out: this.state.attack_time_out,
-            crafting_time_out_started: this.state.crafting_time_out > 0 ? DateTime.local().toSeconds() : 0,
-            attack_time_out_started: this.state.attack_time_out > 0 ? DateTime.local().toSeconds() : 0,
+            crafting_time_out_started:
+                this.state.crafting_time_out > 0
+                    ? DateTime.local().toSeconds()
+                    : 0,
+            attack_time_out_started:
+                this.state.attack_time_out > 0
+                    ? DateTime.local().toSeconds()
+                    : 0,
         });
     }
 
@@ -435,6 +441,8 @@ export default class SmallerActions extends React.Component<
                 update_plane_quests={this.props.update_plane_quests}
                 update_character_position={this.props.update_character_position}
                 map_data={this.props.map_data}
+                map_timer_data={this.props.map_timer_data}
+                update_map_timer_data={this.props.update_map_timer_data}
             />
         );
     }

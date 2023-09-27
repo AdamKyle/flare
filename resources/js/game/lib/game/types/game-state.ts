@@ -1,4 +1,4 @@
-import {CharacterType} from "../character/character-type";
+import { CharacterType } from "../character/character-type";
 import CharacterCurrenciesType from "../character/character-currencies-type";
 import CharacterStatusType from "../character/character-status-type";
 import QuestType from "./quests/quest-type";
@@ -14,6 +14,15 @@ export type GameActionState = {
     crafting_time_out: number;
     attack_time_out_started: number;
     crafting_time_out_started: number;
+}
+
+export type MapTimerData = {
+    time_left: number;
+    time_left_started: number;
+    automation_time_out: number;
+    automation_time_out_started: number;
+    celestial_time_out: number;
+    celestial_time_out_started: number;
 }
 
 export default interface GameState {
@@ -48,9 +57,11 @@ export default interface GameState {
 
     show_global_timeout: boolean;
 
-    tabs: {name: string, key: string, has_logs?: boolean}[]|[];
+    tabs: { name: string, key: string, has_logs?: boolean }[] | [];
 
-    action_data: GameActionState|null;
+    action_data: GameActionState | null;
 
-    map_data: MapState|null;
+    map_data: MapState | null;
+
+    map_timer_data: MapTimerData;
 }

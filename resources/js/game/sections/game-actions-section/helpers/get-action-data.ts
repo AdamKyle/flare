@@ -1,5 +1,6 @@
 import { DateTime } from "luxon";
 import { GameActionState } from "../../../lib/game/types/game-state";
+import { getRemainingTime } from "../../../lib/helpers/time-left-seconds";
 
 
 function getActionData(actionData: GameActionState): GameActionState {
@@ -22,20 +23,6 @@ function getActionData(actionData: GameActionState): GameActionState {
     return actionData;
 }
 
-function getRemainingTime(
-    timeLeftInSeconds: number,
-    timeStartedInSeconds: number
-): number {
-    const now = DateTime.local();
 
-    const seconds_left = timeLeftInSeconds;
-
-    const currentTime = now.toSeconds();
-    const startTime = timeStartedInSeconds;
-
-    const timeElapsedInSeconds = currentTime - startTime;
-
-    return Math.floor(Math.max(seconds_left - timeElapsedInSeconds, 0));
-}
 
 export { getActionData };

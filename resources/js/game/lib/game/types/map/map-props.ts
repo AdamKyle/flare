@@ -1,5 +1,6 @@
 import MapState from "../../../../sections/map/types/map-state";
 import CharacterCurrenciesDetails from "../character-currencies-details";
+import { MapTimerData } from "../game-state";
 import PositionType from "./position-type";
 
 export default interface MapProps {
@@ -30,5 +31,9 @@ export default interface MapProps {
 
     can_engage_celestial: boolean;
 
-    map_data: MapState|null;
+    map_data: MapState | null;
+
+    map_timer_data: MapTimerData;
+
+    update_map_timer_data: (timerData: MapTimerData) => void;
 }

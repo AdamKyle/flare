@@ -1,7 +1,8 @@
-import {CharacterType} from "../../../../../lib/game/character/character-type";
+import { CharacterType } from "../../../../../lib/game/character/character-type";
 import MapState from "../../../../map/types/map-state";
 import CharacterCurrenciesDetails from "../../../../../lib/game/types/character-currencies-details";
 import PositionType from "../../../../../lib/game/types/map/position-type";
+import { MapTimerData } from "../../../../../lib/game/types/game-state";
 
 export default interface SmallMapSectionProps {
     close_map_section: () => void;
@@ -18,5 +19,9 @@ export default interface SmallMapSectionProps {
 
     update_character_position: (position: PositionType) => void;
 
-    map_data: MapState|null;
+    map_data: MapState | null;
+
+    map_timer_data: MapTimerData;
+
+    update_map_timer_data: (timerData: MapTimerData) => void;
 }
