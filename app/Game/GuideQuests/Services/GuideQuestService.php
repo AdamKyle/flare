@@ -24,7 +24,6 @@ class GuideQuestService {
     }
 
     public function fetchQuestForCharacter(Character $character): array | null {
-        $this->completedAttributes = [];
 
         $lastCompletedGuideQuest = $character->questsCompleted()
             ->whereNotNull('guide_quest_id')
@@ -124,6 +123,10 @@ class GuideQuestService {
 
     public function canHandInQuest(Character $character, GuideQuest $quest, bool $ignoreAutomation = false): bool {
 
+        if ($quest->name === 'secondary guide quest') {
+            dump('Can hand in a quest?');
+        }
+
         $this->completedAttributes = [];
 
         $alreadyCompleted = $character->questsCompleted()->where('guide_quest_id', $quest->id)->first();
@@ -164,6 +167,8 @@ class GuideQuestService {
             $requiredAttributes = $this->requiredAttributeNames($quest);
 
             $difference = array_diff($requiredAttributes, $this->completedAttributes);
+
+            $this->guideQuestRequirementsService->resetFinishedRequirements();
 
             if (empty($difference)) {
                 return true;

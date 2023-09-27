@@ -27,8 +27,10 @@ class ClassRanksServiceTest extends TestCase {
         $this->character        = (new CharacterFactory())->createBaseCharacter()->assignSkill(
             $this->createGameSkill([
                 'class_bonus' => 0.01
-            ]), 5
+            ]),
+            5
         )->givePlayerLocation();
+
         $this->classRankService = resolve(ClassRankService::class);
     }
 
@@ -64,7 +66,7 @@ class ClassRanksServiceTest extends TestCase {
         ]);
 
         $character = $this->character->addAdditionalClassRanks([$heretic->id, $thief->id, $prisonerClass->id])
-                                     ->getCharacter();
+            ->getCharacter();
 
         $response = $this->classRankService->getClassRanks($character);
 

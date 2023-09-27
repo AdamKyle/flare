@@ -17,6 +17,10 @@ class GuideQuestRequirementsService {
         return $this->finishedRequirements;
     }
 
+    public function resetFinishedRequirements(): void {
+        $this->finishedRequirements = [];
+    }
+
     public function requiredLevelCheck(Character $character, GuideQuest $quest): GuideQuestRequirementsService {
         if (!is_null($quest->required_level)) {
             if ($character->level >= $quest->required_level) {
