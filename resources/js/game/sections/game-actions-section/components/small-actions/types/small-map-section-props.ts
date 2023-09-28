@@ -24,4 +24,6 @@ export default interface SmallMapSectionProps {
     map_timer_data: MapTimerData;
 
     update_map_timer_data: (timerData: MapTimerData) => void;
+
+    set_map_data: (mapData: MapState) => void;
 }

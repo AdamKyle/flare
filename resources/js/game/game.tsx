@@ -27,6 +27,7 @@ import { removeCommas } from "./lib/game/format-number";
 import CharacterCurrenciesType from "./lib/game/character/character-currencies-type";
 import KingdomLogDetails from "./lib/game/kingdoms/kingdom-log-details";
 import GlobalTimeoutModal from "./sections/game-modals/global-timeout-modal";
+import MapState from "./sections/map/types/map-state";
 
 export default class Game extends React.Component<GameProps, GameState> {
     private characterTopBar: any;
@@ -497,6 +498,12 @@ export default class Game extends React.Component<GameProps, GameState> {
         });
     }
 
+    setMapState(mapData: MapState): void {
+        this.setState({
+            map_data: mapData,
+        });
+    }
+
     setMapTimerData(timerData: MapTimerData): void {
         this.setState({
             map_timer_data: timerData,
@@ -616,6 +623,7 @@ export default class Game extends React.Component<GameProps, GameState> {
                                             update_map_timer_data={this.setMapTimerData.bind(
                                                 this
                                             )}
+                                            set_map_data={this.setMapState.bind(this)}
                                         />
                                     ) : (
                                         <Actions
@@ -690,6 +698,7 @@ export default class Game extends React.Component<GameProps, GameState> {
                                     )}
                                     disable_bottom_timer={false}
                                     map_data={this.state.map_data}
+                                    set_map_data={this.setMapState.bind(this)}
                                 />
                             </BasicCard>
                         </div>

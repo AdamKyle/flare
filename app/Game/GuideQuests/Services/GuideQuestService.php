@@ -123,10 +123,6 @@ class GuideQuestService {
 
     public function canHandInQuest(Character $character, GuideQuest $quest, bool $ignoreAutomation = false): bool {
 
-        if ($quest->name === 'secondary guide quest') {
-            dump('Can hand in a quest?');
-        }
-
         $this->completedAttributes = [];
 
         $alreadyCompleted = $character->questsCompleted()->where('guide_quest_id', $quest->id)->first();

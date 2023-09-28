@@ -110,6 +110,7 @@ export default class MapSection extends React.Component<MapProps, MapState> {
     }
 
     componentDidMount() {
+        console.log(this.props.map_data);
         if (this.props.map_data !== null) {
             this.setState({ ...this.props.map_data }, () => {
                 this.updateTimers();
@@ -250,9 +251,15 @@ export default class MapSection extends React.Component<MapProps, MapState> {
                     ? DateTime.local().toSeconds()
                     : 0,
         });
+
+        this.props.set_map_data(this.state);
     }
 
     updateTimers() {
+        if (this.props.map_data === null) {
+            return;
+        }
+
         this.setState({
             celestial_time_out: getRemainingTime(
                 this.props.can_engage_celestials_again_at,
@@ -263,7 +270,7 @@ export default class MapSection extends React.Component<MapProps, MapState> {
                 this.props.map_timer_data.automation_time_out_started
             ),
             time_left: getRemainingTime(
-                this.props.map_timer_data.time_left,
+                this.props.map_data.time_left,
                 this.props.map_timer_data.time_left_started
             ),
         });

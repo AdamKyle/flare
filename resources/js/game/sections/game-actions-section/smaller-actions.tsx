@@ -443,6 +443,7 @@ export default class SmallerActions extends React.Component<
                 map_data={this.props.map_data}
                 map_timer_data={this.props.map_timer_data}
                 update_map_timer_data={this.props.update_map_timer_data}
+                set_map_data={this.props.set_map_data}
             />
         );
     }
