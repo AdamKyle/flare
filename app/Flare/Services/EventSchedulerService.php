@@ -120,7 +120,7 @@ class EventSchedulerService {
 
         $eventType = new EventType($params['selected_event_type']);
 
-        $date = new Carbon($params['selected_start_date'], config('app.timezone'));
+        $date = (new Carbon($params['selected_start_date']))->tz(config('app.timezone'));
 
         $eventData['start_date'] = $date;
 
@@ -141,8 +141,8 @@ class EventSchedulerService {
         }
 
         if ($type->isWeeklyCurrencyDrops()) {
-            return 'For the next 24 hours you just have to kill creatures for Gold Dust,'.
-            'Shards and Copper Coins (provided you have the quest item) will drop at a rate of 1-50 per kill! How fun!';
+            return 'For the next 24 hours you just have to kill creatures for Gold Dust,' .
+                'Shards and Copper Coins (provided you have the quest item) will drop at a rate of 1-50 per kill! How fun!';
         }
 
         if ($type->isMonthlyPVP()) {

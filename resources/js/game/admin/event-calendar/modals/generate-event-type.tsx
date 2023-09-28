@@ -11,6 +11,8 @@ import InfoAlert from "../../../components/ui/alerts/simple-alerts/info-alert";
 import Ajax from "../../../lib/ajax/ajax";
 import { AxiosError, AxiosResponse } from "axios";
 import AjaxInterface from "../../../lib/ajax/ajax-interface";
+import { DateTime } from "luxon";
+import { cloneDeep } from "lodash";
 
 export default class GenerateEventType extends React.Component<
     GenerateExtentTypeProps,
@@ -71,12 +73,28 @@ export default class GenerateEventType extends React.Component<
                     this.setState({
                         error_message:
                             "No field can be left blank. Please make sure the form is filled out.",
+                        action_in_progress: false,
                     });
 
                     return;
                 }
 
                 const ajax: AjaxInterface = new Ajax();
+
+                const formData = cloneDeep(this.state.form_data);
+
+                const startDate = formData.selected_start_date.toString();
+
+                formData.selected_start_date = DateTime.fromISO(
+                    new Date(startDate).toISOString(),
+                    {
+                        zone: "utc",
+                    }
+                )
+                    .setZone("America/Edmonton")
+                    .toISO();
+
+                console.log(formData);
 
                 ajax.setRoute("admin/create-multiple-events")
                     .setParameters(this.state.form_data)
@@ -217,7 +235,9 @@ export default class GenerateEventType extends React.Component<
                                 </div>
                                 <DatePicker
                                     selected={
-                                        this.state.form_data.selected_start_date
+                                        new Date(
+                                            this.state.form_data.selected_start_date
+                                        )
                                     }
                                     onChange={(date) =>
                                         date !== null
