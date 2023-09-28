@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Features\Game\GuideQuest\Controllers\Api;
+namespace Tests\Feature\Game\GuideQuest\Controllers\Api;
 
 use App\Flare\Models\Item;
 use Illuminate\Foundation\Testing\RefreshDatabase;
