@@ -120,8 +120,6 @@ trait ItemsShowInformation {
             }
 
             $skills = $query->pluck('name')->toArray();
-
-            dump($skills, $item->affects_skill_type);
         }
 
 

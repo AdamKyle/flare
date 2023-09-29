@@ -1,8 +1,8 @@
 import MapState from "../../../../sections/map/types/map-state";
 import { DateTime } from "luxon";
 import MapData from "../request-types/MapData";
-import {getPortLocation} from "../location-helpers";
-import {getNewXPosition, getNewYPosition} from "../map-position";
+import { getPortLocation } from "../location-helpers";
+import { getNewXPosition, getNewYPosition } from "../map-position";
 import Game from "../../../../game";
 import MapSection from "../../../../sections/map/map-section";
 
@@ -17,27 +17,38 @@ export default class MapStateManager {
      * @param component
      * @returns
      */
-    static buildChangeState(data: MapData, component: MapSection): MapState {
-        let state: MapState = {...this.setState(data), ...{map_id: data.character_map.game_map.id}};
+    static buildChangeState(data: MapData, component: MapSection | Game): MapState {
+        let state: MapState = { ...this.setState(data), ...{ map_id: data.character_map.game_map.id } };
 
         state.port_location = getPortLocation(state);
 
+        const viewPort: number = component instanceof MapSection ? component.props.view_port : component.state.view_port;
+
         state.map_position = {
-            x: getNewXPosition(state.character_position.x, state.map_position.x, component.props.view_port),
-            y: getNewYPosition(state.character_position.y, state.map_position.y, component.props.view_port),
+            x: getNewXPosition(state.character_position.x, state.map_position.x, viewPort),
+            y: getNewYPosition(state.character_position.y, state.map_position.y, viewPort),
         }
 
         if (state.time_left !== 0) {
             state.can_player_move = false;
         }
 
-        component.props.show_celestial_fight_button(data.celestial_id);
+        if (component instanceof MapSection) {
+            component.props.show_celestial_fight_button(data.celestial_id);
+        } else {
+            component.updateCelestial(data.celestial_id);
+        }
 
-        let position: {x: number, y: number, game_map_id?: number} = state.character_position;
+
+        let position: { x: number, y: number, game_map_id?: number } = state.character_position;
 
         position.game_map_id = state.game_map_id;
 
-        component.props.set_character_position(position);
+        if (component instanceof MapSection) {
+            component.props.set_character_position(position);
+        } else {
+            component.setCharacterPosition(position);
+        }
 
         return state;
     }
@@ -55,7 +66,7 @@ export default class MapStateManager {
      * @returns
      */
     static buildCoreState(data: MapData, component: Game): MapState {
-        let state: MapState = {...this.setState(data), ...{map_id: data.character_map.game_map.id}};
+        let state: MapState = { ...this.setState(data), ...{ map_id: data.character_map.game_map.id } };
 
         state.port_location = getPortLocation(state);
 
@@ -70,7 +81,7 @@ export default class MapStateManager {
 
         component.updateCelestial(data.celestial_id);
 
-        let position: {x: number, y: number, game_map_id?: number} = state.character_position;
+        let position: { x: number, y: number, game_map_id?: number } = state.character_position;
 
         position.game_map_id = state.game_map_id;
 
@@ -106,13 +117,19 @@ export default class MapStateManager {
             port_location: null,
             coordinates: data.coordinates,
             bottom_bounds: 0,
-            right_bounds:  0,
+            right_bounds: 0,
             loading: false,
             automation_time_out: 0,
             celestial_time_out: 0,
         }
     }
 
+    /**
+     * Set the maps movement action state.
+     *
+     * @param data
+     * @returns
+     */
     static setMapMovementActionsState(data: MapData): any {
         return {
             character_position: {
@@ -147,7 +164,7 @@ export default class MapStateManager {
      */
     static getTimeLeftInSeconds(data: any): any {
         if (data.can_move_again_at !== null) {
-            const end   = DateTime.fromISO(data.can_move_again_at);
+            const end = DateTime.fromISO(data.can_move_again_at);
             const start = DateTime.now();
 
             const timeLeft = (end.diff(start, 'seconds')).toObject()

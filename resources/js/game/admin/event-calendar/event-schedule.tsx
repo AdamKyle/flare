@@ -126,7 +126,6 @@ export default class EventSchedule extends React.Component<
     }
 
     color(name: string): string {
-        console.log(name);
         if (name === "Weekly Celestials") {
             return "#0891B2";
         }

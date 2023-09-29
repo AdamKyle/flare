@@ -14,9 +14,7 @@ export default class DropDown extends React.Component<DropDownProps, any> {
 
         if (typeof this.props.alert_names === 'undefined') {
             return false;
-        } 
-
-        console.log(this.props.alert_names.includes(name));
+        }
 
         return this.props.alert_names.includes(name);
     }
@@ -57,8 +55,8 @@ export default class DropDown extends React.Component<DropDownProps, any> {
                                 :
                                     menuItem.name
                             }
-                            
-                            
+
+
                         </button>
                     )}
                 </Menu.Item>

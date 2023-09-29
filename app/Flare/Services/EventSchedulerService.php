@@ -94,9 +94,13 @@ class EventSchedulerService {
     }
 
     public function generateFutureEvents(ScheduledEventConfiguration $scheduledEventConfiguration): void {
+        $event = ScheduledEvent::where('event_type', $scheduledEventConfiguration->event_type)
+            ->where('start_date', '>=', now())
+            ->orderBy('start_date')->last();
+
         $params = [
             'selected_event_type' => $scheduledEventConfiguration->event_type,
-            'selected_start_date' => $scheduledEventConfiguration->start_date,
+            'selected_start_date' => $event->start_date,
         ];
 
         $eventType = new EventType($scheduledEventConfiguration->event_type);

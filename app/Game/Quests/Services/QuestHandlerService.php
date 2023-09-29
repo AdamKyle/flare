@@ -14,6 +14,10 @@ use App\Game\Quests\Handlers\NpcQuestsHandler;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Flare\Jobs\CharacterAttackTypesCacheBuilder;
+use App\Game\Maps\Events\UpdateMap;
+use App\Game\Maps\Events\UpdateMonsterList;
+use App\Game\Maps\Events\UpdateRaidMonsters;
+use Illuminate\Support\Facades\Cache;
 
 class QuestHandlerService {
 
@@ -49,11 +53,13 @@ class QuestHandlerService {
      * @param CanTravelToMap $canTravelToMap
      * @param MapTileValue $mapTileValue
      */
-    public function __construct(NpcQuestsHandler $npcQuestsHandler, 
-                                CanTravelToMap $canTravelToMap, 
-                                MapTileValue $mapTileValue,
-                                BuildQuestCacheService $buildQuestCacheService) {
-                                    
+    public function __construct(
+        NpcQuestsHandler $npcQuestsHandler,
+        CanTravelToMap $canTravelToMap,
+        MapTileValue $mapTileValue,
+        BuildQuestCacheService $buildQuestCacheService
+    ) {
+
         $this->npcQuestsHandler       = $npcQuestsHandler;
         $this->canTravelToMap         = $canTravelToMap;
         $this->mapTileValue           = $mapTileValue;
@@ -174,13 +180,24 @@ class QuestHandlerService {
 
         event(new ServerMessageEvent($character->user, 'You were moved (at no gold cost or time out) from: ' . $oldMapDetails->gameMap->name . ' to: ' . $character->map->gameMap->name . ' in order to hand in the quest.'));
 
+        $this->updateMapDetails($character);
+
         return $character;
+    }
+
+    protected function updateMapDetails(Character $character): void {
+        event(new UpdateMap($character->user));
+
+        $monsters = Cache::get('monsters')[$character->map->gameMap->name];
+
+        event(new UpdateMonsterList($monsters, $character->user));
+        event(new UpdateRaidMonsters([], $character->user));
     }
 
     public function handInQuest(Character $character, Quest $quest) {
         $this->npcQuestsHandler()->handleNpcQuest($character, $quest);
 
-        event(new GlobalMessageEvent($character->name . ' Has completed a quest ('.$quest->name.') for: ' . $quest->npc->real_name . ' and been rewarded with a godly gift!'));
+        event(new GlobalMessageEvent($character->name . ' Has completed a quest (' . $quest->name . ') for: ' . $quest->npc->real_name . ' and been rewarded with a godly gift!'));
 
         $character = $character->refresh();
 

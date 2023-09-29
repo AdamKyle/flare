@@ -94,8 +94,6 @@ export default class GenerateEventType extends React.Component<
                     .setZone("America/Edmonton")
                     .toISO();
 
-                console.log(formData);
-
                 ajax.setRoute("admin/create-multiple-events")
                     .setParameters(this.state.form_data)
                     .doAjaxCall(

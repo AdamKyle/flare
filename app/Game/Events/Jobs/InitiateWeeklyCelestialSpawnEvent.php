@@ -54,7 +54,7 @@ class InitiateWeeklyCelestialSpawnEvent implements ShouldQueue {
             'ends_at'    => now()->addDay()
         ]);
 
-        SpawnCancelingJob::dispatch()->delay(now()->addMinutes(15))->onConnection('weekly_spawn');
+        SpawnCancelingJob::dispatch()->delay(now()->addMinutes(15))->onConnection('weekly_events');
 
         event(new GlobalMessageEvent(
             'The gates have swung open and the Celestial\'s are free.

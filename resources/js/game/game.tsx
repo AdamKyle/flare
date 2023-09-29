@@ -28,6 +28,8 @@ import CharacterCurrenciesType from "./lib/game/character/character-currencies-t
 import KingdomLogDetails from "./lib/game/kingdoms/kingdom-log-details";
 import GlobalTimeoutModal from "./sections/game-modals/global-timeout-modal";
 import MapState from "./sections/map/types/map-state";
+import MapData from "./lib/game/map/request-types/MapData";
+import MapStateManager from "./lib/game/map/state/map-state-manager";
 
 export default class Game extends React.Component<GameProps, GameState> {
     private characterTopBar: any;
@@ -55,6 +57,8 @@ export default class Game extends React.Component<GameProps, GameState> {
     private updateCharacterBasePosition: any;
 
     private characterCurrencies: any;
+
+    private traverseUpdate: any;
 
     constructor(props: GameProps) {
         super(props);
@@ -105,6 +109,9 @@ export default class Game extends React.Component<GameProps, GameState> {
                 },
             ],
         };
+
+        // @ts-ignore
+        this.traverseUpdate = Echo.private("update-plane-" + this.props.userId);
 
         // @ts-ignore
         this.characterTopBar = Echo.private(
@@ -413,6 +420,25 @@ export default class Game extends React.Component<GameProps, GameState> {
                 });
             }
         );
+
+        this.traverseUpdate.listen(
+            "Game.Maps.Events.UpdateMap",
+            (event: any) => {
+                this.setStateFromData(event.mapDetails);
+
+                this.updateQuestPlane(
+                    event.mapDetails.character_map.game_map.name
+                );
+            }
+        );
+    }
+
+    setStateFromData(data: MapData) {
+        const state = MapStateManager.buildChangeState(data, this);
+
+        this.setState({
+            map_data: state,
+        });
     }
 
     updateLogIcon() {
@@ -623,7 +649,9 @@ export default class Game extends React.Component<GameProps, GameState> {
                                             update_map_timer_data={this.setMapTimerData.bind(
                                                 this
                                             )}
-                                            set_map_data={this.setMapState.bind(this)}
+                                            set_map_data={this.setMapState.bind(
+                                                this
+                                            )}
                                         />
                                     ) : (
                                         <Actions

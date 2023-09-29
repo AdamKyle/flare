@@ -41,15 +41,15 @@ class ProcessScheduledEvents extends Command {
             }
 
             if ($eventType->isWeeklyCelestials()) {
-                InitiateWeeklyCelestialSpawnEvent::dispatch($event->id)->addMinutes(5);
+                InitiateWeeklyCelestialSpawnEvent::dispatch($event->id)->delay(now()->addMinutes(5));
             }
 
             if ($eventType->isWeeklyCurrencyDrops()) {
-                InitiateWeeklyCurrencyDropEvent::dispatch($event->id)->addMinutes(5);
+                InitiateWeeklyCurrencyDropEvent::dispatch($event->id)->delay(now()->addMinutes(5));
             }
 
             if ($eventType->isMonthlyPVP()) {
-                InitiateMonthlyPVPEvent::dispatch($event->id)->addMinutes(5);
+                InitiateMonthlyPVPEvent::dispatch($event->id)->delay(now()->addMinutes(5));
             }
         }
     }

@@ -152,6 +152,8 @@ class CharacterRewardService {
 
         $this->giveShards();
 
+        $this->currencyEventReward($monster);
+
         if (!$this->character->is_auto_battling && $this->character->isLoggedIn()) {
             event(new UpdateCharacterCurrenciesEvent($this->character->refresh()));
         }

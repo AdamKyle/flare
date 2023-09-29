@@ -191,6 +191,14 @@ export default class GuideQuest extends React.Component<any, any> {
                     <div className="p-5 mb-2">
                         <ComponentLoading />
                     </div>
+                ) : this.state.quest_data === null ? (
+                    <div className="text-center">
+                        <p>
+                            You have completed all the current Guide Quests.
+                            When new features are released there will be more
+                            guide quests for you!
+                        </p>
+                    </div>
                 ) : (
                     <div className="overflow-y-auto max-h-[450px] lg:max-h-none lg:overflow-visible">
                         {this.state.success_message !== null ? (

@@ -27,7 +27,6 @@ export default class Calendar extends React.Component<{}, CalendarState> {
     }
 
     color(name: string): string {
-        console.log(name);
         if (name === "Weekly Celestials") {
             return "#0891B2";
         }

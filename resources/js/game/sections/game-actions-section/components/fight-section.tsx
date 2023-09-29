@@ -4,14 +4,16 @@ import clsx from "clsx";
 import HealthMeters from "./health-meters";
 import FightSectionProps from "./types/fight-section-props";
 import Ajax from "../../../lib/ajax/ajax";
-import {AxiosError, AxiosResponse} from "axios";
+import { AxiosError, AxiosResponse } from "axios";
 import FightSectionState from "./types/fight-section-state";
 import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
 import BattleMesages from "./fight-section/battle-mesages";
 import DangerAlert from "../../../components/ui/alerts/simple-alerts/danger-alert";
 
-export default class FightSection extends React.Component<FightSectionProps, FightSectionState> {
-
+export default class FightSection extends React.Component<
+    FightSectionProps,
+    FightSectionState
+> {
     constructor(props: FightSectionProps) {
         super(props);
 
@@ -30,8 +32,8 @@ export default class FightSection extends React.Component<FightSectionProps, Fig
             setting_up_regular_fight: false,
             processing_regular_fight: false,
             show_clear_message: true,
-            error_message: '',
-        }
+            error_message: "",
+        };
     }
 
     componentDidMount() {
@@ -45,37 +47,48 @@ export default class FightSection extends React.Component<FightSectionProps, Fig
     }
 
     componentDidUpdate() {
-
         if (this.props.is_rank_fight) {
-
             if (this.state.setting_up_rank_fight) {
                 return;
             }
 
             if (this.props.is_same_monster) {
-                this.setState({
-                    battle_messages: [],
-                    setting_up_rank_fight: true,
-                }, () => {
-                    this.props.setup_rank_fight(this);
-                });
+                this.setState(
+                    {
+                        battle_messages: [],
+                        setting_up_rank_fight: true,
+                    },
+                    () => {
+                        this.props.setup_rank_fight(this);
+                    }
+                );
             }
 
-            if (this.props.monster_to_fight.id !== this.state.monster_to_fight_id && this.state.monster_to_fight_id !== 0) {
-                this.setState({
-                    battle_messages: [],
-                    setting_up_rank_fight: true,
-                }, () => {
-                    this.props.setup_rank_fight(this);
-                });
+            if (
+                this.props.monster_to_fight.id !==
+                    this.state.monster_to_fight_id &&
+                this.state.monster_to_fight_id !== 0
+            ) {
+                this.setState(
+                    {
+                        battle_messages: [],
+                        setting_up_rank_fight: true,
+                    },
+                    () => {
+                        this.props.setup_rank_fight(this);
+                    }
+                );
             }
 
             return;
         }
 
-        if (this.props.monster_to_fight.id !== this.state.monster_to_fight_id && this.state.monster_to_fight_id !== 0) {
+        if (
+            this.props.monster_to_fight.id !== this.state.monster_to_fight_id &&
+            this.state.monster_to_fight_id !== 0
+        ) {
             this.setState({
-                monster_to_fight_id: this.props.monster_to_fight.id
+                monster_to_fight_id: this.props.monster_to_fight.id,
             });
 
             this.setUpBattle();
@@ -92,82 +105,119 @@ export default class FightSection extends React.Component<FightSectionProps, Fig
         }
 
         if (this.props.character_revived) {
-            this.setState({
-                character_current_health: this.props.character?.health,
-                character_max_health: this.props.character?.health,
-                battle_messages: [],
-            }, () => {
-                this.props.reset_revived();
-            });
+            this.setState(
+                {
+                    character_current_health: this.props.character?.health,
+                    character_max_health: this.props.character?.health,
+                    battle_messages: [],
+                },
+                () => {
+                    this.props.reset_revived();
+                }
+            );
         }
     }
 
     setUpBattle() {
-
         if (this.props.character == null) {
             return;
         }
 
-        this.setState({
-            setting_up_regular_fight: true,
-            show_clear_message: true,
-            error_message: '',
-        }, () => {
-            (new Ajax).setRoute('setup-monster-fight/'+this.props.character.id+'/' + this.props.monster_to_fight.id)
-                  .setParameters({attack_type: 'attack'})
-                  .doAjaxCall('get', (result: AxiosResponse) => {
-                    this.setState({
-                        battle_messages: result.data.opening_messages,
-                        character_current_health: result.data.health.current_character_health,
-                        character_max_health: result.data.health.max_character_health,
-                        monster_current_health: result.data.health.current_monster_health,
-                        monster_max_health: result.data.health.max_monster_health,
-                        monster_to_fight_id: result.data.monster.id,
-                        setting_up_regular_fight: false,
-                    });
-                  }, (error: AxiosError) => {
-                    console.log(error);
-                  });
-        })
+        this.setState(
+            {
+                setting_up_regular_fight: true,
+                show_clear_message: true,
+                error_message: "",
+            },
+            () => {
+                new Ajax()
+                    .setRoute(
+                        "setup-monster-fight/" +
+                            this.props.character.id +
+                            "/" +
+                            this.props.monster_to_fight.id
+                    )
+                    .setParameters({ attack_type: "attack" })
+                    .doAjaxCall(
+                        "get",
+                        (result: AxiosResponse) => {
+                            this.setState({
+                                battle_messages: result.data.opening_messages,
+                                character_current_health:
+                                    result.data.health.current_character_health,
+                                character_max_health:
+                                    result.data.health.max_character_health,
+                                monster_current_health:
+                                    result.data.health.current_monster_health,
+                                monster_max_health:
+                                    result.data.health.max_monster_health,
+                                monster_to_fight_id: result.data.monster.id,
+                                setting_up_regular_fight: false,
+                            });
+                        },
+                        (error: AxiosError) => {
+                            console.error(error);
+                        }
+                    );
+            }
+        );
     }
 
     attack(attackType: string) {
-
         if (this.props.is_rank_fight) {
             return this.props.process_rank_fight(this, attackType);
         }
 
-        this.setState({
-            processing_regular_fight: true,
-            error_message: '',
-        }, () => {
-            (new Ajax).setRoute('monster-fight/'+this.props.character.id)
-                      .setParameters({attack_type: attackType})
-                      .doAjaxCall('post', (result: AxiosResponse) => {
-                        this.setState({
-                            battle_messages: result.data.messages,
-                            character_current_health: result.data.health.current_character_health < 0 ? 0 : result.data.health.current_character_health,
-                            monster_current_health: result.data.health.current_monster_health < 0 ? 0 : result.data.health.current_monster_health,
-                            processing_regular_fight: false,
-                        })
-                      }, (error: AxiosError) => {
-                        if (typeof error.response !== 'undefined') {
-                            const response = error.response;
-
+        this.setState(
+            {
+                processing_regular_fight: true,
+                error_message: "",
+            },
+            () => {
+                new Ajax()
+                    .setRoute("monster-fight/" + this.props.character.id)
+                    .setParameters({ attack_type: attackType })
+                    .doAjaxCall(
+                        "post",
+                        (result: AxiosResponse) => {
                             this.setState({
-                                error_message: response.data.message,
+                                battle_messages: result.data.messages,
+                                character_current_health:
+                                    result.data.health
+                                        .current_character_health < 0
+                                        ? 0
+                                        : result.data.health
+                                              .current_character_health,
+                                monster_current_health:
+                                    result.data.health.current_monster_health <
+                                    0
+                                        ? 0
+                                        : result.data.health
+                                              .current_monster_health,
                                 processing_regular_fight: false,
-                            })
+                            });
+                        },
+                        (error: AxiosError) => {
+                            if (typeof error.response !== "undefined") {
+                                const response = error.response;
+
+                                this.setState({
+                                    error_message: response.data.message,
+                                    processing_regular_fight: false,
+                                });
+                            }
                         }
-                      });
-        });
+                    );
+            }
+        );
     }
 
     attackButtonDisabled() {
-
         if (this.props.is_rank_fight) {
-
-            if (this.props.character?.is_dead || !this.props.character?.can_attack) {
+            if (
+                this.props.character?.is_dead ||
+                !this.props.character?.can_attack
+            ) {
                 return true;
             }
 
@@ -178,96 +228,160 @@ export default class FightSection extends React.Component<FightSectionProps, Fig
             return false;
         }
 
-        if (typeof this.state.character_current_health === 'undefined') {
+        if (typeof this.state.character_current_health === "undefined") {
             return true;
         }
 
-        return this.state.monster_current_health <= 0 || this.state.character_current_health <= 0 || this.props.character?.is_dead || !this.props.character?.can_attack
+        return (
+            this.state.monster_current_health <= 0 ||
+            this.state.character_current_health <= 0 ||
+            this.props.character?.is_dead ||
+            !this.props.character?.can_attack
+        );
     }
 
     clearBattleMessages() {
         this.setState({
             battle_messages: [],
-            monster_max_health: this.state.monster_current_health <= 0 ? 0 : this.state.monster_max_health,
-            show_clear_message: this.state.monster_current_health <= 0 ? false : true,
-        })
+            monster_max_health:
+                this.state.monster_current_health <= 0
+                    ? 0
+                    : this.state.monster_max_health,
+            show_clear_message:
+                this.state.monster_current_health <= 0 ? false : true,
+        });
     }
 
     render() {
         if (this.state.setting_up_regular_fight) {
-            return <LoadingProgressBar />
+            return <LoadingProgressBar />;
         }
 
-        if (this.state.error_message !== '') {
+        if (this.state.error_message !== "") {
             return (
-                <div className='ml-auto mr-auto my-4 md:max-w-[75%]'>
-                    <DangerAlert>
-                        {this.state.error_message}
-                    </DangerAlert>
+                <div className="ml-auto mr-auto my-4 md:max-w-[75%]">
+                    <DangerAlert>{this.state.error_message}</DangerAlert>
                 </div>
             );
         }
 
         return (
-            <div className={clsx({'ml-[-100px]': !this.props.is_small})}>
-                <div className={clsx('mt-4 mb-4 text-xs text-center', {
-                    'hidden': this.attackButtonDisabled(),
-                    'ml-[50px]': !this.props.is_small && !this.props.is_rank_fight
-                })}>
+            <div className={clsx({ "ml-[-100px]": !this.props.is_small })}>
+                <div
+                    className={clsx("mt-4 mb-4 text-xs text-center", {
+                        hidden: this.attackButtonDisabled(),
+                        "ml-[50px]":
+                            !this.props.is_small && !this.props.is_rank_fight,
+                    })}
+                >
+                    <AttackButton
+                        is_small={this.props.is_small}
+                        type={"Atk"}
+                        additional_css={"btn-attack"}
+                        icon_class={"ra ra-sword"}
+                        on_click={() => this.attack("attack")}
+                        disabled={this.attackButtonDisabled()}
+                    />
+                    <AttackButton
+                        is_small={this.props.is_small}
+                        type={"Cast"}
+                        additional_css={"btn-cast"}
+                        icon_class={"ra ra-burning-book"}
+                        on_click={() => this.attack("cast")}
+                        disabled={this.attackButtonDisabled()}
+                    />
+                    <AttackButton
+                        is_small={this.props.is_small}
+                        type={"Cast & Atk"}
+                        additional_css={"btn-cast-attack"}
+                        icon_class={"ra ra-lightning-sword"}
+                        on_click={() => this.attack("cast_and_attack")}
+                        disabled={this.attackButtonDisabled()}
+                    />
+                    <AttackButton
+                        is_small={this.props.is_small}
+                        type={"Atk & Cast"}
+                        additional_css={"btn-attack-cast"}
+                        icon_class={"ra ra-lightning-sword"}
+                        on_click={() => this.attack("attack_and_cast")}
+                        disabled={this.attackButtonDisabled()}
+                    />
+                    <AttackButton
+                        is_small={this.props.is_small}
+                        type={"Defend"}
+                        additional_css={"btn-defend"}
+                        icon_class={"ra ra-round-shield"}
+                        on_click={() => this.attack("defend")}
+                        disabled={this.attackButtonDisabled()}
+                    />
 
-                    <AttackButton is_small={this.props.is_small} type={'Atk'} additional_css={'btn-attack'} icon_class={'ra ra-sword'} on_click={() => this.attack('attack')} disabled={this.attackButtonDisabled()}/>
-                    <AttackButton is_small={this.props.is_small} type={'Cast'} additional_css={'btn-cast'} icon_class={'ra ra-burning-book'} on_click={() => this.attack('cast')} disabled={this.attackButtonDisabled()}/>
-                    <AttackButton is_small={this.props.is_small} type={'Cast & Atk'} additional_css={'btn-cast-attack'} icon_class={'ra ra-lightning-sword'} on_click={() => this.attack('cast_and_attack')} disabled={this.attackButtonDisabled()}/>
-                    <AttackButton is_small={this.props.is_small} type={'Atk & Cast'} additional_css={'btn-attack-cast'} icon_class={'ra ra-lightning-sword'} on_click={() => this.attack('attack_and_cast')} disabled={this.attackButtonDisabled()}/>
-                    <AttackButton is_small={this.props.is_small} type={'Defend'} additional_css={'btn-defend'} icon_class={'ra ra-round-shield'} on_click={() => this.attack('defend')} disabled={this.attackButtonDisabled()}/>
-
-                    {
-                        !this.props.is_rank_fight ?
-                            <a href='/information/combat' target='_blank' className='ml-2'>Help <i
-                                className="fas fa-external-link-alt"></i></a>
-                        : null
-                    }
-
+                    {!this.props.is_rank_fight ? (
+                        <a
+                            href="/information/combat"
+                            target="_blank"
+                            className="ml-2"
+                        >
+                            Help <i className="fas fa-external-link-alt"></i>
+                        </a>
+                    ) : null}
                 </div>
-                <div className={clsx('mt-1 text-xs text-center ml-[-50px] lg:ml-0', { 'hidden': this.attackButtonDisabled() })}>
-                    <span className={'w-10 mr-4 ml-4'}>Atk</span>
-                    <span className={'w-10 ml-6'}>Cast</span>
-                    <span className={'w-10 ml-4'}>Cast & Atk</span>
-                    <span className={'w-10 ml-2'}>Atk & Cast</span>
-                    <span className={'w-10 ml-2'}>Defend</span>
+                <div
+                    className={clsx(
+                        "mt-1 text-xs text-center ml-[-50px] lg:ml-0",
+                        { hidden: this.attackButtonDisabled() }
+                    )}
+                >
+                    <span className={"w-10 mr-4 ml-4"}>Atk</span>
+                    <span className={"w-10 ml-6"}>Cast</span>
+                    <span className={"w-10 ml-4"}>Cast & Atk</span>
+                    <span className={"w-10 ml-2"}>Atk & Cast</span>
+                    <span className={"w-10 ml-2"}>Defend</span>
                 </div>
-                {
-                    this.state.processing_rank_battle || this.state.processing_regular_fight ?
-                        <div className='w-1/2 mx-auto'>
-                            <LoadingProgressBar />
-                        </div>
-                    : null
-                }
-                {
-                    this.attackButtonDisabled() && this.state.show_clear_message ?
-                        <div className='text-center mt-4'>
-                            <button onClick={this.clearBattleMessages.bind(this)}
-                                    className='text-red-500 dark:text-red-400 underline hover:text-red-600 dark:hover:text-red-500'>
-                                Clear
-                            </button>
-                        </div>
-                    : null
-                }
-                {
-                    this.state.monster_max_health > 0 && this.props.character !== null ?
-                        <div className={clsx('mb-4 max-w-md m-auto', {
-                            'mt-4': this.attackButtonDisabled()
-                        })}>
-                            <HealthMeters is_enemy={true} name={this.props.monster_to_fight.name} current_health={this.state.monster_current_health} max_health={this.state.monster_max_health} />
-                            <HealthMeters is_enemy={false} name={this.props.character.name} current_health={this.state.character_current_health} max_health={this.state.character_max_health} />
-                        </div>
-                    : null
-                }
-                <div className='italic text-center'>
-                    <BattleMesages battle_messages={this.state.battle_messages} is_small={this.props.is_small} />
+                {this.state.processing_rank_battle ||
+                this.state.processing_regular_fight ? (
+                    <div className="w-1/2 mx-auto">
+                        <LoadingProgressBar />
+                    </div>
+                ) : null}
+                {this.attackButtonDisabled() &&
+                this.state.show_clear_message ? (
+                    <div className="text-center mt-4">
+                        <button
+                            onClick={this.clearBattleMessages.bind(this)}
+                            className="text-red-500 dark:text-red-400 underline hover:text-red-600 dark:hover:text-red-500"
+                        >
+                            Clear
+                        </button>
+                    </div>
+                ) : null}
+                {this.state.monster_max_health > 0 &&
+                this.props.character !== null ? (
+                    <div
+                        className={clsx("mb-4 max-w-md m-auto", {
+                            "mt-4": this.attackButtonDisabled(),
+                        })}
+                    >
+                        <HealthMeters
+                            is_enemy={true}
+                            name={this.props.monster_to_fight.name}
+                            current_health={this.state.monster_current_health}
+                            max_health={this.state.monster_max_health}
+                        />
+                        <HealthMeters
+                            is_enemy={false}
+                            name={this.props.character.name}
+                            current_health={this.state.character_current_health}
+                            max_health={this.state.character_max_health}
+                        />
+                    </div>
+                ) : null}
+                <div className="italic text-center">
+                    <BattleMesages
+                        battle_messages={this.state.battle_messages}
+                        is_small={this.props.is_small}
+                    />
                 </div>
             </div>
-        )
+        );
     }
-
 }

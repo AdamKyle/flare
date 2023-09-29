@@ -163,7 +163,6 @@ class BattleDrop {
 
             if ($canGetQuestItem && !$returnItem) {
                 $this->attemptToPickUpItem($character, $this->monster->questItem);
-
             } else if ($canGetQuestItem && $returnItem) {
                 return $this->monster->questItem;
             }

@@ -67,6 +67,9 @@ class Kernel extends ConsoleKernel {
 
         // Reset raid attacks every day.
         $schedule->command('reset:daily-raid-attack-limits')->dailyAt('04:00')->timezone(config('app.timezone'));
+
+        // process and start any scheduled events.
+        $schedule->command('process:scheduled-events')->everyFiveMinutes()->timezone(config('app.timezone'));
     }
 
     /**

@@ -29,7 +29,7 @@ class InitiateWeeklyCurrencyDropEvent implements ShouldQueue {
      * @param int $eventId
      */
     public function __construct(int $eventId) {
-        $this->eventId   = $eventId;
+        $this->eventId = $eventId;
     }
 
     /**
@@ -50,7 +50,7 @@ class InitiateWeeklyCurrencyDropEvent implements ShouldQueue {
             'ends_at'    => now()->addDay()
         ]);
 
-        WeeklyCurrencyEventJob::dispatch()->delay(now()->addMinutes(15))->onConnection('weekly_spawn');
+        WeeklyCurrencyEventJob::dispatch()->delay(now()->addMinutes(15))->onConnection('weekly_events');
 
         event(new GlobalMessageEvent('Currencies are dropping like crazy! Shards, Copper Coins (for those with the quest item) and
         Gold Dust are falling off the enemies for one day only! At a rate of 1-50 per currency type.'));

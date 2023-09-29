@@ -28,8 +28,6 @@ import { getRemainingTime } from "../../lib/helpers/time-left-seconds";
 export default class MapSection extends React.Component<MapProps, MapState> {
     private mapTimeOut: any;
 
-    private traverseUpdate: any;
-
     private explorationTimeOut: any;
 
     private globalMapUpdate: any;
@@ -93,11 +91,6 @@ export default class MapSection extends React.Component<MapProps, MapState> {
         );
 
         // @ts-ignore
-        this.traverseUpdate = Echo.private(
-            "update-plane-" + this.props.user_id
-        );
-
-        // @ts-ignore
         this.npcKingdomsUpdate = Echo.join("npc-kingdoms-update");
 
         // @ts-ignore
@@ -110,7 +103,6 @@ export default class MapSection extends React.Component<MapProps, MapState> {
     }
 
     componentDidMount() {
-        console.log(this.props.map_data);
         if (this.props.map_data !== null) {
             this.setState({ ...this.props.map_data }, () => {
                 this.updateTimers();
@@ -126,17 +118,6 @@ export default class MapSection extends React.Component<MapProps, MapState> {
                     time_left: event.forLength,
                     can_player_move: event.canMove,
                 });
-            }
-        );
-
-        this.traverseUpdate.listen(
-            "Game.Maps.Events.UpdateMap",
-            (event: any) => {
-                this.setStateFromData(event.mapDetails);
-
-                this.props.update_character_quests_plane(
-                    event.mapDetails.character_map.game_map.name
-                );
             }
         );
 
@@ -231,6 +212,12 @@ export default class MapSection extends React.Component<MapProps, MapState> {
 
                 this.setState({ loading: false });
             });
+        }
+
+        if (this.props.map_data !== null) {
+            if (this.props.map_data.map_url !== this.state.map_url) {
+                this.setState({ ...this.props.map_data });
+            }
         }
     }
 
