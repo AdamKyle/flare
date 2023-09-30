@@ -68,6 +68,10 @@ export default class GuideQuest extends React.Component<any, any> {
             return "One moment ...";
         }
 
+        if (this.state.quest_data === null) {
+            return "Guide Quest";
+        }
+
         return this.state.quest_data.name;
     }
 
@@ -103,7 +107,16 @@ export default class GuideQuest extends React.Component<any, any> {
                                     result.data.completed_requirements,
                             });
                         },
-                        (error: AxiosError) => {}
+                        (error: AxiosError) => {
+                            if (typeof error.response !== "undefined") {
+                                const response = error.response;
+
+                                this.setState({
+                                    error_message: response.data.message,
+                                    is_handing_in: false,
+                                });
+                            }
+                        }
                     );
             }
         );
@@ -184,7 +197,7 @@ export default class GuideQuest extends React.Component<any, any> {
                     secondary_button_disabled: !this.state.can_hand_in,
                     handle_action: this.handInQuest.bind(this),
                 }}
-                medium_modal={true}
+                medium_modal={this.state.quest_data !== null}
                 primary_button_disabled={this.state.action_loading}
             >
                 {this.state.loading && this.state.quest_data === null ? (
@@ -192,11 +205,12 @@ export default class GuideQuest extends React.Component<any, any> {
                         <ComponentLoading />
                     </div>
                 ) : this.state.quest_data === null ? (
-                    <div className="text-center">
+                    <div className="my-4 text-orange-500 dark:text-orange-300">
                         <p>
                             You have completed all the current Guide Quests.
                             When new features are released there will be more
-                            guide quests for you!
+                            Guide Quests for you to walk you through new
+                            features!
                         </p>
                     </div>
                 ) : (

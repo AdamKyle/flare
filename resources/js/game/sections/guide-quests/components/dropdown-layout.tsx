@@ -37,11 +37,6 @@ export default class DropDownLayout extends React.Component<
                 icon_class: "fas fa-info-circle",
                 on_click: () => this.switchInformation("instructions"),
             },
-            // {
-            //     name: "Desktop Instructions",
-            //     icon_class: "fas fa-desktop",
-            //     on_click: () => this.switchInformation("desktop_instructions"),
-            // },
             {
                 name: "Mobile Instructions",
                 icon_class: "fas fa-mobile",
@@ -59,7 +54,7 @@ export default class DropDownLayout extends React.Component<
             <Fragment>
                 <DropDown
                     menu_items={this.renderDropDownOptions()}
-                    button_title={"Guide Help"}
+                    button_title={"Instructions/Information"}
                     selected_name={this.state.section}
                 />
                 <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3"></div>

@@ -65,9 +65,9 @@ class GuideQuestsController extends Controller {
     protected function getNextQuest(Character $character, string $message = ''): JsonResponse {
         $data = $this->guideQuestService->fetchQuestForCharacter($character);
 
-        $quest = $data['quest'];
+        if (!is_null($data)) {
 
-        if (!is_null($quest)) {
+            $quest = $data['quest'];
 
             $quest->intro_text           = nl2br($quest->intro_text);
             $quest->instructions         = nl2br($quest->instructions);
@@ -92,8 +92,6 @@ class GuideQuestsController extends Controller {
             'can_hand_in'            => false,
             'completed_requirements' => [],
         ];
-
-        event(new RemoveGuideQuestButton($character->user));
 
         return response()->json($response);
     }

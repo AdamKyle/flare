@@ -97,6 +97,10 @@
                             <dt>Required Class Specials Equipped</dt>
                             <dd>{{ $guideQuest->required_class_specials_equipped }}</dd>
                         @endif
+                        @if (!is_null($guideQuest->required_class_rank_level))
+                            <dt>Required Current Class Rank Level</dt>
+                            <dd>{{ $guideQuest->required_class_rank_level }}</dd>
+                        @endif
                         @if (!is_null($guideQuest->required_stats))
                             <dt>Required Stats</dt>
                             <dd>{{ number_format($guideQuest->required_stats) }}</dd>

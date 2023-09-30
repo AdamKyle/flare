@@ -95,6 +95,7 @@ class GuideQuest extends Model {
         'required_mercenary_level'           => 'integer',
         'required_secondary_mercenary_level' => 'integer',
         'required_class_specials_equipped'   => 'integer',
+        'required_class_rank_level'          => 'integer',
         'required_stats'                     => 'integer',
         'required_str'                       => 'integer',
         'required_dex'                       => 'integer',

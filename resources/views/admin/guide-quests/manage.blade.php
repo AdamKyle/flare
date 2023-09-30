@@ -116,10 +116,11 @@
 
                                 <div class='border-b-2 block md:hidden border-b-gray-300 dark:border-b-gray-600 my-6'>
                                 </div>
-                                <h3 class="mb-3">Required Class Specials</h3>
+                                <h3 class="mb-3">Required Class Rank Details</h3>
                                 <x-core.forms.input :model="$guideQuest" label="Required # of class specials equipped:"
                                     modelKey="required_class_specials_equipped" name="required_class_specials_equipped" />
-
+                                <x-core.forms.input :model="$guideQuest" label="Required Class Rank Level:"
+                                    modelKey="required_class_specials_equipped" name="required_class_rank_level" />
                                 <div class='border-b-2 block md:hidden border-b-gray-300 dark:border-b-gray-600 my-6'>
                                 </div>
                                 <h3 class="mb-3">Required Currency Amounts</h3>

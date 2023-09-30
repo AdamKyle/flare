@@ -43,18 +43,20 @@ const guideQuestLabelBuilder = (
             );
         case "skill_type_name":
             return `Get Skill Type: ${questData.skill_type_name} to level`;
-        case "faction_name":
+        case "required_faction_id":
             return `Get Faction ${questData.faction_name} to level`;
         case "required_mercenary_type":
             return `Purchase Mercenary: ${questData.mercenary_name}`;
         case "required_secondary_mercenary_type":
             return `Purchase Secondary Mercenary: ${questData.secondary_mercenary_name}`;
         case "required_mercenary_level":
-             return `Get Mercenary ${questData.mercenary_name} to level`
+            return `Get Mercenary ${questData.mercenary_name} to level`;
         case "required_secondary_mercenary_level":
-             return `Get Secondary Mercenary ${questData.mercenary_name} to level`
+            return `Get Secondary Mercenary ${questData.mercenary_name} to level`;
         case "required_class_specials_equipped":
             return "Equip # of Class Specials";
+        case "required_class_rank_level":
+            return "Level Your Current Class Rank To Level:";
         case "required_kingdoms":
             return "Required Kingdom #";
         case "required_kingdom_level":
@@ -160,7 +162,7 @@ const getRequirementKey = (labelKey: string): string => {
             return "required_secondary_skill_level";
         case "required_skill_type":
             return "required_skill_type_level";
-        case "faction_name":
+        case "required_faction_id":
             return "required_faction_level";
         case "required_mercenary_type":
             return "required_mercenary_level";
