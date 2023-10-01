@@ -32,8 +32,6 @@ export default class Actions extends React.Component<
 
     private craftingTimeOut: any;
 
-    private monsterUpdate: any;
-
     private pvpUpdate: any;
 
     private duelOptions: any;
@@ -41,8 +39,6 @@ export default class Actions extends React.Component<
     private traverseUpdate: any;
 
     private manageRankFights: any;
-
-    private raidMonsterUpdate: any;
 
     constructor(props: ActionsProps) {
         super(props);
@@ -69,16 +65,6 @@ export default class Actions extends React.Component<
         };
 
         this.actionsManager = new ActionsManager(this);
-
-        // @ts-ignore
-        this.monsterUpdate = Echo.private(
-            "update-monsters-list-" + this.props.character.user_id
-        );
-
-        // @ts-ignore
-        this.raidMonsterUpdate = Echo.private(
-            "update-raid-monsters-list-" + this.props.character.user_id
-        );
 
         // @ts-ignore
         this.attackTimeOut = Echo.private(
@@ -128,25 +114,6 @@ export default class Actions extends React.Component<
             (event: any) => {
                 this.setState({
                     crafting_time_out: event.timeout,
-                });
-            }
-        );
-
-        // @ts-ignore
-        this.monsterUpdate.listen(
-            "Game.Maps.Events.UpdateMonsterList",
-            (event: any) => {
-                this.setState({
-                    monsters: event.monsters,
-                });
-            }
-        );
-
-        this.raidMonsterUpdate.listen(
-            "Game.Maps.Events.UpdateRaidMonsters",
-            (event: any) => {
-                this.setState({
-                    raid_monsters: event.raidMonsters,
                 });
             }
         );
@@ -227,11 +194,28 @@ export default class Actions extends React.Component<
                 ...{ loading: false },
             });
         }
+
+        if (this.props.action_data === null) {
+            return;
+        }
+
+        if (this.props.action_data.monsters != this.state.monsters) {
+            this.setState({
+                monsters: this.props.action_data.monsters,
+            });
+        }
+
+        if (this.props.action_data.raid_monsters != this.state.raid_monsters) {
+            this.setState({
+                raid_monsters: this.props.action_data.raid_monsters,
+            });
+        }
     }
 
     componentWillUnmount(): void {
         this.props.update_parent_state({
             monsters: this.state.monsters,
+            raid_monsters: this.state.raid_monsters,
             crafting_time_out: this.state.crafting_time_out,
             attack_time_out: this.state.attack_time_out,
             attack_time_out_started:
@@ -246,6 +230,7 @@ export default class Actions extends React.Component<
     }
 
     setUpState(): void {
+        console.log("Action SetUpState", this.props.action_data);
         if (this.props.action_data === null) {
             return;
         }
@@ -254,7 +239,25 @@ export default class Actions extends React.Component<
 
         actionData = getActionData(actionData);
 
-        this.setState({ ...this.state, ...actionData, ...{ loading: false } });
+        this.setState(
+            { ...this.state, ...actionData, ...{ loading: false } },
+            () => {
+                this.props.update_parent_state({
+                    monsters: this.state.monsters,
+                    raid_monsters: this.state.raid_monsters,
+                    crafting_time_out: this.state.crafting_time_out,
+                    attack_time_out: this.state.attack_time_out,
+                    attack_time_out_started:
+                        this.state.attack_time_out > 0
+                            ? DateTime.local().toSeconds()
+                            : 0,
+                    crafting_time_out_started:
+                        this.state.crafting_time_out > 0
+                            ? DateTime.local().toSeconds()
+                            : 0,
+                });
+            }
+        );
     }
 
     openCrafting(type: CraftingOptions) {

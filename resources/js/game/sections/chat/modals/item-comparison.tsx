@@ -173,7 +173,7 @@ export default class ItemComparison extends React.Component<any, any> {
 
     renderViewForType(type: string, holy_number?: number): JSX.Element {
         if (type === "alchemy") {
-            if (typeof holy_number !== "undefined") {
+            if (typeof holy_number !== "undefined" && holy_number !== null) {
                 return (
                     <AlchemyItemHoly
                         item={this.state.comparison_details.itemToEquip}

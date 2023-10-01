@@ -13,15 +13,15 @@ class RandomNumberGenerator {
      */
     public function generateRandomNumber(int $min = 1, int $max = 1000): int {
         $seed = mt_rand();
-        
+
         mt_srand($seed);
-    
+
         $randomNumbers = array();
-        
+
         for ($i = 0; $i < 10; $i++) {
             $randomNumbers[] = mt_rand($min, $max);
         }
-    
+
         $selectedNumberIndex = array_rand($randomNumbers);
 
         return $randomNumbers[$selectedNumberIndex];

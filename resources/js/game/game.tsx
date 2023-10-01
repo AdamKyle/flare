@@ -60,6 +60,10 @@ export default class Game extends React.Component<GameProps, GameState> {
 
     private traverseUpdate: any;
 
+    private monsterUpdate: any;
+
+    private raidMonsterUpdate: any;
+
     constructor(props: GameProps) {
         super(props);
 
@@ -112,6 +116,16 @@ export default class Game extends React.Component<GameProps, GameState> {
 
         // @ts-ignore
         this.traverseUpdate = Echo.private("update-plane-" + this.props.userId);
+
+        // @ts-ignore
+        this.monsterUpdate = Echo.private(
+            "update-monsters-list-" + this.props.userId
+        );
+
+        // @ts-ignore
+        this.raidMonsterUpdate = Echo.private(
+            "update-raid-monsters-list-" + this.props.userId
+        );
 
         // @ts-ignore
         this.characterTopBar = Echo.private(
@@ -240,6 +254,41 @@ export default class Game extends React.Component<GameProps, GameState> {
             (event: any) => {
                 this.setState({
                     character: { ...this.state.character, ...event.currencies },
+                });
+            }
+        );
+
+        // @ts-ignore
+        this.monsterUpdate.listen(
+            "Game.Maps.Events.UpdateMonsterList",
+            (event: any) => {
+                console.log("Event Action Data State", this.state.action_data);
+                console.log("Event Data", event);
+                if (this.state.action_data === null) {
+                    return;
+                }
+
+                this.setState({
+                    action_data: {
+                        ...this.state.action_data,
+                        monsters: event.monsters,
+                    },
+                });
+            }
+        );
+
+        this.raidMonsterUpdate.listen(
+            "Game.Maps.Events.UpdateRaidMonsters",
+            (event: any) => {
+                if (this.state.action_data === null) {
+                    return;
+                }
+
+                this.setState({
+                    action_data: {
+                        ...this.state.action_data,
+                        raid_monsters: event.raidMonsters,
+                    },
                 });
             }
         );

@@ -31,8 +31,6 @@ export default class SmallerActions extends React.Component<
 
     private mapTimeOut: any;
 
-    private monsterUpdate: any;
-
     private pvpUpdate: any;
 
     private duelOptions: any;
@@ -44,8 +42,6 @@ export default class SmallerActions extends React.Component<
     private celestialTimeout: any;
 
     private manageRankFights: any;
-
-    private raidMonsterUpdate: any;
 
     constructor(props: SmallActionsProps) {
         super(props);
@@ -96,11 +92,6 @@ export default class SmallerActions extends React.Component<
         );
 
         // @ts-ignore
-        this.monsterUpdate = Echo.private(
-            "update-monsters-list-" + this.props.character.user_id
-        );
-
-        // @ts-ignore
         this.pvpUpdate = Echo.private(
             "update-pvp-attack-" + this.props.character.user_id
         );
@@ -113,11 +104,6 @@ export default class SmallerActions extends React.Component<
         // @ts-ignore
         this.manageRankFights = Echo.private(
             "update-rank-fight-" + this.props.character.user_id
-        );
-
-        // @ts-ignore
-        this.raidMonsterUpdate = Echo.private(
-            "update-raid-monsters-list-" + this.props.character.user_id
         );
 
         // @ts-ignore
@@ -170,16 +156,6 @@ export default class SmallerActions extends React.Component<
             (event: any) => {
                 this.setState({
                     movement_time_left: event.forLength,
-                });
-            }
-        );
-
-        // @ts-ignore
-        this.monsterUpdate.listen(
-            "App.Game.Maps.Events.UpdateMonsterList",
-            (event: any) => {
-                this.setState({
-                    monsters: event.monster,
                 });
             }
         );
@@ -238,15 +214,6 @@ export default class SmallerActions extends React.Component<
                 });
             }
         );
-
-        this.raidMonsterUpdate.listen(
-            "Game.Maps.Events.UpdateRaidMonsters",
-            (event: any) => {
-                this.setState({
-                    raid_monsters: event.raidMonsters,
-                });
-            }
-        );
     }
 
     componentDidUpdate(
@@ -258,10 +225,44 @@ export default class SmallerActions extends React.Component<
             this.props.action_data !== null &&
             this.state.monsters.length === 0
         ) {
+            this.setState(
+                {
+                    ...this.state,
+                    ...this.props.action_data,
+                    ...{ loading: false },
+                },
+                () => {
+                    this.props.update_parent_state({
+                        monsters: this.state.monsters,
+                        raid_monsters: this.state.raid_monsters,
+                        crafting_time_out: this.state.crafting_time_out,
+                        attack_time_out: this.state.attack_time_out,
+                        attack_time_out_started:
+                            this.state.attack_time_out > 0
+                                ? DateTime.local().toSeconds()
+                                : 0,
+                        crafting_time_out_started:
+                            this.state.crafting_time_out > 0
+                                ? DateTime.local().toSeconds()
+                                : 0,
+                    });
+                }
+            );
+        }
+
+        if (this.props.action_data === null) {
+            return;
+        }
+
+        if (this.props.action_data.monsters != this.state.monsters) {
             this.setState({
-                ...this.state,
-                ...this.props.action_data,
-                ...{ loading: false },
+                monsters: this.props.action_data.monsters,
+            });
+        }
+
+        if (this.props.action_data.raid_monsters != this.state.raid_monsters) {
+            this.setState({
+                raid_monsters: this.props.action_data.raid_monsters,
             });
         }
     }
@@ -269,6 +270,7 @@ export default class SmallerActions extends React.Component<
     componentWillUnmount(): void {
         this.props.update_parent_state({
             monsters: this.state.monsters,
+            raid_monsters: this.state.raid_monsters,
             crafting_time_out: this.state.crafting_time_out,
             attack_time_out: this.state.attack_time_out,
             crafting_time_out_started:

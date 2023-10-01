@@ -76,11 +76,11 @@ class GuideQuestService {
         }
 
         if ($quest->gold_dust_reward > 0) {
-            event(new ServerMessageEvent($character->user, 'Rewarded with: ' . number_format($quest->gold_reward) . ' Gold.'));
+            event(new ServerMessageEvent($character->user, 'Rewarded with: ' . number_format($quest->gold_dust_reward) . ' Gold Dust.'));
         }
 
         if ($quest->shards_reward > 0) {
-            event(new ServerMessageEvent($character->user, 'Rewarded with: ' . number_format($quest->gold_reward) . ' Gold.'));
+            event(new ServerMessageEvent($character->user, 'Rewarded with: ' . number_format($quest->shards_reward) . ' Shards.'));
         }
 
 
@@ -157,6 +157,7 @@ class GuideQuestService {
             ->requiredTotalStats($character, $quest, $stats)
             ->requiredStats($character, $quest, $stats)
             ->requiredClassRanksEquipped($character, $quest)
+            ->requiredClassRankLevel($character, $quest)
             ->getFinishedRequirements();
 
         if (!empty($this->completedAttributes)) {

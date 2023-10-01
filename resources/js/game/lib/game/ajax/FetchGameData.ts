@@ -1,7 +1,7 @@
 import { setDefaultResultOrder } from "dns";
 import Game from "../../../game";
 import Ajax from "../../ajax/ajax";
-import {AxiosResponse} from "axios";
+import { AxiosResponse } from "axios";
 import { calculateTimeLeft } from "../../helpers/time-calculator";
 import MapStateManager from "../map/state/map-state-manager";
 
@@ -9,13 +9,13 @@ export default class FetchGameData {
 
     private component: Game;
 
-    private urls?: {url: string, name: string}[];
+    private urls?: { url: string, name: string }[];
 
     constructor(component: Game) {
-        this.component   = component;
+        this.component = component;
     }
 
-    setUrls(urls: {url: string, name: string}[]): FetchGameData {
+    setUrls(urls: { url: string, name: string }[]): FetchGameData {
         this.urls = urls;
 
         return this;
@@ -29,7 +29,7 @@ export default class FetchGameData {
 
         this.urls.forEach((url) => {
             (new Ajax()).setRoute(url.url).doAjaxCall('get', (result: AxiosResponse) => {
-                switch(url.name) {
+                switch (url.name) {
                     case 'character-sheet':
                         return this.setCharacterSheet(result);
                     case 'actions':
@@ -49,7 +49,7 @@ export default class FetchGameData {
         });
     }
 
-    setCharacterSheet(result: AxiosResponse)  {
+    setCharacterSheet(result: AxiosResponse) {
 
         this.component.setState({
             character: result.data.sheet,
@@ -80,7 +80,7 @@ export default class FetchGameData {
         });
     }
 
-    setQuestData(result: AxiosResponse)  {
+    setQuestData(result: AxiosResponse) {
         this.component.setState({
             quests: result.data,
             percentage_loaded: this.component.state.percentage_loaded + .20,
@@ -88,7 +88,7 @@ export default class FetchGameData {
         });
     }
 
-    setKingdomsData(result: AxiosResponse)  {
+    setKingdomsData(result: AxiosResponse) {
 
         this.component.setState({
             kingdoms: result.data.kingdoms,
@@ -108,6 +108,7 @@ export default class FetchGameData {
             percentage_loaded: this.component.state.percentage_loaded + .20,
             secondary_loading_title: 'Fetching Map Data ...',
             action_data: {
+                raid_monsters: [],
                 monsters: result.data.monsters,
                 attack_time_out: this.component.state.character.can_attack_again_at !== null ?
                     calculateTimeLeft(this.component.state.character.can_attack_again_at) : 0,

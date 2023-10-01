@@ -7,9 +7,11 @@ import PositionType from "./map/position-type";
 import KingdomLogDetails from "../kingdoms/kingdom-log-details";
 import MonsterType from "./actions/monster/monster-type";
 import MapState from "../../../sections/map/types/map-state";
+import RaidMonsterType from "./actions/monster/raid-monster-type";
 
 export type GameActionState = {
     monsters: MonsterType[];
+    raid_monsters: RaidMonsterType[] | [];
     attack_time_out: number;
     crafting_time_out: number;
     attack_time_out_started: number;

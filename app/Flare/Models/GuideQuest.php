@@ -48,6 +48,7 @@ class GuideQuest extends Model {
         'required_mercenary_level',
         'required_secondary_mercenary_level',
         'required_class_specials_equipped',
+        'required_class_rank_level',
         'required_gold',
         'required_gold_dust',
         'required_shards',
