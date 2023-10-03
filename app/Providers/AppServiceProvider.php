@@ -14,9 +14,9 @@ use App\Console\DevelopmentCommands\IncreaseRankFightToMax;
 use App\Console\DevelopmentCommands\AssignTopEndGearToPlayer;
 use App\Console\DevelopmentCommands\UpdateUsersForDevelopment;
 use App\Console\DevelopmentCommands\TestExploration;
+use Illuminate\Support\Facades\Blade;
 
-class AppServiceProvider extends ServiceProvider
-{
+class AppServiceProvider extends ServiceProvider {
     /**
      * Register any application services.
      *
@@ -46,6 +46,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void {
 
+        Blade::componentNamespace('App\\View\\Components', 'core');
+
         if ($this->app->environment('local')) {
             Mail::alwaysTo(env('DEFAULT_LOCAL_EMAIL'));
         }
@@ -54,7 +56,7 @@ class AppServiceProvider extends ServiceProvider
 
             $headers = [
                 'Content-type' => 'text/json',
-                'Content-Disposition' => "attachment; filename=".$fileName.".json",
+                'Content-Disposition' => "attachment; filename=" . $fileName . ".json",
             ];
 
             return \Response::make($content, 200, $headers);

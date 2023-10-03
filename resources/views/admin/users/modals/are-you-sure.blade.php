@@ -12,13 +12,11 @@
         </div>
         <div class="modal-footer">
             <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
-            <x-forms.button-with-form
+            <x-core.forms.button-with-form
                 form-route="{{route('user.ignore.unban.request', [
                     'user' => $character->user->id
                 ])}}"
-                form-id="{{$character->user->id}}-character-user"
                 button-title="Continue"
-                class="btn btn-primary"
             />
         </div>
         </div>
