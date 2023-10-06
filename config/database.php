@@ -142,7 +142,7 @@ return [
 
         'options' => [
             'cluster' => env('REDIS_CLUSTER', 'redis'),
-            'prefix' => env('REDIS_PREFIX', Str::slug(env('APP_NAME', 'laravel'), '_').'_database_'),
+            'prefix' => env('REDIS_PREFIX', Str::slug(env('APP_NAME', 'laravel'), '_') . '_database_'),
         ],
 
         'default' => [
@@ -177,12 +177,20 @@ return [
             'database' => env('REDIS_CACHE_DB', 3),
         ],
 
-        'weekly_events' => [
+        'weekly_spawns' => [
             'url' => env('REDIS_URL'),
             'host' => env('REDIS_HOST', '127.0.0.1'),
             'password' => env('REDIS_PASSWORD', null),
             'port' => env('REDIS_PORT', 6379),
             'database' => env('REDIS_CACHE_DB', 4),
+        ],
+
+        'weekly_events' => [
+            'url' => env('REDIS_URL'),
+            'host' => env('REDIS_HOST', '127.0.0.1'),
+            'password' => env('REDIS_PASSWORD', null),
+            'port' => env('REDIS_PORT', 6379),
+            'database' => env('REDIS_CACHE_DB', 5),
         ],
 
         'shop_buying' => [
@@ -190,7 +198,7 @@ return [
             'host' => env('REDIS_HOST', '127.0.0.1'),
             'password' => env('REDIS_PASSWORD', null),
             'port' => env('REDIS_PORT', 6379),
-            'database' => env('REDIS_CACHE_DB', 4),
+            'database' => env('REDIS_CACHE_DB', 6),
         ],
 
         'disenchanting' => [
@@ -198,7 +206,7 @@ return [
             'host' => env('REDIS_HOST', '127.0.0.1'),
             'password' => env('REDIS_PASSWORD', null),
             'port' => env('REDIS_PORT', 6379),
-            'database' => env('REDIS_CACHE_DB', 4),
+            'database' => env('REDIS_CACHE_DB', 7),
         ],
 
         'npc_commands' => [
@@ -206,7 +214,7 @@ return [
             'host' => env('REDIS_HOST', '127.0.0.1'),
             'password' => env('REDIS_PASSWORD', null),
             'port' => env('REDIS_PORT', 6379),
-            'database' => env('REDIS_CACHE_DB', 4),
+            'database' => env('REDIS_CACHE_DB', 8),
         ],
 
     ],
