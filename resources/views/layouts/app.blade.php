@@ -157,6 +157,10 @@
 
     <script src="{{ mix('js/admin-app.js') }}"></script>
 
+    <script>
+         window.APP_DEBUG = {{ config('app.debug') ? 'true' : 'false' }};
+    </script>
+
     @stack('scripts')
 </body>
 </html>
