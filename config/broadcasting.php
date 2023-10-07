@@ -41,6 +41,10 @@ return [
                 'port'   => 6001,
                 'scheme' => env('APP_ENV') === 'local' ? 'http' : 'https',
                 'useTLS' => env('APP_ENV') === 'local' ? false : true,
+                'curl_options' => [
+                    CURLOPT_SSL_VERIFYHOST => 0,
+                    CURLOPT_SSL_VERIFYPEER => 0,
+                ],
             ],
         ],
 
