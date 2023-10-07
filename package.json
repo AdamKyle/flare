@@ -65,7 +65,7 @@
         "postcss-import": "^14.0.2",
         "postcss-nested": "^5.0.5",
         "postcss-nesting": "^10.0.2",
-        "pusher-js": "8.3.0",
+        "pusher-js": "4.3.1",
         "random-js-no-node": "^2.1.0-b",
         "react-charts": "^3.0.0-beta.30",
         "react-data-table-component": "^7.5.0",
