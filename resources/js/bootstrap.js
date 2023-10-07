@@ -54,7 +54,7 @@ window.Echo = new Echo({
   wsPort: 6001,
   wssPort: 443,
   disableStats: true,
-  forceTLS: false,
+  forceTLS: true,
   enabledTransports: ['ws', 'wss'],
   namespace: 'App',
   auth: {
