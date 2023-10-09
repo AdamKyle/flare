@@ -47,12 +47,19 @@ Alpine.start();
 
 window.Pusher = require('pusher-js');
 
+let isEncrypted = false;
+
+if (window.location.protocol === 'https:') {
+    isEncrypted = true;
+}
+
 window.Echo = new Echo({
   broadcaster: 'pusher',
   key: process.env.MIX_PUSHER_APP_KEY,
   wsHost: window.location.hostname,
   wsPort: 6001,
   wssPort: 6001,
+  encrypted: isEncrypted,
   enabledTransports: ['ws', 'wss'],
   namespace: 'App',
   auth: {
