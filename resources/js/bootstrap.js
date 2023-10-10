@@ -60,7 +60,6 @@ window.Echo = new Echo({
   wsPort: 6001,
   wssPort: 6001,
   encrypted: isEncrypted,
-  forceTLS: false,
   enabledTransports: ['ws', 'wss'],
   namespace: 'App',
   auth: {
