@@ -7,7 +7,7 @@ use App\Flare\Models\Character;
 use Illuminate\Console\Command;
 
 class CreateCharacterAttackDataCache extends Command {
-    
+
     /**
      * The name and signature of the console command.
      *
@@ -27,8 +27,7 @@ class CreateCharacterAttackDataCache extends Command {
      *
      * @return void
      */
-    public function __construct()
-    {
+    public function __construct() {
         parent::__construct();
     }
 
@@ -37,12 +36,11 @@ class CreateCharacterAttackDataCache extends Command {
      *
      * @return mixed
      */
-    public function handle()
-    {
+    public function handle() {
 
         $this->line('Creating Character Attack Data Jobs...');
 
-        Character::chunkById(100, function($characters) {
+        Character::chunkById(100, function ($characters) {
             foreach ($characters as $character) {
                 CreateCharacterAttackData::dispatch($character->id)->onConnection('long_running');
             }
