@@ -171,7 +171,7 @@
 
                     <x-core.buttons.link-buttons.primary-button
                         href="{{ route('info.page', [
-                            'pageName' => 'rank-fights',
+                            'pageName' => 'ranked-fights',
                         ]) }}">
                         Learn more
                     </x-core.buttons.link-buttons.primary-button>
@@ -327,7 +327,7 @@
             <h4 class="mb-5 font-thin text-3xl dark:text-gray-300 text-gray-800">And so many more!</h1>
                 <p class="mb-10 dark:text-gray-300 text-gray-800 italic">Planes of tlessa has so many rich and diverse
                     features its hard to showcase them all!</p>
-                <div class="text-center w-1/3 mr-auto ml-auto">
+                <div class="text-center w-full lg:w-1/3 mr-auto ml-auto">
                     <x-core.buttons.link-buttons.success-button css="mr-2" href="{{ route('game.features') }}">
                         See all the features
                     </x-core.buttons.link-buttons.success-button>
