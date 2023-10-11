@@ -51,8 +51,8 @@ window.Echo = new Echo({
   broadcaster: 'pusher',
   key: process.env.MIX_PUSHER_APP_KEY,
   wsHost: window.location.hostname,
-  wsPort: process.env.MIX_PUSHER_APP_PORT,
-  wssPort: process.env.MIX_PUSHER_APP_PORT,
+  wsPort: 6001,
+  wssPort: 6001,
   enabledTransports: ['ws', 'wss'],
   namespace: 'App',
   auth: {
