@@ -8,7 +8,7 @@ use App\Http\Controllers\Controller;
 
 class TimersController extends Controller {
 
-    public function updateTimersCharacter(Character $character) {
+    public function updateTimersForCharacter(Character $character) {
         $characterAutomation = $character->currentAutomations()->first();
 
         if ($characterAutomation) {
