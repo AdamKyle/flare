@@ -7,4 +7,6 @@ export default interface GuideQuestLayoutProps {
     desktop_instructions: string;
 
     mobile_instructions: string;
+
+    is_small: boolean;
 }

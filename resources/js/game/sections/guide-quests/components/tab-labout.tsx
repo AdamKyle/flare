@@ -3,7 +3,10 @@ import Tabs from "../../../components/ui/tabs/tabs";
 import TabPanel from "../../../components/ui/tabs/tab-panel";
 import GuideQuestLayoutProps from "./types/guide-quest-layout-props";
 
-export default class TabLayout extends React.Component<GuideQuestLayoutProps, {}> {
+export default class TabLayout extends React.Component<
+    GuideQuestLayoutProps,
+    {}
+> {
     private tabs: { name: string; key: string }[];
 
     constructor(props: GuideQuestLayoutProps) {
@@ -23,6 +26,15 @@ export default class TabLayout extends React.Component<GuideQuestLayoutProps, {}
                 name: "Desktop Instructions",
             },
         ];
+
+        if (this.props.is_small) {
+            this.tabs.pop();
+
+            this.tabs.push({
+                key: "mobile-instructions",
+                name: "Mobile Instructions",
+            });
+        }
     }
 
     render() {

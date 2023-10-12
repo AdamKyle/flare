@@ -262,35 +262,17 @@ export default class GuideQuest extends React.Component<any, any> {
                             </p>
                         ) : null}
 
-                        <div className="lg:hidden block">
-                            <DropDownLayout
-                                intro_text={this.state.quest_data.intro_text}
-                                instructions={
-                                    this.state.quest_data.instructions
-                                }
-                                desktop_instructions={
-                                    this.state.quest_data.desktop_instructions
-                                }
-                                mobile_instructions={
-                                    this.state.quest_data.mobile_instructions
-                                }
-                            />
-                        </div>
-
-                        <div className="lg:block hidden">
-                            <TabLayout
-                                intro_text={this.state.quest_data.intro_text}
-                                instructions={
-                                    this.state.quest_data.instructions
-                                }
-                                desktop_instructions={
-                                    this.state.quest_data.desktop_instructions
-                                }
-                                mobile_instructions={
-                                    this.state.quest_data.mobile_instructions
-                                }
-                            />
-                        </div>
+                        <TabLayout
+                            intro_text={this.state.quest_data.intro_text}
+                            instructions={this.state.quest_data.instructions}
+                            desktop_instructions={
+                                this.state.quest_data.desktop_instructions
+                            }
+                            mobile_instructions={
+                                this.state.quest_data.mobile_instructions
+                            }
+                            is_small={this.props.view_port < 1600}
+                        />
 
                         <p className={"mt-4 mb-4"}>
                             The Hand in button will become available when you

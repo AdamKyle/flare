@@ -1,6 +1,7 @@
 import React, { Fragment } from "react";
 import SuccessOutlineButton from "../../components/ui/buttons/success-outline-button";
 import GuideQuest from "./modals/guide-quest";
+import { viewPortWatcher } from "../../lib/view-port-watcher";
 
 export default class GuideButton extends React.Component<any, any> {
     private guideQuestButton: any;
@@ -11,6 +12,7 @@ export default class GuideButton extends React.Component<any, any> {
         this.state = {
             is_modal_open: false,
             show_button: true,
+            view_port: 0,
         };
 
         // @ts-ignore
@@ -20,6 +22,8 @@ export default class GuideButton extends React.Component<any, any> {
     }
 
     componentDidMount() {
+        viewPortWatcher(this);
+
         const self = this;
 
         setTimeout(function () {
@@ -65,6 +69,7 @@ export default class GuideButton extends React.Component<any, any> {
                         is_open={this.state.is_modal_open}
                         manage_modal={this.manageGuideQuestModal.bind(this)}
                         user_id={this.props.user_id}
+                        view_port={this.state.view_port}
                     />
                 ) : null}
             </Fragment>
