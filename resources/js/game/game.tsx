@@ -621,6 +621,8 @@ export default class Game extends React.Component<GameProps, GameState> {
             return this.renderLoading();
         }
 
+        console.log(this.state.action_data);
+
         return (
             <Fragment>
                 <ScreenRefresh user_id={this.state.character.user_id} />
