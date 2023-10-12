@@ -17,7 +17,6 @@ Route::get('/information/{pageName}', ['as' => 'info.page', 'uses' => 'InfoPageC
 Route::get('/information/race/{race}', ['as' => 'info.page.race', 'uses' => 'InfoPageController@viewRace']);
 Route::get('/information/class/{class}', ['as' => 'info.page.class', 'uses' => 'InfoPageController@viewClass']);
 Route::get('/information/skill/{skill}', ['as' => 'info.page.skill', 'uses' => 'InfoPageController@viewSkill']);
-Route::get('/information/monsters/list', ['as' => 'info.page.monsters-list', 'uses' => 'InfoPageController@viewMonsters']);
 Route::get('/information/monster/{monster}', ['as' => 'info.page.monster', 'uses' => 'InfoPageController@viewMonster']);
 Route::get('/information/locations/{location}', ['as' => 'info.page.location', 'uses' => 'InfoPageController@viewLocation']);
 Route::get('/information/building/{building}', ['as' => 'info.page.building', 'uses' => 'InfoPageController@viewBuilding']);

@@ -122,12 +122,6 @@ class InfoPageController extends Controller
         ]);
     }
 
-    public function viewMonsters() {
-        return view('information.monsters.monsters', [
-            'gameMapNames' => GameMap::all()->pluck('name')->toArray(),
-        ]);
-    }
-
     public function viewMonster(Request $request, Monster $monster) {
         return $this->renderMonsterShow($monster, 'information.monsters.monster');
     }
