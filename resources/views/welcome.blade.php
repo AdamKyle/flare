@@ -8,8 +8,7 @@
 @section('content')
     <div class="container mx-auto lg:px-4 mb-5">
         <div class="text-center mb-10 lg:mt-10">
-            <h1 class="mb-5 font-thin text-7xl dark:text-gray-300 text-gray-800 text-4xl md:text-9xl text-orange-400">Planes
-                of Tlessa</h1>
+            <h1 class="mb-5 font-thin text-7xl dark:text-gray-300 text-gray-800 text-4xl md:text-9xl">Planes of Tlessa</h1>
             <p class="mb-10 dark:text-gray-300 text-gray-800 italic">A world full of mystery and exploration.</p>
             <div class="grid md:grid-cols-3 gap-2 w-1/3 mr-auto ml-auto">
                 <x-core.buttons.link-buttons.primary-button css="mr-2" href="{{ route('register') }}">
