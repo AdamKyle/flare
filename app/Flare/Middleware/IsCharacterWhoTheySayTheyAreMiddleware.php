@@ -17,6 +17,10 @@ class IsCharacterWhoTheySayTheyAreMiddleware {
      */
     public function handle($request, Closure $next, $guard = null)
     {
+        if (is_null(auth()->user())) {
+            return redirect()->route('game')->with('error', 'You don\'t have permission to do that.');
+        }
+
         if (auth()->user()->hasRole('Admin')) {
             $letAdminThrough = [
                 'game.inventory.compare',
