@@ -16,7 +16,6 @@ import { questRewardKeys } from "../lib/guide-quests-rewards";
 import RewardListItem from "../components/reward-list-item";
 import TabLayout from "../components/tab-labout";
 import { viewPortWatcher } from "../../../lib/view-port-watcher";
-import DropDownLayout from "../components/dropdown-layout";
 
 export default class GuideQuest extends React.Component<any, any> {
     constructor(props: any) {
