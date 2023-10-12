@@ -1,8 +1,10 @@
 <x-core.layout.info-container>
     @php
         $backUrl = route('maps');
-        
-        if (
+
+        if (!auth()->user()) {
+            $backUrl = '/information/planes';
+        } elseif (
             !auth()
                 ->user()
                 ->hasRole('Admin')
