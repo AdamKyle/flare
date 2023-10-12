@@ -20,6 +20,7 @@ import RaidSection from "./components/raid-section";
 import { GameActionState } from "../../lib/game/types/game-state";
 import { DateTime } from "luxon";
 import { getActionData } from "./helpers/get-action-data";
+import { updateTimers } from "../../lib/ajax/update-timers";
 
 export default class SmallerActions extends React.Component<
     SmallActionsProps,
@@ -117,6 +118,8 @@ export default class SmallerActions extends React.Component<
             ...this.state,
             ...this.props.action_data,
             ...{ loading: false },
+        }, () => {
+            updateTimers(this.props.character.id);
         });
 
         // @ts-ignore
