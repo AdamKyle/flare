@@ -23,11 +23,13 @@ class MapsTable extends DataTableComponent {
             Column::make('Name')->searchable()->format(function ($value, $row) {
                 $gameMapId = GameMap::where('name', $value)->first()->id;
 
-                if (auth()->user()->hasRole('Admin')) {
-                    return '<a href="/admin/maps/'.$gameMapId.'">'.$row->name.'</a>';
+                if (!is_null(auth()->user())) {
+                    if (auth()->user()->hasRole('Admin')) {
+                        return '<a href="/admin/maps/' . $gameMapId . '">' . $row->name . '</a>';
+                    }
                 }
 
-                return '<a href="/information/map/'.$gameMapId.'" >'.$row->name . '</a>';
+                return '<a href="/information/map/' . $gameMapId . '" >' . $row->name . '</a>';
             })->html(),
             Column::make('Default Map?', 'default')->searchable()->sortable()->format(function ($value, $row) {
                 return $value ? 'Yes' : 'No';

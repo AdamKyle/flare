@@ -6,7 +6,7 @@
 @endpush
 
 @section('content')
-    <div class="container mx-auto px-4 mb-5">
+    <div class="container mx-auto lg:px-4 mb-5">
         <div class="text-center mb-10 lg:mt-10">
             <h1 class="mb-5 font-thin text-7xl dark:text-gray-300 text-gray-800 text-4xl md:text-9xl">Planes of Tlessa</h1>
             <p class="mb-10 dark:text-gray-300 text-gray-800 italic">A world full of mystery and exploration.</p>
@@ -323,12 +323,12 @@
             </x-core.cards.feature-card>
         </div>
 
-        <div class="text-center mt-4 w-full md:w-2/3 m-auto">
+        <div class="text-center mt-4 w-full md:w-2/3 m-auto mb-8">
             <h4 class="mb-5 font-thin text-3xl dark:text-gray-300 text-gray-800">And so many more!</h1>
                 <p class="mb-10 dark:text-gray-300 text-gray-800 italic">Planes of tlessa has so many rich and diverse
                     features its hard to showcase them all!</p>
                 <div class="text-center w-full lg:w-1/3 mr-auto ml-auto">
-                    <x-core.buttons.link-buttons.success-button css="mr-2" href="{{ route('game.features') }}">
+                    <x-core.buttons.link-buttons.success-button css="mr-2 mb-4" href="{{ route('game.features') }}">
                         See all the features
                     </x-core.buttons.link-buttons.success-button>
                 </div>
@@ -340,7 +340,7 @@
                 FAQ
             </h2>
             <dl class="mt-3">
-                <dt>Are there Adds?</dt>
+                <dt>Are there Ads?</dt>
                 <dd>
                     No. There are no adds whatsoever.
                 </dd>
