@@ -4,6 +4,7 @@ import Ajax from "../../ajax/ajax";
 import { AxiosResponse } from "axios";
 import { calculateTimeLeft } from "../../helpers/time-calculator";
 import MapStateManager from "../map/state/map-state-manager";
+import { CharacterType } from "../character/character-type";
 
 export default class FetchGameData {
 
@@ -11,8 +12,12 @@ export default class FetchGameData {
 
     private urls?: { url: string, name: string }[];
 
+    private characterSheet: CharacterType | null;
+
     constructor(component: Game) {
         this.component = component;
+
+        this.characterSheet = null;
     }
 
     setUrls(urls: { url: string, name: string }[]): FetchGameData {
@@ -50,6 +55,8 @@ export default class FetchGameData {
     }
 
     setCharacterSheet(result: AxiosResponse) {
+
+        this.characterSheet = result.data.sheet;
 
         this.component.setState({
             character: result.data.sheet,
@@ -100,8 +107,8 @@ export default class FetchGameData {
     }
 
     setActionData(result: AxiosResponse) {
-        console.log(this.component.state.character);
-        if (this.component.state.character === null) {
+        console.log(this.characterSheet);
+        if (this.characterSheet === null) {
             return;
         }
 
@@ -111,10 +118,10 @@ export default class FetchGameData {
             action_data: {
                 raid_monsters: [],
                 monsters: result.data.monsters,
-                attack_time_out: this.component.state.character.can_attack_again_at !== null ?
-                    calculateTimeLeft(this.component.state.character.can_attack_again_at) : 0,
-                crafting_time_out: this.component.state.character.can_craft_again_at !== null ?
-                    calculateTimeLeft(this.component.state.character.can_craft_again_at) : 0,
+                attack_time_out: this.characterSheet.can_attack_again_at !== null ?
+                    calculateTimeLeft(this.characterSheet.can_attack_again_at) : 0,
+                crafting_time_out: this.characterSheet.can_craft_again_at !== null ?
+                    calculateTimeLeft(this.characterSheet.can_craft_again_at) : 0,
                 attack_time_out_started: 0,
                 crafting_time_out_started: 0,
             }
