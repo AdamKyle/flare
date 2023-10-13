@@ -6,11 +6,13 @@ import { calculateTimeLeft } from "../../helpers/time-calculator";
 import MapStateManager from "../map/state/map-state-manager";
 import { CharacterType } from "../character/character-type";
 
+type AjaxUrls = { url: string, name: string }[];
+
 export default class FetchGameData {
 
     private component: Game;
 
-    private urls?: { url: string, name: string }[];
+    private urls: AjaxUrls | [];
 
     private characterSheet: CharacterType | null;
 
@@ -18,6 +20,8 @@ export default class FetchGameData {
         this.component = component;
 
         this.characterSheet = null;
+
+        this.urls = [];
     }
 
     setUrls(urls: { url: string, name: string }[]): FetchGameData {
@@ -26,40 +30,57 @@ export default class FetchGameData {
         return this;
     }
 
-    doAjaxCalls() {
-
+    async doAjaxCalls() {
         if (typeof this.urls === 'undefined') {
             return;
         }
 
-        this.urls.forEach((url) => {
-            (new Ajax()).setRoute(url.url).doAjaxCall('get', (result: AxiosResponse) => {
-                switch (url.name) {
-                    case 'character-sheet':
-                        this.setCharacterSheet(result);
-                        console.log('After setCharacterSheet', this.characterSheet);
-                        break;
-                    case 'actions':
-                        console.log('Before setActionData', this.characterSheet);
-                        this.setActionData(result);
-                        break;
-                    case 'game-map':
-                        this.setMapData(result);
-                        break;
-                    case 'quests':
-                        this.setQuestData(result);
-                        break;
-                    case 'kingdoms':
-                        this.setKingdomsData(result);
-                        break;
-                    default:
-                        break;
-                }
+        const makeSequentialAjaxCalls = async (urls: AjaxUrls) => {
+            if (urls.length === 0) {
+                return;
+            }
+
+            const url = urls[0];
+            const result = await this.makeAjaxCall(url.url);
+
+            switch (url.name) {
+                case 'character-sheet':
+                    this.setCharacterSheet(result);
+                    console.log('After setCharacterSheet', this.characterSheet);
+                    break;
+                case 'actions':
+                    console.log('Before setActionData', this.characterSheet);
+                    this.setActionData(result);
+                    break;
+                case 'game-map':
+                    this.setMapData(result);
+                    break;
+                case 'quests':
+                    this.setQuestData(result);
+                    break;
+                case 'kingdoms':
+                    this.setKingdomsData(result);
+                    break;
+                default:
+                    break;
+            }
+
+            await makeSequentialAjaxCalls(urls.slice(1));
+        };
+
+        await makeSequentialAjaxCalls(this.urls);
+    }
+
+    async makeAjaxCall(url: string): Promise<AxiosResponse> {
+        return new Promise((resolve, reject) => {
+            (new Ajax()).setRoute(url).doAjaxCall('get', (result: AxiosResponse) => {
+                resolve(result);
             }, (error: AxiosResponse) => {
-                console.error(error);
+                reject(error);
             });
         });
     }
+
 
     setCharacterSheet(result: AxiosResponse) {
 
