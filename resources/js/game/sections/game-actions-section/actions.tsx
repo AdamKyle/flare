@@ -230,7 +230,6 @@ export default class Actions extends React.Component<
     }
 
     setUpState(): void {
-        console.log("Action SetUpState", this.props.action_data);
         if (this.props.action_data === null) {
             return;
         }

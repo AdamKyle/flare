@@ -262,8 +262,6 @@ export default class Game extends React.Component<GameProps, GameState> {
         this.monsterUpdate.listen(
             "Game.Maps.Events.UpdateMonsterList",
             (event: any) => {
-                console.log("Event Action Data State", this.state.action_data);
-                console.log("Event Data", event);
                 if (this.state.action_data === null) {
                     return;
                 }
@@ -620,8 +618,6 @@ export default class Game extends React.Component<GameProps, GameState> {
         if (this.state.character_status === null) {
             return this.renderLoading();
         }
-
-        console.log("ActionData at render time", this.state.action_data);
 
         return (
             <Fragment>
