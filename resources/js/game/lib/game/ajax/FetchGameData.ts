@@ -36,15 +36,22 @@ export default class FetchGameData {
             (new Ajax()).setRoute(url.url).doAjaxCall('get', (result: AxiosResponse) => {
                 switch (url.name) {
                     case 'character-sheet':
-                        return this.setCharacterSheet(result);
+                        this.setCharacterSheet(result);
+                        console.log('After setCharacterSheet', this.characterSheet);
+                        break;
                     case 'actions':
-                        return this.setActionData(result);
+                        console.log('Before setActionData', this.characterSheet);
+                        this.setActionData(result);
+                        break;
                     case 'game-map':
-                        return this.setMapData(result);
+                        this.setMapData(result);
+                        break;
                     case 'quests':
-                        return this.setQuestData(result);
+                        this.setQuestData(result);
+                        break;
                     case 'kingdoms':
-                        return this.setKingdomsData(result);
+                        this.setKingdomsData(result);
+                        break;
                     default:
                         break;
                 }
@@ -57,6 +64,8 @@ export default class FetchGameData {
     setCharacterSheet(result: AxiosResponse) {
 
         this.characterSheet = result.data.sheet;
+
+        console.log('setCharacterSheet', this.characterSheet);
 
         this.component.setState({
             character: result.data.sheet,
@@ -107,7 +116,7 @@ export default class FetchGameData {
     }
 
     setActionData(result: AxiosResponse) {
-        console.log(this.characterSheet);
+        console.log('setActionData', this.characterSheet);
         if (this.characterSheet === null) {
             return;
         }

@@ -621,7 +621,7 @@ export default class Game extends React.Component<GameProps, GameState> {
             return this.renderLoading();
         }
 
-        console.log(this.state.action_data);
+        console.log("ActionData at render time", this.state.action_data);
 
         return (
             <Fragment>
