@@ -35,6 +35,8 @@ export default class FetchGameData {
             return;
         }
 
+        console.log('doAjaxCalls urls:', this.urls);
+
         const makeSequentialAjaxCalls = async (urls: AjaxUrls) => {
             if (urls.length === 0) {
                 return;
