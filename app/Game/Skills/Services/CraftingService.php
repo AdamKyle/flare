@@ -43,10 +43,11 @@ class CraftingService {
      * @param ItemListCostTransformerService $itemListCostTransformerService
      * @param SkillCheckService $skillCheckService
      */
-    public function __construct(RandomEnchantmentService $randomEnchantmentService,
-                                SkillService $skillService,
-                                ItemListCostTransformerService $itemListCostTransformerService,
-                                SkillCheckService $skillCheckService,
+    public function __construct(
+        RandomEnchantmentService $randomEnchantmentService,
+        SkillService $skillService,
+        ItemListCostTransformerService $itemListCostTransformerService,
+        SkillCheckService $skillCheckService,
     ) {
         $this->randomEnchantmentService       = $randomEnchantmentService;
         $this->skillService                   = $skillService;
@@ -141,27 +142,26 @@ class CraftingService {
     protected function handleCraftingTimeOut(Character $character, Item $item): void {
         $craftingTimeOut = null;
 
-        if ($character->classType()->isBlacksmith() &&
+        if (
+            $character->classType()->isBlacksmith() &&
             (WeaponTypes::isWeaponType($item->type) ||
-                ArmourTypes::isArmourType($item->type)) )
-        {
+                ArmourTypes::isArmourType($item->type))
+        ) {
             ServerMessageHandler::sendBasicMessage($character->user, 'As a Blacksmith, your crafting timeout is reduced by 25% for weapons (including rings) and armour.');
 
             $craftingTimeOut = ceil(10 - 10 * 0.25);
         }
 
-        if ($character->classType()->isBlacksmith() && SpellTypes::isSpellType($item->type) )  {
+        if ($character->classType()->isBlacksmith() && SpellTypes::isSpellType($item->type)) {
             ServerMessageHandler::sendBasicMessage($character->user, 'As a Blacksmith, your crafting timeout is increased by 25% for spell crafting.');
 
             $craftingTimeOut = ceil(10 + 10 * 0.25);
-
         }
 
-        if ($character->classType()->isArcaneAlchemist() && SpellTypes::isSpellType($item->type) )  {
+        if ($character->classType()->isArcaneAlchemist() && SpellTypes::isSpellType($item->type)) {
             ServerMessageHandler::sendBasicMessage($character->user, 'As a Arcane Alchemist, your crafting timeout is reduced by 15% for spell crafting.');
 
             $craftingTimeOut = ceil(10 - 10 * 0.15);
-
         }
 
         event(new CraftedItemTimeOutEvent($character, null, $craftingTimeOut));
@@ -174,10 +174,13 @@ class CraftingService {
             $cost = floor($cost - $cost * 0.30);
         }
 
-        if ($character->classType()->isBlacksmith() && (
-            WeaponTypes::isWeaponType($item->type) || ArmourTypes::isArmourType($item->type)
+        if ($character->classType()->isBlacksmith() && (WeaponTypes::isWeaponType($item->type) || ArmourTypes::isArmourType($item->type)
         )) {
             $cost = floor($cost - $cost * 0.25);
+        }
+
+        if ($character->classType()->isArcaneAlchemist() && (SpellTypes::isSpellType($item->type))) {
+            $cost = floor($cost - $cost * 0.15);
         }
 
         return $cost;
@@ -256,11 +259,11 @@ class CraftingService {
         $craftingTypes    = ['armour', 'ring', 'spell'];
 
         $items = Item::where('can_craft', true)
-                    ->where('skill_level_required', '<=', $skill->level)
-                    ->whereNull('item_prefix_id')
-                    ->whereNull('item_suffix_id')
-                    ->doesntHave('appliedHolyStacks')
-                    ->orderBy('skill_level_required', 'asc');
+            ->where('skill_level_required', '<=', $skill->level)
+            ->whereNull('item_prefix_id')
+            ->whereNull('item_suffix_id')
+            ->doesntHave('appliedHolyStacks')
+            ->orderBy('skill_level_required', 'asc');
 
         if (in_array($craftingType, $twoHandedWeapons)) {
             $items->where('default_position', strtolower($craftingType));
@@ -273,11 +276,11 @@ class CraftingService {
         $items = $items->select('name', 'cost', 'type', 'id')->get();
 
 
-        if ($craftingType === 'spell') {
-           return $this->itemListCostTransformerService->reduceCostOfAlchemyItems($character, $items, true);
+        if ($craftingType === 'alchemy') {
+            return $this->itemListCostTransformerService->reduceCostOfAlchemyItems($character, $items, $merchantMessage);
         }
 
-        return $this->itemListCostTransformerService->reduceCostOfCraftingItems($character, $items, true);
+        return $this->itemListCostTransformerService->reduceCostOfCraftingItems($character, $items, $craftingType, $merchantMessage);
     }
 
     /**

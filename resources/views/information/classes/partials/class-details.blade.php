@@ -81,6 +81,18 @@
                     <dt>Requirements:</dt>
                     <dd>{{$classBonus['requires']}}</dd>
                 </dl>
+
+                @if ($class->type()->isArcaneAlchemist())
+                    <h5 class="my-2">Crafting Bonuses</h5>
+                    <p>
+                        As an Arcane Alchemist you will get a bonus when crafting specific
+                        items such as spells and alchemy items.
+                    </p>
+                    <ul class="mb-4 list-disc">
+                        <li>Alchemy items will cost 15% less to craft and you recieve a 15% reduction on crsfting time out for Alchemy items.</li>
+                        <li>Spells will cost 15% less to craft and you recieve a 15% reduction on crsfting time out for Spells.</li>
+                    </ul>
+                @endif
             </div>
         </div>
     </x-core.cards.card-with-title>

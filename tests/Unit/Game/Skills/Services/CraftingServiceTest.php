@@ -194,9 +194,9 @@ class CraftingServiceTest extends TestCase {
         ]);
 
         $this->assertNotEmpty($result);
-        $this->assertNotEquals($result[0]->cost, $this->craftingItem->cost);
+        $this->assertEquals($result[0]->cost, $this->craftingItem->cost);
 
-        Event::assertDispatched(ServerMessageEvent::class);
+        Event::assertNotDispatched(ServerMessageEvent::class);
     }
 
     public function testFailToCraftForItemThatDoesNotExist() {

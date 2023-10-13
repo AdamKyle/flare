@@ -45,6 +45,18 @@ class ArmourTypes {
         $this->value = $value;
     }
 
+    public static function armourTypes(): array {
+        return [
+            self::SLEEVES,
+            self::LEGGINGS,
+            self::GLOVES,
+            self::SHIELD,
+            self::BODY,
+            self::FEET,
+            self::HELMET,
+        ];
+    }
+
     /**
      * Is valid armour?
      *

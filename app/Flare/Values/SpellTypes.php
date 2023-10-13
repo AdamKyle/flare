@@ -35,6 +35,10 @@ class SpellTypes {
         $this->value = $value;
     }
 
+    public static function getTypes(): array {
+        return self::$values;
+    }
+
     /**
      * Is valid spell?
      *

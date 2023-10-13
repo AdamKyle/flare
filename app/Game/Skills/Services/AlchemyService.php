@@ -32,14 +32,13 @@ class AlchemyService {
 
         $skill     = Skill::where('game_skill_id', $gameSkill->id)->where('character_id', $character->id)->first();
 
-
         $items = Item::where('can_craft', true)
             ->where('crafting_type', 'alchemy')
             ->where('skill_level_required', '<=', $skill->level)
             ->where('item_prefix_id', null)
             ->where('item_suffix_id', null)
             ->orderBy('skill_level_required', 'asc')
-            ->select('id', 'name', 'gold_dust_cost', 'shards_cost')
+            ->select('id', 'name', 'gold_dust_cost', 'shards_cost', 'type')
             ->get();
 
         return $this->itemListCostTransformerService->reduceCostOfAlchemyItems($character, $items, $showMerchantMessage);

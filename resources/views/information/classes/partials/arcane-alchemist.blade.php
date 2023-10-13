@@ -1,4 +1,3 @@
-
 <p class="mt-2">
     Arcane Alchemists prefer to use staves above other weapons as it gives them an increase to their damage.
     Arcane Alchemists are also as proficient with damage spells like Heretics and are ok at using Healing spells.

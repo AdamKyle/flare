@@ -11,6 +11,7 @@ use App\Flare\Models\Item;
 use App\Flare\Values\CharacterClassValue;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Skills\Services\AlchemyService;
+use App\Game\Skills\Values\SkillTypeValue;
 use Mockery;
 use Mockery\MockInterface;
 use Tests\Setup\Character\CharacterFactory;
@@ -43,6 +44,7 @@ class AlchemyServiceTest extends TestCase {
             'skill_level_trivial'  => 100,
             'crafting_type'        => 'alchemy',
             'can_craft'            => true,
+            'type'                 => 'alchemy'
         ]);
     }
 
@@ -67,7 +69,9 @@ class AlchemyServiceTest extends TestCase {
 
         $character = (new CharacterFactory())->createBaseCharacter([], $this->createClass([
             'name' => CharacterClassValue::ARCANE_ALCHEMIST
-        ]))->givePlayerLocation()->getCharacter();
+        ]))->assignSkill($this->createGameSkill([
+            'type' => SkillTypeValue::ALCHEMY,
+        ]), 10)->givePlayerLocation()->getCharacter();
 
         $result = $this->alchemyService->fetchAlchemistItems($character);
 
@@ -83,7 +87,9 @@ class AlchemyServiceTest extends TestCase {
 
         $character = (new CharacterFactory())->createBaseCharacter([], $this->createClass([
             'name' => CharacterClassValue::MERCHANT
-        ]))->givePlayerLocation()->getCharacter();
+        ]))->assignSkill($this->createGameSkill([
+            'type' => SkillTypeValue::ALCHEMY,
+        ]), 10)->givePlayerLocation()->getCharacter();
 
         $result = $this->alchemyService->fetchAlchemistItems($character);
 
