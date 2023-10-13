@@ -22,7 +22,14 @@ export default class GuideButton extends React.Component<any, any> {
     }
 
     componentDidMount() {
-        viewPortWatcher(this);
+        this.setState(
+            {
+                view_port: window.innerWidth,
+            },
+            () => {
+                viewPortWatcher(this);
+            }
+        );
 
         const self = this;
 
@@ -55,6 +62,8 @@ export default class GuideButton extends React.Component<any, any> {
         if (!this.state.show_button) {
             return null;
         }
+
+        console.log(this.state.view_port, window.innerWidth);
 
         return (
             <Fragment>

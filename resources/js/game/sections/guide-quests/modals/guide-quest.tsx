@@ -29,12 +29,10 @@ export default class GuideQuest extends React.Component<any, any> {
             can_hand_in: false,
             is_handing_in: false,
             completed_requirements: [],
-            view_port: 0,
         };
     }
 
     componentDidMount() {
-        viewPortWatcher(this);
 
         new Ajax()
             .setRoute("character/guide-quest/" + this.props.user_id)
