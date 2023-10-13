@@ -100,6 +100,7 @@ export default class FetchGameData {
     }
 
     setActionData(result: AxiosResponse) {
+        console.log(this.component.state.character);
         if (this.component.state.character === null) {
             return;
         }
