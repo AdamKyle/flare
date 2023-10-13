@@ -1,4 +1,3 @@
-
 @php
     $editUrl = route('classes.edit', ['class' => $class->id]);
     $backUrl = route('classes.list');
@@ -6,44 +5,43 @@
 
     if (is_null(auth()->user())) {
         $backUrl = '/information/races-and-classes';
-    } else if (!auth()->user()->hasRole('Admin')) {
+    } elseif (
+        !auth()
+            ->user()
+            ->hasRole('Admin')
+    ) {
         $backUrl = '/information/races-and-classes';
     }
 @endphp
 
 <div class="w-full md:w-1/2 ml-auto m-auto">
-    <x-core.cards.card-with-title
-        title="{{$class->name}}"
-        css="mt-20 mb-10 w-full lg:w-1/2 m-auto"
-        editUrl="{{$editUrl}}"
-        backUrl="{{$backUrl}}"
-        buttons="{{$buttons}}"
-    >
+    <x-core.cards.card-with-title title="{{ $class->name }}" css="mt-20 mb-10 w-full lg:w-1/2 m-auto"
+        editUrl="{{ $editUrl }}" backUrl="{{ $backUrl }}" buttons="{{ $buttons }}">
         <div class="flex flex-wrap -mx-2 mb-8">
             <div class="w-full md:w-1/2 px-2 mb-4">
                 <dl class="mb-4">
                     <dt>Strength Mofidfier</dt>
-                    <dd>+ {{$class->str_mod > 0 ? $class->str_mod : 0}} pts.</dd>
+                    <dd>+ {{ $class->str_mod > 0 ? $class->str_mod : 0 }} pts.</dd>
                     <dt>Durability Modifier</dt>
-                    <dd>+ {{$class->dur_mod > 0 ? $class->dur_mod : 0}} pts.</dd>
+                    <dd>+ {{ $class->dur_mod > 0 ? $class->dur_mod : 0 }} pts.</dd>
                     <dt>Dexterity Modifier</dt>
-                    <dd>+ {{$class->dex_mod > 0 ? $class->dex_mod : 0}} pts.</dd>
+                    <dd>+ {{ $class->dex_mod > 0 ? $class->dex_mod : 0 }} pts.</dd>
                     <dt>Intelligence Modifier</dt>
-                    <dd>+ {{$class->int_mod > 0 ? $class->int_mod : 0}} pts.</dd>
+                    <dd>+ {{ $class->int_mod > 0 ? $class->int_mod : 0 }} pts.</dd>
                     <dt>Charsima Modifier</dt>
-                    <dd>+ {{$class->chr_mod > 0 ? $class->chr_mod : 0}} pts.</dd>
+                    <dd>+ {{ $class->chr_mod > 0 ? $class->chr_mod : 0 }} pts.</dd>
                     <dt>Focus Modifier</dt>
-                    <dd>+ {{$class->focus_mod > 0 ? $class->focus_mod : 0}} pts.</dd>
+                    <dd>+ {{ $class->focus_mod > 0 ? $class->focus_mod : 0 }} pts.</dd>
                     <dt>Agility Modifier</dt>
-                    <dd>+ {{$class->aglity_modifier > 0 ? $class->aglity_modifier : 0}} pts.</dd>
+                    <dd>+ {{ $class->aglity_modifier > 0 ? $class->aglity_modifier : 0 }} pts.</dd>
                     <dt>Accuracy Modifier</dt>
-                    <dd>+ {{$class->accuracy_mod * 100}} %</dd>
+                    <dd>+ {{ $class->accuracy_mod * 100 }} %</dd>
                     <dt>Dodge Modifier</dt>
-                    <dd>+ {{$class->dodge_mod * 100}} %</dd>
+                    <dd>+ {{ $class->dodge_mod * 100 }} %</dd>
                     <dt>Looting Modifier</dt>
-                    <dd>+ {{$class->looting_mod * 100}} %</dd>
+                    <dd>+ {{ $class->looting_mod * 100 }} %</dd>
                     <dt>Defense Modifier</dt>
-                    <dd>+ {{$class->defense_mod * 100}} %</dd>
+                    <dd>+ {{ $class->defense_mod * 100 }} %</dd>
                 </dl>
                 <div class='border-b-2 border-b-gray-200 dark:border-b-gray-600 my-3'></div>
                 <p class="my-2">
@@ -55,9 +53,9 @@
                 </p>
                 <dl class="my-4">
                     <dt>Damage Stat</dt>
-                    <dd>{{$class->damage_stat}}</dd>
+                    <dd>{{ $class->damage_stat }}</dd>
                     <dt>To Hit Stat</dt>
-                    <dd>{{$class->to_hit_stat}}</dd>
+                    <dd>{{ $class->to_hit_stat }}</dd>
                 </dl>
             </div>
             <div class="w-full md:w-1/2 px-2 mb-4">
@@ -65,33 +63,35 @@
                     <h5 class="mb-2">Class Skills</h5>
                     <ul>
                         @foreach ($class->gameSkills as $skill)
-                            <li><a href="{{route('info.page.skill', ['skill' => $skill->id])}}">{{$skill->name}}</a></li>
+                            <li><a
+                                    href="{{ route('info.page.skill', ['skill' => $skill->id]) }}">{{ $skill->name }}</a>
+                            </li>
                         @endforeach
                     </ul>
                 @endif
                 <h5 class="mb-2 mt-2">Class Attack Bonus</h5>
                 <p class="mb-4">
-                    {{$classBonus['description']}}
+                    {{ $classBonus['description'] }}
                 </p>
                 <dl className="mt-4">
                     <dt>Type:</dt>
-                    <dd>{{$classBonus['type']}}</dd>
+                    <dd>{{ $classBonus['type'] }}</dd>
                     <dt>Base Chance:</dt>
-                    <dd>{{$classBonus['base_chance'] * 100}}%</dd>
+                    <dd>{{ $classBonus['base_chance'] * 100 }}%</dd>
                     <dt>Requirements:</dt>
-                    <dd>{{$classBonus['requires']}}</dd>
+                    <dd>{{ $classBonus['requires'] }}</dd>
                 </dl>
 
                 @if ($class->type()->isArcaneAlchemist())
-                    <h5 class="my-2">Crafting Bonuses</h5>
-                    <p>
-                        As an Arcane Alchemist you will get a bonus when crafting specific
-                        items such as spells and alchemy items.
-                    </p>
-                    <ul class="mb-4 list-disc">
-                        <li>Alchemy items will cost 15% less to craft and you recieve a 15% reduction on crsfting time out for Alchemy items.</li>
-                        <li>Spells will cost 15% less to craft and you recieve a 15% reduction on crsfting time out for Spells.</li>
-                    </ul>
+                    @include('information.classes.partials.crafting.arcane-alchemist')
+                @endif
+
+                @if ($class->type()->isBlackSmith())
+                    @include('information.classes.partials.crafting.blacksmith')
+                @endif
+
+                @if ($class->type()->isMerchant())
+                    @include('information.classes.partials.crafting.merchant')
                 @endif
             </div>
         </div>
