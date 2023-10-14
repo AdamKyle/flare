@@ -120,7 +120,7 @@ export default class InventoryItemGemDetails extends React.Component<any, any> {
         return (
             <div
                 className={clsx({
-                    "grid lg:grid-cols-2 gap-2 max-h-[150px] lg:max-h-full overflow-x-scroll":
+                    "grid lg:grid-cols-2 gap-2 max-h-[150px] lg:max-h-full overflow-y-scroll lg:overflow-y-visible":
                         typeof this.props.equipped_atonements[0] !==
                         "undefined",
                 })}
