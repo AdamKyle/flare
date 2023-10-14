@@ -19,8 +19,8 @@ import { removeCommas } from "../../lib/game/format-number";
 import GamblingSection from "./components/gambling-section";
 import RaidSection from "./components/raid-section";
 import { DateTime } from "luxon";
-import GameState, { GameActionState } from "../../lib/game/types/game-state";
-import { getActionData } from "./helpers/get-action-data";
+import { GameActionState } from "../../lib/game/types/game-state";
+import { updateTimers } from "../../lib/ajax/update-timers";
 
 export default class Actions extends React.Component<
     ActionsProps,
@@ -216,16 +216,6 @@ export default class Actions extends React.Component<
         this.props.update_parent_state({
             monsters: this.state.monsters,
             raid_monsters: this.state.raid_monsters,
-            crafting_time_out: this.state.crafting_time_out,
-            attack_time_out: this.state.attack_time_out,
-            attack_time_out_started:
-                this.state.attack_time_out > 0
-                    ? DateTime.local().toSeconds()
-                    : 0,
-            crafting_time_out_started:
-                this.state.crafting_time_out > 0
-                    ? DateTime.local().toSeconds()
-                    : 0,
         });
     }
 
@@ -236,24 +226,14 @@ export default class Actions extends React.Component<
 
         let actionData: GameActionState = this.props.action_data;
 
-        actionData = getActionData(actionData);
-
         this.setState(
             { ...this.state, ...actionData, ...{ loading: false } },
             () => {
+                updateTimers(this.props.character.id);
+
                 this.props.update_parent_state({
                     monsters: this.state.monsters,
                     raid_monsters: this.state.raid_monsters,
-                    crafting_time_out: this.state.crafting_time_out,
-                    attack_time_out: this.state.attack_time_out,
-                    attack_time_out_started:
-                        this.state.attack_time_out > 0
-                            ? DateTime.local().toSeconds()
-                            : 0,
-                    crafting_time_out_started:
-                        this.state.crafting_time_out > 0
-                            ? DateTime.local().toSeconds()
-                            : 0,
                 });
             }
         );

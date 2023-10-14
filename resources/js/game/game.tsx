@@ -693,9 +693,6 @@ export default class Game extends React.Component<GameProps, GameState> {
                                             map_timer_data={
                                                 this.state.map_timer_data
                                             }
-                                            update_map_timer_data={this.setMapTimerData.bind(
-                                                this
-                                            )}
                                             set_map_data={this.setMapState.bind(
                                                 this
                                             )}
@@ -768,9 +765,6 @@ export default class Game extends React.Component<GameProps, GameState> {
                                         this
                                     )}
                                     map_timer_data={this.state.map_timer_data}
-                                    update_map_timer_data={this.setMapTimerData.bind(
-                                        this
-                                    )}
                                     disable_bottom_timer={false}
                                     map_data={this.state.map_data}
                                     set_map_data={this.setMapState.bind(this)}

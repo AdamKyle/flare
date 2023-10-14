@@ -12,10 +12,6 @@ import RaidMonsterType from "./actions/monster/raid-monster-type";
 export type GameActionState = {
     monsters: MonsterType[];
     raid_monsters: RaidMonsterType[] | [];
-    attack_time_out: number;
-    crafting_time_out: number;
-    attack_time_out_started: number;
-    crafting_time_out_started: number;
 }
 
 export type MapTimerData = {

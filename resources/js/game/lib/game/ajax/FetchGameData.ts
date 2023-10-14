@@ -143,12 +143,6 @@ export default class FetchGameData {
             action_data: {
                 raid_monsters: [],
                 monsters: result.data.monsters,
-                attack_time_out: this.characterSheet.can_attack_again_at !== null ?
-                    calculateTimeLeft(this.characterSheet.can_attack_again_at) : 0,
-                crafting_time_out: this.characterSheet.can_craft_again_at !== null ?
-                    calculateTimeLeft(this.characterSheet.can_craft_again_at) : 0,
-                attack_time_out_started: 0,
-                crafting_time_out_started: 0,
             }
         });
     }

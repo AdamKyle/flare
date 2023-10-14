@@ -47,7 +47,7 @@ class GenerateScheduledEvents extends Command
     }
 
     protected function handleWeeklyEvents(ScheduledEventConfiguration $scheduledEventConfiguration, EventSchedulerService $eventSchedulerService): void {
-        $futureLastGenerated = $scheduledEventConfiguration->last_time_generated->copy()->addWeeks(2)->addDays(3);
+        $futureLastGenerated = $scheduledEventConfiguration->last_time_generated->copy()->addWeeks(2);
 
         if (now()->gte($futureLastGenerated)) {
             $eventSchedulerService->generateFutureEvents($scheduledEventConfiguration);
@@ -55,7 +55,7 @@ class GenerateScheduledEvents extends Command
     }
 
     protected function handleMonthlyEvents(ScheduledEventConfiguration $scheduledEventConfiguration, EventSchedulerService $eventSchedulerService): void {
-        $futureLastGenerated = $scheduledEventConfiguration->last_time_generated->copy()->addMonths(2)->addDays(15);
+        $futureLastGenerated = $scheduledEventConfiguration->last_time_generated->copy()->addMonths(2);
 
         if (now()->gte($futureLastGenerated)) {
             $eventSchedulerService->generateFutureEvents($scheduledEventConfiguration);
