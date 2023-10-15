@@ -107,7 +107,7 @@ const buildLabelLink = (
         case "required_skill":
             return (
                 <a
-                    href={"/information/skill" + questData.required_skill}
+                    href={"/information/skill/" + questData.required_skill}
                     target="_blank"
                 >
                     {name} <i className="fas fa-external-link-alt"></i>
@@ -117,7 +117,7 @@ const buildLabelLink = (
             return (
                 <a
                     href={
-                        "/information/skill" +
+                        "/information/skill/" +
                         questData.required_secondary_skill
                     }
                     target="_blank"
