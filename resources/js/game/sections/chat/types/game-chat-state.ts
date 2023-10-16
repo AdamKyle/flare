@@ -20,6 +20,4 @@ export default interface GameChatState {
 export interface AnnouncementType {
     id: number;
     message: string;
-    expires_at: string;
-    expires_at_formatted: string;
 }

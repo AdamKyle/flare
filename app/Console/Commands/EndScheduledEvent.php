@@ -15,10 +15,10 @@ use App\Game\Maps\Services\LocationService;
 use App\Game\Raids\Events\CorruptLocations;
 use App\Flare\Services\EventSchedulerService;
 use App\Game\Maps\Services\UpdateRaidMonsters;
+use App\Game\Messages\Events\DeleteAnnouncementEvent;
 use App\Game\Messages\Events\GlobalMessageEvent;
 
-class EndScheduledEvent extends Command
-{
+class EndScheduledEvent extends Command {
     /**
      * The name and signature of the console command.
      *
@@ -40,8 +40,6 @@ class EndScheduledEvent extends Command
      * @return void
      */
     public function handle(LocationService $locationService, UpdateRaidMonsters $updateRaidMonsters, EventSchedulerService $eventSchedulerService) {
-        $targetEventStart = now()->copy()->addMinutes(5);
-
         $this->endScheduledEvent($locationService, $updateRaidMonsters, $eventSchedulerService);
     }
 
@@ -69,35 +67,129 @@ class EndScheduledEvent extends Command
 
                 event(new UpdateScheduledEvents($eventSchedulerService->fetchEvents()));
             }
+
+            if ($eventType->isWeeklyCurrencyDrops()) {
+                $this->endWeeklyCurrencyDrops();
+
+                $event->update([
+                    'currently_running' => false,
+                ]);
+
+                event(new UpdateScheduledEvents($eventSchedulerService->fetchEvents()));
+            }
+
+            if ($eventType->isWeeklyCelestials()) {
+                $this->endWeeklySpawnEvent();
+
+                $event->update([
+                    'currently_running' => false,
+                ]);
+
+                event(new UpdateScheduledEvents($eventSchedulerService->fetchEvents()));
+            }
+
+            if ($eventType->isMonthlyPVP()) {
+                $this->endMonthlyPVPEvent();
+
+                $event->update([
+                    'currently_running' => false,
+                ]);
+
+                event(new UpdateScheduledEvents($eventSchedulerService->fetchEvents()));
+            }
         }
     }
 
     /**
      * End the raid.
-     * 
+     *
      * - Un corrupt locations
      * - Delete Event for raid.
      * - Update monsters for locations, to set them back to normal.
      * - Cleanup other aspects such as announcements.
      *
-     * @param Event $event
+     * @param ScheduledEvent $event
      * @param LocationService $locationService
      * @param UpdateRaidMonsters $updateRaidMonsters
      * @return void
      */
-    protected function endRaid(Event $event, LocationService $locationService, UpdateRaidMonsters $updateRaidMonsters) {
-        
+    protected function endRaid(ScheduledEvent $event, LocationService $locationService, UpdateRaidMonsters $updateRaidMonsters) {
+
         $raid = $event->raid;
-        
+
         event(new GlobalMessageEvent('The Raid: ' . $raid->name . ' is now ending! Don\'t worry, the raid will be back soon. Check the event calendar for the next time!'));
 
         $this->unCorruptLocations($raid, $locationService);
 
-        Event::where('raid_id', $raid->id)->delete();
+        $event = Event::where('raid_id', $raid->id)->first();
 
         $this->updateMonstersForCharactersAtRaidLocations($raid, $updateRaidMonsters);
 
-        Announcement::where('expires_at', '<=', now())->where('event_id', $event->id)->first()->delete();
+        $announcement = Announcement::where('event_id', $event->id)->first();
+
+        event(new DeleteAnnouncementEvent($announcement->id));
+
+        $announcement->delete();
+
+        $event->delete();
+    }
+
+    /**
+     * Ends a weekly currency event
+     *
+     * @param ScheduledEvent $event
+     * @return void
+     */
+    protected function endWeeklyCurrencyDrops() {
+        event(new GlobalMessageEvent('Weekly currency drops have come to an end! Come back next sunday for another chance!'));
+
+        $event = Event::where('type', EventType::WEEKLY_CURRENCY_DROPS)->first();
+
+        $announcement = Announcement::where('event_id', $event->id)->first();
+
+        event(new DeleteAnnouncementEvent($announcement->id));
+
+        $announcement->delete();
+
+        $event->delete();
+    }
+
+    /**
+     * End Weekly Celestial Spawn Event
+     *
+     * @param ScheduledEvent $event
+     * @return void
+     */
+    protected function endWeeklySpawnEvent() {
+        event(new GlobalMessageEvent('The Creator has managed to close the gates and lock the Celestials away behind the doors of Kalitorm! Come back next week for another chance at the hunt!'));
+
+        $event = Event::where('type', EventType::WEEKLY_CELESTIALS)->first();
+
+        $announcement = Announcement::where('event_id', $event->id)->first();
+
+        event(new DeleteAnnouncementEvent($announcement->id));
+
+        $announcement->delete();
+    }
+
+    /**
+     * End monthly pvp event
+     *
+     * @param ScheduledEvent $event
+     * @return void
+     */
+    protected function endMonthlyPVPEvent() {
+        event(new GlobalMessageEvent('Monthly PVP has ended. Come back at the end of next month for a chance to win a mythic and test your might!'));
+
+        $event = Event::where('type', EventType::MONTHLY_PVP)->first();
+
+        $announcement = Announcement::where('event_id', $event->id)->first();
+
+        event(new DeleteAnnouncementEvent($announcement->id));
+
+        $announcement->delete();
+
+        $event->delete();
     }
 
     /**
@@ -107,7 +199,7 @@ class EndScheduledEvent extends Command
      * @param LocationService $locationService
      * @return void
      */
-    protected function unCorruptLocations(Raid $raid, LocationService $locationService) {
+    private function unCorruptLocations(Raid $raid, LocationService $locationService) {
         $raidLocations = [...$raid->corrupted_location_ids, $raid->raid_boss_location_id];
 
         Location::whereIn('id', $raidLocations)->update([
@@ -120,13 +212,13 @@ class EndScheduledEvent extends Command
     }
 
     /**
-     * Update monsyers for the characters at raid locations.
+     * Update monsters for the characters at raid locations.
      *
      * @param Raid $raid
      * @param UpdateRaidMonsters $updateRaidMonsters
      * @return void
      */
-    protected function updateMonstersForCharactersAtRaidLocations(Raid $raid, UpdateRaidMonsters $updateRaidMonsters): void {
+    private function updateMonstersForCharactersAtRaidLocations(Raid $raid, UpdateRaidMonsters $updateRaidMonsters): void {
         $corruptedLocationIds = $raid->corrupted_location_ids;
 
         array_unshift($corruptedLocationIds, $raid->raid_boss_location_id);

@@ -29,7 +29,7 @@ class EventSchedulerService {
 
     public function createEvent(array $params): array {
 
-        if (is_null($params['selected_raid'])) {
+        if (is_null($params['selected_raid']) && $params['selected_event_type'] === EventType::RAID_EVENT) {
             return $this->errorResult('You have an event type selected but not what kind of event (raid or general event).');
         }
 

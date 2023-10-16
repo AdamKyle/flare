@@ -29,3 +29,8 @@ Broadcast::channel('global-message', function ($user) {
 Broadcast::channel('announcement-message', function ($user) {
     return $user;
 });
+
+// When a global message is sent out.
+Broadcast::channel('delete-announcement-message', function ($user) {
+    return $user;
+});

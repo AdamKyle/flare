@@ -46,13 +46,13 @@ class AnnouncementHandler {
             '. While the boss (' . $raid->raidBoss->name . ') is at: ' . $locationOfRaidBoss->name . ' At (X/Y): ' . $locationOfRaidBoss->x .
             '/' . $locationOfRaidBoss->y . ' on plane: ' . $locationOfRaidBoss->map->name . '.';
 
-        Announcement::create([
+        $announcement = Announcement::create([
             'message'    => $message,
             'expires_at' => $event->ends_at,
             'event_id'   => $event->id,
         ]);
 
-        event(new AnnouncementMessageEvent($message));
+        event(new AnnouncementMessageEvent($message, $announcement->id));
     }
 
     private function buildMonthlyPVPMessage(): void {
@@ -68,13 +68,13 @@ class AnnouncementHandler {
             'in a matched pvp event. After the last player is left standing he/she will be rewarded with a mythic and the Celestial Kings, ' .
             'who can also drop mythics. These Beings will only be around for an hour after the main PVP event!';
 
-        Announcement::create([
+        $announcement = Announcement::create([
             'message'    => $message,
             'expires_at' => $event->ends_at,
             'event_id'   => $event->id
         ]);
 
-        event(new AnnouncementMessageEvent($message));
+        event(new AnnouncementMessageEvent($message, $announcement->id));
     }
 
     private function buildWeeklyCelestialMessage(): void {
@@ -88,13 +88,13 @@ class AnnouncementHandler {
             'ending at: ' . $event->ends_at->format('l, j \of F \a\t h:ia \G\M\TP') . ' players just have to move around the map and there is a 80% ' .
             'chance for Celestial Entities that you would otherwise have to pay to conjure, will spawn! Kill em all child and get those pretty shards for alchemy!';
 
-        Announcement::create([
+        $announcement = Announcement::create([
             'message'    => $message,
             'expires_at' => $event->ends_at,
             'event_id'   => $event->id
         ]);
 
-        event(new AnnouncementMessageEvent($message));
+        event(new AnnouncementMessageEvent($message, $announcement->id));
     }
 
     private function buildWeeklyCurrencyDrop(): void {
@@ -107,12 +107,12 @@ class AnnouncementHandler {
         $message = 'For one day only, ending: ' . $event->ends_at->format('l, j \of F \a\t h:ia \G\M\TP') . ' ' .
             'Players can get 1-50 of each type of currency, Gold Dust, Crystal Shards, Copper Coins (if you have the appropriate quest item). ';
 
-        Announcement::create([
+        $announcement = Announcement::create([
             'message'    => $message,
             'expires_at' => $event->ends_at,
             'event_id'   => $event->id
         ]);
 
-        event(new AnnouncementMessageEvent($message));
+        event(new AnnouncementMessageEvent($message, $announcement->id));
     }
 }

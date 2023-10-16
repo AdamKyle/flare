@@ -90,6 +90,14 @@ return [
             'block_for' => null,
         ],
 
+        'weekly_events' => [
+            'driver' => 'redis',
+            'connection' => 'weekly_events',
+            'queue' => env('REDIS_QUEUE', 'default'),
+            'retry_after' => 90,
+            'block_for' => null,
+        ],
+
         'shop_buying' => [
             'driver' => 'redis',
             'connection' => 'shop_buying',

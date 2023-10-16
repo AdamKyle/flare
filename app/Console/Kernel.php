@@ -70,6 +70,9 @@ class Kernel extends ConsoleKernel {
 
         // process and start any scheduled events.
         $schedule->command('process:scheduled-events')->everyFiveMinutes()->timezone(config('app.timezone'));
+
+        // End scheduled events
+        $schedule->command('end:scheduled-event')->everyFiveMinutes()->timezone(config('app.timezone'));
     }
 
     /**

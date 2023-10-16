@@ -31,7 +31,10 @@ class ProcessScheduledEvents extends Command {
     public function handle() {
         $targetEventStart = now()->copy()->addMinutes(5);
 
-        $scheduledEvents = ScheduledEvent::whereBetween('start_date', [now(), $targetEventStart])->get();
+        $scheduledEvents = ScheduledEvent::where('start_date', '>=', now())
+            ->where('start_date', '<=', $targetEventStart)
+            ->get();
+
 
         foreach ($scheduledEvents as $event) {
             $eventType = new EventType($event->event_type);

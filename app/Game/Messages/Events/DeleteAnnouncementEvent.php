@@ -9,14 +9,10 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 
-class AnnouncementMessageEvent implements ShouldBroadcastNow {
+class DeleteAnnouncementEvent implements ShouldBroadcastNow {
 
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    /**
-     * @var string $message
-     */
-    public string $message;
 
     /**
      * @var integer $id
@@ -26,14 +22,9 @@ class AnnouncementMessageEvent implements ShouldBroadcastNow {
     /**
      * Create a new event instance.
      *
-     * - specialColor should be a css class that
-     * represents the color you want applied to the message.
-     *
-     * @param string $message
      * @param int $id
      */
-    public function __construct(string $message, int $id) {
-        $this->message = $message;
+    public function __construct(int $id) {
         $this->id      = $id;
     }
 
@@ -43,6 +34,6 @@ class AnnouncementMessageEvent implements ShouldBroadcastNow {
      * @return Channel|array
      */
     public function broadcastOn(): Channel|array {
-        return new PresenceChannel('announcement-message');
+        return new PresenceChannel('delete-announcement-message');
     }
 }

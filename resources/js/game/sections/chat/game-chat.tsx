@@ -27,6 +27,8 @@ export default class GameChat extends React.Component<GameChatProps, GameChatSta
 
     private announcements: any;
 
+    private deleteAnnouncements: any;
+
     constructor(props: GameChatProps) {
         super(props);
 
@@ -79,6 +81,9 @@ export default class GameChat extends React.Component<GameChatProps, GameChatSta
 
         // @ts-ignore
         this.announcements = Echo.join('announcement-message');
+
+        // @ts-ignore
+        this.deleteAnnouncements = Echo.join('delete-announcement-message');
     }
 
     componentDidMount() {
@@ -277,23 +282,29 @@ export default class GameChat extends React.Component<GameChatProps, GameChatSta
         })
 
         this.announcements.listen('Game.Messages.Events.AnnouncementMessageEvent', (event: any) => {
-            const chat = JSON.parse(JSON.stringify(this.state.announcements))
+            const announcements = JSON.parse(JSON.stringify(this.state.announcements))
 
-            if (chat.length > 1000) {
-                chat.length = 500;
-            }
-
-            chat.unshift({
-                message:    event.message,
-                expires_at: event.expires_at,
+            announcements.unshift({
+                message: event.message,
+                id: event.id
             });
 
             this.setState({
-                announcements: chat,
+                announcements: announcements,
                 updated_tabs: this.canUpdateTabs('Announcements') ? [...this.state.updated_tabs, 'Announcements'] : this.state.updated_tabs
             }, () => {
                 this.setTabToUpdated('announcements-messages');
             })
+        });
+
+        this.deleteAnnouncements.listen('Game.Messages.Events.DeleteAnnouncementEvent', (event: any) => {
+            const announcements = JSON.parse(JSON.stringify(this.state.announcements))
+
+            const updatedAnnouncements = announcements.filter((announcement: any) => announcement.id !== event.id);
+
+            this.setState({
+                announcements: updatedAnnouncements,
+            });
         })
     }
 
