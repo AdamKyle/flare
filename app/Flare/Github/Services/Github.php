@@ -56,4 +56,18 @@ class Github {
 
         return $this->client->api('repo')->releases()->latest('AdamKyle', 'flare');
     }
+
+    /**
+     * Fetch all releases from github.
+     *
+     * @return array
+     * @throws Exception
+     */
+    public function fetchAllReleases(): array {
+        if (is_null($this->client)) {
+            throw new Exception('Client is not initiated. Please call initiateClient first');
+        }
+
+        return $this->client->api('repo')->releases()->all('AdamKyle', 'flare');
+    }
 }

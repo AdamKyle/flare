@@ -23,6 +23,10 @@ class ReleaseNote extends Model {
         'body',
     ];
 
+    protected $casts = [
+        'release_date' => 'date',
+    ];
+
     protected static function newFactory() {
         return ReleaseNoteFactory::new();
     }
