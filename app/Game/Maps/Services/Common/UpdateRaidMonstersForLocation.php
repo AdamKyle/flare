@@ -31,7 +31,9 @@ trait UpdateRaidMonstersForLocation {
             if (!is_null($location->enemy_strength_type)) {
                 $monsters = Cache::get('monsters')[$location->name];
 
-                event(new ServerMessageEvent($character->user, 'You have entered a special location.
+                event(new ServerMessageEvent(
+                    $character->user,
+                    'You have entered a special location.
                 Special locations are places where only specific quest items can drop. You can click View Location Details
                 to read more about the location and click the relevant help docs link in the modal to read more about special locations.
                 Exploring here will NOT allow the location specific quest items to drop. Monsters here are stronger then outside the location.'
@@ -54,15 +56,20 @@ trait UpdateRaidMonstersForLocation {
         $raidEvent = Event::whereNotNull('raid_id')->first();
 
         if (!is_null($raidEvent) && !is_null($location)) {
-            $locationIds = array_map('intval', $raidEvent->raid->corrupted_location_ids);
-            
-            array_push($locationIds, $raidEvent->raid->raid_boss_location_id);
+            $locationIds        = array_map('intval', $raidEvent->raid->corrupted_location_ids);
+            $raidBossLocationId = $raidEvent->raid->raid_boss_location_id;
 
-            if (!in_array($location->id, $locationIds)) {
-                return false;
+            if ($location->id !== $raidBossLocationId) {
+                $index = array_search($raidBossLocationId, $locationIds);
+
+                if ($index !== false) {
+                    unset($locationIds[$index]);
+                }
             }
 
-            event(new UpdateRaidMonsters($raidEvent->raid->getMonstersForSelection(), $character->user));
+            $raidMonsters = $raidEvent->raid->getMonstersForSelection($locationIds);
+
+            event(new UpdateRaidMonsters($raidMonsters, $character->user));
 
             return true;
         }

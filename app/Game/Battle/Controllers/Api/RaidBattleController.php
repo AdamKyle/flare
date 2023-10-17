@@ -80,8 +80,9 @@ class RaidBattleController extends Controller {
 
         if ($monster->is_raid_monster) {
             $result = $this->raidBattleService->fightRaidMonster($character, $monster->id, $attackTypeRequest->attack_type, false);
+
             $status = $result['status'];
-    
+
             unset($result['status']);
 
             return response()->json($result, $status);

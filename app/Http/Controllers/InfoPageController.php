@@ -29,8 +29,7 @@ use App\Game\Core\Values\View\ClassBonusInformation;
 use App\Flare\Traits\Controllers\ItemsShowInformation;
 use App\Flare\Traits\Controllers\MonstersShowInformation;
 
-class InfoPageController extends Controller
-{
+class InfoPageController extends Controller {
 
     use ItemsShowInformation, MonstersShowInformation;
 
@@ -40,7 +39,7 @@ class InfoPageController extends Controller
             return response()->redirectToRoute('info.page', ['pageName' => 'home']);
         }
 
-        $searchResults = InfoPage::whereRaw("JSON_EXTRACT(page_sections, '$[*].content') LIKE '%".$request->info_search."%'")->get();
+        $searchResults = InfoPage::whereRaw("JSON_EXTRACT(page_sections, '$[*].content') LIKE '%" . $request->info_search . "%'")->get();
 
         return view('information.search-results', [
             'results' => $searchResults,
@@ -165,8 +164,8 @@ class InfoPageController extends Controller
             'unit'          => $unit,
             'building'      => $belongsToKingdomBuilding,
             'requiredLevel' => GameBuildingUnit::where('game_building_id', $belongsToKingdomBuilding->id)
-                                               ->where('game_unit_id', $unit->id)
-                                               ->first()->required_level
+                ->where('game_unit_id', $unit->id)
+                ->first()->required_level
         ]);
     }
 
@@ -222,7 +221,7 @@ class InfoPageController extends Controller
 
     public function itemSkill(ItemSkill $itemSkill) {
         return view('information.item-skills.skill', [
-            'skill' => $itemSkill,
+            'itemSkill' => $itemSkill,
         ]);
     }
 }

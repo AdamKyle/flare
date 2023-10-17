@@ -84,6 +84,14 @@
                 Market Board
             </a>
         </div>
+        <hr />
+        <div class="menu-detail-wrapper">
+            <h6 class="uppercase">Cosmetic Features</h6>
+            <a href="{{ route('info.page', ['pageName' => 'cosmetic-text']) }}">
+                <span class="text-sm icon far fa-keyboard"></span>
+                Cosmetic Text
+            </a>
+        </div>
     </div>
 
     <!-- Character -->

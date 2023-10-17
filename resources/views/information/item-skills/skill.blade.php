@@ -1,1 +1,1 @@
-@include('admin.item-skills.skill', ['skill' => $skill])
+@include('admin.item-skills.skill', ['itemSkill' => $itemSkill])

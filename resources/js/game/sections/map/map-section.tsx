@@ -23,6 +23,7 @@ import clsx from "clsx";
 import Draggable from "react-draggable/build/web/react-draggable.min";
 import MapState from "./types/map-state";
 import { updateTimers } from "../../lib/ajax/update-timers";
+import { mergeLocations } from "./helpers/merge-locations";
 
 export default class MapSection extends React.Component<MapProps, MapState> {
     private mapTimeOut: any;
@@ -195,10 +196,13 @@ export default class MapSection extends React.Component<MapProps, MapState> {
                     JSON.stringify(this.state.locations)
                 );
 
-                locations = [...locations, ...event.corruptedLocations];
+                console.log(locations, event.corruptedLocations);
 
                 this.setState({
-                    locations: locations,
+                    locations: mergeLocations(
+                        locations,
+                        event.corruptedLocations
+                    ),
                 });
             }
         );

@@ -211,7 +211,7 @@ class InitiateRaid implements ShouldQueue {
             'type'        => EventType::RAID_EVENT,
             'started_at'  => now(),
             'ends_at'     => $scheduledEvent->end_date,
-            'raid_id'     => $scheduledEvent->id,
+            'raid_id'     => $scheduledEvent->raid_id,
         ]);
 
         $scheduledEvent->update([

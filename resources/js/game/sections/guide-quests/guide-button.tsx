@@ -63,8 +63,6 @@ export default class GuideButton extends React.Component<any, any> {
             return null;
         }
 
-        console.log(this.state.view_port, window.innerWidth);
-
         return (
             <Fragment>
                 <SuccessOutlineButton

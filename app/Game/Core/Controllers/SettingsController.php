@@ -22,10 +22,10 @@ class SettingsController extends Controller {
 
     public function index(User $user) {
 
-        $quest              = Quest::where('unlocks_feature', FeatureTypes::COSMETIC_TEXT)->first()->id;
+        $quest              = Quest::where('unlocks_feature', FeatureTypes::COSMETIC_TEXT)->first();
         $canUseCosmeticText = false;
 
-        if (is_null($quest)) {
+        if (!is_null($quest)) {
             $canUseCosmeticText = !is_null(QuestsCompleted::where('character_id', $user->character->id)->where('id', $quest->id)->first());
         }
 

@@ -10,4 +10,6 @@ export default interface MonsterActionState {
     attack_time_out: number;
 
     rank_selected: number;
+
+    monsters: MonsterType[] | [];
 }

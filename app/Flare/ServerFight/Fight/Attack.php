@@ -115,8 +115,8 @@ class Attack {
 
         if ($whoAttacks === 'character') {
             $response = $this->baseCharacterAttack->setMonsterHealth($this->monsterHealth)
-                                                  ->setCharacterHealth($this->characterHealth)
-                                                  ->doAttack($character, $serverMonster, $this->isCharacterVoided, $attackType);
+                ->setCharacterHealth($this->characterHealth)
+                ->doAttack($character, $serverMonster, $this->isCharacterVoided, $attackType);
 
             $this->mergeBattleMessages($response->getMessages());
 

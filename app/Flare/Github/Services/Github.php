@@ -68,6 +68,8 @@ class Github {
             throw new Exception('Client is not initiated. Please call initiateClient first');
         }
 
-        return $this->client->api('repo')->releases()->all('AdamKyle', 'flare');
+        return $this->client->api('repo')->releases()->all('AdamKyle', 'flare', [
+            'per_page' => 100,
+        ]);
     }
 }

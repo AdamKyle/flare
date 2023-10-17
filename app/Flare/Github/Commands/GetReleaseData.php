@@ -46,9 +46,13 @@ class GetReleaseData extends Command {
     public function handle(Github $github): void {
 
         if (ReleaseNote::count() === 0) {
-            $releases = $github->initiateClient()->fetchAllReleases();
+            $releases = $github->initiateClient(true)->fetchAllReleases();
 
             foreach ($releases as $releaseData) {
+                if ($releaseData['draft']) {
+                    continue;
+                }
+
                 $this->storeRelease($releaseData);
             }
 
@@ -61,7 +65,6 @@ class GetReleaseData extends Command {
     }
 
     public function storeRelease(array $releaseData): void {
-        dump($releaseData['html_url']);
         $notes  = ReleaseNote::where('url', $releaseData['html_url'])->first();
 
         if (is_null($notes)) {

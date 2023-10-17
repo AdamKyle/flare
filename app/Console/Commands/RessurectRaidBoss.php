@@ -11,8 +11,7 @@ use App\Flare\Models\RaidBossParticipation;
 use App\Game\Maps\Services\UpdateRaidMonsters;
 use App\Game\Messages\Events\GlobalMessageEvent;
 
-class RessurectRaidBoss extends Command
-{
+class RessurectRaidBoss extends Command {
     /**
      * The name and signature of the console command.
      *
@@ -31,7 +30,7 @@ class RessurectRaidBoss extends Command
      * Execute the console command.
      */
     public function handle(UpdateRaidMonsters $updateRaidMonsters) {
-        
+
         $events = Event::whereNotNull('raid_id')->get();
 
         foreach ($events as $event) {
@@ -47,12 +46,12 @@ class RessurectRaidBoss extends Command
 
             event(new GlobalMessageEvent('"Death has come for you child! I shall have my revenge!!"', 'raid-global-message'));
 
-            event(new GlobalMessageEvent('Location: ' . $locationOfRaidBoss->name . ' At (X/Y): '.$locationOfRaidBoss->x.
-            '/'.$locationOfRaidBoss->y.' on plane: ' . $locationOfRaidBoss->map->name . ' has become over run! The Raid boss: '.$event->raid->raidBoss->name.
-            ' has set up shop!'));
+            event(new GlobalMessageEvent('Location: ' . $locationOfRaidBoss->name . ' At (X/Y): ' . $locationOfRaidBoss->x .
+                '/' . $locationOfRaidBoss->y . ' on plane: ' . $locationOfRaidBoss->map->name . ' has become over run! The Raid boss: ' . $event->raid->raidBoss->name .
+                ' has set up shop!'));
 
             $corruptedLocationIds = $event->raid->corrupted_location_ids;
-        
+
             array_unshift($corruptedLocationIds, $event->raid->raid_boss_location_id);
 
             $corruptedLocations = Location::whereIn('id', $corruptedLocationIds)->get();
@@ -63,7 +62,7 @@ class RessurectRaidBoss extends Command
             //                            ->where('maps.character_position_y', $location->y)
             //                            ->where('maps.game_map_id', $location->game_map_id)
             //                            ->get();
-    
+
             //     foreach ($characters as $character) {
             //         $updateRaidMonsters->updateMonstersForRaidLocations($character, $location);
             //     }

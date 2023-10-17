@@ -63,11 +63,12 @@ class RaidBattleService {
      * @param BuildMonsterCacheService $buildMonsterCacheService
      * @param BattleEventHandler $battleEventHandler
      */
-    public function __construct(BuildMonster $buildMonster, 
-                                CharacterCacheData $characterCacheData, 
-                                MonsterPlayerFight $monsterPlayerFight,
-                                BuildMonsterCacheService $buildMonsterCacheService,
-                                BattleEventHandler $battleEventHandler,
+    public function __construct(
+        BuildMonster $buildMonster,
+        CharacterCacheData $characterCacheData,
+        MonsterPlayerFight $monsterPlayerFight,
+        BuildMonsterCacheService $buildMonsterCacheService,
+        BattleEventHandler $battleEventHandler,
     ) {
         $this->buildMonster             = $buildMonster;
         $this->characterCacheData       = $characterCacheData;
@@ -191,9 +192,9 @@ class RaidBattleService {
         }
 
         $monster   = $serverMonster->getMonster();
-        
+
         $fightData = $this->getFightData($character, $serverMonster, $monsterId, $monster, $attackType, $isRaidBoss);
-        
+
         $messages  = $this->monsterPlayerFight->getBattleMessages();
 
         if (!$this->hasCachedHealth($character->id, $monsterId)) {
@@ -207,11 +208,7 @@ class RaidBattleService {
 
         $result = $this->monsterPlayerFight->processAttack($fightData, true);
 
-        $resultData = [
-            'character_current_health' => $this->monsterPlayerFight->getCharacterHealth(),
-            'monster_current_health'   => $this->monsterPlayerFight->getMonsterHealth(),
-            'messages'                 => $this->monsterPlayerFight->getBattleMessages(),
-        ];
+        $resultData = $this->buildBaseResultData();
 
         if (!$result && $this->monsterPlayerFight->getCharacterHealth() <= 0) {
 
@@ -248,6 +245,19 @@ class RaidBattleService {
     }
 
     /**
+     * Build Base result data.
+     *
+     * @return array
+     */
+    protected function buildBaseResultData(): array {
+        return [
+            'character_current_health' => $this->monsterPlayerFight->getCharacterHealth(),
+            'monster_current_health'   => $this->monsterPlayerFight->getMonsterHealth(),
+            'messages'                 => $this->monsterPlayerFight->getBattleMessages(),
+        ];
+    }
+
+    /**
      * Get the fight data for the raid critter.
      *
      * @param Character $character
@@ -272,7 +282,7 @@ class RaidBattleService {
             $raidBoss = RaidBoss::where('raid_boss_id', $monsterId)->first();
 
             $fightData['monster']                  = resolve(ServerMonster::class)->setMonster($raidBoss->raid_boss_deatils)
-                                                                                  ->setHealth($raidBoss->boss_current_hp);
+                ->setHealth($raidBoss->boss_current_hp);
             $fightData['health']['monster_health'] = $raidBoss->boss_current_hp;
         }
 
@@ -282,7 +292,7 @@ class RaidBattleService {
 
     /**
      * Process the pre attack.
-     * 
+     *
      * This could mean the character is deasd, the monster is dead.
      *
      * @param Character $character
@@ -300,11 +310,15 @@ class RaidBattleService {
                 'type'    => 'enemy-action',
             ];
 
-            $this->handleRaidBossHealth($character, $monsterId, $isRaidBoss);
+            $this->handleRaidBossHealth($character, $monsterId, $isRaidBoss, $health);
 
             $this->battleEventHandler->processDeadCharacter($character);
 
-            return $this->successResult();
+            return $this->successResult([
+                'character_current_health' => 0,
+                'monster_current_health'   => $health['monster_health'],
+                'messages'                 => $messages,
+            ]);
         }
 
         if ($health['monster_health'] <= 0) {
@@ -315,13 +329,17 @@ class RaidBattleService {
                 'type'    => 'enemy-action',
             ];
 
-            $this->handleRaidBossHealth($character, $monsterId, $isRaidBoss);
+            $this->handleRaidBossHealth($character, $monsterId, $isRaidBoss, $health);
 
             $raid = Raid::where('raid_boss_id', $monsterId)->first();
 
             RaidBossRewardHandler::dispatch($character->id, $raid->id, $monsterId);
 
-            return $this->successResult();
+            return $this->successResult([
+                'character_current_health' => $health['character_health'],
+                'monster_current_health'   => 0,
+                'messages'                 => $messages,
+            ]);
         }
 
         return [];
@@ -352,7 +370,7 @@ class RaidBattleService {
      * @param boolean $shouldUpdateHealth
      * @return void
      */
-    protected function handleRaidBossHealth(Character $character, int $monsterId, bool $shouldUpdateHealth): void {
+    protected function handleRaidBossHealth(Character $character, int $monsterId, bool $shouldUpdateHealth, array $health = []): void {
 
         if (!$shouldUpdateHealth) {
             return;
@@ -361,7 +379,9 @@ class RaidBattleService {
         $raidBoss  = RaidBoss::where('raid_boss_id', $monsterId)->first();
         $oldHealth = $raidBoss->boss_current_hp;
 
-        $this->updateRaidBossHealth($raidBoss, $this->monsterPlayerFight->getMonsterHealth());
+        $currentHealth = empty($health) ? $this->monsterPlayerFight->getMonsterHealth() : $health['monster_health'];
+
+        $this->updateRaidBossHealth($raidBoss, $currentHealth);
 
         $this->updateRaidParticipation($character, $raidBoss, $oldHealth);
     }
@@ -383,9 +403,9 @@ class RaidBattleService {
 
         if (!is_null($raidBossParticipation)) {
             $attacksLeft     = $raidBossParticipation->attacks_left - 1;
-            
+
             $newDamageAmount = $raidBossParticipation->damage_dealt + ($damageDealt >= $oldHealth ? $oldHealth : $damageDealt);
-           
+
             $raidBossParticipation->update([
                 'attacks_left' => $attacksLeft <= 0 ? 0 : $attacksLeft,
                 'damage_dealt' => $newDamageAmount,

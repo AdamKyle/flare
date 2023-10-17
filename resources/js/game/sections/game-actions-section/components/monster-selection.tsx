@@ -1,24 +1,26 @@
 import React from "react";
-import {isEqual} from "lodash";
+import { isEqual } from "lodash";
 import MonsterType from "../../../lib/game/types/actions/monster/monster-type";
 import MonsterSelectionProps from "./types/monster-selection-props";
 import MonsterSelectionState from "./types/monster-selection-state";
 import CritterSelection from "./fight-section/monster-selection";
 
-export default class MonsterSelection extends React.Component<MonsterSelectionProps, MonsterSelectionState> {
-
+export default class MonsterSelection extends React.Component<
+    MonsterSelectionProps,
+    MonsterSelectionState
+> {
     constructor(props: MonsterSelectionProps) {
         super(props);
 
         this.state = {
             monster_to_fight: null,
             monsters: [],
-        }
+        };
     }
 
     componentDidMount() {
         this.setState({
-            monsters: this.props.monsters
+            monsters: this.props.monsters,
         });
     }
 
@@ -32,7 +34,7 @@ export default class MonsterSelection extends React.Component<MonsterSelectionPr
     }
 
     setMonsterToFight(data: any) {
-        const monster: MonsterType|null = this.findMonster(data.value);
+        const monster: MonsterType | null = this.findMonster(data.value);
 
         if (monster !== null) {
             this.setState({
@@ -43,34 +45,37 @@ export default class MonsterSelection extends React.Component<MonsterSelectionPr
 
     buildMonsters() {
         if (this.props.monsters === null) {
-            return [{label: '', value: 0}];
+            return [{ label: "", value: 0 }];
         }
 
         return this.props.monsters.map((monster: MonsterType) => {
-            return {label: monster.name, value: monster.id};
+            return { label: monster.name, value: monster.id };
         });
     }
 
-    defaultMonster(): {label: string, value: number}[] {
-
+    defaultMonster(): { label: string; value: number }[] {
         if (this.state.monster_to_fight !== null) {
-            const monster: MonsterType|null = this.findMonster(this.state.monster_to_fight.id);
+            const monster: MonsterType | null = this.findMonster(
+                this.state.monster_to_fight.id
+            );
 
             if (monster !== null) {
-                return [{ label: monster.name, value: monster.id}];
+                return [{ label: monster.name, value: monster.id }];
             }
         }
 
-        return [{label: 'Please select a monster', value: 0}];
+        return [{ label: "Please select a monster", value: 0 }];
     }
 
-    findMonster(monsterId: number): MonsterType|null {
-        const foundMonster: MonsterType[]|[] = this.props.monsters.filter((monster: MonsterType) => {
-            return monster.id === monsterId;
-        });
+    findMonster(monsterId: number): MonsterType | null {
+        const foundMonster: MonsterType[] | [] = this.props.monsters.filter(
+            (monster: MonsterType) => {
+                return monster.id === monsterId;
+            }
+        );
 
         if (foundMonster.length > 0) {
-            return foundMonster[0]
+            return foundMonster[0];
         }
 
         return null;
@@ -80,11 +85,13 @@ export default class MonsterSelection extends React.Component<MonsterSelectionPr
         if (this.props.character === null) {
             return false;
         }
-        
-        return this.props.character.is_dead ||
+
+        return (
+            this.props.character.is_dead ||
             this.props.character.is_automation_running ||
             !this.props.character.can_attack ||
-            this.state.monster_to_fight === null;
+            this.state.monster_to_fight === null
+        );
     }
 
     attack() {
@@ -103,5 +110,4 @@ export default class MonsterSelection extends React.Component<MonsterSelectionPr
             />
         );
     }
-
 }
