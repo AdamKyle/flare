@@ -63,7 +63,6 @@ class LocationService {
         $this->coordinatesCache           = $coordinatesCache;
         $this->characterCacheData         = $characterCacheData;
         $this->updateCharacterAttackTypes = $updateCharacterAttackTypes;
-
     }
 
     /**
@@ -119,7 +118,7 @@ class LocationService {
 
     /**
      * Update the location with rank fights if there is any.
-     * 
+     *
      * @param Character $character
      * @return void
      */
@@ -148,25 +147,25 @@ class LocationService {
 
     /**
      * Fetch the locations for this map the characters on.
-     * 
+     *
      * @param Character $character
      * @return Collection
      */
     public function fetchLocationData(Character $character): Collection {
         $locations = Location::with('questRewardItem')->where('game_map_id', $character->map->game_map_id)->get();
-        
+
         return $this->transformLocationData($locations);
     }
 
 
     /**
      * Fetch corrupted locatuions based on the raid.
-     * 
+     *
      * If no raid is set, return an empty collection.
-     * 
+     *
      * @param ?Raid $raid
      * @return Collection
-     * 
+     *
      */
     public function fetchCorruptedLocationData(?Raid $raid = null): Collection {
 
@@ -185,12 +184,12 @@ class LocationService {
 
     /**
      * Add additional data to the location data.
-     * 
+     *
      * @param Collection $collection
      * @return Collection
      */
     protected function transformLocationData(Collection $locations): Collection {
-        return $locations->transform(function($location) {
+        return $locations->transform(function ($location) {
 
             $location->increases_enemy_stats_by      = null;
             $location->increase_enemy_percentage_by  = null;
@@ -229,30 +228,18 @@ class LocationService {
                 $location->required_quest_item_name = $location->requiredQuestItem->name;
             }
 
-            $location->is_corrupted = false;
-
-            $events = Event::whereNotNull('raid_id')->get();
-
-            foreach ($events as $event) {
-                if (in_array($location->id, $event->raid->corrupted_location_ids)) {
-                    $location->is_corrupted = true;
-
-                    break;
-                }
-            }
-
             return $location;
         });
     }
 
     /**
      * Is there a cedlestial entity at the characters location?
-     * 
+     *
      * @param Character $character
      * @return int|null
      */
     protected function getCelestialEntityId(Character $character): int|null {
-        $fight = CelestialFight::with('monster')->join('monsters', function($join) use($character) {
+        $fight = CelestialFight::with('monster')->join('monsters', function ($join) use ($character) {
             $join->on('monsters.id', 'celestial_fights.monster_id')
                 ->where('x_position', $character->x_position)
                 ->where('y_position', $character->y_position)
@@ -278,9 +265,9 @@ class LocationService {
      */
     protected function processLocation(Character $character): void {
         $this->location = Location::where('x', $character->x_position)
-                                  ->where('y', $character->y_position)
-                                  ->where('game_map_id', $character->map->game_map_id)
-                                  ->first();
+            ->where('y', $character->y_position)
+            ->where('game_map_id', $character->map->game_map_id)
+            ->first();
     }
 
     /**
@@ -307,9 +294,9 @@ class LocationService {
      */
     protected function getLockedLocation(Character $character): ?Location {
         return Location::where('x', $character->map->character_position_x)
-                       ->where('y', $character->map->character_position_y)
-                       ->where('game_map_id', $character->map->game_map_id)
-                       ->whereNotNull('required_quest_item_id')
-                       ->first();
+            ->where('y', $character->map->character_position_y)
+            ->where('game_map_id', $character->map->game_map_id)
+            ->whereNotNull('required_quest_item_id')
+            ->first();
     }
 }

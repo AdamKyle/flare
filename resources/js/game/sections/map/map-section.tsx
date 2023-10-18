@@ -196,13 +196,13 @@ export default class MapSection extends React.Component<MapProps, MapState> {
                     JSON.stringify(this.state.locations)
                 );
 
-                console.log(locations, event.corruptedLocations);
+                const mergedLocations = mergeLocations(
+                    locations,
+                    event.corruptedLocations
+                );
 
                 this.setState({
-                    locations: mergeLocations(
-                        locations,
-                        event.corruptedLocations
-                    ),
+                    locations: mergedLocations,
                 });
             }
         );

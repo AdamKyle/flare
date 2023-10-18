@@ -11,6 +11,8 @@ use Illuminate\Console\Command;
 use App\Flare\Models\Announcement;
 use App\Flare\Models\ScheduledEvent;
 use App\Flare\Events\UpdateScheduledEvents;
+use App\Flare\Models\RaidBoss;
+use App\Flare\Models\RaidBossParticipation;
 use App\Game\Maps\Services\LocationService;
 use App\Game\Raids\Events\CorruptLocations;
 use App\Flare\Services\EventSchedulerService;
@@ -122,6 +124,10 @@ class EndScheduledEvent extends Command {
         $this->unCorruptLocations($raid, $locationService);
 
         $event = Event::where('raid_id', $raid->id)->first();
+
+        RaidBossParticipation::where('raid_id', $raid->id)->delete();
+
+        RaidBoss::where('raid_id', $raid->id)->delete();
 
         $this->updateMonstersForCharactersAtRaidLocations($raid, $updateRaidMonsters);
 
