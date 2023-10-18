@@ -54,7 +54,7 @@ class CastType extends BattleBase
         $spellDamage = $this->attackData['spell_damage'];
 
         if ($spellDamage > 0) {
-            $this->heal($$attacker, $defender, true);
+            $this->heal($attacker, $defender, true);
 
             if ($this->allowSecondaryAttacks) {
                 $this->secondaryAttack($attacker, null, $this->characterCacheData->getCachedCharacterData($defender, 'affix_damage_reduction'), true);
@@ -119,7 +119,7 @@ class CastType extends BattleBase
 
                 $this->elementalAttack($character, $monster);
             }
-            
+
             return;
         }
 
@@ -259,15 +259,15 @@ class CastType extends BattleBase
 
                 if ($monsterSpellEvasion > 1) {
                     $this->addMessage('The enemy evades your magic!', 'enemy-action');
-    
+
                     return;
                 }
-    
+
                 $evasion = 100 - (100 - 100 * $monsterSpellEvasion);
-    
+
                 if (rand(1, 100) > $evasion) {
                     $this->addMessage('The enemy evades your magic!', 'enemy-action');
-    
+
                     return;
                 }
             } else {

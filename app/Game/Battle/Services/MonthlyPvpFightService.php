@@ -136,7 +136,7 @@ class MonthlyPvpFightService {
             'item_id'      => $item->id,
         ]);
 
-        event(new ServerMessageEvent($character->user,'You are rewarded with a Mythic Unique: ' . $item->affix_name . ' This item has been given to you regardless of how full your inventory is.', $item->id));
+        event(new ServerMessageEvent($character->user, 'You are rewarded with a Mythic Unique: ' . $item->affix_name . ' This item has been given to you regardless of how full your inventory is.', $item->id));
 
         $gold = $character->gold + 50000000000;
 
@@ -150,7 +150,7 @@ class MonthlyPvpFightService {
             'can_attack' => true,
         ]);
 
-        event(new ServerMessageEvent($character->user,'Rewarded with : 50,000,000,000 Gold!'));
+        event(new ServerMessageEvent($character->user, 'Rewarded with : 50,000,000,000 Gold!'));
 
         CharacterAutomation::where('character_id', $character->id)->delete();
 
@@ -162,7 +162,7 @@ class MonthlyPvpFightService {
 
         event(new UpdateMap($character->user));
 
-        event(new ServerMessageEvent($character->user,'You can move from the location now. The arena is closed. Come again next month!'));
+        event(new ServerMessageEvent($character->user, 'You can move from the location now. The arena is closed. Come again next month!'));
     }
 
     /**
@@ -282,9 +282,8 @@ class MonthlyPvpFightService {
      * @return Collection
      */
     protected function reOrderCharactersByLevel(array $characterIds): Collection {
-        return MonthlyPvpParticipant::whereIn('character_id', $characterIds)->join('characters', function($join) {
+        return MonthlyPvpParticipant::whereIn('character_id', $characterIds)->join('characters', function ($join) {
             $join->on('characters.id', '=', 'monthly_pvp_participants.character_id');
         })->orderBy('characters.level', 'asc')->select('monthly_pvp_participants.*')->get();
     }
-
 }

@@ -88,8 +88,8 @@ class PvpService {
                 'defender_max_health' => $this->pvpAttack->cache()->getCachedCharacterData($defender, 'health'),
                 'defender_id'         => $defender->id,
                 'attacker_id'         => $attacker->id,
-                'defender_atonement'  => !is_null($defenderElementalData) ? $defenderElementalData['elemental_damage']['name'] : 'N/A',
-                'attacker_atonement'  => !is_null($attackerElementalData) ? $attackerElementalData['elemental_damage']['name'] : 'N/A',
+                'defender_atonement'  => !is_null($defenderElementalData) ? $defenderElementalData['highest_element']['name'] : 'N/A',
+                'attacker_atonement'  => !is_null($attackerElementalData) ? $attackerElementalData['highest_element']['name'] : 'N/A',
             ];
         }
 
@@ -100,8 +100,8 @@ class PvpService {
             'defender_max_health' => $this->pvpAttack->cache()->getCachedCharacterData($defender, 'health'),
             'defender_id'         => $defender->id,
             'attacker_id'         => $attacker->id,
-            'defender_atonement'  => !is_null($defenderElementalData) ? $defenderElementalData['elemental_damage']['name'] : 'N/A',
-            'attacker_atonement'  => !is_null($attackerElementalData) ? $attackerElementalData['elemental_damage']['name'] : 'N/A',
+            'defender_atonement'  => !is_null($defenderElementalData) ? $defenderElementalData['highest_element']['name'] : 'N/A',
+            'attacker_atonement'  => !is_null($attackerElementalData) ? $attackerElementalData['highest_element']['name'] : 'N/A',
         ];
     }
 
@@ -197,8 +197,8 @@ class PvpService {
             'messages'    => $this->pvpAttack->getMessages()['attacker'],
             'attacker_id' => $attacker->id,
             'defender_id' => $defenderId,
-            'attacker_atonement' => !is_null($attackerElementalAtonement) ? $attackerElementalAtonement['elemental_damage']['name'] : 'N/A',
-            'defender_atonement' => !is_null($defenderElementalAtonement) ? $defenderElementalAtonement['elemental_damage']['name'] : 'N/A'
+            'attacker_atonement' => !is_null($attackerElementalAtonement) ? $attackerElementalAtonement['highest_element']['name'] : 'N/A',
+            'defender_atonement' => !is_null($defenderElementalAtonement) ? $defenderElementalAtonement['highest_element']['name'] : 'N/A'
         ]));
     }
 
@@ -216,8 +216,8 @@ class PvpService {
             'messages'    => $this->pvpAttack->getMessages()['defender'],
             'attacker_id' => $defender->id,
             'defender_id' => $attackerId,
-            'attacker_atonement' => !is_null($attackerElementalAtonement) ? $attackerElementalAtonement['elemental_damage']['name'] : 'N/A',
-            'defender_atonement' => !is_null($defenderElementalAtonement) ? $defenderElementalAtonement['elemental_damage']['name'] : 'N/A'
+            'attacker_atonement' => !is_null($attackerElementalAtonement) ? $attackerElementalAtonement['highest_element']['name'] : 'N/A',
+            'defender_atonement' => !is_null($defenderElementalAtonement) ? $defenderElementalAtonement['highest_element']['name'] : 'N/A'
         ]));
     }
 
@@ -247,7 +247,8 @@ class PvpService {
 
         $character = $character->refresh();
 
-        if (!$this->mapTileValue->canWalkOnWater($character, $character->map->character_position_x, $character->map->character_position_y) ||
+        if (
+            !$this->mapTileValue->canWalkOnWater($character, $character->map->character_position_x, $character->map->character_position_y) ||
             !$this->mapTileValue->canWalkOnDeathWater($character, $character->map->character_position_x, $character->map->character_position_y) ||
             !$this->mapTileValue->canWalkOnMagma($character, $character->map->character_position_x, $character->map->character_position_y) ||
             $this->mapTileValue->isPurgatoryWater($this->mapTileValue->getTileColor($character, $character->map->character_position_x, $character->map->character_position_y))
@@ -258,7 +259,7 @@ class PvpService {
                 'character_position_y' => $y[rand(0, count($y) - 1)],
             ]);
 
-            return $this->movePlayerToNewLocation($character->refresh(), $cache);
+            return $this->movePlayerToNewLocation($character->refresh());
         }
 
         $character = $character->refresh();

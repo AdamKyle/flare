@@ -22,7 +22,7 @@ class RandomAffixDetails {
         0 => self::BASIC,
         1 => self::MEDIUM,
         3 => self::LEGENDARY,
-        4 => self:: MYTHIC,
+        4 => self::MYTHIC,
     ];
 
     /**
@@ -31,8 +31,7 @@ class RandomAffixDetails {
      * @param string $value
      * @throws \Exception
      */
-    public function __construct(int $value)
-    {
+    public function __construct(int $value) {
         if (!in_array($value, self::$values)) {
             throw new \Exception($value . ' does not exist.');
         }
@@ -41,13 +40,13 @@ class RandomAffixDetails {
     }
 
     public function getPercentageRange(): array {
-        switch($this->value) {
+        switch ($this->value) {
             case self::MEDIUM:
                 return [50, 125];
             case self::LEGENDARY:
-                return [250, 600];
+                return [150, 175];
             case self::MYTHIC:
-                return [700, 1000];
+                return [200, 300];
             case self::BASIC:
             default:
                 return [5, 25];
@@ -55,16 +54,16 @@ class RandomAffixDetails {
     }
 
     public function getDamageRange(): array {
-        switch($this->value) {
+        switch ($this->value) {
             case self::MEDIUM:
-                return [10000, 15000];
+                return [750, 1000];
             case self::LEGENDARY:
-                return [50000, 1000000000];
+                return [10000, 50000];
             case self::MYTHIC:
-                return [2000000000, 5000000000];
+                return [1000000, 10000000];
             case self::BASIC:
             default:
-                return [500, 1000];
+                return [250, 500];
         }
     }
 
@@ -106,5 +105,4 @@ class RandomAffixDetails {
             'Burst of Precision'
         ];
     }
-
 }

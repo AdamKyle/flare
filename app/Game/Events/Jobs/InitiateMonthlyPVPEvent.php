@@ -68,6 +68,6 @@ class InitiateMonthlyPVPEvent implements ShouldQueue {
             }
         });
 
-        AnnouncementHandler::createAnnouncement('monthly_php');
+        AnnouncementHandler::createAnnouncement('monthly_pvp');
     }
 }

@@ -2,16 +2,17 @@
 
 namespace App\Console\Commands;
 
+use App\Flare\Models\Announcement;
 use App\Flare\Models\Character;
 use App\Flare\Models\Event;
 use App\Flare\Values\EventType;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Battle\Jobs\MonthlyPvpAutomation;
+use App\Game\Messages\Events\DeleteAnnouncementEvent;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use Illuminate\Console\Command;
 
-class StartMonthlyPvpEvent extends Command
-{
+class StartMonthlyPvpEvent extends Command {
     /**
      * The name and signature of the console command.
      *
@@ -32,7 +33,6 @@ class StartMonthlyPvpEvent extends Command
      * @return int
      */
     public function handle() {
-        Event::where('type', EventType::MONTHLY_PVP)->delete();
 
         event(new GlobalMessageEvent('Those participating in Monthly PVP will be moved to the Arena (on Surface) in 15 minutes.
         All current explorations for these players will stop. You will be considered in "automation" for the time you are in the
@@ -41,10 +41,20 @@ class StartMonthlyPvpEvent extends Command
 
         MonthlyPvpAutomation::dispatch()->delay(now()->addMinutes(1));
 
-        Character::chunkById(100, function($character) {
+        Character::chunkById(100, function ($character) {
             foreach ($character as $character) {
                 event(new UpdateCharacterStatus($character));
             }
         });
+
+        $event = Event::where('type', EventType::MONTHLY_PVP)->first();
+
+        $announcement = Announcement::where('event_id', $event->id)->first();
+
+        event(new DeleteAnnouncementEvent($announcement->id));
+
+        $announcement->delete();
+
+        $event->delete();
     }
 }

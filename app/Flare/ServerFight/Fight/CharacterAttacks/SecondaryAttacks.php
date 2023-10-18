@@ -8,10 +8,13 @@ use App\Flare\Models\Location;
 use App\Flare\ServerFight\BattleBase;
 use App\Flare\ServerFight\Fight\Affixes;
 use App\Flare\ServerFight\Monster\ServerMonster;
+use App\Flare\Traits\ElementAttackData;
 use App\Flare\Values\LocationType;
 use App\Game\Gems\Values\GemTypeValue;
 
 class SecondaryAttacks extends BattleBase {
+
+    use ElementAttackData;
 
     private Affixes $affixes;
 
@@ -50,7 +53,6 @@ class SecondaryAttacks extends BattleBase {
             $this->affixDamage($character, $monster, $affixReduction, $isPvp);
 
             $this->ringDamage($isPvp);
-
         } else {
             if ($isPvp) {
                 $this->addAttackerMessage('You are voided, none of your rings or enchantments fire ...', 'enemy-action');
@@ -125,21 +127,23 @@ class SecondaryAttacks extends BattleBase {
             $this->affixes->setEntranced();
         }
 
-        $monsterData            = $monster->getMonster();
-        $lifeStealingResistance = $monsterData['life_stealing_resistance'];
-        $damageResistance       = 0.0;      
-
-        if (($monsterData['is_raid_monster'] || $monsterData['is_raid_boss']) && !is_null($lifeStealingResistance)) {
-
-            $damageResistance = $lifeStealingResistance;
-        }
-
         $lifeStealingDamage = $this->affixes->getAffixLifeSteal($character, $this->attackData, $this->monsterHealth, $resistance, $isPvp);
 
-        if ($damageResistance > 0) {
-            $lifeStealingDamage -= $lifeStealingDamage * $damageResistance;
+        if (!is_null($monster)) {
+            $monsterData            = $monster->getMonster();
+            $lifeStealingResistance = $monsterData['life_stealing_resistance'];
+            $damageResistance       = 0.0;
 
-            $this->addMessage('The enemy manages to resist ('.($damageResistance * 100).'%) some of the life stealing damage!', 'enemy-action');
+            if (($monsterData['is_raid_monster'] || $monsterData['is_raid_boss']) && !is_null($lifeStealingResistance)) {
+
+                $damageResistance = $lifeStealingResistance;
+            }
+
+            if ($damageResistance > 0) {
+                $lifeStealingDamage -= $lifeStealingDamage * $damageResistance;
+
+                $this->addMessage('The enemy manages to resist (' . ($damageResistance * 100) . '%) some of the life stealing damage!', 'enemy-action');
+            }
         }
 
         if (!$isPvp) {
@@ -203,23 +207,41 @@ class SecondaryAttacks extends BattleBase {
         $attackerAtonement = $character->getInformation()->buildElementalAtonement();
         $defenderAtonement = Character::find($this->defenderId)->getInformation()->buildElementalAtonement();
 
-        if (!is_null($attackerAtonement)) {
-            $attackerOppositeElement = GemTypeValue::getOppositeForName($attackerAtonement['elemental_damage']['name']);
+        if ($attackerAtonement['highest_element']['name'] === 'N/A') {
+            return;
+        }
 
-            $damage = $this->getDamageForElementalDamage();
+        $damage = $this->getDamageForElementalDamage();
 
-            if (!is_null($defenderAtonement)) {
-                $defenderOppositeElement = GemTypeValue::getOppositeForName($defenderAtonement['elemental_damage']['name']);
+        if ($defenderAtonement['highest_element']['name'] === 'N/A') {
+            if ($attackerAtonement['highest_element']['name'] === 'N/A') {
+                return;
+            }
 
-                if ($attackerAtonement['elemental_damage']['name'] === $defenderOppositeElement) {
-                    $this->addMessage('Your elemental atonement is strong against the enemies elemental atonement (damage doubled!)', 'regular', true);
-                    $this->addDefenderMessage('Your elemental atonement is weak against the enemies! You suffer double damage.', 'regular');
-                    $damage = $damage * 2;
-                } else if ($attackerOppositeElement === $defenderAtonement['elemental_damage']['name']) {
-                    $this->addMessage('Your elemental atonement is weak against the enemies elemental atonement (damage is halved)', 'enemy-action', true);
-                    $this->addDefenderMessage('Your elemental atonement is strong against the enemies! You only suffer half damage.', 'regular');
-                    $damage = $damage / 2;
-                }
+            $this->addMessage('Your elemental atonement is normal against the enemies elemental atonement', 'regular', true);
+            $this->addDefenderMessage('Your elemental atonement does not protect you against the enemies! You suffer regular elemental damage.', 'regular');
+
+            $this->monsterHealth -= $this->monsterHealth - $damage;
+
+            $this->addMessage('The elements deep inside the gems on your gear roar to life dealing: ' . number_format($damage) . ' damage.', 'player-action', true);
+            $this->addDefenderMessage('The enemies gems blast light towards you as the elements tare into your skin for: ' . number_format($damage) . ' damage.', 'enemy-action');
+
+            return;
+        }
+
+        if (!is_null($attackerAtonement) && !is_null($defenderAtonement)) {
+
+            if ($this->isHalfDamage($defenderAtonement['elemental_data'], $attackerAtonement['highest_element']['name'])) {
+                $this->addMessage('Your elemental atonement is weak against the enemies elemental atonement (damage is halved)', 'enemy-action', true);
+                $this->addDefenderMessage('Your elemental atonement is strong against the enemies! You only suffer half damage.', 'regular');
+                $damage = $damage / 2;
+            } else if ($this->isDoubleDamage($defenderAtonement['elemental_data'], $attackerAtonement['highest_element']['name'])) {
+                $this->addMessage('Your elemental atonement is strong against the enemies elemental atonement (damage doubled!)', 'regular', true);
+                $this->addDefenderMessage('Your elemental atonement is weak against the enemies! You suffer double damage.', 'regular');
+                $damage = $damage * 2;
+            } else {
+                $this->addMessage('Your elemental atonement is normal against the enemies elemental atonement', 'regular', true);
+                $this->addDefenderMessage('Your elemental atonement is normal against the enemies! You suffer regular damage.', 'regular');
             }
 
             $this->monsterHealth -= $this->monsterHealth - $damage;
@@ -244,12 +266,11 @@ class SecondaryAttacks extends BattleBase {
     protected function isAtRankedFightLocation(Character $character): bool {
 
         $location = Location::where('x', $character->map->x_position)
-                            ->where('y', $character->map->y_position)
-                            ->where('game_map_id', $character->map->game_map_id)
-                            ->where('type', LocationType::UNDERWATER_CAVES)
-                            ->first();
+            ->where('y', $character->map->y_position)
+            ->where('game_map_id', $character->map->game_map_id)
+            ->where('type', LocationType::UNDERWATER_CAVES)
+            ->first();
 
         return !is_null($location) ** $character->classType()->isVampire();
     }
-
 }

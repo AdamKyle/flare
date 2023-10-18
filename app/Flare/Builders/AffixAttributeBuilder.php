@@ -139,7 +139,7 @@ class AffixAttributeBuilder {
         $statAttributes = [];
 
         foreach ($stats as $stat) {
-            $statAttributes[$stat] = $this->getPercentage($this->percentageRange[0], $this->percentageRange[1]);
+            $statAttributes[$stat] = $this->getPercentage($this->percentageRange[0], $this->percentageRange[1]) / $this->percentageRange[1];
         }
 
         return $statAttributes;
@@ -169,13 +169,13 @@ class AffixAttributeBuilder {
 
     public function setLifeStealingAmount(): array {
         return [
-            'steal_life_amount' => $this->getPercentage($this->percentageRange[0], $this->percentageRange[1]) / 10,
+            'steal_life_amount' => $this->getPercentage($this->percentageRange[0], $this->percentageRange[1]) / $this->percentageRange[1],
         ];
     }
 
     public function setEntrancingAmount(): array {
         return [
-            'entranced_chance' => $this->getPercentage($this->percentageRange[0], $this->percentageRange[1]) / 10,
+            'entranced_chance' => $this->getPercentage($this->percentageRange[0], $this->percentageRange[1]) / $this->percentageRange[1],
         ];
     }
 
@@ -197,22 +197,22 @@ class AffixAttributeBuilder {
 
     public function setReductions(): array {
         return [
-            'skill_reduction'      => $this->getPercentage($this->percentageRange[0], $this->percentageRange[1]),
-            'resistance_reduction' => $this->getPercentage($this->percentageRange[0], $this->percentageRange[1]),
+            'skill_reduction'      => $this->getPercentage($this->percentageRange[0], $this->percentageRange[1]) / $this->percentageRange[1],
+            'resistance_reduction' => $this->getPercentage($this->percentageRange[0], $this->percentageRange[1]) / $this->percentageRange[1],
         ];
     }
 
     public function setSkillDetails(): array {
         return [
             'skill_name'              => $this->characterSkills[rand(0, count($this->characterSkills) - 1)]->baseSkill->name,
-            'skill_training_bonus'    => $this->getPercentage($this->percentageRange[0], $this->percentageRange[1]),
-            'skill_bonus'             => $this->getPercentage($this->percentageRange[0], $this->percentageRange[1]),
+            'skill_training_bonus'    => $this->getPercentage($this->percentageRange[0], $this->percentageRange[1]) / $this->percentageRange[1],
+            'skill_bonus'             => $this->getPercentage($this->percentageRange[0], $this->percentageRange[1]) / $this->percentageRange[1],
         ];
     }
 
     public function setSkillBonuses(): array {
         $allowedTypes = [
-            1,2,3,4,5,6,7,13 // The match to the SkillTypeValue const's
+            1, 2, 3, 4, 5, 6, 7, 13 // The match to the SkillTypeValue const's
         ];
 
         return [
@@ -267,6 +267,6 @@ class AffixAttributeBuilder {
     }
 
     protected function getPercentage(int $min, int $max): float {
-        return ($min + mt_rand() / mt_getrandmax() * ($max - $min)) / 100;
+        return ($min + mt_rand() / mt_getrandmax() * ($max - $min));
     }
 }

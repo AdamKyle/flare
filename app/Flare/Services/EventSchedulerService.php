@@ -162,27 +162,31 @@ class EventSchedulerService {
         for ($i = 1; $i <= $amount; $i++) {
 
             if ($type === 'weekly') {
-                $date = $date->copy()->addWeek();
+                $startDate = $date->copy()->addWeek();
 
-                $endDate = $date->copy()->addDay();
+                $endDate = $startDate->copy()->addDay();
 
                 $newEventData = $eventData;
-                $newEventData['start_date'] = $date;
+                $newEventData['start_date'] = $startDate;
                 $newEventData['end_date'] = $endDate;
 
                 ScheduledEvent::create($newEventData);
+
+                $date = $startDate;
             }
 
             if ($type === 'monthly') {
-                $date = $date->copy()->addMonth();
+                $startDate = $date->copy()->addMonthsNoOverflow()->endOfMonth();
 
-                $endDate = $date->copy()->addDay();
+                $endDate = $startDate->setTime(19, 0);
 
                 $newEventData = $eventData;
-                $newEventData['start_date'] = $date;
+                $newEventData['start_date'] = $startDate;
                 $newEventData['end_date'] = $endDate;
 
                 ScheduledEvent::create($newEventData);
+
+                $date = $startDate;
             }
         }
 

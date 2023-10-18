@@ -186,16 +186,6 @@ class EndScheduledEvent extends Command {
      */
     protected function endMonthlyPVPEvent() {
         event(new GlobalMessageEvent('Monthly PVP has ended. Come back at the end of next month for a chance to win a mythic and test your might!'));
-
-        $event = Event::where('type', EventType::MONTHLY_PVP)->first();
-
-        $announcement = Announcement::where('event_id', $event->id)->first();
-
-        event(new DeleteAnnouncementEvent($announcement->id));
-
-        $announcement->delete();
-
-        $event->delete();
     }
 
     /**
