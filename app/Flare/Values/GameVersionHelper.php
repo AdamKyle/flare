@@ -7,7 +7,7 @@ use App\Flare\Models\ReleaseNote;
 class GameVersionHelper {
 
     public static function version() {
-        $releaseNotes = ReleaseNote::orderBy('id', 'desc')->first();
+        $releaseNotes = ReleaseNote::orderBy('release_date', 'desc')->first();
 
         if (is_null($releaseNotes)) {
             return 'a.b.c';
