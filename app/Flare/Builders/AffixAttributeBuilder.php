@@ -64,7 +64,7 @@ class AffixAttributeBuilder {
         $attributes = [];
 
         if ($this->increasesStats()) {
-            $attributes = $this->mergeDetails($attributes, $this->increaseStats());
+            $attributes = $this->mergeDetails($attributes, $this->increaseStats($amountPaid));
         }
 
         if ($this->reducesEnemyStats()) {
@@ -125,7 +125,7 @@ class AffixAttributeBuilder {
         ];
     }
 
-    public function increaseStats() {
+    public function increaseStats(int $amountPaid) {
         $stats = [
             'str_mod',
             'dur_mod',
@@ -139,7 +139,15 @@ class AffixAttributeBuilder {
         $statAttributes = [];
 
         foreach ($stats as $stat) {
-            $statAttributes[$stat] = $this->getPercentage($this->percentageRange[0], $this->percentageRange[1]) / $this->percentageRange[1];
+            $amount = $this->getPercentage($this->percentageRange[0], $this->percentageRange[1]);
+
+            if (!RandomAffixDetails::isMythicForCost($amountPaid)) {
+                $amount = $amount / $this->percentageRange[1];
+            } else {
+                $amount = $amount / 100;
+            }
+
+            $statAttributes[$stat] = $amount;
         }
 
         return $statAttributes;
@@ -159,7 +167,7 @@ class AffixAttributeBuilder {
         $statAttributes = [];
 
         foreach ($stats as $stat) {
-            $statAttributes[$stat] = $this->getPercentage($this->percentageRange[0], $this->percentageRange[1]);
+            $statAttributes[$stat] = $this->getPercentage($this->percentageRange[0], $this->percentageRange[1]) / $this->percentageRange[1];
         }
 
         $statAttributes['reduces_enemy_stats'] = true;
@@ -181,9 +189,9 @@ class AffixAttributeBuilder {
 
     public function setCoreModifiers(): array {
         return [
-            'base_damage_mod'  => $this->getPercentage($this->percentageRange[0], $this->percentageRange[1]),
-            'base_ac_mod'      => $this->getPercentage($this->percentageRange[0], $this->percentageRange[1]),
-            'base_healing_mod' => $this->getPercentage($this->percentageRange[0], $this->percentageRange[1]),
+            'base_damage_mod'  => $this->getPercentage($this->percentageRange[0], $this->percentageRange[1]) / $this->percentageRange[1],
+            'base_ac_mod'      => $this->getPercentage($this->percentageRange[0], $this->percentageRange[1]) / $this->percentageRange[1],
+            'base_healing_mod' => $this->getPercentage($this->percentageRange[0], $this->percentageRange[1]) / $this->percentageRange[1],
         ];
     }
 

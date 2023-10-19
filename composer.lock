@@ -101,16 +101,16 @@
         },
         {
             "name": "bkwld/cloner",
-            "version": "3.11.1",
+            "version": "3.11.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/BKWLD/cloner.git",
-                "reference": "18fbd1c42dfe10991f964c3668be61e05e414ab6"
+                "reference": "ebce0acded4cd4aeb92eb0bdb2f946fa7e1aa9f4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/BKWLD/cloner/zipball/18fbd1c42dfe10991f964c3668be61e05e414ab6",
-                "reference": "18fbd1c42dfe10991f964c3668be61e05e414ab6",
+                "url": "https://api.github.com/repos/BKWLD/cloner/zipball/ebce0acded4cd4aeb92eb0bdb2f946fa7e1aa9f4",
+                "reference": "ebce0acded4cd4aeb92eb0bdb2f946fa7e1aa9f4",
                 "shasum": ""
             },
             "require": {
@@ -154,9 +154,9 @@
             "description": "A trait for Laravel Eloquent models that lets you clone of a model and it's relationships, including files.",
             "support": {
                 "issues": "https://github.com/BKWLD/cloner/issues",
-                "source": "https://github.com/BKWLD/cloner/tree/3.11.1"
+                "source": "https://github.com/BKWLD/cloner/tree/3.11.2"
             },
-            "time": "2023-04-20T00:19:55+00:00"
+            "time": "2023-10-17T14:34:42+00:00"
         },
         {
             "name": "brick/math",
@@ -3119,16 +3119,16 @@
         },
         {
             "name": "league/mime-type-detection",
-            "version": "1.13.0",
+            "version": "1.14.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/thephpleague/mime-type-detection.git",
-                "reference": "a6dfb1194a2946fcdc1f38219445234f65b35c96"
+                "reference": "b6a5854368533df0295c5761a0253656a2e52d9e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thephpleague/mime-type-detection/zipball/a6dfb1194a2946fcdc1f38219445234f65b35c96",
-                "reference": "a6dfb1194a2946fcdc1f38219445234f65b35c96",
+                "url": "https://api.github.com/repos/thephpleague/mime-type-detection/zipball/b6a5854368533df0295c5761a0253656a2e52d9e",
+                "reference": "b6a5854368533df0295c5761a0253656a2e52d9e",
                 "shasum": ""
             },
             "require": {
@@ -3159,7 +3159,7 @@
             "description": "Mime-type detection for Flysystem",
             "support": {
                 "issues": "https://github.com/thephpleague/mime-type-detection/issues",
-                "source": "https://github.com/thephpleague/mime-type-detection/tree/1.13.0"
+                "source": "https://github.com/thephpleague/mime-type-detection/tree/1.14.0"
             },
             "funding": [
                 {
@@ -3171,7 +3171,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2023-08-05T12:09:49+00:00"
+            "time": "2023-10-17T14:13:20+00:00"
         },
         {
             "name": "livewire/livewire",
@@ -6384,16 +6384,16 @@
         },
         {
             "name": "spatie/laravel-collection-macros",
-            "version": "7.13.0",
+            "version": "7.13.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-collection-macros.git",
-                "reference": "56ebda102ef4552aa6bb1ad65e9b2a32e3915f30"
+                "reference": "448d0a9e7a4151938e3cfaf1235d69d899f13ba7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-collection-macros/zipball/56ebda102ef4552aa6bb1ad65e9b2a32e3915f30",
-                "reference": "56ebda102ef4552aa6bb1ad65e9b2a32e3915f30",
+                "url": "https://api.github.com/repos/spatie/laravel-collection-macros/zipball/448d0a9e7a4151938e3cfaf1235d69d899f13ba7",
+                "reference": "448d0a9e7a4151938e3cfaf1235d69d899f13ba7",
                 "shasum": ""
             },
             "require": {
@@ -6405,9 +6405,7 @@
                 "amphp/parallel-functions": "^1.1.0",
                 "mockery/mockery": "^1.6.2",
                 "orchestra/testbench": "^8.5.9",
-                "pestphp/pest": "dev-develop as 2.99",
-                "pestphp/pest-plugin-drift": "2.x-dev",
-                "pestphp/pest-plugin-type-coverage": "2.x-dev",
+                "pestphp/pest": "^2.0",
                 "phpunit/phpunit": "10.2.2",
                 "spatie/laravel-ray": "^1.32.5",
                 "symfony/stopwatch": "^6.3"
@@ -6453,7 +6451,7 @@
                 "spatie"
             ],
             "support": {
-                "source": "https://github.com/spatie/laravel-collection-macros/tree/7.13.0"
+                "source": "https://github.com/spatie/laravel-collection-macros/tree/7.13.1"
             },
             "funding": [
                 {
@@ -6461,7 +6459,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-06-30T17:46:10+00:00"
+            "time": "2023-10-17T15:12:13+00:00"
         },
         {
             "name": "spatie/laravel-package-tools",
@@ -12004,35 +12002,35 @@
         },
         {
             "name": "spatie/flare-client-php",
-            "version": "1.4.2",
+            "version": "1.4.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/flare-client-php.git",
-                "reference": "5f2c6a7a0d2c1d90c12559dc7828fd942911a544"
+                "reference": "5db2fdd743c3ede33f2a5367d89ec1a7c9c1d1ec"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/flare-client-php/zipball/5f2c6a7a0d2c1d90c12559dc7828fd942911a544",
-                "reference": "5f2c6a7a0d2c1d90c12559dc7828fd942911a544",
+                "url": "https://api.github.com/repos/spatie/flare-client-php/zipball/5db2fdd743c3ede33f2a5367d89ec1a7c9c1d1ec",
+                "reference": "5db2fdd743c3ede33f2a5367d89ec1a7c9c1d1ec",
                 "shasum": ""
             },
             "require": {
-                "illuminate/pipeline": "^8.0|^9.0|^10.0",
+                "illuminate/pipeline": "^8.0|^9.0|^10.0|^11.0",
                 "nesbot/carbon": "^2.62.1",
                 "php": "^8.0",
                 "spatie/backtrace": "^1.5.2",
-                "symfony/http-foundation": "^5.0|^6.0",
-                "symfony/mime": "^5.2|^6.0",
-                "symfony/process": "^5.2|^6.0",
-                "symfony/var-dumper": "^5.2|^6.0"
+                "symfony/http-foundation": "^5.2|^6.0|^7.0",
+                "symfony/mime": "^5.2|^6.0|^7.0",
+                "symfony/process": "^5.2|^6.0|^7.0",
+                "symfony/var-dumper": "^5.2|^6.0|^7.0"
             },
             "require-dev": {
-                "dms/phpunit-arraysubset-asserts": "^0.3.0",
-                "pestphp/pest": "^1.20",
+                "dms/phpunit-arraysubset-asserts": "^0.5.0",
+                "pestphp/pest": "^1.20|^2.0",
                 "phpstan/extension-installer": "^1.1",
                 "phpstan/phpstan-deprecation-rules": "^1.0",
                 "phpstan/phpstan-phpunit": "^1.0",
-                "spatie/phpunit-snapshot-assertions": "^4.0"
+                "spatie/phpunit-snapshot-assertions": "^4.0|^5.0"
             },
             "type": "library",
             "extra": {
@@ -12062,7 +12060,7 @@
             ],
             "support": {
                 "issues": "https://github.com/spatie/flare-client-php/issues",
-                "source": "https://github.com/spatie/flare-client-php/tree/1.4.2"
+                "source": "https://github.com/spatie/flare-client-php/tree/1.4.3"
             },
             "funding": [
                 {
@@ -12070,20 +12068,20 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-07-28T08:07:24+00:00"
+            "time": "2023-10-17T15:54:07+00:00"
         },
         {
             "name": "spatie/ignition",
-            "version": "1.11.2",
+            "version": "1.11.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/ignition.git",
-                "reference": "48b23411ca4bfbc75c75dfc638b6b36159c375aa"
+                "reference": "3d886de644ff7a5b42e4d27c1e1f67c8b5f00044"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/ignition/zipball/48b23411ca4bfbc75c75dfc638b6b36159c375aa",
-                "reference": "48b23411ca4bfbc75c75dfc638b6b36159c375aa",
+                "url": "https://api.github.com/repos/spatie/ignition/zipball/3d886de644ff7a5b42e4d27c1e1f67c8b5f00044",
+                "reference": "3d886de644ff7a5b42e4d27c1e1f67c8b5f00044",
                 "shasum": ""
             },
             "require": {
@@ -12092,19 +12090,19 @@
                 "php": "^8.0",
                 "spatie/backtrace": "^1.5.3",
                 "spatie/flare-client-php": "^1.4.0",
-                "symfony/console": "^5.4|^6.0",
-                "symfony/var-dumper": "^5.4|^6.0"
+                "symfony/console": "^5.4|^6.0|^7.0",
+                "symfony/var-dumper": "^5.4|^6.0|^7.0"
             },
             "require-dev": {
-                "illuminate/cache": "^9.52",
+                "illuminate/cache": "^9.52|^10.0|^11.0",
                 "mockery/mockery": "^1.4",
-                "pestphp/pest": "^1.20",
+                "pestphp/pest": "^1.20|^2.0",
                 "phpstan/extension-installer": "^1.1",
                 "phpstan/phpstan-deprecation-rules": "^1.0",
                 "phpstan/phpstan-phpunit": "^1.0",
                 "psr/simple-cache-implementation": "*",
-                "symfony/cache": "^6.0",
-                "symfony/process": "^5.4|^6.0",
+                "symfony/cache": "^5.4|^6.0|^7.0",
+                "symfony/process": "^5.4|^6.0|^7.0",
                 "vlucas/phpdotenv": "^5.5"
             },
             "suggest": {
@@ -12153,7 +12151,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-09-19T15:29:52+00:00"
+            "time": "2023-10-18T14:09:40+00:00"
         },
         {
             "name": "spatie/laravel-ignition",

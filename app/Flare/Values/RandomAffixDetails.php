@@ -39,6 +39,10 @@ class RandomAffixDetails {
         $this->value = $value;
     }
 
+    public static function isMythicForCost(int $amountPaid) {
+        return self::MYTHIC === $amountPaid;
+    }
+
     public function getPercentageRange(): array {
         switch ($this->value) {
             case self::MEDIUM:
