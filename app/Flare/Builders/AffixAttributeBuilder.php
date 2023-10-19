@@ -141,11 +141,7 @@ class AffixAttributeBuilder {
         foreach ($stats as $stat) {
             $amount = $this->getPercentage($this->percentageRange[0], $this->percentageRange[1]);
 
-            if (!RandomAffixDetails::isMythicForCost($amountPaid)) {
-                $amount = $amount / $this->percentageRange[1];
-            } else {
-                $amount = $amount / 100;
-            }
+            $amount = $amount / 100;
 
             $statAttributes[$stat] = $amount;
         }

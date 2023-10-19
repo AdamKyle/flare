@@ -8,11 +8,11 @@ use App\Flare\Models\Item;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\MarketBoard;
 use App\Flare\Models\MarketHistory;
+use App\Flare\Models\Raid;
 use App\Flare\Models\SetSlot;
 use Illuminate\Console\Command;
 
-class CleanupUnusedItems extends Command
-{
+class CleanupUnusedItems extends Command {
     /**
      * The name and signature of the console command.
      *
@@ -34,20 +34,21 @@ class CleanupUnusedItems extends Command
      */
     public function handle(): void {
 
-        ini_set('memory_limit','3G');
+        ini_set('memory_limit', '3G');
 
         $this->line('Cleaning up items ...');
 
         $prefixItems = Item::whereHas('itemPrefix')
-                           ->whereDoesntHave('inventorySlots')
-                           ->whereDoesntHave('inventorySetSlots')
-                           ->whereDoesntHave('marketListings')
-                           ->whereDoesntHave('marketHistory')
-                           ->pluck('id')->toArray();
+            ->whereDoesntHave('inventorySlots')
+            ->whereDoesntHave('inventorySetSlots')
+            ->whereDoesntHave('marketListings')
+            ->whereDoesntHave('marketHistory')
+            ->where('type', '!=', 'artifact')
+            ->pluck('id')->toArray();
 
         $prefixCount = count($prefixItems);
 
-        $this->line('Cleaning Prefixes ('.$prefixCount.') ...');
+        $this->line('Cleaning Prefixes (' . $prefixCount . ') ...');
         $this->newLine();
 
         $chunkedPrefixItems = array_chunk($prefixItems, 10);
@@ -62,13 +63,14 @@ class CleanupUnusedItems extends Command
         }
 
         $suffixItems = Item::whereHas('itemSuffix')
-                           ->whereDoesntHave('inventorySlots')
-                           ->whereDoesntHave('inventorySetSlots')
-                           ->whereDoesntHave('marketListings')
-                           ->whereDoesntHave('marketHistory')
-                           ->pluck('id')->toArray();
+            ->whereDoesntHave('inventorySlots')
+            ->whereDoesntHave('inventorySetSlots')
+            ->whereDoesntHave('marketListings')
+            ->whereDoesntHave('marketHistory')
+            ->where('type', '!=', 'artifact')
+            ->pluck('id')->toArray();
 
-        $this->line('Cleaning Suffixes ('.count($suffixItems).') ...');
+        $this->line('Cleaning Suffixes (' . count($suffixItems) . ') ...');
         $this->newLine();
 
         $chunkedSuffixItems = array_chunk($suffixItems, 10);
@@ -86,9 +88,9 @@ class CleanupUnusedItems extends Command
         $this->newLine();
 
         $unusedArtifacts = Item::where('type', 'artifact')
-                               ->whereDoesntHave('inventorySlots')
-                               ->whereDoesntHave('inventorySetSlots')
-                               ->pluck('id')->toArray();
+            ->whereDoesntHave('inventorySlots')
+            ->whereDoesntHave('inventorySetSlots')
+            ->pluck('id')->toArray();
 
         $chunkedSuffixItems = array_chunk($unusedArtifacts, 10);
 
@@ -98,6 +100,13 @@ class CleanupUnusedItems extends Command
             $items = Item::whereIn('id', $chunk)->get();
 
             foreach ($items as $item) {
+
+                $raid = Raid::where('artifact_item_id', $item->id)->first();
+
+                if (!is_null($raid)) {
+                    continue;
+                }
+
                 $item->itemSkillProgressions()->delete();
                 $item->delete();
             }
