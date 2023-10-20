@@ -33,13 +33,16 @@ export default class GuideButton extends React.Component<any, any> {
 
         const self = this;
 
-        setTimeout(function () {
-            if (self.props.force_open_modal) {
-                self.setState({
-                    is_modal_open: true,
-                });
-            }
-        }, 500);
+        setTimeout(
+            function () {
+                if (self.props.force_open_modal) {
+                    self.setState({
+                        is_modal_open: true,
+                    });
+                }
+            },
+            process.env.APP_ENV === "production" ? 3500 : 500
+        );
 
         // @ts-ignore
         this.guideQuestButton.listen(
