@@ -9,8 +9,8 @@ class RandomAffixDetails {
      */
     private $value;
 
-    const BASIC     = 10000000000;
-    const MEDIUM    = 50000000000;
+    const BASIC     = 2000000000;
+    const MEDIUM    = 4000000000;
     const LEGENDARY = 100000000000;
     const MYTHIC    = 500000000000;
 

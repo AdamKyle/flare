@@ -6,8 +6,7 @@ use App\Flare\Models\ScheduledEventConfiguration;
 use App\Flare\Services\EventSchedulerService;
 use Illuminate\Console\Command;
 
-class GenerateScheduledEvents extends Command
-{
+class GenerateScheduledEvents extends Command {
     /**
      * The name and signature of the console command.
      *
@@ -37,7 +36,7 @@ class GenerateScheduledEvents extends Command
         foreach ($scheduledEventConfigurations as $scheduledEventConfiguration) {
 
             if ($scheduledEventConfiguration->generate_every === 'weekly') {
-                $this->handleMakeEvents($scheduledEventConfiguration, $eventSchedulerService);
+                $this->handleWeeklyEvents($scheduledEventConfiguration, $eventSchedulerService);
             }
 
             if ($scheduledEventConfiguration->generate_every === 'monthly') {
