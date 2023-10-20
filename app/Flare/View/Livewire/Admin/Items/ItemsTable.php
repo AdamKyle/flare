@@ -34,7 +34,7 @@ class ItemsTable extends DataTableComponent {
 
         if ($this->isShop) {
             $query = $query->where('cost', '<=', 2000000000)
-                ->whereNotIn('type', ['quest', 'alchemy', 'trinket'])
+                ->whereNotIn('type', ['quest', 'alchemy', 'trinket', 'artifact'])
                 ->whereNull('item_suffix_id')
                 ->whereNull('item_prefix_id')
                 ->whereNull('specialty_type');
@@ -62,7 +62,7 @@ class ItemsTable extends DataTableComponent {
                     $builder->where('cost', '<=', 2000000000)
                         ->whereNull('item_suffix_id')
                         ->whereNull('item_prefix_id')
-                        ->whereNotIn('type', ['quest', 'alchemy', 'trinket']);
+                        ->whereNotIn('type', ['quest', 'alchemy', 'trinket', 'artifact']);
 
                     if ($this->isShop) {
                         $builder->whereNull('specialty_type');

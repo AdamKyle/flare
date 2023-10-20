@@ -163,7 +163,8 @@ class AffixAttributeBuilder {
         $statAttributes = [];
 
         foreach ($stats as $stat) {
-            $statAttributes[$stat] = $this->getPercentage($this->percentageRange[0], $this->percentageRange[1]) / $this->percentageRange[1];
+            $amount = $this->getPercentage($this->percentageRange[0], $this->percentageRange[1]) / 100;
+            $statAttributes[$stat] = $amount > 1 ? 1 : $amount;
         }
 
         $statAttributes['reduces_enemy_stats'] = true;
@@ -172,22 +173,26 @@ class AffixAttributeBuilder {
     }
 
     public function setLifeStealingAmount(): array {
+        $amount = $this->getPercentage($this->percentageRange[0], $this->percentageRange[1]) / 100;
+
         return [
-            'steal_life_amount' => $this->getPercentage($this->percentageRange[0], $this->percentageRange[1]) / $this->percentageRange[1],
+            'steal_life_amount' => $amount > 1 ? 1 : $amount,
         ];
     }
 
     public function setEntrancingAmount(): array {
+        $amount = $this->getPercentage($this->percentageRange[0], $this->percentageRange[1]) / 100;
+
         return [
-            'entranced_chance' => $this->getPercentage($this->percentageRange[0], $this->percentageRange[1]) / $this->percentageRange[1],
+            'entranced_chance' => $amount > 1 ? 1 : $amount,
         ];
     }
 
     public function setCoreModifiers(): array {
         return [
-            'base_damage_mod'  => $this->getPercentage($this->percentageRange[0], $this->percentageRange[1]) / $this->percentageRange[1],
-            'base_ac_mod'      => $this->getPercentage($this->percentageRange[0], $this->percentageRange[1]) / $this->percentageRange[1],
-            'base_healing_mod' => $this->getPercentage($this->percentageRange[0], $this->percentageRange[1]) / $this->percentageRange[1],
+            'base_damage_mod'  => $this->getPercentage($this->percentageRange[0], $this->percentageRange[1]) / 100,
+            'base_ac_mod'      => $this->getPercentage($this->percentageRange[0], $this->percentageRange[1]) / 100,
+            'base_healing_mod' => $this->getPercentage($this->percentageRange[0], $this->percentageRange[1]) / 100,
         ];
     }
 
@@ -200,17 +205,21 @@ class AffixAttributeBuilder {
     }
 
     public function setReductions(): array {
+        $amount = $this->getPercentage($this->percentageRange[0], $this->percentageRange[1]) / 100;
+
         return [
-            'skill_reduction'      => $this->getPercentage($this->percentageRange[0], $this->percentageRange[1]) / $this->percentageRange[1],
-            'resistance_reduction' => $this->getPercentage($this->percentageRange[0], $this->percentageRange[1]) / $this->percentageRange[1],
+            'skill_reduction'      => $amount > 1 ? 1 : $amount,
+            'resistance_reduction' => $amount > 1 ? 1 : $amount,
         ];
     }
 
     public function setSkillDetails(): array {
+        $amount = $this->getPercentage($this->percentageRange[0], $this->percentageRange[1]) / 100;
+
         return [
             'skill_name'              => $this->characterSkills[rand(0, count($this->characterSkills) - 1)]->baseSkill->name,
-            'skill_training_bonus'    => $this->getPercentage($this->percentageRange[0], $this->percentageRange[1]) / $this->percentageRange[1],
-            'skill_bonus'             => $this->getPercentage($this->percentageRange[0], $this->percentageRange[1]) / $this->percentageRange[1],
+            'skill_training_bonus'    => $amount > 1 ? 1 : $amount,
+            'skill_bonus'             => $amount > 1 ? 1 : $amount,
         ];
     }
 
@@ -225,8 +234,10 @@ class AffixAttributeBuilder {
     }
 
     public function setDevouringLight(): array {
+        $amount = $this->getPercentage($this->percentageRange[0], $this->percentageRange[1]) / 100;
+
         return [
-            'devouring_light' => $this->getPercentage($this->percentageRange[0], $this->percentageRange[1]) / 10
+            'devouring_light' => $amount > 1 ? 1 : $amount,
         ];
     }
 

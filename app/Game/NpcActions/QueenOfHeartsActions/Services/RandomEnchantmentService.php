@@ -113,11 +113,11 @@ class RandomEnchantmentService {
      */
     public function fetchNonUniqueItems(Character $character): Collection {
         return $character->inventory->slots->filter(function($slot) {
-            if (!$slot->equipped && 
-                $slot->item->type !== 'quest' && 
-                $slot->item->type !== 'alchemy' && 
-                $slot->item->type !== 'trinket' && 
-                $slot->item->type !== 'artifact') 
+            if (!$slot->equipped &&
+                $slot->item->type !== 'quest' &&
+                $slot->item->type !== 'alchemy' &&
+                $slot->item->type !== 'trinket' &&
+                $slot->item->type !== 'artifact')
             {
                 if (!is_null($slot->item->itemPrefix)) {
                     if (!$slot->item->itemPrefix->randomly_generated) {
@@ -164,8 +164,8 @@ class RandomEnchantmentService {
     protected function generateRandomAffixForRandom(Character $character, int $amount): Item {
         $item = Item::whereNull('item_prefix_id')
             ->whereNull('item_suffix_id')
-            ->whereNotIn('type', ['alchemy', 'quest', 'trinket'])
-            ->where('cost', '<=', 4000000000)
+            ->whereNotIn('type', ['alchemy', 'quest', 'trinket', 'artifact'])
+            ->where('cost', '<=', 2000000000)
             ->inRandomOrder()
             ->first();
 

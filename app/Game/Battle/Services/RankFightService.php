@@ -453,9 +453,9 @@ class RankFightService {
         $item = Item::whereNull('item_prefix_id')
                     ->whereNull('item_suffix_id')
                     ->whereNull('specialty_type')
-                    ->whereNotIn('type', ['alchemy', 'quest', 'trinket'])
+                    ->whereNotIn('type', ['alchemy', 'quest', 'trinket', 'artifact'])
                     ->whereDoesntHave('appliedHolyStacks')
-                    ->where('cost', '<=', 4000000000)
+                    ->where('cost', '<=', 2000000000)
                     ->inRandomOrder()
                     ->first();
 

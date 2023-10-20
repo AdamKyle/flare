@@ -131,7 +131,7 @@ class ShopController extends Controller {
 
     public function sell(Request $request, Character $character) {
 
-        $inventorySlot = $character->inventory->slots->filter(function($slot) use($request) {
+        $inventorySlot = $character->inventory->slots->filter(function ($slot) use ($request) {
             return $slot->id === (int) $request->slot_id && !$slot->equipped;
         })->first();
 
@@ -196,11 +196,11 @@ class ShopController extends Controller {
 
     public function puracheMultiple(ShopBuyMultipleValidation $request, Character $character) {
         $item = Item::where('name', $request->item_name)
-                    ->whereNotIn('type', ['alchemy', 'trinket'])
-                    ->whereNull('item_suffix_id')
-                    ->whereNull('item_prefix_id')
-                    ->whereDoesntHave('appliedHolyStacks')
-                    ->first();
+            ->whereNotIn('type', ['alchemy', 'trinket', 'artifact', 'quest'])
+            ->whereNull('item_suffix_id')
+            ->whereNull('item_prefix_id')
+            ->whereDoesntHave('appliedHolyStacks')
+            ->first();
 
         if (is_null($item)) {
             return redirect()->back()->with('error', 'No matching item found ...');

@@ -43,7 +43,7 @@ class AssignParentChildRelationsToEnchantedItems extends Command
     {
         Item::whereNull('item_suffix_id')
             ->whereNull('item_prefix_id')
-            ->whereNotIn('type', ['quest', 'alchemy'])
+            ->whereNotIn('type', ['quest', 'alchemy', 'trinket', 'artifact'])
             ->chunk(100, function($items) {
                foreach ($items as $item) {
                    $this->assignRelation($item);
@@ -55,6 +55,7 @@ class AssignParentChildRelationsToEnchantedItems extends Command
         $hangingChildren = Item::whereNotNull('item_suffix_id')
             ->whereNotNull('item_prefix_id')
             ->whereNull('parent_id')
+            ->whereNotIn('type', ['quest', 'alchemy', 'trinket', 'artifact'])
             ->get();
 
         if ($hangingChildren->isNotEmpty()) {

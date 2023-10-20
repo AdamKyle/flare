@@ -40,7 +40,7 @@ class BuildMythicItem {
         $item = Item::inRandomOrder()
                     ->doesntHave('itemSuffix')
                     ->doesntHave('itemPrefix')
-                    ->whereNotIn('type', ['quest', 'alchemy', 'trinket'])
+                    ->whereNotIn('type', ['quest', 'alchemy', 'trinket', 'artifact'])
                     ->whereNull('specialty_type')
                     ->first();
 

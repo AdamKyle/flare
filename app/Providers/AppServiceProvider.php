@@ -12,6 +12,7 @@ use App\Console\DevelopmentCommands\CreateTestCharacters;
 use App\Console\DevelopmentCommands\ReincarnateCharacter;
 use App\Console\DevelopmentCommands\IncreaseRankFightToMax;
 use App\Console\DevelopmentCommands\AssignTopEndGearToPlayer;
+use App\Console\DevelopmentCommands\GivePlayerUniqueItem;
 use App\Console\DevelopmentCommands\UpdateUsersForDevelopment;
 use App\Console\DevelopmentCommands\TestExploration;
 use Illuminate\Support\Facades\Blade;
@@ -33,6 +34,7 @@ class AppServiceProvider extends ServiceProvider {
             AssignTopEndGearToPlayer::class,
             ReincarnateCharacter::class,
             IncreaseRankFightToMax::class,
+            GivePlayerUniqueItem::class,
             GivePlayerAncenstorItem::class,
             GivePlayerMythicItem::class,
             TestExploration::class,
