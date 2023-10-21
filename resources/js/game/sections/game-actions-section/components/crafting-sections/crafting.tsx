@@ -185,6 +185,8 @@ export default class Crafting extends React.Component<any, any> {
                                             result.data.items
                                         )
                                     ) {
+                                        this.updateSortedArmour();
+
                                         generateServerMessage(
                                             "new_items",
                                             "You have new items to craft. Check the list!"
@@ -197,6 +199,20 @@ export default class Crafting extends React.Component<any, any> {
                     );
             }
         );
+    }
+
+    updateSortedArmour() {
+        if (this.state.armour_craft_type != null) {
+            const filteredArmour = this.state.craftable_items.filter(
+                (item: any) => {
+                    return item.type === this.state.armour_craft_type;
+                }
+            );
+
+            this.setState({
+                sorted_armour: filteredArmour,
+            });
+        }
     }
 
     clearCrafting() {
