@@ -10,4 +10,5 @@ Welcome back ladies and gents to another release: 1.5.1
 - Fixed issue with Enchanting:
 	+ We never had Spell Crafting Enchants. So those were generated.
 	+ Selecting Ring Crafting would show nothing, but Spell Crafting would show Ring Enchants, this has been fixed.
-	
+- Fixed issue where the kingdom passive timer would not show the passive name being trained.
+	+ Moved the timer to the top of the passive tree.
