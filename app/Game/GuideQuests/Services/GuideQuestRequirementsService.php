@@ -433,9 +433,9 @@ class GuideQuestRequirementsService {
      * @return void
      */
     protected function craftingSkillTypeCheck(Character $character, GuideQuest $quest): void {
-        $classSkill = $character->skills()->whereHas('baseSkill', function ($query) use ($quest) {
-            $query->where('type', SkillTypeValue::CRAFTING)->where('level', $quest->required_skill_type_level);
-        })->first();
+        $classSkill = $character->skills()->whereHas('baseSkill', function ($query) {
+            $query->where('type', SkillTypeValue::CRAFTING);
+        })->where('level', '>=', $quest->required_skill_type_level)->first();
 
         if (!is_null($classSkill)) {
             $this->finishedRequirements[] = 'required_skill_type_level';
