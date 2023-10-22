@@ -24,7 +24,7 @@ class GuideQuestsSheet implements ToCollection {
                 if (is_null($guideQuestData)) {
                     continue;
                 } else {
-                    $foundGuideQuest = GuideQuest::where('name', $guideQuestData['name']);
+                    $foundGuideQuest = GuideQuest::where('name', $guideQuestData['name'])->first();
 
                     if (!is_null($foundGuideQuest)) {
                         $foundGuideQuest->update($guideQuestData);
