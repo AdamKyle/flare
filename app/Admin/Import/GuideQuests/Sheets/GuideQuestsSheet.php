@@ -24,7 +24,7 @@ class GuideQuestsSheet implements ToCollection {
                 if (is_null($guideQuestData)) {
                     continue;
                 } else {
-                    $foundGuideQuest = GuideQuest::find($guideQuestData['id']);
+                    $foundGuideQuest = GuideQuest::where('name', $guideQuestData['name']);
 
                     if (!is_null($foundGuideQuest)) {
                         $foundGuideQuest->update($guideQuestData);
@@ -43,8 +43,8 @@ class GuideQuestsSheet implements ToCollection {
         $secondarySkill = GameSkill::where('name', $data['required_secondary_skill'])->first();
         $passiveSkill   = PassiveSkill::where('name', $data['required_passive_skill'])->first();
         $faction        = Faction::whereHas('gameMap', function ($query) use ($data) {
-                            $query->where('name', $data['required_faction_id']);
-                        })->first();
+            $query->where('name', $data['required_faction_id']);
+        })->first();
         $requiredItem   = Item::where('name', $data['required_quest_item_id'])->where('type', 'quest')->first();
         $secondaryItem  = Item::where('name', $data['secondary_quest_item_id'])->where('type', 'quest')->first();
         $quest          = Quest::where('name', $data['required_quest_id'])->first();
