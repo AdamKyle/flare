@@ -12,3 +12,13 @@ Welcome back ladies and gents to another release: 1.5.1
 	+ Selecting Ring Crafting would show nothing, but Spell Crafting would show Ring Enchants, this has been fixed.
 - Fixed issue where the kingdom passive timer would not show the passive name being trained.
 	+ Moved the timer to the top of the passive tree.
+- Fixed issue with enchanting load bar being too far to the left on mobile.
+
+## Guide Quests
+
+New Guide Quests:
+
+- Consequences Pt. 1
+	+ Get to Dungeons, Get Quest Items. Craft/Enchant and level.
+- Consequences Pt. 2
+	+ Level your character and level alchemy after unlocking it.
