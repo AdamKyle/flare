@@ -3,7 +3,6 @@ import BasicCard from "../../components/ui/cards/basic-card";
 import KingdomProps from "../../lib/game/kingdoms/types/kingdom-props";
 import KingdomDetails from "./kingdom-details";
 import Select from "react-select";
-import BuildingInQueueDetails from "../../lib/game/kingdoms/building-in-queue-details";
 import SmallBuildingsSection from "./buildings/small-buildings-section";
 import SmallUnitsSection from "./units/small-units-section";
 import DangerButton from "../../components/ui/buttons/danger-button";

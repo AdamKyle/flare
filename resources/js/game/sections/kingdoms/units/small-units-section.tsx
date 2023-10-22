@@ -60,6 +60,7 @@ export default class SmallUnitsSection extends React.Component<SmallUnitSectionP
                                          kingdom_iron_cost_reduction={this.props.kingdom.iron_cost_reduction}
                                          kingdom_population_cost_reduction={this.props.kingdom.population_cost_reduction}
                                          kingdom_current_population={this.props.kingdom.current_population}
+                                         kingdom_unit_time_reduction={this.props.kingdom.unit_time_reduction}
                                          unit_cost_reduction={this.props.kingdom.unit_cost_reduction}
                                          character_id={this.props.kingdom.character_id}
                                          is_in_queue={this.isUnitInQueue()}
