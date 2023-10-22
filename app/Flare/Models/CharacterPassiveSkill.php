@@ -36,6 +36,10 @@ class CharacterPassiveSkill extends Model {
         'is_locked'        => 'boolean',
     ];
 
+    protected $appends = [
+        'name',
+    ];
+
     public function character() {
         return $this->belongsTo(Character::class);
     }
@@ -56,4 +60,7 @@ class CharacterPassiveSkill extends Model {
         return $this->current_level * $this->passiveSkill->bonus_per_level;
     }
 
+    public function getNameAttribute() {
+        return $this->passiveSkill->name;
+    }
 }
