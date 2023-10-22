@@ -6,6 +6,8 @@ use App\Flare\Models\GameSkill;
 
 class AffixGeneratorDTO {
 
+    private string $prefixOrSuffix;
+
     private string $affixType;
 
     private ?string $skillName = null;
@@ -24,8 +26,8 @@ class AffixGeneratorDTO {
         $this->doesDamageStack = $doesDamageStack;
     }
 
-    public function setAffixType(string $type) {
-        $this->affixType = $type;
+    public function setPrefixOrSuffix(string $prefixOrSuffix) {
+        $this->prefixOrSuffix = $prefixOrSuffix;
     }
 
     public function setSkillName(string $skillName) {
@@ -34,6 +36,14 @@ class AffixGeneratorDTO {
 
     public function setAttributes(array $attributes) {
         $this->attributes = $attributes;
+    }
+
+    public function setAffixType(int $type) {
+        $this->affixType = $type;
+    }
+
+    public function getPrefixOrSuffix(): string {
+        return $this->prefixOrSuffix;
     }
 
     public function getType(): string {

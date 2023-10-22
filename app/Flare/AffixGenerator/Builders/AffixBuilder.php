@@ -40,7 +40,7 @@ class AffixBuilder {
 
         $affix['cost']         = $affixCurveDTO->getValueForIndex(AffixCurveDTO::COST_CURVE, $index);
         $affix['int_required'] = $affixCurveDTO->getValueForIndex(AffixCurveDTO::INT_REQUIRED_CURVE, $index);
-        $affix['type']         = $affixGeneratorDTO->getType();
+        $affix['type']         = $affixGeneratorDTO->getPrefixOrSuffix();
 
         foreach ($affixGeneratorDTO->getAttributes() as $attribute) {
             $castType = $this->getCastType($attribute);
@@ -79,11 +79,12 @@ class AffixBuilder {
         if ($skillLevelRequirements['skill_level_required'] < 10) {
             $affix['can_drop'] = true;
         }
-        
+
 
         // Randomly generate name and description.
         $affix['name']        = Str::random(10);
         $affix['description'] = Str::random(10);
+        $affix['affix_type']  = $affixGeneratorDTO->getType();
 
         return array_merge($affix, $skillLevelRequirements);
     }
@@ -102,7 +103,7 @@ class AffixBuilder {
 
     /**
      * Get the cast type of the attribute
-     * 
+     *
      * - Can be null if the attribute doesn't have a cast type.
      *
      * @param string $attributeName

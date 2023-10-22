@@ -5,4 +5,9 @@ Welcome back ladies and gents to another release: 1.5.1
 ## Bug Fixes:
 
 - Fixed "Enchanting is key" Guide quest to allow players to complete it once they have reached the required level for Skill Type: Crafting.
-- Fixed an issue with kingdom units on mobile showing NAN for the econds when trying to recruit them.
+- Fixed an issue with kingdom units on mobile showing NAN for the seconds when trying to recruit them.
+	+ Updated the Time Help modal to properly shows days, hours, minutes and then seconds with a bit of help text.
+- Fixed issue with Enchanting:
+	+ We never had Spell Crafting Enchants. So those were generated.
+	+ Selecting Ring Crafting would show nothing, but Spell Crafting would show Ring Enchants, this has been fixed.
+	

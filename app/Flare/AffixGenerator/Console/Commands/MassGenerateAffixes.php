@@ -7,6 +7,7 @@ use App\Flare\AffixGenerator\DTO\AffixGeneratorDTO;
 use App\Flare\AffixGenerator\Generator\GenerateAffixes;
 use App\Flare\AffixGenerator\Values\AffixGeneratorTypes;
 use App\Flare\Models\GameSkill;
+use App\Flare\Values\ItemAffixType;
 
 class MassGenerateAffixes extends Command {
     /**
@@ -31,15 +32,17 @@ class MassGenerateAffixes extends Command {
         $this->line('For this reason it is suggested you export the affixes you generate and rename the names and update descriptions.');
         $this->newLine();
 
-        $type = $this->affixType();
+        $prefixOrSuffix = $this->prefixOrSuffix();
 
-        $affixGeneratorDTO->setAffixType($type);
+        $affixGeneratorDTO->setPrefixOrSuffix($prefixOrSuffix);
 
         $skill = $this->skillForAffixes();
 
         if (!is_null($skill)) {
             $affixGeneratorDTO->setSkillName($skill);
         }
+
+        $affixGeneratorDTO->setAffixType($this->affixType());
 
         $attributes = $this->selectAttributesForAffixes();
 
@@ -84,14 +87,25 @@ class MassGenerateAffixes extends Command {
     }
 
     /**
-     * What type of affix are we generatoring
+     * What type of affix are we generating
      *
      * @return string
      */
-    protected function affixType(): string {
+    protected function prefixOrSuffix(): string {
         return $this->choice('What type do these affixes have?', [
             'prefix', 'suffix'
         ]);
+    }
+
+    /**
+     * What type of affix are we generating
+     *
+     * @return int
+     */
+    protected function affixType(): int {
+        $value = $this->choice('What type do these affixes have?', ItemAffixType::$dropDownValues);
+
+        return ItemAffixType::convertNameToType($value);
     }
 
     /**

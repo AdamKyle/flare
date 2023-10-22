@@ -2,6 +2,7 @@
 
 namespace App\Flare\Values;
 
+use Exception;
 use Illuminate\Database\Eloquent\Builder;
 
 class ItemAffixType {
@@ -27,7 +28,7 @@ class ItemAffixType {
     const ARMOUR_CRAFTING      = 13;
     const RING_CRAFTING        = 14;
     const SPELL_CRAFTING       = 15;
-    const ENCHANTMENT_CRAFTING = 16; 
+    const ENCHANTMENT_CRAFTING = 16;
     const ENTRANCING           = 17;
     const RANDOMLY_GENERATED   = 18;
 
@@ -92,10 +93,31 @@ class ItemAffixType {
      */
     public function __construct(string $value) {
         if (!in_array($value, self::$values)) {
-            throw new \Exception($value . ' does not exist.');
+            throw new \Exception($value . ' does not exist on ItemAffixType');
         }
 
         $this->value = $value;
+    }
+
+    /**
+     * convert name to type.
+     *
+     * @param string $name
+     * @return integer
+     * @throws Exception
+     */
+    public static function convertNameToType(string $name): int {
+        if (in_array($name, self::$dropDownValues)) {
+            $value = array_search($name, self::$dropDownValues);
+
+            if (!$value) {
+                throw new Exception($name . ' not found for ItemAffixType');
+            }
+
+            return $value;
+        }
+
+        throw new Exception($name . ' not found for ItemAffixType');
     }
 
     /**
