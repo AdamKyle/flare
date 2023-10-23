@@ -1,24 +1,8 @@
-# Planes of Tlessa 1.5.1
+# Planes of Tlessa 1.5.2
 
-Welcome back ladies and gents to another release: 1.5.1
+Welcome back ladies and gents to another release: 1.5.2
 
 ## Bug Fixes:
 
-- Fixed "Enchanting is key" Guide quest to allow players to complete it once they have reached the required level for Skill Type: Crafting.
-- Fixed an issue with kingdom units on mobile showing NAN for the seconds when trying to recruit them.
-	+ Updated the Time Help modal to properly shows days, hours, minutes and then seconds with a bit of help text.
-- Fixed issue with Enchanting:
-	+ We never had Spell Crafting Enchants. So those were generated.
-	+ Selecting Ring Crafting would show nothing, but Spell Crafting would show Ring Enchants, this has been fixed.
-- Fixed issue where the kingdom passive timer would not show the passive name being trained.
-	+ Moved the timer to the top of the passive tree.
-- Fixed issue with enchanting load bar being too far to the left on mobile.
-
-## Guide Quests
-
-New Guide Quests:
-
-- Consequences Pt. 1
-	+ Get to Dungeons, Get Quest Items. Craft/Enchant and level.
-- Consequences Pt. 2
-	+ Level your character and level alchemy after unlocking it.
+- Fixed an issue with Guide Quests where a quest item required could be upgraded or traded in to a complete quest, thus we need to check if you took the item you need and upgraded it. If so, it still counts because you once had it.
+- Fixed Accuracy and Dodge Enchantments
