@@ -209,13 +209,14 @@ class GuideQuestRequirementsService {
                 return $slot->item->type === 'quest' && $slot->item->id === $quest->{$attribute};
             })->isNotEmpty();
 
-            if ($canHandIn) {
+            if ($canHandIn || $this->wasItemUsedInQuest($character, $quest->{$attribute})) {
                 $this->finishedRequirements[] = $attribute;
             }
         }
 
         return $this;
     }
+
 
     /**
      * Does character have the required kingdom count?
@@ -440,5 +441,23 @@ class GuideQuestRequirementsService {
         if (!is_null($classSkill)) {
             $this->finishedRequirements[] = 'required_skill_type_level';
         }
+    }
+
+    /**
+     * Checks to see if the item  fr the guide quest exists on a completed quest that we handed in.
+     *
+     * @param Character $character
+     * @param integer $itemId
+     * @return boolean
+     */
+    protected function wasItemUsedInQuest(Character $character, int $itemId): bool {
+        return $character->questsCompleted()
+            ->whereHas('quest', function ($query) use ($itemId) {
+                $query->where(function ($q) use ($itemId) {
+                    $q->where('item_id', $itemId)
+                        ->orWhere('secondary_required_item', $itemId);
+                });
+            })
+            ->exists();
     }
 }
