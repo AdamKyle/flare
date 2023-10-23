@@ -352,13 +352,13 @@ class CharacterInventoryService {
         foreach ($ids as $id) {
             $inventorySet = InventorySet::find($id);
 
-            if (!$inventorySet->equipped) {
+            if (!$inventorySet->is_equipped) {
 
                 $indexes[] = [
                     'index'    => array_search($id, $setIds) + 1,
                     'id'       => $id,
                     'name'     => is_null($inventorySet->name) ? 'Set ' . array_search($id, $setIds) + 1 : $inventorySet->name,
-                    'equipped' => $inventorySet->equipped,
+                    'equipped' => $inventorySet->is_equipped,
                 ];
             }
         }

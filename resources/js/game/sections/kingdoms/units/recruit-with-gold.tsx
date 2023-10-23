@@ -103,13 +103,6 @@ export default class RecruitWithGold extends React.Component<any, any> {
             });
         }
 
-        console.log(
-            this.props.unit.time_to_recruit,
-            value,
-            this.props.kingdom_unit_time_reduction,
-            this.props
-        );
-
         const timeNeeded = this.props.unit.time_to_recruit * value;
 
         this.setState(
