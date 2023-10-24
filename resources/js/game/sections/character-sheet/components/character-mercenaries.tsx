@@ -306,7 +306,7 @@ export default class CharacterMercenaries extends React.Component<CharacterMerce
                 <div className='text-center text-red-500 dark:text-red-400'>
                     <p>You must complete a quest to unlock this feature. Head down to <a href='/information/planes' target='_blank' >Labyrinth <i
                         className="fas fa-external-link-alt"></i></a></p> and complete the <a href='/information/quests' target='_blank'>Quest: <i
-                    className="fas fa-external-link-alt"></i></a> "The story of the children".
+                    className="fas fa-external-link-alt"></i></a> "The truth is out there".
                 </div>
             );
         }
