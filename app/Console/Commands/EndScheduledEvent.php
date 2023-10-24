@@ -57,6 +57,11 @@ class EndScheduledEvent extends Command {
         $scheduledEvents = ScheduledEvent::where('end_date', '<=', now())->get();
 
         foreach ($scheduledEvents as $event) {
+
+            if (!$event->currently_running) {
+                continue;
+            }
+
             $eventType = new EventType($event->event_type);
 
             if ($eventType->isRaidEvent()) {
@@ -91,8 +96,6 @@ class EndScheduledEvent extends Command {
             }
 
             if ($eventType->isMonthlyPVP()) {
-                $this->endMonthlyPVPEvent();
-
                 $event->update([
                     'currently_running' => false,
                 ]);
@@ -147,9 +150,9 @@ class EndScheduledEvent extends Command {
      * @return void
      */
     protected function endWeeklyCurrencyDrops() {
-        event(new GlobalMessageEvent('Weekly currency drops have come to an end! Come back next sunday for another chance!'));
-
         $event = Event::where('type', EventType::WEEKLY_CURRENCY_DROPS)->first();
+
+        event(new GlobalMessageEvent('Weekly currency drops have come to an end! Come back next sunday for another chance!'));
 
         $announcement = Announcement::where('event_id', $event->id)->first();
 
@@ -167,25 +170,15 @@ class EndScheduledEvent extends Command {
      * @return void
      */
     protected function endWeeklySpawnEvent() {
-        event(new GlobalMessageEvent('The Creator has managed to close the gates and lock the Celestials away behind the doors of Kalitorm! Come back next week for another chance at the hunt!'));
-
         $event = Event::where('type', EventType::WEEKLY_CELESTIALS)->first();
+
+        event(new GlobalMessageEvent('The Creator has managed to close the gates and lock the Celestials away behind the doors of Kalitorm! Come back next week for another chance at the hunt!'));
 
         $announcement = Announcement::where('event_id', $event->id)->first();
 
         event(new DeleteAnnouncementEvent($announcement->id));
 
         $announcement->delete();
-    }
-
-    /**
-     * End monthly pvp event
-     *
-     * @param ScheduledEvent $event
-     * @return void
-     */
-    protected function endMonthlyPVPEvent() {
-        event(new GlobalMessageEvent('Monthly PVP has ended. Come back at the end of next month for a chance to win a mythic and test your might!'));
     }
 
     /**
