@@ -2,10 +2,12 @@
 
 namespace App\Flare\View\Livewire\Info\AlchemyItems;
 
+use App\Flare\AlchemyItemGenerator\Values\AlchemyItemType;
 use App\Flare\Models\Item;
 use Illuminate\Database\Eloquent\Builder;
 use Rappasoft\LaravelLivewireTables\DataTableComponent;
 use Rappasoft\LaravelLivewireTables\Views\Column;
+use Rappasoft\LaravelLivewireTables\Views\Filters\SelectFilter;
 
 class AlchemyHolyItemsTable extends DataTableComponent {
 
@@ -15,10 +17,10 @@ class AlchemyHolyItemsTable extends DataTableComponent {
 
     public function builder(): Builder {
         return Item::whereNull('item_prefix_id')
-                   ->whereNull('item_suffix_id')
-                   ->where('type', 'alchemy')
-                   ->where('can_use_on_other_items', true)
-                   ->orderBy('skill_level_required', 'asc');
+            ->whereNull('item_suffix_id')
+            ->where('type', 'alchemy')
+            ->where('can_use_on_other_items', true)
+            ->orderBy('skill_level_required', 'asc');
     }
 
     public function columns(): array {
@@ -26,7 +28,7 @@ class AlchemyHolyItemsTable extends DataTableComponent {
             Column::make('Name')->searchable()->format(function ($value, $row) {
                 $itemId = Item::where('name', $value)->first()->id;
 
-                return '<a href="/items/'. $itemId.'" >'.$row->name . '</a>';
+                return '<a href="/items/' . $itemId . '" >' . $row->name . '</a>';
             })->html(),
             Column::make('Gold Dust Cost')->sortable()->format(function ($value) {
                 return number_format($value);

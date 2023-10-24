@@ -2,6 +2,7 @@
 
 namespace App\Flare\GameImporter\Console\Commands;
 
+use Illuminate\Support\Str;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\InfoPage;
 use Illuminate\Console\Command;
@@ -17,7 +18,7 @@ class ImportGameData extends Command {
      *
      * @var string
      */
-    protected $signature = 'import:game-data';
+    protected $signature = 'import:game-data {dirName?}';
 
     /**
      * The console command description.
@@ -36,6 +37,20 @@ class ImportGameData extends Command {
         $this->line('Fetching files ...');
 
         $files = $this->fetchFiles();
+
+        $dirNameForReImport = Str::title($this->argument('dirName'));
+
+        if (!is_null($dirNameForReImport)) {
+            if (!isset($files[$dirNameForReImport])) {
+                return $this->error('No directory in data-imports for: ' . $dirNameForReImport);
+            }
+
+            $this->line('Re importing: ' . $dirNameForReImport);
+
+            $this->import($excelMapper, $files[$dirNameForReImport], $dirNameForReImport);
+
+            return $this->line('All done ...');
+        }
 
         $this->line('Importing maps ...');
 

@@ -5,6 +5,7 @@
             <th>market_sellable</th>
             <th>name</th>
             <th>type</th>
+            <th>alchemy_type</th>
             <th>specialty_type</th>
             <th>description</th>
             <th>default_position</th>
@@ -81,6 +82,7 @@
                 <td>{{ $item->market_sellable }}</td>
                 <td>{{ $item->name }}</td>
                 <td>{{ $item->type }}</td>
+                <td>{{ $item->alchemy_type }}</td>
                 <td>{{ $item->specialty_type }}</td>
                 <td>{{ $item->description }}</td>
                 <td>{{ $item->default_position }}</td>

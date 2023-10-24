@@ -15,10 +15,11 @@ class AlchemyKingdomItemsTable extends DataTableComponent {
 
     public function builder(): Builder {
         return Item::whereNull('item_prefix_id')
-                   ->whereNull('item_suffix_id')
-                   ->where('type', 'alchemy')
-                   ->where('damages_kingdoms', true)
-                   ->orderBy('skill_level_required', 'asc');
+            ->whereNull('item_suffix_id')
+            ->where('type', 'alchemy')
+            ->where('damages_kingdoms', true)
+            ->where('can_use_on_other_items', false)
+            ->orderBy('skill_level_required', 'asc');
     }
 
     public function columns(): array {
@@ -26,7 +27,7 @@ class AlchemyKingdomItemsTable extends DataTableComponent {
             Column::make('Name')->searchable()->format(function ($value, $row) {
                 $itemId = Item::where('name', $value)->first()->id;
 
-                return '<a href="/items/'. $itemId.'" >'.$row->name . '</a>';
+                return '<a href="/items/' . $itemId . '" >' . $row->name . '</a>';
             })->html(),
             Column::make('Gold Dust Cost')->sortable()->format(function ($value) {
                 return number_format($value);

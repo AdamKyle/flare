@@ -13,18 +13,20 @@ class AlchemyItemType {
     const INCREASE_SKILL_TYPE = 'increase-skill-type';
     const DAMAGES_KINGDOMS = 'damages-kingdoms';
     const HOLY_OILS = 'holy-oils';
+    const INCREASE_ALCHEMY_SKILL = 'increases-alchemy-skill';
 
     /**
      * @var array $types
      */
     protected static array $types = [
-        self::INCREASE_STATS      => self::INCREASE_STATS,
-        self::INCREASE_DAMAGE     => self::INCREASE_DAMAGE,
-        self::INCREASE_ARMOUR     => self::INCREASE_ARMOUR,
-        self::INCREASE_HEALING    => self::INCREASE_HEALING,
-        self::INCREASE_SKILL_TYPE => self::INCREASE_SKILL_TYPE,
-        self::DAMAGES_KINGDOMS    => self::DAMAGES_KINGDOMS,
-        self::HOLY_OILS           => self::HOLY_OILS,
+        self::INCREASE_STATS         => self::INCREASE_STATS,
+        self::INCREASE_DAMAGE        => self::INCREASE_DAMAGE,
+        self::INCREASE_ARMOUR        => self::INCREASE_ARMOUR,
+        self::INCREASE_HEALING       => self::INCREASE_HEALING,
+        self::INCREASE_SKILL_TYPE    => self::INCREASE_SKILL_TYPE,
+        self::DAMAGES_KINGDOMS       => self::DAMAGES_KINGDOMS,
+        self::HOLY_OILS              => self::HOLY_OILS,
+        self::INCREASE_ALCHEMY_SKILL => self::INCREASE_ALCHEMY_SKILL,
     ];
 
     /**

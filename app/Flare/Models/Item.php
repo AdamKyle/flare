@@ -24,6 +24,7 @@ class Item extends Model {
         'item_prefix_id',
         'drop_location_id',
         'type',
+        'alchemy_type',
         'default_position',
         'base_damage',
         'base_ac',
