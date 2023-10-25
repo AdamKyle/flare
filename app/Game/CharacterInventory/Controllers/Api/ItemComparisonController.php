@@ -1,23 +1,22 @@
 <?php
 
-namespace App\Game\Core\Controllers\Api;
+namespace App\Game\CharacterInventory\Controllers\Api;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\Inventory;
 use App\Flare\Models\InventorySlot;
-use App\Game\Core\Requests\ComparisonFromChatValidate;
-use App\Game\Core\Requests\ComparisonValidation;
-use App\Game\Core\Services\CharacterGemBagService;
-use App\Game\Core\Services\CharacterInventoryService;
-use App\Game\Core\Services\ComparisonService;
-use App\Game\Skills\Services\GemService;
+use App\Game\CharacterInventory\Requests\ComparisonFromChatValidate;
+use App\Game\CharacterInventory\Requests\ComparisonValidation;
+use App\Game\CharacterInventory\Services\CharacterGemBagService;
+use App\Game\CharacterInventory\Services\CharacterInventoryService;
+use App\Game\CharacterInventory\Services\ComparisonService;
 use App\Http\Controllers\Controller;
 
 class ItemComparisonController extends Controller {
 
-    private $comparisonService;
+    private ComparisonService $comparisonService;
 
-    private $characterInventoryService;
+    private CharacterInventoryService $characterInventoryService;
 
     private $gemBagService;
 

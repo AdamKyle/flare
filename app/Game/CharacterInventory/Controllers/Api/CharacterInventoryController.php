@@ -1,32 +1,29 @@
 <?php
 
-namespace App\Game\Core\Controllers\Api;
+namespace App\Game\CharacterInventory\Controllers\Api;
 
-use App\Flare\Handlers\UpdateCharacterAttackTypes;
-use App\Game\Core\Requests\UseManyItemsValidation;
 use Exception;
-use Illuminate\Http\JsonResponse;
+use League\Fractal\Manager;
 use League\Fractal\Resource\Item as FractalItem;
+use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use App\Flare\Models\InventorySet;
 use App\Flare\Models\Item;
-use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
-use App\Flare\Transformers\ItemTransformer;
-use App\Game\Core\Exceptions\EquipItemException;
-use App\Game\Core\Requests\EquipItemValidation;
-use App\Game\Core\Requests\RemoveItemRequest;
-use App\Game\Core\Requests\RenameSetRequest;
-use App\Game\Core\Requests\SaveEquipmentAsSet;
-use App\Game\Core\Services\EquipItemService;
-use App\Game\Core\Services\UseItemService;
-use App\Game\Skills\Services\EnchantingService;
-use League\Fractal\Manager;
-use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
-use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;
-use App\Game\Core\Services\CharacterInventoryService;
-use App\Game\Core\Requests\MoveItemRequest;
-use App\Game\Core\Services\InventorySetService;
+use App\Flare\Transformers\ItemTransformer;
+use App\Flare\Handlers\UpdateCharacterAttackTypes;
+use App\Game\CharacterInventory\Requests\UseManyItemsValidation;
+use App\Game\CharacterInventory\Requests\EquipItemValidation;
+use App\Game\CharacterInventory\Requests\RemoveItemRequest;
+use App\Game\CharacterInventory\Requests\RenameSetRequest;
+use App\Game\CharacterInventory\Requests\SaveEquipmentAsSet;
+use App\Game\CharacterInventory\Services\EquipItemService;
+use App\Game\CharacterInventory\Services\UseItemService;
+use App\Game\Core\Events\UpdateTopBarEvent;
+use App\Game\CharacterInventory\Services\CharacterInventoryService;
+use App\Game\CharacterInventory\Requests\MoveItemRequest;
+use App\Game\CharacterInventory\Services\InventorySetService;
+use App\Http\Controllers\Controller;
 
 class  CharacterInventoryController extends Controller {
 
@@ -36,43 +33,21 @@ class  CharacterInventoryController extends Controller {
     private CharacterInventoryService $characterInventoryService;
 
     /**
-     * @var CharacterSheetBaseInfoTransformer $characterTransformer
-     */
-    private CharacterSheetBaseInfoTransformer $characterTransformer;
-
-    /**
      * @var UpdateCharacterAttackTypes $updateCharacterAttackTypes
      */
     private UpdateCharacterAttackTypes $updateCharacterAttackTypes;
 
     /**
-     * @var EnchantingService $enchantingService
-     */
-    private EnchantingService $enchantingService;
-
-    /**
-     * @var Manager $manager
-     */
-    private Manager $manager;
-
-    /**
      * @param CharacterInventoryService $characterInventoryService
-     * @param CharacterSheetBaseInfoTransformer $characterTransformer
      * @param UpdateCharacterAttackTypes $updateCharacterAttackTypes
-     * @param EnchantingService $enchantingService
-     * @param Manager $manager
      */
-    public function __construct(CharacterInventoryService $characterInventoryService,
-                                CharacterSheetBaseInfoTransformer $characterTransformer,
-                                UpdateCharacterAttackTypes $updateCharacterAttackTypes,
-                                EnchantingService $enchantingService,
-                                Manager $manager) {
+    public function __construct(
+        CharacterInventoryService $characterInventoryService,
+        UpdateCharacterAttackTypes $updateCharacterAttackTypes,
+    ) {
 
         $this->characterInventoryService  = $characterInventoryService;
-        $this->characterTransformer       = $characterTransformer;
         $this->updateCharacterAttackTypes = $updateCharacterAttackTypes;
-        $this->enchantingService          = $enchantingService;
-        $this->manager                    = $manager;
     }
 
     /**
@@ -115,7 +90,7 @@ class  CharacterInventoryController extends Controller {
      */
     public function destroy(Request $request, Character $character): JsonResponse {
 
-        $slot = $character->inventory->slots->filter(function($slot) use ($request) {
+        $slot = $character->inventory->slots->filter(function ($slot) use ($request) {
             return $slot->id === (int) $request->slot_id;
         })->first();
 
@@ -127,7 +102,7 @@ class  CharacterInventoryController extends Controller {
             return response()->json(['message' => 'Cannot destroy equipped item.'], 422);
         }
 
-        $name = $slot ->item->affix_name;
+        $name = $slot->item->affix_name;
 
         $item = null;
 
@@ -162,7 +137,7 @@ class  CharacterInventoryController extends Controller {
 
         $slotIds   = $inventory->findCharacterInventorySlotIds();
 
-        $items     = $character->inventory->slots->where('item.type', 'artifact')->whereNotNull('item.itemSkillProgressions')->pluck('item.id')->toArray(); 
+        $items     = $character->inventory->slots->where('item.type', 'artifact')->whereNotNull('item.itemSkillProgressions')->pluck('item.id')->toArray();
 
         $character->inventory->slots()->whereIn('id', $slotIds)->delete();
 
@@ -191,7 +166,7 @@ class  CharacterInventoryController extends Controller {
     public function disenchantAll(Character $character): JsonResponse {
         $inventory = $this->characterInventoryService->setCharacter($character);
 
-        $slots   = $inventory->getInventoryCollection()->filter(function($slot) {
+        $slots   = $inventory->getInventoryCollection()->filter(function ($slot) {
             return (!is_null($slot->item->item_prefix_id) || !is_null($slot->item->item_suffix_id));
         })->values();
 
@@ -234,7 +209,7 @@ class  CharacterInventoryController extends Controller {
         $characterInventoryService = $this->characterInventoryService->setCharacter($character);
 
         if (is_null($inventorySet->name)) {
-            $index     = $character->inventorySets->search(function($set) use ($request) {
+            $index     = $character->inventorySets->search(function ($set) use ($request) {
                 return $set->id === $request->move_to_set;
             });
 
@@ -300,7 +275,7 @@ class  CharacterInventoryController extends Controller {
      * @return JsonResponse
      */
     public function saveEquippedAsSet(SaveEquipmentAsSet $request, Character $character, InventorySetService $inventorySetService): JsonResponse {
-        $currentlyEquipped = $character->inventory->slots->filter(function($slot) {
+        $currentlyEquipped = $character->inventory->slots->filter(function ($slot) {
             return $slot->equipped;
         });
 
@@ -318,7 +293,7 @@ class  CharacterInventoryController extends Controller {
 
         $character = $character->refresh();
 
-        $setIndex = $character->inventorySets->search(function($set) {
+        $setIndex = $character->inventorySets->search(function ($set) {
             return $set->is_equipped;
         });
 
@@ -382,7 +357,7 @@ class  CharacterInventoryController extends Controller {
         if (!is_null($set->name)) {
             $setName = $set->name;
         } else {
-            $index     = $character->inventorySets->search(function($set) use ($request) {
+            $index     = $character->inventorySets->search(function ($set) use ($request) {
                 return $set->id === $request->inventory_set_id;
             });
 
@@ -396,7 +371,7 @@ class  CharacterInventoryController extends Controller {
         $sets = $characterInventoryService->getInventoryForType('sets');
 
         return response()->json([
-            'message' => $itemName . ' Has been removed from '.$setName.' and placed back into your inventory.',
+            'message' => $itemName . ' Has been removed from ' . $setName . ' and placed back into your inventory.',
             'inventory' => [
                 'inventory' => $characterInventoryService->getInventoryForType('inventory'),
                 'sets'      => $sets['sets'],
@@ -439,7 +414,7 @@ class  CharacterInventoryController extends Controller {
             }
         }
 
-        $setIndex = $character->inventorySets->search(function($set) use ($inventorySet) {
+        $setIndex = $character->inventorySets->search(function ($set) use ($inventorySet) {
             return $set->id === $inventorySet->id;
         });
 
@@ -475,8 +450,8 @@ class  CharacterInventoryController extends Controller {
         try {
 
             $equipItemService->setRequest($request->all())
-                             ->setCharacter($character)
-                             ->replaceItem();
+                ->setCharacter($character)
+                ->replaceItem();
 
             $this->updateCharacterAttackDataCache($character);
 
@@ -490,8 +465,7 @@ class  CharacterInventoryController extends Controller {
                 ],
                 'message'       => 'Equipped item.'
             ]);
-
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             return response()->json([
                 'message' => $e->getMessage()
             ], 422);
@@ -509,7 +483,9 @@ class  CharacterInventoryController extends Controller {
 
         if ($request->inventory_set_equipped) {
             $inventorySet = $character->inventorySets()->where('is_equipped', true)->first();
-            $inventoryIndex = $character->inventorySets->search(function($set) { return $set->is_equipped; });
+            $inventoryIndex = $character->inventorySets->search(function ($set) {
+                return $set->is_equipped;
+            });
 
             $inventorySetService->unEquipInventorySet($inventorySet);
 
@@ -597,7 +573,7 @@ class  CharacterInventoryController extends Controller {
                 ], 422);
             }
 
-            $character->inventory->slots->each(function($slot) {
+            $character->inventory->slots->each(function ($slot) {
                 $slot->update([
                     'equipped' => false,
                     'position' => null,
@@ -640,7 +616,7 @@ class  CharacterInventoryController extends Controller {
 
         $character->refresh();
 
-        $setIndex = $character->inventorySets->search(function($set) {
+        $setIndex = $character->inventorySets->search(function ($set) {
             return $set->is_equipped;
         });
 
@@ -735,7 +711,7 @@ class  CharacterInventoryController extends Controller {
             }
         }
 
-        $slot = $character->inventory->slots->filter(function($slot) use($item) {
+        $slot = $character->inventory->slots->filter(function ($slot) use ($item) {
             return $slot->item_id === $item->id;
         })->first();
 
@@ -767,7 +743,7 @@ class  CharacterInventoryController extends Controller {
      * @return JsonResponse
      */
     public function destroyAlchemyItem(Request $request, Character $character): JsonResponse {
-        $slot = $character->inventory->slots->filter(function($slot) use($request) {
+        $slot = $character->inventory->slots->filter(function ($slot) use ($request) {
             return $slot->id === $request->slot_id;
         })->first();
 
@@ -800,7 +776,7 @@ class  CharacterInventoryController extends Controller {
      * @return JsonResponse
      */
     public function destroyAllAlchemyItems(Character $character): JsonResponse {
-        $slots = $character->inventory->slots->filter(function($slot) {
+        $slots = $character->inventory->slots->filter(function ($slot) {
             return $slot->item->type === 'alchemy';
         });
 

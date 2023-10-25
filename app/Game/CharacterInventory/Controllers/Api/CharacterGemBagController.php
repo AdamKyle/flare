@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Game\Core\Controllers\Api;
+namespace App\Game\CharacterInventory\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
 use App\Flare\Models\Character;
 use App\Flare\Models\GemBagSlot;
-use App\Game\Core\Services\CharacterGemBagService;
+use App\Game\CharacterInventory\Services\CharacterGemBagService;
 use App\Http\Controllers\Controller;
 
 

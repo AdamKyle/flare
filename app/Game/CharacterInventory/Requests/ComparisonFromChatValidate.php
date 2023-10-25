@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Game\Core\Requests;
+namespace App\Game\CharacterInventory\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class MoveItemRequest extends FormRequest
+class ComparisonFromChatValidate extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,16 +24,13 @@ class MoveItemRequest extends FormRequest
     public function rules()
     {
         return [
-            'move_to_set' => 'required',
-            'slot_id'     => 'integer|required',
+            'id' => 'required',
         ];
     }
 
     public function messages() {
         return [
-            'move_to_set.required' => 'Which set do you want to move this too?',
-            'slot_id.integer'      => 'The slot id must be an integer',
-            'slot_id.required'     => 'The slot id is required',
+            'id.required' => 'Error. Invalid Input.',
         ];
     }
 }

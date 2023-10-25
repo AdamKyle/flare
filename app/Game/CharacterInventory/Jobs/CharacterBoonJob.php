@@ -1,18 +1,17 @@
 <?php
 
-namespace App\Game\Core\Jobs;
+namespace App\Game\CharacterInventory\Jobs;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use App\Game\Core\Services\UseItemService;
+use App\Game\CharacterInventory\Services\UseItemService;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Flare\Models\CharacterBoon;
 
-class CharacterBoonJob implements ShouldQueue
-{
+class CharacterBoonJob implements ShouldQueue {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     /**
@@ -25,8 +24,7 @@ class CharacterBoonJob implements ShouldQueue
      *
      * @param CharacterBoon $characterBoon
      */
-    public function __construct(int $characterBoonId)
-    {
+    public function __construct(int $characterBoonId) {
         $this->characterBoon = $characterBoonId;
     }
 
@@ -35,8 +33,7 @@ class CharacterBoonJob implements ShouldQueue
      *
      * @return void
      */
-    public function handle(UseItemService $useItemService)
-    {
+    public function handle(UseItemService $useItemService) {
         $boon = CharacterBoon::find($this->characterBoon);
 
         if (is_null($boon)) {

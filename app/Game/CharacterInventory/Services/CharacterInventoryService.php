@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Game\Core\Services;
+namespace App\Game\CharacterInventory\Services;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;

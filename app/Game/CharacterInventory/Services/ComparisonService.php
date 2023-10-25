@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Game\Core\Services;
+namespace App\Game\CharacterInventory\Services;
 
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item as FractalItem;
@@ -15,6 +15,9 @@ use App\Game\Gems\Services\ItemAtonements;
 
 class ComparisonService {
 
+    /**
+     * @var ValidEquipPositionsValue $validEquipPositionsValue
+     */
     private ValidEquipPositionsValue $validEquipPositionsValue;
 
     /**
@@ -57,9 +60,9 @@ class ComparisonService {
      */
     public function buildComparisonData(Character $character, InventorySlot $itemToEquip, string $type = null) {
         $service  = $this->characterInventoryService->setCharacter($character)
-                                                    ->setInventorySlot($itemToEquip)
-                                                    ->setPositions($this->validEquipPositionsValue->getPositions($itemToEquip->item))
-                                                    ->setInventory($type);
+            ->setInventorySlot($itemToEquip)
+            ->setPositions($this->validEquipPositionsValue->getPositions($itemToEquip->item))
+            ->setInventory($type);
 
         $inventory = $service->inventory();
 
@@ -82,7 +85,9 @@ class ComparisonService {
 
 
             $hasSet   = !is_null($setEquipped);
-            $setIndex = !is_null($setEquipped) ? $character->inventorySets->search(function($set) {return $set->is_equipped; }) + 1 : 0;
+            $setIndex = !is_null($setEquipped) ? $character->inventorySets->search(function ($set) {
+                return $set->is_equipped;
+            }) + 1 : 0;
 
             $viewData = [
                 'details'        => $this->equipItemService->getItemStats($itemToEquip->item, $inventory, $character),
@@ -119,7 +124,9 @@ class ComparisonService {
         $setEquipped = $character->inventorySets()->where('is_equipped', true)->first();
 
         $hasSet   = !is_null($setEquipped);
-        $setIndex = !is_null($setEquipped) ? $character->inventorySets->search(function($set) {return $set->is_equipped; }) + 1 : 0;
+        $setIndex = !is_null($setEquipped) ? $character->inventorySets->search(function ($set) {
+            return $set->is_equipped;
+        }) + 1 : 0;
 
         $inventory = $service->inventory();
 
@@ -155,7 +162,7 @@ class ComparisonService {
     }
 
     public function characterHasUniqueEquipped(Character $character): bool {
-        return $character->getInformation()->fetchInventory()->filter(function($slot) {
+        return $character->getInformation()->fetchInventory()->filter(function ($slot) {
             $item = $slot->item;
 
             if (!is_null($item->itemPrefix)) {
@@ -173,7 +180,7 @@ class ComparisonService {
     }
 
     public function hasTypeEquipped(Character $character, string $type): bool {
-        return $character->getInformation()->fetchInventory()->filter(function($slot) use($type) {
+        return $character->getInformation()->fetchInventory()->filter(function ($slot) use ($type) {
             return $slot->item->type === $type;
         })->isNotEmpty();
     }

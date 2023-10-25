@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Game\Core\Requests;
+namespace App\Game\CharacterInventory\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class ComparisonFromChatValidate extends FormRequest
+class UseManyItemsValidation extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,13 +24,13 @@ class ComparisonFromChatValidate extends FormRequest
     public function rules()
     {
         return [
-            'id' => 'required',
+            'items_to_use' => 'required',
         ];
     }
 
     public function messages() {
         return [
-            'id.required' => 'Error. Invalid Input.',
+            'items_to_use.required' => 'You must select some items to use.',
         ];
     }
 }

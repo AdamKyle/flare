@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Game\Core\Services;
+namespace App\Game\CharacterInventory\Services;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\InventorySet;
@@ -8,7 +8,6 @@ use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 use App\Flare\Models\SetSlot;
 use App\Game\Core\Traits\ResponseBuilder;
-use App\Game\Messages\Events\ServerMessageEvent;
 
 class InventorySetService {
 

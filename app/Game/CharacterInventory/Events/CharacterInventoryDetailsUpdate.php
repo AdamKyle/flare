@@ -1,8 +1,7 @@
 <?php
 
-namespace App\Game\Core\Events;
+namespace App\Game\CharacterInventory\Events;
 
-use App\Game\Core\Services\CharacterInventoryService;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Broadcasting\PrivateChannel;

@@ -8,8 +8,6 @@ use App\Flare\Models\Character;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Item;
 use App\Flare\Models\Skill;
-use App\Game\Core\Events\CharacterInventoryDetailsUpdate;
-use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 
@@ -122,10 +120,6 @@ class TrinketCraftingService {
         }
 
         $this->craftingService->pickUpItem($character, $item, $trinkentrySkill);
-
-        event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'inventory'));
-
-        event(new CharacterInventoryDetailsUpdate($character->user));
 
         return $this->fetchItemsToCraft($character->refresh(), false);
     }

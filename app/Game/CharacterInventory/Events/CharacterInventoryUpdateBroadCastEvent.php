@@ -1,18 +1,18 @@
 <?php
 
-namespace App\Game\Core\Events;
+namespace App\Game\CharacterInventory\Events;
 
-use App\Game\Core\Services\CharacterInventoryService;
+
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
-Use App\Flare\Models\User;
+use App\Flare\Models\User;
+use App\Game\CharacterInventory\Services\CharacterInventoryService;
 
-class CharacterInventoryUpdateBroadCastEvent implements ShouldBroadcastNow
-{
+class CharacterInventoryUpdateBroadCastEvent implements ShouldBroadcastNow {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
 
@@ -40,8 +40,8 @@ class CharacterInventoryUpdateBroadCastEvent implements ShouldBroadcastNow
     public function __construct(User $user, string $type) {
         $this->user      = $user;
         $this->inventory = resolve(CharacterInventoryService::class)
-                                ->setCharacter($user->character->refresh())
-                                ->getInventoryForType($type);
+            ->setCharacter($user->character->refresh())
+            ->getInventoryForType($type);
         $this->type      = $type;
     }
 
@@ -50,8 +50,7 @@ class CharacterInventoryUpdateBroadCastEvent implements ShouldBroadcastNow
      *
      * @return Channel|array
      */
-    public function broadcastOn()
-    {
+    public function broadcastOn() {
         return new PrivateChannel('update-inventory-' . $this->user->id);
     }
 }

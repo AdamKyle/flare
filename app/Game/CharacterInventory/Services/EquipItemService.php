@@ -1,24 +1,19 @@
 <?php
 
-namespace App\Game\Core\Services;
+namespace App\Game\CharacterInventory\Services;
 
+use League\Fractal\Manager;
+use Illuminate\Database\Eloquent\Collection;
 use App\Flare\Models\Inventory;
 use App\Flare\Models\InventorySet;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\SetSlot;
-use App\Game\Core\Events\UpdateAttackStats;
-use League\Fractal\Manager;
-
-use Illuminate\Http\Request;
-use Illuminate\Database\Eloquent\Collection;
-use League\Fractal\Resource\Item as ResourceItem;
 use App\Flare\Models\Item;
 use App\Flare\Models\Character;
-use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Game\Core\Comparison\ItemComparison;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
-use App\Game\Core\Exceptions\EquipItemException;
+use App\Game\CharacterInventory\Exceptions\EquipItemException;
 
 
 class EquipItemService {
@@ -86,7 +81,7 @@ class EquipItemService {
     }
 
     public function replaceItem(): Item {
-        $characterSlot = $this->character->inventory->slots->filter(function($slot) {
+        $characterSlot = $this->character->inventory->slots->filter(function ($slot) {
             return $slot->id === (int) $this->request['slot_id'] && !$slot->equipped;
         })->first();
 
@@ -144,7 +139,7 @@ class EquipItemService {
     }
 
     public function getUniqueFromSet(Inventory|InventorySet $equipped): InventorySlot|SetSlot|null {
-        return $equipped->slots->filter(function($slot) {
+        return $equipped->slots->filter(function ($slot) {
             if (!is_null($slot->item->item_prefix_id)) {
                 return $slot->item->itemPrefix->randomly_generated && $slot->equipped;
             }
@@ -168,7 +163,7 @@ class EquipItemService {
     }
 
     public function isItemToBeReplacedUnique(Inventory|InventorySet $inventory): bool {
-        $item = $inventory->slots->filter(function($slot) {
+        $item = $inventory->slots->filter(function ($slot) {
             return $slot->position === $this->request['position'] && $slot->equipped;
         })->first();
 
@@ -198,7 +193,7 @@ class EquipItemService {
      * @return array
      */
     public function getItemStats(Item $toCompare, Collection $inventorySlots, Character $character): array {
-       return resolve(ItemComparison::class)->fetchDetails($toCompare, $inventorySlots, $character);
+        return resolve(ItemComparison::class)->fetchDetails($toCompare, $inventorySlots, $character);
     }
 
     /**
@@ -213,10 +208,10 @@ class EquipItemService {
         $validTypes = ['bow', 'hammer', 'stave'];
 
         if (!in_array($itemToEquip->type, $validTypes)) {
-             return false;
+            return false;
         }
 
-        return $inventorySlots->filter(function($slot) use($type) {
+        return $inventorySlots->filter(function ($slot) use ($type) {
             return $slot->item->type === $type && $slot->equipped;
         })->isNotEmpty();
     }
@@ -252,7 +247,7 @@ class EquipItemService {
     protected function removeTwoHandedWeapon(Inventory|InventorySet $inventory): bool {
         if ($this->request['position'] === 'right-hand' || $this->request['position'] === 'left-hand') {
 
-            $itemsForPosition = $inventory->slots->filter(function($slot) {
+            $itemsForPosition = $inventory->slots->filter(function ($slot) {
                 return ($slot->position === 'right-hand' || $slot->position === 'left-hand') && $slot->equipped;
             });
 
@@ -281,7 +276,7 @@ class EquipItemService {
      * Unequips both hands.
      */
     public function unequipBothHands() {
-        $slots = $this->character->inventory->slots->filter(function($slot) {
+        $slots = $this->character->inventory->slots->filter(function ($slot) {
             return $slot->equipped;
         });
 
@@ -291,7 +286,7 @@ class EquipItemService {
             $equippedSet = $this->character->inventorySets()->where('is_equipped', true)->first();
 
             if (!is_null($equippedSet)) {
-                $slots = $equippedSet->slots->filter(function($slot) {
+                $slots = $equippedSet->slots->filter(function ($slot) {
                     return $slot->equipped;
                 });
 
@@ -316,5 +311,4 @@ class EquipItemService {
 
         $this->character = $this->character->refresh();
     }
-
 }

@@ -1,28 +1,27 @@
 <?php
 
-namespace App\Game\Core\Events;
+namespace App\Game\CharacterInventory\Events;
 
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 Use App\Flare\Models\User;
 
-class UpdateAttackStats implements ShouldBroadcastNow
+class CharacterBoonsUpdateBroadcastEvent implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    /**
-     * @param array $character
-     */
-    public $character;
 
     /**
-     * @var User $user
-     *
+     * @var array $boons
+     */
+    public $boons;
+
+    /**
+     * @var User $users
      */
     public $user;
 
@@ -30,10 +29,11 @@ class UpdateAttackStats implements ShouldBroadcastNow
      * Create a new event instance.
      *
      * @param User $user
+     * @param array $boons
      */
-    public function __construct(array $characterData, User $user) {
-        $this->character = $characterData;
-        $this->user      = $user;
+    public function __construct(User $user, array $boons) {
+        $this->user  = $user;
+        $this->boons = $boons;
     }
 
     /**
@@ -41,7 +41,8 @@ class UpdateAttackStats implements ShouldBroadcastNow
      *
      * @return Channel|array
      */
-    public function broadcastOn() {
-        return new PrivateChannel('update-character-attack-' . $this->user->id);
+    public function broadcastOn()
+    {
+        return new PrivateChannel('update-boons-' . $this->user->id);
     }
 }

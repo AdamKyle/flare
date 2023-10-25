@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Game\Core\Services;
+namespace App\Game\CharacterInventory\Services;
 
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;
@@ -9,13 +9,11 @@ use App\Flare\Models\GameSkill;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 use App\Flare\Services\BuildCharacterAttackTypes;
-use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Flare\Values\ItemUsabilityType;
-use App\Game\Core\Events\CharacterBoonsUpdateBroadcastEvent;
-use App\Game\Core\Events\UpdateAttackStats;
+use App\Game\CharacterInventory\Events\CharacterBoonsUpdateBroadcastEvent;
 use App\Game\Core\Events\UpdateBaseCharacterInformation;
-use App\Game\Core\Jobs\CharacterBoonJob;
+use App\Game\CharacterInventory\Jobs\CharacterBoonJob;
 use App\Game\Messages\Events\ServerMessageEvent;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item as ResourceItem;

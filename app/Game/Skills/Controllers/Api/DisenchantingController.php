@@ -2,12 +2,13 @@
 
 namespace App\Game\Skills\Controllers\Api;
 
-use App\Game\Core\Events\UpdateTopBarEvent;
+
 use App\Flare\Models\Inventory;
 use App\Flare\Models\InventorySlot;
-use App\Game\Core\Events\CharacterInventoryDetailsUpdate;
-use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
-use App\Game\Core\Services\CharacterInventoryService;
+use App\Game\Core\Events\UpdateTopBarEvent;
+use App\Game\CharacterInventory\Events\CharacterInventoryDetailsUpdate;
+use App\Game\CharacterInventory\Events\CharacterInventoryUpdateBroadCastEvent;
+use App\Game\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Skills\Services\DisenchantService;
 use App\Http\Controllers\Controller;

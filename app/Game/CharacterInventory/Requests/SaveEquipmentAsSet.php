@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Game\Core\Requests;
+namespace App\Game\CharacterInventory\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UseManyItemsValidation extends FormRequest
+class SaveEquipmentAsSet extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,13 +24,13 @@ class UseManyItemsValidation extends FormRequest
     public function rules()
     {
         return [
-            'items_to_use' => 'required',
+            'move_to_set' => 'required',
         ];
     }
 
     public function messages() {
         return [
-            'items_to_use.required' => 'You must select some items to use.',
+            'move_to_set.required' => 'Which set do you want to move this equipment to?',
         ];
     }
 }

@@ -1,17 +1,7 @@
 <?php
 
-// When an item is sold or bought:
-Broadcast::channel('update-shop-inventory-{userId}', function ($user, $userId) {
-	return $user->id === (int) $userId;
-});
-
 // When the crafting bar should show
 Broadcast::channel('show-crafting-timeout-bar-{userId}', function($user, $userId) {
-	return $user->id === (int) $userId;
-});
-
-// When the adventure logs are updated.
-Broadcast::channel('update-adventure-logs-{userId}', function($user, $userId) {
 	return $user->id === (int) $userId;
 });
 
@@ -60,11 +50,6 @@ Broadcast::channel('component-show-{userId}', function($user, $userId) {
     return $user->id === (int) $userId;
 });
 
-// When a characters boons update.
-Broadcast::channel('update-boons-{userId}', function ($user, $userId) {
-    return $user->id === (int) $userId;
-});
-
 // When the player levels up the top bar should reflect that.
 Broadcast::channel('update-top-bar-{userId}', function ($user, $userId) {
 	return $user->id === (int) $userId;
@@ -75,15 +60,6 @@ Broadcast::channel('update-currencies-{userId}', function ($user, $userId) {
 	return $user->id === (int) $userId;
 });
 
-// When a characters Inventory updates
-Broadcast::channel('update-inventory-{userId}', function ($user, $userId) {
-    return $user->id === (int) $userId;
-});
-
-// When a characters Inventory Details updates
-Broadcast::channel('update-inventory-details-{userId}', function ($user, $userId) {
-    return $user->id === (int) $userId;
-});
 
 // When the characters factions update.
 Broadcast::channel('update-factions-{userId}', function ($user, $userId) {

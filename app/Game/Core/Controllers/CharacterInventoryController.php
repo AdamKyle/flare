@@ -2,25 +2,26 @@
 
 namespace App\Game\Core\Controllers;
 
-
+use Exception;
+use League\Fractal\Resource\Item as ResourceItem;
+use League\Fractal\Manager;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use App\Flare\Models\User;
 use App\Flare\Models\Character;
 use App\Flare\Models\InventorySlot;
-use App\Http\Controllers\Controller;
-use App\Game\Core\Services\EquipItemService;
-use App\Game\Core\Services\ComparisonService;
+use App\Flare\Services\BuildCharacterAttackTypes;
+use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
+use App\Game\CharacterInventory\Services\EquipItemService;
+use App\Game\CharacterInventory\Services\ComparisonService;
 use App\Game\Core\Requests\EquipItemValidation;
 use App\Game\Skills\Services\EnchantingService;
-use App\Game\Core\Exceptions\EquipItemException;
-use App\Game\Core\Requests\ComparisonValidation;
-use App\Flare\Services\BuildCharacterAttackTypes;
-use League\Fractal\Resource\Item as ResourceItem;
+use App\Game\CharacterInventory\Requests\ComparisonValidation;
 use App\Game\Core\Events\UpdateBaseCharacterInformation;
-use App\Game\Core\Events\CharacterInventoryDetailsUpdate;
+use App\Game\CharacterInventory\Events\CharacterInventoryDetailsUpdate;
 use App\Game\Skills\Events\UpdateCharacterEnchantingList;
-use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
-use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
-use Exception;
+use App\Game\CharacterInventory\Events\CharacterInventoryUpdateBroadCastEvent;
+use App\Http\Controllers\Controller;
 
 class CharacterInventoryController extends Controller {
 
@@ -29,7 +30,7 @@ class CharacterInventoryController extends Controller {
     private CharacterSheetBaseInfoTransformer $characterTransformer;
 
     private BuildCharacterAttackTypes $buildCharacterAttackTypes;
-    
+
     private EnchantingService $enchantingService;
 
     private Manager $manager;
@@ -95,8 +96,8 @@ class CharacterInventoryController extends Controller {
         try {
 
             $item = $this->equipItemService->setRequest($request->all())
-                                           ->setCharacter($character)
-                                           ->replaceItem();
+                ->setCharacter($character)
+                ->replaceItem();
 
             $this->updateCharacterAttackDataCache($character);
 
@@ -115,8 +116,7 @@ class CharacterInventoryController extends Controller {
             ));
 
             return redirect()->to(route('game.character.sheet'))->with('success', $item->affix_name . ' Equipped.');
-
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             return redirect()->back()->with('error', $e->getMessage());
         }
     }

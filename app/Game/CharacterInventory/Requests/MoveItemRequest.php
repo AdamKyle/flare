@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Game\Core\Requests;
+namespace App\Game\CharacterInventory\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class SaveEquipmentAsSet extends FormRequest
+class MoveItemRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,12 +25,15 @@ class SaveEquipmentAsSet extends FormRequest
     {
         return [
             'move_to_set' => 'required',
+            'slot_id'     => 'integer|required',
         ];
     }
 
     public function messages() {
         return [
-            'move_to_set.required' => 'Which set do you want to move this equipment to?',
+            'move_to_set.required' => 'Which set do you want to move this too?',
+            'slot_id.integer'      => 'The slot id must be an integer',
+            'slot_id.required'     => 'The slot id is required',
         ];
     }
 }

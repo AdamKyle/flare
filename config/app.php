@@ -215,7 +215,7 @@ return [
         App\Game\Battle\Providers\EventsProvider::class,
 
         /**
-         * Gem Acrions
+         * Gem Actions
          */
         \App\Game\Gems\Providers\ServiceProvider::class,
 
@@ -228,6 +228,7 @@ return [
          * Game Related
          */
         App\Game\Exploration\Providers\ServiceProvider::class,
+        App\Game\CharacterInventory\Providers\ServiceProvider::class,
         App\Game\Core\Providers\ServiceProvider::class,
         App\Game\Battle\Providers\ServiceProvider::class,
         App\Game\BattleRewardProcessing\Providers\ServiceProvider::class,

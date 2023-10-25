@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Game\Core\Services;
+namespace App\Game\CharacterInventory\Services;
 
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
