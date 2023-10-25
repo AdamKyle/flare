@@ -2,7 +2,7 @@
 
 namespace App\Game\Mercenaries\Providers;
 
-use App\Game\Core\Services\EquipItemService;
+use App\Game\CharacterInventory\Services\EquipItemService;
 use App\Game\Market\Services\MarketBoard;
 use App\Game\Market\Services\MarketHistory;
 use App\Game\Mercenaries\Services\MercenaryService;
@@ -17,7 +17,7 @@ class ServiceProvider extends ApplicationServiceProvider {
      * @return void
      */
     public function register(): void {
-        $this->app->bind(MercenaryService::class, function() {
+        $this->app->bind(MercenaryService::class, function () {
             return new MercenaryService();
         });
     }
@@ -27,5 +27,6 @@ class ServiceProvider extends ApplicationServiceProvider {
      *
      * @return void
      */
-    public function boot(): void { }
+    public function boot(): void {
+    }
 }

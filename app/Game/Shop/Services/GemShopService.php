@@ -6,7 +6,7 @@ use App\Flare\Models\Character;
 use App\Flare\Models\GemBagSlot;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
-use App\Game\Core\Services\CharacterGemBagService;
+use App\Game\CharacterInventory\Services\CharacterGemBagService;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Gems\Values\GemTierValue;
 
@@ -62,7 +62,6 @@ class GemShopService {
             'gems'    => $this->characterGemBagService->getGems($character->refresh())['gem_slots'],
             'message' => $message,
         ]);
-
     }
 
     public function sellAllGems(Character $character): array {

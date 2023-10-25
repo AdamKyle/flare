@@ -6,7 +6,7 @@ use App\Flare\Transformers\CharacterGemsTransformer;
 use App\Game\Core\Middleware\IsCharacterAtLocationMiddleware;
 use App\Game\Core\Middleware\IsCharacterWhoTheySayTheyAre;
 use App\Game\Core\Services\AdventureRewardService;
-use App\Game\Core\Services\CharacterInventoryService;
+use App\Game\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Core\Services\CraftingSkillService;
 use App\Game\Core\Services\ShopService;
 use App\Game\Gems\Services\AttachedGemService;
@@ -23,7 +23,7 @@ class ServiceProvider extends ApplicationServiceProvider {
      */
     public function register() {
 
-        $this->app->bind(AttachedGemService::class, function($app) {
+        $this->app->bind(AttachedGemService::class, function ($app) {
             return new AttachedGemService(
                 $app->make(CharacterGemsTransformer::class),
                 $app->make(Manager::class),
@@ -31,11 +31,11 @@ class ServiceProvider extends ApplicationServiceProvider {
             );
         });
 
-        $this->app->bind(GemComparison::class, function($app) {
+        $this->app->bind(GemComparison::class, function ($app) {
             return new GemComparison($app->make(CharacterGemsTransformer::class), $app->make(Manager::class));
         });
 
-        $this->app->bind(ItemAtonements::class, function($app) {
+        $this->app->bind(ItemAtonements::class, function ($app) {
             return new ItemAtonements($app->make(GemComparison::class));
         });
     }
@@ -45,7 +45,6 @@ class ServiceProvider extends ApplicationServiceProvider {
      *
      * @return void
      */
-    public function boot()
-    {
+    public function boot() {
     }
 }

@@ -7,7 +7,7 @@ use App\Flare\Models\Character;
 use App\Flare\Models\Inventory;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
-use App\Game\Core\Services\EquipItemService;
+use App\Game\CharacterInventory\Services\EquipItemService;
 use App\Game\Shop\Events\BuyItemEvent;
 use App\Game\Shop\Events\SellItemEvent;
 use Facades\App\Flare\Calculators\SellItemCalculator;
@@ -37,7 +37,7 @@ class ShopService {
     public function sellAllItemsInInventory(Character $character): int {
         $invalidTypes = ['alchemy', 'quest', 'trinket'];
 
-        $itemsToSell = $character->inventory->slots()->with('item')->get()->filter(function($slot) use($invalidTypes) {
+        $itemsToSell = $character->inventory->slots()->with('item')->get()->filter(function ($slot) use ($invalidTypes) {
             return !$slot->equipped && !in_array($slot->item->type, $invalidTypes);
         });
 
@@ -78,8 +78,8 @@ class ShopService {
         $requestData['slot_id'] = $slot->id;
 
         $this->equipItemService->setRequest($requestData)
-                               ->setCharacter($character)
-                               ->replaceItem();
+            ->setCharacter($character)
+            ->replaceItem();
 
         CharacterAttackTypesCacheBuilder::dispatch($character);
     }

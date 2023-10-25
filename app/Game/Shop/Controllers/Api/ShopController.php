@@ -8,7 +8,7 @@ use App\Game\Shop\Services\ShopService;
 use App\Http\Controllers\Controller;
 use Facades\App\Flare\Calculators\SellItemCalculator;
 use App\Game\Shop\Requests\ShopSellValidation;
-use App\Game\Core\Services\CharacterInventoryService;
+use App\Game\CharacterInventory\Services\CharacterInventoryService;
 use App\Flare\Models\Character;
 use App\Game\Shop\Events\SellItemEvent;
 
@@ -22,7 +22,7 @@ class ShopController extends Controller {
 
     public function sellItem(ShopSellValidation $request, Character $character) {
 
-        $inventorySlot = $character->inventory->slots->filter(function($slot) use($request) {
+        $inventorySlot = $character->inventory->slots->filter(function ($slot) use ($request) {
             return $slot->id === (int) $request->slot_id && !$slot->equipped;
         })->first();
 

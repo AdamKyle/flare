@@ -11,7 +11,7 @@ use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 use App\Flare\Models\ItemAffix;
 use App\Flare\Models\Skill;
-use App\Game\Core\Services\CharacterInventoryService;
+use App\Game\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\NpcActions\QueenOfHeartsActions\Services\RandomEnchantmentService;
@@ -65,11 +65,12 @@ class EnchantingService {
      * @param EnchantItemService $enchantItemService
      * @param RandomEnchantmentService $randomEnchantmentService
      */
-    public function __construct(CharacterStatBuilder $characterStatBuilder,
-                                CharacterInventoryService $characterInventoryService,
-                                EnchantItemService $enchantItemService,
-                                RandomEnchantmentService $randomEnchantmentService)
-    {
+    public function __construct(
+        CharacterStatBuilder $characterStatBuilder,
+        CharacterInventoryService $characterInventoryService,
+        EnchantItemService $enchantItemService,
+        RandomEnchantmentService $randomEnchantmentService
+    ) {
 
         $this->characterStatBuilder        = $characterStatBuilder;
         $this->characterInventoryService   = $characterInventoryService;
@@ -95,7 +96,7 @@ class EnchantingService {
         $inventory                 = $characterInventoryService->getInventoryForType('inventory');
 
         if ($ignoreTrinkets) {
-            $inventory = array_values(array_filter($inventory, function($item) {
+            $inventory = array_values(array_filter($inventory, function ($item) {
                 return $item['type'] !== 'trinket' && $item['type'] !== 'artifact';
             }));
         }
@@ -115,7 +116,7 @@ class EnchantingService {
             'character_inventory' => $newInventory,
         ];
     }
-    
+
     public function getEnchantingXP(Character $character): array {
         $skill = $this->getEnchantingSkill($character);
 
@@ -229,11 +230,11 @@ class EnchantingService {
         $currentInt = $builder->statMod('int');
 
         $affixes = ItemAffix::select('name', 'cost', 'id', 'type')
-                            ->where('int_required', '<=', $currentInt)
-                            ->where('skill_level_required', '<=', $enchantingSkill->level)
-                            ->where('randomly_generated', false)
-                            ->orderBy('skill_level_required', 'asc')
-                            ->get();
+            ->where('int_required', '<=', $currentInt)
+            ->where('skill_level_required', '<=', $enchantingSkill->level)
+            ->where('randomly_generated', false)
+            ->orderBy('skill_level_required', 'asc')
+            ->get();
 
         $character = $builder->character();
 
@@ -312,7 +313,7 @@ class EnchantingService {
     }
 
     protected function appliedEnchantment(InventorySlot $slot, ItemAffix $affix, Character $character, Skill $enchantingSkill, bool $tooEasy = false) {
-        $message = 'Applied enchantment: '.$affix->name.' to: ' . $slot->item->refresh()->affix_name;
+        $message = 'Applied enchantment: ' . $affix->name . ' to: ' . $slot->item->refresh()->affix_name;
 
         ServerMessageHandler::handleMessage($character->user, 'enchanted', $message, $slot->id);
 
@@ -322,7 +323,7 @@ class EnchantingService {
     }
 
     protected function failedToApplyEnchantment(InventorySlot $slot, ItemAffix $affix, Character $character) {
-        $message = 'You failed to apply '.$affix->name.' to: ' . $slot->item->refresh()->affix_name . '. The item shatters before you. You lost the investment.';
+        $message = 'You failed to apply ' . $affix->name . ' to: ' . $slot->item->refresh()->affix_name . '. The item shatters before you. You lost the investment.';
 
         ServerMessageHandler::handleMessage($character->user, 'enchantment_failed', $message);
 

@@ -3,7 +3,7 @@
 namespace App\Game\Market\Controllers\Api;
 
 use App\Flare\Traits\IsItemUnique;
-use App\Game\Core\Services\CharacterInventoryService;
+use App\Game\CharacterInventory\Services\CharacterInventoryService;
 use Facades\App\Flare\Calculators\SellItemCalculator;
 use App\Flare\Models\MarketBoard;
 use App\Game\Core\Traits\UpdateMarketBoard;
@@ -56,7 +56,7 @@ class  MarketController extends Controller {
 
         $minCost = SellItemCalculator::fetchMinPrice($slot->item);
 
-        if ( $minCost !== 0 && $minCost > $request->list_for) {
+        if ($minCost !== 0 && $minCost > $request->list_for) {
             return response()->json(['message' => 'No! The minimum selling price is: ' . number_format($minCost) . ' Gold.'], 422);
         }
 

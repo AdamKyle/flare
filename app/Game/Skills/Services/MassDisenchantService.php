@@ -2,7 +2,7 @@
 
 namespace App\Game\Skills\Services;
 
-use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
+use App\Game\CharacterInventory\Events\CharacterInventoryUpdateBroadCastEvent;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Core\Traits\MercenaryBonus;
@@ -86,15 +86,15 @@ class MassDisenchantService {
     public function setUp(Character $character): MassDisenchantService {
         $this->character = $character;
 
-        $this->disenchantingSkill = $character->skills->filter(function($skill) {
+        $this->disenchantingSkill = $character->skills->filter(function ($skill) {
             return $skill->type()->isDisenchanting();
         })->first();
 
-        $this->enchantingSkill = $character->skills->filter(function($skill) {
+        $this->enchantingSkill = $character->skills->filter(function ($skill) {
             return $skill->type()->isEnchanting();
         })->first();
 
-        $this->questSlot = $character->inventory->slots->filter(function($slot) {
+        $this->questSlot = $character->inventory->slots->filter(function ($slot) {
             return $slot->item->type === 'quest' && $slot->item->effect === ItemEffectsValue::GOLD_DUST_RUSH;
         })->first();
 

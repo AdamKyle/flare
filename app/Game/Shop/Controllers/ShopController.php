@@ -15,7 +15,7 @@ use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Shop\Requests\ShopBuyMultipleValidation;
 use App\Game\Shop\Requests\ShopPurchaseMultipleValidation;
-use App\Game\Core\Services\EquipItemService;
+use App\Game\CharacterInventory\Services\EquipItemService;
 use App\Game\Core\Services\ComparisonService;
 use App\Game\Shop\Events\BuyItemEvent;
 use App\Game\Shop\Services\ShopService;

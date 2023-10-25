@@ -10,7 +10,7 @@ use App\Flare\Models\MarketHistory;
 use App\Flare\Models\MarketBoard as MarketBoardModel;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Core\Events\UpdateTopBarEvent;
-use App\Game\Core\Services\EquipItemService;
+use App\Game\CharacterInventory\Services\EquipItemService;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 
 class MarketBoard {
@@ -44,13 +44,12 @@ class MarketBoard {
         ]);
 
         $this->equipItemService->setRequest($request)
-             ->setCharacter($character)
-             ->replaceItem();
+            ->setCharacter($character)
+            ->replaceItem();
 
         $this->updateCharacterAttackDataCache($character->refresh());
 
         $listing->delete();
-
     }
 
     /**

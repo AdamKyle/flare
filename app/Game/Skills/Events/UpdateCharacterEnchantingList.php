@@ -2,7 +2,7 @@
 
 namespace App\Game\Skills\Events;
 
-use App\Game\Core\Services\CharacterInventoryService;
+use App\Game\CharacterInventory\Services\CharacterInventoryService;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Queue\SerializesModels;
@@ -10,10 +10,9 @@ use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
-Use App\Flare\Models\User;
+use App\Flare\Models\User;
 
-class UpdateCharacterEnchantingList implements ShouldBroadcastNow
-{
+class UpdateCharacterEnchantingList implements ShouldBroadcastNow {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
 
@@ -50,8 +49,7 @@ class UpdateCharacterEnchantingList implements ShouldBroadcastNow
      *
      * @return Channel|array
      */
-    public function broadcastOn()
-    {
+    public function broadcastOn() {
         return new PrivateChannel('update-enchanting-list-' . $this->user->id);
     }
 }

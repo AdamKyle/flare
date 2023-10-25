@@ -7,10 +7,10 @@ use App\Flare\Models\Character;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Flare\Models\ItemSkillProgression;
 use App\Flare\Builders\Character\Traits\FetchEquipped;
-use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
+use App\Game\CharacterInventory\Events\CharacterInventoryUpdateBroadCastEvent;
 
 class ItemSkillService {
-    
+
     use ResponseBuilder, FetchEquipped;
 
     /**
@@ -95,7 +95,7 @@ class ItemSkillService {
         if (is_null($equippedItems)) {
             return null;
         }
-        
+
         $slot = $equippedItems->where('item.type', 'artifact')->where('item.id', $itemId)->first();
 
         if (is_null($slot)) {
