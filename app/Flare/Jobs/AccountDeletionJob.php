@@ -16,6 +16,7 @@ use App\Flare\Mail\GenericMail;
 use App\Flare\Models\UserSiteAccessStatistics;
 use App\Game\Core\Traits\UpdateMarketBoard;
 use App\Game\Messages\Events\GlobalMessageEvent;
+use App\Game\Messages\Models\Message;
 
 class AccountDeletionJob implements ShouldQueue
 {
@@ -80,6 +81,8 @@ class AccountDeletionJob implements ShouldQueue
 
                 event(new GlobalMessageEvent('The Creator is sad today: ' . $characterName . ' has decided to call it quits. We wish them the best on their journeys'));
             }
+
+            Message::where('user_id', $user->id)->delete();
 
             $user->delete();
         } catch (\Exception $e) {

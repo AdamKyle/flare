@@ -34,7 +34,7 @@ class FetchMessages {
      * @return SupportCollection
      */
     protected function transformMessages(Collection $messages): SupportCollection {
-        return $messages->transform(function($message) {
+        return $messages->transform(function ($message) {
 
             $message->x     = $message->x_position;
             $message->y     = $message->y_position;
@@ -42,8 +42,6 @@ class FetchMessages {
             if (!is_null($message->color)) {
                 $message->map = $this->getMapNameFromColor($message->color);
             }
-
-            $user = auth()->user();
 
             $message = $this->setUpCustomOverRides($message);
 
@@ -101,7 +99,7 @@ class FetchMessages {
                 return 'PURG';
             case '#ffffff':
             default:
-                return'SUR';
+                return 'SUR';
         }
     }
 }

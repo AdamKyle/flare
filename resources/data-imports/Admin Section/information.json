@@ -1,9 +1,0 @@
-# Planes of Tlessa 1.5.2
-
-Welcome back ladies and gents to another release: 1.5.2
-
-## Bug Fixes:
-
-- Fixed an issue with Guide Quests where a quest item required could be upgraded or traded in to a complete quest, thus we need to check if you took the item you need and upgraded it. If so, it still counts because you once had it.
-- Fixed Accuracy and Dodge Enchantments
-- I believe we have fixed an inventory set issue where a route error gets thrown but more testing might be needed.
