@@ -33,6 +33,10 @@ export default class ArmourTypeSelection extends React.Component<
                 value: "shield",
             },
             {
+                label: "Leggings",
+                value: "leggings",
+            },
+            {
                 label: "Feet",
                 value: "feet",
             },
