@@ -89,7 +89,7 @@ export default class CharacterInventoryTabs extends React.Component<
                     const inventoryState = JSON.parse(
                         JSON.stringify(this.state.inventory)
                     );
-                    
+
                     inventoryState[event.type] = event.inventory;
 
                     this.setState(
@@ -115,8 +115,6 @@ export default class CharacterInventoryTabs extends React.Component<
         let stateInventory = JSON.parse(JSON.stringify(this.state.inventory));
 
         const keys = Object.keys(inventory);
-
-        console.log("updateInventory", stateInventory, keys, inventory);
 
         for (let i = 0; i < keys.length; i++) {
             stateInventory[keys[i]] = inventory[keys[i]];
