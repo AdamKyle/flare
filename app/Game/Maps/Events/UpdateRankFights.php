@@ -2,11 +2,8 @@
 
 namespace App\Game\Maps\Events;
 
-use App\Flare\Models\Character;
-use App\Flare\Models\Map;
 use App\Flare\Models\RankFight;
 use Illuminate\Broadcasting\Channel;
-use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Foundation\Events\Dispatchable;

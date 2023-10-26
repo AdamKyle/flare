@@ -24,6 +24,7 @@ import Draggable from "react-draggable/build/web/react-draggable.min";
 import MapState from "./types/map-state";
 import { updateTimers } from "../../lib/ajax/update-timers";
 import { mergeLocations } from "./helpers/merge-locations";
+import { updateLocationBasedActions } from "../../lib/ajax/update-location-based-actions";
 
 export default class MapSection extends React.Component<MapProps, MapState> {
     private mapTimeOut: any;
@@ -106,6 +107,8 @@ export default class MapSection extends React.Component<MapProps, MapState> {
         if (this.props.map_data !== null) {
             this.setState({ ...this.props.map_data }, () => {
                 updateTimers(this.props.character_id);
+
+                updateLocationBasedActions(this.props.character_id);
 
                 this.setState({ loading: false });
             });
@@ -212,6 +215,8 @@ export default class MapSection extends React.Component<MapProps, MapState> {
         if (this.props.map_data !== null && this.state.loading) {
             this.setState({ ...this.props.map_data }, () => {
                 updateTimers(this.props.character_id);
+
+                updateLocationBasedActions(this.props.character_id);
 
                 this.setState({ loading: false });
             });

@@ -72,11 +72,32 @@ class LocationService {
      * @return array
      */
     public function getLocationData(Character $character, ?Raid $raid = null): array {
-        $this->processLocation($character);
+
+        $this->locationBasedEvents($character);
 
         $this->kingdomManagement($character);
 
         $lockedLocation = $this->getLockedLocation($character);
+
+        return [
+            'map_url'                => Storage::disk('maps')->url($character->map_url),
+            'character_map'          => $character->map,
+            'locations'              => $this->fetchLocationData($character)->merge($this->fetchCorruptedLocationData($raid)),
+            'can_move'               => $character->can_move,
+            'can_move_again_at'      => $character->can_move_again_at,
+            'coordinates'            => $this->coordinatesCache->getFromCache(),
+            'celestial_id'           => $this->getCelestialEntityId($character),
+            'can_settle_kingdom'     => $this->canSettle,
+            'my_kingdoms'            => $this->getKingdoms($character),
+            'npc_kingdoms'           => Kingdom::select('id', 'x_position', 'y_position', 'npc_owned', 'name')->whereNull('character_id')->where('game_map_id', $character->map->game_map_id)->where('npc_owned', true)->get(),
+            'other_kingdoms'         => $this->getEnemyKingdoms($character),
+            'characters_on_map'      => $this->getActiveUsersCountForMap($character),
+            'lockedLocationType'     => is_null($lockedLocation) ? null : $lockedLocation->type,
+        ];
+    }
+
+    public function locationBasedEvents(Character $character) {
+        $this->processLocation($character);
 
         // In case automation is running, this way the timer updates.
         event(new UpdateCharacterStatus($character));
@@ -98,22 +119,6 @@ class LocationService {
 
         // Update monsters foir a possible raid at a possible location
         $this->updateMonstersForRaid($character, $this->location);
-
-        return [
-            'map_url'                => Storage::disk('maps')->url($character->map_url),
-            'character_map'          => $character->map,
-            'locations'              => $this->fetchLocationData($character)->merge($this->fetchCorruptedLocationData($raid)),
-            'can_move'               => $character->can_move,
-            'can_move_again_at'      => $character->can_move_again_at,
-            'coordinates'            => $this->coordinatesCache->getFromCache(),
-            'celestial_id'           => $this->getCelestialEntityId($character),
-            'can_settle_kingdom'     => $this->canSettle,
-            'my_kingdoms'            => $this->getKingdoms($character),
-            'npc_kingdoms'           => Kingdom::select('id', 'x_position', 'y_position', 'npc_owned', 'name')->whereNull('character_id')->where('game_map_id', $character->map->game_map_id)->where('npc_owned', true)->get(),
-            'other_kingdoms'         => $this->getEnemyKingdoms($character),
-            'characters_on_map'      => $this->getActiveUsersCountForMap($character),
-            'lockedLocationType'     => is_null($lockedLocation) ? null : $lockedLocation->type,
-        ];
     }
 
     /**
@@ -136,7 +141,6 @@ class LocationService {
         }
 
         if ((new LocationType($this->location->type))->isUnderWaterCaves()) {
-
             event(new UpdateRankFights($character->user, true));
 
             return;

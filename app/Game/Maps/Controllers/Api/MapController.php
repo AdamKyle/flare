@@ -48,11 +48,12 @@ class MapController extends Controller {
      * @param WalkingService $walkingService
      * @param SetSailService $setSail
      */
-    public function __construct(MovementService $movementService,
-                                TeleportService $teleportService,
-                                WalkingService $walkingService,
-                                SetSailService $setSail)
-    {
+    public function __construct(
+        MovementService $movementService,
+        TeleportService $teleportService,
+        WalkingService $walkingService,
+        SetSailService $setSail
+    ) {
         $this->movementService = $movementService;
         $this->teleportService = $teleportService;
         $this->walkingService  = $walkingService;
@@ -68,6 +69,15 @@ class MapController extends Controller {
      */
     public function mapInformation(Character $character, LocationService $locationService): JsonResponse {
         return response()->json($locationService->getLocationData($character));
+    }
+
+    /**
+     * @param Character $character
+     * @param LocationService $locationService
+     * @return JsonResponse
+     */
+    public function updateLocationActions(Character $character, LocationService $locationService): JsonResponse {
+        return response()->json($locationService->locationBasedEvents($character));
     }
 
     /**
@@ -133,9 +143,9 @@ class MapController extends Controller {
         }
 
         $response = $this->teleportService->setCoordinatesToTravelTo($request->x, $request->y)
-                                          ->setCost($request->cost)
-                                          ->setTimeOutValue($request->timeout)
-                                          ->teleport($character);
+            ->setCost($request->cost)
+            ->setTimeOutValue($request->timeout)
+            ->teleport($character);
 
         $status = $response['status'];
 
@@ -155,9 +165,9 @@ class MapController extends Controller {
         }
 
         $response = $this->setSail->setCoordinatesToTravelTo($request->x, $request->y)
-                                  ->setCost($request->cost)
-                                  ->setTimeOutValue($request->timeout)
-                                  ->setSail($character);
+            ->setCost($request->cost)
+            ->setTimeOutValue($request->timeout)
+            ->setSail($character);
 
         $status = $response['status'];
 

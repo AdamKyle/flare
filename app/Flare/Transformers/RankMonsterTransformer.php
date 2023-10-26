@@ -39,6 +39,7 @@ class RankMonsterTransformer extends TransformerAbstract {
             'name'                      => $monster->name,
             'map_name'                  => $monster->gameMap->name,
             'damage_stat'               => $monster->damage_stat,
+            'life_stealing_resistance'  => $monster->life_stealing_resistance,
             'str'                       => $this->statAmount,
             'dur'                       => $this->statAmount,
             'dex'                       => $this->statAmount,
@@ -71,6 +72,13 @@ class RankMonsterTransformer extends TransformerAbstract {
             'counter_resistance_chance' => .45,
             'increases_damage_by'       => 0,
             'is_special'                => false,
+            'is_raid_monster'           => false,
+            'is_raid_boss'              => false,
+            'fire_atonement'            => $monster->fire_atonement,
+            'ice_atonement'             => $monster->ice_atonement,
+            'water_atonement'           => $monster->water_atonement,
+            'life_stealing_resistance'  => $monster->life_stealing_resistance,
+            'raid_special_attack_type'  => $monster->raid_special_attack_type,
         ];
     }
 }
