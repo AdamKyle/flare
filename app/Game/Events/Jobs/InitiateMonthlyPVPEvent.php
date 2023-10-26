@@ -59,9 +59,7 @@ class InitiateMonthlyPVPEvent implements ShouldQueue {
                 $user = User::find($session->user_id);
 
                 if (!is_null($user->character)) {
-
                     if ($user->character->level >= 302) {
-
                         event(new UpdateCharacterStatus($user->character));
                     }
                 }

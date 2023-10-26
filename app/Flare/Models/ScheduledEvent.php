@@ -3,9 +3,13 @@
 namespace App\Flare\Models;
 
 use App\Flare\Values\EventType;
+use Database\Factories\ScheduledEventFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class ScheduledEvent extends Model {
+
+    use HasFactory;
 
     /**
      * The attributes that are mass assignable.
@@ -53,5 +57,9 @@ class ScheduledEvent extends Model {
         }
 
         return 'Event Name';
+    }
+
+    protected static function newFactory() {
+        return ScheduledEventFactory::new();
     }
 }

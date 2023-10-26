@@ -12,14 +12,14 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Cache;
 
-class WeeklyCelestialSpawnEvent implements ShouldQueue
-{
+class WeeklyCelestialSpawnEvent implements ShouldQueue {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     /**
      * Create a new job instance.
      */
-    public function __construct() {}
+    public function __construct() {
+    }
 
     public function handle() {
 
