@@ -175,8 +175,8 @@ class GemService {
         $copperCoins = $character->copper_coins;
 
         return $goldDust >= $data['cost']['gold_dust'] &&
-               $shards >= $data['cost']['shards'] &&
-               $copperCoins >= $data['cost']['copper_coins'];
+            $shards >= $data['cost']['shards'] &&
+            $copperCoins >= $data['cost']['copper_coins'];
     }
 
     /**

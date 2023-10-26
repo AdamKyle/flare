@@ -103,6 +103,6 @@ class ServerMonster {
             'fire'  => $this->monster['fire_atonement'],
             'ice'   => $this->monster['ice_atonement'],
             'water' => $this->monster['water_atonement']
-        ];  
+        ];
     }
 }

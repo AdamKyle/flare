@@ -10,7 +10,6 @@ use App\Flare\ServerFight\Fight\Affixes;
 use App\Flare\ServerFight\Monster\ServerMonster;
 use App\Flare\Traits\ElementAttackData;
 use App\Flare\Values\LocationType;
-use App\Game\Gems\Values\GemTypeValue;
 
 class SecondaryAttacks extends BattleBase {
 

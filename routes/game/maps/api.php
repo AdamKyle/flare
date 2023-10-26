@@ -7,9 +7,10 @@ Route::middleware(['auth', 'is.player.banned', 'is.character.who.they.say.they.a
     // Map related info:
     Route::get('/map/{character}', ['uses' => 'Api\MapController@mapInformation']);
 
+    Route::get('/map/update-character-location-actions/{character}', ['uses' => 'Api\MapController@updateLocationActions']);
+
     // Fetch Quests for map:
     Route::get('/map/quests/{character}', ['uses' => 'Api\MapController@fetchQuests']);
-
 
 
     Route::group(['middleware' => 'throttle:moving'], function() {

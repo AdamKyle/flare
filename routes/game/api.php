@@ -23,7 +23,7 @@ Route::group(['middleware' => ['is.character.who.they.say.they.are']], function 
     Route::get('/character-location-data/{character}', ['uses' => 'Api\CharacterSheetController@basicLocationInformation']);
     Route::get('/character-base-data/{character}', ['uses' => 'Api\CharacterSheetController@baseCharacterInformation']);
     Route::get('/update-character-timers/{character}', ['uses' => 'Api\TimersController@updateTimersForCharacter']);
-
+    
     Route::post('/character-sheet/{character}/name-change', ['uses' => 'Api\CharacterSheetController@nameChange']);
 
     Route::middleware(['is.character.exploring'])->group(function () {

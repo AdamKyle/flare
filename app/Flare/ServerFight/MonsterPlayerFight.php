@@ -305,7 +305,7 @@ class MonsterPlayerFight {
      *
      * - Returns true if the character won.
      * - Returns false if the character lost or took too long or if neither side won.
-     * 
+     *
      * Use the methods here to determine based on health who won.
      *
      * @param bool $onlyOnce
@@ -324,14 +324,14 @@ class MonsterPlayerFight {
                 $data = Cache::get('rank-fight-for-character-' . $this->character->id);
 
                 $this->rank    = $data['rank'];
-                $this->monster = $data['monster']->getMonster();
+                $this->monster = $data['monster'];
             } else {
                 $data = $this->fightSetUp(true);
 
                 $this->rank    = $data['rank'];
-                $this->monster = $data['monster']->getMonster();
+                $this->monster = $data['monster'];
             }
-        } else if (Cache::has('monster-fight-' . $this->character->id)){
+        } else if (Cache::has('monster-fight-' . $this->character->id)) {
             $data = Cache::get('monster-fight-' . $this->character->id);
 
             $this->monster = $data['monster'];
@@ -393,10 +393,10 @@ class MonsterPlayerFight {
      */
     protected function doAttack(ServerMonster $monster, array $health, bool $isPlayerVoided, bool $isEnemyVoided, bool $onlyOnce, bool $isRankFight = false): bool {
         $this->attack->setHealth($health)
-                     ->setIsCharacterVoided($isPlayerVoided)
-                     ->setIsEnemyVoided($isEnemyVoided)
-                     ->onlyAttackOnce($onlyOnce)
-                     ->attack($this->character, $monster, $this->attackType, 'character', $isRankFight);
+            ->setIsCharacterVoided($isPlayerVoided)
+            ->setIsEnemyVoided($isEnemyVoided)
+            ->onlyAttackOnce($onlyOnce)
+            ->attack($this->character, $monster, $this->attackType, 'character', $isRankFight);
 
         $this->mergeMessages($this->attack->getMessages());
 
@@ -526,7 +526,7 @@ class MonsterPlayerFight {
      */
     protected function removeDuplicateMessages(array &$array) {
         $uniqueMessages = [];
-    
+
         $array = array_reduce($array, function ($result, $item) use (&$uniqueMessages) {
             if (!in_array($item['message'], $uniqueMessages)) {
                 $uniqueMessages[] = $item['message'];
