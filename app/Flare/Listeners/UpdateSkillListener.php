@@ -38,7 +38,7 @@ class UpdateSkillListener {
      * @return void
      */
     public function handle(UpdateSkillEvent $event) {
-        if ($event->skill->level <= $event->skill->baseSkill->max_level) {
+        if ($event->skill->level >= $event->skill->baseSkill->max_level) {
             return;
         }
 
