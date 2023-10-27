@@ -86,15 +86,15 @@ class MassDisenchantService {
     public function setUp(Character $character): MassDisenchantService {
         $this->character = $character;
 
-        $this->disenchantingSkill = $character->skills->filter(function($skill) {
+        $this->disenchantingSkill = $character->skills->filter(function ($skill) {
             return $skill->type()->isDisenchanting();
         })->first();
 
-        $this->enchantingSkill = $character->skills->filter(function($skill) {
+        $this->enchantingSkill = $character->skills->filter(function ($skill) {
             return $skill->type()->isEnchanting();
         })->first();
 
-        $this->questSlot = $character->inventory->slots->filter(function($slot) {
+        $this->questSlot = $character->inventory->slots->filter(function ($slot) {
             return $slot->item->type === 'quest' && $slot->item->effect === ItemEffectsValue::GOLD_DUST_RUSH;
         })->first();
 
@@ -181,8 +181,7 @@ class MassDisenchantService {
      * @return Skill
      */
     protected function giveXpToSkill(Skill $skill, int $leftOver, string $leveledType): Skill {
-
-        if ($leftOver >= $skill->xp_next) {
+        if ($leftOver >= $skill->xp_max) {
 
             $leftOver = $leftOver - $skill->xp_max;
             $this->levelUpSkill($skill, $leveledType);
@@ -198,17 +197,21 @@ class MassDisenchantService {
             }
         }
 
-        // @codeCoverageIgnoreStart
         if ($leftOver >= 0 && $leftOver < $skill->xp_next && ($skill->level < $skill->baseSkill->max_level)) {
             $skill->update([
                 'xp' => $skill->xp + $leftOver,
             ]);
         }
-        // @codeCoverageIgnoreEnd
+
+        if ($leveledType === 'enchantingLevelTimes') {
+            $this->enchantingSkill = $skill->refresh();
+
+            return $skill;
+        }
 
         $this->disenchantingSkill = $skill->refresh();
 
-        return $this->disenchantingSkill;
+        return $skill;
     }
 
     protected function levelUpSkill(Skill $skill, string $leveledType): void {
