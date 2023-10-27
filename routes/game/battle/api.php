@@ -1,11 +1,11 @@
 <?php
 
-Route::middleware(['auth', 'is.character.who.they.say.they.are', 'throttle:150,2'])->group(function() {
+Route::middleware(['auth', 'is.character.who.they.say.they.are', 'throttle:150,2'])->group(function () {
 
     Route::get('/map-actions/{character}', ['uses' => 'Api\BattleController@index']);
 
-    Route::middleware(['is.character.exploring'])->group(function() {
-        Route::middleware(['is.character.dead'])->group(function() {
+    Route::middleware(['is.character.exploring'])->group(function () {
+        Route::middleware(['is.character.dead', 'throttle:attacking'])->group(function () {
 
             Route::get('/setup-monster-fight/{character}/{monster}', ['uses' => 'Api\BattleController@setupMonster']);
             Route::post('/monster-fight/{character}', ['uses' => 'Api\BattleController@fightMonster']);
@@ -34,10 +34,9 @@ Route::middleware(['auth', 'is.character.who.they.say.they.are', 'throttle:150,2
         Route::post('/pvp/revive/{character}', ['uses' => 'Api\PvpBattleController@revive']);
     });
 
-    Route::middleware(['throttle:fighting', 'is.globally.timed.out', 'is.character.exploring'])->group(function() {
+    Route::middleware(['throttle:fighting', 'is.globally.timed.out', 'is.character.exploring'])->group(function () {
         Route::post('/battle-results/{character}', ['uses' => 'Api\BattleController@battleResults']);
     });
 
     Route::post('/battle-revive/{character}', ['uses' => 'Api\BattleController@revive']);
 });
-
