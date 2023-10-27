@@ -39,7 +39,7 @@ class DailyRandomGoldDust extends Command
      * Execute the console command.
      */
     public function handle(DailyGoldDustService $dailyGoldDustService) {
-        $characterIds = Character::pluck('id')->toArray();
+        $characterIds = Character::where('level', '>=', 500)->pluck('id')->toArray();
 
         Cache::delete('daily-gold-dust-lottery-won');
 
