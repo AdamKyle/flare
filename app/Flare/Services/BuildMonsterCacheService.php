@@ -59,10 +59,10 @@ class BuildMonsterCacheService {
         foreach (GameMap::all() as $gameMap) {
             $monsters =  new Collection(
                 Monster::where('is_celestial_entity', false)
-                       ->where('is_raid_monster', false)
-                       ->where('is_raid_boss', false)
-                       ->where('game_map_id', $gameMap->id)
-                       ->get(),
+                    ->where('is_raid_monster', false)
+                    ->where('is_raid_boss', false)
+                    ->where('game_map_id', $gameMap->id)
+                    ->get(),
                 $this->monster
             );
 
@@ -75,7 +75,7 @@ class BuildMonsterCacheService {
         Cache::put('monsters', $monstersCache);
     }
 
-     /**
+    /**
      * Builds raid monster cache.
      *
      * @return void
@@ -88,16 +88,16 @@ class BuildMonsterCacheService {
         foreach (GameMap::all() as $gameMap) {
 
             $raidCritters = Monster::where('is_celestial_entity', false)
-                                   ->where('is_raid_monster', true)
-                                   ->where('is_raid_boss', false)
-                                   ->where('game_map_id', $gameMap->id)
-                                   ->get();
+                ->where('is_raid_monster', true)
+                ->where('is_raid_boss', false)
+                ->where('game_map_id', $gameMap->id)
+                ->get();
 
             $raidBosses = Monster::where('is_celestial_entity', false)
-                                 ->where('is_raid_monster', false)
-                                 ->where('is_raid_boss', true)
-                                 ->where('game_map_id', $gameMap->id)
-                                 ->get();
+                ->where('is_raid_monster', false)
+                ->where('is_raid_boss', true)
+                ->where('game_map_id', $gameMap->id)
+                ->get();
 
 
             $monsters =  new Collection(
@@ -155,8 +155,8 @@ class BuildMonsterCacheService {
         }
 
         $monsters          = Monster::where('game_map_id', GameMap::where('name', MapNameValue::SURFACE)->first()->id)
-                                    ->where('is_celestial_entity', false)
-                                    ->get();
+            ->where('is_celestial_entity', false)
+            ->get();
         $iteration         = $monsters->count();
         $baseAmount        = 100000;
         $maxAmount         = 1000000;
@@ -178,7 +178,6 @@ class BuildMonsterCacheService {
                 $rankCache[$i][] = $this->manager->createData($monster)->toArray();
 
                 $baseAmount += $increments;
-
             }
 
             $maxAmount += $maxAmount;
@@ -253,6 +252,8 @@ class BuildMonsterCacheService {
         foreach (Location::whereNotNull('enemy_strength_type')->get() as $location) {
             $monsters = Monster::where('is_celestial_entity', false)
                 ->where('game_map_id', $location->game_map_id)
+                ->where('is_raid_monster', false)
+                ->where('is_raid_boss', false)
                 ->get();
 
             $monsters = $this->transformMonsterForLocation(
@@ -280,7 +281,7 @@ class BuildMonsterCacheService {
      * @return IlluminateCollection
      */
     protected function transformMonsterForLocation(DBCollection $monsters, int $increaseStatsBy, float $increasePercentageBy): IlluminateCollection {
-        return $monsters->transform(function($monster) use ($increaseStatsBy, $increasePercentageBy) {
+        return $monsters->transform(function ($monster) use ($increaseStatsBy, $increasePercentageBy) {
             $monster->str                       += $increaseStatsBy;
             $monster->dex                       += $increaseStatsBy;
             $monster->agi                       += $increaseStatsBy;
