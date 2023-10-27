@@ -2,9 +2,13 @@
 
 namespace App\Flare\Models;
 
+use Database\Factories\RaidFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Raid extends Model {
+
+    use HasFactory;
 
     /**
      * The attributes that are mass assignable.
@@ -75,5 +79,9 @@ class Raid extends Model {
         }
 
         return $raidMonsters;
+    }
+
+    protected static function newFactory() {
+        return RaidFactory::new();
     }
 }
