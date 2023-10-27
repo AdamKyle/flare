@@ -181,6 +181,7 @@ class MassDisenchantService {
      * @return Skill
      */
     protected function giveXpToSkill(Skill $skill, int $leftOver, string $leveledType): Skill {
+
         if ($leftOver >= $skill->xp_max) {
 
             $leftOver = $leftOver - $skill->xp_max;
@@ -190,10 +191,6 @@ class MassDisenchantService {
 
             if ($leftOver >= $skill->xp_max && ($skill->level < $skill->baseSkill->max_level)) {
                 $this->giveXpToSkill($skill, $leftOver, $leveledType);
-            } else if ($leftOver >= 0 && ($skill->level < $skill->baseSkill->max_level)) {
-                $skill->update([
-                    'xp' => $skill->xp + $leftOver
-                ]);
             }
         }
 

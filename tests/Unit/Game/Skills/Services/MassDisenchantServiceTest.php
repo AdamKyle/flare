@@ -52,7 +52,8 @@ class MassDisenchantServiceTest extends TestCase {
         )->assignSkill($this->enchantingSkill)->assignSkill(
             $this->createGameSkill([
                 'class_bonus' => 0.01
-            ]), 5
+            ]),
+            5
         )->givePlayerLocation();
 
         $this->massDisenchantService = resolve(MassDisenchantService::class);
@@ -192,7 +193,7 @@ class MassDisenchantServiceTest extends TestCase {
     }
 
     public function testGetSkillXpForDisenchantingItemsWhenMapBonusApplied() {
-        $character = $this->character->inventoryManagement()->giveItemMultipleTimes($this->itemToDisenchant, 10)->getCharacter();
+        $character = $this->character->inventoryManagement()->giveItemMultipleTimes($this->itemToDisenchant, 25)->getCharacter();
 
         $character->map->gameMap()->update([
             'skill_training_bonus' => .50
