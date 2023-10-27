@@ -156,6 +156,8 @@ class BuildMonsterCacheService {
 
         $monsters          = Monster::where('game_map_id', GameMap::where('name', MapNameValue::SURFACE)->first()->id)
             ->where('is_celestial_entity', false)
+            ->where('is_raid_boss', false)
+            ->where('is_raid_monster', false)
             ->get();
         $iteration         = $monsters->count();
         $baseAmount        = 100000;

@@ -206,7 +206,9 @@ class MassDisenchantService {
         }
         // @codeCoverageIgnoreEnd
 
-        return $skill->refresh();
+        $this->disenchantingSkill = $skill->refresh();
+
+        return $this->disenchantingSkill;
     }
 
     protected function levelUpSkill(Skill $skill, string $leveledType): void {
