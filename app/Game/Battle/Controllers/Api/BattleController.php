@@ -46,10 +46,10 @@ class BattleController extends Controller {
         $characterMap       = $character->map;
 
         $locationWithEffect = Location::whereNotNull('enemy_strength_type')
-                                      ->where('x', $characterMap->character_position_x)
-                                      ->where('y', $characterMap->character_position_y)
-                                      ->where('game_map_id', $characterMap->game_map_id)
-                                      ->first();
+            ->where('x', $characterMap->character_position_x)
+            ->where('y', $characterMap->character_position_y)
+            ->where('game_map_id', $characterMap->game_map_id)
+            ->first();
 
         if (!Cache::has('monsters')) {
             resolve(BuildMonsterCacheService::class)->buildCache();
@@ -66,7 +66,7 @@ class BattleController extends Controller {
         $monsters = collect($monsters);
 
         return response()->json([
-            'monsters'  => $monsters->map(function($monster) {
+            'monsters'  => $monsters->map(function ($monster) {
                 return [
                     'id'   => $monster['id'],
                     'name' => $monster['name']
@@ -101,12 +101,16 @@ class BattleController extends Controller {
     public function fightMonster(AttackTypeRequest $attackTypeRequest, Character $character): JsonResponse {
         $result = $this->monsterFightService->fightMonster($character, $attackTypeRequest->attack_type);
 
+        $status = $result['status'];
+        unset($result['status']);
+
+        if ($status !== 200) {
+            return response()->json($result, $status);
+        }
+
         if ($result['health']['current_character_health'] <= 0 || $result['health']['current_monster_health'] <= 0) {
             event(new AttackTimeOutEvent($character));
         }
-
-        $status = $result['status'];
-        unset($result['status']);
 
         return response()->json($result, $status);
     }
@@ -120,5 +124,4 @@ class BattleController extends Controller {
 
         return response()->json([]);
     }
-
 }

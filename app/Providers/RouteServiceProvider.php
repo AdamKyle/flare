@@ -8,8 +8,7 @@ use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvi
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-class RouteServiceProvider extends ServiceProvider
-{
+class RouteServiceProvider extends ServiceProvider {
     /**
      * This namespace is applied to your controller routes.
      *
@@ -36,28 +35,32 @@ class RouteServiceProvider extends ServiceProvider
     protected function configureRateLimiting() {
 
         // When sending public or private messages
-        RateLimiter::for('chat', function(Request $request) {
+        RateLimiter::for('chat', function (Request $request) {
             return Limit::perMinute(25)->by($request->ip());
         });
 
         // When fighting monsters
-        RateLimiter::for('fighting', function(Request $request) {
+        RateLimiter::for('fighting', function (Request $request) {
             return Limit::perMinute(100)->by($request->ip());
         });
 
         // When crafting items
-        RateLimiter::for('crafting', function(Request $request) {
+        RateLimiter::for('crafting', function (Request $request) {
             return Limit::perMinute(100)->by($request->ip());
         });
 
         // When enchanting items
-        RateLimiter::for('enchanting', function(Request $request) {
+        RateLimiter::for('enchanting', function (Request $request) {
             return Limit::perMinute(100)->by($request->ip());
         });
 
         // When moving around the map (including traversing)
-        RateLimiter::for('moving', function(Request $request) {
+        RateLimiter::for('moving', function (Request $request) {
             return Limit::perMinute(100)->by($request->ip());
+        });
+
+        RateLimiter::for('attacking', function (Request $request) {
+            return Limit::perMinute(20)->by($request->ip());
         });
     }
 
@@ -120,8 +123,8 @@ class RouteServiceProvider extends ServiceProvider
      */
     protected function mapWebRoutes() {
         Route::middleware('web')
-             ->namespace($this->namespace)
-             ->group(base_path('routes/web.php'));
+            ->namespace($this->namespace)
+            ->group(base_path('routes/web.php'));
     }
 
     /**
@@ -141,9 +144,9 @@ class RouteServiceProvider extends ServiceProvider
 
     protected function mapApiRoutes() {
         Route::prefix('api')
-             ->middleware('api')
-             ->namespace($this->namespace)
-             ->group(base_path('routes/api.php'));
+            ->middleware('api')
+            ->namespace($this->namespace)
+            ->group(base_path('routes/api.php'));
     }
 
     protected function mapExplorationApiRoutes() {
@@ -155,16 +158,16 @@ class RouteServiceProvider extends ServiceProvider
 
     protected function mapGameKingdomApiRoutes() {
         Route::prefix('api')
-             ->middleware('web')
-             ->namespace('App\Game\Kingdoms\Controllers')
-             ->group(base_path('routes/game/kingdoms/api.php'));
+            ->middleware('web')
+            ->namespace('App\Game\Kingdoms\Controllers')
+            ->group(base_path('routes/game/kingdoms/api.php'));
     }
 
     protected function mapGameSkillsApiRoutes() {
         Route::prefix('api')
-             ->middleware('web')
-             ->namespace('App\Game\Skills\Controllers')
-             ->group(base_path('routes/game/skills/api.php'));
+            ->middleware('web')
+            ->namespace('App\Game\Skills\Controllers')
+            ->group(base_path('routes/game/skills/api.php'));
     }
 
     protected function mapShopApiRoutes() {
@@ -176,8 +179,8 @@ class RouteServiceProvider extends ServiceProvider
 
     protected function mapAdminRoutes() {
         Route::middleware('web')
-             ->namespace('App\Admin\Controllers')
-             ->group(base_path('routes/admin/web.php'));
+            ->namespace('App\Admin\Controllers')
+            ->group(base_path('routes/admin/web.php'));
     }
 
     protected function mapAdminApiRoutes() {
@@ -189,8 +192,8 @@ class RouteServiceProvider extends ServiceProvider
 
     protected function mapGameCoreRoutes() {
         Route::middleware('web')
-             ->namespace('App\Game\Core\Controllers')
-             ->group(base_path('routes/game/web.php'));
+            ->namespace('App\Game\Core\Controllers')
+            ->group(base_path('routes/game/web.php'));
     }
 
     protected function mapKingdomRoutes() {
@@ -238,30 +241,30 @@ class RouteServiceProvider extends ServiceProvider
 
     protected function mapGameCoreApiRoutes() {
         Route::prefix('api')
-             ->middleware('web')
-             ->namespace('App\Game\Core\Controllers')
-             ->group(base_path('routes/game/api.php'));
+            ->middleware('web')
+            ->namespace('App\Game\Core\Controllers')
+            ->group(base_path('routes/game/api.php'));
     }
 
     protected function mapGameMessageApiRoutes() {
         Route::prefix('api')
-             ->middleware('web')
-             ->namespace('App\Game\Messages\Controllers')
-             ->group(base_path('routes/game/messages/api.php'));
+            ->middleware('web')
+            ->namespace('App\Game\Messages\Controllers')
+            ->group(base_path('routes/game/messages/api.php'));
     }
 
     protected function mapGameBattleApiRoutes() {
         Route::prefix('api')
-             ->middleware('web')
-             ->namespace('App\Game\Battle\Controllers')
-             ->group(base_path('routes/game/battle/api.php'));
+            ->middleware('web')
+            ->namespace('App\Game\Battle\Controllers')
+            ->group(base_path('routes/game/battle/api.php'));
     }
 
     protected function mapGameMapApiRoutes() {
         Route::prefix('api')
-             ->middleware('web')
-             ->namespace('App\Game\Maps\Controllers')
-             ->group(base_path('routes/game/maps/api.php'));
+            ->middleware('web')
+            ->namespace('App\Game\Maps\Controllers')
+            ->group(base_path('routes/game/maps/api.php'));
     }
 
     protected function mapGameMarketApiRoutes() {

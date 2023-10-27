@@ -25,8 +25,8 @@ class MonsterFightService {
 
         Cache::delete('monster-fight-' . $character->id);
 
-        $data = $this->monsterPlayerFight->setUpFight($character, $params)->fightSetUp();  
-        
+        $data = $this->monsterPlayerFight->setUpFight($character, $params)->fightSetUp();
+
         Cache::put('monster-fight-' . $character->id, $data, 900);
 
         return $this->successResult($data);
@@ -36,7 +36,7 @@ class MonsterFightService {
         $cache = Cache::get('monster-fight-' . $character->id);
 
         if (is_null($cache)) {
-            return $this->errorResult('The monster seems to have fled. Click attack again to start a new battle. You have 15 minutes from clicking attack to attack the creature before the cache resets.');
+            return $this->errorResult('The monster seems to have fled. Click attack again to start a new battle. You have 15 minutes from clicking attack to attack the creature.');
         }
 
         $this->monsterPlayerFight->setCharacter($character);
@@ -59,14 +59,12 @@ class MonsterFightService {
             Cache::put('monster-fight-' . $character->id, $cache, 900);
         } else {
             Cache::delete('monster-fight-' . $character->id);
-            
+
             BattleAttackHandler::dispatch($character->id, $this->monsterPlayerFight->getMonster()['id'])->onQueue('default_long')->delay(now()->addSeconds(2));
         }
-        
+
         $cache['messages'] = $this->monsterPlayerFight->getBattleMessages();
 
         return $this->successResult($cache);
     }
-
-
 }
