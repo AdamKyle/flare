@@ -117,7 +117,7 @@ class LocationService {
         // Update rank fights.
         $this->updateForRankFights($character);
 
-        // Update monsters foir a possible raid at a possible location
+        // Update monsters for a possible raid at a possible location
         $this->updateMonstersForRaid($character, $this->location);
     }
 

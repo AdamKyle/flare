@@ -66,12 +66,13 @@ class RankFightService {
      * @param RandomAffixGenerator $randomAffixGenerator
      * @param BuildMythicItem $buildMythicItem
      */
-    public function __construct(BattleEventHandler $battleEventHandler,
-                                CharacterCacheData $characterCacheData,
-                                CharacterXPService $characterXPService,
-                                MonsterPlayerFight $monsterPlayerFight,
-                                RandomAffixGenerator $randomAffixGenerator,
-                                BuildMythicItem $buildMythicItem,
+    public function __construct(
+        BattleEventHandler $battleEventHandler,
+        CharacterCacheData $characterCacheData,
+        CharacterXPService $characterXPService,
+        MonsterPlayerFight $monsterPlayerFight,
+        RandomAffixGenerator $randomAffixGenerator,
+        BuildMythicItem $buildMythicItem,
     ) {
         $this->battleEventHandler   = $battleEventHandler;
         $this->characterCacheData   = $characterCacheData;
@@ -311,7 +312,6 @@ class RankFightService {
 
                 return;
             }
-
         }
 
         if ($isLastMonsterForRank) {
@@ -451,18 +451,18 @@ class RankFightService {
      */
     protected function giveCharacterRandomItem(Character $character): Item {
         $item = Item::whereNull('item_prefix_id')
-                    ->whereNull('item_suffix_id')
-                    ->whereNull('specialty_type')
-                    ->whereNotIn('type', ['alchemy', 'quest', 'trinket', 'artifact'])
-                    ->whereDoesntHave('appliedHolyStacks')
-                    ->where('cost', '<=', 2000000000)
-                    ->inRandomOrder()
-                    ->first();
+            ->whereNull('item_suffix_id')
+            ->whereNull('specialty_type')
+            ->whereNotIn('type', ['alchemy', 'quest', 'trinket', 'artifact'])
+            ->whereDoesntHave('appliedHolyStacks')
+            ->where('cost', '<=', 2000000000)
+            ->inRandomOrder()
+            ->first();
 
 
         $randomAffix = $this->randomAffixGenerator
-                            ->setCharacter($character)
-                            ->setPaidAmount(RandomAffixDetails::LEGENDARY);
+            ->setCharacter($character)
+            ->setPaidAmount(RandomAffixDetails::LEGENDARY);
 
         $duplicateItem = $item->duplicate();
 
