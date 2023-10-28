@@ -49,6 +49,9 @@ class Kernel extends ConsoleKernel {
         // Fix Character Gold every 5 minutes.
         $schedule->command('fix:character-gold')->everyFiveMinutes();
 
+        // Fix Character Timers every minute.
+        $schedule->command('reset:timers')->everyMinute();
+
         /**
          * Game Events:
          */

@@ -35,9 +35,10 @@ class TrinketCraftingService {
      * @param SkillCheckService $skillCheckService
      * @param ItemListCostTransformerService $itemListCostTransformerService
      */
-    public function __construct(CraftingService $craftingService,
-                                SkillCheckService $skillCheckService,
-                                ItemListCostTransformerService $itemListCostTransformerService
+    public function __construct(
+        CraftingService $craftingService,
+        SkillCheckService $skillCheckService,
+        ItemListCostTransformerService $itemListCostTransformerService
     ) {
         $this->craftingService                = $craftingService;
         $this->skillCheckService              = $skillCheckService;
@@ -56,9 +57,10 @@ class TrinketCraftingService {
         $trinkentrySkill = $this->fetchCharacterSkill($character);
 
         $items = Item::where('type', 'trinket')
-                     ->where('skill_level_required', '<=', $trinkentrySkill->level)
-                     ->select('name', 'id', 'gold_dust_cost', 'copper_coin_cost')
-                     ->get();
+            ->where('skill_level_required', '<=', $trinkentrySkill->level)
+            ->orderBy('skill_level_required', 'asc')
+            ->select('name', 'id', 'gold_dust_cost', 'copper_coin_cost')
+            ->get();
 
         return $this->itemListCostTransformerService->reduceCostForTrinketryItems($character, $items, $showMerchantMessage)->toArray();
     }
