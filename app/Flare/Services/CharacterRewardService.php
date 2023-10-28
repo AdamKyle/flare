@@ -348,7 +348,7 @@ class CharacterRewardService {
 
         // Get XP based on the skill in trainings training sacraficial amount, ie, give me back 85% of this xp.
         $xp = $this->skillService->getXpWithSkillTrainingReduction($this->character, $xp);
-
+        dump($xp);
         if ($xp === 0) {
             return;
         }
