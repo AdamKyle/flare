@@ -152,12 +152,14 @@ class KingdomBuildingService {
         $ironCostReduction       = $building->kingdom->fetchIronCostReduction();
         $populationCostReduction = $building->kingdom->fetchPopulationCostReduction();
 
+        dump($building->name, $building->base_steel_cost);
+
         $woodCost       = $building->level * $building->base_wood_cost;
         $clayCost       = $building->level * $building->base_clay_cost;
         $stoneCost      = $building->level * $building->base_stone_cost;
         $ironCost       = $building->level * $building->base_iron_cost;
         $populationCost = $building->level * $building->base_population;
-        $steelCost      = $building->level - $building->base_steel_cost;
+        $steelCost      = $building->level * $building->base_steel_cost;
 
         $woodCost       -= $woodCost * $buildingCostReduction;
         $clayCost       -= $clayCost * $buildingCostReduction;
@@ -306,8 +308,8 @@ class KingdomBuildingService {
         UpgradeBuildingWithGold::dispatch($building, $character->user, $queue->id, $toLevel)->delay($timeToComplete);
     }
 
-    protected function calculateBuildingTimeReduction(KingdomBuilding $building, int $toLevel = 1)  {
-        $skillBonus = $building->kingdom->character->skills->filter(function($skill) {
+    protected function calculateBuildingTimeReduction(KingdomBuilding $building, int $toLevel = 1) {
+        $skillBonus = $building->kingdom->character->skills->filter(function ($skill) {
             return $skill->baseSkill->type === SkillTypeValue::EFFECTS_KINGDOM;
         })->first()->building_time_reduction;
 
@@ -328,7 +330,7 @@ class KingdomBuildingService {
         $elapsedTime = $now->diffInMinutes($startedAt);
         $totalTime   = $completedAt->diffInMinutes($startedAt);
 
-        return 100 - ceil($elapsedTime/$totalTime);
+        return 100 - ceil($elapsedTime / $totalTime);
     }
 
     protected function calculateGoldNeeded(Character $character, KingdomBuilding $building, Kingdom $kingdom, array $params): int {

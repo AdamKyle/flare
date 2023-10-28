@@ -18,7 +18,6 @@ import Shop from "./components/specialty-shops/shop";
 import { removeCommas } from "../../lib/game/format-number";
 import GamblingSection from "./components/gambling-section";
 import RaidSection from "./components/raid-section";
-import { DateTime } from "luxon";
 import { GameActionState } from "../../lib/game/types/game-state";
 import { updateTimers } from "../../lib/ajax/update-timers";
 
