@@ -12,6 +12,7 @@ use App\Console\DevelopmentCommands\CreateTestCharacters;
 use App\Console\DevelopmentCommands\ReincarnateCharacter;
 use App\Console\DevelopmentCommands\IncreaseRankFightToMax;
 use App\Console\DevelopmentCommands\AssignTopEndGearToPlayer;
+use App\Console\DevelopmentCommands\CompleteGuideQuestForCharacter;
 use App\Console\DevelopmentCommands\GivePlayerUniqueItem;
 use App\Console\DevelopmentCommands\UpdateUsersForDevelopment;
 use App\Console\DevelopmentCommands\TestExploration;
@@ -38,6 +39,7 @@ class AppServiceProvider extends ServiceProvider {
             GivePlayerAncenstorItem::class,
             GivePlayerMythicItem::class,
             TestExploration::class,
+            CompleteGuideQuestForCharacter::class,
         ]);
     }
 

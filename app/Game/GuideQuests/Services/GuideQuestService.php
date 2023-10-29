@@ -158,6 +158,8 @@ class GuideQuestService {
             ->requiredStats($character, $quest, $stats)
             ->requiredClassRanksEquipped($character, $quest)
             ->requiredClassRankLevel($character, $quest)
+            ->requiredKingdomGoldBarsAmount($character, $quest)
+            ->requiredKingdomSpecificBuildingLevel($character, $quest)
             ->getFinishedRequirements();
 
         if (!empty($this->completedAttributes)) {

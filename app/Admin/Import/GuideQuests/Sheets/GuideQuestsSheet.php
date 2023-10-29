@@ -5,6 +5,7 @@ namespace App\Admin\Import\GuideQuests\Sheets;
 use App\Flare\Models\Item;
 use App\Flare\Models\Quest;
 use App\Flare\Models\Faction;
+use App\Flare\Models\GameBuilding;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\GuideQuest;
@@ -38,16 +39,17 @@ class GuideQuestsSheet implements ToCollection {
 
     protected function returnCleanAffix(array $data) {
 
-        $gameMap        = GameMap::where('name', $data['required_game_map_id'])->first();
-        $skill          = GameSkill::where('name', $data['required_skill'])->first();
-        $secondarySkill = GameSkill::where('name', $data['required_secondary_skill'])->first();
-        $passiveSkill   = PassiveSkill::where('name', $data['required_passive_skill'])->first();
-        $faction        = Faction::whereHas('gameMap', function ($query) use ($data) {
+        $gameMap         = GameMap::where('name', $data['required_game_map_id'])->first();
+        $skill           = GameSkill::where('name', $data['required_skill'])->first();
+        $secondarySkill  = GameSkill::where('name', $data['required_secondary_skill'])->first();
+        $passiveSkill    = PassiveSkill::where('name', $data['required_passive_skill'])->first();
+        $faction         = Faction::whereHas('gameMap', function ($query) use ($data) {
             $query->where('name', $data['required_faction_id']);
         })->first();
-        $requiredItem   = Item::where('name', $data['required_quest_item_id'])->where('type', 'quest')->first();
-        $secondaryItem  = Item::where('name', $data['secondary_quest_item_id'])->where('type', 'quest')->first();
-        $quest          = Quest::where('name', $data['required_quest_id'])->first();
+        $requiredItem    = Item::where('name', $data['required_quest_item_id'])->where('type', 'quest')->first();
+        $secondaryItem   = Item::where('name', $data['secondary_quest_item_id'])->where('type', 'quest')->first();
+        $quest           = Quest::where('name', $data['required_quest_id'])->first();
+        $kingdomBuilding = GameBuilding::where('name', $data['required_kingdom_building_id'])->first();
 
         if (is_null($skill)) {
             $data['required_skill_level'] = null;
@@ -99,6 +101,13 @@ class GuideQuestsSheet implements ToCollection {
             $data['required_game_map_id'] = null;
         } else {
             $data['required_game_map_id'] = $gameMap->id;
+        }
+
+        if (is_null($kingdomBuilding)) {
+            $data['required_kingdom_building_id'] = null;
+            $data['required_kingdom_building_level'] = null;
+        } else {
+            $data['required_kingdom_building_id'] = $kingdomBuilding->id;
         }
 
         return $data;

@@ -29,9 +29,12 @@
             <th>required_gold</th>
             <th>required_gold_dust</th>
             <th>required_shards</th>
+            <th>required_gold_bars</th>
             <th>required_kingdoms</th>
             <th>required_kingdom_level</th>
             <th>required_kingdom_units</th>
+            <th>required_kingdom_building_id</th>
+            <th>required_kingdom_building_level</th>
             <th>required_passive_skill</th>
             <th>required_passive_level</th>
             <th>required_stats</th>
@@ -77,12 +80,16 @@
                 <td>{{ !is_null($guideQuest->required_quest_item_id) ? $guideQuest->quest_item_name : '' }}</td>
                 <td>{{ !is_null($guideQuest->secondary_quest_item_id) ? $guideQuest->secondary_quest_item_name : '' }}
                 </td>
-                <td>{{ !is_null($guideQuest->required_quest_item_id) ? $guideQuest->required_gold : '' }}</td>
-                <td>{{ !is_null($guideQuest->required_quest_item_id) ? $guideQuest->required_gold_dust : '' }}</td>
-                <td>{{ !is_null($guideQuest->required_quest_item_id) ? $guideQuest->required_shards : '' }}</td>
+                <td>{{ $guideQuest->required_gold }}</td>
+                <td>{{ $guideQuest->required_gold_dust }}</td>
+                <td>{{ $guideQuest->required_shards }}</td>
+                <td>{{ $guideQuest->required_gold_bars }}</td>
                 <td>{{ $guideQuest->required_kingdoms }}</td>
                 <td>{{ $guideQuest->required_kingdom_level }}</td>
                 <td>{{ $guideQuest->required_kingdom_units }}</td>
+                <td>{{ !is_null($guideQuest->required_kingdom_building_id) ? $guideQuest->kingdom_building_name : '' }}
+                </td>
+                <td>{{ $guideQuest->required_kingdom_building_level }}</td>
                 <td>{{ !is_null($guideQuest->required_passive_skill) ? $guideQuest->passive_name : '' }}</td>
                 <td>{{ $guideQuest->required_passive_level }}</td>
                 <td>{{ $guideQuest->required_stats }}</td>

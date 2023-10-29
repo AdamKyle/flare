@@ -7,6 +7,7 @@ use App\Admin\Import\GuideQuests\GuideQuests;
 use App\Admin\Requests\GuideQuestManagement;
 use App\Admin\Requests\GuideQuestsImport;
 use App\Admin\Services\GuideQuestService;
+use App\Flare\Models\GameBuilding;
 use App\Flare\Models\GuideQuest;
 use App\Flare\Models\PassiveSkill;
 use App\Http\Controllers\Controller;
@@ -59,14 +60,15 @@ class GuideQuestsController extends Controller {
 
     public function create() {
         return view('admin.guide-quests.manage', [
-            'guideQuest'     => null,
-            'gameSkills'     => GameSkill::pluck('name', 'id')->toArray(),
-            'gameMaps'       => GameMap::where('name', '!=', 'Purgatory')->pluck('name', 'id')->toArray(),
-            'quests'         => Quest::pluck('name', 'id')->toArray(),
-            'questItems'     => Item::where('type', 'quest')->pluck('name', 'id')->toArray(),
-            'passives'       => PassiveSkill::pluck('name', 'id')->toArray(),
-            'skillTypes'     => SkillTypeValue::$namedValues,
-            'mercenaryTypes' => MercenaryValue::mercenaryList(),
+            'guideQuest'       => null,
+            'gameSkills'       => GameSkill::pluck('name', 'id')->toArray(),
+            'gameMaps'         => GameMap::where('name', '!=', 'Purgatory')->pluck('name', 'id')->toArray(),
+            'quests'           => Quest::pluck('name', 'id')->toArray(),
+            'questItems'       => Item::where('type', 'quest')->pluck('name', 'id')->toArray(),
+            'passives'         => PassiveSkill::pluck('name', 'id')->toArray(),
+            'skillTypes'       => SkillTypeValue::$namedValues,
+            'mercenaryTypes'   => MercenaryValue::mercenaryList(),
+            'kingdomBuildings' => GameBuilding::pluck('name', 'id')->toArray(),
         ]);
     }
 
@@ -84,14 +86,15 @@ class GuideQuestsController extends Controller {
 
     public function edit(GuideQuest $guideQuest) {
         return view('admin.guide-quests.manage', [
-            'guideQuest'     => $guideQuest,
-            'gameSkills'     => GameSkill::pluck('name', 'id')->toArray(),
-            'gameMaps'       => GameMap::where('name', '!=', 'Purgatory')->pluck('name', 'id')->toArray(),
-            'quests'         => Quest::pluck('name', 'id')->toArray(),
-            'questItems'     => Item::where('type', 'quest')->pluck('name', 'id')->toArray(),
-            'passives'       => PassiveSkill::pluck('name', 'id')->toArray(),
-            'skillTypes'     => SkillTypeValue::$namedValues,
-            'mercenaryTypes' => MercenaryValue::mercenaryList(),
+            'guideQuest'       => $guideQuest,
+            'gameSkills'       => GameSkill::pluck('name', 'id')->toArray(),
+            'gameMaps'         => GameMap::where('name', '!=', 'Purgatory')->pluck('name', 'id')->toArray(),
+            'quests'           => Quest::pluck('name', 'id')->toArray(),
+            'questItems'       => Item::where('type', 'quest')->pluck('name', 'id')->toArray(),
+            'passives'         => PassiveSkill::pluck('name', 'id')->toArray(),
+            'skillTypes'       => SkillTypeValue::$namedValues,
+            'mercenaryTypes'   => MercenaryValue::mercenaryList(),
+            'kingdomBuildings' => GameBuilding::pluck('name', 'id')->toArray(),
         ]);
     }
 
