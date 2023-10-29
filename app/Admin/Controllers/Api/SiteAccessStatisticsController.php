@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers\Api;
 
+use App\Admin\Requests\SiteAccessStatisticsRequest;
 use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\User;
@@ -11,12 +12,12 @@ use App\Http\Controllers\Controller;
 class SiteAccessStatisticsController extends Controller {
 
 
-    public function fetchLoggedInAllTime() {
-        return response()->json(['stats' => SiteAccessStatisticValue::getSignedIn(),], 200);
+    public function fetchLoggedInAllTime(SiteAccessStatisticsRequest $request) {
+        return response()->json(['stats' => SiteAccessStatisticValue::getSignedIn($request->daysPast)], 200);
     }
 
-    public function fetchRegisteredAllTime() {
-        return response()->json(['stats' => SiteAccessStatisticValue::getRegistered()], 200);
+    public function fetchRegisteredAllTime(SiteAccessStatisticsRequest $request) {
+        return response()->json(['stats' => SiteAccessStatisticValue::getRegistered($request->daysPast)], 200);
     }
 
     public function fetchCharactersGold() {
@@ -73,14 +74,15 @@ class SiteAccessStatisticsController extends Controller {
     }
 
     public function getTotalGoldIncludingKingdomsForCharacters() {
-        $data = Character::select('characters.name as character_name',
-             \DB::raw('characters.gold + SUM(kingdoms.treasury) + SUM(kingdoms.gold_bars) * 2000000000 as total_gold')
-         )->leftJoin('kingdoms', 'kingdoms.character_id', '=', 'characters.id')
-          ->where('kingdoms.id', '!=', null)
-          ->having('total_gold', '>', 2000000000000)
-          ->orderBy('total_gold', 'asc')
-          ->groupBy('characters.id')
-          ->get();
+        $data = Character::select(
+            'characters.name as character_name',
+            \DB::raw('characters.gold + SUM(kingdoms.treasury) + SUM(kingdoms.gold_bars) * 2000000000 as total_gold')
+        )->leftJoin('kingdoms', 'kingdoms.character_id', '=', 'characters.id')
+            ->where('kingdoms.id', '!=', null)
+            ->having('total_gold', '>', 2000000000000)
+            ->orderBy('total_gold', 'asc')
+            ->groupBy('characters.id')
+            ->get();
 
         return response()->json([
             'data' => $data->pluck('total_gold')->toArray(),

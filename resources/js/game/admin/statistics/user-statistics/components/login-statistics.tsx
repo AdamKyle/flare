@@ -1,9 +1,9 @@
 import React from "react";
-import Ajax from "../../../../lib/ajax/ajax";
-import { AxiosError, AxiosResponse } from "axios";
 import { AxisOptions, Chart } from "react-charts";
 import ComponentLoading from "../../../../components/ui/loading/component-loading";
 import ResizableBox from "../../../../components/ui/resizable-box";
+import SiteStatisticsAjax from "../helpers/site-statistics-ajax";
+import DropDown from "../../../../components/ui/drop-down/drop-down";
 
 type LogInStats = {
     login_count: number;
@@ -27,6 +27,8 @@ const secondaryAxes: AxisOptions<any>[] = [
 ];
 
 export default class LoginStatistics extends React.Component<any, any> {
+    private siteStatisticsAjax: SiteStatisticsAjax;
+
     constructor(props: any) {
         super(props);
 
@@ -34,26 +36,12 @@ export default class LoginStatistics extends React.Component<any, any> {
             data: [],
             loading: true,
         };
+
+        this.siteStatisticsAjax = new SiteStatisticsAjax(this);
     }
 
     componentDidMount() {
-        new Ajax()
-            .setRoute("admin/site-statistics/all-time-sign-in")
-            .doAjaxCall(
-                "get",
-                (result: AxiosResponse) => {
-                    this.setState({
-                        data: this.createDataSet(
-                            result.data.stats.data,
-                            result.data.stats.labels
-                        ),
-                        loading: false,
-                    });
-                },
-                (error: AxiosError) => {
-                    console.error(error);
-                }
-            );
+        this.siteStatisticsAjax.fetchStatisticalData("all-time-sign-in", 0);
     }
 
     createDataSet(
@@ -95,13 +83,23 @@ export default class LoginStatistics extends React.Component<any, any> {
         // @ts-ignore
         return (
             <ResizableBox height={350}>
-                <Chart
-                    options={{
-                        data: dataForChart,
-                        primaryAxis: primaryAxis,
-                        secondaryAxes: secondaryAxes,
-                    }}
-                />
+                <div>
+                    <DropDown
+                        menu_items={this.siteStatisticsAjax.createActionsDropDown(
+                            "all-time-sign-in"
+                        )}
+                        button_title={"Date Filter"}
+                    />
+                    <ResizableBox height={350}>
+                        <Chart
+                            options={{
+                                data: dataForChart,
+                                primaryAxis: primaryAxis,
+                                secondaryAxes: secondaryAxes,
+                            }}
+                        />
+                    </ResizableBox>
+                </div>
             </ResizableBox>
         );
     }

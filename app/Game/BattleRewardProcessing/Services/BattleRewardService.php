@@ -55,7 +55,7 @@ class BattleRewardService {
         if ($this->gameMap->mapType()->isPurgatory()) {
             return;
         }
-
+        
         $this->factionHandler->handleFaction($this->character, $this->monster);
 
         $this->character = $this->character->refresh();
