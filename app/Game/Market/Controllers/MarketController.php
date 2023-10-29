@@ -15,6 +15,7 @@ use App\Http\Controllers\Controller;
 use App\Flare\Models\Character;
 use App\Flare\Models\MarketBoard;
 use App\Flare\Transformers\MarketItemsTransformer;
+use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Market\Services\MarketBoard as MarketBoardService;
 use App\Game\Market\Services\MarketSaleHistory;
 
@@ -49,10 +50,11 @@ class MarketController extends Controller {
      * @param MarketBoardService $marketBoardService
      * @param MarketSaleHistory $marketSaleHistory
      */
-    public function __construct(Manager $manager,
-                                MarketItemsTransformer $transformer,
-                                MarketBoardService $marketBoardService,
-                                MarketSaleHistory $marketSaleHistory
+    public function __construct(
+        Manager $manager,
+        MarketItemsTransformer $transformer,
+        MarketBoardService $marketBoardService,
+        MarketSaleHistory $marketSaleHistory
     ) {
         $this->manager              = $manager;
         $this->transformer          = $transformer;
@@ -87,7 +89,6 @@ class MarketController extends Controller {
         Cache::put('market-board-comparison-character-' . $character->id, $viewData, now()->addMinutes(10));
 
         return redirect()->to(route('game.market.view.comparison', ['character' => $character, 'marketBoard' => $marketBoard]));
-
     }
 
     /**
@@ -249,8 +250,15 @@ class MarketController extends Controller {
             return redirect()->back()->with('error', 'Listed price cannot be below or equal to 0.');
         }
 
-        $marketBoard->update(array_merge($request->all(), [
+        $listedPrice = $request->listed_price;
+
+        if ($listedPrice > MaxCurrenciesValue::MAX_GOLD) {
+            $listedPrice = MaxCurrenciesValue::MAX_GOLD;
+        }
+
+        $marketBoard->update(array_merge([
             'is_locked' => false,
+            'listed_price' => $listedPrice,
         ]));
 
         return redirect()->to(route('game.current-listings', [
