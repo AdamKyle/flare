@@ -2,9 +2,13 @@
 
 namespace App\Flare\Models;
 
+use Database\Factories\AnnouncementFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Announcement extends Model {
+
+    use HasFactory;
 
     /**
      * The attributes that are mass assignable.
@@ -23,5 +27,9 @@ class Announcement extends Model {
 
     public function event() {
         return $this->belongsTo(Event::class, 'event_id', 'id');
+    }
+
+    protected static function newFactory() {
+        return AnnouncementFactory::new();
     }
 }

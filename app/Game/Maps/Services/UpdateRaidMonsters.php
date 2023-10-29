@@ -19,13 +19,15 @@ class UpdateRaidMonsters extends BaseMovementService {
      * @param ConjureService $conjureService
      * @param MovementService $movementService
      */
-    public function __construct(MapTileValue     $mapTileValue,
-                                MapPositionValue $mapPositionValue,
-                                CoordinatesCache $coordinatesCache,
-                                ConjureService   $conjureService,
-                                MovementService  $movementService
+    public function __construct(
+        MapTileValue     $mapTileValue,
+        MapPositionValue $mapPositionValue,
+        CoordinatesCache $coordinatesCache,
+        ConjureService   $conjureService,
+        MovementService  $movementService
     ) {
-        parent::__construct($mapTileValue,
+        parent::__construct(
+            $mapTileValue,
             $mapPositionValue,
             $coordinatesCache,
             $conjureService,
@@ -36,5 +38,4 @@ class UpdateRaidMonsters extends BaseMovementService {
     public function updateMonstersForRaidLocations(Character $character, Location $location): void {
         $this->updateMonstersList($character, $location);
     }
-
 }

@@ -54,7 +54,7 @@ class ProcessScheduledEventsTest extends TestCase {
         ]);
 
         $this->createScheduledEvent([
-            'event_type' => EventType::WEEKLY_CURRENCY_DROPS,
+            'event_type' => EventType::RAID_EVENT,
             'start_date' => now()->addMinutes(5),
             'raid_id'    => $raid,
         ]);

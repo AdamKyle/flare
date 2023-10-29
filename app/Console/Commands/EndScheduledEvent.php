@@ -179,6 +179,8 @@ class EndScheduledEvent extends Command {
         event(new DeleteAnnouncementEvent($announcement->id));
 
         $announcement->delete();
+
+        $event->delete();
     }
 
     /**
