@@ -96,7 +96,13 @@ class FactionHandler {
         }
 
         if ($character->user->guide_enabled) {
-            $guideQuest = $guideQuestService->fetchQuestForCharacter($character)['quest'];
+            $guideQuest = $guideQuestService->fetchQuestForCharacter($character);
+
+            if (is_null($guideQuest)) {
+                return;
+            }
+
+            $guideQuest = $guideQuest['quest'];
 
             if (!is_null($guideQuest)) {
                 if (!is_null($guideQuest->faction_points_per_kill) && !is_null($guideQuest->required_faction_level)) {

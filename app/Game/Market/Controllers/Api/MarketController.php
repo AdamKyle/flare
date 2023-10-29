@@ -13,6 +13,7 @@ use League\Fractal\Resource\Collection;
 use App\Http\Controllers\Controller;
 use App\Flare\Models\Character;
 use App\Flare\Transformers\MarketItemsTransformer;
+use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Market\Requests\ChangeItemTypeRequest;
 
 class  MarketController extends Controller {
@@ -60,10 +61,16 @@ class  MarketController extends Controller {
             return response()->json(['message' => 'No! The minimum selling price is: ' . number_format($minCost) . ' Gold.'], 422);
         }
 
+        $listPrice = $request->list_for;
+
+        if ($listPrice > MaxCurrenciesValue::MAX_GOLD) {
+            $listPrice = MaxCurrenciesValue::MAX_GOLD;
+        }
+
         MarketBoard::create([
             'character_id' => auth()->user()->character->id,
             'item_id'      => $slot->item->id,
-            'listed_price' => $request->list_for,
+            'listed_price' => $listPrice,
         ]);
 
         $itemName = $slot->item->affix_name;
@@ -75,7 +82,7 @@ class  MarketController extends Controller {
         $inventory = $this->characterInventoryService->setCharacter($character->refresh());
 
         return response()->json([
-            'message'   => 'Listed: ' . $itemName . ' For: ' . number_format($request->list_for) . ' Gold.',
+            'message'   => 'Listed: ' . $itemName . ' For: ' . number_format($listPrice) . ' Gold.',
             'inventory' => [
                 'inventory' => $inventory->getInventoryForType('inventory'),
                 'usable_items' => $inventory->getInventoryForType('usable_items'),
