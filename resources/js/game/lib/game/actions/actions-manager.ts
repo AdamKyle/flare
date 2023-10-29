@@ -1,10 +1,10 @@
 import Ajax from "../../ajax/ajax";
-import {AxiosError, AxiosResponse} from "axios";
-import {capitalize} from "lodash";
-import {CraftingOptions} from "../types/actions/crafting-type-options";
+import { AxiosError, AxiosResponse } from "axios";
+import { capitalize } from "lodash";
+import { CraftingOptions } from "../types/actions/crafting-type-options";
 import Actions from "../../../sections/game-actions-section/actions";
 import PvpCharactersType from "../types/pvp-characters-type";
-import {DateTime} from "luxon";
+import { DateTime } from "luxon";
 
 export default class ActionsManager {
 
@@ -37,15 +37,14 @@ export default class ActionsManager {
      * @param eventCharactersForDueling
      */
     public setCharactersForDueling(eventCharactersForDueling: PvpCharactersType[]) {
-        let charactersForDueling: PvpCharactersType[]|[] = [];
+        let charactersForDueling: PvpCharactersType[] | [] = [];
         const props = this.component.props;
 
-        if (props.character_position !== null) {
+        if (props.character_position !== null && typeof props.character.base_position !== 'undefined') {
             charactersForDueling = eventCharactersForDueling.filter((character: PvpCharactersType) => {
                 if (character.id !== props.character.id &&
                     character.character_position_x === props.character.base_position.x &&
-                    character.character_position_y === props.character.base_position.y)
-                {
+                    character.character_position_y === props.character.base_position.y) {
                     return character;
                 }
             });
@@ -69,9 +68,9 @@ export default class ActionsManager {
     protected calculateTimeLeft(timeLeft: string): number {
 
         const future = DateTime.fromISO(timeLeft);
-        const now    = DateTime.now();
+        const now = DateTime.now();
 
-        const diff       = future.diff(now, ['seconds']);
+        const diff = future.diff(now, ['seconds']);
         const objectDiff = diff.toObject();
 
         if (typeof objectDiff.seconds === 'undefined') {
@@ -90,11 +89,11 @@ export default class ActionsManager {
 
         if (state.crafting_type !== null) {
             if (state.crafting_type === 'queen' && !props.character.can_access_queen) {
-                this.component.setState({crafting_type: null});
+                this.component.setState({ crafting_type: null });
             }
 
             if (state.crafting_type === 'workbench' && !props.character.can_use_work_bench) {
-                this.component.setState({crafting_type: null});
+                this.component.setState({ crafting_type: null });
             }
         }
     }

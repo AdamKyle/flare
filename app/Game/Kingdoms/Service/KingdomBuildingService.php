@@ -152,8 +152,6 @@ class KingdomBuildingService {
         $ironCostReduction       = $building->kingdom->fetchIronCostReduction();
         $populationCostReduction = $building->kingdom->fetchPopulationCostReduction();
 
-        dump($building->name, $building->base_steel_cost);
-
         $woodCost       = $building->level * $building->base_wood_cost;
         $clayCost       = $building->level * $building->base_clay_cost;
         $stoneCost      = $building->level * $building->base_stone_cost;
