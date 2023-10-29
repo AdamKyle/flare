@@ -55,10 +55,6 @@ class GemTypeValue {
 
         $value = array_search(strtolower($name), array_map('strtolower', self::$names));
 
-        if ($value === false) {
-            throw new \Exception($name . ' does not exist.');
-        }
-
         $opposite = self::$halfDamage[$value];
 
         return self::$names[$opposite];
@@ -70,10 +66,6 @@ class GemTypeValue {
         }
 
         $value = array_search(strtolower($name), array_map('strtolower', self::$names));
-
-        if ($value === false) {
-            throw new \Exception($name . ' does not exist.');
-        }
 
         $opposite = self::$doubleDamage[$value];
 

@@ -27,19 +27,19 @@ class GemTierValue {
     }
 
     public function isTierOne(): bool {
-        return self::TIER_ONE;
+        return $this->value === self::TIER_ONE;
     }
 
     public function isTierTwo(): bool {
-        return self::TIER_TWO;
+        return $this->value === self::TIER_TWO;
     }
 
     public function isTierThree(): bool {
-        return self::TIER_THREE;
+        return $this->value === self::TIER_THREE;
     }
 
     public function isTierFour(): bool {
-        return self::TIER_THREE;
+        return $this->value === self::TIER_FOUR;
     }
 
     public function maxTierOneAmount(): array|null {

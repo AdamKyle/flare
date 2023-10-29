@@ -118,7 +118,23 @@ class GemComparisonTest extends TestCase {
     }
 
     public function testWhenComparingGemsToGemsOnAnItem() {
-        $character = $this->characterFactory->inventoryManagement()->giveItem($this->item)->getCharacter();
+        $this->item->sockets()->create([
+            'item_id' => $this->item->id,
+            'gem_id'  => $this->createGem([
+                'name'                       => 'Sample VR',
+                'tier'                       => 4,
+                'primary_atonement_type'     => GemTypeValue::FIRE,
+                'secondary_atonement_type'   => GemTypeValue::ICE,
+                'tertiary_atonement_type'    => GemTypeValue::WATER,
+                'primary_atonement_amount'   => 0.10,
+                'secondary_atonement_amount' => 0.26,
+                'tertiary_atonement_amount'  => 0.45,
+            ])->id,
+        ]);
+
+        $item = $this->item->refresh();
+
+        $character = $this->characterFactory->inventoryManagement()->giveItem($item)->getCharacter();
 
         $character->gemBag->gemSlots()->create([
             'gem_bag_id' => $character->gemBag->id,
