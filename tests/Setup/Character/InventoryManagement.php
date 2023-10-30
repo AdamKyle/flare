@@ -212,7 +212,7 @@ class InventoryManagement {
      * @return InventoryManagement
      */
     public function unequipAll(): InventoryManagement {
-        $this->character->inventory->slots->each(function($slot) {
+        $this->character->inventory->slots->each(function ($slot) {
             $slot->update([
                 'position' => null,
                 'equipped' => false,
@@ -245,14 +245,14 @@ class InventoryManagement {
     }
 
     protected function fetchSlot(string $itemName): InventorySlot {
-        $foundMatching = $this->character->inventory->slots->filter(function($slot) use($itemName) {
+        $foundMatching = $this->character->inventory->slots->filter(function ($slot) use ($itemName) {
             return $slot->item->name === $itemName;
-         })->first();
+        })->first();
 
-         if (is_null($foundMatching)) {
-             throw new \Exception('Item is not in inventory or is already equipped');
-         }
+        if (is_null($foundMatching)) {
+            throw new \Exception('Item is not in inventory or is already equipped');
+        }
 
-         return $foundMatching;
+        return $foundMatching;
     }
 }

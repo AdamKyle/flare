@@ -56,20 +56,20 @@ class CharacterGemBagService {
 
     /**
      * @param Character $character
-     * @param GemBagSlot $gemBagSlot
+     * @param int $gemBagSlot
      * @return array
      */
-    public function getGemData(Character $character, GemBagSlot $gemBagSlot): array {
+    public function getGemData(Character $character, int $gemBagSlot): array {
 
         $gemSlot = $character->gemBag->gemSlots->find($gemBagSlot);
 
         if (is_null($gemSlot)) {
-            return $this->errorResult(['message' => 'no gem was found']);
+            return $this->errorResult('No gem was found');
         }
 
         $gem = new Item($gemSlot->gem, $this->gemsTransformer);
         $gem = $this->manager->createData($gem)->toArray();
 
-        return $this->successResult($gem);
+        return $this->successResult(['gem' => $gem]);
     }
 }

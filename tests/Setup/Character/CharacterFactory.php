@@ -274,6 +274,10 @@ class CharacterFactory {
         return new InventoryManagement($this->character, $this);
     }
 
+    public function gemBagManagement(): GemBagManagement {
+        return new GemBagManagement($this->character, $this);
+    }
+
     /**
      * Fetch the kingdom management class.
      *
