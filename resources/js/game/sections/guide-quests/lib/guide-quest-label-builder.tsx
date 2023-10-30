@@ -15,6 +15,12 @@ const guideQuestLabelBuilder = (
             return "Get Quest Item";
         case "secondary_quest_item_id":
             return "Get Secondary Quest Item";
+        case "required_kingdom_building_id":
+            return (
+                "Get Kingdom Building: " +
+                questData.kingdom_building_name +
+                " to level"
+            );
         case "required_skill":
             return (
                 <span>
@@ -93,6 +99,8 @@ const guideQuestLabelBuilder = (
             return "Obtain Gold Dust amount";
         case "required_shards":
             return "Obtain Shards amount";
+        case "required_gold_bars":
+            return "Create Gold Bars amount";
         default:
             return null;
     }
@@ -166,6 +174,8 @@ const getRequirementKey = (labelKey: string): string => {
             return "required_secondary_mercenary_level";
         case "required_passive_skill":
             return "required_passive_level";
+        case "required_kingdom_building_id":
+            return "required_kingdom_building_level";
         default:
             return labelKey;
     }

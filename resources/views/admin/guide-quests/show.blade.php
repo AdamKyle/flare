@@ -71,6 +71,10 @@
                             <dt>Required Kingdom Building Level (combined)</dt>
                             <dd>{{ $guideQuest->required_kingdom_level }}</dd>
                         @endif
+                        @if (!is_null($guideQuest->required_kingdom_building_id))
+                            <dt>Required Kingdom Building: {{ $guideQuest->kingdom_building_name }} to level</dt>
+                            <dd>{{ $guideQuest->required_kingdom_building_level }}</dd>
+                        @endif
                         @if (!is_null($guideQuest->required_kingdom_units))
                             <dt>Required Kingdom Units (combined)</dt>
                             <dd>{{ $guideQuest->required_kingdom_units }}</dd>
@@ -144,6 +148,10 @@
                         @if (!is_null($guideQuest->required_shards))
                             <dt>Required Shards</dt>
                             <dd>{{ number_format($guideQuest->required_shards) }}</dd>
+                        @endif
+                        @if (!is_null($guideQuest->required_gold_bars))
+                            <dt>Required Gold Bars</dt>
+                            <dd>{{ number_format($guideQuest->required_gold_bars) }}</dd>
                         @endif
                     </dl>
                     <h3 class="text-sky-600 dark:text-sky-500">XP Reward</h3>

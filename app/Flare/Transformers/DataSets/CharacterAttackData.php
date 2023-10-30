@@ -25,6 +25,7 @@ class CharacterAttackData {
             'heal_for'                    => $characterStatBuilder->buildHealing($this->includeReductions),
             'to_hit_stat'                 => $character->class->to_hit_stat,
             'base_stat'                   => $characterStatBuilder->statMod($character->class->damage_stat, $this->includeReductions),
+            'voided_base_stat'            => $characterStatBuilder->statMod($character->class->damage_stat, true),
             'str_modded'                  => $characterStatBuilder->statMod('str'),
             'dur_modded'                  => $characterStatBuilder->statMod('dur'),
             'dex_modded'                  => $characterStatBuilder->statMod('dex'),

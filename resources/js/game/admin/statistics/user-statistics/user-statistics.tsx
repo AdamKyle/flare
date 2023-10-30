@@ -17,11 +17,11 @@ export default class UserStatistics extends React.Component<any, any> {
             <div className="pb-10">
                 <div className="grid lg:grid-cols-2 gap-3 mb-5">
                     <BasicCard>
-                        <h3 className="mb-4">Logins (Last 7 Days)</h3>
+                        <h3 className="mb-4">Logins</h3>
                         <LoginStatistics />
                     </BasicCard>
                     <BasicCard>
-                        <h3 className="mb-4">Registrations (Last 7 Days)</h3>
+                        <h3 className="mb-4">Registrations</h3>
                         <RegistrationStatistics />
                     </BasicCard>
                 </div>

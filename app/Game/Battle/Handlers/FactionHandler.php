@@ -99,6 +99,8 @@ class FactionHandler {
             $guideQuest = $guideQuestService->fetchQuestForCharacter($character);
 
             if (is_null($guideQuest)) {
+                $faction->save();
+
                 return;
             }
 

@@ -49,7 +49,7 @@ class CharacterCacheData extends CharacterPvpCacheData {
         } else {
             $cache = $this->characterSheetCache($character);
         }
-        
+
         return $cache[$key];
     }
 

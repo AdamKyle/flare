@@ -8,8 +8,8 @@
             <x-core.form-wizard.container action="{{ route('admin.guide-quests.store') }}"
                 modelId="{{ !is_null($guideQuest) ? $guideQuest->id : 0 }}" lastTab="tab-style-2-5">
                 <x-core.form-wizard.tabs>
-                    <x-core.form-wizard.tab target="tab-style-2-1" primaryTitle="Basic Info"
-                        secondaryTitle="Basic quest info." isActive="true" />
+                    <x-core.form-wizard.tab target="tab-style-2-1" primaryTitle="Basic Info" secondaryTitle="Basic quest info."
+                        isActive="true" />
                     <x-core.form-wizard.tab target="tab-style-2-2" primaryTitle="Requirements"
                         secondaryTitle="Requirments" />
                     <x-core.form-wizard.tab target="tab-style-2-3" primaryTitle="Bonuses" secondaryTitle="Bonuses" />
@@ -20,8 +20,8 @@
                     <x-core.form-wizard.content target="tab-style-2-1" isOpen="true">
                         <h3 class="mb-3">Basic Info</h3>
                         <x-core.forms.input :model="$guideQuest" label="Name:" modelKey="name" name="name" />
-                        <x-core.forms.quill-editor type="normal" :model="$guideQuest" label="Guide Text:" modelKey="intro_text"
-                            name="intro_text" quillId="intro-text" />
+                        <x-core.forms.quill-editor type="normal" :model="$guideQuest" label="Guide Text:"
+                            modelKey="intro_text" name="intro_text" quillId="intro-text" />
                         <x-core.forms.quill-editor type="html" :model="$guideQuest" label="Instructions:"
                             modelKey="instructions" name="instructions" quillId="quest-instructions" />
                         <x-core.forms.quill-editor type="html" :model="$guideQuest" label="Desktop Instructions:"
@@ -73,12 +73,18 @@
                                 <x-core.forms.input :model="$guideQuest" label="Required Focus (Total):"
                                     modelKey="required_focus" name="required_focus" />
 
-                                <div class='border-b-2 block md:hidden border-b-gray-300 dark:border-b-gray-600 my-6'></div>
+                                <div class='border-b-2 block md:hidden border-b-gray-300 dark:border-b-gray-600 my-6'>
+                                </div>
                                 <h3 class="mb-3">Kingdom Requirements</h3>
                                 <x-core.forms.input :model="$guideQuest" label="Required Kingdoms #:"
                                     modelKey="required_kingdoms" name="required_kingdoms" />
                                 <x-core.forms.input :model="$guideQuest" label="Required Kingdom Level:"
                                     modelKey="required_kingdom_level" name="required_kingdom_level" />
+                                <x-core.forms.key-value-select :model="$guideQuest" label="Required Building Level:"
+                                    modelKey="required_kingdom_building_id" name="required_kingdom_building_id"
+                                    :options="$kingdomBuildings" />
+                                <x-core.forms.input :model="$guideQuest" label="Required Building Level:"
+                                    modelKey="required_kingdom_building_level" name="required_kingdom_building_level" />
                                 <x-core.forms.input :model="$guideQuest" label="Required Kingdom Units:"
                                     modelKey="required_kingdom_units" name="required_kingdom_units" />
                                 <x-core.forms.key-value-select :model="$guideQuest" label="Required Passive:"
@@ -130,6 +136,8 @@
                                     modelKey="required_gold_dust" name="required_gold_dust" />
                                 <x-core.forms.input :model="$guideQuest" label="Required Shards" modelKey="required_shards"
                                     name="required_shards" />
+                                <x-core.forms.input :model="$guideQuest" label="Required Gold Bars"
+                                    modelKey="required_gold_bars" name="required_gold_bars" />
                             </div>
                         </div>
                     </x-core.form-wizard.content>

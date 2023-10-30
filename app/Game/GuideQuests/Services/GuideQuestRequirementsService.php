@@ -5,6 +5,7 @@ namespace App\Game\GuideQuests\Services;
 use Exception;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Character;
+use App\Flare\Models\GameBuilding;
 use App\Flare\Models\GuideQuest;
 use Illuminate\Support\Facades\Log;
 use App\Game\Skills\Values\SkillTypeValue;
@@ -250,6 +251,44 @@ class GuideQuestRequirementsService {
 
                     break;
                 }
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Does the combined gold bars across all kingdoms match or exceed the amount required?
+     *
+     * @param Character $character
+     * @param GuideQuest $quest
+     * @return GuideQuestRequirementsService
+     */
+    public function requiredKingdomGoldBarsAmount(Character $character, GuideQuest $quest): GuideQuestRequirementsService {
+        if (!is_null($quest->required_gold_bars)) {
+            foreach ($character->kingdoms as $kingdom) {
+                if ($kingdom->sum('gold_bars') >= $quest->required_gold_bars) {
+                    $this->finishedRequirements[] = 'required_gold_bars';
+
+                    break;
+                }
+            }
+        }
+
+        return $this;
+    }
+
+    public function requiredKingdomSpecificBuildingLevel(Character $character, GuideQuest $quest): GuideQuestRequirementsService {
+        if (!is_null($quest->required_kingdom_building_level) && !is_null($quest->required_kingdom_building_id)) {
+            $gameBuilding = GameBuilding::find($quest->required_kingdom_building_id);
+
+            $count = $character->kingdoms()->whereHas('buildings', function ($query) use ($gameBuilding, $quest) {
+                $query->where('game_building_id', $gameBuilding->id)
+                    ->where('level', '>=', $quest->required_kingdom_building_level);
+            })->count();
+
+            if ($count > 0) {
+                $this->finishedRequirements[] = 'required_kingdom_building_id';
             }
         }
 

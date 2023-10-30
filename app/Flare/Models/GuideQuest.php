@@ -39,6 +39,8 @@ class GuideQuest extends Model {
         'required_kingdoms',
         'required_kingdom_level',
         'required_kingdom_units',
+        'required_kingdom_building_id',
+        'required_kingdom_building_level',
         'required_passive_skill',
         'required_passive_level',
         'required_skill_type',
@@ -52,6 +54,7 @@ class GuideQuest extends Model {
         'required_gold',
         'required_gold_dust',
         'required_shards',
+        'required_gold_bars',
         'required_stats',
         'required_str',
         'required_dex',
@@ -87,6 +90,8 @@ class GuideQuest extends Model {
         'required_kingdoms'                  => 'integer',
         'required_kingdom_level'             => 'integer',
         'required_kingdom_units'             => 'integer',
+        'required_kingdom_building_id'       => 'integer',
+        'required_kingdom_building_level'    => 'integer',
         'required_passive_skill'             => 'integer',
         'required_passive_level'             => 'integer',
         'required_skill_type'                => 'integer',
@@ -108,6 +113,7 @@ class GuideQuest extends Model {
         'required_gold'                      => 'integer',
         'required_gold_dust'                 => 'integer',
         'required_shards'                    => 'integer',
+        'required_gold_bars'                 => 'integer',
         'gold_reward'                        => 'integer',
         'gold_dust_reward'                   => 'integer',
         'shards_reward'                      => 'integer',
@@ -127,6 +133,7 @@ class GuideQuest extends Model {
         'skill_type_name',
         'mercenary_name',
         'secondary_mercenary_name',
+        'kingdom_building_name',
     ];
 
     public function getSkillNameAttribute() {
@@ -242,6 +249,16 @@ class GuideQuest extends Model {
 
         if (!is_null($gameMap)) {
             return $gameMap->name;
+        }
+
+        return null;
+    }
+
+    public function getKingdomBuildingNameAttribute() {
+        $gameBuilding = GameBuilding::find($this->required_kingdom_building_id);
+
+        if (!is_null($gameBuilding)) {
+            return $gameBuilding->name;
         }
 
         return null;
