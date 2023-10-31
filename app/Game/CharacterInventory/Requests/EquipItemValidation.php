@@ -1,18 +1,16 @@
 <?php
 
-namespace App\Game\Core\Requests;
+namespace App\Game\CharacterInventory\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class EquipItemValidation extends FormRequest
-{
+class EquipItemValidation extends FormRequest {
     /**
      * Determine if the user is authorized to make this request.
      *
      * @return bool
      */
-    public function authorize()
-    {
+    public function authorize() {
         return true;
     }
 
@@ -21,8 +19,7 @@ class EquipItemValidation extends FormRequest
      *
      * @return array
      */
-    public function rules()
-    {
+    public function rules() {
         return [
             'position'           => 'required|in:left-hand,right-hand,body,shield,leggings,feet,sleeves,sleeves,helmet,gloves,ring-one,ring-two,spell-one,spell-two,trinket-one,trinket-two,artifact',
             'slot_id'            => 'required',

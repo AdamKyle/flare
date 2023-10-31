@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Game\Gems\Services;
+namespace Tests\Unit\Game\Gems\Values;
 
 use App\Game\Gems\Values\GemTierValue;
 use Exception;
