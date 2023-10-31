@@ -194,12 +194,6 @@ class MassDisenchantService {
             }
         }
 
-        if ($leftOver >= 0 && $leftOver < $skill->xp_next && ($skill->level < $skill->baseSkill->max_level)) {
-            $skill->update([
-                'xp' => $skill->xp + $leftOver,
-            ]);
-        }
-
         if ($leveledType === 'enchantingLevelTimes') {
             $this->enchantingSkill = $skill->refresh();
 
