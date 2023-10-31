@@ -6,15 +6,15 @@ Route::get('/game/kingdoms/buildings/{building}', ['as' => 'game.buildings.build
 Route::get('/game/quests/{quest}', ['as' => 'game.quests.show', 'uses' => 'QuestsController@show']);
 Route::get('/game/npcs/{npc}', ['as' => 'game.npcs.show', 'uses' => 'NpcsController@show']);
 
-Route::middleware(['auth', 'is.admin'])->group(function() {
+Route::middleware(['auth', 'is.admin'])->group(function () {
     Route::get('/admin', ['as' => 'home', 'uses' => 'AdminController@home']);
 
     Route::get('/admin/chat-logs', ['as' => 'admin.chat-logs', 'uses' => 'AdminController@chatLogs']);
 
     Route::get('/admin/maps', ['as' => 'maps', 'uses' => 'MapsController@index']);
+    Route::get('/admin/maps/upload', ['as' => 'maps.upload', 'uses' => 'MapsController@uploadMap']);
     Route::get('/admin/maps/{gameMap}', ['as' => 'map', 'uses' => 'MapsController@show']);
     Route::get('/admin/maps/{gameMap}/add-bonuses', ['as' => 'map.bonuses', 'uses' => 'MapsController@manageBonuses']);
-    Route::get('/admin/maps/upload', ['as' => 'maps.upload', 'uses' => 'MapsController@uploadMap']);
     Route::post('/admin/maps/process-upload', ['as' => 'upload.map', 'uses' => 'MapsController@upload']);
     Route::post('/admin/maps/{gameMap}/post-bonuses', ['as' => 'add.map.bonuses', 'uses' => 'MapsController@postBonuses']);
 

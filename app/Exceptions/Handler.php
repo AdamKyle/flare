@@ -10,8 +10,7 @@ use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 /**
  * @codeCoverageIgnore
  */
-class Handler extends ExceptionHandler
-{
+class Handler extends ExceptionHandler {
     /**
      * A list of the exception types that are not reported.
      *
@@ -37,8 +36,7 @@ class Handler extends ExceptionHandler
      * @param  \Exception  $exception
      * @return void
      */
-    public function report(Throwable $exception)
-    {
+    public function report(Throwable $exception) {
         parent::report($exception);
     }
 
@@ -49,9 +47,8 @@ class Handler extends ExceptionHandler
      * @param  \Exception  $exception
      * @return \Illuminate\Http\Response
      */
-    public function render($request, Throwable $exception)
-    {
-
+    public function render($request, Throwable $exception) {
+        dd($exception);
         if ($exception instanceof TokenMismatchException) {
             return redirect()->to('/')->with('error', 'You were logged out due to inactivity. Please login again.');
         }
