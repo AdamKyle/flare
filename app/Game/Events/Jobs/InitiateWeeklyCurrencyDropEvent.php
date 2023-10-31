@@ -43,6 +43,10 @@ class InitiateWeeklyCurrencyDropEvent implements ShouldQueue {
             return;
         }
 
+        $event->update([
+            'currently_running' => true,
+        ]);
+
         Event::create([
             'type'       => EventType::WEEKLY_CURRENCY_DROPS,
             'started_at' => now(),

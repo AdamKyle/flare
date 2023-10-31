@@ -60,6 +60,10 @@ class InitiateRaid implements ShouldQueue {
 
         $event = ScheduledEvent::find($this->eventId);
 
+        $event->update([
+            'currently_running' => true,
+        ]);
+
         if (empty($this->raidStory)) {
 
             $raid = Raid::find($event->raid_id);
