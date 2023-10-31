@@ -24,8 +24,7 @@ use Tests\Traits\CreateGameSkill;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateItemAffix;
 
-class EnchantingServiceTest extends TestCase
-{
+class EnchantingServiceTest extends TestCase {
 
     use RefreshDatabase, CreateItem, CreateClass, CreateGameSkill, CreateItemAffix;
 
@@ -41,8 +40,7 @@ class EnchantingServiceTest extends TestCase
 
     private ?GameSkill $enchantingSkill;
 
-    public function setUp(): void
-    {
+    public function setUp(): void {
         parent::setUp();
 
         $this->enchantingSkill = $this->createGameSkill([
@@ -83,8 +81,7 @@ class EnchantingServiceTest extends TestCase
         ]);
     }
 
-    public function tearDown(): void
-    {
+    public function tearDown(): void {
         parent::tearDown();
 
         $this->character          = null;
@@ -345,8 +342,8 @@ class EnchantingServiceTest extends TestCase
 
         $this->assertEquals(0, $character->gold);
 
-        Event::assertDispatched(function (ServerMessageEvent $event) use($slot) {
-            return $event->message === 'Applied enchantment: '.$this->prefix->name.' to: ' . $slot->item->refresh()->affix_name;
+        Event::assertDispatched(function (ServerMessageEvent $event) use ($slot) {
+            return $event->message === 'Applied enchantment: ' . $this->prefix->name . ' to: ' . $slot->item->refresh()->affix_name;
         });
     }
 
@@ -381,8 +378,8 @@ class EnchantingServiceTest extends TestCase
 
         $this->assertEquals(0, $character->gold);
 
-        Event::assertDispatched(function (ServerMessageEvent $event) use($itemName) {
-            return $event->message === 'You failed to apply '.$this->prefix->name.' to: ' . $itemName . '. The item shatters before you. You lost the investment.';
+        Event::assertDispatched(function (ServerMessageEvent $event) use ($itemName) {
+            return $event->message === 'You failed to apply ' . $this->prefix->name . ' to: ' . $itemName . '. The item shatters before you. You lost the investment.';
         });
     }
 
@@ -422,5 +419,22 @@ class EnchantingServiceTest extends TestCase
 
         $this->assertNotNull($slot);
         $this->assertEquals($slotId, $slot->id);
+    }
+
+    public function testFetchCharacterEnchantingXP() {
+        $character = $this->character->getCharacter();
+
+        $weaponCraftingXpData = $this->enchantingService->getEnchantingXP($character);
+
+        $enchantingSkill = $character->skills()->where('game_skill_id', $this->enchantingSkill->id)->first();
+
+        $expected = [
+            'current_xp' => 0,
+            'next_level_xp' => $enchantingSkill->xp_max,
+            'skill_name' => $enchantingSkill->baseSkill->name,
+            'level' => $enchantingSkill->level,
+        ];
+
+        $this->assertEquals($weaponCraftingXpData, $expected);
     }
 }

@@ -199,6 +199,40 @@ class CraftingServiceTest extends TestCase {
         Event::assertNotDispatched(ServerMessageEvent::class);
     }
 
+    public function testFetchCraftableItemsAsArcaneAlchemistWhenCraftingSpells() {
+        Event::fake();
+
+        $spellCraftingSkill = $this->createGameSkill([
+            'name' => 'Spell Crafting',
+            'type' => SkillTypeValue::CRAFTING,
+        ]);
+
+        $character = (new CharacterFactory())->createBaseCharacter([], $this->createClass([
+            'name' => CharacterClassValue::ARCANE_ALCHEMIST
+        ]))->assignSkill(
+            $this->craftingSkill
+        )->assignSkill(
+            $spellCraftingSkill
+        )->givePlayerLocation()->getCharacter();
+
+        $spellToCraft = $this->createItem([
+            'type' => SpellTypes::DAMAGE,
+            'skill_level_required' => 1,
+            'skill_level_trivial' => 10,
+            'crafting_type' => 'spell',
+            'can_craft' => true,
+        ]);
+
+        $result = $this->craftingService->fetchCraftableItems($character, [
+            'crafting_type' => 'spell',
+        ]);
+
+        $this->assertNotEmpty($result);
+        $this->assertLessThan($spellToCraft->cost, $result[0]->cost);
+
+        Event::assertDispatched(ServerMessageEvent::class);
+    }
+
     public function testFailToCraftForItemThatDoesNotExist() {
         Event::fake();
 
@@ -571,5 +605,22 @@ class CraftingServiceTest extends TestCase {
         Event::assertDispatched(function (ServerMessageEvent $event) {
             return $event->message === 'As a Arcane Alchemist, your crafting timeout is reduced by 15% for spell crafting.';
         });
+    }
+
+    public function testFetchCharacterWeaponCraftingXP() {
+        $character = $this->character->getCharacter();
+
+        $weaponCraftingXpData = $this->craftingService->getCraftingXP($character, 'hammer');
+
+        $weaponCraftingSkill = $character->skills()->where('game_skill_id', $this->craftingSkill->id)->first();
+
+        $expected = [
+            'current_xp' => 0,
+            'next_level_xp' => $weaponCraftingSkill->xp_max,
+            'skill_name' => $weaponCraftingSkill->baseSkill->name,
+            'level' => $weaponCraftingSkill->level,
+        ];
+
+        $this->assertEquals($weaponCraftingXpData, $expected);
     }
 }

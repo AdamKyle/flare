@@ -1,5 +1,6 @@
 <?php
 
+use App\Flare\Models\GameSkill;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
@@ -50,6 +51,88 @@ class BattleRewardServiceTest extends TestCase {
         $this->battleRewardService->setUp($monster, $character)->handleBaseRewards();
 
         Event::assertNotDispatched(UpdateCharacterCurrenciesEvent::class);
+    }
+
+    public function testShouldReceiveLessXpWhenTrainingASkill() {
+        $character = $this->characterFactory->getCharacter();
+
+        $character->skills()->where('game_skill_id', GameSkill::where('name', 'Accuracy')->first()->id)->update([
+            'currently_training' => true,
+            'xp_towards' => 0.10,
+        ]);
+
+        $character = $character->refresh();
+
+        $monster   = $this->createMonster([
+            'game_map_id' => $character->map->game_map_id,
+            'xp'          => 50,
+        ]);
+
+        DB::table('sessions')->truncate();
+
+        DB::table('sessions')->insert([[
+            'id'           => '1',
+            'user_id'      => $character->refresh()->user->id,
+            'ip_address'   => '1',
+            'user_agent'   => '1',
+            'payload'      => '1',
+            'last_activity' => 1602801731,
+        ]]);
+
+        Event::fake();
+
+        Queue::fake();
+
+        $this->battleRewardService->setUp($monster, $character)->handleBaseRewards();
+
+        Event::assertDispatched(UpdateCharacterCurrenciesEvent::class);
+
+        $character = $character->refresh();
+
+        $this->assertLessThan($monster->xp, $character->xp);
+    }
+
+    public function testShouldReceiveFullXpWhenTrainingASkillThatIsMaxLevel() {
+        $character = $this->characterFactory->getCharacter();
+
+        $accuracySkill = GameSkill::where('name', 'Accuracy')->first();
+
+        $character->skills()->where('game_skill_id', $accuracySkill->id)->update([
+            'currently_training' => true,
+            'xp_towards' => 0.10,
+            'level' => $accuracySkill->max_level
+        ]);
+
+        $character = $character->refresh();
+
+        $monster   = $this->createMonster([
+            'game_map_id' => $character->map->game_map_id,
+            'xp'          => 50,
+            'max_level'   => 9999,
+        ]);
+
+        DB::table('sessions')->truncate();
+
+        DB::table('sessions')->insert([[
+            'id'           => '1',
+            'user_id'      => $character->refresh()->user->id,
+            'ip_address'   => '1',
+            'user_agent'   => '1',
+            'payload'      => '1',
+            'last_activity' => 1602801731,
+        ]]);
+
+        Event::fake();
+
+        Queue::fake();
+
+        $this->battleRewardService->setUp($monster, $character)->handleBaseRewards();
+
+        Event::assertDispatched(UpdateCharacterCurrenciesEvent::class);
+
+        $character = $character->refresh();
+
+        $this->assertEquals($monster->xp, $character->xp);
     }
 
     public function testShouldUpdateCharacterCurrenciesWhenLoggedIn() {

@@ -6,7 +6,6 @@ use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Skills\Services\MassDisenchantService;
 use App\Game\Skills\Services\SkillCheckService;
-use App\Game\Skills\Services\SkillService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\Models\Item;
 use App\Flare\Models\GameSkill;
@@ -93,6 +92,30 @@ class MassDisenchantServiceTest extends TestCase {
         $character = $character->refresh();
 
         $this->assertEmpty($character->inventory->slots->toArray());
+    }
+
+    public function testDisenchantAllItemsWithOverFlowOfXp() {
+        $character = $this->character->inventoryManagement()->giveItemMultipleTimes($this->itemToDisenchant, 10)->getCharacter();
+
+        $massDisenchantmentService = \Mockery::mock(MassDisenchantService::class)->makePartial();
+
+        $massDisenchantmentService->__construct(resolve(SkillCheckService::class));
+
+        $massDisenchantmentService->shouldAllowMockingProtectedMethods()
+            ->shouldReceive('getSkillXp')
+            ->andReturn(1000);
+
+        $massDisenchantmentService->setUp($character)->disenchantItems($character->inventory->slots);
+
+        $character = $character->refresh();
+
+        $this->assertEmpty($character->inventory->slots->toArray());
+
+        $disenchantingSkill = $character->skills->where('game_skill_id', GameSkill::where('name', 'Disenchanting')->first()->id)->first();
+        $enchantingSkill    = $character->skills->where('game_skill_id', GameSkill::where('name', 'Enchanting')->first()->id)->first();
+
+        $this->assertGreaterThan(1, $disenchantingSkill->level);
+        $this->assertGreaterThan(1, $enchantingSkill->level);
     }
 
     public function testGetSkillXpForDisenchantingItems() {

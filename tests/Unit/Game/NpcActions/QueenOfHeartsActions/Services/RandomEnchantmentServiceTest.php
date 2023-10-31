@@ -13,8 +13,7 @@ use Tests\Traits\CreateGameMap;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateItemAffix;
 
-class RandomEnchantmentServiceTest extends TestCase
-{
+class RandomEnchantmentServiceTest extends TestCase {
 
     use RefreshDatabase, CreateItem, CreateGameMap, CreateItemAffix;
 
@@ -63,8 +62,8 @@ class RandomEnchantmentServiceTest extends TestCase
         $randomEnchantmentService->__construct(resolve(RandomAffixGenerator::class));
 
         $randomEnchantmentService->shouldAllowMockingProtectedMethods()
-                                 ->shouldReceive('shouldAddSuffixToItem')
-                                 ->andReturn(100);
+            ->shouldReceive('shouldAddSuffixToItem')
+            ->andReturn(100);
 
         $basicItem = $randomEnchantmentService->generateForType($character, 'basic');
 

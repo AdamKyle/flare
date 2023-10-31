@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Game\Skills\Services;
 
+use App\Flare\Models\GameSkill;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Messages\Builders\ServerMessageBuilder;
 use App\Game\Skills\Services\SkillCheckService;
@@ -360,5 +361,22 @@ class AlchemyServiceTest extends TestCase {
         $this->assertCount(1, $character->inventory->slots);
         $this->assertGreaterThan($goldDustAfterOriginalCost, $character->gold_dust);
         $this->assertGreaterThan($shardsAfterOriginalCost, $character->shards);
+    }
+
+    public function testFetchCharacterAlchemyCraftingXP() {
+        $character = $this->character->getCharacter();
+
+        $alchemyCraftingXpData = $this->alchemyService->fetchSkillXP($character);
+
+        $alchemySkill = $character->skills()->where('game_skill_id', GameSkill::where('type', SkillTypeValue::ALCHEMY)->first()->id)->first();
+
+        $expected = [
+            'current_xp' => 0,
+            'next_level_xp' => $alchemySkill->xp_max,
+            'skill_name' => $alchemySkill->baseSkill->name,
+            'level' => $alchemySkill->level,
+        ];
+
+        $this->assertEquals($alchemyCraftingXpData, $expected);
     }
 }

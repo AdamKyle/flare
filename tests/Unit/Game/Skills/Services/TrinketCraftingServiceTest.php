@@ -332,4 +332,21 @@ class TrinketCraftingServiceTest extends TestCase {
         });
     }
 
+    public function testFetchCharacterTrinketCraftingXP() {
+        $character = $this->character->getCharacter();
+
+        $trinketCraftingXPData = $this->trinketCraftingService->fetchSkillXP($character);
+
+        $trinketSkill = $character->skills()->where('game_skill_id', $this->trinketSkill->id)->first();
+
+        $expected = [
+            'current_xp' => 0,
+            'next_level_xp' => $trinketSkill->xp_max,
+            'skill_name' => $trinketSkill->baseSkill->name,
+            'level' => $trinketSkill->level,
+        ];
+
+        $this->assertEquals($trinketCraftingXPData, $expected);
+    }
+
 }

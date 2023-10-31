@@ -275,7 +275,6 @@ class CraftingService {
 
         $items = $items->select('name', 'cost', 'type', 'id')->get();
 
-
         if ($craftingType === 'alchemy') {
             return $this->itemListCostTransformerService->reduceCostOfAlchemyItems($character, $items, $merchantMessage);
         }

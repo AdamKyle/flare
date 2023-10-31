@@ -23,8 +23,7 @@ use Tests\Traits\CreateGem;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateItemAffix;
 
-class GemServiceTest extends TestCase
-{
+class GemServiceTest extends TestCase {
 
     use RefreshDatabase, CreateItem, CreateClass, CreateGameSkill, CreateItemAffix, CreateGem;
 
@@ -34,8 +33,7 @@ class GemServiceTest extends TestCase
 
     private ?GameSkill $gemSkill;
 
-    public function setUp(): void
-    {
+    public function setUp(): void {
         parent::setUp();
 
         $this->gemSkill = $this->createGameSkill([
@@ -50,8 +48,7 @@ class GemServiceTest extends TestCase
         $this->gemService = resolve(GemService::class);
     }
 
-    public function tearDown(): void
-    {
+    public function tearDown(): void {
         parent::tearDown();
 
         $this->character   = null;
@@ -206,7 +203,7 @@ class GemServiceTest extends TestCase
             'tertiary_atonement_amount'  => 0.10,
         ]);
 
-        $gemBuilder = Mockery::mock(GemBuilder::class, function (MockInterface $mock) use($gem) {
+        $gemBuilder = Mockery::mock(GemBuilder::class, function (MockInterface $mock) use ($gem) {
             $mock->makePartial()->shouldAllowMockingProtectedMethods()->shouldReceive('buildGem')->once()->andReturn($gem);
         });
 
@@ -252,5 +249,22 @@ class GemServiceTest extends TestCase
         $character = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
         $this->gemService->getCraftableTiers($character);
+    }
+
+    public function testFetchCharacterGemCraftingXP() {
+        $character = $this->character->getCharacter();
+
+        $gemCraftingXPData = $this->gemService->fetchSkillXP($character);
+
+        $gemCraftingSkill = $character->skills()->where('game_skill_id', $this->gemSkill->id)->first();
+
+        $expected = [
+            'current_xp' => 0,
+            'next_level_xp' => $gemCraftingSkill->xp_max,
+            'skill_name' => $gemCraftingSkill->baseSkill->name,
+            'level' => $gemCraftingSkill->level,
+        ];
+
+        $this->assertEquals($gemCraftingXPData, $expected);
     }
 }
