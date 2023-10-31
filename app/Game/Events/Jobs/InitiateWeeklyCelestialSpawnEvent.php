@@ -45,6 +45,10 @@ class InitiateWeeklyCelestialSpawnEvent implements ShouldQueue {
             return;
         }
 
+        $event->update([
+            'currently_running' => true,
+        ]);
+
         Cache::put('celestial-spawn-rate', .8);
         Cache::put('celestial-event-date', now()->addDay());
 
