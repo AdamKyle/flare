@@ -15,6 +15,8 @@ class EventType {
 
     const RAID_EVENT            = 3;
 
+    const WINTER_EVENT          = 4;
+
     /**
      * @var int $value
      */
@@ -28,6 +30,7 @@ class EventType {
         1 => self::MONTHLY_PVP,
         2 => self::WEEKLY_CURRENCY_DROPS,
         3 => self::RAID_EVENT,
+        4 => self::WINTER_EVENT,
     ];
 
     protected static array $selection = [
@@ -35,6 +38,7 @@ class EventType {
         1 => 'Monthly PVP',
         2 => 'Weekly Currency Drops',
         3 => 'Raid Event',
+        4 => 'Winter Event',
     ];
 
     /**
@@ -94,5 +98,14 @@ class EventType {
      */
     public function isRaidEvent(): bool {
         return $this->value === self::RAID_EVENT;
+    }
+
+    /**
+     * Are we a winter event?
+     *
+     * @return boolean
+     */
+    public function isWinterEvent(): bool {
+        return $this->value === self::WINTER_EVENT;
     }
 }

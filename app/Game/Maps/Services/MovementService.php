@@ -7,6 +7,7 @@ use League\Fractal\Manager;
 use App\Flare\Cache\CoordinatesCache;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Flare\Models\Character;
+use App\Flare\Models\Event;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Location;
 use App\Flare\Services\BuildMonsterCacheService;
@@ -81,17 +82,18 @@ class MovementService {
      * @param PortService $portService
      * @return void
      */
-    public function __construct(PortService $portService,
-                                MapTileValue $mapTile,
-                                CharacterSheetBaseInfoTransformer $characterAttackTransformer,
-                                CoordinatesCache $coordinatesCache,
-                                MapPositionValue $mapPositionValue,
-                                TraverseService $traverseService,
-                                ConjureService $conjureService,
-                                BuildMonsterCacheService $buildMonsterCacheService,
-                                LocationService $locationService,
-                                Manager $manager)
-    {
+    public function __construct(
+        PortService $portService,
+        MapTileValue $mapTile,
+        CharacterSheetBaseInfoTransformer $characterAttackTransformer,
+        CoordinatesCache $coordinatesCache,
+        MapPositionValue $mapPositionValue,
+        TraverseService $traverseService,
+        ConjureService $conjureService,
+        BuildMonsterCacheService $buildMonsterCacheService,
+        LocationService $locationService,
+        Manager $manager
+    ) {
         $this->portService                = $portService;
         $this->mapTile                    = $mapTile;
         $this->characterAttackTransformer = $characterAttackTransformer;
@@ -146,9 +148,9 @@ class MovementService {
         $character = $character->refresh();
 
         $location = Location::where('x', $character->map->character_position_x)
-                            ->where('y', $character->map->character_position_y)
-                            ->whereNotNull('quest_reward_item_id')
-                            ->first();
+            ->where('y', $character->map->character_position_y)
+            ->whereNotNull('quest_reward_item_id')
+            ->first();
 
         if (!is_null($location)) {
             $this->giveLocationReward($character, $location);
@@ -211,6 +213,9 @@ class MovementService {
      * - Some maps are hidden from the list unless the player
      *   is physically at the location or on the map.
      *
+     * - Some maps are only available during specific events,
+     *   therefor we hide them when that event is not running.
+     *
      * @param Character $character
      * @param Location|null $location
      * @param Collection $gameMaps
@@ -218,12 +223,21 @@ class MovementService {
      */
     protected function filterTraversableMaps(Character $character, Collection $gameMaps, ?Location $location = null): array {
         foreach ($gameMaps as $index => $gameMap) {
+
             if (!is_null($gameMap->required_location_id) && !$character->map->gameMap->mapType()->isPurgatory()) {
                 if (!is_null($location)) {
                     if ($location->id !== $gameMap->required_location_id) {
                         unset($gameMaps[$index]);
                     }
                 } else {
+                    unset($gameMaps[$index]);
+                }
+            }
+
+            if (!is_null($gameMap->only_during_event_type)) {
+                $event = Event::where('type', $gameMap->only_during_event_type)->first();
+
+                if (is_null($event)) {
                     unset($gameMaps[$index]);
                 }
             }

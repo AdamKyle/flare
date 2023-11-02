@@ -27,7 +27,8 @@ class GameMap extends Model {
         'drop_chance_bonus',
         'enemy_stat_bonus',
         'character_attack_reduction',
-        'required_location_id'
+        'required_location_id',
+        'only_during_event_type',
     ];
 
     protected $casts = [
@@ -37,6 +38,7 @@ class GameMap extends Model {
         'drop_chance_bonus'          => 'float',
         'enemy_stat_bonus'           => 'float',
         'character_attack_reduction' => 'float',
+        'only_during_event_type'     => 'integer',
     ];
 
     protected $appends = [
@@ -70,6 +72,7 @@ class GameMap extends Model {
     public function getMapRequiredItemAttribute() {
         switch ($this->name) {
             case 'Labyrinth':
+            case 'Ice Plane':
                 return Item::where('effect', ItemEffectsValue::LABYRINTH)->first();
             case 'Dungeons':
                 return Item::where('effect', ItemEffectsValue::DUNGEON)->first();
