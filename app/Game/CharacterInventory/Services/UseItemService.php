@@ -12,25 +12,42 @@ use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Flare\Values\ItemUsabilityType;
 use App\Game\CharacterInventory\Events\CharacterBoonsUpdateBroadcastEvent;
-use App\Game\Core\Events\UpdateBaseCharacterInformation;
 use App\Game\CharacterInventory\Jobs\CharacterBoonJob;
+use App\Game\Core\Events\UpdateBaseCharacterInformation;
 use App\Game\Messages\Events\ServerMessageEvent;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item as ResourceItem;
 
 class UseItemService {
 
-    private $characterAttackTransformer;
+    /**
+     * @var CharacterSheetBaseInfoTransformer $characterAttackTransformer
+     */
+    private CharacterSheetBaseInfoTransformer $characterAttackTransformer;
 
-    private $manager;
+    /**
+     * @var Manager $manager
+     */
+    private Manager $manager;
 
+    /**
+     * @param Manager $manager
+     * @param CharacterSheetBaseInfoTransformer $characterAttackTransformer
+     */
     public function __construct(Manager $manager, CharacterSheetBaseInfoTransformer $characterAttackTransformer) {
         $this->manager                    = $manager;
         $this->characterAttackTransformer = $characterAttackTransformer;
     }
 
-    public function useItem(InventorySlot $slot, Character $character, Item $item) {
-        $completedAt = now()->addMinutes($item->lasts_for);
+    /**
+     * Use the item on the character and create a boon.
+     *
+     * @param InventorySlot $slot
+     * @param Character $character
+     * @return void
+     */
+    public function useItem(InventorySlot $slot, Character $character) {
+        $completedAt = now()->addMinutes($slot->item->lasts_for);
 
         $boon = $character->boons()->create([
             'character_id'             => $character->id,
@@ -58,6 +75,13 @@ class UseItemService {
         $this->updateCharacter($character);
     }
 
+    /**
+     * Update a character based on the item they used.
+     *
+     * @param Character $character
+     * @param Item|null $item
+     * @return void
+     */
     public function updateCharacter(Character $character, Item $item = null) {
         resolve(BuildCharacterAttackTypes::class)->buildCache($character->refresh());
 
@@ -75,32 +99,17 @@ class UseItemService {
         foreach ($boons as $key => $boon) {
             $item   = Item::find($boon['item_id']);
 
-            if (is_null($item->affect_skill_type)) {
+            if (is_null($item->affects_skill_type)) {
                 continue;
             }
 
             $skills = GameSkill::where('type', $item->affect_skill_type)->pluck('name')->toArray();
 
-            $boon['type'] = (new ItemUsabilityType($boon['type']))->getNamedValue();
             $boon['affected_skills'] = implode(', ', $skills);
 
             $boons[$key] = $boon;
         }
 
         event(new CharacterBoonsUpdateBroadcastEvent($character->user, $boons));
-    }
-
-    protected function getType(Item $item): int {
-        $type = ItemUsabilityType::OTHER;
-
-        if ($item->stat_increase) {
-            $type = ItemUsabilityType::STAT_INCREASE;
-        }
-
-        if (!is_null($item->affects_skill_type)) {
-            $type = ItemUsabilityType::EFFECTS_SKILL;
-        }
-
-        return $type;
     }
 }

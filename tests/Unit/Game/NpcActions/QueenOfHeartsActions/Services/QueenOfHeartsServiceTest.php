@@ -8,7 +8,6 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
-use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\NpcActions\QueenOfHeartsActions\Events\UpdateQueenOfHeartsPanel;
 use App\Game\NpcActions\QueenOfHeartsActions\Services\QueenOfHeartsService;
@@ -17,8 +16,7 @@ use Tests\TestCase;
 use Tests\Traits\CreateGameMap;
 use Tests\Traits\CreateItem;
 
-class QueenOfHeartsServiceTest extends TestCase
-{
+class QueenOfHeartsServiceTest extends TestCase {
 
     use RefreshDatabase, CreateItem, CreateGameMap;
 
@@ -155,8 +153,8 @@ class QueenOfHeartsServiceTest extends TestCase
         $gameMap   = $this->createGameMap(['name' => 'Hell']);
 
         $character = $this->character->inventoryManagement()
-                                     ->giveItem($this->createItem(['effect' => ItemEffectsValue::QUEEN_OF_HEARTS]))
-                                     ->getCharacter();
+            ->giveItem($this->createItem(['effect' => ItemEffectsValue::QUEEN_OF_HEARTS]))
+            ->getCharacter();
 
         $character->map()->update(['game_map_id' => $gameMap->id]);
 
@@ -168,7 +166,7 @@ class QueenOfHeartsServiceTest extends TestCase
 
         $character = $character->refresh();
 
-        $slotWithUnique = $character->inventory->slots->filter(function($slot) {
+        $slotWithUnique = $character->inventory->slots->filter(function ($slot) {
             return $slot->item->is_unique;
         })->first();
 
@@ -184,8 +182,8 @@ class QueenOfHeartsServiceTest extends TestCase
         $gameMap   = $this->createGameMap(['name' => 'Hell']);
 
         $character = $this->character->inventoryManagement()
-                                     ->giveItem($this->createItem(['effect' => ItemEffectsValue::QUEEN_OF_HEARTS]))
-                                     ->getCharacter();
+            ->giveItem($this->createItem(['effect' => ItemEffectsValue::QUEEN_OF_HEARTS]))
+            ->getCharacter();
 
         $character->map()->update(['game_map_id' => $gameMap->id]);
 
@@ -197,7 +195,7 @@ class QueenOfHeartsServiceTest extends TestCase
 
         $character = $character->refresh();
 
-        $slotWithUnique = $character->inventory->slots->filter(function($slot) {
+        $slotWithUnique = $character->inventory->slots->filter(function ($slot) {
             return $slot->item->is_unique;
         })->first();
 
@@ -267,17 +265,93 @@ class QueenOfHeartsServiceTest extends TestCase
 
         $character = $character->refresh();
 
-        $slotWithUnique = $character->inventory->slots->filter(function($slot) {
+        $slotWithUnique = $character->inventory->slots->filter(function ($slot) {
             return $slot->item->is_unique;
         })->first();
 
-        $slotToMoveTo = $character->inventory->slots->filter(function($slot) {
+        $slotToMoveTo = $character->inventory->slots->filter(function ($slot) {
             return !$slot->item->is_unique;
         })->first();
 
         $result = $this->queenOfHeartsService->moveAffixes($character, $slotWithUnique->id, $slotToMoveTo->id, 'all-enchantments');
 
         $this->assertEquals('Child, you are so poor (Not enough currency) ...', $result['message']);
+        $this->assertEquals(422, $result['status']);
+    }
+
+    public function testCannotMoveEnchantmentsWhenInvalidItemTypeForItemToMoveTo() {
+        $questItem = $this->createItem(['effect' => ItemEffectsValue::QUEEN_OF_HEARTS]);
+
+        $character = $this->character->inventoryManagement()->giveItem($questItem)->giveItem($this->createItem(['name' => 'Sample', 'type' => 'artifact']))->getCharacter();
+
+        $gameMap = $this->createGameMap(['name' => 'Hell']);
+
+        $character->map()->update(['game_map_id' => $gameMap->id]);
+
+        $character->update([
+            'gold' => MaxCurrenciesValue::MAX_GOLD
+        ]);
+
+        $character = $character->refresh();
+
+        $this->queenOfHeartsService->purchaseUnique($character, 'legendary');
+
+        $character->update(['gold' => MaxCurrenciesValue::MAX_GOLD]);
+
+        $character = $character->refresh();
+
+        $slotWithUnique = $character->inventory->slots->filter(function ($slot) {
+            return $slot->item->is_unique;
+        })->first();
+
+        $slotToMoveTo = $character->inventory->slots->filter(function ($slot) {
+            return $slot->item->type === 'artifact';
+        })->first();
+
+        $result = $this->queenOfHeartsService->moveAffixes($character, $slotWithUnique->id, $slotToMoveTo->id, 'all-enchantments');
+
+        $this->assertEquals('I don\'t know how to handle trinkets or artifacts child. Bring me something sexy! Oooooh hooo hooo!', $result['message']);
+        $this->assertEquals(422, $result['status']);
+    }
+
+    public function testCannotMoveEnchantmentsWhenInvalidItemTypeForItemToMoveFrom() {
+        $questItem = $this->createItem(['effect' => ItemEffectsValue::QUEEN_OF_HEARTS]);
+
+        $character = $this->character->inventoryManagement()->giveItem($questItem)->giveItem($this->createItem(['name' => 'Sample', 'type' => 'spell-damage']))->getCharacter();
+
+        $gameMap = $this->createGameMap(['name' => 'Hell']);
+
+        $character->map()->update(['game_map_id' => $gameMap->id]);
+
+        $character->update([
+            'gold' => MaxCurrenciesValue::MAX_GOLD
+        ]);
+
+        $character = $character->refresh();
+
+        $this->queenOfHeartsService->purchaseUnique($character, 'legendary');
+
+        $character->update(['gold' => MaxCurrenciesValue::MAX_GOLD]);
+
+        $character = $character->refresh();
+
+        $slotWithUnique = $character->inventory->slots->filter(function ($slot) {
+            return $slot->item->is_unique;
+        })->first();
+
+        $slotWithUnique->item()->update([
+            'type' => 'artifact',
+        ]);
+
+        $slotWithUnique = $slotWithUnique->refresh();
+
+        $slotToMoveTo = $character->inventory->slots->filter(function ($slot) {
+            return $slot->item->type === 'spell-damage';
+        })->first();
+
+        $result = $this->queenOfHeartsService->moveAffixes($character, $slotWithUnique->id, $slotToMoveTo->id, 'all-enchantments');
+
+        $this->assertEquals('I don\'t know how to handle trinkets or artifacts child. Bring me something sexy! Oooooh hooo hooo!', $result['message']);
         $this->assertEquals(422, $result['status']);
     }
 
@@ -306,11 +380,11 @@ class QueenOfHeartsServiceTest extends TestCase
 
         $character = $character->refresh();
 
-        $slotWithUnique = $character->inventory->slots->filter(function($slot) {
+        $slotWithUnique = $character->inventory->slots->filter(function ($slot) {
             return $slot->item->is_unique;
         })->first();
 
-        $slotToMoveTo = $character->inventory->slots->filter(function($slot) {
+        $slotToMoveTo = $character->inventory->slots->filter(function ($slot) {
             return !$slot->item->is_unique;
         })->first();
 

@@ -250,14 +250,14 @@ class Item extends Model {
         $itemName   = '';
 
         if (!is_null($itemPrefix)) {
-            $itemName = '*'.$itemPrefix->name.'* ' . $this->name;
+            $itemName = '*' . $itemPrefix->name . '* ' . $this->name;
         }
 
         if (!is_null($itemSuffix)) {
             if ($itemName !== '') {
-                $itemName .= ' *'.$itemSuffix->name.'*';
+                $itemName .= ' *' . $itemSuffix->name . '*';
             } else {
-                $itemName = $this->name . ' *'.$itemSuffix->name.'*';
+                $itemName = $this->name . ' *' . $itemSuffix->name . '*';
             }
         }
 
@@ -320,7 +320,7 @@ class Item extends Model {
 
     public function getLocationsAttribute() {
         if ($this->type === 'quest') {
-           return Location::where('quest_reward_item_id', $this->id)->with('map')->get();
+            return Location::where('quest_reward_item_id', $this->id)->with('map')->get();
         }
 
         return [];

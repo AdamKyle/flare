@@ -65,11 +65,11 @@ class HolyItemServiceTest extends TestCase {
             'can_use_on_other_items' => true,
         ]))->getCharacter();
 
-        $slot = $character->inventory->slots->filter(function($slot) {
+        $slot = $character->inventory->slots->filter(function ($slot) {
             return $slot->item->type === 'weapon';
         })->first();
 
-        $alchemy = $character->inventory->slots->filter(function($slot) {
+        $alchemy = $character->inventory->slots->filter(function ($slot) {
             return $slot->item->type === 'alchemy';
         })->first();
 
@@ -81,6 +81,45 @@ class HolyItemServiceTest extends TestCase {
         Event::assertDispatched(ServerMessageEvent::class);
 
         $this->assertEquals(200, $result['status']);
+    }
+
+    public function testCannotApplyOilWhenInvalidItemType() {
+        Event::fake();
+
+        $character = $this->character->inventoryManagement()->giveItem(
+            $this->createItem([
+                'type'        => 'artifact',
+                'holy_stacks' => 20,
+            ])
+        )->giveItem($this->createItem([
+            'type' => 'alchemy',
+            'holy_level' => 1,
+            'can_use_on_other_items' => true,
+        ]))->getCharacter();
+
+        $character->update([
+            'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
+        ]);
+
+        $character = $character->refresh();
+
+        $slot = $character->inventory->slots->filter(function ($slot) {
+            return $slot->item->type === 'artifact';
+        })->first();
+
+        $alchemy = $character->inventory->slots->filter(function ($slot) {
+            return $slot->item->type === 'alchemy';
+        })->first();
+
+        $result = $this->holyItemService->applyOil($character, [
+            'item_id' => $slot->item_id,
+            'alchemy_item_id' => $alchemy->item_id,
+        ]);
+
+        Event::assertNotDispatched(ServerMessageEvent::class);
+
+        $this->assertEquals(422, $result['status']);
+        $this->assertEquals('Trinkets and Artifacts cannot have holy oils applied.', $result['message']);
     }
 
     public function testCannotApplyHolyOilWhenNoStacks() {
@@ -101,11 +140,11 @@ class HolyItemServiceTest extends TestCase {
 
         $character = $character->refresh();
 
-        $slot = $character->inventory->slots->filter(function($slot) {
+        $slot = $character->inventory->slots->filter(function ($slot) {
             return $slot->item->type === 'weapon';
         })->first();
 
-        $alchemy = $character->inventory->slots->filter(function($slot) {
+        $alchemy = $character->inventory->slots->filter(function ($slot) {
             return $slot->item->type === 'alchemy';
         })->first();
 
@@ -136,11 +175,11 @@ class HolyItemServiceTest extends TestCase {
 
         $character = $character->refresh();
 
-        $slot = $character->inventory->slots->filter(function($slot) {
+        $slot = $character->inventory->slots->filter(function ($slot) {
             return $slot->item->type === 'weapon';
         })->first();
 
-        $alchemy = $character->inventory->slots->filter(function($slot) {
+        $alchemy = $character->inventory->slots->filter(function ($slot) {
             return $slot->item->type === 'alchemy';
         })->first();
 
@@ -151,7 +190,7 @@ class HolyItemServiceTest extends TestCase {
 
         $character = $character->refresh();
 
-        $this->assertNotNull($character->inventory->slots->filter(function($slot) {
+        $this->assertNotNull($character->inventory->slots->filter(function ($slot) {
             return $slot->item->holy_stacks_applied === 1;
         })->first());
 
@@ -178,11 +217,11 @@ class HolyItemServiceTest extends TestCase {
 
         $character = $character->refresh();
 
-        $slot = $character->inventory->slots->filter(function($slot) {
+        $slot = $character->inventory->slots->filter(function ($slot) {
             return $slot->item->type === 'weapon';
         })->first();
 
-        $alchemy = $character->inventory->slots->filter(function($slot) {
+        $alchemy = $character->inventory->slots->filter(function ($slot) {
             return $slot->item->type === 'alchemy';
         })->first();
 
@@ -193,7 +232,7 @@ class HolyItemServiceTest extends TestCase {
 
         $character = $character->refresh();
 
-        $this->assertNotNull($character->inventory->slots->filter(function($slot) {
+        $this->assertNotNull($character->inventory->slots->filter(function ($slot) {
             return $slot->item->holy_stacks_applied === 1;
         })->first());
 
@@ -230,11 +269,11 @@ class HolyItemServiceTest extends TestCase {
 
         $character = $character->refresh();
 
-        $slot = $character->inventory->slots->filter(function($slot) {
+        $slot = $character->inventory->slots->filter(function ($slot) {
             return $slot->item->type === 'weapon';
         })->first();
 
-        $alchemy = $character->inventory->slots->filter(function($slot) {
+        $alchemy = $character->inventory->slots->filter(function ($slot) {
             return $slot->item->type === 'alchemy';
         })->first();
 
@@ -245,12 +284,10 @@ class HolyItemServiceTest extends TestCase {
 
         $character = $character->refresh();
 
-        $this->assertNotNull($character->inventory->slots->filter(function($slot) {
+        $this->assertNotNull($character->inventory->slots->filter(function ($slot) {
             return $slot->item->holy_stacks_applied === 2;
         })->first());
 
         $this->assertEquals(200, $result['status']);
     }
-
-
 }

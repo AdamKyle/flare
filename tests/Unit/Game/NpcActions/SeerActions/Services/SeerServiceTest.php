@@ -54,6 +54,22 @@ class SeerServiceTest extends TestCase {
         $this->assertEquals('You do not have the gold bars to do this.', $result['message']);
     }
 
+    public function testCannotAttachSocketsToArtifacts() {
+        $character = $this->character->inventoryManagement()->giveItem($this->createItem([
+            'type' => 'artifact',
+        ]))->getCharacterFactory()
+            ->kingdomManagement()
+            ->assignKingdom([
+                'gold_bars' => 2000,
+            ])->getCharacter();
+
+        $slot = $character->inventory->slots->first();
+        $result = $this->seerService->createSockets($character, $slot->id);
+
+        $this->assertEquals(422, $result['status']);
+        $this->assertEquals('Trinkets and Artifacts cannot have sockets on them.', $result['message']);
+    }
+
     public function testCannotAddSocketsWhenYouHaveGemsAttached() {
         $item = $this->createItem([
             'type' => 'weapon',

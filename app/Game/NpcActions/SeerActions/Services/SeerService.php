@@ -54,7 +54,7 @@ class SeerService {
             ArmourTypes::FEET,
             ArmourTypes::LEGGINGS,
             ArmourTypes::GLOVES
-        ])->map(function($slot) use($isManagingGems) {
+        ])->map(function ($slot) use ($isManagingGems) {
 
             if ($isManagingGems) {
                 if ($slot->item->socket_count > 0) {
@@ -71,7 +71,6 @@ class SeerService {
                     'socket_amount' => $slot->item->socket_count,
                 ];
             }
-
         })->toArray()));
     }
 
@@ -82,7 +81,7 @@ class SeerService {
      * @return array
      */
     public function getGems(Character $character): array {
-        return array_values($character->gemBag->gemSlots->map(function($slot) {
+        return array_values($character->gemBag->gemSlots->map(function ($slot) {
             return [
                 'name'    => $slot->gem->name,
                 'amount'  => $slot->amount,
@@ -137,9 +136,8 @@ class SeerService {
         return $this->successResult([
             'items'   => $this->getItems($character),
             'gems'    => $this->getGems($character),
-            'message' => 'Attached sockets to item! (Old Socket Count: '.$oldSocketCount.', New Count: '.$newSocketCount.').'
+            'message' => 'Attached sockets to item! (Old Socket Count: ' . $oldSocketCount . ', New Count: ' . $newSocketCount . ').'
         ]);
-
     }
 
     /**
@@ -363,10 +361,6 @@ class SeerService {
             return $this->errorResult('No item was found to add a gem to.');
         }
 
-        if ($slot->item->type === 'trinket' || $slot->item->type === 'artifact') {
-            return $this->errorResult('Trinkets and Artifacts cannot have gems on them.');
-        }
-
         if (is_null($gemSlot)) {
             return $this->errorResult('No gem to attach to supplied item was found.');
         }
@@ -466,11 +460,6 @@ class SeerService {
      * @return InventorySlot|null
      */
     protected function removeGemFromItem(Character $character, InventorySlot $slot, int $gemId): InventorySlot|null {
-
-        if ($slot->item->sockets->isEmpty()) {
-            return null;
-        }
-
         $newItem = DuplicateItemHandler::duplicateItem($slot->item);
 
         $socket = $newItem->sockets->where('gem_id', $gemId)->first();

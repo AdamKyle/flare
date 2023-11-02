@@ -85,8 +85,8 @@ class QueenOfHeartsService {
      * @param string $selectedAffix
      * @return array
      */
-    public function reRollUnique(Character $character, int $selectedSlotId, string $selectedReRollType, string $selectedAffix): array  {
-        $slot = $character->inventory->slots->filter(function($slot) use ($selectedSlotId) {
+    public function reRollUnique(Character $character, int $selectedSlotId, string $selectedReRollType, string $selectedAffix): array {
+        $slot = $character->inventory->slots->filter(function ($slot) use ($selectedSlotId) {
             return $slot->id === $selectedSlotId;
         })->first();
 
@@ -95,7 +95,7 @@ class QueenOfHeartsService {
         }
 
         if (!$this->randomEnchantmentService->isPlayerInHell($character)) {
-            event (new GlobalMessageEvent($character->name . ' has pissed off the Queen of Hearts with their cheating ways. They attempted to access her while not in Hell and/or with out the required item.'));
+            event(new GlobalMessageEvent($character->name . ' has pissed off the Queen of Hearts with their cheating ways. They attempted to access her while not in Hell and/or with out the required item.'));
 
             return $this->errorResult('Invalid location to use that.');
         }
@@ -129,16 +129,16 @@ class QueenOfHeartsService {
      */
     public function moveAffixes(Character $character, int $selectedSlotId, int $selectedSecondarySlotId, string $selectedAffix): array {
         if (!$this->randomEnchantmentService->isPlayerInHell($character)) {
-            event (new GlobalMessageEvent($character->name . ' has pissed off the Queen of Hearts with their cheating ways. They attempted to access her while not in Hell and/or with out the required item.'));
+            event(new GlobalMessageEvent($character->name . ' has pissed off the Queen of Hearts with their cheating ways. They attempted to access her while not in Hell and/or with out the required item.'));
 
             return $this->errorResult('Invalid location to use that.');
         }
 
-        $slot = $character->inventory->slots->filter(function($slot) use ($selectedSlotId) {
+        $slot = $character->inventory->slots->filter(function ($slot) use ($selectedSlotId) {
             return $slot->id === $selectedSlotId;
         })->first();
 
-        $secondSlot = $character->inventory->slots->filter(function($slot) use ($selectedSecondarySlotId) {
+        $secondSlot = $character->inventory->slots->filter(function ($slot) use ($selectedSecondarySlotId) {
             return $slot->id === $selectedSecondarySlotId;
         })->first();
 
@@ -148,7 +148,11 @@ class QueenOfHeartsService {
         }
 
         if ($slot->item->type === 'trinket' || $slot->item->type === 'artifact') {
-            $this->errorResult('I don\'t know how to handle trinkets or artifacts child. Bring me something sexy! Oooooh hooo hooo!');
+            return $this->errorResult('I don\'t know how to handle trinkets or artifacts child. Bring me something sexy! Oooooh hooo hooo!');
+        }
+
+        if ($secondSlot->item->type === 'trinket' || $secondSlot->item->type === 'artifact') {
+            return $this->errorResult('I don\'t know how to handle trinkets or artifacts child. Bring me something sexy! Oooooh hooo hooo!');
         }
 
         if (!$this->reRollEnchantmentService->canAffordMovementCost($character, $slot->item->id, $selectedAffix)) {
