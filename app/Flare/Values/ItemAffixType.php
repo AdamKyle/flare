@@ -36,7 +36,7 @@ class ItemAffixType {
     /**
      * @var string[]
      */
-    protected static $values = [
+    public static $values = [
         self::STAT_MODIFIERS       => self::STAT_MODIFIERS,
         self::BASE_MODIFIERS       => self::BASE_MODIFIERS,
         self::STAT_REDUCTION       => self::STAT_REDUCTION,

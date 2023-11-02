@@ -46,6 +46,10 @@ class InitiateMonthlyPVPEvent implements ShouldQueue {
             return;
         }
 
+        $event->update([
+            'currently_running' => true,
+        ]);
+
         $event = Event::create([
             'type'       => EventType::MONTHLY_PVP,
             'started_at' => now(),
