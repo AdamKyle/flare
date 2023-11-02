@@ -28,6 +28,7 @@ class ResetTimers extends Command {
         $this->resetCraftingTimers();
         $this->resetCharacterMovement();
         $this->resetCharacterAttack();
+        $this->resetCharacterSpinTimer();
     }
 
     protected function resetCraftingTimers() {
@@ -72,6 +73,22 @@ class ResetTimers extends Command {
             $character->update([
                 'can_move_again_at' => null,
                 'can_move' => true,
+            ]);
+
+            event(new UpdateCharacterStatus($character->refresh()));
+        }
+    }
+
+    protected function resetCharacterSpinTimer() {
+        $characters = Character::whereNotNull('can_spin_again_at')
+            ->where('can_spin_again_at', '<', now())
+            ->where('can_spin', false)
+            ->get();
+
+        foreach ($characters as $character) {
+            $character->update([
+                'can_spin_again_at' => null,
+                'can_spin' => true,
             ]);
 
             event(new UpdateCharacterStatus($character->refresh()));
