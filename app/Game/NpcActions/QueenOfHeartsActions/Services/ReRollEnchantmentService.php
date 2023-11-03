@@ -201,11 +201,11 @@ class ReRollEnchantmentService {
             }
         } else {
             $duplicateSecondaryItem->update([
-                'item_'.$affixType.'_id' => $slot->item->{'item_'.$affixType.'_id'},
+                'item_' . $affixType . '_id' => $slot->item->{'item_' . $affixType . '_id'},
             ]);
 
             $duplicateUnique->update([
-                'item_'.$affixType.'_id' => null,
+                'item_' . $affixType . '_id' => null,
             ]);
 
             $duplicateUnique = $duplicateUnique->refresh();
@@ -315,8 +315,8 @@ class ReRollEnchantmentService {
         $amountPaid             = new RandomAffixDetails($itemAffix->cost);
 
         $affixAttributeBuilder = $this->affixAttributeBuilder->setPercentageRange($amountPaid->getPercentageRange())
-                                                              ->setDamageRange($amountPaid->getDamageRange())
-                                                              ->setCharacterSkills($character->skills);
+            ->setDamageRange($amountPaid->getDamageRange())
+            ->setCharacterSkills($character->skills);
         if ($changeType === 'everything') {
             $changes = $affixAttributeBuilder->buildAttributes($itemAffix->type, $itemAffix->cost);
 
@@ -325,7 +325,12 @@ class ReRollEnchantmentService {
             $changes = [];
 
             foreach ($this->functionMap[$changeType] as $functionName) {
-                $changes = array_merge($changes, $affixAttributeBuilder->{$functionName}());
+
+                if ($functionName === 'increaseStats') {
+                    $changes = array_merge($changes, $affixAttributeBuilder->{$functionName}($itemAffix->cost));
+                } else {
+                    $changes = array_merge($changes, $affixAttributeBuilder->{$functionName}());
+                }
             }
         }
 
