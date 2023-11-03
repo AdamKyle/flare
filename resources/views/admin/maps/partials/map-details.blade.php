@@ -108,6 +108,43 @@
                         as well as use appropriate affixes to reduce enemy stats and entrance them.
                     </p>
                 @endif
+                @if ($map->mapType()->isTheIcePlane())
+                    <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2'></div>
+                    <x-core.alerts.info-alert title="ATTN!">
+                        This plane is only accessible during The Winter Event which runs from December 15th to March 15
+                        the following year.
+                    </x-core.alerts.info-alert>
+                    <h3 class="my-4">The Ice Qaueen Reins!</h3>
+                    <p>
+                        There is a corrupt Queen who rules this plane of existance and spreads the chilld of her own
+                        dying and dead heart
+                        across the land it's self.
+                    </p>
+                    <p class="my-2">
+                        Players who come down to The Ice Plane will encounter frozen terrors the likes of which they
+                        have never seen,
+                        be able to complete an epic quest line that tells the story of who this Queen of ice really is.
+                        Is she tied to The Creator some how?
+                    </p>
+                    <p class="my-2">
+                        During the winter event there will be a raid where players can fight The Ice Queen and gain new
+                        gear set: Corrupted Ice set.
+                    </p>
+                    <p class="my-2">
+                        Players will also be able to earn the Ice Sceptor Artifact which is atuned to Charisma.
+                    </p>
+                    <p class="my-2">
+                        Players will also find that their gold, gold_dust, shards and copper coins drop at 2x the rate
+                        while fighting creatures.
+                    </p>
+                    <p class="my-2">
+                        Players will also notice that all enemies have 100-130% in all resiatances and skills and even
+                        have elemental atonement of, Ice.
+                    </p>
+                    <p class="my-2">
+                        Critters also have special attacks, simmilar to those of class specials.
+                    </p>
+                @endif
                 @if (!is_null($itemNeeded))
                     <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2'></div>
                     <h3 class="my-4">Item required for access</h3>

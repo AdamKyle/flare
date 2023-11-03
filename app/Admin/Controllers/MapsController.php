@@ -10,6 +10,7 @@ use App\Flare\Models\Location;
 use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Models\GameMap;
 use App\Admin\Requests\MapUploadValidation;
+use App\Flare\Values\EventType;
 
 class MapsController extends Controller {
 
@@ -29,15 +30,33 @@ class MapsController extends Controller {
             default        => '',
         };
 
+        $walkOnWater = null;
+
+        if ($gameMap->mapType()->isHell()) {
+            $walkOnWater = Item::where('effect', ItemEffectsValue::WALK_ON_MAGMA)->first();
+        }
+
+        if ($gameMap->mapType()->isDungeons()) {
+            $walkOnWater = Item::where('effect', ItemEffectsValue::WALK_ON_DEATH_WATER)->first();
+        }
+
+        if ($gameMap->mapType()->isSurface() || $gameMap->mapType()->isLabyrinth()) {
+            $walkOnWater = Item::where('effect', ItemEffectsValue::WALK_ON_WATER)->first();
+        }
+
         return view('admin.maps.map', [
-            'map'        => $gameMap,
-            'itemNeeded' => Item::where('effect', $effects)->first(),
-            'mapUrl'     => Storage::disk('maps')->url($gameMap->path),
+            'map'         => $gameMap,
+            'itemNeeded'  => Item::where('effect', $effects)->first(),
+            'walkOnWater' => $walkOnWater,
+            'mapUrl'      => Storage::disk('maps')->url($gameMap->path),
         ]);
     }
 
     public function uploadMap() {
-        return view('admin.maps.upload');
+        return view('admin.maps.upload', [
+            'mapDetails' => null,
+            'eventTypes' => EventType::getOptionsForSelect(),
+        ]);
     }
 
     public function upload(MapUploadValidation $request) {
@@ -46,7 +65,7 @@ class MapsController extends Controller {
         GameMap::create([
             'name'              => $request->name,
             'path'              => $path,
-            'default'           => $request->default === 'yes' ? true : false,
+            'default'           => $request->default,
             'kingdom_color'     => $request->kingdom_color,
             'only_during_event' => $request->only_during_event,
         ]);
