@@ -168,7 +168,7 @@ class GuideQuestService {
             $difference = array_diff($requiredAttributes, $this->completedAttributes);
 
             $this->guideQuestRequirementsService->resetFinishedRequirements();
-
+            dump($difference);
             if (empty($difference)) {
                 return true;
             }
@@ -201,6 +201,14 @@ class GuideQuestService {
             }
 
             if ($key === 'required_skill_type') {
+                continue;
+            }
+
+            if ($key === 'required_skill_type') {
+                continue;
+            }
+
+            if ($key === 'required_kingdom_building_id') {
                 continue;
             }
 
