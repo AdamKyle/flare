@@ -23,6 +23,7 @@ class AnnouncementHandler {
             'monthly_pvp' => $this->buildMonthlyPVPMessage(),
             'weekly_celestial_spawn' => $this->buildWeeklyCelestialMessage(),
             'weekly_currency_drop' => $this->buildWeeklyCurrencyDrop(),
+            'createAnnouncement' => $this->buildWinterEventMessage(),
             default => throw new Exception('Cannot determine announcement type'),
         };
     }
@@ -106,6 +107,27 @@ class AnnouncementHandler {
 
         $message = 'For one day only, ending: ' . $event->ends_at->format('l, j \of F \a\t h:ia \G\M\TP') . ' ' .
             'Players can get 1-50 of each type of currency, Gold Dust, Crystal Shards, Copper Coins (if you have the appropriate quest item). ';
+
+        $announcement = Announcement::create([
+            'message'    => $message,
+            'expires_at' => $event->ends_at,
+            'event_id'   => $event->id
+        ]);
+
+        event(new AnnouncementMessageEvent($message, $announcement->id));
+    }
+
+    private function buildWinterEventMessage(): void {
+        $event = Event::where('type', EventType::WINTER_EVENT)->first();
+
+        if (is_null($event)) {
+            throw new Exception('Cannot create message for Winter Event, when no event exists.');
+        }
+
+        $message = 'From now until: ' . $event->ends_at->format('l, j \of F \a\t h:ia \G\M\TP') . ' ' .
+            'Players can enter, with no item requirements, The ice Plane and fight fearsome creatures as well as take on The Ice Queen her self.' . ' ' .
+            'You will find the creatures down here to be much more powerful then even Purgatory! Prepare your self child, the chill of death awaits.' . ' ' .
+            'All you have to do is use the traverse feature to move from your current plane to The Ice Plane where rewards are bountiful!';
 
         $announcement = Announcement::create([
             'message'    => $message,

@@ -52,6 +52,10 @@ class ScheduledEvent extends Model {
             return 'Monthly PVP';
         }
 
+        if ($type->isWinterEvent()) {
+            return 'The Ice Queen\'s Realm';
+        }
+
         return 'Event Name';
     }
 }

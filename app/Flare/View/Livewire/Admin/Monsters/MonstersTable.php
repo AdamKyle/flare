@@ -32,6 +32,7 @@ class MonstersTable extends DataTableComponent {
                     'Shadow Plane'                => 'Shadow Plane',
                     'Hell'                        => 'Hell',
                     'Purgatory'                   => 'Purgatory',
+                    'The Ice Plane'               => 'The Ice Plane',
                     'Surface Celestials'          => 'Surface Celestials',
                     'Labyrinth Celestials'        => 'Labyrinth Celestials',
                     'Dungeons Celestials'         => 'Dungeons Celestials',
@@ -49,7 +50,7 @@ class MonstersTable extends DataTableComponent {
                     'Shadow Plane Raid Monsters'  => 'Shadow Plane Raid Monsters',
                     'Hell Raid Monsters'          => 'Hell Raid Monsters',
                     'Purgatory Raid Monsters'     => 'Purgatory Raid Monsters',
-                ])->filter(function(Builder $builder, string $value) {
+                ])->filter(function (Builder $builder, string $value) {
                     if (str_contains($value, 'Celestials')) {
 
                         $gameMapId = GameMap::where('name', trim(str_replace('Celestials', '', $value)))->first()->id;
@@ -74,8 +75,8 @@ class MonstersTable extends DataTableComponent {
                     $gameMapId = GameMap::where('name', $value)->first()->id;
 
                     return $builder->where('game_map_id', $gameMapId)
-                                   ->where('is_celestial_entity', false)
-                                   ->where('is_raid_boss', false);
+                        ->where('is_celestial_entity', false)
+                        ->where('is_raid_boss', false);
                 }),
         ];
     }
@@ -91,7 +92,7 @@ class MonstersTable extends DataTableComponent {
                     }
                 }
 
-                return '<a href="/monsters/'. $monsterId.'" >'.$row->name . '</a>';
+                return '<a href="/monsters/' . $monsterId . '" >' . $row->name . '</a>';
             })->html(),
             Column::make('Is Raid Boss', 'is_raid_boss')->searchable()->format(function ($value, $row) {
 
