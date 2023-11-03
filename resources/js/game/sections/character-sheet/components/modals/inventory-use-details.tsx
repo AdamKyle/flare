@@ -8,21 +8,24 @@ export default class InventoryUseDetails extends React.Component<any, any> {
         super(props);
     }
 
-
-
     render() {
         return (
-            <Dialogue is_open={this.props.is_open}
-                      handle_close={this.props.manage_modal}
-                      title={<span className='text-pink-500 dark:text-pink-300'>{this.props.item.item_name}</span>}
+            <Dialogue
+                is_open={this.props.is_open}
+                handle_close={this.props.manage_modal}
+                title={
+                    <span className="text-pink-500 dark:text-pink-300">
+                        {this.props.item.item_name}
+                    </span>
+                }
             >
                 <div className="mb-5">
-                    {
-                        this.props.item.usable ?
-                            <UsableItemSection item={this.props.item} />
-                        :
-                            <AlchemyItemHoly item={this.props.item} />
-                    }
+                    {this.props.item.usable ||
+                    this.props.item.damages_kingdoms ? (
+                        <UsableItemSection item={this.props.item} />
+                    ) : (
+                        <AlchemyItemHoly item={this.props.item} />
+                    )}
                 </div>
             </Dialogue>
         );
