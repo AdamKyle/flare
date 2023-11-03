@@ -45,7 +45,7 @@ class MapChatColor {
                 return self::HELL;
             case 'Purgatory':
                 return self::PURGATORY;
-            case 'Ice Plane':
+            case 'The Ice Plane':
                 return self::ICE_PLANE;
             case 'Surface':
             default:
