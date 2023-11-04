@@ -18,8 +18,8 @@ class Ambush extends BattleBase {
     public function handleAmbush(Character $character, ServerMonster $monster, bool $isCharacterVoided = false, bool $isRankFight = false): Ambush {
 
         $this->healthObject = [
-            'character_health' => $this->characterCacheData->getCachedCharacterData($character, 'health'),
-            'monster_health'   => $monster->getHealth(),
+            'current_character_health' => $this->characterCacheData->getCachedCharacterData($character, 'health'),
+            'current_monster_health'   => $monster->getHealth(),
         ];
 
         if ($character->map->gameMap->mapType()->isPurgatory() && !$isRankFight) {
@@ -75,7 +75,7 @@ class Ambush extends BattleBase {
             $baseStat = $this->characterCacheData->getCachedCharacterData($character, $isPlayerVoided ? 'voided_base_stat' : 'base_stat');
             $damage   = $baseStat * 2;
 
-            $this->healthObject['monster_health'] -= $damage;
+            $this->healthObject['current_monster_health'] -= $damage;
 
             $this->addMessage('You strike the enemy in an ambush doing: ' . number_format($damage) . ' damage!', 'player-action');
         } else if ($this->canMonsterAmbushPlayer($serverMonster->getMonsterStat('ambush_chance'), $characterAmbushResistance)) {
@@ -84,7 +84,7 @@ class Ambush extends BattleBase {
             $damageStat = $serverMonster->getMonsterStat('damage_stat');
             $damage     = $serverMonster->getMonsterStat($damageStat) * 2;
 
-            $this->healthObject['character_health'] -= $damage;
+            $this->healthObject['current_character_health'] -= $damage;
 
             $this->addMessage($serverMonster->getName() . ' strikes you in an ambush doing: ' . number_format($damage) . ' damage!', 'enemy-action');
         }
@@ -100,7 +100,7 @@ class Ambush extends BattleBase {
             $damageStat = $serverMonster->getMonsterStat('damage_stat');
             $damage     = $serverMonster->getMonsterStat($damageStat) * 2;
 
-            $this->healthObject['character_health'] -= $damage;
+            $this->healthObject['current_character_health'] -= $damage;
 
             $this->addMessage($serverMonster->getName() . ' strikes you in an ambush doing: ' . number_format($damage) . ' damage!', 'enemy-action');
         } else if ($this->canPlayerAmbushMonster($characterAmbushChance, $serverMonster->getMonsterStat('ambush_resistance_chance'))) {
@@ -109,7 +109,7 @@ class Ambush extends BattleBase {
             $baseStat = $this->characterCacheData->getCachedCharacterData($character, $isPlayerVoided ? 'voided_base_stat' : 'base_stat');
             $damage   = $baseStat * 2;
 
-            $this->healthObject['monster_health'] -= $damage;
+            $this->healthObject['current_monster_health'] -= $damage;
 
             $this->addMessage('You strike the enemy in an ambush doing: ' . number_format($damage) . ' damage!', 'player-action');
         }
@@ -134,7 +134,7 @@ class Ambush extends BattleBase {
             $chance = 0.05;
         }
 
-        return rand (1, 100) > (100 - 100 * $chance);
+        return rand(1, 100) > (100 - 100 * $chance);
     }
 
     public function canMonsterAmbushPlayer(float $ambushChance, float $playerAmbushResistance): bool {
@@ -148,6 +148,6 @@ class Ambush extends BattleBase {
 
         $chance = $ambushChance - $playerAmbushResistance;
 
-        return rand (1, 100) > (100 - 100 * $chance);
+        return rand(1, 100) > (100 - 100 * $chance);
     }
 }

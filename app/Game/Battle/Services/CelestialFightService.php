@@ -48,7 +48,7 @@ class CelestialFightService {
                 'celestial_fight_id'      => $celestialFight->id,
                 'character_id'            => $character->id,
                 'character_max_health'    => $health,
-                'character_current_health'=> $health,
+                'character_current_health' => $health,
             ]);
         } else {
             if (now()->diffInMinutes($characterInCelestialFight->updated_at) > 5) {
@@ -83,8 +83,8 @@ class CelestialFightService {
             return $this->successResult([
                 'logs' => $messages,
                 'health' => [
-                    'character_health' => $characterHealth,
-                    'monster_health'   => 0,
+                    'current_character_health' => $characterHealth,
+                    'current_monster_health'   => 0,
                 ]
             ]);
         }
@@ -113,8 +113,8 @@ class CelestialFightService {
         return $this->successResult([
             'logs'      => $this->monsterPlayerFight->getBattleMessages(),
             'health' => [
-                'character_health' => $characterHealth,
-                'monster_health'   => $this->monsterPlayerFight->getMonsterHealth(),
+                'current_character_health' => $characterHealth,
+                'current_monster_health'   => $this->monsterPlayerFight->getMonsterHealth(),
             ]
         ]);
     }
@@ -127,7 +127,7 @@ class CelestialFightService {
 
         return $this->successResult([
             'fight' => [
-                'character' =>[
+                'character' => [
                     'max_health'     => $characterInCelestialFight->character_max_health,
                     'current_health' => $characterInCelestialFight->character_current_health,
                 ],
@@ -153,7 +153,7 @@ class CelestialFightService {
         if ($celestialFightType->isPublic()) {
             event(new GlobalMessageEvent($character->name . ' has slain the ' . $celestialFight->monster->name . '! They have been rewarded with a godly gift!'));
         } else {
-            event(new ServerMessageEvent($character->user,'You have slain the ' . $celestialFight->monster->name . '! They have been rewarded with a godly gift!'));
+            event(new ServerMessageEvent($character->user, 'You have slain the ' . $celestialFight->monster->name . '! They have been rewarded with a godly gift!'));
         }
 
         $this->characterCacheData->deleteCharacterSheet($character);
@@ -209,7 +209,7 @@ class CelestialFightService {
 
         $characterInCelestialFight->update([
             'character_max_health'    => $health,
-            'character_current_health'=> $health,
+            'character_current_health' => $health,
         ]);
 
         return $characterInCelestialFight->refresh();

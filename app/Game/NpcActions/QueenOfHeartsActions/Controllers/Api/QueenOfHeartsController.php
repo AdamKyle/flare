@@ -3,16 +3,11 @@
 namespace App\Game\NpcActions\QueenOfHeartsActions\Controllers\Api;
 
 use App\Flare\Models\Character;
-use App\Game\Core\Events\UpdateTopBarEvent;
-use App\Game\Messages\Events\GlobalMessageEvent;
-use App\Game\Messages\Events\ServerMessageEvent;
-use App\Game\NpcActions\QueenOfHeartsActions\Events\UpdateQueenOfHeartsPanel;
 use App\Game\NpcActions\QueenOfHeartsActions\Requests\MoveRandomEnchantment;
 use App\Game\NpcActions\QueenOfHeartsActions\Requests\PurchaseRandomEnchantment;
 use App\Game\NpcActions\QueenOfHeartsActions\Requests\ReRollRandomEnchantment;
 use App\Game\NpcActions\QueenOfHeartsActions\Services\QueenOfHeartsService;
 use App\Game\NpcActions\QueenOfHeartsActions\Services\RandomEnchantmentService;
-use App\Game\NpcActions\QueenOfHeartsActions\Services\ReRollEnchantmentService;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 
