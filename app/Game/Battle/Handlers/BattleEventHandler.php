@@ -101,7 +101,6 @@ class BattleEventHandler {
         $monsterFightCache = Cache::get('monster-fight-' . $character->id);
 
         if (!is_null($monsterFightCache)) {
-            $monsterFightCache['health']['character_health']         = $characterHealth;
             $monsterFightCache['health']['current_character_health'] = $characterHealth;
 
             Cache::put('monster-fight-' . $character->id, $monsterFightCache, 900);

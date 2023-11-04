@@ -271,7 +271,7 @@ class RaidBattleService {
     protected function getFightData(Character $character, ServerMonster $serverMonster, int $monsterId, array $monster, string $attackType, bool $isRaidBoss): array {
         if (!$isRaidBoss && $this->hasCachedHealth($character->id, $monsterId)) {
             $fightData = $this->getCachedFightData($character->id, $monsterId);
-            $fightData['health']['monster_health'] = $serverMonster->getHealth();
+            $fightData['health']['current_monster_health'] = $serverMonster->getHealth();
 
             $this->monsterPlayerFight->setUpRaidFight($character, $monster, $attackType);
         } else {
@@ -283,7 +283,7 @@ class RaidBattleService {
 
             $fightData['monster']                  = resolve(ServerMonster::class)->setMonster($raidBoss->raid_boss_deatils)
                 ->setHealth($raidBoss->boss_current_hp);
-            $fightData['health']['monster_health'] = $raidBoss->boss_current_hp;
+            $fightData['health']['current_monster_health'] = $raidBoss->boss_current_hp;
         }
 
         return $fightData;
@@ -302,8 +302,8 @@ class RaidBattleService {
      * @return array
      */
     protected function handlePreAttack(Character $character, array $health, array $messages, int $monsterId, bool $isRaidBoss = false): array {
-        if ($health['character_health'] <= 0) {
-            $health['character_health'] = 0;
+        if ($health['current_character_health'] <= 0) {
+            $health['current_character_health'] = 0;
 
             $messages[] = [
                 'message' => 'The enemies ambush has slaughtered you!',
@@ -316,13 +316,13 @@ class RaidBattleService {
 
             return $this->successResult([
                 'character_current_health' => 0,
-                'monster_current_health'   => $health['monster_health'],
+                'monster_current_health'   => $health['current_monster_health'],
                 'messages'                 => $messages,
             ]);
         }
 
-        if ($health['monster_health'] <= 0) {
-            $health['monster_health'] = 0;
+        if ($health['current_monster_health'] <= 0) {
+            $health['current_monster_health'] = 0;
 
             $messages[] = [
                 'message' => 'Your ambush has slaughtered the enemy!',
@@ -336,7 +336,7 @@ class RaidBattleService {
             RaidBossRewardHandler::dispatch($character->id, $raid->id, $monsterId);
 
             return $this->successResult([
-                'character_current_health' => $health['character_health'],
+                'character_current_health' => $health['current_character_health'],
                 'monster_current_health'   => 0,
                 'messages'                 => $messages,
             ]);
@@ -379,7 +379,7 @@ class RaidBattleService {
         $raidBoss  = RaidBoss::where('raid_boss_id', $monsterId)->first();
         $oldHealth = $raidBoss->boss_current_hp;
 
-        $currentHealth = empty($health) ? $this->monsterPlayerFight->getMonsterHealth() : $health['monster_health'];
+        $currentHealth = empty($health) ? $this->monsterPlayerFight->getMonsterHealth() : $health['current_monster_health'];
 
         $this->updateRaidBossHealth($raidBoss, $currentHealth);
 

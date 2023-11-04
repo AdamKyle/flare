@@ -280,9 +280,9 @@ class MonsterPlayerFight {
         $health = $ambush->getHealthObject();
 
         $health['max_character_health']     = (int) $this->characterCacheData->getCachedCharacterData($this->character, 'health');
-        $health['current_character_health'] = (int) $this->characterCacheData->getCachedCharacterData($this->character, 'health');
+        $health['current_character_health'] = $health['current_character_health'] <= 0 ? 0 : $health['current_character_health'];
         $health['max_monster_health']       = $monster->getHealth();
-        $health['current_monster_health']   = $monster->getHealth();
+        $health['current_monster_health']   = $health['current_monster_health'] <= 0 ? 0 : $health['current_monster_health'];
 
         $data = [
             'health'                => $health,
@@ -293,7 +293,7 @@ class MonsterPlayerFight {
             'rank'                  => $rank,
         ];
 
-        if ($isRankFight && ($data['health']['character_health'] > 0 && $data['health']['monster_health'] > 0)) {
+        if ($isRankFight && ($data['health']['current_character_health'] > 0 && $data['health']['current_monster_health'] > 0)) {
             Cache::put('rank-fight-for-character-' . $this->character->id, $data);
         }
 
@@ -359,7 +359,7 @@ class MonsterPlayerFight {
         $isPlayerVoided = $data['player_voided'];
         $isEnemyVoided  = $data['enemy_voided'];
 
-        if ($health['character_health'] <= 0) {
+        if ($health['current_character_health'] <= 0) {
             $this->battleMessages[] = [
                 'message' => 'The enemies ambush has slaughtered you!',
                 'type'    => 'enemy-action',
@@ -368,7 +368,7 @@ class MonsterPlayerFight {
             return false;
         }
 
-        if ($health['monster_health'] <= 0) {
+        if ($health['current_monster_health'] <= 0) {
             $this->battleMessages[] = [
                 'message' => 'Your ambush has slaughtered the enemy!',
                 'type'    => 'enemy-action',

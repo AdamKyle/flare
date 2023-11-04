@@ -52,8 +52,8 @@ class Attack {
     }
 
     public function setHealth(array $healthObject): Attack {
-        $this->characterHealth = $healthObject['character_health'];
-        $this->monsterHealth   = $healthObject['monster_health'];
+        $this->characterHealth = $healthObject['current_character_health'];
+        $this->monsterHealth   = $healthObject['current_monster_health'];
 
         return $this;
     }

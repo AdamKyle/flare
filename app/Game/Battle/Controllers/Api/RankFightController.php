@@ -48,8 +48,8 @@ class RankFightController extends Controller {
                     ]
                 ],
                 'health'   => [
-                    'character_health' => 0,
-                    'monster_health'   => 0,
+                    'current_character_health' => 0,
+                    'current_monster_health'   => 0,
                 ],
             ]);
         }
@@ -79,8 +79,8 @@ class RankFightController extends Controller {
                     ]
                 ],
                 'health'   => [
-                    'character_health' => 0,
-                    'monster_health'   => 0,
+                    'current_character_health' => 0,
+                    'current_monster_health'   => 0,
                 ],
             ]);
         }
@@ -92,6 +92,4 @@ class RankFightController extends Controller {
 
         return response()->json($result, $status);
     }
-
-
 }

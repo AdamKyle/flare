@@ -168,7 +168,7 @@ class GuideQuestService {
             $difference = array_diff($requiredAttributes, $this->completedAttributes);
 
             $this->guideQuestRequirementsService->resetFinishedRequirements();
-            dump($difference);
+
             if (empty($difference)) {
                 return true;
             }
