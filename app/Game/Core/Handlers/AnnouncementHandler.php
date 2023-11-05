@@ -23,7 +23,7 @@ class AnnouncementHandler {
             'monthly_pvp' => $this->buildMonthlyPVPMessage(),
             'weekly_celestial_spawn' => $this->buildWeeklyCelestialMessage(),
             'weekly_currency_drop' => $this->buildWeeklyCurrencyDrop(),
-            'createAnnouncement' => $this->buildWinterEventMessage(),
+            'winter_event' => $this->buildWinterEventMessage(),
             default => throw new Exception('Cannot determine announcement type'),
         };
     }

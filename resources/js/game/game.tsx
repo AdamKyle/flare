@@ -651,10 +651,13 @@ export default class Game extends React.Component<GameProps, GameState> {
                                     />
                                 </BasicCard>
                                 <BasicCard
-                                    additionalClasses={clsx("min-h-60", {
-                                        "ml-auto mr-auto":
-                                            this.state.view_port < 1600,
-                                    })}
+                                    additionalClasses={clsx(
+                                        "min-h-60",
+                                        {
+                                            "ml-auto mr-auto":
+                                                this.state.view_port < 1600,
+                                        }
+                                    )}
                                 >
                                     {this.state.view_port < 1600 ? (
                                         <SmallerActions

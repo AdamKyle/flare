@@ -99,7 +99,7 @@ class TraverseService {
         $gameMap = GameMap::find($mapId);
 
         if ($gameMap->mapType()->isLabyrinth()) {
-            $hasItem = $character->inventory->slots->filter(function($slot) {
+            $hasItem = $character->inventory->slots->filter(function ($slot) {
                 return $slot->item->effect === ItemEffectsValue::LABYRINTH;
             })->all();
 
@@ -107,7 +107,7 @@ class TraverseService {
         }
 
         if ($gameMap->mapType()->isDungeons()) {
-            $hasItem = $character->inventory->slots->filter(function($slot) {
+            $hasItem = $character->inventory->slots->filter(function ($slot) {
                 return $slot->item->effect === ItemEffectsValue::DUNGEON;
             })->all();
 
@@ -115,7 +115,7 @@ class TraverseService {
         }
 
         if ($gameMap->mapType()->isShadowPlane()) {
-            $hasItem = $character->inventory->slots->filter(function($slot) {
+            $hasItem = $character->inventory->slots->filter(function ($slot) {
                 return $slot->item->effect === ItemEffectsValue::SHADOWPLANE;
             })->all();
 
@@ -123,15 +123,15 @@ class TraverseService {
         }
 
         if ($gameMap->mapType()->isHell()) {
-            $hasItem = $character->inventory->slots->filter(function($slot) {
+            $hasItem = $character->inventory->slots->filter(function ($slot) {
                 return $slot->item->effect === ItemEffectsValue::HELL;
             })->all();
 
             return !empty($hasItem);
         }
 
-        if ($gameMap->mapType()->isPurgatory()) {
-            $hasItem = $character->inventory->slots->filter(function($slot) {
+        if ($gameMap->mapType()->isPurgatory() || $gameMap->mapType()->isTheIcePlane()) {
+            $hasItem = $character->inventory->slots->filter(function ($slot) {
                 return $slot->item->effect === ItemEffectsValue::PURGATORY;
             })->all();
 
@@ -228,13 +228,13 @@ class TraverseService {
         $x = $character->map->character_position_x;
         $y = $character->map->character_position_y;
 
-        Kingdom::where('x_position',$x)
-               ->where('y_position', $y)
-               ->where('character_id', $character->id)
-               ->where('game_map_id', $mapId)
-               ->update([
-                   'last_walked' => now(),
-               ]);
+        Kingdom::where('x_position', $x)
+            ->where('y_position', $y)
+            ->where('character_id', $character->id)
+            ->where('game_map_id', $mapId)
+            ->update([
+                'last_walked' => now(),
+            ]);
     }
 
     /**
@@ -283,7 +283,8 @@ class TraverseService {
         $x = $cache['x'];
         $y = $cache['y'];
 
-        if (!$this->mapTileValue->canWalkOnWater($character, $character->map->character_position_x, $character->map->character_position_y) ||
+        if (
+            !$this->mapTileValue->canWalkOnWater($character, $character->map->character_position_x, $character->map->character_position_y) ||
             !$this->mapTileValue->canWalkOnDeathWater($character, $character->map->character_position_x, $character->map->character_position_y) ||
             !$this->mapTileValue->canWalkOnMagma($character, $character->map->character_position_x, $character->map->character_position_y) ||
             $this->mapTileValue->isPurgatoryWater($this->mapTileValue->getTileColor($character, $character->map->character_position_x, $character->map->character_position_y))

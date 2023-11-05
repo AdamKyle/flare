@@ -146,7 +146,7 @@ class MapNameValue {
                     'xp_bonus'                     => 0.50,
                     'skill_training_bonus'         => 0.50,
                     'drop_chance_bonus'            => 0.30,
-                    'enemy_stat_bonus'             => 0.30,
+                    'enemy_stat_bonus'             => 0.35,
                     'character_attack_reduction'   => 0.30,
                     'required_location_id'         => null,
                 ];

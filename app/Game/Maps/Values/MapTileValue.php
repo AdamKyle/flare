@@ -27,7 +27,7 @@ class MapTileValue {
         $g = ($rgb >> 8) & 0xFF;
         $b = $rgb & 0xFF;
 
-        return $r.$g.$b;
+        return $r . $g . $b;
     }
 
     /**
@@ -103,7 +103,7 @@ class MapTileValue {
         $color = $this->getTileColor($character, $x, $y);
 
         if ($this->isDeathWaterTile((int) $color)) {
-            return $character->inventory->slots->filter(function($slot) {
+            return $character->inventory->slots->filter(function ($slot) {
                 return $slot->item->effect === ItemEffectsValue::WALK_ON_DEATH_WATER;
             })->isNotEmpty();
         }
@@ -125,7 +125,7 @@ class MapTileValue {
         $color = $this->getTileColor($character, $x, $y);
 
         if ($this->isWaterTile((int) $color)) {
-            return $character->inventory->slots->filter(function($slot) {
+            return $character->inventory->slots->filter(function ($slot) {
                 return $slot->item->effect === ItemEffectsValue::WALK_ON_WATER;
             })->isNotEmpty();
         }
@@ -146,7 +146,7 @@ class MapTileValue {
         $color = $this->getTileColor($character, $x, $y);
 
         if ($this->isMagma((int) $color)) {
-            return $character->inventory->slots->filter(function($slot) {
+            return $character->inventory->slots->filter(function ($slot) {
                 return $slot->item->effect === ItemEffectsValue::WALK_ON_MAGMA;
             })->isNotEmpty();
         }
