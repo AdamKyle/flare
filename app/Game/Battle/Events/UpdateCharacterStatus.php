@@ -9,7 +9,7 @@ use App\Flare\Models\GameSkill;
 use App\Flare\Models\MonthlyPvpParticipant;
 use App\Flare\Models\Skill;
 use App\Flare\Values\AutomationType;
-use App\Flare\Values\EventType;
+use App\Game\Events\Values\EventType;
 use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\PrivateChannel;

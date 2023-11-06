@@ -5,7 +5,7 @@ namespace App\Flare\Services;
 use App\Flare\Events\UpdateScheduledEvents;
 use App\Flare\Models\ScheduledEvent;
 use App\Flare\Models\ScheduledEventConfiguration;
-use App\Flare\Values\EventType;
+use App\Game\Events\Values\EventType;
 use App\Game\Core\Traits\ResponseBuilder;
 use Carbon\Carbon;
 

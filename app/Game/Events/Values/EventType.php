@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Flare\Values;
+namespace App\Game\Events\Values;
 
 use Exception;
 

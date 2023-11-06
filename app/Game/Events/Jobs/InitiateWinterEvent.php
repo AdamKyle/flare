@@ -10,7 +10,9 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use App\Flare\Models\ScheduledEvent;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Flare\Models\Event;
-use App\Flare\Values\EventType;
+use App\Flare\Models\GlobalEventGoal;
+use App\Game\Events\Values\EventType;
+use App\Game\Events\Values\GlobalEventForEventTypeValue;
 use Facades\App\Game\Core\Handlers\AnnouncementHandler;
 
 class InitiateWinterEvent implements ShouldQueue {
@@ -53,8 +55,18 @@ class InitiateWinterEvent implements ShouldQueue {
             'ends_at'    => $event->end_date
         ]);
 
-        event(new GlobalMessageEvent('The Ice Queen has opened the gates to her realm. She calls on valiant heros of Tlessa to help her fight back the corruption that seeks to melt her dynasty!'));
+        event(new GlobalMessageEvent('A winter chill sets over you. You turn and see the gates to the Ice Queens Realm is open. Do you dare enter? (Players just have to traverse to the new plane, you can do with this the traverse on desktop or Map Movement -> Traverse on Mobile.)'));
 
         AnnouncementHandler::createAnnouncement('winter_event');
+
+        $this->kickOffGlobalEventGoal();
+    }
+
+    public function kickOffGlobalEventGoal() {
+        $globalEventGoalData = GlobalEventForEventTypeValue::returnGlobalEventInfoForSeasonalEvents(EventType::WINTER_EVENT);
+
+        GlobalEventGoal::create($globalEventGoalData);
+
+        event(new GlobalMessageEvent('While on the The Ice Plane, characters who kill: ANY CREATURE in either manual or exploration, will increase the new: Global Event Goal. Players will be rewarded with random Corrupted Ice Gear when specific milestones are reached.'));
     }
 }

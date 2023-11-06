@@ -9,7 +9,7 @@ use App\Flare\Models\ScheduledEvent;
 use App\Flare\Services\EventSchedulerService;
 use App\Http\Controllers\Controller;
 use App\Admin\Requests\ManageEventRequest;
-use App\Flare\Values\EventType;
+use App\Game\Events\Values\EventType;
 
 class EventScheduleController extends Controller {
 

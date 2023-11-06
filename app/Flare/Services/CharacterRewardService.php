@@ -11,7 +11,7 @@ use App\Flare\Models\Monster;
 use App\Flare\Models\Location;
 use App\Flare\Models\Character;
 use App\Flare\Models\Inventory;
-use App\Flare\Values\EventType;
+use App\Game\Events\Values\EventType;
 use League\Fractal\Resource\Item;
 use App\Flare\Values\LocationType;
 use App\Flare\Models\InventorySlot;

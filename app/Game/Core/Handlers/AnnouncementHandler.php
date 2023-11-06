@@ -7,7 +7,7 @@ use App\Flare\Models\Event;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Location;
 use App\Flare\Models\Raid;
-use App\Flare\Values\EventType;
+use App\Game\Events\Values\EventType;
 use App\Game\Messages\Events\AnnouncementMessageEvent;
 use Exception;
 

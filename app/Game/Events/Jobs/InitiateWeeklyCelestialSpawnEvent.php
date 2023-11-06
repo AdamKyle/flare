@@ -10,7 +10,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use App\Flare\Jobs\WeeklyCelestialSpawnEvent as SpawnCancelingJob;
 use App\Flare\Models\Event;
 use App\Flare\Models\ScheduledEvent;
-use App\Flare\Values\EventType;
+use App\Game\Events\Values\EventType;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use Facades\App\Game\Core\Handlers\AnnouncementHandler;
 use Illuminate\Support\Facades\Cache;

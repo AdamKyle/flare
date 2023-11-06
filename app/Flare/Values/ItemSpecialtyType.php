@@ -14,6 +14,7 @@ class ItemSpecialtyType {
     const HELL_FORGED         = 'Hell Forged';
     const PURGATORY_CHAINS    = 'Purgatory Chains';
     const PIRATE_LORD_LEATHER = 'Pirate Lord Leather';
+    const CORRUPTED_ICE       = 'Corrupted Ice';
 
     /**
      * @var string[] $values
@@ -22,6 +23,7 @@ class ItemSpecialtyType {
         self::HELL_FORGED         => 'Hell Forged',
         self::PURGATORY_CHAINS    => 'Purgatory Chains',
         self::PIRATE_LORD_LEATHER => 'Pirate Lord Leather',
+        self::CORRUPTED_ICE       => 'Corrupted Ice',
     ];
 
     /**
@@ -67,5 +69,14 @@ class ItemSpecialtyType {
      */
     public function isPirateLordLeather(): bool {
         return $this->value === self::PIRATE_LORD_LEATHER;
+    }
+
+    /**
+     * Is Corrupted Ice
+     *
+     * @return boolean
+     */
+    public function isCorruptedIce(): bool {
+        return $this->value === self::CORRUPTED_ICE;
     }
 }

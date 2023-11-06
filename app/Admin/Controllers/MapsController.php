@@ -10,7 +10,7 @@ use App\Flare\Models\Location;
 use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Models\GameMap;
 use App\Admin\Requests\MapUploadValidation;
-use App\Flare\Values\EventType;
+use App\Game\Events\Values\EventType;
 
 class MapsController extends Controller {
 

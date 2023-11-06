@@ -2,7 +2,7 @@
 
 namespace App\Flare\Models;
 
-use App\Flare\Values\EventType;
+use App\Game\Events\Values\EventType;
 use App\Flare\Values\ItemSpecialtyType;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;

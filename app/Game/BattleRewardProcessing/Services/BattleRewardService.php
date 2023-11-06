@@ -10,7 +10,7 @@ use App\Flare\Models\GlobalEventGoal;
 use App\Game\Core\Services\GoldRush;
 use App\Game\Battle\Handlers\FactionHandler;
 use App\Flare\Services\CharacterRewardService;
-use App\Flare\Values\EventType;
+use App\Game\Events\Values\EventType;
 use App\Game\Battle\Handlers\GlobalEventParticipationHandler;
 use App\Game\Battle\Jobs\BattleItemHandler;
 
@@ -24,10 +24,12 @@ class BattleRewardService {
     private GoldRush $goldRush;
     private GlobalEventParticipationHandler $globalEventParticipationHandler;
 
-    public function __construct(FactionHandler $factionHandler,
+    public function __construct(
+        FactionHandler $factionHandler,
         CharacterRewardService $characterRewardService,
         GoldRush $goldRush,
-        GlobalEventParticipationHandler $globalEventParticipationHandler) {
+        GlobalEventParticipationHandler $globalEventParticipationHandler
+    ) {
         $this->factionHandler                  = $factionHandler;
         $this->characterRewardService          = $characterRewardService;
         $this->goldRush                        = $goldRush;

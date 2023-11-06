@@ -10,7 +10,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use App\Flare\Models\ScheduledEvent;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Flare\Models\Event;
-use App\Flare\Values\EventType;
+use App\Game\Events\Values\EventType;
 use Facades\App\Game\Core\Handlers\AnnouncementHandler;
 
 class InitiateWeeklyCurrencyDropEvent implements ShouldQueue {

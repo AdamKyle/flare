@@ -2,7 +2,7 @@
 
 namespace App\Flare\Models;
 
-use App\Flare\Values\EventType;
+use App\Game\Events\Values\EventType;
 use Illuminate\Database\Eloquent\Model;
 
 class ScheduledEvent extends Model {

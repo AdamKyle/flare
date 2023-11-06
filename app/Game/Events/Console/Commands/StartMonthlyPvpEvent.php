@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Console\Commands;
+namespace App\Game\Events\Console\Commands;
 
 use App\Flare\Models\Announcement;
 use App\Flare\Models\Character;
 use App\Flare\Models\Event;
-use App\Flare\Values\EventType;
+use App\Game\Events\Values\EventType;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Battle\Jobs\MonthlyPvpAutomation;
 use App\Game\Messages\Events\DeleteAnnouncementEvent;

@@ -10,7 +10,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use App\Flare\Models\ScheduledEvent;
 use App\Flare\Models\User;
-use App\Flare\Values\EventType;
+use App\Game\Events\Values\EventType;
 use App\Flare\Values\UserOnlineValue;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Messages\Events\GlobalMessageEvent;
