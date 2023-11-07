@@ -4,7 +4,7 @@ namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Flare\Models\ScheduledEvent;
-use App\Flare\Values\EventType;
+use App\Game\Events\Values\EventType;
 
 class ScheduledEventFactory extends Factory {
     /**

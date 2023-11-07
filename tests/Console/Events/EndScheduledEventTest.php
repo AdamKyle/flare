@@ -1,11 +1,11 @@
 <?php
 
-namespace Tests\Console;
+namespace Tests\Console\Events;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\Models\Announcement;
 use App\Flare\Models\Event;
-use App\Flare\Values\EventType;
+use App\Game\Events\Values\EventType;
 use Illuminate\Support\Facades\Cache;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;

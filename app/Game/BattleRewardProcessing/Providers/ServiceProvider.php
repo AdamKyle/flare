@@ -6,6 +6,7 @@ use App\Flare\Models\GlobalEventGoal;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use App\Flare\Services\CharacterRewardService;
 use App\Game\Battle\Handlers\FactionHandler;
+use App\Game\Battle\Handlers\GlobalEventParticipationHandler;
 use App\Game\BattleRewardProcessing\Services\BattleRewardService;
 use App\Game\BattleRewardProcessing\Services\SecondaryRewardService;
 use App\Game\ClassRanks\Services\ClassRankService;
@@ -26,7 +27,7 @@ class ServiceProvider extends ApplicationServiceProvider {
                 $app->make(FactionHandler::class),
                 $app->make(CharacterRewardService::class),
                 $app->make(GoldRush::class),
-                $app->make(GlobalEventGoal::class)
+                $app->make(GlobalEventParticipationHandler::class)
             );
         });
 

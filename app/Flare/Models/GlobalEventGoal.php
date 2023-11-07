@@ -4,10 +4,14 @@ namespace App\Flare\Models;
 
 use App\Game\Events\Values\EventType;
 use App\Flare\Values\ItemSpecialtyType;
+use Database\Factories\GlobalEventGoalFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class GlobalEventGoal extends Model {
+
+    use HasFactory;
 
     /**
      * The attributes that are mass assignable.
@@ -59,5 +63,9 @@ class GlobalEventGoal extends Model {
 
     public function getTotalKillsAttribute(): int {
         return $this->globalEventParticipation->sum('current_kills');
+    }
+
+    protected static function newFactory() {
+        return GlobalEventGoalFactory::new();
     }
 }

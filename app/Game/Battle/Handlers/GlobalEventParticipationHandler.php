@@ -24,7 +24,7 @@ class GlobalEventParticipationHandler {
 
         $globalEventParticipation = $character->globalEventParticipation;
 
-        if ($globalEventParticipation->isEmpty()) {
+        if (is_null($globalEventParticipation)) {
             $character->globalEventParticipation()->create([
                 'global_event_goal_id' => $globalEventGoal->id,
                 'character_id'         => $character->id,

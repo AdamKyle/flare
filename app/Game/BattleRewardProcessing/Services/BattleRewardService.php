@@ -59,6 +59,8 @@ class BattleRewardService {
 
         $this->goldRush->processPotentialGoldRush($this->character, $this->monster);
 
+        $this->handleGlobalEventGoals();
+
         BattleItemHandler::dispatch($this->character, $this->monster);
     }
 

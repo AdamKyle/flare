@@ -227,6 +227,7 @@ return [
         /**
          * Game Related
          */
+        App\Game\Events\Providers\ServiceProvider::class,
         App\Game\Exploration\Providers\ServiceProvider::class,
         App\Game\CharacterInventory\Providers\ServiceProvider::class,
         App\Game\Core\Providers\ServiceProvider::class,

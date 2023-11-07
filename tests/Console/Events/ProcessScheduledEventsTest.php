@@ -1,11 +1,12 @@
 <?php
 
-namespace Tests\Console;
+namespace Tests\Console\Events;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\Models\Announcement;
 use App\Flare\Models\Event;
-use App\Flare\Values\EventType;
+use App\Flare\Models\GlobalEventGoal;
+use App\Game\Events\Values\EventType;
 use Tests\TestCase;
 use Tests\Traits\CreateGameMap;
 use Tests\Traits\CreateItem;
@@ -99,5 +100,18 @@ class ProcessScheduledEventsTest extends TestCase {
 
         $this->assertGreaterThan(0, Event::count());
         $this->assertGreaterThan(0, Announcement::count());
+    }
+
+    public function testWinterEvent() {
+        $this->createScheduledEvent([
+            'event_type' => EventType::WINTER_EVENT,
+            'start_date' => now()->addMinutes(5),
+        ]);
+
+        $this->artisan('process:scheduled-events');
+
+        $this->assertGreaterThan(0, Event::count());
+        $this->assertGreaterThan(0, Announcement::count());
+        $this->assertGreaterThan(0, GlobalEventGoal::count());
     }
 }

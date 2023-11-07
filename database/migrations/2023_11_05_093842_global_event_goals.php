@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -16,9 +15,9 @@ return new class extends Migration
             $table->bigInteger('reward_every_kills');
             $table->bigInteger('next_reward_at');
             $table->integer('event_type');
-            $table->integer('item_specialty_type_reward');
+            $table->string('item_specialty_type_reward');
             $table->boolean('should_be_unique');
-            $table->integer('unique_type');
+            $table->bigInteger('unique_type');
             $table->boolean('should_be_mythic');
             $table->timestamps();
         });

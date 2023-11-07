@@ -5,7 +5,7 @@ namespace Tests\Unit\Game\Events\Jobs;
 use App\Flare\Jobs\WeeklyCelestialSpawnEvent;
 use App\Flare\Models\Announcement;
 use App\Flare\Models\Event as ModelsEvent;
-use App\Flare\Values\EventType;
+use App\Game\Events\Values\EventType;
 use App\Game\Events\Jobs\InitiateWeeklyCelestialSpawnEvent;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;

@@ -4,16 +4,17 @@ namespace Tests\Unit\Game\Events\Jobs;
 
 use App\Flare\Models\Announcement;
 use App\Flare\Models\Event as ModelsEvent;
+use App\Flare\Models\GlobalEventGoal;
 use App\Game\Events\Values\EventType;
-use App\Game\Events\Jobs\InitiateWeeklyCelestialSpawnEvent;
 use App\Game\Events\Jobs\InitiateWeeklyCurrencyDropEvent;
+use App\Game\Events\Jobs\InitiateWinterEvent;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use Tests\TestCase;
 use Tests\Traits\CreateScheduledEvent;
 
-class InitiateWeeklyCurrencyDropEventTest extends TestCase {
+class InitiateWinterEventTest extends TestCase {
 
     use RefreshDatabase, CreateScheduledEvent;
 
@@ -33,27 +34,29 @@ class InitiateWeeklyCurrencyDropEventTest extends TestCase {
         parent::tearDown();
     }
 
-    public function testWeeklyCurrencyEventDoesNotTrigger() {
+    public function testWinterEventDoesNotTrigger() {
         Event::fake();
 
-        InitiateWeeklyCurrencyDropEvent::dispatch(3);
+        InitiateWinterEvent::dispatch(3);
 
         Event::assertNotDispatched(GlobalMessageEvent::class);
         $this->assertEmpty(Announcement::all());
         $this->assertEmpty(ModelsEvent::all());
+        $this->assertEmpty(GlobalEventGoal::all());
     }
 
-    public function testWeeklyCurrencyEventDoesTrigger() {
+    public function testWinterEventDoesTrigger() {
         Event::fake();
 
         $event = $this->createScheduledEvent([
-            'event_type' => EventType::WEEKLY_CURRENCY_DROPS
+            'event_type' => EventType::WINTER_EVENT
         ]);
 
-        InitiateWeeklyCurrencyDropEvent::dispatch($event->id);
+        InitiateWinterEvent::dispatch($event->id);
 
         Event::assertDispatched(GlobalMessageEvent::class);
         $this->assertNotEmpty(Announcement::all());
         $this->assertNotEmpty(ModelsEvent::all());
+        $this->assertNotEmpty(GlobalEventGoal::all());
     }
 }
