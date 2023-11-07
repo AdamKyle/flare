@@ -178,7 +178,7 @@ class CharacterRewardService {
                 $locationType = new LocationType($specialLocation->type);
 
                 if ($locationType->isGoldMines()) {
-                    $shards = rand(1, 25);
+                    $shards = rand(1, 1000);
 
                     $shards = $shards + $shards * $this->getShardBonus($this->character);
 
@@ -211,17 +211,17 @@ class CharacterRewardService {
                 return $slot->item->effect === ItemEffectsValue::GET_COPPER_COINS;
             })->isNotEmpty();
 
-            $shards = rand(1, 50);
+            $shards = rand(1, 500);
             $shards = $shards + $shards * $this->getShardBonus($this->character);
 
-            $goldDust = rand(1, 50);
+            $goldDust = rand(1, 500);
             $goldDust = $goldDust + $goldDust * $this->getGoldDustBonus($this->character);
 
             $characterShards      = $this->character->shards + $shards;
             $characterGoldDust    = $this->character->gold_dust + $goldDust;
 
             if ($canHaveCopperCoins) {
-                $copperCoins = rand(1, 50);
+                $copperCoins = rand(1, 150);
                 $copperCoins = $copperCoins + $copperCoins * $this->getCopperCoinBonus($this->character);
 
                 $characterCopperCoins = $this->character->copper_coins + $copperCoins;
