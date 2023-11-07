@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Game\Events\Jobs;
+namespace Tests\Unit\Game\Events\Values;
 
 use Exception;
 use App\Game\Events\Values\EventType;

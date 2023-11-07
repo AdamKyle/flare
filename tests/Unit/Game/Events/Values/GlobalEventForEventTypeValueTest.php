@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Game\Events\Jobs;
+namespace Tests\Unit\Game\Events\Values;
 
 use App\Flare\Values\ItemSpecialtyType;
 use App\Flare\Values\RandomAffixDetails;
