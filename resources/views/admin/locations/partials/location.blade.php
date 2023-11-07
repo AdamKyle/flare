@@ -17,7 +17,7 @@
     @if (!is_null($locationType))
         @if ($locationType->isGoldMines())
             <h3 class="mb-4">Welcome to Gold Mines</h3>
-            <p class="mb-4"> This location will let you explore here, for shards to drop off enemies. 1-25 shards per kill.</p>
+            <p class="mb-4"> This location will let you explore here, for shards to drop off enemies. 1-1000 shards per kill.</p>
         @endif
 
         @if ($locationType->isPurgatoryDungeons())
