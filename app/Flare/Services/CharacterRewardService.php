@@ -178,7 +178,7 @@ class CharacterRewardService {
                 $locationType = new LocationType($specialLocation->type);
 
                 if ($locationType->isGoldMines()) {
-                    $shards = rand(1, 25);
+                    $shards = rand(1, 1000);
 
                     $shards = $shards + $shards * $this->getShardBonus($this->character);
 
