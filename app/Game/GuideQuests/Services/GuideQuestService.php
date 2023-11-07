@@ -204,6 +204,14 @@ class GuideQuestService {
                 continue;
             }
 
+            if ($key === 'required_skill_type') {
+                continue;
+            }
+
+            if ($key === 'required_kingdom_building_id') {
+                continue;
+            }
+
             if (str_contains($key, 'required') !== false) {
                 if (!is_null($attributes[$key])) {
                     $requiredAttributes[] = $key;

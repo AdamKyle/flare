@@ -106,8 +106,8 @@ class RankFightService {
 
         $messages = $monsterPlayerFight->getBattleMessages();
 
-        if ($health['character_health'] <= 0) {
-            $health['character_health'] = 0;
+        if ($health['current_character_health'] <= 0) {
+            $health['current_character_health'] = 0;
 
             $messages[] = [
                 'message' => 'The enemies ambush has slaughtered you!',
@@ -128,8 +128,8 @@ class RankFightService {
             ]);
         }
 
-        if ($health['monster_health'] <= 0) {
-            $health['monster_health'] = 0;
+        if ($health['current_monster_health'] <= 0) {
+            $health['current_monster_health'] = 0;
 
             $messages[] = [
                 'message' => 'Your ambush has slaughtered the enemy!',
@@ -184,8 +184,8 @@ class RankFightService {
             return $this->successResult([
                 'messages' => $messages,
                 'health'   => [
-                    'character_health' => $characterHealth,
-                    'monster_health'   => 0,
+                    'current_character_health' => $characterHealth,
+                    'current_monster_health'   => 0,
                 ],
                 'is_dead'  => false,
             ]);
@@ -204,8 +204,8 @@ class RankFightService {
 
             return $this->successResult([
                 'health'   => [
-                    'character_health' => 0,
-                    'monster_health'   => $monsterHealth,
+                    'current_character_health' => 0,
+                    'current_monster_health'   => $monsterHealth,
                 ],
                 'messages' => $this->monsterPlayerFight->getBattleMessages(),
                 'is_dead'  => true,
@@ -217,8 +217,8 @@ class RankFightService {
         return $this->successResult([
             'messages' => $this->monsterPlayerFight->getBattleMessages(),
             'health'   => [
-                'character_health' => $characterHealth,
-                'monster_health'   => $this->monsterPlayerFight->getMonsterHealth(),
+                'current_character_health' => $characterHealth,
+                'current_monster_health'   => $this->monsterPlayerFight->getMonsterHealth(),
             ]
         ]);
     }
@@ -233,8 +233,8 @@ class RankFightService {
         $cacheData = Cache::get('rank-fight-for-character-' . $character->id);
 
         if (!is_null($cacheData)) {
-            $cacheData['health']['character_health'] = $this->monsterPlayerFight->getCharacterHealth();
-            $cacheData['health']['monster_health'] = $this->monsterPlayerFight->getMonsterHealth();
+            $cacheData['health']['current_character_health'] = $this->monsterPlayerFight->getCharacterHealth();
+            $cacheData['health']['current_monster_health'] = $this->monsterPlayerFight->getMonsterHealth();
 
             Cache::put('rank-fight-for-character-' . $character->id, $cacheData);
         }

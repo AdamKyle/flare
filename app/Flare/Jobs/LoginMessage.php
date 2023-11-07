@@ -3,7 +3,7 @@
 namespace App\Flare\Jobs;
 
 use App\Flare\Models\Event;
-use App\Flare\Values\EventType;
+use App\Game\Events\Values\EventType;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -14,8 +14,7 @@ use App\Flare\Models\Character;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
 
-class LoginMessage implements ShouldQueue
-{
+class LoginMessage implements ShouldQueue {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     /**

@@ -11,6 +11,14 @@ class MapChatColor {
     const HELL      = '#ff7d8e';
     const PURGATORY = '#639cff';
 
+    // Special Event Maps
+    const ICE_PLANE = '#485ead';
+
+    /**
+     * @var string $mapName
+     */
+    private string $mapName;
+
     /**
      * MapChatColor constructor.
      *
@@ -19,7 +27,6 @@ class MapChatColor {
     public function __construct(string $mapName) {
         $this->mapName = $mapName;
     }
-
 
     /**
      * Gets the chat color.
@@ -38,6 +45,8 @@ class MapChatColor {
                 return self::HELL;
             case 'Purgatory':
                 return self::PURGATORY;
+            case 'The Ice Plane':
+                return self::ICE_PLANE;
             case 'Surface':
             default:
                 return self::SURFACE;

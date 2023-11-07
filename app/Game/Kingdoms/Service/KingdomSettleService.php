@@ -66,6 +66,10 @@ class KingdomSettleService {
             return $this->errorResult('Child, this is not place to be a King or Queen, The Creator would destroy anything you build down here.');
         }
 
+        if ($character->map->gameMap->mapType()->isTheIcePlane()) {
+            return $this->errorResult('The Queen of Ice will not allow you to settle here child.');
+        }
+
         $kingdom = Kingdom::where('name', $kingdomName)->where('game_map_id', $character->map->game_map_id)->first();
 
         if (!is_null($kingdom)) {

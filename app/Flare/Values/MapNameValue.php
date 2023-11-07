@@ -18,16 +18,20 @@ class MapNameValue {
     const HELL                   = 'Hell';
     const PURGATORY              = 'Purgatory';
 
+    // Event Specific Panes:
+    const ICE_PLANE              = 'The Ice Plane';
+
     /**
      * @var array $values
      */
     protected static $values = [
-        'Surface'      => self::SURFACE,
-        'Labyrinth'    => self::LABYRINTH,
-        'Dungeons'     => self::DUNGEONS,
-        'Shadow Plane' => self::SHADOW_PLANE,
-        'Hell'         => self::HELL,
-        'Purgatory'    => self::PURGATORY,
+        'Surface'       => self::SURFACE,
+        'Labyrinth'     => self::LABYRINTH,
+        'Dungeons'      => self::DUNGEONS,
+        'Shadow Plane'  => self::SHADOW_PLANE,
+        'Hell'          => self::HELL,
+        'Purgatory'     => self::PURGATORY,
+        'The Ice Plane' => self::ICE_PLANE,
     ];
 
     /**
@@ -40,6 +44,7 @@ class MapNameValue {
         self::SHADOW_PLANE => '#000000',
         self::HELL         => '#1194d1',
         self::PURGATORY    => '#000000',
+        self::ICE_PLANE    => '#cebeeb',
     ];
 
     /**
@@ -71,8 +76,7 @@ class MapNameValue {
      * @param string $value
      * @throws \Exception
      */
-    public function __construct(string $value)
-    {
+    public function __construct(string $value) {
         if (!in_array($value, self::$values)) {
             throw new \Exception($value . ' does not exist.');
         }
@@ -80,28 +84,32 @@ class MapNameValue {
         $this->value = $value;
     }
 
-    public function isSurface() : bool {
+    public function isSurface(): bool {
         return $this->value === self::SURFACE;
     }
 
-    public function isLabyrinth() : bool {
+    public function isLabyrinth(): bool {
         return $this->value === self::LABYRINTH;
     }
 
-    public function isDungeons() : bool {
+    public function isDungeons(): bool {
         return $this->value === self::DUNGEONS;
     }
 
-    public function isShadowPlane() : bool {
+    public function isShadowPlane(): bool {
         return $this->value === self::SHADOW_PLANE;
     }
 
-    public function isHell() : bool {
+    public function isHell(): bool {
         return $this->value === self::HELL;
     }
 
-    public function isPurgatory() : bool {
+    public function isPurgatory(): bool {
         return $this->value === self::PURGATORY;
+    }
+
+    public function isTheIcePlane(): bool {
+        return $this->value === self::ICE_PLANE;
     }
 
     public function getMapModifers(): array {
@@ -132,6 +140,15 @@ class MapNameValue {
                     'enemy_stat_bonus'             => 0.30,
                     'character_attack_reduction'   => 0.25,
                     'required_location_id'         => Location::where('type', LocationType::TEAR_FABRIC_TIME)->first()->id,
+                ];
+            case self::ICE_PLANE:
+                return [
+                    'xp_bonus'                     => 0.50,
+                    'skill_training_bonus'         => 0.50,
+                    'drop_chance_bonus'            => 0.30,
+                    'enemy_stat_bonus'             => 0.35,
+                    'character_attack_reduction'   => 0.30,
+                    'required_location_id'         => null,
                 ];
             case self::SURFACE:
             case self::LABYRINTH:

@@ -10,6 +10,7 @@ use App\Flare\Builders\BuildMythicItem;
 use App\Flare\Builders\Character\CharacterCacheData;
 use App\Flare\Builders\RandomAffixGenerator;
 use App\Flare\Builders\RandomItemDropBuilder;
+use App\Flare\Models\GlobalEventParticipation;
 use App\Flare\ServerFight\Monster\BuildMonster;
 use App\Flare\ServerFight\MonsterPlayerFight;
 use App\Flare\ServerFight\Pvp\PvpAttack;
@@ -51,6 +52,12 @@ class ServiceProvider extends ApplicationServiceProvider
             return new FactionHandler(
                 $app->make(RandomAffixGenerator::class),
                 $app->make(GuideQuestService::class),
+            );
+        });
+
+        $this->app->bind(GlobalEventParticipation::class, function($app) {
+            return new GlobalEventParticipation(
+                $app->make(RandomAffixGenerator::class),
             );
         });
 

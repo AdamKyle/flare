@@ -59,6 +59,16 @@ class ReBalanceMonsters extends Command
 
         $this->manageMonsters($monsters, $exponentialAttributeCurve, 1000000, 4000000000, 100000, 500);
 
+        // Ice Plane Monsters:
+        $gameMap  = GameMap::where('name', MapNameValue::ICE_PLANE)->first();
+        $monsters = Monster::where('game_map_id', $gameMap->id)
+                           ->where('is_raid_monster', false)
+                           ->where('is_raid_boss', false)
+                           ->where('is_celestial_entity', false)
+                           ->get();
+
+        $this->manageMonsters($monsters, $exponentialAttributeCurve, 5000000, 8000000000, 1000000, 5000);
+
         // Raid Monsters:
         $gameMap  = GameMap::where('name', MapNameValue::SURFACE)->first();
         $monsters = Monster::orderBy('game_map_id')

@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Console\Commands;
+namespace App\Game\Events\Console\Commands;
 
 use App\Flare\Models\Raid;
 use App\Flare\Models\Event;
 use App\Flare\Models\Location;
 use App\Flare\Models\Character;
-use App\Flare\Values\EventType;
+use App\Game\Events\Values\EventType;
 use Illuminate\Console\Command;
 use App\Flare\Models\Announcement;
 use App\Flare\Models\ScheduledEvent;

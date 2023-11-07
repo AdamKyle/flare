@@ -31,7 +31,7 @@ class LocationEffectValue {
         self::INCREASE_STATS_BY_FIVE_HUNDRED      => '500pts and 5% towards resistances and skills.',
         self::INCREASE_STATS_BY_ONE_THOUSAND      => '1,000pts and 8% towards resistances and skills. ',
         self::INCREASE_STATS_BY_TWO_THOUSAND      => '2,000pts and 10% towards resistances and skills.',
-        self::INCREASE_STATS_BY_THREE_THOUSAND    => '3,000pts and 14$ towards resistances and skills.',
+        self::INCREASE_STATS_BY_THREE_THOUSAND    => '3,000pts and 14% towards resistances and skills.',
     ];
 
     protected static $integerValues = [

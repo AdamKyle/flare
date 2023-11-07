@@ -4,7 +4,7 @@ namespace App\Game\Raids\Services;
 
 use App\Flare\Models\Event;
 use App\Flare\Models\Raid;
-use App\Flare\Values\EventType;
+use App\Game\Events\Values\EventType;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Raids\Jobs\InitiateRaid;
 

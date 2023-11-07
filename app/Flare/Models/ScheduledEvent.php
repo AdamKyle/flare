@@ -2,9 +2,10 @@
 
 namespace App\Flare\Models;
 
-use App\Flare\Values\EventType;
+
 use Database\Factories\ScheduledEventFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Game\Events\Values\EventType;
 use Illuminate\Database\Eloquent\Model;
 
 class ScheduledEvent extends Model {
@@ -54,6 +55,10 @@ class ScheduledEvent extends Model {
 
         if ($type->isMonthlyPVP()) {
             return 'Monthly PVP';
+        }
+
+        if ($type->isWinterEvent()) {
+            return 'The Ice Queen\'s Realm';
         }
 
         return 'Event Name';

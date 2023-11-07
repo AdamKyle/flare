@@ -4,7 +4,7 @@ namespace App\Flare\Jobs;
 
 use App\Flare\Models\Event;
 use App\Flare\Models\ItemAffix;
-use App\Flare\Values\EventType;
+use App\Game\Events\Values\EventType;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -35,7 +35,7 @@ class RefactorAttributes implements ShouldQueue {
 
     public function handle() {
         $itemAffixes = ItemAffix::whereIn('id', $this->affixIds)->get();
-        
+
 
         foreach ($itemAffixes as $index => $affix) {
 

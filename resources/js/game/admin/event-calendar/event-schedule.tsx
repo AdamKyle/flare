@@ -13,6 +13,7 @@ import EventScheduleState from "./types/event-schedule-state";
 import EventView from "../../components/ui/scheduler/event-view";
 import PrimaryButton from "../../components/ui/buttons/primary-button";
 import GenerateEventType from "./modals/generate-event-type";
+import { DateTime } from "luxon";
 
 export default class EventSchedule extends React.Component<
     {},
@@ -43,8 +44,12 @@ export default class EventSchedule extends React.Component<
                 this.setState({
                     raids: result.data.raids,
                     events: result.data.events.map((event: ProcessedEvent) => {
-                        event.start = new Date(event.start);
-                        event.end = new Date(event.end);
+                        event.start = DateTime.fromJSDate(new Date(event.start))
+                            .toLocal()
+                            .toJSDate();
+                        event.end = DateTime.fromJSDate(new Date(event.end))
+                            .toLocal()
+                            .toJSDate();
                         event.color = event.currently_running
                             ? "#16a34a"
                             : this.color(event.title);

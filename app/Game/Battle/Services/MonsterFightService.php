@@ -27,7 +27,11 @@ class MonsterFightService {
 
         $data = $this->monsterPlayerFight->setUpFight($character, $params)->fightSetUp();
 
-        Cache::put('monster-fight-' . $character->id, $data, 900);
+        if ($data['health']['current_character_health'] <= 0) {
+            $this->battleEventHandler->processDeadCharacter($character);
+        } else {
+            Cache::put('monster-fight-' . $character->id, $data, 900);
+        }
 
         return $this->successResult($data);
     }
@@ -52,8 +56,8 @@ class MonsterFightService {
 
         $cache['health']['current_character_health'] = $characterHealth;
         $cache['health']['current_monster_health']   = $monsterHealth;
-        $cache['health']['character_health']         = $characterHealth;
-        $cache['health']['monster_health']           = $monsterHealth;
+        $cache['health']['current_character_health']         = $characterHealth;
+        $cache['health']['current_monster_health']           = $monsterHealth;
 
         if ($monsterHealth >= 0) {
             Cache::put('monster-fight-' . $character->id, $cache, 900);

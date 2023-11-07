@@ -70,20 +70,19 @@ class RandomEnchantmentService {
      * @return Collection
      */
     public function fetchUniquesFromCharactersInventory(Character $character): Collection {
-        return $character->inventory->slots->filter(function($slot) {
-            if (!$slot->equipped && ($slot->item->type !== 'quest' && $slot->item->type !== 'alchemy' && $slot->item->type !== 'trinket')) {
-                if (!is_null($slot->item->itemPrefix)) {
-                    if ($slot->item->itemPrefix->randomly_generated) {
-                        return $slot;
-                    }
-                }
-            }
+        return $character->inventory->slots->filter(function ($slot) {
+            $item = $slot->item;
 
-            if (!$slot->equipped && ($slot->item->type !== 'quest' && $slot->item->type !== 'alchemy' && $slot->item->type !== 'trinket')) {
-                if (!is_null($slot->item->itemSuffix)) {
-                    if ($slot->item->itemSuffix->randomly_generated) {
-                        return $slot;
-                    }
+            $item->load('itemPrefix', 'itemSuffix');
+
+            if (!$slot->equipped && ($item->is_mythic || $item->is_unique)) {
+                // Check if item has a prefix and it's randomly generated
+                if ($item->itemPrefix && $item->itemPrefix->randomly_generated) {
+                    return true;
+                }
+                // Check if item has a suffix and it's randomly generated
+                if ($item->itemSuffix && $item->itemSuffix->randomly_generated) {
+                    return true;
                 }
             }
         })->values();
@@ -112,13 +111,16 @@ class RandomEnchantmentService {
      * @return Collection
      */
     public function fetchNonUniqueItems(Character $character): Collection {
-        return $character->inventory->slots->filter(function($slot) {
-            if (!$slot->equipped &&
+        return $character->inventory->slots->filter(function ($slot) {
+            if (
+                !$slot->equipped &&
                 $slot->item->type !== 'quest' &&
                 $slot->item->type !== 'alchemy' &&
                 $slot->item->type !== 'trinket' &&
-                $slot->item->type !== 'artifact')
-            {
+                $slot->item->type !== 'artifact' &&
+                !$slot->item->is_mythic &&
+                !$slot->item->is_unique
+            ) {
                 if (!is_null($slot->item->itemPrefix)) {
                     if (!$slot->item->itemPrefix->randomly_generated) {
                         return $slot;
@@ -130,6 +132,8 @@ class RandomEnchantmentService {
                         return $slot;
                     }
                 }
+
+                return $slot;
             }
         })->values();
     }
@@ -141,7 +145,7 @@ class RandomEnchantmentService {
      * @return bool
      */
     public function isPlayerInHell(Character $character): bool {
-        return $character->inventory->slots->filter(function($slot) {
+        return $character->inventory->slots->filter(function ($slot) {
             return $slot->item->effect === ItemEffectsValue::QUEEN_OF_HEARTS;
         })->isNotEmpty() && $character->map->gameMap->mapType()->isHell();
     }
@@ -170,8 +174,8 @@ class RandomEnchantmentService {
             ->first();
 
         $randomAffix = $this->randomAffixGenerator
-                            ->setCharacter($character)
-                            ->setPaidAmount($amount);
+            ->setCharacter($character)
+            ->setPaidAmount($amount);
 
         $duplicateItem = $item->duplicate();
 

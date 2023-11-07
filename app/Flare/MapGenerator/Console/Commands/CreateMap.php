@@ -7,8 +7,7 @@ use Illuminate\Support\Str;
 use ChristianEssl\LandmapGeneration\Struct\Color;
 use App\Flare\MapGenerator\Builders\MapBuilder;
 
-class CreateMap extends Command
-{
+class CreateMap extends Command {
     /**
      * The name and signature of the console command.
      *
@@ -28,8 +27,7 @@ class CreateMap extends Command
      *
      * @return void
      */
-    public function __construct()
-    {
+    public function __construct() {
         parent::__construct();
     }
 
@@ -38,8 +36,7 @@ class CreateMap extends Command
      *
      * @return mixed
      */
-    public function handle()
-    {
+    public function handle() {
 
         // Surface:
         // $land  = new Color(23, 132, 72);
@@ -59,8 +56,8 @@ class CreateMap extends Command
         // Purgatory:
         // $land = new Color(0,0,0);
 
-        // Emerald Curse
-        $land = new Color(13, 133, 46);
+        // Ice Plane
+        $land = new Color(39, 84, 166);
 
         // Surface & Labyrinth:
         // $water = new Color(66, 129, 178);
@@ -77,8 +74,8 @@ class CreateMap extends Command
         // Purgatory Water:
         // $water = new Color(255, 255, 255);
 
-        // Emerald Curse Water:
-        $water = new Color(113, 227, 144);
+        // Ice Planes:
+        $water = new Color(195, 225, 250);
 
         // Regular Water Level
         // $waterLevel = 30;
@@ -92,13 +89,13 @@ class CreateMap extends Command
         // Emerald Curse Water Level:
         $waterLevel = 25;
 
-        ini_set('memory_limit','3G');
+        ini_set('memory_limit', '3G');
 
         resolve(MapBuilder::class)->setLandColor($land)
-                                  ->setWaterColor($water)
-                                  ->setMapHeight($this->argument('height'))
-                                  ->setMapWidth($this->argument('width'))
-                                  ->setMapSeed($this->argument('randomness'))
-                                  ->buildMap($this->argument('name'), $waterLevel);
+            ->setWaterColor($water)
+            ->setMapHeight($this->argument('height'))
+            ->setMapWidth($this->argument('width'))
+            ->setMapSeed($this->argument('randomness'))
+            ->buildMap($this->argument('name'), $waterLevel);
     }
 }

@@ -1,6 +1,6 @@
 @props(['action', 'lastTab', 'modelId' => 0])
 
-<form method="post" action="{{$action}}">
+<form method="post" action="{{$action}}" {{$attributes}}>
     @csrf
 
     <input type="hidden" name="id" value="{{$modelId}}" />

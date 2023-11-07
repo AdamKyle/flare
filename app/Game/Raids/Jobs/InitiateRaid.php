@@ -12,7 +12,7 @@ use App\Flare\Models\Event;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Location;
 use App\Flare\Models\Character;
-use App\Flare\Values\EventType;
+use App\Game\Events\Values\EventType;
 use App\Flare\Models\ScheduledEvent;
 use App\Flare\Events\UpdateScheduledEvents;
 use App\Flare\Models\RaidBoss;

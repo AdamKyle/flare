@@ -1,14 +1,15 @@
 <?php
 
-namespace App\Console\Commands;
+namespace App\Game\Events\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Flare\Models\ScheduledEvent;
-use App\Flare\Values\EventType;
+use App\Game\Events\Values\EventType;
 use App\Game\Events\Jobs\InitiateMonthlyPVPEvent;
 use App\Game\Raids\Jobs\InitiateRaid;
 use App\Game\Events\Jobs\InitiateWeeklyCelestialSpawnEvent;
 use App\Game\Events\Jobs\InitiateWeeklyCurrencyDropEvent;
+use App\Game\Events\Jobs\InitiateWinterEvent;
 
 class ProcessScheduledEvents extends Command {
     /**
@@ -53,6 +54,10 @@ class ProcessScheduledEvents extends Command {
 
             if ($eventType->isMonthlyPVP()) {
                 InitiateMonthlyPVPEvent::dispatch($event->id)->delay(now()->addMinutes(5));
+            }
+
+            if ($eventType->isWinterEvent()) {
+                InitiateWinterEvent::dispatch($event->id)->delay(now()->addMinutes(5));
             }
         }
     }

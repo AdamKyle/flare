@@ -288,7 +288,7 @@ class GuideQuestRequirementsService {
             })->count();
 
             if ($count > 0) {
-                $this->finishedRequirements[] = 'required_kingdom_building_id';
+                $this->finishedRequirements[] = 'required_kingdom_building_level';
             }
         }
 

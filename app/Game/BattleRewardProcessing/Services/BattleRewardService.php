@@ -5,9 +5,13 @@ namespace App\Game\BattleRewardProcessing\Services;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Monster;
 use App\Flare\Models\Character;
+use App\Flare\Models\Event;
+use App\Flare\Models\GlobalEventGoal;
 use App\Game\Core\Services\GoldRush;
 use App\Game\Battle\Handlers\FactionHandler;
 use App\Flare\Services\CharacterRewardService;
+use App\Game\Events\Values\EventType;
+use App\Game\Battle\Handlers\GlobalEventParticipationHandler;
 use App\Game\Battle\Jobs\BattleItemHandler;
 
 class BattleRewardService {
@@ -18,11 +22,18 @@ class BattleRewardService {
     private FactionHandler $factionHandler;
     private CharacterRewardService $characterRewardService;
     private GoldRush $goldRush;
+    private GlobalEventParticipationHandler $globalEventParticipationHandler;
 
-    public function __construct(FactionHandler $factionHandler, CharacterRewardService $characterRewardService, GoldRush $goldRush) {
-        $this->factionHandler         = $factionHandler;
-        $this->characterRewardService = $characterRewardService;
-        $this->goldRush               = $goldRush;
+    public function __construct(
+        FactionHandler $factionHandler,
+        CharacterRewardService $characterRewardService,
+        GoldRush $goldRush,
+        GlobalEventParticipationHandler $globalEventParticipationHandler
+    ) {
+        $this->factionHandler                  = $factionHandler;
+        $this->characterRewardService          = $characterRewardService;
+        $this->goldRush                        = $goldRush;
+        $this->globalEventParticipationHandler = $globalEventParticipationHandler;
     }
 
     public function setUp(Monster $monster, Character $character): BattleRewardService {
@@ -52,12 +63,33 @@ class BattleRewardService {
     }
 
     protected function handleFactionRewards() {
-        if ($this->gameMap->mapType()->isPurgatory()) {
+        if (
+            $this->gameMap->mapType()->isPurgatory() ||
+            $this->gameMap->mapType()->isTheIcePlane()
+        ) {
             return;
         }
-        
+
         $this->factionHandler->handleFaction($this->character, $this->monster);
 
         $this->character = $this->character->refresh();
+    }
+
+    protected function handleGlobalEventGoals() {
+        $event = Event::whereIn('type', [
+            EventType::WINTER_EVENT,
+        ])->first();
+
+        if (is_null($event)) {
+            return;
+        }
+
+        $globalEventGoal = GlobalEventGoal::where('event_type', $event->type)->first();
+
+        if (is_null($globalEventGoal)) {
+            return;
+        }
+
+        $this->globalEventParticipationHandler->handleGlobalEventParticipation($this->character->refresh(), $globalEventGoal->refresh());
     }
 }
