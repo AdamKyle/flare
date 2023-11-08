@@ -20,6 +20,7 @@ use App\Admin\Import\Quests\QuestsImport;
 use App\Admin\Requests\QuestsImportRequest;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Quest;
+use App\Game\Events\Values\EventType;
 
 class QuestsController extends Controller {
 
@@ -59,6 +60,7 @@ class QuestsController extends Controller {
             'passiveSkills'   => PassiveSkill::pluck('name', 'id')->toArray(),
             'raids'           => Raid::pluck('name', 'id')->toArray(),
             'requiredQuests'  => Quest::pluck('name', 'id')->toArray(),
+            'eventTypes'      => EventType::getOptionsForSelect(),
         ]);
     }
 
@@ -75,6 +77,7 @@ class QuestsController extends Controller {
             'passiveSkills'   => PassiveSkill::pluck('name', 'id')->toArray(),
             'raids'           => Raid::pluck('name', 'id')->toArray(),
             'requiredQuests'  => Quest::pluck('name', 'id')->toArray(),
+            'eventTypes'      => EventType::getOptionsForSelect(),
         ]);
     }
 

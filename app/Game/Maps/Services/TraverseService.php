@@ -130,12 +130,16 @@ class TraverseService {
             return !empty($hasItem);
         }
 
-        if ($gameMap->mapType()->isPurgatory() || $gameMap->mapType()->isTheIcePlane()) {
+        if ($gameMap->mapType()->isPurgatory()) {
             $hasItem = $character->inventory->slots->filter(function ($slot) {
                 return $slot->item->effect === ItemEffectsValue::PURGATORY;
             })->all();
 
             return !empty($hasItem);
+        }
+        dd($gameMap);
+        if (!is_null($gameMap->only_during_event_type)) {
+            return true;
         }
 
         if ($gameMap->name === 'Surface') {

@@ -39,7 +39,6 @@ class MonsterAttack extends BattleBase {
             $this->attackPlayer($monster, $character, $previousAttackType);
 
             $this->doPlayerCounterMonster($character, $monster);
-
         } else {
             $this->addMessage($monster->getName() . ' misses!', 'enemy-action');
         }
@@ -76,13 +75,16 @@ class MonsterAttack extends BattleBase {
             $this->monsterHealth   = $elementalAttack->getMonsterHealth();
 
             $this->mergeMessages($elementalAttack->getMessages());
-    
+
             $elementalAttack->clearMessages();
         }
     }
 
     protected function monsterSpecialAttack(ServerMonster $monster, Character $character) {
-        if ($monster->getMonsterStat('is_raid_monster') || $monster->getMonsterStat('is_raid_boss')) {
+        if ($monster->getMonsterStat('is_raid_monster') ||
+            $monster->getMonsterStat('is_raid_boss') ||
+            $monster->canMonsterUseElementalAttack()
+        ) {
             $ac = $this->characterCacheData->getCachedCharacterData($character, 'ac');
 
             $monsterSpecialAttack = resolve(MonsterSpecialAttack::class);
@@ -99,7 +101,7 @@ class MonsterAttack extends BattleBase {
             $this->monsterHealth   = $monsterSpecialAttack->getMonsterHealth();
 
             $this->mergeMessages($monsterSpecialAttack->getMessages());
-    
+
             $monsterSpecialAttack->clearMessages();
         }
     }
@@ -192,8 +194,8 @@ class MonsterAttack extends BattleBase {
         $spellDamage = $monster->getMonsterStat('spell_damage');
 
 
-        if ($spellDamage > 0 )  {
-            $spellEvasion = $this->characterCacheData->getCachedCharacterData($character,'spell_evasion');
+        if ($spellDamage > 0) {
+            $spellEvasion = $this->characterCacheData->getCachedCharacterData($character, 'spell_evasion');
             $dc           = 100 - 100 * $spellEvasion;
             $roll         = rand(1, 100);
 
@@ -203,7 +205,7 @@ class MonsterAttack extends BattleBase {
                 return;
             }
 
-             $criticality = $monster->getMonsterStat('criticality');
+            $criticality = $monster->getMonsterStat('criticality');
 
             if (rand(1, 100) > (100 - 100 * $criticality)) {
                 $this->addMessage($monster->getName() . ' With a fury of hatred their spells fly viciously at you! (Critical Strike!)', 'regular');

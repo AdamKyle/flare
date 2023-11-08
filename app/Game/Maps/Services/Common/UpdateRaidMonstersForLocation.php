@@ -5,6 +5,7 @@ namespace App\Game\Maps\Services\Common;
 use App\Flare\Models\Event;
 use App\Flare\Models\Location;
 use App\Flare\Models\Character;
+use App\Flare\Values\ItemEffectsValue;
 use Illuminate\Support\Facades\Cache;
 use App\Game\Maps\Events\UpdateMonsterList;
 use App\Game\Maps\Events\UpdateRaidMonsters;
@@ -22,6 +23,16 @@ trait UpdateRaidMonstersForLocation {
     public function updateMonstersList(Character $character, ?Location $location = null): void {
 
         $monsters = Cache::get('monsters')[$character->map->gameMap->name];
+
+        if (!is_null($character->map->gameMap->only_for_event)) {
+            $hasAccessToPurgatory = $character->inventory->slots->where('item.type', 'quest')->where('item.effect', ItemEffectsValue::PURGATORY)->count() > 0;
+
+            if (!$hasAccessToPurgatory) {
+                $monsters = $monsters['easier'];
+            } else {
+                $monsters = $monsters['regular'];
+            }
+        }
 
         if ($this->updateMonstersForRaid($character, $location)) {
             return;

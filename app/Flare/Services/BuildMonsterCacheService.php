@@ -66,6 +66,11 @@ class BuildMonsterCacheService {
                 $this->monster
             );
 
+            if (!is_null($gameMap->only_during_event_type)) {
+                $monstersCache[$gameMap->name] = $this->createMonstersForEventMaps($monsters);
+
+                continue;
+            }
 
             $monstersCache[$gameMap->name] = $this->manager->createData($monsters)->toArray();
         }
@@ -242,6 +247,25 @@ class BuildMonsterCacheService {
         }
 
         return collect(Cache::get('celestials')[$planeName])->where('name', $monsterName)->first();
+    }
+
+    protected function createMonstersForEventMaps(Collection $monsters): array {
+
+        $defaultMap = GameMap::where('is_default', true)->first();
+
+        $easierMonsters =  new Collection(
+            Monster::where('is_celestial_entity', false)
+                ->where('is_raid_monster', false)
+                ->where('is_raid_boss', false)
+                ->where('game_map_id', $defaultMap->id)
+                ->get(),
+            $this->monster
+        );
+
+        return [
+            'regular' => $this->manager->createData($monsters)->toArray(),
+            'easier'  => $this->manager->createData($easierMonsters)->toArray()
+        ];
     }
 
     /**

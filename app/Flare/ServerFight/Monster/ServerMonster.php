@@ -105,4 +105,10 @@ class ServerMonster {
             'water' => $this->monster['water_atonement']
         ];
     }
+
+    public function canMonsterUseElementalAttack(): bool {
+        return $this->monster['fire_atonement'] > 0 &&
+            $this->monster['ice_atonement'] > 0 &&
+            $this->monster['water_atonement'] > 0;
+    }
 }

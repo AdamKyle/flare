@@ -6,6 +6,8 @@ export default interface QuestState {
 
     raid_quests: QuestDetails[]|[];
 
+    is_winter_event: boolean;
+
     completed_quests: number[] | [];
 
     loading: boolean,

@@ -9,6 +9,7 @@ use App\Game\Quests\Services\QuestHandlerService;
 use App\Game\Skills\Values\SkillTypeValue;
 use App\Flare\Models\Character;
 use App\Flare\Models\Quest;
+use App\Game\Events\Values\EventType;
 use App\Http\Controllers\Controller;
 
 class QuestsController extends Controller {
@@ -31,6 +32,7 @@ class QuestsController extends Controller {
             'quests'           => $this->buildQuestCacheService->getRegularQuests(),
             'raid_quests'      => $this->buildQuestCacheService->fetchQuestsForRaid($eventWithRaid),
             'player_plane'     => $character->map->gameMap->name,
+            'is_winter_event'  => Event::where('type', EventType::WINTER_EVENT)->count() > 0,
         ]);
     }
 

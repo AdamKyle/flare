@@ -2,20 +2,20 @@
 
 namespace App\Game\Kingdoms\Service;
 
-use App\Game\Kingdoms\Handlers\UpdateKingdomHandler;
-use App\Game\Kingdoms\Traits\UpdateKingdomBuildingsBasedOnPassives;
-use App\Game\Messages\Events\ServerMessageEvent;
-use Cache;
-use App\Flare\Models\Character;
-use App\Flare\Models\GameBuilding;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\Location;
+use App\Flare\Models\Character;
+use App\Flare\Models\GameBuilding;
+use Illuminate\Support\Facades\Cache;
+use App\Flare\Values\ItemEffectsValue;
 use App\Game\Core\Traits\KingdomCache;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Kingdoms\Events\AddKingdomToMap;
 use App\Game\Kingdoms\Events\UpdateGlobalMap;
-use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Kingdoms\Builders\KingdomBuilder;
+use App\Game\Messages\Events\ServerMessageEvent;
+use App\Game\Kingdoms\Handlers\UpdateKingdomHandler;
+use App\Game\Kingdoms\Traits\UpdateKingdomBuildingsBasedOnPassives;
 
 class KingdomSettleService {
 
@@ -67,7 +67,12 @@ class KingdomSettleService {
         }
 
         if ($character->map->gameMap->mapType()->isTheIcePlane()) {
-            return $this->errorResult('The Queen of Ice will not allow you to settle here child.');
+
+            $hasQuestItem = $character->inventory->slots->where('item.type', 'quest')->where('item.effects', ItemEffectsValue::SETTLE_IN_ICE_PLANE)->isNotEmpty();
+
+            if (!$hasQuestItem) {
+                return $this->errorResult('The Queen of Ice will not allow you to settle here child.');
+            }
         }
 
         $kingdom = Kingdom::where('name', $kingdomName)->where('game_map_id', $character->map->game_map_id)->first();

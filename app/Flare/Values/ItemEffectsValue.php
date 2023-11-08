@@ -27,6 +27,8 @@ class ItemEffectsValue {
     const GET_COPPER_COINS      = 'get-copper-coins';
     const ENTER_PURGATORY_HOUSE = 'enter-purgatory-house';
     const HIDE_CHAT_LOCATION    = 'hide-chat-location';
+    const WALK_ON_ICE           = 'walk-on-ice';
+    const SETTLE_IN_ICE_PLANE   = 'settle-on-the-ice-plane';
 
     /**
      * @var string[] $values
@@ -50,6 +52,8 @@ class ItemEffectsValue {
         self::GET_COPPER_COINS      => 'get-copper-coins',
         self::ENTER_PURGATORY_HOUSE => 'enter-purgatory-house',
         self::HIDE_CHAT_LOCATION    => 'hide-chat-location',
+        self::WALK_ON_ICE           => 'walk-on-ice',
+        self::SETTLE_IN_ICE_PLANE   => 'settle-on-the-ice-plane',
     ];
 
     /**
@@ -76,6 +80,15 @@ class ItemEffectsValue {
      */
     public function walkOnWater(): bool {
         return $this->value === self::WALK_ON_WATER;
+    }
+
+    /**
+     * is walk on ice?
+     *
+     * @return bool
+     */
+    public function walkOnIce(): bool {
+        return $this->value === self::WALK_ON_ICE;
     }
 
     /**
@@ -221,5 +234,14 @@ class ItemEffectsValue {
      */
     public function hideChatLocation(): bool {
         return $this->value === self::HIDE_CHAT_LOCATION;
+    }
+
+    /**
+     * Does this item allows you to settle kingdoms on the ice plane?
+     *
+     * @return boolean
+     */
+    public function canSettleOnIcePlane(): bool {
+        return $this->value === self::SETTLE_IN_ICE_PLANE;
     }
 }

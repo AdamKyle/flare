@@ -55,7 +55,7 @@ class InitiateRaid implements ShouldQueue {
     public function handle(
         LocationService $locationService,
         EventSchedulerService $eventSchedulerService,
-        UpdateRaidMonsters $updateRaidMonsters
+        UpdateRaidMonsters $updateRaidMonsters,
     ): void {
 
         $event = ScheduledEvent::find($this->eventId);

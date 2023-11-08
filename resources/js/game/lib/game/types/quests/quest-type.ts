@@ -9,4 +9,6 @@ export default interface QuestType {
     completed_quests: number[];
 
     player_plane: string;
+
+    is_winter_event: boolean;
 }

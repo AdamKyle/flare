@@ -185,6 +185,7 @@ class ImportGameData extends Command {
             "Shadow Plane.jpeg",
             "Hell.jpeg",
             "Purgatory.jpeg",
+            "IcePlane.jpeg",
         ];
 
         // Sort the array such that the maps are in the correct order.

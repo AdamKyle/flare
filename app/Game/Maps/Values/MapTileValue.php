@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Storage;
 
 class MapTileValue {
 
+    private $imageResource;
+
     /**
      * Get the tile color from the current map.
      *
@@ -70,6 +72,10 @@ class MapTileValue {
         return in_array($color, [255255255]);
     }
 
+    public function isIcePlaneIce(int $color): bool {
+        return in_array($color, [255255255]);
+    }
+
     public function canWalk(Character $character, int $x, int $y) {
 
         if (!$this->canWalkOnWater($character, $x, $y)) {
@@ -82,6 +88,14 @@ class MapTileValue {
 
         if (!$this->canWalkOnMagma($character, $x, $y)) {
             return false;
+        }
+
+        if ($character->map->gameMap->mapType()->isTheIcePlane()) {
+            if (!$this->canWalkOnIcePlaneIce($character, $x, $y)) {
+                return false;
+            }
+
+            return true;
         }
 
         if (!$this->canWalkOnPurgatoryWater($character, $x, $y)) {
@@ -170,6 +184,27 @@ class MapTileValue {
 
         if ($this->isPurgatoryWater((int) $color)) {
             return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Can we walk on ice plane ice?
+     *
+     *
+     * @param Character $character
+     * @param int $x
+     * @param int $y
+     * @return bool
+     */
+    public function canWalkOnIcePlaneIce(Character $character, int $x, int $y) {
+        $color = $this->getTileColor($character, $x, $y);
+
+        if ($this->isIcePlaneIce((int) $color)) {
+            return $character->inventory->slots->filter(function ($slot) {
+                return $slot->item->effect === ItemEffectsValue::WALK_ON_ICE;
+            })->isNotEmpty();
         }
 
         return true;

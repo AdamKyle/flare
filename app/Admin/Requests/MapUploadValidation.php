@@ -24,9 +24,10 @@ class MapUploadValidation extends FormRequest
     public function rules()
     {
         return [
-            'name'          => 'required',
-            'map'           => 'required|image|max:2000',
-            'kingdom_color' => 'required|min:7',
+            'name'              => 'required',
+            'map'               => 'required|image|max:2000',
+            'kingdom_color'     => 'required|min:7',
+            'only_during_event' => 'nullable|int'
         ];
     }
 

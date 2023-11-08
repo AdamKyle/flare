@@ -33,6 +33,7 @@
                         <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
                         <h3 class="mb-3">Quest RelationShip</h3>
                         <x-core.forms.key-value-select :model="$quest" label="Parent Quest:" modelKey="parent_quest_id" name="parent_quest_id" :options="$quests" />
+                        <x-core.forms.key-value-select :model="$quest" label="Only During Event (only for the parent):" modelKey="only_for_event" name="only_for_event" :options="$eventTypes" />
                         <x-core.forms.check-box :model="$quest" label="Is Parent?" modelKey="is_parent" name="is_parent" />
 
                         <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>

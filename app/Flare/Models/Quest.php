@@ -3,6 +3,7 @@
 namespace App\Flare\Models;
 
 use App\Flare\Values\FeatureTypes;
+use App\Game\Events\Values\EventType;
 use Database\Factories\QuestFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -44,6 +45,7 @@ class Quest extends Model {
         'after_completion_description',
         'unlocks_feature',
         'unlocks_passive_id',
+        'only_for_event'
     ];
 
     protected $casts = [
@@ -69,12 +71,21 @@ class Quest extends Model {
         'secondary_required_item' => 'integer',
         'required_faction_level'  => 'integer',
         'unlocks_feature'         => 'integer',
-        'unlocks_passive_id'      => 'integer'
+        'unlocks_passive_id'      => 'integer',
+        'only_for_event'          => 'integer',
     ];
 
     protected $appends = [
         'belongs_to_map_name',
     ];
+
+    public function eventType(): EventType | null {
+        if (!is_null($this->only_for_event)) {
+            return new EventType($this->only_for_event);
+        }
+
+        return null;
+    }
 
     public static function getAllQuestsInOrder() {
         $quests = self::where('is_parent', true)

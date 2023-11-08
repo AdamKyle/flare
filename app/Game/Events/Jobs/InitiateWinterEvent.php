@@ -11,6 +11,7 @@ use App\Flare\Models\ScheduledEvent;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Flare\Models\Event;
 use App\Flare\Models\GlobalEventGoal;
+use App\Flare\Services\BuildQuestCacheService;
 use App\Game\Events\Values\EventType;
 use App\Game\Events\Values\GlobalEventForEventTypeValue;
 use Facades\App\Game\Core\Handlers\AnnouncementHandler;
@@ -36,7 +37,7 @@ class InitiateWinterEvent implements ShouldQueue {
     /**
      * @return void
      */
-    public function handle(): void {
+    public function handle(BuildQuestCacheService $buildQuestCacheService): void {
 
         $event = ScheduledEvent::find($this->eventId);
 
@@ -58,6 +59,8 @@ class InitiateWinterEvent implements ShouldQueue {
         event(new GlobalMessageEvent('A winter chill sets over you. You turn and see the gates to the Ice Queens Realm is open. Do you dare enter? (Players just have to traverse to the new plane, you can do with this the traverse on desktop or Map Movement -> Traverse on Mobile.)'));
 
         AnnouncementHandler::createAnnouncement('winter_event');
+
+        $buildQuestCacheService->buildQuestCache();
 
         $this->kickOffGlobalEventGoal();
     }

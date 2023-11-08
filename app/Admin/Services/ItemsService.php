@@ -61,6 +61,7 @@ class ItemsService {
                 ItemEffectsValue::WALK_ON_WATER,
                 ItemEffectsValue::WALK_ON_DEATH_WATER,
                 ItemEffectsValue::WALK_ON_MAGMA,
+                ItemEffectsValue::WALK_ON_ICE,
                 ItemEffectsValue::LABYRINTH,
                 ItemEffectsValue::DUNGEON,
                 ItemEffectsValue::SHADOWPLANE,

@@ -2,7 +2,6 @@ import { setDefaultResultOrder } from "dns";
 import Game from "../../../game";
 import Ajax from "../../ajax/ajax";
 import { AxiosResponse } from "axios";
-import { calculateTimeLeft } from "../../helpers/time-calculator";
 import MapStateManager from "../map/state/map-state-manager";
 import { CharacterType } from "../character/character-type";
 
@@ -114,6 +113,7 @@ export default class FetchGameData {
     }
 
     setQuestData(result: AxiosResponse) {
+        console.log('Quests Result: ', result.data);
         this.component.setState({
             quests: result.data,
             percentage_loaded: this.component.state.percentage_loaded + .20,

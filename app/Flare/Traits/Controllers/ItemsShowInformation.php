@@ -45,6 +45,10 @@ trait ItemsShowInformation {
                 $effects = 'Walk on water (Surface and Labyrinth)';
             }
 
+            if ($effect->walkOnIce()) {
+                $effects = 'Walk on Ice (The Ice Plane)';
+            }
+
             if ($effect->labyrinth()) {
                 $effects = 'Use Traverse (beside movement map-actions) to traverse to Labyrinth plane';
             }
@@ -107,6 +111,10 @@ trait ItemsShowInformation {
 
             if ($effect->hideChatLocation()) {
                 $effects = 'Hides your location from chat so others cannot find you to duel you!';
+            }
+
+            if ($effect->canSettleOnIcePlane()) {
+                $effects = 'Allows you to settle kingdoms on The Ice Plane.';
             }
         }
 
