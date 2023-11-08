@@ -69,6 +69,9 @@ class ImportGameData extends Command {
 
         $this->line('Importing map spefic data ...');
 
+        $this->import($excelMapper, $files['Locations'], 'Locations');
+        $this->import($excelMapper, $files['Locations'], 'NPCs');
+
         // // This stuff depends on maps existing.
         $this->import($excelMapper, $files['.'], '.');
 

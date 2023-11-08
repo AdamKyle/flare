@@ -28,6 +28,9 @@
             <th>unlocks_passive_id</th>
             <th>before_completion_description</th>
             <th>after_completion_description</th>
+            <th>raid_id</th>
+            <th>required_quest_id</th>
+            <th>only_for_event</th>
         </tr>
     </thead>
     <tbody>
@@ -63,7 +66,7 @@
                 <td>{{ nl2br($quest->after_completion_description) }}</td>
                 <td>{{ !is_null($quest->raid_id) ? $quest->raid->name : '' }}</td>
                 <td>{{ !is_null($quest->required_quest_id) ? $quest->requiredQuest->name : '' }}</td>
-
+                <td>{{ !is_null($quest->only_for_event) ? $quest->only_for_event : '' }}</td>
             </tr>
         @endforeach
     </tbody>

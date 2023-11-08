@@ -48,10 +48,10 @@ class ExcelMapper {
         ],
         'Quests'        => QuestsImport::class,
         'Locations Give Items' => LocationsImport::class,
+        'Locations' => LocationsImport::class,
+        'NPCs' => NpcsImport::class,
         '.'             => [
             ClassSpecialsImport::class,
-            LocationsImport::class,
-            NpcsImport::class,
         ]
     ];
 
