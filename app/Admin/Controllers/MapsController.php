@@ -44,6 +44,10 @@ class MapsController extends Controller {
             $walkOnWater = Item::where('effect', ItemEffectsValue::WALK_ON_WATER)->first();
         }
 
+        if ($gameMap->mapType()->isTheIcePlane()) {
+            $walkOnWater = Item::where('effect', ItemEffectsValue::WALK_ON_ICE)->first();
+        }
+
         return view('admin.maps.map', [
             'map'         => $gameMap,
             'itemNeeded'  => Item::where('effect', $effects)->first(),
@@ -63,11 +67,11 @@ class MapsController extends Controller {
         $path = Storage::disk('maps')->putFile($request->name, $request->map);
 
         GameMap::create([
-            'name'              => $request->name,
-            'path'              => $path,
-            'default'           => $request->default,
-            'kingdom_color'     => $request->kingdom_color,
-            'only_during_event' => $request->only_during_event,
+            'name'                   => $request->name,
+            'path'                   => $path,
+            'default'                => $request->default,
+            'kingdom_color'          => $request->kingdom_color,
+            'only_during_event_type' => $request->only_during_event,
         ]);
 
         return redirect()->route('maps')->with('success', $request->name . ' uploaded successfully.');

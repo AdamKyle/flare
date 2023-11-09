@@ -26,11 +26,8 @@ class ExcelMapper {
      * @var array $map
      */
     private array $map = [
-        'Admin Section' => [
-            GuideQuests::class,
-            RaidsImport::class,
-            EventsImport::class,
-        ],
+        'Admin Section' => GuideQuests::class,
+        'Raids'         => RaidsImport::class,
         'Affixes'       => AffixesImport::class,
         'Core Imports'  => [
             ClassImport::class,
@@ -49,7 +46,7 @@ class ExcelMapper {
         'Quests'        => QuestsImport::class,
         'Locations Give Items' => LocationsImport::class,
         'Locations' => LocationsImport::class,
-        'NPCs' => NpcsImport::class,
+        'Npcs' => NpcsImport::class,
         '.'             => [
             ClassSpecialsImport::class,
         ]

@@ -40,6 +40,7 @@ class RaidsController extends Controller {
             'raidBosses'  => Monster::where('is_raid_boss', true)->get(),
             'itemTypes'   => [
                 ItemSpecialtyType::PIRATE_LORD_LEATHER,
+                ItemSpecialtyType::CORRUPTED_ICE,
             ],
             'artifacts'   => Item::where('type', 'artifact')->get(),
         ]);
@@ -53,6 +54,7 @@ class RaidsController extends Controller {
             'raidBosses' => Monster::where('is_raid_boss', true)->get(),
             'itemTypes'  => [
                 ItemSpecialtyType::PIRATE_LORD_LEATHER,
+                ItemSpecialtyType::CORRUPTED_ICE,
             ],
             'artifacts'   => Item::where('type', 'artifact')->get(),
         ]);

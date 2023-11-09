@@ -15,9 +15,17 @@ use Maatwebsite\Excel\Concerns\ToCollection;
 class QuestsSheet implements ToCollection {
 
     public function collection(Collection $rows) {
+        $questsWhichRequireOtherQuests = [];
+
         foreach ($rows as $index => $row) {
             if ($index !== 0) {
                 $quest = array_combine($rows[0]->toArray(), $row->toArray());
+
+                if (!is_null($quest['required_quest_id'])) {
+                    $questsWhichRequireOtherQuests[] = $quest;
+
+                    $quest['required_quest_id'] = null;
+                }
 
                 $questData = $this->returnCleanItem($quest);
 
@@ -26,6 +34,12 @@ class QuestsSheet implements ToCollection {
                 }
             }
         }
+
+        foreach ($questsWhichRequireOtherQuests as $index => $quest) {
+            $questData = $this->returnCleanItem($quest);
+
+            Quest::updateOrCreate(['name' => $questData['name']], $questData);
+        }
     }
 
     protected function returnCleanItem(array $quest) {
@@ -33,6 +47,8 @@ class QuestsSheet implements ToCollection {
         $npc = Npc::where('name', $quest['npc_id'])->first();
 
         if (is_null($npc)) {
+            dump('Missing NPC');
+            dump($quest);
             return [];
         }
 
@@ -147,10 +163,10 @@ class QuestsSheet implements ToCollection {
         } else {
             $requiredQuest = Quest::where('name', $quest['required_quest_id'])->first();
 
-            if (is_null($quest)) {
+            if (is_null($requiredQuest)) {
                 $quest['required_quest_id'] = null;
             } else {
-                $quest['required_quest_id'] = $requiredQuest->od;
+                $quest['required_quest_id'] = $requiredQuest->id;
             }
         }
 

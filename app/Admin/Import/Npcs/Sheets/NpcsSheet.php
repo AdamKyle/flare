@@ -12,8 +12,8 @@ class NpcsSheet implements ToCollection {
     public function collection(Collection $rows) {
         foreach ($rows as $index => $row) {
             if ($index !== 0) {
-                $data = array_combine($rows[0]->toArray(), $row->toArray());
-                $data = $this->returnCleanData($data);
+                $rowData = array_combine($rows[0]->toArray(), $row->toArray());
+                $data = $this->returnCleanData($rowData);
 
                 if (!empty($data)) {
                     Npc::updateOrCreate(['id' => $data['id']], $data);

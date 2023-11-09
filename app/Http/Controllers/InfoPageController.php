@@ -98,6 +98,7 @@ class InfoPageController extends Controller {
             'Labyrinth', 'Surface' => ItemEffectsValue::WALK_ON_WATER,
             'Dungeons'     => ItemEffectsValue::WALK_ON_DEATH_WATER,
             'Hell'         => ItemEffectsValue::WALK_ON_MAGMA,
+            'The Ice Plane' => ItemEffectsValue::WALK_ON_ICE,
             default        => '',
         };
 

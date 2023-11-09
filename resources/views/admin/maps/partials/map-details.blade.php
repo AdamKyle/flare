@@ -112,13 +112,10 @@
                     <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2'></div>
                     <x-core.alerts.info-alert title="ATTN!">
                         <p class='my-4'>This plane is only accessible during The Winter Event which runs from December
-                            15th to March 15
+                            15th to March 14th
                             the following year.</p>
-
-                        <p class='my-4'>If you have access to Purgatory, you can traverse to this plane from any
-                            plane. Kingdoms cannot be settled here.</p>
                     </x-core.alerts.info-alert>
-                    <h3 class="my-4">The Ice Qaueen Reins!</h3>
+                    <h3 class="my-4">The Ice Queen Reins!</h3>
                     <p>
                         There is a corrupt Queen who rules this plane of existance and spreads the chilld of her own
                         dying and dead heart
@@ -172,6 +169,8 @@
                             Magma
                         @elseif ($map->mapType()->isDungeons())
                             Death Water
+                        @elseif ($map->mapType()->isTheIcePlane())
+                            Ice
                         @else
                             Water
                         @endif

@@ -31,17 +31,19 @@ class MassImportCustomData extends Command {
 
         // Handle importing things in a custom format.
 
-        if (GameMap::where('only_for_event', EventType::WINTER_EVENT)->count() <= 0) {
-            throw Exception('No map for this type of import was uploaded. Upload the map first.');
+        if (GameMap::where('only_during_event_type', EventType::WINTER_EVENT)->count() <= 0) {
+            throw new Exception('No map for this type of import was uploaded. Upload the map first.');
         }
 
         Artisan::call('import:game-data Items');
+        Artisan::call('import:game-data Locations');
+        Artisan::call('import:game-data Items');
         Artisan::call('import:game-data Skills');
         Artisan::call('import:game-data Monsters');
-        Artisan::call('import:game-data NPCs');
+        Artisan::call('import:game-data Npcs');
         Artisan::call('import:game-data Quests');
+        Artisan::call('import:game-data Raids');
 
         Artisan::call('generate:monster-cache');
-
     }
 }
