@@ -27,6 +27,7 @@ use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Game\Maps\Services\Common\UpdateRaidMonstersForLocation;
 use App\Flare\Jobs\CharacterAttackTypesCacheBuilderWithDeductions;
+use App\Flare\Models\Event;
 
 class TraverseService {
 
@@ -137,8 +138,14 @@ class TraverseService {
 
             return !empty($hasItem);
         }
-        dd($gameMap);
+
         if (!is_null($gameMap->only_during_event_type)) {
+            $event = Event::where('type', $gameMap->only_during_event_type)->first();
+
+            if (is_null($event)) {
+                return false;
+            }
+
             return true;
         }
 

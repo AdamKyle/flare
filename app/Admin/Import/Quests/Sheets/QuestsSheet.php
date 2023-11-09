@@ -47,8 +47,6 @@ class QuestsSheet implements ToCollection {
         $npc = Npc::where('name', $quest['npc_id'])->first();
 
         if (is_null($npc)) {
-            dump('Missing NPC');
-            dump($quest);
             return [];
         }
 

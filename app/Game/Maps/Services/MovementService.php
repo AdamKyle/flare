@@ -123,7 +123,7 @@ class MovementService {
      */
     public function getMapsToTraverse(Character $character): array {
 
-        $gameMaps = GameMap::select('id', 'required_location_id', 'name')->get();
+        $gameMaps = GameMap::select('id', 'required_location_id', 'only_during_event_type', 'name')->get();
         $xPosition = $character->map->character_position_x;
         $yPosition = $character->map->character_position_y;
         $location  = Location::where('x', $xPosition)->where('y', $yPosition)->first();
