@@ -113,7 +113,6 @@ export default class FetchGameData {
     }
 
     setQuestData(result: AxiosResponse) {
-        console.log('Quests Result: ', result.data);
         this.component.setState({
             quests: result.data,
             percentage_loaded: this.component.state.percentage_loaded + .20,

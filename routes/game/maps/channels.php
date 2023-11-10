@@ -60,6 +60,11 @@ broadCast::channel('update-location-base-shops-{userId}', function($user, $userI
     return $user->id === (int) $userId;
 });
 
+// When we need to update event goals
+broadCast::channel('update-location-base-event-goals-{userId}', function($user, $userId) {
+    return $user->id === (int) $userId;
+});
+
 // Update the character base position
 broadCast::channel('update-character-position-{userId}', function($user, $userId) {
     return $user->id === (int) $userId;

@@ -8,9 +8,11 @@ use App\Flare\Models\Character;
 use App\Flare\ServerFight\Fight\Ambush;
 use App\Flare\ServerFight\Fight\Attack;
 use App\Flare\Builders\Character\CharacterCacheData;
+use App\Flare\Models\GameMap;
 use App\Flare\ServerFight\Fight\Voidance;
 use App\Flare\ServerFight\Monster\BuildMonster;
 use App\Flare\Services\BuildMonsterCacheService;
+use App\Flare\Values\ItemEffectsValue;
 use App\Game\Core\Traits\ResponseBuilder;
 
 class MonsterPlayerFight {
@@ -392,6 +394,7 @@ class MonsterPlayerFight {
      * @return bool
      */
     protected function doAttack(ServerMonster $monster, array $health, bool $isPlayerVoided, bool $isEnemyVoided, bool $onlyOnce, bool $isRankFight = false): bool {
+
         $this->attack->setHealth($health)
             ->setIsCharacterVoided($isPlayerVoided)
             ->setIsEnemyVoided($isEnemyVoided)
@@ -452,6 +455,22 @@ class MonsterPlayerFight {
         }
 
         $monsters = Cache::get('monsters')[$mapName];
+
+        $gameMap  = GameMap::where('name', $mapName)->first();
+
+        if (is_null($gameMap)) {
+            return null;
+        }
+
+        if ($gameMap->mapType()->isTheIcePlane()) {
+            $canAccessPurgatory = $this->character->inventory->slots->where('item.effect', ItemEffectsValue::PURGATORY)->count() > 0;
+
+            if ($canAccessPurgatory) {
+                $monsters = $monsters['regular'];
+            } else {
+                $monsters = $monsters['easier'];
+            }
+        }
 
         foreach ($monsters as $monster) {
             if ($monster['id'] === $monsterId) {

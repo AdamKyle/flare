@@ -8,6 +8,7 @@ use App\Game\Core\Traits\ResponseBuilder;
 use App\Flare\ServerFight\MonsterPlayerFight;
 use App\Game\Battle\Jobs\BattleAttackHandler;
 use App\Game\Battle\Handlers\BattleEventHandler;
+use Hamcrest\Arrays\IsArray;
 
 class MonsterFightService {
 
@@ -25,7 +26,13 @@ class MonsterFightService {
 
         Cache::delete('monster-fight-' . $character->id);
 
-        $data = $this->monsterPlayerFight->setUpFight($character, $params)->fightSetUp();
+        $data = $this->monsterPlayerFight->setUpFight($character, $params);
+
+        if (is_array($data)) {
+            return $data;
+        }
+
+        $data = $data->fightSetUp();
 
         if ($data['health']['current_character_health'] <= 0) {
             $this->battleEventHandler->processDeadCharacter($character);

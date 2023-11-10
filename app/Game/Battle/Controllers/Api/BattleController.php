@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Cache;
 use App\Game\Battle\Events\AttackTimeOutEvent;
 use App\Game\Battle\Request\AttackTypeRequest;
 use App\Flare\Services\BuildMonsterCacheService;
+use App\Flare\Values\ItemEffectsValue;
 use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Battle\Services\MonsterFightService;
@@ -58,7 +59,17 @@ class BattleController extends Controller {
         if (!is_null($locationWithEffect)) {
             $monsters = Cache::get('monsters')[$locationWithEffect->name];
         } else {
-            $monsters = Cache::get('monsters')[$character->map->gameMap->name];
+
+            $isTheIcePlane = $character->map->gameMap->mapType()->isTheIcePlane();
+            $hasPurgatoryAccess = $character->inventory->slots->where('item.effect', ItemEffectsValue::PURGATORY)->count() > 0;
+
+            if ($isTheIcePlane && $hasPurgatoryAccess) {
+                $monsters = Cache::get('monsters')[$character->map->gameMap->name]['regular'];
+            } else if ($isTheIcePlane && !$hasPurgatoryAccess) {
+                $monsters = Cache::get('monsters')[$character->map->gameMap->name]['easier'];
+            } else {
+                $monsters = Cache::get('monsters')[$character->map->gameMap->name];
+            }
         }
 
         event(new UpdateCharacterStatus($character));

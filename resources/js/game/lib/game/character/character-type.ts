@@ -7,7 +7,7 @@ export interface CharacterType {
 
     user_id: number;
 
-    affix_damage_reduction:  number;
+    affix_damage_reduction: number;
 
     agi_modded: number;
 
@@ -77,7 +77,7 @@ export interface CharacterType {
 
     to_hit_stat: string;
 
-    can_attack_again_at: string|null;
+    can_attack_again_at: string | null;
 
     is_automation_running: boolean;
 
@@ -155,9 +155,11 @@ export interface CharacterType {
 
     can_craft: boolean;
 
-    can_craft_again_at: string|null;
+    can_craft_again_at: string | null;
 
     can_use_work_bench: boolean;
+
+    can_use_event_goals_button: boolean;
 
     is_silenced: boolean;
 

@@ -36,6 +36,10 @@ class Map extends Model {
         'character_position_y' => 'integer',
     ];
 
+    public function character() {
+        return $this->belongsTo(Character::class, 'character_id', 'id');
+    }
+
     public function gameMap() {
         return $this->belongsTo(GameMap::class, 'game_map_id', 'id');
     }

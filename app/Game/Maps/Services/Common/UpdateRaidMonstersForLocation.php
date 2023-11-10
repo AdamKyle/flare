@@ -24,8 +24,8 @@ trait UpdateRaidMonstersForLocation {
 
         $monsters = Cache::get('monsters')[$character->map->gameMap->name];
 
-        if (!is_null($character->map->gameMap->only_for_event)) {
-            $hasAccessToPurgatory = $character->inventory->slots->where('item.type', 'quest')->where('item.effect', ItemEffectsValue::PURGATORY)->count() > 0;
+        if (!is_null($character->map->gameMap->only_during_event_type)) {
+            $hasAccessToPurgatory = $character->inventory->slots->where('item.effect', ItemEffectsValue::PURGATORY)->count() > 0;
 
             if (!$hasAccessToPurgatory) {
                 $monsters = $monsters['easier'];

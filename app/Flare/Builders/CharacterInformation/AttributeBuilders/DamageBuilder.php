@@ -245,7 +245,7 @@ class DamageBuilder extends BaseAttribute {
                 $lifeStealAmount =  0.99;
             }
 
-            if (($gameMap->mapType()->isHell() || $gameMap->mapType()->isPurgatory())) {
+            if (($gameMap->mapType()->isHell() || $gameMap->mapType()->isPurgatory() || $gameMap->mapType()->isTheIcePlane())) {
                 $lifeStealAmount = $lifeStealAmount / 2;
             }
 

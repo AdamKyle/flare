@@ -23,6 +23,7 @@ use App\Game\Maps\Services\Common\LiveCharacterCount;
 use App\Game\Maps\Services\Common\CanPlayerMassEmbezzle;
 use App\Game\Maps\Events\UpdateLocationBasedSpecialShops;
 use App\Game\Maps\Events\UpdateLocationBasedCraftingOptions;
+use App\Game\Maps\Events\UpdateLocationBasedEventGoals;
 use App\Game\Maps\Services\Common\UpdateRaidMonstersForLocation;
 
 class LocationService {
@@ -110,6 +111,9 @@ class LocationService {
 
         // Update location based special shops:
         event(new UpdateLocationBasedSpecialShops($character->user));
+
+        // UPdate location based event goals
+        event(new UpdateLocationBasedEventGoals($character->user));
 
         // Remove character from pvp cache
         $this->characterCacheData->removeFromPvpCache($character);

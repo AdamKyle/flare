@@ -30,6 +30,7 @@ import GlobalTimeoutModal from "./sections/game-modals/global-timeout-modal";
 import MapState from "./sections/map/types/map-state";
 import MapData from "./lib/game/map/request-types/MapData";
 import MapStateManager from "./lib/game/map/state/map-state-manager";
+import MapTabs from "./sections/map/map-tabs";
 
 export default class Game extends React.Component<GameProps, GameState> {
     private characterTopBar: any;
@@ -51,6 +52,8 @@ export default class Game extends React.Component<GameProps, GameState> {
     private kingdomLogsUpdate: any;
 
     private updateSpecialShopsAccess: any;
+
+    private updateSpecialEventGoals: any;
 
     private globalTimeOut: any;
 
@@ -170,6 +173,11 @@ export default class Game extends React.Component<GameProps, GameState> {
         // @ts-ignore
         this.updateSpecialShopsAccess = Echo.private(
             "update-location-base-shops-" + this.props.userId
+        );
+
+        // @ts-ignore
+        this.updateSpecialEventGoals = Echo.private(
+            "update-location-base-event-goals-" + this.props.userId
         );
 
         // @ts-ignore
@@ -388,6 +396,22 @@ export default class Game extends React.Component<GameProps, GameState> {
                     event.canAccessHellForgedShop;
                 character.can_access_purgatory_chains =
                     event.canAccessPurgatoryChainsShop;
+
+                this.setState({
+                    character: character,
+                });
+            }
+        );
+
+        //@ts-ignore
+        this.updateSpecialEventGoals.listen(
+            "Game.Maps.Events.UpdateLocationBasedEventGoals",
+            (event: any) => {
+                const character = JSON.parse(
+                    JSON.stringify(this.state.character)
+                );
+
+                character.can_use_event_goals_button = event.canSeeEventGoals;
 
                 this.setState({
                     character: character,
@@ -651,13 +675,10 @@ export default class Game extends React.Component<GameProps, GameState> {
                                     />
                                 </BasicCard>
                                 <BasicCard
-                                    additionalClasses={clsx(
-                                        "min-h-60",
-                                        {
-                                            "ml-auto mr-auto":
-                                                this.state.view_port < 1600,
-                                        }
-                                    )}
+                                    additionalClasses={clsx("min-h-60", {
+                                        "ml-auto mr-auto":
+                                            this.state.view_port < 1600,
+                                    })}
                                 >
                                     {this.state.view_port < 1600 ? (
                                         <SmallerActions
@@ -731,47 +752,63 @@ export default class Game extends React.Component<GameProps, GameState> {
                                 additionalClasses={clsx(
                                     "hidden lg:block md:mt-0 lg:col-start-3 lg:col-end-3 max-h-[630px] max-w-[555px]",
                                     {
+                                        "max-h-[700px]":
+                                            this.state.character
+                                                .can_use_event_goals_button,
                                         "max-h-[624px]":
                                             this.state.character.is_dead,
                                     }
                                 )}
                             >
-                                <MapSection
-                                    user_id={this.props.userId}
-                                    character_id={this.props.characterId}
-                                    view_port={this.state.view_port}
-                                    currencies={this.state.character_currencies}
-                                    is_dead={this.state.character.is_dead}
-                                    is_automaton_running={
+                                <MapTabs
+                                    use_tabs={
                                         this.state.character
-                                            .is_automation_running
+                                            .can_use_event_goals_button
                                     }
-                                    can_engage_celestial={
-                                        this.state.character
-                                            .can_engage_celestials
-                                    }
-                                    automation_completed_at={
-                                        this.state.character
-                                            .automation_completed_at
-                                    }
-                                    can_engage_celestials_again_at={
-                                        this.state.character
-                                            .can_engage_celestials_again_at
-                                    }
-                                    show_celestial_fight_button={this.updateCelestial.bind(
-                                        this
-                                    )}
-                                    set_character_position={this.setCharacterPosition.bind(
-                                        this
-                                    )}
-                                    update_character_quests_plane={this.updateQuestPlane.bind(
-                                        this
-                                    )}
-                                    map_timer_data={this.state.map_timer_data}
-                                    disable_bottom_timer={false}
-                                    map_data={this.state.map_data}
-                                    set_map_data={this.setMapState.bind(this)}
-                                />
+                                >
+                                    <MapSection
+                                        user_id={this.props.userId}
+                                        character_id={this.props.characterId}
+                                        view_port={this.state.view_port}
+                                        currencies={
+                                            this.state.character_currencies
+                                        }
+                                        is_dead={this.state.character.is_dead}
+                                        is_automaton_running={
+                                            this.state.character
+                                                .is_automation_running
+                                        }
+                                        can_engage_celestial={
+                                            this.state.character
+                                                .can_engage_celestials
+                                        }
+                                        automation_completed_at={
+                                            this.state.character
+                                                .automation_completed_at
+                                        }
+                                        can_engage_celestials_again_at={
+                                            this.state.character
+                                                .can_engage_celestials_again_at
+                                        }
+                                        show_celestial_fight_button={this.updateCelestial.bind(
+                                            this
+                                        )}
+                                        set_character_position={this.setCharacterPosition.bind(
+                                            this
+                                        )}
+                                        update_character_quests_plane={this.updateQuestPlane.bind(
+                                            this
+                                        )}
+                                        map_timer_data={
+                                            this.state.map_timer_data
+                                        }
+                                        disable_bottom_timer={false}
+                                        map_data={this.state.map_data}
+                                        set_map_data={this.setMapState.bind(
+                                            this
+                                        )}
+                                    />
+                                </MapTabs>
                             </BasicCard>
                         </div>
                     </TabPanel>

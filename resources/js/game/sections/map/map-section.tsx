@@ -1,4 +1,5 @@
 import React, { Fragment } from "react";
+import Snowfall from 'react-snowfall'
 import { dragMap, fetchLeftBounds } from "../../lib/game/map/map-position";
 import MapProps from "../../lib/game/types/map/map-props";
 import Location from "../components/locations/location";
@@ -289,6 +290,13 @@ export default class MapSection extends React.Component<MapProps, MapState> {
                                 className="handle game-map"
                                 style={getStyle(this)}
                             >
+
+                                {
+                                    this.state.map_name === 'The Ice Plane' ?
+                                        <Snowfall />
+                                    : null
+                                }
+
                                 <Location
                                     locations={this.state.locations}
                                     character_position={

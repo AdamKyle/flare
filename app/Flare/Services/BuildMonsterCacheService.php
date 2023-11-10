@@ -251,13 +251,13 @@ class BuildMonsterCacheService {
 
     protected function createMonstersForEventMaps(Collection $monsters): array {
 
-        $defaultMap = GameMap::where('default', true)->first();
+        $eventMap = GameMap::where('default', true)->first();
 
         $easierMonsters =  new Collection(
             Monster::where('is_celestial_entity', false)
                 ->where('is_raid_monster', false)
                 ->where('is_raid_boss', false)
-                ->where('game_map_id', $defaultMap->id)
+                ->where('game_map_id', $eventMap->id)
                 ->get(),
             $this->monster
         );

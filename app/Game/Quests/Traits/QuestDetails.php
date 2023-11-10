@@ -48,13 +48,13 @@ trait QuestDetails {
     }
 
     protected function fetchRequiredItem(Quest $quest, Character $character): ?InventorySlot {
-        return $character->inventory->slots->filter(function($slot) use ($quest) {
+        return $character->inventory->slots->filter(function ($slot) use ($quest) {
             return $slot->item_id === $quest->item_id;
         })->first();
     }
 
     protected function fetchSecondaryRequiredItem(Quest $quest, Character $character): ?InventorySlot {
-        return $character->inventory->slots->filter(function($slot) use ($quest) {
+        return $character->inventory->slots->filter(function ($slot) use ($quest) {
             return $slot->item_id === $quest->secondary_required_item;
         })->first();
     }
@@ -62,7 +62,7 @@ trait QuestDetails {
     protected function hasPlaneAccess(Quest $quest, Character $character): bool {
         $itemNeeded = $quest->requiredPlane->map_required_item;
 
-        $planeAccessItem = $character->inventory->slots->filter(function($slot) use($itemNeeded) {
+        $planeAccessItem = $character->inventory->slots->filter(function ($slot) use ($itemNeeded) {
             return $slot->item->effect === $itemNeeded->effect;
         })->first();
 
@@ -89,7 +89,7 @@ trait QuestDetails {
         return true;
     }
 
-    protected function canPay(Character $character, Quest $quest) : bool {
+    protected function canPay(Character $character, Quest $quest): bool {
         $hasGold     = $character->gold >= $quest->gold_cost;
         $hasGoldDust = $character->gold_dust >= $quest->gold_dust_cost;
         $hasShards   = $character->shards >= $quest->shard_cost;
@@ -101,7 +101,7 @@ trait QuestDetails {
 
     protected function hasCompletedRequiredQuest(Character $character, Quest $quest): bool {
         if (!is_null($quest->required_quest_id)) {
-            return !is_null($character->completedQuests->where('required_quest_id', $quest->required_quest_id)->first());
+            return $character->questsCompleted->where('quest_id', $quest->required_quest_id)->count() > 0;
         }
 
         return true;

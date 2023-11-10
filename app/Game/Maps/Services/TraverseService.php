@@ -211,6 +211,14 @@ class TraverseService {
 
             event(new GlobalMessageEvent('Thunder claps in the sky: ' . $character->name . ' has called forth The Creator\'s gates of despair! The Creator is Furious! "Hear me, child! I shall face you in the depths of my despair and crush the soul from your bones!" the lands fall silent, the children no longer have faith and the fabric of time rips open...'));
         }
+
+        if ($gameMap->mapType()->isTheIcePlane()) {
+            $message = 'The air becomes bitter and cold, the ice starts to form on the ground around you. Everything seems so frozen in place.';
+
+            event(new ServerMessageEvent($character->user,  $message));
+
+            event(new GlobalMessageEvent('"Have you seen my son?" the call of the Ice Queen is heard across the lands of Tlessa. The Poet turns in his study: "So she has breached our reality."'));
+        }
     }
 
     /**
@@ -382,12 +390,19 @@ class TraverseService {
      */
     protected function updateActionsForMap(GameMap $gameMap, GameMap $oldGameMap, Character $character): void {
         if ($gameMap->mapType()->isShadowPlane()) {
-            $this->updateActionTypeCache($character, $gameMap->enemy_stat_bonus);
+            $this->updateActionTypeCache($character, $gameMap->character_attack_reduction);
         } else if ($gameMap->mapType()->isHell()) {
-            $this->updateActionTypeCache($character, $gameMap->enemy_stat_bonus);
+            $this->updateActionTypeCache($character, $gameMap->character_attack_reduction);
         } else if ($gameMap->mapType()->isPurgatory()) {
-            $this->updateActionTypeCache($character, $gameMap->enemy_stat_bonus);
-        } else if ($oldGameMap->mapType()->isPurgatory() || $oldGameMap->mapType()->isHell() || $oldGameMap->mapType()->isShadowPlane()) {
+            $this->updateActionTypeCache($character, $gameMap->character_attack_reduction);
+        } else if ($gameMap->mapType()->isTheIcePlane()) {
+            $this->updateActionTypeCache($character, $gameMap->character_attack_reduction);
+        } else if (
+            $oldGameMap->mapType()->isPurgatory() ||
+            $oldGameMap->mapType()->isHell() ||
+            $oldGameMap->mapType()->isShadowPlane() ||
+            $oldGameMap->mapType()->isTheIcePlane()
+        ) {
             $this->updateActionTypeCache($character, 0.0);
         }
     }
@@ -403,7 +418,19 @@ class TraverseService {
             return Cache::get('monsters')[$locationWithEffect->name];
         }
 
-        return Cache::get('monsters')[GameMap::find($mapId)->name];
+        $monsters = Cache::get('monsters')[GameMap::find($mapId)->name];
+
+        if ($characterMap->gameMap->mapType()->isTheIcePlane()) {
+            $canAccessPurgatory = $characterMap->character->inventory->slots->where('items.effect', ItemEffectsValue::PURGATORY)->count() > 0;
+
+            if ($canAccessPurgatory) {
+                $monsters = $monsters['regular'];
+            } else {
+                $monsters = $monsters['easier'];
+            }
+        }
+
+        return $monsters;
     }
 
     /**

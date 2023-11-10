@@ -34,7 +34,6 @@ class MonsterAttack extends BattleBase {
     }
 
     public function monsterAttack(ServerMonster $monster, Character $character, string $previousAttackType, bool $isRankFight) {
-
         if ($this->canHit->canMonsterHitPlayer($character, $monster, $this->isVoided, $isRankFight)) {
             $this->attackPlayer($monster, $character, $previousAttackType);
 
@@ -61,7 +60,11 @@ class MonsterAttack extends BattleBase {
     }
 
     protected function monsterElementalAttack(ServerMonster $monster, Character $character) {
-        if ($monster->getMonsterStat('is_raid_monster') || $monster->getMonsterStat('is_raid_boss')) {
+        if (
+            $monster->getMonsterStat('is_raid_monster') ||
+            $monster->getMonsterStat('is_raid_boss') ||
+            $monster->canMonsterUseElementalAttack()
+        ) {
             $elementalData = $this->characterCacheData->getCachedCharacterData($character, 'elemental_atonement')['elemental_data'];
 
             $elementalAttack = resolve(ElementalAttack::class);
@@ -81,7 +84,8 @@ class MonsterAttack extends BattleBase {
     }
 
     protected function monsterSpecialAttack(ServerMonster $monster, Character $character) {
-        if ($monster->getMonsterStat('is_raid_monster') ||
+        if (
+            $monster->getMonsterStat('is_raid_monster') ||
             $monster->getMonsterStat('is_raid_boss') ||
             $monster->canMonsterUseElementalAttack()
         ) {

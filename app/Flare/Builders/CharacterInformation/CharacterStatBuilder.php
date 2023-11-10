@@ -261,7 +261,7 @@ class CharacterStatBuilder {
             $baseStat = $baseStat + $baseStat * $this->character->base_stat_mod;
         }
 
-        if (($this->map->mapType()->isHell() || $this->map->mapType()->isPurgatory()) && !$this->ignoreReductions) {
+        if (($this->map->mapType()->isHell() || $this->map->mapType()->isPurgatory() || $this->map->mapType()->isTheIcePlane()) && !$this->ignoreReductions) {
             $baseStat = $baseStat - $baseStat * $this->map->character_attack_reduction;
         }
 

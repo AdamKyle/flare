@@ -50,7 +50,7 @@ class MonsterTransformer extends TransformerAbstract {
             'focus'                     => $shouldIncrease ? $this->increaseValue($monster->focus, $increaseAmount) : $monster->focus,
             'to_hit_base'               => $shouldIncrease ? $this->increaseValue($monster->dex, $increaseAmount) : $monster->dex,
             'ac'                        => $shouldIncrease ? $this->increaseValue($monster->ac, $increaseAmount) : $monster->ac,
-            'health_range'              => $shouldIncrease ? $this->createNewHealthRange($monster, $increaseAmount): $monster->health_range,
+            'health_range'              => $shouldIncrease ? $this->createNewHealthRange($monster, $increaseAmount) : $monster->health_range,
             'attack_range'              => $shouldIncrease ? $this->createNewAttackRange($monster, $increaseAmount) : $monster->attack_range,
             'accuracy'                  => $shouldIncrease ? $this->increaseValue($monster->accuracy, $increaseAmount) : $monster->accuracy,
             'dodge'                     => $shouldIncrease ? $this->increaseValue($monster->dodge, $increaseAmount) : $monster->dodge,
@@ -145,10 +145,11 @@ class MonsterTransformer extends TransformerAbstract {
 
         $increase = false;
 
-        switch($monster->gameMap->name) {
+        switch ($monster->gameMap->name) {
             case 'Shadow Plane':
             case 'Hell':
             case 'Purgatory':
+            case 'The Ice Plane':
                 $increase = true;
                 break;
             default:

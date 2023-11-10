@@ -55,11 +55,13 @@ class BaseMovementService {
      * @param ConjureService $conjureService
      * @param MovementService $movementService
      */
-    public function __construct(MapTileValue $mapTileValue,
-                                MapPositionValue $mapPositionValue,
-                                CoordinatesCache $coordinatesCache,
-                                ConjureService $conjureService,
-                                MovementService $movementService) {
+    public function __construct(
+        MapTileValue $mapTileValue,
+        MapPositionValue $mapPositionValue,
+        CoordinatesCache $coordinatesCache,
+        ConjureService $conjureService,
+        MovementService $movementService
+    ) {
 
         $this->mapTileValue     = $mapTileValue;
         $this->mapPositionValue = $mapPositionValue;
@@ -157,12 +159,12 @@ class BaseMovementService {
         $mapId = $character->map->game_map_id;
 
         Kingdom::where('x_position', $this->x)
-               ->where('y_position', $this->y)
-               ->where('character_id', $character->id)
-               ->where('game_map_id', $mapId)
-               ->update([
-                    'last_walked' => now(),
-               ]);
+            ->where('y_position', $this->y)
+            ->where('character_id', $character->id)
+            ->where('game_map_id', $mapId)
+            ->update([
+                'last_walked' => now(),
+            ]);
     }
 
     /**
@@ -245,7 +247,7 @@ class BaseMovementService {
             $slot = $character->inventory->slots()->where('item_id', $item->id)->first();
 
             if (is_null($slot)) {
-                event(new ServerMessageEvent($character->user, 'Cannot enter this location without a ' . $item->name, $item->id, true));
+                event(new ServerMessageEvent($character->user, 'Cannot enter this location without a ' . $item->name));
 
                 return false;
             }

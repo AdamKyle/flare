@@ -81,8 +81,7 @@ class Ambush extends BattleBase {
         } else if ($this->canMonsterAmbushPlayer($serverMonster->getMonsterStat('ambush_chance'), $characterAmbushResistance)) {
             $this->addMessage('The enemies plotting and scheming comes to fruition!', 'enemy-action');
 
-            $damageStat = $serverMonster->getMonsterStat('damage_stat');
-            $damage     = $serverMonster->getMonsterStat($damageStat) * 2;
+            $damage = $serverMonster->buildAttack() * 2;
 
             $this->healthObject['current_character_health'] -= $damage;
 

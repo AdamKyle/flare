@@ -71,5 +71,6 @@ class InitiateWinterEvent implements ShouldQueue {
         GlobalEventGoal::create($globalEventGoalData);
 
         event(new GlobalMessageEvent('While on the The Ice Plane, characters who kill: ANY CREATURE in either manual or exploration, will increase the new: Global Event Goal. Players will be rewarded with random Corrupted Ice Gear when specific milestones are reached.'));
+
     }
 }
