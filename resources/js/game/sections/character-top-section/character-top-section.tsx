@@ -2,6 +2,7 @@ import React, {Fragment} from "react";
 import CharacterTopSectionProps from "../../lib/game/character-top-section/character-top-section-props";
 import CharacterTopSectionState from "../../lib/game/character-top-section/character-top-section-state";
 import {formatNumber} from "../../lib/game/format-number";
+import OrangeProgressBar from "../../components/ui/progress-bars/orange-progress-bar";
 
 export default class CharacterTopSection extends React.Component<CharacterTopSectionProps, CharacterTopSectionState> {
     constructor(props: CharacterTopSectionProps) {
@@ -119,8 +120,8 @@ export default class CharacterTopSection extends React.Component<CharacterTopSec
                             this.props.character.is_dead ?
                                 <Fragment>
                                     <span className='text-red-600 dark:text-red-400'>0 [DEAD]</span>
-                                </Fragment> 
-                            : 
+                                </Fragment>
+                            :
                                 this.abbreviateNumber(this.props.character.health)
                         }</div>
                     </div>
@@ -138,15 +139,11 @@ export default class CharacterTopSection extends React.Component<CharacterTopSec
                         <div className='py-1'><strong>Agility</strong>: {this.abbreviateNumber(this.props.character.agi_modded)}</div>
                     </div>
                 </div>
-                <div className='relative top-[24px]'>
-                    <div className="flex justify-between mb-1">
-                        <span className="font-medium text-orange-700 dark:text-white text-xs">XP</span>
-                        <span className="text-xs font-medium text-orange-700 dark:text-white">{formatNumber(this.props.character.xp)}/{formatNumber(this.props.character.xp_next)}</span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-1.5 dark:bg-gray-700">
-                        <div className="bg-orange-600 h-1.5 rounded-full" style={{width: this.getXpPercentage() + '%'}}></div>
-                    </div>
-                </div>
+                <OrangeProgressBar
+                    primary_label="XP"
+                    secondary_label={formatNumber(this.props.character.xp)+'/'+formatNumber(this.props.character.xp_next)}
+                    percentage_filled={this.getXpPercentage()}
+                />
             </Fragment>
         )
     }

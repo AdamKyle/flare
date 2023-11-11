@@ -1,4 +1,4 @@
-import React, {SyntheticEvent} from 'react';
+import React from 'react';
 import LocationPinProps from "../../../lib/game/types/map/location-pins/location-pin-props";
 
 export default class LocationPin extends React.Component<LocationPinProps, {}> {

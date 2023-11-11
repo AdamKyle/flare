@@ -1,5 +1,11 @@
 .game-map {
-    .map-x-pin, .location-x-pin, .port-x-pin, .kingdom-x-pin, .location-corrupted-pin {
+    .map-x-pin,
+    .location-x-pin,
+    .port-x-pin,
+    .kingdom-x-pin,
+    .location-corrupted-pin,
+    .christmas-tree-x-pin,
+    .snowman-x-pin {
         background-color: black; /* So we can see where the pixel is */
         height: 1px;
         position: absolute;
@@ -29,6 +35,28 @@
              top: -18px;
              left: -6px;
          }
+    }
+
+    .christmas-tree-x-pin {
+        &:after {
+             font-family: 'Font Awesome\ 5 Free';
+             content: '\f1bb';
+             font-size: 16px;
+             color: rgb(57, 172, 76);
+             top: -18px;
+             left: -6px;
+         }
+    }
+
+    .snowman-x-pin {
+        &:after {
+            font-family: 'Font Awesome\ 5 Free';
+            content: '\f7d0';
+            font-size: 16px;
+            color: #ffffff;
+            top: -18px;
+            left: -6px;
+        }
     }
 
     .location-corrupted-pin {

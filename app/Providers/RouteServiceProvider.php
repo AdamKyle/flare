@@ -82,6 +82,7 @@ class RouteServiceProvider extends ServiceProvider {
         $this->mapGameCoreRoutes();
         $this->mapShopRoutes();
         $this->mapGamblingRoutes();
+        $this->mapEvents();
 
         // Api Routes:
         $this->mapAdminApiRoutes();
@@ -349,5 +350,12 @@ class RouteServiceProvider extends ServiceProvider {
             ->middleware('web')
             ->namespace('App\Game\NpcActions\WorkBench\Controllers')
             ->group(base_path('routes/game/npc-actions/work-bench/api.php'));
+    }
+
+    protected function mapEvents() {
+        Route::prefix('api')
+            ->middleware('web')
+            ->namespace('App\Game\Events\Controllers')
+            ->group(base_path('routes/game/events/api.php'));
     }
 }

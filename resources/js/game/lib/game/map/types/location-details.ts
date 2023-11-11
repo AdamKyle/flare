@@ -22,6 +22,7 @@ export default interface LocationDetails {
     quest_reward_item_id: number | null;
 
     required_quest_item_id: number | null;
+
     required_quest_item_name: string | null;
 
     type: string | null;
@@ -31,4 +32,6 @@ export default interface LocationDetails {
     is_corrupted: boolean;
 
     has_raid_boss: boolean;
+
+    pin_css_class: string | null;
 }

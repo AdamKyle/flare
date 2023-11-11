@@ -33,6 +33,14 @@ class LocationService {
             'questItems'      => Item::where('type', 'quest')->pluck('name', 'id')->toArray(),
             'locationTypes'   => LocationType::getNamedValues(),
             'location'        => $location,
-         ];
+            'specialCssPins'  => $this->getLocationCssPins(),
+        ];
+    }
+
+    protected function getLocationCssPins(): array {
+        return [
+            'christmas-tree-x-pin' => 'Christmas Tree',
+            'snowman-x-pin'        => 'Snowman',
+        ];
     }
 }

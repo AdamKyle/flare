@@ -21,6 +21,8 @@
                                     name="description" />
                                 <x-core.forms.key-value-select :model="$location" label="Belongs to Game Map:"
                                     modelKey="game_map_id" name="game_map_id" :options="$gameMaps" />
+                                <x-core.forms.key-value-select :model="$location" label="Special Location Pin:"
+                                    modelKey="pin_css_class" name="pin_css_class" :options="$specialCssPins" />
                                 <x-core.forms.check-box :model="$location" label="Is Port Location?" modelKey="is_port"
                                     name="is_port" />
                                 <x-core.forms.check-box :model="$location" label="Can players enter this location?"

@@ -1,11 +1,11 @@
 import React from "react";
 import Tabs from "../../components/ui/tabs/tabs";
 import TabPanel from "../../components/ui/tabs/tab-panel";
+import EventGoalsTab from "./tabs/event-goals-tab";
 
-type TabDefinition = {key: string; name:string;}[];
+type TabDefinition = { key: string; name: string }[];
 
 export default class MapTabs extends React.Component<any, any> {
-
     private tabs: TabDefinition;
 
     constructor(props: any) {
@@ -24,20 +24,15 @@ export default class MapTabs extends React.Component<any, any> {
     }
 
     render() {
-        return (
-            this.props.use_tabs ?
-                <Tabs
-                    tabs={this.tabs}
-                    disabled={false}
-                >
-                    <TabPanel key={"map"}>
-                        {this.props.children}
-                    </TabPanel>
-                    <TabPanel key={"event-goals"}>
-                        Content here ...
-                    </TabPanel>
-                </Tabs>
-            : this.props.children
+        return this.props.use_tabs ? (
+            <Tabs tabs={this.tabs} disabled={false}>
+                <TabPanel key={"map"}>{this.props.children}</TabPanel>
+                <TabPanel key={"event-goals"}>
+                    <EventGoalsTab />
+                </TabPanel>
+            </Tabs>
+        ) : (
+            this.props.children
         );
     }
 }

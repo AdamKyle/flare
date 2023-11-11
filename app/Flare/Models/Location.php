@@ -31,7 +31,8 @@ class Location extends Model {
         'type',
         'raid_id',
         'has_raid_boss',
-        'is_corrupted'
+        'is_corrupted',
+        'pin_css_class',
     ];
 
     /**

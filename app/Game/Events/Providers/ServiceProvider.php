@@ -6,6 +6,7 @@ use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use App\Game\Events\Console\Commands\EndScheduledEvent;
 use App\Game\Events\Console\Commands\ProcessScheduledEvents;
 use App\Game\Events\Console\Commands\StartMonthlyPvpEvent;
+use App\Game\Events\Services\EventGoalsService;
 
 class ServiceProvider extends ApplicationServiceProvider {
 
@@ -21,6 +22,10 @@ class ServiceProvider extends ApplicationServiceProvider {
             ProcessScheduledEvents::class,
             StartMonthlyPvpEvent::class,
         ]);
+
+        $this->app->bind(EventGoalsService::class, function () {
+            return new EventGoalsService();
+        });
     }
 
     /**

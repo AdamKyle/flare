@@ -13,8 +13,8 @@
             <th>x</th>
             <th>y</th>
             <th>type</th>
-            <th>drops_items
-            <th>
+            <th>drops_items</th>
+            <th>pin_css_class</th>
         </tr>
     </thead>
     <tbody>
@@ -32,7 +32,8 @@
                 <td>{{ $location->x }}</td>
                 <td>{{ $location->y }}</td>
                 <td>{{ $location->type }}</td>
-                <td>{{ !is_null($location->enemy_strength_type) ? 'Yes' : 'No' }}
+                <td>{{ !is_null($location->enemy_strength_type) ? 'Yes' : 'No' }}</td>
+                <td>{{ $location->pin_css_class }}</td>
             </tr>
         @endforeach
     </tbody>
