@@ -11,11 +11,15 @@ use Illuminate\Console\Command;
 use App\Flare\Models\Announcement;
 use App\Flare\Models\ScheduledEvent;
 use App\Flare\Events\UpdateScheduledEvents;
+use App\Flare\Models\GameMap;
 use App\Flare\Models\RaidBoss;
 use App\Flare\Models\RaidBossParticipation;
 use App\Game\Maps\Services\LocationService;
 use App\Game\Raids\Events\CorruptLocations;
 use App\Flare\Services\EventSchedulerService;
+use App\Flare\Values\MapNameValue;
+use App\Game\Events\Services\KingdomEventService;
+use App\Game\Maps\Services\TraverseService;
 use App\Game\Maps\Services\UpdateRaidMonsters;
 use App\Game\Messages\Events\DeleteAnnouncementEvent;
 use App\Game\Messages\Events\GlobalMessageEvent;
@@ -39,10 +43,18 @@ class EndScheduledEvent extends Command {
      * @param LocationService $locationService
      * @param UpdateRaidMonsters $updateRaidMonsters
      * @param EventSchedulerService $eventSchedulerService
+     * @param KingdomEventService $kingdomEventService,
+     * @param TraverseService $traverseService,
      * @return void
      */
-    public function handle(LocationService $locationService, UpdateRaidMonsters $updateRaidMonsters, EventSchedulerService $eventSchedulerService) {
-        $this->endScheduledEvent($locationService, $updateRaidMonsters, $eventSchedulerService);
+    public function handle(
+        LocationService $locationService,
+        UpdateRaidMonsters $updateRaidMonsters,
+        EventSchedulerService $eventSchedulerService,
+        KingdomEventService $kingdomEventService,
+        TraverseService $traverseService
+    ) {
+        $this->endScheduledEvent($locationService, $updateRaidMonsters, $eventSchedulerService, $kingdomEventService, $traverseService);
     }
 
     /**
@@ -53,7 +65,14 @@ class EndScheduledEvent extends Command {
      * @param EventSchedulerService $eventSchedulerService
      * @return void
      */
-    protected function endScheduledEvent(LocationService $locationService, UpdateRaidMonsters $updateRaidMonsters, EventSchedulerService $eventSchedulerService): void {
+    protected function endScheduledEvent(
+        LocationService $locationService,
+        UpdateRaidMonsters $updateRaidMonsters,
+        EventSchedulerService $eventSchedulerService,
+        KingdomEventService $kingdomEventService,
+        TraverseService $traverseService
+    ): void {
+
         $scheduledEvents = ScheduledEvent::where('end_date', '<=', now())->get();
 
         foreach ($scheduledEvents as $event) {
@@ -96,6 +115,16 @@ class EndScheduledEvent extends Command {
             }
 
             if ($eventType->isMonthlyPVP()) {
+                $event->update([
+                    'currently_running' => false,
+                ]);
+
+                event(new UpdateScheduledEvents($eventSchedulerService->fetchEvents()));
+            }
+
+            if ($eventType->isWinterEvent()) {
+                $this->endWinterEvent($kingdomEventService, $traverseService);
+
                 $event->update([
                     'currently_running' => false,
                 ]);
@@ -173,6 +202,39 @@ class EndScheduledEvent extends Command {
         $event = Event::where('type', EventType::WEEKLY_CELESTIALS)->first();
 
         event(new GlobalMessageEvent('The Creator has managed to close the gates and lock the Celestials away behind the doors of Kalitorm! Come back next week for another chance at the hunt!'));
+
+        $announcement = Announcement::where('event_id', $event->id)->first();
+
+        event(new DeleteAnnouncementEvent($announcement->id));
+
+        $announcement->delete();
+
+        $event->delete();
+    }
+
+    /**
+     * End the winter event.
+     *
+     * @param KingdomEventService $kingdomEventService
+     * @return void
+     */
+    protected function endWinterEvent(KingdomEventService $kingdomEventService, TraverseService $traverseService) {
+        $event = Event::where('type', EventType::WINTER_EVENT)->first();
+
+        $kingdomEventService->handleKingdomRewardsForEvent(MapNameValue::ICE_PLANE);
+
+        $gameMap    = GameMap::where('name', MapNameValue::ICE_PLANE)->first();
+        $surfaceMap = GameMap::where('name', MapNameValue::SURFACE)->first();
+
+        Character::join('maps', 'maps.character_id', '=', 'characters.id')
+            ->where('maps.game_map_id', $gameMap->id)
+            ->chunk(100, function ($characters) use ($traverseService, $surfaceMap) {
+                foreach ($characters as $character) {
+                    $traverseService->travel($surfaceMap->id, $character);
+                }
+            });
+
+        event(new GlobalMessageEvent('The Queen of Ice calls forth her twisted memories and magics to seal the gates to her realm. "My son! You have stolen the memories of my son!" She bellows as she banishes you and others from her realm!'));
 
         $announcement = Announcement::where('event_id', $event->id)->first();
 

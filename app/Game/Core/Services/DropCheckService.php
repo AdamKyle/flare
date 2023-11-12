@@ -56,7 +56,7 @@ class DropCheckService {
         $this->battleDrop      = $battleDrop;
         $this->buildMythicItem = $buildMythicItem;
     }
-    
+
 
     /**
      * Process the drop check.
@@ -80,9 +80,9 @@ class DropCheckService {
         $this->findLocationWithEffect($characterMap);
 
         $this->battleDrop = $this->battleDrop->setMonster($this->monster)
-                                             ->setSpecialLocation($this->locationWithEffect)
-                                             ->setGameMapBonus($this->gameMapBonus)
-                                             ->setLootingChance($this->lootingChance);
+            ->setSpecialLocation($this->locationWithEffect)
+            ->setGameMapBonus($this->gameMapBonus)
+            ->setLootingChance($this->lootingChance);
 
         $this->handleDropChance($character);
 
@@ -146,10 +146,10 @@ class DropCheckService {
      */
     public function findLocationWithEffect(Map $map): void {
         $this->locationWithEffect = Location::whereNotNull('enemy_strength_type')
-                                            ->where('x', $map->character_position_x)
-                                            ->where('y', $map->character_position_y)
-                                            ->where('game_map_id', $map->game_map_id)
-                                            ->first();
+            ->where('x', $map->character_position_x)
+            ->where('y', $map->character_position_y)
+            ->where('game_map_id', $map->game_map_id)
+            ->first();
     }
 
     /**
@@ -171,10 +171,10 @@ class DropCheckService {
 
             $roll = $roll + $roll * $chance;
 
-            return $roll > 990;
+            return $roll > 999;
         }
 
-        return $roll > 990;
+        return $roll > 999;
     }
 
     /**

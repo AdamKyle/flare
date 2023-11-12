@@ -30,5 +30,6 @@ class BroadcastServiceProvider extends ServiceProvider {
         require base_path('routes/flare/channels.php');
         require base_path('routes/game/gambler/channels.php');
         require base_path('routes/game/npc-actions/queen-of-hearts/channels.php');
+        require base_path('routes/game/events/channels.php');
     }
 }

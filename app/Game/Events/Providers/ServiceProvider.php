@@ -7,6 +7,7 @@ use App\Game\Events\Console\Commands\EndScheduledEvent;
 use App\Game\Events\Console\Commands\ProcessScheduledEvents;
 use App\Game\Events\Console\Commands\StartMonthlyPvpEvent;
 use App\Game\Events\Services\EventGoalsService;
+use App\Game\Events\Services\KingdomEventService;
 
 class ServiceProvider extends ApplicationServiceProvider {
 
@@ -25,6 +26,10 @@ class ServiceProvider extends ApplicationServiceProvider {
 
         $this->app->bind(EventGoalsService::class, function () {
             return new EventGoalsService();
+        });
+
+        $this->app->bind(KingdomEventService::class, function () {
+            return new KingdomEventService();
         });
     }
 

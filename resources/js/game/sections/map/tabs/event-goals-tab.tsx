@@ -5,11 +5,14 @@ import LoadingProgressBar from "../../../components/ui/progress-bars/loading-pro
 import OrangeProgressBar from "../../../components/ui/progress-bars/orange-progress-bar";
 import { formatNumber } from "../../../lib/game/format-number";
 import EventGoalsTabState from "./types/event-goals-tab-state";
+import EventGoal from "./definitions/event-goal";
 
 export default class EventGoalsTab extends React.Component<
     {},
     EventGoalsTabState
 > {
+    private eventGoalsUpdate: any;
+
     constructor(props: {}) {
         super(props);
 
@@ -17,6 +20,9 @@ export default class EventGoalsTab extends React.Component<
             loading: true,
             eventGoal: null,
         };
+
+        // @ts-ignore
+        this.eventGoalsUpdate = Echo.join("update-event-goal-progress");
     }
 
     componentDidMount(): void {
@@ -32,6 +38,15 @@ export default class EventGoalsTab extends React.Component<
                 console.error(error);
             }
         );
+
+        this.eventGoalsUpdate.listen(
+            "Game.Events.Events.UpdateEventGoalProgress",
+            (event: { eventGoalData: { event_goals: EventGoal } }) => {
+                this.setState({
+                    eventGoal: event.eventGoalData.event_goals,
+                });
+            }
+        );
     }
 
     buildProgressBars() {
@@ -43,12 +58,12 @@ export default class EventGoalsTab extends React.Component<
 
         let current = this.state.eventGoal.reward_every;
         let phase = 1;
-        console.log(this.state.eventGoal);
+
         while (current <= this.state.eventGoal.max_kills) {
             const value = Math.min(current, this.state.eventGoal.total_kills);
 
             progressBars.push(
-                <div className="mb-4">
+                <div className="mb-4 relative top-[-15px]">
                     <OrangeProgressBar
                         key={current}
                         primary_label={"Phase: " + phase}
@@ -114,6 +129,14 @@ export default class EventGoalsTab extends React.Component<
                         <dt>With Mythic Attached?</dt>
                         <dd>No</dd>
                     </dl>
+                    <p className="my-2 font-bold">
+                        <span className="text-orange-500 dark:text-orange-300">
+                            Amount of kills required to gain phase reward:
+                        </span>{" "}
+                        {formatNumber(
+                            this.state.eventGoal.kills_needed_for_reward
+                        )}
+                    </p>
                 </div>
                 <div className="max-h-[200px] overflow-y-scroll px-2 relative top-[-10px]">
                     {this.buildProgressBars()}

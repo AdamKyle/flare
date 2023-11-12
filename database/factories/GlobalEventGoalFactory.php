@@ -3,7 +3,6 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use App\Flare\Models\Event;
 use App\Flare\Models\GlobalEventGoal;
 
 class GlobalEventGoalFactory extends Factory {

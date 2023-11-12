@@ -50,6 +50,7 @@ class MonstersTable extends DataTableComponent {
                     'Shadow Plane Raid Monsters'  => 'Shadow Plane Raid Monsters',
                     'Hell Raid Monsters'          => 'Hell Raid Monsters',
                     'Purgatory Raid Monsters'     => 'Purgatory Raid Monsters',
+                    'The Ice Plane Raid Monsters' => 'The Ice Plane Raid Monsters',
                 ])->filter(function (Builder $builder, string $value) {
                     if (str_contains($value, 'Celestials')) {
 

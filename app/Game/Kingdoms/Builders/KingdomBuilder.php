@@ -4,6 +4,7 @@ namespace App\Game\Kingdoms\Builders;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
+use App\Game\Messages\Events\ServerMessageEvent;
 
 class KingdomBuilder {
 
@@ -16,6 +17,20 @@ class KingdomBuilder {
      * @return Kingdom
      */
     public function createKingdom(Character $character, string $name, string $color): Kingdom {
+
+        $isOnIcePlane          = $character->map->gameMap->mapType()->isTheIcePlane();
+        $characterKingdomCount = $character->kingdoms()->count();
+
+        $protectedUntil        = null;
+
+        if (!$isOnIcePlane && $characterKingdomCount === 0) {
+            $protectedUntil = now()->addDays(7);
+        }
+
+        if ($isOnIcePlane && $character->kingdoms()->count() === 0) {
+            event(new ServerMessageEvent($character->user, 'Kingdoms settled on The Ice Plane do not have protection. Keep that in mind child!'));
+        }
+
         $kingdom = [
             'name'                    => $name,
             'color'                   => $color,
@@ -39,7 +54,7 @@ class KingdomBuilder {
             'x_position'              => $character->map->character_position_x,
             'y_position'              => $character->map->character_position_y,
             'last_walked'             => now(),
-            'protected_until'         => $character->kingdoms()->count() === 0 ? now()->addDays(7) : null,
+            'protected_until'         => $protectedUntil,
         ];
 
         return Kingdom::create($kingdom);

@@ -7,16 +7,40 @@ use App\Flare\Models\Character;
 use App\Flare\Models\GlobalEventGoal;
 use App\Flare\Models\Item;
 use App\Flare\Values\RandomAffixDetails;
+use App\Game\Events\Events\UpdateEventGoalProgress;
+use App\Game\Events\Services\EventGoalsService;
 use App\Game\Messages\Events\ServerMessageEvent;
 
 class GlobalEventParticipationHandler {
 
+
+    /**
+     * @var RandomAffixGenerator $randomAffixGenerator
+     */
     private RandomAffixGenerator $randomAffixGenerator;
 
-    public function __construct(RandomAffixGenerator $randomAffixGenerator) {
+    /**
+     * @var EventGoalsService $eventGoalService
+     */
+    private EventGoalsService $eventGoalService;
+
+    /**
+     * @param RandomAffixGenerator $randomAffixGenerator
+     * @param EventGoalsService $eventGoalService
+     */
+    public function __construct(RandomAffixGenerator $randomAffixGenerator, EventGoalsService $eventGoalService) {
         $this->randomAffixGenerator = $randomAffixGenerator;
+
+        $this->eventGoalService = $eventGoalService;
     }
 
+    /**
+     * Handle updating the global; event participation
+     *
+     * @param Character $character
+     * @param GlobalEventGoal $globalEventGoal
+     * @return void
+     */
     public function handleGlobalEventParticipation(Character $character, GlobalEventGoal $globalEventGoal) {
         if ($globalEventGoal->total_kills >= $globalEventGoal->max_kills) {
             return;
@@ -30,6 +54,8 @@ class GlobalEventParticipationHandler {
                 'character_id'         => $character->id,
                 'current_kills'        => 1,
             ]);
+
+            event(new UpdateEventGoalProgress($this->eventGoalService->getEventGoalData()));
 
             return;
         }
@@ -49,17 +75,42 @@ class GlobalEventParticipationHandler {
 
             $this->rewardCharactersParticipating($globalEventGoal->refresh());
         }
+
+        event(new UpdateEventGoalProgress($this->eventGoalService->getEventGoalData()));
     }
 
+    /**
+     * Reward only those who have met the required amount of kills or higher.
+     *
+     * @param GlobalEventGoal $globalEventGoal
+     * @return void
+     */
     protected function rewardCharactersParticipating(GlobalEventGoal $globalEventGoal) {
         Character::whereIn('id', $globalEventGoal->pluck('globalEventParticipation.character_id')->toArray())
             ->chunkById(100, function ($characters) use ($globalEventGoal) {
                 foreach ($characters as $character) {
-                    $this->rewardForCharacter($character, $globalEventGoal);
+
+                    $amountOfKills = $globalEventGoal->globalEventParticipation
+                        ->where('character_id', $character->id)
+                        ->first()
+                        ->current_kills;
+
+                    if ($amountOfKills >= $this->eventGoalService->fetchKillAmountNeeded($globalEventGoal)) {
+                        $this->rewardForCharacter($character, $globalEventGoal);
+                    }
                 }
             });
+
+        $this->resetParticipationAtPhaseCompletion($globalEventGoal);
     }
 
+    /**
+     * Generate reward for the character.
+     *
+     * @param Character $character
+     * @param GlobalEventGoal $globalEventGoal
+     * @return void
+     */
     protected function rewardForCharacter(Character $character, GlobalEventGoal $globalEventGoal) {
         $randomAffixGenerator = $this->randomAffixGenerator->setCharacter($character);
 
@@ -89,9 +140,7 @@ class GlobalEventParticipationHandler {
                 'item_id'      => $newItem->id,
             ]);
 
-            if ($character->isInventoryFull()) {
-                event(new ServerMessageEvent($character->user, 'Your characters inventory is full. You were rewarded the Event Item either way.'));
-            }
+            event(new ServerMessageEvent($character->user, 'You were rewarded with an item of Unique power for participating in the current events global goal.'));
         }
 
         if ($globalEventGoal->is_mythic) {
@@ -109,11 +158,17 @@ class GlobalEventParticipationHandler {
                 'item_id'      => $newItem->id,
             ]);
 
-            event(new ServerMessageEvent($character->user, 'You were rewarded with an item of great power for participating in the current events global goal'));
-
-            if ($character->isInventoryFull()) {
-                event(new ServerMessageEvent($character->user, 'Your characters inventory is full. You were rewarded the Event Item either way.'));
-            }
+            event(new ServerMessageEvent($character->user, 'You were rewarded with an item of Mythical power for participating in the current events global goal.'));
         }
+    }
+
+    /**
+     * Reset the participation.
+     *
+     * @param GlobalEventGoal $globalEventGoal
+     * @return void
+     */
+    private function resetParticipationAtPhaseCompletion(GlobalEventGoal $globalEventGoal) {
+        $globalEventGoal->globalEventParticipation()->truncate();
     }
 }

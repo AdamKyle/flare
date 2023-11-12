@@ -419,12 +419,12 @@ class CharacterFactory {
      * @param int $y | 16
      * @return CharacterFactory
      */
-    public function givePlayerLocation(int $x = 16, int $y = 16): CharacterFactory {
-        $gameMap = GameMap::where('default', true)->get();
+    public function givePlayerLocation(int $x = 16, int $y = 16, GameMap $gameMap = null): CharacterFactory {
+        $gameMap = !is_null($gameMap) ? $gameMap : GameMap::where('default', true)->first();
         $id      = 0;
 
-        if ($gameMap->isNotEmpty()) {
-            $id = $gameMap->first()->id;
+        if (!is_null($gameMap)) {
+            $id = $gameMap->id;
         } else {
             $id = $this->createGameMap([
                 'name'    => 'Surface',

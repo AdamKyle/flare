@@ -5,8 +5,15 @@ namespace Tests\Console\Events;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\Models\Announcement;
 use App\Flare\Models\Event;
+use App\Flare\Models\GameMap;
+use App\Flare\Values\ItemSpecialtyType;
+use App\Flare\Values\MapNameValue;
+use App\Flare\Values\WeaponTypes;
 use App\Game\Events\Values\EventType;
+use App\Game\Maps\Values\MapTileValue;
 use Illuminate\Support\Facades\Cache;
+use Mockery;
+use Mockery\MockInterface;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateAnnouncement;
@@ -27,7 +34,8 @@ class EndScheduledEventTest extends TestCase {
         CreateLocation,
         CreateGameMap,
         CreateEvent,
-        CreateAnnouncement;
+        CreateAnnouncement,
+        CreateMonster;
 
     public function setUp(): void {
         parent::setUp();
@@ -181,5 +189,67 @@ class EndScheduledEventTest extends TestCase {
         $this->artisan('end:scheduled-event');
 
         $this->assertFalse($scheduledEvent->refresh()->currently_running);
+    }
+
+    public function testEndWinterEvent() {
+
+        $monsterCache = [
+            MapNameValue::SURFACE => [$this->createMonster()]
+        ];
+
+        Cache::put('monsters', $monsterCache);
+
+        $this->instance(
+            MapTileValue::class,
+            Mockery::mock(MapTileValue::class, function (MockInterface $mock) {
+                $mock->shouldReceive('canWalkOnWater')->once()->andReturn(true);
+                $mock->shouldReceive('canWalkOnDeathWater')->once()->andReturn(true);
+                $mock->shouldReceive('canWalkOnMagma')->once()->andReturn(true);
+                $mock->shouldReceive('isPurgatoryWater')->once()->andReturn(false);
+                $mock->shouldReceive('getTileColor')->once()->andReturn('000');
+            })
+        );
+
+        $scheduledEvent = $this->createScheduledEvent([
+            'event_type'        => EventType::WINTER_EVENT,
+            'start_date'        => now()->addMinutes(5),
+            'currently_running' => true,
+        ]);
+
+        $event = $this->createEvent([
+            'type'        => EventType::WINTER_EVENT,
+            'started_at'  => now(),
+            'ends_at'     => now()->subMinute(10),
+        ]);
+
+        $this->createAnnouncement([
+            'event_id' => $event->id,
+        ]);
+
+        $icePlane = $this->createGameMap([
+            'name' => MapNameValue::ICE_PLANE,
+        ]);
+
+        $character = (new CharacterFactory())->createBaseCharacter()
+            ->givePlayerLocation(16, 16, $icePlane)
+            ->kingdomManagement()
+            ->assignKingdom()
+            ->assignBuilding()
+            ->assignUnits()
+            ->getCharacter();
+
+        $this->createItem(['specialty_type' => ItemSpecialtyType::CORRUPTED_ICE, 'type' => WeaponTypes::HAMMER]);
+
+        $this->artisan('end:scheduled-event');
+
+        $character = $character->refresh();
+
+        $this->assertNotEmpty($character->inventory->slots->where('item.specialty_type', ItemSpecialtyType::CORRUPTED_ICE)->all());
+        $this->assertEmpty($character->kingdoms);
+        $this->assertEquals(GameMap::where('name', MapNameValue::SURFACE)->first()->id, $character->map->game_map_id);
+
+        $this->assertFalse($scheduledEvent->refresh()->currently_running);
+        $this->assertEmpty(Event::all());
+        $this->assertEmpty(Announcement::all());
     }
 }

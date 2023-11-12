@@ -7,7 +7,7 @@
 
         @if (!is_null($quest->only_for_event))
             @if ($quest->eventType()->isWinterEvent())
-                <x-core.alerts.info-alert>
+                <x-core.alerts.info-alert title="ATTN!">
                     <p>This quest chain is only available during the Winter Event</p>
                 </x-core.alerts.info-alert>
             @endif
@@ -42,7 +42,8 @@
                 <dt>Npc X/Y:</dt>
                 <dd>{{ $quest->npc->x_position }}/{{ $quest->npc->y_position }}
                     <strong>{{ $quest->npc->gameMap->name }}</strong> (You will be moved to this location upon handing
-                    in the quest.)</dd>
+                    in the quest.)
+                </dd>
             @endif
             <dt>Required Item:</dt>
             <dd>

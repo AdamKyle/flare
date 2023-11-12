@@ -77,11 +77,13 @@ class ItemsService {
                 ItemEffectsValue::GET_COPPER_COINS,
                 ItemEffectsValue::ENTER_PURGATORY_HOUSE,
                 ItemEffectsValue::HIDE_CHAT_LOCATION,
+                ItemeffectsValue::SETTLE_IN_ICE_PLANE,
             ],
             'specialtyTypes' => [
                 ItemSpecialtyType::HELL_FORGED,
                 ItemSpecialtyType::PURGATORY_CHAINS,
                 ItemSpecialtyType::PIRATE_LORD_LEATHER,
+                ItemSpecialtyType::CORRUPTED_ICE,
             ],
             'itemSkills' => ItemSkill::whereNull('parent_id')->get(),
             'locations'  => Location::select('name', 'id')->get(),

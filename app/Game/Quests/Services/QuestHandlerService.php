@@ -14,6 +14,7 @@ use App\Game\Quests\Handlers\NpcQuestsHandler;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Flare\Jobs\CharacterAttackTypesCacheBuilder;
+use App\Flare\Models\Event;
 use App\Game\Maps\Events\UpdateMap;
 use App\Game\Maps\Events\UpdateMonsterList;
 use App\Game\Maps\Events\UpdateRaidMonsters;
@@ -84,6 +85,16 @@ class QuestHandlerService {
      */
     public function shouldBailOnQuest(Character $character, Quest $quest): bool {
         $completedQuests = $character->questsCompleted->pluck('quest_id')->toArray();
+
+        if (!is_null($quest->only_for_event)) {
+            $event = Event::where('type', $quest->only_for_event)->first();
+
+            if (is_null($event)) {
+                $this->bailMessage = 'This quest can only be done during a special event.';
+
+                return true;
+            }
+        }
 
         if (!$this->validateParentQuest($quest, $completedQuests)) {
             $this->bailMessage = 'You must finish the parent quest first ...';
