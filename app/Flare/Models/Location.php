@@ -74,6 +74,10 @@ class Location extends Model {
     }
 
     public function locationType() {
+        if (is_null($this->type)) {
+            return null;
+        }
+
         return new LocationType($this->type);
     }
 

@@ -4,7 +4,7 @@ namespace App\Game\Battle\Services;
 
 use App\Flare\Models\Character;
 use App\Flare\ServerFight\MonsterPlayerFight;
-use App\Game\BattleRewardProcessing\Handlers\BattleEventHandler;
+use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\BattleRewardProcessing\Jobs\BattleAttackHandler;
 use App\Game\Core\Traits\ResponseBuilder;
 use Illuminate\Support\Facades\Cache;

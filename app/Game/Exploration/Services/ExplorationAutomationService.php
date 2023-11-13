@@ -7,7 +7,7 @@ use App\Flare\Models\CharacterAutomation;
 use App\Flare\ServerFight\MonsterPlayerFight;
 use App\Flare\Values\AutomationType;
 use App\Game\Battle\Events\UpdateCharacterStatus;
-use App\Game\BattleRewardProcessing\Handlers\BattleEventHandler;
+use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Exploration\Events\ExplorationLogUpdate;
 use App\Game\Exploration\Events\ExplorationTimeOut;
 use App\Game\Exploration\Jobs\Exploration;

@@ -12,6 +12,7 @@ use App\Flare\ServerFight\Pvp\PvpAttack;
 use App\Flare\Services\BuildMonsterCacheService;
 use App\Flare\Services\CharacterXPService;
 use App\Game\Battle\Console\Commands\ClearCelestials;
+use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Battle\Services\BattleDrop;
 use App\Game\Battle\Services\CelestialFightService;
 use App\Game\Battle\Services\ConjureService;
@@ -20,7 +21,8 @@ use App\Game\Battle\Services\MonthlyPvpService;
 use App\Game\Battle\Services\PvpService;
 use App\Game\Battle\Services\RaidBattleService;
 use App\Game\Battle\Services\RankFightService;
-use App\Game\BattleRewardProcessing\Handlers\BattleEventHandler;
+use App\Game\BattleRewardProcessing\Services\BattleRewardService;
+use App\Game\BattleRewardProcessing\Services\SecondaryRewardService;
 use App\Game\Core\Services\GoldRush;
 use App\Game\Maps\Values\MapTileValue;
 use App\Game\Messages\Builders\NpcServerMessageBuilder;
@@ -96,6 +98,13 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(MonsterPlayerFight::class),
                 $app->make(BuildMonsterCacheService::class),
                 $app->make(BattleEventHandler::class)
+            );
+        });
+
+        $this->app->bind(BattleEventHandler::class, function($app) {
+            return new BattleEventHandler(
+                $app->make(BattleRewardService::class),
+                $app->make(SecondaryRewardService::class)
             );
         });
 

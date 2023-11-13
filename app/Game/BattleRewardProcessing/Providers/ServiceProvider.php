@@ -5,7 +5,7 @@ namespace App\Game\BattleRewardProcessing\Providers;
 use App\Flare\Builders\RandomAffixGenerator;
 use App\Flare\Models\GlobalEventParticipation;
 use App\Flare\Services\CharacterRewardService;
-use App\Game\BattleRewardProcessing\Handlers\BattleEventHandler;
+use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\BattleRewardProcessing\Handlers\FactionHandler;
 use App\Game\BattleRewardProcessing\Handlers\GlobalEventParticipationHandler;
 use App\Game\BattleRewardProcessing\Handlers\PurgatorySmithHouseRewardHandler;
@@ -58,13 +58,6 @@ class ServiceProvider extends ApplicationServiceProvider {
             return new SecondaryRewardService(
                 $app->make(MercenaryService::class),
                 $app->make(ClassRankService::class),
-            );
-        });
-
-        $this->app->bind(BattleEventHandler::class, function($app) {
-            return new BattleEventHandler(
-                $app->make(BattleRewardService::class),
-                $app->make(SecondaryRewardService::class)
             );
         });
     }

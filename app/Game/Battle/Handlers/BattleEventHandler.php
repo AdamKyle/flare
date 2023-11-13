@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Game\BattleRewardProcessing\Handlers;
+namespace App\Game\Battle\Handlers;
 
 use App\Flare\Builders\Character\Traits\FetchEquipped;
 use App\Flare\Models\Character;

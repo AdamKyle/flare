@@ -15,7 +15,7 @@ use App\Flare\Services\CharacterXPService;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Flare\Values\RandomAffixDetails;
 use App\Game\Battle\Events\AttackTimeOutEvent;
-use App\Game\BattleRewardProcessing\Handlers\BattleEventHandler;
+use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\BattleRewardProcessing\Jobs\BattleAttackHandler;
 use App\Game\Core\Traits\HandleCharacterLevelUp;
 use App\Game\Core\Traits\ResponseBuilder;

@@ -25,7 +25,8 @@ class SettingsController extends Controller {
 
     public function index(User $user) {
 
-        $canUseCosmeticText = $user->character->questsCompleted->where('quest.unlocks_feature', FeatureTypes::COSMETIC_TEXT)->count() > 0;;
+        $canUseCosmeticText = $user->character->questsCompleted->where('quest.unlocks_feature', FeatureTypes::COSMETIC_TEXT)->count() > 0;
+        $canUseNameTags     = $user->character->questsCompleted->where('quest.unlocks_feature', FeatureTypes::NAME_TAGS)->count() > 0;
 
         return view('game.core.settings.settings', [
             'user'         => $user,
@@ -34,6 +35,7 @@ class SettingsController extends Controller {
                 ->whereNull('secondary_required_class_id')
                 ->pluck('name', 'id'),
             'cosmeticText' => $canUseCosmeticText,
+            'cosmeticNameTag' => $canUseNameTags,
             'nameTags'    => NameTags::$valueNames,
         ]);
     }
@@ -115,9 +117,9 @@ class SettingsController extends Controller {
 
     public function cosmeticNametag(NameTagRequest $request, User $user) {
 
-//        if ($user->character->questsCompleted->where('quest.unlocks_feature', FeatureTypes::NAME_TAGS)->count() <= 0) {
-//            return redirect()->back()->with('error', 'Missing required quest completion for that action.');
-//        }
+        if ($user->character->questsCompleted->where('quest.unlocks_feature', FeatureTypes::NAME_TAGS)->count() <= 0) {
+            return redirect()->back()->with('error', 'Missing required quest completion for that action.');
+        }
 
         $nameTag = $request->name_tag;
 

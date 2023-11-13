@@ -11,7 +11,7 @@ use App\Flare\Models\Monster;
 use App\Flare\ServerFight\MonsterPlayerFight;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Battle\Events\UpdateCharacterStatus;
-use App\Game\BattleRewardProcessing\Handlers\BattleEventHandler;
+use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\BattleRewardProcessing\Handlers\FactionHandler;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use App\Game\Exploration\Events\ExplorationLogUpdate;

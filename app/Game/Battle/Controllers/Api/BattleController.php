@@ -5,6 +5,7 @@ namespace App\Game\Battle\Controllers\Api;
 use App\Flare\Models\Monster;
 use App\Flare\Models\Location;
 use App\Flare\Models\Character;
+use App\Game\Battle\Handlers\BattleEventHandler;
 use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Cache;
@@ -18,17 +19,24 @@ use App\Game\Battle\Services\MonsterFightService;
 class BattleController extends Controller {
 
     /**
-     * @var MonsterFightService
+     * @var MonsterFightService $monsterFightService
      */
     private MonsterFightService $monsterFightService;
 
     /**
+     * @var BattleEventHandler $battleEventHandler
+     */
+    private BattleEventHandler $battleEventHandler;
+
+    /**
      * @param MonsterFightService $monsterFightService
      */
-    public function __construct(MonsterFightService $monsterFightService) {
+    public function __construct(MonsterFightService $monsterFightService, BattleEventHandler $battleEventHandler) {
         $this->middleware('is.character.dead')->except(['revive', 'index']);
 
         $this->monsterFightService = $monsterFightService;
+
+        $this->battleEventHandler = $battleEventHandler;
     }
 
     /**

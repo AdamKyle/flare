@@ -43,6 +43,10 @@ class PurgatorySmithHouseRewardHandler {
             ->where('game_map_id', $character->map->game_map_id)
             ->first();
 
+        if (is_null($location) || is_null($location->locationType())) {
+            return $character;
+        }
+
         if (!$location->locationType()->isPurgatorySmithHouse()) {
              return $character;
         }
