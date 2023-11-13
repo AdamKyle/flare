@@ -125,7 +125,13 @@ class InventorySetServiceTest extends TestCase {
             ->createInventorySets(10);
 
         foreach ($itemTypes as $type) {
-            $character = $character->putItemInSet($this->createItem(['type' => $type]), 0);
+
+            if ($type === ArmourTypes::BODY) {
+                $character = $character->putItemInSet($this->createItem(['type' => $type, 'default_position' => 'body']), 0);
+            } else {
+                $character = $character->putItemInSet($this->createItem(['type' => $type]), 0);
+            }
+
         }
 
         $character = $character->getCharacter();
@@ -213,4 +219,636 @@ class InventorySetServiceTest extends TestCase {
         $this->assertFalse($character->inventorySets->first()->is_equipped);
         $this->assertTrue($character->inventorySets[1]->is_equipped);
     }
+
+    public function testUnequipSet() {
+        $itemTypes = [
+            WeaponTypes::STAVE,
+            ArmourTypes::BODY,
+            ArmourTypes::FEET,
+            ArmourTypes::GLOVES,
+            ArmourTypes::HELMET,
+            ArmourTypes::LEGGINGS,
+            ArmourTypes::SLEEVES,
+            SpellTypes::DAMAGE,
+            SpellTypes::HEALING,
+            WeaponTypes::RING,
+            WeaponTypes::RING,
+            'trinket',
+            'trinket'
+        ];
+
+        $character = $this->character
+            ->inventoryManagement()
+            ->getCharacterFactory()
+            ->inventorySetManagement()
+            ->createInventorySets(10);
+
+        foreach ($itemTypes as $type) {
+            $character = $character->putItemInSet($this->createItem(['type' => $type]), 0);
+        }
+
+        $character = $character->getCharacter();
+
+        $character->inventorySets()->first()->update([
+            'is_equipped' => true,
+        ]);
+
+        $character = $character->refresh();
+
+        $this->inventorySetService->unEquipInventorySet($character->inventorySets->first());
+
+        $character = $character->refresh();
+
+        $this->assertFalse($character->inventorySets->first()->is_equipped);
+    }
+
+    public function testSetIsNotEquippableForWeapons() {
+        $itemTypes = [
+            WeaponTypes::WEAPON,
+            WeaponTypes::WEAPON,
+            WeaponTypes::WEAPON,
+        ];
+
+        $character = $this->character
+            ->inventoryManagement()
+            ->getCharacterFactory()
+            ->inventorySetManagement()
+            ->createInventorySets(10);
+
+        foreach ($itemTypes as $type) {
+            $character = $character->putItemInSet($this->createItem(['type' => $type]), 0);
+        }
+
+        $character = $character->getCharacter();
+
+        $this->assertFalse($this->inventorySetService->isSetEquippable($character->inventorySets->first()));
+    }
+
+    public function testSetIsNotEquippableForArmour() {
+        $itemTypes = [
+            ArmourTypes::BODY,
+            ArmourTypes::BODY,
+        ];
+
+        $character = $this->character
+            ->inventoryManagement()
+            ->getCharacterFactory()
+            ->inventorySetManagement()
+            ->createInventorySets(10);
+
+        foreach ($itemTypes as $type) {
+            $character = $character->putItemInSet($this->createItem(['type' => $type]), 0);
+        }
+
+        $character = $character->getCharacter();
+
+        $this->assertFalse($this->inventorySetService->isSetEquippable($character->inventorySets->first()));
+    }
+
+    public function testSetIsNotEquippableForTrinkets() {
+        $itemTypes = [
+            'trinket',
+            'trinket',
+            'trinket',
+        ];
+
+        $character = $this->character
+            ->inventoryManagement()
+            ->getCharacterFactory()
+            ->inventorySetManagement()
+            ->createInventorySets(10);
+
+        foreach ($itemTypes as $type) {
+            $character = $character->putItemInSet($this->createItem(['type' => $type]), 0);
+        }
+
+        $character = $character->getCharacter();
+
+        $this->assertFalse($this->inventorySetService->isSetEquippable($character->inventorySets->first()));
+    }
+
+    public function testSetIsNotEquippableForRings() {
+        $itemTypes = [
+            WeaponTypes::RING,
+            WeaponTypes::RING,
+            WeaponTypes::RING,
+        ];
+
+        $character = $this->character
+            ->inventoryManagement()
+            ->getCharacterFactory()
+            ->inventorySetManagement()
+            ->createInventorySets(10);
+
+        foreach ($itemTypes as $type) {
+            $character = $character->putItemInSet($this->createItem(['type' => $type]), 0);
+        }
+
+        $character = $character->getCharacter();
+
+        $this->assertFalse($this->inventorySetService->isSetEquippable($character->inventorySets->first()));
+    }
+
+    public function testSetIsNotEquippableForSpells() {
+        $itemTypes = [
+            SpellTypes::DAMAGE,
+            SpellTypes::DAMAGE,
+            SpellTypes::HEALING
+        ];
+
+        $character = $this->character
+            ->inventoryManagement()
+            ->getCharacterFactory()
+            ->inventorySetManagement()
+            ->createInventorySets(10);
+
+        foreach ($itemTypes as $type) {
+            $character = $character->putItemInSet($this->createItem(['type' => $type]), 0);
+        }
+
+        $character = $character->getCharacter();
+
+        $this->assertFalse($this->inventorySetService->isSetEquippable($character->inventorySets->first()));
+    }
+
+    public function testSetIsNotEquippableForSpellsHealing() {
+        $itemTypes = [
+            SpellTypes::HEALING,
+            SpellTypes::HEALING,
+            SpellTypes::HEALING
+        ];
+
+        $character = $this->character
+            ->inventoryManagement()
+            ->getCharacterFactory()
+            ->inventorySetManagement()
+            ->createInventorySets(10);
+
+        foreach ($itemTypes as $type) {
+            $character = $character->putItemInSet($this->createItem(['type' => $type]), 0);
+        }
+
+        $character = $character->getCharacter();
+
+        $this->assertFalse($this->inventorySetService->isSetEquippable($character->inventorySets->first()));
+    }
+
+    public function testSetIsNotEquippableForSpellsHealingAndDamage() {
+        $itemTypes = [
+            SpellTypes::HEALING,
+            SpellTypes::HEALING,
+            SpellTypes::DAMAGE,
+        ];
+
+        $character = $this->character
+            ->inventoryManagement()
+            ->getCharacterFactory()
+            ->inventorySetManagement()
+            ->createInventorySets(10);
+
+        foreach ($itemTypes as $type) {
+            $character = $character->putItemInSet($this->createItem(['type' => $type]), 0);
+        }
+
+        $character = $character->getCharacter();
+
+        $this->assertFalse($this->inventorySetService->isSetEquippable($character->inventorySets->first()));
+    }
+
+    public function testSetIsNotEquippableForSpellsDamage() {
+        $itemTypes = [
+            SpellTypes::DAMAGE,
+            SpellTypes::DAMAGE,
+            SpellTypes::DAMAGE
+        ];
+
+        $character = $this->character
+            ->inventoryManagement()
+            ->getCharacterFactory()
+            ->inventorySetManagement()
+            ->createInventorySets(10);
+
+        foreach ($itemTypes as $type) {
+            $character = $character->putItemInSet($this->createItem(['type' => $type]), 0);
+        }
+
+        $character = $character->getCharacter();
+
+        $this->assertFalse($this->inventorySetService->isSetEquippable($character->inventorySets->first()));
+    }
+
+    public function testSetIsNotEquippableForArtifact() {
+        $itemTypes = [
+            'artifact',
+            'artifact',
+        ];
+
+        $character = $this->character
+            ->inventoryManagement()
+            ->getCharacterFactory()
+            ->inventorySetManagement()
+            ->createInventorySets(10);
+
+        foreach ($itemTypes as $type) {
+            $character = $character->putItemInSet($this->createItem(['type' => $type]), 0);
+        }
+
+        $character = $character->getCharacter();
+
+        $this->assertFalse($this->inventorySetService->isSetEquippable($character->inventorySets->first()));
+    }
+
+    public function testSetIsNotEquippableForUniquesItemPrefix() {
+        $itemTypes = [
+            WeaponTypes::WEAPON,
+            WeaponTypes::RING,
+        ];
+
+        $character = $this->character
+            ->inventoryManagement()
+            ->getCharacterFactory()
+            ->inventorySetManagement()
+            ->createInventorySets(10);
+
+        foreach ($itemTypes as $type) {
+            $character = $character->putItemInSet($this->createItem(['type' => $type, 'item_prefix_id' => $this->createItemAffix([
+                'randomly_generated' => true,
+            ])]), 0);
+        }
+
+        $character = $character->getCharacter();
+
+        $this->assertFalse($this->inventorySetService->isSetEquippable($character->inventorySets->first()));
+    }
+
+    public function testSetIsNotEquippableForUniquesItemSuffix() {
+        $itemTypes = [
+            WeaponTypes::WEAPON,
+            WeaponTypes::RING,
+        ];
+
+        $character = $this->character
+            ->inventoryManagement()
+            ->getCharacterFactory()
+            ->inventorySetManagement()
+            ->createInventorySets(10);
+
+        foreach ($itemTypes as $type) {
+            $character = $character->putItemInSet($this->createItem(['type' => $type, 'item_suffix_id' => $this->createItemAffix([
+                'randomly_generated' => true,
+            ])]), 0);
+        }
+
+        $character = $character->getCharacter();
+
+        $this->assertFalse($this->inventorySetService->isSetEquippable($character->inventorySets->first()));
+    }
+
+    public function testSetIsNotEquippableForShieldAndHammer() {
+        $itemTypes = [
+            ArmourTypes::SHIELD,
+            WeaponTypes::HAMMER,
+        ];
+
+        $character = $this->character
+            ->inventoryManagement()
+            ->getCharacterFactory()
+            ->inventorySetManagement()
+            ->createInventorySets(10);
+
+        foreach ($itemTypes as $type) {
+            $character = $character->putItemInSet($this->createItem(['type' => $type, 'item_suffix_id' => $this->createItemAffix([
+                'randomly_generated' => true,
+            ])]), 0);
+        }
+
+        $character = $character->getCharacter();
+
+        $this->assertFalse($this->inventorySetService->isSetEquippable($character->inventorySets->first()));
+    }
+
+    public function testSetIsNotEquippableForShieldAndBow() {
+        $itemTypes = [
+            ArmourTypes::SHIELD,
+            WeaponTypes::BOW,
+        ];
+
+        $character = $this->character
+            ->inventoryManagement()
+            ->getCharacterFactory()
+            ->inventorySetManagement()
+            ->createInventorySets(10);
+
+        foreach ($itemTypes as $type) {
+            $character = $character->putItemInSet($this->createItem(['type' => $type, 'item_suffix_id' => $this->createItemAffix([
+                'randomly_generated' => true,
+            ])]), 0);
+        }
+
+        $character = $character->getCharacter();
+
+        $this->assertFalse($this->inventorySetService->isSetEquippable($character->inventorySets->first()));
+    }
+
+    public function testSetIsNotEquippableForShieldAndStave() {
+        $itemTypes = [
+            ArmourTypes::SHIELD,
+            WeaponTypes::STAVE,
+        ];
+
+        $character = $this->character
+            ->inventoryManagement()
+            ->getCharacterFactory()
+            ->inventorySetManagement()
+            ->createInventorySets(10);
+
+        foreach ($itemTypes as $type) {
+            $character = $character->putItemInSet($this->createItem(['type' => $type, 'item_suffix_id' => $this->createItemAffix([
+                'randomly_generated' => true,
+            ])]), 0);
+        }
+
+        $character = $character->getCharacter();
+
+        $this->assertFalse($this->inventorySetService->isSetEquippable($character->inventorySets->first()));
+    }
+
+    public function testSetIsNotEquippableForBowAndHammer() {
+        $itemTypes = [
+            WeaponTypes::BOW,
+            WeaponTypes::HAMMER,
+        ];
+
+        $character = $this->character
+            ->inventoryManagement()
+            ->getCharacterFactory()
+            ->inventorySetManagement()
+            ->createInventorySets(10);
+
+        foreach ($itemTypes as $type) {
+            $character = $character->putItemInSet($this->createItem(['type' => $type, 'item_suffix_id' => $this->createItemAffix([
+                'randomly_generated' => true,
+            ])]), 0);
+        }
+
+        $character = $character->getCharacter();
+
+        $this->assertFalse($this->inventorySetService->isSetEquippable($character->inventorySets->first()));
+    }
+
+    public function testSetIsNotEquippableForHammerAndBow() {
+        $itemTypes = [
+            WeaponTypes::HAMMER,
+            WeaponTypes::BOW,
+        ];
+
+        $character = $this->character
+            ->inventoryManagement()
+            ->getCharacterFactory()
+            ->inventorySetManagement()
+            ->createInventorySets(10);
+
+        foreach ($itemTypes as $type) {
+            $character = $character->putItemInSet($this->createItem(['type' => $type, 'item_suffix_id' => $this->createItemAffix([
+                'randomly_generated' => true,
+            ])]), 0);
+        }
+
+        $character = $character->getCharacter();
+
+        $this->assertFalse($this->inventorySetService->isSetEquippable($character->inventorySets->first()));
+    }
+
+    public function testSetIsNotEquippableForBowAndStave() {
+        $itemTypes = [
+            WeaponTypes::BOW,
+            WeaponTypes::STAVE,
+        ];
+
+        $character = $this->character
+            ->inventoryManagement()
+            ->getCharacterFactory()
+            ->inventorySetManagement()
+            ->createInventorySets(10);
+
+        foreach ($itemTypes as $type) {
+            $character = $character->putItemInSet($this->createItem(['type' => $type, 'item_suffix_id' => $this->createItemAffix([
+                'randomly_generated' => true,
+            ])]), 0);
+        }
+
+        $character = $character->getCharacter();
+
+        $this->assertFalse($this->inventorySetService->isSetEquippable($character->inventorySets->first()));
+    }
+
+    public function testSetIsNotEquippableForHammerAndStave() {
+        $itemTypes = [
+            WeaponTypes::HAMMER,
+            WeaponTypes::STAVE,
+        ];
+
+        $character = $this->character
+            ->inventoryManagement()
+            ->getCharacterFactory()
+            ->inventorySetManagement()
+            ->createInventorySets(10);
+
+        foreach ($itemTypes as $type) {
+            $character = $character->putItemInSet($this->createItem(['type' => $type, 'item_suffix_id' => $this->createItemAffix([
+                'randomly_generated' => true,
+            ])]), 0);
+        }
+
+        $character = $character->getCharacter();
+
+        $this->assertFalse($this->inventorySetService->isSetEquippable($character->inventorySets->first()));
+    }
+
+    public function testSetIsNotEquippableForWeaponAndStave() {
+        $itemTypes = [
+            WeaponTypes::WEAPON,
+            WeaponTypes::STAVE,
+        ];
+
+        $character = $this->character
+            ->inventoryManagement()
+            ->getCharacterFactory()
+            ->inventorySetManagement()
+            ->createInventorySets(10);
+
+        foreach ($itemTypes as $type) {
+            $character = $character->putItemInSet($this->createItem(['type' => $type, 'item_suffix_id' => $this->createItemAffix([
+                'randomly_generated' => true,
+            ])]), 0);
+        }
+
+        $character = $character->getCharacter();
+
+        $this->assertFalse($this->inventorySetService->isSetEquippable($character->inventorySets->first()));
+    }
+
+    public function testSetIsNotEquippableForWeaponAndBow() {
+        $itemTypes = [
+            WeaponTypes::WEAPON,
+            WeaponTypes::BOW,
+        ];
+
+        $character = $this->character
+            ->inventoryManagement()
+            ->getCharacterFactory()
+            ->inventorySetManagement()
+            ->createInventorySets(10);
+
+        foreach ($itemTypes as $type) {
+            $character = $character->putItemInSet($this->createItem(['type' => $type, 'item_suffix_id' => $this->createItemAffix([
+                'randomly_generated' => true,
+            ])]), 0);
+        }
+
+        $character = $character->getCharacter();
+
+        $this->assertFalse($this->inventorySetService->isSetEquippable($character->inventorySets->first()));
+    }
+
+    public function testSetIsNotEquippableForWeaponAndHammer() {
+        $itemTypes = [
+            WeaponTypes::WEAPON,
+            WeaponTypes::HAMMER,
+        ];
+
+        $character = $this->character
+            ->inventoryManagement()
+            ->getCharacterFactory()
+            ->inventorySetManagement()
+            ->createInventorySets(10);
+
+        foreach ($itemTypes as $type) {
+            $character = $character->putItemInSet($this->createItem(['type' => $type, 'item_suffix_id' => $this->createItemAffix([
+                'randomly_generated' => true,
+            ])]), 0);
+        }
+
+        $character = $character->getCharacter();
+
+        $this->assertFalse($this->inventorySetService->isSetEquippable($character->inventorySets->first()));
+    }
+
+    public function testSetIsNotEquippableForTwoSheildsAndAWeapon() {
+        $itemTypes = [
+            WeaponTypes::WEAPON,
+            ArmourTypes::SHIELD,
+            ArmourTypes::SHIELD
+        ];
+
+        $character = $this->character
+            ->inventoryManagement()
+            ->getCharacterFactory()
+            ->inventorySetManagement()
+            ->createInventorySets(10);
+
+        foreach ($itemTypes as $type) {
+            $character = $character->putItemInSet($this->createItem(['type' => $type, 'item_suffix_id' => $this->createItemAffix([
+                'randomly_generated' => true,
+            ])]), 0);
+        }
+
+        $character = $character->getCharacter();
+
+        $this->assertFalse($this->inventorySetService->isSetEquippable($character->inventorySets->first()));
+    }
+
+    public function testSetIsNotEquippableForTwoHammers() {
+        $itemTypes = [
+            WeaponTypes::HAMMER,
+            WeaponTypes::HAMMER,
+        ];
+
+        $character = $this->character
+            ->inventoryManagement()
+            ->getCharacterFactory()
+            ->inventorySetManagement()
+            ->createInventorySets(10);
+
+        foreach ($itemTypes as $type) {
+            $character = $character->putItemInSet($this->createItem(['type' => $type, 'item_suffix_id' => $this->createItemAffix([
+                'randomly_generated' => true,
+            ])]), 0);
+        }
+
+        $character = $character->getCharacter();
+
+        $this->assertFalse($this->inventorySetService->isSetEquippable($character->inventorySets->first()));
+    }
+
+    public function testSetIsNotEquippableForTwoBows() {
+        $itemTypes = [
+            WeaponTypes::BOW,
+            WeaponTypes::BOW,
+        ];
+
+        $character = $this->character
+            ->inventoryManagement()
+            ->getCharacterFactory()
+            ->inventorySetManagement()
+            ->createInventorySets(10);
+
+        foreach ($itemTypes as $type) {
+            $character = $character->putItemInSet($this->createItem(['type' => $type, 'item_suffix_id' => $this->createItemAffix([
+                'randomly_generated' => true,
+            ])]), 0);
+        }
+
+        $character = $character->getCharacter();
+
+        $this->assertFalse($this->inventorySetService->isSetEquippable($character->inventorySets->first()));
+    }
+
+    public function testSetIsNotEquippableForTwoStaves() {
+        $itemTypes = [
+            WeaponTypes::STAVE,
+            WeaponTypes::STAVE,
+        ];
+
+        $character = $this->character
+            ->inventoryManagement()
+            ->getCharacterFactory()
+            ->inventorySetManagement()
+            ->createInventorySets(10);
+
+        foreach ($itemTypes as $type) {
+            $character = $character->putItemInSet($this->createItem(['type' => $type, 'item_suffix_id' => $this->createItemAffix([
+                'randomly_generated' => true,
+            ])]), 0);
+        }
+
+        $character = $character->getCharacter();
+
+        $this->assertFalse($this->inventorySetService->isSetEquippable($character->inventorySets->first()));
+    }
+
+    public function testSetIsNotEquippableForSingleShieldTwoWeapons() {
+        $itemTypes = [
+            ArmourTypes::SHIELD,
+            WeaponTypes::WEAPON,
+            WeaponTypes::WEAPON,
+        ];
+
+        $character = $this->character
+            ->inventoryManagement()
+            ->getCharacterFactory()
+            ->inventorySetManagement()
+            ->createInventorySets(10);
+
+        foreach ($itemTypes as $type) {
+            $character = $character->putItemInSet($this->createItem(['type' => $type, 'item_suffix_id' => $this->createItemAffix([
+                'randomly_generated' => true,
+            ])]), 0);
+        }
+
+        $character = $character->getCharacter();
+
+        $this->assertFalse($this->inventorySetService->isSetEquippable($character->inventorySets->first()));
+    }
+
 }

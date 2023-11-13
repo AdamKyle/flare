@@ -155,7 +155,7 @@ class EndScheduledEventTest extends TestCase {
         $this->assertFalse($scheduledEvent->refresh()->currently_running);
     }
 
-    public function testNothingHappensWhenNoScheduledEventsAreRunning() {
+    public function testEndsEventsRunningWhenNoScheduledEventsAreRunning() {
         $this->createScheduledEvent([
             'event_type'        => EventType::WEEKLY_CELESTIALS,
             'start_date'        => now()->addMinutes(5),
@@ -174,8 +174,8 @@ class EndScheduledEventTest extends TestCase {
 
         $this->artisan('end:scheduled-event');
 
-        $this->assertEquals(1, Event::count());
-        $this->assertEquals(1, Announcement::count());
+        $this->assertEquals(0, Event::count());
+        $this->assertEquals(0, Announcement::count());
     }
 
     public function testEndPVPMonthlyEvent() {

@@ -65,7 +65,7 @@ class BattleRewardService {
 
         $this->handleGlobalEventGoals();
 
-        $this->purgatorySmithHouseRewardHandler->handleFightingAtPurgatorySmithHouse($this->character, $this->monster);
+        // $this->purgatorySmithHouseRewardHandler->handleFightingAtPurgatorySmithHouse($this->character, $this->monster);
 
         BattleItemHandler::dispatch($this->character, $this->monster);
     }

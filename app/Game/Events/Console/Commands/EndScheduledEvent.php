@@ -74,7 +74,7 @@ class EndScheduledEvent extends Command {
     ): void {
 
         $scheduledEvents = ScheduledEvent::where('end_date', '<=', now())->get();
-        $eventsToEnd     = Event::where('end_at', '<=', now())->get();
+        $eventsToEnd     = Event::where('ends_at', '<=', now())->get();
 
         foreach ($scheduledEvents as $event) {
 
@@ -139,6 +139,10 @@ class EndScheduledEvent extends Command {
          */
         forEach ($eventsToEnd as $event) {
             $announcement = Announcement::where('event_id', $event->id)->first();
+
+            if (is_null($announcement)) {
+                continue;
+            }
 
             event(new DeleteAnnouncementEvent($announcement->id));
 

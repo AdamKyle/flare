@@ -40,14 +40,7 @@ class ServiceProvider extends ApplicationServiceProvider {
 
         $this->app->bind(PurgatorySmithHouseRewardHandler::class, function($app) {
             return new PurgatorySmithHouseRewardHandler(
-                $app->make(PurgatorySmithHouseRewardHandler::class),
-            );
-        });
-
-        $this->app->bind(BattleEventHandler::class, function($app) {
-            return new BattleEventHandler(
-                $app->make(BattleRewardService::class),
-                $app->make(SecondaryRewardService::class)
+                $app->make(RandomAffixGenerator::class),
             );
         });
 
@@ -65,6 +58,13 @@ class ServiceProvider extends ApplicationServiceProvider {
             return new SecondaryRewardService(
                 $app->make(MercenaryService::class),
                 $app->make(ClassRankService::class),
+            );
+        });
+
+        $this->app->bind(BattleEventHandler::class, function($app) {
+            return new BattleEventHandler(
+                $app->make(BattleRewardService::class),
+                $app->make(SecondaryRewardService::class)
             );
         });
     }
