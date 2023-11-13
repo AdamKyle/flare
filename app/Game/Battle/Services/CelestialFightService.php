@@ -3,24 +3,24 @@
 namespace App\Game\Battle\Services;
 
 use App\Flare\Builders\Character\CharacterCacheData;
-use App\Flare\ServerFight\MonsterPlayerFight;
-use App\Flare\Values\MaxCurrenciesValue;
-use App\Game\Battle\Events\UpdateCharacterStatus;
-use App\Game\Battle\Jobs\CelestialTimeOut;
-use App\Game\Battle\Values\CelestialConjureType;
-use App\Game\Core\Events\UpdateCharacterCelestialTimeOut;
-use App\Game\Core\Events\UpdateTopBarEvent;
-use App\Game\Core\Traits\MercenaryBonus;
-use Facades\App\Flare\Cache\CoordinatesCache;
 use App\Flare\Models\CelestialFight;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterInCelestialFight;
+use App\Flare\ServerFight\MonsterPlayerFight;
+use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Battle\Events\UpdateCelestialFight;
-use App\Game\Battle\Handlers\BattleEventHandler;
-use App\Game\Battle\Jobs\BattleAttackHandler;
+use App\Game\Battle\Events\UpdateCharacterStatus;
+use App\Game\Battle\Jobs\CelestialTimeOut;
+use App\Game\Battle\Values\CelestialConjureType;
+use App\Game\BattleRewardProcessing\Handlers\BattleEventHandler;
+use App\Game\BattleRewardProcessing\Jobs\BattleAttackHandler;
+use App\Game\Core\Events\UpdateCharacterCelestialTimeOut;
+use App\Game\Core\Events\UpdateTopBarEvent;
+use App\Game\Core\Traits\MercenaryBonus;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
+use Facades\App\Flare\Cache\CoordinatesCache;
 
 class CelestialFightService {
 

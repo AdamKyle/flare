@@ -2,6 +2,7 @@
 
 namespace App\Game\Messages\Events;
 
+use App\Flare\Values\NameTags;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -30,6 +31,11 @@ class MessageSentEvent implements ShouldBroadcastNow {
     public string $name;
 
     /**
+     * @var ?string $nameTag;
+     */
+    public ?string $nameTag;
+
+    /**
      * Create a new event instance.
      *
      * @param User $user
@@ -40,8 +46,11 @@ class MessageSentEvent implements ShouldBroadcastNow {
             return;
         }
 
+        $nameTag = $user->name_tag;
+
         $this->message = $message;
         $this->name    = auth()->user()->hasRole('Admin') ? 'The Creator' : $user->character->name;
+        $this->nameTag = is_null($nameTag) ? null : NameTags::$valueNames[$user->name_tag];
     }
 
     /**

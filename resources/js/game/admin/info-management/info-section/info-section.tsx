@@ -143,6 +143,10 @@ export default class InfoSection extends React.Component<any, any> {
                 value: "info.items.pirate-lord-leather",
             },
             {
+                label: "Corrupted Ice",
+                value: "info.items.corrupted-ice",
+            },
+            {
                 label: "Ancestral Items",
                 value: "info.items.ancestral-items",
             },

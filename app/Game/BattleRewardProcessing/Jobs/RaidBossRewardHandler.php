@@ -1,25 +1,27 @@
 <?php
 
-namespace App\Game\Battle\Jobs;
+namespace App\Game\BattleRewardProcessing\Jobs;
 
-use App\Flare\Models\Item;
-use App\Flare\Models\Raid;
-use App\Flare\Models\Monster;
-use Illuminate\Bus\Queueable;
-use App\Flare\Models\Location;
 use App\Flare\Models\Character;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
+use App\Flare\Models\Item;
+use App\Flare\Models\Location;
+use App\Flare\Models\Monster;
+use App\Flare\Models\Raid;
 use App\Flare\Models\RaidBossParticipation;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Database\Eloquent\Collection;
-use App\Game\Battle\Handlers\BattleEventHandler;
-use App\Game\Messages\Events\GlobalMessageEvent;
-use App\Game\Battle\Events\UpdateRaidAttacksLeft;
 use App\Game\Battle\Concerns\HandleGivingAncestorItem;
+use App\Game\Battle\Events\UpdateRaidAttacksLeft;
+use App\Game\Battle\Jobs\Exception;
+use App\Game\Battle\Jobs\MonthlyPvpFightService;
+use App\Game\BattleRewardProcessing\Handlers\BattleEventHandler;
 use App\Game\Maps\Services\Common\UpdateRaidMonstersForLocation;
+use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 
 class RaidBossRewardHandler implements ShouldQueue {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, UpdateRaidMonstersForLocation, HandleGivingAncestorItem;

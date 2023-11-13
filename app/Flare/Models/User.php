@@ -45,6 +45,7 @@ class User extends Authenticatable {
         'chat_text_color',
         'chat_is_bold',
         'chat_is_italic',
+        'name_tag'
     ];
 
     /**

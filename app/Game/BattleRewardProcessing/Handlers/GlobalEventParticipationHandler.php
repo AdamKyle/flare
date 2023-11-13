@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Game\Battle\Handlers;
+namespace App\Game\BattleRewardProcessing\Handlers;
 
 use App\Flare\Builders\RandomAffixGenerator;
 use App\Flare\Models\Character;
@@ -112,8 +112,6 @@ class GlobalEventParticipationHandler {
      * @return void
      */
     protected function rewardForCharacter(Character $character, GlobalEventGoal $globalEventGoal) {
-        $randomAffixGenerator = $this->randomAffixGenerator->setCharacter($character);
-
         $item = Item::where('specialty_type', $globalEventGoal->item_specialty_type_reward)
             ->whereIsNull('item_prefix_id')
             ->whereIsNull('item_suffix_id')
@@ -135,12 +133,12 @@ class GlobalEventParticipationHandler {
                 'item_suffix_id' => $randomAffixGenerator->generateAffix('suffix')->id,
             ]);
 
-            $character->inventory->slots()->create([
+            $slot = $character->inventory->slots()->create([
                 'inventory_id' => $character->inventory->id,
                 'item_id'      => $newItem->id,
             ]);
 
-            event(new ServerMessageEvent($character->user, 'You were rewarded with an item of Unique power for participating in the current events global goal.'));
+            event(new ServerMessageEvent($character->user, 'You were rewarded with an item of Unique power for participating in the current events global goal.', $slot->id));
         }
 
         if ($globalEventGoal->is_mythic) {
@@ -153,12 +151,12 @@ class GlobalEventParticipationHandler {
                 'item_suffix_id' => $randomAffixGenerator->generateAffix('suffix')->id,
             ]);
 
-            $character->inventory->slots()->create([
+            $slot = $character->inventory->slots()->create([
                 'inventory_id' => $character->inventory->id,
                 'item_id'      => $newItem->id,
             ]);
 
-            event(new ServerMessageEvent($character->user, 'You were rewarded with an item of Mythical power for participating in the current events global goal.'));
+            event(new ServerMessageEvent($character->user, 'You were rewarded with an item of Mythical power for participating in the current events global goal.', $slot->id));
         }
     }
 

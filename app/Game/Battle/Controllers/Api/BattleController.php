@@ -12,16 +12,10 @@ use App\Game\Battle\Events\AttackTimeOutEvent;
 use App\Game\Battle\Request\AttackTypeRequest;
 use App\Flare\Services\BuildMonsterCacheService;
 use App\Flare\Values\ItemEffectsValue;
-use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Battle\Services\MonsterFightService;
 
 class BattleController extends Controller {
-
-    /**
-     * @var BattleEventHandler $battleEventHandler
-     */
-    private BattleEventHandler $battleEventHandler;
 
     /**
      * @var MonsterFightService
@@ -29,13 +23,11 @@ class BattleController extends Controller {
     private MonsterFightService $monsterFightService;
 
     /**
-     * @param BattleEventHandler $battleEventHandler
      * @param MonsterFightService $monsterFightService
      */
-    public function __construct(BattleEventHandler $battleEventHandler, MonsterFightService $monsterFightService) {
+    public function __construct(MonsterFightService $monsterFightService) {
         $this->middleware('is.character.dead')->except(['revive', 'index']);
 
-        $this->battleEventHandler  = $battleEventHandler;
         $this->monsterFightService = $monsterFightService;
     }
 

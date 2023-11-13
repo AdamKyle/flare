@@ -3,6 +3,7 @@
 namespace App\Flare\Models;
 
 use App\Flare\Values\LocationEffectValue;
+use App\Flare\Values\LocationType;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Database\Factories\LocationFactory;
@@ -70,6 +71,10 @@ class Location extends Model {
 
     public function requiredQuestItem() {
         return $this->hasOne(Item::class, 'id', 'required_quest_item_id');
+    }
+
+    public function locationType() {
+        return new LocationType($this->type);
     }
 
     /**

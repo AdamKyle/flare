@@ -2,25 +2,25 @@
 
 namespace  App\Game\Battle\Services;
 
-use Exception;
-use App\Flare\Models\Raid;
-use App\Flare\Models\Monster;
-use App\Flare\Models\RaidBoss;
-use App\Flare\Models\Character;
-use Illuminate\Support\Facades\Cache;
-use App\Game\Core\Traits\ResponseBuilder;
-use App\Flare\Models\RaidBossParticipation;
-use App\Flare\ServerFight\MonsterPlayerFight;
-use App\Flare\ServerFight\Monster\BuildMonster;
-use App\Game\Battle\Jobs\RaidBossRewardHandler;
-use App\Flare\ServerFight\Monster\ServerMonster;
-use App\Flare\Services\BuildMonsterCacheService;
-use App\Game\Battle\Events\UpdateRaidBossHealth;
-use App\Game\Battle\Handlers\BattleEventHandler;
-use App\Game\Battle\Events\UpdateRaidAttacksLeft;
 use App\Flare\Builders\Character\CharacterCacheData;
-use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
+use App\Flare\Models\Character;
+use App\Flare\Models\Monster;
+use App\Flare\Models\Raid;
+use App\Flare\Models\RaidBoss;
+use App\Flare\Models\RaidBossParticipation;
+use App\Flare\ServerFight\Monster\BuildMonster;
+use App\Flare\ServerFight\Monster\ServerMonster;
+use App\Flare\ServerFight\MonsterPlayerFight;
+use App\Flare\Services\BuildMonsterCacheService;
+use App\Game\Battle\Events\UpdateRaidAttacksLeft;
+use App\Game\Battle\Events\UpdateRaidBossHealth;
 use App\Game\Battle\Services\Concerns\HandleCachedRaidCritterHealth;
+use App\Game\BattleRewardProcessing\Handlers\BattleEventHandler;
+use App\Game\BattleRewardProcessing\Jobs\RaidBossRewardHandler;
+use App\Game\Core\Traits\ResponseBuilder;
+use Exception;
+use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
+use Illuminate\Support\Facades\Cache;
 
 class RaidBattleService {
 

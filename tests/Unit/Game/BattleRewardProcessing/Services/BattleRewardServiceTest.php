@@ -3,22 +3,22 @@
 use App\Flare\Models\Event as ModelsEvent;
 use App\Flare\Models\GameSkill;
 use App\Flare\Values\ItemSpecialtyType;
+use App\Flare\Values\MapNameValue;
+use App\Flare\Values\RandomAffixDetails;
+use App\Game\BattleRewardProcessing\Jobs\BattleItemHandler;
+use App\Game\BattleRewardProcessing\Services\BattleRewardService;
+use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
+use App\Game\Events\Values\EventType;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
-use Tests\TestCase;
-use Tests\Traits\CreateMonster;
 use Tests\Setup\Character\CharacterFactory;
-use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
-use App\Game\BattleRewardProcessing\Services\BattleRewardService;
-use App\Flare\Values\MapNameValue;
-use App\Flare\Values\RandomAffixDetails;
-use App\Game\Battle\Jobs\BattleItemHandler;
-use App\Game\Events\Values\EventType;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 use Tests\Traits\CreateEvent;
 use Tests\Traits\CreateGameMap;
 use Tests\Traits\CreateGlobalEventGoal;
+use Tests\Traits\CreateMonster;
 
 class BattleRewardServiceTest extends TestCase {
 

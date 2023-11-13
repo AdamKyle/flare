@@ -24,6 +24,7 @@ class AnnouncementHandler {
             'weekly_celestial_spawn' => $this->buildWeeklyCelestialMessage(),
             'weekly_currency_drop' => $this->buildWeeklyCurrencyDrop(),
             'winter_event' => $this->buildWinterEventMessage(),
+            'purgatory_house' => $this->buildPurgatoryHouseMessage(),
             default => throw new Exception('Cannot determine announcement type'),
         };
     }
@@ -128,6 +129,26 @@ class AnnouncementHandler {
             'Players can enter, with no item requirements, The ice Plane and fight fearsome creatures as well as take on The Ice Queen her self.' . ' ' .
             'You will find the creatures down here to be much more powerful then even Purgatory! Prepare your self child, the chill of death awaits.' . ' ' .
             'All you have to do is use the traverse feature to move from your current plane to The Ice Plane where rewards are bountiful!';
+
+        $announcement = Announcement::create([
+            'message'    => $message,
+            'expires_at' => $event->ends_at,
+            'event_id'   => $event->id
+        ]);
+
+        event(new AnnouncementMessageEvent($message, $announcement->id));
+    }
+
+    private function buildPurgatoryHouseMessage(): void {
+        $event = Event::where('type', EventType::PURGATORY_SMITH_HOUSE)->first();
+
+        if (is_null($event)) {
+            throw new Exception('Cannot create message for Winter Event, when no event exists.');
+        }
+
+        $message = 'From now until: ' . $event->ends_at->format('l, j \of F \a\t h:ia \G\M\TP') . ' ' .
+            'Players who are in The Purgatory Smiths House will have double chance to get LEGENDARY uniques and MYTHICAL gear. ' .
+            'Players will also get 2x the amount of Gold Dust, Copper Coins and Shards from critters.';
 
         $announcement = Announcement::create([
             'message'    => $message,

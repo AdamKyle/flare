@@ -1,20 +1,20 @@
 <?php
 
-namespace App\Game\Battle\Handlers;
+namespace App\Game\BattleRewardProcessing\Handlers;
 
-use Exception;
-use App\Flare\Models\Monster;
-use App\Flare\Models\Character;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Cache;
-use App\Game\Battle\Events\CharacterRevive;
-use App\Game\Battle\Events\AttackTimeOutEvent;
-use App\Flare\Models\CharacterInCelestialFight;
-use App\Game\Messages\Events\ServerMessageEvent;
-use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Flare\Builders\Character\Traits\FetchEquipped;
+use App\Flare\Models\Character;
+use App\Flare\Models\CharacterInCelestialFight;
+use App\Flare\Models\Monster;
+use App\Game\Battle\Events\AttackTimeOutEvent;
+use App\Game\Battle\Events\CharacterRevive;
+use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\BattleRewardProcessing\Services\BattleRewardService;
 use App\Game\BattleRewardProcessing\Services\SecondaryRewardService;
+use App\Game\Messages\Events\ServerMessageEvent;
+use Exception;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 
 class BattleEventHandler {
 

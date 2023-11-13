@@ -4,6 +4,7 @@ namespace App\Game\Messages\Services;
 
 use App\Flare\Models\User;
 use App\Flare\Models\Announcement;
+use App\Flare\Values\NameTags;
 use App\Game\Messages\Models\Message;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Collection as SupportCollection;
@@ -65,7 +66,10 @@ class FetchMessages {
             return $message;
         }
 
-        $message->name = $message->user->character->name;
+        $nameTag = $message->user->name_tag;
+
+        $message->name     = $message->user->character->name;
+        $message->name_tag = is_null($nameTag) ? null :NameTags::$valueNames[$nameTag];
 
         return $message;
     }
@@ -97,6 +101,8 @@ class FetchMessages {
                 return 'SHP';
             case '#639cff':
                 return 'PURG';
+            case '#aeb6d3':
+                return 'ICE';
             case '#ffffff':
             default:
                 return 'SUR';

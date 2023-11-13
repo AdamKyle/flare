@@ -4,6 +4,9 @@ namespace App\Game\Core\Controllers;
 
 use App\Flare\Models\User;
 use App\Flare\Models\Quest;
+use App\Flare\Values\NameTags;
+use App\Game\Core\Requests\NameTagRequest;
+use Exception;
 use Illuminate\Http\Request;
 use App\Flare\Models\GameRace;
 use App\Flare\Models\GameClass;
@@ -22,12 +25,7 @@ class SettingsController extends Controller {
 
     public function index(User $user) {
 
-        $quest              = Quest::where('unlocks_feature', FeatureTypes::COSMETIC_TEXT)->first();
-        $canUseCosmeticText = false;
-
-        if (!is_null($quest)) {
-            $canUseCosmeticText = !is_null(QuestsCompleted::where('character_id', $user->character->id)->where('id', $quest->id)->first());
-        }
+        $canUseCosmeticText = $user->character->questsCompleted->where('quest.unlocks_feature', FeatureTypes::COSMETIC_TEXT)->count() > 0;;
 
         return view('game.core.settings.settings', [
             'user'         => $user,
@@ -36,6 +34,7 @@ class SettingsController extends Controller {
                 ->whereNull('secondary_required_class_id')
                 ->pluck('name', 'id'),
             'cosmeticText' => $canUseCosmeticText,
+            'nameTags'    => NameTags::$valueNames,
         ]);
     }
 
@@ -104,8 +103,32 @@ class SettingsController extends Controller {
     }
 
     public function cosmeticText(CosmeticTextRequest $request, User $user) {
+
+        if ($user->character->questsCompleted->where('quest.unlocks_feature', FeatureTypes::COSMETIC_TEXT)->count() <= 0) {
+            return redirect()->back()->with('error', 'Missing required quest completion for that action.');
+        }
+
         $user->update($request->all());
 
         return redirect()->back()->with('success', 'Updated Cosmetic Text options');
+    }
+
+    public function cosmeticNametag(NameTagRequest $request, User $user) {
+
+//        if ($user->character->questsCompleted->where('quest.unlocks_feature', FeatureTypes::NAME_TAGS)->count() <= 0) {
+//            return redirect()->back()->with('error', 'Missing required quest completion for that action.');
+//        }
+
+        $nameTag = $request->name_tag;
+
+        try {
+            (new NameTags($nameTag));
+        } catch (Exception $e) {
+            return redirect()->back()->with('error', 'No such name tag.');
+        }
+
+        $user->update($request->all());
+
+        return redirect()->back()->with('success', 'Updated Name Tag options');
     }
 }

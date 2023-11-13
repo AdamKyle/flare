@@ -346,6 +346,10 @@
                 <span class="ra ra-dervish-swords"></span>
                 Pirate Lord Leather
             </a>
+            <a href="{{ route('info.page', ['pageName' => 'corrupted-ice']) }}">
+                <span class="ra ra-kaleidoscope"></span>
+                Corrupted ice
+            </a>
             <a href="{{ route('info.page', ['pageName' => 'ancestral-items']) }}">
                 <span class="ra ra-crowned-heart"></span>
                 Ancestral Items

@@ -2,27 +2,27 @@
 
 namespace App\Game\Battle\Services;
 
-use App\Flare\Services\CharacterXPService;
-use Exception;
-use Illuminate\Support\Facades\Cache;
 use App\Flare\Builders\BuildMythicItem;
 use App\Flare\Builders\Character\CharacterCacheData;
 use App\Flare\Builders\RandomAffixGenerator;
+use App\Flare\Models\Character;
 use App\Flare\Models\Item;
 use App\Flare\Models\Monster;
 use App\Flare\Models\RankFight;
 use App\Flare\Models\RankFightTop;
 use App\Flare\ServerFight\MonsterPlayerFight;
+use App\Flare\Services\CharacterXPService;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Flare\Values\RandomAffixDetails;
-use App\Flare\Models\Character;
-use App\Game\Battle\Handlers\BattleEventHandler;
-use App\Game\Battle\Jobs\BattleAttackHandler;
+use App\Game\Battle\Events\AttackTimeOutEvent;
+use App\Game\BattleRewardProcessing\Handlers\BattleEventHandler;
+use App\Game\BattleRewardProcessing\Jobs\BattleAttackHandler;
+use App\Game\Core\Traits\HandleCharacterLevelUp;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
-use App\Game\Battle\Events\AttackTimeOutEvent;
-use App\Game\Core\Traits\HandleCharacterLevelUp;
+use Exception;
+use Illuminate\Support\Facades\Cache;
 
 class RankFightService {
 

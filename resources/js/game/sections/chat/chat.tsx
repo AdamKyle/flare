@@ -150,6 +150,14 @@ export default class Chat extends React.Component<ChatComponentProps, ChatCompon
         return message.time_stamp + ' [' + message.map_name + ' ' + message.x + '/' + message.y + ']'
     }
 
+    renderNameTag(message: any): JSX.Element | null {
+        if (message.name_tag === null) {
+            return null;
+        }
+
+        return <>The <span className='italic'>{message.name_tag}</span></>
+    }
+
     renderChatMessages() {
         const self = this;
 
@@ -169,12 +177,22 @@ export default class Chat extends React.Component<ChatComponentProps, ChatCompon
                             'font-extrabold': message.chat_is_bold,
                             'italic': message.chat_is_italic,
                         })}>
-                            {self.renderLocation(message)} <button type='button' className='underline' onClick={() => self.privateMessage(message.character_name)}>{message.character_name}</button>: {message.message}
+                            {self.renderLocation(message)} <button type='button'
+                                    className='underline'
+                                    onClick={() =>
+                                        self.privateMessage(message.character_name)}
+                            > {message.character_name} {self.renderNameTag(message)}
+                            </button>: {message.message}
                         </li>
                     }
 
                     return <li style={{color: message.color}} className='mb-2 break-all md:break-normal'>
-                        {self.renderLocation(message)} <button type='button' className='underline' onClick={() => self.privateMessage(message.character_name)}>{message.character_name}</button>: {message.message}
+                        {self.renderLocation(message)} <button type='button'
+                                className='underline'
+                                onClick={() =>
+                                    self.privateMessage(message.character_name)}
+                        >{message.character_name} {self.renderNameTag(message)}
+                        </button>: {message.message}
                     </li>
                 case 'private-message-sent':
                     return <li className='text-fuchsia-400 italic mb-2 break-all md:break-normal'>{message.message}</li>

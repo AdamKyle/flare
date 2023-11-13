@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Game\Battle\Handlers;
+namespace App\Game\BattleRewardProcessing\Handlers;
 
 
 use App\Flare\Builders\RandomAffixGenerator;
@@ -10,7 +10,6 @@ use App\Flare\Models\GameMap;
 use App\Flare\Models\Inventory;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
-use App\Flare\Models\Item as ItemModel;
 use App\Flare\Models\Map;
 use App\Flare\Models\Monster;
 use App\Flare\Values\ItemEffectsValue;
@@ -286,11 +285,11 @@ class FactionHandler {
      * Find a random item to attach the uniques to.
      *
      * @param Character $character
-     * @return ItemModel
+     * @return Item
      * @throws Exception
      */
     protected function giveCharacterRandomItem(Character $character): Item {
-        $item = ItemModel::where('cost', '<=', RandomAffixDetails::BASIC)
+        $item = Item::where('cost', '<=', RandomAffixDetails::BASIC)
             ->whereNull('item_prefix_id')
             ->whereNull('item_suffix_id')
             ->whereNull('specialty_type')

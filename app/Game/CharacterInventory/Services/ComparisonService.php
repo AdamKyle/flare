@@ -56,9 +56,9 @@ class ComparisonService {
     /**
      * @param Character $character
      * @param InventorySlot $itemToEquip
-     * @param string|null $type
+     * @param string $type
      */
-    public function buildComparisonData(Character $character, InventorySlot $itemToEquip, string $type = null) {
+    public function buildComparisonData(Character $character, InventorySlot $itemToEquip, string $type) {
         $service  = $this->characterInventoryService->setCharacter($character)
             ->setInventorySlot($itemToEquip)
             ->setPositions($this->validEquipPositionsValue->getPositions($itemToEquip->item))
@@ -86,7 +86,9 @@ class ComparisonService {
 
             $hasSet   = !is_null($setEquipped);
             $setIndex = !is_null($setEquipped) ? $character->inventorySets->search(function ($set) {
+                // @codeCoverageIgnoreStart
                 return $set->is_equipped;
+                // @codeCoverageIgnoreEnd
             }) + 1 : 0;
 
             $viewData = [
@@ -125,7 +127,9 @@ class ComparisonService {
 
         $hasSet   = !is_null($setEquipped);
         $setIndex = !is_null($setEquipped) ? $character->inventorySets->search(function ($set) {
+            // @codeCoverageIgnoreStart
             return $set->is_equipped;
+            // @codeCoverageIgnoreEnd
         }) + 1 : 0;
 
         $inventory = $service->inventory();
@@ -145,38 +149,6 @@ class ComparisonService {
             'setIndex'       => $setIndex,
             'setName'        => !is_null($setEquipped) ? $setEquipped->name : null,
         ];
-    }
-
-    public function isItemUnique(InventorySlot $slot): bool {
-        $item = $slot->item;
-
-        if (!is_null($item->itemPrefix)) {
-            return $item->itemPrefix->randomly_generated;
-        }
-
-        if (!is_null($item->itemSuffix)) {
-            return $item->itemSuffix->randomly_generated;
-        }
-
-        return false;
-    }
-
-    public function characterHasUniqueEquipped(Character $character): bool {
-        return $character->getInformation()->fetchInventory()->filter(function ($slot) {
-            $item = $slot->item;
-
-            if (!is_null($item->itemPrefix)) {
-                if ($item->itemPrefix->randomly_generated) {
-                    return $slot;
-                }
-            }
-
-            if (!is_null($item->itemSuffix)) {
-                if ($item->itemSuffix->randomly_generated) {
-                    return $slot;
-                }
-            }
-        })->isNotEmpty();
     }
 
     public function hasTypeEquipped(Character $character, string $type): bool {

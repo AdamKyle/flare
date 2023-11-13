@@ -2,17 +2,18 @@
 
 namespace App\Game\BattleRewardProcessing\Services;
 
-use App\Flare\Models\GameMap;
-use App\Flare\Models\Monster;
 use App\Flare\Models\Character;
 use App\Flare\Models\Event;
+use App\Flare\Models\GameMap;
 use App\Flare\Models\GlobalEventGoal;
-use App\Game\Core\Services\GoldRush;
-use App\Game\Battle\Handlers\FactionHandler;
+use App\Flare\Models\Monster;
 use App\Flare\Services\CharacterRewardService;
+use App\Game\BattleRewardProcessing\Handlers\FactionHandler;
+use App\Game\BattleRewardProcessing\Handlers\GlobalEventParticipationHandler;
+use App\Game\BattleRewardProcessing\Handlers\PurgatorySmithHouseRewardHandler;
+use App\Game\BattleRewardProcessing\Jobs\BattleItemHandler;
+use App\Game\Core\Services\GoldRush;
 use App\Game\Events\Values\EventType;
-use App\Game\Battle\Handlers\GlobalEventParticipationHandler;
-use App\Game\Battle\Jobs\BattleItemHandler;
 
 class BattleRewardService {
 
@@ -23,17 +24,20 @@ class BattleRewardService {
     private CharacterRewardService $characterRewardService;
     private GoldRush $goldRush;
     private GlobalEventParticipationHandler $globalEventParticipationHandler;
+    private PurgatorySmithHouseRewardHandler $purgatorySmithHouseRewardHandler;
 
     public function __construct(
         FactionHandler $factionHandler,
         CharacterRewardService $characterRewardService,
         GoldRush $goldRush,
-        GlobalEventParticipationHandler $globalEventParticipationHandler
+        GlobalEventParticipationHandler $globalEventParticipationHandler,
+        PurgatorySmithHouseRewardHandler $purgatorySmithHouseRewardHandler
     ) {
-        $this->factionHandler                  = $factionHandler;
-        $this->characterRewardService          = $characterRewardService;
-        $this->goldRush                        = $goldRush;
-        $this->globalEventParticipationHandler = $globalEventParticipationHandler;
+        $this->factionHandler                   = $factionHandler;
+        $this->characterRewardService           = $characterRewardService;
+        $this->goldRush                         = $goldRush;
+        $this->globalEventParticipationHandler  = $globalEventParticipationHandler;
+        $this->purgatorySmithHouseRewardHandler = $purgatorySmithHouseRewardHandler;
     }
 
     public function setUp(Monster $monster, Character $character): BattleRewardService {
@@ -60,6 +64,8 @@ class BattleRewardService {
         $this->goldRush->processPotentialGoldRush($this->character, $this->monster);
 
         $this->handleGlobalEventGoals();
+
+        $this->purgatorySmithHouseRewardHandler->handleFightingAtPurgatorySmithHouse($this->character, $this->monster);
 
         BattleItemHandler::dispatch($this->character, $this->monster);
     }

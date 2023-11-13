@@ -2,36 +2,30 @@
 
 namespace App\Game\Battle\Providers;
 
-use App\Flare\Services\CharacterXPService;
-use App\Game\Battle\Services\RankFightService;
-use App\Game\Skills\Services\DisenchantService;
-use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use App\Flare\Builders\BuildMythicItem;
 use App\Flare\Builders\Character\CharacterCacheData;
 use App\Flare\Builders\RandomAffixGenerator;
 use App\Flare\Builders\RandomItemDropBuilder;
-use App\Flare\Models\GlobalEventParticipation;
 use App\Flare\ServerFight\Monster\BuildMonster;
 use App\Flare\ServerFight\MonsterPlayerFight;
 use App\Flare\ServerFight\Pvp\PvpAttack;
 use App\Flare\Services\BuildMonsterCacheService;
-use App\Flare\Services\CharacterRewardService;
+use App\Flare\Services\CharacterXPService;
 use App\Game\Battle\Console\Commands\ClearCelestials;
-use App\Game\Battle\Handlers\BattleEventHandler;
-use App\Game\Battle\Handlers\FactionHandler;
 use App\Game\Battle\Services\BattleDrop;
 use App\Game\Battle\Services\CelestialFightService;
+use App\Game\Battle\Services\ConjureService;
 use App\Game\Battle\Services\MonthlyPvpFightService;
 use App\Game\Battle\Services\MonthlyPvpService;
 use App\Game\Battle\Services\PvpService;
+use App\Game\Battle\Services\RaidBattleService;
+use App\Game\Battle\Services\RankFightService;
+use App\Game\BattleRewardProcessing\Handlers\BattleEventHandler;
 use App\Game\Core\Services\GoldRush;
 use App\Game\Maps\Values\MapTileValue;
-use App\Game\Battle\Services\ConjureService;
-use App\Game\Battle\Services\RaidBattleService;
-use App\Game\BattleRewardProcessing\Services\BattleRewardService;
-use App\Game\BattleRewardProcessing\Services\SecondaryRewardService;
 use App\Game\Messages\Builders\NpcServerMessageBuilder;
-use App\Game\GuideQuests\Services\GuideQuestService;
+use App\Game\Skills\Services\DisenchantService;
+use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 
 class ServiceProvider extends ApplicationServiceProvider
 {
@@ -48,19 +42,6 @@ class ServiceProvider extends ApplicationServiceProvider
             );
         });
 
-        $this->app->bind(FactionHandler::class, function($app) {
-            return new FactionHandler(
-                $app->make(RandomAffixGenerator::class),
-                $app->make(GuideQuestService::class),
-            );
-        });
-
-        $this->app->bind(GlobalEventParticipation::class, function($app) {
-            return new GlobalEventParticipation(
-                $app->make(RandomAffixGenerator::class),
-            );
-        });
-
         $this->app->bind(GoldRush::class, function($app) {
             return new GoldRush();
         });
@@ -69,13 +50,6 @@ class ServiceProvider extends ApplicationServiceProvider
             return new BattleDrop(
                 $app->make(RandomItemDropBuilder::class),
                 $app->make(DisenchantService::class)
-            );
-        });
-
-        $this->app->bind(BattleEventHandler::class, function($app) {
-            return new BattleEventHandler(
-                $app->make(BattleRewardService::class),
-                $app->make(SecondaryRewardService::class)
             );
         });
 
@@ -135,8 +109,7 @@ class ServiceProvider extends ApplicationServiceProvider
      *
      * @return void
      */
-    public function boot()
-    {
+    public function boot() {
         // ...
     }
 }

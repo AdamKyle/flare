@@ -12,7 +12,7 @@ class MapChatColor {
     const PURGATORY = '#639cff';
 
     // Special Event Maps
-    const ICE_PLANE = '#485ead';
+    const ICE_PLANE = '#aeb6d3';
 
     /**
      * @var string $mapName

@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Game\Battle\Jobs;
+namespace App\Game\BattleRewardProcessing\Jobs;
 
+use App\Game\BattleRewardProcessing\Handlers\BattleEventHandler;
 use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use App\Game\Battle\Handlers\BattleEventHandler;
 
 class  BattleAttackHandler implements ShouldQueue {
 

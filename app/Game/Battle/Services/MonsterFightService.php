@@ -3,12 +3,11 @@
 namespace App\Game\Battle\Services;
 
 use App\Flare\Models\Character;
-use Illuminate\Support\Facades\Cache;
-use App\Game\Core\Traits\ResponseBuilder;
 use App\Flare\ServerFight\MonsterPlayerFight;
-use App\Game\Battle\Jobs\BattleAttackHandler;
-use App\Game\Battle\Handlers\BattleEventHandler;
-use Hamcrest\Arrays\IsArray;
+use App\Game\BattleRewardProcessing\Handlers\BattleEventHandler;
+use App\Game\BattleRewardProcessing\Jobs\BattleAttackHandler;
+use App\Game\Core\Traits\ResponseBuilder;
+use Illuminate\Support\Facades\Cache;
 
 class MonsterFightService {
 

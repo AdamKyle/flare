@@ -2,19 +2,18 @@
 
 namespace App\Game\Battle\Services;
 
-use App\Game\Maps\Events\UpdateDuelAtPosition;
-use App\Game\Maps\Events\UpdateMap;
-use Cache;
 use App\Flare\Builders\BuildMythicItem;
 use App\Flare\Builders\Character\CharacterCacheData;
 use App\Flare\Jobs\RemoveKilledInPvpFromUser;
 use App\Flare\Models\Character;
 use App\Flare\ServerFight\Pvp\PvpAttack;
 use App\Game\Battle\Events\UpdateCharacterPvpAttack;
-use App\Game\Battle\Handlers\BattleEventHandler;
+use App\Game\BattleRewardProcessing\Handlers\BattleEventHandler;
+use App\Game\Maps\Events\UpdateDuelAtPosition;
+use App\Game\Maps\Events\UpdateMap;
 use App\Game\Maps\Values\MapTileValue;
-use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
+use Cache;
 
 class PvpService {
 

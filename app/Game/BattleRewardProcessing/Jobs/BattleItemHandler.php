@@ -1,16 +1,16 @@
 <?php
 
-namespace App\Game\Battle\Jobs;
+namespace App\Game\BattleRewardProcessing\Jobs;
 
+use App\Flare\Models\Character;
+use App\Flare\Models\Monster;
+use App\Game\Core\Services\DropCheckService;
 use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use App\Flare\Models\Character;
-use App\Flare\Models\Monster;
-use App\Game\Core\Services\DropCheckService;
 
 class BattleItemHandler implements ShouldQueue {
 
