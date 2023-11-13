@@ -40,6 +40,21 @@
         <p class="mb-4"> This location will let you explore here, for 3x the copper coin drop and a 1/1000 chance for a
             Mythic Item to drop.</p>
     @endif
+
+    @if ($locationType->isPurgatorySmithHouse())
+        <h3 class="mb-4">Welcome to Purgatory Smith House!</h3>
+        <p class="mb-4">In this location, a few things will happen for those who have access:</p>
+        <ul class="list-disc">
+            <li class="ml-4">Characters can get 1-1000 Gold Dust from fighting monsters. This can be increased to 5,000 if an event is triggered at this area.</li>
+            <li class="ml-4">Characters can get 1-1000 Shards from fighting monsters. This can be increased to 5,000 if an event is triggered at this area.</li>
+            <li class="ml-4">Characters can get 1-1000 Copper Coins<sup>*</sup> from fighting monsters. This can be increased to 5,000 if an event is triggered at this area.</li>
+            <li class="ml-4">There is a 1/1,000,000 chance to get a Purgatory Chain Legendary Unique from Monsters half way down the list of more. This can be reduced to 1/500,000 chance if an event is triggered at this area.</li>
+            <li class="ml-4">There is a 1/10,000,000 chance to get a Purgatory Chain Mythic from the last monster in the list. This can be reduced to 1/5,000,000 chance if an event is triggered at this area.</li>
+            <li class="ml-4">There is a 1/1,000,000 chance to trigger an event while fighting here to reduce the chances and increase the currencies (the above "if an event is triggered") for 1 hour at this location only.</li>
+        </ul>
+        <p class="mt-4 mb-4 italic"><sup>*</sup> Provided characters have the required quest item to obtain copper coins.</p>
+
+    @endif
 @endif
 
 @if (!is_null($increasesEnemyStrengthBy))

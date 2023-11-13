@@ -38,7 +38,7 @@ export default class LocationDetails extends React.Component<LocationDetailsProp
                 </Fragment>
             )
         }
-        
+
 
         if (this.props.location.type_name === 'Purgatory Dungeons') {
             return (
@@ -47,9 +47,28 @@ export default class LocationDetails extends React.Component<LocationDetailsProp
                     <h5 className='text-orange-500 dark:text-orange-400'>Purgatory Dungeons!</h5>
                     <p className='my-4'>
                         You have entered into the Purgatory Dungeons. You <strong>can explore here</strong>.
-                        This is the only place known to drop <a href='/information/gear-progression' target="_blank">Mythic Items <i className="fas fa-external-link-alt"></i></a>,
+                        This is the only place known to drop <a href='/information/mythical-items' target="_blank">Mythic Items <i className="fas fa-external-link-alt"></i></a>,
                         aside from Celestial Kings who spawn after <a href='/information/monthly-pvp-event' target="_blank">Monthly PVP <i className="fas fa-external-link-alt"></i></a>
                     </p>
+                </Fragment>
+            )
+        }
+
+        if (this.props.location.type_name === 'Purgatory Smiths House') {
+            return (
+                <Fragment>
+                    <div className='border-b-2 border-b-gray-200 dark:border-b-gray-600 my-3 hidden sm:block'></div>
+                    <h5 className='text-orange-500 dark:text-orange-400'>Purgatory Smith House!</h5>
+                    <p className="mb-4">In this location, a few things will happen for those who have access:</p>
+                    <ul className="list-disc">
+                        <li className="ml-4">Characters can get 1-1000 Gold Dust from fighting monsters. This can be increased to 5,000 if an event is triggered at this area.</li>
+                        <li className="ml-4">Characters can get 1-1000 Shards from fighting monsters. This can be increased to 5,000 if an event is triggered at this area.</li>
+                        <li className="ml-4">Characters can get 1-1000 Copper Coins<sup>*</sup> from fighting monsters. This can be increased to 5,000 if an event is triggered at this area.</li>
+                        <li className="ml-4">There is a 1/1,000,000 chance to get a Purgatory Chain <a href="/information/random-enchants" target="_blank">Legendary Unique <i className="fas fa-external-link-alt"></i></a> from Monsters half way down the list of more. This can be reduced to 1/500,000 chance if an event is triggered at this area.</li>
+                        <li className="ml-4">There is a 1/10,000,000 chance to get a Purgatory Chain <a href='/information/mythical-items' target="_blank">Mythic Items <i className="fas fa-external-link-alt"></i></a> from the last monster in the list. This can be reduced to 1/5,000,000 chance if an event is triggered at this area.</li>
+                        <li className="ml-4">There is a 1/1,000,000 chance to trigger an event while fighting here to reduce the chances and increase the currencies (the above "if an event is triggered") for 1 hour at this location only.</li>
+                    </ul>
+                    <p className="mt-4 mb-4 italic"><sup>*</sup> Provided characters have the required quest item to obtain copper coins.</p>
                 </Fragment>
             )
         }
@@ -92,7 +111,7 @@ export default class LocationDetails extends React.Component<LocationDetailsProp
                 {this.renderRaidDetails()}
                 {
                     this.isSpecialLocation() ?
-                        <Fragment>
+                        <div className="max-h-[350px] lg:max-h-auto overflow-y-scroll lg:overflow-y-visible">
                             <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
                             <div className='flex items-center mb-4'>
                                 <h4>Special Location Details</h4>
@@ -121,7 +140,7 @@ export default class LocationDetails extends React.Component<LocationDetailsProp
                                     this.renderSpecialType()
                                 : null
                             }
-                        </Fragment>
+                        </div>
                     :
                         this.props.location.quest_reward_item_id !== null ?
                             <Fragment>

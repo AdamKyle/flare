@@ -5,17 +5,17 @@ namespace App\Game\BattleRewardProcessing\Handlers;
 use App\Flare\Builders\RandomAffixGenerator;
 use App\Flare\Models\Character;
 use App\Flare\Models\Event;
-use App\Flare\Models\GlobalEventGoal;
 use App\Flare\Models\Item;
 use App\Flare\Models\Location;
 use App\Flare\Models\Monster;
-use App\Flare\RandomNumber\RandomNumberGenerator;
+use Facades\App\Flare\RandomNumber\RandomNumberGenerator;
 use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\ItemSpecialtyType;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Flare\Values\RandomAffixDetails;
-use App\Game\Core\Handlers\AnnouncementHandler;
+use Facades\App\Game\Core\Handlers\AnnouncementHandler;
 use App\Game\Events\Values\EventType;
+use App\Game\Mercenaries\Values\MercenaryValue;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
 use Exception;
@@ -110,15 +110,24 @@ class PurgatorySmithHouseRewardHandler {
             $maximumAmount = 50000;
         }
 
-        $goldDust = RandomNumberGenerator::generateRandomNumber(1, $maximumAmount) + $character->gold_dust;
-        $shards   = RandomNumberGenerator::generateRandomNumber(1, $maximumAmount) + $character->shards;
+        $goldDust = RandomNumberGenerator::generateRandomNumber(1, $maximumAmount);
+        $shards   = RandomNumberGenerator::generateRandomNumber(1, $maximumAmount);
 
-        $hasItemForCopperCoins = $character->inventory->slots->where('item.effect', ItemEffectsValue::GET_COPPER_COINS)->exists();
+        $hasItemForCopperCoins = $character->inventory->slots->where('item.effect', ItemEffectsValue::GET_COPPER_COINS)->count() > 0;
         $copperCoins = 0;
 
+        $goldDust = $goldDust + $goldDust * $this->getCurrencyMercenaryBonus($character, MercenaryValue::CHILD_OF_GOLD_DUST);
+        $shards = $shards + $shards * $this->getCurrencyMercenaryBonus($character, MercenaryValue::CHILD_OF_SHARDS);
+
         if ($hasItemForCopperCoins) {
-            $copperCoins = RandomNumberGenerator::generateRandomNumber(1, $maximumAmount) + $character->copper_coins;
+            $copperCoins = RandomNumberGenerator::generateRandomNumber(1, $maximumAmount);
+
+            $copperCoins = $copperCoins + $copperCoins * $this->getCurrencyMercenaryBonus($character, MercenaryValue::CHILD_OF_COPPER_COINS);
         }
+
+        $goldDust    += $character->gold_dust;
+        $shards      += $character->shards;
+        $copperCoins += $character->copper_coins;
 
         if ($goldDust > MaxCurrenciesValue::MAX_GOLD_DUST) {
             $goldDust = MaxCurrenciesValue::MAX_GOLD_DUST;
@@ -236,6 +245,17 @@ class PurgatorySmithHouseRewardHandler {
 
             event(new ServerMessageEvent($character->user, 'You found something MYTHICAL in the basement child: ' . $item->affix_name, $slot->id));
         }
+    }
+
+    protected function getCurrencyMercenaryBonus(Character $character, string $mercenaryType): float {
+
+        $mercenary = $character->mercenaries()->where('mercenary_type', $mercenaryType)->first();
+
+        if (!is_null($mercenary)) {
+            return $mercenary->type()->getBonus($mercenary->current_level, $mercenary->reincarnated_bonus);
+        }
+
+        return 0;
     }
 
 
