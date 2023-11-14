@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\GameMap;
+use App\Flare\RandomNumber\LotteryRandomNumberGenerator;
 use App\Flare\Values\MapNameValue;
 use Illuminate\Console\Command;
 
@@ -25,11 +26,33 @@ class TestQuery extends Command {
     /**
      * Execute the console command.
      */
-    public function handle() {
+    public function handle(LotteryRandomNumberGenerator $lotteryRandomNumberGenerator) {
 
-        $gameMap = GameMap::where('name', MapNameValue::ICE_PLANE)->first();
+        // Example: Generate a true random number between 1 and 1,000,000
+        $min = 1;
+        $max = 1000000;
 
-        $result = Character::join('maps', 'maps.character_id', '=', 'characters.id')
-            ->where('maps.game_map_id', $gameMap->id)->get();
+        for ($i =0; $i <= 10000; $i++) {
+            $randomNumber = $this->generateTrueRandomNumber($min, $max);
+            $number       = $lotteryRandomNumberGenerator->generateNumber($randomNumber);
+
+            if ($number >= 96) {
+                $this->line('HOLY SHIT!!!! :: ' . $number);
+                return;
+            } else {
+                $this->line('['.$i.'] Number: ' . $number);
+            }
+        }
+    }
+
+
+    public function generateTrueRandomNumber($min, $max)
+    {
+        do {
+            $randomBytes = random_bytes(4); // Adjust the number of bytes based on your needs
+            $randomNumber = hexdec(bin2hex($randomBytes));
+        } while ($randomNumber < $min || $randomNumber > $max);
+
+        return $randomNumber;
     }
 }

@@ -9,6 +9,8 @@ import FightSectionState from "./types/fight-section-state";
 import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
 import BattleMesages from "./fight-section/battle-mesages";
 import DangerAlert from "../../../components/ui/alerts/simple-alerts/danger-alert";
+import PrimaryLinkButton from "../../../components/ui/buttons/primary-link-button";
+import RaidElementInfo from "./fight-section/modals/raid-elemental-info";
 
 export default class FightSection extends React.Component<
     FightSectionProps,
@@ -32,6 +34,7 @@ export default class FightSection extends React.Component<
             setting_up_regular_fight: false,
             processing_regular_fight: false,
             show_clear_message: true,
+            open_elemental_atonement: false,
             error_message: "",
         };
     }
@@ -153,6 +156,7 @@ export default class FightSection extends React.Component<
                                     result.data.health.max_monster_health,
                                 monster_to_fight_id: result.data.monster.id,
                                 setting_up_regular_fight: false,
+                                monster_to_fight: result.data.monster,
                             });
                         },
                         (error: AxiosError) => {
@@ -252,6 +256,12 @@ export default class FightSection extends React.Component<
         });
     }
 
+    manageElementalAtonement() {
+        this.setState({
+            open_elemental_atonement: !this.state.open_elemental_atonement,
+        });
+    }
+
     render() {
         if (this.state.setting_up_regular_fight) {
             return <LoadingProgressBar />;
@@ -267,6 +277,17 @@ export default class FightSection extends React.Component<
 
         return (
             <div className={clsx({ "ml-[-100px]": !this.props.is_small })}>
+
+                {
+                    this.state.monster_to_fight?.highest_element !== 'UNKNOWN' ?
+                        <div className="flex items-center justify-center">
+                            <div className=" mt-4 mb-4 text-center">
+                                <PrimaryLinkButton button_label={'Elemental Atonement Info'} on_click={this.manageElementalAtonement.bind(this)} />
+                            </div>
+                        </div>
+                    : null
+                }
+
                 <div
                     className={clsx("mt-4 mb-4 text-xs text-center", {
                         hidden: this.attackButtonDisabled(),
@@ -374,6 +395,15 @@ export default class FightSection extends React.Component<
                             max_health={this.state.character_max_health}
                         />
                     </div>
+                ) : null}
+                {this.state.open_elemental_atonement && this.state.monster_to_fight !== null ? (
+                    <RaidElementInfo
+                        element_atonements={this.state.monster_to_fight.elemental_atonement}
+                        highest_element={this.state.monster_to_fight.highest_element}
+                        monster_name={this.state.monster_to_fight.name}
+                        is_open={this.state.open_elemental_atonement}
+                        manage_modal={this.manageElementalAtonement.bind(this)}
+                    />
                 ) : null}
                 <div className="italic text-center">
                     <BattleMesages

@@ -161,7 +161,7 @@ class DropCheckService {
     protected function canHaveMythic(bool $useLooting = false): bool {
         $chance = $this->lootingChance;
 
-        $roll = RandomNumberGenerator::generateRandomNumber(1, 1000);
+        $roll = RandomNumberGenerator::generateRandomNumber(1, 1000000);
 
         if ($useLooting) {
 
@@ -171,10 +171,10 @@ class DropCheckService {
 
             $roll = $roll + $roll * $chance;
 
-            return $roll > 999;
+            return $roll > 999999;
         }
 
-        return $roll > 999;
+        return $roll > 999999;
     }
 
     /**

@@ -11,10 +11,11 @@ use App\Game\Skills\Handlers\UpdateItemSkill;
 use Facades\App\Game\Skills\Handlers\UpdateItemSkill as UpdateItemSkillFacade;
 use App\Game\BattleRewardProcessing\Services\SecondaryRewardService;
 use Tests\Traits\CreateItem;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class SecondaryRewardServiceTest extends TestCase {
 
-    use CreateMonster, CreateGameMap, CreateItem;
+    use CreateMonster, CreateGameMap, CreateItem, RefreshDatabase;
 
     private ?SecondaryRewardService $secondaryRewardService;
 

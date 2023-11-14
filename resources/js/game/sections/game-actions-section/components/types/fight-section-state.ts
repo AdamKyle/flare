@@ -29,6 +29,8 @@ export default interface FightSectionState {
     processing_regular_fight: boolean;
 
     show_clear_message: boolean;
-    
+
     error_message: string;
+
+    open_elemental_atonement: boolean;
 }

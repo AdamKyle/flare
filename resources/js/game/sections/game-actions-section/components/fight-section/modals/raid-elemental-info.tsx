@@ -45,8 +45,8 @@ export default class RaidElementInfo extends React.Component<any, any> {
                     the use of <a href='/information/gems' target='_blank'>Gems <i className="fas fa-external-link-alt"></i></a>.
                 </p>
                 <p className='my-4'>
-                    When an enemy attacks, they will do a % of their weapon damage as that elements damage towards you. For example if there attack is 500, and 
-                    the enemies highest element is 15% in water they will do 15% of 500 towards you as water damage. If your element is Fire, they will do 
+                    When an enemy attacks, they will do a % of their weapon damage as that elements damage towards you. For example if there attack is 500, and
+                    the enemies highest element is 15% in water they will do 15% of 500 towards you as water damage. If your element is Fire, they will do
                     double that damage. If your element is Ice, they will do half damage to you.
                 </p>
                 <p className='my-4'>

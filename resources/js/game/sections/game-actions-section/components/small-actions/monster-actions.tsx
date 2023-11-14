@@ -10,6 +10,7 @@ import Select from "react-select";
 import Ajax from "../../../../lib/ajax/ajax";
 import { AxiosError, AxiosResponse } from "axios";
 import Revive from "../fight-section/revive";
+import RaidElementInfo from "../fight-section/modals/raid-elemental-info";
 
 export default class MonsterActions extends React.Component<
     MonsterActionsProps,
@@ -259,6 +260,8 @@ export default class MonsterActions extends React.Component<
                         setup_rank_fight={this.setupRankFight.bind(this)}
                     />
                 ) : null}
+
+
             </div>
         );
     }

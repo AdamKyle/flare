@@ -81,7 +81,12 @@ class MonsterPlayerFight {
      * @param Ambush $ambush
      * @param Attack $attack
      */
-    public function __construct(BuildMonster $buildMonster, CharacterCacheData $characterCacheData, Voidance $voidance, Ambush $ambush, Attack $attack) {
+    public function __construct(BuildMonster $buildMonster,
+                                CharacterCacheData $characterCacheData,
+                                Voidance $voidance,
+                                Ambush $ambush,
+                                Attack $attack
+    ) {
         $this->buildMonster       = $buildMonster;
         $this->characterCacheData = $characterCacheData;
         $this->voidance           = $voidance;
@@ -474,6 +479,14 @@ class MonsterPlayerFight {
 
         foreach ($monsters as $monster) {
             if ($monster['id'] === $monsterId) {
+
+                $serverMonster = $this->buildMonster->setServerMonster($monster);
+
+                $elementalData = $serverMonster->getElementData();
+
+                $monster['elemental_atonement'] = $elementalData;
+                $monster['highest_element']     = $serverMonster->getHighestElementName($elementalData, $serverMonster->getHighestElementDamage($elementalData));
+
                 return $monster;
             }
         }

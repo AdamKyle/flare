@@ -1,5 +1,7 @@
+import ElementalAtonement from "../deffinitions/elemental-atonement";
+
 export default interface RaidSelectionState {
-    
+
     is_loading: boolean;
     is_fighting: boolean;
     monster_current_health: number,
@@ -12,6 +14,6 @@ export default interface RaidSelectionState {
     raid_boss_attacks_left: number;
     is_raid_boss: boolean;
     open_elemental_atonement: boolean;
-    elemental_atonement: object,
-    highest_element: string|null,
+    elemental_atonement: ElementalAtonement | object;
+    highest_element: string | null;
 }

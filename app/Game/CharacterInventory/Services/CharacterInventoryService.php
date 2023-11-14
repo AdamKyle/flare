@@ -170,7 +170,7 @@ class CharacterInventoryService {
             case 'sets':
                 return [
                     'sets'         => $this->getCharacterInventorySets(),
-                    'set_equipped' => $this->isInventorySetIsEquipped
+                    'set_equipped' => InventorySet::where('character_id', $this->character->id)->where('is_equipped', true)->count() > 0,
                 ];
             case 'quest_items':
                 return $this->getQuestItems();
@@ -189,20 +189,21 @@ class CharacterInventoryService {
      * @return InventorySlot|SetSlot|null
      */
     public function getSlotForItemDetails(Character $character, Item $item): InventorySlot | SetSlot | null {
+
         $slot = Inventory::where('character_id', $character->id)->first()->slots()->where('item_id', $item->id)->first();
 
         if (is_null($slot)) {
-            $slot = SetSlot::where('item_id', $item->id)->first();
 
-            if (is_null($slot)) {
+            $desiredSlot = $character->inventorySets()
+                ->whereHas('slots', function($query) use ($item) {
+                    $query->where('item_id', $item->id);
+                })->with('slots')->first();
+
+            if (is_null($desiredSlot)) {
                 return null;
             }
 
-            $characterInventorySet = InventorySet::find($slot->inventory_set_id)->where('character_id', $character->id)->first();
-
-            if (is_null($characterInventorySet)) {
-                $slot = null;
-            }
+            $slot = $desiredSlot->slots->first();
         }
 
         return $slot;
@@ -370,16 +371,12 @@ class CharacterInventoryService {
      * @return Collection
      */
     public function getInventoryCollection(): Collection {
-        $inventory = Inventory::where('character_id', $this->character->id)->first();
 
-        if (is_null($inventory)) {
-            return collect();
-        }
-
-        return InventorySlot::where('inventory_slots.inventory_id', $inventory->id)->join('items', function ($join) {
-            $join->on('inventory_slots.item_id', '=', 'items.id')
-                ->whereNotIn('items.type', ['quest', 'alchemy']);
-        })->where('inventory_slots.equipped', false)->select('inventory_slots.*')->get();
+        return $this->character
+            ->inventory
+            ->slots
+            ->whereNotIn('item.type', ['quest', 'alchemy'])
+            ->where('equipped', false);
     }
 
     /**
@@ -400,12 +397,15 @@ class CharacterInventoryService {
     }
 
     public function findCharacterInventorySlotIds(): array {
-        $inventory = Inventory::where('character_id', $this->character->id)->first();
 
-        return InventorySlot::where('inventory_slots.inventory_id', $inventory->id)->join('items', function ($join) {
-            $join->on('inventory_slots.item_id', '=', 'items.id')
-                ->whereNotIn('items.type', ['quest', 'alchemy']);
-        })->where('inventory_slots.equipped', false)->select('inventory_slots.*')->orderBy('inventory_slots.id', 'asc')->pluck('inventory_slots.id')->toArray();
+        return $this->character
+            ->inventory
+            ->slots
+            ->whereNotIn('item.type', ['quest', 'alchemy'])
+            ->where('equipped', false)
+            ->sortBy('id')
+            ->pluck('id')
+            ->toArray();
     }
 
     /**

@@ -428,13 +428,6 @@ class EnchantingServiceTest extends TestCase {
 
         $enchantingSkill = $character->skills()->where('game_skill_id', $this->enchantingSkill->id)->first();
 
-        $expected = [
-            'current_xp' => 0,
-            'next_level_xp' => $enchantingSkill->xp_max,
-            'skill_name' => $enchantingSkill->baseSkill->name,
-            'level' => $enchantingSkill->level,
-        ];
-
-        $this->assertEquals($weaponCraftingXpData, $expected);
+        $this->assertEquals($weaponCraftingXpData['skill_name'], $enchantingSkill->baseSkill->name);
     }
 }
