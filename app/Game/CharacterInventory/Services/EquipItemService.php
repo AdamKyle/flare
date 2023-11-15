@@ -197,25 +197,12 @@ class EquipItemService {
     }
 
     /**
-     * Do we have a bow equipped?
+     * Unequipped a slot.
      *
-     * @param Item $itemToEquip
-     * @param Collection $inventorySlots
-     * @param string $type
-     * @return bool
+     * @param InventorySlot $characterSlot
+     * @param Inventory|InventorySet $inventory
+     * @return void
      */
-    public function isTwoHandedItemEquipped(Item $itemToEquip, Collection $inventorySlots, string $type): bool {
-        $validTypes = ['bow', 'hammer', 'stave'];
-
-        if (!in_array($itemToEquip->type, $validTypes)) {
-            return false;
-        }
-
-        return $inventorySlots->filter(function ($slot) use ($type) {
-            return $slot->item->type === $type && $slot->equipped;
-        })->isNotEmpty();
-    }
-
     public function unequipSlot(InventorySlot $characterSlot, Inventory|InventorySet $inventory) {
         if ($characterSlot->item->type === 'bow') {
             $this->unequipBothHands();
@@ -225,55 +212,27 @@ class EquipItemService {
             $this->unequipBothHands();
         } else {
 
-            if (!$this->removeTwoHandedWeapon($inventory)) {
-                $itemForPosition = $inventory->slots->filter(function ($slot) {
-                    return $slot->position === $this->request['position'] && $slot->equipped;
-                })->first();
+            $itemForPosition = $inventory->slots->filter(function ($slot) {
+                return $slot->position === $this->request['position'] && $slot->equipped;
+            })->first();
 
-                if (!is_null($itemForPosition)) {
-                    $itemForPosition->update(['equipped' => false]);
+            if (!is_null($itemForPosition)) {
+                $itemForPosition->update(['equipped' => false]);
 
-                    $this->character->inventory->slots()->create([
-                        'inventory_id' => $this->character->inventory->id,
-                        'item_id' => $itemForPosition->item->id,
-                    ]);
+                $this->character->inventory->slots()->create([
+                    'inventory_id' => $this->character->inventory->id,
+                    'item_id' => $itemForPosition->item->id,
+                ]);
 
-                    $itemForPosition->delete();
-                }
+                $itemForPosition->delete();
             }
         }
-    }
-
-    protected function removeTwoHandedWeapon(Inventory|InventorySet $inventory): bool {
-        if ($this->request['position'] === 'right-hand' || $this->request['position'] === 'left-hand') {
-
-            $itemsForPosition = $inventory->slots->filter(function ($slot) {
-                return ($slot->position === 'right-hand' || $slot->position === 'left-hand') && $slot->equipped;
-            });
-
-            $unequipTypes = ['bow', 'hammer', 'stave'];
-
-            foreach ($itemsForPosition as $itemForPosition) {
-                if (in_array($itemForPosition->item->type, $unequipTypes)) {
-                    $itemForPosition->update(['equipped' => false]);
-
-                    $this->character->inventory->slots()->create([
-                        'inventory_id' => $this->character->inventory->id,
-                        'item_id'      => $itemForPosition->item->id,
-                    ]);
-
-                    $itemForPosition->delete();
-
-                    return true;
-                }
-            }
-        }
-
-        return false;
     }
 
     /**
-     * Unequips both hands.
+     * Unequip both hands.
+     *
+     * @return void
      */
     public function unequipBothHands() {
         $slots = $this->character->inventory->slots->filter(function ($slot) {

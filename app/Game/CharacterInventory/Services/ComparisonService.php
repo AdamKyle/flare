@@ -57,8 +57,9 @@ class ComparisonService {
      * @param Character $character
      * @param InventorySlot $itemToEquip
      * @param string $type
+     * @return array
      */
-    public function buildComparisonData(Character $character, InventorySlot $itemToEquip, string $type) {
+    public function buildComparisonData(Character $character, InventorySlot $itemToEquip, string $type): array {
         $service  = $this->characterInventoryService->setCharacter($character)
             ->setInventorySlot($itemToEquip)
             ->setPositions($this->validEquipPositionsValue->getPositions($itemToEquip->item))
@@ -70,7 +71,7 @@ class ComparisonService {
             'details'        => [],
             'atonement'      => $this->itemAtonements->getAtonements($itemToEquip->item, $inventory),
             'itemToEquip'    => $itemToEquip->item->type === 'alchemy' ? $this->buildUsableItemDetails($itemToEquip) : $this->buildItemDetails($itemToEquip),
-            'type'           => $service->getType($itemToEquip->item, $type),
+            'type'           => $service->getType($itemToEquip->item),
             'slotId'         => $itemToEquip->id,
             'characterId'    => $character->id,
             'bowEquipped'    => $this->hasTypeEquipped($character, 'bow'),
@@ -95,7 +96,7 @@ class ComparisonService {
                 'details'        => $this->equipItemService->getItemStats($itemToEquip->item, $inventory, $character),
                 'atonement'      => $this->itemAtonements->getAtonements($itemToEquip->item, $inventory),
                 'itemToEquip'    => $this->buildItemDetails($itemToEquip),
-                'type'           => $service->getType($itemToEquip->item, $type),
+                'type'           => $service->getType($itemToEquip->item),
                 'slotId'         => $itemToEquip->id,
                 'slotPosition'   => $itemToEquip->position,
                 'characterId'    => $character->id,
@@ -138,7 +139,7 @@ class ComparisonService {
             'details'        => $this->equipItemService->getItemStats($item, $inventory, $character),
             'atonement'      => $this->itemAtonements->getAtonements($item, $inventory),
             'itemToEquip'    => $this->itemDetails($item),
-            'type'           => $service->getType($item, $type),
+            'type'           => $service->getType($item),
             'slotId'         => $item->id,
             'slotPosition'   => null,
             'characterId'    => $character->id,

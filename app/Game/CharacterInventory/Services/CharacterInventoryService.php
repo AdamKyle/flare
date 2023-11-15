@@ -2,6 +2,7 @@
 
 namespace App\Game\CharacterInventory\Services;
 
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use League\Fractal\Resource\Collection as LeagueCollection;
@@ -136,6 +137,11 @@ class CharacterInventoryService {
         return $this;
     }
 
+    /**
+     * Get api response.
+     *
+     * @return array
+     */
     public function getInventoryForApi(): array {
         $equipped   = $this->fetchEquipped();
         $usableSets = $this->getUsableSets();
@@ -368,6 +374,11 @@ class CharacterInventoryService {
     }
 
     /**
+     * Get inventory collection.
+     *
+     *  - Does not include equipped, usable or quest items.
+     *  - Only comes from inventory, does not include sets.
+     *
      * @return Collection
      */
     public function getInventoryCollection(): Collection {
@@ -396,6 +407,14 @@ class CharacterInventoryService {
         return array_reverse($this->manager->createData($slots)->toArray());
     }
 
+    /**
+     * Fetch inventory slot items.
+     *
+     * - Does not include alchemy or quest items.
+     * - Items can also not be equipped.
+     *
+     * @return array
+     */
     public function findCharacterInventorySlotIds(): array {
 
         return $this->character
@@ -455,41 +474,29 @@ class CharacterInventoryService {
     /**
      * Set the inventory
      *
-     * @param Request $request
      * @return CharacterInventoryService
      */
-    public function setInventory(string $type): CharacterInventoryService {
+    public function setInventory(): CharacterInventoryService {
 
-        $useArray = !in_array($type, ['body', 'shield', 'leggings', 'feet', 'sleeves', 'helmet', 'gloves', 'artifact']);
-
-        $this->inventory = $this->getInventory($type, $useArray);
+        $this->inventory = $this->getInventory();
 
         return $this;
     }
 
-    protected function getInventory(string $type, bool $useArray = false): Collection {
-        $inventory = $this->character->inventory->slots->filter(function ($slot) use ($type, $useArray) {
-            if ($useArray) {
-                return in_array($slot->position, $this->positions) && $slot->equipped;
-            }
+    /**
+     * Get inventory
+     *
+     * @return Collection
+     */
+    protected function getInventory(): Collection {
 
-            return $slot->item->type === $type && $slot->equipped;
-        });
+        $inventory = $this->character->inventory->slots->whereIn('position', $this->positions)->where('equipped', true);
 
-        if ($inventory->isEmpty()) {
-            $equippedSet = $this->character->inventorySets()->where('is_equipped', true)->first();
-            if (!is_null($equippedSet)) {
-                $inventory = $equippedSet->slots->filter(function ($slot) use ($type, $useArray) {
-                    if ($useArray) {
-                        return in_array($slot->position, $this->positions) && $slot->equipped;
-                    }
-
-                    return $slot->item->type === $type && $slot->equipped;
-                });
-            }
+        if (!$inventory->isEmpty()) {
+            return $inventory;
         }
 
-        return $inventory;
+        return $this->character->inventorySets->where('is_equipped', true)->whereIn('slots.position', $this->positions);
     }
 
     /**
@@ -504,27 +511,32 @@ class CharacterInventoryService {
     /**
      * Fetches the type of the item.
      *
-     * @param Request $request
      * @param Item $item
      * @return string
+     * @throws Exception
      */
-    public function getType(Item $item, string $type = null): string {
-        if (!is_null($type)) {
-            return $this->fetchType($type);
-        }
-
-        if ($item->type === 'bow') {
-            return $item->type;
-        }
-
-        return $item->crafting_type;
+    public function getType(Item $item): string {
+        return $this->fetchType($item->type);
     }
 
+    /**
+     * Fetch type based on accepted types.
+     *
+     * @param string $type
+     * @return string
+     * @throws Exception
+     */
     protected function fetchType(string $type): string {
         $acceptedTypes = [
-            'weapon', 'ring', 'shield', 'artifact', 'spell', 'armour', 'trinket', 'stave', 'hammer'
+            'weapon', 'ring', 'shield', 'artifact', 'spell', 'armour',
+            'trinket', 'stave', 'hammer', 'bow', 'alchemy', 'quest',
         ];
 
-        return in_array($type, $acceptedTypes) ? $type : 'armour';
+        // Spells do not have the tye spell - they are differentiated by damage or healing suffix.
+        if ($type === 'spell-damage' || $type === 'spell-healing') {
+            $type = 'spell';
+        }
+
+        return !in_array($type, $acceptedTypes) ? throw new Exception('Unknown Item type: ' . $type) : $type;
     }
 }
