@@ -3,7 +3,7 @@ import CharacterCurrenciesType from "../character/character-currencies-type";
 import CharacterStatusType from "../character/character-status-type";
 import QuestType from "./quests/quest-type";
 import KingdomDetails from "../kingdoms/kingdom-details";
-import PositionType from "./map/position-type";
+import PositionType from "../../../sections/map/types/map/position-type";
 import KingdomLogDetails from "../kingdoms/kingdom-log-details";
 import MonsterType from "./actions/monster/monster-type";
 import MapState from "../../../sections/map/types/map-state";

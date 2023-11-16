@@ -1,24 +1,24 @@
 import React, { Fragment } from "react";
 import Snowfall from 'react-snowfall'
-import { dragMap, fetchLeftBounds } from "../../lib/game/map/map-position";
-import MapProps from "../../lib/game/types/map/map-props";
+import { dragMap, fetchLeftBounds } from "./lib/map-position";
+import MapProps from "./types/map/map-props";
 import Location from "../components/locations/location";
 import Kingdoms from "../components/kingdoms/kingdoms";
 import EnemyKingdoms from "../components/kingdoms/enemy-kingdoms";
-import MovePlayer from "../../lib/game/map/ajax/move-player";
-import MapStateManager from "../../lib/game/map/state/map-state-manager";
+import MovePlayer from "./lib/ajax/move-player";
+import MapStateManager from "./lib/state/map-state-manager";
 import NpcKingdoms from "../components/kingdoms/npc-kingdoms";
 import ComponentLoading from "../../components/ui/loading/component-loading";
-import MapData from "../../lib/game/map/request-types/MapData";
+import MapData from "./lib/request-types/MapData";
 import {
     getStyle,
     playerIconPosition,
-} from "../../lib/game/map/map-management";
+} from "./lib/map-management";
 import MapTimer from "./map-timer";
 import DirectionalMovement from "./actions/directional-movement";
 import MapActions from "./actions/map-actions";
-import NpcKingdomsDetails from "../../lib/game/types/map/npc-kingdoms-details";
-import PlayerKingdomsDetails from "../../lib/game/types/map/player-kingdoms-details";
+import NpcKingdomsDetails from "./types/map/npc-kingdoms-details";
+import PlayerKingdomsDetails from "./types/map/player-kingdoms-details";
 import clsx from "clsx";
 // @ts-ignore
 import Draggable from "react-draggable/build/web/react-draggable.min";

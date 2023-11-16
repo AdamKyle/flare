@@ -1,6 +1,6 @@
 import React, {Fragment} from "react";
 import NpcKingdomPin from "./npc-kingdom-pin";
-import NpcKingdomProps from "../../../lib/game/types/map/kingdom-pins/npc-kingdom-props";
+import NpcKingdomProps from "../../map/types/map/kingdom-pins/npc-kingdom-props";
 import {viewPortWatcher} from "../../../lib/view-port-watcher";
 import KingdomModal from "./modals/kingdom-modal";
 

@@ -1,8 +1,8 @@
 import React, {Fragment} from "react";
-import KingdomProps from "../../../lib/game/types/map/kingdom-pins/kingdom-props";
+import KingdomProps from "../../map/types/map/kingdom-pins/kingdom-props";
 import KingdomPin from "./kingdom-pin";
 import KingdomModal from "./modals/kingdom-modal";
-import KingdomState from "../../../lib/game/types/map/kingdom-pins/kingdom-state";
+import KingdomState from "../../map/types/map/kingdom-pins/kingdom-state";
 import {viewPortWatcher} from "../../../lib/view-port-watcher";
 
 export default class Kingdoms extends React.Component<KingdomProps, KingdomState> {

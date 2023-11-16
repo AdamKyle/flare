@@ -2,7 +2,7 @@ import { setDefaultResultOrder } from "dns";
 import Game from "../../../game";
 import Ajax from "../../ajax/ajax";
 import { AxiosResponse } from "axios";
-import MapStateManager from "../map/state/map-state-manager";
+import MapStateManager from "../../../sections/map/lib/state/map-state-manager";
 import { CharacterType } from "../character/character-type";
 
 type AjaxUrls = { url: string, name: string }[];

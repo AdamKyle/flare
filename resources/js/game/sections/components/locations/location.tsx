@@ -1,7 +1,7 @@
 import React, { Fragment, SyntheticEvent } from "react";
-import LocationProps from "../../../lib/game/types/map/location-pins/location-props";
+import LocationProps from "../../map/types/map/location-pins/location-props";
 import LocationPin from "./location-pin";
-import LocationState from "../../../lib/game/types/map/location-pins/location-state";
+import LocationState from "../../map/types/map/location-pins/location-state";
 import LocationModal from "./modals/location-modal";
 import { viewPortWatcher } from "../../../lib/view-port-watcher";
 

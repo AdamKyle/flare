@@ -5,7 +5,7 @@ import {formatNumber, percent} from "../../../../../lib/game/format-number";
 import KingdomHelpModal from "../kingdom-help-modal";
 import KingdomTopSection from "./kingdom-top-section";
 import KingdomDetailsProps
-    from "../../../../../lib/game/types/map/kingdom-pins/modals/components/kingdom-details-props";
+    from "../../../../map/types/map/kingdom-pins/modals/components/kingdom-details-props";
 import ComponentLoading from "../../../../../components/ui/loading/component-loading";
 import PrimaryOutlineButton from "../../../../../components/ui/buttons/primary-outline-button";
 import LoadingProgressBar from "../../../../../components/ui/progress-bars/loading-progress-bar";

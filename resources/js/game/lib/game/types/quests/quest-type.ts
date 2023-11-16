@@ -1,4 +1,4 @@
-import {QuestDetails} from "../../map/types/quest-details";
+import {QuestDetails} from "../../../../sections/map/types/quest-details";
 
 export default interface QuestType {
 

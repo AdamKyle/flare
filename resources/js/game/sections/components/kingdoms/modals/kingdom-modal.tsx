@@ -1,12 +1,12 @@
 import React, {Fragment} from "react";
-import {fetchCost} from "../../../../lib/game/map/teleportion-costs";
+import {fetchCost} from "../../../map/lib/teleportion-costs";
 import Dialogue from "../../../../components/ui/dialogue/dialogue";
-import KingdomModalProps from "../../../../lib/game/types/map/kingdom-pins/modals/kingdom-modal-props";
-import KingdomModalState from "../../../../lib/game/types/map/kingdom-pins/modals/kingdom-modal-state";
+import KingdomModalProps from "../../../map/types/map/kingdom-pins/modals/kingdom-modal-props";
+import KingdomModalState from "../../../map/types/map/kingdom-pins/modals/kingdom-modal-state";
 import {formatNumber} from "../../../../lib/game/format-number";
 import clsx from "clsx";
 import WarningAlert from "../../../../components/ui/alerts/simple-alerts/warning-alert";
-import KingdomDetailsType from "../../../../lib/game/map/types/kingdom-details";
+import KingdomDetailsType from "../../../map/types/kingdom-details";
 import KingdomDetails from "./components/kingdom-details";
 
 export default class KingdomModal extends React.Component<KingdomModalProps, KingdomModalState> {

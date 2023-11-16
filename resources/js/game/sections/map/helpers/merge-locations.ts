@@ -1,4 +1,4 @@
-import LocationDetails from "../../../lib/game/map/types/location-details";
+import LocationDetails from "../types/location-details";
 
 const mergeLocations = (locations: LocationDetails[], locationsToMerge: LocationDetails[]): LocationDetails[] => {
     const mergedMap = new Map<number, LocationDetails>();

@@ -1,6 +1,6 @@
 import React, { Fragment } from "react";
-import QuestsProps from "../../../lib/game/types/map/quests/quests-props";
-import QuestState from "../../../lib/game/types/map/quests/quest-state";
+import QuestsProps from "../../map/types/map/quests/quests-props";
+import QuestState from "../../map/types/map/quests/quest-state";
 import ComponentLoading from "../../../components/ui/loading/component-loading";
 import QuestTree from "./components/quest-tree";
 import DropDown from "../../../components/ui/drop-down/drop-down";

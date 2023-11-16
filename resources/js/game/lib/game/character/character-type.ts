@@ -1,4 +1,4 @@
-import PositionType from "../types/map/position-type";
+import PositionType from "../../../sections/map/types/map/position-type";
 import AttackTypes from "./attack-types";
 import ExtraActionType from "./extra-action-type";
 

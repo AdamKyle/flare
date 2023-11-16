@@ -2,7 +2,7 @@ import React, {Fragment} from "react";
 import Table from "../../../components/ui/data-tables/table";
 import BuildingDetails from "../../../lib/game/kingdoms/building-details";
 import {buildBuildingsColumns} from "../../../lib/game/kingdoms/build-buildings-columns";
-import BuildingsTableProps from "resources/js/game/lib/game/kingdoms/types/buildings-table-props";
+import BuildingsTableProps from "../../../lib/game/kingdoms/types/buildings-table-props";
 import {AxiosError, AxiosResponse} from "axios";
 import Ajax from "../../../lib/ajax/ajax";
 import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";

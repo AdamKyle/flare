@@ -22,14 +22,14 @@ import ScreenRefresh from "./sections/screen-refresh/screen-refresh";
 import KingdomsList from "./sections/kingdoms/kingdoms-list";
 import KingdomDetails from "./lib/game/kingdoms/kingdom-details";
 import Actions from "./sections/game-actions-section/actions";
-import PositionType from "./lib/game/types/map/position-type";
+import PositionType from "./sections/map/types/map/position-type";
 import { removeCommas } from "./lib/game/format-number";
 import CharacterCurrenciesType from "./lib/game/character/character-currencies-type";
 import KingdomLogDetails from "./lib/game/kingdoms/kingdom-log-details";
 import GlobalTimeoutModal from "./sections/game-modals/global-timeout-modal";
 import MapState from "./sections/map/types/map-state";
-import MapData from "./lib/game/map/request-types/MapData";
-import MapStateManager from "./lib/game/map/state/map-state-manager";
+import MapData from "./sections/map/lib/request-types/MapData";
+import MapStateManager from "./sections/map/lib/state/map-state-manager";
 import MapTabs from "./sections/map/map-tabs";
 
 export default class Game extends React.Component<GameProps, GameState> {

@@ -1,9 +1,9 @@
 import React, {Fragment} from "react";
-import MovePlayer from "../../../lib/game/map/ajax/move-player";
+import MovePlayer from "../lib/ajax/move-player";
 import PrimaryOutlineButton from "../../../components/ui/buttons/primary-outline-button";
-import TraverseModal from "../../components/map-actions/modals/traverse-modal";
-import DirectionalMovementProps from "../../../lib/game/map/types/directional-movement-props";
-import DirectionalMovementState from "../../../lib/game/map/types/directional-movement-state";
+import TraverseModal from "../modals/traverse-modal";
+import DirectionalMovementProps from "../types/directional-movement-props";
+import DirectionalMovementState from "../types/directional-movement-state";
 import clsx from "clsx";
 
 export default class DirectionalMovement extends React.Component<DirectionalMovementProps, DirectionalMovementState> {

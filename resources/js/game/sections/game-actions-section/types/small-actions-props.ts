@@ -1,6 +1,6 @@
 import CharacterCurrenciesDetails from "../../../lib/game/types/character-currencies-details";
 import ActionsProps from "./actions-props";
-import PositionType from "../../../lib/game/types/map/position-type";
+import PositionType from "../../map/types/map/position-type";
 import MapState from "../../map/types/map-state";
 import { MapTimerData } from "../../../lib/game/types/game-state";
 

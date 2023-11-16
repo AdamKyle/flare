@@ -1,7 +1,7 @@
 import React, {Fragment} from "react";
 import {formatNumber} from "../../../../lib/game/format-number";
 import SpecialLocationHelpModal from "./special-location-help-modal";
-import LocationDetailsProps from "../../../../lib/game/types/map/location-pins/modals/location-details-props";
+import LocationDetailsProps from "../../../map/types/map/location-pins/modals/location-details-props";
 import Gems from '../../npc-actions/seer-actions/deffinitions/gems';
 
 export default class LocationDetails extends React.Component<LocationDetailsProps, any> {

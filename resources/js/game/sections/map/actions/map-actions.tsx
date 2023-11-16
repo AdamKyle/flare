@@ -1,16 +1,16 @@
 import React, { Fragment } from "react";
 import PrimaryOutlineButton from "../../../components/ui/buttons/primary-outline-button";
-import MapActionsProps from "../../../lib/game/map/types/map-actions-props";
-import { canSettleHere } from "../../../lib/game/map/location-helpers";
-import MapActionsState from "../../../lib/game/map/types/map-actions-state";
-import ViewLocationState from "../../../lib/game/map/state/view-location-state";
-import TeleportModal from "../../components/map-actions/modals/teleport-modal";
-import MovePlayer from "../../../lib/game/map/ajax/move-player";
-import SetSailModal from "../../components/map-actions/modals/set-sail-modal";
-import LocationDetails from "../../../lib/game/map/types/location-details";
-import Conjuration from "../../components/map-actions/modals/conjuration";
-import SettleKingdomModal from "../../components/map-actions/modals/settle-kingdom-modal";
-import ViewLocationModal from "../../components/map-actions/modals/view-location-modal";
+import MapActionsProps from "../types/map-actions-props";
+import { canSettleHere } from "../lib/location-helpers";
+import MapActionsState from "../types/map-actions-state";
+import ViewLocationState from "../lib/state/view-location-state";
+import TeleportModal from "../modals/teleport-modal";
+import MovePlayer from "../lib/ajax/move-player";
+import SetSailModal from "../modals/set-sail-modal";
+import LocationDetails from "../types/location-details";
+import Conjuration from "../modals/conjuration";
+import SettleKingdomModal from "../modals/settle-kingdom-modal";
+import ViewLocationModal from "../modals/view-location-modal";
 
 export default class MapActions extends React.Component<
     MapActionsProps,

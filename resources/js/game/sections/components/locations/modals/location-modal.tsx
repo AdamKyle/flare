@@ -1,11 +1,11 @@
 import React, {Fragment} from "react";
 import Dialogue from "../../../../components/ui/dialogue/dialogue";
-import {LocationModalPros} from "../../../../lib/game/types/map/location-pins/modals/location-modal-pros";
-import {fetchCost} from "../../../../lib/game/map/teleportion-costs";
+import {LocationModalPros} from "../../../map/types/map/location-pins/modals/location-modal-pros";
+import {fetchCost} from "../../../map/lib/teleportion-costs";
 import {formatNumber} from "../../../../lib/game/format-number";
 import clsx from "clsx";
 import WarningAlert from "../../../../components/ui/alerts/simple-alerts/warning-alert";
-import LocationModalState from "../../../../lib/game/types/map/location-pins/modals/location-modal-state";
+import LocationModalState from "../../../map/types/map/location-pins/modals/location-modal-state";
 import SpecialLocationHelpModal from "./special-location-help-modal";
 import LocationDetails from "./location-details";
 

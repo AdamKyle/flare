@@ -1,9 +1,9 @@
 import React from "react";
 import {Tree, TreeNode} from "react-organizational-chart";
-import QuestTreeProps from "../../../../lib/game/types/map/quests/quest-tree-props";
+import QuestTreeProps from "../../../map/types/map/quests/quest-tree-props";
 import QuestNode from "./quest-node";
-import {QuestDetails} from "../../../../lib/game/map/types/quest-details";
-import {ChildQuestDetails} from "../../../../lib/game/map/types/child-quest-details";
+import {QuestDetails} from "../../../map/types/quest-details";
+import {ChildQuestDetails} from "../../../map/types/child-quest-details";
 import Tabs from "../../../../components/ui/tabs/tabs";
 import TabPanel from "../../../../components/ui/tabs/tab-panel";
 

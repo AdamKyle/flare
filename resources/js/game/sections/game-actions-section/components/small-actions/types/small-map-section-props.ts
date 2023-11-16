@@ -1,7 +1,7 @@
 import { CharacterType } from "../../../../../lib/game/character/character-type";
 import MapState from "../../../../map/types/map-state";
 import CharacterCurrenciesDetails from "../../../../../lib/game/types/character-currencies-details";
-import PositionType from "../../../../../lib/game/types/map/position-type";
+import PositionType from "../../../../map/types/map/position-type";
 import { MapTimerData } from "../../../../../lib/game/types/game-state";
 
 export default interface SmallMapSectionProps {

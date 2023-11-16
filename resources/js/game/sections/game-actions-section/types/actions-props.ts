@@ -1,6 +1,6 @@
 import {CharacterType} from "../../../lib/game/character/character-type";
 import CharacterStatusType from "../../../lib/game/character/character-status-type";
-import PositionType from "../../../lib/game/types/map/position-type";
+import PositionType from "../../map/types/map/position-type";
 import { GameActionState } from "../../../lib/game/types/game-state";
 
 export default interface ActionsProps {

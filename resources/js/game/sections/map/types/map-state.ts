@@ -1,6 +1,6 @@
-import NpcKingdomsDetails from "../../../lib/game/types/map/npc-kingdoms-details";
-import PlayerKingdomsDetails from "../../../lib/game/types/map/player-kingdoms-details";
-import LocationDetails from "../../../lib/game/map/types/location-details";
+import NpcKingdomsDetails from "./map/npc-kingdoms-details";
+import PlayerKingdomsDetails from "./map/player-kingdoms-details";
+import LocationDetails from "./location-details";
 
 export type MapDetails = {
     map_url: string;

@@ -1,5 +1,5 @@
 import React from 'react';
-import LocationPinProps from "../../../lib/game/types/map/location-pins/location-pin-props";
+import LocationPinProps from "../../map/types/map/location-pins/location-pin-props";
 
 export default class LocationPin extends React.Component<LocationPinProps, {}> {
 

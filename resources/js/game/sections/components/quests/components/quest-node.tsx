@@ -1,5 +1,5 @@
 import React from "react";
-import QuestNodeProps from "../../../../lib/game/types/map/quests/quest-node-props";
+import QuestNodeProps from "../../../map/types/map/quests/quest-node-props";
 import QuestDetailsModal from "../modals/quest-details-modal";
 import clsx from "clsx";
 

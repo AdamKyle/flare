@@ -1,7 +1,7 @@
 import React, {Fragment} from "react";
 import {formatNumber} from "../../../../../lib/game/format-number";
 import KingdomTopSectionProps
-    from "../../../../../lib/game/types/map/kingdom-pins/modals/components/kingdom-top-section-props";
+    from "../../../../map/types/map/kingdom-pins/modals/components/kingdom-top-section-props";
 
 export default class KingdomTopSection extends React.Component<KingdomTopSectionProps, {}> {
     constructor(props: KingdomTopSectionProps) {
