@@ -42,8 +42,8 @@ class DropCheckCalculator {
      * @param float $lootingChance
      * @return bool
      */
-    public function fetchDifficultItemChance(float $lootingChance = 0.0): bool {
-        return $this->canGetReward(1000000, $lootingChance);
+    public function fetchDifficultItemChance(float $lootingChance = 0.0, int $max = 1000000): bool {
+        return $this->canGetReward($max, $lootingChance);
     }
 
     /**

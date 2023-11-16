@@ -29,11 +29,22 @@ class MercenaryValueTest extends TestCase {
         $this->assertEquals(1, $bonus);
     }
 
-    public function testgetMaxBonusWithReincarnation() {
+    public function testGetMaxBonusWithReincarnation() {
         $mercType = new MercenaryValue(MercenaryValue::CHILD_OF_GOLD_DUST);
 
         $bonus = $mercType->getMaxBonus(1);
 
         $this->assertEquals(2, $bonus);
+    }
+
+    public function testGetMercenaryList() {
+        $expected = [
+            MercenaryValue::CHILD_OF_GOLD_DUST    => 'Child of Gold Dust',
+            MercenaryValue::CHILD_OF_SHARDS       => 'Child of Shards',
+            MercenaryValue::CHILD_OF_COPPER_COINS => 'Child of Copper Coins',
+            MercenaryValue::CHILD_OF_GAMBLING     => 'Child of Gambling'
+        ];
+
+        $this->assertEquals($expected, MercenaryValue::mercenaryList());
     }
 }

@@ -59,6 +59,8 @@ class MessageSentEvent implements ShouldBroadcastNow {
      * @return Channel|array
      */
     public function broadcastOn(): Channel|array {
+        // @codeCoverageIgnoreStart
         return new PresenceChannel('chat');
+        // @codeCoverageIgnoreEnd
     }
 }

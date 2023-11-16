@@ -48,6 +48,8 @@ class NPCMessageEvent implements ShouldBroadcastNow
      * @return Channel|array
      */
     public function broadcastOn(): Channel|array {
+        // @codeCoverageIgnoreStart
         return new PrivateChannel('npc-message-' . $this->user->id);
+        // @codeCoverageIgnoreEnd
     }
 }

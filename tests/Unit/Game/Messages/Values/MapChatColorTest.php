@@ -140,4 +140,23 @@ class MapChatColorTest extends TestCase {
 
         $this->assertEquals($mapColor->getColor(), MapChatColor::PURGATORY);
     }
+
+    public function testTheIcePlaneColor() {
+        $character = $this->character->getCharacter();
+
+        $map = $this->createMap([
+            'character_id'          => $character->id,
+            'position_x'            => 0,
+            'position_y'            => 0,
+            'character_position_x'  => 0,
+            'character_position_y'  => 0,
+            'game_map_id'           => $this->createGameMap([
+                'name' => 'The Ice Plane',
+            ]),
+        ]);
+
+        $mapColor = new MapChatColor($map->gameMap->name);
+
+        $this->assertEquals($mapColor->getColor(), MapChatColor::ICE_PLANE);
+    }
 }

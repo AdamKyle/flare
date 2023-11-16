@@ -95,6 +95,16 @@ class FetchMessagesTest extends TestCase {
         $this->assertEquals('PURG', $message->map);
     }
 
+    public function testMessageMapNameIsICE() {
+        $character = $this->character->getCharacter();
+
+        $this->createMessageForTest($character, MapChatColor::ICE_PLANE);
+
+        $message = $this->fetchMessagesService->fetchMessages()->first();
+
+        $this->assertEquals('ICE', $message->map);
+    }
+
     public function testMessageMapNameIsDefaultSurface() {
         $character = $this->character->getCharacter();
 

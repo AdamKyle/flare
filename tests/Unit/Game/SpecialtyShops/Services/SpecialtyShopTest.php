@@ -3,6 +3,7 @@
 namespace Tests\Unit\Game\SpecialtyShops\Services;
 
 use App\Flare\Models\Item;
+use App\Flare\Values\CharacterClassValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\Values\ItemSpecialtyType;
 use App\Game\SpecialtyShops\Services\SpecialtyShop;
@@ -127,6 +128,42 @@ class SpecialtyShopTest extends TestCase {
         $this->assertEquals(200, $response['status']);
         $this->assertEquals(9000, $character->gold_dust);
         $this->assertEquals(9000, $character->shards);
+        $this->assertCount(1, Item::where('name', $item->name)->where('specialty_type', ItemSpecialtyType::HELL_FORGED)->get());
+    }
+
+    public function testPurchaseHellForgedItemAsMercenary() {
+        $item = $this->createItem([
+            'skill_level_required' => 400,
+            'skill_level_trivial'  => 401,
+            'type'                 => 'weapon',
+        ]);
+
+        $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
+
+        $character->class()->update([
+            'name' => CharacterClassValue::MERCHANT
+        ]);
+
+        $character = $character->refresh();
+
+        $item = $this->createItem([
+            'name'           => 'Special Item',
+            'specialty_type' => ItemSpecialtyType::HELL_FORGED,
+            'shards_cost'    => 1000,
+            'gold_dust_cost' => 1000,
+            'cost'           => 0,
+            'type'           => 'weapon',
+        ]);
+
+        $character->update(['shards' => 10000, 'gold_dust' => 10000]);
+
+        $response = $this->specialtyShop->purchaseItem($character->refresh(), $item->id, $item->specialty_type);
+
+        $character = $character->refresh();
+
+        $this->assertEquals(200, $response['status']);
+        $this->assertEquals(10000 - (1000 - (1000 * 0.05)), $character->gold_dust);
+        $this->assertEquals(10000 - (1000 - (1000 * 0.05)), $character->shards);
         $this->assertCount(1, Item::where('name', $item->name)->where('specialty_type', ItemSpecialtyType::HELL_FORGED)->get());
     }
 

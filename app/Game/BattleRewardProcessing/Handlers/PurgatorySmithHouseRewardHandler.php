@@ -166,6 +166,7 @@ class PurgatorySmithHouseRewardHandler {
      */
     protected function handleItemReward(Character $character, bool $isMythic, Event $event = null): Character {
         $lootingChance = $character->skills->where('baseSkill.name', 'Looting')->skill_bonus;
+        $maxRoll = $isMythic ? 10000000 : 1000000;
 
         if ($lootingChance > 0.15) {
             $lootingChance = 0.15;
@@ -173,14 +174,14 @@ class PurgatorySmithHouseRewardHandler {
 
         if (!is_null($event)) {
             $lootingChance = .30;
+            $maxRoll = $maxRoll / 2;
         }
 
-        if (DropCheckCalculator::fetchDifficultItemChance($lootingChance)) {
+        if (DropCheckCalculator::fetchDifficultItemChance($lootingChance, $maxRoll)) {
             if (!$character->isInventoryFull()) {
                 $this->rewardForCharacter($character, $isMythic);
             }
         }
-
 
         $this->createPossibleEvent();
 

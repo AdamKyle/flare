@@ -111,7 +111,7 @@ export default class LocationDetails extends React.Component<LocationDetailsProp
                 {this.renderRaidDetails()}
                 {
                     this.isSpecialLocation() ?
-                        <div className="max-h-[350px] lg:max-h-auto overflow-y-scroll lg:overflow-y-visible">
+                        <div className="max-h-[350px] lg:max-h-auto overflow-y-scroll">
                             <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
                             <div className='flex items-center mb-4'>
                                 <h4>Special Location Details</h4>
