@@ -21,45 +21,33 @@ class DropCheckCalculator {
      * @return bool
      */
     public function fetchDropCheckChance(Monster $monster, int $characterLevel, float $lootingChance = 0.0, float $gameMapBonus = 0.0): bool {
-        if ($monster->drop_check <= 0.0) {
-            return false;
-        }
+        $totalChance = $monster->drop_check + $lootingChance + $gameMapBonus;
 
-        $bonus = $lootingChance + $gameMapBonus;
-
-        if ($bonus >= 1) {
+        if ($totalChance >= 1) {
             return true;
         }
 
         if ($characterLevel < 12 && $lootingChance < .10) {
-            $roll = RandomNumberGenerator::generateRandomNumber(1, 500);
-        } else {
-            $roll = RandomNumberGenerator::generateRandomNumber(1, 100);
+            $totalChance = .85;
+
+            return $this->canGetReward(100, $totalChance);
         }
 
-        $dc = round((100 - (100 * ($monster->drop_check + $bonus))));
-
-        return $roll >= $dc;
+        return $this->canGetReward(100, $totalChance);
     }
 
     /**
-     * Can we get a location drop?
+     * Can we get more difficult items like mythics and specific quest items.
      *
-     * @param float $locationChance
      * @param float $lootingChance
      * @return bool
      */
-    public function fetchLocationDropChance(float $locationChance, float $lootingChance): bool {
-        $roll = RandomNumberGenerator::generateRandomNumber(1, 100);
-        $dc   = round((100 - (100 * ($locationChance + $lootingChance))));
-
-        return $roll > $dc;
+    public function fetchDifficultItemChance(float $lootingChance = 0.0): bool {
+        return $this->canGetReward(1000000, $lootingChance);
     }
 
     /**
      * Determines if the player can get a quest item from the monster.
-     *
-     * Fetches the adventure bonuses, if applies and applies it to the looting bonus against the monster quest_item_drop_chance.
      *
      * @param Monster $monster
      * @param float $lootingChance
@@ -67,24 +55,44 @@ class DropCheckCalculator {
      * @return bool
      */
     public function fetchQuestItemDropCheck(Monster $monster, float $lootingChance = 0.0, float $gameMapBonus = 0.0): bool {
-        $totalBonus     = $lootingChance + $gameMapBonus;
+        $totalBonus = $lootingChance + $gameMapBonus + $monster->drop_check;
 
-        if ($monster->quest_item_drop_chance <= 0) {
-            return false;
-        }
-
-        if ($monster->quest_item_drop_chance >= 1.0) {
+        if ($totalBonus >= 1) {
             return true;
         }
 
-        if ($totalBonus >= 1.0) {
+        return $this->canGetReward(100, $totalBonus);
+    }
+
+    /**
+     * Can we get the actual reward?
+     *
+     * - The base chance is calculated based on a 1/x chance where x is the max of a random number.
+     * - We then add additional bonuses to this chance and apply a condition based on a true random number.
+     *
+     * @param int $max
+     * @param float $additionalChanceBonus
+     * @return bool
+     */
+    protected function canGetReward(int $max = 100, float $additionalChanceBonus = 0.0): bool {
+        $baseChance = 1 / $max;
+        $chanceOfSuccess = $baseChance * (1 + $additionalChanceBonus);
+
+        return $this->attemptToGainReward($chanceOfSuccess);
+    }
+
+    /**
+     * Based on chance of success and roll of the dice we attempt to gain the reward.
+     *
+     * @param float $chanceOfSuccess
+     * @return bool
+     */
+    private function attemptToGainReward(float $chanceOfSuccess): bool {
+
+        if (RandomNumberGenerator::generateTureRandomNumber(0, 1) <= $chanceOfSuccess) {
             return true;
         }
 
-        $roll = RandomNumberGenerator::generateRandomNumber(1, 100);;
-        $roll = round($roll + $roll * $totalBonus);
-        $dc   = round((100 - (100 * $monster->drop_check)));
-
-        return $roll > $dc;
+        return false;
     }
 }

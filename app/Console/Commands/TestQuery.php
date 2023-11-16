@@ -23,36 +23,50 @@ class TestQuery extends Command {
      */
     protected $description = 'Command description';
 
-    /**
-     * Execute the console command.
-     */
-    public function handle(LotteryRandomNumberGenerator $lotteryRandomNumberGenerator) {
+    public function handle()
+    {
 
-        // Example: Generate a true random number between 1 and 1,000,000
-        $min = 1;
-        $max = 1000000;
+        $this->line('Simulating 1/1 Million Chance with 45% Looting applied');
+        $this->line('======================================================');
+        $this->line('');
 
-        for ($i =0; $i <= 10000; $i++) {
-            $randomNumber = $this->generateTrueRandomNumber($min, $max);
-            $number       = $lotteryRandomNumberGenerator->generateNumber($randomNumber);
+        $attempts = 1000000;
+        $success = false;
 
-            if ($number >= 96) {
-                $this->line('HOLY SHIT!!!! :: ' . $number);
-                return;
-            } else {
-                $this->line('['.$i.'] Number: ' . $number);
+        $baseChance = 1 / $attempts;
+        $chanceOfSuccess = $baseChance * (1 + 0.0);
+
+        for ($i = 1; $i <= $attempts; $i++) {
+            if ($this->attemptToGainReward($chanceOfSuccess)) {
+                $this->line('Attempt: ' . $i);
+                $success = true;
+                break; // Exit the loop on success
             }
+        }
+
+        $this->line('');
+
+        if ($success) {
+            $this->info('Player gained the reward!');
+        } else {
+            $this->info("Player did not gain the reward after $attempts attempts.");
         }
     }
 
-
-    public function generateTrueRandomNumber($min, $max)
+    private function attemptToGainReward(float $chanceOfSuccess): bool
     {
-        do {
-            $randomBytes = random_bytes(4); // Adjust the number of bytes based on your needs
-            $randomNumber = hexdec(bin2hex($randomBytes));
-        } while ($randomNumber < $min || $randomNumber > $max);
 
-        return $randomNumber;
+        if ($this->getTrueRandomNumber(0, 1) <= $chanceOfSuccess) {
+            return true; // Player gained the reward
+        }
+
+        return false; // Player did not gain the reward
+    }
+
+    private function getTrueRandomNumber($min, $max): float
+    {
+        $randomNumber = random_int($min * 1000, $max * 1000);
+
+        return $randomNumber / 1000;
     }
 }

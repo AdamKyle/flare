@@ -161,20 +161,16 @@ class DropCheckService {
     protected function canHaveMythic(bool $useLooting = false): bool {
         $chance = $this->lootingChance;
 
-        $roll = RandomNumberGenerator::generateRandomNumber(1, 1000000);
-
         if ($useLooting) {
 
             if ($chance > 0.15) {
                 $chance = 0.15;
             }
 
-            $roll = $roll + $roll * $chance;
-
-            return $roll > 999999;
+            return DropCheckCalculator::fetchDifficultItemChance($chance);
         }
 
-        return $roll > 999999;
+        return DropCheckCalculator::fetchDifficultItemChance();
     }
 
     /**
@@ -186,7 +182,6 @@ class DropCheckService {
      */
     protected function canHaveDrop(Character $character): bool {
         if (!is_null($this->locationWithEffect)) {
-            $dropRate   = new LocationEffectValue($this->locationWithEffect->enemy_strength_type);
 
             $lootingBonus = $this->lootingChance;
 
@@ -194,7 +189,7 @@ class DropCheckService {
                 $lootingBonus = 0.45;
             }
 
-            return DropCheckCalculator::fetchLocationDropChance($dropRate->fetchDropRate(), $lootingBonus);
+            return DropCheckCalculator::fetchDifficultItemChance($lootingBonus);
         }
 
         return DropCheckCalculator::fetchDropCheckChance($this->monster, $character->level, $this->lootingChance, $this->gameMapBonus);

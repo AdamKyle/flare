@@ -81,23 +81,6 @@ class Location extends Model {
         return new LocationType($this->type);
     }
 
-    /**
-     * Return the drop chance for a location.
-     *
-     * Locations must have an Effect Value.
-     *
-     * @return float
-     * @throws \Exception
-     */
-    public function getDropChance(): float {
-
-        if (is_null($this->enemy_strength_type)) {
-            return 0.0;
-        }
-
-        return (new LocationEffectValue($this->enemy_strength_type))->fetchDropRate();
-    }
-
     protected static function newFactory() {
         return LocationFactory::new();
     }

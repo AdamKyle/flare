@@ -26,4 +26,17 @@ class RandomNumberGenerator {
 
         return $randomNumbers[$selectedNumberIndex];
     }
+
+    /**
+     * Generates a true random number.
+     * @param int $min
+     * @param int $max
+     * @return float|int
+     * @throws \Exception
+     */
+    public function generateTureRandomNumber(int $min = 0, int $max = 1): float {
+        $randomNumber = random_int($min * 1000, $max * 1000);
+
+        return $randomNumber / 1000;
+    }
 }
