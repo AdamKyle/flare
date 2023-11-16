@@ -3,6 +3,7 @@
 namespace App\Game\BattleRewardProcessing\Handlers;
 
 use App\Flare\Builders\RandomAffixGenerator;
+use Facades\App\Flare\Calculators\DropCheckCalculator;
 use App\Flare\Models\Character;
 use App\Flare\Models\Event;
 use App\Flare\Models\Item;
@@ -164,9 +165,6 @@ class PurgatorySmithHouseRewardHandler {
      * @throws Exception
      */
     protected function handleItemReward(Character $character, bool $isMythic, Event $event = null): Character {
-        $max = !$isMythic ? 1000000 : 10000000;
-        $dc = !$isMythic ? 999999 : 9999999;
-
         $lootingChance = $character->skills->where('baseSkill.name', 'Looting')->skill_bonus;
 
         if ($lootingChance > 0.15) {
@@ -174,20 +172,15 @@ class PurgatorySmithHouseRewardHandler {
         }
 
         if (!is_null($event)) {
-            $max = !$isMythic ? 500000 : 5000000;
-            $dc = !$isMythic ? 499999 : 4999999;
             $lootingChance = .30;
         }
 
-
-        $roll = RandomNumberGenerator::generateRandomNumber(1, $max);
-        $roll = $roll + $roll * $lootingChance;
-
-        if ($roll >= $dc) {
+        if (DropCheckCalculator::fetchDifficultItemChance($lootingChance)) {
             if (!$character->isInventoryFull()) {
                 $this->rewardForCharacter($character, $isMythic);
             }
         }
+
 
         $this->createPossibleEvent();
 
@@ -251,6 +244,13 @@ class PurgatorySmithHouseRewardHandler {
         }
     }
 
+    /**
+     * Get mercenary bonus.
+     *
+     * @param Character $character
+     * @param string $mercenaryType
+     * @return float
+     */
     protected function getCurrencyMercenaryBonus(Character $character, string $mercenaryType): float {
 
         $mercenary = $character->mercenaries()->where('mercenary_type', $mercenaryType)->first();
@@ -262,17 +262,18 @@ class PurgatorySmithHouseRewardHandler {
         return 0;
     }
 
-
+    /**
+     * 1 out of 1 million chance to create an event.
+     *
+     * @return void
+     */
     protected function createPossibleEvent() {
 
         if (Event::where('type', EventType::PURGATORY_SMITH_HOUSE)->exists()) {
             return;
         }
 
-        $roll = RandomNumberGenerator::generateRandomNumber(1, 1000000);
-        $chance = 999999;
-
-        if ($roll > $chance) {
+        if (RandomNumberGenerator::generateTureRandomNumber(0, 1) <= (1 / 1000000)) {
             Event::create([
                 'type'        => EventType::PURGATORY_SMITH_HOUSE,
                 'started_at'  => now(),
