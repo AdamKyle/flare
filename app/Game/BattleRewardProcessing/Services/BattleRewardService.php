@@ -94,7 +94,7 @@ class BattleRewardService {
 
         $globalEventGoal = GlobalEventGoal::where('event_type', $event->type)->first();
 
-        if (is_null($globalEventGoal)) {
+        if (is_null($globalEventGoal) || !$this->character->map->gameMap->mapType()->isTheIcePlane()) {
             return;
         }
 
