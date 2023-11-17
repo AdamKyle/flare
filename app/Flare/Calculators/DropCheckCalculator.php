@@ -76,7 +76,8 @@ class DropCheckCalculator {
      */
     protected function canGetReward(int $max = 100, float $additionalChanceBonus = 0.0): bool {
         $baseChance = 1 / $max;
-        $chanceOfSuccess = $baseChance * (1 + $additionalChanceBonus);
+
+        $chanceOfSuccess = $baseChance + $additionalChanceBonus;
 
         return $this->attemptToGainReward($chanceOfSuccess);
     }
@@ -89,7 +90,9 @@ class DropCheckCalculator {
      */
     private function attemptToGainReward(float $chanceOfSuccess): bool {
 
-        if (RandomNumberGenerator::generateTureRandomNumber(0, 1) <= $chanceOfSuccess) {
+        $roll = RandomNumberGenerator::generateTureRandomNumber(0, 1);
+
+        if ($roll <= $chanceOfSuccess) {
             return true;
         }
 

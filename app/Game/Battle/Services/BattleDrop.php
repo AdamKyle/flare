@@ -190,19 +190,12 @@ class BattleDrop {
 
         if ($items->isNotEmpty()) {
 
-            foreach ($items as $item) {
-                if ($this->canHaveItem($character, $item)) {
-                    $chance = 999999 - (999999 * $lootingChance);
-                    $roll = RandomNumberGenerator::generateRandomNumber(1, 1000000);
+            $items = collect($items)->reject(function($item) use($character) {
+               return $character->inventory->slots->where('item_id', $item->id)->isNotEmpty();
+            });
 
-                    if ($roll > $chance) {
-                        $this->attemptToPickUpItem($character, $item);
-
-                        return;
-                    }
-
-                    return;
-                }
+            if ($items->isNotEmpty() && DropCheckCalculator::fetchDifficultItemChance($lootingChance, 100)) {
+                $this->attemptToPickUpItem($character, $items->random());
             }
         }
     }
