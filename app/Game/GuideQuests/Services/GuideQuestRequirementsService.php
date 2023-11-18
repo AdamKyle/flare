@@ -462,6 +462,26 @@ class GuideQuestRequirementsService {
     }
 
     /**
+     * Has the player participated in the required kill amount?
+     *
+     * @param Character $character
+     * @param GuideQuest $guideQuest
+     * @return $this
+     */
+    public function requiredGlobalEventKillAmount(Character $character, GuideQuest $guideQuest): GuideQuestRequirementsService {
+
+        if (is_null($character->globalEventKills)) {
+            return $this;
+        }
+
+        if ($character->globalEventKills->kills >= $guideQuest->require_event_goal_participation) {
+            $this->finishedRequirements[] = 'require_event_goal_participation';
+        }
+
+        return $this;
+    }
+
+    /**
      * Has the character leveled their class skill to the desired level?
      *
      * @param Character $character

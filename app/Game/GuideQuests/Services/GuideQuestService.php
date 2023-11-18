@@ -152,6 +152,7 @@ class GuideQuestService {
             ->requiredClassRankLevel($character, $quest)
             ->requiredKingdomGoldBarsAmount($character, $quest)
             ->requiredKingdomSpecificBuildingLevel($character, $quest)
+            ->requiredGlobalEventKillAmount($character, $quest)
             ->requirePlayerToBeOnASpecificMap($character, $quest)
             ->getFinishedRequirements();
 
