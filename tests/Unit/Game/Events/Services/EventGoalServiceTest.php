@@ -30,6 +30,8 @@ class EventGoalServiceTest extends TestCase {
     }
 
     public function testFetchCurrentEventGoalDataForResponse() {
+        $character = (new CharacterFactory())->createBaseCharacter()->getCharacter();
+
         $eventGoal = $this->createGlobalEventGoal([
             'event_type'                      => EventType::WINTER_EVENT,
             'item_specialty_type_reward'      => ItemSpecialtyType::CORRUPTED_ICE,
@@ -44,14 +46,17 @@ class EventGoalServiceTest extends TestCase {
                 'total_kills'             => $eventGoal->total_kills,
                 'reward_every'            => $eventGoal->reward_every_kills,
                 'kills_needed_for_reward' => 10,
+                'current_kills'           => 0,
             ],
             'status' => 200
         ];
 
-        $this->assertEquals($expected, $this->eventGoalService->fetchCurrentEventGoal());
+        $this->assertEquals($expected, $this->eventGoalService->fetchCurrentEventGoal($character));
     }
 
     public function testFetchCurrentEventGoalData() {
+        $character = (new CharacterFactory())->createBaseCharacter()->getCharacter();
+
         $eventGoal = $this->createGlobalEventGoal([
             'event_type'                      => EventType::WINTER_EVENT,
             'item_specialty_type_reward'      => ItemSpecialtyType::CORRUPTED_ICE,
@@ -66,10 +71,43 @@ class EventGoalServiceTest extends TestCase {
                 'total_kills'             => $eventGoal->total_kills,
                 'reward_every'            => $eventGoal->reward_every_kills,
                 'kills_needed_for_reward' => 10,
+                'current_kills'           => 0,
             ]
         ];
 
-        $this->assertEquals($expected, $this->eventGoalService->getEventGoalData());
+        $this->assertEquals($expected, $this->eventGoalService->getEventGoalData($character));
+    }
+
+    public function testFetchCurrentEventGoalDataWithCurrentKillCount() {
+        $character = (new CharacterFactory())->createBaseCharacter()->getCharacter();
+
+        $eventGoal = $this->createGlobalEventGoal([
+            'event_type'                      => EventType::WINTER_EVENT,
+            'item_specialty_type_reward'      => ItemSpecialtyType::CORRUPTED_ICE,
+            'should_be_unique'                => true,
+            'unique_type'                     => RandomAffixDetails::LEGENDARY,
+            'should_be_mythic'                => false,
+        ]);
+
+        $character->globalEventKills()->create([
+            'global_event_goal_id' => $eventGoal->id,
+            'character_id'         => $character->id,
+            'kills'                => 10,
+        ]);
+
+        $character = $character->refresh();
+
+        $expected = [
+            'event_goals' => [
+                'max_kills'               => $eventGoal->max_kills,
+                'total_kills'             => $eventGoal->total_kills,
+                'reward_every'            => $eventGoal->reward_every_kills,
+                'kills_needed_for_reward' => 10,
+                'current_kills'           => 10,
+            ]
+        ];
+
+        $this->assertEquals($expected, $this->eventGoalService->getEventGoalData($character));
     }
 
     public function testFetchCurrentEventGoalKillRequiredIsEqualToRewardEvery() {

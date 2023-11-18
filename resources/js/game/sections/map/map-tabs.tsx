@@ -28,7 +28,7 @@ export default class MapTabs extends React.Component<any, any> {
             <Tabs tabs={this.tabs} disabled={false}>
                 <TabPanel key={"map"}>{this.props.children}</TabPanel>
                 <TabPanel key={"event-goals"}>
-                    <EventGoalsTab />
+                    <EventGoalsTab character_id={this.props.character_id} />
                 </TabPanel>
             </Tabs>
         ) : (

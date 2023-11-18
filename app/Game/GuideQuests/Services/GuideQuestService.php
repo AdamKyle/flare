@@ -3,12 +3,14 @@
 namespace App\Game\GuideQuests\Services;
 
 use App\Flare\Models\Character;
+use App\Flare\Models\Event;
 use App\Flare\Models\GuideQuest;
 use App\Flare\Values\AutomationType;
 use App\Flare\Models\QuestsCompleted;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\HandleCharacterLevelUp;
+use App\Game\Events\Values\EventType;
 use App\Game\Messages\Events\ServerMessageEvent;
 
 class GuideQuestService {
@@ -25,17 +27,7 @@ class GuideQuestService {
 
     public function fetchQuestForCharacter(Character $character): array | null {
 
-        $lastCompletedGuideQuest = $character->questsCompleted()
-            ->whereNotNull('guide_quest_id')
-            ->orderByDesc('guide_quest_id')
-            ->first();
-
-        if (is_null($lastCompletedGuideQuest)) {
-            $quest = GuideQuest::first();
-        } else {
-            $questId = GuideQuest::where('id', '>', $lastCompletedGuideQuest->guide_quest_id)->min('id');
-            $quest   = GuideQuest::find($questId);
-        }
+        $quest = $this->fetchNextGuideQuest($character);
 
         if (is_null($quest)) {
             return null;
@@ -160,6 +152,7 @@ class GuideQuestService {
             ->requiredClassRankLevel($character, $quest)
             ->requiredKingdomGoldBarsAmount($character, $quest)
             ->requiredKingdomSpecificBuildingLevel($character, $quest)
+            ->requirePlayerToBeOnASpecificMap($character, $quest)
             ->getFinishedRequirements();
 
         if (!empty($this->completedAttributes)) {
@@ -175,6 +168,74 @@ class GuideQuestService {
         }
 
         return false;
+    }
+
+    protected function fetchNextGuideQuest(Character $character): GuideQuest | null {
+
+        $winterEvent    = Event::where('type' , EventType::WINTER_EVENT)->first();
+        $nextGuideQuest = null;
+
+        if (!is_null($winterEvent)) {
+            $eventGuideQuest = GuideQuest::where('only_during_event', EventType::WINTER_EVENT)->where('parent_id')->first();
+
+            if (!is_null($eventGuideQuest)) {
+                $nextGuideQuest = $this->fetchNextEventQuest($character, $eventGuideQuest);
+            }
+        }
+
+        if (!is_null($nextGuideQuest)) {
+            return $nextGuideQuest;
+        }
+
+        return $this->fetchNextRegularGuideQuest($character);
+    }
+
+    protected function fetchNextRegularGuideQuest(Character $character): GuideQuest | null {
+        $lastCompletedGuideQuest = $character->questsCompleted()
+            ->whereNotNull('guide_quest_id')
+            ->orderByDesc('guide_quest_id')
+            ->first();
+
+        if (is_null($lastCompletedGuideQuest)) {
+            return GuideQuest::first();
+        }
+
+        $questId = GuideQuest::where('id', '>', $lastCompletedGuideQuest->guide_quest_id)->min('id');
+
+        return GuideQuest::find($questId);
+    }
+
+    protected function fetchNextEventQuest(Character $character, GuideQuest $initialEventGuideQuest): GuideQuest | null {
+
+        if (!is_null($initialEventGuideQuest->unlock_at_level)) {
+            if ($character->level < $initialEventGuideQuest->unlock_at_level) {
+                return null;
+            }
+        }
+
+        $completedFirstEventQuest = $character->questsCompleted()
+                ->where('guide_quest_id', $initialEventGuideQuest->id)
+                ->first();
+
+        if (is_null($completedFirstEventQuest)) {
+            return $initialEventGuideQuest;
+        }
+
+        $firstCompletedChildEventQuest = $character->questsCompleted()
+            ->join('guide_quests', function($join) use($initialEventGuideQuest) {
+                $join->on('guide_quests.id', 'quests_completed.guide_quest_id')
+                     ->where('parent_id', $initialEventGuideQuest->id);
+            })
+            ->orderByDesc('guide_quest_id')
+            ->first();
+
+        if (is_null($firstCompletedChildEventQuest)) {
+            return GuideQuest::where('parent_id', $initialEventGuideQuest->id)->orderBy('id')->first();
+        }
+
+        $questId = GuideQuest::where('id', '>', $firstCompletedChildEventQuest->guide_quest_id)->where('parent_id', $initialEventGuideQuest->id)->min('id');
+
+        return GuideQuest::find($questId);
     }
 
     protected function requiredAttributeNames(GuideQuest $quest): array {

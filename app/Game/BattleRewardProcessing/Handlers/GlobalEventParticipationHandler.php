@@ -55,13 +55,25 @@ class GlobalEventParticipationHandler {
                 'current_kills'        => 1,
             ]);
 
-            event(new UpdateEventGoalProgress($this->eventGoalService->getEventGoalData()));
+            $character->globalEventKills()->create([
+                'global_event_goal_id' => $globalEventGoal->id,
+                'character_id'         => $character->id,
+                'kills'                => 1,
+            ]);
+
+            $character = $character->refresh();
+
+            event(new UpdateEventGoalProgress($this->eventGoalService->getEventGoalData($character)));
 
             return;
         }
 
         $character->globalEventParticipation()->update([
             'current_kills' => $character->globalEventParticipation->current_kills + 1,
+        ]);
+
+        $character->globalEventKills()->create([
+            'kills' => $character->globalEventKills->kills + 1,
         ]);
 
         $globalEventGoal = $globalEventGoal->refresh();

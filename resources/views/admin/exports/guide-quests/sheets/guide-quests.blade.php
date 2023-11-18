@@ -49,6 +49,13 @@
             <th>shards_reward</th>
             <th>gold_reward</th>
             <th>xp_reward</th>
+            <th>parent_id<th>
+            <th>unlock_at_level<th>
+            <th>only_during_event<th>
+            <th>be_on_game_map</th>
+            <th>require_event_goal_participation</th>
+            <th>required_holy_stacks</th>
+            <th>required_attached_gems</th>
         </tr>
     </thead>
     <tbody>
@@ -103,7 +110,14 @@
                 <td>{{ $guideQuest->gold_dust_reward }}</td>
                 <td>{{ $guideQuest->shards_reward }}</td>
                 <td>{{ $guideQuest->gold_reward }}</td>
-                <td>{{ $guideQuest->xp_reward }}</td>+
+                <td>{{ $guideQuest->xp_reward }}</td>
+                <td>{{ !is_null($guideQuest->parent_id) ? $guideQuest->parent_quest_name : ''}}<td>
+                <td>{{ $guideQuest->unlock_at_level}}<td>
+                <td>{{ $guideQuest->only_during_event}}<td>
+                <td>{{ !is_null($guideQuest->be_on_game_map) ? $guideQuest->required_to_be_on_game_map_name : ''}}</td>
+                <td>{{ $guideQuest->require_event_goal_participation }}</td>
+                <td>{{ $guideQuest->required_holy_stacks }}</td>
+                <td>{{ $guideQuest->required_attached_gems }}</td>
             </tr>
         @endforeach
     </tbody>

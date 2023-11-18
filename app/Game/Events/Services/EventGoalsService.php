@@ -3,6 +3,7 @@
 namespace App\Game\Events\Services;
 
 
+use App\Flare\Models\Character;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Flare\Models\GlobalEventGoal;
 
@@ -16,8 +17,8 @@ class EventGoalsService {
      *
      * @return array
      */
-    public function fetchCurrentEventGoal(): array {
-        return $this->successResult($this->getEventGoalData());
+    public function fetchCurrentEventGoal(Character $character): array {
+        return $this->successResult($this->getEventGoalData($character));
     }
 
     /**
@@ -25,8 +26,13 @@ class EventGoalsService {
      *
      * @return array
      */
-    public function getEventGoalData(): array {
+    public function getEventGoalData(Character $character): array {
         $globalEventGoal = GlobalEventGoal::first();
+        $characterKills  = 0;
+
+        if (!is_null($character->globalEventKills)) {
+            $characterKills = $character->globalEventKills->kills;
+        }
 
         return [
             'event_goals' => [
@@ -34,6 +40,7 @@ class EventGoalsService {
                 'total_kills'             => $globalEventGoal->total_kills,
                 'reward_every'            => $globalEventGoal->reward_every_kills,
                 'kills_needed_for_reward' => $this->fetchKillAmountNeeded($globalEventGoal),
+                'current_kills'           => $characterKills,
             ]
         ];
     }

@@ -2,6 +2,7 @@
 
 namespace App\Flare\Models;
 
+use App\Game\Events\Values\EventType;
 use Exception;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Database\Eloquent\Model;
@@ -67,7 +68,14 @@ class GuideQuest extends Model {
         'gold_dust_reward',
         'shards_reward',
         'gold_reward',
-        'xp_reward'
+        'xp_reward',
+        'parent_id',
+        'unlock_at_level',
+        'only_during_event',
+        'be_on_game_map',
+        'require_event_goal_participation',
+        'required_holy_stacks',
+        'required_attached_gems',
     ];
 
     /**
@@ -119,6 +127,13 @@ class GuideQuest extends Model {
         'shards_reward'                      => 'integer',
         'faction_points_per_kill'            => 'integer',
         'xp_reward'                          => 'integer',
+        'parent_id'                          => 'integer',
+        'unlock_at_level'                    => 'integer',
+        'only_during_event'                  => 'integer',
+        'be_on_game_map'                     => 'integer',
+        'require_event_goal_participation'   => 'integer',
+        'required_holy_stacks'               => 'integer',
+        'required_attached_gems'             => 'integer',
     ];
 
     protected $appends = [
@@ -134,6 +149,8 @@ class GuideQuest extends Model {
         'mercenary_name',
         'secondary_mercenary_name',
         'kingdom_building_name',
+        'parent_quest_name',
+        'required_to_be_on_game_map_name',
     ];
 
     public function getSkillNameAttribute() {
@@ -262,6 +279,33 @@ class GuideQuest extends Model {
         }
 
         return null;
+    }
+
+    public function getParentQuestNameAttribute() {
+        $parentQuest = GuideQuest::find($this->parent_id);
+
+        if (is_null($parentQuest)) {
+            return null;
+        }
+
+        return $parentQuest->name;
+    }
+
+    public function getRequiredToBeOnGameMapNameAttribute() {
+        if (is_null($this->be_on_game_map)) {
+            return null;
+        }
+
+        return GameMap::find($this->be_on_game_map)->name;
+    }
+
+    public function eventType(): EventType | null {
+
+        if (is_null($this->only_during_event)) {
+            return null;
+        }
+
+        return new EventType($this->only_during_event);
     }
 
     protected static function newFactory() {

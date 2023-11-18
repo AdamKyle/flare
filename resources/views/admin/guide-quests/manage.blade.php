@@ -28,6 +28,23 @@
                             modelKey="desktop_instructions" name="desktop_instructions" quillId="desktop-instructions" />
                         <x-core.forms.quill-editor type="html" :model="$guideQuest" label="Mobile Instructions:"
                             modelKey="mobile_instructions" name="mobile_instructions" quillId="mobile-instructions" />
+
+                        <div class='border-b-2 block md:hidden border-b-gray-300 dark:border-b-gray-600 my-6'></div>
+                        <h3 class="mb-3">Appear During</h3>
+                        <p class="mb-3">When setting these values, these guide quests will jump in regardless of where the player is
+                        In their set of guide quests, these will over ride those and make the player do the quests going down.</p>
+                        <p class="mb-3">
+                            The quests that use these should be in the order of Parent which unlocks during an event and/or at a specific level
+                            and then any additional guide quests that need to explain the specific feature or features would set that quest as their parent.
+                        </p>
+                        <p class="mb-3">
+                            Once the quests are done in the parent line then the player is returned to the original set of guide quests.
+                        </p>
+                        <x-core.forms.input :model="$guideQuest" label="Only At Level:" modelKey="unlock_at_level" name="unlock_at_level" />
+                        <x-core.forms.key-value-select :model="$guideQuest" label="Only During Event:"
+                                                       modelKey="only_during_event" name="only_during_event" :options="$events" />
+                        <x-core.forms.key-value-select :model="$guideQuest" label="Belongs to parent:"
+                                                       modelKey="parent_id" name="parent_id" :options="$guideQuests" />
                     </x-core.form-wizard.content>
 
                     <x-core.form-wizard.content target="tab-style-2-2">
@@ -50,7 +67,7 @@
                                 <x-core.forms.input :model="$guideQuest" label="Required Skill Type Level (Optional):"
                                     modelKey="required_skill_type_level" name="required_skill_type_level" />
                                 <x-core.forms.key-value-select :model="$guideQuest" label="Required Faction:"
-                                    modelKey="required_faction_id" name="required_faction_id" :options="$gameMaps" />
+                                    modelKey="required_faction_id" name="required_faction_id" :options="$factionMaps" />
                                 <x-core.forms.input :model="$guideQuest" label="Required (Faction) Level:"
                                     modelKey="required_faction_level" name="required_faction_level" />
 
@@ -138,6 +155,18 @@
                                     name="required_shards" />
                                 <x-core.forms.input :model="$guideQuest" label="Required Gold Bars"
                                     modelKey="required_gold_bars" name="required_gold_bars" />
+                                <div class='border-b-2 block md:hidden border-b-gray-300 dark:border-b-gray-600 my-6'>
+                                </div>
+                                <h3 class="mb-3">Required To Be (Physically) On Map</h3>
+                                <x-core.forms.key-value-select :model="$guideQuest" label="Must be on Map:"
+                                   modelKey="be_on_game_map" name="be_on_game_map"
+                                   :options="$gameMaps" />
+                                <div class='border-b-2 block md:hidden border-b-gray-300 dark:border-b-gray-600 my-6'>
+                                </div>
+                                <h3 class="mb-3">Event Goal Participation</h3>
+                                <x-core.forms.input :model="$guideQuest" label="Required Event Goal Kills:"
+                                   modelKey="require_event_goal_participation"
+                                   name="require_event_goal_participation" />
                             </div>
                         </div>
                     </x-core.form-wizard.content>

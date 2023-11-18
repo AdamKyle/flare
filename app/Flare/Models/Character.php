@@ -215,6 +215,10 @@ class Character extends Model {
         return $this->hasOne(GlobalEventParticipation::class, 'character_id', 'id');
     }
 
+    public function globalEventKills() {
+        return $this->hasOne(GlobalEventKill::class, 'character_id', 'id');
+    }
+
     public function getIsAutoBattlingAttribute() {
         return !is_null(CharacterAutomation::where('character_id', $this->id)->first());
     }

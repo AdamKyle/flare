@@ -2,6 +2,7 @@
 
 namespace App\Game\Events\Providers;
 
+use App\Game\Events\Console\Commands\RestartGlobalEventGoal;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use App\Game\Events\Console\Commands\EndScheduledEvent;
 use App\Game\Events\Console\Commands\ProcessScheduledEvents;
@@ -22,6 +23,7 @@ class ServiceProvider extends ApplicationServiceProvider {
             EndScheduledEvent::class,
             ProcessScheduledEvents::class,
             StartMonthlyPvpEvent::class,
+            RestartGlobalEventGoal::class,
         ]);
 
         $this->app->bind(EventGoalsService::class, function () {

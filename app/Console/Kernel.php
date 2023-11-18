@@ -76,6 +76,9 @@ class Kernel extends ConsoleKernel {
 
         // End scheduled events
         $schedule->command('end:scheduled-event')->everyFiveMinutes()->timezone(config('app.timezone'));
+
+        // Restart the global events.
+        $schedule->command('restart:global-event-goal')->hourly()->timezone(config('app.timezone'));
     }
 
     /**

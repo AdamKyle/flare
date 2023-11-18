@@ -53,6 +53,10 @@ class GlobalEventGoal extends Model {
         return $this->hasMany(GlobalEventParticipation::class, 'global_event_goal_id', 'id');
     }
 
+    public function globalEventKills(): HasMany {
+        return $this->hasMany(GlobalEventKill::class, 'global_event_goal_id', 'id');
+    }
+
     public function eventType(): EventType {
         return new EventType($this->event_type);
     }

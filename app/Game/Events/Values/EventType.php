@@ -69,6 +69,15 @@ class EventType {
     }
 
     /**
+     * Gets the name of the event.
+     *
+     * @return string
+     */
+    public function getNameForEvent(): string {
+        return self::$selection[$this->value];
+    }
+
+    /**
      * Is weekly celestials?
      *
      * @return bool

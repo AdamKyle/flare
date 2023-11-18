@@ -765,6 +765,7 @@ export default class Game extends React.Component<GameProps, GameState> {
                                         this.state.character
                                             .can_use_event_goals_button
                                     }
+                                    character_id={this.state.character.id}
                                 >
                                     <MapSection
                                         user_id={this.props.userId}

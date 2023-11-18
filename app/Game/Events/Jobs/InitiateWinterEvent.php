@@ -63,6 +63,8 @@ class InitiateWinterEvent implements ShouldQueue {
         $buildQuestCacheService->buildQuestCache();
 
         $this->kickOffGlobalEventGoal();
+
+        event(new GlobalMessageEvent('Players who have Guide Quests enabled will also see a set of new quests to introduce them to the Winter Event. These are geared at new and existing players.'));
     }
 
     public function kickOffGlobalEventGoal() {

@@ -8,7 +8,7 @@ import EventGoalsTabState from "./types/event-goals-tab-state";
 import EventGoal from "./definitions/event-goal";
 
 export default class EventGoalsTab extends React.Component<
-    {},
+    any,
     EventGoalsTabState
 > {
     private eventGoalsUpdate: any;
@@ -26,7 +26,7 @@ export default class EventGoalsTab extends React.Component<
     }
 
     componentDidMount(): void {
-        new Ajax().setRoute("global-event-goals").doAjaxCall(
+        new Ajax().setRoute("global-event-goals/" + this.props.character_id).doAjaxCall(
             "get",
             (result: AxiosResponse) => {
                 this.setState({
@@ -135,6 +135,14 @@ export default class EventGoalsTab extends React.Component<
                         </span>{" "}
                         {formatNumber(
                             this.state.eventGoal.kills_needed_for_reward
+                        )}
+                    </p>
+                    <p className="my-2 font-bold">
+                        <span className="text-orange-500 dark:text-orange-300">
+                            Your Current Kills For Event Goal:
+                        </span>{" "}
+                        {formatNumber(
+                            this.state.eventGoal.current_kills
                         )}
                     </p>
                 </div>

@@ -101,6 +101,10 @@ const guideQuestLabelBuilder = (
             return "Obtain Shards amount";
         case "required_gold_bars":
             return "Create Gold Bars amount";
+        case "be_on_game_map":
+            return "Physically be on Plane";
+        case "require_event_goal_participation":
+            return "Kill # of Event Creatures";
         default:
             return null;
     }

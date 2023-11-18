@@ -446,6 +446,22 @@ class GuideQuestRequirementsService {
     }
 
     /**
+     * Is the player actually on the map we want them to be?
+     *
+     * @param Character $character
+     * @param GuideQuest $quest
+     * @return $this
+     */
+    public function requirePlayerToBeOnASpecificMap(Character $character, GuideQuest $quest): GuideQuestRequirementsService {
+
+        if ($character->map->game_map_id === $quest->be_on_game_map) {
+            $this->finishedRequirements[] = 'be_on_game_map';
+        }
+
+        return $this;
+    }
+
+    /**
      * Has the character leveled their class skill to the desired level?
      *
      * @param Character $character

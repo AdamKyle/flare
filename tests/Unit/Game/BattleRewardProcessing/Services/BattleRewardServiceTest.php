@@ -256,6 +256,14 @@ class BattleRewardServiceTest extends TestCase {
     public function testShouldUpdateGlobalEventParticipation() {
         $character = $this->characterFactory->getCharacter();
 
+        $character->map()->update([
+            'game_map_id' =>  $this->createGameMap([
+                'name' => MapNameValue::ICE_PLANE
+            ])->id,
+        ]);
+
+        $character = $character->refresh();
+
         $monster   = $this->createMonster([
             'game_map_id' => $character->map->game_map_id,
         ]);

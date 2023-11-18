@@ -23,6 +23,10 @@
                             <dt>Required Player Level</dt>
                             <dd>{{ $guideQuest->required_level }}</dd>
                         @endif
+                        @if (!is_null($guideQuest->require_event_goal_participation))
+                            <dt>Participate in the Event Goal and Kill # of Creatures:</dt>
+                            <dd>{{$guideQuest->require_event_goal_participation}}</dd>
+                        @endif
                         @if (!is_null($guideQuest->required_game_map_id))
                             <dt>Required Access To Map</dt>
                             <dd>{{ $guideQuest->game_map_name }}</dd>
@@ -50,6 +54,10 @@
                             <dd>{{ $guideQuest->faction_name }}</dd>
                             <dt>Required Faction Level</dt>
                             <dd>{{ $guideQuest->required_faction_level }}</dd>
+                        @endif
+                        @if (!is_null($guideQuest->be_on_game_map))
+                            <dt>Physically be on Map:</dt>
+                            <dd>{{$guideQuest->required_to_be_on_game_map_name}}</dd>
                         @endif
                         @if (!is_null($guideQuest->quest_name))
                             <dt>Required Quest</dt>
@@ -171,6 +179,22 @@
                         <dt>Shards Reward</dt>
                         <dd>{{ is_null($guideQuest->shards_reward) ? 0 : number_format($guideQuest->shards_reward) }}</dd>
                     </dl>
+                    @if (!is_null($guideQuest->eventType()))
+                        <div class="my-4">
+                            <x-core.alerts.info-alert title="Event Specific Guide Quest!">
+                                <p>This Guide quest only appears during a specific event:</p>
+                                <div class='border-b-2 border-b-blue-300 dark:border-b-blue-600 my-3'></div>
+                                <dl>
+                                    <dt>Unlocks at Level</dt>
+                                    <dd>{{ $guideQuest->unlock_at_level }}</dd>
+                                    <dt>Only During Event:</dt>
+                                    <dd>{{ $guideQuest->eventType()->getNameForEvent() }}</dd>
+                                    <dt>Parent ID</dt>
+                                    <dd>{{ is_null($guideQuest->parent_id) ? 'N/A' : $guideQuest->parent_quest_name }}</dd>
+                                </dl>
+                            </x-core.alerts.info-alert>
+                        </div>
+                    @endif
                 </div>
                 <div class='block md:hidden border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
                 <div>

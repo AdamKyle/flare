@@ -3,4 +3,5 @@ export default interface EventGoal {
     total_kills: number;
     reward_every: number;
     kills_needed_for_reward: number,
+    current_kills: number;
 }
