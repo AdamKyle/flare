@@ -80,6 +80,7 @@
         "rpg-awesome": "^0.2.0",
         "styled-components": "^5.3.3",
         "tailwindcss-classnames": "^3.0.2",
+        "tsyringe": "^4.8.0",
         "uuid": "^8.3.2"
     }
 }
