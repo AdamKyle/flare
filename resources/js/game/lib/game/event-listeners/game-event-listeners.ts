@@ -1,10 +1,13 @@
 import CoreEventListener from "./core-event-listener";
 import {singleton, inject} from "tsyringe";
-import {Channel} from "laravel-echo";
 import Game from "../../../game";
 import {serviceContainer} from "../../containers/core-container";
 import GameListener from "./game-listener";
 import MapListeners from "./game/map-listeners";
+import CharacterListeners from "./game/character-listeners";
+import MonsterListeners from "./game/monster-listeners";
+import KingdomListeners from "./game/kingdom-listeners";
+import ActionListeners from "./game/action-listeners";
 
 @singleton()
 export default class GameEventListeners {
@@ -13,7 +16,15 @@ export default class GameEventListeners {
 
     private userId?: number;
 
-    private traverseUpdate?: GameListener;
+    private mapListeners?: GameListener;
+
+    private characterListeners?: GameListener;
+
+    private monsterListeners?: GameListener;
+
+    private kingdomListener?: GameListener;
+
+    private actionListeners?: GameListener;
 
     constructor(@inject(CoreEventListener) private coreEventListener: CoreEventListener) {}
 
@@ -21,7 +32,11 @@ export default class GameEventListeners {
         this.component = component;
         this.userId    = userId;
 
-        this.traverseUpdate = serviceContainer().fetch<GameListener>(MapListeners);
+        this.mapListeners = serviceContainer().fetch<GameListener>(MapListeners);
+        this.characterListeners = serviceContainer().fetch<GameListener>(CharacterListeners);
+        this.monsterListeners = serviceContainer().fetch<GameListener>(MonsterListeners);
+        this.kingdomListener = serviceContainer().fetch<GameListener>(KingdomListeners);
+        this.actionListeners = serviceContainer().fetch<GameListener>(ActionListeners);
     }
 
     public registerEvents(): void {
@@ -30,17 +45,52 @@ export default class GameEventListeners {
             throw new Error('Need to call initialize on GameEventListeners first.');
         }
 
+        if (this.mapListeners) {
+            this.mapListeners.initialize(this.component, this.userId);
+            this.mapListeners.register();
+        }
 
-        if (this.traverseUpdate) {
-            this.traverseUpdate.initialize(this.component, this.userId);
-            this.traverseUpdate.register();
+        if (this.characterListeners) {
+            this.characterListeners.initialize(this.component, this.userId);
+            this.characterListeners.register();
+        }
+
+        if (this.monsterListeners) {
+            this.monsterListeners.initialize(this.component, this.userId);
+            this.monsterListeners.register();
+        }
+
+        if (this.kingdomListener) {
+            this.kingdomListener.initialize(this.component, this.userId);
+            this.kingdomListener.register();
+        }
+
+        if (this.actionListeners) {
+            this.actionListeners.initialize(this.component, this.userId);
+            this.actionListeners.register();
         }
     }
 
     public listenToEvents(): void {
 
-        if (this.traverseUpdate) {
-            this.traverseUpdate.listen();
+        if (this.mapListeners) {
+            this.mapListeners.listen();
+        }
+
+        if (this.characterListeners) {
+            this.characterListeners.listen()
+        }
+
+        if (this.monsterListeners) {
+            this.monsterListeners.listen()
+        }
+
+        if (this.kingdomListener) {
+            this.kingdomListener.listen()
+        }
+
+        if (this.actionListeners) {
+            this.actionListeners.listen()
         }
     }
 }
