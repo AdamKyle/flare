@@ -1,12 +1,15 @@
 
-import {container} from 'tsyringe';
+import {container, InjectionToken} from 'tsyringe';
+import mainContainer from "./registrations/main-container";
+import gameEventContainer from "./registrations/game-event-container";
 
 class CoreContainer {
 
     private static instance: CoreContainer;
 
-    private constructor() {
-
+    public constructor() {
+        mainContainer(this);
+        gameEventContainer(this);
     }
 
     /**
@@ -25,16 +28,9 @@ class CoreContainer {
      * Throws is the dependency does not exist.
      *
      * @param key
-     * @throws Error
      */
-    public fetch<T>(key: string): T {
-        const service = container.resolve<T>(key);
-
-        if (!service) {
-            throw new Error(`Service not found: ${key}`);
-        }
-
-        return service;
+    public fetch<T>(token: InjectionToken<T>): T {
+        return container.resolve<T>(token);
     }
 
     /**
@@ -47,3 +43,15 @@ class CoreContainer {
         container.register(key, { useValue: service });
     }
 }
+
+let dependencyRegistry: CoreContainer;
+
+const serviceContainer = (): CoreContainer => {
+    if (!dependencyRegistry) {
+        dependencyRegistry = new CoreContainer();
+    }
+
+    return dependencyRegistry;
+};
+
+export { serviceContainer, CoreContainer };

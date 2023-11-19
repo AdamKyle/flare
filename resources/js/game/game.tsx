@@ -31,8 +31,13 @@ import MapState from "./sections/map/types/map-state";
 import MapData from "./sections/map/lib/request-types/MapData";
 import MapStateManager from "./sections/map/lib/state/map-state-manager";
 import MapTabs from "./sections/map/map-tabs";
+import {CoreContainer, serviceContainer} from "./lib/containers/core-container";
+import GameEventListeners from "./lib/game/event-listeners/game-event-listeners";
 
 export default class Game extends React.Component<GameProps, GameState> {
+
+    private gameEventListener?: GameEventListeners;
+
     private characterTopBar: any;
 
     private characterAttacks: any;
@@ -67,8 +72,14 @@ export default class Game extends React.Component<GameProps, GameState> {
 
     private raidMonsterUpdate: any;
 
-    constructor(props: GameProps) {
+    constructor(props: GameProps, context: CoreContainer | undefined) {
         super(props);
+
+        this.gameEventListener = serviceContainer().fetch(GameEventListeners);
+
+        this.gameEventListener.initialize(this, this.props.userId);
+
+        this.gameEventListener.registerEvents();
 
         this.state = {
             view_port: 0,
@@ -116,9 +127,6 @@ export default class Game extends React.Component<GameProps, GameState> {
                 },
             ],
         };
-
-        // @ts-ignore
-        this.traverseUpdate = Echo.private("update-plane-" + this.props.userId);
 
         // @ts-ignore
         this.monsterUpdate = Echo.private(
@@ -235,6 +243,10 @@ export default class Game extends React.Component<GameProps, GameState> {
                 },
             ])
             .doAjaxCalls();
+
+        if (this.gameEventListener) {
+            this.gameEventListener.listenToEvents();
+        }
 
         // @ts-ignore
         this.characterTopBar.listen(
@@ -489,17 +501,6 @@ export default class Game extends React.Component<GameProps, GameState> {
                 this.setState({
                     character: character,
                 });
-            }
-        );
-
-        this.traverseUpdate.listen(
-            "Game.Maps.Events.UpdateMap",
-            (event: any) => {
-                this.setStateFromData(event.mapDetails);
-
-                this.updateQuestPlane(
-                    event.mapDetails.character_map.game_map.name
-                );
             }
         );
     }
