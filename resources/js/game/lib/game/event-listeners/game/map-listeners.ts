@@ -3,6 +3,8 @@ import Game from "../../../../game";
 import {inject, injectable} from "tsyringe";
 import CoreEventListener from "../core-event-listener";
 import {Channel} from "laravel-echo";
+import {mergeLocations} from "../../../../sections/map/helpers/merge-locations";
+import MapState from "../../../../sections/map/types/map-state";
 
 @injectable()
 export default class MapListeners implements GameListener {
@@ -20,6 +22,8 @@ export default class MapListeners implements GameListener {
     private updateSpecialShopsAccess?: Channel;
 
     private updateSpecialEventGoals?: Channel;
+
+    private corruptedLocations?: Channel;
 
     constructor(@inject(CoreEventListener) private coreEventListener: CoreEventListener) {}
 
@@ -39,6 +43,7 @@ export default class MapListeners implements GameListener {
             this.updateCraftingTypes = echo.private("update-location-base-crafting-options-" + this.userId);
             this.updateSpecialShopsAccess = echo.private("update-location-base-shops-" + this.userId);
             this.updateSpecialEventGoals = echo.private("update-location-base-event-goals-" + this.userId);
+            this.corruptedLocations = echo.join("corrupt-locations");
         } catch (e: any|unknown) {
             throw new Error(e);
         }
@@ -50,6 +55,7 @@ export default class MapListeners implements GameListener {
         this.listForLocationBasedCraftingTypes();
         this.listForUpdatesToSpecialShopsAccess();
         this.listenForEventGoalUpdates();
+        this.listenForCorruptedLocationUpdates();
     }
 
     /**
@@ -202,6 +208,49 @@ export default class MapListeners implements GameListener {
 
                 this.component.setState({
                     character: character,
+                });
+            }
+        );
+    }
+
+    /**
+     * Listen for corrupted location updates.
+     *
+     * @protected
+     */
+    protected listenForCorruptedLocationUpdates() {
+
+        if (!this.corruptedLocations) {
+            return;
+        }
+
+        this.corruptedLocations.listen(
+            "Game.Raids.Events.CorruptLocations",
+            (event: any) => {
+
+                if (!this.component) {
+                    return;
+                }
+
+                let mapState: MapState = JSON.parse(
+                    JSON.stringify(this.component.state.map_data)
+                );
+
+                const locations = mapState.locations
+
+                if (locations === null) {
+                    return;
+                }
+
+                const mergedLocations = mergeLocations(
+                    locations ,
+                    event.corruptedLocations
+                );
+
+                mapState.locations = mergedLocations;
+
+                this.component.setState({
+                    map_data: mapState,
                 });
             }
         );

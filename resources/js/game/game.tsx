@@ -7,7 +7,6 @@ import BasicCard from "./components/ui/cards/basic-card";
 import MapSection from "./sections/map/map-section";
 import GameState, {
     GameActionState,
-    MapTimerData,
 } from "./lib/game/types/game-state";
 import CharacterTopSection from "./sections/character-top-section/character-top-section";
 import Quests from "./sections/components/quests/quests";
@@ -20,7 +19,6 @@ import SmallerActions from "./sections/game-actions-section/smaller-actions";
 import QuestType from "./lib/game/types/quests/quest-type";
 import ScreenRefresh from "./sections/screen-refresh/screen-refresh";
 import KingdomsList from "./sections/kingdoms/kingdoms-list";
-import KingdomDetails from "./lib/game/kingdoms/kingdom-details";
 import Actions from "./sections/game-actions-section/actions";
 import PositionType from "./sections/map/types/map/position-type";
 import { removeCommas } from "./lib/game/format-number";
@@ -65,14 +63,6 @@ export default class Game extends React.Component<GameProps, GameState> {
             show_global_timeout: false,
             action_data: null,
             map_data: null,
-            map_timer_data: {
-                time_left: 0,
-                time_left_started: 0,
-                automation_time_out: 0,
-                automation_time_out_started: 0,
-                celestial_time_out: 0,
-                celestial_time_out_started: 0,
-            },
             tabs: [
                 {
                     key: "game",
@@ -232,12 +222,6 @@ export default class Game extends React.Component<GameProps, GameState> {
         });
     }
 
-    setMapTimerData(timerData: MapTimerData): void {
-        this.setState({
-            map_timer_data: timerData,
-        });
-    }
-
     renderLoading() {
         return (
             <div className="flex h-screen justify-center items-center max-w-md m-auto mt-[-150px]">
@@ -345,9 +329,6 @@ export default class Game extends React.Component<GameProps, GameState> {
                                             update_parent_state={this.setActionState.bind(
                                                 this
                                             )}
-                                            map_timer_data={
-                                                this.state.map_timer_data
-                                            }
                                             set_map_data={this.setMapState.bind(
                                                 this
                                             )}
@@ -431,9 +412,6 @@ export default class Game extends React.Component<GameProps, GameState> {
                                         update_character_quests_plane={this.updateQuestPlane.bind(
                                             this
                                         )}
-                                        map_timer_data={
-                                            this.state.map_timer_data
-                                        }
                                         disable_bottom_timer={false}
                                         map_data={this.state.map_data}
                                         set_map_data={this.setMapState.bind(

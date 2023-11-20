@@ -15,7 +15,5 @@ export default interface SmallActionsProps extends ActionsProps {
 
     map_data: MapState | null;
 
-    map_timer_data: MapTimerData;
-
     set_map_data: (mapData: MapState) => void;
 }

@@ -33,7 +33,5 @@ export default interface MapProps {
 
     map_data: MapState | null;
 
-    map_timer_data: MapTimerData;
-
     set_map_data: (mapData: MapState) => void;
 }

@@ -426,7 +426,6 @@ export default class SmallerActions extends React.Component<
                 update_plane_quests={this.props.update_plane_quests}
                 update_character_position={this.props.update_character_position}
                 map_data={this.props.map_data}
-                map_timer_data={this.props.map_timer_data}
                 set_map_data={this.props.set_map_data}
             />
         );

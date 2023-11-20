@@ -17,30 +17,20 @@ import {
 import MapTimer from "./map-timer";
 import DirectionalMovement from "./actions/directional-movement";
 import MapActions from "./actions/map-actions";
-import NpcKingdomsDetails from "./types/map/npc-kingdoms-details";
-import PlayerKingdomsDetails from "./types/map/player-kingdoms-details";
 import clsx from "clsx";
-// @ts-ignore
-import Draggable from "react-draggable/build/web/react-draggable.min";
 import MapState from "./types/map-state";
 import { updateTimers } from "../../lib/ajax/update-timers";
-import { mergeLocations } from "./helpers/merge-locations";
 import { updateLocationBasedActions } from "../../lib/ajax/update-location-based-actions";
+// @ts-ignore
+import Draggable from "react-draggable/build/web/react-draggable.min";
+import {differenceWith, isEqual} from "lodash";
 
 export default class MapSection extends React.Component<MapProps, MapState> {
     private mapTimeOut: any;
 
     private explorationTimeOut: any;
 
-    private globalMapUpdate: any;
-
-    private kingdomsUpdate: any;
-
-    private npcKingdomsUpdate: any;
-
     private celestialTimeout: any;
-
-    private corruptedLocations: any;
 
     constructor(props: MapProps) {
         super(props);
@@ -80,33 +70,24 @@ export default class MapSection extends React.Component<MapProps, MapState> {
         );
 
         // @ts-ignore
-        this.globalMapUpdate = Echo.join("global-map-update");
-
-        // @ts-ignore
-        this.kingdomsUpdate = Echo.private(
-            "add-kingdom-to-map-" + this.props.user_id
-        );
-
-        // @ts-ignore
         this.explorationTimeOut = Echo.private(
             "exploration-timeout-" + this.props.user_id
         );
 
         // @ts-ignore
-        this.npcKingdomsUpdate = Echo.join("npc-kingdoms-update");
-
-        // @ts-ignore
         this.celestialTimeout = Echo.private(
             "update-character-celestial-timeout-" + this.props.user_id
         );
-
-        // @ts-ignore
-        this.corruptedLocations = Echo.join("corrupt-locations");
     }
 
     componentDidMount() {
         if (this.props.map_data !== null) {
-            this.setState({ ...this.props.map_data }, () => {
+            this.setState({
+                ...this.props.map_data,
+                time_left: 0,
+                automation_time_out: 0,
+                celestial_time_out: 0
+            }, () => {
                 updateTimers(this.props.character_id);
 
                 updateLocationBasedActions(this.props.character_id);
@@ -125,62 +106,12 @@ export default class MapSection extends React.Component<MapProps, MapState> {
             }
         );
 
-        this.globalMapUpdate.listen(
-            "Game.Kingdoms.Events.UpdateGlobalMap",
-            (event: any) => {
-                const playerKingdomsFilter = this.state.player_kingdoms.filter(
-                    (playerKingdom: PlayerKingdomsDetails) => {
-                        if (
-                            !event.npcKingdoms.some(
-                                (kingdom: NpcKingdomsDetails) =>
-                                    kingdom.id === playerKingdom.id
-                            )
-                        ) {
-                            return playerKingdom;
-                        }
-                    }
-                );
-
-                this.setState({
-                    enemy_kingdoms: event.otherKingdoms.filter(
-                        (kingdom: PlayerKingdomsDetails) =>
-                            kingdom.character_id !== this.props.character_id
-                    ),
-                    npc_kingdoms: event.npcKingdoms,
-                    player_kingdoms: playerKingdomsFilter,
-                });
-            }
-        );
-
         this.explorationTimeOut.listen(
             "Game.Exploration.Events.ExplorationTimeOut",
             (event: any) => {
                 this.setState({
                     automation_time_out: event.forLength,
                 });
-            }
-        );
-
-        this.kingdomsUpdate.listen(
-            "Game.Kingdoms.Events.AddKingdomToMap",
-            (event: any) => {
-                this.setState({
-                    player_kingdoms: event.myKingdoms,
-                });
-            }
-        );
-
-        this.npcKingdomsUpdate.listen(
-            "Game.Kingdoms.Events.UpdateNPCKingdoms",
-            (event: {
-                npcKingdoms: NpcKingdomsDetails[] | [];
-                mapName: string;
-            }) => {
-                if (this.state.map_name === event.mapName) {
-                    this.setState({
-                        npc_kingdoms: event.npcKingdoms,
-                    });
-                }
             }
         );
 
@@ -192,29 +123,16 @@ export default class MapSection extends React.Component<MapProps, MapState> {
                 });
             }
         );
-
-        this.corruptedLocations.listen(
-            "Game.Raids.Events.CorruptLocations",
-            (event: any) => {
-                let locations = JSON.parse(
-                    JSON.stringify(this.state.locations)
-                );
-
-                const mergedLocations = mergeLocations(
-                    locations,
-                    event.corruptedLocations
-                );
-
-                this.setState({
-                    locations: mergedLocations,
-                });
-            }
-        );
     }
 
     componentDidUpdate(): void {
         if (this.props.map_data !== null && this.state.loading) {
-            this.setState({ ...this.props.map_data }, () => {
+            this.setState({
+                ...this.props.map_data,
+                time_left: 0,
+                automation_time_out: 0,
+                celestial_time_out: 0
+            }, () => {
                 updateTimers(this.props.character_id);
 
                 updateLocationBasedActions(this.props.character_id);
@@ -226,6 +144,22 @@ export default class MapSection extends React.Component<MapProps, MapState> {
         if (this.props.map_data !== null) {
             if (this.props.map_data.map_url !== this.state.map_url) {
                 this.setState({ ...this.props.map_data });
+            }
+
+            if (
+                (this.props.map_data.player_kingdoms.length !== this.state.player_kingdoms.length ||
+                this.props.map_data.enemy_kingdoms.length !== this.state.enemy_kingdoms.length ||
+                this.props.map_data.npc_kingdoms.length !== this.state.npc_kingdoms.length) &&
+                this.props.map_data.player_kingdoms.length > 0 &&
+                this.props.map_data.enemy_kingdoms.length > 0 &&
+                this.props.map_data.npc_kingdoms.length > 0
+            ) {
+
+                this.setState({
+                    player_kingdoms: this.props.map_data.player_kingdoms,
+                    enemy_kingdoms: this.props.map_data.enemy_kingdoms,
+                    npc_kingdoms: this.props.map_data.npc_kingdoms,
+                });
             }
         }
     }

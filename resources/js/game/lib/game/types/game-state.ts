@@ -60,6 +60,4 @@ export default interface GameState {
     action_data: GameActionState | null;
 
     map_data: MapState | null;
-
-    map_timer_data: MapTimerData;
 }
