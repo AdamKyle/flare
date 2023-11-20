@@ -161,6 +161,12 @@ export default class MapSection extends React.Component<MapProps, MapState> {
                     npc_kingdoms: this.props.map_data.npc_kingdoms,
                 });
             }
+
+            if (!isEqual(this.props.map_data.locations, this.state.locations)) {
+                this.setState({
+                    locations: this.props.map_data.locations,
+                })
+            }
         }
     }
 

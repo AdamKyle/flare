@@ -40,6 +40,7 @@ class GuideQuestsSheet implements ToCollection {
     protected function returnCleanAffix(array $data) {
 
         $gameMap         = GameMap::where('name', $data['required_game_map_id'])->first();
+        $beOnMap         = GameMap::where('name', $data['be_on_game_map'])->first();
         $skill           = GameSkill::where('name', $data['required_skill'])->first();
         $secondarySkill  = GameSkill::where('name', $data['required_secondary_skill'])->first();
         $passiveSkill    = PassiveSkill::where('name', $data['required_passive_skill'])->first();
@@ -50,6 +51,7 @@ class GuideQuestsSheet implements ToCollection {
         $secondaryItem   = Item::where('name', $data['secondary_quest_item_id'])->where('type', 'quest')->first();
         $quest           = Quest::where('name', $data['required_quest_id'])->first();
         $kingdomBuilding = GameBuilding::where('name', $data['required_kingdom_building_id'])->first();
+        $parentGuideQuest = GuideQuest::where('name', $data['parent_id'])->first();
 
         if (is_null($skill)) {
             $data['required_skill_level'] = null;
@@ -108,6 +110,18 @@ class GuideQuestsSheet implements ToCollection {
             $data['required_kingdom_building_level'] = null;
         } else {
             $data['required_kingdom_building_id'] = $kingdomBuilding->id;
+        }
+
+        if (is_null($beOnMap)) {
+            $data['be_on_game_map'] = null;
+        } else {
+            $data['be_on_game_map'] = $beOnMap->id;
+        }
+
+        if (is_null($parentGuideQuest)) {
+            $data['parent_id'] = null;
+        } else {
+            $data['parent_id'] = $parentGuideQuest->id;
         }
 
         return $data;

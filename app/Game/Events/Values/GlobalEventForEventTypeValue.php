@@ -13,9 +13,9 @@ class GlobalEventForEventTypeValue {
 
         if ($event->isWinterEvent()) {
             return [
-                'max_kills'                  => 19000,
-                'reward_every_kills'         => 1000,
-                'next_reward_at'             => 1000,
+                'max_kills'                  => 190000,
+                'reward_every_kills'         => 10000,
+                'next_reward_at'             => 10000,
                 'event_type'                 => EventType::WINTER_EVENT,
                 'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE,
                 'should_be_unique'           => true,
