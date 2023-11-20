@@ -144,6 +144,40 @@ export default class KingdomLogDetails extends React.Component<KingdomLogProps, 
     }
 
     render() {
+        if (this.props.log.status === 'Kingdom has not been walked') {
+            return (
+                <BasicCard>
+                    <div className='text-right cursor-pointer text-red-500'>
+                        <button onClick={this.props.close_details}><i className="fas fa-minus-circle"></i></button>
+                    </div>
+                    <div className='my-4'>
+                        <h3 className='mb-4'>{this.props.log.status}</h3>
+                        <p className='my-4 text-red-600 dark:text-red-500'>
+                            You have not visited your kingdom in the last 90 days. So it was handed to The Old Man and made
+                            into an NPC Kingdom.
+                        </p>
+                        <dl className='my-4'>
+                            <dt>Kingdom Name</dt>
+                            <dd>{this.props.log.additional_details.kingdom_data.name}</dd>
+                            <dt>Kingdom Location</dt>
+                            <dd>(X/Y) {this.props.log.additional_details.kingdom_data.x} / {this.props.log.additional_details.kingdom_data.y}</dd>
+                            <dt>On Map</dt>
+                            <dd>{this.props.log.additional_details.kingdom_data.game_map_name}</dd>
+                            <dt>Reason</dt>
+                            <dd>{this.props.log.additional_details.kingdom_data.reason}</dd>
+                        </dl>
+                        <InfoAlert additional_css={'my-4'}>
+                            <h4>Walking your kingdoms</h4>
+                            <p className='my-4'>
+                                Kingdoms have to be walked at least once in a 90 day period or they get handed over to The Old Man.
+                                What it means to walk a kingdom is to physically visit the kingdom to consider it "walked".
+                            </p>
+                        </InfoAlert>
+                    </div>
+                </BasicCard>
+            )
+        }
+
         if (this.props.log.status === 'Kingdom was overpopulated') {
             return (
                 <BasicCard>

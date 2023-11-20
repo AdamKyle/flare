@@ -137,13 +137,17 @@ class KingdomUpdateService {
         if ($this->shouldGiveKingdomToNpc()) {
             $this->giveKingdomsToNpcHandler->giveKingdomToNPC($this->kingdom);
 
-            event(new ServerMessageEvent($this->character->user, 'Your kingdom has been given over to the NPC: The Old Man. Kingdom has not been walked in 30 days or more.'));
+            event(new ServerMessageEvent($this->character->user, 'Your kingdom has been given over to the NPC: The Old Man. Kingdom has not been walked in 90 days or more.'));
 
             $gameMapName   = $this->kingdom->gameMap->name;
             $xPosition     = $this->kingdom->x_position;
             $yPosition     = $this->kingdom->y_position;
 
             $this->kingdom = null;
+
+            $additionalLogData['kingdom_data']['reason'] = 'Your kingdom was handed over to The Old Man and made a NPC kingdom because you did not walk it with in 90 days.';
+
+            $this->createKingdomLog($character, $additionalLogData, KingdomLogStatusValue::NOT_WALKED);
 
             event(new GlobalMessageEvent('A kingdom on: ' . $gameMapName . ' at (X/Y): ' . $xPosition . '/' . $yPosition . ' has been neglected. The Old Man has taken it (New NPC Kingdom up for grabs).'));
 

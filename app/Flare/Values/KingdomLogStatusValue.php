@@ -19,6 +19,7 @@ class KingdomLogStatusValue {
     const UNITS_RETURNING  = 5;
     const BOMBS_DROPPED    = 6;
     const OVER_POPULATED   = 7;
+    const NOT_WALKED       = 8;
 
     /**
      * @var string[] $values
@@ -32,6 +33,7 @@ class KingdomLogStatusValue {
         self::UNITS_RETURNING  => 5,
         self::BOMBS_DROPPED    => 6,
         self::OVER_POPULATED   => 7,
+        self::NOT_WALKED       => 8,
     ];
 
     /**
@@ -120,5 +122,14 @@ class KingdomLogStatusValue {
      */
     public function overPopulated(): bool {
         return $this->value === self::OVER_POPULATED;
+    }
+
+    /**
+     * Has the kingdom not been walked?
+     *
+     * @return bool
+     */
+    public function notWalked(): bool {
+        return $this->value === self::NOT_WALKED;
     }
 }

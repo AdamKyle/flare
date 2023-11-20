@@ -178,6 +178,10 @@ class KingdomAttackLogsTransformer extends TransformerAbstract {
             return 'Kingdom was overpopulated';
         }
 
+        if ($logStatus->notWalked()) {
+            return 'Kingdom has not been walked';
+        }
+
         return 'Error. Unknown status';
     }
 }
