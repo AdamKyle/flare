@@ -31,6 +31,7 @@ class KingdomLog extends Model {
         'morale_loss',
         'published',
         'opened',
+        'additional_details',
         'created_at',
     ];
 
@@ -40,17 +41,18 @@ class KingdomLog extends Model {
      * @var array
      */
     protected $casts = [
-        'units_sent'     => 'array',
-        'units_survived' => 'array',
-        'old_buildings'  => 'array',
-        'new_buildings'  => 'array',
-        'old_units'      => 'array',
-        'new_units'      => 'array',
-        'published'      => 'boolean',
-        'opened'         => 'boolean',
-        'item_damage'    => 'float',
-        'morale_loss'    => 'float',
-        'status'         => 'integer',
+        'units_sent'         => 'array',
+        'units_survived'     => 'array',
+        'old_buildings'      => 'array',
+        'new_buildings'      => 'array',
+        'old_units'          => 'array',
+        'new_units'          => 'array',
+        'additional_details' => 'array',
+        'published'          => 'boolean',
+        'opened'             => 'boolean',
+        'item_damage'        => 'float',
+        'morale_loss'        => 'float',
+        'status'             => 'integer',
     ];
 
     protected $appends = [
@@ -92,6 +94,10 @@ class KingdomLog extends Model {
 
     public function setNewUnitsUnitsAttribute($value) {
         $this->attributes['new_units'] = json_encode($value);
+    }
+
+    public function setAdditionalDetailsAttribute($value) {
+        $this->attributes['additional_details'] = json_encode($value);
     }
 
     protected static function newFactory() {

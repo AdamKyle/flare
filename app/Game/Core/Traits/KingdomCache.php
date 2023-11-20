@@ -2,6 +2,7 @@
 
 namespace App\Game\Core\Traits;
 
+use App\Flare\Values\MapNameValue;
 use Cache;
 use Illuminate\Database\Eloquent\Collection;
 use App\Flare\Models\GameMap;
@@ -52,7 +53,7 @@ trait KingdomCache {
 
             $kingdoms = Kingdom::select('id', 'x_position', 'y_position', 'color', 'name')
                 ->where('character_id', $character->id)
-                ->where('game_map_id', $gameMap)
+                ->where('game_map_id', $gameMap->id)
                 ->get();
 
             if ($kingdoms->isEmpty()) {

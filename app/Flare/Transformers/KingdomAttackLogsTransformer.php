@@ -57,6 +57,7 @@ class KingdomAttackLogsTransformer extends TransformerAbstract {
             'opened'                   => $log->opened,
             'created_at'               => $log->created_at->setTimezone(env('TIME_ZONE'))->format('Y-m-d H:m:s'),
             'took_kingdom'             => (new KingdomLogStatusValue($log->status))->tookKingdom(),
+            'additional_details'       => $log->additional_details,
         ];
     }
 
@@ -100,6 +101,10 @@ class KingdomAttackLogsTransformer extends TransformerAbstract {
             $character = Character::find($this->characterId);
         } else {
             $character = $user->character;
+        }
+
+        if (is_null($log->to_kingdom_id)) {
+            return true;
         }
 
         $attackedKingdom = Kingdom::find($log->to_kingdom_id);
@@ -167,6 +172,10 @@ class KingdomAttackLogsTransformer extends TransformerAbstract {
 
         if ($logStatus->tookKingdom()) {
             return 'Kingdom was taken';
+        }
+
+        if ($logStatus->overPopulated()) {
+            return 'Kingdom was overpopulated';
         }
 
         return 'Error. Unknown status';

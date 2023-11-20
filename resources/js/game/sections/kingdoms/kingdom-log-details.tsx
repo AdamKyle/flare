@@ -4,6 +4,7 @@ import clsx from "clsx";
 import { formatNumber } from "../../lib/game/format-number";
 import KingdomLogProps from "../../lib/game/kingdoms/types/kingdom-log-props";
 import {BuildingLogDetails, UnitLogDetails} from "../../lib/game/kingdoms/kingdom-log-details";
+import InfoAlert from "../../components/ui/alerts/simple-alerts/info-alert";
 
 export default class KingdomLogDetails extends React.Component<KingdomLogProps, {  }> {
 
@@ -143,6 +144,46 @@ export default class KingdomLogDetails extends React.Component<KingdomLogProps, 
     }
 
     render() {
+        if (this.props.log.status === 'Kingdom was overpopulated') {
+            return (
+                <BasicCard>
+                    <div className='text-right cursor-pointer text-red-500'>
+                        <button onClick={this.props.close_details}><i className="fas fa-minus-circle"></i></button>
+                    </div>
+                    <div className='my-4'>
+                        <h3 className='mb-4'>{this.props.log.status}</h3>
+                        <p className='my-4 text-red-600 dark:text-red-500'>
+                            You kingdom was overpopulated. The Old Man took it and demolished it.
+                        </p>
+                        <dl className='my-4'>
+                            <dt>Kingdom Name</dt>
+                            <dd>{this.props.log.additional_details.kingdom_data.name}</dd>
+                            <dt>Kingdom Location</dt>
+                            <dd>(X/Y) {this.props.log.additional_details.kingdom_data.x} / {this.props.log.additional_details.kingdom_data.y}</dd>
+                            <dt>On Map</dt>
+                            <dd>{this.props.log.additional_details.kingdom_data.game_map_name}</dd>
+                            <dt>Reason</dt>
+                            <dd>{this.props.log.additional_details.kingdom_data.reason}</dd>
+                        </dl>
+                        <InfoAlert additional_css={'my-4'}>
+                            <h4>Over Population</h4>
+                            <p className='my-4'>
+                                Kingdoms can purchase additional population for recruiting large amount of units,
+                                but one should becarfeul because if you have more then your max at the hourly reset
+                                The Old Man will stomp around. he will attempt to:
+                            </p>
+                            <ul className='my-4 list-disc'>
+                                <li className='ml-4'>Take the cost our of your gold bars</li>
+                                <li className='ml-4'>If you have none, he will take it from your treasury.</li>
+                                <li className='ml-4'>If you have none, he will take it from your own gold.</li>
+                                <li className='ml-4'>If you have none, he will destroy the kingdom.</li>
+                            </ul>
+                        </InfoAlert>
+                    </div>
+                </BasicCard>
+            )
+        }
+
         return (
             <BasicCard>
                 <div className='text-right cursor-pointer text-red-500'>

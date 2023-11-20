@@ -4,12 +4,15 @@ namespace App\Game\Kingdoms\Handlers\Traits;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
+use App\Game\Core\Traits\KingdomCache;
 use App\Game\Kingdoms\Events\AddKingdomToMap;
 use App\Game\Kingdoms\Events\UpdateGlobalMap;
 use App\Game\Kingdoms\Events\UpdateNPCKingdoms;
 use App\Game\Messages\Events\GlobalMessageEvent;
 
 Trait DestroyKingdom {
+
+    use KingdomCache;
 
     /**
      * Destroy a kingdom.
@@ -41,13 +44,17 @@ Trait DestroyKingdom {
         ));
 
         if (!is_null($character)) {
-            $character = $character->refresh;
+            $character = $character->refresh();
+
+            $this->rebuildCharacterKingdomCache($character);
 
             event(new UpdateGlobalMap($character));
             event(new AddKingdomToMap($character));
         }
 
         if (is_null($character)) {
+            $this->rebuildCharacterKingdomCache($character);
+
             event(new UpdateNPCKingdoms($gameMap));
         }
     }

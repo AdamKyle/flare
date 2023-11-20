@@ -18,6 +18,7 @@ class KingdomLogStatusValue {
     const KINGDOM_ATTACKED = 4;
     const UNITS_RETURNING  = 5;
     const BOMBS_DROPPED    = 6;
+    const OVER_POPULATED   = 7;
 
     /**
      * @var string[] $values
@@ -29,7 +30,8 @@ class KingdomLogStatusValue {
         self::LOST_KINGDOM     => 3,
         self::KINGDOM_ATTACKED => 4,
         self::UNITS_RETURNING  => 5,
-        self::BOMBS_DROPPED    => 6
+        self::BOMBS_DROPPED    => 6,
+        self::OVER_POPULATED   => 7,
     ];
 
     /**
@@ -109,5 +111,14 @@ class KingdomLogStatusValue {
      */
     public function bombsDropped(): bool {
         return $this->value === self::BOMBS_DROPPED;
+    }
+
+    /**
+     * Were we overpopulated?
+     *
+     * @return bool
+     */
+    public function overPopulated(): bool {
+        return $this->value === self::OVER_POPULATED;
     }
 }

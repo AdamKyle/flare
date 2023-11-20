@@ -3,6 +3,8 @@
 namespace App\Game\Kingdoms\Service;
 
 
+use App\Flare\Models\KingdomLog;
+use App\Flare\Values\KingdomLogStatusValue;
 use App\Game\Kingdoms\Traits\CalculateMorale;
 use Illuminate\Support\Facades\Mail;
 use Facades\App\Flare\Values\UserOnlineValue;
@@ -121,6 +123,17 @@ class KingdomUpdateService {
             return;
         }
 
+        $character = $this->kingdom->character;
+
+        $additionalLogData = [
+            'kingdom_data' => [
+                'x' => $this->kingdom->x_position,
+                'y' => $this->kingdom->y_position,
+                'name' => $this->kingdom->name,
+                'game_map_name' => $this->kingdom->gameMap->name,
+            ]
+        ];
+
         if ($this->shouldGiveKingdomToNpc()) {
             $this->giveKingdomsToNpcHandler->giveKingdomToNPC($this->kingdom);
 
@@ -138,11 +151,17 @@ class KingdomUpdateService {
         }
 
         if ($this->isTheOldManAngry()) {
+
             $this->tooMuchPopulationHandler->setKingdom($this->kingdom)->handleAngryNPC();
 
             $kingdom = $this->tooMuchPopulationHandler->getKingdom();
 
             if (is_null($kingdom)) {
+
+                $additionalLogData['kingdom_data']['reason'] = 'Your kingdom was over populated and you could not afford the 10,000 Gold per additional person over your max population.';
+
+                $this->createKingdomLog($character, $additionalLogData, KingdomLogStatusValue::OVER_POPULATED);
+
                 return;
             }
 
@@ -166,6 +185,27 @@ class KingdomUpdateService {
         $this->alertUsersOfKingdomRemoval();
 
         $this->updateKingdomProtectedUntil();
+    }
+
+    protected function createKingdomLog(Character $character, array $additionalData, int $status) {
+
+        $log = [
+            'to_kingdom_id'      => null,
+            'from_kingdom_id'    => null,
+            'status'             => $status,
+            'published'          => true,
+            'additional_details' => $additionalData,
+            'character_id'       => $character->id,
+            'old_buildings'      => [],
+            'new_buildings'      => [],
+            'old_units'          => [],
+            'new_units'          => [],
+            'morale_loss'        => 1.0,
+        ];
+
+        KingdomLog::create($log);
+
+        $this->updateKingdom->updateKingdomLogs($character);
     }
 
     /**

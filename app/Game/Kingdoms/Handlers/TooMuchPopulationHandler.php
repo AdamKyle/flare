@@ -242,7 +242,7 @@ class TooMuchPopulationHandler {
 
         $this->destroyKingdom($this->kingdom, $character);
 
-        $character = $character->refresh;
+        $character = $character->refresh();
 
         event(new UpdateGlobalMap($character));
         event(new AddKingdomToMap($character));

@@ -48,4 +48,7 @@ export default interface KingdomLogDetails {
 
     took_kingdom: boolean;
 
+    // This can be anything that we want to send back.
+    additional_details: any;
+
 }
