@@ -53,8 +53,6 @@ Trait DestroyKingdom {
         }
 
         if (is_null($character)) {
-            $this->rebuildCharacterKingdomCache($character);
-
             event(new UpdateNPCKingdoms($gameMap));
         }
     }
