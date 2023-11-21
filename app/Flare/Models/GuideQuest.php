@@ -73,7 +73,7 @@ class GuideQuest extends Model {
         'unlock_at_level',
         'only_during_event',
         'be_on_game_map',
-        'require_event_goal_participation',
+        'required_event_goal_participation',
         'required_holy_stacks',
         'required_attached_gems',
     ];
@@ -131,7 +131,7 @@ class GuideQuest extends Model {
         'unlock_at_level'                    => 'integer',
         'only_during_event'                  => 'integer',
         'be_on_game_map'                     => 'integer',
-        'require_event_goal_participation'   => 'integer',
+        'required_event_goal_participation'   => 'integer',
         'required_holy_stacks'               => 'integer',
         'required_attached_gems'             => 'integer',
     ];

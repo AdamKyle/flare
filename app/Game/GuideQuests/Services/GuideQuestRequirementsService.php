@@ -474,8 +474,8 @@ class GuideQuestRequirementsService {
             return $this;
         }
 
-        if ($character->globalEventKills->kills >= $guideQuest->require_event_goal_participation) {
-            $this->finishedRequirements[] = 'require_event_goal_participation';
+        if ($character->globalEventKills->kills >= $guideQuest->required_event_goal_participation) {
+            $this->finishedRequirements[] = 'required_event_goal_participation';
         }
 
         return $this;

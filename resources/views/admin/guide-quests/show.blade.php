@@ -23,9 +23,9 @@
                             <dt>Required Player Level</dt>
                             <dd>{{ $guideQuest->required_level }}</dd>
                         @endif
-                        @if (!is_null($guideQuest->require_event_goal_participation))
+                        @if (!is_null($guideQuest->required_event_goal_participation))
                             <dt>Participate in the Event Goal and Kill # of Creatures:</dt>
-                            <dd>{{$guideQuest->require_event_goal_participation}}</dd>
+                            <dd>{{$guideQuest->required_event_goal_participation}}</dd>
                         @endif
                         @if (!is_null($guideQuest->required_game_map_id))
                             <dt>Required Access To Map</dt>

@@ -1,4 +1,4 @@
-import React, { Fragment } from "react";
+import React from "react";
 import Dialogue from "../../../components/ui/dialogue/dialogue";
 import ComponentLoading from "../../../components/ui/loading/component-loading";
 import { AxiosError, AxiosResponse } from "axios";
@@ -15,7 +15,12 @@ import RequiredListItem from "../components/required-list-item";
 import { questRewardKeys } from "../lib/guide-quests-rewards";
 import RewardListItem from "../components/reward-list-item";
 import TabLayout from "../components/tab-labout";
-import { viewPortWatcher } from "../../../lib/view-port-watcher";
+import InfoAlert from "../../../components/ui/alerts/simple-alerts/info-alert";
+import clsx from "clsx";
+
+enum EVENT_TYPE {
+    WINTER_EVENT = 4,
+};
 
 export default class GuideQuest extends React.Component<any, any> {
     constructor(props: any) {
@@ -131,6 +136,8 @@ export default class GuideQuest extends React.Component<any, any> {
     buildRequirementsList(): JSX.Element[] | [] {
         const requirementsList: JSX.Element[] = [];
 
+        console.log(this.state.quest_data);
+
         this.fetchRequiredKeys().forEach((key: string) => {
             let label = guideQuestLabelBuilder(key, this.state.quest_data);
 
@@ -212,6 +219,17 @@ export default class GuideQuest extends React.Component<any, any> {
                     </div>
                 ) : (
                     <div className="overflow-y-auto max-h-[450px] lg:max-h-none lg:overflow-visible">
+                        <InfoAlert additional_css={clsx('my-4', {'hidden': this.state.quest_data.only_during_event === null})}>
+                            <p>
+                                {
+                                    this.state.quest_data.only_during_event === EVENT_TYPE.WINTER_EVENT ?
+                                        'This is a special event guide quest to get new and existing ' +
+                                        'players engaged with the new event content. Once these quests are finished, ' +
+                                        'you will be returned to your remaining regular guide quests.'
+                                    : null
+                                }
+                            </p>
+                        </InfoAlert>
                         {this.state.success_message !== null ? (
                             <SuccessAlert
                                 close_alert={this.closeMessage.bind(this)}

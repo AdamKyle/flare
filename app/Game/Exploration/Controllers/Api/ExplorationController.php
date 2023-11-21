@@ -26,17 +26,10 @@ class ExplorationController extends Controller {
     private  ExplorationAutomationService $explorationAutomationService;
 
     /**
-     * @var CharacterCacheData $characterCacheData
-     */
-    private CharacterCacheData $characterCacheData;
-
-    /**
      * @param ExplorationAutomationService $explorationAutomationService
-     * @param CharacterCacheData $characterCacheData
      */
-    public function __construct(ExplorationAutomationService $explorationAutomationService, CharacterCacheData $characterCacheData) {
+    public function __construct(ExplorationAutomationService $explorationAutomationService) {
         $this->explorationAutomationService = $explorationAutomationService;
-        $this->characterCacheData           = $characterCacheData;
     }
 
     /**
@@ -83,25 +76,7 @@ class ExplorationController extends Controller {
      */
     public function stop(Character $character): JsonResponse {
 
-        $characterAutomation = CharacterAutomation::where('character_id', $character->id)->where('type', AutomationType::EXPLORING)->first();
-
-        if (is_null($characterAutomation)) {
-            return response()->json([
-                'message' => 'Nope. You don\'t own that.'
-            ], 422);
-        }
-
-        $characterAutomation->delete();
-
-        $this->characterCacheData->deleteCharacterSheet($character);
-
-        $character = $character->refresh();
-
-        event(new ExplorationTimeOut($character->user, 0));
-        event(new ExplorationStatus($character->user, false));
-        event(new UpdateCharacterStatus($character));
-
-        event(new ExplorationLogUpdate($character->user->id, 'Exploration has been stopped at player request.'));
+        $this->explorationAutomationService->stopExploration($character);
 
         return response()->json();
     }

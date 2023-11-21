@@ -3,6 +3,7 @@
 namespace App\Game\Exploration\Providers;
 
 
+use App\Flare\Builders\Character\CharacterCacheData;
 use App\Flare\ServerFight\MonsterPlayerFight;
 use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Exploration\Middleware\IsCharacterExploring;
@@ -22,7 +23,8 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(ExplorationAutomationService::class, function($app) {
             return new ExplorationAutomationService(
                 $app->make(MonsterPlayerFight::class),
-                $app->make(BattleEventHandler::class)
+                $app->make(BattleEventHandler::class),
+                $app->make(CharacterCacheData::class)
             );
         });
     }

@@ -7,6 +7,7 @@ use App\Flare\Models\Event;
 use App\Flare\Models\Location;
 use App\Flare\Models\Character;
 use App\Game\Events\Values\EventType;
+use App\Game\Exploration\Services\ExplorationAutomationService;
 use Illuminate\Console\Command;
 use App\Flare\Models\Announcement;
 use App\Flare\Models\ScheduledEvent;
@@ -52,9 +53,17 @@ class EndScheduledEvent extends Command {
         UpdateRaidMonsters $updateRaidMonsters,
         EventSchedulerService $eventSchedulerService,
         KingdomEventService $kingdomEventService,
-        TraverseService $traverseService
+        TraverseService $traverseService,
+        ExplorationAutomationService $explorationAutomationService,
     ) {
-        $this->endScheduledEvent($locationService, $updateRaidMonsters, $eventSchedulerService, $kingdomEventService, $traverseService);
+        $this->endScheduledEvent(
+            $locationService,
+            $updateRaidMonsters,
+            $eventSchedulerService,
+            $kingdomEventService,
+            $traverseService,
+            $explorationAutomationService,
+        );
     }
 
     /**
@@ -63,14 +72,19 @@ class EndScheduledEvent extends Command {
      * @param LocationService $locationService
      * @param UpdateRaidMonsters $updateRaidMonsters
      * @param EventSchedulerService $eventSchedulerService
+     * @param KingdomEventService $kingdomEventService
+     * @param TraverseService $traverseService
+     * @param ExplorationAutomationService $explorationAutomationService
      * @return void
+     * @throws \Exception
      */
     protected function endScheduledEvent(
         LocationService $locationService,
         UpdateRaidMonsters $updateRaidMonsters,
         EventSchedulerService $eventSchedulerService,
         KingdomEventService $kingdomEventService,
-        TraverseService $traverseService
+        TraverseService $traverseService,
+        ExplorationAutomationService $explorationAutomationService,
     ): void {
 
         $scheduledEvents = ScheduledEvent::where('end_date', '<=', now())->get();
@@ -124,7 +138,7 @@ class EndScheduledEvent extends Command {
             }
 
             if ($eventType->isWinterEvent()) {
-                $this->endWinterEvent($kingdomEventService, $traverseService);
+                $this->endWinterEvent($kingdomEventService, $traverseService, $explorationAutomationService);
 
                 $event->update([
                     'currently_running' => false,
@@ -234,9 +248,13 @@ class EndScheduledEvent extends Command {
      * End the winter event.
      *
      * @param KingdomEventService $kingdomEventService
+     * @param TraverseService $traverseService
+     * @param ExplorationAutomationService $explorationAutomationService
      * @return void
      */
-    protected function endWinterEvent(KingdomEventService $kingdomEventService, TraverseService $traverseService) {
+    protected function endWinterEvent(KingdomEventService $kingdomEventService,
+                                      TraverseService $traverseService,
+                                      ExplorationAutomationService $explorationAutomationService) {
         $event = Event::where('type', EventType::WINTER_EVENT)->first();
 
         $kingdomEventService->handleKingdomRewardsForEvent(MapNameValue::ICE_PLANE);
@@ -246,8 +264,10 @@ class EndScheduledEvent extends Command {
 
         Character::join('maps', 'maps.character_id', '=', 'characters.id')
             ->where('maps.game_map_id', $gameMap->id)
-            ->chunk(100, function ($characters) use ($traverseService, $surfaceMap) {
+            ->chunk(100, function ($characters) use ($traverseService, $surfaceMap, $explorationAutomationService) {
                 foreach ($characters as $character) {
+                    $explorationAutomationService->stopExploration($character);
+
                     $traverseService->travel($surfaceMap->id, $character);
                 }
             });

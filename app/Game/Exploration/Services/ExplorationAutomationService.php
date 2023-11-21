@@ -2,6 +2,7 @@
 
 namespace App\Game\Exploration\Services;
 
+use App\Flare\Builders\Character\CharacterCacheData;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterAutomation;
 use App\Flare\ServerFight\MonsterPlayerFight;
@@ -9,6 +10,7 @@ use App\Flare\Values\AutomationType;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Exploration\Events\ExplorationLogUpdate;
+use App\Game\Exploration\Events\ExplorationStatus;
 use App\Game\Exploration\Events\ExplorationTimeOut;
 use App\Game\Exploration\Jobs\Exploration;
 use App\Game\Maps\Events\UpdateDuelAtPosition;
@@ -19,9 +21,15 @@ class ExplorationAutomationService {
 
     private BattleEventHandler $battleEventHandler;
 
-    public function __construct(MonsterPlayerFight $monsterPlayerFight, BattleEventHandler $battleEventHandler) {
+    private CharacterCacheData $characterCacheData;
+
+    public function __construct(MonsterPlayerFight $monsterPlayerFight,
+                                BattleEventHandler $battleEventHandler,
+                                CharacterCacheData $characterCacheData) {
+
         $this->monsterPlayerFight = $monsterPlayerFight;
         $this->battleEventHandler = $battleEventHandler;
+        $this->characterCacheData = $characterCacheData;
     }
 
     /**
@@ -51,6 +59,28 @@ class ExplorationAutomationService {
         event(new UpdateDuelAtPosition($character->refresh()->user));
 
         $this->startAutomation($character, $automation->id, $params['attack_type']);
+    }
+
+    public function stopExploration(Character $character) {
+        $characterAutomation = CharacterAutomation::where('character_id', $character->id)->where('type', AutomationType::EXPLORING)->first();
+
+        if (is_null($characterAutomation)) {
+            return response()->json([
+                'message' => 'Nope. You don\'t own that.'
+            ], 422);
+        }
+
+        $characterAutomation->delete();
+
+        $this->characterCacheData->deleteCharacterSheet($character);
+
+        $character = $character->refresh();
+
+        event(new ExplorationTimeOut($character->user, 0));
+        event(new ExplorationStatus($character->user, false));
+        event(new UpdateCharacterStatus($character));
+
+        event(new ExplorationLogUpdate($character->user->id, 'Exploration has been stopped at player request.'));
     }
 
     protected function startAutomation(Character $character, int $automationId, string $attackType) {

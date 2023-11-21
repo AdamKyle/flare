@@ -101,9 +101,9 @@ const guideQuestLabelBuilder = (
             return "Obtain Shards amount";
         case "required_gold_bars":
             return "Create Gold Bars amount";
-        case "be_on_game_map":
+        case "required_to_be_on_game_map_name":
             return "Physically be on Plane";
-        case "require_event_goal_participation":
+        case "required_event_goal_participation":
             return "Kill # of Event Creatures";
         default:
             return null;
@@ -180,6 +180,8 @@ const getRequirementKey = (labelKey: string): string => {
             return "required_passive_level";
         case "required_kingdom_building_id":
             return "required_kingdom_building_level";
+        case "required_to_be_on_game_map_name":
+            return "be_on_game_map";
         default:
             return labelKey;
     }

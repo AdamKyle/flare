@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('guide_quests', function (Blueprint $table) {
             $table->unsignedBigInteger('be_on_game_map')->nullable();
-            $table->bigInteger('require_event_goal_participation')->nullable();
+            $table->bigInteger('required_event_goal_participation')->nullable();
             $table->integer('required_holy_stacks')->nullable();
             $table->integer('required_attached_gems')->nullable();
         });

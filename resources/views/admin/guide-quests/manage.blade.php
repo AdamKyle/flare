@@ -165,8 +165,8 @@
                                 </div>
                                 <h3 class="mb-3">Event Goal Participation</h3>
                                 <x-core.forms.input :model="$guideQuest" label="Required Event Goal Kills:"
-                                   modelKey="require_event_goal_participation"
-                                   name="require_event_goal_participation" />
+                                   modelKey="required_event_goal_participation"
+                                   name="required_event_goal_participation" />
                             </div>
                         </div>
                     </x-core.form-wizard.content>
