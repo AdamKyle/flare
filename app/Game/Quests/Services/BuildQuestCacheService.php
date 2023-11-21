@@ -1,16 +1,18 @@
 <?php
 
-namespace App\Flare\Services;
+namespace App\Game\Quests\Services;
 
 use App\Flare\Models\Event;
-use Illuminate\Support\Facades\Cache;
 use App\Flare\Models\Quest;
 use App\Flare\Models\Raid;
 use App\Game\Events\Values\EventType;
+use App\Game\Quests\Events\UpdateQuests;
+use App\Game\Quests\Events\UpdateRaidQuests;
+use Illuminate\Support\Facades\Cache;
 
 class BuildQuestCacheService {
 
-    public function buildQuestCache(): void {
+    public function buildQuestCache(bool $sendOffEvent = false): void {
         $quests = Quest::where('is_parent', true)
             ->whereNull('only_for_event');
 
@@ -22,15 +24,21 @@ class BuildQuestCacheService {
             ->with('childQuests')
             ->get();
 
-        Cache::put('game-quests', $quests->toArray());
+        $quests = $quests->toArray();
+
+        Cache::put('game-quests', $quests);
+
+        if ($sendOffEvent) {
+            event(new UpdateQuests($quests));
+        }
     }
 
 
     protected function isWinterEventRunning(): bool {
-        return Event::where('type', EventType::WINTER_EVENT)->count();
+        return Event::where('type', EventType::WINTER_EVENT)->count() > 0;
     }
 
-    public function buildRaidQuestCache(): void {
+    public function buildRaidQuestCache(bool $sendOffEvent = false): void {
         $raids      = Raid::all();
         $raidQuests = [];
 
@@ -44,6 +52,10 @@ class BuildQuestCacheService {
         }
 
         Cache::put('raid-quests', $raidQuests);
+
+        if ($sendOffEvent) {
+            event(new UpdateRaidQuests($raidQuests));
+        }
     }
 
     public function getRegularQuests(): array|null {

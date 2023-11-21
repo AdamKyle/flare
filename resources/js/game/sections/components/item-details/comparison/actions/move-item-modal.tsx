@@ -83,7 +83,7 @@ export default class MoveItemModal extends React.Component<
                                 <strong>Rings</strong>: Max of 2
                             </li>
                             <li>
-                                <strong>Trinkets</strong>: Max of 2
+                                <strong>Trinkets</strong>: Max of 1
                             </li>
                             <li>
                                 <strong>Uniques (green items)</strong>: 1

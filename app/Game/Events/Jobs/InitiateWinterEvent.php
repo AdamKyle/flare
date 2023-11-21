@@ -2,19 +2,19 @@
 
 namespace App\Game\Events\Jobs;
 
-use Illuminate\Bus\Queueable;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Bus\Dispatchable;
-use App\Flare\Models\ScheduledEvent;
-use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Flare\Models\Event;
 use App\Flare\Models\GlobalEventGoal;
-use App\Flare\Services\BuildQuestCacheService;
+use App\Flare\Models\ScheduledEvent;
 use App\Game\Events\Values\EventType;
 use App\Game\Events\Values\GlobalEventForEventTypeValue;
+use App\Game\Messages\Events\GlobalMessageEvent;
+use App\Game\Quests\Services\BuildQuestCacheService;
 use Facades\App\Game\Core\Handlers\AnnouncementHandler;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 
 class InitiateWinterEvent implements ShouldQueue {
 
@@ -60,7 +60,7 @@ class InitiateWinterEvent implements ShouldQueue {
 
         AnnouncementHandler::createAnnouncement('winter_event');
 
-        $buildQuestCacheService->buildQuestCache();
+        $buildQuestCacheService->buildQuestCache(true);
 
         $this->kickOffGlobalEventGoal();
 
@@ -73,6 +73,5 @@ class InitiateWinterEvent implements ShouldQueue {
         GlobalEventGoal::create($globalEventGoalData);
 
         event(new GlobalMessageEvent('While on the The Ice Plane, characters who kill: ANY CREATURE in either manual or exploration, will increase the new: Global Event Goal. Players will be rewarded with random Corrupted Ice Gear when specific milestones are reached.'));
-
     }
 }

@@ -62,16 +62,17 @@ class InventorySetService {
      *
      * @param InventorySet $inventorySet
      * @param Item $item
+     * @param bool $ignoreInventoryLimit
      * @return array
      */
-    public function removeItemFromInventorySet(InventorySet $inventorySet, Item $item): array {
+    public function removeItemFromInventorySet(InventorySet $inventorySet, Item $item, bool $ignoreInventoryLimit = false): array {
         $slotWithItem = $inventorySet->slots->filter(function($slot) use ($item) {
             return $slot->item_id === $item->id;
         })->first();
 
         $character = $inventorySet->character;
 
-        if ($character->isInventoryFull()) {
+        if ($character->isInventoryFull() && !$ignoreInventoryLimit) {
             return $this->errorResult('Not enough inventory space to put this item back into your inventory.');
         }
 
@@ -388,7 +389,7 @@ class InventorySetService {
             return $slot->item->type === 'trinket';
         }));
 
-        if ($trinkets->count() > 2) {
+        if ($trinkets->count() > 1) {
             return false;
         }
 

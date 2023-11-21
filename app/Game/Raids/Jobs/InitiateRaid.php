@@ -2,6 +2,7 @@
 
 namespace App\Game\Raids\Jobs;
 
+use App\Game\Quests\Services\BuildQuestCacheService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
@@ -56,6 +57,7 @@ class InitiateRaid implements ShouldQueue {
         LocationService $locationService,
         EventSchedulerService $eventSchedulerService,
         UpdateRaidMonsters $updateRaidMonsters,
+        BuildQuestCacheService $buildQuestCacheService,
     ): void {
 
         $event = ScheduledEvent::find($this->eventId);
@@ -69,6 +71,8 @@ class InitiateRaid implements ShouldQueue {
             $raid = Raid::find($event->raid_id);
 
             $this->initializeRaid($raid, $locationService, $eventSchedulerService, $updateRaidMonsters);
+
+            $buildQuestCacheService->buildRaidQuestCache(true);
 
             return;
         }

@@ -75,6 +75,12 @@ export default class EquipModal extends React.Component<EquipModalProps, { }> {
                 }
 
                 {
+                    EquipPositions.isTrinket(this.props.item_to_equip.type) ?
+                        <p className='mt-3 mb-3'>Trinkets have their own dedicated slot. Players may only equip one trinket</p>
+                    : null
+                }
+
+                {
                     this.renderEquipButtons()
                 }
             </Dialogue>

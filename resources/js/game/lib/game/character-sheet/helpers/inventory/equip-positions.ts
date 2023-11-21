@@ -14,7 +14,6 @@ export abstract class EquipPositions {
             case 'spell-healing':
                 return ['spell-one','spell-two'];
             case 'trinket':
-                return ['trinket-one','trinket-two'];
             case 'armour':
             case 'artifact':
             default:
@@ -32,5 +31,9 @@ export abstract class EquipPositions {
 
     public static isArtifact(type: string): boolean {
         return type === 'artifact'
+    }
+
+    public static isTrinket(type: string): boolean {
+        return type === 'trinket';
     }
 }

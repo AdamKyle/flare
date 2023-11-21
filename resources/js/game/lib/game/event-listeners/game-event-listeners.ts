@@ -26,6 +26,8 @@ export default class GameEventListeners {
 
     private actionListeners?: GameListener;
 
+    private questListeners?: GameListener;
+
     constructor(@inject(CoreEventListener) private coreEventListener: CoreEventListener) {}
 
     public initialize(component: Game, userId: number): void {
@@ -37,6 +39,7 @@ export default class GameEventListeners {
         this.monsterListeners = serviceContainer().fetch<GameListener>(MonsterListeners);
         this.kingdomListener = serviceContainer().fetch<GameListener>(KingdomListeners);
         this.actionListeners = serviceContainer().fetch<GameListener>(ActionListeners);
+        this.questListeners = serviceContainer().fetch<GameListener>(ActionListeners);
     }
 
     public registerEvents(): void {
@@ -69,6 +72,11 @@ export default class GameEventListeners {
             this.actionListeners.initialize(this.component, this.userId);
             this.actionListeners.register();
         }
+
+        if (this.questListeners) {
+            this.questListeners.initialize(this.component, this.userId);
+            this.questListeners.register();
+        }
     }
 
     public listenToEvents(): void {
@@ -91,6 +99,10 @@ export default class GameEventListeners {
 
         if (this.actionListeners) {
             this.actionListeners.listen()
+        }
+
+        if (this.questListeners) {
+            this.questListeners.listen()
         }
     }
 }

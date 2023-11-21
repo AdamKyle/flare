@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Console\Commands;
+namespace App\Game\Quests\Console\Commands;
 
-use App\Flare\Services\BuildQuestCacheService;
+use App\Game\Quests\Services\BuildQuestCacheService;
 use Illuminate\Console\Command;
 
 class CreateQuestCache extends Command {
