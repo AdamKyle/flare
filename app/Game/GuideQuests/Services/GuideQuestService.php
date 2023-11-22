@@ -193,7 +193,10 @@ class GuideQuestService {
 
     protected function fetchNextRegularGuideQuest(Character $character): GuideQuest | null {
         $lastCompletedGuideQuest = $character->questsCompleted()
-            ->whereNotNull('guide_quest_id')
+            ->whereHas('guideQuest', function($query) {
+                $query->whereNull('only_during_event')
+                      ->whereNull('unlock_at_level');
+            })
             ->orderByDesc('guide_quest_id')
             ->first();
 
@@ -201,7 +204,10 @@ class GuideQuestService {
             return GuideQuest::first();
         }
 
-        $questId = GuideQuest::where('id', '>', $lastCompletedGuideQuest->guide_quest_id)->min('id');
+        $questId = GuideQuest::whereNull('only_during_event')
+            ->whereNull('unlock_at_level')
+            ->where('id', '>', $lastCompletedGuideQuest->guide_quest_id)
+            ->min('id');
 
         return GuideQuest::find($questId);
     }
@@ -222,21 +228,18 @@ class GuideQuestService {
             return $initialEventGuideQuest;
         }
 
-        $firstCompletedChildEventQuest = $character->questsCompleted()
-            ->join('guide_quests', function($join) use($initialEventGuideQuest) {
-                $join->on('guide_quests.id', 'quests_completed.guide_quest_id')
-                     ->where('parent_id', $initialEventGuideQuest->id);
+        $firstCompletedEventQuest = $character->questsCompleted()
+            ->whereHas('guideQuest', function($query) use($initialEventGuideQuest) {
+                $query->where('parent_id', $initialEventGuideQuest->id);
             })
             ->orderByDesc('guide_quest_id')
             ->first();
 
-        if (is_null($firstCompletedChildEventQuest)) {
+        if (is_null($firstCompletedEventQuest)) {
             return GuideQuest::where('parent_id', $initialEventGuideQuest->id)->orderBy('id')->first();
         }
 
-        $questId = GuideQuest::where('id', '>', $firstCompletedChildEventQuest->guide_quest_id)->where('parent_id', $initialEventGuideQuest->id)->min('id');
-
-        return GuideQuest::find($questId);
+        return GuideQuest::where('parent_id', $firstCompletedEventQuest->guide_quest_id)->first();
     }
 
     protected function requiredAttributeNames(GuideQuest $quest): array {

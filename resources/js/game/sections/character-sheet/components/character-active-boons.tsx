@@ -8,6 +8,9 @@ import Table from "../../../components/ui/data-tables/table";
 import {formatNumber} from "../../../lib/game/format-number";
 import InventoryUseDetails from "./modals/inventory-use-details";
 import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
+import DangerButton from "../../../components/ui/buttons/danger-button";
+import SuccessAlert from "../../../components/ui/alerts/simple-alerts/success-alert";
+import DangerAlert from "../../../components/ui/alerts/simple-alerts/danger-alert";
 
 export default class CharacterActiveBoons extends React.Component<any, any> {
 
@@ -20,6 +23,9 @@ export default class CharacterActiveBoons extends React.Component<any, any> {
             dark_tables: false,
             show_usable_details: false,
             item_to_use: null,
+            removing_boon: false,
+            error_message: null,
+            success_message: null,
         }
     }
 
@@ -34,7 +40,7 @@ export default class CharacterActiveBoons extends React.Component<any, any> {
                     boons: result.data.active_boons,
                 });
             }, (error: AxiosError) => {
-                console.error(error);;
+                console.error(error);
             })
         }
     }
@@ -44,6 +50,40 @@ export default class CharacterActiveBoons extends React.Component<any, any> {
             show_usable_details: !this.state.show_usable_details,
             item_to_use: typeof row !== 'undefined' ? row.boon_applied : null,
         });
+    }
+
+    removeBoon(boonId: number) {
+        this.setState({
+            removing_boon: true,
+            success_message: null,
+            error_message: null,
+        }, () => {
+            (new Ajax()).setRoute('character-sheet/'+this.props.character_id+'/remove-boon/' + boonId)
+                .doAjaxCall('post', (result: AxiosResponse) => {
+                    this.setState({
+                        removing_boon: false,
+                        boons: result.data.boons,
+                        success_message: result.data.message,
+                    })
+                }, (error: AxiosError) => {
+
+                    let message = 'UNKNOWN ERROR - CHECK CONSOLE!';
+
+                    if (error.response !== undefined) {
+                        const response: AxiosResponse = error.response;
+
+                        message = response.data.message;
+                    }
+
+                    this.setState({
+                        removing_boon: false,
+                        error_message: message,
+                    });
+
+                    console.error(error.response);
+                });
+        });
+
     }
 
     buildColumns() {
@@ -64,6 +104,15 @@ export default class CharacterActiveBoons extends React.Component<any, any> {
                 cell: (row: { started: string; complete: string }) => <span
                     key={row.started + '-' + (Math.random() + 1).toString(36).substring(7)}>
                     {this.getLabel(row.started, row.complete)}
+                </span>
+            },
+            {
+                name: 'Actions',
+                selector: (row: { id: number; boon_applied: { id: number; } }) => row.boon_applied.id,
+                sortable: true,
+                cell: (row: { id: number; boon_applied: { id: number; }}) => <span
+                    key={row.boon_applied.id + '-' + (Math.random() + 1).toString(36).substring(7)}>
+                    <DangerButton button_label={'Remove Boon'} on_click={() => this.removeBoon(row.id)} />
                 </span>
             },
         ]
@@ -96,7 +145,7 @@ export default class CharacterActiveBoons extends React.Component<any, any> {
                 <LoadingProgressBar />
             )
         }
-        
+
         return (
             <Fragment>
 
@@ -106,6 +155,25 @@ export default class CharacterActiveBoons extends React.Component<any, any> {
                             <InfoAlert>
                                 This tab does not update in real time. You can switch tabs to get the latest data.
                             </InfoAlert>
+                        : null
+                    }
+                    {
+                        this.state.removing_boon ?
+                            <LoadingProgressBar />
+                        : null
+                    }
+                    {
+                        this.state.success_message !== null ?
+                            <SuccessAlert additional_css={'my-4'}>
+                                <p>{this.state.success_message}</p>
+                            </SuccessAlert>
+                        : null
+                    }
+                    {
+                        this.state.error_message !== null ?
+                            <DangerAlert additional_css={'my-4'}>
+                                <p>{this.state.error_message}</p>
+                            </DangerAlert>
                         : null
                     }
                     <p className='my-4 text-center'>

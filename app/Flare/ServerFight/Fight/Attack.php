@@ -140,7 +140,7 @@ class Attack {
             $this->mergeBattleMessages($this->monsterAttack->getMessages());
 
             $this->characterHealth = $this->monsterAttack->getCharacterHealth();
-            $this->monsterHealth   = $this->getMonsterHealth();
+            $this->monsterHealth   = $this->monsterAttack->getMonsterHealth();
 
             if ($this->monsterHealth > $serverMonster->getHealth()) {
                 $this->monsterHealth = $serverMonster->getHealth();

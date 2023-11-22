@@ -3,6 +3,7 @@
 namespace App\Game\Core\Controllers\Api;
 
 use App\Flare\Models\User;
+use App\Game\CharacterInventory\Services\UseItemService;
 use League\Fractal\Manager;
 use Illuminate\Http\Request;
 use App\Flare\Models\Character;
@@ -14,7 +15,6 @@ use League\Fractal\Resource\Collection;
 use App\Game\Core\Jobs\EndGlobalTimeOut;
 use App\Admin\Events\UpdateAdminChatEvent;
 use App\Flare\Transformers\CharacterElementalAtonementTransformer;
-use App\Game\Core\Services\UseItemService;
 use App\Flare\Transformers\SkillsTransformer;
 use App\Flare\Transformers\UsableItemTransformer;
 use App\Game\Core\Services\CharacterPassiveSkills;
@@ -195,13 +195,29 @@ class CharacterSheetController extends Controller {
         ], 200);
     }
 
-    public function cancelBoon(Character $character, CharacterBoon $boon, UseItemService $useItemService) {
+    public function cancelBoon(Character $character, CharacterBoon $boon, UseItemService $useItemService, UsableItemTransformer $usableItemTransformer,  Manager $manager) {
         if ($character->id !== $boon->character_id) {
             return response()->json(['message' => 'You cannot do that.'], 422);
         }
 
         $useItemService->removeBoon($character, $boon);
 
-        return response()->json(['message' => 'Boon has been deleted'], 200);
+        $character = $character->refresh();
+
+        $characterBoons = $character->boons->load('itemUsed');
+
+        $characterBoons = $characterBoons->transform(function($boon) use($usableItemTransformer, $manager) {
+            $item = new Item($boon->itemUsed, $usableItemTransformer);
+            $item = (new Manager())->createData($item)->toArray();
+
+            $item         = $item['data'];
+            $item['name'] = $boon->itemUsed->name;
+
+            $boon->boon_applied = $item;
+
+            return $boon;
+        });
+
+        return response()->json(['message' => 'Boon has been deleted', 'boons' => $characterBoons], 200);
     }
 }
