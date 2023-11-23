@@ -28,11 +28,7 @@ export default class Quests extends React.Component<QuestsProps, QuestState> {
         });
     }
 
-    componentDidUpdate(
-        prevProps: Readonly<QuestsProps>,
-        prevState: Readonly<QuestState>,
-        snapshot?: any
-    ) {
+    componentDidUpdate() {
         if (
             !isEqual(
                 this.props.quest_details.completed_quests,
@@ -42,6 +38,18 @@ export default class Quests extends React.Component<QuestsProps, QuestState> {
             this.setState({
                 completed_quests: this.props.quest_details.completed_quests,
             });
+        }
+
+        if (!isEqual(this.props.quest_details.quests, this.state.quests)) {
+            this.setState({
+                quests: this.props.quest_details.quests,
+            })
+        }
+
+        if (!isEqual(this.props.quest_details.raid_quests, this.state.raid_quests)) {
+            this.setState({
+                quests: this.props.quest_details.raid_quests,
+            })
         }
     }
 

@@ -8,6 +8,7 @@ use App\Flare\Models\Location;
 use App\Flare\Models\Character;
 use App\Game\Events\Values\EventType;
 use App\Game\Exploration\Services\ExplorationAutomationService;
+use App\Game\Quests\Services\BuildQuestCacheService;
 use Illuminate\Console\Command;
 use App\Flare\Models\Announcement;
 use App\Flare\Models\ScheduledEvent;
@@ -26,6 +27,7 @@ use App\Game\Messages\Events\DeleteAnnouncementEvent;
 use App\Game\Messages\Events\GlobalMessageEvent;
 
 class EndScheduledEvent extends Command {
+
     /**
      * The name and signature of the console command.
      *
@@ -55,6 +57,7 @@ class EndScheduledEvent extends Command {
         KingdomEventService $kingdomEventService,
         TraverseService $traverseService,
         ExplorationAutomationService $explorationAutomationService,
+        BuildQuestCacheService $buildQuestCacheService
     ) {
         $this->endScheduledEvent(
             $locationService,
@@ -63,6 +66,7 @@ class EndScheduledEvent extends Command {
             $kingdomEventService,
             $traverseService,
             $explorationAutomationService,
+            $buildQuestCacheService
         );
     }
 
@@ -85,6 +89,7 @@ class EndScheduledEvent extends Command {
         KingdomEventService $kingdomEventService,
         TraverseService $traverseService,
         ExplorationAutomationService $explorationAutomationService,
+        BuildQuestCacheService $buildQuestCacheService
     ): void {
 
         $scheduledEvents = ScheduledEvent::where('end_date', '<=', now())->get();
@@ -101,6 +106,8 @@ class EndScheduledEvent extends Command {
             if ($eventType->isRaidEvent()) {
 
                 $this->endRaid($event, $locationService, $updateRaidMonsters);
+
+                $buildQuestCacheService->buildRaidQuestCache(true);
 
                 $event->update([
                     'currently_running' => false,
@@ -139,6 +146,9 @@ class EndScheduledEvent extends Command {
 
             if ($eventType->isWinterEvent()) {
                 $this->endWinterEvent($kingdomEventService, $traverseService, $explorationAutomationService);
+
+                $buildQuestCacheService->buildQuestCache(true);
+                $buildQuestCacheService->buildRaidQuestCache(true);
 
                 $event->update([
                     'currently_running' => false,

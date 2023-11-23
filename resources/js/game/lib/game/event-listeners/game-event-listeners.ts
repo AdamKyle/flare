@@ -8,6 +8,7 @@ import CharacterListeners from "./game/character-listeners";
 import MonsterListeners from "./game/monster-listeners";
 import KingdomListeners from "./game/kingdom-listeners";
 import ActionListeners from "./game/action-listeners";
+import QuestListeners from "./game/quest-listeners";
 
 @singleton()
 export default class GameEventListeners {
@@ -39,7 +40,7 @@ export default class GameEventListeners {
         this.monsterListeners = serviceContainer().fetch<GameListener>(MonsterListeners);
         this.kingdomListener = serviceContainer().fetch<GameListener>(KingdomListeners);
         this.actionListeners = serviceContainer().fetch<GameListener>(ActionListeners);
-        this.questListeners = serviceContainer().fetch<GameListener>(ActionListeners);
+        this.questListeners = serviceContainer().fetch<GameListener>(QuestListeners);
     }
 
     public registerEvents(): void {

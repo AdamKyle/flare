@@ -26,9 +26,9 @@ export default class QuestListeners implements GameListener {
         try {
             const echo = this.coreEventListener.getEcho();
 
-            this.questUpdate = echo.private("update-quests");
+            this.questUpdate = echo.join("update-quests");
 
-            this.raidQuestUpdate = echo.private("update-raid-quests");
+            this.raidQuestUpdate = echo.join("update-raid-quests");
         } catch (e: any|unknown) {
             throw new Error(e);
         }
@@ -52,7 +52,6 @@ export default class QuestListeners implements GameListener {
         this.questUpdate.listen(
             "Game.Quests.Events.UpdateQuests",
             (event: any) => {
-
                 if (!this.component) {
                     return;
                 }
@@ -64,6 +63,8 @@ export default class QuestListeners implements GameListener {
                 if (quests === null) {
                     return;
                 }
+
+                console.log('Hello?');
 
                 quests.quests = event.quests;
 
