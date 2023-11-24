@@ -9,6 +9,7 @@ use App\Flare\ServerFight\Fight\CanHit;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks;
 use App\Flare\ServerFight\Fight\Entrance;
 use App\Flare\ServerFight\Monster\ServerMonster;
+use App\Flare\Values\WeaponTypes;
 
 class WeaponType extends BattleBase {
 
@@ -17,6 +18,8 @@ class WeaponType extends BattleBase {
     private CanHit $canHit;
 
     private SpecialAttacks $specialAttacks;
+
+    private bool $canEntrance = false;
 
     public function __construct(CharacterCacheData $characterCacheData, Entrance $entrance, CanHit $canHit, SpecialAttacks $specialAttacks) {
         parent::__construct($characterCacheData);
@@ -30,6 +33,12 @@ class WeaponType extends BattleBase {
 
         $this->attackData = $this->characterCacheData->getDataFromAttackCache($character, $isVoided ? 'voided_attack' : 'attack');
         $this->isVoided   = $isVoided;
+
+        return $this;
+    }
+
+    public function setAllowEntrancing(bool $allowEntrance): WeaponType {
+        $this->canEntrance = $allowEntrance;
 
         return $this;
     }
@@ -78,8 +87,19 @@ class WeaponType extends BattleBase {
     public function doWeaponAttack(Character $character, ServerMonster $serverMonster): WeaponType {
         $weaponDamage = $this->attackData['weapon_damage'];
 
+        if (!$this->isEnemyEntranced && $this->canEntrance) {
+            $this->doEnemyEntrance($character, $serverMonster, $this->entrance);
+        }
+
         if ($this->isEnemyEntranced) {
             $this->weaponAttack($character, $serverMonster, $weaponDamage);
+
+            if ($this->allowSecondaryAttacks && !$this->abortCharacterIsDead) {
+                $this->secondaryAttack($character, $serverMonster);
+
+                $this->elementalAttack($character, $serverMonster);
+            }
+
             return $this;
         }
 
@@ -87,6 +107,12 @@ class WeaponType extends BattleBase {
             $this->addMessage('You dance along in the shadows, the enemy doesn\'t see you. Strike now!', 'regular');
 
             $this->weaponAttack($character, $serverMonster, $weaponDamage);
+
+            if ($this->allowSecondaryAttacks  && !$this->abortCharacterIsDead) {
+                $this->secondaryAttack($character, $serverMonster);
+
+                $this->elementalAttack($character, $serverMonster);
+            }
 
             return $this;
         }
@@ -101,7 +127,7 @@ class WeaponType extends BattleBase {
         } else {
             $this->addMessage('Your attack missed!', 'enemy-action');
 
-            if ($this->allowSecondaryAttacks) {
+            if ($this->allowSecondaryAttacks  && !$this->abortCharacterIsDead) {
                 $this->secondaryAttack($character, $serverMonster);
 
                 $this->elementalAttack($character, $serverMonster);

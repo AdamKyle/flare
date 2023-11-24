@@ -16,4 +16,5 @@ export default interface RaidSelectionState {
     open_elemental_atonement: boolean;
     elemental_atonement: ElementalAtonement | object;
     highest_element: string | null;
+    update_raid_fight: boolean;
 }

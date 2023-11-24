@@ -65,6 +65,7 @@ class BattleEventHandler {
      */
     public function processMonsterDeath(int $characterId, int $monsterId): void {
         $monster   = Monster::find($monsterId);
+
         $character = Character::find($characterId);
 
         if (is_null($monster)) {

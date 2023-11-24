@@ -64,9 +64,8 @@ export default class QuestListeners implements GameListener {
                     return;
                 }
 
-                console.log('Hello?');
-
-                quests.quests = event.quests;
+                quests.quests          = event.quests;
+                quests.is_winter_event = event.isWinterEvent;
 
                 this.component.setState({
                     quests: quests,
@@ -102,7 +101,7 @@ export default class QuestListeners implements GameListener {
                     return;
                 }
 
-                quests.raid_quests = event.raidQuests;
+                quests.raid_quests     = event.raidQuests;
 
                 this.component.setState({
                     quests: quests,

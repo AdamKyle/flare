@@ -39,18 +39,6 @@ export default class Quests extends React.Component<QuestsProps, QuestState> {
                 completed_quests: this.props.quest_details.completed_quests,
             });
         }
-
-        if (!isEqual(this.props.quest_details.quests, this.state.quests)) {
-            this.setState({
-                quests: this.props.quest_details.quests,
-            })
-        }
-
-        if (!isEqual(this.props.quest_details.raid_quests, this.state.raid_quests)) {
-            this.setState({
-                quests: this.props.quest_details.raid_quests,
-            })
-        }
     }
 
     setPlaneForQuests(plane: string) {

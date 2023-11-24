@@ -50,15 +50,17 @@ export default class RaidFight extends React.Component<RaidFightProps, RaidFight
                 this.props.reset_revived();
             });
         }
-    }
 
-    attackButtonDisabled(): boolean {
-        return this.props.monster_current_health <= 0 || 
-               this.props.character_current_health <= 0 || 
-               this.props.is_dead || 
-               !this.props.can_attack || 
-               this.props.monster_id === 0 || 
-               this.state.is_attacking;
+        if (this.props.update_raid_fight) {
+            this.setState({
+                character_current_health: this.props.character_current_health,
+                monster_current_health: this.props.monster_current_health,
+                attacks_left: this.props.initial_attacks_left,
+                battle_messages: [],
+            }, () => {
+                this.props.reset_update();
+            });
+        }
     }
 
     attack(type: string): void {
@@ -90,7 +92,7 @@ export default class RaidFight extends React.Component<RaidFightProps, RaidFight
             });
         });
     }
-    
+
     canAttack(): boolean {
         if (this.props.is_raid_boss && this.state.attacks_left <= 0 && !this.props.is_dead) {
             return false;
@@ -126,7 +128,7 @@ export default class RaidFight extends React.Component<RaidFightProps, RaidFight
                     </div>
                 </div>
 
-                <ServerFight 
+                <ServerFight
                     monster_health={this.state.monster_current_health}
                     character_health={this.state.character_current_health}
                     monster_max_health={this.props.monster_max_health}

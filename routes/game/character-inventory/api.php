@@ -14,6 +14,7 @@ Route::group(['middleware' => ['is.character.dead']], function () {
     Route::middleware(['is.character.exploring'])->group(function () {
 
         Route::post('/character/{character}/inventory/equip-item', ['uses' => 'Api\CharacterInventoryController@equipItem']);
+        Route::post('/character/{character}/inventory/equip-best-in-slot', ['uses' => 'Api\CharacterInventoryController@equipBestInSlot']);
         Route::post('/character/{character}/inventory/save-equipped-as-set', ['uses' => 'Api\CharacterInventoryController@saveEquippedAsSet']);
         Route::post('/character/{character}/inventory/unequip', ['uses' => 'Api\CharacterInventoryController@unequipItem']);
         Route::post('/character/{character}/inventory/unequip-all', ['uses' => 'Api\CharacterInventoryController@unequipAll']);

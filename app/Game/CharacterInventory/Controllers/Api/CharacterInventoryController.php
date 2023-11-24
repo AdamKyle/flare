@@ -2,6 +2,7 @@
 
 namespace App\Game\CharacterInventory\Controllers\Api;
 
+use App\Game\CharacterInventory\Services\EquipBestItemForSlotsTypesService;
 use Exception;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item as FractalItem;
@@ -464,6 +465,34 @@ class  CharacterInventoryController extends Controller {
                     'sets'      => $characterInventoryService->getCharacterInventorySets(),
                 ],
                 'message'       => 'Equipped item.'
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage()
+            ], 422);
+        }
+    }
+
+    public function equipBestInSlot(Character $character, EquipBestItemForSlotsTypesService $equipBestItemForSlotsTypesService): JsonResponse {
+        try {
+
+            $changedEquipment = $equipBestItemForSlotsTypesService->compareAndEquipBestItems($character);
+
+            $character = $character->refresh();
+
+            $this->updateCharacterAttackDataCache($character);
+
+            $characterInventoryService = $this->characterInventoryService->setCharacter($character);
+
+            $message = $changedEquipment ? 'Equipped or Replaced equipped items with the best in slot items!' : 'You currently have the best items equipped!';
+
+            return response()->json([
+                'inventory' => [
+                    'inventory' => $characterInventoryService->fetchCharacterInventory(),
+                    'equipped'  => $characterInventoryService->fetchEquipped(),
+                    'sets'      => $characterInventoryService->getCharacterInventorySets(),
+                ],
+                'message'       => $message
             ]);
         } catch (Exception $e) {
             return response()->json([

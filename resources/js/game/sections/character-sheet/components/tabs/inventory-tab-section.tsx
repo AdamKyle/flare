@@ -12,6 +12,7 @@ import clsx from "clsx";
 import UsableItemsDetails from "../../../../lib/game/character-sheet/types/inventory/usable-items-details";
 import InventoryUseManyItems from "../modals/inventory-use-many-items";
 import { GemBagTable } from "./inventory-tabs/gem-bag-table";
+import OrangeButton from "../../../../components/ui/buttons/orange-button";
 
 export default class InventoryTabSection extends React.Component<
     InventoryTabSectionProps,
@@ -29,16 +30,13 @@ export default class InventoryTabSection extends React.Component<
             show_sell_all: false,
             show_use_many: false,
             show_destroy_all_alchemy: false,
+            show_equip_best: false,
             success_message: null,
             search_string: "",
         };
     }
 
-    componentDidUpdate(
-        prevProps: Readonly<any>,
-        prevState: Readonly<any>,
-        snapshot?: any
-    ) {
+    componentDidUpdate() {
         if (
             !isEqual(this.state.data, this.props.inventory) &&
             this.state.search_string.length === 0
@@ -105,6 +103,13 @@ export default class InventoryTabSection extends React.Component<
             });
         }
     }
+
+    handleEquipBest() {
+        this.setState({
+            show_equip_best: !this.state.show_equip_best,
+        })
+    }
+
 
     manageDisenchantAll() {
         this.setState({
@@ -288,6 +293,9 @@ export default class InventoryTabSection extends React.Component<
                             disabled={this.props.is_dead}
                         />
                     </div>
+                    <div className={"ml-2"}>
+                        <OrangeButton button_label={'Equip Best'} on_click={this.handleEquipBest.bind(this)} />
+                    </div>
                     <div className="sm:ml-4 md:ml-0 my-4 md:my-0 md:absolute md:right-[10px]">
                         <input
                             type="text"
@@ -444,6 +452,37 @@ export default class InventoryTabSection extends React.Component<
                             It is highly recommended you use the market place to
                             sell anything beyond shop gear to make your money
                             back.
+                        </p>
+                    </InventoryActionConfirmationModal>
+                ) : null}
+
+                {this.state.show_equip_best ? (
+                    <InventoryActionConfirmationModal
+                        is_open={this.state.show_equip_best}
+                        manage_modal={this.manageSellAll.bind(this)}
+                        title={"Equip best in slot"}
+                        url={
+                            "character/" +
+                            this.props.character_id +
+                            "/inventory/equip-best-in-slot"
+                        }
+                        update_inventory={this.props.update_inventory}
+                        set_success_message={this.setSuccessMessage.bind(this)}
+                    >
+                        <p>
+                            This will compare all items you currently have in your inventory against each other based on
+                            equip types. From here, if we have anything, we then compare to what you have equipped.
+                        </p>
+                        <p className="mt-2">
+                            If we have anything to equip, we equip it. If you have nothing equipped, what ever we found that
+                            would be considered "the best of your inventory" will be equipped.
+                        </p>
+                        <p className="mt-2">
+                            Items in sets can also be replaced this way assuming you have the set equipped and you have the inventory
+                            space for when we replace items.
+                        </p>
+                        <p className="mt-2">
+                            Equip best in slot, will follow all set and equipment rules.
                         </p>
                     </InventoryActionConfirmationModal>
                 ) : null}

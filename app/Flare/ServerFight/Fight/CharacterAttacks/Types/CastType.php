@@ -19,6 +19,8 @@ class CastType extends BattleBase
 
     private SpecialAttacks $specialAttacks;
 
+    private bool $allowEntrancing = false;
+
     public function __construct(CharacterCacheData $characterCacheData, Entrance $entrance, CanHit $canHit, SpecialAttacks $specialAttacks) {
         parent::__construct($characterCacheData);
 
@@ -40,6 +42,12 @@ class CastType extends BattleBase
 
         $this->attackData = $this->characterCacheData->getDataFromAttackCache($character, $isVoided ? 'voided_cast_and_attack' : 'cast_and_attack');
         $this->isVoided = $isVoided;
+
+        return $this;
+    }
+
+    public function setAllowEntrancing(bool $allow): CastType {
+        $this->allowEntrancing = $allow;
 
         return $this;
     }
@@ -120,20 +128,22 @@ class CastType extends BattleBase
                 $this->elementalAttack($character, $monster);
             }
 
-            return;
+            return $this;
         }
 
-        if (!$this->isEnemyEntranced) {
+        if (!$this->isEnemyEntranced && $this->allowEntrancing) {
+            $this->doEnemyEntrance($character, $monster, $this->entrance);
+        }
 
-            //$this->doEnemyEntrance($character, $monster, $this->entrance);
+        if ($this->isEnemyEntranced) {
+            $this->doSpellDamage($character, $monster, $spellDamage, true);
 
-            if ($this->isEnemyEntranced) {
-                $this->doSpellDamage($character, $monster, $spellDamage, true);
-                return $this;
+            if ($this->allowSecondaryAttacks) {
+                $this->secondaryAttack($character, $monster);
+
+                $this->elementalAttack($character, $monster);
             }
 
-        } else if ($this->isEnemyEntranced) {
-            $this->doSpellDamage($character, $monster, $spellDamage, true);
             return $this;
         }
 
@@ -141,6 +151,12 @@ class CastType extends BattleBase
             $this->addMessage('You dance along in the shadows, the enemy doesn\'t see you. Strike now!', 'regular');
 
             $this->doSpellDamage($character, $monster, $spellDamage, true);
+
+            if ($this->allowSecondaryAttacks) {
+                $this->secondaryAttack($character, $monster);
+
+                $this->elementalAttack($character, $monster);
+            }
 
             return $this;
         }

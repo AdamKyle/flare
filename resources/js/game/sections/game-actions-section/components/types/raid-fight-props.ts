@@ -18,4 +18,6 @@ export default interface RaidFightProps {
     initial_attacks_left: number;
     is_raid_boss: boolean;
     manage_elemental_atonement_modal: () => void;
+    update_raid_fight: boolean;
+    reset_update: () => void;
 }

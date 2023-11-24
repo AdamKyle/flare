@@ -49,6 +49,7 @@ class CharacterAttack {
         $this->weaponType->setCharacterHealth($characterHealth);
         $this->weaponType->setMonsterHealth($monsterHealth);
         $this->weaponType->setCharacterAttackData($character, $isPlayerVoided);
+        $this->weaponType->setAllowEntrancing(true);
         $this->weaponType->doWeaponAttack($character, $monster);
 
         $this->type = $this->weaponType;

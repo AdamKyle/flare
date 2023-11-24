@@ -2,11 +2,12 @@
 
 namespace App\Game\Quests\Events;
 
+use App\Flare\Models\Event;
 use App\Flare\Models\User;
+use App\Game\Events\Values\EventType;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
-use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
@@ -16,11 +17,15 @@ class UpdateQuests implements ShouldBroadcastNow {
 
     public array $quests;
 
+    public bool $isWinterEvent;
+
     /**
      * Constructor
      */
     public function __construct(array $quests) {
         $this->quests = $quests;
+
+        $this->isWinterEvent = Event::where('type', EventType::WINTER_EVENT)->count() > 0;
     }
 
     /**

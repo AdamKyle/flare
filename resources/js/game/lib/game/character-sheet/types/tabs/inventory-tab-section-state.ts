@@ -18,6 +18,8 @@ export default interface InventoryTabSectionState {
 
     show_use_many: boolean;
 
+    show_equip_best: boolean;
+
     success_message: string | null;
 
     search_string: string;

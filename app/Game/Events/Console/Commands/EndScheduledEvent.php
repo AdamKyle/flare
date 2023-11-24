@@ -267,6 +267,10 @@ class EndScheduledEvent extends Command {
                                       ExplorationAutomationService $explorationAutomationService) {
         $event = Event::where('type', EventType::WINTER_EVENT)->first();
 
+        if (is_null($event)) {
+            return;
+        }
+
         $kingdomEventService->handleKingdomRewardsForEvent(MapNameValue::ICE_PLANE);
 
         $gameMap    = GameMap::where('name', MapNameValue::ICE_PLANE)->first();

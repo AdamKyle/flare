@@ -128,7 +128,7 @@ class BattleBase extends BattleMessages {
         $elementalAttack->setCharacterHealth($this->characterHealth);
 
         $characterElementalData = $this->characterCacheData->getCachedCharacterData($character, 'elemental_atonement')['elemental_data'];
-        
+
         $weaponDamage           = $this->characterCacheData->getCachedCharacterData($character, 'weapon_attack');
 
         $elementalAttack->doElementalAttack($monster->getElementData(), $characterElementalData, $weaponDamage);
@@ -164,7 +164,7 @@ class BattleBase extends BattleMessages {
         if ($this->getMonsterHealth() < 0) {
             return;
         }
-        
+
         $counter = resolve(Counter::class);
 
         $counter->setCharacterHealth($this->characterHealth);

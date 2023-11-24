@@ -6,6 +6,7 @@ use App\Flare\Models\Monster;
 use App\Flare\Models\RaidBoss;
 use App\Flare\Models\Character;
 use App\Flare\Models\RaidBossParticipation;
+use App\Game\Battle\Events\AttackTimeOutEvent;
 use App\Game\Battle\Request\AttackTypeRequest;
 use App\Game\Battle\Services\Concerns\HandleCachedRaidCritterHealth;
 use Illuminate\Http\JsonResponse;
@@ -79,11 +80,15 @@ class RaidBattleController extends Controller {
     public function fightMonster(AttackTypeRequest $attackTypeRequest, Character $character, Monster $monster): JsonResponse {
 
         if ($monster->is_raid_monster) {
-            $result = $this->raidBattleService->fightRaidMonster($character, $monster->id, $attackTypeRequest->attack_type, false);
+            $result = $this->raidBattleService->fightRaidMonster($character, $monster->id, $attackTypeRequest->attack_type);
 
             $status = $result['status'];
 
             unset($result['status']);
+
+            if ($result['monster_current_health'] <= 0) {
+                event(new AttackTimeOutEvent($character));
+            }
 
             return response()->json($result, $status);
         }
@@ -110,6 +115,10 @@ class RaidBattleController extends Controller {
         $status = $result['status'];
 
         unset($result['status']);
+
+        if ($result['monster_current_health'] <= 0) {
+            event(new AttackTimeOutEvent($character));
+        }
 
         return response()->json($result, $status);
     }

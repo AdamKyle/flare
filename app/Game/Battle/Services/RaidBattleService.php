@@ -16,6 +16,7 @@ use App\Game\Battle\Events\UpdateRaidAttacksLeft;
 use App\Game\Battle\Events\UpdateRaidBossHealth;
 use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Battle\Services\Concerns\HandleCachedRaidCritterHealth;
+use App\Game\BattleRewardProcessing\Jobs\BattleAttackHandler;
 use App\Game\BattleRewardProcessing\Jobs\RaidBossRewardHandler;
 use App\Game\Core\Traits\ResponseBuilder;
 use Exception;
@@ -233,6 +234,8 @@ class RaidBattleService {
             $resultData['monster_current_health'] = 0;
 
             $this->deleteMonsterCacheHealth($character->id, $monsterId);
+
+            BattleAttackHandler::dispatch($character->id, $monsterId);
 
             return $this->successResult($resultData);
         }

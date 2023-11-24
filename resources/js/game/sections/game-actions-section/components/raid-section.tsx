@@ -36,6 +36,7 @@ export default class RaidSection extends React.Component<
             open_elemental_atonement: false,
             elemental_atonement: {},
             highest_element: null,
+            update_raid_fight: false,
         };
 
         // @ts-ignore
@@ -196,6 +197,7 @@ export default class RaidSection extends React.Component<
                                 elemental_atonement:
                                     result.data.elemental_atonemnt,
                                 highest_element: result.data.highest_element,
+                                update_raid_fight: true,
                             });
                         },
                         (error: AxiosError) => {
@@ -208,6 +210,12 @@ export default class RaidSection extends React.Component<
                     );
             }
         );
+    }
+
+    resetUpdate(): void {
+        this.setState({
+            update_raid_fight: false,
+        })
     }
 
     fetchRaidMonsterName(): string {
@@ -334,6 +342,8 @@ export default class RaidSection extends React.Component<
                         manage_elemental_atonement_modal={this.manageAtonementModal.bind(
                             this
                         )}
+                        update_raid_fight={this.state.update_raid_fight}
+                        reset_update={this.resetUpdate.bind(this)}
                     />
                 ) : null}
 
