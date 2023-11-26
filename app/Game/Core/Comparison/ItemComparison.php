@@ -128,16 +128,7 @@ class ItemComparison {
         return $toCompare->counter_resistance - $equipped->counter_resistance;
     }
 
-    protected function fetchHandComparison(Item $toCompare, Collection $inventorySlots, string $hand): array {
-
-        $foundPosition = $inventorySlots->filter(function($slot) use ($hand) {
-            return $slot->position === $hand;
-        })->first();
-
-        if (is_null($foundPosition)) {
-            return [];
-        }
-
+    public function fetchItemComparisonDetails(Item $firstItem, Item $compareAgainst): array {
         $adjustments = [
             'damage_adjustment',
             'base_damage_adjustment',
@@ -168,26 +159,39 @@ class ItemComparison {
             $parts = explode('_', $adjustmentType);
 
             if (in_array($parts[0], $this->coreStats)) {
-                $adjustment = $this->getStatAdjustment($toCompare, $foundPosition->item, $parts[0]);
+                $adjustment = $this->getStatAdjustment($firstItem, $compareAgainst, $parts[0]);
 
                 $result[$adjustmentType] = $adjustment;
             } else {
                 $function   = 'get' . ucfirst(camel_case($adjustmentType));
 
-                $adjustment = $this->{$function}($toCompare, $foundPosition->item);
+                $adjustment = $this->{$function}($firstItem, $compareAgainst);
 
                 $result[$adjustmentType] = $adjustment;
             }
         }
 
-        $result = $this->getAffixComparisons($toCompare, $foundPosition->item, $result);
+        $result = $this->getAffixComparisons($firstItem, $compareAgainst, $result);
 
         if (!empty($result)) {
-            $result['name']   = $foundPosition->item->affix_name;
-            $result['skills'] = $this->addSkillComparison($toCompare, $foundPosition->item, $result);
+            $result['name']   = $compareAgainst->affix_name;
+            $result['skills'] = $this->addSkillComparison($firstItem, $compareAgainst, $result);
         }
 
         return $result;
+    }
+
+    protected function fetchHandComparison(Item $toCompare, Collection $inventorySlots, string $hand): array {
+
+        $foundPosition = $inventorySlots->filter(function($slot) use ($hand) {
+            return $slot->position === $hand;
+        })->first();
+
+        if (is_null($foundPosition)) {
+            return [];
+        }
+
+        return $this->fetchItemComparisonDetails($toCompare, $foundPosition->item);
     }
 
     /**

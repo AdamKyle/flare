@@ -495,6 +495,7 @@ class  CharacterInventoryController extends Controller {
                 'message'       => $message
             ]);
         } catch (Exception $e) {
+            dump($e->getTrace());
             return response()->json([
                 'message' => $e->getMessage()
             ], 422);

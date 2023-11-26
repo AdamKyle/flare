@@ -2,6 +2,9 @@
 
 namespace App\Game\CharacterInventory\Providers;
 
+use App\Game\CharacterInventory\AutoEquipHandlers\HandPositionsFromInventory;
+use App\Game\CharacterInventory\Services\EquipBestItemForSlotsTypesService;
+use App\Game\Core\Comparison\ItemComparison;
 use League\Fractal\Manager;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use App\Flare\Transformers\CharacterAttackTransformer;
@@ -20,7 +23,7 @@ use App\Game\Skills\Services\MassDisenchantService;
 use App\Game\Skills\Services\UpdateCharacterSkillsService;
 
 class ServiceProvider extends ApplicationServiceProvider {
-    
+
     /**
      * Register any application services.
      *
@@ -58,6 +61,13 @@ class ServiceProvider extends ApplicationServiceProvider {
             return new UseItemService(
                 $app->make(Manager::class),
                 $app->make(CharacterSheetBaseInfoTransformer::class),
+            );
+        });
+
+        $this->app->bind(EquipBestItemForSlotsTypesService::class, function( $app) {
+            return new EquipBestItemForSlotsTypesService(
+                $app->make(EquipItemService::class),
+                $app->make(ItemComparison::class)
             );
         });
 

@@ -13,6 +13,7 @@ import UsableItemsDetails from "../../../../lib/game/character-sheet/types/inven
 import InventoryUseManyItems from "../modals/inventory-use-many-items";
 import { GemBagTable } from "./inventory-tabs/gem-bag-table";
 import OrangeButton from "../../../../components/ui/buttons/orange-button";
+import WarningAlert from "../../../../components/ui/alerts/simple-alerts/warning-alert";
 
 export default class InventoryTabSection extends React.Component<
     InventoryTabSectionProps,
@@ -459,7 +460,7 @@ export default class InventoryTabSection extends React.Component<
                 {this.state.show_equip_best ? (
                     <InventoryActionConfirmationModal
                         is_open={this.state.show_equip_best}
-                        manage_modal={this.manageSellAll.bind(this)}
+                        manage_modal={this.handleEquipBest.bind(this)}
                         title={"Equip best in slot"}
                         url={
                             "character/" +
@@ -469,6 +470,23 @@ export default class InventoryTabSection extends React.Component<
                         update_inventory={this.props.update_inventory}
                         set_success_message={this.setSuccessMessage.bind(this)}
                     >
+                        <WarningAlert additional_css={'my-4'}>
+                            <p className={'mb-4'}>
+                                This is a highly experimental feature which might break or give unexpected results
+                            </p>
+                            <p className={'mb-4'}>
+                                The core of this feature is to allow you to have the game automatically equip what it think's is
+                                the best equipment. This does not take into account any skills on the item or that you are training and
+                                does not take into account your current classs.
+                            </p>
+                            <p>
+                                If you encounter issues or bugs please, with as much details as you can, post the issues in {" "}
+                                <a href='https://discord.gg/hcwdqJUerh' target="_blank">
+                                    Discord <i
+                                    className="fas fa-external-link-alt"></i>
+                                </a>
+                            </p>
+                        </WarningAlert>
                         <p>
                             This will compare all items you currently have in your inventory against each other based on
                             equip types. From here, if we have anything, we then compare to what you have equipped.
