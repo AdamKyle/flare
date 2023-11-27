@@ -35,6 +35,17 @@ return [
     */
 
     'channels' => [
+
+
+        // Game Related
+        'equip_best' => [
+            'driver' => 'daily',
+            'path'   => storage_path('logs/equip-best.log'),
+            'level'  => 'debug',
+            'days'   => 14,
+        ],
+
+
         'stack' => [
             'driver' => 'stack',
             'channels' => ['daily'],

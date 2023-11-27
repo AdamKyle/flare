@@ -13,6 +13,7 @@ use Illuminate\Support\Collection;
 use App\Flare\Builders\Character\Traits\FetchEquipped;
 use App\Flare\Models\Character;
 use App\Game\CharacterInventory\Values\EquippablePositions;
+use Illuminate\Support\Facades\Log;
 
 class EquipBestItemForSlotsTypesService {
 
@@ -22,11 +23,12 @@ class EquipBestItemForSlotsTypesService {
 
     private ItemComparison $itemComparison;
 
-    private Collection $currentlyEquipped;
+    private ?Collection $currentlyEquipped = null;
+
+    private Collection $inventorySlots;
 
     private bool $replacedOrEquipped = false;
     private bool $threwError         = false;
-    private ?string $errorMessage    = null;
 
     public function __construct(EquipItemService $equipItemService, ItemComparison $itemComparison) {
         $this->equipItemService = $equipItemService;
@@ -39,80 +41,35 @@ class EquipBestItemForSlotsTypesService {
 
     public function replaceCurrentlyEquippedItems(Character $character): array {
         $this->currentlyEquipped = $this->fetchEquipped($character);
-        $inventorySlots          = $character->inventory
+        $this->inventorySlots    = $character->inventory
             ->slots
             ->where('equipped', false)
             ->whereNotIn('item.type', ['quest', 'alchemy']);
 
-        if ($inventorySlots->isEmpty()) {
+        if ($this->inventorySlots->isEmpty()) {
             return $this->successResult([
                 'message' => 'Nothing in your inventory to equip or replace.'
             ]);
         }
 
-        return $this->equipForEachPosition($character, $inventorySlots);
+        return $this->equipForEachPosition($character);
     }
 
-    public function equipForEachPosition(Character $character, Collection $slots): array {
+    public function equipForEachPosition(Character $character): array {
 
         $equipItemService = $this->equipItemService->setCharacter($character);
 
         foreach (EquippablePositions::equippablePositions() as $position) {
 
-            if ($this->threwError && !is_null($this->errorMessage)) {
-                return $this->errorResult($this->errorMessage);
+            if ($this->threwError) {
+                return $this->errorResult(
+                    'An error has occurred when attempting to figure out what to equip.' . ' ' .
+                    'This has been logged. When posting in discord, please also post your character ' .
+                    'name to make searching the logs easier.'
+                );
             }
 
-            $bestSlotForPosition = $this->getBetItemForSpecificPosition($slots, $position);
-
-            if (!is_null($bestSlotForPosition)) {
-
-                if (is_null($this->currentlyEquipped)) {
-                    $character = $this->equipNewBestItem($equipItemService, $character, $bestSlotForPosition, $position);
-
-                    $this->currentlyEquipped = $this->fetchEquipped($character);
-
-                    continue;
-                }
-
-                if ($bestSlotForPosition->is_unique) {
-                    $result = $this->handleUniqueOrMythic($equipItemService, $character, $slots, $bestSlotForPosition, $position);
-
-                    if (is_null($result)) {
-                        continue;
-                    }
-
-                }
-
-
-                if ($bestSlotForPosition->is_mythic) {
-                    $result = $this->handleUniqueOrMythic($equipItemService, $character, $slots, $bestSlotForPosition, $position);
-
-                    if (is_null($result)) {
-                        continue;
-                    }
-
-                    $bestSlotForPosition = $result;
-                }
-
-                if ($position === EquippablePositions::LEFT_HAND || $position === EquippablePositions::RIGHT_HAND) {
-                    $this->handleHands($equipItemService, $character, $bestSlotForPosition, $position);
-
-                    continue;
-                }
-
-                if ($position === EquippablePositions::TRINKET) {
-                    $this->handleTrinketsOrArtifacts($equipItemService, $character, $bestSlotForPosition, $position);
-                    continue;
-                }
-
-                if ($position === EquippablePositions::ARTIFACT) {
-                    $this->handleTrinketsOrArtifacts($equipItemService, $character, $bestSlotForPosition, $position);
-                    continue;
-                }
-
-                $this->handleSwappingEquipment($equipItemService, $character, $bestSlotForPosition, $position);
-            }
+            $this->handlePossibleReplaceOrEquipOfPosition($character, $equipItemService, $position);
         }
 
         $message = 'What you have equipped is either better or the same as anything in your inventory. No changes made.';
@@ -126,7 +83,58 @@ class EquipBestItemForSlotsTypesService {
         ]);
     }
 
+    protected function handlePossibleReplaceOrEquipOfPosition(Character $character, EquipItemService $equipItemService, string $position) {
+        $bestSlotForPosition = $this->getBetItemForSpecificPosition($position);
+
+        if (!is_null($bestSlotForPosition)) {
+
+            if (is_null($this->currentlyEquipped)) {
+                $character = $this->equipNewBestItem($equipItemService, $character, $bestSlotForPosition, $position);
+
+                $this->currentlyEquipped = $this->fetchEquipped($character);
+
+                return;
+            }
+
+            if ($bestSlotForPosition->item->is_unique || $bestSlotForPosition->item->is_mythic) {
+                $result = $this->handleUniqueOrMythic($equipItemService, $character, $bestSlotForPosition, $position);
+
+                if (is_null($result)) {
+                    return;
+                }
+
+                $bestSlotForPosition = $result;
+            }
+
+            if ($position === EquippablePositions::LEFT_HAND || $position === EquippablePositions::RIGHT_HAND) {
+
+                $this->handleHands($equipItemService, $character, $bestSlotForPosition, $position);
+
+                return;
+            }
+
+            if ($position === EquippablePositions::TRINKET) {
+
+                $this->handleTrinketsOrArtifacts($equipItemService, $character, $bestSlotForPosition, $position);
+
+                return;
+            }
+
+            if ($position === EquippablePositions::ARTIFACT) {
+
+                $this->handleTrinketsOrArtifacts($equipItemService, $character, $bestSlotForPosition, $position);
+
+                return;
+            }
+
+            $this->handleSwappingEquipment($equipItemService, $character, $bestSlotForPosition, $position);
+        } else {
+            dump('Nothing found for Position: ' . $position);
+        }
+    }
+
     protected function handleSwappingEquipment(EquipItemService $equipItemService, Character $character, InventorySlot $bestSlotForPosition, string $position): void {
+
         $slotCurrentlyEquippedForPosition = $this->currentlyEquipped->where('position', $position)->first();
 
         if (is_null($slotCurrentlyEquippedForPosition)) {
@@ -157,14 +165,13 @@ class EquipBestItemForSlotsTypesService {
                 $inventoryWithTrinket = $currentlyEquippedTrinket->inventorySet;
             }
 
-            $this->equipItemService->unequipSlot($currentlyEquippedTrinket, $inventoryWithTrinket);
+            $this->equipItemService->setRequest([
+                'position' => $currentlyEquippedTrinket->position
+            ])->unequipSlot($currentlyEquippedTrinket, $inventoryWithTrinket);
 
             $this->equipNewBestItem($equipItemService, $character, $bestSlotForPosition, $position);
         }
     }
-
-    protected function handleArtifacts(EquipItemService $equipItemService, Character $character, InventorySlot $bestSlotForPosition, string $position): void {}
-
 
     protected function handleHands(EquipItemService $equipItemService, Character $character, InventorySlot $bestSlotForPosition, string $position): void {
         $twoHanded = [WeaponTypes::HAMMER, WeaponTypes::BOW, WeaponTypes::STAVE];
@@ -203,40 +210,86 @@ class EquipBestItemForSlotsTypesService {
 
     protected function handleUniqueOrMythic(EquipItemService $equipItemService,
                                         Character $character,
-                                        Collection $slots,
                                         InventorySlot $bestSlotForPosition,
                                         string $position
     ): ?InventorySlot {
-        if (($this->doesCharacterHaveUniqueEquipped() || $this->doesCharacterHaveMythicEquipped()) &&
-            ($bestSlotForPosition->item->is_unique || $bestSlotForPosition->item->is_mythic)) {
 
-            if ($bestSlotForPosition->item->is_unique) {
-                $slotWithSpecial = $this->fetchSlotWithUnique();
-            } else {
-                $slotWithSpecial = $this->fetchSlotWithMythic();
-            }
+        $hasUnique = $this->doesCharacterHaveUniqueEquipped();
+        $hasMythic = $this->doesCharacterHaveMythicEquipped();
 
-            $result = $this->handleSpecialItemTypes($equipItemService, $character, $slots, $bestSlotForPosition, $slotWithSpecial, $position);
-
-            if ($result instanceof Collection) {
-                $this->currentlyEquipped = $result;
-
-                return null;
-            }
-
-            if ($result instanceof InventorySlot) {
-                return $result;
-            }
-
+        if ($hasMythic && $bestSlotForPosition->item->is_unique) {
             return null;
+        }
+
+        if ($hasMythic && $bestSlotForPosition->item->is_mythic) {
+            return $this->handleReplacingUniqueOrMythic(
+                $equipItemService,
+                $character,
+                $bestSlotForPosition,
+                $position,
+                true
+            );
+        }
+
+        if ($hasUnique && $bestSlotForPosition->item->is_mythic) {
+            return $this->handleReplacingUniqueOrMythic(
+                $equipItemService,
+                $character,
+                $bestSlotForPosition,
+                $position,
+                true
+            );
+        }
+
+        if ($hasUnique && $bestSlotForPosition->item->is_unique) {
+            return $this->handleReplacingUniqueOrMythic(
+                $equipItemService,
+                $character,
+                $bestSlotForPosition,
+                $position,
+                true
+            );
+        }
+
+        if ($bestSlotForPosition->item->is_unique || $bestSlotForPosition->item->is_mythic) {
+            dump($this->currentlyEquipped->pluck('item.affix_name', 'item.type')->toArray(), $bestSlotForPosition->item->affix_name);
         }
 
         return $bestSlotForPosition;
     }
 
+    protected function handleReplacingUniqueOrMythic(EquipItemService $equipItemService,
+                                                     Character $character,
+                                                     InventorySlot $bestSlotForPosition,
+                                                     string $position,
+                                                     bool $replaceMythic = false): ?InventorySlot {
+
+        if ($replaceMythic) {
+            $slotWithSpecial = $this->fetchSlotWithMythic();
+        } else {
+            $slotWithSpecial = $this->fetchSlotWithUnique();
+        }
+
+        $positionToReplace = $slotWithSpecial->position;
+        $result            = $this->handleSpecialItemTypes($equipItemService, $character, $bestSlotForPosition, $slotWithSpecial, $position);
+
+        if ($result instanceof Collection) {
+            $this->currentlyEquipped = $result;
+
+            $this->handlePossibleReplaceOrEquipOfPosition($character, $equipItemService, $positionToReplace);
+
+            return null;
+        }
+
+        if ($result instanceof InventorySlot) {
+            return $result;
+        }
+
+        return null;
+    }
+
     protected function handleSpecialItemTypes(EquipItemService $equipItemService,
                                               Character $character,
-                                              Collection $slots,
                                               InventorySlot $bestSlotForPosition,
                                               InventorySlot|SetSlot $slotWithUniqueOrMythicEquipped,
                                               string $position
@@ -250,15 +303,26 @@ class EquipBestItemForSlotsTypesService {
                 $inventoryForEquippedUnique = $slotWithUniqueOrMythicEquipped->inventorySet;
             }
 
-            $this->equipItemService->unequipSlot($slotWithUniqueOrMythicEquipped, $inventoryForEquippedUnique);
+            $this->equipItemService->setRequest([
+                'position' => $slotWithUniqueOrMythicEquipped->position,
+            ])->unequipSlot($slotWithUniqueOrMythicEquipped, $inventoryForEquippedUnique);
+
+            $character = $character->refresh();
 
             $character = $this->equipNewBestItem($equipItemService, $character, $bestSlotForPosition, $position);
+
+            $this->inventorySlots    = $character->inventory
+                ->slots
+                ->where('equipped', false)
+                ->whereNotIn('item.type', ['quest', 'alchemy']);
 
             return $this->fetchEquipped($character);
 
         }
 
-        return $this->getBetItemForSpecificPosition($slots, $position, true);
+        $bestSlot = $this->getBetItemForSpecificPosition($position, true);
+
+        return $bestSlot;
     }
 
     protected function equipNewBestItem(EquipItemService $equipItemService, Character $character, InventorySlot $bestSlotForPosition, string $position): Character {
@@ -271,11 +335,31 @@ class EquipBestItemForSlotsTypesService {
             ])->replaceItem();
 
         } catch (EquipItemException $e) {
+
+            Log::channel('equip_best')->info('======= [ Best Equipment Issue] =======');
+            Log::channel('equip_best')->info('BEST SLOT FOR POSITION:');
+            Log::channel('equip_best')->info(json_decode(json_encode($bestSlotForPosition)));
+
+            Log::channel('equip_best')->info('');
+
+            Log::channel('equip_best')->info('=== ERROR DETAILS ===');
+            Log::channel('equip_best')->info($e->getMessage());
+
+            Log::channel('equip_best')->info('======================================');
+            Log::channel('equip_best')->info('');
+            Log::channel('equip_best')->info('');
+
             $this->threwError   = true;
-            $this->errorMessage = $e->getMessage();
         }
 
-        return $character->refresh();
+        $character = $character->refresh();
+
+        $this->inventorySlots = $character->inventory
+            ->slots
+            ->where('equipped', false)
+            ->whereNotIn('item.type', ['quest', 'alchemy']);
+
+        return $character;
     }
 
     protected function doesCharacterHaveUniqueEquipped(): bool {
@@ -294,12 +378,16 @@ class EquipBestItemForSlotsTypesService {
         return $this->currentlyEquipped->where('item.is_mythic', true)->first();
     }
 
-    protected function getBetItemForSpecificPosition(Collection $slots, string $position, bool $ignoreMythicsAndUniques = false): ?InventorySlot {
+    protected function getBetItemForSpecificPosition(string $position, bool $ignoreMythicsAndUniques = false): ?InventorySlot {
         $typesForPosition = EquippablePositions::typesForPositions($position);
 
-        $bestItemsForPosition = $this->findForBestForTypes($slots, $typesForPosition, $ignoreMythicsAndUniques);
+        $bestItemsForPosition = $this->findForBestForTypes($typesForPosition, $ignoreMythicsAndUniques);
 
         $bestItemForPosition = null;
+
+        if (count($bestItemsForPosition) === 1) {
+            return $bestItemsForPosition[0];
+        }
 
         foreach ($bestItemsForPosition as $index => $bestItem) {
             $nextSlot = null;
@@ -331,14 +419,14 @@ class EquipBestItemForSlotsTypesService {
             }
         }
 
-        return $bestItem;
+        return $bestItemForPosition;
     }
 
-    protected function findForBestForTypes(Collection $slots, array $typesForPosition, bool $ignoreMythicsAndUniques): array {
+    protected function findForBestForTypes(array $typesForPosition, bool $ignoreMythicsAndUniques): array {
         $bestItems = [];
 
         foreach ($typesForPosition as $type) {
-            $bestSlot = $slots
+            $bestSlot = $this->inventorySlots
                 ->filter(function ($slot) use ($type, $ignoreMythicsAndUniques) {
 
                     if ($ignoreMythicsAndUniques) {
@@ -348,7 +436,8 @@ class EquipBestItemForSlotsTypesService {
                     return $slot->item->type === $type;
                 })
                 ->reduce(function ($bestItem, $currentItem) {
-                    if (!$bestItem) {
+
+                    if (is_null($bestItem)) {
                         return $currentItem;
                     }
 
@@ -378,7 +467,7 @@ class EquipBestItemForSlotsTypesService {
 
             if (is_numeric($value)) {
 
-                if ($value > 0) {
+                if ($value >= 0) {
                     $goodCount++;
                 } else {
                     $reductions++;

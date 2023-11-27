@@ -482,7 +482,7 @@ class  CharacterInventoryController extends Controller {
 
             $this->updateCharacterAttackDataCache($character);
 
-            $characterInventoryService = $this->characterInventoryService->setCharacter($character);
+            $characterInventoryService = $this->characterInventoryService->setCharacter($character->refresh());
 
             $message = $changedEquipment ? 'Equipped or Replaced equipped items with the best in slot items!' : 'You currently have the best items equipped!';
 
@@ -561,11 +561,11 @@ class  CharacterInventoryController extends Controller {
             'position' => null,
         ]);
 
-        event(new UpdateTopBarEvent($character->refresh()));
+        $character = $character->refresh();
 
         $this->updateCharacterAttackDataCache($character);
 
-        $character = $character->refresh();
+        event(new UpdateTopBarEvent($character->refresh()));
 
         $inventory = $this->characterInventoryService->setCharacter($character);
 

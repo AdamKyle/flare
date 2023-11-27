@@ -430,9 +430,9 @@ class CharacterInventoryService {
     /**
      * Fetch equipped items.
      *
-     * @return array|null
+     * @return array
      */
-    public function fetchEquipped(): array|null {
+    public function fetchEquipped(): array {
 
         $inventory = Inventory::where('character_id', $this->character->id)->first();
 
@@ -447,7 +447,7 @@ class CharacterInventoryService {
         $inventorySet = InventorySet::where('character_id', $this->character->id)->where('is_equipped', true)->first();
 
         if (is_null($inventorySet)) {
-            return null;
+            return [];
         }
 
         $this->isInventorySetIsEquipped = true;

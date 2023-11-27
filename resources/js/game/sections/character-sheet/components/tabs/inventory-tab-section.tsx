@@ -477,7 +477,7 @@ export default class InventoryTabSection extends React.Component<
                             <p className={'mb-4'}>
                                 The core of this feature is to allow you to have the game automatically equip what it think's is
                                 the best equipment. This does not take into account any skills on the item or that you are training and
-                                does not take into account your current classs.
+                                does not take into account your current class in relation to whats might be best for it.
                             </p>
                             <p>
                                 If you encounter issues or bugs please, with as much details as you can, post the issues in {" "}
@@ -488,19 +488,11 @@ export default class InventoryTabSection extends React.Component<
                             </p>
                         </WarningAlert>
                         <p>
-                            This will compare all items you currently have in your inventory against each other based on
-                            equip types. From here, if we have anything, we then compare to what you have equipped.
-                        </p>
-                        <p className="mt-2">
-                            If we have anything to equip, we equip it. If you have nothing equipped, what ever we found that
-                            would be considered "the best of your inventory" will be equipped.
-                        </p>
-                        <p className="mt-2">
-                            Items in sets can also be replaced this way assuming you have the set equipped and you have the inventory
-                            space for when we replace items.
-                        </p>
-                        <p className="mt-2">
-                            Equip best in slot, will follow all set and equipment rules.
+                            Based on equippable positions, what you may or may not have equipped and following <a href='/information/equipment-sets' target="_blank">
+                            Rules of equipment <i
+                            className="fas fa-external-link-alt"></i>
+                        </a>, we will compare whats in your inventory to whats equipped and replace or equip
+                            what's considered better for your character.
                         </p>
                     </InventoryActionConfirmationModal>
                 ) : null}

@@ -108,15 +108,13 @@ class EquippablePositions {
                 SpellTypes::HEALING,
                 SpellTypes::DAMAGE,
             ],
-            default          => [
-                self::SLEEVES,
-                self::LEGGINGS,
-                self::GLOVES,
-                self::SHIELD,
-                self::BODY,
-                self::FEET,
-                self::HELMET,
-            ],
+            self::SLEEVES    => [self::SLEEVES],
+            self::HELMET     => [self::HELMET],
+            self::LEGGINGS   => [self::LEGGINGS],
+            self::GLOVES     => [self::GLOVES],
+            self::BODY       => [self::BODY],
+            self::FEET       => [self::FEET],
+            default          => [],
         };
     }
 
