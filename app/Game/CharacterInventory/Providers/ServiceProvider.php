@@ -3,6 +3,10 @@
 namespace App\Game\CharacterInventory\Providers;
 
 use App\Game\CharacterInventory\AutoEquipHandlers\HandPositionsFromInventory;
+use App\Game\CharacterInventory\Handlers\EquipBest\FetchBestItemForPositionFromInventory;
+use App\Game\CharacterInventory\Handlers\EquipBest\HandleHands;
+use App\Game\CharacterInventory\Handlers\EquipBest\HandleUniquesAndMythics;
+use App\Game\CharacterInventory\Handlers\EquipBest\InventoryItemComparison;
 use App\Game\CharacterInventory\Services\EquipBestItemForSlotsTypesService;
 use App\Game\Core\Comparison\ItemComparison;
 use League\Fractal\Manager;
@@ -64,10 +68,37 @@ class ServiceProvider extends ApplicationServiceProvider {
             );
         });
 
-        $this->app->bind(EquipBestItemForSlotsTypesService::class, function( $app) {
-            return new EquipBestItemForSlotsTypesService(
-                $app->make(EquipItemService::class),
+        $this->app->bind(InventoryItemComparison::class, function($app) {
+            return new InventoryItemComparison(
                 $app->make(ItemComparison::class)
+            );
+        });
+
+        $this->app->bind(HandleHands::class, function($app) {
+            return new HandleHands(
+                $app->make(EquipItemService::class),
+                $app->make(InventoryItemComparison::class),
+            );
+        });
+
+        $this->app->bind(HandleUniquesAndMythics::class, function($app) {
+            return new HandleUniquesAndMythics(
+                $app->make(EquipItemService::class),
+                $app->make(InventoryItemComparison::class),
+            );
+        });
+
+        $this->app->bind(FetchBestItemForPositionFromInventory::class, function($app) {
+            return new FetchBestItemForPositionFromInventory(
+                $app->make(InventoryItemComparison::class)
+            );
+        });
+
+        $this->app->bind(EquipBestItemForSlotsTypesService::class, function($app) {
+            return new EquipBestItemForSlotsTypesService(
+                $app->make(FetchBestItemForPositionFromInventory::class),
+                $app->make(HandleHands::class),
+                $app->make(HandleUniquesAndMythics::class),
             );
         });
 

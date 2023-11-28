@@ -476,7 +476,7 @@ class  CharacterInventoryController extends Controller {
     public function equipBestInSlot(Character $character, EquipBestItemForSlotsTypesService $equipBestItemForSlotsTypesService): JsonResponse {
         try {
 
-            $changedEquipment = $equipBestItemForSlotsTypesService->compareAndEquipBestItems($character);
+            $changedEquipment = $equipBestItemForSlotsTypesService->handleBestEquipmentForCharacter($character);
 
             $character = $character->refresh();
 
