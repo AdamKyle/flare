@@ -42,7 +42,7 @@ class HandleUniquesAndMythics {
         return $this->replacedSpecialPosition;
     }
 
-    public function handleUniquesOrMythics(Character $character, ?InventorySlot $slotToEquip, string $position): Character {
+    public function handleUniquesOrMythics(Character $character, string $position, ?InventorySlot $slotToEquip = null): Character {
 
         if (is_null($slotToEquip)) {
             return $character;
@@ -73,6 +73,8 @@ class HandleUniquesAndMythics {
             );
         }
 
+        $this->equipSpecialItem($character, $slotToEquip, $position);
+
         return $character;
     }
 
@@ -93,11 +95,7 @@ class HandleUniquesAndMythics {
 
             $character = $character->refresh();
 
-            $this->equipItemService->setCharacter($character)->setRequest([
-                'position'   => $position,
-                'slot_id'    => $slotToEquip->id,
-                'equip_type' => $slotToEquip->item->type,
-            ])->replaceItem();
+            $this->equipSpecialItem($character, $slotToEquip, $position);
 
             $this->replacedSpecialItem = true;
 
@@ -105,6 +103,14 @@ class HandleUniquesAndMythics {
         }
 
         return $character;
+    }
+
+    protected function equipSpecialItem(Character $character, InventorySlot $slotToEquip, string $position): void {
+        $this->equipItemService->setCharacter($character)->setRequest([
+            'position'   => $position,
+            'slot_id'    => $slotToEquip->id,
+            'equip_type' => $slotToEquip->item->type,
+        ])->replaceItem();
     }
 
     protected function getUniqueFromInventory(): InventorySlot|SetSlot|null {

@@ -65,26 +65,30 @@ class EquipBestItemForSlotsTypesService {
 
     protected function processPositions(Character $character): void {
 
-        $fetchBestItemForPosition = $this->fetchBestItemForPositionFromInventory->setInventory($this->inventorySlots);
+        $this->fetchBestItemForPositionFromInventory = $this->fetchBestItemForPositionFromInventory->setInventory($this->inventorySlots);
 
         foreach (EquippablePositions::equippablePositions() as $position) {
-            $bestSlot = $fetchBestItemForPosition->fetchBestItemForPosition(EquippablePositions::typesForPositions($position));
+            $bestSlot = $this->fetchBestItemForPositionFromInventory->fetchBestItemForPosition(EquippablePositions::typesForPositions($position));
 
             if (is_null($bestSlot)) {
                 continue;
             }
 
+            dump($bestSlot->id . ' ' . $bestSlot->item->affix_name . ' ' . $position);
+
             if ($bestSlot->item->is_mythic || $bestSlot->item->is_unique) {
+
                 $character = $this->handleUniquesAndMythics->setCurrentlyEquipped($this->currentlyEquippedSlots)
-                                                           ->handleUniquesOrMythics($character, $bestSlot, $position);
+                                                           ->handleUniquesOrMythics($character, $position, $bestSlot);
 
                 $this->fetchInventoryDetails($character);
 
                 if (!$this->handleUniquesAndMythics->replacedSpecialItem()) {
+                    dump($this->inventorySlots->pluck('item.affix_name')->toArray());
                     continue;
                 }
 
-                $slotForReplacedSpecialItem = $fetchBestItemForPosition->fetchBestItemForPosition(
+                $slotForReplacedSpecialItem = $this->fetchBestItemForPositionFromInventory->fetchBestItemForPosition(
                     EquippablePositions::typesForPositions(
                         $this->handleUniquesAndMythics->getSpecialSlotPosition()
                     ),
@@ -132,12 +136,17 @@ class EquipBestItemForSlotsTypesService {
         $this->currentlyEquippedSlots = $this->fetchEquipped($character);
 
         $this->inventorySlots         = $character->inventory
-            ->slots
+            ->slots()
             ->where('equipped', false)
-            ->whereNotIn('item.type', ['quest', 'alchemy']);
+            ->whereHas('item', function($query) {
+                $query->whereNotIn('type', ['quest', 'alchemy']);
+            })
+            ->get();
 
         if (!is_null($oldCurrentlyEquipped)) {
             $this->equipmentHasChanged = $this->currentlyEquippedSlots->diff($oldCurrentlyEquipped)->count() > 0;
         }
+
+        $this->fetchBestItemForPositionFromInventory = $this->fetchBestItemForPositionFromInventory->setInventory($this->inventorySlots);
     }
 }

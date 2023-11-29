@@ -239,6 +239,6 @@ class CharacterInventoryServiceTest extends TestCase {
     public function testFetchEquippedReturnsNull() {
         $character = $this->character->inventorySetManagement()->createInventorySets()->getCharacter();
 
-        $this->assertNull($this->characterInventoryService->setCharacter($character)->fetchEquipped());
+        $this->assertEmpty($this->characterInventoryService->setCharacter($character)->fetchEquipped());
     }
 }

@@ -2129,16 +2129,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v10.33.0",
+            "version": "v10.34.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "4536872e3e5b6be51b1f655dafd12c9a4fa0cfe8"
+                "reference": "c581caa233e380610b34cc491490bfa147a3b62b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/4536872e3e5b6be51b1f655dafd12c9a4fa0cfe8",
-                "reference": "4536872e3e5b6be51b1f655dafd12c9a4fa0cfe8",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/c581caa233e380610b34cc491490bfa147a3b62b",
+                "reference": "c581caa233e380610b34cc491490bfa147a3b62b",
                 "shasum": ""
             },
             "require": {
@@ -2327,7 +2327,7 @@
                 "issues": "https://github.com/laravel/framework/issues",
                 "source": "https://github.com/laravel/framework"
             },
-            "time": "2023-11-21T14:49:31+00:00"
+            "time": "2023-11-28T19:06:27+00:00"
         },
         {
             "name": "laravel/helpers",
@@ -2387,16 +2387,16 @@
         },
         {
             "name": "laravel/horizon",
-            "version": "v5.21.3",
+            "version": "v5.21.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/horizon.git",
-                "reference": "6e2b0bb3f8c5b653e8e3ba15661caea6d9613c31"
+                "reference": "bdf58c84b592b83f62262cc6ca98b0debbbc308b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/horizon/zipball/6e2b0bb3f8c5b653e8e3ba15661caea6d9613c31",
-                "reference": "6e2b0bb3f8c5b653e8e3ba15661caea6d9613c31",
+                "url": "https://api.github.com/repos/laravel/horizon/zipball/bdf58c84b592b83f62262cc6ca98b0debbbc308b",
+                "reference": "bdf58c84b592b83f62262cc6ca98b0debbbc308b",
                 "shasum": ""
             },
             "require": {
@@ -2459,9 +2459,9 @@
             ],
             "support": {
                 "issues": "https://github.com/laravel/horizon/issues",
-                "source": "https://github.com/laravel/horizon/tree/v5.21.3"
+                "source": "https://github.com/laravel/horizon/tree/v5.21.4"
             },
-            "time": "2023-10-27T13:58:13+00:00"
+            "time": "2023-11-23T15:47:58+00:00"
         },
         {
             "name": "laravel/prompts",
@@ -2651,16 +2651,16 @@
         },
         {
             "name": "laravel/ui",
-            "version": "v4.2.2",
+            "version": "v4.2.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/ui.git",
-                "reference": "a58ec468db4a340b33f3426c778784717a2c144b"
+                "reference": "eb532ea096ca1c0298c87c19233daf011fda743a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/ui/zipball/a58ec468db4a340b33f3426c778784717a2c144b",
-                "reference": "a58ec468db4a340b33f3426c778784717a2c144b",
+                "url": "https://api.github.com/repos/laravel/ui/zipball/eb532ea096ca1c0298c87c19233daf011fda743a",
+                "reference": "eb532ea096ca1c0298c87c19233daf011fda743a",
                 "shasum": ""
             },
             "require": {
@@ -2707,9 +2707,9 @@
                 "ui"
             ],
             "support": {
-                "source": "https://github.com/laravel/ui/tree/v4.2.2"
+                "source": "https://github.com/laravel/ui/tree/v4.2.3"
             },
-            "time": "2023-05-09T19:47:28+00:00"
+            "time": "2023-11-23T14:44:22+00:00"
         },
         {
             "name": "league/commonmark",
