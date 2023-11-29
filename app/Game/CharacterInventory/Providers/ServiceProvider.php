@@ -5,6 +5,8 @@ namespace App\Game\CharacterInventory\Providers;
 use App\Game\CharacterInventory\AutoEquipHandlers\HandPositionsFromInventory;
 use App\Game\CharacterInventory\Handlers\EquipBest\FetchBestItemForPositionFromInventory;
 use App\Game\CharacterInventory\Handlers\EquipBest\HandleHands;
+use App\Game\CharacterInventory\Handlers\EquipBest\HandleRegularComparisonAndReplace;
+use App\Game\CharacterInventory\Handlers\EquipBest\HandleTrinketsAndArtifacts;
 use App\Game\CharacterInventory\Handlers\EquipBest\HandleUniquesAndMythics;
 use App\Game\CharacterInventory\Handlers\EquipBest\InventoryItemComparison;
 use App\Game\CharacterInventory\Services\EquipBestItemForSlotsTypesService;
@@ -88,6 +90,20 @@ class ServiceProvider extends ApplicationServiceProvider {
             );
         });
 
+        $this->app->bind(HandleTrinketsAndArtifacts::class, function($app) {
+            return new HandleTrinketsAndArtifacts(
+                $app->make(EquipItemService::class),
+                $app->make(InventoryItemComparison::class),
+            );
+        });
+
+        $this->app->bind(HandleRegularComparisonAndReplace::class, function($app) {
+            return new HandleRegularComparisonAndReplace(
+                $app->make(EquipItemService::class),
+                $app->make(InventoryItemComparison::class),
+            );
+        });
+
         $this->app->bind(FetchBestItemForPositionFromInventory::class, function($app) {
             return new FetchBestItemForPositionFromInventory(
                 $app->make(InventoryItemComparison::class)
@@ -99,6 +115,8 @@ class ServiceProvider extends ApplicationServiceProvider {
                 $app->make(FetchBestItemForPositionFromInventory::class),
                 $app->make(HandleHands::class),
                 $app->make(HandleUniquesAndMythics::class),
+                $app->make(HandleTrinketsAndArtifacts::class),
+                $app->make(HandleRegularComparisonAndReplace::class),
             );
         });
 

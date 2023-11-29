@@ -6,6 +6,8 @@ use App\Flare\Builders\Character\Traits\FetchEquipped;
 use App\Flare\Models\Character;
 use App\Game\CharacterInventory\Handlers\EquipBest\FetchBestItemForPositionFromInventory;
 use App\Game\CharacterInventory\Handlers\EquipBest\HandleHands;
+use App\Game\CharacterInventory\Handlers\EquipBest\HandleRegularComparisonAndReplace;
+use App\Game\CharacterInventory\Handlers\EquipBest\HandleTrinketsAndArtifacts;
 use App\Game\CharacterInventory\Handlers\EquipBest\HandleUniquesAndMythics;
 use App\Game\CharacterInventory\Values\EquippablePositions;
 use App\Game\Core\Traits\ResponseBuilder;
@@ -15,9 +17,11 @@ class EquipBestItemForSlotsTypesService {
 
     use ResponseBuilder, FetchEquipped;
 
-    private ?Collection $currentlyEquippedSlots;
+    private ?Collection $currentlyEquippedSlots = null;
 
-    private ?Collection $inventorySlots;
+    private ?Collection $inventorySlots = null;
+
+    private bool $equipmentHasChanged = false;
 
     private FetchBestItemForPositionFromInventory $fetchBestItemForPositionFromInventory;
 
@@ -25,13 +29,21 @@ class EquipBestItemForSlotsTypesService {
 
     private HandleUniquesAndMythics $handleUniquesAndMythics;
 
+    private HandleTrinketsAndArtifacts $handleTrinketsAndArtifacts;
+
+    private HandleRegularComparisonAndReplace $handleRegularComparisonAndReplace;
+
     public function __construct(FetchBestItemForPositionFromInventory $fetchBestItemForPositionFromInventory,
                                 HandleHands $handleHands,
-                                HandleUniquesAndMythics $handleUniquesAndMythics
+                                HandleUniquesAndMythics $handleUniquesAndMythics,
+                                HandleTrinketsAndArtifacts $handleTrinketsAndArtifacts,
+                                HandleRegularComparisonAndReplace $handleRegularComparisonAndReplace
     ) {
         $this->fetchBestItemForPositionFromInventory = $fetchBestItemForPositionFromInventory;
         $this->handleHands                           = $handleHands;
         $this->handleUniquesAndMythics               = $handleUniquesAndMythics;
+        $this->handleTrinketsAndArtifacts            = $handleTrinketsAndArtifacts;
+        $this->handleRegularComparisonAndReplace     = $handleRegularComparisonAndReplace;
     }
 
     public function handleBestEquipmentForCharacter(Character $character) {
@@ -47,7 +59,11 @@ class EquipBestItemForSlotsTypesService {
         $this->processPositions($character);
     }
 
-    protected function processPositions(Character $character) {
+    public function hasEquipmentChanged(): bool {
+        return $this->equipmentHasChanged;
+    }
+
+    protected function processPositions(Character $character): void {
 
         $fetchBestItemForPosition = $this->fetchBestItemForPositionFromInventory->setInventory($this->inventorySlots);
 
@@ -91,17 +107,37 @@ class EquipBestItemForSlotsTypesService {
 
                 continue;
             }
+
+            if (in_array($position, [EquippablePositions::TRINKET, EquippablePositions::ARTIFACT])) {
+                $character = $this->handleHands->setCurrentlyEquipped($this->currentlyEquippedSlots)
+                                               ->handleHands($character, $bestSlot, $position);
+
+
+                $this->fetchInventoryDetails($character);
+
+                continue;
+            }
+
+            $this->handleRegularComparisonAndReplace->setCurrentlyEquipped($this->currentlyEquippedSlots)
+                                                    ->handleRegularComparison($character, $bestSlot, $position);
+
+            $this->fetchInventoryDetails($character);
         }
     }
 
     protected function fetchInventoryDetails(Character $character): void {
 
-        $this->currentlyEquipped = $this->fetchEquipped($character);
+        $oldCurrentlyEquipped         = $this->currentlyEquippedSlots;
 
-        $this->inventorySlots    = $character->inventory
+        $this->currentlyEquippedSlots = $this->fetchEquipped($character);
+
+        $this->inventorySlots         = $character->inventory
             ->slots
             ->where('equipped', false)
             ->whereNotIn('item.type', ['quest', 'alchemy']);
-    }
 
+        if (!is_null($oldCurrentlyEquipped)) {
+            $this->equipmentHasChanged = $this->currentlyEquippedSlots->diff($oldCurrentlyEquipped)->count() > 0;
+        }
+    }
 }

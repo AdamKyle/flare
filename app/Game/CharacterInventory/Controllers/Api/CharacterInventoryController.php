@@ -473,10 +473,14 @@ class  CharacterInventoryController extends Controller {
         }
     }
 
+    /**
+     * @param Character $character
+     * @param EquipBestItemForSlotsTypesService $equipBestItemForSlotsTypesService
+     * @return JsonResponse
+     */
     public function equipBestInSlot(Character $character, EquipBestItemForSlotsTypesService $equipBestItemForSlotsTypesService): JsonResponse {
         try {
-
-            $changedEquipment = $equipBestItemForSlotsTypesService->handleBestEquipmentForCharacter($character);
+            $equipBestItemForSlotsTypesService->handleBestEquipmentForCharacter($character);
 
             $character = $character->refresh();
 
@@ -484,7 +488,9 @@ class  CharacterInventoryController extends Controller {
 
             $characterInventoryService = $this->characterInventoryService->setCharacter($character->refresh());
 
-            $message = $changedEquipment ? 'Equipped or Replaced equipped items with the best in slot items!' : 'You currently have the best items equipped!';
+            $message = $equipBestItemForSlotsTypesService->hasEquipmentChanged() ?
+                'Equipped or Replaced equipped items with the best in slot items!' :
+                'You currently have the best items equipped!';
 
             return response()->json([
                 'inventory' => [
@@ -495,7 +501,6 @@ class  CharacterInventoryController extends Controller {
                 'message'       => $message
             ]);
         } catch (Exception $e) {
-            dump($e->getTrace());
             return response()->json([
                 'message' => $e->getMessage()
             ], 422);

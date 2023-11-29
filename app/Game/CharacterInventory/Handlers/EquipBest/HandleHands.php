@@ -45,6 +45,13 @@ class HandleHands {
 
         $oppositePosition = EquippablePositions::getOppisitePosition($position);
 
+        if (is_null($oppositePosition)) {
+
+            $this->equipItem($character, $slotToEquip, $position);
+
+            return $character->refresh();
+        }
+
         $slotForPosition  = $this->getSlotForPosition($oppositePosition);
 
         if (is_null($slotForPosition)) {
@@ -60,7 +67,7 @@ class HandleHands {
 
                 $this->equipItem($character, $slotToEquip, $position);
 
-                return $character->refrsh();
+                return $character->refresh();
             }
         }
 
@@ -81,6 +88,6 @@ class HandleHands {
             return null;
         }
 
-        return $this->currentlyEquipped->where('position', $position)->first();
+        return $this->currentlyEquipped->where('position', '=', $position)->first();
     }
 }

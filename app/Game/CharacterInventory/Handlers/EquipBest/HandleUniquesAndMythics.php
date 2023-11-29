@@ -97,11 +97,11 @@ class HandleUniquesAndMythics {
                 'position'   => $position,
                 'slot_id'    => $slotToEquip->id,
                 'equip_type' => $slotToEquip->item->type,
-            ])->equipItem($character, $slotToEquip, $position);
+            ])->replaceItem();
 
             $this->replacedSpecialItem = true;
 
-            return $character->refrsh();
+            return $character->refresh();
         }
 
         return $character;
@@ -112,7 +112,7 @@ class HandleUniquesAndMythics {
             return null;
         }
 
-        return $this->currentlyEquipped->where('item.is_unique', true)->first();
+        return $this->currentlyEquipped->where('item.is_unique', '=', true)->first();
     }
 
     protected function getMythicFromInventory(): InventorySlot|SetSlot|null {
@@ -120,6 +120,6 @@ class HandleUniquesAndMythics {
             return null;
         }
 
-        return $this->currentlyEquipped->where('item.is_mythic', true)->first();
+        return $this->currentlyEquipped->where('item.is_mythic', '=', true)->first();
     }
 }
