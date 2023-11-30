@@ -9,6 +9,8 @@ class FetchBestItemForPositionFromInventory {
 
     private ?Collection $inventorySlots = null;
 
+    private ?Collection $currentlyEquipped = null;
+
     private InventoryItemComparison $inventoryItemComparison;
 
     public function __construct(InventoryItemComparison $inventoryItemComparison) {
@@ -21,14 +23,67 @@ class FetchBestItemForPositionFromInventory {
         return $this;
     }
 
+    public function setCurrentlyEquipped(?Collection $currentlyEquipped = null): FetchBestItemForPositionFromInventory {
+        $this->currentlyEquipped = $currentlyEquipped;
+
+        return $this;
+    }
+
     public function fetchBestItemForPosition(array $typesForPosition, bool $ignoreMythicsAndUniques = false): ?InventorySlot {
-        $inventorySlots = $this->fetchBestItemsForPositionTypes($typesForPosition, $ignoreMythicsAndUniques);
+
+        $hasMythicEquipped = $this->currentlyHasSpecialEquipped('is_mythic');
+        $hasUniqueEquipped = $this->currentlyHasSpecialEquipped('is_unique');
+
+        if (!$ignoreMythicsAndUniques && !$hasMythicEquipped) {
+
+            $mythicSlots = $this->fetchSpecialItemFromPossibleItems($typesForPosition, 'is_mythic');
+
+            if (!empty($mythicSlots)) {
+                return $this->findBestItem($mythicSlots);
+            }
+        }
+
+        if (!$ignoreMythicsAndUniques && !$hasUniqueEquipped && !$hasMythicEquipped) {
+            $uniqueSlots = $this->fetchSpecialItemFromPossibleItems($typesForPosition, 'is_unique');
+
+            if (!empty($uniqueSlots)) {
+                return $this->findBestItem($uniqueSlots);
+            }
+        }
+
+        $inventorySlots = $this->fetchBestItemsForPositionTypes($typesForPosition);
 
         if (empty($inventorySlots)) {
             return null;
         }
 
         return $this->findBestItem($inventorySlots);
+    }
+
+    protected function fetchSpecialItemFromPossibleItems(array $typesForPosition, string $attributeKey): array {
+
+        $specialSlotsForType = [];
+
+        if (!$this->currentlyHasSpecialEquipped($attributeKey)) {
+
+            $specialSlotsForType =  $this->inventorySlots
+                ->reject(fn($slot) => $this->currentlyHasSpecialEquipped($attributeKey))
+                ->filter(function ($slot) use ($typesForPosition, $attributeKey) {
+                    return in_array($slot->item->type, $typesForPosition) && $slot->item->{$attributeKey} === true;
+                })->all();
+        }
+
+        return array_values($specialSlotsForType);
+    }
+
+    protected function currentlyHasSpecialEquipped(string $key): bool {
+        if (is_null($this->currentlyEquipped)) {
+            return false;
+        }
+
+        return $this->currentlyEquipped->filter(function($slot) use ($key) {
+            return $slot->item->{$key} === true;
+        })->isNotEmpty();
     }
 
     protected function findBestItem(array $itemSlotsForTypes): ?InventorySlot {
@@ -55,7 +110,7 @@ class FetchBestItemForPositionFromInventory {
         return $bestItemForPosition;
     }
 
-    protected function fetchBestItemsForPositionTypes(array $typesForPosition, bool $ignoreMythicsAndUniques = false): array {
+    protected function fetchBestItemsForPositionTypes(array $typesForPosition): array {
 
         $bestItems = [];
 
@@ -65,13 +120,8 @@ class FetchBestItemForPositionFromInventory {
 
         foreach ($typesForPosition as $type) {
             $bestSlot = $this->inventorySlots
-                ->filter(function ($slot) use ($type, $ignoreMythicsAndUniques) {
-
-                    if ($ignoreMythicsAndUniques) {
-                        return $slot->item->type === $type && !$slot->item->is_unique && !$slot->item->is_mythic;
-                    }
-
-                    return $slot->item->type === $type;
+                ->filter(function ($slot) use ($type) {
+                    return $slot->item->type === $type && !$slot->item->is_unique && !$slot->item->is_mythic;
                 })
                 ->reduce(function ($bestItem, $currentItem) {
 

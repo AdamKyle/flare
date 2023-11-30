@@ -4,6 +4,8 @@ namespace App\Game\CharacterInventory\Services;
 
 use App\Flare\Builders\Character\Traits\FetchEquipped;
 use App\Flare\Models\Character;
+use App\Flare\Values\ArmourTypes;
+use App\Flare\Values\WeaponTypes;
 use App\Game\CharacterInventory\Handlers\EquipBest\FetchBestItemForPositionFromInventory;
 use App\Game\CharacterInventory\Handlers\EquipBest\HandleHands;
 use App\Game\CharacterInventory\Handlers\EquipBest\HandleRegularComparisonAndReplace;
@@ -65,35 +67,74 @@ class EquipBestItemForSlotsTypesService {
 
     protected function processPositions(Character $character): void {
 
-        $this->fetchBestItemForPositionFromInventory = $this->fetchBestItemForPositionFromInventory->setInventory($this->inventorySlots);
+        $this->fetchBestItemForPositionFromInventory = $this->fetchBestItemForPositionFromInventory
+            ->setCurrentlyEquipped($this->currentlyEquippedSlots)
+            ->setInventory($this->inventorySlots);
 
-        foreach (EquippablePositions::equippablePositions() as $position) {
-            $bestSlot = $this->fetchBestItemForPositionFromInventory->fetchBestItemForPosition(EquippablePositions::typesForPositions($position));
+        $positions = EquippablePositions::equippablePositions();
+
+        $character = $this->handleEquippingBest($character, $positions);
+
+        $currentHands = collect($this->currentlyEquippedSlots->whereIn('position', [
+            EquippablePositions::LEFT_HAND, EquippablePositions::RIGHT_HAND
+        ])->all());
+
+        if ($currentHands->count() === 1) {
+
+            $hasSpecialEquipped = $this->currentlyEquippedSlots->filter(function($slot) {
+                return $slot->item->is_unique || $slot->item->is_mythic;
+            })->isNotEmpty();
+
+            $currentSlot = $currentHands->first();
+
+            $oppositeHand = EquippablePositions::getOppisitePosition($currentSlot->position);
+
+            $bestSlot = $this->fetchBestItemForPositionFromInventory
+                ->fetchBestItemForPosition(EquippablePositions::typesForPositions($oppositeHand), $hasSpecialEquipped);
+
+            if (!is_null($bestSlot)) {
+                $this->handleHands->setCurrentlyEquipped($this->currentlyEquippedSlots)
+                    ->handleHands($character, $bestSlot, $oppositeHand);
+            }
+        }
+
+    }
+
+    protected function handleEquippingBest(Character $character, array $positions, array $overrideTypesForPosition = []): Character {
+        foreach ($positions as $position) {
+
+            $typesForEquip = EquippablePositions::typesForPositions($position);
+
+            if (!empty($overrideTypesForPosition)) {
+                $typesForEquip = $overrideTypesForPosition;
+            }
+
+            $bestSlot = $this->fetchBestItemForPositionFromInventory
+                ->fetchBestItemForPosition($typesForEquip);
+
 
             if (is_null($bestSlot)) {
+
                 continue;
             }
 
-            dump($bestSlot->id . ' ' . $bestSlot->item->affix_name . ' ' . $position);
-
             if ($bestSlot->item->is_mythic || $bestSlot->item->is_unique) {
-
                 $character = $this->handleUniquesAndMythics->setCurrentlyEquipped($this->currentlyEquippedSlots)
-                                                           ->handleUniquesOrMythics($character, $position, $bestSlot);
+                    ->handleUniquesOrMythics($character, $position, $bestSlot);
 
                 $this->fetchInventoryDetails($character);
 
                 if (!$this->handleUniquesAndMythics->replacedSpecialItem()) {
-                    dump($this->inventorySlots->pluck('item.affix_name')->toArray());
                     continue;
                 }
 
-                $slotForReplacedSpecialItem = $this->fetchBestItemForPositionFromInventory->fetchBestItemForPosition(
-                    EquippablePositions::typesForPositions(
-                        $this->handleUniquesAndMythics->getSpecialSlotPosition()
-                    ),
-                    true,
-                );
+                $position = $this->handleUniquesAndMythics->getSpecialSlotPosition();
+
+                $slotForReplacedSpecialItem = $this->fetchBestItemForPositionFromInventory
+                    ->fetchBestItemForPosition(
+                        EquippablePositions::typesForPositions($position),
+                        true,
+                    );
 
                 if (is_null($slotForReplacedSpecialItem)) {
                     continue;
@@ -104,8 +145,7 @@ class EquipBestItemForSlotsTypesService {
 
             if (in_array($position, [EquippablePositions::LEFT_HAND, EquippablePositions::RIGHT_HAND])) {
                 $character = $this->handleHands->setCurrentlyEquipped($this->currentlyEquippedSlots)
-                                               ->handleHands($character, $bestSlot, $position);
-
+                    ->handleHands($character, $bestSlot, $position);
 
                 $this->fetchInventoryDetails($character);
 
@@ -114,7 +154,7 @@ class EquipBestItemForSlotsTypesService {
 
             if (in_array($position, [EquippablePositions::TRINKET, EquippablePositions::ARTIFACT])) {
                 $character = $this->handleHands->setCurrentlyEquipped($this->currentlyEquippedSlots)
-                                               ->handleHands($character, $bestSlot, $position);
+                    ->handleHands($character, $bestSlot, $position);
 
 
                 $this->fetchInventoryDetails($character);
@@ -123,10 +163,12 @@ class EquipBestItemForSlotsTypesService {
             }
 
             $this->handleRegularComparisonAndReplace->setCurrentlyEquipped($this->currentlyEquippedSlots)
-                                                    ->handleRegularComparison($character, $bestSlot, $position);
+                ->handleRegularComparison($character, $bestSlot, $position);
 
             $this->fetchInventoryDetails($character);
         }
+
+        return $character->refresh();
     }
 
     protected function fetchInventoryDetails(Character $character): void {
@@ -147,6 +189,8 @@ class EquipBestItemForSlotsTypesService {
             $this->equipmentHasChanged = $this->currentlyEquippedSlots->diff($oldCurrentlyEquipped)->count() > 0;
         }
 
-        $this->fetchBestItemForPositionFromInventory = $this->fetchBestItemForPositionFromInventory->setInventory($this->inventorySlots);
+        $this->fetchBestItemForPositionFromInventory = $this->fetchBestItemForPositionFromInventory
+            ->setCurrentlyEquipped($this->currentlyEquippedSlots)
+            ->setInventory($this->inventorySlots);
     }
 }

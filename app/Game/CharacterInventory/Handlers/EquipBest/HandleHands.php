@@ -55,7 +55,6 @@ class HandleHands {
         $slotForPosition  = $this->getSlotForPosition($oppositePosition);
 
         if (is_null($slotForPosition)) {
-
             $this->equipItem($character, $slotToEquip, $position);
 
             return $character->refresh();
