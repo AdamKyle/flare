@@ -89,10 +89,25 @@ class EquipBestItemForSlotsTypesService {
 
             $oppositeHand = EquippablePositions::getOppisitePosition($currentSlot->position);
 
+            $typesForPosition = EquippablePositions::typesForPositions($oppositeHand);
+
+            if ($currentSlot->item->type === WeaponTypes::WEAPON) {
+                $typesForPosition = [ArmourTypes::SHIELD];
+            }
+
+            if ($currentSlot->item->type === ArmourTypes::SHIELD) {
+                $index = array_search(ArmourTypes::SHIELD, $typesForPosition);
+
+                if ($index !== false) {
+                    unset($typesForPosition[$index]);
+                }
+            }
+
             $bestSlot = $this->fetchBestItemForPositionFromInventory
-                ->fetchBestItemForPosition(EquippablePositions::typesForPositions($oppositeHand), $hasSpecialEquipped);
+                ->fetchBestItemForPosition($typesForPosition, $hasSpecialEquipped);
 
             if (!is_null($bestSlot)) {
+
                 $this->handleHands->setCurrentlyEquipped($this->currentlyEquippedSlots)
                     ->handleHands($character, $bestSlot, $oppositeHand);
             }

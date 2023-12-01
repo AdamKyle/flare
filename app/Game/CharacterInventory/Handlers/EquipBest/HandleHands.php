@@ -60,7 +60,9 @@ class HandleHands {
             return $character->refresh();
         }
 
-        if (in_array($slotForPosition->item->type, self::TWO_HANDED)) {
+        if (in_array($slotForPosition->item->type, self::TWO_HANDED) ||
+            in_array($slotToEquip->item->type, self::TWO_HANDED))
+        {
             if ($this->inventoryItemComparison->compareItems($slotToEquip->item, $slotForPosition->item)) {
                 $this->equipItemService->setCharacter($character)->unequipBothHands();
 
@@ -70,7 +72,7 @@ class HandleHands {
             }
         }
 
-        return $character;
+        return $character->refresh();
     }
 
     protected function equipItem(Character $character, InventorySlot $slotToEquip, string $position) {
