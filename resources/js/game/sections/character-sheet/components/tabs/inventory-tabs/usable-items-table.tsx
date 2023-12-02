@@ -14,6 +14,7 @@ import {AxiosError, AxiosResponse} from "axios";
 import InventoryUseItem from "../../modals/inventory-use-item";
 import UsableItemsDetails from "../../../../../lib/game/character-sheet/types/inventory/usable-items-details";
 import InventoryUseDetails from "../../modals/inventory-use-details";
+import InventoryActionConfirmationModal from "../../modals/inventory-action-confirmation-modal";
 
 export default class UsableItemsTable extends React.Component<UsableItemTable, any> implements ActionsInterface {
     constructor(props: UsableItemTable) {
@@ -24,15 +25,18 @@ export default class UsableItemsTable extends React.Component<UsableItemTable, a
             show_use_item_modal: false,
             show_usable_details: false,
             show_use_many: false,
+            show_destroy_item: false,
             item_to_list: null,
             item_to_use: null,
+            item_to_destroy_name: null,
+            item_slot_id_to_delete: null,
         }
     }
 
-    manageUseItem(row?: UsableItemsDetails) {
+    manageUseItem(row: UsableItemsDetails) {
         this.setState({
             show_use_item_modal: !this.state.show_use_item_modal,
-            item_to_use: typeof row !== 'undefined' ? row : null,
+            item_to_use: row,
         })
     }
 
@@ -55,14 +59,18 @@ export default class UsableItemsTable extends React.Component<UsableItemTable, a
     }
 
     destroy(row: UsableItemsDetails) {
-        (new Ajax()).setRoute('character/'+this.props.character_id+'/inventory/destroy-alchemy-item').setParameters({
-            slot_id: row.slot_id,
-        }).doAjaxCall('post', (result: AxiosResponse) => {
-            this.props.update_inventory(result.data.inventory);
+        this.setState({
+            show_destroy_item: !this.state.show_destroy_item,
+            item_to_destroy_name: row.item_name,
+            item_slot_id_to_delete: row.slot_id,
+        });
+    }
 
-            this.props.set_success_message(result.data.message);
-        }, (error: AxiosError) => {
-
+    showDestroyConfirmation() {
+        this.setState({
+            show_destroy_item: !this.state.show_destroy_item,
+            item_to_destroy_name: null,
+            item_slot_id_to_delete: null,
         });
     }
 
@@ -114,6 +122,30 @@ export default class UsableItemsTable extends React.Component<UsableItemTable, a
                 <div className={'max-w-[290px] sm:max-w-[100%] overflow-y-hidden'}>
                     <Table data={this.props.usable_items} columns={buildLimitedColumns(this, this.manageViewItem.bind(this), true)} dark_table={this.props.dark_table}/>
                 </div>
+
+                {
+                    this.state.show_destroy_item ?
+                        <InventoryActionConfirmationModal
+                            is_open={this.state.show_destroy_item}
+                            manage_modal={this.showDestroyConfirmation.bind(this)}
+                            title={"Destroy " + this.state.item_to_destroy_name}
+                            url={
+                                'character/'+ this.props.character_id +'/inventory/destroy-alchemy-item'
+                            }
+                            ajax_params={{
+                                slot_id: this.state.item_slot_id_to_delete
+                            }}
+                            update_inventory={this.props.update_inventory}
+                            set_success_message={this.props.set_success_message}
+                        >
+                            <p>
+                                Are you sure you want to do this? This action will
+                                destroy the selected item from your usable inventory. You cannot undo
+                                this action.
+                            </p>
+                        </InventoryActionConfirmationModal>
+                    : null
+                }
 
                 {
                     this.state.show_list_modal && this.state.item_to_list !== null ?

@@ -37,11 +37,13 @@ class ResetTrinketsOnPlayers extends Command
                     continue;
                 }
 
-                $slots = $character->inventory->slots()->whereHas('item', function ($query) {
+                $slots = $character->inventory->slots()->where('equipped', true)->whereHas('item', function ($query) {
                     $query->where('type', 'trinket');
-                })->get();
+                });
 
-                if ($slots->isEmpty()) {
+                $slotsCount = $slots->count();
+
+                if ($slotsCount === 0) {
                     $inventorySets = $character->inventorySets()
                         ->whereHas('slots', function ($query) {
                             $query->whereHas('item', function ($innerQuery) {
@@ -63,8 +65,8 @@ class ResetTrinketsOnPlayers extends Command
                     }
                 }
 
-                if ($slots->isNotEmpty()) {
-                    $slots->update(['equipped', false]);
+                if ($slotsCount > 0) {
+                    $slots->update(['equipped' => false]);
                 }
             }
         });

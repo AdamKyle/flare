@@ -57,7 +57,7 @@ class GemService {
         $characterSkill = $this->getCraftingSkill($character);
 
         if ($this->skillLevelToHigh($characterSkill, $tier)) {
-            ServerMessageHandler::sendBasicMessage($character->user, 'This gem tier is too hard.');
+            ServerMessageHandler::sendBasicMessage($character->user, 'This gem tier is too hard. You lost your investment and start to cry.');
 
             return $this->successResult();
         }
@@ -70,8 +70,6 @@ class GemService {
         }
 
         $gemBagEntry = $this->giveGem($character, $tier);
-
-        $character = $this->updateCharacterCurrencies($character, $tier);
 
         if (!$characterSkill->level <= (new GemTierValue($tier))->maxForTier()['max_level']) {
             event(new UpdateSkillEvent($characterSkill));
@@ -204,35 +202,7 @@ class GemService {
             'copper_coins' => $newCopperCoins,
         ]);
 
-        return $character->refresh();
-    }
-
-    /**
-     * Update character currencies.
-     *
-     * @param Character $character
-     * @param int $tier
-     * @return Character
-     * @throws Exception
-     */
-    protected function updateCharacterCurrencies(Character $character, int $tier): Character {
-        $data = (new GemTierValue($tier))->maxForTier();
-
-        $goldDust    = $character->gold_dust;
-        $shards      = $character->shards;
-        $copperCoins = $character->copper_coins;
-
-        $goldDust    = $goldDust - $data['cost']['gold_dust'];
-        $shards      = $shards - $data['cost']['shards'];
-        $copperCoins = $copperCoins - $data['cost']['copper_coins'];
-
-        $character->update([
-            'gold'        => $goldDust > 0 ? $goldDust : 0,
-            'shards'      => $shards > 0 ? $shards : 0,
-            'copperCoins' => $copperCoins > 0 ? $copperCoins : 0,
-        ]);
-
-        $character = $character->refresh();
+        $character = $character->refresh();;
 
         event(new UpdateTopBarEvent($character));
 

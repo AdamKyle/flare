@@ -63,7 +63,7 @@ class ComparisonService {
         $service  = $this->characterInventoryService->setCharacter($character)
             ->setInventorySlot($itemToEquip)
             ->setPositions($this->validEquipPositionsValue->getPositions($itemToEquip->item))
-            ->setInventory($type);
+            ->setInventory();
 
         $inventory = $service->inventory();
 

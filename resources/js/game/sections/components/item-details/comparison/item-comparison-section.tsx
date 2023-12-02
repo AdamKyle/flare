@@ -24,11 +24,11 @@ export default class ItemComparisonSection extends React.Component<ItemCompariso
         super(props);
 
         this.tabs = [{
-            key: 'general',
-            name: 'General'
-        }, {
             key: 'comparison',
             name: 'Comparison',
+        }, {
+            key: 'general',
+            name: 'General'
         }, {
             key: 'gem-comparison',
             name: 'Gem Data',
@@ -253,7 +253,7 @@ export default class ItemComparisonSection extends React.Component<ItemCompariso
             const keyCount = Object.keys(this.props.comparison_details.itemToEquip)
                                    .filter((key: string) => !this.invalidFields.includes(key))
                                    .length;
-            
+
 
             return (
                 <div className={clsx({
@@ -321,18 +321,18 @@ export default class ItemComparisonSection extends React.Component<ItemCompariso
     renderTabs(double: boolean) {
         return (
             <Tabs tabs={this.tabs}>
-                <TabPanel key={'general'}>
-                    <div className='mb-10'>
-                        {this.renderSingleItem()}
-                    </div>
-                </TabPanel>
                 <TabPanel key={'comparison'}>
                     {
                         double ?
                             this.renderTwoComparisons()
-                        :
+                            :
                             this.renderSingleComparison()
                     }
+                </TabPanel>
+                <TabPanel key={'general'}>
+                    <div className='mb-10'>
+                        {this.renderSingleItem()}
+                    </div>
                 </TabPanel>
                 <TabPanel key={'gem-comparison'}>
                     <InventoryItemGemDetails

@@ -73,12 +73,19 @@ class GemShopService {
         foreach ($character->gemBag->gemSlots as $slot) {
             $cost = $this->getCurrencyBack($slot);
 
-            $newGoldDust    += $cost['gold_dust'] + $character->gold_dust;
-            $newShards      += $cost['shards'] + $character->shards;
-            $newCopperCoins += $cost['copper_coins'] + $character->copper_coins;
+            $newGoldDust    += $cost['gold_dust'];
+            $newShards      += $cost['shards'];
+            $newCopperCoins += $cost['copper_coins'];
 
             $slot->delete();
         }
+
+        $message = 'You sold the gems for: ' . number_format($newGoldDust) . ' Gold Dust, ' .
+            number_format($newShards) . ' Shards and ' . number_format($newCopperCoins) . ' Copper Coins.';
+
+        $newGoldDust    += $character->gold_dust;
+        $newShards      += $character->shards;
+        $newCopperCoins += $character->copper_coins;
 
         if ($newGoldDust >= MaxCurrenciesValue::MAX_GOLD_DUST) {
             $newGoldDust = MaxCurrenciesValue::MAX_GOLD_DUST;
@@ -99,9 +106,6 @@ class GemShopService {
         ]);
 
         event(new UpdateCharacterCurrenciesEvent($character->refresh()));
-
-        $message = 'You sold the gems for: ' . number_format($cost['gold_dust']) . ' Gold Dust, ' .
-            number_format($cost['shards']) . ' Shards and ' . number_format($cost['copper_coins']) . ' Copper Coins.';
 
         return $this->successResult([
             'gems'    => $this->characterGemBagService->getGems($character->refresh())['gem_slots'],

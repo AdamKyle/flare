@@ -5,6 +5,13 @@
             the quest, click complete.</p>
         <p class="mb-3">You must have the required items, currencies and/or faction points needed.</p>
 
+
+        @if (!is_null($quest->raid_id))
+            <x-core.alerts.info-alert title="ATTN!">
+                <p>This quest chain is only available during the: {{$quest->raid->name}} Raid.</p>
+            </x-core.alerts.info-alert>
+        @endif
+
         @if (!is_null($quest->only_for_event))
             @if ($quest->eventType()->isWinterEvent())
                 <x-core.alerts.info-alert title="ATTN!">

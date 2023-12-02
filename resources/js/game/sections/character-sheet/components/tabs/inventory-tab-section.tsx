@@ -482,7 +482,7 @@ export default class InventoryTabSection extends React.Component<
                             <p>
                                 If you encounter issues or bugs please, with as much details as you can, post the issues in {" "}
                                 <a href='https://discord.gg/hcwdqJUerh' target="_blank">
-                                    Discord <i
+                                    Discord #bugs <i
                                     className="fas fa-external-link-alt"></i>
                                 </a>
                             </p>

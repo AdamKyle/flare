@@ -181,7 +181,7 @@ const getRequirementKey = (labelKey: string): string => {
         case "required_kingdom_building_id":
             return "required_kingdom_building_level";
         case "required_to_be_on_game_map_name":
-            return "be_on_game_map";
+            return "required_to_be_on_game_map_name";
         default:
             return labelKey;
     }

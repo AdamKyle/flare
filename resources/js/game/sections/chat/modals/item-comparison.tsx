@@ -94,7 +94,7 @@ export default class ItemComparison extends React.Component<any, any> {
             <div className="grid grid-cols-2 gap-2">
                 {this.state.comparison_details.itemToEquip.type === "gem" ? (
                     <span className="text-lime-600 dark:text-lime-500">
-                        {this.state.comparison_details.itemToEquip.item.name}
+                        {this.state.comparison_details.itemToEquip.item.gem.name}
                     </span>
                 ) : (
                     <ItemNameColorationText
@@ -199,7 +199,7 @@ export default class ItemComparison extends React.Component<any, any> {
         if (type === "gem") {
             return (
                 <GemDetails
-                    gem={this.state.comparison_details.itemToEquip.item}
+                    gem={this.state.comparison_details.itemToEquip.item.gem}
                 />
             );
         }

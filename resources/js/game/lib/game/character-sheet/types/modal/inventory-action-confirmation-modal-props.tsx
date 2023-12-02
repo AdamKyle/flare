@@ -15,4 +15,6 @@ export default interface InventoryActionConfirmationModalProps {
     url: string;
 
     children?: React.ReactNode;
+
+    ajax_params?: any;
 }

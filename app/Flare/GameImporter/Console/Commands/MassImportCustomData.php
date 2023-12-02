@@ -43,11 +43,13 @@ class MassImportCustomData extends Command {
         Artisan::call('import:game-data Skills');
         Artisan::call('import:game-data Monsters');
         Artisan::call('import:game-data Npcs');
-        Artisan::call('import:game-data Quests');
         Artisan::call('import:game-data Raids');
+        Artisan::call('import:game-data Quests');
         Artisan::call('import:game-data "Admin Section"');
 
         $this->importInformationSection();
+
+        Artisan::call('reset:trinkets-on-players');
 
         Artisan::call('generate:monster-cache');
     }

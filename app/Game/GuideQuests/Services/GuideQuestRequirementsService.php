@@ -455,7 +455,7 @@ class GuideQuestRequirementsService {
     public function requirePlayerToBeOnASpecificMap(Character $character, GuideQuest $quest): GuideQuestRequirementsService {
 
         if ($character->map->game_map_id === $quest->be_on_game_map) {
-            $this->finishedRequirements[] = 'be_on_game_map';
+            $this->finishedRequirements[] = 'required_to_be_on_game_map_name';
         }
 
         return $this;

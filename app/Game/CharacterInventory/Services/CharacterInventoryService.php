@@ -3,10 +3,10 @@
 namespace App\Game\CharacterInventory\Services;
 
 use Exception;
-use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Collection;
 use League\Fractal\Resource\Collection as LeagueCollection;
 use League\Fractal\Manager;
+use App\Flare\Values\ArmourTypes;
 use App\Flare\Transformers\UsableItemTransformer;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Core\Traits\ResponseBuilder;
@@ -490,13 +490,25 @@ class CharacterInventoryService {
      */
     protected function getInventory(): Collection {
 
-        $inventory = $this->character->inventory->slots->whereIn('position', $this->positions)->where('equipped', true);
+        $inventory = $this->character->inventory->slots()->whereIn('position', $this->positions)->get();
 
         if (!$inventory->isEmpty()) {
             return $inventory;
         }
 
-        return $this->character->inventorySets->where('is_equipped', true)->whereIn('slots.position', $this->positions);
+        $result = $this->character->inventorySets()
+            ->where('is_equipped', true)
+            ->whereHas('slots', function ($query) {
+                $query->whereIn('position', $this->positions);
+            })
+            ->with(['slots' => function ($query) {
+                $query->whereIn('position', $this->positions);
+            }])
+            ->get()
+            ->pluck('slots')
+            ->flatten();
+
+        return new Collection($result);
     }
 
     /**
@@ -527,6 +539,11 @@ class CharacterInventoryService {
      * @throws Exception
      */
     protected function fetchType(string $type): string {
+
+        if (in_array($type, ArmourTypes::armourTypes())) {
+            $type = 'armour';
+        }
+
         $acceptedTypes = [
             'weapon', 'ring', 'shield', 'artifact', 'spell', 'armour',
             'trinket', 'stave', 'hammer', 'bow', 'alchemy', 'quest',

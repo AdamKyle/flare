@@ -56,16 +56,10 @@ class CharacterGemBagService {
 
     /**
      * @param Character $character
-     * @param int $gemBagSlot
+     * @param GemBagSlot $gemBagSlot
      * @return array
      */
-    public function getGemData(Character $character, int $gemBagSlot): array {
-
-        $gemSlot = $character->gemBag->gemSlots->find($gemBagSlot);
-
-        if (is_null($gemSlot)) {
-            return $this->errorResult('No gem was found');
-        }
+    public function getGemData(Character $character, GemBagSlot $gemSlot): array {
 
         $gem = new Item($gemSlot->gem, $this->gemsTransformer);
         $gem = $this->manager->createData($gem)->toArray();

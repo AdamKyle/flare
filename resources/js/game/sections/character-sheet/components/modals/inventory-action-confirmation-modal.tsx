@@ -22,7 +22,13 @@ export default class InventoryActionConfirmationModal extends React.Component<In
         this.setState({
             loading: true
         }, () => {
-            (new Ajax()).setRoute(this.props.url).doAjaxCall('post', (result: AxiosResponse) => {
+            let ajax = (new Ajax()).setRoute(this.props.url);
+
+            if (this.props.ajax_params) {
+                ajax = ajax.setParameters(this.props.ajax_params);
+            }
+
+            ajax.doAjaxCall('post', (result: AxiosResponse) => {
                 this.setState({
                     loading: false,
                 }, () => {

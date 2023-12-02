@@ -3,6 +3,7 @@
 namespace App\Game\Core\Values;
 
 use App\Flare\Models\Item;
+use App\Flare\Values\ArmourTypes;
 
 class ValidEquipPositionsValue {
 
@@ -14,8 +15,10 @@ class ValidEquipPositionsValue {
      */
     public function getPositions(Item $item): array {
         if (!is_null($item->default_position)) {
-            if (!in_array($item->default_position, ['stave', 'bow', 'hammer'])) {
-                return [];
+            if (in_array($item->default_position, array_merge(
+                ArmourTypes::armourTypes(),
+            ))) {
+                return [$item->default_position];
             }
         }
 
@@ -37,7 +40,10 @@ class ValidEquipPositionsValue {
                 $positions = ['ring-one', 'ring-two'];
                 break;
             case 'trinket':
-                $positions = ['trinket-one', 'trinket-two'];
+                $positions = ['trinket'];
+                break;
+            case 'artifact':
+                $positions = ['artifact'];
                 break;
             default:
                 break;
