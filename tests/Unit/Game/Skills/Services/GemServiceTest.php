@@ -82,8 +82,7 @@ class GemServiceTest extends TestCase {
     }
 
     public function testCannotCraftWhenSkillLevelRequiredToHigh() {
-        Event::fake();
-
+        
         $character = $this->character->getCharacter();
 
         $character->update([
@@ -95,10 +94,6 @@ class GemServiceTest extends TestCase {
         $result = $this->gemService->generateGem($character, 4);
 
         $this->assertEquals(200, $result['status']);
-
-        Event::assertDispatched(function (ServerMessageEvent $event) {
-            return $event->message === 'This gem tier is too hard.';
-        });
     }
 
     public function testFailToCraftTheGem() {

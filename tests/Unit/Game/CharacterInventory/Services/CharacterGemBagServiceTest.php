@@ -43,18 +43,9 @@ class CharacterGemBagServiceTest extends TestCase {
     public function testGetGemData() {
         $character = $this->character->gemBagManagement()->assignGemsToBag()->getCharacter();
 
-        $result = $this->characterGemBagService->getGemData($character, $character->gemBag->gemSlots->first()->id);
+        $result = $this->characterGemBagService->getGemData($character, $character->gemBag->gemSlots->first());
 
         $this->assertEquals(200, $result['status']);
         $this->assertNotEmpty($result['gem']);
-    }
-
-    public function testFailToGetGemData() {
-        $character = $this->character->getCharacter();
-
-        $result = $this->characterGemBagService->getGemData($character, rand(1000, 2000));
-
-        $this->assertEquals(422, $result['status']);
-        $this->assertEquals('No gem was found', $result['message']);
     }
 }

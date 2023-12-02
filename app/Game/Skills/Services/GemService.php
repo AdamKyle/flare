@@ -57,6 +57,7 @@ class GemService {
         $characterSkill = $this->getCraftingSkill($character);
 
         if ($this->skillLevelToHigh($characterSkill, $tier)) {
+
             ServerMessageHandler::sendBasicMessage($character->user, 'This gem tier is too hard. You lost your investment and start to cry.');
 
             return $this->successResult();

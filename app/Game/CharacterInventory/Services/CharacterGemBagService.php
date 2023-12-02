@@ -56,10 +56,14 @@ class CharacterGemBagService {
 
     /**
      * @param Character $character
-     * @param GemBagSlot $gemBagSlot
+     * @param GemBagSlot $gemSlot
      * @return array
      */
     public function getGemData(Character $character, GemBagSlot $gemSlot): array {
+
+        if ($character->id !== $gemSlot->gemBag->character_id) {
+            return $this->errorResult('No. Not yours!');
+        }
 
         $gem = new Item($gemSlot->gem, $this->gemsTransformer);
         $gem = $this->manager->createData($gem)->toArray();

@@ -34,7 +34,7 @@ class GemBagSlot extends Model {
         return $this->hasOne(Gem::class, 'id', 'gem_id');
     }
 
-    public function GemBag(): BelongsTo {
+    public function gemBag(): BelongsTo {
         return $this->belongsTo(GemBag::class, 'gem_bag_id', 'id');
     }
 }
