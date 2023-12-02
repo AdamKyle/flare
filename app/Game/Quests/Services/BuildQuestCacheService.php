@@ -8,23 +8,23 @@ use App\Flare\Models\Raid;
 use App\Game\Events\Values\EventType;
 use App\Game\Quests\Events\UpdateQuests;
 use App\Game\Quests\Events\UpdateRaidQuests;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Cache;
 
 class BuildQuestCacheService {
 
     public function buildQuestCache(bool $sendOffEvent = false): void {
         $quests = Quest::where('is_parent', true)
-            ->whereNull('only_for_event');
-
-        if ($this->isWinterEventRunning()) {
-            $quests = $quests->orWhere('only_for_event', EventType::WINTER_EVENT);
-        }
-
-        $quests = $quests->whereNull('raid_id')
+            ->whereNull('only_for_event')
+            ->whereNull('raid_id')
             ->with('childQuests')
             ->get();
 
         $quests = $quests->toArray();
+
+        $winterQuests = $this->fetchWinterEventQuests();
+
+        $quests = array_merge($quests, $winterQuests);
 
         Cache::put('game-quests', $quests);
 
@@ -34,8 +34,19 @@ class BuildQuestCacheService {
     }
 
 
-    protected function isWinterEventRunning(): bool {
-        return Event::where('type', EventType::WINTER_EVENT)->count() > 0;
+    protected function fetchWinterEventQuests(): array {
+        $event = Event::where('type', EventType::WINTER_EVENT)->first();
+
+        if (is_null($event)) {
+            return [];
+        }
+
+        return Quest::where('is_parent', true)
+            ->where('only_for_event', EventType::WINTER_EVENT)
+            ->whereNull('raid_id')
+            ->with('childQuests')
+            ->get()
+            ->toArray();
     }
 
     public function buildRaidQuestCache(bool $sendOffEvent = false): void {
