@@ -22,6 +22,7 @@ export default class Quests extends React.Component<QuestsProps, QuestState> {
     }
 
     componentDidMount() {
+        console.log(this.props.quest_details.raid_quests);
         this.setState({
             quests: this.props.quest_details.quests,
             raid_quests: this.props.quest_details.raid_quests,

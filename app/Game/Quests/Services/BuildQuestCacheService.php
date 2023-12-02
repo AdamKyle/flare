@@ -65,7 +65,17 @@ class BuildQuestCacheService {
         Cache::put('raid-quests', $raidQuests);
 
         if ($sendOffEvent) {
-            event(new UpdateRaidQuests($raidQuests));
+
+            $event  = Event::where('type', EventType::WINTER_EVENT)->first();
+            $quests = [];
+
+            if (!is_null($event)) {
+                $quests = $this->fetchQuestsForRaid($event);
+            } else {
+                $quests = $this->fetchQuestsForRaid();
+            }
+
+            event(new UpdateRaidQuests($quests));
         }
     }
 
