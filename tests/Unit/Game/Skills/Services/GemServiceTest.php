@@ -82,7 +82,7 @@ class GemServiceTest extends TestCase {
     }
 
     public function testCannotCraftWhenSkillLevelRequiredToHigh() {
-        
+
         $character = $this->character->getCharacter();
 
         $character->update([
