@@ -27,7 +27,8 @@ class UserLoggedInListener {
             UserSiteAccessStatistics::create([
                 'amount_signed_in'  => 1,
                 'amount_registered' => 0,
-                'invalid_ips'       => [$event->user->ip_address]
+                'invalid_ips'       => [$event->user->ip_address],
+                'invalid_user_ids'  => [$event->user->id],
             ]);
 
             $adminUser = User::with('roles')->whereHas('roles', function($q) { $q->where('name', 'Admin'); })->first();
@@ -45,25 +46,30 @@ class UserLoggedInListener {
             UserSiteAccessStatistics::create([
                 'amount_signed_in'  => 1,
                 'amount_registered' => 0,
-                'invalid_ips'       => [$event->user->ip_address]
+                'invalid_ips'       => [$event->user->ip_address],
+                'invalid_user_ids'  => [$event->user->id],
             ]);
         } else {
 
-            $invalidIps = $lastRecord->invalid_ips;
+            $invalidIps     = $lastRecord->invalid_ips;
+            $invalidUserIds = $lastRecord->invalid_user_ids;
 
             if (is_null($invalidIps)) {
                 UserSiteAccessStatistics::create([
                     'amount_signed_in'  => $lastRecord->amount_signed_in + 1,
                     'amount_registered' => $lastRecord->amount_registered,
                     'invalid_ips'       => [$event->user->ip_address],
+                    'invalid_user_ids'  => [$event->user->id],
                 ]);
-            } else if (!in_array($event->user->ip_address, $invalidIps)) {
-                $invalidIps[] = $event->user->ip_address;
+            } else if (!in_array($event->user->id, $invalidUserIds)) {
+                $invalidIps[]     = $event->user->ip_address;
+                $invalidUserIds[] = $event->user->ip_address;
 
                 UserSiteAccessStatistics::create([
                     'amount_signed_in'  => $lastRecord->amount_signed_in + 1,
                     'amount_registered' => $lastRecord->amount_registered,
                     'invalid_ips'       => $invalidIps,
+                    'invalid_user_ids'  => $invalidUserIds,
                 ]);
             }
         }
