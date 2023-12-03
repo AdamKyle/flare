@@ -101,8 +101,6 @@ export default class QuestListeners implements GameListener {
                     return;
                 }
 
-                console.log(event.raidQuests);
-
                 quests.raid_quests = event.raidQuests;
 
                 this.component.setState({

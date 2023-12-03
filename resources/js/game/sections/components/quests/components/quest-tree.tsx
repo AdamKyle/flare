@@ -7,31 +7,65 @@ import {ChildQuestDetails} from "../../../map/types/child-quest-details";
 import Tabs from "../../../../components/ui/tabs/tabs";
 import TabPanel from "../../../../components/ui/tabs/tab-panel";
 
-export  default class QuestTree extends React.Component<QuestTreeProps, {}> {
-
-    private tabs: {key: string, name: string}[];
+export  default class QuestTree extends React.Component<QuestTreeProps, {tabs: {key: string, name: string}[]}> {
 
     private invalid_planes: string[];
 
     constructor(props: QuestTreeProps) {
         super(props);
 
-        this.tabs = [{
-            key: 'quest-chain',
-            name: 'Quest Chain'
-        }, {
-            key: 'one-off-quests',
-            name: 'One Off Quests',
-        }];
+        this.state = {
+            tabs: [{
+                key: 'quest-chain',
+                name: 'Quest Chain'
+            }, {
+                key: 'one-off-quests',
+                name: 'One Off Quests',
+            }],
+        }
 
         this.invalid_planes = ['Purgatory']
     }
 
     componentDidMount(): void {
-        if (this.props.raid_quests.length > 0) {
-            this.tabs.push({
+        const planeRaidQuest = this.fetchParentRaidQuestChain();
+
+        if (this.props.raid_quests.length > 0 && planeRaidQuest !== null) {
+
+            const tabs = JSON.parse(JSON.stringify(this.state.tabs));
+
+            tabs.push({
                 key: 'raid-quests',
                 name: 'Raid Quests',
+            });
+
+            this.setState({
+                tabs: tabs,
+            });
+        }
+    }
+
+    componentDidUpdate() {
+        const tabIndex = this.state.tabs.findIndex((tab) => tab.key === 'raid-quests');
+        
+        if (this.fetchParentRaidQuestChain() === null && tabIndex !== -1) {
+            const tabs = JSON.parse(JSON.stringify(this.state.tabs));
+
+            tabs.splice(tabIndex, 1);
+
+            this.setState({
+                tabs: tabs,
+            });
+        } else if (this.fetchParentRaidQuestChain() !== null && tabIndex === -1) {
+            const tabs = JSON.parse(JSON.stringify(this.state.tabs));
+
+            tabs.push({
+                key: 'raid-quests',
+                name: 'Raid Quests',
+            });
+
+            this.setState({
+                tabs: tabs,
             });
         }
     }
@@ -115,7 +149,7 @@ export  default class QuestTree extends React.Component<QuestTreeProps, {}> {
 
     render() {
         return(
-            <Tabs tabs={this.tabs}>
+            <Tabs tabs={this.state.tabs}>
                 <TabPanel key={'quest-chain'}>
                     <Tree
                         lineWidth={'2px'}
@@ -131,7 +165,7 @@ export  default class QuestTree extends React.Component<QuestTreeProps, {}> {
 
                 </TabPanel>
                 {
-                    this.props.raid_quests.length > 0 ?
+                    this.props.raid_quests.length > 0 && this.fetchParentRaidQuestChain() !== null ?
                         <TabPanel key={'one-off-quests'}>
                             <Tree
                                 lineWidth={'2px'}
