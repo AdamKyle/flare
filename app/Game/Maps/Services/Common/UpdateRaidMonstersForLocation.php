@@ -78,11 +78,14 @@ trait UpdateRaidMonstersForLocation {
                 }
             }
 
-            $raidMonsters = $raidEvent->raid->getMonstersForSelection($locationIds);
+            if (in_array($location->id, $locationIds)) {
+                $raidMonsters = $raidEvent->raid->getMonstersForSelection($locationIds);
 
-            event(new UpdateRaidMonsters($raidMonsters, $character->user));
+                event(new UpdateRaidMonsters($raidMonsters, $character->user));
 
-            return true;
+                return true;
+            }
+            
         }
 
         return false;

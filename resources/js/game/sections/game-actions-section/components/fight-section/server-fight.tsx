@@ -43,8 +43,8 @@ export default class ServerFight extends React.Component<ServerFightProps, {}> {
                             <div className={clsx('mb-4 max-w-md m-auto', {
                                 'mt-4': this.attackButtonDisabled()
                             })}>
-                                <HealthMeters is_enemy={true} name={this.props.monster_name} current_health={this.props.monster_health} max_health={this.props.monster_max_health} />
-                                <HealthMeters is_enemy={false} name={this.props.character_name} current_health={this.props.character_health} max_health={this.props.character_max_health} />
+                                <HealthMeters is_enemy={true} name={this.props.monster_name} current_health={Math.floor(this.props.monster_health)} max_health={Math.floor(this.props.monster_max_health)} />
+                                <HealthMeters is_enemy={false} name={this.props.character_name} current_health={Math.floor(this.props.character_health)} max_health={Math.floor(this.props.character_max_health)} />
                             </div>
                             : null
                     }
@@ -64,7 +64,7 @@ export default class ServerFight extends React.Component<ServerFightProps, {}> {
                                 <DangerButton button_label={'Leave Fight'} on_click={this.props.manage_server_fight} additional_css={'mr-4'} disabled={this.props.is_dead}/>
                             : null
                         }
-                        
+
                         {
                             this.props.is_dead ?
                                 <PrimaryButton button_label={'Revive'} on_click={this.props.revive.bind(this)} disabled={!this.props.can_attack}/>
