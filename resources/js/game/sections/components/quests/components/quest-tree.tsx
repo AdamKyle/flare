@@ -47,7 +47,7 @@ export  default class QuestTree extends React.Component<QuestTreeProps, {tabs: {
 
     componentDidUpdate() {
         const tabIndex = this.state.tabs.findIndex((tab) => tab.key === 'raid-quests');
-        
+
         if (this.fetchParentRaidQuestChain() === null && tabIndex !== -1) {
             const tabs = JSON.parse(JSON.stringify(this.state.tabs));
 

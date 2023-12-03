@@ -19,6 +19,7 @@ class UserSiteAccessStatistics extends Model {
         'amount_signed_in',
         'amount_registered',
         'invalid_ips',
+        'invalid_user_ids'
     ];
 
     /**
@@ -30,6 +31,7 @@ class UserSiteAccessStatistics extends Model {
         'amount_signed_in'  => 'integer',
         'amount_registered' => 'integer',
         'invalid_ips'       => 'array',
+        'invalid_user_ids'  => 'array',
     ];
 
     protected static function newFactory() {

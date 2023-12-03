@@ -24,6 +24,7 @@ class UserRegisteredListener {
                 'amount_signed_in'  => 1,
                 'amount_registered' => 1,
                 'invalid_ips'       => [$event->user->ip_address],
+                'invalid_user_ids'  => [$event->user->id],
             ]);
 
             $adminUser = User::with('roles')->whereHas('roles', function($q) { $q->where('name', 'Admin'); })->first();
@@ -41,26 +42,31 @@ class UserRegisteredListener {
             UserSiteAccessStatistics::create([
                 'amount_signed_in'  => 1,
                 'amount_registered' => 1,
-                'invalid_ips'       => [$event->user->ip_address]
+                'invalid_ips'       => [$event->user->ip_address],
+                'invalid_user_ids'  => [$event->user->id]
             ]);
         } else {
 
-            $invalidIps = $lastRecord->invalid_ips;
+            $invalidUsers = $lastRecord->invalid_user_ids;
+            $invalidIps   = $lastRecord->invalid_ips;
 
-            if (is_null($invalidIps)) {
+            if (is_null($invalidUsers)) {
 
                 UserSiteAccessStatistics::create([
                     'amount_signed_in'  => $lastRecord->amount_signed_in + 1,
                     'amount_registered' => $lastRecord->amount_registered + 1,
-                    'invalid_ips'       => [$event->user->ip_address]
+                    'invalid_ips'       => [$event->user->ip_address],
+                    'invalid_user_ids'  => [$event->user->id]
                 ]);
-            } else if (!in_array($event->user->ip_address, $invalidIps)) {
+            } else if (!in_array($event->user->id, $invalidUsers)) {
                 $invalidIps[] = $event->user->ip_address;
+                $invalidUsers[] = $event->user->id;
 
                 UserSiteAccessStatistics::create([
                     'amount_signed_in'  => $lastRecord->amount_signed_in + 1,
                     'amount_registered' => $lastRecord->amount_registered + 1,
                     'invalid_ips'       => $invalidIps,
+                    'invalid_user_ids'  => $invalidUsers,
                 ]);
             }
         }
