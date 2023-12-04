@@ -143,7 +143,7 @@ class PurgatorySmithHouseRewardHandler {
         }
 
         if ($copperCoins > MaxCurrenciesValue::MAX_COPPER) {
-            $shards = MaxCurrenciesValue::MAX_COPPER;
+            $copperCoins = MaxCurrenciesValue::MAX_COPPER;
         }
 
         $character->update([
