@@ -54,7 +54,7 @@ class UserLoggedInListener {
             $invalidIps     = $lastRecord->invalid_ips;
             $invalidUserIds = $lastRecord->invalid_user_ids;
 
-            if (is_null($invalidIps)) {
+            if (is_null($invalidUserIds)) {
                 UserSiteAccessStatistics::create([
                     'amount_signed_in'  => $lastRecord->amount_signed_in + 1,
                     'amount_registered' => $lastRecord->amount_registered,
