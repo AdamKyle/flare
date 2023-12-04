@@ -113,7 +113,7 @@ export default class EventGoalsTab extends React.Component<
                 </div>
                 <div className="my-4 relative top-2">
                     <p className="my-2">
-                        Each phase is an objective then when completed will
+                        Each phase is an objective that when completed will
                         reward all players who participated with a piece of new
                         gear in relation to the event goal.
                     </p>
@@ -123,7 +123,8 @@ export default class EventGoalsTab extends React.Component<
                     </p>
                     <dl className="my-2">
                         <dt>Gear Set Name</dt>
-                        <dd>Corrupted Ice</dd>
+                        <dd><a href="/information/corrupted-ice" target='_blank'>Corrupted Ice <i
+                            className="fas fa-external-link-alt"></i></a></dd>
                         <dt>With Legendary Unique Attached?</dt>
                         <dd>Yes</dd>
                         <dt>With Mythic Attached?</dt>
