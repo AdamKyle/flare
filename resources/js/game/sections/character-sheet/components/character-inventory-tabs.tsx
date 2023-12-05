@@ -83,12 +83,14 @@ export default class CharacterInventoryTabs extends React.Component<
 
         // @ts-ignore
         this.updateInventoryListener.listen(
-            "Game.Core.Events.CharacterInventoryUpdateBroadCastEvent",
+            "Game.CharacterInventory.Events.CharacterInventoryUpdateBroadCastEvent",
             (event: any) => {
                 if (this.state.inventory !== null) {
                     const inventoryState = JSON.parse(
                         JSON.stringify(this.state.inventory)
                     );
+
+                    console.log(inventoryState, event);
 
                     inventoryState[event.type] = event.inventory;
 

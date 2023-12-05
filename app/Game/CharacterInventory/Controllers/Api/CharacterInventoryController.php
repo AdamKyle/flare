@@ -152,6 +152,10 @@ class  CharacterInventoryController extends Controller {
             }
         }
 
+        $character = $character->refresh();
+
+        $inventory = $this->characterInventoryService->setCharacter($character);
+
         return response()->json([
             'message' => 'Destroyed All Items.',
             'inventory' => [
