@@ -165,7 +165,7 @@ class PurgatorySmithHouseRewardHandler {
      * @throws Exception
      */
     protected function handleItemReward(Character $character, bool $isMythic, Event $event = null): Character {
-        $lootingChance = $character->skills->where('baseSkill.name', 'Looting')->skill_bonus;
+        $lootingChance = $character->skills->where('baseSkill.name', 'Looting')->first()->skill_bonus;
         $maxRoll = $isMythic ? 10000000 : 1000000;
 
         if ($lootingChance > 0.15) {
