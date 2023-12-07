@@ -74,7 +74,10 @@ class CharacterAttack {
         $this->castType->setCharacterHealth($characterHealth);
         $this->castType->setMonsterHealth($monsterHealth);
         $this->castType->setCharacterAttackData($character, $isPlayerVoided);
+        $this->castType->setAllowEntrancing(true);
+
         $this->castType->castAttack($character, $monster);
+
 
         $this->type = $this->castType;
 

@@ -94,12 +94,6 @@ class WeaponType extends BattleBase {
         if ($this->isEnemyEntranced) {
             $this->weaponAttack($character, $serverMonster, $weaponDamage);
 
-            if ($this->allowSecondaryAttacks && !$this->abortCharacterIsDead) {
-                $this->secondaryAttack($character, $serverMonster);
-
-                $this->elementalAttack($character, $serverMonster);
-            }
-
             return $this;
         }
 
@@ -108,12 +102,6 @@ class WeaponType extends BattleBase {
 
             $this->weaponAttack($character, $serverMonster, $weaponDamage);
 
-            if ($this->allowSecondaryAttacks  && !$this->abortCharacterIsDead) {
-                $this->secondaryAttack($character, $serverMonster);
-
-                $this->elementalAttack($character, $serverMonster);
-            }
-
             return $this;
         }
 
@@ -121,20 +109,24 @@ class WeaponType extends BattleBase {
 
             if ($this->canBlock($weaponDamage, $serverMonster->getMonsterStat('ac'))) {
                 $this->addMessage('Your weapon was blocked!', 'enemy-action');
+
+                $this->dealSecondaryAttackDamage($character, $serverMonster);
             } else {
                 $this->weaponAttack($character, $serverMonster, $weaponDamage);
             }
         } else {
             $this->addMessage('Your attack missed!', 'enemy-action');
 
-            if ($this->allowSecondaryAttacks  && !$this->abortCharacterIsDead) {
-                $this->secondaryAttack($character, $serverMonster);
-
-                $this->elementalAttack($character, $serverMonster);
-            }
+            $this->dealSecondaryAttackDamage($character, $serverMonster);
         }
 
         return $this;
+    }
+
+    protected function dealSecondaryAttackDamage(Character $character, ServerMonster $serverMonster = null): void {
+        if ($this->allowSecondaryAttacks  && !$this->abortCharacterIsDead) {
+            $this->secondaryAttack($character, $serverMonster);
+        }
     }
 
     public function resetMessages() {
@@ -161,11 +153,7 @@ class WeaponType extends BattleBase {
             return;
         }
 
-        if ($this->allowSecondaryAttacks) {
-            $this->secondaryAttack($character, $monster);
-
-            $this->elementalAttack($character, $monster);
-        }
+        $this->dealSecondaryAttackDamage($character, $monster);
     }
 
     public function pvpWeaponDamage(Character $attacker, Character $defender, int $weaponDamage) {

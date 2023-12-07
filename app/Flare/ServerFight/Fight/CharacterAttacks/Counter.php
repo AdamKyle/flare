@@ -59,6 +59,8 @@ class Counter extends BattleBase {
         $characterCounterResistance = $this->characterCacheData->getCachedCharacterData($character, 'counter_resistance_chance');
         $monsterCounterChance       = $monster->getMonsterStat('counter_chance');
 
+        dump($characterCounterResistance, $monsterCounterChance, $characterAc);
+
         $monsterCounterChance -= $characterCounterResistance;
 
         $canCounter = $this->canCounter($monsterCounterChance);

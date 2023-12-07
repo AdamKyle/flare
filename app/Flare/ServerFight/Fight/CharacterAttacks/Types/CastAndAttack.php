@@ -36,13 +36,14 @@ class CastAndAttack extends AttackAndCast {
     }
 
     public function handleAttack(Character $character, ServerMonster $monster) {
-        $this->handleCastAttack($character, $monster, true);
+
+        $this->handleCastAttack($character, $monster, false);
 
         if ($this->characterHealth <= 0) {
             return $this;
         }
 
-        $this->handleWeaponAttack($character, $monster, false);
+        $this->handleWeaponAttack($character, $monster);
 
         if ($this->characterHealth <= 0) {
             return $this;

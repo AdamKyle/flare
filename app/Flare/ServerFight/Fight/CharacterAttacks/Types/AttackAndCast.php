@@ -23,12 +23,12 @@ class AttackAndCast extends BattleBase
 
     private CastType $castType;
 
-    public function __construct(CharacterCacheData $characterCacheData, 
-                                Entrance $entrance, 
-                                CanHit $canHit, 
-                                SecondaryAttacks $secondaryAttacks, 
-                                WeaponType $weaponType, 
-                                CastType $castType) 
+    public function __construct(CharacterCacheData $characterCacheData,
+                                Entrance $entrance,
+                                CanHit $canHit,
+                                SecondaryAttacks $secondaryAttacks,
+                                WeaponType $weaponType,
+                                CastType $castType)
     {
         parent::__construct($characterCacheData);
 
@@ -161,7 +161,7 @@ class AttackAndCast extends BattleBase
             $this->castType->doNotAllowSecondaryAttacks();
         }
 
-        if ($this->isEnemyEntranced && !$disableSecondaryAttacks) {
+        if ($this->isEnemyEntranced) {
             $this->castType->setEntranced();
         }
 

@@ -47,6 +47,7 @@ class CastType extends BattleBase
     }
 
     public function setAllowEntrancing(bool $allow): CastType {
+
         $this->allowEntrancing = $allow;
 
         return $this;
@@ -122,11 +123,7 @@ class CastType extends BattleBase
 
             $this->heal($character);
 
-            if ($this->allowSecondaryAttacks) {
-                $this->secondaryAttack($character, $monster);
-
-                $this->elementalAttack($character, $monster);
-            }
+            $this->doSecondaryAttacks($character, $monster);
 
             return $this;
         }
@@ -138,12 +135,6 @@ class CastType extends BattleBase
         if ($this->isEnemyEntranced) {
             $this->doSpellDamage($character, $monster, $spellDamage, true);
 
-            if ($this->allowSecondaryAttacks) {
-                $this->secondaryAttack($character, $monster);
-
-                $this->elementalAttack($character, $monster);
-            }
-
             return $this;
         }
 
@@ -152,29 +143,21 @@ class CastType extends BattleBase
 
             $this->doSpellDamage($character, $monster, $spellDamage, true);
 
-            if ($this->allowSecondaryAttacks) {
-                $this->secondaryAttack($character, $monster);
-
-                $this->elementalAttack($character, $monster);
-            }
-
             return $this;
         }
 
         if ($this->canHit->canPlayerCastSpell($character, $monster, $this->isVoided)) {
             if ($monster->getMonsterStat('ac') > $spellDamage) {
                 $this->addMessage('Your spell was blocked!', 'enemy-action');
+
+                $this->doSecondaryAttacks($character, $monster);
             } else {
                 $this->doSpellDamage($character, $monster, $spellDamage);
             }
         } else {
             $this->addMessage('Your spell fizzled and failed!', 'enemy-action');
 
-            if ($this->allowSecondaryAttacks) {
-                $this->secondaryAttack($character, $monster);
-
-                $this->elementalAttack($character, $monster);
-            }
+            $this->doSecondaryAttacks($character, $monster);
         }
 
         return $this;
@@ -199,11 +182,7 @@ class CastType extends BattleBase
             return;
         }
 
-        if ($this->allowSecondaryAttacks) {
-            $this->secondaryAttack($character, $monster);
-
-            $this->elementalAttack($character, $monster);
-        }
+        $this->doSecondaryAttacks($character, $monster);
     }
 
     public function pvpSpellDamage(Character $attacker, Character $defender, int $spellDamage, bool $outSideEntrance = false) {
@@ -378,6 +357,14 @@ class CastType extends BattleBase
 
 
             $this->specialAttacks->clearMessages();
+        }
+    }
+
+    protected function doSecondaryAttacks($character, $monster) {
+        if ($this->allowSecondaryAttacks && !$this->abortCharacterIsDead) {
+            $this->secondaryAttack($character, $monster);
+
+            $this->elementalAttack($character, $monster);
         }
     }
 
