@@ -73,9 +73,10 @@ export default class ItemComparisonSection extends React.Component<ItemCompariso
 
     renderChange(details: InventoryComparisonAdjustment, itemToEquip?: InventoryComparisonAdjustment) {
         const invalidFields     = ['item_id', 'id', 'min_cost', 'skill_level_req', 'skill_level_trivial', 'holy_level', 'holy_stacks', 'holy_stacks_applied', 'reduces_enemy_stats', 'cost', 'shop_cost', 'slot_id', 'affix_count', 'is_unique', 'is_mythic'];
-
+        console.log(details);
         let elements = Object.keys(details).map((key) => {
             if (!invalidFields.includes(key)) {
+
                 if (typeof details[key] === 'number' && details[key] !== 0) {
                     return (
                         <Fragment>
@@ -96,14 +97,12 @@ export default class ItemComparisonSection extends React.Component<ItemCompariso
             }
         }).filter((e: any) => typeof e !== 'undefined');
 
+        console.log(elements);
+
         if (elements.length === 0 && typeof itemToEquip !== 'undefined') {
             return (
                 <Fragment>
                     <p className='mb-4'>This item is identical to the one you have equipped.</p>
-                    <dl>
-                        <dt>Position: </dt>
-                        <dd className={'text-blue-600 dark:text-blue-500'}>{this.formatPosition(details['position'])}</dd>
-                    </dl>
                 </Fragment>
             );
         }
@@ -226,7 +225,7 @@ export default class ItemComparisonSection extends React.Component<ItemCompariso
     renderTwoComparisons() {
         if (this.props.comparison_details !== null) {
             return (
-                <div className='grid w-full lg:grid-cols-2 md:m-auto max-h-[400px] lg:max-h-[500px] overflow-y-auto'>
+                <div className='grid w-full lg:grid-cols-2 md:m-auto'>
                     <div>
                         <div className={'font-light pb-3'}>
                             <ItemNameColorationText item={this.fetchItemInfoForColorization(this.props.comparison_details.details[0])} />
@@ -249,6 +248,7 @@ export default class ItemComparisonSection extends React.Component<ItemCompariso
     }
 
     renderSingleComparison() {
+        console.log('renderSingleComparison');
         if (this.props.comparison_details !== null) {
             const keyCount = Object.keys(this.props.comparison_details.itemToEquip)
                                    .filter((key: string) => !this.invalidFields.includes(key))
@@ -256,10 +256,7 @@ export default class ItemComparisonSection extends React.Component<ItemCompariso
 
 
             return (
-                <div className={clsx({
-                    'max-h-[200px] overflow-y-auto md:max-h-[500px] lg:max-h-[600px] lg:overflow-visible': keyCount < 15,
-                    'max-h-[200px] overflow-y-auto': keyCount > 15,
-                })}>
+                <div>
                     <div className={'font-light pb-3'}>
                         <ItemNameColorationText item={this.fetchItemInfoForColorization(this.props.comparison_details.details[0])} />
                     </div>
@@ -276,19 +273,17 @@ export default class ItemComparisonSection extends React.Component<ItemCompariso
             return null;
         }
 
-        const keyCount = Object.keys(this.props.comparison_details.itemToEquip)
+        const keys = Object.keys(this.props.comparison_details.itemToEquip)
                                .filter((key: string) => !this.invalidFields.includes(key))
                                .filter((key: string) => this.props.comparison_details.itemToEquip[key] > 0)
                                .filter((key: string) => this.props.comparison_details.itemToEquip[key] !== null)
-                               .filter((key: string) => typeof this.props.comparison_details.itemToEquip[key] !== 'boolean')
-                               .length;
+                               .filter((key: string) => typeof this.props.comparison_details.itemToEquip[key] !== 'boolean');
+
+        console.log(keys)
 
         if (this.props.comparison_details.itemToEquip.type === 'ring' || this.props.comparison_details.details.length !== 0) {
             return (
-                <div className={clsx({
-                    'max-h-[200px] overflow-y-auto md:max-h-[500px] lg:max-h-[600px] lg:overflow-visible': keyCount < 15,
-                    'max-h-[200px] overflow-y-auto': keyCount > 15,
-                })}>
+                <div>
                     <dl>
                         {this.renderItemToEquip(this.props.comparison_details.itemToEquip)}
                     </dl>
@@ -299,10 +294,7 @@ export default class ItemComparisonSection extends React.Component<ItemCompariso
         return (
             <Tabs tabs={this.singleItemTabs}>
                 <TabPanel key={'general'}>
-                    <div className={clsx({
-                        'max-h-[200px] overflow-y-auto md:max-h-[500px] lg:max-h-[600px] lg:overflow-visible': keyCount < 15,
-                        'max-h-[200px] overflow-y-auto': keyCount > 15,
-                    })}>
+                    <div>
                         <dl>
                             {this.renderItemToEquip(this.props.comparison_details.itemToEquip)}
                         </dl>

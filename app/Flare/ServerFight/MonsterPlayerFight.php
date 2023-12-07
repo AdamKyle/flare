@@ -282,8 +282,6 @@ class MonsterPlayerFight {
 
         $ambush = $this->ambush->handleAmbush($this->character, $monster, $isPlayerVoided, $isRankFight);
 
-        $this->mergeMessages($ambush->getMessages());
-
         $health = $ambush->getHealthObject();
 
         $health['max_character_health']     = (int) $this->characterCacheData->getCachedCharacterData($this->character, 'health');

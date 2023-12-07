@@ -93,6 +93,7 @@ class Ambush extends BattleBase {
         $characterAmbushResistance = $this->characterCacheData->getCachedCharacterData($character, 'ambush_resistance_chance');
         $characterAmbushChance     = $this->characterCacheData->getCachedCharacterData($character, 'ambush_chance');
 
+
         if ($this->canMonsterAmbushPlayer($serverMonster->getMonsterStat('ambush_chance'), $characterAmbushResistance)) {
             $this->addMessage('The enemies plotting and scheming comes to fruition!', 'enemy-action');
 
@@ -133,7 +134,10 @@ class Ambush extends BattleBase {
             $chance = 0.05;
         }
 
-        return rand(1, 100) > (100 - 100 * $chance);
+        $roll = rand(1, 100);
+        $dc   = 100 - (100 * $chance);
+
+        return $roll > $dc;
     }
 
     public function canMonsterAmbushPlayer(float $ambushChance, float $playerAmbushResistance): bool {

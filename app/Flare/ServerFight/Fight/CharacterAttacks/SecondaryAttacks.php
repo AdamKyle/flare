@@ -36,7 +36,6 @@ class SecondaryAttacks extends BattleBase {
     }
 
     public function doSecondaryAttack(Character $character, ServerMonster $monster = null, float $affixReduction = 0.0, bool $isPvp = false) {
-        dump ('Do secondary attack');
         $this->classSpecialtyDamage($isPvp);
 
         $this->dealElementalDamage($character, $monster, $isPvp, $isPvp);

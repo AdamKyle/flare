@@ -11,12 +11,10 @@ export default class Dialogue extends React.Component<DialogueTypes, any> {
     }
 
     closeModal() {
-        if (typeof this.props.handle_close !== 'undefined') {
+        if (typeof this.props.handle_close !== 'undefined' && this.props.is_open) {
             this.props.handle_close();
         }
     }
-
-    emptyClose(){}
 
     render() {
         return (
@@ -24,7 +22,7 @@ export default class Dialogue extends React.Component<DialogueTypes, any> {
                 <Dialog
                     as="div"
                     className={"absolute inset-0 z-50"}
-                    onClose={this.emptyClose.bind(this)}
+                    onClose={() => { this.closeModal() }}
                 >
                     <Dialog.Overlay className="fixed inset-0 bg-black opacity-30" />
 

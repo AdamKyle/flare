@@ -24,6 +24,7 @@ class MonsterFightService {
     public function setupMonster(Character $character, array $params): array {
 
         Cache::delete('monster-fight-' . $character->id);
+        Cache::delete('character-sheet-' . $character->id);
 
         $data = $this->monsterPlayerFight->setUpFight($character, $params);
 
