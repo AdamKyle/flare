@@ -7,6 +7,7 @@ use Illuminate\Auth\Events\Login;
 use App\Flare\Events\UpdateSiteStatisticsChart;
 use App\Flare\Models\User;
 use App\Flare\Models\UserSiteAccessStatistics;
+use Illuminate\Broadcasting\PendingBroadcast;
 
 class UserLoggedInListener {
 
@@ -15,6 +16,7 @@ class UserLoggedInListener {
      * Handle the event.
      *
      * @param Login $event
+     * @return PendingBroadcast|void
      */
     public function handle(Login $event) {
 
@@ -63,7 +65,13 @@ class UserLoggedInListener {
                 ]);
             } else if (!in_array($event->user->id, $invalidUserIds)) {
                 $invalidIps[]     = $event->user->ip_address;
-                $invalidUserIds[] = $event->user->ip_address;
+                $userId           = $event->user->id;
+
+                if (is_null($invalidUserIds)) {
+                    $invalidUserIds = [$userId];
+                } else {
+                    $invalidUserIds[] = $userId;
+                }
 
                 UserSiteAccessStatistics::create([
                     'amount_signed_in'  => $lastRecord->amount_signed_in + 1,

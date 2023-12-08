@@ -60,7 +60,13 @@ class UserRegisteredListener {
                 ]);
             } else if (!in_array($event->user->id, $invalidUsers)) {
                 $invalidIps[] = $event->user->ip_address;
-                $invalidUsers[] = $event->user->id;
+                $userId = $event->user->id;
+
+                if (is_null($invalidUsers)) {
+                    $invalidUsers = [$userId];
+                } else {
+                    $invalidUsers[] = $userId;
+                }
 
                 UserSiteAccessStatistics::create([
                     'amount_signed_in'  => $lastRecord->amount_signed_in + 1,
