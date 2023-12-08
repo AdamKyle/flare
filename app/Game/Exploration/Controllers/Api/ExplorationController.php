@@ -65,6 +65,8 @@ class ExplorationController extends Controller {
 
         $this->explorationAutomationService->beginAutomation($character, $request->all());
 
+        $timeDelay = $this->explorationAutomationService->getTimeDelay();
+
         return response()->json([
             'message' => 'Exploration has started. Check the exploration tab (beside server messages) for update. The tab will every five minutes, rewards are handed to you or disenchanted automatically.'
         ]);

@@ -14,6 +14,7 @@ use App\Game\Exploration\Events\ExplorationStatus;
 use App\Game\Exploration\Events\ExplorationTimeOut;
 use App\Game\Exploration\Jobs\Exploration;
 use App\Game\Maps\Events\UpdateDuelAtPosition;
+use App\Game\Skills\Values\SkillTypeValue;
 
 class ExplorationAutomationService {
 
@@ -22,6 +23,8 @@ class ExplorationAutomationService {
     private BattleEventHandler $battleEventHandler;
 
     private CharacterCacheData $characterCacheData;
+
+    private int $timeDelay = 0;
 
     public function __construct(MonsterPlayerFight $monsterPlayerFight,
                                 BattleEventHandler $battleEventHandler,
@@ -50,9 +53,11 @@ class ExplorationAutomationService {
             'attack_type'                    => $params['attack_type'],
         ]);
 
+        $this->setTimeDelay($character);
+
         event(new UpdateCharacterStatus($character));
 
-        event(new ExplorationLogUpdate($character->user->id, 'The exploration will begin in 5 minutes. Every 5 minutes you will encounter the enemy up to a maximum of 8 times in a single "encounter"'));
+        event(new ExplorationLogUpdate($character->user->id, 'The exploration will begin in '.$this->timeDelay.' minutes. Every '.$this->timeDelay.' minutes you will encounter the enemy up to a maximum of 8 times in a single "encounter"'));
 
         event(new ExplorationTimeOut($character->user, now()->diffInSeconds($automation->completed_at)));
 
@@ -83,7 +88,14 @@ class ExplorationAutomationService {
         event(new ExplorationLogUpdate($character->user->id, 'Exploration has been stopped at player request.'));
     }
 
+    public function setTimeDelay(Character $character): void {
+        $fightTimeOutSkill = $character->skills->where('baseSkill.type', SkillTypeValue::EFFECTS_BATTLE_TIMER)->first();
+
+        $this->timeDelay = 5 - (5 * $fightTimeOutSkill->fight_time_out_mod);
+    }
+
     protected function startAutomation(Character $character, int $automationId, string $attackType) {
-        Exploration::dispatch($character, $automationId, $attackType)->delay(now()->addMinutes(5))->onQueue('default_long');
+
+        Exploration::dispatch($character, $automationId, $attackType, $this->timeDelay)->delay(now()->addMinutes($this->timeDelay))->onQueue('default_long');
     }
 }

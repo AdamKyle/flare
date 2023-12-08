@@ -43,16 +43,19 @@ class Exploration implements ShouldQueue
      */
     private string $attackType;
 
+    private int $timeDelay;
+
 
     /**
      * @param Character $character
      * @param int $automationId
      * @param string $attackType
      */
-    public function __construct(Character $character, int $automationId, string $attackType) {
+    public function __construct(Character $character, int $automationId, string $attackType, int $timeDelay) {
         $this->character    = $character;
         $this->automationId = $automationId;
         $this->attackType   = $attackType;
+        $this->timeDelay    = $timeDelay;
     }
 
     /**
@@ -87,13 +90,23 @@ class Exploration implements ShouldQueue
 
         if ($response instanceof MonsterPlayerFight) {
 
-            if ($this->encounter($response, $automation, $battleEventHandler, $params)) {
+            if ($this->encounter($response, $automation, $battleEventHandler, $params, $this->timeDelay)) {
 
                 $this->rewardAdditionalFactionPoints($factionHandler, $guideQuestService);
 
                 $time = now()->diffInMinutes($automation->completed_at);
 
-                Exploration::dispatch($this->character, $this->automationId, $this->attackType)->delay(now()->addMinutes($time >= 5 ? 5 : $time))->onQueue('default_long');
+                $delay = $time >= $this->timeDelay ? $this->timeDelay : ($time > 1 ? $time : 0);
+
+                if ($delay === 0) {
+                    $this->endAutomation($automation, $characterCacheData);
+
+                    event(new UpdateDuelAtPosition($this->character->user));
+
+                    return;
+                }
+
+                Exploration::dispatch($this->character, $this->automationId, $this->attackType)->delay(now()->addMinutes())->onQueue('default_long');
             }
 
             $response->deleteCharacterCache($this->character);
@@ -126,14 +139,14 @@ class Exploration implements ShouldQueue
      * @return bool
      * @throws \Exception
      */
-    protected function encounter(MonsterPlayerFight $response, CharacterAutomation $automation, BattleEventHandler $battleEventHandler, array $params): bool {
+    protected function encounter(MonsterPlayerFight $response, CharacterAutomation $automation, BattleEventHandler $battleEventHandler, array $params, int $timeDelay): bool {
 
         $this->sendOutEventLogUpdate('While on your exploration of the area, you encounter a: ' . $response->getEnemyName());
 
         if ($this->fightAutomationMonster($response, $automation, $battleEventHandler, $params)) {
             $this->sendOutEventLogUpdate('You search the corpse of you enemy for clues, where did they come from? None to be found. Upon searching the area further, you find the enemies friends.', true);
 
-            $enemies = rand(1, 7);
+            $enemies = rand(10, 50);
 
             $this->sendOutEventLogUpdate('"Chirst, child there are: '.$enemies.' of them ..."
             The Guide hisses at you from the shadows. You ignore his words and prepare for battle. One right after the other ...', true);
@@ -146,7 +159,7 @@ class Exploration implements ShouldQueue
 
             $this->sendOutEventLogUpdate('The last of the enemies fall. Covered in blood, exhausted, you look around for any signs of more of their friends. The area is silent. "Another day, another battle.
             We managed to survive." The Guide states as he walks from the shadows. The pair of you set off in search of the next adventure ...
-            (Exploration will begin again in 5 minutes)', true);
+            (Exploration will begin again in '.$timeDelay.' minutes)', true);
 
             return true;
         }
