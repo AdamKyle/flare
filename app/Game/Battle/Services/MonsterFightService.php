@@ -4,6 +4,7 @@ namespace App\Game\Battle\Services;
 
 use App\Flare\Models\Character;
 use App\Flare\ServerFight\MonsterPlayerFight;
+use App\Game\Battle\Events\AttackTimeOutEvent;
 use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\BattleRewardProcessing\Jobs\BattleAttackHandler;
 use App\Game\Core\Traits\ResponseBuilder;
@@ -36,6 +37,10 @@ class MonsterFightService {
 
         if ($data['health']['current_character_health'] <= 0) {
             $this->battleEventHandler->processDeadCharacter($character);
+        } else if ($data['health']['current_monster_health'] <= 0) {
+            $this->battleEventHandler->processMonsterDeath($character->id, $data['monster']['id']);
+
+            event(new AttackTimeOutEvent($character));
         } else {
             Cache::put('monster-fight-' . $character->id, $data, 900);
         }
@@ -63,8 +68,8 @@ class MonsterFightService {
 
         $cache['health']['current_character_health'] = $characterHealth;
         $cache['health']['current_monster_health']   = $monsterHealth;
-        $cache['health']['current_character_health']         = $characterHealth;
-        $cache['health']['current_monster_health']           = $monsterHealth;
+        $cache['health']['current_character_health'] = $characterHealth;
+        $cache['health']['current_monster_health']   = $monsterHealth;
 
         if ($monsterHealth >= 0) {
             Cache::put('monster-fight-' . $character->id, $cache, 900);

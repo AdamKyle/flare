@@ -70,6 +70,7 @@ class Ambush extends BattleBase {
 
 
         if ($this->canPlayerAmbushMonster($characterAmbushChance, $serverMonster->getMonsterStat('ambush_resistance_chance'))) {
+
             $this->addMessage('You spot the enemy! Now is the time to ambush!', 'player-action');
 
             $baseStat = $this->characterCacheData->getCachedCharacterData($character, $isPlayerVoided ? 'voided_base_stat' : 'base_stat');
@@ -116,6 +117,9 @@ class Ambush extends BattleBase {
     }
 
     public function canPlayerAmbushMonster(float $ambushChance, float $monsterAmbushResistance, bool $isPvp = false): bool {
+
+        return true;
+
         if ($monsterAmbushResistance >= 1) {
             return false;
         }

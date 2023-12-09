@@ -15,6 +15,7 @@ use App\Game\Exploration\Events\ExplorationTimeOut;
 use App\Game\Exploration\Jobs\Exploration;
 use App\Game\Maps\Events\UpdateDuelAtPosition;
 use App\Game\Skills\Values\SkillTypeValue;
+use Illuminate\Support\Facades\Cache;
 
 class ExplorationAutomationService {
 
@@ -57,7 +58,7 @@ class ExplorationAutomationService {
 
         event(new UpdateCharacterStatus($character));
 
-        event(new ExplorationLogUpdate($character->user->id, 'The exploration will begin in '.$this->timeDelay.' minutes. Every '.$this->timeDelay.' minutes you will encounter the enemy up to a maximum of 8 times in a single "encounter"'));
+        event(new ExplorationLogUpdate($character->user->id, 'The exploration will begin in '.$this->timeDelay.' minutes. Every '.$this->timeDelay.' minutes you will encounter the enemy up to a maximum of 70 times in a single "encounter"'));
 
         event(new ExplorationTimeOut($character->user, now()->diffInSeconds($automation->completed_at)));
 
@@ -80,6 +81,8 @@ class ExplorationAutomationService {
         $this->characterCacheData->deleteCharacterSheet($character);
 
         $character = $character->refresh();
+
+        Cache::delete('can-character-survive-' . $this->character->id);
 
         event(new ExplorationTimeOut($character->user, 0));
         event(new ExplorationStatus($character->user, false));

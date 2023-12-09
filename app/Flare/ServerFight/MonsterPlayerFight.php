@@ -289,6 +289,9 @@ class MonsterPlayerFight {
         $health['max_monster_health']       = $monster->getHealth();
         $health['current_monster_health']   = $health['current_monster_health'] <= 0 ? 0 : $health['current_monster_health'];
 
+        $this->mergeMessages($this->ambush->getMessages());
+
+
         $data = [
             'health'                => $health,
             'player_voided'         => $isPlayerVoided,

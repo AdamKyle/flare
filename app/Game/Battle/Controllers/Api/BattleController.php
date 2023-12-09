@@ -106,10 +106,10 @@ class BattleController extends Controller {
     /**
      * @param AttackTypeRequest $attackTypeRequest
      * @param Character $character
-     * @param Monster $monster
      * @return JsonResponse
      */
     public function fightMonster(AttackTypeRequest $attackTypeRequest, Character $character): JsonResponse {
+
         $result = $this->monsterFightService->fightMonster($character, $attackTypeRequest->attack_type);
 
         $status = $result['status'];

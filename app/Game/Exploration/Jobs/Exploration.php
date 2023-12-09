@@ -23,6 +23,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Cache;
 
 class Exploration implements ShouldQueue
 {
@@ -43,6 +44,9 @@ class Exploration implements ShouldQueue
      */
     private string $attackType;
 
+    /**
+     * @var int $timeDelay
+     */
     private int $timeDelay;
 
 
@@ -50,6 +54,7 @@ class Exploration implements ShouldQueue
      * @param Character $character
      * @param int $automationId
      * @param string $attackType
+     * @param int $timeDelay
      */
     public function __construct(Character $character, int $automationId, string $attackType, int $timeDelay) {
         $this->character    = $character;
@@ -75,6 +80,8 @@ class Exploration implements ShouldQueue
             $this->endAutomation($automation, $characterCacheData);
 
             event(new UpdateDuelAtPosition($this->character->user));
+
+            Cache::delete('can-character-survive-' . $this->character->id);
 
             return;
         }
@@ -141,10 +148,11 @@ class Exploration implements ShouldQueue
      */
     protected function encounter(MonsterPlayerFight $response, CharacterAutomation $automation, BattleEventHandler $battleEventHandler, array $params, int $timeDelay): bool {
 
-        $this->sendOutEventLogUpdate('While on your exploration of the area, you encounter a: ' . $response->getEnemyName());
+        $canSurviveFights = $this->canSurviveFight($response, $automation, $battleEventHandler, $params);
 
-        if ($this->fightAutomationMonster($response, $automation, $battleEventHandler, $params)) {
-            $this->sendOutEventLogUpdate('You search the corpse of you enemy for clues, where did they come from? None to be found. Upon searching the area further, you find the enemies friends.', true);
+        if ($canSurviveFights) {
+
+            $this->sendOutEventLogUpdate('You and The Guide search the area looking for any other signs of them. That\'s when The Guide spots them and points', true);
 
             $enemies = rand(10, 50);
 
@@ -152,9 +160,7 @@ class Exploration implements ShouldQueue
             The Guide hisses at you from the shadows. You ignore his words and prepare for battle. One right after the other ...', true);
 
             for ($i = 1; $i <= $enemies; $i++) {
-                if (!$this->fightAutomationMonster($response, $automation, $battleEventHandler, $params)) {
-                    return false;
-                }
+                $battleEventHandler->processMonsterDeath($this->character->id, $params['selected_monster_id']);
             }
 
             $this->sendOutEventLogUpdate('The last of the enemies fall. Covered in blood, exhausted, you look around for any signs of more of their friends. The area is silent. "Another day, another battle.
@@ -165,6 +171,25 @@ class Exploration implements ShouldQueue
         }
 
         return false;
+    }
+
+    protected function canSurviveFight(MonsterPlayerFight $response, CharacterAutomation $automation, BattleEventHandler $battleEventHandler, array $params): bool {
+
+        if (Cache::has('character-can-survive-' . $this->character->id)) {
+            return true;
+        }
+
+        $this->sendOutEventLogUpdate('"Child, I can see a small group of these creature. If we slaughter them we might learn something." The guide insists. "Theres ten of them. Quick, kill them. We will continue the hunt!"');
+
+        for ($i = 1; $i <= 10; $i++) {
+            if (!$this->fightAutomationMonster($response, $automation, $battleEventHandler, $params)) {
+                return false;
+            }
+        }
+
+        Cache::put('can-character-survive-' . $this->character->id, true);
+
+        return true;
     }
 
     /**
@@ -196,7 +221,7 @@ class Exploration implements ShouldQueue
 
         $response->resetBattleMessages();
 
-        $battleEventHandler->processMonsterDeath($this->character->id, $params['selected_monster_id'], true);
+        $battleEventHandler->processMonsterDeath($this->character->id, $params['selected_monster_id']);
 
         return true;
     }
