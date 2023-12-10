@@ -340,7 +340,7 @@ export default class FightSection extends React.Component<
                         <a
                             href="/information/combat"
                             target="_blank"
-                            className="ml-2 mt-4 mb-4 hidden lg:display-block"
+                            className="ml-2 mt-4 mb-4 hidden lg:block"
                         >
                             Help <i className="fas fa-external-link-alt"></i>
                         </a>
@@ -363,7 +363,7 @@ export default class FightSection extends React.Component<
                         <a
                             href="/information/combat"
                             target="_blank"
-                            className="display-block lg:hidden"
+                            className="block lg:hidden"
                         >
                             Help <i className="fas fa-external-link-alt"></i>
                         </a>
