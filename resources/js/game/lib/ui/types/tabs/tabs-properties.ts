@@ -15,4 +15,6 @@ export default interface TabProperties {
     additonal_css?: string;
 
     children?: React.ReactNode;
+
+    listen_for_change?: (tabIndex: number) => void;
 }

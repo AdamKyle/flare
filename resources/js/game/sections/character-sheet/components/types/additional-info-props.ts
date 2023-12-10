@@ -11,5 +11,6 @@ export interface AdditionalInfoProps extends CharacterSheetProps {
 
     character: CharacterType | null
 
+    when_tab_changes?: (tabIndex: number, tabs: {key: string, name: string}[]) => void
 }
 

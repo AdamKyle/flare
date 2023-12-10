@@ -37,6 +37,15 @@ export default class AdditionalInfoSection extends React.Component<AdditionalInf
         }
     }
 
+    whenTabUpdates(index: number) {
+
+        if (!this.props.when_tab_changes) {
+            return;
+        }
+
+        this.props.when_tab_changes(index, this.tabs);
+    }
+
     componentDidMount() {
         if (this.props.character === null) {
             return;
@@ -68,7 +77,7 @@ export default class AdditionalInfoSection extends React.Component<AdditionalInf
         }
 
         return (
-            <Tabs tabs={this.tabs} full_width={true}>
+            <Tabs tabs={this.tabs} full_width={true} listen_for_change={this.whenTabUpdates.bind(this)} >
                 <TabPanel key={'stats'}>
                     <div className='max-h-[350px] md:max-h-full overflow-y-scroll md:overflow-y-visible'>
                         <div className='grid md:grid-cols-2 gap-2'>

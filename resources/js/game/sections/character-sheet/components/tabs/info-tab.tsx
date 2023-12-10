@@ -106,18 +106,6 @@ export default class InfoTab extends React.Component<InfoTabProps, InfoTabState>
                 </div>
 
                 {
-                    this.state.open_info ?
-                        <AdditionalInfoSection
-                            is_open={this.state.open_info}
-                            manage_modal={this.manageInfoDialogue.bind(this)}
-                            title={'Additional Information'}
-                            character={this.props.character}
-                            finished_loading={true}
-                        />
-                    : null
-                }
-
-                {
                     this.state.open_resistances ?
                         <CharacterResistances
                             is_open={this.state.open_resistances}
