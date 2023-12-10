@@ -1,5 +1,5 @@
 import React from 'react';
-import BasicCardProperties from "../../../lib/ui/types/cards/basic-card-properties";
+import BasicCardProperties from "./types/basic-card-properties";
 
 export default class BasicCard extends React.Component<BasicCardProperties, any> {
     constructor(props: BasicCardProperties) {

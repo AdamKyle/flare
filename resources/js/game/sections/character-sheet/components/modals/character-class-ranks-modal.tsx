@@ -1,14 +1,14 @@
 import React from "react";
 import Dialogue from "../../../../components/ui/dialogue/dialogue";
-import {AdditionalInfoModalProps} from "../../../../lib/game/character-sheet/types/modal/additional-info-modal-props";
+import {AdditionalInfoProps} from "../types/additional-info-props";
 import CharacterClassRanks from "../character-class-ranks";
 import InfoAlert from "../../../../components/ui/alerts/simple-alerts/info-alert";
 import CharacterClassSpecialtiesModal from "./character-class-specialties-modal";
 
-export default class CharacterClassRanksModal extends React.Component<AdditionalInfoModalProps, any> {
+export default class CharacterClassRanksModal extends React.Component<AdditionalInfoProps, any> {
 
 
-    constructor(props: AdditionalInfoModalProps) {
+    constructor(props: AdditionalInfoProps) {
         super(props);
 
         this.state = {

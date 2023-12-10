@@ -1,6 +1,6 @@
 import React, {Fragment} from "react";
 import PrimaryButton from "../../../../components/ui/buttons/primary-button";
-import AdditionalInfoModal from "../modals/additional-info-modal";
+import AdditionalInfoSection from "../additional-info-section";
 import InfoTabProps from "../../../../lib/game/character-sheet/types/tabs/info-tab-props";
 import {formatNumber} from "../../../../lib/game/format-number";
 import OrangeButton from "../../../../components/ui/buttons/orange-button";
@@ -91,26 +91,9 @@ export default class InfoTab extends React.Component<InfoTabProps, InfoTabState>
                 </div>
                 <div className='border-b-2 block border-b-gray-300 dark:border-b-gray-600 my-3'></div>
                 <div className='flex flex-wrap justify-center gap-2 lg:flex-nowrap'>
-
                     <div className='mt-4 w-full lg:w-auto'>
                         <OrangeButton button_label={'Show additional details'} on_click={this.props.manage_addition_data} />
                     </div>
-
-                    {/*<div className='mt-4 w-full lg:w-auto'>*/}
-                    {/*    <OrangeButton button_label={'Additional Information'} on_click={this.manageInfoDialogue.bind(this)} additional_css="w-full lg:w-auto"/>*/}
-                    {/*</div>*/}
-                    {/*<div className='mt-4 w-full lg:w-auto'>*/}
-                    {/*    <OrangeButton button_label={'Resistances'} on_click={this.manageResistancesDialogue.bind(this)} additional_css="w-full lg:w-auto"/>*/}
-                    {/*</div>*/}
-                    {/*<div className='mt-4 w-full lg:w-auto'>*/}
-                    {/*    <OrangeButton button_label={'Reincarnation'} on_click={this.manageReincarnation.bind(this)} additional_css="w-full lg:w-auto"/>*/}
-                    {/*</div>*/}
-                    {/*<div className='mt-4 w-full lg:w-auto'>*/}
-                    {/*    <OrangeButton button_label={'Class Ranks'} on_click={this.manageClassRanks.bind(this)} additional_css="w-full lg:w-auto"/>*/}
-                    {/*</div>*/}
-                    {/*<div className='mt-4 w-full lg:w-auto'>*/}
-                    {/*    <OrangeButton button_label={'Elemental Atonement'} on_click={this.manageElementalAtonement.bind(this)} additional_css="w-full lg:w-auto"/>*/}
-                    {/*</div>*/}
                 </div>
                 <div className='relative top-[24px]'>
                     <div className="flex justify-between mb-1">
@@ -124,7 +107,7 @@ export default class InfoTab extends React.Component<InfoTabProps, InfoTabState>
 
                 {
                     this.state.open_info ?
-                        <AdditionalInfoModal
+                        <AdditionalInfoSection
                             is_open={this.state.open_info}
                             manage_modal={this.manageInfoDialogue.bind(this)}
                             title={'Additional Information'}
