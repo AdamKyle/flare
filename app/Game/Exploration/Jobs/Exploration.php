@@ -175,7 +175,7 @@ class Exploration implements ShouldQueue
 
     protected function canSurviveFight(MonsterPlayerFight $response, CharacterAutomation $automation, BattleEventHandler $battleEventHandler, array $params): bool {
 
-        if (Cache::has('character-can-survive-' . $this->character->id)) {
+        if (Cache::has('can-character-survive-' . $this->character->id)) {
             return true;
         }
 
