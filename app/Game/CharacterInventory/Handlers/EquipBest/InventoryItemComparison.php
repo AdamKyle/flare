@@ -22,7 +22,6 @@ class InventoryItemComparison {
 
     private function isItemGood(array $item): bool {
 
-        $goodIncrease = 0;
         $badIncrease = 0;
 
         forEach ($item as $key => $value) {
@@ -35,18 +34,12 @@ class InventoryItemComparison {
             }
 
             if ($value >= 0) {
-                $goodIncrease += 1;
-
                 continue;
             }
 
             $badIncrease += 1;
         }
 
-        if ($goodIncrease >= $badIncrease) {
-            return true;
-        }
-
-        return false;
+        return $badIncrease === 0;
     }
 }

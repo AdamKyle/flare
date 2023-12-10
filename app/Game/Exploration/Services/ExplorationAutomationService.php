@@ -82,13 +82,17 @@ class ExplorationAutomationService {
 
         $character = $character->refresh();
 
-        Cache::delete('can-character-survive-' . $this->character->id);
+        Cache::delete('can-character-survive-' . $character->id);
 
         event(new ExplorationTimeOut($character->user, 0));
         event(new ExplorationStatus($character->user, false));
         event(new UpdateCharacterStatus($character));
 
         event(new ExplorationLogUpdate($character->user->id, 'Exploration has been stopped at player request.'));
+    }
+
+    public function getTimeDelay(): int {
+        return $this->timeDelay;
     }
 
     public function setTimeDelay(Character $character): void {

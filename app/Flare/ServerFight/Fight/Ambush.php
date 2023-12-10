@@ -118,8 +118,6 @@ class Ambush extends BattleBase {
 
     public function canPlayerAmbushMonster(float $ambushChance, float $monsterAmbushResistance, bool $isPvp = false): bool {
 
-        return true;
-
         if ($monsterAmbushResistance >= 1) {
             return false;
         }

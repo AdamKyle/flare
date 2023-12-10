@@ -28,7 +28,7 @@ class DropCheckCalculator {
         }
 
         if ($characterLevel < 12 && $lootingChance < .10) {
-            $totalChance = .65;
+            $totalChance = .15;
 
             return $this->canGetReward(100, $totalChance);
         }
@@ -91,7 +91,7 @@ class DropCheckCalculator {
     private function attemptToGainReward(float $chanceOfSuccess): bool {
 
         $roll = RandomNumberGenerator::generateTureRandomNumber(0, 1);
-
+        dump('Random Role: ' . $roll);
         if ($roll <= $chanceOfSuccess) {
             return true;
         }

@@ -109,6 +109,7 @@ class PurgatorySmithHouseRewardHandler {
      * @return Character
      */
     public function currencyReward(Character $character, Event $event = null): Character {
+        dump('Am I here?');
         $maximumAmount = 1000;
 
         if (!is_null($event)) {

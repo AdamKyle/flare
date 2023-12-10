@@ -113,7 +113,7 @@ class Exploration implements ShouldQueue
                     return;
                 }
 
-                Exploration::dispatch($this->character, $this->automationId, $this->attackType)->delay(now()->addMinutes())->onQueue('default_long');
+                Exploration::dispatch($this->character, $this->automationId, $this->attackType, $this->timeDelay)->delay(now()->addMinutes($this->timeDelay))->onQueue('default_long');
             }
 
             $response->deleteCharacterCache($this->character);
@@ -154,7 +154,7 @@ class Exploration implements ShouldQueue
 
             $this->sendOutEventLogUpdate('You and The Guide search the area looking for any other signs of them. That\'s when The Guide spots them and points', true);
 
-            $enemies = rand(10, 50);
+            $enemies = rand(10, 25);
 
             $this->sendOutEventLogUpdate('"Chirst, child there are: '.$enemies.' of them ..."
             The Guide hisses at you from the shadows. You ignore his words and prepare for battle. One right after the other ...', true);
