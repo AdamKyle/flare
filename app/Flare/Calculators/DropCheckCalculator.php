@@ -91,7 +91,7 @@ class DropCheckCalculator {
     private function attemptToGainReward(float $chanceOfSuccess): bool {
 
         $roll = RandomNumberGenerator::generateTureRandomNumber(0, 1);
-        dump('Random Role: ' . $roll);
+
         if ($roll <= $chanceOfSuccess) {
             return true;
         }
