@@ -14,15 +14,6 @@ export default class BattleMesages extends React.Component<BattleMessageProps, {
     }
 
     render() {
-        if (this.props.is_small && this.props.battle_messages.length > 0) {
-            const message = this.props.battle_messages.filter((battleMessage: BattleMessage) => battleMessage.message.includes('resurrect') || battleMessage.message.includes('has been defeated!'))
-
-            if (message.length > 0) {
-                return <p className='text-red-500 dark:text-red-400'>{message[0].message}</p>
-            } else {
-                return <p className='text-blue-500 dark:text-blue-400'>Attack child!</p>
-            }
-        }
 
         return this.props.battle_messages.map((battleMessage: BattleMessage) => {
             return <p className={clsx(

@@ -340,7 +340,7 @@ export default class FightSection extends React.Component<
                         <a
                             href="/information/combat"
                             target="_blank"
-                            className="ml-2"
+                            className="ml-2 mt-4 mb-4 hidden lg:display-block"
                         >
                             Help <i className="fas fa-external-link-alt"></i>
                         </a>
@@ -348,7 +348,7 @@ export default class FightSection extends React.Component<
                 </div>
                 <div
                     className={clsx(
-                        "mt-1 text-xs text-center ml-[-50px] lg:ml-0",
+                        "mt-1 text-xs text-center",
                         { hidden: this.attackButtonDisabled() }
                     )}
                 >
@@ -358,6 +358,17 @@ export default class FightSection extends React.Component<
                     <span className={"w-10 ml-2"}>Atk & Cast</span>
                     <span className={"w-10 ml-2"}>Defend</span>
                 </div>
+                {!this.props.is_rank_fight ? (
+                    <div className="text-center my-4">
+                        <a
+                            href="/information/combat"
+                            target="_blank"
+                            className="display-block lg:hidden"
+                        >
+                            Help <i className="fas fa-external-link-alt"></i>
+                        </a>
+                    </div>
+                ) : null}
                 {this.state.processing_rank_battle ||
                 this.state.processing_regular_fight ? (
                     <div className="w-1/2 mx-auto">
@@ -378,9 +389,7 @@ export default class FightSection extends React.Component<
                 {this.state.monster_max_health > 0 &&
                 this.props.character !== null ? (
                     <div
-                        className={clsx("mb-4 max-w-md m-auto", {
-                            "mt-4": this.attackButtonDisabled(),
-                        })}
+                        className={clsx("mb-4 max-w-md m-auto mt-4")}
                     >
                         <HealthMeters
                             is_enemy={true}
