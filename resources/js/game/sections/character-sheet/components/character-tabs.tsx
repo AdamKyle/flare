@@ -34,7 +34,7 @@ export default class CharacterTabs extends React.Component<CharacterTabsProps, a
             <Fragment>
                 <Tabs tabs={this.tabs} full_width={true}>
                     <TabPanel key={'info'}>
-                        <InfoTab character={this.props.character} finished_loading={this.props.finished_loading}/>
+                        <InfoTab character={this.props.character} finished_loading={this.props.finished_loading} manage_addition_data={this.props.manage_addition_data}/>
                     </TabPanel>
                     <TabPanel key={'active-boons'}>
                         <CharacterActiveBoons character_id={this.props.character?.id} finished_loading={this.props.finished_loading} />

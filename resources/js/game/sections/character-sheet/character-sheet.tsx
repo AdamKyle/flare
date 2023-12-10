@@ -12,6 +12,7 @@ import LoadingProgressBar from "../../components/ui/progress-bars/loading-progre
 import {AxiosError, AxiosResponse} from "axios";
 import Ajax from "../../lib/ajax/ajax";
 import ReincarnationCheckModal from "./components/modals/reincarnation-check-modal";
+import BasicClosableCard from "../../components/ui/cards/basic-closable-card";
 
 export default class CharacterSheet extends React.Component<CharacterSheetProps, any> {
 
@@ -22,6 +23,7 @@ export default class CharacterSheet extends React.Component<CharacterSheetProps,
             show_inventory_section: false,
             show_skills_section: false,
             show_top_section: false,
+            show_additional_character_data: false,
             reincarnating: false,
             success_message: null,
             error_message: null,
@@ -69,6 +71,12 @@ export default class CharacterSheet extends React.Component<CharacterSheetProps,
         }
     }
 
+    showAdditionalCharacterData() {
+        this.setState({
+            show_additional_character_data: !this.state.show_additional_character_data,
+        });
+    }
+
     manageInventoryManagement() {
         this.setState({
             show_inventory_section: !this.state.show_inventory_section
@@ -112,7 +120,15 @@ export default class CharacterSheet extends React.Component<CharacterSheetProps,
         if (this.props.character === null) {
             return null;
         }
-        
+
+        if (this.state.show_additional_character_data) {
+            return (
+                <BasicClosableCard close_action={this.showAdditionalCharacterData.bind(this)}>
+                    Test
+                </BasicClosableCard>
+            )
+        }
+
         return(
             <div>
                 {
@@ -151,6 +167,7 @@ export default class CharacterSheet extends React.Component<CharacterSheetProps,
                                         character={this.props.character}
                                         finished_loading={this.props.finished_loading}
                                         view_port={this.props.view_port}
+                                        manage_addition_data={this.showAdditionalCharacterData.bind(this)}
                                     />
                                 </BasicCard>
                                 <BasicCard additionalClasses={'overflow-y-auto lg:w-1/2 md:max-h-[325px]'}>
