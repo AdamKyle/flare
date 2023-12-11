@@ -5,7 +5,7 @@ import InfoTabProps from "../../../../lib/game/character-sheet/types/tabs/info-t
 import {formatNumber} from "../../../../lib/game/format-number";
 import OrangeButton from "../../../../components/ui/buttons/orange-button";
 import InfoTabState from "../../../../lib/game/character-sheet/types/tabs/info-tab-state";
-import CharacterResistances from "../modals/character-resistances";
+import ResistanceInfoSection from "../resistance-info-section";
 import CharacterReincarnationModal from "../modals/character-reincarnation-modal";
 import CharacterTabs from "../character-tabs";
 import CharacterClassRanksModal from "../modals/character-class-ranks-modal";
@@ -23,12 +23,6 @@ export default class InfoTab extends React.Component<InfoTabProps, InfoTabState>
             open_class_ranks: false,
             open_elemental_atonement: false,
         }
-    }
-
-    manageInfoDialogue() {
-        this.setState({
-            open_info: !this.state.open_info
-        })
     }
 
     manageResistancesDialogue() {
@@ -107,7 +101,7 @@ export default class InfoTab extends React.Component<InfoTabProps, InfoTabState>
 
                 {
                     this.state.open_resistances ?
-                        <CharacterResistances
+                        <ResistanceInfoSection
                             is_open={this.state.open_resistances}
                             manage_modal={this.manageResistancesDialogue.bind(this)}
                             title={'Resistance Info'}
