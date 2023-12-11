@@ -14,7 +14,6 @@ export default class CraftingSectionManager {
      * Are we not allowed to craft?
      */
     public cannotCraft(): boolean {
-        const state = this.component.state;
         const props = this.component.props;
 
         return props.crafting_time_out > 0 || !props.character_status.can_craft || props.character_status.is_dead;
@@ -29,6 +28,79 @@ export default class CraftingSectionManager {
         }
 
         return '';
+    }
+
+    public smallCraftingList() {
+        const options = [{
+            label: 'Craft',
+            value: 'craft',
+        },{
+            label: 'Enchant',
+            value: 'enchant',
+        },{
+            label: 'Trinketry',
+            value: 'trinketry',
+        }];
+
+        if (!this.component.props.character.is_alchemy_locked) {
+            options.splice(2, 0, {
+                label: 'Alchemy',
+                value: 'alchemy',
+            });
+        }
+
+        if (this.component.props.character.can_use_work_bench) {
+            if (typeof options[2] !== 'undefined') {
+                options.splice(3, 0, {
+                    label: 'Workbench',
+                    value: 'workbench'
+                })
+            } else {
+                options.splice(2, 0, {
+                    label: 'Workbench',
+                    value: 'workbench'
+                });
+            }
+        }
+
+        if (this.component.props.character.can_access_queen) {
+            if (typeof options[2] !== 'undefined') {
+                options.splice(3, 0, {
+                    label: 'Queen of hearts',
+                    value: 'queen',
+                })
+            } else {
+                options.splice(2, 0, {
+                    label: 'Queen of hearts',
+                    value: 'queen',
+                })
+            }
+        }
+
+        return options;
+    }
+
+    public setCraftingTypeForSmallerActionsList(data: any) {
+        this.component.setState({
+            crafting_type: data.value,
+        })
+    }
+
+    public getSelectedCraftingTypeForSmallerActionsList(): {label: string, value: string}[] {
+        if (this.component.state.crafting_type === null) {
+            return [{
+                label: 'Please select type',
+                value: '',
+            }]
+        }
+
+        const options = this.smallCraftingList();
+
+        const option = options.filter((option) => {
+            return option.value === this.component.state.crafting_type
+        })
+
+        return option;
     }
 
     /**

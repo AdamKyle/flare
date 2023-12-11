@@ -6,6 +6,7 @@ import SmallCraftingSectionProps from "./types/small-crafting-section-props";
 import SmallCraftingSectionState from "./types/small-crafting-section-state";
 import MainCraftingSection from '../crafting-section';
 import DangerButton from "../../../../components/ui/buttons/danger-button";
+import Select from "react-select";
 
 export default class SmallCraftingSection extends React.Component<SmallCraftingSectionProps, SmallCraftingSectionState> {
 
@@ -48,13 +49,23 @@ export default class SmallCraftingSection extends React.Component<SmallCraftingS
                         />
                     :
                         <div className="text-center my-4">
-                            <DropDown menu_items={this.craftingSectionManager.buildCraftingList(this.setCraftingType.bind(this))}
-                                      button_title={'Craft/Enchant'}
-                                      disabled={this.craftingSectionManager.cannotCraft()}
-                                      selected_name={this.craftingSectionManager.getSelectedCraftingOption()}
-                                      show_close_button={true}
-                                      close_button_action={this.props.close_crafting_section}
+                            <Select
+                                onChange={(value) => this.craftingSectionManager.setCraftingTypeForSmallerActionsList(value)}
+                                options={this.craftingSectionManager.smallCraftingList()}
+                                menuPosition={"absolute"}
+                                menuPlacement={"bottom"}
+                                styles={{
+                                    menuPortal: (base: any) => ({
+                                        ...base,
+                                        zIndex: 9999,
+                                        color: "#000000",
+                                    }),
+                                }}
+                                menuPortalTarget={document.body}
+                                value={this.craftingSectionManager.getSelectedCraftingTypeForSmallerActionsList()}
                             />
+
+                            <DangerButton button_label={'Close'} on_click={this.props.close_crafting_section} additional_css={'my-4 w-full'} />
 
                         </div>
                 }

@@ -90,8 +90,6 @@ export default class CharacterInventoryTabs extends React.Component<
                         JSON.stringify(this.state.inventory)
                     );
 
-                    console.log(inventoryState, event);
-
                     inventoryState[event.type] = event.inventory;
 
                     this.setState(

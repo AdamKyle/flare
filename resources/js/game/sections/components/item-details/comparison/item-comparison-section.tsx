@@ -73,7 +73,7 @@ export default class ItemComparisonSection extends React.Component<ItemCompariso
 
     renderChange(details: InventoryComparisonAdjustment, itemToEquip?: InventoryComparisonAdjustment) {
         const invalidFields     = ['item_id', 'id', 'min_cost', 'skill_level_req', 'skill_level_trivial', 'holy_level', 'holy_stacks', 'holy_stacks_applied', 'reduces_enemy_stats', 'cost', 'shop_cost', 'slot_id', 'affix_count', 'is_unique', 'is_mythic'];
-        console.log(details);
+
         let elements = Object.keys(details).map((key) => {
             if (!invalidFields.includes(key)) {
 
@@ -96,8 +96,6 @@ export default class ItemComparisonSection extends React.Component<ItemCompariso
                 }
             }
         }).filter((e: any) => typeof e !== 'undefined');
-
-        console.log(elements);
 
         if (elements.length === 0 && typeof itemToEquip !== 'undefined') {
             return (
@@ -248,7 +246,6 @@ export default class ItemComparisonSection extends React.Component<ItemCompariso
     }
 
     renderSingleComparison() {
-        console.log('renderSingleComparison');
         if (this.props.comparison_details !== null) {
             const keyCount = Object.keys(this.props.comparison_details.itemToEquip)
                                    .filter((key: string) => !this.invalidFields.includes(key))
@@ -278,8 +275,6 @@ export default class ItemComparisonSection extends React.Component<ItemCompariso
                                .filter((key: string) => this.props.comparison_details.itemToEquip[key] > 0)
                                .filter((key: string) => this.props.comparison_details.itemToEquip[key] !== null)
                                .filter((key: string) => typeof this.props.comparison_details.itemToEquip[key] !== 'boolean');
-
-        console.log(keys)
 
         if (this.props.comparison_details.itemToEquip.type === 'ring' || this.props.comparison_details.details.length !== 0) {
             return (
