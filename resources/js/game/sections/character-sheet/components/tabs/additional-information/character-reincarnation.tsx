@@ -1,8 +1,9 @@
 import React from "react";
 import AdditionalInfoSection from "./sections/additional-info-section";
 import ResistanceInfoSection from "./sections/resistance-info-section";
+import CharacterReincarnationSection from "./sections/character-reincarnation-section";
 
-export default class CharacterResistances extends React.Component<any, any> {
+export default class CharacterReincarnation extends React.Component<any, any> {
 
     constructor(props: any) {
         super(props);
@@ -20,7 +21,7 @@ export default class CharacterResistances extends React.Component<any, any> {
                 <div className="flex flex-wrap md:flex-nowrap items-center">
 
                     <div id="leftSide" className="pr-4 sm:w-full md:w-1/2">
-                        <ResistanceInfoSection
+                        <CharacterReincarnationSection
                             character={this.props.character}
                             is_open={true}
                             manage_modal={() => {}}
@@ -31,18 +32,21 @@ export default class CharacterResistances extends React.Component<any, any> {
                     <div id="rightSide" className="mt-10 md:mt-0 pl-4 sm:w-full md:w-1/2">
                         <h1>What is this?</h1>
                         <p className="dark:text-gray-300 my-4">
-                            To the left we can see a set of resistances.
-                            These effect your character in one way: Resisting the damage
-                            of spells or enchantments (also known as Affix Damage) that's the enemy can do
-                            to you.
+                            To the left we can see some basic information about how many times our character{' '}
+                            can <a href="/information/reincarnation" target="_blank">
+                            reincarnated <i className="fas fa-external-link-alt"></i>
+                            </a>{' '}as well as the effects that has on your character.
                         </p>
-                        <h3 className="underline">Spell Evasion</h3>
+                        <h3 className="underline">Reincarnation</h3>
                         <p className="dark:text-gray-300 my-4">
-                           Helps you evade the enemies spells. This can be obtained from rings.
+                            Characters who reach the max level: 5,000 and have access to end game currency: <a href="/information/currencies" target="_blank">
+                                Copper Coins <i className="fas fa-external-link-alt"></i>
+                            </a>{' '}Have the ability to Reincarnate.
                         </p>
-                        <h3 className="underline">Affix Damage Reduction</h3>
                         <p className="dark:text-gray-300 my-4">
-                            Helps you reduce the incoming Affix Damage. This can be obtained from rings.
+                            Essentially, when you reincarnate you set your character level to level 1. You keep a portion of your raw stats at the level you choose to reincarnate
+                            and then you level from 1 to, ideally, 5000 again and then repeat another 98 times. Why? Power. Every time you do this your raw stats
+                            will grow and your character will become much more powerful - especially when combined with your gear.
                         </p>
                     </div>
                 </div>

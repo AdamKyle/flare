@@ -1,12 +1,12 @@
 import React from "react";
-import Dialogue from "../../../../components/ui/dialogue/dialogue";
-import {AdditionalInfoProps} from "../types/additional-info-props";
-import {formatNumber} from "../../../../lib/game/format-number";
-import Ajax from "../../../../lib/ajax/ajax";
+import Dialogue from "../../../../../../components/ui/dialogue/dialogue";
+import {AdditionalInfoProps} from "../../../types/additional-info-props";
+import {formatNumber} from "../../../../../../lib/game/format-number";
+import Ajax from "../../../../../../lib/ajax/ajax";
 import { AxiosError, AxiosResponse } from "axios";
-import ComponentLoading from "../../../../components/ui/loading/component-loading";
+import ComponentLoading from "../../../../../../components/ui/loading/component-loading";
 
-export default class CharacterReincarnationModal extends React.Component<AdditionalInfoProps, any> {
+export default class CharacterReincarnationSection extends React.Component<AdditionalInfoProps, any> {
 
 
     constructor(props: AdditionalInfoProps) {
@@ -50,31 +50,12 @@ export default class CharacterReincarnationModal extends React.Component<Additio
         }
 
         return (
-            <Dialogue is_open={this.props.is_open}
-                      handle_close={this.props.manage_modal}
-                      title={this.props.title}
-            >
+            <>
                 {
                     this.state.is_loading ?
                         <ComponentLoading />
-                    :
+                        :
                         <div>
-                            <p className='mb-4'>
-                                Reincarnation is a way to slowly grow your character over time. You can read more about it <a href='/information/reincarnation' target="_blank">
-                                    here <i
-                                    className="fas fa-external-link-alt"></i>
-                                </a>.
-                            </p>
-                            <p className='mb-4'>
-                                The gist is simple, reincarnate your character and start back at level one but keep 20% of your raw stats at the time
-                                or reincarnation.
-                            </p>
-                            <p className='mb-4'>
-                                You will only increase your Base Stat and Damage Mod when your character base stats reach 999,999 and you
-                                cannot reincarnate anymore but can technically continue leveling Doing so, leveling, will increase these
-                                additional modifiers which are then applied to your modified stats. This gives incentive to
-                                keep leveling even after maxing reincarnation.
-                            </p>
                             <dl>
                                 <dt>Reincarnated Times</dt>
                                 <dd>{this.state.reincarnation_details.reincarnated_times !== null ? formatNumber(this.state.reincarnation_details.reincarnated_times) : 0}</dd>
@@ -89,7 +70,7 @@ export default class CharacterReincarnationModal extends React.Component<Additio
                             </dl>
                         </div>
                 }
-            </Dialogue>
+            </>
         );
     }
 }

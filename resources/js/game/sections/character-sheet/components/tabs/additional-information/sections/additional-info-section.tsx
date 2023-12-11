@@ -1,13 +1,13 @@
 import React from "react";
-import Dialogue from "../../../components/ui/dialogue/dialogue";
-import {AdditionalInfoProps} from "./types/additional-info-props";
-import Tabs from "../../../components/ui/tabs/tabs";
-import TabPanel from "../../../components/ui/tabs/tab-panel";
-import {formatNumber} from "../../../lib/game/format-number";
-import Ajax from "../../../lib/ajax/ajax";
+import Dialogue from "../../../../../../components/ui/dialogue/dialogue";
+import {AdditionalInfoProps} from "../../../types/additional-info-props";
+import Tabs from "../../../../../../components/ui/tabs/tabs";
+import TabPanel from "../../../../../../components/ui/tabs/tab-panel";
+import {formatNumber} from "../../../../../../lib/game/format-number";
+import Ajax from "../../../../../../lib/ajax/ajax";
 import { AxiosError, AxiosResponse } from 'axios';
-import ComponentLoading from "../../../components/ui/loading/component-loading";
-import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
+import ComponentLoading from "../../../../../../components/ui/loading/component-loading";
+import LoadingProgressBar from "../../../../../../components/ui/progress-bars/loading-progress-bar";
 
 export default class AdditionalInfoSection extends React.Component<AdditionalInfoProps, any> {
 

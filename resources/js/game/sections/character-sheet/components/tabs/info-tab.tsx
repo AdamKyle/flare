@@ -1,14 +1,14 @@
 import React, {Fragment} from "react";
 import PrimaryButton from "../../../../components/ui/buttons/primary-button";
-import AdditionalInfoSection from "../additional-info-section";
+import AdditionalInfoSection from "./additional-information/sections/additional-info-section";
 import InfoTabProps from "../../../../lib/game/character-sheet/types/tabs/info-tab-props";
 import {formatNumber} from "../../../../lib/game/format-number";
 import OrangeButton from "../../../../components/ui/buttons/orange-button";
 import InfoTabState from "../../../../lib/game/character-sheet/types/tabs/info-tab-state";
-import ResistanceInfoSection from "../resistance-info-section";
-import CharacterReincarnationModal from "../modals/character-reincarnation-modal";
+import ResistanceInfoSection from "./additional-information/sections/resistance-info-section";
+import CharacterReincarnationSection from "./additional-information/sections/character-reincarnation-section";
 import CharacterTabs from "../character-tabs";
-import CharacterClassRanksModal from "../modals/character-class-ranks-modal";
+import CharacterClassRanksSection from "./additional-information/sections/character-class-ranks-section";
 import CharacaterElementalAtonement from "../modals/characater-elemental-atonement";
 
 export default class InfoTab extends React.Component<InfoTabProps, InfoTabState> {
@@ -100,31 +100,8 @@ export default class InfoTab extends React.Component<InfoTabProps, InfoTabState>
                 </div>
 
                 {
-                    this.state.open_resistances ?
-                        <ResistanceInfoSection
-                            is_open={this.state.open_resistances}
-                            manage_modal={this.manageResistancesDialogue.bind(this)}
-                            title={'Resistance Info'}
-                            character={this.props.character}
-                            finished_loading={true}
-                        />
-                    : null
-                }
-
-                {
-                    this.state.open_reincarnation ?
-                        <CharacterReincarnationModal is_open={this.state.open_reincarnation}
-                                                     manage_modal={this.manageReincarnation.bind(this)}
-                                                     title={'Character Reincarnation Stats'}
-                                                     character={this.props.character}
-                                                     finished_loading={true}
-                        />
-                    : null
-                }
-
-                {
                     this.state.open_class_ranks ?
-                        <CharacterClassRanksModal
+                        <CharacterClassRanksSection
                             is_open={this.state.open_class_ranks}
                             manage_modal={this.manageClassRanks.bind(this)}
                             title={'Character Class Ranks'}

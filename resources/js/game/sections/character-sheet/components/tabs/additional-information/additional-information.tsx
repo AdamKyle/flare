@@ -1,5 +1,5 @@
 import React from "react";
-import AdditionalInfoSection from "../../additional-info-section";
+import AdditionalInfoSection from "./sections/additional-info-section";
 
 export default class AdditionalInformation extends React.Component<any, any> {
 
