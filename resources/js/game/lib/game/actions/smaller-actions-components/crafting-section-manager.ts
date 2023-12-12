@@ -40,6 +40,9 @@ export default class CraftingSectionManager {
         },{
             label: 'Trinketry',
             value: 'trinketry',
+        }, {
+            label: 'Gem Crafting',
+            value: 'gem-crafting',
         }];
 
         if (!this.component.props.character.is_alchemy_locked) {
