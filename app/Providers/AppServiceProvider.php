@@ -2,6 +2,12 @@
 
 namespace App\Providers;
 
+use App\Console\AfterDeployment\AddHolyStacksToItems;
+use App\Console\AfterDeployment\AssignNewSkillsToPlayers;
+use App\Console\AfterDeployment\CreateCharacterAttackDataCache;
+use App\Console\AfterDeployment\CreateMonsterCache;
+use App\Console\AfterDeployment\UpdateCharactersForClassRanks;
+use App\Console\DevelopmentCommands\CreateCharacter;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\ServiceProvider;
 use App\Console\DevelopmentCommands\GivePlayerMythicItem;
@@ -28,6 +34,15 @@ class AppServiceProvider extends ServiceProvider {
 
         // Register development based commands.
         $this->commands([
+            // After Deployment Commands
+            AddHolyStacksToItems::class,
+            AssignNewSkillsToPlayers::class,
+            CreateCharacterAttackDataCache::class,
+            CreateMonsterCache::class,
+            UpdateCharactersForClassRanks::class,
+
+            // Development Commands:
+            CreateCharacter::class,
             CreateTestCharacters::class,
             MaxOutCharacter::class,
             UpdateUsersForDevelopment::class,

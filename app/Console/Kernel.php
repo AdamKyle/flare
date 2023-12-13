@@ -46,9 +46,6 @@ class Kernel extends ConsoleKernel {
         // Generate new scheduled events based on the Scheduled event configuration
         $schedule->command('generate:scheduled-events')->dailyAt('04:00')->timezone(config('app.timezeon'));
 
-        // Fix Character Gold every 5 minutes.
-        $schedule->command('fix:character-gold')->everyFiveMinutes();
-
         // Fix Character Timers every minute.
         $schedule->command('reset:timers')->everyMinute();
 

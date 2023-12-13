@@ -1,9 +1,8 @@
 <?php
 
-namespace App\Console\Commands;
+namespace App\Console\DevelopmentCommands;
 
 use App\Flare\Builders\CharacterBuilder;
-use App\Flare\Events\CreateCharacterEvent;
 use App\Flare\Models\GameClass;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\GameRace;

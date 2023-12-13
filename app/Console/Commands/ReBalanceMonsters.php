@@ -70,7 +70,6 @@ class ReBalanceMonsters extends Command
         $this->manageMonsters($monsters, $exponentialAttributeCurve, 5000000, 8000000000, 1000000, 5000);
 
         // Raid Monsters:
-        $gameMap  = GameMap::where('name', MapNameValue::SURFACE)->first();
         $monsters = Monster::orderBy('game_map_id')
                             ->where('is_celestial_entity', false)
                             ->where('is_raid_monster', true)
