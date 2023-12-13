@@ -3,8 +3,8 @@ import CharacterSkillsTabs from "../../sections/character-sheet/components/chara
 import {Component} from "react";
 import ItemComparison from "../../sections/chat/modals/item-comparison";
 import CharacterClassRanks from "../../sections/character-sheet/components/character-class-ranks";
-import CharacterClassSpecialtiesModal
-    from "../../sections/character-sheet/components/modals/character-class-specialties-modal";
+import CharacterClassRankSpecialtiesSection
+    from "../../sections/character-sheet/components/tabs/additional-information/sections/character-class-rank-specialties-section";
 import RankFightTops from "../../tops/rank-fight-tops";
 
 /**
@@ -55,7 +55,7 @@ export const watchForDarkModeClassRankChange = (component: CharacterClassRanks) 
     }, 10);
 }
 
-export const watchForDarkModeClassSpecialtyChange = (component: CharacterClassSpecialtiesModal) => {
+export const watchForDarkModeClassSpecialtyChange = (component: CharacterClassRankSpecialtiesSection) => {
     window.setInterval(() => {
         if (window.localStorage.hasOwnProperty('scheme') && component.state.dark_tables !== true) {
             component.setState({
@@ -103,7 +103,7 @@ export const watchForDarkModeTableChange = (component: Component<any, {dark_tabl
     window.setInterval(() => {
       if (window.localStorage.hasOwnProperty('scheme')) {
         const currentScheme = window.localStorage.scheme;
-        
+
         if (currentScheme === 'dark' && !component.state.dark_tables) {
           component.setState({
             dark_tables: true
@@ -113,7 +113,7 @@ export const watchForDarkModeTableChange = (component: Component<any, {dark_tabl
             dark_tables: false
           });
         }
-  
+
         previousScheme = currentScheme;
       } else if (component.state.dark_tables) {
         component.setState({

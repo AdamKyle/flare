@@ -1,23 +1,33 @@
 import React from "react";
 import {AdditionalInfoProps} from "../../../types/additional-info-props";
 import CharacterClassRanks from "../../../character-class-ranks";
-import CharacterClassSpecialtiesModal from "../../../modals/character-class-specialties-modal";
+import CharacterClassRankSpecialtiesSection from "./character-class-rank-specialties-section";
+import Tabs from "../../../../../../components/ui/tabs/tabs";
+import TabPanel from "../../../../../../components/ui/tabs/tab-panel";
 
-export default class CharacterClassRanksSection extends React.Component<AdditionalInfoProps, any> {
+export default class CharacterClassRanksSection extends React.Component<AdditionalInfoProps, {}> {
 
+    private tabs: {key: string, name: string}[];
 
     constructor(props: AdditionalInfoProps) {
         super(props);
 
-        this.state = {
-            show_class_specialties_model: false,
-        }
+        this.tabs = [{
+            key: 'class-ranks',
+            name: 'Class Ranks'
+        }, {
+            key: 'class-masteries',
+            name: 'Class Masteries',
+        }];
     }
 
-    manageClassSpecialtiesModal() {
-        this.setState({
-            show_class_specialties_model: !this.state.show_class_specialties_model,
-        });
+    whenTabUpdates(index: number) {
+
+        if (!this.props.when_tab_changes) {
+            return;
+        }
+
+        this.props.when_tab_changes(index, this.tabs);
     }
 
     render() {
@@ -27,23 +37,33 @@ export default class CharacterClassRanksSection extends React.Component<Addition
         }
 
         return (
-            <>
+            <Tabs tabs={this.tabs} full_width={true} listen_for_change={this.whenTabUpdates.bind(this)} >
+                <TabPanel key={'class-ranks'}>
+                    <CharacterClassRanks character={this.props.character} />
+                </TabPanel>
+                <TabPanel key={'class-masteries'}>
+                    <CharacterClassRankSpecialtiesSection
+                        is_open={true}
+                        manage_modal={() => {}}
+                        title={''}
+                        character={this.props.character}
+                        finished_loading={true}
+                    />
+                </TabPanel>
+            </Tabs>
 
-                <CharacterClassRanks character={this.props.character} />
-
-                {
-                    this.state.show_class_specialties_model ?
-                        <CharacterClassSpecialtiesModal
-                            is_open={this.state.show_class_specialties}
-                            manage_modal={this.manageClassSpecialtiesModal.bind(this)}
-                            title={'Class Specialties'}
-                            character={this.props.character}
-                            finished_loading={true}
-                        />
-                        :
-                        null
-                }
-            </>
+            // {
+            //     this.state.show_class_specialties_model ?
+            //         <CharacterClassSpecialtiesModal
+            //             is_open={this.state.show_class_specialties}
+            //             manage_modal={this.manageClassSpecialtiesModal.bind(this)}
+            //             title={'Class Specialties'}
+            //             character={this.props.character}
+            //             finished_loading={true}
+            //         />
+            //         :
+            //         null
+            // }
         );
     }
 }

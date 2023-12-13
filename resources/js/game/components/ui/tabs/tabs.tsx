@@ -86,7 +86,9 @@ export default class Tabs extends React.Component<TabProperties, any> {
         return(
             <Tab.Group onChange={this.props.listen_for_change}>
                 <Tab.List className={clsx("w-full grid gap-2 content-center " + this.props.additonal_css,
-                    {'md:w-1/3': !this.props.full_width}, {'grid-cols-4': this.state.tabs.length === 4},
+                    {'md:w-1/3': !this.props.full_width},
+                    {'grid-cols-5': this.state.tabs.length === 5},
+                    {'grid-cols-4': this.state.tabs.length === 4},
                     {'grid-cols-3': this.state.tabs.length === 3},
                     {'grid-cols-2': this.state.tabs.length === 2})}
                 >

@@ -1,32 +1,32 @@
 import React, {Fragment} from "react";
-import Dialogue from "../../../../components/ui/dialogue/dialogue";
-import Tabs from "../../../../components/ui/tabs/tabs";
-import TabPanel from "../../../../components/ui/tabs/tab-panel";
-import {formatNumber} from "../../../../lib/game/format-number";
-import ComponentLoading from "../../../../components/ui/loading/component-loading";
+import Dialogue from "../../../../../../components/ui/dialogue/dialogue";
+import Tabs from "../../../../../../components/ui/tabs/tabs";
+import TabPanel from "../../../../../../components/ui/tabs/tab-panel";
+import {formatNumber} from "../../../../../../lib/game/format-number";
+import ComponentLoading from "../../../../../../components/ui/loading/component-loading";
 import ClassSpecialtiesEquippedProps
-    from "../../../../lib/game/character-sheet/types/modal/class-specialties-equipped-props";
-import Ajax from "../../../../lib/ajax/ajax";
+    from "../../../../../../lib/game/character-sheet/types/modal/class-specialties-equipped-props";
+import Ajax from "../../../../../../lib/ajax/ajax";
 import {AxiosError, AxiosResponse} from "axios";
 import ClassSpecialtiesState
-    from "../../../../lib/game/character-sheet/types/class-ranks/types/class-specialties-state";
-import ClassSpecialtiesType from "../../../../lib/game/character-sheet/types/class-ranks/class-specialties-type";
-import PrimaryButton from "../../../../components/ui/buttons/primary-button";
+    from "../../../../../../lib/game/character-sheet/types/class-ranks/types/class-specialties-state";
+import ClassSpecialtiesType from "../../../../../../lib/game/character-sheet/types/class-ranks/class-specialties-type";
+import PrimaryButton from "../../../../../../components/ui/buttons/primary-button";
 import {
     watchForDarkModeClassSpecialtyChange
-} from "../../../../lib/game/dark-mode-watcher";
-import Table from "../../../../components/ui/data-tables/table";
-import LoadingProgressBar from "../../../../components/ui/progress-bars/loading-progress-bar";
+} from "../../../../../../lib/game/dark-mode-watcher";
+import Table from "../../../../../../components/ui/data-tables/table";
+import LoadingProgressBar from "../../../../../../components/ui/progress-bars/loading-progress-bar";
 import CharacterSpecialsEquippedTyp
-    from "../../../../lib/game/character-sheet/types/class-ranks/character-specials-equipped-typ";
-import SuccessAlert from "../../../../components/ui/alerts/simple-alerts/success-alert";
-import DangerAlert from "../../../../components/ui/alerts/simple-alerts/danger-alert";
+    from "../../../../../../lib/game/character-sheet/types/class-ranks/character-specials-equipped-typ";
+import SuccessAlert from "../../../../../../components/ui/alerts/simple-alerts/success-alert";
+import DangerAlert from "../../../../../../components/ui/alerts/simple-alerts/danger-alert";
 import {startCase} from "lodash";
 import Select from "react-select";
-import InfoAlert from "../../../../components/ui/alerts/simple-alerts/info-alert";
-import ClassRankType from "../../../../lib/game/character-sheet/types/class-ranks/class-rank-type";
+import InfoAlert from "../../../../../../components/ui/alerts/simple-alerts/info-alert";
+import ClassRankType from "../../../../../../lib/game/character-sheet/types/class-ranks/class-rank-type";
 
-export default class CharacterClassSpecialtiesModal extends React.Component<ClassSpecialtiesEquippedProps, ClassSpecialtiesState> {
+export default class CharacterClassRankSpecialtiesSection extends React.Component<ClassSpecialtiesEquippedProps, ClassSpecialtiesState> {
 
     private tabs: { key: string, name: string }[];
 
@@ -575,17 +575,6 @@ export default class CharacterClassSpecialtiesModal extends React.Component<Clas
     renderSpecialties() {
         return (
             <Fragment>
-                <p className='my-4'>
-                    Each class has its own specialties that unlock at specific Class Ranks for a class.
-                    As you level the class, through killing monsters, you will slowly unlock the
-                    specialities for the selected class. A player may only have three specialities equipped
-                    and can only have one damage speciality equipped. You may mix and match across classes
-                    to create your own unique build.
-                </p>
-                <p className='my-4'>
-                    <a href={"/information/class-ranks/"} target="_blank">Learn more <i className="fas fa-external-link-alt"></i></a>.
-                </p>
-
                 {
                     this.state.equipping ?
                         <LoadingProgressBar />
@@ -679,28 +668,20 @@ export default class CharacterClassSpecialtiesModal extends React.Component<Clas
         }
 
         return (
-            <Dialogue is_open={this.props.is_open}
-                      handle_close={this.props.manage_modal}
-                      title={this.props.title}
-                      medium_modal={true}
-            >
-                <div className='max-h-[475px] lg:max-h-[525px] overflow-y-auto'>
-                    {
-                        this.state.loading ?
-                            <div className='p-10'>
-                                <ComponentLoading />
-                            </div>
+            <div className='max-h-[475px] lg:max-h-[525px] overflow-y-auto'>
+                {
+                    this.state.loading ?
+                        <div className='p-10'>
+                            <ComponentLoading />
+                        </div>
                         :
-                            this.state.equipped_special !== null ?
-                                this.renderSpecialtyEquipped('Equipped')
-                            :
-                                this.state.special_selected !== null ?
-                                    this.renderSpecialty()
-                                :
-                                    this.renderSpecialties()
-                    }
-                </div>
-            </Dialogue>
+                        this.state.equipped_special !== null ?
+                            this.renderSpecialtyEquipped('Equipped')
+                        : this.state.special_selected !== null ?
+                            this.renderSpecialty()
+                        : this.renderSpecialties()
+                }
+            </div>
         );
     }
 }

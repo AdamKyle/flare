@@ -5,6 +5,8 @@ import AdditionalInformation from "../additional-information";
 import CharacterResistances from "../character-resistances";
 import CharacterReincarnation from "../character-reincarnation";
 import CharacterClassRanks from "../character-class-ranks";
+import CharacterElementalAtonementSection from "./character-elemental-atonement-section";
+import CharacterElementalAtonement from "../character-elemental-atonement";
 
 export default class CharacterAdditionalStatsSection extends React.Component<any, any> {
 
@@ -15,7 +17,7 @@ export default class CharacterAdditionalStatsSection extends React.Component<any
 
         this.tabs = [{
             key: 'core-info',
-            name: 'Core Information'
+            name: 'Base Info'
         },{
             key: 'resistance',
             name: 'Resistances',
@@ -25,6 +27,9 @@ export default class CharacterAdditionalStatsSection extends React.Component<any
         }, {
             key: 'class-ranks',
             name: 'Class Ranks',
+        }, {
+            key: 'elemental-atonement',
+            name: 'Elemental Atonement',
         }];
 
         this.state = {
@@ -46,6 +51,9 @@ export default class CharacterAdditionalStatsSection extends React.Component<any
                 </TabPanel>
                 <TabPanel key={'class-ranks'}>
                     <CharacterClassRanks character={this.props.character} />
+                </TabPanel>
+                <TabPanel key={'elemental-atonement'}>
+                    <CharacterElementalAtonement character={this.props.character} />
                 </TabPanel>
             </Tabs>
         );

@@ -1,52 +1,12 @@
 import React, {Fragment} from "react";
-import PrimaryButton from "../../../../components/ui/buttons/primary-button";
-import AdditionalInfoSection from "./additional-information/sections/additional-info-section";
 import InfoTabProps from "../../../../lib/game/character-sheet/types/tabs/info-tab-props";
 import {formatNumber} from "../../../../lib/game/format-number";
 import OrangeButton from "../../../../components/ui/buttons/orange-button";
-import InfoTabState from "../../../../lib/game/character-sheet/types/tabs/info-tab-state";
-import ResistanceInfoSection from "./additional-information/sections/resistance-info-section";
-import CharacterReincarnationSection from "./additional-information/sections/character-reincarnation-section";
-import CharacterTabs from "../character-tabs";
-import CharacterClassRanksSection from "./additional-information/sections/character-class-ranks-section";
-import CharacaterElementalAtonement from "../modals/characater-elemental-atonement";
 
-export default class InfoTab extends React.Component<InfoTabProps, InfoTabState> {
+export default class InfoTab extends React.Component<InfoTabProps, {}> {
 
     constructor(props: InfoTabProps) {
         super(props);
-
-        this.state = {
-            open_info: false,
-            open_resistances: false,
-            open_reincarnation: false,
-            open_class_ranks: false,
-            open_elemental_atonement: false,
-        }
-    }
-
-    manageResistancesDialogue() {
-        this.setState({
-            open_resistances: !this.state.open_resistances
-        })
-    }
-
-    manageReincarnation() {
-        this.setState({
-            open_reincarnation: !this.state.open_reincarnation
-        })
-    }
-
-    manageClassRanks() {
-        this.setState({
-            open_class_ranks: !this.state.open_class_ranks,
-        });
-    }
-
-    manageElementalAtonement() {
-        this.setState({
-            open_elemental_atonement: !this.state.open_elemental_atonement,
-        })
     }
 
     render() {
@@ -98,29 +58,6 @@ export default class InfoTab extends React.Component<InfoTabProps, InfoTabState>
                         <div className="bg-orange-600 h-1.5 rounded-full" style={{width: ((this.props.character.xp / this.props.character.xp_next) * 100) + '%'}}></div>
                     </div>
                 </div>
-
-                {
-                    this.state.open_class_ranks ?
-                        <CharacterClassRanksSection
-                            is_open={this.state.open_class_ranks}
-                            manage_modal={this.manageClassRanks.bind(this)}
-                            title={'Character Class Ranks'}
-                            character={this.props.character}
-                            finished_loading={true}
-                        />
-                    : null
-                }
-
-                {
-                    this.state.open_elemental_atonement ?
-                        <CharacaterElementalAtonement
-                            elemental_atonement={this.props.character.elemental_atonement}
-                            is_open={this.state.open_elemental_atonement}
-                            manage_modal={this.manageElementalAtonement.bind(this)}
-                            character={this.props.character}
-                        />
-                    : null
-                }
             </Fragment>
         )
     }

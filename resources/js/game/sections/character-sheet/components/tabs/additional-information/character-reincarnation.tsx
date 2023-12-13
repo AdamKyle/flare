@@ -12,8 +12,6 @@ export default class CharacterReincarnation extends React.Component<any, any> {
     render() {
         return (
             <div className="relative">
-                {/* Horizontal line on small screens */}
-                <div className="absolute top-1/2 left-0 right-0 bg-gray-300 h-px transform -translate-y-1/2 sm:hidden"></div>
 
                 {/* Vertical line on large screens */}
                 <div className="hidden md:block absolute top-1/4 bottom-1/4 left-1/2 bg-gray-300 w-px transform -translate-x-1/2"></div>

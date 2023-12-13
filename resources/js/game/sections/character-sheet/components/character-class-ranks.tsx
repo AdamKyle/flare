@@ -10,7 +10,7 @@ import CharacterClassRanksState
 import ClassRankType from "../../../lib/game/character-sheet/types/class-ranks/class-rank-type";
 import WeaponMastery from "../../../lib/game/character-sheet/types/class-ranks/weapon-mastery";
 import PrimaryButton from "../../../components/ui/buttons/primary-button";
-import CharacterClassSpecialtiesModal from "./modals/character-class-specialties-modal";
+import CharacterClassRankSpecialtiesSection from "./tabs/additional-information/sections/character-class-rank-specialties-section";
 import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
 import DangerAlert from "../../../components/ui/alerts/simple-alerts/danger-alert";
 import SuccessAlert from "../../../components/ui/alerts/simple-alerts/success-alert";
