@@ -99,6 +99,10 @@ export default class CharacterClassRankSpecialtiesSection extends React.Componen
         if (data.value === 'Please select') {
             this.setState({
                 class_specials_for_table: this.state.class_specialties,
+                selected_filter: this.props.character === null ? null : this.props.character.class
+            }, () => {
+                this.filterTable();
+                this.filterOtherClassSpecialsTable();
             });
 
             return;
@@ -672,7 +676,7 @@ export default class CharacterClassRankSpecialtiesSection extends React.Componen
                 {
                     this.state.loading ?
                         <div className='p-10'>
-                            <ComponentLoading />
+                            <LoadingProgressBar />
                         </div>
                         :
                         this.state.equipped_special !== null ?

@@ -150,47 +150,10 @@ class CharacterRewardService {
 
         $this->distributeCopperCoins($monster);
 
-        $this->giveShards();
-
         $this->currencyEventReward($monster);
 
         if (!$this->character->is_auto_battling && $this->character->isLoggedIn()) {
             event(new UpdateCharacterCurrenciesEvent($this->character->refresh()));
-        }
-
-        return $this;
-    }
-
-    /**
-     * Give character shards.
-     *
-     * - Only if they are at a special location and in gold mines.
-     *
-     * @param Character $character
-     * @return CharacterRewardService
-     * @throws Exception
-     */
-    public function giveShards(): CharacterRewardService {
-        $specialLocation = $this->findLocationWithEffect($this->character->map);
-
-        if (!is_null($specialLocation)) {
-            if (!is_null($specialLocation->type)) {
-                $locationType = new LocationType($specialLocation->type);
-
-                if ($locationType->isGoldMines()) {
-                    $shards = rand(1, 1000);
-
-                    $shards = $shards + $shards * $this->getShardBonus($this->character);
-
-                    $newShards = $this->character->shards + $shards;
-
-                    if ($newShards > MaxCurrenciesValue::MAX_SHARDS) {
-                        $newShards = MaxCurrenciesValue::MAX_SHARDS;
-                    }
-
-                    $this->character->update(['shards' => $newShards]);
-                }
-            }
         }
 
         return $this;
@@ -255,20 +218,6 @@ class CharacterRewardService {
         }
 
         return $this;
-    }
-
-    /**
-     * Are we at a location with an effect (special location)?
-     *
-     * @param Map $map
-     * @return Location|null
-     */
-    protected function findLocationWithEffect(Map $map): ?Location {
-        return Location::whereNotNull('enemy_strength_type')
-            ->where('x', $map->character_position_x)
-            ->where('y', $map->character_position_y)
-            ->where('game_map_id', $map->game_map_id)
-            ->first();
     }
 
 

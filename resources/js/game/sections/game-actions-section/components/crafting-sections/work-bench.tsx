@@ -15,6 +15,7 @@ export default class WorkBench extends React.Component<any, any> {
 
         this.state = {
             loading: true,
+            applying_oil: false,
             selected_item: null,
             selected_alchemy_item: null,
             selected_item_name: null,
@@ -36,7 +37,7 @@ export default class WorkBench extends React.Component<any, any> {
                 alchemy_items: result.data.alchemy_items,
             });
         }, (error: AxiosError) => {
-
+            this.setState({loading: false});
         });
     }
 
@@ -44,7 +45,7 @@ export default class WorkBench extends React.Component<any, any> {
         const url = craftingPostEndPoints('workbench', this.props.character_id);
 
         this.setState({
-            loading: true
+            applying_oil: true
 
         },() => {
             (new Ajax()).setRoute(url).setParameters({
@@ -52,7 +53,7 @@ export default class WorkBench extends React.Component<any, any> {
                 alchemy_item_id: this.state.selected_alchemy_item,
             }).doAjaxCall('post', (result: AxiosResponse) => {
                 this.setState({
-                    loading: false,
+                    applying_oil: false,
                     inventory_items: result.data.items,
                     alchemy_items: result.data.alchemy_items,
                 }, () => {
@@ -116,7 +117,7 @@ export default class WorkBench extends React.Component<any, any> {
         const alchemyItem     = foundAlchemyItem[0].item;
         const selectedItem    = foundSelectedItem[0].item;
 
-        const baseCost        = selectedItem.holy_stacks * 1000;
+        const baseCost        = selectedItem.holy_stacks * 100;
         const cost            = baseCost * alchemyItem.holy_level;
 
         this.setState({
@@ -126,12 +127,12 @@ export default class WorkBench extends React.Component<any, any> {
     }
 
     buildItems() {
-        return this.state.inventory_items.map((slot: any) => {
-            return {
+        return this.state.inventory_items
+            .filter((slot: any) => slot.item.type !== 'alchemy')
+            .map((slot: any) => ({
                 label: slot.item.affix_name,
                 value: slot.item.id
-            }
-        });
+            }));
     }
 
     selectedItem() {
@@ -186,6 +187,17 @@ export default class WorkBench extends React.Component<any, any> {
     }
 
     render() {
+
+        if (this.state.loading) {
+            return (
+                <div className='mt-2 grid md:grid-cols-3 gap-2 md:ml-[120px]'>
+                    <div className='col-start-1 col-span-2'>
+                        <LoadingProgressBar />
+                    </div>
+                </div>
+            )
+        }
+
         return (
             <Fragment>
                 <div className='mt-2 grid md:grid-cols-3 gap-2 md:ml-[120px]'>
@@ -247,7 +259,7 @@ export default class WorkBench extends React.Component<any, any> {
 
                 <div className='m-auto w-1/2 md:relative left-[-20px]'>
                     {
-                        this.state.loading ?
+                        this.state.applying_oil ?
                             <LoadingProgressBar />
                             : null
                     }

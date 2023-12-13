@@ -31,10 +31,16 @@ export default class LocationDetails extends React.Component<LocationDetailsProp
                     <div className='border-b-2 border-b-gray-200 dark:border-b-gray-600 my-3 hidden sm:block'></div>
                     <h5 className='text-orange-500 dark:text-orange-400'>Gold Mines!</h5>
                     <p className='my-4'>
-                        You are in the Gold Mines! This place will drops between 1-1000 Shards per kill. You <strong>can explore here</strong>.
-                        This is the only place known to drop <a href='/information/currencies' target="_blank">Crystal Shards <i className="fas fa-external-link-alt"></i></a>,
-                        aside from Celestials who drop the most.
+                        Welcome to the Gold Mines, a special mid game location to help players start farming currencies for end game gear while they continue their questing
+                        to unlock more of the game and work further towarfds the true power of their character! Come now child, death awaits!
                     </p>
+                    <ul className="list-disc">
+                        <li className="ml-4">Characters can get 1-10,000 Gold from fighting monsters. This can be increased to 50,000 if an event is triggered at this area.</li>
+                        <li className="ml-4">Characters can get 1-500 Gold Dust from fighting monsters. This can be increased to 1,000 if an event is triggered at this area.</li>
+                        <li className="ml-4">Characters can get 1-500 Shards from fighting monsters. This can be increased to 1,000 if an event is triggered at this area.</li>
+                        <li className="ml-4">There is a 1/1,000,000 chance to get a random <a href="/information/random-enchants" target="_blank">Medium Unique <i className="fas fa-external-link-alt"></i></a> from Monsters half way down the list of more. This can be reduced to 1/500,000 chance if an event is triggered at this area.</li>
+                        <li className="ml-4">There is a 1/1,000,000 chance to trigger an event while fighting here to reduce the chances and increase the currencies (the above "if an event is triggered") for 1 hour at this location only.</li>
+                    </ul>
                 </Fragment>
             )
         }

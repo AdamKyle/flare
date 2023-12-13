@@ -8,6 +8,7 @@ use App\Flare\Services\CharacterRewardService;
 use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\BattleRewardProcessing\Handlers\FactionHandler;
 use App\Game\BattleRewardProcessing\Handlers\GlobalEventParticipationHandler;
+use App\Game\BattleRewardProcessing\Handlers\GoldMinesRewardHandler;
 use App\Game\BattleRewardProcessing\Handlers\PurgatorySmithHouseRewardHandler;
 use App\Game\BattleRewardProcessing\Services\BattleRewardService;
 use App\Game\BattleRewardProcessing\Services\SecondaryRewardService;
@@ -44,13 +45,20 @@ class ServiceProvider extends ApplicationServiceProvider {
             );
         });
 
+        $this->app->bind(GoldMinesRewardHandler::class, function($app) {
+            return new GoldMinesRewardHandler(
+                $app->make(RandomAffixGenerator::class),
+            );
+        });
+
         $this->app->bind(BattleRewardService::class, function ($app) {
             return new BattleRewardService(
                 $app->make(FactionHandler::class),
                 $app->make(CharacterRewardService::class),
                 $app->make(GoldRush::class),
                 $app->make(GlobalEventParticipationHandler::class),
-                $app->make(PurgatorySmithHouseRewardHandler::class)
+                $app->make(PurgatorySmithHouseRewardHandler::class),
+                $app->make(GoldMinesRewardHandler::class),
             );
         });
 

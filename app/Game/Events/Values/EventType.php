@@ -19,6 +19,8 @@ class EventType {
 
     const PURGATORY_SMITH_HOUSE = 5;
 
+    const GOLD_MINES            = 6;
+
     /**
      * @var int $value
      */
@@ -34,6 +36,7 @@ class EventType {
         3 => self::RAID_EVENT,
         4 => self::WINTER_EVENT,
         5 => self::PURGATORY_SMITH_HOUSE,
+        6 => self::GOLD_MINES,
     ];
 
     protected static array $selection = [
@@ -42,7 +45,8 @@ class EventType {
         2 => 'Weekly Currency Drops',
         3 => 'Raid Event',
         4 => 'Winter Event',
-        5 => 'Purgatory Smith House'
+        5 => 'Purgatory Smith House',
+        6 => 'Gold Mines',
     ];
 
     /**
@@ -129,5 +133,14 @@ class EventType {
      */
     public function isPurgatorySmithHouseEvent(): bool {
         return $this->value = self::PURGATORY_SMITH_HOUSE;
+    }
+
+    /**
+     * Is Gold Mines event?
+     *
+     * @return bool
+     */
+    public function isGoldMinesEvent(): bool {
+        return $this->value = self::GOLD_MINES;
     }
 }

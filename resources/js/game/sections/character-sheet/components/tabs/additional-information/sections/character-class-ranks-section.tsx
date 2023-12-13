@@ -51,19 +51,6 @@ export default class CharacterClassRanksSection extends React.Component<Addition
                     />
                 </TabPanel>
             </Tabs>
-
-            // {
-            //     this.state.show_class_specialties_model ?
-            //         <CharacterClassSpecialtiesModal
-            //             is_open={this.state.show_class_specialties}
-            //             manage_modal={this.manageClassSpecialtiesModal.bind(this)}
-            //             title={'Class Specialties'}
-            //             character={this.props.character}
-            //             finished_loading={true}
-            //         />
-            //         :
-            //         null
-            // }
         );
     }
 }

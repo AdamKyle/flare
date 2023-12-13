@@ -10,6 +10,7 @@ use App\Flare\Models\Monster;
 use App\Flare\Services\CharacterRewardService;
 use App\Game\BattleRewardProcessing\Handlers\FactionHandler;
 use App\Game\BattleRewardProcessing\Handlers\GlobalEventParticipationHandler;
+use App\Game\BattleRewardProcessing\Handlers\GoldMinesRewardHandler;
 use App\Game\BattleRewardProcessing\Handlers\PurgatorySmithHouseRewardHandler;
 use App\Game\BattleRewardProcessing\Jobs\BattleItemHandler;
 use App\Game\Core\Services\GoldRush;
@@ -25,19 +26,22 @@ class BattleRewardService {
     private GoldRush $goldRush;
     private GlobalEventParticipationHandler $globalEventParticipationHandler;
     private PurgatorySmithHouseRewardHandler $purgatorySmithHouseRewardHandler;
+    private GoldMinesRewardHandler $goldMinesRewardHandler;
 
     public function __construct(
         FactionHandler $factionHandler,
         CharacterRewardService $characterRewardService,
         GoldRush $goldRush,
         GlobalEventParticipationHandler $globalEventParticipationHandler,
-        PurgatorySmithHouseRewardHandler $purgatorySmithHouseRewardHandler
+        PurgatorySmithHouseRewardHandler $purgatorySmithHouseRewardHandler,
+        GoldMinesRewardHandler $goldMinesRewardHandler,
     ) {
         $this->factionHandler                   = $factionHandler;
         $this->characterRewardService           = $characterRewardService;
         $this->goldRush                         = $goldRush;
         $this->globalEventParticipationHandler  = $globalEventParticipationHandler;
         $this->purgatorySmithHouseRewardHandler = $purgatorySmithHouseRewardHandler;
+        $this->goldMinesRewardHandler           = $goldMinesRewardHandler;
     }
 
     public function setUp(Monster $monster, Character $character): BattleRewardService {
@@ -65,9 +69,13 @@ class BattleRewardService {
 
         $this->handleGlobalEventGoals();
 
-        $this->purgatorySmithHouseRewardHandler->handleFightingAtPurgatorySmithHouse($this->character, $this->monster);
+        $character = $this->character->refresh();
 
-        BattleItemHandler::dispatch($this->character, $this->monster);
+        $character = $this->purgatorySmithHouseRewardHandler->handleFightingAtPurgatorySmithHouse($character, $this->monster);
+
+        $character = $this->goldMinesRewardHandler->handleFightingAtGoldMines($character, $this->monster);
+
+        BattleItemHandler::dispatch($character, $this->monster);
     }
 
     protected function handleFactionRewards() {

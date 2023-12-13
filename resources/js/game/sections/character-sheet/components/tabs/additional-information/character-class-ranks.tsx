@@ -94,6 +94,11 @@ export default class CharacterClassRanks extends React.Component<any, any> {
                 find that they have a play ground of their own making where they can create their own build that make their character
                 not just feel unique but all their own.
             </p>
+            <h3 className="underline">Specific Attack Types</h3>
+            <p className="dark:text-gray-300 my-4">
+                As you click through the Class Specials you will notice the ones that do damage will tell you, in the top left,
+                what attack type to use when fighting monsters to trigger the attack.
+            </p>
         </>
     }
 
