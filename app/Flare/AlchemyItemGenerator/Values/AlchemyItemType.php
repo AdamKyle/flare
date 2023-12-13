@@ -29,6 +29,17 @@ class AlchemyItemType {
         self::INCREASE_ALCHEMY_SKILL => self::INCREASE_ALCHEMY_SKILL,
     ];
 
+    public static $list = [
+        self::INCREASE_STATS,
+        self::INCREASE_DAMAGE,
+        self::INCREASE_ARMOUR,
+        self::INCREASE_HEALING,
+        self::INCREASE_SKILL_TYPE,
+        self::DAMAGES_KINGDOMS,
+        self::HOLY_OILS,
+        self::INCREASE_ALCHEMY_SKILL,
+    ];
+
     /**
      * @var string $value
      */
