@@ -22,6 +22,7 @@ class EventTypeTest extends TestCase {
             EventType::RAID_EVENT => 'Raid Event',
             EventType::WINTER_EVENT => 'Winter Event',
             EventType::PURGATORY_SMITH_HOUSE => 'Purgatory Smith House',
+            EventType::GOLD_MINES => 'Gold Mines',
         ];
 
         $this->assertEquals($expected, EventType::getOptionsForSelect());
