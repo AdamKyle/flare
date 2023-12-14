@@ -14,17 +14,17 @@ class GoldRushCheckCalculator {
      *
      * If true, the check passed and the character should be rewarded.
      *
+     * Players have a 5% chance by default to get a gold rush.
+     *
      * @param Monster $monster
      * @param float $gameMapBonus
      * @return bool
      */
     public function fetchGoldRushChance(float $gameMapBonus = 0.0) {
-        $bonus = $gameMapBonus;
+        $bonus = $gameMapBonus + 0.05;
 
-        $roll  = RandomNumberGenerator::generateRandomNumber(1, 100);
+        $roll  = RandomNumberGenerator::generateTureRandomNumber(100, $bonus);
 
-        $roll += ceil($roll * $bonus);
-
-        return $roll > 95;
+        $roll >= 100;
     }
 }

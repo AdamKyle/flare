@@ -179,7 +179,7 @@ class BaseMovementService {
             return rand(1, 100) > $needed;
         }
 
-        return RandomNumberGenerator::generateRandomNumber(1, 500) > 499;
+        return RandomNumberGenerator::generateTureRandomNumber(500, 0.05) >= 500;
     }
 
     /**

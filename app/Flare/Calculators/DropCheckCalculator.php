@@ -40,6 +40,7 @@ class DropCheckCalculator {
      * Can we get more difficult items like mythics and specific quest items.
      *
      * @param float $lootingChance
+     * @param int $max
      * @return bool
      */
     public function fetchDifficultItemChance(float $lootingChance = 0.0, int $max = 1000000): bool {
@@ -75,24 +76,21 @@ class DropCheckCalculator {
      * @return bool
      */
     protected function canGetReward(int $max = 100, float $additionalChanceBonus = 0.0): bool {
-        $baseChance = 1 / $max;
-
-        $chanceOfSuccess = $baseChance + $additionalChanceBonus;
-
-        return $this->attemptToGainReward($chanceOfSuccess);
+        return $this->attemptToGainReward($max, $additionalChanceBonus);
     }
 
     /**
      * Based on chance of success and roll of the dice we attempt to gain the reward.
      *
+     * @param int $max
      * @param float $chanceOfSuccess
      * @return bool
      */
-    private function attemptToGainReward(float $chanceOfSuccess): bool {
+    private function attemptToGainReward(int $max, float $chanceOfSuccess): bool {
 
-        $roll = RandomNumberGenerator::generateTureRandomNumber(0, 1);
+        $roll = RandomNumberGenerator::generateTureRandomNumber($max, $chanceOfSuccess);
 
-        if ($roll <= $chanceOfSuccess) {
+        if ($roll >= $max) {
             return true;
         }
 

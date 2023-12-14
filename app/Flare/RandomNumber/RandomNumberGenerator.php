@@ -29,14 +29,18 @@ class RandomNumberGenerator {
 
     /**
      * Generates a true random number.
-     * @param int $min
-     * @param int $max
      * @return float|int
-     * @throws \Exception
      */
-    public function generateTureRandomNumber(int $min = 0, int $max = 1): float {
-        $randomNumber = random_int($min * 1000, $max * 1000);
+    public function generateTureRandomNumber(int $max, float $chance): int {
+        $randomNumber = mt_rand(1, $max);
+        $bonus = $chance * $max;
+        $isBonusSuccessful = mt_rand() / mt_getrandmax() <= $chance;
 
-        return $randomNumber / 1000;
+        if ($isBonusSuccessful) {
+            $randomNumber += $bonus;
+            $randomNumber = min($randomNumber, $max);
+        }
+
+        return $randomNumber;
     }
 }
