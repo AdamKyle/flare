@@ -44,7 +44,7 @@ export default class InfoTab extends React.Component<InfoTabProps, {}> {
                     </div>
                 </div>
                 <div className='border-b-2 block border-b-gray-300 dark:border-b-gray-600 my-3'></div>
-                <div className='flex flex-wrap justify-center gap-2 lg:flex-nowrap'>
+                <div className='flex flex-wrap justify-center gap-2 lg:flex-nowrap text-center'>
                     <div className='mt-4 w-full lg:w-auto'>
                         <OrangeButton button_label={'Show additional details'} on_click={this.props.manage_addition_data} />
                     </div>
