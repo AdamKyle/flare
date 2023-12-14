@@ -21,7 +21,6 @@ export default class CharacterElementalAtonementSection extends React.Component<
 
     componentDidMount(): void {
         (new Ajax).setRoute('character-sheet/'+this.props.character.id+'/elemental-atonement-info').doAjaxCall('get', (response: AxiosResponse) => {
-            console.log(response.data);
             this.setState({
                 is_loading: false,
                 elemental_atonement_details: response.data.elemental_atonement_details,

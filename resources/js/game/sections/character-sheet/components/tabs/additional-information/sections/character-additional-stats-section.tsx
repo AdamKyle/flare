@@ -119,9 +119,6 @@ export default class CharacterAdditionalStatsSection extends React.Component<any
     }
 
     render() {
-
-        console.log(this.state.view_port);
-
         if (this.state.view_port < 775) {
             return (
                 <>
