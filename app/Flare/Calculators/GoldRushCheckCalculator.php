@@ -23,7 +23,7 @@ class GoldRushCheckCalculator {
     public function fetchGoldRushChance(float $gameMapBonus = 0.0) {
         $bonus = $gameMapBonus + 0.05;
 
-        $roll  = RandomNumberGenerator::generateTureRandomNumber(100, $bonus);
+        $roll  = RandomNumberGenerator::generateTrueRandomNumber(100, $bonus);
 
         $roll >= 100;
     }

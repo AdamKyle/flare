@@ -233,7 +233,7 @@ class GoldMinesRewardHandler {
             return;
         }
 
-        if (RandomNumberGenerator::generateTureRandomNumber(0, 1) <= (1 / 1000000)) {
+        if (RandomNumberGenerator::generateTrueRandomNumber(0, 1) <= (1 / 1000000)) {
             Event::create([
                 'type'        => EventType::GOLD_MINES,
                 'started_at'  => now(),

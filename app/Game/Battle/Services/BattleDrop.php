@@ -193,7 +193,7 @@ class BattleDrop {
             $items = collect($items)->reject(function($item) use($character) {
                return $character->inventory->slots->where('item_id', $item->id)->isNotEmpty();
             });
-
+            
             if ($items->isNotEmpty() && DropCheckCalculator::fetchDifficultItemChance($lootingChance, 100)) {
                 $this->attemptToPickUpItem($character, $items->random());
             }
