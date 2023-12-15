@@ -40,14 +40,15 @@ class RandomNumberGenerator {
         }
 
         $randomNumber = mt_rand(1, $max);
-        $bonus = $chance * $max * 0.1; // Adjust 0.1 to your desired factor
 
-        $fraction = 0.5; // Adjust to your desired fraction
+        $bonus = (int) round($chance * $max);
 
-        $isBonusSuccessful = mt_rand() / mt_getrandmax() <= $chance * 0.5; // Adjust 0.5 to your desired factor
+        $fraction = 0.5;
+
+        $isBonusSuccessful = mt_rand() / mt_getrandmax() <= $chance * 0.5;
 
         if ($isBonusSuccessful) {
-            $randomNumber += $fraction * $bonus;
+            $randomNumber += (int) round($fraction * $bonus);
             $randomNumber = min($randomNumber, $max);
         }
 

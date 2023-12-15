@@ -28,7 +28,7 @@ class DropCheckCalculator {
         }
 
         if ($characterLevel < 12 && $lootingChance < .10) {
-            $totalChance = .15;
+            $totalChance = .80;
 
             return $this->canGetReward(100, $totalChance);
         }
