@@ -70,7 +70,7 @@ export default class EventGoalsTab extends React.Component<
                         secondary_label={
                             formatNumber(value) + "/" + formatNumber(current)
                         }
-                        percentage_filled={value / current}
+                        percentage_filled={(value / current) * 100}
                         height_override_class="h-2"
                         text_override_class="text-md"
                     />
@@ -104,8 +104,8 @@ export default class EventGoalsTab extends React.Component<
                             formatNumber(this.state.eventGoal.max_kills)
                         }
                         percentage_filled={
-                            this.state.eventGoal?.total_kills /
-                            this.state.eventGoal?.max_kills
+                            (this.state.eventGoal?.total_kills /
+                            this.state.eventGoal?.max_kills) * 100
                         }
                         height_override_class="h-3"
                         text_override_class="text-md"
