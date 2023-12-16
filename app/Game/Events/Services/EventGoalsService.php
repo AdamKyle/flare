@@ -15,6 +15,7 @@ class EventGoalsService {
     /**
      * Fetches the current event goal data for controller action.
      *
+     * @param Character $character
      * @return array
      */
     public function fetchCurrentEventGoal(Character $character): array {
@@ -24,6 +25,7 @@ class EventGoalsService {
     /**
      * Get the event goal data.
      *
+     * @param Character $character
      * @return array
      */
     public function getEventGoalData(Character $character): array {

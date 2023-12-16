@@ -6,6 +6,7 @@ use App\Console\AfterDeployment\AddHolyStacksToItems;
 use App\Console\AfterDeployment\AssignNewSkillsToPlayers;
 use App\Console\AfterDeployment\CreateCharacterAttackDataCache;
 use App\Console\AfterDeployment\CreateMonsterCache;
+use App\Console\AfterDeployment\KickOffEventGoalForWinterEvent;
 use App\Console\AfterDeployment\RebalanceQuestCurrencyCostsAndRewards;
 use App\Console\AfterDeployment\ReduceAlchemyItemsCost;
 use App\Console\AfterDeployment\UpdateCharacterCurrencies;
@@ -46,6 +47,7 @@ class AppServiceProvider extends ServiceProvider {
             ReduceAlchemyItemsCost::class,
             UpdateCharacterCurrencies::class,
             RebalanceQuestCurrencyCostsAndRewards::class,
+            KickOffEventGoalForWinterEvent::class,
 
             // Development Commands:
             CreateCharacter::class,

@@ -125,6 +125,8 @@ class PublicMessage {
                 return 'HELL';
             case 'Purgatory':
                 return 'PURG';
+            case 'The Ice Plane':
+                return 'ICE';
             case 'Surface':
             default:
                 return 'SUR';
