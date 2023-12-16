@@ -210,7 +210,8 @@ class PurgatorySmithHouseRewardHandler {
         }
 
         if (!$isMythic) {
-            $randomAffixGenerator = $this->randomAffixGenerator->setPaidAmount(RandomAffixDetails::LEGENDARY);
+            $randomAffixGenerator = $this->randomAffixGenerator->setCharacter($character)
+                ->setPaidAmount(RandomAffixDetails::LEGENDARY);
 
             $newItem = $item->duplicate();
 
