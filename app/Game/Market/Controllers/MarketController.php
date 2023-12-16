@@ -3,10 +3,10 @@
 namespace App\Game\Market\Controllers;
 
 
+use App\Game\CharacterInventory\Services\ComparisonService;
 use Cache;
 use App\Flare\Models\Item;
 use App\Flare\Traits\Controllers\ItemsShowInformation;
-use App\Game\Core\Services\ComparisonService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;

@@ -13,47 +13,43 @@
 
             <dl class="my-4">
                 <dt>Your Gold:</dt>
-                <dd>{{number_format($gold)}}</dd>
+                <dd>{{ number_format($gold) }}</dd>
                 <dt>Item Cost:</dt>
-                <dd>{{number_format($cost)}}</dd>
+                <dd>{{ number_format($cost) }}</dd>
             </dl>
 
-            <form method="post" action="{{route('game.shop.purchase.multiple', ['character' => $characterId])}}">
-                @csrf
+            <form x-data="{ quantity: 1, cost: @json($cost), gold: @json($gold) }" x-init="quantity = 1" method="post" action="{{ route('game.shop.purchase.multiple', ['character' => $characterId]) }}">
+                @csrf()
 
-                <input type="hidden" name="item_id" value="{{$itemId}}" />
+                <input type="hidden" value="{{$itemId}}" name="item_id" id="item_id" />
 
-                <div class="mb-5" x-data="{
-                    amount: 0,
-                    get cost() {
-                        let amount = this.amount * {{$cost}};
-
-                        if ({{$character->classType()->isMerchant()}}) {
-                            amount = amount - amount * .025;
-                        }
-
-                        return Math.floor(amount);
-                    },
-                    get isDisabled() { return true; }
-                }">
-                    <label class="label block mb-2" for="amount">Amount</label>
-                    <input  x-model="amount" id="amount" type="number" class="form-control" name="amount" min="0" max="75" value="{{ old('amount') }}" required autofocus>
-                    @error('amount')
-                    <div class="text-red-800 dark:text-red-500 pt-3" role="alert">
-                        <strong>{{$message}}</strong>
-                    </div>
-                    @enderror
-                    <dl class="my-4">
-                        <dt>Cost</dt>
-                        <dd x-text="cost" :class="{'text-red-500': cost > {{$gold}}}"></dd>
-                    </dl>
+                <div class="my-4" x-cloak>
+                    <label for="quantity">Enter Quantity:</label>
+                    <input x-model="quantity" type="number" id="amount" name="amount" min="1" max="75" class="w-1/3 border rounded-md p-2">
                 </div>
 
-                <x-core.buttons.primary-button type="submit">
+                <div x-show="quantity > 75" x-cloak>
+                    <x-core.alerts.danger-alert>
+                        Quantity cannot exceed 75.
+                    </x-core.alerts.danger-alert>
+                </div>
+
+                <div x-show="quantity * cost > gold" x-cloak>
+                    <x-core.alerts.danger-alert>
+                        You don't have enough gold to purchase that many items.
+                    </x-core.alerts.danger-alert>
+                </div>
+
+                <div class="my-4 text-green-700 dark:text-green-500" x-cloak x-show="quantity <= 75 && quantity * cost <= gold">
+                    <p x-text="'You want to purchase ' + quantity + ', that will cost you ' + (quantity * cost).toLocaleString() + '.'"></p>
+                </div>
+
+                <x-core.buttons.primary-button x-bind:disabled="quantity > 75 || quantity * cost > gold" type="submit">
                     Purchase Amount
                 </x-core.buttons.primary-button>
             </form>
         </x-core.cards.card-with-title>
 
     </x-core.layout.info-container>
+
 @endsection

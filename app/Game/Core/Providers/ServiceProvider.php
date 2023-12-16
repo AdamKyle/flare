@@ -14,7 +14,7 @@ use App\Game\Core\Comparison\ItemComparison;
 use App\Game\Core\Handlers\HandleGoldBarsAsACurrency;
 use App\Game\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Core\Services\CharacterPassiveSkills;
-use App\Game\Core\Services\ComparisonService;
+use App\Game\CharacterInventory\Services;
 use App\Game\Core\Services\DropCheckService;
 use App\Game\CharacterInventory\Services\EquipItemService;
 use App\Game\CharacterInventory\Services\InventorySetService;

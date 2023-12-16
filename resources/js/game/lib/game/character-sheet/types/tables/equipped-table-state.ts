@@ -9,6 +9,8 @@ export default interface EquippedTableState {
 
     success_message: string | null;
 
+    error_message: string | null;
+
     item_id: number | null;
 
     view_item: boolean;

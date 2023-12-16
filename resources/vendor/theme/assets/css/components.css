@@ -909,7 +909,7 @@ Menu Bar
 Workspace
 */
 .workspace {
-  @apply relative flex flex-auto flex-col mt-20 px-5 pt-5;
+  @apply relative flex flex-auto flex-col mt-20 px-5 pt-5 my-10;
 
   @screen md {
     @apply px-10 pt-10;

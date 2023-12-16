@@ -2,6 +2,8 @@
 
 namespace App\Game\Shop\Controllers;
 
+use App\Game\CharacterInventory\Services\ComparisonService;
+use App\Game\Shop\Requests\ShopBuyMultipleOfItem;
 use Cache;
 use Illuminate\Http\Request;
 use League\Fractal\Manager;
@@ -13,10 +15,8 @@ use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Core\Events\UpdateTopBarEvent;
-use App\Game\Shop\Requests\ShopBuyMultipleValidation;
 use App\Game\Shop\Requests\ShopPurchaseMultipleValidation;
 use App\Game\CharacterInventory\Services\EquipItemService;
-use App\Game\Core\Services\ComparisonService;
 use App\Game\Shop\Events\BuyItemEvent;
 use App\Game\Shop\Services\ShopService;
 use App\Game\Shop\Requests\ShopReplaceItemValidation;
@@ -145,7 +145,8 @@ class ShopController extends Controller {
         return redirect()->back()->with('success', 'Sold: ' . $item->affix_name . ' for: ' . $totalSoldFor . ' gold.');
     }
 
-    public function shopCompare(Request $request, Character $character, ComparisonService $comparisonService) {
+    public function shopCompare(Request $request, Character $character,
+                                ComparisonService $comparisonService) {
 
         $viewData = $comparisonService->buildShopData($character, Item::where('name', $request->item_name)->first(), $request->item_type);
 
@@ -194,7 +195,7 @@ class ShopController extends Controller {
         return redirect()->to(route('game.shop.buy', ['character' => $character]))->with('success', 'Purchased and equipped: ' . $item->affix_name . '.');
     }
 
-    public function puracheMultiple(ShopBuyMultipleValidation $request, Character $character) {
+    public function puracheMultiple(ShopBuyMultipleOfItem $request, Character $character) {
         $item = Item::where('name', $request->item_name)
             ->whereNotIn('type', ['alchemy', 'trinket', 'artifact', 'quest'])
             ->whereNull('item_suffix_id')

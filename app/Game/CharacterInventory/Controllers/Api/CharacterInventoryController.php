@@ -562,7 +562,7 @@ class  CharacterInventoryController extends Controller {
         $foundItem = $character->inventory->slots->find($request->item_to_remove);
 
         if (is_null($foundItem)) {
-            return response()->json(['error' => 'No item found to be unequipped.'], 422);
+            return response()->json(['message' => 'No item found to be unequipped.'], 422);
         }
 
         $foundItem->update([
@@ -608,7 +608,7 @@ class  CharacterInventoryController extends Controller {
 
             if ($character->isInventoryFull()) {
                 return response()->json([
-                    'message' => 'Your inventory is full. Cannot unequip item.s You have no room in your inventory.'
+                    'message' => 'Your inventory is full. Cannot unequip items You have no room in your inventory.'
                 ], 422);
             }
 

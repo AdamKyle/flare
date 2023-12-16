@@ -14,6 +14,7 @@ import EquippedTableState from "../../../../../lib/game/character-sheet/types/ta
 import SuccessAlert from "../../../../../components/ui/alerts/simple-alerts/success-alert";
 import UsableItemsDetails from "../../../../../lib/game/character-sheet/types/inventory/usable-items-details";
 import InventoryUseDetails from "../../modals/inventory-item-details";
+import DangerAlert from "../../../../../components/ui/alerts/simple-alerts/danger-alert";
 
 export default class EquippedTable extends React.Component<EquippedInventoryTabProps, EquippedTableState> implements ActionsInterface  {
     constructor(props: EquippedInventoryTabProps) {
@@ -24,6 +25,7 @@ export default class EquippedTable extends React.Component<EquippedInventoryTabP
             loading: false,
             search_string: '',
             success_message: null,
+            error_message: null,
             item_id: null,
             view_item: false,
         }
@@ -114,9 +116,17 @@ export default class EquippedTable extends React.Component<EquippedInventoryTabP
         });
     }
 
+    manageErrorMessage() {
+        this.setState({
+            error_message: null
+        });
+    }
+
     unequipAll() {
         this.setState({
             loading: true,
+            success_message: null,
+            error_message: null,
         }, () => {
             this.props.disable_tabs();
 
@@ -132,7 +142,16 @@ export default class EquippedTable extends React.Component<EquippedInventoryTabP
                     this.props.disable_tabs();
                 });
             }, (error: AxiosError) => {
+                const response = error.response;
 
+                if (response) {
+                    this.setState({
+                        loading: false,
+                        error_message: response.data.message
+                    }, () => {
+                        this.props.disable_tabs();
+                    })
+                }
             });
         })
     }
@@ -140,6 +159,8 @@ export default class EquippedTable extends React.Component<EquippedInventoryTabP
     unequip(id: number) {
         this.setState({
             loading: true,
+            success_message: null,
+            error_message: null,
         }, () => {
             (new Ajax()).setRoute('character/'+this.props.character_id+'/inventory/unequip').setParameters({
                 inventory_set_equipped: this.props.is_set_equipped,
@@ -152,13 +173,18 @@ export default class EquippedTable extends React.Component<EquippedInventoryTabP
                     this.props.update_inventory(result.data.inventory);
                 });
             }, (error: AxiosError) => {
+                const response = error.response;
 
+                if (response) {
+                    this.setState({
+                        loading: false,
+                        error_message: response.data.message
+                    }, () => {
+                        this.props.disable_tabs();
+                    })
+                }
             });
         });
-    }
-
-    saveAsSet() {
-
     }
 
     render() {
@@ -170,6 +196,14 @@ export default class EquippedTable extends React.Component<EquippedInventoryTabP
                             {this.state.success_message}
                         </SuccessAlert>
                      : null
+                }
+
+                {
+                    this.state.error_message !== null ?
+                        <DangerAlert additional_css={'mb-4 mt-4'} close_alert={this.manageErrorMessage.bind(this)}>
+                            {this.state.error_message}
+                        </DangerAlert>
+                        : null
                 }
                 <div className='mb-5'>
                     <div className='flex flex-row flex-wrap items-center'>
