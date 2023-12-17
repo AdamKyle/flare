@@ -40,6 +40,7 @@ class GlobalEventParticipationHandler {
      * @param Character $character
      * @param GlobalEventGoal $globalEventGoal
      * @return void
+     * @throws \Exception
      */
     public function handleGlobalEventParticipation(Character $character, GlobalEventGoal $globalEventGoal) {
         if ($globalEventGoal->total_kills >= $globalEventGoal->max_kills) {
@@ -80,14 +81,15 @@ class GlobalEventParticipationHandler {
 
         $globalEventGoal = $globalEventGoal->refresh();
 
+
         if ($globalEventGoal->total_kills >= $globalEventGoal->next_reward_at) {
             $newAmount = $globalEventGoal->next_reward_at + $globalEventGoal->reward_every_kills;
+
+            $this->rewardCharactersParticipating($globalEventGoal->refresh());
 
             $globalEventGoal->update([
                 'next_reward_at' => $newAmount >= $globalEventGoal->max_kills ? $globalEventGoal->max_kills : $newAmount,
             ]);
-
-            $this->rewardCharactersParticipating($globalEventGoal->refresh());
         }
 
         event(new UpdateEventGoalProgress($this->eventGoalService->getEventGoalData($character)));
@@ -98,9 +100,11 @@ class GlobalEventParticipationHandler {
      *
      * @param GlobalEventGoal $globalEventGoal
      * @return void
+     * @throws \Exception
      */
     protected function rewardCharactersParticipating(GlobalEventGoal $globalEventGoal) {
-        Character::whereIn('id', $globalEventGoal->pluck('globalEventParticipation.character_id')->toArray())
+
+        Character::whereIn('id', $globalEventGoal->globalEventParticipation->pluck('character_id')->toArray())
             ->chunkById(100, function ($characters) use ($globalEventGoal) {
                 foreach ($characters as $character) {
 
@@ -114,8 +118,6 @@ class GlobalEventParticipationHandler {
                     }
                 }
             });
-
-        $this->resetParticipationAtPhaseCompletion($globalEventGoal);
     }
 
     /**
@@ -124,11 +126,13 @@ class GlobalEventParticipationHandler {
      * @param Character $character
      * @param GlobalEventGoal $globalEventGoal
      * @return void
+     * @throws \Exception
      */
     protected function rewardForCharacter(Character $character, GlobalEventGoal $globalEventGoal) {
+
         $item = Item::where('specialty_type', $globalEventGoal->item_specialty_type_reward)
-            ->whereIsNull('item_prefix_id')
-            ->whereIsNull('item_suffix_id')
+            ->whereNull('item_prefix_id')
+            ->whereNull('item_suffix_id')
             ->whereDoesntHave('appliedHolyStacks')
             ->inRandomOrder()
             ->first();
@@ -137,8 +141,9 @@ class GlobalEventParticipationHandler {
             return;
         }
 
-        if ($globalEventGoal->is_unique) {
-            $randomAffixGenerator = $this->randomAffixGenerator->setPaidAmount(RandomAffixDetails::LEGENDARY);
+        if ($globalEventGoal->should_be_unique) {
+
+            $randomAffixGenerator = $this->randomAffixGenerator->setCharacter($character)->setPaidAmount(RandomAffixDetails::LEGENDARY);
 
             $newItem = $item->duplicate();
 
@@ -146,6 +151,8 @@ class GlobalEventParticipationHandler {
                 'item_prefix_id' => $randomAffixGenerator->generateAffix('prefix')->id,
                 'item_suffix_id' => $randomAffixGenerator->generateAffix('suffix')->id,
             ]);
+
+            $newItem = $newItem->refresh();
 
             $slot = $character->inventory->slots()->create([
                 'inventory_id' => $character->inventory->id,
@@ -153,10 +160,12 @@ class GlobalEventParticipationHandler {
             ]);
 
             event(new ServerMessageEvent($character->user, 'You were rewarded with an item of Unique power for participating in the current events global goal.', $slot->id));
+
+            return;
         }
 
-        if ($globalEventGoal->is_mythic) {
-            $randomAffixGenerator = $this->randomAffixGenerator->setPaidAmount(RandomAffixDetails::MYTHIC);
+        if ($globalEventGoal->should_be_mythic) {
+            $randomAffixGenerator = $this->randomAffixGenerator->setCharacter($character)->setPaidAmount(RandomAffixDetails::MYTHIC);
 
             $newItem = $item->duplicate();
 
@@ -164,6 +173,8 @@ class GlobalEventParticipationHandler {
                 'item_prefix_id' => $randomAffixGenerator->generateAffix('prefix')->id,
                 'item_suffix_id' => $randomAffixGenerator->generateAffix('suffix')->id,
             ]);
+
+            $newItem = $newItem->refresh();
 
             $slot = $character->inventory->slots()->create([
                 'inventory_id' => $character->inventory->id,
@@ -172,15 +183,5 @@ class GlobalEventParticipationHandler {
 
             event(new ServerMessageEvent($character->user, 'You were rewarded with an item of Mythical power for participating in the current events global goal.', $slot->id));
         }
-    }
-
-    /**
-     * Reset the participation.
-     *
-     * @param GlobalEventGoal $globalEventGoal
-     * @return void
-     */
-    private function resetParticipationAtPhaseCompletion(GlobalEventGoal $globalEventGoal) {
-        $globalEventGoal->globalEventParticipation()->truncate();
     }
 }

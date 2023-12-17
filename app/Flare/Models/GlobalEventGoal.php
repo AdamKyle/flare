@@ -39,7 +39,6 @@ class GlobalEventGoal extends Model {
         'reward_every_kills'            => 'integer',
         'next_reward_at'                => 'integer',
         'event_type'                    => 'integer',
-        'item_specialty_type_reward'    => 'integer',
         'should_be_unique'              => 'boolean',
         'unique_type'                   => 'integer',
         'should_be_mythic'              => 'boolean',

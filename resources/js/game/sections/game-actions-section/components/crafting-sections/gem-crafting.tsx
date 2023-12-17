@@ -41,6 +41,13 @@ export default class GemCrafting extends React.Component<any, any> {
     }
 
     craft() {
+
+        if (this.state.selectedTier === 0) {
+            return this.setState({
+                error_message: 'Please select a tier.'
+            });
+        }
+
         this.setState({
             isCrafting: true,
             errorMessage: null,
