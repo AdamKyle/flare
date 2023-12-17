@@ -112,7 +112,7 @@ class LocationService {
         // Update location based special shops:
         event(new UpdateLocationBasedSpecialShops($character->user));
 
-        // UPdate location based event goals
+        // Update location based event goals
         event(new UpdateLocationBasedEventGoals($character->user));
 
         // Remove character from pvp cache

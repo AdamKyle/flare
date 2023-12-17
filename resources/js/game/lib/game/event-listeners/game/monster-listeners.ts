@@ -65,11 +65,12 @@ export default class MonsterListeners implements GameListener {
                     return;
                 }
 
+                const actionData = JSON.parse(JSON.stringify(this.component.state.action_data));
+
+                actionData.monsters = event.monsters;
+
                 this.component.setState({
-                    action_data: {
-                        ...this.component.state.action_data,
-                        monsters: event.monsters,
-                    },
+                    action_data: actionData,
                 });
             }
         );
@@ -94,16 +95,26 @@ export default class MonsterListeners implements GameListener {
                     return;
                 }
 
-                if (this.component.state.action_data === null) {
-                    return;
-                }
+                const self = this;
 
-                this.component.setState({
-                    action_data: {
-                        ...this.component.state.action_data,
-                        raid_monsters: event.raidMonsters,
-                    },
-                });
+                setTimeout(function() {
+
+                    if (!self.component) {
+                        return;
+                    }
+
+                    if (self.component.state.action_data === null) {
+                        return;
+                    }
+
+                    const actionData = JSON.parse(JSON.stringify(self.component.state.action_data));
+
+                    actionData.raid_monsters = event.raidMonsters;
+
+                    self.component.setState({
+                        action_data: actionData
+                    });
+                }, 1000);
             }
         );
 

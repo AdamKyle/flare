@@ -414,15 +414,20 @@ class TraverseService {
             ->where('game_map_id', $characterMap->game_map_id)
             ->first();
 
-        if (!is_null($locationWithEffect)) {
-            return Cache::get('monsters')[$locationWithEffect->name];
-        }
+        $canAccessPurgatory = $characterMap->character->inventory->slots->where('items.effect', ItemEffectsValue::PURGATORY)->count() > 0;
 
         $monsters = Cache::get('monsters')[GameMap::find($mapId)->name];
 
-        if ($characterMap->gameMap->mapType()->isTheIcePlane()) {
-            $canAccessPurgatory = $characterMap->character->inventory->slots->where('items.effect', ItemEffectsValue::PURGATORY)->count() > 0;
+        if (!is_null($locationWithEffect)) {
 
+            if ($characterMap->gameMap->only_during_event_type && $canAccessPurgatory) {
+                return Cache::get('monsters')[$locationWithEffect->name];
+            }
+
+            return $monsters['easier'];
+        }
+
+        if ($characterMap->gameMap->only_during_event_type) {
             if ($canAccessPurgatory) {
                 $monsters = $monsters['regular'];
             } else {

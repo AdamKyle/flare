@@ -24,9 +24,9 @@ trait UpdateRaidMonstersForLocation {
 
         $monsters = Cache::get('monsters')[$character->map->gameMap->name];
 
-        if (!is_null($character->map->gameMap->only_during_event_type)) {
-            $hasAccessToPurgatory = $character->inventory->slots->where('item.effect', ItemEffectsValue::PURGATORY)->count() > 0;
+        $hasAccessToPurgatory = $character->inventory->slots->where('item.effect', ItemEffectsValue::PURGATORY)->count() > 0;
 
+        if (!is_null($character->map->gameMap->only_during_event_type)) {
             if (!$hasAccessToPurgatory) {
                 $monsters = $monsters['easier'];
             } else {
@@ -40,15 +40,29 @@ trait UpdateRaidMonstersForLocation {
 
         if (!is_null($location)) {
             if (!is_null($location->enemy_strength_type)) {
-                $monsters = Cache::get('monsters')[$location->name];
+                $locationMonsters = Cache::get('monsters')[$location->name];
 
-                event(new ServerMessageEvent(
-                    $character->user,
-                    'You have entered a special location.
+                if (!$hasAccessToPurgatory && !is_null($character->map->gameMap->only_during_event_type)) {
+                    event(new ServerMessageEvent(
+                        $character->user,
+                        'You have entered a special location in a place that is hostile and dangerous. Alas because you are so squishy,
+                        down here, at this location, you will only face regular critters. Fight on child! Become stronger! Special quest items can drop
+                        from this location only through manual fighting! You can automate here if you please, but no quest items will drop from here. You can see what quest
+                        items will drop by clicking or tapping View Location Details. Click or tap the help link and then click or tap special locations with in the help modal. Find this
+                        location in the list on the help docs and open it to see the quest items.'
+                    ));
+
+                } else {
+                    $monsters = $locationMonsters;
+
+                    event(new ServerMessageEvent(
+                        $character->user,
+                        'You have entered a special location.
                 Special locations are places where only specific quest items can drop. You can click View Location Details
                 to read more about the location and click the relevant help docs link in the modal to read more about special locations.
                 Exploring here will NOT allow the location specific quest items to drop. Monsters here are stronger then outside the location.'
-                ));
+                    ));
+                }
             }
         }
 
@@ -85,7 +99,7 @@ trait UpdateRaidMonstersForLocation {
 
                 return true;
             }
-            
+
         }
 
         return false;
