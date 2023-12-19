@@ -68,7 +68,7 @@ class KingdomSettleService {
 
         if ($character->map->gameMap->mapType()->isTheIcePlane()) {
 
-            $hasQuestItem = $character->inventory->slots->where('item.type', 'quest')->where('item.effects', ItemEffectsValue::SETTLE_IN_ICE_PLANE)->isNotEmpty();
+            $hasQuestItem = $character->inventory->slots->where('item.type', 'quest')->where('item.effect', ItemEffectsValue::SETTLE_IN_ICE_PLANE)->isNotEmpty();
 
             if (!$hasQuestItem) {
                 return $this->errorResult('The Queen of Ice will not allow you to settle here child.');
