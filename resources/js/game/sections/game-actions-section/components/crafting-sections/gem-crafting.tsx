@@ -181,7 +181,9 @@ export default class GemCrafting extends React.Component<any, any> {
 
                                     {
                                         this.state.tiersForCrafting.length > 0 ?
-                                            <CraftingXp skill_xp={this.state.skill_xp} />
+                                            <div className='my-4'>
+                                                <CraftingXp skill_xp={this.state.skill_xp} />
+                                            </div>
                                         : null
                                     }
                                 </Fragment>
@@ -190,9 +192,13 @@ export default class GemCrafting extends React.Component<any, any> {
                 </div>
                 {
                     this.state.errorMessage !== null ?
-                        <DangerAlert>
-                            {this.state.errorMessage}
-                        </DangerAlert>
+                        <div className='mt-2 lg:grid lg:grid-cols-3 lg:gap-2 lg:ml-[120px]'>
+                            <div className='lg:cols-start-1 lg:col-span-2'>
+                                <DangerAlert>
+                                    {this.state.errorMessage}
+                                </DangerAlert>
+                            </div>
+                        </div>
                     : null
                 }
                 <div className='text-center lg:ml-[-100px] mt-3 mb-3'>

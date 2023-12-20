@@ -22,6 +22,14 @@ export default class GemDetails extends React.Component<any, any> {
         </Fragment>
     }
 
+    getGem() {
+        if (this.props.gem.gem) {
+            return this.props.gem.gem;
+        }
+
+        return this.props.gem;
+    }
+
     render() {
         return (
             <Fragment>
@@ -36,7 +44,7 @@ export default class GemDetails extends React.Component<any, any> {
                     </p>
                 </div>
                 <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
-                {this.renderDetails(this.props.gem.gem)}
+                {this.renderDetails(this.getGem())}
             </Fragment>
         )
     }
