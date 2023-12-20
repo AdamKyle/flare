@@ -55,9 +55,18 @@ export default class KingdomListeners implements GameListener {
     public listen(): void {
         this.listenForKingdomLogUpdates();
         this.listenToKingdomUpdates();
-        this.listenToPlayerKingdomUpdates();
-        this.listenForNPCKingdomUpdates();
-        this.listenToGlobalKingdomUpdates();
+
+        setTimeout(() => {
+            this.listenToPlayerKingdomUpdates();
+        }, 1000)
+
+        setTimeout(() => {
+            this.listenForNPCKingdomUpdates();
+        }, 1100)
+
+        setTimeout(() => {
+            this.listenToGlobalKingdomUpdates();
+        }, 1200)
     }
 
     /**

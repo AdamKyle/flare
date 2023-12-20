@@ -20,6 +20,12 @@ class HolyItemsController extends Controller {
     }
 
     public function apply(ApplyHolyOilRequest $request, Character $character) {
-        return response()->json($this->holyItemService->applyOil($character, $request->all()));
+
+        $response = $this->holyItemService->applyOil($character, $request->all());
+
+        $status = $response['status'];
+        unset($response['status']);
+
+        return response()->json($response, $status);
     }
 }

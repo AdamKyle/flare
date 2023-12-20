@@ -149,10 +149,7 @@ export default class MapSection extends React.Component<MapProps, MapState> {
             if (
                 (this.props.map_data.player_kingdoms.length !== this.state.player_kingdoms.length ||
                 this.props.map_data.enemy_kingdoms.length !== this.state.enemy_kingdoms.length ||
-                this.props.map_data.npc_kingdoms.length !== this.state.npc_kingdoms.length) &&
-                this.props.map_data.player_kingdoms.length > 0 &&
-                this.props.map_data.enemy_kingdoms.length > 0 &&
-                this.props.map_data.npc_kingdoms.length > 0
+                this.props.map_data.npc_kingdoms.length !== this.state.npc_kingdoms.length)
             ) {
 
                 this.setState({

@@ -203,13 +203,15 @@ class CharacterInventoryService {
             $desiredSlot = $character->inventorySets()
                 ->whereHas('slots', function($query) use ($item) {
                     $query->where('item_id', $item->id);
-                })->with('slots')->first();
+                })->first();
 
             if (is_null($desiredSlot)) {
                 return null;
             }
 
-            $slot = $desiredSlot->slots->first();
+            $slot = $desiredSlot->slots->filter(function ($slot) use ($item) {
+                return $slot->item_id === $item->id;
+            })->first();
         }
 
         return $slot;

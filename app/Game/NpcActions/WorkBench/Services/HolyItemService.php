@@ -42,9 +42,8 @@ class HolyItemService {
         $cost = $this->getCost($itemSlot->item, $alchemySlot->item);
 
         if ($cost > $character->gold_dust) {
-            event(new ServerMessageEvent($character->user, 'Not enough gold dust to apply this oil.'));
 
-            return $this->successResult();
+            return $this->errorResult('Not enough gold dust to apply this oil.');
         }
 
         if (!$this->canApplyAdditionalStacks($itemSlot->item)) {

@@ -31,7 +31,6 @@ import MapStateManager from "./sections/map/lib/state/map-state-manager";
 import MapTabs from "./sections/map/map-tabs";
 import {serviceContainer} from "./lib/containers/core-container";
 import GameEventListeners from "./lib/game/event-listeners/game-event-listeners";
-import {isEqual} from "lodash";
 
 export default class Game extends React.Component<GameProps, GameState> {
 

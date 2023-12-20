@@ -7,6 +7,7 @@ import LoadingProgressBar from "../../../../components/ui/progress-bars/loading-
 import PrimaryButton from "../../../../components/ui/buttons/primary-button";
 import DangerButton from "../../../../components/ui/buttons/danger-button";
 import {formatNumber} from "../../../../lib/game/format-number";
+import DangerAlert from "../../../../components/ui/alerts/simple-alerts/danger-alert";
 
 export default class WorkBench extends React.Component<any, any> {
 
@@ -23,6 +24,7 @@ export default class WorkBench extends React.Component<any, any> {
             alchemy_items: [],
             max_holy_stacks: 0,
             applied_holy_stacks: 0,
+            error_message: null,
             cost: 0,
         }
     }
@@ -45,8 +47,8 @@ export default class WorkBench extends React.Component<any, any> {
         const url = craftingPostEndPoints('workbench', this.props.character_id);
 
         this.setState({
-            applying_oil: true
-
+            applying_oil: true,
+            error_message: null,
         },() => {
             (new Ajax()).setRoute(url).setParameters({
                 item_id: this.state.selected_item,
@@ -77,7 +79,13 @@ export default class WorkBench extends React.Component<any, any> {
                     }
                 });
             }, (error: AxiosError) => {
+                this.setState({applying_oil: false});
 
+                if (error.response) {
+                    this.setState({
+                        error_message: error.response.data.message,
+                    })
+                }
             })
         });
     }
@@ -262,6 +270,14 @@ export default class WorkBench extends React.Component<any, any> {
                         this.state.applying_oil ?
                             <LoadingProgressBar />
                             : null
+                    }
+
+                    {
+                        this.state.error_message !== null ?
+                            <DangerAlert additional_css={'my-4'}>
+                                {this.state.error_message}
+                            </DangerAlert>
+                        : null
                     }
                 </div>
 
