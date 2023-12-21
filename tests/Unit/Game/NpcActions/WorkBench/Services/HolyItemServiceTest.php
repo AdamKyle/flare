@@ -78,9 +78,7 @@ class HolyItemServiceTest extends TestCase {
             'alchemy_item_id' => $alchemy->item_id,
         ]);
 
-        Event::assertDispatched(ServerMessageEvent::class);
-
-        $this->assertEquals(200, $result['status']);
+        $this->assertEquals(422, $result['status']);
     }
 
     public function testCannotApplyOilWhenInvalidItemType() {
