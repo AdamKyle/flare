@@ -33,13 +33,17 @@ class RandomNumberGenerator {
      * @param float $chance
      * @return int
      */
-    public function generateTrueRandomNumber(int $max, float $chance): int {
+    public function generateTrueRandomNumber(int $max, float $chance = 0): int {
 
         if ($chance >= 1.0) {
             return $max;
         }
 
         $randomNumber = mt_rand(1, $max);
+
+        if ($chance <= 0) {
+            return $randomNumber;
+        }
 
         $bonus = (int) round($chance * $max);
 
