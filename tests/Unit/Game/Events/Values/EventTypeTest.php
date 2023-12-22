@@ -51,4 +51,8 @@ class EventTypeTest extends TestCase {
     public function testIsPurgatorySmithsHouse() {
         $this->assertTrue((new EventType(EventType::PURGATORY_SMITH_HOUSE))->isPurgatorySmithHouseEvent());
     }
+
+    public function testIsGoldMines() {
+        $this->assertTrue((new EventType(EventType::GOLD_MINES))->isGoldMinesEvent());
+    }
 }

@@ -2,10 +2,14 @@
 
 namespace App\Flare\Models;
 
+use Database\Factories\GlobalEventKillFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class GlobalEventKill extends Model {
+
+    use HasFactory;
 
     protected $table = 'event_goal_participation_kills';
 
@@ -37,5 +41,9 @@ class GlobalEventKill extends Model {
 
     public function character(): BelongsTo {
         return $this->belongsTo(Character::class, 'character_id', 'id');
+    }
+
+    protected static function newFactory() {
+        return GlobalEventKillFactory::new();
     }
 }

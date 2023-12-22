@@ -7,6 +7,8 @@ use App\Flare\Models\GameMap;
 use App\Flare\Models\GameRace;
 use App\Flare\Models\GameClass;
 use App\Flare\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabaseState;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 use Tests\Traits\CreateGameSkill;
 use Tests\Traits\CreatePassiveSkill;
@@ -37,13 +39,6 @@ class RegistrationControllerTest extends TestCase
             'base_damage' => 3,
         ]);
 
-        GameMap::create([
-            'name'          => 'Surface',
-            'path'          => 'test path',
-            'default'       => true,
-            'kingdom_color' => '#ffffff',
-        ]);
-
         $this->createPassiveSkill();
     }
 
@@ -66,6 +61,13 @@ class RegistrationControllerTest extends TestCase
     }
 
     public function testCanRegister() {
+        GameMap::create([
+            'name'          => 'Surface',
+            'path'          => 'test path',
+            'default'       => true,
+            'kingdom_color' => '#ffffff',
+        ]);
+
         $race  = $this->createRace([
             'dex_mod' => 2,
         ]);
@@ -86,7 +88,7 @@ class RegistrationControllerTest extends TestCase
                 'class'                 => $class->id,
             ])->dontSee('The name has already been taken.');
 
-        $user = User::first();
+        $user = User::where('email', 'a@example.net')->first();
 
         $this->assertEquals('bobtest', $user->character->name);
         $this->assertEquals($race->name, $user->character->race->name);
@@ -94,6 +96,13 @@ class RegistrationControllerTest extends TestCase
     }
 
     public function testCannotRegisterWhenBanned() {
+        GameMap::create([
+            'name'          => 'Surface',
+            'path'          => 'test path',
+            'default'       => true,
+            'kingdom_color' => '#ffffff',
+        ]);
+
         $this->createUser(['is_banned' => true]);
 
         $race  = $this->createRace([
@@ -120,7 +129,9 @@ class RegistrationControllerTest extends TestCase
 
     public function testCannotRegisterWhenNoMap() {
 
-        GameMap::first()->delete();
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        GameMap::truncate();
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
         $race  = $this->createRace([
             'dex_mod' => 2,
@@ -137,13 +148,20 @@ class RegistrationControllerTest extends TestCase
                 'email'                 => 'a@example.net',
                 'password'              => 'TestExamplePassword',
                 'password_confirmation' => 'TestExamplePassword',
-                'name'                  => 'bob',
+                'name'                  => 'TestExample',
                 'race'                  => $race->id,
                 'class'                 => $class->id,
             ])->see('No game map has been set as default or created. Registration is disabled.');
     }
 
     public function testCannotRegisterWhenCharacterExists() {
+        GameMap::create([
+            'name'          => 'Surface',
+            'path'          => 'test path',
+            'default'       => true,
+            'kingdom_color' => '#ffffff',
+        ]);
+
         $race  = $this->createRace([
             'dex_mod' => 2,
         ]);
@@ -168,6 +186,13 @@ class RegistrationControllerTest extends TestCase
     }
 
     public function testCannotRegisterAnyMore() {
+        GameMap::create([
+            'name'          => 'Surface',
+            'path'          => 'test path',
+            'default'       => true,
+            'kingdom_color' => '#ffffff',
+        ]);
+
         $this->setupCharacters();
 
         $this->visit('/login')

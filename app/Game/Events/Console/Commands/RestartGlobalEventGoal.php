@@ -37,7 +37,7 @@ class RestartGlobalEventGoal extends Command {
 
         $globalEvent = GlobalEventGoal::first();
 
-        if ($globalEvent->total_kills <= $globalEvent->max_kills) {
+        if ($globalEvent->total_kills < $globalEvent->max_kills) {
             return;
         }
 

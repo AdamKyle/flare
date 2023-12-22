@@ -32,16 +32,9 @@ class MassImportCustomData extends Command {
     public function handle() {
 
         // Handle importing things in a custom format.
-
-        Artisan::call('rebalance:quest-currency-costs-and-rewards');
-        Artisan::call('reduce:alchemy-items-cost');
-        Artisan::call('update:character-currencies');
+        Artisan::call('import:game-data Skills');
 
         $this->importInformationSection();
-
-        Artisan::call('generate:monster-cache');
-        Artisan::call('create:quest-cache');
-        Artisan::call('create:character-attack-data');
     }
 
     protected function importInformationSection(): void {

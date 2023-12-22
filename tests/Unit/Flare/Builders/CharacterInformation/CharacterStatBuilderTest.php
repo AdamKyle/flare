@@ -2,6 +2,9 @@
 
 namespace Tests\Unit\Flare\Builders\CharacterInformation;
 
+use App\Flare\Models\GameSkill;
+use App\Game\Skills\Values\SkillTypeValue;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateClass;
@@ -28,12 +31,7 @@ class CharacterStatBuilderTest extends TestCase {
     public function setUp(): void {
         parent::setUp();
 
-        $this->character            = (new CharacterFactory())->createBaseCharacter()->assignSkill(
-            $this->createGameSkill([
-                'class_bonus' => 0.01
-            ]),
-            5
-        )->givePlayerLocation();
+        $this->character            = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
 
         $this->characterStatBuilder = resolve(CharacterStatBuilder::class);
     }
@@ -70,11 +68,28 @@ class CharacterStatBuilderTest extends TestCase {
     }
 
     public function testClassBonusWithSkill() {
-        $character = $this->character->assignSkill($this->createGameSkill([
+        $character = $this->character->getCharacter();
+
+        $classGameSkill = $this->createGameSkill([
             'name'          => 'Class Skill',
-            'game_class_id' => GameClass::first()->id,
+            'game_class_id' => $character->class_id,
             'class_bonus'   => 0.01
-        ]), 10)->getCharacter();
+        ]);
+
+        $character->skills()->create([
+            'character_id'        => $character->id,
+            'game_skill_id'       => $classGameSkill->id,
+            'currently_training'  => false,
+            'is_locked'           => false,
+            'level'               => 10,
+            'xp'                  => 100,
+            'xp_max'              => 1000,
+            'xp_towards'          => 0,
+            'skill_type'          => SkillTypeValue::EFFECTS_CLASS,
+            'is_hidden'           => false,
+        ]);
+
+        $character = $character->refresh();
 
         $value = $this->characterStatBuilder->setCharacter($character)->classBonus();
 

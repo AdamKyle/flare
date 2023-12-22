@@ -2,10 +2,12 @@
 
 namespace Tests;
 
+use Illuminate\Support\Facades\DB;
 use Laravel\BrowserKitTesting\TestCase as BaseTestCase;
 use Tests\Setup\AttackDataCacheSetUp;
 
-abstract class TestCase extends BaseTestCase {
+abstract class TestCase extends BaseTestCase
+{
 
     use CreatesApplication;
 
@@ -13,7 +15,8 @@ abstract class TestCase extends BaseTestCase {
 
     public AttackDataCacheSetUp $attackDataCacheSetUp;
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
 
         parent::setUp();
 
@@ -22,7 +25,8 @@ abstract class TestCase extends BaseTestCase {
         $this->attackDataCacheSetUp->mockCacheBuilder($this->app);
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
     }
 }

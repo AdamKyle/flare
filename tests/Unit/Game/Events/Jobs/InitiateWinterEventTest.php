@@ -5,10 +5,13 @@ namespace Tests\Unit\Game\Events\Jobs;
 use App\Flare\Models\Announcement;
 use App\Flare\Models\Event as ModelsEvent;
 use App\Flare\Models\GlobalEventGoal;
+use App\Flare\Models\GlobalEventKill;
+use App\Flare\Models\GlobalEventParticipation;
 use App\Game\Events\Values\EventType;
 use App\Game\Events\Jobs\InitiateWeeklyCurrencyDropEvent;
 use App\Game\Events\Jobs\InitiateWinterEvent;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use Tests\TestCase;
@@ -20,6 +23,12 @@ class InitiateWinterEventTest extends TestCase {
 
     public function setUp(): void {
         parent::setUp();
+
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        GlobalEventGoal::truncate();
+        GlobalEventKill::truncate();
+        GlobalEventParticipation::truncate();
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
         foreach (Announcement::all() as $announcement) {
             $announcement->delete();

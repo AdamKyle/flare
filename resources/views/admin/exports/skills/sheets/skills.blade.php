@@ -16,6 +16,7 @@
         <th>unit_movement_time_reduction</th>
         <th>can_train</th>
         <th>skill_bonus_per_level</th>
+        <th>class_bonus</th>
         <th>game_class_id</th>
         <th>is_locked</th>
     </tr>
@@ -38,6 +39,7 @@
             <th>{{$skill->unit_movement_time_reduction}}</th>
             <td>{{$skill->can_train}}</td>
             <td>{{$skill->skill_bonus_per_level}}</td>
+            <td>{{$skill->class_bonus}}</td>
             <td>{{!is_null($skill->gameClass) ? $skill->gameClass->id : null}}</td>
             <td>{{$skill->is_locked}}</td>
         </tr>

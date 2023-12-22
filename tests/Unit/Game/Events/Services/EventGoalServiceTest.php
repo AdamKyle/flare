@@ -2,11 +2,15 @@
 
 namespace Tests\Unit\Game\Events\Services;
 
+use App\Flare\Models\GlobalEventGoal;
+use App\Flare\Models\GlobalEventKill;
+use App\Flare\Models\GlobalEventParticipation;
 use App\Flare\Values\ItemSpecialtyType;
 use App\Flare\Values\RandomAffixDetails;
 use App\Game\Events\Services\EventGoalsService;
 use App\Game\Events\Values\EventType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateGlobalEventGoal;
@@ -19,6 +23,12 @@ class EventGoalServiceTest extends TestCase {
 
     public function setUp(): void {
         parent::setUp();
+
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        GlobalEventGoal::truncate();
+        GlobalEventKill::truncate();
+        GlobalEventParticipation::truncate();
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
         $this->eventGoalService = resolve(EventGoalsService::class);
     }

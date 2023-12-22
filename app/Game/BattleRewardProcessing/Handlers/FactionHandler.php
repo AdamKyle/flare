@@ -75,7 +75,7 @@ class FactionHandler {
         }
 
         if ($this->playerHasQuestItem($character) && $faction->current_level >= 1) {
-            $faction->current_points += 10;
+            $faction->current_points += 95;
         } else {
             $faction->current_points += FactionLevel::gatPointsPerLevel($faction->current_level);
         }

@@ -2,10 +2,14 @@
 
 namespace App\Flare\Models;
 
+use Database\Factories\GlobalEventParticipationFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class GlobalEventParticipation extends Model {
+
+    use HasFactory;
 
     protected $table = 'global_event_participation';
 
@@ -37,5 +41,9 @@ class GlobalEventParticipation extends Model {
 
     public function character(): BelongsTo {
         return $this->belongsTo(Character::class, 'character_id', 'id');
+    }
+
+    protected static function newFactory() {
+        return GlobalEventParticipationFactory::new();
     }
 }

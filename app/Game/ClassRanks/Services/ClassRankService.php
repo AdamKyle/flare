@@ -147,7 +147,7 @@ class ClassRankService {
         $this->updateCharacterAttackTypes->updateCache($character);
 
         return $this->successResult(array_merge([
-            'message'           => 'Equipped class special: ' . $gameClassSpecial->name
+            'message' => 'Equipped class special: ' . $gameClassSpecial->name
         ], $this->getSpecials($character)));
     }
 
@@ -173,7 +173,7 @@ class ClassRankService {
         $this->updateCharacterAttackTypes->updateCache($character);
 
         return $this->successResult(array_merge([
-            'message'           => 'Unequipped class special: ' . $classSpecialEquipped->gameClassSpecial->name
+            'message' => 'Unequipped class special: ' . $classSpecialEquipped->gameClassSpecial->name
         ], $this->getSpecials($character)));
     }
 

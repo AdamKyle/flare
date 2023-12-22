@@ -265,11 +265,8 @@ class EndScheduledEvent extends Command {
     protected function endWinterEvent(KingdomEventService $kingdomEventService,
                                       TraverseService $traverseService,
                                       ExplorationAutomationService $explorationAutomationService) {
-        $event = Event::where('type', EventType::WINTER_EVENT)->first();
 
-        if (is_null($event)) {
-            return;
-        }
+        $event = Event::where('type', EventType::WINTER_EVENT)->first();
 
         $kingdomEventService->handleKingdomRewardsForEvent(MapNameValue::ICE_PLANE);
 

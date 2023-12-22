@@ -145,7 +145,7 @@ class DisenchantService {
             $dc   = 1000 - 1000 * 0.02;
             $roll = $this->fetchDCRoll();
 
-            if ($roll > $dc) {
+            if ($roll >= $dc) {
                 $characterTotalGoldDust = $characterTotalGoldDust + $characterTotalGoldDust * 0.05;
 
                 if ($characterTotalGoldDust >= MaxCurrenciesValue::MAX_GOLD_DUST) {
