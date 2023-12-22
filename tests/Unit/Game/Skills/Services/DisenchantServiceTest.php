@@ -300,6 +300,8 @@ class DisenchantServiceTest extends TestCase {
     public function testCallDisenchantItemAndFail() {
         Event::fake();
 
+        $character = $this->character->getCharacter();
+
         $this->instance(
             SkillCheckService::class,
             Mockery::mock(SkillCheckService::class, function (MockInterface $mock) {
@@ -307,8 +309,6 @@ class DisenchantServiceTest extends TestCase {
                 $mock->shouldReceive('characterRoll')->once()->andReturn(1);
             })
         );
-
-        $character = $this->character->getCharacter();
 
         $disenchantingService = $this->app->make(DisenchantService::class);
 
