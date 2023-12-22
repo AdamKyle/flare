@@ -25,6 +25,6 @@ class GoldRushCheckCalculator {
 
         $roll  = RandomNumberGenerator::generateTrueRandomNumber(100, $bonus);
 
-        $roll >= 100;
+        return $roll >= 100;
     }
 }

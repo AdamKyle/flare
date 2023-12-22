@@ -33,12 +33,10 @@ class DisenchantService {
      */
     private Skill $disenchantingSkill;
 
-    private SkillCheckService $skillCheckService;
-
     /**
-     * @var InventorySlot|null $questSlot
+     * @var SkillCheckService $skillCheckService
      */
-    private ?InventorySlot $questSlot = null;
+    private SkillCheckService $skillCheckService;
 
     public function __construct(SkillCheckService $skillCheckService) {
         $this->skillCheckService = $skillCheckService;
@@ -55,10 +53,6 @@ class DisenchantService {
 
         $this->disenchantingSkill = $character->skills->filter(function($skill) {
             return $skill->type()->isDisenchanting();
-        })->first();;
-
-        $this->questSlot = $character->inventory->slots->filter(function($slot) {
-            return $slot->item->type === 'quest' && $slot->item->effect === ItemEffectsValue::GOLD_DUST_RUSH;
         })->first();
 
         return $this;
@@ -132,19 +126,15 @@ class DisenchantService {
     protected function updateGoldDust(Character $character, bool $failedCheck = false): int {
         $goldDust = !$failedCheck ? rand(2, 1150) : 1;
 
-        if (!$failedCheck) {
-            $goldDust = $goldDust + $goldDust * $this->disenchantingSkill->bonus;
-        }
-
-        $goldDust = $goldDust + $goldDust * $this->getGoldDustBonus($character);
+        $goldDust = $goldDust + $goldDust * ($this->getGoldDustBonus($character) + $this->disenchantingSkill->bonus);
 
         $characterTotalGoldDust = $character->gold_dust + $goldDust;
 
-        if (!is_null($this->questSlot) && !$failedCheck) {
+        if (!$failedCheck) {
 
-            $dc   = 1000 - 1000 * 0.02;
+            $dc   = 500 - 500 * 0.10;
             $roll = $this->fetchDCRoll();
-
+            dump('Gold Dust Rush Roll: ' . $roll . ' and DC: ' . $dc);
             if ($roll >= $dc) {
                 $characterTotalGoldDust = $characterTotalGoldDust + $characterTotalGoldDust * 0.05;
 

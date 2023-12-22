@@ -52,7 +52,13 @@ class RandomNumberGenerator {
         $isBonusSuccessful = mt_rand() / mt_getrandmax() <= $chance * 0.5;
 
         if ($isBonusSuccessful) {
-            $randomNumber += (int) round($fraction * $bonus);
+
+            if ($max > 100) {
+                $randomNumber += (int)round($fraction * $bonus);
+            } else {
+                $randomNumber += $bonus;
+            }
+
             $randomNumber = min($randomNumber, $max);
         }
 

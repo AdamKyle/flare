@@ -189,7 +189,7 @@ class DropCheckService {
                 $lootingBonus = 0.45;
             }
 
-            return DropCheckCalculator::fetchDifficultItemChance($lootingBonus);
+            return DropCheckCalculator::fetchDifficultItemChance($lootingBonus, 100);
         }
 
         return DropCheckCalculator::fetchDropCheckChance($this->monster, $character->level, $this->lootingChance, $this->gameMapBonus);
