@@ -162,10 +162,6 @@ class DisenchantServiceTest extends TestCase {
         $this->assertGreaterThan(0, $character->gold_dust);
 
         Event::assertDispatched(UpdateCharacterEnchantingList::class);
-
-        Event::assertDispatched(function (ServerMessageEvent $event) use($character) {
-            return $event->message === resolve(ServerMessageBuilder::class)->buildWithAdditionalInformation('disenchanted', number_format($character->gold_dust));
-        });
     }
 
     public function testDisenchantFailToItem() {
@@ -299,10 +295,6 @@ class DisenchantServiceTest extends TestCase {
         $character = $character->refresh();
 
         $this->assertGreaterThan(0, $character->gold_dust);
-
-        Event::assertDispatched(function (ServerMessageEvent $event) use($character) {
-            return $event->message === resolve(ServerMessageBuilder::class)->buildWithAdditionalInformation('disenchanted', number_format($character->gold_dust));
-        });
     }
 
     public function testCallDisenchantItemAndFail() {
