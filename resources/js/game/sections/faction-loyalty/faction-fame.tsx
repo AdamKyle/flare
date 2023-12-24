@@ -38,7 +38,7 @@ export default class FactionFame extends React.Component<any, any> {
                 <h2>Surface Fame</h2>
                 <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
                 <div className="my-4 flex flex-wrap md:flex-nowrap gap-4">
-                    <div className='flex-none w-full md:w-1/3 mt-[-25px]'>
+                    <div className='flex-none mt-[-25px]'>
                         <div className={'w-full md:w-1/3 relative left-0'}>
                             <DropDown
                                 menu_items={this.buildNpcList(
@@ -48,6 +48,21 @@ export default class FactionFame extends React.Component<any, any> {
                                 selected_name={this.selectedNpc()}
                             />
                         </div>
+
+                        <h4>Rewards</h4>
+                        <dl className='my-2'>
+                            <dt>XP Per Level</dt>
+                            <dd>500</dd>
+                            <dt>Currencies Per Level</dt>
+                            <dd>1500</dd>
+                            <dt>Item Reward</dt>
+                            <dd>Medium Unique</dd>
+                        </dl>
+
+                        <a href="/information/faction-loyalty" target="_blank" className='my-2'>
+                            What is all this? <i
+                            className="fas fa-external-link-alt"></i>
+                        </a>
                     </div>
                     <div className='flex-none md:flex-auto w-full md:w-3/4'>
                         <div>
