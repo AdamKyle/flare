@@ -36,22 +36,10 @@ export default class FactionFame extends React.Component<any, any> {
         return (
             <div className='py-4'>
                 <h2>Surface Fame</h2>
-                <p className='my-2'>
-                    Earning fame for a faction is as easy as fighting monsters and crafting. When it comes to the kill requirements
-                    for factions, only manual kills will count towards fame requirements.
-                </p>
-                <p className='my-2'>
-                    When it comes to crafting, there will be a secondary button called "Craft for fame". Clicking this will
-                    craft the item and give it to the npc.
-                </p>
-                <p className='my-2'>
-                    Bounty specific kills must be made manually and on the same plane as the NPC, while crafting tasks
-                    can be done any where.
-                </p>
                 <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
-                <div className="my-4">
-                    <div>
-                        <div className={'w-1/3 relative left-0'}>
+                <div className="my-4 flex flex-wrap md:flex-nowrap gap-4">
+                    <div className='flex-none w-full md:w-1/3 mt-[-25px]'>
+                        <div className={'w-full md:w-1/3 relative left-0'}>
                             <DropDown
                                 menu_items={this.buildNpcList(
                                     this.switchToNpc.bind(this)
@@ -60,6 +48,8 @@ export default class FactionFame extends React.Component<any, any> {
                                 selected_name={this.selectedNpc()}
                             />
                         </div>
+                    </div>
+                    <div className='flex-none md:flex-auto w-full md:w-3/4'>
                         <div>
                             <OrangeProgressBar primary_label={'NPC Name Fame Lv: 1'} secondary_label={'10/650 Fame'} percentage_filled={20} push_down={false}/>
                         </div>
@@ -80,22 +70,16 @@ export default class FactionFame extends React.Component<any, any> {
                             <div>
                                 <h3 className='my-2'> Crafting </h3>
                                 <dl>
-                                    <dt>Craft Me: Broken Dagger</dt>
+                                    <dt>Broken Dagger</dt>
                                     <dd>0/100</dd>
-                                    <dt>Craft Me: Broken Dagger</dt>
+                                    <dt>Broken Dagger</dt>
                                     <dd>0/100</dd>
-                                    <dt>Craft Me: Broken Dagger</dt>
+                                    <dt>Broken Dagger</dt>
                                     <dd>0/100</dd>
                                 </dl>
                             </div>
                         </div>
                     </div>
-                    <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
-                    <h4 className='my-4'>Fame Level Requirements</h4>
-                    <p className='my-2'>These are the requirements to gain a level in fame. As each one is completed, each point is added to the fame meter to the left.</p>
-                    <p className='my-2'>When the meter fills up you will receive a fame level, and a medium unique reward of the max crafting level that can drop for the plane you have pledged loyalty to.</p>
-                    <p className='my-2'>Fame can also increase Damage, Healing and AC while on the plane, each level is a 5% bonus towards the respective stats.</p>
-                    <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
                 </div>
             </div>
         );

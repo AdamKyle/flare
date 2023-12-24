@@ -9,7 +9,7 @@ use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateItem;
 
-class GamblerHolyItemsControllerTest extends TestCase {
+class HolyItemsControllerTest extends TestCase {
 
     use RefreshDatabase, CreateItem;
 
