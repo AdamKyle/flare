@@ -15,11 +15,9 @@ import FetchGameData from "./lib/game/ajax/FetchGameData";
 import CharacterSheet from "./sections/character-sheet/character-sheet";
 import GameChat from "./sections/chat/game-chat";
 import ForceNameChange from "./sections/force-name-change/force-name-change";
-import SmallerActions from "./sections/game-actions-section/smaller-actions";
 import QuestType from "./lib/game/types/quests/quest-type";
 import ScreenRefresh from "./sections/screen-refresh/screen-refresh";
 import KingdomsList from "./sections/kingdoms/kingdoms-list";
-import Actions from "./sections/game-actions-section/actions";
 import PositionType from "./sections/map/types/map/position-type";
 import { removeCommas } from "./lib/game/format-number";
 import CharacterCurrenciesType from "./lib/game/character/character-currencies-type";
@@ -297,7 +295,7 @@ export default class Game extends React.Component<GameProps, GameState> {
                                             this.state.view_port < 1600,
                                     })}
                                 >
-                                    <ActionTabs use_tabs={true}>
+                                    <ActionTabs use_tabs={true} character_id={this.props.characterId}>
                                         <ActionSection
                                             character={this.state.character}
                                             character_status={this.state.character_status}

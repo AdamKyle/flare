@@ -27,7 +27,7 @@ export default class ActionTabs extends React.Component<ActionTabsProps, { }> {
             <Tabs tabs={this.tabs} disabled={false}>
                 <TabPanel key={"actions"}>{this.props.children}</TabPanel>
                 <TabPanel key={"faction-loyalty"}>
-                    <FactionFame />
+                    <FactionFame character_id={this.props.character_id} />
                 </TabPanel>
             </Tabs>
         ) : (

@@ -57,7 +57,7 @@ class ProcessScheduledEventsTest extends TestCase {
         $this->createScheduledEvent([
             'event_type' => EventType::RAID_EVENT,
             'start_date' => now()->addMinutes(5),
-            'raid_id'    => $raid,
+            'raid_id'    => $raid->id,
         ]);
 
         $this->artisan('process:scheduled-events');

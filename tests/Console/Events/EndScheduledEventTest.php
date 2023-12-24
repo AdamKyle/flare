@@ -83,7 +83,7 @@ class EndScheduledEventTest extends TestCase {
         $event = $this->createEvent([
             'type'        => EventType::RAID_EVENT,
             'started_at'  => now(),
-            'ends_at'     => now()->subMinute(10),
+            'ends_at'     => now()->subMinutes(10),
             'raid_id'     => $raid->id,
         ]);
 

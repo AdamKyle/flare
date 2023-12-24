@@ -114,6 +114,7 @@ class RouteServiceProvider extends ServiceProvider {
         $this->mapMercenariesApiRoutes();
         $this->mapReincarnateApiRoutes();
         $this->mapClassRanksApiRoutes();
+        $this->mapFactionLoyaltyApiRoutes();
     }
 
     /**
@@ -357,5 +358,12 @@ class RouteServiceProvider extends ServiceProvider {
             ->middleware('web')
             ->namespace('App\Game\Events\Controllers')
             ->group(base_path('routes/game/events/api.php'));
+    }
+
+    protected function mapFactionLoyaltyApiRoutes() {
+        Route::prefix('api')
+            ->middleware('web')
+            ->namespace('App\Game\Factions\FactionLoyalty\Controllers')
+            ->group(base_path('routes/game/factions/faction-loyalty/api.php'));
     }
 }

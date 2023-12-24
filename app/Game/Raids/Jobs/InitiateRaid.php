@@ -24,7 +24,7 @@ use App\Flare\Services\EventSchedulerService;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use Facades\App\Game\Core\Handlers\AnnouncementHandler;
 
-class InitiateRaid implements ShouldQueue {
+class  InitiateRaid implements ShouldQueue {
 
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -85,9 +85,6 @@ class InitiateRaid implements ShouldQueue {
     /**
      * Initialize the raid
      *
-     * @param Raid $raid
-     * @param LocationService $locationService
-     * @return void
      */
     protected function initializeRaid(
         Raid $raid,

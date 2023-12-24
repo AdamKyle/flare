@@ -19,7 +19,7 @@ class RaidEventService {
      */
     public function createRaid(Raid $raid): void {
 
-        $existingRaid = Event::where('type', EventType::RAID_EVENT)->first();
+        $existingRaid = Event::where('type', EventType::RAID_EVENT)->where('raid_id', $raid->id)->first();
 
         if (!is_null($existingRaid)) {
             return;

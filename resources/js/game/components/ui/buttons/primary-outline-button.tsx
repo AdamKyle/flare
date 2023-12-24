@@ -17,7 +17,7 @@ export default class PrimaryOutlineButton extends React.Component<ButtonProps, {
                       'dark:focus:ring-blue-800 disabled:bg-blue-600 disabled:bg-opacity-75 dark:disabled:bg-opacity-50 ' +
                       'dark:disabled:bg-blue-500 disabled:text-white ' +
                       'focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-200 dark:focus-visible:ring-white ' +
-                      'focus-visible:ring-opacity-75' + this.props.additional_css}
+                      'focus-visible:ring-opacity-75 ' + this.props.additional_css}
                   onClick={this.props.on_click}
                   disabled={this.props.disabled}
           >
