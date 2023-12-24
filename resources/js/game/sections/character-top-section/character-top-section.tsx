@@ -143,6 +143,7 @@ export default class CharacterTopSection extends React.Component<CharacterTopSec
                     primary_label="XP"
                     secondary_label={formatNumber(this.props.character.xp)+'/'+formatNumber(this.props.character.xp_next)}
                     percentage_filled={this.getXpPercentage()}
+                    push_down={true}
                 />
             </Fragment>
         )

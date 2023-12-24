@@ -7,6 +7,7 @@ import InfoAlert from "../../../components/ui/alerts/simple-alerts/info-alert";
 import Table from "../../../components/ui/data-tables/table";
 import {formatNumber} from "../../../lib/game/format-number";
 import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
+import PrimaryButton from "../../../components/ui/buttons/primary-button";
 
 export default class CharacterFactions extends React.Component<any, any> {
 
@@ -73,7 +74,20 @@ export default class CharacterFactions extends React.Component<any, any> {
                     {formatNumber(row.current_points)} / {formatNumber(row.points_needed)}
                 </span>
             },
+            {
+                name: 'Pledge Loyalty',
+                selector: (row: any) => row.id,
+                sortable: true,
+                cell: (row: any) => <span
+                    key={row.id + '-' + (Math.random() + 1).toString(36).substring(7)}>
+                    <PrimaryButton button_label={'Pledge Loyalty'} on_click={() => { console.log(row) }} disabled={!row.maxed}/>
+                </span>
+            },
         ];
+    }
+
+    pledgeLoyalty(row: any): void {
+
     }
 
     render() {
@@ -91,7 +105,7 @@ export default class CharacterFactions extends React.Component<any, any> {
                         this.state.factions.length > 0 ?
                             <InfoAlert additional_css={'mb-4'}>
                                 This tab does not update in real time. You can switch tabs to get the latest data. You can learn more about <a href='/information/factions' target='_blank'>Factions <i
-                                className="fas fa-external-link-alt"></i></a> in the help docs.
+                                className="fas fa-external-link-alt"></i></a> in the help docs. Players who reach the max level (5) of a faction can then <a href='/information/faction-loyalty' target='_blank'>Pledge their loyalty</a>.
                             </InfoAlert>
                             : null
                     }

@@ -1,5 +1,6 @@
 import React from "react";
 import OrangeProgressBarProps from "../../../lib/ui/types/progress-bars/orange-progress-bar-props";
+import clsx from "clsx";
 
 export default class OrangeProgressBar extends React.Component<
     OrangeProgressBarProps,
@@ -11,7 +12,7 @@ export default class OrangeProgressBar extends React.Component<
 
     render() {
         return (
-            <div className="relative top-[24px]">
+            <div className={clsx({"relative top-[24px]" : this.props.push_down})}>
                 <div className="flex justify-between mb-1">
                     <span
                         className={

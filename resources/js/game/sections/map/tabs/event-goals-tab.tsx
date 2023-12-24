@@ -73,6 +73,7 @@ export default class EventGoalsTab extends React.Component<
                         percentage_filled={(value / current) * 100}
                         height_override_class="h-2"
                         text_override_class="text-md"
+                        push_down={true}
                     />
                 </div>
             );
@@ -109,6 +110,7 @@ export default class EventGoalsTab extends React.Component<
                         }
                         height_override_class="h-3"
                         text_override_class="text-md"
+                        push_down={true}
                     />
                 </div>
                 <div className="my-4 relative top-2">

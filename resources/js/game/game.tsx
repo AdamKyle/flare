@@ -31,6 +31,8 @@ import MapStateManager from "./sections/map/lib/state/map-state-manager";
 import MapTabs from "./sections/map/map-tabs";
 import {serviceContainer} from "./lib/containers/core-container";
 import GameEventListeners from "./lib/game/event-listeners/game-event-listeners";
+import ActionSection from "./sections/game-actions-section/action-section";
+import ActionTabs from "./sections/game-actions-section/action-tabs";
 
 export default class Game extends React.Component<GameProps, GameState> {
 
@@ -295,69 +297,24 @@ export default class Game extends React.Component<GameProps, GameState> {
                                             this.state.view_port < 1600,
                                     })}
                                 >
-                                    {this.state.view_port < 1600 ? (
-                                        <SmallerActions
+                                    <ActionTabs use_tabs={true}>
+                                        <ActionSection
                                             character={this.state.character}
-                                            character_status={
-                                                this.state.character_status
-                                            }
-                                            character_position={
-                                                this.state.position
-                                            }
-                                            character_currencies={
-                                                this.state.character_currencies
-                                            }
-                                            celestial_id={
-                                                this.state.celestial_id
-                                            }
-                                            update_celestial={this.updateCelestial.bind(
-                                                this
-                                            )}
-                                            update_plane_quests={this.updateQuestPlane.bind(
-                                                this
-                                            )}
-                                            update_character_position={this.setCharacterPosition.bind(
-                                                this
-                                            )}
+                                            character_status={this.state.character_status}
+                                            character_position={this.state.position}
+                                            character_currencies={this.state.character_currencies}
+                                            celestial_id={this.state.celestial_id}
+                                            update_celestial={this.updateCelestial.bind(this)}
+                                            update_plane_quests={this.updateQuestPlane.bind(this)}
+                                            update_character_position={this.setCharacterPosition.bind(this)}
                                             view_port={this.state.view_port}
-                                            can_engage_celestial={
-                                                this.state.character
-                                                    .can_engage_celestials
-                                            }
+                                            can_engage_celestial={this.state.character.can_engage_celestials}
                                             action_data={this.state.action_data}
                                             map_data={this.state.map_data}
-                                            update_parent_state={this.setActionState.bind(
-                                                this
-                                            )}
-                                            set_map_data={this.setMapState.bind(
-                                                this
-                                            )}
+                                            update_parent_state={this.setActionState.bind(this)}
+                                            set_map_data={this.setMapState.bind(this)}
                                         />
-                                    ) : (
-                                        <Actions
-                                            character={this.state.character}
-                                            character_status={
-                                                this.state.character_status
-                                            }
-                                            character_position={
-                                                this.state.position
-                                            }
-                                            celestial_id={
-                                                this.state.celestial_id
-                                            }
-                                            update_celestial={this.updateCelestial.bind(
-                                                this
-                                            )}
-                                            can_engage_celestial={
-                                                this.state.character
-                                                    .can_engage_celestials
-                                            }
-                                            action_data={this.state.action_data}
-                                            update_parent_state={this.setActionState.bind(
-                                                this
-                                            )}
-                                        />
-                                    )}
+                                    </ActionTabs>
                                 </BasicCard>
                             </div>
                             <BasicCard

@@ -1,8 +1,7 @@
 <?php
 
-namespace Tests\Feature\Game\Gambler\Controllers\Api;
+namespace Tests\Feature\Game\Workbench\Controllers\Api;
 
-use App\Flare\Models\Character;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Gambler\Values\CurrencyValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -10,16 +9,16 @@ use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateItem;
 
-class HolyItemsControllerTest extends TestCase {
+class GamblerHolyItemsControllerTest extends TestCase {
 
     use RefreshDatabase, CreateItem;
 
-    private ?Character $character = null;
+    private ?CharacterFactory $character = null;
 
     public function setUp(): void {
         parent::setUp();
 
-        $this->character = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $this->character = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
     }
 
     public function tearDown(): void {
@@ -29,7 +28,9 @@ class HolyItemsControllerTest extends TestCase {
     }
 
     public function testGetSlots() {
-        $response = $this->actingAs($this->character->user)
+        $character = $this->character->getCharacter();
+
+        $response = $this->actingAs($character->user)
             ->call('GET', '/api/character/gambler');
 
         $jsonData = json_decode($response->getContent(), true);
@@ -70,8 +71,8 @@ class HolyItemsControllerTest extends TestCase {
             return $slot->item->type === 'alchemy';
         })->first();
 
-        $response = $this->actingAs($this->character->user)
-            ->call('POST', '/api/character/'.$this->character->id.'/smithy-workbench/apply', [
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/character/'.$character->id.'/smithy-workbench/apply', [
                 '_token' => csrf_token(),
                 'item_id' => $slot->item->id,
                 'alchemy_item_id' => $alchemy->item->id
@@ -85,6 +86,7 @@ class HolyItemsControllerTest extends TestCase {
             return $slot->item->holy_stacks_applied === 1;
         })->first());
 
-        $this->assertEquals(200, $jsonData['status']);
+        $this->assertCount(1, $jsonData['items']);
+        $this->assertCount(0, $jsonData['alchemy_items']);
     }
 }
