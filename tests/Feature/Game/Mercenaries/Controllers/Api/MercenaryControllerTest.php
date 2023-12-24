@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Game\GuideQuest\Controllers\Api;
+namespace Tests\Feature\Game\Mercenaries\Controllers\Api;
 
 use App\Flare\Models\CharacterMercenary;
 use App\Flare\Values\MaxCurrenciesValue;

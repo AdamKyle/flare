@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Game\Workbench\Controllers\Api;
+namespace Tests\Feature\Game\NpcActions\Workbench\Controllers\Api;
 
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Gambler\Values\CurrencyValue;

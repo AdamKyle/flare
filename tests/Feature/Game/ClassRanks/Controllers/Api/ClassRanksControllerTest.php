@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Game\GuideQuest\Controllers\Api;
+namespace Tests\Feature\Game\ClassRanks\Controllers\Api;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;

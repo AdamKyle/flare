@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Game\Gambler\Controllers\Api;
+namespace Tests\Feature\Game\Reincarnation\Controllers\Api;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\MaxLevelConfiguration;

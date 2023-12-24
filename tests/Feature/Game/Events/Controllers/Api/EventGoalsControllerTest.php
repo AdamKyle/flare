@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Game\GuideQuest\Controllers\Api;
+namespace Tests\Feature\Game\Events\Controllers\Api;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\GlobalEventGoal;
