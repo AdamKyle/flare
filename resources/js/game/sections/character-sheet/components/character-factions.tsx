@@ -2,12 +2,12 @@ import React, {Fragment} from "react";
 import Ajax from "../../../lib/ajax/ajax";
 import {AxiosError, AxiosResponse} from "axios";
 import {watchForDarkModeTableChange} from "../../../lib/game/dark-mode-watcher";
-import ComponentLoading from "../../../components/ui/loading/component-loading";
 import InfoAlert from "../../../components/ui/alerts/simple-alerts/info-alert";
 import Table from "../../../components/ui/data-tables/table";
 import {formatNumber} from "../../../lib/game/format-number";
 import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
 import PrimaryButton from "../../../components/ui/buttons/primary-button";
+import PledgeLoyalty from "../../faction-loyalty/modals/pledge-loyalty";
 
 export default class CharacterFactions extends React.Component<any, any> {
 
@@ -18,6 +18,7 @@ export default class CharacterFactions extends React.Component<any, any> {
             loading: true,
             factions: [],
             dark_tables: false,
+            pledge_faction: null,
         }
     }
 
@@ -34,6 +35,10 @@ export default class CharacterFactions extends React.Component<any, any> {
                 console.error(error);;
             })
         }
+    }
+
+    handlePledge() {
+        console.log(this.state.pledge_faction)
     }
 
     buildColumns() {
@@ -80,14 +85,23 @@ export default class CharacterFactions extends React.Component<any, any> {
                 sortable: true,
                 cell: (row: any) => <span
                     key={row.id + '-' + (Math.random() + 1).toString(36).substring(7)}>
-                    <PrimaryButton button_label={'Pledge Loyalty'} on_click={() => { console.log(row) }} disabled={!row.maxed}/>
+                    <PrimaryButton button_label={'Pledge Loyalty'} on_click={() => { this.pledgeLoyalty(row) }} disabled={!row.maxed}/>
                 </span>
             },
         ];
     }
 
     pledgeLoyalty(row: any): void {
+        console.log(row);
+        this.setState({
+            pledge_faction: row,
+        })
+    }
 
+    closePledge() {
+        this.setState({
+            pledge_faction: null
+        })
     }
 
     render() {
@@ -113,6 +127,17 @@ export default class CharacterFactions extends React.Component<any, any> {
                         <Table columns={this.buildColumns()} data={this.state.factions} dark_table={this.state.dark_tables} />
                     </div>
                 </div>
+
+                {
+                    this.state.pledge_faction !== null ?
+                        <PledgeLoyalty
+                            is_open={true}
+                            manage_modal={this.closePledge.bind(this)}
+                            faction={this.state.pledge_faction}
+                            handle_pledge={this.handlePledge.bind(this)}
+                        />
+                    : null
+                }
             </Fragment>
         )
     }

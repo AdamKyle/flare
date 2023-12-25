@@ -14,9 +14,9 @@ class RaidAttackTypes {
     const WATER_ATTACK = 2;
 
     /**
-     * @var string $value
+     * @var int $value
      */
-    private string $value;
+    private int $value;
 
     /**
      * @var int[] $values

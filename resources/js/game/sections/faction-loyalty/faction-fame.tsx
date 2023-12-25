@@ -111,7 +111,7 @@ export default class FactionFame extends React.Component<FactionLoyaltyProps, Fa
                                 />
                             </div>
                             <div>
-                                <PrimaryOutlineButton button_label={'Remember'} on_click={() => {}} additional_css={'mt-[34px] ml-4'}/>
+                                <PrimaryOutlineButton button_label={'Assist'} on_click={() => {}} additional_css={'mt-[34px] ml-4'}/>
                             </div>
                         </div>
 
@@ -123,6 +123,17 @@ export default class FactionFame extends React.Component<FactionLoyaltyProps, Fa
                             <dd>1500</dd>
                             <dt>Item Reward</dt>
                             <dd>Medium Unique</dd>
+                        </dl>
+
+                        <h4>Kingdom Item Defence Bonus</h4>
+                        <p className='my-4'>
+                            Slowly accumulates as you level this NPC's fame.
+                        </p>
+                        <dl>
+                            <dt>Defence Bonus per level</dt>
+                            <dd>0.002%</dd>
+                            <dt>Defence Bonus</dt>
+                            <dd>0%</dd>
                         </dl>
                     </div>
                     <div className='flex-none md:flex-auto w-full md:w-3/4'>
