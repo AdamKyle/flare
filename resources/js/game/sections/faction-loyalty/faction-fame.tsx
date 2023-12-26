@@ -53,9 +53,6 @@ export default class FactionFame extends React.Component<FactionLoyaltyProps, Fa
     }
 
     selectedNpc(): string | undefined {
-        console.log(this.state.npcs?.find((npc: FactionLoyaltyNpc) => {
-            return npc.name === this.state.selected_npc?.name
-        }), this.state.selected_npc, this.state.npcs);
         return this.state.npcs?.find((npc: FactionLoyaltyNpc) => {
              return npc.name === this.state.selected_npc?.name
         })?.name;
@@ -113,6 +110,9 @@ export default class FactionFame extends React.Component<FactionLoyaltyProps, Fa
                             <div>
                                 <PrimaryOutlineButton button_label={'Assist'} on_click={() => {}} additional_css={'mt-[34px] ml-4'}/>
                             </div>
+                            <div>
+                                <div className='mt-[38px] ml-4 font-bold'><span>{this.selectedNpc()}</span></div>
+                            </div>
                         </div>
 
                         <h4>Rewards (per level)</h4>
@@ -132,7 +132,7 @@ export default class FactionFame extends React.Component<FactionLoyaltyProps, Fa
                         <dl>
                             <dt>Defence Bonus per level</dt>
                             <dd>0.002%</dd>
-                            <dt>Defence Bonus</dt>
+                            <dt>Current Defence Bonus</dt>
                             <dd>0%</dd>
                         </dl>
                     </div>
@@ -166,6 +166,7 @@ export default class FactionFame extends React.Component<FactionLoyaltyProps, Fa
                                 </dl>
                             </div>
                         </div>
+                        <p className='my-4'>Bounties must be completed on the respective plane and manually. Automation will not work for this.</p>
                     </div>
                 </div>
             </div>

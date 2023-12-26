@@ -92,7 +92,6 @@ export default class CharacterFactions extends React.Component<any, any> {
     }
 
     pledgeLoyalty(row: any): void {
-        console.log(row);
         this.setState({
             pledge_faction: row,
         })
