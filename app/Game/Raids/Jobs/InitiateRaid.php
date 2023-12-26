@@ -92,9 +92,6 @@ class  InitiateRaid implements ShouldQueue {
         EventSchedulerService $eventSchedulerService,
         UpdateRaidMonsters $updateRaidMonsters
     ): void {
-        if (empty($raid->corrupted_location_ids)) {
-            return;
-        }
 
         $this->corruptLocations($raid, $locationService);
 
