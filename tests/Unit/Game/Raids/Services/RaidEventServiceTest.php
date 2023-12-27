@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Game\Raids\Services;
+namespace Tests\Unit\Game\Raids\Services;
 
 
 use App\Flare\Models\Character;

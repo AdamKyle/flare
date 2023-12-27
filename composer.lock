@@ -6755,16 +6755,16 @@
         },
         {
             "name": "spatie/temporary-directory",
-            "version": "2.2.0",
+            "version": "2.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/temporary-directory.git",
-                "reference": "efc258c9f4da28f0c7661765b8393e4ccee3d19c"
+                "reference": "76949fa18f8e1a7f663fd2eaa1d00e0bcea0752a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/temporary-directory/zipball/efc258c9f4da28f0c7661765b8393e4ccee3d19c",
-                "reference": "efc258c9f4da28f0c7661765b8393e4ccee3d19c",
+                "url": "https://api.github.com/repos/spatie/temporary-directory/zipball/76949fa18f8e1a7f663fd2eaa1d00e0bcea0752a",
+                "reference": "76949fa18f8e1a7f663fd2eaa1d00e0bcea0752a",
                 "shasum": ""
             },
             "require": {
@@ -6800,7 +6800,7 @@
             ],
             "support": {
                 "issues": "https://github.com/spatie/temporary-directory/issues",
-                "source": "https://github.com/spatie/temporary-directory/tree/2.2.0"
+                "source": "https://github.com/spatie/temporary-directory/tree/2.2.1"
             },
             "funding": [
                 {
@@ -6812,7 +6812,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-09-25T07:13:36+00:00"
+            "time": "2023-12-25T11:46:58+00:00"
         },
         {
             "name": "symfony/console",

@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Game\Raids\Values;
+namespace Tests\Unit\Game\Raids\Values;
 
 use App\Game\Raids\Values\RaidAttackTypes;
 use Exception;

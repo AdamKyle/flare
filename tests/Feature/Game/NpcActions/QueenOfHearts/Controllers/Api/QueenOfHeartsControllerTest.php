@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Game\NpcActions\SeerActions\Controllers\Api;
+namespace Tests\Feature\Game\NpcActions\QueenOfHearts\Controllers\Api;
 
 use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\MaxCurrenciesValue;
