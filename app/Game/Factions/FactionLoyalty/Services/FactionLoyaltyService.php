@@ -35,9 +35,21 @@ class FactionLoyaltyService {
             ];
         });
 
+        $factionLoyalties = $character->factionLoyalties;
+        $factionLoyalty   = [];
+
+        if ($factionLoyalties->isNotEmpty()) {
+            $factionLoyalty = $factionLoyalties->where('factionLoyaltyNpcs.currently_helping', '=', true)->first();
+
+            if (is_null($factionLoyalty)) {
+                $factionLoyalty = $factionLoyalties->where('faction.gamee_map_id', '=', $character->map->game_map_id)->first();
+            }
+        }
+
         return $this->successResult([
-            'npcs' => $npcNames,
-            'map_name' => $gameMap->name,
+            'npcs'            => $npcNames,
+            'faction_loyalty' => $factionLoyalty,
+            'map_name'        => $gameMap->name,
         ]);
     }
 
@@ -71,13 +83,13 @@ class FactionLoyaltyService {
                 'max_level'                  => 25,
                 'next_level_fame'            => collect($craftingTasks)->sum('required_amount') +
                     collect($bountyTasks)->sum('required_amount'),
-                'kingdom_item_defence_bonus' => $totalNpcFame
+                'kingdom_item_defence_bonus' => $totalNpcFame,
+                'currently_helping'          => false,
             ]);
 
             FactionLoyaltyNpcTask::create([
                 'faction_loyalty_id'     => $factionLoyalty->id,
                 'faction_loyalty_npc_id' => $factionLoyaltyNpc->id,
-                'currently_helping'      => false,
                 'fame_tasks'             => array_merge($bountyTasks, $craftingTasks)
             ]);
         }

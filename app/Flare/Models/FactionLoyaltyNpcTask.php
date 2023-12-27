@@ -2,9 +2,13 @@
 
 namespace App\Flare\Models;
 
+use Database\Factories\FactionLoyaltyNpcTaskFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class FactionLoyaltyNpcTask extends Model {
+
+    use HasFactory;
 
     /**
      * The attributes that are mass assignable.
@@ -14,7 +18,6 @@ class FactionLoyaltyNpcTask extends Model {
     protected $fillable = [
         'faction_loyalty_id',
         'faction_loyalty_npc_id',
-        'currently_helping',
         'fame_tasks',
     ];
 
@@ -37,5 +40,9 @@ class FactionLoyaltyNpcTask extends Model {
 
     public function getCurrentAmountAttribute() {
         return collect($this->fame_tasks)->sum('amount_completed');
+    }
+
+    protected static function newFactory() {
+        return FactionLoyaltyNpcTaskFactory::new();
     }
 }

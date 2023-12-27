@@ -2,9 +2,13 @@
 
 namespace App\Flare\Models;
 
+use Database\Factories\FactionLoyaltyNpcFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class FactionLoyaltyNpc extends Model {
+
+    use HasFactory;
 
     /**
      * The attributes that are mass assignable.
@@ -17,7 +21,16 @@ class FactionLoyaltyNpc extends Model {
         'current_level',
         'max_level',
         'next_level_fame',
+        'currently_helping',
         'kingdom_item_defence_bonus'
+    ];
+
+    protected $casts = [
+        'current_level'              => 'integer',
+        'max_level'                  => 'integer',
+        'next_level_fame'            => 'integer',
+        'currently_helping'          => 'boolean',
+        'kingdom_item_defence_bonus' => 'float'
     ];
 
     protected $appends = [
@@ -34,7 +47,7 @@ class FactionLoyaltyNpc extends Model {
     }
 
     public function factionLoyaltyNpcTasks() {
-        return $this->hasMany(FactionLoyaltyNpcTask::class);
+        return $this->hasOne(FactionLoyaltyNpcTask::class);
     }
 
     public function getCurrentFameAttribute() {
@@ -43,5 +56,9 @@ class FactionLoyaltyNpc extends Model {
 
     public function getCurrentKingdomItemDefenceBonus() {
         return $this->kingdom_item_defence_bonus * $this->current_level;
+    }
+
+    protected static function newFactory() {
+        return FactionLoyaltyNpcFactory::new();
     }
 }

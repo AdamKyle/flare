@@ -10,8 +10,10 @@ use App\Flare\Models\Event as GamEvent;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Raids\Services\RaidEventService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
+use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateEvent;
 use Tests\Traits\CreateItem;
@@ -65,6 +67,16 @@ class RaidEventServiceTest extends TestCase {
             'start_date'        => now()->addMinutes(5),
             'raid_id'           => $raid,
             'currently_running' => true,
+        ]);
+
+        (new CharacterFactory())->createBaseCharacter()->givePlayerLocation(
+            $location->x, $location->y, $location->map
+        );
+
+        Cache::put('monsters', [
+            $location->map->name => [
+                $monster->toArray(),
+            ]
         ]);
 
         $this->raidEventService->createRaid($raid);
