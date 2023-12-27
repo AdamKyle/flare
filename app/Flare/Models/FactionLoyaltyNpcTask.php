@@ -22,8 +22,7 @@ class FactionLoyaltyNpcTask extends Model {
     ];
 
     protected $casts = [
-        'currently_helping' => 'boolean',
-        'fame_tasks'        => 'array',
+        'fame_tasks' => 'array',
     ];
 
     protected $appends = [

@@ -2,6 +2,7 @@
 
 namespace App\Game\Raids\Jobs;
 
+use App\Flare\Models\Map;
 use App\Game\Quests\Services\BuildQuestCacheService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;

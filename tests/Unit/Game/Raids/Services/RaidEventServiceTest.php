@@ -3,6 +3,8 @@
 namespace Tests\Game\Raids\Services;
 
 
+use App\Flare\Models\Character;
+use App\Flare\Models\Map;
 use App\Flare\Models\Raid;
 use App\Flare\Models\ScheduledEvent;
 use App\Game\Events\Values\EventType;
@@ -35,6 +37,8 @@ class RaidEventServiceTest extends TestCase {
         GamEvent::truncate();
         ScheduledEvent::truncate();
         Raid::truncate();
+        Map::truncate();
+        Character::truncate();
         DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
         $this->raidEventService = resolve(RaidEventService::class);

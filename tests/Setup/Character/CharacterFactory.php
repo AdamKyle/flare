@@ -421,7 +421,6 @@ class CharacterFactory {
      */
     public function givePlayerLocation(int $x = 16, int $y = 16, GameMap $gameMap = null): CharacterFactory {
         $gameMap = !is_null($gameMap) ? $gameMap : GameMap::where('default', true)->first();
-        $id      = 0;
 
         if (!is_null($gameMap)) {
             $id = $gameMap->id;
@@ -441,6 +440,8 @@ class CharacterFactory {
             'character_position_y' => $y,
             'game_map_id'          => $id,
         ]);
+
+        $this->character = $this->character->refresh();
 
         return $this;
     }
