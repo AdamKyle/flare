@@ -27,10 +27,42 @@ class FactionLoyaltyController extends Controller {
      * @return JsonResponse
      */
     public function fetchLoyaltyInfo(Character $character): JsonResponse {
-        return response()->json($this->factionLoyaltyService->getLoyaltyInfoForPlane($character));
+
+        $response = $this->factionLoyaltyService->getLoyaltyInfoForPlane($character);
+
+        $status = $response['status'];
+        unset($response['status']);
+
+        return response()->json($response, $status);
     }
 
+    /**
+     * @param Character $character
+     * @param Faction $faction
+     * @return JsonResponse
+     */
     public function pledgeLoyalty(Character $character, Faction $faction): JsonResponse {
-        return response()->json($this->factionLoyaltyService->pledgeLoyalty($character, $faction));
+
+        $response = $this->factionLoyaltyService->pledgeLoyalty($character);
+
+        $status = $response['status'];
+        unset($response['status']);
+
+        return response()->json($response, $status);
+    }
+
+    /**
+     * @param Charactrer $character
+     * @param Faction $faction
+     * @return JsonResponse
+     */
+    public function removePledge(Charactrer $character, Faction $faction): JsonResponse {
+
+        $response = $this->factionLoyaltyService->removePledge($character);
+
+        $status = $response['status'];
+        unset($response['status']);
+
+        return response()->json($response, $status);
     }
 }

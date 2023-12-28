@@ -38,12 +38,12 @@ class FactionLoyaltyNpc extends Model {
         'current_kingdom_item_defence_bonus'
     ];
 
-    public function faction() {
-        return $this->belongsTo(Faction::class, 'faction_id', 'id');
+    public function factionLoyalty() {
+        return $this->belongsTo(FactionLoyalty::class, 'faction_loyalty_id', 'id');
     }
 
-    public function character() {
-        return $this->belongsTo(Character::class, 'character_id', 'id');
+    public function npc() {
+        return $this->belongsTo(Npc::class, 'npc_id', 'id');
     }
 
     public function factionLoyaltyNpcTasks() {

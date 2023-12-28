@@ -5,8 +5,8 @@ namespace App\Game\BattleRewardProcessing\Providers;
 use App\Flare\Builders\RandomAffixGenerator;
 use App\Flare\Models\GlobalEventParticipation;
 use App\Flare\Services\CharacterRewardService;
-use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\BattleRewardProcessing\Handlers\FactionHandler;
+use App\Game\BattleRewardProcessing\Handlers\FactionLoyaltyBountyHandler;
 use App\Game\BattleRewardProcessing\Handlers\GlobalEventParticipationHandler;
 use App\Game\BattleRewardProcessing\Handlers\GoldMinesRewardHandler;
 use App\Game\BattleRewardProcessing\Handlers\PurgatorySmithHouseRewardHandler;
@@ -14,6 +14,7 @@ use App\Game\BattleRewardProcessing\Services\BattleRewardService;
 use App\Game\BattleRewardProcessing\Services\SecondaryRewardService;
 use App\Game\ClassRanks\Services\ClassRankService;
 use App\Game\Core\Services\GoldRush;
+use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
 use App\Game\GuideQuests\Services\GuideQuestService;
 use App\Game\Mercenaries\Services\MercenaryService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
@@ -30,6 +31,13 @@ class ServiceProvider extends ApplicationServiceProvider {
             return new FactionHandler(
                 $app->make(RandomAffixGenerator::class),
                 $app->make(GuideQuestService::class),
+            );
+        });
+
+        $this->app->bind(FactionLoyaltyBountyHandler::class, function($app) {
+            return new FactionLoyaltyBountyHandler(
+                $app->make(RandomAffixGenerator::class),
+                $app->make(FactionLoyaltyService::class),
             );
         });
 
@@ -59,6 +67,7 @@ class ServiceProvider extends ApplicationServiceProvider {
                 $app->make(GlobalEventParticipationHandler::class),
                 $app->make(PurgatorySmithHouseRewardHandler::class),
                 $app->make(GoldMinesRewardHandler::class),
+                $app->make(FactionLoyaltyBountyHandler::class),
             );
         });
 

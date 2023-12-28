@@ -22,6 +22,7 @@ class FactionLoyaltyFactory extends Factory {
         return [
             'faction_id'    => null,
             'character_id'  => null,
+            'is_pledged'    => true,
         ];
     }
 }

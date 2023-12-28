@@ -2,10 +2,10 @@
 
 namespace Database\Factories;
 
-use App\Flare\Models\GameMap;
 use App\Flare\Models\Npc;
 use App\Flare\Values\NpcTypes;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
 class NpcFactory extends Factory
 {
@@ -24,8 +24,8 @@ class NpcFactory extends Factory
     public function definition()
     {
         return [
-            'name'                        => 'SampleNpc',
-            'real_name'                   => 'Sample NPC',
+            'name'                        => Str::random(10),
+            'real_name'                   => Str::random(10),
             'type'                        => NpcTypes::KINGDOM_HOLDER,
             'game_map_id'                 => null,
             'x_position'                  => 32,

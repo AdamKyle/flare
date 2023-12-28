@@ -9,6 +9,7 @@ use App\Flare\Models\GlobalEventGoal;
 use App\Flare\Models\Monster;
 use App\Flare\Services\CharacterRewardService;
 use App\Game\BattleRewardProcessing\Handlers\FactionHandler;
+use App\Game\BattleRewardProcessing\Handlers\FactionLoyaltyBountyHandler;
 use App\Game\BattleRewardProcessing\Handlers\GlobalEventParticipationHandler;
 use App\Game\BattleRewardProcessing\Handlers\GoldMinesRewardHandler;
 use App\Game\BattleRewardProcessing\Handlers\PurgatorySmithHouseRewardHandler;
@@ -27,6 +28,7 @@ class BattleRewardService {
     private GlobalEventParticipationHandler $globalEventParticipationHandler;
     private PurgatorySmithHouseRewardHandler $purgatorySmithHouseRewardHandler;
     private GoldMinesRewardHandler $goldMinesRewardHandler;
+    private FactionLoyaltyBountyHandler $factionLoyaltyBountyHandler;
 
     public function __construct(
         FactionHandler $factionHandler,
@@ -35,6 +37,7 @@ class BattleRewardService {
         GlobalEventParticipationHandler $globalEventParticipationHandler,
         PurgatorySmithHouseRewardHandler $purgatorySmithHouseRewardHandler,
         GoldMinesRewardHandler $goldMinesRewardHandler,
+        FactionLoyaltyBountyHandler $factionLoyaltyBountyHandler,
     ) {
         $this->factionHandler                   = $factionHandler;
         $this->characterRewardService           = $characterRewardService;
@@ -42,6 +45,7 @@ class BattleRewardService {
         $this->globalEventParticipationHandler  = $globalEventParticipationHandler;
         $this->purgatorySmithHouseRewardHandler = $purgatorySmithHouseRewardHandler;
         $this->goldMinesRewardHandler           = $goldMinesRewardHandler;
+        $this->factionLoyaltyBountyHandler      = $factionLoyaltyBountyHandler;
     }
 
     public function setUp(Monster $monster, Character $character): BattleRewardService {
@@ -74,6 +78,8 @@ class BattleRewardService {
         $character = $this->purgatorySmithHouseRewardHandler->handleFightingAtPurgatorySmithHouse($character, $this->monster);
 
         $character = $this->goldMinesRewardHandler->handleFightingAtGoldMines($character, $this->monster);
+
+        $character = $this->factionLoyaltyBountyHandler->handleBounty($character, $this->monster);
 
         BattleItemHandler::dispatch($character, $this->monster);
     }

@@ -57,8 +57,6 @@ class SecondaryRewardService {
 
         if ($character->isLoggedIn()) {
             event (new UpdateTopBarEvent($character->refresh()));
-
-            return;
         }
     }
 

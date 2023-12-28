@@ -22,7 +22,6 @@ class FactionLoyaltyNpcTaskFactory extends Factory {
         return [
             'faction_loyalty_id'       => null,
             'faction_loyalty_npc_id'   => null,
-            'currently_helping'        => false,
             'fame_tasks'               => [],
         ];
     }

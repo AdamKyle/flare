@@ -24,7 +24,7 @@ class MapNameValue {
     /**
      * @var array $values
      */
-    protected static $values = [
+    public static $values = [
         'Surface'       => self::SURFACE,
         'Labyrinth'     => self::LABYRINTH,
         'Dungeons'      => self::DUNGEONS,

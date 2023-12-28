@@ -2,6 +2,7 @@
 
 namespace App\Flare\Models;
 
+use Database\Factories\FactionLoyaltyFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -17,6 +18,11 @@ class FactionLoyalty extends Model {
     protected $fillable = [
         'faction_id',
         'character_id',
+        'is_pledged',
+    ];
+
+    protected $casts = [
+        'is_pledged' => 'boolean',
     ];
 
     public function faction() {
@@ -32,6 +38,6 @@ class FactionLoyalty extends Model {
     }
 
     protected static function newFactory() {
-        return FactionLoyalty::new();
+        return FactionLoyaltyFactory::new();
     }
 }

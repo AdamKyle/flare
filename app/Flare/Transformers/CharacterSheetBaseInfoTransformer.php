@@ -84,11 +84,7 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer {
             'can_access_hell_forged'      => false,
             'can_access_purgatory_chains' => false,
             'is_in_timeout'               => !is_null($character->user->timeout_until),
-            // 'base_position' => [
-            //   'x' => $character->map->character_position_x,
-            //   'y' => $character->map->character_position_y,
-            //   'game_map_id' => $character->map->game_map_id,
-            // ],
+            'can_see_pledge_tab'          => $character->factionLoyalties()->where('is_pledged', '=', true)->exists(),
         ];
     }
 
