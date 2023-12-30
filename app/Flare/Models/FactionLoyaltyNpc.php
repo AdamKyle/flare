@@ -51,7 +51,7 @@ class FactionLoyaltyNpc extends Model {
     }
 
     public function getCurrentFameAttribute() {
-        $this->factionLoyaltyNpcTasks->sum('current_amount');
+        return collect($this->factionLoyaltyNpcTasks->fame_tasks)->sum('current_amount');
     }
 
     public function getCurrentKingdomItemDefenceBonus() {

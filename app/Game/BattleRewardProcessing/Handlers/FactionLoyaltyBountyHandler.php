@@ -14,7 +14,7 @@ use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\HandleCharacterLevelUp;
 use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
 use App\Game\Messages\Events\ServerMessageEvent;
-use Facade\App\Game\Messages\Handlers\ServerMessageHandler;
+use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 
 class FactionLoyaltyBountyHandler {
 
@@ -71,9 +71,8 @@ class FactionLoyaltyBountyHandler {
         }
 
         $hasMonsterForBounty = collect($helpingNpc->factionLoyaltyNpcTasks->fame_tasks)->filter(function($task) use($monster) {
-
             if (!isset($task['monster_id'])) {
-                return false;
+                return collect();
             }
 
             return $task['monster_id'] === $monster->id;
@@ -90,7 +89,6 @@ class FactionLoyaltyBountyHandler {
             }
 
             if ($task['monster_id'] === $monster->id) {
-
                 $newCurrent = $task['current_amount'] + 1;
 
                 if ($newCurrent > $task['required_amount']) {
@@ -109,9 +107,9 @@ class FactionLoyaltyBountyHandler {
 
         $helpingNpc = $helpingNpc->refresh();
 
-        if ($this->canLevelUpFame($helpingNpc->factionLoyaltyNpc) && $helpingNpc->current_level !== $helpingNpc->max_level) {
-            $this->handOutXp($character, $helpingNpc->factionLoyaltyNpc);
-            $this->handOutCurrencies($character, $helpingNpc->factionLoyaltyNpc);
+        if ($this->canLevelUpFame($helpingNpc) && $helpingNpc->current_level !== $helpingNpc->max_level) {
+            $this->handOutXp($character, $helpingNpc);
+            $this->handOutCurrencies($character, $helpingNpc);
             $this->rewardTheUniqueItem($character);
 
             $newLevel = $helpingNpc->current_level + 1;
@@ -121,7 +119,7 @@ class FactionLoyaltyBountyHandler {
             }
 
             $helpingNpc->update([
-                'current_level' => $newLevel,
+                'current_level'  => $newLevel,
             ]);
 
             $helpingNpc = $helpingNpc->refresh();
@@ -139,16 +137,16 @@ class FactionLoyaltyBountyHandler {
     }
 
     protected function handOutCurrencies(Character $character, FactionLoyaltyNpc $factionLoyaltyNpc): void {
-        $newGold     = $factionLoyaltyNpc->current_level * 1000000;
-        $newGoldDust = $factionLoyaltyNpc->current_level * 1000;
-        $newShards   = $factionLoyaltyNpc->current_level * 100;
+        $newGold     = (($factionLoyaltyNpc->current_level <= 0 ? 1 : $factionLoyaltyNpc->current_level) * 1000000) + $character->gold;
+        $newGoldDust = (($factionLoyaltyNpc->current_level <= 0 ? 1 : $factionLoyaltyNpc->current_level) * 1000) + $character->gold_dust;
+        $newShards   = (($factionLoyaltyNpc->current_level <= 0 ? 1 : $factionLoyaltyNpc->current_level) * 100) + $character->shards;
 
         if ($newGold >= MaxCurrenciesValue::MAX_GOLD) {
             $newGold = MaxCurrenciesValue::MAX_GOLD;
         }
 
-        if ($newGoldDust >= MaxCurrenciesValue::GOLD_DUST) {
-            $newGoldDust = MaxCurrenciesValue::GOLD_DUST;
+        if ($newGoldDust >= MaxCurrenciesValue::MAX_GOLD_DUST) {
+            $newGoldDust = MaxCurrenciesValue::MAX_GOLD_DUST;
         }
 
         if ($newShards >= MaxCurrenciesValue::MAX_SHARDS) {
@@ -179,17 +177,13 @@ class FactionLoyaltyBountyHandler {
     }
 
     protected function rewardTheUniqueItem(Character $character) {
-        $item = Item::where('specialty_type', ItemSpecialtyType::PURGATORY_CHAINS)
+        $item = Item::whereNull('specialty_type')
             ->whereNull('item_prefix_id')
             ->whereNull('item_suffix_id')
             ->whereDoesntHave('appliedHolyStacks')
             ->whereNotIn('type', ['alchemy', 'artifact', 'trinket'])
             ->inRandomOrder()
             ->first();
-
-        if (is_null($item)) {
-            return;
-        }
 
         $randomAffixGenerator = $this->randomAffixGenerator->setCharacter($character)
             ->setPaidAmount(RandomAffixDetails::MEDIUM);
@@ -210,7 +204,7 @@ class FactionLoyaltyBountyHandler {
     }
 
     protected function canLevelUpFame(FactionLoyaltyNpc $factionLoyaltyNpc): bool {
-        if ($factionLoyaltyNpc->current_level === $factionLoyaltyNpc->max_level) {
+        if ($factionLoyaltyNpc->current_level >= $factionLoyaltyNpc->max_level) {
             return false;
         }
 

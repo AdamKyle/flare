@@ -107,6 +107,7 @@ class GoldMinesRewardHandler {
         $goldDust = $goldDust + $goldDust * $this->getCurrencyMercenaryBonus($character, MercenaryValue::CHILD_OF_GOLD_DUST);
         $shards = $shards + $shards * $this->getCurrencyMercenaryBonus($character, MercenaryValue::CHILD_OF_SHARDS);
 
+        $gold        += $character->gold;
         $goldDust    += $character->gold_dust;
         $shards      += $character->shards;
 
