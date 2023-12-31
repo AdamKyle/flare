@@ -36,10 +36,10 @@ trait FactionLoyalty {
      * @param FactionLoyaltyNpc $helpingNpc
      * @param string $key
      * @param int $id
-     * @return void
+     * @return bool
      */
     public function hasMatchingTask(FactionLoyaltyNpc $helpingNpc, string $key, int $id): bool {
-        collect($helpingNpc->factionLoyaltyNpcTasks->fame_tasks)->filter(function($task) use($key, $id) {
+        return collect($helpingNpc->factionLoyaltyNpcTasks->fame_tasks)->filter(function($task) use($key, $id) {
             if (!isset($task[$key])) {
                 return collect();
             }
