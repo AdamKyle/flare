@@ -164,6 +164,7 @@ export default class Crafting extends React.Component<any, any> {
                     .setParameters({
                         item_to_craft: this.state.selected_item.id,
                         type: getCraftingType(this.state.selected_item.type),
+                        craft_for_npc: false,
                     })
                     .doAjaxCall(
                         "post",
