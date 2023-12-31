@@ -3,7 +3,7 @@
 namespace Tests\Unit\Game\Factions\FactionLoyalty\Services;
 
 use App\Flare\Models\Character;
-use App\Flare\Models\GameMap;
+use App\Flare\Models\Faction;
 use App\Flare\Values\MapNameValue;
 use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -141,7 +141,27 @@ class FactionLoyaltyServiceTest extends TestCase {
         $this->assertEquals($this->character->map->gameMap->name, $result['map_name']);
     }
 
+    public function testCannotPledgeWithAnotherCharactersFaction() {
+
+        $secondCharacter = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation()->assignFactionSystem()->getCharacter();
+
+        $result = $this->factionLoyaltyService->pledgeLoyalty($this->character, $secondCharacter->factions->first());
+
+        $this->assertEquals('Nope. Not allowed.', $result['message']);
+    }
+
+    public function testCannotPledgeToFactionWhenNotMaxed() {
+        $result = $this->factionLoyaltyService->pledgeLoyalty($this->character, $this->character->factions->first());
+
+        $this->assertEquals('You must level the faction to level 5 before being able to assist the fine people of this plane with their tasks.', $result['message']);
+    }
+
     public function testPledgeLoyalty() {
+
+        $this->character->factions()->update(['maxed' => true]);
+
+        $this->character = $this->character->refresh();
+
         $firstNpc = $this->createNpc([
             'game_map_id' => $this->character->map->game_map_id
         ]);
@@ -222,7 +242,7 @@ class FactionLoyaltyServiceTest extends TestCase {
                 'current_level' => 0,
                 'current_points' => 0,
                 'points_needed' => 1000,
-                'maxed' => false,
+                'maxed' => true,
                 'title' => null,
             ]);
 
@@ -241,6 +261,10 @@ class FactionLoyaltyServiceTest extends TestCase {
     }
 
     public function testPledgeToExistingLoyalty() {
+        $this->character->factions()->first()->update(['maxed' => true]);
+
+        $this->character = $this->character->refresh();
+
         $npc = $this->createNpc([
             'game_map_id' => $this->character->map->game_map_id
         ]);

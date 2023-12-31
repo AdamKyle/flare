@@ -222,4 +222,6 @@ export interface CharacterType {
     base_damage_stat_mod: number;
 
     elemental_atonement: any;
+
+    can_see_pledge_tab: boolean;
 }

@@ -13,6 +13,7 @@ use App\Game\Core\Events\CraftedItemTimeOutEvent;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\NpcActions\QueenOfHeartsActions\Services\RandomEnchantmentService;
+use App\Game\Skills\Handlers\UpdateCraftingTasksForFactionLoyalty;
 use App\Game\Skills\Services\Traits\UpdateCharacterCurrency;
 use Exception;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
@@ -33,9 +34,25 @@ class CraftingService {
      */
     private SkillService $skillService;
 
+    /**
+     * @var ItemListCostTransformerService $itemListCostTransformerService
+     */
     private ItemListCostTransformerService $itemListCostTransformerService;
 
+    /**
+     * @var SkillCheckService $skillCheckService
+     */
     private SkillCheckService $skillCheckService;
+
+    /**
+     * @var UpdateCraftingTasksForFactionLoyalty $updateCraftingTasksForFactionLoyalty
+     */
+    private UpdateCraftingTasksForFactionLoyalty $updateCraftingTasksForFactionLoyalty;
+
+    /**
+     * @var bool $craftForNpc
+     */
+    private bool $craftForNpc = false;
 
     /**
      * @param RandomEnchantmentService $randomEnchantmentService
@@ -48,11 +65,13 @@ class CraftingService {
         SkillService $skillService,
         ItemListCostTransformerService $itemListCostTransformerService,
         SkillCheckService $skillCheckService,
+        UpdateCraftingTasksForFactionLoyalty $updateCraftingTasksForFactionLoyalty,
     ) {
-        $this->randomEnchantmentService       = $randomEnchantmentService;
-        $this->skillService                   = $skillService;
-        $this->itemListCostTransformerService = $itemListCostTransformerService;
-        $this->skillCheckService              = $skillCheckService;
+        $this->randomEnchantmentService             = $randomEnchantmentService;
+        $this->skillService                         = $skillService;
+        $this->itemListCostTransformerService       = $itemListCostTransformerService;
+        $this->skillCheckService                    = $skillCheckService;
+        $this->updateCraftingTasksForFactionLoyalty = $updateCraftingTasksForFactionLoyalty;
     }
 
     /**
@@ -79,6 +98,13 @@ class CraftingService {
         return $this->getItems($character, $skill, $params['crafting_type'], $merchantMessage);
     }
 
+    /**
+     * Get Crafting XP
+     *
+     * @param Character $character
+     * @param string $type
+     * @return array
+     */
     public function getCraftingXP(Character $character, string $type): array {
         if ($type == 'hammer' || $type == 'bow' || $type == 'stave') {
             $type = 'weapon';
@@ -108,6 +134,9 @@ class CraftingService {
      * @throws Exception
      */
     public function craft(Character $character, array $params): bool {
+
+        $this->craftForNpc = $params['craft_for_npc'];
+
         $item  = Item::find($params['item_to_craft']);
 
         $skill = $this->fetchCraftingSkill($character, $params['type']);
@@ -289,6 +318,21 @@ class CraftingService {
      * @throws Exception
      */
     public function pickUpItem(Character $character, Item $item, Skill $skill, bool $tooEasy = false, bool $updateGoldCost = true) {
+
+        $this->updateCraftingTasksForFactionLoyalty->handleCraftingTask($character, $item);
+
+        if ($this->updateCraftingTasksForFactionLoyalty->handedOverItem()) {
+            if (!$tooEasy) {
+                $this->skillService->assignXpToCraftingSkill($character->map->gameMap, $skill);
+            }
+
+            if ($updateGoldCost) {
+                $this->updateCharacterGold($character, $item);
+            }
+
+            return;
+        }
+
         if ($this->attemptToPickUpItem($character, $item)) {
 
             if (!$tooEasy) {
@@ -309,6 +353,11 @@ class CraftingService {
      * @return bool
      */
     private function attemptToPickUpItem(Character $character, Item $item): bool {
+
+        if ($this->craftForNpc) {
+
+        }
+
         if (!$character->isInventoryFull()) {
 
             $slot = $character->inventory->slots()->create([

@@ -104,6 +104,14 @@ class FactionLoyaltyService {
      */
     public function pledgeLoyalty(Character $character, Faction $faction): array {
 
+        if ($faction->character_id !== $character->id) {
+            return $this->errorResult('Nope. Not allowed.');
+        }
+
+        if (!$faction->maxed) {
+            return $this->errorResult('You must level the faction to level 5 before being able to assist the fine people of this plane with their tasks.');
+        }
+
         $factionLoyalty = $character->factionLoyalties()->where('faction_id', $faction->id)->first();
 
         if (!is_null($factionLoyalty)) {

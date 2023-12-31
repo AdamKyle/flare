@@ -295,7 +295,7 @@ export default class Game extends React.Component<GameProps, GameState> {
                                             this.state.view_port < 1600,
                                     })}
                                 >
-                                    <ActionTabs use_tabs={true} character_id={this.props.characterId}>
+                                    <ActionTabs use_tabs={this.state.character.can_see_pledge_tab} character_id={this.props.characterId}>
                                         <ActionSection
                                             character={this.state.character}
                                             character_status={this.state.character_status}

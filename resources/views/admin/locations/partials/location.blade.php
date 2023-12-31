@@ -31,8 +31,18 @@
 @if (!is_null($locationType))
     @if ($locationType->isGoldMines())
         <h3 class="mb-4">Welcome to Gold Mines</h3>
+        <x-core.alerts.warning-alert title="ATTN!">
+            <strong>Exploration cannot be used here if you want the below rewards. You must manually fight.</strong>
+        </x-core.alerts.warning-alert>
         <p class="mb-4"> This location will let you explore here, for shards to drop off enemies. 1-1000 shards per
             kill.</p>
+        <ul class="list-disc my-4">
+            <li class="ml-4">Characters can get 1-10,000 Gold from fighting monsters. This can be increased to 50,000 if an event is triggered at this area.</li>
+            <li class="ml-4">Characters can get 1-500 Gold Dust from fighting monsters. This can be increased to 1,000 if an event is triggered at this area.</li>
+            <li class="ml-4">Characters can get 1-500 Shards from fighting monsters. This can be increased to 1,000 if an event is triggered at this area.</li>
+            <li class="ml-4">There is a 1/1,000,000 chance to get a random <a href="/information/random-enchants" target="_blank">Medium Unique <i className="fas fa-external-link-alt"></i></a> from Monsters half way down the list of more. This can be reduced to 1/500,000 chance if an event is triggered at this area.</li>
+            <li class="ml-4">There is a 1/1,000,000 chance to trigger an event while fighting here to reduce the chances and increase the currencies (the above "if an event is triggered") for 1 hour at this location only.</li>
+        </ul>
     @endif
 
     @if ($locationType->isPurgatoryDungeons())
@@ -43,8 +53,11 @@
 
     @if ($locationType->isPurgatorySmithHouse())
         <h3 class="mb-4">Welcome to Purgatory Smith House!</h3>
-        <p class="mb-4">In this location, a few things will happen for those who have access:</p>
-        <ul class="list-disc">
+        <x-core.alerts.warning-alert title="ATTN!">
+            <strong>Exploration cannot be used here if you want the below rewards. You must manually fight.</strong>
+        </x-core.alerts.warning-alert>
+        <p class="my-4">In this location, a few things will happen for those who have access:</p>
+        <ul class="list-disc my-4">
             <li class="ml-4">Characters can get 1-1000 Gold Dust from fighting monsters. This can be increased to 5,000 if an event is triggered at this area.</li>
             <li class="ml-4">Characters can get 1-1000 Shards from fighting monsters. This can be increased to 5,000 if an event is triggered at this area.</li>
             <li class="ml-4">Characters can get 1-1000 Copper Coins<sup>*</sup> from fighting monsters. This can be increased to 5,000 if an event is triggered at this area.</li>

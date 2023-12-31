@@ -259,6 +259,7 @@ class CharacterFactory {
                 'character_id'  => $this->character->id,
                 'game_map_id'   => $map->id,
                 'points_needed' => FactionLevel::getPointsNeeded(0),
+                'maxed'         => false
             ]);
         }
 

@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Game\BattleRewardProcessing\Handlers;
+namespace App\Game\Skills\Handlers;
 
 use App\Flare\Builders\RandomAffixGenerator;
 use App\Flare\Models\Character;
+use App\Flare\Models\Faction;
 use App\Flare\Models\FactionLoyaltyNpc;
 use App\Flare\Models\Item;
-use App\Flare\Models\Monster;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Flare\Values\RandomAffixDetails;
 use App\Game\Core\Events\UpdateTopBarEvent;
@@ -16,43 +16,28 @@ use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
 use App\Game\Messages\Events\ServerMessageEvent;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 
-class FactionLoyaltyBountyHandler {
+class UpdateCraftingTasksForFactionLoyalty {
 
     use HandleCharacterLevelUp, FactionLoyalty;
 
-    /**
-     * @var RandomAffixGenerator $randomAffixGenerator
-     */
     private RandomAffixGenerator $randomAffixGenerator;
 
-    /**
-     * @var FactionLoyaltyService $factionLoyaltyService
-     */
     private FactionLoyaltyService $factionLoyaltyService;
 
-    /**
-     * @param RandomAffixGenerator $randomAffixGenerator
-     * @param FactionLoyaltyService $factionLoyaltyService
-     */
+    private bool $handedOverItem = false;
+
     public function __construct(RandomAffixGenerator $randomAffixGenerator, FactionLoyaltyService $factionLoyaltyService) {
-        $this->randomAffixGenerator = $randomAffixGenerator;
+        $this->randomAffixGenerator  = $randomAffixGenerator;
         $this->factionLoyaltyService = $factionLoyaltyService;
     }
 
-    /**
-     * Handle the faction loyalty bounty.
-     *
-     * @param Character $character
-     * @param Monster $monster
-     * @return Character
-     */
-    public function handleBounty(Character $character, Monster $monster): Character {
+    public function handedOverItem(): bool {
+        return $this->handedOverItem;
+    }
 
-        if ($character->currentAutomations->isNotEmpty()) {
-             return $character;
-        }
+    public function handleCraftingTask(Character $character, Item $item): Character {
 
-        $faction = $character->factions->where('game_map_id', $monster->game_map_id)->first();
+        $faction = Faction::where('game_map_id', $character->map->game_map_id)->first();
 
         if (is_null($faction)) {
             return $character;
@@ -67,14 +52,16 @@ class FactionLoyaltyBountyHandler {
         $helpingNpc = $this->getNpcCurrentlyHelping($factionLoyalty);
 
         if (is_null($helpingNpc)) {
-             return $character;
-        }
-
-        if (!$this->hasMatchingTask($helpingNpc, 'monster_id', $monster->id)) {
             return $character;
         }
 
-        $helpingNpc = $this->updateMatchingHelpTask($helpingNpc, 'monster_id', $monster->id);
+        if (!$this->hasMatchingTask($helpingNpc, 'item_id', $item->id)) {
+            return $character;
+        }
+
+        $this->handedOverItem = true;
+
+        $helpingNpc = $this->updateMatchingHelpTask($helpingNpc, 'item_id', $item->id);
 
         if ($this->canLevelUpFame($helpingNpc) && $helpingNpc->current_level !== $helpingNpc->max_level) {
             $this->handleFameLevelUp($character, $helpingNpc);

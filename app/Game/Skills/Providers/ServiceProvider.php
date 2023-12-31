@@ -3,11 +3,14 @@
 namespace App\Game\Skills\Providers;
 
 use App\Flare\Builders\CharacterInformation\CharacterStatBuilder;
+use App\Flare\Builders\RandomAffixGenerator;
 use App\Flare\Handlers\UpdateCharacterAttackTypes;
 use App\Flare\Transformers\BasicSkillsTransformer;
 use App\Flare\Transformers\SkillsTransformer;
 use App\Game\CharacterInventory\Services\CharacterInventoryService;
+use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
 use App\Game\NpcActions\QueenOfHeartsActions\Services\RandomEnchantmentService;
+use App\Game\Skills\Handlers\UpdateCraftingTasksForFactionLoyalty;
 use App\Game\Skills\Handlers\UpdateItemSkill;
 use App\Game\Skills\Builders\GemBuilder;
 use App\Game\Skills\Services\AlchemyService;
@@ -23,6 +26,7 @@ use App\Game\Skills\Services\SkillCheckService;
 use App\Game\Skills\Services\SkillService;
 use App\Game\Skills\Services\TrinketCraftingService;
 use App\Game\Skills\Services\UpdateCharacterSkillsService;
+use Deployer\Component\PharUpdate\Update;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use League\Fractal\Manager;
 
@@ -99,6 +103,13 @@ class ServiceProvider extends ApplicationServiceProvider {
         $this->app->bind(GemService::class, function ($app) {
             return new GemService(
                 $app->make(GemBuilder::class)
+            );
+        });
+
+        $this->app->bind(UpdateCraftingTasksForFactionLoyalty::class, function($app) {
+            return new UpdateCraftingTasksForFactionLoyalty(
+                $app->make(RandomAffixGenerator::class),
+                $app->make(FactionLoyaltyService::class)
             );
         });
 

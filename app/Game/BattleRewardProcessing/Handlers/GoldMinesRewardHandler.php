@@ -39,6 +39,10 @@ class GoldMinesRewardHandler {
 
     public function handleFightingAtGoldMines(Character $character, Monster $monster): Character {
 
+        if ($character->currentAutomations->isNotEmpty()) {
+            return $character;
+        }
+
         $location = Location::where('x', $character->x_position)
             ->where('y', $character->y_position)
             ->where('game_map_id', $character->map->game_map_id)

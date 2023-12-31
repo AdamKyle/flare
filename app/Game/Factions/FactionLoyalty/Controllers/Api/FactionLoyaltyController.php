@@ -43,7 +43,7 @@ class FactionLoyaltyController extends Controller {
      */
     public function pledgeLoyalty(Character $character, Faction $faction): JsonResponse {
 
-        $response = $this->factionLoyaltyService->pledgeLoyalty($character);
+        $response = $this->factionLoyaltyService->pledgeLoyalty($character, $faction);
 
         $status = $response['status'];
         unset($response['status']);
@@ -52,13 +52,13 @@ class FactionLoyaltyController extends Controller {
     }
 
     /**
-     * @param Charactrer $character
+     * @param Character $character
      * @param Faction $faction
      * @return JsonResponse
      */
-    public function removePledge(Charactrer $character, Faction $faction): JsonResponse {
+    public function removePledge(Character $character, Faction $faction): JsonResponse {
 
-        $response = $this->factionLoyaltyService->removePledge($character);
+        $response = $this->factionLoyaltyService->removePledge($character, $faction);
 
         $status = $response['status'];
         unset($response['status']);
