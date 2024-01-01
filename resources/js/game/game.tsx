@@ -222,6 +222,16 @@ export default class Game extends React.Component<GameProps, GameState> {
         });
     }
 
+    setCanSeeFactionLoyaltyTab(canSee: boolean) {
+        const character = JSON.parse(JSON.stringify(this.state.character));
+
+        character.can_see_pledge_tab = canSee;
+
+        this.setState({
+            character: character
+        });
+    }
+
     renderLoading() {
         return (
             <div className="flex h-screen justify-center items-center max-w-md m-auto mt-[-150px]">
@@ -385,6 +395,7 @@ export default class Game extends React.Component<GameProps, GameState> {
                             update_disable_tabs={this.updateDisabledTabs.bind(
                                 this
                             )}
+                            update_pledge_tab={this.setCanSeeFactionLoyaltyTab.bind(this)}
                         />
                     </TabPanel>
                     <TabPanel key={"quests"}>

@@ -24,16 +24,29 @@ export default class PledgeLoyalty extends React.Component<any, any> {
                         <strong>Would you like to pledge your loyalty to Surface?</strong>
                     </p>
                     <p className='mb-4'>
-                        You can switch this at any time. Doing so allows you to gain rewards for each NPC
-                        you assist with their tasks, which in turn increases the loyalty you have with that NPC.
+                       Pledging to a Faction allows a player to complete tasks to gain fame with the NPs
+                       of that plane. As Players complete tasks they will be rewarded with Currencies, <a href='/information/random-enchants' target='_blank'>Medium Unique Items <i
+                        className="fas fa-external-link-alt"></i></a>
+                       and XP.
                     </p>
                     <p className='mb-4'>
-                        As you level your loyalty with an NPC you will not only gain currency, xp and a Medium Unique item, you
-                        will also gain Bonus defence towards defence of items being dropped on your kingdoms.
+                        A bonus to completing Fame tasks for NPC's is that your kingdoms on that plane will gain a % of defence based on how
+                        many NPC's you have helped and their Fame Level.
                     </p>
                     <p className='mb-4'>
-                        Players can switch their loyalty at any time. The bonus kingdom defence only applies when you
-                        have pledge dto that loyalty and onlt you kingdoms of that plane.
+                        Upon pledging, players will see a new tab on the Game tab named "Faction Loyalty".
+                        This tab will show you all the requirements for each NPC of that plane. There are two types of tasks: Bounties
+                        and Crafting. Crafting can be done any where and just requires you to click the "Craft for NPC" while Bounties are kill X
+                        creatures and must be done <strong>manually</strong>.
+                    </p>
+                    <p className='mb-4'>
+                        Each NPC will have a button called Assist. Players can assist only one NPC at a time with their tasks and must be
+                        assisting for their bounties and crafting to count. The total amount of tasks to do is the total amount of
+                        Fame needed to level the NPC. These tasks will switch each level.
+                    </p>
+                    <p className='mb-4 italic'>
+                        It is suggested you <a href='/information/automation' target='_blank'>read more about Faction Loyalties <i
+                        className="fas fa-external-link-alt"></i></a> for your own curiosity child.
                     </p>
                 </div>
             </Dialogue>

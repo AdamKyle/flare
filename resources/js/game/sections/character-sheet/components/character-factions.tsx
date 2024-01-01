@@ -8,6 +8,7 @@ import {formatNumber} from "../../../lib/game/format-number";
 import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
 import PrimaryButton from "../../../components/ui/buttons/primary-button";
 import PledgeLoyalty from "../../faction-loyalty/modals/pledge-loyalty";
+import SuccessAlert from "../../../components/ui/alerts/simple-alerts/success-alert";
 
 export default class CharacterFactions extends React.Component<any, any> {
 
@@ -19,6 +20,7 @@ export default class CharacterFactions extends React.Component<any, any> {
             factions: [],
             dark_tables: false,
             pledge_faction: null,
+            success_message: null,
         }
     }
 
@@ -38,7 +40,22 @@ export default class CharacterFactions extends React.Component<any, any> {
     }
 
     handlePledge() {
-        console.log(this.state.pledge_faction)
+
+        if (this.props.update_pledge_tab) {
+            (new Ajax()).setRoute('faction-loyalty/pledge/'+this.props.character_id+'/' + this.state.pledge_faction.id)
+                .doAjaxCall('post', (result: AxiosResponse) => {
+                    this.closePledge();
+
+                    this.setState({
+                        success_message: result.data.message,
+                    }, () => {
+                        this.props.update_pledge_tab();
+                    })
+                }, (error: AxiosError) => {
+                    console.error(error)
+                })
+            console.log(this.state.pledge_faction);
+        }
     }
 
     buildColumns() {
@@ -120,6 +137,14 @@ export default class CharacterFactions extends React.Component<any, any> {
                                 This tab does not update in real time. You can switch tabs to get the latest data. You can learn more about <a href='/information/factions' target='_blank'>Factions <i
                                 className="fas fa-external-link-alt"></i></a> in the help docs. Players who reach the max level (5) of a faction can then <a href='/information/faction-loyalty' target='_blank'>Pledge their loyalty</a>.
                             </InfoAlert>
+                            : null
+                    }
+
+                    {
+                        this.state.success_message !== null ?
+                            <SuccessAlert additional_css={'mb-4'}>
+                                {this.state.success_message}
+                            </SuccessAlert>
                             : null
                     }
                     <div className={'max-w-[290px] sm:max-w-[100%] overflow-x-hidden'}>

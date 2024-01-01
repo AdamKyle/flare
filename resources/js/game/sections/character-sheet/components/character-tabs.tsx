@@ -40,7 +40,7 @@ export default class CharacterTabs extends React.Component<CharacterTabsProps, a
                         <CharacterActiveBoons character_id={this.props.character?.id} finished_loading={this.props.finished_loading} />
                     </TabPanel>
                     <TabPanel key={'factions'}>
-                        <CharacterFactions character_id={this.props.character?.id} finished_loading={this.props.finished_loading}/>
+                        <CharacterFactions update_pledge_tab={this.props.update_pledge_tab} character_id={this.props.character?.id} finished_loading={this.props.finished_loading}/>
                     </TabPanel>
                     <TabPanel key={'mercenaries'}>
                         <CharacterMercenaries character={this.props.character} />

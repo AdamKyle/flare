@@ -9,4 +9,6 @@ export default interface CharacterSheetProps {
     view_port?: number;
 
     update_disable_tabs?: () => void;
+
+    update_pledge_tab?: (canSee: boolean) => void;
 }
