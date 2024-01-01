@@ -14,30 +14,58 @@ use App\Game\Core\Traits\HandleCharacterLevelUp;
 use App\Game\Factions\FactionLoyalty\Concerns\FactionLoyalty;
 use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
 use App\Game\Messages\Events\ServerMessageEvent;
+use Exception;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 
 class UpdateCraftingTasksForFactionLoyalty {
 
     use HandleCharacterLevelUp, FactionLoyalty;
 
+    /**
+     * @var RandomAffixGenerator $randomAffixGenerator
+     */
     private RandomAffixGenerator $randomAffixGenerator;
 
+    /**
+     * @var FactionLoyaltyService $factionLoyaltyService
+     */
     private FactionLoyaltyService $factionLoyaltyService;
 
+    /**
+     * @var bool $handedOverItem
+     */
     private bool $handedOverItem = false;
 
+    /**
+     * @param RandomAffixGenerator $randomAffixGenerator
+     * @param FactionLoyaltyService $factionLoyaltyService
+     */
     public function __construct(RandomAffixGenerator $randomAffixGenerator, FactionLoyaltyService $factionLoyaltyService) {
         $this->randomAffixGenerator  = $randomAffixGenerator;
         $this->factionLoyaltyService = $factionLoyaltyService;
     }
 
+    /**
+     * Have we handed over the item?
+     *
+     * In reality: Have we updated the fame task for the npc?
+     *
+     * @return bool
+     */
     public function handedOverItem(): bool {
         return $this->handedOverItem;
     }
 
+    /**
+     * Handle when we craft for a npc.
+     *
+     * @param Character $character
+     * @param Item $item
+     * @return Character
+     */
     public function handleCraftingTask(Character $character, Item $item): Character {
 
-        $faction = Faction::where('game_map_id', $character->map->game_map_id)->first();
+        $faction = $character->factions->where('game_map_id', $character->map->game_map_id)->first();
 
         if (is_null($faction)) {
             return $character;
@@ -70,6 +98,13 @@ class UpdateCraftingTasksForFactionLoyalty {
         return $character->refresh();
     }
 
+    /**
+     * Handle when the fame levels up.
+     *
+     * @param Character $character
+     * @param FactionLoyaltyNpc $helpingNpc
+     * @return void
+     */
     protected function handleFameLevelUp(Character $character, FactionLoyaltyNpc $helpingNpc): void {
 
         $this->handOutXp($character, $helpingNpc);
@@ -97,6 +132,13 @@ class UpdateCraftingTasksForFactionLoyalty {
         }
     }
 
+    /**
+     * Handle currencies.
+     *
+     * @param Character $character
+     * @param FactionLoyaltyNpc $factionLoyaltyNpc
+     * @return void
+     */
     protected function handOutCurrencies(Character $character, FactionLoyaltyNpc $factionLoyaltyNpc): void {
         $newGold     = (($factionLoyaltyNpc->current_level <= 0 ? 1 : $factionLoyaltyNpc->current_level) * 1000000) + $character->gold;
         $newGoldDust = (($factionLoyaltyNpc->current_level <= 0 ? 1 : $factionLoyaltyNpc->current_level) * 1000) + $character->gold_dust;
@@ -125,6 +167,13 @@ class UpdateCraftingTasksForFactionLoyalty {
         ServerMessageHandler::sendBasicMessage($character->user, 'Your fame with: ' . $factionLoyaltyNpc->npc->real_name . ' on Plane: ' . $factionLoyaltyNpc->npc->gameMap->name);
     }
 
+    /**
+     * handout XP
+     *
+     * @param Character $character
+     * @param FactionLoyaltyNpc $factionLoyaltyNpc
+     * @return void
+     */
     protected function handOutXp(Character $character, FactionLoyaltyNpc $factionLoyaltyNpc): void {
         $character->update([
             'xp' => $character->xp + $factionLoyaltyNpc->current_level * 1000
@@ -137,6 +186,13 @@ class UpdateCraftingTasksForFactionLoyalty {
         ServerMessageHandler::sendBasicMessage($character->user, 'Rewarded with: ' . number_format($factionLoyaltyNpc->current_level * 1000) . ' XP.');
     }
 
+    /**
+     * Reward with a unique item.
+     *
+     * @param Character $character
+     * @return void
+     * @throws Exception
+     */
     protected function rewardTheUniqueItem(Character $character) {
         $item = Item::whereNull('specialty_type')
             ->whereNull('item_prefix_id')
@@ -164,6 +220,12 @@ class UpdateCraftingTasksForFactionLoyalty {
         event(new ServerMessageEvent($character->user, 'You found something of MEDIUM value child. A simple reward: ' . $item->affix_name, $slot->id));
     }
 
+    /**
+     * Can we level the fame of the npc we are helping, up?
+     *
+     * @param FactionLoyaltyNpc $factionLoyaltyNpc
+     * @return bool
+     */
     protected function canLevelUpFame(FactionLoyaltyNpc $factionLoyaltyNpc): bool {
         if ($factionLoyaltyNpc->current_level >= $factionLoyaltyNpc->max_level) {
             return false;

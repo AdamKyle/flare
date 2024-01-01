@@ -82,4 +82,37 @@ trait FactionLoyalty {
 
         return $helpingNpc->refresh();
     }
+
+    /**
+     * Should we show the npc craft button?
+     *
+     * @param Character $character
+     * @param string $craftingType
+     * @return bool
+     */
+    public function showCraftForNpcButton(Character $character, string $craftingType): bool {
+        $pledgedFaction = $character->factionLoyalties()->where('is_pledged', true)->first();
+
+        if (is_null($pledgedFaction)) {
+            return false;
+        }
+
+        $helpingNpc = $pledgedFaction->factionLoyaltyNpcs()->where('currently_helping', true)->first();
+
+        if (is_null($helpingNpc)) {
+            return false;
+        }
+
+        if (empty($helpingNpc->fame_tasks)) {
+            return false;
+        }
+
+        return collect($helpingNpc->fame_tasks)->filter(function($task) use($craftingType) {
+            if (!isset($task['type'])) {
+                return collect();
+            }
+
+            return $task['type'] === $craftingType;
+        })->isNotEmpty();
+    }
 }
