@@ -24,15 +24,11 @@ export default class PledgeLoyalty extends React.Component<any, any> {
                         <strong>Would you like to pledge your loyalty to Surface?</strong>
                     </p>
                     <p className='mb-4'>
-                       Pledging to a Faction allows a player to complete tasks to gain fame with the NPs
+                       Pledging to a Faction allows a player to complete tasks to gain fame with the NPcs
                        of that plane. As Players complete tasks they will be rewarded with Currencies, <a href='/information/random-enchants' target='_blank'>Medium Unique Items <i
-                        className="fas fa-external-link-alt"></i></a>
-                       and XP.
+                        className="fas fa-external-link-alt"></i></a> and XP.
                     </p>
-                    <p className='mb-4'>
-                        A bonus to completing Fame tasks for NPC's is that your kingdoms on that plane will gain a % of defence based on how
-                        many NPC's you have helped and their Fame Level.
-                    </p>
+                    <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
                     <p className='mb-4'>
                         Upon pledging, players will see a new tab on the Game tab named "Faction Loyalty".
                         This tab will show you all the requirements for each NPC of that plane. There are two types of tasks: Bounties
