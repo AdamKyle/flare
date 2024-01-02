@@ -224,4 +224,6 @@ export interface CharacterType {
     elemental_atonement: any;
 
     can_see_pledge_tab: boolean;
+
+    pledged_to_faction_id: number | null
 }

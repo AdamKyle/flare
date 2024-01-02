@@ -28,6 +28,7 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer {
     public function transform(Character $character): array {
         $characterStatBuilder         = resolve(CharacterStatBuilder::class)->setCharacter($character, $this->ignoreReductions);
         $gameClass                    = GameClass::find($character->game_class_id);
+        $factionLoyalty               = $character->factionLoyalties()->where('is_pledged', '=', true)->first();
 
         return [
             'id'                          => $character->id,
@@ -84,7 +85,8 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer {
             'can_access_hell_forged'      => false,
             'can_access_purgatory_chains' => false,
             'is_in_timeout'               => !is_null($character->user->timeout_until),
-            'can_see_pledge_tab'          => $character->factionLoyalties()->where('is_pledged', '=', true)->exists(),
+            'can_see_pledge_tab'          => !is_null($factionLoyalty),
+            'pledged_to_faction_id'       => !is_null($factionLoyalty) ? $factionLoyalty->faction_id : null,
         ];
     }
 

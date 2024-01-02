@@ -32,21 +32,12 @@ class FactionLoyaltyService {
      * @return array
      */
     public function getLoyaltyInfoForPlane(Character $character): array {
-        $gameMap = $character->map->gameMap;
-
-        $npcNames = Npc::where('game_map_id', $gameMap->id)->get()->map(function($npc) {
-            return [
-                'id'   => $npc->id,
-                'name' => $npc->real_name
-            ];
-        });
-
         $factionLoyalties = $character->factionLoyalties;
 
         $factionLoyalty   = [];
 
         if ($factionLoyalties->isNotEmpty()) {
-            $factionLoyalty = $factionLoyalties->where('faction.game_map_id', '=', $character->map->game_map_id)->first();
+            $factionLoyalty = $factionLoyalties->where('is_pledged', true)->first();
         }
 
         if (empty($factionLoyalty)) {
@@ -55,6 +46,13 @@ class FactionLoyaltyService {
 
         $assistingNpc = $factionLoyalty->factionLoyaltyNpcs->where('currently_helping', '=', true)->first();
 
+        $npcNames = $factionLoyalty->factionLoyaltyNpcs->map(function($factionNpc) {
+            return [
+                'id' => $factionNpc->npc_id,
+                'name' => $factionNpc->npc->real_name,
+            ];
+        })->toArray();
+
         if (is_null($assistingNpc)) {
             $assistingNpc = $factionLoyalty->factionLoyaltyNpcs->where('npc_id', '=', $npcNames[0]['id'])->first();
         }
@@ -62,7 +60,7 @@ class FactionLoyaltyService {
         return $this->successResult([
             'npcs'            => $npcNames,
             'faction_loyalty' => $assistingNpc,
-            'map_name'        => $gameMap->name,
+            'map_name'        => $factionLoyalty->faction->gameMap->name,
         ]);
     }
 
@@ -133,7 +131,7 @@ class FactionLoyaltyService {
                 'is_pledged'   => true,
             ]);
 
-            $this->createNpcsForLoyalty($character, $factionLoyalty);
+            $this->createNpcsForLoyalty($factionLoyalty);
         }
 
         return $this->successResult([
@@ -178,12 +176,11 @@ class FactionLoyaltyService {
     /**
      * Create NPC For Loyalty.
      *
-     * @param Character $character
      * @param FactionLoyalty $factionLoyalty
      * @return void
      */
-    protected function createNpcsForLoyalty(Character $character, FactionLoyalty $factionLoyalty) {
-        $npcs = Npc::where('game_map_id', $character->map->game_map_id)->get();
+    protected function createNpcsForLoyalty(FactionLoyalty $factionLoyalty) {
+        $npcs = Npc::where('game_map_id', $factionLoyalty->faction->game_map_id)->get();
 
         $totalNpcFame = (1 / $npcs->count()) / 25;
 

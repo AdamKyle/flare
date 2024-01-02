@@ -140,7 +140,7 @@ class FactionLoyaltyBountyHandler {
 
     protected function handOutXp(Character $character, FactionLoyaltyNpc $factionLoyaltyNpc): void {
         $character->update([
-            'xp' => $character->xp + $factionLoyaltyNpc->current_level * 1000
+            'xp' => $character->xp + ($factionLoyaltyNpc->current_level > 0 ? $factionLoyaltyNpc->current_level : 1) * 1000
         ]);
 
         $character = $character->refresh();

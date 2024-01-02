@@ -9,6 +9,7 @@ import LoadingProgressBar from "../../../components/ui/progress-bars/loading-pro
 import PrimaryButton from "../../../components/ui/buttons/primary-button";
 import PledgeLoyalty from "../../faction-loyalty/modals/pledge-loyalty";
 import SuccessAlert from "../../../components/ui/alerts/simple-alerts/success-alert";
+import DangerButton from "../../../components/ui/buttons/danger-button";
 
 export default class CharacterFactions extends React.Component<any, any> {
 
@@ -21,6 +22,7 @@ export default class CharacterFactions extends React.Component<any, any> {
             dark_tables: false,
             pledge_faction: null,
             success_message: null,
+            pledging: false,
         }
     }
 
@@ -42,19 +44,26 @@ export default class CharacterFactions extends React.Component<any, any> {
     handlePledge() {
 
         if (this.props.update_pledge_tab) {
-            (new Ajax()).setRoute('faction-loyalty/pledge/'+this.props.character_id+'/' + this.state.pledge_faction.id)
-                .doAjaxCall('post', (result: AxiosResponse) => {
-                    this.closePledge();
+            this.setState({
+                pledging: true,
+            }, () => {
+                (new Ajax()).setRoute('faction-loyalty/pledge/'+this.props.character_id+'/' + this.state.pledge_faction.id)
+                    .doAjaxCall('post', (result: AxiosResponse) => {
+                        this.closePledge();
 
-                    this.setState({
-                        success_message: result.data.message,
-                    }, () => {
-                        this.props.update_pledge_tab();
+                        this.setState({
+                            success_message: result.data.message,
+                            pledging: false,
+                        }, () => {
+                            this.props.update_pledge_tab();
+                        })
+                    }, (error: AxiosError) => {
+                        this.setState({
+                            pledging: false
+                        })
+                        console.error(error)
                     })
-                }, (error: AxiosError) => {
-                    console.error(error)
-                })
-            console.log(this.state.pledge_faction);
+            })
         }
     }
 
@@ -102,7 +111,12 @@ export default class CharacterFactions extends React.Component<any, any> {
                 sortable: true,
                 cell: (row: any) => <span
                     key={row.id + '-' + (Math.random() + 1).toString(36).substring(7)}>
-                    <PrimaryButton button_label={'Pledge Loyalty'} on_click={() => { this.pledgeLoyalty(row) }} disabled={!row.maxed}/>
+                    {
+                        this.props.is_pledged && this.props.pledged_faction_id === row.id ?
+                            <DangerButton button_label={'Un-pledge'} on_click={() => {}} />
+                        :
+                            <PrimaryButton button_label={'Pledge Loyalty'} on_click={() => { this.pledgeLoyalty(row) }} disabled={!row.maxed}/>
+                    }
                 </span>
             },
         ];
@@ -159,6 +173,7 @@ export default class CharacterFactions extends React.Component<any, any> {
                             manage_modal={this.closePledge.bind(this)}
                             faction={this.state.pledge_faction}
                             handle_pledge={this.handlePledge.bind(this)}
+                            pledging={this.state.pledging}
                         />
                     : null
                 }
