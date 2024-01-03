@@ -9,6 +9,14 @@ export interface NPC {
     y_position: number,
 }
 
+export interface  FactionLoyalty {
+    id: number;
+    character_id: number;
+    faction_id: number;
+    is_pledged: boolean;
+    faction_loyalty_npcs: FactionLoyaltyNpc[];
+}
+
 export interface FactionLoyaltyNpc {
     id:  number;
     faction_loyalty_id: number;

@@ -44,8 +44,6 @@ class FactionLoyaltyService {
             return $this->errorResult('You have not pledged to a faction.');
         }
 
-        $assistingNpc = $factionLoyalty->factionLoyaltyNpcs->where('currently_helping', '=', true)->first();
-
         $npcNames = $factionLoyalty->factionLoyaltyNpcs->map(function($factionNpc) {
             return [
                 'id' => $factionNpc->npc_id,
@@ -53,13 +51,9 @@ class FactionLoyaltyService {
             ];
         })->toArray();
 
-        if (is_null($assistingNpc)) {
-            $assistingNpc = $factionLoyalty->factionLoyaltyNpcs->where('npc_id', '=', $npcNames[0]['id'])->first();
-        }
-
         return $this->successResult([
             'npcs'            => $npcNames,
-            'faction_loyalty' => $assistingNpc,
+            'faction_loyalty' => $factionLoyalty,
             'map_name'        => $factionLoyalty->faction->gameMap->name,
         ]);
     }
@@ -94,6 +88,71 @@ class FactionLoyaltyService {
     }
 
     /**
+     * Assist a Npc.
+     *
+     * @param Character $character
+     * @param FactionLoyaltyNpc $factionLoyaltyNpc
+     * @return array
+     */
+    public function assistNpc(Character $character, FactionLoyaltyNpc $factionLoyaltyNpc): array {
+        if ($factionLoyaltyNpc->factionLoyalty->character_id !== $character->id) {
+            return $this->errorResult('Nope. Not allowed.');
+        }
+
+        $foundLoyalty = $character->factionLoyalties()
+            ->whereHas('factionLoyaltyNpcs', function ($query) use ($factionLoyaltyNpc) {
+                $query->where('id', $factionLoyaltyNpc->id);
+            })
+            ->first();
+
+
+        if (is_null($foundLoyalty)) {
+            return $this->errorResult('No matching loyalty found for this selected npc.');
+        }
+
+        $foundLoyalty->factionLoyaltyNpcs()->update(['currently_helping' => false]);
+
+        $factionLoyaltyNpc->update([
+            'currently_helping' => true,
+        ]);
+
+        $factionLoyaltyNpc = $factionLoyaltyNpc->refresh();
+
+        $result = $this->getLoyaltyInfoForPlane($character->refresh());
+
+        return $this->successResult([
+            'message' => 'You are now assisting ' . $factionLoyaltyNpc->npc->real_name . ' with their tasks!',
+            'faction_loyalty' => $result['faction_loyalty'],
+        ]);
+    }
+
+    public function stopAssistingNpc(Character $character, FactionLoyaltyNpc $factionLoyaltyNpc): array {
+        if ($factionLoyaltyNpc->factionLoyalty->character_id !== $character->id) {
+            return $this->errorResult('Nope. Not allowed.');
+        }
+
+        $foundLoyalty = $character->factionLoyalties()
+            ->whereHas('factionLoyaltyNpcs', function ($query) use ($factionLoyaltyNpc) {
+                $query->where('id', $factionLoyaltyNpc->id);
+            })
+            ->first();
+
+
+        if (is_null($foundLoyalty)) {
+            return $this->errorResult('No matching loyalty found for this selected npc.');
+        }
+
+        $foundLoyalty->factionLoyaltyNpcs()->update(['currently_helping' => false]);
+
+        $result = $this->getLoyaltyInfoForPlane($character->refresh());
+
+        return $this->successResult([
+            'message' => 'You stopped assisting ' . $factionLoyaltyNpc->npc->real_name . ' with their tasks. They are sad but understand.',
+            'faction_loyalty' => $result['faction_loyalty'],
+        ]);
+    }
+
+    /**
      * Pledge to a plain and create the approproate tasks and npc mappings.
      *
      * @param Character $character
@@ -117,6 +176,8 @@ class FactionLoyaltyService {
                 'is_pledged' => false,
             ]);
 
+            $character = $character->refresh();
+
             $factionLoyalty = $factionLoyalty->refresh();
 
             $factionLoyalty->update([
@@ -125,6 +186,12 @@ class FactionLoyaltyService {
 
             $factionLoyalty = $factionLoyalty->refresh();
         } else {
+            $character->factionLoyalties()->update([
+                'is_pledged' => false,
+            ]);
+
+            $character = $character->refresh();
+
             $factionLoyalty = FactionLoyalty::create([
                 'character_id' => $character->id,
                 'faction_id'   => $faction->id,

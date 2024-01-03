@@ -1,5 +1,4 @@
 import React from "react";
-import OrangeProgressBar from "../../components/ui/progress-bars/orange-progress-bar";
 import DropDown from "../../components/ui/drop-down/drop-down";
 import LoadingProgressBar from "../../components/ui/progress-bars/loading-progress-bar";
 import Ajax from "../../lib/ajax/ajax";
@@ -8,8 +7,11 @@ import FactionLoyaltyState, {FactionLoyaltyNpcListItem} from "./types/faction-lo
 import FactionLoyaltyProps from "./types/faction-loyalty-props";
 import DangerAlert from "../../components/ui/alerts/simple-alerts/danger-alert";
 import PrimaryOutlineButton from "../../components/ui/buttons/primary-outline-button";
-import {formatNumber} from "../../lib/game/format-number";
-import {FameTasks} from "./deffinitions/faction-loaylaty-npc";
+import {FactionLoyalty, FactionLoyaltyNpc, FameTasks} from "./deffinitions/faction-loaylaty";
+import FactionNpcSection from "./faction-npc-section";
+import FactionNpcTasks from "./faction-npc-tasks";
+import SuccessAlert from "../../components/ui/alerts/simple-alerts/success-alert";
+import DangerOutlineButton from "../../components/ui/buttons/danger-outline-button";
 
 export default class FactionFame extends React.Component<FactionLoyaltyProps, FactionLoyaltyState> {
 
@@ -18,11 +20,14 @@ export default class FactionFame extends React.Component<FactionLoyaltyProps, Fa
 
         this.state = {
             is_loading: true,
+            is_processing: false,
             selected_npc: null,
             error_message: null,
+            success_message: null,
             npcs: [],
             game_map_name: null,
-            faction_loyalty_npc: null,
+            faction_loyalty: null,
+            selected_faction_loyalty_npc: null,
         }
     }
 
@@ -31,9 +36,10 @@ export default class FactionFame extends React.Component<FactionLoyaltyProps, Fa
             this.setState({
                 is_loading: false,
                 npcs: result.data.npcs,
-                selected_npc: result.data.npcs[0],
                 game_map_name: result.data.map_name,
-                faction_loyalty_npc: result.data.faction_loyalty,
+                faction_loyalty: result.data.faction_loyalty,
+            }, () => {
+                this.setInitialSelectedFactionInfo(result.data.faction_loyalty, result.data.npcs);
             })
         }, (error: AxiosError) => {
             this.setState({is_loading: false});
@@ -44,6 +50,70 @@ export default class FactionFame extends React.Component<FactionLoyaltyProps, Fa
                 });
             }
         });
+    }
+
+    manageAssistingNpc(isHelping: boolean) {
+
+        if (!this.state.selected_faction_loyalty_npc) {
+            return;
+        }
+
+        this.setState({
+            error_message: null,
+            is_processing: true,
+        }, () => {
+
+            if (!this.state.selected_faction_loyalty_npc) {
+                this.setState({
+                    error_message: null,
+                    is_processing: false,
+                });
+
+                return;
+            }
+
+            (new Ajax()).setRoute('faction-loyalty/' + (isHelping ? 'stop-assisting' : 'assist') + '/'+ this.props.character_id +'/' + this.state.selected_faction_loyalty_npc.id).doAjaxCall('post', (result: AxiosResponse) => {
+
+                this.setState({
+                    is_processing: false,
+                    success_message: result.data.message,
+                    faction_loyalty: result.data.faction_loyalty,
+                }, () => {
+                    console.log(result.data.faction_loyalty);
+                    this.setInitialSelectedFactionInfo(result.data.faction_loyalty, this.state.npcs);
+                });
+            });
+        });
+    }
+
+    setInitialSelectedFactionInfo(factionLoyalty: FactionLoyalty, npcs: FactionLoyaltyNpcListItem[]) {
+        let helpingNpc = factionLoyalty.faction_loyalty_npcs.filter((factionLoyaltyNpc: FactionLoyaltyNpc) => {
+            return factionLoyaltyNpc.currently_helping
+        });
+
+        if (helpingNpc.length === 0) {
+            helpingNpc = factionLoyalty.faction_loyalty_npcs.filter((factionLoyaltyNpc: FactionLoyaltyNpc) => {
+                return factionLoyaltyNpc.npc_id === npcs[0].id;
+            });
+
+            this.setState({
+                selected_npc: npcs[0],
+                selected_faction_loyalty_npc: helpingNpc[0],
+            });
+
+            return;
+        }
+
+        const factionLoyaltyNpcHelping = helpingNpc[0];
+
+        this.setState({
+            selected_npc: npcs.filter((npc: FactionLoyaltyNpcListItem) => {
+                return npc.id === factionLoyaltyNpcHelping.npc_id
+            })[0],
+            selected_faction_loyalty_npc: factionLoyaltyNpcHelping,
+        });
+
+        return helpingNpc[0];
     }
 
     buildNpcList(handler: (npc: any) => void) {
@@ -57,36 +127,50 @@ export default class FactionFame extends React.Component<FactionLoyaltyProps, Fa
     }
 
     selectedNpc(): string | undefined {
+        console.log(this.state.npcs, this.state.selected_npc?.name);
         return this.state.npcs?.find((npc: FactionLoyaltyNpcListItem) => {
              return npc.name === this.state.selected_npc?.name
         })?.name;
     }
 
     switchToNpc(npc: FactionLoyaltyNpcListItem) {
+
+        if (!this.state.faction_loyalty) {
+            return;
+        }
+
         this.setState({
             selected_npc: npc,
+            selected_faction_loyalty_npc: this.state.faction_loyalty.faction_loyalty_npcs.filter((factionLoyaltyNpc: FactionLoyaltyNpc) => {
+                return factionLoyaltyNpc.npc_id === npc.id;
+            })[0]
         });
     }
 
-    renderTasks(fameTasks: FameTasks[], bounties: boolean) {
-        return fameTasks.filter((fameTask: FameTasks) => {
-            return bounties ? fameTask.type === 'bounty' : fameTask.type !== 'bounty';
-        }).map((fameTask: FameTasks) => {
-            return <>
-                <dt>{bounties ? fameTask.monster_name : fameTask.item_name}</dt>
-                <dd>{fameTask.current_amount} / {fameTask.required_amount}</dd>
-            </>
-        })
+    isAssisting(): boolean {
+        if (!this.state.selected_faction_loyalty_npc) {
+            return false;
+        }
+
+        return this.state.selected_faction_loyalty_npc.currently_helping;
     }
 
     render() {
 
-        if (this.state.is_loading || this.state.faction_loyalty_npc === null) {
+        if (this.state.is_loading || this.state.faction_loyalty === null) {
             return (
                 <div className='w-1/2 m-auto'>
                     <LoadingProgressBar />
                 </div>
             );
+        }
+
+        if (!this.state.selected_faction_loyalty_npc) {
+
+            return <DangerAlert additional_css={'my-4'}>
+                Uh oh. We encountered an error here. Seems there is no Faction Loyalty info for this NPC. Not sure how that
+                happened, but I would tell The Creator to investigate how the Faction Loyalty info is fetched for an NPC.
+            </DangerAlert>
         }
 
         if (this.state.error_message !== null) {
@@ -114,10 +198,26 @@ export default class FactionFame extends React.Component<FactionLoyaltyProps, Fa
                         className="fas fa-external-link-alt"></i>
                     </a>
                 </p>
+                <div className='my-4'>
+                    {
+                        this.state.success_message ?
+                            <SuccessAlert>
+                                {this.state.success_message}
+                            </SuccessAlert>
+                        : null
+                    }
+                </div>
+                <div className='my-4'>
+                    {
+                        this.state.is_processing ?
+                            <LoadingProgressBar />
+                        : null
+                    }
+                </div>
                 <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
                 <div className="my-4 flex flex-wrap md:flex-nowrap gap-2">
                     <div className='flex-none mt-[-25px] md:w-1/2'>
-                        <div className='w-full md:w-2/3 relative left-0 flex flex-wrap'>
+                        <div className='w-full relative left-0 flex flex-wrap'>
                             <div>
                                 <DropDown
                                     menu_items={this.buildNpcList(
@@ -128,64 +228,22 @@ export default class FactionFame extends React.Component<FactionLoyaltyProps, Fa
                                 />
                             </div>
                             <div>
-                                <PrimaryOutlineButton button_label={'Assist'} on_click={() => {}} additional_css={'mt-[34px] ml-4'}/>
+                                {
+                                    this.isAssisting() ?
+                                        <DangerOutlineButton button_label={'Stop Assisting'} on_click={() => this.manageAssistingNpc(true)} additional_css={'mt-[34px] ml-4'} />
+                                    :
+                                        <PrimaryOutlineButton button_label={'Assist'} on_click={() => this.manageAssistingNpc(false)} additional_css={'mt-[34px] ml-4'}/>
+                                }
                             </div>
                             <div>
                                 <div className='mt-[38px] ml-4 font-bold'><span>{this.selectedNpc()}</span></div>
                             </div>
                         </div>
 
-                        <h4>Rewards (when fame levels up)</h4>
-                        <dl className='my-2'>
-                            <dt>XP</dt>
-                            <dd>{formatNumber(this.state.faction_loyalty_npc.current_level > 0 ? this.state.faction_loyalty_npc.current_level * 1000 : 1000)}</dd>
-                            <dt>Gold</dt>
-                            <dd>{formatNumber(this.state.faction_loyalty_npc.current_level > 0 ? this.state.faction_loyalty_npc.current_level * 1000000 : 1000000)}</dd>
-                            <dt>Gold Dust</dt>
-                            <dd>
-                                {formatNumber(this.state.faction_loyalty_npc.current_level > 0 ? this.state.faction_loyalty_npc.current_level * 1000 : 1000)}
-                            </dd>
-                            <dt>Shards</dt>
-                            <dd>
-                                {formatNumber(this.state.faction_loyalty_npc.current_level > 0 ? this.state.faction_loyalty_npc.current_level * 1000 : 1000)}
-                            </dd>
-                            <dt>Item Reward</dt>
-                            <dd><a href='/information/random-enchants' target='_blank'>Medium Unique Item <i
-                                className="fas fa-external-link-alt"></i></a></dd>
-                        </dl>
-
-                        <h4>Kingdom Item Defence Bonus</h4>
-                        <p className='my-4'>
-                            Slowly accumulates as you level this NPC's fame.
-                        </p>
-                        <dl>
-                            <dt>Defence Bonus per level</dt>
-                            <dd>{this.state.faction_loyalty_npc.kingdom_item_defence_bonus}%</dd>
-                            <dt>Current Defence Bonus</dt>
-                            <dd>{this.state.faction_loyalty_npc.current_kingdom_item_defence_bonus}%</dd>
-                        </dl>
+                        <FactionNpcSection faction_loyalty_npc={this.state.selected_faction_loyalty_npc} />
                     </div>
                     <div className='flex-none md:flex-auto w-full md:w-1/2'>
-                        <div>
-                            <OrangeProgressBar primary_label={'NPC Name Fame Lv: 1'} secondary_label={this.state.faction_loyalty_npc.current_fame + '/' + this.state.faction_loyalty_npc.next_level_fame + ' Fame'} percentage_filled={(this.state.faction_loyalty_npc.current_fame / this.state.faction_loyalty_npc.next_level_fame) * 100} push_down={false}/>
-                        </div>
-                        <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
-                        <div>
-                            <div>
-                                <h3 className='my-2'> Bounties </h3>
-                                <dl>
-                                    {this.renderTasks(this.state.faction_loyalty_npc.faction_loyalty_npc_tasks.fame_tasks, true)}
-                                </dl>
-                            </div>
-                            <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
-                            <div>
-                                <h3 className='my-2'> Crafting </h3>
-                                <dl>
-                                    {this.renderTasks(this.state.faction_loyalty_npc.faction_loyalty_npc_tasks.fame_tasks, false)}
-                                </dl>
-                            </div>
-                        </div>
-                        <p className='my-4'>Bounties must be completed on the respective plane and manually. Automation will not work for this.</p>
+                        <FactionNpcTasks faction_loyalty_npc={this.state.selected_faction_loyalty_npc} />
                     </div>
                 </div>
             </div>
