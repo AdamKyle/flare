@@ -219,7 +219,7 @@ class UpdateCraftingTasksForFactionLoyaltyTest extends TestCase {
 
         $character = $this->updateCraftingTasksForFactionLoyalty->handleCraftingTask($character, $item);
 
-        Event::assertNotDispatched(ServerMessageEvent::class);
+        Event::assertDispatched(ServerMessageEvent::class);
         Event::assertNotDispatched(UpdateTopBarEvent::class);
 
         $this->assertEquals(1, $character->factionLoyalties->first()
@@ -313,7 +313,7 @@ class UpdateCraftingTasksForFactionLoyaltyTest extends TestCase {
         $this->assertEquals(100, $character->shards);
     }
 
-    public function testDoNotGiveMoreCurrenciesThenMaxAllowed() {
+    public function testDoNotGiveMoreCurrenciesThenMaxAllowedForCraftingTasks() {
         $item = $this->createItem();
 
         $character = (new CharacterFactory())->createBaseCharacter()
@@ -380,14 +380,16 @@ class UpdateCraftingTasksForFactionLoyaltyTest extends TestCase {
             'faction_loyalty_npc_id'     => $factionLoyaltyNpc->id,
             'fame_tasks'                 => [[
                 'type'            => $item->crafting_type,
-                'monster_name'    => $item->name,
-                'monster_id'      => $item->id,
+                'item_name'    => $item->name,
+                'item_id'      => $item->id,
                 'required_amount' => rand(10, 50),
                 'current_amount'  => 200000,
             ]],
         ]);
 
-        $character = $this->updateCraftingTasksForFactionLoyalty->handleCraftingTask($character->refresh(), $item);
+        $character = $character->refresh();
+
+        $character = $this->updateCraftingTasksForFactionLoyalty->handleCraftingTask($character, $item);
 
         Event::assertDispatched(ServerMessageEvent::class);
         Event::assertDispatched(UpdateTopBarEvent::class);
@@ -463,8 +465,8 @@ class UpdateCraftingTasksForFactionLoyaltyTest extends TestCase {
             'faction_loyalty_npc_id'     => $factionLoyaltyNpc->id,
             'fame_tasks'                 => [[
                 'type'            => $item->crafting_type,
-                'monster_name'    => $item->name,
-                'monster_id'      => $item->id,
+                'item_name'       => $item->name,
+                'item_id'         => $item->id,
                 'required_amount' => rand(10, 50),
                 'current_amount'  => 200000,
             ]],

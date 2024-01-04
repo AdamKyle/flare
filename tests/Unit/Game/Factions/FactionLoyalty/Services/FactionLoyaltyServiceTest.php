@@ -98,6 +98,7 @@ class FactionLoyaltyServiceTest extends TestCase {
         $factionLoyalty = $this->createFactionLoyalty([
             'faction_id'   => $this->character->factions->first()->id,
             'character_id' => $this->character->id,
+            'is_pledged'   => true,
         ]);
 
         $factionNpc = $this->createFactionLoyaltyNpc([
@@ -137,7 +138,7 @@ class FactionLoyaltyServiceTest extends TestCase {
         $result = $this->factionLoyaltyService->getLoyaltyInfoForPlane($character);
 
         $this->assertCount(2, $result['npcs']);
-        $this->assertEquals($secondNpc->id, $result['faction_loyalty']->npc_id);
+        $this->assertEquals($secondNpc->id, $result['faction_loyalty']->factionLoyaltyNpcs->where('currently_helping', true)->first()->npc_id);
         $this->assertEquals($this->character->map->gameMap->name, $result['map_name']);
     }
 

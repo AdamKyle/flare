@@ -9,7 +9,7 @@ export default class SuccessAlert extends React.Component<AlertProps, any> {
 
     render() {
         return  (
-            <div className={'border-l-2 border-l-green-500 px-4 pl-[10px] ' + this.props.additional_css}>
+            <div className={'border-l-2 border-l-green-500 bg-greed-50 dark:bg-green-600/[.15] p-4 pl-[10px] ' + this.props.additional_css}>
                 <div className="flex justify-between"
                 >
                     <span className="self-center">{this.props.children}</span>

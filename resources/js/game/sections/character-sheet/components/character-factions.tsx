@@ -10,6 +10,8 @@ import PrimaryButton from "../../../components/ui/buttons/primary-button";
 import PledgeLoyalty from "../../faction-loyalty/modals/pledge-loyalty";
 import SuccessAlert from "../../../components/ui/alerts/simple-alerts/success-alert";
 import DangerButton from "../../../components/ui/buttons/danger-button";
+import DangerAlert from "../../../components/ui/alerts/simple-alerts/danger-alert";
+import WarningAlert from "../../../components/ui/alerts/simple-alerts/warning-alert";
 
 export default class CharacterFactions extends React.Component<any, any> {
 
@@ -160,7 +162,7 @@ export default class CharacterFactions extends React.Component<any, any> {
                                 This tab does not update in real time. You can switch tabs to get the latest data. You can learn more about <a href='/information/factions' target='_blank'>Factions <i
                                 className="fas fa-external-link-alt"></i></a> in the help docs. Players who reach the max level (5) of a faction can then <a href='/information/faction-loyalty' target='_blank'>Pledge their loyalty</a>.
                             </InfoAlert>
-                            : null
+                        : null
                     }
 
                     {
