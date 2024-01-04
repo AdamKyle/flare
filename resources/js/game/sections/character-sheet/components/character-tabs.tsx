@@ -45,6 +45,7 @@ export default class CharacterTabs extends React.Component<CharacterTabsProps, a
                                            finished_loading={this.props.finished_loading}
                                            is_pledged={this.props.character?.can_see_pledge_tab}
                                            pledged_faction_id={this.props.character?.pledged_to_faction_id}
+                                           update_faction_action_tasks={this.props.update_faction_action_tasks}
 
                         />
                     </TabPanel>

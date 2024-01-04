@@ -8,6 +8,7 @@ import KingdomLogDetails from "../kingdoms/kingdom-log-details";
 import MonsterType from "./actions/monster/monster-type";
 import MapState from "../../../sections/map/types/map-state";
 import RaidMonsterType from "./actions/monster/raid-monster-type";
+import {FameTasks} from "../../../sections/faction-loyalty/deffinitions/faction-loaylaty";
 
 export type GameActionState = {
     monsters: MonsterType[];
@@ -60,4 +61,6 @@ export default interface GameState {
     action_data: GameActionState | null;
 
     map_data: MapState | null;
+
+    fame_action_tasks: FameTasks[] | null;
 }

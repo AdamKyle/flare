@@ -480,6 +480,7 @@ export default class Actions extends React.Component<
                                         character_id={this.props.character.id}
                                         user_id={this.props.character.user_id}
                                         cannot_craft={this.actionsManager.cannotCraft()}
+                                        fame_tasks={this.props.fame_tasks}
                                         is_small={false}
                                     />
                                 ) : null}
@@ -530,6 +531,7 @@ export default class Actions extends React.Component<
                                         character_id={this.props.character.id}
                                         user_id={this.props.character.user_id}
                                         cannot_craft={this.actionsManager.cannotCraft()}
+                                        fame_tasks={this.props.fame_tasks}
                                     />
                                 ) : null}
 

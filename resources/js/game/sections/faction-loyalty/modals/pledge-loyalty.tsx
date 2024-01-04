@@ -25,7 +25,7 @@ export default class PledgeLoyalty extends React.Component<any, any> {
                         <strong>Would you like to pledge your loyalty to Surface?</strong>
                     </p>
                     {
-                        this.state.pledging ?
+                        this.props.pledging ?
                             <div className='my-4'>
                                 <LoadingProgressBar />
                             </div>

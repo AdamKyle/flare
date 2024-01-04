@@ -2,9 +2,9 @@
 
 namespace App\Game\Skills\Handlers;
 
+use Exception;
 use App\Flare\Builders\RandomAffixGenerator;
 use App\Flare\Models\Character;
-use App\Flare\Models\Faction;
 use App\Flare\Models\FactionLoyaltyNpc;
 use App\Flare\Models\Item;
 use App\Flare\Values\MaxCurrenciesValue;
@@ -14,7 +14,6 @@ use App\Game\Core\Traits\HandleCharacterLevelUp;
 use App\Game\Factions\FactionLoyalty\Concerns\FactionLoyalty;
 use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
 use App\Game\Messages\Events\ServerMessageEvent;
-use Exception;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 
 class UpdateCraftingTasksForFactionLoyalty {
@@ -65,13 +64,7 @@ class UpdateCraftingTasksForFactionLoyalty {
      */
     public function handleCraftingTask(Character $character, Item $item): Character {
 
-        $faction = $character->factions->where('game_map_id', $character->map->game_map_id)->first();
-
-        if (is_null($faction)) {
-            return $character;
-        }
-
-        $factionLoyalty = $this->getFactionLoyalty($character, $faction);
+        $factionLoyalty = $this->getFactionLoyalty($character);
 
         if (is_null($factionLoyalty)) {
             return $character;
@@ -90,6 +83,8 @@ class UpdateCraftingTasksForFactionLoyalty {
         $this->handedOverItem = true;
 
         $helpingNpc = $this->updateMatchingHelpTask($helpingNpc, 'item_id', $item->id);
+
+        ServerMessageHandler::sendBasicMessage($character->user, $helpingNpc->npc->real_name . ' is elated at your ability to craft: ' . $item->affix_name . '. "Thank you child!"');
 
         if ($this->canLevelUpFame($helpingNpc) && $helpingNpc->current_level !== $helpingNpc->max_level) {
             $this->handleFameLevelUp($character, $helpingNpc);

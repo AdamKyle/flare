@@ -170,6 +170,7 @@ export default class CharacterSheet extends React.Component<CharacterSheetProps,
                                         view_port={this.props.view_port}
                                         manage_addition_data={this.showAdditionalCharacterData.bind(this)}
                                         update_pledge_tab={this.props.update_pledge_tab}
+                                        update_faction_action_tasks={this.props.update_faction_action_tasks}
                                     />
                                 </BasicCard>
                                 <BasicCard additionalClasses={'overflow-y-auto lg:w-1/2 md:max-h-[325px]'}>

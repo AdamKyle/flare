@@ -39,6 +39,7 @@ export default class ActionSection extends React.Component<ActionSectionProps, {
                         map_data={this.props.map_data}
                         update_parent_state={this.props.update_parent_state}
                         set_map_data={this.props.set_map_data}
+                        fame_tasks={this.props.fame_tasks}
                     />
                 ) : (
                     <Actions
@@ -59,6 +60,7 @@ export default class ActionSection extends React.Component<ActionSectionProps, {
                         }
                         action_data={this.props.action_data}
                         update_parent_state={this.props.update_parent_state}
+                        fame_tasks={this.props.fame_tasks}
                     />
                 )}
             </Fragment>

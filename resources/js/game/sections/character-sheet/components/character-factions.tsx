@@ -41,13 +41,20 @@ export default class CharacterFactions extends React.Component<any, any> {
         }
     }
 
-    handlePledge() {
+    handlePledge(pledging: boolean) {
 
         if (this.props.update_pledge_tab) {
             this.setState({
                 pledging: true,
             }, () => {
-                (new Ajax()).setRoute('faction-loyalty/pledge/'+this.props.character_id+'/' + this.state.pledge_faction.id)
+
+                let factionId = this.props.pledged_faction_id;
+
+                if (!factionId) {
+                    factionId = this.state.pledge_faction.id;
+                }
+
+                (new Ajax()).setRoute('faction-loyalty/'+(pledging ? 'pledge' : `remove-pledge`)+'/'+this.props.character_id+'/' + factionId)
                     .doAjaxCall('post', (result: AxiosResponse) => {
                         this.closePledge();
 
@@ -55,7 +62,9 @@ export default class CharacterFactions extends React.Component<any, any> {
                             success_message: result.data.message,
                             pledging: false,
                         }, () => {
-                            this.props.update_pledge_tab();
+                            this.props.update_pledge_tab(pledging, (pledging ? factionId : null));
+
+                            this.props.update_faction_action_tasks(null);
                         })
                     }, (error: AxiosError) => {
                         this.setState({
@@ -113,7 +122,7 @@ export default class CharacterFactions extends React.Component<any, any> {
                     key={row.id + '-' + (Math.random() + 1).toString(36).substring(7)}>
                     {
                         this.props.is_pledged && this.props.pledged_faction_id === row.id ?
-                            <DangerButton button_label={'Un-pledge'} on_click={() => {}} />
+                            <DangerButton button_label={'Un-pledge'} on_click={() => this.handlePledge(false)} />
                         :
                             <PrimaryButton button_label={'Pledge Loyalty'} on_click={() => { this.pledgeLoyalty(row) }} disabled={!row.maxed}/>
                     }
@@ -161,6 +170,15 @@ export default class CharacterFactions extends React.Component<any, any> {
                             </SuccessAlert>
                             : null
                     }
+
+                    {
+                        this.state.pledge_faction === null && this.state.pledging ?
+                            <div className='mb-4'>
+                                <LoadingProgressBar />
+                            </div>
+                        : null
+                    }
+
                     <div className={'max-w-[290px] sm:max-w-[100%] overflow-x-hidden'}>
                         <Table columns={this.buildColumns()} data={this.state.factions} dark_table={this.state.dark_tables} />
                     </div>
@@ -172,7 +190,7 @@ export default class CharacterFactions extends React.Component<any, any> {
                             is_open={true}
                             manage_modal={this.closePledge.bind(this)}
                             faction={this.state.pledge_faction}
-                            handle_pledge={this.handlePledge.bind(this)}
+                            handle_pledge={() => this.handlePledge(true)}
                             pledging={this.state.pledging}
                         />
                     : null

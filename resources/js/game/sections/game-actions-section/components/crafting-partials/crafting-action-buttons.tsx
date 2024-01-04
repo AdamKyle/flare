@@ -2,6 +2,7 @@ import React, { Fragment } from "react";
 import PrimaryButton from "../../../../components/ui/buttons/primary-button";
 import DangerButton from "../../../../components/ui/buttons/danger-button";
 import CraftingActionButtonsProps from "./types/crafting-action-buttons-props";
+import SuccessButton from "../../../../components/ui/buttons/success-button";
 
 export default class CraftingActionButtons extends React.Component<
     CraftingActionButtonsProps,
@@ -17,9 +18,19 @@ export default class CraftingActionButtons extends React.Component<
                 <PrimaryButton
                     additional_css="mb-2"
                     button_label={"Craft"}
-                    on_click={this.props.craft}
+                    on_click={() => this.props.craft(false)}
                     disabled={this.props.can_craft}
                 />
+                {
+                    this.props.show_craft_for_npc ?
+                        <SuccessButton
+                            additional_css={"lg:ml-2 mb-2"}
+                            button_label={"Craft for NPC"}
+                            on_click={() => this.props.craft(true)}
+                            disabled={this.props.can_craft}
+                        />
+                    : null
+                }
                 <PrimaryButton
                     button_label={"Change Type"}
                     on_click={this.props.change_type}

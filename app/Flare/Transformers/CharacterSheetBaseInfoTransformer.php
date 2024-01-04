@@ -2,6 +2,7 @@
 
 namespace App\Flare\Transformers;
 
+use App\Flare\Models\FactionLoyalty;
 use App\Flare\Models\Skill;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameClass;
@@ -87,11 +88,29 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer {
             'is_in_timeout'               => !is_null($character->user->timeout_until),
             'can_see_pledge_tab'          => !is_null($factionLoyalty),
             'pledged_to_faction_id'       => !is_null($factionLoyalty) ? $factionLoyalty->faction_id : null,
+            'current_fame_tasks'          => $this->getFactionTasks($factionLoyalty),
         ];
     }
 
     public function isAlchemyLocked(Character $character): bool {
         return Skill::where('character_id', $character->id)->where('game_skill_id', GameSkill::where('type', SkillTypeValue::ALCHEMY)->first()->id)->first()->is_locked;
+    }
+
+    protected function getFactionTasks(?FactionLoyalty $factionLoyalty = null): array | null {
+
+        if (is_null($factionLoyalty)) {
+            return null;
+        }
+
+        $factionLoyaltyNpc = $factionLoyalty->factionLoyaltyNpcs->where('currently_helping', true)->first();
+
+        if (is_null($factionLoyaltyNpc)) {
+            return null;
+        }
+
+        return array_values(collect($factionLoyaltyNpc->factionLoyaltyNpcTasks->fame_tasks)->filter(function($task) {
+            return $task['type'] !== 'bounty';
+        })->toArray());
     }
 
     protected function getTimeLeftOnAutomation(Character $character) {

@@ -40,7 +40,7 @@ export interface FactionLoyaltyNpcTask {
 }
 
 export interface FameTasks {
-    type: 'bounty' | 'weapon';
+    type: 'bounty' | string;
     monster_id?: number;
     monster_name?: string;
     item_id?: number;

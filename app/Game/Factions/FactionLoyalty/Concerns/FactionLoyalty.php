@@ -10,14 +10,13 @@ use App\Flare\Models\FactionLoyaltyNpc;
 trait FactionLoyalty {
 
     /**
-     * Get faction loyalty.
+     * Get faction loyalty that the character is pledged to.
      *
      * @param Character $character
-     * @param Faction $faction
      * @return FactionLoyaltyModel|null
      */
-    public function getFactionLoyalty(Character $character, Faction $faction): ?FactionLoyaltyModel  {
-       return $character->factionLoyalties()->where('faction_id', $faction->id)->where('is_pledged', true)->first();
+    public function getFactionLoyalty(Character $character): ?FactionLoyaltyModel  {
+       return $character->factionLoyalties()->where('is_pledged', true)->first();
     }
 
     /**

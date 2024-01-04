@@ -101,6 +101,8 @@ export default class FactionFame extends React.Component<FactionLoyaltyProps, Fa
                 selected_faction_loyalty_npc: helpingNpc[0],
             });
 
+            this.props.update_faction_action_tasks(null);
+
             return;
         }
 
@@ -112,6 +114,10 @@ export default class FactionFame extends React.Component<FactionLoyaltyProps, Fa
             })[0],
             selected_faction_loyalty_npc: factionLoyaltyNpcHelping,
         });
+
+        this.props.update_faction_action_tasks(factionLoyaltyNpcHelping.faction_loyalty_npc_tasks.fame_tasks.filter((fameTasks: FameTasks) => {
+            return fameTasks.type !== 'bounty'
+        }));
 
         return helpingNpc[0];
     }

@@ -1,4 +1,5 @@
 import {CharacterType} from "../../character/character-type";
+import {FameTasks} from "../../../../sections/faction-loyalty/deffinitions/faction-loaylaty";
 
 export default interface CharacterSheetProps {
 
@@ -11,4 +12,6 @@ export default interface CharacterSheetProps {
     update_disable_tabs?: () => void;
 
     update_pledge_tab?: (canSee: boolean) => void;
+
+    update_faction_action_tasks?: (fameTasks: FameTasks[] | null, factionId?: number) => void;
 }

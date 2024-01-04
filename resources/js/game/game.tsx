@@ -31,6 +31,7 @@ import {serviceContainer} from "./lib/containers/core-container";
 import GameEventListeners from "./lib/game/event-listeners/game-event-listeners";
 import ActionSection from "./sections/game-actions-section/action-section";
 import ActionTabs from "./sections/game-actions-section/action-tabs";
+import {FameTasks} from "./sections/faction-loyalty/deffinitions/faction-loaylaty";
 
 export default class Game extends React.Component<GameProps, GameState> {
 
@@ -63,6 +64,7 @@ export default class Game extends React.Component<GameProps, GameState> {
             show_global_timeout: false,
             action_data: null,
             map_data: null,
+            fame_action_tasks: null,
             tabs: [
                 {
                     key: "game",
@@ -222,14 +224,21 @@ export default class Game extends React.Component<GameProps, GameState> {
         });
     }
 
-    setCanSeeFactionLoyaltyTab(canSee: boolean) {
+    setCanSeeFactionLoyaltyTab(canSee: boolean, factionId?: number) {
         const character = JSON.parse(JSON.stringify(this.state.character));
 
         character.can_see_pledge_tab = canSee;
+        character.pledged_to_faction_id = factionId;
 
         this.setState({
             character: character
         });
+    }
+
+    updateFactionActionTasks(fameTasks: FameTasks[] | null) {
+        this.setState({
+            fame_action_tasks: fameTasks,
+        })
     }
 
     renderLoading() {
@@ -305,7 +314,10 @@ export default class Game extends React.Component<GameProps, GameState> {
                                             this.state.view_port < 1600,
                                     })}
                                 >
-                                    <ActionTabs use_tabs={this.state.character.can_see_pledge_tab} character_id={this.props.characterId}>
+                                    <ActionTabs use_tabs={this.state.character.can_see_pledge_tab}
+                                                character_id={this.props.characterId}
+                                                update_faction_action_tasks={this.updateFactionActionTasks.bind(this)}
+                                    >
                                         <ActionSection
                                             character={this.state.character}
                                             character_status={this.state.character_status}
@@ -321,6 +333,7 @@ export default class Game extends React.Component<GameProps, GameState> {
                                             map_data={this.state.map_data}
                                             update_parent_state={this.setActionState.bind(this)}
                                             set_map_data={this.setMapState.bind(this)}
+                                            fame_tasks={this.state.fame_action_tasks}
                                         />
                                     </ActionTabs>
                                 </BasicCard>
@@ -396,6 +409,7 @@ export default class Game extends React.Component<GameProps, GameState> {
                                 this
                             )}
                             update_pledge_tab={this.setCanSeeFactionLoyaltyTab.bind(this)}
+                            update_faction_action_tasks={this.updateFactionActionTasks.bind(this)}
                         />
                     </TabPanel>
                     <TabPanel key={"quests"}>

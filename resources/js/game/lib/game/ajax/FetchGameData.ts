@@ -103,6 +103,7 @@ export default class FetchGameData {
                 is_silenced: result.data.sheet.is_silenced,
                 killed_in_pvp: result.data.sheet.kill_in_pvp,
             },
+            fame_action_tasks: result.data.sheet.current_fame_tasks,
         }, () => {
             this.component.setCharacterPosition(result.data.sheet.base_position);
 

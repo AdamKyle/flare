@@ -73,6 +73,10 @@ class FactionLoyaltyService {
                 'is_pledged' => false,
             ]);
 
+            $factionLoyalty->factionLoyaltyNpcs()->update([
+                'currently_helping' => false,
+            ]);
+
             return $this->successResult([
                 'message' => 'No longer pledged to: ' . $faction->gameMap->name . '.',
                 'factions' => $character->refresh()->factions->transform(function($faction) {
@@ -175,6 +179,12 @@ class FactionLoyaltyService {
             $character->factionLoyalties()->update([
                 'is_pledged' => false,
             ]);
+
+            foreach ($character->factionLoyalties() as $factionLoyalty) {
+                $factionLoyalty->factionLoyaltyNpcs()->update([
+                    'currently_helping' => false,
+                ]);
+            }
 
             $character = $character->refresh();
 

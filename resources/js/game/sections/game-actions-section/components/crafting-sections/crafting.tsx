@@ -16,6 +16,7 @@ import CraftingTypeSelection from "../crafting-partials/crafting-type-selecting"
 import CraftingActionButtons from "../crafting-partials/crafting-action-buttons";
 import ArmourTypeSelection from "../crafting-partials/armour-type-selection";
 import SelectItemToCraft from "../crafting-partials/select-item-to-craft";
+import {FameTasks} from "../../../faction-loyalty/deffinitions/faction-loaylaty";
 
 export default class Crafting extends React.Component<any, any> {
     constructor(props: any) {
@@ -36,6 +37,25 @@ export default class Crafting extends React.Component<any, any> {
                 level: 1,
             },
         };
+    }
+
+    showCraftForNpc() {
+
+        if (this.state.selected_type === null) {
+            return false;
+        }
+
+        if (this.state.selected_item === null) {
+            return false;
+        }
+
+        if (this.props.fame_tasks === null) {
+            return false;
+        }
+
+        return this.props.fame_tasks.filter((task: FameTasks) => {
+            return task.item_id === this.state.selected_item.id;
+        }).length > 0;
     }
 
     setItemToCraft(data: any) {
@@ -148,7 +168,7 @@ export default class Crafting extends React.Component<any, any> {
         return { label: "Please select item to craft", value: 0 };
     }
 
-    craft() {
+    craft(craftForNpc: boolean) {
         this.setState(
             {
                 loading: true,
@@ -164,7 +184,7 @@ export default class Crafting extends React.Component<any, any> {
                     .setParameters({
                         item_to_craft: this.state.selected_item.id,
                         type: getCraftingType(this.state.selected_item.type),
-                        craft_for_npc: false,
+                        craft_for_npc: craftForNpc,
                     })
                     .doAjaxCall(
                         "post",
@@ -302,6 +322,7 @@ export default class Crafting extends React.Component<any, any> {
                             craft={this.craft.bind(this)}
                             change_type={this.changeType.bind(this)}
                             clear_crafting={this.clearCrafting.bind(this)}
+                            show_craft_for_npc={this.showCraftForNpc()}
                         />
                     </div>
                 ) : (
@@ -313,6 +334,7 @@ export default class Crafting extends React.Component<any, any> {
                             craft={this.craft.bind(this)}
                             change_type={this.changeType.bind(this)}
                             clear_crafting={this.clearCrafting.bind(this)}
+                            show_craft_for_npc={this.showCraftForNpc()}
                         />
                     </div>
                 )}
