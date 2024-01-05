@@ -103,16 +103,7 @@ class FactionLoyaltyService {
             return $this->errorResult('Nope. Not allowed.');
         }
 
-        $foundLoyalty = $character->factionLoyalties()
-            ->whereHas('factionLoyaltyNpcs', function ($query) use ($factionLoyaltyNpc) {
-                $query->where('id', $factionLoyaltyNpc->id);
-            })
-            ->first();
-
-
-        if (is_null($foundLoyalty)) {
-            return $this->errorResult('No matching loyalty found for this selected npc.');
-        }
+        $foundLoyalty = $factionLoyaltyNpc->factionLoyalty;
 
         $foundLoyalty->factionLoyaltyNpcs()->update(['currently_helping' => false]);
 
@@ -130,21 +121,19 @@ class FactionLoyaltyService {
         ]);
     }
 
+    /**
+     * Stop Assisting NPC.
+     *
+     * @param Character $character
+     * @param FactionLoyaltyNpc $factionLoyaltyNpc
+     * @return array
+     */
     public function stopAssistingNpc(Character $character, FactionLoyaltyNpc $factionLoyaltyNpc): array {
         if ($factionLoyaltyNpc->factionLoyalty->character_id !== $character->id) {
             return $this->errorResult('Nope. Not allowed.');
         }
 
-        $foundLoyalty = $character->factionLoyalties()
-            ->whereHas('factionLoyaltyNpcs', function ($query) use ($factionLoyaltyNpc) {
-                $query->where('id', $factionLoyaltyNpc->id);
-            })
-            ->first();
-
-
-        if (is_null($foundLoyalty)) {
-            return $this->errorResult('No matching loyalty found for this selected npc.');
-        }
+        $foundLoyalty = $factionLoyaltyNpc->factionLoyalty;
 
         $foundLoyalty->factionLoyaltyNpcs()->update(['currently_helping' => false]);
 
@@ -180,11 +169,9 @@ class FactionLoyaltyService {
                 'is_pledged' => false,
             ]);
 
-            foreach ($character->factionLoyalties() as $factionLoyalty) {
-                $factionLoyalty->factionLoyaltyNpcs()->update([
-                    'currently_helping' => false,
-                ]);
-            }
+            $character->factionLoyalties->each(function ($faction) {
+                $faction->factionLoyaltyNpcs()->update(['currently_helping' => false]);
+            });
 
             $character = $character->refresh();
 
@@ -199,6 +186,10 @@ class FactionLoyaltyService {
             $character->factionLoyalties()->update([
                 'is_pledged' => false,
             ]);
+
+            $character->factionLoyalties->each(function ($faction) {
+                $faction->factionLoyaltyNpcs()->update(['currently_helping' => false]);
+            });
 
             $character = $character->refresh();
 

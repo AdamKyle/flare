@@ -2,11 +2,10 @@
 
 namespace Tests\Unit\Game\Factions\FactionLoyalty\Services;
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\Models\Character;
-use App\Flare\Models\Faction;
 use App\Flare\Values\MapNameValue;
 use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateFactionLoyalty;
@@ -442,11 +441,130 @@ class FactionLoyaltyServiceTest extends TestCase {
             'fame_tasks'              => [],
         ]);
 
-
         $oldTasks = $npcTask->fame_tasks;
 
         $newNPCtask = $this->factionLoyaltyService->createNewTasksForNpc($npcTask);
 
         $this->assertNotEquals($oldTasks, $newNPCtask->fame_tasks);
+    }
+
+    public function testFailToAssistNpcThatDoesNotBelongToCharacter() {
+        $character = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation()->assignFactionSystem()->getCharacter();
+
+        $factionLoyalty = $this->createFactionLoyalty([
+            'faction_id'   => $character->factions->first()->id,
+            'character_id' => $character->id,
+        ]);
+
+        $npc = $this->createNpc([
+            'game_map_id' => $this->character->map->game_map_id
+        ]);
+
+        $factionNpc = $this->createFactionLoyaltyNpc([
+            'faction_loyalty_id'          => $factionLoyalty->id,
+            'npc_id'                      => $npc->id,
+            'current_level'               => 0,
+            'max_level'                   => 25,
+            'next_level_fame'             => 100,
+            'currently_helping'           => false,
+            'kingdom_item_defence_bonus'  => 0.002,
+        ]);
+
+        $result = $this->factionLoyaltyService->assistNpc($this->character, $factionNpc);
+
+        $this->assertEquals('Nope. Not allowed.', $result['message']);
+    }
+
+    public function testAssistNpc() {
+        $npc = $this->createNpc([
+            'game_map_id' => $this->character->map->game_map_id
+        ]);
+
+        $factionLoyalty = $this->createFactionLoyalty([
+            'faction_id'   => $this->character->factions->first()->id,
+            'character_id' => $this->character->id,
+            'is_pledged'   => true,
+        ]);
+
+        $factionNpc = $this->createFactionLoyaltyNpc([
+            'faction_loyalty_id'          => $factionLoyalty->id,
+            'npc_id'                      => $npc->id,
+            'current_level'               => 0,
+            'max_level'                   => 25,
+            'next_level_fame'             => 100,
+            'currently_helping'           => false,
+            'kingdom_item_defence_bonus'  => 0.002,
+        ]);
+
+        $character = $this->character->refresh();
+
+        $result = $this->factionLoyaltyService->assistNpc($character, $factionNpc);
+
+        $character = $character->refresh();
+
+        $this->assertTrue(
+            $character->factionLoyalties->first()->factionLoyaltyNpcs->first()->currently_helping
+        );
+
+        $this->assertEquals('You are now assisting ' . $factionNpc->npc->real_name . ' with their tasks!', $result['message']);
+    }
+
+    public function testFailToStopAssistingNpcCharacterDoesNotOwn() {
+        $character = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation()->assignFactionSystem()->getCharacter();
+
+        $factionLoyalty = $this->createFactionLoyalty([
+            'faction_id'   => $character->factions->first()->id,
+            'character_id' => $character->id,
+        ]);
+
+        $npc = $this->createNpc([
+            'game_map_id' => $this->character->map->game_map_id
+        ]);
+
+        $factionNpc = $this->createFactionLoyaltyNpc([
+            'faction_loyalty_id'          => $factionLoyalty->id,
+            'npc_id'                      => $npc->id,
+            'current_level'               => 0,
+            'max_level'                   => 25,
+            'next_level_fame'             => 100,
+            'currently_helping'           => true,
+            'kingdom_item_defence_bonus'  => 0.002,
+        ]);
+
+        $result = $this->factionLoyaltyService->stopAssistingNpc($this->character, $factionNpc);
+
+        $this->assertEquals('Nope. Not allowed.', $result['message']);
+    }
+
+    public function testStopAssistingNpc() {
+        $npc = $this->createNpc([
+            'game_map_id' => $this->character->map->game_map_id
+        ]);
+
+        $factionLoyalty = $this->createFactionLoyalty([
+            'faction_id'   => $this->character->factions->first()->id,
+            'character_id' => $this->character->id,
+            'is_pledged'   => true,
+        ]);
+
+        $factionNpc = $this->createFactionLoyaltyNpc([
+            'faction_loyalty_id'          => $factionLoyalty->id,
+            'npc_id'                      => $npc->id,
+            'current_level'               => 0,
+            'max_level'                   => 25,
+            'next_level_fame'             => 100,
+            'currently_helping'           => true,
+            'kingdom_item_defence_bonus'  => 0.002,
+        ]);
+
+        $character = $this->character->refresh();
+
+        $result = $this->factionLoyaltyService->stopAssistingNpc($character, $factionNpc);
+
+        $this->assertFalse(
+            $character->factionLoyalties->first()->factionLoyaltyNpcs->first()->currently_helping
+        );
+
+        $this->assertEquals('You stopped assisting ' . $factionNpc->npc->real_name . ' with their tasks. They are sad but understand.', $result['message']);
     }
 }

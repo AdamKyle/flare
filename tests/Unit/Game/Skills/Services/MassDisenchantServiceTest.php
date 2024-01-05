@@ -91,7 +91,7 @@ class MassDisenchantServiceTest extends TestCase {
 
         $massDisenchantmentService->shouldAllowMockingProtectedMethods()
             ->shouldReceive('getSkillXp')
-            ->andReturn(1000);
+            ->andReturn(5000);
 
         $massDisenchantmentService->setUp($character)->disenchantItems($character->inventory->slots);
 
