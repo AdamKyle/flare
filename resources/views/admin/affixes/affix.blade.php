@@ -112,16 +112,19 @@
             >
                 <x-core.alerts.warning-alert title="ATTN!">
                     <p class="my-2">
-                        Some damage based affixes can stack - which is outlined below. Those that can stack are able to be resisted
-                        by the enemy. 
+                        Some damage based affixes can stack - which is outlined below. Those that do stack have a chance to be
+                        resisted by the enemy.
+                    </p>
+                    <p class="mb-2">
+                        Those that do not stack, are irresistible and cannot be blocked.
                     </p>
                     <p>
-                        Those that do not stack, are irresistible and cannot be blocked.
+                        Damage is a % of your weapon damage.
                     </p>
                 </x-core.alerts.warning-alert>
                 <dl>
                     <dt>Damage:</dt>
-                    <dd>{{number_format($itemAffix->damage)}}</dd>
+                    <dd>{{$itemAffix->damage_amount * 100}}%</dd>
                     <dt>Is Damage Irresistible?:</dt>
                     <dd>{{$itemAffix->irresistible_damage ? 'Yes' : 'No'}}</dd>
                     <dt>Can Stack:</dt>
@@ -136,7 +139,7 @@
             >
                 <x-core.alerts.warning-alert title="ATTN!">
                     These affixes will only stack, both stat increase and life stealing, for Vampire classes.
-                    For other classes, we will take the Lifestealing Affix attached. The durability will 
+                    For other classes, we will take the Lifestealing Affix attached. The durability will
                     stack when calculating your durability and therfor your health - for all classes.
                 </x-core.alerts.warning-alert>
                 <dl>
@@ -181,7 +184,7 @@
                 buttons="false"
             >
                 <x-core.alerts.warning-alert title="ATTN!">
-                    These Affixes will not stack. These can reduce the base skills of en 
+                    These Affixes will not stack. These can reduce the base skills of en
                     enemy such as Acuracy, needed to hit you or Dodge - used to get out the way of your attack.
                 </x-core.alerts.warning-alert>
                 <dl>

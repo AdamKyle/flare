@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Console\AfterDeployment\AddHolyStacksToItems;
 use App\Console\AfterDeployment\AssignNewSkillsToPlayers;
+use App\Console\AfterDeployment\ChangeDamageAmountOnAffixes;
 use App\Console\AfterDeployment\CreateCharacterAttackDataCache;
 use App\Console\AfterDeployment\CreateMonsterCache;
 use App\Console\AfterDeployment\GivePhaseRewardsForCharacters;
@@ -50,6 +51,7 @@ class AppServiceProvider extends ServiceProvider {
             RebalanceQuestCurrencyCostsAndRewards::class,
             KickOffEventGoalForWinterEvent::class,
             GivePhaseRewardsForCharacters::class,
+            ChangeDamageAmountOnAffixes::class,
 
             // Development Commands:
             CreateCharacter::class,

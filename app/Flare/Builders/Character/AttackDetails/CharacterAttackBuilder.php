@@ -141,9 +141,7 @@ class CharacterAttackBuilder {
             'affixes'                   => [
                 'cant_be_resisted'       => $this->characterStatBuilder->canAffixesBeResisted(),
                 'stacking_damage'        => $this->characterStatBuilder->buildAffixDamage('affix-stacking-damage', $voided),
-                                            $this->characterStatBuilder->buildAffixDamage('affix-irresistible-damage-stacking', $voided),
                 'non_stacking_damage'    => $this->characterStatBuilder->buildAffixDamage('affix-non-stacking', $voided),
-                                            $this->characterStatBuilder->buildAffixDamage('affix-irresistible-damage-non-stacking', $voided),
                 'stacking_life_stealing' => $this->characterStatBuilder->buildAffixDamage('life-stealing', $voided),
                 'life_stealing'          => $this->characterStatBuilder->buildAffixDamage('life-stealing', $voided),
                 'entrancing_chance'      => $this->characterStatBuilder->buildEntrancingChance($voided)

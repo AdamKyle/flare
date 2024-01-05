@@ -140,8 +140,8 @@ class DamageBuilder extends BaseAttribute {
             return 0;
         }
 
-        $itemSuffix = $this->inventory->where('item.itemSuffix.damage_can_stack', true)->sum('item.itemSuffix.damage');
-        $itemPrefix = $this->inventory->where('item.itemPrefix.damage_can_stack', true)->sum('item.itemPrefix.damage');
+        $itemSuffix = $this->inventory->where('item.itemSuffix.damage_can_stack', true)->sum('item.itemSuffix.damage_amount');
+        $itemPrefix = $this->inventory->where('item.itemPrefix.damage_can_stack', true)->sum('item.itemPrefix.damage_amount');
 
         return $itemSuffix + $itemPrefix;
     }
@@ -158,8 +158,8 @@ class DamageBuilder extends BaseAttribute {
             return 0;
         }
 
-        $itemSuffix = $this->inventory->where('item.itemSuffix.damage_can_stack', false)->sum('item.itemSuffix.damage');
-        $itemPrefix = $this->inventory->where('item.itemPrefix.damage_can_stack', false)->sum('item.itemPrefix.damage');
+        $itemSuffix = $this->inventory->where('item.itemSuffix.damage_can_stack', false)->sum('item.itemSuffix.damage_amount');
+        $itemPrefix = $this->inventory->where('item.itemPrefix.damage_can_stack', false)->sum('item.itemPrefix.damage_amount');
 
         $amounts = array_filter([$itemPrefix, $itemSuffix]);
 

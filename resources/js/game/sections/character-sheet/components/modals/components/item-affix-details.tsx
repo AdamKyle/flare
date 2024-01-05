@@ -73,12 +73,15 @@ export default class ItemAffixDetails extends React.Component<any, any> {
                             <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
                             <dl>
                                 <dt>Damage:</dt>
-                                <dd>{formatNumber(this.props.affix.damage)}</dd>
+                                <dd>{this.props.affix.damage_amount * 100}%</dd>
                                 <dt>Is Damage Irresistible?:</dt>
                                 <dd>{this.props.affix.irresistible_damage ? 'Yes' : 'No'}</dd>
                                 <dt>Can Stack:</dt>
                                 <dd>{this.props.affix.damage_can_stack ? 'Yes' : 'No'}</dd>
                             </dl>
+                            <p className="my-4">
+                                Damage is a % of your total weapon damage after all modifiers.
+                            </p>
 
                             <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
                             <h4 className='text-sky-600 dark:text-sky-500'>Stat Reduction</h4>

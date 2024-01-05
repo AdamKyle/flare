@@ -198,7 +198,7 @@ class AffixAttributeBuilder {
 
     public function setDamageDetails(): array {
         return [
-            'damage'              => rand($this->damageRange[0], $this->damageRange[1]),
+            'damage_amount'       => rand($this->damageRange[0], $this->damageRange[1]) / 100,
             'irresistible_damage' => $this->canHave(),
             'damage_can_stack'    =>  $this->canHave(),
         ];

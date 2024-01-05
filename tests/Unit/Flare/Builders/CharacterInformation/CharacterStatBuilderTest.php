@@ -1175,7 +1175,7 @@ class CharacterStatBuilderTest extends TestCase {
         $itemPrefixAffix = $this->createItemAffix([
             'name'                => 'Sample',
             'chr_mod'             => 0.15,
-            'damage'              => 100,
+            'damage_amount'              => 1.0,
             'damage_can_stack'    => true,
             'irresistible_damage' => true,
         ]);
@@ -1183,7 +1183,7 @@ class CharacterStatBuilderTest extends TestCase {
         $itemSuffixAffix = $this->createItemAffix([
             'name'                => 'Sample',
             'chr_mod'             => 0.15,
-            'damage'              => 150,
+            'damage_amount'              => 1.50,
             'damage_can_stack'    => true,
             'irresistible_damage' => true,
         ]);
@@ -1206,7 +1206,7 @@ class CharacterStatBuilderTest extends TestCase {
         $itemPrefixAffix = $this->createItemAffix([
             'name'                => 'Sample',
             'chr_mod'             => 0.15,
-            'damage'              => 100,
+            'damage_amount'              => 1.0,
             'damage_can_stack'    => true,
             'irresistible_damage' => true,
         ]);
@@ -1214,7 +1214,7 @@ class CharacterStatBuilderTest extends TestCase {
         $itemSuffixAffix = $this->createItemAffix([
             'name'                => 'Sample',
             'chr_mod'             => 0.15,
-            'damage'              => 150,
+            'damage_amount'              => 1.50,
             'damage_can_stack'    => true,
             'irresistible_damage' => true,
         ]);
@@ -1237,7 +1237,7 @@ class CharacterStatBuilderTest extends TestCase {
         $itemPrefixAffix = $this->createItemAffix([
             'name'                => 'Sample',
             'chr_mod'             => 0.15,
-            'damage'              => 100,
+            'damage_amount'              => 1.0,
             'damage_can_stack'    => false,
             'irresistible_damage' => true,
         ]);
@@ -1245,7 +1245,7 @@ class CharacterStatBuilderTest extends TestCase {
         $itemSuffixAffix = $this->createItemAffix([
             'name'                => 'Sample',
             'chr_mod'             => 0.15,
-            'damage'              => 150,
+            'damage_amount'              => 1.50,
             'damage_can_stack'    => false,
             'irresistible_damage' => true,
         ]);
@@ -1282,7 +1282,7 @@ class CharacterStatBuilderTest extends TestCase {
         $itemPrefixAffix = $this->createItemAffix([
             'name'                => 'Sample',
             'chr_mod'             => 0.15,
-            'damage'              => 100,
+            'damage_amount'       => 1.0,
             'damage_can_stack'    => false,
             'irresistible_damage' => true,
         ]);
@@ -1290,7 +1290,7 @@ class CharacterStatBuilderTest extends TestCase {
         $itemSuffixAffix = $this->createItemAffix([
             'name'                => 'Sample',
             'chr_mod'             => 0.15,
-            'damage'              => 150,
+            'damage_amount'       => 1.50,
             'damage_can_stack'    => false,
             'irresistible_damage' => true,
         ]);
@@ -1313,14 +1313,14 @@ class CharacterStatBuilderTest extends TestCase {
         $itemPrefixAffix = $this->createItemAffix([
             'name'                => 'Sample',
             'chr_mod'             => 0.15,
-            'damage'              => 100,
+            'damage_amount'              => 1.0,
             'steal_life_amount'   => 1.0,
         ]);
 
         $itemSuffixAffix = $this->createItemAffix([
             'name'                => 'Sample',
             'chr_mod'             => 0.15,
-            'damage'              => 150,
+            'damage_amount'              => 1.50,
             'steal_life_amount'   => .10,
         ]);
 
@@ -1355,14 +1355,14 @@ class CharacterStatBuilderTest extends TestCase {
         $itemPrefixAffix = $this->createItemAffix([
             'name'                => 'Sample',
             'chr_mod'             => 0.15,
-            'damage'              => 100,
+            'damage_amount'              => 1.0,
             'steal_life_amount'   => 1.0,
         ]);
 
         $itemSuffixAffix = $this->createItemAffix([
             'name'                => 'Sample',
             'chr_mod'             => 0.15,
-            'damage'              => 150,
+            'damage_amount'              => 1.50,
             'steal_life_amount'   => .10,
         ]);
 
@@ -1384,14 +1384,14 @@ class CharacterStatBuilderTest extends TestCase {
         $itemPrefixAffix = $this->createItemAffix([
             'name'                => 'Sample',
             'chr_mod'             => 0.15,
-            'damage'              => 100,
+            'damage_amount'              => 1.0,
             'steal_life_amount'   => 1.0,
         ]);
 
         $itemSuffixAffix = $this->createItemAffix([
             'name'                => 'Sample',
             'chr_mod'             => 0.15,
-            'damage'              => 150,
+            'damage_amount'              => 1.50,
             'steal_life_amount'   => .10,
         ]);
 
@@ -1420,14 +1420,14 @@ class CharacterStatBuilderTest extends TestCase {
         $itemPrefixAffix = $this->createItemAffix([
             'name'                => 'Sample',
             'chr_mod'             => 0.15,
-            'damage'              => 100,
+            'damage_amount'              => 1.0,
             'steal_life_amount'   => 1.0,
         ]);
 
         $itemSuffixAffix = $this->createItemAffix([
             'name'                => 'Sample',
             'chr_mod'             => 0.15,
-            'damage'              => 150,
+            'damage_amount'              => 1.50,
             'steal_life_amount'   => .10,
         ]);
 
@@ -1479,14 +1479,14 @@ class CharacterStatBuilderTest extends TestCase {
         $itemPrefixAffix = $this->createItemAffix([
             'name'                => 'Sample',
             'chr_mod'             => 0.15,
-            'damage'              => 100,
+            'damage_amount'              => 1.0,
             'entranced_chance'    => 1.0,
         ]);
 
         $itemSuffixAffix = $this->createItemAffix([
             'name'                => 'Sample',
             'chr_mod'             => 0.15,
-            'damage'              => 150,
+            'damage_amount'              => 1.50,
             'entranced_chance'    => .10,
         ]);
 
@@ -1508,14 +1508,14 @@ class CharacterStatBuilderTest extends TestCase {
         $itemPrefixAffix = $this->createItemAffix([
             'name'                => 'Sample',
             'chr_mod'             => 0.15,
-            'damage'              => 100,
+            'damage_amount'              => 1.0,
             'reduces_enemy_stats' => true,
         ]);
 
         $itemSuffixAffix = $this->createItemAffix([
             'name'                => 'Sample II',
             'chr_mod'             => 0.15,
-            'damage'              => 150,
+            'damage_amount'              => 1.50,
             'reduces_enemy_stats' => true,
         ]);
 
@@ -1545,7 +1545,7 @@ class CharacterStatBuilderTest extends TestCase {
         $itemPrefixAffix = $this->createItemAffix([
             'name'                => 'Sample',
             'chr_mod'             => 0.15,
-            'damage'              => 100,
+            'damage_amount'              => 1.0,
             'type'                => 'prefix',
             'reduces_enemy_stats' => false,
         ]);
@@ -1553,7 +1553,7 @@ class CharacterStatBuilderTest extends TestCase {
         $itemSuffixAffix = $this->createItemAffix([
             'name'                => 'Sample II',
             'chr_mod'             => 0.15,
-            'damage'              => 150,
+            'damage_amount'              => 1.50,
             'reduces_enemy_stats' => false,
             'type'                => 'suffix',
         ]);
@@ -1576,7 +1576,7 @@ class CharacterStatBuilderTest extends TestCase {
         $itemPrefixAffix = $this->createItemAffix([
             'name'                => 'Sample',
             'chr_mod'             => 0.15,
-            'damage'              => 100,
+            'damage_amount'              => 1.0,
             'type'                => 'prefix',
             'reduces_enemy_stats' => true,
         ]);
@@ -1584,7 +1584,7 @@ class CharacterStatBuilderTest extends TestCase {
         $itemSuffixAffix = $this->createItemAffix([
             'name'                => 'Sample II',
             'chr_mod'             => 0.15,
-            'damage'              => 150,
+            'damage_amount'              => 1.50,
             'reduces_enemy_stats' => true,
             'type'                => 'suffix',
         ]);
