@@ -264,7 +264,11 @@ export default class FightSection extends React.Component<
 
     render() {
         if (this.state.setting_up_regular_fight) {
-            return <LoadingProgressBar />;
+            return (
+                <div className="flex items-center justify-center">
+                    <LoadingProgressBar />
+                </div>
+            )
         }
 
         if (this.state.error_message !== "") {

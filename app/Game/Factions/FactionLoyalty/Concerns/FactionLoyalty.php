@@ -38,7 +38,6 @@ trait FactionLoyalty {
      * @return bool
      */
     public function hasMatchingTask(FactionLoyaltyNpc $helpingNpc, string $key, int $id): bool {
-
         return collect($helpingNpc->factionLoyaltyNpcTasks->fame_tasks)->filter(function($task) use ($key, $id) {
             return isset($task[$key]) && $task[$key] === $id;
         })->isNotEmpty();
@@ -54,7 +53,9 @@ trait FactionLoyalty {
      */
     public function updateMatchingHelpTask(FactionLoyaltyNpc $helpingNpc, string $key, int $id): FactionLoyaltyNpc {
         $tasks = array_map(function ($task) use ($key, $id) {
-            return array_key_exists($key, $task) ? array_merge($task, ['current_amount' => min($task['current_amount'] + 1, $task['required_amount'])]) : $task;
+            return isset($task[$key]) && ($task[$key] === $id) ?
+                array_merge($task, ['current_amount' => min($task['current_amount'] + 1, $task['required_amount'])]) :
+                $task;
         }, $helpingNpc->factionLoyaltyNpcTasks->fame_tasks);
 
         $helpingNpc->factionLoyaltyNpcTasks()->update([
