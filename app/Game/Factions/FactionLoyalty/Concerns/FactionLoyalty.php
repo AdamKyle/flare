@@ -53,24 +53,9 @@ trait FactionLoyalty {
      * @return FactionLoyaltyNpc
      */
     public function updateMatchingHelpTask(FactionLoyaltyNpc $helpingNpc, string $key, int $id): FactionLoyaltyNpc {
-        $tasks = collect($helpingNpc->factionLoyaltyNpcTasks->fame_tasks)->map(function($task) use($key, $id) {
-
-            if (!isset($task[$key])) {
-                return $task;
-            }
-
-            if ($task[$key] === $id) {
-                $newCurrent = $task['current_amount'] + 1;
-
-                if ($newCurrent > $task['required_amount']) {
-                    $newCurrent = $task['required_amount'];
-                }
-
-                $task['current_amount'] = $newCurrent;
-            }
-
-            return $task;
-        })->toArray();
+        $tasks = array_map(function ($task) use ($key, $id) {
+            return array_key_exists($key, $task) ? array_merge($task, ['current_amount' => min($task['current_amount'] + 1, $task['required_amount'])]) : $task;
+        }, $helpingNpc->factionLoyaltyNpcTasks->fame_tasks);
 
         $helpingNpc->factionLoyaltyNpcTasks()->update([
             'fame_tasks' => $tasks
@@ -87,28 +72,14 @@ trait FactionLoyalty {
      * @return bool
      */
     public function showCraftForNpcButton(Character $character, string $craftingType): bool {
-        $pledgedFaction = $character->factionLoyalties()->where('is_pledged', true)->first();
 
-        if (is_null($pledgedFaction)) {
-            return false;
-        }
-
-        $helpingNpc = $pledgedFaction->factionLoyaltyNpcs()->where('currently_helping', true)->first();
-
-        if (is_null($helpingNpc)) {
-            return false;
-        }
-
-        if (empty($helpingNpc->fame_tasks)) {
-            return false;
-        }
-
-        return collect($helpingNpc->fame_tasks)->filter(function($task) use($craftingType) {
-            if (!isset($task['type'])) {
-                return collect();
-            }
-
-            return $task['type'] === $craftingType;
-        })->isNotEmpty();
+        return optional(
+            optional($character->factionLoyalties()->where('is_pledged', true)->first())
+                ->factionLoyaltyNpcs()->where('currently_helping', true)->first()
+        )->factionLoyaltyNpcTasks->fame_tasks
+            ? collect(optional($character->factionLoyalties()->where('is_pledged', true)->first())
+                ->factionLoyaltyNpcs()->where('currently_helping', true)->first()
+                ->factionLoyaltyNpcTasks->fame_tasks)->contains('type', $craftingType)
+            : false;
     }
 }
