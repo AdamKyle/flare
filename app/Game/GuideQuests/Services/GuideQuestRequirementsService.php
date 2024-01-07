@@ -218,6 +218,48 @@ class GuideQuestRequirementsService {
         return $this;
     }
 
+    /**
+     * Do we have an item that has a specific specialty type either in out inventory or in a set?
+     *
+     * @param Character $character
+     * @param GuideQuest $quest
+     * @return $this
+     */
+    public function requiredSpecialtyType(Character $character, GuideQuest $quest): GuideQuestRequirementsService {
+        if (!is_null($quest->required_specialty_type)) {
+            $isInInventory = $character->inventory->filter(function($slot) use ($quest) {
+                return $slot->item->specialty_type === $quest->required_specialty_type;
+            })->isNotEmpty();
+
+            $isInSet = $character->inventorySets->filter(function($set) use ($quest) {
+                return $set->slots->filter(function($slot) use($quest) {
+                    $slot->item->specialty_type === $quest->required_specialty_type;
+                })->isNotempty();
+            })->isNotEmpty();
+
+            if ($isInInventory || $isInSet) {
+                $this->finishedRequirements[] = 'required_specialty_type';
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Does the character have the required holy stacks?
+     *
+     * @param Character $character
+     * @param GuideQuest $quest
+     * @return $this
+     */
+    public function requiredHolyStacks(Character $character, GuideQuest $quest): GuideQuestRequirementsService {
+        if ($character->getInformation()->holyInfo()->getTotalAppliedStacks() >= $quest->required_holy_stacks) {
+            $this->finishedRequirements[] = 'required_holy_stacks';
+        }
+
+        return $this;
+    }
+
 
     /**
      * Does character have the required kingdom count?

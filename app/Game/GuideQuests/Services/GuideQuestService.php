@@ -146,6 +146,7 @@ class GuideQuestService {
             ->requiredCurrency($character, $quest, 'gold')
             ->requiredCurrency($character, $quest, 'gold_dust')
             ->requiredCurrency($character, $quest, 'shards')
+            ->requiredCurrency($character, $quest, 'copper_coins')
             ->requiredTotalStats($character, $quest, $stats)
             ->requiredStats($character, $quest, $stats)
             ->requiredClassRanksEquipped($character, $quest)
@@ -154,6 +155,8 @@ class GuideQuestService {
             ->requiredKingdomSpecificBuildingLevel($character, $quest)
             ->requiredGlobalEventKillAmount($character, $quest)
             ->requirePlayerToBeOnASpecificMap($character, $quest)
+            ->requiredSpecialtyType($character, $quest)
+            ->requiredHolyStacks($character, $quest)
             ->getFinishedRequirements();
 
         if (!empty($this->completedAttributes)) {

@@ -2,6 +2,7 @@
 
 namespace App\Flare\Models;
 
+use App\Flare\Values\ItemSpecialtyType;
 use App\Game\Events\Values\EventType;
 use Exception;
 use Illuminate\Support\Facades\Log;
@@ -55,6 +56,7 @@ class GuideQuest extends Model {
         'required_gold',
         'required_gold_dust',
         'required_shards',
+        'required_copper_coins',
         'required_gold_bars',
         'required_stats',
         'required_str',
@@ -76,6 +78,7 @@ class GuideQuest extends Model {
         'required_event_goal_participation',
         'required_holy_stacks',
         'required_attached_gems',
+        'required_specialty_type',
     ];
 
     /**
@@ -122,6 +125,7 @@ class GuideQuest extends Model {
         'required_gold_dust'                 => 'integer',
         'required_shards'                    => 'integer',
         'required_gold_bars'                 => 'integer',
+        'required_copper_coins'              => 'integer',
         'gold_reward'                        => 'integer',
         'gold_dust_reward'                   => 'integer',
         'shards_reward'                      => 'integer',

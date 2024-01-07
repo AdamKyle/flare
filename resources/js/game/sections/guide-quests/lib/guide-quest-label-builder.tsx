@@ -93,12 +93,18 @@ const guideQuestLabelBuilder = (
             return "Get CHR to";
         case "required_focus":
             return "Get Focus to";
+        case "required_specialty_type":
+            return `Purchase a piece of: ${questData.required_specialty_type}`
+        case "required_holy_stacks":
+            return `Applied Holy Oil Amount: ${questData.required_holy_stacks}`
         case "required_gold":
             return "Obtain Gold amount";
         case "required_gold_dust":
             return "Obtain Gold Dust amount";
         case "required_shards":
             return "Obtain Shards amount";
+        case "required_copper_coins":
+            return "Obtain Copper coins amount";
         case "required_gold_bars":
             return "Create Gold Bars amount";
         case "required_to_be_on_game_map_name":

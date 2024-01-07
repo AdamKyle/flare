@@ -10,6 +10,7 @@ use App\Admin\Services\GuideQuestService;
 use App\Flare\Models\GameBuilding;
 use App\Flare\Models\GuideQuest;
 use App\Flare\Models\PassiveSkill;
+use App\Flare\Values\ItemSpecialtyType;
 use App\Flare\Values\MapNameValue;
 use App\Game\Events\Values\EventType;
 use App\Http\Controllers\Controller;
@@ -77,6 +78,7 @@ class GuideQuestsController extends Controller {
             'events'           => EventType::getOptionsForSelect(),
             'guideQuests'      => GuideQuest::pluck('name', 'id')->toArray(),
             'gameMaps'         => GameMap::pluck('name', 'id')->toArray(),
+            'itemSpecialtyTypes' => ItemSpecialtyType::getValuesForSelect(),
         ]);
     }
 
@@ -109,6 +111,7 @@ class GuideQuestsController extends Controller {
             'events'           => EventType::getOptionsForSelect(),
             'guideQuests'      => GuideQuest::pluck('name', 'id')->toArray(),
             'gameMaps'         => GameMap::pluck('name', 'id')->toArray(),
+            'itemSpecialtyTypes' => ItemSpecialtyType::getValuesForSelect(),
         ]);
     }
 

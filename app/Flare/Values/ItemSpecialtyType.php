@@ -43,6 +43,23 @@ class ItemSpecialtyType {
         $this->value = $value;
     }
 
+    /**
+     * Get the values for selection.
+     *
+     * @return string[]
+     */
+    public static function getValuesForSelect(): array {
+        return self::$values;
+    }
+
+    /**
+     * Get the name of the specialty type.
+     *
+     * @return string
+     */
+    public function getItemSpecialtyTypeName(): string {
+        return self::$values[$this->value];
+    }
 
     /**
      * Are we hell forged?

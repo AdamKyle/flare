@@ -29,6 +29,7 @@
             <th>required_gold</th>
             <th>required_gold_dust</th>
             <th>required_shards</th>
+            <th>required_copper_coins</th>
             <th>required_gold_bars</th>
             <th>required_kingdoms</th>
             <th>required_kingdom_level</th>
@@ -56,6 +57,7 @@
             <th>required_event_goal_participation</th>
             <th>required_holy_stacks</th>
             <th>required_attached_gems</th>
+            <th>required_specialty_type</th>
         </tr>
     </thead>
     <tbody>
@@ -90,6 +92,7 @@
                 <td>{{ $guideQuest->required_gold }}</td>
                 <td>{{ $guideQuest->required_gold_dust }}</td>
                 <td>{{ $guideQuest->required_shards }}</td>
+                <td>{{ $guideQuest->required_copper_coins }}</td>
                 <td>{{ $guideQuest->required_gold_bars }}</td>
                 <td>{{ $guideQuest->required_kingdoms }}</td>
                 <td>{{ $guideQuest->required_kingdom_level }}</td>
@@ -118,6 +121,7 @@
                 <td>{{ $guideQuest->required_event_goal_participation }}</td>
                 <td>{{ $guideQuest->required_holy_stacks }}</td>
                 <td>{{ $guideQuest->required_attached_gems }}</td>
+                <td>{{ $guideQuest->required_specialty_type }}</td>
             </tr>
         @endforeach
     </tbody>

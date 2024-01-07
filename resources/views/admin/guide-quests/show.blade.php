@@ -145,6 +145,14 @@
                             <dt>Required Focus</dt>
                             <dd>{{ number_format($guideQuest->required_focus) }}</dd>
                         @endif
+                        @if (!is_null($guideQuest->required_specialty_type))
+                            <dt>Required Set Item Type</dt>
+                            <dd>{{$guideQuest->required_specialty_type}}</dd>
+                        @endif
+                        @if (!is_null($guideQuest->required_holy_stacks))
+                            <dt>Required Holy Stacks</dt>
+                            <dd>{{$guideQuest->required_holy_stacks}}</dd>
+                        @endif
                         @if (!is_null($guideQuest->required_gold))
                             <dt>Required Gold</dt>
                             <dd>{{ number_format($guideQuest->required_gold) }}</dd>
@@ -156,6 +164,10 @@
                         @if (!is_null($guideQuest->required_shards))
                             <dt>Required Shards</dt>
                             <dd>{{ number_format($guideQuest->required_shards) }}</dd>
+                        @endif
+                        @if (!is_null($guideQuest->required_copper_coins))
+                            <dt>Required Copper Coins</dt>
+                            <dd>{{ number_format($guideQuest->required_copper_coins) }}</dd>
                         @endif
                         @if (!is_null($guideQuest->required_gold_bars))
                             <dt>Required Gold Bars</dt>

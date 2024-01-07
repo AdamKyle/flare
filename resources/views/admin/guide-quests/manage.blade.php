@@ -109,9 +109,25 @@
                                 <x-core.forms.input :model="$guideQuest" label="Required Passive Level:"
                                     modelKey="required_passive_level" name="required_passive_level" />
                             </div>
+
                             <div class='border-b-2 block md:hidden border-b-gray-300 dark:border-b-gray-600 my-6'></div>
+
                             <div>
-                                <h3 class="mb-3">Other Requirements</h3>
+
+                                <div class='border-b-2 block md:hidden border-b-gray-300 dark:border-b-gray-600 my-6'>
+                                </div>
+                                <h3 class="mb-3">Item Requirements</h3>
+                                <x-core.forms.key-value-select :model="$guideQuest" label="Required Specialty Type:"
+                                                               modelKey="required_specialty_type" name="required_specialty_type"
+                                                               :options="$itemSpecialtyTypes" />
+
+                                <x-core.forms.input :model="$guideQuest" label="Required Holy Stacks Applied:"
+                                                    modelKey="required_holy_stacks" name="required_holy_stacks" />
+
+                                <div class='border-b-2 block md:hidden border-b-gray-300 dark:border-b-gray-600 my-6'>
+                                </div>
+
+                                <h3 class="mb-3">Quest and Plane Requirements</h3>
                                 <x-core.forms.key-value-select :model="$guideQuest" label="Required Plane Access:"
                                     modelKey="required_game_map_id" name="required_game_map_id" :options="$gameMaps" />
                                 <x-core.forms.key-value-select :model="$guideQuest" label="Required Quest (Complete):"
@@ -124,6 +140,7 @@
 
                                 <div class='border-b-2 block md:hidden border-b-gray-300 dark:border-b-gray-600 my-6'>
                                 </div>
+
                                 <h3 class="mb-3">Required Mercenary Info</h3>
                                 <x-core.forms.key-value-select :model="$guideQuest" label="Required Mercenary:"
                                     modelKey="required_mercenary_type" name="required_mercenary_type"
@@ -139,13 +156,16 @@
 
                                 <div class='border-b-2 block md:hidden border-b-gray-300 dark:border-b-gray-600 my-6'>
                                 </div>
+
                                 <h3 class="mb-3">Required Class Rank Details</h3>
                                 <x-core.forms.input :model="$guideQuest" label="Required # of class specials equipped:"
                                     modelKey="required_class_specials_equipped" name="required_class_specials_equipped" />
                                 <x-core.forms.input :model="$guideQuest" label="Required Class Rank Level:"
                                     modelKey="required_class_rank_level" name="required_class_rank_level" />
+
                                 <div class='border-b-2 block md:hidden border-b-gray-300 dark:border-b-gray-600 my-6'>
                                 </div>
+
                                 <h3 class="mb-3">Required Currency Amounts</h3>
                                 <x-core.forms.input :model="$guideQuest" label="Required Gold" modelKey="required_gold"
                                     name="required_gold" />
@@ -153,16 +173,22 @@
                                     modelKey="required_gold_dust" name="required_gold_dust" />
                                 <x-core.forms.input :model="$guideQuest" label="Required Shards" modelKey="required_shards"
                                     name="required_shards" />
+                                <x-core.forms.input :model="$guideQuest" label="Required Copper Coins" modelKey="required_copper_coins"
+                                                    name="required_copper_coins" />
                                 <x-core.forms.input :model="$guideQuest" label="Required Gold Bars"
                                     modelKey="required_gold_bars" name="required_gold_bars" />
+
                                 <div class='border-b-2 block md:hidden border-b-gray-300 dark:border-b-gray-600 my-6'>
                                 </div>
+
                                 <h3 class="mb-3">Required To Be (Physically) On Map</h3>
                                 <x-core.forms.key-value-select :model="$guideQuest" label="Must be on Map:"
                                    modelKey="be_on_game_map" name="be_on_game_map"
                                    :options="$gameMaps" />
+
                                 <div class='border-b-2 block md:hidden border-b-gray-300 dark:border-b-gray-600 my-6'>
                                 </div>
+
                                 <h3 class="mb-3">Event Goal Participation</h3>
                                 <x-core.forms.input :model="$guideQuest" label="Required Event Goal Kills:"
                                    modelKey="required_event_goal_participation"
