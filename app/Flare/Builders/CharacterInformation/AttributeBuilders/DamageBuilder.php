@@ -134,7 +134,7 @@ class DamageBuilder extends BaseAttribute {
      * @param bool $voided
      * @return int
      */
-    public function buildAffixStackingDamage(bool $voided = false): int {
+    public function buildAffixStackingDamage(bool $voided = false): float {
 
         if ($voided || is_null($this->inventory)) {
             return 0;
@@ -152,7 +152,7 @@ class DamageBuilder extends BaseAttribute {
      * @param bool $voided
      * @return int
      */
-    public function buildAffixNonStackingDamage(bool $voided = false): int {
+    public function buildAffixNonStackingDamage(bool $voided = false): float {
 
         if ($voided || is_null($this->inventory)) {
             return 0;
@@ -168,56 +168,6 @@ class DamageBuilder extends BaseAttribute {
         }
 
         return max($amounts);
-    }
-
-    /**
-     * Build irresistible stacking damage.
-     *
-     * @param bool $voided
-     * @return int
-     */
-    public function buildIrresistibleNonStackingAffixDamage(bool $voided = false): int {
-
-        if ($voided || is_null($this->inventory)) {
-            return 0;
-        }
-
-        $itemSuffix = $this->inventory->where('item.itemSuffix.damage_can_stack', false)
-            ->where('item.itemSuffix.irresistible_damage', true)
-            ->sum('item.itemSuffix.damage');
-        $itemPrefix = $this->inventory->where('item.itemPrefix.damage_can_stack', false)
-            ->where('item.itemPrefix.irresistible_damage', true)
-            ->sum('item.itemPrefix.damage');
-
-        $amounts = array_filter([$itemPrefix, $itemSuffix]);
-
-        if (empty($amounts)) {
-            return 0.0;
-        }
-
-        return max($amounts);
-    }
-
-    /**
-     * Build non stacking irresistible damage.
-     *
-     * @param bool $voided
-     * @return int
-     */
-    public function buildIrresistibleStackingAffixDamage(bool $voided = false): int {
-
-        if ($voided || is_null($this->inventory)) {
-            return 0;
-        }
-
-        $itemSuffix = $this->inventory->where('item.itemSuffix.damage_can_stack', true)
-            ->where('item.itemSuffix.irresistible_damage', true)
-            ->sum('item.itemSuffix.damage');
-        $itemPrefix = $this->inventory->where('item.itemPrefix.damage_can_stack', true)
-            ->where('item.itemPrefix.irresistible_damage', true)
-            ->sum('item.itemPrefix.damage');
-
-        return $itemPrefix + $itemSuffix;
     }
 
     /**

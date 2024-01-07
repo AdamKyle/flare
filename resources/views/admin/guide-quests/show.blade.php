@@ -173,6 +173,10 @@
                             <dt>Required Gold Bars</dt>
                             <dd>{{ number_format($guideQuest->required_gold_bars) }}</dd>
                         @endif
+                        @if (!is_null($guideQuest->required_fame_level))
+                            <dt>Required Fame Level</dt>
+                            <dd>{{ number_format($guideQuest->required_fame_level) }}</dd>
+                        @endif
                     </dl>
                     <h3 class="text-sky-600 dark:text-sky-500">XP Reward</h3>
                     <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
@@ -191,16 +195,19 @@
                         <dt>Shards Reward</dt>
                         <dd>{{ is_null($guideQuest->shards_reward) ? 0 : number_format($guideQuest->shards_reward) }}</dd>
                     </dl>
-                    @if (!is_null($guideQuest->eventType()))
+                    @if (!is_null($guideQuest->eventType()) || !is_null($guideQuest->unlock_at_level))
                         <div class="my-4">
                             <x-core.alerts.info-alert title="Event Specific Guide Quest!">
-                                <p>This Guide quest only appears during a specific event:</p>
+                                <p>This Guide quest is only available when it unlocks at a specific level, is used for an event or both.</p>
+                                <p class="my-2">These types of quests interrupt what the player was doing to introduce them to new features.</p>
                                 <div class='border-b-2 border-b-blue-300 dark:border-b-blue-600 my-3'></div>
                                 <dl>
                                     <dt>Unlocks at Level</dt>
                                     <dd>{{ $guideQuest->unlock_at_level }}</dd>
-                                    <dt>Only During Event:</dt>
-                                    <dd>{{ $guideQuest->eventType()->getNameForEvent() }}</dd>
+                                    @if (!is_null($guideQuest->eventType()))
+                                        <dt>Only During Event:</dt>
+                                        <dd>{{ $guideQuest->eventType()->getNameForEvent() }}</dd>
+                                    @endif
                                     <dt>Parent ID</dt>
                                     <dd>{{ is_null($guideQuest->parent_id) ? 'N/A' : $guideQuest->parent_quest_name }}</dd>
                                 </dl>

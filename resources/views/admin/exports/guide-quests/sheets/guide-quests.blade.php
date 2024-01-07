@@ -58,6 +58,7 @@
             <th>required_holy_stacks</th>
             <th>required_attached_gems</th>
             <th>required_specialty_type</th>
+            <th>required_fame_level</th>
         </tr>
     </thead>
     <tbody>
@@ -122,6 +123,7 @@
                 <td>{{ $guideQuest->required_holy_stacks }}</td>
                 <td>{{ $guideQuest->required_attached_gems }}</td>
                 <td>{{ $guideQuest->required_specialty_type }}</td>
+                <td>{{ $guideQuest->required_fame_level }}</td>
             </tr>
         @endforeach
     </tbody>

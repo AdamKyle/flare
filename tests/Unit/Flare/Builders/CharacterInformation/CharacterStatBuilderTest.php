@@ -1046,14 +1046,14 @@ class CharacterStatBuilderTest extends TestCase {
         $itemPrefixAffix = $this->createItemAffix([
             'name'             => 'Sample',
             'chr_mod'          => 0.15,
-            'damage'           => 100,
+            'damage_amount'    => 1.0,
             'damage_can_stack' => true,
         ]);
 
         $itemSuffixAffix = $this->createItemAffix([
             'name'             => 'Sample',
             'chr_mod'          => 0.15,
-            'damage'           => 150,
+            'damage_amount'    => 1.5,
             'damage_can_stack' => true,
         ]);
 
@@ -1065,24 +1065,24 @@ class CharacterStatBuilderTest extends TestCase {
             'base_healing'   => 100
         ]);
 
-        $character = $this->character->inventoryManagement()->giveItem($item)->equipItem('spell-one', 'weapon')->getCharacter();
+        $character = $this->character->inventoryManagement()->giveItem($item, true, 'spell-one')->getCharacter();
         $damage   = $this->characterStatBuilder->setCharacter($character)->buildAffixDamage('affix-stacking-damage');
 
-        $this->assertEquals(250, $damage);
+        $this->assertEquals(2.5, $damage);
     }
 
     public function testBuildAffixStackingDamageVoided() {
         $itemPrefixAffix = $this->createItemAffix([
             'name'             => 'Sample',
             'chr_mod'          => 0.15,
-            'damage'           => 100,
+            'damage_amount'           => 1.0,
             'damage_can_stack' => true,
         ]);
 
         $itemSuffixAffix = $this->createItemAffix([
             'name'             => 'Sample',
             'chr_mod'          => 0.15,
-            'damage'           => 150,
+            'damage_amount'           => 1.5,
             'damage_can_stack' => true,
         ]);
 
@@ -1104,14 +1104,14 @@ class CharacterStatBuilderTest extends TestCase {
         $itemPrefixAffix = $this->createItemAffix([
             'name'             => 'Sample',
             'chr_mod'          => 0.15,
-            'damage'           => 100,
+            'damage_amount'    => 1.0,
             'damage_can_stack' => false,
         ]);
 
         $itemSuffixAffix = $this->createItemAffix([
             'name'             => 'Sample',
             'chr_mod'          => 0.15,
-            'damage'           => 150,
+            'damage_amount'    => 1.5,
             'damage_can_stack' => false,
         ]);
 
@@ -1126,7 +1126,7 @@ class CharacterStatBuilderTest extends TestCase {
         $character = $this->character->inventoryManagement()->giveItem($item)->equipItem('spell-one', 'weapon')->getCharacter();
         $damage   = $this->characterStatBuilder->setCharacter($character)->buildAffixDamage('affix-non-stacking');
 
-        $this->assertEquals(150, $damage);
+        $this->assertEquals(1.5, $damage);
     }
 
     public function testBuildAffixNonStackingDamageNoEnchantments() {
@@ -1146,14 +1146,14 @@ class CharacterStatBuilderTest extends TestCase {
         $itemPrefixAffix = $this->createItemAffix([
             'name'             => 'Sample',
             'chr_mod'          => 0.15,
-            'damage'           => 100,
+            'damage_amount'           => 1.0,
             'damage_can_stack' => false,
         ]);
 
         $itemSuffixAffix = $this->createItemAffix([
             'name'             => 'Sample',
             'chr_mod'          => 0.15,
-            'damage'           => 150,
+            'damage_amount'           => 1.5,
             'damage_can_stack' => false,
         ]);
 
@@ -1167,144 +1167,6 @@ class CharacterStatBuilderTest extends TestCase {
 
         $character = $this->character->inventoryManagement()->giveItem($item)->equipItem('spell-one', 'weapon')->getCharacter();
         $damage   = $this->characterStatBuilder->setCharacter($character)->buildAffixDamage('affix-non-stacking', true);
-
-        $this->assertEquals(0, $damage);
-    }
-
-    public function testBuildAffixIrresistibleDamage() {
-        $itemPrefixAffix = $this->createItemAffix([
-            'name'                => 'Sample',
-            'chr_mod'             => 0.15,
-            'damage_amount'              => 1.0,
-            'damage_can_stack'    => true,
-            'irresistible_damage' => true,
-        ]);
-
-        $itemSuffixAffix = $this->createItemAffix([
-            'name'                => 'Sample',
-            'chr_mod'             => 0.15,
-            'damage_amount'              => 1.50,
-            'damage_can_stack'    => true,
-            'irresistible_damage' => true,
-        ]);
-
-        $item = $this->createItem([
-            'name'           => 'weapon',
-            'type'           => 'spell-healing',
-            'item_suffix_id' => $itemSuffixAffix->id,
-            'item_prefix_id' => $itemPrefixAffix->id,
-            'base_healing'   => 100
-        ]);
-
-        $character = $this->character->inventoryManagement()->giveItem($item)->equipItem('spell-one', 'weapon')->getCharacter();
-        $damage   = $this->characterStatBuilder->setCharacter($character)->buildAffixDamage('affix-irresistible-damage-stacking');
-
-        $this->assertEquals(250, $damage);
-    }
-
-    public function testBuildAffixIrresistibleDamageVoided() {
-        $itemPrefixAffix = $this->createItemAffix([
-            'name'                => 'Sample',
-            'chr_mod'             => 0.15,
-            'damage_amount'              => 1.0,
-            'damage_can_stack'    => true,
-            'irresistible_damage' => true,
-        ]);
-
-        $itemSuffixAffix = $this->createItemAffix([
-            'name'                => 'Sample',
-            'chr_mod'             => 0.15,
-            'damage_amount'              => 1.50,
-            'damage_can_stack'    => true,
-            'irresistible_damage' => true,
-        ]);
-
-        $item = $this->createItem([
-            'name'           => 'weapon',
-            'type'           => 'spell-healing',
-            'item_suffix_id' => $itemSuffixAffix->id,
-            'item_prefix_id' => $itemPrefixAffix->id,
-            'base_healing'   => 100
-        ]);
-
-        $character = $this->character->inventoryManagement()->giveItem($item)->equipItem('spell-one', 'weapon')->getCharacter();
-        $damage   = $this->characterStatBuilder->setCharacter($character)->buildAffixDamage('affix-irresistible-damage-stacking', true);
-
-        $this->assertEquals(0, $damage);
-    }
-
-    public function testBuildAffixIrresistibleNonStackingDamage() {
-        $itemPrefixAffix = $this->createItemAffix([
-            'name'                => 'Sample',
-            'chr_mod'             => 0.15,
-            'damage_amount'              => 1.0,
-            'damage_can_stack'    => false,
-            'irresistible_damage' => true,
-        ]);
-
-        $itemSuffixAffix = $this->createItemAffix([
-            'name'                => 'Sample',
-            'chr_mod'             => 0.15,
-            'damage_amount'              => 1.50,
-            'damage_can_stack'    => false,
-            'irresistible_damage' => true,
-        ]);
-
-        $item = $this->createItem([
-            'name'           => 'weapon',
-            'type'           => 'spell-healing',
-            'item_suffix_id' => $itemSuffixAffix->id,
-            'item_prefix_id' => $itemPrefixAffix->id,
-            'base_healing'   => 100
-        ]);
-
-        $character = $this->character->inventoryManagement()->giveItem($item)->equipItem('spell-one', 'weapon')->getCharacter();
-        $damage   = $this->characterStatBuilder->setCharacter($character)->buildAffixDamage('affix-irresistible-damage-non-stacking');
-
-        $this->assertEquals(150, $damage);
-    }
-
-    public function testBuildAffixIrresistibleNonStackingDamageWithNoEnchantments() {
-
-        $item = $this->createItem([
-            'name'           => 'weapon',
-            'type'           => 'spell-healing',
-            'base_healing'   => 100
-        ]);
-
-        $character = $this->character->inventoryManagement()->giveItem($item)->equipItem('spell-one', 'weapon')->getCharacter();
-        $damage   = $this->characterStatBuilder->setCharacter($character)->buildAffixDamage('affix-irresistible-damage-non-stacking');
-
-        $this->assertEquals(0, $damage);
-    }
-
-    public function testBuildAffixIrresistibleNonStackingDamageVoided() {
-        $itemPrefixAffix = $this->createItemAffix([
-            'name'                => 'Sample',
-            'chr_mod'             => 0.15,
-            'damage_amount'       => 1.0,
-            'damage_can_stack'    => false,
-            'irresistible_damage' => true,
-        ]);
-
-        $itemSuffixAffix = $this->createItemAffix([
-            'name'                => 'Sample',
-            'chr_mod'             => 0.15,
-            'damage_amount'       => 1.50,
-            'damage_can_stack'    => false,
-            'irresistible_damage' => true,
-        ]);
-
-        $item = $this->createItem([
-            'name'           => 'weapon',
-            'type'           => 'spell-healing',
-            'item_suffix_id' => $itemSuffixAffix->id,
-            'item_prefix_id' => $itemPrefixAffix->id,
-            'base_healing'   => 100
-        ]);
-
-        $character = $this->character->inventoryManagement()->giveItem($item)->equipItem('spell-one', 'weapon')->getCharacter();
-        $damage   = $this->characterStatBuilder->setCharacter($character)->buildAffixDamage('affix-irresistible-damage-non-stacking', true);
 
         $this->assertEquals(0, $damage);
     }

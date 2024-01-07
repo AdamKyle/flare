@@ -79,6 +79,9 @@ class GuideQuest extends Model {
         'required_holy_stacks',
         'required_attached_gems',
         'required_specialty_type',
+        'must_be_pledged_to_faction',
+        'must_be_assisting_npc',
+        'required_fame_level',
     ];
 
     /**
@@ -135,9 +138,10 @@ class GuideQuest extends Model {
         'unlock_at_level'                    => 'integer',
         'only_during_event'                  => 'integer',
         'be_on_game_map'                     => 'integer',
-        'required_event_goal_participation'   => 'integer',
+        'required_event_goal_participation'  => 'integer',
         'required_holy_stacks'               => 'integer',
         'required_attached_gems'             => 'integer',
+        'required_fame_level'                => 'integer',
     ];
 
     protected $appends = [

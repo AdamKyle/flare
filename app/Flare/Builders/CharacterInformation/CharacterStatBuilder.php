@@ -691,10 +691,6 @@ class CharacterStatBuilder {
                 return $this->damageBuilder->buildAffixStackingDamage($voided);
             case 'affix-non-stacking':
                 return $this->damageBuilder->buildAffixNonStackingDamage($voided);
-            case 'affix-irresistible-damage-stacking':
-                return $this->damageBuilder->buildIrresistibleStackingAffixDamage($voided);
-            case 'affix-irresistible-damage-non-stacking':
-                return $this->damageBuilder->buildIrresistibleNonStackingAffixDamage($voided);
             case 'life-stealing':
                 return $this->damageBuilder->buildLifeStealingDamage($voided);
             default:

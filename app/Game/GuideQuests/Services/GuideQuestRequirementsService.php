@@ -219,6 +219,31 @@ class GuideQuestRequirementsService {
     }
 
     /**
+     * Does the players current fame level match that of the requirement?
+     *
+     * - Players must be pledged
+     * - Players must be assisting
+     * - Players must have their fame level with that NPC at or higher than the requirement.
+     *
+     * @param Character $character
+     * @param GuideQuest $quest
+     * @return $this
+     */
+    public function requiredFameLevel(Character $character, GuideQuest $quest): GuideQuestRequirementsService {
+
+        if (!is_null($quest->required_fame_level)) {
+            if (optional(
+                optional($character->factionLoyalties()->where('is_pledged', true)->first())
+                    ->factionLoyaltyNpcs()->where('currently_helping', true)->first()
+            )->current_level >= $quest->required_fame_level) {
+                $this->finishedRequirements[] = 'required_fame_level';
+            }
+        }
+
+        return $this;
+    }
+
+    /**
      * Do we have an item that has a specific specialty type either in out inventory or in a set?
      *
      * @param Character $character
@@ -253,6 +278,11 @@ class GuideQuestRequirementsService {
      * @return $this
      */
     public function requiredHolyStacks(Character $character, GuideQuest $quest): GuideQuestRequirementsService {
+
+        if (is_null($quest->required_holy_stacks)) {
+            return $this;
+        }
+
         if ($character->getInformation()->holyInfo()->getTotalAppliedStacks() >= $quest->required_holy_stacks) {
             $this->finishedRequirements[] = 'required_holy_stacks';
         }

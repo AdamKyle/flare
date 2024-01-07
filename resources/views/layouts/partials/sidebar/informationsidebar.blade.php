@@ -171,10 +171,6 @@
                 <span class="fas fa-user-clock"></span>
                 Automation
             </a>
-            <a href="{{ route('info.page', ['pageName' => 'factions']) }}">
-                <span class="ra ra-arrow-cluster"></span>
-                Factions
-            </a>
             <a href="{{ route('info.page', ['pageName' => 'voidance']) }}">
                 <span class="ra ra-burning-book"></span>
                 Voidance/Devoidance
@@ -214,6 +210,16 @@
             <a href="{{ route('info.page', ['pageName' => 'special-locations']) }}">
                 <span class="fas fa-dungeon"></span>
                 Special Locations
+            </a>
+            <hr />
+            <h6 class="uppercase">Factions</h6>
+            <a href="{{ route('info.page', ['pageName' => 'factions']) }}">
+                <span class="ra ra-arrow-cluster"></span>
+                Factions
+            </a>
+            <a href="{{ route('info.page', ['pageName' => 'faction-loyalty']) }}">
+                <span class="ra ra-double-team"></span>
+                Factions Loyalty
             </a>
         </div>
     </div>

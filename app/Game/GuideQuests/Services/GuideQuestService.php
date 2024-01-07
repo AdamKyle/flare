@@ -157,6 +157,7 @@ class GuideQuestService {
             ->requirePlayerToBeOnASpecificMap($character, $quest)
             ->requiredSpecialtyType($character, $quest)
             ->requiredHolyStacks($character, $quest)
+            ->requiredFameLevel($character, $quest)
             ->getFinishedRequirements();
 
         if (!empty($this->completedAttributes)) {
@@ -176,11 +177,16 @@ class GuideQuestService {
 
     protected function fetchNextGuideQuest(Character $character): GuideQuest | null {
 
-        $winterEvent    = Event::where('type' , EventType::WINTER_EVENT)->first();
-        $nextGuideQuest = null;
+        $winterEvent          = Event::where('type' , EventType::WINTER_EVENT)->first();
+        $unlocksAtLevelQuest  = GuideQuest::where('unlock_at_level', '<=', $character->level)->whereNull('parent_id')->orderBy('unlock_at_level', 'asc')->first();
+        $nextGuideQuest       = null;
 
-        if (!is_null($winterEvent)) {
-            $eventGuideQuest = GuideQuest::where('only_during_event', EventType::WINTER_EVENT)->where('parent_id')->first();
+        if (!is_null($unlocksAtLevelQuest)) {
+            $nextGuideQuest = $this->fetchNextEventQuest($character, $unlocksAtLevelQuest);
+        }
+
+        if (!is_null($winterEvent) && is_null($nextGuideQuest)) {
+            $eventGuideQuest = GuideQuest::where('only_during_event', EventType::WINTER_EVENT)->whereNull('parent_id')->first();
 
             if (!is_null($eventGuideQuest)) {
                 $nextGuideQuest = $this->fetchNextEventQuest($character, $eventGuideQuest);

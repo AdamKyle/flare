@@ -66,13 +66,20 @@
                                     modelKey="required_skill_type" name="required_skill_type" :options="$skillTypes" />
                                 <x-core.forms.input :model="$guideQuest" label="Required Skill Type Level (Optional):"
                                     modelKey="required_skill_type_level" name="required_skill_type_level" />
-                                <x-core.forms.key-value-select :model="$guideQuest" label="Required Faction:"
-                                    modelKey="required_faction_id" name="required_faction_id" :options="$factionMaps" />
-                                <x-core.forms.input :model="$guideQuest" label="Required (Faction) Level:"
-                                    modelKey="required_faction_level" name="required_faction_level" />
 
                                 <div class='border-b-2 block md:hidden border-b-gray-300 dark:border-b-gray-600 my-6'></div>
-                                <h3 class="mb-3">Stat Requirmenets</h3>
+                                <h3 class="mb-3">Faction Requirements</h3>
+
+                                <x-core.forms.key-value-select :model="$guideQuest" label="Required Faction:"
+                                                               modelKey="required_faction_id" name="required_faction_id" :options="$factionMaps" />
+                                <x-core.forms.input :model="$guideQuest" label="Required (Faction) Level:"
+                                                    modelKey="required_faction_level" name="required_faction_level" />
+
+                                <x-core.forms.input :model="$guideQuest" label="Required Fame Level"
+                                                    modelKey="required_fame_level" name="required_fame_level" />
+
+                                <div class='border-b-2 block md:hidden border-b-gray-300 dark:border-b-gray-600 my-6'></div>
+                                <h3 class="mb-3">Stat Requirements</h3>
                                 <x-core.forms.input :model="$guideQuest" label="Required Stats (Total):"
                                     modelKey="required_stats" name="required_stats" />
                                 <x-core.forms.input :model="$guideQuest" label="Required Strength (Total):"

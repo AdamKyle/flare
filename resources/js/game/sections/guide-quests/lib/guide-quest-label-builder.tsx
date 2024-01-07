@@ -94,9 +94,9 @@ const guideQuestLabelBuilder = (
         case "required_focus":
             return "Get Focus to";
         case "required_specialty_type":
-            return `Purchase a piece of: ${questData.required_specialty_type}`
+            return `Purchase a piece of`
         case "required_holy_stacks":
-            return `Applied Holy Oil Amount: ${questData.required_holy_stacks}`
+            return `Applied Holy Oil Amount`
         case "required_gold":
             return "Obtain Gold amount";
         case "required_gold_dust":
@@ -111,6 +111,8 @@ const guideQuestLabelBuilder = (
             return "Physically be on Plane";
         case "required_event_goal_participation":
             return "Kill # of Event Creatures";
+        case "required_fame_level":
+            return "Increase your fame with an NPC to";
         default:
             return null;
     }
