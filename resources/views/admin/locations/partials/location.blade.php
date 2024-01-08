@@ -37,10 +37,10 @@
         <p class="mb-4"> This location will let you explore here, for shards to drop off enemies. 1-1000 shards per
             kill.</p>
         <ul class="list-disc my-4">
-            <li class="ml-4">Characters can get 1-10,000 Gold from fighting monsters. This can be increased to 50,000 if an event is triggered at this area.</li>
+            <li class="ml-4">Characters can get 1-10,000 Gold from fighting monsters. This can be increased to 20,000 if an event is triggered at this area.</li>
             <li class="ml-4">Characters can get 1-500 Gold Dust from fighting monsters. This can be increased to 1,000 if an event is triggered at this area.</li>
             <li class="ml-4">Characters can get 1-500 Shards from fighting monsters. This can be increased to 1,000 if an event is triggered at this area.</li>
-            <li class="ml-4">There is a 1/1,000,000 chance to get a random <a href="/information/random-enchants" target="_blank">Medium Unique <i className="fas fa-external-link-alt"></i></a> from Monsters half way down the list of more. This can be reduced to 1/500,000 chance if an event is triggered at this area.</li>
+            <li class="ml-4">There is a 1/1,000,000 (+15% Looting) chance to get a random <a href="/information/random-enchants" target="_blank">Medium Unique <i className="fas fa-external-link-alt"></i></a> from Monsters half way down the list of more. This can be reduced to 1/500,000 (+30% looting) chance if an event is triggered at this area.</li>
             <li class="ml-4">There is a 1/1,000,000 chance to trigger an event while fighting here to reduce the chances and increase the currencies (the above "if an event is triggered") for 1 hour at this location only.</li>
         </ul>
     @endif
@@ -66,7 +66,26 @@
             <li class="ml-4">There is a 1/1,000,000 chance to trigger an event while fighting here to reduce the chances and increase the currencies (the above "if an event is triggered") for 1 hour at this location only.</li>
         </ul>
         <p class="mt-4 mb-4 italic"><sup>*</sup> Provided characters have the required quest item to obtain copper coins.</p>
+    @endif
 
+    @if ($locationType->isTheOldChurch())
+        <h3 class="mb-4">Welcome to The Old Church!</h3>
+        <x-core.alerts.warning-alert title="ATTN!">
+            <strong>Exploration cannot be used here if you want the below rewards. You must manually fight.</strong>
+        </x-core.alerts.warning-alert>
+        <x-core.alerts.info-alert title="WAIT!">
+            The below only applies to those who poses the Christmas Tree Light Bulb Quest item from completing a quest chain that starts with: Thousands of Years Ago ... and
+            ends with: The doors to The Old Church.
+        </x-core.alerts.info-alert>
+        <p class="my-4">In this location, a few things will happen for those who have access:</p>
+        <ul class="list-disc my-4">
+            <li class="ml-4">Characters can get 1-1000 Gold Dust from fighting monsters. This can be increased to 5,000 if an event is triggered at this area.</li>
+            <li class="ml-4">Characters can get 1-1000 Shards from fighting monsters. This can be increased to 5,000 if an event is triggered at this area.</li>
+            <li class="ml-4">Characters can get 1-20,000 Gold<sup>*</sup> from fighting monsters. This can be increased to 40,000 if an event is triggered at this area.</li>
+            <li class="ml-4">There is a 1/1,000,000 chance (+15% of your looting) to get a Medium Corrupted Ice <a href="/information/random-enchants" target="_blank">Medium Unique <i className="fas fa-external-link-alt"></i></a> from Monsters halfway down the list of more. This can be reduced to 1/500,000 (+30% Looting) chance if an event is triggered at this area.</li>
+            <li class="ml-4">There is a 1/1,000,000 chance to trigger an event while fighting here to reduce the chances and increase the currencies (the above "if an event is triggered") for 1 hour at this location only.</li>
+        </ul>
+        <p class="mt-4 mb-4 italic"><sup>*</sup> Provided characters have the required quest item to obtain copper coins.</p>
     @endif
 @endif
 

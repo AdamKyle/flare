@@ -13,6 +13,7 @@ use App\Game\BattleRewardProcessing\Handlers\FactionLoyaltyBountyHandler;
 use App\Game\BattleRewardProcessing\Handlers\GlobalEventParticipationHandler;
 use App\Game\BattleRewardProcessing\Handlers\GoldMinesRewardHandler;
 use App\Game\BattleRewardProcessing\Handlers\PurgatorySmithHouseRewardHandler;
+use App\Game\BattleRewardProcessing\Handlers\TheOldChurchRewardHandler;
 use App\Game\BattleRewardProcessing\Jobs\BattleItemHandler;
 use App\Game\Core\Services\GoldRush;
 use App\Game\Events\Values\EventType;
@@ -29,6 +30,7 @@ class BattleRewardService {
     private PurgatorySmithHouseRewardHandler $purgatorySmithHouseRewardHandler;
     private GoldMinesRewardHandler $goldMinesRewardHandler;
     private FactionLoyaltyBountyHandler $factionLoyaltyBountyHandler;
+    private TheOldChurchRewardHandler $theOldChurchRewardHandler;
 
     public function __construct(
         FactionHandler $factionHandler,
@@ -38,6 +40,7 @@ class BattleRewardService {
         PurgatorySmithHouseRewardHandler $purgatorySmithHouseRewardHandler,
         GoldMinesRewardHandler $goldMinesRewardHandler,
         FactionLoyaltyBountyHandler $factionLoyaltyBountyHandler,
+        TheOldChurchRewardHandler $theOldChurchRewardHandler,
     ) {
         $this->factionHandler                   = $factionHandler;
         $this->characterRewardService           = $characterRewardService;
@@ -46,6 +49,7 @@ class BattleRewardService {
         $this->purgatorySmithHouseRewardHandler = $purgatorySmithHouseRewardHandler;
         $this->goldMinesRewardHandler           = $goldMinesRewardHandler;
         $this->factionLoyaltyBountyHandler      = $factionLoyaltyBountyHandler;
+        $this->theOldChurchRewardHandler        = $theOldChurchRewardHandler;
     }
 
     public function setUp(Monster $monster, Character $character): BattleRewardService {
@@ -78,6 +82,8 @@ class BattleRewardService {
         $character = $this->purgatorySmithHouseRewardHandler->handleFightingAtPurgatorySmithHouse($character, $this->monster);
 
         $character = $this->goldMinesRewardHandler->handleFightingAtGoldMines($character, $this->monster);
+
+        $character = $this->theOldChurchRewardHandler->handleFightingAtTheOldChurch($character, $this->monster);
 
         $character = $this->factionLoyaltyBountyHandler->handleBounty($character, $this->monster);
 

@@ -2,8 +2,8 @@ import React, {Fragment} from "react";
 import {formatNumber} from "../../../../lib/game/format-number";
 import SpecialLocationHelpModal from "./special-location-help-modal";
 import LocationDetailsProps from "../../../map/types/map/location-pins/modals/location-details-props";
-import Gems from '../../npc-actions/seer-actions/deffinitions/gems';
 import WarningAlert from "../../../../components/ui/alerts/simple-alerts/warning-alert";
+import InfoAlert from "../../../../components/ui/alerts/simple-alerts/info-alert";
 
 export default class LocationDetails extends React.Component<LocationDetailsProps, any> {
     constructor(props: LocationDetailsProps) {
@@ -36,13 +36,41 @@ export default class LocationDetails extends React.Component<LocationDetailsProp
                     </WarningAlert>
                     <p className='my-4'>
                         Welcome to the Gold Mines, a special mid game location to help players start farming currencies for end game gear while they continue their questing
-                        to unlock more of the game and work further towarfds the true power of their character! Come now child, death awaits!
+                        to unlock more of the game and work further towards the true power of their character! Come now child, death awaits!
                     </p>
                     <ul className="list-disc">
-                        <li className="ml-4">Characters can get 1-10,000 Gold from fighting monsters. This can be increased to 50,000 if an event is triggered at this area.</li>
+                        <li className="ml-4">Characters can get 1-10,000 Gold from fighting monsters. This can be increased to 20,000 if an event is triggered at this area.</li>
                         <li className="ml-4">Characters can get 1-500 Gold Dust from fighting monsters. This can be increased to 1,000 if an event is triggered at this area.</li>
                         <li className="ml-4">Characters can get 1-500 Shards from fighting monsters. This can be increased to 1,000 if an event is triggered at this area.</li>
-                        <li className="ml-4">There is a 1/1,000,000 chance to get a random <a href="/information/random-enchants" target="_blank">Medium Unique <i className="fas fa-external-link-alt"></i></a> from Monsters half way down the list of more. This can be reduced to 1/500,000 chance if an event is triggered at this area.</li>
+                        <li className="ml-4">There is a 1/1,000,000 (+15% Looting) chance to get a random <a href="/information/random-enchants" target="_blank">Medium Unique <i className="fas fa-external-link-alt"></i></a> from Monsters half way down the list of more. This can be reduced to 1/500,000 (+30% Looting) chance if an event is triggered at this area.</li>
+                        <li className="ml-4">There is a 1/1,000,000 chance to trigger an event while fighting here to reduce the chances and increase the currencies (the above "if an event is triggered") for 1 hour at this location only.</li>
+                    </ul>
+                </Fragment>
+            )
+        }
+
+        if (this.props.location.type_name === 'The Old Church') {
+            return (
+                <Fragment>
+                    <div className='border-b-2 border-b-gray-200 dark:border-b-gray-600 my-3 hidden sm:block'></div>
+                    <h5 className='text-orange-500 dark:text-orange-400'>The Old Church!</h5>
+                    <WarningAlert additional_css={'my-4 font-bold'}>
+                        Exploration cannot be used here if you want the below rewards. You must manually fight.
+                    </WarningAlert>
+
+                    <InfoAlert additional_css={'my-4 font-bold'}>
+                        The below only applies to those who poses the Christmas Tree Light Bulb Quest item from completing a quest chain that starts with: Thousands of Years Ago ... and
+                        ends with: The doors to The Old Church.
+                    </InfoAlert>
+                    <p className='my-4'>
+                        Welcome to the The Old Church, a special mid game location to help players start farming currencies for end game gear while they continue their questing
+                        to unlock more of the game and work further towards the true power of their character! Come now child, death awaits!
+                    </p>
+                    <ul className="list-disc">
+                        <li className="ml-4">Characters can get 1-20,000 Gold from fighting monsters. This can be increased to 40,000 if an event is triggered at this area.</li>
+                        <li className="ml-4">Characters can get 1-1000 Gold Dust from fighting monsters. This can be increased to 2,000 if an event is triggered at this area.</li>
+                        <li className="ml-4">Characters can get 1-1000 Shards from fighting monsters. This can be increased to 2,000 if an event is triggered at this area.</li>
+                        <li className="ml-4">There is a 1/1,000,000 (+15% Looting) chance to get a random <a href="/information/random-enchants" target="_blank">Medium Unique <i className="fas fa-external-link-alt"></i></a> from Monsters half way down the list of more. This can be reduced to 1/500,000 (+30% Looting) chance if an event is triggered at this area.</li>
                         <li className="ml-4">There is a 1/1,000,000 chance to trigger an event while fighting here to reduce the chances and increase the currencies (the above "if an event is triggered") for 1 hour at this location only.</li>
                     </ul>
                 </Fragment>
@@ -118,6 +146,7 @@ export default class LocationDetails extends React.Component<LocationDetailsProp
     }
 
     render() {
+        console.log(this.props.location);
         return (
             <Fragment>
                 <p className='my-3'>{this.props.location.description}</p>

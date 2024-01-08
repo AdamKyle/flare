@@ -22,7 +22,7 @@ use App\Game\Messages\Events\ServerMessageEvent;
 use Exception;
 use Illuminate\Support\Facades\Cache;
 
-class GoldMinesRewardHandler {
+class TheOldChurchRewardHandler {
 
 
     /**
@@ -37,7 +37,7 @@ class GoldMinesRewardHandler {
         $this->randomAffixGenerator = $randomAffixGenerator;
     }
 
-    public function handleFightingAtGoldMines(Character $character, Monster $monster): Character {
+    public function handleFightingAtTheOldChurch(Character $character, Monster $monster): Character {
 
         if ($character->currentAutomations->isNotEmpty()) {
             return $character;
@@ -52,11 +52,19 @@ class GoldMinesRewardHandler {
             return $character;
         }
 
-        if (!$location->locationType()->isGoldMines()) {
+        if (!$location->locationType()->isTheOldChurch()) {
              return $character;
         }
 
-        $event = Event::where('type', EventType::GOLD_MINES)->first();
+        $hasQuestItem = $character->inventory->slots->filter(function($slot) {
+            return $slot->item->effect === ItemEffectsValue::THE_OLD_CHURCH;
+        })->isNotEmpty();
+
+        if (!$hasQuestItem) {
+            return $character;
+        }
+
+        $event = Event::where('type', EventType::THE_OLD_CHURCH)->first();
 
         $character = $this->currencyReward($character, $event);
 
@@ -96,12 +104,12 @@ class GoldMinesRewardHandler {
      * @return Character
      */
     public function currencyReward(Character $character, Event $event = null): Character {
-        $maximumAmount = 500;
-        $maximumGold = 10000;
+        $maximumAmount = 1000;
+        $maximumGold = 20000;
 
         if (!is_null($event)) {
-            $maximumAmount = 1000;
-            $maximumGold = 20000;
+            $maximumAmount = 2000;
+            $maximumGold = 40000;
         }
 
         $goldDust = RandomNumberGenerator::generateRandomNumber(1, $maximumAmount);
@@ -178,7 +186,7 @@ class GoldMinesRewardHandler {
      * @throws Exception
      */
     protected function rewardForCharacter(Character $character, bool $isMythic = false) {
-        $item = Item::whereIsNull('specialty_type')
+        $item = Item::where('specialty_type', ItemSpecialtyType::CORRUPTED_ICE)
             ->whereIsNull('item_prefix_id')
             ->whereIsNull('item_suffix_id')
             ->whereDoesntHave('appliedHolyStacks')
@@ -205,7 +213,7 @@ class GoldMinesRewardHandler {
                 'item_id'      => $newItem->id,
             ]);
 
-            event(new ServerMessageEvent($character->user, 'You found something MEDIUM but still unique, in the mines child: ' . $item->affix_name, $slot->id));
+            event(new ServerMessageEvent($character->user, 'You found something MEDIUM but still unique, in The Old Church child: ' . $item->affix_name, $slot->id));
         }
     }
 
@@ -234,22 +242,22 @@ class GoldMinesRewardHandler {
      */
     protected function createPossibleEvent() {
 
-        if (Event::where('type', EventType::GOLD_MINES)->exists()) {
+        if (Event::where('type', EventType::THE_OLD_CHURCH)->exists()) {
             return;
         }
 
         if (RandomNumberGenerator::generateTrueRandomNumber(1000000) >= 1000000) {
             Event::create([
-                'type'        => EventType::GOLD_MINES,
+                'type'        => EventType::THE_OLD_CHURCH,
                 'started_at'  => now(),
                 'ends_at'     => now()->addHour(),
             ]);
 
-            AnnouncementHandler::createAnnouncement('gold_mines');
+            AnnouncementHandler::createAnnouncement('the_old_house');
 
             event(new GlobalMessageEvent(
-                'There comes a howling scream from the depths of the mines in the land of tormenting shadows.
-                Someone released the vien of hate and flooded the mines with treasure!'
+                'The shadows of the past come to dance and finally you are able to see the light of the answers as
+                The Emerald Prince appears before you.'
             ));
         }
     }

@@ -25,6 +25,8 @@ class AnnouncementHandler {
             'weekly_currency_drop' => $this->buildWeeklyCurrencyDrop(),
             'winter_event' => $this->buildWinterEventMessage(),
             'purgatory_house' => $this->buildPurgatoryHouseMessage(),
+            'gold_mines' => $this->buildTheGoldMinesMessage(),
+            'the_old_church' => $this->buildTheOldChurchMessage(),
             default => throw new Exception('Cannot determine announcement type'),
         };
     }
@@ -52,6 +54,46 @@ class AnnouncementHandler {
             'message'    => $message,
             'expires_at' => $event->ends_at,
             'event_id'   => $event->id,
+        ]);
+
+        event(new AnnouncementMessageEvent($message, $announcement->id));
+    }
+
+    private function buildTheGoldMinesMessage(): void {
+        $event = Event::where('type', EventType::THE_OLD_CHURCH)->first();
+
+        if (is_null($event)) {
+            throw new Exception('Cannot create message for The The Old Church, when no event exists.');
+        }
+
+        $message = 'From now until: ' . $event->ends_at->format('l, j \of F \a\t h:ia \G\M\TP') . ' ' .
+            'Players who are in The Gold Mines will have double chance to get MEDIUM uniques gear. ' .
+            'Players will also get 2x the amount of Gold Dust, Shards and Gold from critters.';
+
+        $announcement = Announcement::create([
+            'message'    => $message,
+            'expires_at' => $event->ends_at,
+            'event_id'   => $event->id
+        ]);
+
+        event(new AnnouncementMessageEvent($message, $announcement->id));
+    }
+
+    private function buildTheOldChurchMessage(): void {
+        $event = Event::where('type', EventType::THE_OLD_CHURCH)->first();
+
+        if (is_null($event)) {
+            throw new Exception('Cannot create message for The The Old Church, when no event exists.');
+        }
+
+        $message = 'From now until: ' . $event->ends_at->format('l, j \of F \a\t h:ia \G\M\TP') . ' ' .
+            'Players who are in The Old Church will have double chance to get MEDIUM uniques Corrupted Ice gear. ' .
+            'Players will also get 2x the amount of Gold Dust, Shards and Gold from critters.';
+
+        $announcement = Announcement::create([
+            'message'    => $message,
+            'expires_at' => $event->ends_at,
+            'event_id'   => $event->id
         ]);
 
         event(new AnnouncementMessageEvent($message, $announcement->id));
@@ -143,7 +185,7 @@ class AnnouncementHandler {
         $event = Event::where('type', EventType::PURGATORY_SMITH_HOUSE)->first();
 
         if (is_null($event)) {
-            throw new Exception('Cannot create message for Winter Event, when no event exists.');
+            throw new Exception('Cannot create message for The Purgatory Smith House, when no event exists.');
         }
 
         $message = 'From now until: ' . $event->ends_at->format('l, j \of F \a\t h:ia \G\M\TP') . ' ' .

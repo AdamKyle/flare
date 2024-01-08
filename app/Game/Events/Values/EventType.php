@@ -21,6 +21,8 @@ class EventType {
 
     const GOLD_MINES            = 6;
 
+    const THE_OLD_CHURCH         = 7;
+
     /**
      * @var int $value
      */
@@ -37,6 +39,7 @@ class EventType {
         4 => self::WINTER_EVENT,
         5 => self::PURGATORY_SMITH_HOUSE,
         6 => self::GOLD_MINES,
+        7 => self::THE_OLD_CHURCH,
     ];
 
     protected static array $selection = [
@@ -47,6 +50,7 @@ class EventType {
         4 => 'Winter Event',
         5 => 'Purgatory Smith House',
         6 => 'Gold Mines',
+        7 => 'The Old Church',
     ];
 
     /**
@@ -132,7 +136,7 @@ class EventType {
      * @return bool
      */
     public function isPurgatorySmithHouseEvent(): bool {
-        return $this->value = self::PURGATORY_SMITH_HOUSE;
+        return $this->value === self::PURGATORY_SMITH_HOUSE;
     }
 
     /**
@@ -141,6 +145,15 @@ class EventType {
      * @return bool
      */
     public function isGoldMinesEvent(): bool {
-        return $this->value = self::GOLD_MINES;
+        return $this->value === self::GOLD_MINES;
+    }
+
+    /**
+     * Is The Old Church Event?
+     *
+     * @return bool
+     */
+    public function isTheOldChurchEvent(): bool {
+        return $this->value === self::THE_OLD_CHURCH;
     }
 }

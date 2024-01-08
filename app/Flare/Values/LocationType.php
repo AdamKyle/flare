@@ -14,13 +14,15 @@ class LocationType {
     const PURGATORY_DUNGEONS    = 2;
     const UNDERWATER_CAVES      = 3;
     const TEAR_FABRIC_TIME      = 4;
+    const THE_OLD_CHURCH        = 5;
 
     protected static $values = [
         0 => self::PURGATORY_SMITH_HOUSE,
         1 => self::GOLD_MINES,
         2 => self::PURGATORY_DUNGEONS,
         3 => self::UNDERWATER_CAVES,
-        4 => self::TEAR_FABRIC_TIME
+        4 => self::TEAR_FABRIC_TIME,
+        5 => self::THE_OLD_CHURCH,
     ];
 
     /**
@@ -32,6 +34,7 @@ class LocationType {
         self::PURGATORY_DUNGEONS    => 'Purgatory Dungeons',
         self::UNDERWATER_CAVES      => 'Underwater Caves',
         self::TEAR_FABRIC_TIME      => 'Tear in the fabrice of time',
+        self::THE_OLD_CHURCH        => 'The Old Church'
     ];
 
     /**
@@ -84,11 +87,20 @@ class LocationType {
     }
 
     /**
-     * Is Purgatory dungeons?
+     * Is underwater caves?
      *
      * @return bool
      */
     public function isUnderWaterCaves(): bool {
         return $this->value === self::UNDERWATER_CAVES;
+    }
+
+    /**
+     * is the old church?
+     *
+     * @return bool
+     */
+    public function isTheOldChurch(): bool {
+        return $this->value === self::THE_OLD_CHURCH;
     }
 }

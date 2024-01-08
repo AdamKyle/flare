@@ -10,6 +10,7 @@ use App\Game\BattleRewardProcessing\Handlers\FactionLoyaltyBountyHandler;
 use App\Game\BattleRewardProcessing\Handlers\GlobalEventParticipationHandler;
 use App\Game\BattleRewardProcessing\Handlers\GoldMinesRewardHandler;
 use App\Game\BattleRewardProcessing\Handlers\PurgatorySmithHouseRewardHandler;
+use App\Game\BattleRewardProcessing\Handlers\TheOldChurchRewardHandler;
 use App\Game\BattleRewardProcessing\Services\BattleRewardService;
 use App\Game\BattleRewardProcessing\Services\SecondaryRewardService;
 use App\Game\ClassRanks\Services\ClassRankService;
@@ -59,6 +60,12 @@ class ServiceProvider extends ApplicationServiceProvider {
             );
         });
 
+        $this->app->bind(TheOldChurchRewardHandler::class, function($app) {
+            return new TheOldChurchRewardHandler(
+                $app->make(RandomAffixGenerator::class),
+            );
+        });
+
         $this->app->bind(BattleRewardService::class, function ($app) {
             return new BattleRewardService(
                 $app->make(FactionHandler::class),
@@ -68,6 +75,7 @@ class ServiceProvider extends ApplicationServiceProvider {
                 $app->make(PurgatorySmithHouseRewardHandler::class),
                 $app->make(GoldMinesRewardHandler::class),
                 $app->make(FactionLoyaltyBountyHandler::class),
+                $app->make(TheOldChurchRewardHandler::class),
             );
         });
 

@@ -227,6 +227,10 @@ class LocationService {
                     if ($locationType->isPurgatoryDungeons()) {
                         $location->type_name = 'Purgatory Dungeons';
                     }
+
+                    if ($locationType->isTheOldChurch()) {
+                        $location->type_name = 'The Old Church';
+                    }
                 }
             }
 
