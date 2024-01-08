@@ -2,8 +2,11 @@
 
 namespace App\Game\Core\Controllers\Api;
 
+use App\Flare\Models\Event;
+use App\Flare\Models\GameMap;
 use App\Flare\Models\User;
 use App\Game\CharacterInventory\Services\UseItemService;
+use App\Game\Events\Values\EventType;
 use League\Fractal\Manager;
 use Illuminate\Http\Request;
 use App\Flare\Models\Character;
@@ -163,6 +166,17 @@ class CharacterSheetController extends Controller {
 
             return $faction;
         });
+
+        $winterEvent = Event::where('type', EventType::WINTER_EVENT)->first();
+
+        if (is_null($winterEvent)) {
+
+            $gameMap = GameMap::where('only_during_event_type', EventType::WINTER_EVENT)->first();
+
+            $factions = $factions->filter(function($faction) use($gameMap) {
+                return $faction->game_map_id !== $gameMap->id;
+            });
+        }
 
         return response()->json([
             'factions' => $factions,
