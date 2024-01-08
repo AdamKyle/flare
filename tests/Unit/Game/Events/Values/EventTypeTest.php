@@ -23,6 +23,7 @@ class EventTypeTest extends TestCase {
             EventType::WINTER_EVENT => 'Winter Event',
             EventType::PURGATORY_SMITH_HOUSE => 'Purgatory Smith House',
             EventType::GOLD_MINES => 'Gold Mines',
+            EventType::THE_OLD_CHURCH => 'The Old Church',
         ];
 
         $this->assertEquals($expected, EventType::getOptionsForSelect());
@@ -54,5 +55,9 @@ class EventTypeTest extends TestCase {
 
     public function testIsGoldMines() {
         $this->assertTrue((new EventType(EventType::GOLD_MINES))->isGoldMinesEvent());
+    }
+
+    public function testIsTheOldChurch() {
+        $this->assertTrue((new EventType(EventType::THE_OLD_CHURCH))->isTheOldChurchEvent());
     }
 }

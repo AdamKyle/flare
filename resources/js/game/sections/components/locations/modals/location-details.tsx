@@ -146,7 +146,6 @@ export default class LocationDetails extends React.Component<LocationDetailsProp
     }
 
     render() {
-        console.log(this.props.location);
         return (
             <Fragment>
                 <p className='my-3'>{this.props.location.description}</p>

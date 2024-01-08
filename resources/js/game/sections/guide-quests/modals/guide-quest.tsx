@@ -217,15 +217,10 @@ export default class GuideQuest extends React.Component<any, any> {
                     </div>
                 ) : (
                     <div className="overflow-y-auto max-h-[450px] lg:max-h-none lg:overflow-visible">
-                        <InfoAlert additional_css={clsx('my-4', {'hidden': this.state.quest_data.only_during_event === null})}>
+                        <InfoAlert additional_css={clsx('my-4', {'hidden': this.state.quest_data.only_during_event === null && this.state.quest_data.unlock_at_level === null})}>
                             <p>
-                                {
-                                    this.state.quest_data.only_during_event === EVENT_TYPE.WINTER_EVENT ?
-                                        'This is a special event guide quest to get new and existing ' +
-                                        'players engaged with the new event content. Once these quests are finished, ' +
-                                        'you will be returned to your remaining regular guide quests.'
-                                    : null
-                                }
+                                These types of Guide quests only pop up during special events or when new features are unlocked.
+                                You can continue your regular guide quests once you finish the ones related to this.
                             </p>
                         </InfoAlert>
                         {this.state.success_message !== null ? (

@@ -309,15 +309,17 @@ export default class ItemComparisonSection extends React.Component<ItemCompariso
         return (
             <Tabs tabs={this.tabs}>
                 <TabPanel key={'comparison'}>
-                    {
-                        double ?
-                            this.renderTwoComparisons()
-                            :
-                            this.renderSingleComparison()
-                    }
+                    <div className='max-h-[250px] md:max-h-[400px] overflow-y-scroll'>
+                        {
+                            double ?
+                                this.renderTwoComparisons()
+                                :
+                                this.renderSingleComparison()
+                        }
+                    </div>
                 </TabPanel>
                 <TabPanel key={'general'}>
-                    <div className='mb-10'>
+                    <div className='mb-10 max-h-[250px] md:max-h-[300px] overflow-y-scroll'>
                         {this.renderSingleItem()}
                     </div>
                 </TabPanel>

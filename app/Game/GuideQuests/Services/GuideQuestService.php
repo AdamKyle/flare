@@ -178,7 +178,7 @@ class GuideQuestService {
     protected function fetchNextGuideQuest(Character $character): GuideQuest | null {
 
         $winterEvent          = Event::where('type' , EventType::WINTER_EVENT)->first();
-        $unlocksAtLevelQuest  = GuideQuest::where('unlock_at_level', '<=', $character->level)->whereNull('parent_id')->orderBy('unlock_at_level', 'asc')->first();
+        $unlocksAtLevelQuest  = GuideQuest::where('unlock_at_level', '<=', $character->level)->whereNull('only_during_event')->whereNull('parent_id')->orderBy('unlock_at_level', 'asc')->first();
         $nextGuideQuest       = null;
 
         if (!is_null($unlocksAtLevelQuest)) {
