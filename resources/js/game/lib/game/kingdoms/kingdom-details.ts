@@ -105,4 +105,6 @@ export default interface KingdomDetails extends DataTableBaseData {
     is_under_attack: boolean;
 
     smelting_completed_at: string;
+
+    item_resistance_bonus: number;
 }

@@ -74,6 +74,18 @@ class AttackWithItemsService {
            return $this->errorResult('You are not allowed to do that.');
        }
 
+       if ($kingdom->kingdomItemResistanceBonus() >= 1.0) {
+
+           event(new GlobalMessageEvent($character->name . ' tried to drop items on a kingdom: ' .
+               $kingdom->name . ' on the plane: ' . $kingdom->gameMap->name . ' At (X/Y): ' . $kingdom->x_position . '/' . $kingdom->y_position .
+               ' but this kingdom is well defended against such tricks. The armies prepare for battle!'
+           ));
+
+           return $this->successResult([
+               'message' => 'You dropped the items but they did nothing. This kingdom is resistant tro the damage. No ogs created.'
+           ]);
+       }
+
        $this->setOldBuildings($kingdom);
        $this->setOldUnits($kingdom);
 
@@ -81,6 +93,12 @@ class AttackWithItemsService {
        $reduction = $this->getReductionToDamage($kingdom) / 100;
 
        $damage -= ($damage * $reduction);
+
+       $itemResistance = $kingdom->kingdomItemResistanceBonus();
+
+       if ($itemResistance > 0) {
+           $damage -= ($damage * $itemResistance);
+       }
 
        $currentMorale = $kingdom->current_morale;
 
@@ -301,6 +319,7 @@ class AttackWithItemsService {
      */
     protected function getReductionToDamage(Kingdom $kingdom): float {
        $totalDefence = $kingdom->fetchKingdomDefenceBonus();
+
        $reduction    = 0.0;
 
        if ($totalDefence > 1) {

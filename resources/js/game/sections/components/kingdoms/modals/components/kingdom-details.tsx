@@ -81,7 +81,7 @@ export default class KingdomDetails extends React.Component<KingdomDetailsProps,
                     });
     }
 
-    manageHelpDialogue(type: 'wall_defence' | 'treas_defence' | 'gb_defence' | 'passive_defence' | 'total_defence' | 'teleport_details') {
+    manageHelpDialogue(type: 'wall_defence' | 'treas_defence' | 'gb_defence' | 'passive_defence' | 'total_defence' | 'teleport_details' | 'item_resistance') {
         this.setState({
             show_help: !this.state.show_help,
             help_type: type,
@@ -176,6 +176,23 @@ export default class KingdomDetails extends React.Component<KingdomDetailsProps,
                                 </dd>
                             </dl>
                             <div className='border-b-2 block border-b-gray-300 dark:border-b-gray-600 my-3 md:hidden'></div>
+                            <div>
+                                <dl>
+                                    <dt>Item Resistance</dt>
+                                    <dd>
+                                        <div className='flex items-center mb-4'>
+                                            {percent(this.state.kingdom_details.item_resistance_bonus)}%
+                                            <div>
+                                                <div className='ml-2'>
+                                                    <button type={"button"} onClick={() => this.manageHelpDialogue('item_resistance')} className='text-blue-500 dark:text-blue-300'>
+                                                        <i className={'fas fa-info-circle'}></i> Help
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </dd>
+                                </dl>
+                            </div>
                         </div>
                         <div>
                             <dl>

@@ -36,7 +36,6 @@ trait ItemsShowInformation {
     public function itemShowDetails(Item $item): array {
         $effects = 'N/A';
         $skills  = [];
-        $skill   = null;
 
         if (!is_null($item->effect)) {
             $effect = new ItemEffectsValue($item->effect);
@@ -115,6 +114,10 @@ trait ItemsShowInformation {
 
             if ($effect->canSettleOnIcePlane()) {
                 $effects = 'Allows you to settle kingdoms on The Ice Plane.';
+            }
+
+            if ($effect->canGainRewardsAtTheOldChurch()) {
+                $effect = 'Allows you to gain currency bonuses and uniques at The Old Church on the Ice Plane during the Winter Event';
             }
         }
 

@@ -166,6 +166,14 @@ export default class KingdomDetails extends React.Component<KingdomDetailsProps,
                             <dt>Total Defence Bonus</dt>
                             <dd>{(this.props.kingdom.defence_bonus * 100).toFixed(2)}%</dd>
                         </dl>
+
+                        <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
+                        <h3>Item Resistance</h3>
+                        <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
+                        <dl>
+                            <dt>Item Resistance</dt>
+                            <dd>{(this.props.kingdom.item_resistance_bonus * 100).toFixed(2)}%</dd>
+                        </dl>
                     </div>
                     <div className='border-b-2 block md:hidden border-b-gray-300 dark:border-b-gray-600 my-6'></div>
                     <div>

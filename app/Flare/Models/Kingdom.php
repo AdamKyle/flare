@@ -147,6 +147,16 @@ class Kingdom extends Model {
         return $this->gold_bars / KingdomMaxValue::MAX_GOLD_BARS;
     }
 
+    public function kingdomItemResistanceBonus(): float {
+        $loyalties = $this->character->factionLoyalties->where('is_pledged', true);
+
+        if ($loyalties->isEmpty()) {
+            return 0;
+        }
+
+        return $loyalties->sum('factionLoyaltyNpcs.current_kingdom_item_defence_bonus');
+    }
+
     public function getWallsDefence(): float {
         $walls = $this->buildings->filter(function($building) {
             return $building->gameBuilding->is_walls;

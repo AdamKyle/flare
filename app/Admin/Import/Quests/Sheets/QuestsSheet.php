@@ -168,6 +168,20 @@ class QuestsSheet implements ToCollection {
             }
         }
 
+        if (!isset($quest['assisting_npc_id'])) {
+            $quest['assisting_npc_id'] = null;
+            $quest['requested_fame_level'] = null;
+        } else {
+            $npc = Npc::where('name', $quest['assisting_npc_id'] )->first();
+
+            if (is_null($npc)) {
+                $quest['assisting_npc_id'] = null;
+                $quest['requested_fame_level'] = null;
+            } else {
+                $quest['assisting_npc_id'] = $npc->id;
+            }
+        }
+
         unset($quest['item_name']);
         unset($quest['secondary_required_item_name']);
         unset($quest['reward_item_name']);

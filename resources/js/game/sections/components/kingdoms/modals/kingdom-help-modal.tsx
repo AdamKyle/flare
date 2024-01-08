@@ -28,6 +28,8 @@ export default class KingdomHelpModal extends React.Component<any, any> {
                 return 'Damage to the defenders units';
             case 'total_reduction':
                 return 'Defenders Damage Reduction';
+            case 'item_resistance':
+                return 'Item Resistance'
             default:
                 return 'Error. Unknown type.'
         }
@@ -124,6 +126,18 @@ export default class KingdomHelpModal extends React.Component<any, any> {
         );
     }
 
+    renderItemResistance() {
+        return (
+            <p className='my-4'>
+                A kingdom with 100% Item Resistance will not take damage from <a href='/information/items-and-kingdoms' target='_blank'>items that you craft through alchemy <i
+                className="fas fa-external-link-alt"></i></a> in which would do damage
+                to players kingdoms. This defence is earned only through completing <a href='/information/faction-loyalty' target='_blank'>Faction Loyalty <i
+                className="fas fa-external-link-alt"></i></a> Fame objectives for NPC's while Pledged
+                to a faction. This bonus will only apply while pledged to that faction to all kingdoms on that factions plane.
+            </p>
+        );
+    }
+
     buildSections() {
         switch (this.props.type) {
             case 'wall_defence':
@@ -146,6 +160,8 @@ export default class KingdomHelpModal extends React.Component<any, any> {
                 return this.renderUnitDamage();
             case 'total_reduction':
                 return this.renderTotalReduction();
+            case 'item_resistance':
+                return this.renderItemResistance();
             default:
                 return 'Error. Unknown type.'
         }

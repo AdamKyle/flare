@@ -29,6 +29,7 @@ class ItemEffectsValue {
     const HIDE_CHAT_LOCATION    = 'hide-chat-location';
     const WALK_ON_ICE           = 'walk-on-ice';
     const SETTLE_IN_ICE_PLANE   = 'settle-on-the-ice-plane';
+    const THE_OLD_CHURCH        = 'the-old-church';
 
     /**
      * @var string[] $values
@@ -54,6 +55,7 @@ class ItemEffectsValue {
         self::HIDE_CHAT_LOCATION    => 'hide-chat-location',
         self::WALK_ON_ICE           => 'walk-on-ice',
         self::SETTLE_IN_ICE_PLANE   => 'settle-on-the-ice-plane',
+        self::THE_OLD_CHURCH        => 'the-old-church',
     ];
 
     /**
@@ -243,5 +245,14 @@ class ItemEffectsValue {
      */
     public function canSettleOnIcePlane(): bool {
         return $this->value === self::SETTLE_IN_ICE_PLANE;
+    }
+
+    /**
+     * Does this item allow players to gain rewards at The Old Church on the ice plane?
+     *
+     * @return bool
+     */
+    public function canGainRewardsAtTheOldChurch(): bool {
+        return $this->value === self::THE_OLD_CHURCH;
     }
 }

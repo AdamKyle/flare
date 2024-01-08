@@ -72,6 +72,7 @@ class KingdomTransformer extends TransformerAbstract {
             'walls_defence'             => $kingdom->getWallsDefence(),
             'gold_bars_defence'         => $kingdom->fetchGoldBarsDefenceBonus(),
             'defence_bonus'             => $kingdom->fetchKingdomDefenceBonus(),
+            'item_resistance_bonus'     => $kingdom->kingdomItemResistanceBonus(),
             'unit_time_reduction'       => $this->fetchTimeReductionBonus($kingdom, 'unit_time_reduction'),
             'building_time_reduction'   => $this->fetchTimeReductionBonus($kingdom, 'building_time_reduction'),
             'is_protected'              => !is_null($kingdom->protected_until),

@@ -105,6 +105,20 @@
 
             </dd>
 
+            @if (!is_null($quest->faction_game_map_id))
+                <dt>Faction</dt>
+                <dd>{{ $quest->factionMap->name }}</dd>
+                <dt>Required Level</dt>
+                <dd>{{ $quest->required_faction_level }}</dd>
+            @endif
+
+            @if (!is_null($quest->assisting_npc_id))
+                <dt>Faction Loyalty NPC To Assist</dt>
+                <dd>{{ $quest->factionLoyaltyNpc->real_name }}</dd>
+                <dt>Required Fame Level</dt>
+                <dd>{{ $quest->required_fame_level }}</dd>
+            @endif
+
             @if (!is_null($quest->gold_cost))
                 <dt>Required Gold:</dt>
                 <dd>{{ $quest->gold_cost }}</dd>

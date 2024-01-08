@@ -45,7 +45,9 @@ class Quest extends Model {
         'after_completion_description',
         'unlocks_feature',
         'unlocks_passive_id',
-        'only_for_event'
+        'only_for_event',
+        'assisting_npc_id',
+        'required_fame_level',
     ];
 
     protected $casts = [
@@ -73,6 +75,7 @@ class Quest extends Model {
         'unlocks_feature'         => 'integer',
         'unlocks_passive_id'      => 'integer',
         'only_for_event'          => 'integer',
+        'required_fame_level'     => 'integer',
     ];
 
     protected $appends = [
@@ -130,6 +133,8 @@ class Quest extends Model {
             'secondaryItem',
             'secondaryItem.dropLocation',
             'requiredPlane',
+            'factionLoyaltyNpc',
+            'factionLoyaltyNpc.gameMap',
             'npc',
             'npc.gameMap',
             'raid',
@@ -162,6 +167,10 @@ class Quest extends Model {
 
     public function npc() {
         return $this->belongsTo(Npc::class, 'npc_id', 'id');
+    }
+
+    public function factionLoyaltyNpc() {
+        return $this->belongsTo(Npc::class, 'assisting_npc_id', 'id');
     }
 
     public function requiredPlane() {

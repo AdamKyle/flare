@@ -31,6 +31,8 @@
             <th>raid_id</th>
             <th>required_quest_id</th>
             <th>only_for_event</th>
+            <th>assisting_npc_id</th>
+            <th>required_fame_level</th>
         </tr>
     </thead>
     <tbody>
@@ -67,6 +69,8 @@
                 <td>{{ !is_null($quest->raid_id) ? $quest->raid->name : '' }}</td>
                 <td>{{ !is_null($quest->required_quest_id) ? $quest->requiredQuest->name : '' }}</td>
                 <td>{{ !is_null($quest->only_for_event) ? $quest->only_for_event : '' }}</td>
+                <td>{{ !is_null($quest->assisting_npc_id) ? $quest->factionLoyaltyNpc->name : ''}}</td>
+                <td>{{ $quest->required_fame_level }}</td>
             </tr>
         @endforeach
     </tbody>

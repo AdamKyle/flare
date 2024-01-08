@@ -22,6 +22,10 @@ export default class QuestHelpModal extends React.Component<any, any> {
                 return 'Quest to complete: ' + this.props.quest.required_quest.name
             case 'reincarnation_times':
                 return 'Times to reincarnate'
+            case 'faction_map':
+                return 'Faction Map Requirements'
+            case 'fame_requirements':
+                return 'Fame Requirements'
             default:
                 return null;
         }
@@ -70,6 +74,48 @@ export default class QuestHelpModal extends React.Component<any, any> {
                 </p>
             </Fragment>
         );
+    }
+
+    buildFactionMapRequirements() {
+        return (
+            <Fragment>
+                <p className='my-2 text-gray-700 dark:text-gray-200'>
+                    There are two aspects to this requirement: The Faction and the level of the faction.
+                </p>
+                <p className='my-2 text-gray-700 dark:text-gray-200'>
+                    <strong>Plane Faction Name (Map to fight on)</strong> refers to the map you need to be on
+                    to raise the second part: <strong>Level required</strong>. For example, if you need to be on Surface and get it to level three
+                    then you would kill creatures while on Surface to raise the Faction level.
+                </p>
+                <p className='my-2'>
+                    <a href='/information/factions' target='_blank'>Learn more about Factions here <i
+                        className="fas fa-external-link-alt"></i></a>
+                </p>
+            </Fragment>
+        )
+    }
+
+    buildFameRequirements() {
+        return (
+            <Fragment>
+                <p className='my-2 text-gray-700 dark:text-gray-200'>
+                    There are three aspects to fame requirements: The Npc to assist. The Map the Npc lives on
+                    and the fame level to have with that npc.
+                </p>
+                <p className='my-2 text-gray-700 dark:text-gray-200'>
+                    Players must have a faction at level 5 for the map that the npc lives on in order to assist the npc with their tasks
+                    and thus raise their fame to the required level. Once a player has this they just have to Pledge to that faction
+                    and then assist the NPC in order for their actions to count.
+                </p>
+                <p className='my-2 text-gray-700 dark:text-gray-200'>
+                   By assisting an NPC with their tasks, players will raise their fame with that NPC and gain items and currencies.
+                </p>
+                <p className='my-2'>
+                    <a href='/information/faction-loyalty' target='_blank'>Learn more about Faction Loyalty here <i
+                        className="fas fa-external-link-alt"></i></a>
+                </p>
+            </Fragment>
+        )
     }
 
     buildRequiredQuestHelp() {
@@ -144,6 +190,10 @@ export default class QuestHelpModal extends React.Component<any, any> {
                 return this.buildRequiredQuestHelp()
             case 'reincarnation_times':
                 return this.buildReincarnationHelp();
+            case 'faction_map':
+                return this.buildFactionMapRequirements();
+            case 'fame_requirements':
+                return this.buildFameRequirements();
             default:
                 return null;
         }

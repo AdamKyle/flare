@@ -126,9 +126,35 @@ export default class CurrencyRequirement extends React.Component<any, any> {
                         this.props.quest.faction_game_map_id !== null ?
                             <Fragment>
                                 <dt>Plane Faction Name (Map to fight on)</dt>
-                                <dd>{this.props.quest.faction_map.name}</dd>
+                                <dd className='flex items-center'>
+                                    <span>{this.props.quest.faction_map.name}</span>
+                                    <div className='ml-2'>
+                                        <button type={"button"} onClick={() => this.manageHelpDialogue('faction_map')} className='text-blue-500 dark:text-blue-300'>
+                                            <i className={'fas fa-info-circle'}></i> Help
+                                        </button>
+                                    </div>
+                                </dd>
                                 <dt>Level required</dt>
                                 <dd>{this.props.quest.required_faction_level}</dd>
+                            </Fragment>
+                            : null
+                    }
+                    {
+                        this.props.quest.assisting_npc_id !== null ?
+                            <Fragment>
+                                <dt>Assist the NPC with their tasks</dt>
+                                <dd className='flex items-center'>
+                                    <span>{this.props.quest.faction_loyalty_npc.real_name}</span>
+                                    <div className='ml-2'>
+                                        <button type={"button"} onClick={() => this.manageHelpDialogue('fame_requirements')} className='text-blue-500 dark:text-blue-300'>
+                                            <i className={'fas fa-info-circle'}></i> Help
+                                        </button>
+                                    </div>
+                                </dd>
+                                <dt>On Game Map</dt>
+                                <dd>{this.props.quest.faction_loyalty_npc.game_map.name}</dd>
+                                <dt>Fame level required</dt>
+                                <dd>{this.props.quest.required_fame_level}</dd>
                             </Fragment>
                             : null
                     }

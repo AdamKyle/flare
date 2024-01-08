@@ -42,6 +42,11 @@
                         <x-core.forms.input :model="$quest" label="Faction Level:" modelKey="required_faction_level" name="required_faction_level" />
 
                         <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
+                        <h3 class="mb-3">Faction Loyalty Requirements</h3>
+                        <x-core.forms.key-value-select :model="$quest" label="Npc To Assist:" modelKey="assisting_npc_id" name="assisting_npc_id" :options="$npcs" />
+                        <x-core.forms.input :model="$quest" label="Fame Level Required:" modelKey="required_fame_level" name="required_fame_level" />
+
+                        <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
                         <h3 class="mb-3">Cost Requirements</h3>
                         <x-core.forms.input :model="$quest" label="Gold Cost:" modelKey="gold_cost" name="gold_cost" />
                         <x-core.forms.input :model="$quest" label="Gold Dust Cost:" modelKey="gold_dust_cost" name="gold_dust_cost" />
