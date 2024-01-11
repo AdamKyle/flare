@@ -91,12 +91,10 @@ class UpdateCraftingTasksForFactionLoyalty {
         $amountLeft = $task['required_amount'] - $task['current_amount'];
 
         if ($amountLeft === 0) {
-            ServerMessageHandler::sendBasicMessage($character->user, $helpingNpc->npc->real_name . ' does not want this item anymore. "We\'re done with this child. Move on. I got other tasks for you to do!"');
+            ServerMessageHandler::sendBasicMessage($character->user, $helpingNpc->npc->real_name . ' does not want anymore of this item anymore. "We\'re done with this child. Move on. I got other tasks for you to do! But you since you crafted it ..."');
         } else {
             ServerMessageHandler::sendBasicMessage($character->user, $helpingNpc->npc->real_name . ' is elated at your ability to craft: ' . $item->affix_name . '. "Thank you child! Only: '.$amountLeft.' Left to go!"');
         }
-
-
 
         if ($this->canLevelUpFame($helpingNpc) && $helpingNpc->current_level !== $helpingNpc->max_level) {
             $this->handleFameLevelUp($character, $helpingNpc);
