@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Console\AfterDeployment\AddHolyStacksToItems;
+use App\Console\AfterDeployment\AssignNewFactionsToCharacters;
 use App\Console\AfterDeployment\AssignNewSkillsToPlayers;
 use App\Console\AfterDeployment\ChangeDamageAmountOnAffixes;
 use App\Console\AfterDeployment\CreateCharacterAttackDataCache;
@@ -52,6 +53,7 @@ class AppServiceProvider extends ServiceProvider {
             KickOffEventGoalForWinterEvent::class,
             GivePhaseRewardsForCharacters::class,
             ChangeDamageAmountOnAffixes::class,
+            AssignNewFactionsToCharacters::class,
 
             // Development Commands:
             CreateCharacter::class,

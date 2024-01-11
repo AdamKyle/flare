@@ -72,7 +72,6 @@ class GameMap extends Model {
     public function getMapRequiredItemAttribute() {
         switch ($this->name) {
             case 'Labyrinth':
-            case 'Ice Plane':
                 return Item::where('effect', ItemEffectsValue::LABYRINTH)->first();
             case 'Dungeons':
                 return Item::where('effect', ItemEffectsValue::DUNGEON)->first();
@@ -80,6 +79,8 @@ class GameMap extends Model {
                 return Item::where('effect', ItemEffectsValue::SHADOWPLANE)->first();
             case 'Hell':
                 return Item::where('effect', ItemEffectsValue::HELL)->first();
+            case 'Purgatory':
+                return Item::where('effect', ItemEffectsValue::PURGATORY)->first();
             case 'Surface':
             default:
                 return null;

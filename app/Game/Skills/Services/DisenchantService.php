@@ -140,6 +140,7 @@ class DisenchantService {
 
                 if ($characterTotalGoldDust >= MaxCurrenciesValue::MAX_GOLD_DUST) {
                     $characterTotalGoldDust = MaxCurrenciesValue::MAX_GOLD_DUST;
+
                     event(new ServerMessageEvent($character->user, 'Gold Dust Rush! You gained 5% interest on your total gold dust. You are now capped!'));
                 } else {
                     event(new ServerMessageEvent($character->user, 'Gold Dust Rush! You gained 5% interest on your total gold dust. Your new total is: ' . number_format($characterTotalGoldDust)));
@@ -166,6 +167,6 @@ class DisenchantService {
      * @return int
      */
     protected function fetchDCRoll(): int {
-        return rand(1, 1000);
+        return rand(1, 500);
     }
 }

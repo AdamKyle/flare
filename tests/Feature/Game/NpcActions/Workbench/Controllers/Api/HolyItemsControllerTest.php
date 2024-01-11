@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Game\NpcActions\Workbench\Controllers\Api;
 
+use App\Flare\AlchemyItemGenerator\Values\AlchemyItemType;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Gambler\Values\CurrencyValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -27,17 +28,30 @@ class HolyItemsControllerTest extends TestCase {
         $this->character = null;
     }
 
-    public function testGetSlots() {
-        $character = $this->character->getCharacter();
+    public function testGetSmithingItems() {
+        $character = $this->character->givePlayerLocation()
+            ->inventoryManagement()
+            ->giveItem(
+                $this->createItem([
+                    'holy_stacks' => 20,
+                ])
+            )
+            ->giveItem(
+                $this->createItem([
+                    'type' => 'alchemy',
+                    'holy_level' => 5,
+                    'can_use_on_other_items' => true,
+                ])
+            )
+            ->getCharacter();
 
         $response = $this->actingAs($character->user)
-            ->call('GET', '/api/character/gambler');
+            ->call('GET', '/api/character/'.$character->id.'/inventory/smiths-workbench');
 
         $jsonData = json_decode($response->getContent(), true);
 
-        $icons = CurrencyValue::getIcons();
-
-        $this->assertEquals($icons, $jsonData['icons']);
+        $this->assertCount(1, $jsonData['items']);
+        $this->assertCount(1, $jsonData['alchemy_items']);
     }
 
     public function testApplyOil() {

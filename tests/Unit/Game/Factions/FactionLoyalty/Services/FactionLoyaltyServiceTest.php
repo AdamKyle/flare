@@ -2,6 +2,8 @@
 
 namespace Tests\Unit\Game\Factions\FactionLoyalty\Services;
 
+use App\Flare\Models\GameMap;
+use App\Flare\Models\Monster;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\Models\Character;
 use App\Flare\Values\MapNameValue;
@@ -170,9 +172,11 @@ class FactionLoyaltyServiceTest extends TestCase {
             'game_map_id' => $this->character->map->game_map_id
         ]);
 
-        $this->createMonster([
-            'game_map_id' => $this->character->map->game_map_id,
-        ]);
+        $this->createMultipleMonsters(
+            [
+                'game_map_id' => $this->character->map->game_map_id,
+            ], 10
+        );
 
         $this->createItem([
             'skill_Level_required' => 10,
@@ -246,9 +250,11 @@ class FactionLoyaltyServiceTest extends TestCase {
                 'title' => null,
             ]);
 
-            $this->createMonster([
-                'game_map_id' => $gameMap->id
-            ]);
+            $this->createMultipleMonsters(
+                [
+                    'game_map_id' => $gameMap->id,
+                ], 10
+            );
 
             $character->refresh();
 
@@ -390,6 +396,14 @@ class FactionLoyaltyServiceTest extends TestCase {
     public function testCreateNewTasksForNpcLoyaltyTasks() {
         $npc = $this->createNpc([
             'game_map_id' => $this->character->map->game_map_id
+        ]);
+
+        $this->createMonster([
+            'game_map_id' => $this->character->map->game_map_id,
+        ]);
+
+        $this->createMonster([
+            'game_map_id' => $this->character->map->game_map_id,
         ]);
 
         $this->createMonster([

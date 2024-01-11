@@ -14,14 +14,14 @@ class Affixes extends BattleBase {
 
     public function getCharacterAffixDamage(array $attackData, bool $isPvp, float $monsterResistance = 0.0): int {
 
-        dump($attackData['affixes']);
+        $attribute = isset($attackData['weapon_damage']) ? 'weapon_damage' : 'spell_damage';
 
         $totalDamage       = $attackData['affixes']['stacking_damage'] - $attackData['damage_deduction'];
         $nonStackingDamage = ($attackData['affixes']['non_stacking_damage'] - $attackData['damage_deduction']) + $totalDamage;
         $cantBeResisted    = $attackData['affixes']['cant_be_resisted'];
 
-        $weaponDamage = $attackData['weapon_damage'] + ($attackData['weapon_damage'] * ($totalDamage + $nonStackingDamage));
-        $nonStackingWeaponDamage = $attackData['weapon_damage'] + ($attackData['weapon_damage'] * $nonStackingDamage);
+        $weaponDamage = $attackData[$attribute] + ($attackData[$attribute] * ($totalDamage + $nonStackingDamage));
+        $nonStackingWeaponDamage = $attackData[$attribute] + ($attackData[$attribute] * $nonStackingDamage);
 
         if ($totalDamage > 0 || $nonStackingDamage > 0) {
 

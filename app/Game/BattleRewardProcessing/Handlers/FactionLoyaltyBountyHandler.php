@@ -76,6 +76,15 @@ class FactionLoyaltyBountyHandler {
 
         $helpingNpc = $this->updateMatchingHelpTask($helpingNpc, 'monster_id', $monster->id);
 
+        if ($this->wasCurrentFameForTaskUpdated()) {
+
+            $matchingTask = $this->getMatchingTask($helpingNpc, 'monster_id', $monster->id);
+
+            ServerMessageHandler::sendBasicMessage($character->user, $helpingNpc->npc->real_name .
+                ' is happy that you slaughtered another one of the enemies on their hit list. "Only: ' .
+                ($matchingTask['required_amount'] - $matchingTask['current_amount']).' to go child!"');
+        }
+
         if ($this->canLevelUpFame($helpingNpc) && $helpingNpc->current_level !== $helpingNpc->max_level) {
             $this->handleFameLevelUp($character, $helpingNpc);
         }

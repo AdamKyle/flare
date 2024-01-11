@@ -14,7 +14,7 @@ export default class FactionNpcTasks extends React.Component<FactionNpcSectionPr
             return bounties ? fameTask.type === 'bounty' : fameTask.type !== 'bounty';
         }).map((fameTask: FameTasks) => {
             return <>
-                <dt>{bounties ? fameTask.monster_name : fameTask.item_name}</dt>
+                <dt>{bounties ? fameTask.monster_name : fameTask.item_name + ' ['+fameTask.type+']'}</dt>
                 <dd>{fameTask.current_amount} / {fameTask.required_amount}</dd>
             </>
         })

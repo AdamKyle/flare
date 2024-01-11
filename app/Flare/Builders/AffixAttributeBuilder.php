@@ -125,7 +125,7 @@ class AffixAttributeBuilder {
         ];
     }
 
-    public function increaseStats(int $amountPaid) {
+    public function increaseStats() {
         $stats = [
             'str_mod',
             'dur_mod',

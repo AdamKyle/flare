@@ -93,7 +93,7 @@ class FactionLoyaltyControllerTest extends TestCase {
         $this->assertEquals($jsonData['map_name'], $character->map->gameMap->name);
     }
 
-    public function testPledgeLoyalty() {
+    public function testPledgeLoyaltyControllerAction() {
         $this->character->factions()->update(['maxed' => true]);
 
         $this->character = $this->character->refresh();
@@ -104,6 +104,14 @@ class FactionLoyaltyControllerTest extends TestCase {
 
         $this->createNpc([
             'game_map_id' => $this->character->map->game_map_id
+        ]);
+
+        $this->createMonster([
+            'game_map_id' => $this->character->map->game_map_id,
+        ]);
+
+        $this->createMonster([
+            'game_map_id' => $this->character->map->game_map_id,
         ]);
 
         $this->createMonster([

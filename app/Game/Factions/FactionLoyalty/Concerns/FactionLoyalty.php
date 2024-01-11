@@ -3,11 +3,15 @@
 namespace App\Game\Factions\FactionLoyalty\Concerns;
 
 use App\Flare\Models\Character;
-use App\Flare\Models\Faction;
 use App\Flare\Models\FactionLoyalty as FactionLoyaltyModel;
 use App\Flare\Models\FactionLoyaltyNpc;
 
 trait FactionLoyalty {
+
+    /**
+     * @var bool $updatedMatchingTaskAmount
+     */
+    private bool $updatedMatchingTaskAmount = false;
 
     /**
      * Get faction loyalty that the character is pledged to.
@@ -52,6 +56,9 @@ trait FactionLoyalty {
      * @return FactionLoyaltyNpc
      */
     public function updateMatchingHelpTask(FactionLoyaltyNpc $helpingNpc, string $key, int $id): FactionLoyaltyNpc {
+
+        $existingFame = $helpingNpc->current_fame;
+
         $tasks = array_map(function ($task) use ($key, $id) {
             return isset($task[$key]) && ($task[$key] === $id) ?
                 array_merge($task, ['current_amount' => min($task['current_amount'] + 1, $task['required_amount'])]) :
@@ -62,7 +69,36 @@ trait FactionLoyalty {
             'fame_tasks' => $tasks
         ]);
 
+        $helpingNpc = $helpingNpc->refresh();
+
+        if ($existingFame < $helpingNpc->current_fame) {
+            $this->updatedMatchingTaskAmount = true;
+        }
+
         return $helpingNpc->refresh();
+    }
+
+    /**
+     * get the matching task.
+     *
+     * @param FactionLoyaltyNpc $helpingNpc
+     * @param $key
+     * @param $id
+     * @return array
+     */
+    public function getMatchingTask(FactionLoyaltyNpc $helpingNpc, $key, $id): array {
+        return current(array_filter($helpingNpc->factionLoyaltyNpcTasks->fame_tasks, function ($task) use ($key, $id) {
+            return isset($task[$key]) && $task[$key] === $id;
+        })) ?: [];
+    }
+
+    /**
+     * Was the current matching task, if any fund, updated?
+     *
+     * @return bool
+     */
+    public function wasCurrentFameForTaskUpdated(): bool {
+        return $this->updatedMatchingTaskAmount;
     }
 
     /**

@@ -326,11 +326,7 @@ class ReRollEnchantmentService {
 
             foreach ($this->functionMap[$changeType] as $functionName) {
 
-                if ($functionName === 'increaseStats') {
-                    $changes = array_merge($changes, $affixAttributeBuilder->{$functionName}($itemAffix->cost));
-                } else {
-                    $changes = array_merge($changes, $affixAttributeBuilder->{$functionName}());
-                }
+                $changes = array_merge($changes, $affixAttributeBuilder->{$functionName}());
             }
         }
 

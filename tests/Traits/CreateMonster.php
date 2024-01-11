@@ -27,4 +27,10 @@ trait CreateMonster {
 
         return $monster->refresh();
     }
+
+    public function createMultipleMonsters(array $options = [], int $amount = 1) {
+        for ($i = 1; $i <= $amount; $i++) {
+            $this->createMonster($options);
+        }
+    }
 }

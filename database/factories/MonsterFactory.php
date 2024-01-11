@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Flare\Models\Monster;
+use Illuminate\Support\Str;
 
 class MonsterFactory extends Factory
 {
@@ -22,7 +23,7 @@ class MonsterFactory extends Factory
     public function definition()
     {
         return [
-            'name'             => 'Goblin',
+            'name'             => Str::random(32),
             'damage_stat'      => 'str',
             'xp'               => 10,
             'str'              => 1,

@@ -232,10 +232,20 @@ class GuideQuestRequirementsService {
     public function requiredFameLevel(Character $character, GuideQuest $quest): GuideQuestRequirementsService {
 
         if (!is_null($quest->required_fame_level)) {
-            if (optional(
-                optional($character->factionLoyalties()->where('is_pledged', true)->first())
-                    ->factionLoyaltyNpcs()->where('currently_helping', true)->first()
-            )->current_level >= $quest->required_fame_level) {
+
+            $pledgedFaction = $character->factionLoyalties()->where('is_pledged', true)->first();
+
+            if (is_null($pledgedFaction)) {
+                return $this;
+            }
+
+            $currentlyHelpingNpc = $pledgedFaction->factionLoyaltyNpcs()->where('currently_helping', true)->first();
+
+            if (is_null($currentlyHelpingNpc)) {
+                return $this;
+            }
+
+            if ($currentlyHelpingNpc->current_level >= $quest->required_fame_level) {
                 $this->finishedRequirements[] = 'required_fame_level';
             }
         }
@@ -252,7 +262,7 @@ class GuideQuestRequirementsService {
      */
     public function requiredSpecialtyType(Character $character, GuideQuest $quest): GuideQuestRequirementsService {
         if (!is_null($quest->required_specialty_type)) {
-            $isInInventory = $character->inventory->filter(function($slot) use ($quest) {
+            $isInInventory = $character->inventory->slots->filter(function($slot) use ($quest) {
                 return $slot->item->specialty_type === $quest->required_specialty_type;
             })->isNotEmpty();
 

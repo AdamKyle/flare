@@ -285,14 +285,18 @@ class FactionLoyaltyService {
     protected function createCraftingTasks(string $gameMapName): array {
         $tasks       = [];
 
-        for ($i = 1; $i <= 3; $i++) {
+        while (count($tasks) < 3) {
 
             $craftingType = self::CRAFTING_TYPES[rand(0, count(self::CRAFTING_TYPES) - 1)];
 
             $item = $this->getItemForCraftingTask($craftingType, $gameMapName);
 
+            if ($this->hasTaskAlready($tasks, 'item_id', $item->id)) {
+                continue;
+            }
+
             $tasks[] = [
-                'type'            => $craftingType,
+                'type'            => $item->type,
                 'item_name'       => $item->affix_name,
                 'item_id'         => $item->id,
                 'required_amount' => rand(10, 50),
@@ -312,13 +316,17 @@ class FactionLoyaltyService {
     protected function createBountyTasks(int $gameMapId): array {
         $tasks = [];
 
-        for ($i = 1; $i <= 3; $i++) {
+        while (count($tasks) < 3) {
 
             $monster = Monster::where('game_map_id', $gameMapId)
                 ->where('is_raid_monster', false)
                 ->where('is_raid_boss', false)
                 ->inRandomOrder()
                 ->first();
+
+            if ($this->hasTaskAlready($tasks, 'monster_id', $monster->id)) {
+                continue;
+            }
 
             $tasks[] = [
                 'type'            => 'bounty',
@@ -330,6 +338,16 @@ class FactionLoyaltyService {
         }
 
         return $tasks;
+    }
+
+    private function hasTaskAlready(array $tasks, string $key, int $id): bool {
+        foreach ($tasks as $task) {
+            if ($task[$key] === $id) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

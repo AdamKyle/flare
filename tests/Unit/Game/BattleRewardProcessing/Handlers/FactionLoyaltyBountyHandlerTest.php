@@ -237,7 +237,7 @@ class FactionLoyaltyBountyHandlerTest extends TestCase {
 
         $character = $this->factionLoyaltyBountyHandler->handleBounty($character->refresh(), $monster);
 
-        Event::assertNotDispatched(ServerMessageEvent::class);
+        Event::assertDispatched(ServerMessageEvent::class);
         Event::assertNotDispatched(UpdateTopBarEvent::class);
 
         $this->assertEquals(1, $character->factionLoyalties->first()
@@ -250,6 +250,14 @@ class FactionLoyaltyBountyHandlerTest extends TestCase {
 
     public function testLevelUpFame() {
         $monster = $this->createMonster();
+
+        $this->createMonster([
+            'game_map_id' => $monster->game_map_id
+        ]);
+
+        $this->createMonster([
+            'game_map_id' => $monster->game_map_id
+        ]);
 
         $character = (new CharacterFactory())->createBaseCharacter()
             ->givePlayerLocation(16, 16, $monster->gameMap)
@@ -331,6 +339,14 @@ class FactionLoyaltyBountyHandlerTest extends TestCase {
 
     public function testDoNotGiveMoreCurrenciesThenMaxAllowed() {
         $monster = $this->createMonster();
+
+        $this->createMonster([
+            'game_map_id' => $monster->game_map_id
+        ]);
+
+        $this->createMonster([
+            'game_map_id' => $monster->game_map_id
+        ]);
 
         $character = (new CharacterFactory())->createBaseCharacter()
             ->givePlayerLocation(16, 16, $monster->gameMap)

@@ -28,8 +28,7 @@ class ChangeDamageAmountOnAffixes extends Command
      * Execute the console command.
      */
     public function handle(ExponentialAttributeCurve $exponentialAttributeCurve) {
-        $regularStackingAffixes = ItemAffix::whereNotNull('damage')
-            ->where('randomly_generated', false)
+        $regularStackingAffixes = ItemAffix::where('randomly_generated', false)
             ->where('affix_type', ItemAffixType::DAMAGE_STACKING)
             ->orderBy('skill_level_required', 'asc')
             ->get();
@@ -49,8 +48,7 @@ class ChangeDamageAmountOnAffixes extends Command
             ]);
         });
 
-        $regularNonStackingAffixes = ItemAffix::whereNotNull('damage')
-            ->where('randomly_generated', false)
+        $regularNonStackingAffixes = ItemAffix::where('randomly_generated', false)
             ->where('affix_type', ItemAffixType::DAMAGE_IRRESISTIBLE)
             ->orderBy('skill_level_required', 'asc')
             ->get();
@@ -78,8 +76,7 @@ class ChangeDamageAmountOnAffixes extends Command
         ];
 
         foreach ($affixCots as $cost) {
-            $stackingUniqueAffixes = ItemAffix::whereNotNull('damage')
-                ->where('randomly_generated', true)
+            $stackingUniqueAffixes = ItemAffix::where('randomly_generated', true)
                 ->where('irresistible_damage', false)
                 ->where('damage_can_stack', true)
                 ->where('affix_type', ItemAffixType::RANDOMLY_GENERATED)
