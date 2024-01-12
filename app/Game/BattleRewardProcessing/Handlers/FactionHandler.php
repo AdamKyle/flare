@@ -63,6 +63,11 @@ class FactionHandler {
      * @return void
      */
     protected function handleFactionPoints(Character $character, Monster $monster, GuideQuestService $guideQuestService): void {
+
+        if ($character->currentAutomations()->isNotEmpty()) {
+            return;
+        }
+
         $map     = GameMap::find($monster->game_map_id);
         $faction = Faction::where('character_id', $character->id)->where('game_map_id', $map->id)->first();
 
