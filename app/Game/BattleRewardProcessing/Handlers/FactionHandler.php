@@ -64,7 +64,7 @@ class FactionHandler {
      */
     protected function handleFactionPoints(Character $character, Monster $monster, GuideQuestService $guideQuestService): void {
 
-        if ($character->currentAutomations()->isNotEmpty()) {
+        if ($character->currentAutomations->isNotEmpty()) {
             return;
         }
 
