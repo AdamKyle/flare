@@ -236,21 +236,7 @@ class DisenchantServiceTest extends TestCase {
     public function testGivePlayerGoldDustRushWhenGoldDustCapped() {
         Event::fake();
 
-        $this->instance(
-            SkillCheckService::class,
-            Mockery::mock(SkillCheckService::class, function (MockInterface $mock) {
-                $mock->shouldReceive('getDCCheck')->once()->andReturn(1);
-                $mock->shouldReceive('characterRoll')->once()->andReturn(100);
-            })
-        );
-
-        $disenchantingService = \Mockery::mock(DisenchantService::class)->makePartial();
-
-        $disenchantingService->__construct(resolve(SkillCheckService::class));
-
-        $disenchantingService->shouldAllowMockingProtectedMethods()
-                             ->shouldReceive('fetchDCRoll')
-                             ->andReturn(1000);
+        $disenchantingService = resolve(DisenchantService::class);
 
         $character = $this->character->inventoryManagement()->giveItem($this->itemToDisenchant)->giveItem($this->createItem([
             'type' => 'quest',

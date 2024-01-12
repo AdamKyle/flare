@@ -11,7 +11,19 @@ use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 
 class GoldRush {
 
-    public function processPotentialGoldRush(Character $character, Monster $monster) {
+    /**
+     * Process a potential gold rush.
+     *
+     * @param Character $character
+     * @return void
+     * @throws \Exception
+     */
+    public function processPotentialGoldRush(Character $character): void {
+
+        if ($character->gold >= MaxCurrenciesValue::MAX_GOLD) {
+            return;
+        }
+
         if ($character->gold === MaxCurrenciesValue::MAX_GOLD) {
             return;
         }
@@ -27,7 +39,14 @@ class GoldRush {
         }
     }
 
-    protected function giveGoldRush(Character $character) {
+    /**
+     * Give the player a gold rush.
+     *
+     * @param Character $character
+     * @return void
+     * @throws \Exception
+     */
+    protected function giveGoldRush(Character $character): void {
         $goldRush      = $character->gold + ($character->gold * 0.05);
 
         $maxCurrencies = new MaxCurrenciesValue($goldRush, MaxCurrenciesValue::GOLD);
@@ -49,6 +68,12 @@ class GoldRush {
         ServerMessageHandler::handleMessage($character->user, $type, number_format($character->gold));
     }
 
+    /**
+     * Get the gameMap Bonus.
+     *
+     * @param Character $character
+     * @return float
+     */
     protected function getGameMapBonus(Character $character): float {
         $gameMap        = $character->map->gameMap;
         $gameMapBonus   = 0.0;

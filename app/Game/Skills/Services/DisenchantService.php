@@ -66,6 +66,20 @@ class DisenchantService {
      */
     public function disenchantWithSkill(InventorySlot $slot): void {
 
+        if ($this->character->gold_dust >= MaxCurrenciesValue::MAX_GOLD_DUST) {
+            $slot->delete();
+
+            $affixData = resolve(EnchantingService::class)->fetchAffixes($this->character->refresh());
+
+            event(new UpdateCharacterEnchantingList(
+                $this->character->user,
+                $affixData['affixes'],
+                $affixData['character_inventory'],
+            ));
+
+            return;
+        }
+
         $characterRoll = $this->skillCheckService->characterRoll($this->disenchantingSkill);
         $dcCheck       = $this->skillCheckService->getDCCheck($this->disenchantingSkill);
 
@@ -99,10 +113,23 @@ class DisenchantService {
      * @return void
      */
     public function disenchantItemWithSkill(): void {
+
         $characterRoll = $this->skillCheckService->characterRoll($this->disenchantingSkill);
         $dcCheck       = $this->skillCheckService->getDCCheck($this->disenchantingSkill);
 
-        if ($characterRoll > $dcCheck) {
+        $characterCurrentGoldDust = $this->character->gold_dust;
+
+        $canDisenchant = $characterRoll > $dcCheck;
+
+        if ($characterCurrentGoldDust >= MaxCurrenciesValue::MAX_GOLD_DUST && $canDisenchant) {
+            ServerMessageHandler::sendBasicMessage($this->character->user, 'Disenchanted the item.');
+
+            event(new UpdateSkillEvent($this->disenchantingSkill));
+
+            return;
+        }
+
+        if ($canDisenchant) {
             $goldDust = $this->updateGoldDust($this->character);
 
             ServerMessageHandler::handleMessage($this->character->user, 'disenchanted', number_format($goldDust));
@@ -124,6 +151,7 @@ class DisenchantService {
      * @return int
      */
     protected function updateGoldDust(Character $character, bool $failedCheck = false): int {
+
         $goldDust = !$failedCheck ? rand(2, 1150) : 1;
 
         $goldDust = $goldDust + $goldDust * ($this->getGoldDustBonus($character) + $this->disenchantingSkill->bonus);
