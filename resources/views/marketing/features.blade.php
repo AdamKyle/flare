@@ -147,7 +147,7 @@
                                     'pageName' => 'quests'
                                 ])}}">Quests</a>
                     </x-slot:title>
-    
+
                     <p>
                         Quests allow you to progress your character futrther and unlock features gated behind the quest system.
                         You can also use quests to unlock the various planes!
@@ -162,9 +162,9 @@
                                     'pageName' => 'planes'
                                 ])}}">Planes</a>
                     </x-slot:title>
-    
+
                     <p>
-                        Traverse from the Surface world to the various other planes and fight new and fearsome monsters! Advance your character 
+                        Traverse from the Surface world to the various other planes and fight new and fearsome monsters! Advance your character
                         and the story with the various quests on each plane
                     </p>
                 </x-core.cards.feature-card>
@@ -177,7 +177,7 @@
                                     'pageName' => 'races-and-classes'
                                 ])}}">Locations</a>
                     </x-slot:title>
-    
+
                     <p>
                         Visit tons of locations for quest items, fight harder monsters for specific quest items and drops!
                     </p>
@@ -191,7 +191,7 @@
                                     'pageName' => 'monsters'
                                 ])}}">Monsters</a>
                     </x-slot:title>
-    
+
                     <p>
                         Fight monsters to find magical items, gain exp and currencies! Some locations have harder monsters, some planes
                         while weakening you will buff the monster.
@@ -206,9 +206,9 @@
                                     'pageName' => 'celestials'
                                 ])}}">Celestials</a>
                     </x-slot:title>
-    
+
                     <p>
-                        Monsters stronger then the ones that roam the land! You can conjure them and they have a specific 
+                        Monsters stronger then the ones that roam the land! You can conjure them and they have a specific
                         times when they spawn more easily for players to hunt for valuable shards!
                     </p>
                 </x-core.cards.feature-card>
@@ -221,11 +221,57 @@
                                     'pageName' => 'raids'
                                 ])}}">Raids</a>
                     </x-slot:title>
-    
+
                     <p>
                         Specific events will corrupt locations on one plane causing a new list of super strong creatures and a special
-                        one for all players to try and take down together: Raid Bosses! Players gain epic loot and new Gear 
+                        one for all players to try and take down together: Raid Bosses! Players gain epic loot and new Gear
                         peices you cant find anywhere!
+                    </p>
+                </x-core.cards.feature-card>
+                <x-core.cards.feature-card>
+                    <x-slot:icon>
+                        <i class="ra ra-arrow-cluster text-primary-600 relative top-[10px] right-[10px]"></i>
+                    </x-slot:icon>
+                    <x-slot:title>
+                        <a href="{{route('info.page', [
+                                    'pageName' => 'factions'
+                                ])}}">Factions</a>
+                    </x-slot:title>
+
+                    <p>
+                        Players can earn powerful items simply by killing creatures on the Plane they are currently on.
+                        Earning faction points will gain you notoriety with the plane you are on!
+                    </p>
+                </x-core.cards.feature-card>
+                <x-core.cards.feature-card>
+                    <x-slot:icon>
+                        <i class="ra ra-double-team text-primary-600 relative top-[10px] right-[10px]"></i>
+                    </x-slot:icon>
+                    <x-slot:title>
+                        <a href="{{route('info.page', [
+                                    'pageName' => 'faction-loyalt'
+                                ])}}">Faction Loyalty</a>
+                    </x-slot:title>
+
+                    <p>
+                        Once a player maxes out their Faction with a plane, they can then Pledge and assist an NPC
+                        with their Bounty and Crafting tasks.
+
+                    </p>
+                </x-core.cards.feature-card>
+                <x-core.cards.feature-card>
+                    <x-slot:icon>
+                        <i class="fas fa-calendar text-primary-600 relative top-[10px] right-[10px]"></i>
+                    </x-slot:icon>
+                    <x-slot:title>
+                        <a href="{{route('info.page', [
+                                    'pageName' => 'events'
+                                ])}}">Events</a>
+                    </x-slot:title>
+
+                    <p>
+                        Players can participate in various types of events, either weekly, monthly or special events like raids or
+                        The Winter Event.
                     </p>
                 </x-core.cards.feature-card>
             </div>
@@ -258,7 +304,7 @@
                                     'pageName' => 'crafting'
                                 ])}}">Crafting</a>
                     </x-slot:title>
-    
+
                     <p>
                         Players can craft items well beyond what they can purchase in the shop for even more power.
                     </p>
@@ -272,7 +318,7 @@
                                     'pageName' => 'enchanting'
                                 ])}}">Enchanting</a>
                     </x-slot:title>
-    
+
                     <p>
                         Enchant items to give your gear even more powers, boost your stats, deal damage and weaken your enemy
                         all while trapping tehm in your web of magics!
@@ -287,7 +333,7 @@
                                     'pageName' => 'random-enchants'
                                 ])}}">Uniques</a>
                     </x-slot:title>
-    
+
                     <p>
                         Earn Uniques through Factions, but also purchase them from the Queen of Hearts. These are more powerful then the best enchantment,
                         and only get better the more gold spend!
@@ -302,7 +348,7 @@
                                     'pageName' => 'mythical-items'
                                 ])}}">Mythics</a>
                     </x-slot:title>
-    
+
                     <p>
                        The most powerful of enchantments is the Mythic! Dwelve deep into the depths of purgatory dungeons or even participate in monthly PVP
                        to have a chance to win one of these!
@@ -317,7 +363,7 @@
                                     'pageName' => 'alchemy'
                                 ])}}">Alchemy</a>
                     </x-slot:title>
-    
+
                     <p>
                         Craft usable items that you can drop on your enemies kingdoms or even use on  your self to make
                         your self even stronger for a limited time!
@@ -332,7 +378,7 @@
                                     'pageName' => 'gems'
                                 ])}}">Gem Crafting/Sockets</a>
                     </x-slot:title>
-    
+
                     <p>
                         Craft gems to then apply to gear you assign sockets to in order to increase your Elemental Atonement
                         for Raids!
@@ -347,7 +393,7 @@
                                     'pageName' => 'trinketry'
                                 ])}}">Trinketry</a>
                     </x-slot:title>
-    
+
                     <p>
                         The deeper you dwelve, the harder they hit. Protect your self child from ambushes and counters!
                         help your self to counter and ambush the enemy! Crafting trinkets will help with this!
@@ -362,7 +408,7 @@
                                     'pageName' => 'holy-items'
                                 ])}}">Holy Items</a>
                     </x-slot:title>
-    
+
                     <p>
                         Using the power of alchemy, you can create and then apply Holy Oils which help increase your damage,
                         healing and other aspects of your character!
@@ -377,7 +423,7 @@
                                     'pageName' => 'ancestral-items'
                                 ])}}">Ancestral Items</a>
                     </x-slot:title>
-    
+
                     <p>
                         Particpta ein raids and kill the Raid Boss to earn your self the most powerful of legendary items! Ancestral items come with
                         their own skill tree that con be leveled over time to give your character even more power!
