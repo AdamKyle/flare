@@ -6,6 +6,7 @@ use App\Flare\Models\Raid;
 use App\Flare\Models\Event;
 use App\Flare\Models\Location;
 use App\Flare\Models\Character;
+use App\Game\Core\Values\FactionLevel;
 use App\Game\Events\Values\EventType;
 use App\Game\Exploration\Services\ExplorationAutomationService;
 use App\Game\Quests\Services\BuildQuestCacheService;
@@ -275,9 +276,17 @@ class EndScheduledEvent extends Command {
 
         Character::join('maps', 'maps.character_id', '=', 'characters.id')
             ->where('maps.game_map_id', $gameMap->id)
-            ->chunk(100, function ($characters) use ($traverseService, $surfaceMap, $explorationAutomationService) {
+            ->chunk(100, function ($characters) use ($traverseService, $surfaceMap, $explorationAutomationService, $gameMap) {
                 foreach ($characters as $character) {
                     $explorationAutomationService->stopExploration($character);
+
+                    $character->factions()->where('game_map_id', $gameMap->id)->update([
+                        'current_level'  => 0,
+                        'current_points' => 0,
+                        'points_needed'  => FactionLevel::getPointsNeeded(0),
+                        'maxed'          => false,
+                        'title'          => null,
+                    ]);
 
                     $traverseService->travel($surfaceMap->id, $character);
                 }
