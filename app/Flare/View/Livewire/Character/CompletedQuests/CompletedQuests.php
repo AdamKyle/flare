@@ -14,7 +14,7 @@ class CompletedQuests extends DataTableComponent {
     }
 
     public function builder(): Builder {
-        return QuestsCompleted::where('character_id', auth()->user()->character->id);
+        return QuestsCompleted::where('character_id', auth()->user()->character->id)->whereNull('guide_quest_id');
     }
 
     public function columns(): array {

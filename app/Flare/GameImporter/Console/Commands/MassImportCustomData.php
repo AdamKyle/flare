@@ -33,8 +33,9 @@ class MassImportCustomData extends Command {
 
         // Handle importing things in a custom format.
         Artisan::call('import:game-data Skills');
-        Artisan::call('import:game-data "Admin Section"');
         Artisan::call('import:game-data Items');
+        Artisan::call('import:game-data Monsters');
+        Artisan::call('import:game-data "Admin Section"');
         Artisan::call('import:game-data Quests');
         Artisan::call('import:game-data Locations');
 

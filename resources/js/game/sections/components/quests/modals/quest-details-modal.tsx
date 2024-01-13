@@ -226,8 +226,8 @@ export default class QuestDetailsModal extends React.Component<any, any> {
                                 challenge.
                             </p>
                             <p className="mb-2">
-                                These items have a 1/100 chance to drop.
-                                Your looting skill is capped at 45% here.
+                                These items have a small chance to drop while
+                                your looting skill is capped at 45% here.
                             </p>
                             <p>
                                 <strong>

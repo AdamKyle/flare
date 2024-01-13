@@ -14,7 +14,7 @@ class CompletedGuideQuests extends DataTableComponent {
     }
 
     public function builder(): Builder {
-        return QuestsCompleted::where('character_id', auth()->user()->character->id)->whereNotNull('guide_quest_id');
+        return QuestsCompleted::where('character_id', auth()->user()->character->id)->whereHas('guideQuest')->whereNull('quest_id');
     }
 
     public function columns(): array {
