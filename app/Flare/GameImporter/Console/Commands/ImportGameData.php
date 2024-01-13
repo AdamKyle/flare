@@ -38,11 +38,14 @@ class ImportGameData extends Command {
 
         $files = $this->fetchFiles();
 
-        $dirNameForReImport = Str::title($this->argument('dirName'));
+        $dirNameForReImport = $this->argument('dirName');
 
         if (!is_null($dirNameForReImport)) {
 
+            $dirNameForReImport = Str::title($dirNameForReImport);
+
             if (!isset($files[$dirNameForReImport])) {
+
                 return $this->error('No directory in data-imports for: ' . $dirNameForReImport);
             }
 
@@ -71,7 +74,7 @@ class ImportGameData extends Command {
         $this->line('Importing map spefic data ...');
 
         $this->import($excelMapper, $files['Locations'], 'Locations');
-        $this->import($excelMapper, $files['NPCs'], 'NPCs');
+        $this->import($excelMapper, $files['Npcs'], 'Npcs');
 
         // // This stuff depends on maps existing.
         $this->import($excelMapper, $files['.'], '.');

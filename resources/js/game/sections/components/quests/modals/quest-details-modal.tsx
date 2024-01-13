@@ -213,7 +213,26 @@ export default class QuestDetailsModal extends React.Component<any, any> {
         });
     }
 
+    getMonsterTypeForRenderingItem(requiredMonster: any): string {
+        let type = 'Regular Monster';
+
+        if (requiredMonster.is_celestial_entity) {
+            type = 'Celestial';
+        }
+
+        if (requiredMonster.is_raid_monster) {
+            type = 'Raid Monster'
+        }
+
+        if (requiredMonster.is_raid_boss) {
+            type = 'Raid Boss'
+        }
+
+        return type;
+    }
+
     renderItem(item: any) {
+        console.log(item.required_monster);
         return (
             <Fragment>
                 {item.drop_location_id !== null ? (
@@ -269,9 +288,7 @@ export default class QuestDetailsModal extends React.Component<any, any> {
                             <dt>Obtained by killing</dt>
                             <dd>
                                 {item.required_monster.name}{" "}
-                                {item.required_monster.is_celestial_entity
-                                    ? "(Celestial)"
-                                    : "(Regular Monster)"}
+                                {'(' + this.getMonsterTypeForRenderingItem(item.required_monster) + ')'}
                             </dd>
                             <dt>Resides on plane</dt>
                             <dd>{item.required_monster.game_map.name}</dd>
