@@ -321,6 +321,7 @@ class FactionLoyaltyService {
             $monster = Monster::where('game_map_id', $gameMapId)
                 ->where('is_raid_monster', false)
                 ->where('is_raid_boss', false)
+                ->where('is_celestial_entity', false)
                 ->inRandomOrder()
                 ->first();
 
