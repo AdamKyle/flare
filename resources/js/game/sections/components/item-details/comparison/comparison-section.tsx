@@ -156,7 +156,7 @@ export default class ComparisonSection extends React.Component<
 
     render() {
         return (
-            <div className="p-5">
+            <div className="p-5 max-h-[450px] md:max-h-[600px] lg:max-h-full overflow-y-scroll lg:overflow-y-hidden">
                 {this.props.is_automation_running ? (
                     <WarningAlert additional_css={"mb-4"}>
                         <p>
@@ -185,7 +185,7 @@ export default class ComparisonSection extends React.Component<
                 <div className="border-b-2 mt-6 border-b-gray-300 dark:border-b-gray-600 my-3"></div>
                 <div
                     className={clsx(
-                        "mt-6 grid grid-cols-1 w-full gap-2 md:m-auto max-h-[150px] overflow-x-auto",
+                        "mt-6 grid grid-cols-1 w-full gap-2 md:m-auto",
                         {
                             "md:w-3/4": this.props.is_large_modal,
                             "md:grid-cols-7": this.props.is_grid_size(

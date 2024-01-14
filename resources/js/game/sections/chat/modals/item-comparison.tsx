@@ -12,7 +12,6 @@ import UsableItemSection from "../../character-sheet/components/modals/component
 import InventoryQuestItemDetails from "../../character-sheet/components/modals/components/inventory-quest-item-details";
 import AlchemyItemHoly from "../../character-sheet/components/modals/components/alchemy-item-holy";
 import GemDetails from "../../character-sheet/components/modals/components/gem-details";
-import { viewPortWatcher } from "../../../lib/view-port-watcher";
 
 export default class ItemComparison extends React.Component<any, any> {
     constructor(props: any) {
