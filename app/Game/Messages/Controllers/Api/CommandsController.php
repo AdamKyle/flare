@@ -2,6 +2,7 @@
 
 namespace App\Game\Messages\Controllers\Api;
 
+use App\Game\Messages\Handlers\ServerMessageHandler;
 use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
 use App\Game\Messages\Request\PublicEntityRequest;
@@ -27,9 +28,19 @@ class CommandsController extends Controller {
      * @return JsonResponse
      */
     public function publicEntity(PublicEntityRequest $request): JsonResponse {
-        $command = $this->publicEntityCommand->setCharacter(auth()->user());
+
+        $user = auth()->user();
+
+        $command = $this->publicEntityCommand->setCharacter($user);
 
         if ($request->attempt_to_teleport) {
+
+            if ($user->character->is_dead) {
+                ServerMessageHandler::sendBasicMessage($user, 'You are dead. How are you suppose to teleport? Resurrect child!');
+
+                return response()->json();
+            }
+
             $command->usePCTCommand();
 
             return response()->json();
