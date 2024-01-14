@@ -48,9 +48,9 @@ export default class ItemSkillManagement extends React.Component<ItemSkillManage
     render() {
 
         if (this.state.skill_progression !== null && this.state.skill !== null) {
-            return <ItemSkillDetails skill_progression_data={this.state.skill_progression} 
+            return <ItemSkillDetails skill_progression_data={this.state.skill_progression}
                                      skills={this.props.skill_data}
-                                     manage_skill_details={this.showSkillSection.bind(this)} 
+                                     manage_skill_details={this.showSkillSection.bind(this)}
                                      character_id={this.props.character_id}
                                      is_skill_locked={isSkillLocked(this.state.skill, this.props.skill_data, this.props.skill_progression_data)}
                     />
@@ -62,18 +62,18 @@ export default class ItemSkillManagement extends React.Component<ItemSkillManage
                     <h3>Ancestral Skill Tree</h3>
                 </div>
                 <p className='text-center font-thin text-sm text-gray-600 dark:text-gray-300 italic mt-1'>
-                    All the skills here will stack together. For more info please refer to: <a href='/information/item-skills' target='_blank' >
-                        Item Skills help docs <i
+                    All the skills here will stack together. For more info please refer to: <a href='/information/ancestral-items' target='_blank' >
+                    Ancestral items help docs <i
                         className="fas fa-external-link-alt"></i>
                     </a>.
                 </p>
                 <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
                 <DangerButton button_label={'Close Skill Tree'} on_click={() => this.props.close_skill_tree()} additional_css="mb-4"/>
 
-                <ItemSkillTree 
-                    skill_data={this.props.skill_data} 
-                    progression_data={this.props.skill_progression_data} 
-                    show_skill_management={this.showSkillSection.bind(this)} 
+                <ItemSkillTree
+                    skill_data={this.props.skill_data}
+                    progression_data={this.props.skill_progression_data}
+                    show_skill_management={this.showSkillSection.bind(this)}
                 />
             </Fragment>
         );
