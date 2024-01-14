@@ -64,6 +64,7 @@ class BattleRewardService {
     }
 
     public function handleBaseRewards() {
+
         $this->handleFactionRewards();
 
         $this->characterRewardService->setCharacter($this->character)
@@ -91,10 +92,7 @@ class BattleRewardService {
     }
 
     protected function handleFactionRewards() {
-        if (
-            $this->gameMap->mapType()->isPurgatory() ||
-            $this->gameMap->mapType()->isTheIcePlane()
-        ) {
+        if ($this->gameMap->mapType()->isPurgatory()) {
             return;
         }
 
