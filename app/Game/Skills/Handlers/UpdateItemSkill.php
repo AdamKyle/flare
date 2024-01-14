@@ -6,6 +6,7 @@ use App\Flare\Handlers\UpdateCharacterAttackTypes;
 use App\Flare\Models\Item;
 use App\Flare\Models\Character;
 use App\Flare\Models\ItemSkillProgression;
+use \Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 
 class UpdateItemSkill {
 
@@ -36,13 +37,20 @@ class UpdateItemSkill {
     }
 
     protected function levelUpSkill(Character $character, ItemSkillProgression $itemSkillProgression) {
-        if ($itemSkillProgression->current_kills >= $itemSkillProgression->itemSkill->total_kills_needed) {
+        if ($itemSkillProgression->current_kill >= $itemSkillProgression->itemSkill->total_kills_needed) {
             $itemSkillProgression->update([
-                'current_level' => $itemSkillProgression->current_level + 1
+                'current_level' => $itemSkillProgression->current_level + 1,
+                'current_kill'  => 0,
             ]);
 
+            $character = $character->refresh();
+            $itemSkillProgression = $itemSkillProgression->refresh();
+
             $this->updateCharacterAttackTypes->updateCache($character->refresh());
-            
+
+            ServerMessageHandler::sendBasicMessage($character->user,
+                'Your equipped artifacts: ' . $itemSkillProgression->item->affix_name . '\'s Skill: ' . $itemSkillProgression->itemSkill->name . ' has gained a new level and is now level: ' . $itemSkillProgression->current_level . '.'
+            );
         }
     }
 }

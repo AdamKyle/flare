@@ -122,8 +122,6 @@ class DisenchantService {
         $canDisenchant = $characterRoll > $dcCheck;
 
         if ($characterCurrentGoldDust >= MaxCurrenciesValue::MAX_GOLD_DUST && $canDisenchant) {
-            ServerMessageHandler::sendBasicMessage($this->character->user, 'Disenchanted the item.');
-
             event(new UpdateSkillEvent($this->disenchantingSkill));
 
             return;
