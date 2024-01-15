@@ -5,6 +5,7 @@ namespace App\Flare\ServerFight\Fight;
 use App\Flare\Builders\Character\CharacterCacheData;
 use App\Flare\Models\Character;
 use App\Flare\ServerFight\BattleBase;
+use App\Flare\Values\AttackTypeValue;
 
 class Affixes extends BattleBase {
 
@@ -13,6 +14,10 @@ class Affixes extends BattleBase {
     }
 
     public function getCharacterAffixDamage(array $attackData, bool $isPvp, float $monsterResistance = 0.0): int {
+
+        if ($attackData['attack_type'] === AttackTypeValue::DEFEND) {
+            return 0;
+        }
 
         $attribute = isset($attackData['weapon_damage']) ? 'weapon_damage' : 'spell_damage';
 

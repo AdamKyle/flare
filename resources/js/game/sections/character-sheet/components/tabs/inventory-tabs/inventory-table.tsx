@@ -40,7 +40,10 @@ export default class InventoryTable extends React.Component<InventoryTabProps, I
         return (
             <Fragment>
                 <InfoAlert additional_css={'mt-4 mb-4'}>
-                    Click the item name to get additional actions. This table only sometimes updates automatically, such as with mass disenchanting items.
+                    Click the item name to get additional actions. This table only sometimes updates automatically,
+                    such as with mass disenchanting items. Players will find their inventory fills up with a lot of "colorful" items,
+                    you can learn more about that <a href='/information/equiptment-types' target='_blank'>here. <i
+                    className="fas fa-external-link-alt"></i></a>!
                 </InfoAlert>
                 <div className={'max-w-[290px] sm:max-w-[100%] overflow-x-hidden'}>
                     <Table data={this.props.inventory} columns={BuildInventoryTableColumns(undefined, this.viewItem.bind(this), this.props.manage_skills)} dark_table={this.props.dark_table}/>
