@@ -31,18 +31,8 @@ class MassImportCustomData extends Command {
      */
     public function handle() {
 
-        // Handle importing things in a custom format.
-        Artisan::call('import:game-data Skills');
-        Artisan::call('import:game-data Items');
-        Artisan::call('import:game-data Monsters');
-        Artisan::call('import:game-data "Admin Section"');
-        Artisan::call('import:game-data Quests');
-        Artisan::call('import:game-data Locations');
-
-        Artisan::call('change:damage-amount-on-affixes');
-        Artisan::call('assign:new-factions-to-characters');
         Artisan::call('create:character-attack-data');
-        Artisan::call('create:quest-cache');
+
         $this->importInformationSection();
     }
 
