@@ -106,7 +106,7 @@ class BuildMonsterCacheService {
 
 
             $monsters =  new Collection(
-                $raidCritters->merge($raidBosses),
+                $raidBosses->merge($raidCritters),
                 $this->monster
             );
 

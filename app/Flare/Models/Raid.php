@@ -5,6 +5,7 @@ namespace App\Flare\Models;
 use Database\Factories\RaidFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 
 class Raid extends Model {
 
@@ -32,15 +33,35 @@ class Raid extends Model {
         'item_specialty_reward_type' => 'string',
     ];
 
-    public function getMonstersForSelection(array $locationIds): array {
+    public function getMonstersForSelection(GameMap $gameMap, array $locationIds): array {
 
-        $monstersArray = $this->raid_monster_ids;
+        $raidMonsters = Cache::get('raid-monsters');
 
-        array_unshift($monstersArray, $this->raid_boss_id);
+        if (empty($raidMonsters)) {
+            return [];
+        }
 
-        $raidMonsters = Monster::whereIn('id', $monstersArray)->select('name', 'id', 'is_raid_boss')->get()->toArray();
+        if (!isset($raidMonsters[$gameMap->name])) {
+            return [];
+        }
 
-        return $this->moveRaidBossToTheTopOfTheList($raidMonsters, $locationIds);
+        $raidMonsters = $raidMonsters[$gameMap->name];
+
+        $newRaidMonsters = [];
+
+        foreach ($raidMonsters as $monster) {
+            if (!in_array($this->raid_boss_location_id, $locationIds) && $monster['is_raid_boss']) {
+                continue;
+            }
+
+            if ($monster['is_raid_boss']) {
+                $monster['name'] = $monster['name'] . ' (RAID BOSS)';
+            }
+
+            $newRaidMonsters[] = $monster;
+        }
+
+        return $newRaidMonsters;
 
     }
 

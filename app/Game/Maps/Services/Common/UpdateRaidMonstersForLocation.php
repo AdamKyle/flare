@@ -93,7 +93,7 @@ trait UpdateRaidMonstersForLocation {
             }
 
             if (in_array($location->id, $locationIds)) {
-                $raidMonsters = $raidEvent->raid->getMonstersForSelection($locationIds);
+                $raidMonsters = $raidEvent->raid->getMonstersForSelection($location->map, $locationIds);
 
                 event(new UpdateRaidMonsters($raidMonsters, $character->user));
 
