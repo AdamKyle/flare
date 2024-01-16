@@ -31,7 +31,12 @@ class MassImportCustomData extends Command {
      */
     public function handle() {
 
+        Artisan::call('import:game-data Monsters');
+        Artisan::call('import:game-data Quests');
+
         Artisan::call('create:character-attack-data');
+        Artisan::call('generate:monster-cache');
+        Artisan::call('create:quest-cache');
 
         $this->importInformationSection();
     }

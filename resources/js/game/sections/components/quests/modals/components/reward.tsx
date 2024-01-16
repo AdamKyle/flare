@@ -1,5 +1,6 @@
 import React, {Fragment} from "react";
 import {formatNumber} from "../../../../../lib/game/format-number";
+import {kebabCase} from "lodash";
 
 export default class Reward extends React.Component<any, any> {
 
@@ -9,7 +10,7 @@ export default class Reward extends React.Component<any, any> {
 
     getFeatureLink() {
         return (
-            <a href={"/information/" + this.props.quest.feature_to_unlock_name.toLowerCase()} target="_blank">
+            <a href={"/information/" + kebabCase(this.props.quest.feature_to_unlock_name.toLowerCase())} target="_blank">
                 {this.props.quest.feature_to_unlock_name} <i
                 className="fas fa-external-link-alt"></i>
             </a>
