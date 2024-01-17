@@ -9,8 +9,8 @@ use App\Game\Messages\Events\ServerMessageEvent;
 
 trait HandleGivingAncestorItem {
 
-    public function giveAncientReward(Character $character): Character {
-        $item = Item::where('type', 'artifact')->doesntHave('itemSkillProgressions')->inRandomOrder()->first();
+    public function giveAncientReward(Character $character, int $artifactItemId): Character {
+        $item = Item::where('type', 'artifact')->doesntHave('itemSkillProgressions')->where('id', $artifactItemId)->first();
 
         $newItem = $item->duplicate();
 

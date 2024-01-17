@@ -86,9 +86,10 @@ class RaidBossRewardHandler implements ShouldQueue {
     private function handleWhenRaidBossIsKilled(Character $charater, Monster $raidBoss): void {
         event(new GlobalMessageEvent($charater->name . ' Has slaughted: ' . $raidBoss->name . ' and has recieved a special Ancient gift from The Poet him self!'));
 
-        $this->giveAncientReward($charater);
-
         $raid = Raid::find($this->raidId);
+
+        $this->giveAncientReward($charater, $raid->artifact_item_id);
+
 
         $this->giveGearReward($raid);
 

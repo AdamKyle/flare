@@ -29,9 +29,11 @@ class CastType extends BattleBase
         $this->specialAttacks     = $specialAttacks;
     }
 
-    public function setCharacterAttackData(Character $character, bool $isVoided): CastType{
+    public function setCharacterAttackData(Character $character, bool $isVoided, string $type): CastType{
 
-        $this->attackData = $this->characterCacheData->getDataFromAttackCache($character, $isVoided ? 'voided_cast' : 'cast');
+        $attackType = $isVoided ? 'voided_' . $type : $type;
+
+        $this->attackData = $this->characterCacheData->getDataFromAttackCache($character, $attackType);
         $this->isVoided   = $isVoided;
 
         return $this;

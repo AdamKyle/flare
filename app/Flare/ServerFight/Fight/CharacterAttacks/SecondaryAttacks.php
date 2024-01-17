@@ -94,6 +94,8 @@ class SecondaryAttacks extends BattleBase {
     public function classSpecialtyDamage(bool $isPvp = false) {
         $special = $this->attackData['special_damage'];
 
+        dump($this->attackData['special_damage'], $this->attackData['attack_type'], $this->attackData);
+
         if (empty($special)) {
             return;
         }

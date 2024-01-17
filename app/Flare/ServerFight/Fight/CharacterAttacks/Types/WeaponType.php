@@ -29,9 +29,11 @@ class WeaponType extends BattleBase {
         $this->specialAttacks     = $specialAttacks;
     }
 
-    public function setCharacterAttackData(Character $character, bool $isVoided): WeaponType {
+    public function setCharacterAttackData(Character $character, bool $isVoided, string $type): WeaponType {
 
-        $this->attackData = $this->characterCacheData->getDataFromAttackCache($character, $isVoided ? 'voided_attack' : 'attack');
+        $attackType = $isVoided ? 'voided_' . $type : $type;
+
+        $this->attackData = $this->characterCacheData->getDataFromAttackCache($character, $attackType);
         $this->isVoided   = $isVoided;
 
         return $this;

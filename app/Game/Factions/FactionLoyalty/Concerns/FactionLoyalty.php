@@ -110,13 +110,21 @@ trait FactionLoyalty {
      */
     public function showCraftForNpcButton(Character $character, string $craftingType): bool {
 
-        return optional(
-            optional($character->factionLoyalties()->where('is_pledged', true)->first())
-                ->factionLoyaltyNpcs()->where('currently_helping', true)->first()
-        )->factionLoyaltyNpcTasks->fame_tasks
-            ? collect(optional($character->factionLoyalties()->where('is_pledged', true)->first())
-                ->factionLoyaltyNpcs()->where('currently_helping', true)->first()
-                ->factionLoyaltyNpcTasks->fame_tasks)->contains('type', $craftingType)
-            : false;
+        $pledgedFaction = $character->factionLoyalties()->where('is_pledged', true)->first();
+
+        if (is_null($pledgedFaction)) {
+            return false;
+        }
+
+        $assistingNpc = $pledgedFaction->factionLoyaltyNpcs()->where('currently_helping', true)->first();
+
+        if (is_null($assistingNpc)) {
+            return false;
+        }
+
+
+        return ollect(optional($character->factionLoyalties()->where('is_pledged', true)->first())
+            ->factionLoyaltyNpcs()->where('currently_helping', true)->first()
+            ->factionLoyaltyNpcTasks->fame_tasks)->contains('type', $craftingType);
     }
 }

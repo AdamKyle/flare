@@ -9,6 +9,7 @@ use App\Flare\ServerFight\Fight\CanHit;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SecondaryAttacks;
 use App\Flare\ServerFight\Fight\Entrance;
 use App\Flare\ServerFight\Monster\ServerMonster;
+use App\Flare\Values\AttackTypeValue;
 
 class AttackAndCast extends BattleBase
 {
@@ -64,13 +65,13 @@ class AttackAndCast extends BattleBase
     }
 
     public function handleAttack(Character $character, ServerMonster $monster) {
-        $this->handleWeaponAttack($character, $monster);
+        $this->handleWeaponAttack($character, $monster, false);
 
         if ($this->characterHealth <= 0) {
             return $this;
         }
 
-        $this->handleCastAttack($character, $monster, false);
+        $this->handleCastAttack($character, $monster,);
 
         if ($this->characterHealth <= 0) {
             return $this;
@@ -109,7 +110,7 @@ class AttackAndCast extends BattleBase
 
         $this->weaponType->setMonsterHealth($this->monsterHealth);
         $this->weaponType->setCharacterHealth($this->characterHealth);
-        $this->weaponType->setCharacterAttackData($character, $this->isVoided);
+        $this->weaponType->setCharacterAttackData($character, $this->isVoided, AttackTypeValue::ATTACK_AND_CAST);
 
         if ($disableSecondaryAttacks) {
             $this->weaponType->doNotAllowSecondaryAttacks();
@@ -132,7 +133,7 @@ class AttackAndCast extends BattleBase
     protected function handlePvpCastAttack(Character $attacker, Character $defender) {
         $this->castType->setMonsterHealth($this->monsterHealth);
         $this->castType->setCharacterHealth($this->characterHealth);
-        $this->castType->setCharacterAttackData($attacker, $this->isVoided);
+        $this->castType->setCharacterAttackData($attacker, $this->isVoided, AttackTypeValue::ATTACK_AND_CAST);
         $this->castType->doNotAllowSecondaryAttacks();
         $this->castType->pvpCastAttack($attacker, $defender);
 
