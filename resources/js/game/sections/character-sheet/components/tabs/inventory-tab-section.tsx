@@ -12,7 +12,6 @@ import clsx from "clsx";
 import UsableItemsDetails from "../../../../lib/game/character-sheet/types/inventory/usable-items-details";
 import InventoryUseManyItems from "../modals/inventory-use-many-items";
 import { GemBagTable } from "./inventory-tabs/gem-bag-table";
-import OrangeButton from "../../../../components/ui/buttons/orange-button";
 import WarningAlert from "../../../../components/ui/alerts/simple-alerts/warning-alert";
 
 export default class InventoryTabSection extends React.Component<
@@ -293,9 +292,6 @@ export default class InventoryTabSection extends React.Component<
                             selected_name={this.state.table}
                             disabled={this.props.is_dead}
                         />
-                    </div>
-                    <div className={"ml-2"}>
-                        <OrangeButton button_label={'Equip Best'} on_click={this.handleEquipBest.bind(this)} />
                     </div>
                     <div className="sm:ml-4 md:ml-0 my-4 md:my-0 md:absolute md:right-[10px]">
                         <input

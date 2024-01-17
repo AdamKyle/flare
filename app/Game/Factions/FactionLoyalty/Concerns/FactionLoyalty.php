@@ -122,9 +122,6 @@ trait FactionLoyalty {
             return false;
         }
 
-
-        return ollect(optional($character->factionLoyalties()->where('is_pledged', true)->first())
-            ->factionLoyaltyNpcs()->where('currently_helping', true)->first()
-            ->factionLoyaltyNpcTasks->fame_tasks)->contains('type', $craftingType);
+        return collect($assistingNpc->factionLoyaltyNpcTasks->fame_tasks)->contains('type', $craftingType);
     }
 }
