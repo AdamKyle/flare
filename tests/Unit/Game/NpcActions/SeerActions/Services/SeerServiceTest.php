@@ -988,11 +988,14 @@ class SeerServiceTest extends TestCase {
         $slot    = $character->inventory->slots->where('item_id', $item->id)->first();
         $gemSlot = $character->gemBag->gemSlots->where('gem_id', $gemForAddition->id)->first();
 
-        $result  = $this->seerService->assignGemToSocket($character->refresh(), $slot->id, $gemSlot->id);
+        $character = $character->refresh();
+
+        $result  = $this->seerService->assignGemToSocket($character, $slot->id, $gemSlot->id);
 
         $this->assertEquals(200, $result['status']);
         $this->assertEquals('Attached gem to item!', $result['message']);
         $this->assertEquals(1, $gemSlot->refresh()->amount);
+        $this->assertEquals(1500, $character->kingdoms->sum('gold_bars'));
     }
 
     public function testGetNoItemsWhenHasNotItemsWithSockets() {
