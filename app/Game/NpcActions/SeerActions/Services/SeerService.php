@@ -379,7 +379,7 @@ class SeerService {
 
         $this->addGemToItem($slot, $gemSlot);
 
-        HandleGoldBarsAsACurrency::subtractCostFromKingdoms($character->kingdoms, self::SOCKET_COST);
+        HandleGoldBarsAsACurrency::subtractCostFromKingdoms($character->kingdoms, self::GEM_ATTACH_COST);
 
         $character = $character->refresh();
 
@@ -395,7 +395,7 @@ class SeerService {
     }
 
     /**
-     * Gem removal validation.
+     * Gem removal validation.SOCKET_COST
      *
      * - Common validation for removing gems.
      *
