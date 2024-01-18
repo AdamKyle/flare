@@ -9,6 +9,7 @@ use App\Flare\ServerFight\Fight\CharacterAttacks\Types\CastType;
 use App\Flare\ServerFight\Fight\CharacterAttacks\Types\Defend;
 use App\Flare\ServerFight\Fight\CharacterAttacks\Types\WeaponType;
 use App\Flare\ServerFight\Monster\ServerMonster;
+use App\Flare\Values\AttackTypeValue;
 
 class CharacterAttack {
 
@@ -35,7 +36,7 @@ class CharacterAttack {
     public function pvpAttack(Character $attacker, Character $defender, bool $isAttackerVoided, bool $isEnemyVoided, array $healthObject): CharacterAttack {
         $this->weaponType->setCharacterHealth($healthObject['attacker_health']);
         $this->weaponType->setMonsterHealth($healthObject['defender_health']);
-        $this->weaponType->setCharacterAttackData($attacker, $isAttackerVoided);
+        $this->weaponType->setCharacterAttackData($attacker, $isAttackerVoided, AttackTypeValue::ATTACK);
         $this->weaponType->setIsEnemyVoided($isEnemyVoided);
         $this->weaponType->setDefenderId($defender->id);
         $this->weaponType->doPvpWeaponAttack($attacker, $defender);
@@ -48,7 +49,7 @@ class CharacterAttack {
     public function attack(Character $character, ServerMonster $monster, bool $isPlayerVoided, int $characterHealth, int $monsterHealth): CharacterAttack {
         $this->weaponType->setCharacterHealth($characterHealth);
         $this->weaponType->setMonsterHealth($monsterHealth);
-        $this->weaponType->setCharacterAttackData($character, $isPlayerVoided);
+        $this->weaponType->setCharacterAttackData($character, $isPlayerVoided, AttackTypeValue::ATTACK);
         $this->weaponType->setAllowEntrancing(true);
         $this->weaponType->doWeaponAttack($character, $monster);
 
@@ -60,7 +61,7 @@ class CharacterAttack {
     public function pvpCast(Character $attacker, Character $defender, bool $isAttackerVoided, bool $isEnemyVoided, array $healthObject): CharacterAttack {
         $this->castType->setCharacterHealth($healthObject['attacker_health']);
         $this->castType->setMonsterHealth($healthObject['defender_health']);
-        $this->castType->setCharacterAttackData($attacker, $isAttackerVoided);
+        $this->castType->setCharacterAttackData($attacker, $isAttackerVoided, AttackTypeValue::CAST);
         $this->castType->setIsEnemyVoided($isEnemyVoided);
         $this->castType->setDefenderId($defender->id);
         $this->castType->pvpCastAttack($attacker, $defender);
@@ -73,7 +74,7 @@ class CharacterAttack {
     public function cast(Character $character, ServerMonster $monster, bool $isPlayerVoided, int $characterHealth, int $monsterHealth): CharacterAttack {
         $this->castType->setCharacterHealth($characterHealth);
         $this->castType->setMonsterHealth($monsterHealth);
-        $this->castType->setCharacterAttackData($character, $isPlayerVoided);
+        $this->castType->setCharacterAttackData($character, $isPlayerVoided, AttackTypeValue::CAST);
         $this->castType->setAllowEntrancing(true);
 
         $this->castType->castAttack($character, $monster);
@@ -87,7 +88,7 @@ class CharacterAttack {
     public function pvpAttackAndCast(Character $attacker, Character $defender, bool $isAttackerVoided, bool $isEnemyVoided, array $healthObject): CharacterAttack {
         $this->attackAndCast->setCharacterHealth($healthObject['attacker_health']);
         $this->attackAndCast->setMonsterHealth($healthObject['defender_health']);
-        $this->attackAndCast->setCharacterAttackData($attacker, $isAttackerVoided);
+        $this->attackAndCast->setCharacterAttackData($attacker, $isAttackerVoided, AttackTypeValue::ATTACK_AND_CAST);
         $this->attackAndCast->setIsEnemyVoided($isEnemyVoided);
         $this->attackAndCast->setDefenderId($defender->id);
         $this->attackAndCast->handlePvpAttack($attacker, $defender);
@@ -100,7 +101,7 @@ class CharacterAttack {
     public function attackAndCast(Character $character, ServerMonster $monster, bool $isPlayerVoided, int $characterHealth, int $monsterHealth): CharacterAttack {
         $this->attackAndCast->setCharacterHealth($characterHealth);
         $this->attackAndCast->setMonsterHealth($monsterHealth);
-        $this->attackAndCast->setCharacterAttackData($character, $isPlayerVoided);
+        $this->attackAndCast->setCharacterAttackData($character, $isPlayerVoided, AttackTypeValue::ATTACK_AND_CAST);
         $this->attackAndCast->handleAttack($character, $monster);
 
         $this->type = $this->attackAndCast;
