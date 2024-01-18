@@ -25,48 +25,28 @@ class FixDuplicateQuestItems extends Command {
      * Execute the console command.
      */
     public function handle() {
-        $characters = Character::with('inventory.slots.item')
-            ->whereHas('inventory.slots.item', function ($query) {
-                $query->where('type', 'quest');
-            })
-            ->get();
+        Character::chunkById(50, function ($characters) {
+            foreach ($characters as $character) {
 
-        $duplicateQuestItems = [];
+                if (is_null($character->inventory)) {
+                    continue;
+                }
 
-        foreach ($characters as $character) {
-            $questItems = $character->inventory->slots
-                ->where('item.type', 'quest')
-                ->pluck('item.name')
-                ->toArray();
+                $questItems = $character->inventory->slots
+                    ->where('item.type', 'quest')
+                    ->pluck('item.name')
+                    ->toArray();
 
-            $duplicateItems = array_diff_assoc($questItems, array_unique($questItems));
+                $duplicateItems = array_unique(array_diff_assoc($questItems, array_unique($questItems)));
 
-            if (!empty($duplicateItems)) {
-                $duplicateQuestItems[] = [
-                    'character_name' => $character->name,
-                    'duplicate_quest_item_names' => $duplicateItems
-                ];
+                if (!empty($duplicateItems)) {
+                    $itemIds = Item::whereIn('name', $duplicateItems)->pluck('id')->toArray();
+
+                    $character->inventory->slots()->whereIn('item_id', $itemIds)->delete();
+
+                    $this->line('Deleted Duplicate Quest Items for: ' . $character->name);
+                }
             }
-        }
-
-        if (empty($duplicateQuestItems)) {
-            return;
-        }
-
-        foreach ($duplicateQuestItems as $duplicateItemDetails) {
-            $character = Character::where('name', $duplicateItemDetails['character_name'])->first();
-
-            if (is_null($character)) {
-                $this->line('No Character for name: ' . $duplicateItemDetails['character_name']);
-
-                continue;
-            }
-
-            $itemIds = Item::whereIn('name', $duplicateItemDetails['duplicate_quest_item_names'])->pluck('id')->toArray();
-
-            $character->inventory->slots()->whereIn('item_id', $itemIds)->delete();
-
-            $this->line('Deleted Duplicate Quest Items for: ' . $character->name);
-        }
+        });
     }
 }
