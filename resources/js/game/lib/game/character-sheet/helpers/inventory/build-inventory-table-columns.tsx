@@ -145,6 +145,26 @@ export const buildGemColumns = (component: GemBagTable, onClick: (gemSlot: GemBa
             name: 'Amount',
             selector: (row: GemBagDetails) => row.amount,
             cell: (row: GemBagDetails) => row.amount
+        },
+        {
+            name: 'Atoned To',
+            selector: (row: GemBagDetails) => row.element_atoned_to,
+            cell: (row: GemBagDetails) => row.element_atoned_to
+        },
+        {
+            name: 'Atoned Amount',
+            selector: (row: GemBagDetails) => row.element_atoned_to_amount,
+            cell: (row: GemBagDetails) => (row.element_atoned_to_amount * 100).toFixed(2) + '%'
+        },
+        {
+            name: 'Strong Against',
+            selector: (row: GemBagDetails) => row.strong_against,
+            cell: (row: GemBagDetails) => row.strong_against
+        },
+        {
+            name: 'Weak Against',
+            selector: (row: GemBagDetails) => row.weak_against,
+            cell: (row: GemBagDetails) => row.weak_against
         }
     ];
 

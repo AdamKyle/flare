@@ -8,5 +8,8 @@ export default interface GemBagSlotDetails {
     tertiary_atonement_amount: number;
     tertiary_atonement_name: string;
     tier: number;
-
+    weak_against: string;
+    strong_against: string;
+    element_atoned_to: string;
+    element_atoned_to_amount: number;
 }
