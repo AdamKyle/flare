@@ -232,7 +232,6 @@ export default class QuestDetailsModal extends React.Component<any, any> {
     }
 
     renderItem(item: any) {
-        console.log(item.required_monster);
         return (
             <Fragment>
                 {item.drop_location_id !== null ? (

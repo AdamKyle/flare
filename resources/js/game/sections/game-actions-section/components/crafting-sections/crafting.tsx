@@ -40,16 +40,15 @@ export default class Crafting extends React.Component<any, any> {
     }
 
     showCraftForNpc() {
-
-        if (this.state.selected_type === null) {
+        if (!this.state.selected_type) {
             return false;
         }
 
-        if (this.state.selected_item === null) {
+        if (!this.state.selected_item) {
             return false;
         }
 
-        if (this.props.fame_tasks === null) {
+        if (!this.props.fame_tasks) {
             return false;
         }
 

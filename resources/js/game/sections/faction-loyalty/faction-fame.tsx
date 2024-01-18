@@ -79,7 +79,6 @@ export default class FactionFame extends React.Component<FactionLoyaltyProps, Fa
                     success_message: result.data.message,
                     faction_loyalty: result.data.faction_loyalty,
                 }, () => {
-                    console.log(result.data.faction_loyalty);
                     this.setInitialSelectedFactionInfo(result.data.faction_loyalty, this.state.npcs);
                 });
             });
@@ -133,7 +132,6 @@ export default class FactionFame extends React.Component<FactionLoyaltyProps, Fa
     }
 
     selectedNpc(): string | undefined {
-        console.log(this.state.npcs, this.state.selected_npc?.name);
         return this.state.npcs?.find((npc: FactionLoyaltyNpcListItem) => {
              return npc.name === this.state.selected_npc?.name
         })?.name;
