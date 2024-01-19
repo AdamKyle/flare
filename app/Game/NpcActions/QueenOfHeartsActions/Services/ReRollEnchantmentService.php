@@ -4,6 +4,7 @@ namespace App\Game\NpcActions\QueenOfHeartsActions\Services;
 
 use App\Flare\Builders\AffixAttributeBuilder;
 use App\Flare\Models\Character;
+use App\Flare\Models\HolyStack;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 use App\Flare\Models\ItemAffix;
@@ -150,6 +151,8 @@ class ReRollEnchantmentService {
             'market_sellable' => true,
         ]);
 
+        $duplicateUnique = $duplicateUnique->refresh();
+
         $deletedAll  = false;
         $deletedSome = false;
         $deletedNone = false;
@@ -187,12 +190,32 @@ class ReRollEnchantmentService {
                 }
             }
 
-            if ($deletedOne && $deletedTwo) {
+            if ($deletedOne && $deletedTwo && $slot->item->appliedHolyStacks->isEmpty()) {
                 $slot->delete();
                 $duplicateUnique->delete();
 
                 $deletedAll = true;
             } else {
+
+                foreach ($slot->item->appliedHolyStacks as $stack) {
+                    $duplicateUnique->appliedHolyStacks()->create([
+                        'item_id'                  => $duplicateUnique->id,
+                        'devouring_darkness_bonus' => $stack->devouring_darkness_bonus,
+                        'stat_increase_bonus'      => $stack->stat_increase_bonus,
+                    ]);
+
+                    $duplicateUnique = $duplicateUnique->refresh();
+                }
+
+                if ($deletedOne && $deletedTwo) {
+                    $duplicateUnique->update([
+                        'market_sellable' => false,
+                        'is_mythic' => false,
+                    ]);
+
+                    $duplicateUnique = $duplicateUnique->refresh();
+                }
+
                 $slot->update([
                     'item_id' => $duplicateUnique->id,
                 ]);
