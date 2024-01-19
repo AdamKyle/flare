@@ -71,6 +71,10 @@ class AttachedGemsControllerTest extends TestCase {
             "primary_atonement_amount" => $this->gem->primary_atonement_amount,
             "secondary_atonement_amount" => $this->gem->secondary_atonement_amount,
             "tertiary_atonement_amount" => $this->gem->tertiary_atonement_amount,
+            'weak_against' => (new GemTypeValue($this->gem->secondary_atonement_type))->getNameOfAtonement(),
+            'strong_against' => (new GemTypeValue($this->gem->primary_atonement_type))->getNameOfAtonement(),
+            'element_atoned_to' => (new GemTypeValue($this->gem->tertiary_atonement_type))->getNameOfAtonement(),
+            'element_atoned_to_amount' => $this->gem->tertiary_atonement_amount,
         ];
 
         $this->assertCount(1, $jsonData['socketed_gems']);
