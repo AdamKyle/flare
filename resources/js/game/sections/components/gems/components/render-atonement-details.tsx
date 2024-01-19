@@ -1,4 +1,4 @@
-import React, {Fragment} from "react";
+import React, {Fragment, ReactNode} from "react";
 
 export default class RenderAtonementDetails extends React.Component<any, any> {
 
@@ -6,19 +6,17 @@ export default class RenderAtonementDetails extends React.Component<any, any> {
         super(props);
     }
 
-    renderAtonements(atonementData: any): JSX.Element[]|[] {
-        const elements = [];
+    renderAtonements(atonementData: any): ReactNode[] | [] {
+        const atonements = atonementData.atonements;
 
-        for (const key in atonementData) {
-            elements.push(
-                <Fragment>
-                    <dt>{key}</dt>
-                    <dd>{(atonementData[key] * 100).toFixed(2)}%</dd>
-                </Fragment>
-            )
-        }
+        const atonementNames = Object.keys(atonements);
 
-        return elements;
+        return atonementNames.map((name) => (
+            <Fragment key={name}>
+                <dt>{name}</dt>
+                <dd>{(atonements[name] * 100).toFixed(0)}%</dd>
+            </Fragment>
+        ));
     }
 
 

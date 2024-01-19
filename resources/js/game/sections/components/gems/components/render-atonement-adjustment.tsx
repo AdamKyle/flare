@@ -8,29 +8,35 @@ export default class RenderAtonementAdjustment extends React.Component<any, any>
     }
 
     renderDifference(atonementData: any, originalAtonement: any): JSX.Element[]|[] {
-        return atonementData.map((data: any) => {
 
-            const atonementValue = this.findElementAtonement(originalAtonement, data.name);
+        const atonementKeys = Object.keys(atonementData);
+
+        return atonementKeys.map((atonementName: string) => {
+
+            const atonementValue = this.findElementAtonement(originalAtonement, atonementName);
 
             return (
                 <Fragment>
-                    <dt>{data.name}</dt>
+                    <dt>{atonementName}</dt>
                     <dd
                         className={clsx({
-                            'text-green-700 dark:text-green-500': data.total > atonementValue,
-                            'text-red-700 dark:text-red-500': data.total < atonementValue
+                            'text-green-700 dark:text-green-500': atonementData[atonementName] > atonementValue,
+                            'text-red-700 dark:text-red-500': atonementData[atonementName] < atonementValue
                         })}
-                    >{(data.total * 100).toFixed(2)}%</dd>
+                    >{(atonementData[atonementName] * 100).toFixed(0)}%</dd>
                 </Fragment>
             );
         });
     }
 
-    findElementAtonement(originalAtonement: any, elementName: string): number {
-        const element = originalAtonement.filter((atonement: any) => atonement.name === elementName);
+    findElementAtonement(atonements: any, elementName: string): number {
+
+        const atonementsKeys = Object.keys(atonements);
+
+        const element = atonementsKeys.filter((atonementsName: string) => atonementsName === elementName);
 
         if (element.length > 0) {
-            return element[0].total;
+            return atonements[element[0]];
         }
 
         return 0;

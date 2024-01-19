@@ -37,7 +37,7 @@ export default class InventoryItemGemDetails extends React.Component<any, any> {
                     <Fragment>
                         <dt>{atonementName}</dt>
                         <dd className="text-green-700 dark:text-green-500">
-                            +{(total * 100).toFixed(2)}%
+                            +{(total * 100).toFixed(0)}%
                         </dd>
                     </Fragment>
                 );
@@ -52,7 +52,7 @@ export default class InventoryItemGemDetails extends React.Component<any, any> {
                             {(value === 0
                                 ? total * 100
                                 : (total - value) * 100
-                            ).toFixed(2)}
+                            ).toFixed(0)}
                             %
                         </dd>
                     </Fragment>
@@ -64,7 +64,7 @@ export default class InventoryItemGemDetails extends React.Component<any, any> {
                     <Fragment>
                         <dt>{atonementName}</dt>
                         <dd className="text-red-700 dark:text-red-500">
-                            -{((total - value) * 100).toFixed(2)}%
+                            -{((total - value) * 100).toFixed(0)}%
                         </dd>
                     </Fragment>
                 );
@@ -73,7 +73,7 @@ export default class InventoryItemGemDetails extends React.Component<any, any> {
             elements.push(
                 <Fragment>
                     <dt>{atonementName}</dt>
-                    <dd>{(total * 100).toFixed(2)}%</dd>
+                    <dd>{(total * 100).toFixed(0)}%</dd>
                 </Fragment>
             );
         });
@@ -147,7 +147,7 @@ export default class InventoryItemGemDetails extends React.Component<any, any> {
                                 {(
                                     this.props.item_atonement.elemental_damage
                                         .amount * 100
-                                ).toFixed(2)}
+                                ).toFixed(0)}
                                 %
                             </dd>
                         </dl>
