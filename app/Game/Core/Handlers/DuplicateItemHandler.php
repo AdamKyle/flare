@@ -25,7 +25,7 @@ class DuplicateItemHandler {
         $newItem = $newItem->refresh();
 
         $hasItemAffix = (!is_null($newItem->item_prefix_id) || !is_null($newItem->item_suffix_id));
-        $hasHoly      = $newItem->appliedHolyStacks->count() > 0;
+        $hasHoly      = $item->appliedHolyStacks->count() > 0;
 
         if ($hasItemAffix || $hasHoly) {
             $newItem->update([
@@ -56,6 +56,8 @@ class DuplicateItemHandler {
                 $stackAttributes['item_id'] = $newItem->id;
 
                 $newItem->appliedHolyStacks()->create($stackAttributes);
+
+                $newItem = $newItem->refresh();
             }
         }
 
