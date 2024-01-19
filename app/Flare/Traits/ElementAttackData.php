@@ -67,6 +67,10 @@ trait ElementAttackData {
 
         $name = $this->getHighestElementName($elementData, $this->getHighestElementDamage($elementData));
 
+        if ($name === 'UNKNOWN') {
+            return false;
+        }
+
         return GemTypeValue::getOppsiteForHalfDamage($name)  === $attackingElementName;
     }
 
@@ -81,6 +85,10 @@ trait ElementAttackData {
      */
     public function isDoubleDamage(array $elementData, string $attackingElementName): bool {
         $name = $this->getHighestElementName($elementData, $this->getHighestElementDamage($elementData));
+
+        if ($name === 'UNKNOWN') {
+            return false;
+        }
 
         return GemTypeValue::getOppsiteForDoubleDamage($name)  === $attackingElementName;
     }

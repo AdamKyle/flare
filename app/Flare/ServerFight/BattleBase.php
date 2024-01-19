@@ -116,11 +116,7 @@ class BattleBase extends BattleMessages {
         $secondaryAttacks->clearMessages();
     }
 
-    protected function elementalAttack(Character $character, ServerMonster $monster) {
-
-        if (!$monster->getMonsterStat('is_raid_monster') && !$monster->getMonsterStat('is_raid_boss')) {
-            return;
-        }
+    protected function elementalAttack(Character $character, ServerMonster $monster, string $damageType) {
 
         $elementalAttack = resolve(ElementalAttack::class);
 
@@ -129,9 +125,9 @@ class BattleBase extends BattleMessages {
 
         $characterElementalData = $this->characterCacheData->getCachedCharacterData($character, 'elemental_atonement')['elemental_data'];
 
-        $weaponDamage           = $this->characterCacheData->getCachedCharacterData($character, 'weapon_attack');
+        $damage = $this->characterCacheData->getCachedCharacterData($character, $damageType);
 
-        $elementalAttack->doElementalAttack($monster->getElementData(), $characterElementalData, $weaponDamage);
+        $elementalAttack->doElementalAttack($monster->getElementData(), $characterElementalData, $damage);
 
         $this->mergeMessages($elementalAttack->getMessages());
 

@@ -110,6 +110,7 @@ class CharacterCacheData extends CharacterPvpCacheData {
         $characterSheet['elemental_atonement'] = $this->characterStatBuilder->buildElementalAtonement();
 
         $characterSheet['weapon_attack'] = $this->characterStatBuilder->buildDamage('weapon');
+        $characterSheet['spell_attack'] = $this->characterStatBuilder->buildDamage('spell-damage');
 
         Cache::put('character-sheet-' . $characterId, $characterSheet);
 

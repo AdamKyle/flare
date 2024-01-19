@@ -9,6 +9,7 @@ use App\Flare\ServerFight\BattleBase;
 use App\Flare\ServerFight\Fight\Affixes;
 use App\Flare\ServerFight\Monster\ServerMonster;
 use App\Flare\Traits\ElementAttackData;
+use App\Flare\Values\AttackTypeValue;
 use App\Flare\Values\LocationType;
 
 class SecondaryAttacks extends BattleBase {
@@ -38,7 +39,7 @@ class SecondaryAttacks extends BattleBase {
     public function doSecondaryAttack(Character $character, ServerMonster $monster = null, float $affixReduction = 0.0, bool $isPvp = false) {
         $this->classSpecialtyDamage($isPvp);
 
-        $this->dealElementalDamage($character, $monster, $isPvp, $isPvp);
+        $this->dealElementalDamage($character, $monster, true, $isPvp);
 
         if (!$this->isVoided) {
 
@@ -197,10 +198,19 @@ class SecondaryAttacks extends BattleBase {
             return;
         }
 
+        if ($this->attackData['attack_type'] === AttackTypeValue::DEFEND) {
+            return;
+        }
+
+        $damageType = match ($this->attackData['attack_type']) {
+            AttackTypeValue::ATTACK, AttackTypeValue::ATTACK_AND_CAST => 'weapon_attack',
+            AttackTypeValue::CAST, AttackTypeValue::CAST_AND_ATTACK => 'spell_attack',
+        };
+
         if ($isPvp) {
             $this->doElementalPvpDamage($character);
         } else if (!is_null($monster)) {
-            $this->elementalAttack($character, $monster);
+            $this->elementalAttack($character, $monster, $damageType);
         }
     }
 

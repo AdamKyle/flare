@@ -9,7 +9,7 @@ use App\Flare\Traits\ElementAttackData;
 class ElementalAttack extends BattleBase {
 
     use ElementAttackData;
- 
+
     /**
      * @param CharacterCacheData $characterCacheData
      */
@@ -31,6 +31,9 @@ class ElementalAttack extends BattleBase {
         $highestDefendingElement = $this->getHighestElementDamage($defenderElements);
 
         $highestElementName = $this->getHighestElementName($attackerElements, $highestElement);
+        if ($highestElementName === 'UNKNOWN') {
+            return;
+        }
 
         if ($highestElement <= 0) {
             return;
@@ -83,10 +86,10 @@ class ElementalAttack extends BattleBase {
                 break;
             case 'regular':
             default:
-                $this->regularAttackMessages($isMonster, $damage);    
+                $this->regularAttackMessages($isMonster, $damage);
         }
 
-        $this->addMessage($isMonster ? 
+        $this->addMessage($isMonster ?
             'You manage to resist: ' . number_format($damage - $newDamage) . ' ('.($highestDefendingElement * 100).'%) damage from the enemies bloody gems!' :
             'The enemy resists: ' . number_format($damage - $newDamage) . ' ('.($highestDefendingElement * 100).'%) damage from your gems!',
             ($isMonster ? 'regular' : 'enemy-action')

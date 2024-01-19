@@ -99,10 +99,15 @@ class ServerMonster {
     }
 
     public function getElementData(): array {
+
+        $fire = is_null($this->monster['fire_atonement']) ? 0 : $this->monster['fire_atonement'];
+        $ice = is_null($this->monster['ice_atonement']) ? 0 : $this->monster['ice_atonement'];
+        $water = is_null($this->monster['water_atonement']) ? 0 : $this->monster['water_atonement'];
+
         return [
-            'fire'  => $this->monster['fire_atonement'],
-            'ice'   => $this->monster['ice_atonement'],
-            'water' => $this->monster['water_atonement']
+            'fire'  => $fire,
+            'ice'   => $ice,
+            'water' => $water,
         ];
     }
 

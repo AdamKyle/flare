@@ -365,8 +365,6 @@ class CastType extends BattleBase
     protected function doSecondaryAttacks($character, $monster) {
         if ($this->allowSecondaryAttacks && !$this->abortCharacterIsDead) {
             $this->secondaryAttack($character, $monster);
-
-            $this->elementalAttack($character, $monster);
         }
     }
 
