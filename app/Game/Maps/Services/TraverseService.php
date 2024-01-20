@@ -308,13 +308,20 @@ class TraverseService {
             !$this->mapTileValue->canWalkOnMagma($character, $character->map->character_position_x, $character->map->character_position_y) ||
             $this->mapTileValue->isPurgatoryWater((int) $this->mapTileValue->getTileColor($character, $character->map->character_position_x, $character->map->character_position_y))
         ) {
-
+            // Update the players location, call the method again to validate that we are not at a invalid location.
+            // repeat until we are in a non-invalid location,
             $character->map()->update([
                 'character_position_x' => $x[rand(0, count($x) - 1)],
                 'character_position_y' => $y[rand(0, count($y) - 1)],
             ]);
 
             return $this->changeLocation($character->refresh(), $cache);
+        } else {
+            // Randomly move to any valid location.
+            $character->map()->update([
+                'character_position_x' => $x[rand(0, count($x) - 1)],
+                'character_position_y' => $y[rand(0, count($y) - 1)],
+            ]);
         }
 
         $location = Location::where('x', $character->map->character_position_x)->where('y', $character->map->character_position_y)->where('game_map_id', $character->map->game_map_id)->first();

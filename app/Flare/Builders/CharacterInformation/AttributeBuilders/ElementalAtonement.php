@@ -41,7 +41,7 @@ class ElementalAtonement extends BaseAttribute {
         $highestElement = $this->calculateHighestElement($averages);
 
         return [
-            'elemental_data' => $averages,
+            'atonements' => $averages,
             'highest_element' => $highestElement,
         ];
     }

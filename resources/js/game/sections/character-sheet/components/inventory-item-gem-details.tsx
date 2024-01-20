@@ -130,7 +130,7 @@ export default class InventoryItemGemDetails extends React.Component<any, any> {
                         <RenderAtonementDetails
                             title={"This Items Atonement"}
                             original_atonement={
-                                this.props.item_atonement.atonements
+                                this.props.item_atonement
                             }
                         />
                         <h4 className="my-4">Elemental Atonement</h4>

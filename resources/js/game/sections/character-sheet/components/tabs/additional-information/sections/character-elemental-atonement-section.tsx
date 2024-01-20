@@ -61,7 +61,7 @@ export default class CharacterElementalAtonementSection extends React.Component<
                         </WarningAlert>
                         :
                         <Fragment>
-                            <RenderAtonementDetails original_atonement={this.state.elemental_atonement_details.elemental_atonement.elemental_data} />
+                            <RenderAtonementDetails original_atonement={this.state.elemental_atonement_details.elemental_atonement} />
                             <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
                             <h4 className='my-4'>Elemental Damage</h4>
                             <dl>

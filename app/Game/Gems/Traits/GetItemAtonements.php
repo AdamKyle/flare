@@ -28,7 +28,7 @@ trait GetItemAtonements {
             if (empty($gemData)) {
                 $atonements['atonements'][$name] = 0.0;
             } else {
-                $atonements['atonements'][$name] = $this->fetchSummedValueFromArray($gemData, $type, $name);
+                $atonements['atonements'][$name] = $this->fetchSummedValueFromArray($gemData, $type, $name)[$name];
             }
         }
 

@@ -73,7 +73,7 @@ class ElementalAtonementTest extends TestCase {
         $this->assertNotEmpty($elementalData['highest_element']);
         $this->assertEquals('Fire', $elementalData['highest_element']['name']);
         $this->assertEquals(0.75, $elementalData['highest_element']['damage']);
-        $this->assertNotEmpty($elementalData['elemental_data']);
+        $this->assertNotEmpty($elementalData['atonements']);
     }
 
     public function testCharacterGetsNothingBackForElementalAtonement() {

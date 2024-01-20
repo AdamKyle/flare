@@ -36,9 +36,9 @@ export default class FactionNpcSection extends React.Component<FactionNpcSection
               </p>
               <dl>
                   <dt>Defence Bonus per level</dt>
-                  <dd>{this.props.faction_loyalty_npc.kingdom_item_defence_bonus}%</dd>
+                  <dd>{(this.props.faction_loyalty_npc.kingdom_item_defence_bonus * 100).toFixed(0)}%</dd>
                   <dt>Current Defence Bonus</dt>
-                  <dd>{this.props.faction_loyalty_npc.current_kingdom_item_defence_bonus}%</dd>
+                  <dd>{(this.props.faction_loyalty_npc.current_kingdom_item_defence_bonus * 100).toFixed(0)}%</dd>
               </dl>
           </>
         );
