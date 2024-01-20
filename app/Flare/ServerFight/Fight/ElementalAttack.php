@@ -90,8 +90,8 @@ class ElementalAttack extends BattleBase {
         }
 
         $this->addMessage($isMonster ?
-            'You manage to resist: ' . number_format($damage - $newDamage) . ' ('.($highestDefendingElement * 100).'%) damage from the enemies bloody gems!' :
-            'The enemy resists: ' . number_format($damage - $newDamage) . ' ('.($highestDefendingElement * 100).'%) damage from your gems!',
+            'You manage to resist: ' . number_format($damage - $newDamage) . ' ('.number_format($highestDefendingElement * 100, 2).'%) damage from the enemies bloody gems!' :
+            'The enemy resists: ' . number_format($damage - $newDamage) . ' ('.number_format($highestDefendingElement * 100, 2).'%) damage from your gems!',
             ($isMonster ? 'regular' : 'enemy-action')
         );
 
