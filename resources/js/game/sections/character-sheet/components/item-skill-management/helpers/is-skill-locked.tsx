@@ -4,21 +4,22 @@ import ItemSkillProgression from "../types/deffinitions/item-skill-progression";
 
 /**
  * Determine if the skill is locked.
- * 
- * @param skill 
- * @param skillData 
- * @param progressionData 
- * @returns 
+ *
+ * @param skill
+ * @param skillData
+ * @param progressionData
+ * @returns
  */
 export const isSkillLocked = (skill: ItemSkill, skillData: ItemSkill[], progressionData: ItemSkillProgression[]): boolean => {
 
     const parentSkill: ItemSkill | undefined = findParentSkill(skill, skillData);
     let isLocked      = false;
-    
+
     if (typeof parentSkill !== 'undefined') {
         const progressionDataForParent = getSkillProgressionData(parentSkill, progressionData);
+
         if (typeof progressionDataForParent !== 'undefined' && skill.parent_level_needed !== null) {
-            isLocked = progressionDataForParent.current_level <= skill.parent_level_needed;
+            isLocked = progressionDataForParent.current_level < skill.parent_level_needed;
         }
     }
 
@@ -27,10 +28,10 @@ export const isSkillLocked = (skill: ItemSkill, skillData: ItemSkill[], progress
 
 /**
  * Get skill progression data:
- * 
- * @param skill 
- * @param progressionData 
- * @returns 
+ *
+ * @param skill
+ * @param progressionData
+ * @returns
  */
 export const getSkillProgressionData = (skill: ItemSkill, progressionData: ItemSkillProgression[]): ItemSkillProgression | undefined => {
     return progressionData.find((data: ItemSkillProgression) => data.item_skill_id === skill.id);
@@ -38,10 +39,10 @@ export const getSkillProgressionData = (skill: ItemSkill, progressionData: ItemS
 
 /**
  * Find the parent skill.
- * 
- * @param skill 
- * @param skills 
- * @returns 
+ *
+ * @param skill
+ * @param skills
+ * @returns
  */
 export const findParentSkill = (skill: ItemSkill, skills: ItemSkill[]): ItemSkill | undefined => {
     for (const skillData of skills) {

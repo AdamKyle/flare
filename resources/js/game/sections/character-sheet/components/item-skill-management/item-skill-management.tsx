@@ -7,7 +7,6 @@ import ItemSkillDetails from "./item-skill-details";
 import DangerButton from "../../../../components/ui/buttons/danger-button";
 import ItemSkill from "./types/deffinitions/item-skill";
 import { isSkillLocked } from "./helpers/is-skill-locked";
-import Skills from '../tabs/skill-tabs/skills';
 
 export default class ItemSkillManagement extends React.Component<ItemSkillManagementProps, ItemSkillManagementState> {
 
