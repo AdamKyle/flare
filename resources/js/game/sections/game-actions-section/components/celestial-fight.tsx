@@ -66,12 +66,11 @@ export default class CelestialFight extends React.Component<any, any> {
                 attack_type: type,
             }).doAjaxCall('post',
                 (result: AxiosResponse) => {
-
                     this.setState({
                         preforming_action: false,
                         battle_messages: result.data.logs,
-                        character_health: result.data.health.character_health,
-                        monster_health: result.data.health.monster_health,
+                        character_health: result.data.health.current_character_health,
+                        monster_health: result.data.health.current_monster_health,
                     })
                 }, (error: AxiosError) => {
                     console.error(error);;
@@ -104,7 +103,7 @@ export default class CelestialFight extends React.Component<any, any> {
             this.state.loading ?
                 <ComponentLoading />
             :
-                <ServerFight 
+                <ServerFight
                     monster_health={this.state.monster_health}
                     character_health={this.state.character_health}
                     monster_max_health={this.state.monster_max_health}
