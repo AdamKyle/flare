@@ -38,11 +38,6 @@ class UnitService {
     private $totalResources;
 
     /**
-     * @var bool $paidGold
-     */
-    private bool $paidGold = false;
-
-    /**
      * @var UpdateKingdomHandler $updateKingdomHandler
      */
     private UpdateKingdomHandler $updateKingdomHandler;
@@ -55,15 +50,6 @@ class UnitService {
     }
 
     /**
-     * Get whether we paid gold or not.
-     *
-     * @return bool
-     */
-    public function getPaidGold(): bool {
-        return $this->paidGold;
-    }
-
-    /**
      * @param GameUnit $gameUnit
      * @param Kingdom $kingdom
      * @param string $recruitmentType
@@ -71,38 +57,12 @@ class UnitService {
      * @return array
      * @throws Exception
      */
-    public function handlePayment(GameUnit $gameUnit, Kingdom $kingdom, string $recruitmentType, int $amount): array {
-        if ($recruitmentType === 'resources') {
-            if (ResourceValidation::shouldRedirectUnits($gameUnit, $kingdom, $amount)) {
-                return $this->errorResult("You don't have the resources.");
-            }
-
-            $this->updateKingdomResources($kingdom, $gameUnit, $amount);
-        } else {
-
-            if ($gameUnit->is_special) {
-                return $this->errorResult('No, this unit cannot be bought with gold.');
-            }
-
-            $amount              = $gameUnit->required_population * $amount;
-            $populationReduction = $kingdom->fetchUnitCostReduction();
-
-            $amount = ceil($amount - $amount * $populationReduction);
-
-            if ($amount > $kingdom->current_population) {
-                return $this->errorResult("You don't have enough population to purchase with gold alone.");
-            }
-
-            $this->updateCharacterGold($kingdom, $gameUnit, $amount);
-
-            $newPop = $kingdom->current_population - $amount;
-
-            $kingdom->update([
-                'current_population' => $newPop > 0 ? $newPop : 0
-            ]);
-
-            $this->paidGold = true;
+    public function handlePayment(GameUnit $gameUnit, Kingdom $kingdom, int $amount): array {
+        if (ResourceValidation::shouldRedirectUnits($gameUnit, $kingdom, $amount)) {
+            return $this->errorResult("You don't have the resources.");
         }
+
+        $this->updateKingdomResources($kingdom, $gameUnit, $amount);
 
         return [];
     }
@@ -118,25 +78,17 @@ class UnitService {
      * @param bool $paidGold
      * @throws Exception
      */
-    public function recruitUnits(Kingdom $kingdom, GameUnit $gameUnit, int $amount, bool $paidGold = false): void {
+    public function recruitUnits(Kingdom $kingdom, GameUnit $gameUnit, int $amount): void {
         $character        = $kingdom->character;
         $totalTime        = $gameUnit->time_to_recruit * $amount;
         $totalTime        = $totalTime - $totalTime * $this->fetchTimeReduction($character)->unit_time_reduction;
         $timeTillFinished = now()->addSeconds($totalTime);
-
-        $goldPaid = null;
-
-        if ($paidGold) {
-            $goldPaid = (new UnitCosts($gameUnit->name))->fetchCost() * $amount;
-            $goldPaid = $goldPaid - $goldPaid * $kingdom->fetchUnitCostReduction();
-        }
 
         $queue = UnitInQueue::create([
             'character_id' => $character->id,
             'kingdom_id'   => $kingdom->id,
             'game_unit_id' => $gameUnit->id,
             'amount'       => $amount,
-            'gold_paid'    => $goldPaid,
             'completed_at' => $timeTillFinished,
             'started_at'   => now(),
         ]);
@@ -200,32 +152,6 @@ class UnitService {
     }
 
     /**
-     * Allows the player to purchase units with gold.
-     *
-     * @param Kingdom $kingdom
-     * @param GameUnit $gameUnit
-     * @param int $amount
-     * @throws Exception
-     */
-    public function updateCharacterGold(Kingdom $kingdom, GameUnit $gameUnit, int $amount) {
-        $character         = $kingdom->character;
-        $unitCostReduction = $kingdom->fetchUnitCostReduction();
-
-        $totalCost = (new UnitCosts($gameUnit->name))->fetchCost() * $amount;
-        $totalCost = $totalCost - $totalCost * $unitCostReduction;
-
-        $character->gold -= $totalCost;
-
-        if ($character->gold < 0) {
-            $character->gold = 0;
-        }
-
-        $character->save();
-
-        event(new UpdateTopBarEvent($character->refresh()));
-    }
-
-    /**
      * Cancel a recruitment order.
      *
      * Can return false if resources gained back are too little.
@@ -236,78 +162,19 @@ class UnitService {
     public function cancelRecruit(UnitInQueue $queue): ?Kingdom {
 
         $kingdom = $queue->kingdom;
-        $user    = $kingdom->character->user;
 
-        if (!is_null($queue->gold_paid)) {
-            if ($this->calculateElapsedTimePercent($queue) >= 85) {
-                 return false;
-            }
+        $this->resourceCalculation($queue);
 
-            $character = $queue->character;
-
-            $currentPopulation    = $kingdom->current_population;
-            $currentCharacterGold = $character->gold;
-
-            $populationToGiveBack = $queue->amount * 0.25;
-            $goldToGiveBack       = $queue->gold_paid * 0.25;
-
-            $newPopulation = ($currentPopulation + $populationToGiveBack);
-            $newGold       = ($currentCharacterGold + $goldToGiveBack);
-
-            if ($newGold > MaxCurrenciesValue::MAX_GOLD) {
-                $newGold = MaxCurrenciesValue::MAX_GOLD;
-            }
-
-            if ($newPopulation > KingdomMaxValue::MAX_CURRENT_POPULATION) {
-                $newPopulation = KingdomMaxValue::MAX_CURRENT_POPULATION;
-            }
-
-            $character->update([
-                'gold' => $newGold
-            ]);
-
-            $kingdom->update([
-                'current_population' => $newPopulation
-            ]);
-
-            $character = $character->refresh();
-
-            event(new updateTopBarEvent($character));
-        } else {
-            $this->resourceCalculation($queue);
-
-            if (!($this->totalResources >= .10)) {
-                return null;
-            }
-
-            $unit    = $queue->unit;
-            $kingdom = $this->updateKingdomAfterCancellation($kingdom, $unit, $queue);
+        if (!($this->totalResources >= .10)) {
+            return null;
         }
+
+        $unit    = $queue->unit;
+        $kingdom = $this->updateKingdomAfterCancellation($kingdom, $unit, $queue);
 
         $queue->delete();
 
         return $kingdom->refresh();
-    }
-
-    /**
-     * Calculate elapsed time percent.
-     *
-     * @param UnitInQueue $queue
-     * @return int
-     */
-    protected function calculateElapsedTimePercent(UnitInQueue $queue): int {
-        $startedAt   = Carbon::parse($queue->started_at);
-        $completedAt = Carbon::parse($queue->completed_at);
-        $now         = now();
-
-        $elapsedTime = $now->diffInMinutes($startedAt);
-        $totalTime   = $completedAt->diffInMinutes($startedAt);
-
-        if ($elapsedTime === 0) {
-            return 0;
-        }
-
-        return 100 - (100 - ceil($elapsedTime/$totalTime));
     }
 
     /**

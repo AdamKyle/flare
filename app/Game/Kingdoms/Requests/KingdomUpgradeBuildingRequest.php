@@ -25,13 +25,12 @@ class KingdomUpgradeBuildingRequest extends FormRequest
     {
         return [
             'to_level'         => 'required|int',
-            'paying_with_gold' => 'required',
         ];
     }
 
     public function messages() {
         return [
-            'deposit_amount.required' => 'Amount to deposit is required.',
+            'to_level.required' => 'What level do you want to go to?',
         ];
     }
 }

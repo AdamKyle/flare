@@ -2,26 +2,16 @@
 
 namespace App\Game\Kingdoms\Service;
 
-use App\Game\Core\Events\UpdateTopBarEvent;
+
+use Carbon\Carbon;
 use App\Flare\Models\BuildingInQueue;
 use App\Flare\Models\KingdomBuilding;
-use App\Flare\Models\KingdomBuildingInQueue;
 use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
-use App\Flare\Transformers\KingdomTransformer;
-use App\Flare\Values\MaxCurrenciesValue;
-use App\Game\Kingdoms\Events\UpdateKingdom;
 use App\Game\Kingdoms\Handlers\UpdateKingdomHandler;
 use App\Game\Kingdoms\Jobs\RebuildBuilding;
 use App\Game\Kingdoms\Jobs\UpgradeBuilding;
-use App\Game\Kingdoms\Jobs\UpgradeBuildingWithGold;
-use App\Game\Kingdoms\Values\BuildingCosts;
-use App\Game\Kingdoms\Values\UnitCosts;
 use App\Game\Skills\Values\SkillTypeValue;
-use Carbon\Carbon;
-use League\Fractal\Manager;
-use League\Fractal\Resource\Item;
-
 
 class KingdomBuildingService {
 
@@ -194,38 +184,13 @@ class KingdomBuildingService {
         $building = $queue->building;
         $kingdom  = $building->kingdom;
 
-        if ($queue->paid_with_gold) {
-            $percentage = $this->calculatePercentageOfGold($queue);
+        $this->resourceCalculation($queue);
 
-            if ($percentage <= 15) {
-                return false;
-            }
-
-            $character = $queue->building->kingdom->character;
-
-            $gold = ceil($queue->paid_amount - $queue->paid_amount * ($percentage / 100));
-            $gold = $character->gold + $gold;
-
-            if ($gold > MaxCurrenciesValue::MAX_GOLD) {
-                $gold = MaxCurrenciesValue::MAX_GOLD;
-            }
-
-            $character->update([
-                'gold' => $gold
-            ]);
-
-            event(new UpdateTopBarEvent($character->refresh()));
-
-            $kingdom = $queue->building->kingdom;
-        } else {
-            $this->resourceCalculation($queue);
-
-            if ($this->completed === 0 || !$this->totalResources >= .10) {
-                return false;
-            }
-
-            $kingdom = $this->updateKingdomAfterCancellation($kingdom, $building);
+        if ($this->completed === 0 || !$this->totalResources >= .10) {
+            return false;
         }
+
+        $kingdom = $this->updateKingdomAfterCancellation($kingdom, $building);
 
         $queue->delete();
 
@@ -235,77 +200,12 @@ class KingdomBuildingService {
     }
 
     /**
-     * Pay for the cost.
+     * Calculate the buildings time reduction.
      *
      * @param KingdomBuilding $building
-     * @param array $params
-     * @return bool
+     * @param int $toLevel
+     * @return float
      */
-    public function upgradeBuildingWithGold(KingdomBuilding $building, array $params): bool {
-        $character = $building->kingdom->character;
-        $kingdom   = $building->kingdom;
-
-        // Add population cost to the total cost if we need it.
-        $cost = $this->calculateGoldNeeded($character, $building, $kingdom, $params);
-
-        if ($cost > $character->gold) {
-            return false;
-        }
-
-        $popNeeded = $building->required_population * $params['to_level'];
-        $popNeeded = $popNeeded - $popNeeded * $building->kingdom->fetchPopulationCostReduction();
-
-        $newAmount =  $kingdom->current_population - $popNeeded;
-
-        if ($newAmount < 0) {
-            $newAmount = 0;
-        }
-
-        $kingdom->update([
-            'current_population' => $newAmount
-        ]);
-
-        $characterGold = $character->gold - $cost;
-
-        $character->update([
-            'gold' => $characterGold
-        ]);
-
-        event(new UpdateTopBarEvent($character->refresh()));
-
-        return true;
-    }
-
-    public function processUpgradeWithGold(KingdomBuilding $building, int $amountPaid, int $toLevel) {
-
-        $character = $building->kingdom->character;
-
-        $minutes = $this->calculateBuildingTimeReduction($building, $toLevel);
-
-        $timeToComplete = now()->addMinutes($minutes);
-
-        if ($toLevel > $building->gameBuilding->max_level) {
-            $toLevel = $building->gameBuilding->max_level;
-        }
-
-        $queue = BuildingInQueue::create([
-            'character_id'   => $character->id,
-            'kingdom_id'     => $building->kingdom->id,
-            'building_id'    => $building->id,
-            'to_level'       => $toLevel,
-            'completed_at'   => $timeToComplete,
-            'started_at'     => now(),
-            'paid_with_gold' => true,
-            'paid_amount'    => $amountPaid,
-        ]);
-
-        if ($minutes > 15) {
-            $timeToComplete = now()->addMinutes(15);
-        }
-
-        UpgradeBuildingWithGold::dispatch($building, $character->user, $queue->id, $toLevel)->delay($timeToComplete);
-    }
-
     protected function calculateBuildingTimeReduction(KingdomBuilding $building, int $toLevel = 1) {
         $skillBonus = $building->kingdom->character->skills->filter(function ($skill) {
             return $skill->baseSkill->type === SkillTypeValue::EFFECTS_KINGDOM;
@@ -318,37 +218,6 @@ class KingdomBuildingService {
         }
 
         return floor($building->time_increase - $building->time_increase * $skillBonus);
-    }
-
-    protected function calculatePercentageOfGold(BuildingInQueue $queue) {
-        $startedAt   = Carbon::parse($queue->started_at);
-        $completedAt = Carbon::parse($queue->completed_at);
-        $now         = now();
-
-        $elapsedTime = $now->diffInMinutes($startedAt);
-        $totalTime   = $completedAt->diffInMinutes($startedAt);
-
-        return 100 - ceil($elapsedTime / $totalTime);
-    }
-
-    protected function calculateGoldNeeded(Character $character, KingdomBuilding $building, Kingdom $kingdom, array $params): int {
-
-        $populationNeeded  = $building->required_population * $params['to_level'];
-        $populationNeeded  = $populationNeeded - $populationNeeded * $kingdom->fetchPopulationCostReduction();
-        $currentPopulation = $kingdom->current_population;
-        $costForAdditional = 0;
-        $costReduction     = $kingdom->fetchBuildingCostReduction();
-
-        if ($currentPopulation < $populationNeeded) {
-            $costForAdditional  = ($populationNeeded - $kingdom->current_population) * (new UnitCosts(UnitCosts::PERSON))->fetchCost();
-        }
-
-        $costToUpgrade      = $populationNeeded * (new BuildingCosts($building->gameBuilding->name))->fetchCost();
-        $costToUpgrade     -= $costToUpgrade * $costReduction;
-
-        $costForAdditional -= $costForAdditional * $costReduction;
-
-        return $costToUpgrade + $costForAdditional;
     }
 
     /**

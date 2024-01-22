@@ -24,16 +24,13 @@ class KingdomUnitRecruitmentRequest extends FormRequest
     public function rules()
     {
         return [
-            'amount'           => 'required|numeric',
-            'recruitment_type' => 'required|in:gold,resources',
+            'amount' => 'required|numeric',
         ];
     }
 
     public function messages() {
         return [
-            'amount.required'           => 'Amount is missing',
-            'recruitment_type.required' => 'Recruitment type is missing',
-            'total_cost.required'       => 'Total cost is missing',
+            'amount.required' => 'Amount is missing',
         ];
     }
 }

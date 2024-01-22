@@ -41,40 +41,21 @@ class KingdomBuildingsController extends Controller {
      * @return JsonResponse
      */
     public function upgradeKingdomBuilding(KingdomUpgradeBuildingRequest $request, Character $character, KingdomBuilding $building): JsonResponse {
-        if ($request->paying_with_gold) {
-
-            if ($building->gameBuilding->is_special) {
-                return response()->json([
-                    'message' => 'Cannot upgrade this building with gold.'
-                ], 422);
-            }
-
-            $paid = $this->kingdomBuildingService->upgradeBuildingWithGold($building, $request->all());
-
-            if (!$paid) {
-                return response()->json([
-                    'message' => 'You cannot afford this upgrade.'
-                ], 422);
-            }
-
-            $this->kingdomBuildingService->processUpgradeWithGold($building, $paid, $request->to_level);
-        } else {
-            if (ResourceValidation::shouldRedirectKingdomBuilding($building, $building->kingdom)) {
-                return response()->json([
-                    'message' => "You don't have the resources."
-                ], 422);
-            }
-
-            if ($building->level + 1 > $building->gameBuilding->max_level) {
-                return response()->json([
-                    'message' => 'Building is already max level.'
-                ], 422);
-            }
-
-            $this->kingdomBuildingService->updateKingdomResourcesForKingdomBuildingUpgrade($building);
-
-            $this->kingdomBuildingService->upgradeKingdomBuilding($building, $character);
+        if (ResourceValidation::shouldRedirectKingdomBuilding($building, $building->kingdom)) {
+            return response()->json([
+                'message' => "You don't have the resources."
+            ], 422);
         }
+
+        if ($building->level + 1 > $building->gameBuilding->max_level) {
+            return response()->json([
+                'message' => 'Building is already max level.'
+            ], 422);
+        }
+
+        $this->kingdomBuildingService->updateKingdomResourcesForKingdomBuildingUpgrade($building);
+
+        $this->kingdomBuildingService->upgradeKingdomBuilding($building, $character);
 
         $this->updateKingdom->updateKingdom($building->kingdom->refresh());
 

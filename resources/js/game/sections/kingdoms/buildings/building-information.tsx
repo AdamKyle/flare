@@ -2,9 +2,7 @@ import React, {Fragment} from "react";
 import BasicCard from "../../../components/ui/cards/basic-card";
 import BuildingInformationProps from "../../../lib/game/kingdoms/types/building-information-props";
 import {formatNumber} from "../../../lib/game/format-number";
-import Select from "react-select";
 import TimeHelpModal from "../modals/time-help-modal";
-import UpgradeWithGold from "./upgrade-with-gold";
 import UpgradeWithResources from "./upgrade-with-resources";
 import BuildingTimeCalculation from "../../../lib/game/kingdoms/calculations/building-time-calculation";
 import DangerAlert from "../../../components/ui/alerts/simple-alerts/danger-alert";
@@ -48,10 +46,9 @@ export default class BuildingInformation extends React.Component<BuildingInforma
         }
     }
 
-    showSelectedForm(data: any) {
+    showSelectedForm(type: string) {
         this.setState({
-            upgrade_section: data.value,
-            paying_with_gold: data.value === 'gold' ? true : false,
+            upgrade_section: type,
         });
     }
 
@@ -121,21 +118,7 @@ export default class BuildingInformation extends React.Component<BuildingInforma
 
     renderSelectedSection() {
         switch (this.state.upgrade_section) {
-            case 'gold':
-                return <UpgradeWithGold character_id={this.props.character_id}
-                                        building={this.props.building}
-                                        show_help_dialogue={this.manageHelpDialogue.bind(this)}
-                                        remove_section={this.removeSelection.bind(this)}
-                                        kingdom_building_time_reduction={this.props.kingdom_building_time_reduction}
-                                        kingdom_iron_cost_reduction={this.props.kingdom_iron_cost_reduction}
-                                        kingdom_population_cost_reduction={this.props.kingdom_population_cost_reduction}
-                                        kingdom_current_population={this.props.kingdom_current_population}
-                                        kingdom_building_cost_reduction={this.props.kingdom_building_cost_reduction}
-                                        is_in_queue={this.props.is_in_queue}
-                                        character_gold={this.props.character_gold}
-
-                />
-            case 'resources':
+            case 'upgrade':
                 return <UpgradeWithResources
                     character_id={this.props.character_id}
                     building={this.props.building}
@@ -215,28 +198,6 @@ export default class BuildingInformation extends React.Component<BuildingInforma
         );
     }
 
-    buildOptions() {
-        const options = [
-            {
-                label: 'Upgrade with resources',
-                value: 'resources',
-            },
-            {
-                label: 'Repair Building',
-                value: 'repair-building',
-            }
-        ];
-
-        if (!this.props.building.is_special) {
-            options.push({
-                label: 'Upgrade with gold',
-                value: 'gold',
-            })
-        }
-
-        return options;
-    }
-
     render() {
         return (
             <Fragment>
@@ -310,17 +271,8 @@ export default class BuildingInformation extends React.Component<BuildingInforma
                                                 :
                                                     !this.props.is_in_queue && !this.props.building.is_locked ?
                                                         <Fragment>
-                                                            <Select
-                                                                onChange={this.showSelectedForm.bind(this)}
-                                                                options={this.buildOptions()}
-                                                                menuPosition={'absolute'}
-                                                                menuPlacement={'bottom'}
-                                                                styles={{menuPortal: (base: any) => ({...base, zIndex: 9999, color: '#000000'})}}
-                                                                menuPortalTarget={document.body}
-                                                                value={[
-                                                                    {label: 'Please Select Upgrade Path', value: ''}
-                                                                ]}
-                                                            />
+                                                            <PrimaryButton button_label={'Upgrade'} on_click={() => this.showSelectedForm('upgrade')} />
+                                                            <PrimaryButton button_label={'Repair'} on_click={() => this.showSelectedForm('repair-building')} />
                                                             {
                                                                 this.props.building.is_special ?
                                                                     <p className='my-4 text-sm'>

@@ -57,7 +57,7 @@ class KingdomUnitsController extends Controller {
 
         $amount = $request->amount < 1 ? 1 : $request->amount;
 
-        $response = $this->unitService->handlePayment($gameUnit, $kingdom, $request->recruitment_type, $amount);
+        $response = $this->unitService->handlePayment($gameUnit, $kingdom, $amount);
 
         if (!empty($response)) {
             return response()->json([
@@ -65,7 +65,7 @@ class KingdomUnitsController extends Controller {
             ], 422);
         }
 
-        $this->unitService->recruitUnits($kingdom, $gameUnit, $amount, $this->unitService->getPaidGold());
+        $this->unitService->recruitUnits($kingdom, $gameUnit, $amount);
 
         $this->updateKingdom->updateKingdom($kingdom->refresh());
 

@@ -1,15 +1,14 @@
-import React, { Fragment } from "react";
+import React, {Fragment, ReactNode} from "react";
 import BasicCard from "../../../components/ui/cards/basic-card";
 import UnitInformationProps from "../../../lib/game/kingdoms/types/unit-information-props";
 import { formatNumber } from "../../../lib/game/format-number";
-import Select from "react-select";
 import DangerAlert from "../../../components/ui/alerts/simple-alerts/danger-alert";
 import { parseInt } from "lodash";
 import TimeHelpModal from "../modals/time-help-modal";
-import RecruitWithGold from "./recruit-with-gold";
 import RecruitWithResources from "./recruit-with-resources";
 import UnitDetails from "../../../lib/game/kingdoms/unit-details";
 import BuildingDetails from "../../../lib/game/kingdoms/building-details";
+import PrimaryOutlineButton from "../../../components/ui/buttons/primary-outline-button";
 
 export default class UnitInformation extends React.Component<
     UnitInformationProps,
@@ -57,9 +56,9 @@ export default class UnitInformation extends React.Component<
         return parseInt(this.state.amount_to_recruit) || 1;
     }
 
-    showSelectedForm(data: any) {
+    showSelectedForm(type: string) {
         this.setState({
-            upgrade_section: data.value,
+            upgrade_section: type,
         });
     }
 
@@ -107,64 +106,28 @@ export default class UnitInformation extends React.Component<
         );
     }
 
-    renderSelectedSection() {
-        switch (this.state.upgrade_section) {
-            case "gold":
-                return (
-                    <RecruitWithGold
-                        kingdom_id={this.props.kingdom_id}
-                        character_id={this.props.character_id}
-                        unit={this.props.unit}
-                        unit_cost_reduction={this.props.unit_cost_reduction}
-                        kingdom_unit_time_reduction={
-                            this.props.kingdom_unit_time_reduction
-                        }
-                        manage_help_dialogue={this.manageHelpDialogue.bind(
-                            this
-                        )}
-                        remove_selection={this.removeSelection.bind(this)}
-                        character_gold={this.props.character_gold}
-                    />
-                );
-            case "resources":
-                return (
-                    <RecruitWithResources
-                        kingdom_id={this.props.kingdom_id}
-                        character_id={this.props.character_id}
-                        unit={this.props.unit}
-                        unit_cost_reduction={this.props.unit_cost_reduction}
-                        kingdom_unit_time_reduction={
-                            this.props.kingdom_unit_time_reduction
-                        }
-                        manage_help_dialogue={this.manageHelpDialogue.bind(
-                            this
-                        )}
-                        remove_selection={this.removeSelection.bind(this)}
-                        set_resource_amount={this.setResourceAmount.bind(this)}
-                    />
-                );
-            default:
-                return null;
-        }
-    }
+    renderSelectedSection(): ReactNode {
 
-    buildRecruitmentOptions() {
-        const options = [
-            {
-                label: "Recruit with resources",
-                value: "resources",
-            },
-        ];
-
-        if (!this.props.unit.is_special) {
-            options.push({
-                label: "Recruit with gold",
-                value: "gold",
-            });
+        if (this.state.type === 'recruit') {
+            return <RecruitWithResources
+                kingdom_id={this.props.kingdom_id}
+                character_id={this.props.character_id}
+                unit={this.props.unit}
+                unit_cost_reduction={this.props.unit_cost_reduction}
+                kingdom_unit_time_reduction={
+                    this.props.kingdom_unit_time_reduction
+                }
+                manage_help_dialogue={this.manageHelpDialogue.bind(
+                    this
+                )}
+                remove_selection={this.removeSelection.bind(this)}
+                set_resource_amount={this.setResourceAmount.bind(this)}
+            />
         }
 
-        return options;
+        return null;
     }
+
 
     render() {
         return (
@@ -337,28 +300,7 @@ export default class UnitInformation extends React.Component<
                                 this.renderSelectedSection()
                             ) : (
                                 <Fragment>
-                                    <Select
-                                        onChange={this.showSelectedForm.bind(
-                                            this
-                                        )}
-                                        options={this.buildRecruitmentOptions()}
-                                        menuPosition={"absolute"}
-                                        menuPlacement={"bottom"}
-                                        styles={{
-                                            menuPortal: (base: any) => ({
-                                                ...base,
-                                                zIndex: 9999,
-                                                color: "#000000",
-                                            }),
-                                        }}
-                                        menuPortalTarget={document.body}
-                                        value={[
-                                            {
-                                                label: "Please Select Recruit Path",
-                                                value: "",
-                                            },
-                                        ]}
-                                    />
+                                    <PrimaryOutlineButton button_label={'Recruit Units'} on_click={() => this.showSelectedForm('recruit')} />
                                     {this.props.unit.is_special ? (
                                         <p className="my-4 text-sm">
                                             This unit cannot be recruited with
