@@ -108,7 +108,7 @@ export default class UnitInformation extends React.Component<
 
     renderSelectedSection(): ReactNode {
 
-        if (this.state.type === 'recruit') {
+        if (this.state.upgrade_section === 'resources') {
             return <RecruitWithResources
                 kingdom_id={this.props.kingdom_id}
                 character_id={this.props.character_id}
@@ -253,36 +253,38 @@ export default class UnitInformation extends React.Component<
                                         this.props.unit.time_to_recruit
                                     )}
                                 </dd>
-                                {this.state.upgrade_section === "resources" ? (
-                                    <Fragment>
-                                        <dt>Time Required (Seconds):</dt>
-                                        <dd className="flex items-center">
-                                            <span>
-                                                {formatNumber(
-                                                    this.state.time_needed
-                                                )}
-                                            </span>
-                                            <div>
-                                                <div className="ml-2">
-                                                    <button
-                                                        type={"button"}
-                                                        onClick={() =>
-                                                            this.manageHelpDialogue()
-                                                        }
-                                                        className="text-blue-500 dark:text-blue-300"
-                                                    >
-                                                        <i
-                                                            className={
-                                                                "fas fa-info-circle"
+                                {
+                                    this.state.upgrade_section === "resources" ?
+                                        <Fragment>
+                                            <dt>Time Required (Seconds):</dt>
+                                            <dd className="flex items-center">
+                                                <span>
+                                                    {formatNumber(
+                                                        this.state.time_needed
+                                                    )}
+                                                </span>
+                                                <div>
+                                                    <div className="ml-2">
+                                                        <button
+                                                            type={"button"}
+                                                            onClick={() =>
+                                                                this.manageHelpDialogue()
                                                             }
-                                                        ></i>{" "}
-                                                        Help
-                                                    </button>
+                                                            className="text-blue-500 dark:text-blue-300"
+                                                        >
+                                                            <i
+                                                                className={
+                                                                    "fas fa-info-circle"
+                                                                }
+                                                            ></i>{" "}
+                                                            Help
+                                                        </button>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        </dd>
-                                    </Fragment>
-                                ) : null}
+                                            </dd>
+                                        </Fragment>
+                                    : null
+                                }
                             </dl>
                             {this.cannotBeRecruited(
                                 this.props.unit
@@ -300,13 +302,7 @@ export default class UnitInformation extends React.Component<
                                 this.renderSelectedSection()
                             ) : (
                                 <Fragment>
-                                    <PrimaryOutlineButton button_label={'Recruit Units'} on_click={() => this.showSelectedForm('recruit')} />
-                                    {this.props.unit.is_special ? (
-                                        <p className="my-4 text-sm">
-                                            This unit cannot be recruited with
-                                            gold.
-                                        </p>
-                                    ) : null}
+                                    <PrimaryOutlineButton button_label={'Recruit Units'} on_click={() => this.showSelectedForm('resources')} />
                                 </Fragment>
                             )}
                         </div>

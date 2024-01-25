@@ -271,7 +271,7 @@ export default class BuildingInformation extends React.Component<BuildingInforma
                                                 :
                                                     !this.props.is_in_queue && !this.props.building.is_locked ?
                                                         <Fragment>
-                                                            <PrimaryButton button_label={'Upgrade'} on_click={() => this.showSelectedForm('upgrade')} />
+                                                            <PrimaryButton button_label={'Upgrade'} on_click={() => this.showSelectedForm('upgrade')} additional_css={'mr-2'}/>
                                                             <PrimaryButton button_label={'Repair'} on_click={() => this.showSelectedForm('repair-building')} />
                                                             {
                                                                 this.props.building.is_special ?

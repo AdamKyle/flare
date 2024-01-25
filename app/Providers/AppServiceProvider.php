@@ -12,6 +12,7 @@ use App\Console\AfterDeployment\GivePhaseRewardsForCharacters;
 use App\Console\AfterDeployment\KickOffEventGoalForWinterEvent;
 use App\Console\AfterDeployment\RebalanceQuestCurrencyCostsAndRewards;
 use App\Console\AfterDeployment\ReduceAlchemyItemsCost;
+use App\Console\AfterDeployment\ReduceUnitQueueAmount;
 use App\Console\AfterDeployment\RemoveInvalidQuestItems;
 use App\Console\AfterDeployment\UpdateCharacterCurrencies;
 use App\Console\AfterDeployment\UpdateCharactersForClassRanks;
@@ -56,6 +57,7 @@ class AppServiceProvider extends ServiceProvider {
             ChangeDamageAmountOnAffixes::class,
             AssignNewFactionsToCharacters::class,
             RemoveInvalidQuestItems::class,
+            ReduceUnitQueueAmount::class,
 
             // Development Commands:
             CreateCharacter::class,

@@ -2,6 +2,7 @@
 
 namespace App\Game\Kingdoms\Jobs;
 
+use App\Game\Kingdoms\Values\KingdomMaxValue;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -112,6 +113,10 @@ class RecruitUnits implements ShouldQueue {
                 ]);
             } else {
                 $amount += $found->amount;
+
+                if ($amount >= KingdomMaxValue::MAX_UNIT) {
+                    $amount = KingdomMaxValue::MAX_UNIT;
+                }
 
                 $found->update([
                     'amount' => $amount,
