@@ -3,9 +3,9 @@
 
 
 "@aldabil/react-scheduler@^2.7.9":
-  version "2.8.0"
-  resolved "https://registry.yarnpkg.com/@aldabil/react-scheduler/-/react-scheduler-2.8.0.tgz#50bc264db4402a8201020613885447c2bd2c56e1"
-  integrity sha512-Zn2WbU7FgwzfvWeT256+w8EhI5C3YhKW2n73Ahv3M/QmJT4zrqpmD89adM+YAX5sWag5TuZoJ+u1z79W96iD+w==
+  version "2.8.2"
+  resolved "https://registry.yarnpkg.com/@aldabil/react-scheduler/-/react-scheduler-2.8.2.tgz#48db20a5bb9e79a115cb0926b76035e401412e46"
+  integrity sha512-NZwXfrJ2UGZUpH4IrsZv1darlzbPG02rFOEo/ejG/jNOLCW0hISnra84yuw4Jv9Lgi66Iq9SaCl3a3CeuCwymA==
 
 "@alloc/quick-lru@^5.2.0":
   version "5.2.0"
