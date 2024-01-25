@@ -17,6 +17,7 @@ use App\Console\AfterDeployment\RemoveInvalidQuestItems;
 use App\Console\AfterDeployment\UpdateCharacterCurrencies;
 use App\Console\AfterDeployment\UpdateCharactersForClassRanks;
 use App\Console\DevelopmentCommands\CreateCharacter;
+use App\Console\DevelopmentCommands\MaxOutCharactersPassiveSkills;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\ServiceProvider;
 use App\Console\DevelopmentCommands\GivePlayerMythicItem;
@@ -73,6 +74,7 @@ class AppServiceProvider extends ServiceProvider {
             GivePlayerMythicItem::class,
             TestExploration::class,
             CompleteGuideQuestForCharacter::class,
+            MaxOutCharactersPassiveSkills::class,
         ]);
     }
 
