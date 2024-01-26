@@ -2,7 +2,7 @@ import React, {Fragment} from "react";
 import BasicCard from "../../components/ui/cards/basic-card";
 import KingdomProps from "../../lib/game/kingdoms/types/kingdom-props";
 import KingdomDetails from "./kingdom-details";
-import BuildingDetails from "../../lib/game/kingdoms/building-details";
+import BuildingDetails from "./buildings/deffinitions/building-details";
 import BuildingInQueueDetails from "../../lib/game/kingdoms/building-in-queue-details";
 import UnitDetails from "../../lib/game/kingdoms/unit-details";
 import UnitsInQueue from "../../lib/game/kingdoms/units-in-queue";

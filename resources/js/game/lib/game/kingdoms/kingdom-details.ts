@@ -1,4 +1,4 @@
-import BuildingDetails from "./building-details";
+import BuildingDetails from "../../../sections/kingdoms/buildings/deffinitions/building-details";
 import DataTableBaseData from "../../ui/types/tables/data-table-base-data";
 import UnitDetails from "./unit-details";
 import BuildingInQueueDetails from "./building-in-queue-details";

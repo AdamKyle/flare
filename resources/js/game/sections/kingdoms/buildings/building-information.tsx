@@ -1,6 +1,6 @@
 import React, {Fragment} from "react";
 import BasicCard from "../../../components/ui/cards/basic-card";
-import BuildingInformationProps from "../../../lib/game/kingdoms/types/building-information-props";
+import BuildingInformationProps from "./types/building-information-props";
 import {formatNumber} from "../../../lib/game/format-number";
 import TimeHelpModal from "../modals/time-help-modal";
 import UpgradeWithResources from "./upgrade-with-resources";
@@ -12,6 +12,10 @@ import Ajax from "../../../lib/ajax/ajax";
 import {AxiosError, AxiosResponse} from "axios";
 import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
 import SuccessAlert from "../../../components/ui/alerts/simple-alerts/success-alert";
+import PrimaryOutlineButton from "../../../components/ui/buttons/primary-outline-button";
+import TimerProgressBar from "../../../components/ui/progress-bars/timer-progress-bar";
+import BuildingDetails from "./deffinitions/building-details";
+import ResourceBuildingExpansion from "./resource-building-expansion";
 
 export default class BuildingInformation extends React.Component<BuildingInformationProps, any> {
 
@@ -243,6 +247,13 @@ export default class BuildingInformation extends React.Component<BuildingInforma
                                 <dt>Morale Gain (per hour):</dt>
                                 <dd>{(this.props.building.morale_increase * 100).toFixed(2)}%</dd>
                             </dl>
+
+                            {
+                                this.props.building.is_resource_building ?
+                                    <ResourceBuildingExpansion building={this.props.building} building_needs_to_be_repaired={this.buildingNeedsToBeRepaired()} />
+                                : null
+                            }
+
                         </div>
                         <div className='border-b-2 block md:hidden border-b-gray-300 dark:border-b-gray-600 my-6'></div>
                         <div>

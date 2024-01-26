@@ -9,7 +9,7 @@ import DangerAlert from "../../../components/ui/alerts/simple-alerts/danger-aler
 import SuccessAlert from "../../../components/ui/alerts/simple-alerts/success-alert";
 import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
 import UpgradeTablesState from "../../../lib/game/kingdoms/types/upgrade-tables-state";
-import BuildingDetails from "../../../lib/game/kingdoms/building-details";
+import BuildingDetails from "../buildings/deffinitions/building-details";
 
 export default class UnitsTable extends React.Component<UnitsTableProps, UpgradeTablesState> {
 

@@ -2,6 +2,7 @@
 
 namespace App\Console\AfterDeployment;
 
+use App\Flare\Models\Kingdom;
 use App\Flare\Models\UnitInQueue;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Kingdoms\Values\KingdomMaxValue;
@@ -48,6 +49,14 @@ class ReduceUnitQueueAmount extends Command
                         'gold_paid' => null,
                     ]);
                 }
+            }
+        });
+
+        Kingdom::chunkById(250, function($kingdoms) {
+            foreach ($kingdoms as $kingdom) {
+                $kingdom->units()->where('amount', '>', KingdomMaxValue::MAX_UNIT)->update([
+                    'amount' => KingdomMaxValue::MAX_UNIT
+                ]);
             }
         });
     }

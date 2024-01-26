@@ -1,4 +1,4 @@
-import BuildingDetails from "../building-details";
+import BuildingDetails from "../../../../sections/kingdoms/buildings/deffinitions/building-details";
 
 export default class BuildingTimeCalculation {
 

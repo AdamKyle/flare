@@ -1,6 +1,6 @@
 import React, {Fragment} from "react";
 import Table from "../../../components/ui/data-tables/table";
-import BuildingDetails from "../../../lib/game/kingdoms/building-details";
+import BuildingDetails from "./deffinitions/building-details";
 import {buildBuildingsColumns} from "../../../lib/game/kingdoms/build-buildings-columns";
 import BuildingsTableProps from "../../../lib/game/kingdoms/types/buildings-table-props";
 import {AxiosError, AxiosResponse} from "axios";

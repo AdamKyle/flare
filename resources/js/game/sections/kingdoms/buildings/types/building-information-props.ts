@@ -1,5 +1,5 @@
-import BuildingDetails from "../building-details";
-import InformationPropsBase from "../information-props-base";
+import BuildingDetails from "../deffinitions/building-details";
+import InformationPropsBase from "../../../../lib/game/kingdoms/information-props-base";
 
 export default interface BuildingInformationProps extends InformationPropsBase {
     building: BuildingDetails;

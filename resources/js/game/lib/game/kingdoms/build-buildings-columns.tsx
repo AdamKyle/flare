@@ -1,6 +1,6 @@
 import React, {Fragment} from "react";
 import {formatNumber} from "../format-number";
-import BuildingDetails from "./building-details";
+import BuildingDetails from "../../../sections/kingdoms/buildings/deffinitions/building-details";
 import clsx from "clsx";
 import BuildingInQueueDetails from "./building-in-queue-details";
 import TimerProgressBar from "../../../components/ui/progress-bars/timer-progress-bar";

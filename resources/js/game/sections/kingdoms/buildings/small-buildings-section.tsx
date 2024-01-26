@@ -2,7 +2,7 @@ import React, {Fragment} from "react";
 import BuildingInformation from "./building-information";
 import BasicCard from "../../../components/ui/cards/basic-card";
 import BuildingsTable from "./buildings-table";
-import BuildingDetails from "../../../lib/game/kingdoms/building-details";
+import BuildingDetails from "./deffinitions/building-details";
 import BuildingInQueueDetails from "../../../lib/game/kingdoms/building-in-queue-details";
 import SmallBuildingsSectionsProps from "../../../lib/game/kingdoms/types/small-buildings-sections-props";
 import SmallBuildingsSectionsState from "../../../lib/game/kingdoms/types/small-buildings-sections-state";

@@ -1,5 +1,5 @@
-import DataTableBaseData from "../../ui/types/tables/data-table-base-data";
-import UnitDetails from "./unit-details";
+import DataTableBaseData from "../../../../lib/ui/types/tables/data-table-base-data";
+import UnitDetails from "../../../../lib/game/kingdoms/unit-details";
 
 export default interface BuildingDetails extends DataTableBaseData {
 

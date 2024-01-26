@@ -1,6 +1,6 @@
 import React, {Fragment} from "react";
 import {formatNumber} from "../format-number";
-import BuildingDetails from "./building-details";
+import BuildingDetails from "../../../sections/kingdoms/buildings/deffinitions/building-details";
 import clsx from "clsx";
 import UnitDetails from "./unit-details";
 import UnitsInQueue from "./units-in-queue";
@@ -114,7 +114,7 @@ const renderAmount = (unitId: number, currentUnits: CurrentUnitDetails[]|[]) => 
     if (foundUnitDetails.length > 0) {
         let unitDetails: CurrentUnitDetails = foundUnitDetails[0];
 
-        return unitDetails.amount;
+        return formatNumber(unitDetails.amount);
     }
 
     return 0;

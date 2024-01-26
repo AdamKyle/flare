@@ -7,7 +7,7 @@ import { parseInt } from "lodash";
 import TimeHelpModal from "../modals/time-help-modal";
 import RecruitWithResources from "./recruit-with-resources";
 import UnitDetails from "../../../lib/game/kingdoms/unit-details";
-import BuildingDetails from "../../../lib/game/kingdoms/building-details";
+import BuildingDetails from "../buildings/deffinitions/building-details";
 import PrimaryOutlineButton from "../../../components/ui/buttons/primary-outline-button";
 
 export default class UnitInformation extends React.Component<
