@@ -41,6 +41,12 @@ class RestartGlobalEventGoal extends Command {
             return;
         }
 
+        $globalEvent->update([
+            'next_reward_at' => $globalEvent->reward_every_kills,
+        ]);
+
+        $globalEvent = $globalEvent->refresh();
+
         $globalEvent->globalEventParticipation()->truncate();
         $globalEvent->globalEventKills()->truncate();
 
