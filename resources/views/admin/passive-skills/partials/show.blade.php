@@ -7,6 +7,8 @@
     <dd>{{$skill->hours_per_level}}</dd>
     <dt>Bonus Per Level:</dt>
     <dd>{{$skill->bonus_per_level * 100}}%</dd>
+    <dt>Bonus Resources Per Level:</dt>
+    <dd>{{number_format($skill->resource_bonus_per_level)}}</dd>
     <dt>Effects:</dt>
     <dd>{{$skill->passiveType()->getNamedValue()}}</dd>
     @if (!is_null($skill->parent_skill_id))

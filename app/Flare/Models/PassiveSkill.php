@@ -22,6 +22,7 @@ class PassiveSkill extends Model {
         'max_level',
         'hours_per_level',
         'bonus_per_level',
+        'resource_bonus_per_level',
         'effect_type',
         'parent_skill_id',
         'unlocks_at_level',
@@ -45,6 +46,7 @@ class PassiveSkill extends Model {
         'is_locked'                => 'boolean',
         'is_parent'                => 'boolean',
         'unlocks_game_building_id' => 'integer',
+        'resource_bonus_per_level' => 'integer',
     ];
 
     public function passiveType(): PassiveSkillTypeValue {

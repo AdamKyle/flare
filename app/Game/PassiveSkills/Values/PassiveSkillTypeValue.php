@@ -21,6 +21,8 @@ class PassiveSkillTypeValue {
     const STEEL_SMELTING_TIME_REDUCTION   = 7;
     const AIRSHIP_ATTACK_INCREASE         = 8;
     const AIRSHIP_UNIT_DEFENCE            = 9;
+    const RESOURCE_INCREASE               = 10;
+    const STEEL_INCREASE                  = 11;
 
 
     /**
@@ -37,6 +39,8 @@ class PassiveSkillTypeValue {
         self::STEEL_SMELTING_TIME_REDUCTION   => 7,
         self::AIRSHIP_ATTACK_INCREASE         => 8,
         self::AIRSHIP_UNIT_DEFENCE            => 9,
+        self::RESOURCE_INCREASE               => 10,
+        self::STEEL_INCREASE                  => 11,
     ];
 
     /**
@@ -53,6 +57,8 @@ class PassiveSkillTypeValue {
         7  => 'Steel Smelting Time Reduction',
         8  => 'Airship Attack Increase',
         9  => 'Airship Unit Defence',
+        10 => 'Resource Increase',
+        11 => 'Steel Increase',
     ];
 
     /**
@@ -141,6 +147,24 @@ class PassiveSkillTypeValue {
      */
     public function isSteelSmeltingTimeReduction(): bool {
         return $this->value === self::STEEL_SMELTING_TIME_REDUCTION;
+    }
+
+    /**
+     * Is resource increase?
+     *
+     * @return bool
+     */
+    public function isResourceIncrease(): bool {
+        return $this->value === self::RESOURCE_INCREASE;
+    }
+
+    /**
+     * Is steel increase?
+     *
+     * @return bool
+     */
+    public function isSteelIncrease(): bool {
+        return $this->value === self::STEEL_INCREASE;
     }
 
     /**

@@ -696,14 +696,21 @@ class  CharacterInventoryController extends Controller {
             Check active boons to see which ones you have. You can always cancel one by clicking on the row.'], 422);
         }
 
-        $slots = $character->inventory->slots()->whereIn('id', $request->items_to_use)->get();
+        $arrayOfItemsToUse = $request->items_to_use;
+        $boonCount = $character->boons->count();
+
+        if ($boonCount > 0) {
+            $arrayOfItemsToUse = array_slice($arrayOfItemsToUse, 0, $boonCount);
+        }
+
+        $slots = $character->inventory->slots()->whereIn('id', $arrayOfItemsToUse)->get();
 
         if ($slots->isEmpty()) {
             return response()->json(['message' => 'You don\'t have these items.'], 422);
         }
 
         foreach ($slots as $slot) {
-            $useItemService->useItem($slot, $character, $slot->item);
+            $useItemService->useItem($slot, $character);
         }
 
         $this->updateCharacterAttackDataCache($character);

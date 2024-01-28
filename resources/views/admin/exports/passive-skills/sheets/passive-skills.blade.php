@@ -7,6 +7,7 @@
             <th>max_level</th>
             <th>hours_per_level</th>
             <th>bonus_per_level</th>
+            <th>resource_bonus_per_level</th>
             <th>effect_type</th>
             <th>parent_skill_id</th>
             <th>unlocks_at_level</th>
@@ -23,6 +24,7 @@
             <td>{{$passiveSkill->max_level}}</td>
             <td>{{$passiveSkill->hours_per_level}}</td>
             <td>{{$passiveSkill->bonus_per_level}}</td>
+            <td>{{$passiveSkill->resource_bonus_per_level}}</td>
             <td>{{$passiveSkill->effect_type}}</td>
             <td>
                 @if (!is_null($passiveSkill->parent_skill_id))

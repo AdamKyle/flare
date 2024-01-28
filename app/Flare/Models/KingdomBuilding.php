@@ -303,6 +303,10 @@ class KingdomBuilding extends Model {
         return $this->belongsTo(Kingdom::class, 'kingdom_id', 'id');
     }
 
+    public function buildingExpansion() {
+        return $this->hasOne(KingdomBuildingExpansion::class);
+    }
+
     protected static function newFactory() {
         return KingdomBuildingFactory::new();
     }

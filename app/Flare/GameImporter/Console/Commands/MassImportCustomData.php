@@ -31,8 +31,11 @@ class MassImportCustomData extends Command {
      */
     public function handle() {
 
-        Artisan::call('remove:invalid-quest-items');
-        Artisan::call('fix:duplicate-quest-items');
+        Artisan::call('reduce:unit-queue-amount');
+
+        Artisan::call('import:game-data "Admin Section"');
+
+        Artisan::call('assign:new-skills');
         Artisan::call('create:character-attack-data');
         Artisan::call('generate:monster-cache');
         Artisan::call('create:quest-cache');

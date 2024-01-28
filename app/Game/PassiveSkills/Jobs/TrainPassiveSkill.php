@@ -117,6 +117,42 @@ class TrainPassiveSkill implements ShouldQueue
             }
         }
 
+        if ($newPassive->passiveSkill->passiveType()->isResourceIncrease()) {
+            $kingdoms = $this->character->kingdoms;
+
+            foreach ($kingdoms as $kingdom) {
+                $kingdom->update([
+                    'max_stone' => $kingdom->max_stone + $newPassive->passiveSkill->resource_bonus_per_level,
+                    'max_wood' => $kingdom->max_wood + $newPassive->passiveSkill->resource_bonus_per_level,
+                    'max_clay' => $kingdom->max_clay + $newPassive->passiveSkill->resource_bonus_per_level,
+                    'max_iron' => $kingdom->max_iron + $newPassive->passiveSkill->resource_bonus_per_level,
+                    'max_steel' => $kingdom->max_steel + $newPassive->passiveSkill->resource_bonus_per_level,
+                ]);
+
+                $kingdom  = new Item($kingdom->refresh(), $kingdomTransformer);
+                $kingdom  = $manager->createData($kingdom)->toArray();
+                $user     = $this->character->user;
+
+                event(new UpdateKingdom($user, $kingdom));
+            }
+        }
+
+        if ($newPassive->passiveSkill->passiveType()->isSteelIncrease()) {
+            $kingdoms = $this->character->kingdoms;
+
+            foreach ($kingdoms as $kingdom) {
+                $kingdom->update([
+                    'max_steel' => $kingdom->max_steel + $newPassive->passiveSkill->resource_bonus_per_level,
+                ]);
+
+                $kingdom  = new Item($kingdom->refresh(), $kingdomTransformer);
+                $kingdom  = $manager->createData($kingdom)->toArray();
+                $user     = $this->character->user;
+
+                event(new UpdateKingdom($user, $kingdom));
+            }
+        }
+
         $character = $this->character->Refresh();
 
         event(new ServerMessageEvent($character->user, $newPassive->passiveSkill->name . ' skill has gained a new level! Check your character sheet!'));

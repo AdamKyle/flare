@@ -30,7 +30,6 @@ class ManagePassiveSkillRequest extends FormRequest
             'name'                 => 'required|string',
             'description'          => 'required|string',
             'max_level'            => 'required|integer',
-            'bonus_per_level'      => 'required',
             'effect_type'          => 'required|integer',
             'hours_per_level'      => 'required|integer',
             'parent_skill_id'      => 'nullable|integer',
@@ -50,7 +49,6 @@ class ManagePassiveSkillRequest extends FormRequest
             'name.required'                 => 'Missing name.',
             'description.required'          => 'Missing description.',
             'max_level.required'            => 'Missing max level.',
-            'bonus_per_level.required'      => 'Missing bonus per level.',
             'effect_type.required'          => 'Missing effect type.',
             'hours_per_level.required'      => 'Missing length of time per level.'
         ];

@@ -209,12 +209,18 @@ class CharacterBuilder {
                     $parent = $this->character->passiveSkills()->where('passive_skill_id', $parentId)->first();
                 }
 
+                $isLocked = $passiveSkill->is_locked;
+
+                if (!is_null($parent)) {
+                    $isLocked = $passiveSkill->unlocks_at_level >= $parent->current_level;
+                }
+
                 $this->character->passiveSkills()->create([
                     'character_id'     => $this->character->id,
                     'passive_skill_id' => $passiveSkill->id,
                     'current_level'    => 0,
                     'hours_to_next'    => $passiveSkill->hours_per_level,
-                    'is_locked'        => $passiveSkill->is_locked,
+                    'is_locked'        => $isLocked,
                     'parent_skill_id'  => !is_null($parent) ? $parent->id : null,
                 ]);
             }
