@@ -11,6 +11,7 @@ use App\Game\Kingdoms\Handlers\KingdomSiegeHandler;
 use App\Game\Kingdoms\Handlers\KingdomUnitHandler;
 use App\Game\Kingdoms\Handlers\ReturnSurvivingUnitHandler;
 use App\Game\Kingdoms\Handlers\SettlerHandler;
+use App\Game\Kingdoms\Service\ExpandResourceBuildingService;
 use App\Game\Kingdoms\Service\SteelSmeltingService;
 use League\Fractal\Manager;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
@@ -216,6 +217,10 @@ class ServiceProvider extends ApplicationServiceProvider {
                 $app->make(AttackLogHandler::class),
                 $app->make(ReturnSurvivingUnitHandler::class),
             );
+        });
+
+        $this->app->bind(ExpandResourceBuildingService::class, function($app) {
+            return new ExpandResourceBuildingService($app->make(UpdateKingdom::class));
         });
 
         $this->commands([

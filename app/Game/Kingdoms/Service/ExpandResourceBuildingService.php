@@ -2,19 +2,18 @@
 
 namespace App\Game\Kingdoms\Service;
 
+use App\Flare\Models\BuildingExpansionQueue;
 use App\Flare\Models\Character;
 use App\Flare\Models\KingdomBuilding;
 use App\Game\Core\Traits\ResponseBuilder;
+use App\Game\Kingdoms\Jobs\ExpandResourceBuilding;
+use App\Game\Kingdoms\Values\ResourceBuildingExpansionBaseValue;
 
 class ExpandResourceBuildingService {
 
     use ResponseBuilder;
 
     private UpdateKingdom $updateKingdom;
-
-    const HOURS_TO_SECONDS = 3600;
-
-    const MINUTES_TO_SECONDS = 60;
 
     public function __construct(UpdateKingdom $updateKingdom) {
         $this->updateKIngdom = $updateKingdom;
@@ -23,6 +22,12 @@ class ExpandResourceBuildingService {
     public function startExpansion(Character $character, KingdomBuilding $building) {
 
         $buildingExpansion = $building->buildingExpansion;
+
+        $expansionInQueueForBuilding = BuildingExpansionQueue::where('building_id', $building->id)->first();
+
+        if (!is_null($expansionInQueueForBuilding)) {
+            return $this->errorResult('You already have an expansion in progress for this building.');
+        }
 
         if (!is_null($buildingExpansion)) {
 
@@ -38,22 +43,38 @@ class ExpandResourceBuildingService {
 
             $this->subtractCostFromKingdom($buildingExpansion);
 
-            // Create Expansion Record
+            $timeNeeded = now()->addMinutes(ResourceBuildingExpansionBaseValue::BASE_MINUTES_REQUIRED);
 
-            // Start Job
+            $expansionInQueueForBuilding = BuildingExpansionQueue::create([
+                'character_id' => $building->kingdom->character_id,
+                'kingdom_id'   => $building->kingdom_id,
+                'building_id'  => $building->id,
+                'completed_at' => $timeNeeded,
+                'started_at'   => now(),
+            ]);
+
+            ExpandResourceBuilding::dispatch($building, $building->kingdom->character->user, $expansionInQueueForBuilding->id)->delay($timeNeeded);
 
             return $this->successResult([
-                'time_left' => $buildingExpansion->hour_for_next_expansion * self::HOURS_TO_SECONDS,
+                'time_left' => $timeNeeded->diffInSeconds(),
                 'message' => 'Currently expanding your building!'
             ]);
         }
 
-        // Create Expansion Record
+        $timeNeeded = now()->addMinutes(ResourceBuildingExpansionBaseValue::BASE_MINUTES_REQUIRED * $buildingExpansion->expansion_count);
 
-        // Start Job
+        BuildingExpansionQueue::create([
+            'character_id' => $building->kingdom->character_id,
+            'kingdom_id'   => $building->kingdom_id,
+            'building_id'  => $building->id,
+            'completed_at' => $timeNeeded,
+            'started_at'   => now(),
+        ]);
+
+        ExpandResourceBuilding::dispatch($building, $building->kingdom->character->user, $expansionInQueueForBuilding->id)->delay($timeNeeded);
 
         return $this->successResult([
-            'time_left' => 15 * self::MINUTES_TO_SECONDS,
+            'time_left' => $timeNeeded->diffInSeconds(),
             'message' => 'Currently expanding your building!'
         ]);
     }
@@ -63,7 +84,7 @@ class ExpandResourceBuildingService {
         $kingdom = $building->kingdom;
 
         return collect($buildingExpansion->resource_costs)->filter(function ($key, $value) use ($kingdom) {
-            return $value >= $kingdom->$key;
+            return $value >= $kingdom->{'current_' . $key};
         })->isEmpty();
     }
 
@@ -73,8 +94,8 @@ class ExpandResourceBuildingService {
         $kingdom = $building->kingdom;
 
         $result = collect($buildingExpansion)->map(function ($key, $value) use ($kingdom) {
-            $remainingValue = min(0,  $kingdom->$key - $value);
-            return [$key => $remainingValue];
+            $remainingValue = min(0,  $kingdom->{'current_' . $key} - $value);
+            return ['current_' . $key => $remainingValue];
         })->collapse()->all();
 
         $kingdom->update($result);
