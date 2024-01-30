@@ -20,7 +20,7 @@ class KingdomBuildingExpansion extends Model {
         'expansion_type',
         'expansion_count',
         'expansions_left',
-        'hour_for_next_expansion',
+        'minutes_until_next_expansion',
         'resource_costs',
         'gold_bars_cost',
         'resource_increases',
@@ -32,14 +32,14 @@ class KingdomBuildingExpansion extends Model {
      * @var array
      */
     protected $casts = [
-        'expansion_type'            => 'integer',
-        'expansion_count'           => 'integer',
-        'expansions_left'           => 'integer',
-        'hour_for_next_expansion'   => 'integer',
-        'resource_costs'            => 'array',
-        'gold_bars_cost'            => 'integer',
-        'population_cost'           => 'integer',
-        'resource_increases'        => 'array',
+        'expansion_type'               => 'integer',
+        'expansion_count'              => 'integer',
+        'expansions_left'              => 'integer',
+        'minutes_until_next_expansion' => 'integer',
+        'resource_costs'               => 'array',
+        'gold_bars_cost'               => 'integer',
+        'population_cost'              => 'integer',
+        'resource_increases'           => 'array',
     ];
 
     public function gameBuilding() {

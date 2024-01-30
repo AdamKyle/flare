@@ -30,7 +30,7 @@ class ExpandResourceBuildingService {
             return $this->successResult([
                 'resource_costs' => ResourceBuildingExpansionBaseValue::resourceCostsForExpansion(),
                 'gold_bars_cost' => ResourceBuildingExpansionBaseValue::BASE_GOLD_BARS_REQUIRED,
-                'hour_for_next_expansion' => ResourceBuildingExpansionBaseValue::BASE_MINUTES_REQUIRED,
+                'minutes_until_next_expansion' => ResourceBuildingExpansionBaseValue::BASE_MINUTES_REQUIRED,
                 'expansion_count' => 0,
                 'expansions_left' => ResourceBuildingExpansionBaseValue::MAX_EXPANSIONS,
             ]);
@@ -82,7 +82,7 @@ class ExpandResourceBuildingService {
             ]);
         }
 
-        $timeNeeded = now()->addMinutes($buildingExpansion->hour_for_next_expansion);
+        $timeNeeded = now()->addMinutes($buildingExpansion->minutes_until_next_expansion);
 
         BuildingExpansionQueue::create([
             'character_id' => $building->kingdom->character_id,

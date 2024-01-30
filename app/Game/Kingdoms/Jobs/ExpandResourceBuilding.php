@@ -105,7 +105,7 @@ class ExpandResourceBuilding implements ShouldQueue {
                 'expansion_type' => BuildingExpansionTypes::RESOURCE_EXPANSION,
                 'expansion_count' => 1,
                 'expansions_left' => ResourceBuildingExpansionBaseValue::MAX_EXPANSIONS - 1,
-                'hour_for_next_expansion' => ResourceBuildingExpansionBaseValue::BASE_MINUTES_REQUIRED * 2,
+                'minutes_until_next_expansion' => ResourceBuildingExpansionBaseValue::BASE_MINUTES_REQUIRED * 2,
                 'resource_costs' => ResourceBuildingExpansionBaseValue::resourceCostsForExpansion(),
                 'gold_bars_cost' => ResourceBuildingExpansionBaseValue::BASE_GOLD_BARS_REQUIRED,
                 'resource_increases' => ResourceBuildingExpansionBaseValue::BASE_RESOURCE_GAIN,
@@ -128,7 +128,7 @@ class ExpandResourceBuilding implements ShouldQueue {
         if ($buildingExpansion->expansion_count < ResourceBuildingExpansionBaseValue::MAX_EXPANSIONS) {
             $buildingExpansion->update([
                 'expansion_count' => $buildingExpansion->expansion_count + 1,
-                'hour_for_next_expansion' => $buildingExpansion->hour_for_next_expansion * 2,
+                'minutes_until_next_expansion' => $buildingExpansion->minutes_until_next_expansion * 2,
                 'resource_costs' => ResourceBuildingExpansionBaseValue::resourceCostsForExpansion($buildingExpansion),
                 'gold_bars_cost' => $buildingExpansion->gold_bars_cost + ResourceBuildingExpansionBaseValue::BASE_GOLD_BARS_REQUIRED,
             ]);
