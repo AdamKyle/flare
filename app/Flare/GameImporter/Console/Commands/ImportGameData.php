@@ -70,6 +70,7 @@ class ImportGameData extends Command {
         $this->import($excelMapper, $files['Items'], 'Items');
         $this->import($excelMapper, $files['Affixes'], 'Affixes');
         $this->import($excelMapper, $files['Kingdoms'], 'Kingdoms');
+        $this->import($excelMapper, $files['Kingdom Passive Skills'], 'Kingdom Passive Skills');
 
         $this->line('Importing map spefic data ...');
 

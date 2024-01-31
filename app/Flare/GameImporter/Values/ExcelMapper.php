@@ -39,10 +39,8 @@ class ExcelMapper {
             ItemSkillsImport::class,
             SkillsImport::class,
         ],
-        'Kingdoms'      => [
-            PassiveSkillsImport::class,
-            KingdomsImport::class,
-        ],
+        'Kingdoms'      => KingdomsImport::class,
+        'Kingdom Passive Skills' => PassiveSkillsImport::class,
         'Quests'        => QuestsImport::class,
         'Locations Give Items' => LocationsImport::class,
         'Locations' => LocationsImport::class,

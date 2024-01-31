@@ -33,6 +33,7 @@ class MassImportCustomData extends Command {
 
         Artisan::call('reduce:unit-queue-amount');
 
+        Artisan::call('import:game-data "Kingdom Passive Skills"');
         Artisan::call('import:game-data "Admin Section"');
 
         Artisan::call('assign:new-skills');
