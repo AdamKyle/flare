@@ -6,12 +6,16 @@ use App\Flare\Models\Character;
 use App\Flare\ServerFight\BattleMessages;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\AlchemistsRavenousDream;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\BloodyPuke;
+use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\BookBindersFear;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\DoubleAttack;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\DoubleCast;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\DoubleHeal;
+use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\GunslingersAssassination;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\HammerSmash;
+use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\HolySmite;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\MerchantSupply;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\PrisonerRage;
+use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\SensualDance;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\ThiefBackStab;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\TripleAttack;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\VampireThirst;
@@ -125,6 +129,24 @@ class SpecialAttacks extends BattleMessages {
         if ($character->classType()->isVampire()) {
             return $this->vampireThirst($character, $attackData, $isPvp);
         }
+
+        if ($character->classType()->isGunslinger()) {
+            return $this->gunslingersAssassination($character, $attackData, $isPvp);
+        }
+
+        if ($character->classType()->isDancer()) {
+            return $this->sensualDance($character, $attackData, $isPvp);
+        }
+
+        if ($character->classType()->isBookBinder()) {
+            return $this->bookBindersFear($character, $attackData, $isPvp);
+        }
+
+        if ($character->classType()->isCleric()) {
+            return $this->holySmite($character, $attackData, $isPvp);
+        }
+
+        return null;
     }
 
     /**
@@ -436,6 +458,98 @@ class SpecialAttacks extends BattleMessages {
         $this->monsterHealth   = $merchantsSupply->getMonsterHealth();
 
         $merchantsSupply->clearMessages();
+    }
+
+    /**
+     * Gunslingers Assassination special attack.
+     *
+     * @param Character $character
+     * @param array $attackData
+     * @param bool $isPvp
+     * @return void
+     */
+    public function gunslingersAssassination(Character $character, array $attackData, bool $isPvp = false) {
+        $gunslingersAssassination = resolve(GunslingersAssassination::class);
+
+        $gunslingersAssassination->setCharacterHealth($this->characterHealth);
+        $gunslingersAssassination->setMonsterHealth($this->monsterHealth);
+        $gunslingersAssassination->handleAttack($character, $attackData, $isPvp);
+
+        $this->mergeMessages($gunslingersAssassination->getMessages());
+
+        $this->characterHealth = $gunslingersAssassination->getCharacterHealth();
+        $this->monsterHealth   = $gunslingersAssassination->getMonsterHealth();
+
+        $gunslingersAssassination->clearMessages();
+    }
+
+    /**
+     * Dancers Sensual Dance special attack.
+     *
+     * @param Character $character
+     * @param array $attackData
+     * @param bool $isPvp
+     * @return void
+     */
+    public function sensualDance(Character $character, array $attackData, bool $isPvp = false) {
+        $sensualDance = resolve(SensualDance::class);
+
+        $sensualDance->setCharacterHealth($this->characterHealth);
+        $sensualDance->setMonsterHealth($this->monsterHealth);
+        $sensualDance->handleAttack($character, $attackData, $isPvp);
+
+        $this->mergeMessages($sensualDance->getMessages());
+
+        $this->characterHealth = $sensualDance->getCharacterHealth();
+        $this->monsterHealth   = $sensualDance->getMonsterHealth();
+
+        $sensualDance->clearMessages();
+    }
+
+    /**
+     * Book Binders Fear Special Attack
+     *
+     * @param Character $character
+     * @param array $attackData
+     * @param bool $isPvp
+     * @return void
+     */
+    public function bookBindersFear(Character $character, array $attackData, bool $isPvp = false) {
+        $bookBindersFear = resolve(BookBindersFear::class);
+
+        $bookBindersFear->setCharacterHealth($this->characterHealth);
+        $bookBindersFear->setMonsterHealth($this->monsterHealth);
+        $bookBindersFear->handleAttack($character, $attackData, $isPvp);
+
+        $this->mergeMessages($bookBindersFear->getMessages());
+
+        $this->characterHealth = $bookBindersFear->getCharacterHealth();
+        $this->monsterHealth   = $bookBindersFear->getMonsterHealth();
+
+        $bookBindersFear->clearMessages();
+    }
+
+    /**
+     * Book Binders Fear Special Attack
+     *
+     * @param Character $character
+     * @param array $attackData
+     * @param bool $isPvp
+     * @return void
+     */
+    public function holySmite(Character $character, array $attackData, bool $isPvp = false) {
+        $holySmite = resolve(HolySmite::class);
+
+        $holySmite->setCharacterHealth($this->characterHealth);
+        $holySmite->setMonsterHealth($this->monsterHealth);
+        $holySmite->handleAttack($character, $attackData, $isPvp);
+
+        $this->mergeMessages($holySmite->getMessages());
+
+        $this->characterHealth = $holySmite->getCharacterHealth();
+        $this->monsterHealth   = $holySmite->getMonsterHealth();
+
+        $holySmite->clearMessages();
     }
 
 }

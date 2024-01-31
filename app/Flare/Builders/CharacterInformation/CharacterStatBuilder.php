@@ -446,6 +446,12 @@ class CharacterStatBuilder {
             return ceil($chrMod + $healing);
         }
 
+        if ($this->character->class->type()->isCleric()) {
+            $chrMod = $this->statMod('chr', $voided) * 0.45;
+
+            return ceil($chrMod + $healing);
+        }
+
         if ($this->character->class->type()->isArcaneAlchemist()) {
             $chrMod = $this->statMod('chr', $voided) * 0.10;
 

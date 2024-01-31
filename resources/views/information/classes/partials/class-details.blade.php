@@ -143,6 +143,22 @@
             @if ($class->type()->isMerchant())
                 @include('information.classes.partials.merchant')
             @endif
+
+            @if ($class->type()->isDancer())
+                @include('information.classes.partials.dancer')
+            @endif
+
+            @if ($class->type()->isGunslinger())
+                @include('information.classes.partials.gunslinger')
+            @endif
+
+            @if ($class->type()->isBookBinder())
+                @include('information.classes.partials.book-binder')
+            @endif
+
+            @if ($class->type()->isCleric())
+                @include('information.classes.partials.cleric')
+            @endif
         </div>
     </x-core.cards.card-with-title>
 </div>

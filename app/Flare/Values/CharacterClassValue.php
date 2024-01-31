@@ -12,6 +12,8 @@ class CharacterClassValue {
     const THIEF            = 'Thief';
     const BLACKSMITH       = 'Blacksmith';
     const ARCANE_ALCHEMIST = 'Arcane Alchemist';
+    const GUNSLINGER       = 'Gunslinger';
+    const DANCER           = 'Dancer';
 
     // These are special classes that require you to unlock them
     // via the class rank's system:
@@ -19,6 +21,8 @@ class CharacterClassValue {
     const PRISONER         = 'Prisoner';
     const ALCOHOLIC        = 'Alcoholic';
     const MERCHANT         = 'Merchant';
+    const CLERIC           = 'Cleric';
+    const BOOK_BINDER      = 'Book Binder';
 
 
     /**
@@ -52,17 +56,21 @@ class CharacterClassValue {
         self::PRISONER,
         self::ALCOHOLIC,
         self::MERCHANT,
+        self::GUNSLINGER,
     ];
 
     protected $caster = [
         self::PROPHET,
         self::HERETIC,
         self::ARCANE_ALCHEMIST,
+        self::BOOK_BINDER,
+        self::CLERIC
     ];
 
     protected $healers = [
         self::PROPHET,
         self::RANGER,
+        self::CLERIC
     ];
 
     /**
@@ -174,6 +182,42 @@ class CharacterClassValue {
     }
 
     /**
+     * Is a gunslinger?
+     *
+     * @return bool
+     */
+    public function isGunslinger(): bool {
+        return $this->value === self::GUNSLINGER;
+    }
+
+    /**
+     * Is a dancer?
+     *
+     * @return bool
+     */
+    public function isDancer(): bool {
+        return $this->value === self::DANCER;
+    }
+
+    /**
+     * Is a book binder?
+     *
+     * @return bool
+     */
+    public function isBookBinder(): bool {
+        return $this->value === self::BOOK_BINDER;
+    }
+
+    /**
+     * Is a cleric?
+     *
+     * @return bool
+     */
+    public function isCleric(): bool {
+        return $this->value === self::CLERIC;
+    }
+
+    /**
      * is a Merchant?
      *
      * @return bool
@@ -208,4 +252,5 @@ class CharacterClassValue {
     public function isHealer(): bool {
         return in_array($this->value, $this->healers);
     }
+
 }

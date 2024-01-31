@@ -44,6 +44,9 @@ use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\MerchantSupply;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\ThiefBackStab;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\TripleAttack;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\VampireThirst;
+use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\GunslingersAssassination;
+use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\SensualDance;
+use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\BookBindersFear;
 use App\Flare\ServerFight\Fight\CharacterAttacks\Types\AttackAndCast;
 use App\Flare\ServerFight\Fight\CharacterAttacks\Types\CastAndAttack;
 use App\Flare\ServerFight\Fight\CharacterAttacks\Types\CastType;
@@ -418,6 +421,18 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(MerchantSupply::class, function($app) {
             return new MerchantSupply($app->make(CharacterCacheData::class));
+        });
+
+        $this->app->bind(GunslingersAssassination::class, function($app) {
+            return new GunslingersAssassination($app->make(CharacterCacheData::class));
+        });
+
+        $this->app->bind(SensualDance::class, function($app) {
+            return new SensualDance($app->make(CharacterCacheData::class));
+        });
+
+        $this->app->bind(BookBindersFear::class, function($app) {
+            return new BookBindersFear($app->make(CharacterCacheData::class));
         });
 
         $this->app->bind(MonsterPlayerFight::class, function($app) {
