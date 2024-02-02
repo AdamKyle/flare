@@ -138,6 +138,7 @@ export default class MapListeners implements GameListener {
 
                 character.can_use_work_bench = event.canUseWorkBench;
                 character.can_access_queen = event.canUseQueenOfHearts;
+                character.can_access_labyrinth_oracle = event.canAccessLabyrinthOracle;
 
                 this.component.setState({
                     character: character,

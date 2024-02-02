@@ -85,6 +85,7 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer {
             'can_access_queen'            => false,
             'can_access_hell_forged'      => false,
             'can_access_purgatory_chains' => false,
+            'can_access_labyrinth_oracle' => false,
             'is_in_timeout'               => !is_null($character->user->timeout_until),
             'can_see_pledge_tab'          => !is_null($factionLoyalty),
             'pledged_to_faction_id'       => !is_null($factionLoyalty) ? $factionLoyalty->faction_id : null,

@@ -36,6 +36,8 @@ class UpdateLocationBasedCraftingOptions implements ShouldBroadcastNow {
      */
     public bool $canUseQueenOfHearts = false;
 
+    public bool $canAccessLabyrinthOracle = false;
+
     /**
      * Create a new event instance.
      *
@@ -46,6 +48,7 @@ class UpdateLocationBasedCraftingOptions implements ShouldBroadcastNow {
 
         $this->canUseWorkBench     = $this->canUseWorkBench($user->character);
         $this->canUseQueenOfHearts = $this->canUseQueenOfHearts($user->character);
+        $this->canAccessLabyrinthOracle = $this->canUseLabyrinthOracle($user->character);
     }
 
     /**
@@ -64,6 +67,10 @@ class UpdateLocationBasedCraftingOptions implements ShouldBroadcastNow {
         return $character->inventory->slots->filter(function($slot) {
             return $slot->item->effect === ItemEffectsValue::QUEEN_OF_HEARTS;
         })->isNotEmpty() && $character->map->gameMap->mapType()->isHell();
+    }
+
+    protected function canUseLabyrinthOracle(Character $character): bool {
+        return $character->map->gameMap->mapType()->isLabyrinth();
     }
 
     /**
