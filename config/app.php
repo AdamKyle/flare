@@ -222,7 +222,10 @@ return [
         /**
          * Npc Actions
          */
+        App\Game\NpcActions\QueenOfHeartsActions\Providers\ServiceProvider::class,
         App\Game\NpcActions\SeerActions\Providers\ServiceProvider::class,
+        App\Game\NpcActions\WorkBench\Providers\ServiceProvider::class,
+        App\Game\NpcActions\LabyrinthOracle\Providers\ServiceProvider::class,
 
         /**
          * Game Related

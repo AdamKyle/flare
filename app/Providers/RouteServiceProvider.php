@@ -94,6 +94,7 @@ class RouteServiceProvider extends ServiceProvider {
         $this->mapSeerActions();
         $this->mapQueenOfHeartsActions();
         $this->mapWorkBenchActions();
+        $this->mapLabyrinthOracleRoutes();
 
         // Game Api Routes
         $this->mapApiRoutes();
@@ -344,6 +345,13 @@ class RouteServiceProvider extends ServiceProvider {
             ->middleware('web')
             ->namespace('App\Game\NpcActions\QueenOfHeartsActions\Controllers')
             ->group(base_path('routes/game/npc-actions/queen-of-hearts/api.php'));
+    }
+
+    protected function mapLabyrinthOracleRoutes() {
+        Route::prefix('api')
+            ->middleware('web')
+            ->namespace('App\Game\NpcActions\LabyrinthOracle\Controllers')
+            ->group(base_path('routes/game/npc-actions/labyrinth-oracle/api.php'));
     }
 
     protected function mapWorkBenchActions() {

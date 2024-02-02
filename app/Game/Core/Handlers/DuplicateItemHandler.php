@@ -47,7 +47,7 @@ class DuplicateItemHandler {
      * @param Item $newItem
      * @return Item
      */
-    protected function applyHolyStacks(Item $oldItem, Item $newItem): Item {
+    public function applyHolyStacks(Item $oldItem, Item $newItem): Item {
         if ($oldItem->appliedHolyStacks()->count() > 0) {
 
             foreach ($oldItem->appliedHolyStacks as $stack) {
@@ -71,7 +71,7 @@ class DuplicateItemHandler {
      * @param Item $newItem
      * @return Item
      */
-    protected function applyGems(Item $oldItem, Item $newItem): Item {
+    public function applyGems(Item $oldItem, Item $newItem): Item {
         if ($oldItem->socket_count > 0) {
             foreach ($oldItem->sockets as $socket) {
                 $newItem->sockets()->create([

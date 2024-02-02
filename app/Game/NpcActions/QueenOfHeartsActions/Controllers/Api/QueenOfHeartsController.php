@@ -3,7 +3,7 @@
 namespace App\Game\NpcActions\QueenOfHeartsActions\Controllers\Api;
 
 use App\Flare\Models\Character;
-use App\Game\NpcActions\QueenOfHeartsActions\Requests\MoveRandomEnchantment;
+use App\Game\NpcActions\QueenOfHeartsActions\Requests\ItemTransferRequest;
 use App\Game\NpcActions\QueenOfHeartsActions\Requests\PurchaseRandomEnchantment;
 use App\Game\NpcActions\QueenOfHeartsActions\Requests\ReRollRandomEnchantment;
 use App\Game\NpcActions\QueenOfHeartsActions\Services\QueenOfHeartsService;
@@ -64,11 +64,11 @@ class QueenOfHeartsController extends Controller {
     }
 
     /**
-     * @param MoveRandomEnchantment $request
+     * @param ItemTransferRequest $request
      * @param Character $character
      * @return JsonResponse
      */
-    public function moveAffixes(MoveRandomEnchantment $request, Character $character): JsonResponse {
+    public function moveAffixes(ItemTransferRequest $request, Character $character): JsonResponse {
         $result = $this->queenOfHeartsService->moveAffixes(
             $character,
             $request->selected_slot_id,
