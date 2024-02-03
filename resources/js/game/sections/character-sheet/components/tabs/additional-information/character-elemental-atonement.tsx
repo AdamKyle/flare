@@ -31,7 +31,7 @@ export default class CharacterElementalAtonement extends React.Component<any, an
                     <div id="rightSide" className="mt-10 md:mt-0 pl-4 sm:w-full md:w-1/2 max-h-[400px] overflow-y-scroll">
                         <h1>What is this?</h1>
                         <p className="dark:text-gray-300 mt-4">
-                            To the left we can see our <a href="/information/gems" target="_blank">
+                            To the left, or top (For mobile), we can see our <a href="/information/gems" target="_blank">
                             Elemental Atonement's <i className="fas fa-external-link-alt"></i>
                         </a>{' '}. You get these from Gem Crafting (Click link above) which we can start doing at
                             End game when it matters.

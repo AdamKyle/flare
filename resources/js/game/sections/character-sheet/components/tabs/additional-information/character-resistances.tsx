@@ -29,7 +29,7 @@ export default class CharacterResistances extends React.Component<any, any> {
                     <div id="rightSide" className="mt-10 md:mt-0 pl-4 sm:w-full md:w-1/2">
                         <h1>What is this?</h1>
                         <p className="dark:text-gray-300 my-4">
-                            To the left we can see a set of resistances.
+                            To the left, or top (For mobile), we can see a set of resistances.
                             These effect your character in one way: Resisting the damage
                             of spells or enchantments (also known as Affix Damage) that's the enemy can do
                             to you.

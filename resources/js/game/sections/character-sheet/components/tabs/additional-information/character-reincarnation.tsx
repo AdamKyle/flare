@@ -30,7 +30,7 @@ export default class CharacterReincarnation extends React.Component<any, any> {
                     <div id="rightSide" className="mt-10 md:mt-0 pl-4 sm:w-full md:w-1/2">
                         <h1>What is this?</h1>
                         <p className="dark:text-gray-300 my-4">
-                            To the left we can see some basic information about how many times our character{' '}
+                            To the left, or top (For mobile), we can see some basic information about how many times our character{' '}
                             can <a href="/information/reincarnation" target="_blank">
                             reincarnated <i className="fas fa-external-link-alt"></i>
                             </a>{' '}as well as the effects that has on your character.

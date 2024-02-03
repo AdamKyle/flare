@@ -27,6 +27,10 @@ return new class extends Migration
      */
     public function down(): void
     {
+//        Schema::table('event_goal_participation_kills', function (Blueprint $table) {
+//            $table->dropForeign(['global_event_goal_id']);
+//        });
+
         Schema::dropIfExists('new_table_event_goal_participation_kills');
     }
 };

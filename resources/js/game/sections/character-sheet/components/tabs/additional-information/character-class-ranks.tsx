@@ -38,7 +38,7 @@ export default class CharacterClassRanks extends React.Component<any, any> {
         return <div className='max-h-[400px] overflow-y-scroll'>
             <h1>What is this?</h1>
             <p className="dark:text-gray-300 mt-4">
-                To the left we can manage our <a href="/information/class-ranks" target="_blank">
+                To the left, or top (For mobile), we can manage our <a href="/information/class-ranks" target="_blank">
                 Class Ranks <i className="fas fa-external-link-alt"></i>
             </a>{' '}. We can think of these in a similar vien of Final Fantasy Job system (or similar games) where
                 players cna switch classes, level special abilities and mix and match those abilities to make their own build.
@@ -77,7 +77,7 @@ export default class CharacterClassRanks extends React.Component<any, any> {
         return <>
             <h1>What is this?</h1>
             <p className="dark:text-gray-300 my-4">
-                To the left we can manage our <a href="/information/class-ranks" target="_blank">
+                To the left, or top (For mobile), we can manage our <a href="/information/class-ranks" target="_blank">
                 Class Specialties <i className="fas fa-external-link-alt"></i>
             </a>{' '}. We can think of these as special abilities that you can equip and level up by killing
                 creatures.

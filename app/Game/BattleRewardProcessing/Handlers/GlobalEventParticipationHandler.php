@@ -81,7 +81,6 @@ class GlobalEventParticipationHandler {
 
         $globalEventGoal = $globalEventGoal->refresh();
 
-        dump($globalEventGoal->total_kills, $globalEventGoal->next_reward_at);
         if ($globalEventGoal->total_kills >= $globalEventGoal->next_reward_at) {
             $newAmount = $globalEventGoal->next_reward_at + $globalEventGoal->reward_every_kills;
 
