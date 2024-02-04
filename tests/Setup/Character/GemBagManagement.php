@@ -62,4 +62,23 @@ class GemBagManagement {
 
         return $this;
     }
+
+    /**
+     * Assign a specific gem to the character.
+     *
+     * @param int $gemId
+     * @param int $amount
+     * @return $this
+     */
+    public function assignGemToGab(int $gemId, int $amount = 1): GemBagManagement {
+        $this->character->gemBag->gemSlots()->create([
+            'gem_bag_id' => $this->character->gemBag->id,
+            'gem_id'     => $gemId,
+            'amount'     => $amount,
+        ]);
+
+        $this->character = $this->character->refresh();
+
+        return $this;
+    }
 }

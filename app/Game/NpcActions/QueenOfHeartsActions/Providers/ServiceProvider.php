@@ -20,9 +20,11 @@ class ServiceProvider extends ApplicationServiceProvider
     {
 
         $this->app->bind(RandomEnchantmentService::class, function($app) {
+            // @codeCoverageIgnoreStart
             return new RandomEnchantmentService(
                 $app->make(RandomAffixGenerator::class)
             );
+            // @codeCoverageIgnoreEnd
         });
 
         $this->app->bind(ReRollEnchantmentService::class, function($app) {

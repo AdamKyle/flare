@@ -30,7 +30,6 @@ class ItemTransferRequest extends FormRequest
             'currency_costs.gold' => 'required|integer',
             'currency_costs.gold_dust' => 'required|integer',
             'currency_costs.shards' => 'required|integer',
-            'currency_costs.copper_coins' => 'required|integer',
         ];
     }
 
@@ -42,7 +41,6 @@ class ItemTransferRequest extends FormRequest
             'currency_costs.gold.required' => 'Must include gold as a currency cost.',
             'currency_costs.gold_dust.required' => 'Must include Gold Dust as a currency cost.',
             'currency_costs.shards.required' => 'Must include Shards as a currency cost.',
-            'currency_costs.copper_coins.required' => 'Must include Copper Coins as a currency cost.',
         ];
     }
 }

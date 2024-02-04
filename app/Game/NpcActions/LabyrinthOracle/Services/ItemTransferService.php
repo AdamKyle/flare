@@ -50,9 +50,17 @@ class ItemTransferService {
             return $this->errorResult('This item has nothing on it to transfer from.');
         }
 
+        if ($this->cannotMoveGems($character, $itemSlotToTransferTo->item)) {
+            return $this->errorResult('You do not have the inventory room to move the gems attached to: ' . $itemSlotToTransferTo->item->affix_name . ' back into your gem bag.');
+        }
+
         $this->itemToTransferFromDuplicated = DuplicateItemHandler::duplicateItem($itemSlotToTransferFrom->item);
 
         $this->itemToTransferToDuplicated = DuplicateItemHandler::duplicateItem($itemSlotToTransferTo->item);
+
+        $this->removeGemsFromItemToMoveTo($character);
+
+        $character = $character->fresh();
 
         $this->moveAffixesOver();
 
@@ -75,22 +83,32 @@ class ItemTransferService {
         return $this->successResult([
             'message' => 'Transferred attributes (Enchantments, Holy Oils and Gems) from: ' . $this->itemToTransferFromDuplicated->affix_name . ' To: ' . $this->itemToTransferToDuplicated->affix_name,
             'inventory' => $character->refresh()->inventory->slots->filter(function($slot) {
-                $itemIsValid = $slot->item->type !== 'artifact' && $slot->item->type !== 'trinket';
+                $itemIsValid = $slot->item->type !== 'artifact' && $slot->item->type !== 'trinket' && $slot->item->type !== 'quest';
 
                 $hasSuffixOrPrefix = !is_null($slot->item->item_suffix_id) || !is_null($slot->item->item_prefix_id);
 
-                $hasHolyStacks = !is_null($slot->item->holy_stacks_applied);
+                $hasHolyStacks = $slot->item->holy_stacks_applied > 0;
 
-                $hasSocketCount = !is_null($slot->item->socket_count);
+                $hasSocketCount = $slot->item->socket_count > 0;
 
                 return $itemIsValid && ($hasSuffixOrPrefix || $hasHolyStacks || $hasSocketCount);
             })->pluck('item.affix_name', 'item.id')->toArray(),
         ]);
     }
 
+    protected function cannotMoveGems(Character $character, Item $item): bool {
+        if ($character->isInventoryFull()) {
+            return true;
+        }
+
+        $totalGemsAttached = $item->sockets->count();
+
+        return ($totalGemsAttached + $character->totalInventoryCount()) > $character->inventory_max;
+    }
+
     /**
      * Can we transfer from this item?
-     *
+     *Gem
      * These are the rules for being able to transfer items.
      *
      * Item must have either item_prefix or suffix or both.
@@ -124,6 +142,42 @@ class ItemTransferService {
 
         return true;
     }
+
+    /**
+     * Remove the gems and sockets from the item to move attributes to.
+     *
+     * @param Character $character
+     * @return void
+     */
+    protected function removeGemsFromItemToMoveTo(Character $character) {
+        $socketsCount = $this->itemToTransferToDuplicated->sockets->count();
+
+        if ($socketsCount > 0) {
+            foreach ($this->itemToTransferToDuplicated->sockets as $socket) {
+                $foundGemSlot = $character->gemBag->gemSlots->where('gem_id', $socket->gem_id)->first();
+
+                if (!is_null($foundGemSlot)) {
+                    $foundGemSlot->update([
+                        'amount' => $foundGemSlot->amount + 1,
+                    ]);
+                } else {
+                    $character->gemBag->gemSlots()->create([
+                        'gem_bag_id' => $character->gemBag->id,
+                        'gem_id' => $socket->gem_id,
+                        'amount' => 1,
+                    ]);
+                }
+            }
+
+            $this->itemToTransferToDuplicated->sockets()->delete();
+            $this->itemToTransferToDuplicated->update([
+                'socket_count' => 0
+            ]);
+
+            $this->itemToTransferToDuplicated = $this->itemToTransferToDuplicated->fresh();
+        }
+    }
+
 
     /**
      * Move the affixes over.

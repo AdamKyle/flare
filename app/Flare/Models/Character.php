@@ -290,6 +290,12 @@ class Character extends Model {
         return ($this->getInventoryCount() + $gemCount) >= $this->inventory_max;
     }
 
+    public function totalInventoryCount(): int {
+        $gemCount = $this->gemBag->gemSlots->sum('amount');
+
+        return $this->getInventoryCount() + $gemCount;
+    }
+
     protected static function newFactory() {
         return CharacterFactory::new();
     }

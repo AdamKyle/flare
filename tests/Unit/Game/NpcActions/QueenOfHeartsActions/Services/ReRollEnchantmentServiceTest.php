@@ -13,12 +13,13 @@ use Illuminate\Support\Facades\Event;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateGameMap;
+use Tests\Traits\CreateGem;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateItemAffix;
 
 class ReRollEnchantmentServiceTest extends TestCase {
 
-    use RefreshDatabase, CreateItem, CreateGameMap, CreateItemAffix;
+    use RefreshDatabase, CreateItem, CreateGameMap, CreateItemAffix, CreateGem;
 
     private ?CharacterFactory $character;
 
@@ -212,6 +213,61 @@ class ReRollEnchantmentServiceTest extends TestCase {
                 'randomly_generated' => true
             ])->id,
         ]);
+
+        $secondItem = $this->createItem([
+            'type' => 'weapon',
+            'item_prefix_id' => $this->createItemAffix([
+                'type'               => 'prefix',
+                'randomly_generated' => false
+            ])->id,
+            'item_suffix_id' => $this->createItemAffix([
+                'type'               => 'suffix',
+                'randomly_generated' => false
+            ])->id,
+        ]);
+
+        $character = $this->character->inventoryManagement()->giveItem($item)->giveItem($secondItem)->getCharacter();
+
+        $slotUnique    = $character->inventory->slots->filter(function($slot) {
+            return $slot->item->is_unique;
+        })->first();
+
+        $slotNotUnique = $character->inventory->slots->filter(function($slot) {
+            return !$slot->item->is_unique;
+        })->first();
+
+        $this->reRollEnchantmentService->moveAffixes($character, $slotUnique, $slotNotUnique, 'all-enchantments');
+
+        Event::assertDispatched(UpdateCharacterCurrenciesEvent::class);
+        Event::assertDispatchedTimes(ServerMessageEvent::class, 2);
+        Event::assertDispatched(GlobalMessageEvent::class);
+    }
+
+    public function testMoveAllAffixesWhenOneItemHasGems() {
+        Event::fake();
+
+        $item      = $this->createItem([
+            'type'           => 'weapon',
+            'item_prefix_id' => $this->createItemAffix([
+                'type'               => 'prefix',
+                'randomly_generated' => true
+            ])->id,
+            'item_suffix_id' => $this->createItemAffix([
+                'type'               => 'suffix',
+                'randomly_generated' => true
+            ])->id,
+        ]);
+
+        $item->sockets()->create([
+            'item_id' => $item->id,
+            'gem_id' => $this->createGem()->id,
+        ]);
+
+        $item->update([
+            'socket_count' => 2,
+        ]);
+
+        $item = $item->refresh();
 
         $secondItem = $this->createItem([
             'type' => 'weapon',

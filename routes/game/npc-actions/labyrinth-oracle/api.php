@@ -5,6 +5,6 @@ Route::group(['middleware' => [
     'is.character.dead',
     'is.character.exploring']
 ], function() {
-    Route::get('/character/{character}/inventory', ['uses' => 'Api\LabyrinthOracleController@inventoryItems']);
-    Route::get('/character/{character}/transfer', ['uses' => 'Api\LabyrinthOracleController@transferItem']);
+    Route::get('/character/{character}/labyrinth-oracle', ['uses' => 'Api\LabyrinthOracleController@inventoryItems']);
+    Route::post('/character/{character}/transfer-attributes', ['uses' => 'Api\LabyrinthOracleController@transferItem']);
 });
