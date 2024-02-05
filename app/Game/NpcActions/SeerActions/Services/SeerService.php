@@ -510,8 +510,10 @@ class SeerService {
 
         $type = $this->getRandomType();
 
+        $socketCount = $slot->item->socket_count;
+
         if ($type > 99) {
-            $newItem->update(['socket_count' => 6]);
+            $newItem->update(['socket_count' => $socketCount > 6 ? $socketCount : 6]);
 
             $slot->update([
                 'item_id' => $newItem->refresh()->id,
@@ -521,7 +523,7 @@ class SeerService {
         }
 
         if ($type >= 95) {
-            $newItem->update(['socket_count' => 5]);
+            $newItem->update(['socket_count' => $socketCount > 5 ? $socketCount : 5]);
 
             $slot->update([
                 'item_id' => $newItem->refresh()->id,
@@ -531,7 +533,7 @@ class SeerService {
         }
 
         if ($type >= 80) {
-            $newItem->update(['socket_count' => 4]);
+            $newItem->update(['socket_count' => $socketCount > 4 ? $socketCount : 4]);
 
             $slot->update([
                 'item_id' => $newItem->refresh()->id,
@@ -541,7 +543,7 @@ class SeerService {
         }
 
         if ($type >= 60) {
-            $newItem->update(['socket_count' => 3]);
+            $newItem->update(['socket_count' => $socketCount > 3 ? $socketCount : 3]);
 
             $slot->update([
                 'item_id' => $newItem->refresh()->id,
@@ -551,7 +553,7 @@ class SeerService {
         }
 
         if ($type >= 50) {
-            $newItem->update(['socket_count' => 2]);
+            $newItem->update(['socket_count' => $socketCount > 2 ? $socketCount : 2]);
 
             $slot->update([
                 'item_id' => $newItem->refresh()->id,
@@ -561,7 +563,7 @@ class SeerService {
         }
 
         if ($type >= 1) {
-            $newItem->update(['socket_count' => 1]);
+            $newItem->update(['socket_count' => $socketCount > 1 ? $socketCount : 1]);
         }
 
         $slot->update([
