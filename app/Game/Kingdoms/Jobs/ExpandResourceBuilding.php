@@ -100,7 +100,7 @@ class ExpandResourceBuilding implements ShouldQueue {
 
         if (is_null($buildingExpansion)) {
             $kingdomBuildingExpansion = KingdomBuildingExpansion::create([
-                'game_building_id' => $this->building->id,
+                'kingdom_building_id' => $this->building->id,
                 'kingdom_id' => $this->building->kingdom->id,
                 'expansion_type' => BuildingExpansionTypes::RESOURCE_EXPANSION,
                 'expansion_count' => 1,

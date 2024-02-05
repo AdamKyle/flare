@@ -72,11 +72,14 @@ Route::middleware(['auth', 'is.character.dead', 'is.character.exploring', 'is.ch
     Route::post('/recall-units/{unitMovementQueue}/{character}', ['as' => 'recall.units', 'uses' => 'Api\UnitMovementController@recallUnits']);
 });
 
-Route::middleware(['auth', 'is.character.dead', 'is.character.exploring', 'is.character.who.they.say.they.are'])->group(function() {
+Route::middleware(['auth', 'is.character.who.they.say.they.are'])->group(function() {
     Route::middleware(['character.owns.kingdom'])->group(function() {
-        Route::get('/kingdom/building/{kingdomBuilding}/{character}', ['as' => 'kingdom.fetch.building-expansion', 'uses' => 'Api\ResourceBuildingExpansionController@getBuildingExpansionDetails']);
-        Route::post('/kingdom/building/expand/{kingdomBuilding}/{character}', ['as' => 'kingdom.expand.building-expansion', 'uses' => 'Api\ResourceBuildingExpansionController@expandBuilding']);
-        Route::post('/kingdom/building/cancel-expand/{kingdomBuilding}/{character}', ['as' => 'kingdom.cancel-expansion.building-expansion', 'uses' => 'Api\ResourceBuildingExpansionController@cancelExpansionBuilding']);
+        Route::get('/kingdom/building-expansion/details/{kingdomBuilding}/{character}', ['as' => 'kingdom.fetch.building-expansion', 'uses' => 'Api\ResourceBuildingExpansionController@getBuildingExpansionDetails']);
+    });
+
+    Route::middleware(['character.owns.kingdom', 'is.character.dead', 'is.character.exploring'])->group(function() {
+        Route::post('/kingdom/building-expansion/expand/{kingdomBuilding}/{character}', ['as' => 'kingdom.expand.building-expansion', 'uses' => 'Api\ResourceBuildingExpansionController@expandBuilding']);
+        Route::post('/kingdom/building-expansion/cancel-expand/{kingdomBuilding}/{character}', ['as' => 'kingdom.cancel-expansion.building-expansion', 'uses' => 'Api\ResourceBuildingExpansionController@cancelExpansionBuilding']);
     });
 });
 

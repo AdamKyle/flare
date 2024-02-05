@@ -16,7 +16,7 @@ class ResourceBuildingExpansionController extends Controller {
         $this->expandResourceBuildingService = $expandResourceBuildingService;
     }
 
-    public function getBuildingExpansionDetails(KingdomBuilding $kingdomBuilding) {
+    public function getBuildingExpansionDetails(KingdomBuilding $kingdomBuilding, Character $character) {
         $response = $this->expandResourceBuildingService->fetchExpansionDetails($kingdomBuilding);
 
         $status = $response['status'];
@@ -25,7 +25,7 @@ class ResourceBuildingExpansionController extends Controller {
         return response()->json($response, $status);
     }
 
-    public function expandBuilding(KingdomBuilding $kingdomBuilding) {
+    public function expandBuilding(KingdomBuilding $kingdomBuilding, Character $character) {
         $response = $this->expandResourceBuildingService->startExpansion($kingdomBuilding);
 
         $status = $response['status'];
@@ -34,7 +34,7 @@ class ResourceBuildingExpansionController extends Controller {
         return response()->json($response, $status);
     }
 
-    public function cancelExpansionBuilding(KingdomBuilding $kingdomBuilding) {
+    public function cancelExpansionBuilding(KingdomBuilding $kingdomBuilding, Character $character) {
         $response = $this->expandResourceBuildingService->cancelExpansion($kingdomBuilding);
 
         $status = $response['status'];

@@ -250,7 +250,10 @@ export default class BuildingInformation extends React.Component<BuildingInforma
 
                             {
                                 this.props.building.is_resource_building ?
-                                    <ResourceBuildingExpansion building={this.props.building} building_needs_to_be_repaired={this.buildingNeedsToBeRepaired()} />
+                                    <ResourceBuildingExpansion building={this.props.building}
+                                                               building_needs_to_be_repaired={this.buildingNeedsToBeRepaired()}
+                                                               character_id={this.props.character_id}
+                                    />
                                 : null
                             }
 

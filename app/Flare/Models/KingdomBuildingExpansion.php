@@ -15,7 +15,7 @@ class KingdomBuildingExpansion extends Model {
      * @var array
      */
     protected $fillable = [
-        'game_building_id',
+        'kingdom_building_id',
         'kingdom_id',
         'expansion_type',
         'expansion_count',
@@ -38,12 +38,11 @@ class KingdomBuildingExpansion extends Model {
         'minutes_until_next_expansion' => 'integer',
         'resource_costs'               => 'array',
         'gold_bars_cost'               => 'integer',
-        'population_cost'              => 'integer',
         'resource_increases'           => 'array',
     ];
 
-    public function gameBuilding() {
-        return $this->belongsTo(GameBuilding::class, 'game_building_id', 'id');
+    public function kingdomBuilding() {
+        return $this->belongsTo(KingdomBuilding::class, 'kingdom_building_id', 'id');
     }
 
     public function kingdom() {
