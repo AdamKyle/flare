@@ -45,6 +45,10 @@ class CharacterClassValue {
         self::PRISONER         => 'Prisoner',
         self::ALCOHOLIC        => 'Alcoholic',
         self::MERCHANT         => 'Merchant',
+        self::GUNSLINGER       => 'Gunslinger',
+        self::DANCER           => 'Dancer',
+        self::CLERIC           => 'Cleric',
+        self::BOOK_BINDER      => 'Book Binder',
     ];
 
     protected $nonCaster = [

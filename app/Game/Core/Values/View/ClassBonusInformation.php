@@ -105,6 +105,30 @@ class ClassBonusInformation {
             $details['description'] = 'With a stave or bow equipped you have a chance to do one of two attacks based on a coin flip. One is 2x your damage and the other is 4x your damage.';
         }
 
+        if ($classAttackValue->isDancer()) {
+            $details['type'] = Str::ucfirst(ClassAttackValue::SENSUAL_DANCE);
+            $details['requires'] = 'Fans';
+            $details['description'] = 'With one or two fans you can dance around the enemy and sensually lure them to their own bloody death.';
+        }
+
+        if ($classAttackValue->isCleric()) {
+            $details['type'] = Str::ucfirst(ClassAttackValue::HOLY_SMITE);
+            $details['requires'] = 'Maces';
+            $details['description'] = 'Pray to the one true god. Follow in the foot steps of The Church. Follow the orders of The Federation and slay the beats before you in divine light.';
+        }
+
+        if ($classAttackValue->isGunslinger()) {
+            $details['type'] = Str::ucfirst(ClassAttackValue::GUNSLINGERS_ASSASSINATION);
+            $details['requires'] = 'Guns';
+            $details['description'] = 'Take aim child, take aim and may your bullets from the old world strike down the enemy.';
+        }
+
+        if ($classAttackValue->isBookBinder()) {
+            $details['type'] = Str::ucfirst(ClassAttackValue::BOOK_BINDERS_FEAR);
+            $details['requires'] = 'Scratch Awls';
+            $details['description'] = 'Fear, it\'s what keeps us alive child. Fear is what makes you lash out and violently stab your enemy over and over and over again, just to live.';
+        }
+
         return $details;
     }
 }
