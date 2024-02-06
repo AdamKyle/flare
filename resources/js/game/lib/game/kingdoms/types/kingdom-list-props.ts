@@ -10,4 +10,6 @@ export default interface KingdomListProps {
     view_port: number;
 
     character_gold: number;
+
+    user_id: number;
 }

@@ -19,6 +19,7 @@ export default class InformationSection extends React.Component<InformationSecti
                                         kingdom_population_cost_reduction={this.props.cost_reduction.kingdom_population_cost_reduction}
                                         kingdom_current_population={this.props.cost_reduction.kingdom_current_population}
                                         character_id={this.props.character_id}
+                                        user_id={this.props.user_id}
                                         is_in_queue={this.props.queue.is_building_in_queue}
                                         character_gold={this.props.character_gold}
             />

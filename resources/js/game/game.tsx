@@ -431,6 +431,7 @@ export default class Game extends React.Component<GameProps, GameState> {
                             character_gold={removeCommas(
                                 this.state.character.gold
                             )}
+                            user_id={this.state.character.user_id}
                         />
                     </TabPanel>
                 </Tabs>

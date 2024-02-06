@@ -151,6 +151,7 @@ export default class KingdomsList extends React.Component<KingdomListProps, King
                                           dark_tables={this.state.dark_tables}
                                           character_gold={this.props.character_gold}
                                           view_port={this.props.view_port}
+                                          user_id={this.props.user_id}
                             />
                         :
                             <Kingdom close_details={this.closeKingdomDetails.bind(this)}
@@ -158,6 +159,7 @@ export default class KingdomsList extends React.Component<KingdomListProps, King
                                      dark_tables={this.state.dark_tables}
                                      character_gold={this.props.character_gold}
                                      view_port={this.props.view_port}
+                                     user_id={this.props.user_id}
                             />
                     : this.state.selected_log !== null ?
                         <KingdomLogDetailsView

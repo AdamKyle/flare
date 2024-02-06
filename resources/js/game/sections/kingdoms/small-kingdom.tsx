@@ -46,6 +46,7 @@ export default class SmallKingdom extends React.Component<KingdomProps, SmallKin
                     close_selected={this.closeSelected.bind(this)}
                     character_gold={this.props.character_gold}
                     view_port={this.props.view_port}
+                    user_id={this.props.user_id}
                 />
             case 'units':
                 return <SmallUnitsSection

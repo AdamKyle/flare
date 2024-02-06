@@ -4,6 +4,8 @@ export default interface ResourceBuildingExpansionProps {
 
     character_id: number;
 
+    user_id: number;
+
     building: BuildingDetails;
 
     building_needs_to_be_repaired: boolean;

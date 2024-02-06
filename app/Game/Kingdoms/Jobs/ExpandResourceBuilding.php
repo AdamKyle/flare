@@ -4,6 +4,7 @@ namespace App\Game\Kingdoms\Jobs;
 
 use App\Flare\Models\BuildingExpansionQueue;
 use App\Flare\Models\KingdomBuildingExpansion;
+use App\Game\Kingdoms\Events\UpdateBuildingExpansion;
 use App\Game\Kingdoms\Values\BuildingExpansionTypes;
 use App\Game\Kingdoms\Values\ResourceBuildingExpansionBaseValue;
 use League\Fractal\Manager;
@@ -63,8 +64,7 @@ class ExpandResourceBuilding implements ShouldQueue {
     /**
      * Execute the job.
      *
-     * @param Manager $manager
-     * @param KingdomTransformer $kingdomTransformer
+     * @param UpdateKingdom $updateKingdom
      * @return void
      */
     public function handle(UpdateKingdom $updateKingdom)
@@ -119,6 +119,8 @@ class ExpandResourceBuilding implements ShouldQueue {
                 'max_' . $resourceType => $this->building->kingdom->{'max_' . $resourceType} + $kingdomBuildingExpansion->resource_increases,
             ]);
 
+            event(new UpdateBuildingExpansion($this->user->character, $kingdomBuildingExpansion));
+
             $updateKingdom->updateKingdom($this->building->kingdom->refresh());
 
             return;
@@ -126,10 +128,12 @@ class ExpandResourceBuilding implements ShouldQueue {
 
 
         if ($buildingExpansion->expansion_count < ResourceBuildingExpansionBaseValue::MAX_EXPANSIONS) {
+            $expansionCount = $buildingExpansion->expansion_count + 1;
+
             $buildingExpansion->update([
-                'expansion_count' => $buildingExpansion->expansion_count + 1,
+                'expansion_count' => $expansionCount,
                 'minutes_until_next_expansion' => $buildingExpansion->minutes_until_next_expansion * 2,
-                'resource_costs' => ResourceBuildingExpansionBaseValue::resourceCostsForExpansion($buildingExpansion),
+                'resource_costs' => ResourceBuildingExpansionBaseValue::resourceCostsForExpansion($expansionCount),
                 'gold_bars_cost' => $buildingExpansion->gold_bars_cost + ResourceBuildingExpansionBaseValue::BASE_GOLD_BARS_REQUIRED,
             ]);
 
@@ -143,8 +147,9 @@ class ExpandResourceBuilding implements ShouldQueue {
                 'max_' . $resourceType => $this->building->kingdom->{'max_' . $resourceType} + $buildingExpansion->resource_increases,
             ]);
 
-            $updateKingdom->updateKingdom($this->building->kingdom->refresh());
+            event(new UpdateBuildingExpansion($this->user->character, $buildingExpansion));
 
+            $updateKingdom->updateKingdom($this->building->kingdom->refresh());
         }
     }
 

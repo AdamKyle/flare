@@ -21,9 +21,9 @@ class ResourceBuildingExpansionBaseValue {
     const MAX_EXPANSIONS = 8;
 
 
-    public static function resourceCostsForExpansion(?KingdomBuildingExpansion $buildingExpansion = null): array {
+    public static function resourceCostsForExpansion(int $expansionCount = 0): array {
 
-        if (is_null($buildingExpansion)) {
+        if ($expansionCount === 0) {
             return [
                 'stone' => self::BASE_RESOURCE_REQUIRED,
                 'wood'  => self::BASE_RESOURCE_REQUIRED,
@@ -35,12 +35,12 @@ class ResourceBuildingExpansionBaseValue {
         }
 
         return [
-            'stone' => self::BASE_RESOURCE_REQUIRED * $buildingExpansion->expansion_count,
-            'wood'  => self::BASE_RESOURCE_REQUIRED * $buildingExpansion->expansion_count,
-            'iron'  => self::BASE_RESOURCE_REQUIRED * $buildingExpansion->expansion_count,
-            'clay'  => self::BASE_RESOURCE_REQUIRED * $buildingExpansion->expansion_count,
-            'steel' => self::BASE_STEEL_REQUIRED * $buildingExpansion->expansion_count,
-            'population' => self::POPULATION_COST * $buildingExpansion->expansion_count,
+            'stone' => self::BASE_RESOURCE_REQUIRED * $expansionCount,
+            'wood'  => self::BASE_RESOURCE_REQUIRED * $expansionCount,
+            'iron'  => self::BASE_RESOURCE_REQUIRED * $expansionCount,
+            'clay'  => self::BASE_RESOURCE_REQUIRED * $expansionCount,
+            'steel' => self::BASE_STEEL_REQUIRED * $expansionCount,
+            'population' => self::POPULATION_COST * $expansionCount,
         ];
     }
 }

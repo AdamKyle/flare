@@ -11,8 +11,16 @@ import clsx from "clsx";
 import Ajax from "../../../lib/ajax/ajax";
 import {AxiosError, AxiosResponse} from "axios";
 import {formatNumber} from "../../../lib/game/format-number";
+import Echo from "laravel-echo";
+import {serviceContainer} from "../../../lib/containers/core-container";
+import GameEventListeners from "../../../lib/game/event-listeners/game-event-listeners";
+import CoreEventListener from "../../../lib/game/event-listeners/core-event-listener";
 
 export default class ResourceBuildingExpansion extends React.Component<ResourceBuildingExpansionProps, ResourceBuildingExpansionState> {
+
+    private gameEventListener: CoreEventListener;
+
+    private updateExpansionDetails: any;
 
     constructor(props: ResourceBuildingExpansionProps) {
         super(props);
@@ -25,6 +33,12 @@ export default class ResourceBuildingExpansion extends React.Component<ResourceB
             time_remaining_for_expansion: 0,
             expansion_details: null,
         }
+
+        this.gameEventListener = serviceContainer().fetch(CoreEventListener);
+
+        this.gameEventListener.initialize();
+
+        this.updateExpansionDetails = this.gameEventListener.getEcho().private("update-building-expansion-details-" + this.props.user_id);
     }
 
     componentDidMount() {
@@ -46,7 +60,18 @@ export default class ResourceBuildingExpansion extends React.Component<ResourceB
                         error_message: response.data.message,
                     });
                 }
-            })
+            });
+
+        this.updateExpansionDetails.listen(
+            "Game.Kingdoms.Events.UpdateBuildingExpansion",
+            (event: any) => {
+                console.log(event);
+                this.setState({
+                    expansion_details: event.kingdomBuildingExpansion,
+                    time_remaining_for_expansion: event.timeLeft
+                });
+            }
+        );
     }
 
     canNotExpand(building: BuildingDetails): boolean {

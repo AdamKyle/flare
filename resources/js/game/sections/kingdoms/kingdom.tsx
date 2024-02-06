@@ -115,6 +115,7 @@ export default class Kingdom extends React.Component<KingdomProps, any> {
                                     character_id={this.props.kingdom.character_id}
                                     kingdom_id={this.props.kingdom.id}
                                     character_gold={this.props.character_gold}
+                                    user_id={this.props.user_id}
                                 />
                             :
                                 <KingdomTabs

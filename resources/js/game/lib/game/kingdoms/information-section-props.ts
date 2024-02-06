@@ -24,6 +24,8 @@ export default interface InformationSectionProps {
         is_unit_in_queue: boolean;
     };
 
+    user_id: number
+
     character_id: number;
 
     kingdom_id: number;

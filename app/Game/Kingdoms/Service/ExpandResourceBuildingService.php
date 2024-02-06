@@ -81,10 +81,10 @@ class ExpandResourceBuildingService {
             }
 
             if (!$this->canAffordResourceCost($building) || $kingdomGoldBars < $buildingExpansion->gold_bars_cost) {
-                return $this->errorResult('You annot afford to expand this building.');
+                return $this->errorResult('You cannot afford to expand this building.');
             }
 
-            $this->subtractCostFromKingdom($buildingExpansion);
+            $this->subtractCostFromKingdom($building);
 
             $timeNeeded = now()->addMinutes($buildingExpansion->minutes_until_next_expansion);
 
@@ -211,9 +211,12 @@ class ExpandResourceBuildingService {
         $buildingExpansion = $building->buildingExpansion;
         $kingdom = $building->kingdom;
 
-        $result = collect($buildingExpansion)->map(function ($key, $value) use ($kingdom) {
+        $result = collect($buildingExpansion->resource_costs)->map(function ($key, $value) use ($kingdom) {
             $remainingValue = $kingdom->{'current_' . $value} - $key;
-            return ['current_' . $value => $remainingValue] > 0 ? $remainingValue : 0;
+
+            $remainingValue = $remainingValue > 0 ? $remainingValue : 0;
+
+            return ['current_' . $value => $remainingValue];
         })->collapse()->all();
 
         $kingdom->update($result);
@@ -224,6 +227,9 @@ class ExpandResourceBuildingService {
     protected function subtractBaseCostFromKingdom(Kingdom $kingdom): void {
         $result = collect(ResourceBuildingExpansionBaseValue::resourceCostsForExpansion())->map(function ($key, $value) use ($kingdom) {
             $remainingValue = $kingdom->{'current_' . $value} - $key;
+
+            $remainingValue = $remainingValue > 0 ? $remainingValue : 0;
+
             return ['current_' . $value => $remainingValue];
         })->collapse()->all();
 
