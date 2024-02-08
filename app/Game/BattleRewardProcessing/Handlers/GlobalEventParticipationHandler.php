@@ -81,7 +81,6 @@ class GlobalEventParticipationHandler {
 
         $globalEventGoal = $globalEventGoal->refresh();
 
-        dump($globalEventGoal->total_kills, $globalEventGoal->next_reward_at);
         if ($globalEventGoal->total_kills >= $globalEventGoal->next_reward_at) {
             $newAmount = $globalEventGoal->next_reward_at + $globalEventGoal->reward_every_kills;
 
@@ -134,6 +133,11 @@ class GlobalEventParticipationHandler {
             ->whereNull('item_prefix_id')
             ->whereNull('item_suffix_id')
             ->whereDoesntHave('appliedHolyStacks')
+            ->whereNotIn('type', [
+                'artifact',
+                'trinket',
+                'quest'
+            ])
             ->inRandomOrder()
             ->first();
 

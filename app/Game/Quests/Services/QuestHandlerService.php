@@ -17,6 +17,7 @@ use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Quests\Handlers\NpcQuestsHandler;
 use App\Game\Quests\Traits\QuestDetails;
+use Exception;
 use Illuminate\Support\Facades\Cache;
 
 class QuestHandlerService {
@@ -145,6 +146,14 @@ class QuestHandlerService {
             }
         }
 
+        if ($this->questHasFactionLoyaltyRequirement($quest)) {
+            if (!$this->hasMetFactionLoyaltyRequirements($quest, $character)) {
+                $this->bailMessage = 'There is an NPC on this map who requires you to assist them with their tasks to increase their Faction Loyalty. Click the Required To Complete tab.';
+
+                return true;
+            }
+        }
+
         if (!$this->hasCompletedRequiredQuest($character, $quest)) {
             $this->bailMessage = 'You need to complete another quest before handing this one in. Check the Required To Complete tab.';
 
@@ -188,7 +197,9 @@ class QuestHandlerService {
 
         CharacterAttackTypesCacheBuilder::dispatch($character);
 
-        event(new ServerMessageEvent($character->user, 'You were moved (at no gold cost or time out) from: ' . $oldMapDetails->gameMap->name . ' to: ' . $character->map->gameMap->name . ' in order to hand in the quest.'));
+        if ($oldMapDetails->gameMap ->id !== $character->map->gameMap->id) {
+            event(new ServerMessageEvent($character->user, 'You were moved (at no gold cost or time out) from: ' . $oldMapDetails->gameMap->name . ' to: ' . $character->map->gameMap->name . ' in order to hand in the quest.'));
+        }
 
         $this->updateMapDetails($character);
 
@@ -205,21 +216,26 @@ class QuestHandlerService {
     }
 
     public function handInQuest(Character $character, Quest $quest) {
-        $this->npcQuestsHandler()->handleNpcQuest($character, $quest);
 
-        event(new GlobalMessageEvent($character->name . ' Has completed a quest (' . $quest->name . ') for: ' . $quest->npc->real_name . ' and been rewarded with a godly gift!'));
+        try {
+            $this->npcQuestsHandler()->handleNpcQuest($character, $quest);
 
-        $character = $character->refresh();
+            event(new GlobalMessageEvent($character->name . ' Has completed a quest (' . $quest->name . ') for: ' . $quest->npc->real_name . ' and been rewarded with a godly gift!'));
 
-        $quests     = $this->buildQuestCacheService->getRegularQuests();
-        $raidQuests = $this->buildQuestCacheService->fetchQuestsForRaid();
+            $character = $character->refresh();
 
-        return $this->successResult([
-            'completed_quests' => $character->questsCompleted()->pluck('quest_id'),
-            'player_plane'     => $character->map->gameMap->name,
-            'quests'           => $quests,
-            'raid_quests'      => $raidQuests,
-        ]);
+            $quests     = $this->buildQuestCacheService->getRegularQuests();
+            $raidQuests = $this->buildQuestCacheService->fetchQuestsForRaid();
+
+            return $this->successResult([
+                'completed_quests' => $character->questsCompleted()->pluck('quest_id'),
+                'player_plane'     => $character->map->gameMap->name,
+                'quests'           => $quests,
+                'raid_quests'      => $raidQuests,
+            ]);
+        } catch (Exception $e) {
+            return $this->errorResult($e->getMessage());
+        }
     }
 
     /**
