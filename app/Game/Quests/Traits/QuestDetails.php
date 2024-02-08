@@ -47,6 +47,29 @@ trait QuestDetails {
         return !is_null($quest->faction_game_map_id);
     }
 
+    protected function questHasFactionLoyaltyRequirement(Quest $quest): bool {
+        return !is_null($quest->assisting_npc_id) && !is_null($quest->required_fame_level);
+    }
+
+    protected function hasMetFactionLoyaltyRequirements(Quest $quest, Character $character): bool {
+        $factionLoyalty = $character->factionLoyalties()
+            ->with('factionLoyaltyNpcs')
+            ->whereHas('factionLoyaltyNpcs', function($query) use($quest) {
+                $query->where('npc_id', $quest->assisting_npc_id);
+            })
+            ->first();
+
+        $assistingNpc = $factionLoyalty->factionLoyaltyNpcs->filter(function($factionLoyaltyNpc) use($quest) {
+            return $factionLoyaltyNpc->npc_id === $quest->npc_id;
+        })->first();
+
+        if (is_null($assistingNpc)) {
+            return false;
+        }
+
+        return $assistingNpc->current_level >= $quest->required_fame_level;
+    }
+
     protected function fetchRequiredItem(Quest $quest, Character $character): ?InventorySlot {
         return $character->inventory->slots->filter(function ($slot) use ($quest) {
             return $slot->item_id === $quest->item_id;

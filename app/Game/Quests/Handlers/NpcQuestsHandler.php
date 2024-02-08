@@ -8,6 +8,7 @@ use App\Flare\Models\Npc;
 use App\Flare\Models\Quest;
 use App\Game\Messages\Builders\NpcServerMessageBuilder;
 use App\Game\Quests\Traits\QuestDetails;
+use Exception;
 
 class NpcQuestsHandler {
 
@@ -69,9 +70,21 @@ class NpcQuestsHandler {
             }
         }
 
+        if ($this->questHasFactionLoyaltyRequirement($quest)) {
+            if ($this->hasMetFactionLoyaltyRequirements($quest, $character)) {
+
+                $giveRewards = true;
+            }
+        }
+
         if ($giveRewards) {
             $this->npcQuestRewardHandler->processReward($quest, $npc, $character);
+
+            return;
         }
+
+        throw new Exception($quest->npc->real_name . ' thinks The Creator forgot to tell them how to handle this quest!');
+
     }
 
     public function payCurrencies(Character $character, Quest $quest) {

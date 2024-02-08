@@ -133,6 +133,11 @@ class GlobalEventParticipationHandler {
             ->whereNull('item_prefix_id')
             ->whereNull('item_suffix_id')
             ->whereDoesntHave('appliedHolyStacks')
+            ->whereNotIn('type', [
+                'artifact',
+                'trinket',
+                'quest'
+            ])
             ->inRandomOrder()
             ->first();
 
