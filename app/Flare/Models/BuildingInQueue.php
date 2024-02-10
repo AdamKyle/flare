@@ -2,6 +2,7 @@
 
 namespace App\Flare\Models;
 
+use App\Game\Kingdoms\Values\BuildingQueueType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Database\Factories\BuildingInQueueFactory;
@@ -26,6 +27,7 @@ class BuildingInQueue extends Model {
         'paid_amount',
         'completed_at',
         'started_at',
+        'type'
     ];
 
     /**
@@ -39,6 +41,14 @@ class BuildingInQueue extends Model {
         'completed_at'   => 'datetime',
         'started_at'     => 'datetime',
         'paid_with_gold' => 'boolean',
+        'type'           => 'integer'
+    ];
+
+    /**
+     * @var string[]
+     */
+    protected $appends = [
+        'type_name',
     ];
 
     public function character() {
@@ -51,6 +61,14 @@ class BuildingInQueue extends Model {
 
     public function kingdom() {
         return $this->belongsTo(Kingdom::class);
+    }
+
+    public function getTypeNameAttribute() {
+        return (new BuildingQueueType($this->type))->getNameOfType();
+    }
+
+    public function getType(): BuildingQueueType {
+        return (new BuildingQueueType($this->type));
     }
 
     protected static function newFactory() {

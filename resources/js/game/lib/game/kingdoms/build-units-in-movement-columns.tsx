@@ -1,4 +1,4 @@
-import UnitMovementDetails from "./unit-movement-details";
+import UnitMovementDetails from "../../../sections/kingdoms/queues/deffinitions/unit-movement-details";
 import React, { Fragment } from "react";
 import TimerProgressBar from "../../../components/ui/progress-bars/timer-progress-bar";
 

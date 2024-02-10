@@ -7,6 +7,7 @@ use App\Flare\Models\Kingdom;
 use App\Flare\Models\KingdomLog;
 use App\Flare\Transformers\KingdomAttackLogsTransformer;
 use App\Game\Kingdoms\Events\UpdateKingdomLogs;
+use App\Game\Kingdoms\Events\UpdateKingdomQueues;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
 use League\Fractal\Resource\Item;
@@ -51,11 +52,13 @@ class UpdateKingdom {
     public function updateKingdom(Kingdom $kingdom): void {
         $character = $kingdom->character;
 
-        $kingdom = new Item($kingdom, $this->kingdomTransformer);
+        $kingdomData = new Item($kingdom, $this->kingdomTransformer);
 
-        $kingdom = $this->manager->createData($kingdom)->toArray();
+        $kingdomData = $this->manager->createData($kingdomData)->toArray();
 
-        event(new UpdateKingdomDetails($character->user, $kingdom));
+        event(new UpdateKingdomDetails($character->user, $kingdomData));
+
+        event(new UpdateKingdomQueues($kingdom));
     }
 
     /**

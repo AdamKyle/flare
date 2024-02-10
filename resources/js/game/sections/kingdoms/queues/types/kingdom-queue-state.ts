@@ -1,9 +1,10 @@
+import UnitMovementDetails from "../deffinitions/unit-movement-details";
 
 export interface BuildingQueue {
     name: string,
     id: number,
-    from_level?: number;
-    to_level?: number;
+    from_level: number | null;
+    to_level: number | null;
     type: string;
     time_remaining: number;
 }
@@ -12,22 +13,6 @@ export interface UnitQueue {
     name: string,
     id: number,
     recruit_amount: number;
-    time_remaining: number;
-}
-
-interface KingdomMovementDetails {
-    name: string,
-    x: number,
-    y: number,
-    plane: string
-}
-
-export interface UnitMovementQueue {
-    name: string,
-    id: number,
-    moving_from_kingdom: KingdomMovementDetails,
-    moving_to_kingdom: KingdomMovementDetails,
-    reason: string,
     time_remaining: number;
 }
 
@@ -42,12 +27,12 @@ export interface BuildingExpansionQueue {
 export interface queues {
     building_queues: BuildingQueue[]|[],
     unit_recruitment_queues: UnitQueue[]|[],
-    unit_movement_queues: UnitMovementQueue[]|[],
+    unit_movement_queues: UnitMovementDetails[]|[],
     building_expansion_queues: BuildingExpansionQueue[]|[],
 }
 
 export default interface KingdomQueueState {
-    loading: true,
+    loading: boolean,
     error_message: null,
     queues: queues | null,
 }

@@ -12,6 +12,7 @@ use App\Flare\Models\GameUnit;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\UnitInQueue;
 use App\Flare\Transformers\KingdomTransformer;
+use App\Game\Kingdoms\Events\UpdateKingdomQueues;
 use App\Game\Kingdoms\Handlers\UpdateKingdomHandler;
 use App\Game\Kingdoms\Jobs\RecruitUnits;
 use App\Game\Kingdoms\Values\KingdomMaxValue;
@@ -92,6 +93,8 @@ class UnitService {
             'completed_at' => $timeTillFinished,
             'started_at'   => now(),
         ]);
+
+        event(new UpdateKingdomQueues($kingdom));
 
         if ($totalTime > 900) {
             RecruitUnits::dispatch($gameUnit, $kingdom, $amount, $queue->id)->delay(now()->addMinutes(15));

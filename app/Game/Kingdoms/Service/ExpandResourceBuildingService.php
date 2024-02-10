@@ -24,7 +24,12 @@ class ExpandResourceBuildingService {
         $this->updateKingdom = $updateKingdom;
     }
 
-    public function fetchExpansionDetails(KingdomBuilding $building): array {
+    public function fetchExpansionDetails(KingdomBuilding $building, Character $character): array {
+
+        if ($character->id !== $building->kingdom->character_id) {
+            return $this->errorResult('You do not own that.');
+        }
+
         $buildingExpansion = $building->buildingExpansion;
 
         if (is_null($buildingExpansion)) {
@@ -133,6 +138,7 @@ class ExpandResourceBuildingService {
     }
 
     public function cancelExpansion(KingdomBuilding $building): array {
+
         $buildingExpansion = $building->buildingExpansion;
         $queue = BuildingExpansionQueue::where('building');
 

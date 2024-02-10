@@ -10,5 +10,10 @@ Broadcast::channel('update-building-expansion-details-{userId}', function ($user
     return $user->id === (int) $userId;
 });
 
+// When a kingdoms queue updates
+Broadcast::channel('refresh-kingdom-queues-{userId}', function($user, $userId) {
+    return $user->id === (int) $userId;
+});
+
 
 

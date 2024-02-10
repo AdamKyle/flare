@@ -3,6 +3,8 @@
 namespace App\Game\Kingdoms\Service;
 
 
+use App\Game\Kingdoms\Events\UpdateKingdomQueues;
+use App\Game\Kingdoms\Values\BuildingQueueType;
 use Carbon\Carbon;
 use App\Flare\Models\BuildingInQueue;
 use App\Flare\Models\KingdomBuilding;
@@ -56,8 +58,11 @@ class KingdomBuildingService {
             'building_id'  => $building->id,
             'to_level'     => $building->level + 1,
             'completed_at' => $timeToComplete,
+            'type'         => BuildingQueueType::UPGRADE,
             'started_at'   => now(),
         ]);
+
+        event(new UpdateKingdomQueues($building->kingdom));
 
         UpgradeBuilding::dispatch($building, $character->user, $queue->id)->delay($timeToComplete);
     }
@@ -83,6 +88,7 @@ class KingdomBuildingService {
             'building_id'  => $building->id,
             'to_level'     => $building->level,
             'completed_at' => $timeToComplete,
+            'type'         => BuildingQueueType::REPAIR,
             'started_at'   => now(),
         ]);
 

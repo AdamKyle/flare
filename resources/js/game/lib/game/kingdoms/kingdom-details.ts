@@ -3,7 +3,7 @@ import DataTableBaseData from "../../ui/types/tables/data-table-base-data";
 import UnitDetails from "./unit-details";
 import BuildingInQueueDetails from "./building-in-queue-details";
 import CurrentUnitDetails from "./current-unit-details";
-import UnitMovementDetails from "./unit-movement-details";
+import UnitMovementDetails from "../../../sections/kingdoms/queues/deffinitions/unit-movement-details";
 
 export default interface KingdomDetails extends DataTableBaseData {
     building_cost_reduction: number;
@@ -49,6 +49,8 @@ export default interface KingdomDetails extends DataTableBaseData {
     defence_bonus: number;
 
     game_map_id: number;
+
+    game_map_name: string;
 
     gold_bars: number;
 

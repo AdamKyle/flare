@@ -5,6 +5,7 @@ namespace App\Game\Kingdoms\Service;
 use App\Flare\Models\KingdomUnit;
 use App\Flare\Models\UnitMovementQueue;
 use App\Game\Core\Traits\ResponseBuilder;
+use App\Game\Kingdoms\Events\UpdateKingdomQueues;
 use App\Game\Kingdoms\Jobs\MoveUnits;
 use App\Game\Kingdoms\Validators\MoveUnitsValidator;
 use App\Game\Kingdoms\Values\KingdomMaxValue;
@@ -64,9 +65,7 @@ class UnitMovementService {
     public function getKingdomUnitTravelData(Character $character, Kingdom $kingdom): array {
         $kingdomData = [];
 
-        $gameMapId = $character->map->game_map_id;
-
-        $playerKingdoms = Kingdom::where('game_map_id', $gameMapId)
+        $playerKingdoms = Kingdom::where('game_map_id', $kingdom->game_map_id)
                                  ->where('character_id', $character->id)
                                  ->where('id', '!=', $kingdom->id)
                                  ->whereNull('protected_until')
@@ -118,16 +117,8 @@ class UnitMovementService {
      */
     public function moveUnitsToKingdom(Character $character, Kingdom $kingdom, array $params): array {
 
-        if (!$this->moveUnitsValidator->setUnitsToMove($params['units_to_move'])->isValid($character)) {
+        if (!$this->moveUnitsValidator->setUnitsToMove($params['units_to_move'])->isValid($character, $kingdom)) {
             return $this->errorResult('Invalid input.');
-        }
-
-        if ($character->map->game_map_id !== $kingdom->game_map_id) {
-            return $this->errorResult('cannot move across plabe.');
-        }
-
-        if ($kingdom->character_id !== $character->id) {
-            return $this->errorResult('Not allowed to do that');
         }
 
         $unitsToMove = $this->buildUnitsToMoveBasedOnKingdom($kingdom, $params['units_to_move']);
@@ -175,6 +166,9 @@ class UnitMovementService {
             'is_returning'     => false,
             'is_moving'        => false,
         ]);
+
+        event(new UpdateKingdomQueues($toKingdom));
+        event(new UpdateKingdomQueues($fromKingdom));
 
         MoveUnits::dispatch($queue->id)->delay($timeLeft);
 
@@ -284,6 +278,9 @@ class UnitMovementService {
             'is_returning'      => false,
             'is_moving'         => true,
         ]);
+
+        event(new UpdateKingdomQueues($kingdom));
+        event(new UpdateKingdomQueues($fromKingdom));
 
         MoveUnits::dispatch($unitMovementQueue->id)->delay($minutes);
     }

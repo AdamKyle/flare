@@ -73,7 +73,7 @@ class UnitMovementTransformer extends TransformerAbstract {
         }
 
         if ($unitMovementQueue->is_moving) {
-            return 'Currently moving';
+            return 'Called for Reinforcement';
         }
 
         return 'ERROR: unknown.';

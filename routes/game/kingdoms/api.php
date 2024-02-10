@@ -83,4 +83,10 @@ Route::middleware(['auth', 'is.character.who.they.say.they.are'])->group(functio
     });
 });
 
+Route::middleware([
+    'auth', 'is.character.who.they.say.they.are', 'character.owns.kingdom'
+])->group(function() {
+    Route::get('/kingdom/queues/{kingdom}/{character}', ['as' => 'kingdom.queues', 'uses' => 'Api\KingdomQueueController@fetchQueuesForKingdom']);
+});
+
 

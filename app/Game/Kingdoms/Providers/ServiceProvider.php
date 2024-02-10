@@ -3,6 +3,7 @@
 namespace App\Game\Kingdoms\Providers;
 
 
+use App\Flare\Transformers\UnitMovementTransformer;
 use App\Game\Kingdoms\Handlers\AttackLogHandler;
 use App\Game\Kingdoms\Handlers\DefenderArcherHandler;
 use App\Game\Kingdoms\Handlers\DefenderSiegeHandler;
@@ -12,6 +13,7 @@ use App\Game\Kingdoms\Handlers\KingdomUnitHandler;
 use App\Game\Kingdoms\Handlers\ReturnSurvivingUnitHandler;
 use App\Game\Kingdoms\Handlers\SettlerHandler;
 use App\Game\Kingdoms\Service\ExpandResourceBuildingService;
+use App\Game\Kingdoms\Service\KingdomQueueService;
 use App\Game\Kingdoms\Service\SteelSmeltingService;
 use League\Fractal\Manager;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
@@ -221,6 +223,13 @@ class ServiceProvider extends ApplicationServiceProvider {
 
         $this->app->bind(ExpandResourceBuildingService::class, function($app) {
             return new ExpandResourceBuildingService($app->make(UpdateKingdom::class));
+        });
+
+        $this->app->bind(KingdomQueueService::class, function($app) {
+            return new KingdomQueueService(
+                $app->make(Manager::class),
+                $app->make(UnitMovementTransformer::class)
+            );
         });
 
         $this->commands([

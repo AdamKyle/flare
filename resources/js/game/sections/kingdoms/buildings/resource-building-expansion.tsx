@@ -65,7 +65,6 @@ export default class ResourceBuildingExpansion extends React.Component<ResourceB
         this.updateExpansionDetails.listen(
             "Game.Kingdoms.Events.UpdateBuildingExpansion",
             (event: any) => {
-                console.log(event);
                 this.setState({
                     expansion_details: event.kingdomBuildingExpansion,
                     time_remaining_for_expansion: event.timeLeft

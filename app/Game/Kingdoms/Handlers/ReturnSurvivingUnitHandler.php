@@ -4,6 +4,7 @@ namespace App\Game\Kingdoms\Handlers;
 
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\UnitMovementQueue;
+use App\Game\Kingdoms\Events\UpdateKingdomQueues;
 use App\Game\Kingdoms\Jobs\MoveUnits;
 use App\Game\Kingdoms\Service\UnitMovementService;
 
@@ -73,6 +74,9 @@ class ReturnSurvivingUnitHandler {
             'is_returning'      => true,
             'is_moving'         => false,
         ]);
+
+        event(new UpdateKingdomQueues($defendingKingdom));
+        event(new UpdateKingdomQueues($attackingKingdom));
 
         MoveUnits::dispatch($unitMovementQueue->id)->delay($minutes);
     }

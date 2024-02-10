@@ -124,6 +124,7 @@ export default class Kingdom extends React.Component<KingdomProps, any> {
                                     manage_view_building={this.manageViewBuilding.bind(this)}
                                     manage_view_unit={this.manageViewUnit.bind(this)}
                                     view_port={this.props.view_port}
+                                    user_id={this.props.user_id}
                                 />
                         }
 

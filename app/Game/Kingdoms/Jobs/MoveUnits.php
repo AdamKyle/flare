@@ -4,6 +4,7 @@ namespace App\Game\Kingdoms\Jobs;
 
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\KingdomUnit;
+use App\Game\Kingdoms\Events\UpdateKingdomQueues;
 use App\Game\Kingdoms\Events\UpdateUnitMovementLogs;
 use App\Game\Kingdoms\Handlers\AttackKingdomWithUnitsHandler;
 use App\Game\Kingdoms\Service\UpdateKingdom;
@@ -78,6 +79,9 @@ class MoveUnits implements ShouldQueue {
 
             $unitMovement->delete();
 
+            event(new UpdateKingdomQueues($kingdom));
+            event(new UpdateKingdomQueues($attackingKingdom));
+
             if (!is_null($kingdom->character_id)) {
                 $updateKingdom->updateKingdomAllKingdoms($kingdom->character);
             }
@@ -85,7 +89,6 @@ class MoveUnits implements ShouldQueue {
             $updateKingdom->updateKingdomAllKingdoms($attackingKingdom->character);
 
             $attackKingdomWithUnitsHandler->attackKingdomWithUnits($kingdom, $attackingKingdom, $unitMovement->units_moving);
-
         }
     }
 
@@ -121,6 +124,9 @@ class MoveUnits implements ShouldQueue {
         $character = Character::find($unitMovement->character_id);
 
         $updateKingdom->updateKingdomAllKingdoms($character);
+
+        event(new UpdateKingdomQueues($toKingdom));
+        event(new UpdateKingdomQueues($fromKingdom));
     }
 
     /**
@@ -235,6 +241,9 @@ class MoveUnits implements ShouldQueue {
             $attributes['from_kingdom_id'] = $attributes['to_kingdom_id'];
 
             $unitMovementQueue = UnitMovementQueue::create($attributes);
+
+            event(new UpdateKingdomQueues($toKingdom));
+            event(new UpdateKingdomQueues($fromKingdom));
 
             $minutes = (new Carbon($attributes['completed_at']))->diffInMinutes($attributes['started_at']);
 

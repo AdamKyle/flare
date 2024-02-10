@@ -10,6 +10,8 @@ import LoadingProgressBar from "../../../components/ui/progress-bars/loading-pro
 import MoveUnits from "../../../lib/game/kingdoms/move-units/move-units";
 import UnitMovement from "./partials/unit-movement";
 import SelectedUnitsToCallType from "../../../lib/game/kingdoms/types/selected-units-to-call-type";
+import SuccessAlert from "../../../components/ui/alerts/simple-alerts/success-alert";
+import DangerAlert from "../../../components/ui/alerts/simple-alerts/danger-alert";
 
 
 export default class CallForReinforcements extends React.Component<CallForReinforcementsProps, CallForReinforcementsState> {
@@ -23,8 +25,8 @@ export default class CallForReinforcements extends React.Component<CallForReinfo
             loading: true,
             processing_unit_request: false,
             kingdoms: [],
-            error_message: '',
-            success_message: '',
+            error_message: null,
+            success_message: null,
             selected_kingdoms: [],
             selected_units: [],
         }
@@ -55,13 +57,16 @@ export default class CallForReinforcements extends React.Component<CallForReinfo
                 .doAjaxCall('post', (result: AxiosResponse) => {
                     this.setState({
                         processing_unit_request: false,
-                    }, () => {
-                        this.props.handle_close();
+                        success_message: result.data.message,
                     })
                 }, (error: AxiosError) => {
                     this.setState({processing_unit_request: false});
 
-                    console.error(error);
+                    if (typeof error.response != 'undefined') {
+                        this.setState({
+                            error_message: error.response.data.message,
+                        });
+                    }
                 });
         });
 
@@ -116,6 +121,22 @@ export default class CallForReinforcements extends React.Component<CallForReinfo
                         <InfoAlert>
                             You have no units in other kingdoms to move units from or you have no other kingdoms.
                         </InfoAlert>
+                }
+
+                {
+                    this.state.success_message !== null ?
+                        <SuccessAlert additional_css={'my-4'}>
+                            {this.state.success_message}
+                        </SuccessAlert>
+                    : null
+                }
+
+                {
+                    this.state.error_message !== null ?
+                        <DangerAlert additional_css={'my-4'}>
+                            {this.state.error_message}
+                        </DangerAlert>
+                    : null
                 }
             </Dialogue>
         )

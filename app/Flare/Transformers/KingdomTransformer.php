@@ -33,6 +33,7 @@ class KingdomTransformer extends TransformerAbstract {
             'id'                        => $kingdom->id,
             'character_id'              => $kingdom->character_id,
             'game_map_id'               => $kingdom->game_map_id,
+            'game_map_name'             => $kingdom->gameMap->name,
             'name'                      => $kingdom->name,
             'color'                     => $kingdom->color,
             'max_stone'                 => $kingdom->max_stone,

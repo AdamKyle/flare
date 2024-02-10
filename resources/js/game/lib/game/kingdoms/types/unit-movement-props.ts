@@ -1,4 +1,4 @@
-import UnitMovementDetails from "../unit-movement-details";
+import UnitMovementDetails from "../../../../sections/kingdoms/queues/deffinitions/unit-movement-details";
 
 export default interface UnitMovementProps {
 

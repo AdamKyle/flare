@@ -17,7 +17,7 @@ class ResourceBuildingExpansionController extends Controller {
     }
 
     public function getBuildingExpansionDetails(KingdomBuilding $kingdomBuilding, Character $character) {
-        $response = $this->expandResourceBuildingService->fetchExpansionDetails($kingdomBuilding);
+        $response = $this->expandResourceBuildingService->fetchExpansionDetails($kingdomBuilding, $character);
 
         $status = $response['status'];
         unset($response['status']);

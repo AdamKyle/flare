@@ -9,11 +9,12 @@ export default interface CallForReinforcementsState {
 
     kingdoms: KingdomReinforcementType[]|[];
 
-    error_message: string;
+    error_message: string | null;
 
-    success_message: string;
+    success_message: string | null;
 
     selected_kingdoms: number[];
 
     selected_units: SelectedUnitsToCallType[]|[];
+
 }

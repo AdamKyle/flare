@@ -6,6 +6,7 @@ use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\UnitMovementQueue;
 use App\Game\Core\Traits\ResponseBuilder;
+use App\Game\Kingdoms\Events\UpdateKingdomQueues;
 use App\Game\Kingdoms\Jobs\MoveUnits;
 use App\Game\Kingdoms\Validators\MoveUnitsValidator;
 use App\Game\Messages\Events\GlobalMessageEvent;
@@ -137,6 +138,9 @@ class KingdomAttackService {
             'is_returning'      => false,
             'is_moving'         => false,
         ]);
+
+        event(new UpdateKingdomQueues($kingdom));
+        event(new UpdateKingdomQueues($fromKingdom));
 
         MoveUnits::dispatch($unitMovementQueue->id)->delay($minutes);
 

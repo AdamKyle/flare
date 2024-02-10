@@ -4,7 +4,6 @@ import BuildingsTable from "../buildings/buildings-table";
 import UnitsTable from "../units/units-table";
 import BasicCard from "../../../components/ui/cards/basic-card";
 import React from "react";
-import UnitMovement from "../unit-movement";
 import KingdomQueues from "../queues/kingdom-queues";
 
 export default class KingdomTabs extends React.Component<any, any> {
@@ -48,7 +47,7 @@ export default class KingdomTabs extends React.Component<any, any> {
                         />
                     </TabPanel>
                     <TabPanel key={'current-queue'}>
-                        <KingdomQueues kingdom_id={this.props.kingdom.id} character_id={this.props.kingdom.character_id} />
+                        <KingdomQueues user_id={this.props.user_id} kingdom_id={this.props.kingdom.id} character_id={this.props.kingdom.character_id} />
                     </TabPanel>
                 </Tabs>
             </BasicCard>

@@ -2,7 +2,7 @@ import KingdomDetails from "./kingdom-details";
 import React from "react";
 import {formatNumber} from "../format-number";
 import clsx from "clsx";
-import UnitMovementDetails from "./unit-movement-details";
+import UnitMovementDetails from "../../../sections/kingdoms/queues/deffinitions/unit-movement-details";
 
 export const buildKingdomsColumns = (onClick: (kingdom: KingdomDetails) => void) => {
     return [
@@ -12,6 +12,10 @@ export const buildKingdomsColumns = (onClick: (kingdom: KingdomDetails) => void)
             cell: (row: any) => <button className='text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-500' onClick={() => onClick(row)}>
                 {iconsToShow(row)} {row.name} {row.is_protected ? ' (Protected) ' : ''}
             </button>
+        },
+        {
+            name: 'Map',
+            selector: (row: KingdomDetails) => row.game_map_name
         },
         {
             name: 'X Position',
@@ -57,8 +61,9 @@ const iconsToShow = (kingdom: KingdomDetails) => {
     const anyMoving = kingdom.unitsInMovement.filter((unitMovement: UnitMovementDetails) => {
         const anyMoving = unitMovement.is_returning || unitMovement.is_moving || unitMovement.is_recalled || unitMovement.is_attacking;
         const fromThisKingdom = kingdom.name === unitMovement.from_kingdom_name;
+        const toThisKingdom = kingdom.name === unitMovement.to_kingdom_name;
 
-        return anyMoving && fromThisKingdom;
+        return anyMoving && (fromThisKingdom || toThisKingdom);
     });
 
     if (anyMoving.length > 0) {
@@ -74,10 +79,9 @@ const iconsToShow = (kingdom: KingdomDetails) => {
             );
         } else {
             icons.push(
-                <i className='ra ra-trail text-green-500 dark:text-green-400'></i>
+                <i className='ra ra-heavy-shield text-blue-500 dark:text-blue-400'></i>
             );
         }
-
     }
 
     return icons;
