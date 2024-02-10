@@ -5,6 +5,7 @@ import UnitsTable from "../units/units-table";
 import BasicCard from "../../../components/ui/cards/basic-card";
 import React from "react";
 import UnitMovement from "../unit-movement";
+import KingdomQueues from "../queues/kingdom-queues";
 
 export default class KingdomTabs extends React.Component<any, any> {
 
@@ -20,15 +21,15 @@ export default class KingdomTabs extends React.Component<any, any> {
             key: 'units',
             name: 'Units',
         },{
-            name: 'Unit Movement',
-            key: 'unit-movement',
+            name: 'Queues',
+            key: 'current-queue'
         }]
     }
 
     render() {
         return (
             <BasicCard>
-                <Tabs tabs={this.tabs}>
+                <Tabs tabs={this.tabs} full_width={true}>
                     <TabPanel key={'buildings'}>
                         <BuildingsTable buildings={this.props.kingdom.buildings}
                                         dark_tables={this.props.dark_tables}
@@ -46,8 +47,8 @@ export default class KingdomTabs extends React.Component<any, any> {
                                     current_units={this.props.kingdom.current_units}
                         />
                     </TabPanel>
-                    <TabPanel key={'unit-movement'}>
-                        <UnitMovement units_in_movement={this.props.kingdom.unitsInMovement} dark_tables={this.props.dark_tables} character_id={this.props.kingdom.character_id} />
+                    <TabPanel key={'current-queue'}>
+                        <KingdomQueues kingdom_id={this.props.kingdom.id} character_id={this.props.kingdom.character_id} />
                     </TabPanel>
                 </Tabs>
             </BasicCard>
