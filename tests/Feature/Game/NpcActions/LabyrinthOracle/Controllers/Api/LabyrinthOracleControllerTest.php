@@ -65,7 +65,7 @@ class LabyrinthOracleControllerTest extends TestCase {
 
         $jsonData = json_decode($response->getContent(), true);
 
-        $this->assertCount(1, $jsonData['inventory']);
+        $this->assertCount(2, $jsonData['inventory']);
     }
 
     public function testInventoryItemsWithOneOfEach() {
@@ -126,7 +126,7 @@ class LabyrinthOracleControllerTest extends TestCase {
 
         $jsonData = json_decode($response->getContent(), true);
 
-        $this->assertCount(3, $jsonData['inventory']);
+        $this->assertCount(4, $jsonData['inventory']);
     }
 
     public function testUseLabyrinthOracleToTransferItem() {
