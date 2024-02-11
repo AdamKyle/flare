@@ -95,6 +95,10 @@ export default class ActionsManager {
             if (state.crafting_type === 'workbench' && !props.character.can_use_work_bench) {
                 this.component.setState({ crafting_type: null });
             }
+
+            if (state.crafting_type === 'labyrinth-oracle' && !props.character?.can_access_labyrinth_oracle) {
+                this.component.setState({ crafting_type: null });
+            }
         }
     }
 
@@ -243,6 +247,22 @@ export default class ActionsManager {
                     name: 'Seer Camp',
                     icon_class: 'fas fa-campground',
                     on_click: () => handler('seer-camp'),
+                })
+            }
+        }
+
+        if (this.component.props.character.can_access_labyrinth_oracle) {
+            if (typeof options[3] !== 'undefined') {
+                options.splice(4, 0, {
+                    name: 'Labyrinth Oracle',
+                    icon_class: 'ra ra-crystal-ball',
+                    on_click: () => handler('labyrinth-oracle'),
+                })
+            } else {
+                options.splice(4, 0, {
+                    name: 'Labyrinth Oracle',
+                    icon_class: 'ra ra-crystal-ball',
+                    on_click: () => handler('labyrinth-oracle'),
                 })
             }
         }

@@ -1,6 +1,6 @@
 import React from "react";
 import { formatNumber } from "../../../lib/game/format-number";
-import CraftingXPProps from "./types/crsfting-xp-props";
+import CraftingXPProps from "./types/crafting-xp-props";
 
 export default class CraftingXp extends React.Component<CraftingXPProps, any> {
 

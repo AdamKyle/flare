@@ -5,7 +5,6 @@ namespace App\Game\NpcActions\LabyrinthOracle\Services;
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
 use App\Game\Messages\Events\ServerMessageEvent;
-use Exception;
 use Facades\App\Game\Core\Handlers\DuplicateItemHandler;
 use App\Game\Core\Traits\ResponseBuilder;
 
@@ -24,6 +23,18 @@ class ItemTransferService {
     private Item $itemToTransferToDuplicated;
 
     /**
+     * The Cost of the transfer.
+     *
+     * @var array|int[]
+     */
+    private array $currencyCosts = [
+        'gold' => 200_000_000_000,
+        'shards' => 500_000,
+        'gold_dust' => 250_000,
+        'copper_coins' => 25_000,
+    ];
+
+    /**
      * Transfer the enhancements from one item to another.
      *
      * @param Character $character
@@ -32,9 +43,9 @@ class ItemTransferService {
      * @param int $itemIdToTransferTo
      * @return array
      */
-    public function transferItemEnhancements(Character $character, array $currencyCosts, int $itemIdToTransferFrom, int $itemIdToTransferTo): array {
+    public function transferItemEnhancements(Character $character, int $itemIdToTransferFrom, int $itemIdToTransferTo): array {
 
-        if (!$this->canAfford($character, $currencyCosts)) {
+        if (!$this->canAfford($character, $this->currencyCosts)) {
             return $this->errorResult('You cannot afford to do this.');
         }
 
@@ -82,17 +93,14 @@ class ItemTransferService {
 
         return $this->successResult([
             'message' => 'Transferred attributes (Enchantments, Holy Oils and Gems) from: ' . $this->itemToTransferFromDuplicated->affix_name . ' To: ' . $this->itemToTransferToDuplicated->affix_name,
-            'inventory' => $character->refresh()->inventory->slots->filter(function($slot) {
-                $itemIsValid = $slot->item->type !== 'artifact' && $slot->item->type !== 'trinket' && $slot->item->type !== 'quest';
-
-                $hasSuffixOrPrefix = !is_null($slot->item->item_suffix_id) || !is_null($slot->item->item_prefix_id);
-
-                $hasHolyStacks = $slot->item->holy_stacks_applied > 0;
-
-                $hasSocketCount = $slot->item->socket_count > 0;
-
-                return $itemIsValid && ($hasSuffixOrPrefix || $hasHolyStacks || $hasSocketCount);
-            })->pluck('item.affix_name', 'item.id')->toArray(),
+            'inventory' => array_values($character->refresh()->inventory->slots->filter(function($slot) {
+                return $slot->item->type !== 'artifact' && $slot->item->type !== 'trinket' && $slot->item->type !== 'quest';
+            })->map(function($slot) {
+                return [
+                    'affix_name' => $slot->item->affix_name,
+                    'id' => $slot->item_id,
+                ];
+            })->toArray()),
         ]);
     }
 

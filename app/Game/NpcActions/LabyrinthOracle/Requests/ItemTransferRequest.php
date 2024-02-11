@@ -26,10 +26,6 @@ class ItemTransferRequest extends FormRequest
         return [
             'item_id_from' => 'required|integer',
             'item_id_to' => 'required|integer',
-            'currency_costs' => 'required|array',
-            'currency_costs.gold' => 'required|integer',
-            'currency_costs.gold_dust' => 'required|integer',
-            'currency_costs.shards' => 'required|integer',
         ];
     }
 
@@ -37,10 +33,6 @@ class ItemTransferRequest extends FormRequest
         return [
             'item_id_from.required' => 'Missing item to transfer from.',
             'item_id_to.required' => 'Missing item to transfer to.',
-            'currency_costs.required' => 'Missing the currency costs.',
-            'currency_costs.gold.required' => 'Must include gold as a currency cost.',
-            'currency_costs.gold_dust.required' => 'Must include Gold Dust as a currency cost.',
-            'currency_costs.shards.required' => 'Must include Shards as a currency cost.',
         ];
     }
 }

@@ -89,7 +89,7 @@ class CraftingService {
 
         $craftingType = $params['crafting_type'];
 
-        if ($craftingType == 'hammer' || $craftingType == 'bow' || $craftingType == 'stave') {
+        if ($craftingType == 'hammer' || $craftingType == 'bow' || $craftingType == 'stave' || $craftingType === 'gun') {
             $craftingType = 'weapon';
         }
 
@@ -106,7 +106,7 @@ class CraftingService {
      * @return array
      */
     public function getCraftingXP(Character $character, string $type): array {
-        if ($type == 'hammer' || $type == 'bow' || $type == 'stave') {
+        if ($type == 'hammer' || $type == 'bow' || $type == 'stave' || $type === 'gun') {
             $type = 'weapon';
         }
 

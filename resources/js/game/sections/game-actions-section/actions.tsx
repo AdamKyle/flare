@@ -169,7 +169,7 @@ export default class Actions extends React.Component<
             (event: any) => {
                 let craftingType = this.state.crafting_type;
 
-                if (craftingType === "workbench" || craftingType === "queen") {
+                if (craftingType === "workbench" || craftingType === "queen" || craftingType === 'labyrinth-oracle') {
                     craftingType = null;
                 }
 

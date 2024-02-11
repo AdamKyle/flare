@@ -194,6 +194,7 @@ class UnitService {
         $current = Carbon::parse(now())->timestamp;
 
         $this->completed      = (($current - $start) / ($end - $start));
+
         $this->totalResources = 1 - $this->completed;
     }
 
