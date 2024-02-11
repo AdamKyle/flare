@@ -131,6 +131,10 @@ class UpdateCharactersForClassRanks extends Command
             return 5;
         }
 
+        if (($classRank->gameClass->type()->isGunslinger()) && (new WeaponMasteryValue($type))->isGun()) {
+            return 5;
+        }
+
         return 0;
     }
 }

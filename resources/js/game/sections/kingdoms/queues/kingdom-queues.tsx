@@ -16,6 +16,8 @@ import CancellationAjax from "./ajax/cancellation-ajax";
 import {CancellationType} from "./enums/cancellation-type";
 import {QueueTypes} from "./enums/queue-types";
 import SuccessAlert from "../../../components/ui/alerts/simple-alerts/success-alert";
+import {unitMovementReasonIcon} from "../helpers/unit-movement-reason-icon";
+import KingdomDetails from "../../../lib/game/kingdoms/kingdom-details";
 
 export default class KingdomQueues extends React.Component<KingdomQueueProps, KingdomQueueState> {
 
@@ -172,24 +174,44 @@ export default class KingdomQueues extends React.Component<KingdomQueueProps, Ki
         }
 
         return this.state.queues.unit_movement_queues.map((unitMovementQueue: UnitMovementDetails, index: number) => {
+
+            let canCancelAttack = true;
+
+            if (unitMovementQueue.reason === 'Currently attacking') {
+                canCancelAttack = this.props.kingdoms.filter((kingdom: KingdomDetails) => {
+                    return kingdom.name === unitMovementQueue.from_kingdom_name;
+                }).length > 0;
+            }
+
+            let canCancelRecall = true;
+
             return (
                 <BasicCard additionalClasses={'my-2'}>
                     <div className='bold my-2'>
                         Units Are on the move!
                     </div>
-                    <p className='my-2'>
-                        <strong>Why?</strong> {unitMovementQueue.reason}
-                    </p>
+                    <dl className={'my-4'}>
+                        <dt>Why</dt>
+                        <dd>{unitMovementReasonIcon(unitMovementQueue)} {unitMovementQueue.reason}</dd>
+                        <dt>From:</dt>
+                        <dd>{unitMovementQueue.from_kingdom_name} (X/Y: {unitMovementQueue.from_x}/{unitMovementQueue.from_y})</dd>
+                        <dt>To:</dt>
+                        <dd>{unitMovementQueue.to_kingdom_name} (X/Y: {unitMovementQueue.moving_to_y}/{unitMovementQueue.moving_to_y})</dd>
+                    </dl>
+
                     <TimerProgressBar time_out_label={
                         'Units are in movement'
                     } time_remaining={unitMovementQueue.time_left} />
+
                     <DangerOutlineButton button_label={'Cancel'} on_click={() => {
                         this.cancelQueue(
                             CancellationType.UNIT_MOVEMENT,
                             index,
                             QueueTypes.UNIT_MOVEMENT_QUEUES,
                         )
-                    }} additional_css={'my-2'} />
+                    }} additional_css={'my-2'} disabled={
+                        (!canCancelAttack || !canCancelRecall ) && unitMovementQueue.reason === 'Returning from attack' || unitMovementQueue.reason === 'Recalled units'
+                    }/>
                 </BasicCard>
             )
         });

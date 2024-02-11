@@ -2,16 +2,12 @@
 
 namespace App\Game\Battle\Listeners;
 
-use App\Flare\Builders\Character\ClassDetails\ClassBonuses;
+
 use App\Flare\Builders\CharacterInformation\CharacterStatBuilder;
-use App\Flare\Models\Character;
-use App\Flare\Models\GameSkill;
-use App\Flare\Models\Skill;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Battle\Events\AttackTimeOutEvent;
 use App\Game\Core\Events\ShowTimeOutEvent;
 use App\Game\Battle\Jobs\AttackTimeOutJob;
-use App\Game\Skills\Values\SkillTypeValue;
 use Exception;
 
 class AttackTimeOutListener {

@@ -167,8 +167,8 @@ class UnitMovementService {
             'is_moving'        => false,
         ]);
 
-        event(new UpdateKingdomQueues($toKingdom));
-        event(new UpdateKingdomQueues($fromKingdom));
+        event(new UpdateKingdomQueues(Kingdom::find($toKingdom)));
+        event(new UpdateKingdomQueues(Kingdom::find($fromKingdom)));
 
         MoveUnits::dispatch($queue->id)->delay($timeLeft);
 

@@ -28,6 +28,7 @@ class ValidEquipPositionsValue {
             case 'weapon':
             case 'stave':
             case 'bow':
+            case 'gun':
             case 'hammer':
             case 'shield':
                 $positions = ['left-hand', 'right-hand'];

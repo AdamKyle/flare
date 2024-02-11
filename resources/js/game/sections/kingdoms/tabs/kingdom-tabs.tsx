@@ -47,7 +47,12 @@ export default class KingdomTabs extends React.Component<any, any> {
                         />
                     </TabPanel>
                     <TabPanel key={'current-queue'}>
-                        <KingdomQueues user_id={this.props.user_id} kingdom_id={this.props.kingdom.id} character_id={this.props.kingdom.character_id} />
+                        <KingdomQueues
+                            user_id={this.props.user_id}
+                            kingdom_id={this.props.kingdom.id}
+                            character_id={this.props.kingdom.character_id}
+                            kingdoms={this.props.kingdoms}
+                        />
                     </TabPanel>
                 </Tabs>
             </BasicCard>

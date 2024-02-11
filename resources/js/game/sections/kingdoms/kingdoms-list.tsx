@@ -152,10 +152,12 @@ export default class KingdomsList extends React.Component<KingdomListProps, King
                                           character_gold={this.props.character_gold}
                                           view_port={this.props.view_port}
                                           user_id={this.props.user_id}
+                                          kingdoms={this.props.my_kingdoms}
                             />
                         :
                             <Kingdom close_details={this.closeKingdomDetails.bind(this)}
                                      kingdom={this.state.selected_kingdom}
+                                     kingdoms={this.props.my_kingdoms}
                                      dark_tables={this.state.dark_tables}
                                      character_gold={this.props.character_gold}
                                      view_port={this.props.view_port}

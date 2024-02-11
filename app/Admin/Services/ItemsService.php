@@ -23,6 +23,7 @@ class ItemsService {
             'types'            => [
                 'weapon',
                 'bow',
+                'gun',
                 'stave',
                 'hammer',
                 'body',

@@ -226,15 +226,7 @@ class InventorySetService {
     }
 
     /**
-     * Do we have at least one weapon?
-     *
-     * If you have more than two weapons, it's a no.
-     *
-     * If you have a bow and a weapon or a shield, its a no.
-     *
-     * If you have multiple weapons and a shield/bow its a no.
-     *
-     * Valid: 2 weapons (neither are bow) or 1 weapons (bow) or 1 weapon (non bow) and shield.
+     * Is our set considered valid based on what we have in it?
      *
      * @param InventorySet $inventorySet
      * @return bool
@@ -250,6 +242,10 @@ class InventorySetService {
 
         $bows = collect($inventorySet->slots->filter(function($slot) {
             return $slot->item->type === 'bow';
+        })->all());
+
+        $guns = collect($inventorySet->slots->filter(function($slot) {
+            return $slot->item->type === 'gun';
         })->all());
 
         $hammers = collect($inventorySet->slots->filter(function($slot) {
@@ -280,6 +276,18 @@ class InventorySetService {
             return false;
         }
 
+        if ($guns->count() > 2) {
+            return false;
+        }
+
+        if ($guns->count() > 1 && $weapons->count() > 1) {
+            return false;
+        }
+
+        if ($guns->count() > 1 && $shields->count() > 1) {
+            return false;
+        }
+
         if ($hasHammer && $weapons->count() > 0) {
             return false;
         }
@@ -289,6 +297,18 @@ class InventorySetService {
         }
 
         if ($hasStave && $weapons->count() > 0) {
+            return false;
+        }
+
+        if ($hasHammer && $guns->count() > 0) {
+            return false;
+        }
+
+        if ($hasBow && $guns->count() > 0) {
+            return false;
+        }
+
+        if ($hasStave && $guns->count() > 0) {
             return false;
         }
 

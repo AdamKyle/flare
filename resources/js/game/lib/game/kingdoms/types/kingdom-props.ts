@@ -6,6 +6,8 @@ export default interface KingdomProps {
 
     kingdom: KingdomDetails;
 
+    kingdoms: KingdomDetails[] | [];
+
     dark_tables: boolean;
 
     character_gold: number;
