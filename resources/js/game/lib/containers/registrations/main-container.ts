@@ -1,5 +1,6 @@
 import {CoreContainer} from "../core-container";
 import CoreEventListener from "../../game/event-listeners/core-event-listener";
+import Ajax from "../../ajax/ajax";
 
 /**
  * Register core dependencies here.
@@ -14,6 +15,10 @@ function mainContainer(container: CoreContainer) {
     container.register('core-event-listener', {
         useClass: CoreEventListener
     });
+
+    container.register('AjaxInterface', {
+        useClass: Ajax,
+    })
 }
 
 export default mainContainer;

@@ -2,6 +2,7 @@
 import {container, InjectionToken} from 'tsyringe';
 import mainContainer from "./registrations/main-container";
 import gameEventContainer from "./registrations/game-event-container";
+import {containerRegistry} from "../../configuration/container-registry";
 
 class CoreContainer {
 
@@ -10,6 +11,9 @@ class CoreContainer {
     public constructor() {
         mainContainer(this);
         gameEventContainer(this);
+
+        // Game Registrations:
+        containerRegistry(this);
     }
 
     /**
@@ -30,6 +34,7 @@ class CoreContainer {
      * @param key
      */
     public fetch<T>(token: InjectionToken<T>): T {
+        console.log(token);
         return container.resolve<T>(token);
     }
 

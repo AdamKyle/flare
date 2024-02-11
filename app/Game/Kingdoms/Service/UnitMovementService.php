@@ -176,11 +176,13 @@ class UnitMovementService {
 
         $kingdom = Kingdom::find($toKingdom);
 
-        event(new ServerMessageEvent($character->user, 'You have recalled your units to: ' . $kingdom->name));
-
         $this->updateKingdom->updateKingdomAllKingdoms($character->refresh());
 
-        return $this->successResult();
+        event(new UpdateKingdomQueues($kingdom));
+
+        return $this->successResult([
+            'message' => 'Units have been recalled to: ' . $kingdom->name,
+        ]);
     }
 
     /**

@@ -9,6 +9,7 @@ use App\Flare\Models\Kingdom;
 use App\Flare\Models\KingdomBuilding;
 use App\Flare\Models\KingdomBuildingExpansion;
 use App\Game\Core\Traits\ResponseBuilder;
+use App\Game\Kingdoms\Events\UpdateKingdomQueues;
 use App\Game\Kingdoms\Jobs\ExpandResourceBuilding;
 use App\Game\Kingdoms\Values\KingdomMaxValue;
 use App\Game\Kingdoms\Values\ResourceBuildingExpansionBaseValue;
@@ -174,6 +175,8 @@ class ExpandResourceBuildingService {
         $this->updateKingdom->updateKingdom($kingdom->refresh());
 
         $queue->delete();
+
+        event(new UpdateKingdomQueues($kingdom));
 
         return $this->successResult([
             'message' => 'Expansion has been canceled. You got back: ' . number_format($resourcesToGainBack * 100) . '% of your resources spent - with the exception of Gold Bars.',

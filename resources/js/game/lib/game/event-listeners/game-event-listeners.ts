@@ -1,4 +1,3 @@
-import CoreEventListener from "./core-event-listener";
 import {singleton, inject} from "tsyringe";
 import Game from "../../../game";
 import {serviceContainer} from "../../containers/core-container";
@@ -28,8 +27,6 @@ export default class GameEventListeners {
     private actionListeners?: GameListener;
 
     private questListeners?: GameListener;
-
-    constructor(@inject(CoreEventListener) private coreEventListener: CoreEventListener) {}
 
     public initialize(component: Game, userId: number): void {
         this.component = component;

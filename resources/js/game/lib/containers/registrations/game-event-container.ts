@@ -16,12 +16,12 @@ function gameEventContainer(container: CoreContainer) {
 
     // Game Event Listeners:
     // Classes are registered with their interface as their key.
-    container.register('GameListeners', {useClass: MapListeners});
-    container.register('GameListeners', {useClass: CharacterListeners});
-    container.register('GameListeners', {useClass: MonsterListeners});
-    container.register('GameListeners', {useClass: KingdomListeners});
-    container.register('GameListeners', {useClass: ActionListeners});
-    container.register('GameListeners', {useClass: QuestListeners});
+    container.register('GameListener', {useClass: MapListeners});
+    container.register('GameListener', {useClass: CharacterListeners});
+    container.register('GameListener', {useClass: MonsterListeners});
+    container.register('GameListener', {useClass: KingdomListeners});
+    container.register('GameListener', {useClass: ActionListeners});
+    container.register('GameListener', {useClass: QuestListeners});
 
     // The Core Listener Class
     container.register('game-event-listeners', GameEventListeners);

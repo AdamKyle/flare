@@ -1,7 +1,8 @@
-import { Component } from "react";
 import AjaxInterface from "./ajax-interface";
 import axios, { AxiosError, AxiosResponse, Method } from 'axios';
+import {injectable} from "tsyringe";
 
+@injectable()
 export default class Ajax implements AjaxInterface {
 
 

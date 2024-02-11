@@ -1,11 +1,7 @@
 import React, {ReactNode} from "react";
 import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
 import {KingdomQueueProps} from "./types/kingdom-queue-props";
-import KingdomQueueState, {
-    BuildingExpansionQueue,
-    BuildingQueue,
-    UnitQueue
-} from "./types/kingdom-queue-state";
+import KingdomQueueState, {BuildingExpansionQueue, BuildingQueue, UnitQueue} from "./types/kingdom-queue-state";
 import TimerProgressBar from "../../../components/ui/progress-bars/timer-progress-bar";
 import UnitMovementDetails from "./deffinitions/unit-movement-details";
 import Ajax from "../../../lib/ajax/ajax";
@@ -16,6 +12,10 @@ import DangerOutlineButton from "../../../components/ui/buttons/danger-outline-b
 import {serviceContainer} from "../../../lib/containers/core-container";
 import CoreEventListener from "../../../lib/game/event-listeners/core-event-listener";
 import {Channel} from "laravel-echo";
+import CancellationAjax from "./ajax/cancellation-ajax";
+import {CancellationType} from "./enums/cancellation-type";
+import {QueueTypes} from "./enums/queue-types";
+import SuccessAlert from "../../../components/ui/alerts/simple-alerts/success-alert";
 
 export default class KingdomQueues extends React.Component<KingdomQueueProps, KingdomQueueState> {
 
@@ -23,16 +23,21 @@ export default class KingdomQueues extends React.Component<KingdomQueueProps, Ki
 
     private updateKingdomQueues: Channel;
 
+    private cancellationAjax: CancellationAjax;
+
     constructor(props: any) {
         super(props);
 
         this.state = {
             loading: true,
             error_message: null,
+            success_message: null,
             queues: null,
         }
 
         this.gameEventListener = serviceContainer().fetch(CoreEventListener);
+
+        this.cancellationAjax = serviceContainer().fetch(CancellationAjax);
 
         this.gameEventListener.initialize();
 
@@ -75,12 +80,21 @@ export default class KingdomQueues extends React.Component<KingdomQueueProps, Ki
         );
     }
 
+    cancelQueue(cancellationType: CancellationType, queueIndex: number, queueKey: QueueTypes) {
+
+        if (this.state.queues === null) {
+            return;
+        }
+
+        this.cancellationAjax.doAjaxCall(this, cancellationType, this.state.queues[queueKey][queueIndex], this.props.character_id);
+    }
+
     renderBuildingQueues(): ReactNode[]|[]|null {
         if (this.state.queues === null) {
             return null;
         }
 
-        const buildingQueues = this.state.queues.building_queues.map((buildingQueue: BuildingQueue) => {
+        const buildingQueues = this.state.queues.building_queues.map((buildingQueue: BuildingQueue, index: number) => {
 
             if (buildingQueue.type === 'upgrading') {
                 return (
@@ -91,7 +105,13 @@ export default class KingdomQueues extends React.Component<KingdomQueueProps, Ki
                         <TimerProgressBar  time_out_label={
                             'From Level: ' + buildingQueue.from_level + ' To Level: ' + buildingQueue.to_level
                         } time_remaining={buildingQueue.time_remaining} />
-                        <DangerOutlineButton button_label={'Cancel'} on_click={() => {}} additional_css={'my-2'} />
+                        <DangerOutlineButton button_label={'Cancel'} on_click={() => {
+                            this.cancelQueue(
+                                CancellationType.BUILDING_IN_QUEUE,
+                                index,
+                                QueueTypes.BUILDING_QUEUES,
+                            )
+                        }} additional_css={'my-2'} />
                     </BasicCard>
                 )
             }
@@ -103,7 +123,13 @@ export default class KingdomQueues extends React.Component<KingdomQueueProps, Ki
                             Repairing {buildingQueue.name}
                         </div>
                         <TimerProgressBar time_out_label={'Repairing'} time_remaining={buildingQueue.time_remaining} />
-                        <DangerOutlineButton button_label={'Cancel'} on_click={() => {}} additional_css={'my-2'} />
+                        <DangerOutlineButton button_label={'Cancel'} on_click={() => {
+                            this.cancelQueue(
+                                CancellationType.BUILDING_IN_QUEUE,
+                                index,
+                                QueueTypes.BUILDING_QUEUES,
+                            )
+                        }} additional_css={'my-2'} />
                     </BasicCard>
                 )
             }
@@ -119,7 +145,7 @@ export default class KingdomQueues extends React.Component<KingdomQueueProps, Ki
             return null;
         }
 
-        return this.state.queues.unit_recruitment_queues.map((unitRecruitmentQueue: UnitQueue) => {
+        return this.state.queues.unit_recruitment_queues.map((unitRecruitmentQueue: UnitQueue, index: number) => {
             return (
                 <BasicCard additionalClasses={'my-2'}>
                     <div className='bold my-2'>
@@ -128,7 +154,13 @@ export default class KingdomQueues extends React.Component<KingdomQueueProps, Ki
                     <TimerProgressBar time_out_label={
                         'Rectuiting: ' + unitRecruitmentQueue.recruit_amount
                     } time_remaining={unitRecruitmentQueue.time_remaining} />
-                    <DangerOutlineButton button_label={'Cancel'} on_click={() => {}} additional_css={'my-2'} />
+                    <DangerOutlineButton button_label={'Cancel'} on_click={() => {
+                        this.cancelQueue(
+                            CancellationType.UNIT_RECRUITMENT,
+                            index,
+                            QueueTypes.UNIT_RECRUITMENT_QUEUES,
+                        )
+                    }} additional_css={'my-2'} />
                 </BasicCard>
             )
         });
@@ -139,7 +171,7 @@ export default class KingdomQueues extends React.Component<KingdomQueueProps, Ki
             return null;
         }
 
-        return this.state.queues.unit_movement_queues.map((unitMovementQueue: UnitMovementDetails) => {
+        return this.state.queues.unit_movement_queues.map((unitMovementQueue: UnitMovementDetails, index: number) => {
             return (
                 <BasicCard additionalClasses={'my-2'}>
                     <div className='bold my-2'>
@@ -151,7 +183,13 @@ export default class KingdomQueues extends React.Component<KingdomQueueProps, Ki
                     <TimerProgressBar time_out_label={
                         'Units are in movement'
                     } time_remaining={unitMovementQueue.time_left} />
-                    <DangerOutlineButton button_label={'Cancel'} on_click={() => {}} additional_css={'my-2'} />
+                    <DangerOutlineButton button_label={'Cancel'} on_click={() => {
+                        this.cancelQueue(
+                            CancellationType.UNIT_MOVEMENT,
+                            index,
+                            QueueTypes.UNIT_MOVEMENT_QUEUES,
+                        )
+                    }} additional_css={'my-2'} />
                 </BasicCard>
             )
         });
@@ -163,7 +201,7 @@ export default class KingdomQueues extends React.Component<KingdomQueueProps, Ki
             return null;
         }
 
-        return this.state.queues.building_expansion_queues.map((buildingExpansionQueue: BuildingExpansionQueue) => {
+        return this.state.queues.building_expansion_queues.map((buildingExpansionQueue: BuildingExpansionQueue, index: number) => {
             return (
                 <BasicCard additionalClasses={'my-2'}>
                     <div className='bold my-2'>
@@ -172,7 +210,13 @@ export default class KingdomQueues extends React.Component<KingdomQueueProps, Ki
                     <TimerProgressBar time_out_label={
                         'From slot: ' + buildingExpansionQueue.from_slot + ' to slot: ' + buildingExpansionQueue.to_slot
                     } time_remaining={buildingExpansionQueue.time_remaining} />
-                    <DangerOutlineButton button_label={'Cancel'} on_click={() => {}} additional_css={'my-2'} />
+                    <DangerOutlineButton button_label={'Cancel'} on_click={() => {
+                        this.cancelQueue(
+                            CancellationType.BUILDING_EXPANSION,
+                            index,
+                            QueueTypes.BUILDING_EXPANSION_QUEUES,
+                        )
+                    }} additional_css={'my-2'} />
                 </BasicCard>
             )
         });
@@ -197,6 +241,13 @@ export default class KingdomQueues extends React.Component<KingdomQueueProps, Ki
                             {this.state.error_message}
                         </DangerAlert>
                     : null
+                }
+                {
+                    this.state.success_message !== null ?
+                        <SuccessAlert>
+                            {this.state.success_message}
+                        </SuccessAlert>
+                        : null
                 }
                 <div className='w-[90%] mr-auto ml-auto max-h-[600px] overflow-y-auto'>
                     {this.renderBuildingQueues()}

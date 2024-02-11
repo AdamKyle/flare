@@ -202,6 +202,8 @@ class KingdomBuildingService {
 
         $this->updateKingdomHandler->refreshPlayersKingdoms($kingdom->character->refresh());
 
+        event(new UpdateKingdomQueues($kingdom));
+
         return true;
     }
 

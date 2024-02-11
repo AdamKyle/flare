@@ -177,6 +177,8 @@ class UnitService {
 
         $queue->delete();
 
+        event(new UpdateKingdomQueues($kingdom));
+
         return $kingdom->refresh();
     }
 
