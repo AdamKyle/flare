@@ -166,13 +166,11 @@ export default class LabyrinthOracle extends React.Component<LabyrinthOracleProp
                                           <div className='mt-4 mb-2'>
                                               <dl>
                                                   <dt>Gold Cost</dt>
-                                                  <dl>{formatNumber(200_000_000_000)}</dl>
+                                                  <dl>{formatNumber(100_000_000)}</dl>
                                                   <dt>Shards Cost</dt>
-                                                  <dl>{formatNumber(500_000)}</dl>
+                                                  <dl>{formatNumber(5_000)}</dl>
                                                   <dt>Gold Dust Cost</dt>
-                                                  <dl>{formatNumber(250_000)}</dl>
-                                                  <dt>Copper Coin Cost</dt>
-                                                  <dl>{formatNumber(25_000)}</dl>
+                                                  <dl>{formatNumber(2_500)}</dl>
                                               </dl>
                                           </div>
                                       : null

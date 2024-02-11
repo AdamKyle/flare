@@ -41,11 +41,6 @@ class ItemTransferServiceTest extends TestCase {
 
         $result = $this->itemTransferService->transferItemEnhancements(
             $character,
-            [
-                'gold' => 1000000,
-                'gold_dust' => 100000,
-                'shards' => 100000,
-            ],
             10,
             10
         );
@@ -67,11 +62,6 @@ class ItemTransferServiceTest extends TestCase {
 
         $result = $this->itemTransferService->transferItemEnhancements(
             $character,
-            [
-                'gold' => 10,
-                'gold_dust' => 10,
-                'shards' => 10,
-            ],
             10,
             10
         );
@@ -100,11 +90,6 @@ class ItemTransferServiceTest extends TestCase {
 
         $result = $this->itemTransferService->transferItemEnhancements(
             $character,
-            [
-                'gold' => 10,
-                'gold_dust' => 10,
-                'shards' => 10,
-            ],
             $itemToTransferFrom->id,
             $itemToTransferTo->id,
         );
@@ -155,11 +140,6 @@ class ItemTransferServiceTest extends TestCase {
 
         $result = $this->itemTransferService->transferItemEnhancements(
             $character,
-            [
-                'gold' => 10,
-                'gold_dust' => 10,
-                'shards' => 10,
-            ],
             $itemToTransferFrom->id,
             $itemToTransferTo->id,
         );
@@ -223,11 +203,6 @@ class ItemTransferServiceTest extends TestCase {
 
         $result = $this->itemTransferService->transferItemEnhancements(
             $character,
-            [
-                'gold' => 10,
-                'gold_dust' => 10,
-                'shards' => 10,
-            ],
             $itemToTransferFrom->id,
             $itemToTransferTo->id,
         );
@@ -326,11 +301,6 @@ class ItemTransferServiceTest extends TestCase {
 
         $result = $this->itemTransferService->transferItemEnhancements(
             $character,
-            [
-                'gold' => 10,
-                'gold_dust' => 10,
-                'shards' => 10,
-            ],
             $itemToTransferFrom->id,
             $itemToTransferTo->id,
         );
@@ -428,11 +398,6 @@ class ItemTransferServiceTest extends TestCase {
 
         $result = $this->itemTransferService->transferItemEnhancements(
             $character,
-            [
-                'gold' => 10,
-                'gold_dust' => 10,
-                'shards' => 10,
-            ],
             $itemToTransferFrom->id,
             $itemToTransferTo->id,
         );

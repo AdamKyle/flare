@@ -28,10 +28,9 @@ class ItemTransferService {
      * @var array|int[]
      */
     private array $currencyCosts = [
-        'gold' => 200_000_000_000,
-        'shards' => 500_000,
-        'gold_dust' => 250_000,
-        'copper_coins' => 25_000,
+        'gold' => 100_000_000,
+        'shards' => 5_000,
+        'gold_dust' => 2_500,
     ];
 
     /**
@@ -92,7 +91,7 @@ class ItemTransferService {
         event(new ServerMessageEvent($character->user, 'The Labyrinth Oracle works his magic to transfer the magical enhancements to: ' . $this->itemToTransferToDuplicated->affix_name, $itemSlotToTransferTo->id));
 
         return $this->successResult([
-            'message' => 'Transferred attributes (Enchantments, Holy Oils and Gems) from: ' . $this->itemToTransferFromDuplicated->affix_name . ' To: ' . $this->itemToTransferToDuplicated->affix_name,
+            'message' => 'Transferred attributes (Enchantments, Holy Oils and Gems) from: ' . $this->itemToTransferFromDuplicated->affix_name . ' To: ' . $this->itemToTransferToDuplicated->affix_name . '. Check Server Messages (Mobile: Chat Tabs Drop Down -> Server Messages) for link to new item!',
             'inventory' => array_values($character->refresh()->inventory->slots->filter(function($slot) {
                 return $slot->item->type !== 'artifact' && $slot->item->type !== 'trinket' && $slot->item->type !== 'quest';
             })->map(function($slot) {

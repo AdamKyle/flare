@@ -182,17 +182,12 @@ class LabyrinthOracleControllerTest extends TestCase {
             ->call('POST', '/api/character/'. $character->id .'/transfer-attributes', [
                 'item_id_from' => $itemToTransferFrom->id,
                 'item_id_to' => $itemToTransferTo->id,
-                'currency_costs' => [
-                    'gold' => 1000,
-                    'gold_dust' => 10000,
-                    'shards' => 100000,
-
-                ],
             ]);
+
 
         $jsonData = json_decode($response->getContent(), true);
 
-        $this->assertEquals(1, count($jsonData['inventory']));
+        $this->assertEquals(2, count($jsonData['inventory']));
 
         Event::assertDispatched(ServerMessageEvent::class);
     }
