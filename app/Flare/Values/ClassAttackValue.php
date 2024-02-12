@@ -231,6 +231,8 @@ class ClassAttackValue {
         $this->chance['has_item']   = !$this->hasItemTypeEquipped('weapon') &&
                                       !$this->hasItemTypeEquipped('stave') &&
                                       !$this->hasItemTypeEquipped('bow') &&
+                                      !$this->hasItemTypeEquipped('gun') &&
+                                      !$this->hasItemTypeEquipped('fan') &&
                                       !$this->hasItemTypeEquipped('hammer') &&
                                       !$this->hasItemTypeEquipped('spell-damage') &&
                                       !$this->hasItemTypeEquipped('gun');

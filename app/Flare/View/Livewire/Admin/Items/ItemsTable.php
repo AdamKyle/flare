@@ -79,6 +79,7 @@ class ItemsTable extends DataTableComponent {
             'weapon'        => 'Weapons',
             'bow'           => 'Bows',
             'gun'           => 'Guns',
+            'fan'           => 'Fan',
             'stave'         => 'Staves',
             'hammer'        => 'Hammers',
             'body'          => 'Body',

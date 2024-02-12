@@ -39,6 +39,7 @@ class RaidItemsForType extends DataTableComponent {
             'weapon'        => 'Weapons',
             'bow'           => 'Bows',
             'gun'           => 'Guns',
+            'fan'           => 'Fans',
             'stave'         => 'Staves',
             'hammer'        => 'Hammers',
             'body'          => 'Body',

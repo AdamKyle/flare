@@ -57,7 +57,10 @@ class CreateMap extends Command {
         // $land = new Color(0,0,0);
 
         // Ice Plane
-        $land = new Color(39, 84, 166);
+        // $land = new Color(39, 84, 166);
+
+        // Sky Plane
+        $land = new Color(84, 56, 19);
 
         // Surface & Labyrinth:
         // $water = new Color(66, 129, 178);

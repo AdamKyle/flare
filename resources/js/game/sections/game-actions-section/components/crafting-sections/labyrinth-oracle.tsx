@@ -82,16 +82,19 @@ export default class LabyrinthOracle extends React.Component<LabyrinthOracleProp
     }
 
     selectedTransfer(key: string) {
+
+        const isFrom = key === 'item_to_transfer_from';
+
         if (this.state[key] === null) {
-            return {label: 'Please select transfer from', value: ''};
+            return {label: 'Please select transfer ' + (isFrom ? 'from' : 'to'), value: ''};
         }
 
         const foundSelectedItem = this.state.inventory.filter((item: LabyrinthOracleInventory) => {
-            return item.id === this.state[key]
+            return item.id === parseInt(this.state[key])
         });
 
         if (foundSelectedItem.length === 0) {
-            return {label: 'Please select transfer from', value: ''};
+            return {label: 'Please select transfer '  + (isFrom ? 'from' : 'to'), value: ''};
         }
 
         return {
@@ -110,7 +113,7 @@ export default class LabyrinthOracle extends React.Component<LabyrinthOracleProp
             this.ajax.setRoute('character/'+this.props.character_id+'/transfer-attributes').setParameters({
                 item_id_from: this.state.item_to_transfer_from,
                 item_id_to: this.state.item_to_transfer_to,
-            }).doAjaxCall('get', (result: AxiosResponse) => {
+            }).doAjaxCall('post', (result: AxiosResponse) => {
                 this.setState({
                     transferring: false,
                     inventory:result.data.inventory,

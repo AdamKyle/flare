@@ -30,7 +30,7 @@ class LabyrinthOracleController extends Controller {
 
         return response()->json([
             'inventory' => array_values($character->refresh()->inventory->slots->filter(function($slot) {
-                return $slot->item->type !== 'artifact' && $slot->item->type !== 'trinket' && $slot->item->type !== 'quest';
+                return $slot->item->type !== 'artifact' && $slot->item->type !== 'trinket' && $slot->item->type !== 'quest' && $slot->item->type !== 'alchemy';
             })->map(function($slot) {
                 return [
                     'affix_name' => $slot->item->affix_name,

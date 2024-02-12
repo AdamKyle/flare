@@ -248,6 +248,10 @@ class InventorySetService {
             return $slot->item->type === 'gun';
         })->all());
 
+        $fans = collect($inventorySet->slots->filter(function($slot) {
+            return $slot->item->type === 'fan';
+        })->all());
+
         $hammers = collect($inventorySet->slots->filter(function($slot) {
             return $slot->item->type === 'hammer';
         })->all());
@@ -280,11 +284,27 @@ class InventorySetService {
             return false;
         }
 
+        if ($fans->count() > 2) {
+            return false;
+        }
+
         if ($guns->count() > 1 && $weapons->count() > 1) {
             return false;
         }
 
         if ($guns->count() > 1 && $shields->count() > 1) {
+            return false;
+        }
+
+        if ($fans->count() > 1 && $shields->count() > 1) {
+            return false;
+        }
+
+        if ($guns->count() > 1 && $fans->count() > 1) {
+            return false;
+        }
+
+        if ($weapons->count() > 1 && $fans->count() > 1) {
             return false;
         }
 
@@ -304,11 +324,19 @@ class InventorySetService {
             return false;
         }
 
+        if ($hasHammer && $fans->count() > 0) {
+            return false;
+        }
+
         if ($hasBow && $guns->count() > 0) {
             return false;
         }
 
         if ($hasStave && $guns->count() > 0) {
+            return false;
+        }
+
+        if ($hasStave && $fans->count() > 0) {
             return false;
         }
 

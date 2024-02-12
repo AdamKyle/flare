@@ -548,7 +548,7 @@ class CharacterInventoryService {
 
         $acceptedTypes = [
             'weapon', 'ring', 'shield', 'artifact', 'spell', 'armour',
-            'trinket', 'stave', 'hammer', 'bow', 'gun', 'alchemy', 'quest',
+            'trinket', 'stave', 'hammer', 'bow', 'fan', 'gun', 'alchemy', 'quest',
         ];
 
         // Spells do not have the tye spell - they are differentiated by damage or healing suffix.

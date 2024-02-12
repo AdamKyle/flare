@@ -24,6 +24,7 @@ class ItemsService {
                 'weapon',
                 'bow',
                 'gun',
+                'fan',
                 'stave',
                 'hammer',
                 'body',

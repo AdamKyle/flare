@@ -34,7 +34,6 @@ class CoreContainer {
      * @param key
      */
     public fetch<T>(token: InjectionToken<T>): T {
-        console.log(token);
         return container.resolve<T>(token);
     }
 

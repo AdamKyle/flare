@@ -15,6 +15,8 @@ class WeaponTypes {
     CONST STAVE  = 'stave';
     const HAMMER = 'hammer';
     const BOW    = 'bow';
+    const GUN    = 'gun';
+    const FAN    = 'fan';
     const RING   = 'ring';
 
 
@@ -26,6 +28,8 @@ class WeaponTypes {
         self::STAVE  => self::STAVE,
         self::HAMMER => self::HAMMER,
         self::BOW    => self::BOW,
+        self::GUN    => self::GUN,
+        self::FAN    => self::FAN,
         self::RING   => self::RING,
     ];
 

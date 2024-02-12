@@ -8,6 +8,8 @@
                 'weapon'          => ['left-hand','right-hand'],
                 'stave'           => ['left-hand','right-hand'],
                 'hammer'          => ['left-hand','right-hand'],
+                'gun'             => ['left-hand','right-hand'],
+                'fan'             => ['left-hand','right-hand'],
                 'bow'             => ['left-hand','right-hand'],
                 'ring'            => ['ring-one','ring-two'],
                 'spell-healing'   => ['spell-one','spell-two'],
@@ -56,7 +58,7 @@
                         Attack and Cast and Cast and Attack.
                     </x-core.alerts.info-alert>
                 @endif
-                @if (in_array($itemToEquip['type'], ['weapon', 'stave', 'bow', 'shield', 'hammer', 'ring', 'spell-healing', 'spell-damage', 'shield']))
+                @if (in_array($itemToEquip['type'], ['weapon', 'stave', 'bow', 'gun', 'fan', 'shield', 'hammer', 'ring', 'spell-healing', 'spell-damage', 'shield']))
                     <div class="w-full mt-4">
                         <div class="flex justify-center">
                             <form method="post" action="{{$route}}" class="mr-5">

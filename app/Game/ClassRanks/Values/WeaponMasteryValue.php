@@ -13,6 +13,7 @@ class WeaponMasteryValue {
     const DAMAGE_SPELL  = 4;
     const HEALING_SPELL = 5;
     const GUN           = 6;
+    const FAN           = 7;
 
     const XP_PER_LEVEL = 1000000;
     const XP_PER_KILL  = 10000;
@@ -31,6 +32,7 @@ class WeaponMasteryValue {
         self::WEAPON        => 'Weapons',
         self::BOW           => 'Bows',
         self::GUN           => 'Guns',
+        self::FAN           => 'Fans',
         self::HAMMER        => 'Hammers',
         self::STAVE         => 'Staves',
         self::DAMAGE_SPELL  => 'Damage Spells',
@@ -83,6 +85,8 @@ class WeaponMasteryValue {
                 return self::BOW;
             case 'gun':
                 return self::GUN;
+            case 'fan':
+                return self::FAN;
             case 'spell-damage':
                 return self::DAMAGE_SPELL;
             case 'spell-healing':
@@ -104,6 +108,8 @@ class WeaponMasteryValue {
                 return 'bow';
             case self::GUN:
                 return 'gun';
+            case self::FAN:
+                return 'fan';
             case self::DAMAGE_SPELL:
                 return 'spell-damage';
             case self::HEALING_SPELL:
@@ -120,7 +126,7 @@ class WeaponMasteryValue {
      * @return bool
      */
     public static function isValidType(string $type): bool {
-        $types = ['weapon', 'hammer', 'bow', 'gun', 'stave', 'spell-damage', 'spell-healing'];
+        $types = ['weapon', 'hammer', 'bow', 'gun', 'fan', 'stave', 'spell-damage', 'spell-healing'];
 
         return in_array(strtolower($type), $types);
     }
@@ -150,6 +156,10 @@ class WeaponMasteryValue {
 
     public function isGun(): bool {
         return $this->value === self::GUN;
+    }
+
+    public function isFan(): bool {
+        return $this->value === self::FAN;
     }
 
     public function isDamageSpell(): bool {

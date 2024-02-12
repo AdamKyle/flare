@@ -112,7 +112,13 @@ class ComparisonService {
     }
 
     public function buildShopData(Character $character, Item $item, string $type = null) {
-        if ($type === 'bow') {
+        $defaultWeaponTypes = [
+            'bow',
+            'gun',
+            'fan',
+        ];
+
+        if (in_array($type, $defaultWeaponTypes)) {
             $type = 'weapon';
         }
 
