@@ -28,7 +28,15 @@ export default class CraftingTypeSelection extends React.Component<CraftingSelec
             },
             {
                 label: "Guns",
-                value: "guns",
+                value: "gun",
+            },
+            {
+                label: "Fans",
+                value: "fan",
+            },
+            {
+                label: "Maces",
+                value: "mace",
             },
             {
                 label: "Armour",
@@ -71,7 +79,7 @@ export default class CraftingTypeSelection extends React.Component<CraftingSelec
                     When it comes to weapons there are general
                     "weapons" that any one can use, then there
                     are specialty weapons: Hammers, Staves,
-                    Bows and Guns. For Weapon Crafting, you can craft ANY
+                    Bows, Guns, Fans and Maces for Weapon Crafting. You can craft ANY
                     of these types to gain levels.
                 </p>
             </Fragment>

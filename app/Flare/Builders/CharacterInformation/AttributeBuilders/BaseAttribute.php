@@ -97,7 +97,10 @@ class BaseAttribute {
                 WeaponTypes::WEAPON,
                 WeaponTypes::HAMMER,
                 WeaponTypes::BOW,
-                WeaponTypes::STAVE
+                WeaponTypes::STAVE,
+                WeaponTypes::GUN,
+                WeaponTypes::FAN,
+                WeaponTypes::MACE
             ])->sum('item.base_damage');
         }
 
@@ -105,7 +108,10 @@ class BaseAttribute {
             WeaponTypes::WEAPON,
             WeaponTypes::HAMMER,
             WeaponTypes::BOW,
-            WeaponTypes::STAVE
+            WeaponTypes::STAVE,
+            WeaponTypes::GUN,
+            WeaponTypes::FAN,
+            WeaponTypes::MACE
         ])->where('position', $position)
           ->sum('item.base_damage');
     }

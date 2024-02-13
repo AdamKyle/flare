@@ -14,6 +14,7 @@ class WeaponMasteryValue {
     const HEALING_SPELL = 5;
     const GUN           = 6;
     const FAN           = 7;
+    const MACE          = 8;
 
     const XP_PER_LEVEL = 1000000;
     const XP_PER_KILL  = 10000;
@@ -26,6 +27,9 @@ class WeaponMasteryValue {
         self::STAVE         => 3,
         self::DAMAGE_SPELL  => 4,
         self::HEALING_SPELL => 5,
+        self::GUN           => 6,
+        self::FAN           => 7,
+        self::MACE          => 8,
     ];
 
     protected static $attributes = [
@@ -33,10 +37,11 @@ class WeaponMasteryValue {
         self::BOW           => 'Bows',
         self::GUN           => 'Guns',
         self::FAN           => 'Fans',
+        self::MACE          => 'Maces',
         self::HAMMER        => 'Hammers',
         self::STAVE         => 'Staves',
         self::DAMAGE_SPELL  => 'Damage Spells',
-        self::HEALING_SPELL => 'Healing Spell',
+        self::HEALING_SPELL => 'Healing Spells',
     ];
 
     private int $value;
@@ -87,6 +92,8 @@ class WeaponMasteryValue {
                 return self::GUN;
             case 'fan':
                 return self::FAN;
+            case 'mace':
+                return self::MACE;
             case 'spell-damage':
                 return self::DAMAGE_SPELL;
             case 'spell-healing':
@@ -110,6 +117,8 @@ class WeaponMasteryValue {
                 return 'gun';
             case self::FAN:
                 return 'fan';
+            case self::MACE:
+                return 'mace';
             case self::DAMAGE_SPELL:
                 return 'spell-damage';
             case self::HEALING_SPELL:
@@ -126,7 +135,7 @@ class WeaponMasteryValue {
      * @return bool
      */
     public static function isValidType(string $type): bool {
-        $types = ['weapon', 'hammer', 'bow', 'gun', 'fan', 'stave', 'spell-damage', 'spell-healing'];
+        $types = ['weapon', 'hammer', 'bow', 'gun', 'fan', 'mace', 'stave', 'spell-damage', 'spell-healing'];
 
         return in_array(strtolower($type), $types);
     }
@@ -160,6 +169,10 @@ class WeaponMasteryValue {
 
     public function isFan(): bool {
         return $this->value === self::FAN;
+    }
+
+    public function isMace(): bool {
+        return $this->value === self::MACE;
     }
 
     public function isDamageSpell(): bool {

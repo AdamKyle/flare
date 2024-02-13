@@ -94,6 +94,7 @@ class CraftingService {
             'stave',
             'gun',
             'fan',
+            'mace',
         ];
 
         if (in_array($craftingType, $defaultToWeapon)) {
@@ -113,7 +114,7 @@ class CraftingService {
      * @return array
      */
     public function getCraftingXP(Character $character, string $type): array {
-        if ($type == 'hammer' || $type == 'bow' || $type == 'stave' || $type === 'gun' || $type === 'fan') {
+        if ($type == 'hammer' || $type == 'bow' || $type == 'stave' || $type === 'gun' || $type === 'fan' || $type === 'mace') {
             $type = 'weapon';
         }
 
@@ -271,7 +272,7 @@ class CraftingService {
      */
     protected function fetchCraftingSkill(Character $character, string $craftingType): Skill {
 
-        if ($craftingType === 'hammer' || $craftingType === 'bow' || $craftingType === 'stave' || $craftingType === 'gun' || $craftingType === 'fan') {
+        if ($craftingType === 'hammer' || $craftingType === 'bow' || $craftingType === 'stave' || $craftingType === 'gun' || $craftingType === 'fan' || $craftingType === 'mace') {
             $craftingType = 'weapon';
         }
 

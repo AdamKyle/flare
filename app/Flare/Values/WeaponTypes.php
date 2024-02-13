@@ -16,6 +16,7 @@ class WeaponTypes {
     const HAMMER = 'hammer';
     const BOW    = 'bow';
     const GUN    = 'gun';
+    const MACE   = 'mace';
     const FAN    = 'fan';
     const RING   = 'ring';
 
@@ -30,6 +31,7 @@ class WeaponTypes {
         self::BOW    => self::BOW,
         self::GUN    => self::GUN,
         self::FAN    => self::FAN,
+        self::MACE   => self::MACE,
         self::RING   => self::RING,
     ];
 

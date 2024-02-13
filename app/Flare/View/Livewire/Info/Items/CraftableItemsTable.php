@@ -37,6 +37,8 @@ class CraftableItemsTable extends DataTableComponent
             'weapon'        => 'Weapons',
             'bow'           => 'Bows',
             'gun'           => 'Guns',
+            'fan'           => 'Fans',
+            'mace'          => 'Maces',
             'stave'         => 'Staves',
             'hammer'        => 'Hammers',
             'body'          => 'Body',

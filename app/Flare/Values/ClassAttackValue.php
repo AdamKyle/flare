@@ -235,7 +235,9 @@ class ClassAttackValue {
                                       !$this->hasItemTypeEquipped('fan') &&
                                       !$this->hasItemTypeEquipped('hammer') &&
                                       !$this->hasItemTypeEquipped('spell-damage') &&
-                                      !$this->hasItemTypeEquipped('gun');
+                                      !$this->hasItemTypeEquipped('gun') &&
+                                      !$this->hasItemTypeEquipped('fan') &&
+                                      !$this->hasItemTypeEquipped('mace');
                                       !$this->hasItemTypeEquipped('spell-healing');
         $this->chance['amount']     = 0;
         $this->chance['chance']     = $this->chance['chance'] + $this->characterInfo->classBonus();
