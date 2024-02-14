@@ -25,6 +25,7 @@ class ItemsService {
                 'bow',
                 'gun',
                 'fan',
+                'scratch-awl',
                 'stave',
                 'hammer',
                 'body',

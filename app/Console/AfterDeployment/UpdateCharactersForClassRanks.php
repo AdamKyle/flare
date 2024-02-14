@@ -115,6 +115,10 @@ class UpdateCharactersForClassRanks extends Command
             return 5;
         }
 
+        if (($classRank->gameClass->type()->isBookBinder()) && (new WeaponMasteryValue($type))->isScratchAwl()) {
+            return 5;
+        }
+
         if (($classRank->gameClass->type()->isThief() || $classRank->gameClass->type()->isArcaneAlchemist()) && (new WeaponMasteryValue($type))->isBow()) {
             return 2;
         }

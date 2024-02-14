@@ -25,7 +25,7 @@ class CraftingValidation extends FormRequest
     {
         return [
             'item_to_craft'   => 'required|integer',
-            'type'            => 'required|in:weapon,hammer,bow,fan,gun,mace,stave,armour,spell,ring,artifact',
+            'type'            => 'required|in:weapon,hammer,bow,fan,gun,mace,scratch-awl,stave,armour,spell,ring,artifact',
         ];
     }
 

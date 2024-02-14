@@ -248,6 +248,10 @@ class InventorySetService {
             return $slot->item->type === 'gun';
         })->all());
 
+        $scratchAwls = collect($inventorySet->slots->filter(function($slot) {
+            return $slot->item->type === 'scratch-awl';
+        })->all());
+
         $fans = collect($inventorySet->slots->filter(function($slot) {
             return $slot->item->type === 'fan';
         })->all());
@@ -296,6 +300,10 @@ class InventorySetService {
             return false;
         }
 
+        if ($scratchAwls->count() > 2) {
+            return false;
+        }
+
         if ($guns->count() > 1 && $weapons->count() > 1) {
             return false;
         }
@@ -312,6 +320,28 @@ class InventorySetService {
             return false;
         }
 
+        if ($guns->count() > 1 && $scratchAwls->count() > 1) {
+            return false;
+        }
+
+
+        if ($scratchAwls->count() > 1 && $weapons->count() > 1) {
+            return false;
+        }
+
+        if ($scratchAwls->count() > 1 && $shields->count() > 1) {
+            return false;
+        }
+
+        if ($scratchAwls->count() > 1 && $fans->count() > 1) {
+            return false;
+        }
+
+        if ($scratchAwls->count() > 1 && $maces->count() > 1) {
+            return false;
+        }
+
+
         if ($weapons->count() > 1 && $fans->count() > 1) {
             return false;
         }
@@ -321,6 +351,10 @@ class InventorySetService {
         }
 
         if ($maces->count() > 1 && $fans->count() > 1) {
+            return false;
+        }
+
+        if ($maces->count() > 1 && $scratchAwls->count() > 1) {
             return false;
         }
 
@@ -356,6 +390,10 @@ class InventorySetService {
             return false;
         }
 
+        if ($hasHammer && $scratchAwls->count() > 0) {
+            return false;
+        }
+
         if ($hasBow && $weapons->count() > 0) {
             return false;
         }
@@ -372,11 +410,7 @@ class InventorySetService {
             return false;
         }
 
-        if ($hasStave && $guns->count() > 0) {
-            return false;
-        }
-
-        if ($hasStave && $fans->count() > 0) {
+        if ($hasBow && $scratchAwls->count() > 0) {
             return false;
         }
 
@@ -385,6 +419,10 @@ class InventorySetService {
         }
 
         if ($hasStave && $maces->count() > 0) {
+            return false;
+        }
+
+        if ($hasStave && $scratchAwls->count() > 0) {
             return false;
         }
 
@@ -417,6 +455,10 @@ class InventorySetService {
         }
 
         if ($shields->count() == 2 && $fans->count() > 0) {
+            return false;
+        }
+
+        if ($shields->count() == 2 && $scratchAwls->count() > 0) {
             return false;
         }
 
@@ -457,6 +499,10 @@ class InventorySetService {
         }
 
         if ($hasShield && $maces->count() > 1) {
+            return false;
+        }
+
+        if ($hasShield && $scratchAwls->count() > 1) {
             return false;
         }
 

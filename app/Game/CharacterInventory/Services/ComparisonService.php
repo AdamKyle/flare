@@ -116,7 +116,8 @@ class ComparisonService {
             'bow',
             'gun',
             'fan',
-            'mace'
+            'mace',
+            'scratch-awl',
         ];
 
         if (in_array($type, $defaultWeaponTypes)) {

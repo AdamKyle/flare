@@ -15,6 +15,7 @@ class WeaponMasteryValue {
     const GUN           = 6;
     const FAN           = 7;
     const MACE          = 8;
+    const SCRATCH_AWL   = 9;
 
     const XP_PER_LEVEL = 1000000;
     const XP_PER_KILL  = 10000;
@@ -30,6 +31,7 @@ class WeaponMasteryValue {
         self::GUN           => 6,
         self::FAN           => 7,
         self::MACE          => 8,
+        self::SCRATCH_AWL   => 9,
     ];
 
     protected static $attributes = [
@@ -38,6 +40,7 @@ class WeaponMasteryValue {
         self::GUN           => 'Guns',
         self::FAN           => 'Fans',
         self::MACE          => 'Maces',
+        self::SCRATCH_AWL   => 'scratch-awl',
         self::HAMMER        => 'Hammers',
         self::STAVE         => 'Staves',
         self::DAMAGE_SPELL  => 'Damage Spells',
@@ -94,6 +97,8 @@ class WeaponMasteryValue {
                 return self::FAN;
             case 'mace':
                 return self::MACE;
+            case 'scratch-awl':
+                return self::SCRATCH_AWL;
             case 'spell-damage':
                 return self::DAMAGE_SPELL;
             case 'spell-healing':
@@ -119,6 +124,8 @@ class WeaponMasteryValue {
                 return 'fan';
             case self::MACE:
                 return 'mace';
+            case self::SCRATCH_AWL:
+                return 'scratch-awl';
             case self::DAMAGE_SPELL:
                 return 'spell-damage';
             case self::HEALING_SPELL:
@@ -135,7 +142,7 @@ class WeaponMasteryValue {
      * @return bool
      */
     public static function isValidType(string $type): bool {
-        $types = ['weapon', 'hammer', 'bow', 'gun', 'fan', 'mace', 'stave', 'spell-damage', 'spell-healing'];
+        $types = ['weapon', 'hammer', 'bow', 'gun', 'fan', 'mace', 'scratch-awl', 'stave', 'spell-damage', 'spell-healing'];
 
         return in_array(strtolower($type), $types);
     }
@@ -173,6 +180,10 @@ class WeaponMasteryValue {
 
     public function isMace(): bool {
         return $this->value === self::MACE;
+    }
+
+    public function isScratchAwl(): bool {
+        return $this->value === self::SCRATCH_AWL;
     }
 
     public function isDamageSpell(): bool {

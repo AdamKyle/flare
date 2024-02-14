@@ -79,7 +79,7 @@ class ItemsController extends Controller {
     public function export(Request $request) {
         $types = [
             'weapons' => [
-                'weapon', 'bow', 'hammer', 'stave', 'gun', 'fan'
+                'weapon', 'bow', 'hammer', 'stave', 'gun', 'fan', 'scratch-awl'
             ],
             'armour' => [
                 'helmet', 'body', 'leggings', 'sleeves', 'feet', 'shield', 'gloves'

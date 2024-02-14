@@ -10,6 +10,8 @@
                 'hammer'          => ['left-hand','right-hand'],
                 'gun'             => ['left-hand','right-hand'],
                 'fan'             => ['left-hand','right-hand'],
+                'mace'            => ['left-hand','right-hand'],
+                'scratch-awl'     => ['left-hand','right-hand'],
                 'bow'             => ['left-hand','right-hand'],
                 'ring'            => ['ring-one','ring-two'],
                 'spell-healing'   => ['spell-one','spell-two'],

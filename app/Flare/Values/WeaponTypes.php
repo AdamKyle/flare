@@ -18,6 +18,7 @@ class WeaponTypes {
     const GUN    = 'gun';
     const MACE   = 'mace';
     const FAN    = 'fan';
+    const SCRATCH_AWL = 'scratch-awl';
     const RING   = 'ring';
 
 
@@ -32,6 +33,7 @@ class WeaponTypes {
         self::GUN    => self::GUN,
         self::FAN    => self::FAN,
         self::MACE   => self::MACE,
+        self::SCRATCH_AWL => self::SCRATCH_AWL,
         self::RING   => self::RING,
     ];
 
