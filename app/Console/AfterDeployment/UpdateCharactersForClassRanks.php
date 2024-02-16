@@ -147,6 +147,10 @@ class UpdateCharactersForClassRanks extends Command
             return 5;
         }
 
+        if (($classRank->gameClass->type()->isBookBinder()) && (new WeaponMasteryValue($type))->isScratchAwl()) {
+            return 5;
+        }
+
         return 0;
     }
 }

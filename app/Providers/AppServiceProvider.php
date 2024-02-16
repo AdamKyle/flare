@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Console\AfterDeployment\AddHolyStacksToItems;
+use App\Console\AfterDeployment\AssignNewClassRanksAndMasteriesToCharacters;
 use App\Console\AfterDeployment\AssignNewFactionsToCharacters;
 use App\Console\AfterDeployment\AssignNewSkillsToPlayers;
 use App\Console\AfterDeployment\ChangeDamageAmountOnAffixes;

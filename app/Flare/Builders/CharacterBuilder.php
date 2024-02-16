@@ -259,6 +259,7 @@ class CharacterBuilder {
      * Assign Class Ranks to a character.
      *
      * @return CharacterBuilder
+     * @throws Exception
      */
     public function assignClassRanks(): CharacterBuilder {
         $gameClasses = GameClass::all();
@@ -360,6 +361,30 @@ class CharacterBuilder {
         }
 
         if (($classRank->gameClass->type()->isBlackSmith()) && (new WeaponMasteryValue($type))->isHammer()) {
+            return 5;
+        }
+
+        if (($classRank->gameClass->type()->isMerchant()) && (new WeaponMasteryValue($type))->isBow()) {
+            return 3;
+        }
+
+        if (($classRank->gameClass->type()->isMerchant()) && (new WeaponMasteryValue($type))->isStaff()) {
+            return 5;
+        }
+
+        if (($classRank->gameClass->type()->isGunslinger()) && (new WeaponMasteryValue($type))->isGun()) {
+            return 5;
+        }
+
+        if (($classRank->gameClass->type()->isDancer()) && (new WeaponMasteryValue($type))->isFan()) {
+            return 5;
+        }
+
+        if (($classRank->gameClass->type()->isCleric()) && (new WeaponMasteryValue($type))->isMace()) {
+            return 5;
+        }
+
+        if (($classRank->gameClass->type()->isBookBinder()) && (new WeaponMasteryValue($type))->isScratchAwl()) {
             return 5;
         }
 
