@@ -16,6 +16,11 @@ class ItemsSheet implements ToCollection {
         foreach ($rows as $index => $row) {
             if ($index !== 0) {
                 $item      = array_combine($rows[0]->toArray(), $row->toArray());
+
+                if (is_null($item['name'])) {
+                    return;
+                }
+
                 $gameClass = null;
 
                 if (isset($item['unlocks_class_id'])) {
@@ -42,23 +47,10 @@ class ItemsSheet implements ToCollection {
 
                 if (!is_null($item)) {
                     $item->update($itemData);
-
-                    $this->updateChildrenElements($item->refresh());
                 } else {
                     Item::create($itemData);
                 }
             }
-        }
-    }
-
-    protected function updateChildrenElements(Item $item) {
-        foreach ($item->children as $childItem) {
-            $attributes = $item->getAttributes();
-
-            $attributes['item_suffix_id'] = $childItem->item_suffix_id;
-            $attributes['item_prefix_id'] = $childItem->item_prefix_id;
-
-            $childItem->update();
         }
     }
 

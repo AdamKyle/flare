@@ -38,11 +38,19 @@ class AssignNewSkillsToPlayers extends Command
      * @return int
      */
     public function handle() {
-        Character::chunkById(100, function($characters) {
+
+        $bar = $this->output->createProgressBar(Character::count());
+        $bar->start();
+
+        Character::chunkById(100, function($characters) use($bar) {
             foreach ($characters as $character) {
                 $this->assignNewSkills($character);
+
+                $bar->advance();
             }
         });
+
+        $bar->finish();
     }
 
     public function assignNewSkills(Character $character) {

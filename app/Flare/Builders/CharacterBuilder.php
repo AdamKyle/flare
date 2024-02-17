@@ -3,6 +3,7 @@
 namespace App\Flare\Builders;
 
 use App\Flare\Models\CharacterClassRank;
+use App\Flare\Models\CharacterPassiveSkill;
 use App\Flare\Models\PassiveSkill;
 use App\Flare\Models\User;
 use App\Flare\Models\GameMap;
@@ -18,6 +19,7 @@ use App\Game\ClassRanks\Values\ClassRankValue;
 use App\Game\ClassRanks\Values\WeaponMasteryValue;
 use App\Game\Core\Values\FactionLevel;
 use Exception;
+use phpDocumentor\Reflection\Types\Boolean;
 
 class CharacterBuilder {
 
@@ -201,27 +203,25 @@ class CharacterBuilder {
         foreach (PassiveSkill::all() as $passiveSkill) {
             $characterPassive = $this->character->passiveSkills()->where('passive_skill_id', $passiveSkill->id)->first();
 
+            $parentId = $passiveSkill->parent_skill_id;
+            $parent   = null;
+
+            if (!is_null($parentId)) {
+                $parent = $this->character->passiveSkills()->where('passive_skill_id', $parentId)->first();
+            }
+
             if (is_null($characterPassive)) {
-                $parentId = $passiveSkill->parent_skill_id;
-                $parent   = null;
-
-                if (!is_null($parentId)) {
-                    $parent = $this->character->passiveSkills()->where('passive_skill_id', $parentId)->first();
-                }
-
-                $isLocked = $passiveSkill->is_locked;
-
-                if (!is_null($parent)) {
-                    $isLocked = $passiveSkill->unlocks_at_level >= $parent->current_level;
-                }
-
                 $this->character->passiveSkills()->create([
                     'character_id'     => $this->character->id,
                     'passive_skill_id' => $passiveSkill->id,
                     'current_level'    => 0,
                     'hours_to_next'    => $passiveSkill->hours_per_level,
-                    'is_locked'        => $isLocked,
+                    'is_locked'        => $this->getIsSkillLocked($passiveSkill, $parent),
                     'parent_skill_id'  => !is_null($parent) ? $parent->id : null,
+                ]);
+            } else {
+                $characterPassive->update([
+                    'is_locked' => $this->getIsSkillLocked($characterPassive->passiveSkill, $parent),
                 ]);
             }
         }
@@ -229,6 +229,17 @@ class CharacterBuilder {
         $this->character = $this->character->refresh();
 
         return $this;
+    }
+
+    protected function getIsSkillLocked(PassiveSkill $passiveSkill, ?CharacterPassiveSkill $parentSkill = null): bool {
+
+        $isLocked = $passiveSkill->is_locked;
+
+        if (!is_null($parentSkill)) {
+            $isLocked = $passiveSkill->unlocks_at_level > $parentSkill->current_level;
+        }
+
+        return $isLocked;
     }
 
     /**

@@ -53,12 +53,24 @@ class KingdomQueueService {
     protected function fetchBuildingExpansionQueues(Kingdom $kingdom): array {
         $buildingExpansionQueues = BuildingExpansionQueue::where('kingdom_id', $kingdom->id)->get();
 
+
         return $buildingExpansionQueues->map(function ($buildingExpansionQueue) {
+
+            $fromSlot = 0;
+            $toSlot = 1;
+
+            $buildingExpansion = $buildingExpansionQueue->building->buildingExpansion;
+
+            if (!is_null($buildingExpansion)) {
+                $fromSlot = $buildingExpansion->expansion_count;
+                $toSlot = $buildingExpansion->expansion_count + 1;
+            }
+
             return [
                 'name' => $buildingExpansionQueue->building->name,
                 'id'   => $buildingExpansionQueue->id,
-                'from_slot' => $buildingExpansionQueue->building->buildingExpansion->current_slot,
-                'to_slot' => $buildingExpansionQueue->building->buildingExpansion->current_slot + 1,
+                'from_slot' => $fromSlot,
+                'to_slot' => $toSlot,
                 'time_remaining' => now()->diffInSeconds($buildingExpansionQueue->completed_at),
             ];
         })->toArray();
