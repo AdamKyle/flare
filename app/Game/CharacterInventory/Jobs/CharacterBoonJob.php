@@ -10,6 +10,7 @@ use Illuminate\Queue\SerializesModels;
 use App\Game\CharacterInventory\Services\UseItemService;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Flare\Models\CharacterBoon;
+use Illuminate\Support\Facades\Cache;
 
 class CharacterBoonJob implements ShouldQueue {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
@@ -64,6 +65,8 @@ class CharacterBoonJob implements ShouldQueue {
 
         $useItemService->updateCharacter($character->refresh());
 
-        event(new ServerMessageEvent($character->user, 'A boon has worn off, your stats (skills) have been adjusted accordingly.'));
+        Cache::delete('can-character-survive-' . $character->id);
+
+        event(new ServerMessageEvent($character->user, 'A boon (or set of, if stacked) has worn off, your stats (skills) have been adjusted accordingly.'));
     }
 }
