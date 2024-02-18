@@ -282,6 +282,8 @@ class CharacterStatBuilderTest extends TestCase {
             'item_id'      => $boonAffectsAllStats->id,
             'started'      => now(),
             'complete'     => now(),
+            'last_for_minutes' => 10,
+            'amount_used'      => 1,
         ]);
 
         $character->boons()->create([
@@ -289,6 +291,8 @@ class CharacterStatBuilderTest extends TestCase {
             'item_id'      => $boonAffectsStrStat->id,
             'started'      => now(),
             'complete'     => now(),
+            'last_for_minutes' => 10,
+            'amount_used'      => 1,
         ]);
 
         $moddedStr = $this->characterStatBuilder->setCharacter($character)->statMod('str');
@@ -317,6 +321,8 @@ class CharacterStatBuilderTest extends TestCase {
             'item_id'      => $boonAffectsAllStats->id,
             'started'      => now(),
             'complete'     => now(),
+            'last_for_minutes' => 10,
+            'amount_used'      => 1,
         ]);
 
         $character->boons()->create([
@@ -324,6 +330,8 @@ class CharacterStatBuilderTest extends TestCase {
             'item_id'      => $boonAffectsStrStat->id,
             'started'      => now(),
             'complete'     => now(),
+            'last_for_minutes' => 10,
+            'amount_used'      => 1,
         ]);
 
         $moddedStr = $this->characterStatBuilder->setCharacter($character)->statMod('str');

@@ -20,6 +20,9 @@ use League\Fractal\Resource\Item as ResourceItem;
 
 class UseItemService {
 
+    const MAX_TIME = 8 * 60;
+    const MAX_AMOUNT = 10;
+
     /**
      * @var CharacterSheetBaseInfoTransformer $characterAttackTransformer
      */
@@ -47,6 +50,43 @@ class UseItemService {
      * @return void
      */
     public function useItem(InventorySlot $slot, Character $character) {
+
+        $foundBoon = $character->boons()
+            ->where('item_id', $slot->item_id)
+            ->where('last_for_minutes', '<', self::MAX_TIME)
+            ->where(function ($query) {
+                $query->where('amount_used', '<', self::MAX_AMOUNT);
+            })
+            ->first();
+
+        if (!is_null($foundBoon) && $slot->item->can_stack) {
+            $completesAtMinutes = $foundBoon->complete->diffInMinutes();
+
+            $remainingTime = min(self::MAX_TIME - $completesAtMinutes, $completesAtMinutes);
+
+            $timeStamp = now();
+
+            $amountUsed = min(self::MAX_AMOUNT, $foundBoon->amount_used + 1);
+
+            $timeStamp->addMinutes($remainingTime);
+
+            $lastsFor = $slot->item->lasts_for;
+
+            $additionalTime = min($lastsFor, self::MAX_TIME - $timeStamp->diffInMinutes(now()));
+
+            $timeStamp->addMinutes($additionalTime);
+
+            $foundBoon->update([
+                'last_for_minutes' => min(self::MAX_TIME, $foundBoon->last_for_minutes + $slot->item->lasts_for),
+                'complete' => $timeStamp,
+                'amount_used' => $amountUsed,
+            ]);
+
+            $slot->delete();
+
+            return;
+        }
+
         $completedAt = now()->addMinutes($slot->item->lasts_for);
 
         $boon = $character->boons()->create([
@@ -54,6 +94,8 @@ class UseItemService {
             'item_id'                  => $slot->item->id,
             'started'                  => now(),
             'complete'                 => $completedAt,
+            'amount_used'              => 1,
+            'last_for_minutes'         => $slot->item->lasts_for,
         ]);
 
         CharacterBoonJob::dispatch($boon->id)->delay($completedAt);

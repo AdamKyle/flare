@@ -18,6 +18,8 @@ class CharacterBoon extends Model {
     protected $fillable = [
         'character_id',
         'item_id',
+        'last_for_minutes',
+        'amount_used',
         'started',
         'complete',
     ];
@@ -32,6 +34,8 @@ class CharacterBoon extends Model {
         'item_id'                                 => 'integer',
         'started'                                 => 'datetime',
         'complete'                                => 'datetime',
+        'last_for_minutes'                        => 'integer',
+        'amount_used'                             => 'integer',
     ];
 
     public function character() {

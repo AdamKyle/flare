@@ -44,6 +44,8 @@ class CharacterBoonJobTest extends TestCase {
             'item_id' => $this->createItem(['type' => 'alchemy'])->id,
             'started' => now(),
             'complete' => now(),
+            'last_for_minutes' => 10,
+            'amount_used' => 1,
         ]);
 
         $character = $character->refresh();

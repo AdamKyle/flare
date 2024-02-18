@@ -40,6 +40,24 @@ class CharacterBoonJob implements ShouldQueue {
             return;
         }
 
+        if (!$boon->complete->lessThanOrEqualTo(now())) {
+            $timeLeft = $boon->complete->diffInMinutes(now());
+
+            if ($timeLeft <= 15) {
+                $time = now()->addMinutes($timeLeft);
+            } else {
+                $time = now()->addMinutes(15);
+            }
+
+            // @codeCoverageIgnoreStart
+            CharacterBoonJob::dispatch(
+                $boon->id,
+            )->delay($time);
+
+            return;
+            // @codeCoverageIgnoreEnd
+        }
+
         $character = $boon->character;
 
         $boon->delete();

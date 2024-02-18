@@ -142,4 +142,141 @@ class UseItemServiceTest extends TestCase {
         Event::assertDispatched(ServerMessageEvent::class);
         Event::assertDispatched(CharacterBoonsUpdateBroadcastEvent::class);
     }
+
+    public function testCharacterBoonsStackWhenTheSameItemIsFoundAndUsed() {
+        Queue::fake();
+        Event::fake();
+
+        $item = $this->createItem([
+            'usable' => true,
+            'lasts_for' => 30,
+            'type' => 'alchemy',
+            'can_stack' => true,
+        ]);
+
+        $character = (new CharacterFactory())->createBaseCharacter()
+            ->givePlayerLocation()
+            ->inventoryManagement()
+            ->giveItem($item)
+            ->giveItem($item)
+            ->getCharacter();
+
+        $items = $character->inventory->slots->where('item.type', 'alchemy');
+
+        for ($i = 0; $i <= ($items->count() - 1); $i++) {
+            $this->useItemService->useItem($items[$i], $character);
+
+            $character = $character->refresh();
+        }
+
+        $character = $character->refresh();
+
+        $this->useItemService->updateCharacter($character, $item);
+
+        Event::assertDispatched(UpdateBaseCharacterInformation::class);
+        Event::assertDispatched(UpdateTopBarEvent::class);
+        Event::assertDispatched(ServerMessageEvent::class);
+        Event::assertDispatched(CharacterBoonsUpdateBroadcastEvent::class);
+
+        $this->assertEquals(2, $character->boons->first()->amount_used);
+        $this->assertEquals(60, $character->boons->first()->last_for_minutes);
+    }
+
+    public function testDoNotGoAboveTheMaxAmountAndMaxTime() {
+        Queue::fake();
+        Event::fake();
+
+        $item = $this->createItem([
+            'usable' => true,
+            'lasts_for' => 60,
+            'type' => 'alchemy',
+            'can_stack' => true,
+        ]);
+
+        $character = (new CharacterFactory())->createBaseCharacter()
+            ->givePlayerLocation()
+            ->inventoryManagement();
+
+        for ($i = 1; $i <= 10; $i++) {
+            $character->giveItem($item);
+        }
+
+        $character = $character->getCharacter();
+
+        $items = $character->inventory->slots->where('item.type', 'alchemy');
+
+        for ($i = 0; $i <= ($items->count() - 1); $i++) {
+            $this->useItemService->useItem($items[$i], $character);
+
+            $character = $character->refresh();
+        }
+
+        $character = $character->refresh();
+
+        $this->useItemService->updateCharacter($character, $item);
+
+        Event::assertDispatched(UpdateBaseCharacterInformation::class);
+        Event::assertDispatched(UpdateTopBarEvent::class);
+        Event::assertDispatched(ServerMessageEvent::class);
+        Event::assertDispatched(CharacterBoonsUpdateBroadcastEvent::class);
+
+        $boons = $character->boons;
+
+        $this->assertEquals(2, $boons->count());
+
+        $this->assertEquals(8, $boons[0]->amount_used);
+        $this->assertEquals(480, $boons[0]->last_for_minutes);
+
+        $this->assertEquals(2, $boons[1]->amount_used);
+        $this->assertEquals(120, $boons[1]->last_for_minutes);
+    }
+
+    public function testUseMultipleItemsCreatingTeoStacksEach() {
+        Queue::fake();
+        Event::fake();
+
+        $item = $this->createItem([
+            'usable' => true,
+            'lasts_for' => 10,
+            'type' => 'alchemy',
+            'can_stack' => true,
+        ]);
+
+        $character = (new CharacterFactory())->createBaseCharacter()
+            ->givePlayerLocation()
+            ->inventoryManagement();
+
+        for ($i = 1; $i <= 20; $i++) {
+            $character->giveItem($item);
+        }
+
+        $character = $character->getCharacter();
+
+        $items = $character->inventory->slots->where('item.type', 'alchemy');
+
+        for ($i = 0; $i <= ($items->count() - 1); $i++) {
+            $this->useItemService->useItem($items[$i], $character);
+
+            $character = $character->refresh();
+        }
+
+        $character = $character->refresh();
+
+        $this->useItemService->updateCharacter($character, $item);
+
+        Event::assertDispatched(UpdateBaseCharacterInformation::class);
+        Event::assertDispatched(UpdateTopBarEvent::class);
+        Event::assertDispatched(ServerMessageEvent::class);
+        Event::assertDispatched(CharacterBoonsUpdateBroadcastEvent::class);
+
+        $boons = $character->boons;
+
+        $this->assertEquals(2, $boons->count());
+
+        $this->assertEquals(10, $boons[0]->amount_used);
+        $this->assertEquals(100, $boons[0]->last_for_minutes);
+
+        $this->assertEquals(10, $boons[1]->amount_used);
+        $this->assertEquals(100, $boons[1]->last_for_minutes);
+    }
 }
