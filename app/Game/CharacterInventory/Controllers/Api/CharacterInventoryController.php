@@ -478,40 +478,6 @@ class  CharacterInventoryController extends Controller {
     }
 
     /**
-     * @param Character $character
-     * @param EquipBestItemForSlotsTypesService $equipBestItemForSlotsTypesService
-     * @return JsonResponse
-     */
-    public function equipBestInSlot(Character $character, EquipBestItemForSlotsTypesService $equipBestItemForSlotsTypesService): JsonResponse {
-        try {
-            $equipBestItemForSlotsTypesService->handleBestEquipmentForCharacter($character);
-
-            $character = $character->refresh();
-
-            $this->updateCharacterAttackDataCache($character);
-
-            $characterInventoryService = $this->characterInventoryService->setCharacter($character->refresh());
-
-            $message = $equipBestItemForSlotsTypesService->hasEquipmentChanged() ?
-                'Equipped or Replaced equipped items with the best in slot items!' :
-                'You currently have the best items equipped!';
-
-            return response()->json([
-                'inventory' => [
-                    'inventory' => $characterInventoryService->fetchCharacterInventory(),
-                    'equipped'  => $characterInventoryService->fetchEquipped(),
-                    'sets'      => $characterInventoryService->getCharacterInventorySets(),
-                ],
-                'message'       => $message
-            ]);
-        } catch (Exception $e) {
-            return response()->json([
-                'message' => $e->getMessage()
-            ], 422);
-        }
-    }
-
-    /**
      * @param Request $request
      * @param Character $character
      * @param InventorySetService $inventorySetService

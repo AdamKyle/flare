@@ -293,6 +293,7 @@ class ItemComparison {
         $totalStatForEquipped = $equipped->getTotalPercentageForStat($this->character->damage_stat);
         $totalStatForCompare  = $toCompare->getTotalPercentageForStat($this->character->damage_stat);
 
+
         if ($totalStatForEquipped > 0.0) {
             if ($totalStatForCompare > $totalStatForEquipped) {
                 return true;
