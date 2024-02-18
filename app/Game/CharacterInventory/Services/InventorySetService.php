@@ -7,11 +7,24 @@ use App\Flare\Models\InventorySet;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 use App\Flare\Models\SetSlot;
+use App\Game\CharacterInventory\Validations\SetHandsValidation;
 use App\Game\Core\Traits\ResponseBuilder;
 
 class InventorySetService {
 
     use ResponseBuilder;
+
+    /**
+     * @var SetHandsValidation $setHandsValidation
+     */
+    private SetHandsValidation $setHandsValidation;
+
+    /**
+     * @param SetHandsValidation $setHandsValidation
+     */
+    public function __construct(SetHandsValidation $setHandsValidation) {
+        $this->setHandsValidation = $setHandsValidation;
+    }
 
     /**
      * Allows us to add an item to an inventory set.
@@ -175,15 +188,13 @@ class InventorySetService {
     /**
      * Checks to see if the set is equippable.
      *
-     * When new items are added or items are removed from the set, the set will call this
-     * function to then update its equippable status.
-     *
      * @param InventorySet $inventorySet
      * @return bool
      */
     public function isSetEquippable(InventorySet $inventorySet): bool {
-        // Bail early as our weapons are invalid.
-        if (!$this->hasWeapon($inventorySet)) {
+
+        // Bail early as our hands are invalid.
+        if (!$this->setHandsValidation->isInventorySetHandPositionsValid($inventorySet)) {
             return false;
         }
 
@@ -196,7 +207,7 @@ class InventorySetService {
             }
         }
 
-        // Bail if we have more then two trinkets
+        // Bail if we have more than two trinkets
         if (!$this->hasTrinkets($inventorySet)) {
             return false;
         }
@@ -222,290 +233,6 @@ class InventorySetService {
         }
 
         // Assume that this set is equippable.
-        return true;
-    }
-
-    /**
-     * Is our set considered valid based on what we have in it?
-     *
-     * @param InventorySet $inventorySet
-     * @return bool
-     */
-    protected function hasWeapon(InventorySet $inventorySet) {
-        $weapons = collect($inventorySet->slots->filter(function($slot) {
-           return $slot->item->type === 'weapon';
-        })->all());
-
-        $shields = collect($inventorySet->slots->filter(function($slot) {
-            return $slot->item->type === 'shield';
-        })->all());
-
-        $bows = collect($inventorySet->slots->filter(function($slot) {
-            return $slot->item->type === 'bow';
-        })->all());
-
-        $guns = collect($inventorySet->slots->filter(function($slot) {
-            return $slot->item->type === 'gun';
-        })->all());
-
-        $scratchAwls = collect($inventorySet->slots->filter(function($slot) {
-            return $slot->item->type === 'scratch-awl';
-        })->all());
-
-        $fans = collect($inventorySet->slots->filter(function($slot) {
-            return $slot->item->type === 'fan';
-        })->all());
-
-        $maces = collect($inventorySet->slots->filter(function($slot) {
-            return $slot->item->type === 'mace';
-        })->all());
-
-        $hammers = collect($inventorySet->slots->filter(function($slot) {
-            return $slot->item->type === 'hammer';
-        })->all());
-
-        $staves = collect($inventorySet->slots->filter(function($slot) {
-            return $slot->item->type === 'stave';
-        })->all());
-
-        $hasShield = $inventorySet->slots->filter(function($slot) {
-            return $slot->item->type === 'shield';
-        })->isNotEmpty();
-
-        $hasBow = $inventorySet->slots->filter(function($slot) {
-            return $slot->item->type === 'bow';
-        })->isNotEmpty();
-
-        $hasHammer = $inventorySet->slots->filter(function($slot) {
-            return $slot->item->type === 'hammer';
-        })->isNotEmpty();
-
-        $hasStave = $inventorySet->slots->filter(function($slot) {
-            return $slot->item->type === 'stave';
-        })->isNotEmpty();
-
-        if ($weapons->count() > 2) {
-            return false;
-        }
-
-        if ($guns->count() > 2) {
-            return false;
-        }
-
-        if ($fans->count() > 2) {
-            return false;
-        }
-
-        if ($maces->count() > 2) {
-            return false;
-        }
-
-        if ($scratchAwls->count() > 2) {
-            return false;
-        }
-
-        if ($guns->count() > 1 && $weapons->count() > 1) {
-            return false;
-        }
-
-        if ($guns->count() > 1 && $shields->count() > 1) {
-            return false;
-        }
-
-        if ($fans->count() > 1 && $shields->count() > 1) {
-            return false;
-        }
-
-        if ($guns->count() > 1 && $fans->count() > 1) {
-            return false;
-        }
-
-        if ($guns->count() > 1 && $scratchAwls->count() > 1) {
-            return false;
-        }
-
-
-        if ($scratchAwls->count() > 1 && $weapons->count() > 1) {
-            return false;
-        }
-
-        if ($scratchAwls->count() > 1 && $shields->count() > 1) {
-            return false;
-        }
-
-        if ($scratchAwls->count() > 1 && $fans->count() > 1) {
-            return false;
-        }
-
-        if ($scratchAwls->count() > 1 && $maces->count() > 1) {
-            return false;
-        }
-
-
-        if ($weapons->count() > 1 && $fans->count() > 1) {
-            return false;
-        }
-
-        if ($maces->count() > 1 && $guns->count() > 1) {
-            return false;
-        }
-
-        if ($maces->count() > 1 && $fans->count() > 1) {
-            return false;
-        }
-
-        if ($maces->count() > 1 && $scratchAwls->count() > 1) {
-            return false;
-        }
-
-        if ($maces->count() > 1 && $weapons->count() > 1) {
-            return false;
-        }
-
-        if ($maces->count() > 1 && $shields->count() > 1) {
-            return false;
-        }
-
-        if ($hasHammer && $weapons->count() > 0) {
-            return false;
-        }
-
-        if ($hasBow && $weapons->count() > 0) {
-            return false;
-        }
-
-        if ($hasStave && $weapons->count() > 0) {
-            return false;
-        }
-
-        if ($hasHammer && $guns->count() > 0) {
-            return false;
-        }
-
-        if ($hasHammer && $fans->count() > 0) {
-            return false;
-        }
-
-        if ($hasHammer && $maces->count() > 0) {
-            return false;
-        }
-
-        if ($hasHammer && $scratchAwls->count() > 0) {
-            return false;
-        }
-
-        if ($hasBow && $weapons->count() > 0) {
-            return false;
-        }
-
-        if ($hasBow && $guns->count() > 0) {
-            return false;
-        }
-
-        if ($hasBow && $fans->count() > 0) {
-            return false;
-        }
-
-        if ($hasBow && $maces->count() > 0) {
-            return false;
-        }
-
-        if ($hasBow && $scratchAwls->count() > 0) {
-            return false;
-        }
-
-        if ($hasStave && $bows->count() > 0) {
-            return false;
-        }
-
-        if ($hasStave && $maces->count() > 0) {
-            return false;
-        }
-
-        if ($hasStave && $scratchAwls->count() > 0) {
-            return false;
-        }
-
-        if ($hasStave && $weapons->count() > 0) {
-            return false;
-        }
-
-        if ($hammers->count() > 1) {
-            return false;
-        }
-
-        if ($bows->count() > 1) {
-            return false;
-        }
-
-        if ($staves->count() > 1) {
-            return false;
-        }
-
-        if ($shields->count() == 2 && $weapons->count() > 0) {
-            return false;
-        }
-
-        if ($shields->count() == 2 && $guns->count() > 0) {
-            return false;
-        }
-
-        if ($shields->count() == 2 && $maces->count() > 0) {
-            return false;
-        }
-
-        if ($shields->count() == 2 && $fans->count() > 0) {
-            return false;
-        }
-
-        if ($shields->count() == 2 && $scratchAwls->count() > 0) {
-            return false;
-        }
-
-        if ($hasShield && $hasBow) {
-            return false;
-        }
-
-        if ($hasShield && $hasHammer) {
-            return false;
-        }
-
-        if ($hasShield && $hasStave) {
-            return false;
-        }
-
-        if ($hasHammer && $hasBow) {
-            return false;
-        }
-
-        if ($hasStave && $hasBow) {
-            return false;
-        }
-
-        if ($hasHammer && $hasStave) {
-            return false;
-        }
-
-        if ($hasShield && $weapons->count() > 1) {
-            return false;
-        }
-
-        if ($hasShield && $guns->count() > 1) {
-            return false;
-        }
-
-        if ($hasShield && $fans->count() > 1) {
-            return false;
-        }
-
-        if ($hasShield && $maces->count() > 1) {
-            return false;
-        }
-
-        if ($hasShield && $scratchAwls->count() > 1) {
-            return false;
-        }
-
         return true;
     }
 
@@ -620,6 +347,12 @@ class InventorySetService {
         return true;
     }
 
+    /**
+     * Do we have more than one unique in the set?
+     *
+     * @param InventorySet $inventorySet
+     * @return bool
+     */
     protected function hasMoreThanOneUnique(InventorySet $inventorySet): bool {
         return $inventorySet->slots->filter(function($slot) {
             if (!is_null($slot->item->itemPrefix)) {
@@ -635,8 +368,6 @@ class InventorySetService {
             }
         })->count() > 1;
     }
-
-
 
     /**
      * Set the position of equipment, except armour.

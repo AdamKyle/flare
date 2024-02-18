@@ -10,6 +10,7 @@ use App\Game\CharacterInventory\Handlers\EquipBest\HandleTrinketsAndArtifacts;
 use App\Game\CharacterInventory\Handlers\EquipBest\HandleUniquesAndMythics;
 use App\Game\CharacterInventory\Handlers\EquipBest\InventoryItemComparison;
 use App\Game\CharacterInventory\Services\EquipBestItemForSlotsTypesService;
+use App\Game\CharacterInventory\Validations\SetHandsValidation;
 use App\Game\Core\Comparison\ItemComparison;
 use League\Fractal\Manager;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
@@ -45,8 +46,16 @@ class ServiceProvider extends ApplicationServiceProvider {
             return $manager;
         });
 
+        $this->app->bind(SetHandsValidation::class, function () {
+            return new SetHandsValidation();
+        });
+
         $this->app->bind(InventorySetService::class, function ($app) {
-            return new InventorySetService();
+            return new InventorySetService(
+                $app->make(
+                    SetHandsValidation::class
+                )
+            );
         });
 
         $this->app->bind(EquipItemService::class, function ($app) {

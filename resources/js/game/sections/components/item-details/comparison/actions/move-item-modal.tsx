@@ -69,7 +69,8 @@ export default class MoveItemModal extends React.Component<
                             <li>
                                 <strong>Hands</strong>: 1 or 2 weapons for
                                 hands, or 1 or 2 shields or 1 duel wielded
-                                weapon (bow, hammer or stave)
+                                weapon (bow, hammer or stave). Guns, Fans, Scratch Awls and Maces
+                                follow the same rules
                             </li>
                             <li>
                                 <strong>Armour</strong>: 1 of each type, body,
