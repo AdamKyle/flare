@@ -28,10 +28,10 @@
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css" />
 
-    <link href="{{ mix('css/app.css') }}" rel="stylesheet">
-    <link href="{{ mix('css/tailwind.css') }}" rel="stylesheet">
+    @vite('resources/css/app.css')
+    @vite('resources/css/tailwind.css')
 
-    <script src={{mix('js/dark-mode.js')}} type="text/javascript"></script>
+    @vite('resources/js/dark-mode.js')
 
     @stack('head')
 </head>
@@ -87,8 +87,8 @@
 
 </main>
 
-<script src={{mix('js/theme-vendor.js')}} type="text/javascript"></script>
-<script src={{mix('js/theme-script.js')}} type="text/javascript"></script>
+@vite('resources/js/theme-vendor.js')
+@vite('resources/js/theme-script.js')
 
 </body>
 </html>

@@ -28,18 +28,18 @@
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css" />
 
-    <link href="{{ mix('css/app.css') }}" rel="stylesheet">
-    <link href="{{ mix('css/tailwind.css') }}" rel="stylesheet">
+    @vite('resources/css/app.css')
+    @vite('resources/css/tailwind.css')
 
     @livewireStyles
 
-    <script src={{mix('js/manifest.js')}} type="text/javascript"></script>
-    <script src={{mix('js/vendor.js')}} type="text/javascript"></script>
+    @vite('resources/js/manifest.js')
+    @vite('resources/js/vendor.js')
 
     <script src="https://cdn.jsdelivr.net/gh/mcstudios/glightbox/dist/js/glightbox.min.js"></script>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
-    <script src={{mix('js/dark-mode.js')}} type="text/javascript"></script>
+    @vite('resources/js/dark-mode.js')
 
     @stack('head')
 </head>
@@ -101,9 +101,9 @@
 
 @livewireScripts
 
-<script src={{mix('js/theme-vendor.js')}} type="text/javascript"></script>
-<script src={{mix('js/theme-script.js')}} type="text/javascript"></script>
-<script src="{{ mix('js/app.js') }}"></script>
+@vite('resources/js/theme-vendor.js')
+@vite('resources/js/theme-script.js')
+@vite('resources/js/app.js')
 
 <script>
     const lightbox = GLightbox();
