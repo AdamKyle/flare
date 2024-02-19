@@ -11,7 +11,6 @@
         "strict": true,                 // Enable strict type-checking options
         "skipLibCheck": false,          // Skip type checking of declaration files
         "noImplicitAny": true,
-        // Bypass raising errors on `any` type
         "allowSyntheticDefaultImports": true,
         "downlevelIteration": true,
         "allowJs": true,
