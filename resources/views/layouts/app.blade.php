@@ -29,6 +29,14 @@
     @vite('resources/sass/app.scss')
     @vite('resources/css/tailwind.css')
 
+    @livewireStyles
+
+    @vite('resources/js/vendor/livewire-data-tables.js')
+
+    @vite('resources/js/vendor/livewire.js')
+
+
+
 {{--    @livewireStyles--}}
 
     @vite('resources/vendor/theme/assets/js/dark-mode/dark-mode.js')
@@ -140,7 +148,7 @@
     @endguest
     <!-- Scripts -->
 
-{{--    @livewireScripts--}}
+    @livewireScriptConfig
 
     @vite('resources/js/vendor/theme-script.js')
 

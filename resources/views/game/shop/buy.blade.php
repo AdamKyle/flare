@@ -37,6 +37,8 @@
                 <p><strong>Your Gold</strong>: <span class="color-gold">{{number_format($gold)}}</span></p>
             </x-core.cards.card>
 
+            <livewire:items-table theme="tailwind" />
+
 {{--            @livewire('admin.items.items-table', ['isShop' => true])--}}
         </div>
   </div>
