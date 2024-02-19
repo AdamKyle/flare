@@ -14,9 +14,6 @@
 /* Animate.css */
 @import "animate.css/animate.css";
 
-/* Glide.js */
-@import "@glidejs/glide/dist/css/glide.core.css";
-
 /* Main */
 @import "tailwindcss/base.css";
 @import "base.css";

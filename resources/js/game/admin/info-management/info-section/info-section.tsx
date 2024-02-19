@@ -1,6 +1,5 @@
 import React, { Fragment } from "react";
-const ReactQuill = require("react-quill");
-import "react-quill/dist/quill.snow.css";
+import ReactQuill from 'react-quill';
 import BasicCard from "../../../components/ui/cards/basic-card";
 import Select from "react-select";
 import PrimaryButton from "../../../components/ui/buttons/primary-button";

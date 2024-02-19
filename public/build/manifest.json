@@ -1,4 +1,13 @@
 {
+  "_calendar-DL-QoAyD.js": {
+    "file": "assets/calendar-DL-QoAyD.js",
+    "imports": [
+      "_popper-CvwSYPO-.js"
+    ]
+  },
+  "_popper-CvwSYPO-.js": {
+    "file": "assets/popper-CvwSYPO-.js"
+  },
   "node_modules/line-awesome/dist/line-awesome/fonts/la-brands-400.eot": {
     "file": "assets/la-brands-400-LN4CMlGg.eot",
     "src": "node_modules/line-awesome/dist/line-awesome/fonts/la-brands-400.eot"
@@ -60,13 +69,60 @@
     "src": "node_modules/line-awesome/dist/line-awesome/fonts/la-solid-900.woff2"
   },
   "resources/css/tailwind.css": {
-    "file": "assets/tailwind-CPW335Tz.css",
+    "file": "assets/tailwind-B-N7-p5r.css",
     "src": "resources/css/tailwind.css",
     "isEntry": true
   },
+  "resources/fonts/rpgawesome-webfont.eot": {
+    "file": "assets/rpgawesome-webfont-BRLmZ7ej.eot",
+    "src": "resources/fonts/rpgawesome-webfont.eot"
+  },
+  "resources/fonts/rpgawesome-webfont.svg": {
+    "file": "assets/rpgawesome-webfont-DVZLXeu_.svg",
+    "src": "resources/fonts/rpgawesome-webfont.svg"
+  },
+  "resources/fonts/rpgawesome-webfont.ttf": {
+    "file": "assets/rpgawesome-webfont-BFwApLwb.ttf",
+    "src": "resources/fonts/rpgawesome-webfont.ttf"
+  },
+  "resources/fonts/rpgawesome-webfont.woff": {
+    "file": "assets/rpgawesome-webfont-Dqq2L5LG.woff",
+    "src": "resources/fonts/rpgawesome-webfont.woff"
+  },
+  "resources/js/admin-app.ts": {
+    "file": "assets/admin-app-BWY4AE3Q.js",
+    "src": "resources/js/admin-app.ts",
+    "isEntry": true,
+    "imports": [
+      "_calendar-DL-QoAyD.js",
+      "_popper-CvwSYPO-.js"
+    ]
+  },
   "resources/js/app.ts": {
-    "file": "assets/app-Bqz_sARz.js",
+    "file": "assets/app-DitrLprN.js",
     "src": "resources/js/app.ts",
+    "isEntry": true,
+    "imports": [
+      "_calendar-DL-QoAyD.js",
+      "_popper-CvwSYPO-.js"
+    ]
+  },
+  "resources/js/vendor/theme-script.js": {
+    "file": "assets/theme-script-Bnr8zB4S.js",
+    "src": "resources/js/vendor/theme-script.js",
+    "isEntry": true,
+    "imports": [
+      "_popper-CvwSYPO-.js"
+    ]
+  },
+  "resources/sass/app.scss": {
+    "file": "assets/app-JzTnxpCf.css",
+    "src": "resources/sass/app.scss",
+    "isEntry": true
+  },
+  "resources/vendor/theme/assets/js/dark-mode/dark-mode.js": {
+    "file": "assets/dark-mode-Cag0kHpS.js",
+    "src": "resources/vendor/theme/assets/js/dark-mode/dark-mode.js",
     "isEntry": true
   }
 }

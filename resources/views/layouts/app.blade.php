@@ -26,18 +26,12 @@
     <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
 
+    @vite('resources/sass/app.scss')
     @vite('resources/css/tailwind.css')
 
     @livewireStyles
 
-{{--    @vite('js/manifest.js')--}}
-{{--    @vite('js/vendor.js')--}}
-{{--    @vite('js/dark-mode.js')--}}
-
-{{--    <script src={{mix('js/manifest.js')}} type="text/javascript"></script>--}}
-{{--    <script src={{mix('js/vendor.js')}} type="text/javascript"></script>--}}
-
-{{--    <script src={{mix('js/dark-mode.js')}} type="text/javascript"></script>--}}
+    @vite('resources/vendor/theme/assets/js/dark-mode/dark-mode.js')
 
     @stack('head')
 </head>
@@ -148,18 +142,16 @@
 
     @livewireScripts
 
-    @vite('resources/js/theme-vendor.js')
-    @vite('resources/js/theme-script.js')
-
-{{--    <script src={{mix('js/theme-vendor.js')}} type="text/javascript"></script>--}}
-{{--    <script src={{mix('js/theme-script.js')}} type="text/javascript"></script>--}}
+    @vite('resources/js/vendor/theme-script.js')
 
     @if (!is_null(auth()->user()))
         @if (!auth()->user()->hasRole('Admin'))
-            @vite('resources/js/app.js')
+            @vite('resources/js/app.ts')
+        @else
+            @vite('resources/js/admin-app.ts')
         @endif
     @endif
-{{--    @vite('js/admin-app.js')--}}
+
     @stack('scripts')
 </body>
 </html>

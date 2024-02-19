@@ -4,7 +4,6 @@ import DangerAlert from "../../../components/ui/alerts/simple-alerts/danger-aler
 import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
 import GenerateExtentTypeState from "../types/modals/generate-event-type-state";
 import { setHours, setMinutes } from "date-fns";
-import DatePicker from "react-datepicker";
 import Select from "react-select";
 import Dialogue from "../../../components/ui/dialogue/dialogue";
 import InfoAlert from "../../../components/ui/alerts/simple-alerts/info-alert";
@@ -231,24 +230,8 @@ export default class GenerateEventType extends React.Component<
                                 <div className="my-3 dark:text-gray-300">
                                     <strong>Start Date (and time)</strong>
                                 </div>
-                                <DatePicker
-                                    selected={
-                                        new Date(
-                                            this.state.form_data.selected_start_date
-                                        )
-                                    }
-                                    onChange={(date) =>
-                                        date !== null
-                                            ? this.setStartDate(date)
-                                            : null
-                                    }
-                                    showTimeSelect
-                                    dateFormat="MMMM d, yyyy h:mm aa"
-                                    className={
-                                        "border-2 border-gray-300 rounded-md p-2 w-full"
-                                    }
-                                    withPortal
-                                />
+
+                                Missing Date Picker ....
                             </div>
                             <InfoAlert>
                                 <p className="my-4">

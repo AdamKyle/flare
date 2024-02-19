@@ -25,21 +25,17 @@
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
-
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css" />
 
-    <link href="{{ mix('css/app.css') }}" rel="stylesheet">
-    <link href="{{ mix('css/tailwind.css') }}" rel="stylesheet">
+    @vite('resources/sass/app.scss')
+    @vite('resources/css/tailwind.css')
 
     @livewireStyles
 
-    <script src={{mix('js/manifest.js')}} type="text/javascript"></script>
-    <script src={{mix('js/vendor.js')}} type="text/javascript"></script>
+    @vite('resources/vendor/theme/assets/js/dark-mode/dark-mode.js')
 
     <script src="https://cdn.jsdelivr.net/gh/mcstudios/glightbox/dist/js/glightbox.min.js"></script>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
-
-    <script src={{mix('js/dark-mode.js')}} type="text/javascript"></script>
 
     @stack('head')
 </head>
@@ -101,9 +97,11 @@
 
 @livewireScripts
 
-<script src={{mix('js/theme-vendor.js')}} type="text/javascript"></script>
-<script src={{mix('js/theme-script.js')}} type="text/javascript"></script>
-<script src="{{ mix('js/app.js') }}"></script>
+@vite('resources/js/vendor/theme-script.js')
+
+{{--<script src={{mix('js/theme-vendor.js')}} type="text/javascript"></script>--}}
+{{--<script src={{mix('js/theme-script.js')}} type="text/javascript"></script>--}}
+{{--<script src="{{ mix('js/app.js') }}"></script>--}}
 
 <script>
     const lightbox = GLightbox();

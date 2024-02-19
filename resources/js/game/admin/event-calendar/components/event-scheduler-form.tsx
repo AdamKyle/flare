@@ -1,6 +1,5 @@
 import React, { Fragment } from "react";
 import Select from "react-select";
-import DatePicker from "react-datepicker";
 import { setHours, setMinutes } from "date-fns";
 import EventSchedulerFormState from "../types/components/event-scheduler-form-state";
 import EventSchedulerFormProps from "../types/components/event-scheduler-form-props";
@@ -259,39 +258,14 @@ export default class EventSchedulerForm extends React.Component<
                         <div className="my-3 dark:text-gray-300">
                             <strong>Start Date (and time)</strong>
                         </div>
-                        <DatePicker
-                            selected={this.state.selected_start_date}
-                            onChange={(date) =>
-                                date !== null ? this.setStartDate(date) : null
-                            }
-                            showTimeSelect
-                            filterTime={this.filterPassedTime.bind(this)}
-                            dateFormat="MMMM d, yyyy h:mm aa"
-                            className={
-                                "border-2 border-gray-300 rounded-md p-2"
-                            }
-                            withPortal
-                        />
+                        Missing Date Picker
                     </div>
 
                     <div className="my-4">
                         <div className="my-3 dark:text-gray-300">
                             <strong>End Date (and time)</strong>
                         </div>
-                        <DatePicker
-                            selected={this.state.selected_end_date}
-                            onChange={(date) =>
-                                date !== null ? this.setEndDate(date) : null
-                            }
-                            showTimeSelect
-                            filterTime={this.filterPassedTime.bind(this)}
-                            filterDate={this.filterEndDates.bind(this)}
-                            dateFormat="MMMM d, yyyy h:mm aa"
-                            className={
-                                "border-2 border-gray-300 rounded-md p-2"
-                            }
-                            withPortal
-                        />
+                        Missing Date Picker
                     </div>
                 </div>
 

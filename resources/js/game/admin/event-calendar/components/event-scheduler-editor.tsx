@@ -2,7 +2,6 @@ import React from "react";
 import PrimaryButton from "../../../components/ui/buttons/primary-button";
 import {DialogActions} from "@mui/material";
 import DangerButton from "../../../components/ui/buttons/danger-button";
-import "react-datepicker/dist/react-datepicker.css";
 import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
 import EventSchedulerForm from "./event-scheduler-form";
 import {AxiosError, AxiosResponse} from "axios";
