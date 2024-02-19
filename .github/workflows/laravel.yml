@@ -37,7 +37,7 @@ jobs:
     - name: Link Storage
       run: php artisan storage:link
     - name: Install dependencies (laravel mix)
-      run: yarn run prod
+      run: yarn build
     - name: Execute tests (Unit and Feature tests) via PHPUnit
       env:
         DB_CONNECTION: mysql
