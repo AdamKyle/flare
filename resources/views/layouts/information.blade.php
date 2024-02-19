@@ -30,7 +30,7 @@
     @vite('resources/sass/app.scss')
     @vite('resources/css/tailwind.css')
 
-    @livewireStyles
+{{--    @livewireStyles--}}
 
     @vite('resources/vendor/theme/assets/js/dark-mode/dark-mode.js')
 
@@ -95,7 +95,7 @@
 
 <!-- Scripts -->
 
-@livewireScripts
+{{--@livewireScripts--}}
 
 @vite('resources/js/vendor/theme-script.js')
 

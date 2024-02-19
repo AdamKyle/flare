@@ -230,13 +230,13 @@
                 </p>
 
                 <p class="my-4">
-                    Items with item skills cannot be sold on the market and cannot be sold. They are bound to your character and 
+                    Items with item skills cannot be sold on the market and cannot be sold. They are bound to your character and
                     there skills effects only take place whe equipped.
                 </p>
 
-                @livewire('admin.item-skills.item-skills-table', [
-                    'itemSkillId' => $item->itemSkill->id
-                ])
+{{--                @livewire('admin.item-skills.item-skills-table', [--}}
+{{--                    'itemSkillId' => $item->itemSkill->id--}}
+{{--                ])--}}
             </x-core.cards.card-woth-title>
         @endif
     </div>

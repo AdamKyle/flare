@@ -14,6 +14,6 @@
                 Upload New Map
             </x-core.buttons.link-buttons.primary-button>
         </x-core.page-title>
-        @livewire('admin.maps.maps-table')
+{{--        @livewire('admin.maps.maps-table')--}}
     </div>
 @endsection

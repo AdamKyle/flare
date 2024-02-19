@@ -101,9 +101,9 @@
         modifications
         will be taken into account along with the locations enemy modifications. Your gear, stats and level matter.
     </p>
-    @livewire('admin.items.items-table', [
-        'type' => 'quest',
-        'locationId' => $location->id,
-    ])
+{{--    @livewire('admin.items.items-table', [--}}
+{{--        'type' => 'quest',--}}
+{{--        'locationId' => $location->id,--}}
+{{--    ])--}}
 @endif
 </p>

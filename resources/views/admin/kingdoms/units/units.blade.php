@@ -13,5 +13,5 @@
             Create Unit
         </x-core.buttons.link-buttons.primary-button>
     </x-core.page-title>
-    @livewire('admin.kingdoms.units.units-table')
+{{--    @livewire('admin.kingdoms.units.units-table')--}}
 @endsection

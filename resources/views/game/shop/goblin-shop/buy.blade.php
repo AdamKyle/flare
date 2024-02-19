@@ -38,7 +38,7 @@
                 </p>
             </x-core.cards.card>
 
-            @livewire('game.shops.goblin-shop', ['isShop' => true])
+{{--            @livewire('game.shops.goblin-shop', ['isShop' => true])--}}
         </div>
     </div>
 @endsection

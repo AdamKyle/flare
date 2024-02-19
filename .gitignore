@@ -26,4 +26,5 @@ deploy.yaml
 .idea/workspace.xml
 .idea/
 .phpunit.cache/
+public/build/
 

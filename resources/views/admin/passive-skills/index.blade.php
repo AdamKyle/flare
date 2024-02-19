@@ -26,5 +26,5 @@
         </x-core.buttons.link-buttons.primary-button>
     </x-core.page-title>
 
-    @livewire('admin.passive-skills.passive-skill-table')
+{{--    @livewire('admin.passive-skills.passive-skill-table')--}}
 @endsection

@@ -1,4 +1,3 @@
-import Alpine from 'alpinejs'
 import Echo from "laravel-echo"
 import 'reflect-metadata'
 
@@ -34,13 +33,6 @@ axios.interceptors.request.use(function (config) {
 }, function (error) {
     return Promise.reject(error);
 });
-
-/**
- * Alpine Set up:
- */
-window.Alpine = Alpine;
-
-Alpine.start();
 
 /**
  * Echo exposes an expressive API for subscribing to channels and listening

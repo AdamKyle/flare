@@ -29,6 +29,6 @@
         <x-core.alerts.info-alert>
             <strong>ATTN!</strong> Raids must be scheduled on the <a href="{{route('admin.events')}}" target="_blank">  <i class="fas fa-external-link-alt"></i> Event Page</a>.
         </x-core.alerts.info-alert>
-        @livewire('admin.raids.raids-table')
+{{--        @livewire('admin.raids.raids-table')--}}
     </div>
 @endsection

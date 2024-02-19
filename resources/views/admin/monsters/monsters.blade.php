@@ -27,5 +27,5 @@
         </x-core.buttons.link-buttons.primary-button>
     </x-core.page-title>
 
-    @livewire('admin.monsters.monsters-table')
+{{--    @livewire('admin.monsters.monsters-table')--}}
 @endsection

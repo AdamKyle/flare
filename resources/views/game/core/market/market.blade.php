@@ -16,7 +16,7 @@
             </div>
         </x-core.cards.card-with-title>
 
-        @livewire('market.all-listings')
+{{--        @livewire('market.all-listings')--}}
     </x-core.layout.info-container>
 
     @push('scripts')

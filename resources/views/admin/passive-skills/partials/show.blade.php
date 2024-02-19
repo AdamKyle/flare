@@ -29,6 +29,6 @@
   These skills will unlock at specific levels of this skill.
 </p>
 
-@livewire('admin.passive-skills.passive-skill-table', [
-    'skillId' => $skill->id
-])
+{{--@livewire('admin.passive-skills.passive-skill-table', [--}}
+{{--    'skillId' => $skill->id--}}
+{{--])--}}

@@ -86,9 +86,9 @@
                     <h3 class="text-sky-600 dark:text-sky-500">Child Skills</h3>
                     <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
 
-                    @livewire('admin.item-skills.item-skills-table', [
-                        'parentSkill' => $itemSkill->id
-                    ])
+{{--                    @livewire('admin.item-skills.item-skills-table', [--}}
+{{--                        'parentSkill' => $itemSkill->id--}}
+{{--                    ])--}}
                 </div>
             @endif
         </x-core.cards.card-with-title>

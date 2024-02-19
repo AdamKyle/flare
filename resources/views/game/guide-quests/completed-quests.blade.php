@@ -9,6 +9,6 @@
         >
         </x-core.page-title>
 
-        @livewire('character.completed-guide-quests.completed-guide-quests')
+{{--        @livewire('character.completed-guide-quests.completed-guide-quests')--}}
     </x-core.layout.info-container>
 @endsection

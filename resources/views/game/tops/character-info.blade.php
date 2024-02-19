@@ -68,9 +68,9 @@
                 </div>
                 <div>
                     <h2 className="my-2">Equipped Items</h2>
-                    @livewire('game.tops.character-equipped-inventory', [
-                        'characterId' => $character->id
-                    ])
+{{--                    @livewire('game.tops.character-equipped-inventory', [--}}
+{{--                        'characterId' => $character->id--}}
+{{--                    ])--}}
                 </div>
             </div>
 

@@ -48,6 +48,6 @@
 
         <h4 class="mb-4">Your Items To Sell</h4>
 
-        @livewire('character.inventory.character-inventory')
+{{--        @livewire('character.inventory.character-inventory')--}}
     </div>
 @endsection

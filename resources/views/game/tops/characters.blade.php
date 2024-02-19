@@ -10,6 +10,6 @@
             color="primary"
         ></x-core.page-title>
 
-        @livewire('game.tops.characters')
+{{--        @livewire('game.tops.characters')--}}
     </div>
 @endsection

@@ -9,6 +9,6 @@
             color="success"
         ></x-core.page-title>
 
-        @livewire('market.my-listings')
+{{--        @livewire('market.my-listings')--}}
     </x-core.layout.info-container>
 @endsection

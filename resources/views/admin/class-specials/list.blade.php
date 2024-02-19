@@ -25,5 +25,5 @@
             <i class="fas fa-file-upload"></i> Import
         </x-core.buttons.link-buttons.primary-button>
     </x-core.page-title>
-    @livewire('admin.class-specials.class-specials-table')
+{{--    @livewire('admin.class-specials.class-specials-table')--}}
 @endsection

@@ -47,7 +47,7 @@
             @if (!is_null($section['live_wire_component']) && $section['live_wire_component'] !== 'null')
                 <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
 
-                @livewire($section['live_wire_component'])
+{{--                @livewire($section['live_wire_component'])--}}
             @endif
 
             @if (end($sections) !== $section)
