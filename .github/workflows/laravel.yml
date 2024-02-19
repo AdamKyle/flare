@@ -36,7 +36,7 @@ jobs:
       run: php artisan key:generate
     - name: Link Storage
       run: php artisan storage:link
-    - name: Install dependencies (laravel mix)
+    - name: Install dependencies (Laravel Vite)
       run: yarn build
     - name: Execute tests (Unit and Feature tests) via PHPUnit
       env:
