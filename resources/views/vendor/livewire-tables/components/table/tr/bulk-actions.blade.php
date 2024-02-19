@@ -1,31 +1,30 @@
-@aware(['component'])
+@aware(['component', 'tableName'])
 @props(['rows'])
 
-@if ($component->bulkActionsAreEnabled() && $component->hasBulkActions() && $component->hasSelected())
+@if ($component->bulkActionsAreEnabled() && $component->hasBulkActions())
     @php
-        $table = $component->getTableName();
-        $theme = $component->getTheme();
         $colspan = $component->getColspanCount();
-        $selected = $component->getSelectedCount();
         $selectAll = $component->selectAllIsEnabled();
+        $simplePagination = $component->isPaginationMethod('simple');
     @endphp
 
-    @if ($theme === 'tailwind')
+    @if ($component->isTailwind())
         <x-livewire-tables::table.tr.plain
-            wire:key="bulk-select-message-{{ $table }}"
+            x-cloak x-show="selectedItems.length > 0 && !currentlyReorderingStatus"
+            wire:key="{{ $tableName }}-bulk-select-message"
             class="bg-indigo-50 dark:bg-gray-900 dark:text-white"
         >
             <x-livewire-tables::table.td.plain :colspan="$colspan">
-                @if ($selectAll)
-                    <div wire:key="all-selected-{{ $table }}">
+                <template x-if="selectedItems.length == paginationTotalItemCount">
+                    <div wire:key="{{ $tableName }}-all-selected">
                         <span>
                             @lang('You are currently selecting all')
-                            <strong>{{ number_format($rows->total()) }}</strong>
+                            @if(!$simplePagination) <strong><span x-text="paginationTotalItemCount"></span></strong> @endif
                             @lang('rows').
                         </span>
 
                         <button
-                            wire:click="clearSelected"
+                            x-on:click="clearSelected"
                             wire:loading.attr="disabled"
                             type="button"
                             class="ml-1 text-blue-600 underline text-gray-700 text-sm leading-5 font-medium focus:outline-none focus:text-gray-800 focus:underline transition duration-150 ease-in-out dark:text-white dark:hover:text-gray-400"
@@ -33,17 +32,28 @@
                             @lang('Deselect All')
                         </button>
                     </div>
-                @else
-                    <div wire:key="some-selected-{{ $table }}">
+                </template>
+
+                <template x-if="selectedItems.length !== paginationTotalItemCount">
+                    <div wire:key="{{ $tableName }}-some-selected">
                         <span>
                             @lang('You have selected')
-                            <strong>{{ $selected }}</strong>
+                            <strong><span x-text="selectedItems.length"></span></strong>
                             @lang('rows, do you want to select all')
-                            <strong>{{ number_format($rows->total()) }}</strong>?
+                            @if(!$simplePagination) <strong><span x-text="paginationTotalItemCount"></span></strong> @endif
                         </span>
 
                         <button
-                            wire:click="setAllSelected"
+                            x-on:click="selectAllOnPage()"
+                            wire:loading.attr="disabled"
+                            type="button"
+                            class="ml-1 text-blue-600 underline text-gray-700 text-sm leading-5 font-medium focus:outline-none focus:text-gray-800 focus:underline transition duration-150 ease-in-out dark:text-white dark:hover:text-gray-400"
+                        >
+                            @lang('Select All On Page')
+                        </button>&nbsp;
+
+                        <button
+                            x-on:click="setAllSelected"
                             wire:loading.attr="disabled"
                             type="button"
                             class="ml-1 text-blue-600 underline text-gray-700 text-sm leading-5 font-medium focus:outline-none focus:text-gray-800 focus:underline transition duration-150 ease-in-out dark:text-white dark:hover:text-gray-400"
@@ -52,7 +62,7 @@
                         </button>
 
                         <button
-                            wire:click="clearSelected"
+                            x-on:click="clearSelected"
                             wire:loading.attr="disabled"
                             type="button"
                             class="ml-1 text-blue-600 underline text-gray-700 text-sm leading-5 font-medium focus:outline-none focus:text-gray-800 focus:underline transition duration-150 ease-in-out dark:text-white dark:hover:text-gray-400"
@@ -60,24 +70,25 @@
                             @lang('Deselect All')
                         </button>
                     </div>
-                @endif
+                </template>
             </x-livewire-tables::table.td.plain>
         </x-livewire-tables::table.tr.plain>
-    @elseif ($theme === 'bootstrap-4' || $theme === 'bootstrap-5')
+    @elseif ($component->isBootstrap())
         <x-livewire-tables::table.tr.plain
-            wire:key="bulk-select-message-{{ $table }}"
+            x-cloak x-show="selectedItems.length > 0 && !currentlyReorderingStatus"
+            wire:key="{{ $tableName }}-bulk-select-message"
         >
             <x-livewire-tables::table.td.plain :colspan="$colspan">
-                @if ($selectAll)
-                    <div wire:key="all-selected-{{ $table }}">
+                <template x-if="selectedItems.length == paginationTotalItemCount">
+                    <div wire:key="{{ $tableName }}-all-selected">
                         <span>
                             @lang('You are currently selecting all')
-                            <strong>{{ number_format($rows->total()) }}</strong>
+                            @if(!$simplePagination) <strong><span x-text="paginationTotalItemCount"></span></strong> @endif
                             @lang('rows').
                         </span>
 
                         <button
-                            wire:click="clearSelected"
+                            x-on:click="clearSelected"
                             wire:loading.attr="disabled"
                             type="button"
                             class="btn btn-primary btn-sm"
@@ -85,17 +96,28 @@
                             @lang('Deselect All')
                         </button>
                     </div>
-                @else
-                    <div wire:key="some-selected-{{ $table }}">
+                </template>
+
+                <template x-if="selectedItems.length !== paginationTotalItemCount">
+                    <div wire:key="{{ $tableName }}-some-selected">
                         <span>
                             @lang('You have selected')
-                            <strong>{{ $selected }}</strong>
+                            <strong><span x-text="selectedItems.length"></span></strong>
                             @lang('rows, do you want to select all')
-                            <strong>{{ number_format($rows->total()) }}</strong>?
+                            @if(!$simplePagination) <strong><span x-text="paginationTotalItemCount"></span></strong> @endif
                         </span>
 
                         <button
-                            wire:click="setAllSelected"
+                            x-on:click="selectAllOnPage"
+                            wire:loading.attr="disabled"
+                            type="button"
+                            class="btn btn-primary btn-sm"
+                        >
+                            @lang('Select All On Page')
+                        </button>&nbsp;
+
+                        <button
+                            x-on:click="setAllSelected"
                             wire:loading.attr="disabled"
                             type="button"
                             class="btn btn-primary btn-sm"
@@ -104,7 +126,7 @@
                         </button>
 
                         <button
-                            wire:click="clearSelected"
+                            x-on:click="clearSelected"
                             wire:loading.attr="disabled"
                             type="button"
                             class="btn btn-primary btn-sm"
@@ -112,7 +134,7 @@
                             @lang('Deselect All')
                         </button>
                     </div>
-                @endif
+                </template>
             </x-livewire-tables::table.td.plain>
         </x-livewire-tables::table.tr.plain>
     @endif

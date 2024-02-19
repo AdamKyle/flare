@@ -1,6 +1,6 @@
 {
-  "_calendar-DL-QoAyD.js": {
-    "file": "assets/calendar-DL-QoAyD.js",
+  "_calendar-DMOIlyV4.js": {
+    "file": "assets/calendar-DMOIlyV4.js",
     "imports": [
       "_popper-CvwSYPO-.js"
     ]
@@ -69,7 +69,7 @@
     "src": "node_modules/line-awesome/dist/line-awesome/fonts/la-solid-900.woff2"
   },
   "resources/css/tailwind.css": {
-    "file": "assets/tailwind-B-N7-p5r.css",
+    "file": "assets/tailwind-DEes2pxS.css",
     "src": "resources/css/tailwind.css",
     "isEntry": true
   },
@@ -90,22 +90,35 @@
     "src": "resources/fonts/rpgawesome-webfont.woff"
   },
   "resources/js/admin-app.ts": {
-    "file": "assets/admin-app-BWY4AE3Q.js",
+    "file": "assets/admin-app-_mKymTnh.js",
     "src": "resources/js/admin-app.ts",
     "isEntry": true,
     "imports": [
-      "_calendar-DL-QoAyD.js",
+      "_calendar-DMOIlyV4.js",
       "_popper-CvwSYPO-.js"
     ]
   },
   "resources/js/app.ts": {
-    "file": "assets/app-DitrLprN.js",
+    "file": "assets/app-DxqfFZGR.js",
     "src": "resources/js/app.ts",
     "isEntry": true,
     "imports": [
-      "_calendar-DL-QoAyD.js",
+      "_calendar-DMOIlyV4.js",
       "_popper-CvwSYPO-.js"
     ]
+  },
+  "resources/js/vendor/livewire-data-tables.js": {
+    "file": "assets/livewire-data-tables-CC7ni21_.js",
+    "src": "resources/js/vendor/livewire-data-tables.js",
+    "isEntry": true,
+    "css": [
+      "assets/livewire-data-tables-Cr24NqPN.css"
+    ]
+  },
+  "resources/js/vendor/livewire.js": {
+    "file": "assets/livewire-D6ULmdeL.js",
+    "src": "resources/js/vendor/livewire.js",
+    "isEntry": true
   },
   "resources/js/vendor/theme-script.js": {
     "file": "assets/theme-script-Bnr8zB4S.js",

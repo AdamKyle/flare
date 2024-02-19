@@ -2,6 +2,16 @@
 
 return [
 
+    'legacy_model_binding' => false,
+
+    'inject_assets' => false,
+
+    'inject_morph_markers' => true,
+
+    'navigate' => false,
+
+    'pagination_theme' => 'tailwind',
+
     /*
     |--------------------------------------------------------------------------
     | Class Namespace

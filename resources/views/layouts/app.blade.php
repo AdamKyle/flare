@@ -31,6 +31,10 @@
 
     @livewireStyles
 
+    @vite('resources/js/vendor/livewire-data-tables.js')
+
+    @vite('resources/js/vendor/livewire.js')
+
     @vite('resources/vendor/theme/assets/js/dark-mode/dark-mode.js')
 
     @stack('head')
@@ -140,7 +144,7 @@
     @endguest
     <!-- Scripts -->
 
-    @livewireScripts
+    @livewireScriptConfig
 
     @vite('resources/js/vendor/theme-script.js')
 
