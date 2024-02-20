@@ -113,10 +113,6 @@ class SeerService {
             return $this->errorResult('You do not have the gold bars to do this.');
         }
 
-        if ($slot->item->sockets->count() > 0) {
-            return $this->errorResult('Cannot re-roll sockets as this item has gems attached. Remove them first.');
-        }
-
         $oldSocketCount = $slot->item->socket_count;
 
         $this->assignSocketCount($slot);
@@ -133,10 +129,16 @@ class SeerService {
 
         ServerMessageHandler::handleMessage($character->user, 'seer_actions', $message, $slot->id);
 
+        if ($oldSocketCount === $newSocketCount) {
+            $message = 'Failed to attach new sockets. "Sorry child. I tried." He takes your money anyways ...';
+        } else {
+            $message = 'Attached sockets to item! (Old Socket Count: ' . $oldSocketCount . ', New Count: ' . $newSocketCount . ').';
+        }
+
         return $this->successResult([
             'items'   => $this->getItems($character),
             'gems'    => $this->getGems($character),
-            'message' => 'Attached sockets to item! (Old Socket Count: ' . $oldSocketCount . ', New Count: ' . $newSocketCount . ').'
+            'message' => $message
         ]);
     }
 

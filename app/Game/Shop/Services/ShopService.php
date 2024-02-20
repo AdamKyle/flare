@@ -7,10 +7,14 @@ use App\Flare\Models\Character;
 use App\Flare\Models\Inventory;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
+use App\Flare\Transformers\ItemTransformer;
 use App\Game\CharacterInventory\Services\EquipItemService;
 use App\Game\Shop\Events\BuyItemEvent;
 use App\Game\Shop\Events\SellItemEvent;
 use Facades\App\Flare\Calculators\SellItemCalculator;
+use Illuminate\Support\Facades\Cache;
+use League\Fractal\Manager;
+use League\Fractal\Resource\Collection;
 
 class ShopService {
 
@@ -20,10 +24,48 @@ class ShopService {
     private EquipItemService $equipItemService;
 
     /**
-     * @param EquipItemService $equipItemService
+     * @var ItemTransformer $itemTransformer
      */
-    public function __construct(EquipItemService $equipItemService) {
+    private ItemTransformer $itemTransformer;
+
+    /**
+     * @var Manager $manager
+     */
+    private Manager $manager;
+
+    /**
+     * @param EquipItemService $equipItemService
+     * @param ItemTransformer $itemTransformer
+     * @param Manager $manager
+     */
+    public function __construct(EquipItemService $equipItemService, ItemTransformer $itemTransformer, Manager $manager) {
         $this->equipItemService = $equipItemService;
+        $this->itemTransformer = $itemTransformer;
+        $this->manager  = $manager;
+    }
+
+    public function getItemsForShop(): array {
+
+        $cachedItems = Cache::get('items-for-shop');
+
+        if (!is_null($cachedItems)) {
+            return $cachedItems;
+        }
+
+        $items = Item::where('cost', '<=', 2000000000)
+            ->whereNotIn('type', ['quest', 'alchemy', 'trinket', 'artifact'])
+            ->whereNull('item_suffix_id')
+            ->whereNull('item_prefix_id')
+            ->whereNull('specialty_type')
+            ->get();
+
+        $items = new Collection($items, $this->itemTransformer);
+
+        $items = $this->manager->createData($items)->toArray();
+
+        Cache::put('items-for-shop', $items);
+
+        return $items;
     }
 
     /**

@@ -70,36 +70,6 @@ class SeerServiceTest extends TestCase {
         $this->assertEquals('Trinkets and Artifacts cannot have sockets on them.', $result['message']);
     }
 
-    public function testCannotAddSocketsWhenYouHaveGemsAttached() {
-        $item = $this->createItem([
-            'type' => 'weapon',
-            'socket_count' => 1,
-        ]);
-
-        $item->sockets()->create([
-            'item_id' => $item->id,
-            'gem_id'  => $this->createGem()->id,
-        ]);
-
-        $this->createGameMap();
-
-        $character = $this->character->givePlayerLocation()
-            ->inventoryManagement()
-            ->giveItem($item->refresh())
-            ->getCharacterFactory()
-            ->kingdomManagement()
-            ->assignKingdom([
-                'gold_bars' => 2000,
-            ])
-            ->getCharacter();
-
-        $slot   = $character->inventory->slots->first();
-        $result = $this->seerService->createSockets($character, $slot->id);
-
-        $this->assertEquals(422, $result['status']);
-        $this->assertEquals('Cannot re-roll sockets as this item has gems attached. Remove them first.', $result['message']);
-    }
-
     public function testAddSocketToItem() {
         $item = $this->createItem([
             'type' => 'weapon',

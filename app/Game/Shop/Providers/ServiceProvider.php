@@ -2,12 +2,14 @@
 
 namespace App\Game\Shop\Providers;
 
+use App\Flare\Transformers\ItemTransformer;
 use App\Game\CharacterInventory\Services\CharacterGemBagService;
 use App\Game\CharacterInventory\Services\EquipItemService;
 use App\Game\Shop\Services\GemShopService;
 use App\Game\Shop\Services\GoblinShopService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use App\Game\Shop\Services\ShopService;
+use League\Fractal\Manager;
 
 class ServiceProvider extends ApplicationServiceProvider {
     /**
@@ -19,7 +21,9 @@ class ServiceProvider extends ApplicationServiceProvider {
 
         $this->app->bind(ShopService::class, function ($app) {
             return new ShopService(
-                $app->make(EquipItemService::class)
+                $app->make(EquipItemService::class),
+                $app->make(ItemTransformer::class),
+                $app->make(Manager::class)
             );
         });
 

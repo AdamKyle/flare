@@ -11,13 +11,22 @@ use App\Game\Shop\Requests\ShopSellValidation;
 use App\Game\CharacterInventory\Services\CharacterInventoryService;
 use App\Flare\Models\Character;
 use App\Game\Shop\Events\SellItemEvent;
+use Illuminate\Http\JsonResponse;
 
 class ShopController extends Controller {
 
-    private $characterInventoryService;
+    private CharacterInventoryService $characterInventoryService;
+    private ShopService $shopService;
 
-    public function __construct(CharacterInventoryService $characterInventoryService) {
+    public function __construct(CharacterInventoryService $characterInventoryService, ShopService $shopService) {
         $this->characterInventoryService = $characterInventoryService;
+        $this->shopService = $shopService;
+    }
+
+    public function fetchItemsForShop(Character $character): JsonResponse {
+        return response()->json([
+            'items' => $this->shopService->getItemsForShop(),
+        ]);
     }
 
     public function sellItem(ShopSellValidation $request, Character $character) {

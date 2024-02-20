@@ -37,7 +37,8 @@
                 <p><strong>Your Gold</strong>: <span class="color-gold">{{number_format($gold)}}</span></p>
             </x-core.cards.card>
 
-            @livewire('admin.items.items-table', ['isShop' => true])
+{{--            @livewire('admin.items.items-table', ['isShop' => true])--}}
+            <div id="player-shop"></div>
         </div>
   </div>
 @endsection
