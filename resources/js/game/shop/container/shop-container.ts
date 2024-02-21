@@ -1,6 +1,7 @@
 import ShopAjax from "../ajax/shop-ajax";
 
 import {container, InjectionToken} from 'tsyringe';
+import ShopTableColumns from "../shop-table/colums/shop-table-columns";
 
 class ShopContainer {
 
@@ -9,6 +10,10 @@ class ShopContainer {
     public constructor() {
         this.register('shop-ajax', {
             useClass: ShopAjax
+        });
+
+        this.register('shop-table-columns', {
+            useClass: ShopTableColumns
         });
     }
 
