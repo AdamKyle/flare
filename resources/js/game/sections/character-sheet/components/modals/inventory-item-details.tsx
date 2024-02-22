@@ -1,6 +1,6 @@
 import React, {Fragment} from "react";
 import Dialogue from "../../../../components/ui/dialogue/dialogue";
-import ItemNameColorationText from "../../../../components/ui/item-name-coloration-text";
+import ItemNameColorationText from "../../../items/item-name/item-name-coloration-text";
 import {AxiosError, AxiosResponse} from "axios";
 import Ajax from "../../../../lib/ajax/ajax";
 import ComponentLoading from "../../../../components/ui/loading/component-loading";

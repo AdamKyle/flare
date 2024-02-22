@@ -1,5 +1,5 @@
 import React, { Fragment } from "react";
-import ItemNameColorationText from "../../../components/ui/item-name-coloration-text";
+import ItemNameColorationText from "../../items/item-name/item-name-coloration-text";
 import { capitalize } from "lodash";
 import InventoryComparisonAdjustment from "../../components/item-details/comparison/definitions/inventory-comparison-adjustment";
 import Dialogue from "../../../components/ui/dialogue/dialogue";

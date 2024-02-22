@@ -1,10 +1,9 @@
 import clsx from "clsx";
 import React from "react";
-import ItemNameColorationProps from "../../lib/ui/types/item-name-coloration-props";
-import InventoryDetails from "../../lib/game/character-sheet/types/inventory/inventory-details";
-import {GemBagTable} from "../../sections/character-sheet/components/tabs/inventory-tabs/gem-bag-table";
+import ItemNameColorationProps from "./types/item-name-coloration-props";
+import {GemBagTable} from "../../character-sheet/components/tabs/inventory-tabs/gem-bag-table";
 
-export default class ItemNameColorationButton extends React.Component<ItemNameColorationProps, any> {
+export default class ItemNameColorationButton extends React.Component<ItemNameColorationProps, { }> {
 
     constructor(props: ItemNameColorationProps) {
         super(props);

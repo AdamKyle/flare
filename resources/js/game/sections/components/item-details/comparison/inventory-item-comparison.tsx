@@ -5,7 +5,7 @@ import {AxiosError, AxiosResponse} from "axios";
 import Ajax from "../../../../lib/ajax/ajax";
 import InventoryItemComparisonState
     from "./types/inventory-item-comparison-state";
-import ItemNameColorationText from "../../../../components/ui/item-name-coloration-text";
+import ItemNameColorationText from "../../../items/item-name/item-name-coloration-text";
 import InventoryItemComparisonProps
     from "./types/inventory-item-comparison-props";
 import InventoryComparisonAdjustment

@@ -502,7 +502,7 @@ class Item extends Model {
             $baseStat += $this->holy_stack_stat_bonus;
         }
 
-        return number_format($baseStat, 2);
+        return $baseStat;
     }
 
     /**

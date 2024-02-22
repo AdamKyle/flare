@@ -1,36 +1,40 @@
 import React from "react";
 import {formatNumber} from "../../../lib/game/format-number";
-import {ShopItemTypes} from "../enums/shop-item-types";
+import {ItemType} from "../../../sections/items/enums/item-type";
 import PrimaryLinkButton from "../../../components/ui/buttons/primary-link-button";
+
+type onClick = (itemId: number) => void;
 
 export default class ShopTableColumns {
 
     private WEAPON_TYPES = [
-        ShopItemTypes.WEAPON,
-        ShopItemTypes.BOW,
-        ShopItemTypes.FAN,
-        ShopItemTypes.GUN,
-        ShopItemTypes.HAMMER,
-        ShopItemTypes.STAVE,
+        ItemType.WEAPON,
+        ItemType.BOW,
+        ItemType.FAN,
+        ItemType.GUN,
+        ItemType.HAMMER,
+        ItemType.STAVE,
     ];
 
     private ARMOUR_TYPES = [
-        ShopItemTypes.BODY,
-        ShopItemTypes.BOOTS,
-        ShopItemTypes.GLOVES,
-        ShopItemTypes.HELMET,
-        ShopItemTypes.LEGGINGS,
-        ShopItemTypes.SLEEVES,
-        ShopItemTypes.SHIELD,
+        ItemType.BODY,
+        ItemType.BOOTS,
+        ItemType.GLOVES,
+        ItemType.HELMET,
+        ItemType.LEGGINGS,
+        ItemType.SLEEVES,
+        ItemType.SHIELD,
     ];
 
-    public buildColumns(itemType?: ShopItemTypes) {
+
+
+    public buildColumns(onClick: onClick, itemType?: ItemType) {
         let shopColumns: any[] = [
             {
                 name: 'Name',
                 selector: (row: { name: string; id: number, type: string}) => row.name,
                 cell: (row: any) => <span>
-                    <PrimaryLinkButton button_label={row.name} on_click={() => this.navigateToItemShow(row.id)} additional_css={'text-gray-600 hover:text-gray-700 dark:text-gray-300 dark:hover:text-gray-400'} />
+                    <PrimaryLinkButton button_label={row.name} on_click={() => onClick(row.id)} additional_css={'text-gray-600 hover:text-gray-700 dark:text-gray-300 dark:hover:text-gray-400'} />
                 </span>
             },
             {
@@ -44,11 +48,11 @@ export default class ShopTableColumns {
             shopColumns = [...shopColumns, ...this.getWeaponColumns(), ...this.getArmourColumns()];
         } else {
 
-            const isWeaponType = this.WEAPON_TYPES.filter((weaponType: ShopItemTypes) => {
+            const isWeaponType = this.WEAPON_TYPES.filter((weaponType: ItemType) => {
                 return weaponType === itemType
             }).length > 0;
 
-            const isArmorType = this.ARMOUR_TYPES.filter((armorType: ShopItemTypes) => {
+            const isArmorType = this.ARMOUR_TYPES.filter((armorType: ItemType) => {
                 return armorType === itemType
             }).length > 0;
 

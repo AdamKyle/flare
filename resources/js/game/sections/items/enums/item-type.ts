@@ -1,4 +1,4 @@
-export enum ShopItemTypes {
+export enum ItemType {
 
     // Weapon Types
     WEAPON = 'weapon',

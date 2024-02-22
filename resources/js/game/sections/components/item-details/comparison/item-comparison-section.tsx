@@ -6,11 +6,11 @@ import clsx from "clsx";
 import Tabs from "../../../../components/ui/tabs/tabs";
 import TabPanel from "../../../../components/ui/tabs/tab-panel";
 import {formatNumber} from "../../../../lib/game/format-number";
-import ItemNameColorationText from "../../../../components/ui/item-name-coloration-text";
+import ItemNameColorationText from "../../../items/item-name/item-name-coloration-text";
 import ItemsAttachedSkills from "../../../../lib/game/character-sheet/types/modal/items-attached-skills";
 import InventoryItemGemDetails from "../../../character-sheet/components/inventory-item-gem-details";
 import ItemComparisonSectionProps from "./types/item-comparison-section-props";
-import {ItemForColorizationDefinition} from "../../../../lib/ui/types/item-name-coloration-text-props";
+import {ItemForColorizationDefinition} from "../../../items/item-name/types/item-name-coloration-text-props";
 
 export default class ItemComparisonSection extends React.Component<ItemComparisonSectionProps, {}> {
 
@@ -226,7 +226,7 @@ export default class ItemComparisonSection extends React.Component<ItemCompariso
                 <div className='grid w-full lg:grid-cols-2 md:m-auto'>
                     <div>
                         <div className={'font-light pb-3'}>
-                            <ItemNameColorationText item={this.fetchItemInfoForColorization(this.props.comparison_details.details[0])} />
+                            <ItemNameColorationText item={this.fetchItemInfoForColorization(this.props.comparison_details.details[0])} custom_width={true} />
                         </div>
                         {this.renderChange(this.props.comparison_details.details[0], this.props.comparison_details.itemToEquip)}
                     </div>
@@ -234,7 +234,7 @@ export default class ItemComparisonSection extends React.Component<ItemCompariso
                         className='border-b-2 block md:hidden border-b-gray-300 dark:border-b-gray-600 my-3 mt-6'></div>
                     <div>
                         <div className={'font-light mb-3'}>
-                            <ItemNameColorationText item={this.fetchItemInfoForColorization(this.props.comparison_details.details[1])} />
+                            <ItemNameColorationText item={this.fetchItemInfoForColorization(this.props.comparison_details.details[1])}  custom_width={true} />
                         </div>
                         {this.renderChange(this.props.comparison_details.details[1], this.props.comparison_details.itemToEquip)}
                     </div>
@@ -255,7 +255,7 @@ export default class ItemComparisonSection extends React.Component<ItemCompariso
             return (
                 <div>
                     <div className={'font-light pb-3'}>
-                        <ItemNameColorationText item={this.fetchItemInfoForColorization(this.props.comparison_details.details[0])} />
+                        <ItemNameColorationText item={this.fetchItemInfoForColorization(this.props.comparison_details.details[0])} custom_width={true} />
                     </div>
                     {this.renderChange(this.props.comparison_details.details[0], this.props.comparison_details.itemToEquip)}
                 </div>

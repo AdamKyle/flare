@@ -1,6 +1,6 @@
 import React from "react";
 import Dialogue from "../../../../../components/ui/dialogue/dialogue";
-import ItemNameColorationText from "../../../../../components/ui/item-name-coloration-text";
+import ItemNameColorationText from "../../../../items/item-name/item-name-coloration-text";
 import SellModalProps from "./types/sell-modal-props";
 import {formatNumber} from "../../../../../lib/game/format-number";
 

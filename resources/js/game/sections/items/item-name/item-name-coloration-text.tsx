@@ -1,6 +1,5 @@
-import clsx from "clsx";
 import React from "react";
-import ItemNameColorationTextProps from "../../lib/ui/types/item-name-coloration-text-props";
+import ItemNameColorationTextProps from "./types/item-name-coloration-text-props";
 
 export default class ItemNameColorationText extends React.Component<ItemNameColorationTextProps, { }> {
 
@@ -52,7 +51,7 @@ export default class ItemNameColorationText extends React.Component<ItemNameColo
 
     render() {
         return (
-            <span className={this.getColorClass() + ' max-w-[75%] sm:max-w-full'}>{this.props.item.name}</span>
+            <span className={this.getColorClass() + (this.props.custom_width ? ' max-w-[75%] sm:max-w-full' : '')}>{this.props.item.name}</span>
         )
     }
 }
