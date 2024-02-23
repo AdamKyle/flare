@@ -1,8 +1,8 @@
 import React, {ReactNode} from "react";
-import ItemNameColorationText from "./item-name/item-name-coloration-text";
 import {isWeaponType} from "./helpers/is-weapon-type";
 import {formatNumber} from "../../lib/game/format-number";
 import {isArmourType} from "./helpers/is-armour-type";
+import {startCase} from "lodash";
 
 export default class Item extends React.Component<any, any> {
     constructor(props: any) {
@@ -10,13 +10,9 @@ export default class Item extends React.Component<any, any> {
     }
 
     getName() {
-        if (!this.props.item.hasOwnProperty('item_name')) {
-            return <span className='text-gray-600 dark:text-white'>
-                {this.props.item.name}
-            </span>
-        }
-
-        return <ItemNameColorationText item={this.props.item} custom_width={false} />
+        return <span className='text-gray-600 dark:text-white'>
+            {this.props.item.name}
+        </span>
     }
 
     renderItemTypeData(): ReactNode {
@@ -48,8 +44,8 @@ export default class Item extends React.Component<any, any> {
                     {this.getName()}
                 </h3>
                 <div className='border-b-2 border-b-gray-200 dark:border-b-gray-600 my-3'></div>
-                <div className='grid grid-cols-2 gap-2'>
-                    <div className='m-4'>
+                <div className='grid md:grid-cols-2 sm:grid-gcols-1 gap-2'>
+                    <div>
                         <dl>
                             <dt>Strength</dt>
                             <dd className='text-green-700 dark:text-green-500'>+{(this.props.item.str_modifier * 100).toFixed(2)}%</dd>
@@ -67,9 +63,19 @@ export default class Item extends React.Component<any, any> {
                             <dd className='text-green-700 dark:text-green-500'>+{(this.props.item.focus_modifier * 100).toFixed(2)}%</dd>
                         </dl>
                     </div>
+                    <div className='border-b-2 border-b-gray-200 dark:border-b-gray-600 my-3 md:hidden sm:block'></div>
                     <div>
                         <dl>
                             {this.renderItemTypeData()}
+                        </dl>
+                        <div className='border-b-2 border-b-gray-200 dark:border-b-gray-600 my-4'></div>
+                        <dl>
+                            <dt>Crafting Type:</dt>
+                            <dd>{startCase(this.props.item.crafting_type)}</dd>
+                            <dt>Skill Level Required</dt>
+                            <dd>{this.props.item.skill_level_req}</dd>
+                            <dt>Skill Level Trivial</dt>
+                            <dd>{this.props.item.skill_level_trivial}</dd>
                         </dl>
                     </div>
                 </div>

@@ -75,7 +75,8 @@ export default class ShopAjax {
 
     private handleFetchData(component: Shop, axiosData: any): void {
         component.setState({
-            items: axiosData.items
+            items: axiosData.items,
+            original_items: axiosData.items,
         })
     }
 }
