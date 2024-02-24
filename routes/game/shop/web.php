@@ -17,7 +17,6 @@ Route::middleware([
         Route::post('/shop/purchase/multiple/{character}', ['as' => 'game.shop.purchase.multiple', 'uses' => 'ShopController@buyMultiple']);
         Route::post('/shop/compare/item/{character}', ['as' => 'game.shop.compare.item', 'uses' => 'ShopController@shopCompare']);
         Route::post('/shop/sell-all/{character}', ['as' => 'game.shop.sell.all', 'uses' => 'ShopController@shopSellAll']);
-        Route::post('/shop/buy/item/{character}', ['as' => 'game.shop.buy.item', 'uses' => 'ShopController@buy']);
         Route::post('/shop/sell/item/{character}', ['as' => 'game.shop.sell.item', 'uses' => 'ShopController@sell']);
         Route::post('/shop/buy-and-replace/{character}', ['as' => 'game.shop.buy-and-replace', 'uses' => 'ShopController@buyAndReplace']);
     });

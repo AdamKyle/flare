@@ -2,8 +2,10 @@
 
 namespace App\Game\Shop\Controllers\Api;
 
+use App\Flare\Models\Item;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Core\Events\UpdateTopBarEvent;
+use App\Game\Shop\Events\BuyItemEvent;
 use App\Game\Shop\Services\ShopService;
 use App\Http\Controllers\Controller;
 use Facades\App\Flare\Calculators\SellItemCalculator;
@@ -12,6 +14,7 @@ use App\Game\CharacterInventory\Services\CharacterInventoryService;
 use App\Flare\Models\Character;
 use App\Game\Shop\Events\SellItemEvent;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class ShopController extends Controller {
 
@@ -26,6 +29,42 @@ class ShopController extends Controller {
     public function fetchItemsForShop(Character $character): JsonResponse {
         return response()->json([
             'items' => $this->shopService->getItemsForShop(),
+            'gold' =>  $character->gold,
+            'inventory_count' => $character->getInventoryCount(),
+            'inventory_max'   => $character->inventory_max,
+        ]);
+    }
+
+    public function buy(Request $request, Character $character) {
+
+        if ($character->gold === 0) {
+            return redirect()->back()->with('error', 'You do not have enough gold.');
+        }
+
+        $item = Item::find($request->item_id);
+
+        if (is_null($item)) {
+            return redirect()->back()->with('error', 'Item not found.');
+        }
+
+        $cost = $item->cost;
+
+        if ($character->classType()->isMerchant()) {
+            $cost = floor($cost - $cost * 0.25);
+        }
+
+        if ($cost > $character->gold) {
+            return redirect()->back()->with('error', 'You do not have enough gold.');
+        }
+
+        if ($character->isInventoryFull()) {
+            return redirect()->back()->with('error', 'Inventory is full. Please make room.');
+        }
+
+        event(new BuyItemEvent($item, $character));
+
+        return response()->json([
+            'message' => 'Purchased: ' . $item->affix_name . '.'
         ]);
     }
 

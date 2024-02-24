@@ -22,5 +22,5 @@ Route::group(['middleware' => [
     Route::post('/character/{character}/sell-gem/{gemBagSlot}', ['uses' => 'Api\GemShopController@sellSingleGem']);
     Route::post('/character/{character}/sell-all-gems', ['uses' => 'Api\GemShopController@SellAllGems']);
 
-
+    Route::post('/shop/buy/item/{character}', ['uses' => 'Api\ShopController@buy']);
 });

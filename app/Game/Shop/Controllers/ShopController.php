@@ -98,36 +98,7 @@ class ShopController extends Controller {
         return redirect()->back()->with('success', 'Sold all your unequipped items for a total of: ' . $totalSoldFor . ' gold.');
     }
 
-    public function buy(Request $request, Character $character) {
 
-        if ($character->gold === 0) {
-            return redirect()->back()->with('error', 'You do not have enough gold.');
-        }
-
-        $item = Item::find($request->item_id);
-
-        if (is_null($item)) {
-            return redirect()->back()->with('error', 'Item not found.');
-        }
-
-        $cost = $item->cost;
-
-        if ($character->classType()->isMerchant()) {
-            $cost = floor($cost - $cost * 0.25);
-        }
-
-        if ($cost > $character->gold) {
-            return redirect()->back()->with('error', 'You do not have enough gold.');
-        }
-
-        if ($character->isInventoryFull()) {
-            return redirect()->back()->with('error', 'Inventory is full. Please make room.');
-        }
-
-        event(new BuyItemEvent($item, $character));
-
-        return redirect()->back()->with('success', 'Purchased: ' . $item->affix_name . '.');
-    }
 
     public function sell(Request $request, Character $character) {
 

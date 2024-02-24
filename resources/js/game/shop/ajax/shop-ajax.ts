@@ -3,6 +3,7 @@ import Ajax from "../../lib/ajax/ajax.js";
 import AjaxInterface from "../../lib/ajax/ajax-interface.js";
 import Shop from "../shop";
 import {AxiosError, AxiosResponse, Method} from "axios";
+import BuyMultiple from "../buy-multiple";
 
 
 export enum SHOP_ACTIONS {
@@ -17,9 +18,11 @@ export default class ShopAjax {
 
     constructor(@inject(Ajax) private ajax: AjaxInterface) {}
 
-    public doShopAction(component: Shop, actionType: SHOP_ACTIONS, params?: any) {
+    public doShopAction(component: Shop | BuyMultiple, actionType: SHOP_ACTIONS, params?: any) {
         const route = this.getRoute(actionType, component.props.character_id);
         const actionForRoute = this.getActionType(actionType);
+
+        component.setState({ loading: true });
 
         this.ajax.setRoute(route).setParameters(params).doAjaxCall(actionForRoute, (result: AxiosResponse) => {
             component.setState({
@@ -46,6 +49,8 @@ export default class ShopAjax {
         switch(actionType) {
             case SHOP_ACTIONS.FETCH:
                 return 'character/'+characterId+'/visit-shop';
+            case SHOP_ACTIONS.BUY:
+
             default:
                 throw new Error('Unknown route to take.')
         }
@@ -64,19 +69,34 @@ export default class ShopAjax {
         }
     }
 
-    protected processResponse(component: Shop, actionType: SHOP_ACTIONS, axiosData: any): void {
+    protected processResponse(component: Shop | BuyMultiple, actionType: SHOP_ACTIONS, axiosData: any): void {
         switch (actionType) {
             case SHOP_ACTIONS.FETCH:
                 return this.handleFetchData(component, axiosData)
+            case SHOP_ACTIONS.BUY:
+                return this.handleMessage(component, axiosData);
+            case SHOP_ACTIONS.BUY_MANY:
+                return this.handleBuyingMany(component, axiosData);
             default:
                 throw new Error('Cannot figure out what to do with axios data from shop action');
         }
     }
 
-    private handleFetchData(component: Shop, axiosData: any): void {
+    private handleFetchData(component: Shop | BuyMultiple, axiosData: any): void {
         component.setState({
             items: axiosData.items,
-            original_items: axiosData.items,
+        })
+    }
+
+    private handleMessage(component: Shop | BuyMultiple, axiosData: any): void {
+        component.setState({
+            success_message: axiosData.message,
+        })
+    }
+
+    private handleBuyingMany(component: Shop | BuyMultiple, axiosData: any): void {
+        component.setState({
+            success_message: axiosData.message,
         })
     }
 }

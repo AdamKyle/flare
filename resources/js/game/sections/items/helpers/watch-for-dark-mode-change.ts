@@ -1,6 +1,7 @@
-import Shop from "../shop";
 
-export const watchForDarkModeChange = (component: Shop) => {
+import ItemTable from "../item-table";
+
+export const watchForDarkModeChange = (component: ItemTable) => {
     window.setInterval(() => {
         if (window.localStorage.hasOwnProperty('scheme') && component.state.dark_tables !== true) {
             component.setState({
