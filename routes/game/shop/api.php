@@ -15,6 +15,7 @@ Route::group(['middleware' => [
     'is.character.dead'
 ]], function() {
 
+    Route::get('/shop/view/comparison/{character}', ['uses' => 'Api\ShopController@shopCompare']);
 
     Route::post('/character/{character}/inventory/sell-item', ['uses' => 'Api\ShopController@sellItem']);
     Route::post('/character/{character}/inventory/sell-all', ['uses' => 'Api\ShopController@sellAll']);
@@ -23,4 +24,5 @@ Route::group(['middleware' => [
     Route::post('/character/{character}/sell-all-gems', ['uses' => 'Api\GemShopController@SellAllGems']);
 
     Route::post('/shop/buy/item/{character}', ['uses' => 'Api\ShopController@buy']);
+    Route::post('/shop/purchase/multiple/{character}', ['uses' => 'Api\ShopController@buyMultiple']);
 });

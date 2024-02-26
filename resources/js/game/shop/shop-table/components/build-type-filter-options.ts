@@ -17,6 +17,9 @@ export const ITEM_TYPES = [
   ItemType.SLEEVES,
   ItemType.LEGGINGS,
   ItemType.HELMET,
+  ItemType.SPELL_DAMAGE,
+  ItemType.SPELL_HEALING,
+  ItemType.RING
 ];
 
 export const itemTypeFilter = () => {

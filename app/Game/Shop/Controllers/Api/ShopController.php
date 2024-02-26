@@ -4,8 +4,10 @@ namespace App\Game\Shop\Controllers\Api;
 
 use App\Flare\Models\Item;
 use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\CharacterInventory\Services\ComparisonService;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Shop\Events\BuyItemEvent;
+use App\Game\Shop\Requests\ShopPurchaseMultipleValidation;
 use App\Game\Shop\Services\ShopService;
 use App\Http\Controllers\Controller;
 use Facades\App\Flare\Calculators\SellItemCalculator;
@@ -28,10 +30,21 @@ class ShopController extends Controller {
 
     public function fetchItemsForShop(Character $character): JsonResponse {
         return response()->json([
-            'items' => $this->shopService->getItemsForShop(),
-            'gold' =>  $character->gold,
+            'items'           => $this->shopService->getItemsForShop(),
+            'gold'            =>  $character->gold,
             'inventory_count' => $character->getInventoryCount(),
             'inventory_max'   => $character->inventory_max,
+            'is_merchant'     => $character->classType()->isMerchant(),
+        ]);
+    }
+
+    public function shopCompare(Request $request, Character $character,
+                                ComparisonService $comparisonService) {
+
+        $viewData = $comparisonService->buildShopData($character, Item::where('name', $request->item_name)->first(), $request->item_type);
+
+        return response()->json([
+            'comparison_data' => $viewData,
         ]);
     }
 
@@ -66,6 +79,29 @@ class ShopController extends Controller {
         return response()->json([
             'message' => 'Purchased: ' . $item->affix_name . '.'
         ]);
+    }
+
+    public function buyMultiple(ShopPurchaseMultipleValidation $request, Character $character) {
+        $item   = Item::find($request->item_id);
+        $amount = $request->amount;
+
+        if ($amount > $character->inventory_max || $character->isInventoryFull()) {
+            return redirect()->back()->with('error', 'You cannot purchase more then you have inventory space.');
+        }
+
+        $cost = $amount * $item->cost;
+
+        if ($character->classType()->isMerchant()) {
+            $cost = $cost - $cost * 0.25;
+        }
+
+        if ($cost > $character->gold) {
+            return redirect()->back()->with('error', 'You do not have enough gold.');
+        }
+
+        $this->shopService->buyMultipleItems($character, $item, $cost, $amount);
+
+        return redirect()->to(route('game.shop.buy', ['character' => $character->id]))->with('success', 'You purchased: ' . $amount . ' of ' . $item->name);
     }
 
     public function sellItem(ShopSellValidation $request, Character $character) {

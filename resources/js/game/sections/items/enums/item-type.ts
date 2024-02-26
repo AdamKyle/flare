@@ -18,4 +18,17 @@ export enum ItemType {
     SHIELD = 'shield',
     HELMET = 'helmet',
     LEGGINGS = 'leggings',
+
+    // Spells
+    SPELL_DAMAGE = 'spell-damage',
+    SPELL_HEALING = 'spell-healing',
+
+    // Rings
+    RING = 'ring',
+
+    // Trinket
+    TRINKET = 'trinket',
+
+    // Artifact
+    ARTIFACT = 'artifact',
 }

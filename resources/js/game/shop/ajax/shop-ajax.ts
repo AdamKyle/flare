@@ -4,7 +4,7 @@ import AjaxInterface from "../../lib/ajax/ajax-interface.js";
 import Shop from "../shop";
 import {AxiosError, AxiosResponse, Method} from "axios";
 import BuyMultiple from "../buy-multiple";
-
+import BuyAndCompare from "../buy-and-compare";
 
 export enum SHOP_ACTIONS {
     FETCH = 'fetch',
@@ -16,19 +16,112 @@ export enum SHOP_ACTIONS {
 @injectable()
 export default class ShopAjax {
 
-    constructor(@inject(Ajax) private ajax: AjaxInterface) {}
+    constructor(@inject(Ajax) private ajax: AjaxInterface) {
+    }
 
-    public doShopAction(component: Shop | BuyMultiple, actionType: SHOP_ACTIONS, params?: any) {
+    public doShopAction(component: Shop | BuyMultiple | BuyAndCompare, actionType: SHOP_ACTIONS, params?: any) {
         const route = this.getRoute(actionType, component.props.character_id);
         const actionForRoute = this.getActionType(actionType);
 
-        component.setState({ loading: true });
+        if (component instanceof Shop) {
+            if (actionType === SHOP_ACTIONS.BUY) {
+                return this.handleBuy(component, route, actionForRoute, params);
+            }
 
-        this.ajax.setRoute(route).setParameters(params).doAjaxCall(actionForRoute, (result: AxiosResponse) => {
+            if (actionType === SHOP_ACTIONS.FETCH) {
+                return this.handleFetchShopContent(component, route, actionForRoute, params);
+            }
+        }
+
+        if (component instanceof BuyMultiple) {
+            return this.handleBuyingMany(component, route, actionForRoute, params);
+        }
+
+        if (component instanceof BuyAndCompare) {
+            return this.handleComparisonFetch(component, route, actionForRoute, params);
+        }
+    }
+
+    protected handleBuy(component: Shop, route: string, action: Method, params?: any) {
+        component.setState({loading: true});
+
+        this.ajax.setRoute(route).setParameters(params).doAjaxCall(action, (result: AxiosResponse) => {
+            component.setState({
+                loading: false,
+                success_message: result.data.sucess_message,
+            })
+        }, (error: AxiosError) => {
             component.setState({
                 loading: false
-            }, () => {
-                this.processResponse(component, actionType, result.data);
+            });
+
+            if (typeof error.response !== 'undefined') {
+                const response = error.response;
+
+                component.setState({
+                    error_message: response.data.message,
+                });
+            }
+        })
+    }
+
+    protected handleBuyingMany(component: BuyMultiple, route: string, action: Method, params?: any) {
+        component.setState({loading: true});
+
+        this.ajax.setRoute(route).setParameters(params).doAjaxCall(action, (result: AxiosResponse) => {
+            component.setState({
+                loading: false,
+                success_message: result.data.message,
+            })
+        }, (error: AxiosError) => {
+            component.setState({
+                loading: false
+            });
+
+            if (typeof error.response !== 'undefined') {
+                const response = error.response;
+
+                component.setState({
+                    error_message: response.data.message,
+                });
+            }
+        })
+    }
+
+    protected handleFetchShopContent(component: Shop, route: string, action: Method, params?: any) {
+        component.setState({loading: true});
+
+        this.ajax.setRoute(route).setParameters(params).doAjaxCall(action, (result: AxiosResponse) => {
+            component.setState({
+                loading: false,
+                items: result.data.items,
+                gold: result.data.gold,
+                inventory_count: result.data.inventory_count,
+                inventory_max: result.data.inventory_max,
+                is_merchant: result.data.is_merchant
+            })
+        }, (error: AxiosError) => {
+            component.setState({
+                loading: false
+            });
+
+            if (typeof error.response !== 'undefined') {
+                const response = error.response;
+
+                component.setState({
+                    error_message: response.data.message,
+                });
+            }
+        })
+    }
+
+    protected handleComparisonFetch(component: BuyAndCompare, route: string, action: Method, params?: any) {
+        component.setState({loading: true});
+
+        this.ajax.setRoute(route).setParameters(params).doAjaxCall(action, (result: AxiosResponse) => {
+            component.setState({
+                loading: false,
+                comparison_data: result.data.comparison_data,
             })
         }, (error: AxiosError) => {
             component.setState({
@@ -46,57 +139,30 @@ export default class ShopAjax {
     }
 
     protected getRoute(actionType: SHOP_ACTIONS, characterId: number): string {
-        switch(actionType) {
+        switch (actionType) {
             case SHOP_ACTIONS.FETCH:
-                return 'character/'+characterId+'/visit-shop';
+                return 'character/' + characterId + '/visit-shop';
             case SHOP_ACTIONS.BUY:
-
+                return 'shop/buy/item/' + characterId;
+            case SHOP_ACTIONS.BUY_MANY:
+                return 'shop/purchase/multiple/' + characterId;
+            case SHOP_ACTIONS.COMPARE:
+                return 'shop/view/comparison/' + characterId;
             default:
                 throw new Error('Unknown route to take.')
         }
     }
 
     protected getActionType(actionType: SHOP_ACTIONS): Method {
-        switch(actionType) {
+        switch (actionType) {
             case SHOP_ACTIONS.FETCH:
-                return 'get'
             case SHOP_ACTIONS.COMPARE:
+                return 'get'
             case SHOP_ACTIONS.BUY:
             case SHOP_ACTIONS.BUY_MANY:
                 return 'post'
             default:
                 throw new Error('Unknown action to take for route.')
         }
-    }
-
-    protected processResponse(component: Shop | BuyMultiple, actionType: SHOP_ACTIONS, axiosData: any): void {
-        switch (actionType) {
-            case SHOP_ACTIONS.FETCH:
-                return this.handleFetchData(component, axiosData)
-            case SHOP_ACTIONS.BUY:
-                return this.handleMessage(component, axiosData);
-            case SHOP_ACTIONS.BUY_MANY:
-                return this.handleBuyingMany(component, axiosData);
-            default:
-                throw new Error('Cannot figure out what to do with axios data from shop action');
-        }
-    }
-
-    private handleFetchData(component: Shop | BuyMultiple, axiosData: any): void {
-        component.setState({
-            items: axiosData.items,
-        })
-    }
-
-    private handleMessage(component: Shop | BuyMultiple, axiosData: any): void {
-        component.setState({
-            success_message: axiosData.message,
-        })
-    }
-
-    private handleBuyingMany(component: Shop | BuyMultiple, axiosData: any): void {
-        component.setState({
-            success_message: axiosData.message,
-        })
     }
 }

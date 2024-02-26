@@ -139,7 +139,10 @@ export default class ItemTable extends React.Component<ItemTableProps, any> {
                                 <div className="grid md:grid-cols-3 gap-4 my-4">
                                     <div className="flex items-center">
                                         <div className="mr-2">Search:</div>
-                                        <input type="text" className="w-full h-9 text-gray-800 dark:text-white border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 bg-gray-200 dark:bg-gray-700 px-4" value={this.state.search_term} onChange={this.handleSearchInputChange.bind(this)}/>
+                                        <input type="text" className="w-full h-9 text-gray-800 dark:text-white border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 bg-gray-200 dark:bg-gray-700 px-4"
+                                               value={this.state.search_term}
+                                               onChange={this.handleSearchInputChange.bind(this)}
+                                        />
                                     </div>
                                     <div>
                                         <Select

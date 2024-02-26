@@ -116,29 +116,6 @@ class ShopController extends Controller {
         return redirect()->back()->with('success', 'Sold: ' . $item->affix_name . ' for: ' . $totalSoldFor . ' gold.');
     }
 
-    public function shopCompare(Request $request, Character $character,
-                                ComparisonService $comparisonService) {
-
-        $viewData = $comparisonService->buildShopData($character, Item::where('name', $request->item_name)->first(), $request->item_type);
-
-        Cache::put('shop-comparison-character-' . $character->id, $viewData, now()->addMinutes(10));
-
-        return redirect()->to(route('game.shop.view.comparison', ['character' => $character]));
-    }
-
-    public function viewShopCompare(Character $character) {
-        $cache = Cache::get('shop-comparison-character-' . $character->id);
-
-        if (is_null($cache)) {
-            return redirect()->to(route('game.shop.buy', ['character' => $character->id]))->with('error', 'Comparison cache has expired. Please click compare again. Cache expires after 10 minutes');
-        }
-
-        return view('game.core.comparison.comparison', [
-            'itemToEquip' => $cache,
-            'route' => route('game.shop.buy-and-replace', ['character' => $character->id])
-        ]);
-    }
-
     public function buyAndReplace(ShopReplaceItemValidation $request, Character $character) {
 
         $item = Item::find($request->item_id_to_buy);
@@ -188,26 +165,5 @@ class ShopController extends Controller {
         ]);
     }
 
-    public function buyMultiple(ShopPurchaseMultipleValidation $request, Character $character) {
-        $item   = Item::find($request->item_id);
-        $amount = $request->amount;
 
-        if ($amount > $character->inventory_max || $character->isInventoryFull()) {
-            return redirect()->back()->with('error', 'You cannot purchase more then you have inventory space.');
-        }
-
-        $cost = $amount * $item->cost;
-
-        if ($character->classType()->isMerchant()) {
-            $cost = $cost - $cost * 0.25;
-        }
-
-        if ($cost > $character->gold) {
-            return redirect()->back()->with('error', 'You do not have enough gold.');
-        }
-
-        $this->shopService->buyMultipleItems($character, $item, $cost, $amount);
-
-        return redirect()->to(route('game.shop.buy', ['character' => $character->id]))->with('success', 'You purchased: ' . $amount . ' of ' . $item->name);
-    }
 }

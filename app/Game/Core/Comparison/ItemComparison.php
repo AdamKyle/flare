@@ -45,8 +45,10 @@ class ItemComparison {
 
                     $result['position']            = $slot->position;
                     $result['is_unique']           = $this->isUnique($slot->item);
+                    $result['is_mythic']           = $slot->item->is_mythic;
                     $result['affix_count']         = $slot->item->affix_count;
                     $result['holy_stacks_applied'] = $slot->item->holy_stacks_applied;
+                    $result['type']                = $slot->item->type;
 
                     $comparison[] = $result;
                 }
