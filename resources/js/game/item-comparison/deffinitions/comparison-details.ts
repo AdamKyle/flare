@@ -1,3 +1,4 @@
+import {ItemType} from "../../sections/items/enums/item-type";
 
 export interface attachedSkills {
     skill_name: string,
@@ -46,6 +47,6 @@ export default interface ComparisonDetails {
     is_unique: boolean,
     affix_count: number,
     holy_stacks_applied: number,
-    type:string,
+    type:ItemType,
     is_mythic: boolean;
 }
