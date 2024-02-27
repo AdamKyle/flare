@@ -116,33 +116,6 @@ class ShopController extends Controller {
         return redirect()->back()->with('success', 'Sold: ' . $item->affix_name . ' for: ' . $totalSoldFor . ' gold.');
     }
 
-    public function buyAndReplace(ShopReplaceItemValidation $request, Character $character) {
-
-        $item = Item::find($request->item_id_to_buy);
-
-        if ($item->craft_only) {
-            return redirect()->back()->with('error', 'You are not capable of affording such luxury, child!');
-        }
-
-        $cost = $item->cost;
-
-        if ($character->classType()->isMerchant()) {
-            $cost = $cost - $cost * 0.25;
-        }
-
-        if ($cost > $character->gold) {
-            return redirect()->back()->with('error', 'You do not have enough gold.');
-        }
-
-        if ($character->isInventoryFull()) {
-            return redirect()->back()->with('error', 'Inventory is full. Please make room.');
-        }
-
-        $this->shopService->buyAndReplace($item, $character, $request->all());
-
-        return redirect()->to(route('game.shop.buy', ['character' => $character]))->with('success', 'Purchased and equipped: ' . $item->affix_name . '.');
-    }
-
     public function puracheMultiple(ShopBuyMultipleOfItem $request, Character $character) {
         $item = Item::where('name', $request->item_name)
             ->whereNotIn('type', ['alchemy', 'trinket', 'artifact', 'quest'])

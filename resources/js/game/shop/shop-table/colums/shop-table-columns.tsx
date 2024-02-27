@@ -110,7 +110,7 @@ export default class ShopTableColumns {
                         <PrimaryButton button_label={'Buy'} on_click={() => this.buyItem(row)} additional_css={'w-full'} />
                     </div>
                     <div className="w-full mb-2">
-                        <PrimaryButton button_label={'Buy and compare'} on_click={() => this.viewComparison(row, viewComparison)} additional_css={'w-full'} />
+                        <PrimaryButton button_label={'Compare'} on_click={() => this.viewComparison(row, viewComparison)} additional_css={'w-full'} />
                     </div>
                     <div className="w-full">
                         <SuccessButton button_label={'Buy Multiple'} on_click={() => this.viewPurchaseAny(row, viewBuyMany)} additional_css={'w-full'} />

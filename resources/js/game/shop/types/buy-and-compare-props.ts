@@ -7,4 +7,6 @@ export default interface BuyAndCompareProps {
     item: ItemDefinition;
 
     close_view_buy_and_compare: () => void;
+
+    set_success_message: (message: string | null) => void;
 }

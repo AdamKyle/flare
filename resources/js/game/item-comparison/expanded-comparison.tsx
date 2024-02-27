@@ -306,8 +306,9 @@ export default class ExpandedComparison extends React.Component<any, any> {
                                 {(this.props.comparison_details.ambush_resistance_adjustment * 100).toFixed(2)}%
                             </dd>
                         </dl>
+                        {this.renderSkillsChanges()}
                         <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-4'></div>
-                        <strong>Entrancing</strong>
+                        <strong>Misc. Modifiers</strong>
                         <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2'></div>
                         <dl>
                             <dt>Entrancing Chance</dt>
@@ -318,11 +319,6 @@ export default class ExpandedComparison extends React.Component<any, any> {
                             })}>
                                 {(this.props.comparison_details.entranced_chance * 100).toFixed(2)}%
                             </dd>
-                        </dl>
-                        <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-4'></div>
-                        <strong>Life Stealing</strong>
-                        <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2'></div>
-                        <dl>
                             <dt>Steal Life Chance</dt>
                             <dd className={clsx({
                                 'text-green-700 dark:text-green-500' : this.isValueAboveZero(this.props.comparison_details.steal_life_amount),
@@ -332,7 +328,6 @@ export default class ExpandedComparison extends React.Component<any, any> {
                                 {(this.props.comparison_details.steal_life_amount * 100).toFixed(2)}%
                             </dd>
                         </dl>
-                        {this.renderSkillsChanges()}
                     </div>
                 </div>
             </div>

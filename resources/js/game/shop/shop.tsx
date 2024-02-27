@@ -71,64 +71,73 @@ export default class Shop extends React.Component<ShopProps, ShopState> {
         })
     }
 
+    setSuccessMessage(message: string | null) {
+        this.setState({
+            success_message: message,
+        });
+    }
+
     render() {
+
+        if (this.state.items.length === 0) {
+            return <LoadingProgressBar />
+        }
+
         return (
             <>
                 {
-                    this.state.loading || this.state.items.length <= 0 ?
+                    this.state.loading ?
                         <LoadingProgressBar />
-                    :
-                        <>
-                            {
-                                this.state.item_to_compare !== null ?
-                                    <BuyAndCompare character_id={this.props.character_id}
-                                                   item={this.state.item_to_compare}
-                                                   close_view_buy_and_compare={this.closeViewSection.bind(this)}
-                                    />
-                                :
-                                    this.state.item_to_buy_many !== null ?
-                                        <BuyMultiple
-                                            character_id={this.props.character_id}
-                                            close_view_buy_many={this.closeViewSection.bind(this)}
-                                            inventory_count={this.state.inventory_count}
-                                            inventory_max={this.state.inventory_max}
-                                            character_gold={this.state.gold}
-                                            is_merchant={this.state.is_merchant}
-                                            item={this.state.item_to_buy_many} />
-                                    :
-                                        <div>
-                                            {
-                                                this.state.error_message !== null ?
-                                                    <DangerAlert additional_css={'my-4'}>
-                                                        {this.state.error_message}
-                                                    </DangerAlert>
-                                                : null
-                                            }
-
-                                            {
-                                                this.state.success_message !== null ?
-                                                    <SuccessAlert additional_css={'my-4'}>
-                                                        {this.state.success_message}
-                                                    </SuccessAlert>
-                                                    : null
-                                            }
-                                            <ItemTable items={this.state.items}
-                                                       item_to_view={this.state.item_to_view}
-                                                       close_view_item_action={this.closeViewSection.bind(this)}
-                                                       close_view_item_label={'Back to Shop'}
-                                                       table_columns={
-                                                           this.shopColumns.buildColumns(
-                                                               this.viewItem.bind(this),
-                                                               this.viewBuyMany.bind(this),
-                                                               this.viewComparison.bind(this),
-                                                           )
-                                                       }
-                                            />
-                                        </div>
-                            }
-                        </>
+                    : null
                 }
+                {
+                    this.state.item_to_compare !== null ?
+                        <BuyAndCompare character_id={this.props.character_id}
+                                       item={this.state.item_to_compare}
+                                       close_view_buy_and_compare={this.closeViewSection.bind(this)}
+                                       set_success_message={this.setSuccessMessage.bind(this)}
+                        />
+                    :
+                        this.state.item_to_buy_many !== null ?
+                            <BuyMultiple
+                                character_id={this.props.character_id}
+                                close_view_buy_many={this.closeViewSection.bind(this)}
+                                inventory_count={this.state.inventory_count}
+                                inventory_max={this.state.inventory_max}
+                                character_gold={this.state.gold}
+                                is_merchant={this.state.is_merchant}
+                                item={this.state.item_to_buy_many} />
+                        :
+                            <div>
+                                {
+                                    this.state.error_message !== null ?
+                                        <DangerAlert additional_css={'my-4'}>
+                                            {this.state.error_message}
+                                        </DangerAlert>
+                                        : null
+                                }
 
+                                {
+                                    this.state.success_message !== null ?
+                                        <SuccessAlert additional_css={'my-4'}>
+                                            {this.state.success_message}
+                                        </SuccessAlert>
+                                        : null
+                                }
+                                <ItemTable items={this.state.items}
+                                           item_to_view={this.state.item_to_view}
+                                           close_view_item_action={this.closeViewSection.bind(this)}
+                                           close_view_item_label={'Back to Shop'}
+                                           table_columns={
+                                               this.shopColumns.buildColumns(
+                                                   this.viewItem.bind(this),
+                                                   this.viewBuyMany.bind(this),
+                                                   this.viewComparison.bind(this),
+                                               )
+                                           }
+                                />
+                            </div>
+                }
             </>
         )
     }

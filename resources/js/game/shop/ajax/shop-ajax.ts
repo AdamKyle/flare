@@ -9,6 +9,7 @@ import BuyAndCompare from "../buy-and-compare";
 export enum SHOP_ACTIONS {
     FETCH = 'fetch',
     COMPARE = 'compare-and-buy',
+    BUY_AND_REPLACE = 'buy-and-replace',
     BUY = 'buy',
     BUY_MANY = 'buy-many'
 }
@@ -38,7 +39,14 @@ export default class ShopAjax {
         }
 
         if (component instanceof BuyAndCompare) {
-            return this.handleComparisonFetch(component, route, actionForRoute, params);
+
+            if (actionType === SHOP_ACTIONS.COMPARE) {
+                return this.handleComparisonFetch(component, route, actionForRoute, params);
+            }
+
+            if (actionType === SHOP_ACTIONS.BUY_AND_REPLACE) {
+                return this.handleBuyAndReplace(component, route, actionForRoute, params);
+            }
         }
     }
 
@@ -48,7 +56,7 @@ export default class ShopAjax {
         this.ajax.setRoute(route).setParameters(params).doAjaxCall(action, (result: AxiosResponse) => {
             component.setState({
                 loading: false,
-                success_message: result.data.sucess_message,
+                success_message: result.data.message,
             })
         }, (error: AxiosError) => {
             component.setState({
@@ -138,6 +146,32 @@ export default class ShopAjax {
         })
     }
 
+    protected handleBuyAndReplace(component: BuyAndCompare, route: string, action: Method, params?: any) {
+        component.setState({loading: true});
+
+        this.ajax.setRoute(route).setParameters(params).doAjaxCall(action, (result: AxiosResponse) => {
+            component.setState({
+                loading: false,
+            }, () => {
+                component.props.set_success_message(result.data.message);
+
+                component.props.close_view_buy_and_compare();
+            });
+        }, (error: AxiosError) => {
+            component.setState({
+                loading: false
+            });
+
+            if (typeof error.response !== 'undefined') {
+                const response = error.response;
+
+                component.setState({
+                    error_message: response.data.message,
+                });
+            }
+        })
+    }
+
     protected getRoute(actionType: SHOP_ACTIONS, characterId: number): string {
         switch (actionType) {
             case SHOP_ACTIONS.FETCH:
@@ -148,6 +182,8 @@ export default class ShopAjax {
                 return 'shop/purchase/multiple/' + characterId;
             case SHOP_ACTIONS.COMPARE:
                 return 'shop/view/comparison/' + characterId;
+            case SHOP_ACTIONS.BUY_AND_REPLACE:
+                return 'shop/buy-and-replace/' + characterId;
             default:
                 throw new Error('Unknown route to take.')
         }
@@ -160,6 +196,7 @@ export default class ShopAjax {
                 return 'get'
             case SHOP_ACTIONS.BUY:
             case SHOP_ACTIONS.BUY_MANY:
+            case SHOP_ACTIONS.BUY_AND_REPLACE:
                 return 'post'
             default:
                 throw new Error('Unknown action to take for route.')

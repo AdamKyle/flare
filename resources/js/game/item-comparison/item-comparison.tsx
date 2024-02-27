@@ -95,7 +95,7 @@ export default class ItemComparison extends React.Component<ItemComparisonProps,
                         <PrimaryOutlineButton button_label={'See Expanded Details'} on_click={() => this.showExpandedComparison(this.props.comparison_info.details[0])} />
                     </div>
                     <div>
-                        <SuccessOutlineButton button_label={'Buy and Replace'} on_click={() => {}} />
+                        <SuccessOutlineButton button_label={'Buy and Replace'} on_click={this.props.handle_buy_and_replace} />
                     </div>
                 </div>
             </div>

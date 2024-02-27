@@ -36,6 +36,26 @@ export default class BuyAndCompare extends React.Component<BuyAndCompareProps, B
 
     buyAndReplaceItem() {
 
+        if (this.state.comparison_data === null) {
+            return;
+        }
+
+        this.setState({
+            error_message: null,
+            success_message: null,
+        }, () => {
+            if (this.state.comparison_data === null) {
+                return;
+            }
+
+            this.ajax.doShopAction(this, SHOP_ACTIONS.BUY_AND_REPLACE, {
+                position: this.state.comparison_data.slotPosition ?? this.state.comparison_data.itemToEquip.type,
+                item_id_to_buy: this.state.comparison_data.itemToEquip.id,
+                equip_type: this.state.comparison_data.itemToEquip.type,
+                slot_id: this.state.comparison_data.slotId,
+            });
+        })
+
     }
 
     updateIsShowingExpandedLocation() {
@@ -67,6 +87,7 @@ export default class BuyAndCompare extends React.Component<BuyAndCompareProps, B
                     <ItemComparison comparison_info={this.state.comparison_data}
                                     is_showing_expanded_comparison={this.state.is_showing_expanded_comparison}
                                     manage_show_expanded_comparison={this.updateIsShowingExpandedLocation.bind(this)}
+                                    handle_buy_and_replace={this.buyAndReplaceItem.bind(this)}
                     />
                 </BasicCard>
             </div>
