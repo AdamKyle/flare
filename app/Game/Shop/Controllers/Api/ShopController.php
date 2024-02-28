@@ -7,6 +7,7 @@ use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\CharacterInventory\Services\ComparisonService;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Shop\Events\BuyItemEvent;
+use App\Game\Shop\Events\UpdateShopEvent;
 use App\Game\Shop\Requests\ShopPurchaseMultipleValidation;
 use App\Game\Shop\Requests\ShopReplaceItemValidation;
 use App\Game\Shop\Services\ShopService;
@@ -75,7 +76,11 @@ class ShopController extends Controller {
             return redirect()->back()->with('error', 'Inventory is full. Please make room.');
         }
 
+        $character = $character->refresh();
+
         event(new BuyItemEvent($item, $character));
+
+        event(new UpdateShopEvent($character->user, $character->gold, $character->getInventoryCount()));
 
         return response()->json([
             'message' => 'Purchased: ' . $item->affix_name . '.'
@@ -101,6 +106,10 @@ class ShopController extends Controller {
         }
 
         $this->shopService->buyMultipleItems($character, $item, $cost, $amount);
+
+        $character = $character->refresh();
+
+        event(new UpdateShopEvent($character->user, $character->gold, $character->getInventoryCount()));
 
         return response()->json([
             'message' => 'You purchased: ' . $amount . ' of ' . $item->name,
@@ -130,6 +139,10 @@ class ShopController extends Controller {
         }
 
         $this->shopService->buyAndReplace($item, $character, $request->all());
+
+        $character = $character->refresh();
+
+        event(new UpdateShopEvent($character->user, $character->gold, $character->getInventoryCount()));
 
         return response()->json([
             'message' => 'Purchased and equipped: ' . $item->affix_name . '.'

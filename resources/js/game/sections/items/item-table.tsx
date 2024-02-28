@@ -133,7 +133,7 @@ export default class ItemTable extends React.Component<ItemTableProps, any> {
                         :
                         <BasicCard additionalClasses={'my-4'}>
                             <InfoAlert additional_css={'my-3'}>
-                                <p>Click an item name to learn more info.</p>
+                                <p>Click the name of the item to get more info about it's stats.</p>
                             </InfoAlert>
                             <div className="md:w-3/5 sm:w-full my-4">
                                 <div className="grid md:grid-cols-3 gap-4 my-4">

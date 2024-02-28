@@ -11,12 +11,18 @@ import SuccessAlert from "../components/ui/alerts/simple-alerts/success-alert";
 import BuyAndCompare from "./buy-and-compare";
 import ShopProps from "./types/shop-props";
 import ShopState from "./types/shop-state";
+import BasicCard from "../components/ui/cards/basic-card";
+import {formatNumber} from "../lib/game/format-number";
+import ShopListenerDefinition from "./event-listeners/shop-listener-definition";
+import ShopListener from "./event-listeners/shop-listener";
 
 export default class Shop extends React.Component<ShopProps, ShopState> {
 
     private ajax: ShopAjax;
 
     private shopColumns: ShopTableColumns;
+
+    private shopListener: ShopListenerDefinition;
 
     constructor(props: ShopProps) {
         super(props);
@@ -38,11 +44,19 @@ export default class Shop extends React.Component<ShopProps, ShopState> {
         this.ajax = shopServiceContainer().fetch(ShopAjax);
 
         this.shopColumns = shopServiceContainer().fetch(ShopTableColumns).setComponent(this);
+
+        this.shopListener = shopServiceContainer().fetch<ShopListenerDefinition>(ShopListener);
+
+        this.shopListener.initialize(this, this.props.user_id);
+
+        this.shopListener.register();
     }
 
     componentDidMount() {
 
         this.ajax.doShopAction(this, SHOP_ACTIONS.FETCH);
+
+        this.shopListener.listen();
     }
 
     viewItem(itemId: number) {
@@ -90,6 +104,14 @@ export default class Shop extends React.Component<ShopProps, ShopState> {
                         <LoadingProgressBar />
                     : null
                 }
+                <BasicCard additionalClasses={'my-4'}>
+                    <div>
+                        <strong>Your Gold:</strong> {formatNumber(this.state.gold)}
+                    </div>
+                    <div className='my-3'>
+                        <strong>Current inventory space:</strong> {formatNumber(this.state.inventory_count)}/{formatNumber(this.state.inventory_max)}
+                    </div>
+                </BasicCard>
                 {
                     this.state.item_to_compare !== null ?
                         <BuyAndCompare character_id={this.props.character_id}
