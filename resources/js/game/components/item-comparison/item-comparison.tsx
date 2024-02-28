@@ -1,9 +1,9 @@
 import React from "react";
 import ItemComparisonProps from "./types/item-comparison-props";
 import Comparison from "./comparison";
-import ItemNameColorationText from "../sections/items/item-name/item-name-coloration-text";
-import PrimaryOutlineButton from "../components/ui/buttons/primary-outline-button";
-import SuccessOutlineButton from "../components/ui/buttons/success-outline-button";
+import ItemNameColorationText from "../../sections/items/item-name/item-name-coloration-text";
+import PrimaryOutlineButton from "../ui/buttons/primary-outline-button";
+import SuccessOutlineButton from "../ui/buttons/success-outline-button";
 import ComparisonDetails from "./deffinitions/comparison-details";
 import ExpandedComparison from "./expanded-comparison";
 

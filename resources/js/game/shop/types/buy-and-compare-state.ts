@@ -1,4 +1,4 @@
-import {ComparisonData} from "../../item-comparison/deffinitions/comparison-data";
+import {ComparisonData} from "../../components/item-comparison/deffinitions/comparison-data";
 
 export default interface BuyAndCompareState {
     loading: boolean,

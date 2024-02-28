@@ -1,8 +1,8 @@
 import React from "react";
 import clsx from "clsx";
-import {formatNumber} from "../lib/game/format-number";
-import ItemNameColorationText from "../sections/items/item-name/item-name-coloration-text";
-import {ItemType} from "../sections/items/enums/item-type";
+import {formatNumber} from "../../lib/game/format-number";
+import ItemNameColorationText from "../../sections/items/item-name/item-name-coloration-text";
+import {ItemType} from "../../sections/items/enums/item-type";
 
 const coreAttributes = [
     'str', 'dex', 'dur', 'int', 'chr', 'agi', 'focus'

@@ -4,7 +4,7 @@ import LoadingProgressBar from "../components/ui/progress-bars/loading-progress-
 import PrimaryOutlineButton from "../components/ui/buttons/primary-outline-button";
 import ShopAjax, {SHOP_ACTIONS} from "./ajax/shop-ajax";
 import {shopServiceContainer} from "./container/shop-container";
-import ItemComparison from "../item-comparison/item-comparison";
+import ItemComparison from "../components/item-comparison/item-comparison";
 import BuyAndCompareProps from "./types/buy-and-compare-props";
 import BuyAndCompareState from "./types/buy-and-compare-state";
 
