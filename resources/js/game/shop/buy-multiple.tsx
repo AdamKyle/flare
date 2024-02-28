@@ -77,12 +77,15 @@ export default class BuyMultiple extends React.Component<BuyMultipleProps, BuyMu
         this.setState({
             success_message: null,
             error_message: null,
-            cost: this.props.item.cost * 1,
-            amount: 1,
         }, () => {
             this.ajax.doShopAction(this, SHOP_ACTIONS.BUY_MANY, {
                 item_id: this.props.item.id,
                 amount: this.state.amount,
+            });
+
+            this.setState({
+                cost: this.props.item.cost * 1,
+                amount: 1,
             })
         })
     }
