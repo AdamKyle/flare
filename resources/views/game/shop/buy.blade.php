@@ -37,3 +37,8 @@
         </div>
   </div>
 @endsection
+
+@push('scripts')
+    @vite('resources/js/shop-component.ts');
+@endpush
+

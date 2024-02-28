@@ -24,9 +24,4 @@ import './game/tops/rank-fight-tops-component';
 /**
  * Load the event calendar for the player.
  */
-import './game/event-calendar/calendar-component';
-
-/**
- * Load the game shop
- */
-import './game/shop/shop-component';
+import './individual-components/player-components/event-calendar/calendar-component';

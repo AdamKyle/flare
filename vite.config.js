@@ -9,10 +9,12 @@ export default defineConfig({
             'resources/css/tailwind.css',
             'resources/js/app.ts',
             'resources/js/admin-app.ts',
+            'resources/js/shop-component.ts',
+            'resources/js/player-event-calendar-component.ts',
             'resources/js/vendor/theme-script.js',
             'resources/vendor/theme/assets/js/dark-mode/dark-mode.js',
             'resources/js/vendor/livewire-data-tables.js',
-            'resources/js/vendor/livewire.js'
+            'resources/js/vendor/livewire.js',
         ]),
         react(),
     ],

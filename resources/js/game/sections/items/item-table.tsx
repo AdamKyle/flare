@@ -4,7 +4,7 @@ import BasicCard from "../../components/ui/cards/basic-card";
 import Item from "./item";
 import InfoAlert from "../../components/ui/alerts/simple-alerts/info-alert";
 import Select from "react-select";
-import {ITEM_TYPES, itemTypeFilter} from "../../shop/shop-table/components/build-type-filter-options";
+import {ITEM_TYPES, itemTypeFilter} from "../../../individual-components/player-components/shop/shop-table/components/build-type-filter-options";
 import DangerOutlineButton from "../../components/ui/buttons/danger-outline-button";
 import Table from "../../components/ui/data-tables/table";
 import ItemDefinition from "./deffinitions/item-definition";
