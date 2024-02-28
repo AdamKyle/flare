@@ -32,10 +32,13 @@
 
     @livewireStyles
 
+    @vite('resources/js/vendor/livewire-data-tables.js')
+
+    @vite('resources/js/vendor/livewire.js')
+
     @vite('resources/vendor/theme/assets/js/dark-mode/dark-mode.js')
 
     <script src="https://cdn.jsdelivr.net/gh/mcstudios/glightbox/dist/js/glightbox.min.js"></script>
-    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
     @stack('head')
 </head>
@@ -91,17 +94,10 @@
 
 </main>
 
-
-
-<!-- Scripts -->
-
-@livewireScripts
+@livewireScriptConfig
 
 @vite('resources/js/vendor/theme-script.js')
 
-{{--<script src={{mix('js/theme-vendor.js')}} type="text/javascript"></script>--}}
-{{--<script src={{mix('js/theme-script.js')}} type="text/javascript"></script>--}}
-{{--<script src="{{ mix('js/app.js') }}"></script>--}}
 
 <script>
     const lightbox = GLightbox();
