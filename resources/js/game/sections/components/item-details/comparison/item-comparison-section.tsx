@@ -6,11 +6,11 @@ import clsx from "clsx";
 import Tabs from "../../../../components/ui/tabs/tabs";
 import TabPanel from "../../../../components/ui/tabs/tab-panel";
 import {formatNumber} from "../../../../lib/game/format-number";
-import ItemNameColorationText from "../../../items/item-name/item-name-coloration-text";
+import ItemNameColorationText from "../../../../components/items/item-name/item-name-coloration-text";
 import ItemsAttachedSkills from "../../../../lib/game/character-sheet/types/modal/items-attached-skills";
 import InventoryItemGemDetails from "../../../character-sheet/components/inventory-item-gem-details";
 import ItemComparisonSectionProps from "./types/item-comparison-section-props";
-import {ItemForColorizationDefinition} from "../../../items/item-name/types/item-name-coloration-text-props";
+import {ItemForColorizationDefinition} from "../../../../components/items/item-name/types/item-name-coloration-text-props";
 
 export default class ItemComparisonSection extends React.Component<ItemComparisonSectionProps, {}> {
 

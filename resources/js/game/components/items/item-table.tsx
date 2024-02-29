@@ -1,12 +1,12 @@
 import React, {ChangeEvent} from "react";
-import PrimaryOutlineButton from "../../components/ui/buttons/primary-outline-button";
-import BasicCard from "../../components/ui/cards/basic-card";
+import PrimaryOutlineButton from "../ui/buttons/primary-outline-button";
+import BasicCard from "../ui/cards/basic-card";
 import Item from "./item";
-import InfoAlert from "../../components/ui/alerts/simple-alerts/info-alert";
+import InfoAlert from "../ui/alerts/simple-alerts/info-alert";
 import Select from "react-select";
 import {ITEM_TYPES, itemTypeFilter} from "../../../individual-components/player-components/shop/shop-table/components/build-type-filter-options";
-import DangerOutlineButton from "../../components/ui/buttons/danger-outline-button";
-import Table from "../../components/ui/data-tables/table";
+import DangerOutlineButton from "../ui/buttons/danger-outline-button";
+import Table from "../ui/data-tables/table";
 import ItemDefinition from "./deffinitions/item-definition";
 import {ItemType} from "./enums/item-type";
 import {startCase} from "lodash";
@@ -147,7 +147,7 @@ export default class ItemTable extends React.Component<ItemTableProps, any> {
                                     <div>
                                         <Select
                                             onChange={this.setSelectedFilterType.bind(this)}
-                                            options={itemTypeFilter()}
+                                            options={this.props.custom_filter ?? itemTypeFilter()}
                                             menuPosition={'absolute'}
                                             menuPlacement={'bottom'}
                                             styles={{menuPortal: (base) => ({...base, zIndex: 9999, color: '#000000'})}}

@@ -1,4 +1,5 @@
 import ItemDefinition from "../deffinitions/item-definition";
+import {ItemType} from "../enums/item-type";
 
 export default interface ItemTableProps {
     items: ItemDefinition[]|[]
@@ -6,4 +7,5 @@ export default interface ItemTableProps {
     close_view_item_label: string;
     table_columns: any[];
     close_view_item_action: () => void;
+    custom_filter?:  {label: string, value: ItemType}[]
 }

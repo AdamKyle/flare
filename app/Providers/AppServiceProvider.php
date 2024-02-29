@@ -9,6 +9,7 @@ use App\Console\AfterDeployment\AssignNewSkillsToPlayers;
 use App\Console\AfterDeployment\ChangeDamageAmountOnAffixes;
 use App\Console\AfterDeployment\CreateCharacterAttackDataCache;
 use App\Console\AfterDeployment\CreateMonsterCache;
+use App\Console\AfterDeployment\FillInfoSectionsWithItemTableType;
 use App\Console\AfterDeployment\GivePhaseRewardsForCharacters;
 use App\Console\AfterDeployment\KickOffEventGoalForWinterEvent;
 use App\Console\AfterDeployment\RebalanceQuestCurrencyCostsAndRewards;
@@ -60,6 +61,7 @@ class AppServiceProvider extends ServiceProvider {
             AssignNewFactionsToCharacters::class,
             RemoveInvalidQuestItems::class,
             ReduceUnitQueueAmount::class,
+            FillInfoSectionsWithItemTableType::class,
 
             // Development Commands:
             CreateCharacter::class,

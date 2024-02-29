@@ -51,7 +51,8 @@ export default class InfoManagement extends React.Component<any, any> {
         const form = new FormData();
 
         form.append('content', section.content);
-        form.append('live_wire_component', section.live_wire_component)
+        form.append('live_wire_component', section.live_wire_component);
+        form.append('item_table_type', section.item_table_type);
         form.append('page_name', this.state.page_name);
         form.append('order', section.order);
 

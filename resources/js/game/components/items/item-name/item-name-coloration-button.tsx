@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import React from "react";
 import ItemNameColorationProps from "./types/item-name-coloration-props";
-import {GemBagTable} from "../../character-sheet/components/tabs/inventory-tabs/gem-bag-table";
+import {GemBagTable} from "../../../sections/character-sheet/components/tabs/inventory-tabs/gem-bag-table";
 
 export default class ItemNameColorationButton extends React.Component<ItemNameColorationProps, { }> {
 

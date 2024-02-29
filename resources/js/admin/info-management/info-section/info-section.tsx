@@ -1,4 +1,4 @@
-import React, { Fragment } from "react";
+import React from "react";
 import ReactQuill from 'react-quill';
 import BasicCard from "../../../game/components/ui/cards/basic-card";
 import Select from "react-select";
@@ -15,6 +15,7 @@ export default class InfoSection extends React.Component<any, any> {
         this.state = {
             content: "",
             selected_live_wire_component: null,
+            selected_item_table_type: null,
             image_to_upload: null,
             order: "",
             loading: true,
@@ -29,6 +30,8 @@ export default class InfoSection extends React.Component<any, any> {
                 content: self.props.content.content,
                 selected_live_wire_component:
                     self.props.content.live_wire_component,
+                selected_item_table_type:
+                    self.props.content.item_table_type,
                 image_to_upload: null,
                 order: self.props.content.order,
                 loading: false,
@@ -38,8 +41,6 @@ export default class InfoSection extends React.Component<any, any> {
 
     componentDidUpdate(
         prevProps: Readonly<any>,
-        prevState: Readonly<any>,
-        snapshot?: any
     ) {
         if (!isEqual(this.props.content.content, prevProps.content.content)) {
             this.setState({
@@ -71,6 +72,18 @@ export default class InfoSection extends React.Component<any, any> {
         );
     }
 
+    setItemTableType(data: any) {
+        this.setState(
+            {
+                selected_item_table_type:
+                    data.value !== "" ? data.value : null,
+            },
+            () => {
+                this.updateParentElement();
+            }
+        );
+    }
+
     setOrder(e: React.ChangeEvent<HTMLInputElement>) {
         this.setState(
             {
@@ -85,6 +98,7 @@ export default class InfoSection extends React.Component<any, any> {
     updateParentElement() {
         this.props.update_parent_element(this.props.index, {
             live_wire_component: this.state.selected_live_wire_component,
+            item_table_type: this.state.selected_item_table_type,
             content: this.state.content,
             content_image_path: this.state.image_to_upload,
             order: this.state.order,
@@ -97,6 +111,10 @@ export default class InfoSection extends React.Component<any, any> {
 
     buildOptions() {
         return [
+            {
+                label: 'Please select',
+                value: '',
+            },
             {
                 label: "Items",
                 value: "admin.items.items-table",
@@ -216,6 +234,35 @@ export default class InfoSection extends React.Component<any, any> {
         ];
     }
 
+    buildItemTableTypes() {
+        return [
+            {
+                label: 'Please select',
+                value: '',
+            },
+            {
+                label: 'Crafting',
+                value: 'crafting',
+            },
+            {
+                label: 'Hell Forged',
+                value: 'hell-forged',
+            },
+            {
+                label: 'Purgatory Chains',
+                value: 'purgatory-chains',
+            },
+            {
+                label: 'Pirate Lord Leather',
+                value: 'pirate-lord-leather',
+            },
+            {
+                label: 'Corrupted Ice',
+                value: 'corrupted-ice',
+            },
+        ]
+    }
+
     setFileForUpload(event: React.ChangeEvent<HTMLInputElement>) {
         if (event.target.files !== null) {
             this.setState(
@@ -234,6 +281,22 @@ export default class InfoSection extends React.Component<any, any> {
             return this.buildOptions().filter(
                 (option: any) =>
                     option.value === this.state.selected_live_wire_component
+            );
+        }
+
+        return [
+            {
+                label: "Please Select",
+                value: "",
+            },
+        ];
+    }
+
+    defaultSelectedItemType() {
+        if (this.state.selected_item_table_type !== null) {
+            return this.buildItemTableTypes().filter(
+                (option: any) =>
+                    option.value === this.state.selected_item_table_type
             );
         }
 
@@ -303,6 +366,24 @@ export default class InfoSection extends React.Component<any, any> {
                     menuPortalTarget={document.body}
                     value={this.defaultSelectedAction()}
                 />
+
+                <div className='my-4'>
+                    <Select
+                        onChange={this.setItemTableType.bind(this)}
+                        options={this.buildItemTableTypes()}
+                        menuPosition={"absolute"}
+                        menuPlacement={"bottom"}
+                        styles={{
+                            menuPortal: (base: any) => ({
+                                ...base,
+                                zIndex: 9999,
+                                color: "#000000",
+                            }),
+                        }}
+                        menuPortalTarget={document.body}
+                        value={this.defaultSelectedItemType()}
+                    />
+                </div>
 
                 <div className="flex mt-4 justify-end">
                     {this.props.sections_length !== 1 &&

@@ -2,7 +2,7 @@ import React from "react";
 import ComparisonProps from "./types/comparison-props";
 import clsx from "clsx";
 import {formatNumber} from "../../lib/game/format-number";
-import {ItemType} from "../../sections/items/enums/item-type";
+import {ItemType} from "../items/enums/item-type";
 
 const coreAttributes = [
     'str', 'dex', 'dur', 'int', 'chr', 'agi', 'focus'

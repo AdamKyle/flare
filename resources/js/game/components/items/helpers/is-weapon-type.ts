@@ -7,6 +7,7 @@ const WEAPON_TYPES = [
     ItemType.GUN,
     ItemType.HAMMER,
     ItemType.STAVE,
+    ItemType.SPELL_DAMAGE,
 ];
 
 export const isWeaponType = (itemType: ItemType) => {

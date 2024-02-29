@@ -26,6 +26,7 @@ class InformationManagementRequest extends FormRequest {
             'order'               => 'required|string',
             'content_image'       => 'nullable|file|mimes:png|max:2000',
             'live_wire_component' => 'nullable|string',
+            'item_table_type'     => 'nullable|string',
             'page_id'             => 'nullable|string|exists:info_pages,id',
 
         ];

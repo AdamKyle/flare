@@ -1,6 +1,6 @@
 import React, { Fragment } from "react";
 import Dialogue from "../../../../../components/ui/dialogue/dialogue";
-import ItemNameColorationText from "../../../../items/item-name/item-name-coloration-text";
+import ItemNameColorationText from "../../../../../components/items/item-name/item-name-coloration-text";
 import { MarketBoardLineChart } from "../../../../../components/ui/charts/line-chart";
 import Ajax from "../../../../../lib/ajax/ajax";
 import { AxiosError, AxiosResponse } from "axios";

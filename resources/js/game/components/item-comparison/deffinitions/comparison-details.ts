@@ -1,4 +1,4 @@
-import {ItemType} from "../../../sections/items/enums/item-type";
+import {ItemType} from "../../items/enums/item-type";
 
 export interface attachedSkills {
     skill_name: string,

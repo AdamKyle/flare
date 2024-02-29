@@ -1,5 +1,5 @@
 import React from "react";
-import ItemNameColorationButton from "../../../../../sections/items/item-name/item-name-coloration-button";
+import ItemNameColorationButton from "../../../../../components/items/item-name/item-name-coloration-button";
 import { formatNumber } from "../../../format-number";
 import ActionsInterface from "./actions-interface";
 import InventoryDetails from "../../types/inventory/inventory-details";

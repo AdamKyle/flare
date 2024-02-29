@@ -3,9 +3,15 @@ import {isWeaponType} from "./helpers/is-weapon-type";
 import {formatNumber} from "../../lib/game/format-number";
 import {isArmourType} from "./helpers/is-armour-type";
 import {startCase} from "lodash";
+import ItemDefinition from "./deffinitions/item-definition";
+import {ItemType} from "./enums/item-type";
 
-export default class Item extends React.Component<any, any> {
-    constructor(props: any) {
+interface ItemProps {
+    item: ItemDefinition;
+}
+
+export default class Item extends React.Component<ItemProps, any> {
+    constructor(props: ItemProps) {
         super(props);
     }
 
@@ -20,7 +26,9 @@ export default class Item extends React.Component<any, any> {
             return (
                 <>
                     <dt>Base Damage</dt>
-                    <dd className='text-green-700 dark:text-green-500'>+{formatNumber(this.props.item.base_damage)}</dd>
+                    <dd className='text-green-700 dark:text-green-500'>+{formatNumber(this.props.item.raw_damage)}</dd>
+                    <dt>Base Damage Mod</dt>
+                    <dd className='text-green-700 dark:text-green-500'>+{(this.props.item.base_damage_mod * 100).toFixed(2)}%</dd>
                 </>
             )
         }
@@ -29,7 +37,22 @@ export default class Item extends React.Component<any, any> {
             return (
                 <>
                     <dt>Base AC</dt>
-                    <dd className='text-green-700 dark:text-green-500'>+{formatNumber(this.props.item.base_ac)}</dd>
+                    <dd className='text-green-700 dark:text-green-500'>+{formatNumber(this.props.item.raw_ac)}</dd>
+                    <dt>Base AC Mod</dt>
+                    <dd className='text-green-700 dark:text-green-500'>+{(this.props.item.base_ac_mod * 100).toFixed(2)}%</dd>
+                </>
+            )
+        }
+
+        if (this.props.item.type === ItemType.SPELL_HEALING) {
+            return (
+                <>
+                    <dt>Base Healing</dt>
+                    <dd className='text-green-700 dark:text-green-500'>+{formatNumber(this.props.item.raw_healing)}</dd>
+                    <dt>Base Healing Mod</dt>
+                    <dd className='text-green-700 dark:text-green-500'>+{(this.props.item.base_healing_mod * 100).toFixed(2)}%</dd>
+                    <dt>Resurrection Chance</dt>
+                    <dd className='text-green-700 dark:text-green-500'>+{(this.props.item.resurrection_chance * 100).toFixed(2)}%</dd>
                 </>
             )
         }
@@ -68,15 +91,21 @@ export default class Item extends React.Component<any, any> {
                         <dl>
                             {this.renderItemTypeData()}
                         </dl>
-                        <div className='border-b-2 border-b-gray-200 dark:border-b-gray-600 my-4'></div>
-                        <dl>
-                            <dt>Crafting Type:</dt>
-                            <dd>{startCase(this.props.item.crafting_type)}</dd>
-                            <dt>Skill Level Required</dt>
-                            <dd>{this.props.item.skill_level_req}</dd>
-                            <dt>Skill Level Trivial</dt>
-                            <dd>{this.props.item.skill_level_trivial}</dd>
-                        </dl>
+                        {
+                            this.props.item.crafting_type !== null ?
+                                <>
+                                    <div className='border-b-2 border-b-gray-200 dark:border-b-gray-600 my-4'></div>
+                                    <dl>
+                                        <dt>Crafting Type:</dt>
+                                        <dd>{startCase(this.props.item.crafting_type)}</dd>
+                                        <dt>Skill Level Required</dt>
+                                        <dd>{this.props.item.skill_level_req}</dd>
+                                        <dt>Skill Level Trivial</dt>
+                                        <dd>{this.props.item.skill_level_trivial}</dd>
+                                    </dl>
+                                </>
+                            : null
+                        }
                     </div>
                 </div>
                 <div className='border-b-2 border-b-gray-200 dark:border-b-gray-600 my-3'></div>

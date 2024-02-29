@@ -1,4 +1,4 @@
-import {ItemType} from "../../../../../game/sections/items/enums/item-type";
+import {ItemType} from "../../../../../game/components/items/enums/item-type";
 import {startCase} from "lodash";
 
 export const ITEM_TYPES = [
@@ -22,7 +22,7 @@ export const ITEM_TYPES = [
   ItemType.RING
 ];
 
-export const itemTypeFilter = () => {
+export const itemTypeFilter = ():  {label: string, value: ItemType}[] => {
     return ITEM_TYPES.map((type: ItemType) => {
         return {
             label: startCase(type),

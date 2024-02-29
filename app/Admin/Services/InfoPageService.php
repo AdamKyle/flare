@@ -117,6 +117,7 @@ class InfoPageService {
 
             $sectionToUpdate['content']             = $content;
             $sectionToUpdate['live_wire_component'] = $params['live_wire_component'];
+            $sectionToUpdate['item_table_type']     = $params['item_table_type'];
             $sectionToUpdate['order']               = (int) $params['order'];
 
             $sections[$sectionIndex] = $sectionToUpdate;
@@ -184,6 +185,7 @@ class InfoPageService {
             'content'             => $content,
             'content_image_path'  => $path,
             'live_wire_component' => $params['live_wire_component'] !== 'null' ? $params['live_wire_component'] : null,
+            'item_table_type'     => $params['item_table_type'] !== 'null' ? $params['item_table_type'] : null,
         ];
 
         return $sections;

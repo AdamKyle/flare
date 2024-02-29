@@ -1,4 +1,5 @@
 import ItemAtonement from "./item-atonement";
+import {ItemType} from "../enums/item-type";
 
 export default interface ItemDefinition {
     affects_skills: any[]; // or specify the type if known
@@ -9,6 +10,9 @@ export default interface ItemDefinition {
     ambush_resistance: number;
     ambush_resistance_chance: number;
     applied_stacks: any[]; // or specify the type if known
+    raw_damage: number;
+    raw_ac: number;
+    raw_healing: number;
     base_ac: number;
     base_ac_mod: any; // specify the type if known
     base_ac_mod_bonus: number;
@@ -68,7 +72,7 @@ export default interface ItemDefinition {
     spell_evasion: number;
     stat_increase: boolean;
     str_modifier: number;
-    type: string;
+    type: ItemType;
     usable: boolean;
     xp_bonus: any; // specify the type if known
 }
