@@ -11,7 +11,7 @@ export default class AnnouncementMessages extends React.Component<AnnouncementMe
 
     buildMessages() {
         return this.props.announcements.map((message: AnnouncementType) => {
-            return <li className='my-2 break-all lg:break-normal text-orange-500' key={message.id}>
+            return <li className='my-2 break-word lg:break-normal text-orange-500' key={message.id}>
                 {message.message}
             </li>
         });

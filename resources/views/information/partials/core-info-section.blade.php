@@ -17,27 +17,27 @@
         @endauth
     </x-core.page-title>
 
-    <div class="prose dark:prose-invert min-w-full m-auto pb-10">
+    <div class="min-w-full m-auto pb-10">
 
         @foreach($sections as $section)
 
             @if (is_null($section['content_image_path']))
-                <div class="mt-[30px]" id="{{$section['order']}}">
+                <div class="mt-[30px] max-w-[100%] prose dark:prose-invert" id="{{$section['order']}}">
                     <x-core.cards.card>
                         {!! $section['content'] !!}
                     </x-core.cards.card>
                 </div>
             @else
                 <div class="grid md:grid-cols-2 md:gap-4 m-auto" id="{{$section['order']}}">
-                    <div class="md:mt-[30px]">
+                    <div class="md:mt-[30px] max-w-[100%] prose dark:prose-invert">
                         <x-core.cards.card>
                             {!! $section['content'] !!}
                         </x-core.cards.card>
                     </div>
 
                     <div>
-                        <img src="{{Storage::disk('info-sections-images')->url($section['content_image_path'])}}" class="rounded-sm p-1 bg-white border max-w-[475px] cursor-pointer glightbox md:mt-[30px]" alt="image"/>
-                        <div class="relative top-[-30px] text-gray-700 dark:text-white italic">
+                        <img src="{{Storage::disk('info-sections-images')->url($section['content_image_path'])}}" class="rounded-sm p-1 bg-white border max-w-full md:max-w-[475px] cursor-pointer glightbox md:mt-[30px]" alt="image"/>
+                        <div class="relative top-[10px] md:top-[-30px] text-gray-700 dark:text-white italic">
                             Click/Tap me to make me larger.
                         </div>
                     </div>

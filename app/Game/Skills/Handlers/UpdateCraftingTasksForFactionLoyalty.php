@@ -206,7 +206,7 @@ class UpdateCraftingTasksForFactionLoyalty {
             ->whereNull('item_prefix_id')
             ->whereNull('item_suffix_id')
             ->whereDoesntHave('appliedHolyStacks')
-            ->whereNotIn('type', ['alchemy', 'artifact', 'trinket'])
+            ->whereNotIn('type', ['alchemy', 'artifact', 'trinket', 'quest'])
             ->inRandomOrder()
             ->first();
 

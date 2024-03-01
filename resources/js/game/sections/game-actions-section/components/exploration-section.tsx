@@ -167,7 +167,7 @@ export default class ExplorationSection extends React.Component<any, any> {
         }
 
         return {
-            label: 'Please select when to move down the list (optional)',
+            label: 'Move down the list (optional)',
             value: '',
         }
     }

@@ -354,7 +354,7 @@
             </a>
             <a href="{{ route('info.page', ['pageName' => 'corrupted-ice']) }}">
                 <span class="ra ra-kaleidoscope"></span>
-                Corrupted ice
+                Corrupted Ice
             </a>
             <a href="{{ route('info.page', ['pageName' => 'ancestral-items']) }}">
                 <span class="ra ra-crowned-heart"></span>

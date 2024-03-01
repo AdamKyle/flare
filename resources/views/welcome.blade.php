@@ -10,7 +10,7 @@
         <div class="text-center mb-10 lg:mt-10">
             <h1 class="mb-5 font-thin text-7xl dark:text-gray-300 text-gray-800 text-4xl md:text-9xl">Planes of Tlessa</h1>
             <p class="mb-10 dark:text-gray-300 text-gray-800 italic">A world full of mystery and exploration.</p>
-            <div class="grid md:grid-cols-3 gap-2 w-1/3 mr-auto ml-auto">
+            <div class="grid md:grid-cols-3 gap-2 md:w-1/3 w-full mr-auto ml-auto">
                 <x-core.buttons.link-buttons.primary-button css="mr-2" href="{{ route('register') }}">
                     Join Today!
                 </x-core.buttons.link-buttons.primary-button>
@@ -18,9 +18,9 @@
                     href="{{ route('info.page', ['pageName' => 'home']) }}">
                     Learn More
                 </x-core.buttons.link-buttons.success-button>
-                <x-core.buttons.link-buttons.success-button css="mr-2" href="{{ route('releases.list') }}">
-                    Releases
-                </x-core.buttons.link-buttons.success-button>
+                <x-core.buttons.link-buttons.orange-button css="mr-2" href="{{ route('releases.list') }}">
+                    Release Notes
+                </x-core.buttons.link-buttons.orange-button>
             </div>
         </div>
         <div class="grid gap-2 mb-5 w-2/3 md:hidden mr-auto ml-auto">
@@ -342,7 +342,7 @@
             <dl class="mt-3">
                 <dt>Are there Ads?</dt>
                 <dd>
-                    No. There are no adds whatsoever.
+                    No. There are no ads whatsoever.
                 </dd>
                 <dt>Is it persistent?</dt>
                 <dd>

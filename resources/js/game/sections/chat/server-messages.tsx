@@ -28,12 +28,12 @@ export default class ServerMessages extends React.Component<ServerMessagesCompon
     buildMessages() {
         return this.props.server_messages.map((message: any) => {
             if (message.event_id !== 0 && message.event_id !== null) {
-                return <li className='text-pink-400 my-2 break-all lg:break-normal' key={message.id}>
+                return <li className='text-pink-400 my-2 break-word lg:break-normal' key={message.id}>
                     <button type='button' className='italic underline hover:text-pink-300' onClick={() => this.viewItem(message.event_id, message.is_quest_item)}>{message.message} <i className='ra ra-anvil'></i></button>
                 </li>
             }
 
-            return <li className='text-pink-400 my-2 break-all lg:break-normal' key={message.id}>{message.message}</li>
+            return <li className='text-pink-400 my-2 break-word lg:break-normal' key={message.id}>{message.message}</li>
         });
     }
 

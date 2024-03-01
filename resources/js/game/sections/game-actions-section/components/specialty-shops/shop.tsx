@@ -8,6 +8,7 @@ import PrimaryButton from "../../../../components/ui/buttons/primary-button";
 import DangerButton from "../../../../components/ui/buttons/danger-button";
 import {snakeCase} from "lodash";
 import { formatNumber } from "../../../../lib/game/format-number";
+import SuccessAlert from "../../../../components/ui/alerts/simple-alerts/success-alert";
 
 export default class Shop extends React.Component<any, any> {
 
@@ -19,6 +20,7 @@ export default class Shop extends React.Component<any, any> {
             loading: false,
             item_selected: null,
             error_message: '',
+            success_message: '',
             items: [],
             gold_dust_cost: 0,
             gold_cost: 0,
@@ -116,6 +118,7 @@ export default class Shop extends React.Component<any, any> {
         this.setState({
             loading: true,
             error_message: '',
+            success_message: '',
         }, () => {
             (new Ajax).setRoute('specialty-shop/purchase/' + this.props.character_id)
                 .setParameters({
@@ -124,6 +127,7 @@ export default class Shop extends React.Component<any, any> {
                 }).doAjaxCall('post', (result: AxiosResponse) => {
                 this.setState({
                     loading: false,
+                    success_message: 'Item has been purchased! Check server messages to see a link for the new item! For mobile players you can tap on Chat Tabs and select Server Messages.'
                 })
             }, (error: AxiosError) => {
                 this.setState({loading: false});
@@ -204,6 +208,12 @@ export default class Shop extends React.Component<any, any> {
                                     {
                                         this.state.error_message !== '' ?
                                             <DangerAlert additional_css={'my-3'}>{this.state.error_message}</DangerAlert>
+                                            : null
+                                    }
+
+                                    {
+                                        this.state.success_message !== '' ?
+                                            <SuccessAlert additional_css={'my-3'}>{this.state.success_message}</SuccessAlert>
                                             : null
                                     }
 

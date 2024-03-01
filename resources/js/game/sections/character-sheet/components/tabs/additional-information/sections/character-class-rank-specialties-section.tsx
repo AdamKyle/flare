@@ -194,7 +194,11 @@ export default class CharacterClassRankSpecialtiesSection extends React.Componen
             'Arcane Alchemist',
             'Prisoner',
             'Alcoholic',
-            'Merchant'
+            'Merchant',
+            'Gunslinger',
+            'Dancer',
+            'Cleric',
+            'Book Binder',
         ];
 
         if (addEquippable) {

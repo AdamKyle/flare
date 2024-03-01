@@ -165,7 +165,7 @@ export default class Chat extends React.Component<ChatComponentProps, ChatCompon
             switch (message.type) {
                 case 'chat':
                     if (message.character_name === 'The Creator') {
-                        return <li className='mb-2 break-all md:break-normal text-yellow-300 text-xl bold'>
+                        return <li className='mb-2 break-word md:break-normal text-yellow-300 text-xl bold'>
                             The Creator: {message.message}
                         </li>
                     }
@@ -173,7 +173,7 @@ export default class Chat extends React.Component<ChatComponentProps, ChatCompon
                     if (message.chat_text_color !== null) {
                         const color = message.chat_text_color;
 
-                        return <li className={clsx('mb-2 break-all md:break-normal ' + color, {
+                        return <li className={clsx('mb-2 break-word md:break-normal ' + color, {
                             'font-extrabold': message.chat_is_bold,
                             'italic': message.chat_is_italic,
                         })}>
@@ -186,7 +186,7 @@ export default class Chat extends React.Component<ChatComponentProps, ChatCompon
                         </li>
                     }
 
-                    return <li style={{color: message.color}} className='mb-2 break-all md:break-normal'>
+                    return <li style={{color: message.color}} className='mb-2 break-word md:break-normal'>
                         {self.renderLocation(message)} <button type='button'
                                 className='underline'
                                 onClick={() =>
@@ -195,23 +195,23 @@ export default class Chat extends React.Component<ChatComponentProps, ChatCompon
                         </button>: {message.message}
                     </li>
                 case 'private-message-sent':
-                    return <li className='text-fuchsia-400 italic mb-2 break-all md:break-normal'>{message.message}</li>
+                    return <li className='text-fuchsia-400 italic mb-2 break-word md:break-normal'>{message.message}</li>
                 case 'private-message-received':
                     if (message.from === 'The Creator') {
-                        return <li className='text-fuchsia-300 text-xl italic mb-2 break-all md:break-normal'>{message.from}: {message.message}</li>
+                        return <li className='text-fuchsia-300 text-xl italic mb-2 break-word md:break-normal'>{message.from}: {message.message}</li>
                     }
 
-                    return <li className='text-fuchsia-300 italic mb-2 break-all md:break-normal'><button type='button' className='underline' onClick={() => self.privateMessage(message.from)}>{message.from}</button>: {message.message}</li>
+                    return <li className='text-fuchsia-300 italic mb-2 break-words md:break-normal'><button type='button' className='underline' onClick={() => self.privateMessage(message.from)}>{message.from}</button>: {message.message}</li>
                 case 'error-message':
-                    return <li className='text-red-400 bold mb-2 break-all md:break-normal'>{message.message}</li>
+                    return <li className='text-red-400 bold mb-2 break-word md:break-normal'>{message.message}</li>
                 case 'creator-message':
-                    return <li className='text-yellow-300 text-xl bold mb-2 break-all md:break-normal'>{message.character_name}: {message.message}</li>
+                    return <li className='text-yellow-300 text-xl bold mb-2 break-word md:break-normal'>{message.character_name}: {message.message}</li>
                 case 'global-message':
-                    return <li className='text-yellow-400 bold italic mb-2 break-all md:break-normal'>{message.message}</li>
+                    return <li className='text-yellow-400 bold italic mb-2 break-word md:break-normal'>{message.message}</li>
                 case 'raid-global-message':
-                    return <li className='text-regent-st-blue-300 bold italic mb-2 break-all md:break-normal'>{message.message}</li>
+                    return <li className='text-regent-st-blue-300 bold italic mb-2 break-word md:break-normal'>{message.message}</li>
                 case 'npc-message':
-                    return <li className='text-sky-400 mb-2 break-all md:break-normal'>{message.message}</li>
+                    return <li className='text-sky-400 mb-2 break-word md:break-normal'>{message.message}</li>
                 default:
                     return null;
 

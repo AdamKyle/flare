@@ -32,12 +32,14 @@ class MassImportCustomData extends Command {
     public function handle() {
 
         Artisan::call('reduce:unit-queue-amount');
+        Artisan::call('remove:invalid-quest-items');
 
         Artisan::call('import:game-data "Core Imports"');
         Artisan::call('import:game-data Skills');
         Artisan::call('import:game-data Items');
         Artisan::call('import:game-data "Kingdom Passive Skills"');
         Artisan::call('import:game-data "Admin Section"');
+        Artisan::call('import:game-data "Quests"');
         Artisan::call('import:game-data "."');
 
         // Artisan::call('assign:class-ranks');

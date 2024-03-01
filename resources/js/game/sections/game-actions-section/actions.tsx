@@ -343,7 +343,7 @@ export default class Actions extends React.Component<
                         !this.state.show_join_pvp &&
                         !this.state.show_celestial_fight &&
                         this.props.character !== null ? (
-                            <div className="max-w-[100px]">
+                            <div className='w-1/2'>
                                 <DropDown
                                     menu_items={this.actionsManager.buildCraftingList(
                                         this.openCrafting.bind(this)

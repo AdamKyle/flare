@@ -546,7 +546,7 @@ export default class SmallerActions extends React.Component<
                     </Fragment>
                 )}
 
-                <div className="pb-5">
+                <div className="pb-5 relative bottom-[40px]">
                     <ActionsTimers
                         attack_time_out={this.state.attack_time_out}
                         crafting_time_out={this.state.crafting_time_out}
@@ -557,11 +557,15 @@ export default class SmallerActions extends React.Component<
                     />
                 </div>
                 <div className="mt-4">
-                    <MapTimer
-                        time_left={this.state.movement_time_left}
-                        automation_time_out={this.state.automation_time_out}
-                        celestial_time_out={this.state.celestial_time_out}
-                    />
+                    <div className="relative">
+                        <div className="absolute bottom-0 inset-x-0">
+                            <MapTimer
+                                time_left={this.state.movement_time_left}
+                                automation_time_out={this.state.automation_time_out}
+                                celestial_time_out={this.state.celestial_time_out}
+                            />
+                        </div>
+                    </div>
                 </div>
             </Fragment>
         );
