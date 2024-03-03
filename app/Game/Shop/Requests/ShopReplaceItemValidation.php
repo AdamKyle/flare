@@ -26,7 +26,7 @@ class ShopReplaceItemValidation extends FormRequest
         return [
             'position'           => 'required|in:left-hand,right-hand,body,shield,leggings,feet,sleeves,sleeves,helmet,gloves,ring-one,ring-two,spell-one,spell-two,artifact-one,artifact-two',
             'slot_id'            => 'required',
-            'equip_type'         => 'required|in:weapon,stave,bow,hammer,body,shield,leggings,feet,sleeves,helmet,gloves,ring,spell-healing,spell-damage,artifact',
+            'equip_type'         => 'required|in:weapon,stave,bow,hammer,mace,fan,gun,scratch-awl,body,shield,leggings,feet,sleeves,helmet,gloves,ring,spell-healing,spell-damage,artifact',
             'item_id_to_buy'     => 'required|integer|exists:items,id',
         ];
     }

@@ -112,25 +112,10 @@ class ComparisonService {
     }
 
     public function buildShopData(Character $character, Item $item, string $type = null) {
-        $defaultWeaponTypes = [
-            'bow',
-            'gun',
-            'fan',
-            'mace',
-            'scratch-awl',
-        ];
-
-        if (in_array($type, $defaultWeaponTypes)) {
-            $type = 'weapon';
-        }
-
-        if ($type === 'spell-damage' || $type === 'spell-healing') {
-            $type = 'spell';
-        }
 
         $service = $this->characterInventoryService->setCharacter($character)
             ->setPositions($this->validEquipPositionsValue->getPositions($item))
-            ->setInventory($type);
+            ->setInventory();
 
         $setEquipped = $character->inventorySets()->where('is_equipped', true)->first();
 

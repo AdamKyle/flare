@@ -2,7 +2,7 @@
 
 @section('content')
 
-    <div class="container flex items-center justify-center mt-20 py-10">
+    <div class="container flex items-center justify-center">
         <div class="w-full md:w-1/2 xl:w-1/3">
             <div class="mx-5 md:mx-10">
                 <h2 class="uppercase">Begin your journey</h2>
@@ -105,7 +105,7 @@
                     @enderror
                 </div>
                 <div class="mt-5">
-                    <label class="custom-checkbox" for="enable_guide">
+                    <label for="enable_guide">
                         <input type="checkbox" name="guide_enabled" id="enable_guide">
                         <span></span>
                         <span>Enable Guide? <a href="#no-link" data-toggle="modal" data-target="#guide-explanation">(Help)</a></span>

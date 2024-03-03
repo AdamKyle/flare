@@ -248,7 +248,7 @@ export default class Crafting extends React.Component<any, any> {
     }
 
     canClose(): boolean {
-        return this.state.loading || this.props.cannot_craft;
+        return this.state.loading;
     }
 
     canChangeType(): boolean {

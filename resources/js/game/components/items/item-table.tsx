@@ -135,7 +135,7 @@ export default class ItemTable extends React.Component<ItemTableProps, any> {
                             <InfoAlert additional_css={'my-3'}>
                                 <p>Click the name of the item to get more info about it's stats.</p>
                             </InfoAlert>
-                            <div className="md:w-3/5 sm:w-full my-4">
+                            <div className="md:w-3/5 w-full my-4">
                                 <div className="grid md:grid-cols-3 gap-4 my-4">
                                     <div className="flex items-center">
                                         <div className="mr-2">Search:</div>

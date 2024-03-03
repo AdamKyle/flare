@@ -57,6 +57,7 @@ class ShopService {
             ->whereNull('item_suffix_id')
             ->whereNull('item_prefix_id')
             ->whereNull('specialty_type')
+            ->inRandomOrder()
             ->get();
 
         $items = new Collection($items, $this->itemTransformer);

@@ -131,11 +131,15 @@ class ShopController extends Controller {
         }
 
         if ($cost > $character->gold) {
-            return redirect()->back()->with('error', 'You do not have enough gold.');
+            return response()->json([
+                'message' => 'You do not have enough gold.',
+            ], 422);
         }
 
         if ($character->isInventoryFull()) {
-            return redirect()->back()->with('error', 'Inventory is full. Please make room.');
+            return response()->json([
+                'message' => 'Inventory is full. Please make room.'
+            ], 422);
         }
 
         $this->shopService->buyAndReplace($item, $character, $request->all());

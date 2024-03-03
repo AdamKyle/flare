@@ -39,6 +39,6 @@
 @endsection
 
 @push('scripts')
-    @vite('resources/js/shop-component.ts');
+    @vite('resources/js/shop-component.ts')
 @endpush
 

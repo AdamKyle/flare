@@ -3,6 +3,7 @@ import ComparisonProps from "./types/comparison-props";
 import clsx from "clsx";
 import {formatNumber} from "../../lib/game/format-number";
 import {ItemType} from "../items/enums/item-type";
+import {startCase} from "lodash";
 
 const coreAttributes = [
     'str', 'dex', 'dur', 'int', 'chr', 'agi', 'focus'
@@ -16,6 +17,10 @@ export default class Comparison extends React.Component<ComparisonProps, any> {
 
     isValueBeloZero(value: number): boolean {
         return value < 0;
+    }
+
+    isValueAboveZero(value: number): boolean {
+        return value > 0;
     }
 
     mapCoreAttributes(attributeName: string) {
@@ -45,7 +50,7 @@ export default class Comparison extends React.Component<ComparisonProps, any> {
                 <>
                     <dt>{this.mapCoreAttributes(attribute)}</dt>
                     <dd className={clsx({
-                        'text-green-700 dark:text-green-500' : !this.isValueBeloZero(this.props.comparison[attribute + '_adjustment']),
+                        'text-green-700 dark:text-green-500' : this.isValueAboveZero(this.props.comparison[attribute + '_adjustment']),
                         'text-red-700 dark:text-red-500' : this.isValueBeloZero(this.props.comparison[attribute + '_adjustment']),
                         'text-gray-700 dark:text-white': this.props.comparison[attribute + '_adjustment'] === 0,
                     })}>
@@ -61,7 +66,7 @@ export default class Comparison extends React.Component<ComparisonProps, any> {
             <dl>
                 <dt>Attack</dt>
                 <dd className={clsx({
-                    'text-green-700 dark:text-green-500' : !this.isValueBeloZero(this.props.comparison.damage_adjustment),
+                    'text-green-700 dark:text-green-500' : this.isValueAboveZero(this.props.comparison.damage_adjustment),
                     'text-red-700 dark:text-red-500' : this.isValueBeloZero(this.props.comparison.damage_adjustment),
                     'text-gray-700 dark:text-white': this.props.comparison.damage_adjustment === 0,
                 })}>
@@ -76,7 +81,7 @@ export default class Comparison extends React.Component<ComparisonProps, any> {
             <dl>
                 <dt>Defence</dt>
                 <dd className={clsx({
-                    'text-green-700 dark:text-green-500' : !this.isValueBeloZero(this.props.comparison.ac_adjustment),
+                    'text-green-700 dark:text-green-500' : this.isValueAboveZero(this.props.comparison.ac_adjustment),
                     'text-red-700 dark:text-red-500' : this.isValueBeloZero(this.props.comparison.ac_adjustment),
                     'text-gray-700 dark:text-white': this.props.comparison.ac_adjustment === 0,
                 })}>
@@ -109,8 +114,18 @@ export default class Comparison extends React.Component<ComparisonProps, any> {
     render() {
         return (
             <div>
-                <div>
-                    {this.renderAttackOrDefenceAdjustment()}
+                <div className='grid md:grid-cols-2 gap-2'>
+                    <div>
+                        {this.renderAttackOrDefenceAdjustment()}
+                    </div>
+                    <div>
+                        <dl>
+                            <dt>Equipped Position</dt>
+                            <dd>
+                                {startCase(this.props.comparison.position)}
+                            </dd>
+                        </dl>
+                    </div>
                 </div>
                 <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2'></div>
                 <div>

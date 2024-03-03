@@ -18,7 +18,6 @@ import GamblingSection from "./components/gambling-section";
 import Revive from "./components/fight-section/revive";
 import RaidSection from "./components/raid-section";
 import { GameActionState } from "../../lib/game/types/game-state";
-import { DateTime } from "luxon";
 import { updateTimers } from "../../lib/ajax/update-timers";
 
 export default class SmallerActions extends React.Component<
@@ -520,7 +519,16 @@ export default class SmallerActions extends React.Component<
         return (
             <Fragment>
                 {this.state.selected_action !== null ? (
-                    this.buildSection()
+                    <>
+                        {this.buildSection()}
+                        <div className='mt-8 mb-4'>
+                            <Revive
+                                can_attack={this.props.character_status.can_attack}
+                                is_character_dead={this.props.character.is_dead}
+                                character_id={this.props.character.id}
+                            />
+                        </div>
+                    </>
                 ) : (
                     <Fragment>
                         <Select
@@ -546,19 +554,21 @@ export default class SmallerActions extends React.Component<
                     </Fragment>
                 )}
 
-                <div className="pb-5 relative bottom-[40px]">
-                    <ActionsTimers
-                        attack_time_out={this.state.attack_time_out}
-                        crafting_time_out={this.state.crafting_time_out}
-                        update_attack_timer={this.updateAttackTimer.bind(this)}
-                        update_crafting_timer={this.updateCraftingTimer.bind(
-                            this
-                        )}
-                    />
+                <div className="mt-4 mb-4">
+                    <div className='relative bottom-4'>
+                        <ActionsTimers
+                            attack_time_out={this.state.attack_time_out}
+                            crafting_time_out={this.state.crafting_time_out}
+                            update_attack_timer={this.updateAttackTimer.bind(this)}
+                            update_crafting_timer={this.updateCraftingTimer.bind(
+                                this
+                            )}
+                        />
+                    </div>
                 </div>
                 <div className="mt-4">
                     <div className="relative">
-                        <div className="absolute bottom-0 inset-x-0">
+                        <div className="">
                             <MapTimer
                                 time_left={this.state.movement_time_left}
                                 automation_time_out={this.state.automation_time_out}

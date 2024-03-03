@@ -116,27 +116,5 @@ class ShopController extends Controller {
         return redirect()->back()->with('success', 'Sold: ' . $item->affix_name . ' for: ' . $totalSoldFor . ' gold.');
     }
 
-    public function puracheMultiple(ShopBuyMultipleOfItem $request, Character $character) {
-        $item = Item::where('name', $request->item_name)
-            ->whereNotIn('type', ['alchemy', 'trinket', 'artifact', 'quest'])
-            ->whereNull('item_suffix_id')
-            ->whereNull('item_prefix_id')
-            ->whereDoesntHave('appliedHolyStacks')
-            ->first();
-
-        if (is_null($item)) {
-            return redirect()->back()->with('error', 'No matching item found ...');
-        }
-
-        return view('game.shop.multiple', [
-            'gold'        => $character->gold,
-            'cost'        => $item->cost,
-            'itemId'      => $item->id,
-            'itemName'    => $item->name,
-            'characterId' => $character->id,
-            'character'   => $character,
-        ]);
-    }
-
 
 }

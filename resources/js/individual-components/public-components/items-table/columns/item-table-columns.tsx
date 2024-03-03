@@ -36,6 +36,12 @@ export default class ItemTableColumns {
 
         if (tableType === TableType.CRAFTING) {
             itemsTableColumns.push({
+                name: 'Cost (Gold)',
+                selector: (row: ItemDefinition) => formatNumber(row.cost),
+                sortable: true,
+            });
+
+            itemsTableColumns.push({
                 name: 'Crafting Type',
                 selector: (row: ItemDefinition) => row.crafting_type,
                 sortable: true,

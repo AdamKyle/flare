@@ -7,6 +7,8 @@ import {shopServiceContainer} from "./container/shop-container";
 import ItemComparison from "../../../game/components/item-comparison/item-comparison";
 import BuyAndCompareProps from "./types/buy-and-compare-props";
 import BuyAndCompareState from "./types/buy-and-compare-state";
+import DangerAlert from "../../../game/components/ui/alerts/simple-alerts/danger-alert";
+import {ItemType} from "../../../game/components/items/enums/item-type";
 
 export default class BuyAndCompare extends React.Component<BuyAndCompareProps, BuyAndCompareState> {
 
@@ -28,13 +30,20 @@ export default class BuyAndCompare extends React.Component<BuyAndCompareProps, B
 
     componentDidMount() {
 
+        const weaponTypes = [
+            ItemType.WEAPON, ItemType.GUN, ItemType.FAN, ItemType.MACE, ItemType.SCRATCH_AWL,
+            ItemType.BOW, ItemType.HAMMER
+        ];
+
+        const type = weaponTypes.includes(this.props.item.type) ? ItemType.WEAPON : this.props.item.type;
+
         this.ajax.doShopAction(this, SHOP_ACTIONS.COMPARE, {
             item_name: this.props.item.name,
-            item_type: this.props.item.type,
+            item_type: type,
         });
     }
 
-    buyAndReplaceItem() {
+    buyAndReplaceItem(positionSelected?: string) {
 
         if (this.state.comparison_data === null) {
             return;
@@ -48,8 +57,14 @@ export default class BuyAndCompare extends React.Component<BuyAndCompareProps, B
                 return;
             }
 
+            let position = this.state.comparison_data.slotPosition ?? this.state.comparison_data.itemToEquip.type;
+
+            if (positionSelected) {
+                position = positionSelected;
+            }
+
             this.ajax.doShopAction(this, SHOP_ACTIONS.BUY_AND_REPLACE, {
-                position: this.state.comparison_data.slotPosition ?? this.state.comparison_data.itemToEquip.type,
+                position: position,
                 item_id_to_buy: this.state.comparison_data.itemToEquip.id,
                 equip_type: this.state.comparison_data.itemToEquip.type,
                 slot_id: this.state.comparison_data.slotId,
@@ -83,6 +98,13 @@ export default class BuyAndCompare extends React.Component<BuyAndCompareProps, B
                 } on_click={
                     this.state.is_showing_expanded_comparison ? this.updateIsShowingExpandedLocation.bind(this) : this.props.close_view_buy_and_compare
                 } />
+                {
+                    this.state.error_message !== null ?
+                        <DangerAlert additional_css='my-4'>
+                            {this.state.error_message}
+                        </DangerAlert>
+                    : null
+                }
                 <BasicCard additionalClasses={'my-4'}>
                     <ItemComparison comparison_info={this.state.comparison_data}
                                     is_showing_expanded_comparison={this.state.is_showing_expanded_comparison}
