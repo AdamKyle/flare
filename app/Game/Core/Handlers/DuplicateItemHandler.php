@@ -20,6 +20,7 @@ class DuplicateItemHandler {
         $newItem->update([
             'item_prefix_id' => $item->item_prefix_id,
             'item_suffix_id' => $item->item_suffix_id,
+            'holy_stacks'    => $item->holy_stacks,
         ]);
 
         $newItem = $newItem->refresh();

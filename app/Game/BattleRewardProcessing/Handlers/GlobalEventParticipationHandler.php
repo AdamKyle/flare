@@ -154,6 +154,7 @@ class GlobalEventParticipationHandler {
             $newItem->update([
                 'item_prefix_id' => $randomAffixGenerator->generateAffix('prefix')->id,
                 'item_suffix_id' => $randomAffixGenerator->generateAffix('suffix')->id,
+                'holy_stacks' => 20,
             ]);
 
             $newItem = $newItem->refresh();

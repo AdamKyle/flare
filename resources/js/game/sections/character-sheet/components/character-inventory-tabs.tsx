@@ -15,6 +15,7 @@ import CharacterInventoryTabsProps from "../../../lib/game/character-sheet/types
 import ItemSkillManagement from "./item-skill-management/item-skill-management";
 import ItemSkill from "./item-skill-management/types/deffinitions/item-skill";
 import ItemSkillProgression from "./item-skill-management/types/deffinitions/item-skill-progression";
+import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
 
 export default class CharacterInventoryTabs extends React.Component<
     CharacterInventoryTabsProps,
@@ -186,7 +187,7 @@ export default class CharacterInventoryTabs extends React.Component<
         if (this.state.loading || this.state.inventory === null) {
             return (
                 <div className="my-4">
-                    <ComponentLoading />
+                    <LoadingProgressBar />
                 </div>
             );
         }

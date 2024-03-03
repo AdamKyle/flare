@@ -355,7 +355,7 @@ export default class ItemComparisonSection extends React.Component<ItemCompariso
 
     render() {
         return (
-            <Fragment>
+            <div className='max-h-[500px] overflow-y-auto'>
                 {
                     this.props.comparison_details.details.length > 0 ?
                         this.props.comparison_details.details.length === 2 ?
@@ -365,7 +365,7 @@ export default class ItemComparisonSection extends React.Component<ItemCompariso
                     :
                         this.renderSingleItem()
                 }
-            </Fragment>
+            </div>
         )
     }
 }

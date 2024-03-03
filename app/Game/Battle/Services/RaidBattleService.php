@@ -299,9 +299,10 @@ class RaidBattleService {
      * This could mean the character is deasd, the monster is dead.
      *
      * @param Character $character
-     * @param RaidBoss $raidBoss
      * @param array $health
      * @param array $messages
+     * @param int $monsterId
+     * @param bool $isRaidBoss
      * @return array
      */
     protected function handlePreAttack(Character $character, array $health, array $messages, int $monsterId, bool $isRaidBoss = false): array {
@@ -355,7 +356,8 @@ class RaidBattleService {
      * @param integer $newHealth
      * @return void
      */
-    protected function updateRaidBossHealth(RaidBoss $raidBoss, int $newHealth) {
+    protected function updateRaidBossHealth(RaidBoss $raidBoss, int $newHealth): void
+    {
         $raidBoss->update([
             // always get the latest and greates new health when updating.
             'boss_current_hp' => $raidBoss->refresh()->boss_current_hp < $newHealth ? $raidBoss->refresh()->boss_current_hp : $newHealth,
@@ -369,8 +371,10 @@ class RaidBattleService {
     /**
      * Handle the raid boss health, assuming we are a raid monster.
      *
+     * @param Character $character
      * @param integer $monsterId
      * @param boolean $shouldUpdateHealth
+     * @param array $health
      * @return void
      */
     protected function handleRaidBossHealth(Character $character, int $monsterId, bool $shouldUpdateHealth, array $health = []): void {
@@ -449,6 +453,7 @@ class RaidBattleService {
      * @param Character $character
      * @param integer $monsterId
      * @return ServerMonster
+     * @throws Exception
      */
     private function buildServerMonster(Character $character, int $monsterId): ServerMonster {
         $characterStatReductionAffixes = $this->characterCacheData->getCachedCharacterData($character, 'stat_affixes');

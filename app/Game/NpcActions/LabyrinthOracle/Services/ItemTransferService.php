@@ -37,7 +37,6 @@ class ItemTransferService {
      * Transfer the enhancements from one item to another.
      *
      * @param Character $character
-     * @param array $currencyCosts
      * @param int $itemIdToTransferFrom
      * @param int $itemIdToTransferTo
      * @return array
@@ -212,10 +211,19 @@ class ItemTransferService {
      * Will remove applied holy stacks from one item, if they have them.
      *
      */
-    protected function moveHolyStacks() {
+    protected function moveHolyStacks(): void
+    {
         if ($this->itemToTransferFromDuplicated->appliedHolyStacks()->count() > 0) {
 
+            $totalStacksAllowed = $this->itemToTransferToDuplicated->holy_stacks;
+            $currentStacksApplied = 0;
+
             foreach ($this->itemToTransferFromDuplicated->appliedHolyStacks as $stack) {
+
+                if ($currentStacksApplied === $totalStacksAllowed) {
+                    return;
+                }
+
                 $stackAttributes = $stack->getAttributes();
                 $stackAttributes['item_id'] = $this->itemToTransferToDuplicated->id;
 
@@ -223,6 +231,10 @@ class ItemTransferService {
                 $newStack->setRelation('item', $this->itemToTransferToDuplicated);
 
                 $newStack->save();
+
+                $stack->delete();
+
+                $currentStacksApplied++;
             }
 
             $this->itemToTransferFromDuplicated->appliedHolyStacks()->delete();

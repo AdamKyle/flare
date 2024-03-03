@@ -46,7 +46,7 @@ export default class QuestItemsTable extends React.Component<QuestItemsInventory
                         <div>
                             <label className="label block mt-2 md:mt-0 mb-2 mr-3" htmlFor="search">Search</label>
                         </div>
-                        <div className='w-[50%] md:w-full'>
+                        <div className='w-1/2'>
                             <input type='text' name='search' className='form-control' onChange={this.search.bind(this)} />
                         </div>
                         <div className='mt-[-5px] ml-2 md:ml-0 md:mt-0'>

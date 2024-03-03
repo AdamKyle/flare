@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Flare\Models\HolyStack;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
+use App\Flare\Models\ItemSocket;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\MarketBoard;
 use App\Flare\Models\MarketHistory;
@@ -57,6 +58,7 @@ class CleanupUnusedItems extends Command {
 
         foreach ($chunkedPrefixItems as $chunk) {
             HolyStack::whereIn('item_id', $chunk)->delete();
+            ItemSocket::whereIn('item_id', $chunk)->delete();
             Item::whereIn('id', $chunk)->delete();
 
             $bar->advance();
@@ -79,6 +81,7 @@ class CleanupUnusedItems extends Command {
 
         foreach ($chunkedSuffixItems as $chunk) {
             HolyStack::whereIn('item_id', $chunk)->delete();
+            ItemSocket::whereIn('item_id', $chunk)->delete();
             Item::whereIn('id', $chunk)->delete();
 
             $bar->advance();

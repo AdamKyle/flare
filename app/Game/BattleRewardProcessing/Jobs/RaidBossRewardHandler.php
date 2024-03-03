@@ -42,7 +42,9 @@ class RaidBossRewardHandler implements ShouldQueue {
     private int $monsterId;
 
     /**
-     * @param Collection $participants
+     * @param int $characterId
+     * @param int $monsterId
+     * @param int|null $raidId
      */
     public function __construct(int $characterId, int $monsterId, int $raidId = null) {
         $this->characterId = $characterId;
@@ -51,9 +53,9 @@ class RaidBossRewardHandler implements ShouldQueue {
     }
 
     /**
-     * @param MonthlyPvpFightService $monthlyPvpFightService
+     * @param BattleEventHandler $battleEventHandler
      * @return void
-     * @throws Exception
+     * @throws \Exception
      */
     public function handle(BattleEventHandler $battleEventHandler) {
         $character = Character::find($this->characterId);
@@ -124,11 +126,19 @@ class RaidBossRewardHandler implements ShouldQueue {
 
                 $duplicatedItem = $item->duplicate();
 
+                $duplicatedItem->update([
+                    'holy_stacks' => 20,
+                ]);
+
+                $duplicatedItem = $duplicatedItem->refresh();
+
                 if (in_array($duplicatedItem->type, $validSocketTypes)) {
 
                     $duplicatedItem->update([
                         'socket_count' => rand(0, 6),
                     ]);
+
+                    $duplicatedItem = $duplicatedItem->refresh();
                 }
 
                 $slot = $participator->character->inventory->slots()->create([
