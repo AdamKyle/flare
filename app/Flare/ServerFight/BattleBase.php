@@ -122,8 +122,14 @@ class BattleBase extends BattleMessages {
 
         $elementalAttack->setMonsterHealth($this->monsterHealth);
         $elementalAttack->setCharacterHealth($this->characterHealth);
-        
-        $characterElementalData = $this->characterCacheData->getCachedCharacterData($character, 'elemental_atonement')['atonements'];
+
+        $characterElementalData = $this->characterCacheData->getCachedCharacterData($character, 'elemental_atonement');
+
+        if (is_null($characterElementalData)) {
+            return;
+        }
+
+        $characterElementalData = $characterElementalData['atonements'];
 
         $damage = $this->characterCacheData->getCachedCharacterData($character, $damageType);
 

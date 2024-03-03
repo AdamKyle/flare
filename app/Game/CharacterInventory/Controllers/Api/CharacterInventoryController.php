@@ -3,6 +3,7 @@
 namespace App\Game\CharacterInventory\Controllers\Api;
 
 use App\Game\CharacterInventory\Services\EquipBestItemForSlotsTypesService;
+use App\Game\NpcActions\LabyrinthOracle\Events\LabyrinthOracleUpdate;
 use Exception;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item as FractalItem;
@@ -210,6 +211,8 @@ class  CharacterInventoryController extends Controller {
         $character = $character->refresh();
 
         event(new UpdateTopBarEvent($character));
+
+        event(new LabyrinthOracleUpdate($character));
 
         $characterInventoryService = $this->characterInventoryService->setCharacter($character);
 

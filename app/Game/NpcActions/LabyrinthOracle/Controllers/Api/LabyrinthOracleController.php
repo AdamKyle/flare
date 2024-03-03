@@ -29,14 +29,7 @@ class LabyrinthOracleController extends Controller {
     public function inventoryItems(Character $character): JsonResponse {
 
         return response()->json([
-            'inventory' => array_values($character->refresh()->inventory->slots->filter(function($slot) {
-                return $slot->item->type !== 'artifact' && $slot->item->type !== 'trinket' && $slot->item->type !== 'quest' && $slot->item->type !== 'alchemy';
-            })->map(function($slot) {
-                return [
-                    'affix_name' => $slot->item->affix_name,
-                    'id' => $slot->item_id,
-                ];
-            })->toArray()),
+            'inventory' => $this->itemTransferService->fetchInventoryItems($character),
         ]);
     }
 

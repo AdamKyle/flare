@@ -34,7 +34,7 @@ export default class CraftingSection extends React.Component<any, any> {
             case 'seer-camp':
                 return <SeerCamp character_id={this.props.character_id} leave_seer_camp={this.props.remove_crafting} />
             case 'labyrinth-oracle':
-                return <LabyrinthOracle character_id={this.props.character_id} remove_crafting={this.props.remove_crafting} cannot_craft={this.props.cannot_craft} />
+                return <LabyrinthOracle character_id={this.props.character_id} remove_crafting={this.props.remove_crafting} cannot_craft={this.props.cannot_craft} user_id={this.props.user_id} />
             default:
                 return null;
         }

@@ -34,6 +34,24 @@ class ItemTransferService {
     ];
 
     /**
+     * @param Character $character
+     * @return array
+     */
+    public function fetchInventoryItems(Character $character): array {
+
+        return array_values($character->refresh()->inventory->slots->filter(function($slot) {
+            return !in_array($slot->item->type, [
+                'artifact', 'trinket', 'quest', 'alchemy'
+            ]);
+        })->map(function($slot) {
+            return [
+                'affix_name' => $slot->item->affix_name,
+                'id' => $slot->item_id,
+            ];
+        })->toArray());
+    }
+
+    /**
      * Transfer the enhancements from one item to another.
      *
      * @param Character $character
@@ -91,14 +109,7 @@ class ItemTransferService {
 
         return $this->successResult([
             'message' => 'Transferred attributes (Enchantments, Holy Oils and Gems) from: ' . $this->itemToTransferFromDuplicated->affix_name . ' To: ' . $this->itemToTransferToDuplicated->affix_name . '. Check Server Messages (Mobile: Chat Tabs Drop Down -> Server Messages) for link to new item!',
-            'inventory' => array_values($character->refresh()->inventory->slots->filter(function($slot) {
-                return $slot->item->type !== 'artifact' && $slot->item->type !== 'trinket' && $slot->item->type !== 'quest'  && $slot->item->type !== 'alchemy';
-            })->map(function($slot) {
-                return [
-                    'affix_name' => $slot->item->affix_name,
-                    'id' => $slot->item_id,
-                ];
-            })->toArray()),
+            'inventory' => $this->fetchInventoryItems($character)
         ]);
     }
 

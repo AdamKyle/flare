@@ -30,9 +30,10 @@ class InventorySetService {
      * Allows us to add an item to an inventory set.
      *
      * @param InventorySet $inventorySet
-     * @param Item $item
+     * @param InventorySlot $slot
      */
-    public function assignItemToSet(InventorySet $inventorySet, InventorySlot $slot) {
+    public function assignItemToSet(InventorySet $inventorySet, InventorySlot $slot): void
+    {
         $inventorySet->slots()->create([
             'inventory_set_id' => $inventorySet->id,
             'item_id'          => $slot->item_id,

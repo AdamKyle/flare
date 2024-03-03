@@ -16,6 +16,8 @@ export default class LabyrinthOracle extends React.Component<LabyrinthOracleProp
 
     private ajax: Ajax;
 
+    private labyrinthOracle: any;
+
     constructor(props: LabyrinthOracleProps) {
         super(props);
 
@@ -30,6 +32,11 @@ export default class LabyrinthOracle extends React.Component<LabyrinthOracleProp
         }
 
         this.ajax = serviceContainer().fetch(Ajax);
+
+        // @ts-ignore
+        this.labyrinthOracle = Echo.private(
+            "update-labyrinth-oracle-" + this.props.user_id
+        );
     }
 
     componentDidMount() {
@@ -47,7 +54,17 @@ export default class LabyrinthOracle extends React.Component<LabyrinthOracleProp
                         error_message: error.response.data.message,
                     });
                 }
-            })
+            });
+
+        // @ts-ignore
+        this.labyrinthOracle.listen(
+            "Game.NpcActions.LabyrinthOracle.Events.LabyrinthOracleUpdate",
+            (event: any) => {
+                this.setState({
+                    inventory: event.inventory,
+                });
+            }
+        );
     }
 
     transferItems(): {label: string, value: string}[]|[] {
