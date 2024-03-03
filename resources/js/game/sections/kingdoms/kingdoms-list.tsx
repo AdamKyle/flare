@@ -174,7 +174,7 @@ export default class KingdomsList extends React.Component<KingdomListProps, King
                                 <TabPanel key={'kingdoms'}>
                                     {
                                         this.props.my_kingdoms.length > 0 ?
-                                            <div className={'max-w-[290px] sm:max-w-[100%] overflow-x-hidden'}>
+                                            <div className={'max-w-[390px] md:max-w-full overflow-x-hidden'}>
                                                 <Table data={this.props.my_kingdoms}
                                                        columns={buildKingdomsColumns(this.viewKingdomDetails.bind(this))}
                                                        dark_table={this.state.dark_tables}
@@ -197,7 +197,7 @@ export default class KingdomsList extends React.Component<KingdomListProps, King
                                 <TabPanel key={'kingdom-logs'}>
                                     {
                                         this.props.logs.length > 0 ?
-                                            <div className={'max-w-[290px] sm:max-w-[100%] overflow-x-hidden'}>
+                                            <div className={'max-w-[390px] md:max-w-full overflow-x-hidden'}>
                                                 <Table data={this.props.logs}
                                                        columns={buildLogsColumns(this.viewLogs.bind(this), this.deleteLog.bind(this))}
                                                        dark_table={this.state.dark_tables}

@@ -218,7 +218,7 @@ export default class EquippedTable extends React.Component<EquippedInventoryTabP
                         </div>
                         {
                             this.hasEmptySet() ?
-                                <div className='ml-2'>
+                                <div className='ml-2 md:mt-0 mt-2'>
                                     <DropDown menu_items={this.buildMenuItems()} button_title={'Assign to Set'} disabled={this.props.is_dead || this.props.is_automation_running || this.state.loading} />
                                 </div>
                             : null
@@ -245,7 +245,7 @@ export default class EquippedTable extends React.Component<EquippedInventoryTabP
                     : null
                 }
 
-                <div className={'max-w-[290px] sm:max-w-[100%] overflow-y-hidden'}>
+                <div className={'max-w-[390px] md:max-w-full overflow-y-hidden'}>
                     <Table data={this.state.data} columns={BuildInventoryTableColumns(this, this.viewItem.bind(this), this.props.manage_skills, 'equipped')} dark_table={this.props.dark_tables}/>
                 </div>
             </Fragment>

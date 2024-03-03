@@ -326,7 +326,7 @@ export default class CharacterMercenaries extends React.Component<CharacterMerce
                     : null
                 }
 
-                <div className='max-w-[290px] sm:max-w-[100%] overflow-x-hidden'>
+                <div className='max-w-[390px] md:max-w-full overflow-x-hidden'>
                     <Table columns={this.buildColumns()} data={this.state.mercs} dark_table={this.state.dark_tables} />
                 </div>
 

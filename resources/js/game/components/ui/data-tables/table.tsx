@@ -10,7 +10,7 @@ export default class Table extends React.Component<DataTableProps, any> {
 
     render() {
         return (
-            <div className={'w-[400px] sm:w-full'}>
+            <div>
                 <DataTable
                     columns={this.props.columns}
                     data={this.props.data}

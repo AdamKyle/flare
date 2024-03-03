@@ -574,7 +574,7 @@ export default class SetsTable
 
                 <div
                     className={
-                        "max-w-[290px] sm:max-w-[100%] overflow-y-hidden"
+                        "max-w-[390px] md:max-w-full overflow-y-hidden"
                     }
                 >
                     <Table

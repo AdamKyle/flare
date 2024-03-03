@@ -139,7 +139,7 @@ export default class Skills extends React.Component<SkillsProps, any> {
                     </InfoAlert>
                 </div>
 
-                <div className={'max-w-[290px] sm:max-w-[100%] overflow-y-hidden'}>
+                <div className={'max-w-[390px] md:max-w-full overflow-y-hidden'}>
                     <Table columns={this.buildColumns()} data={this.props.trainable_skills} dark_table={this.props.dark_table} />
                 </div>
 

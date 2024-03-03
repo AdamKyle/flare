@@ -151,7 +151,7 @@ export class GemBagTable extends React.Component<any, any> {
                         </SuccessAlert>
                     : null
                 }
-                <div className={'max-w-[290px] sm:max-w-[100%] overflow-x-hidden'}>
+                <div className={'max-w-[390px] md:max-w-full overflow-x-hidden'}>
                     <Table data={this.state.gem_slots} columns={buildGemColumns(this, this.viewItem.bind(this))} dark_table={this.props.dark_table}/>
                 </div>
 

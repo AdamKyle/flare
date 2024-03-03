@@ -96,7 +96,7 @@ export default class BuildingsTable extends React.Component<BuildingsTableProps,
                         </div>
                     : null
                 }
-                <div className={'max-w-[290px] sm:max-w-[100%] overflow-x-hidden'}>
+                <div className={'max-w-[390px] md:max-w-full overflow-x-hidden'}>
                     <Table data={this.props.buildings}
                            columns={buildBuildingsColumns(this.viewBuilding.bind(this), this.cancelBuildingQueue.bind(this), this.props.buildings_in_queue, this.props.view_port)}
                            dark_table={this.props.dark_tables}

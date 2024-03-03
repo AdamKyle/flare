@@ -119,7 +119,7 @@ export default class UsableItemsTable extends React.Component<UsableItemTable, a
         return (
             <Fragment>
 
-                <div className={'max-w-[290px] sm:max-w-[100%] overflow-y-hidden'}>
+                <div className={'max-w-[390px] md:max-w-full overflow-y-hidden'}>
                     <Table data={this.props.usable_items} columns={buildLimitedColumns(this, this.manageViewItem.bind(this), true)} dark_table={this.props.dark_table}/>
                 </div>
 

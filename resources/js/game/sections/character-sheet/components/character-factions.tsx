@@ -181,7 +181,7 @@ export default class CharacterFactions extends React.Component<any, any> {
                         : null
                     }
 
-                    <div className={'max-w-[290px] sm:max-w-[100%] overflow-x-hidden'}>
+                    <div className={'max-w-[390px] md:max-w-full overflow-x-hidden'}>
                         <Table columns={this.buildColumns()} data={this.state.factions} dark_table={this.state.dark_tables} />
                     </div>
                 </div>

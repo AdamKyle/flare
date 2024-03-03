@@ -44,19 +44,19 @@ export default class QuestItemsTable extends React.Component<QuestItemsInventory
                 <div className='mb-5'>
                     <div className='flex flex-row flex-wrap items-center'>
                         <div>
-                            <label className="label block mb-2 mr-3" htmlFor="search">Search</label>
+                            <label className="label block mt-2 md:mt-0 mb-2 mr-3" htmlFor="search">Search</label>
                         </div>
-                        <div>
+                        <div className='w-[50%] md:w-full'>
                             <input type='text' name='search' className='form-control' onChange={this.search.bind(this)} />
                         </div>
-                        <div className='mt-2 sm:mt-0'>
+                        <div className='mt-[-5px] ml-2 md:ml-0 md:mt-0'>
                             <a href='/information/quests' target='_blank' className='sm:ml-2'>Quests help <i
                                 className="fas fa-external-link-alt"></i></a>
                         </div>
                     </div>
                 </div>
 
-                <div className={'max-w-[290px] sm:max-w-[100%] overflow-y-hidden'}>
+                <div className={'max-w-[390px] md:max-w-full overflow-y-hidden'}>
                     <Table data={this.state.data} columns={buildLimitedColumns(undefined, this.viewItem.bind(this))} dark_table={this.props.dark_table}/>
                 </div>
 
