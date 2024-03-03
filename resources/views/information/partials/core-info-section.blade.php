@@ -50,7 +50,8 @@
                 @livewire($section['live_wire_component'])
             @endif
 
-            @if(!is_null($section['item_table_type']))
+
+            @if(!is_null($section['item_table_type']) && $section['item_table_type'] !== 'undefined')
                 <div id="items-table" data-item-table-type="{{$section['item_table_type']}}"></div>
 
                 @push('scripts')

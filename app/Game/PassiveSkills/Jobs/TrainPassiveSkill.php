@@ -13,7 +13,6 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use App\Flare\Models\Character;
-use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Models\CharacterPassiveSkill;
 use App\Flare\Models\Notification as Notification;
 use App\Flare\Transformers\KingdomTransformer;
@@ -26,13 +25,13 @@ class TrainPassiveSkill implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    private $character;
+    private Character $character;
 
-    private $characterPassiveSkill;
+    private CharacterPassiveSkill $characterPassiveSkill;
 
     /**
      * @param Character $character
-     * @param int $itemToCraft
+     * @param CharacterPassiveSkill $characterPassiveSkill
      */
     public function __construct(Character $character, CharacterPassiveSkill $characterPassiveSkill)
     {
@@ -126,7 +125,7 @@ class TrainPassiveSkill implements ShouldQueue
                     'max_wood' => $kingdom->max_wood + $newPassive->passiveSkill->resource_bonus_per_level,
                     'max_clay' => $kingdom->max_clay + $newPassive->passiveSkill->resource_bonus_per_level,
                     'max_iron' => $kingdom->max_iron + $newPassive->passiveSkill->resource_bonus_per_level,
-                    'max_steel' => $kingdom->max_steel + $newPassive->passiveSkill->resource_bonus_per_level,
+                    'max_population' => $kingdom->max_population + $newPassive->passiveSkill->resource_bonus_per_level,
                 ]);
 
                 $kingdom  = new Item($kingdom->refresh(), $kingdomTransformer);

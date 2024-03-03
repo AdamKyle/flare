@@ -248,6 +248,10 @@
                 <span class="fas fa-sitemap"></span>
                 Kingdom Passive Skills
             </a>
+            <a href="{{ route('info.page', ['pageName' => 'kingdom-resource-expansion']) }}">
+                <span class="fas fa-expand-arrows-alt"></span>
+                Kingdom Resource Expansion
+            </a>
         </div>
     </div>
 

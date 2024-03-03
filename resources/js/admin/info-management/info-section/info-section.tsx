@@ -1,5 +1,4 @@
 import React from "react";
-import ReactQuill from 'react-quill';
 import BasicCard from "../../../game/components/ui/cards/basic-card";
 import Select from "react-select";
 import PrimaryButton from "../../../game/components/ui/buttons/primary-button";
@@ -7,6 +6,7 @@ import { isEqual } from "lodash";
 import ComponentLoading from "../../../game/components/ui/loading/component-loading";
 import SuccessButton from "../../../game/components/ui/buttons/success-button";
 import OrangeButton from "../../../game/components/ui/buttons/orange-button";
+import {Editor} from "@tinymce/tinymce-react";
 
 export default class InfoSection extends React.Component<any, any> {
     constructor(props: any) {
@@ -313,6 +313,9 @@ export default class InfoSection extends React.Component<any, any> {
             return <ComponentLoading />;
         }
 
+        // @ts-ignore
+        const apiKey = import.meta.env.VITE_TINY_MCE_API_KEY;
+
         return (
             <BasicCard additionalClasses={"mb-4"}>
                 {this.props.index !== 0 ? (
@@ -327,10 +330,14 @@ export default class InfoSection extends React.Component<any, any> {
                     </div>
                 ) : null}
 
-                <ReactQuill
-                    theme="snow"
-                    value={this.state.content}
-                    onChange={this.setValue.bind(this)}
+                <Editor
+                    apiKey={apiKey}
+                    init={{
+                        plugins: 'lists link image paste help wordcount',
+                        toolbar: 'undo redo | blocks | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | help'
+                    }}
+                    initialValue={this.state.content}
+                    onEditorChange={this.setValue.bind(this)}
                 />
 
                 <div className="my-5">
