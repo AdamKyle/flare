@@ -98,6 +98,11 @@ export default class CharacterActiveBoons extends React.Component<any, any> {
                 </span>
             },
             {
+                name: 'Amount Used',
+                selector: (row: { amount_used: number }) => row.amount_used,
+                sortable: true,
+            },
+            {
                 name: 'Time Remaining',
                 selector: (row: { started: string; completed: string }) => row.started,
                 sortable: true,

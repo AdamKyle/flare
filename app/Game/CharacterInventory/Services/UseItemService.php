@@ -54,9 +54,7 @@ class UseItemService {
         $foundBoon = $character->boons()
             ->where('item_id', $slot->item_id)
             ->where('last_for_minutes', '<', self::MAX_TIME)
-            ->where(function ($query) {
-                $query->where('amount_used', '<', self::MAX_AMOUNT);
-            })
+            ->where('amount_used', '<', self::MAX_AMOUNT)
             ->first();
 
         if (!is_null($foundBoon) && $slot->item->can_stack) {
