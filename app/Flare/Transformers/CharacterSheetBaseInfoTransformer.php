@@ -11,6 +11,7 @@ use App\Flare\Values\AutomationType;
 use App\Flare\Values\ClassAttackValue;
 use App\Game\Skills\Values\SkillTypeValue;
 use App\Flare\Builders\CharacterInformation\CharacterStatBuilder;
+use Exception;
 
 class CharacterSheetBaseInfoTransformer extends BaseTransformer {
 
@@ -25,6 +26,7 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer {
      *
      * @param Character $character
      * @return array
+     * @throws Exception
      */
     public function transform(Character $character): array {
         $characterStatBuilder         = resolve(CharacterStatBuilder::class)->setCharacter($character, $this->ignoreReductions);
