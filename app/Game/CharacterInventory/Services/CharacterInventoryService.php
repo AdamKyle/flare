@@ -503,9 +503,6 @@ class CharacterInventoryService {
             ->whereHas('slots', function ($query) {
                 $query->whereIn('position', $this->positions);
             })
-            ->with(['slots' => function ($query) {
-                $query->whereIn('position', $this->positions);
-            }])
             ->get()
             ->pluck('slots')
             ->flatten();

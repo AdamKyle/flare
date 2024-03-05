@@ -48,4 +48,15 @@ class CharacterGemBagServiceTest extends TestCase {
         $this->assertEquals(200, $result['status']);
         $this->assertNotEmpty($result['gem']);
     }
+
+    public function testCannotGetGemData() {
+        $character = $this->character->gemBagManagement()->assignGemsToBag()->getCharacter();
+
+        $secondCharacter = (new CharacterFactory())->createBaseCharacter()->gemBagManagement()->assignGemsToBag()->getCharacter();
+
+        $result = $this->characterGemBagService->getGemData($character, $secondCharacter->gemBag->gemSlots->first());
+
+        $this->assertEquals(422, $result['status']);
+        $this->assertEquals('No. Not yours!', $result['message']);
+    }
 }

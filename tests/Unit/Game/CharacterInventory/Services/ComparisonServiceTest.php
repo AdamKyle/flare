@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Game\CharacterInventory\Services;
 
+use App\Flare\Values\ArmourTypes;
 use App\Flare\Values\SpellTypes;
 use App\Flare\Values\WeaponTypes;
 use App\Game\CharacterInventory\Services\ComparisonService;
@@ -115,6 +116,22 @@ class ComparisonServiceTest extends TestCase {
         )->getCharacter();
 
         $comparisonData = $this->comparisonService->buildShopData($character, $item, WeaponTypes::BOW);
+
+        $this->assertEquals($item->affix_name, $comparisonData['itemToEquip']['affix_name']);
+    }
+
+    public function testBuildShopDataForArmourType() {
+        $item = $this->createItem(['type' => ArmourTypes::SHIELD]);
+
+        $character = $this->character->inventoryManagement()->giveItem(
+            $this->createItem([
+                'type' => ArmourTypes::SHIELD,
+                'base_ac' => 25,
+                'str_mod' => 0.10,
+            ]), true, 'left-hand'
+        )->getCharacter();
+
+        $comparisonData = $this->comparisonService->buildShopData($character, $item, ArmourTypes::SHIELD);
 
         $this->assertEquals($item->affix_name, $comparisonData['itemToEquip']['affix_name']);
     }
