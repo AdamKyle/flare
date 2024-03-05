@@ -4,6 +4,7 @@ import Select from "react-select";
 import UsableItemsDetails from "../../../../lib/game/character-sheet/types/inventory/usable-items-details";
 import UseManyItems from "../../../../lib/game/character-sheet/ajax/use-many-items";
 import LoadingProgressBar from "../../../../components/ui/progress-bars/loading-progress-bar";
+import DangerAlert from "../../../../components/ui/alerts/simple-alerts/danger-alert";
 
 export default class InventoryUseManyItems extends React.Component<any, any> {
     constructor(props: any) {
@@ -99,6 +100,13 @@ export default class InventoryUseManyItems extends React.Component<any, any> {
                         menuPortalTarget={document.body}
                         value={this.defaultItem()}
                     />
+                    {
+                        this.state.error_message !== null ?
+                            <DangerAlert additional_css={'my-4'}>
+                                {this.state.error_message}
+                            </DangerAlert>
+                        : null
+                    }
                     {
                         this.state.loading ?
                             <div className='mt-4 mb-4'>

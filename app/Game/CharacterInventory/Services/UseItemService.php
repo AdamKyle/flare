@@ -169,15 +169,13 @@ class UseItemService {
             ->first();
 
         if (!is_null($foundBoon) && $slot->item->can_stack && $foundBoon->amount_used <= self::MAX_AMOUNT) {
-            $completesAtMinutes = $foundBoon->complete->diffInMinutes();
-            $remainingTime = min(self::MAX_TIME - $completesAtMinutes, $slot->item->lasts_for);
             $newLastsForMinutes = $foundBoon->last_for_minutes + $slot->item->lasts_for;
 
             if ($newLastsForMinutes > self::MAX_TIME) {
                 return false;
             }
 
-            $timeStamp = now()->addMinutes($remainingTime);
+            $timeStamp = $foundBoon->complete->addMinutes($slot->item->lasts_for);
             $amountUsed = min(self::MAX_AMOUNT, $foundBoon->amount_used + 1);
 
             $foundBoon->update([
