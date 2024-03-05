@@ -72,7 +72,7 @@ class CharacterStatBuilderTest extends TestCase {
 
         $classGameSkill = $this->createGameSkill([
             'name'          => 'Class Skill',
-            'game_class_id' => $character->class_id,
+            'game_class_id' => $character->game_class_id,
             'class_bonus'   => 0.01
         ]);
 
@@ -94,6 +94,35 @@ class CharacterStatBuilderTest extends TestCase {
         $value = $this->characterStatBuilder->setCharacter($character)->classBonus();
 
         $this->assertEquals(0.1, $value);
+    }
+
+    public function testClassBonusWithSkillDoesNotGoAboveOneHundredPercent() {
+        $character = $this->character->getCharacter();
+
+        $classGameSkill = $this->createGameSkill([
+            'name'          => 'Class Skill',
+            'game_class_id' => $character->game_class_id,
+            'class_bonus'   => 0.20
+        ]);
+
+        $character->skills()->create([
+            'character_id'        => $character->id,
+            'game_skill_id'       => $classGameSkill->id,
+            'currently_training'  => false,
+            'is_locked'           => false,
+            'level'               => 10,
+            'xp'                  => 100,
+            'xp_max'              => 1000,
+            'xp_towards'          => 0,
+            'skill_type'          => SkillTypeValue::EFFECTS_CLASS,
+            'is_hidden'           => false,
+        ]);
+
+        $character = $character->refresh();
+
+        $value = $this->characterStatBuilder->setCharacter($character)->classBonus();
+
+        $this->assertEquals(1.0, $value);
     }
 
     public function testGetHolyInfo() {

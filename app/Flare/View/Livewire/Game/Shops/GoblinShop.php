@@ -41,7 +41,7 @@ class GoblinShop extends DataTableComponent {
             Column::make('Type')->searchable()->format(function ($value) {
                 return ucfirst(str_replace('-', ' ', $value));
             }),
-            Column::make('Lasts for', 'lasts_for')->sortable()->format(function ($value) {
+            Column::make('Lasts for (minutes)', 'lasts_for')->sortable()->format(function ($value) {
                 return number_format($value);
             }),
             Column::make('Gold Bars (Cost)', 'gold_bars_cost')->sortable()->format(function ($value) {

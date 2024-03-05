@@ -2,6 +2,8 @@
 
 namespace App\Game\CharacterInventory\Providers;
 
+use App\Flare\Handlers\UpdateCharacterAttackTypes;
+use App\Game\Core\Events\UpdateCharacterAttacks;
 use League\Fractal\Manager;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use App\Game\CharacterInventory\Validations\SetHandsValidation;
@@ -67,6 +69,8 @@ class ServiceProvider extends ApplicationServiceProvider {
             return new UseItemService(
                 $app->make(Manager::class),
                 $app->make(CharacterSheetBaseInfoTransformer::class),
+                $app->make(UpdateCharacterAttackTypes::class),
+                $app->make(CharacterInventoryService::class),
             );
         });
 

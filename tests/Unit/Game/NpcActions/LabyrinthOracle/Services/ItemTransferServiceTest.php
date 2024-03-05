@@ -164,6 +164,7 @@ class ItemTransferServiceTest extends TestCase {
             'item_suffix_id' => $attachedSuffix->id,
             'item_prefix_id' => $attachedPrefix->id,
             'socket_count' => 2,
+            'holy_stacks'  => 1,
         ]);
 
         $itemToTransferFrom->appliedHolyStacks()->create([
@@ -182,7 +183,9 @@ class ItemTransferServiceTest extends TestCase {
         ]);
 
         $itemToTransferFrom = $itemToTransferFrom->refresh();
-        $itemToTransferTo   = $this->createItem();
+        $itemToTransferTo   = $this->createItem([
+            'holy_stacks' => 1,
+        ]);
 
         $character = $this->character
             ->inventoryManagement()
@@ -248,6 +251,7 @@ class ItemTransferServiceTest extends TestCase {
             'item_suffix_id' => $attachedSuffix->id,
             'item_prefix_id' => $attachedPrefix->id,
             'socket_count' => 2,
+            'holy_stacks' => 1,
         ]);
 
         $itemToTransferFrom->appliedHolyStacks()->create([
@@ -266,7 +270,9 @@ class ItemTransferServiceTest extends TestCase {
         ]);
 
         $itemToTransferFrom = $itemToTransferFrom->refresh();
-        $itemToTransferTo   = $this->createItem();
+        $itemToTransferTo   = $this->createItem([
+            'holy_stacks' => 1,
+        ]);
 
         $gemToRemove = $this->createGem();
 
@@ -348,6 +354,7 @@ class ItemTransferServiceTest extends TestCase {
             'item_suffix_id' => $attachedSuffix->id,
             'item_prefix_id' => $attachedPrefix->id,
             'socket_count' => 2,
+            'holy_stacks' => 1,
         ]);
 
         $itemToTransferFrom->appliedHolyStacks()->create([
@@ -366,7 +373,9 @@ class ItemTransferServiceTest extends TestCase {
         ]);
 
         $itemToTransferFrom = $itemToTransferFrom->refresh();
-        $itemToTransferTo   = $this->createItem();
+        $itemToTransferTo   = $this->createItem([
+            'holy_stacks' => 1,
+        ]);
 
         $gemToRemove = $this->createGem();
 

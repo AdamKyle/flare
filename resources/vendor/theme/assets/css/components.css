@@ -256,7 +256,7 @@ Custom Checkbox
 
         &:after {
           @apply absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2;
-          background: url(../vendor/theme/assets/images/check.svg);
+          background: url('../../assets/images/check.svg');
           width: 10px;
           height: 10px;
           content: "";
@@ -268,7 +268,7 @@ Custom Checkbox
     &[partial] {
       + span {
         &:after {
-          background: url(../vendor/theme/assets/images/check-partial.svg);
+          background: url('../../assets/images/check-partial.svg');
         }
       }
     }

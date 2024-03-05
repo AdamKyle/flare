@@ -26,7 +26,7 @@ class LevelUpValue {
         $gainsAdditionalLevel = $this->gainsAdditionalLevelOnLevelUp($character);
         $baseStatMod          = $this->addModifier($character, 'base_stat_mod', false, $gainsAdditionalLevel);
         $baseDamageStatMod    = $this->addModifier($character, 'base_damage_stat_mod', true, $gainsAdditionalLevel);
-        $newLevel             = $character->level + ($gainsAdditionalLevel ? 2 : 1);
+        $newLevel             = $character->level + ($gainsAdditionalLevel ? $this->additionalLevelsToGain($character) : 1);
         $maxLevel             = $this->getMaxLevel($character);
 
         if ($newLevel > $maxLevel) {

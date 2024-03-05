@@ -202,11 +202,11 @@ class EndScheduledEventTest extends TestCase {
         $this->instance(
             MapTileValue::class,
             Mockery::mock(MapTileValue::class, function (MockInterface $mock) {
-                $mock->shouldReceive('canWalkOnWater')->once()->andReturn(true);
-                $mock->shouldReceive('canWalkOnDeathWater')->once()->andReturn(true);
-                $mock->shouldReceive('canWalkOnMagma')->once()->andReturn(true);
-                $mock->shouldReceive('isPurgatoryWater')->once()->andReturn(false);
-                $mock->shouldReceive('getTileColor')->once()->andReturn('000');
+                $mock->shouldReceive('canWalkOnWater')->andReturn(true);
+                $mock->shouldReceive('canWalkOnDeathWater')->andReturn(true);
+                $mock->shouldReceive('canWalkOnMagma')->andReturn(true);
+                $mock->shouldReceive('isPurgatoryWater')->andReturn(false);
+                $mock->shouldReceive('getTileColor')->andReturn('000');
             })
         );
 

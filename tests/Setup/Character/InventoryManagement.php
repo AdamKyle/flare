@@ -244,6 +244,7 @@ class InventoryManagement {
         return $this->character->refresh();
     }
 
+
     protected function fetchSlot(string $itemName): InventorySlot {
         $foundMatching = $this->character->inventory->slots->filter(function ($slot) use ($itemName) {
             return $slot->item->name === $itemName;

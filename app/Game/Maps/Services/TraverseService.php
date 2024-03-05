@@ -302,11 +302,6 @@ class TraverseService {
         $x = $cache['x'];
         $y = $cache['y'];
 
-        dump(
-            (int) $this->mapTileValue->getTileColor($character, $character->map->character_position_x, $character->map->character_position_y),
-            $this->mapTileValue->isPurgatoryWater((int) $this->mapTileValue->getTileColor($character, $character->map->character_position_x, $character->map->character_position_y))
-        );
-
         if (
             !$this->mapTileValue->canWalkOnWater($character, $character->map->character_position_x, $character->map->character_position_y) ||
             !$this->mapTileValue->canWalkOnDeathWater($character, $character->map->character_position_x, $character->map->character_position_y) ||

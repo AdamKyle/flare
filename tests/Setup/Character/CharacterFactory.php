@@ -2,7 +2,9 @@
 
 namespace Tests\Setup\Character;
 
+use App\Flare\Models\CharacterBoon;
 use App\Game\ClassRanks\Values\WeaponMasteryValue;
+use Exception;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Cache;
 use App\Flare\Models\GameBuilding;
@@ -500,7 +502,7 @@ class CharacterFactory {
         $skill = $this->character->skills->where('name', $name)->first();
 
         if (is_null($skill)) {
-            throw new \Exception($name . ' not found.');
+            throw new Exception($name . ' not found.');
         }
 
         $skill->update($changes);
@@ -543,6 +545,7 @@ class CharacterFactory {
      *
      * @param string $name
      * @return CharacterFactory
+     * @throws Exception
      */
     public function trainSkill(string $name): CharacterFactory {
         $skill = $this->character->skills->filter(function ($skill) {
@@ -550,7 +553,7 @@ class CharacterFactory {
         })->first();
 
         if (!is_null($skill)) {
-            throw new \Exception('Already have a skill in training.');
+            throw new Exception('Already have a skill in training.');
         }
 
         $this->character->skills->each(function ($skill) use ($name) {
@@ -572,24 +575,7 @@ class CharacterFactory {
      */
     public function getCharacter(): Character {
 
-        $character = $this->character->refresh();
-
-        return $character;
-    }
-
-    /**
-     * Builds the character cache data.
-     *
-     * @return $this
-     */
-    public function buildCharacterCacheData(): CharacterFactory {
-        $character = $this->character->Refresh();
-
-        if (!Cache::has('character-attack-data-' . $character->id)) {
-            resolve(BuildCharacterAttackTypes::class)->buildCache($character);
-        }
-
-        return $this;
+        return $this->character->refresh();
     }
 
     /**
@@ -610,30 +596,6 @@ class CharacterFactory {
         ]);
 
         return $this;
-    }
-
-    /**
-     * Get the user.
-     *
-     * @return User
-     */
-    public function getUser(): User {
-        return $this->character->user;
-    }
-
-    /**
-     * Create the core inventory.
-     */
-    protected function createInventory() {
-        $this->character->inventory()->create([
-            'character_id' => $this->character->id,
-        ]);
-    }
-
-    protected function createGemBag() {
-        $this->character->gemBag()->create([
-            'character_id' => $this->character->id,
-        ]);
     }
 
     /**
@@ -699,6 +661,30 @@ class CharacterFactory {
         $this->createSkill([
             'character_id'  => $this->character->id,
             'game_skill_id' => $enchanting->id,
+        ]);
+    }
+
+    /**
+     * Get the user.
+     *
+     * @return User
+     */
+    public function getUser(): User {
+        return $this->character->user;
+    }
+
+    /**
+     * Create the core inventory.
+     */
+    protected function createInventory() {
+        $this->character->inventory()->create([
+            'character_id' => $this->character->id,
+        ]);
+    }
+
+    protected function createGemBag() {
+        $this->character->gemBag()->create([
+            'character_id' => $this->character->id,
         ]);
     }
 

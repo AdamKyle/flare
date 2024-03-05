@@ -40,16 +40,24 @@ class  CharacterInventoryController extends Controller {
     private UpdateCharacterAttackTypes $updateCharacterAttackTypes;
 
     /**
+     * @var UseItemService $useItemService
+     */
+    private UseItemService $useItemService;
+
+    /**
      * @param CharacterInventoryService $characterInventoryService
      * @param UpdateCharacterAttackTypes $updateCharacterAttackTypes
+     * @param UseItemService $useItemService
      */
     public function __construct(
         CharacterInventoryService $characterInventoryService,
         UpdateCharacterAttackTypes $updateCharacterAttackTypes,
+        UseItemService $useItemService,
     ) {
 
         $this->characterInventoryService  = $characterInventoryService;
         $this->updateCharacterAttackTypes = $updateCharacterAttackTypes;
+        $this->useItemService = $useItemService;
     }
 
     /**
@@ -655,101 +663,32 @@ class  CharacterInventoryController extends Controller {
     /**
      * @param UseManyItemsValidation $request
      * @param Character $character
-     * @param UseItemService $useItemService
      * @return JsonResponse
      * @throws Exception
      */
-    public function useManyItems(UseManyItemsValidation $request, Character $character, UseItemService $useItemService): JsonResponse {
-        if ($character->boons->count() === 10) {
-            return response()->json(['message' => 'You can only have a max of ten boons applied.
-            Check active boons to see which ones you have. You can always cancel one by clicking on the row.'], 422);
-        }
+    public function useManyItems(UseManyItemsValidation $request, Character $character): JsonResponse {
 
-        $arrayOfItemsToUse = $request->items_to_use;
-        $boonCount = $character->boons->count();
+        $result = $this->useItemService->useManyItemsFromInventory($character, $request->items_to_use);
 
-        if ($boonCount > 0) {
-            $arrayOfItemsToUse = array_slice($arrayOfItemsToUse, 0, $boonCount);
-        }
+        $status = $result['status'];
+        unset($result['status']);
 
-        $slots = $character->inventory->slots()->whereIn('id', $arrayOfItemsToUse)->get();
-
-        if ($slots->isEmpty()) {
-            return response()->json(['message' => 'You don\'t have these items.'], 422);
-        }
-
-        foreach ($slots as $slot) {
-            $useItemService->useItem($slot, $character);
-        }
-
-        $this->updateCharacterAttackDataCache($character);
-
-        $character = $character->refresh();
-
-        event(new UpdateTopBarEvent($character));
-
-        $inventory = $this->characterInventoryService->setCharacter($character);
-
-        return response()->json([
-            'inventory' => [
-                'usable_items' => $inventory->getInventoryForType('usable_items')
-            ]
-        ], 200);
+        return response()->json($result, $status);
     }
 
     /**
      * @param Character $character
      * @param Item $item
-     * @param UseItemService $useItemService
      * @return JsonResponse
      * @throws Exception
      */
-    public function useItem(Character $character, Item $item, UseItemService $useItemService): JsonResponse {
-        if ($character->boons->count() === 10) {
-            return response()->json(['message' => 'You can only have a max of ten boons applied.
-            Check active boons to see which ones you have. You can always cancel one by clicking on the row.'], 422);
-        }
+    public function useItem(Character $character, Item $item): JsonResponse {
+        $result = $this->useItemService->useSingleItemFromInventory($character, $item);
 
-        if (!$item->can_stack) {
-            $foundItem = $character->boons()->where('item_id', $item->id)->first();
+        $status = $result['status'];
+        unset($result['status']);
 
-            if (!is_null($foundItem)) {
-                return response()->json(['message' => 'This item cannot stack. You cannot use more then one at a time.'], 422);
-            }
-
-            if ($item->xp_bonus > 0.0) {
-                $foundItem = $character->boons->where('itemUsed.xp_bonus', '>', 0)->first();
-
-                if (!is_null($foundItem)) {
-                    return response()->json(['message' => 'This item cannot stack. You cannot use more then one at a time.'], 422);
-                }
-            }
-        }
-
-        $slot = $character->inventory->slots->filter(function ($slot) use ($item) {
-            return $slot->item_id === $item->id;
-        })->first();
-
-        if (is_null($slot)) {
-            return response()->json(['message' => 'You don\'t have this item.'], 422);
-        }
-
-        $useItemService->useItem($slot, $character, $item);
-
-        $this->updateCharacterAttackDataCache($character);
-
-        $character = $character->refresh();
-
-        event(new UpdateTopBarEvent($character));
-
-        $inventory = $this->characterInventoryService->setCharacter($character);
-
-        return response()->json([
-            'message' => 'Applied: ' . $item->name . ' for: ' . $item->lasts_for . ' Minutes.',
-            'inventory' => [
-                'usable_items' => $inventory->getInventoryForType('usable_items')
-            ]
-        ], 200);
+        return response()->json($result, $status);
     }
 
     /**

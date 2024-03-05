@@ -22,14 +22,12 @@ class CharacterBoonFactory extends Factory
     public function definition()
     {
         return [
-            'character_id'         => null,
-            'type'                 => null,
-            'stat_bonus'           => null,
-            'affect_skill_type'    => null,
-            'skill_bonus'          => null,
-            'skill_training_bonus' => null,
-            'started'              => null,
-            'complete'             => null,
+            'character_id' => null,
+            'item_id' => null,
+            'last_for_minutes' => null,
+            'amount_used' => null,
+            'started' => null,
+            'complete' => null,
         ];
     }
 }

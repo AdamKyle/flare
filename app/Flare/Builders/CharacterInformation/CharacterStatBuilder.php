@@ -190,8 +190,7 @@ class CharacterStatBuilder {
     public function classBonus(): float {
         $classBonusSkill = $this->character->skills()
             ->whereHas('baseSkill', function ($query) {
-                $query
-                    ->whereNotNull('game_class_id');
+                $query->whereNotNull('game_class_id');
             })
             ->first();
 
@@ -201,7 +200,7 @@ class CharacterStatBuilder {
 
         $classBonus = $classBonusSkill->baseSkill->class_bonus * $classBonusSkill->level;
 
-        return max(1, $classBonus);
+        return min(1, $classBonus);
     }
 
     /**
