@@ -27,10 +27,10 @@ class ElementalAttack extends BattleBase {
      * @return void
      */
     public function doElementalAttack(array $defenderElements, array $attackerElements, int $damage, bool $isMonster = false): void {
-        $highestElement          = $this->getHighestElementDamage($attackerElements);
-        $highestDefendingElement = $this->getHighestElementDamage($defenderElements);
+        $highestElement = $this->getHighestElementDamage($attackerElements);
 
         $highestElementName = $this->getHighestElementName($attackerElements, $highestElement);
+
         if ($highestElementName === 'UNKNOWN') {
             return;
         }
@@ -38,6 +38,16 @@ class ElementalAttack extends BattleBase {
         if ($highestElement <= 0) {
             return;
         }
+
+        if (empty($defenderElements)) {
+            $damage = floor($damage * $highestElement);
+
+            $this->dealDamage($damage, 0, $highestElement, $isMonster, 'regular');
+
+            return;
+        }
+
+        $highestDefendingElement = $this->getHighestElementDamage($defenderElements);
 
         if ($this->isHalfDamage($defenderElements, $highestElementName)) {
 

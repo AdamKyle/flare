@@ -65,7 +65,13 @@ class MonsterAttack extends BattleBase {
             $monster->getMonsterStat('is_raid_boss') ||
             $monster->canMonsterUseElementalAttack()
         ) {
-            $elementalData = $this->characterCacheData->getCachedCharacterData($character, 'elemental_atonement')['atonements'];
+            $elementalData = $this->characterCacheData->getCachedCharacterData($character, 'elemental_atonement');
+
+            if (is_null($elementalData)) {
+                return;
+            }
+
+            $elementalData = $elementalData['atonements'];
 
             $elementalAttack = resolve(ElementalAttack::class);
 
