@@ -66,6 +66,20 @@ export default class CraftingSectionManager {
             }
         }
 
+        if (this.component.props.character.can_access_labyrinth_oracle) {
+            if (typeof options[3] !== 'undefined') {
+                options.splice(3, 0, {
+                    label: 'Labyrinth Oracle',
+                    value: 'labyrinth-oracle',
+                })
+            } else {
+                options.splice(4, 0, {
+                    label: 'Labyrinth Oracle',
+                    value: 'labyrinth-oracle',
+                })
+            }
+        }
+
         if (this.component.props.character.can_access_queen) {
             if (typeof options[2] !== 'undefined') {
                 options.splice(3, 0, {

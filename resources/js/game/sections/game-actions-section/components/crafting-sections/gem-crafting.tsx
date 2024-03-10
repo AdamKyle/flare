@@ -210,7 +210,7 @@ export default class GemCrafting extends React.Component<any, any> {
                                   on_click={this.props.remove_crafting}
                                   additional_css={'ml-2'}
                                   disabled={this.state.loading || this.props.cannot_craft || this.state.isCrafting} />
-                    <a href='/information/gem-crafting' target='_blank' className='relative top-[20px] md:top-[0px] ml-2'>Help <i
+                    <a href='/information/gem-crafting' target='_blank' className='relative top-[0px] ml-2'>Help <i
                         className="fas fa-external-link-alt"></i></a>
                 </div>
             </Fragment>
