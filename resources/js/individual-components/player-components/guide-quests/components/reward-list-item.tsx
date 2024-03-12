@@ -1,5 +1,5 @@
 import React from "react";
-import { formatNumber } from "../../../lib/game/format-number";
+import { formatNumber } from "../../../../game/lib/game/format-number";
 import RewardListItemProps from "./types/reward-list-item-props";
 
 export default class RewardListItem extends React.Component<

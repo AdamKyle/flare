@@ -1,6 +1,6 @@
 import React from "react";
-import Tabs from "../../../components/ui/tabs/tabs";
-import TabPanel from "../../../components/ui/tabs/tab-panel";
+import Tabs from "../../../../game/components/ui/tabs/tabs";
+import TabPanel from "../../../../game/components/ui/tabs/tab-panel";
 import GuideQuestLayoutProps from "./types/guide-quest-layout-props";
 
 export default class TabLayout extends React.Component<

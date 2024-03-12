@@ -1,11 +1,11 @@
 import React from "react";
-import Dialogue from "../../../components/ui/dialogue/dialogue";
-import ComponentLoading from "../../../components/ui/loading/component-loading";
+import Dialogue from "../../../../game/components/ui/dialogue/dialogue";
+import ComponentLoading from "../../../../game/components/ui/loading/component-loading";
 import { AxiosError, AxiosResponse } from "axios";
-import Ajax from "../../../lib/ajax/ajax";
-import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
-import SuccessAlert from "../../../components/ui/alerts/simple-alerts/success-alert";
-import DangerAlert from "../../../components/ui/alerts/simple-alerts/danger-alert";
+import Ajax from "../../../../game/lib/ajax/ajax";
+import LoadingProgressBar from "../../../../game/components/ui/progress-bars/loading-progress-bar";
+import SuccessAlert from "../../../../game/components/ui/alerts/simple-alerts/success-alert";
+import DangerAlert from "../../../../game/components/ui/alerts/simple-alerts/danger-alert";
 import {
     guideQuestLabelBuilder,
     getRequirementKey,
@@ -15,7 +15,7 @@ import RequiredListItem from "../components/required-list-item";
 import { questRewardKeys } from "../lib/guide-quests-rewards";
 import RewardListItem from "../components/reward-list-item";
 import TabLayout from "../components/tab-labout";
-import InfoAlert from "../../../components/ui/alerts/simple-alerts/info-alert";
+import InfoAlert from "../../../../game/components/ui/alerts/simple-alerts/info-alert";
 import clsx from "clsx";
 
 enum EVENT_TYPE {

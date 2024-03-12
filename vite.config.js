@@ -11,6 +11,7 @@ export default defineConfig({
             'resources/js/admin-app.ts',
             'resources/js/shop-component.ts',
             'resources/js/player-event-calendar-component.ts',
+            'resources/js/guide-quests-init.tsx',
             'resources/js/items-table-component.ts',
             'resources/js/vendor/theme-script.js',
             'resources/vendor/theme/assets/js/dark-mode/dark-mode.js',

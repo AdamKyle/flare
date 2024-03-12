@@ -1,10 +1,15 @@
 import React, { Fragment } from "react";
-import SuccessOutlineButton from "../../components/ui/buttons/success-outline-button";
+import SuccessOutlineButton from "../../../game/components/ui/buttons/success-outline-button";
 import GuideQuest from "./modals/guide-quest";
-import { viewPortWatcher } from "../../lib/view-port-watcher";
+import { viewPortWatcher } from "../../../game/lib/view-port-watcher";
+import GuideQuestListenerDefinition from "./event-listeners/guide-quest-listener-definition";
+import {guideQuestServiceContainer} from "./container/guide-quest-container";
+import GuideQuestListener from "./event-listeners/guide-quest-listener";
 
 export default class GuideButton extends React.Component<any, any> {
     private guideQuestButton: any;
+
+    private guideQuestListener: GuideQuestListenerDefinition;
 
     constructor(props: any) {
         super(props);
@@ -15,10 +20,10 @@ export default class GuideButton extends React.Component<any, any> {
             view_port: 0,
         };
 
-        // @ts-ignore
-        this.guideQuestButton = Echo.private(
-            "guide-quest-button-" + this.props.user_id
-        );
+        this.guideQuestListener = guideQuestServiceContainer().fetch(GuideQuestListener);
+        this.guideQuestListener.initialize(this, this.props.user_id);
+
+        this.guideQuestListener.register();
     }
 
     componentDidMount() {
@@ -44,15 +49,7 @@ export default class GuideButton extends React.Component<any, any> {
             process.env.APP_ENV === "production" ? 3500 : 500
         );
 
-        // @ts-ignore
-        this.guideQuestButton.listen(
-            "Game.GuideQuests.Events.RemoveGuideQuestButton",
-            (event: any) => {
-                this.setState({
-                    show_button: false,
-                });
-            }
-        );
+        this.guideQuestListener.listen();
     }
 
     manageGuideQuestModal() {

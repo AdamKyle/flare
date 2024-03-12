@@ -1,6 +1,7 @@
 import { createRoot } from 'react-dom/client';
 import React from "react";
-import GuideButton from "./guide-button";
+import "reflect-metadata"
+import GuideButton from "./individual-components/player-components/guide-quests/guide-button";
 
 type UserIdProps = {userId: number;}
 
