@@ -5,7 +5,6 @@ namespace App\Flare\Models;
 use Bkwld\Cloner\Cloneable;
 use Database\Factories\ItemFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Flare\Models\ItemSkillProgression;
 use App\Flare\Models\Traits\CalculateSkillBonus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
