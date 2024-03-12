@@ -218,10 +218,10 @@ class EndScheduledEvent extends Command {
     /**
      * Ends a weekly currency event
      *
-     * @param ScheduledEvent $event
      * @return void
      */
-    protected function endWeeklyCurrencyDrops() {
+    protected function endWeeklyCurrencyDrops(): void
+    {
         $event = Event::where('type', EventType::WEEKLY_CURRENCY_DROPS)->first();
 
         event(new GlobalMessageEvent('Weekly currency drops have come to an end! Come back next sunday for another chance!'));
@@ -238,10 +238,10 @@ class EndScheduledEvent extends Command {
     /**
      * End Weekly Celestial Spawn Event
      *
-     * @param ScheduledEvent $event
      * @return void
      */
-    protected function endWeeklySpawnEvent() {
+    protected function endWeeklySpawnEvent(): void
+    {
         $event = Event::where('type', EventType::WEEKLY_CELESTIALS)->first();
 
         event(new GlobalMessageEvent('The Creator has managed to close the gates and lock the Celestials away behind the doors of Kalitorm! Come back next week for another chance at the hunt!'));

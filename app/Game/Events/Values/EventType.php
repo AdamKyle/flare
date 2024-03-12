@@ -21,7 +21,7 @@ class EventType {
 
     const GOLD_MINES            = 6;
 
-    const THE_OLD_CHURCH         = 7;
+    const THE_OLD_CHURCH        = 7;
 
     /**
      * @var int $value
