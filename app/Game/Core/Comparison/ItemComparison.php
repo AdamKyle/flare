@@ -4,7 +4,9 @@ namespace App\Game\Core\Comparison;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
+use App\Flare\ServerFight\Fight\CharacterAttacks\Types\WeaponType;
 use App\Flare\Traits\IsItemUnique;
+use App\Flare\Values\SpellTypes;
 use Illuminate\Database\Eloquent\Collection;
 
 class ItemComparison {
@@ -36,26 +38,44 @@ class ItemComparison {
 
         $comparison = [];
 
-        foreach($inventorySlots as $slot) {
+        $positions = match($toCompare->type) {
+            'spell-damage',
+            'spell-healing' => ['spell-one', 'spell-two'],
+            'weapon',
+            'mace',
+            'gun',
+            'fan',
+            'scratch-awl',
+            'stave',
+            'bow',
+            'hammer',
+            'shield' => ['left-hand', 'right-hand'],
+            'ring' => ['ring-one', 'ring-two'],
+            default => [$toCompare->type]
+        };
 
-            if ($slot->position !== null) {
-                $result = $this->fetchHandComparison($toCompare, $inventorySlots, $slot->position);
+        $foundInventorySlots = $inventorySlots->filter(function($slot) use($positions) {
+            return in_array($slot->position, $positions);
+        });
 
-                if (!empty($result)) {
+        foreach($foundInventorySlots as $slot) {
 
-                    $result['position']            = $slot->position;
-                    $result['is_unique']           = $this->isUnique($slot->item);
-                    $result['is_mythic']           = $slot->item->is_mythic;
-                    $result['affix_count']         = $slot->item->affix_count;
-                    $result['holy_stacks_applied'] = $slot->item->holy_stacks_applied;
-                    $result['type']                = $slot->item->type;
+            $result = $this->fetchHandComparison($toCompare, $inventorySlots, $slot->position);
 
-                    $comparison[] = $result;
-                }
+            if (!empty($result)) {
+
+                $result['position']            = $slot->position;
+                $result['is_unique']           = $this->isUnique($slot->item);
+                $result['is_mythic']           = $slot->item->is_mythic;
+                $result['affix_count']         = $slot->item->affix_count;
+                $result['holy_stacks_applied'] = $slot->item->holy_stacks_applied;
+                $result['type']                = $slot->item->type;
+
+                $comparison[] = $result;
             }
         }
 
-        return $comparison;
+        return array_reverse($comparison);
     }
 
     public function getDamageAdjustment(Item $toCompare, Item $equipped): int {
@@ -184,7 +204,6 @@ class ItemComparison {
     }
 
     protected function fetchHandComparison(Item $toCompare, Collection $inventorySlots, string $hand): array {
-
         $foundPosition = $inventorySlots->filter(function($slot) use ($hand) {
             return $slot->position === $hand;
         })->first();
