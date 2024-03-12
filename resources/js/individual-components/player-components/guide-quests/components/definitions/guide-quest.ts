@@ -1,4 +1,5 @@
 export default interface GuideQuest {
+    [key: string]: any;
     id: number;
     name: string;
     intro_text: string;

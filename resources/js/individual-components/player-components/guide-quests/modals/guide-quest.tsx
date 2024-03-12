@@ -70,11 +70,18 @@ export default class GuideQuest extends React.Component<GuideQuestProps, GuideQu
     }
 
     fetchRequiredKeys(): string[] {
+
+        if (this.state.quest_data === null) {
+            return ['UNKNOWN']
+        }
+
         return Object.keys(this.state.quest_data).filter((key: string) => {
-            return (
-                (key.startsWith("required_") || key.startsWith("secondary_")) &&
-                this.state.quest_data[key] !== null
-            );
+            if (this.state.quest_data !== null) {
+                return (
+                    (key.startsWith("required_") || key.startsWith("secondary_")) &&
+                    this.state.quest_data[key] !== null
+                );
+            }
         });
     }
 
@@ -82,6 +89,10 @@ export default class GuideQuest extends React.Component<GuideQuestProps, GuideQu
         const requirementsList: JSX.Element[] = [];
 
         this.fetchRequiredKeys().forEach((key: string) => {
+            if (this.state.quest_data === null) {
+                return [];
+            }
+
             let label = guideQuestLabelBuilder(key, this.state.quest_data);
 
             if (label !== null) {
@@ -115,6 +126,10 @@ export default class GuideQuest extends React.Component<GuideQuestProps, GuideQu
         const items: JSX.Element[] = [];
 
         questRewardKeys().forEach((key: string) => {
+            if (this.state.quest_data === null) {
+                return [];
+            }
+
             if (this.state.quest_data[key] !== null) {
                 const label = key
                     .split("_")
