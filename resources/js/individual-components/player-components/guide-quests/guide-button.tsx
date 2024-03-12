@@ -5,13 +5,15 @@ import { viewPortWatcher } from "../../../game/lib/view-port-watcher";
 import GuideQuestListenerDefinition from "./event-listeners/guide-quest-listener-definition";
 import {guideQuestServiceContainer} from "./container/guide-quest-container";
 import GuideQuestListener from "./event-listeners/guide-quest-listener";
+import GuideButtonProps from "./types/guide-button-props";
+import GuideButtonState from "./types/guide-button-state";
 
-export default class GuideButton extends React.Component<any, any> {
+export default class GuideButton extends React.Component<GuideButtonProps, GuideButtonState> {
     private guideQuestButton: any;
 
     private guideQuestListener: GuideQuestListenerDefinition;
 
-    constructor(props: any) {
+    constructor(props: GuideButtonProps) {
         super(props);
 
         this.state = {

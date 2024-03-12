@@ -1,5 +1,7 @@
 import {container, InjectionToken} from 'tsyringe';
 import GuideQuestListener from "../event-listeners/guide-quest-listener";
+import ShopAjax from "../../shop/ajax/shop-ajax";
+import GuideQuestAjax from "../ajax/guide-quest-ajax";
 
 class GuideQuestContainer {
 
@@ -10,6 +12,10 @@ class GuideQuestContainer {
         this.register('GuideQuestListenerDefinition', {
             useClass: GuideQuestListener
         })
+
+        this.register('guide-quest-ajax', {
+            useClass: GuideQuestAjax
+        });
     }
 
     /**

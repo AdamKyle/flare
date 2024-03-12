@@ -1,33 +1,35 @@
 import React from "react";
 import Dialogue from "../../../../game/components/ui/dialogue/dialogue";
 import ComponentLoading from "../../../../game/components/ui/loading/component-loading";
-import { AxiosError, AxiosResponse } from "axios";
-import Ajax from "../../../../game/lib/ajax/ajax";
 import LoadingProgressBar from "../../../../game/components/ui/progress-bars/loading-progress-bar";
 import SuccessAlert from "../../../../game/components/ui/alerts/simple-alerts/success-alert";
 import DangerAlert from "../../../../game/components/ui/alerts/simple-alerts/danger-alert";
-import {
-    guideQuestLabelBuilder,
-    getRequirementKey,
-    buildValueLink,
-} from "../lib/guide-quest-label-builder";
+import {buildValueLink, getRequirementKey, guideQuestLabelBuilder,} from "../lib/guide-quest-label-builder";
 import RequiredListItem from "../components/required-list-item";
-import { questRewardKeys } from "../lib/guide-quests-rewards";
+import {questRewardKeys} from "../lib/guide-quests-rewards";
 import RewardListItem from "../components/reward-list-item";
 import TabLayout from "../components/tab-labout";
 import InfoAlert from "../../../../game/components/ui/alerts/simple-alerts/info-alert";
 import clsx from "clsx";
+import GuideQuestProps from "./types/guide-quest-props";
+import GuideQuestState from "./types/guide-quest-state";
+import GuideQuestAjax, {GUIDE_QUEST_ACTIONS} from "../ajax/guide-quest-ajax";
+import {guideQuestServiceContainer} from "../container/guide-quest-container";
 
 enum EVENT_TYPE {
     WINTER_EVENT = 4,
-};
+}
 
-export default class GuideQuest extends React.Component<any, any> {
-    constructor(props: any) {
+export default class GuideQuest extends React.Component<GuideQuestProps, GuideQuestState> {
+
+    private guideQuestAjax: GuideQuestAjax;
+
+    constructor(props: GuideQuestProps) {
         super(props);
 
         this.state = {
             loading: true,
+            action_loading: false,
             error_message: null,
             success_message: null,
             quest_data: null,
@@ -35,34 +37,13 @@ export default class GuideQuest extends React.Component<any, any> {
             is_handing_in: false,
             completed_requirements: [],
         };
+
+        this.guideQuestAjax = guideQuestServiceContainer().fetch(GuideQuestAjax);
     }
 
     componentDidMount() {
 
-        new Ajax()
-            .setRoute("character/guide-quest/" + this.props.user_id)
-            .doAjaxCall(
-                "get",
-                (result: AxiosResponse) => {
-                    this.setState({
-                        loading: false,
-                        quest_data: result.data.quest,
-                        can_hand_in: result.data.can_hand_in,
-                        completed_requirements:
-                            result.data.completed_requirements,
-                    });
-                },
-                (error: AxiosError) => {
-                    if (typeof error.response !== "undefined") {
-                        const response = error.response;
-
-                        this.setState({
-                            error_message: response.data.message,
-                            is_handing_in: false,
-                        });
-                    }
-                }
-            );
+        this.guideQuestAjax.doGuideQuestAction(this, GUIDE_QUEST_ACTIONS.FETCH);
     }
 
     buildTitle() {
@@ -85,43 +66,7 @@ export default class GuideQuest extends React.Component<any, any> {
     }
 
     handInQuest() {
-        this.setState(
-            {
-                is_handing_in: true,
-            },
-            () => {
-                new Ajax()
-                    .setRoute(
-                        "guide-quests/hand-in/" +
-                            this.props.user_id +
-                            "/" +
-                            this.state.quest_data.id
-                    )
-                    .doAjaxCall(
-                        "post",
-                        (result: AxiosResponse) => {
-                            this.setState({
-                                is_handing_in: false,
-                                quest_data: result.data.quest,
-                                can_hand_in: result.data.can_hand_in,
-                                success_message: result.data.message,
-                                completed_requirements:
-                                    result.data.completed_requirements,
-                            });
-                        },
-                        (error: AxiosError) => {
-                            if (typeof error.response !== "undefined") {
-                                const response = error.response;
-
-                                this.setState({
-                                    error_message: response.data.message,
-                                    is_handing_in: false,
-                                });
-                            }
-                        }
-                    );
-            }
-        );
+        this.guideQuestAjax.doGuideQuestAction(this, GUIDE_QUEST_ACTIONS.HAND_IN);
     }
 
     fetchRequiredKeys(): string[] {
@@ -142,7 +87,7 @@ export default class GuideQuest extends React.Component<any, any> {
             if (label !== null) {
                 const requiredKey = getRequirementKey(key);
                 const value = this.state.quest_data[requiredKey];
-                const completedRequirements = this.state.completed_requirements;
+                const completedRequirements: string[] = this.state.completed_requirements || [];
 
                 const isFinished =
                     completedRequirements.includes(key) ||
