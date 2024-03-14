@@ -224,6 +224,10 @@ class EndScheduledEvent extends Command {
     {
         $event = Event::where('type', EventType::WEEKLY_CURRENCY_DROPS)->first();
 
+        if (is_null($event)) {
+            return;
+        }
+
         event(new GlobalMessageEvent('Weekly currency drops have come to an end! Come back next sunday for another chance!'));
 
         $announcement = Announcement::where('event_id', $event->id)->first();
@@ -243,6 +247,10 @@ class EndScheduledEvent extends Command {
     protected function endWeeklySpawnEvent(): void
     {
         $event = Event::where('type', EventType::WEEKLY_CELESTIALS)->first();
+
+        if (is_null($event)) {
+            return;
+        }
 
         event(new GlobalMessageEvent('The Creator has managed to close the gates and lock the Celestials away behind the doors of Kalitorm! Come back next week for another chance at the hunt!'));
 
@@ -268,6 +276,10 @@ class EndScheduledEvent extends Command {
                                       ExplorationAutomationService $explorationAutomationService) {
 
         $event = Event::where('type', EventType::WINTER_EVENT)->first();
+
+        if (is_null($event)) {
+            return;
+        }
 
         $kingdomEventService->handleKingdomRewardsForEvent(MapNameValue::ICE_PLANE);
 
