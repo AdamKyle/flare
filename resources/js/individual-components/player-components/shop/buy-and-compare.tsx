@@ -109,7 +109,8 @@ export default class BuyAndCompare extends React.Component<BuyAndCompareProps, B
                     <ItemComparison comparison_info={this.state.comparison_data}
                                     is_showing_expanded_comparison={this.state.is_showing_expanded_comparison}
                                     manage_show_expanded_comparison={this.updateIsShowingExpandedLocation.bind(this)}
-                                    handle_buy_and_replace={this.buyAndReplaceItem.bind(this)}
+                                    handle_replace_action={this.buyAndReplaceItem.bind(this)}
+                                    replace_button_text={'Buy and Replace'}
                     />
                 </BasicCard>
             </div>

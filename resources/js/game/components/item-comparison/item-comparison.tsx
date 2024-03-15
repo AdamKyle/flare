@@ -6,17 +6,19 @@ import PrimaryOutlineButton from "../ui/buttons/primary-outline-button";
 import SuccessOutlineButton from "../ui/buttons/success-outline-button";
 import ComparisonDetails from "./deffinitions/comparison-details";
 import ExpandedComparison from "./expanded-comparison";
-import ShopAjax, {SHOP_ACTIONS} from "../../../individual-components/player-components/shop/ajax/shop-ajax";
-import {shopServiceContainer} from "../../../individual-components/player-components/shop/container/shop-container";
 import {ItemType} from "../items/enums/item-type";
 import WarningAlert from "../ui/alerts/simple-alerts/warning-alert";
-import InfoAlert from "../ui/alerts/simple-alerts/info-alert";
 import { startCase } from "lodash";
 import {formatNumber} from "../../lib/game/format-number";
+import clsx from "clsx";
+
+const twoHandedWeapons = [
+    ItemType.STAVE,
+    ItemType.BOW,
+    ItemType.HAMMER
+];
 
 export default class ItemComparison extends React.Component<ItemComparisonProps, any> {
-
-    private ajax: ShopAjax;
 
     constructor(props: ItemComparisonProps) {
         super(props);
@@ -27,8 +29,6 @@ export default class ItemComparison extends React.Component<ItemComparisonProps,
             error_message: null,
             expanded_comparison_details: null,
         }
-
-        this.ajax = shopServiceContainer().fetch(ShopAjax);
     }
 
     componentDidUpdate(prevProps: Readonly<ItemComparisonProps>) {
@@ -40,7 +40,7 @@ export default class ItemComparison extends React.Component<ItemComparisonProps,
         }
     }
 
-    renderEquipButtons(isInline?: boolean): ReactNode {
+    renderEquipButtons(isInline: boolean, comparisonItemType?: ItemType): ReactNode {
         const singleHandedItems = [
             ItemType.FAN,
             ItemType.WEAPON,
@@ -50,19 +50,19 @@ export default class ItemComparison extends React.Component<ItemComparisonProps,
             ItemType.SHIELD,
         ]
 
-        const twoHandedWeapons = [
-            ItemType.STAVE,
-            ItemType.BOW,
-            ItemType.HAMMER
-        ];
+        if (comparisonItemType) {
+            if (twoHandedWeapons.includes(comparisonItemType)) {
+                return;
+            }
+        }
 
         const itemType = this.props.comparison_info.itemToEquip.type as ItemType;
 
         if (singleHandedItems.includes(itemType)) {
             return (
                 <div className='flex justify-center'>
-                    <PrimaryOutlineButton button_label={'Left Hand'} on_click={() => this.props.handle_buy_and_replace('left-hand')} />
-                    <PrimaryOutlineButton button_label={'Right Hand'} on_click={() => this.props.handle_buy_and_replace('right-hand')} additional_css={'ml-4'} />
+                    <PrimaryOutlineButton button_label={'Left Hand'} on_click={() => this.props.handle_replace_action('left-hand')} />
+                    <PrimaryOutlineButton button_label={'Right Hand'} on_click={() => this.props.handle_replace_action('right-hand')} additional_css={'ml-4'} />
                 </div>
             )
         }
@@ -79,8 +79,8 @@ export default class ItemComparison extends React.Component<ItemComparisonProps,
                      }
 
                     <div className='flex justify-center'>
-                        <PrimaryOutlineButton button_label={'Left Hand'} on_click={() => this.props.handle_buy_and_replace('left-hand')} />
-                        <PrimaryOutlineButton button_label={'Right Hand'} on_click={() => this.props.handle_buy_and_replace('right-hand')} additional_css={'ml-4'} />
+                        <PrimaryOutlineButton button_label={'Left Hand'} on_click={() => this.props.handle_replace_action('left-hand')} />
+                        <PrimaryOutlineButton button_label={'Right Hand'} on_click={() => this.props.handle_replace_action('right-hand')} additional_css={'ml-4'} />
                     </div>
                  </>
             )
@@ -89,8 +89,8 @@ export default class ItemComparison extends React.Component<ItemComparisonProps,
         if (ItemType.RING === itemType) {
             return (
                 <div className='flex justify-center'>
-                    <PrimaryOutlineButton button_label={'Ring One'} on_click={() => this.props.handle_buy_and_replace('ring-one')} />
-                    <PrimaryOutlineButton button_label={'Ring Two'} on_click={() => this.props.handle_buy_and_replace('ring-two')} additional_css={'ml-4'} />
+                    <PrimaryOutlineButton button_label={'Ring One'} on_click={() => this.props.handle_replace_action('ring-one')} />
+                    <PrimaryOutlineButton button_label={'Ring Two'} on_click={() => this.props.handle_replace_action('ring-two')} additional_css={'ml-4'} />
                 </div>
             )
         }
@@ -98,16 +98,15 @@ export default class ItemComparison extends React.Component<ItemComparisonProps,
         if ([ItemType.SPELL_DAMAGE, ItemType.SPELL_HEALING].includes(itemType)) {
             return (
                 <div className='flex justify-center'>
-                    <PrimaryOutlineButton button_label={'Spell One'} on_click={() => this.props.handle_buy_and_replace('spell-one')} />
-                    <PrimaryOutlineButton button_label={'Spell Two'} on_click={() => this.props.handle_buy_and_replace('spell-two')} additional_css={'ml-4'} />
+                    <PrimaryOutlineButton button_label={'Spell One'} on_click={() => this.props.handle_replace_action('spell-one')} />
+                    <PrimaryOutlineButton button_label={'Spell Two'} on_click={() => this.props.handle_replace_action('spell-two')} additional_css={'ml-4'} />
                 </div>
             )
         }
 
-
         return (
             <div className='flex justify-center'>
-                <PrimaryOutlineButton button_label={'Equip'} on_click={() => this.props.handle_buy_and_replace(this.props.comparison_info.itemToEquip.type)} />
+                <PrimaryOutlineButton button_label={'Equip'} on_click={() => this.props.handle_replace_action(this.props.comparison_info.itemToEquip.type)} />
                 <div className='ml-4 mt-2'>
                     This item has a default position of <strong>{startCase(this.props.comparison_info.itemToEquip.default_position)}</strong> selected for you.
                 </div>
@@ -147,7 +146,7 @@ export default class ItemComparison extends React.Component<ItemComparisonProps,
                                 <PrimaryOutlineButton button_label={'See Expanded Details'} on_click={() => this.showExpandedComparison(this.props.comparison_info.details[0])} />
                             </div>
                             <div>
-                                <SuccessOutlineButton button_label={'Buy and Replace'} on_click={() => this.props.handle_buy_and_replace(this.props.comparison_info.details[0].position)} />
+                                <SuccessOutlineButton button_label={this.props.replace_button_text} on_click={() => this.props.handle_replace_action(this.props.comparison_info.details[0].position)} />
                             </div>
                         </div>
                     </div>
@@ -163,7 +162,7 @@ export default class ItemComparison extends React.Component<ItemComparisonProps,
                                 <PrimaryOutlineButton button_label={'See Expanded Details'} on_click={() => this.showExpandedComparison(this.props.comparison_info.details[1])} />
                             </div>
                             <div>
-                                <SuccessOutlineButton button_label={'Buy and Replace'} on_click={() => this.props.handle_buy_and_replace(this.props.comparison_info.details[1].position)} />
+                                <SuccessOutlineButton button_label={this.props.replace_button_text} on_click={() => this.props.handle_replace_action(this.props.comparison_info.details[1].position)} />
                             </div>
                         </div>
                     </div>
@@ -210,14 +209,17 @@ export default class ItemComparison extends React.Component<ItemComparisonProps,
                                               on_click={() => this.showExpandedComparison(this.props.comparison_info.details[0])}/>
                     </div>
                     <div>
-                        <SuccessOutlineButton button_label={'Buy and Replace'}
-                                              on_click={() => this.props.handle_buy_and_replace(this.props.comparison_info.details[0].position)}/>
+                        <SuccessOutlineButton button_label={this.props.replace_button_text}
+                                              on_click={() => this.props.handle_replace_action(this.props.comparison_info.details[0].position)}/>
                     </div>
                     {
                         nonArmourItems.includes(this.props.comparison_info.itemToEquip.type as ItemType) ?
                             <>
-                                <div className='px-5'>Or (Select position)</div>
-                                {this.renderEquipButtons()}
+                                <div className={clsx('px-5', {
+                                    'hidden': twoHandedWeapons.includes(this.props.comparison_info.details[0].type),
+                                })}>Or (Select position)</div>
+
+                                {this.renderEquipButtons(false, this.props.comparison_info.details[0].type)}
                             </>
                             : null
                     }
