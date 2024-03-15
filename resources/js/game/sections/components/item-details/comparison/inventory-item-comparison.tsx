@@ -14,18 +14,8 @@ import ComparisonSection from "./comparison-section";
 
 export default class InventoryItemComparison extends React.Component<InventoryItemComparisonProps, InventoryItemComparisonState> {
 
-    private tabs: {name: string, key: string}[];
-
     constructor(props: InventoryItemComparisonProps) {
         super(props);
-
-        this.tabs = [{
-            key: 'general',
-            name: 'General'
-        }, {
-            key: 'comparison',
-            name: 'Comparison',
-        }]
 
         this.state = {
             loading: true,
@@ -65,7 +55,7 @@ export default class InventoryItemComparison extends React.Component<InventoryIt
         }
 
         return (
-            <ItemNameColorationText item={{
+            <ItemNameColorationText custom_width={false} item={{
                 name: this.state.comparison_details.itemToEquip.affix_name,
                 type: this.state.comparison_details.itemToEquip.type,
                 affix_count: this.state.comparison_details.itemToEquip.affix_count,

@@ -23,5 +23,5 @@ export default interface ItemAtonement {
         atonements: Atonement,
         elemental_damage: ElementalDamage
     },
-    "inventory_atonements": InventoryAtonements[]|[]
+    inventory_atonements: InventoryAtonements[]|[]
 }

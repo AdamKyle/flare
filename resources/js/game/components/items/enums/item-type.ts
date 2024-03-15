@@ -31,4 +31,7 @@ export enum ItemType {
 
     // Artifact
     ARTIFACT = 'artifact',
+
+    // Gem
+    GEM = 'gem',
 }

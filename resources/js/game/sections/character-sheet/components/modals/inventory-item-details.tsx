@@ -45,7 +45,7 @@ export default class InventoryUseDetails extends React.Component<any, any> {
             return 'There was an error!';
         }
 
-        return <ItemNameColorationText item={this.state.item} />;
+        return <ItemNameColorationText custom_width={false} item={this.state.item} />;
     }
 
     largeModal() {

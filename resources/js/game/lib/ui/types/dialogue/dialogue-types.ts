@@ -1,4 +1,4 @@
-import React from "react";
+import React, {ReactNode} from "react";
 
 export default interface DialogueTypes {
 
@@ -20,7 +20,7 @@ export default interface DialogueTypes {
         handle_action: (args: any) => void;
     };
 
-    title: string | JSX.Element;
+    title: ReactNode | string;
 
     large_modal?: boolean;
 

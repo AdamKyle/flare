@@ -5,6 +5,7 @@ export default interface ItemDefinition {
     affects_skills: any[]; // or specify the type if known
     affix_count: number;
     affix_damage_reduction: number;
+    affix_name: string;
     agi_modifier: number;
     ambush_chance: number;
     ambush_resistance: number;
@@ -14,13 +15,13 @@ export default interface ItemDefinition {
     raw_ac: number;
     raw_healing: number;
     base_ac: number;
-    base_ac_mod: any; // specify the type if known
+    base_ac_mod: number;
     base_ac_mod_bonus: number;
     base_damage: number;
     base_damage_mod: number;
     base_damage_mod_bonus: number;
     base_healing: number;
-    base_healing_mod: any; // specify the type if known
+    base_healing_mod: number;
     base_healing_mod_bonus: number;
     can_resurrect: boolean;
     can_use_on_other_items: boolean;
@@ -40,7 +41,7 @@ export default interface ItemDefinition {
     fight_time_out_mod_bonus: number;
     focus_modifier: number;
     healing_reduction: number;
-    holy_level: any; // specify the type if known
+    holy_level: number;
     holy_stack_devouring_darkness: number;
     holy_stack_stat_bonus: number;
     holy_stacks: number;
@@ -57,16 +58,16 @@ export default interface ItemDefinition {
     item_prefix: any; // specify the type if known
     item_suffix: any; // specify the type if known
     kingdom_damage: number;
-    lasts_for: any; // specify the type if known
+    lasts_for: number;
     min_cost: number;
     move_time_out_mod_bonus: number;
     name: string;
     resurrection_chance: number;
-    skill_bonus: any; // specify the type if known
+    skill_bonus: number;
     skill_level_req: number;
     skill_level_trivial: number;
-    skill_name: any; // specify the type if known
-    skill_training_bonus: any; // specify the type if known
+    skill_name: string;
+    skill_training_bonus: number;
     socket_amount: number;
     sockets: any[]; // or specify the type if known
     spell_evasion: number;
@@ -74,5 +75,5 @@ export default interface ItemDefinition {
     str_modifier: number;
     type: ItemType;
     usable: boolean;
-    xp_bonus: any; // specify the type if known
+    xp_bonus: number;
 }

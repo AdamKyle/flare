@@ -97,6 +97,7 @@ export default class ItemComparison extends React.Component<any, any> {
                     </span>
                 ) : (
                     <ItemNameColorationText
+                        custom_width={false}
                         item={{
                             name: this.getTheName(),
                             type: this.state.comparison_details.itemToEquip
@@ -130,22 +131,6 @@ export default class ItemComparison extends React.Component<any, any> {
                 </div>
             </div>
         );
-    }
-
-    isLargeModal() {
-        if (this.state.comparison_details !== null) {
-            if (this.state.comparison_details.itemToEquip.type === "gem") {
-                return false;
-            }
-
-            if (this.state.comparison_details.itemToEquip.type !== "quest") {
-                return this.state.comparison_details.details.length === 2;
-            }
-
-            return this.props.view_port > 1600;
-        }
-
-        return false;
     }
 
     isGridSize(
@@ -205,7 +190,7 @@ export default class ItemComparison extends React.Component<any, any> {
 
         return (
             <ComparisonSection
-                is_large_modal={this.isLargeModal()}
+                is_large_modal={true}
                 is_grid_size={this.isGridSize.bind(this)}
                 comparison_details={this.state.comparison_details}
                 set_action_loading={this.setStatusToLoading.bind(this)}
@@ -227,7 +212,7 @@ export default class ItemComparison extends React.Component<any, any> {
                     is_open={this.props.is_open}
                     handle_close={this.props.manage_modal}
                     title={"You are dead"}
-                    large_modal={false}
+                    large_modal={true}
                     primary_button_disabled={false}
                 >
                     <p className="text-red-700 dark:text-red-400">
@@ -245,7 +230,7 @@ export default class ItemComparison extends React.Component<any, any> {
                 handle_close={this.props.manage_modal}
                 title={this.buildTitle()}
                 large_modal={
-                    this.state.error_message === null && this.isLargeModal()
+                    true
                 }
                 primary_button_disabled={this.state.action_loading}
             >

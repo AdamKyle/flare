@@ -57,4 +57,9 @@ export default interface ItemToEquip {
     damage: number,
     class_bonus: number,
     skills: any[]|[]
+    item: {
+        gem: {
+            name: string;
+        }
+    }
 }

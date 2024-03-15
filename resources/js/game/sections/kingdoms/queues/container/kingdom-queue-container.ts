@@ -1,6 +1,6 @@
 
-import CancellationAjax from "../ajax/cancellation-ajax";
 import {CoreContainer} from "../../../../lib/containers/core-container";
+import CancellationAjax from "../ajax/cancellation-ajax";
 
 /**
  * Register core dependencies here.
@@ -11,7 +11,7 @@ import {CoreContainer} from "../../../../lib/containers/core-container";
  * @param container
  */
 function kingdomQueueContainer(container: CoreContainer) {
-    container.register('cancellation-ajax', {
+    container.register('kingdom-cancellation-ajax', {
         useClass: CancellationAjax
     });
 }
