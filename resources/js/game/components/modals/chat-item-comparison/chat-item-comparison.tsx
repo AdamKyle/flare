@@ -3,9 +3,10 @@ import {ChatItemComparisonProps} from "./types/chat-item-comparison-props";
 import {ChatItemComparisonState} from "./types/chat-item-comparison-state";
 import Dialogue from "../../ui/dialogue/dialogue";
 import ChatItemComparisonModalTitle from "./chat-item-comparison-modal-title";
-import ComponentLoading from "../../ui/loading/component-loading";
 import ChatItemComparisonAjax from "./ajax/chat-item-comparison-ajax";
 import {serviceContainer} from "../../../lib/containers/core-container";
+import LoadingProgressBar from "../../ui/progress-bars/loading-progress-bar";
+import ItemView from "./item-view";
 
 export default class ChatItemComparison extends React.Component<ChatItemComparisonProps, ChatItemComparisonState> {
 
@@ -53,11 +54,10 @@ export default class ChatItemComparison extends React.Component<ChatItemComparis
                 primary_button_disabled={this.state.action_loading}
             >
                 {
-                    this.state.loading ?
-                        <ComponentLoading />
-                    : <>
-                        Put content here ...
-                    </>
+                    this.state.loading || this.state.comparison_details === null ?
+                        <LoadingProgressBar />
+                    :
+                        <ItemView item={this.state.comparison_details.itemToEquip} />
                 }
             </Dialogue>
         );

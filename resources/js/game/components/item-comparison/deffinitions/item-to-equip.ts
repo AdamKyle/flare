@@ -1,4 +1,5 @@
 export default interface ItemToEquip {
+    [key: string]: any;
     id: number,
     item_id: number,
     description: string,
@@ -26,7 +27,6 @@ export default interface ItemToEquip {
     base_damage_mod_bonus: number,
     base_healing_mod_bonus: number,
     base_ac_mod_bonus: number,
-    fight_time_out_mod_bonus: number,
     resurrection_chance: number,
     spell_evasion: number,
     artifact_annulment: number,
@@ -56,7 +56,19 @@ export default interface ItemToEquip {
     entranced_chance: number,
     damage: number,
     class_bonus: number,
-    skills: any[]|[]
+    skills: any[]|[];
+
+    damages_kingdoms: boolean;
+    kingdom_damage: number;
+    can_stack: boolean;
+    gain_additional_level: boolean;
+    xp_bonus: number;
+    lasts_for: number;
+    move_time_out_mod_bonus: number;
+    fight_time_out_mod_bonus: number;
+    increase_skill_bonus_by: number;
+    increase_skill_training_bonus_by: number;
+
     item: {
         gem: {
             name: string;

@@ -23,7 +23,7 @@ export default class ChatItemComparisonModalTitle extends React.Component<ChatIt
         }
     }
 
-    return () {
+    render () {
         return (
             <div className="grid grid-cols-2 gap-2">
                 {this.props.itemToEquip.type === ItemType.GEM ? (

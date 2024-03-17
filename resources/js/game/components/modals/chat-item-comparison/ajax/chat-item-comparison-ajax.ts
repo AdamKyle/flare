@@ -24,15 +24,23 @@ export default class ChatItemComparisonAjax {
                 });
             },
             (error: AxiosError) => {
+
+                component.setState({ loading: false});
+
                 if (typeof error.response !== "undefined") {
                     const response = error.response;
 
                     if (response.status === 404) {
                         component.setState({
                             error_message: "Item no longer exists in your inventory...",
-                            loading: false,
                         });
+
+                        return;
                     }
+
+                    component.setState({
+                        error_message: error.response.data.message,
+                    });
                 }
             }
         );

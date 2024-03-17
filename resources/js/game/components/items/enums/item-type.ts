@@ -34,4 +34,10 @@ export enum ItemType {
 
     // Gem
     GEM = 'gem',
+
+    // Alchemy items
+    ALCHEMY = 'alchemy',
+
+    // Quest Items
+    QUEST = 'quest',
 }

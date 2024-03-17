@@ -177,7 +177,6 @@ export default class GameChat extends React.Component<GameChatProps, GameChatSta
                 id: event.id + '-' + (Math.random() + 1).toString(36).substring(7),
                 message: event.message,
                 event_id: event.id,
-                is_quest_item: event.isQuestItem,
             });
 
             this.setState({

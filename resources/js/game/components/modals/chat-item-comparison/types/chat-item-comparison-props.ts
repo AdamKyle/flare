@@ -4,5 +4,4 @@ export interface ChatItemComparisonProps {
     character_id: number;
     slot_id: number;
     is_automation_running: boolean;
-    is_dead: boolean;
 }

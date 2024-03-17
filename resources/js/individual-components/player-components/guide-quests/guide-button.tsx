@@ -48,7 +48,7 @@ export default class GuideButton extends React.Component<GuideButtonProps, Guide
                     });
                 }
             },
-            process.env.APP_ENV === "production" ? 3500 : 500
+            (import.meta as any).env.VITE_APP_ENV === "production" ? 3500 : 500
         );
 
         this.guideQuestListener.listen();

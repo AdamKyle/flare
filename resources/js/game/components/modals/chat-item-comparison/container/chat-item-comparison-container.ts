@@ -1,6 +1,7 @@
 
 import {CoreContainer} from "../../../../lib/containers/core-container";
 import ChatItemComparisonAjax from "../../../../components/modals/chat-item-comparison/ajax/chat-item-comparison-ajax";
+import ItemHolyEffects from "../values/item-holy-effects";
 
 /**
  * Register core dependencies here.
@@ -13,6 +14,10 @@ import ChatItemComparisonAjax from "../../../../components/modals/chat-item-comp
 function chatItemComparisonContainer(container: CoreContainer) {
     container.register('chat-item-comparison-ajax', {
         useClass: ChatItemComparisonAjax
+    });
+
+    container.register('item-holy-effects', {
+        useClass: ItemHolyEffects
     });
 }
 

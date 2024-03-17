@@ -4,6 +4,7 @@ import ItemComparison from "./modals/item-comparison";
 import ServerMessagesComponentProps from "./types/components/server-messages-component-props";
 import ServerMessagesComponentState from "./types/components/server-messages-component-state";
 import { viewPortWatcher } from "../../lib/view-port-watcher";
+import ChatItemComparison from "../../components/modals/chat-item-comparison/chat-item-comparison";
 
 export default class ServerMessages extends React.Component<ServerMessagesComponentProps, ServerMessagesComponentState> {
 
@@ -46,12 +47,11 @@ export default class ServerMessages extends React.Component<ServerMessagesCompon
 
                 {
                     this.state.view_item && this.state.slot_id !== 0 ?
-                        <ItemComparison
+                        <ChatItemComparison
                             is_open={this.state.view_item}
                             manage_modal={this.viewItem.bind(this)}
                             character_id={this.props.character_id}
                             slot_id={this.state.slot_id}
-                            view_port={this.props.view_port}
                             is_automation_running={this.props.is_automation_running}
                         />
                     : null
