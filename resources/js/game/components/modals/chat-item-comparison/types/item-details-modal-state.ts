@@ -13,7 +13,7 @@ export interface ChatItemComparisonDialogueSecondaryActions {
     handle_action: (args: any) => void;
 }
 
-export interface ChatItemComparisonState {
+export interface ItemDetailsModalState {
     comparison_details: ComparisonData | null;
     usable_sets: UsableSets[] | [];
     action_loading: boolean;

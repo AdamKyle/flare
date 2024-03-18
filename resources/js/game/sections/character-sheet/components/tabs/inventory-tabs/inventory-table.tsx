@@ -3,10 +3,10 @@ import Table from "../../../../../components/ui/data-tables/table";
 import InventoryTabProps from "../../../../../lib/game/character-sheet/types/inventory-tab-props";
 import {BuildInventoryTableColumns} from "../../../../../lib/game/character-sheet/helpers/inventory/build-inventory-table-columns";
 import InventoryDetails from "../../../../../lib/game/character-sheet/types/inventory/inventory-details";
-import InventoryItemComparison from "../../../../components/item-details/comparison/inventory-item-comparison";
 import InventoryItemsTableState from "../../../../../lib/game/character-sheet/types/tables/inventory-items-table-state";
 import UsableItemsDetails from "../../../../../lib/game/character-sheet/types/inventory/usable-items-details";
 import InfoAlert from "../../../../../components/ui/alerts/simple-alerts/info-alert";
+import ItemDetailsModal from "../../../../../components/modals/chat-item-comparison/item-details-modal";
 
 export default class InventoryTable extends React.Component<InventoryTabProps, InventoryItemsTableState> {
 
@@ -51,21 +51,17 @@ export default class InventoryTable extends React.Component<InventoryTabProps, I
 
                 {
                     this.state.view_comparison ?
-                        <InventoryItemComparison
+                        <ItemDetailsModal
                             is_open={this.state.view_comparison}
                             manage_modal={this.closeViewItem.bind(this)}
-                            title={'Comparison'}
                             slot_id={this.state.slot_id}
-                            item_type={this.state.item_type}
                             character_id={this.props.character_id}
                             update_inventory={this.props.update_inventory}
-                            usable_sets={this.props.usable_sets}
                             set_success_message={this.props.set_success_message}
-                            dark_charts={this.props.dark_table}
                             is_dead={this.props.is_dead}
                             is_automation_running={this.props.is_automation_running}
                         />
-                        : null
+                    : null
                 }
             </Fragment>
         );

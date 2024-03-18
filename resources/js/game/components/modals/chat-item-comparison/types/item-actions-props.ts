@@ -1,5 +1,5 @@
 import {ComparisonData} from "../../../item-comparison/deffinitions/comparison-data";
-import {UsableSets} from "./chat-item-comparison-state";
+import {UsableSets} from "./item-details-modal-state";
 import InventoryDetails from "../../../../lib/game/character-sheet/types/inventory/inventory-details";
 
 export default interface ItemActionsProps {
@@ -7,6 +7,7 @@ export default interface ItemActionsProps {
     character_id: number;
     dark_charts: boolean;
     is_automation_running: boolean;
+    is_dead: boolean;
     comparison_details: ComparisonData;
     usable_sets: UsableSets[]|[];
 

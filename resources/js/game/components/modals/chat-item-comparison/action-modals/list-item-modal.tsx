@@ -1,13 +1,13 @@
 import React, { Fragment } from "react";
-import Dialogue from "../../../../../components/ui/dialogue/dialogue";
-import ItemNameColorationText from "../../../../../components/items/item-name/item-name-coloration-text";
-import { MarketBoardLineChart } from "../../../../../components/ui/charts/line-chart";
-import Ajax from "../../../../../lib/ajax/ajax";
+import Dialogue from "../../../ui/dialogue/dialogue";
+import ItemNameColorationText from "../../../items/item-name/item-name-coloration-text";
+import { MarketBoardLineChart } from "../../../ui/charts/line-chart";
+import Ajax from "../../../../lib/ajax/ajax";
 import { AxiosError, AxiosResponse } from "axios";
-import ComponentLoading from "../../../../../components/ui/loading/component-loading";
+import ComponentLoading from "../../../ui/loading/component-loading";
 import { DateTime } from "luxon";
-import InfoAlert from "../../../../../components/ui/alerts/simple-alerts/info-alert";
-import { formatNumber } from "../../../../../lib/game/format-number";
+import InfoAlert from "../../../ui/alerts/simple-alerts/info-alert";
+import { formatNumber } from "../../../../lib/game/format-number";
 
 export default class ListItemModal extends React.Component<any, any> {
     constructor(props: any) {
@@ -130,6 +130,7 @@ export default class ListItemModal extends React.Component<any, any> {
                     <Fragment>
                         <h3 className="mb-4 mt-4">
                             <ItemNameColorationText
+                                custom_width={false}
                                 item={{
                                     ...this.props.item,
                                     ["name"]: this.props.item.affix_name,

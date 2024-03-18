@@ -1,9 +1,9 @@
 import React from "react";
-import Dialogue from "../../../../../components/ui/dialogue/dialogue";
-import {EquipPositions} from "../../../../../lib/game/character-sheet/helpers/inventory/equip-positions";
-import PrimaryButton from "../../../../../components/ui/buttons/primary-button";
+import Dialogue from "../../../ui/dialogue/dialogue";
+import {EquipPositions} from "../../../../lib/game/character-sheet/helpers/inventory/equip-positions";
+import PrimaryButton from "../../../ui/buttons/primary-button";
 import {capitalize} from "lodash";
-import EquipModalProps from "./types/equip-modal-props";
+import EquipModalProps from "../types/equip-modal-props";
 
 export default class EquipModal extends React.Component<EquipModalProps, { }> {
 

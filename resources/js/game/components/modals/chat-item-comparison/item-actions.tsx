@@ -5,10 +5,10 @@ import PrimaryOutlineButton from "../../ui/buttons/primary-outline-button";
 import SuccessOutlineButton from "../../ui/buttons/success-outline-button";
 import DangerOutlineButton from "../../ui/buttons/danger-outline-button";
 import LoadingProgressBar from "../../ui/progress-bars/loading-progress-bar";
-import EquipModal from "../../../sections/components/item-details/comparison/actions/equip-modal";
-import MoveItemModal from "../../../sections/components/item-details/comparison/actions/move-item-modal";
-import SellItemModal from "../../../sections/components/item-details/comparison/actions/sell-item-modal";
-import ListItemModal from "../../../sections/components/item-details/comparison/actions/list-item-modal";
+import EquipModal from "./action-modals/equip-modal";
+import MoveItemModal from "./action-modals/move-item-modal";
+import SellItemModal from "./action-modals/sell-item-modal";
+import ListItemModal from "./action-modals/list-item-modal";
 import InventoryUseDetails from "../../../sections/character-sheet/components/modals/inventory-item-details";
 import InventoryComparisonActionsAjax
     from "./ajax/inventory-comparison-actions-ajax";
@@ -260,13 +260,14 @@ export default class ItemActions extends React.Component<ItemActionsProps, ItemA
                         disabled={
                             this.state.show_loading_label ||
                             this.props.is_automation_running ||
+                            this.props.is_dead ||
                             this.state.has_updated_item
                         }
                     />
                     <PrimaryOutlineButton
                         button_label={"Move"}
                         on_click={this.manageMoveModalModal.bind(this)}
-                        disabled={this.state.show_loading_label || this.state.has_updated_item}
+                        disabled={this.state.show_loading_label || this.state.has_updated_item || this.props.is_dead}
                     />
 
                     {this.props.comparison_details.itemToEquip.type !==
@@ -280,7 +281,7 @@ export default class ItemActions extends React.Component<ItemActionsProps, ItemA
                                     this.props.comparison_details.itemToEquip
                                 )
                             }
-                            disabled={this.state.show_loading_label || this.state.has_updated_item}
+                            disabled={this.state.show_loading_label || this.state.has_updated_item || this.props.is_dead}
                         />
                     ) : null}
 
@@ -300,6 +301,7 @@ export default class ItemActions extends React.Component<ItemActionsProps, ItemA
                             disabled={
                                 this.state.show_loading_label ||
                                 this.props.is_automation_running ||
+                                this.props.is_dead ||
                                 this.state.has_updated_item
                             }
                         />
@@ -310,14 +312,14 @@ export default class ItemActions extends React.Component<ItemActionsProps, ItemA
                         <DangerOutlineButton
                             button_label={"Disenchant"}
                             on_click={this.disenchantItem.bind(this)}
-                            disabled={this.state.show_loading_label || this.state.has_updated_item}
+                            disabled={this.state.show_loading_label || this.state.has_updated_item || this.props.is_dead}
                         />
                     ) : null}
 
                     <DangerOutlineButton
                         button_label={"Destroy"}
                         on_click={this.destroyItem.bind(this)}
-                        disabled={this.state.show_loading_label || this.state.has_updated_item}
+                        disabled={this.state.show_loading_label || this.state.has_updated_item || this.props.is_dead}
                     />
                 </div>
 

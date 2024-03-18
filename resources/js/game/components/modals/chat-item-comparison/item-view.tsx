@@ -61,9 +61,14 @@ export default class ItemView extends React.Component<ItemViewProps, ItemViewSta
                 <ItemActions slot_id={this.props.comparison_details.slotId}
                              character_id={this.props.comparison_details.characterId}
                              dark_charts={this.state.dark_charts}
-                             is_automation_running={false}
+                             is_automation_running={this.props.is_automation_running}
+                             is_dead={this.props.is_dead}
                              comparison_details={this.props.comparison_details}
                              usable_sets={this.props.usable_sets}
+                             manage_modal={this.props.manage_modal}
+                             update_inventory={this.props.update_inventory}
+                             set_success_message={this.props.set_success_message}
+
                 />
             </>
 

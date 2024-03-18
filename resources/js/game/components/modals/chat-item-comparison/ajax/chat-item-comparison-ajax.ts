@@ -1,7 +1,7 @@
 import {inject, injectable} from "tsyringe";
 import AjaxInterface from "../../../../lib/ajax/ajax-interface";
 import Ajax from "../../../../lib/ajax/ajax";
-import ChatItemComparison from "../chat-item-comparison";
+import ItemDetailsModal from "../item-details-modal";
 import {AxiosError, AxiosResponse} from "axios";
 
 @injectable()
@@ -9,7 +9,7 @@ export default class ChatItemComparisonAjax {
 
     constructor(@inject(Ajax) private ajax: AjaxInterface) {}
 
-    public fetchChatComparisonData(component: ChatItemComparison) {
+    public fetchChatComparisonData(component: ItemDetailsModal) {
         this.ajax.setRoute(
             'character/' + component.props.character_id + '/inventory/comparison-from-chat'
         ).setParameters({

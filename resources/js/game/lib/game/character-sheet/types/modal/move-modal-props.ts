@@ -1,4 +1,4 @@
-import {UsableSets} from "../../../../../components/modals/chat-item-comparison/types/chat-item-comparison-state";
+import {UsableSets} from "../../../../../components/modals/chat-item-comparison/types/item-details-modal-state";
 
 export default interface MoveModalProps {
 

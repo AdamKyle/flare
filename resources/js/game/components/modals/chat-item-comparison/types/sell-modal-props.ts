@@ -1,4 +1,4 @@
-import ItemToEquip from "../../../../../../components/item-comparison/deffinitions/item-to-equip";
+import ItemToEquip from "../../../item-comparison/deffinitions/item-to-equip";
 
 export default interface SellModalProps {
 

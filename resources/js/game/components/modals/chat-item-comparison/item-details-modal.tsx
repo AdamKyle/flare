@@ -1,19 +1,19 @@
 import React, {ReactNode} from "react";
-import {ChatItemComparisonProps} from "./types/chat-item-comparison-props";
-import {ChatItemComparisonState} from "./types/chat-item-comparison-state";
+import {ItemDetailsModalProps} from "./types/item-details-modal-props";
+import {ItemDetailsModalState} from "./types/item-details-modal-state";
 import Dialogue from "../../ui/dialogue/dialogue";
-import ChatItemComparisonModalTitle from "./chat-item-comparison-modal-title";
+import ItemDetailsModalTitle from "./item-details-modal-title";
 import ChatItemComparisonAjax from "./ajax/chat-item-comparison-ajax";
 import {serviceContainer} from "../../../lib/containers/core-container";
 import LoadingProgressBar from "../../ui/progress-bars/loading-progress-bar";
 import ItemView from "./item-view";
 import DangerAlert from "../../ui/alerts/simple-alerts/danger-alert";
 
-export default class ChatItemComparison extends React.Component<ChatItemComparisonProps, ChatItemComparisonState> {
+export default class ItemDetailsModal extends React.Component<ItemDetailsModalProps, ItemDetailsModalState> {
 
     private ajax: ChatItemComparisonAjax;
 
-    constructor(props: ChatItemComparisonProps) {
+    constructor(props: ItemDetailsModalProps) {
         super(props);
 
         this.state = {
@@ -63,7 +63,7 @@ export default class ChatItemComparison extends React.Component<ChatItemComparis
             return "Loading comparison data ...";
         }
 
-        return <ChatItemComparisonModalTitle itemToEquip={this.state.comparison_details.itemToEquip} />
+        return <ItemDetailsModalTitle itemToEquip={this.state.comparison_details.itemToEquip} />
     }
 
     render() {
@@ -92,6 +92,11 @@ export default class ChatItemComparison extends React.Component<ChatItemComparis
                                     usable_sets={this.state.usable_sets}
                                     manage_showing_expanded_section={this.manageShowingExpandedDetails.bind(this)}
                                     is_showing_expanded_section={this.state.is_showing_expanded_details}
+                                    manage_modal={this.props.manage_modal}
+                                    set_success_message={this.props.set_success_message}
+                                    update_inventory={this.props.update_inventory}
+                                    is_automation_running={this.props.is_automation_running}
+                                    is_dead={this.props.is_dead}
                                 />
                         : null
 

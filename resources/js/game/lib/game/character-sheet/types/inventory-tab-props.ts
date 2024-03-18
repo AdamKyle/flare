@@ -1,11 +1,12 @@
 import InventoryDetails from "./inventory/inventory-details";
 import SetDetails from "./inventory/set-details";
+import {UsableSets} from "../../../../components/modals/chat-item-comparison/types/item-details-modal-state";
 
 export default interface InventoryTabProps {
 
     inventory: InventoryDetails[];
 
-    usable_sets: SetDetails[] | [];
+    usable_sets: UsableSets[] | [];
 
     character_id: number;
 

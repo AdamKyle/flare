@@ -97,7 +97,7 @@ export default class InventoryComparisonActionsAjax {
             })
         }
 
-        if (component.props.manage_modal) {
+        if (component.props.manage_modal && component.props.update_inventory) {
             component.props.manage_modal();
         }
     }
