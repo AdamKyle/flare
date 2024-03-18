@@ -1,5 +1,6 @@
-import ItemToEquip from "../../../item-comparison/deffinitions/item-to-equip";
+
+import {ComparisonData} from "../../../item-comparison/deffinitions/comparison-data";
 
 export default interface ItemViewProps {
-    item: ItemToEquip;
+    comparison_details: ComparisonData;
 }

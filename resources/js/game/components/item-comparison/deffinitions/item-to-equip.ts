@@ -1,3 +1,5 @@
+import GemBagSlotDetails from "../../../lib/game/character-sheet/types/inventory/gem-bag-slot-details";
+
 export default interface ItemToEquip {
     [key: string]: any;
     id: number,
@@ -70,8 +72,6 @@ export default interface ItemToEquip {
     increase_skill_training_bonus_by: number;
 
     item: {
-        gem: {
-            name: string;
-        }
+        gem: GemBagSlotDetails;
     }
 }

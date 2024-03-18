@@ -57,7 +57,7 @@ export default class ChatItemComparison extends React.Component<ChatItemComparis
                     this.state.loading || this.state.comparison_details === null ?
                         <LoadingProgressBar />
                     :
-                        <ItemView item={this.state.comparison_details.itemToEquip} />
+                        <ItemView comparison_details={this.state.comparison_details}  />
                 }
             </Dialogue>
         );

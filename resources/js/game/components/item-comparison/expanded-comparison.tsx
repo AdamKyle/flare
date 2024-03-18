@@ -3,14 +3,15 @@ import clsx from "clsx";
 import {formatNumber} from "../../lib/game/format-number";
 import ItemNameColorationText from "../items/item-name/item-name-coloration-text";
 import {ItemType} from "../items/enums/item-type";
+import ExpandedComparisonProps from "./types/expanded-comparison-props";
 
 const coreAttributes = [
     'str', 'dex', 'dur', 'int', 'chr', 'agi', 'focus'
 ];
 
-export default class ExpandedComparison extends React.Component<any, any> {
+export default class ExpandedComparison extends React.Component<ExpandedComparisonProps, any> {
 
-    constructor(props: any) {
+    constructor(props: ExpandedComparisonProps) {
         super(props);
     }
 
@@ -169,7 +170,7 @@ export default class ExpandedComparison extends React.Component<any, any> {
     }
 
     renderSkillsChanges() {
-        if (this.props.comparison_details.skills.lengh === 0) {
+        if (this.props.comparison_details.skills.length === 0) {
             return;
         }
 
@@ -244,90 +245,106 @@ export default class ExpandedComparison extends React.Component<any, any> {
         })
     }
 
+    shouldUseMobileHeightRestrictions(customWidth: number) {
+        if (!this.props.mobile_data) {
+            return false
+        }
+
+        return this.props.mobile_data.view_port < customWidth && this.props.mobile_data.mobile_height_restriction
+    }
+
     render() {
         return (
             <div>
                 <h2 className='my-4'>
                     <ItemNameColorationText item={this.props.comparison_details} custom_width={false} />
                 </h2>
-                <div className='my-4'>
-                    {this.renderAttackOrDefenceAdjustment()}
-                </div>
-                <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2'></div>
-                <div className='grid md:grid-cols-2 gap-2'>
-                    <div>
-                        <strong>Stat Adjustment</strong>
-                        <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2'></div>
-                        <dl>
-                            {this.renderCoreAttributes()}
-                        </dl>
-                        <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2'></div>
-                        <strong>Enemy Stat Reductions</strong>
-                        <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2'></div>
-                        <dl>
-                            {this.renderEnemyStatReductions()}
-                        </dl>
+                <div className={
+                    clsx({
+                        'max-h-[400px] overflow-y-scroll': this.shouldUseMobileHeightRestrictions(1500),
+                        'max-h-[200px] overflow-y-scroll': this.shouldUseMobileHeightRestrictions(800)
+                    })
+                }>
+                    <div className='my-4'>
+                        {this.renderAttackOrDefenceAdjustment()}
                     </div>
-                    <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-4 sm:block md:hidden'></div>
-                    <div>
-                        <strong>Counter & Ambush</strong>
-                        <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2'></div>
-                        <dl>
-                            <dt>Counter Chance</dt>
-                            <dd className={clsx({
-                                'text-green-700 dark:text-green-500' : this.isValueAboveZero(this.props.comparison_details.counter_chance_adjustment),
-                                'text-red-700 dark:text-red-500' : this.isValueBelowZero(this.props.comparison_details.counter_chance_adjustment),
-                                'text-gray-700 dark:text-white': this.props.comparison_details.counter_chance_adjustment === 0,
-                            })}>
-                                {(this.props.comparison_details.counter_chance_adjustment * 100).toFixed(2)}%
-                            </dd>
-                            <dt>Counter Resistance Chance</dt>
-                            <dd className={clsx({
-                                'text-green-700 dark:text-green-500' : this.isValueAboveZero(this.props.comparison_details.counter_resistance_adjustment),
-                                'text-red-700 dark:text-red-500' : this.isValueBelowZero(this.props.comparison_details.counter_resistance_adjustment),
-                                'text-gray-700 dark:text-white': this.props.comparison_details.counter_resistance_adjustment === 0,
-                            })}>
-                                {(this.props.comparison_details.counter_resistance_adjustment * 100).toFixed(2)}%
-                            </dd>
-                            <dt>Ambush Chance</dt>
-                            <dd className={clsx({
-                                'text-green-700 dark:text-green-500' : this.isValueAboveZero(this.props.comparison_details.ambush_chance_adjustment),
-                                'text-red-700 dark:text-red-500' : this.isValueBelowZero(this.props.comparison_details.ambush_chance_adjustment),
-                                'text-gray-700 dark:text-white': this.props.comparison_details.ambush_chance_adjustment === 0,
-                            })}>
-                                {(this.props.comparison_details.ambush_chance_adjustment * 100).toFixed(2)}%
-                            </dd>
-                            <dt>Ambush Resistance</dt>
-                            <dd className={clsx({
-                                'text-green-700 dark:text-green-500' : this.isValueAboveZero(this.props.comparison_details.ambush_resistance_adjustment),
-                                'text-red-700 dark:text-red-500' : this.isValueBelowZero(this.props.comparison_details.ambush_resistance_adjustment),
-                                'text-gray-700 dark:text-white': this.props.comparison_details.ambush_resistance_adjustment === 0,
-                            })}>
-                                {(this.props.comparison_details.ambush_resistance_adjustment * 100).toFixed(2)}%
-                            </dd>
-                        </dl>
-                        {this.renderSkillsChanges()}
-                        <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-4'></div>
-                        <strong>Misc. Modifiers</strong>
-                        <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2'></div>
-                        <dl>
-                            <dt>Entrancing Chance</dt>
-                            <dd className={clsx({
-                                'text-green-700 dark:text-green-500' : this.isValueAboveZero(this.props.comparison_details.entranced_chance),
-                                'text-red-700 dark:text-red-500' : this.isValueBelowZero(this.props.comparison_details.entranced_chance),
-                                'text-gray-700 dark:text-white': this.props.comparison_details.entranced_chance === 0,
-                            })}>
-                                {(this.props.comparison_details.entranced_chance * 100).toFixed(2)}%
-                            </dd>
-                            <dt>Steal Life Chance</dt>
-                            <dd className={clsx({
-                                'text-green-700 dark:text-green-500' : this.isValueAboveZero(this.props.comparison_details.steal_life_amount),
-                                'text-red-700 dark:text-red-500' : this.isValueBelowZero(this.props.comparison_details.steal_life_amount),
-                                'text-gray-700 dark:text-white': this.props.comparison_details.steal_life_amount === 0,
-                            })}>
-                                {(this.props.comparison_details.steal_life_amount * 100).toFixed(2)}%
-                            </dd>
-                        </dl>
+                    <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2'></div>
+                    <div className='grid md:grid-cols-2 gap-2'>
+                        <div>
+                            <strong>Stat Adjustment</strong>
+                            <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2'></div>
+                            <dl>
+                                {this.renderCoreAttributes()}
+                            </dl>
+                            <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2'></div>
+                            <strong>Enemy Stat Reductions</strong>
+                            <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2'></div>
+                            <dl>
+                                {this.renderEnemyStatReductions()}
+                            </dl>
+                        </div>
+                        <div
+                            className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-4 sm:block md:hidden'></div>
+                        <div>
+                            <strong>Counter & Ambush</strong>
+                            <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2'></div>
+                            <dl>
+                                <dt>Counter Chance</dt>
+                                <dd className={clsx({
+                                    'text-green-700 dark:text-green-500': this.isValueAboveZero(this.props.comparison_details.counter_chance_adjustment),
+                                    'text-red-700 dark:text-red-500': this.isValueBelowZero(this.props.comparison_details.counter_chance_adjustment),
+                                    'text-gray-700 dark:text-white': this.props.comparison_details.counter_chance_adjustment === 0,
+                                })}>
+                                    {(this.props.comparison_details.counter_chance_adjustment * 100).toFixed(2)}%
+                                </dd>
+                                <dt>Counter Resistance Chance</dt>
+                                <dd className={clsx({
+                                    'text-green-700 dark:text-green-500': this.isValueAboveZero(this.props.comparison_details.counter_resistance_adjustment),
+                                    'text-red-700 dark:text-red-500': this.isValueBelowZero(this.props.comparison_details.counter_resistance_adjustment),
+                                    'text-gray-700 dark:text-white': this.props.comparison_details.counter_resistance_adjustment === 0,
+                                })}>
+                                    {(this.props.comparison_details.counter_resistance_adjustment * 100).toFixed(2)}%
+                                </dd>
+                                <dt>Ambush Chance</dt>
+                                <dd className={clsx({
+                                    'text-green-700 dark:text-green-500': this.isValueAboveZero(this.props.comparison_details.ambush_chance_adjustment),
+                                    'text-red-700 dark:text-red-500': this.isValueBelowZero(this.props.comparison_details.ambush_chance_adjustment),
+                                    'text-gray-700 dark:text-white': this.props.comparison_details.ambush_chance_adjustment === 0,
+                                })}>
+                                    {(this.props.comparison_details.ambush_chance_adjustment * 100).toFixed(2)}%
+                                </dd>
+                                <dt>Ambush Resistance</dt>
+                                <dd className={clsx({
+                                    'text-green-700 dark:text-green-500': this.isValueAboveZero(this.props.comparison_details.ambush_resistance_adjustment),
+                                    'text-red-700 dark:text-red-500': this.isValueBelowZero(this.props.comparison_details.ambush_resistance_adjustment),
+                                    'text-gray-700 dark:text-white': this.props.comparison_details.ambush_resistance_adjustment === 0,
+                                })}>
+                                    {(this.props.comparison_details.ambush_resistance_adjustment * 100).toFixed(2)}%
+                                </dd>
+                            </dl>
+                            {this.renderSkillsChanges()}
+                            <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-4'></div>
+                            <strong>Misc. Modifiers</strong>
+                            <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2'></div>
+                            <dl>
+                                <dt>Entrancing Chance</dt>
+                                <dd className={clsx({
+                                    'text-green-700 dark:text-green-500': this.isValueAboveZero(this.props.comparison_details.entranced_chance),
+                                    'text-red-700 dark:text-red-500': this.isValueBelowZero(this.props.comparison_details.entranced_chance),
+                                    'text-gray-700 dark:text-white': this.props.comparison_details.entranced_chance === 0,
+                                })}>
+                                    {(this.props.comparison_details.entranced_chance * 100).toFixed(2)}%
+                                </dd>
+                                <dt>Steal Life Chance</dt>
+                                <dd className={clsx({
+                                    'text-green-700 dark:text-green-500': this.isValueAboveZero(this.props.comparison_details.steal_life_amount),
+                                    'text-red-700 dark:text-red-500': this.isValueBelowZero(this.props.comparison_details.steal_life_amount),
+                                    'text-gray-700 dark:text-white': this.props.comparison_details.steal_life_amount === 0,
+                                })}>
+                                    {(this.props.comparison_details.steal_life_amount * 100).toFixed(2)}%
+                                </dd>
+                            </dl>
+                        </div>
                     </div>
                 </div>
             </div>

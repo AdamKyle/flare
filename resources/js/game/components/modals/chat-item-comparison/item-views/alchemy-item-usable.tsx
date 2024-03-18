@@ -1,7 +1,8 @@
 import React, {ReactNode} from "react";
 import ItemViewProps from "../types/item-view-props";
 import clsx from "clsx";
-import {capitalize, startCase} from "lodash";
+import {startCase} from "lodash";
+import AlchemyItemUsableProps from "../types/alchemy-item-usable-props";
 
 const statKeys = [
     'str_mod', 'dex_mod', 'dur_mod', 'int_mod', 'chr_mod', 'agi_mod', 'focus_mod'
@@ -22,9 +23,9 @@ const miscSkillModifiers = [
     'move_time_out_mod_bonus',
 ]
 
-export default class AlchemyItemUsable extends React.Component<ItemViewProps, {}> {
+export default class AlchemyItemUsable extends React.Component<AlchemyItemUsableProps, {}> {
 
-    constructor(props: ItemViewProps) {
+    constructor(props: AlchemyItemUsableProps) {
         super(props);
     }
 
@@ -202,7 +203,7 @@ export default class AlchemyItemUsable extends React.Component<ItemViewProps, {}
 
     renderUsableColumns(): ReactNode {
         return (
-            <div className='grid grid-cols-2 gap-2'>
+            <div className='grid md:grid-cols-2 gap-2'>
                 <div>
                     {
                         this.props.item.stat_increase ?

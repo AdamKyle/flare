@@ -1,9 +1,10 @@
 import React, {Fragment} from "react";
-import GemBagSlotDetails from "../../../../../lib/game/character-sheet/types/inventory/gem-bag-slot-details";
+import GemBagSlotDetails from "../../../../lib/game/character-sheet/types/inventory/gem-bag-slot-details";
+import GemDetailsProps from "../types/gem-details-props";
 
-export default class GemDetails extends React.Component<any, any> {
+export default class GemDetails extends React.Component<GemDetailsProps, {}> {
 
-    constructor(props: any) {
+    constructor(props: GemDetailsProps) {
         super(props);
     }
 
@@ -39,10 +40,6 @@ export default class GemDetails extends React.Component<any, any> {
     }
 
     getGem() {
-        if (this.props.gem.gem) {
-            return this.props.gem.gem;
-        }
-
         return this.props.gem;
     }
 

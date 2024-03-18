@@ -1,5 +1,5 @@
 
-import GemDetails from "../../../character-sheet/components/modals/components/gem-details";
+import GemDetails from "../../../../components/modals/chat-item-comparison/item-views/gem-details";
 import GemBagSlotDetails from "../../../../lib/game/character-sheet/types/inventory/gem-bag-slot-details";
 
 export type ActionTypes = 'attach-gem' | 'replace-gem'

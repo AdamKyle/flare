@@ -1,3 +1,5 @@
-import ItemViewProps from "./item-view-props";
+import ItemToEquip from "../../../item-comparison/deffinitions/item-to-equip";
 
-export default interface AlchemyItemHolyProps extends ItemViewProps {}
+export default interface AlchemyItemHolyProps {
+    item: ItemToEquip;
+}
