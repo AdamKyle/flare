@@ -1,4 +1,4 @@
-import InventoryComparisonAdjustment from "../definitions/inventory-comparison-adjustment";
+import ItemToEquip from "../../../../../components/item-comparison/deffinitions/item-to-equip";
 
 export default interface ComparisonSectionState {
     show_equip_modal: boolean;
@@ -11,9 +11,9 @@ export default interface ComparisonSectionState {
 
     show_item_details: boolean;
 
-    item_to_sell: InventoryComparisonAdjustment|null;
+    item_to_sell: ItemToEquip|null;
 
-    item_to_show: InventoryComparisonAdjustment|null;
+    item_to_show: ItemToEquip|null;
 
     error_message: string|null;
 

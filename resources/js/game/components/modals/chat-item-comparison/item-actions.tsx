@@ -1,28 +1,23 @@
 import React from "react";
-import ItemComparisonSection from "./item-comparison-section";
+import ItemActionsState from "./types/item-actions-state";
 import clsx from "clsx";
-import PrimaryOutlineButton from "../../../../components/ui/buttons/primary-outline-button";
-import SuccessOutlineButton from "../../../../components/ui/buttons/success-outline-button";
-import DangerOutlineButton from "../../../../components/ui/buttons/danger-outline-button";
-import LoadingProgressBar from "../../../../components/ui/progress-bars/loading-progress-bar";
-import EquipModal from "./actions/equip-modal";
-import MoveItemModal from "./actions/move-item-modal";
-import SellItemModal from "./actions/sell-item-modal";
-import ListItemModal from "./actions/list-item-modal";
-import InventoryComparisonAdjustment from "./definitions/inventory-comparison-adjustment";
-import InventoryComparisonActions from "./ajax/inventory-comparison-actions";
-import WarningAlert from "../../../../components/ui/alerts/simple-alerts/warning-alert";
-import ComparisonSectionProps from "./types/comparison-section-props";
-import ComparisonSectionState from "./types/comparison-section-state";
-import InventoryUseDetails from "../../../character-sheet/components/modals/inventory-item-details";
-import DangerAlert from "../../../../components/ui/alerts/simple-alerts/danger-alert";
-import ItemToEquip from "../../../../components/item-comparison/deffinitions/item-to-equip";
+import PrimaryOutlineButton from "../../ui/buttons/primary-outline-button";
+import SuccessOutlineButton from "../../ui/buttons/success-outline-button";
+import DangerOutlineButton from "../../ui/buttons/danger-outline-button";
+import LoadingProgressBar from "../../ui/progress-bars/loading-progress-bar";
+import EquipModal from "../../../sections/components/item-details/comparison/actions/equip-modal";
+import MoveItemModal from "../../../sections/components/item-details/comparison/actions/move-item-modal";
+import SellItemModal from "../../../sections/components/item-details/comparison/actions/sell-item-modal";
+import ListItemModal from "../../../sections/components/item-details/comparison/actions/list-item-modal";
+import InventoryUseDetails from "../../../sections/character-sheet/components/modals/inventory-item-details";
+import InventoryComparisonActions
+    from "../../../sections/components/item-details/comparison/ajax/inventory-comparison-actions";
+import ItemToEquip from "../../item-comparison/deffinitions/item-to-equip";
+import ItemActionsProps from "./types/item-actions-props";
 
-export default class ComparisonSection extends React.Component<
-    ComparisonSectionProps,
-    ComparisonSectionState
-> {
-    constructor(props: ComparisonSectionProps) {
+export default class ItemActions extends React.Component<ItemActionsProps, ItemActionsState> {
+
+    constructor(props: ItemActionsProps) {
         super(props);
 
         this.state = {
@@ -33,10 +28,32 @@ export default class ComparisonSection extends React.Component<
             item_to_sell: null,
             item_to_show: null,
             show_item_details: false,
-            error_message: null,
             show_loading_label: false,
             loading_label: null,
-        };
+            error_message: null
+        }
+    }
+
+    isGridSize(
+        size: number,
+        itemToEquip: ItemToEquip
+    ): boolean {
+        switch (size) {
+            case 5:
+                return (
+                    itemToEquip.affix_count === 0 &&
+                    itemToEquip.holy_stacks_applied === 0 &&
+                    !itemToEquip.is_unique
+                );
+            case 7:
+                return (
+                    itemToEquip.affix_count > 0 ||
+                    itemToEquip.holy_stacks_applied > 0 ||
+                    itemToEquip.is_unique
+                );
+            default:
+                return false;
+        }
     }
 
     manageEquipModal() {
@@ -52,23 +69,33 @@ export default class ComparisonSection extends React.Component<
     }
 
     manageSellModal(item?: ItemToEquip) {
+
+        if (!item) {
+            this.setState({
+                show_sell_modal: !this.state.show_sell_modal,
+                item_to_sell: null,
+            });
+
+            return;
+        }
+
         this.setState({
             show_sell_modal: !this.state.show_sell_modal,
-            item_to_sell: typeof item === "undefined" ? null : item,
+            item_to_sell: item,
         });
     }
 
-    manageViewItemDetails(item?: ItemToEquip) {
+    manageViewItemDetails(item: ItemToEquip) {
         this.setState({
             show_item_details: !this.state.show_item_details,
-            item_to_show: typeof item === "undefined" ? null : item,
+            item_to_show: item,
         });
     }
 
-    manageListItemModal(item?: ItemToEquip) {
+    manageListItemModal(item: ItemToEquip) {
         this.setState({
             show_list_item_modal: !this.state.show_list_item_modal,
-            item_to_sell: typeof item === "undefined" ? null : item,
+            item_to_sell: item,
         });
     }
 
@@ -80,8 +107,6 @@ export default class ComparisonSection extends React.Component<
                     "Equipping set and recalculating your stats (this can take a few seconds) ...",
             },
             () => {
-                this.props.set_action_loading();
-
                 const params = {
                     position: position,
                     slot_id: this.props.slot_id,
@@ -94,7 +119,6 @@ export default class ComparisonSection extends React.Component<
     }
 
     moveItem(setId: number) {
-        this.props.set_action_loading();
 
         const params = {
             move_to_set: setId,
@@ -105,7 +129,6 @@ export default class ComparisonSection extends React.Component<
     }
 
     sellItem() {
-        this.props.set_action_loading();
 
         const params = {
             slot_id: this.props.comparison_details.itemToEquip.slot_id,
@@ -115,7 +138,6 @@ export default class ComparisonSection extends React.Component<
     }
 
     listItem(price: number) {
-        this.props.set_action_loading();
 
         const params = {
             list_for: price,
@@ -126,13 +148,11 @@ export default class ComparisonSection extends React.Component<
     }
 
     disenchantItem() {
-        this.props.set_action_loading();
 
         new InventoryComparisonActions().disenchantItem(this);
     }
 
     destroyItem() {
-        this.props.set_action_loading();
 
         const params = {
             slot_id: this.props.comparison_details.itemToEquip.slot_id,
@@ -157,47 +177,20 @@ export default class ComparisonSection extends React.Component<
 
     render() {
         return (
-            <div className="p-5 max-h-[450px] md:max-h-[600px] lg:max-h-full overflow-y-scroll lg:overflow-y-hidden">
-                {this.props.is_automation_running ? (
-                    <WarningAlert additional_css={"mb-4"}>
-                        <p>
-                            Automation is running. Some actions have been
-                            disabled.
-                        </p>
-                    </WarningAlert>
-                ) : null}
-                {this.state.error_message !== null ? (
-                    <DangerAlert additional_css={"mb-4"}>
-                        {this.state.error_message}
-                    </DangerAlert>
-                ) : null}
-                {this.showReplaceMessage() ? (
-                    <WarningAlert additional_css={"mb-4"}>
-                        <p>
-                            The item you are looking at will replace the current
-                            two handed weapon you have equipped.
-                        </p>
-                    </WarningAlert>
-                ) : null}
-
-                <ItemComparisonSection
-                    comparison_details={this.props.comparison_details}
-                />
-                <div className="border-b-2 mt-6 border-b-gray-300 dark:border-b-gray-600 my-3"></div>
+            <div>
                 <div
                     className={clsx(
-                        "mt-6 grid grid-cols-1 w-full gap-2 md:m-auto",
+                        "mt-6 grid grid-cols-1 w-full gap-2 md:m-auto md:w-3/4",
                         {
-                            "md:w-3/4": this.props.is_large_modal,
-                            "md:grid-cols-7": this.props.is_grid_size(
+                            "md:grid-cols-7": this.isGridSize(
                                 7,
                                 this.props.comparison_details.itemToEquip
                             ),
-                            "md:grid-cols-5": this.props.is_grid_size(
+                            "md:grid-cols-5": this.isGridSize(
                                 5,
                                 this.props.comparison_details.itemToEquip
                             ),
-                            hidden:
+                            'hidden':
                                 this.props.comparison_details.itemToEquip
                                     .type === "quest",
                         }
@@ -210,26 +203,26 @@ export default class ComparisonSection extends React.Component<
                                 this.props.comparison_details.itemToEquip
                             )
                         }
-                        disabled={this.props.is_action_loading}
+                        disabled={this.state.show_loading_label}
                     />
                     <PrimaryOutlineButton
                         button_label={"Equip"}
                         on_click={this.manageEquipModal.bind(this)}
                         disabled={
-                            this.props.is_action_loading ||
+                            this.state.show_loading_label ||
                             this.props.is_automation_running
                         }
                     />
                     <PrimaryOutlineButton
                         button_label={"Move"}
                         on_click={this.manageMoveModalModal.bind(this)}
-                        disabled={this.props.is_action_loading}
+                        disabled={this.state.show_loading_label}
                     />
 
                     {this.props.comparison_details.itemToEquip.type !==
-                        "trinket" &&
+                    "trinket" &&
                     this.props.comparison_details.itemToEquip.type !==
-                        "artifact" ? (
+                    "artifact" ? (
                         <SuccessOutlineButton
                             button_label={"Sell"}
                             on_click={() =>
@@ -237,16 +230,16 @@ export default class ComparisonSection extends React.Component<
                                     this.props.comparison_details.itemToEquip
                                 )
                             }
-                            disabled={this.props.is_action_loading}
+                            disabled={this.state.show_loading_label}
                         />
                     ) : null}
 
                     {this.props.comparison_details.itemToEquip.affix_count >
-                        0 ||
+                    0 ||
                     this.props.comparison_details.itemToEquip
                         .holy_stacks_applied > 0 ||
                     this.props.comparison_details.itemToEquip.type ===
-                        "trinket" ? (
+                    "trinket" ? (
                         <SuccessOutlineButton
                             button_label={"List"}
                             on_click={() =>
@@ -255,7 +248,7 @@ export default class ComparisonSection extends React.Component<
                                 )
                             }
                             disabled={
-                                this.props.is_action_loading ||
+                                this.state.show_loading_label ||
                                 this.props.is_automation_running
                             }
                         />
@@ -266,18 +259,18 @@ export default class ComparisonSection extends React.Component<
                         <DangerOutlineButton
                             button_label={"Disenchant"}
                             on_click={this.disenchantItem.bind(this)}
-                            disabled={this.props.is_action_loading}
+                            disabled={this.state.show_loading_label}
                         />
                     ) : null}
 
                     <DangerOutlineButton
                         button_label={"Destroy"}
                         on_click={this.destroyItem.bind(this)}
-                        disabled={this.props.is_action_loading}
+                        disabled={this.state.show_loading_label}
                     />
                 </div>
 
-                {this.props.is_action_loading ? (
+                {this.state.show_loading_label ? (
                     <LoadingProgressBar
                         show_label={this.state.show_loading_label}
                         label={this.state.loading_label}
@@ -343,6 +336,6 @@ export default class ComparisonSection extends React.Component<
                     />
                 ) : null}
             </div>
-        );
+        )
     }
 }

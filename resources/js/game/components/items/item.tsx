@@ -5,9 +5,10 @@ import {isArmourType} from "./helpers/is-armour-type";
 import {startCase} from "lodash";
 import ItemDefinition from "./deffinitions/item-definition";
 import {ItemType} from "./enums/item-type";
+import ItemToEquip from "../item-comparison/deffinitions/item-to-equip";
 
 interface ItemProps {
-    item: ItemDefinition;
+    item: ItemDefinition | ItemToEquip;
 }
 
 export default class Item extends React.Component<ItemProps, any> {
@@ -34,6 +35,10 @@ export default class Item extends React.Component<ItemProps, any> {
         }
 
         if (isArmourType(this.props.item.type)) {
+            if (this.props.item.base_ac_mod === null) {
+                return;
+            }
+
             return (
                 <>
                     <dt>Base AC</dt>
@@ -45,6 +50,11 @@ export default class Item extends React.Component<ItemProps, any> {
         }
 
         if (this.props.item.type === ItemType.SPELL_HEALING) {
+
+            if (this.props.item.base_healing_mod === null) {
+                return;
+            }
+
             return (
                 <>
                     <dt>Base Healing</dt>
@@ -94,7 +104,11 @@ export default class Item extends React.Component<ItemProps, any> {
                         {
                             this.props.item.crafting_type !== null ?
                                 <>
-                                    <div className='border-b-2 border-b-gray-200 dark:border-b-gray-600 my-4'></div>
+                                    {
+                                        this.props.item.type !== ItemType.TRINKET ?
+                                            <div className='border-b-2 border-b-gray-200 dark:border-b-gray-600 my-4'></div>
+                                        : null
+                                    }
                                     <dl>
                                         <dt>Crafting Type:</dt>
                                         <dd>{startCase(this.props.item.crafting_type)}</dd>

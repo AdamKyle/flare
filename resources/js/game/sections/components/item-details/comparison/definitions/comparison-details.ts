@@ -1,5 +1,6 @@
 import InventoryComparisonAdjustment from "./inventory-comparison-adjustment";
 import OriginalAtonement from "../../../../../lib/game/types/core/atonement/definitions/original-atonement";
+import ItemToEquip from "../../../../../components/item-comparison/deffinitions/item-to-equip";
 
 export default interface ComparisonDetails {
 
@@ -21,7 +22,7 @@ export default interface ComparisonDetails {
 
     type: string;
 
-    itemToEquip: InventoryComparisonAdjustment;
+    itemToEquip: ItemToEquip;
 
     details: InventoryComparisonAdjustment[] | [];
 

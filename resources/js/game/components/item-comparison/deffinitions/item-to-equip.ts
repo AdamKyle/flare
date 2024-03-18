@@ -1,4 +1,5 @@
 import GemBagSlotDetails from "../../../lib/game/character-sheet/types/inventory/gem-bag-slot-details";
+import {ItemType} from "../../items/enums/item-type";
 
 export default interface ItemToEquip {
     [key: string]: any;
@@ -19,7 +20,7 @@ export default interface ItemToEquip {
     chr_modifier: number,
     agi_modifier: number,
     focus_modifier: number,
-    type: string,
+    type: ItemType,
     default_position: string,
     crafting_type: string,
     skill_level_req: number,

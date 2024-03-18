@@ -22,6 +22,8 @@ export default class ChatItemComparison extends React.Component<ChatItemComparis
             loading: true,
             dark_charts: false,
             error_message: null,
+            is_showing_expanded_details: false,
+            secondary_actions: null,
         }
 
         this.ajax = serviceContainer().fetch(ChatItemComparisonAjax);
@@ -29,6 +31,26 @@ export default class ChatItemComparison extends React.Component<ChatItemComparis
 
     componentDidMount() {
         this.ajax.fetchChatComparisonData(this);
+    }
+
+    manageShowingExpandedDetails() {
+        this.setState({
+            is_showing_expanded_details: !this.state.is_showing_expanded_details
+        }, () => {
+            if (!this.state.is_showing_expanded_details) {
+               return this.setState({ secondary_actions: null })
+            }
+
+            const secondaryAction ={
+                secondary_button_disabled: false,
+                secondary_button_label: 'Back to comparison',
+                handle_action: this.manageShowingExpandedDetails.bind(this)
+            }
+
+            return this.setState({
+                secondary_actions: secondaryAction,
+            })
+        })
     }
 
     buildTitle(): ReactNode | string {
@@ -52,12 +74,18 @@ export default class ChatItemComparison extends React.Component<ChatItemComparis
                 title={this.buildTitle()}
                 large_modal={true}
                 primary_button_disabled={this.state.action_loading}
+                secondary_actions={this.state.secondary_actions}
             >
                 {
                     this.state.loading || this.state.comparison_details === null ?
                         <LoadingProgressBar />
                     :
-                        <ItemView comparison_details={this.state.comparison_details}  />
+                        <ItemView
+                            comparison_details={this.state.comparison_details}
+                            usable_sets={this.state.usable_sets}
+                            manage_showing_expanded_section={this.manageShowingExpandedDetails.bind(this)}
+                            is_showing_expanded_section={this.state.is_showing_expanded_details}
+                        />
                 }
             </Dialogue>
         );

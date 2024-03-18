@@ -2,6 +2,7 @@ import InventoryItemComparison from "../inventory-item-comparison";
 import Ajax from "../../../../../lib/ajax/ajax";
 import { AxiosError, AxiosResponse } from "axios";
 import ComparisonSection from "../comparison-section";
+import ItemActions from "../../../../../components/modals/chat-item-comparison/item-actions";
 
 type EquipParams = { position?: string, slot_id: number, equip_type: string };
 
@@ -15,7 +16,7 @@ type ListItem = { list_for: number; slot_id: number; };
 
 export default class InventoryComparisonActions {
 
-    equipItem(component: ComparisonSection, params: EquipParams) {
+    equipItem(component: ComparisonSection | ItemActions, params: EquipParams) {
         (new Ajax()).setRoute('character/' + component.props.character_id + '/inventory/equip-item')
             .setParameters(params)
             .doAjaxCall('post', (result: AxiosResponse) => {
@@ -40,7 +41,7 @@ export default class InventoryComparisonActions {
             });
     }
 
-    moveItem(component: ComparisonSection, params: MoveItemParams) {
+    moveItem(component: ComparisonSection | ItemActions, params: MoveItemParams) {
         (new Ajax()).setRoute('character/' + component.props.character_id + '/inventory/move-to-set')
             .setParameters(params)
             .doAjaxCall('post', (result: AxiosResponse) => {
@@ -60,7 +61,7 @@ export default class InventoryComparisonActions {
             });
     }
 
-    sellItem(component: ComparisonSection, params: SellItem) {
+    sellItem(component: ComparisonSection | ItemActions, params: SellItem) {
         (new Ajax()).setRoute('character/' + component.props.character_id + '/inventory/sell-item')
             .setParameters(params)
             .doAjaxCall('post', (result: AxiosResponse) => {
@@ -80,7 +81,7 @@ export default class InventoryComparisonActions {
             });
     }
 
-    listItem(component: ComparisonSection, params: ListItem) {
+    listItem(component: ComparisonSection | ItemActions, params: ListItem) {
         (new Ajax()).setRoute('market-board/sell-item/' + component.props.character_id)
             .setParameters(params)
             .doAjaxCall('post', (result: AxiosResponse) => {
@@ -100,7 +101,7 @@ export default class InventoryComparisonActions {
             });
     }
 
-    disenchantItem(component: ComparisonSection) {
+    disenchantItem(component: ComparisonSection | ItemActions) {
         (new Ajax()).setRoute('disenchant/' + component.props.comparison_details?.itemToEquip.id)
             .doAjaxCall('post', (result: AxiosResponse) => {
                 component.props.set_action_loading();
@@ -119,7 +120,7 @@ export default class InventoryComparisonActions {
             });
     }
 
-    destroyItem(component: ComparisonSection, params: DestroyItem) {
+    destroyItem(component: ComparisonSection | ItemActions, params: DestroyItem) {
         (new Ajax()).setRoute('character/' + component.props.character_id + '/inventory/destroy')
             .setParameters(params)
             .doAjaxCall('post', (result: AxiosResponse) => {

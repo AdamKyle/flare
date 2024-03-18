@@ -7,6 +7,12 @@ export interface UsableSets {
     equipped: boolean;
 }
 
+export interface ChatItemComparisonDialogueSecondaryActions {
+    secondary_button_disabled: boolean;
+    secondary_button_label: string;
+    handle_action: (args: any) => void;
+}
+
 export interface ChatItemComparisonState {
     comparison_details: ComparisonData | null;
     usable_sets: UsableSets[] | [];
@@ -14,4 +20,6 @@ export interface ChatItemComparisonState {
     loading: boolean;
     dark_charts: boolean;
     error_message: string | null;
+    is_showing_expanded_details: boolean;
+    secondary_actions: ChatItemComparisonDialogueSecondaryActions | null
 }

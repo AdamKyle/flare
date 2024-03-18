@@ -1,4 +1,4 @@
-import InventoryComparisonAdjustment from "../../definitions/inventory-comparison-adjustment";
+import ItemToEquip from "../../../../../../components/item-comparison/deffinitions/item-to-equip";
 
 export default interface SellModalProps {
 
@@ -8,5 +8,5 @@ export default interface SellModalProps {
 
     sell_item: () => void;
 
-    item: InventoryComparisonAdjustment;
+    item: ItemToEquip;
 }

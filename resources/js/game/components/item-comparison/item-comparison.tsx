@@ -12,6 +12,7 @@ import { startCase } from "lodash";
 import {formatNumber} from "../../lib/game/format-number";
 import clsx from "clsx";
 import ItemComparisonState from "./types/item-comparison-state";
+import Item from "../items/item";
 
 const twoHandedWeapons = [
     ItemType.STAVE,
@@ -180,7 +181,7 @@ export default class ItemComparison extends React.Component<ItemComparisonProps,
         return (
             <div className={
                 clsx({
-                    'max-h-[400px] overflow-y-scroll': this.shouldUseMobileHeightRestrictions(1500),
+                    'max-h-[375px] overflow-y-scroll': this.shouldUseMobileHeightRestrictions(1500),
                     'max-h-[200px] overflow-y-scroll': this.shouldUseMobileHeightRestrictions(800)
                 })
             }>
@@ -241,7 +242,7 @@ export default class ItemComparison extends React.Component<ItemComparisonProps,
 
         return (
             <div className='mr-auto ml-auto w-full md:w-3/5'>
-                <div className={'my-4'}>
+                <div className={clsx('my-4', {'hidden': this.props.mobile_height_restriction})}>
                     Looking to purchase: <strong>{this.props.comparison_info.itemToEquip.affix_name}</strong>, below is
                     your comparison data, if you
                     were to equip this item in the equipped items slot. This fabulous item will only cost
@@ -280,6 +281,16 @@ export default class ItemComparison extends React.Component<ItemComparisonProps,
     renderComparison() {
 
         if (this.props.comparison_info.details.length === 0) {
+            if (this.props.mobile_height_restriction) {
+                return (
+                    <div>
+                        <p className='my-4 italic text-center'>
+                            You have nothing equipped. Anything is better then nothing.
+                        </p>
+                        <Item item={this.props.comparison_info.itemToEquip}/>
+                    </div>
+                );
+            }
             return <div className='w-full md:max-w-3/5 md:mr-auto md:ml-auto'>
                 <p className='my-4 text-center'>
                     You don't have anything equipped in this slot. Why not buy and equip

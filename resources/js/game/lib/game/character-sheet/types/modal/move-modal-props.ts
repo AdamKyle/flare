@@ -1,10 +1,10 @@
-import SetDetails from "../inventory/set-details";
+import {UsableSets} from "../../../../../components/modals/chat-item-comparison/types/chat-item-comparison-state";
 
 export default interface MoveModalProps {
 
     is_open: boolean;
 
-    usable_sets: SetDetails[] | [];
+    usable_sets: UsableSets[] | [];
 
     manage_modal: () => void;
 

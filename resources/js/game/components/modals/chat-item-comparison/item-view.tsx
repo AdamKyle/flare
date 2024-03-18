@@ -8,6 +8,10 @@ import GemDetails from "./item-views/gem-details";
 import ItemComparison from "../../item-comparison/item-comparison";
 import ItemViewState from "./types/item-view-state";
 import PrimaryOutlineButton from "../../ui/buttons/primary-outline-button";
+import {
+    watchForChatDarkModeItemViewChange
+} from "../../../lib/game/dark-mode-watcher";
+import ItemActions from "./item-actions";
 
 export default class ItemView extends React.Component<ItemViewProps, ItemViewState> {
 
@@ -15,14 +19,12 @@ export default class ItemView extends React.Component<ItemViewProps, ItemViewSta
         super(props);
 
         this.state = {
-            is_showing_expanded_comparison: false,
+            dark_charts: false,
         }
     }
 
-    updateIsShowingExpandedLocation() {
-        this.setState({
-            is_showing_expanded_comparison: !this.state.is_showing_expanded_comparison,
-        });
+    componentDidMount() {
+        watchForChatDarkModeItemViewChange(this);
     }
 
     render() {
@@ -48,19 +50,23 @@ export default class ItemView extends React.Component<ItemViewProps, ItemViewSta
 
         return (
             <>
-                {
-                    this.state.is_showing_expanded_comparison ?
-                        <PrimaryOutlineButton button_label={
-                            'Back to comparison'
-                        } on_click={this.updateIsShowingExpandedLocation.bind(this)} additional_css={'my-4'} />
-                    : null
-                }
-
                 <ItemComparison comparison_info={this.props.comparison_details}
-                                is_showing_expanded_comparison={this.state.is_showing_expanded_comparison}
-                                manage_show_expanded_comparison={this.updateIsShowingExpandedLocation.bind(this)}
+                                is_showing_expanded_comparison={this.props.is_showing_expanded_section}
+                                manage_show_expanded_comparison={this.props.manage_showing_expanded_section}
                                 mobile_height_restriction={true}
                 />
+
+                <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2"></div>
+
+                <div className='max-h-[150px] md:max-h-auto overflow-y-auto'>
+                    <ItemActions slot_id={this.props.comparison_details.slotId}
+                                 character_id={this.props.comparison_details.characterId}
+                                 dark_charts={this.state.dark_charts}
+                                 is_automation_running={false}
+                                 comparison_details={this.props.comparison_details}
+                                 usable_sets={this.props.usable_sets}
+                    />
+                </div>
             </>
 
         )

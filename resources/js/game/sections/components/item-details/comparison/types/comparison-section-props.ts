@@ -2,11 +2,12 @@ import ComparisonDetails from '../definitions/comparison-details';
 import SetDetails from "../../../../../lib/game/character-sheet/types/inventory/set-details";
 import InventoryDetails from "../../../../../lib/game/character-sheet/types/inventory/inventory-details";
 import InventoryComparisonAdjustment from "../definitions/inventory-comparison-adjustment";
+import ItemToEquip from "../../../../../components/item-comparison/deffinitions/item-to-equip";
 
 export default interface ComparisonSectionProps {
     is_large_modal: boolean;
 
-    is_grid_size: (size: number, itemToEquip: InventoryComparisonAdjustment) => boolean;
+    is_grid_size: (size: number, itemToEquip: ItemToEquip) => boolean;
 
     comparison_details: ComparisonDetails;
 

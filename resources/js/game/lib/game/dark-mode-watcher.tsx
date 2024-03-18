@@ -6,6 +6,7 @@ import CharacterClassRanks from "../../sections/character-sheet/components/chara
 import CharacterClassRankSpecialtiesSection
     from "../../sections/character-sheet/components/tabs/additional-information/sections/character-class-rank-specialties-section";
 import RankFightTops from "../../tops/rank-fight-tops";
+import ItemView from "../../components/modals/chat-item-comparison/item-view";
 
 /**
  * When dark mode is enabled set the dark_table to true on the table.
@@ -70,6 +71,20 @@ export const watchForDarkModeClassSpecialtyChange = (component: CharacterClassRa
 }
 
 export const watchForChatDarkModeComparisonChange = (component: ItemComparison) => {
+    window.setInterval(() => {
+        if (window.localStorage.hasOwnProperty('scheme') && component.state.dark_charts !== true) {
+            component.setState({
+                dark_charts: window.localStorage.scheme === 'dark'
+            })
+        } else if (!window.localStorage.hasOwnProperty('scheme') && component.state.dark_charts) {
+            component.setState({
+                dark_charts: false
+            });
+        }
+    }, 10);
+}
+
+export const watchForChatDarkModeItemViewChange = (component: ItemView) => {
     window.setInterval(() => {
         if (window.localStorage.hasOwnProperty('scheme') && component.state.dark_charts !== true) {
             component.setState({

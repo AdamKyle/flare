@@ -261,7 +261,7 @@ export default class ExpandedComparison extends React.Component<ExpandedComparis
                 </h2>
                 <div className={
                     clsx({
-                        'max-h-[400px] overflow-y-scroll': this.shouldUseMobileHeightRestrictions(1500),
+                        'max-h-[250px] overflow-y-scroll': this.shouldUseMobileHeightRestrictions(1500),
                         'max-h-[200px] overflow-y-scroll': this.shouldUseMobileHeightRestrictions(800)
                     })
                 }>

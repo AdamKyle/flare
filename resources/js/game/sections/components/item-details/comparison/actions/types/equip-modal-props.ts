@@ -1,4 +1,5 @@
 import InventoryComparisonAdjustment from "../../definitions/inventory-comparison-adjustment";
+import ItemToEquip from "../../../../../../components/item-comparison/deffinitions/item-to-equip";
 
 export default interface EquipModalProps {
 
@@ -6,7 +7,7 @@ export default interface EquipModalProps {
 
     manage_modal: () => void;
 
-    item_to_equip: InventoryComparisonAdjustment;
+    item_to_equip: ItemToEquip;
 
     equip_item: (type: string, position?: string) => void;
 

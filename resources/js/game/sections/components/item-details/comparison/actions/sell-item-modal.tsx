@@ -32,7 +32,7 @@ export default class SellItemModal extends React.Component<SellModalProps, { }> 
                       }}
             >
                 <h3 className='mb-3'>
-                    Sell <ItemNameColorationText item={{
+                    Sell <ItemNameColorationText custom_width={false} item={{
                         name: this.props.item.affix_name,
                         type: this.props.item.type,
                         affix_count: this.props.item.affix_count,
