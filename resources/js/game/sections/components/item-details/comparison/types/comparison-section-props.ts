@@ -15,8 +15,6 @@ export default interface ComparisonSectionProps {
 
     is_action_loading: boolean;
 
-    manage_modal: () => void;
-
     character_id: number;
 
     dark_charts: boolean;
@@ -26,6 +24,8 @@ export default interface ComparisonSectionProps {
     slot_id: number;
 
     is_automation_running: boolean;
+
+    manage_modal: () => void;
 
     update_inventory?: (inventory: {[key: string]: InventoryDetails[]}) => void;
 

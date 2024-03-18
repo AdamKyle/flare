@@ -7,6 +7,7 @@ import ChatItemComparisonAjax from "./ajax/chat-item-comparison-ajax";
 import {serviceContainer} from "../../../lib/containers/core-container";
 import LoadingProgressBar from "../../ui/progress-bars/loading-progress-bar";
 import ItemView from "./item-view";
+import DangerAlert from "../../ui/alerts/simple-alerts/danger-alert";
 
 export default class ChatItemComparison extends React.Component<ChatItemComparisonProps, ChatItemComparisonState> {
 
@@ -77,15 +78,23 @@ export default class ChatItemComparison extends React.Component<ChatItemComparis
                 secondary_actions={this.state.secondary_actions}
             >
                 {
-                    this.state.loading || this.state.comparison_details === null ?
+                    this.state.loading ?
                         <LoadingProgressBar />
                     :
-                        <ItemView
-                            comparison_details={this.state.comparison_details}
-                            usable_sets={this.state.usable_sets}
-                            manage_showing_expanded_section={this.manageShowingExpandedDetails.bind(this)}
-                            is_showing_expanded_section={this.state.is_showing_expanded_details}
-                        />
+
+                        this.state.error_message !== null ?
+                            <DangerAlert>
+                                {this.state.error_message}
+                            </DangerAlert>
+                        : this.state.comparison_details !== null ?
+                                <ItemView
+                                    comparison_details={this.state.comparison_details}
+                                    usable_sets={this.state.usable_sets}
+                                    manage_showing_expanded_section={this.manageShowingExpandedDetails.bind(this)}
+                                    is_showing_expanded_section={this.state.is_showing_expanded_details}
+                                />
+                        : null
+
                 }
             </Dialogue>
         );

@@ -12,6 +12,7 @@ import UsableItemSection from "../../character-sheet/components/modals/component
 import InventoryQuestItemDetails from "../../character-sheet/components/modals/components/inventory-quest-item-details";
 import AlchemyItemHoly from "../../../components/modals/chat-item-comparison/item-views/alchemy-item-holy";
 import GemDetails from "../../../components/modals/chat-item-comparison/item-views/gem-details";
+import ItemToEquip from "../../../components/item-comparison/deffinitions/item-to-equip";
 
 export default class ItemComparison extends React.Component<any, any> {
     constructor(props: any) {
@@ -135,7 +136,7 @@ export default class ItemComparison extends React.Component<any, any> {
 
     isGridSize(
         size: number,
-        itemToEquip: InventoryComparisonAdjustment
+        itemToEquip: ItemToEquip
     ): boolean {
         switch (size) {
             case 5:

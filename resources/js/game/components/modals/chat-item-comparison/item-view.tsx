@@ -58,15 +58,13 @@ export default class ItemView extends React.Component<ItemViewProps, ItemViewSta
 
                 <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2"></div>
 
-                <div className='max-h-[150px] md:max-h-auto overflow-y-auto'>
-                    <ItemActions slot_id={this.props.comparison_details.slotId}
-                                 character_id={this.props.comparison_details.characterId}
-                                 dark_charts={this.state.dark_charts}
-                                 is_automation_running={false}
-                                 comparison_details={this.props.comparison_details}
-                                 usable_sets={this.props.usable_sets}
-                    />
-                </div>
+                <ItemActions slot_id={this.props.comparison_details.slotId}
+                             character_id={this.props.comparison_details.characterId}
+                             dark_charts={this.state.dark_charts}
+                             is_automation_running={false}
+                             comparison_details={this.props.comparison_details}
+                             usable_sets={this.props.usable_sets}
+                />
             </>
 
         )

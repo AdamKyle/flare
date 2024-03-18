@@ -21,4 +21,8 @@ export default interface ItemActionsState {
     loading_label: string|null,
 
     error_message: string|null,
+
+    success_message: string|null;
+
+    has_updated_item: boolean;
 }

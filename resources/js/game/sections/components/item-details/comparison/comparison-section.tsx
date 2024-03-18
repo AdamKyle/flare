@@ -10,18 +10,23 @@ import MoveItemModal from "./actions/move-item-modal";
 import SellItemModal from "./actions/sell-item-modal";
 import ListItemModal from "./actions/list-item-modal";
 import InventoryComparisonAdjustment from "./definitions/inventory-comparison-adjustment";
-import InventoryComparisonActions from "./ajax/inventory-comparison-actions";
+import InventoryComparisonActionsAjax from "../../../../components/modals/chat-item-comparison/ajax/inventory-comparison-actions-ajax";
 import WarningAlert from "../../../../components/ui/alerts/simple-alerts/warning-alert";
 import ComparisonSectionProps from "./types/comparison-section-props";
 import ComparisonSectionState from "./types/comparison-section-state";
 import InventoryUseDetails from "../../../character-sheet/components/modals/inventory-item-details";
 import DangerAlert from "../../../../components/ui/alerts/simple-alerts/danger-alert";
 import ItemToEquip from "../../../../components/item-comparison/deffinitions/item-to-equip";
+import {serviceContainer} from "../../../../lib/containers/core-container";
+import ItemActionsState from "../../../../components/modals/chat-item-comparison/types/item-actions-state";
 
 export default class ComparisonSection extends React.Component<
     ComparisonSectionProps,
-    ComparisonSectionState
+    ItemActionsState
 > {
+
+    private inventoryActionComparisonAjax: InventoryComparisonActionsAjax;
+
     constructor(props: ComparisonSectionProps) {
         super(props);
 
@@ -36,7 +41,11 @@ export default class ComparisonSection extends React.Component<
             error_message: null,
             show_loading_label: false,
             loading_label: null,
+            success_message: null,
+            has_updated_item: false,
         };
+
+        this.inventoryActionComparisonAjax = serviceContainer().fetch(InventoryComparisonActionsAjax);
     }
 
     manageEquipModal() {
@@ -88,7 +97,7 @@ export default class ComparisonSection extends React.Component<
                     equip_type: type,
                 };
 
-                new InventoryComparisonActions().equipItem(this, params);
+                this.inventoryActionComparisonAjax.equipItem(this, params);
             }
         );
     }
@@ -101,7 +110,7 @@ export default class ComparisonSection extends React.Component<
             slot_id: this.props.comparison_details.itemToEquip.slot_id,
         };
 
-        new InventoryComparisonActions().moveItem(this, params);
+        this.inventoryActionComparisonAjax.moveItem(this, params);
     }
 
     sellItem() {
@@ -111,7 +120,7 @@ export default class ComparisonSection extends React.Component<
             slot_id: this.props.comparison_details.itemToEquip.slot_id,
         };
 
-        new InventoryComparisonActions().sellItem(this, params);
+        this.inventoryActionComparisonAjax.sellItem(this, params);
     }
 
     listItem(price: number) {
@@ -122,13 +131,13 @@ export default class ComparisonSection extends React.Component<
             slot_id: this.props.comparison_details.itemToEquip.slot_id,
         };
 
-        new InventoryComparisonActions().listItem(this, params);
+        this.inventoryActionComparisonAjax.listItem(this, params);
     }
 
     disenchantItem() {
         this.props.set_action_loading();
 
-        new InventoryComparisonActions().disenchantItem(this);
+        this.inventoryActionComparisonAjax.disenchantItem(this);
     }
 
     destroyItem() {
@@ -138,7 +147,7 @@ export default class ComparisonSection extends React.Component<
             slot_id: this.props.comparison_details.itemToEquip.slot_id,
         };
 
-        new InventoryComparisonActions().destroyItem(this, params);
+        this.inventoryActionComparisonAjax.destroyItem(this, params);
     }
 
     showReplaceMessage() {
