@@ -1,6 +1,6 @@
 import InventoryDetails from "./inventory/inventory-details";
 import SetDetails from "./inventory/set-details";
-import {UsableSets} from "../../../../components/modals/chat-item-comparison/types/item-details-modal-state";
+import {UsableSets} from "../../../../components/modals/item-details/types/item-details-modal-state";
 
 export default interface InventoryTabProps {
 

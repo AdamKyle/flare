@@ -1,8 +1,8 @@
 
 import {CoreContainer} from "../../../../lib/containers/core-container";
-import ChatItemComparisonAjax from "../../../../components/modals/chat-item-comparison/ajax/chat-item-comparison-ajax";
 import ItemHolyEffects from "../values/item-holy-effects";
 import InventoryComparisonActionsAjax from "../ajax/inventory-comparison-actions-ajax";
+import ItemComparisonAjax from "../ajax/item-comparison-ajax";
 
 /**
  * Register core dependencies here.
@@ -13,8 +13,8 @@ import InventoryComparisonActionsAjax from "../ajax/inventory-comparison-actions
  * @param container
  */
 function chatItemComparisonContainer(container: CoreContainer) {
-    container.register('chat-item-comparison-ajax', {
-        useClass: ChatItemComparisonAjax
+    container.register('item-details-ajax', {
+        useClass: ItemComparisonAjax
     });
 
     container.register('inventory-comparison-action-ajax', {

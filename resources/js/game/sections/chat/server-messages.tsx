@@ -4,7 +4,7 @@ import ItemComparison from "./modals/item-comparison";
 import ServerMessagesComponentProps from "./types/components/server-messages-component-props";
 import ServerMessagesComponentState from "./types/components/server-messages-component-state";
 import { viewPortWatcher } from "../../lib/view-port-watcher";
-import ItemDetailsModal from "../../components/modals/chat-item-comparison/item-details-modal";
+import ItemDetailsModal from "../../components/modals/item-details/item-details-modal";
 
 export default class ServerMessages extends React.Component<ServerMessagesComponentProps, ServerMessagesComponentState> {
 

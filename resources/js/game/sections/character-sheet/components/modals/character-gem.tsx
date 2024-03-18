@@ -3,7 +3,7 @@ import Dialogue from "../../../../components/ui/dialogue/dialogue";
 import {AxiosError, AxiosResponse} from "axios";
 import Ajax from "../../../../lib/ajax/ajax";
 import LoadingProgressBar from "../../../../components/ui/progress-bars/loading-progress-bar";
-import GemDetails from "../../../../components/modals/chat-item-comparison/item-views/gem-details";
+import GemDetails from "../../../../components/modals/item-details/item-views/gem-details";
 
 export default class CharacterGem extends React.Component<any, any> {
 

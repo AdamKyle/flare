@@ -5,7 +5,7 @@ import ItemDetailsModal from "../item-details-modal";
 import {AxiosError, AxiosResponse} from "axios";
 
 @injectable()
-export default class ChatItemComparisonAjax {
+export default class ItemComparisonAjax {
 
     constructor(@inject(Ajax) private ajax: AjaxInterface) {}
 

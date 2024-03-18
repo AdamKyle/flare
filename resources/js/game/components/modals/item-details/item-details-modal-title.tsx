@@ -3,8 +3,6 @@ import ItemDetailsModalTitleProps from "./types/item-details-modal-title-props";
 import ItemNameColorationText from "../../items/item-name/item-name-coloration-text";
 import {capitalize} from "lodash";
 import {ItemType} from "../../items/enums/item-type";
-import ChatItemComparisonAjax from "./ajax/chat-item-comparison-ajax";
-import {serviceContainer} from "../../../lib/containers/core-container";
 
 export default class ItemDetailsModalTitle extends React.Component<ItemDetailsModalTitleProps, {  }> {
 

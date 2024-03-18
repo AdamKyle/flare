@@ -10,8 +10,8 @@ import ComparisonSection from "../../components/item-details/comparison/comparis
 import { watchForChatDarkModeComparisonChange } from "../../../lib/game/dark-mode-watcher";
 import UsableItemSection from "../../character-sheet/components/modals/components/usable-item-section";
 import InventoryQuestItemDetails from "../../character-sheet/components/modals/components/inventory-quest-item-details";
-import AlchemyItemHoly from "../../../components/modals/chat-item-comparison/item-views/alchemy-item-holy";
-import GemDetails from "../../../components/modals/chat-item-comparison/item-views/gem-details";
+import AlchemyItemHoly from "../../../components/modals/item-details/item-views/alchemy-item-holy";
+import GemDetails from "../../../components/modals/item-details/item-views/gem-details";
 import ItemToEquip from "../../../components/item-comparison/deffinitions/item-to-equip";
 
 export default class ItemComparison extends React.Component<any, any> {

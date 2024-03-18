@@ -3,15 +3,15 @@ import {ItemDetailsModalProps} from "./types/item-details-modal-props";
 import {ItemDetailsModalState} from "./types/item-details-modal-state";
 import Dialogue from "../../ui/dialogue/dialogue";
 import ItemDetailsModalTitle from "./item-details-modal-title";
-import ChatItemComparisonAjax from "./ajax/chat-item-comparison-ajax";
 import {serviceContainer} from "../../../lib/containers/core-container";
 import LoadingProgressBar from "../../ui/progress-bars/loading-progress-bar";
 import ItemView from "./item-view";
 import DangerAlert from "../../ui/alerts/simple-alerts/danger-alert";
+import ItemComparisonAjax from "./ajax/item-comparison-ajax";
 
 export default class ItemDetailsModal extends React.Component<ItemDetailsModalProps, ItemDetailsModalState> {
 
-    private ajax: ChatItemComparisonAjax;
+    private ajax: ItemComparisonAjax;
 
     constructor(props: ItemDetailsModalProps) {
         super(props);
@@ -27,7 +27,7 @@ export default class ItemDetailsModal extends React.Component<ItemDetailsModalPr
             secondary_actions: null,
         }
 
-        this.ajax = serviceContainer().fetch(ChatItemComparisonAjax);
+        this.ajax = serviceContainer().fetch(ItemComparisonAjax);
     }
 
     componentDidMount() {

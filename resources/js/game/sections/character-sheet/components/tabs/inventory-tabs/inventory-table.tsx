@@ -6,7 +6,7 @@ import InventoryDetails from "../../../../../lib/game/character-sheet/types/inve
 import InventoryItemsTableState from "../../../../../lib/game/character-sheet/types/tables/inventory-items-table-state";
 import UsableItemsDetails from "../../../../../lib/game/character-sheet/types/inventory/usable-items-details";
 import InfoAlert from "../../../../../components/ui/alerts/simple-alerts/info-alert";
-import ItemDetailsModal from "../../../../../components/modals/chat-item-comparison/item-details-modal";
+import ItemDetailsModal from "../../../../../components/modals/item-details/item-details-modal";
 
 export default class InventoryTable extends React.Component<InventoryTabProps, InventoryItemsTableState> {
 
