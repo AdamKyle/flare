@@ -3,20 +3,13 @@
 namespace App\Providers;
 
 use App\Console\AfterDeployment\AddHolyStacksToItems;
-use App\Console\AfterDeployment\AssignNewClassRanksAndMasteriesToCharacters;
 use App\Console\AfterDeployment\AssignNewFactionsToCharacters;
 use App\Console\AfterDeployment\AssignNewSkillsToPlayers;
-use App\Console\AfterDeployment\ChangeDamageAmountOnAffixes;
 use App\Console\AfterDeployment\CreateCharacterAttackDataCache;
 use App\Console\AfterDeployment\CreateMonsterCache;
-use App\Console\AfterDeployment\FillInfoSectionsWithItemTableType;
-use App\Console\AfterDeployment\GivePhaseRewardsForCharacters;
-use App\Console\AfterDeployment\KickOffEventGoalForWinterEvent;
 use App\Console\AfterDeployment\RebalanceQuestCurrencyCostsAndRewards;
 use App\Console\AfterDeployment\ReduceAlchemyItemsCost;
-use App\Console\AfterDeployment\ReduceUnitQueueAmount;
 use App\Console\AfterDeployment\RemoveInvalidQuestItems;
-use App\Console\AfterDeployment\UpdateCharacterCurrencies;
 use App\Console\AfterDeployment\UpdateCharactersForClassRanks;
 use App\Console\DevelopmentCommands\CreateCharacter;
 use App\Console\DevelopmentCommands\MaxOutCharactersPassiveSkills;
@@ -53,15 +46,9 @@ class AppServiceProvider extends ServiceProvider {
             CreateMonsterCache::class,
             UpdateCharactersForClassRanks::class,
             ReduceAlchemyItemsCost::class,
-            UpdateCharacterCurrencies::class,
             RebalanceQuestCurrencyCostsAndRewards::class,
-            KickOffEventGoalForWinterEvent::class,
-            GivePhaseRewardsForCharacters::class,
-            ChangeDamageAmountOnAffixes::class,
             AssignNewFactionsToCharacters::class,
             RemoveInvalidQuestItems::class,
-            ReduceUnitQueueAmount::class,
-            FillInfoSectionsWithItemTableType::class,
 
             // Development Commands:
             CreateCharacter::class,
