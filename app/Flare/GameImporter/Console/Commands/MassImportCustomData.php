@@ -31,9 +31,6 @@ class MassImportCustomData extends Command {
      */
     public function handle() {
 
-        Artisan::call('reduce:unit-queue-amount');
-        Artisan::call('remove:invalid-quest-items');
-
         Artisan::call('import:game-data "Core Imports"');
         Artisan::call('import:game-data Skills');
         Artisan::call('import:game-data Items');
@@ -42,12 +39,9 @@ class MassImportCustomData extends Command {
         Artisan::call('import:game-data "Quests"');
         Artisan::call('import:game-data "."');
 
-        Artisan::call('add:holy-stacks-to-items');
-        Artisan::call('assign:new-skills');
         Artisan::call('create:character-attack-data');
         Artisan::call('generate:monster-cache');
         Artisan::call('create:quest-cache');
-
 
         $this->importInformationSection();
     }
