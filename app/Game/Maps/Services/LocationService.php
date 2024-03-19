@@ -3,7 +3,6 @@
 namespace App\Game\Maps\Services;
 
 use App\Flare\Models\Raid;
-use App\Flare\Models\Event;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\Location;
 use App\Flare\Models\Character;
@@ -14,7 +13,6 @@ use App\Flare\Cache\CoordinatesCache;
 use App\Game\Core\Traits\KingdomCache;
 use Illuminate\Support\Facades\Storage;
 use App\Flare\Values\LocationEffectValue;
-use App\Game\Maps\Events\UpdateRankFights;
 use App\Game\Maps\Events\UpdateDuelAtPosition;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Flare\Handlers\UpdateCharacterAttackTypes;
@@ -118,39 +116,8 @@ class LocationService {
         // Remove character from pvp cache
         $this->characterCacheData->removeFromPvpCache($character);
 
-        // Update rank fights.
-        $this->updateForRankFights($character);
-
         // Update monsters for a possible raid at a possible location
         $this->updateMonstersForRaid($character, $this->location);
-    }
-
-    /**
-     * Update the location with rank fights if there is any.
-     *
-     * @param Character $character
-     * @return void
-     */
-    protected function updateForRankFights(Character $character): void {
-        if (is_null($this->location)) {
-            event(new UpdateRankFights($character->user, false));
-
-            return;
-        }
-
-        if (is_null($this->location->type)) {
-            event(new UpdateRankFights($character->user, false));
-
-            return;
-        }
-
-        if ((new LocationType($this->location->type))->isUnderWaterCaves()) {
-            event(new UpdateRankFights($character->user, true));
-
-            return;
-        }
-
-        event(new UpdateRankFights($character->user, false));
     }
 
     /**
@@ -245,7 +212,7 @@ class LocationService {
     }
 
     /**
-     * Is there a cedlestial entity at the characters location?
+     * Is there a celestial entity at the characters' location?
      *
      * @param Character $character
      * @return int|null

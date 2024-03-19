@@ -15,8 +15,4 @@ export default interface MonsterActionsProps {
     is_small: boolean;
 
     children?: React.ReactNode;
-
-    is_rank_fights: boolean;
-
-    total_ranks: number;
 }

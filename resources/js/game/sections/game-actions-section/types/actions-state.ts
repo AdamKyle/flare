@@ -35,8 +35,4 @@ export default interface ActionsState {
     show_purgatory_chains_section: boolean;
 
     show_gambling_section: boolean;
-
-    show_rank_fight: boolean;
-
-    total_ranks: number;
 }

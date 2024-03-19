@@ -39,112 +39,6 @@ export default class MonsterActions extends React.Component<
         });
     }
 
-    setupRankFight(component: FightSection) {
-        component.setState(
-            {
-                processing_rank_battle: true,
-            },
-            () => {
-                if (this.state.monster_to_fight === null) {
-                    component.setState({
-                        processing_rank_battle: false,
-                    });
-
-                    return;
-                }
-
-                new Ajax()
-                    .setRoute(
-                        "set-up-rank-fight/" +
-                            this.props.character.id +
-                            "/" +
-                            this.state.monster_to_fight.id
-                    )
-                    .setParameters({ rank: this.state.rank_selected })
-                    .doAjaxCall(
-                        "post",
-                        (result: AxiosResponse) => {
-                            this.setState(
-                                {
-                                    is_same_monster: false,
-                                },
-                                () => {
-                                    component.setState({
-                                        processing_rank_battle: false,
-                                        battle_messages: result.data.messages,
-                                        character_current_health:
-                                            result.data.health.character_health,
-                                        character_max_health:
-                                            result.data.health
-                                                .max_character_health,
-                                        monster_current_health:
-                                            result.data.health.monster_health,
-                                        monster_max_health:
-                                            result.data.health
-                                                .max_monster_health,
-                                        setting_up_rank_fight: false,
-                                        monster_to_fight_id:
-                                            result.data.monster_id,
-                                    });
-                                }
-                            );
-                        },
-                        (error: AxiosError) => {
-                            component.setState({
-                                processing_rank_battle: false,
-                            });
-
-                            console.error(error);
-                        }
-                    );
-            }
-        );
-    }
-
-    processRankFight(component: FightSection, attackType: string) {
-        component.setState(
-            {
-                processing_rank_battle: true,
-            },
-            () => {
-                if (this.state.monster_to_fight === null) {
-                    component.setState({
-                        processing_rank_battle: false,
-                    });
-
-                    return;
-                }
-
-                new Ajax()
-                    .setRoute("fight-ranked-monster/" + this.props.character.id)
-                    .setParameters({
-                        rank: this.state.rank_selected,
-                        monster_id: this.state.monster_to_fight.id,
-                        attack_type: attackType,
-                    })
-                    .doAjaxCall(
-                        "post",
-                        (result: AxiosResponse) => {
-                            component.setState({
-                                processing_rank_battle: false,
-                                battle_messages: [
-                                    ...component.state.battle_messages,
-                                    ...result.data.messages,
-                                ],
-                                character_current_health:
-                                    result.data.health.character_health,
-                                monster_current_health:
-                                    result.data.health.monster_health,
-                            });
-                        },
-                        (error: AxiosError) => {
-                            console.error(error);
-                        }
-                    );
-            }
-        );
-    }
-
     setSelectedMonster(monster: MonsterType | null) {
         this.monsterActionManager.setSelectedMonster(monster);
     }
@@ -180,50 +74,9 @@ export default class MonsterActions extends React.Component<
         return options;
     }
 
-    renderRankSelection() {
-        return (
-            <div className="mt-2 md:ml-[120px]">
-                <div className="grid grid-cols-3 gap-2">
-                    <div className="cols-start-1 col-span-2">
-                        <Select
-                            onChange={this.setRank.bind(this)}
-                            options={this.optionsForRanks()}
-                            menuPosition={"absolute"}
-                            menuPlacement={"bottom"}
-                            styles={{
-                                menuPortal: (base) => ({
-                                    ...base,
-                                    zIndex: 9999,
-                                    color: "#000000",
-                                }),
-                            }}
-                            menuPortalTarget={document.body}
-                            value={[
-                                {
-                                    label: "Rank " + this.state.rank_selected,
-                                    value: this.state.rank_selected,
-                                },
-                            ]}
-                        />
-                    </div>
-                    <div className="cols-start-3 cols-end-3">
-                        <a
-                            href="/information/ranked-fights"
-                            target="_blank"
-                            className="ml-2 relative top-[5px]"
-                        >
-                            Help <i className="fas fa-external-link-alt"></i>
-                        </a>
-                    </div>
-                </div>
-            </div>
-        );
-    }
-
     render() {
         return (
             <div className="relative">
-                {this.props.is_rank_fights ? this.renderRankSelection() : null}
 
                 <MonsterSelection
                     monsters={this.props.monsters}
@@ -255,9 +108,6 @@ export default class MonsterActions extends React.Component<
                         character_revived={this.state.character_revived}
                         reset_revived={this.resetRevived.bind(this)}
                         is_small={this.props.is_small}
-                        is_rank_fight={this.props.is_rank_fights}
-                        process_rank_fight={this.processRankFight.bind(this)}
-                        setup_rank_fight={this.setupRankFight.bind(this)}
                     />
                 ) : null}
 

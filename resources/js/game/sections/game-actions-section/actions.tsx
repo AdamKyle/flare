@@ -467,7 +467,6 @@ export default class Actions extends React.Component<
                                 monsters={this.state.monsters}
                                 character={this.props.character}
                                 character_statuses={this.props.character_status}
-                                is_rank_fights={this.state.show_rank_fight}
                                 total_ranks={this.state.total_ranks}
                                 is_small={false}
                             >

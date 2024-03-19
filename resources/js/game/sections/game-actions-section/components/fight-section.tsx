@@ -40,52 +40,10 @@ export default class FightSection extends React.Component<
     }
 
     componentDidMount() {
-        if (this.props.is_rank_fight) {
-            this.props.setup_rank_fight(this);
-
-            return;
-        }
-
         this.setUpBattle();
     }
 
     componentDidUpdate() {
-        if (this.props.is_rank_fight) {
-            if (this.state.setting_up_rank_fight) {
-                return;
-            }
-
-            if (this.props.is_same_monster) {
-                this.setState(
-                    {
-                        battle_messages: [],
-                        setting_up_rank_fight: true,
-                    },
-                    () => {
-                        this.props.setup_rank_fight(this);
-                    }
-                );
-            }
-
-            if (
-                this.props.monster_to_fight.id !==
-                    this.state.monster_to_fight_id &&
-                this.state.monster_to_fight_id !== 0
-            ) {
-                this.setState(
-                    {
-                        battle_messages: [],
-                        setting_up_rank_fight: true,
-                    },
-                    () => {
-                        this.props.setup_rank_fight(this);
-                    }
-                );
-            }
-
-            return;
-        }
-
         if (
             this.props.monster_to_fight.id !== this.state.monster_to_fight_id &&
             this.state.monster_to_fight_id !== 0
@@ -168,9 +126,6 @@ export default class FightSection extends React.Component<
     }
 
     attack(attackType: string) {
-        if (this.props.is_rank_fight) {
-            return this.props.process_rank_fight(this, attackType);
-        }
 
         this.setState(
             {
@@ -217,20 +172,6 @@ export default class FightSection extends React.Component<
     }
 
     attackButtonDisabled() {
-        if (this.props.is_rank_fight) {
-            if (
-                this.props.character?.is_dead ||
-                !this.props.character?.can_attack
-            ) {
-                return true;
-            }
-
-            if (this.state.monster_current_health <= 0) {
-                return true;
-            }
-
-            return false;
-        }
 
         if (typeof this.state.character_current_health === "undefined") {
             return true;
@@ -294,9 +235,7 @@ export default class FightSection extends React.Component<
 
                 <div
                     className={clsx("mt-4 mb-4 text-xs text-center", {
-                        hidden: this.attackButtonDisabled(),
-                        "ml-[50px]":
-                            !this.props.is_small && !this.props.is_rank_fight,
+                        'hidden': this.attackButtonDisabled(),
                     })}
                 >
                     <AttackButton
@@ -339,16 +278,6 @@ export default class FightSection extends React.Component<
                         on_click={() => this.attack("defend")}
                         disabled={this.attackButtonDisabled()}
                     />
-
-                    {!this.props.is_rank_fight ? (
-                        <a
-                            href="/information/combat"
-                            target="_blank"
-                            className="ml-2 mt-4 mb-4 hidden lg:block"
-                        >
-                            Help <i className="fas fa-external-link-alt"></i>
-                        </a>
-                    ) : null}
                 </div>
                 <div
                     className={clsx(
@@ -362,17 +291,6 @@ export default class FightSection extends React.Component<
                     <span className={"w-10 ml-2"}>Atk & Cast</span>
                     <span className={"w-10 ml-2"}>Defend</span>
                 </div>
-                {!this.props.is_rank_fight ? (
-                    <div className="text-center my-4">
-                        <a
-                            href="/information/combat"
-                            target="_blank"
-                            className="block lg:hidden"
-                        >
-                            Help <i className="fas fa-external-link-alt"></i>
-                        </a>
-                    </div>
-                ) : null}
                 {this.state.processing_rank_battle ||
                 this.state.processing_regular_fight ? (
                     <div className="w-1/2 mx-auto">

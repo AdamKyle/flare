@@ -105,10 +105,6 @@
                 <span class="fas fa-list"></span>
                 Characters
             </a>
-            <a href="{{ route('game.ranked-fights-tops') }}">
-                <span class="fas fa-list"></span>
-                Ranked Fights Tops
-            </a>
         </div>
     </div>
 </aside>

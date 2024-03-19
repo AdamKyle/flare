@@ -9,8 +9,6 @@ Route::middleware([
 ])->group(function() {
     Route::get('/game/tops', ['as' => 'game.tops', 'uses' => 'GameTopsController@tops']);
     Route::get('/game/tops/{character}', ['as' => 'game.tops.character.stats', 'uses' => 'GameTopsController@characterStats']);
-
-    Route::get('/game/ranked-fights-tops', ['as' => 'game.ranked-fights-tops', 'uses' => 'GameTopsController@rankedFightsTops']);
 });
 
 Route::middleware([

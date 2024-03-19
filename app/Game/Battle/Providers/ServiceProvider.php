@@ -4,13 +4,11 @@ namespace App\Game\Battle\Providers;
 
 use App\Flare\Builders\BuildMythicItem;
 use App\Flare\Builders\Character\CharacterCacheData;
-use App\Flare\Builders\RandomAffixGenerator;
 use App\Flare\Builders\RandomItemDropBuilder;
 use App\Flare\ServerFight\Monster\BuildMonster;
 use App\Flare\ServerFight\MonsterPlayerFight;
 use App\Flare\ServerFight\Pvp\PvpAttack;
 use App\Flare\Services\BuildMonsterCacheService;
-use App\Flare\Services\CharacterXPService;
 use App\Game\Battle\Console\Commands\ClearCelestials;
 use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Battle\Services\BattleDrop;
@@ -20,7 +18,6 @@ use App\Game\Battle\Services\MonthlyPvpFightService;
 use App\Game\Battle\Services\MonthlyPvpService;
 use App\Game\Battle\Services\PvpService;
 use App\Game\Battle\Services\RaidBattleService;
-use App\Game\Battle\Services\RankFightService;
 use App\Game\BattleRewardProcessing\Services\BattleRewardService;
 use App\Game\BattleRewardProcessing\Services\SecondaryRewardService;
 use App\Game\Core\Services\GoldRush;
@@ -57,17 +54,6 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(CelestialFightService::class, function($app) {
             return new CelestialFightService($app->make(BattleEventHandler::class), $app->make(CharacterCacheData::class), $app->make(MonsterPlayerFight::class));
-        });
-
-        $this->app->bind(RankFightService::class, function($app) {
-            return new RankFightService(
-                $app->make(BattleEventHandler::class),
-                $app->make(CharacterCacheData::class),
-                $app->make(CharacterXPService::class),
-                $app->make(MonsterPlayerFight::class),
-                $app->make(RandomAffixGenerator::class),
-                $app->make(BuildMythicItem::class)
-            );
         });
 
         $this->app->bind(PvpService::class, function($app) {

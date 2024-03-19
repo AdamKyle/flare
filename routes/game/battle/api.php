@@ -15,9 +15,6 @@ Route::middleware(['auth', 'is.character.who.they.say.they.are', 'throttle:150,2
             Route::post('/conjure/{character}', ['uses' => 'Api\CelestialBattleController@conjure']);
             Route::post('/attack-celestial/{character}/{celestialFight}', ['uses' => 'Api\CelestialBattleController@attack']);
 
-            Route::post('/set-up-rank-fight/{character}/{monster}', ['uses' => 'Api\RankFightController@setUpRankFight']);
-            Route::post('/fight-ranked-monster/{character}', ['uses' => 'Api\RankFightController@fightRankedMonster']);
-
             Route::get('/attack-player/get-health/{character}', ['uses' => 'Api\PvpBattleController@getHealth']);
             Route::post('/attack-player/{character}', ['uses' => 'Api\PvpBattleController@fightCharacter']);
 

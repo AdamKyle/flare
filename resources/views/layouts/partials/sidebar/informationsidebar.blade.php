@@ -155,10 +155,6 @@
                 <span class="ra ra-muscle-fat"></span>
                 Ambush and Counter
             </a>
-            <a href="{{ route('info.page', ['pageName' => 'ranked-fights']) }}">
-                <span class="ra ra-monster-skull"></span>
-                Ranked Fights (End Game)
-            </a>
             <a href="{{ route('info.page', ['pageName' => 'player-vs-player']) }}">
                 <span class="ra ra-helmet"></span>
                 Player vs Player

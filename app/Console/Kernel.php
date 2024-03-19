@@ -56,9 +56,6 @@ class Kernel extends ConsoleKernel {
         // Update kingdoms every hour.
         $schedule->command('update:kingdoms')->hourly()->timezone(config('app.timezone'));
 
-        // Monthly Rank Fights Roll Ahead
-        $schedule->command('update:rank-fights')->monthly()->timezone(config('app.timezone'));
-
         // Start the monthly pvp event.
         $schedule->command('start:pvp-monthly-event')->lastDayOfMonth('18:30')->timezone(config('app.timezone'));
 

@@ -35,7 +35,8 @@ class MassImportCustomData extends Command {
         Artisan::call('give:new-slots-quest-item');
 
         Artisan::call('import:game-data Items');
-        Artisan::call('import:game-data "Quests"');
+        Artisan::call('import:game-data Quests');
+        Artisan::call('import:game-data Locations');
 
         Artisan::call('create:character-attack-data');
         Artisan::call('generate:monster-cache');

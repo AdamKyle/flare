@@ -19,10 +19,4 @@ export default interface FightSectionProps {
     character_revived: boolean;
 
     is_small: boolean;
-
-    is_rank_fight: boolean
-
-    process_rank_fight: (component: FightSection, attackType: string) => void;
-
-    setup_rank_fight: (component: FightSection) => void;
 }

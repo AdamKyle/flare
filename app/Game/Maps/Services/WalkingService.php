@@ -64,13 +64,6 @@ class WalkingService extends BaseMovementService
             if (!$this->canPlayerEnterLocation($character, $location)) {
                 return $this->successResult();
             }
-
-            if (!is_null($location->type)) {
-                if ((new LocationType($location->type))->isUnderWaterCaves() && $character->currentAutomations->isNotEmpty()) {
-                    event(new ServerMessageEvent($character->user, 'You cannot enter this place while exploring!'));
-                    return $this->successResult();
-                }
-            }
         }
 
         if ($this->awakensCelestial()) {

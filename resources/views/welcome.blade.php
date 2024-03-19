@@ -155,38 +155,6 @@
         </div>
 
         <div class="grid md:grid-cols-2 gap-3 mt-5 w-full mt-10 mx-auto lg:w-2/3 md:mt-20">
-            <div class="md:flex md:items-center text-center md:text-left">
-                <div>
-                    <h2 class="mb-5 font-thin md:text-4xl lg:text-5xl dark:text-gray-300 text-gray-800">Ranked Fights</h2>
-                    <p class="mb-10 dark:text-gray-300 text-gray-800">
-                        Participate in some of the hardest fights in the game! Reach the top of the list for legendary
-                        rewards!
-                    </p>
-
-                    <p class="mb-10 dark:text-gray-300 text-gray-800">
-                        Ranked fights reset once per month, ranks will also increase one rank per month making the enemies
-                        at the bottom of the rank list
-                        for that month even harder!
-                    </p>
-
-                    <x-core.buttons.link-buttons.primary-button
-                        href="{{ route('info.page', [
-                            'pageName' => 'ranked-fights',
-                        ]) }}">
-                        Learn more
-                    </x-core.buttons.link-buttons.primary-button>
-                </div>
-            </div>
-            <div class="mt-4 lg:mt-0">
-                <img src="{{ asset('promotion/rank-fight-chart-data.png') }}"
-                    class="shadow rounded max-w-full h-auto align-middle border-none img-fluid glightbox w-100 mb-5 cursor-pointer" />
-                <div class="text-center text-sm">
-                    Click to make larger. Chart does not represent actual in game Rank progression data.
-                </div>
-            </div>
-        </div>
-
-        <div class="grid md:grid-cols-2 gap-3 mt-5 w-full mt-10 mx-auto lg:w-2/3 md:mt-20">
             <div class="mt-4 lg:mt-0">
                 <img src="{{ asset('promotion/corrupted-locations.png') }}"
                     class="shadow rounded max-w-full h-auto align-middle border-none img-fluid glightbox w-100 mb-5 cursor-pointer" />

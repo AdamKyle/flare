@@ -66,8 +66,6 @@ export default class SmallerActions extends React.Component<
             show_hell_forged_section: false,
             show_purgatory_chains_section: false,
             show_gambling_section: false,
-            show_rank_fight: false,
-            total_ranks: 0,
         };
 
         // @ts-ignore
@@ -139,17 +137,6 @@ export default class SmallerActions extends React.Component<
             (event: any) => {
                 this.setState({
                     crafting_time_out: event.timeout,
-                });
-            }
-        );
-
-        // @ts-ignore
-        this.manageRankFights.listen(
-            "Game.Maps.Events.UpdateRankFights",
-            (event: any) => {
-                this.setState({
-                    show_rank_fight: event.showRankSelection,
-                    total_ranks: event.ranks,
                 });
             }
         );
@@ -382,8 +369,6 @@ export default class SmallerActions extends React.Component<
             <MonsterActions
                 monsters={this.state.monsters}
                 character={this.props.character}
-                is_rank_fights={this.state.show_rank_fight}
-                total_ranks={this.state.total_ranks}
                 close_monster_section={this.closeMonsterSection.bind(this)}
                 character_statuses={this.props.character_status}
                 is_small={true}

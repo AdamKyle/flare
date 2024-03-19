@@ -18,8 +18,4 @@ class GameTopsController extends Controller {
             'attackData' => Cache::get('character-attack-data-' . $character->id)['attack_types'],
         ]);
     }
-
-    public function rankedFightsTops() {
-        return view('game.tops.ranked-fights-tops');
-    }
 }
