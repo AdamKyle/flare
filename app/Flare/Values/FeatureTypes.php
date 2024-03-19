@@ -70,7 +70,7 @@ class FeatureTypes {
         return $this->value === self::COSMETIC_TEXT;
     }
 
-    public function isNameTab(): bool {
+    public function isNameTag(): bool {
         return $this->value === self::NAME_TAGS;
     }
 }

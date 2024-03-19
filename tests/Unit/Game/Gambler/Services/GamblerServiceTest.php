@@ -110,8 +110,8 @@ class GamblerServiceTest extends TestCase {
 
         $this->assertEquals(0, $character->gold);
         $this->assertEquals(200, $response['status']);
-        $this->assertEquals('You got a 500 Gold dust!', $response['message']);
-        $this->assertEquals(500, $character->gold_dust);
+        $this->assertEquals('You got a 5,000 Gold dust!', $response['message']);
+        $this->assertEquals(5000, $character->gold_dust);
     }
 
     public function testRolledAllThreeOfShards() {
@@ -135,8 +135,8 @@ class GamblerServiceTest extends TestCase {
 
         $this->assertEquals(0, $character->gold);
         $this->assertEquals(200, $response['status']);
-        $this->assertEquals('You got a 500 Shards!', $response['message']);
-        $this->assertEquals(500, $character->shards);
+        $this->assertEquals('You got a 5,000 Shards!', $response['message']);
+        $this->assertEquals(5000, $character->shards);
     }
 
     public function testRolledAllThreeOfCopperCoinsWithItem() {
@@ -166,8 +166,8 @@ class GamblerServiceTest extends TestCase {
 
         $this->assertEquals(0, $character->gold);
         $this->assertEquals(200, $response['status']);
-        $this->assertEquals('You got a 500 Copper coins!', $response['message']);
-        $this->assertEquals(500, $character->copper_coins);
+        $this->assertEquals('You got a 5,000 Copper coins!', $response['message']);
+        $this->assertEquals(5000, $character->copper_coins);
     }
 
     public function testRolledAllThreeOfCopperCoinsWithoutItem() {
@@ -216,8 +216,8 @@ class GamblerServiceTest extends TestCase {
 
         $this->assertEquals(0, $character->gold);
         $this->assertEquals(200, $response['status']);
-        $this->assertEquals('You got a 250 Gold dust!', $response['message']);
-        $this->assertEquals(250, $character->gold_dust);
+        $this->assertEquals('You got a 1,000 Gold dust!', $response['message']);
+        $this->assertEquals(1000, $character->gold_dust);
     }
 
     public function testRolledTwoOfShards() {
@@ -241,8 +241,8 @@ class GamblerServiceTest extends TestCase {
 
         $this->assertEquals(0, $character->gold);
         $this->assertEquals(200, $response['status']);
-        $this->assertEquals('You got a 250 Shards!', $response['message']);
-        $this->assertEquals(250, $character->shards);
+        $this->assertEquals('You got a 1,000 Shards!', $response['message']);
+        $this->assertEquals(1000, $character->shards);
     }
 
     public function testRolledTwoOfCopperCoinsWithItem() {
@@ -272,8 +272,8 @@ class GamblerServiceTest extends TestCase {
 
         $this->assertEquals(0, $character->gold);
         $this->assertEquals(200, $response['status']);
-        $this->assertEquals('You got a 250 Copper coins!', $response['message']);
-        $this->assertEquals(250, $character->copper_coins);
+        $this->assertEquals('You got a 1,000 Copper coins!', $response['message']);
+        $this->assertEquals(1000, $character->copper_coins);
     }
 
     public function testRolledTwoOfGoldDustWithMaxGoldDust() {
@@ -297,7 +297,7 @@ class GamblerServiceTest extends TestCase {
 
         $this->assertEquals(0, $character->gold);
         $this->assertEquals(200, $response['status']);
-        $this->assertEquals('You got a 250 Gold dust!', $response['message']);
+        $this->assertEquals('You got a 1,000 Gold dust!', $response['message']);
         $this->assertEquals(MaxCurrenciesValue::MAX_GOLD_DUST, $character->gold_dust);
     }
 
@@ -322,7 +322,7 @@ class GamblerServiceTest extends TestCase {
 
         $this->assertEquals(0, $character->gold);
         $this->assertEquals(200, $response['status']);
-        $this->assertEquals('You got a 250 Shards!', $response['message']);
+        $this->assertEquals('You got a 1,000 Shards!', $response['message']);
         $this->assertEquals(MaxCurrenciesValue::MAX_SHARDS, $character->shards);
     }
 
@@ -353,7 +353,7 @@ class GamblerServiceTest extends TestCase {
 
         $this->assertEquals(0, $character->gold);
         $this->assertEquals(200, $response['status']);
-        $this->assertEquals('You got a 250 Copper coins!', $response['message']);
+        $this->assertEquals('You got a 1,000 Copper coins!', $response['message']);
         $this->assertEquals(MaxCurrenciesValue::MAX_COPPER, $character->copper_coins);
     }
 }

@@ -18,7 +18,6 @@ use App\Flare\Models\InventorySlot;
 use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Models\Item as ItemModel;
 use App\Flare\Values\MaxCurrenciesValue;
-use App\Game\Core\Traits\MercenaryBonus;
 use App\Game\Skills\Services\SkillService;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Services\CharacterService;
@@ -31,8 +30,6 @@ use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 
 class CharacterRewardService {
-
-    use MercenaryBonus;
 
     /**
      * @var Character $character
@@ -355,9 +352,10 @@ class CharacterRewardService {
      * @throws Exception
      */
     protected function distributeCopperCoins(Monster $monster) {
-        $item      = ItemModel::where('effect', ItemEffectsValue::GET_COPPER_COINS)->first();
+        $copperCoinsItem      = ItemModel::where('effect', ItemEffectsValue::GET_COPPER_COINS)->first();
+        $mercenarySlotBonusItem  = ItemModel::where('effect', ItemEffectsValue::MERCENARY_SLOT_BONUS)->first();
 
-        if (is_null($item)) {
+        if (is_null($copperCoinsItem)) {
             return;
         }
 
@@ -365,17 +363,24 @@ class CharacterRewardService {
 
         if ($gameMap->mapType()->isPurgatory()) {
             $inventory = Inventory::where('character_id', $this->character->id)->first();
-            $slot      = InventorySlot::where('inventory_id', $inventory->id)->where('item_id', $item->id)->first();
+            $copperCoinSlot = InventorySlot::where('inventory_id', $inventory->id)->where('item_id', $copperCoinsItem->id)->first();
+            $mercenaryQuestSlot = InventorySlot::where('inventory_id', $inventory->id)->where('item_id', $mercenarySlotBonusItem->id)->first();
 
-            if (!is_null($slot)) {
+            if (!is_null($copperCoinSlot)) {
                 $coins             = rand(5, 20);
                 $purgatoryDungeons = $this->purgatoryDungeons($this->character->map);
 
                 if (!is_null($purgatoryDungeons)) {
-                    $coins *= 3;
+                    $coins *= 1.5;
                 }
 
-                $coins = $coins + $coins * $this->getCopperCoinBonus($this->character);
+                $mercenarySlotBonus = 0;
+
+                if (!is_null($mercenaryQuestSlot)) {
+                    $mercenarySlotBonus = 0.5;
+                }
+
+                $coins = $coins + $coins * $mercenarySlotBonus;
 
                 $newCoins          = $this->character->copper_coins + $coins;
                 $maxCurrencies     = new MaxCurrenciesValue($newCoins, MaxCurrenciesValue::COPPER);

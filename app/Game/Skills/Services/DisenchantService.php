@@ -6,17 +6,13 @@ use App\Flare\Values\MaxCurrenciesValue;
 use App\Flare\Models\Character;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Skill;
-use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Events\UpdateSkillEvent;
-use App\Game\Core\Traits\MercenaryBonus;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Skills\Events\UpdateCharacterEnchantingList;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 
 class DisenchantService {
-
-    use MercenaryBonus;
 
     /**
      * @var EnchantingService $enchantingService
@@ -152,7 +148,7 @@ class DisenchantService {
 
         $goldDust = !$failedCheck ? rand(2, 1150) : 1;
 
-        $goldDust = $goldDust + $goldDust * ($this->getGoldDustBonus($character) + $this->disenchantingSkill->bonus);
+        $goldDust = $goldDust + $goldDust *  $this->disenchantingSkill->bonus;
 
         $characterTotalGoldDust = $character->gold_dust + $goldDust;
 

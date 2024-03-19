@@ -5,7 +5,6 @@ namespace App\Game\Skills\Services;
 use App\Game\CharacterInventory\Events\CharacterInventoryUpdateBroadCastEvent;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Values\MaxCurrenciesValue;
-use App\Game\Core\Traits\MercenaryBonus;
 use App\Flare\Models\Character;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Skill;
@@ -13,8 +12,6 @@ use App\Flare\Values\ItemEffectsValue;
 use Illuminate\Support\Collection;
 
 class MassDisenchantService {
-
-    use MercenaryBonus;
 
     /**
      * @var int $goldDust
@@ -35,11 +32,6 @@ class MassDisenchantService {
      * @var int $enchantingLevelTimes
      */
     private int $enchantingLevelTimes = 0;
-
-    /**
-     * @var float $goldDustBonus
-     */
-    private float $goldDustBonus = 0.0;
 
     /**
      * @var float|int $baseSkillXP
@@ -97,8 +89,6 @@ class MassDisenchantService {
         $this->questSlot = $character->inventory->slots->filter(function ($slot) {
             return $slot->item->type === 'quest' && $slot->item->effect === ItemEffectsValue::GOLD_DUST_RUSH;
         })->first();
-
-        $this->goldDustBonus = $this->getGoldDustBonus($character);
 
         $this->baseSkillXP   = 25 + 25 * $this->disenchantingSkill->skill_training_bonus;
 
@@ -290,7 +280,6 @@ class MassDisenchantService {
             $goldDust = $goldDust + $goldDust * $this->disenchantingSkill->bonus;
         }
 
-        $goldDust               = $goldDust + $goldDust * $this->goldDustBonus;
         $characterTotalGoldDust = $this->character->gold_dust;
 
         if (!is_null($this->questSlot) && !$failedCheck) {
@@ -299,9 +288,7 @@ class MassDisenchantService {
 
             if ($roll > $dc) {;
 
-                $goldDust = $characterTotalGoldDust * 0.05;
-
-                return $goldDust;
+                return $characterTotalGoldDust * 0.05;
             }
         }
 

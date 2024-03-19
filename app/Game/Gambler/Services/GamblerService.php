@@ -3,12 +3,13 @@
 namespace App\Game\Gambler\Services;
 
 use App\Flare\Models\Character;
+use App\Flare\Models\Event;
 use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
-use App\Game\Core\Traits\MercenaryBonus;
 use App\Game\Core\Traits\ResponseBuilder;
+use App\Game\Events\Values\EventType;
 use App\Game\Gambler\Events\GamblerSlotTimeOut;
 use App\Game\Gambler\Handlers\SpinHandler;
 use App\Game\Gambler\Jobs\SlotTimeOut;
@@ -17,10 +18,16 @@ use Exception;
 
 class GamblerService {
 
-    use ResponseBuilder, MercenaryBonus;
+    use ResponseBuilder;
 
+    /**
+     * @var SpinHandler $spinHandler
+     */
     private SpinHandler $spinHandler;
 
+    /**
+     * @param SpinHandler $spinHandler
+     */
     public function __construct(SpinHandler $spinHandler) {
         $this->spinHandler = $spinHandler;
     }
@@ -53,11 +60,11 @@ class GamblerService {
         $rollInfo = $this->spinHandler->processRoll($rollInfo);
 
         if ($rollInfo['matchingAmount'] === 2) {
-            return $this->giveReward($character, $rollInfo, 250);
+            return $this->giveReward($character, $rollInfo, 1000);
         }
 
         if ($rollInfo['matchingAmount'] === 3) {
-            return $this->giveReward($character, $rollInfo, 500);
+            return $this->giveReward($character, $rollInfo, 5000);
         }
 
         return $this->successResult([
@@ -113,39 +120,25 @@ class GamblerService {
             }
         }
 
-        $newAmount = $character->{$attribute} + $amountToWin;
+        $totalBonus  = 0;
 
-        if ($attribute === 'shards') {
+        $currencyDayEvent = Event::where('type', EventType::WEEKLY_CURRENCY_DROPS)->first();
 
-            $amountToWin = $amountToWin + $amountToWin * $this->getShardBonus($character);
-            $amountToWin = $amountToWin + $amountToWin * $this->getGamblerBonus($character);
-
-            $newAmount   = $character->{$attribute} + $amountToWin;
-
-            $newAmount = $newAmount;
+        if (!is_null($currencyDayEvent)) {
+            $totalBonus += 0.25;
         }
 
-        if ($attribute === 'gold_dust') {
+        $foundQuestItem = $character->inventory->slots->filter(function($slot) {
+            return $slot->item->type === 'quest' && $slot->item->effect === ItemEffectsValue::MERCENARY_SLOT_BONUS;
+        })->first();
 
-            $amountToWin = $amountToWin + $amountToWin * $this->getGoldDustBonus($character);
-            $amountToWin = $amountToWin + $amountToWin * $this->getGamblerBonus($character);
-
-            $newAmount   = $character->{$attribute} + $amountToWin;
-
-            $newAmount = $newAmount;
+        if (!is_null($foundQuestItem)) {
+            $totalBonus += .50;
         }
 
-        if ($attribute === 'copper_coins') {
-
-            $amountToWin = $amountToWin + $amountToWin * $this->getCopperCoinBonus($character);
-            $amountToWin = $amountToWin + $amountToWin * $this->getGamblerBonus($character);
-
-            $newAmount   = $character->{$attribute} + $amountToWin;
-
-            $newAmount = $newAmount;
-        }
-
-        $newAmount = $this->getAmount($attribute, $newAmount);
+        $amountToWin = $amountToWin + $amountToWin * $totalBonus;
+        $newAmount   = $character->{$attribute} + $amountToWin;
+        $newAmount   = $this->getAmount($attribute, $newAmount);
 
         $character->{$attribute} = $newAmount;
         $character->save();

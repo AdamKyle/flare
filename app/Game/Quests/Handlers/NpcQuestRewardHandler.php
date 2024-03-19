@@ -95,6 +95,13 @@ class NpcQuestRewardHandler {
 
                 event(new GlobalMessageEvent($character->name . ' Has unlocked an epic gift! Cosmetic Text! They can truly stand out from the rest of you now!'));
             }
+
+            if ($quest->unlocksFeature()->isNameTag()) {
+                event(new ServerMessageEvent($character->user, 'You can now select name tags fro your character to show off in chat by selecting one from your settings page (Hover/Tap To Right User Icon) to change the tag
+                that shows beside your character name in chat!'));
+
+                event(new GlobalMessageEvent($character->name . ' Has unlocked an epic gift! Name Tags! Their deeds have not gone unnoticed in the land of Tlessa!'));
+            }
         }
 
         $this->createQuestLog($character, $quest);
