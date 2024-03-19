@@ -2,15 +2,9 @@
 
 namespace Tests\Unit\Game\Messages\Models;
 
-use App\Flare\Models\CharacterMercenary;
-use App\Flare\Values\MaxCurrenciesValue;
-use App\Game\Mercenaries\Services\MercenaryService;
-use App\Game\Mercenaries\Values\ExperienceBuffValue;
-use App\Game\Mercenaries\Values\MercenaryValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
-use Tests\Traits\CreateItem;
 use Tests\Traits\CreateMessage;
 
 class MessageTest extends TestCase {

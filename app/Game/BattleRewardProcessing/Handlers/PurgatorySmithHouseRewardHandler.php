@@ -16,7 +16,6 @@ use App\Flare\Values\MaxCurrenciesValue;
 use App\Flare\Values\RandomAffixDetails;
 use Facades\App\Game\Core\Handlers\AnnouncementHandler;
 use App\Game\Events\Values\EventType;
-use App\Game\Mercenaries\Values\MercenaryValue;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
 use Exception;
@@ -125,13 +124,8 @@ class PurgatorySmithHouseRewardHandler {
         $hasItemForCopperCoins = $character->inventory->slots->where('item.effect', ItemEffectsValue::GET_COPPER_COINS)->count() > 0;
         $copperCoins = 0;
 
-        $goldDust = $goldDust + $goldDust * $this->getCurrencyMercenaryBonus($character, MercenaryValue::CHILD_OF_GOLD_DUST);
-        $shards = $shards + $shards * $this->getCurrencyMercenaryBonus($character, MercenaryValue::CHILD_OF_SHARDS);
-
         if ($hasItemForCopperCoins) {
             $copperCoins = RandomNumberGenerator::generateRandomNumber(1, $maximumAmount);
-
-            $copperCoins = $copperCoins + $copperCoins * $this->getCurrencyMercenaryBonus($character, MercenaryValue::CHILD_OF_COPPER_COINS);
         }
 
         $goldDust    += $character->gold_dust;
@@ -249,24 +243,6 @@ class PurgatorySmithHouseRewardHandler {
 
             event(new ServerMessageEvent($character->user, 'You found something MYTHICAL in the basement child: ' . $item->affix_name, $slot->id));
         }
-    }
-
-    /**
-     * Get mercenary bonus.
-     *
-     * @param Character $character
-     * @param string $mercenaryType
-     * @return float
-     */
-    protected function getCurrencyMercenaryBonus(Character $character, string $mercenaryType): float {
-
-        $mercenary = $character->mercenaries()->where('mercenary_type', $mercenaryType)->first();
-
-        if (!is_null($mercenary)) {
-            return $mercenary->type()->getBonus($mercenary->current_level, $mercenary->reincarnated_bonus);
-        }
-
-        return 0;
     }
 
     /**

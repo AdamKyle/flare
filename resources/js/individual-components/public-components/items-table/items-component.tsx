@@ -6,9 +6,14 @@ const itemsTableComponent: HTMLElement | null = document.getElementById('items-t
 
 if (itemsTableComponent !== null) {
 
-    const dataAttribute = itemsTableComponent.getAttribute('data-item-table-type');
+    let dataAttribute = itemsTableComponent.getAttribute('data-item-table-type');
 
     const root: Root = createRoot(itemsTableComponent);
+
+    // Data attributes seem to cast null as a string.
+    if (dataAttribute === 'null') {
+        dataAttribute = null;
+    }
 
     root.render(<Items type={dataAttribute} />);
 }

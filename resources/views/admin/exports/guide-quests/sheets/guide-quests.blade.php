@@ -14,10 +14,6 @@
             <th>required_secondary_skill_level</th>
             <th>required_skill_type</th>
             <th>required_skill_type_level</th>
-            <th>required_mercenary_type</th>
-            <th>required_secondary_mercenary_type</th>
-            <th>required_mercenary_level</th>
-            <th>required_secondary_mercenary_level</th>
             <th>required_class_specials_equipped</th>
             <th>required_class_rank_level</th>
             <th>required_faction_id</th>
@@ -77,10 +73,6 @@
                 <td>{{ $guideQuest->required_secondary_skill_level }}</td>
                 <td>{{ $guideQuest->required_skill_type }}</td>
                 <td>{{ $guideQuest->required_skill_type_level }}</td>
-                <td>{{ $guideQuest->required_mercenary_type }}</td>
-                <td>{{ $guideQuest->required_secondary_mercenary_type }}</td>
-                <td>{{ $guideQuest->required_mercenary_level }}</td>
-                <td>{{ $guideQuest->required_secondary_mercenary_level }}</td>
                 <td>{{ $guideQuest->required_class_specials_equipped }}</td>
                 <td>{{ $guideQuest->required_class_rank_level }}</td>
                 <td>{{ !is_null($guideQuest->required_faction_id) ? $guideQuest->faction_name : '' }}</td>

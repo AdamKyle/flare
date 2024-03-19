@@ -19,7 +19,6 @@ use App\Flare\Models\GameMap;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Item;
 use App\Flare\Models\Quest;
-use App\Game\Mercenaries\Values\MercenaryValue;
 use App\Game\Skills\Values\SkillTypeValue;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -74,7 +73,6 @@ class GuideQuestsController extends Controller {
             'questItems'       => Item::where('type', 'quest')->pluck('name', 'id')->toArray(),
             'passives'         => PassiveSkill::pluck('name', 'id')->toArray(),
             'skillTypes'       => SkillTypeValue::$namedValues,
-            'mercenaryTypes'   => MercenaryValue::mercenaryList(),
             'kingdomBuildings' => GameBuilding::pluck('name', 'id')->toArray(),
             'events'           => EventType::getOptionsForSelect(),
             'guideQuests'      => GuideQuest::pluck('name', 'id')->toArray(),
@@ -107,7 +105,6 @@ class GuideQuestsController extends Controller {
             'questItems'       => Item::where('type', 'quest')->pluck('name', 'id')->toArray(),
             'passives'         => PassiveSkill::pluck('name', 'id')->toArray(),
             'skillTypes'       => SkillTypeValue::$namedValues,
-            'mercenaryTypes'   => MercenaryValue::mercenaryList(),
             'kingdomBuildings' => GameBuilding::pluck('name', 'id')->toArray(),
             'events'           => EventType::getOptionsForSelect(),
             'guideQuests'      => GuideQuest::pluck('name', 'id')->toArray(),

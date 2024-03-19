@@ -93,18 +93,6 @@
                             <dt>Required Passive Level</dt>
                             <dd>{{ $guideQuest->required_passive_level }}</dd>
                         @endif
-                        @if (!is_null($guideQuest->mercenary_name))
-                            <dt>Required Mercenary Name</dt>
-                            <dd>{{ $guideQuest->mercenary_name }}</dd>
-                            <dt>Required Mercenary Level</dt>
-                            <dd>{{ $guideQuest->required_mercenary_level }}</dd>
-                        @endif
-                        @if (!is_null($guideQuest->secondary_mercenary_name))
-                            <dt>Required Secondary Mercenary Name</dt>
-                            <dd>{{ $guideQuest->secondary_mercenary_name }}</dd>
-                            <dt>Required Secondary Mercenary Level</dt>
-                            <dd>{{ $guideQuest->required_secondary_mercenary_level }}</dd>
-                        @endif
                         @if (!is_null($guideQuest->required_class_specials_equipped))
                             <dt>Required Class Specials Equipped</dt>
                             <dd>{{ $guideQuest->required_class_specials_equipped }}</dd>

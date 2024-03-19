@@ -11,7 +11,13 @@ export default class ItemTableAjax {
     constructor(@inject(Ajax) private ajax: AjaxInterface) {}
 
 
-    public fetchTableData(component: Items, type: string) {
+    public fetchTableData(component: Items, type: string | null) {
+        if (type === null) {
+            component.setState({loading: false});
+
+            return;
+        }
+
         if (type === TableType.CRAFTING) {
             return this.fetchCraftingTableItems(component);
         }
@@ -28,11 +34,6 @@ export default class ItemTableAjax {
         }
 
         if (specialtyType === null) {
-            component.setState({
-                loading: false,
-                error_message: 'Specialty type is missing.'
-            })
-
             return;
         }
 

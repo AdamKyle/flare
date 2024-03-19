@@ -77,36 +77,6 @@ class GuideQuestRequirementsService {
     }
 
     /**
-     * Does the character have the require mercenary attributes?
-     *
-     * @param Character $character
-     * @param GuideQuest $quest
-     * @param boolean $primary
-     * @return GuideQuestRequirementsService
-     */
-    public function requiredMercenaryCheck(Character $character, GuideQuest $quest, bool $primary = true): GuideQuestRequirementsService {
-        $attribute = $primary ? 'required_mercenary_type' : 'required_secondary_mercenary_type';
-
-        if (!is_null($quest->{$attribute})) {
-            $requiredMercenary = $character->mercenaries()->where('mercenary_type', $quest->{$attribute})->first();
-
-            if (is_null($requiredMercenary)) {
-                return $this;
-            }
-
-            $this->finishedRequirements[] = $attribute;
-
-            $levelAttribute = $primary ? 'required_mercenary_level' : 'required_secondary_mercenary_level';
-
-            if ($requiredMercenary->current_level >= $quest->{$levelAttribute}) {
-                $this->finishedRequirements[] = $levelAttribute;
-            }
-        }
-
-        return $this;
-    }
-
-    /**
      * Does character have the required skill type?
      *
      * @param Character $character

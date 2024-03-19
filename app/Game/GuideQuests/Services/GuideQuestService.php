@@ -137,8 +137,6 @@ class GuideQuestService {
             ->requiredGameMapAccess($character, $quest)
             ->requiredQuestItem($character, $quest)
             ->requiredQuestItem($character, $quest, false)
-            ->requiredMercenaryCheck($character, $quest)
-            ->requiredMercenaryCheck($character, $quest, false)
             ->requiredKingdomCount($character, $quest)
             ->requiredKingdomBuildingLevel($character, $quest)
             ->requiredKingdomUnitCount($character, $quest)

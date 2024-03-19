@@ -2,15 +2,11 @@
 
 namespace App\Flare\Models;
 
-use App\Flare\Values\ItemSpecialtyType;
 use App\Game\Events\Values\EventType;
-use Exception;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Database\Factories\GuideQuestFactory;
 use App\Game\Skills\Values\SkillTypeValue;
-use App\Game\Mercenaries\Values\MercenaryValue;
 
 class GuideQuest extends Model {
 
@@ -47,10 +43,6 @@ class GuideQuest extends Model {
         'required_passive_level',
         'required_skill_type',
         'required_skill_type_level',
-        'required_mercenary_type',
-        'required_secondary_mercenary_type',
-        'required_mercenary_level',
-        'required_secondary_mercenary_level',
         'required_class_specials_equipped',
         'required_class_rank_level',
         'required_gold',
@@ -110,10 +102,6 @@ class GuideQuest extends Model {
         'required_passive_level'             => 'integer',
         'required_skill_type'                => 'integer',
         'required_skill_type_level'          => 'integer',
-        'required_mercenary_type'            => 'string',
-        'required_secondary_mercenary_type'  => 'string',
-        'required_mercenary_level'           => 'integer',
-        'required_secondary_mercenary_level' => 'integer',
         'required_class_specials_equipped'   => 'integer',
         'required_class_rank_level'          => 'integer',
         'required_stats'                     => 'integer',
@@ -154,8 +142,6 @@ class GuideQuest extends Model {
         'passive_name',
         'secondary_skill_name',
         'skill_type_name',
-        'mercenary_name',
-        'secondary_mercenary_name',
         'kingdom_building_name',
         'parent_quest_name',
         'required_to_be_on_game_map_name',
@@ -187,36 +173,6 @@ class GuideQuest extends Model {
         }
 
         return null;
-    }
-
-    public function getMercenaryNameAttribute() {
-
-        if (is_null($this->required_mercenary_type)) {
-            return null;
-        }
-
-        try {
-            return (new MercenaryValue($this->required_mercenary_type))->getName();
-        } catch (Exception $e) {
-            Log::info('Invalid Mercenary for: ' . $this->required_mercenary_type);
-
-            return null;
-        }
-    }
-
-    public function getSecondaryMercenaryNameAttribute() {
-
-        if (is_null($this->required_secondary_mercenary_type)) {
-            return null;
-        }
-
-        try {
-            return (new MercenaryValue($this->required_secondary_mercenary_type))->getName();
-        } catch (Exception $e) {
-            Log::info('Invalid Mercenary for: ' . $this->required_secondary_mercenary_type);
-
-            return null;
-        }
     }
 
     public function getQuestNameAttribute() {

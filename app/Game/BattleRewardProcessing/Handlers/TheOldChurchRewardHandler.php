@@ -16,14 +16,12 @@ use App\Flare\Values\MaxCurrenciesValue;
 use App\Flare\Values\RandomAffixDetails;
 use Facades\App\Game\Core\Handlers\AnnouncementHandler;
 use App\Game\Events\Values\EventType;
-use App\Game\Mercenaries\Values\MercenaryValue;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
 use Exception;
 use Illuminate\Support\Facades\Cache;
 
 class TheOldChurchRewardHandler {
-
 
     /**
      * @var RandomAffixGenerator $randomAffixGenerator
@@ -108,16 +106,13 @@ class TheOldChurchRewardHandler {
         $maximumGold = 20000;
 
         if (!is_null($event)) {
-            $maximumAmount = 2000;
+            $maximumAmount = 3000;
             $maximumGold = 40000;
         }
 
         $goldDust = RandomNumberGenerator::generateRandomNumber(1, $maximumAmount);
         $shards   = RandomNumberGenerator::generateRandomNumber(1, $maximumAmount);
         $gold     = RandomNumberGenerator::generateRandomNumber(1, $maximumGold);
-
-        $goldDust = $goldDust + $goldDust * $this->getCurrencyMercenaryBonus($character, MercenaryValue::CHILD_OF_GOLD_DUST);
-        $shards = $shards + $shards * $this->getCurrencyMercenaryBonus($character, MercenaryValue::CHILD_OF_SHARDS);
 
         $gold        += $character->gold;
         $goldDust    += $character->gold_dust;
@@ -217,23 +212,6 @@ class TheOldChurchRewardHandler {
         }
     }
 
-    /**
-     * Get mercenary bonus.
-     *
-     * @param Character $character
-     * @param string $mercenaryType
-     * @return float
-     */
-    protected function getCurrencyMercenaryBonus(Character $character, string $mercenaryType): float {
-
-        $mercenary = $character->mercenaries()->where('mercenary_type', $mercenaryType)->first();
-
-        if (!is_null($mercenary)) {
-            return $mercenary->type()->getBonus($mercenary->current_level, $mercenary->reincarnated_bonus);
-        }
-
-        return 0;
-    }
 
     /**
      * 1 out of 1 million chance to create an event.

@@ -60,7 +60,11 @@ export default  class Items extends React.Component<ItemTableProps, ItemTableSta
     }
 
     render() {
-        if (this.state.loading || this.props.type === null) {
+        if (this.props.type === null) {
+            return;
+        }
+
+        if (this.state.loading) {
             return <LoadingProgressBar />
         }
 

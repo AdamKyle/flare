@@ -16,15 +16,13 @@ use App\Game\Battle\Values\CelestialConjureType;
 use App\Game\BattleRewardProcessing\Jobs\BattleAttackHandler;
 use App\Game\Core\Events\UpdateCharacterCelestialTimeOut;
 use App\Game\Core\Events\UpdateTopBarEvent;
-use App\Game\Core\Traits\MercenaryBonus;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
-use Facades\App\Flare\Cache\CoordinatesCache;
 
 class CelestialFightService {
 
-    use ResponseBuilder, MercenaryBonus;
+    use ResponseBuilder;
 
     private BattleEventHandler $battleEventHandler;
 
@@ -185,7 +183,6 @@ class CelestialFightService {
     protected function giveShards(Character $character, CelestialFight $celestialFight) {
 
         $monsterShards = $celestialFight->monster->shards;
-        $monsterShards = $monsterShards + $monsterShards * $this->getShardBonus($character);
 
         $shards = $character->shards + $monsterShards;
 

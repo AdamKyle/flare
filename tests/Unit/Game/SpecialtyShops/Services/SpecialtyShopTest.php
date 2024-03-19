@@ -131,7 +131,7 @@ class SpecialtyShopTest extends TestCase {
         $this->assertCount(1, Item::where('name', $item->name)->where('specialty_type', ItemSpecialtyType::HELL_FORGED)->get());
     }
 
-    public function testPurchaseHellForgedItemAsMercenary() {
+    public function testPurchaseHellForgedItemAsMerchant() {
         $item = $this->createItem([
             'skill_level_required' => 400,
             'skill_level_trivial'  => 401,

@@ -10,13 +10,10 @@ use App\Flare\Models\Item;
 use App\Flare\Models\Location;
 use App\Flare\Models\Monster;
 use Facades\App\Flare\RandomNumber\RandomNumberGenerator;
-use App\Flare\Values\ItemEffectsValue;
-use App\Flare\Values\ItemSpecialtyType;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Flare\Values\RandomAffixDetails;
 use Facades\App\Game\Core\Handlers\AnnouncementHandler;
 use App\Game\Events\Values\EventType;
-use App\Game\Mercenaries\Values\MercenaryValue;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
 use Exception;
@@ -100,16 +97,13 @@ class GoldMinesRewardHandler {
         $maximumGold = 10000;
 
         if (!is_null($event)) {
-            $maximumAmount = 1000;
+            $maximumAmount = 2000;
             $maximumGold = 20000;
         }
 
         $goldDust = RandomNumberGenerator::generateRandomNumber(1, $maximumAmount);
         $shards   = RandomNumberGenerator::generateRandomNumber(1, $maximumAmount);
         $gold     = RandomNumberGenerator::generateRandomNumber(1, $maximumGold);
-
-        $goldDust = $goldDust + $goldDust * $this->getCurrencyMercenaryBonus($character, MercenaryValue::CHILD_OF_GOLD_DUST);
-        $shards = $shards + $shards * $this->getCurrencyMercenaryBonus($character, MercenaryValue::CHILD_OF_SHARDS);
 
         $gold        += $character->gold;
         $goldDust    += $character->gold_dust;
@@ -207,24 +201,6 @@ class GoldMinesRewardHandler {
 
             event(new ServerMessageEvent($character->user, 'You found something MEDIUM but still unique, in the mines child: ' . $item->affix_name, $slot->id));
         }
-    }
-
-    /**
-     * Get mercenary bonus.
-     *
-     * @param Character $character
-     * @param string $mercenaryType
-     * @return float
-     */
-    protected function getCurrencyMercenaryBonus(Character $character, string $mercenaryType): float {
-
-        $mercenary = $character->mercenaries()->where('mercenary_type', $mercenaryType)->first();
-
-        if (!is_null($mercenary)) {
-            return $mercenary->type()->getBonus($mercenary->current_level, $mercenary->reincarnated_bonus);
-        }
-
-        return 0;
     }
 
     /**

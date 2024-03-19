@@ -148,22 +148,6 @@
                                 <div class='border-b-2 block md:hidden border-b-gray-300 dark:border-b-gray-600 my-6'>
                                 </div>
 
-                                <h3 class="mb-3">Required Mercenary Info</h3>
-                                <x-core.forms.key-value-select :model="$guideQuest" label="Required Mercenary:"
-                                    modelKey="required_mercenary_type" name="required_mercenary_type"
-                                    :options="$mercenaryTypes" />
-                                <x-core.forms.input :model="$guideQuest" label="Required (Mercenary) Level:"
-                                    modelKey="required_mercenary_level" name="required_mercenary_level" />
-                                <x-core.forms.key-value-select :model="$guideQuest" label="Required Secondary Mercenary:"
-                                    modelKey="required_secondary_mercenary_type" name="required_secondary_mercenary_type"
-                                    :options="$mercenaryTypes" />
-                                <x-core.forms.input :model="$guideQuest" label="Required (Secondary Mercenary) Level:"
-                                    modelKey="required_secondary_mercenary_level"
-                                    name="required_secondary_mercenary_level" />
-
-                                <div class='border-b-2 block md:hidden border-b-gray-300 dark:border-b-gray-600 my-6'>
-                                </div>
-
                                 <h3 class="mb-3">Required Class Rank Details</h3>
                                 <x-core.forms.input :model="$guideQuest" label="Required # of class specials equipped:"
                                     modelKey="required_class_specials_equipped" name="required_class_specials_equipped" />
