@@ -117,7 +117,11 @@ trait ItemsShowInformation {
             }
 
             if ($effect->canGainRewardsAtTheOldChurch()) {
-                $effect = 'Allows you to gain currency bonuses and uniques at The Old Church on the Ice Plane during the Winter Event';
+                $effects = 'Allows you to gain currency bonuses and uniques at The Old Church on the Ice Plane during the Winter Event';
+            }
+
+            if ($effect->mercenarySlotBonus()) {
+                $effects = 'Allows you to gain +50% towards currency rewards from playing slots and +5% from Copper Coins that drop in Purgatory Dungeons';
             }
         }
 

@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Console\AfterDeployment\AddHolyStacksToItems;
 use App\Console\AfterDeployment\AssignNewFactionsToCharacters;
 use App\Console\AfterDeployment\AssignNewSkillsToPlayers;
+use App\Console\AfterDeployment\ChangeFeatureTypesOnQuests;
 use App\Console\AfterDeployment\CreateCharacterAttackDataCache;
 use App\Console\AfterDeployment\CreateMonsterCache;
 use App\Console\AfterDeployment\RebalanceQuestCurrencyCostsAndRewards;
@@ -49,6 +50,7 @@ class AppServiceProvider extends ServiceProvider {
             RebalanceQuestCurrencyCostsAndRewards::class,
             AssignNewFactionsToCharacters::class,
             RemoveInvalidQuestItems::class,
+            ChangeFeatureTypesOnQuests::class,
 
             // Development Commands:
             CreateCharacter::class,

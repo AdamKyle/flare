@@ -59,7 +59,6 @@ class Character extends Model {
         'shards',
         'copper_coins',
         'killed_in_pvp',
-        'is_mercenary_unlocked',
         'reincarnated_stat_increase',
         'times_reincarnated',
         'base_stat_mod',
@@ -81,7 +80,6 @@ class Character extends Model {
         'force_name_change'           => 'boolean',
         'is_attack_automation_locked' => 'boolean',
         'killed_in_pvp'               => 'boolean',
-        'is_mercenary_unlocked'       => 'boolean',
         'can_engage_celestials'       => 'boolean',
         'can_move_again_at'           => 'datetime',
         'can_attack_again_at'         => 'datetime',
@@ -201,10 +199,6 @@ class Character extends Model {
 
     public function passiveSkills() {
         return $this->hasMany(CharacterPassiveSkill::class);
-    }
-
-    public function mercenaries() {
-        return $this->hasMany(CharacterMercenary::class);
     }
 
     public function classRanks() {

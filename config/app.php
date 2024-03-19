@@ -249,7 +249,6 @@ return [
         App\Game\GuideQuests\Providers\ServiceProvider::class,
         App\Game\SpecialtyShops\Providers\ServiceProvider::class,
         App\Game\Gambler\Providers\ServiceProvider::class,
-        App\Game\Mercenaries\Providers\ServiceProvider::class,
         App\Game\Reincarnate\Providers\ServiceProvider::class,
         App\Game\ClassRanks\Providers\ServiceProvider::class,
         App\Game\NpcActions\SeerActions\Providers\ServiceProvider::class,

@@ -67,18 +67,6 @@ class NpcQuestRewardHandler {
         }
 
         if (!is_null($quest->unlocks_feature)) {
-            if ($quest->unlocksFeature()->isMercenary()) {
-                $character->update(['is_mercenary_unlocked' => true]);
-
-                event(new UpdateCharacterStatus($character->refresh()));
-
-                event(new ServerMessageEvent($character->user, 'You have unlocked a new game feature: Mercenaries!
-                Go to your character sheet and click on the tab beside Factions to purchase mercenaries.
-                You can learn more about them by clicking on Help I\'m Stuck! and selecting Mercenary under Game Systems.
-                There is also a help link on the tab. Mercenaries add new boons to those who farm currencies!'));
-
-                GlobalMessageEvent::dispatch($character->name . ' has unlocked: Mercenaries! A powerful new feature!');
-            }
 
             if ($quest->unlocksFeature()->isReincarnation()) {
 

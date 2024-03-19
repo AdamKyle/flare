@@ -272,11 +272,7 @@
                 Guide Quests
             </a>
             <hr />
-            <h6 class="uppercase">Gambling and Mercenaries</h6>
-            <a href="{{ route('info.page', ['pageName' => 'mercenary']) }}">
-                <span class="ra ra-double-team"></span>
-                Mercenaries
-            </a>
+            <h6 class="uppercase">Gambling</h6>
             <a href="{{ route('info.page', ['pageName' => 'slots']) }}">
                 <span class="ra ra-dice-two"></span>
                 Slots

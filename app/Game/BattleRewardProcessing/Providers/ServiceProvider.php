@@ -17,7 +17,6 @@ use App\Game\ClassRanks\Services\ClassRankService;
 use App\Game\Core\Services\GoldRush;
 use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
 use App\Game\GuideQuests\Services\GuideQuestService;
-use App\Game\Mercenaries\Services\MercenaryService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 
 class ServiceProvider extends ApplicationServiceProvider {
@@ -81,7 +80,6 @@ class ServiceProvider extends ApplicationServiceProvider {
 
         $this->app->bind(SecondaryRewardService::class, function ($app) {
             return new SecondaryRewardService(
-                $app->make(MercenaryService::class),
                 $app->make(ClassRankService::class),
             );
         });

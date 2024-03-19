@@ -112,7 +112,6 @@ class RouteServiceProvider extends ServiceProvider {
         $this->mapShopApiRoutes();
         $this->mapGameGuideQuestsApiRoutes();
         $this->mapSpecialtyShopApiRoutes();
-        $this->mapMercenariesApiRoutes();
         $this->mapReincarnateApiRoutes();
         $this->mapClassRanksApiRoutes();
         $this->mapFactionLoyaltyApiRoutes();
@@ -310,13 +309,6 @@ class RouteServiceProvider extends ServiceProvider {
             ->middleware('web')
             ->namespace('App\Game\SpecialtyShops\Controllers')
             ->group(base_path('routes/game/specialty-shops/api.php'));
-    }
-
-    protected function mapMercenariesApiRoutes() {
-        Route::prefix('api')
-            ->middleware('web')
-            ->namespace('App\Game\Mercenaries\Controllers')
-            ->group(base_path('routes/game/mercenaries/api.php'));
     }
 
     protected function mapReincarnateApiRoutes() {

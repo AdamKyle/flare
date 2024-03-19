@@ -53,7 +53,6 @@ class UpdateCharacterStatus implements ShouldBroadcastNow {
             'can_register_for_pvp'           => !is_null(Event::where('type', EventType::MONTHLY_PVP)->first()) && $character->level >= 301,
             'killed_in_pvp'                  => $character->killed_in_pvp,
             'is_alchemy_locked'              => $this->isAlchemyLocked($character),
-            'is_mercenary_unlocked'          => $character->is_mercenary_unlocked,
         ];
 
         $this->user = $character->user;

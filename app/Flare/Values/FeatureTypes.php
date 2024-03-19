@@ -6,13 +6,11 @@ use Exception;
 
 class FeatureTypes {
 
-    const MERCENARY = 0;
+    const REINCARNATION = 0;
 
-    const REINCARNATION = 1;
+    const COSMETIC_TEXT = 1;
 
-    const COSMETIC_TEXT = 2;
-
-    const NAME_TAGS = 3;
+    const NAME_TAGS = 2;
 
     /**
      * @var int $value
@@ -23,14 +21,12 @@ class FeatureTypes {
      * @var int[] $values
      */
     protected static array $values = [
-        0 => self::MERCENARY,
-        1 => self::REINCARNATION,
-        2 => self::COSMETIC_TEXT,
-        3 => self::NAME_TAGS,
+        0 => self::REINCARNATION,
+        1 => self::COSMETIC_TEXT,
+        2 => self::NAME_TAGS,
     ];
 
     protected static array $valueNames = [
-        self::MERCENARY     => 'Mercenary',
         self::REINCARNATION => 'Reincarnation',
         self::COSMETIC_TEXT => 'Cosmetic Text',
         self::NAME_TAGS     => 'Name Tags',
@@ -56,10 +52,6 @@ class FeatureTypes {
 
     public function getNameOfFeature(): string {
         return self::$valueNames[$this->value];
-    }
-
-    public function isMercenary(): bool {
-        return $this->value === self::MERCENARY;
     }
 
     public function isReincarnation(): bool {

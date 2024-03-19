@@ -81,6 +81,7 @@ class ItemsService {
                 ItemEffectsValue::ENTER_PURGATORY_HOUSE,
                 ItemEffectsValue::HIDE_CHAT_LOCATION,
                 ItemeffectsValue::SETTLE_IN_ICE_PLANE,
+                ItemEffectsValue::MERCENARY_SLOT_BONUS,
             ],
             'specialtyTypes' => [
                 ItemSpecialtyType::HELL_FORGED,
