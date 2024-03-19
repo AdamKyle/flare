@@ -12,6 +12,7 @@ use App\Console\AfterDeployment\RebalanceQuestCurrencyCostsAndRewards;
 use App\Console\AfterDeployment\ReduceAlchemyItemsCost;
 use App\Console\AfterDeployment\RemoveInvalidQuestItems;
 use App\Console\AfterDeployment\UpdateCharactersForClassRanks;
+use App\Console\Commands\GiveNewSlotsQuestItem;
 use App\Console\DevelopmentCommands\CreateCharacter;
 use App\Console\DevelopmentCommands\MaxOutCharactersPassiveSkills;
 use Illuminate\Support\Facades\Mail;
@@ -51,6 +52,7 @@ class AppServiceProvider extends ServiceProvider {
             AssignNewFactionsToCharacters::class,
             RemoveInvalidQuestItems::class,
             ChangeFeatureTypesOnQuests::class,
+            GiveNewSlotsQuestItem::class,
 
             // Development Commands:
             CreateCharacter::class,

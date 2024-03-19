@@ -10,6 +10,7 @@ use App\Admin\Services\GuideQuestService;
 use App\Flare\Models\GameBuilding;
 use App\Flare\Models\GuideQuest;
 use App\Flare\Models\PassiveSkill;
+use App\Flare\Models\QuestsCompleted;
 use App\Flare\Values\ItemSpecialtyType;
 use App\Flare\Values\MapNameValue;
 use App\Game\Events\Values\EventType;
@@ -117,6 +118,8 @@ class GuideQuestsController extends Controller {
 
     public function delete(GuideQuest $guideQuest) {
         $guideQuest->delete();
+
+        QuestsCompleted::where('guide_quest_id', $guideQuest->id)->delete();
 
         return response()->redirectToRoute('admin.guide-quests')->with('success', 'Deleted guide quest.');
     }

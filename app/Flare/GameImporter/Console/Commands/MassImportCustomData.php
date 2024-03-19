@@ -32,6 +32,7 @@ class MassImportCustomData extends Command {
     public function handle() {
 
         Artisan::call('change:feature-types-on-quests');
+        Artisan::call('give:new-slots-quest-item');
 
         Artisan::call('import:game-data Items');
         Artisan::call('import:game-data "Quests"');
