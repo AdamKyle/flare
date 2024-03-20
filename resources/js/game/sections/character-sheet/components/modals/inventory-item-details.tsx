@@ -6,6 +6,7 @@ import Ajax from "../../../../lib/ajax/ajax";
 import ComponentLoading from "../../../../components/ui/loading/component-loading";
 import ItemDetails from "./components/item-details";
 import InventoryQuestItemDetails from "./components/inventory-quest-item-details";
+import QuestItem from "../../../../components/modals/item-details/item-views/quest-item";
 
 export default class InventoryUseDetails extends React.Component<any, any> {
     constructor(props: any) {
@@ -81,7 +82,7 @@ export default class InventoryUseDetails extends React.Component<any, any> {
                                 <Fragment>
                                     {
                                         this.state.item.type === 'quest' ?
-                                            <InventoryQuestItemDetails item={this.state.item} />
+                                            <QuestItem item={this.state.item} />
                                         :
                                             <ItemDetails item={this.state.item} character_id={this.props.character_id} />
                                     }

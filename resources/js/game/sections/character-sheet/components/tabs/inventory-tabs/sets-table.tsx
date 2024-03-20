@@ -574,12 +574,13 @@ export default class SetsTable
 
                 <div
                     className={
-                        "max-w-[390px] md:max-w-full overflow-y-hidden"
+                        "max-w-full overflow-y-hidden"
                     }
                 >
                     <Table
                         data={this.state.data}
                         columns={BuildInventoryTableColumns(
+                            this.props.view_port,
                             this,
                             this.viewItem.bind(this),
                             this.props.manage_skills

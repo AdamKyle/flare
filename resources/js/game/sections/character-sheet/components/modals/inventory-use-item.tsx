@@ -1,10 +1,10 @@
 import React from "react";
 import Dialogue from "../../../../components/ui/dialogue/dialogue";
-import UsableItemSection from "./components/usable-item-section";
 import LoadingProgressBar from "../../../../components/ui/progress-bars/loading-progress-bar";
 import {AxiosError, AxiosResponse} from "axios";
 import Ajax from "../../../../lib/ajax/ajax";
 import DangerAlert from "../../../../components/ui/alerts/simple-alerts/danger-alert";
+import AlchemyItemUsable from "../../../../components/modals/item-details/item-views/alchemy-item-usable";
 
 export default class InventoryUseItem extends React.Component<any, any> {
     constructor(props: any) {
@@ -58,7 +58,7 @@ export default class InventoryUseItem extends React.Component<any, any> {
                       }}
             >
                 <div className="mb-5">
-                    <UsableItemSection item={this.props.item} />
+                    <AlchemyItemUsable item={this.props.item} />
                     {
                         this.state.error_message !== null ?
                             <DangerAlert additional_css='my-4'>

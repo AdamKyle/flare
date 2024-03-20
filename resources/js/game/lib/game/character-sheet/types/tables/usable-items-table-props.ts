@@ -16,4 +16,6 @@ export default interface UsableItemTable {
     set_success_message: (message: string) => void;
 
     is_automation_running: boolean;
+
+    view_port: number;
 }

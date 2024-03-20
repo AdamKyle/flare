@@ -49,7 +49,7 @@ export default class QuestItemsTable extends React.Component<QuestItemsInventory
                         <div className='w-1/2'>
                             <input type='text' name='search' className='form-control' onChange={this.search.bind(this)} />
                         </div>
-                        <div className='mt-[-5px] ml-2 md:ml-0 md:mt-0'>
+                        <div className='mt-2 sm:mt-[-5px] ml-2 md:ml-0 md:mt-0'>
                             <a href='/information/quests' target='_blank' className='sm:ml-2'>Quests help <i
                                 className="fas fa-external-link-alt"></i></a>
                         </div>
@@ -57,7 +57,7 @@ export default class QuestItemsTable extends React.Component<QuestItemsInventory
                 </div>
 
                 <div className={'max-w-[390px] md:max-w-full overflow-y-hidden'}>
-                    <Table data={this.state.data} columns={buildLimitedColumns(undefined, this.viewItem.bind(this))} dark_table={this.props.dark_table}/>
+                    <Table data={this.state.data} columns={buildLimitedColumns(this.props.view_port, undefined, this.viewItem.bind(this))} dark_table={this.props.dark_table}/>
                 </div>
 
                 {

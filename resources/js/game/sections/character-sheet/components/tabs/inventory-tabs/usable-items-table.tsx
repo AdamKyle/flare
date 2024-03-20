@@ -1,4 +1,4 @@
-import React, {Fragment} from "react";
+import React, {Fragment, ReactNode} from "react";
 import Table from "../../../../../components/ui/data-tables/table";
 import {
     buildLimitedColumns
@@ -15,6 +15,9 @@ import InventoryUseItem from "../../modals/inventory-use-item";
 import UsableItemsDetails from "../../../../../lib/game/character-sheet/types/inventory/usable-items-details";
 import InventoryUseDetails from "../../modals/inventory-use-details";
 import InventoryActionConfirmationModal from "../../modals/inventory-action-confirmation-modal";
+import PrimaryButton from "../../../../../components/ui/buttons/primary-button";
+import DangerButton from "../../../../../components/ui/buttons/danger-button";
+import SuccessButton from "../../../../../components/ui/buttons/success-button";
 
 export default class UsableItemsTable extends React.Component<UsableItemTable, any> implements ActionsInterface {
     constructor(props: UsableItemTable) {
@@ -81,30 +84,18 @@ export default class UsableItemsTable extends React.Component<UsableItemTable, a
         });
     }
 
-    actions(row: UsableItemsDetails): JSX.Element {
-        const items: MenuItemType[] = [
-            {
-                name: 'List',
-                icon_class: 'ra ra-wooden-sign',
-                on_click: () => this.manageList(row)
-            },
-            {
-                name: 'Destroy',
-                icon_class: 'ra ra-bubbling-potion',
-                on_click: () => this.destroy(row)
-            },
-        ];
-
-        if (row.usable && !row.damages_kingdoms) {
-            items.push({
-                name: 'Use Item',
-                icon_class: 'ra ra-bubbling-potion',
-                on_click: () => this.manageUseItem(row)
-            });
-        }
-
+    actions(row: UsableItemsDetails): ReactNode {
         return (
-            <DropDown menu_items={items} button_title={'Actions'}  use_relative={true}/>
+            <div className={'flex flex-col w-full'}>
+                <PrimaryButton button_label={'List'} on_click={() => this.manageList(row)} additional_css={'mt-3 mb-2'}/>
+                <DangerButton button_label={'Destroy'} on_click={() => this.destroy(row)} />
+
+                {
+                    row.usable && !row.damages_kingdoms ?
+                        <SuccessButton button_label={'Use Item'} on_click={() => this.manageUseItem(row)} additional_css={'my-3'}/>
+                    : null
+                }
+            </div>
         )
     }
 
@@ -119,8 +110,8 @@ export default class UsableItemsTable extends React.Component<UsableItemTable, a
         return (
             <Fragment>
 
-                <div className={'max-w-[390px] md:max-w-full overflow-y-hidden'}>
-                    <Table data={this.props.usable_items} columns={buildLimitedColumns(this, this.manageViewItem.bind(this), true)} dark_table={this.props.dark_table}/>
+                <div className={'max-w-full overflow-y-hidden'}>
+                    <Table data={this.props.usable_items} columns={buildLimitedColumns(this.props.view_port, this, this.manageViewItem.bind(this), true)} dark_table={this.props.dark_table}/>
                 </div>
 
                 {

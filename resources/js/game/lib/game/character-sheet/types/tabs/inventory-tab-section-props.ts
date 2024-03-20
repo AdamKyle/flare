@@ -16,4 +16,6 @@ export default interface InventoryTabSectionProps extends CoreInventoryTabProps 
     user_id: number;
 
     manage_skills: (itemId: number, itemSkills: any[], itemSkillProgressions: any[]) => void;
+
+    view_port: number;
 }

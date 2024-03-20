@@ -215,6 +215,7 @@ export default class InventoryTabSection extends React.Component<
                         set_success_message={this.setSuccessMessage.bind(this)}
                         is_automation_running={this.props.is_automation_running}
                         manage_skills={this.props.manage_skills}
+                        view_port={this.props.view_port}
                     />
                 );
             case "usable-items":
@@ -227,6 +228,7 @@ export default class InventoryTabSection extends React.Component<
                         update_inventory={this.updateInventory.bind(this)}
                         set_success_message={this.setSuccessMessage.bind(this)}
                         is_automation_running={this.props.is_automation_running}
+                        view_port={this.props.view_port}
                     />
                 );
             case "gems":

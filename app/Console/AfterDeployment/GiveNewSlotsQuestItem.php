@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Console\Commands;
+namespace App\Console\AfterDeployment;
 
 use App\Flare\Models\Inventory;
 use App\Flare\Models\InventorySlot;
@@ -47,8 +47,12 @@ class GiveNewSlotsQuestItem extends Command
         $characterIdsWithQuestCompleted = QuestsCompleted::where('quest_id', $quest->id)->pluck('character_id')->toArray();
         $inventoryIds = Inventory::whereIn('character_id', $characterIdsWithQuestCompleted)->pluck('id')->toArray();
 
-        InventorySlot::whereIn('inventory_id', $inventoryIds)->update([
-            'item_id' => $item->id
-        ]);
+        foreach ($inventoryIds as $id) {
+            InventorySlot::create([
+                'inventory_id' => $id,
+                'item_id' => $item->id
+            ]);
+        }
+
     }
 }

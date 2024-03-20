@@ -297,6 +297,7 @@ export default class CharacterSheet extends React.Component<CharacterSheetProps,
                                                         is_automation_running={this.props.character.is_automation_running}
                                                         finished_loading={this.props.finished_loading}
                                                         update_disable_tabs={this.props.update_disable_tabs}
+                                                        view_port={this.props.view_port}
                                 />
                             </BasicCard>
                         : null

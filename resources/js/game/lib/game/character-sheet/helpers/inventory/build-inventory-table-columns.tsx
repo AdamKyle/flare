@@ -11,12 +11,41 @@ import PrimaryLinkButton from "../../../../../components/ui/buttons/primary-link
 /**
  * Build Inventory Table Columns
  *
+ * @param viewPort
  * @param component
  * @param clickAction
+ * @param manageSkills
  * @param componentName
  * @constructor
  */
-export const BuildInventoryTableColumns = (component?: ActionsInterface, clickAction?: (item?: InventoryDetails | UsableItemsDetails) => any, manageSkills?: (slotId: number, itemSkills: any[]|[], itemSkillProgressions: any[]) => void, componentName?: string) => {
+export const BuildInventoryTableColumns = (viewPort: number, component?: ActionsInterface, clickAction?: (item?: InventoryDetails | UsableItemsDetails) => any, manageSkills?: (slotId: number, itemSkills: any[]|[], itemSkillProgressions: any[]) => void, componentName?: string) => {
+
+    if (viewPort <= 639) {
+        const smallerColumns = [
+            {
+                name: 'Name',
+                selector: (row: { item_name: string; }) => row.item_name,
+                cell: (row: any) => <span className='m-auto'><ItemNameColorationButton item={row} on_click={clickAction} /></span>
+            },
+            {
+                name: 'Type',
+                selector: (row: { type: string; }) => row.type,
+                sortable: true,
+            },
+        ];
+
+        if (typeof component !== 'undefined') {
+            smallerColumns.push({
+                name: 'Actions',
+                selector: (row: any) => '',
+                //@ts-ignore
+                cell: (row: any) => component.actions(row)
+            });
+        }
+
+        return smallerColumns;
+    }
+
     const columns = [
         {
             name: 'Name',
@@ -77,6 +106,7 @@ export const BuildInventoryTableColumns = (component?: ActionsInterface, clickAc
         columns.push({
             name: 'Actions',
             selector: (row: any) => '',
+            // @ts-ignore
             cell: (row: any) => component.actions(row)
         });
     }
@@ -87,20 +117,20 @@ export const BuildInventoryTableColumns = (component?: ActionsInterface, clickAc
 /**
  * Build A limited set of columns.
  *
+ * @param viewPort
  * @param component
  * @param onClick
+ * @param usableItem
  */
-export const buildLimitedColumns = (component?: ActionsInterface, onClick?: (item?: InventoryDetails | UsableItemsDetails) => any, usableItem?: boolean) => {
+export const buildLimitedColumns = (viewPort: number, component?: ActionsInterface, onClick?: (item?: InventoryDetails | UsableItemsDetails) => any, usableItem?: boolean) => {
+
+
+    if (viewPort <= 639) {
         const columns = [
             {
                 name: 'Name',
                 selector: (row: { item_name: string; }) => row.item_name,
                 cell: (row: any) => <ItemNameColorationButton item={row} on_click={onClick}/>
-            },
-            {
-                name: 'Description',
-                selector: (row: { description: string; }) => row.description,
-                cell: (row: any) => row.description
             },
         ];
 
@@ -108,7 +138,13 @@ export const buildLimitedColumns = (component?: ActionsInterface, onClick?: (ite
             columns.push({
                 name: 'Can Stack',
                 selector: (row: any) => '',
-                cell: (row: any) => row.can_stack ? 'Yes' : 'No'
+                cell: (row: { can_stack: boolean }) => <span>{row.can_stack ? 'Yes' : 'No'}</span>
+            })
+        } else {
+            columns.push({
+                name: 'Description',
+                selector: (row: any) => row.description,
+                cell: (row: any) => row.description
             })
         }
 
@@ -116,11 +152,44 @@ export const buildLimitedColumns = (component?: ActionsInterface, onClick?: (ite
             columns.push({
                 name: 'Actions',
                 selector: (row: any) => '',
+                // @ts-ignore
                 cell: (row: any) => component.actions(row)
             });
         }
 
-        return columns
+        return columns;
+    }
+
+    const columns = [
+        {
+            name: 'Name',
+            selector: (row: { item_name: string; }) => row.item_name,
+            cell: (row: any) => <ItemNameColorationButton item={row} on_click={onClick}/>
+        },
+        {
+            name: 'Description',
+            selector: (row: { description: string; }) => row.description,
+            cell: (row: any) => row.description
+        },
+    ];
+
+    if (usableItem) {
+        columns.push({
+            name: 'Can Stack',
+            selector: (row: any) => '',
+            cell: (row: any) => row.can_stack ? 'Yes' : 'No'
+        })
+    }
+
+    if (typeof component !== 'undefined') {
+        columns.push({
+            name: 'Actions',
+            selector: (row: any) => '',
+            cell: (row: any) => component.actions(row)
+        });
+    }
+
+    return columns
 }
 
 /**

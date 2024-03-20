@@ -11,4 +11,6 @@ export default interface CharacterInventoryTabsProps {
     finished_loading: boolean;
 
     update_disable_tabs?: () => void;
+
+    view_port: number;
 }

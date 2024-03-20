@@ -21,4 +21,6 @@ export default interface InventoryTabProps {
     is_automation_running: boolean;
 
     manage_skills: (itemId: number, itemSkills: any[]|[], itemSkillProgressions: any[]) => void;
+
+    view_port: number;
 }

@@ -8,4 +8,6 @@ export default interface QuestItemsInventoryTabProps {
     is_dead: boolean;
 
     character_id: number;
+
+    view_port: number;
 }

@@ -45,8 +45,8 @@ export default class InventoryTable extends React.Component<InventoryTabProps, I
                     you can learn more about that <a href='/information/equipment-types' target='_blank'>here. <i
                     className="fas fa-external-link-alt"></i></a>
                 </InfoAlert>
-                <div className={'max-w-[390px] md:max-w-full overflow-x-hidden'}>
-                    <Table data={this.props.inventory} columns={BuildInventoryTableColumns(undefined, this.viewItem.bind(this), this.props.manage_skills)} dark_table={this.props.dark_table}/>
+                <div className={'max-w-full overflow-x-hidden'}>
+                    <Table data={this.props.inventory} columns={BuildInventoryTableColumns(this.props.view_port, undefined, this.viewItem.bind(this), this.props.manage_skills)} dark_table={this.props.dark_table}/>
                 </div>
 
                 {

@@ -21,7 +21,7 @@ export default class CharacterGem extends React.Component<any, any> {
         (new Ajax()).setRoute('character/'+this.props.character_id+'/gem-details/' + this.props.slot_id).doAjaxCall('get', (result: AxiosResponse) => {
             this.setState({
                 loading: false,
-                gem_details: result.data
+                gem_details: result.data.gem
             });
         }, (error: AxiosError) => {
             console.error(error);

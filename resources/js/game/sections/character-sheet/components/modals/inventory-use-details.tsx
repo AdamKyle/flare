@@ -1,7 +1,7 @@
 import React, { Fragment } from "react";
 import Dialogue from "../../../../components/ui/dialogue/dialogue";
-import UsableItemSection from "./components/usable-item-section";
 import AlchemyItemHoly from "../../../../components/modals/item-details/item-views/alchemy-item-holy";
+import AlchemyItemUsable from "../../../../components/modals/item-details/item-views/alchemy-item-usable";
 
 export default class InventoryUseDetails extends React.Component<any, any> {
     constructor(props: any) {
@@ -22,7 +22,7 @@ export default class InventoryUseDetails extends React.Component<any, any> {
                 <div className="mb-5">
                     {this.props.item.usable ||
                     this.props.item.damages_kingdoms ? (
-                        <UsableItemSection item={this.props.item} />
+                        <AlchemyItemUsable item={this.props.item} />
                     ) : (
                         <AlchemyItemHoly item={this.props.item} />
                     )}

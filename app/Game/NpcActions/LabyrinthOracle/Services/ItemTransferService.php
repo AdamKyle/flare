@@ -95,6 +95,17 @@ class ItemTransferService {
 
         $this->moveGems();
 
+        $this->itemToTransferToDuplicated->update([
+            'is_mythic' => $this->itemToTransferFromDuplicated->is_mythic,
+        ]);
+
+        $this->itemToTransferFromDuplicated->update([
+            'is_mythic' => false,
+        ]);
+
+        $this->itemToTransferFromDuplicated = $this->itemToTransferFromDuplicated->refresh();
+        $this->itemToTransferToDuplicated   = $this->itemToTransferToDuplicated->refresh();
+
         $itemSlotToTransferFrom->update([
             'item_id' => $this->itemToTransferFromDuplicated->id,
         ]);

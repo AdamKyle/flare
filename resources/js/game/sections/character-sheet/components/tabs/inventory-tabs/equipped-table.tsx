@@ -1,4 +1,4 @@
-import React, {Fragment} from "react";
+import React, {Fragment, ReactNode} from "react";
 import Table from "../../../../../components/ui/data-tables/table";
 import {BuildInventoryTableColumns} from "../../../../../lib/game/character-sheet/helpers/inventory/build-inventory-table-columns";
 import InventoryDetails from "../../../../../lib/game/character-sheet/types/inventory/inventory-details";
@@ -57,7 +57,7 @@ export default class EquippedTable extends React.Component<EquippedInventoryTabP
         });
     }
 
-    actions(row: InventoryDetails): JSX.Element {
+    actions(row: InventoryDetails): ReactNode {
         return <DangerButton button_label={'Remove'} on_click={() => this.unequip(row.slot_id)} disabled={this.props.is_dead || this.props.is_automation_running || this.state.loading} />
     }
 
@@ -245,8 +245,8 @@ export default class EquippedTable extends React.Component<EquippedInventoryTabP
                     : null
                 }
 
-                <div className={'max-w-[390px] md:max-w-full overflow-y-hidden'}>
-                    <Table data={this.state.data} columns={BuildInventoryTableColumns(this, this.viewItem.bind(this), this.props.manage_skills, 'equipped')} dark_table={this.props.dark_tables}/>
+                <div className={'max-w-full overflow-y-hidden'}>
+                    <Table data={this.state.data} columns={BuildInventoryTableColumns(this.props.view_port, this, this.viewItem.bind(this), this.props.manage_skills, 'equipped')} dark_table={this.props.dark_tables}/>
                 </div>
             </Fragment>
         );

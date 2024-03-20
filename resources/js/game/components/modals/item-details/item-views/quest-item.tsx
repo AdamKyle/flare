@@ -1,5 +1,6 @@
 import React, {ReactNode} from "react";
 import QuestItemProps from "../types/quest-item-props";
+import clsx from "clsx";
 
 export default class QuestItem extends React.Component<QuestItemProps, {}> {
 
@@ -83,34 +84,65 @@ export default class QuestItem extends React.Component<QuestItemProps, {}> {
     }
 
     renderColumns(): ReactNode {
+
+        if (this.props.item.skill_name === null) {
+            return;
+        }
+
         return (
-            <div className="grid md:grid-cols-2 gap-2">
-                <div>
-                    {this.renderXpBonus()}
-                    {
-                        this.props.item.xp_bonus > 0 && (
-                            this.props.item.devouring_light > 0 ||
-                            this.props.item.devouring_darkness > 0
-                        ) ?
-                            <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
-                            : null
-                    }
-                    {this.renderDevouringBonus()}
-                </div>
-                <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3 block md:hidden'></div>
-                <div>
-                    {this.renderSkillModifierSection()}
+            <div>
+                <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3 '></div>
+                <div className="grid md:grid-cols-2 gap-2">
+                    <div>
+                        {this.renderXpBonus()}
+                        {
+                            this.props.item.xp_bonus > 0 && (
+                                this.props.item.devouring_light > 0 ||
+                                this.props.item.devouring_darkness > 0
+                            ) ?
+                                <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+                                : null
+                        }
+                        {this.renderDevouringBonus()}
+                    </div>
+                    <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3 block md:hidden'></div>
+                    <div>
+                        {this.renderSkillModifierSection()}
+                    </div>
                 </div>
             </div>
         );
     }
 
     renderSingleItem() {
+        if (this.props.item.skill_name === null && !(
+            this.props.item.devouring_light > 0 ||
+            this.props.item.devouring_darkness > 0
+        ) && this.props.item.xp_bonus <= 0) {
+            return;
+        }
+
         return (
             <>
-                {this.renderXpBonus()}
-                {this.renderDevouringBonus()}
-                {this.renderSkillModifierSection()}
+                <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3 '></div>
+                <div className={clsx('mb-4', {
+                    'hidden':  this.props.item.xp_bonus <= 0
+                })}>
+                    {this.renderXpBonus()}
+                </div>
+                <div className={clsx('mb-4', {
+                    'hidden': !(
+                        this.props.item.devouring_light > 0 ||
+                        this.props.item.devouring_darkness > 0
+                    )
+                })}>
+                    {this.renderDevouringBonus()}
+                </div>
+                <div className={clsx('mb-4', {
+                    'hidden': this.props.item.skill_name === null
+                })}>
+                    {this.renderSkillModifierSection()}
+                </div>
             </>
         )
     }
@@ -118,13 +150,12 @@ export default class QuestItem extends React.Component<QuestItemProps, {}> {
     render() {
         return (
             <div className='max-h-[400px] overflow-y-auto'>
-                <div className='mb-4 mt-4 text-sky-700 dark:text-sky-300'
+            <div className='mb-4 mt-4 text-sky-700 dark:text-sky-300'
                      dangerouslySetInnerHTML={{__html: this.props.item.description}}/>
-                <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3 '></div>
                 {
                     this.shouldRenderColumns() ?
                         this.renderColumns()
-                    :
+                        :
                         this.renderSingleItem()
                 }
             </div>

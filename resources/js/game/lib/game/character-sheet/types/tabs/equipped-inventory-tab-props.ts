@@ -13,4 +13,6 @@ export default interface EquippedInventoryTabProps extends CoreInventoryTabProps
     disable_tabs: () => void;
 
     manage_skills: (itemId: number, itemSkills: any[]|[], itemSkillProgressions: any[]) => void;
+
+    view_port: number;
 }

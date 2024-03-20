@@ -57,7 +57,7 @@ export default class ItemDetails extends React.Component<any, any> {
 
     render() {
         return (
-            <div className='max-h-[200px] md:max-h-[400px] overflow-y-auto'>
+            <div className='max-h-[400px] md:max-h-[600px] overflow-y-auto'>
                 <div className='mb-4 mt-4 text-sky-700 dark:text-sky-500' dangerouslySetInnerHTML={{__html: this.props.item.description}} />
 
                 <div className='grid md:grid-cols-3 gap-3 mb-4'>
@@ -155,7 +155,7 @@ export default class ItemDetails extends React.Component<any, any> {
                     </div>
                 </div>
                 <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
-                <div className='grid grid-cols-3 gap-2'>
+                <div className='grid md:grid-cols-3 gap-2'>
                     <div>
                         <h4 className='text-sky-600 dark:text-sky-500'>Sockets</h4>
                         <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>

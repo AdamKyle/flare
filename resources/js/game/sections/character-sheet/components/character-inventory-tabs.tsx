@@ -7,7 +7,6 @@ import QuestItemsTable from "./tabs/inventory-tabs/quest-items-table";
 import { watchForDarkModeInventoryChange } from "../../../lib/game/dark-mode-watcher";
 import Ajax from "../../../lib/ajax/ajax";
 import { AxiosError, AxiosResponse } from "axios";
-import ComponentLoading from "../../../components/ui/loading/component-loading";
 import CharacterInventoryTabsState from "../../../lib/game/character-sheet/types/character-inventory-tabs-state";
 import InventoryTabSection from "./tabs/inventory-tab-section";
 import InventoryDetails from "../../../lib/game/character-sheet/types/inventory/inventory-details";
@@ -104,12 +103,6 @@ export default class CharacterInventoryTabs extends React.Component<
                 }
             }
         );
-    }
-
-    switchTable(type: string) {
-        this.setState({
-            table: type,
-        });
     }
 
     updateInventory(inventory: { [key: string]: InventoryDetails[] }) {
@@ -226,6 +219,7 @@ export default class CharacterInventoryTabs extends React.Component<
                         is_automation_running={this.props.is_automation_running}
                         user_id={this.props.user_id}
                         manage_skills={this.manageItemSkills.bind(this)}
+                        view_port={this.props.view_port}
                     />
                 </TabPanel>
                 <TabPanel key={"equipped"}>
@@ -240,6 +234,7 @@ export default class CharacterInventoryTabs extends React.Component<
                         is_automation_running={this.props.is_automation_running}
                         disable_tabs={this.manageDisableTabs.bind(this)}
                         manage_skills={this.manageItemSkills.bind(this)}
+                        view_port={this.props.view_port}
                     />
                 </TabPanel>
                 <TabPanel key={"sets"}>
@@ -256,6 +251,7 @@ export default class CharacterInventoryTabs extends React.Component<
                         is_automation_running={this.props.is_automation_running}
                         disable_tabs={this.manageDisableTabs.bind(this)}
                         manage_skills={this.manageItemSkills.bind(this)}
+                        view_port={this.props.view_port}
                     />
                 </TabPanel>
                 <TabPanel key={"quest"}>
@@ -264,6 +260,7 @@ export default class CharacterInventoryTabs extends React.Component<
                         quest_items={this.state.inventory.quest_items}
                         is_dead={this.props.is_dead}
                         character_id={this.props.character_id}
+                        view_port={this.props.view_port}
                     />
                 </TabPanel>
             </Tabs>

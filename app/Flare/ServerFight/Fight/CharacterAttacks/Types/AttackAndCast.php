@@ -85,7 +85,7 @@ class AttackAndCast extends BattleBase
 
         $this->weaponType->setMonsterHealth($this->monsterHealth);
         $this->weaponType->setCharacterHealth($this->characterHealth);
-        $this->weaponType->setCharacterAttackData($attacker, $this->isVoided);
+        $this->weaponType->setCharacterAttackData($attacker, $this->isVoided, AttackTypeValue::ATTACK);
         $this->weaponType->doNotAllowSecondaryAttacks();
 
         if ($this->isEnemyEntranced) {
