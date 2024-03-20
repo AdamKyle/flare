@@ -7876,7 +7876,7 @@ ${expression ? 'Expression: "' + expression + '"\n\n' : ""}`, el);
       insertDotNotatedValueIntoData([second, ...rest].join("."), value, data3[first2]);
     };
     let entries = search.split("&").map((i) => i.split("="));
-    let data2 = {};
+    let data2 = /* @__PURE__ */ Object.create(null);
     entries.forEach(([key, value]) => {
       value = decodeURIComponent(value.replaceAll("+", "%20"));
       if (!key.includes("[")) {
@@ -9134,7 +9134,7 @@ ${expression ? 'Expression: "' + expression + '"\n\n' : ""}`, el);
   function toggleBooleanStateDirective(el, directive3, isTruthy, cachedDisplay = null) {
     isTruthy = directive3.modifiers.includes("remove") ? !isTruthy : isTruthy;
     if (directive3.modifiers.includes("class")) {
-      let classes = directive3.expression.split(" ");
+      let classes = directive3.expression.split(" ").filter(String);
       if (isTruthy) {
         el.classList.add(...classes);
       } else {
@@ -9172,9 +9172,9 @@ ${expression ? 'Expression: "' + expression + '"\n\n' : ""}`, el);
 
   // js/directives/wire-loading.js
   directive2("loading", ({ el, directive: directive3, component }) => {
-    let targets = getTargets(el);
+    let { targets, inverted } = getTargets(el);
     let [delay3, abortDelay] = applyDelay(directive3);
-    whenTargetsArePartOfRequest(component, targets, [
+    whenTargetsArePartOfRequest(component, targets, inverted, [
       () => delay3(() => toggleBooleanStateDirective(el, directive3, true)),
       () => abortDelay(() => toggleBooleanStateDirective(el, directive3, false))
     ]);
@@ -9221,11 +9221,11 @@ ${expression ? 'Expression: "' + expression + '"\n\n' : ""}`, el);
       }
     ];
   }
-  function whenTargetsArePartOfRequest(component, targets, [startLoading, endLoading]) {
+  function whenTargetsArePartOfRequest(component, targets, inverted, [startLoading, endLoading]) {
     on2("commit", ({ component: iComponent, commit: payload, respond }) => {
       if (iComponent !== component)
         return;
-      if (targets.length > 0 && !containsTargets(payload, targets))
+      if (targets.length > 0 && containsTargets(payload, targets) === inverted)
         return;
       startLoading();
       respond(() => {
@@ -9283,9 +9283,12 @@ ${expression ? 'Expression: "' + expression + '"\n\n' : ""}`, el);
   function getTargets(el) {
     let directives2 = getDirectives(el);
     let targets = [];
+    let inverted = false;
     if (directives2.has("target")) {
       let directive3 = directives2.get("target");
       let raw2 = directive3.expression;
+      if (directive3.modifiers.includes("except"))
+        inverted = true;
       if (raw2.includes("(") && raw2.includes(")")) {
         targets.push({ target: directive3.method, params: quickHash(JSON.stringify(directive3.params)) });
       } else if (raw2.includes(",")) {
@@ -9299,7 +9302,7 @@ ${expression ? 'Expression: "' + expression + '"\n\n' : ""}`, el);
       let nonActionOrModelLivewireDirectives = ["init", "dirty", "offline", "target", "loading", "poll", "ignore", "key", "id"];
       directives2.all().filter((i) => !nonActionOrModelLivewireDirectives.includes(i.value)).map((i) => i.expression.split("(")[0]).forEach((target) => targets.push({ target }));
     }
-    return targets;
+    return { targets, inverted };
   }
   function quickHash(subject) {
     return btoa(encodeURIComponent(subject));

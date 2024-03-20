@@ -6,7 +6,6 @@
         "build": "vite build"
     },
     "devDependencies": {
-        "@babel/preset-react": "^7.0.0",
         "@ckeditor/ckeditor5-build-classic": "^27.1.0",
         "@emotion/react": "11.7.1",
         "@emotion/styled": "11.6.0",

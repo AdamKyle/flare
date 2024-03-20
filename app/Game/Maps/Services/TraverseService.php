@@ -425,7 +425,9 @@ class TraverseService {
                 return Cache::get('monsters')[$locationWithEffect->name];
             }
 
-            return $monsters['easier'];
+            if (isset($monsters['easier'])) {
+                return $monsters['easier'];
+            }
         }
 
         if ($characterMap->gameMap->only_during_event_type) {

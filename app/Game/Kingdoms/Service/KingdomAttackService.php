@@ -54,7 +54,7 @@ class KingdomAttackService {
      * @return array
      */
     public function attackKingdom(Character $character, Kingdom $kingdom, array $params): array {
-        if (!$this->moveUnitsValidator->setUnitsToMove($params['units_to_move'])->isValid($character)) {
+        if (!$this->moveUnitsValidator->setUnitsToMove($params['units_to_move'])->isValid($character, $kingdom)) {
             return $this->errorResult('Invalid input.');
         }
 
