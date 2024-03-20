@@ -76,6 +76,10 @@ export default class OtherStatistics extends React.Component<any, any> {
                             <dd>{this.state.data.averageCharacterLevel}</dd>
                             <dt>Average Character Gold:</dt>
                             <dd>{this.state.data.averageCharacterGold}</dd>
+                            <dt>Average Quests Completed:</dt>
+                            <dd>{this.state.data.averageRegularQuestsCompleted}</dd>
+                            <dt>Average Guide Quests Completed:</dt>
+                            <dd>{this.state.data.averageGuideQuestsCompleted}</dd>
                         </dl>
                     </BasicCard>
                     <BasicCard>
