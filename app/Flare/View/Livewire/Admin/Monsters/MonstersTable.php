@@ -33,6 +33,7 @@ class MonstersTable extends DataTableComponent {
                     'Hell'                        => 'Hell',
                     'Purgatory'                   => 'Purgatory',
                     'The Ice Plane'               => 'The Ice Plane',
+                    'Twisted Memories'            => 'Twisted Memories',
                     'Surface Celestials'          => 'Surface Celestials',
                     'Labyrinth Celestials'        => 'Labyrinth Celestials',
                     'Dungeons Celestials'         => 'Dungeons Celestials',

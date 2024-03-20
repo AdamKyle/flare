@@ -58,7 +58,7 @@
   <!--[if !mso]><!-->
   <link href="https://fonts.googleapis.com/css?family=Ubuntu:300,400,500,700" rel="stylesheet" type="text/css">
   <style type="text/css">
-    @import url(https://fonts.googleapis.com/css?family=Ubuntu:300,400,500,700);
+    @import url(https://fonts.googleapis.com/css?family=Ubuntu:300,400,500,700)
   </style>
   <!--<![endif]-->
   <style type="text/css">
@@ -94,9 +94,9 @@
             <td style="direction:ltr;font-size:0px;padding:20px 0;text-align:center;">
               <!--[if mso | IE]>
                   <table role="presentation" border="0" cellpadding="0" cellspacing="0">
-                
+
         <tr>
-      
+
             <td
                class="" style="vertical-align:top;width:600px;"
             >
@@ -112,9 +112,9 @@
               </div>
               <!--[if mso | IE]>
             </td>
-          
+
         </tr>
-      
+
                   </table>
                 <![endif]-->
             </td>
@@ -126,7 +126,7 @@
           </td>
         </tr>
       </table>
-      
+
       <table
          align="center" border="0" cellpadding="0" cellspacing="0" class="" style="width:600px;" width="600"
       >
@@ -140,9 +140,9 @@
             <td style="direction:ltr;font-size:0px;padding:20px 0;text-align:center;">
               <!--[if mso | IE]>
                   <table role="presentation" border="0" cellpadding="0" cellspacing="0">
-                
+
         <tr>
-      
+
             <td
                class="" style="vertical-align:top;width:400px;"
             >
@@ -174,9 +174,9 @@
               </div>
               <!--[if mso | IE]>
             </td>
-          
+
         </tr>
-      
+
                   </table>
                 <![endif]-->
             </td>

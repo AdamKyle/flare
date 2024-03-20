@@ -15,6 +15,7 @@ class LocationType {
     const UNDERWATER_CAVES      = 3;
     const TEAR_FABRIC_TIME      = 4;
     const THE_OLD_CHURCH        = 5;
+    const TWISTED_GATE          = 6;
 
     protected static $values = [
         0 => self::PURGATORY_SMITH_HOUSE,
@@ -23,6 +24,7 @@ class LocationType {
         3 => self::UNDERWATER_CAVES,
         4 => self::TEAR_FABRIC_TIME,
         5 => self::THE_OLD_CHURCH,
+        6 => self::TWISTED_GATE,
     ];
 
     /**
@@ -34,7 +36,8 @@ class LocationType {
         self::PURGATORY_DUNGEONS    => 'Purgatory Dungeons',
         self::UNDERWATER_CAVES      => 'Underwater Caves',
         self::TEAR_FABRIC_TIME      => 'Tear in the fabrice of time',
-        self::THE_OLD_CHURCH        => 'The Old Church'
+        self::THE_OLD_CHURCH        => 'The Old Church',
+        self::TWISTED_GATE          => 'The Twisted Gate'
     ];
 
     /**
@@ -102,5 +105,14 @@ class LocationType {
      */
     public function isTheOldChurch(): bool {
         return $this->value === self::THE_OLD_CHURCH;
+    }
+
+    /**
+     * Is the twisted gate?
+     *
+     * @return bool
+     */
+    public function isTwistedGate(): bool {
+        return $this->value === self::TWISTED_GATE;
     }
 }

@@ -17,6 +17,8 @@
                             name="kingdom_color" />
                         <x-core.forms.check-box :model="$mapDetails" label="Is Default" modelKey="default"
                             name="default" />
+                        <x-core.forms.check-box :model="$mapDetails" label="Can Traverse" modelKey="can_traverse"
+                                                name="can_traverse" />
                         <x-core.forms.key-value-select :model="$mapDetails" label="Only For Event Type:"
                             modelKey="only_during_event" name="only_during_event" :options="$eventTypes" />
                         <x-core.forms.file-upload :model="$mapDetails" label="Map:" modelKey="map" name="map" />

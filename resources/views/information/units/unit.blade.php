@@ -3,5 +3,5 @@
 ])
 
 @section('content')
-    @include('admin.kingdoms.units.unit');
+    @include('admin.kingdoms.units.unit')
 @endsection

@@ -29,6 +29,7 @@ class GameMap extends Model {
         'character_attack_reduction',
         'required_location_id',
         'only_during_event_type',
+        'can_traverse',
     ];
 
     protected $casts = [
@@ -39,6 +40,7 @@ class GameMap extends Model {
         'enemy_stat_bonus'           => 'float',
         'character_attack_reduction' => 'float',
         'only_during_event_type'     => 'integer',
+        'can_traverse'               => 'boolean',
     ];
 
     protected $appends = [

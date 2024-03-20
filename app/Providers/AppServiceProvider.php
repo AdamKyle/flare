@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Console\AfterDeployment\AddHolyStacksToItems;
+use App\Console\AfterDeployment\AllowTraverseForMaps;
 use App\Console\AfterDeployment\AssignNewFactionsToCharacters;
 use App\Console\AfterDeployment\AssignNewSkillsToPlayers;
 use App\Console\AfterDeployment\ChangeFeatureTypesOnQuests;
@@ -53,6 +54,7 @@ class AppServiceProvider extends ServiceProvider {
             RemoveInvalidQuestItems::class,
             ChangeFeatureTypesOnQuests::class,
             GiveNewSlotsQuestItem::class,
+            AllowTraverseForMaps::class,
 
             // Development Commands:
             CreateCharacter::class,

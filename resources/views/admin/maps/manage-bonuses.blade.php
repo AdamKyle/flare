@@ -16,7 +16,8 @@
                 <x-core.forms.input :model="$gameMap" label="Enemy Stat increase (%):" modelKey="enemy_stat_bonus" name="enemy_stat_bonus" type="number"/>
                 <x-core.forms.input :model="$gameMap" label="Character Attack Reduction (%):" modelKey="character_attack_reduction" name="character_attack_reduction" type="number"/>
                 <x-core.forms.collection-select :model="$gameMap" label="Required Location:" modelKey="required_location_id" name="required_location_id" value="id" key="name" :options="$locations" />
-
+                <x-core.forms.check-box :model="$gameMap" label="Can Traverse" modelKey="can_traverse"
+                                        name="can_traverse" />
                 <x-core.buttons.primary-button type="submit">
                     Submit
                 </x-core.buttons.primary-button>

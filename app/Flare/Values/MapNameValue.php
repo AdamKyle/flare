@@ -17,6 +17,7 @@ class MapNameValue {
     const SHADOW_PLANE           = 'Shadow Plane';
     const HELL                   = 'Hell';
     const PURGATORY              = 'Purgatory';
+    const TWISTED_MEMORIES       = 'Twisted Memories';
 
     // Event Specific Panes:
     const ICE_PLANE              = 'The Ice Plane';
@@ -31,6 +32,7 @@ class MapNameValue {
         'Shadow Plane'  => self::SHADOW_PLANE,
         'Hell'          => self::HELL,
         'Purgatory'     => self::PURGATORY,
+        'Twisted Memories' => self::TWISTED_MEMORIES,
         'The Ice Plane' => self::ICE_PLANE,
     ];
 
@@ -108,6 +110,10 @@ class MapNameValue {
         return $this->value === self::PURGATORY;
     }
 
+    public function isTwistedMemories(): bool {
+        return $this->value === self::TWISTED_MEMORIES;
+    }
+
     public function isTheIcePlane(): bool {
         return $this->value === self::ICE_PLANE;
     }
@@ -122,6 +128,7 @@ class MapNameValue {
                     'enemy_stat_bonus'             => 0.15,
                     'character_attack_reduction'   => 0.15,
                     'required_location_id'         => null,
+                    'can_traverse'                 => true,
                 ];
             case self::HELL:
                 return [
@@ -131,6 +138,7 @@ class MapNameValue {
                     'enemy_stat_bonus'             => 0.25,
                     'character_attack_reduction'   => 0.20,
                     'required_location_id'         => null,
+                    'can_traverse'                 => true,
                 ];
             case self::PURGATORY:
                 return [
@@ -140,6 +148,7 @@ class MapNameValue {
                     'enemy_stat_bonus'             => 0.30,
                     'character_attack_reduction'   => 0.25,
                     'required_location_id'         => Location::where('type', LocationType::TEAR_FABRIC_TIME)->first()->id,
+                    'can_traverse'                 => true,
                 ];
             case self::ICE_PLANE:
                 return [
@@ -149,6 +158,17 @@ class MapNameValue {
                     'enemy_stat_bonus'             => 0.35,
                     'character_attack_reduction'   => 0.30,
                     'required_location_id'         => null,
+                    'can_traverse'                 => true,
+                ];
+            case self::TWISTED_MEMORIES:
+                return [
+                    'xp_bonus'                     => 0.60,
+                    'skill_training_bonus'         => 0.40,
+                    'drop_chance_bonus'            => 0.35,
+                    'enemy_stat_bonus'             => 0.45,
+                    'character_attack_reduction'   => 0.35,
+                    'required_location_id'         => null,
+                    'can_traverse'                 => false,
                 ];
             case self::SURFACE:
             case self::LABYRINTH:
@@ -161,6 +181,7 @@ class MapNameValue {
                     'enemy_stat_bonus'             => 0.0,
                     'character_attack_reduction'   => 0.0,
                     'required_location_id'         => null,
+                    'can_traverse'                 => true,
                 ];
         }
     }

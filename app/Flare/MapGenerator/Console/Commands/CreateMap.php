@@ -60,7 +60,10 @@ class CreateMap extends Command {
         // $land = new Color(39, 84, 166);
 
         // Sky Plane
-        $land = new Color(84, 56, 19);
+        // $land = new Color(84, 56, 19);
+
+        // Twisted Memories Plane
+        $land = new Color(91, 110, 96);
 
         // Surface & Labyrinth:
         // $water = new Color(66, 129, 178);
@@ -78,7 +81,10 @@ class CreateMap extends Command {
         // $water = new Color(255, 255, 255);
 
         // Ice Planes:
-        $water = new Color(195, 225, 250);
+        // $water = new Color(195, 225, 250);
+
+        // Twisted memories:
+        $water = new Color(18, 57, 87);
 
         // Regular Water Level
         // $waterLevel = 30;
@@ -89,8 +95,11 @@ class CreateMap extends Command {
         //  Purgatory Water Level
         // $waterLevel = 85;
 
+        //  Twisted Memories Water Level
+        $waterLevel = 75;
+
         // Emerald Curse Water Level:
-        $waterLevel = 25;
+        // $waterLevel = 25;
 
         ini_set('memory_limit', '3G');
 

@@ -123,7 +123,7 @@ class MovementService {
      */
     public function getMapsToTraverse(Character $character): array {
 
-        $gameMaps = GameMap::select('id', 'required_location_id', 'only_during_event_type', 'name')->get();
+        $gameMaps = GameMap::select('id', 'required_location_id', 'only_during_event_type', 'name', 'can_traverse')->get();
         $xPosition = $character->map->character_position_x;
         $yPosition = $character->map->character_position_y;
         $location  = Location::where('x', $xPosition)->where('y', $yPosition)->first();
@@ -216,33 +216,27 @@ class MovementService {
      * - Some maps are only available during specific events,
      *   therefor we hide them when that event is not running.
      *
+     * - Some maps cannot be traversed to through traditional means.
+     *
      * @param Character $character
      * @param Location|null $location
      * @param Collection $gameMaps
      * @return array
      */
     protected function filterTraversableMaps(Character $character, Collection $gameMaps, ?Location $location = null): array {
-        foreach ($gameMaps as $index => $gameMap) {
-
-            if (!is_null($gameMap->required_location_id) && !$character->map->gameMap->mapType()->isPurgatory()) {
-                if (!is_null($location)) {
-                    if ($location->id !== $gameMap->required_location_id) {
-                        unset($gameMaps[$index]);
-                    }
-                } else {
-                    unset($gameMaps[$index]);
-                }
+        return $gameMaps->reject(function ($gameMap) use ($character, $location) {
+            if (!is_null($gameMap->required_location_id) &&
+                !$character->map->gameMap->mapType()->isPurgatory() &&
+                (is_null($location) || $location->id !== $gameMap->required_location_id)) {
+                return true;
             }
 
-            if (!is_null($gameMap->only_during_event_type)) {
-                $event = Event::where('type', $gameMap->only_during_event_type)->first();
-
-                if (is_null($event)) {
-                    unset($gameMaps[$index]);
-                }
+            if (!is_null($gameMap->only_during_event_type) &&
+                is_null(Event::where('type', $gameMap->only_during_event_type)->first())) {
+                return true;
             }
-        }
 
-        return $gameMaps->toArray();
+            return !$gameMap->can_traverse;
+        })->values()->toArray();
     }
 }

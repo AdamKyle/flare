@@ -5,5 +5,5 @@
         'map'        => $map,
         'mapUrl'     => $mapUrl,
         'itemNeeded' => $itemNeeded,
-    ]);
+    ])
 @endsection
