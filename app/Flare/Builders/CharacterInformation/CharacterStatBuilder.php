@@ -244,12 +244,6 @@ class CharacterStatBuilder {
     public function statMod(string $stat, bool $voided = false): float {
         $baseStat = $this->character->{$stat};
 
-        if (is_null($this->equippedItems)) {
-            $baseStat = $this->applyBoons($baseStat);
-
-            return $this->applyBoons($baseStat, $stat . '_mod');
-        }
-
         $baseStat = $baseStat + $baseStat * $this->fetchStatFromEquipment($stat, $voided);
 
         $baseStat =  $this->applyBoons($baseStat);
@@ -879,6 +873,10 @@ class CharacterStatBuilder {
      */
     protected function fetchStatFromEquipment(string $stat, bool $voided = false): float {
         $totalPercentFromEquipped = 0;
+
+        if (is_null($this->equippedItems)) {
+            return $totalPercentFromEquipped;
+        }
 
         foreach ($this->equippedItems as $slot) {
             $totalPercentFromEquipped += $this->fetchModdedStat($slot->item, $stat, $voided);

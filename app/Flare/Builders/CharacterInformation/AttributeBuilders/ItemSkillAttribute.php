@@ -19,6 +19,10 @@ class ItemSkillAttribute {
     public function fetchModifier(Character $character, string $attribute): float {
         $equippedItems = $this->fetchEquipped($character);
 
+        if (is_null($equippedItems)) {
+            return 0;
+        }
+
         $slot = $equippedItems->filter(function($slot) {
             return $slot->item->type === 'artifact';
         })->first();

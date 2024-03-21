@@ -11,6 +11,7 @@ use App\Flare\Models\GameClassSpecial;
 use App\Game\ClassRanks\Values\ClassRankValue;
 use App\Game\ClassRanks\Values\ClassSpecialValue;
 use App\Game\ClassRanks\Values\WeaponMasteryValue;
+use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Messages\Events\ServerMessageEvent;
 use Exception;
@@ -145,6 +146,8 @@ class ClassRankService {
         $character = $character->refresh();
 
         $this->updateCharacterAttackTypes->updateCache($character);
+
+        event(new UpdateTopBarEvent($character));
 
         return $this->successResult(array_merge([
             'message' => 'Equipped class special: ' . $gameClassSpecial->name
