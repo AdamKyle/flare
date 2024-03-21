@@ -130,6 +130,7 @@ class CharacterRewardService {
      *
      * @param Monster $monster
      * @return CharacterRewardService
+     * @throws Exception
      */
     public function distributeSkillXP(Monster $monster): CharacterRewardService {
         $this->skillService->assignXPToTrainingSkill($this->character, $monster->xp);
@@ -142,6 +143,7 @@ class CharacterRewardService {
      *
      * @param Monster $monster
      * @return CharacterRewardService
+     * @throws Exception
      */
     public function giveCurrencies(Monster $monster): CharacterRewardService {
         $this->distributeGold($monster);
