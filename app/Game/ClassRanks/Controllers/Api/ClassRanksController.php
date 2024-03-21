@@ -11,6 +11,7 @@ use App\Game\ClassRanks\Services\ClassRankService;
 use App\Game\ClassRanks\Values\ClassSpecialValue;
 use App\Game\ClassRanks\Values\WeaponMasteryValue;
 use App\Http\Controllers\Controller;
+use Exception;
 use Illuminate\Http\JsonResponse;
 
 class ClassRanksController extends Controller {
@@ -61,7 +62,7 @@ class ClassRanksController extends Controller {
      * @param Character $character
      * @param GameClassSpecial $gameClassSpecial
      * @return JsonResponse
-     * @throws \Exception
+     * @throws Exception
      */
     public function equipSpecial(Character $character, GameClassSpecial $gameClassSpecial): JsonResponse {
         $response = $this->classRankService->equipSpecialty($character, $gameClassSpecial);
@@ -77,7 +78,7 @@ class ClassRanksController extends Controller {
      * @param Character $character
      * @param CharacterClassSpecialtiesEquipped $classSpecialEquipped
      * @return JsonResponse
-     * @throws \Exception
+     * @throws Exception
      */
     public function unequipSpecial(Character $character, CharacterClassSpecialtiesEquipped $classSpecialEquipped): JsonResponse {
 
