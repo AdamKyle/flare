@@ -32,6 +32,8 @@ import GameEventListeners from "./lib/game/event-listeners/game-event-listeners"
 import ActionSection from "./sections/game-actions-section/action-section";
 import ActionTabs from "./sections/game-actions-section/action-tabs";
 import {FameTasks} from "./sections/faction-loyalty/deffinitions/faction-loaylaty";
+import OrangeButton from "./components/ui/buttons/orange-button";
+import ActiveBoonsActionSection from "./sections/game-actions-section/active-boons-action-section";
 
 export default class Game extends React.Component<GameProps, GameState> {
 
@@ -308,6 +310,11 @@ export default class Game extends React.Component<GameProps, GameState> {
                                         )}
                                     />
                                 </BasicCard>
+                                <div className={clsx({
+                                    'hidden': this.state.view_port > 639
+                                })}>
+                                    <ActiveBoonsActionSection character_id={this.props.characterId} />
+                                </div>
                                 <BasicCard
                                     additionalClasses={clsx("min-h-60", {
                                         "ml-auto mr-auto":
