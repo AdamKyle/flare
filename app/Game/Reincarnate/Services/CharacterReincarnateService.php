@@ -78,13 +78,32 @@ class CharacterReincarnateService {
             return $this->errorResult('You have maxed all stats to '.number_format(self::MAX_STATS).'.');
         }
 
-        $xpPenalty = $character->xp_penalty + 0.05;
+
 
         $newReincarnatedStatBonus = $character->reincarnated_stat_increase + $characterBonus;
 
         if ($newReincarnatedStatBonus > self::MAX_STATS) {
             $newReincarnatedStatBonus = self::MAX_STATS;
         }
+
+        $timesReincarnated = $character->times_reincarnated + 1;
+
+        $baseXpPenalty = 0.05;
+
+        if ($timesReincarnated >= 10 && $timesReincarnated < 25) {
+            $baseXpPenalty = 0.08;
+        }
+
+        if ($timesReincarnated >= 25 && $timesReincarnated < 50) {
+            $baseXpPenalty = 0.10;
+        }
+
+        if ($timesReincarnated >= 50) {
+            $baseXpPenalty = 0.12;
+        }
+
+        $xpPenalty = $character->xp_penalty + $baseXpPenalty;
+
 
         $additionalUpdates = [
             'xp_penalty'                 => $xpPenalty,
@@ -93,7 +112,7 @@ class CharacterReincarnateService {
             'xp_next'                    => 100 + 100 * $xpPenalty,
             'copper_coins'               => $character->copper_coins > 0 ? $character->copper_coins - 50000 : 0,
             'reincarnated_stat_increase' => $newReincarnatedStatBonus,
-            'times_reincarnated'         => $character->times_reincarnated + 1,
+            'times_reincarnated'         => $timesReincarnated,
         ];
 
         $character->update(array_merge($updatedStats, $additionalUpdates));

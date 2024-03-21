@@ -101,6 +101,7 @@ class CharacterRewardService {
      *
      * @param Monster $monster
      * @return CharacterRewardService
+     * @throws Exception
      */
     public function distributeCharacterXP(Monster $monster): CharacterRewardService {
         $this->distributeXP($monster);
@@ -262,6 +263,7 @@ class CharacterRewardService {
      * Handle character level up.
      *
      * @param int $leftOverXP
+     * @param bool $shouldBuildCache
      * @return void
      */
     public function handleCharacterLevelUp(int $leftOverXP, bool $shouldBuildCache = false): void {

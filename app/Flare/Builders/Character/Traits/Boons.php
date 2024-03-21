@@ -39,9 +39,12 @@ trait Boons {
      * @return int
      */
     public function additionalLevelsToGain(Character $character): int {
-        return CharacterBoon::where('character_id', $character->id)->join('items', function($join) {
-            $join->on('items.id', '=', 'character_boons.item_id');
-        })->where('items.gains_additional_level', true)->sum('items.gains_additional_level') + 1;
+        return CharacterBoon::where('character_id', $character->id)
+                ->join('items', function($join) {
+                    $join->on('items.id', '=', 'character_boons.item_id');
+                })
+                ->where('items.gains_additional_level', true)
+                ->sum('character_boons.amount_used')+ 1;
     }
 
     /**

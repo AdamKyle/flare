@@ -32,7 +32,7 @@ class FactionLevel {
     }
 
     public static function gatPointsPerLevel(int $currentLevel): int {
-        return $currentLevel > 0 ? 75 : 50;
+        return $currentLevel > 0 ? 25 : 30;
     }
 
     public static function getGoldReward(int $currentLevel): int {
