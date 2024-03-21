@@ -94,28 +94,17 @@ class Quest extends Model {
 
     public static function getAllQuestsInOrder() {
         $quests = self::where('is_parent', true)
-                      ->with('childQuests')
-                      ->get();
+            ->with('childQuests')
+            ->get();
 
-        $result = collect();
+        $sortedQuests = collect();
+        $visited = [];
 
         foreach ($quests as $quest) {
-            $result->push($quest);
-            $result = $result->merge(self::flattenChildQuests($quest));
+            self::depthFirstSearch($quest, $sortedQuests, $visited);
         }
 
-        return $result;
-    }
-
-    private static function flattenChildQuests(Quest $quest) {
-        $flattened = collect();
-
-        foreach ($quest->childQuests as $child) {
-            $flattened->push($child);
-            $flattened = $flattened->merge(self::flattenChildQuests($child));
-        }
-
-        return $flattened;
+        return $sortedQuests;
     }
 
     public function childQuests() {
@@ -226,5 +215,43 @@ class Quest extends Model {
 
     protected static function newFactory() {
         return QuestFactory::new();
+    }
+
+    /**
+     * Do a depth first search such that the following rules are applied to quests when exporting them:
+     *
+     * - Parent quests must always come first
+     * - Required quests must come after the quest it requires
+     * - Parent chain Quests must come after the quest it's chained to
+     *
+     * @param $quest
+     * @param $sortedQuests
+     * @param $visited
+     * @return void
+     */
+    private static function depthFirstSearch($quest, &$sortedQuests, &$visited): void {
+        if (!in_array($quest->id, $visited)) {
+            array_push($visited, $quest->id);
+
+            if ($quest->required_quest_id !== null) {
+                $requiredQuest = self::find($quest->required_quest_id);
+                if ($requiredQuest !== null) {
+                    self::dfs($requiredQuest, $sortedQuests, $visited);
+                }
+            }
+
+            if ($quest->parent_chain_quest_id !== null) {
+                $parentChainQuest = self::find($quest->parent_chain_quest_id);
+                if ($parentChainQuest !== null) {
+                    self::dfs($parentChainQuest, $sortedQuests, $visited);
+                }
+            }
+
+            foreach ($quest->childQuests as $childQuest) {
+                self::dfs($childQuest, $sortedQuests, $visited);
+            }
+
+            $sortedQuests->push($quest);
+        }
     }
 }
