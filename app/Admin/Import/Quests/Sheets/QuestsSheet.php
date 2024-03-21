@@ -168,6 +168,18 @@ class QuestsSheet implements ToCollection {
             }
         }
 
+        if (!isset($quest['parent_chain_quest_id'])) {
+            $quest['parent_chain_quest_id'] = null;
+        } else {
+            $parentChainQuest = Quest::where('name', $quest['parent_chain_quest_id'])->first();
+
+            if (is_null($parentChainQuest)) {
+                $quest['parent_chain_quest_id'] = null;
+            } else {
+                $quest['parent_chain_quest_id'] = $parentChainQuest->id;
+            }
+        }
+
         if (!isset($quest['assisting_npc_id'])) {
             $quest['assisting_npc_id'] = null;
             $quest['requested_fame_level'] = null;

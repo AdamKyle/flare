@@ -127,6 +127,19 @@ export default class QuestDetailsModal extends React.Component<any, any> {
 
     getRequiredQuestDetails() {
         if (this.state.quest_details !== null) {
+
+            if (this.state.quest_details.parent_chain_quest !== null) {
+
+                const questName = this.state.quest_details.parent_chain_quest.name;
+                const npcName = this.state.quest_details.parent_chain_quest.npc.real_name;
+                const mapName = this.state.quest_details.parent_chain_quest.belongs_to_map_name
+
+                return <span>
+                    You must complete another quest first, to start this story line. Complete the quest chain starting with: <strong>{questName}</strong>{" "}
+                    For the NPC: <strong>{npcName}</strong> who resides on: <strong>{mapName}</strong>.
+                </span>
+            }
+
             if (this.state.quest_details.required_quest !== null) {
 
                 const questName = this.state.quest_details.required_quest.name;

@@ -56,6 +56,7 @@
                         <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
                         <h3 class="mb-3">Other Requirements</h3>
                         <x-core.forms.key-value-select :model="$quest" label="Requires Quest (optional):" modelKey="required_quest_id" name="required_quest_id" :options="$requiredQuests" />
+                        <x-core.forms.key-value-select :model="$quest" label="Requires Parent Chain Quest (optional):" modelKey="parent_chain_quest_id" name="parent_chain_quest_id" :options="$requiredQuests" />
                         <x-core.forms.input :model="$quest" label="Reincrnation Amount (Optional):" modelKey="reincarnated_times" name="reincarnated_times" />
                     </x-core.form-wizard.content>
 

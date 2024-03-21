@@ -6,6 +6,7 @@
             <th>npc_id</th>
             <th>raid_id</th>
             <th>required_quest_id</th>
+            <th>parent_chain_quest_id</th>
             <th>reincarnated_times</th>
             <th>item_name</th>
             <th>gold_dust_cost</th>
@@ -43,6 +44,7 @@
                 <td>{{ !is_null($quest->npc) ? $quest->npc->name : '' }}</td>
                 <td>{{ !is_null($quest->raid) ? $quest->raid->name : '' }}</td>
                 <td>{{ !is_null($quest->required_quest_id) ? $quest->requiredQuest->name : '' }}</td>
+                <td>{{ !is_null($quest->parent_chain_quest_id) ? $quest->parentChainQuest->name : '' }}</td>
                 <td>{{ $quest->reincarnated_times }}</td>
                 <td>{{ !is_null($quest->item) ? $quest->item->name : '' }}</td>
                 <td>{{ $quest->gold_dust_cost }}</td>

@@ -23,6 +23,7 @@ class Quest extends Model {
         'item_id',
         'raid_id',
         'required_quest_id',
+        'parent_chain_quest_id',
         'reincarnated_times',
         'access_to_map_id',
         'gold_dust_cost',
@@ -55,6 +56,7 @@ class Quest extends Model {
         'item_id'                 => 'integer',
         'raid_id'                 => 'integer',
         'required_quest_id'       => 'integer',
+        'parent_chain_quest_id'   => 'integer',
         'reincarnated_times'      => 'integer',
         'gold_dust_cost'          => 'integer',
         'shard_cost'              => 'integer',
@@ -128,6 +130,7 @@ class Quest extends Model {
             'rewardItem',
             'item',
             'requiredQuest',
+            'parentChainQuest',
             'factionMap',
             'item.dropLocation',
             'secondaryItem',
@@ -151,6 +154,10 @@ class Quest extends Model {
 
     public function requiredQuest() {
         return $this->belongsTo($this, 'required_quest_id')->with('raid');
+    }
+
+    public function parentChainQuest() {
+        return $this->belongsTo($this, 'parent_chain_quest_id')->with('raid');
     }
 
     public function secondaryItem() {
