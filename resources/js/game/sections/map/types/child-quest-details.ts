@@ -10,5 +10,7 @@ export interface ChildQuestDetails {
 
     belongs_to_map_name: string;
 
+    required_quest_id: number | null;
+
     child_quests: ChildQuestDetails[];
 }

@@ -12,6 +12,7 @@ import Reward from "./components/reward";
 import LoadingProgressBar from "../../../../components/ui/progress-bars/loading-progress-bar";
 import SuccessAlert from "../../../../components/ui/alerts/simple-alerts/success-alert";
 import DangerAlert from "../../../../components/ui/alerts/simple-alerts/danger-alert";
+import WarningAlert from "../../../../components/ui/alerts/simple-alerts/warning-alert";
 
 export default class QuestDetailsModal extends React.Component<any, any> {
     private tabs: { name: string; key: string }[];
@@ -122,6 +123,24 @@ export default class QuestDetailsModal extends React.Component<any, any> {
 
     getNPCCommands(npc: any) {
         return npc.commands.map((command: any) => command.command).join(", ");
+    }
+
+    getRequiredQuestDetails() {
+        if (this.state.quest_details !== null) {
+            if (this.state.quest_details.required_quest !== null) {
+
+                const questName = this.state.quest_details.required_quest.name;
+                const npcName = this.state.quest_details.required_quest.npc.real_name;
+                const mapName = this.state.quest_details.required_quest.belongs_to_map_name
+
+                return <span>
+                    You must complete another quest first, to start this story line. Complete: <strong>{questName}</strong>{" "}
+                    For the NPC: <strong>{npcName}</strong> who resides on: <strong>{mapName}</strong>.
+                </span>
+            }
+        }
+
+        return <span>Something went wrong.</span>
     }
 
     renderPlaneAccessRequirements(map: { map_required_item: any | null }) {
@@ -393,11 +412,18 @@ export default class QuestDetailsModal extends React.Component<any, any> {
                     </div>
                 ) : (
                     <Fragment>
+                        {
+                            !this.props.is_required_quest_complete ?
+                                <WarningAlert additional_css={'my-4'}>
+                                    {this.getRequiredQuestDetails()}
+                                </WarningAlert>
+                            : null
+                        }
                         <Tabs tabs={this.tabs} full_width={true}>
                             <TabPanel key={"npc-details"}>
                                 <div
                                     className={clsx({
-                                        "grid md:grid-cols-2 gap-2":
+                                        "grid md:grid-cols-2 gap-2 max-h-[200px] md:max-h-full overflow-y-auto md:overflow-y-visible":
                                             npcPLaneAccess !== null,
                                     })}
                                 >
@@ -465,7 +491,7 @@ export default class QuestDetailsModal extends React.Component<any, any> {
                                             <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3"></div>
                                             <dl
                                                 className={
-                                                    "md:ml-8 max-h-[250px] overflow-y-auto"
+                                                    "md:ml-8 md:max-h-[250px] md:overflow-y-auto"
                                                 }
                                             >
                                                 {npcPLaneAccess}
@@ -476,7 +502,7 @@ export default class QuestDetailsModal extends React.Component<any, any> {
                                 <div
                                     className={
                                         "my-4 max-h-[160px] overflow-x-auto border border-slate-200 dark:border-slate-700 rounded-md bg-slate-200 dark:bg-slate-700 p-4 " +
-                                        (!this.props.is_parent_complete
+                                        (!this.props.is_parent_complete || !this.props.is_required_quest_complete
                                             ? " blur-sm"
                                             : "")
                                     }

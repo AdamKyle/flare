@@ -42,10 +42,22 @@ export default class QuestNode extends React.Component<QuestNodeProps, any> {
         return false
     }
 
+    isRequiredQuestComplete(): boolean {
+        if (this.props.quest !== null) {
+            if (this.props.quest.required_quest_id !== null) {
+                const completedQuests = this.props.completed_quests as number[];
+                return completedQuests.includes(this.props.quest.required_quest_id);
+            }
+        }
+        return true;
+    }
+
     render() {
         return (
             <div>
                 <button type='button' role='button' className={clsx({
+                    'text-yellow-700 dark:text-yellow-600': !this.isRequiredQuestComplete() && this.isParentQuestComplete()
+                },{
                     'text-blue-500 dark:text-blue-400': !this.isQuestCompleted() && this.isParentQuestComplete()
                 }, {
                     'text-green-700 dark:text-green-600': this.isQuestCompleted()
@@ -62,6 +74,7 @@ export default class QuestNode extends React.Component<QuestNodeProps, any> {
                             character_id={this.props.character_id}
                             is_parent_complete={this.isParentQuestComplete()}
                             is_quest_complete={this.isQuestCompleted()}
+                            is_required_quest_complete={this.isRequiredQuestComplete()}
                             update_quests={this.props.update_quests}
                         />
                     : null
