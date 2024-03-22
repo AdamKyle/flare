@@ -71,7 +71,7 @@ class ManageClassServiceTest extends TestCase {
 
         $character->skills()->create($skillData);
 
-        $gameClass = $this->createClass(['name' => 'Heretic']);
+        $gameClass = $this->createClass(['name' => 'Heretic', 'damage_stat' => 'int']);
         $gameSkill = $this->createGameSkill(['name' => 'Heretic Skill', 'game_class_id' => $gameClass->id]);
 
         $response = $this->manageClassService->switchClass($character, $gameClass);
@@ -82,6 +82,7 @@ class ManageClassServiceTest extends TestCase {
 
         $this->assertNotNull($character->skills->where('name', $gameSkill->name)->first());
         $this->assertEquals($character->game_class_id, $gameClass->id);
+        $this->assertEquals($character->damage_stat, $gameClass->damage_stat);
     }
 
     public function testReactivateSkill() {

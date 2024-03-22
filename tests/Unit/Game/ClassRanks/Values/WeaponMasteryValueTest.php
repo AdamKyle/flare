@@ -62,6 +62,22 @@ class WeaponMasteryValueTest extends TestCase {
         $this->assertEquals(WeaponMasteryValue::HEALING_SPELL, WeaponMasteryValue::getNumericValueForStringType('spell-healing'));
     }
 
+    public function testGetNumericValueForGunType() {
+        $this->assertEquals(WeaponMasteryValue::GUN, WeaponMasteryValue::getNumericValueForStringType('gun'));
+    }
+
+    public function testGetNumericValueForFanType() {
+        $this->assertEquals(WeaponMasteryValue::FAN, WeaponMasteryValue::getNumericValueForStringType('fan'));
+    }
+
+    public function testGetNumericValueForMaceType() {
+        $this->assertEquals(WeaponMasteryValue::MACE, WeaponMasteryValue::getNumericValueForStringType('mace'));
+    }
+
+    public function testGetNumericValueForScratchAwlType() {
+        $this->assertEquals(WeaponMasteryValue::SCRATCH_AWL, WeaponMasteryValue::getNumericValueForStringType('scratch-awl'));
+    }
+
     public function testIsValidType() {
         $this->assertTrue(WeaponMasteryValue::isValidType('weapon'));
     }
@@ -92,5 +108,21 @@ class WeaponMasteryValueTest extends TestCase {
 
     public function testIsSpellHealing() {
         $this->assertTrue((new WeaponMasteryValue(WeaponMasteryValue::HEALING_SPELL))->isHealingSpell());
+    }
+
+    public function testIsGun() {
+        $this->assertTrue((new WeaponMasteryValue(WeaponMasteryValue::GUN))->isGun());
+    }
+
+    public function testIsFan() {
+        $this->assertTrue((new WeaponMasteryValue(WeaponMasteryValue::FAN))->isFan());
+    }
+
+    public function testIsMace() {
+        $this->assertTrue((new WeaponMasteryValue(WeaponMasteryValue::MACE))->isMace());
+    }
+
+    public function testisScratchAwl() {
+        $this->assertTrue((new WeaponMasteryValue(WeaponMasteryValue::SCRATCH_AWL))->isScratchAwl());
     }
 }

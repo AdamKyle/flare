@@ -20,6 +20,8 @@ export default interface ClassSpecialtiesState {
 
     other_class_specialties: CharacterSpecialsEquippedTyp[]|[];
 
+    original_class_specialties: CharacterSpecialsEquippedTyp[]|[];
+
     class_ranks: ClassRankType[]|[];
 
     dark_tables: boolean;

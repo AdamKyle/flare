@@ -89,6 +89,7 @@ class ManageClassService {
 
         $character->update([
             'game_class_id' => $class->id,
+            'damage_stat'   => $class->damage_stat,
         ]);
 
         $character = $character->refresh();
