@@ -41,6 +41,7 @@ export default class CharacterClassRankSpecialtiesSection extends React.Componen
             class_specials_for_table: [],
             specialties_equipped: [],
             other_class_specialties: [],
+            original_class_specialties: [],
             filtered_other_class_specialties: [],
             class_ranks: [],
             dark_tables: false,
@@ -83,6 +84,7 @@ export default class CharacterClassRankSpecialtiesSection extends React.Componen
                             specialties_equipped: response.data.specials_equipped,
                             class_ranks: response.data.class_ranks,
                             other_class_specialties: response.data.other_class_specials,
+                            original_class_specialties: response.data.other_class_specials,
                             selected_filter: this.props.character === null ? null : this.props.character.class,
                             other_selected_filter: this.props.character === null ? null : this.props.character.class,
                         }, () => {
@@ -170,11 +172,13 @@ export default class CharacterClassRankSpecialtiesSection extends React.Componen
             return;
         }
 
-        const otherSpecials = JSON.parse(JSON.stringify(this.state.other_class_specialties));
+        const otherSpecials = JSON.parse(JSON.stringify(this.state.original_class_specialties));
 
         if (otherSpecials.length === 0) {
             return;
         }
+
+        console.log(otherSpecials, this.state.other_selected_filter);
 
         this.setState({
             other_class_specialties: otherSpecials.filter((special: ClassSpecialtiesType) => special.class_name === this.state.other_selected_filter),

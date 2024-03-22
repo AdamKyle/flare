@@ -2,10 +2,14 @@
 
 namespace App\Flare\Models;
 
+use Database\Factories\CharacterClassSpecialtiesEquippedFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 
 class CharacterClassSpecialtiesEquipped extends Model {
+
+    use HasFactory;
 
     protected $table = 'character_class_specialties_equipped';
 
@@ -118,5 +122,9 @@ class CharacterClassSpecialtiesEquipped extends Model {
 
     public function character() {
         return $this->belongsTo(Character::class);
+    }
+
+    protected static function newFactory() {
+        return CharacterClassSpecialtiesEquippedFactory::new();
     }
 }

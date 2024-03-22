@@ -9,13 +9,15 @@ use App\Game\ClassRanks\Values\WeaponMasteryValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateCharacterClassRank;
+use Tests\Traits\CreateCharacterClassSpecialitiesEquipped;
 use Tests\Traits\CreateClass;
 use Tests\Traits\CreateGameClassSpecial;
 use Tests\Traits\CreateGameSkill;
 
 class ClassRanksServiceTest extends TestCase {
 
-    use RefreshDatabase, CreateGameClassSpecial, CreateClass, CreateGameSkill;
+    use RefreshDatabase, CreateGameClassSpecial, CreateClass, CreateGameSkill, CreateCharacterClassRank, CreateCharacterClassSpecialitiesEquipped;
 
     private ?CharacterFactory $character;
 
@@ -199,6 +201,46 @@ class ClassRanksServiceTest extends TestCase {
         $this->assertEquals(200, $response['status']);
         $this->assertEquals('Equipped class special: ' . $classSpecial->name, $response['message']);
         $this->assertNotEmpty($response['specials_equipped']);
+    }
+
+    public function testEquipAnotherClassSpecialty() {
+        $character = $this->character->getCharacter();
+
+        $gameClass = $this->createClass(['name' => 'Heretic', 'damage_stat' => 'int']);
+
+        $this->createCharacterClassRank([
+            'character_id' => $character->id,
+            'game_class_id' => $gameClass->id,
+            'current_xp' => 0,
+            'required_xp' => 0,
+            'level' => 100,
+        ]);
+
+        $classSpecial = $this->createGameClassSpecial([
+            'game_class_id' => $gameClass->id,
+            'requires_class_rank_level' => 50
+        ]);
+
+        $this->createCharacterClassRankSpecial([
+            'character_id' => $character->id,
+            'game_class_special_id' => $classSpecial->id,
+            'level' => 100,
+            'current_xp' => 1,
+            'required_xp' => 10,
+            'equipped' => false
+        ]);
+
+        $response = $this->classRankService->equipSpecialty($character, $classSpecial);
+
+        // dump($response);
+
+        $this->assertEquals(200, $response['status']);
+        $this->assertEquals('Equipped class special: ' . $classSpecial->name, $response['message']);
+        $this->assertNotEmpty($response['specials_equipped']);
+
+        $character = $character->refresh();
+
+        $this->assertEquals(1, $character->classSpecialsEquipped->count());
     }
 
     public function testRequipSpecialty() {

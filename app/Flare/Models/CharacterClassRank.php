@@ -2,9 +2,13 @@
 
 namespace App\Flare\Models;
 
+use Database\Factories\CharacterClassRankFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class CharacterClassRank extends Model {
+
+    use HasFactory;
 
     /**
      * The attributes that are mass assignable.
@@ -40,5 +44,9 @@ class CharacterClassRank extends Model {
 
     public function weaponMasteries() {
         return $this->hasMany(CharacterClassRankWeaponMastery::class);
+    }
+
+    protected static function newFactory() {
+        return CharacterClassRankFactory::new();
     }
 }

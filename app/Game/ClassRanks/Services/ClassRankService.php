@@ -117,7 +117,7 @@ class ClassRankService {
             }
         }
 
-        $classRank = $character->classRanks->where('game_class_id', $character->game_class_id)->first();
+        $classRank = $character->classRanks->where('game_class_id', $gameClassSpecial->game_class_id)->first();
 
         if ($classRank->level < $gameClassSpecial->requires_class_rank_level) {
             return $this->errorResult('You do not have the required class rank level for this.');
