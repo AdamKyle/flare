@@ -17,6 +17,7 @@ use App\Console\AfterDeployment\ReduceAlchemyItemsCost;
 use App\Console\AfterDeployment\ReduceUnitQueueAmount;
 use App\Console\AfterDeployment\RemoveInvalidQuestItems;
 use App\Console\AfterDeployment\UpdateCharacterCurrencies;
+use App\Console\AfterDeployment\UpdateCharactersDamageStat;
 use App\Console\AfterDeployment\UpdateCharactersForClassRanks;
 use App\Console\DevelopmentCommands\CreateCharacter;
 use App\Console\DevelopmentCommands\MaxOutCharactersPassiveSkills;
@@ -62,6 +63,7 @@ class AppServiceProvider extends ServiceProvider {
             RemoveInvalidQuestItems::class,
             ReduceUnitQueueAmount::class,
             FillInfoSectionsWithItemTableType::class,
+            UpdateCharactersDamageStat::class,
 
             // Development Commands:
             CreateCharacter::class,

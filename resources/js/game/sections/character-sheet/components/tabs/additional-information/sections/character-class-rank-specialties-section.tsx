@@ -178,8 +178,6 @@ export default class CharacterClassRankSpecialtiesSection extends React.Componen
             return;
         }
 
-        console.log(otherSpecials, this.state.other_selected_filter);
-
         this.setState({
             other_class_specialties: otherSpecials.filter((special: ClassSpecialtiesType) => special.class_name === this.state.other_selected_filter),
         });
