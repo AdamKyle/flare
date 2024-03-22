@@ -54,6 +54,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(CoordinatesCache::class),
                 $app->make(ConjureService::class),
                 $app->make(MovementService::class),
+                $app->make(TraverseService::class),
             );
         });
 
@@ -64,6 +65,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(CoordinatesCache::class),
                 $app->make(ConjureService::class),
                 $app->make(MovementService::class),
+                $app->make(TraverseService::class),
             );
         });
 
@@ -74,6 +76,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(CoordinatesCache::class),
                 $app->make(ConjureService::class),
                 $app->make(MovementService::class),
+                $app->make(TraverseService::class),
             );
         });
 
@@ -85,6 +88,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(ConjureService::class),
                 $app->make(MovementService::class),
                 $app->make(PortService::class),
+                $app->make(TraverseService::class),
             );
         });
 

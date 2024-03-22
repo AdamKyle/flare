@@ -18,20 +18,23 @@ class UpdateRaidMonsters extends BaseMovementService {
      * @param CoordinatesCache $coordinatesCache
      * @param ConjureService $conjureService
      * @param MovementService $movementService
+     * @param TraverseService $traverseService
      */
     public function __construct(
         MapTileValue     $mapTileValue,
         MapPositionValue $mapPositionValue,
         CoordinatesCache $coordinatesCache,
         ConjureService   $conjureService,
-        MovementService  $movementService
+        MovementService  $movementService,
+        TraverseService  $traverseService,
     ) {
         parent::__construct(
             $mapTileValue,
             $mapPositionValue,
             $coordinatesCache,
             $conjureService,
-            $movementService
+            $movementService,
+            $traverseService
         );
     }
 

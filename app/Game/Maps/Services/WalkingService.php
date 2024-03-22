@@ -11,6 +11,7 @@ use App\Game\Maps\Events\MoveTimeOutEvent;
 use App\Game\Maps\Values\MapPositionValue;
 use App\Game\Maps\Values\MapTileValue;
 use App\Game\Messages\Events\ServerMessageEvent;
+use Exception;
 
 class WalkingService extends BaseMovementService
 {
@@ -23,18 +24,21 @@ class WalkingService extends BaseMovementService
      * @param CoordinatesCache $coordinatesCache
      * @param ConjureService $conjureService
      * @param MovementService $movementService
+     * @param TraverseService $traverseService
      */
     public function __construct(MapTileValue     $mapTileValue,
                                 MapPositionValue $mapPositionValue,
                                 CoordinatesCache $coordinatesCache,
                                 ConjureService   $conjureService,
-                                MovementService  $movementService
+                                MovementService  $movementService,
+                                TraverseService  $traverseService,
     ) {
         parent::__construct($mapTileValue,
             $mapPositionValue,
             $coordinatesCache,
             $conjureService,
-            $movementService
+            $movementService,
+            $traverseService,
         );
     }
 
@@ -43,7 +47,7 @@ class WalkingService extends BaseMovementService
      *
      * @param Character $character
      * @return array
-     * @throws \Exception
+     * @throws Exception
      */
     public function movePlayerToNewLocation(Character $character): array {
 
@@ -73,6 +77,11 @@ class WalkingService extends BaseMovementService
         $character = $this->updateCharacterMapPosition($character);
 
         if (!is_null($location)) {
+
+            if ($this->traversePlayer($location, $character)) {
+                return $this->successResult($this->movementService->accessLocationService()->getLocationData($character));
+            }
+
             $this->movementService->giveLocationReward($character, $location);
         }
 

@@ -26,6 +26,7 @@ class SetSailService extends BaseMovementService {
      * @param ConjureService $conjureService
      * @param MovementService $movementService
      * @param PortService $portService
+     * @param TraverseService $traverseService
      */
     public function __construct(MapTileValue     $mapTileValue,
                                 MapPositionValue $mapPositionValue,
@@ -33,12 +34,14 @@ class SetSailService extends BaseMovementService {
                                 ConjureService   $conjureService,
                                 MovementService  $movementService,
                                 PortService      $portService,
+                                TraverseService  $traverseService,
     ) {
         parent::__construct($mapTileValue,
             $mapPositionValue,
             $coordinatesCache,
             $conjureService,
-            $movementService
+            $movementService,
+            $traverseService,
         );
 
         $this->portService = $portService;
@@ -73,6 +76,10 @@ class SetSailService extends BaseMovementService {
         }
 
         $this->movementService->giveLocationReward($character, $toPort);
+
+        if ($this->traversePlayer($toPort, $character)) {
+            return $this->successResult($this->movementService->accessLocationService()->getLocationData($character));
+        }
 
         $this->updateMonstersList($character, $toPort);
 

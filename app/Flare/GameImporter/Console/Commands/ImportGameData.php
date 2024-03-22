@@ -96,6 +96,10 @@ class ImportGameData extends Command {
         $this->import($excelMapper, $files['Raids'], 'Raids');
         $this->import($excelMapper, $files['Quests'], 'Quests');
 
+        // Due to the way quests are ordered, and their dependencies on other quests we have to double import to make
+        // sure all relationships are properly setup.
+        $this->import($excelMapper, $files['Quests'], 'Quests');
+
         $this->line('Importing Infromation section ...');
 
         // Import the information wiki
@@ -195,6 +199,7 @@ class ImportGameData extends Command {
             "Hell.jpeg",
             "Purgatory.jpeg",
             "IcePlane.jpeg",
+            "Twisted Memories.jpeg",
         ];
 
         // Sort the array such that the maps are in the correct order.

@@ -62,6 +62,14 @@ class LocationsSheet implements ToCollection {
             }
         }
 
+        if (!isset($cleanData['can_players_enter'])) {
+            $cleanData['can_players_enter'] = false;
+        }
+
+        if (!isset($cleanData['can_auto_battle'])) {
+            $cleanData['can_auto_battle'] = false;
+        }
+
         return $cleanData;
     }
 }

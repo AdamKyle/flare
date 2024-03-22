@@ -2,6 +2,9 @@
 
 namespace App\Game\Maps\Services;
 
+use App\Flare\Models\GameMap;
+use App\Flare\Values\MapNameValue;
+use Exception;
 use Illuminate\Support\Facades\Cache;
 use App\Flare\Models\Kingdom;
 use App\Flare\Values\AutomationType;
@@ -49,18 +52,25 @@ class BaseMovementService {
     protected MovementService $movementService;
 
     /**
+     * @var TraverseService $traverseService
+     */
+    protected TraverseService $traverseService;
+
+    /**
      * @param MapTileValue $mapTileValue
      * @param MapPositionValue $mapPositionValue
      * @param CoordinatesCache $coordinatesCache
      * @param ConjureService $conjureService
      * @param MovementService $movementService
+     * @param TraverseService $traverseService
      */
     public function __construct(
         MapTileValue $mapTileValue,
         MapPositionValue $mapPositionValue,
         CoordinatesCache $coordinatesCache,
         ConjureService $conjureService,
-        MovementService $movementService
+        MovementService $movementService,
+        TraverseService $traverseService,
     ) {
 
         $this->mapTileValue     = $mapTileValue;
@@ -68,6 +78,7 @@ class BaseMovementService {
         $this->coordinatesCache = $coordinatesCache;
         $this->conjureService   = $conjureService;
         $this->movementService  = $movementService;
+        $this->traverseService  = $traverseService;
     }
 
     /**
@@ -126,6 +137,28 @@ class BaseMovementService {
         $this->timeout = $timeout;
 
         return $this;
+    }
+
+    /**
+     * @param Location $location
+     * @param Character $character
+     * @return bool
+     * @throws Exception
+     */
+    protected function traversePlayer(Location $location, Character $character): bool {
+        if ($location->type === LocationType::TWISTED_GATE) {
+            $gameMap = GameMap::where('name', MapNameValue::TWISTED_MEMORIES)->first();
+
+            if (is_null($gameMap)) {
+                throw new Exception('Could not teleport to Twisted Memories');
+            }
+
+            $this->traverseService->travel($gameMap->id, $character);
+
+            return true;
+        }
+
+        return false;
     }
 
     /**

@@ -4,13 +4,17 @@ namespace App\Game\Maps\Services;
 
 use App\Flare\Cache\CoordinatesCache;
 use App\Flare\Models\Character;
+use App\Flare\Models\GameMap;
 use App\Flare\Models\Location;
+use App\Flare\Values\LocationType;
+use App\Flare\Values\MapNameValue;
 use App\Game\Battle\Services\ConjureService;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Maps\Events\MoveTimeOutEvent;
 use App\Game\Maps\Values\MapPositionValue;
 use App\Game\Maps\Values\MapTileValue;
+use Exception;
 
 class TeleportService extends BaseMovementService {
 
@@ -22,18 +26,21 @@ class TeleportService extends BaseMovementService {
      * @param CoordinatesCache $coordinatesCache
      * @param ConjureService $conjureService
      * @param MovementService $movementService
+     * @param TraverseService $traverseService
      */
     public function __construct(MapTileValue $mapTileValue,
                                 MapPositionValue $mapPositionValue,
                                 CoordinatesCache $coordinatesCache,
                                 ConjureService $conjureService,
-                                MovementService $movementService
+                                MovementService $movementService,
+                                TraverseService $traverseService,
     ) {
         parent::__construct($mapTileValue,
                             $mapPositionValue,
                             $coordinatesCache,
                             $conjureService,
-                            $movementService
+                            $movementService,
+                            $traverseService,
         );
     }
 
@@ -43,6 +50,7 @@ class TeleportService extends BaseMovementService {
      * @param Character $character
      * @param bool $usingPCTCommand
      * @return array
+     * @throws Exception
      */
     public function teleport(Character $character, bool $usingPCTCommand = false): array {
         if (!$this->canPlayerMoveToLocation($character)) {
@@ -91,6 +99,7 @@ class TeleportService extends BaseMovementService {
      * @param Location|null $location
      * @param bool $pctCommand
      * @return void
+     * @throws Exception
      */
     protected function teleportCharacter(Character $character, ?Location $location = null, bool $pctCommand = false): void {
 
@@ -118,6 +127,11 @@ class TeleportService extends BaseMovementService {
         event(new UpdateTopBarEvent($character));
 
         if (!is_null($location)) {
+
+            if ($this->traversePlayer($location, $character)) {
+                return;
+            }
+
             $this->movementService->giveLocationReward($character, $location);
         }
 
