@@ -14,6 +14,8 @@ class LocationEffectValue {
     const INCREASE_STATS_BY_ONE_THOUSAND       = 2;
     const INCREASE_STATS_BY_TWO_THOUSAND       = 3;
     const INCREASE_STATS_BY_THREE_THOUSAND     = 4;
+    const INCREASE_STATS_BY_TEN_THOUSAND       = 5;
+    const INCREASE_STATS_BY_FIFTY_THOUSAND     = 6;
 
     protected static $values = [
         0 => self::INCREASE_STATS_BY_TWO_HUNDRED_FIFTY,
@@ -21,6 +23,8 @@ class LocationEffectValue {
         2 => self::INCREASE_STATS_BY_ONE_THOUSAND,
         3 => self::INCREASE_STATS_BY_TWO_THOUSAND,
         4 => self::INCREASE_STATS_BY_THREE_THOUSAND,
+        5 => self::INCREASE_STATS_BY_TEN_THOUSAND,
+        6 => self::INCREASE_STATS_BY_FIFTY_THOUSAND,
     ];
 
     /**
@@ -32,6 +36,8 @@ class LocationEffectValue {
         self::INCREASE_STATS_BY_ONE_THOUSAND      => '1,000pts and 8% towards resistances and skills. ',
         self::INCREASE_STATS_BY_TWO_THOUSAND      => '2,000pts and 10% towards resistances and skills.',
         self::INCREASE_STATS_BY_THREE_THOUSAND    => '3,000pts and 14% towards resistances and skills.',
+        self::INCREASE_STATS_BY_TEN_THOUSAND      => '10,000pts and 30% towards resistances and skills.',
+        self::INCREASE_STATS_BY_FIFTY_THOUSAND    => '50,000pts and 60% towards resistances and skills.',
     ];
 
     protected static $integerValues = [
@@ -40,6 +46,8 @@ class LocationEffectValue {
         self::INCREASE_STATS_BY_ONE_THOUSAND       => 1000,
         self::INCREASE_STATS_BY_TWO_THOUSAND       => 2000,
         self::INCREASE_STATS_BY_THREE_THOUSAND     => 3000,
+        self::INCREASE_STATS_BY_TEN_THOUSAND       => 10000,
+        self::INCREASE_STATS_BY_FIFTY_THOUSAND     => 50000,
     ];
 
     /**
@@ -76,6 +84,10 @@ class LocationEffectValue {
                 return 0.10;
             case self::INCREASE_STATS_BY_THREE_THOUSAND:
                 return 0.14;
+            case self::INCREASE_STATS_BY_TEN_THOUSAND:
+                return 0.30;
+            case self::INCREASE_STATS_BY_FIFTY_THOUSAND:
+                return 0.60;
             default:
                 // @codeCoverageIgnoreStart
                 return 0.0;
@@ -86,15 +98,19 @@ class LocationEffectValue {
     public static function fetchPercentageIncrease($value): float {
         switch ($value) {
             case self::INCREASE_STATS_BY_TWO_HUNDRED_FIFTY:
-                return 0.05;
+                return 0.02;
             case self::INCREASE_STATS_BY_FIVE_HUNDRED:
-                return 0.10;
+                return 0.05;
             case self::INCREASE_STATS_BY_ONE_THOUSAND:
-                return 0.25;
+                return 0.08;
             case self::INCREASE_STATS_BY_TWO_THOUSAND:
-                return 0.50;
+                return 0.10;
             case self::INCREASE_STATS_BY_THREE_THOUSAND:
-                return 0.70;
+                return 0.14;
+            case self::INCREASE_STATS_BY_TEN_THOUSAND:
+                return 0.30;
+            case self::INCREASE_STATS_BY_FIFTY_THOUSAND:
+                return 0.60;
             default:
                 // @codeCoverageIgnoreStart
                 return 0.0;

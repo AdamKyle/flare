@@ -42,6 +42,11 @@ export default class TraverseModal extends React.Component<any, any> {
     }
 
     setMap(data: any) {
+
+        if (data.value <= 0) {
+            return;
+        }
+
         this.setState({
             map: data.value
         }, () => {
@@ -61,6 +66,10 @@ export default class TraverseModal extends React.Component<any, any> {
 
     getDefaultValue() {
         const playerMap = this.state.game_maps.filter((map: any) => map.id === this.props.map_id)[0];
+
+        if (!playerMap) {
+            return {label: 'Please select', value: 0}
+        }
 
         if (this.state.map  === 0) {
             return {label: playerMap.name, value: playerMap.id}
