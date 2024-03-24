@@ -16,7 +16,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
-class InitiateWinterEvent implements ShouldQueue {
+class InitiateDelusionalMemoriesEvent implements ShouldQueue {
 
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -57,13 +57,13 @@ class InitiateWinterEvent implements ShouldQueue {
             'ends_at'    => $event->end_date
         ]);
 
-        event(new GlobalMessageEvent('A winter chill sets over you. You turn and see the gates to the Ice Queens Realm is open. Do you dare enter? (Players just have to traverse to the new plane, you can do with this the traverse on desktop or Map Movement -> Traverse on Mobile.)'));
+        event(new GlobalMessageEvent('The twisted and delusional laughter of a mad man haunts your ears: Fliniguss\'s realm opens to those who dare to delve the delusional memories of a mad man,'));
 
         AnnouncementHandler::createAnnouncement('winter_event');
 
         $this->kickOffGlobalEventGoal();
 
-        event(new GlobalMessageEvent('Players who have Guide Quests enabled will also see a set of new quests to introduce them to the Winter Event. These are geared at new and existing players.'));
+        event(new GlobalMessageEvent('Players who have Guide Quests enabled will also see a set of new quests to introduce them to the Delusional Memories Event. These are geared at new and existing players.'));
 
         $buildQuestCacheService->buildQuestCache(true);
     }
@@ -76,6 +76,10 @@ class InitiateWinterEvent implements ShouldQueue {
 
         GlobalEventGoal::create($globalEventGoalData);
 
-        event(new GlobalMessageEvent('While on the The Ice Plane, characters who kill: ANY CREATURE in either manual or exploration, will increase the new: Global Event Goal. Players will be rewarded with random Corrupted Ice Gear when specific milestones are reached.'));
+        event(new GlobalMessageEvent('"Child! We need you!" The Red Hawk Soldier looks at you. There is a fear in his eyes. "Please child. Fight with us!"'));
+
+        event(new GlobalMessageEvent('While on the Delusional Memories Plane, characters who kill: ANY CREATURE in either manual or exploration, will increase the new: Global Event Goal. ' .
+            'Players will be rewarded with random Corrupted Ice Gear when specific milestones are reached. ' .
+            'Players who participate and help the battle progress, will move the event forward to a crafting and then enchanting and then back to fighting - and around we go again.'));
     }
 }

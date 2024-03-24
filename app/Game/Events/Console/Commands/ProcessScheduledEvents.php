@@ -2,6 +2,7 @@
 
 namespace App\Game\Events\Console\Commands;
 
+use App\Game\Events\Jobs\InitiateDelusionalMemoriesEvent;
 use Illuminate\Console\Command;
 use App\Flare\Models\ScheduledEvent;
 use App\Game\Events\Values\EventType;
@@ -24,7 +25,7 @@ class ProcessScheduledEvents extends Command {
      *
      * @var string
      */
-    protected $description = 'Process and begin initiazling scheduled events.';
+    protected $description = 'Process and begin initialing scheduled events.';
 
     /**
      * Execute the console command.
@@ -58,6 +59,10 @@ class ProcessScheduledEvents extends Command {
 
             if ($eventType->isWinterEvent()) {
                 InitiateWinterEvent::dispatch($event->id)->delay(now()->addMinutes(5));
+            }
+
+            if ($eventType->isDelusionalMemoriesEvent()) {
+                InitiateDelusionalMemoriesEvent::dispatch($event->id)->delay(now()->addMinutes(5));
             }
         }
     }

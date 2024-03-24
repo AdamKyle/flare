@@ -2,6 +2,7 @@
 
 namespace App\Game\Events\Console\Commands;
 
+use App\Flare\Models\Faction;
 use App\Flare\Models\Raid;
 use App\Flare\Models\Event;
 use App\Flare\Models\Location;
@@ -9,7 +10,9 @@ use App\Flare\Models\Character;
 use App\Game\Core\Values\FactionLevel;
 use App\Game\Events\Values\EventType;
 use App\Game\Exploration\Services\ExplorationAutomationService;
+use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
 use App\Game\Quests\Services\BuildQuestCacheService;
+use Exception;
 use Illuminate\Console\Command;
 use App\Flare\Models\Announcement;
 use App\Flare\Models\ScheduledEvent;
@@ -47,9 +50,13 @@ class EndScheduledEvent extends Command {
      * @param LocationService $locationService
      * @param UpdateRaidMonsters $updateRaidMonsters
      * @param EventSchedulerService $eventSchedulerService
-     * @param KingdomEventService $kingdomEventService,
-     * @param TraverseService $traverseService,
+     * @param KingdomEventService $kingdomEventService ,
+     * @param TraverseService $traverseService ,
+     * @param ExplorationAutomationService $explorationAutomationService
+     * @param BuildQuestCacheService $buildQuestCacheService
+     * @param FactionLoyaltyService $factionLoyaltyService
      * @return void
+     * @throws Exception
      */
     public function handle(
         LocationService $locationService,
@@ -58,7 +65,8 @@ class EndScheduledEvent extends Command {
         KingdomEventService $kingdomEventService,
         TraverseService $traverseService,
         ExplorationAutomationService $explorationAutomationService,
-        BuildQuestCacheService $buildQuestCacheService
+        BuildQuestCacheService $buildQuestCacheService,
+        FactionLoyaltyService $factionLoyaltyService,
     ) {
         $this->endScheduledEvent(
             $locationService,
@@ -67,12 +75,13 @@ class EndScheduledEvent extends Command {
             $kingdomEventService,
             $traverseService,
             $explorationAutomationService,
-            $buildQuestCacheService
+            $buildQuestCacheService,
+            $factionLoyaltyService
         );
     }
 
     /**
-     * End the scheduled events who are suppose to end.
+     * End the scheduled events who are supposed to end.
      *
      * @param LocationService $locationService
      * @param UpdateRaidMonsters $updateRaidMonsters
@@ -80,8 +89,10 @@ class EndScheduledEvent extends Command {
      * @param KingdomEventService $kingdomEventService
      * @param TraverseService $traverseService
      * @param ExplorationAutomationService $explorationAutomationService
+     * @param BuildQuestCacheService $buildQuestCacheService
+     * @param FactionLoyaltyService $factionLoyaltyService
      * @return void
-     * @throws \Exception
+     * @throws Exception
      */
     protected function endScheduledEvent(
         LocationService $locationService,
@@ -90,15 +101,21 @@ class EndScheduledEvent extends Command {
         KingdomEventService $kingdomEventService,
         TraverseService $traverseService,
         ExplorationAutomationService $explorationAutomationService,
-        BuildQuestCacheService $buildQuestCacheService
+        BuildQuestCacheService $buildQuestCacheService,
+        FactionLoyaltyService $factionLoyaltyService
     ): void {
 
         $scheduledEvents = ScheduledEvent::where('end_date', '<=', now())->get();
-        $eventsToEnd     = Event::where('ends_at', '<=', now())->get();
 
         foreach ($scheduledEvents as $event) {
 
             if (!$event->currently_running) {
+                continue;
+            }
+
+            $currentEvent = Event::where('type', $event->event_type)->where('ends_at', '<=', now())->first();
+
+            if (is_null($currentEvent)) {
                 continue;
             }
 
@@ -118,7 +135,7 @@ class EndScheduledEvent extends Command {
             }
 
             if ($eventType->isWeeklyCurrencyDrops()) {
-                $this->endWeeklyCurrencyDrops();
+                $this->endWeeklyCurrencyDrops($event);
 
                 $event->update([
                     'currently_running' => false,
@@ -128,7 +145,7 @@ class EndScheduledEvent extends Command {
             }
 
             if ($eventType->isWeeklyCelestials()) {
-                $this->endWeeklySpawnEvent();
+                $this->endWeeklySpawnEvent($event);
 
                 $event->update([
                     'currently_running' => false,
@@ -146,7 +163,7 @@ class EndScheduledEvent extends Command {
             }
 
             if ($eventType->isWinterEvent()) {
-                $this->endWinterEvent($kingdomEventService, $traverseService, $explorationAutomationService);
+                $this->endWinterEvent($kingdomEventService, $traverseService, $explorationAutomationService, $factionLoyaltyService);
 
                 $buildQuestCacheService->buildQuestCache(true);
                 $buildQuestCacheService->buildRaidQuestCache(true);
@@ -157,13 +174,8 @@ class EndScheduledEvent extends Command {
 
                 event(new UpdateScheduledEvents($eventSchedulerService->fetchEvents()));
             }
-        }
 
-        /**
-         * End Events
-         */
-        forEach ($eventsToEnd as $event) {
-            $announcement = Announcement::where('event_id', $event->id)->first();
+            $announcement = Announcement::where('event_id', $currentEvent->id)->first();
 
             if (is_null($announcement)) {
                 continue;
@@ -173,7 +185,7 @@ class EndScheduledEvent extends Command {
 
             $announcement->delete();
 
-            $event->delete();
+            $currentEvent->delete();
         }
     }
 
@@ -218,15 +230,10 @@ class EndScheduledEvent extends Command {
     /**
      * Ends a weekly currency event
      *
+     * @param Event $event
      * @return void
      */
-    protected function endWeeklyCurrencyDrops(): void
-    {
-        $event = Event::where('type', EventType::WEEKLY_CURRENCY_DROPS)->first();
-
-        if (is_null($event)) {
-            return;
-        }
+    protected function endWeeklyCurrencyDrops(Event $event): void {
 
         event(new GlobalMessageEvent('Weekly currency drops have come to an end! Come back next sunday for another chance!'));
 
@@ -242,16 +249,11 @@ class EndScheduledEvent extends Command {
     /**
      * End Weekly Celestial Spawn Event
      *
+     * @param Event $event
      * @return void
      */
-    protected function endWeeklySpawnEvent(): void
+    protected function endWeeklySpawnEvent(Event $event): void
     {
-        $event = Event::where('type', EventType::WEEKLY_CELESTIALS)->first();
-
-        if (is_null($event)) {
-            return;
-        }
-
         event(new GlobalMessageEvent('The Creator has managed to close the gates and lock the Celestials away behind the doors of Kalitorm! Come back next week for another chance at the hunt!'));
 
         $announcement = Announcement::where('event_id', $event->id)->first();
@@ -269,11 +271,13 @@ class EndScheduledEvent extends Command {
      * @param KingdomEventService $kingdomEventService
      * @param TraverseService $traverseService
      * @param ExplorationAutomationService $explorationAutomationService
+     * @param FactionLoyaltyService $factionLoyaltyService
      * @return void
      */
     protected function endWinterEvent(KingdomEventService $kingdomEventService,
                                       TraverseService $traverseService,
-                                      ExplorationAutomationService $explorationAutomationService) {
+                                      ExplorationAutomationService $explorationAutomationService,
+                                      FactionLoyaltyService $factionLoyaltyService): void {
 
         $event = Event::where('type', EventType::WINTER_EVENT)->first();
 
@@ -284,11 +288,19 @@ class EndScheduledEvent extends Command {
         $kingdomEventService->handleKingdomRewardsForEvent(MapNameValue::ICE_PLANE);
 
         $gameMap    = GameMap::where('name', MapNameValue::ICE_PLANE)->first();
+        $faction    = Faction::where('game_map_id', $gameMap->id)->first();
         $surfaceMap = GameMap::where('name', MapNameValue::SURFACE)->first();
 
         Character::join('maps', 'maps.character_id', '=', 'characters.id')
             ->where('maps.game_map_id', $gameMap->id)
-            ->chunk(100, function ($characters) use ($traverseService, $surfaceMap, $explorationAutomationService, $gameMap) {
+            ->chunk(100, function ($characters) use (
+                $traverseService,
+                $surfaceMap,
+                $explorationAutomationService,
+                $factionLoyaltyService,
+                $faction,
+                $gameMap
+            ) {
                 foreach ($characters as $character) {
                     $explorationAutomationService->stopExploration($character);
 
@@ -301,6 +313,8 @@ class EndScheduledEvent extends Command {
                     ]);
 
                     $traverseService->travel($surfaceMap->id, $character);
+
+                    $this->unpledgeFromTheMapsFaction($character, $factionLoyaltyService, $faction);
                 }
             });
 
@@ -313,6 +327,33 @@ class EndScheduledEvent extends Command {
         $announcement->delete();
 
         $event->delete();
+    }
+
+    /**
+     * Remove the pledge and helping Npc from the character for the map ending.
+     *
+     * @param Character $character
+     * @param FactionLoyaltyService $factionLoyaltyService
+     * @param Faction|null $faction
+     * @return void
+     */
+    private function unpledgeFromTheMapsFaction(Character $character, FactionLoyaltyService $factionLoyaltyService, ?Faction $faction = null): void {
+        if (!is_null($faction)) {
+            $factionLoyalty = $character->factionLoyalties()
+                ->where('faction_id', $faction->id)
+                ->first();
+
+            $assistingNpc = $factionLoyalty
+                ->factionLoyaltyNpcs()
+                ->where('currently_helping', true)
+                ->first();
+
+            if (!is_null($assistingNpc)) {
+                $factionLoyaltyService->stopAssistingNpc($character, $assistingNpc);
+            }
+
+            $factionLoyaltyService->removePledge($character, $faction);
+        }
     }
 
     /**

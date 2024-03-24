@@ -18,10 +18,12 @@ use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateAnnouncement;
 use Tests\Traits\CreateEvent;
+use Tests\Traits\CreateFactionLoyalty;
 use Tests\Traits\CreateGameMap;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateLocation;
 use Tests\Traits\CreateMonster;
+use Tests\Traits\CreateNpc;
 use Tests\Traits\CreateRaid;
 use Tests\Traits\CreateScheduledEvent;
 
@@ -35,7 +37,8 @@ class EndScheduledEventTest extends TestCase {
         CreateGameMap,
         CreateEvent,
         CreateAnnouncement,
-        CreateMonster;
+        CreateNpc,
+        CreateFactionLoyalty;
 
     public function setUp(): void {
         parent::setUp();
@@ -251,5 +254,105 @@ class EndScheduledEventTest extends TestCase {
         $this->assertFalse($scheduledEvent->refresh()->currently_running);
         $this->assertEmpty(Event::all());
         $this->assertEmpty(Announcement::all());
+    }
+
+    public function testEndWinterEventWhilePledgedToFactionAndHelpingNPc() {
+
+        // We go back to this map when the event ends.
+        $this->createGameMap([
+            'name' => MapNameValue::SURFACE,
+        ]);
+
+        $icePlane = $this->createGameMap([
+            'name' => MapNameValue::ICE_PLANE,
+        ]);
+
+        $character = (new CharacterFactory())->createBaseCharacter()
+            ->assignFactionSystem()
+            ->givePlayerLocation(16, 16, $icePlane)
+            ->kingdomManagement()
+            ->assignKingdom()
+            ->assignBuilding()
+            ->assignUnits()
+            ->getCharacter();
+
+        $npc = $this->createNpc([
+            'game_map_id' => $character->map->game_map_id
+        ]);
+
+        $factionLoyalty = $this->createFactionLoyalty([
+            'faction_id'   => $character->factions->where('game_map_id', $icePlane->id)->first()->id,
+            'character_id' => $character->id,
+            'is_pledged'   => true,
+        ]);
+
+        $factionNpc = $this->createFactionLoyaltyNpc([
+            'faction_loyalty_id'          => $factionLoyalty->id,
+            'npc_id'                      => $npc->id,
+            'current_level'               => 0,
+            'max_level'                   => 25,
+            'next_level_fame'             => 100,
+            'currently_helping'           => true,
+            'kingdom_item_defence_bonus'  => 0.002,
+        ]);
+
+        $this->createFactionLoyaltyNpcTask([
+            'faction_loyalty_id'      => $factionLoyalty->id,
+            'faction_loyalty_npc_id'  => $factionNpc->id,
+            'fame_tasks'              => [],
+        ]);
+
+        $monsterCache = [
+            MapNameValue::SURFACE => [$this->createMonster()]
+        ];
+
+        Cache::put('monsters', $monsterCache);
+
+        $this->instance(
+            MapTileValue::class,
+            Mockery::mock(MapTileValue::class, function (MockInterface $mock) {
+                $mock->shouldReceive('canWalkOnWater')->andReturn(true);
+                $mock->shouldReceive('canWalkOnDeathWater')->andReturn(true);
+                $mock->shouldReceive('canWalkOnMagma')->andReturn(true);
+                $mock->shouldReceive('isPurgatoryWater')->andReturn(false);
+                $mock->shouldReceive('getTileColor')->andReturn('000');
+            })
+        );
+
+        $scheduledEvent = $this->createScheduledEvent([
+            'event_type'        => EventType::WINTER_EVENT,
+            'start_date'        => now()->addMinutes(5),
+            'currently_running' => true,
+        ]);
+
+        $event = $this->createEvent([
+            'type'        => EventType::WINTER_EVENT,
+            'started_at'  => now(),
+            'ends_at'     => now()->subMinute(10),
+        ]);
+
+        $this->createAnnouncement([
+            'event_id' => $event->id,
+        ]);
+
+
+        $this->createItem(['specialty_type' => ItemSpecialtyType::CORRUPTED_ICE, 'type' => WeaponTypes::HAMMER]);
+
+        $this->artisan('end:scheduled-event');
+
+        $character = $character->refresh();
+        $factionNpc = $factionNpc->refresh();
+
+        $this->assertNotEmpty($character->inventory->slots->where('item.specialty_type', ItemSpecialtyType::CORRUPTED_ICE)->all());
+        $this->assertEmpty($character->kingdoms);
+        $this->assertEquals(GameMap::where('name', MapNameValue::SURFACE)->first()->id, $character->map->game_map_id);
+
+        $this->assertEmpty($character->factionLoyalties()->where('is_pledged', true)->get());
+        $this->assertFalse($factionNpc->currently_helping);
+
+        $this->assertFalse($scheduledEvent->refresh()->currently_running);
+        $this->assertEmpty(Event::all());
+        $this->assertEmpty(Announcement::all());
+
     }
 }

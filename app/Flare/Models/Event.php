@@ -20,6 +20,8 @@ class Event extends Model {
         'started_at',
         'ends_at',
         'raid_id',
+        'event_goal_steps',
+        'current_event_goal_step',
     ];
 
     /**
@@ -28,9 +30,11 @@ class Event extends Model {
      * @var array
      */
     protected $casts = [
-        'type'    => 'integer',
-        'raid_id' => 'integer',
-        'ends_at' => 'datetime'
+        'type'                    => 'integer',
+        'raid_id'                 => 'integer',
+        'ends_at'                 => 'datetime',
+        'event_goal_steps'        => 'array',
+        'current_event_goal_step' => 'string',
     ];
 
     public function raid() {

@@ -15,6 +15,8 @@ class ItemSpecialtyType {
     const PURGATORY_CHAINS    = 'Purgatory Chains';
     const PIRATE_LORD_LEATHER = 'Pirate Lord Leather';
     const CORRUPTED_ICE       = 'Corrupted Ice';
+    const DELUSIONAL_SILVER   = 'Delusional Silver';
+    const TWISTED_EARTH       = 'Twisted Earth';
 
     /**
      * @var string[] $values
@@ -24,6 +26,8 @@ class ItemSpecialtyType {
         self::PURGATORY_CHAINS    => 'Purgatory Chains',
         self::PIRATE_LORD_LEATHER => 'Pirate Lord Leather',
         self::CORRUPTED_ICE       => 'Corrupted Ice',
+        self::DELUSIONAL_SILVER   => 'Delusional Silver',
+        self::TWISTED_EARTH       => 'Twisted Earth',
     ];
 
     /**
@@ -95,5 +99,23 @@ class ItemSpecialtyType {
      */
     public function isCorruptedIce(): bool {
         return $this->value === self::CORRUPTED_ICE;
+    }
+
+    /**
+     * Is Twisted earth
+     *
+     * @return boolean
+     */
+    public function isTwistedEarth(): bool {
+        return $this->value === self::TWISTED_EARTH;
+    }
+
+    /**
+     * Is twisted delusional
+     *
+     * @return boolean
+     */
+    public function isDelusionalSilver(): bool {
+        return $this->value === self::DELUSIONAL_SILVER;
     }
 }

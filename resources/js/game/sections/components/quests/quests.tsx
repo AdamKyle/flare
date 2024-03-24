@@ -74,6 +74,11 @@ export default class Quests extends React.Component<QuestsProps, QuestState> {
                 on_click: this.setPlaneForQuests.bind(this),
                 icon_class: "ra ra-footprint",
             },
+            {
+                name: "Twisted Memories",
+                on_click: this.setPlaneForQuests.bind(this),
+                icon_class: "ra ra-footprint",
+            },
         ];
 
         if (this.props.quest_details.is_winter_event) {

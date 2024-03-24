@@ -32,10 +32,17 @@ class RestartGlobalEventGoal extends Command {
      * Execute the console command.
      *
      * @return void
+     * @throws \Exception
      */
     public function handle(): void {
 
         $globalEvent = GlobalEventGoal::first();
+
+        $eventType = new EventType($globalEvent->event_type);
+
+        if ($eventType->isDelusionalMemoriesEvent()) {
+
+        }
 
         if ($globalEvent->total_kills < $globalEvent->max_kills) {
             return;

@@ -36,15 +36,14 @@ class CharacterService
      * @return int
      */
     protected function getXPForNextLevel(int $nextLevel): int {
-        if ($nextLevel > 999) {        
+        if ($nextLevel > 999) {
             $xpAtLevel1000 = 1000;
-            
-            // Adjust the growth factor to increase the pace of XP growth
+
             $baseXPFactor = (2000 - $xpAtLevel1000) / pow(1000, 3);
-        
+
             $xpRequired = $xpAtLevel1000 + $baseXPFactor * pow(($nextLevel - 1000), 3);
             $xpRequired = min($xpRequired, 1000000);
-        
+
             return (int)$xpRequired;
         }
 

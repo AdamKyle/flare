@@ -7,21 +7,23 @@ use Exception;
 class EventType {
 
 
-    const WEEKLY_CELESTIALS     = 0;
+    const WEEKLY_CELESTIALS           = 0;
 
-    const MONTHLY_PVP           = 1;
+    const MONTHLY_PVP                 = 1;
 
-    const WEEKLY_CURRENCY_DROPS = 2;
+    const WEEKLY_CURRENCY_DROPS       = 2;
 
-    const RAID_EVENT            = 3;
+    const RAID_EVENT                  = 3;
 
-    const WINTER_EVENT          = 4;
+    const WINTER_EVENT                = 4;
 
-    const PURGATORY_SMITH_HOUSE = 5;
+    const PURGATORY_SMITH_HOUSE       = 5;
 
-    const GOLD_MINES            = 6;
+    const GOLD_MINES                  = 6;
 
-    const THE_OLD_CHURCH        = 7;
+    const THE_OLD_CHURCH              = 7;
+
+    const DELUSIONAL_MEMORIES_EVENT   = 8;
 
     /**
      * @var int $value
@@ -40,6 +42,7 @@ class EventType {
         5 => self::PURGATORY_SMITH_HOUSE,
         6 => self::GOLD_MINES,
         7 => self::THE_OLD_CHURCH,
+        8 => self::DELUSIONAL_MEMORIES_EVENT,
     ];
 
     protected static array $selection = [
@@ -51,6 +54,7 @@ class EventType {
         5 => 'Purgatory Smith House',
         6 => 'Gold Mines',
         7 => 'The Old Church',
+        8 => 'Delusional Memories Event'
     ];
 
     /**
@@ -155,5 +159,14 @@ class EventType {
      */
     public function isTheOldChurchEvent(): bool {
         return $this->value === self::THE_OLD_CHURCH;
+    }
+
+    /**
+     * Is Delusional Memories Event?
+     *
+     * @return bool
+     */
+    public function isDelusionalMemoriesEvent(): bool {
+        return $this->value === self::DELUSIONAL_MEMORIES_EVENT;
     }
 }

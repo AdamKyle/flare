@@ -24,6 +24,27 @@ class GlobalEventForEventTypeValue {
             ];
         }
 
+        if ($event->isDelusionalMemoriesEvent()) {
+            return [
+                'max_kills'                  => 400000,
+                'reward_every_kills'         => 20000,
+                'next_reward_at'             => 20000,
+                'event_type'                 => EventType::DELUSIONAL_MEMORIES_EVENT,
+                'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER,
+                'should_be_unique'           => true,
+                'unique_type'                => RandomAffixDetails::MYTHIC,
+                'should_be_mythic'           => false,
+            ];
+        }
+
         return [];
+    }
+
+    public static function fetchDelusionalMemoriesGlobalEventSteps(): array {
+        return [
+            'battle',
+            'craft',
+            'enchant',
+        ];
     }
 }
