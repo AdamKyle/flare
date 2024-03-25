@@ -109,13 +109,14 @@ class EndScheduledEvent extends Command {
 
         foreach ($scheduledEvents as $event) {
 
-            if (!$event->currently_running) {
-                continue;
-            }
-
             $currentEvent = Event::where('type', $event->event_type)->where('ends_at', '<=', now())->first();
 
             if (is_null($currentEvent)) {
+
+                $event->update([
+                    'currently_running' => false
+                ]);
+
                 continue;
             }
 
@@ -135,7 +136,7 @@ class EndScheduledEvent extends Command {
             }
 
             if ($eventType->isWeeklyCurrencyDrops()) {
-                $this->endWeeklyCurrencyDrops($event);
+                $this->endWeeklyCurrencyDrops($currentEvent);
 
                 $event->update([
                     'currently_running' => false,
@@ -145,7 +146,7 @@ class EndScheduledEvent extends Command {
             }
 
             if ($eventType->isWeeklyCelestials()) {
-                $this->endWeeklySpawnEvent($event);
+                $this->endWeeklySpawnEvent($currentEvent);
 
                 $event->update([
                     'currently_running' => false,

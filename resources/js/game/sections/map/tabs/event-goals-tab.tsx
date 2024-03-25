@@ -137,7 +137,7 @@ export default class EventGoalsTab extends React.Component<
                             Amount of kills required to gain phase reward:
                         </span>{" "}
                         {formatNumber(
-                            this.state.eventGoal.kills_needed_for_reward
+                            this.state.eventGoal.amount_needed_for_reward
                         )}
                     </p>
                     <p className="my-2 font-bold">

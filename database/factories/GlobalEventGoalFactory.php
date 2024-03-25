@@ -21,7 +21,7 @@ class GlobalEventGoalFactory extends Factory {
     public function definition() {
         return [
             'max_kills'                       => 100,
-            'reward_every_kills'              => 10,
+            'reward_every'                    => 10,
             'next_reward_at'                  => 10,
             'event_type'                      => null,
             'item_specialty_type_reward'      => null,

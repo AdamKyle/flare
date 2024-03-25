@@ -36,7 +36,7 @@ class EventGoalsControllerTest extends TestCase {
 
         $this->eventGoal = $this->createGlobalEventGoal([
             'max_kills'                      => 1000,
-            'reward_every'             => 100,
+            'reward_every'                   => 100,
             'next_reward_at'                 => 100,
             'event_type'                     => EventType::WINTER_EVENT,
             'item_specialty_type_reward'     => ItemSpecialtyType::CORRUPTED_ICE,
@@ -74,11 +74,13 @@ class EventGoalsControllerTest extends TestCase {
         $jsonData = json_decode($response->getContent(), true);
 
         $this->assertEquals([
-            'max_kills'               => $this->eventGoal->max_kills,
-            'total_kills'             => $this->eventGoal->total_kills,
-            'reward_every'            => $this->eventGoal->reward_every,
-            'kills_needed_for_reward' => 100,
-            'current_kills'           => 10,
+            'max_kills'                => $this->eventGoal->max_kills,
+            'total_kills'              => $this->eventGoal->total_kills,
+            'reward_every'             => $this->eventGoal->reward_every,
+            'amount_needed_for_reward' => 100,
+            'current_kills'            => 10,
+            'max_crafts'               => null,
+            'current_crafts'           => 0,
         ], $jsonData['event_goals']);
     }
 }

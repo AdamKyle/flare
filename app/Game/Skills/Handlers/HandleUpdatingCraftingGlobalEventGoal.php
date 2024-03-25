@@ -42,9 +42,14 @@ class HandleUpdatingCraftingGlobalEventGoal extends BaseGlobalEventGoalParticipa
     public function handleUpdatingCraftingGlobalEventGoal(Character $character, Item $item): void {
 
         $event = Event::where('current_event_goal_step', GlobalEventSteps::CRAFT)->first();
+
+        if (is_null($event)) {
+            return;
+        }
+
         $globalEventGoal = GlobalEventGoal::where('event_type', $event->type)->first();
 
-        if (is_null($event || $globalEventGoal)) {
+        if (is_null($globalEventGoal)) {
             return;
         }
 

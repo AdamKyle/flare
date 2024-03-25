@@ -11,11 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('global_event_goals', function (Blueprint $table) {
-            $table->renameColumn('reward_every_kills', 'reward_every');
-            $table->integer('max_crafts')->nullable();
-            $table->integer('max_kills')->nullable()->change();
-        });
+        //
     }
 
     /**
