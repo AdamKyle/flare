@@ -8,8 +8,10 @@ use App\Flare\Handlers\UpdateCharacterAttackTypes;
 use App\Flare\Transformers\BasicSkillsTransformer;
 use App\Flare\Transformers\SkillsTransformer;
 use App\Game\CharacterInventory\Services\CharacterInventoryService;
+use App\Game\Events\Services\EventGoalsService;
 use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
 use App\Game\NpcActions\QueenOfHeartsActions\Services\RandomEnchantmentService;
+use App\Game\Skills\Handlers\HandleUpdatingCraftingGlobalEventGoal;
 use App\Game\Skills\Handlers\UpdateCraftingTasksForFactionLoyalty;
 use App\Game\Skills\Handlers\UpdateItemSkill;
 use App\Game\Skills\Builders\GemBuilder;
@@ -54,6 +56,13 @@ class ServiceProvider extends ApplicationServiceProvider {
             return new UpdateCharacterSkillsService($app->make(SkillService::class));
         });
 
+        $this->app->bind(HandleUpdatingCraftingGlobalEventGoal::class, function ($app) {
+            return new HandleUpdatingCraftingGlobalEventGoal(
+                $app->make(RandomAffixGenerator::class),
+                $app->make(EventGoalsService::class)
+            );
+        });
+
         $this->app->bind(CraftingService::class, function ($app) {
             return new CraftingService(
                 $app->make(RandomEnchantmentService::class),
@@ -61,6 +70,7 @@ class ServiceProvider extends ApplicationServiceProvider {
                 $app->make(ItemListCostTransformerService::class),
                 $app->make(SkillCheckService::class),
                 $app->make(UpdateCraftingTasksForFactionLoyalty::class),
+                $app->make(HandleUpdatingCraftingGlobalEventGoal::class),
             );
         });
 

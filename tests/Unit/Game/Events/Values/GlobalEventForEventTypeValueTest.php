@@ -13,7 +13,7 @@ class GlobalEventForEventTypeValueTest extends TestCase {
     public function testGetWinterEventGlobalEventGoalData() {
         $expected = [
             'max_kills'                  => 190000,
-            'reward_every_kills'         => 10000,
+            'reward_every'         => 10000,
             'next_reward_at'             => 10000,
             'event_type'                 => EventType::WINTER_EVENT,
             'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE,

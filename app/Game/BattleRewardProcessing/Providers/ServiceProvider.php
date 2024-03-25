@@ -7,7 +7,7 @@ use App\Flare\Models\GlobalEventParticipation;
 use App\Flare\Services\CharacterRewardService;
 use App\Game\BattleRewardProcessing\Handlers\FactionHandler;
 use App\Game\BattleRewardProcessing\Handlers\FactionLoyaltyBountyHandler;
-use App\Game\BattleRewardProcessing\Handlers\GlobalEventParticipationHandler;
+use App\Game\BattleRewardProcessing\Handlers\BattleGlobalEventParticipationHandler;
 use App\Game\BattleRewardProcessing\Handlers\GoldMinesRewardHandler;
 use App\Game\BattleRewardProcessing\Handlers\PurgatorySmithHouseRewardHandler;
 use App\Game\BattleRewardProcessing\Handlers\TheOldChurchRewardHandler;
@@ -70,7 +70,7 @@ class ServiceProvider extends ApplicationServiceProvider {
                 $app->make(FactionHandler::class),
                 $app->make(CharacterRewardService::class),
                 $app->make(GoldRush::class),
-                $app->make(GlobalEventParticipationHandler::class),
+                $app->make(BattleGlobalEventParticipationHandler::class),
                 $app->make(PurgatorySmithHouseRewardHandler::class),
                 $app->make(GoldMinesRewardHandler::class),
                 $app->make(FactionLoyaltyBountyHandler::class),

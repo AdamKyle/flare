@@ -3,6 +3,7 @@
 namespace App\Game\Events\Providers;
 
 use App\Game\Events\Console\Commands\RestartGlobalEventGoal;
+use App\Game\Events\Handlers\BaseGlobalEventGoalParticipationHandler;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use App\Game\Events\Console\Commands\EndScheduledEvent;
 use App\Game\Events\Console\Commands\ProcessScheduledEvents;

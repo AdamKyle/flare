@@ -13,6 +13,7 @@ use App\Game\Core\Events\CraftedItemTimeOutEvent;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\NpcActions\QueenOfHeartsActions\Services\RandomEnchantmentService;
+use App\Game\Skills\Handlers\HandleUpdatingCraftingGlobalEventGoal;
 use App\Game\Skills\Handlers\UpdateCraftingTasksForFactionLoyalty;
 use App\Game\Skills\Services\Traits\UpdateCharacterCurrency;
 use Exception;
@@ -50,6 +51,11 @@ class CraftingService {
     private UpdateCraftingTasksForFactionLoyalty $updateCraftingTasksForFactionLoyalty;
 
     /**
+     * @var HandleUpdatingCraftingGlobalEventGoal $handleUpdatingCraftingGlobalEventGoal
+     */
+    private HandleUpdatingCraftingGlobalEventGoal $handleUpdatingCraftingGlobalEventGoal;
+
+    /**
      * @var bool $craftForNpc
      */
     private bool $craftForNpc = false;
@@ -59,6 +65,8 @@ class CraftingService {
      * @param SkillService $skillService
      * @param ItemListCostTransformerService $itemListCostTransformerService
      * @param SkillCheckService $skillCheckService
+     * @param UpdateCraftingTasksForFactionLoyalty $updateCraftingTasksForFactionLoyalty
+     * @param HandleUpdatingCraftingGlobalEventGoal $handleUpdatingCraftingGlobalEventGoal
      */
     public function __construct(
         RandomEnchantmentService $randomEnchantmentService,
@@ -66,12 +74,14 @@ class CraftingService {
         ItemListCostTransformerService $itemListCostTransformerService,
         SkillCheckService $skillCheckService,
         UpdateCraftingTasksForFactionLoyalty $updateCraftingTasksForFactionLoyalty,
+        HandleUpdatingCraftingGlobalEventGoal $handleUpdatingCraftingGlobalEventGoal,
     ) {
-        $this->randomEnchantmentService             = $randomEnchantmentService;
-        $this->skillService                         = $skillService;
-        $this->itemListCostTransformerService       = $itemListCostTransformerService;
-        $this->skillCheckService                    = $skillCheckService;
-        $this->updateCraftingTasksForFactionLoyalty = $updateCraftingTasksForFactionLoyalty;
+        $this->randomEnchantmentService              = $randomEnchantmentService;
+        $this->skillService                          = $skillService;
+        $this->itemListCostTransformerService        = $itemListCostTransformerService;
+        $this->skillCheckService                     = $skillCheckService;
+        $this->updateCraftingTasksForFactionLoyalty  = $updateCraftingTasksForFactionLoyalty;
+        $this->handleUpdatingCraftingGlobalEventGoal = $handleUpdatingCraftingGlobalEventGoal;
     }
 
     /**
@@ -337,14 +347,29 @@ class CraftingService {
      * @param Item $item
      * @param Skill $skill
      * @param bool $tooEasy
+     * @param bool $updateGoldCost
      * @return void
      * @throws Exception
      */
-    public function pickUpItem(Character $character, Item $item, Skill $skill, bool $tooEasy = false, bool $updateGoldCost = true) {
+    public function pickUpItem(Character $character, Item $item, Skill $skill, bool $tooEasy = false, bool $updateGoldCost = true): void {
 
         $this->updateCraftingTasksForFactionLoyalty->handleCraftingTask($character, $item);
 
         if ($this->updateCraftingTasksForFactionLoyalty->handedOverItem()) {
+            if (!$tooEasy) {
+                $this->skillService->assignXpToCraftingSkill($character->map->gameMap, $skill);
+            }
+
+            if ($updateGoldCost) {
+                $this->updateCharacterGold($character, $item);
+            }
+
+            return;
+        }
+
+        $this->handleUpdatingCraftingGlobalEventGoal->handleUpdatingCraftingGlobalEventGoal($character, $item);
+
+        if ($this->handleUpdatingCraftingGlobalEventGoal->handedOverItem()) {
             if (!$tooEasy) {
                 $this->skillService->assignXpToCraftingSkill($character->map->gameMap, $skill);
             }

@@ -54,7 +54,7 @@ class EventGoalServiceTest extends TestCase {
             'event_goals' => [
                 'max_kills'               => $eventGoal->max_kills,
                 'total_kills'             => $eventGoal->total_kills,
-                'reward_every'            => $eventGoal->reward_every_kills,
+                'reward_every'            => $eventGoal->reward_every,
                 'kills_needed_for_reward' => 10,
                 'current_kills'           => 0,
             ],
@@ -79,7 +79,7 @@ class EventGoalServiceTest extends TestCase {
             'event_goals' => [
                 'max_kills'               => $eventGoal->max_kills,
                 'total_kills'             => $eventGoal->total_kills,
-                'reward_every'            => $eventGoal->reward_every_kills,
+                'reward_every'            => $eventGoal->reward_every,
                 'kills_needed_for_reward' => 10,
                 'current_kills'           => 0,
             ]
@@ -111,7 +111,7 @@ class EventGoalServiceTest extends TestCase {
             'event_goals' => [
                 'max_kills'               => $eventGoal->max_kills,
                 'total_kills'             => $eventGoal->total_kills,
-                'reward_every'            => $eventGoal->reward_every_kills,
+                'reward_every'            => $eventGoal->reward_every,
                 'kills_needed_for_reward' => 10,
                 'current_kills'           => 10,
             ]
@@ -129,7 +129,7 @@ class EventGoalServiceTest extends TestCase {
             'should_be_mythic'                => false,
         ]);
 
-        $this->assertEquals($eventGoal->reward_every_kills, $this->eventGoalService->fetchKillAmountNeeded($eventGoal));
+        $this->assertEquals($eventGoal->reward_every, $this->eventGoalService->fetchKillAmountNeeded($eventGoal));
     }
 
     public function testOnlyNeedsHalfOfRewardEveryAsCurrentKillCount() {
@@ -153,6 +153,6 @@ class EventGoalServiceTest extends TestCase {
             'current_kills' => 14,
         ]);
 
-        $this->assertEquals(($eventGoal->reward_every_kills / 2), $this->eventGoalService->fetchKillAmountNeeded($eventGoal));
+        $this->assertEquals(($eventGoal->reward_every / 2), $this->eventGoalService->fetchKillAmountNeeded($eventGoal));
     }
 }

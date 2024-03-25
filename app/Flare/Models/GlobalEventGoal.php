@@ -20,7 +20,8 @@ class GlobalEventGoal extends Model {
      */
     protected $fillable = [
         'max_kills',
-        'reward_every_kills',
+        'max_crafts',
+        'reward_every',
         'next_reward_at',
         'event_type',
         'item_specialty_type_reward',
@@ -36,7 +37,8 @@ class GlobalEventGoal extends Model {
      */
     protected $casts = [
         'max_kills'                     => 'integer',
-        'reward_every_kills'            => 'integer',
+        'max_crafts'                    => 'integer',
+        'reward_every'                  => 'integer',
         'next_reward_at'                => 'integer',
         'event_type'                    => 'integer',
         'should_be_unique'              => 'boolean',
@@ -46,6 +48,7 @@ class GlobalEventGoal extends Model {
 
     protected $appends = [
         'total_kills',
+        'total_crafts',
     ];
 
     public function globalEventParticipation(): HasMany {
@@ -66,6 +69,10 @@ class GlobalEventGoal extends Model {
 
     public function getTotalKillsAttribute(): int {
         return $this->globalEventParticipation->sum('current_kills');
+    }
+
+    public function getTotalCraftsAttribute(): int {
+        return $this->globalEventParticipation->sum('current_crafts');
     }
 
     protected static function newFactory() {

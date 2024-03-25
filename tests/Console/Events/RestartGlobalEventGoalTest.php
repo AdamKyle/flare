@@ -36,7 +36,7 @@ class RestartGlobalEventGoalTest extends TestCase {
 
         $this->eventGoal = $this->createGlobalEventGoal([
             'max_kills'                      => 1000,
-            'reward_every_kills'             => 100,
+            'reward_every'             => 100,
             'next_reward_at'                 => 100,
             'event_type'                     => EventType::WINTER_EVENT,
             'item_specialty_type_reward'     => ItemSpecialtyType::CORRUPTED_ICE,

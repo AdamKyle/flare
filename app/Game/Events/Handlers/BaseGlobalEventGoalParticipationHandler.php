@@ -1,18 +1,20 @@
 <?php
 
-namespace App\Game\BattleRewardProcessing\Handlers;
+namespace App\Game\Events\Handlers;
 
 use App\Flare\Builders\RandomAffixGenerator;
 use App\Flare\Models\Character;
 use App\Flare\Models\GlobalEventGoal;
 use App\Flare\Models\Item;
 use App\Flare\Values\RandomAffixDetails;
-use App\Game\Events\Events\UpdateEventGoalProgress;
+use App\Game\Events\Concerns\UpdateCharacterEventGoalParticipation;
 use App\Game\Events\Services\EventGoalsService;
 use App\Game\Messages\Events\ServerMessageEvent;
+use Exception;
 
-class GlobalEventParticipationHandler {
+class BaseGlobalEventGoalParticipationHandler {
 
+    use UpdateCharacterEventGoalParticipation;
 
     /**
      * @var RandomAffixGenerator $randomAffixGenerator
@@ -20,78 +22,17 @@ class GlobalEventParticipationHandler {
     private RandomAffixGenerator $randomAffixGenerator;
 
     /**
-     * @var EventGoalsService $eventGoalService
+     * @var EventGoalsService $eventGoalsService
      */
-    private EventGoalsService $eventGoalService;
+    protected EventGoalsService $eventGoalsService;
 
     /**
+     * @param EventGoalsService $eventGoalsService
      * @param RandomAffixGenerator $randomAffixGenerator
-     * @param EventGoalsService $eventGoalService
      */
-    public function __construct(RandomAffixGenerator $randomAffixGenerator, EventGoalsService $eventGoalService) {
+    public function __construct(RandomAffixGenerator $randomAffixGenerator, EventGoalsService $eventGoalsService) {
         $this->randomAffixGenerator = $randomAffixGenerator;
-
-        $this->eventGoalService = $eventGoalService;
-    }
-
-    /**
-     * Handle updating the global; event participation
-     *
-     * @param Character $character
-     * @param GlobalEventGoal $globalEventGoal
-     * @return void
-     * @throws \Exception
-     */
-    public function handleGlobalEventParticipation(Character $character, GlobalEventGoal $globalEventGoal) {
-        if ($globalEventGoal->total_kills >= $globalEventGoal->max_kills) {
-            return;
-        }
-
-        $globalEventParticipation = $character->globalEventParticipation;
-
-        if (is_null($globalEventParticipation)) {
-            $character->globalEventParticipation()->create([
-                'global_event_goal_id' => $globalEventGoal->id,
-                'character_id'         => $character->id,
-                'current_kills'        => 1,
-            ]);
-
-            $character->globalEventKills()->create([
-                'global_event_goal_id' => $globalEventGoal->id,
-                'character_id'         => $character->id,
-                'kills'                => 1,
-            ]);
-
-            $character = $character->refresh();
-
-            event(new UpdateEventGoalProgress($this->eventGoalService->getEventGoalData($character)));
-
-            return;
-        }
-
-        $character->globalEventParticipation()->update([
-            'current_kills' => $character->globalEventParticipation->current_kills + 1,
-        ]);
-
-        $character->globalEventKills()->update([
-            'kills' => $character->globalEventKills->kills + 1,
-        ]);
-
-        $character = $character->refresh();
-
-        $globalEventGoal = $globalEventGoal->refresh();
-
-        if ($globalEventGoal->total_kills >= $globalEventGoal->next_reward_at) {
-            $newAmount = $globalEventGoal->next_reward_at + $globalEventGoal->reward_every_kills;
-
-            $this->rewardCharactersParticipating($globalEventGoal->refresh());
-
-            $globalEventGoal->update([
-                'next_reward_at' => $newAmount >= $globalEventGoal->max_kills ? $globalEventGoal->max_kills : $newAmount,
-            ]);
-        }
-
-        event(new UpdateEventGoalProgress($this->eventGoalService->getEventGoalData($character)));
+        $this->eventGoalsService    = $eventGoalsService;
     }
 
     /**
@@ -99,9 +40,9 @@ class GlobalEventParticipationHandler {
      *
      * @param GlobalEventGoal $globalEventGoal
      * @return void
-     * @throws \Exception
+     * @throws Exception
      */
-    protected function rewardCharactersParticipating(GlobalEventGoal $globalEventGoal) {
+    protected function rewardCharactersParticipating(GlobalEventGoal $globalEventGoal): void {
 
         Character::whereIn('id', $globalEventGoal->globalEventParticipation->pluck('character_id')->toArray())
             ->chunkById(100, function ($characters) use ($globalEventGoal) {
@@ -112,7 +53,7 @@ class GlobalEventParticipationHandler {
                         ->first()
                         ->current_kills;
 
-                    if ($amountOfKills >= $this->eventGoalService->fetchKillAmountNeeded($globalEventGoal)) {
+                    if ($amountOfKills >= $this->eventGoalsService->fetchAmountNeeded($globalEventGoal)) {
                         $this->rewardForCharacter($character, $globalEventGoal);
                     }
                 }
@@ -125,7 +66,7 @@ class GlobalEventParticipationHandler {
      * @param Character $character
      * @param GlobalEventGoal $globalEventGoal
      * @return void
-     * @throws \Exception
+     * @throws Exception
      */
     protected function rewardForCharacter(Character $character, GlobalEventGoal $globalEventGoal) {
 

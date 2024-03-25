@@ -49,7 +49,7 @@ class RestartGlobalEventGoal extends Command {
         }
 
         $globalEvent->update([
-            'next_reward_at' => $globalEvent->reward_every_kills,
+            'next_reward_at' => $globalEvent->reward_every,
         ]);
 
         $globalEvent = $globalEvent->refresh();

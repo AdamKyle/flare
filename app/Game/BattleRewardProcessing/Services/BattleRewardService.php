@@ -10,7 +10,7 @@ use App\Flare\Models\Monster;
 use App\Flare\Services\CharacterRewardService;
 use App\Game\BattleRewardProcessing\Handlers\FactionHandler;
 use App\Game\BattleRewardProcessing\Handlers\FactionLoyaltyBountyHandler;
-use App\Game\BattleRewardProcessing\Handlers\GlobalEventParticipationHandler;
+use App\Game\BattleRewardProcessing\Handlers\BattleGlobalEventParticipationHandler;
 use App\Game\BattleRewardProcessing\Handlers\GoldMinesRewardHandler;
 use App\Game\BattleRewardProcessing\Handlers\PurgatorySmithHouseRewardHandler;
 use App\Game\BattleRewardProcessing\Handlers\TheOldChurchRewardHandler;
@@ -26,21 +26,21 @@ class BattleRewardService {
     private FactionHandler $factionHandler;
     private CharacterRewardService $characterRewardService;
     private GoldRush $goldRush;
-    private GlobalEventParticipationHandler $globalEventParticipationHandler;
+    private BattleGlobalEventParticipationHandler $globalEventParticipationHandler;
     private PurgatorySmithHouseRewardHandler $purgatorySmithHouseRewardHandler;
     private GoldMinesRewardHandler $goldMinesRewardHandler;
     private FactionLoyaltyBountyHandler $factionLoyaltyBountyHandler;
     private TheOldChurchRewardHandler $theOldChurchRewardHandler;
 
     public function __construct(
-        FactionHandler $factionHandler,
-        CharacterRewardService $characterRewardService,
-        GoldRush $goldRush,
-        GlobalEventParticipationHandler $globalEventParticipationHandler,
-        PurgatorySmithHouseRewardHandler $purgatorySmithHouseRewardHandler,
-        GoldMinesRewardHandler $goldMinesRewardHandler,
-        FactionLoyaltyBountyHandler $factionLoyaltyBountyHandler,
-        TheOldChurchRewardHandler $theOldChurchRewardHandler,
+        FactionHandler                        $factionHandler,
+        CharacterRewardService                $characterRewardService,
+        GoldRush                              $goldRush,
+        BattleGlobalEventParticipationHandler $globalEventParticipationHandler,
+        PurgatorySmithHouseRewardHandler      $purgatorySmithHouseRewardHandler,
+        GoldMinesRewardHandler                $goldMinesRewardHandler,
+        FactionLoyaltyBountyHandler           $factionLoyaltyBountyHandler,
+        TheOldChurchRewardHandler             $theOldChurchRewardHandler,
     ) {
         $this->factionHandler                   = $factionHandler;
         $this->characterRewardService           = $characterRewardService;

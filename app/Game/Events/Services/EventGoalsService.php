@@ -31,18 +31,22 @@ class EventGoalsService {
     public function getEventGoalData(Character $character): array {
         $globalEventGoal = GlobalEventGoal::first();
         $characterKills  = 0;
+        $characterCrafts = 0;
 
         if (!is_null($character->globalEventKills)) {
-            $characterKills = $character->globalEventKills->kills;
+            $characterKills = $character->globalEventKills->kills ?? 0;
+            $characterCrafts = $character->globalEventCrafts->crafts ?? 0;
         }
 
         return [
             'event_goals' => [
-                'max_kills'               => $globalEventGoal->max_kills,
-                'total_kills'             => $globalEventGoal->total_kills,
-                'reward_every'            => $globalEventGoal->reward_every_kills,
-                'kills_needed_for_reward' => $this->fetchKillAmountNeeded($globalEventGoal),
-                'current_kills'           => $characterKills,
+                'max_kills'                => $globalEventGoal->max_kills,
+                'max_crafts'               => $globalEventGoal->max_crafts,
+                'total_kills'              => $globalEventGoal->total_kills,
+                'reward_every'             => $globalEventGoal->reward_every,
+                'amount_needed_for_reward' => $this->fetchAmountNeeded($globalEventGoal),
+                'current_kills'            => $characterKills,
+                'current_crafts'           => $characterCrafts,
             ]
         ];
     }
@@ -53,8 +57,8 @@ class EventGoalsService {
      * @param GlobalEventGoal $globalEventGoal
      * @return integer
      */
-    public function fetchKillAmountNeeded(GlobalEventGoal $globalEventGoal): int {
-        $participationAmount = $globalEventGoal->reward_every_kills;
+    public function fetchAmountNeeded(GlobalEventGoal $globalEventGoal): int {
+        $participationAmount = $globalEventGoal->reward_every;
 
         $participants = $globalEventGoal->globalEventParticipation()->count();
 
