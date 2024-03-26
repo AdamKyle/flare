@@ -42,8 +42,7 @@ class InitiateDelusionalMemoriesEvent implements ShouldQueue {
 
         $event = ScheduledEvent::find($this->eventId);
 
-        if (is_null($event)) {
-
+        if (is_null($event) || $event->currently_running) {
             return;
         }
 
@@ -52,14 +51,14 @@ class InitiateDelusionalMemoriesEvent implements ShouldQueue {
         ]);
 
         Event::create([
-            'type'       => EventType::WINTER_EVENT,
+            'type'       => EventType::DELUSIONAL_MEMORIES_EVENT,
             'started_at' => now(),
             'ends_at'    => $event->end_date
         ]);
 
         event(new GlobalMessageEvent('The twisted and delusional laughter of a mad man haunts your ears: Fliniguss\'s realm opens to those who dare to delve the delusional memories of a mad man,'));
 
-        AnnouncementHandler::createAnnouncement('winter_event');
+        AnnouncementHandler::createAnnouncement('delusional_memories_event');
 
         $this->kickOffGlobalEventGoal();
 

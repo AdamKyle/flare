@@ -114,4 +114,17 @@ class ProcessScheduledEventsTest extends TestCase {
         $this->assertGreaterThan(0, Announcement::count());
         $this->assertGreaterThan(0, GlobalEventGoal::count());
     }
+
+    public function testDelusionalMemoriesEvent() {
+        $this->createScheduledEvent([
+            'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'start_date' => now()->addMinutes(5),
+        ]);
+
+        $this->artisan('process:scheduled-events');
+
+        $this->assertGreaterThan(0, Event::count());
+        $this->assertGreaterThan(0, Announcement::count());
+        $this->assertGreaterThan(0, GlobalEventGoal::count());
+    }
 }

@@ -42,7 +42,7 @@ class InitiateWinterEvent implements ShouldQueue {
 
         $event = ScheduledEvent::find($this->eventId);
 
-        if (is_null($event)) {
+        if (is_null($event) || $event->currently_running) {
 
             return;
         }

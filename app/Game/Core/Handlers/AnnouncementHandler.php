@@ -27,6 +27,7 @@ class AnnouncementHandler {
             'purgatory_house' => $this->buildPurgatoryHouseMessage(),
             'gold_mines' => $this->buildTheGoldMinesMessage(),
             'the_old_church' => $this->buildTheOldChurchMessage(),
+            'delusional_memories_event' => $this->buildDelusionalMemoriesMessage(),
             default => throw new Exception('Cannot determine announcement type'),
         };
     }
@@ -168,9 +169,30 @@ class AnnouncementHandler {
         }
 
         $message = 'From now until: ' . $event->ends_at->format('l, j \of F \a\t h:ia \G\M\TP') . ' ' .
-            'Players can enter, with no item requirements, The ice Plane and fight fearsome creatures as well as take on The Ice Queen her self.' . ' ' .
+            'Players can enter, with no item requirements, The Ice Plane and fight fearsome creatures as well as take on The Ice Queen her self.' . ' ' .
             'You will find the creatures down here to be much more powerful then even Purgatory! Prepare your self child, the chill of death awaits.' . ' ' .
             'All you have to do is use the traverse feature to move from your current plane to The Ice Plane where rewards are bountiful!';
+
+        $announcement = Announcement::create([
+            'message'    => $message,
+            'expires_at' => $event->ends_at,
+            'event_id'   => $event->id
+        ]);
+
+        event(new AnnouncementMessageEvent($message, $announcement->id));
+    }
+
+    private function buildDelusionalMemoriesMessage(): void {
+        $event = Event::where('type', EventType::DELUSIONAL_MEMORIES_EVENT)->first();
+
+        if (is_null($event)) {
+            throw new Exception('Cannot create message for Delusional Memories Event, when no event exists.');
+        }
+
+        $message = 'From now until: ' . $event->ends_at->format('l, j \of F \a\t h:ia \G\M\TP') . ' ' .
+            'Players can enter, with no item requirements, The Delusional Memories Plane and fight fearsome creatures and take on Fliniguss The Corrupt Federation Leader. ' .
+            'All you have to is Traverse to participate in new quests, new raid, new gear and new global events where all players come ' .
+            'together to help the Red Hawks push back an enemy from a time long forgotten!';
 
         $announcement = Announcement::create([
             'message'    => $message,

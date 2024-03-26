@@ -7,6 +7,7 @@ use App\Flare\Models\Event as ModelsEvent;
 use App\Flare\Models\GlobalEventGoal;
 use App\Flare\Models\GlobalEventKill;
 use App\Flare\Models\GlobalEventParticipation;
+use App\Game\Events\Jobs\InitiateDelusionalMemoriesEvent;
 use App\Game\Events\Values\EventType;
 use App\Game\Events\Jobs\InitiateWeeklyCurrencyDropEvent;
 use App\Game\Events\Jobs\InitiateWinterEvent;
@@ -17,7 +18,7 @@ use App\Game\Messages\Events\GlobalMessageEvent;
 use Tests\TestCase;
 use Tests\Traits\CreateScheduledEvent;
 
-class InitiateWinterEventTest extends TestCase {
+class InitiateDelusionalMemoriesEventTest extends TestCase {
 
     use RefreshDatabase, CreateScheduledEvent;
 
@@ -43,10 +44,10 @@ class InitiateWinterEventTest extends TestCase {
         parent::tearDown();
     }
 
-    public function testWinterEventDoesNotTrigger() {
+    public function testDeslusionalMemoriesDoesNotTriggerForInvalidScheduledEvent() {
         Event::fake();
 
-        InitiateWinterEvent::dispatch(rand(1000,9999));
+        InitiateDelusionalMemoriesEvent::dispatch(rand(10000,99999));
 
         Event::assertNotDispatched(GlobalMessageEvent::class);
         $this->assertEmpty(Announcement::all());
@@ -54,14 +55,14 @@ class InitiateWinterEventTest extends TestCase {
         $this->assertEmpty(GlobalEventGoal::all());
     }
 
-    public function testWinterEventDoesTriggerWhenScheduledEventExists() {
+    public function testDelusionalMemoriesEventDoesTriggerScheduledEventExists() {
         Event::fake();
 
         $event = $this->createScheduledEvent([
-            'event_type'        => EventType::WINTER_EVENT,
+            'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
         ]);
 
-        InitiateWinterEvent::dispatch($event->id);
+        InitiateDelusionalMemoriesEvent::dispatch($event->id);
 
         Event::assertDispatched(GlobalMessageEvent::class);
         $this->assertNotEmpty(Announcement::all());

@@ -14,7 +14,7 @@ class GlobalEventForEventTypeValue {
         if ($event->isWinterEvent()) {
             return [
                 'max_kills'                  => 190000,
-                'reward_every'         => 10000,
+                'reward_every'               => 10000,
                 'next_reward_at'             => 10000,
                 'event_type'                 => EventType::WINTER_EVENT,
                 'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE,
@@ -27,7 +27,7 @@ class GlobalEventForEventTypeValue {
         if ($event->isDelusionalMemoriesEvent()) {
             return [
                 'max_kills'                  => 400000,
-                'reward_every'         => 20000,
+                'reward_every'               => 20000,
                 'next_reward_at'             => 20000,
                 'event_type'                 => EventType::DELUSIONAL_MEMORIES_EVENT,
                 'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER,
