@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('global_event_goals', function (Blueprint $table) {
-            $table->renameColumn('reward_every_kills', 'reward_every');
-            $table->integer('max_crafts')->nullable();
-            $table->integer('max_kills')->nullable()->change();
-            $table->bigInteger('unique_type')->nullable()->change();
+        Schema::create('global_event_crafting_inventories', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->unsignedBigInteger('global_event_id');
+            $table->unsignedBigInteger('character_id');
+            $table->timestamps();
         });
     }
 
@@ -24,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
+        Schema::dropIfExists('global_event_crafting_inventories');
     }
 };

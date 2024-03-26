@@ -35,7 +35,7 @@ trait UpdateCharacterEventGoalParticipation {
             }
 
             if ($attribute === 'crafts') {
-                $character->globalEventKills()->create([
+                $character->globalEventCrafts()->create([
                     'global_event_goal_id' => $globalEventGoal->id,
                     'character_id' => $character->id,
                     'crafts' => 1,
@@ -45,12 +45,24 @@ trait UpdateCharacterEventGoalParticipation {
             return;
         }
 
+        if ($attribute === 'crafts') {
+            $character->globalEventParticipation()->update([
+                'current_crafts' => $character->globalEventParticipation->current_crafts + 1,
+            ]);
+
+            $character->globalEventCrafts()->update([
+                'crafts' => $character->globalEventCrafts->crafts + 1,
+            ]);
+
+            return;
+        }
+
         $character->globalEventParticipation()->update([
-            'current_kills' => $character->globalEventParticipation->{'current_' . $attribute} + 1,
+            'current_kills' => $character->globalEventParticipation->current_kills + 1,
         ]);
 
         $character->globalEventKills()->update([
-            'kills' => $character->globalEventKills->{$attribute} + 1,
+            'kills' => $character->globalEventKills->kills + 1,
         ]);
 
     }

@@ -42,7 +42,7 @@ class BaseGlobalEventGoalParticipationHandler {
      * @return void
      * @throws Exception
      */
-    protected function rewardCharactersParticipating(GlobalEventGoal $globalEventGoal): void {
+    public function rewardCharactersParticipating(GlobalEventGoal $globalEventGoal): void {
 
         Character::whereIn('id', $globalEventGoal->globalEventParticipation->pluck('character_id')->toArray())
             ->chunkById(100, function ($characters) use ($globalEventGoal) {
@@ -118,6 +118,7 @@ class BaseGlobalEventGoalParticipationHandler {
             $newItem->update([
                 'item_prefix_id' => $randomAffixGenerator->generateAffix('prefix')->id,
                 'item_suffix_id' => $randomAffixGenerator->generateAffix('suffix')->id,
+                'is_mythic'      => true,
             ]);
 
             $newItem = $newItem->refresh();

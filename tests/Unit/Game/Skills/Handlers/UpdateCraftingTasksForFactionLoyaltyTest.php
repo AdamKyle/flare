@@ -1,6 +1,6 @@
 <?php
 
-namespace Test\Unit\Game\Skills\Handlers;
+namespace Tests\Unit\Game\Skills\Handlers;
 
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Core\Events\UpdateTopBarEvent;
@@ -228,6 +228,63 @@ class UpdateCraftingTasksForFactionLoyaltyTest extends TestCase {
             ->factionLoyaltyNpcTasks
             ->fame_tasks[0]['current_amount']
         );
+    }
+
+    public function testDoNotLevelUpFameFromCraftingWhenFactionNpcLevelIsMaxed() {
+        $item = $this->createItem();
+
+        $character = (new CharacterFactory())->createBaseCharacter()
+            ->givePlayerLocation()
+            ->assignFactionSystem()
+            ->getCharacter();
+
+        $character->update([
+            'gold' => 0,
+            'gold_dust' => 0,
+            'shards' => 0,
+        ]);
+
+        Event::fake();
+
+        $factionLoyalty = $this->createFactionLoyalty([
+            'character_id' => $character->id,
+            'faction_id'   => $character->factions->first(),
+            'is_pledged'   => true
+        ]);
+
+        $npc = $this->createNpc();
+
+        $factionLoyaltyNpc = $this->createFactionLoyaltyNpc([
+            'faction_loyalty_id'            => $factionLoyalty->id,
+            'npc_id'                        => $npc->id,
+            'current_level'                 => 1,
+            'max_level'                     => 25,
+            'next_level_fame'               => 25,
+            'currently_helping'             => true,
+            'kingdom_item_defence_bonus'    => 0.002,
+        ]);
+
+        $this->createFactionLoyaltyNpcTask([
+            'faction_loyalty_id'         => $factionLoyalty->id,
+            'faction_loyalty_npc_id'     => $factionLoyaltyNpc->id,
+            'fame_tasks'                 => [[
+                'type'            => $item->crafting_type,
+                'item_name'       => $item->name,
+                'item_id'         => $item->id,
+                'required_amount' => rand(10, 50),
+                'current_amount'  => 200000,
+            ]],
+        ]);
+
+        $character = $this->updateCraftingTasksForFactionLoyalty->handleCraftingTask($character->refresh(), $item);
+
+        Event::assertNotDispatched(ServerMessageEvent::class);
+        Event::assertNotDispatched(UpdateTopBarEvent::class);
+
+        $this->assertEquals(25, $character->factionLoyalties->first()->factionLoyaltyNpcs->first()->current_level);
+        $this->assertEquals(0, $character->gold);
+        $this->assertEquals(0, $character->gold_dust);
+        $this->assertEquals(0, $character->shards);
     }
 
     public function testLevelUpFameFromCrafting() {

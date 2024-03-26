@@ -19,7 +19,7 @@ class GlobalEventCraftingInventory extends Model {
      * @var array
      */
     protected $fillable = [
-        'event_id',
+        'global_event_id',
         'character_id',
     ];
 
@@ -37,8 +37,8 @@ class GlobalEventCraftingInventory extends Model {
         'total_kills',
     ];
 
-    public function event() {
-        return $this->belongsTo(Event::class, 'event_id', 'id');
+    public function globalEvent() {
+        return $this->belongsTo(GlobalEventGoal::class, 'global_event_id', 'id');
     }
 
     public function craftingSlots() {

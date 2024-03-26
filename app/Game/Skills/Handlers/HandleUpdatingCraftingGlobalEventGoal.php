@@ -2,6 +2,8 @@
 
 namespace App\Game\Skills\Handlers;
 
+use Exception;
+use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 use App\Flare\Builders\RandomAffixGenerator;
 use App\Flare\Models\Character;
 use App\Flare\Models\Event;
@@ -14,7 +16,7 @@ use App\Game\Events\Events\UpdateEventGoalProgress;
 use App\Game\Events\Handlers\BaseGlobalEventGoalParticipationHandler;
 use App\Game\Events\Services\EventGoalsService;
 use App\Game\Events\Values\GlobalEventSteps;
-use Exception;
+
 
 class HandleUpdatingCraftingGlobalEventGoal extends BaseGlobalEventGoalParticipationHandler {
 
@@ -53,11 +55,11 @@ class HandleUpdatingCraftingGlobalEventGoal extends BaseGlobalEventGoalParticipa
             return;
         }
 
-        $this->updateOrCreateEventInventory($character, $event, $item);
+        $this->updateOrCreateEventInventory($character, $globalEventGoal, $item);
 
-        $this->handleUpdatingCraftingGlobalEventGoal($character, $globalEventGoal, 'crafts');
+        $this->handleUpdatingParticipation($character, $globalEventGoal, 'crafts');
 
-        $globalEventGoal = $globalEventGoal->refrsh();
+        $globalEventGoal = $globalEventGoal->refresh();
         $character       = $character->refresh();
 
         if ($globalEventGoal->total_crafts >= $globalEventGoal->next_reward_at) {
@@ -88,13 +90,13 @@ class HandleUpdatingCraftingGlobalEventGoal extends BaseGlobalEventGoalParticipa
      * Set the item into the characters global event crafting inventory.
      *
      * @param Character $character
-     * @param Event $event
+     * @param GlobalEventGoal $event
      * @param Item $item
      * @return void
      */
-    private function updateOrCreateEventInventory(Character $character, Event $event, Item $item): void {
+    private function updateOrCreateEventInventory(Character $character, GlobalEventGoal $event, Item $item): void {
         $inventory = GlobalEventCraftingInventory::firstOrCreate([
-            'event_id' => $event->id,
+            'global_event_id' => $event->id,
             'character_id' => $character->id
         ]);
 

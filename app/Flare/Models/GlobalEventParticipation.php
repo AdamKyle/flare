@@ -34,7 +34,7 @@ class GlobalEventParticipation extends Model {
         'global_event_goal_id' => 'integer',
         'character_id'         => 'integer',
         'current_kills'        => 'integer',
-        'current_crafts'       => 'integer,'
+        'current_crafts'       => 'integer',
     ];
 
     public function globalEventGoal(): BelongsTo {
