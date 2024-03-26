@@ -97,6 +97,10 @@ class UpdateCraftingTasksForFactionLoyalty {
             ServerMessageHandler::sendBasicMessage($character->user, $helpingNpc->npc->real_name . ' is elated at your ability to craft: ' . $item->affix_name . '. "Thank you child! Only: '.$amountLeft.' Left to go!"');
         }
 
+        $canGainLevel = $this->canLevelUpFame($helpingNpc) && $helpingNpc->current_level !== $helpingNpc->max_level;
+
+
+
         if ($this->canLevelUpFame($helpingNpc) && $helpingNpc->current_level !== $helpingNpc->max_level) {
             $this->handleFameLevelUp($character, $helpingNpc);
         }
@@ -237,11 +241,6 @@ class UpdateCraftingTasksForFactionLoyalty {
      * @return bool
      */
     protected function canLevelUpFame(FactionLoyaltyNpc $factionLoyaltyNpc): bool {
-        dump($factionLoyaltyNpc);
-        if ($factionLoyaltyNpc->current_level >= $factionLoyaltyNpc->max_level) {
-            return false;
-        }
-
         return $factionLoyaltyNpc->current_fame >= $factionLoyaltyNpc->next_level_fame;
     }
 }
