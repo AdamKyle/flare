@@ -217,7 +217,7 @@ class FactionLoyaltyService {
      * Creates new tasks for the Faction Npc Tasks.
      *
      * @param FactionLoyaltyNpcTask $factionLoyaltyNpcTask
-     * @return FactionLoyaltyNpc
+     * @return FactionLoyaltyNpcTask
      */
     public function createNewTasksForNpc(FactionLoyaltyNpcTask $factionLoyaltyNpcTask): FactionLoyaltyNpcTask {
         $npc = $factionLoyaltyNpcTask->factionLoyaltyNpc->npc;

@@ -61,6 +61,7 @@ class UpdateCraftingTasksForFactionLoyalty {
      * @param Character $character
      * @param Item $item
      * @return Character
+     * @throws Exception
      */
     public function handleCraftingTask(Character $character, Item $item): Character {
 
@@ -109,6 +110,7 @@ class UpdateCraftingTasksForFactionLoyalty {
      * @param Character $character
      * @param FactionLoyaltyNpc $helpingNpc
      * @return void
+     * @throws Exception
      */
     protected function handleFameLevelUp(Character $character, FactionLoyaltyNpc $helpingNpc): void {
 
@@ -235,6 +237,7 @@ class UpdateCraftingTasksForFactionLoyalty {
      * @return bool
      */
     protected function canLevelUpFame(FactionLoyaltyNpc $factionLoyaltyNpc): bool {
+        dump($factionLoyaltyNpc);
         if ($factionLoyaltyNpc->current_level >= $factionLoyaltyNpc->max_level) {
             return false;
         }
