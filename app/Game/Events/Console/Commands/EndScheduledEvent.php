@@ -164,7 +164,7 @@ class EndScheduledEvent extends Command {
             }
 
             if ($eventType->isWinterEvent()) {
-                $this->endWinterEvent($kingdomEventService, $traverseService, $explorationAutomationService, $factionLoyaltyService);
+                $this->endWinterEvent($kingdomEventService, $traverseService, $explorationAutomationService, $factionLoyaltyService, $currentEvent);
 
                 $buildQuestCacheService->buildQuestCache(true);
                 $buildQuestCacheService->buildRaidQuestCache(true);
@@ -273,18 +273,14 @@ class EndScheduledEvent extends Command {
      * @param TraverseService $traverseService
      * @param ExplorationAutomationService $explorationAutomationService
      * @param FactionLoyaltyService $factionLoyaltyService
+     * @param Event $event
      * @return void
      */
     protected function endWinterEvent(KingdomEventService $kingdomEventService,
                                       TraverseService $traverseService,
                                       ExplorationAutomationService $explorationAutomationService,
-                                      FactionLoyaltyService $factionLoyaltyService): void {
-
-        $event = Event::where('type', EventType::WINTER_EVENT)->first();
-
-        if (is_null($event)) {
-            return;
-        }
+                                      FactionLoyaltyService $factionLoyaltyService,
+                                      Event $event): void {
 
         $kingdomEventService->handleKingdomRewardsForEvent(MapNameValue::ICE_PLANE);
 

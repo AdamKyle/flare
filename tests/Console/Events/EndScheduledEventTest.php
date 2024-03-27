@@ -144,7 +144,31 @@ class EndScheduledEventTest extends TestCase {
         $event = $this->createEvent([
             'type'        => EventType::WEEKLY_CELESTIALS,
             'started_at'  => now(),
-            'ends_at'     => now()->subMinute(10),
+            'ends_at'     => now()->subMinutes(10),
+        ]);
+
+        $this->createAnnouncement([
+            'event_id' => $event->id,
+        ]);
+
+        $this->artisan('end:scheduled-event');
+
+        $this->assertEquals(0, Event::count());
+        $this->assertEquals(0, Announcement::count());
+        $this->assertFalse($scheduledEvent->refresh()->currently_running);
+    }
+
+    public function testEndIsMonthlyPvpEvent() {
+        $scheduledEvent = $this->createScheduledEvent([
+            'event_type'        => EventType::MONTHLY_PVP,
+            'start_date'        => now()->addMinutes(5),
+            'currently_running' => true,
+        ]);
+
+        $event = $this->createEvent([
+            'type'        => EventType::MONTHLY_PVP,
+            'started_at'  => now(),
+            'ends_at'     => now()->subMinutes(10),
         ]);
 
         $this->createAnnouncement([

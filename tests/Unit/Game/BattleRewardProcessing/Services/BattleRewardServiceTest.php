@@ -289,6 +289,57 @@ class BattleRewardServiceTest extends TestCase {
         $this->assertNotNull($character->globalEventParticipation);
     }
 
+    public function testShouldUpdateGlobalEventParticipationWhenParticipationExists() {
+
+        $character = $this->characterFactory->getCharacter();
+
+        $character->map()->update([
+            'game_map_id' =>  $this->createGameMap([
+                'name' => MapNameValue::ICE_PLANE
+            ])->id,
+        ]);
+
+        $character = $character->refresh();
+
+        $monster   = $this->createMonster([
+            'game_map_id' => $character->map->game_map_id,
+        ]);
+
+        $this->createEvent([
+            'type' => EventType::WINTER_EVENT
+        ]);
+
+        $eventGoal = $this->createGlobalEventGoal([
+            'event_type'                      => EventType::WINTER_EVENT,
+            'item_specialty_type_reward'      => ItemSpecialtyType::CORRUPTED_ICE,
+            'unique_type'                     => RandomAffixDetails::LEGENDARY,
+        ]);
+
+        $this->createGlobalEventParticipation([
+            'global_event_goal_id' => $eventGoal->id,
+            'character_id'         => $character->id,
+            'current_kills'        => 1,
+            'current_crafts'       => null,
+        ]);
+
+        $this->createGlobalEventKill([
+            'global_event_goal_id'  => $eventGoal->id,
+            'character_id'          => $character->id,
+            'kills'                 => 1,
+        ]);
+
+        Event::fake();
+
+        Queue::fake();
+
+        $this->battleRewardService->setUp($monster, $character)->handleBaseRewards();
+
+        $character = $character->refresh();
+
+        $this->assertEquals(2, $character->globalEventParticipation->current_kills);
+        $this->assertEquals(2, $character->globalEventKills->kills);
+    }
+
     public function testNoFactionRewardsGivenWhenCharacterIsInPurgatory() {
         $character = $this->characterFactory->assignFactionSystem()->getCharacter();
 

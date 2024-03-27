@@ -4,8 +4,12 @@ namespace Tests\Unit\Game\NpcActions\SeerActions\Services;
 
 use App\Flare\Values\SpellTypes;
 use App\Flare\Values\WeaponTypes;
+use App\Game\Skills\Services\SkillCheckService;
+use App\Game\Skills\Services\TrinketCraftingService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Game\NpcActions\SeerActions\Services\SeerService;
+use Mockery;
+use Mockery\MockInterface;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateGameMap;
@@ -97,6 +101,47 @@ class SeerServiceTest extends TestCase {
         $this->assertEquals(200, $result['status']);
     }
 
+    public function testFailToAddSocketToItem() {
+        $item = $this->createItem([
+            'type' => 'weapon',
+        ]);
+
+        $item->update(['socket_count' => 1]);
+
+        $item = $item->refresh();
+
+        $this->createGameMap();
+
+        $character = $this->character->givePlayerLocation()
+            ->inventoryManagement()
+            ->giveItem($item)
+            ->getCharacterFactory()
+            ->kingdomManagement()
+            ->assignKingdom([
+                'gold_bars' => 2000,
+            ])
+            ->getCharacter();
+
+        $this->instance(
+            SeerService::class,
+            Mockery::mock(SeerService::class, function (MockInterface $mock) {
+                $mock->makePartial()->shouldAllowMockingProtectedMethods()->shouldReceive('getRandomType')->once()->andReturn(1);
+            })
+        );
+
+        $seerService = $this->app->make(SeerService::class);
+
+        $slot   = $character->inventory->slots->first();
+        $result = $seerService->createSockets($character, $slot->id);
+
+        $slot = $slot->refresh();
+
+        $this->assertGreaterThan(0, $slot->item->socket_count);
+
+        $this->assertEquals(200, $result['status']);
+        $this->assertEquals('Failed to attach new sockets. "Sorry child. I tried." He takes your money anyways ...', $result['message']);
+    }
+
     public function testAssignSocketsToItem() {
 
         $item = $this->createItem([
@@ -116,7 +161,7 @@ class SeerServiceTest extends TestCase {
             ->getCharacter();
 
         foreach ([1 => 1, 50 => 2, 60 => 3, 80 => 4, 95 => 5, 100 => 6] as $percent => $socketCount) {
-            $seerService = \Mockery::mock(SeerService::class)->makePartial();
+            $seerService = Mockery::mock(SeerService::class)->makePartial();
 
             $seerService->shouldAllowMockingProtectedMethods()
                 ->shouldReceive('getRandomType')
