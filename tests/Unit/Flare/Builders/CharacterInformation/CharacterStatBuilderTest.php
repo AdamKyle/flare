@@ -1326,7 +1326,7 @@ class CharacterStatBuilderTest extends TestCase {
         $itemSuffixAffix = $this->createItemAffix([
             'name'                => 'Sample',
             'chr_mod'             => 0.15,
-            'damage_amount'              => 1.50,
+            'damage_amount'       => 1.50,
             'steal_life_amount'   => .10,
         ]);
 
@@ -1354,7 +1354,7 @@ class CharacterStatBuilderTest extends TestCase {
 
         $amount    = $this->characterStatBuilder->setCharacter($character)->buildAffixDamage('life-stealing');
 
-        $this->assertEquals((.99 / 2), $amount);
+        $this->assertEquals((.99 - (.99 * .20)), $amount);
     }
 
     public function testBuildInvalidAffixDamage() {
