@@ -223,7 +223,7 @@ class GemService {
         $roll = $roll + $roll * $skill->skill_bonus;
 
         // @codeCoverageIgnoreStart
-        if ($roll >= 1) {
+        if ($roll >= 100) {
             return true;
         }
         // @codeCoverageIgnoreEnd

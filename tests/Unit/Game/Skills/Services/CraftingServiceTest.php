@@ -2,11 +2,17 @@
 
 namespace Tests\Unit\Game\Skills\Services;
 
+use App\Flare\Models\GlobalEventCraftingInventory;
+use App\Flare\Models\GlobalEventCraftingInventorySlot;
 use App\Flare\Values\ArmourTypes;
+use App\Flare\Values\ItemSpecialtyType;
 use App\Flare\Values\ItemUsabilityType;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Flare\Values\SpellTypes;
 use App\Flare\Values\WeaponTypes;
+use App\Game\Core\Events\UpdateTopBarEvent;
+use App\Game\Events\Values\EventType;
+use App\Game\Events\Values\GlobalEventSteps;
 use App\Game\Messages\Builders\ServerMessageBuilder;
 use App\Game\Skills\Services\CraftingService;
 use App\Game\Skills\Services\SkillCheckService;
@@ -23,12 +29,16 @@ use Mockery\MockInterface;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateClass;
+use Tests\Traits\CreateEvent;
+use Tests\Traits\CreateFactionLoyalty;
 use Tests\Traits\CreateGameSkill;
+use Tests\Traits\CreateGlobalEventGoal;
 use Tests\Traits\CreateItem;
+use Tests\Traits\CreateNpc;
 
 class CraftingServiceTest extends TestCase {
 
-    use RefreshDatabase, CreateItem, CreateClass, CreateGameSkill;
+    use RefreshDatabase, CreateItem, CreateClass, CreateGameSkill, CreateFactionLoyalty, CreateNpc, CreateEvent, CreateGlobalEventGoal;
 
     private ?CharacterFactory $character;
 
@@ -635,5 +645,136 @@ class CraftingServiceTest extends TestCase {
         ];
 
         $this->assertEquals($weaponCraftingXpData, $expected);
+    }
+
+    public function testItemIsGivenToNpcWhenDoingFactionLoyaltyCrafting() {
+
+
+        $this->instance(
+            SkillCheckService::class,
+            Mockery::mock(SkillCheckService::class, function (MockInterface $mock) {
+                $mock->shouldReceive('getDCCheck')->once()->andReturn(1);
+                $mock->shouldReceive('characterRoll')->once()->andReturn(100);
+            })
+        );
+
+        $character = (new CharacterFactory())
+            ->createBaseCharacter()
+            ->assignFactionSystem()
+            ->assignSkill($this->craftingSkill)
+            ->givePlayerLocation()
+            ->getCharacter();
+
+        $character->update([
+            'gold' => MaxCurrenciesValue::MAX_GOLD
+        ]);
+
+        $craftingService = $this->app->make(CraftingService::class);
+
+        $character = $character->refresh();
+
+        $factionLoyalty = $this->createFactionLoyalty([
+            'character_id' => $character->id,
+            'faction_id'   => $character->factions->first(),
+            'is_pledged'   => true
+        ]);
+
+        $npc = $this->createNpc();
+
+        $factionLoyaltyNpc = $this->createFactionLoyaltyNpc([
+            'faction_loyalty_id'            => $factionLoyalty->id,
+            'npc_id'                        => $npc->id,
+            'current_level'                 => 1,
+            'max_level'                     => 25,
+            'next_level_fame'               => 1000,
+            'currently_helping'             => true,
+            'kingdom_item_defence_bonus'    => 0.002,
+        ]);
+
+        $this->createFactionLoyaltyNpcTask([
+            'faction_loyalty_id'         => $factionLoyalty->id,
+            'faction_loyalty_npc_id'     => $factionLoyaltyNpc->id,
+            'fame_tasks'                 => [[
+                'type'            => $this->craftingItem->crafting_type,
+                'item_name'    => $this->craftingItem->name,
+                'item_id'      => $this->craftingItem->id,
+                'required_amount' => rand(10, 50),
+                'current_amount'  => 0,
+            ]],
+        ]);
+
+        $character = $character->refresh();
+
+        $craftingService->craft($character, [
+            'item_to_craft' => $this->craftingItem->id,
+            'type'          => 'hammer',
+            'craft_for_npc' => false
+        ]);
+
+        $character = $character->refresh();
+
+        $this->assertCount(0, $character->inventory->slots);
+
+        $this->assertEquals(1, $character->factionLoyalties->first()
+            ->factionLoyaltyNpcs
+            ->first()
+            ->factionLoyaltyNpcTasks
+            ->fame_tasks[0]['current_amount']
+        );
+    }
+
+    public function testCraftWhileParticipatingInEventGoal() {
+        $this->instance(
+            SkillCheckService::class,
+            Mockery::mock(SkillCheckService::class, function (MockInterface $mock) {
+                $mock->shouldReceive('getDCCheck')->once()->andReturn(1);
+                $mock->shouldReceive('characterRoll')->once()->andReturn(100);
+            })
+        );
+
+        $craftingService = $this->app->make(CraftingService::class);
+
+        $this->createEvent([
+            'type'                    => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'current_event_goal_step' => GlobalEventSteps::CRAFT,
+        ]);
+
+        $this->createGlobalEventGoal([
+            'event_type'                  => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'max_crafts'                  => 100,
+            'reward_every'                => 10,
+            'next_reward_at'              => 10,
+            'item_specialty_type_reward'  => ItemSpecialtyType::DELUSIONAL_SILVER,
+            'should_be_unique'            => false,
+            'should_be_mythic'            => true,
+        ]);
+
+        $character = $this->character->getCharacter();
+
+        $character->update([
+            'gold' => MaxCurrenciesValue::MAX_GOLD
+        ]);
+
+        $character = $character->refresh();
+
+        $craftingService->craft($character, [
+            'item_to_craft' => $this->craftingItem->id,
+            'type'          => 'hammer',
+            'craft_for_npc' => false
+        ]);
+
+        $character = $character->refresh();
+
+        $this->assertCount(0, $character->inventory->slots);
+
+        $globalEventCraftingInventory = GlobalEventCraftingInventory::where('character_id', $character->id)->first();
+
+        $this->assertNotNull($globalEventCraftingInventory);
+
+        $globalEventCraftingInventorySlot = GlobalEventCraftingInventorySlot::where('global_event_crafting_inventory_id', $globalEventCraftingInventory->id)->first();
+
+        $this->assertNotNull($globalEventCraftingInventorySlot);
+
+        $this->assertEquals($this->craftingItem->id, $globalEventCraftingInventorySlot->item_id);
     }
 }

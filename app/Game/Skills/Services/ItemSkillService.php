@@ -8,6 +8,7 @@ use App\Game\Core\Traits\ResponseBuilder;
 use App\Flare\Models\ItemSkillProgression;
 use App\Flare\Builders\Character\Traits\FetchEquipped;
 use App\Game\CharacterInventory\Events\CharacterInventoryUpdateBroadCastEvent;
+use Exception;
 
 class ItemSkillService {
 
@@ -20,6 +21,7 @@ class ItemSkillService {
      * @param integer $itemId
      * @param integer $itemSkillProgressionId
      * @return array
+     * @throws Exception
      */
     public function trainSkill(Character $character, int $itemId, int $itemSkillProgressionId): array {
 
@@ -35,6 +37,10 @@ class ItemSkillService {
             return $this->errorResult('No skill found on said item.');
         }
 
+        if (!$this->canTrainSkill($foundSkill)) {
+            return $this->errorResult('You must train the parent skill first.');
+        }
+
         $this->stopTrainingOtherSkills($foundItem);
 
         $foundSkill->update([
@@ -45,8 +51,10 @@ class ItemSkillService {
 
         event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'equipped'));
 
+        $foundSkill = $foundSkill->refresh();
+
         return $this->successResult([
-            'message' => 'You are now training: ' . $foundSkill->name
+            'message' => 'You are now training: ' . $foundSkill->itemSkill->name
         ]);
     }
 
@@ -78,8 +86,30 @@ class ItemSkillService {
         event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'equipped'));
 
         return $this->successResult([
-            'message' => 'You stopped training: ' . $foundSkill->name
+            'message' => 'You stopped training: ' . $foundSkill->itemSkill->name
         ]);
+    }
+
+    /**
+     * Can we train the skill?
+     *
+     * - Check to make sure the parent skill is trained if needed.
+     *
+     * @param ItemSkillProgression $itemSkillProgression
+     * @return bool
+     */
+    protected function canTrainSkill(ItemSkillProgression $itemSkillProgression): bool {
+        $itemSkill = $itemSkillProgression->itemSkill;
+
+        $parentSkill = $itemSkill->parent;
+
+        if (is_null($parentSkill)) {
+            return true;
+        }
+
+        $parentSkillProgression = ItemSkillProgression::where('item_skill_id', $parentSkill->id)->first();
+
+        return $parentSkillProgression->current_level >= $itemSkill->parent_level_needed;
     }
 
     /**

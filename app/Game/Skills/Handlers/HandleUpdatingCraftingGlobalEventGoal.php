@@ -75,6 +75,8 @@ class HandleUpdatingCraftingGlobalEventGoal extends BaseGlobalEventGoalParticipa
         event(new UpdateEventGoalProgress($this->eventGoalsService->getEventGoalData($character)));
 
         ServerMessageHandler::sendBasicMessage($character->user, '"Thank you child! This weapon will help in the fight against The Federation!" The Red Hawk Soldier takes the item from you. Onto the next child.');
+
+        $this->wasItemAccepted = true;
     }
 
     /**

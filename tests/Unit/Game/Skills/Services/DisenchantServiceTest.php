@@ -164,6 +164,84 @@ class DisenchantServiceTest extends TestCase {
         Event::assertDispatched(UpdateCharacterEnchantingList::class);
     }
 
+    public function testDisenchantItemSuccessfullyAndGetMaxGoldDustFromARush() {
+        Event::fake();
+
+        $skillCheckServiceMock = Mockery::mock(SkillCheckService::class);
+        $skillCheckServiceMock->shouldReceive('getDCCheck')->once()->andReturn(1);
+        $skillCheckServiceMock->shouldReceive('characterRoll')->once()->andReturn(100);
+
+        // Create a mock for DisenchantService and allow mocking of protected methods
+        $disenchantingService = Mockery::mock(
+            DisenchantService::class,
+            [$skillCheckServiceMock]
+        )
+            ->makePartial()
+            ->shouldAllowMockingProtectedMethods()
+            ->shouldReceive('fetchDCRoll')
+            ->once()
+            ->andReturn(1000)
+            ->getMock();
+
+        $character = $this->character->inventoryManagement()->giveItem($this->itemToDisenchant)->getCharacter();
+
+        $character->update([
+            'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST - 1,
+        ]);
+
+        $character = $character->refresh();
+
+        $slot = $character->inventory->slots->first();
+
+        $disenchantingService->setUp($character)->disenchantWithSkill($slot);
+
+        $character = $character->refresh();
+
+        $this->assertEmpty($character->inventory->slots);
+        $this->assertEquals(MaxCurrenciesValue::MAX_GOLD_DUST, $character->gold_dust);
+
+        Event::assertDispatched(UpdateCharacterEnchantingList::class);
+    }
+
+    public function testDisenchantItemSuccessfullyAndDoNotGetAGoldRushButDoMaxGoldDust() {
+        Event::fake();
+
+        $skillCheckServiceMock = Mockery::mock(SkillCheckService::class);
+        $skillCheckServiceMock->shouldReceive('getDCCheck')->once()->andReturn(1);
+        $skillCheckServiceMock->shouldReceive('characterRoll')->once()->andReturn(100);
+
+        // Create a mock for DisenchantService and allow mocking of protected methods
+        $disenchantingService = Mockery::mock(
+            DisenchantService::class,
+            [$skillCheckServiceMock]
+        )
+            ->makePartial()
+            ->shouldAllowMockingProtectedMethods()
+            ->shouldReceive('fetchDCRoll')
+            ->once()
+            ->andReturn(1)
+            ->getMock();
+
+        $character = $this->character->inventoryManagement()->giveItem($this->itemToDisenchant)->getCharacter();
+
+        $character->update([
+            'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST - 1,
+        ]);
+
+        $character = $character->refresh();
+
+        $slot = $character->inventory->slots->first();
+
+        $disenchantingService->setUp($character)->disenchantWithSkill($slot);
+
+        $character = $character->refresh();
+
+        $this->assertEmpty($character->inventory->slots);
+        $this->assertEquals(MaxCurrenciesValue::MAX_GOLD_DUST, $character->gold_dust);
+
+        Event::assertDispatched(UpdateCharacterEnchantingList::class);
+    }
+
     public function testDisenchantFailToItem() {
         Event::fake();
 
@@ -281,6 +359,32 @@ class DisenchantServiceTest extends TestCase {
         $character = $character->refresh();
 
         $this->assertGreaterThan(0, $character->gold_dust);
+    }
+
+    public function testCallDisenchantItemAndSucceedButGetNoGoldDustWhenMaxed() {
+        Event::fake();
+
+        $this->instance(
+            SkillCheckService::class,
+            Mockery::mock(SkillCheckService::class, function (MockInterface $mock) {
+                $mock->shouldReceive('getDCCheck')->once()->andReturn(1);
+                $mock->shouldReceive('characterRoll')->once()->andReturn(100);
+            })
+        );
+
+        $character = $this->character->getCharacter();
+
+        $character->update([
+            'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
+        ]);
+
+        $disenchantingService = $this->app->make(DisenchantService::class);
+
+        $disenchantingService->setUp($character)->disenchantItemWithSkill();
+
+        $character = $character->refresh();
+
+        $this->assertEquals(MaxCurrenciesValue::MAX_GOLD_DUST, $character->gold_dust);
     }
 
     public function testCallDisenchantItemAndFail() {

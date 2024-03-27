@@ -61,7 +61,6 @@ class DisenchantService {
      * @return void
      */
     public function disenchantWithSkill(InventorySlot $slot): void {
-
         if ($this->character->gold_dust >= MaxCurrenciesValue::MAX_GOLD_DUST) {
             $slot->delete();
 
@@ -151,7 +150,6 @@ class DisenchantService {
         $goldDust = $goldDust + $goldDust *  $this->disenchantingSkill->bonus;
 
         $characterTotalGoldDust = $character->gold_dust + $goldDust;
-
         if (!$failedCheck) {
 
             $dc   = 500 - 500 * 0.10;

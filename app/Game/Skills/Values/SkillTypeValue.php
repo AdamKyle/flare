@@ -252,9 +252,10 @@ class SkillTypeValue {
             9  => 'Effects Unit Recruitment Timers',
             10 => 'Effects Unit Movement Timers',
             11 => 'Effects Spell Evasion',
-            12 => 'Effects Artifact Annulment',
-            13 => 'Effects the kingdom in some way',
+            12 => 'Effects Kingdoms',
+            13 => 'Effects Class',
             14 => 'Gem Crafting',
+            15 => 'Trinket Crafting',
         ];
     }
 }
