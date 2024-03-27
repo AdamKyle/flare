@@ -4,18 +4,20 @@ namespace Tests\Unit\Game\Gambler\Services;
 
 use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\Events\Values\EventType;
 use Mockery;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Game\Gambler\Handlers\SpinHandler;
 use App\Game\Gambler\Services\GamblerService;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateEvent;
 use Tests\Traits\CreateGameSkill;
 use Tests\Traits\CreateItem;
 
 class GamblerServiceTest extends TestCase {
 
-    use RefreshDatabase, CreateItem, CreateGameSkill;
+    use RefreshDatabase, CreateItem, CreateGameSkill, CreateEvent;
 
     private ?CharacterFactory $character;
 
@@ -168,6 +170,76 @@ class GamblerServiceTest extends TestCase {
         $this->assertEquals(200, $response['status']);
         $this->assertEquals('You got a 5,000 Copper coins!', $response['message']);
         $this->assertEquals(5000, $character->copper_coins);
+    }
+
+    public function testRolledAllThreeOfCopperCoinsWithItemAndQuestItemThatGivesBonus() {
+        $mock = Mockery::mock(SpinHandler::class)->makePartial();
+
+        $mock->shouldReceive('roll')->andReturn([
+            'rolls'      => [2, 2, 2],
+            'difference' => [2, 2],
+        ]);
+
+        $this->app->instance(SpinHandler::class, $mock);
+        $gamblerService = $this->app->make(GamblerService::class);
+
+        $item = $this->createItem([
+            'name' => 'Copper Coins',
+            'type' => 'quest',
+            'effect' => ItemEffectsValue::GET_COPPER_COINS
+        ]);
+
+        $mercenarySlotItem = $this->createItem([
+            'name' => 'Copper Coins',
+            'type' => 'quest',
+            'effect' => ItemEffectsValue::MERCENARY_SLOT_BONUS
+        ]);
+
+        $character = $this->character->inventoryManagement()->giveItem($item)->giveItem($mercenarySlotItem)->getCharacter();
+
+        $character->update(['gold' => 1000000]);
+
+        $character = $character->refresh();
+
+        $response = $gamblerService->roll($character->refresh());
+
+        $this->assertEquals(0, $character->gold);
+        $this->assertEquals(200, $response['status']);
+        $this->assertGreaterThan(5000, $character->copper_coins);
+    }
+
+    public function testRolledAllThreeOfCopperCoinsWithItemAndWeeklyCurrencyEvent() {
+        $mock = Mockery::mock(SpinHandler::class)->makePartial();
+
+        $mock->shouldReceive('roll')->andReturn([
+            'rolls'      => [2, 2, 2],
+            'difference' => [2, 2],
+        ]);
+
+        $this->app->instance(SpinHandler::class, $mock);
+        $gamblerService = $this->app->make(GamblerService::class);
+
+        $item = $this->createItem([
+            'name' => 'Copper Coins',
+            'type' => 'quest',
+            'effect' => ItemEffectsValue::GET_COPPER_COINS
+        ]);
+
+        $this->createEvent([
+            'type' => EventType::WEEKLY_CURRENCY_DROPS
+        ]);
+
+        $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
+
+        $character->update(['gold' => 1000000]);
+
+        $character = $character->refresh();
+
+        $response = $gamblerService->roll($character->refresh());
+
+        $this->assertEquals(0, $character->gold);
+        $this->assertEquals(200, $response['status']);
+        $this->assertGreaterThan(5000, $character->copper_coins);
     }
 
     public function testRolledAllThreeOfCopperCoinsWithoutItem() {

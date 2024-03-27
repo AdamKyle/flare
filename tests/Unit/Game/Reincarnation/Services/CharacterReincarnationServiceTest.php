@@ -152,6 +152,141 @@ class CharacterReincarnationServiceTest extends TestCase {
         $this->assertGreaterThan(0, $character->reincarnated_stat_increase);
     }
 
+    public function testCanReincarnateMoreThenTenTimesAndXpPenaltyShouldBeHigher() {
+        $item      = $this->createItem(['effect' => ItemEffectsValue::CONTINUE_LEVELING]);
+
+        $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
+
+        $character->update(['level' => 2000, 'times_reincarnated' => 9]);
+
+        $quest = $this->createQuest([
+            'unlocks_feature' => FeatureTypes::REINCARNATION,
+            'npc_id'          => $this->createNpc()->id,
+        ]);
+
+        $character->questsCompleted()->create([
+            'character_id' => $character->id,
+            'quest_id'     => $quest->id,
+        ]);
+
+        $character = $character->refresh();
+
+        $character->update([
+            'level' => 4800,
+            'str'   => 4700,
+            'dur'   => 4700,
+            'dex'   => 4700,
+            'chr'   => 4700,
+            'int'   => 4700,
+            'agi'   => 4700,
+            'focus' => 4700,
+            'copper_coins' => 100000,
+        ]);
+
+        $result    = $this->reincarnationService->reincarnate($character->refresh());
+
+        $this->assertEquals(200, $result['status']);
+        $this->assertEquals('Reincarnated character and applied 20% of your current level (base) stats toward your new (base) stats.', $result['message']);
+
+        $character = $character->refresh();
+
+        $this->assertEquals(50000, $character->copper_coins);
+        $this->assertEquals(1, $character->level);
+        $this->assertEquals(10, $character->times_reincarnated);
+        $this->assertGreaterThan(0, $character->reincarnated_stat_increase);
+        $this->assertEquals(0.08, $character->xp_penalty);
+    }
+
+    public function testCanReincarnateMoreThenTwentyFiveTimesAndXpPenaltyShouldBeHigher() {
+        $item      = $this->createItem(['effect' => ItemEffectsValue::CONTINUE_LEVELING]);
+
+        $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
+
+        $character->update(['level' => 2000, 'times_reincarnated' => 24]);
+
+        $quest = $this->createQuest([
+            'unlocks_feature' => FeatureTypes::REINCARNATION,
+            'npc_id'          => $this->createNpc()->id,
+        ]);
+
+        $character->questsCompleted()->create([
+            'character_id' => $character->id,
+            'quest_id'     => $quest->id,
+        ]);
+
+        $character = $character->refresh();
+
+        $character->update([
+            'level' => 4800,
+            'str'   => 4700,
+            'dur'   => 4700,
+            'dex'   => 4700,
+            'chr'   => 4700,
+            'int'   => 4700,
+            'agi'   => 4700,
+            'focus' => 4700,
+            'copper_coins' => 100000,
+        ]);
+
+        $result    = $this->reincarnationService->reincarnate($character->refresh());
+
+        $this->assertEquals(200, $result['status']);
+        $this->assertEquals('Reincarnated character and applied 20% of your current level (base) stats toward your new (base) stats.', $result['message']);
+
+        $character = $character->refresh();
+
+        $this->assertEquals(50000, $character->copper_coins);
+        $this->assertEquals(1, $character->level);
+        $this->assertEquals(25, $character->times_reincarnated);
+        $this->assertGreaterThan(0, $character->reincarnated_stat_increase);
+        $this->assertEquals(0.10, $character->xp_penalty);
+    }
+
+    public function testCanReincarnateMoreThenFiftyTimesAndXpPenaltyShouldBeHigher() {
+        $item      = $this->createItem(['effect' => ItemEffectsValue::CONTINUE_LEVELING]);
+
+        $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
+
+        $character->update(['level' => 2000, 'times_reincarnated' => 49]);
+
+        $quest = $this->createQuest([
+            'unlocks_feature' => FeatureTypes::REINCARNATION,
+            'npc_id'          => $this->createNpc()->id,
+        ]);
+
+        $character->questsCompleted()->create([
+            'character_id' => $character->id,
+            'quest_id'     => $quest->id,
+        ]);
+
+        $character = $character->refresh();
+
+        $character->update([
+            'level' => 4800,
+            'str'   => 4700,
+            'dur'   => 4700,
+            'dex'   => 4700,
+            'chr'   => 4700,
+            'int'   => 4700,
+            'agi'   => 4700,
+            'focus' => 4700,
+            'copper_coins' => 100000,
+        ]);
+
+        $result    = $this->reincarnationService->reincarnate($character->refresh());
+
+        $this->assertEquals(200, $result['status']);
+        $this->assertEquals('Reincarnated character and applied 20% of your current level (base) stats toward your new (base) stats.', $result['message']);
+
+        $character = $character->refresh();
+
+        $this->assertEquals(50000, $character->copper_coins);
+        $this->assertEquals(1, $character->level);
+        $this->assertEquals(50, $character->times_reincarnated);
+        $this->assertGreaterThan(0, $character->reincarnated_stat_increase);
+        $this->assertEquals(0.12, $character->xp_penalty);
+    }
+
     public function testReincarnationWillNotGoAboveMaxValue() {
         $item      = $this->createItem(['effect' => ItemEffectsValue::CONTINUE_LEVELING]);
 
