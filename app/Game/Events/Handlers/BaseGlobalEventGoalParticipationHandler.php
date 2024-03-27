@@ -43,7 +43,6 @@ class BaseGlobalEventGoalParticipationHandler {
      * @throws Exception
      */
     public function rewardCharactersParticipating(GlobalEventGoal $globalEventGoal): void {
-
         Character::whereIn('id', $globalEventGoal->globalEventParticipation->pluck('character_id')->toArray())
             ->chunkById(100, function ($characters) use ($globalEventGoal) {
                 foreach ($characters as $character) {
@@ -53,7 +52,25 @@ class BaseGlobalEventGoalParticipationHandler {
                         ->first()
                         ->current_kills;
 
-                    if ($amountOfKills >= $this->eventGoalsService->fetchAmountNeeded($globalEventGoal)) {
+                    $amountOfCrafts = $globalEventGoal->globalEventParticipation
+                        ->where('character_id', $character->id)
+                        ->first()
+                        ->current_crafts;
+
+                    $amountOfEnchants = $globalEventGoal->globalEventParticipation
+                        ->where('character_id', $character->id)
+                        ->first()
+                        ->current_enchants;
+
+                    if (($amountOfKills ?? 0) >= $this->eventGoalsService->fetchAmountNeeded($globalEventGoal)) {
+                        $this->rewardForCharacter($character, $globalEventGoal);
+                    }
+
+                    if (($amountOfCrafts ?? 0) >= $this->eventGoalsService->fetchAmountNeeded($globalEventGoal)) {
+                        $this->rewardForCharacter($character, $globalEventGoal);
+                    }
+
+                    if (($amountOfEnchants ?? 0) >= $this->eventGoalsService->fetchAmountNeeded($globalEventGoal)) {
                         $this->rewardForCharacter($character, $globalEventGoal);
                     }
                 }

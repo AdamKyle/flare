@@ -221,6 +221,10 @@ class Character extends Model {
         return $this->hasOne(GlobalEventCraft::class, 'character_id', 'id');
     }
 
+    public function globalEventEnchants() {
+        return $this->hasOne(GlobalEventEnchant::class, 'character_id', 'id');
+    }
+
     public function getIsAutoBattlingAttribute() {
         return !is_null(CharacterAutomation::where('character_id', $this->id)->first());
     }

@@ -113,6 +113,8 @@ class HandleUpdatingCraftingGlobalEventGoalTest extends TestCase {
     }
 
     public function testParticipateInGlobalCraftingEventWhenWeShouldBeRewarded() {
+        $this->createItem(['specialty_type' => ItemSpecialtyType::DELUSIONAL_SILVER]);
+
         $this->createEvent([
             'type'                    => EventType::DELUSIONAL_MEMORIES_EVENT,
             'current_event_goal_step' => GlobalEventSteps::CRAFT,
@@ -161,7 +163,7 @@ class HandleUpdatingCraftingGlobalEventGoalTest extends TestCase {
 
         $foundMythic = $character->inventory->slots->filter(function($slot) {
             return $slot->item->is_mythic;
-        });
+        })->first();
 
         $this->assertNotNull($foundMythic);
     }

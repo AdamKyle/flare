@@ -20,6 +20,7 @@ trait UpdateCharacterEventGoalParticipation {
         $globalEventParticipation = $character->globalEventParticipation;
 
         if (is_null($globalEventParticipation)) {
+
             $character->globalEventParticipation()->create([
                 'global_event_goal_id'   => $globalEventGoal->id,
                 'character_id'           => $character->id,
@@ -42,6 +43,14 @@ trait UpdateCharacterEventGoalParticipation {
                 ]);
             }
 
+            if ($attribute === 'enchants') {
+                $character->globalEventEnchants()->create([
+                    'global_event_goal_id' => $globalEventGoal->id,
+                    'character_id' => $character->id,
+                    'enchants' => 1,
+                ]);
+            }
+
             return;
         }
 
@@ -52,6 +61,18 @@ trait UpdateCharacterEventGoalParticipation {
 
             $character->globalEventCrafts()->update([
                 'crafts' => $character->globalEventCrafts->crafts + 1,
+            ]);
+
+            return;
+        }
+
+        if ($attribute === 'enchants') {
+            $character->globalEventParticipation()->update([
+                'current_enchants' => $character->globalEventParticipation->current_enchants + 1,
+            ]);
+
+            $character->globalEventEnchants()->update([
+                'enchants' => $character->globalEventEnchants->enchants + 1,
             ]);
 
             return;

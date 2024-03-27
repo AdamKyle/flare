@@ -15,6 +15,8 @@ use App\Game\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\NpcActions\QueenOfHeartsActions\Services\RandomEnchantmentService;
+use App\Game\Skills\Handlers\HandleUpdatingCraftingGlobalEventGoal;
+use App\Game\Skills\Handlers\HandleUpdatingEnchantingGlobalEventGoal;
 use App\Game\Skills\Services\Traits\UpdateCharacterCurrency;
 use App\Game\Skills\Values\SkillTypeValue;
 use Exception;
@@ -41,9 +43,14 @@ class EnchantingService {
     private EnchantItemService $enchantItemService;
 
     /**
-     * @var RandomEnchantmentService
+     * @var RandomEnchantmentService $randomEnchantmentService
      */
     private RandomEnchantmentService $randomEnchantmentService;
+
+    /**
+     * @var HandleUpdatingEnchantingGlobalEventGoal $handleUpdatingCraftingGlobalEventGoal
+     */
+    private HandleUpdatingEnchantingGlobalEventGoal $handleUpdatingCraftingGlobalEventGoal;
 
     /**
      * @var bool $sentToEasyMessage
@@ -69,7 +76,7 @@ class EnchantingService {
         CharacterStatBuilder $characterStatBuilder,
         CharacterInventoryService $characterInventoryService,
         EnchantItemService $enchantItemService,
-        RandomEnchantmentService $randomEnchantmentService
+        RandomEnchantmentService $randomEnchantmentService,
     ) {
 
         $this->characterStatBuilder        = $characterStatBuilder;
@@ -291,7 +298,6 @@ class EnchantingService {
              */
             if (!$this->wasTooEasy) {
                 if (!$this->processedEnchant($slot, $affix, $character, $enchantingSkill)) {
-
                     return;
                 }
             }

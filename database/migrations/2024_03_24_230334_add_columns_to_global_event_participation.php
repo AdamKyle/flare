@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::table('global_event_participation', function (Blueprint $table) {
             $table->integer('current_kills')->nullable()->change();
             $table->integer('current_crafts')->nullable();
+            $table->integer('current_enchants')->nullable();
         });
     }
 

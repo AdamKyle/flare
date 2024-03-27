@@ -2,16 +2,16 @@
 
 namespace App\Flare\Models;
 
-use Database\Factories\GlobalEventParticipationFactory;
+use Database\Factories\GlobalEventKillFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class GlobalEventParticipation extends Model {
+class GlobalEventEnchant extends Model {
 
     use HasFactory;
 
-    protected $table = 'global_event_participation';
+    protected $table = 'event_goal_participation_enchants';
 
     /**
      * The attributes that are mass assignable.
@@ -21,9 +21,7 @@ class GlobalEventParticipation extends Model {
     protected $fillable = [
         'global_event_goal_id',
         'character_id',
-        'current_kills',
-        'current_crafts',
-        'current_enchants',
+        'enchants',
     ];
 
     /**
@@ -34,9 +32,7 @@ class GlobalEventParticipation extends Model {
     protected $casts = [
         'global_event_goal_id' => 'integer',
         'character_id'         => 'integer',
-        'current_kills'        => 'integer',
-        'current_crafts'       => 'integer',
-        'current_enchants'     => 'integer',
+        'enchants'             => 'integer',
     ];
 
     public function globalEventGoal(): BelongsTo {
@@ -48,6 +44,6 @@ class GlobalEventParticipation extends Model {
     }
 
     protected static function newFactory() {
-        return GlobalEventParticipationFactory::new();
+        return GlobalEventKillFactory::new();
     }
 }

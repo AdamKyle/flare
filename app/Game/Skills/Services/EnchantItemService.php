@@ -6,6 +6,8 @@ use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 use App\Flare\Models\ItemAffix;
 use App\Flare\Models\Skill;
+use App\Game\Skills\Handlers\HandleUpdatingEnchantingGlobalEventGoal;
+use Exception;
 use Facades\App\Game\Core\Handlers\DuplicateItemHandler;
 
 class EnchantItemService {
@@ -25,11 +27,14 @@ class EnchantItemService {
      */
     private SkillCheckService $skillCheckService;
 
+    private HandleUpdatingEnchantingGlobalEventGoal $handleUpdatingEnchantingGlobalEventGoal;
+
     /**
      * @param SkillCheckService $skillCheckService
      */
-    public function __construct(SkillCheckService $skillCheckService) {
+    public function __construct(SkillCheckService $skillCheckService, HandleUpdatingEnchantingGlobalEventGoal $handleUpdatingEnchantingGlobalEventGoal) {
         $this->skillCheckService = $skillCheckService;
+        $this->handleUpdatingEnchantingGlobalEventGoal = $handleUpdatingEnchantingGlobalEventGoal;
     }
 
     /**
@@ -63,6 +68,7 @@ class EnchantItemService {
      *
      * @param InventorySlot $slot
      * @return void
+     * @throws Exception
      */
     public function updateSlot(InventorySlot $slot): void {
         if (!is_null($this->item)) {
@@ -76,6 +82,12 @@ class EnchantItemService {
                     'item_id' => $this->item->id,
                 ]);
             }
+
+            $slot = $slot->refresh();
+
+            $character = $slot->inventory->character;
+
+            $this->handleUpdatingEnchantingGlobalEventGoal->handleUpdatingEnchantingGlobalEventGoal($character, $slot);
         }
     }
 

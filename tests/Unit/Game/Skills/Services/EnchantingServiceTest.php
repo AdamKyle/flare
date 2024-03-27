@@ -2,8 +2,12 @@
 
 namespace Tests\Unit\Game\Skills\Services;
 
+use App\Flare\Models\GlobalEventEnchant;
+use App\Flare\Models\GlobalEventParticipation;
 use App\Flare\Values\CharacterClassValue;
-use App\Flare\Values\MaxCurrenciesValue;
+use App\Flare\Values\ItemSpecialtyType;
+use App\Game\Events\Values\EventType;
+use App\Game\Events\Values\GlobalEventSteps;
 use App\Game\Messages\Builders\ServerMessageBuilder;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Skills\Services\EnchantingService;
@@ -20,13 +24,15 @@ use Mockery\MockInterface;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateClass;
+use Tests\Traits\CreateEvent;
 use Tests\Traits\CreateGameSkill;
+use Tests\Traits\CreateGlobalEventGoal;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateItemAffix;
 
 class EnchantingServiceTest extends TestCase {
 
-    use RefreshDatabase, CreateItem, CreateClass, CreateGameSkill, CreateItemAffix;
+    use RefreshDatabase, CreateItem, CreateClass, CreateGameSkill, CreateItemAffix, CreateEvent, CreateGlobalEventGoal;
 
     private ?CharacterFactory $character;
 
@@ -345,6 +351,60 @@ class EnchantingServiceTest extends TestCase {
         Event::assertDispatched(function (ServerMessageEvent $event) use ($slot) {
             return $event->message === 'Applied enchantment: ' . $this->prefix->name . ' to: ' . $slot->item->refresh()->affix_name;
         });
+    }
+
+    public function testEnchantingSucceedsWhileEnchantingGlobalEventIsRunning() {
+
+        Event::fake();
+
+        $this->instance(
+            SkillCheckService::class,
+            Mockery::mock(SkillCheckService::class, function (MockInterface $mock) {
+                $mock->shouldReceive('getDCCheck')->once()->andReturn(1);
+                $mock->shouldReceive('characterRoll')->once()->andReturn(100);
+            })
+        );
+
+        $enchantingService = $this->app->make(EnchantingService::class);
+
+        $this->createEvent([
+            'type'                    => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'current_event_goal_step' => GlobalEventSteps::ENCHANT,
+        ]);
+
+        $this->createGlobalEventGoal([
+            'event_type'                  => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'max_enchants'                => 100,
+            'reward_every'                => 10,
+            'next_reward_at'              => 10,
+            'item_specialty_type_reward'  => ItemSpecialtyType::DELUSIONAL_SILVER,
+            'should_be_unique'            => false,
+            'should_be_mythic'            => true,
+        ]);
+
+        $character = $this->character->inventoryManagement()->giveItem($this->itemToEnchant)->getCharacter();
+
+        $character->update(['gold' => 1000]);
+
+        $character = $character->refresh();
+
+        $slot = $character->inventory->slots->first();
+
+        $enchantingService->enchant($character, [
+            'affix_ids' => [$this->prefix->id]
+        ], $slot, 1000);
+
+        $character = $character->refresh();
+
+        $this->assertEquals(0, $character->gold);
+
+        $this->assertNotNull($character->globalEventEnchants);
+
+        $globalEventParticipation = GlobalEventParticipation::where('character_id', $character->id)->first();
+
+        $this->assertNotNull($globalEventParticipation);
+
+        $this->assertEmpty($character->inventory->slots);
     }
 
     public function testEnchantingFails() {

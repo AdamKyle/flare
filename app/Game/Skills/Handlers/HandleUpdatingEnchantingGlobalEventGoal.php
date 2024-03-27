@@ -2,15 +2,14 @@
 
 namespace App\Game\Skills\Handlers;
 
+use App\Flare\Models\InventorySlot;
 use Exception;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 use App\Flare\Builders\RandomAffixGenerator;
 use App\Flare\Models\Character;
 use App\Flare\Models\Event;
-use App\Flare\Models\GlobalEventCraftingInventory;
 use App\Flare\Models\GlobalEventCraftingInventorySlot;
 use App\Flare\Models\GlobalEventGoal;
-use App\Flare\Models\Item;
 use App\Game\Events\Concerns\UpdateCharacterEventGoalParticipation;
 use App\Game\Events\Events\UpdateEventGoalProgress;
 use App\Game\Events\Handlers\BaseGlobalEventGoalParticipationHandler;
@@ -18,7 +17,7 @@ use App\Game\Events\Services\EventGoalsService;
 use App\Game\Events\Values\GlobalEventSteps;
 
 
-class HandleUpdatingCraftingGlobalEventGoal extends BaseGlobalEventGoalParticipationHandler {
+class HandleUpdatingEnchantingGlobalEventGoal extends BaseGlobalEventGoalParticipationHandler {
 
     use UpdateCharacterEventGoalParticipation;
 
@@ -37,13 +36,13 @@ class HandleUpdatingCraftingGlobalEventGoal extends BaseGlobalEventGoalParticipa
      * Handle updating crafting global event goal.
      *
      * @param Character $character
-     * @param Item $item
+     * @param InventorySlot|GlobalEventCraftingInventorySlot $slot
      * @return void
      * @throws Exception
      */
-    public function handleUpdatingCraftingGlobalEventGoal(Character $character, Item $item): void {
+    public function handleUpdatingEnchantingGlobalEventGoal(Character $character, InventorySlot|GlobalEventCraftingInventorySlot $slot): void {
 
-        $event = Event::where('current_event_goal_step', GlobalEventSteps::CRAFT)->first();
+        $event = Event::where('current_event_goal_step', GlobalEventSteps::ENCHANT)->first();
 
         if (is_null($event)) {
             return;
@@ -55,26 +54,26 @@ class HandleUpdatingCraftingGlobalEventGoal extends BaseGlobalEventGoalParticipa
             return;
         }
 
-        $this->updateOrCreateEventInventory($character, $globalEventGoal, $item);
+        $slot->delete();
 
-        $this->handleUpdatingParticipation($character, $globalEventGoal, 'crafts');
+        $this->handleUpdatingParticipation($character, $globalEventGoal, 'enchants');
 
         $globalEventGoal = $globalEventGoal->refresh();
         $character       = $character->refresh();
 
-        if ($globalEventGoal->total_crafts >= $globalEventGoal->next_reward_at) {
+        if ($globalEventGoal->total_enchants >= $globalEventGoal->next_reward_at) {
             $newAmount = $globalEventGoal->next_reward_at + $globalEventGoal->reward_every;
 
             $this->rewardCharactersParticipating($globalEventGoal->refresh());
 
             $globalEventGoal->update([
-                'next_reward_at' => $newAmount >= $globalEventGoal->max_crafts ? $globalEventGoal->max_crafts : $newAmount,
+                'next_reward_at' => $newAmount >= $globalEventGoal->max_enchants ? $globalEventGoal->max_enchants : $newAmount,
             ]);
         }
 
         event(new UpdateEventGoalProgress($this->eventGoalsService->getEventGoalData($character)));
 
-        ServerMessageHandler::sendBasicMessage($character->user, '"Thank you child! This item will help in the fight against The Federation! we shall save it for when we are ready for to enchant them!" The Red Hawk Soldier takes the item from you. Onto the next child.');
+        ServerMessageHandler::sendBasicMessage($character->user, '"Thank you child! This enchanted item will help in the fight against The Federation!" The Red Hawk Soldier takes the item from you. Onto the next child.');
 
         $this->wasItemAccepted = true;
     }
@@ -86,25 +85,5 @@ class HandleUpdatingCraftingGlobalEventGoal extends BaseGlobalEventGoalParticipa
      */
     public function handedOverItem(): bool {
         return $this->wasItemAccepted;
-    }
-
-    /**
-     * Set the item into the characters global event crafting inventory.
-     *
-     * @param Character $character
-     * @param GlobalEventGoal $event
-     * @param Item $item
-     * @return void
-     */
-    private function updateOrCreateEventInventory(Character $character, GlobalEventGoal $event, Item $item): void {
-        $inventory = GlobalEventCraftingInventory::firstOrCreate([
-            'global_event_id' => $event->id,
-            'character_id' => $character->id
-        ]);
-
-        GlobalEventCraftingInventorySlot::create([
-            'global_event_crafting_inventory_id' => $inventory->id,
-            'item_id' => $item->id,
-        ]);
     }
 }

@@ -22,7 +22,9 @@ class GlobalEventParticipationFactory extends Factory {
         return [
             'global_event_goal_id' => null,
             'character_id' => null,
-            'current_kills' => 10,
+            'current_kills' => null,
+            'current_crafts' => null,
+            'current_enchants' => null,
         ];
     }
 }
