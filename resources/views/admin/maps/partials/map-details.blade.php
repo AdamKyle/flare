@@ -71,6 +71,13 @@
                         You will want to make sure you have Stat Reducing Affixes and Entrancing <a
                             href="/information/enchanting">affixes</a> down here.
                     </p>
+                    <p class="my-2">
+                        Further complicating things, vampires life stealing percentage is reduced by 10% down here.
+                        For example 99% life stealing, becomes ~89% life stealing.
+                        Casters without high resistance reduction and skill reduction gear
+                        will find their spells are being evaded. Quest items which make your affixes irresistible no
+                        longer work down here.
+                    </p>
                 @endif
 
                 @if ($map->mapType()->isPurgatory())
@@ -97,7 +104,8 @@
                         vital for further down the list as well as for PVp (optional).
                     </p>
                     <p class="my-2">
-                        Further complicating things, vampires damage is capped at 50% of their total life stealing %.
+                        Further complicating things, vampires life stealing percentage is reduced by 20% down here.
+                        For example 99% life stealing, becomes ~79% life stealing.
                         Casters without high resistance reduction and skill reduction gear
                         will find their spells are being evaded. Quest items which make your affixes irresistible no
                         longer work down here.
@@ -108,42 +116,34 @@
                         as well as use appropriate affixes to reduce enemy stats and entrance them.
                     </p>
                 @endif
-                @if ($map->mapType()->isTheIcePlane())
+
+                @if ($map->mapType()->isTwistedMemories())
                     <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2'></div>
                     <x-core.alerts.info-alert title="ATTN!">
-                        <p class='my-4'>This plane is only accessible during The Winter Event which runs from December
-                            15th to March 14th
-                            the following year.</p>
+                        Players will not traverse as normal, read on below. You will complete three quest lines to gain a new item and go to a specific location
+                        to be automatically traversed to the plane.
                     </x-core.alerts.info-alert>
-                    <h3 class="my-4">The Ice Queen Reins!</h3>
+                    <h3 class="my-4">Twisted Memories corrupt the land</h3>
                     <p>
-                        There is a corrupt Queen who rules this plane of existance and spreads the chilld of her own
-                        dying and dead heart
-                        across the land it's self.
+                        Welcome to Twisted Memories plane, an end game map where creatures are much more difficult and give out more XP.
                     </p>
                     <p class="my-2">
-                        Players who come down to The Ice Plane will encounter frozen terrors the likes of which they
-                        have never seen,
-                        be able to complete an epic quest line that tells the story of who this Queen of ice really is.
-                        Is she tied to The Creator some how?
+                       Players will need to complete a series of quests to get here. The quest line starts in Dungeons with: Looking for a prince
+                        and ends with a quest chain in Hell called: Love is dangerous.
                     </p>
                     <p class="my-2">
-                        During the winter event there will be a raid where players can fight The Ice Queen and gain new
-                        gear set: Corrupted Ice set.
+                        From here players just need to head to the Twisted Dimensional Gate and be automatically traversed to the new plane.
                     </p>
                     <p class="my-2">
-                        Players will also be able to earn the Ice Sceptor Artifact which is atuned to Charisma.
+                        Players can settle kingdoms, but the land mass down here is so small that you might find your self defending your lands more often then not.
                     </p>
                     <p class="my-2">
-                        Players will also find that their gold, gold_dust, shards and copper coins drop at 2x the rate
-                        while fighting creatures.
+                        Players will find a new set of quests here that tell the story of the plane and it's inhabitants, which
+                        carries on from the above required quests for entry.
                     </p>
-                    <p class="my-2">
-                        Players will also notice that all enemies have 100-130% in all resiatances and skills and even
-                        have elemental atonement of, Ice.
-                    </p>
-                    <p class="my-2">
-                        Critters also have special attacks, simmilar to those of class specials.
+                    <p>
+                        Vampires have their life stealing reduced by 25% down here. For example dealing 99% life stealing
+                        damage will now be: ~74% life stealing damage.
                     </p>
                 @endif
                 @if (!is_null($itemNeeded))

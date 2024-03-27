@@ -4,6 +4,7 @@ namespace App\Flare\Builders\CharacterInformation\AttributeBuilders;
 
 
 use App\Flare\Models\Character;
+use App\Flare\Models\GameMap;
 use App\Flare\Values\WeaponTypes;
 use Exception;
 use Illuminate\Support\Collection;
@@ -182,24 +183,23 @@ class DamageBuilder extends BaseAttribute {
             return 0;
         }
 
-        $class = $this->character->class;
+        $class   = $this->character->class;
+        $gameMap = $this->character->map->gameMap;
 
         if ($class->type()->isVampire()) {
             $itemSuffix = $this->inventory->sum('item.itemSuffix.steal_life_amount');
             $itemPrefix = $this->inventory->sum('item.itemPrefix.steal_life_amount');
 
             $lifeStealAmount  = $itemSuffix + $itemPrefix;
-            $gameMap          = $this->character->map->gameMap;
+
 
             if ($lifeStealAmount >= 1) {
                 $lifeStealAmount =  0.99;
             }
 
-            if (($gameMap->mapType()->isHell() || $gameMap->mapType()->isPurgatory() || $gameMap->mapType()->isTheIcePlane())) {
-                $lifeStealAmount = $lifeStealAmount / 2;
-            }
+            $lifeStealAmount = $this->getLifeStealAfterPlaneReductions($gameMap, $lifeStealAmount);
 
-            return $lifeStealAmount;
+            return max($lifeStealAmount, 0);
         }
 
         $lifeStealAmounts = [
@@ -213,8 +213,31 @@ class DamageBuilder extends BaseAttribute {
             return 0;
         }
 
-        $value = max($lifeStealAmounts);
+        $lifeStealAmounts = $lifeStealAmounts >= 1 ? .99 : $lifeStealAmounts;
 
-        return $value >= 1 ? .99 : $value;
+        $lifeStealAmount = $this->getLifeStealAfterPlaneReductions($gameMap, $lifeStealAmounts);
+
+        return max($lifeStealAmounts, 0);
+    }
+
+    protected function getLifeStealAfterPlaneReductions(GameMap $gameMap, float $lifeSteal): float {
+
+        if ($gameMap->mapType()->isHell()) {
+            return $lifeSteal - ($lifeSteal * .10);
+        }
+
+        if ($gameMap->mapType()->isPurgatory()) {
+            return $lifeSteal - ($lifeSteal * .20);
+        }
+
+        if ($gameMap->mapType()->isTheIcePlane()) {
+            return $lifeSteal - ($lifeSteal * .20);
+        }
+
+        if ($gameMap->mapType()->isTwistedMemories()) {
+            return $lifeSteal - ($lifeSteal * .25);
+        }
+
+        return $lifeSteal;
     }
 }
