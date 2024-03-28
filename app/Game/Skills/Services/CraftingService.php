@@ -61,6 +61,11 @@ class CraftingService {
     private bool $craftForNpc = false;
 
     /**
+     * @var bool $craftForEvent
+     */
+    private bool $craftForEvent = false;
+
+    /**
      * @param RandomEnchantmentService $randomEnchantmentService
      * @param SkillService $skillService
      * @param ItemListCostTransformerService $itemListCostTransformerService
@@ -162,6 +167,8 @@ class CraftingService {
     public function craft(Character $character, array $params): bool {
 
         $this->craftForNpc = $params['craft_for_npc'];
+
+        $this->craftForEvent = $params['craft_for_event'];
 
         $item  = Item::find($params['item_to_craft']);
 
@@ -353,32 +360,20 @@ class CraftingService {
      */
     public function pickUpItem(Character $character, Item $item, Skill $skill, bool $tooEasy = false, bool $updateGoldCost = true): void {
 
-        $this->updateCraftingTasksForFactionLoyalty->handleCraftingTask($character, $item);
+        if ($this->craftForNpc) {
+            $result = $this->handleCraftingForNpc($character, $item, $skill, $tooEasy, $updateGoldCost);
 
-        if ($this->updateCraftingTasksForFactionLoyalty->handedOverItem()) {
-            if (!$tooEasy) {
-                $this->skillService->assignXpToCraftingSkill($character->map->gameMap, $skill);
+            if ($result) {
+                return;
             }
-
-            if ($updateGoldCost) {
-                $this->updateCharacterGold($character, $item);
-            }
-
-            return;
         }
 
-        $this->handleUpdatingCraftingGlobalEventGoal->handleUpdatingCraftingGlobalEventGoal($character, $item);
+        if ($this->craftForEvent) {
+            $result = $this->handleCraftingForEvent($character, $item, $skill, $tooEasy, $updateGoldCost);
 
-        if ($this->handleUpdatingCraftingGlobalEventGoal->handedOverItem()) {
-            if (!$tooEasy) {
-                $this->skillService->assignXpToCraftingSkill($character->map->gameMap, $skill);
+            if ($result) {
+                return;
             }
-
-            if ($updateGoldCost) {
-                $this->updateCharacterGold($character, $item);
-            }
-
-            return;
         }
 
         if ($this->attemptToPickUpItem($character, $item)) {
@@ -391,6 +386,64 @@ class CraftingService {
                 $this->updateCharacterGold($character, $item);
             }
         }
+    }
+
+    /**
+     * Handle crafting for npc faction loyalty.
+     *
+     * @param Character $character
+     * @param Item $item
+     * @param Skill $skill
+     * @param bool $tooEasy
+     * @param bool $updateGoldCost
+     * @return bool
+     * @throws Exception
+     */
+    private function handleCraftingForNpc(Character $character, Item $item, Skill $skill, bool $tooEasy, bool $updateGoldCost): bool {
+        $this->updateCraftingTasksForFactionLoyalty->handleCraftingTask($character, $item);
+
+        if ($this->updateCraftingTasksForFactionLoyalty->handedOverItem()) {
+            if (!$tooEasy) {
+                $this->skillService->assignXpToCraftingSkill($character->map->gameMap, $skill);
+            }
+
+            if ($updateGoldCost) {
+                $this->updateCharacterGold($character, $item);
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Handle craft for global events.
+     *
+     * @param Character $character
+     * @param Item $item
+     * @param Skill $skill
+     * @param bool $tooEasy
+     * @param bool $updateGoldCost
+     * @return bool
+     * @throws Exception
+     */
+    private function handleCraftingForEvent(Character $character, Item $item, Skill $skill, bool $tooEasy, bool $updateGoldCost): bool {
+        $this->handleUpdatingCraftingGlobalEventGoal->handleUpdatingCraftingGlobalEventGoal($character, $item);
+
+        if ($this->handleUpdatingCraftingGlobalEventGoal->handedOverItem()) {
+            if (!$tooEasy) {
+                $this->skillService->assignXpToCraftingSkill($character->map->gameMap, $skill);
+            }
+
+            if ($updateGoldCost) {
+                $this->updateCharacterGold($character, $item);
+            }
+
+            return true;
+        }
+
+        return false;
     }
 
     /**

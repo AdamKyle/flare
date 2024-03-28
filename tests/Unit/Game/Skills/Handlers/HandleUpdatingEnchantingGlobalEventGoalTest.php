@@ -178,5 +178,7 @@ class HandleUpdatingEnchantingGlobalEventGoalTest extends TestCase {
         $this->assertNotNull($foundMythic);
 
         $this->assertCount(1, $character->inventory->slots);
+
+        $this->assertTrue($this->handleUpdateEnchantingGlobalEventGoal->handedOverItem());
     }
 }

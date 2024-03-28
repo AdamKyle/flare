@@ -5,7 +5,6 @@ import ItemComparison from "../../sections/chat/modals/item-comparison";
 import CharacterClassRanks from "../../sections/character-sheet/components/character-class-ranks";
 import CharacterClassRankSpecialtiesSection
     from "../../sections/character-sheet/components/tabs/additional-information/sections/character-class-rank-specialties-section";
-import RankFightTops from "../../tops/rank-fight-tops";
 import ItemView from "../../components/modals/item-details/item-view";
 
 /**
@@ -15,20 +14,6 @@ import ItemView from "../../components/modals/item-details/item-view";
  * @type [{component: Table}]
  */
 export const watchForDarkModeInventoryChange = (component: CharacterInventoryTabs) => {
-    window.setInterval(() => {
-        if (window.localStorage.hasOwnProperty('scheme') && component.state.dark_tables !== true) {
-            component.setState({
-                dark_tables: window.localStorage.scheme === 'dark'
-            })
-        } else if (!window.localStorage.hasOwnProperty('scheme') && component.state.dark_tables) {
-            component.setState({
-                dark_tables: false
-            });
-        }
-    }, 10);
-}
-
-export const watchForDarkModeRankFightTopsChange = (component: RankFightTops) => {
     window.setInterval(() => {
         if (window.localStorage.hasOwnProperty('scheme') && component.state.dark_tables !== true) {
             component.setState({

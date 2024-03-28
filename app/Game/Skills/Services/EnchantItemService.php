@@ -67,10 +67,11 @@ class EnchantItemService {
      * Update the slot.
      *
      * @param InventorySlot $slot
+     * @param bool $enchantForEvent
      * @return void
      * @throws Exception
      */
-    public function updateSlot(InventorySlot $slot): void {
+    public function updateSlot(InventorySlot $slot, bool $enchantForEvent): void {
         if (!is_null($this->item)) {
 
             if ($this->getCountOfMatchingItems() > 1) {
@@ -85,9 +86,11 @@ class EnchantItemService {
 
             $slot = $slot->refresh();
 
-            $character = $slot->inventory->character;
+            if ($enchantForEvent) {
+                $character = $slot->inventory->character;
 
-            $this->handleUpdatingEnchantingGlobalEventGoal->handleUpdatingEnchantingGlobalEventGoal($character, $slot);
+                $this->handleUpdatingEnchantingGlobalEventGoal->handleUpdatingEnchantingGlobalEventGoal($character, $slot);
+            }
         }
     }
 

@@ -40,8 +40,6 @@ export default class SmallerActions extends React.Component<
 
     private celestialTimeout: any;
 
-    private manageRankFights: any;
-
     constructor(props: SmallActionsProps) {
         super(props);
 
@@ -96,11 +94,6 @@ export default class SmallerActions extends React.Component<
         // @ts-ignore
         this.celestialTimeout = Echo.private(
             "update-character-celestial-timeout-" + this.props.character.user_id
-        );
-
-        // @ts-ignore
-        this.manageRankFights = Echo.private(
-            "update-rank-fight-" + this.props.character.user_id
         );
 
         // @ts-ignore

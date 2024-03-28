@@ -251,7 +251,8 @@ class CraftingServiceTest extends TestCase {
         $result = $this->craftingService->craft($character, [
             'item_to_craft' => 10,
             'type'          => 'hammer',
-            'craft_for_npc' => false
+            'craft_for_npc' => false,
+            'craft_for_event' => false,
         ]);
 
         Event::assertDispatched(ServerMessageEvent::class);
@@ -267,7 +268,8 @@ class CraftingServiceTest extends TestCase {
         $result = $this->craftingService->craft($character, [
             'item_to_craft' => $this->craftingItem->id,
             'type'          => 'hammer',
-            'craft_for_npc' => false
+            'craft_for_npc' => false,
+            'craft_for_event' => false,
         ]);
 
         Event::assertDispatched(function (ServerMessageEvent $event) {
@@ -295,7 +297,8 @@ class CraftingServiceTest extends TestCase {
         $result = $this->craftingService->craft($character, [
             'item_to_craft' => $this->craftingItem->refresh()->id,
             'type'          => 'hammer',
-            'craft_for_npc' => false
+            'craft_for_npc' => false,
+            'craft_for_event' => false,
         ]);
 
         Event::assertDispatched(function (ServerMessageEvent $event) {
@@ -323,7 +326,8 @@ class CraftingServiceTest extends TestCase {
         $result = $this->craftingService->craft($character, [
             'item_to_craft' => $this->craftingItem->refresh()->id,
             'type'          => 'hammer',
-            'craft_for_npc' => false
+            'craft_for_npc' => false,
+            'craft_for_event' => false,
         ]);
 
         Event::assertDispatched(function (ServerMessageEvent $event) {
@@ -345,7 +349,8 @@ class CraftingServiceTest extends TestCase {
         $this->craftingService->craft($character, [
             'item_to_craft' => $this->craftingItem->id,
             'type'          => 'hammer',
-            'craft_for_npc' => false
+            'craft_for_npc' => false,
+            'craft_for_event' => false,
         ]);
 
         $character = $character->refresh();
@@ -378,7 +383,8 @@ class CraftingServiceTest extends TestCase {
         $craftingService->craft($character, [
             'item_to_craft' => $this->craftingItem->id,
             'type'          => 'hammer',
-            'craft_for_npc' => false
+            'craft_for_npc' => false,
+            'craft_for_event' => false,
         ]);
 
         Event::assertDispatched(function (ServerMessageEvent $event) {
@@ -410,7 +416,8 @@ class CraftingServiceTest extends TestCase {
         $craftingService->craft($character, [
             'item_to_craft' => $this->craftingItem->id,
             'type'          => 'hammer',
-            'craft_for_npc' => false
+            'craft_for_npc' => false,
+            'craft_for_event' => false,
         ]);
 
         Event::assertDispatched(function (ServerMessageEvent $event) {
@@ -440,7 +447,8 @@ class CraftingServiceTest extends TestCase {
         $craftingService->craft($character, [
             'item_to_craft' => $this->craftingItem->id,
             'type'          => 'hammer',
-            'craft_for_npc' => false
+            'craft_for_npc' => false,
+            'craft_for_event' => false,
         ]);
 
         $this->assertCount(1, $character->inventory->slots);
@@ -470,7 +478,8 @@ class CraftingServiceTest extends TestCase {
         $craftingService->craft($character, [
             'item_to_craft' => $this->craftingItem->id,
             'type'          => 'hammer',
-            'craft_for_npc' => false
+            'craft_for_npc' => false,
+            'craft_for_event' => false,
         ]);
 
         $this->assertCount(1, $character->inventory->slots);
@@ -511,7 +520,8 @@ class CraftingServiceTest extends TestCase {
                 'cost'                 => 10,
             ])->id,
             'type'          => 'spell',
-            'craft_for_npc' => false
+            'craft_for_npc' => false,
+            'craft_for_event' => false,
         ]);
 
         $this->assertCount(1, $character->inventory->slots);
@@ -545,7 +555,8 @@ class CraftingServiceTest extends TestCase {
         $craftingService->craft($character, [
             'item_to_craft' => $this->craftingItem->id,
             'type'          => 'hammer',
-            'craft_for_npc' => false
+            'craft_for_npc' => false,
+            'craft_for_event' => false,
         ]);
 
         $this->assertCount(1, $character->inventory->slots);
@@ -579,7 +590,8 @@ class CraftingServiceTest extends TestCase {
         $craftingService->craft($character, [
             'item_to_craft' => $this->craftingItem->id,
             'type'          => 'hammer',
-            'craft_for_npc' => false
+            'craft_for_npc' => false,
+            'craft_for_event' => false,
         ]);
 
         $this->assertCount(1, $character->inventory->slots);
@@ -620,7 +632,8 @@ class CraftingServiceTest extends TestCase {
                 'cost'                 => 10,
             ])->id,
             'type'          => 'spell',
-            'craft_for_npc' => false
+            'craft_for_npc' => false,
+            'craft_for_event' => false,
         ]);
 
         $this->assertCount(1, $character->inventory->slots);
@@ -708,7 +721,8 @@ class CraftingServiceTest extends TestCase {
         $craftingService->craft($character, [
             'item_to_craft' => $this->craftingItem->id,
             'type'          => 'hammer',
-            'craft_for_npc' => false
+            'craft_for_npc' => true,
+            'craft_for_event' => false,
         ]);
 
         $character = $character->refresh();
@@ -758,9 +772,10 @@ class CraftingServiceTest extends TestCase {
         $character = $character->refresh();
 
         $craftingService->craft($character, [
-            'item_to_craft' => $this->craftingItem->id,
-            'type'          => 'hammer',
-            'craft_for_npc' => false
+            'item_to_craft'   => $this->craftingItem->id,
+            'type'            => 'hammer',
+            'craft_for_npc'   => false,
+            'craft_for_event' => true,
         ]);
 
         $character = $character->refresh();

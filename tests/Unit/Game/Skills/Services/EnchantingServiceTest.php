@@ -213,7 +213,8 @@ class EnchantingServiceTest extends TestCase {
         $character = $character->refresh();
 
         $this->enchantingService->enchant($character, [
-            'affix_ids' => [$this->prefix->id, $this->suffix->id]
+            'affix_ids' => [$this->prefix->id, $this->suffix->id],
+            'enchant_for_event' => false,
         ], $character->inventory->slots->first(), 1000);
 
         $character = $character->refresh();
@@ -229,7 +230,8 @@ class EnchantingServiceTest extends TestCase {
         $character = $character->refresh();
 
         $this->enchantingService->enchant($character, [
-            'affix_ids' => [10000, 1500]
+            'affix_ids' => [10000, 1500],
+            'enchant_for_event' => false,
         ], $character->inventory->slots->first(), 1000);
 
         $character = $character->refresh();
@@ -252,7 +254,8 @@ class EnchantingServiceTest extends TestCase {
         $character = $character->refresh();
 
         $this->enchantingService->enchant($character, [
-            'affix_ids' => [$this->prefix->id]
+            'affix_ids' => [$this->prefix->id],
+            'enchant_for_event' => false,
         ], $character->inventory->slots->first(), 1000);
 
         $character = $character->refresh();
@@ -280,7 +283,8 @@ class EnchantingServiceTest extends TestCase {
         $character = $character->refresh();
 
         $this->enchantingService->enchant($character, [
-            'affix_ids' => [$this->prefix->id]
+            'affix_ids' => [$this->prefix->id],
+            'enchant_for_event' => false,
         ], $character->inventory->slots->first(), 1000);
 
         $character = $character->refresh();
@@ -307,7 +311,8 @@ class EnchantingServiceTest extends TestCase {
         $character = $character->refresh();
 
         $this->enchantingService->enchant($character, [
-            'affix_ids' => [$this->prefix->id]
+            'affix_ids' => [$this->prefix->id],
+            'enchant_for_event' => false,
         ], $character->inventory->slots->first(), 1000);
 
         $character = $character->refresh();
@@ -341,7 +346,8 @@ class EnchantingServiceTest extends TestCase {
         $slot = $character->inventory->slots->first();
 
         $enchantingService->enchant($character, [
-            'affix_ids' => [$this->prefix->id]
+            'affix_ids' => [$this->prefix->id],
+            'enchant_for_event' => false,
         ], $slot, 1000);
 
         $character = $character->refresh();
@@ -391,7 +397,8 @@ class EnchantingServiceTest extends TestCase {
         $slot = $character->inventory->slots->first();
 
         $enchantingService->enchant($character, [
-            'affix_ids' => [$this->prefix->id]
+            'affix_ids' => [$this->prefix->id],
+            'enchant_for_event' => true,
         ], $slot, 1000);
 
         $character = $character->refresh();
@@ -431,7 +438,8 @@ class EnchantingServiceTest extends TestCase {
         $itemName =  $slot->item->affix_name;
 
         $enchantingService->enchant($character, [
-            'affix_ids' => [$this->prefix->id]
+            'affix_ids' => [$this->prefix->id],
+            'enchant_for_event' => false,
         ], $slot, 1000);
 
         $character = $character->refresh();

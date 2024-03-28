@@ -29,6 +29,7 @@ export default class Crafting extends React.Component<any, any> {
             loading: false,
             craftable_items: [],
             sorted_armour: [],
+            show_craft_for_event: false,
             selected_armour_type: null,
             skill_xp: {
                 curent_xp: 0,
@@ -97,6 +98,7 @@ export default class Crafting extends React.Component<any, any> {
                                     loading: false,
                                     craftable_items: result.data.items,
                                     skill_xp: result.data.xp,
+                                    show_craft_for_event: result.data.show_craft_for_event
                                 });
                             },
                             (error: AxiosError) => {}
@@ -167,7 +169,7 @@ export default class Crafting extends React.Component<any, any> {
         return { label: "Please select item to craft", value: 0 };
     }
 
-    craft(craftForNpc: boolean) {
+    craft(craftForNpc: boolean, craftForEvent: boolean) {
         this.setState(
             {
                 loading: true,
@@ -184,6 +186,7 @@ export default class Crafting extends React.Component<any, any> {
                         item_to_craft: this.state.selected_item.id,
                         type: getCraftingType(this.state.selected_item.type),
                         craft_for_npc: craftForNpc,
+                        craft_for_event: craftForEvent,
                     })
                     .doAjaxCall(
                         "post",
@@ -322,6 +325,7 @@ export default class Crafting extends React.Component<any, any> {
                             change_type={this.changeType.bind(this)}
                             clear_crafting={this.clearCrafting.bind(this)}
                             show_craft_for_npc={this.showCraftForNpc()}
+                            show_craft_for_event={this.props.show_craft_for_event}
                         />
                     </div>
                 ) : (
@@ -334,6 +338,7 @@ export default class Crafting extends React.Component<any, any> {
                             change_type={this.changeType.bind(this)}
                             clear_crafting={this.clearCrafting.bind(this)}
                             show_craft_for_npc={this.showCraftForNpc()}
+                            show_craft_for_event={this.props.show_craft_for_event}
                         />
                     </div>
                 )}

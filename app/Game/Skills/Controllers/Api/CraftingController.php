@@ -2,6 +2,8 @@
 
 namespace App\Game\Skills\Controllers\Api;
 
+use App\Flare\Models\Event;
+use App\Game\Events\Values\GlobalEventSteps;
 use App\Game\Factions\FactionLoyalty\Concerns\FactionLoyalty;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -29,10 +31,13 @@ class CraftingController extends Controller {
     }
 
     public function fetchItemsToCraft(Request $request, Character $character) {
+        $event = Event::where('current_event_goal_step', GlobalEventSteps::CRAFT)->first();
+
         return response()->json([
-            'items'              => $this->craftingService->fetchCraftableItems($character, $request->all()),
-            'xp'                 => $this->craftingService->getCraftingXP($character, $request->crafting_type),
-            'show_craft_for_npc' => $this->showCraftForNpcButton($character, $request->crafting_type),
+            'items'                => $this->craftingService->fetchCraftableItems($character, $request->all()),
+            'xp'                   => $this->craftingService->getCraftingXP($character, $request->crafting_type),
+            'show_craft_for_npc'   => $this->showCraftForNpcButton($character, $request->crafting_type),
+            'show_craft_for_event' => !is_null($event),
         ]);
     }
 

@@ -3,6 +3,7 @@ import PrimaryButton from "../../../../components/ui/buttons/primary-button";
 import DangerButton from "../../../../components/ui/buttons/danger-button";
 import CraftingActionButtonsProps from "./types/crafting-action-buttons-props";
 import SuccessButton from "../../../../components/ui/buttons/success-button";
+import OrangeButton from "../../../../components/ui/buttons/orange-button";
 
 export default class CraftingActionButtons extends React.Component<
     CraftingActionButtonsProps,
@@ -18,7 +19,7 @@ export default class CraftingActionButtons extends React.Component<
                 <PrimaryButton
                     additional_css="mb-2"
                     button_label={"Craft"}
-                    on_click={() => this.props.craft(false)}
+                    on_click={() => this.props.craft(false, false)}
                     disabled={this.props.can_craft}
                 />
                 {
@@ -26,7 +27,17 @@ export default class CraftingActionButtons extends React.Component<
                         <SuccessButton
                             additional_css={"lg:ml-2 mb-2"}
                             button_label={"Craft for NPC"}
-                            on_click={() => this.props.craft(true)}
+                            on_click={() => this.props.craft(true, false)}
+                            disabled={this.props.can_craft}
+                        />
+                    : null
+                }
+                {
+                    this.props.show_craft_for_event ?
+                        <OrangeButton
+                            additional_css={"lg:ml-2 mb-2"}
+                            button_label={"Craft for Event"}
+                            on_click={() => this.props.craft(false, true)}
                             disabled={this.props.can_craft}
                         />
                     : null

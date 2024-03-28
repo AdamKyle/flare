@@ -11,7 +11,3 @@ import './bootstrap';
  */
 import './game/game-launcher';
 
-/**
- * Load the rank fight tops chart and list.
- */
-import './game/tops/rank-fight-tops-component';

@@ -158,7 +158,7 @@ class EnchantItemServiceTest extends TestCase
         $skill    = $character->skills->where('game_skill_id', $this->enchantingSkill->id)->first();
 
         $this->enchantItemService->attachAffix($this->itemToEnchant, $this->suffix, $skill, true);
-        $this->enchantItemService->updateSlot($slot);
+        $this->enchantItemService->updateSlot($slot, false);
 
         $item = $this->enchantItemService->getItem();
 
@@ -180,7 +180,7 @@ class EnchantItemServiceTest extends TestCase
         $skill    = $character->skills->where('game_skill_id', $this->enchantingSkill->id)->first();
 
         $this->enchantItemService->attachAffix($this->itemToEnchant, $this->suffix, $skill, true);
-        $this->enchantItemService->updateSlot($slot);
+        $this->enchantItemService->updateSlot($slot, false);
 
         $item = $this->enchantItemService->getItem();
 
@@ -215,7 +215,7 @@ class EnchantItemServiceTest extends TestCase
         $skill         = $character->skills->where('game_skill_id', $this->enchantingSkill->id)->first();
 
         $this->enchantItemService->attachAffix($itemToEnchant, $this->suffix, $skill, true);
-        $this->enchantItemService->updateSlot($slot);
+        $this->enchantItemService->updateSlot($slot, false);
 
         $item = $this->enchantItemService->getItem();
 

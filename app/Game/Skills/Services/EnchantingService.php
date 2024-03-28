@@ -62,7 +62,7 @@ class EnchantingService {
      *
      * @var bool $wasTooEasy
      */
-    private $wasTooEasy = false;
+    private bool $wasTooEasy = false;
 
     /**
      * Constructor
@@ -204,7 +204,7 @@ class EnchantingService {
 
         $this->attachAffixes($params['affix_ids'], $slot, $enchantingSkill, $character);
 
-        $this->enchantItemService->updateSlot($slot);
+        $this->enchantItemService->updateSlot($slot, $params['enchant_for_event']);
     }
 
     public function timeForEnchanting(Item $item) {

@@ -61,7 +61,7 @@ export default class Enchanting extends React.Component<
         this.props.remove_crafting();
     }
 
-    enchant() {
+    enchant(enchantForEvent: boolean) {
         this.setState(
             {
                 loading: true,
@@ -80,6 +80,7 @@ export default class Enchanting extends React.Component<
                             this.state.selected_prefix,
                             this.state.selected_suffix,
                         ],
+                        enchant_for_event: enchantForEvent
                     })
                     .doAjaxCall(
                         "post",
@@ -388,7 +389,7 @@ export default class Enchanting extends React.Component<
                 <div className={"text-center md:ml-[-100px] mt-3 mb-3"}>
                     <PrimaryButton
                         button_label={"Enchant"}
-                        on_click={this.enchant.bind(this)}
+                        on_click={() => this.enchant(false)}
                         disabled={this.cannotCraft()}
                     />
                     <DangerButton

@@ -26,6 +26,8 @@ class CraftingValidation extends FormRequest
         return [
             'item_to_craft'   => 'required|integer',
             'type'            => 'required|in:weapon,hammer,bow,fan,gun,mace,scratch-awl,stave,armour,spell,ring,artifact',
+            'craft_for_npc'   => 'required|bool',
+            'craft_for_event' => 'required|bool'
         ];
     }
 
@@ -34,6 +36,8 @@ class CraftingValidation extends FormRequest
             'item_to_craft.required' => 'What item are you trying to craft?',
             'type.required'          => 'Missing type.',
             'type.in'                => 'Invalid input.',
+            'craft_for_npc.required' => 'Are we crafting for an npc?',
+            'craft_for_event.required' => 'Are we crafting for an event?'
         ];
     }
 }

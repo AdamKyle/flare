@@ -26,6 +26,7 @@ class EnchantingValidation extends FormRequest
         return [
             'slot_id'   => 'required',
             'affix_ids' => 'required',
+            'enchant_for_event' => 'required|bool',
         ];
     }
 
@@ -33,6 +34,7 @@ class EnchantingValidation extends FormRequest
         return [
             'slot_id.required'    => 'What item are you trying to enchant?',
             'affix_ids.required'  => 'What enchantment(s) are you trying to attach?',
+            'enchant_for_event.required' => 'Are we enchanting for an event?',
         ];
     }
 }

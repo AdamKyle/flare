@@ -37,8 +37,6 @@ export default class Actions extends React.Component<
 
     private traverseUpdate: any;
 
-    private manageRankFights: any;
-
     constructor(props: ActionsProps) {
         super(props);
 
@@ -59,8 +57,6 @@ export default class Actions extends React.Component<
             show_hell_forged_section: false,
             show_purgatory_chains_section: false,
             show_gambling_section: false,
-            show_rank_fight: false,
-            total_ranks: 0,
         };
 
         this.actionsManager = new ActionsManager(this);
@@ -86,11 +82,6 @@ export default class Actions extends React.Component<
         );
 
         // @ts-ignore
-        this.manageRankFights = Echo.private(
-            "update-rank-fight-" + this.props.character.user_id
-        );
-
-        // @ts-ignore
         this.duelOptions = Echo.join("update-duel");
     }
 
@@ -113,17 +104,6 @@ export default class Actions extends React.Component<
             (event: any) => {
                 this.setState({
                     crafting_time_out: event.timeout,
-                });
-            }
-        );
-
-        // @ts-ignore
-        this.manageRankFights.listen(
-            "Game.Maps.Events.UpdateRankFights",
-            (event: any) => {
-                this.setState({
-                    show_rank_fight: event.showRankSelection,
-                    total_ranks: event.ranks,
                 });
             }
         );
@@ -467,7 +447,6 @@ export default class Actions extends React.Component<
                                 monsters={this.state.monsters}
                                 character={this.props.character}
                                 character_statuses={this.props.character_status}
-                                total_ranks={this.state.total_ranks}
                                 is_small={false}
                             >
                                 {this.state.crafting_type !== null ? (
