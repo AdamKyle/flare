@@ -2,6 +2,7 @@
 
 namespace App\Flare\Models;
 
+use Database\Factories\GlobalEventEnchantingFactory;
 use Database\Factories\GlobalEventKillFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -44,6 +45,6 @@ class GlobalEventEnchant extends Model {
     }
 
     protected static function newFactory() {
-        return GlobalEventKillFactory::new();
+        return GlobalEventEnchantingFactory::new();
     }
 }

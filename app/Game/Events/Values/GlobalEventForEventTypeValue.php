@@ -31,9 +31,9 @@ class GlobalEventForEventTypeValue {
                 'next_reward_at'             => 20000,
                 'event_type'                 => EventType::DELUSIONAL_MEMORIES_EVENT,
                 'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER,
-                'should_be_unique'           => true,
+                'should_be_unique'           => false,
                 'unique_type'                => RandomAffixDetails::MYTHIC,
-                'should_be_mythic'           => false,
+                'should_be_mythic'           => true,
             ];
         }
 
@@ -45,6 +45,32 @@ class GlobalEventForEventTypeValue {
             'battle',
             'craft',
             'enchant',
+        ];
+    }
+
+    public static function returnCraftingEventGoal(): array {
+        return [
+            'max_crafts'                 => 1000,
+            'reward_every'               => 100,
+            'next_reward_at'             => 100,
+            'event_type'                 => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER,
+            'should_be_unique'           => true,
+            'unique_type'                => RandomAffixDetails::LEGENDARY,
+            'should_be_mythic'           => false,
+        ];
+    }
+
+    public static function returnEnchantingEventGoal(): array {
+        return [
+            'max_enchants'               => 1000,
+            'reward_every'               => 100,
+            'next_reward_at'             => 100,
+            'event_type'                 => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER,
+            'should_be_unique'           => true,
+            'unique_type'                => RandomAffixDetails::LEGENDARY,
+            'should_be_mythic'           => false,
         ];
     }
 }

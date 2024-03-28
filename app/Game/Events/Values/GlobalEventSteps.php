@@ -6,7 +6,7 @@ use Exception;
 
 class GlobalEventSteps {
 
-    const BATTLE = 'ighting';
+    const BATTLE = 'fighting';
 
     const CRAFT  = 'crafting';
 

@@ -32,12 +32,42 @@ class GlobalEventForEventTypeValueTest extends TestCase {
             'next_reward_at'             => 20000,
             'event_type'                 => EventType::DELUSIONAL_MEMORIES_EVENT,
             'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER,
-            'should_be_unique'           => true,
+            'should_be_unique'           => false,
             'unique_type'                => RandomAffixDetails::MYTHIC,
-            'should_be_mythic'           => false,
+            'should_be_mythic'           => true,
         ];
 
         $this->assertEquals($expected, GlobalEventForEventTypeValue::returnGlobalEventInfoForSeasonalEvents(EventType::DELUSIONAL_MEMORIES_EVENT));
+    }
+
+    public function testGetCraftingEventGoalData() {
+        $expected = [
+            'max_crafts'                 => 1000,
+            'reward_every'               => 100,
+            'next_reward_at'             => 100,
+            'event_type'                 => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER,
+            'should_be_unique'           => true,
+            'unique_type'                => RandomAffixDetails::LEGENDARY,
+            'should_be_mythic'           => false,
+        ];
+
+        $this->assertEquals($expected, GlobalEventForEventTypeValue::returnCraftingEventGoal());
+    }
+
+    public function testGetEnchantingEventGoalData() {
+        $expected = [
+            'max_enchants'               => 1000,
+            'reward_every'               => 100,
+            'next_reward_at'             => 100,
+            'event_type'                 => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER,
+            'should_be_unique'           => true,
+            'unique_type'                => RandomAffixDetails::LEGENDARY,
+            'should_be_mythic'           => false,
+        ];
+
+        $this->assertEquals($expected, GlobalEventForEventTypeValue::returnEnchantingEventGoal());
     }
 
     public function testGetDelusionalMemoriesGlobalEventSteps() {

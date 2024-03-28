@@ -71,7 +71,7 @@ class InitiateDelusionalMemoriesEvent implements ShouldQueue {
      * @return void
      */
     public function kickOffGlobalEventGoal(): void {
-        $globalEventGoalData = GlobalEventForEventTypeValue::returnGlobalEventInfoForSeasonalEvents(EventType::WINTER_EVENT);
+        $globalEventGoalData = GlobalEventForEventTypeValue::returnGlobalEventInfoForSeasonalEvents(EventType::DELUSIONAL_MEMORIES_EVENT);
 
         GlobalEventGoal::create($globalEventGoalData);
 
