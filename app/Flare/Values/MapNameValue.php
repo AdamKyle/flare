@@ -21,6 +21,7 @@ class MapNameValue {
 
     // Event Specific Panes:
     const ICE_PLANE              = 'The Ice Plane';
+    const DELUSIONAL_MEMORIES    = 'Delusional Memories';
 
     /**
      * @var array $values
@@ -34,6 +35,7 @@ class MapNameValue {
         'Purgatory'     => self::PURGATORY,
         'Twisted Memories' => self::TWISTED_MEMORIES,
         'The Ice Plane' => self::ICE_PLANE,
+        'Delusional Memories' => self::DELUSIONAL_MEMORIES,
     ];
 
     /**
@@ -47,6 +49,8 @@ class MapNameValue {
         self::HELL         => '#1194d1',
         self::PURGATORY    => '#000000',
         self::ICE_PLANE    => '#cebeeb',
+        self::TWISTED_MEMORIES    => '#9ae660',
+        self::DELUSIONAL_MEMORIES => '##288f22',
     ];
 
     /**
@@ -114,6 +118,10 @@ class MapNameValue {
         return $this->value === self::TWISTED_MEMORIES;
     }
 
+    public function isDelusionalMemories(): bool {
+        return $this->value === self::DELUSIONAL_MEMORIES;
+    }
+
     public function isTheIcePlane(): bool {
         return $this->value === self::ICE_PLANE;
     }
@@ -167,6 +175,16 @@ class MapNameValue {
                     'drop_chance_bonus'            => 0.35,
                     'enemy_stat_bonus'             => 0.45,
                     'character_attack_reduction'   => 0.35,
+                    'required_location_id'         => null,
+                    'can_traverse'                 => false,
+                ];
+            case self::DELUSIONAL_MEMORIES:
+                return [
+                    'xp_bonus'                     => 0.65,
+                    'skill_training_bonus'         => 0.45,
+                    'drop_chance_bonus'            => 0.40,
+                    'enemy_stat_bonus'             => 0.50,
+                    'character_attack_reduction'   => 0.40,
                     'required_location_id'         => null,
                     'can_traverse'                 => false,
                 ];

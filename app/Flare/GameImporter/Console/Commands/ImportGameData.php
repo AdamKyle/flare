@@ -187,6 +187,7 @@ class ImportGameData extends Command {
      * Import the game maps.
      *
      * @return void
+     * @throws \Exception
      */
     protected function importGameMaps(): void {
         $files = Storage::disk('data-maps')->allFiles();
@@ -200,6 +201,7 @@ class ImportGameData extends Command {
             "Purgatory.jpeg",
             "IcePlane.jpeg",
             "Twisted Memories.jpeg",
+            "Delusional Memories.jpeg",
         ];
 
         // Sort the array such that the maps are in the correct order.

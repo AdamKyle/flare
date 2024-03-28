@@ -217,7 +217,7 @@ class DamageBuilder extends BaseAttribute {
 
         $lifeStealAmount = $this->getLifeStealAfterPlaneReductions($gameMap, $lifeStealAmounts);
 
-        return max($lifeStealAmounts, 0);
+        return max($lifeStealAmount, 0);
     }
 
     protected function getLifeStealAfterPlaneReductions(GameMap $gameMap, float $lifeSteal): float {
@@ -236,6 +236,10 @@ class DamageBuilder extends BaseAttribute {
 
         if ($gameMap->mapType()->isTwistedMemories()) {
             return $lifeSteal - ($lifeSteal * .25);
+        }
+
+        if ($gameMap->mapType()->isDelusionalMemories()) {
+            return $lifeSteal - ($lifeSteal * .30);
         }
 
         return $lifeSteal;
