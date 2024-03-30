@@ -75,7 +75,7 @@ class CanTravelToMap {
     protected function canTravelToShadowPlanes(GameMap $gameMap, Character $character): mixed  {
         if ($gameMap->mapType()->isShadowPlane()) {
             $hasItem = $character->inventory->slots->filter(function($slot) {
-                return $slot->item->effect === ItemEffectsValue::SHADOWPLANE;
+                return $slot->item->effect === ItemEffectsValue::SHADOW_PLANE;
             })->all();
 
             return !empty($hasItem);

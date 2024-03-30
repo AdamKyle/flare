@@ -76,6 +76,10 @@ class MapTileValue {
         return in_array($color, [255255255]);
     }
 
+    public function isTwistedMemoriesWater(int $color): bool {
+        return in_array($color, [3096147]);
+    }
+
     public function canWalk(Character $character, int $x, int $y) {
 
         if (!$this->canWalkOnWater($character, $x, $y)) {
@@ -98,7 +102,19 @@ class MapTileValue {
             return true;
         }
 
+        if ($character->map->gameMap->mapType()->isDelusionalMemories()) {
+            if (!$this->canWalkOnDelusionalMemoriesWater($character, $x, $y)) {
+                return false;
+            }
+
+            return true;
+        }
+
         if (!$this->canWalkOnPurgatoryWater($character, $x, $y)) {
+            return false;
+        }
+
+        if (!$this->canWalkOnTwistedMemoriesWater($character, $x, $y)) {
             return false;
         }
 
@@ -179,7 +195,8 @@ class MapTileValue {
      * @param int $y
      * @return bool
      */
-    public function canWalkOnPurgatoryWater(Character $character, int $x, int $y) {
+    public function canWalkOnPurgatoryWater(Character $character, int $x, int $y): bool
+    {
         $color = $this->getTileColor($character, $x, $y);
 
         if ($this->isPurgatoryWater((int) $color)) {
@@ -198,13 +215,49 @@ class MapTileValue {
      * @param int $y
      * @return bool
      */
-    public function canWalkOnIcePlaneIce(Character $character, int $x, int $y) {
+    public function canWalkOnIcePlaneIce(Character $character, int $x, int $y): bool {
         $color = $this->getTileColor($character, $x, $y);
 
         if ($this->isIcePlaneIce((int) $color)) {
             return $character->inventory->slots->filter(function ($slot) {
                 return $slot->item->effect === ItemEffectsValue::WALK_ON_ICE;
             })->isNotEmpty();
+        }
+
+        return true;
+    }
+
+    /**
+     * Can walk on Delusional Memories water?
+     *
+     * @param Character $character
+     * @param int $x
+     * @param int $y
+     * @return bool
+     */
+    public function canWalkOnDelusionalMemoriesWater(Character $character, int $x, int $y): bool {
+        $color = $this->getTileColor($character, $x, $y);
+
+        dump($color);
+
+        return $character->inventory->slots->filter(function ($slot) {
+            return $slot->item->effect === ItemEffectsValue::WALK_ON_DELUSIONAL_MEMORIES_WATER;
+        })->isNotEmpty();
+    }
+
+    /**
+     * Can walk on Delusional Memories water?
+     *
+     * @param Character $character
+     * @param int $x
+     * @param int $y
+     * @return bool
+     */
+    public function canWalkOnTwistedMemoriesWater(Character $character, int $x, int $y): bool {
+        $color = $this->getTileColor($character, $x, $y);
+
+        if ($this->isTwistedMemoriesWater($color)) {
+            return false;
         }
 
         return true;

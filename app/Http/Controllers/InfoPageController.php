@@ -88,7 +88,7 @@ class InfoPageController extends Controller {
         $effects = match ($map->name) {
             'Labyrinth'    => ItemEffectsValue::LABYRINTH,
             'Dungeons'     => ItemEffectsValue::DUNGEON,
-            'Shadow Plane' => ItemEffectsValue::SHADOWPLANE,
+            'Shadow Plane' => ItemEffectsValue::SHADOW_PLANE,
             'Hell'         => ItemEffectsValue::HELL,
             'Purgatory'    => ItemEffectsValue::PURGATORY,
             default        => '',

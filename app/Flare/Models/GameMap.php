@@ -78,7 +78,7 @@ class GameMap extends Model {
             case 'Dungeons':
                 return Item::where('effect', ItemEffectsValue::DUNGEON)->first();
             case 'Shadow Plane':
-                return Item::where('effect', ItemEffectsValue::SHADOWPLANE)->first();
+                return Item::where('effect', ItemEffectsValue::SHADOW_PLANE)->first();
             case 'Hell':
                 return Item::where('effect', ItemEffectsValue::HELL)->first();
             case 'Purgatory':

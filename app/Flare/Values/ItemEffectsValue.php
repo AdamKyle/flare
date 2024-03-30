@@ -13,7 +13,7 @@ class ItemEffectsValue {
     const WALK_ON_DEATH_WATER   = 'walk-on-death-water';
     const LABYRINTH             = 'labyrinth';
     const DUNGEON               = 'dungeon';
-    const SHADOWPLANE           = 'shadow-plane';
+    const SHADOW_PLANE           = 'shadow-plane';
     const HELL                  = 'hell';
     const PURGATORY             = 'purgatory';
     const TELEPORT_TO_CELESTIAL = 'teleport-to-celestial';
@@ -31,6 +31,7 @@ class ItemEffectsValue {
     const SETTLE_IN_ICE_PLANE   = 'settle-on-the-ice-plane';
     const THE_OLD_CHURCH        = 'the-old-church';
     const MERCENARY_SLOT_BONUS  = 'mercenary-slot-bonus';
+    const WALK_ON_DELUSIONAL_MEMORIES_WATER = 'walk-on-delusional-memories-water';
 
     /**
      * @var string[] $values
@@ -41,7 +42,7 @@ class ItemEffectsValue {
         self::WALK_ON_MAGMA         => 'walk-on-magma',
         self::LABYRINTH             => 'labyrinth',
         self::DUNGEON               => 'dungeon',
-        self::SHADOWPLANE           => 'shadow-plane',
+        self::SHADOW_PLANE           => 'shadow-plane',
         self::HELL                  => 'hell',
         self::TELEPORT_TO_CELESTIAL => 'teleport-to-celestial',
         self::AFFIXES_IRRESISTIBLE  => 'affixes-irresistible',
@@ -58,6 +59,7 @@ class ItemEffectsValue {
         self::SETTLE_IN_ICE_PLANE   => 'settle-on-the-ice-plane',
         self::THE_OLD_CHURCH        => 'the-old-church',
         self::MERCENARY_SLOT_BONUS  => 'mercenary-slot-bonus',
+        self::WALK_ON_DELUSIONAL_MEMORIES_WATER => 'walk-on-delusional-memories-water',
     ];
 
     /**
@@ -138,7 +140,7 @@ class ItemEffectsValue {
      * @return bool
      */
     public function shadowPlane(): bool {
-        return $this->value === self::SHADOWPLANE;
+        return $this->value === self::SHADOW_PLANE;
     }
 
     /**
@@ -265,5 +267,14 @@ class ItemEffectsValue {
      */
     public function mercenarySlotBonus(): bool {
         return $this->value === self::MERCENARY_SLOT_BONUS;
+    }
+
+    /**
+     * Is an item that allows us to walk on the delusional memories water?
+     *
+     * @return bool
+     */
+    public function walkOnDelusionalMemoriesWater(): bool {
+        return $this->value === self::WALK_ON_DELUSIONAL_MEMORIES_WATER;
     }
 }

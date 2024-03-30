@@ -10,6 +10,7 @@ class MonsterSpecialAttack extends BattleBase {
 
     const PHYSICAL_DAMAGE_AMOUNT = 0.15;
     const MAGICAL_ICE_ATTACK_DAMAGE_AMOUNT = 0.20;
+    const DELUSIONAL_MEMORIES_ATTACK_DAMAGE_AMOUNT = 0.25;
 
     /**
      * @param CharacterCacheData $characterCacheData
@@ -25,6 +26,7 @@ class MonsterSpecialAttack extends BattleBase {
      * @param integer $damageStat
      * @param integer $ac
      * @return void
+     * @throws \Exception
      */
     public function doSpecialAttack(int $specialAttackType, int $damageStat, int $ac): void {
 
@@ -38,6 +40,10 @@ class MonsterSpecialAttack extends BattleBase {
 
         if ($specialAttackType->isMagicalIceAttack()) {
             $this->doMagicalIceDamage($damageStat, $ac);
+        }
+
+        if ($specialAttackType->isDelusionalMemoriesAttack()) {
+            $this->doDelusionalMemoriesAttack($damageStat, $ac);
         }
     }
 
@@ -88,6 +94,24 @@ class MonsterSpecialAttack extends BattleBase {
 
         $this->addMessage('The enemy begins their chant, the air gets colder - chilly. Your breath is seen on the air, your flesh begins to freeze!', 'enemy-action');
         $this->addMessage('You block: ' . number_format($ac) . ' of the enemies special attack damage!', 'player-action');
-        $this->addMessage('You take: ' . $newDamage . ' damage from the enemies special attack (Physical)!', 'enemy-action');
+        $this->addMessage('You take: ' . $newDamage . ' damage from the enemies special attack (Magical)!', 'enemy-action');
+    }
+
+    protected function doDelusionalMemoriesAttack(int $damageStat, int $ac): void {
+        $newDamage = $damageStat * self::DELUSIONAL_MEMORIES_ATTACK_DAMAGE_AMOUNT;
+
+        if ($ac > $newDamage) {
+            $this->addMessage('You manage to block the enemies special attack!', 'player-action');
+
+            return;
+        }
+
+        $newDamage = $newDamage - $ac;
+
+        $this->characterHealth -= $newDamage;
+
+        $this->addMessage('The enemy begins screaming frantically about things that make no sense. Their own delusional memories are thrashing at you!', 'enemy-action');
+        $this->addMessage('You block: ' . number_format($ac) . ' of the enemies special attack damage!', 'player-action');
+        $this->addMessage('You take: ' . $newDamage . ' damage from the enemies special attack (Magical)!', 'enemy-action');
     }
 }

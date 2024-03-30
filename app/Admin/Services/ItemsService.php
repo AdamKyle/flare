@@ -67,7 +67,7 @@ class ItemsService {
                 ItemEffectsValue::WALK_ON_ICE,
                 ItemEffectsValue::LABYRINTH,
                 ItemEffectsValue::DUNGEON,
-                ItemEffectsValue::SHADOWPLANE,
+                ItemEffectsValue::SHADOW_PLANE,
                 ItemEffectsValue::HELL,
                 ItemEffectsValue::TELEPORT_TO_CELESTIAL,
                 ItemEffectsValue::AFFIXES_IRRESISTIBLE,

@@ -24,7 +24,7 @@ class MapsController extends Controller {
         $effects = match ($gameMap->name) {
             'Labyrinth'    => ItemEffectsValue::LABYRINTH,
             'Dungeons'     => ItemEffectsValue::DUNGEON,
-            'Shadow Plane' => ItemEffectsValue::SHADOWPLANE,
+            'Shadow Plane' => ItemEffectsValue::SHADOW_PLANE,
             'Hell'         => ItemEffectsValue::HELL,
             'Purgatory'    => ItemEffectsValue::PURGATORY,
             default        => '',

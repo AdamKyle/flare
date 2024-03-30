@@ -4,10 +4,12 @@ namespace App\Console\Commands;
 
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Monster;
+use App\Game\Gems\Values\GemTypeValue;
 use Illuminate\Console\Command;
 use App\Flare\Values\MapNameValue;
 use App\Flare\ExponentialCurve\Curve\ExponentialAttributeCurve;
 use Illuminate\Database\Eloquent\Collection;
+use function Deployer\Support\array_merge_alternate;
 
 class ReBalanceMonsters extends Command
 {
@@ -80,26 +82,106 @@ class ReBalanceMonsters extends Command
 
         $this->manageMonsters($monsters, $exponentialAttributeCurve, 10000000, 16000000000, 1000000, 5000, MapNameValue::TWISTED_MEMORIES);
 
-        // Raid Monsters:
-        $monsters = Monster::orderBy('game_map_id')
+        // Delusional Memories Monsters:
+        $gameMap  = GameMap::where('name', MapNameValue::DELUSIONAL_MEMORIES)->first();
+        $monsters = Monster::where('game_map_id', $gameMap->id)
+            ->where('is_raid_monster', false)
+            ->where('is_raid_boss', false)
+            ->where('is_celestial_entity', false)
+            ->get();
+
+        $this->manageMonsters($monsters, $exponentialAttributeCurve, 50000000, 32000000000, 1000000, 5000, MapNameValue::DELUSIONAL_MEMORIES);
+
+
+        // Surface Raid Monsters:
+        $gameMap = GameMap::where('name', MapNameValue::SURFACE)->first();
+        $monsters = Monster::where('game_map_id', $gameMap->id)
                             ->where('is_celestial_entity', false)
                             ->where('is_raid_monster', true)
                             ->where('is_raid_boss', false)
                             ->get();
 
-        $this->manageMonsters($monsters, $exponentialAttributeCurve, 4000000000, 25000000000, 100000, 500);
+        $this->manageMonsters($monsters, $exponentialAttributeCurve, 4000000000, 8000000000, 100000, 500, null, true);
+
+        $gameMap = GameMap::where('name', MapNameValue::ICE_PLANE)->first();
+        $monsters = Monster::where('game_map_id', $gameMap->id)
+            ->where('is_celestial_entity', false)
+            ->where('is_raid_monster', true)
+            ->where('is_raid_boss', false)
+            ->get();
+
+        $this->manageMonsters($monsters, $exponentialAttributeCurve, 8000000000, 16000000000, 100000, 500, null, true);
+
+        $gameMap = GameMap::where('name', MapNameValue::DELUSIONAL_MEMORIES)->first();
+        $monsters = Monster::where('game_map_id', $gameMap->id)
+            ->where('is_celestial_entity', false)
+            ->where('is_raid_monster', true)
+            ->where('is_raid_boss', false)
+            ->get();
+
+        $this->manageMonsters($monsters, $exponentialAttributeCurve, 16000000000, 32000000000, 100000, 500, null, true);
     }
 
-    protected function manageMonsters(Collection $monsters, ExponentialAttributeCurve $exponentialAttributeCurve, int $min, int $max, int $increase, int $range, ?string $mapName = null): void {
+    protected function manageMonsters(Collection $monsters, ExponentialAttributeCurve $exponentialAttributeCurve, int $min, int $max, int $increase, int $range, ?string $mapName = null, bool $isRaidMonsters = false): void {
         $floats   = $this->generateFloats($exponentialAttributeCurve, $monsters->count());
         $integers = $this->generateIntegers($exponentialAttributeCurve, $monsters->count(), $min, $max, $increase, $range);
         $xpIntegers = $this->getXPIntegers($exponentialAttributeCurve, $monsters->count(), $mapName);
+        $atonements = $this->fetchElementalAtonements($exponentialAttributeCurve, $mapName, $monsters->count(), $isRaidMonsters);
 
         foreach ($monsters as $index => $monster) {
             $monsterStats = $this->setMonsterStats($floats, $integers, $xpIntegers, $index);
 
+            if (isset($atonements[$index])) {
+                $monsterStats = array_merge($monsterStats, $atonements[$index]);
+            }
+
             $monster->update($monsterStats);
         }
+    }
+
+    protected function fetchElementalAtonements(ExponentialAttributeCurve $exponentialAttributeCurve, string $mapName, int $monsterCount, bool $isRaidMonster): array {
+        $primaryAtonement = null;
+        $startingValue    = 0;
+        $maxValue         = 0;
+
+
+        if ($mapName === MapNameValue::SURFACE && $isRaidMonster) {
+            $primaryAtonement = 'fire';
+            $startingValue = .15;
+            $maxValue      = 0.60;
+        }
+
+        if ($mapName === MapNameValue::ICE_PLANE && $isRaidMonster) {
+            $primaryAtonement = 'ice';
+            $startingValue = .25;
+            $maxValue      = 0.65;
+        } else if ($mapName === MapNameValue::ICE_PLANE) {
+            $primaryAtonement = 'ice';
+            $startingValue = .10;
+            $maxValue      = 0.55;
+        }
+
+        if ($mapName === MapNameValue::DELUSIONAL_MEMORIES && $isRaidMonster) {
+            $primaryAtonement = 'water';
+            $startingValue = .35;
+            $maxValue      = 0.68;
+        } else if ($mapName === MapNameValue::DELUSIONAL_MEMORIES) {
+            $primaryAtonement = 'water';
+            $startingValue = .15;
+            $maxValue      = 0.55;
+        }
+
+        if ($mapName === MapNameValue::TWISTED_MEMORIES) {
+            $primaryAtonement = 'fire';
+            $startingValue = .15;
+            $maxValue      = 0.55;
+        }
+
+        if (is_null($primaryAtonement) && $startingValue <= 0 && $maxValue <= 0) {
+            return [];
+        }
+
+        return $this->fetchAtonementDataForMonsters($exponentialAttributeCurve, $monsterCount, $primaryAtonement, $startingValue, $maxValue);
     }
 
     protected function getXPIntegers(ExponentialAttributeCurve $exponentialAttributeCurve, int $size, ?string $mapName = null): array {
@@ -119,15 +201,36 @@ class ReBalanceMonsters extends Command
             return $this->generateIntegers($exponentialAttributeCurve, $size, 60, 4000, 40, 50);
         }
 
+        if ($mapName === MapNameValue::DELUSIONAL_MEMORIES) {
+            return $this->generateIntegers($exponentialAttributeCurve, $size, 120, 8000, 40, 50);
+        }
+
         // Raid Monsters
         return $this->generateIntegers($exponentialAttributeCurve, $size, 100, 4500, 100, 50);
     }
 
-    protected function generateFloats(ExponentialAttributeCurve $exponentialAttributeCurve, int $size): array {
-        $curve = $exponentialAttributeCurve->setMin(0.001)
-                                           ->setMax(1.0)
-                                           ->setIncrease(0.08)
-                                           ->setRange(0.01);
+    protected function fetchAtonementDataForMonsters(ExponentialAttributeCurve $exponentialAttributeCurve, int $monsterCount, string $primaryAtonement, float $startingValue, float $maxValue): array {
+        $floats     = $this->generateFloats($exponentialAttributeCurve, $monsterCount, $startingValue, $maxValue);
+        $atonements = [];
+
+        for ($i = 1; $i <= $monsterCount; $i++) {
+            $value = $floats[$i - 1];
+
+            $atonements[] = [
+                'fire_atonement' => $primaryAtonement !== 'fire' ? $value / 2 : max($value, 0.75),
+                'ice_atonement'  => $primaryAtonement !== 'ice' ? $value / 2 : max($value, 0.75),
+                'water_atonement' => $primaryAtonement !== 'water' ? $value /2 : max($value, 0.75),
+            ];
+        }
+
+        return $atonements;
+    }
+
+    protected function generateFloats(ExponentialAttributeCurve $exponentialAttributeCurve, int $size, float $min = 0.001, float $max = 1.0, float $increase = 0.08, float $range = 0.01): array {
+        $curve = $exponentialAttributeCurve->setMin($min)
+                                           ->setMax($max)
+                                           ->setIncrease($increase)
+                                           ->setRange($range);
 
         return $curve->generateValues($size);
     }
