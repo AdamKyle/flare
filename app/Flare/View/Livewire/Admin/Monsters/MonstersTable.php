@@ -34,6 +34,7 @@ class MonstersTable extends DataTableComponent {
                     'Purgatory'                   => 'Purgatory',
                     'The Ice Plane'               => 'The Ice Plane',
                     'Twisted Memories'            => 'Twisted Memories',
+                    'Delusional Memories'         => 'Delusional Memories',
                     'Surface Celestials'          => 'Surface Celestials',
                     'Labyrinth Celestials'        => 'Labyrinth Celestials',
                     'Dungeons Celestials'         => 'Dungeons Celestials',
@@ -52,6 +53,7 @@ class MonstersTable extends DataTableComponent {
                     'Hell Raid Monsters'          => 'Hell Raid Monsters',
                     'Purgatory Raid Monsters'     => 'Purgatory Raid Monsters',
                     'The Ice Plane Raid Monsters' => 'The Ice Plane Raid Monsters',
+                    'Delusional Memories Raid Monsters' => 'Delusional Memories Raid Monsters',
                 ])->filter(function (Builder $builder, string $value) {
                     if (str_contains($value, 'Celestials')) {
 

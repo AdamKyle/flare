@@ -40,15 +40,15 @@ class ReBalanceMonsters extends Command
      */
     public function handle(ExponentialAttributeCurve $exponentialAttributeCurve) {
 
-        foreach ($this->regularMaps as $map) {
-            $gameMap  = GameMap::where('name', $map)->first();
+        foreach ($this->regularMaps as $mapName) {
+            $gameMap  = GameMap::where('name', $mapName)->first();
             $monsters = Monster::where('game_map_id', $gameMap->id)
                                ->where('is_raid_monster', false)
                                ->where('is_raid_boss', false)
                                ->where('is_celestial_entity', false)
                                ->get();
 
-            $this->manageMonsters($monsters, $exponentialAttributeCurve, 8, 2000000000, 100000, 500, $map);
+            $this->manageMonsters($monsters, $exponentialAttributeCurve, 8, 2000000000, 100000, 500, $mapName);
         }
 
         // Purgatory Monsters:
@@ -101,7 +101,7 @@ class ReBalanceMonsters extends Command
                             ->where('is_raid_boss', false)
                             ->get();
 
-        $this->manageMonsters($monsters, $exponentialAttributeCurve, 4000000000, 8000000000, 100000, 500, null, true);
+        $this->manageMonsters($monsters, $exponentialAttributeCurve, 4000000000, 8000000000, 100000, 500, $gameMap->name, true);
 
         $gameMap = GameMap::where('name', MapNameValue::ICE_PLANE)->first();
         $monsters = Monster::where('game_map_id', $gameMap->id)
@@ -110,7 +110,7 @@ class ReBalanceMonsters extends Command
             ->where('is_raid_boss', false)
             ->get();
 
-        $this->manageMonsters($monsters, $exponentialAttributeCurve, 8000000000, 16000000000, 100000, 500, null, true);
+        $this->manageMonsters($monsters, $exponentialAttributeCurve, 8000000000, 16000000000, 100000, 500, $gameMap->name, true);
 
         $gameMap = GameMap::where('name', MapNameValue::DELUSIONAL_MEMORIES)->first();
         $monsters = Monster::where('game_map_id', $gameMap->id)
@@ -119,10 +119,10 @@ class ReBalanceMonsters extends Command
             ->where('is_raid_boss', false)
             ->get();
 
-        $this->manageMonsters($monsters, $exponentialAttributeCurve, 16000000000, 32000000000, 100000, 500, null, true);
+        $this->manageMonsters($monsters, $exponentialAttributeCurve, 16000000000, 32000000000, 100000, 500, $gameMap->name, true);
     }
 
-    protected function manageMonsters(Collection $monsters, ExponentialAttributeCurve $exponentialAttributeCurve, int $min, int $max, int $increase, int $range, ?string $mapName = null, bool $isRaidMonsters = false): void {
+    protected function manageMonsters(Collection $monsters, ExponentialAttributeCurve $exponentialAttributeCurve, int $min, int $max, int $increase, int $range, string $mapName, bool $isRaidMonsters = false): void {
         $floats   = $this->generateFloats($exponentialAttributeCurve, $monsters->count());
         $integers = $this->generateIntegers($exponentialAttributeCurve, $monsters->count(), $min, $max, $increase, $range);
         $xpIntegers = $this->getXPIntegers($exponentialAttributeCurve, $monsters->count(), $mapName);
@@ -139,7 +139,7 @@ class ReBalanceMonsters extends Command
         }
     }
 
-    protected function fetchElementalAtonements(ExponentialAttributeCurve $exponentialAttributeCurve, string $mapName, int $monsterCount, bool $isRaidMonster): array {
+    protected function fetchElementalAtonements(ExponentialAttributeCurve $exponentialAttributeCurve, string $mapName, int $monsterCount, bool $isRaidMonster,): array {
         $primaryAtonement = null;
         $startingValue    = 0;
         $maxValue         = 0;
@@ -217,9 +217,9 @@ class ReBalanceMonsters extends Command
             $value = $floats[$i - 1];
 
             $atonements[] = [
-                'fire_atonement' => $primaryAtonement !== 'fire' ? $value / 2 : max($value, 0.75),
-                'ice_atonement'  => $primaryAtonement !== 'ice' ? $value / 2 : max($value, 0.75),
-                'water_atonement' => $primaryAtonement !== 'water' ? $value /2 : max($value, 0.75),
+                'fire_atonement' => $primaryAtonement !== 'fire' ? $value / 2 : min($value, $maxValue),
+                'ice_atonement'  => $primaryAtonement !== 'ice' ? $value / 2 : min($value, $maxValue),
+                'water_atonement' => $primaryAtonement !== 'water' ? $value /2 : min($value, $maxValue),
             ];
         }
 
