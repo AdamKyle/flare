@@ -4,17 +4,13 @@ namespace App\Game\Kingdoms\Controllers\Api;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
-use App\Flare\Models\KingdomLog;
 use App\Game\Kingdoms\Requests\AttackRequest;
-use App\Game\Kingdoms\Requests\PurchaseMercenaryRequest;
 use App\Game\Kingdoms\Requests\DropItemsOnKingdomRequest;
 use App\Game\Kingdoms\Service\AttackWithItemsService;
 use App\Game\Kingdoms\Service\KingdomAttackService;
 use App\Game\Kingdoms\Service\UnitMovementService;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
-use League\Fractal\Manager;
-use League\Fractal\Resource\Collection;
 
 class AttackKingdom extends Controller {
 
@@ -84,7 +80,7 @@ class AttackKingdom extends Controller {
     }
 
     /**
-     * @param PurchaseMercenaryRequest $request
+     * @param AttackRequest $request
      * @param Kingdom $kingdom
      * @param Character $character
      * @return JsonResponse

@@ -157,7 +157,7 @@ class Kingdom extends Model {
         $factionNpcs = $loyalty->factionLoyaltyNpcs->filter(function($npc) {
             return $npc->current_level === $npc->max_level;
         });
-        
+
         return $factionNpcs->sum('current_kingdom_item_defence_bonus');
     }
 

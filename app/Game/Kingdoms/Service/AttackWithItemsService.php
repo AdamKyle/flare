@@ -74,7 +74,9 @@ class AttackWithItemsService {
            return $this->errorResult('You are not allowed to do that.');
        }
 
-       if ($kingdom->kingdomItemResistanceBonus() >= 1.0) {
+       $itemDefence = $kingdom->kingdomItemResistanceBonus();
+
+       if ($itemDefence >= 1.0) {
 
            event(new GlobalMessageEvent($character->name . ' tried to drop items on a kingdom: ' .
                $kingdom->name . ' on the plane: ' . $kingdom->gameMap->name . ' At (X/Y): ' . $kingdom->x_position . '/' . $kingdom->y_position .
@@ -94,10 +96,8 @@ class AttackWithItemsService {
 
        $damage -= ($damage * $reduction);
 
-       $itemResistance = $kingdom->kingdomItemResistanceBonus();
-
-       if ($itemResistance > 0) {
-           $damage -= ($damage * $itemResistance);
+       if ($itemDefence > 0) {
+           $damage -= ($damage * $itemDefence);
        }
 
        $currentMorale = $kingdom->current_morale;
