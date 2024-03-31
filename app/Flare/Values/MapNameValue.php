@@ -3,6 +3,7 @@
 namespace App\Flare\Values;
 
 use App\Flare\Models\Location;
+use App\Game\Events\Values\EventType;
 
 class MapNameValue {
 
@@ -50,7 +51,7 @@ class MapNameValue {
         self::PURGATORY    => '#000000',
         self::ICE_PLANE    => '#cebeeb',
         self::TWISTED_MEMORIES    => '#9ae660',
-        self::DELUSIONAL_MEMORIES => '##288f22',
+        self::DELUSIONAL_MEMORIES => '#288f22',
     ];
 
     /**
@@ -165,6 +166,7 @@ class MapNameValue {
                     'drop_chance_bonus'            => 0.30,
                     'enemy_stat_bonus'             => 0.35,
                     'character_attack_reduction'   => 0.30,
+                    'only_during_event_type'       => EventType::WINTER_EVENT,
                     'required_location_id'         => null,
                     'can_traverse'                 => true,
                 ];
@@ -186,7 +188,8 @@ class MapNameValue {
                     'enemy_stat_bonus'             => 0.50,
                     'character_attack_reduction'   => 0.40,
                     'required_location_id'         => null,
-                    'can_traverse'                 => false,
+                    'only_during_event_type'       => EventType::DELUSIONAL_MEMORIES_EVENT,
+                    'can_traverse'                 => true,
                 ];
             case self::SURFACE:
             case self::LABYRINTH:

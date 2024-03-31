@@ -219,12 +219,12 @@ class ImportGameData extends Command {
 
             $mapValue = new MapNameValue($fileName);
 
-            $gameMapData = [
+            $gameMapData = array_merge([
                 'name'          => $fileName,
                 'path'          => $path,
                 'default'       => $mapValue->isSurface(),
                 'kingdom_color' => MapNameValue::$kingdomColors[$fileName],
-            ];
+            ], (new MapNameValue($fileName))->getMapModifers());
 
             GameMap::create($gameMapData);
         }

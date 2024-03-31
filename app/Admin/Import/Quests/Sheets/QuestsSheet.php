@@ -38,6 +38,10 @@ class QuestsSheet implements ToCollection {
         foreach ($questsWhichRequireOtherQuests as $index => $quest) {
             $questData = $this->returnCleanItem($quest);
 
+            if (empty($questData)) {
+                dd($questData, $quest);
+            }
+
             Quest::updateOrCreate(['name' => $questData['name']], $questData);
         }
     }
