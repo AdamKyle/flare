@@ -17,7 +17,7 @@ class MoveTimeOutEvent
     /**
      * @var int $timeout
      */
-    public int $timeout;
+    public int $timeOut;
 
     /**
      * @var bool $setSail

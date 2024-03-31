@@ -468,7 +468,7 @@ class MonsterPlayerFight {
             return null;
         }
 
-        if ($gameMap->mapType()->isTheIcePlane()) {
+        if ($gameMap->mapType()->isTheIcePlane() || $gameMap->mapType()->isDelusionalMemories()) {
             $canAccessPurgatory = $this->character->inventory->slots->where('item.effect', ItemEffectsValue::PURGATORY)->count() > 0;
 
             if ($canAccessPurgatory) {

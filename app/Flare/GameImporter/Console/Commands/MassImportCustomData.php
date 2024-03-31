@@ -99,20 +99,23 @@ class MassImportCustomData extends Command {
         });
 
         foreach ($files as $file) {
-            $fileName = pathinfo($file, PATHINFO_FILENAME);
 
-            $path     = Storage::disk('maps')->putFile($fileName, new File(resource_path('maps') . '/' . $file));
+            if (in_array($file, $orderedMapImages)) {
+                $fileName = pathinfo($file, PATHINFO_FILENAME);
 
-            $mapValue = new MapNameValue($fileName);
+                $path     = Storage::disk('maps')->putFile($fileName, new File(resource_path('maps') . '/' . $file));
 
-            $gameMapData = array_merge([
-                'name'          => $fileName,
-                'path'          => $path,
-                'default'       => $mapValue->isSurface(),
-                'kingdom_color' => MapNameValue::$kingdomColors[$fileName],
-            ], (new MapNameValue($fileName))->getMapModifers());
+                $mapValue = new MapNameValue($fileName);
 
-            GameMap::create($gameMapData);
+                $gameMapData = array_merge([
+                    'name'          => $fileName,
+                    'path'          => $path,
+                    'default'       => $mapValue->isSurface(),
+                    'kingdom_color' => MapNameValue::$kingdomColors[$fileName],
+                ], (new MapNameValue($fileName))->getMapModifers());
+
+                GameMap::create($gameMapData);
+            }
         }
     }
 }

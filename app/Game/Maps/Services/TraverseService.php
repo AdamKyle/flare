@@ -219,6 +219,22 @@ class TraverseService {
 
             event(new GlobalMessageEvent('"Have you seen my son?" the call of the Ice Queen is heard across the lands of Tlessa. The Poet turns in his study: "So she has breached our reality."'));
         }
+
+        if ($gameMap->mapType()->isTwistedMemories()) {
+            $message = 'Your mind becomes a fog as you enter into a land where even your own thoughts become twisted into a darkness never before experienced by mortals before.';
+
+            event(new ServerMessageEvent($character->user,  $message));
+
+            event(new GlobalMessageEvent('"She is the reason the world is trapped in these lies." ' . $character->name . ' enters into a place where their own heart becomes a memory that is twisted into hate.'));
+        }
+
+        if ($gameMap->mapType()->isDelusionalMemories()) {
+            $message = 'The delusions of a mad man are heavy on the air here ...';
+
+            event(new ServerMessageEvent($character->user,  $message));
+
+            event(new GlobalMessageEvent('"Fliniguss has gone mad."  the Red Hawk Soldier states. "Help us put him down!" ' . $character->name . ' enters into a place where the war of the ages past never ended.'));
+        }
     }
 
     /**

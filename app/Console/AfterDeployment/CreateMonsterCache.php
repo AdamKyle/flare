@@ -4,6 +4,7 @@ namespace App\Console\AfterDeployment;
 
 use App\Flare\Services\BuildMonsterCacheService;
 use Illuminate\Console\Command;
+use Psr\SimpleCache\InvalidArgumentException;
 
 class CreateMonsterCache extends Command {
 
@@ -26,12 +27,12 @@ class CreateMonsterCache extends Command {
      *
      * @param BuildMonsterCacheService $buildMonsterCacheService
      * @return void
+     * @throws InvalidArgumentException
      */
     public function handle(BuildMonsterCacheService $buildMonsterCacheService): void
     {
         $buildMonsterCacheService->buildCache();
         $buildMonsterCacheService->buildCelesetialCache();
-        $buildMonsterCacheService->createRankMonsters();
         $buildMonsterCacheService->buildRaidCache();
     }
 }

@@ -56,9 +56,10 @@ class BattleController extends Controller {
             resolve(BuildMonsterCacheService::class)->buildCache();
         }
 
-        $isTheIcePlane      = $character->map->gameMap->mapType()->isTheIcePlane();
-        $hasPurgatoryAccess = $character->inventory->slots->where('item.effect', ItemEffectsValue::PURGATORY)->count() > 0;
-        $monsters           = Cache::get('monsters')[$character->map->gameMap->name];
+        $isTheIcePlane        = $character->map->gameMap->mapType()->isTheIcePlane();
+        $isDelusionalMemories = $character->map->gameMap->mapType()->isDelusionalMemories();
+        $hasPurgatoryAccess   = $character->inventory->slots->where('item.effect', ItemEffectsValue::PURGATORY)->count() > 0;
+        $monsters             = Cache::get('monsters')[$character->map->gameMap->name];
 
         if (!is_null($locationWithEffect) && !$isTheIcePlane) {
             $monsters = Cache::get('monsters')[$locationWithEffect->name];
@@ -74,6 +75,12 @@ class BattleController extends Controller {
         if ($isTheIcePlane && $hasPurgatoryAccess) {
             $monsters = Cache::get('monsters')[$character->map->gameMap->name]['regular'];
         } else if ($isTheIcePlane && !$hasPurgatoryAccess) {
+            $monsters = Cache::get('monsters')[$character->map->gameMap->name]['easier'];
+        }
+
+        if ($isDelusionalMemories && $hasPurgatoryAccess) {
+            $monsters = Cache::get('monsters')[$character->map->gameMap->name]['regular'];
+        } else if ($isDelusionalMemories && !$hasPurgatoryAccess) {
             $monsters = Cache::get('monsters')[$character->map->gameMap->name]['easier'];
         }
 

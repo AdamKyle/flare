@@ -82,7 +82,6 @@ use App\Flare\Transformers\KingdomTransformer;
 use App\Flare\Transformers\MarketItemsTransformer;
 use App\Flare\Transformers\MonsterTransformer;
 use App\Flare\Transformers\OtherKingdomTransformer;
-use App\Flare\Transformers\RankMonsterTransformer;
 use App\Flare\Transformers\UnitTransformer;
 use App\Flare\Transformers\UsableItemTransformer;
 use App\Flare\Values\BaseSkillValue;
@@ -223,7 +222,6 @@ class ServiceProvider extends ApplicationServiceProvider
             return new BuildMonsterCacheService(
                 $app->make(Manager::class),
                 $app->make(MonsterTransformer::class),
-                $app->make(RankMonsterTransformer::class),
             );
         });
 

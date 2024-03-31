@@ -5,6 +5,7 @@ namespace App\Flare\Builders\CharacterInformation\AttributeBuilders;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\GameMap;
+use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\WeaponTypes;
 use Exception;
 use Illuminate\Support\Collection;
@@ -230,16 +231,22 @@ class DamageBuilder extends BaseAttribute {
             return $lifeSteal - ($lifeSteal * .20);
         }
 
-        if ($gameMap->mapType()->isTheIcePlane()) {
-            return $lifeSteal - ($lifeSteal * .20);
-        }
-
         if ($gameMap->mapType()->isTwistedMemories()) {
             return $lifeSteal - ($lifeSteal * .25);
         }
 
-        if ($gameMap->mapType()->isDelusionalMemories()) {
-            return $lifeSteal - ($lifeSteal * .30);
+        $hasPurgatoryItem = $this->character->inventory->slots->filter(function($slot) {
+            return $slot->item->type === ItemEffectsValue::PURGATORY;
+        })->first();
+
+        if (!is_null($hasPurgatoryItem)) {
+            if ($gameMap->mapType()->isTheIcePlane()) {
+                return $lifeSteal - ($lifeSteal * .20);
+            }
+
+            if ($gameMap->mapType()->isDelusionalMemories()) {
+                return $lifeSteal - ($lifeSteal * .30);
+            }
         }
 
         return $lifeSteal;

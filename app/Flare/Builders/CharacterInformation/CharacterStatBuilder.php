@@ -261,11 +261,40 @@ class CharacterStatBuilder {
             $baseStat = $baseStat + $baseStat * $this->character->base_stat_mod;
         }
 
-        if (($this->map->mapType()->isHell() || $this->map->mapType()->isPurgatory() || $this->map->mapType()->isTheIcePlane()) && !$this->ignoreReductions) {
-            $baseStat = $baseStat - $baseStat * $this->map->character_attack_reduction;
+        $reduction = $this->getMapCharacterReductions();
+
+        return $baseStat - $baseStat * $reduction;
+    }
+
+    /**
+     * Get map reductions for characters.
+     *
+     * @return float
+     */
+    protected function getMapCharacterReductions(): float {
+        if ($this->ignoreReductions) {
+            return 0;
         }
 
-        return $baseStat;
+        if ($this->map->mapType()->isHell() ||
+            $this->map->mapType()->isPurgatory() ||
+            $this->map->mapType()->isTwistedMemories()
+        ) {
+            return $this->map->character_attack_reduction;
+        }
+
+        $purgatoryQuestItem = $this->character->inventory->slots->filter(function($slot) {
+            return $slot->item->effect === ItemEffectsValue::PURGATORY;
+        })->first();
+
+        if (!is_null($purgatoryQuestItem)) {
+
+            if ($this->map->mapType()->isTheIcePlane() || $this->map->mapType()->isDelusionalMemories()) {
+                return $this->map->character_attack_reduction;
+            }
+        }
+
+        return 0;
     }
 
     /**
