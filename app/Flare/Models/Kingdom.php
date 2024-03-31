@@ -148,13 +148,15 @@ class Kingdom extends Model {
     }
 
     public function kingdomItemResistanceBonus(): float {
-        $loyalties = $this->character->factionLoyalties->where('is_pledged', true);
+        $loyalty = $this->character->factionLoyalties()->where('is_pledged', true)->first();
 
-        if ($loyalties->isEmpty()) {
+        if (is_null($loyalty)) {
             return 0;
         }
 
-        return $loyalties->sum('factionLoyaltyNpcs.current_kingdom_item_defence_bonus');
+        $factionNpcs = $loyalty->factionLoyaltyNpcs;
+
+        return $factionNpcs->sum('current_kingdom_item_defence_bonus');
     }
 
     public function getWallsDefence(): float {

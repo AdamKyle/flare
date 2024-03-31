@@ -56,6 +56,7 @@ class BasicKingdomTransformer extends TransformerAbstract {
             'walls_defence'      => $kingdom->getWallsDefence(),
             'gold_bars_defence'  => $kingdom->fetchGoldBarsDefenceBonus(),
             'defence_bonus'      => $kingdom->fetchKingdomDefenceBonus(),
+            'item_resistance_bonus' => $kingdom->kingdomItemResistanceBonus(),
             'is_npc_owned'       => $kingdom->npc_owned,
             'is_enemy_kingdom'   => !$kingdom->npc_owned ? $kingdom->character_id !== $this->character->id : false,
             'is_protected'       => !is_null($kingdom->protected_until),
