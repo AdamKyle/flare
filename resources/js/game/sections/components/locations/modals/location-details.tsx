@@ -183,19 +183,42 @@ export default class LocationDetails extends React.Component<LocationDetailsProp
                             }
                         </div>
                     :
-                        this.props.location.quest_reward_item_id !== null ?
-                            <Fragment>
-                                <dl className='mb-4'>
-                                    <dt>Quest Item (Gained on visiting)</dt>
-                                    <dd>
-                                        <a href={"/information/item/" + this.props.location.quest_reward_item_id} target='_blank'>
-                                            {this.props.location.quest_reward_item.affix_name} <i
-                                            className="fas fa-external-link-alt"></i>
-                                        </a>
-                                    </dd>
-                                </dl>
-                            </Fragment>
-                        : null
+                        null
+                }
+
+                {
+                    this.props.location.quest_reward_item_id !== null ?
+                        <Fragment>
+                            <dl className='mb-4'>
+                                <dt>Quest Item (Gained on visiting)</dt>
+                                <dd>
+                                    <a href={"/information/item/" + this.props.location.quest_reward_item_id} target='_blank'>
+                                        {this.props.location.quest_reward_item.affix_name} <i
+                                        className="fas fa-external-link-alt"></i>
+                                    </a>
+                                </dd>
+                            </dl>
+                        </Fragment>
+                    : null
+                }
+
+                {
+                    this.props.location.required_quest_item_id !== null ?
+                        <Fragment>
+                            <WarningAlert>
+                                You cannot simply enter this location with out having the item below.
+                            </WarningAlert>
+                            <dl className='my-4'>
+                                <dt>Quest Item Required To Enter</dt>
+                                <dd>
+                                    <a href={"/information/item/" + this.props.location.required_quest_item_id} target='_blank'>
+                                        {this.props.location.required_quest_item_name} <i
+                                        className="fas fa-external-link-alt"></i>
+                                    </a>
+                                </dd>
+                            </dl>
+                        </Fragment>
+                    : null
                 }
 
                 {

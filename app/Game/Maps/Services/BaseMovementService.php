@@ -320,6 +320,14 @@ class BaseMovementService {
             return $this->mapTileValue->canWalkOnPurgatoryWater($character, $this->x, $this->y);
         }
 
+        if ($gameMap->mapType()->isTwistedMemories()) {
+            return $this->mapTileValue->canWalkOnTwistedMemoriesWater($character, $this->x, $this->y);
+        }
+
+        if ($gameMap->mapType()->isDelusionalMemories()) {
+            return $this->mapTileValue->canWalkOnDelusionalMemoriesWater($character, $this->x, $this->y);
+        }
+
         return true;
     }
 

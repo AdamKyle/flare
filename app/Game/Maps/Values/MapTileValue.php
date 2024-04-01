@@ -80,6 +80,10 @@ class MapTileValue {
         return in_array($color, [3096147]);
     }
 
+    public function isDelusionalMemoriesWater(int $color): bool {
+        return in_array($color, [112219255]);
+    }
+
     public function canWalk(Character $character, int $x, int $y) {
 
         if (!$this->canWalkOnWater($character, $x, $y)) {
@@ -238,11 +242,13 @@ class MapTileValue {
     public function canWalkOnDelusionalMemoriesWater(Character $character, int $x, int $y): bool {
         $color = $this->getTileColor($character, $x, $y);
 
-        dump($color);
+        if ($this->isDelusionalMemoriesWater($color)) {
+            return $character->inventory->slots->filter(function ($slot) {
+                return $slot->item->effect === ItemEffectsValue::WALK_ON_DELUSIONAL_MEMORIES_WATER;
+            })->isNotEmpty();
+        }
 
-        return $character->inventory->slots->filter(function ($slot) {
-            return $slot->item->effect === ItemEffectsValue::WALK_ON_DELUSIONAL_MEMORIES_WATER;
-        })->isNotEmpty();
+        return true;
     }
 
     /**

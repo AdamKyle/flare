@@ -110,18 +110,6 @@ export default class LocationModal extends React.Component<LocationModalPros, Lo
                             <dd>{this.state.distance}</dd>
                             <dt>Timeout (minutes):</dt>
                             <dd>{this.state.time_out}</dd>
-                            <dt>Required Item To Enter:</dt>
-                            <dd>
-                                {
-                                    this.props.location.required_quest_item_id !== null ?
-                                        <a href={"/information/item/" + this.props.location.required_quest_item_id} target='_blank'>
-                                            {this.props.location.required_quest_item_name} <i
-                                            className="fas fa-external-link-alt"></i>
-                                        </a>
-                                    :
-                                        'Requires No Item'
-                                }
-                            </dd>
                         </dl>
                     :
                         <WarningAlert>
