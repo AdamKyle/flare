@@ -3,7 +3,9 @@
 namespace App\Console\Commands;
 
 use App\Flare\Models\GameMap;
+use App\Flare\Models\Location;
 use App\Flare\Models\Monster;
+use App\Flare\Values\LocationType;
 use App\Game\Gems\Values\GemTypeValue;
 use Illuminate\Console\Command;
 use App\Flare\Values\MapNameValue;
@@ -46,9 +48,28 @@ class ReBalanceMonsters extends Command
                                ->where('is_raid_monster', false)
                                ->where('is_raid_boss', false)
                                ->where('is_celestial_entity', false)
+                               ->whereNull('only_for_location_type')
                                ->get();
 
             $this->manageMonsters($monsters, $exponentialAttributeCurve, 8, 2000000000, 100000, 500, $mapName);
+        }
+
+        $locations = Location::whereNotNull('type')->get();
+
+        foreach ($locations as $location) {
+            if ($location->type === LocationType::ALCHEMY_CHURCH) {
+
+                $gameMap  = GameMap::find($location->game_map_id);
+
+                $monsters = Monster::where('game_map_id', $gameMap->id)
+                    ->where('is_raid_monster', false)
+                    ->where('is_raid_boss', false)
+                    ->where('is_celestial_entity', false)
+                    ->where('only_for_location_type', $location->type)
+                    ->get();
+
+                $this->manageMonsters($monsters, $exponentialAttributeCurve, 100000000000, 400000000000, 1000000000, 500, $mapName);
+            }
         }
 
         // Purgatory Monsters:
@@ -58,6 +79,7 @@ class ReBalanceMonsters extends Command
                            ->where('is_raid_monster', false)
                            ->where('is_raid_boss', false)
                            ->where('is_celestial_entity', false)
+                           ->whereNull('only_for_location_type')
                            ->get();
 
         $this->manageMonsters($monsters, $exponentialAttributeCurve, 1000000, 4000000000, 100000, 500, MapNameValue::PURGATORY);
@@ -68,6 +90,7 @@ class ReBalanceMonsters extends Command
                            ->where('is_raid_monster', false)
                            ->where('is_raid_boss', false)
                            ->where('is_celestial_entity', false)
+                           ->whereNull('only_for_location_type')
                            ->get();
 
         $this->manageMonsters($monsters, $exponentialAttributeCurve, 5000000, 8000000000, 1000000, 5000, MapNameValue::ICE_PLANE);
@@ -78,6 +101,7 @@ class ReBalanceMonsters extends Command
             ->where('is_raid_monster', false)
             ->where('is_raid_boss', false)
             ->where('is_celestial_entity', false)
+            ->whereNull('only_for_location_type')
             ->get();
 
         $this->manageMonsters($monsters, $exponentialAttributeCurve, 10000000, 16000000000, 1000000, 5000, MapNameValue::TWISTED_MEMORIES);
@@ -88,6 +112,7 @@ class ReBalanceMonsters extends Command
             ->where('is_raid_monster', false)
             ->where('is_raid_boss', false)
             ->where('is_celestial_entity', false)
+            ->whereNull('only_for_location_type')
             ->get();
 
         $this->manageMonsters($monsters, $exponentialAttributeCurve, 50000000, 32000000000, 1000000, 5000, MapNameValue::DELUSIONAL_MEMORIES);
@@ -99,6 +124,7 @@ class ReBalanceMonsters extends Command
                             ->where('is_celestial_entity', false)
                             ->where('is_raid_monster', true)
                             ->where('is_raid_boss', false)
+                            ->whereNull('only_for_location_type')
                             ->get();
 
         $this->manageMonsters($monsters, $exponentialAttributeCurve, 4000000000, 8000000000, 100000, 500, $gameMap->name, true);
@@ -108,6 +134,7 @@ class ReBalanceMonsters extends Command
             ->where('is_celestial_entity', false)
             ->where('is_raid_monster', true)
             ->where('is_raid_boss', false)
+            ->whereNull('only_for_location_type')
             ->get();
 
         $this->manageMonsters($monsters, $exponentialAttributeCurve, 8000000000, 16000000000, 100000, 500, $gameMap->name, true);
@@ -117,6 +144,7 @@ class ReBalanceMonsters extends Command
             ->where('is_celestial_entity', false)
             ->where('is_raid_monster', true)
             ->where('is_raid_boss', false)
+            ->whereNull('only_for_location_type')
             ->get();
 
         $this->manageMonsters($monsters, $exponentialAttributeCurve, 16000000000, 32000000000, 100000, 500, $gameMap->name, true);

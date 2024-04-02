@@ -18,6 +18,7 @@ export default class RaidElementInfo extends React.Component<any, any> {
     }
 
     renderAtonementData() {
+        console.log(this.props);
         const dlElements = [];
 
         for (const key in this.props.element_atonements) {
@@ -26,7 +27,7 @@ export default class RaidElementInfo extends React.Component<any, any> {
             dlElements.push(
                 <>
                     <dd>{startCase(key)} {this.rnderHighestElementCheck(key)}:</dd>
-                    <dt>{value * 100}%</dt>
+                    <dt>{(value * 100).toFixed(0)}%</dt>
                 </>
             )
         }

@@ -2,6 +2,7 @@
 
 namespace App\Flare\ServerFight;
 
+use App\Flare\Models\Map;
 use App\Flare\ServerFight\Monster\ServerMonster;
 use Illuminate\Support\Facades\Cache;
 use App\Flare\Models\Character;
@@ -14,6 +15,7 @@ use App\Flare\ServerFight\Monster\BuildMonster;
 use App\Flare\Services\BuildMonsterCacheService;
 use App\Flare\Values\ItemEffectsValue;
 use App\Game\Core\Traits\ResponseBuilder;
+use App\Flare\Models\Location;
 
 class MonsterPlayerFight {
 
@@ -121,7 +123,7 @@ class MonsterPlayerFight {
      */
     public function setUpFight(Character $character, array $params): MonsterPlayerFight|array {
         $this->character = $character;
-        $this->monster   = $this->fetchMonster($character->map->gameMap->name, $params['selected_monster_id']);
+        $this->monster   = $this->fetchMonster($character->map, $params['selected_monster_id']);
         $this->attackType = $params['attack_type'];
 
         if (empty($this->monster)) {
@@ -132,32 +134,11 @@ class MonsterPlayerFight {
     }
 
     /**
-     * Set up the rank fight.
-     *
-     * @param Character $character
-     * @param int $monsterId
-     * @param int $rank
-     * @return array|$this
-     */
-    public function setUpRankFight(Character $character, int $monsterId, int $rank): MonsterPlayerFight|array {
-
-        $rankMonster = $this->fetchRankMonster($monsterId, $rank);
-
-        if (is_null($rankMonster)) {
-            return $this->errorResult('No monster was found.');
-        }
-
-        $this->character = $character;
-        $this->monster   = $rankMonster;
-
-        return $this;
-    }
-
-    /**
      * Setup  the raid fight
      *
      * @param Character $character
      * @param array $raidMonster
+     * @param string $attackType
      * @return MonsterPlayerFight
      */
     public function setUpRaidFight(Character $character, array $raidMonster, string $attackType): MonsterPlayerFight {
@@ -292,11 +273,21 @@ class MonsterPlayerFight {
         $this->mergeMessages($this->ambush->getMessages());
 
 
+        $elementalAtonement = $monster->getElementData();
+        $highestElement = $monster->getHighestElementName($elementalAtonement, $monster->getHighestElementDamage($elementalAtonement));
+
+        $monster = $monster->getMonster();
+
+        if (!empty($elementalAtonement)) {
+            $monster['elemental_atonement'] = $elementalAtonement;
+            $monster['highest_element']    = $highestElement;
+        }
+
         $data = [
             'health'                => $health,
             'player_voided'         => $isPlayerVoided,
             'enemy_voided'          => $isEnemyVoided,
-            'monster'               => $monster->getMonster(),
+            'monster'               => $monster,
             'opening_messages'      => $this->getBattleMessages(),
             'rank'                  => $rank,
         ];
@@ -427,22 +418,29 @@ class MonsterPlayerFight {
     /**
      * Fetch the monster.
      *
-     * @param string $mapName
+     * @param Map $map
      * @param int $monsterId
      * @return array
      */
-    protected function fetchMonster(string $mapName, int $monsterId): array {
+    protected function fetchMonster(Map $map, int $monsterId): array {
 
-        $regularMonster = $this->fetchRegularMonster($mapName, $monsterId);
+        $regularMonster = $this->fetchRegularMonster($map, $monsterId);
 
         if (!is_null($regularMonster)) {
             return $regularMonster;
         }
 
-        $celestial = $this->fetchCelestial($mapName, $monsterId);
+        $celestial = $this->fetchCelestial($map, $monsterId);
 
         if (!is_null($celestial)) {
             return $celestial;
+        }
+
+        $locationBasedMonster = $this->fetchLocationTypeSpecialMonster($map, $monsterId);
+
+        if (!is_null($locationBasedMonster)) {
+
+            return $locationBasedMonster;
         }
 
         return [];
@@ -451,14 +449,16 @@ class MonsterPlayerFight {
     /**
      * Fetches a regular monster.
      *
-     * @param string $mapName
+     * @param Map $map
      * @param int $monsterId
      * @return array|null
      */
-    protected function fetchRegularMonster(string $mapName, int $monsterId): array|null {
+    protected function fetchRegularMonster(Map $map, int $monsterId): array|null {
         if (!Cache::has('monsters')) {
             resolve(BuildMonsterCacheService::class)->buildCache();
         }
+
+        $mapName = $map->gameMap->name;
 
         $monsters = Cache::get('monsters')[$mapName];
 
@@ -498,14 +498,16 @@ class MonsterPlayerFight {
     /**
      * Fetches a celestial.
      *
-     * @param string $mapName
+     * @param Map $map
      * @param int $monsterId
      * @return array|null
      */
-    protected function fetchCelestial(string $mapName, int $monsterId): array|null {
+    protected function fetchCelestial(Map $map, int $monsterId): array|null {
         if (!Cache::has('celestials')) {
             resolve(BuildMonsterCacheService::class)->buildCelesetialCache();
         }
+
+        $mapName = $map->gameMap->name;
 
         $monsters = Cache::get('celestials')[$mapName];
 
@@ -519,22 +521,33 @@ class MonsterPlayerFight {
     }
 
     /**
-     * Fetch Rank Monster.
+     * Fetch monster for a special location.
      *
+     * @param Map $map
      * @param int $monsterId
-     * @param int $rank
      * @return array|null
      */
-    protected function fetchRankMonster(int $monsterId, int $rank): array|null {
-        if (!Cache::has('rank-monsters')) {
-            resolve(BuildMonsterCacheService::class)->createRankMonsters();
+    protected function fetchLocationTypeSpecialMonster(Map $map, int $monsterId): array | null {
+
+        $locationWithType = Location::whereNotNull('type')
+            ->where('x', $map->character_position_x)
+            ->where('y', $map->character_position_y)
+            ->where('game_map_id', $map->game_map_id)
+            ->first();
+
+        if (is_null($locationWithType)) {
+            return null;
         }
 
-        $monsters = Cache::get('rank-monsters')[$rank];
+        $monstersForLocation = Cache::get('special-location-monsters');
 
-        foreach ($monsters as $monster) {
-            if ($monster['id'] === $monsterId) {
-                return $monster;
+        if (isset($monstersForLocation['location-type-' . $locationWithType->type])) {
+            $monsters = $monstersForLocation['location-type-' . $locationWithType->type];
+
+            foreach ($monsters as $monster) {
+                if ($monster['id'] === $monsterId) {
+                    return $monster;
+                }
             }
         }
 
@@ -547,7 +560,7 @@ class MonsterPlayerFight {
      * @param array $messages
      * @return void
      */
-    protected function mergeMessages(array $messages) {
+    protected function mergeMessages(array $messages): void {
         $this->battleMessages = array_merge($this->battleMessages, $messages);
     }
 
@@ -557,7 +570,7 @@ class MonsterPlayerFight {
      * @param array $array
      * @return void
      */
-    protected function removeDuplicateMessages(array &$array) {
+    protected function removeDuplicateMessages(array &$array): void {
         $uniqueMessages = [];
 
         $array = array_reduce($array, function ($result, $item) use (&$uniqueMessages) {

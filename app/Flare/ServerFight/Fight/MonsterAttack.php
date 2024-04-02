@@ -105,7 +105,9 @@ class MonsterAttack extends BattleBase {
             $specialAttackType = $monster->getMonsterStat('raid_special_attack_type');
             $damageStatAmount  = $monster->getMonsterStat($monster->getMonsterStat('damage_stat'));
 
-            $monsterSpecialAttack->doSpecialAttack($specialAttackType, $damageStatAmount, $ac);
+            if (!is_null($specialAttackType)) {
+                $monsterSpecialAttack->doSpecialAttack($specialAttackType, $damageStatAmount, $ac);
+            }
 
             $this->characterHealth = $monsterSpecialAttack->getCharacterHealth();
             $this->monsterHealth   = $monsterSpecialAttack->getMonsterHealth();

@@ -87,7 +87,17 @@ class BuildMonster extends BattleMessages {
     }
 
     protected function reduceEnemySkills(array $monster, float $skillReduction): array {
+
+        if (!is_null($monster['only_for_location_type'])) {
+            $skillReduction = $skillReduction / 2;
+        }
+
         if ($skillReduction > 0.0) {
+
+            $monster['accuracy']         = $monster['accuracy'] - $skillReduction;
+            $monster['casting_accuracy'] = $monster['casting_accuracy'] - $skillReduction;
+            $monster['dodge']            = $monster['dodge'] - $skillReduction;
+            $monster['criticality']      = $monster['criticality'] - $skillReduction;
 
             if ($monster['accuracy'] <= 0) {
                 $monster['accuracy'] = 0.0;
@@ -112,6 +122,10 @@ class BuildMonster extends BattleMessages {
     }
 
     protected function reduceResistances(array $monster, float $resistanceReduction): array {
+
+        if (!is_null($monster['only_for_location_type'])) {
+            $resistanceReduction = $resistanceReduction / 2;
+        }
 
         if ($resistanceReduction > 0.0) {
             $monster['spell_evasion']             = $monster['spell_evasion'] - $resistanceReduction;
@@ -150,13 +164,19 @@ class BuildMonster extends BattleMessages {
         }
 
         if ($this->canMonsterHaveStatsReduced($monster, $resistanceReduction, $characterStatReductionAffixes['cant_be_resisted'])) {
-            $monster['str']   = ceil($monster['str'] - $monster['str'] * $allStatReduction['str_reduction']);
-            $monster['int']   = ceil($monster['int'] - $monster['int'] * $allStatReduction['int_reduction']);
-            $monster['dex']   = ceil($monster['dex'] - $monster['dex'] * $allStatReduction['dex_reduction']);
-            $monster['dur']   = ceil($monster['dur'] - $monster['dur'] * $allStatReduction['dur_reduction']);
-            $monster['agi']   = ceil($monster['agi'] - $monster['agi'] * $allStatReduction['agi_reduction']);
-            $monster['chr']   = ceil($monster['chr'] - $monster['chr'] * $allStatReduction['chr_reduction']);
-            $monster['focus'] = ceil($monster['focus'] - $monster['focus'] * $allStatReduction['focus_reduction']);
+
+            $stats = ['str', 'int', 'dex', 'dur', 'agi', 'chr', 'focus'];
+
+            foreach ($stats as $stat) {
+                if (!is_null($monster['only_for_location_type'])) {
+
+                    $reduction = $allStatReduction[$stat . '_reduction'] / 2;
+                } else {
+                    $reduction = $allStatReduction[$stat . '_reduction'];
+                }
+
+                $monster[$stat] = ceil($monster['str'] - $monster['str'] * $reduction);
+            }
 
             return $monster;
         }
@@ -174,6 +194,11 @@ class BuildMonster extends BattleMessages {
             $maxResistance  = max(array_column($statReduction, 'resistance_reduction'));
 
             if ($this->canMonsterHaveStatsReduced($monster, $maxResistance, $statReduction['cant_be_resisted'])) {
+
+                if (!is_null($monster['only_for_location_type'])) {
+                    $sumOfReduction = $sumOfReduction / 2;
+                }
+
                 $monster[$stat] = ceil($monster[$stat] - $monster[$stat] * $sumOfReduction);
 
                 if ($monster[$stat] <= 0) {

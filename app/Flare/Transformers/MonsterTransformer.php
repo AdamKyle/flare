@@ -80,6 +80,7 @@ class MonsterTransformer extends TransformerAbstract {
             'water_atonement'           => $monster->water_atonement,
             'life_stealing_resistance'  => $monster->life_stealing_resistance,
             'raid_special_attack_type'  => $monster->raid_special_attack_type,
+            'only_for_location_type'    => $monster->only_for_location_type,
         ];
     }
 

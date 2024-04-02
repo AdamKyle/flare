@@ -74,7 +74,7 @@ class BattleRewardService {
 
         $this->character = $this->characterRewardService->getCharacter();
 
-        $this->goldRush->processPotentialGoldRush($this->character, $this->monster);
+        $this->goldRush->processPotentialGoldRush($this->character);
 
         $this->handleGlobalEventGoals();
 

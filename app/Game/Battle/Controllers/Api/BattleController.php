@@ -30,6 +30,7 @@ class BattleController extends Controller {
 
     /**
      * @param MonsterFightService $monsterFightService
+     * @param BattleEventHandler $battleEventHandler
      */
     public function __construct(MonsterFightService $monsterFightService, BattleEventHandler $battleEventHandler) {
         $this->middleware('is.character.dead')->except(['revive', 'index']);
@@ -52,6 +53,12 @@ class BattleController extends Controller {
             ->where('game_map_id', $characterMap->game_map_id)
             ->first();
 
+        $locationWithType = Location::whereNotNull('type')
+            ->where('x', $characterMap->character_position_x)
+            ->where('y', $characterMap->character_position_y)
+            ->where('game_map_id', $characterMap->game_map_id)
+            ->first();
+
         if (!Cache::has('monsters')) {
             resolve(BuildMonsterCacheService::class)->buildCache();
         }
@@ -60,6 +67,7 @@ class BattleController extends Controller {
         $isDelusionalMemories = $character->map->gameMap->mapType()->isDelusionalMemories();
         $hasPurgatoryAccess   = $character->inventory->slots->where('item.effect', ItemEffectsValue::PURGATORY)->count() > 0;
         $monsters             = Cache::get('monsters')[$character->map->gameMap->name];
+
 
         if (!is_null($locationWithEffect) && !$isTheIcePlane) {
             $monsters = Cache::get('monsters')[$locationWithEffect->name];
@@ -84,6 +92,14 @@ class BattleController extends Controller {
             $monsters = Cache::get('monsters')[$character->map->gameMap->name]['easier'];
         }
 
+        if (!is_null($locationWithType)) {
+            $monstersForLocation = Cache::get('special-location-monsters');
+
+            if (isset($monstersForLocation['location-type-' . $locationWithType->type])) {
+                $monsters = $monstersForLocation['location-type-' . $locationWithType->type];
+            }
+        }
+
         event(new UpdateCharacterStatus($character));
 
         $monsters = collect($monsters);
@@ -99,6 +115,7 @@ class BattleController extends Controller {
     }
 
     /**
+     * @param AttackTypeRequest $attackTypeRequest
      * @param Character $character
      * @param Monster $monster
      * @return JsonResponse
