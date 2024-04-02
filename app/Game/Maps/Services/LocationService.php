@@ -44,9 +44,9 @@ class LocationService {
     private UpdateCharacterAttackTypes $updateCharacterAttackTypes;
 
     /**
-     * @var Location $location | null
+     * @var ?Location $location | null
      */
-    private Location $location;
+    private ?Location $location;
 
     /**
      * @var bool $canSettle | false
