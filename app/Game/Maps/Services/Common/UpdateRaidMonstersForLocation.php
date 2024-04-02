@@ -38,6 +38,10 @@ trait UpdateRaidMonstersForLocation {
             return;
         }
 
+        if ($this->updateMonsterForLocationType($character, $location)) {
+            return;
+        }
+
         if (!is_null($location)) {
             if (!is_null($location->enemy_strength_type)) {
                 $locationMonsters = Cache::get('monsters')[$location->name];
@@ -103,5 +107,31 @@ trait UpdateRaidMonstersForLocation {
         }
 
         return false;
+    }
+
+    /**
+     * Update the monsters list for a special location type, if it has monsters.
+     *
+     * @param Character $character
+     * @param Location|null $location
+     * @return bool
+     */
+    protected function updateMonsterForLocationType(Character $character, ?Location $location = null): bool {
+        if (is_null($location)) {
+            return false;
+        }
+
+        $cache = Cache::get('special-location-monsters');
+
+        if (!isset($cache['location-type-' . $location->type])) {
+            return false;
+        }
+
+        $monsters = $cache['location-type-' . $location->type];
+
+        event(new UpdateMonsterList($monsters, $character->user));
+        event(new UpdateRaidMonsters([], $character->user));
+
+        return true;
     }
 }

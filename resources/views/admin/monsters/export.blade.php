@@ -39,6 +39,14 @@
                         Export Raid Bosses
                     </x-core.buttons.primary-button>
                 </form>
+
+                <form method="POST" action="{{ route('monsters.export-data') }}" class="text-center">
+                    @csrf
+                    <input type="hidden" value="special_locations" name="monster_type" />
+                    <x-core.buttons.primary-button type="submit">
+                        Special Location Monsters
+                    </x-core.buttons.primary-button>
+                </form>
             </div>
         </x-core.cards.card-with-title>
     </x-core.layout.info-container>

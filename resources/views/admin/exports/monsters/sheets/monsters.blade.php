@@ -50,6 +50,7 @@
         <th>is_raid_boss</th>
         <th>raid_special_attack_type</th>
         <th>life_stealing_resistance</th>
+        <th>only_for_location_type</th>
     </tr>
     </thead>
     <tbody>
@@ -104,6 +105,7 @@
             <td>{{$monster->is_raid_boss}}</td>
             <td>{{$monster->raid_special_attack_type}}</td>
             <td>{{$monster->life_stealing_resistance}}</td>
+            <td>{{$monster->only_for_location_type}}</td>
         </tr>
     @endforeach
     </tbody>

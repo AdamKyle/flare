@@ -2,6 +2,8 @@
 
 namespace App\Flare\Values;
 
+use Exception;
+
 class LocationType {
 
     /**
@@ -16,6 +18,7 @@ class LocationType {
     const TEAR_FABRIC_TIME      = 4;
     const THE_OLD_CHURCH        = 5;
     const TWISTED_GATE          = 6;
+    const ALCHEMY_CHURCH        = 7;
 
     protected static $values = [
         0 => self::PURGATORY_SMITH_HOUSE,
@@ -25,6 +28,7 @@ class LocationType {
         4 => self::TEAR_FABRIC_TIME,
         5 => self::THE_OLD_CHURCH,
         6 => self::TWISTED_GATE,
+        7 => self::ALCHEMY_CHURCH,
     ];
 
     /**
@@ -37,7 +41,8 @@ class LocationType {
         self::UNDERWATER_CAVES      => 'Underwater Caves',
         self::TEAR_FABRIC_TIME      => 'Tear in the fabrice of time',
         self::THE_OLD_CHURCH        => 'The Old Church',
-        self::TWISTED_GATE          => 'The Twisted Gate'
+        self::TWISTED_GATE          => 'The Twisted Gate',
+        self::ALCHEMY_CHURCH        => 'Alchemy Church',
     ];
 
     /**
@@ -46,13 +51,13 @@ class LocationType {
      * Throws if the value does not exist in the array of const values.
      *
      * @param int $value
-     * @throws \Exception
+     * @throws Exception
      */
     public function __construct(int $value)
     {
 
         if (!in_array($value, self::$values)) {
-            throw new \Exception($value . ' does not exist.');
+            throw new Exception($value . ' does not exist.');
         }
 
         $this->value = $value;
@@ -114,5 +119,14 @@ class LocationType {
      */
     public function isTwistedGate(): bool {
         return $this->value === self::TWISTED_GATE;
+    }
+
+    /**
+     * Are we at the alchemy church?
+     *
+     * @return bool
+     */
+    public function isAlchemyChurch(): bool {
+        return $this->value === self::ALCHEMY_CHURCH;
     }
 }

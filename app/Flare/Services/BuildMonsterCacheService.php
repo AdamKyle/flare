@@ -53,6 +53,7 @@ class BuildMonsterCacheService {
                 Monster::where('is_celestial_entity', false)
                     ->where('is_raid_monster', false)
                     ->where('is_raid_boss', false)
+                    ->whereNull('only_for_location_type')
                     ->where('game_map_id', $gameMap->id)
                     ->get(),
                 $this->monster
@@ -89,12 +90,14 @@ class BuildMonsterCacheService {
                 ->where('is_raid_monster', true)
                 ->where('is_raid_boss', false)
                 ->where('game_map_id', $gameMap->id)
+                ->whereNull('only_for_location_type')
                 ->get();
 
             $raidBosses = Monster::where('is_celestial_entity', false)
                 ->where('is_raid_monster', false)
                 ->where('is_raid_boss', true)
                 ->where('game_map_id', $gameMap->id)
+                ->whereNull('only_for_location_type')
                 ->get();
 
 
@@ -110,6 +113,35 @@ class BuildMonsterCacheService {
         $monstersCache = $monstersCache + $this->manageMonsters($monstersCache);
 
         Cache::put('raid-monsters', $monstersCache);
+    }
+
+    /**
+     * Build special location monsters
+     *
+     * @return void
+     */
+    public function buildSpecialLocationMonsterList(): void {
+        $locations = Location::whereNotNull('type')->get();
+
+        $cache = [];
+
+        foreach ($locations as $location) {
+
+            $this->monster = $this->monster->setIsMonsterSpecial(true);
+
+            $monsters =  new Collection(
+                Monster::where('is_celestial_entity', false)
+                    ->where('is_raid_monster', false)
+                    ->where('is_raid_boss', false)
+                    ->where('only_for_location_type', $location->type)
+                    ->get(),
+                $this->monster
+            );
+
+            $cache['location-type-' . $location->type] = $this->manager->createData($monsters)->toArray();
+        }
+
+        Cache::put('special-location-monsters', $cache);
     }
 
     /**
@@ -129,6 +161,7 @@ class BuildMonsterCacheService {
             $monsters =  new Collection(
                 Monster::where('is_celestial_entity', true)
                     ->where('game_map_id', $gameMap->id)
+                    ->whereNull('only_for_location_type')
                     ->get(),
                 $this->monster
             );

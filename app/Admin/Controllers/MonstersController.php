@@ -8,6 +8,7 @@ use App\Flare\Models\Item;
 use App\Flare\Services\BuildMonsterCacheService;
 use App\Flare\Traits\Controllers\MonstersShowInformation;
 use App\Flare\Values\CelestialType;
+use App\Flare\Values\LocationType;
 use App\Flare\Values\RaidAttackTypesValue;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Http\Controllers\Controller;
@@ -49,6 +50,7 @@ class MonstersController extends Controller {
             'questItems'     => Item::where('type', 'quest')->get(),
             'celestialTypes' => CelestialType::getNamedValues(),
             'specialAttacks' => RaidAttackTypesValue::$attackTypeNames,
+            'locationTypes'  => LocationType::getNamedValues(),
         ]);
     }
 
@@ -59,6 +61,7 @@ class MonstersController extends Controller {
             'questItems'     => Item::where('type', 'quest')->get(),
             'celestialTypes' => CelestialType::getNamedValues(),
             'specialAttacks' => RaidAttackTypesValue::$attackTypeNames,
+            'locationTypes'  => LocationType::getNamedValues(),
         ]);
     }
 

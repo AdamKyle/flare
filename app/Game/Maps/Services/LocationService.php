@@ -46,12 +46,12 @@ class LocationService {
     /**
      * @var Location $location | null
      */
-    private $location;
+    private Location $location;
 
     /**
      * @var bool $canSettle | false
      */
-    private $canSettle = false;
+    private bool $canSettle = false;
 
     /**
      * @param CoordinatesCache $coordinatesCache
@@ -68,6 +68,7 @@ class LocationService {
      * Get location data
      *
      * @param Character $character
+     * @param Raid|null $raid
      * @return array
      */
     public function getLocationData(Character $character, ?Raid $raid = null): array {
@@ -95,7 +96,13 @@ class LocationService {
         ];
     }
 
-    public function locationBasedEvents(Character $character) {
+    /**
+     * Fire off location based events.
+     *
+     * @param Character $character
+     * @return void
+     */
+    public function locationBasedEvents(Character $character): void {
         $this->processLocation($character);
 
         // In case automation is running, this way the timer updates.
@@ -118,6 +125,8 @@ class LocationService {
 
         // Update monsters for a possible raid at a possible location
         $this->updateMonstersForRaid($character, $this->location);
+
+        $this->updateMonsterForLocationType($character, $this->location);
     }
 
     /**

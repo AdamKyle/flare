@@ -42,6 +42,10 @@
                                 <x-core.forms.check-box :model="$monster" label="(or) Is Raid Monster?" modelKey="is_raid_monster" name="is_raid_monster" />
                                 <x-core.forms.key-value-select :model="$monster" label="Special Raid Attack Type:" modelKey="raid_special_attack_type" name="raid_special_attack_type" :options="$specialAttacks" />
                                 <x-core.forms.input :model="$monster" label="Life Stealing Resistance:" modelKey="life_stealing_resistance" name="life_stealing_resistance" />
+                                <h3>Belongs to specific location? (Optional)</h3>
+                                <p>This monster can only be fought at a specific location which shares the same selected type as below.</p>
+                                <x-core.forms.key-value-select :model="$monster" label="Only For Location Type:" modelKey="only_for_location_type"
+                                                               name="only_for_location_type" :options="$locationTypes" />
                             </div>
                             <div class='border-b-2 block md:hidden border-b-gray-300 dark:border-b-gray-600 my-6'></div>
                             <div>

@@ -21,8 +21,6 @@ class MonstersSheet implements FromView, WithTitle, ShouldAutoSize {
      */
     public function view(): View {
 
-        $monsters = collect();
-
         switch($this->type) {
             case 'celestial':
                 $monsters = Monster::orderBy('game_map_id')
@@ -30,6 +28,7 @@ class MonstersSheet implements FromView, WithTitle, ShouldAutoSize {
                                    ->where('is_celestial_entity', true)
                                    ->where('is_raid_monster', false)
                                    ->where('is_raid_boss', false)
+                                   ->whereNull('only_for_location_type')
                                    ->get();
                 break;
             case 'raid_monster':
@@ -37,6 +36,7 @@ class MonstersSheet implements FromView, WithTitle, ShouldAutoSize {
                                    ->where('is_celestial_entity', false)
                                    ->where('is_raid_monster', true)
                                    ->where('is_raid_boss', false)
+                                   ->whereNull('only_for_location_type')
                                    ->get();
                 break;
             case 'raid_boss':
@@ -44,7 +44,16 @@ class MonstersSheet implements FromView, WithTitle, ShouldAutoSize {
                                    ->where('is_celestial_entity', false)
                                    ->where('is_raid_monster', false)
                                    ->where('is_raid_boss', true)
+                                   ->whereNull('only_for_location_type')
                                    ->get();
+                break;
+            case 'special_locations':
+                $monsters = Monster::orderBy('game_map_id')
+                                    ->where('is_celestial_entity', false)
+                                    ->where('is_raid_monster', false)
+                                    ->where('is_raid_boss', false)
+                                    ->whereNotNull('only_for_location_type')
+                                    ->get();
                 break;
             case 'monster':
             default:
@@ -52,6 +61,7 @@ class MonstersSheet implements FromView, WithTitle, ShouldAutoSize {
                                    ->where('is_celestial_entity', false)
                                    ->where('is_raid_monster', false)
                                    ->where('is_raid_boss', false)
+                                   ->whereNull('only_for_location_type')
                                    ->get();
 
         }

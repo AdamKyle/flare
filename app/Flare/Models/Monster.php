@@ -64,6 +64,7 @@ class Monster extends Model {
         'ice_atonement',
         'water_atonement',
         'life_stealing_resistance',
+        'only_for_location_type',
     ];
 
     /**
@@ -113,6 +114,7 @@ class Monster extends Model {
         'is_raid_boss'              => 'boolean',
         'raid_special_attack_type'  => 'integer',
         'life_stealing_resistance'  => 'float',
+        'only_for_location_type'    => 'integer',
     ];
 
     public function questItem() {
