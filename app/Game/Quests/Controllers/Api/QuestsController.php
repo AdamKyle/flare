@@ -33,6 +33,7 @@ class QuestsController extends Controller {
             'raid_quests'      => $this->buildQuestCacheService->fetchQuestsForRaid($eventWithRaid),
             'player_plane'     => $character->map->gameMap->name,
             'is_winter_event'  => Event::where('type', EventType::WINTER_EVENT)->count() > 0,
+            'is_delusional_memories' => Event::where('type', EventType::DELUSIONAL_MEMORIES_EVENT)->count() > 0,
         ]);
     }
 

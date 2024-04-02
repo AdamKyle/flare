@@ -61,6 +61,10 @@ class ScheduledEvent extends Model {
             return 'The Ice Queen\'s Realm';
         }
 
+        if ($type->isDelusionalMemoriesEvent()) {
+            return 'Delusional Memories Event';
+        }
+
         return 'Event Name';
     }
 

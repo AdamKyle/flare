@@ -1,9 +1,16 @@
 import React, { Fragment } from "react";
+import DateTimePicker from 'react-datetime-picker';
 import Select from "react-select";
 import { setHours, setMinutes } from "date-fns";
 import EventSchedulerFormState from "../types/components/event-scheduler-form-state";
 import EventSchedulerFormProps from "../types/components/event-scheduler-form-props";
 import EventType from "../values/EventType";
+import {Value} from "react-datetime-picker/src/shared/types";
+
+// Styles for the date picker:
+import 'react-datetime-picker/dist/DateTimePicker.css';
+import 'react-calendar/dist/Calendar.css';
+import 'react-clock/dist/Clock.css';
 
 export default class EventSchedulerForm extends React.Component<
     EventSchedulerFormProps,
@@ -69,10 +76,10 @@ export default class EventSchedulerForm extends React.Component<
         );
     }
 
-    setStartDate(date: Date) {
+    setStartDate(value: Value) {
         this.setState(
             {
-                selected_start_date: date,
+                selected_start_date: value as Date,
             },
             () => {
                 this.props.update_parent(this.state);
@@ -80,10 +87,10 @@ export default class EventSchedulerForm extends React.Component<
         );
     }
 
-    setEndDate(date: Date) {
+    setEndDate(value: Value) {
         this.setState(
             {
-                selected_end_date: date,
+                selected_end_date: value as Date,
             },
             () => {
                 this.props.update_parent(this.state);
@@ -258,14 +265,14 @@ export default class EventSchedulerForm extends React.Component<
                         <div className="my-3 dark:text-gray-300">
                             <strong>Start Date (and time)</strong>
                         </div>
-                        Missing Date Picker
+                        <DateTimePicker onChange={this.setStartDate.bind(this)} value={this.state.selected_start_date} />
                     </div>
 
                     <div className="my-4">
                         <div className="my-3 dark:text-gray-300">
                             <strong>End Date (and time)</strong>
                         </div>
-                        Missing Date Picker
+                        <DateTimePicker onChange={this.setEndDate.bind(this)} value={this.state.selected_end_date} />
                     </div>
                 </div>
 

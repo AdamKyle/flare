@@ -11,4 +11,6 @@ export default interface QuestType {
     player_plane: string;
 
     is_winter_event: boolean;
+
+    is_delusional_memories: boolean;
 }

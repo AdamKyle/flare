@@ -66,6 +66,7 @@
         "random-js-no-node": "^2.1.0-b",
         "react-charts": "^3.0.0-beta.30",
         "react-data-table-component": "^7.5.0",
+        "react-datetime-picker": "^5.6.0",
         "react-draggable": "^4.1.0",
         "react-organizational-chart": "^2.1.0",
         "react-resizable": "^3.0.4",

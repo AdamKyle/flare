@@ -179,9 +179,11 @@ export default class Actions extends React.Component<
         }
 
         if (this.props.action_data.monsters != this.state.monsters) {
-            this.setState({
-                monsters: this.props.action_data.monsters,
-            });
+            if (this.props.action_data.monsters.length > 0) {
+                this.setState({
+                    monsters: this.props.action_data.monsters,
+                });
+            }
         }
 
         if (this.props.action_data.raid_monsters != this.state.raid_monsters) {

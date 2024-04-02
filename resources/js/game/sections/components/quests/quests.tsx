@@ -89,6 +89,14 @@ export default class Quests extends React.Component<QuestsProps, QuestState> {
             });
         }
 
+        if (this.props.quest_details.is_delusional_memories) {
+            planes.push({
+                name: "Delusional Memories",
+                on_click: this.setPlaneForQuests.bind(this),
+                icon_class: "ra ra-footprint",
+            });
+        }
+
         return planes;
     }
 
