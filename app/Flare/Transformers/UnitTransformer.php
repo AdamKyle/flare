@@ -2,6 +2,7 @@
 
 namespace App\Flare\Transformers;
 
+use App\Flare\Models\Kingdom;
 use Exception;
 use League\Fractal\TransformerAbstract;
 use App\Flare\Models\GameUnit;

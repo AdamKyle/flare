@@ -16,6 +16,8 @@ export default interface InventoryDetails extends DataTableBaseData {
 
     is_mythic: boolean;
 
+    is_cosmic: boolean;
+
     item_name: string;
 
     description: string;

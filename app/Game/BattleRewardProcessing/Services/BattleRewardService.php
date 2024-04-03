@@ -31,6 +31,7 @@ class BattleRewardService {
     private GoldMinesRewardHandler $goldMinesRewardHandler;
     private FactionLoyaltyBountyHandler $factionLoyaltyBountyHandler;
     private TheOldChurchRewardHandler $theOldChurchRewardHandler;
+    private WeeklyBattleService $weeklyBattleService;
 
     public function __construct(
         FactionHandler                        $factionHandler,
@@ -41,6 +42,7 @@ class BattleRewardService {
         GoldMinesRewardHandler                $goldMinesRewardHandler,
         FactionLoyaltyBountyHandler           $factionLoyaltyBountyHandler,
         TheOldChurchRewardHandler             $theOldChurchRewardHandler,
+        WeeklyBattleService                   $weeklyBattleService,
     ) {
         $this->factionHandler                   = $factionHandler;
         $this->characterRewardService           = $characterRewardService;
@@ -50,6 +52,7 @@ class BattleRewardService {
         $this->goldMinesRewardHandler           = $goldMinesRewardHandler;
         $this->factionLoyaltyBountyHandler      = $factionLoyaltyBountyHandler;
         $this->theOldChurchRewardHandler        = $theOldChurchRewardHandler;
+        $this->weeklyBattleService              = $weeklyBattleService;
     }
 
     public function setUp(Monster $monster, Character $character): BattleRewardService {
@@ -87,6 +90,8 @@ class BattleRewardService {
         $character = $this->theOldChurchRewardHandler->handleFightingAtTheOldChurch($character, $this->monster);
 
         $character = $this->factionLoyaltyBountyHandler->handleBounty($character, $this->monster);
+
+        $character = $this->weeklyBattleService->handleWeeklyBattle($character, $this->monster);
 
         BattleItemHandler::dispatch($character, $this->monster);
     }

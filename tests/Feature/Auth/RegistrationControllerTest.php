@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Auth;
 
+use App\Flare\Models\Character;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\GameRace;
@@ -128,10 +129,6 @@ class RegistrationControllerTest extends TestCase
 
 
     public function testCannotRegisterWhenNoMap() {
-
-        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
-        GameMap::truncate();
-        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
         $race  = $this->createRace([
             'dex_mod' => 2,

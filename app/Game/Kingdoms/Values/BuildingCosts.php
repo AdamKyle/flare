@@ -23,7 +23,7 @@ class BuildingCosts
     const BLACKSMITHS_FURNACE  = 'Blacksmith\'s Furnace';
     const AIRSHIP_FIELDS       = 'Airship Fields';
 
-    protected static $values = [
+    public static $values = [
         self::KEEP                => self::KEEP,
         self::FARM                => self::FARM,
         self::LUMBER_MILL         => self::LUMBER_MILL,

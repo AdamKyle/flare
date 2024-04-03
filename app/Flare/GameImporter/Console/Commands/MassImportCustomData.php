@@ -2,7 +2,12 @@
 
 namespace App\Flare\GameImporter\Console\Commands;
 
+use App\Flare\Models\Event;
+use App\Flare\Models\FactionLoyalty;
 use App\Flare\Models\GameMap;
+use App\Flare\Models\GlobalEventGoal;
+use App\Flare\Models\GlobalEventKill;
+use App\Flare\Models\GlobalEventParticipation;
 use App\Flare\Models\InfoPage;
 use App\Flare\Values\MapNameValue;
 use App\Game\Events\Values\EventType;
@@ -44,6 +49,23 @@ class MassImportCustomData extends Command {
         Artisan::call('import:game-data Monsters');
         Artisan::call('import:game-data Locations');
         Artisan::call('import:game-data Npcs');
+
+        //Clean up previous events
+        GlobalEventGoal::truncate();
+        GlobalEventKill::truncate();
+        GlobalEventParticipation::truncate();
+
+        $factionLoyaties = FactionLoyalty::where('faction_id', GameMap::where('name', MapNameValue::ICE_PLANE))->get();
+
+        foreach ($factionLoyaties as $factionLoyaty) {
+            $factionLoyaty->factionLoyaltyNpcs()->update([
+                'currently_helping' => false,
+            ]);
+        }
+
+        $factionLoyaties->update([
+            'is_pledged' => false,
+        ]);
 
         Artisan::call('import:game-data Quests');
 

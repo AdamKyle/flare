@@ -232,8 +232,6 @@ class ClassRanksServiceTest extends TestCase {
 
         $response = $this->classRankService->equipSpecialty($character, $classSpecial);
 
-        // dump($response);
-
         $this->assertEquals(200, $response['status']);
         $this->assertEquals('Equipped class special: ' . $classSpecial->name, $response['message']);
         $this->assertNotEmpty($response['specials_equipped']);

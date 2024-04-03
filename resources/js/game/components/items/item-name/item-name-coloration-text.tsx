@@ -26,6 +26,14 @@ export default class ItemNameColorationText extends React.Component<ItemNameColo
     getColorClassFromType() {
         const item = this.props.item;
 
+        if (item.is_cosmic) {
+            return 'text-cosmic-colors-700 dark:text-cosmic-colors-600'
+        }
+
+        if (item.is_mythic) {
+            return 'text-amber-600 dark:text-amber-500'
+        }
+
         if (item.is_mythic) {
             return 'text-amber-600 dark:text-amber-500'
         }

@@ -9,10 +9,12 @@ use App\Game\BattleRewardProcessing\Handlers\FactionHandler;
 use App\Game\BattleRewardProcessing\Handlers\FactionLoyaltyBountyHandler;
 use App\Game\BattleRewardProcessing\Handlers\BattleGlobalEventParticipationHandler;
 use App\Game\BattleRewardProcessing\Handlers\GoldMinesRewardHandler;
+use App\Game\BattleRewardProcessing\Handlers\LocationSpecialtyHandler;
 use App\Game\BattleRewardProcessing\Handlers\PurgatorySmithHouseRewardHandler;
 use App\Game\BattleRewardProcessing\Handlers\TheOldChurchRewardHandler;
 use App\Game\BattleRewardProcessing\Services\BattleRewardService;
 use App\Game\BattleRewardProcessing\Services\SecondaryRewardService;
+use App\Game\BattleRewardProcessing\Services\WeeklyBattleService;
 use App\Game\ClassRanks\Services\ClassRankService;
 use App\Game\Core\Services\GoldRush;
 use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
@@ -65,6 +67,18 @@ class ServiceProvider extends ApplicationServiceProvider {
             );
         });
 
+        $this->app->bind(LocationSpecialtyHandler::class, function($app) {
+            return new LocationSpecialtyHandler(
+                $app->make(RandomAffixGenerator::class),
+            );
+        });
+
+        $this->app->bind(WeeklyBattleService::class, function($app) {
+            return new WeeklyBattleService(
+                $app->make(LocationSpecialtyHandler::class),
+            );
+        });
+
         $this->app->bind(BattleRewardService::class, function ($app) {
             return new BattleRewardService(
                 $app->make(FactionHandler::class),
@@ -75,6 +89,7 @@ class ServiceProvider extends ApplicationServiceProvider {
                 $app->make(GoldMinesRewardHandler::class),
                 $app->make(FactionLoyaltyBountyHandler::class),
                 $app->make(TheOldChurchRewardHandler::class),
+                $app->make(WeeklyBattleService::class)
             );
         });
 

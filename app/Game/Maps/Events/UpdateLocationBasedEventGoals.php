@@ -2,6 +2,7 @@
 
 namespace App\Game\Maps\Events;
 
+use App\Flare\Models\Character;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Broadcasting\PrivateChannel;
@@ -32,7 +33,7 @@ class UpdateLocationBasedEventGoals implements ShouldBroadcastNow {
     public function __construct(User $user) {
         $this->user = $user->refresh();;
 
-        $this->canSeeEventGoals = $user->character->map->gameMap->mapType()->isTheIcePlane();
+        $this->canSeeEventGoals = $this->canSeeEventGoals($user->character);
     }
 
     /**
@@ -42,5 +43,18 @@ class UpdateLocationBasedEventGoals implements ShouldBroadcastNow {
      */
     public function broadcastOn() {
         return new PrivateChannel('update-location-base-event-goals-' . $this->user->id);
+    }
+
+    /**
+     * Can we see the event goals tab?
+     *
+     * @param Character $character
+     * @return bool
+     */
+    private function canSeeEventGoals(Character $character): bool {
+        return (
+            $character->map->gameMap->mapType()->isTheIcePlane() ||
+            $character->map->gameMap->mapType()->isDelusionalMemories()
+        );
     }
 }

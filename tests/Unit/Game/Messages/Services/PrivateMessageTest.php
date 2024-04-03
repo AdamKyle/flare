@@ -64,7 +64,6 @@ class PrivateMessageTest extends TestCase {
 
         $npc = $this->createNpc([
             'type' => NpcTypes::SUMMONER,
-            'name' => 'Sample'
         ]);
 
         $this->privateMessageService->sendPrivateMessage($npc->name, 'Test message');
@@ -81,7 +80,6 @@ class PrivateMessageTest extends TestCase {
 
         $npc = $this->createNpc([
             'type' => NpcTypes::KINGDOM_HOLDER,
-            'name' => 'Sample'
         ]);
 
         $this->privateMessageService->sendPrivateMessage($npc->name, 'Test message');
@@ -98,7 +96,6 @@ class PrivateMessageTest extends TestCase {
 
         $npc = $this->createNpc([
             'type' => NpcTypes::SPECIAL_ENCHANTS,
-            'name' => 'Sample'
         ]);
 
         $this->privateMessageService->sendPrivateMessage($npc->name, 'Test message');
@@ -115,7 +112,6 @@ class PrivateMessageTest extends TestCase {
 
         $npc = $this->createNpc([
             'type' => NpcTypes::QUEST_GIVER,
-            'name' => 'Sample'
         ]);
 
         $this->privateMessageService->sendPrivateMessage($npc->name, 'Test message');

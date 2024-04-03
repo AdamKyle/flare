@@ -26,12 +26,6 @@ class EventGoalsControllerTest extends TestCase {
     public function setUp(): void {
         parent::setUp();
 
-        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
-        GlobalEventGoal::truncate();
-        GlobalEventKill::truncate();
-        GlobalEventParticipation::truncate();
-        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
-
         $this->character = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
         $this->eventGoal = $this->createGlobalEventGoal([

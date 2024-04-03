@@ -2,11 +2,20 @@
 
 namespace Tests\Console\Events;
 
+use App\Flare\Models\Character;
+use App\Flare\Models\Event as GamEvent;
+use App\Flare\Models\Location;
+use App\Flare\Models\Map;
+use App\Flare\Models\Monster;
+use App\Flare\Models\Raid;
+use App\Flare\Models\RaidBoss;
+use App\Flare\Models\ScheduledEvent;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\Models\Announcement;
 use App\Flare\Models\Event;
 use App\Flare\Models\GlobalEventGoal;
 use App\Game\Events\Values\EventType;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 use Tests\Traits\CreateGameMap;
 use Tests\Traits\CreateItem;
@@ -39,12 +48,17 @@ class ProcessScheduledEventsTest extends TestCase {
     }
 
     public function testRaidEventTriggers() {
-        $monster = $this->createMonster();
+        $gameMap = $this->createGameMap();
+
+        $monster = $this->createMonster([
+            'game_map_id' => $gameMap->id,
+        ]);
+
         $item = $this->createItem();
 
-        $this->createGameMap();
-
-        $location = $this->createLocation();
+        $location = $this->createLocation([
+            'game_map_id' => $gameMap->id,
+        ]);
 
         $raid = $this->createRaid([
             'raid_boss_id'                   => $monster->id,
@@ -127,4 +141,5 @@ class ProcessScheduledEventsTest extends TestCase {
         $this->assertGreaterThan(0, Announcement::count());
         $this->assertGreaterThan(0, GlobalEventGoal::count());
     }
+
 }

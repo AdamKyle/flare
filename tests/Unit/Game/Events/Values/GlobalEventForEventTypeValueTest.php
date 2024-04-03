@@ -42,7 +42,7 @@ class GlobalEventForEventTypeValueTest extends TestCase {
 
     public function testGetCraftingEventGoalData() {
         $expected = [
-            'max_crafts'                 => 1000,
+            'max_crafts'                 => 500,
             'reward_every'               => 100,
             'next_reward_at'             => 100,
             'event_type'                 => EventType::DELUSIONAL_MEMORIES_EVENT,
@@ -57,7 +57,7 @@ class GlobalEventForEventTypeValueTest extends TestCase {
 
     public function testGetEnchantingEventGoalData() {
         $expected = [
-            'max_enchants'               => 1000,
+            'max_enchants'               => 500,
             'reward_every'               => 100,
             'next_reward_at'             => 100,
             'event_type'                 => EventType::DELUSIONAL_MEMORIES_EVENT,

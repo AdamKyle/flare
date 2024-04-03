@@ -52,6 +52,9 @@ class  InitiateRaid implements ShouldQueue {
 
     /**
      * @param LocationService $locationService
+     * @param EventSchedulerService $eventSchedulerService
+     * @param UpdateRaidMonsters $updateRaidMonsters
+     * @param BuildQuestCacheService $buildQuestCacheService
      * @return void
      */
     public function handle(

@@ -11,6 +11,7 @@ class GlobalEventForEventTypeValue {
 
         $event = new EventType($eventType);
 
+
         if ($event->isWinterEvent()) {
             return [
                 'max_kills'                  => 190000,
@@ -50,7 +51,7 @@ class GlobalEventForEventTypeValue {
 
     public static function returnCraftingEventGoal(): array {
         return [
-            'max_crafts'                 => 1000,
+            'max_crafts'                 => 500,
             'reward_every'               => 100,
             'next_reward_at'             => 100,
             'event_type'                 => EventType::DELUSIONAL_MEMORIES_EVENT,
@@ -63,7 +64,7 @@ class GlobalEventForEventTypeValue {
 
     public static function returnEnchantingEventGoal(): array {
         return [
-            'max_enchants'               => 1000,
+            'max_enchants'               => 500,
             'reward_every'               => 100,
             'next_reward_at'             => 100,
             'event_type'                 => EventType::DELUSIONAL_MEMORIES_EVENT,

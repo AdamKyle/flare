@@ -187,6 +187,10 @@ class LocationService {
                 if ((new LocationType($location->type))->isUnderWaterCaves()) {
                     $location->type_name = 'Underwater Caves';
                 }
+
+                if ((new LocationType($location->type))->isAlchemyChurch()) {
+                    $location->type_name = 'Alchemy Church';
+                }
             }
 
             if (!is_null($location->enemy_strength_type)) {

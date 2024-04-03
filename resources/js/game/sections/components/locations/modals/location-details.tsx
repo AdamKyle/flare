@@ -77,7 +77,6 @@ export default class LocationDetails extends React.Component<LocationDetailsProp
             )
         }
 
-
         if (this.props.location.type_name === 'Purgatory Dungeons') {
             return (
                 <Fragment>
@@ -97,7 +96,7 @@ export default class LocationDetails extends React.Component<LocationDetailsProp
                 <Fragment>
                     <div className='border-b-2 border-b-gray-200 dark:border-b-gray-600 my-3 hidden sm:block'></div>
                     <h5 className='text-orange-500 dark:text-orange-400'>Purgatory Smith House!</h5>
-                    <WarningAlert>
+                    <WarningAlert additional_css={'my-4 font-bold'}>
                         Exploration cannot be used here if you want the below rewards. You must use manually fight.
                     </WarningAlert>
                     <p className="mb-4">In this location, a few things will happen for those who have access:</p>
@@ -145,6 +144,44 @@ export default class LocationDetails extends React.Component<LocationDetailsProp
         }
     }
 
+    renderWeeklyFightLocationDetails() {
+        const validLocationNames = [
+            'Alchemy Church'
+        ];
+
+        if (this.props.location.type_name === null) {
+            return;
+        }
+
+        if (validLocationNames.includes(this.props.location.type_name)) {
+            return (
+                <Fragment>
+                    <h5 className='text-orange-500 dark:text-orange-400'>Corrupted Alchemy Church</h5>
+                    <WarningAlert additional_css={'my-4 font-bold'}>
+                        Exploration cannot be used here if you want the below rewards. You must use manually fight.
+                    </WarningAlert>
+                    <div className='border-b-2 border-b-gray-200 dark:border-b-gray-600 my-3'></div>
+                    <p className="mb-4">
+                        Players who fight here have a smaller selection of monsters to choose from. These are harder
+                        creatures.
+                        Each monster in the list is restricted to once per week.
+                    </p>
+                    <p className="mb-4">
+                        Players who kill a monster here have a 1% + (max) 15% of their looting skill - 0.02% for each
+                        character death, to get
+                        a Cosmic item. This item is similar to a Mythic, in the sense that only one can be equipped -
+                        but also much more powerful then
+                        Mythics.
+                    </p>
+                    <p className="mb-4">
+                        These types of weekly fights reset every Sunday at 3 AM America/Edmonton time.
+                    </p>
+                    <div className='border-b-2 border-b-gray-200 dark:border-b-gray-600 my-3'></div>
+                </Fragment>
+            )
+        }
+    }
+
     render() {
         return (
             <Fragment>
@@ -183,7 +220,7 @@ export default class LocationDetails extends React.Component<LocationDetailsProp
                             }
                         </div>
                     :
-                        null
+                        this.renderWeeklyFightLocationDetails()
                 }
 
                 {

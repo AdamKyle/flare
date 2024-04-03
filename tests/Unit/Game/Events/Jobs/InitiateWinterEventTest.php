@@ -23,20 +23,6 @@ class InitiateWinterEventTest extends TestCase {
 
     public function setUp(): void {
         parent::setUp();
-
-        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
-        GlobalEventGoal::truncate();
-        GlobalEventKill::truncate();
-        GlobalEventParticipation::truncate();
-        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
-
-        foreach (Announcement::all() as $announcement) {
-            $announcement->delete();
-        }
-
-        foreach (ModelsEvent::all() as $event) {
-            $event->delete();
-        }
     }
 
     public function tearDown(): void {

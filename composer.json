@@ -92,6 +92,6 @@
         "post-create-project-cmd": [
             "@php artisan key:generate --ansi"
         ],
-        "phpunit": "./vendor/bin/phpunit --coverage-html=./test-coverage"
+        "phpunit": "./vendor/bin/phpunit --stop-on-error --stop-on-failure --coverage-html=./test-coverage"
     }
 }

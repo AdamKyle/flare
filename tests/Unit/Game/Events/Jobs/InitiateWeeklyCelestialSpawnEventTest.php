@@ -19,14 +19,6 @@ class InitiateWeeklyCelestialSpawnEventTest extends TestCase {
 
     public function setUp(): void {
         parent::setUp();
-
-        foreach (Announcement::all() as $announcement) {
-            $announcement->delete();
-        }
-
-        foreach (ModelsEvent::all() as $event) {
-            $event->delete();
-        }
     }
 
     public function tearDown(): void {

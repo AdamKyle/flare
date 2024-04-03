@@ -43,8 +43,6 @@ class DeleteFlaggedUsersTest extends TestCase
             ->getCharacter();
 
         $this->createNpc([
-            'name'        => 'Sample',
-            'real_name'   => 'Sample',
             'game_map_id' => GameMap::first()->id,
             'type'        => NpcTypes::KINGDOM_HOLDER,
         ]);

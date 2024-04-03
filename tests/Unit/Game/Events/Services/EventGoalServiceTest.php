@@ -24,12 +24,6 @@ class EventGoalServiceTest extends TestCase {
     public function setUp(): void {
         parent::setUp();
 
-        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
-        GlobalEventGoal::truncate();
-        GlobalEventKill::truncate();
-        GlobalEventParticipation::truncate();
-        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
-
         $this->eventGoalService = resolve(EventGoalsService::class);
     }
 

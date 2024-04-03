@@ -17,4 +17,6 @@ export interface ItemForColorizationDefinition {
     holy_stacks_applied: number;
 
     is_mythic: boolean;
+
+    is_cosmic: boolean;
 }

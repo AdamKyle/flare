@@ -43,22 +43,7 @@ class RestartGlobalEventGoalTest extends TestCase {
         $this->character = null;
     }
 
-    private function cleanUpPreviousEvents() {
-        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
-        GlobalEventGoal::truncate();
-        GlobalEventKill::truncate();
-        GlobalEventCraft::truncate();
-        GlobalEventEnchant::truncate();
-        GlobalEventParticipation::truncate();
-        GlobalEventCraftingInventory::truncate();
-        GlobalEventCraftingInventorySlot::truncate();
-        Event::truncate();
-        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
-    }
-
     public function testRestEventGoal() {
-
-        $this->cleanUpPreviousEvents();
 
         $event = $this->createEvent([
             'type' => EventType::DELUSIONAL_MEMORIES_EVENT
@@ -97,8 +82,6 @@ class RestartGlobalEventGoalTest extends TestCase {
 
     public function testDoNotRestEventGoal() {
 
-        $this->cleanUpPreviousEvents();
-
         $event = $this->createEvent([
             'type' => EventType::DELUSIONAL_MEMORIES_EVENT
         ]);
@@ -135,7 +118,6 @@ class RestartGlobalEventGoalTest extends TestCase {
     }
 
     public function testFailToMoveToNextStepWhenEventDoesNotExist() {
-        $this->cleanUpPreviousEvents();
 
         $eventGoal = $this->createGlobalEventGoal([
             'max_enchants'                   => 1000,
@@ -184,8 +166,6 @@ class RestartGlobalEventGoalTest extends TestCase {
     }
 
     public function testCannotMoveToNextStepWhenNextStepIsNotAValidStep() {
-
-        $this->cleanUpPreviousEvents();
 
         $event = $this->createEvent([
             'type' => EventType::DELUSIONAL_MEMORIES_EVENT,
@@ -245,8 +225,6 @@ class RestartGlobalEventGoalTest extends TestCase {
 
     public function testHandleMovingToTheNextStepFromEnchantingToBattling() {
 
-        $this->cleanUpPreviousEvents();
-
         $event = $this->createEvent([
             'type' => EventType::DELUSIONAL_MEMORIES_EVENT,
             'event_goal_steps' => [GlobalEventSteps::BATTLE, GlobalEventSteps::CRAFT, GlobalEventSteps::ENCHANT],
@@ -305,8 +283,6 @@ class RestartGlobalEventGoalTest extends TestCase {
 
     public function testHandleMovingFromCraftEventStepToEnchantingStep() {
 
-        $this->cleanUpPreviousEvents();
-
         $event = $this->createEvent([
             'type' => EventType::DELUSIONAL_MEMORIES_EVENT,
             'event_goal_steps' => [GlobalEventSteps::BATTLE, GlobalEventSteps::CRAFT, GlobalEventSteps::ENCHANT],
@@ -364,8 +340,6 @@ class RestartGlobalEventGoalTest extends TestCase {
     }
 
     public function testHandleMovingToCraftingStepOfEventGoal() {
-
-        $this->cleanUpPreviousEvents();
 
         $event = $this->createEvent([
             'type' => EventType::DELUSIONAL_MEMORIES_EVENT,

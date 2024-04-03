@@ -228,13 +228,7 @@ class InventorySetService {
             return false;
         }
 
-        // Bail if we have more than one unique.
-        if ($this->hasMoreThanOneUnique($inventorySet)) {
-            return false;
-        }
-
-        // Assume that this set is equippable.
-        return true;
+        return $this->containsValidSpecialTypeAmount($inventorySet);
     }
 
     /**
@@ -348,14 +342,8 @@ class InventorySetService {
         return true;
     }
 
-    /**
-     * Do we have more than one unique in the set?
-     *
-     * @param InventorySet $inventorySet
-     * @return bool
-     */
-    protected function hasMoreThanOneUnique(InventorySet $inventorySet): bool {
-        return $inventorySet->slots->filter(function($slot) {
+    protected function containsValidSpecialTypeAmount(InventorySet $inventorySet): bool {
+        $amountOfUniques = $inventorySet->slots->filter(function($slot) {
             if (!is_null($slot->item->itemPrefix)) {
                 if ($slot->item->itemPrefix->randomly_generated) {
                     return $slot;
@@ -367,7 +355,25 @@ class InventorySetService {
                     return $slot;
                 }
             }
-        })->count() > 1;
+        })->count();
+
+        $mythicCount = $inventorySet->slots->where('item.is_mythic', '=', true)->count();
+
+        $cosmicCount = $inventorySet->slots->where('item.is_cosmic', '=', true)->count();
+
+        if ($amountOfUniques === 1) {
+            return $mythicCount === 0 && $cosmicCount == 0;
+        }
+
+        if ($mythicCount === 1) {
+            return $amountOfUniques === 0 && $cosmicCount == 0;
+        }
+
+        if ($cosmicCount === 1) {
+            return $amountOfUniques === 0 && $mythicCount == 0;
+        }
+
+        return false;
     }
 
     /**

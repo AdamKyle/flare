@@ -39,6 +39,10 @@ export default {
                 '200': '#e9b8e2',
                 '800': '#82326b',
             },
+            'cosmic-colors': {
+                '600': '#7A6AC1',
+                '700': '#6959A9',
+            },
             'item-skill-training': {
                 '300': '#f7c852',
                 '600': '#d36e0c'

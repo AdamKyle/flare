@@ -22,7 +22,7 @@ class UnitNames
     const PERSON          = 'Person';
     const AIRSHIP         = 'Airship';
 
-    protected static $values = [
+    public static $values = [
         self::SPEARMEN        => self::SPEARMEN,
         self::ARCHER          => self::ARCHER,
         self::SWORDSMEN       => self::SWORDSMEN,

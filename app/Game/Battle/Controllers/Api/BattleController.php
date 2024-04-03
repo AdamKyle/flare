@@ -121,6 +121,15 @@ class BattleController extends Controller {
      * @return JsonResponse
      */
     public function setupMonster(AttackTypeRequest $attackTypeRequest, Character $character, Monster $monster): JsonResponse {
+
+        $weeklyFight = $character->weeklyBattleFights()->where('monster_id', $monster->id)->where('monster_was_killed', true)->first();
+
+        if (!is_null($weeklyFight)) {
+            return response()->json([
+                'message' => 'You already fought and killed this beast. You can do so again next week! (Weekly reset is sunday at 3 AM America/Edmonton).'
+            ], 422);
+        }
+
         $result = $this->monsterFightService->setupMonster($character, [
             'attack_type'         => $attackTypeRequest->attack_type,
             'selected_monster_id' => $monster->id,

@@ -39,14 +39,6 @@ class ItemSkillServiceTest extends TestCase {
         $this->itemSkillService = null;
     }
 
-    protected function cleanUpItemSkills() {
-        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
-        ItemSkill::truncate();
-        ItemSkillProgression::truncate();
-        Item::truncate();
-        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
-    }
-
     public function testCannotFindItemForItemSkillToTrain() {
 
         $character = $this->character->getCharacter();
@@ -145,8 +137,6 @@ class ItemSkillServiceTest extends TestCase {
 
     public function testCannotTrainSkillWhenParentIsNotTrained() {
 
-        $this->cleanUpItemSkills();
-
         $itemSkill  = ItemSkill::create([
             'name'            => 'parent 2',
             'description'     => 'sample',
@@ -195,8 +185,6 @@ class ItemSkillServiceTest extends TestCase {
 
     public function testCanTrainChildSkill() {
 
-        $this->cleanUpItemSkills();
-
         $itemSkill  = ItemSkill::create([
             'name'               => 'parent',
             'description'        => 'sample',
@@ -244,7 +232,6 @@ class ItemSkillServiceTest extends TestCase {
     }
 
     public function testStartTrainingTheSkillOnTheItem() {
-        $this->cleanUpItemSkills();
 
         $itemSkill  = ItemSkill::create([
             'name'            => 'test',
@@ -280,7 +267,6 @@ class ItemSkillServiceTest extends TestCase {
     }
 
     public function testStopTrainingTheSkillOnTheItem() {
-        $this->cleanUpItemSkills();
 
         $itemSkill  = ItemSkill::create([
             'name'            => 'test',
@@ -316,7 +302,6 @@ class ItemSkillServiceTest extends TestCase {
     }
 
     public function testStartTrainingOfParentSkillWhenTrainingParentSkill() {
-        $this->cleanUpItemSkills();
 
         $itemSkill  = ItemSkill::create([
             'name'               => 'parent',

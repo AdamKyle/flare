@@ -16,6 +16,7 @@ use Mockery;
 use Mockery\MockInterface;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\Cleanup\CleanupKingdoms;
 use Tests\Traits\CreateAnnouncement;
 use Tests\Traits\CreateEvent;
 use Tests\Traits\CreateFactionLoyalty;
@@ -42,18 +43,6 @@ class EndScheduledEventTest extends TestCase {
 
     public function setUp(): void {
         parent::setUp();
-
-        $announcements = Announcement::all();
-
-        foreach ($announcements as $announcement) {
-            $announcement->delete();
-        }
-
-        $events = Event::all();
-
-        foreach ($events as $event) {
-            $event->delete();
-        }
     }
 
     public function tearDown(): void {
@@ -61,6 +50,8 @@ class EndScheduledEventTest extends TestCase {
     }
 
     public function testEndRaidEvent() {
+        $this->deleteOtherGameMaps();
+
         $monster = $this->createMonster();
         $item = $this->createItem();
 
@@ -111,6 +102,8 @@ class EndScheduledEventTest extends TestCase {
     }
 
     public function testEndWeeklyCurrencyEvent() {
+        $this->deleteOtherGameMaps();
+
         $scheduledEvent = $this->createScheduledEvent([
             'event_type'        => EventType::WEEKLY_CURRENCY_DROPS,
             'start_date'        => now()->addMinutes(5),
@@ -135,6 +128,8 @@ class EndScheduledEventTest extends TestCase {
     }
 
     public function testEndWeeklyCelestialEvent() {
+        $this->deleteOtherGameMaps();
+
         $scheduledEvent = $this->createScheduledEvent([
             'event_type'        => EventType::WEEKLY_CELESTIALS,
             'start_date'        => now()->addMinutes(5),
@@ -159,6 +154,8 @@ class EndScheduledEventTest extends TestCase {
     }
 
     public function testEndIsMonthlyPvpEvent() {
+        $this->deleteOtherGameMaps();
+
         $scheduledEvent = $this->createScheduledEvent([
             'event_type'        => EventType::MONTHLY_PVP,
             'start_date'        => now()->addMinutes(5),
@@ -183,6 +180,8 @@ class EndScheduledEventTest extends TestCase {
     }
 
     public function testEndsEventsRunningWhenNoScheduledEventsAreRunning() {
+        $this->deleteOtherGameMaps();
+
         $this->createScheduledEvent([
             'event_type'        => EventType::WEEKLY_CELESTIALS,
             'start_date'        => now()->addMinutes(5),
@@ -206,6 +205,7 @@ class EndScheduledEventTest extends TestCase {
     }
 
     public function testEndPVPMonthlyEvent() {
+        $this->deleteOtherGameMaps();
 
         $scheduledEvent = $this->createScheduledEvent([
             'event_type'        => EventType::MONTHLY_PVP,
@@ -219,6 +219,7 @@ class EndScheduledEventTest extends TestCase {
     }
 
     public function testEndWinterEvent() {
+        $this->deleteOtherGameMaps();
 
         $monsterCache = [
             MapNameValue::SURFACE => [$this->createMonster()]
@@ -281,6 +282,7 @@ class EndScheduledEventTest extends TestCase {
     }
 
     public function testEndWinterEventWhilePledgedToFactionAndHelpingNPc() {
+        $this->deleteOtherGameMaps();
 
         // We go back to this map when the event ends.
         $this->createGameMap([
@@ -295,7 +297,9 @@ class EndScheduledEventTest extends TestCase {
             ->assignFactionSystem()
             ->givePlayerLocation(16, 16, $icePlane)
             ->kingdomManagement()
-            ->assignKingdom()
+            ->assignKingdom([
+                'game_map_id' => $icePlane->id,
+            ])
             ->assignBuilding()
             ->assignUnits()
             ->getCharacter();
@@ -359,8 +363,9 @@ class EndScheduledEventTest extends TestCase {
             'event_id' => $event->id,
         ]);
 
-
         $this->createItem(['specialty_type' => ItemSpecialtyType::CORRUPTED_ICE, 'type' => WeaponTypes::HAMMER]);
+
+        $character = $character->refresh();
 
         $this->artisan('end:scheduled-event');
 
@@ -378,5 +383,9 @@ class EndScheduledEventTest extends TestCase {
         $this->assertEmpty(Event::all());
         $this->assertEmpty(Announcement::all());
 
+    }
+
+    protected function deleteOtherGameMaps(): void {
+        GameMap::whereIn('name', MapNameValue::$values)->delete();
     }
 }

@@ -87,6 +87,7 @@ class Item extends Model {
         'counter_chance',
         'counter_resistance',
         'is_mythic',
+        'is_cosmic',
         'specialty_type',
         'gold_bars_cost',
         'can_stack',
@@ -168,6 +169,7 @@ class Item extends Model {
         'ambush_resistance'                => 'float',
         'counter_chance'                   => 'float',
         'counter_resistance'               => 'float',
+        'is_cosmic'                        => 'boolean',
     ];
 
     protected $appends = [

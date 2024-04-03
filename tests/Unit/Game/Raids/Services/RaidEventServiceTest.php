@@ -33,14 +33,6 @@ class RaidEventServiceTest extends TestCase {
     public function setUp(): void {
         parent::setUp();
 
-        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
-        GamEvent::truncate();
-        ScheduledEvent::truncate();
-        Raid::truncate();
-        Map::truncate();
-        Character::truncate();
-        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
-
         $this->raidEventService = resolve(RaidEventService::class);
     }
 
@@ -71,6 +63,11 @@ class RaidEventServiceTest extends TestCase {
             'start_date'        => now()->addMinutes(5),
             'raid_id'           => $raid,
             'currently_running' => true,
+        ]);
+
+        $this->createEvent([
+            'type' => EventType::RAID_EVENT,
+            'raid_id' => $raid->id,
         ]);
 
         (new CharacterFactory())->createBaseCharacter()->givePlayerLocation(

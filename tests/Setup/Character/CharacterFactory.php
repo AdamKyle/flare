@@ -3,8 +3,11 @@
 namespace Tests\Setup\Character;
 
 use App\Flare\Models\CharacterBoon;
+use App\Flare\Models\GameRace;
+use App\Flare\Models\Map;
 use App\Game\ClassRanks\Values\WeaponMasteryValue;
 use Exception;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Cache;
 use App\Flare\Models\GameBuilding;
@@ -66,6 +69,7 @@ class CharacterFactory {
      * @return CharacterFactory
      */
     public function createBaseCharacter(array $raceOptions = [], array|GameClass $classOptions = []): CharacterFactory {
+
         $race  = $this->createRace($raceOptions);
 
         if ($classOptions instanceof GameClass) {
@@ -420,19 +424,18 @@ class CharacterFactory {
      *
      * @param int $x | 16
      * @param int $y | 16
+     * @param GameMap|null $gameMap
      * @return CharacterFactory
      */
     public function givePlayerLocation(int $x = 16, int $y = 16, GameMap $gameMap = null): CharacterFactory {
         $gameMap = !is_null($gameMap) ? $gameMap : GameMap::where('default', true)->first();
 
-        if (!is_null($gameMap)) {
-            $id = $gameMap->id;
-        } else {
-            $id = $this->createGameMap([
+        if (is_null($gameMap)) {
+            $gameMap = $this->createGameMap([
                 'name'    => 'Surface',
                 'path'    => 'path',
                 'default' => true,
-            ])->id;
+            ]);
         }
 
         $this->createMap([
@@ -441,7 +444,7 @@ class CharacterFactory {
             'position_y'           => $y,
             'character_position_x' => $x,
             'character_position_y' => $y,
-            'game_map_id'          => $id,
+            'game_map_id'          => $gameMap->id,
         ]);
 
         $this->character = $this->character->refresh();

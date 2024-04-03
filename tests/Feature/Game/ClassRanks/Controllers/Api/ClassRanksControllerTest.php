@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Game\ClassRanks\Controllers\Api;
 
+use App\Flare\Models\GameMap;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
@@ -33,6 +34,7 @@ class ClassRanksControllerTest extends TestCase {
             ->call('GET', '/api/class-ranks/' . $character->id);
 
         $jsonData = json_decode($response->getContent(), true);
+
 
         $this->assertCount(1, $jsonData['class_ranks']);
     }

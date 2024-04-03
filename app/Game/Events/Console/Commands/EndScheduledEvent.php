@@ -3,6 +3,12 @@
 namespace App\Game\Events\Console\Commands;
 
 use App\Flare\Models\Faction;
+use App\Flare\Models\GlobalEventCraft;
+use App\Flare\Models\GlobalEventCraftingInventorySlot;
+use App\Flare\Models\GlobalEventEnchant;
+use App\Flare\Models\GlobalEventGoal;
+use App\Flare\Models\GlobalEventKill;
+use App\Flare\Models\GlobalEventParticipation;
 use App\Flare\Models\Raid;
 use App\Flare\Models\Event;
 use App\Flare\Models\Location;
@@ -67,7 +73,8 @@ class EndScheduledEvent extends Command {
         ExplorationAutomationService $explorationAutomationService,
         BuildQuestCacheService $buildQuestCacheService,
         FactionLoyaltyService $factionLoyaltyService,
-    ) {
+    ): void
+    {
         $this->endScheduledEvent(
             $locationService,
             $updateRaidMonsters,
@@ -165,6 +172,19 @@ class EndScheduledEvent extends Command {
 
             if ($eventType->isWinterEvent()) {
                 $this->endWinterEvent($kingdomEventService, $traverseService, $explorationAutomationService, $factionLoyaltyService, $currentEvent);
+
+                $buildQuestCacheService->buildQuestCache(true);
+                $buildQuestCacheService->buildRaidQuestCache(true);
+
+                $event->update([
+                    'currently_running' => false,
+                ]);
+
+                event(new UpdateScheduledEvents($eventSchedulerService->fetchEvents()));
+            }
+
+            if ($eventType->isDelusionalMemoriesEvent()) {
+                $this->endDelusionalEvent($kingdomEventService, $traverseService, $explorationAutomationService, $factionLoyaltyService, $currentEvent);
 
                 $buildQuestCacheService->buildQuestCache(true);
                 $buildQuestCacheService->buildRaidQuestCache(true);
@@ -324,6 +344,70 @@ class EndScheduledEvent extends Command {
         $announcement->delete();
 
         $event->delete();
+
+        $this->cleanUpEventGoals();
+    }
+
+    /**
+     * End the delusional memories' event.
+     *
+     * @param KingdomEventService $kingdomEventService
+     * @param TraverseService $traverseService
+     * @param ExplorationAutomationService $explorationAutomationService
+     * @param FactionLoyaltyService $factionLoyaltyService
+     * @param Event $event
+     * @return void
+     */
+    protected function endDelusionalEvent(KingdomEventService $kingdomEventService,
+                                      TraverseService $traverseService,
+                                      ExplorationAutomationService $explorationAutomationService,
+                                      FactionLoyaltyService $factionLoyaltyService,
+                                      Event $event): void {
+
+        $kingdomEventService->handleKingdomRewardsForEvent(MapNameValue::DELUSIONAL_MEMORIES);
+
+        $gameMap    = GameMap::where('name', MapNameValue::DELUSIONAL_MEMORIES)->first();
+        $faction    = Faction::where('game_map_id', $gameMap->id)->first();
+        $surfaceMap = GameMap::where('name', MapNameValue::SURFACE)->first();
+
+        Character::join('maps', 'maps.character_id', '=', 'characters.id')
+            ->where('maps.game_map_id', $gameMap->id)
+            ->chunk(100, function ($characters) use (
+                $traverseService,
+                $surfaceMap,
+                $explorationAutomationService,
+                $factionLoyaltyService,
+                $faction,
+                $gameMap
+            ) {
+                foreach ($characters as $character) {
+                    $explorationAutomationService->stopExploration($character);
+
+                    $character->factions()->where('game_map_id', $gameMap->id)->update([
+                        'current_level'  => 0,
+                        'current_points' => 0,
+                        'points_needed'  => FactionLevel::getPointsNeeded(0),
+                        'maxed'          => false,
+                        'title'          => null,
+                    ]);
+
+                    $traverseService->travel($surfaceMap->id, $character);
+
+                    $this->unpledgeFromTheMapsFaction($character, $factionLoyaltyService, $faction);
+                }
+            });
+
+        event(new GlobalMessageEvent('The voice of Fliniguss echos in your ears: "Child, I grow weary of your games." The twisted mother laughs: Ooooh hooo hooo hoo. A chill falls in the air.'));
+
+        $announcement = Announcement::where('event_id', $event->id)->first();
+
+        event(new DeleteAnnouncementEvent($announcement->id));
+
+        $announcement->delete();
+
+        $event->delete();
+
+        $this->cleanUpEventGoals();
     }
 
     /**
@@ -351,6 +435,21 @@ class EndScheduledEvent extends Command {
 
             $factionLoyaltyService->removePledge($character, $faction);
         }
+    }
+
+    /**
+     * Clean up Global Event goal stuff.
+     *
+     * @return void
+     */
+    private function cleanUpEventGoals(): void {
+        GlobalEventParticipation::truncate();
+        GlobalEventGoal::truncate();
+        GlobalEventCraftingInventorySlot::truncate();
+        GlobalEventCraftingInventorySlot::truncate();
+        GlobalEventKill::truncate();
+        GlobalEventCraft::truncate();
+        GlobalEventEnchant::truncate();
     }
 
     /**
