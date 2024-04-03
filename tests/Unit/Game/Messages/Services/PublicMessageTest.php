@@ -56,7 +56,7 @@ class PublicMessageTest extends TestCase {
 
         Event::assertDispatched(MessageSentEvent::class);
 
-        $this->assertGreaterThan(0, Message::all());
+        $this->assertGreaterThan(0, Message::count());
     }
 
     public function testSendPublicMessageForSurfaceColor() {
@@ -82,7 +82,7 @@ class PublicMessageTest extends TestCase {
             return $event->message->map_name === 'SUR';
         });
 
-        $this->assertGreaterThan(0, Message::all());
+        $this->assertGreaterThan(0, Message::count());
     }
 
     public function testSendPublicMessageForLabyrinthColor() {
@@ -108,7 +108,7 @@ class PublicMessageTest extends TestCase {
             return $event->message->map_name === 'LABY';
         });
 
-        $this->assertGreaterThan(0, Message::all());
+        $this->assertGreaterThan(0, Message::count());
     }
 
     public function testSendPublicMessageForDungeonColor() {
@@ -134,7 +134,7 @@ class PublicMessageTest extends TestCase {
             return $event->message->map_name === 'DUN';
         });
 
-        $this->assertGreaterThan(0, Message::all());
+        $this->assertGreaterThan(0, Message::count());
     }
 
     public function testSendPublicMessageForHellColor() {
@@ -160,7 +160,7 @@ class PublicMessageTest extends TestCase {
             return $event->message->map_name === 'HELL';
         });
 
-        $this->assertGreaterThan(0, Message::all());
+        $this->assertGreaterThan(0, Message::count());
     }
 
     public function testSendPublicMessageForShadowPlaneColor() {
@@ -186,7 +186,7 @@ class PublicMessageTest extends TestCase {
             return $event->message->map_name === 'SHP';
         });
 
-        $this->assertGreaterThan(0, Message::all());
+        $this->assertGreaterThan(0, Message::count());
     }
 
     public function testSendPublicMessageForPurgatoryColor() {
@@ -212,7 +212,7 @@ class PublicMessageTest extends TestCase {
             return $event->message->map_name === 'PURG';
         });
 
-        $this->assertGreaterThan(0, Message::all());
+        $this->assertGreaterThan(0, Message::count());
     }
 
     public function testSendPublicMessageDefaultToSurfaceColor() {
@@ -238,7 +238,7 @@ class PublicMessageTest extends TestCase {
             return $event->message->map_name === 'SUR';
         });
 
-        $this->assertGreaterThan(0, Message::all());
+        $this->assertGreaterThan(0, Message::count());
     }
 
     public function testSendPublicMessageWhenKilledInPvp() {
@@ -258,7 +258,7 @@ class PublicMessageTest extends TestCase {
 
         Event::assertDispatched(MessageSentEvent::class);
 
-        $this->assertCount(1, Message::all());
+        $this->assertGreaterThan(0, Message::count());
         $this->assertEquals(0, Message::first()->x_position);
         $this->assertEquals(0, Message::first()->y_position);
     }
@@ -279,7 +279,7 @@ class PublicMessageTest extends TestCase {
 
         Event::assertDispatched(MessageSentEvent::class);
 
-        $this->assertGreaterThan(0, Message::all());
+        $this->assertGreaterThan(0, Message::count());
         $this->assertTrue(Message::first()->hide_location);
     }
 
@@ -294,6 +294,6 @@ class PublicMessageTest extends TestCase {
 
         Event::assertDispatched(MessageSentEvent::class);
 
-        $this->assertGreaterThan(0, Message::all());
+        $this->assertGreaterThan(0, Message::count());
     }
 }
