@@ -4,6 +4,7 @@ namespace App\Flare\GameImporter\Console\Commands;
 
 use App\Flare\Models\Event;
 use App\Flare\Models\FactionLoyalty;
+use App\Flare\Models\FactionLoyaltyNpc;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\GlobalEventGoal;
 use App\Flare\Models\GlobalEventKill;
@@ -55,15 +56,17 @@ class MassImportCustomData extends Command {
         GlobalEventKill::truncate();
         GlobalEventParticipation::truncate();
 
-        $factionLoyaties = FactionLoyalty::where('faction_id', GameMap::where('name', MapNameValue::ICE_PLANE))->get();
+        $factionLoyaties = FactionLoyalty::where('faction_id', GameMap::where('name', MapNameValue::ICE_PLANE)->first()->id)->get();
 
         foreach ($factionLoyaties as $factionLoyaty) {
-            $factionLoyaty->factionLoyaltyNpcs()->update([
-                'currently_helping' => false,
-            ]);
+            $factionLoyaty->factionLoyaltyNpcs()->get()->each(function ($npc) {
+                FactionLoyaltyNpc::where('id', $npc->id)->update([
+                    'currently_helping' => false
+                ]);
+            });
         }
 
-        $factionLoyaties->update([
+        FactionLoyalty::where('faction_id', GameMap::where('name', MapNameValue::ICE_PLANE)->first()->id)->update([
             'is_pledged' => false,
         ]);
 

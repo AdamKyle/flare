@@ -21,7 +21,12 @@ class LocationSpecialtyHandler {
     }
 
     private function giveItemReward(Character $character): void {
-        $this->giveCharacterRandomCosmicItem($character);
+        $item = $this->giveCharacterRandomCosmicItem($character);
+
+        $character->inventory->slots()->create([
+            'inventory_id' => $character->inventory->id,
+            'item_id' => $item->id,
+        ]);
     }
 
     private function giveCharacterRandomCosmicItem(Character $character): Item {
@@ -45,16 +50,18 @@ class LocationSpecialtyHandler {
             'item_prefix_id' => $randomAffix->generateAffix('prefix')->id,
         ]);
 
+        // @codeCoverageIgnoreStart
         if (rand(1, 100) > 50) {
             $duplicateItem->update([
                 'item_suffix_id' => $randomAffix->generateAffix('suffix')->id
             ]);
         }
+        // @codeCoverageIgnoreEnd
 
         $duplicateItem->update([
             'is_cosmic' => true,
         ]);
 
-        return $duplicateItem;
+        return $duplicateItem->refresh();
     }
 }

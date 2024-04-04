@@ -2,17 +2,19 @@
 
 namespace Tests\Unit\Game\BattleRewardProcessing\Services;
 
+use App\Flare\Values\ItemSpecialtyType;
 use App\Flare\Values\LocationType;
 use App\Game\BattleRewardProcessing\Services\WeeklyBattleService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateItem;
 use Tests\Traits\CreateMonster;
 use Tests\Traits\CreateWeeklyMonsterFight;
 
 class WeeklyBattleServiceTest extends TestCase {
 
-    use RefreshDatabase, CreateMonster, CreateWeeklyMonsterFight;
+    use RefreshDatabase, CreateMonster, CreateWeeklyMonsterFight, CreateItem;
 
     private ?WeeklyBattleService $weeklyBattleService;
 
@@ -183,5 +185,39 @@ class WeeklyBattleServiceTest extends TestCase {
         ]);
 
         $this->assertFalse($this->weeklyBattleService->canFightMonster($character, $monster));
+    }
+
+    public function testGiveItemForAlchemyChurch() {
+        $character = $this->characterFactory->getCharacter();
+        $monster = $this->createMonster([
+            'only_for_location_type' => LocationType::ALCHEMY_CHURCH,
+        ]);
+
+        $this->createItem([
+            'type' => 'weapon',
+        ]);
+
+        $character = $this->weeklyBattleService->handleWeeklyBattle($character, $monster);
+
+        $this->assertNotNull($character->inventory->slots->filter(function($slot) {
+            return $slot->item->is_cosmic;
+        })->first());
+    }
+
+    public function testDoNotGiveItemForInvalidLocationType() {
+        $character = $this->characterFactory->getCharacter();
+        $monster = $this->createMonster([
+            'only_for_location_type' => LocationType::TWISTED_GATE
+        ]);
+
+        $this->createItem([
+            'type' => 'weapon',
+        ]);
+
+        $character = $this->weeklyBattleService->handleWeeklyBattle($character, $monster);
+
+        $this->assertNull($character->inventory->slots->filter(function($slot) {
+            return $slot->item->is_cosmic;
+        })->first());
     }
 }

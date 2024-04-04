@@ -30,7 +30,7 @@ class EquippablePositionsTest extends TestCase {
 
     public function testInitializeEquippablePositionValueWithProperValue() {
         $this->expectNotToPerformAssertions();
-        
+
         new EquippablePositions(EquippablePositions::ARTIFACT);
     }
 
