@@ -34,12 +34,6 @@ class RaidEventServiceTest extends TestCase {
         parent::setUp();
 
         $this->raidEventService = resolve(RaidEventService::class);
-
-        if (Character::count() > 0) {
-            foreach (Character::all() as $character) {
-                $character->delete();
-            }
-        }
     }
 
     public function tearDown(): void {

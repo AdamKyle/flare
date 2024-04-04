@@ -126,7 +126,7 @@ class ItemSkillService {
             return null;
         }
 
-        $slot = $equippedItems->where('item.type', 'artifact')->where('item.id', $itemId)->first();
+        $slot = $equippedItems->where('item.type', '=', 'artifact')->where('item.id', '=', $itemId)->first();
 
         if (is_null($slot)) {
             return null;
@@ -148,7 +148,7 @@ class ItemSkillService {
             return null;
         }
 
-        return $item->itemSkillProgressions->where('item_skill_id', $itemSkillProgressionId)->first();
+        return $item->itemSkillProgressions()->find($itemSkillProgressionId);
     }
 
     /**

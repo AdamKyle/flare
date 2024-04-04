@@ -155,7 +155,7 @@ class ItemSkillServiceTest extends TestCase {
             'parent_level_needed' => 4
         ]);
 
-        $item = $this->createItem(['type' => 'artifact', 'item_skill_id' => $itemSkill->id]);
+        $item = $this->createItem(['name' => 'Test Item With Skill', 'type' => 'artifact', 'item_skill_id' => $itemSkill->id]);
 
         $item->itemSkillProgressions()->create([
             'item_id' => $item->id,
@@ -164,6 +164,8 @@ class ItemSkillServiceTest extends TestCase {
             'current_kill' => 0,
             'is_training' => false,
         ]);
+
+        $item = $item->refresh();
 
         $childItemSkillProgression = $item->itemSkillProgressions()->create([
             'item_id' => $item->id,
@@ -175,7 +177,7 @@ class ItemSkillServiceTest extends TestCase {
 
         $item = $item->refresh();
 
-        $character = $this->character->inventoryManagement()->giveItem($item, true, 'left-hand')->getCharacter();
+        $character = $this->character->inventoryManagement()->giveItem($item, true, 'artifact')->getCharacter();
 
         $result = $this->itemSkillService->trainSkill($character, $item->id, $childItemSkillProgression->id);
 

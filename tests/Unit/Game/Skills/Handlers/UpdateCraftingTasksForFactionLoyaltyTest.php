@@ -247,11 +247,26 @@ class UpdateCraftingTasksForFactionLoyaltyTest extends TestCase {
             'gold' => 0,
             'gold_dust' => 0,
             'shards' => 0,
+            'xp_next' => 1000,
         ]);
 
         Event::fake();
 
-        $this->createMonster();
+        $this->createMonster([
+            'game_map_id' => $character->map->game_map_id
+        ]);
+        $this->createMonster([
+            'game_map_id' => $character->map->game_map_id
+        ]);
+        $this->createMonster([
+            'game_map_id' => $character->map->game_map_id
+        ]);
+        $this->createMonster([
+            'game_map_id' => $character->map->game_map_id
+        ]);
+        $this->createMonster([
+            'game_map_id' => $character->map->game_map_id
+        ]);
 
         $this->createItem([
             'crafting_type' => 'weapon',
@@ -316,6 +331,7 @@ class UpdateCraftingTasksForFactionLoyaltyTest extends TestCase {
         $this->assertEquals(1000000, $character->gold);
         $this->assertEquals(1000, $character->gold_dust);
         $this->assertEquals(100, $character->shards);
+
     }
 
     public function testDoNotGiveMoreCurrenciesThenMaxAllowedForCraftingTasks() {
@@ -330,13 +346,28 @@ class UpdateCraftingTasksForFactionLoyaltyTest extends TestCase {
             'gold' => MaxCurrenciesValue::MAX_GOLD,
             'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
             'shards' => MaxCurrenciesValue::MAX_SHARDS,
+            'xp_next' => 1000,
         ]);
 
         $character = $character->refresh();
 
         Event::fake();
 
-        $this->createMonster();
+        $this->createMonster([
+            'game_map_id' => $character->map->game_map_id
+        ]);
+
+        $this->createMonster([
+            'game_map_id' => $character->map->game_map_id
+        ]);
+
+        $this->createMonster([
+            'game_map_id' => $character->map->game_map_id
+        ]);
+
+        $this->createMonster([
+            'game_map_id' => $character->map->game_map_id
+        ]);
 
         $this->createItem([
             'crafting_type' => 'weapon',
@@ -417,6 +448,7 @@ class UpdateCraftingTasksForFactionLoyaltyTest extends TestCase {
             'gold' => MaxCurrenciesValue::MAX_GOLD,
             'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
             'shards' => MaxCurrenciesValue::MAX_SHARDS,
+            'xp_next' => 1000,
         ]);
 
         $character = $character->refresh();

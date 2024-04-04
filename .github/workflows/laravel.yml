@@ -49,4 +49,10 @@ jobs:
         TIME_ZONE: America/Edmonton
       run: |
         php artisan migrate
-        vendor/bin/phpunit --stop-on-failure
+        mkdir test-coverage
+        vendor/bin/phpunit --stop-on-error --stop-on-failure --coverage-html=./test-coverage
+    - name: Upload HTML coverage report
+      uses: actions/upload-artifact@v2
+      with:
+        name: coverage-report
+        path: test-coverage

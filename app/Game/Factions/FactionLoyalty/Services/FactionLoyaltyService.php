@@ -13,6 +13,7 @@ use App\Flare\Models\Monster;
 use App\Flare\Models\Npc;
 use App\Flare\Values\MapNameValue;
 use App\Game\Core\Traits\ResponseBuilder;
+use Exception;
 
 class FactionLoyaltyService {
 
@@ -151,6 +152,7 @@ class FactionLoyaltyService {
      * @param Character $character
      * @param Faction $faction
      * @return array
+     * @throws Exception
      */
     public function pledgeLoyalty(Character $character, Faction $faction): array {
 
@@ -218,6 +220,7 @@ class FactionLoyaltyService {
      *
      * @param FactionLoyaltyNpcTask $factionLoyaltyNpcTask
      * @return FactionLoyaltyNpcTask
+     * @throws Exception
      */
     public function createNewTasksForNpc(FactionLoyaltyNpcTask $factionLoyaltyNpcTask): FactionLoyaltyNpcTask {
         $npc = $factionLoyaltyNpcTask->factionLoyaltyNpc->npc;
@@ -246,6 +249,7 @@ class FactionLoyaltyService {
      *
      * @param FactionLoyalty $factionLoyalty
      * @return void
+     * @throws Exception
      */
     protected function createNpcsForLoyalty(FactionLoyalty $factionLoyalty) {
         $npcs = Npc::where('game_map_id', $factionLoyalty->faction->game_map_id)->get();
@@ -281,6 +285,7 @@ class FactionLoyaltyService {
      *
      * @param string $gameMapName
      * @return array
+     * @throws Exception
      */
     protected function createCraftingTasks(string $gameMapName): array {
         $tasks       = [];
@@ -359,7 +364,7 @@ class FactionLoyaltyService {
      * @param string $type
      * @param string $gamMapName
      * @return Item
-     * @throws \Exception
+     * @throws Exception
      */
     private function getItemForCraftingTask(string $type, string $gamMapName): Item {
 
