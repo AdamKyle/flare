@@ -2,20 +2,11 @@
 
 namespace Tests\Console\Events;
 
-use App\Flare\Models\Character;
-use App\Flare\Models\Event as GamEvent;
-use App\Flare\Models\Location;
-use App\Flare\Models\Map;
-use App\Flare\Models\Monster;
-use App\Flare\Models\Raid;
-use App\Flare\Models\RaidBoss;
-use App\Flare\Models\ScheduledEvent;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\Models\Announcement;
 use App\Flare\Models\Event;
 use App\Flare\Models\GlobalEventGoal;
 use App\Game\Events\Values\EventType;
-use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 use Tests\Traits\CreateGameMap;
 use Tests\Traits\CreateItem;
@@ -29,18 +20,6 @@ class ProcessScheduledEventsTest extends TestCase {
 
     public function setUp(): void {
         parent::setUp();
-
-        $announcements = Announcement::all();
-
-        foreach ($announcements as $announcement) {
-            $announcement->delete();
-        }
-
-        $events = Event::all();
-
-        foreach ($events as $event) {
-            $event->delete();
-        }
     }
 
     public function tearDown(): void {

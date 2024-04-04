@@ -22,6 +22,10 @@ trait UpdateRaidMonstersForLocation {
      */
     public function updateMonstersList(Character $character, ?Location $location = null): void {
 
+        if (is_null($character->map)) {
+            return;
+        }
+
         $monsters = Cache::get('monsters')[$character->map->gameMap->name];
 
         $hasAccessToPurgatory = $character->inventory->slots->where('item.effect', ItemEffectsValue::PURGATORY)->count() > 0;

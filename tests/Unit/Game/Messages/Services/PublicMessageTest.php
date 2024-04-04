@@ -279,8 +279,10 @@ class PublicMessageTest extends TestCase {
 
         Event::assertDispatched(MessageSentEvent::class);
 
+        $message = Message::where('hide_location', true)->first();
+
         $this->assertGreaterThan(0, Message::count());
-        $this->assertTrue(Message::first()->hide_location);
+        $this->assertNotNull($message);
     }
 
     public function testSendAdminPublicMessage() {

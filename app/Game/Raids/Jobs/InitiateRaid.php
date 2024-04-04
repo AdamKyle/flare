@@ -125,11 +125,12 @@ class  InitiateRaid implements ShouldQueue {
         $corruptedLocations = Location::whereIn('id', $corruptedLocationIds)->get();
 
         foreach ($corruptedLocations as $location) {
-            $characters = Character::leftJoin('maps', 'characters.id', '=', 'maps.character_id')
-                ->where('maps.character_position_x', $location->x)
-                ->where('maps.character_position_y', $location->y)
-                ->where('maps.game_map_id', $location->game_map_id)
-                ->get();
+            $characters = Character::join('maps', function ($join) use ($location) {
+                $join->on('characters.id', '=', 'maps.character_id')
+                    ->where('maps.character_position_x', $location->x)
+                    ->where('maps.character_position_y', $location->y)
+                    ->where('maps.game_map_id', $location->game_map_id);
+            })->get();
 
             foreach ($characters as $character) {
                 $updateRaidMonsters->updateMonstersForRaidLocations($character, $location);

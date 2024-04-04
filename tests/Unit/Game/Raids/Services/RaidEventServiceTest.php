@@ -34,6 +34,12 @@ class RaidEventServiceTest extends TestCase {
         parent::setUp();
 
         $this->raidEventService = resolve(RaidEventService::class);
+
+        if (Character::count() > 0) {
+            foreach (Character::all() as $character) {
+                $character->delete();
+            }
+        }
     }
 
     public function tearDown(): void {
@@ -61,13 +67,8 @@ class RaidEventServiceTest extends TestCase {
         $this->createScheduledEvent([
             'event_type'        => EventType::RAID_EVENT,
             'start_date'        => now()->addMinutes(5),
-            'raid_id'           => $raid,
+            'raid_id'           => $raid->id,
             'currently_running' => true,
-        ]);
-
-        $this->createEvent([
-            'type' => EventType::RAID_EVENT,
-            'raid_id' => $raid->id,
         ]);
 
         (new CharacterFactory())->createBaseCharacter()->givePlayerLocation(

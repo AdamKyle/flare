@@ -4,6 +4,7 @@ namespace App\Game\Raids\Services;
 
 use App\Flare\Models\Event;
 use App\Flare\Models\Raid;
+use App\Flare\Models\ScheduledEvent;
 use App\Game\Events\Values\EventType;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Raids\Jobs\InitiateRaid;
@@ -20,8 +21,9 @@ class RaidEventService {
     public function createRaid(Raid $raid): void {
 
         $existingRaid = Event::where('type', EventType::RAID_EVENT)->where('raid_id', $raid->id)->first();
+        $scheduledEvent = ScheduledEvent::where('raid_id', $raid->id)->first();
 
-        if (!is_null($existingRaid)) {
+        if (!is_null($existingRaid) || is_null($scheduledEvent)) {
             return;
         }
 
@@ -30,6 +32,6 @@ class RaidEventService {
 
         $raidStory = preg_split('/(?<=[.?!])\s+(?=[a-z])/i', $raid->story);
 
-        InitiateRaid::dispatch($raid->id, $raidStory)->delay(now()->addMinute());
+        InitiateRaid::dispatch($scheduledEvent->id, $raidStory)->delay(now()->addMinute());
     }
 }
