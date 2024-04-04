@@ -21,8 +21,7 @@ class UpdateEventGoalProgress implements ShouldBroadcastNow {
     /**
      * Create a new event instance.
      *
-     * @param User $user
-     * @param array $boons
+     * @param array $eventGoalData
      */
     public function __construct(array $eventGoalData) {
         $this->eventGoalData = $eventGoalData;

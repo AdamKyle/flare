@@ -11,6 +11,7 @@ use App\Flare\Models\GlobalEventEnchant;
 use App\Flare\Models\GlobalEventGoal;
 use App\Flare\Models\GlobalEventKill;
 use App\Flare\Models\GlobalEventParticipation;
+use App\Flare\Values\MapNameValue;
 use App\Flare\Values\RandomAffixDetails;
 use App\Game\Events\Values\GlobalEventForEventTypeValue;
 use App\Game\Events\Values\GlobalEventSteps;
@@ -21,10 +22,12 @@ use Illuminate\Support\Facades\DB;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateEvent;
+use Tests\Traits\CreateGameMap;
 use Tests\Traits\CreateGlobalEventGoal;
+use Tests\Traits\CreateMap;
 
 class RestartGlobalEventGoalTest extends TestCase {
-    use RefreshDatabase, CreateGlobalEventGoal, CreateEvent;
+    use RefreshDatabase, CreateGlobalEventGoal, CreateEvent, CreateGameMap;
 
     private ?Character $character;
 
@@ -49,12 +52,19 @@ class RestartGlobalEventGoalTest extends TestCase {
             'type' => EventType::DELUSIONAL_MEMORIES_EVENT
         ]);
 
+        $map = $this->createGameMap([
+            'name' => MapNameValue::DELUSIONAL_MEMORIES,
+            'only_during_event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+        ]);
+
+        (new CharacterFactory())->createBaseCharacter()->givePlayerLocation(16, 16, $map);
+
         $eventGoal = $this->createGlobalEventGoal([
             'max_kills'                      => 1000,
             'reward_every'                   => 100,
             'next_reward_at'                 => 100,
             'event_type'                     => $event->type,
-            'item_specialty_type_reward'     => ItemSpecialtyType::CORRUPTED_ICE,
+            'item_specialty_type_reward'     => ItemSpecialtyType::DELUSIONAL_SILVER,
             'should_be_unique'               => true,
             'unique_type'                    => RandomAffixDetails::LEGENDARY,
             'should_be_mythic'               => false,
