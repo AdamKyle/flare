@@ -16,7 +16,6 @@ use Mockery;
 use Mockery\MockInterface;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
-use Tests\Traits\Cleanup\CleanupKingdoms;
 use Tests\Traits\CreateAnnouncement;
 use Tests\Traits\CreateEvent;
 use Tests\Traits\CreateFactionLoyalty;
@@ -273,6 +272,69 @@ class EndScheduledEventTest extends TestCase {
         $character = $character->refresh();
 
         $this->assertNotEmpty($character->inventory->slots->where('item.specialty_type', ItemSpecialtyType::CORRUPTED_ICE)->all());
+        $this->assertEmpty($character->kingdoms);
+        $this->assertEquals(GameMap::where('name', MapNameValue::SURFACE)->first()->id, $character->map->game_map_id);
+
+        $this->assertFalse($scheduledEvent->refresh()->currently_running);
+        $this->assertEmpty(Event::all());
+        $this->assertEmpty(Announcement::all());
+    }
+
+    public function testEndDelusionalMemoriesEvent() {
+        $this->deleteOtherGameMaps();
+
+        $monsterCache = [
+            MapNameValue::SURFACE => [$this->createMonster()]
+        ];
+
+        Cache::put('monsters', $monsterCache);
+
+        $this->instance(
+            MapTileValue::class,
+            Mockery::mock(MapTileValue::class, function (MockInterface $mock) {
+                $mock->shouldReceive('canWalkOnWater')->andReturn(true);
+                $mock->shouldReceive('canWalkOnDeathWater')->andReturn(true);
+                $mock->shouldReceive('canWalkOnMagma')->andReturn(true);
+                $mock->shouldReceive('isPurgatoryWater')->andReturn(false);
+                $mock->shouldReceive('getTileColor')->andReturn('000');
+            })
+        );
+
+        $scheduledEvent = $this->createScheduledEvent([
+            'event_type'        => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'start_date'        => now()->addMinutes(5),
+            'currently_running' => true,
+        ]);
+
+        $event = $this->createEvent([
+            'type'        => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'started_at'  => now(),
+            'ends_at'     => now()->subMinute(10),
+        ]);
+
+        $this->createAnnouncement([
+            'event_id' => $event->id,
+        ]);
+
+        $delusionalMap = $this->createGameMap([
+            'name' => MapNameValue::DELUSIONAL_MEMORIES,
+        ]);
+
+        $character = (new CharacterFactory())->createBaseCharacter()
+            ->givePlayerLocation(16, 16, $delusionalMap)
+            ->kingdomManagement()
+            ->assignKingdom()
+            ->assignBuilding()
+            ->assignUnits()
+            ->getCharacter();
+
+        $this->createItem(['specialty_type' => ItemSpecialtyType::DELUSIONAL_SILVER, 'type' => WeaponTypes::HAMMER]);
+
+        $this->artisan('end:scheduled-event');
+
+        $character = $character->refresh();
+
+        $this->assertNotEmpty($character->inventory->slots->where('item.specialty_type', ItemSpecialtyType::DELUSIONAL_SILVER)->all());
         $this->assertEmpty($character->kingdoms);
         $this->assertEquals(GameMap::where('name', MapNameValue::SURFACE)->first()->id, $character->map->game_map_id);
 

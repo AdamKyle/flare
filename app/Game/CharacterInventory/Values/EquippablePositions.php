@@ -95,7 +95,11 @@ class EquippablePositions {
             self::RIGHT_HAND => [
                 WeaponTypes::WEAPON,
                 WeaponTypes::STAVE,
+                WeaponTypes::SCRATCH_AWL,
+                WeaponTypes::MACE,
+                WeaponTypes::GUN,
                 WeaponTypes::BOW,
+                WeaponTypes::FAN,
                 WeaponTypes::HAMMER,
                 ArmourTypes::SHIELD,
             ],
