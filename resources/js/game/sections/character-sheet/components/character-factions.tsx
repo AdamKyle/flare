@@ -10,8 +10,6 @@ import PrimaryButton from "../../../components/ui/buttons/primary-button";
 import PledgeLoyalty from "../../faction-loyalty/modals/pledge-loyalty";
 import SuccessAlert from "../../../components/ui/alerts/simple-alerts/success-alert";
 import DangerButton from "../../../components/ui/buttons/danger-button";
-import DangerAlert from "../../../components/ui/alerts/simple-alerts/danger-alert";
-import WarningAlert from "../../../components/ui/alerts/simple-alerts/warning-alert";
 
 export default class CharacterFactions extends React.Component<any, any> {
 
@@ -52,7 +50,7 @@ export default class CharacterFactions extends React.Component<any, any> {
 
                 let factionId = this.props.pledged_faction_id;
 
-                if (!factionId) {
+                if (!factionId || this.state.pledge_faction !== null) {
                     factionId = this.state.pledge_faction.id;
                 }
 

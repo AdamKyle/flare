@@ -7,6 +7,7 @@ use App\Flare\Models\Faction;
 use App\Flare\Models\FactionLoyaltyNpc;
 use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
 use App\Http\Controllers\Controller;
+use Exception;
 use Illuminate\Http\JsonResponse;
 
 class FactionLoyaltyController extends Controller {
@@ -41,6 +42,7 @@ class FactionLoyaltyController extends Controller {
      * @param Character $character
      * @param Faction $faction
      * @return JsonResponse
+     * @throws Exception
      */
     public function pledgeLoyalty(Character $character, Faction $faction): JsonResponse {
 
