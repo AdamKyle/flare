@@ -91,7 +91,7 @@ class BattleRewardService {
 
         $character = $this->factionLoyaltyBountyHandler->handleBounty($character, $this->monster);
 
-        $character = $this->weeklyBattleService->handleWeeklyBattle($character, $this->monster);
+        $character = $this->weeklyBattleService->handleMonsterDeath($character, $this->monster);
 
         BattleItemHandler::dispatch($character, $this->monster);
     }

@@ -42,9 +42,9 @@ class WeeklyBattleService {
         ]);
     }
 
-    public function handleMonsterDeath(Character $character, Monster $monster): void {
+    public function handleMonsterDeath(Character $character, Monster $monster): Character {
         if (!in_array($monster->only_for_location_type, $this->validLocationTypes)) {
-            return;
+            return $character;
         }
 
         $weeklyMonsterFight = $character->weeklyBattleFights()->where('monster_id', $monster->id)->first();
@@ -56,12 +56,14 @@ class WeeklyBattleService {
                 'monster_was_killed' => true,
             ]);
 
-            return;
+            return $this->handleWeeklyBattle($character, $monster);
         }
 
         $weeklyMonsterFight->update([
             'monster_was_killed' => true,
         ]);
+
+        return $this->handleWeeklyBattle($character, $monster);
     }
 
     public function canFightMonster(Character $character, Monster $monster): bool {
@@ -74,7 +76,7 @@ class WeeklyBattleService {
         return !$weeklyMonsterFight->monster_was_killed;
     }
 
-    public function handleWeeklyBattle(Character $character, Monster $monster): Character {
+    private function handleWeeklyBattle(Character $character, Monster $monster): Character {
 
         if (!in_array($monster->only_for_location_type, $this->validLocationTypes)) {
             return $character;
@@ -83,7 +85,7 @@ class WeeklyBattleService {
         $locationType = new LocationType($monster->only_for_location_type);
 
         if ($locationType->isAlchemyChurch()) {
-            $this->locationSpecialtyHandler->handleMonsterFromSpecialLocation($character, $monster);
+            $this->locationSpecialtyHandler->handleMonsterFromSpecialLocation($character);
         }
 
 

@@ -3,6 +3,7 @@
 namespace App\Game\Battle\Services;
 
 use App\Flare\Models\Character;
+use App\Flare\Models\Monster;
 use App\Flare\ServerFight\MonsterPlayerFight;
 use App\Game\Battle\Events\AttackTimeOutEvent;
 use App\Game\Battle\Handlers\BattleEventHandler;
@@ -35,15 +36,21 @@ class MonsterFightService {
 
         $data = $data->fightSetUp();
 
-        if ($data['health']['current_character_health'] <= 0) {
-            $this->battleEventHandler->processDeadCharacter($character);
-        } else if ($data['health']['current_monster_health'] <= 0) {
+        if ($data['health']['current_monster_health'] <= 0) {
             $this->battleEventHandler->processMonsterDeath($character->id, $data['monster']['id']);
 
             event(new AttackTimeOutEvent($character));
-        } else {
-            Cache::put('monster-fight-' . $character->id, $data, 900);
+
+            return $this->successResult($data);
         }
+
+        if ($data['health']['current_character_health'] <= 0) {
+            $monster = Monster::find($data['monster']['id']);
+
+            $this->battleEventHandler->processDeadCharacter($character, $monster);
+        }
+
+        Cache::put('monster-fight-' . $character->id, $data, 900);
 
         return $this->successResult($data);
     }
@@ -60,7 +67,12 @@ class MonsterFightService {
         $this->monsterPlayerFight->fightMonster(true, false, $attackType);
 
         if ($this->monsterPlayerFight->getCharacterHealth() <= 0) {
-            $this->battleEventHandler->processDeadCharacter($character);
+
+            $monster = $this->monsterPlayerFight->getMonster();
+
+            $monster = Monster::find($monster['id']);
+
+            $this->battleEventHandler->processDeadCharacter($character, $monster);
         }
 
         $monsterHealth   = $this->monsterPlayerFight->getMonsterHealth();
@@ -70,6 +82,7 @@ class MonsterFightService {
         $cache['health']['current_monster_health']   = $monsterHealth;
         $cache['health']['current_character_health'] = $characterHealth;
         $cache['health']['current_monster_health']   = $monsterHealth;
+        $cache['messages'] = $this->monsterPlayerFight->getBattleMessages();
 
         if ($monsterHealth >= 0) {
             Cache::put('monster-fight-' . $character->id, $cache, 900);
@@ -79,7 +92,6 @@ class MonsterFightService {
             BattleAttackHandler::dispatch($character->id, $this->monsterPlayerFight->getMonster()['id'])->onQueue('default_long')->delay(now()->addSeconds(2));
         }
 
-        $cache['messages'] = $this->monsterPlayerFight->getBattleMessages();
 
         return $this->successResult($cache);
     }

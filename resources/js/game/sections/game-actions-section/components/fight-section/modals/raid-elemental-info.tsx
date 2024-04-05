@@ -18,7 +18,6 @@ export default class RaidElementInfo extends React.Component<any, any> {
     }
 
     renderAtonementData() {
-        console.log(this.props);
         const dlElements = [];
 
         for (const key in this.props.element_atonements) {

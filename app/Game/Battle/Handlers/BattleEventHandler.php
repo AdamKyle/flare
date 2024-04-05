@@ -11,6 +11,7 @@ use App\Game\Battle\Events\CharacterRevive;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\BattleRewardProcessing\Services\BattleRewardService;
 use App\Game\BattleRewardProcessing\Services\SecondaryRewardService;
+use App\Game\BattleRewardProcessing\Services\WeeklyBattleService;
 use App\Game\Messages\Events\ServerMessageEvent;
 use Exception;
 use Illuminate\Support\Facades\Cache;
@@ -31,23 +32,39 @@ class BattleEventHandler {
     private SecondaryRewardService $secondaryRewardService;
 
     /**
-     * @param BattleRewardService $battleRewardService
+     * @var WeeklyBattleService
      */
-    public function __construct(BattleRewardService $battleRewardService, SecondaryRewardService $secondaryRewardService) {
+    private WeeklyBattleService $weeklyBattleService;
+
+    /**
+     * @param BattleRewardService $battleRewardService
+     * @param SecondaryRewardService $secondaryRewardService
+     * @param WeeklyBattleService $weeklyBattleService
+     */
+    public function __construct(BattleRewardService $battleRewardService, SecondaryRewardService $secondaryRewardService, WeeklyBattleService $weeklyBattleService) {
         $this->battleRewardService    = $battleRewardService;
         $this->secondaryRewardService = $secondaryRewardService;
+        $this->weeklyBattleService    = $weeklyBattleService;
     }
 
     /**
      * Process the fact the character has died.
      *
      * @param Character $character
+     * @param Monster|null $monster
      * @return void
      */
-    public function processDeadCharacter(Character $character): void {
+    public function processDeadCharacter(Character $character, ?Monster $monster = null): void {
         $character->update(['is_dead' => true]);
 
         $character = $character->refresh();
+
+        if (!is_null($monster)) {
+
+            if (!is_null($monster->only_for_location_type)) {
+                $this->weeklyBattleService->handleCharacterDeath($character, $monster);
+            }
+        }
 
         event(new AttackTimeOutEvent($character));
 

@@ -118,7 +118,14 @@ export default class FightSection extends React.Component<
                             });
                         },
                         (error: AxiosError) => {
-                            console.error(error);
+                            if (typeof error.response !== "undefined") {
+                                const response = error.response;
+
+                                this.setState({
+                                    error_message: response.data.message,
+                                    setting_up_regular_fight: false,
+                                });
+                            }
                         }
                     );
             }

@@ -162,10 +162,7 @@ export default class Actions extends React.Component<
         );
     }
 
-    componentDidUpdate(
-        prevProps: Readonly<ActionsProps>,
-        prevState: Readonly<ActionsState>
-    ): void {
+    componentDidUpdate(): void {
         if (this.props.action_data !== null && this.state.loading) {
             this.setState({
                 ...this.state,
@@ -178,7 +175,11 @@ export default class Actions extends React.Component<
             return;
         }
 
-        if (this.props.action_data.monsters != this.state.monsters) {
+        if (this.props.action_data.monsters.length  === 0) {
+            return;
+        }
+
+        if (this.props.action_data.monsters[0].id !== this.state.monsters[0].id) {
             if (this.props.action_data.monsters.length > 0) {
                 this.setState({
                     monsters: this.props.action_data.monsters,
@@ -186,7 +187,7 @@ export default class Actions extends React.Component<
             }
         }
 
-        if (this.props.action_data.raid_monsters != this.state.raid_monsters) {
+        if (this.props.action_data.raid_monsters !== this.state.raid_monsters) {
             this.setState({
                 raid_monsters: this.props.action_data.raid_monsters,
             });
@@ -204,8 +205,6 @@ export default class Actions extends React.Component<
         if (this.props.action_data === null) {
             return;
         }
-
-        console.log(this.props.action_data);
 
         let actionData: GameActionState = this.props.action_data;
 

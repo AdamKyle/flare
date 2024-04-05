@@ -68,7 +68,7 @@ export default class MonsterListeners implements GameListener {
                 const actionData = JSON.parse(JSON.stringify(this.component.state.action_data));
 
                 actionData.monsters = event.monsters;
-
+                console.log(actionData);
                 this.component.setState({
                     action_data: actionData,
                 });

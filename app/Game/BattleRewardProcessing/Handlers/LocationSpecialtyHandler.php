@@ -20,7 +20,7 @@ class LocationSpecialtyHandler {
         $this->randomAffixGenerator = $randomAffixGenerator;
     }
 
-    public function handleMonsterFromSpecialLocation(Character $character, Monster $monster): void {
+    public function handleMonsterFromSpecialLocation(Character $character): void {
         $this->giveItemReward($character);
     }
 

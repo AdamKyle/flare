@@ -48,7 +48,6 @@ export default class Quests extends React.Component<QuestsProps, QuestState> {
     }
 
     buildPlaneSelection(): MenuItemType[] | [] {
-        console.log(this.props.quest_details);
         const planes = [
             {
                 name: "Surface",

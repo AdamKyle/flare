@@ -294,6 +294,16 @@ class TraverseService {
 
         $cache = CoordinatesCache::getFromCache();
 
+        $x = $cache['x'];
+        $y = $cache['y'];
+
+        $character->map()->update([
+            'character_position_x' => $x[rand(0, count($x) - 1)],
+            'character_position_y' => $y[rand(0, count($y) - 1)],
+        ]);
+
+        $character = $character->refresh();
+
         $character = $this->changeLocation($character, $cache);
 
         $newXPosition = $character->map->character_position_x;
@@ -322,7 +332,9 @@ class TraverseService {
             !$this->mapTileValue->canWalkOnWater($character, $character->map->character_position_x, $character->map->character_position_y) ||
             !$this->mapTileValue->canWalkOnDeathWater($character, $character->map->character_position_x, $character->map->character_position_y) ||
             !$this->mapTileValue->canWalkOnMagma($character, $character->map->character_position_x, $character->map->character_position_y) ||
-            $this->mapTileValue->isPurgatoryWater((int) $this->mapTileValue->getTileColor($character, $character->map->character_position_x, $character->map->character_position_y))
+            $this->mapTileValue->isPurgatoryWater((int) $this->mapTileValue->getTileColor($character, $character->map->character_position_x, $character->map->character_position_y)) ||
+            $this->mapTileValue->isTwistedMemoriesWater((int) $this->mapTileValue->getTileColor($character, $character->map->character_position_x, $character->map->character_position_y)) ||
+            $this->mapTileValue->isDelusionalMemoriesWater((int) $this->mapTileValue->getTileColor($character, $character->map->character_position_x, $character->map->character_position_y))
         ) {
             // Update the players location, call the method again to validate that we are not at a invalid location.
             // repeat until we are in a non-invalid location,

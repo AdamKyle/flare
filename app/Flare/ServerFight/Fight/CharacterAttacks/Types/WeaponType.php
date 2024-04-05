@@ -147,7 +147,9 @@ class WeaponType extends BattleBase {
     public function weaponAttack(Character $character, ServerMonster $monster, int $weaponDamage) {
         $this->weaponDamage($character, $monster->getName(), $weaponDamage);
 
-        $this->doMonsterCounter($character, $monster);
+        if (!$this->isEnemyEntranced) {
+            $this->doMonsterCounter($character, $monster);
+        }
 
         if ($this->characterHealth <= 0) {
             $this->abortCharacterIsDead = true;

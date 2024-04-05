@@ -5,6 +5,7 @@ namespace App\Game\Battle\Controllers\Api;
 use App\Flare\Models\Monster;
 use App\Flare\Models\Location;
 use App\Flare\Models\Character;
+use App\Flare\Values\LocationType;
 use App\Game\Battle\Handlers\BattleEventHandler;
 use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
@@ -121,14 +122,28 @@ class BattleController extends Controller {
      * @return JsonResponse
      */
     public function setupMonster(AttackTypeRequest $attackTypeRequest, Character $character, Monster $monster): JsonResponse {
-        dump($character->weeklyBattleFights);
-        $weeklyFight = $character->weeklyBattleFights()->where('monster_id', $monster->id)->where('monster_was_killed', true)->first();
 
-        if (!is_null($weeklyFight)) {
-            return response()->json([
-                'message' => 'You already fought and killed this beast. You can do so again next week! (Weekly reset is sunday at 3 AM America/Edmonton).'
-            ], 422);
+        if (!is_null($monster->only_for_location_type)) {
+
+            $location = Location::where('type', LocationType::ALCHEMY_CHURCH)->where(
+                'game_map_id', $character->map->game_map_id
+            )->where('x', $character->map->character_position_x)->where('y', $character->map->character_position_y)->first();
+
+            if (is_null($location)) {
+                return response()->json([
+                    'message' => 'You cannot fight a creature of this magnitude with out being at it\'s location.'
+                ], 422);
+            }
+
+            $weeklyFight = $character->weeklyBattleFights()->where('monster_id', $monster->id)->where('monster_was_killed', true)->first();
+
+            if (!is_null($weeklyFight)) {
+                return response()->json([
+                    'message' => 'You already fought and killed this beast. You can do so again next week! (Weekly reset is sunday at 3 AM America/Edmonton).'
+                ], 422);
+            }
         }
+
 
         $result = $this->monsterFightService->setupMonster($character, [
             'attack_type'         => $attackTypeRequest->attack_type,

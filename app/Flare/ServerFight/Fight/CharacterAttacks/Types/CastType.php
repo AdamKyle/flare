@@ -176,7 +176,9 @@ class CastType extends BattleBase
     public function doSpellDamage(Character $character, ServerMonster $monster, int $spellDamage, bool $entranced = false) {
         $this->spellDamage($character, $monster, $spellDamage, $entranced);
 
-        $this->doMonsterCounter($character, $monster);
+        if (!$entranced) {
+            $this->doMonsterCounter($character, $monster);
+        }
 
         if ($this->characterHealth <= 0) {
             $this->abortCharacterIsDead = true;

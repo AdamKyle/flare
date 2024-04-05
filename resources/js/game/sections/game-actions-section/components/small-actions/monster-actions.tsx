@@ -39,6 +39,19 @@ export default class MonsterActions extends React.Component<
         });
     }
 
+    componentDidUpdate() {
+        if (this.props.monsters.length > 0 && this.state.monsters.length > 0) {
+            const newMonster = this.props.monsters[0];
+            const currentMonster = this.state.monsters[0];
+
+            if (newMonster.id !== currentMonster.id) {
+                this.setState({
+                    monsters: this.props.monsters,
+                });
+            }
+        }
+    }
+
     setSelectedMonster(monster: MonsterType | null) {
         this.monsterActionManager.setSelectedMonster(monster);
     }
