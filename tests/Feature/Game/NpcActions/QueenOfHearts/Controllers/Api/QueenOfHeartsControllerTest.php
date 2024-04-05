@@ -47,6 +47,7 @@ class QueenOfHeartsControllerTest extends TestCase {
 
         $jsonData = json_decode($response->getContent(), true);
 
+
         $this->assertCount(2, $jsonData['unique_slots']);
         $this->assertCount(2, $jsonData['non_unique_slots']);
     }

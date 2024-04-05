@@ -7,6 +7,7 @@ use App\Flare\Models\Location;
 use App\Flare\Models\Character;
 use App\Flare\Values\LocationType;
 use App\Game\Battle\Handlers\BattleEventHandler;
+use App\Game\BattleRewardProcessing\Services\WeeklyBattleService;
 use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Cache;
@@ -30,15 +31,23 @@ class BattleController extends Controller {
     private BattleEventHandler $battleEventHandler;
 
     /**
+     * @var WeeklyBattleService $weeklyBattleService;
+     */
+    private WeeklyBattleService $weeklyBattleService;
+
+    /**
      * @param MonsterFightService $monsterFightService
      * @param BattleEventHandler $battleEventHandler
+     * @param WeeklyBattleService $weeklyBattleService
      */
-    public function __construct(MonsterFightService $monsterFightService, BattleEventHandler $battleEventHandler) {
+    public function __construct(MonsterFightService $monsterFightService, BattleEventHandler $battleEventHandler, WeeklyBattleService $weeklyBattleService) {
         $this->middleware('is.character.dead')->except(['revive', 'index']);
 
         $this->monsterFightService = $monsterFightService;
 
         $this->battleEventHandler = $battleEventHandler;
+
+        $this->weeklyBattleService = $weeklyBattleService;
     }
 
     /**
@@ -135,9 +144,7 @@ class BattleController extends Controller {
                 ], 422);
             }
 
-            $weeklyFight = $character->weeklyBattleFights()->where('monster_id', $monster->id)->where('monster_was_killed', true)->first();
-
-            if (!is_null($weeklyFight)) {
+            if (!$this->weeklyBattleService->canFightMonster($character, $monster)) {
                 return response()->json([
                     'message' => 'You already fought and killed this beast. You can do so again next week! (Weekly reset is sunday at 3 AM America/Edmonton).'
                 ], 422);

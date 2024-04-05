@@ -115,6 +115,11 @@ class WeeklyBattleServiceTest extends TestCase {
 
         $character = $this->characterFactory->getCharacter();
 
+        $this->createItem([
+            'type' => 'weapon',
+            'specialty_type' => ItemSpecialtyType::DELUSIONAL_SILVER
+        ]);
+
         $monster = $this->createMonster([
             'only_for_location_type' => LocationType::ALCHEMY_CHURCH,
         ]);
@@ -136,17 +141,28 @@ class WeeklyBattleServiceTest extends TestCase {
 
         $character = $this->characterFactory->getCharacter();
 
+        $this->createItem([
+            'type' => 'weapon',
+            'specialty_type' => ItemSpecialtyType::DELUSIONAL_SILVER
+        ]);
+
         $monster = $this->createMonster([
             'only_for_location_type' => LocationType::ALCHEMY_CHURCH,
         ]);
 
         $this->weeklyBattleService->handleMonsterDeath($character, $monster);
 
-        $weeklyBattleFight = $character->refresh()->weeklyBattleFights->first();
+        $character = $character->refresh();
+
+        $weeklyBattleFight = $character->weeklyBattleFights->first();
 
         $this->assertNotNull($weeklyBattleFight);
 
         $this->assertTrue($weeklyBattleFight->monster_was_killed);
+
+        $this->assertNotNull($character->inventory->slots->filter(function($slot) {
+            return $slot->item->is_cosmic;
+        })->first());
     }
 
     public function testDoNotCreateRecordMonsterWasKilledForInvalidLocationType() {
@@ -159,7 +175,9 @@ class WeeklyBattleServiceTest extends TestCase {
 
         $this->weeklyBattleService->handleMonsterDeath($character, $monster);
 
-        $weeklyBattleFight = $character->refresh()->weeklyBattleFights->first();
+        $character = $character->refresh();
+
+        $weeklyBattleFight = $character->weeklyBattleFights->first();
 
         $this->assertNull($weeklyBattleFight);
     }
@@ -185,39 +203,5 @@ class WeeklyBattleServiceTest extends TestCase {
         ]);
 
         $this->assertFalse($this->weeklyBattleService->canFightMonster($character, $monster));
-    }
-
-    public function testGiveItemForAlchemyChurch() {
-        $character = $this->characterFactory->getCharacter();
-        $monster = $this->createMonster([
-            'only_for_location_type' => LocationType::ALCHEMY_CHURCH,
-        ]);
-
-        $this->createItem([
-            'type' => 'weapon',
-        ]);
-
-        $character = $this->weeklyBattleService->handleWeeklyBattle($character, $monster);
-
-        $this->assertNotNull($character->inventory->slots->filter(function($slot) {
-            return $slot->item->is_cosmic;
-        })->first());
-    }
-
-    public function testDoNotGiveItemForInvalidLocationType() {
-        $character = $this->characterFactory->getCharacter();
-        $monster = $this->createMonster([
-            'only_for_location_type' => LocationType::TWISTED_GATE
-        ]);
-
-        $this->createItem([
-            'type' => 'weapon',
-        ]);
-
-        $character = $this->weeklyBattleService->handleWeeklyBattle($character, $monster);
-
-        $this->assertNull($character->inventory->slots->filter(function($slot) {
-            return $slot->item->is_cosmic;
-        })->first());
     }
 }

@@ -75,7 +75,7 @@ class RandomEnchantmentService {
 
             $item->load('itemPrefix', 'itemSuffix');
 
-            if (!$slot->equipped && ($item->is_mythic || $item->is_unique || $this->is_cosmic)) {
+            if (!$slot->equipped && ($item->is_mythic || $item->is_unique || $item->is_cosmic)) {
                 // Check if item has a prefix and it's randomly generated
                 if ($item->itemPrefix && $item->itemPrefix->randomly_generated) {
                     return true;

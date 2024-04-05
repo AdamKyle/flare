@@ -20,6 +20,7 @@ use App\Game\Battle\Services\PvpService;
 use App\Game\Battle\Services\RaidBattleService;
 use App\Game\BattleRewardProcessing\Services\BattleRewardService;
 use App\Game\BattleRewardProcessing\Services\SecondaryRewardService;
+use App\Game\BattleRewardProcessing\Services\WeeklyBattleService;
 use App\Game\Core\Services\GoldRush;
 use App\Game\Maps\Values\MapTileValue;
 use App\Game\Messages\Builders\NpcServerMessageBuilder;
@@ -90,7 +91,8 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(BattleEventHandler::class, function($app) {
             return new BattleEventHandler(
                 $app->make(BattleRewardService::class),
-                $app->make(SecondaryRewardService::class)
+                $app->make(SecondaryRewardService::class),
+                $app->make(WeeklyBattleService::class),
             );
         });
 

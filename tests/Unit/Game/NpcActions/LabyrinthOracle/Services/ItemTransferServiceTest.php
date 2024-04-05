@@ -235,6 +235,184 @@ class ItemTransferServiceTest extends TestCase {
         $this->assertEquals($transferredToItem->sockets->first()->gem_id, $gemToAttach->id);
     }
 
+    public function testTransferItemAttributesWhenOneIsMythic() {
+
+        Event::fake();
+
+        $attachedSuffix = $this->createItemAffix([
+            'type' => 'suffix'
+        ]);
+
+        $attachedPrefix = $this->createItemAffix([
+            'type' => 'prefix'
+        ]);
+
+        $itemToTransferFrom = $this->createItem([
+            'item_suffix_id' => $attachedSuffix->id,
+            'item_prefix_id' => $attachedPrefix->id,
+            'socket_count' => 2,
+            'holy_stacks'  => 1,
+            'is_mythic' => true,
+        ]);
+
+        $itemToTransferFrom->appliedHolyStacks()->create([
+            'item_id' => $itemToTransferFrom->id,
+            'devouring_darkness_bonus' => 0.10,
+            'stat_increase_bonus' => 0.10,
+        ]);
+
+        $itemToTransferFrom = $itemToTransferFrom->refresh();
+
+        $gemToAttach = $this->createGem();
+
+        $itemToTransferFrom->sockets()->create([
+            'item_id' => $itemToTransferFrom->id,
+            'gem_id' => $gemToAttach->id,
+        ]);
+
+        $itemToTransferFrom = $itemToTransferFrom->refresh();
+        $itemToTransferTo   = $this->createItem([
+            'holy_stacks' => 1,
+        ]);
+
+        $character = $this->character
+            ->inventoryManagement()
+            ->giveItem($itemToTransferFrom)
+            ->giveItem($itemToTransferTo);
+
+        $slotForItemToTransferTo = $character->getSlotId(1);
+
+        $character = $character->getCharacter();
+
+        $character->update([
+            'gold' => MaxCurrenciesValue::MAX_GOLD,
+            'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
+            'shards' => MaxCurrenciesValue::MAX_SHARDS,
+        ]);
+
+        $character = $character->refresh();
+
+        $result = $this->itemTransferService->transferItemEnhancements(
+            $character,
+            $itemToTransferFrom->id,
+            $itemToTransferTo->id,
+        );
+
+        $character = $character->refresh();
+
+        $transferredToItem = $character->inventory->slots->where('id', $slotForItemToTransferTo)->first()->item;
+
+        $this->assertEquals(200, $result['status']);
+        $this->assertGreaterThan(0, $result['inventory']);
+
+        Event::assertDispatched(ServerMessageEvent::class);
+
+        $this->assertEquals($transferredToItem->item_suffix_id, $attachedSuffix->id);
+        $this->assertEquals($transferredToItem->item_prefix_id, $attachedPrefix->id);
+        $this->assertEquals($transferredToItem->holy_stacks_applied, 1);
+        $this->assertTrue($transferredToItem->is_mythic);
+        $expectedAttributes = [
+            'item_id' => $transferredToItem->id,
+            'devouring_darkness_bonus' => 0.10,
+            'stat_increase_bonus' => 0.10,
+        ];
+
+        $actualAttributes = $transferredToItem->appliedHolyStacks->first()->only(array_keys($expectedAttributes));
+
+        $this->assertEquals($actualAttributes, $expectedAttributes);
+        $this->assertEquals($transferredToItem->socket_count, 2);
+        $this->assertEquals($transferredToItem->sockets->first()->gem_id, $gemToAttach->id);
+    }
+
+    public function testTransferItemAttributesWhenOneCosmic() {
+
+        Event::fake();
+
+        $attachedSuffix = $this->createItemAffix([
+            'type' => 'suffix'
+        ]);
+
+        $attachedPrefix = $this->createItemAffix([
+            'type' => 'prefix'
+        ]);
+
+        $itemToTransferFrom = $this->createItem([
+            'item_suffix_id' => $attachedSuffix->id,
+            'item_prefix_id' => $attachedPrefix->id,
+            'socket_count' => 2,
+            'holy_stacks'  => 1,
+            'is_cosmic' => true,
+        ]);
+
+        $itemToTransferFrom->appliedHolyStacks()->create([
+            'item_id' => $itemToTransferFrom->id,
+            'devouring_darkness_bonus' => 0.10,
+            'stat_increase_bonus' => 0.10,
+        ]);
+
+        $itemToTransferFrom = $itemToTransferFrom->refresh();
+
+        $gemToAttach = $this->createGem();
+
+        $itemToTransferFrom->sockets()->create([
+            'item_id' => $itemToTransferFrom->id,
+            'gem_id' => $gemToAttach->id,
+        ]);
+
+        $itemToTransferFrom = $itemToTransferFrom->refresh();
+        $itemToTransferTo   = $this->createItem([
+            'holy_stacks' => 1,
+        ]);
+
+        $character = $this->character
+            ->inventoryManagement()
+            ->giveItem($itemToTransferFrom)
+            ->giveItem($itemToTransferTo);
+
+        $slotForItemToTransferTo = $character->getSlotId(1);
+
+        $character = $character->getCharacter();
+
+        $character->update([
+            'gold' => MaxCurrenciesValue::MAX_GOLD,
+            'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
+            'shards' => MaxCurrenciesValue::MAX_SHARDS,
+        ]);
+
+        $character = $character->refresh();
+
+        $result = $this->itemTransferService->transferItemEnhancements(
+            $character,
+            $itemToTransferFrom->id,
+            $itemToTransferTo->id,
+        );
+
+        $character = $character->refresh();
+
+        $transferredToItem = $character->inventory->slots->where('id', $slotForItemToTransferTo)->first()->item;
+
+        $this->assertEquals(200, $result['status']);
+        $this->assertGreaterThan(0, $result['inventory']);
+
+        Event::assertDispatched(ServerMessageEvent::class);
+
+        $this->assertEquals($transferredToItem->item_suffix_id, $attachedSuffix->id);
+        $this->assertEquals($transferredToItem->item_prefix_id, $attachedPrefix->id);
+        $this->assertEquals($transferredToItem->holy_stacks_applied, 1);
+        $this->assertTrue($transferredToItem->is_cosmic);
+        $expectedAttributes = [
+            'item_id' => $transferredToItem->id,
+            'devouring_darkness_bonus' => 0.10,
+            'stat_increase_bonus' => 0.10,
+        ];
+
+        $actualAttributes = $transferredToItem->appliedHolyStacks->first()->only(array_keys($expectedAttributes));
+
+        $this->assertEquals($actualAttributes, $expectedAttributes);
+        $this->assertEquals($transferredToItem->socket_count, 2);
+        $this->assertEquals($transferredToItem->sockets->first()->gem_id, $gemToAttach->id);
+    }
+
     public function testTransferItemAttributesWithGemsBeingReturned() {
 
         Event::fake();

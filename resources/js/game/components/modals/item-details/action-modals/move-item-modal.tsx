@@ -96,8 +96,13 @@ export default class MoveItemModal extends React.Component<
                                 type.
                             </li>
                             <li>
+                                <strong>Comsic (light purple items)</strong>: 1
+                                Cosmic, if there is no Unique OR Mythic, regardless of
+                                type.
+                            </li>
+                            <li>
                                 <strong>Ancestral Items (purple items)</strong>:
-                                1 Ancestral item may be equipped at a time.
+                                1 Ancestral item only.
                             </li>
                         </ul>
                         <p className="mb-3">

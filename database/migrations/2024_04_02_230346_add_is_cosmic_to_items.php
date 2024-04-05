@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('items', function (Blueprint $table) {
-            $table->boolean('is_cosmic')->default(false);
+            $table->boolean('is_cosmic')->nullable()->default(false);
         });
     }
 

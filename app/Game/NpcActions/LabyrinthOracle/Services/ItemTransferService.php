@@ -149,10 +149,12 @@ class ItemTransferService {
      * @return bool
      */
     protected function cannotTransferFrom(Item $itemToTransferFrom): bool {
-        return is_null($itemToTransferFrom->item_preffix_id) &&
+        return (
+            is_null($itemToTransferFrom->item_prefix_id) &&
             is_null($itemToTransferFrom->item_suffix_id) &&
             $itemToTransferFrom->holy_stacks_applied <= 0 &&
-            $itemToTransferFrom->socket_count <= 0;
+            $itemToTransferFrom->socket_count <= 0
+        );
 
     }
 

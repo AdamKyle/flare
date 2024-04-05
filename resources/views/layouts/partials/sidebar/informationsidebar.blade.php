@@ -67,6 +67,10 @@
                 <span class="text-sm ra ra-monster-skull"></span>
                 Raids
             </a>
+            <a href="{{ route('info.page', ['pageName' => 'weekly-fights']) }}">
+                <span class="text-sm ra ra-monster-skull"></span>
+                Weekly Fights
+            </a>
         </div>
         <hr />
         <div class="menu-detail-wrapper">
