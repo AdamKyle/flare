@@ -22,9 +22,14 @@ class BuildQuestCacheService {
 
         $quests = $quests->toArray();
 
-        $winterQuests = $this->fetchWinterEventQuests();
+        $eventQuests = [];
+        $events = [EventType::WINTER_EVENT, EventType::DELUSIONAL_MEMORIES_EVENT];
 
-        $quests = array_merge($quests, $winterQuests);
+        foreach ($events as $event) {
+            $eventQuests = array_merge($eventQuests, $this->fetchEventQuests($event));
+        }
+
+        $quests = array_merge($quests, $eventQuests);
 
         Cache::put('game-quests', $quests);
 
@@ -34,15 +39,15 @@ class BuildQuestCacheService {
     }
 
 
-    protected function fetchWinterEventQuests(): array {
-        $event = Event::where('type', EventType::WINTER_EVENT)->first();
+    protected function fetchEventQuests(string $eventType): array {
+        $event = Event::where('type', $eventType)->first();
 
         if (is_null($event)) {
             return [];
         }
 
         return Quest::where('is_parent', true)
-            ->where('only_for_event', EventType::WINTER_EVENT)
+            ->where('only_for_event', $eventType)
             ->whereNull('raid_id')
             ->with('childQuests')
             ->get()

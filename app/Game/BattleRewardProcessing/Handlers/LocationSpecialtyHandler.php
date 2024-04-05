@@ -4,9 +4,12 @@ namespace App\Game\BattleRewardProcessing\Handlers;
 
 use App\Flare\Builders\RandomAffixGenerator;
 use App\Flare\Models\Character;
+use App\Flare\Models\GlobalEventGoal;
 use App\Flare\Models\Item;
 use App\Flare\Models\Monster;
 use App\Flare\Values\RandomAffixDetails;
+use App\Game\Messages\Events\GlobalMessageEvent;
+use App\Game\Messages\Events\ServerMessageEvent;
 
 class LocationSpecialtyHandler {
 
@@ -27,6 +30,14 @@ class LocationSpecialtyHandler {
             'inventory_id' => $character->inventory->id,
             'item_id' => $item->id,
         ]);
+
+        $character = $character->refresh();
+
+        $slot = $character->inventory->slots->where('item_id', '=', $item->id)->first();
+
+        event(new GlobalMessageEvent($character->name . ' Has slaughtered a beast beyond comprehension and been rewarded with a cosmic gift!'));
+
+        event(new ServerMessageEvent($character->user, 'You have received a cosmic item! How exciting! Rewarded with: ' . $slot->item->affix_name, $slot->id));
     }
 
     private function giveCharacterRandomCosmicItem(Character $character): Item {

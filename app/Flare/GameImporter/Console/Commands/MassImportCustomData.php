@@ -79,6 +79,7 @@ class MassImportCustomData extends Command {
 
         Artisan::call('import:game-data "Admin Section"');
 
+        Artisan::call('assign:new-factions-to-characters');
         Artisan::call('change:feature-types-on-quests');
         Artisan::call('give:new-slots-quest-item');
         Artisan::call('allow:traverse-for-maps');

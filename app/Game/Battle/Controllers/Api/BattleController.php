@@ -121,7 +121,7 @@ class BattleController extends Controller {
      * @return JsonResponse
      */
     public function setupMonster(AttackTypeRequest $attackTypeRequest, Character $character, Monster $monster): JsonResponse {
-
+        dump($character->weeklyBattleFights);
         $weeklyFight = $character->weeklyBattleFights()->where('monster_id', $monster->id)->where('monster_was_killed', true)->first();
 
         if (!is_null($weeklyFight)) {

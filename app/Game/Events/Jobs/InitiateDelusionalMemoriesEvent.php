@@ -75,7 +75,7 @@ class InitiateDelusionalMemoriesEvent implements ShouldQueue {
 
         GlobalEventGoal::create($globalEventGoalData);
 
-        event(new GlobalMessageEvent('"Child! We need you!" The Red Hawk Soldier looks at you. There is a fear in his eyes. "Please child. Fight with us!"'));
+        event(new GlobalMessageEvent('"Child! We need you!" The Red Hawk Soldier looks at you. There is a fear in his eyes. "Please child. Fight with us!"', 'raid-global-message'));
 
         event(new GlobalMessageEvent('While on the Delusional Memories Plane, characters who kill: ANY CREATURE in either manual or exploration, will increase the new: Global Event Goal. ' .
             'Players will be rewarded with random Corrupted Ice Gear when specific milestones are reached. ' .

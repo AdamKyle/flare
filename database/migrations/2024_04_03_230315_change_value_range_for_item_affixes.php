@@ -11,16 +11,16 @@ return new class extends Migration
      */
     public function up(): void {
         Schema::table('item_affixes', function (Blueprint $table) {
-            $table->decimal('str_mod', 10, 4)->change();
-            $table->decimal('dex_mod', 10, 4)->change();
-            $table->decimal('dur_mod', 10, 4)->change();
-            $table->decimal('int_mod', 10, 4)->change();
-            $table->decimal('chr_mod', 10, 4)->change();
-            $table->decimal('agi_mod', 10, 4)->change();
-            $table->decimal('focus_mod', 10, 4)->change();
-            $table->decimal('base_damage_mod', 10, 4)->change();
-            $table->decimal('base_ac_mod', 10, 4)->change();
-            $table->decimal('base_healing_mod', 10, 4)->change();
+            $table->decimal('str_mod', 50, 8)->change();
+            $table->decimal('dex_mod', 50, 8)->change();
+            $table->decimal('dur_mod', 50, 8)->change();
+            $table->decimal('int_mod', 50, 8)->change();
+            $table->decimal('chr_mod', 50, 8)->change();
+            $table->decimal('agi_mod', 50, 8)->change();
+            $table->decimal('focus_mod', 50, 8)->change();
+            $table->decimal('base_damage_mod', 50, 8)->change();
+            $table->decimal('base_ac_mod', 50, 8)->change();
+            $table->decimal('base_healing_mod', 50, 8)->change();
         });
     }
 
