@@ -35,6 +35,7 @@ export default interface ItemToEquip {
     artifact_annulment: number,
     is_unique: boolean,
     is_mythic: boolean,
+    is_cosmic: boolean;
     affix_count: number,
     min_cost: number,
     holy_level: number | null,

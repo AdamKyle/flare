@@ -7,6 +7,7 @@ use App\Flare\Models\Character;
 use App\Flare\Models\GlobalEventGoal;
 use App\Flare\Models\Item;
 use App\Flare\Models\Monster;
+use App\Flare\Values\ItemSpecialtyType;
 use App\Flare\Values\RandomAffixDetails;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
@@ -41,10 +42,9 @@ class LocationSpecialtyHandler {
     }
 
     private function giveCharacterRandomCosmicItem(Character $character): Item {
-        $item = Item::where('cost', '<=', RandomAffixDetails::COSMIC)
+        $item = Item::where('specialty_type', ItemSpecialtyType::DELUSIONAL_SILVER)
             ->whereNull('item_prefix_id')
             ->whereNull('item_suffix_id')
-            ->whereNull('specialty_type')
             ->whereNotIn('type', ['alchemy', 'quest', 'trinket', 'artifact'])
             ->whereDoesntHave('appliedHolyStacks')
             ->inRandomOrder()

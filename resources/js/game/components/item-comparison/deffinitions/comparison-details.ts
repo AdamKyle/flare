@@ -49,4 +49,5 @@ export default interface ComparisonDetails {
     holy_stacks_applied: number,
     type:ItemType,
     is_mythic: boolean;
+    is_cosmic: boolean;
 }

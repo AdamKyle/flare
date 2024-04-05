@@ -161,26 +161,37 @@ class CharacterSheetController extends Controller {
     }
 
     public function factions(Character $character) {
-        $factions = $character->factions->transform(function($faction) {
-            $faction->map_name = $faction->gameMap->name;
-
-            return $faction;
-        });
-
         $winterEvent = Event::where('type', EventType::WINTER_EVENT)->first();
+
+        $delusionalEvent = Event::where('type', EventType::DELUSIONAL_MEMORIES_EVENT)->first();
+
+        $removeGameMaps = [];
 
         if (is_null($winterEvent)) {
 
             $gameMap = GameMap::where('only_during_event_type', EventType::WINTER_EVENT)->first();
 
-            $factions = $factions->filter(function($faction) use($gameMap) {
-                return $faction->game_map_id !== $gameMap->id;
-            });
+            $removeGameMaps[] = $gameMap->id;
         }
 
+        if (is_null($delusionalEvent)) {
+
+            $gameMap = GameMap::where('only_during_event_type', EventType::DELUSIONAL_MEMORIES_EVENT)->first();
+
+            $removeGameMaps[] = $gameMap->id;
+        }
+
+        $factions = $character->factions()->whereNotIn('game_map_id', $removeGameMaps)->get();
+
+        $factions = $factions->transform(function($faction) {
+            $faction->map_name = $faction->gameMap->name;
+
+            return $faction;
+        });
+
         return response()->json([
-            'factions' => $factions,
-        ], 200);
+            'factions' => array_values($factions->toArray()),
+        ]);
     }
 
     public function skills(Character $character, CharacterPassiveSkills $characterPassiveSkills, SkillsTransformer $skillsTransformer) {

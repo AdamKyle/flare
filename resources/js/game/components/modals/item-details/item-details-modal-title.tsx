@@ -17,6 +17,7 @@ export default class ItemDetailsModalTitle extends React.Component<ItemDetailsMo
             affix_count: this.props.itemToEquip.affix_count,
             is_unique: this.props.itemToEquip.is_unique,
             is_mythic: this.props.itemToEquip.is_mythic,
+            is_cosmic: this.props.itemToEquip.is_cosmic,
             holy_stacks_applied: this.props.itemToEquip.holy_stacks_applied,
         }
     }

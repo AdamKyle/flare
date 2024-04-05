@@ -97,10 +97,12 @@ class ItemTransferService {
 
         $this->itemToTransferToDuplicated->update([
             'is_mythic' => $this->itemToTransferFromDuplicated->is_mythic,
+            'is_cosmic' => $this->itemToTransferFromDuplicated->is_cosmic,
         ]);
 
         $this->itemToTransferFromDuplicated->update([
             'is_mythic' => false,
+            'is_cosmic' => false,
         ]);
 
         $this->itemToTransferFromDuplicated = $this->itemToTransferFromDuplicated->refresh();

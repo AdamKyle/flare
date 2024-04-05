@@ -36,7 +36,9 @@ class ItemDisplayColor extends Component {
         $isEitherRandomlyGenerated = $this->isEitherEnchantRandomlyGenerated();
 
         if ($isEitherRandomlyGenerated) {
-            if ($this->item->is_mythic) {
+            if ($this->item->is_cosmic) {
+                $this->color = 'cosmic';
+            } else if ($this->item->is_mythic) {
                 $this->color = 'mythic';
             } else {
                 $this->color = 'unique-item';

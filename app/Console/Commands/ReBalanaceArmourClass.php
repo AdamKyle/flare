@@ -47,6 +47,7 @@ class ReBalanaceArmourClass extends Command
                      ->whereNull('item_prefix_id')
                      ->whereNull('item_suffix_id')
                      ->where('is_mythic', false)
+                     ->where('is_cosmic', false)
                      ->get();
 
         $curve                    = $this->generateArmourClassCurve(intVal($this->argument('start')), intVal($this->argument('end')), floatVal($this->argument('growth')), $items->count());
@@ -70,7 +71,7 @@ class ReBalanaceArmourClass extends Command
     protected function generateArmourClassCurve(int $start, int $end, float $curveStrength, int $numberOfItems): array {
         $curve       = $this->buildGeneralCurve($numberOfItems, $curveStrength, $end);
         $scaledCurve = $this->scaleTheCurve($curve, $end, $start);
-        
+
         return $this->resolveRepeatingNumbers($scaledCurve);
     }
 
@@ -93,31 +94,31 @@ class ReBalanaceArmourClass extends Command
     protected function scaleTheCurve(array $curve, int $end, int $start): array {
         $minValue = min($curve);
         $maxValue = max($curve);
-    
+
         $scaledCurve = [];
-    
+
         foreach ($curve as $value) {
             $normalizedValue = ($value - $minValue) / ($maxValue - $minValue);
             $scaledValue     = $normalizedValue * ($end - $start) + $start;
             $scaledCurve[]   = intval($scaledValue);
         }
-    
+
         return $scaledCurve;
-    } 
+    }
 
     protected function resolveRepeatingNumbers(array $curve): array {
         $resolvedCurve = [];
-    
+
         $previousValue = null;
         foreach ($curve as $value) {
             if ($value === $previousValue) {
                 $value += 1;
             }
-    
+
             $resolvedCurve[] = $value;
             $previousValue = $value;
         }
-    
+
         return $resolvedCurve;
     }
 }

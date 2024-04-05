@@ -93,6 +93,7 @@ class ReRollEnchantmentService {
         $duplicateItem->update([
             'market_sellable' => true,
             'is_mythic'       => $item->is_mythic,
+            'is_cosmic'       => $item->is_cosmic,
         ]);
 
         return $duplicateItem->refresh();
@@ -200,6 +201,7 @@ class ReRollEnchantmentService {
                 if ($deletedOne && $deletedTwo) {
                     $duplicateUnique->update([
                         'is_mythic' => false,
+                        'is_cosmic' => false,
                     ]);
 
                     $duplicateUnique = $duplicateUnique->refresh();
@@ -239,6 +241,7 @@ class ReRollEnchantmentService {
         $duplicateSecondaryItem->update([
             'is_market_sellable' => true,
             'is_mythic'          => $slot->item->is_mythic,
+            'is_cosmic'          => $slot->item->is_cosmic,
         ]);
 
         $secondarySlot->update([

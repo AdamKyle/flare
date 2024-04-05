@@ -90,6 +90,7 @@ class ItemTransformer extends TransformerAbstract {
             'ambush_resistance'                => $item->ambush_resistance,
             'counter_resistance'               => $item->counter_resistance,
             'is_mythic'                        => $item->is_mythic,
+            'is_cosmic'                        => $item->is_cosmic,
             'xp_bonus'                         => $item->xp_bonus,
             'ignores_caps'                     => $item->ignores_caps,
             'sockets'                          => $item->sockets,

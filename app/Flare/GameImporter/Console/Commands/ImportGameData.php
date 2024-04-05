@@ -58,7 +58,7 @@ class ImportGameData extends Command {
 
         $this->line('Importing maps ...');
 
-        // // Import maps:
+        // Import maps:
         $this->importGameMaps();
 
         $this->import($excelMapper, $files['Locations Give Items'], 'Locations Give Items');
@@ -68,6 +68,10 @@ class ImportGameData extends Command {
         $this->import($excelMapper, $files['Core Imports'], 'Core Imports');
         $this->import($excelMapper, $files['Skills'], 'Skills');
         $this->import($excelMapper, $files['Items'], 'Items');
+
+        // Some of these locations have items that are required:
+        $this->import($excelMapper, $files['Locations Give Items'], 'Locations Give Items');
+
         $this->import($excelMapper, $files['Affixes'], 'Affixes');
         $this->import($excelMapper, $files['Kingdoms'], 'Kingdoms');
         $this->import($excelMapper, $files['Kingdom Passive Skills'], 'Kingdom Passive Skills');

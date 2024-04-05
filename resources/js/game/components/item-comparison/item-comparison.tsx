@@ -149,7 +149,7 @@ export default class ItemComparison extends React.Component<ItemComparisonProps,
     }
 
     handleSecondaryAction(position: string) {
-        if (typeof this.props.handle_replace_action === 'undefined') {
+        if (typeof this.props.handle_replace_action == 'undefined') {
             return;
         }
 
@@ -170,7 +170,7 @@ export default class ItemComparison extends React.Component<ItemComparisonProps,
     }
 
     shouldRenderPositionButtons() {
-        return typeof this.props.handle_replace_action === 'undefined';
+        return typeof this.props.handle_replace_action !== 'undefined';
     }
 
     shouldUseMobileHeightRestrictions(customWidth: number) {

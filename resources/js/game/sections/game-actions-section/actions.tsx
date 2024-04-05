@@ -205,6 +205,8 @@ export default class Actions extends React.Component<
             return;
         }
 
+        console.log(this.props.action_data);
+
         let actionData: GameActionState = this.props.action_data;
 
         this.setState(

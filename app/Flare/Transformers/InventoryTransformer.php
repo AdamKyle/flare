@@ -25,6 +25,7 @@ class InventoryTransformer extends TransformerAbstract {
             'attached_affixes_count'  => $slot->item->affix_count,
             'is_unique'               => $slot->item->is_unique,
             'is_mythic'               => $slot->item->is_mythic,
+            'is_cosmic'               => $slot->item->is_cosmic,
             'has_holy_stacks_applied' => $slot->item->holy_stacks_applied,
             'ac'                      => $slot->item->getTotalDefence(),
             'attack'                  => $slot->item->getTotalDamage(),

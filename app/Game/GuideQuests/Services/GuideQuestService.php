@@ -176,6 +176,7 @@ class GuideQuestService {
     protected function fetchNextGuideQuest(Character $character): GuideQuest | null {
 
         $winterEvent          = Event::where('type' , EventType::WINTER_EVENT)->first();
+        $delusionalEvent      = Event::where('type' , EventType::DELUSIONAL_MEMORIES_EVENT)->first();
         $unlocksAtLevelQuest  = GuideQuest::where('unlock_at_level', '<=', $character->level)->whereNull('only_during_event')->whereNull('parent_id')->orderBy('unlock_at_level', 'asc')->first();
         $nextGuideQuest       = null;
 
@@ -188,6 +189,14 @@ class GuideQuestService {
 
             if (!is_null($eventGuideQuest)) {
                 $nextGuideQuest = $this->fetchNextEventQuest($character, $eventGuideQuest);
+            }
+        }
+
+        if (!is_null($delusionalEvent) && is_null($nextGuideQuest)) {
+            $delusionalEventQuest = GuideQuest::where('only_during_event', EventType::DELUSIONAL_MEMORIES_EVENT)->whereNull('parent_id')->first();
+
+            if (!is_null($delusionalEventQuest)) {
+                $nextGuideQuest = $this->fetchNextEventQuest($character, $delusionalEventQuest);
             }
         }
 

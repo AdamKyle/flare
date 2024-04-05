@@ -61,25 +61,12 @@ export default class MonsterActions extends React.Component<
         });
     }
 
-    optionsForRanks() {
-        const options = [];
-
-        for (let i = 1; i <= this.props.total_ranks; i++) {
-            options.push({
-                label: "Rank " + i,
-                value: i,
-            });
-        }
-
-        return options;
-    }
-
     render() {
         return (
             <div className="relative">
 
                 <MonsterSelection
-                    monsters={this.props.monsters}
+                    monsters={this.state.monsters}
                     update_monster_to_fight={this.setSelectedMonster.bind(this)}
                     character={this.props.character}
                     close_monster_section={this.props.close_monster_section}

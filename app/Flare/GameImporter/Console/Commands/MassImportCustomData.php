@@ -46,31 +46,17 @@ class MassImportCustomData extends Command {
 
         $this->importGameMaps($correctOrder);
 
+        // Some of these locations have items that are required:
+        Artisan::call('import:game-data "Locations Give Items"');
+
         Artisan::call('import:game-data Items');
+
+        Artisan::call('import:game-data "Locations Give Items"');
+
         Artisan::call('import:game-data Monsters');
         Artisan::call('import:game-data Locations');
         Artisan::call('import:game-data Npcs');
         Artisan::call('import:game-data Skills');
-
-        //Clean up previous events
-        GlobalEventGoal::truncate();
-        GlobalEventKill::truncate();
-        GlobalEventParticipation::truncate();
-
-        $factionLoyaties = FactionLoyalty::where('faction_id', GameMap::where('name', MapNameValue::ICE_PLANE)->first()->id)->get();
-
-        foreach ($factionLoyaties as $factionLoyaty) {
-            $factionLoyaty->factionLoyaltyNpcs()->get()->each(function ($npc) {
-                FactionLoyaltyNpc::where('id', $npc->id)->update([
-                    'currently_helping' => false
-                ]);
-            });
-        }
-
-        FactionLoyalty::where('faction_id', GameMap::where('name', MapNameValue::ICE_PLANE)->first()->id)->update([
-            'is_pledged' => false,
-        ]);
-
         Artisan::call('import:game-data Quests');
 
         // Due to the way quests are ordered, and their dependencies on other quests we have to double import to make
