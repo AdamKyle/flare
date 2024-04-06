@@ -60,6 +60,10 @@ export default class Shop extends React.Component<any, any> {
         if (this.props.type === 'Purgatory Chains') {
             this.props.close_purgatory_chains();
         }
+
+        if (this.props.type === 'Twisted Earth') {
+            this.props.close_twisted_earth();
+        }
     }
 
     setItemToBuy(data: any) {

@@ -146,6 +146,27 @@
                         damage will now be: ~74% life stealing damage.
                     </p>
                 @endif
+                @if($map->mapType()->isTheIcePlane())
+                    <x-core.alerts.warning-alert title="ATTN!">
+                        Players cannot venture this map unless The Winter Event is running, which runs from December 15th to March 15th the following year.
+                        During this time players can traverse to the plane and participate in the quests, events and raids of the map.
+                    </x-core.alerts.warning-alert>
+                @endif
+                @if($map->mapType()->isDelusionalMemories())
+                    <x-core.alerts.warning-alert title="ATTN!">
+                        Players cannot venture this map unless The Delusional Memories Event is running, which runs from May 15th to August 15th the following year.
+                        During this time players can traverse to the plane and participate in the quests, events and raids of the map.
+                    </x-core.alerts.warning-alert>
+                    <p class="my2">
+                        Players down here can participate in what's called: Weekly Fights. These are fights at specific locations for end game players that allow them
+                        a chance to get a cosmically enchanted Delusional Silver item.
+                    </p>
+                    <p class="my-2">
+                        For everyone, you can experience a new story down here, a twisted and delusional fantasy gone wrong. Participate in a raid and complete raid quests.
+                        Players can also do Global Event Goals down here. When players come together and fight monsters or craft items and enchant those items they help fill
+                        specific phases of an event goal meter which in turn will reward players who participate Mythic and Legendary Unique items.
+                    </p>
+                @endif
                 @if (!is_null($itemNeeded))
                     <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2'></div>
                     <h3 class="my-4">Item required for access</h3>

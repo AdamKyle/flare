@@ -174,6 +174,8 @@ export default class MapListeners implements GameListener {
                     event.canAccessHellForgedShop;
                 character.can_access_purgatory_chains =
                     event.canAccessPurgatoryChainsShop;
+                character.can_access_twisted_memories =
+                    event.camAccessTwistedEarthShop
 
                 this.component.setState({
                     character: character,

@@ -2,6 +2,7 @@
 
 namespace App\Game\SpecialtyShops\Controllers\Api;
 
+use App\Flare\Values\MaxCurrenciesValue;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
@@ -55,6 +56,11 @@ class SpecialtyShopController extends Controller {
                 $goldDustCost   = $goldDustCost - $goldDustCost * 0.05;
                 $shardsCost     = $shardsCost - $shardsCost * 0.05;
                 $copperCoinCost = $copperCoinCost - $copperCoinCost * 0.05;
+
+                $goldCost = min($goldCost, MaxCurrenciesValue::MAX_GOLD);
+                $goldDustCost = min($goldDustCost, MaxCurrenciesValue::MAX_GOLD_DUST);
+                $shardsCost = min($shardsCost, MaxCurrenciesValue::MAX_SHARDS);
+                $copperCoinCost = min($copperCoinCost, MaxCurrenciesValue::MAX_COPPER);
 
                 $item->cost             = $goldCost;
                 $item->gold_dust_cost   = $goldDustCost;

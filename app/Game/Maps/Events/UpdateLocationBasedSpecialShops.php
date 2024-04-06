@@ -37,6 +37,11 @@ class UpdateLocationBasedSpecialShops implements ShouldBroadcastNow {
     public bool $canAccessPurgatoryChainsShop = false;
 
     /**
+     * @var bool $camAccessTwistedEarthShop
+     */
+    public bool $camAccessTwistedEarthShop = false;
+
+    /**
      * Create a new event instance.
      *
      * @param User $user
@@ -46,6 +51,7 @@ class UpdateLocationBasedSpecialShops implements ShouldBroadcastNow {
 
         $this->canAccessHellForgedShop      = $this->canAccessHellForgedShop($user->character);
         $this->canAccessPurgatoryChainsShop = $this->canAccessPurgatoryChainsShop($user->character);
+        $this->camAccessTwistedEarthShop    = $this->canAccessTwistedEarthShop($user->character);
     }
 
     /**
@@ -63,6 +69,14 @@ class UpdateLocationBasedSpecialShops implements ShouldBroadcastNow {
      */
     protected function canAccessPurgatoryChainsShop(Character $character): bool {
         return $character->map->gameMap->mapType()->isPurgatory();
+    }
+
+    /**
+     * @param Character $character
+     * @return bool
+     */
+    protected function canAccessTwistedEarthShop(Character $character): bool {
+        return $character->map->gameMap->mapType()->isTwistedMemories();
     }
 
     /**

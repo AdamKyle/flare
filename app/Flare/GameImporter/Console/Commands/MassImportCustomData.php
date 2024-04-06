@@ -94,10 +94,12 @@ class MassImportCustomData extends Command {
         exec($command, $output, $exitCode);
 
         if ($exitCode === 0) {
+            Artisan::call('fix:info-page-internal-links');
             $this->line('Information section images directory copied to public successfully. Information section is now set up.');
         } else {
             $this->line('Failed to copy the information images directory over. You can do this manually from the resources/backup/information-sections-images. Copy the entire directory to app/public');
         }
+
     }
 
     protected function importGameMaps(array $orderedMapImages): void {

@@ -340,6 +340,10 @@
                 <span class="ra ra-chain"></span>
                 Mythics
             </a>
+            <a href="{{ route('info.page', ['pageName' => 'cosmic-items']) }}">
+                <span class="ra ra-chain"></span>
+                Cosmic Items
+            </a>
             <a href="{{ route('info.page', ['pageName' => 'hell-forged-set']) }}">
                 <span class="ra ra-axe"></span>
                 Hell Forged

@@ -34,5 +34,7 @@ export default interface ActionsState {
 
     show_purgatory_chains_section: boolean;
 
+    show_twisted_earth_section: boolean;
+
     show_gambling_section: boolean;
 }

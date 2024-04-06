@@ -56,6 +56,7 @@ export default class Actions extends React.Component<
             show_join_pvp: false,
             show_hell_forged_section: false,
             show_purgatory_chains_section: false,
+            show_twisted_earth_section: false,
             show_gambling_section: false,
         };
 
@@ -226,6 +227,7 @@ export default class Actions extends React.Component<
             {
                 show_purgatory_chains_section: false,
                 show_hell_forged_section: false,
+                show_twisted_earth_section: false,
             },
             () => {
                 this.actionsManager.setCraftingType(type);
@@ -246,6 +248,7 @@ export default class Actions extends React.Component<
             show_join_pvp: false,
             show_duel_fight: false,
             show_celestial_fight: false,
+            show_twisted_earth_section: false,
             show_hell_forged_section: !this.state.show_hell_forged_section,
         });
     }
@@ -257,8 +260,21 @@ export default class Actions extends React.Component<
             show_join_pvp: false,
             show_duel_fight: false,
             show_celestial_fight: false,
+            show_twisted_earth_section: false,
             show_purgatory_chains_section:
                 !this.state.show_purgatory_chains_section,
+        });
+    }
+
+    managedTwistedEarthShop() {
+        this.setState({
+            crafting_type: null,
+            show_exploration: false,
+            show_join_pvp: false,
+            show_duel_fight: false,
+            show_celestial_fight: false,
+            show_purgatory_chains_section: false,
+            show_twisted_earth_section: !this.state.show_twisted_earth_section,
         });
     }
 
@@ -310,6 +326,23 @@ export default class Actions extends React.Component<
         this.setState({
             duel_fight_info: null,
         });
+    }
+
+    getTypeOfSpecialtyGear() {
+
+        if (this.state.show_hell_forged_section) {
+            return 'Hell Forged';
+        }
+
+        if (this.state.show_purgatory_chains_section) {
+            return 'Purgatory Chains';
+        }
+
+        if (this.state.show_twisted_earth_section) {
+            return 'Twisted Earth';
+        }
+
+        return '';
     }
 
     render() {
@@ -369,6 +402,19 @@ export default class Actions extends React.Component<
                                 <SuccessOutlineButton
                                     button_label={"Purgatory Chains Gear"}
                                     on_click={this.managedPurgatoryChainsShop.bind(
+                                        this
+                                    )}
+                                    additional_css={"w-1/2"}
+                                    disabled={this.props.character.is_dead}
+                                />
+                            </div>
+                        ) : null}
+
+                        {this.props.character.can_access_twisted_memories ? (
+                            <div className="mb-4">
+                                <SuccessOutlineButton
+                                    button_label={"Twisted Earth Gear"}
+                                    on_click={this.managedTwistedEarthShop.bind(
                                         this
                                     )}
                                     additional_css={"w-1/2"}
@@ -466,21 +512,24 @@ export default class Actions extends React.Component<
                                     />
                                 ) : null}
 
-                                {this.state.show_hell_forged_section ||
-                                this.state.show_purgatory_chains_section ? (
-                                    <Shop
-                                        type={
-                                            this.state.show_hell_forged_section
-                                                ? "Hell Forged"
-                                                : "Purgatory Chains"
-                                        }
-                                        character_id={this.props.character.id}
-                                        close_hell_forged={this.manageHellForgedShop.bind(
-                                            this
-                                        )}
-                                        close_purgatory_chains={this.managedPurgatoryChainsShop.bind(
-                                            this
-                                        )}
+                                {
+                                    this.state.show_hell_forged_section ||
+                                    this.state.show_purgatory_chains_section ||
+                                    this.state.show_twisted_earth_section ? (
+                                        <Shop
+                                            type={
+                                                this.getTypeOfSpecialtyGear()
+                                            }
+                                            character_id={this.props.character.id}
+                                            close_hell_forged={this.manageHellForgedShop.bind(
+                                                this
+                                            )}
+                                            close_purgatory_chains={this.managedPurgatoryChainsShop.bind(
+                                                this
+                                            )}
+                                            close_twisted_earth={this.managedTwistedEarthShop.bind(
+                                                this
+                                            )}
                                     />
                                 ) : null}
                             </MonsterActions>

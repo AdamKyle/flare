@@ -114,6 +114,7 @@ class InfoPageService {
 
             $content = str_replace('<p><br></p>', '', $params['content']);
             $content = str_replace('<p>&nbsp;</p>', '', $content);
+            $content = str_replace('../../', '/', $content);
 
             $sectionToUpdate['content']             = $content;
             $sectionToUpdate['live_wire_component'] = $params['live_wire_component'];

@@ -104,7 +104,9 @@ class SpecialtyShop {
 
         if ($hasItemAffix || $hasHoly) {
             $duplicatedItem->update([
-                'market_sellable' => true
+                'market_sellable' => true,
+                'is_mythic' => $itemToTrade->is_mythic,
+                'is_cosmic' => $itemToTrade->is_cosmic,
             ]);
         }
 
@@ -221,7 +223,8 @@ class SpecialtyShop {
      *
      * - Item must be of the same type as the item to buy.
      * - Item must be of level 400.
-     * - If the item to is of purgatory chains, the type to trade must be hell forged.
+     * - If the item is of purgatory chains, the type to trade must be hell forged.
+     * - If the item is of twisted earth, the type to trade must be purgatory chains.
      *
      * @param Character $character
      * @param string $specialtyType
@@ -235,6 +238,14 @@ class SpecialtyShop {
         if ($specialtyType->isPurgatoryChains()) {
             return $character->inventory->slots->filter(function($slot) use($itemType) {
                 if ($slot->item->type === $itemType && $slot->item->specialty_type === ItemSpecialtyType::HELL_FORGED) {
+                    return $slot;
+                }
+            })->first();
+        }
+
+        if ($specialtyType->isTwistedEarth()) {
+            return $character->inventory->slots->filter(function($slot) use($itemType) {
+                if ($slot->item->type === $itemType && $slot->item->specialty_type === ItemSpecialtyType::PURGATORY_CHAINS) {
                     return $slot;
                 }
             })->first();

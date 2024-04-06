@@ -9,6 +9,7 @@ use App\Console\AfterDeployment\AssignNewSkillsToPlayers;
 use App\Console\AfterDeployment\ChangeFeatureTypesOnQuests;
 use App\Console\AfterDeployment\CreateCharacterAttackDataCache;
 use App\Console\AfterDeployment\CreateMonsterCache;
+use App\Console\AfterDeployment\FixInfoPageInternalLinks;
 use App\Console\AfterDeployment\GiveNewSlotsQuestItem;
 use App\Console\AfterDeployment\RebalanceQuestCurrencyCostsAndRewards;
 use App\Console\AfterDeployment\ReduceAlchemyItemsCost;
@@ -55,6 +56,7 @@ class AppServiceProvider extends ServiceProvider {
             ChangeFeatureTypesOnQuests::class,
             GiveNewSlotsQuestItem::class,
             AllowTraverseForMaps::class,
+            FixInfoPageInternalLinks::class,
 
             // Development Commands:
             CreateCharacter::class,
