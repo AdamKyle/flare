@@ -30,6 +30,11 @@
             <span class="icon far fa-calendar-alt"></span>
             <span class="title">Event Calendar</span>
         </a>
+        <a href="{{ route('tlessa.donations') }}" class="link" data-toggle="tooltip-menu"
+           data-tippy-content="Events">
+            <span class="icon fas fa-hand-holding-usd"></span>
+            <span class="title">Donate</span>
+        </a>
     </div>
 
     <!-- Character -->
