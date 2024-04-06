@@ -233,6 +233,8 @@ class EndScheduledEventTest extends TestCase {
                 $mock->shouldReceive('canWalkOnDeathWater')->andReturn(true);
                 $mock->shouldReceive('canWalkOnMagma')->andReturn(true);
                 $mock->shouldReceive('isPurgatoryWater')->andReturn(false);
+                $mock->shouldReceive('isTwistedMemoriesWater')->andReturn(false);
+                $mock->shouldReceive('isDelusionalMemoriesWater')->andReturn(false);
                 $mock->shouldReceive('getTileColor')->andReturn('000');
             })
         );
@@ -296,6 +298,8 @@ class EndScheduledEventTest extends TestCase {
                 $mock->shouldReceive('canWalkOnDeathWater')->andReturn(true);
                 $mock->shouldReceive('canWalkOnMagma')->andReturn(true);
                 $mock->shouldReceive('isPurgatoryWater')->andReturn(false);
+                $mock->shouldReceive('isTwistedMemoriesWater')->andReturn(false);
+                $mock->shouldReceive('isDelusionalMemoriesWater')->andReturn(false);
                 $mock->shouldReceive('getTileColor')->andReturn('000');
             })
         );
@@ -405,6 +409,8 @@ class EndScheduledEventTest extends TestCase {
                 $mock->shouldReceive('canWalkOnDeathWater')->andReturn(true);
                 $mock->shouldReceive('canWalkOnMagma')->andReturn(true);
                 $mock->shouldReceive('isPurgatoryWater')->andReturn(false);
+                $mock->shouldReceive('isTwistedMemoriesWater')->andReturn(false);
+                $mock->shouldReceive('isDelusionalMemoriesWater')->andReturn(false);
                 $mock->shouldReceive('getTileColor')->andReturn('000');
             })
         );
