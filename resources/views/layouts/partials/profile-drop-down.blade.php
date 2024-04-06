@@ -38,6 +38,11 @@
                     <span class="fab fa-discord text-2xl leading-none ltr:mr-2 rtl:ml-2"></span>
                     Discord
                 </a>
+                <a href="{{route('tlessa.donations')}}" target="_blank"
+                   class="flex items-center text-gray-700 dark:text-gray-500 hover:text-primary dark:hover:text-primary mt-5" target="_blank">
+                    <span class="fas fa-hand-holding-usd text-2xl leading-none ltr:mr-2 rtl:ml-2"></span>
+                    Donate
+                </a>
             </div>
         @endif
         <hr>
