@@ -47,7 +47,7 @@ class RandomNumberGenerator {
 
         $bonus = (int) round($chance * $max);
 
-        $fraction = 0.5;
+        $fraction = 0.75;
 
         $isBonusSuccessful = mt_rand() / mt_getrandmax() <= $chance * 0.5;
 

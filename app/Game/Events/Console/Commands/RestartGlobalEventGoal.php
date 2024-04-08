@@ -79,7 +79,7 @@ class RestartGlobalEventGoal extends Command {
      */
     private function updateCharactersGlobalMapEvents(EventGoalsService $eventGoalsService, GlobalEventGoal $globalEventGoal, array $characterIds): void {
         $gameMap = GameMap::where('only_during_event_type', $globalEventGoal->event_type)->first();
-        dump($characterIds, $gameMap);
+
         if (is_null($gameMap)) {
             return;
         }

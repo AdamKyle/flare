@@ -11,8 +11,17 @@ export default class ItemDetailsModalTitle extends React.Component<ItemDetailsMo
     }
 
     buildItemDetailsForTitle() {
+
+        let name = '';
+
+        if (!this.props.itemToEquip.affix_name) {
+            name = this.props.itemToEquip.name;
+        } else {
+            name = this.props.itemToEquip.affix_name;
+        }
+
         return {
-            name: this.props.itemToEquip.affix_name,
+            name: name,
             type: this.props.itemToEquip.type,
             affix_count: this.props.itemToEquip.affix_count,
             is_unique: this.props.itemToEquip.is_unique,

@@ -214,7 +214,27 @@ class ReBalanceMonsters extends Command
 
     protected function getXPIntegers(ExponentialAttributeCurve $exponentialAttributeCurve, int $size, ?string $mapName = null): array {
         if (in_array($mapName, $this->regularMaps)) {
-            return $this->generateIntegers($exponentialAttributeCurve, $size, 2, 1000, 2, 10);
+
+            if ($mapName === MapNameValue::SURFACE) {
+                return $this->generateIntegers($exponentialAttributeCurve, $size, 2, 100, 2, 10);
+            }
+
+            if ($mapName === MapNameValue::LABYRINTH) {
+                return $this->generateIntegers($exponentialAttributeCurve, $size, 2, 200, 2, 10);
+            }
+
+            if ($mapName === MapNameValue::DUNGEONS) {
+                return $this->generateIntegers($exponentialAttributeCurve, $size, 2, 250, 2, 10);
+            }
+
+            if ($mapName === MapNameValue::SHADOW_PLANE) {
+                return $this->generateIntegers($exponentialAttributeCurve, $size, 2, 500, 2, 10);
+            }
+
+            if ($mapName === MapNameValue::HELL) {
+                return $this->generateIntegers($exponentialAttributeCurve, $size, 2, 1000, 2, 10);
+            }
+
         }
 
         if ($mapName === MapNameValue::PURGATORY) {

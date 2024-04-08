@@ -1,14 +1,11 @@
-import React, { Fragment } from "react";
+import React, {Fragment, ReactNode} from "react";
 import ItemNameColorationText from "../../../components/items/item-name/item-name-coloration-text";
 import { capitalize } from "lodash";
-import InventoryComparisonAdjustment from "../../components/item-details/comparison/definitions/inventory-comparison-adjustment";
 import Dialogue from "../../../components/ui/dialogue/dialogue";
 import Ajax from "../../../lib/ajax/ajax";
 import { AxiosError, AxiosResponse } from "axios";
 import ComponentLoading from "../../../components/ui/loading/component-loading";
-import ComparisonSection from "../../components/item-details/comparison/comparison-section";
 import { watchForChatDarkModeComparisonChange } from "../../../lib/game/dark-mode-watcher";
-import UsableItemSection from "../../character-sheet/components/modals/components/usable-item-section";
 import InventoryQuestItemDetails from "../../character-sheet/components/modals/components/inventory-quest-item-details";
 import AlchemyItemHoly from "../../../components/modals/item-details/item-views/alchemy-item-holy";
 import GemDetails from "../../../components/modals/item-details/item-views/gem-details";
@@ -65,12 +62,6 @@ export default class ItemComparison extends React.Component<any, any> {
             );
     }
 
-    setStatusToLoading() {
-        this.setState({
-            action_loading: !this.state.action_loading,
-        });
-    }
-
     getTheName() {
         const item = this.state.comparison_details.itemToEquip;
 
@@ -112,6 +103,7 @@ export default class ItemComparison extends React.Component<any, any> {
                             is_mythic:
                                 this.state.comparison_details.itemToEquip
                                     .is_mythic,
+                            is_cosmic: this.state.comparison_details.itemtoEquip.is_cosmic,
                             holy_stacks_applied:
                                 this.state.comparison_details.itemToEquip
                                     .holy_stacks_applied,
@@ -156,7 +148,7 @@ export default class ItemComparison extends React.Component<any, any> {
         }
     }
 
-    renderViewForType(type: string, holy_number?: number): JSX.Element {
+    renderViewForType(type: string, holy_number?: number): ReactNode {
         if (type === "alchemy") {
             if (typeof holy_number !== "undefined" && holy_number !== null) {
                 return (
@@ -165,12 +157,6 @@ export default class ItemComparison extends React.Component<any, any> {
                     />
                 );
             }
-
-            return (
-                <UsableItemSection
-                    item={this.state.comparison_details.itemToEquip}
-                />
-            );
         }
 
         if (type === "quest") {
@@ -188,22 +174,6 @@ export default class ItemComparison extends React.Component<any, any> {
                 />
             );
         }
-
-        return (
-            <ComparisonSection
-                is_large_modal={true}
-                is_grid_size={this.isGridSize.bind(this)}
-                comparison_details={this.state.comparison_details}
-                set_action_loading={this.setStatusToLoading.bind(this)}
-                is_action_loading={this.state.action_loading}
-                manage_modal={this.props.manage_modal}
-                character_id={this.props.character_id}
-                dark_charts={this.state.dark_charts}
-                usable_sets={this.state.usable_sets}
-                slot_id={this.props.slot_id}
-                is_automation_running={this.props.is_automation_running}
-            />
-        );
     }
 
     render() {
