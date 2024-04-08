@@ -137,11 +137,16 @@ export default class ManageTreasuryModal extends React.Component<ManageTreasuryM
                 if (typeof error.response !== 'undefined') {
                     const response = error.response;
 
-                    if (response.status === 422) {
-                        this.setState({
-                            error_message: response.data.message
-                        })
+                    let message = response.data.message;
+
+                    if (response.data.error) {
+                        message = response.data.error;
                     }
+
+                    this.setState({
+                        loading: false,
+                        error_message: message,
+                    });
                 }
 
                 console.error(error);

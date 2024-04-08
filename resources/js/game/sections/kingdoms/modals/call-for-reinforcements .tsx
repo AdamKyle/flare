@@ -63,8 +63,17 @@ export default class CallForReinforcements extends React.Component<CallForReinfo
                     this.setState({processing_unit_request: false});
 
                     if (typeof error.response != 'undefined') {
+                        const response = error.response;
+
+                        let message = response.data.message;
+
+                        if (response.data.error) {
+                            message = response.data.error;
+                        }
+
                         this.setState({
-                            error_message: error.response.data.message,
+                            loading: false,
+                            error_message: message,
                         });
                     }
                 });

@@ -119,8 +119,15 @@ export default class ResourceBuildingExpansion extends React.Component<ResourceB
                 if (typeof error.response != 'undefined') {
                     const response = error.response;
 
+                    let message = response.data.message;
+
+                    if (response.data.error) {
+                        message = response.data.error;
+                    }
+
                     this.setState({
-                        error_message: response.data.message,
+                        loading: false,
+                        error_message: message,
                     });
                 }
             })

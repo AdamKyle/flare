@@ -37,9 +37,15 @@ export default class UpgradeWithResources extends React.Component<any, any> {
                 if (typeof error.response !== 'undefined') {
                     const response = error.response;
 
+                    let message = response.data.message;
+
+                    if (response.data.error) {
+                        message = response.data.error;
+                    }
+
                     this.setState({
                         loading: false,
-                        error_message: response.data.message
+                        error_message: message,
                     });
                 }
             });

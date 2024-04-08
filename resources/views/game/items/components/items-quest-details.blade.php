@@ -88,7 +88,8 @@
             @endif
             @if (!is_null($item->dropLocation))
                 <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
-                <p class="mb-4">Players cannot be auto battling for this item to drop. Looting in this location is capped at 45%. All drop chances are 1/1,000,000. Players may also eed to do relevant quests to access this location.</p>
+                <p class="mb-4">Players cannot be auto battling for this item to drop. Looting in this location is capped at 45%.
+                    All drop chances are 1/100. Players may also eed to do relevant quests to access this location.</p>
 
                 <dl>
                     <dt>Drops only from<sup>*</sup>: </dt>

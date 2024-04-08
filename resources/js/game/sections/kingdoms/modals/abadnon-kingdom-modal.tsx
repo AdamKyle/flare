@@ -36,14 +36,17 @@ export default class AbandonKingdomModal extends React.Component<AbandonKingdomM
                     if (typeof error.response !== 'undefined') {
                         const response = error.response;
 
-                        if (response.status === 422) {
-                            this.setState({
-                                error_message: response.data.message,
-                            });
-                        }
-                    }
+                        let message = response.data.message;
 
-                    console.error(error);
+                        if (response.data.error) {
+                            message = response.data.error;
+                        }
+
+                        this.setState({
+                            loading: false,
+                            error_message: message,
+                        });
+                    }
                 });
         });
     }

@@ -18,6 +18,7 @@ import KingdomLogDetails from "../../lib/game/kingdoms/kingdom-log-details";
 import Ajax from "../../lib/ajax/ajax";
 import {AxiosError, AxiosResponse} from "axios";
 import LoadingProgressBar from "../../components/ui/progress-bars/loading-progress-bar";
+import DangerAlert from "../../components/ui/alerts/simple-alerts/danger-alert";
 
 export default class KingdomsList extends React.Component<KingdomListProps, KingdomListState> {
 
@@ -143,6 +144,15 @@ export default class KingdomsList extends React.Component<KingdomListProps, King
 
         return (
             <Fragment>
+                {
+                    this.props.is_dead ?
+                        <DangerAlert additional_css={'my-4'}>
+                            Christ child! You are dead. Dead people cannot do a lot of things including:{" "}
+                            Manage inventory, Manage Skills - including passives, Manage Boons or even use items.{" "}
+                            And they cannot manage their kingdoms! How sad! Go resurrect child! (head to Game tab and click Revive).
+                        </DangerAlert>
+                    : null
+                }
                 {
                     this.state.selected_kingdom !== null ?
                         this.props.view_port < 1600 ?

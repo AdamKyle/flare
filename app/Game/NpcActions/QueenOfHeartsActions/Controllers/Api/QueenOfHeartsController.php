@@ -38,6 +38,7 @@ class QueenOfHeartsController extends Controller {
      * @param PurchaseRandomEnchantment $request
      * @param Character $character
      * @return JsonResponse
+     * @throws \Exception
      */
     public function purchase(PurchaseRandomEnchantment $request, Character $character): JsonResponse {
 

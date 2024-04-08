@@ -124,7 +124,7 @@ export default class LocationDetails extends React.Component<LocationDetailsProp
                     <h5 className='text-orange-500 dark:text-orange-400'>Corrupted</h5>
                     <p className='my-4'>
                         This location has been corrupted by evil forces! There happens to be a raid going on here, the monsters of this
-                        location are exceptionaly hard, how ever quest items that you would get for visiting the place, if applicable, will still drop.
+                        location are exceptionally hard, how ever quest items that you would get for visiting the place, if applicable, will still drop.
                     </p>
                     {
                         this.props.location.has_raid_boss ?
@@ -136,7 +136,7 @@ export default class LocationDetails extends React.Component<LocationDetailsProp
 
                     }
                     <p className='my-4 italic text-sm'>
-                        It is recomended that players have top tier gear, have reincarnated (at max level) at least twice and have gear with sockets and Gems
+                        It is recommended that players have top tier gear, have reincarnated (at max level) at least twice and have gear with sockets and Gems
                         attached. All players are welcome to participate in the raid, regardless of gear or level, but the more prepared the better chances you have.
                     </p>
                 </Fragment>
@@ -194,32 +194,39 @@ export default class LocationDetails extends React.Component<LocationDetailsProp
                             <div className='flex items-center mb-4'>
                                 <h4>Special Location Details</h4>
                                 <div>
-                                    <button type={"button"} onClick={this.manageHelpDialogue.bind(this)} className='text-blue-500 dark:text-blue-300 ml-2'>
+                                    <button type={"button"} onClick={this.manageHelpDialogue.bind(this)}
+                                            className='text-blue-500 dark:text-blue-300 ml-2'>
                                         <i className={'fas fa-info-circle'}></i> Help
                                     </button>
                                 </div>
                             </div>
                             <p className={'mb-4'}>
-                                Places like this can increase the enemies stats and resistances as well as skills. It is essential that players craft appropriate resistance
+                                Places like this can increase the enemies stats and resistances as well as skills. It is
+                                essential that players craft appropriate resistance
                                 and stat reduction gear to survive harder creatures here.
                             </p>
+                            <p className={'mb-4'}>
+                                Quest items that drop from these locations can only be obtained at a 1/100 chance with a max of 45% of your looting skill.
+                                Players must manually fight monsters to obtain the quest items that drop here.
+                            </p>
                             <dl className={'mb-4'}>
-                                <dt>Increase Core Stats By: </dt>
+                                <dt>Increase Core Stats By:</dt>
                                 <dd>{formatNumber(this.props.location.increases_enemy_stats_by)}</dd>
-                                <dt>Increase Percentage Based Values By: </dt>
+                                <dt>Increase Percentage Based Values By:</dt>
                                 <dd>{this.props.location.increase_enemy_percentage_by !== null ?
-                                        (this.props.location.increase_enemy_percentage_by * 100).toFixed(0)
+                                    (this.props.location.increase_enemy_percentage_by * 100).toFixed(0)
                                     : 0
-                                }%</dd>
+                                }%
+                                </dd>
                             </dl>
 
                             {
                                 this.props.location.type_name !== null ?
                                     this.renderSpecialType()
-                                : null
+                                    : null
                             }
                         </div>
-                    :
+                        :
                         this.renderWeeklyFightLocationDetails()
                 }
 

@@ -135,8 +135,11 @@ export default class CharacterSheet extends React.Component<CharacterSheetProps,
                 {
                     this.props.character.is_dead ?
                         <DangerAlert additional_css={'mb-4'}>
-                            <p className='p-3'>Christ child! You are dead. Dead people cannot do a lot of things including: Manage inventory, Manage Skills - including passives, Manage Boons
-                                or even use items. Go resurrect child!</p>
+                            <p className='p-3'>
+                                Christ child! You are dead. Dead people cannot do a lot of things including:{" "}
+                                Manage inventory, Manage Skills - including passives, Manage Boons or even use items.{" "}
+                                And they cannot manage their kingdoms! How sad! Go resurrect child! (head to Game tab and click Revive).
+                            </p>
                         </DangerAlert>
                     : null
                 }

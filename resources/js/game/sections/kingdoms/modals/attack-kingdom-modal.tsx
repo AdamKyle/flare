@@ -97,12 +97,17 @@ export default class AttackKingdomModal extends React.Component<any, AttackKingd
                 if (typeof error.response !== 'undefined') {
                     const response = error.response;
 
+                    let message = response.data.message;
+
+                    if (response.data.error) {
+                        message = response.data.error;
+                    }
+
                     this.setState({
-                        success_message: response.data.message,
+                        loading: false,
+                        error_message: message,
                     });
                 }
-
-                console.error(error);
             });
         });
     }

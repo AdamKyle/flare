@@ -18,6 +18,7 @@ use App\Flare\Models\ItemAffix;
 use App\Flare\Models\Skill;
 use App\Game\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Core\Traits\ResponseBuilder;
+use App\Game\Events\Concerns\ShouldShowEnchantingEventButton;
 use App\Game\Events\Values\GlobalEventSteps;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\NpcActions\QueenOfHeartsActions\Services\RandomEnchantmentService;
@@ -31,7 +32,7 @@ use Illuminate\Database\Eloquent\Collection;
 
 class EnchantingService {
 
-    use ResponseBuilder, UpdateCharacterCurrency;
+    use ResponseBuilder, UpdateCharacterCurrency, ShouldShowEnchantingEventButton;
 
     /**
      * @var CharacterStatBuilder $characterStatBuilder;
@@ -124,45 +125,20 @@ class EnchantingService {
             }
         }
 
-        $event = Event::where('current_event_goal_step', GlobalEventSteps::ENCHANT)->first();
-        $showEnchantForEvent = false;
-        $itemsForEvent = [];
-
-        if (!is_null($event)) {
-
-            $gameMap = GameMap::where('only_during_event_type', $event->type)->first();
-
-            if ($character->map->game_map_id === $gameMap->id) {
-
-                $eventInventory = GlobalEventCraftingInventory::where('character_id', $character->id)->first();
-
-                if (!is_null($eventInventory)) {
-
-
-                    $globalEventGoal = GlobalEventGoal::where('event_type', $event->type)->first();
-
-                    if (!is_null($globalEventGoal)) {
-                        $itemsForEvent = $eventInventory->craftingSlots->map(function($slot) {
-                            return [
-                                'slot_id' => $slot->id,
-                                'item_name' => $slot->item->name
-                            ];
-                        })->toArray();
-                        $showEnchantForEvent = $globalEventGoal->total_enchants < $globalEventGoal->max_enchants;
-                    }
-                }
-            }
-        }
-
         return [
             'affixes'                   => $this->getAvailableAffixes($characterInfo, $enchantingSkill, $showMerchantMessage),
             'character_inventory'       => $newInventory,
-            'show_enchanting_for_event' => $showEnchantForEvent,
-            'items_for_event'           => $itemsForEvent,
+            'show_enchanting_for_event' => $this->shouldShowEnchantingEventButton($character),
+            'items_for_event'           => $this->fetchEventItemsForEnchanting($character),
         ];
     }
 
-
+    /**
+     * Get the current state of the enchanting xp bar.
+     *
+     * @param Character $character
+     * @return array
+     */
     public function getEnchantingXP(Character $character): array {
         $skill = $this->getEnchantingSkill($character);
 
@@ -381,5 +357,37 @@ class EnchantingService {
         ServerMessageHandler::handleMessage($character->user, 'enchantment_failed', $message);
 
         $this->enchantItemService->deleteSlot($slot);
+    }
+
+    private function fetchEventItemsForEnchanting(Character $character): array {
+        $event = Event::where('current_event_goal_step', GlobalEventSteps::ENCHANT)->first();
+        $itemsForEvent = [];
+
+        if (!is_null($event)) {
+
+            $gameMap = GameMap::where('only_during_event_type', $event->type)->first();
+
+            if ($character->map->game_map_id === $gameMap->id) {
+
+                $eventInventory = GlobalEventCraftingInventory::where('character_id', $character->id)->first();
+
+                if (!is_null($eventInventory)) {
+
+
+                    $globalEventGoal = GlobalEventGoal::where('event_type', $event->type)->first();
+
+                    if (!is_null($globalEventGoal)) {
+                        $itemsForEvent = $eventInventory->craftingSlots->map(function($slot) {
+                            return [
+                                'slot_id' => $slot->id,
+                                'item_name' => $slot->item->name
+                            ];
+                        })->toArray();
+                    }
+                }
+            }
+        }
+
+        return $itemsForEvent;
     }
 }

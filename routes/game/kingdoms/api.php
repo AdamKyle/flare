@@ -1,7 +1,7 @@
 <?php
 
 Route::middleware(['auth'])->group(function() {
-    Route::middleware(['is.character.who.they.say.they.are', 'character.owns.kingdom', 'throttle:500,1'])->group(function() {
+    Route::middleware(['is.character.who.they.say.they.are', 'is.character.dead', 'character.owns.kingdom', 'throttle:500,1'])->group(function() {
 
         Route::post('/kingdom/{kingdom}/rename', ['as' => 'kingdom.rename', 'uses' => 'Api\KingdomsController@rename']);
 

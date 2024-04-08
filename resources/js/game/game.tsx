@@ -432,6 +432,7 @@ export default class Game extends React.Component<GameProps, GameState> {
                     </TabPanel>
                     <TabPanel key={"kingdoms"}>
                         <KingdomsList
+                            is_dead={this.state.character_status.is_dead}
                             my_kingdoms={this.state.kingdoms}
                             logs={this.state.kingdom_logs}
                             view_port={this.state.view_port}
