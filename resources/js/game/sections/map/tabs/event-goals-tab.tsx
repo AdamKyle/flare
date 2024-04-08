@@ -43,7 +43,6 @@ export default class EventGoalsTab extends React.Component<
         this.eventGoalsUpdate.listen(
             "Game.Events.Events.UpdateEventGoalProgress",
             (event: { eventGoalData: { event_goals: EventGoal } }) => {
-                console.log('Event Goal ...', event);
                 this.setState({
                     eventGoal: event.eventGoalData.event_goals,
                 });

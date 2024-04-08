@@ -214,6 +214,8 @@ export default class Crafting extends React.Component<any, any> {
                                 JSON.stringify(this.state.craftable_items)
                             );
 
+                            console.log('After craft response:', result.data);
+
                             this.setState(
                                 {
                                     loading: false,

@@ -50,12 +50,13 @@ class UpdateCharacterStatus implements ShouldBroadcastNow {
         $showEnchantingForEvent = false;
 
         if (!is_null($craftEvent)) {
-            $gameMap = GameMap::where('only_during_event_type', $craftEvent->type)->first();
 
+            $gameMap = GameMap::where('only_during_event_type', $craftEvent->type)->first();
             $globalEvent = GlobalEventGoal::where('event_type', $craftEvent->type)->first();
 
             if (!is_null($gameMap) && !is_null($globalEvent)) {
-                $showCraftForEvent = $character->map->game_map_id === $gameMap->id && $globalEvent->total_crafts < $globalEvent->max_craftsl;
+                $showCraftForEvent = $character->map->game_map_id === $gameMap->id &&
+                    $globalEvent->total_crafts < $globalEvent->max_crafts;
             }
         }
 
