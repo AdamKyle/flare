@@ -8,6 +8,7 @@ use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\NpcActions\QueenOfHeartsActions\Events\UpdateQueenOfHeartsPanel;
+use Exception;
 
 class QueenOfHeartsService {
 
@@ -38,6 +39,7 @@ class QueenOfHeartsService {
      * @param Character $character
      * @param string $type
      * @return array
+     * @throws Exception
      */
     public function purchaseUnique(Character $character, string $type): array {
         if (!$this->randomEnchantmentService->isPlayerInHell($character)) {

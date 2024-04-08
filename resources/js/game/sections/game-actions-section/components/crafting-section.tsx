@@ -18,9 +18,9 @@ export default class CraftingSection extends React.Component<any, any> {
     renderCraftingSection() {
         switch (this.props.type) {
             case 'craft':
-                return <Crafting is_small={this.props.is_small} character_id={this.props.character_id} remove_crafting={this.props.remove_crafting} cannot_craft={this.props.cannot_craft} fame_tasks={this.props.fame_tasks} />
+                return <Crafting is_small={this.props.is_small} character_id={this.props.character_id} remove_crafting={this.props.remove_crafting} cannot_craft={this.props.cannot_craft} fame_tasks={this.props.fame_tasks} user_id={this.props.user_id} />
             case 'enchant':
-                return <Enchanting character_id={this.props.character_id} remove_crafting={this.props.remove_crafting} cannot_craft={this.props.cannot_craft} />
+                return <Enchanting character_id={this.props.character_id} remove_crafting={this.props.remove_crafting} cannot_craft={this.props.cannot_craft} user_id={this.props.user_id} />
             case 'alchemy':
                 return <Alchemy character_id={this.props.character_id} remove_crafting={this.props.remove_crafting} cannot_craft={this.props.cannot_craft} />
             case 'workbench':

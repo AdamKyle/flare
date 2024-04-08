@@ -10,11 +10,19 @@ export interface EnchantingState {
 
     selected_suffix: number | null;
 
+    selected_type: string | null;
+
     enchantable_items: Enchantment[];
 
     enchantments: ItemToEnchant[];
 
+    event_items: ItemToEnchant[]|[];
+
+    show_enchanting_for_event: boolean;
+
     skill_xp: SkillXP
+
+    info_message: string | null;
 }
 
 export type ItemToEnchant = {

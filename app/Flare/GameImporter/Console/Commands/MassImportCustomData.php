@@ -39,6 +39,10 @@ class MassImportCustomData extends Command {
      */
     public function handle() {
 
+        GlobalEventGoal::truncate();
+        GlobalEventParticipation::truncate();
+        GlobalEventKill::truncate();
+
         $correctOrder = [
             "Twisted Memories.jpeg",
             "Delusional Memories.jpeg",

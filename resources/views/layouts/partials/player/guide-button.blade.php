@@ -11,6 +11,6 @@
     <div id="guide-button" data-open-modal="{{$showModal ? 'true' : 'false'}}"></div>
 
     @push('scripts')
-        @vite('resources/js/guide-quests-init.tsx');
+        @vite('resources/js/guide-quests-init.tsx')
     @endpush
 @endif

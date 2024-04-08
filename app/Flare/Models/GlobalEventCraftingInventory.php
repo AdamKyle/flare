@@ -42,7 +42,11 @@ class GlobalEventCraftingInventory extends Model {
     }
 
     public function craftingSlots() {
-        return $this->hasMany(GlobalEventCraftingInventorySlot::class, 'id', 'global_event_crafting_inventory_id');
+        return $this->hasMany(GlobalEventCraftingInventorySlot::class, 'global_event_crafting_inventory_id', 'id');
+    }
+
+    public function character() {
+        return $this->belongsTo(Character::class, 'character_id', 'id');
     }
 
     protected static function newFactory() {

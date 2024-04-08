@@ -2,6 +2,7 @@
 
 namespace App\Game\Skills\Services;
 
+use App\Flare\Models\GlobalEventCraftingInventorySlot;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 use App\Flare\Models\ItemAffix;
@@ -66,12 +67,12 @@ class EnchantItemService {
     /**
      * Update the slot.
      *
-     * @param InventorySlot $slot
+     * @param InventorySlot|GlobalEventCraftingInventorySlot $slot
      * @param bool $enchantForEvent
      * @return void
      * @throws Exception
      */
-    public function updateSlot(InventorySlot $slot, bool $enchantForEvent): void {
+    public function updateSlot(InventorySlot|GlobalEventCraftingInventorySlot $slot, bool $enchantForEvent): void {
         if (!is_null($this->item)) {
 
             if ($this->getCountOfMatchingItems() > 1) {

@@ -34,7 +34,9 @@ export default class CharacterTopSection extends React.Component<CharacterTopSec
         const xpNext    = this.props.character.xp_next;
         const currentXP = this.props.character.xp;
 
-        return (currentXP/xpNext) * 100;
+        const value = (currentXP/xpNext) * 100;
+
+        return value > 100 ? 100 : value;
     }
 
     abbreviateNumber(stat: number|undefined): string|number {

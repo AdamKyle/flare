@@ -11,8 +11,6 @@ export default class ActionListeners implements GameListener {
     private userId?: number;
 
     private unlockAlchemySkill?: Channel;
-    private updateCraftingTypes?: Channel;
-    private updateSpecialShopsAccess?: Channel;
 
     constructor(@inject(CoreEventListener) private coreEventListener: CoreEventListener) {}
 

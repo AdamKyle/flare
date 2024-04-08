@@ -256,9 +256,7 @@ export default class ExpandedComparison extends React.Component<ExpandedComparis
     render() {
         return (
             <div>
-                <h2 className='my-4'>
-                    <ItemNameColorationText item={this.props.comparison_details} custom_width={false} />
-                </h2>
+                <ItemNameColorationText item={this.props.comparison_details} custom_width={false} additional_css={'my-4'} />
                 <div className={
                     clsx({
                         'max-h-[250px] overflow-y-scroll': this.shouldUseMobileHeightRestrictions(1500),

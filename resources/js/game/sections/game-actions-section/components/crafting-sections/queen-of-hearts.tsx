@@ -72,6 +72,7 @@ export default class QueenOfHearts extends React.Component<any, any> {
         this.queenOfHearts.listen(
             "Game.NpcActions.QueenOfHearts.Events.UpdateQueenOfHeartsPanel",
             (event: any) => {
+                console.log('Queen of Hearts Updated:', event);
                 this.setState({
                     character_uniques: event.panelData.unique_slots,
                     character_non_uniques: event.panelData.non_unique_slots,

@@ -5,11 +5,16 @@ namespace App\Game\Battle\Events;
 use App\Flare\Models\CelestialFight;
 use App\Flare\Models\Character;
 use App\Flare\Models\Event;
+use App\Flare\Models\GameMap;
 use App\Flare\Models\GameSkill;
+use App\Flare\Models\GlobalEventGoal;
+use App\Flare\Models\GlobalEventParticipation;
 use App\Flare\Models\MonthlyPvpParticipant;
 use App\Flare\Models\Skill;
+use App\Flare\Models\User;
 use App\Flare\Values\AutomationType;
 use App\Game\Events\Values\EventType;
+use App\Game\Events\Values\GlobalEventSteps;
 use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\PrivateChannel;
@@ -22,11 +27,14 @@ class UpdateCharacterStatus implements ShouldBroadcastNow {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     /**
-     * @var array
+     * @var array $characterStatuses
      */
     public array $characterStatuses = [];
 
-    private $user;
+    /**
+     * @var User $user
+     */
+    private User $user;
 
     /**
      * Create a new event instance.
@@ -35,6 +43,32 @@ class UpdateCharacterStatus implements ShouldBroadcastNow {
      */
     public function __construct(Character $character) {
         $character = $character->refresh();
+
+        $craftEvent = Event::where('current_event_goal_step', GlobalEventSteps::CRAFT)->first();
+        $enchantEvent = Event::where('current_event_goal_step', GlobalEventSteps::ENCHANT)->first();
+        $showCraftForEvent = false;
+        $showEnchantingForEvent = false;
+
+        if (!is_null($craftEvent)) {
+            $gameMap = GameMap::where('only_during_event_type', $craftEvent->type)->first();
+
+            $globalEvent = GlobalEventGoal::where('event_type', $craftEvent->type)->first();
+
+            if (!is_null($gameMap) && !is_null($globalEvent)) {
+                $showCraftForEvent = $character->map->game_map_id === $gameMap->id && $globalEvent->total_crafts < $globalEvent->max_craftsl;
+            }
+        }
+
+        if (!is_null($enchantEvent)) {
+            $gameMap = GameMap::where('only_during_event_type', $enchantEvent->type)->first();
+
+            $globalEvent = GlobalEventGoal::where('event_type', $enchantEvent->type)->first();
+
+            if (!is_null($gameMap) && !is_null($globalEvent)) {
+                $showEnchantingForEvent = $character->map->game_map_id === $gameMap->id && $globalEvent->total_enchants < $globalEvent->max_enchants;
+            }
+
+        }
 
         $this->characterStatuses = [
             'can_attack'                     => $character->can_attack,
@@ -53,6 +87,8 @@ class UpdateCharacterStatus implements ShouldBroadcastNow {
             'can_register_for_pvp'           => !is_null(Event::where('type', EventType::MONTHLY_PVP)->first()) && $character->level >= 301,
             'killed_in_pvp'                  => $character->killed_in_pvp,
             'is_alchemy_locked'              => $this->isAlchemyLocked($character),
+            'show_craft_for_event'           => $showCraftForEvent,
+            'show_enchanting_for_event'      => $showEnchantingForEvent,
         ];
 
         $this->user = $character->user;

@@ -13,6 +13,7 @@ use App\Flare\Models\GlobalEventGoal;
 use App\Flare\Models\GlobalEventKill;
 use App\Flare\Models\GlobalEventParticipation;
 use App\Flare\Models\Map;
+use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Events\Events\UpdateEventGoalProgress;
 use App\Game\Events\Services\EventGoalsService;
 use App\Game\Events\Values\GlobalEventForEventTypeValue;
@@ -52,16 +53,20 @@ class RestartGlobalEventGoal extends Command {
             return;
         }
 
+        $characterParticipationIds = GlobalEventParticipation::pluck('character_id')->toArray();
+
         if (!is_null($event->event_goal_steps)) {
 
             $this->handleStepBaseGlobalEvent($event);
+
+            $this->updateCharactersGlobalMapEvents($eventGoalsService, $globalEvent, $characterParticipationIds);
 
             return;
         }
 
         $this->handleRegularGlobalEvent($globalEvent);
 
-        $this->updateCharactersGlobalMapEvents($eventGoalsService, $globalEvent);
+        $this->updateCharactersGlobalMapEvents($eventGoalsService, $globalEvent, $characterParticipationIds);
     }
 
     /**
@@ -69,16 +74,15 @@ class RestartGlobalEventGoal extends Command {
      *
      * @param EventGoalsService $eventGoalsService
      * @param GlobalEventGoal $globalEventGoal
+     * @param array $characterIds
      * @return void
      */
-    private function updateCharactersGlobalMapEvents(EventGoalsService $eventGoalsService, GlobalEventGoal $globalEventGoal): void {
+    private function updateCharactersGlobalMapEvents(EventGoalsService $eventGoalsService, GlobalEventGoal $globalEventGoal, array $characterIds): void {
         $gameMap = GameMap::where('only_during_event_type', $globalEventGoal->event_type)->first();
-
+        dump($characterIds, $gameMap);
         if (is_null($gameMap)) {
             return;
         }
-
-        $characterIds = Map::where('game_map_id', $gameMap->id)->pluck('character_id')->toArray();
 
         Character::whereIn('id', $characterIds)->chunkById(250, function($characters) use ($eventGoalsService) {
             foreach ($characters as $character) {
@@ -87,6 +91,8 @@ class RestartGlobalEventGoal extends Command {
                         $eventGoalsService->getEventGoalData($character)
                     )
                 );
+
+                event(new UpdateCharacterStatus($character));
             }
         });
     }
@@ -156,6 +162,8 @@ class RestartGlobalEventGoal extends Command {
             'current_event_goal_step' => $newStep,
         ]);
 
+        $event = $event->refresh();
+
         $globalEventGoalData = GlobalEventForEventTypeValue::returnGlobalEventInfoForSeasonalEvents($event->type);
 
         if ($newStep === GlobalEventSteps::CRAFT) {
@@ -168,8 +176,14 @@ class RestartGlobalEventGoal extends Command {
 
         $globalEventGoal = GlobalEventGoal::create($globalEventGoalData);
 
+        $gameMap = GameMap::where('only_during_event_type', $event->type)->first();
+
         event(new GlobalMessageEvent('Global Event Goal for: ' . $globalEventGoal->eventType()->getNameForEvent() .
             ' Players can now participate in the new step: ' . strtoupper($newStep) . '! How exciting!'));
+        event(new GlobalMessageEvent('Players can participate by going to the map: ' . $gameMap->name .
+            ' via Traverse (under the map for desktop, under the map inside Map Movement action drop down for mobile)' . ' ' .
+        'And completing either Fighting monsters, Crafting: Weapons, Spells, Armour and Rings or enchanting the already crafted items.' .
+            ' You can see the event goal for the map specified by being on the map and clicking the Event Goal tab from the map.'));
 
     }
 }

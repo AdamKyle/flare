@@ -6,6 +6,7 @@ import OrangeProgressBar from "../../../components/ui/progress-bars/orange-progr
 import { formatNumber } from "../../../lib/game/format-number";
 import EventGoalsTabState from "./types/event-goals-tab-state";
 import EventGoal from "./definitions/event-goal";
+import {snakeCase} from "lodash";
 
 export default class EventGoalsTab extends React.Component<
     any,
@@ -42,6 +43,7 @@ export default class EventGoalsTab extends React.Component<
         this.eventGoalsUpdate.listen(
             "Game.Events.Events.UpdateEventGoalProgress",
             (event: { eventGoalData: { event_goals: EventGoal } }) => {
+                console.log('Event Goal ...', event);
                 this.setState({
                     eventGoal: event.eventGoalData.event_goals,
                 });
@@ -56,11 +58,29 @@ export default class EventGoalsTab extends React.Component<
             return progressBars;
         }
 
+        let totalDone = 0;
+        let maxAmount = 0;
+
         let current = this.state.eventGoal.reward_every;
         let phase = 1;
 
-        while (current <= this.state.eventGoal.max_kills) {
-            const value = Math.min(current, this.state.eventGoal.total_kills);
+        if (this.state.eventGoal.max_kills !== null && this.state.eventGoal.total_kills !== null) {
+            maxAmount = this.state.eventGoal.max_kills;
+            totalDone = this.state.eventGoal.total_kills;
+        }
+
+        if (this.state.eventGoal.max_crafts !== null && this.state.eventGoal.total_crafts !== null) {
+            maxAmount = this.state.eventGoal.max_crafts;
+            totalDone = this.state.eventGoal.total_crafts;
+        }
+
+        if (this.state.eventGoal.max_enchants !== null && this.state.eventGoal.total_enchants !== null) {
+            maxAmount = this.state.eventGoal.max_enchants;
+            totalDone = this.state.eventGoal.total_enchants;
+        }
+
+        while (current <= maxAmount) {
+            const value = Math.min(current, totalDone);
 
             progressBars.push(
                 <div className="mb-4 relative top-[-15px]">
@@ -85,6 +105,93 @@ export default class EventGoalsTab extends React.Component<
         return progressBars;
     }
 
+    getEventGoalLabel(): string {
+
+        if (this.state.eventGoal === null) {
+            return 'ERROR - Missing event goal.';
+        }
+
+        let label = 'ERROR - undefined type of total for event goal.';
+
+        if (this.state.eventGoal.total_kills !== null && this.state.eventGoal.max_kills !== null) {
+            label = formatNumber(this.state.eventGoal.total_kills) + "/" + formatNumber(this.state.eventGoal.max_kills)
+        }
+
+        if (this.state.eventGoal.total_crafts !== null && this.state.eventGoal.max_crafts !== null) {
+            label = formatNumber(this.state.eventGoal.total_crafts) + "/" + formatNumber(this.state.eventGoal.max_crafts)
+        }
+
+        if (this.state.eventGoal.total_enchants !== null && this.state.eventGoal.max_enchants !== null) {
+            label = formatNumber(this.state.eventGoal.total_enchants) + "/" + formatNumber(this.state.eventGoal.max_enchants)
+        }
+
+        return label;
+    }
+
+    getOverAllProgress(): number {
+        if (this.state.eventGoal === null) {
+            return 0;
+        }
+
+        let percentageFilled = 0;
+
+        if (this.state.eventGoal.total_kills !== null && this.state.eventGoal.max_kills !== null) {
+            percentageFilled = (this.state.eventGoal.total_kills / this.state.eventGoal.max_kills) * 100;
+        }
+
+        if (this.state.eventGoal.total_crafts !== null && this.state.eventGoal.max_crafts !== null) {
+            percentageFilled = (this.state.eventGoal.total_crafts / this.state.eventGoal.max_crafts) * 100;
+        }
+
+        if (this.state.eventGoal.total_enchants !== null && this.state.eventGoal.max_enchants !== null) {
+            percentageFilled = (this.state.eventGoal.total_enchants / this.state.eventGoal.max_enchants) * 100;
+        }
+
+        return percentageFilled > 100 ? 100 : percentageFilled;
+    }
+
+    getTitleForProgressBar(): string {
+
+        if (this.state.eventGoal === null) {
+            return  'Unknown Event Step';
+        }
+
+        if (this.state.eventGoal.total_kills !== null && this.state.eventGoal.max_kills !== null) {
+            return 'Creature Kill'
+        }
+
+        if (this.state.eventGoal.total_crafts !== null && this.state.eventGoal.max_crafts !== null) {
+            return 'Item Crafting Amount'
+        }
+
+        if (this.state.eventGoal.total_enchants !== null && this.state.eventGoal.max_enchants !== null) {
+            return 'Enchanting Amount'
+        }
+
+        return 'Unknown Event Step';
+    }
+
+    getCurrentAmount(): number {
+
+        if (this.state.eventGoal === null) {
+            return 0;
+        }
+
+        if (this.state.eventGoal.total_kills !== null && this.state.eventGoal.max_kills !== null) {
+            return this.state.eventGoal.current_kills;
+        }
+
+        if (this.state.eventGoal.total_crafts !== null && this.state.eventGoal.max_crafts !== null) {
+            return this.state.eventGoal.current_crafts;
+        }
+
+        if (this.state.eventGoal.total_enchants !== null && this.state.eventGoal.max_enchants !== null) {
+            return this.state.eventGoal.current_enchants;
+        }
+
+        return 0;
+    }
+
     render() {
         if (this.state.loading) {
             return <LoadingProgressBar />;
@@ -98,16 +205,9 @@ export default class EventGoalsTab extends React.Component<
             <div>
                 <div className="relative top-[-30px]">
                     <OrangeProgressBar
-                        primary_label={"Event Goal - Creature Kill"}
-                        secondary_label={
-                            formatNumber(this.state.eventGoal.total_kills) +
-                            "/" +
-                            formatNumber(this.state.eventGoal.max_kills)
-                        }
-                        percentage_filled={
-                            (this.state.eventGoal?.total_kills /
-                            this.state.eventGoal?.max_kills) * 100
-                        }
+                        primary_label={"Event Goal - " + this.getTitleForProgressBar()}
+                        secondary_label={this.getEventGoalLabel()}
+                        percentage_filled={this.getOverAllProgress()}
                         height_override_class="h-3"
                         text_override_class="text-md"
                         push_down={true}
@@ -125,16 +225,18 @@ export default class EventGoalsTab extends React.Component<
                     </p>
                     <dl className="my-2">
                         <dt>Gear Set Name</dt>
-                        <dd><a href="/information/corrupted-ice" target='_blank'>Corrupted Ice <i
+                        <dd><a href={"/information/" + snakeCase(this.state.eventGoal.reward)} target='_blank'>{
+                            this.state.eventGoal.reward
+                        } <i
                             className="fas fa-external-link-alt"></i></a></dd>
                         <dt>With Legendary Unique Attached?</dt>
-                        <dd>Yes</dd>
+                        <dd>{this.state.eventGoal.should_be_unique ? 'Yes' : 'No'}</dd>
                         <dt>With Mythic Attached?</dt>
-                        <dd>No</dd>
+                        <dd>{this.state.eventGoal.should_be_mythic ? 'Yes' : 'No'}</dd>
                     </dl>
                     <p className="my-2 font-bold">
                         <span className="text-orange-500 dark:text-orange-300">
-                            Amount of kills required to gain phase reward:
+                            Contribution required for reward:
                         </span>{" "}
                         {formatNumber(
                             this.state.eventGoal.amount_needed_for_reward
@@ -142,10 +244,10 @@ export default class EventGoalsTab extends React.Component<
                     </p>
                     <p className="my-2 font-bold">
                         <span className="text-orange-500 dark:text-orange-300">
-                            Your Current Kills For Event Goal:
+                            Your current contribution:
                         </span>{" "}
                         {formatNumber(
-                            this.state.eventGoal.current_kills
+                            this.getCurrentAmount()
                         )}
                     </p>
                 </div>

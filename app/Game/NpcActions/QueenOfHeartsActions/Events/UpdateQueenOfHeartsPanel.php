@@ -16,18 +16,19 @@ class UpdateQueenOfHeartsPanel implements ShouldBroadcastNow {
     /**
      * @param array $panelData
      */
-    public $panelData;
+    public array $panelData;
 
     /**
      * @var User $user
      *
      */
-    public $user;
+    public User $user;
 
     /**
      * Create a new event instance.
      *
      * @param User $user
+     * @param array $panelData
      */
     public function __construct(User $user, array $panelData, ) {
         $this->panelData = $panelData;

@@ -209,7 +209,7 @@ export default class AlchemyItemUsable extends React.Component<AlchemyItemUsable
                         this.props.item.stat_increase ?
                             <dl className={'my-4'}>
                                 <dt>All Stat increase %</dt>
-                                <dd className='text-green-700 dark:text-green-600'>{(this.props.item.stat_increase * 100).toFixed(2)}%</dd>
+                                <dd className='text-green-700 dark:text-green-500'>{(this.props.item.stat_increase * 100).toFixed(2)}%</dd>
                             </dl>
                             :
                             this.renderStatSection()
@@ -242,7 +242,7 @@ export default class AlchemyItemUsable extends React.Component<AlchemyItemUsable
                     this.props.item.stat_increase ?
                         <dl className={'my-4'}>
                             <dt>All Stat increase %</dt>
-                            <dd className='text-green-700 dark:text-green-600'>{(this.props.item.stat_increase * 100).toFixed(2)}%</dd>
+                            <dd className='text-green-700 dark:text-green-500'>{(this.props.item.stat_increase * 100).toFixed(2)}%</dd>
                         </dl>
                         :
                         this.renderStatSection()

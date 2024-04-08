@@ -139,7 +139,7 @@
             @yield('content')
         @endauth
 
-    @guest
+    @guest;
         </main>
     @endguest
     <!-- Scripts -->

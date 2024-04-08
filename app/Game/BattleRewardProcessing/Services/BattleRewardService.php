@@ -8,6 +8,7 @@ use App\Flare\Models\GameMap;
 use App\Flare\Models\GlobalEventGoal;
 use App\Flare\Models\Monster;
 use App\Flare\Services\CharacterRewardService;
+use App\Flare\Values\MapNameValue;
 use App\Game\BattleRewardProcessing\Handlers\FactionHandler;
 use App\Game\BattleRewardProcessing\Handlers\FactionLoyaltyBountyHandler;
 use App\Game\BattleRewardProcessing\Handlers\BattleGlobalEventParticipationHandler;
@@ -109,6 +110,7 @@ class BattleRewardService {
     protected function handleGlobalEventGoals() {
         $event = Event::whereIn('type', [
             EventType::WINTER_EVENT,
+            EventType::DELUSIONAL_MEMORIES_EVENT,
         ])->first();
 
         if (is_null($event)) {
@@ -117,7 +119,12 @@ class BattleRewardService {
 
         $globalEventGoal = GlobalEventGoal::where('event_type', $event->type)->first();
 
-        if (is_null($globalEventGoal) || !$this->character->map->gameMap->mapType()->isTheIcePlane()) {
+        $gameMapArrays = GameMap::whereIn('name', [
+            MapNameValue::ICE_PLANE,
+            MapNameValue::DELUSIONAL_MEMORIES,
+        ])->pluck('id')->toArray();
+
+        if (is_null($globalEventGoal) || !in_array($this->character->map->game_map_id, $gameMapArrays)) {
             return;
         }
 

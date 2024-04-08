@@ -3,6 +3,8 @@ export default interface ItemNameColorationTextProps {
     item: ItemForColorizationDefinition
 
     custom_width: boolean;
+
+    additional_css?: string;
 }
 
 export interface ItemForColorizationDefinition {

@@ -19,6 +19,9 @@ import SelectItemToCraft from "../crafting-partials/select-item-to-craft";
 import {FameTasks} from "../../../faction-loyalty/deffinitions/faction-loaylaty";
 
 export default class Crafting extends React.Component<any, any> {
+
+    private characterStatus: any;
+
     constructor(props: any) {
         super(props);
 
@@ -38,6 +41,22 @@ export default class Crafting extends React.Component<any, any> {
                 level: 1,
             },
         };
+
+        // @ts-ignore
+        this.characterStatus = Echo.private(
+            "update-character-status-" + this.props.user_id
+        );
+    }
+
+    componentDidMount() {
+        this.characterStatus.listen(
+            "Game.Battle.Events.UpdateCharacterStatus",
+            (event: any) => {
+                this.setState({
+                    show_craft_for_event: event.characterStatuses.show_craft_for_event
+                });
+            }
+        );
     }
 
     showCraftForNpc() {
@@ -200,6 +219,7 @@ export default class Crafting extends React.Component<any, any> {
                                     loading: false,
                                     craftable_items: result.data.items,
                                     skill_xp: result.data.xp,
+                                    show_craft_for_event: result.data.show_craft_for_event,
                                 },
                                 () => {
                                     if (
@@ -325,7 +345,7 @@ export default class Crafting extends React.Component<any, any> {
                             change_type={this.changeType.bind(this)}
                             clear_crafting={this.clearCrafting.bind(this)}
                             show_craft_for_npc={this.showCraftForNpc()}
-                            show_craft_for_event={this.props.show_craft_for_event}
+                            show_craft_for_event={this.state.show_craft_for_event}
                         />
                     </div>
                 ) : (
@@ -338,7 +358,7 @@ export default class Crafting extends React.Component<any, any> {
                             change_type={this.changeType.bind(this)}
                             clear_crafting={this.clearCrafting.bind(this)}
                             show_craft_for_npc={this.showCraftForNpc()}
-                            show_craft_for_event={this.props.show_craft_for_event}
+                            show_craft_for_event={this.state.show_craft_for_event}
                         />
                     </div>
                 )}

@@ -192,9 +192,7 @@ export default class ItemComparison extends React.Component<ItemComparisonProps,
                 </div>
                 <div className='grid md:grid-cols-2 gap-2'>
                     <div>
-                        <h3 className={'mt-4'}>
-                            <ItemNameColorationText item={this.props.comparison_info.details[0]} custom_width={true} />
-                        </h3>
+                        <ItemNameColorationText item={this.props.comparison_info.details[0]} custom_width={true} additional_css={'mt-4'} />
                         <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2"></div>
                         <Comparison comparison={this.props.comparison_info.details[0]} />
                         <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2"></div>
@@ -206,9 +204,7 @@ export default class ItemComparison extends React.Component<ItemComparisonProps,
                         </div>
                     </div>
                     <div>
-                        <h3 className={'mt-4'}>
-                            <ItemNameColorationText item={this.props.comparison_info.details[1]} custom_width={true} />
-                        </h3>
+                        <ItemNameColorationText item={this.props.comparison_info.details[0]} custom_width={true} additional_css={'mt-4'} />
                         <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2"></div>
                         <Comparison comparison={this.props.comparison_info.details[1]} />
                         <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2"></div>

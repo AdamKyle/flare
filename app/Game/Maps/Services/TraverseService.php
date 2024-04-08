@@ -235,6 +235,8 @@ class TraverseService {
 
             event(new GlobalMessageEvent('"Fliniguss has gone mad."  the Red Hawk Soldier states. "Help us put him down!" ' . $character->name . ' enters into a place where the war of the ages past never ended.'));
         }
+
+        event(new UpdateCharacterStatus($character));
     }
 
     /**
@@ -426,11 +428,17 @@ class TraverseService {
             $this->updateActionTypeCache($character, $gameMap->character_attack_reduction);
         } else if ($gameMap->mapType()->isTheIcePlane()) {
             $this->updateActionTypeCache($character, $gameMap->character_attack_reduction);
+        } else if ($gameMap->mapType()->isTwistedMemories()) {
+            $this->updateActionTypeCache($character, $gameMap->character_attack_reduction);
+        } else if ($gameMap->mapType()->isDelusionalMemories()) {
+            $this->updateActionTypeCache($character, $gameMap->character_attack_reduction);
         } else if (
             $oldGameMap->mapType()->isPurgatory() ||
             $oldGameMap->mapType()->isHell() ||
             $oldGameMap->mapType()->isShadowPlane() ||
-            $oldGameMap->mapType()->isTheIcePlane()
+            $oldGameMap->mapType()->isTheIcePlane() ||
+            $oldGameMap->mapType()->isTwistedMemories() ||
+            $oldGameMap->mapType()->isDelusionalMemories()
         ) {
             $this->updateActionTypeCache($character, 0.0);
         }

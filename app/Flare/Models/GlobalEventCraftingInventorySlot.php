@@ -33,15 +33,14 @@ class GlobalEventCraftingInventorySlot extends Model {
         'character_id'     => 'integer',
     ];
 
-    protected $appends = [
-        'total_kills',
-    ];
+    public function item() {
+        return $this->hasOne(Item::class, 'id', 'item_id');
+    }
 
-    public function event() {
-        return $this->belongsTo(Event::class, 'event_id', 'id');
+    public function inventory() {
+        return $this->belongsTo(GlobalEventCraftingInventory::class, 'global_event_crafting_inventory_id', 'id');
     }
 
     protected static function newFactory() {
-        return GlobalEventGoalFactory::new();
     }
 }
