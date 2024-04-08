@@ -45,11 +45,6 @@ class UpdateUsersForDevelopment extends Command
                     continue;
                 }
 
-                if ($user->character->name === 'TestPVPChar') {
-                    $progressBar->advance();
-                    continue;
-                }
-
                 $user->update([
                     'email'    => Str::random(10) . '@test.com',
                     'password' => Hash::make(Str::random(10))
