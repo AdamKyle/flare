@@ -2,6 +2,7 @@
 
 namespace Tests\Console\Events;
 
+use App\Flare\Values\MapNameValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\Models\Announcement;
 use App\Flare\Models\Event;
@@ -96,6 +97,10 @@ class ProcessScheduledEventsTest extends TestCase {
     }
 
     public function testWinterEvent() {
+        $this->createGameMap([
+            'name' => MapNameValue::ICE_PLANE,
+        ]);
+
         $this->createScheduledEvent([
             'event_type' => EventType::WINTER_EVENT,
             'start_date' => now()->addMinutes(5),
@@ -109,6 +114,10 @@ class ProcessScheduledEventsTest extends TestCase {
     }
 
     public function testDelusionalMemoriesEvent() {
+        $this->createGameMap([
+            'name' => MapNameValue::DELUSIONAL_MEMORIES,
+        ]);
+
         $this->createScheduledEvent([
             'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
             'start_date' => now()->addMinutes(5),

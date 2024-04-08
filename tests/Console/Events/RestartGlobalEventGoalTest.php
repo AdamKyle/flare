@@ -235,6 +235,10 @@ class RestartGlobalEventGoalTest extends TestCase {
 
     public function testHandleMovingToTheNextStepFromEnchantingToBattling() {
 
+        $this->createGameMap([
+            'only_during_event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+        ]);
+
         $event = $this->createEvent([
             'type' => EventType::DELUSIONAL_MEMORIES_EVENT,
             'event_goal_steps' => [GlobalEventSteps::BATTLE, GlobalEventSteps::CRAFT, GlobalEventSteps::ENCHANT],
@@ -292,6 +296,9 @@ class RestartGlobalEventGoalTest extends TestCase {
     }
 
     public function testHandleMovingFromCraftEventStepToEnchantingStep() {
+        $this->createGameMap([
+            'only_during_event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+        ]);
 
         $event = $this->createEvent([
             'type' => EventType::DELUSIONAL_MEMORIES_EVENT,
@@ -350,6 +357,9 @@ class RestartGlobalEventGoalTest extends TestCase {
     }
 
     public function testHandleMovingToCraftingStepOfEventGoal() {
+        $this->createGameMap([
+            'only_during_event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+        ]);
 
         $event = $this->createEvent([
             'type' => EventType::DELUSIONAL_MEMORIES_EVENT,
