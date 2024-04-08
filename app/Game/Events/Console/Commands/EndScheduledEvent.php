@@ -13,6 +13,7 @@ use App\Flare\Models\Raid;
 use App\Flare\Models\Event;
 use App\Flare\Models\Location;
 use App\Flare\Models\Character;
+use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Core\Values\FactionLevel;
 use App\Game\Events\Values\EventType;
 use App\Game\Exploration\Services\ExplorationAutomationService;
@@ -346,6 +347,8 @@ class EndScheduledEvent extends Command {
         $event->delete();
 
         $this->cleanUpEventGoals();
+
+        $this->updateAllCharacterStatuses();
     }
 
     /**
@@ -408,6 +411,16 @@ class EndScheduledEvent extends Command {
         $event->delete();
 
         $this->cleanUpEventGoals();
+
+        $this->updateAllCharacterStatuses();
+    }
+
+    private function updateAllCharacterStatuses(): void {
+        Character::chunkById(250, function($characters) {
+            foreach ($characters as $character) {
+                event(new UpdateCharacterStatus($character));
+            }
+        });
     }
 
     /**
