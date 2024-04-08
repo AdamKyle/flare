@@ -13,7 +13,7 @@ class RandomAffixDetails {
 
     const BASIC     = 2000000000;
     const MEDIUM    = 4000000000;
-    const LEGENDARY = 100000000000;
+    const LEGENDARY = 80000000000;
     const MYTHIC    = 500000000000;
     const COSMIC    = 1000000000000;
 

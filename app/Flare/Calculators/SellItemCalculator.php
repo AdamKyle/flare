@@ -5,6 +5,7 @@ namespace App\Flare\Calculators;
 use App\Flare\Models\Item;
 use App\Flare\Traits\IsItemUnique;
 use App\Flare\Values\MaxCurrenciesValue;
+use App\Flare\Values\RandomAffixDetails;
 
 class SellItemCalculator {
 
@@ -95,6 +96,14 @@ class SellItemCalculator {
 
         if ($item->type === 'trinket') {
             $minPrice = $item->gold_dust_cost * 100;
+        }
+
+        if ($item->is_mythic) {
+            $minPrice = RandomAffixDetails::MYTHIC;
+        }
+
+        if ($item->is_cosmic) {
+            $minPrice = RandomAffixDetails::COSMIC;
         }
 
         return $minPrice;

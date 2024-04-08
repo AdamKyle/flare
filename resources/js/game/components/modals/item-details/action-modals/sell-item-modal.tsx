@@ -38,6 +38,7 @@ export default class SellItemModal extends React.Component<SellModalProps, { }> 
                         affix_count: this.props.item.affix_count,
                         is_unique: this.props.item.is_unique,
                         is_mythic: this.props.item.is_mythic,
+                        is_cosmic: this.props.item.is_cosmic,
                         holy_stacks_applied: this.props.item.holy_stacks_applied,
                 }} />
                 </h3>

@@ -50,6 +50,8 @@ class MassImportCustomData extends Command {
 
         $this->importGameMaps($correctOrder);
 
+        Artisan::call('import:game-data "Core Imports"');
+
         // Some of these locations have items that are required:
         Artisan::call('import:game-data "Locations Give Items"');
 
