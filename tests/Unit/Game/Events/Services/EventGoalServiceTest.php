@@ -46,13 +46,20 @@ class EventGoalServiceTest extends TestCase {
 
         $expected = [
             'event_goals' => [
-                'max_kills'               => $eventGoal->max_kills,
-                'total_kills'             => $eventGoal->total_kills,
-                'reward_every'            => $eventGoal->reward_every,
+                'max_kills'                => $eventGoal->max_kills,
+                'total_kills'              => $eventGoal->total_kills,
+                'reward_every'             => $eventGoal->reward_every,
                 'amount_needed_for_reward' => 10,
-                'current_kills'           => 0,
-                'max_crafts'              => null,
-                'current_crafts'          => 0,
+                'current_kills'            => 0,
+                'max_crafts'               => null,
+                'current_crafts'           => 0,
+                'current_enchants'         => 0,
+                'total_crafts'             => 0,
+                'total_enchants'           => 0,
+                'max_enchants'             => null,
+                'should_be_mythic'         => false,
+                'should_be_unique'         => true,
+                'reward'                   => ItemSpecialtyType::CORRUPTED_ICE,
             ],
             'status' => 200
         ];
@@ -78,8 +85,15 @@ class EventGoalServiceTest extends TestCase {
                 'reward_every'            => $eventGoal->reward_every,
                 'amount_needed_for_reward' => 10,
                 'current_kills'           => 0,
-                'max_crafts'              => null,
-                'current_crafts'          => 0,
+                'max_crafts'               => null,
+                'current_crafts'           => 0,
+                'current_enchants'         => 0,
+                'total_crafts'             => 0,
+                'total_enchants'           => 0,
+                'max_enchants'             => null,
+                'should_be_mythic'         => false,
+                'should_be_unique'         => true,
+                'reward'                   => ItemSpecialtyType::CORRUPTED_ICE,
             ]
         ];
 
@@ -112,8 +126,15 @@ class EventGoalServiceTest extends TestCase {
                 'reward_every'            => $eventGoal->reward_every,
                 'amount_needed_for_reward' => 10,
                 'current_kills'           => 10,
-                'max_crafts'              => null,
-                'current_crafts'          => 0,
+                'max_crafts'               => null,
+                'current_crafts'           => 0,
+                'current_enchants'         => 0,
+                'total_crafts'             => 0,
+                'total_enchants'           => 0,
+                'max_enchants'             => null,
+                'should_be_mythic'         => false,
+                'should_be_unique'         => true,
+                'reward'                   => ItemSpecialtyType::CORRUPTED_ICE,
             ]
         ];
 

@@ -7,6 +7,7 @@ use App\Flare\Models\Event as ModelsEvent;
 use App\Flare\Models\GlobalEventGoal;
 use App\Flare\Models\GlobalEventKill;
 use App\Flare\Models\GlobalEventParticipation;
+use App\Flare\Values\MapNameValue;
 use App\Game\Events\Jobs\InitiateDelusionalMemoriesEvent;
 use App\Game\Events\Values\EventType;
 use App\Game\Events\Jobs\InitiateWeeklyCurrencyDropEvent;
@@ -16,11 +17,12 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use Tests\TestCase;
+use Tests\Traits\CreateGameMap;
 use Tests\Traits\CreateScheduledEvent;
 
 class InitiateDelusionalMemoriesEventTest extends TestCase {
 
-    use RefreshDatabase, CreateScheduledEvent;
+    use RefreshDatabase, CreateScheduledEvent, CreateGameMap;
 
     public function setUp(): void {
         parent::setUp();
@@ -42,6 +44,12 @@ class InitiateDelusionalMemoriesEventTest extends TestCase {
     }
 
     public function testDelusionalMemoriesEventDoesTriggerScheduledEventExists() {
+
+        $this->createGameMap([
+            'name' => MapNameValue::DELUSIONAL_MEMORIES,
+            'only_during_event_type' => EventType::DELUSIONAL_MEMORIES_EVENT
+        ]);
+
         Event::fake();
 
         $event = $this->createScheduledEvent([

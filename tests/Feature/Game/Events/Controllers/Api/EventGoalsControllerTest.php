@@ -74,7 +74,14 @@ class EventGoalsControllerTest extends TestCase {
             'amount_needed_for_reward' => 100,
             'current_kills'            => 10,
             'max_crafts'               => null,
+            'max_enchants'             => null,
             'current_crafts'           => 0,
+            'current_enchants'         => 0,
+            'should_be_mythic'         => false,
+            'should_be_unique'         => true,
+            'reward'                   => ItemSpecialtyType::CORRUPTED_ICE,
+            'total_crafts'             => 0,
+            'total_enchants'           => 0,
         ], $jsonData['event_goals']);
     }
 }

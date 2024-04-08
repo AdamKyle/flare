@@ -7,6 +7,7 @@ use App\Flare\Models\Event as ModelsEvent;
 use App\Flare\Models\GlobalEventGoal;
 use App\Flare\Models\GlobalEventKill;
 use App\Flare\Models\GlobalEventParticipation;
+use App\Flare\Values\MapNameValue;
 use App\Game\Events\Values\EventType;
 use App\Game\Events\Jobs\InitiateWeeklyCurrencyDropEvent;
 use App\Game\Events\Jobs\InitiateWinterEvent;
@@ -15,11 +16,12 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use Tests\TestCase;
+use Tests\Traits\CreateGameMap;
 use Tests\Traits\CreateScheduledEvent;
 
 class InitiateWinterEventTest extends TestCase {
 
-    use RefreshDatabase, CreateScheduledEvent;
+    use RefreshDatabase, CreateScheduledEvent, CreateGameMap;
 
     public function setUp(): void {
         parent::setUp();
@@ -41,6 +43,12 @@ class InitiateWinterEventTest extends TestCase {
     }
 
     public function testWinterEventDoesTriggerWhenScheduledEventExists() {
+
+        $this->createGameMap([
+            'name' => MapNameValue::ICE_PLANE,
+            'only_during_event_type' => EventType::WINTER_EVENT
+        ]);
+
         Event::fake();
 
         $event = $this->createScheduledEvent([
