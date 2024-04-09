@@ -3,11 +3,14 @@
 namespace App\Game\Battle\Services;
 
 use App\Flare\Models\Character;
+use App\Flare\Models\Location;
 use App\Flare\Models\Monster;
 use App\Flare\ServerFight\MonsterPlayerFight;
+use App\Flare\Values\LocationType;
 use App\Game\Battle\Events\AttackTimeOutEvent;
 use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\BattleRewardProcessing\Jobs\BattleAttackHandler;
+use App\Game\BattleRewardProcessing\Services\WeeklyBattleService;
 use App\Game\Core\Traits\ResponseBuilder;
 use Illuminate\Support\Facades\Cache;
 
@@ -18,9 +21,15 @@ class MonsterFightService {
     private MonsterPlayerFight $monsterPlayerFight;
     private BattleEventHandler $battleEventHandler;
 
-    public function __construct(MonsterPlayerFight $monsterPlayerFight, BattleEventHandler $battleEventHandler,) {
+    /**
+     * @var WeeklyBattleService $weeklyBattleService;
+     */
+    private WeeklyBattleService $weeklyBattleService;
+
+    public function __construct(MonsterPlayerFight $monsterPlayerFight, BattleEventHandler $battleEventHandler, WeeklyBattleService $weeklyBattleService) {
         $this->monsterPlayerFight = $monsterPlayerFight;
         $this->battleEventHandler = $battleEventHandler;
+        $this->weeklyBattleService = $weeklyBattleService;
     }
 
     public function setupMonster(Character $character, array $params): array {
@@ -58,6 +67,14 @@ class MonsterFightService {
     public function fightMonster(Character $character, string $attackType): array {
         $cache = Cache::get('monster-fight-' . $character->id);
 
+        if (!$this->isAtMonstersLocation($character, $cache['monster']['id'])) {
+            return $this->errorResult('You are too far away from the monster. Move back to it\'s location');
+        }
+
+        if (!$this->isMonsterAlreadyDefeatedThisWeek($character, $cache['monster']['id'])) {
+            return $this->errorResult('You already defeated this monster. Reset is on Sundays at 3am America/Edmonton.');
+        }
+
         if (is_null($cache)) {
             return $this->errorResult('The monster seems to have fled. Click attack again to start a new battle. You have 15 minutes from clicking attack to attack the creature.');
         }
@@ -94,5 +111,29 @@ class MonsterFightService {
 
 
         return $this->successResult($cache);
+    }
+
+    public function isAtMonstersLocation(Character $character, int $monsterId): bool {
+
+        $monster = Monster::find($monsterId);
+
+        if (!is_null($monster->only_for_location_type)) {
+
+            $location = Location::where('type', LocationType::ALCHEMY_CHURCH)->where(
+                'game_map_id', $character->map->game_map_id
+            )->where('x', $character->map->character_position_x)->where('y', $character->map->character_position_y)->first();
+
+            if (is_null($location)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public function isMonsterAlreadyDefeatedThisWeek(Character $character, int $monsterId): bool {
+        $monster = Monster::find($monsterId);
+
+        return $this->weeklyBattleService->canFightMonster($character, $monster);
     }
 }

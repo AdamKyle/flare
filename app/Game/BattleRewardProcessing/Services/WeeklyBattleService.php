@@ -4,6 +4,7 @@ namespace App\Game\BattleRewardProcessing\Services;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\Monster;
+use App\Flare\Models\WeeklyMonsterFight;
 use App\Flare\Values\LocationType;
 use App\Game\BattleRewardProcessing\Handlers\LocationSpecialtyHandler;
 use Exception;
@@ -75,20 +76,23 @@ class WeeklyBattleService {
         $weeklyMonsterFight = $character->weeklyBattleFights()->where('monster_id', $monster->id)->first();
 
         if (is_null($weeklyMonsterFight)) {
-            $character->weeklyBattleFights()->create([
+            $weeklyMonsterFight = $character->weeklyBattleFights()->create([
                 'character_id' => $character->id,
                 'monster_id'   => $monster->id,
                 'monster_was_killed' => true,
             ]);
 
-            return $this->handleReward($character, $monster);
+
+            return $this->handleReward($character, $monster, $weeklyMonsterFight);
         }
 
         $weeklyMonsterFight->update([
             'monster_was_killed' => true,
         ]);
 
-        return $this->handleReward($character, $monster);
+        $weeklyMonsterFight = $weeklyMonsterFight->refresh();
+
+        return $this->handleReward($character, $monster, $weeklyMonsterFight);
     }
 
     /**
@@ -113,15 +117,16 @@ class WeeklyBattleService {
      *
      * @param Character $character
      * @param Monster $monster
+     * @param WeeklyMonsterFight $weeklyMonsterFight
      * @return Character
      * @throws Exception
      */
-    private function handleReward(Character $character, Monster $monster): Character {
+    private function handleReward(Character $character, Monster $monster, WeeklyMonsterFight $weeklyMonsterFight): Character {
 
         $locationType = new LocationType($monster->only_for_location_type);
 
         if ($locationType->isAlchemyChurch()) {
-            $this->locationSpecialtyHandler->handleMonsterFromSpecialLocation($character);
+            $this->locationSpecialtyHandler->handleMonsterFromSpecialLocation($character, $weeklyMonsterFight);
         }
 
 

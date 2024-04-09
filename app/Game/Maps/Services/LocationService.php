@@ -169,7 +169,7 @@ class LocationService {
     /**
      * Add additional data to the location data.
      *
-     * @param Collection $collection
+     * @param Collection $locations
      * @return Collection
      */
     protected function transformLocationData(Collection $locations): Collection {
@@ -219,6 +219,8 @@ class LocationService {
             if (!is_null($location->required_quest_item_id)) {
                 $location->required_quest_item_name = $location->requiredQuestItem->name;
             }
+
+            $location->game_map_name = $location->map->name;
 
             return $location;
         });

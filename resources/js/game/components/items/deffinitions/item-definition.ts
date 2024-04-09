@@ -2,6 +2,7 @@ import ItemAtonement from "./item-atonement";
 import {ItemType} from "../enums/item-type";
 
 export default interface ItemDefinition {
+    [key: string]: any;
     affects_skills: any[]; // or specify the type if known
     affix_count: number;
     affix_damage_reduction: number;

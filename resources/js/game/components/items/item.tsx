@@ -6,10 +6,15 @@ import {startCase} from "lodash";
 import ItemDefinition from "./deffinitions/item-definition";
 import {ItemType} from "./enums/item-type";
 import ItemToEquip from "../item-comparison/deffinitions/item-to-equip";
+import clsx from "clsx";
 
 interface ItemProps {
     item: ItemDefinition | ItemToEquip;
 }
+
+const coreAttributes = [
+    'str', 'dex', 'dur', 'int', 'chr', 'agi', 'focus'
+];
 
 export default class Item extends React.Component<ItemProps, any> {
     constructor(props: ItemProps) {
@@ -20,6 +25,56 @@ export default class Item extends React.Component<ItemProps, any> {
         return <span className='text-gray-600 dark:text-white'>
             {this.props.item.name}
         </span>
+    }
+
+    renderAttackChange() {
+        return (
+            <dl>
+                <dt>Attack</dt>
+                <dd className={clsx({
+                    'text-green-700 dark:text-green-500' : this.isValueAboveZero(this.props.item.damage_adjustment),
+                    'text-red-700 dark:text-red-500' : this.isValueBeloZero(this.props.item.damage_adjustment),
+                    'text-gray-700 dark:text-white': this.props.item.damage_adjustment === 0,
+                })}>
+                    {formatNumber(this.props.item.damage_adjustment)}
+                </dd>
+            </dl>
+        )
+    }
+
+    renderDefenceChange() {
+        return (
+            <dl>
+                <dt>Defence</dt>
+                <dd className={clsx({
+                    'text-green-700 dark:text-green-500' : this.isValueAboveZero(this.props.item.ac_adjustment),
+                    'text-red-700 dark:text-red-500' : this.isValueBeloZero(this.props.item.ac_adjustment),
+                    'text-gray-700 dark:text-white': this.props.item.ac_adjustment === 0,
+                })}>
+                    {formatNumber(this.props.item.ac_adjustment)}
+                </dd>
+            </dl>
+        )
+    }
+
+    renderAttackOrDefenceAdjustment() {
+        const damageBased = [
+            ItemType.WEAPON,
+            ItemType.MACE,
+            ItemType.STAVE,
+            ItemType.FAN,
+            ItemType.HAMMER,
+            ItemType.GUN,
+            ItemType.SPELL_DAMAGE,
+            ItemType.SCRATCH_AWL,
+            ItemType.RING
+        ];
+
+        if (damageBased.includes(this.props.item.type)) {
+            return this.renderAttackChange();
+        }
+
+        return this.renderDefenceChange();
     }
 
     renderItemTypeData(): ReactNode {
@@ -70,6 +125,52 @@ export default class Item extends React.Component<ItemProps, any> {
         return null;
     }
 
+    isValueBeloZero(value: number): boolean {
+        return value < 0;
+    }
+
+    isValueAboveZero(value: number): boolean {
+        return value > 0;
+    }
+
+    mapCoreAttributes(attributeName: string) {
+        switch(attributeName) {
+            case 'str':
+                return 'Strength';
+            case 'dex':
+                return 'Dexterity';
+            case 'dur':
+                return 'Durability';
+            case 'int':
+                return'Intelligence';
+            case 'chr':
+                return 'Charisma';
+            case 'agi':
+                return 'Agility';
+            case 'focus':
+                return'Focus';
+            default:
+                return 'ERROR';
+        }
+    }
+
+    renderCoreAttributes() {
+        return coreAttributes.map((attribute: string) => {
+            return (
+                <>
+                    <dt>{this.mapCoreAttributes(attribute)}</dt>
+                    <dd className={clsx({
+                        'text-green-700 dark:text-green-500' : this.isValueAboveZero(this.props.item[attribute + '_modifier']),
+                        'text-red-700 dark:text-red-500' : this.isValueBeloZero(this.props.item[attribute + '_modifier']),
+                        'text-gray-700 dark:text-white': this.props.item[attribute + '_modifier'] === 0,
+                    })}>
+                        {(this.props.item[attribute + '_modifier'] * 100).toFixed(2) + '%'}
+                    </dd>
+                </>
+            )
+        })
+    }
+
     render() {
         return (
             <div>
@@ -80,20 +181,7 @@ export default class Item extends React.Component<ItemProps, any> {
                 <div className='grid md:grid-cols-2 sm:grid-gcols-1 gap-2'>
                     <div>
                         <dl>
-                            <dt>Strength</dt>
-                            <dd className='text-green-700 dark:text-green-500'>+{(this.props.item.str_modifier * 100).toFixed(2)}%</dd>
-                            <dt>Dexterity</dt>
-                            <dd className='text-green-700 dark:text-green-500'>+{(this.props.item.dex_modifier * 100).toFixed(2)}%</dd>
-                            <dt>Durability</dt>
-                            <dd className='text-green-700 dark:text-green-500'>+{(this.props.item.dur_modifier * 100).toFixed(2)}%</dd>
-                            <dt>Intelligence</dt>
-                            <dd className='text-green-700 dark:text-green-500'>+{(this.props.item.int_modifier * 100).toFixed(2)}%</dd>
-                            <dt>Charisma</dt>
-                            <dd className='text-green-700 dark:text-green-500'>+{(this.props.item.chr_modifier * 100).toFixed(2)}%</dd>
-                            <dt>Agility</dt>
-                            <dd className='text-green-700 dark:text-green-500'>+{(this.props.item.agi_modifier * 100).toFixed(2)}%</dd>
-                            <dt>Focus</dt>
-                            <dd className='text-green-700 dark:text-green-500'>+{(this.props.item.focus_modifier * 100).toFixed(2)}%</dd>
+                            {this.renderCoreAttributes()}
                         </dl>
                     </div>
                     <div className='border-b-2 border-b-gray-200 dark:border-b-gray-600 my-3 md:hidden sm:block'></div>

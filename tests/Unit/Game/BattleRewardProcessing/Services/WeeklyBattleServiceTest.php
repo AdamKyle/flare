@@ -5,6 +5,7 @@ namespace Tests\Unit\Game\BattleRewardProcessing\Services;
 use App\Flare\Values\ItemSpecialtyType;
 use App\Flare\Values\LocationType;
 use App\Game\BattleRewardProcessing\Services\WeeklyBattleService;
+use Facades\App\Flare\Calculators\DropCheckCalculator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
@@ -138,6 +139,8 @@ class WeeklyBattleServiceTest extends TestCase {
     }
 
     public function testCreateRecordMonsterWasKilled() {
+
+        DropCheckCalculator::partialMock()->shouldReceive('fetchDifficultItemChance')->andReturn(true);
 
         $character = $this->characterFactory->getCharacter();
 

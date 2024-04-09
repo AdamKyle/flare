@@ -1,4 +1,4 @@
-import React, {Fragment} from "react";
+import React, {Fragment, ReactNode} from "react";
 import {formatNumber} from "../../../../lib/game/format-number";
 import SpecialLocationHelpModal from "./special-location-help-modal";
 import LocationDetailsProps from "../../../map/types/map/location-pins/modals/location-details-props";
@@ -25,7 +25,6 @@ export default class LocationDetails extends React.Component<LocationDetailsProp
     }
 
     renderSpecialType() {
-
         if (this.props.location.type_name === 'Gold Mines') {
             return (
                 <Fragment>
@@ -182,6 +181,17 @@ export default class LocationDetails extends React.Component<LocationDetailsProp
         }
     }
 
+    renderInfoForSpecialMaps(): ReactNode {
+        if (this.props.location.game_map_name === 'Delusional Memories' ||
+            this.props.location.game_map_name === 'The Ice Plane'
+        ) {
+            return <InfoAlert additional_css={'my-2'}>
+                If you do not have access to Purgatory, than the enemy strength boost of this location does not apply to you.
+                You encounter regular creatures. The rest of the locations effects, such as drop rates and manual fighting still apply.
+            </InfoAlert>
+        }
+    }
+
     render() {
         return (
             <Fragment>
@@ -189,8 +199,11 @@ export default class LocationDetails extends React.Component<LocationDetailsProp
                 {this.renderRaidDetails()}
                 {
                     this.isSpecialLocation() ?
-                        <div className="max-h-[350px] lg:max-h-auto overflow-y-scroll">
+                        <div className="max-h-[350px] lg:max-h-auto overflow-y-auto">
                             <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+                            {
+                                this.renderInfoForSpecialMaps()
+                            }
                             <div className='flex items-center mb-4'>
                                 <h4>Special Location Details</h4>
                                 <div>
@@ -205,19 +218,18 @@ export default class LocationDetails extends React.Component<LocationDetailsProp
                                 essential that players craft appropriate resistance
                                 and stat reduction gear to survive harder creatures here.
                             </p>
-                            <p className={'mb-4'}>
-                                Quest items that drop from these locations can only be obtained at a 1/100 chance with a max of 45% of your looting skill.
-                                Players must manually fight monsters to obtain the quest items that drop here.
-                            </p>
                             <dl className={'mb-4'}>
                                 <dt>Increase Core Stats By:</dt>
                                 <dd>{formatNumber(this.props.location.increases_enemy_stats_by)}</dd>
                                 <dt>Increase Percentage Based Values By:</dt>
-                                <dd>{this.props.location.increase_enemy_percentage_by !== null ?
-                                    (this.props.location.increase_enemy_percentage_by * 100).toFixed(0)
-                                    : 0
-                                }%
+                                <dd>{
+                                        this.props.location.increase_enemy_percentage_by !== null ?
+                                            (this.props.location.increase_enemy_percentage_by * 100).toFixed(0)
+                                        : 0
+                                    }%
                                 </dd>
+                                <dt>Drop Chance</dt>
+                                <dd>1/100 chance for quest items with a cap of 45% of your looting skill. (If your looting skill bonus is 45% or higher we only use 45%)</dd>
                             </dl>
 
                             {

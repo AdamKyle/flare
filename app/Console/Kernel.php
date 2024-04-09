@@ -34,6 +34,9 @@ class Kernel extends ConsoleKernel {
         // Clean the chat every three months starting at 2am.
         $schedule->command('clean:chat')->cron('0 2 * */3 *')->timezone(config('app.timezone'));
 
+        // Clean Weekly Fights every Sunday at 3am
+        $schedule->command('reset:weekly-fights')->cron('0 3 * * 0')->timezone(config('app.timezone'));
+
         // clean the kingdom logs every week on monday at 2 am.
         $schedule->command('clean:kingdomLogs')->weeklyOn(1, '2:00')->timezone(config('app.timezone'));
 

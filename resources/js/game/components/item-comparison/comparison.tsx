@@ -115,17 +115,7 @@ export default class Comparison extends React.Component<ComparisonProps, any> {
         return (
             <div>
                 <div className='grid md:grid-cols-2 gap-2'>
-                    <div>
-                        {this.renderAttackOrDefenceAdjustment()}
-                    </div>
-                    <div>
-                        <dl>
-                            <dt>Equipped Position</dt>
-                            <dd>
-                                {startCase(this.props.comparison.position)}
-                            </dd>
-                        </dl>
-                    </div>
+                    {this.renderAttackOrDefenceAdjustment()}
                 </div>
                 <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2'></div>
                 <div>

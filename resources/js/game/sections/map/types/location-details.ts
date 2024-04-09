@@ -34,4 +34,6 @@ export default interface LocationDetails {
     has_raid_boss: boolean;
 
     pin_css_class: string | null;
+
+    game_map_name: string;
 }

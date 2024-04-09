@@ -150,11 +150,16 @@ class ReBalanceMonsters extends Command
         $this->manageMonsters($monsters, $exponentialAttributeCurve, 16000000000, 32000000000, 100000, 500, $gameMap->name, true);
     }
 
-    protected function manageMonsters(Collection $monsters, ExponentialAttributeCurve $exponentialAttributeCurve, int $min, int $max, int $increase, int $range, string $mapName, bool $isRaidMonsters = false): void {
-        $floats   = $this->generateFloats($exponentialAttributeCurve, $monsters->count());
-        $integers = $this->generateIntegers($exponentialAttributeCurve, $monsters->count(), $min, $max, $increase, $range);
-        $xpIntegers = $this->getXPIntegers($exponentialAttributeCurve, $monsters->count(), $mapName);
-        $atonements = $this->fetchElementalAtonements($exponentialAttributeCurve, $mapName, $monsters->count(), $isRaidMonsters);
+    protected function manageMonsters(Collection $monsters, ExponentialAttributeCurve $exponentialAttributeCurve, int $min, int $max, int $increase, int $range, string $mapName, bool $isSpecialMonster = false): void {
+        $floats     = $this->generateFloats($exponentialAttributeCurve, $monsters->count());
+        $integers   = $this->generateIntegers($exponentialAttributeCurve, $monsters->count(), $min, $max, $increase, $range);
+        $xpIntegers = [];
+
+        if (!$isSpecialMonster) {
+            $xpIntegers = $this->getXPIntegers($exponentialAttributeCurve, $monsters->count(), $mapName);
+        }
+
+        $atonements = $this->fetchElementalAtonements($exponentialAttributeCurve, $mapName, $monsters->count(), $isSpecialMonster);
 
         foreach ($monsters as $index => $monster) {
             $monsterStats = $this->setMonsterStats($floats, $integers, $xpIntegers, $index);
@@ -216,19 +221,19 @@ class ReBalanceMonsters extends Command
         if (in_array($mapName, $this->regularMaps)) {
 
             if ($mapName === MapNameValue::SURFACE) {
-                return $this->generateIntegers($exponentialAttributeCurve, $size, 2, 100, 2, 10);
+                return $this->generateIntegers($exponentialAttributeCurve, $size, 2, 100, 2, 1);
             }
 
             if ($mapName === MapNameValue::LABYRINTH) {
-                return $this->generateIntegers($exponentialAttributeCurve, $size, 2, 200, 2, 10);
+                return $this->generateIntegers($exponentialAttributeCurve, $size, 2, 200, 2, 5);
             }
 
             if ($mapName === MapNameValue::DUNGEONS) {
-                return $this->generateIntegers($exponentialAttributeCurve, $size, 2, 250, 2, 10);
+                return $this->generateIntegers($exponentialAttributeCurve, $size, 2, 250, 2, 5);
             }
 
             if ($mapName === MapNameValue::SHADOW_PLANE) {
-                return $this->generateIntegers($exponentialAttributeCurve, $size, 2, 500, 2, 10);
+                return $this->generateIntegers($exponentialAttributeCurve, $size, 2, 500, 2, 8);
             }
 
             if ($mapName === MapNameValue::HELL) {
@@ -295,8 +300,13 @@ class ReBalanceMonsters extends Command
     private function setMonsterStats(array $floats, array $integers, array $xpIntegers, int $index): array {
 
         $floatValue = min($floats[$index], 1.05);
+        $xpDetails  = [];
 
-        return [
+        if (isset($xpIntegers[$index])) {
+            $xpDetails['xp'] = $xpIntegers[$index];
+        }
+
+        return array_merge([
             'str'                    => $integers[$index],
             'dur'                    => $integers[$index],
             'dex'                    => $integers[$index],
@@ -313,7 +323,6 @@ class ReBalanceMonsters extends Command
             'gold'                   => ceil($integers[$index] / 2),
             'health_range'           => ceil($integers[$index] / 2) . '-' . $integers[$index],
             'attack_range'           => ceil($integers[$index] / 2) . '-' . $integers[$index],
-            'xp'                     => $xpIntegers[$index],
             'max_spell_damage'       => $integers[$index],
             'max_affix_damage'       => $integers[$index],
             'healing_percentage'     => $floatValue,
@@ -321,6 +330,6 @@ class ReBalanceMonsters extends Command
             'affix_resistance'       => $floatValue,
             'entrancing_chance'      => $floatValue,
             'devouring_light_chance' => $floatValue,
-        ];
+        ], $xpDetails);
     }
 }

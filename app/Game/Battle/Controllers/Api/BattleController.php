@@ -31,23 +31,15 @@ class BattleController extends Controller {
     private BattleEventHandler $battleEventHandler;
 
     /**
-     * @var WeeklyBattleService $weeklyBattleService;
-     */
-    private WeeklyBattleService $weeklyBattleService;
-
-    /**
      * @param MonsterFightService $monsterFightService
      * @param BattleEventHandler $battleEventHandler
-     * @param WeeklyBattleService $weeklyBattleService
      */
-    public function __construct(MonsterFightService $monsterFightService, BattleEventHandler $battleEventHandler, WeeklyBattleService $weeklyBattleService) {
+    public function __construct(MonsterFightService $monsterFightService, BattleEventHandler $battleEventHandler) {
         $this->middleware('is.character.dead')->except(['revive', 'index']);
 
         $this->monsterFightService = $monsterFightService;
 
         $this->battleEventHandler = $battleEventHandler;
-
-        $this->weeklyBattleService = $weeklyBattleService;
     }
 
     /**
@@ -132,25 +124,18 @@ class BattleController extends Controller {
      */
     public function setupMonster(AttackTypeRequest $attackTypeRequest, Character $character, Monster $monster): JsonResponse {
 
-        if (!is_null($monster->only_for_location_type)) {
 
-            $location = Location::where('type', LocationType::ALCHEMY_CHURCH)->where(
-                'game_map_id', $character->map->game_map_id
-            )->where('x', $character->map->character_position_x)->where('y', $character->map->character_position_y)->first();
-
-            if (is_null($location)) {
-                return response()->json([
-                    'message' => 'You cannot fight a creature of this magnitude with out being at it\'s location.'
-                ], 422);
-            }
-
-            if (!$this->weeklyBattleService->canFightMonster($character, $monster)) {
-                return response()->json([
-                    'message' => 'You already fought and killed this beast. You can do so again next week! (Weekly reset is sunday at 3 AM America/Edmonton).'
-                ], 422);
-            }
+        if (!$this->monsterFightService->isAtMonstersLocation($character, $monster->id)) {
+            return response()->json([
+                'message' => 'You cannot fight a creature of this magnitude with out being at it\'s location.'
+            ], 422);
         }
 
+        if (!$this->monsterFightService->isMonsterAlreadyDefeatedThisWeek($character, $monster->id)) {
+            return response()->json([
+                'message' => 'You already defeated this monster. Reset is on Sundays at 3am America/Edmonton.'
+            ], 422);
+        }
 
         $result = $this->monsterFightService->setupMonster($character, [
             'attack_type'         => $attackTypeRequest->attack_type,

@@ -48,6 +48,7 @@ export default class ServerMessages extends React.Component<ServerMessagesCompon
                 {
                     this.state.view_item && this.state.slot_id !== 0 ?
                         <ItemDetailsModal
+                            is_dead={false}
                             is_open={this.state.view_item}
                             manage_modal={this.viewItem.bind(this)}
                             character_id={this.props.character_id}

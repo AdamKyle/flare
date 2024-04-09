@@ -148,14 +148,26 @@
                 @endif
                 @if($map->mapType()->isTheIcePlane())
                     <x-core.alerts.warning-alert title="ATTN!">
-                        Players cannot venture this map unless The Winter Event is running, which runs from December 15th to March 15th the following year.
+                        <p class="my-2">
+                            Players cannot venture this map unless The Winter Event is running, which runs from December 15th to March 15th the following year.
                         During this time players can traverse to the plane and participate in the quests, events and raids of the map.
+                        </p>
+                        <p class="my-2">
+                            Players who are new, or do not have access to purgatory will not face the same creature strength as those who do, instead you will face Surface mobs.
+                            Special locations that increase monster strength down here will not apply to you, until yuo have access to purgatory.
+                        </p>
                     </x-core.alerts.warning-alert>
                 @endif
                 @if($map->mapType()->isDelusionalMemories())
                     <x-core.alerts.warning-alert title="ATTN!">
-                        Players cannot venture this map unless The Delusional Memories Event is running, which runs from May 15th to August 15th the following year.
-                        During this time players can traverse to the plane and participate in the quests, events and raids of the map.
+                        <p class="my-2">
+                            Players cannot venture this map unless The Delusional Memories Event is running, which runs from May 15th to August 15th the following year.
+                            During this time players can traverse to the plane and participate in the quests, events and raids of the map.
+                        </p>
+                        <p class="my-2">
+                            Players who are new, or do not have access to purgatory will not face the same creature strength as those who do, instead you will face Surface mobs.
+                            Special locations that increase monster strength down here will not apply to you, until yuo have access to purgatory.
+                        </p>
                     </x-core.alerts.warning-alert>
                     <p class="my2">
                         Players down here can participate in what's called: Weekly Fights. These are fights at specific locations for end game players that allow them

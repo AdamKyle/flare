@@ -80,72 +80,43 @@ class ExponentialAttributeCurve {
     /**
      * Generate values using the formula: y = YO - VO/k(i - e^kx)
      *
-     * We handle situations where the number generated is greator the the max,
-     * or less then the previous number generated.
+     * We handle situations where the number generated is greater than the max,
+     * or less than the previous number generated.
      *
-     * Can generated for integers or floats.
+     * Can be generated for integers or floats.
      *
      * @param integer $size
      * @param boolean $integer
      * @return array
      */
     public function generateValues(int $size, bool $integer = false): array {
-
         $this->previousY = 0;
-
-        $numbers = array();
+        $numbers = [];
 
         for ($x = 0; $x < $size; $x++) {
             $y = $this->calculateY($x, $size);
 
+            // Handle integer generation
             if ($integer) {
-                if ($y > 10000) {
-                    $y = round(ceil($y), -2);
-                }
-
-                if (!empty($numbers)) {
-                    if ($numbers[count($numbers) - 1] > $y) {
-                        $y = (($this->max - $numbers[count($numbers) - 1]) / 2) + $numbers[count($numbers) - 1];
-                    }
-                }
-
-                $y = ceil($y);
-
-                if ($y > $this->max) {
-                    $y = $this->max;
-                }
-
-                if ($y === $this->max) {
-                    $y = $numbers[count($numbers) - 1] + ($numbers[count($numbers) - 1] / 10);
-
-                    if ($y > $this->max && $x !== $size - 1) {
-                        $y = $numbers[count($numbers) - 1] + ($numbers[count($numbers) - 1] / 100);
-                    }
-
-                    if ($y > $this->max && $x === $size - 1) {
-                        $y = $this->max;
-                    }
-                }
+                $y = ceil($y); // Round up to the nearest integer
             }
 
-            if (!$integer) {
-
-                if (!empty($numbers) && $y > $this->max) {
-                    $y = $numbers[count($numbers) - 1] + 0.02;
+            // Handle boundary conditions
+            if (!empty($numbers)) {
+                if ($y > $this->max) {
+                    $y = $this->max; // Cap the value at the maximum allowed
                 }
-
-                if (!empty($numbers) && $y < $numbers[count($numbers) - 1]) {
-                    $y = $numbers[count($numbers) - 1] + 0.02;
+                if ($y < $numbers[count($numbers) - 1]) {
+                    $y = $numbers[count($numbers) - 1] + 0.02; // Ensure increasing sequence
                 }
             }
 
             $numbers[] = $y;
         }
 
-        if ($integer) {
-            if ($numbers[$size - 2] > $numbers[$size - 1]) {
-                $numbers[$size - 2] = ($numbers[$size - 3] + $numbers[$size - 1]) / 2;
-            }
+        // Ensure the last value is not lower than the second last value
+        if ($integer && $size > 1 && $numbers[$size - 2] > $numbers[$size - 1]) {
+            $numbers[$size - 1] = ($numbers[$size - 2] + $numbers[$size - 1]) / 2;
         }
 
         return $numbers;
