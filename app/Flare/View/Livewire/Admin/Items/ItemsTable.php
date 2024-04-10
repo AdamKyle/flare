@@ -59,10 +59,21 @@ class ItemsTable extends DataTableComponent {
                         return $builder;
                     }
 
-                    $builder->where('cost', '<=', 2000000000)
-                        ->whereNull('item_suffix_id')
-                        ->whereNull('item_prefix_id')
-                        ->whereNotIn('type', ['quest', 'alchemy', 'trinket', 'artifact']);
+
+                    $builder = $builder->whereNull('item_suffix_id')
+                                       ->whereNull('item_prefix_id');
+
+                    if ($value === 'artifact') {
+                        $builder = $builder->doesntHave('itemSkillProgressions');
+                    }
+
+                    if (!is_null(auth()->user())) {
+                        if (!auth()->user()->hasRole('Admin')) {
+                            $builder = $builder->whereNotIn('type', ['quest', 'alchemy', 'trinket', 'artifact'])
+                                ->where('cost', '<=', 2000000000);
+                        }
+                    }
+
 
                     if ($this->isShop) {
                         $builder->whereNull('specialty_type');
@@ -101,6 +112,7 @@ class ItemsTable extends DataTableComponent {
                 $options['trinket'] = 'Trinkets';
                 $options['quest'] = 'Quest items';
                 $options['alchemy'] = 'Alchemy items';
+                $options['artifact'] = 'Artifacts';
             }
         }
 

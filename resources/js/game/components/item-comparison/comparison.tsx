@@ -104,7 +104,6 @@ export default class Comparison extends React.Component<ComparisonProps, any> {
     }
 
     renderAttackOrDefenceAdjustment() {
-        console.log(this.props.comparison);
         const damageBased = [
             ItemType.WEAPON,
             ItemType.MACE,
