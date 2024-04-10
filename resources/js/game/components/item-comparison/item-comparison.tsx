@@ -292,6 +292,7 @@ export default class ItemComparison extends React.Component<ItemComparisonProps,
                     You don't have anything equipped in this slot. Why not buy and equip
                     the <strong>{this.props.comparison_info.itemToEquip.affix_name}</strong> for the low, low price of: {formatNumber(this.props.comparison_info.itemToEquip.cost)} gold?
                 </p>
+                <Item item={this.props.comparison_info.itemToEquip}/>
                 <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-4 w-1/3 ml-auto mr-auto"></div>
                 {this.renderEquipButtons(true)}
             </div>

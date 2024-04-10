@@ -91,23 +91,20 @@ export default class Comparison extends React.Component<ComparisonProps, any> {
     }
 
     renderHealingChange() {
-        if (this.props.comparison.base_healing_mod === null) {
-            return;
-        }
-
         return(
             <dl>
                 <dt>Base Healing</dt>
-                <dd className='text-green-700 dark:text-green-500'>+{formatNumber(this.props.comparison.raw_healing)}</dd>
+                <dd className='text-green-700 dark:text-green-500'>+{formatNumber(this.props.comparison.healing_adjustment)}</dd>
                 <dt>Base Healing Mod</dt>
-                <dd className='text-green-700 dark:text-green-500'>+{(this.props.comparison.base_healing_mod * 100).toFixed(2)}%</dd>
+                <dd className='text-green-700 dark:text-green-500'>+{(this.props.comparison.base_healing_adjustment * 100).toFixed(2)}%</dd>
                 <dt>Resurrection Chance</dt>
-                <dd className='text-green-700 dark:text-green-500'>+{(this.props.comparison.resurrection_chance * 100).toFixed(2)}%</dd>
+                <dd className='text-green-700 dark:text-green-500'>+{(this.props.comparison.res_chance_adjustment * 100).toFixed(2)}%</dd>
             </dl>
         )
     }
 
     renderAttackOrDefenceAdjustment() {
+        console.log(this.props.comparison);
         const damageBased = [
             ItemType.WEAPON,
             ItemType.MACE,
@@ -125,7 +122,7 @@ export default class Comparison extends React.Component<ComparisonProps, any> {
         }
 
         if (this.props.comparison.type === ItemType.SPELL_HEALING) {
-            this.renderHealingChange();
+            return this.renderHealingChange();
         }
 
         return this.renderDefenceChange();
