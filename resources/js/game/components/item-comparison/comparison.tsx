@@ -3,7 +3,6 @@ import ComparisonProps from "./types/comparison-props";
 import clsx from "clsx";
 import {formatNumber} from "../../lib/game/format-number";
 import {ItemType} from "../items/enums/item-type";
-import {startCase} from "lodash";
 
 const coreAttributes = [
     'str', 'dex', 'dur', 'int', 'chr', 'agi', 'focus'
@@ -91,6 +90,23 @@ export default class Comparison extends React.Component<ComparisonProps, any> {
         )
     }
 
+    renderHealingChange() {
+        if (this.props.comparison.base_healing_mod === null) {
+            return;
+        }
+
+        return(
+            <dl>
+                <dt>Base Healing</dt>
+                <dd className='text-green-700 dark:text-green-500'>+{formatNumber(this.props.comparison.raw_healing)}</dd>
+                <dt>Base Healing Mod</dt>
+                <dd className='text-green-700 dark:text-green-500'>+{(this.props.comparison.base_healing_mod * 100).toFixed(2)}%</dd>
+                <dt>Resurrection Chance</dt>
+                <dd className='text-green-700 dark:text-green-500'>+{(this.props.comparison.resurrection_chance * 100).toFixed(2)}%</dd>
+            </dl>
+        )
+    }
+
     renderAttackOrDefenceAdjustment() {
         const damageBased = [
             ItemType.WEAPON,
@@ -106,6 +122,10 @@ export default class Comparison extends React.Component<ComparisonProps, any> {
 
         if (damageBased.includes(this.props.comparison.type)) {
             return this.renderAttackChange();
+        }
+
+        if (this.props.comparison.type === ItemType.SPELL_HEALING) {
+            this.renderHealingChange();
         }
 
         return this.renderDefenceChange();

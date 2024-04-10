@@ -57,6 +57,23 @@ export default class Item extends React.Component<ItemProps, any> {
         )
     }
 
+    renderHealingChange() {
+        if (this.props.item.base_healing_mod === null) {
+            return;
+        }
+
+        return(
+            <dl>
+                <dt>Base Healing</dt>
+                <dd className='text-green-700 dark:text-green-500'>+{formatNumber(this.props.item.raw_healing)}</dd>
+                <dt>Base Healing Mod</dt>
+                <dd className='text-green-700 dark:text-green-500'>+{(this.props.item.base_healing_mod * 100).toFixed(2)}%</dd>
+                <dt>Resurrection Chance</dt>
+                <dd className='text-green-700 dark:text-green-500'>+{(this.props.item.resurrection_chance * 100).toFixed(2)}%</dd>
+            </dl>
+        )
+    }
+
     renderAttackOrDefenceAdjustment() {
         const damageBased = [
             ItemType.WEAPON,
@@ -74,56 +91,13 @@ export default class Item extends React.Component<ItemProps, any> {
             return this.renderAttackChange();
         }
 
+        if (this.props.item.type === ItemType.SPELL_HEALING) {
+            return this.renderHealingChange();
+        }
+
         return this.renderDefenceChange();
     }
 
-    renderItemTypeData(): ReactNode {
-        if (isWeaponType(this.props.item.type)) {
-            return (
-                <>
-                    <dt>Base Damage</dt>
-                    <dd className='text-green-700 dark:text-green-500'>+{formatNumber(this.props.item.raw_damage)}</dd>
-                    <dt>Base Damage Mod</dt>
-                    <dd className='text-green-700 dark:text-green-500'>+{(this.props.item.base_damage_mod * 100).toFixed(2)}%</dd>
-                </>
-            )
-        }
-
-        if (isArmourType(this.props.item.type)) {
-            if (this.props.item.base_ac_mod === null) {
-                return;
-            }
-
-            return (
-                <>
-                    <dt>Base AC</dt>
-                    <dd className='text-green-700 dark:text-green-500'>+{formatNumber(this.props.item.raw_ac)}</dd>
-                    <dt>Base AC Mod</dt>
-                    <dd className='text-green-700 dark:text-green-500'>+{(this.props.item.base_ac_mod * 100).toFixed(2)}%</dd>
-                </>
-            )
-        }
-
-        if (this.props.item.type === ItemType.SPELL_HEALING) {
-
-            if (this.props.item.base_healing_mod === null) {
-                return;
-            }
-
-            return (
-                <>
-                    <dt>Base Healing</dt>
-                    <dd className='text-green-700 dark:text-green-500'>+{formatNumber(this.props.item.raw_healing)}</dd>
-                    <dt>Base Healing Mod</dt>
-                    <dd className='text-green-700 dark:text-green-500'>+{(this.props.item.base_healing_mod * 100).toFixed(2)}%</dd>
-                    <dt>Resurrection Chance</dt>
-                    <dd className='text-green-700 dark:text-green-500'>+{(this.props.item.resurrection_chance * 100).toFixed(2)}%</dd>
-                </>
-            )
-        }
-
-        return null;
-    }
 
     isValueBeloZero(value: number): boolean {
         return value < 0;
@@ -187,7 +161,7 @@ export default class Item extends React.Component<ItemProps, any> {
                     <div className='border-b-2 border-b-gray-200 dark:border-b-gray-600 my-3 md:hidden sm:block'></div>
                     <div>
                         <dl>
-                            {this.renderItemTypeData()}
+                            {this.renderAttackOrDefenceAdjustment()}
                         </dl>
                         {
                             this.props.item.crafting_type !== null ?
