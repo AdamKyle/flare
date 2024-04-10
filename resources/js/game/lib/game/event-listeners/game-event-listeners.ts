@@ -8,6 +8,12 @@ import MonsterListeners from "./game/monster-listeners";
 import KingdomListeners from "./game/kingdom-listeners";
 import ActionListeners from "./game/action-listeners";
 import QuestListeners from "./game/quest-listeners";
+import GuideQuestListener
+    from "../../../../individual-components/player-components/guide-quests/event-listeners/guide-quest-listener";
+import GuideQuestListenerDefinition
+    from "../../../../individual-components/player-components/guide-quests/event-listeners/guide-quest-listener-definition";
+import CompletedGuideQuestListener
+    from "../../../../individual-components/player-components/guide-quests/event-listeners/completed-guide-quest-listener";
 
 @singleton()
 export default class GameEventListeners {
@@ -28,6 +34,8 @@ export default class GameEventListeners {
 
     private questListeners?: GameListener;
 
+    private guideQuestCompletedListener?: GuideQuestListenerDefinition;
+
     public initialize(component: Game, userId: number): void {
         this.component = component;
         this.userId    = userId;
@@ -38,6 +46,7 @@ export default class GameEventListeners {
         this.kingdomListener = serviceContainer().fetch<GameListener>(KingdomListeners);
         this.actionListeners = serviceContainer().fetch<GameListener>(ActionListeners);
         this.questListeners = serviceContainer().fetch<GameListener>(QuestListeners);
+        this.guideQuestCompletedListener = serviceContainer().fetch<GuideQuestListenerDefinition>(CompletedGuideQuestListener);
     }
 
     public registerEvents(): void {
@@ -75,6 +84,11 @@ export default class GameEventListeners {
             this.questListeners.initialize(this.component, this.userId);
             this.questListeners.register();
         }
+
+        if (this.guideQuestCompletedListener) {
+            this.guideQuestCompletedListener.initialize(this.component, this.userId);
+            this.guideQuestCompletedListener.register();
+        }
     }
 
     public listenToEvents(): void {
@@ -101,6 +115,10 @@ export default class GameEventListeners {
 
         if (this.questListeners) {
             this.questListeners.listen()
+        }
+
+        if (this.guideQuestCompletedListener) {
+            this.guideQuestCompletedListener.listen();
         }
     }
 }

@@ -63,4 +63,6 @@ export default interface GameState {
     map_data: MapState | null;
 
     fame_action_tasks: FameTasks[] | null;
+
+    show_guide_quest_completed: boolean;
 }

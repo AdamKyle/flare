@@ -52,6 +52,9 @@ class Kernel extends ConsoleKernel {
         // Fix Character Timers every minute.
         $schedule->command('reset:timers')->everyMinute();
 
+        // Determine if we should alert on new guide quest.
+        $schedule->command('check:for-complete-guide-quests')->everySecond();
+
         /**
          * Game Events:
          */

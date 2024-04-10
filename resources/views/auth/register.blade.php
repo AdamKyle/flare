@@ -104,13 +104,6 @@
                     </div>
                     @enderror
                 </div>
-                <div class="mt-5">
-                    <label for="enable_guide">
-                        <input type="checkbox" name="guide_enabled" id="enable_guide">
-                        <span></span>
-                        <span>Enable Guide? <a href="#no-link" data-toggle="modal" data-target="#guide-explanation">(Help)</a></span>
-                    </label>
-                </div>
                 <hr class="my-4" />
                 <div class="flex my-4">
                     <a href="/information/account-deletion" css="rtl:ml-auto rtl:mr-auto" target="_blank">

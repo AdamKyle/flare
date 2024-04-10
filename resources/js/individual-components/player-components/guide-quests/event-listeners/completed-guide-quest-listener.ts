@@ -7,12 +7,12 @@ import GuideQuestListenerDefinition from "./guide-quest-listener-definition";
 import Game from "../../../../game/game";
 
 @injectable()
-export default class GuideQuestListener implements GuideQuestListenerDefinition {
+export default class CompletedGuideQuestListener implements GuideQuestListenerDefinition {
 
     private component?: Game | GuideButton;
     private userId?: number;
 
-    private guideQuestButton?: Channel;
+    private guideQuestCompleted?: Channel;
 
     constructor(@inject(CoreEventListener) private coreEventListener: CoreEventListener) {}
 
@@ -27,39 +27,45 @@ export default class GuideQuestListener implements GuideQuestListenerDefinition 
         try {
             const echo = this.coreEventListener.getEcho();
 
-            this.guideQuestButton = echo.private(
-                "guide-quest-button-" + this.userId
+            this.guideQuestCompleted = echo.private(
+                "guide-quest-completed-toast-" + this.userId
             );
-
         } catch (e: any|unknown) {
             throw new Error(e);
         }
     }
 
     listen(): void {
-        this.listenForGuideQuestUpdates();
+        this.listForGuideQuestToasts();
     }
 
+
     /**
-     * Listen to the guide quest update - if we should show it or not.
+     * Listen for when the guide quest toast should fire.
      *
      * @protected
      */
-    protected listenForGuideQuestUpdates() {
-        if (!this.guideQuestButton) {
+    protected listForGuideQuestToasts() {
+        if (!this.guideQuestCompleted) {
             return;
         }
 
-        this.guideQuestButton.listen(
-            "Game.GuideQuests.Events.RemoveGuideQuestButton",
+        this.guideQuestCompleted.listen(
+            "Game.GuideQuests.Events.ShowGuideQuestCompletedToast",
             (event: any) => {
                 if (!this.component) {
                     return;
                 }
 
-                if (this.component instanceof  GuideButton) {
+                if (this.component instanceof Game) {
                     this.component.setState({
-                        show_button: false,
+                        show_guide_quest_completed: event.showQuestCompleted,
+                    });
+                }
+
+                if (this.component instanceof GuideButton) {
+                    this.component.setState({
+                        show_guide_quest_completed: event.showQuestCompleted,
                     });
                 }
             }

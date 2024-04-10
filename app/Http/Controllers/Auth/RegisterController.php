@@ -104,7 +104,7 @@ class RegisterController extends Controller {
             'password'         => Hash::make($data['password']),
             'ip_address'       => $ip,
             'last_logged_in'   => now(),
-            'guide_enabled'    => isset($data['guide_enabled'])
+            'guide_enabled'    => true
         ]);
     }
 

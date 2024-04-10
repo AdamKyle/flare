@@ -34,6 +34,7 @@ import ActionTabs from "./sections/game-actions-section/action-tabs";
 import {FameTasks} from "./sections/faction-loyalty/deffinitions/faction-loaylaty";
 import OrangeButton from "./components/ui/buttons/orange-button";
 import ActiveBoonsActionSection from "./sections/game-actions-section/active-boons-action-section";
+import SuccessAlert from "./components/ui/alerts/simple-alerts/success-alert";
 
 export default class Game extends React.Component<GameProps, GameState> {
 
@@ -67,6 +68,7 @@ export default class Game extends React.Component<GameProps, GameState> {
             action_data: null,
             map_data: null,
             fame_action_tasks: null,
+            show_guide_quest_completed: false,
             tabs: [
                 {
                     key: "game",
@@ -310,6 +312,14 @@ export default class Game extends React.Component<GameProps, GameState> {
                                         )}
                                     />
                                 </BasicCard>
+                                {
+                                    this.state.show_guide_quest_completed ?
+                                        <SuccessAlert additional_css={'mb-4'}>
+                                            You have completed a guide quest. Click the button in the top right to collect your rewards and move on to the next!
+                                        </SuccessAlert>
+                                    : null
+                                }
+
                                 <div className={clsx({
                                     'hidden': this.state.view_port > 639
                                 })}>

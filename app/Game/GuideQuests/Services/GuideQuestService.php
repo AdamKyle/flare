@@ -11,6 +11,7 @@ use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\HandleCharacterLevelUp;
 use App\Game\Events\Values\EventType;
+use App\Game\GuideQuests\Events\ShowGuideQuestCompletedToast;
 use App\Game\Messages\Events\ServerMessageEvent;
 
 class GuideQuestService {
@@ -89,7 +90,11 @@ class GuideQuestService {
             'guide_quest_id' => $quest->id,
         ]);
 
-        event(new UpdateTopBarEvent($character->refresh()));
+        $character = $character->refresh();
+
+        event(new UpdateTopBarEvent($character));
+
+        event(new ShowGuideQuestCompletedToast($character->user, false));
 
         return true;
     }

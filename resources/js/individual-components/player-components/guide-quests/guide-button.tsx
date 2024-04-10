@@ -7,11 +7,13 @@ import {guideQuestServiceContainer} from "./container/guide-quest-container";
 import GuideQuestListener from "./event-listeners/guide-quest-listener";
 import GuideButtonProps from "./types/guide-button-props";
 import GuideButtonState from "./types/guide-button-state";
+import clsx from "clsx";
+import CompletedGuideQuestListener from "./event-listeners/completed-guide-quest-listener";
 
 export default class GuideButton extends React.Component<GuideButtonProps, GuideButtonState> {
-    private guideQuestButton: any;
 
     private guideQuestListener: GuideQuestListenerDefinition;
+    private guideQuestCompletedListener: GuideQuestListenerDefinition;
 
     constructor(props: GuideButtonProps) {
         super(props);
@@ -19,13 +21,18 @@ export default class GuideButton extends React.Component<GuideButtonProps, Guide
         this.state = {
             is_modal_open: false,
             show_button: true,
+            show_guide_quest_completed: false,
             view_port: 0,
         };
 
         this.guideQuestListener = guideQuestServiceContainer().fetch(GuideQuestListener);
         this.guideQuestListener.initialize(this, this.props.user_id);
 
+        this.guideQuestCompletedListener = guideQuestServiceContainer().fetch(CompletedGuideQuestListener);
+        this.guideQuestCompletedListener.initialize(this, this.props.user_id);
+
         this.guideQuestListener.register();
+        this.guideQuestCompletedListener.register();
     }
 
     componentDidMount() {
@@ -52,6 +59,7 @@ export default class GuideButton extends React.Component<GuideButtonProps, Guide
         );
 
         this.guideQuestListener.listen();
+        this.guideQuestCompletedListener.listen();
     }
 
     manageGuideQuestModal() {
@@ -67,11 +75,22 @@ export default class GuideButton extends React.Component<GuideButtonProps, Guide
 
         return (
             <Fragment>
-                <SuccessOutlineButton
-                    button_label={"Guide Quests"}
-                    on_click={this.manageGuideQuestModal.bind(this)}
-                    additional_css={"mr-4"}
-                />
+
+                <div className='relative'>
+
+                    <span className={clsx("fa-stack absolute top-[-10px] left-[-15px]", {
+                        'hidden': !this.state.show_guide_quest_completed
+                    })}>
+                      <i className="fas fa-circle fa-stack-2x text-red-700 dark:text-red-500 fa-beat"></i>
+                      <i className="fas fa-exclamation fa-stack-1x text-yellow-500 dark:text-yello-700"></i>
+                    </span>
+
+                    <SuccessOutlineButton
+                        button_label={"Guide Quests"}
+                        on_click={this.manageGuideQuestModal.bind(this)}
+                        additional_css={"mr-4"}
+                    />
+                </div>
 
                 {this.state.is_modal_open ? (
                     <GuideQuest

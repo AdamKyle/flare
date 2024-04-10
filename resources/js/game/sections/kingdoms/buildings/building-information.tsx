@@ -145,7 +145,7 @@ export default class BuildingInformation extends React.Component<BuildingInforma
                             </Fragment>
                         :
                             <Fragment>
-                                <p className='my-2'>Building does not need tro be Repaired</p>
+                                <p className='my-2'>Building does not need to be repaired.</p>
                                 <DangerButton button_label={'Close section'} on_click={this.removeSelection.bind(this)} />
                             </Fragment>
                     }

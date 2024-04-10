@@ -6,6 +6,10 @@ import MonsterListeners from "../../game/event-listeners/game/monster-listeners"
 import KingdomListeners from "../../game/event-listeners/game/kingdom-listeners";
 import ActionListeners from "../../game/event-listeners/game/action-listeners";
 import QuestListeners from "../../game/event-listeners/game/quest-listeners";
+import GuideQuestListener
+    from "../../../../individual-components/player-components/guide-quests/event-listeners/guide-quest-listener";
+import CompletedGuideQuestListener
+    from "../../../../individual-components/player-components/guide-quests/event-listeners/completed-guide-quest-listener";
 
 /**
  * Register game event listeners here.
@@ -22,6 +26,7 @@ function gameEventContainer(container: CoreContainer) {
     container.register('GameListener', {useClass: KingdomListeners});
     container.register('GameListener', {useClass: ActionListeners});
     container.register('GameListener', {useClass: QuestListeners});
+    container.register('GuideQuestListenerDefinition', {useClass: CompletedGuideQuestListener})
 
     // The Core Listener Class
     container.register('game-event-listeners', GameEventListeners);
