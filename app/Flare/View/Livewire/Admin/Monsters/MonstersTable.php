@@ -40,6 +40,7 @@ class MonstersTable extends DataTableComponent {
                     'Dungeons Celestials'         => 'Dungeons Celestials',
                     'Shadow Plane Celestials'     => 'Shadow Planes Celestials',
                     'Purgatory Celestials'        => 'Purgatory Celestials',
+                    'Delusional Memories Celestials' => 'Delusional Memories Celestials',
                     'Surface Raid Bosses'         => 'Surface Raid Bosses',
                     'Labyrinth Raid Bosses'       => 'Labyrinth Raid Bosses',
                     'Dungeons Raid Bosses'        => 'Dungeons Raid Bosses',
