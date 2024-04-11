@@ -133,7 +133,7 @@ class UpgradeBuilding implements ShouldQueue {
 
         if ($building->is_farm) {
             $building->kingdom->update([
-                'max_population' => ($building->level * 100) + 100,
+                'max_population' => $building->kingdom->max_population + (($building->level * 100) + 100),
             ]);
         }
 
