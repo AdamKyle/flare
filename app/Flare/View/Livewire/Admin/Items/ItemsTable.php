@@ -53,7 +53,13 @@ class ItemsTable extends DataTableComponent {
                     if (in_array($value, ['quest', 'alchemy', 'trinket'])) {
 
                         if ($value === 'alchemy') {
-                            return $builder->whereNotNull('skill_level_required');
+                            if (!is_null(auth()->user())) {
+                                if (auth()->user()->hasRole('Admin')) {
+                                    $builder->where('gold_bars_cost', '>', 0);
+                                }
+                            } else {
+                                return $builder->whereNotNull('skill_level_required');
+                            }
                         }
 
                         return $builder;

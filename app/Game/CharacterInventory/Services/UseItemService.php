@@ -135,7 +135,7 @@ class UseItemService {
 
         if (!$this->useItem($foundSlot, $character)) {
             return $this->errorResult(
-                'Cannot use requested item. Items may stack to a multiple of 10 or a max of 8 hours.'
+                'Cannot use requested item. Items may stack to a multiple of 10 or a max of 8 hours. Non stacking items cannot be used more then once, while another one is running.'
             );
         };
 
@@ -187,6 +187,10 @@ class UseItemService {
             $slot->delete();
 
             return true;
+        }
+
+        if (!is_null($foundBoon) && !$slot->item->can_stack) {
+            return false;
         }
 
         $completedAt = now()->addMinutes($slot->item->lasts_for);

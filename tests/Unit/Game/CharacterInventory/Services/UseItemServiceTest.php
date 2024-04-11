@@ -151,7 +151,51 @@ class UseItemServiceTest extends TestCase {
         $character = $character->refresh();
 
         $this->assertEquals(422, $result['status']);
-        $this->assertEquals('Cannot use requested item. Items may stack to a multiple of 10 or a max of 8 hours.', $result['message']);
+        $this->assertEquals('Cannot use requested item. Items may stack to a multiple of 10 or a max of 8 hours. Non stacking items cannot be used more then once, while another one is running.', $result['message']);
+
+        Event::assertNotDispatched(UpdateCharacterAttacks::class);
+        Event::assertNotDispatched(UpdateCharacterAttackEvent::class);
+        Event::assertNotDispatched(UpdateTopBarEvent::class);
+
+        $this->assertNotEmpty($character->boons);
+        $this->assertNotNull($character->inventory->slots->where('item.type', 'alchemy')->first());
+    }
+
+    public function testDoNotUseItemWhenItemDoesNotStack() {
+        Event::fake();
+        Queue::fake();
+
+        $item = $this->createItem([
+            'usable' => true,
+            'lasts_for' => 30,
+            'type' => 'alchemy',
+            'affects_skill_type' => SkillTypeValue::TRAINING,
+            'can_stack' => false,
+        ]);
+
+        $character = (new CharacterFactory())->createBaseCharacter()
+            ->givePlayerLocation()
+            ->inventoryManagement()
+            ->giveItem($item)
+            ->getCharacter();
+
+        $this->createCharacterBoon([
+            'character_id'             => $character->id,
+            'item_id'                  => $item->id,
+            'started'                  => now(),
+            'complete'                 => now()->addHours(2),
+            'amount_used'              => 1,
+            'last_for_minutes'         => 8 * 60,
+        ]);
+
+        $character = $character->refresh();
+
+        $result = $this->useItemService->useSingleItemFromInventory($character, $character->inventory->slots->where('item.type', 'alchemy')->first()->item);
+
+        $character = $character->refresh();
+
+        $this->assertEquals(422, $result['status']);
+        $this->assertEquals('Cannot use requested item. Items may stack to a multiple of 10 or a max of 8 hours. Non stacking items cannot be used more then once, while another one is running.', $result['message']);
 
         Event::assertNotDispatched(UpdateCharacterAttacks::class);
         Event::assertNotDispatched(UpdateCharacterAttackEvent::class);

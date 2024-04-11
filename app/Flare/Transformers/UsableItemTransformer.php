@@ -59,7 +59,7 @@ class UsableItemTransformer extends TransformerAbstract {
             'stat_increase'                    => $slot->item->increase_stat_by,
             'holy_level'                       => $slot->item->holy_level,
             'can_stack'                        => $slot->item->can_stack,
-            'gain_additional_level'            => $slot->item->gain_additional_level,
+            'gain_additional_level'            => $slot->item->gains_additional_level,
             'xp_bonus'                         => $slot->item->xp_bonus,
         ];
     }
