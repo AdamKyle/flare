@@ -503,4 +503,136 @@ class InventorySetServiceTest extends TestCase {
 
         $this->assertFalse($this->inventorySetService->isSetEquippable($character->inventorySets->first()));
     }
+
+    public function testSetIsNotEquippableForMythics() {
+        $itemTypes = [
+            WeaponTypes::WEAPON,
+            WeaponTypes::RING,
+        ];
+
+        $character = $this->character
+            ->inventoryManagement()
+            ->getCharacterFactory()
+            ->inventorySetManagement()
+            ->createInventorySets(10);
+
+        foreach ($itemTypes as $type) {
+            $character = $character->putItemInSet($this->createItem(['type' => $type, 'is_mythic' => true, 'item_suffix_id' => $this->createItemAffix([
+                'randomly_generated' => true,
+            ])]), 0);
+        }
+
+        $character = $character->getCharacter();
+
+        $this->assertFalse($this->inventorySetService->isSetEquippable($character->inventorySets->first()));
+    }
+
+    public function testSetIsNotEquippableForCosmics() {
+        $itemTypes = [
+            WeaponTypes::WEAPON,
+            WeaponTypes::RING,
+        ];
+
+        $character = $this->character
+            ->inventoryManagement()
+            ->getCharacterFactory()
+            ->inventorySetManagement()
+            ->createInventorySets(10);
+
+        foreach ($itemTypes as $type) {
+            $character = $character->putItemInSet($this->createItem(['type' => $type, 'is_cosmic' => true, 'item_suffix_id' => $this->createItemAffix([
+                'randomly_generated' => true,
+            ])]), 0);
+        }
+
+        $character = $character->getCharacter();
+
+        $this->assertFalse($this->inventorySetService->isSetEquippable($character->inventorySets->first()));
+    }
+
+    public function testSetIsNotEquippableForUniquesAndMythics() {
+        $mythics = [
+            WeaponTypes::WEAPON,
+        ];
+
+        $uniques = [
+            WeaponTypes::RING,
+        ];
+
+        $character = $this->character
+            ->inventoryManagement()
+            ->getCharacterFactory()
+            ->inventorySetManagement()
+            ->createInventorySets(10);
+
+        foreach ($mythics as $type) {
+            $character = $character->putItemInSet($this->createItem(['type' => $type, 'is_mythic' => true, 'item_suffix_id' => $this->createItemAffix([
+                'randomly_generated' => true,
+            ])]), 0);
+        }
+
+        foreach ($uniques as $type) {
+            $character = $character->putItemInSet($this->createItem(['type' => $type, 'item_suffix_id' => $this->createItemAffix([
+                'randomly_generated' => true,
+            ])]), 0);
+        }
+
+        $character = $character->getCharacter();
+
+        $this->assertFalse($this->inventorySetService->isSetEquippable($character->inventorySets->first()));
+    }
+
+    public function testSetIsNotEquippableForCosmicAndMythics() {
+        $cosmics = [
+            WeaponTypes::WEAPON,
+        ];
+
+        $mythics = [
+            WeaponTypes::RING,
+        ];
+
+        $character = $this->character
+            ->inventoryManagement()
+            ->getCharacterFactory()
+            ->inventorySetManagement()
+            ->createInventorySets(10);
+
+        foreach ($cosmics as $type) {
+            $character = $character->putItemInSet($this->createItem(['type' => $type, 'is_cosmic' => true, 'item_suffix_id' => $this->createItemAffix([
+                'randomly_generated' => true,
+            ])]), 0);
+        }
+
+        foreach ($mythics as $type) {
+            $character = $character->putItemInSet($this->createItem(['type' => $type, 'is_mythic' => true, 'item_suffix_id' => $this->createItemAffix([
+                'randomly_generated' => true,
+            ])]), 0);
+        }
+
+        $character = $character->getCharacter();
+
+        $this->assertFalse($this->inventorySetService->isSetEquippable($character->inventorySets->first()));
+    }
+
+    public function testIsEquippableForComsic() {
+        $cosmic = [
+            WeaponTypes::WEAPON,
+        ];
+
+        $character = $this->character
+            ->inventoryManagement()
+            ->getCharacterFactory()
+            ->inventorySetManagement()
+            ->createInventorySets(10);
+
+        foreach ($cosmic as $type) {
+            $character = $character->putItemInSet($this->createItem(['type' => $type, 'is_cosmic' => true, 'item_suffix_id' => $this->createItemAffix([
+                'randomly_generated' => true,
+            ])]), 0);
+        }
+
+        $character = $character->getCharacter();
+
+        $this->assertTrue($this->inventorySetService->isSetEquippable($character->inventorySets->first()));
+    }
 }

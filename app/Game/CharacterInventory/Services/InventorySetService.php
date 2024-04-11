@@ -382,8 +382,6 @@ class InventorySetService {
             return false;
         }
 
-        dump('Hello world.', $mythicCount, $amountOfUniques, $cosmicCount);
-
         if ($amountOfUniques === 1) {
             return $mythicCount === 0 && $cosmicCount == 0;
         }
