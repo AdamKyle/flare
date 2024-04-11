@@ -5,9 +5,11 @@ namespace App\Http\Controllers\Auth;
 use App\Flare\Handlers\CheatingCheck;
 use App\Flare\Jobs\LoginMessage;
 use App\Flare\Services\CanUserEnterSiteService;
+use App\Game\GuideQuests\Services\GuideQuestService;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class LoginController extends Controller
 {
@@ -31,16 +33,20 @@ class LoginController extends Controller
      */
     protected $redirectTo = '/';
 
-    private $canUserEnterSiteService;
+    private CanUserEnterSiteService $canUserEnterSiteService;
+
+    private GuideQuestService $guideQuestService;
 
     /**
      * Create a new controller instance.
      *
      * @return void
      */
-    public function __construct(CanUserEnterSiteService $canUserEnterSiteService)
+    public function __construct(CanUserEnterSiteService $canUserEnterSiteService, GuideQuestService $guideQuestService)
     {
         $this->canUserEnterSiteService = $canUserEnterSiteService;
+
+        $this->guideQuestService = $guideQuestService;
 
         $this->middleware('guest')->except('logout');
     }
@@ -81,6 +87,12 @@ class LoginController extends Controller
                 $character = $this->guard()->user()->character;
 
                 LoginMessage::dispatch($character)->delay(now()->addSeconds(5));
+
+                $guideQuest = $this->guideQuestService->fetchQuestForCharacter($character);
+
+                if (!is_null($guideQuest)) {
+                    Cache::put('user-show-guide-initial-message-' . $character->user->id, 'true');
+                }
             }
 
             return $this->sendLoginResponse($request);
