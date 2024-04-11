@@ -51,7 +51,7 @@ class ReBalanceMonsters extends Command
                                ->whereNull('only_for_location_type')
                                ->get();
 
-            $this->manageMonsters($monsters, $exponentialAttributeCurve, 8, 2000000000, 100000, 500, $mapName);
+            $this->manageMonsters($monsters, $exponentialAttributeCurve, 2, 2000000000, 100000, 500, $mapName);
 
             $celestials = Monster::where('game_map_id', $gameMap->id)
                 ->where('is_raid_monster', false)
@@ -160,7 +160,18 @@ class ReBalanceMonsters extends Command
                             ->whereNull('only_for_location_type')
                             ->get();
 
-        $this->manageMonsters($monsters, $exponentialAttributeCurve, 4000000000, 8000000000, 100000, 500, $gameMap->name, true);
+        $this->manageMonsters($monsters, $exponentialAttributeCurve, 4000000000000, 8000000000000, 1000000000000, 500000000000, $gameMap->name, true);
+
+        // Surface Raid Boss:
+        $gameMap = GameMap::where('name', MapNameValue::SURFACE)->first();
+        $monsters = Monster::where('game_map_id', $gameMap->id)
+            ->where('is_celestial_entity', false)
+            ->where('is_raid_monster', false)
+            ->where('is_raid_boss', true)
+            ->whereNull('only_for_location_type')
+            ->get();
+
+        $this->manageMonsters($monsters, $exponentialAttributeCurve, 8000000000000, 10000000000000, 1000000000000, 500000000000, $gameMap->name, true);
 
 
         // Ice Plane Raid Monsters
@@ -172,7 +183,20 @@ class ReBalanceMonsters extends Command
             ->whereNull('only_for_location_type')
             ->get();
 
-        $this->manageMonsters($monsters, $exponentialAttributeCurve, 8000000000, 16000000000, 100000, 500, $gameMap->name, true);
+        $this->manageMonsters($monsters, $exponentialAttributeCurve, 8000000000000, 14000000000000, 1000000000000, 500000000000, $gameMap->name, true);
+
+
+        // Ice Plane Raid Boss
+        $gameMap = GameMap::where('name', MapNameValue::ICE_PLANE)->first();
+        $monsters = Monster::where('game_map_id', $gameMap->id)
+            ->where('is_celestial_entity', false)
+            ->where('is_raid_monster', false)
+            ->where('is_raid_boss', true)
+            ->whereNull('only_for_location_type')
+            ->get();
+
+        $this->manageMonsters($monsters, $exponentialAttributeCurve, 14000000000000, 15000000000000, 1000000000000, 500000000000, $gameMap->name, true);
+
 
         // Delusional Memories Raid Monsters:
         $gameMap = GameMap::where('name', MapNameValue::DELUSIONAL_MEMORIES)->first();
@@ -183,7 +207,18 @@ class ReBalanceMonsters extends Command
             ->whereNull('only_for_location_type')
             ->get();
 
-        $this->manageMonsters($monsters, $exponentialAttributeCurve, 16000000000, 32000000000, 100000, 500, $gameMap->name, true);
+        $this->manageMonsters($monsters, $exponentialAttributeCurve, 16000000000000, 32000000000000, 1000000000000, 500000000000, $gameMap->name, true);
+
+        // Delusional Memories Raid Bosses:
+        $gameMap = GameMap::where('name', MapNameValue::DELUSIONAL_MEMORIES)->first();
+        $monsters = Monster::where('game_map_id', $gameMap->id)
+            ->where('is_celestial_entity', false)
+            ->where('is_raid_monster', false)
+            ->where('is_raid_boss', true)
+            ->whereNull('only_for_location_type')
+            ->get();
+
+        $this->manageMonsters($monsters, $exponentialAttributeCurve, 32000000000000, 36000000000000, 1000000000000, 500000000000, $gameMap->name, true);
     }
 
     protected function manageMonsters(Collection $monsters, ExponentialAttributeCurve $exponentialAttributeCurve, int $min, int $max, int $increase, int $range, string $mapName, bool $isSpecialMonster = false): void {

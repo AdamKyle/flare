@@ -41,8 +41,9 @@ class RaidsController extends Controller {
             'itemTypes'   => [
                 ItemSpecialtyType::PIRATE_LORD_LEATHER,
                 ItemSpecialtyType::CORRUPTED_ICE,
+                ItemSpecialtyType::DELUSIONAL_SILVER,
             ],
-            'artifacts'   => Item::where('type', 'artifact')->get(),
+            'artifacts'   => Item::where('type', 'artifact')->whereDoesntHave('itemSkill')->get(),
         ]);
     }
 
@@ -52,11 +53,12 @@ class RaidsController extends Controller {
             'monsters'   => Monster::where('is_raid_monster', true)->get(),
             'locations'  => Location::all(),
             'raidBosses' => Monster::where('is_raid_boss', true)->get(),
-            'itemTypes'  => [
+            'itemTypes'   => [
                 ItemSpecialtyType::PIRATE_LORD_LEATHER,
                 ItemSpecialtyType::CORRUPTED_ICE,
+                ItemSpecialtyType::DELUSIONAL_SILVER,
             ],
-            'artifacts'   => Item::where('type', 'artifact')->get(),
+            'artifacts'   => Item::where('type', 'artifact')->doesntHave('itemSkillProgressions')->get(),
         ]);
     }
 

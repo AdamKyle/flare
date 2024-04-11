@@ -1,16 +1,5 @@
 <?php
-
-Route::get('/', function () {
-    if (!Auth::check()) {
-        return view('welcome');
-    }
-
-    if (auth()->user()->hasRole('Admin')) {
-        return redirect()->route('home');
-    }
-
-    return redirect()->route('game');
-});
+Route::get('/', ['as' => 'welcome', 'uses' => 'WelcomeController@welcome']);
 
 Route::get('/information/search', ['as' => 'info.search', 'uses' => 'InfoPageController@search']);
 Route::get('/information/{pageName}', ['as' => 'info.page', 'uses' => 'InfoPageController@viewPage']);

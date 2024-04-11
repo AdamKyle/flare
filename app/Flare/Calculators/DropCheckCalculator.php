@@ -27,6 +27,10 @@ class DropCheckCalculator {
             return true;
         }
 
+        if ($characterLevel < 2) {
+            return true;
+        }
+
         if ($characterLevel < 12 && $lootingChance < .10) {
             $totalChance = .80;
 

@@ -130,7 +130,14 @@ class ExponentialAttributeCurve {
      * @return integer|float
      */
     protected function calculateY(int $x, int $size): int|float {
-        $growthRate = pow($this->max / $this->min, 1 / ($size - 1));
+
+        $newSize = $size - 1;
+
+        if ($newSize <= 0) {
+            $newSize = 1;
+        }
+
+        $growthRate = pow($this->max / $this->min, 1 / $newSize);
 
         if ($x >= $size / 2) {
             $growthRate *= 1.0102;

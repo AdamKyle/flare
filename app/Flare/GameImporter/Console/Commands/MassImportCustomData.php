@@ -53,6 +53,7 @@ class MassImportCustomData extends Command {
         // Some of these locations have items that are required:
         Artisan::call('import:game-data "Locations Give Items"');
 
+        Artisan::call('import:game-data Skills');
         Artisan::call('import:game-data Items');
 
         Artisan::call('import:game-data "Locations Give Items"');
@@ -60,7 +61,7 @@ class MassImportCustomData extends Command {
         Artisan::call('import:game-data Monsters');
         Artisan::call('import:game-data Locations');
         Artisan::call('import:game-data Npcs');
-        Artisan::call('import:game-data Skills');
+        Artisan::call('import:game-data Raids');
         Artisan::call('import:game-data Quests');
 
         // Due to the way quests are ordered, and their dependencies on other quests we have to double import to make

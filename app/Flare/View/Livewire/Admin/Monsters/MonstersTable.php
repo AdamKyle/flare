@@ -46,6 +46,8 @@ class MonstersTable extends DataTableComponent {
                     'Dungeons Raid Bosses'        => 'Dungeons Raid Bosses',
                     'Shadow Plane Raid Bosses'    => 'Shadow Plane Raid Bosses',
                     'Hell Raid Bosses'            => 'Hell Raid Bosses',
+                    'The Ice Plane Raid Bosses'   => 'The Ice Plane Raid Bosses',
+                    'Delusional Memories Raid Bosses' => 'Delusional Memories Raid Bosses',
                     'Purgatory Raid Bosses'       => 'Purgatory Raid Bosses',
                     'Surface Raid Monsters'       => 'Surface Raid Monsters',
                     'Labyrinth Raid Monsters'     => 'Labyrinth Raid Monsters',

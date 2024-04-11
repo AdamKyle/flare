@@ -160,9 +160,8 @@ export default class Item extends React.Component<ItemProps, any> {
                     </div>
                     <div className='border-b-2 border-b-gray-200 dark:border-b-gray-600 my-3 md:hidden sm:block'></div>
                     <div>
-                        <dl>
-                            {this.renderAttackOrDefenceAdjustment()}
-                        </dl>
+                        {this.renderAttackOrDefenceAdjustment()}
+
                         {
                             this.props.item.crafting_type !== null ?
                                 <>

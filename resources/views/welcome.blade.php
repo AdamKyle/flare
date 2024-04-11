@@ -47,6 +47,12 @@
             </div>
         </div>
 
+        @if (count($scheduledEventsRunning) > 0)
+            @include('./welcome-partials/event-container', [
+                'scheduledEventsRunning' => $scheduledEventsRunning
+            ])
+        @endif
+
         <div class="text-center w-full lg:w-2/4 mx-auto mt-20">
             <h2 class="mb-5 font-thin text-2xl lg:text-5xl dark:text-gray-300 text-gray-800">
                 <i class="fas fa-globe-americas"></i>
