@@ -55,7 +55,8 @@ class InventorySetService {
      * @param InventorySet $set
      * @param Item $item
      */
-    public function putItemIntoSet(InventorySet $set, Item $item) {
+    public function putItemIntoSet(InventorySet $set, Item $item): void
+    {
         $set->slots()->create([
             'inventory_set_id' => $set->id,
             'item_id'          => $item->id
@@ -193,6 +194,10 @@ class InventorySetService {
      * @return bool
      */
     public function isSetEquippable(InventorySet $inventorySet): bool {
+
+        if ($inventorySet->slots->isEmpty()) {
+            return true;
+        }
 
         // Bail early as our hands are invalid.
         if (!$this->setHandsValidation->isInventorySetHandPositionsValid($inventorySet)) {
@@ -344,6 +349,10 @@ class InventorySetService {
 
     protected function containsValidSpecialTypeAmount(InventorySet $inventorySet): bool {
         $amountOfUniques = $inventorySet->slots->filter(function($slot) {
+            return !$slot->item->is_mythic;
+        })->filter(function($slot) {
+            return !$slot->item->is_cosmic;
+        })->filter(function($slot) {
             if (!is_null($slot->item->itemPrefix)) {
                 if ($slot->item->itemPrefix->randomly_generated) {
                     return $slot;
@@ -357,9 +366,23 @@ class InventorySetService {
             }
         })->count();
 
+        if ($amountOfUniques > 1) {
+            return false;
+        }
+
         $mythicCount = $inventorySet->slots->where('item.is_mythic', '=', true)->count();
 
+        if ($mythicCount > 1) {
+            return false;
+        }
+
         $cosmicCount = $inventorySet->slots->where('item.is_cosmic', '=', true)->count();
+
+        if ($cosmicCount > 1) {
+            return false;
+        }
+
+        dump('Hello world.', $mythicCount, $amountOfUniques, $cosmicCount);
 
         if ($amountOfUniques === 1) {
             return $mythicCount === 0 && $cosmicCount == 0;
@@ -373,7 +396,7 @@ class InventorySetService {
             return $amountOfUniques === 0 && $mythicCount == 0;
         }
 
-        return false;
+        return true;
     }
 
     /**
