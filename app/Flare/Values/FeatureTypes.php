@@ -12,6 +12,8 @@ class FeatureTypes {
 
     const NAME_TAGS = 2;
 
+    const EXTEND_SETS = 3;
+
     /**
      * @var int $value
      */
@@ -24,12 +26,14 @@ class FeatureTypes {
         0 => self::REINCARNATION,
         1 => self::COSMETIC_TEXT,
         2 => self::NAME_TAGS,
+        3 => self::EXTEND_SETS,
     ];
 
     protected static array $valueNames = [
         self::REINCARNATION => 'Reincarnation',
         self::COSMETIC_TEXT => 'Cosmetic Text',
         self::NAME_TAGS     => 'Name Tags',
+        self::EXTEND_SETS   => 'Give 10 additional sets'
     ];
 
     /**
@@ -64,5 +68,9 @@ class FeatureTypes {
 
     public function isNameTag(): bool {
         return $this->value === self::NAME_TAGS;
+    }
+
+    public function isExtendSets(): bool {
+        return $this->value === self::EXTEND_SETS;
     }
 }

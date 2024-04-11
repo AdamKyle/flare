@@ -90,6 +90,15 @@ class NpcQuestRewardHandler {
 
                 event(new GlobalMessageEvent($character->name . ' Has unlocked an epic gift! Name Tags! Their deeds have not gone unnoticed in the land of Tlessa!'));
             }
+
+            if ($quest->unlocksFeature()->isExtendSets()) {
+
+                $this->giveAdditionalSetsToCharacter($character);
+
+                event(new ServerMessageEvent($character->user, 'You now have an additional 10 sets. If you head to your Character Sheet, and visit your inventory, under the sets tab you have ten additional sets you can add items to.'));
+
+                event(new GlobalMessageEvent($character->name . ' Has unlocked an epic gift! 10 additional sets! Their deeds have not gone unnoticed in the land of Tlessa!'));
+            }
         }
 
         $this->createQuestLog($character, $quest);
@@ -251,5 +260,18 @@ class NpcQuestRewardHandler {
         broadcast(new ServerMessageEvent($character->user, 'Quest: ' . $quest->name . ' completed. Check quest logs under quest logs section.'));
 
         event(new UpdateTopBarEvent($character));
+    }
+
+    private function giveAdditionalSetsToCharacter(Character $character): Character {
+        for ($i = 1; $i <= 10; $i++) {
+            $character->inventorySets()->create([
+                'character_id'    => $this->character->id,
+                'can_be_equipped' => true,
+            ]);
+
+            $character = $character->refresh();
+        }
+
+        return $character;
     }
 }
