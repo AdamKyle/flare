@@ -3,9 +3,9 @@
 
 
 "@aldabil/react-scheduler@^2.7.9":
-  version "2.8.5"
-  resolved "https://registry.yarnpkg.com/@aldabil/react-scheduler/-/react-scheduler-2.8.5.tgz#f791b206703ba95b961ca4da5a8ae2bcf5a3fd7c"
-  integrity sha512-wFAGZtLzn6ahTwMuP2Y7RA+zoFjS6TycFgTAM4654qrYT603hJr9Y4kHlHW+MiAwhCd1Z3/8pM6Kyb8w7zNqmA==
+  version "2.8.8"
+  resolved "https://registry.yarnpkg.com/@aldabil/react-scheduler/-/react-scheduler-2.8.8.tgz#bf3fbe643ff6200ce96edbc095e533736f7fd139"
+  integrity sha512-3gYLbud0fHzTBm5cKG7FamkQvYrMWaFtRXiA6rGQslV4kqpCAOdx6Vm12lnlYaPZrgaCFpm5E8uReGrnhIZu7g==
 
 "@alloc/quick-lru@^5.2.0":
   version "5.2.0"
@@ -3985,9 +3985,9 @@ kind-of@^6.0.2:
   integrity sha512-dcS1ul+9tmeD95T+x28/ehLgd9mENa3LsvDTtzm3vyBEO7RPptvAD+t44WVXaUjTBRcrpFeFlC8WCruUR456hw==
 
 laravel-echo@^1.6.1:
-  version "1.16.0"
-  resolved "https://registry.yarnpkg.com/laravel-echo/-/laravel-echo-1.16.0.tgz#9d5b725f0c815a56007d21a45cb6fb6f599ae8fc"
-  integrity sha512-BJGUa4tcKvYmTkzTmcBGMHiO2tq+k7Do5wPmLbRswWfzKwyfZEUR+J5iwBTPEfLLwNPZlA9Kjo6R/NV6pmyIpg==
+  version "1.16.1"
+  resolved "https://registry.yarnpkg.com/laravel-echo/-/laravel-echo-1.16.1.tgz#880b922d1ff4ea1f2c091b804f9476a26cb11285"
+  integrity sha512-++Ylb6M3ariC9Rk5WE5gZjj6wcEV5kvLF8b+geJ5/rRIfdoOA+eG6b9qJPrarMD9rY28Apx+l3eelIrCc2skVg==
 
 laravel-vite-plugin@^1.0.1:
   version "1.0.2"
@@ -6625,9 +6625,9 @@ typedarray-to-buffer@^3.1.5:
     is-typedarray "^1.0.0"
 
 typescript@^5.0.4:
-  version "5.4.4"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.4.4.tgz#eb2471e7b0a5f1377523700a21669dce30c2d952"
-  integrity sha512-dGE2Vv8cpVvw28v8HCPqyb08EzbBURxDpuhJvTrusShUfGnhHBafDsLdS1EhhxyL6BJQE+2cT3dDPAv+MQ6oLw==
+  version "5.4.5"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.4.5.tgz#42ccef2c571fdbd0f6718b1d1f5e6e5ef006f611"
+  integrity sha512-vcI4UpRgg81oIRUFwR0WSIHKt11nJ7SAVlYNIu+QpqeyXP+gpQJy/Z4+F0aGxSE4MqwjyXvW/TzgkLAx2AGHwQ==
 
 ua-parser-js@^1.0.33:
   version "1.0.37"
