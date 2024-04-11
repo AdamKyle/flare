@@ -97,6 +97,10 @@ export default class ItemTableAjax {
                 return 'Pirate Lord Leather';
             case TableType.CORRUPTED_ICE:
                 return 'Corrupted Ice';
+            case TableType.TWISTED_EARTH:
+                return 'Twisted Earth';
+            case TableType.DELUSIONAL_SILVER:
+                return 'Delusional Silver';
             default:
                 throw new Error('Unknown type of table to render.');
         }

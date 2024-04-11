@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Rappasoft\LaravelLivewireTables\Views\Column;
 use Rappasoft\LaravelLivewireTables\DataTableComponent;
 
-class CorruptedIce extends DataTableComponent {
+class DelusionalSilver extends DataTableComponent {
     public function configure(): void {
         $this->setPrimaryKey('id');
     }
@@ -20,7 +20,7 @@ class CorruptedIce extends DataTableComponent {
                    ->doesntHave('inventorySetSlots')
                    ->doesntHave('appliedHolyStacks')
                    ->doesnthave('sockets')
-                   ->where('specialty_type', ItemSpecialtyType::CORRUPTED_ICE);
+                   ->where('specialty_type', ItemSpecialtyType::DELUSIONAL_SILVER);
     }
 
     public function columns(): array {

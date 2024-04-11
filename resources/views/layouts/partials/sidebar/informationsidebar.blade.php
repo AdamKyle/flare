@@ -360,6 +360,14 @@
                 <span class="ra ra-kaleidoscope"></span>
                 Corrupted Ice
             </a>
+            <a href="{{ route('info.page', ['pageName' => 'twisted-earth']) }}">
+                <span class="ra ra-kaleidoscope"></span>
+                Twisted Earth
+            </a>
+            <a href="{{ route('info.page', ['pageName' => 'delusional-silver']) }}">
+                <span class="ra ra-kaleidoscope"></span>
+                Delusional Silver
+            </a>
             <a href="{{ route('info.page', ['pageName' => 'ancestral-items']) }}">
                 <span class="ra ra-crowned-heart"></span>
                 Ancestral Items

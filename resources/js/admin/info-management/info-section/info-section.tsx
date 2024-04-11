@@ -164,6 +164,14 @@ export default class InfoSection extends React.Component<any, any> {
                 value: "info.items.corrupted-ice",
             },
             {
+                label: "Twisted Earth",
+                value: "info.items.twisted-earth",
+            },
+            {
+                label: "Delusional Silver",
+                value: "info.items.delusional-silver",
+            },
+            {
                 label: "Ancestral Items",
                 value: "info.items.ancestral-items",
             },
@@ -259,6 +267,14 @@ export default class InfoSection extends React.Component<any, any> {
             {
                 label: 'Corrupted Ice',
                 value: 'corrupted-ice',
+            },
+            {
+                label: 'Twisted Earth',
+                value: 'twisted-earth',
+            },
+            {
+                label: 'Delusional Silver',
+                value: 'delusional-silver',
             },
         ]
     }

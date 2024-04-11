@@ -88,6 +88,8 @@ class ItemsService {
                 ItemSpecialtyType::PURGATORY_CHAINS,
                 ItemSpecialtyType::PIRATE_LORD_LEATHER,
                 ItemSpecialtyType::CORRUPTED_ICE,
+                ItemSpecialtyType::TWISTED_EARTH,
+                ItemSpecialtyType::DELUSIONAL_SILVER,
             ],
             'itemSkills' => ItemSkill::whereNull('parent_id')->get(),
             'locations'  => Location::select('name', 'id')->get(),

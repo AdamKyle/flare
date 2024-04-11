@@ -53,6 +53,10 @@ class ItemsController extends Controller {
         $items = Item::whereNotIn('type', ['quest', 'alchemy', 'trinket', 'artifact'])
             ->whereNull('item_suffix_id')
             ->whereNull('item_prefix_id')
+            ->doesntHave('inventorySlots')
+            ->doesntHave('inventorySetSlots')
+            ->doesntHave('appliedHolyStacks')
+            ->doesnthave('sockets')
             ->where('specialty_type', $request->specialty_type)
             ->get();
 
