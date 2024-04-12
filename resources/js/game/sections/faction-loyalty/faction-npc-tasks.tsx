@@ -1,4 +1,4 @@
-import React from "react";
+import React, {ReactNode} from "react";
 import FactionNpcSectionProps from "./types/faction-npc-section-props";
 import OrangeProgressBar from "../../components/ui/progress-bars/orange-progress-bar";
 import {FameTasks} from "./deffinitions/faction-loaylaty";
@@ -9,13 +9,22 @@ export default class FactionNpcTasks extends React.Component<FactionNpcSectionPr
         super(props);
     }
 
+    showCheckMark(fameTask: FameTasks): ReactNode {
+
+        if (fameTask.current_amount === fameTask.required_amount) {
+            return <i className="fas fa-check text-green-700 dark:text-green-500"></i>
+        }
+
+        return;
+    }
+
     renderTasks(fameTasks: FameTasks[], bounties: boolean) {
         return fameTasks.filter((fameTask: FameTasks) => {
             return bounties ? fameTask.type === 'bounty' : fameTask.type !== 'bounty';
         }).map((fameTask: FameTasks) => {
             return <>
                 <dt>{bounties ? fameTask.monster_name : fameTask.item_name + ' ['+fameTask.type+']'}</dt>
-                <dd>{fameTask.current_amount} / {fameTask.required_amount}</dd>
+                <dd>{this.showCheckMark(fameTask)}{" "}{fameTask.current_amount} / {fameTask.required_amount}</dd>
             </>
         })
     }

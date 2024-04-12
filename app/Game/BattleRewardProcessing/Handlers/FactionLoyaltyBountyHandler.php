@@ -58,7 +58,7 @@ class FactionLoyaltyBountyHandler {
             return $character;
         }
 
-        $factionLoyalty = $this->getFactionLoyalty($character, $faction);
+        $factionLoyalty = $this->getFactionLoyalty($character);
 
         if (is_null($factionLoyalty)) {
             return $character;
@@ -148,15 +148,24 @@ class FactionLoyaltyBountyHandler {
     }
 
     protected function handOutXp(Character $character, FactionLoyaltyNpc $factionLoyaltyNpc): void {
+
+        $newXp = 0;
+
+        if ($factionLoyaltyNpc->current_level <= 0) {
+            $newXp += 1000;
+        } else {
+            $newXp += $factionLoyaltyNpc->current_level * 1000;
+        }
+
         $character->update([
-            'xp' => $character->xp + ($factionLoyaltyNpc->current_level > 0 ? $factionLoyaltyNpc->current_level : 1) * 1000
+            'xp' => $character->xp + $newXp
         ]);
 
         $character = $character->refresh();
 
         $this->handlePossibleLevelUp($character);
 
-        ServerMessageHandler::sendBasicMessage($character->user, 'Rewarded with: ' . number_format($factionLoyaltyNpc->current_level * 1000) . ' XP.');
+        ServerMessageHandler::sendBasicMessage($character->user, 'Rewarded with: ' . number_format($newXp) . ' XP.');
     }
 
     protected function rewardTheUniqueItem(Character $character) {

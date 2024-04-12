@@ -306,8 +306,12 @@ class FactionLoyaltyService {
 
             $event = Event::where('type', EventType::WEEKLY_FACTION_LOYALTY_EVENT)->first();
 
-            if (is_null($event)) {
+            if (!is_null($event)) {
                 $amount = ceil($amount / 2);
+            }
+
+            if ($amount <= 0) {
+                $amount = 5;
             }
 
             $tasks[] = [
@@ -348,8 +352,12 @@ class FactionLoyaltyService {
 
             $event = Event::where('type', EventType::WEEKLY_FACTION_LOYALTY_EVENT)->first();
 
-            if (is_null($event)) {
+            if (!is_null($event)) {
                 $amount = ceil($amount / 2);
+            }
+
+            if ($amount <= 0) {
+                $amount = 5;
             }
 
             $tasks[] = [
