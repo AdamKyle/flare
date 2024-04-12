@@ -2,11 +2,11 @@
 
 namespace App\Game\Reincarnate\Services;
 
-use App\Flare\Handlers\UpdateCharacterAttackTypes;
 use App\Flare\Models\Character;
 use App\Flare\Models\MaxLevelConfiguration;
 use App\Flare\Values\BaseStatValue;
 use App\Flare\Values\FeatureTypes;
+use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\CharacterMaxLevel;
 use App\Game\Core\Traits\ResponseBuilder;
@@ -17,9 +17,9 @@ class CharacterReincarnateService {
 
     use ResponseBuilder, CharacterMaxLevel;
 
-    private UpdateCharacterAttackTypes $updateCharacterAttackTypes;
+    private UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes;
 
-    public function __construct(UpdateCharacterAttackTypes $updateCharacterAttackTypes) {
+    public function __construct(UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes) {
         $this->updateCharacterAttackTypes = $updateCharacterAttackTypes;
     }
 

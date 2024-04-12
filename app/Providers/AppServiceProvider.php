@@ -4,10 +4,7 @@ namespace App\Providers;
 
 use App\Console\AfterDeployment\AddHolyStacksToItems;
 use App\Console\AfterDeployment\AllowTraverseForMaps;
-use App\Console\AfterDeployment\AssignNewFactionsToCharacters;
-use App\Console\AfterDeployment\AssignNewSkillsToPlayers;
 use App\Console\AfterDeployment\ChangeFeatureTypesOnQuests;
-use App\Console\AfterDeployment\CreateCharacterAttackDataCache;
 use App\Console\AfterDeployment\CreateMonsterCache;
 use App\Console\AfterDeployment\FixInfoPageInternalLinks;
 use App\Console\AfterDeployment\GiveNewSlotsQuestItem;
@@ -22,7 +19,6 @@ use App\Console\DevelopmentCommands\CreateTestCharacters;
 use App\Console\DevelopmentCommands\GivePlayerAncenstorItem;
 use App\Console\DevelopmentCommands\GivePlayerMythicItem;
 use App\Console\DevelopmentCommands\GivePlayerUniqueItem;
-use App\Console\DevelopmentCommands\IncreaseRankFightToMax;
 use App\Console\DevelopmentCommands\LevelCharacter;
 use App\Console\DevelopmentCommands\MaxOutCharacter;
 use App\Console\DevelopmentCommands\MaxOutCharactersPassiveSkills;
@@ -45,13 +41,10 @@ class AppServiceProvider extends ServiceProvider {
         $this->commands([
             // After Deployment Commands
             AddHolyStacksToItems::class,
-            AssignNewSkillsToPlayers::class,
-            CreateCharacterAttackDataCache::class,
             CreateMonsterCache::class,
             UpdateCharactersForClassRanks::class,
             ReduceAlchemyItemsCost::class,
             RebalanceQuestCurrencyCostsAndRewards::class,
-            AssignNewFactionsToCharacters::class,
             RemoveInvalidQuestItems::class,
             ChangeFeatureTypesOnQuests::class,
             GiveNewSlotsQuestItem::class,
@@ -66,7 +59,6 @@ class AppServiceProvider extends ServiceProvider {
             LevelCharacter::class,
             AssignTopEndGearToPlayer::class,
             ReincarnateCharacter::class,
-            IncreaseRankFightToMax::class,
             GivePlayerUniqueItem::class,
             GivePlayerAncenstorItem::class,
             GivePlayerMythicItem::class,

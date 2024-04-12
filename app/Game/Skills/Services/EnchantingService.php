@@ -2,8 +2,6 @@
 
 namespace App\Game\Skills\Services;
 
-use App\Flare\Builders\CharacterInformation\CharacterStatBuilder;
-use App\Flare\Events\UpdateSkillEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\Event;
 use App\Flare\Models\GameMap;
@@ -16,13 +14,14 @@ use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 use App\Flare\Models\ItemAffix;
 use App\Flare\Models\Skill;
-use App\Game\CharacterInventory\Services\CharacterInventoryService;
+use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
+use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Events\Concerns\ShouldShowEnchantingEventButton;
 use App\Game\Events\Values\GlobalEventSteps;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\NpcActions\QueenOfHeartsActions\Services\RandomEnchantmentService;
-use App\Game\Skills\Handlers\HandleUpdatingCraftingGlobalEventGoal;
+use App\Game\Skills\Events\UpdateSkillEvent;
 use App\Game\Skills\Handlers\HandleUpdatingEnchantingGlobalEventGoal;
 use App\Game\Skills\Services\Traits\UpdateCharacterCurrency;
 use App\Game\Skills\Values\SkillTypeValue;

@@ -2,8 +2,6 @@
 
 namespace App\Game\Skills\Services;
 
-use Exception;
-use App\Flare\Events\UpdateSkillEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\GemBagSlot;
@@ -13,7 +11,9 @@ use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Gems\Values\GemTierValue;
 use App\Game\Skills\Builders\GemBuilder;
+use App\Game\Skills\Events\UpdateSkillEvent;
 use App\Game\Skills\Values\SkillTypeValue;
+use Exception;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 
 class GemService {

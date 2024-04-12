@@ -5,15 +5,15 @@ namespace App\Game\Battle\Services;
 use App\Admin\Events\RefreshUserScreenEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterAutomation;
-use App\Flare\Values\AutomationType;
-use App\Game\Battle\Jobs\MonthlyPvpFight;
-use  Illuminate\Database\Eloquent\Builder;
-use App\Flare\Jobs\CharacterAttackTypesCacheBuilder;
+use App\Flare\Models\Location;
 use App\Flare\Models\MonthlyPvpParticipant;
+use App\Flare\Values\AutomationType;
 use App\Flare\Values\UserOnlineValue;
+use App\Game\Battle\Jobs\MonthlyPvpFight;
+use App\Game\Character\Builders\AttackBuilders\Jobs\CharacterAttackTypesCacheBuilder;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
-use App\Flare\Models\Location;
+use Illuminate\Database\Eloquent\Builder;
 
 class MonthlyPvpService {
 

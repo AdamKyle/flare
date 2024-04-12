@@ -3,12 +3,11 @@
 namespace Tests\Console;
 
 
-use App\Flare\Jobs\CreateCharacterAttackData;
+use App\Game\Character\Builders\AttackBuilders\Jobs\CreateCharacterAttackData;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Queue;
-use Tests\TestCase;
 use Tests\Setup\Character\CharacterFactory;
+use Tests\TestCase;
 
 class CreateCharacterAttackDataCacheTest extends TestCase
 {

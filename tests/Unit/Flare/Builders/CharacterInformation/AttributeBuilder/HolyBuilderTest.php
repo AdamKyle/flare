@@ -2,9 +2,8 @@
 
 namespace Tests\Unit\Flare\Builders\CharacterInformation\AttributeBuilder;
 
-use App\Flare\Builders\CharacterInformation\AttributeBuilders\DefenceBuilder;
+use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Flare\Builders\CharacterInformation\CharacterStatBuilder;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateClass;

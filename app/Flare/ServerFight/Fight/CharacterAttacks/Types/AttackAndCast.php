@@ -2,7 +2,6 @@
 
 namespace App\Flare\ServerFight\Fight\CharacterAttacks\Types;
 
-use App\Flare\Builders\Character\CharacterCacheData;
 use App\Flare\Models\Character;
 use App\Flare\ServerFight\BattleBase;
 use App\Flare\ServerFight\Fight\CanHit;
@@ -10,6 +9,7 @@ use App\Flare\ServerFight\Fight\CharacterAttacks\SecondaryAttacks;
 use App\Flare\ServerFight\Fight\Entrance;
 use App\Flare\ServerFight\Monster\ServerMonster;
 use App\Flare\Values\AttackTypeValue;
+use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 
 class AttackAndCast extends BattleBase
 {

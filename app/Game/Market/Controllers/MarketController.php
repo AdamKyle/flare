@@ -3,21 +3,21 @@
 namespace App\Game\Market\Controllers;
 
 
-use App\Game\CharacterInventory\Services\ComparisonService;
-use Cache;
+use App\Flare\Models\Character;
 use App\Flare\Models\Item;
+use App\Flare\Models\MarketBoard;
 use App\Flare\Traits\Controllers\ItemsShowInformation;
+use App\Flare\Transformers\MarketItemsTransformer;
+use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\Character\CharacterInventory\Services\ComparisonService;
+use App\Game\Market\Services\MarketBoard as MarketBoardService;
+use App\Game\Market\Services\MarketSaleHistory;
+use App\Http\Controllers\Controller;
+use Cache;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use League\Fractal\Manager;
-use App\Http\Controllers\Controller;
-use App\Flare\Models\Character;
-use App\Flare\Models\MarketBoard;
-use App\Flare\Transformers\MarketItemsTransformer;
-use App\Flare\Values\MaxCurrenciesValue;
-use App\Game\Market\Services\MarketBoard as MarketBoardService;
-use App\Game\Market\Services\MarketSaleHistory;
 
 
 class MarketController extends Controller {

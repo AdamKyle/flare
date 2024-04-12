@@ -2,15 +2,15 @@
 
 namespace App\Flare\Transformers;
 
-use App\Flare\Models\FactionLoyalty;
-use App\Flare\Models\Skill;
 use App\Flare\Models\Character;
+use App\Flare\Models\FactionLoyalty;
 use App\Flare\Models\GameClass;
 use App\Flare\Models\GameSkill;
+use App\Flare\Models\Skill;
 use App\Flare\Values\AutomationType;
 use App\Flare\Values\ClassAttackValue;
+use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
 use App\Game\Skills\Values\SkillTypeValue;
-use App\Flare\Builders\CharacterInformation\CharacterStatBuilder;
 use Exception;
 
 class CharacterSheetBaseInfoTransformer extends BaseTransformer {

@@ -3,12 +3,12 @@
 namespace App\Game\Shop\Providers;
 
 use App\Flare\Transformers\ItemTransformer;
-use App\Game\CharacterInventory\Services\CharacterGemBagService;
-use App\Game\CharacterInventory\Services\EquipItemService;
+use App\Game\Character\CharacterInventory\Services\CharacterGemBagService;
+use App\Game\Character\CharacterInventory\Services\EquipItemService;
 use App\Game\Shop\Services\GemShopService;
 use App\Game\Shop\Services\GoblinShopService;
-use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use App\Game\Shop\Services\ShopService;
+use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use League\Fractal\Manager;
 
 class ServiceProvider extends ApplicationServiceProvider {

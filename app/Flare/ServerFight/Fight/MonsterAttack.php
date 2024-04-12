@@ -2,13 +2,13 @@
 
 namespace App\Flare\ServerFight\Fight;
 
-use App\Flare\Builders\Character\CharacterCacheData;
 use App\Flare\Models\Character;
 use App\Flare\ServerFight\BattleBase;
 use App\Flare\ServerFight\Fight\CharacterAttacks\PlayerHealing;
 use App\Flare\ServerFight\Monster\MonsterSpecialAttack;
 use App\Flare\ServerFight\Monster\ServerMonster;
 use App\Flare\Values\AttackTypeValue;
+use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 
 class MonsterAttack extends BattleBase {
 

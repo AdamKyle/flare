@@ -2,7 +2,6 @@
 
 namespace  App\Game\Battle\Services;
 
-use App\Flare\Builders\Character\CharacterCacheData;
 use App\Flare\Models\Character;
 use App\Flare\Models\Monster;
 use App\Flare\Models\Raid;
@@ -18,6 +17,7 @@ use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Battle\Services\Concerns\HandleCachedRaidCritterHealth;
 use App\Game\BattleRewardProcessing\Jobs\BattleAttackHandler;
 use App\Game\BattleRewardProcessing\Jobs\RaidBossRewardHandler;
+use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use App\Game\Core\Traits\ResponseBuilder;
 use Exception;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;

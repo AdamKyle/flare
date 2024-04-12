@@ -2,7 +2,6 @@
 
 namespace App\Game\Battle\Services;
 
-use App\Flare\Builders\Character\CharacterCacheData;
 use App\Flare\Models\CelestialFight;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterInCelestialFight;
@@ -14,6 +13,7 @@ use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Battle\Jobs\CelestialTimeOut;
 use App\Game\Battle\Values\CelestialConjureType;
 use App\Game\BattleRewardProcessing\Jobs\BattleAttackHandler;
+use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use App\Game\Core\Events\UpdateCharacterCelestialTimeOut;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\ResponseBuilder;

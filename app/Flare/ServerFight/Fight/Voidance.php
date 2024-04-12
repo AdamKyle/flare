@@ -2,13 +2,10 @@
 
 namespace App\Flare\ServerFight\Fight;
 
-use App\Flare\Builders\Character\CharacterCacheData;
 use App\Flare\Models\Character;
-use App\Flare\Models\GameMap;
-use App\Flare\ServerFight\BattleBase;
 use App\Flare\ServerFight\BattleMessages;
 use App\Flare\ServerFight\Monster\ServerMonster;
-use App\Flare\Values\MapNameValue;
+use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 
 class Voidance extends BattleMessages {
 

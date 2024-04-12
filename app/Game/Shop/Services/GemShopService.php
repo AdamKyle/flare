@@ -5,8 +5,8 @@ namespace App\Game\Shop\Services;
 use App\Flare\Models\Character;
 use App\Flare\Models\GemBagSlot;
 use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\Character\CharacterInventory\Services\CharacterGemBagService;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
-use App\Game\CharacterInventory\Services\CharacterGemBagService;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Gems\Values\GemTierValue;
 

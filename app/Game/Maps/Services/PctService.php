@@ -2,11 +2,11 @@
 
 namespace App\Game\Maps\Services;
 
-use App\Flare\Jobs\CharacterAttackTypesCacheBuilder;
 use App\Flare\Models\CelestialFight;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameMap;
 use App\Game\Battle\Values\CelestialConjureType;
+use App\Game\Character\Builders\AttackBuilders\Jobs\CharacterAttackTypesCacheBuilder;
 use App\Game\Maps\Events\UpdateMap;
 use App\Game\Maps\Values\MapTileValue;
 use App\Game\Messages\Events\ServerMessageEvent;

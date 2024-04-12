@@ -213,11 +213,14 @@ return [
          */
         App\Game\Core\Providers\EventsProvider::class,
         App\Game\Battle\Providers\EventsProvider::class,
+        App\Game\Character\CharacterAttack\Providers\EventsProvider::class,
+        App\Game\Character\CharacterCreation\Providers\EventsProvider::class,
+        App\Game\Skills\Providers\EventsProvider::class,
 
         /**
          * Gem Actions
          */
-        \App\Game\Gems\Providers\ServiceProvider::class,
+        App\Game\Gems\Providers\ServiceProvider::class,
 
         /**
          * Npc Actions
@@ -232,7 +235,11 @@ return [
          */
         App\Game\Events\Providers\ServiceProvider::class,
         App\Game\Exploration\Providers\ServiceProvider::class,
-        App\Game\CharacterInventory\Providers\ServiceProvider::class,
+        App\Game\Character\Providers\ServiceProvider::class,
+        App\Game\Character\Builders\AttackBuilders\Providers\ServiceProvider::class,
+        App\Game\Character\Builders\InformationBuilders\Providers\ServiceProvider::class,
+        App\Game\Character\CharacterCreation\Providers\ServiceProvider::class,
+        App\Game\Character\CharacterInventory\Providers\ServiceProvider::class,
         App\Game\Core\Providers\ServiceProvider::class,
         App\Game\Battle\Providers\ServiceProvider::class,
         App\Game\BattleRewardProcessing\Providers\ServiceProvider::class,

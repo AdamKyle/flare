@@ -2,21 +2,15 @@
 
 namespace App\Game\Exploration\Controllers\Api;
 
-use Illuminate\Http\JsonResponse;
-use App\Http\Controllers\Controller;
-use App\Flare\Models\Location;
 use App\Flare\Models\Character;
-use App\Flare\Values\LocationType;
-use App\Flare\Values\AutomationType;
+use App\Flare\Models\Location;
 use App\Flare\Values\AttackTypeValue;
-use App\Flare\Models\CharacterAutomation;
-use App\Game\Battle\Events\UpdateCharacterStatus;
-use App\Game\Exploration\Events\ExplorationStatus;
-use App\Game\Exploration\Events\ExplorationTimeOut;
-use App\Flare\Builders\Character\CharacterCacheData;
-use App\Game\Exploration\Events\ExplorationLogUpdate;
+use App\Flare\Values\AutomationType;
+use App\Flare\Values\LocationType;
 use App\Game\Exploration\Requests\ExplorationRequest;
 use App\Game\Exploration\Services\ExplorationAutomationService;
+use App\Http\Controllers\Controller;
+use Illuminate\Http\JsonResponse;
 
 class ExplorationController extends Controller {
 

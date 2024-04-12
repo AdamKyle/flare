@@ -2,27 +2,27 @@
 
 namespace App\Game\Maps\Services;
 
-use App\Flare\Models\Raid;
+use App\Flare\Cache\CoordinatesCache;
+use App\Flare\Models\CelestialFight;
+use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\Location;
-use App\Flare\Models\Character;
-use App\Flare\Values\LocationType;
-use Illuminate\Support\Collection;
-use App\Flare\Models\CelestialFight;
-use App\Flare\Cache\CoordinatesCache;
-use App\Game\Core\Traits\KingdomCache;
-use Illuminate\Support\Facades\Storage;
+use App\Flare\Models\Raid;
 use App\Flare\Values\LocationEffectValue;
-use App\Game\Maps\Events\UpdateDuelAtPosition;
+use App\Flare\Values\LocationType;
 use App\Game\Battle\Events\UpdateCharacterStatus;
-use App\Flare\Handlers\UpdateCharacterAttackTypes;
-use App\Flare\Builders\Character\CharacterCacheData;
-use App\Game\Maps\Services\Common\LiveCharacterCount;
-use App\Game\Maps\Services\Common\CanPlayerMassEmbezzle;
-use App\Game\Maps\Events\UpdateLocationBasedSpecialShops;
+use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
+use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
+use App\Game\Core\Traits\KingdomCache;
+use App\Game\Maps\Events\UpdateDuelAtPosition;
 use App\Game\Maps\Events\UpdateLocationBasedCraftingOptions;
 use App\Game\Maps\Events\UpdateLocationBasedEventGoals;
+use App\Game\Maps\Events\UpdateLocationBasedSpecialShops;
+use App\Game\Maps\Services\Common\CanPlayerMassEmbezzle;
+use App\Game\Maps\Services\Common\LiveCharacterCount;
 use App\Game\Maps\Services\Common\UpdateRaidMonstersForLocation;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Storage;
 
 class LocationService {
 
@@ -39,9 +39,9 @@ class LocationService {
     private CharacterCacheData $characterCacheData;
 
     /**
-     * @var UpdateCharacterAttackTypes $updateCharacterAttackTypes
+     * @var UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes
      */
-    private UpdateCharacterAttackTypes $updateCharacterAttackTypes;
+    private UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes;
 
     /**
      * @var ?Location $location | null
@@ -56,9 +56,9 @@ class LocationService {
     /**
      * @param CoordinatesCache $coordinatesCache
      * @param CharacterCacheData $characterCacheData
-     * @param UpdateCharacterAttackTypes $updateCharacterAttackTypes
+     * @param UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes
      */
-    public function __construct(CoordinatesCache $coordinatesCache, CharacterCacheData $characterCacheData, UpdateCharacterAttackTypes $updateCharacterAttackTypes) {
+    public function __construct(CoordinatesCache $coordinatesCache, CharacterCacheData $characterCacheData, UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes) {
         $this->coordinatesCache           = $coordinatesCache;
         $this->characterCacheData         = $characterCacheData;
         $this->updateCharacterAttackTypes = $updateCharacterAttackTypes;

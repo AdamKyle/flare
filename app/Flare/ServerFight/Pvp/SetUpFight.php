@@ -2,11 +2,10 @@
 
 namespace App\Flare\ServerFight\Pvp;
 
-use App\Flare\Builders\Character\CharacterCacheData;
 use App\Flare\Models\Character;
 use App\Flare\ServerFight\Fight\Ambush;
 use App\Flare\ServerFight\Fight\Voidance;
-use PHPUnit\TextUI\Exception;
+use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 
 class SetUpFight extends PvpMessages {
 

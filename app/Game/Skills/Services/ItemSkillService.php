@@ -2,12 +2,12 @@
 
 namespace App\Game\Skills\Services;
 
-use App\Flare\Models\Item;
 use App\Flare\Models\Character;
-use App\Game\Core\Traits\ResponseBuilder;
+use App\Flare\Models\Item;
 use App\Flare\Models\ItemSkillProgression;
-use App\Flare\Builders\Character\Traits\FetchEquipped;
-use App\Game\CharacterInventory\Events\CharacterInventoryUpdateBroadCastEvent;
+use App\Game\Character\CharacterInventory\Events\CharacterInventoryUpdateBroadCastEvent;
+use App\Game\Character\Concerns\FetchEquipped;
+use App\Game\Core\Traits\ResponseBuilder;
 use Exception;
 
 class ItemSkillService {

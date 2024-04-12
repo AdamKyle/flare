@@ -2,23 +2,20 @@
 
 namespace Tests\Unit\Flare\Builders\CharacterInformation;
 
-use App\Flare\Models\GameSkill;
+use App\Flare\Values\CharacterClassValue;
+use App\Flare\Values\ItemEffectsValue;
+use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\HolyBuilder;
+use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ReductionsBuilder;
+use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
 use App\Game\Skills\Values\SkillTypeValue;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
-use Tests\Traits\CreateItem;
 use Tests\Traits\CreateClass;
-use App\Flare\Models\GameClass;
 use Tests\Traits\CreateGameMap;
 use Tests\Traits\CreateGameSkill;
+use Tests\Traits\CreateItem;
 use Tests\Traits\CreateItemAffix;
-use App\Flare\Values\ItemEffectsValue;
-use Tests\Setup\Character\CharacterFactory;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Flare\Builders\CharacterInformation\CharacterStatBuilder;
-use App\Flare\Builders\CharacterInformation\AttributeBuilders\HolyBuilder;
-use App\Flare\Builders\CharacterInformation\AttributeBuilders\ReductionsBuilder;
-use App\Flare\Values\CharacterClassValue;
 
 class CharacterStatBuilderTest extends TestCase {
 

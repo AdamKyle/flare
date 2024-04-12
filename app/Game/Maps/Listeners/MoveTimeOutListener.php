@@ -2,8 +2,8 @@
 
 namespace App\Game\Maps\Listeners;
 
-use App\Flare\Builders\CharacterInformation\CharacterStatBuilder;
 use App\Flare\Models\Character;
+use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
 use App\Game\Maps\Events\MoveTimeOutEvent;
 use App\Game\Maps\Events\ShowTimeOutEvent;
 use App\Game\Maps\Jobs\MoveTimeOutJob;

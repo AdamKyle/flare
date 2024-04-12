@@ -2,14 +2,14 @@
 
 namespace App\Game\Skills\Services;
 
-use App\Flare\Values\MaxCurrenciesValue;
 use App\Flare\Models\Character;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Skill;
-use App\Flare\Events\UpdateSkillEvent;
-use App\Game\Messages\Events\ServerMessageEvent;
+use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Core\Events\UpdateTopBarEvent;
+use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Skills\Events\UpdateCharacterEnchantingList;
+use App\Game\Skills\Events\UpdateSkillEvent;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 
 class DisenchantService {

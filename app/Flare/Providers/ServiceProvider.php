@@ -4,22 +4,10 @@ namespace App\Flare\Providers;
 
 use App\Flare\Builders\AffixAttributeBuilder;
 use App\Flare\Builders\BuildMythicItem;
-use App\Flare\Builders\Character\AttackDetails\CharacterAttackBuilder;
-use App\Flare\Builders\Character\CharacterCacheData;
-use App\Flare\Builders\CharacterBuilder;
-use App\Flare\Builders\CharacterInformation\AttributeBuilders\ClassRanksWeaponMasteriesBuilder;
-use App\Flare\Builders\CharacterInformation\AttributeBuilders\DamageBuilder;
-use App\Flare\Builders\CharacterInformation\AttributeBuilders\DefenceBuilder;
-use App\Flare\Builders\CharacterInformation\AttributeBuilders\ElementalAtonement;
-use App\Flare\Builders\CharacterInformation\AttributeBuilders\HealingBuilder;
-use App\Flare\Builders\CharacterInformation\AttributeBuilders\HolyBuilder;
-use App\Flare\Builders\CharacterInformation\AttributeBuilders\ReductionsBuilder;
-use App\Flare\Builders\CharacterInformation\CharacterStatBuilder;
 use App\Flare\Builders\RandomAffixGenerator;
 use App\Flare\Builders\RandomItemDropBuilder;
 use App\Flare\Cache\CoordinatesCache;
 use App\Flare\Handlers\MessageThrottledHandler;
-use App\Flare\Handlers\UpdateCharacterAttackTypes;
 use App\Flare\Middleware\IsCharacterDeadMiddleware;
 use App\Flare\Middleware\IsCharacterLoggedInMiddleware;
 use App\Flare\Middleware\IsCharacterWhoTheySayTheyAreMiddleware;
@@ -36,17 +24,17 @@ use App\Flare\ServerFight\Fight\CharacterAttacks\SecondaryAttacks;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\AlchemistsRavenousDream;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\BloodyPuke;
+use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\BookBindersFear;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\DoubleAttack;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\DoubleCast;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\DoubleHeal;
+use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\GunslingersAssassination;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\HammerSmash;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\MerchantSupply;
+use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\SensualDance;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\ThiefBackStab;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\TripleAttack;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\VampireThirst;
-use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\GunslingersAssassination;
-use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\SensualDance;
-use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\BookBindersFear;
 use App\Flare\ServerFight\Fight\CharacterAttacks\Types\AttackAndCast;
 use App\Flare\ServerFight\Fight\CharacterAttacks\Types\CastAndAttack;
 use App\Flare\ServerFight\Fight\CharacterAttacks\Types\CastType;
@@ -62,7 +50,6 @@ use App\Flare\ServerFight\Monster\ServerMonster;
 use App\Flare\ServerFight\MonsterPlayerFight;
 use App\Flare\ServerFight\Pvp\PvpAttack;
 use App\Flare\ServerFight\Pvp\SetUpFight;
-use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Flare\Services\BuildMonsterCacheService;
 use App\Flare\Services\CanUserEnterSiteService;
 use App\Flare\Services\CharacterDeletion;
@@ -71,7 +58,6 @@ use App\Flare\Services\CharacterXPService;
 use App\Flare\Services\DailyGoldDustService;
 use App\Flare\Services\EventSchedulerService;
 use App\Flare\Transformers\BasicKingdomTransformer;
-use App\Flare\Transformers\CharacterAttackDataTransformer;
 use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Flare\Transformers\InventoryTransformer;
@@ -87,8 +73,12 @@ use App\Flare\Transformers\UsableItemTransformer;
 use App\Flare\Values\BaseSkillValue;
 use App\Flare\Values\BaseStatValue;
 use App\Flare\View\Components\ItemDisplayColor;
+use App\Game\Character\Builders\AttackBuilders\AttackDetails\CharacterAttackBuilder;
+use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
+use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ClassRanksWeaponMasteriesBuilder;
+use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
+use App\Game\Character\CharacterCreation\Services\CharacterBuilderService;
 use App\Game\Core\Services\CharacterService;
-use App\Game\Gems\Services\GemComparison;
 use App\Game\Kingdoms\Handlers\GiveKingdomsToNpcHandler;
 use App\Game\Quests\Services\BuildQuestCacheService;
 use App\Game\Skills\Services\SkillService;
@@ -109,11 +99,7 @@ class ServiceProvider extends ApplicationServiceProvider
             return new BaseStatValue();
         });
 
-        $this->app->bind(CharacterBuilder::class, function ($app) {
-            return new CharacterBuilder(
-                $app->make(BuildCharacterAttackTypes::class)
-            );
-        });
+
 
         $this->app->bind(AffixAttributeBuilder::class, function() {
             return new AffixAttributeBuilder();
@@ -225,12 +211,6 @@ class ServiceProvider extends ApplicationServiceProvider
             );
         });
 
-        $this->app->bind(BuildCharacterAttackTypes::class, function($app) {
-            return new BuildCharacterAttackTypes(
-                $app->make(CharacterAttackBuilder::class)
-            );
-        });
-
         $this->app->bind(CanUserEnterSiteService::class, function($app) {
            return new CanUserEnterSiteService();
         });
@@ -247,14 +227,6 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(Voidance::class, function() {
             return new Voidance();
-        });
-
-        $this->app->bind(CharacterCacheData::class, function($app) {
-            return new CharacterCacheData(
-                $app->make(Manager::class),
-                $app->make(CharacterAttackDataTransformer::class),
-                $app->make(CharacterStatBuilder::class)
-            );
         });
 
         $this->app->bind(Ambush::class, function($app) {
@@ -446,7 +418,7 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(CharacterDeletion::class, function($app) {
             return new CharacterDeletion(
                 $app->make(GiveKingdomsToNpcHandler::class),
-                $app->make(CharacterBuilder::class),
+                $app->make(CharacterBuilderService::class),
             );
         });
 
@@ -470,47 +442,8 @@ class ServiceProvider extends ApplicationServiceProvider
             return new BuildMythicItem($app->make(RandomAffixGenerator::class));
         });
 
-        $this->app->bind(UpdateCharacterAttackTypes::class, function($app) {
-            return new UpdateCharacterAttackTypes($app->make(BuildCharacterAttackTypes::class));
-        });
-
-        $this->app->bind(DefenceBuilder::class, function() {
-            return new DefenceBuilder();
-        });
-
         $this->app->bind(ClassRanksWeaponMasteriesBuilder::class, function() {
             return new ClassRanksWeaponMasteriesBuilder();
-        });
-
-        $this->app->bind(DamageBuilder::class, function($app) {
-            return new DamageBuilder($app->make(ClassRanksWeaponMasteriesBuilder::class));
-        });
-
-        $this->app->bind(HealingBuilder::class, function($app) {
-            return new HealingBuilder($app->make(ClassRanksWeaponMasteriesBuilder::class));
-        });
-
-        $this->app->bind(HolyBuilder::class, function() {
-            return new HolyBuilder();
-        });
-
-        $this->app->bind(ElementalAtonement::class, function($app) {
-            return new ElementalAtonement($app->make(GemComparison::class));
-        });
-
-        $this->app->bind(ReductionsBuilder::class, function() {
-            return new ReductionsBuilder();
-        });
-
-        $this->app->bind(CharacterStatBuilder::class, function($app) {
-            return new CharacterStatBuilder(
-                $app->make(DefenceBuilder::class),
-                $app->make(DamageBuilder::class),
-                $app->make(HealingBuilder::class),
-                $app->make(HolyBuilder::class),
-                $app->make(ReductionsBuilder::class),
-                $app->make(ElementalAtonement::class)
-            );
         });
 
         $this->app->bind(EventSchedulerService::class, function() {

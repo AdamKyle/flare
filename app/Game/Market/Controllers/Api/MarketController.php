@@ -2,19 +2,19 @@
 
 namespace App\Game\Market\Controllers\Api;
 
-use App\Flare\Traits\IsItemUnique;
-use App\Game\CharacterInventory\Services\CharacterInventoryService;
-use Facades\App\Flare\Calculators\SellItemCalculator;
-use App\Flare\Models\MarketBoard;
-use App\Game\Core\Traits\UpdateMarketBoard;
-use App\Game\Market\Requests\ListPriceRequest;
-use League\Fractal\Manager;
-use League\Fractal\Resource\Collection;
-use App\Http\Controllers\Controller;
 use App\Flare\Models\Character;
+use App\Flare\Models\MarketBoard;
+use App\Flare\Traits\IsItemUnique;
 use App\Flare\Transformers\MarketItemsTransformer;
 use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
+use App\Game\Core\Traits\UpdateMarketBoard;
 use App\Game\Market\Requests\ChangeItemTypeRequest;
+use App\Game\Market\Requests\ListPriceRequest;
+use App\Http\Controllers\Controller;
+use Facades\App\Flare\Calculators\SellItemCalculator;
+use League\Fractal\Manager;
+use League\Fractal\Resource\Collection;
 
 class  MarketController extends Controller {
 

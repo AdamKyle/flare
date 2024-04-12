@@ -2,12 +2,12 @@
 
 namespace App\Game\ClassRanks\Services;
 
-use App\Flare\Builders\Character\Traits\FetchEquipped;
-use App\Flare\Handlers\UpdateCharacterAttackTypes;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterClassRank;
 use App\Flare\Models\CharacterClassSpecialtiesEquipped;
 use App\Flare\Models\GameClassSpecial;
+use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
+use App\Game\Character\Concerns\FetchEquipped;
 use App\Game\ClassRanks\Values\ClassRankValue;
 use App\Game\ClassRanks\Values\ClassSpecialValue;
 use App\Game\ClassRanks\Values\WeaponMasteryValue;
@@ -20,9 +20,9 @@ class ClassRankService {
 
     use FetchEquipped, ResponseBuilder;
 
-    private UpdateCharacterAttackTypes $updateCharacterAttackTypes;
+    private UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes;
 
-    public function __construct(UpdateCharacterAttackTypes $updateCharacterAttackTypes) {
+    public function __construct(UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes) {
         $this->updateCharacterAttackTypes = $updateCharacterAttackTypes;
     }
 

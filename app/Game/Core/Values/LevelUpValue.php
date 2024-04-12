@@ -2,11 +2,11 @@
 
 namespace App\Game\Core\Values;
 
-use App\Flare\Builders\Character\Traits\Boons;
 use App\Flare\Models\Character;
 use App\Flare\Models\Inventory;
 use App\Flare\Models\MaxLevelConfiguration;
 use App\Flare\Values\ItemEffectsValue;
+use App\Game\Character\Concerns\Boons;
 
 class LevelUpValue {
 

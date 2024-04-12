@@ -2,18 +2,18 @@
 
 namespace App\Console\DevelopmentCommands;
 
-use App\Flare\Models\User;
-use Illuminate\Support\Str;
-use App\Flare\Models\GameMap;
-use App\Flare\Models\Monster;
-use App\Flare\Models\GameRace;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameClass;
-use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Hash;
-use App\Flare\Builders\CharacterBuilder;
-use Illuminate\Database\Eloquent\Collection;
+use App\Flare\Models\GameMap;
+use App\Flare\Models\GameRace;
+use App\Flare\Models\Monster;
+use App\Flare\Models\User;
+use App\Game\Character\CharacterCreation\Services\CharacterBuilderService;
 use App\Game\Exploration\Services\ExplorationAutomationService;
+use Illuminate\Console\Command;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class TestExploration extends Command
 {
@@ -34,7 +34,7 @@ class TestExploration extends Command
     /**
      * Execute the console command.
      */
-    public function handle(CharacterBuilder $characterBuilder, ExplorationAutomationService $explorationAutomationService) {
+    public function handle(CharacterBuilderService $characterBuilder, ExplorationAutomationService $explorationAutomationService) {
         ini_set('memory_limit','3G');
 
         $numberOfCharacters = $this->argument('numberOfCharacters');
@@ -62,12 +62,12 @@ class TestExploration extends Command
      * - Will create a specfic amount to match the number of characters we want to use for exploration.
      * - Will ignore a specfic character from the list to return.
      *
-     * @param CharacterBuilder $characterBuilder
+     * @param CharacterBuilderService $characterBuilder
      * @param integer $numberOfCharacters
      * @param string|null $characterToIgnore
      * @return Collection
      */
-    protected function getTheCharacters(CharacterBuilder $characterBuilder, int $numberOfCharacters, ?string $characterToIgnore): Collection {
+    protected function getTheCharacters(CharacterBuilderService $characterBuilder, int $numberOfCharacters, ?string $characterToIgnore): Collection {
         $characters = Character::query();
 
         if (!is_null($characterToIgnore)) {
@@ -93,11 +93,11 @@ class TestExploration extends Command
     /**
      * Create the characters needed.
      *
-     * @param CharacterBuilder $characterBuilder
+     * @param CharacterBuilderService $characterBuilder
      * @param integer $charactersToCreate
      * @return void
      */
-    protected function createTheCharacters(CharacterBuilder $characterBuilder, int $charactersToCreate) {
+    protected function createTheCharacters(CharacterBuilderService $characterBuilder, int $charactersToCreate) {
         for ($i = 0; $i <= $charactersToCreate; $i++) {
             $user = $this->createUser();
 
@@ -128,7 +128,7 @@ class TestExploration extends Command
     /**
      * Create the character.
      *
-     * @param CharacterBuilder $characterBuilder
+     * @param CharacterBuilderService $characterBuilder
      * @param GameMap $map
      * @param GameClass $class
      * @param Collection $races
@@ -136,7 +136,7 @@ class TestExploration extends Command
      * @return Character
      * @throws Exception
      */
-    protected function createCharacter(CharacterBuilder $characterBuilder, User $user, GameMap $map, GameClass $class, GameRace $race): Character {
+    protected function createCharacter(CharacterBuilderService $characterBuilder, User $user, GameMap $map, GameClass $class, GameRace $race): Character {
 
         $characterBuilder->setRace($race)
             ->setClass($class)

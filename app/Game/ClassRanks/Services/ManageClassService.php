@@ -2,12 +2,11 @@
 
 namespace App\Game\ClassRanks\Services;
 
-use App\Flare\Handlers\UpdateCharacterAttackTypes;
 use App\Flare\Models\Character;
-use App\Flare\Models\CharacterClassRank;
 use App\Flare\Models\GameClass;
 use App\Flare\Models\GameSkill;
 use App\Flare\Values\BaseSkillValue;
+use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Skills\Services\UpdateCharacterSkillsService;
 use Exception;
@@ -17,9 +16,9 @@ class ManageClassService {
     use ResponseBuilder;
 
     /**
-     * @var UpdateCharacterAttackTypes $updateCharacterAttackTypes
+     * @var UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes
      */
-    private UpdateCharacterAttackTypes $updateCharacterAttackTypes;
+    private UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes;
 
     /**
      * @var UpdateCharacterSkillsService $updateCharacterSkillsService
@@ -32,13 +31,13 @@ class ManageClassService {
     private ClassRankService $classRankService;
 
     /**
-     * @param UpdateCharacterAttackTypes $updateCharacterAttackTypes
+     * @param UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes
      * @param UpdateCharacterSkillsService $updateCharacterSkillsService
      * @param ClassRankService $classRankService
      */
-    public function __construct(UpdateCharacterAttackTypes $updateCharacterAttackTypes,
-                                UpdateCharacterSkillsService $updateCharacterSkillsService,
-                                ClassRankService $classRankService
+    public function __construct(UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes,
+                                UpdateCharacterSkillsService      $updateCharacterSkillsService,
+                                ClassRankService                  $classRankService
     ) {
         $this->updateCharacterAttackTypes   = $updateCharacterAttackTypes;
         $this->updateCharacterSkillsService = $updateCharacterSkillsService;

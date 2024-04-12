@@ -2,17 +2,17 @@
 
 namespace Tests\Unit\Flare\Builders\CharacterInformation\AttributeBuilder;
 
-use App\Flare\Builders\CharacterInformation\AttributeBuilders\ElementalAtonement;
+use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ElementalAtonement;
+use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
-use Tests\Traits\CreateItem;
 use Tests\Traits\CreateClass;
 use Tests\Traits\CreateGameMap;
 use Tests\Traits\CreateGameSkill;
-use Tests\Traits\CreateItemAffix;
-use Tests\Setup\Character\CharacterFactory;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Flare\Builders\CharacterInformation\CharacterStatBuilder;
 use Tests\Traits\CreateGem;
+use Tests\Traits\CreateItem;
+use Tests\Traits\CreateItemAffix;
 
 class ElementalAtonementTest extends TestCase {
 

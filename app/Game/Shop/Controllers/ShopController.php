@@ -2,24 +2,17 @@
 
 namespace App\Game\Shop\Controllers;
 
-use App\Game\CharacterInventory\Services\ComparisonService;
-use App\Game\Shop\Requests\ShopBuyMultipleOfItem;
-use Cache;
-use Illuminate\Http\Request;
-use League\Fractal\Manager;
-use App\Http\Controllers\Controller;
 use App\Flare\Models\Character;
-use App\Flare\Models\Item;
 use App\Flare\Models\Location;
-use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\Character\Builders\AttackBuilders\Services\BuildCharacterAttackTypes;
+use App\Game\Character\CharacterInventory\Services\EquipItemService;
 use App\Game\Core\Events\UpdateTopBarEvent;
-use App\Game\Shop\Requests\ShopPurchaseMultipleValidation;
-use App\Game\CharacterInventory\Services\EquipItemService;
-use App\Game\Shop\Events\BuyItemEvent;
 use App\Game\Shop\Services\ShopService;
-use App\Game\Shop\Requests\ShopReplaceItemValidation;
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use League\Fractal\Manager;
 
 
 class ShopController extends Controller {

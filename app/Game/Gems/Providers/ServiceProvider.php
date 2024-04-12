@@ -3,10 +3,10 @@
 namespace App\Game\Gems\Providers;
 
 use App\Flare\Transformers\CharacterGemsTransformer;
+use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Core\Middleware\IsCharacterAtLocationMiddleware;
 use App\Game\Core\Middleware\IsCharacterWhoTheySayTheyAre;
 use App\Game\Core\Services\AdventureRewardService;
-use App\Game\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Core\Services\CraftingSkillService;
 use App\Game\Core\Services\ShopService;
 use App\Game\Gems\Services\AttachedGemService;

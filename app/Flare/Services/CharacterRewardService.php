@@ -2,32 +2,32 @@
 
 namespace App\Flare\Services;
 
-use Exception;
-use App\Flare\Models\Map;
-use App\Flare\Models\Event;
-use League\Fractal\Manager;
-use App\Flare\Models\GameMap;
-use App\Flare\Models\Monster;
-use App\Flare\Models\Location;
 use App\Flare\Models\Character;
+use App\Flare\Models\Event;
+use App\Flare\Models\GameMap;
 use App\Flare\Models\Inventory;
-use App\Game\Events\Values\EventType;
-use League\Fractal\Resource\Item;
-use App\Flare\Values\LocationType;
 use App\Flare\Models\InventorySlot;
-use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Models\Item as ItemModel;
+use App\Flare\Models\Location;
+use App\Flare\Models\Map;
+use App\Flare\Models\Monster;
+use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
+use App\Flare\Values\ItemEffectsValue;
+use App\Flare\Values\LocationType;
 use App\Flare\Values\MaxCurrenciesValue;
-use App\Game\Skills\Services\SkillService;
-use App\Game\Core\Events\UpdateTopBarEvent;
-use App\Game\Core\Services\CharacterService;
-use Facades\App\Flare\Calculators\XPCalculator;
-use App\Game\Messages\Events\ServerMessageEvent;
-use App\Flare\Jobs\CharacterAttackTypesCacheBuilder;
+use App\Game\Character\Builders\AttackBuilders\Jobs\CharacterAttackTypesCacheBuilder;
 use App\Game\Core\Events\UpdateBaseCharacterInformation;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
+use App\Game\Core\Events\UpdateTopBarEvent;
+use App\Game\Core\Services\CharacterService;
+use App\Game\Events\Values\EventType;
+use App\Game\Messages\Events\ServerMessageEvent;
+use App\Game\Skills\Services\SkillService;
+use Exception;
+use Facades\App\Flare\Calculators\XPCalculator;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
-use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
+use League\Fractal\Manager;
+use League\Fractal\Resource\Item;
 
 class CharacterRewardService {
 

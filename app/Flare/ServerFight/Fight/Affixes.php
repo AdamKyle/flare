@@ -2,10 +2,10 @@
 
 namespace App\Flare\ServerFight\Fight;
 
-use App\Flare\Builders\Character\CharacterCacheData;
 use App\Flare\Models\Character;
 use App\Flare\ServerFight\BattleBase;
 use App\Flare\Values\AttackTypeValue;
+use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 
 class Affixes extends BattleBase {
 

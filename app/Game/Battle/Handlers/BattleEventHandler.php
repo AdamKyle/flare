@@ -2,7 +2,6 @@
 
 namespace App\Game\Battle\Handlers;
 
-use App\Flare\Builders\Character\Traits\FetchEquipped;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterInCelestialFight;
 use App\Flare\Models\Monster;
@@ -12,6 +11,7 @@ use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\BattleRewardProcessing\Services\BattleRewardService;
 use App\Game\BattleRewardProcessing\Services\SecondaryRewardService;
 use App\Game\BattleRewardProcessing\Services\WeeklyBattleService;
+use App\Game\Character\Concerns\FetchEquipped;
 use App\Game\Messages\Events\ServerMessageEvent;
 use Exception;
 use Illuminate\Support\Facades\Cache;

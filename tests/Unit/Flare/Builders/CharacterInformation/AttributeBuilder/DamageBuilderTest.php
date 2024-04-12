@@ -2,17 +2,16 @@
 
 namespace Tests\Unit\Flare\Builders\CharacterInformation\AttributeBuilder;
 
-use App\Flare\Builders\CharacterInformation\AttributeBuilders\DamageBuilder;
-use App\Flare\Builders\CharacterInformation\AttributeBuilders\ElementalAtonement;
+use App\Flare\Values\CharacterClassValue;
+use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\DamageBuilder;
+use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
-use Tests\Traits\CreateItem;
 use Tests\Traits\CreateClass;
 use Tests\Traits\CreateGameSkill;
-use Tests\Setup\Character\CharacterFactory;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Flare\Builders\CharacterInformation\CharacterStatBuilder;
-use App\Flare\Values\CharacterClassValue;
 use Tests\Traits\CreateGem;
+use Tests\Traits\CreateItem;
 
 class DamageBuilderTest extends TestCase {
 

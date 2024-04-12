@@ -2,20 +2,20 @@
 
 namespace App\Game\Battle\Jobs;
 
-use Illuminate\Bus\Queueable;
 use App\Flare\Models\Character;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
+use App\Game\Character\Concerns\FetchEquipped;
+use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use App\Game\Core\Events\UpdateTopBarEvent;
+use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use App\Flare\Builders\Character\Traits\FetchEquipped;
-use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 
 class CharacterUpdateJob implements ShouldQueue {
 
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, FetchEquipped;
-    
+
     /**
      * @var Character $character
      */
@@ -30,7 +30,7 @@ class CharacterUpdateJob implements ShouldQueue {
 
     /**
      * Handles Character Top Bar Update.
-     * 
+     *
      * @return void
      */
     public function handle(): void {

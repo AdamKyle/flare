@@ -2,12 +2,12 @@
 
 namespace App\Game\Core\Listeners;
 
-use Exception;
-use App\Flare\Events\UpdateCharacterAttackEvent;
-use App\Flare\Services\BuildCharacterAttackTypes;
+use App\Game\Character\Builders\AttackBuilders\Services\BuildCharacterAttackTypes;
+use App\Game\Character\CharacterAttack\Events\UpdateCharacterAttackEvent;
 use App\Game\Core\Events\CharacterLevelUpEvent;
-use App\Game\Core\Services\CharacterService;
 use App\Game\Core\Events\UpdateTopBarEvent;
+use App\Game\Core\Services\CharacterService;
+use Exception;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 
 

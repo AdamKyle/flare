@@ -4,7 +4,7 @@ namespace Tests\Setup\Character;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
-use App\Flare\Services\BuildCharacterAttackTypes;
+use App\Game\Character\Builders\AttackBuilders\Services\BuildCharacterAttackTypes;
 use Tests\Traits\CreateInventorySets;
 
 class InventorySetManagement

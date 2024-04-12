@@ -2,13 +2,13 @@
 
 namespace App\Flare\ServerFight;
 
-use App\Flare\ServerFight\Fight\CharacterAttacks\Counter;
-use App\Flare\Builders\Character\CharacterCacheData;
 use App\Flare\Models\Character;
+use App\Flare\ServerFight\Fight\CharacterAttacks\Counter;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SecondaryAttacks;
+use App\Flare\ServerFight\Fight\ElementalAttack;
 use App\Flare\ServerFight\Fight\Entrance;
 use App\Flare\ServerFight\Monster\ServerMonster;
-use App\Flare\ServerFight\Fight\ElementalAttack;
+use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 
 class BattleBase extends BattleMessages {
 

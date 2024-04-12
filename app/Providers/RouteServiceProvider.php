@@ -155,8 +155,8 @@ class RouteServiceProvider extends ServiceProvider {
     protected function mapCharacterInventoryRoutes() {
         Route::prefix('api')
             ->middleware('web')
-            ->namespace('App\Game\CharacterInventory\Controllers')
-            ->group(base_path('routes/game/character-inventory/api.php'));
+            ->namespace('App\Game\Character\CharacterInventory\Controllers')
+            ->group(base_path('routes/game/characters/character-inventory/api.php'));
     }
 
     protected function mapExplorationApiRoutes() {

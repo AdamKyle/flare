@@ -2,19 +2,17 @@
 
 namespace App\Game\Core\Controllers;
 
+use App\Flare\Models\GameClass;
+use App\Flare\Models\GameRace;
 use App\Flare\Models\User;
-use App\Flare\Models\Quest;
+use App\Flare\Values\FeatureTypes;
 use App\Flare\Values\NameTags;
+use App\Game\Character\CharacterAttack\Events\UpdateCharacterAttackEvent;
+use App\Game\Core\Requests\CosmeticTextRequest;
 use App\Game\Core\Requests\NameTagRequest;
+use App\Http\Controllers\Controller;
 use Exception;
 use Illuminate\Http\Request;
-use App\Flare\Models\GameRace;
-use App\Flare\Models\GameClass;
-use App\Flare\Values\FeatureTypes;
-use App\Http\Controllers\Controller;
-use App\Flare\Models\QuestsCompleted;
-use App\Game\Core\Requests\CosmeticTextRequest;
-use App\Flare\Events\UpdateCharacterAttackEvent;
 use Illuminate\Support\Facades\Cache;
 
 class SettingsController extends Controller {

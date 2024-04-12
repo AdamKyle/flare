@@ -3,7 +3,7 @@
 namespace App\Flare\Transformers;
 
 use App\Flare\Models\Character;
-use App\Flare\Builders\CharacterInformation\CharacterStatBuilder;
+use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
 
 class CharacterResistanceInfoTransformer extends BaseTransformer {
 

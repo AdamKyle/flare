@@ -2,7 +2,6 @@
 
 namespace App\Flare\Services;
 
-use App\Flare\Builders\CharacterBuilder;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameClass;
 use App\Flare\Models\GameMap;
@@ -12,6 +11,7 @@ use App\Flare\Models\Inventory;
 use App\Flare\Models\MarketBoard;
 use App\Flare\Models\RankFightTop;
 use App\Flare\Models\User;
+use App\Game\Character\CharacterCreation\Services\CharacterBuilderService;
 use App\Game\Kingdoms\Handlers\GiveKingdomsToNpcHandler;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -20,9 +20,9 @@ class CharacterDeletion {
 
     private GiveKingdomsToNpcHandler $giveKingdomsToNpcHandler;
 
-    private CharacterBuilder $characterBuilder;
+    private CharacterBuilderService $characterBuilder;
 
-    public function __construct(GiveKingdomsToNpcHandler $giveKingdomsToNpcHandler, CharacterBuilder $characterBuilder) {
+    public function __construct(GiveKingdomsToNpcHandler $giveKingdomsToNpcHandler, CharacterBuilderService $characterBuilder) {
         $this->giveKingdomsToNpcHandler = $giveKingdomsToNpcHandler;
         $this->characterBuilder         = $characterBuilder;
     }

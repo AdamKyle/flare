@@ -2,9 +2,9 @@
 
 namespace App\Flare\Transformers;
 
-use App\Flare\Builders\CharacterInformation\CharacterStatBuilder;
-use Facades\App\Flare\Transformers\DataSets\CharacterAttackData;
 use App\Flare\Models\Character;
+use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
+use Facades\App\Flare\Transformers\DataSets\CharacterAttackData;
 
 class CharacterAttackTransformer extends BaseTransformer {
 

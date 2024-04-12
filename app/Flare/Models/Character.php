@@ -2,12 +2,12 @@
 
 namespace App\Flare\Models;
 
-use Exception;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Database\Factories\CharacterFactory;
-use App\Flare\Builders\CharacterInformation\CharacterStatBuilder;
 use App\Flare\Values\CharacterClassValue;
+use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
+use Database\Factories\CharacterFactory;
+use Exception;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class Character extends Model {
 

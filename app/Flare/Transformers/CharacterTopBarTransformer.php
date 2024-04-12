@@ -2,8 +2,8 @@
 
 namespace App\Flare\Transformers;
 
-use App\Flare\Builders\CharacterInformation\CharacterStatBuilder;
 use App\Flare\Models\Character;
+use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
 
 class CharacterTopBarTransformer extends BaseTransformer {
 

@@ -2,15 +2,15 @@
 
 namespace App\Game\Quests\Handlers;
 
-use App\Flare\Jobs\CharacterAttackTypesCacheBuilder;
-use App\Game\Battle\Events\UpdateCharacterStatus;
-use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Npc;
 use App\Flare\Models\Quest;
 use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\Battle\Events\UpdateCharacterStatus;
+use App\Game\Character\Builders\AttackBuilders\Jobs\CharacterAttackTypesCacheBuilder;
+use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\HandleCharacterLevelUp;
 use App\Game\Messages\Builders\NpcServerMessageBuilder;
 use App\Game\Messages\Events\GlobalMessageEvent;

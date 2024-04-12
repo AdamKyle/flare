@@ -2,7 +2,6 @@
 
 namespace App\Flare\ServerFight\Fight\CharacterAttacks;
 
-use App\Flare\Builders\Character\CharacterCacheData;
 use App\Flare\Models\Character;
 use App\Flare\Models\Location;
 use App\Flare\ServerFight\BattleBase;
@@ -11,6 +10,7 @@ use App\Flare\ServerFight\Monster\ServerMonster;
 use App\Flare\Traits\ElementAttackData;
 use App\Flare\Values\AttackTypeValue;
 use App\Flare\Values\LocationType;
+use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 
 class SecondaryAttacks extends BattleBase {
 

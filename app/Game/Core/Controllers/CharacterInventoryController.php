@@ -2,26 +2,26 @@
 
 namespace App\Game\Core\Controllers;
 
-use Exception;
-use League\Fractal\Resource\Item as ResourceItem;
-use League\Fractal\Manager;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
-use App\Flare\Models\User;
 use App\Flare\Models\Character;
 use App\Flare\Models\InventorySlot;
-use App\Flare\Services\BuildCharacterAttackTypes;
+use App\Flare\Models\User;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
-use App\Game\CharacterInventory\Services\EquipItemService;
-use App\Game\CharacterInventory\Services\ComparisonService;
-use App\Game\Core\Requests\EquipItemValidation;
-use App\Game\Skills\Services\EnchantingService;
-use App\Game\CharacterInventory\Requests\ComparisonValidation;
+use App\Game\Character\Builders\AttackBuilders\Services\BuildCharacterAttackTypes;
+use App\Game\Character\CharacterInventory\Events\CharacterInventoryDetailsUpdate;
+use App\Game\Character\CharacterInventory\Events\CharacterInventoryUpdateBroadCastEvent;
+use App\Game\Character\CharacterInventory\Requests\ComparisonValidation;
+use App\Game\Character\CharacterInventory\Services\ComparisonService;
+use App\Game\Character\CharacterInventory\Services\EquipItemService;
 use App\Game\Core\Events\UpdateBaseCharacterInformation;
-use App\Game\CharacterInventory\Events\CharacterInventoryDetailsUpdate;
+use App\Game\Core\Requests\EquipItemValidation;
 use App\Game\Skills\Events\UpdateCharacterEnchantingList;
-use App\Game\CharacterInventory\Events\CharacterInventoryUpdateBroadCastEvent;
+use App\Game\Skills\Services\EnchantingService;
 use App\Http\Controllers\Controller;
+use Exception;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use League\Fractal\Manager;
+use League\Fractal\Resource\Item as ResourceItem;
 
 class CharacterInventoryController extends Controller {
 

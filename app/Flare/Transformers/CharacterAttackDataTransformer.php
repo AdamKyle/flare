@@ -3,8 +3,8 @@
 namespace App\Flare\Transformers;
 
 use App\Flare\Models\Character;
-use App\Flare\Builders\CharacterInformation\CharacterStatBuilder;
 use App\Flare\Transformers\DataSets\CharacterAttackData;
+use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
 
 class CharacterAttackDataTransformer extends BaseTransformer {
 

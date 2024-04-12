@@ -2,24 +2,18 @@
 
 namespace Tests\Unit\Game\Skills\Services;
 
-use App\Flare\Events\UpdateSkillEvent;
+use App\Flare\Models\GameSkill;
 use App\Flare\Models\Item;
 use App\Flare\Values\CharacterClassValue;
 use App\Flare\Values\MaxCurrenciesValue;
-use App\Game\Gems\Values\GemTypeValue;
 use App\Game\Messages\Builders\ServerMessageBuilder;
 use App\Game\Messages\Events\ServerMessageEvent;
-use App\Game\Skills\Builders\GemBuilder;
 use App\Game\Skills\Services\CraftingService;
-use App\Game\Skills\Services\EnchantItemService;
-use App\Game\Skills\Services\GemService;
 use App\Game\Skills\Services\ItemListCostTransformerService;
 use App\Game\Skills\Services\SkillCheckService;
 use App\Game\Skills\Services\TrinketCraftingService;
-use Exception;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Flare\Models\GameSkill;
 use App\Game\Skills\Values\SkillTypeValue;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Mockery;
 use Mockery\MockInterface;
@@ -27,9 +21,7 @@ use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateClass;
 use Tests\Traits\CreateGameSkill;
-use Tests\Traits\CreateGem;
 use Tests\Traits\CreateItem;
-use Tests\Traits\CreateItemAffix;
 
 class TrinketCraftingServiceTest extends TestCase {
 

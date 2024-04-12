@@ -2,17 +2,17 @@
 
 namespace App\Game\Skills\Handlers;
 
-use App\Flare\Handlers\UpdateCharacterAttackTypes;
-use App\Flare\Models\Item;
 use App\Flare\Models\Character;
+use App\Flare\Models\Item;
 use App\Flare\Models\ItemSkillProgression;
-use \Facades\App\Game\Messages\Handlers\ServerMessageHandler;
+use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
+use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 
 class UpdateItemSkill {
 
-    private UpdateCharacterAttackTypes $updateCharacterAttackTypes;
+    private UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes;
 
-    public function __construct(UpdateCharacterAttackTypes $updateCharacterAttackTypes) {
+    public function __construct(UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes) {
         $this->updateCharacterAttackTypes = $updateCharacterAttackTypes;
     }
 

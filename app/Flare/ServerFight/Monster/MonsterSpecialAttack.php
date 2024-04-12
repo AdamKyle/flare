@@ -3,8 +3,8 @@
 namespace App\Flare\ServerFight\Monster;
 
 use App\Flare\ServerFight\BattleBase;
-use App\Flare\Builders\Character\CharacterCacheData;
 use App\Flare\Values\RaidAttackTypesValue;
+use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 
 class MonsterSpecialAttack extends BattleBase {
 

@@ -3,12 +3,12 @@
 namespace App\Game\Skills\Services;
 
 use App\Flare\Events\SkillLeveledUpServerMessageEvent;
-use App\Flare\Handlers\UpdateCharacterAttackTypes;
+use App\Flare\Models\Character;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Skill;
-use App\Flare\Models\Character;
 use App\Flare\Transformers\BasicSkillsTransformer;
 use App\Flare\Transformers\SkillsTransformer;
+use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
 use App\Game\Core\Traits\ResponseBuilder;
 use Exception;
 use League\Fractal\Manager;
@@ -35,20 +35,20 @@ class SkillService {
     private SkillsTransformer $skillsTransformer;
 
     /**
-     * @var UpdateCharacterAttackTypes $updateCharacterAttackTypes
+     * @var UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes
      */
-    private UpdateCharacterAttackTypes $updateCharacterAttackTypes;
+    private UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes;
 
     /**
      * @param Manager $manager
      * @param BasicSkillsTransformer $basicSkillsTransformer
      * @param SkillsTransformer $skillsTransformer
-     * @param UpdateCharacterAttackTypes $updateCharacterAttackTypes
+     * @param UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes
      */
     public function __construct(Manager $manager,
                                 BasicSkillsTransformer $basicSkillsTransformer,
                                 SkillsTransformer $skillsTransformer,
-                                UpdateCharacterAttackTypes $updateCharacterAttackTypes
+                                UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes
     ) {
         $this->manager                    = $manager;
         $this->basicSkillsTransformer     = $basicSkillsTransformer;

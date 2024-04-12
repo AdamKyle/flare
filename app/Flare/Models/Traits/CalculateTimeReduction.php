@@ -2,8 +2,8 @@
 
 namespace App\Flare\Models\Traits;
 
-use App\Flare\Builders\Character\Traits\Boons;
 use App\Flare\Models\Skill;
+use App\Game\Character\Concerns\Boons;
 
 trait CalculateTimeReduction {
 

@@ -2,13 +2,13 @@
 
 namespace App\Game\BattleRewardProcessing\Services;
 
-use App\Flare\Builders\Character\Traits\FetchEquipped;
 use App\Flare\Models\Character;
+use App\Game\Character\Concerns\FetchEquipped;
+use App\Game\ClassRanks\Services\ClassRankService;
 use App\Game\Core\Events\UpdateTopBarEvent;
+use App\Game\Mercenaries\Services\MercenaryService;
 use Exception;
 use Facades\App\Game\Skills\Handlers\UpdateItemSkill;
-use App\Game\ClassRanks\Services\ClassRankService;
-use App\Game\Mercenaries\Services\MercenaryService;
 
 
 class SecondaryRewardService {

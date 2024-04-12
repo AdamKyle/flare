@@ -3,11 +3,11 @@
 namespace App\Game\Battle\Listeners;
 
 
-use App\Flare\Builders\CharacterInformation\CharacterStatBuilder;
-use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Battle\Events\AttackTimeOutEvent;
-use App\Game\Core\Events\ShowTimeOutEvent;
+use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Battle\Jobs\AttackTimeOutJob;
+use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
+use App\Game\Core\Events\ShowTimeOutEvent;
 use Exception;
 
 class AttackTimeOutListener {

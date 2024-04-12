@@ -2,8 +2,8 @@
 
 namespace App\Game\Skills\Controllers\Api;
 
-use App\Flare\Builders\Character\Traits\FetchEquipped;
 use App\Flare\Models\Character;
+use App\Game\Character\Concerns\FetchEquipped;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Skills\Services\ItemSkillService;
 use App\Http\Controllers\Controller;

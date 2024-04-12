@@ -2,21 +2,21 @@
 
 namespace App\Game\Shop\Controllers\Api;
 
+use App\Flare\Models\Character;
 use App\Flare\Models\Item;
 use App\Flare\Values\MaxCurrenciesValue;
-use App\Game\CharacterInventory\Services\ComparisonService;
+use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
+use App\Game\Character\CharacterInventory\Services\ComparisonService;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Shop\Events\BuyItemEvent;
+use App\Game\Shop\Events\SellItemEvent;
 use App\Game\Shop\Events\UpdateShopEvent;
 use App\Game\Shop\Requests\ShopPurchaseMultipleValidation;
 use App\Game\Shop\Requests\ShopReplaceItemValidation;
+use App\Game\Shop\Requests\ShopSellValidation;
 use App\Game\Shop\Services\ShopService;
 use App\Http\Controllers\Controller;
 use Facades\App\Flare\Calculators\SellItemCalculator;
-use App\Game\Shop\Requests\ShopSellValidation;
-use App\Game\CharacterInventory\Services\CharacterInventoryService;
-use App\Flare\Models\Character;
-use App\Game\Shop\Events\SellItemEvent;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 

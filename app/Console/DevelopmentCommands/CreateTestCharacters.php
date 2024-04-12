@@ -2,12 +2,12 @@
 
 namespace App\Console\DevelopmentCommands;
 
-use App\Flare\Builders\CharacterBuilder;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameClass;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\GameRace;
 use App\Flare\Models\User;
+use App\Game\Character\CharacterCreation\Services\CharacterBuilderService;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Collection;
@@ -36,13 +36,13 @@ class CreateTestCharacters extends Command {
     /**
      * Execute the console command.
      *
-     * @param CharacterBuilder $characterBuilder
+     * @param CharacterBuilderService $characterBuilder
      * @return void
      * @throws Exception
      */
-    public function handle(CharacterBuilder $characterBuilder): void {
+    public function handle(CharacterBuilderService $characterBuilder): void {
         ini_set('memory_limit', -1);
-        
+
         $password  = $this->argument('password');
         $className = $this->argument('className');
         $races     = GameRace::all();
@@ -124,7 +124,7 @@ class CreateTestCharacters extends Command {
     /**
      * Create the character.
      *
-     * @param CharacterBuilder $characterBuilder
+     * @param CharacterBuilderService $characterBuilder
      * @param GameMap $map
      * @param GameClass $class
      * @param Collection $races
@@ -132,7 +132,7 @@ class CreateTestCharacters extends Command {
      * @return Character
      * @throws Exception
      */
-    protected function createCharacter(CharacterBuilder $characterBuilder, GameMap $map, GameClass $class, Collection $races, string $password): Character {
+    protected function createCharacter(CharacterBuilderService $characterBuilder, GameMap $map, GameClass $class, Collection $races, string $password): Character {
         $user = $this->createUser($password);
         $race = $races[rand(0, count($races) - 1)];
 

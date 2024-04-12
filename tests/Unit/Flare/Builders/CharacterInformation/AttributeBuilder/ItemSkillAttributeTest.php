@@ -2,9 +2,9 @@
 
 namespace Tests\Unit\Flare\Builders\CharacterInformation\AttributeBuilder;
 
-use App\Flare\Builders\CharacterInformation\AttributeBuilders\ItemSkillAttribute;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\Models\ItemSkill;
+use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ItemSkillAttribute;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateClass;

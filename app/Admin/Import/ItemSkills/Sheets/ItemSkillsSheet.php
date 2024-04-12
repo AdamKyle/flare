@@ -4,9 +4,9 @@ namespace App\Admin\Import\ItemSkills\Sheets;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\ItemSkill;
+use App\Game\Character\Builders\AttackBuilders\Jobs\CreateCharacterAttackData;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToCollection;
-use App\Flare\Jobs\CreateCharacterAttackData;
 
 class ItemSkillsSheet implements ToCollection {
 

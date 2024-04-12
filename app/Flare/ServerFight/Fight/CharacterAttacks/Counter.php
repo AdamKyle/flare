@@ -2,10 +2,10 @@
 
 namespace App\Flare\ServerFight\Fight\CharacterAttacks;
 
-use App\Flare\Builders\Character\CharacterCacheData;
 use App\Flare\Models\Character;
 use App\Flare\ServerFight\BattleBase;
 use App\Flare\ServerFight\Monster\ServerMonster;
+use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 
 class Counter extends BattleBase {
 

@@ -2,16 +2,16 @@
 
 namespace Tests\Unit\Game\Skills\Services;
 
-use App\Flare\Events\UpdateSkillEvent;
+use App\Flare\Models\GameSkill;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Gems\Values\GemTypeValue;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Skills\Builders\GemBuilder;
+use App\Game\Skills\Events\UpdateSkillEvent;
 use App\Game\Skills\Services\GemService;
+use App\Game\Skills\Values\SkillTypeValue;
 use Exception;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Flare\Models\GameSkill;
-use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Support\Facades\Event;
 use Mockery;
 use Mockery\MockInterface;

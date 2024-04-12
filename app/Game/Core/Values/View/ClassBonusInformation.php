@@ -2,10 +2,10 @@
 
 namespace App\Game\Core\Values\View;
 
-use App\Flare\Builders\CharacterInformation\CharacterStatBuilder;
 use App\Flare\Models\Character;
 use App\Flare\Values\CharacterClassValue;
 use App\Flare\Values\ClassAttackValue;
+use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
 use Illuminate\Support\Str;
 
 class ClassBonusInformation {

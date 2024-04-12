@@ -2,11 +2,11 @@
 
 namespace App\Game\Market\Providers;
 
-use App\Game\CharacterInventory\Services\EquipItemService;
+use App\Game\Character\CharacterInventory\Services\EquipItemService;
+use App\Game\Market\Middleware\CanCharacterAccessMarket;
 use App\Game\Market\Services\MarketBoard;
 use App\Game\Market\Services\MarketHistory;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
-use App\Game\Market\Middleware\CanCharacterAccessMarket;
 
 class ServiceProvider extends ApplicationServiceProvider {
     /**

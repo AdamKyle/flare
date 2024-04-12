@@ -3,8 +3,8 @@
 namespace App\Flare\ServerFight\Fight;
 
 use App\Flare\ServerFight\BattleBase;
-use App\Flare\Builders\Character\CharacterCacheData;
 use App\Flare\Traits\ElementAttackData;
+use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 
 class ElementalAttack extends BattleBase {
 

@@ -2,13 +2,13 @@
 
 namespace App\Game\Shop\Services;
 
-use App\Flare\Jobs\CharacterAttackTypesCacheBuilder;
 use App\Flare\Models\Character;
 use App\Flare\Models\Inventory;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 use App\Flare\Transformers\ItemTransformer;
-use App\Game\CharacterInventory\Services\EquipItemService;
+use App\Game\Character\Builders\AttackBuilders\Jobs\CharacterAttackTypesCacheBuilder;
+use App\Game\Character\CharacterInventory\Services\EquipItemService;
 use App\Game\Shop\Events\BuyItemEvent;
 use App\Game\Shop\Events\SellItemEvent;
 use Facades\App\Flare\Calculators\SellItemCalculator;

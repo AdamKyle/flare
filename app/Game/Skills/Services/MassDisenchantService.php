@@ -2,13 +2,13 @@
 
 namespace App\Game\Skills\Services;
 
-use App\Game\CharacterInventory\Events\CharacterInventoryUpdateBroadCastEvent;
-use App\Game\Core\Events\UpdateTopBarEvent;
-use App\Flare\Values\MaxCurrenciesValue;
 use App\Flare\Models\Character;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Skill;
 use App\Flare\Values\ItemEffectsValue;
+use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\Character\CharacterInventory\Events\CharacterInventoryUpdateBroadCastEvent;
+use App\Game\Core\Events\UpdateTopBarEvent;
 use Illuminate\Support\Collection;
 
 class MassDisenchantService {

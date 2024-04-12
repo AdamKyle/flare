@@ -2,14 +2,11 @@
 
 namespace App\Game\ClassRanks\Controllers\Api;
 
-use App\Flare\Handlers\UpdateCharacterAttackTypes;
 use App\Flare\Models\Character;
-use App\Flare\Models\CharacterClassRank;
 use App\Flare\Models\CharacterClassSpecialtiesEquipped;
 use App\Flare\Models\GameClassSpecial;
+use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
 use App\Game\ClassRanks\Services\ClassRankService;
-use App\Game\ClassRanks\Values\ClassSpecialValue;
-use App\Game\ClassRanks\Values\WeaponMasteryValue;
 use App\Http\Controllers\Controller;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -22,15 +19,15 @@ class ClassRanksController extends Controller {
     private ClassRankService $classRankService;
 
     /**
-     * @var UpdateCharacterAttackTypes $updateCharacterAttackTypes
+     * @var UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes
      */
-    private UpdateCharacterAttackTypes $updateCharacterAttackTypes;
+    private UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes;
 
     /**
      * @param ClassRankService $classRankService
-     * @param UpdateCharacterAttackTypes $updateCharacterAttackTypes
+     * @param UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes
      */
-    public function __construct(ClassRankService $classRankService, UpdateCharacterAttackTypes $updateCharacterAttackTypes) {
+    public function __construct(ClassRankService $classRankService, UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes) {
         $this->classRankService           = $classRankService;
         $this->updateCharacterAttackTypes = $updateCharacterAttackTypes;
     }

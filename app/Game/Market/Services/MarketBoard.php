@@ -2,16 +2,16 @@
 
 namespace App\Game\Market\Services;
 
-use Illuminate\Http\Request;
-use App\Flare\Jobs\CharacterAttackTypesCacheBuilder;
 use App\Flare\Models\Character;
 use App\Flare\Models\InventorySlot;
-use App\Flare\Models\MarketHistory;
 use App\Flare\Models\MarketBoard as MarketBoardModel;
+use App\Flare\Models\MarketHistory;
 use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\Character\Builders\AttackBuilders\Jobs\CharacterAttackTypesCacheBuilder;
+use App\Game\Character\CharacterInventory\Services\EquipItemService;
 use App\Game\Core\Events\UpdateTopBarEvent;
-use App\Game\CharacterInventory\Services\EquipItemService;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
+use Illuminate\Http\Request;
 
 class MarketBoard {
 

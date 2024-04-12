@@ -2,9 +2,9 @@
 
 namespace App\Flare\ServerFight\Pvp;
 
-use App\Flare\Builders\Character\CharacterCacheData;
 use App\Flare\Models\Character;
 use App\Flare\ServerFight\Fight\CharacterAttacks\BaseCharacterAttack;
+use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 
 class PvpAttack extends PvpBase {
 

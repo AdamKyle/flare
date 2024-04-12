@@ -3,7 +3,6 @@
 
 namespace App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks;
 
-use App\Flare\Builders\Character\CharacterCacheData;
 use App\Flare\Models\Character;
 use App\Flare\ServerFight\BattleBase;
 

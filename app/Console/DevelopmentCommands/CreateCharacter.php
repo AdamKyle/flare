@@ -2,11 +2,11 @@
 
 namespace App\Console\DevelopmentCommands;
 
-use App\Flare\Builders\CharacterBuilder;
 use App\Flare\Models\GameClass;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\GameRace;
 use App\Flare\Models\User;
+use App\Game\Character\CharacterCreation\Services\CharacterBuilderService;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
@@ -30,7 +30,7 @@ class CreateCharacter extends Command {
     /**
      * Execute the console command.
      */
-    public function handle(CharacterBuilder $characterBuilder) {
+    public function handle(CharacterBuilderService $characterBuilder) {
         $map = GameMap::where('default', true)->first();
 
         $race = $this->choice('Which Race?', GameRace::all()->pluck('name')->toArray());

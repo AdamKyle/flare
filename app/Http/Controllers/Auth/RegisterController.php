@@ -2,25 +2,25 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Flare\Jobs\RegisterMessage;
+use App\Flare\Models\GameClass;
+use App\Flare\Models\GameMap;
+use App\Flare\Models\GameRace;
+use App\Flare\Models\User;
+use App\Flare\Services\CanUserEnterSiteService;
+use App\Game\Character\CharacterCreation\Events\CreateCharacterEvent;
+use App\Http\Controllers\Controller;
 use Exception;
-use Illuminate\Contracts\Validation\Validator as RequestValidator;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Auth\Events\Registered;
+use Illuminate\Contracts\Validation\Validator as RequestValidator;
 use Illuminate\Foundation\Auth\RegistersUsers;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
-use App\Http\Controllers\Controller;
-use App\Flare\Events\CreateCharacterEvent;
-use App\Flare\Models\GameRace;
-use App\Flare\Models\GameClass;
-use App\Flare\Models\GameMap;
-use App\Flare\Models\User;
-use App\Flare\Jobs\RegisterMessage;
-use App\Flare\Services\CanUserEnterSiteService;
 
 class RegisterController extends Controller {
 

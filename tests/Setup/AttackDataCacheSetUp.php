@@ -2,9 +2,7 @@
 
 namespace Tests\Setup;
 
-use App\Flare\Models\Character;
-use Cache;
-use App\Flare\Services\BuildCharacterAttackTypes;
+use App\Game\Character\Builders\AttackBuilders\Services\BuildCharacterAttackTypes;
 
 class AttackDataCacheSetUp {
 

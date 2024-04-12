@@ -6,12 +6,12 @@ use App\Flare\Models\Character;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Item;
 use App\Flare\Models\Skill;
-use App\Flare\Events\UpdateSkillEvent;
 use App\Game\Core\Events\CraftedItemTimeOutEvent;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use App\Game\Core\Traits\ResponseBuilder;
-use App\Game\Skills\Services\Traits\UpdateCharacterCurrency;
 use App\Game\Messages\Events\ServerMessageEvent;
+use App\Game\Skills\Events\UpdateSkillEvent;
+use App\Game\Skills\Services\Traits\UpdateCharacterCurrency;
 use App\Game\Skills\Values\SkillTypeValue;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 

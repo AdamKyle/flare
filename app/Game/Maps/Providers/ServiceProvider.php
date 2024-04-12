@@ -2,29 +2,29 @@
 
 namespace App\Game\Maps\Providers;
 
-use App\Flare\Builders\Character\CharacterCacheData;
-use App\Flare\Handlers\UpdateCharacterAttackTypes;
-use App\Game\Maps\Services\PctService;
-use App\Game\Maps\Services\SetSailService;
-use App\Game\Maps\Services\TeleportService;
-use App\Game\Maps\Services\WalkingService;
-use League\Fractal\Manager;
-use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use App\Flare\Cache\CoordinatesCache;
-use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Flare\Services\BuildMonsterCacheService;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Flare\Transformers\MonsterTransformer;
 use App\Game\Battle\Services\ConjureService;
-use App\Game\Maps\Console\Commands\UpdateMapCount;
-use App\Game\Maps\Services\TraverseService;
-use App\Game\Maps\Values\MapTileValue;
+use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
+use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
+use App\Game\Character\Builders\AttackBuilders\Services\BuildCharacterAttackTypes;
 use App\Game\Maps\Calculations\DistanceCalculation;
+use App\Game\Maps\Console\Commands\UpdateMapCount;
 use App\Game\Maps\Services\LocationService;
 use App\Game\Maps\Services\MovementService;
+use App\Game\Maps\Services\PctService;
 use App\Game\Maps\Services\PortService;
-use App\Game\Maps\Values\MapPositionValue;
+use App\Game\Maps\Services\SetSailService;
+use App\Game\Maps\Services\TeleportService;
+use App\Game\Maps\Services\TraverseService;
 use App\Game\Maps\Services\UpdateRaidMonsters;
+use App\Game\Maps\Services\WalkingService;
+use App\Game\Maps\Values\MapPositionValue;
+use App\Game\Maps\Values\MapTileValue;
+use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
+use League\Fractal\Manager;
 
 class ServiceProvider extends ApplicationServiceProvider
 {
@@ -118,7 +118,7 @@ class ServiceProvider extends ApplicationServiceProvider
             return new LocationService(
                 $app->make(CoordinatesCache::class),
                 $app->make(CharacterCacheData::class),
-                $app->make(UpdateCharacterAttackTypes::class),
+                $app->make(UpdateCharacterAttackTypesHandler::class),
             );
         });
 

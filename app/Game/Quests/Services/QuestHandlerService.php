@@ -2,11 +2,11 @@
 
 namespace App\Game\Quests\Services;
 
-use App\Flare\Jobs\CharacterAttackTypesCacheBuilder;
 use App\Flare\Models\Character;
 use App\Flare\Models\Event;
 use App\Flare\Models\Npc;
 use App\Flare\Models\Quest;
+use App\Game\Character\Builders\AttackBuilders\Jobs\CharacterAttackTypesCacheBuilder;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Maps\Events\UpdateMap;
 use App\Game\Maps\Events\UpdateMonsterList;

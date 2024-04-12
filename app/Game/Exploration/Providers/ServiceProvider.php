@@ -3,9 +3,9 @@
 namespace App\Game\Exploration\Providers;
 
 
-use App\Flare\Builders\Character\CharacterCacheData;
 use App\Flare\ServerFight\MonsterPlayerFight;
 use App\Game\Battle\Handlers\BattleEventHandler;
+use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use App\Game\Exploration\Middleware\IsCharacterExploring;
 use App\Game\Exploration\Services\ExplorationAutomationService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;

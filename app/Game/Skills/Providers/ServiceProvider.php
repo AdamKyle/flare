@@ -2,20 +2,20 @@
 
 namespace App\Game\Skills\Providers;
 
-use App\Flare\Builders\CharacterInformation\CharacterStatBuilder;
 use App\Flare\Builders\RandomAffixGenerator;
-use App\Flare\Handlers\UpdateCharacterAttackTypes;
 use App\Flare\Transformers\BasicSkillsTransformer;
 use App\Flare\Transformers\SkillsTransformer;
-use App\Game\CharacterInventory\Services\CharacterInventoryService;
+use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
+use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
+use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Events\Services\EventGoalsService;
 use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
 use App\Game\NpcActions\QueenOfHeartsActions\Services\RandomEnchantmentService;
+use App\Game\Skills\Builders\GemBuilder;
 use App\Game\Skills\Handlers\HandleUpdatingCraftingGlobalEventGoal;
 use App\Game\Skills\Handlers\HandleUpdatingEnchantingGlobalEventGoal;
 use App\Game\Skills\Handlers\UpdateCraftingTasksForFactionLoyalty;
 use App\Game\Skills\Handlers\UpdateItemSkill;
-use App\Game\Skills\Builders\GemBuilder;
 use App\Game\Skills\Services\AlchemyService;
 use App\Game\Skills\Services\CraftingService;
 use App\Game\Skills\Services\DisenchantService;
@@ -29,7 +29,6 @@ use App\Game\Skills\Services\SkillCheckService;
 use App\Game\Skills\Services\SkillService;
 use App\Game\Skills\Services\TrinketCraftingService;
 use App\Game\Skills\Services\UpdateCharacterSkillsService;
-use Deployer\Component\PharUpdate\Update;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use League\Fractal\Manager;
 
@@ -101,7 +100,7 @@ class ServiceProvider extends ApplicationServiceProvider {
                 $app->make(Manager::class),
                 $app->make(BasicSkillsTransformer::class),
                 $app->make(SkillsTransformer::class),
-                $app->make(UpdateCharacterAttackTypes::class),
+                $app->make(UpdateCharacterAttackTypesHandler::class),
             );
         });
 
@@ -149,7 +148,7 @@ class ServiceProvider extends ApplicationServiceProvider {
 
         $this->app->bind(UpdateItemSkill::class, function ($app) {
             return new UpdateItemSkill(
-                $app->make(UpdateCharacterAttackTypes::class),
+                $app->make(UpdateCharacterAttackTypesHandler::class),
             );
         });
     }
