@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateEvent;
 use Tests\Traits\CreateFactionLoyalty;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateMonster;
