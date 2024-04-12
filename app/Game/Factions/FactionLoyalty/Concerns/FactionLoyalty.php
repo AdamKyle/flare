@@ -3,8 +3,11 @@
 namespace App\Game\Factions\FactionLoyalty\Concerns;
 
 use App\Flare\Models\Character;
+use App\Flare\Models\Event;
 use App\Flare\Models\FactionLoyalty as FactionLoyaltyModel;
 use App\Flare\Models\FactionLoyaltyNpc;
+use App\Flare\Models\ScheduledEvent;
+use App\Game\Events\Values\EventType;
 
 trait FactionLoyalty {
 
@@ -60,8 +63,17 @@ trait FactionLoyalty {
         $existingFame = $helpingNpc->current_fame;
 
         $tasks = array_map(function ($task) use ($key, $id) {
+
+            $amount = min($task['current_amount'] + 1, $task['required_amount']);
+
+            $event = Event::where('type', EventType::WEEKLY_FACTION_LOYALTY_EVENT)->first();
+
+            if (!is_null($event)) {
+                $amount = min($task['current_amount'] + 2, $task['required_amount']);
+            }
+
             return isset($task[$key]) && ($task[$key] === $id) ?
-                array_merge($task, ['current_amount' => min($task['current_amount'] + 1, $task['required_amount'])]) :
+                array_merge($task, ['current_amount' => $amount]) :
                 $task;
         }, $helpingNpc->factionLoyaltyNpcTasks->fame_tasks);
 

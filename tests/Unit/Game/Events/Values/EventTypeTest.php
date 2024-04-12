@@ -25,6 +25,7 @@ class EventTypeTest extends TestCase {
             EventType::GOLD_MINES => 'Gold Mines',
             EventType::THE_OLD_CHURCH => 'The Old Church',
             EventType::DELUSIONAL_MEMORIES_EVENT => 'Delusional Memories Event',
+            EventType::WEEKLY_FACTION_LOYALTY_EVENT => 'Weekly Faction Loyalty Event',
         ];
 
         $this->assertEquals($expected, EventType::getOptionsForSelect());
@@ -60,5 +61,9 @@ class EventTypeTest extends TestCase {
 
     public function testIsTheOldChurch() {
         $this->assertTrue((new EventType(EventType::THE_OLD_CHURCH))->isTheOldChurchEvent());
+    }
+
+    public function testIsWeeklyFactionLoyaltyEvent() {
+        $this->assertTrue((new EventType(EventType::WEEKLY_FACTION_LOYALTY_EVENT))->isWeeklyFactionLoyaltyEvent());
     }
 }

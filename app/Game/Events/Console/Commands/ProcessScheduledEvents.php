@@ -3,6 +3,7 @@
 namespace App\Game\Events\Console\Commands;
 
 use App\Game\Events\Jobs\InitiateDelusionalMemoriesEvent;
+use App\Game\Events\Jobs\InitiateWeeklyFactionLoyaltyEvent;
 use Illuminate\Console\Command;
 use App\Flare\Models\ScheduledEvent;
 use App\Game\Events\Values\EventType;
@@ -62,6 +63,10 @@ class ProcessScheduledEvents extends Command {
 
             if ($eventType->isDelusionalMemoriesEvent()) {
                 InitiateDelusionalMemoriesEvent::dispatch($event->id)->delay(now()->addMinutes(5));
+            }
+
+            if ($eventType->isWeeklyFactionLoyaltyEvent()) {
+                InitiateWeeklyFactionLoyaltyEvent::dispatch($event->id)->delay(now()->addMinutes(5));
             }
         }
     }

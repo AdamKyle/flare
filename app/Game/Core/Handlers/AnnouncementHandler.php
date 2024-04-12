@@ -28,6 +28,7 @@ class AnnouncementHandler {
             'gold_mines' => $this->buildTheGoldMinesMessage(),
             'the_old_church' => $this->buildTheOldChurchMessage(),
             'delusional_memories_event' => $this->buildDelusionalMemoriesMessage(),
+            'weekly_faction_loyalty_event' => $this->buildWeeklyFactionLoyaltyEvent(),
             default => throw new Exception('Cannot determine announcement type'),
         };
     }
@@ -151,6 +152,26 @@ class AnnouncementHandler {
 
         $message = 'For one day only, ending: ' . $event->ends_at->format('l, j \of F \a\t h:ia \G\M\TP') . ' ' .
             'Players can get 1-50 of each type of currency, Gold Dust, Crystal Shards, Copper Coins (if you have the appropriate quest item). ';
+
+        $announcement = Announcement::create([
+            'message'    => $message,
+            'expires_at' => $event->ends_at,
+            'event_id'   => $event->id
+        ]);
+
+        event(new AnnouncementMessageEvent($message, $announcement->id));
+    }
+
+    public function buildWeeklyFactionLoyaltyEvent(): void {
+        $event = Event::where('type', EventType::WEEKLY_FACTION_LOYALTY_EVENT)->first();
+
+        if (is_null($event)) {
+            throw new Exception('Cannot create message for weekly celestial event, when no event exists.');
+        }
+
+        $message = 'For one day only, ending: ' . $event->ends_at->format('l, j \of F \a\t h:ia \G\M\TP') . ' ' .
+            'Players will get two points in their faction loyalty tasks when completing a task. When an NPC task list refreshes from gaining a level,' . ' ' .
+            'it will half the required amount of each task.';
 
         $announcement = Announcement::create([
             'message'    => $message,

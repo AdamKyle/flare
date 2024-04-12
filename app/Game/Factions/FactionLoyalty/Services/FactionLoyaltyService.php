@@ -4,6 +4,7 @@ namespace App\Game\Factions\FactionLoyalty\Services;
 
 
 use App\Flare\Models\Character;
+use App\Flare\Models\Event;
 use App\Flare\Models\Faction;
 use App\Flare\Models\FactionLoyalty;
 use App\Flare\Models\FactionLoyaltyNpc;
@@ -13,6 +14,7 @@ use App\Flare\Models\Monster;
 use App\Flare\Models\Npc;
 use App\Flare\Values\MapNameValue;
 use App\Game\Core\Traits\ResponseBuilder;
+use App\Game\Events\Values\EventType;
 use Exception;
 
 class FactionLoyaltyService {
@@ -300,11 +302,19 @@ class FactionLoyaltyService {
                 continue;
             }
 
+            $amount = rand(10, 50);
+
+            $event = Event::where('type', EventType::WEEKLY_FACTION_LOYALTY_EVENT)->first();
+
+            if (is_null($event)) {
+                $amount = ciel($amount / 2);
+            }
+
             $tasks[] = [
                 'type'            => $item->type,
                 'item_name'       => $item->affix_name,
                 'item_id'         => $item->id,
-                'required_amount' => rand(10, 50),
+                'required_amount' => $amount,
                 'current_amount'  => 0,
             ];
         }
@@ -334,11 +344,19 @@ class FactionLoyaltyService {
                 continue;
             }
 
+            $amount = rand(10, 50);
+
+            $event = Event::where('type', EventType::WEEKLY_FACTION_LOYALTY_EVENT)->first();
+
+            if (is_null($event)) {
+                $amount = ciel($amount / 2);
+            }
+
             $tasks[] = [
                 'type'            => 'bounty',
                 'monster_name'    => $monster->name,
                 'monster_id'      => $monster->id,
-                'required_amount' => rand(10, 50),
+                'required_amount' => $amount,
                 'current_amount'  => 0,
             ];
         }

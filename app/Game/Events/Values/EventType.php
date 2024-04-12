@@ -25,6 +25,8 @@ class EventType {
 
     const DELUSIONAL_MEMORIES_EVENT   = 8;
 
+    const WEEKLY_FACTION_LOYALTY_EVENT = 9;
+
     /**
      * @var int $value
      */
@@ -43,6 +45,7 @@ class EventType {
         6 => self::GOLD_MINES,
         7 => self::THE_OLD_CHURCH,
         8 => self::DELUSIONAL_MEMORIES_EVENT,
+        9 => self::WEEKLY_FACTION_LOYALTY_EVENT,
     ];
 
     protected static array $selection = [
@@ -54,7 +57,8 @@ class EventType {
         5 => 'Purgatory Smith House',
         6 => 'Gold Mines',
         7 => 'The Old Church',
-        8 => 'Delusional Memories Event'
+        8 => 'Delusional Memories Event',
+        9 => 'Weekly Faction Loyalty Event',
     ];
 
     /**
@@ -168,5 +172,14 @@ class EventType {
      */
     public function isDelusionalMemoriesEvent(): bool {
         return $this->value === self::DELUSIONAL_MEMORIES_EVENT;
+    }
+
+    /**
+     * Is Delusional Memories Event?
+     *
+     * @return bool
+     */
+    public function isWeeklyFactionLoyaltyEvent(): bool {
+        return $this->value === self::WEEKLY_FACTION_LOYALTY_EVENT;
     }
 }

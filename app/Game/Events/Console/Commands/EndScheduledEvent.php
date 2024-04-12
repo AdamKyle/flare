@@ -163,6 +163,16 @@ class EndScheduledEvent extends Command {
                 event(new UpdateScheduledEvents($eventSchedulerService->fetchEvents()));
             }
 
+            if ($eventType->isWeeklyFactionLoyaltyEvent()) {
+                $this->endWeeklyFactionLoyaltyEvent($currentEvent);
+
+                $event->update([
+                    'currently_running' => false,
+                ]);
+
+                event(new UpdateScheduledEvents($eventSchedulerService->fetchEvents()));
+            }
+
             if ($eventType->isMonthlyPVP()) {
                 $event->update([
                     'currently_running' => false,
@@ -258,6 +268,25 @@ class EndScheduledEvent extends Command {
     protected function endWeeklyCurrencyDrops(Event $event): void {
 
         event(new GlobalMessageEvent('Weekly currency drops have come to an end! Come back next sunday for another chance!'));
+
+        $announcement = Announcement::where('event_id', $event->id)->first();
+
+        event(new DeleteAnnouncementEvent($announcement->id));
+
+        $announcement->delete();
+
+        $event->delete();
+    }
+
+    /**
+     * End Faction Loyalty Event.
+     *
+     * @param Event $event
+     * @return void
+     */
+    protected function endWeeklyFactionLoyaltyEvent(Event $event): void {
+
+        event(new GlobalMessageEvent('Weekly Faction Loyalty Event has come to an end. Next time Npc Tasks refresh from level up, they will be back to normal.'));
 
         $announcement = Announcement::where('event_id', $event->id)->first();
 
