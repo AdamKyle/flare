@@ -53,6 +53,10 @@ class ScheduledEvent extends Model {
             return 'Weekly Currency Drops';
         }
 
+        if ($type->isWeeklyFactionLoyaltyEvent()) {
+            return 'Weekly Faction Loyalty Event';
+        }
+
         if ($type->isMonthlyPVP()) {
             return 'Monthly PVP';
         }

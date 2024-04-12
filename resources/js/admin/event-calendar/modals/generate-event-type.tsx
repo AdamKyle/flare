@@ -47,6 +47,10 @@ export default class GenerateEventType extends React.Component<
                 label: "Weekly Currency Drops",
                 value: "2",
             },
+            {
+                label: "Weekly Faction Loyalty Event",
+                value: "9",
+            },
         ];
 
         this.generate_options = [

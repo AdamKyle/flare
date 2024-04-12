@@ -9,6 +9,10 @@
         $icon = 'ra-gem';
     }
 
+    if ($eventRunning->getTitleOfEvent() === 'Weekly Faction Loyalty Event') {
+        $icon = 'ra-sheriff';
+    }
+
     if ($eventRunning->getTitleOfEvent() === 'Monthly PVP') {
         $icon = 'ra-lightning-sword';
     }
@@ -39,6 +43,10 @@
 
         @if ($eventRunning->getTitleOfEvent() === 'Weekly Currency Drops')
             Get a boost to currencies like Gold Dust, Crystal Shards, and Copper Coins! Great for advanced crafting. This boon also applies to Slots and special locations!
+        @endif
+
+        @if ($eventRunning->getTitleOfEvent() === 'Weekly Faction Loyalty Event')
+            Get a boost to working on your Faction Loyalties. Gain 2 points instead of one. When the fame levels up, the requirements for the next level are halved!
         @endif
 
         @if ($eventRunning->getTitleOfEvent() === 'Monthly PVP')
