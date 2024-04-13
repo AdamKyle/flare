@@ -9,6 +9,7 @@ use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\DefenceBui
 use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ElementalAtonement;
 use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\HealingBuilder;
 use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\HolyBuilder;
+use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ItemSkillAttribute;
 use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ReductionsBuilder;
 use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
 use App\Game\Gems\Services\GemComparison;
@@ -22,6 +23,11 @@ class ServiceProvider extends ApplicationServiceProvider {
      * @return void
      */
     public function register() {
+
+        $this->app->bind(itemSkillAttribute::class, function() {
+            return new itemSkillAttribute();
+        });
+
         $this->app->bind(DefenceBuilder::class, function() {
             return new DefenceBuilder();
         });
