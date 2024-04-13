@@ -158,7 +158,9 @@ class CharacterAttackBuilder {
      * @return array
      */
     protected function fetchClassSpecialDamageInfo():array {
-        $classSpecialEquipped = $this->character->classSpecialsEquipped->where('equipped', true)->where('specialty_damage', '>', 0)->first();
+        $classSpecialEquipped = $this->character->classSpecialsEquipped()->where('equipped', true)->whereHas('gameClassSpecial', function($query) {
+            $query->where('specialty_damage', '>', 0);
+        })->first();
 
         if (is_null($classSpecialEquipped)) {
             return [];

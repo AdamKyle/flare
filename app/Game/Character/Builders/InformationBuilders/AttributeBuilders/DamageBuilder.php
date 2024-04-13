@@ -236,7 +236,7 @@ class DamageBuilder extends BaseAttribute {
         }
 
         $hasPurgatoryItem = $this->character->inventory->slots->filter(function($slot) {
-            return $slot->item->type === ItemEffectsValue::PURGATORY;
+            return $slot->item->type === 'quest' && $slot->item->effect === ItemEffectsValue::PURGATORY;
         })->first();
 
         if (!is_null($hasPurgatoryItem)) {

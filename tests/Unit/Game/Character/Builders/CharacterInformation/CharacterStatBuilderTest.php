@@ -1,9 +1,10 @@
 <?php
 
-namespace Tests\Unit\Flare\Builders\CharacterInformation;
+namespace Tests\Unit\Game\Character\Builders\CharacterInformation;
 
 use App\Flare\Values\CharacterClassValue;
 use App\Flare\Values\ItemEffectsValue;
+use App\Flare\Values\MapNameValue;
 use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\HolyBuilder;
 use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ReductionsBuilder;
 use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
@@ -167,6 +168,46 @@ class CharacterStatBuilderTest extends TestCase {
         $moddedStr = $this->characterStatBuilder->setCharacter($character)->statMod('str');
 
         $this->assertEquals($str, $moddedStr);
+    }
+
+    public function testModdedStatShouldBeTheSameWhenIgnoreReductionsIsTrue() {
+        $character = $this->character->getCharacter();
+
+        $str       = $character->str;
+        $moddedStr = $this->characterStatBuilder->setCharacter($character, true)->statMod('str');
+
+        $this->assertEquals($str, $moddedStr);
+    }
+
+    public function testModdedStatShouldBeHalfWhenCharacterHasPurgatoryAccessAndIsOnTheIcePlane() {
+        $character = $this->character->inventoryManagement()->giveItem($this->createItem([
+            'type' => 'quest',
+            'effect' => ItemEffectsValue::PURGATORY,
+        ]))->getCharacter();
+
+        $map = $this->createGameMap([
+            'name'                       => MapNameValue::ICE_PLANE,
+            'path'                       => '...',
+            'default'                    => false,
+            'kingdom_color'              => '#fff',
+            'xp_bonus'                   => 0,
+            'skill_training_bonus'       => 0,
+            'drop_chance_bonus'          => 0,
+            'enemy_stat_bonus'           => 0,
+            'character_attack_reduction' => 0.50,
+            'required_location_id'       => null
+        ]);
+
+        $character->map()->update([
+            'game_map_id' => $map->id,
+        ]);
+
+        $character = $character->refresh();
+
+        $str       = $character->str;
+        $moddedStr = $this->characterStatBuilder->setCharacter($character)->statMod('str');
+
+        $this->assertLessThan($str, $moddedStr);
     }
 
     public function testModdedStatShouldBeHigher() {
@@ -702,6 +743,22 @@ class CharacterStatBuilderTest extends TestCase {
         $item = $this->createItem(['name' => 'sample', 'type' => 'spell-healing', 'base_healing' => 100]);
 
         $character = $this->character->inventoryManagement()->giveItem($item)->equipItem('spell-one', 'sample')->getCharacter();
+
+        $damage = $this->characterStatBuilder->setCharacter($character)->positionalHealing('spell-one');
+
+        $this->assertGreaterThan(0, $damage);
+    }
+
+    public function testGetPositionalHealingWhenClassIsCleric() {
+        $cleric = $this->createClass(['name' => CharacterClassValue::CLERIC]);
+
+        $item = $this->createItem(['name' => 'sample', 'type' => 'spell-healing', 'base_healing' => 100]);
+
+        $character = $this->character->inventoryManagement()->giveItem($item)->equipItem('spell-one', 'sample')->getCharacter();
+
+        $character->update(['game_class_id' => $cleric->id]);
+
+        $character = $character->refresh();
 
         $damage = $this->characterStatBuilder->setCharacter($character)->positionalHealing('spell-one');
 
@@ -1352,6 +1409,184 @@ class CharacterStatBuilderTest extends TestCase {
         $amount    = $this->characterStatBuilder->setCharacter($character)->buildAffixDamage('life-stealing');
 
         $this->assertEquals((.99 - (.99 * .20)), $amount);
+    }
+
+    public function testBuildAffixLifeStealingVampireInHell() {
+        $itemPrefixAffix = $this->createItemAffix([
+            'name'                => 'Sample',
+            'chr_mod'             => 0.15,
+            'damage_amount'              => 1.0,
+            'steal_life_amount'   => 1.0,
+        ]);
+
+        $itemSuffixAffix = $this->createItemAffix([
+            'name'                => 'Sample',
+            'chr_mod'             => 0.15,
+            'damage_amount'       => 1.50,
+            'steal_life_amount'   => .10,
+        ]);
+
+        $item = $this->createItem([
+            'name'           => 'weapon',
+            'type'           => 'spell-healing',
+            'item_suffix_id' => $itemSuffixAffix->id,
+            'item_prefix_id' => $itemPrefixAffix->id,
+            'base_healing'   => 100
+        ]);
+
+        $character = $this->character->inventoryManagement()->giveItem($item)->equipItem('spell-one', 'weapon')->getCharacter();
+
+        $class     = $this->createClass(['name' => 'Vampire']);
+
+        $character->update(['game_class_id' => $class->id]);
+
+        $character = $character->refresh();
+
+        $map       = $this->createGameMap(['name' => MapNameValue::HELL]);
+
+        $character->map()->update(['game_map_id' => $map->id]);
+
+        $character = $character->refresh();
+
+        $amount    = $this->characterStatBuilder->setCharacter($character)->buildAffixDamage('life-stealing');
+
+        $this->assertEquals((.99 - (.99 * .10)), $amount);
+    }
+
+    public function testBuildAffixLifeStealingVampireInTwistedMemories() {
+        $itemPrefixAffix = $this->createItemAffix([
+            'name'                => 'Sample',
+            'chr_mod'             => 0.15,
+            'damage_amount'              => 1.0,
+            'steal_life_amount'   => 1.0,
+        ]);
+
+        $itemSuffixAffix = $this->createItemAffix([
+            'name'                => 'Sample',
+            'chr_mod'             => 0.15,
+            'damage_amount'       => 1.50,
+            'steal_life_amount'   => .10,
+        ]);
+
+        $item = $this->createItem([
+            'name'           => 'weapon',
+            'type'           => 'spell-healing',
+            'item_suffix_id' => $itemSuffixAffix->id,
+            'item_prefix_id' => $itemPrefixAffix->id,
+            'base_healing'   => 100
+        ]);
+
+        $character = $this->character->inventoryManagement()->giveItem($item)->equipItem('spell-one', 'weapon')->getCharacter();
+
+        $class     = $this->createClass(['name' => 'Vampire']);
+
+        $character->update(['game_class_id' => $class->id]);
+
+        $character = $character->refresh();
+
+        $map       = $this->createGameMap(['name' => MapNameValue::TWISTED_MEMORIES]);
+
+        $character->map()->update(['game_map_id' => $map->id]);
+
+        $character = $character->refresh();
+
+        $amount    = $this->characterStatBuilder->setCharacter($character)->buildAffixDamage('life-stealing');
+
+        $this->assertEquals((.99 - (.99 * .25)), $amount);
+    }
+
+    public function testBuildAffixLifeStealingVampireInEventMapIcePlaneWithAccessToPurgatory() {
+        $itemPrefixAffix = $this->createItemAffix([
+            'name'                => 'Sample',
+            'chr_mod'             => 0.15,
+            'damage_amount'       => 1.0,
+            'steal_life_amount'   => 1.0,
+        ]);
+
+        $itemSuffixAffix = $this->createItemAffix([
+            'name'                => 'Sample',
+            'chr_mod'             => 0.15,
+            'damage_amount'       => 1.50,
+            'steal_life_amount'   => .10,
+        ]);
+
+        $item = $this->createItem([
+            'name'           => 'weapon',
+            'type'           => 'spell-healing',
+            'item_suffix_id' => $itemSuffixAffix->id,
+            'item_prefix_id' => $itemPrefixAffix->id,
+            'base_healing'   => 100
+        ]);
+
+        $questItem = $this->createItem([
+            'type' => 'quest',
+            'effect' => ItemEffectsValue::PURGATORY,
+        ]);
+
+        $character = $this->character->inventoryManagement()->giveItem($item)->equipItem('spell-one', 'weapon')->giveItem($questItem)->getCharacter();
+
+        $class     = $this->createClass(['name' => 'Vampire']);
+
+        $character->update(['game_class_id' => $class->id]);
+
+        $character = $character->refresh();
+
+        $map       = $this->createGameMap(['name' => MapNameValue::ICE_PLANE]);
+
+        $character->map()->update(['game_map_id' => $map->id]);
+
+        $character = $character->refresh();
+
+        $amount    = $this->characterStatBuilder->setCharacter($character)->buildAffixDamage('life-stealing');
+
+        $this->assertEquals((.99 - (.99 * .20)), $amount);
+    }
+
+    public function testBuildAffixLifeStealingVampireInEventMapDelusionalMemoriesWithAccessToPurgatory() {
+        $itemPrefixAffix = $this->createItemAffix([
+            'name'                => 'Sample',
+            'chr_mod'             => 0.15,
+            'damage_amount'              => 1.0,
+            'steal_life_amount'   => 1.0,
+        ]);
+
+        $itemSuffixAffix = $this->createItemAffix([
+            'name'                => 'Sample',
+            'chr_mod'             => 0.15,
+            'damage_amount'       => 1.50,
+            'steal_life_amount'   => .10,
+        ]);
+
+        $item = $this->createItem([
+            'name'           => 'weapon',
+            'type'           => 'spell-healing',
+            'item_suffix_id' => $itemSuffixAffix->id,
+            'item_prefix_id' => $itemPrefixAffix->id,
+            'base_healing'   => 100
+        ]);
+
+        $questItem = $this->createItem([
+            'type' => 'quest',
+            'effect' => ItemEffectsValue::PURGATORY,
+        ]);
+
+        $character = $this->character->inventoryManagement()->giveItem($item)->equipItem('spell-one', 'weapon')->giveItem($questItem)->getCharacter();
+
+        $class     = $this->createClass(['name' => 'Vampire']);
+
+        $character->update(['game_class_id' => $class->id]);
+
+        $character = $character->refresh();
+
+        $map       = $this->createGameMap(['name' => MapNameValue::DELUSIONAL_MEMORIES]);
+
+        $character->map()->update(['game_map_id' => $map->id]);
+
+        $character = $character->refresh();
+
+        $amount    = $this->characterStatBuilder->setCharacter($character)->buildAffixDamage('life-stealing');
+
+        $this->assertEquals((.99 - (.99 * .30)), $amount);
     }
 
     public function testBuildInvalidAffixDamage() {

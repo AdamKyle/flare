@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Flare\Builders\CharacterInformation\AttributeBuilder;
+namespace Tests\Unit\Game\Character\Builders\CharacterInformation\AttributeBuilder;
 
 use App\Flare\Values\CharacterClassValue;
 use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\DamageBuilder;
