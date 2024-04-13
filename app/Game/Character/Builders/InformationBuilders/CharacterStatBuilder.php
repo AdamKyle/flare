@@ -13,11 +13,12 @@ use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\DefenceBui
 use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ElementalAtonement;
 use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\HealingBuilder;
 use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\HolyBuilder;
+use Facades\App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ItemSkillAttribute;
 use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ReductionsBuilder;
 use App\Game\Character\Concerns\Boons;
 use App\Game\Character\Concerns\FetchEquipped;
 use Exception;
-use Facades\App\Flare\Builders\CharacterInformation\AttributeBuilders\ItemSkillAttribute;
+
 use Illuminate\Support\Collection;
 
 class CharacterStatBuilder {
