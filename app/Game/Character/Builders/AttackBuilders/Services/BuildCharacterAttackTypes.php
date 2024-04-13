@@ -2,6 +2,7 @@
 
 namespace App\Game\Character\Builders\AttackBuilders\Services;
 
+use Exception;
 use Illuminate\Support\Facades\Cache;
 use App\Flare\Models\Character;
 use App\Flare\Transformers\Traits\SkillsTransformerTrait;
@@ -29,7 +30,7 @@ class BuildCharacterAttackTypes {
      * @param Character $character
      * @param bool $ignoreReductions
      * @return array
-     * @throws \Exception
+     * @throws Exception
      */
     public function buildCache(Character $character, bool $ignoreReductions = false): array {
 
