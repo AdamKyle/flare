@@ -196,6 +196,13 @@ export default class SmallActionsManager {
             });
         }
 
+        if (props.character.can_access_twisted_memories) {
+            options.push({
+                label: 'Twisted Earth',
+                value: 'twisted-earth-gear'
+            });
+        }
+
         return options;
     }
 

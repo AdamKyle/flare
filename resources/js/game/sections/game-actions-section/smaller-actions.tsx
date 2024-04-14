@@ -64,6 +64,7 @@ export default class SmallerActions extends React.Component<
             show_hell_forged_section: false,
             show_purgatory_chains_section: false,
             show_gambling_section: false,
+            show_twisted_earth_section: false,
         };
 
         // @ts-ignore
@@ -330,6 +331,12 @@ export default class SmallerActions extends React.Component<
         });
     }
 
+    manageTwistedEarthShop() {
+        this.setState({
+            selected_action: null,
+        });
+    }
+
     removeSlots() {
         this.setState({
             selected_action: null,
@@ -376,6 +383,7 @@ export default class SmallerActions extends React.Component<
                 character={this.props.character}
                 character_status={this.props.character_status}
                 crafting_time_out={this.state.crafting_time_out}
+                fame_tasks={this.props.fame_tasks}
             />
         );
     }
@@ -457,9 +465,14 @@ export default class SmallerActions extends React.Component<
         return (
             <SmallerSpecialtyShop
                 show_hell_forged_section={type === "hell-forged-gear"}
+                show_purgatory_chains_section={type === 'purgatory-chains-gear'}
+                show_twisted_earth_section={type === 'twisted-earth-gear'}
                 character={this.props.character}
                 manage_hell_forged_shop={this.manageHellForgedShop.bind(this)}
                 manage_purgatory_chain_shop={this.managePurgatoryChainShop.bind(
+                    this
+                )}
+                manage_twisted_earth_shop={this.manageTwistedEarthShop.bind(
                     this
                 )}
             />
@@ -486,6 +499,8 @@ export default class SmallerActions extends React.Component<
                 return this.showSpecialtyShop("hell-forged-gear");
             case "purgatory-chains-gear":
                 return this.showSpecialtyShop("purgatory-chains-gear");
+            case "twisted-earth-gear":
+                return this.showSpecialtyShop("twisted-earth-gear");
             case "slots":
                 return this.showSlots();
             default:
