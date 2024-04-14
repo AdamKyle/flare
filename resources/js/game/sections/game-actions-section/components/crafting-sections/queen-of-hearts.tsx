@@ -177,15 +177,15 @@ export default class QueenOfHearts extends React.Component<any, any> {
     buyItemOptions() {
         return [
             {
-                label: "10 Billion (Gold Cost) - Basic",
+                label: "20 Billion (Gold Cost) - Basic",
                 value: "basic",
             },
             {
-                label: "50 Billion (Gold Cost) - Medium",
+                label: "40 Billion (Gold Cost) - Medium",
                 value: "medium",
             },
             {
-                label: "100 Billion (Gold Cost) - Legendary",
+                label: "80 Billion (Gold Cost) - Legendary",
                 value: "legendary",
             },
         ];
