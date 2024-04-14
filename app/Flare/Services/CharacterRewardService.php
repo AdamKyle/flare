@@ -175,17 +175,14 @@ class CharacterRewardService {
             })->isNotEmpty();
 
             $shards = rand(1, 500);
-            $shards = $shards + $shards * $this->getShardBonus($this->character);
 
             $goldDust = rand(1, 500);
-            $goldDust = $goldDust + $goldDust * $this->getGoldDustBonus($this->character);
 
             $characterShards      = $this->character->shards + $shards;
             $characterGoldDust    = $this->character->gold_dust + $goldDust;
 
             if ($canHaveCopperCoins) {
                 $copperCoins = rand(1, 150);
-                $copperCoins = $copperCoins + $copperCoins * $this->getCopperCoinBonus($this->character);
 
                 $characterCopperCoins = $this->character->copper_coins + $copperCoins;
             } else {
