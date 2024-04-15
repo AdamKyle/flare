@@ -327,11 +327,20 @@ class ReRollEnchantmentService {
     }
 
     protected function changeAffix(Character $character, Item $item, ItemAffix $itemAffix, string $changeType) {
-        $amountPaid             = new RandomAffixDetails($itemAffix->cost);
+
+        $oldCost                = 100000000000; // Old Legendary Cost
+        $updateNewCost          = 0;
+
+        if ($oldCost === $itemAffix->cost) {
+            $updateNewCost = RandomAffixDetails::LEGENDARY;;
+        }
+
+        $amountPaid            = new RandomAffixDetails($updateNewCost > 0 ? $updateNewCost : $itemAffix->cost);
 
         $affixAttributeBuilder = $this->affixAttributeBuilder->setPercentageRange($amountPaid->getPercentageRange())
             ->setDamageRange($amountPaid->getDamageRange())
             ->setCharacterSkills($character->skills);
+
         if ($changeType === 'everything') {
             $changes = $affixAttributeBuilder->buildAttributes($itemAffix->type, $itemAffix->cost);
 
@@ -343,6 +352,10 @@ class ReRollEnchantmentService {
 
                 $changes = array_merge($changes, $affixAttributeBuilder->{$functionName}());
             }
+        }
+
+        if ($updateNewCost > 0) {
+            $changes['cost'] = $updateNewCost;
         }
 
         $duplicateAffix = $itemAffix->duplicate();

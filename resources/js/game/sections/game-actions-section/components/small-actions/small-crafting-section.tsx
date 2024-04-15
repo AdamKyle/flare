@@ -45,6 +45,7 @@ export default class SmallCraftingSection extends React.Component<SmallCraftingS
                             character_id={this.props.character.id}
                             user_id={this.props.character.user_id}
                             cannot_craft={this.craftingSectionManager.cannotCraft()}
+                            fame_tasks={this.props.fame_tasks}
                             is_small={true}
                         />
                     :

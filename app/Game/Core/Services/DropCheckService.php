@@ -94,7 +94,7 @@ class DropCheckService {
             if (!is_null($this->locationWithEffect->type)) {
                 $locationType = new LocationType($this->locationWithEffect->type);
 
-                if ($locationType->isPurgatoryDungeons()) {
+                if ($locationType->isPurgatoryDungeons() && $character->currentAutomations->isEmpty()) {
                     $this->handleMythicDrop($character);
                 }
             }
