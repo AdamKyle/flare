@@ -99,8 +99,6 @@ class Exploration implements ShouldQueue
 
             if ($this->encounter($response, $automation, $battleEventHandler, $params, $this->timeDelay)) {
 
-                $this->rewardAdditionalFactionPoints($factionHandler, $guideQuestService);
-
                 $time = now()->diffInMinutes($automation->completed_at);
 
                 $delay = $time >= $this->timeDelay ? $this->timeDelay : ($time > 1 ? $time : 0);
@@ -277,40 +275,6 @@ class Exploration implements ShouldQueue
         }
 
         return $automation->refresh();
-    }
-
-    /**
-     * Reward the faction points.
-     *
-     * @param FactionHandler $factionHandler
-     * @param GuideQuestService $guideQuestService
-     * @return void
-     */
-    protected function rewardAdditionalFactionPoints(FactionHandler $factionHandler, GuideQuestService $guideQuestService): void {
-        $map     = GameMap::find($this->character->map->game_map_id);
-        $faction = Faction::where('character_id', $this->character->id)->where('game_map_id', $map->id)->first();
-
-        if (is_null($faction)) {
-            return;
-        }
-
-        if ($faction->maxed) {
-            return;
-        }
-
-        $hasQuestItem = $factionHandler->playerHasQuestItem($this->character);
-
-        if ($faction->current_level == 0) {
-            $amount = 50;
-        } else if ($faction->current_level === 0 && $hasQuestItem) {
-            $amount = 25;
-        } else {
-            $amount = 10;
-        }
-
-        $this->sendOutEventLogUpdate('Gained: ' . $amount . ' Additional ' . $map->name . ' Faction points', false, true);
-
-        $factionHandler->handleCustomFactionAmount($this->character, $amount);
     }
 
     /**
