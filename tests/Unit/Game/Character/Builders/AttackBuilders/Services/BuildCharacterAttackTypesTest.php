@@ -59,7 +59,6 @@ class BuildCharacterAttackTypesTest extends TestCase {
 
         Cache::delete('character-attack-data-' . $character->id);
 
-        dump($this->buildCharacterAttackTypes, $this->useMockForAttackDataCache);
         $this->buildCharacterAttackTypes->buildCache($character);
 
         $this->assertNotNull(

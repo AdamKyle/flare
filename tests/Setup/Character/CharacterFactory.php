@@ -50,7 +50,7 @@ class CharacterFactory {
 
     private Character $character;
 
-    private $inventorySetManagement;
+    private ?InventorySetManagement $inventorySetManagement = null;
 
     /**
      * Creates a base character associated with a user.
@@ -62,9 +62,11 @@ class CharacterFactory {
      *
      * @param array $raceOptions
      * @param array|GameClass $classOptions
+     * @param bool $assignBaseSkill
+     * @param bool $assignPassiveSkills
      * @return CharacterFactory
      */
-    public function createBaseCharacter(array $raceOptions = [], array|GameClass $classOptions = []): CharacterFactory {
+    public function createBaseCharacter(array $raceOptions = [], array|GameClass $classOptions = [], bool $assignBaseSkill = true, bool $assignPassiveSkills = true): CharacterFactory {
 
         $race  = $this->createRace($raceOptions);
 
@@ -93,9 +95,13 @@ class CharacterFactory {
 
         $this->createGemBag();
 
-        $this->assignBaseSkills();
+        if ($assignBaseSkill) {
+            $this->assignBaseSkills();
+        }
 
-        $this->assignPassiveSkills();
+        if ($assignPassiveSkills) {
+            $this->assignPassiveSkills();
+        }
 
         $this->createClassRanks();
 
