@@ -14,7 +14,7 @@ class MapChatColor {
     // Special Event Maps
     const ICE_PLANE = '#aeb6d3';
     const TWISTED_MEMORIES = '#07917d';
-    const DELUSIONAL_MEMORIES = '#753dad';
+    const DELUSIONAL_MEMORIES = '#9159c9';
 
     /**
      * @var string $mapName
