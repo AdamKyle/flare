@@ -45,7 +45,7 @@ class CharacterBuilderServiceTest extends TestCase {
         $character = (new CharacterFactory())->createBaseCharacter([], [], false, false)->getCharacter();
 
         $classGameSkill = $this->createGameSkill([
-            'game_class_id' => $character->class_id
+            'game_class_id' => $character->game_class_id
         ]);
 
         $character = $this->characterBuilderService->setCharacter($character)->assignSkills()->character();
