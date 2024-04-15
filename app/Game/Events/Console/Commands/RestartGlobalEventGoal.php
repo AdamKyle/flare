@@ -47,6 +47,24 @@ class RestartGlobalEventGoal extends Command {
 
         $globalEvent = GlobalEventGoal::first();
 
+        if (!is_null($globalEvent->max_kills)) {
+            if ($globalEvent->total_kills < $globalEvent->max_kills) {
+                return;
+            }
+        }
+
+        if (!is_null($globalEvent->max_crafts)) {
+            if ($globalEvent->total_crafts < $globalEvent->max_crafts) {
+                return;
+            }
+        }
+
+        if (!is_null($globalEvent->max_enchants)) {
+            if ($globalEvent->total_enchants < $globalEvent->max_enchants) {
+                return;
+            }
+        }
+
         $event = Event::where('type', $globalEvent->event_type)->first();
 
         if (is_null($event)) {

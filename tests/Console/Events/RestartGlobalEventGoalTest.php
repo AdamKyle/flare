@@ -46,7 +46,7 @@ class RestartGlobalEventGoalTest extends TestCase {
         $this->character = null;
     }
 
-    public function testRestEventGoal() {
+    public function testResetEventGoal() {
 
         $event = $this->createEvent([
             'type' => EventType::DELUSIONAL_MEMORIES_EVENT
@@ -125,6 +125,80 @@ class RestartGlobalEventGoalTest extends TestCase {
 
         $this->assertNotEmpty($eventGoal->globalEventParticipation);
         $this->assertNotEmpty($eventGoal->globalEventKills);
+    }
+
+    public function testDoNotResetCraftingGoal() {
+
+        $event = $this->createEvent([
+            'type' => EventType::DELUSIONAL_MEMORIES_EVENT
+        ]);
+
+        $eventGoal = $this->createGlobalEventGoal([
+            'max_crafts'                     => 1000,
+            'reward_every'                   => 100,
+            'next_reward_at'                 => 100,
+            'event_type'                     => $event->type,
+            'item_specialty_type_reward'     => ItemSpecialtyType::CORRUPTED_ICE,
+            'should_be_unique'               => true,
+            'unique_type'                    => RandomAffixDetails::LEGENDARY,
+            'should_be_mythic'               => false,
+        ]);
+
+        $this->createGlobalEventCrafts([
+            'global_event_goal_id'  => $eventGoal->id,
+            'character_id'          => $this->character->id,
+            'crafts'                => 10,
+        ]);
+
+        $this->createGlobalEventParticipation([
+            'global_event_goal_id' => $eventGoal->id,
+            'character_id'         => $this->character->id,
+            'current_crafts'       => 10,
+        ]);
+
+        $this->artisan('restart:global-event-goal');
+
+        $eventGoal = $eventGoal->refresh();
+
+        $this->assertNotEmpty($eventGoal->globalEventParticipation);
+        $this->assertNotEmpty($eventGoal->globalEventCrafts);
+    }
+
+    public function testDoNotResetEnchantingGoal() {
+
+        $event = $this->createEvent([
+            'type' => EventType::DELUSIONAL_MEMORIES_EVENT
+        ]);
+
+        $eventGoal = $this->createGlobalEventGoal([
+            'max_enchants'                   => 1000,
+            'reward_every'                   => 100,
+            'next_reward_at'                 => 100,
+            'event_type'                     => $event->type,
+            'item_specialty_type_reward'     => ItemSpecialtyType::CORRUPTED_ICE,
+            'should_be_unique'               => true,
+            'unique_type'                    => RandomAffixDetails::LEGENDARY,
+            'should_be_mythic'               => false,
+        ]);
+
+        $this->createGlobalEventEnchants([
+            'global_event_goal_id'  => $eventGoal->id,
+            'character_id'          => $this->character->id,
+            'enchants'              => 10,
+        ]);
+
+        $this->createGlobalEventParticipation([
+            'global_event_goal_id' => $eventGoal->id,
+            'character_id'         => $this->character->id,
+            'current_enchants'     => 10,
+        ]);
+
+        $this->artisan('restart:global-event-goal');
+
+        $eventGoal = $eventGoal->refresh();
+
+        $this->assertNotEmpty($eventGoal->globalEventParticipation);
+        $this->assertNotEmpty($eventGoal->globalEventEnchants);
     }
 
     public function testFailToMoveToNextStepWhenEventDoesNotExist() {
