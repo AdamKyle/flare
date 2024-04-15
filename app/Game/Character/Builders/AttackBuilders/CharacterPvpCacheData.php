@@ -31,10 +31,6 @@ class CharacterPvpCacheData {
 
     }
 
-    public function removePlayerFromPvpCache(Character $character) {
-        Cache::delete('pvp-cache-' . $character->id);
-    }
-
     public function updatePlayerHealth(Character $character, int $health) {
         Cache::put('pvp-cache-' . $character->id, $health);
     }

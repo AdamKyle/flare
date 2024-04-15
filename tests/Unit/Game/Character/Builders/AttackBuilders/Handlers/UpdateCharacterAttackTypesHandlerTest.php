@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Game\Character\Builders\AttackBuilders\AttackDetails;
+namespace Tests\Unit\Game\Character\Builders\AttackBuilders\Handlers;
 
 use App\Flare\Models\Character;
 use App\Flare\Values\SpellTypes;

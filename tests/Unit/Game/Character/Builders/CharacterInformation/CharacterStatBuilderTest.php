@@ -49,6 +49,14 @@ class CharacterStatBuilderTest extends TestCase {
         $this->assertTrue($notEmpty);
     }
 
+    public function testGetCharacter() {
+        $character = $this->character->equipStartingEquipment()->getCharacter();
+
+        $characterStatBuilderCharacter = $this->characterStatBuilder->setCharacter($character)->character();
+
+        $this->assertEquals($character->name, $characterStatBuilderCharacter->name);
+    }
+
     public function testCharacterHasNoEquippedItem() {
         $character = $this->character->getCharacter();
 

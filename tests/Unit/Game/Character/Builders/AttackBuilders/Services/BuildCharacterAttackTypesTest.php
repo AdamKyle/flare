@@ -2,17 +2,12 @@
 
 namespace Tests\Unit\Game\Character\Builders\AttackBuilders\Services;
 
+use Cache;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\Models\Character;
 use App\Flare\Values\SpellTypes;
 use App\Flare\Values\WeaponTypes;
-use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
-use App\Game\Character\Builders\AttackBuilders\Jobs\CharacterAttackTypesCacheBuilderWithDeductions;
-use App\Game\Character\Builders\AttackBuilders\Jobs\CreateCharacterAttackData;
 use App\Game\Character\Builders\AttackBuilders\Services\BuildCharacterAttackTypes;
-use App\Game\Core\Events\UpdateCharacterAttacks;
-use Cache;
-use Event;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateItem;
@@ -26,6 +21,8 @@ class BuildCharacterAttackTypesTest extends TestCase {
     private ?BuildCharacterAttackTypes $buildCharacterAttackTypes;
 
     public function setUp(): void {
+        $this->useMockForAttackDataCache = false;
+
         parent::setUp();
 
         $this->character = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
@@ -58,9 +55,11 @@ class BuildCharacterAttackTypesTest extends TestCase {
     }
 
     public function testBuildCharacterAttackTypesData() {
-
         $character = $this->setUpCharacterForTests();
 
+        Cache::delete('character-attack-data-' . $character->id);
+
+        dump($this->buildCharacterAttackTypes, $this->useMockForAttackDataCache);
         $this->buildCharacterAttackTypes->buildCache($character);
 
         $this->assertNotNull(

@@ -13,6 +13,8 @@ abstract class TestCase extends BaseTestCase
 
     use CreatesApplication;
 
+    protected bool $useMockForAttackDataCache = true;
+
     public string $baseUrl = 'http://localhost';
 
     public ?AttackDataCacheSetUp $attackDataCacheSetUp;
@@ -22,14 +24,18 @@ abstract class TestCase extends BaseTestCase
 
         parent::setUp();
 
-        $this->attackDataCacheSetUp = new AttackDataCacheSetUp();
+        if ($this->useMockForAttackDataCache) {
+            $this->attackDataCacheSetUp = new AttackDataCacheSetUp();
 
-        $this->attackDataCacheSetUp->mockCacheBuilder($this->app);
+            $this->attackDataCacheSetUp->mockCacheBuilder($this->app);
+        }
     }
 
     public function tearDown(): void {
 
         $this->attackDataCacheSetUp = null;
+
+        $this->useMockForAttackDataCache = true;
 
         $this->cleanUp();
 
