@@ -13,6 +13,8 @@ class MapChatColor {
 
     // Special Event Maps
     const ICE_PLANE = '#aeb6d3';
+    const TWISTED_MEMORIES = '#07917d';
+    const DELUSIONAL_MEMORIES = '#753dad';
 
     /**
      * @var string $mapName
@@ -47,6 +49,10 @@ class MapChatColor {
                 return self::PURGATORY;
             case 'The Ice Plane':
                 return self::ICE_PLANE;
+            case 'Twisted Memories':
+                return self::TWISTED_MEMORIES;
+            case 'Delusional Memories':
+                return self::DELUSIONAL_MEMORIES;
             case 'Surface':
             default:
                 return self::SURFACE;
