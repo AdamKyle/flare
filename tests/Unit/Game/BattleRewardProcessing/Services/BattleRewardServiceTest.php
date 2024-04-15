@@ -273,6 +273,7 @@ class BattleRewardServiceTest extends TestCase {
         ]);
 
         $this->createGlobalEventGoal([
+            'max_kills'                       => 100,
             'event_type'                      => EventType::WINTER_EVENT,
             'item_specialty_type_reward'      => ItemSpecialtyType::CORRUPTED_ICE,
             'unique_type'                     => RandomAffixDetails::LEGENDARY,
@@ -310,6 +311,7 @@ class BattleRewardServiceTest extends TestCase {
         ]);
 
         $eventGoal = $this->createGlobalEventGoal([
+            'max_kills'                       => 100,
             'event_type'                      => EventType::WINTER_EVENT,
             'item_specialty_type_reward'      => ItemSpecialtyType::CORRUPTED_ICE,
             'unique_type'                     => RandomAffixDetails::LEGENDARY,
