@@ -3,6 +3,7 @@ import ComparisonProps from "./types/comparison-props";
 import clsx from "clsx";
 import {formatNumber} from "../../lib/game/format-number";
 import {ItemType} from "../items/enums/item-type";
+import {startCase} from "lodash";
 
 const coreAttributes = [
     'str', 'dex', 'dur', 'int', 'chr', 'agi', 'focus'
@@ -94,11 +95,23 @@ export default class Comparison extends React.Component<ComparisonProps, any> {
         return(
             <dl>
                 <dt>Base Healing</dt>
-                <dd className='text-green-700 dark:text-green-500'>+{formatNumber(this.props.comparison.healing_adjustment)}</dd>
+                <dd className={clsx({
+                    'text-green-700 dark:text-green-500' : this.isValueAboveZero(this.props.comparison.ac_adjustment),
+                    'text-red-700 dark:text-red-500' : this.isValueBeloZero(this.props.comparison.ac_adjustment),
+                    'text-gray-700 dark:text-white': this.props.comparison.ac_adjustment === 0,
+                })}>{formatNumber(this.props.comparison.healing_adjustment)}</dd>
                 <dt>Base Healing Mod</dt>
-                <dd className='text-green-700 dark:text-green-500'>+{(this.props.comparison.base_healing_adjustment * 100).toFixed(2)}%</dd>
+                <dd className={clsx({
+                    'text-green-700 dark:text-green-500' : this.isValueAboveZero(this.props.comparison.ac_adjustment),
+                    'text-red-700 dark:text-red-500' : this.isValueBeloZero(this.props.comparison.ac_adjustment),
+                    'text-gray-700 dark:text-white': this.props.comparison.ac_adjustment === 0,
+                })}>{(this.props.comparison.base_healing_adjustment * 100).toFixed(2)}%</dd>
                 <dt>Resurrection Chance</dt>
-                <dd className='text-green-700 dark:text-green-500'>+{(this.props.comparison.res_chance_adjustment * 100).toFixed(2)}%</dd>
+                <dd className={clsx({
+                    'text-green-700 dark:text-green-500' : this.isValueAboveZero(this.props.comparison.ac_adjustment),
+                    'text-red-700 dark:text-red-500' : this.isValueBeloZero(this.props.comparison.ac_adjustment),
+                    'text-gray-700 dark:text-white': this.props.comparison.ac_adjustment === 0,
+                })}>{(this.props.comparison.res_chance_adjustment * 100).toFixed(2)}%</dd>
             </dl>
         )
     }
@@ -130,9 +143,16 @@ export default class Comparison extends React.Component<ComparisonProps, any> {
     render() {
         return (
             <div>
-                <div className='grid md:grid-cols-2 gap-2'>
-                    {this.renderAttackOrDefenceAdjustment()}
-                </div>
+
+                <dl>
+                    <dt className={'text-orange-500 dark:text-orange-400'}>Equipped Position</dt>
+                    <dd>{startCase(this.props.comparison.position.replace('-', ' '))}</dd>
+                </dl>
+
+                <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2'></div>
+
+                {this.renderAttackOrDefenceAdjustment()}
+
                 <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2'></div>
                 <div>
                     <dl>

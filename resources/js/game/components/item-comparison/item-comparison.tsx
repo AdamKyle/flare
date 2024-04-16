@@ -178,6 +178,7 @@ export default class ItemComparison extends React.Component<ItemComparisonProps,
     }
 
     renderColumns() {
+        console.log(this.props.comparison_info);
         return (
             <div className={
                 clsx({
@@ -190,9 +191,16 @@ export default class ItemComparison extends React.Component<ItemComparisonProps,
                     your comparison data, if you
                     were to equip this item in the equipped items slot. This fabulous item will only cost you: {formatNumber(this.props.comparison_info.itemToEquip.cost)} gold!
                 </div>
-                <div className='grid md:grid-cols-2 gap-2'>
+                <div className='grid md:grid-cols-2 gap-4'>
                     <div>
-                        <ItemNameColorationText item={this.props.comparison_info.details[0]} custom_width={true} additional_css={'mt-4'} />
+                        <div className={'flex justify-between'}>
+                            <div>
+                                <ItemNameColorationText item={this.props.comparison_info.details[0]} custom_width={true} additional_css={'mt-4'} />
+                            </div>
+                            <div>
+                                <span className={'text-gray-600 dark:text-gray-200'}>({startCase(this.props.comparison_info.details[0].type.replace('-', ' '))})</span>
+                            </div>
+                        </div>
                         <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2"></div>
                         <Comparison comparison={this.props.comparison_info.details[0]} />
                         <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2"></div>
@@ -204,13 +212,23 @@ export default class ItemComparison extends React.Component<ItemComparisonProps,
                         </div>
                     </div>
                     <div>
-                        <ItemNameColorationText item={this.props.comparison_info.details[0]} custom_width={true} additional_css={'mt-4'} />
+                        <div className={'flex justify-between'}>
+                            <div>
+                                <ItemNameColorationText item={this.props.comparison_info.details[1]} custom_width={true}
+                                                        additional_css={'mt-4'}/>
+                            </div>
+                            <div>
+                                <span
+                                    className={'text-gray-600 dark:text-gray-200'}>({startCase(this.props.comparison_info.details[1].type.replace('-', ' '))})</span>
+                            </div>
+                        </div>
                         <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2"></div>
-                        <Comparison comparison={this.props.comparison_info.details[1]} />
+                        <Comparison comparison={this.props.comparison_info.details[1]}/>
                         <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2"></div>
                         <div className="flex items-center">
                             <div className='mr-2'>
-                                <PrimaryOutlineButton button_label={'See Expanded Details'} on_click={() => this.showExpandedComparison(this.props.comparison_info.details[1])} />
+                                <PrimaryOutlineButton button_label={'See Expanded Details'}
+                                                      on_click={() => this.showExpandedComparison(this.props.comparison_info.details[1])} />
                             </div>
                             {this.renderSecondaryActionButton()}
                         </div>
