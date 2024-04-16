@@ -184,8 +184,6 @@ class ItemComparisonControllerTest extends TestCase {
                 'id' => $gemSlotId
             ]);
 
-        dd($response);
-
         $jsonData = json_decode($response->getContent(), true);
 
         $this->assertNotEmpty($jsonData['comparison_data']['itemToEquip']['item']);
