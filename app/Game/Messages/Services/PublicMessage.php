@@ -127,6 +127,10 @@ class PublicMessage {
                 return 'PURG';
             case 'The Ice Plane':
                 return 'ICE';
+            case 'Twisted Memories':
+                return 'TWM';
+            case 'Delusional Memories':
+                return 'DM';
             case 'Surface':
             default:
                 return 'SUR';

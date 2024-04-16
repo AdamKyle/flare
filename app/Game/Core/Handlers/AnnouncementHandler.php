@@ -211,7 +211,7 @@ class AnnouncementHandler {
         }
 
         $message = 'From now until: ' . $event->ends_at->format('l, j \of F \a\t h:ia \G\M\TP') . ' ' .
-            'Players can enter, with no item requirements, The Delusional Memories Plane and fight fearsome creatures and take on Fliniguss The Corrupt Federation Leader. ' .
+            'Players can enter, with no item requirements, The Delusional Memories Plane and fight fearsome creatures and take on the Jester of Time who twist and deludes his own memories. ' .
             'All you have to is Traverse to participate in new quests, new raid, new gear and new global events where all players come ' .
             'together to help the Red Hawks push back an enemy from a time long forgotten!';
 
