@@ -2,16 +2,19 @@
 
 namespace Tests\Unit\Game\Character\CharacterCreation\Services;
 
+use App\Flare\Models\GameClass;
+use App\Flare\Values\CharacterClassValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Game\Character\CharacterCreation\Services\CharacterBuilderService;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateClass;
 use Tests\Traits\CreateGameSkill;
 use Tests\Traits\CreatePassiveSkill;
 
 class CharacterBuilderServiceTest extends TestCase {
 
-    use RefreshDatabase, CreateGameSkill, CreatePassiveSkill;
+    use RefreshDatabase, CreateGameSkill, CreatePassiveSkill, CreateClass;
 
     private ?CharacterBuilderService $characterBuilderService;
 
@@ -108,5 +111,23 @@ class CharacterBuilderServiceTest extends TestCase {
         $this->assertNotNull($characterParentPassive);
         $this->assertFalse($characterParentPassive->is_locked);
         $this->assertNotNull($characterChildPassive);
+    }
+
+    public function testAssignClassRanksToCharacter() {
+
+        foreach (CharacterClassValue::getClasses() as $className) {
+
+            if (is_null(GameClass::where('name', $className)->first())) {
+                $this->createClass([
+                    'name' => $className,
+                ]);
+            }
+        }
+
+        $character = (new CharacterFactory())->createBaseCharacter()->getCharacter();
+
+        $character = $this->characterBuilderService->setCharacter($character)->assignClassRanks()->character();
+
+        $this->assertNotEmpty($character->classRanks);
     }
 }

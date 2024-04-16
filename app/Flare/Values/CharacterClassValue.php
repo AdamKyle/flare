@@ -96,6 +96,13 @@ class CharacterClassValue {
     }
 
     /**
+     * @return string[]
+     */
+    public static function getClasses(): array {
+        return self::$values;
+    }
+
+    /**
      * Are we a fighter?
      *
      * @return bool

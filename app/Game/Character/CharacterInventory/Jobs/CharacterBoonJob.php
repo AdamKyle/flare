@@ -41,6 +41,7 @@ class CharacterBoonJob implements ShouldQueue {
             return;
         }
 
+        // @codeCoverageIgnoreStart
         if (!$boon->complete->lessThanOrEqualTo(now())) {
             $timeLeft = $boon->complete->diffInMinutes(now());
 
@@ -50,14 +51,13 @@ class CharacterBoonJob implements ShouldQueue {
                 $time = now()->addMinutes(15);
             }
 
-            // @codeCoverageIgnoreStart
             CharacterBoonJob::dispatch(
                 $boon->id,
             )->delay($time);
 
             return;
-            // @codeCoverageIgnoreEnd
         }
+        // @codeCoverageIgnoreEnd
 
         $character = $boon->character;
 
