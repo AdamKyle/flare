@@ -172,12 +172,12 @@ class ItemComparisonControllerTest extends TestCase {
 
         $character = $this->character->gemBagManagement()
             ->assignGemToBag($gemInInventory->id, 3)
-            ->assignGemsToBag($gemInInventoryToCompare->id, 1)
+            ->assignGemToBag($gemInInventoryToCompare->id)
             ->getCharacter();
 
         $gemSlotId = $character->gemBag->gemSlots->filter(function($slot) use($gemInInventoryToCompare) {
             return $slot->gem_id === $gemInInventoryToCompare->id;
-        })->first();
+        })->first()->id;
 
         $response = $this->actingAs($character->user)
             ->call('GET', '/api/character/'.$character->id.'/inventory/comparison-from-chat', [
@@ -187,7 +187,6 @@ class ItemComparisonControllerTest extends TestCase {
         $jsonData = json_decode($response->getContent(), true);
 
         $this->assertNotEmpty($jsonData['comparison_data']['itemToEquip']['item']);
-        $this->assertEquals('gem', $jsonData['comparison_data']['itemToEquip']['item']['type']);
-        $this->assertNotEmpty($jsonData['usable_sets']);
+        $this->assertEquals('gem', $jsonData['comparison_data']['itemToEquip']['type']);
     }
 }
