@@ -70,7 +70,7 @@ class GemBagManagement {
      * @param int $amount
      * @return $this
      */
-    public function assignGemToGab(int $gemId, int $amount = 1): GemBagManagement {
+    public function assignGemToBag(int $gemId, int $amount = 1): GemBagManagement {
         $this->character->gemBag->gemSlots()->create([
             'gem_bag_id' => $this->character->gemBag->id,
             'gem_id'     => $gemId,

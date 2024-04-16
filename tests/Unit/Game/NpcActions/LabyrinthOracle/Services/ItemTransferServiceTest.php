@@ -472,7 +472,7 @@ class ItemTransferServiceTest extends TestCase {
 
         $character = $character->getCharacterFactory()
             ->gemBagManagement()
-            ->assignGemToGab($gemToRemove->id)
+            ->assignGemToBag($gemToRemove->id)
             ->getCharacter();
 
         $character->update([

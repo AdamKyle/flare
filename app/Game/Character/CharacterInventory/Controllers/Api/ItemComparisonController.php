@@ -51,12 +51,7 @@ class ItemComparisonController extends Controller {
 
         if (is_null($itemToEquip)) {
 
-            $itemToEquip = InventorySlot::where('inventory_id', $inventory->id)->where('item_id', $request->id)->first();
-            $gemSlot     = $character->gemBag->gemSlots->find($request->id);
-
-            if (is_null($itemToEquip) && is_null($gemSlot)) {
-                return response()->json(['message' => 'Item does not exist  ...'], 404);
-            }
+            $gemSlot  = $character->gemBag->gemSlots->find($request->id);
 
             if (!is_null($gemSlot)) {
                 return response()->json([
@@ -69,6 +64,10 @@ class ItemComparisonController extends Controller {
                     'usable_sets'     => $this->characterInventoryService->setCharacter($character)->getInventoryForType('usable_sets')
                 ]);
             }
+        }
+
+        if (is_null($itemToEquip) && is_null($gemSlot)) {
+            return response()->json(['message' => 'Item does not exist  ...'], 404);
         }
 
         if ($itemToEquip->equipped) {
