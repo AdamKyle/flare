@@ -338,7 +338,8 @@ class EndScheduledEvent extends Command {
         $faction    = Faction::where('game_map_id', $gameMap->id)->first();
         $surfaceMap = GameMap::where('name', MapNameValue::SURFACE)->first();
 
-        Character::join('maps', 'maps.character_id', '=', 'characters.id')
+        Character::select('characters.*')
+            ->join('maps', 'maps.character_id', '=', 'characters.id')
             ->where('maps.game_map_id', $gameMap->id)
             ->chunk(100, function ($characters) use (
                 $traverseService,
