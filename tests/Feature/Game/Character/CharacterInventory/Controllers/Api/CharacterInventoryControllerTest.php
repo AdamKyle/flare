@@ -211,7 +211,7 @@ class CharacterInventoryControllerTest extends TestCase {
             ]);
 
         $jsonData = json_decode($response->getContent(), true);
-        
+
         $this->assertEquals('Removed ' . 2 . ' of ' . 2 . ' items from ' . $set->name . '. If all items were not moved over, it is because your inventory became full.', $jsonData['message']);
     }
 }

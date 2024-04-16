@@ -160,6 +160,25 @@ class InventorySetServiceTest extends TestCase {
         $this->assertEquals('Removed ' . $itemToRemove->affix_name . ' from ' . $setName . ' and placed back into your inventory.', $result['message']);
     }
 
+    public function testCanRemoveItemFromSetBecauseInventoryIsNotMaxedOutAndSetIsNotNamed() {
+        $itemToRemove = $this->createItem();
+        $character = $this->character
+            ->inventoryManagement()
+            ->getCharacterFactory()
+            ->inventorySetManagement()
+            ->createInventorySets(10)
+            ->putItemInSet($itemToRemove, 0)
+            ->getCharacter();
+
+        $result = $this->inventorySetService->removeItemFromInventorySet($character, $character->inventorySets()->first()->id, $character->inventorySets()->first()->slots->first()->id);
+
+        $character = $character->refresh();
+
+        $setName = 'Set 1';
+
+        $this->assertEquals('Removed ' . $itemToRemove->affix_name . ' from ' . $setName . ' and placed back into your inventory.', $result['message']);
+    }
+
     public function testEquipFullSet() {
         $itemTypes = [
             WeaponTypes::WEAPON,
