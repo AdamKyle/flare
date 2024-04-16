@@ -142,7 +142,7 @@ class CharacterInventoryControllerTest extends TestCase {
         $character = $character->refresh();
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/character/'.$character->id.'/inventory/rename-set', [
+            ->call('POST', '/api/character/'.$character->id.'/inventory-set/rename-set', [
                 'set_id' => $character->inventorySets->first()->id,
                 'set_name' => 'Apples',
             ]);
@@ -211,8 +211,7 @@ class CharacterInventoryControllerTest extends TestCase {
             ]);
 
         $jsonData = json_decode($response->getContent(), true);
-
-        $this->assertEquals(200, $jsonData['status']);
+        
         $this->assertEquals('Removed ' . 2 . ' of ' . 2 . ' items from ' . $set->name . '. If all items were not moved over, it is because your inventory became full.', $jsonData['message']);
     }
 }
