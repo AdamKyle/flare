@@ -8,7 +8,9 @@ use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 use App\Flare\Models\SetSlot;
 use App\Game\Character\CharacterInventory\Validations\SetHandsValidation;
+use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\ResponseBuilder;
+use App\Game\NpcActions\LabyrinthOracle\Events\LabyrinthOracleUpdate;
 
 class InventorySetService {
 
@@ -19,11 +21,15 @@ class InventorySetService {
      */
     private SetHandsValidation $setHandsValidation;
 
+    private CharacterInventoryService $characterInventoryService;
+
     /**
      * @param SetHandsValidation $setHandsValidation
+     * @param CharacterInventoryService $characterInventoryService
      */
-    public function __construct(SetHandsValidation $setHandsValidation) {
+    public function __construct(SetHandsValidation $setHandsValidation, CharacterInventoryService $characterInventoryService) {
         $this->setHandsValidation = $setHandsValidation;
+        $this->characterInventoryService = $characterInventoryService;
     }
 
     /**
@@ -71,25 +77,181 @@ class InventorySetService {
     }
 
     /**
-     * Allows us to remove an item from the set.
+     * Move an item to a set.
      *
-     * Returns a response object.
-     *
-     * @param InventorySet $inventorySet
-     * @param Item $item
-     * @param bool $ignoreInventoryLimit
+     * @param Character $character
+     * @param int $slotId
+     * @param int $setId
      * @return array
      */
-    public function removeItemFromInventorySet(InventorySet $inventorySet, Item $item, bool $ignoreInventoryLimit = false): array {
+    public function moveItemToSet(Character $character, int $slotId, int $setId): array {
+        $slot         = $character->inventory->slots()->find($slotId);
+        $inventorySet = $character->inventorySets()->find($setId);
+
+        if (is_null($slot) || is_null($inventorySet)) {
+
+            return $this->errorResult('Either the slot or the inventory set does not exist.');
+        }
+
+        $itemName = $slot->item->affix_name;
+
+        $this->assignItemToSet($inventorySet, $slot);
+
+        $character = $character->refresh();
+
+        event(new UpdateTopBarEvent($character));
+
+        event(new LabyrinthOracleUpdate($character));
+
+        $characterInventoryService = $this->characterInventoryService->setCharacter($character);
+
+        if (is_null($inventorySet->name)) {
+            $index     = $character->inventorySets->search(function ($set) use ($setId) {
+                return $set->id === $setId;
+            });
+
+            return $this->successResult([
+                'message'   => $itemName . ' Has been moved to: Set ' . $index + 1,
+                'inventory' => [
+                    'inventory' => $characterInventoryService->getInventoryForType('inventory'),
+                    'sets'      => $characterInventoryService->getInventoryForType('sets')['sets']
+                ]
+            ]);
+        }
+
+        return $this->successResult([
+            'message'   => $itemName . ' Has been moved to: ' . $inventorySet->name,
+            'inventory' => [
+                'inventory' => $characterInventoryService->getInventoryForType('inventory'),
+                'sets'      => $characterInventoryService->getInventoryForType('sets')['sets']
+            ]
+        ]);
+    }
+
+    /**
+     * Allows us to remove an item from the set.
+     *
+     * - Must own the inventory set
+     * - Inventory set cannot be equipped.
+     *
+     * @param Character $character
+     * @param int $inventorySetId
+     * @param int $slotIdToRemove
+     * @return array
+     */
+    public function removeItemFromInventorySet(Character $character, int $inventorySetId, int $slotIdToRemove): array {
+
+        $inventorySet = $character->inventorySets->find($inventorySetId);
+
+        if (is_null($inventorySet)) {
+            return $this->errorResult('Not allowed to do that.');
+        }
+
+        if ($inventorySet->is_equipped) {
+            return $this->errorResult('You cannot move an equipped item into your inventory from this set. Unequip the set first.');
+        }
+
+        $slot = $inventorySet->slots->find($slotIdToRemove);
+
+        if (is_null($slot)) {
+            return $this->errorResult('Item does not exist in this set.');
+        }
+
+        $item = $slot->item;
+
+
+        if (!$this->putItemFromInventorySetBackIntoCharacterInventory($character, $inventorySet, $item)) {
+            return $this->errorResult('Not enough inventory space to put this item back into your inventory.');
+        }
+
+        if (!is_null($inventorySet->name)) {
+            $setName = $inventorySet->name;
+        } else {
+            $index     = $character->inventorySets->search(function ($set) use ($inventorySetId) {
+                return $set->id === $inventorySetId;
+            });
+
+            $setName = 'Set ' . $index + 1;
+        }
+
+        event(new UpdateTopBarEvent($character));
+
+        $characterInventoryService = $this->characterInventoryService->setCharacter($character);
+
+        $sets = $characterInventoryService->getInventoryForType('sets');
+
+        return $this->successResult([
+            'message' => 'Removed ' . $item->affix_name . ' from ' . $setName . ' and placed back into your inventory.',
+            'inventory' => [
+                'inventory' => $characterInventoryService->getInventoryForType('inventory'),
+                'sets'      => $sets['sets'],
+            ]
+        ]);
+    }
+
+    /**
+     * Empty a characters set.
+     *
+     * @param Character $character
+     * @param InventorySet $inventorySet
+     * @return array
+     */
+    public function emptySet(Character $character, InventorySet $inventorySet): array {
+        if ($character->isInventoryFull()) {
+            return $this->errorResult('Your inventory is full. Cannot remove items from set.');
+        }
+
+        if ($character->id !== $inventorySet->character_id) {
+            return $this->errorResult('Cannot do that.');
+        }
+
+        $originalInventorySetCount = $inventorySet->slots->count();
+        $itemsRemoved              = 0;
+
+        // Only grab the amount of items your inventory can hold.
+        foreach ($inventorySet->slots as $slot) {
+            if ($this->putItemFromInventorySetBackIntoCharacterInventory($character, $inventorySet, $slot->item)) {
+                $itemsRemoved           += 1;
+
+                continue;
+            }
+
+            break;
+        }
+
+        $setIndex = $character->inventorySets->search(function ($set) use ($inventorySet) {
+            return $set->id === $inventorySet->id;
+        });
+
+        if (is_null($inventorySet->name)) {
+            $setName = 'Set ' . $setIndex + 1;
+        } else {
+            $setName = $inventorySet->name;
+        }
+
+        $character = $character->refresh();
+
+        event(new UpdateTopBarEvent($character->refresh()));
+
+        $inventory = $this->characterInventoryService->setCharacter($character);
+
+        return $this->successResult([
+            'message' => 'Removed ' . $itemsRemoved . ' of ' . $originalInventorySetCount . ' items from ' . $setName . '. If all items were not moved over, it is because your inventory became full.',
+            'inventory' => [
+                'inventory' => $inventory->getInventoryForType('inventory'),
+                'sets' => $inventory->getInventoryForType('sets')['sets'],
+            ]
+        ]);
+    }
+
+    public function putItemFromInventorySetBackIntoCharacterInventory(Character $character, InventorySet $inventorySet, Item $item): bool {
+        if ($character->isInventoryFull()) {
+            return false;
+        }
+
         $slotWithItem = $inventorySet->slots->filter(function($slot) use ($item) {
             return $slot->item_id === $item->id;
         })->first();
-
-        $character = $inventorySet->character;
-
-        if ($character->isInventoryFull() && !$ignoreInventoryLimit) {
-            return $this->errorResult('Not enough inventory space to put this item back into your inventory.');
-        }
 
         $character->inventory->slots()->create([
             'inventory_id' => $character->inventory->id,
@@ -104,10 +266,9 @@ class InventorySetService {
             'can_be_equipped' => $this->isSetEquippable($inventorySet),
         ]);
 
-        return $this->successResult([
-            'message' => 'Removed ' . $item->affix_name . ' from Set.',
-        ]);
+        return true;
     }
+
 
     /**
      * Equips an inventory set.
@@ -309,6 +470,101 @@ class InventorySetService {
         }
 
         return true;
+    }
+
+    /**
+     * Rename inventory set.
+     *
+     * - name cannot match any other set name.
+     *
+     * @param Character $character
+     * @param $setId
+     * @param string $setName
+     * @return array
+     */
+    public function renameInventorySet(Character $character, $setId, string $setName): array {
+        $inventorySet = $character->inventorySets->firstWhere('id', $setId);
+
+        if (is_null($inventorySet)) {
+
+            return $this->errorResult('Set does not exist.');
+        }
+
+        if ($character->inventorySets->where('name', $setName)->isNotEmpty()) {
+            return $this->errorResult('You already have a set with this name. Pick something else.');
+        }
+
+        $inventorySet->update([
+            'name' => $setName
+        ]);
+
+        $inventory = $this->characterInventoryService->setCharacter($character->refresh());
+
+        return $this->successResult([
+            'message' => 'Renamed set to: ' . $setName,
+            'inventory' => [
+                'sets'         => $inventory->getInventoryForType('sets')['sets'],
+                'usable_sets'  => $inventory->getInventoryForType('usable_sets'),
+                'savable_sets' => $inventory->getInventoryForType('savable_sets'),
+            ]
+        ]);
+    }
+
+    /**
+     * Take what ever is equipped and save it to a set. Equip that set.
+     *
+     * - Set must be empty to save equipped to it.
+     *
+     * @param Character $character
+     * @param int $setId
+     * @return array
+     */
+    public function saveEquippedItemsToSet(Character $character, int $setId): array {
+        $currentlyEquipped = $character->inventory->slots->filter(function ($slot) {
+            return $slot->equipped;
+        });
+
+        $inventorySet = $character->inventorySets()->find($setId);
+
+        if ($inventorySet->slots->isNotEmpty()) {
+            return $this->errorResult('Set must be empty.');
+        }
+
+        foreach ($currentlyEquipped as $equipped) {
+            $inventorySet->slots()->create(array_merge(['inventory_set_id' => $inventorySet->id], $equipped->getAttributes()));
+
+            $equipped->delete();
+        }
+
+        $inventorySet->update([
+            'is_equipped' => true,
+        ]);
+
+        $character = $character->refresh();
+
+        $setIndex = $character->inventorySets->search(function ($set) {
+            return $set->is_equipped;
+        });
+
+        $setName = 'Set ' . $setIndex + 1;
+
+        if (!is_null($inventorySet->name)) {
+            $setName = $inventorySet->name;
+        }
+
+        event(new UpdateTopBarEvent($character));
+
+        $inventory = $this->characterInventoryService->setCharacter($character);
+
+        return $this->successResult([
+            'message'   => $setName . ' is now equipped (equipment has been moved to the set).',
+            'inventory' => [
+                'sets'            => $inventory->getInventoryForType('sets')['sets'],
+                'usable_sets'     => $inventory->getInventoryForType('usable_sets'),
+                'savable_sets'    => $inventory->getInventoryForType('savable_sets'),
+                'set_is_equipped' => true,
+            ]
+        ]);
     }
 
     /**

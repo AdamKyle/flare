@@ -35,6 +35,11 @@ class  CharacterInventoryController extends Controller {
     private CharacterInventoryService $characterInventoryService;
 
     /**
+     * @var InventorySetService $inventorySetService
+     */
+    private InventorySetService $inventorySetService;
+
+    /**
      * @var UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes
      */
     private UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes;
@@ -46,16 +51,19 @@ class  CharacterInventoryController extends Controller {
 
     /**
      * @param CharacterInventoryService $characterInventoryService
+     * @param InventorySetService $inventorySetService
      * @param UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes
      * @param UseItemService $useItemService
      */
     public function __construct(
         CharacterInventoryService         $characterInventoryService,
+        InventorySetService               $inventorySetService,
         UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes,
         UseItemService                    $useItemService,
     ) {
 
         $this->characterInventoryService  = $characterInventoryService;
+        $this->inventorySetService = $inventorySetService;
         $this->updateCharacterAttackTypes = $updateCharacterAttackTypes;
         $this->useItemService = $useItemService;
     }
@@ -67,7 +75,7 @@ class  CharacterInventoryController extends Controller {
     public function inventory(Character $character): JsonResponse {
         $inventory = $this->characterInventoryService->setCharacter($character);
 
-        return response()->json($inventory->getInventoryForApi(), 200);
+        return response()->json($inventory->getInventoryForApi());
     }
 
     /**
@@ -100,42 +108,12 @@ class  CharacterInventoryController extends Controller {
      */
     public function destroy(Request $request, Character $character): JsonResponse {
 
-        $slot = $character->inventory->slots->filter(function ($slot) use ($request) {
-            return $slot->id === (int) $request->slot_id;
-        })->first();
+        $result = $this->characterInventoryService->setCharacter($character->refresh())->deleteItem($request->slot_id);
 
-        if (is_null($slot)) {
-            return response()->json(['message' => 'You don\'t own that item.'], 422);
-        }
+        $status = $result['status'];
+        unset($result['status']);
 
-        if ($slot->equipped) {
-            return response()->json(['message' => 'Cannot destroy equipped item.'], 422);
-        }
-
-        $name = $slot->item->affix_name;
-
-        $item = null;
-
-        if ($slot->item->type === 'artifact' && $slot->item->itemSkillProgressions->isNotEmpty()) {
-            $item = $slot->item;
-        }
-
-        $slot->delete();
-
-        if (!is_null($item)) {
-            $item->itemSkillProgressions()->delete();
-
-            $item->delete();
-        }
-
-        $inventory = $this->characterInventoryService->setCharacter($character->refresh());
-
-        return response()->json([
-            'message' => 'Destroyed ' . $name . '.',
-            'inventory' => [
-                'inventory' => $inventory->getInventoryForType('inventory'),
-            ]
-        ]);
+        return response()->json($result, $status);
     }
 
     /**
@@ -143,34 +121,12 @@ class  CharacterInventoryController extends Controller {
      * @return JsonResponse
      */
     public function destroyAll(Character $character): JsonResponse {
-        $inventory = $this->characterInventoryService->setCharacter($character);
+        $result = $this->characterInventoryService->setCharacter($character)->destroyAllItemsInInventory();
 
-        $slotIds   = $inventory->findCharacterInventorySlotIds();
+        $status = $result['status'];
+        unset($result['status']);
 
-        $items     = $character->inventory->slots->where('item.type', 'artifact')->whereNotNull('item.itemSkillProgressions')->pluck('item.id')->toArray();
-
-        $character->inventory->slots()->whereIn('id', $slotIds)->delete();
-
-        if (!empty($items)) {
-            $items = Item::whereIn('id', $items)->get();
-
-            foreach ($items as $item) {
-                $item->itemSkillProgressions()->delete();
-
-                $item->delete();
-            }
-        }
-
-        $character = $character->refresh();
-
-        $inventory = $this->characterInventoryService->setCharacter($character);
-
-        return response()->json([
-            'message' => 'Destroyed All Items.',
-            'inventory' => [
-                'inventory' => $inventory->getInventoryForType('inventory'),
-            ]
-        ], 200);
+        return response()->json($result, $status);
     }
 
     /**
@@ -178,73 +134,26 @@ class  CharacterInventoryController extends Controller {
      * @return JsonResponse
      */
     public function disenchantAll(Character $character): JsonResponse {
-        $inventory = $this->characterInventoryService->setCharacter($character);
+        $result = $this->characterInventoryService->setCharacter($character)->disenchantAllItemsInInventory();
 
-        $slots   = $inventory->getInventoryCollection()->filter(function ($slot) {
-            return (!is_null($slot->item->item_prefix_id) || !is_null($slot->item->item_suffix_id));
-        })->values();
+        $status = $result['status'];
+        unset($result['status']);
 
-        if ($slots->isNotEmpty()) {
-
-            $response = $this->characterInventoryService->disenchantAllItems($slots, $character);
-
-            unset($response['status']);
-
-            return response()->json($response);
-        }
-
-        return response()->json(['message' => 'You have nothing to disenchant.']);
+        return response()->json($result, $status);
     }
 
     /**
      * @param MoveItemRequest $request
      * @param Character $character
-     * @param InventorySetService $inventorySetService
      * @return JsonResponse
      */
-    public function moveToSet(MoveItemRequest $request, Character $character, InventorySetService $inventorySetService): JsonResponse {
-        $slot         = $character->inventory->slots()->find($request->slot_id);
-        $inventorySet = $character->inventorySets()->find($request->move_to_set);
+    public function moveToSet(MoveItemRequest $request, Character $character): JsonResponse {
+        $result = $this->inventorySetService->moveItemToSet($character, $request->slot_id, $request->move_to_set);
 
-        if (is_null($slot) || is_null($inventorySet)) {
-            return response()->json([
-                'message' => 'Either the slot or the inventory set does not exist.'
-            ], 422);
-        }
+        $status = $result['status'];
+        unset($result['status']);
 
-        $itemName = $slot->item->affix_name;
-
-        $inventorySetService->assignItemToSet($inventorySet, $slot);
-
-        $character = $character->refresh();
-
-        event(new UpdateTopBarEvent($character));
-
-        event(new LabyrinthOracleUpdate($character));
-
-        $characterInventoryService = $this->characterInventoryService->setCharacter($character);
-
-        if (is_null($inventorySet->name)) {
-            $index     = $character->inventorySets->search(function ($set) use ($request) {
-                return $set->id === $request->move_to_set;
-            });
-
-            return response()->json([
-                'message'   => $itemName . ' Has been moved to: Set ' . $index + 1,
-                'inventory' => [
-                    'inventory' => $characterInventoryService->getInventoryForType('inventory'),
-                    'sets'      => $characterInventoryService->getInventoryForType('sets')['sets']
-                ]
-            ]);
-        }
-
-        return response()->json([
-            'message'   => $itemName . ' Has been moved to: ' . $inventorySet->name,
-            'inventory' => [
-                'inventory' => $characterInventoryService->getInventoryForType('inventory'),
-                'sets'      => $characterInventoryService->getInventoryForType('sets')['sets']
-            ]
-        ]);
+        return response()->json($result, $status);
     }
 
     /**
@@ -253,206 +162,56 @@ class  CharacterInventoryController extends Controller {
      * @return JsonResponse
      */
     public function renameSet(RenameSetRequest $request, Character $character): JsonResponse {
-        $inventorySets = $character->inventorySets;
-        $inventorySet  = $inventorySets->firstWhere('id', $request->set_id);
+        $result = $this->inventorySetService->renameInventorySet($character, $request->set_id, $request->set_name);
 
-        if (is_null($inventorySet)) {
-            return response()->json([
-                'message' => 'Set does not exist.'
-            ], 422);
-        }
+        $status = $result['status'];
+        unset($result['status']);
 
-        if ($inventorySets->where('name', $request->set_name)->isNotEmpty()) {
-            return response()->json([
-                'message' => 'You already have a set with this name. Pick something else.'
-            ], 422);
-        }
-
-        $inventorySet->update([
-            'name' => $request->set_name
-        ]);
-
-        $inventory = $this->characterInventoryService->setCharacter($character->refresh());
-
-        return response()->json([
-            'message' => 'Renamed set to: ' . $request->set_name,
-            'inventory' => [
-                'sets'         => $inventory->getInventoryForType('sets')['sets'],
-                'usable_sets'  => $inventory->getInventoryForType('usable_sets'),
-                'savable_sets' => $inventory->getInventoryForType('savable_sets'),
-            ]
-        ]);
+        return response()->json($result, $status);
     }
 
     /**
      * @param SaveEquipmentAsSet $request
      * @param Character $character
-     * @param InventorySetService $inventorySetService
      * @return JsonResponse
      */
-    public function saveEquippedAsSet(SaveEquipmentAsSet $request, Character $character, InventorySetService $inventorySetService): JsonResponse {
-        $currentlyEquipped = $character->inventory->slots->filter(function ($slot) {
-            return $slot->equipped;
-        });
+    public function saveEquippedAsSet(SaveEquipmentAsSet $request, Character $character): JsonResponse {
+        $result = $this->inventorySetService->saveEquippedItemsToSet($character, $request->move_to_set);
 
-        $inventorySet = $character->inventorySets()->find($request->move_to_set);
+        $status = $result['status'];
+        unset($result['status']);
 
-        foreach ($currentlyEquipped as $equipped) {
-            $inventorySet->slots()->create(array_merge(['inventory_set_id' => $inventorySet->id], $equipped->getAttributes()));
-
-            $equipped->delete();
-        }
-
-        $inventorySet->update([
-            'is_equipped' => true,
-        ]);
-
-        $character = $character->refresh();
-
-        $setIndex = $character->inventorySets->search(function ($set) {
-            return $set->is_equipped;
-        });
-
-        $setName = 'Set ' . $setIndex + 1;
-
-        if (!is_null($inventorySet->name)) {
-            $setName = $inventorySet->name;
-        }
-
-        event(new UpdateTopBarEvent($character));
-
-        $inventory = $this->characterInventoryService->setCharacter($character);
-
-        return response()->json([
-            'message'   => $setName . ' is now equipped (equipment has been moved to the set)',
-            'inventory' => [
-                'sets'            => $inventory->getInventoryForType('sets')['sets'],
-                'usable_sets'     => $inventory->getInventoryForType('usable_sets'),
-                'savable_sets'    => $inventory->getInventoryForType('savable_sets'),
-                'set_is_equipped' => true,
-            ]
-        ]);
+        return response()->json($result, $status);
     }
 
     /**
      * @param RemoveItemRequest $request
      * @param Character $character
-     * @param InventorySetService $inventorySetService
      * @return JsonResponse
      */
-    public function removeFromSet(RemoveItemRequest $request, Character $character, InventorySetService $inventorySetService): JsonResponse {
-        if ($character->isInventoryFull()) {
-            return response()->json([
-                'message' => 'Your inventory is full. Cannot remove item from set.'
-            ], 422);
-        }
+    public function removeFromSet(RemoveItemRequest $request, Character $character): JsonResponse {
 
-        $slot = $character->inventorySets()->find($request->inventory_set_id)->slots()->find($request->slot_id);
+        $result = $this->inventorySetService->removeItemFromInventorySet($character, $request->inventory_set_id, $request->slot_id);
 
-        if (is_null($slot)) {
-            return response()->json(['message' => 'Either the slot or the inventory set does not exist.'], 422);
-        }
+        $status = $result['status'];
+        unset($result['status']);
 
-        if ($slot->inventorySet->is_equipped) {
-            return response()->json(['message' => 'You cannot move an equipped item into your inventory from this set. Unequip it first.'], 422);
-        }
-
-        $itemName = $slot->item->affix_name;
-
-        $result = $inventorySetService->removeItemFromInventorySet($slot->inventorySet, $slot->item);
-
-        // Chances are no inventory space.
-        if ($result['status'] !== 200) {
-            return response()->json(['message' => $result['message']], 422);
-        }
-
-        $character = $character->refresh();
-
-        $set  = InventorySet::find($request->inventory_set_id);
-
-        if (!is_null($set->name)) {
-            $setName = $set->name;
-        } else {
-            $index     = $character->inventorySets->search(function ($set) use ($request) {
-                return $set->id === $request->inventory_set_id;
-            });
-
-            $setName = 'Set ' . $index + 1;
-        }
-
-        event(new UpdateTopBarEvent($character));
-
-        $characterInventoryService = $this->characterInventoryService->setCharacter($character);
-
-        $sets = $characterInventoryService->getInventoryForType('sets');
-
-        return response()->json([
-            'message' => $itemName . ' Has been removed from ' . $setName . ' and placed back into your inventory.',
-            'inventory' => [
-                'inventory' => $characterInventoryService->getInventoryForType('inventory'),
-                'sets'      => $sets['sets'],
-            ]
-        ]);
+        return response()->json($result, $status);
     }
 
     /**
      * @param Character $character
      * @param InventorySet $inventorySet
-     * @param InventorySetService $inventorySetService
      * @return JsonResponse
      */
-    public function emptySet(Character $character, InventorySet $inventorySet, InventorySetService $inventorySetService): JsonResponse {
+    public function emptySet(Character $character, InventorySet $inventorySet): JsonResponse {
 
-        if ($character->isInventoryFull()) {
-            return response()->json([
-                'message' => 'Your inventory is full. Cannot remove items from set.'
-            ], 422);
-        }
+        $result = $this->inventorySetService->emptySet($character, $inventorySet);
 
-        $currentInventoryAmount    = $character->inventory_max - $inventorySet->slots->count();
-        $originalInventorySetCount = $inventorySet->slots->count();
-        $itemsRemoved              = 0;
+        $status = $result['status'];
+        unset($result['status']);
 
-        // Only grab the amount of items your inventory can hold.
-        foreach ($inventorySet->slots()->take($currentInventoryAmount)->get() as $slot) {
-
-            if ($currentInventoryAmount !== 0) {
-                if ($inventorySetService->removeItemFromInventorySet($inventorySet, $slot->item)) {
-                    $currentInventoryAmount -= 1;
-                    $itemsRemoved           += 1;
-
-                    continue;
-                }
-
-                // @codeCoverageIgnoreStart
-                break;
-                // @codeCoverageIgnoreEnd
-            }
-        }
-
-        $setIndex = $character->inventorySets->search(function ($set) use ($inventorySet) {
-            return $set->id === $inventorySet->id;
-        });
-
-        if (is_null($inventorySet->name)) {
-            $setName = 'Set ' . $setIndex + 1;
-        } else {
-            $setName = $inventorySet->name;
-        }
-
-        $character = $character->refresh();
-
-        event(new UpdateTopBarEvent($character->refresh()));
-
-        $inventory = $this->characterInventoryService->setCharacter($character);
-
-        return response()->json([
-            'message' => 'Removed ' . $itemsRemoved . ' of ' . $originalInventorySetCount . ' items from ' . $setName,
-            'inventory' => [
-                'inventory' => $inventory->getInventoryForType('inventory'),
-                'sets' => $inventory->getInventoryForType('sets')['sets'],
-            ]
-        ]);
+        return response()->json($result, $status);
     }
 
     /**
@@ -464,7 +223,6 @@ class  CharacterInventoryController extends Controller {
      */
     public function equipItem(EquipItemValidation $request, Character $character, EquipItemService $equipItemService): JsonResponse {
         try {
-
             $equipItemService->setRequest($request->all())
                 ->setCharacter($character)
                 ->replaceItem();

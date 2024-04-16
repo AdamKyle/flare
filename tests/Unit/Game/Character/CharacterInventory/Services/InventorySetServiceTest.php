@@ -80,9 +80,65 @@ class InventorySetServiceTest extends TestCase {
             ->putItemInSet($itemToRemove, 0)
             ->getCharacter();
 
-        $result = $this->inventorySetService->removeItemFromInventorySet($character->inventorySets()->first(), $itemToRemove);
+        $result = $this->inventorySetService->removeItemFromInventorySet($character, $character->inventorySets()->first()->id, $character->inventorySets()->first()->slots->first()->id);
 
         $this->assertEquals('Not enough inventory space to put this item back into your inventory.', $result['message']);
+    }
+
+    public function testCannotRemoveItemFromSetBecauseInventorySetIsNotYours() {
+        $itemToRemove = $this->createItem();
+        $character = $this->character
+            ->inventoryManagement()
+            ->giveItemMultipleTimes($this->createItem(), 75)
+            ->getCharacterFactory()
+            ->inventorySetManagement()
+            ->createInventorySets(10)
+            ->putItemInSet($itemToRemove, 0)
+            ->getCharacter();
+
+        $result = $this->inventorySetService->removeItemFromInventorySet($character, 977, $character->inventorySets()->first()->slots->first()->id);
+
+        $this->assertEquals('Not allowed to do that.', $result['message']);
+    }
+
+    public function testCannotRemoveItemFromSetBecauseInventorySetIsEquipped() {
+        $itemToRemove = $this->createItem();
+        $character = $this->character
+            ->inventoryManagement()
+            ->giveItemMultipleTimes($this->createItem(), 75)
+            ->getCharacterFactory()
+            ->inventorySetManagement()
+            ->createInventorySets(10)
+            ->putItemInSet($itemToRemove, 0)
+            ->getCharacter();
+
+        $character->inventorySets()->first()->update([
+            'is_equipped' => true
+        ]);
+
+        $character = $character->refresh();
+
+        $result = $this->inventorySetService->removeItemFromInventorySet($character, $character->inventorySets()->first()->id, $character->inventorySets()->first()->slots->first()->id);
+
+        $this->assertEquals('You cannot move an equipped item into your inventory from this set. Unequip the set first.', $result['message']);
+    }
+
+    public function testCannotRemoveItemFromSetBecauseItemDoesNotExistInInventorySet() {
+        $itemToRemove = $this->createItem();
+        $character = $this->character
+            ->inventoryManagement()
+            ->giveItemMultipleTimes($this->createItem(), 75)
+            ->getCharacterFactory()
+            ->inventorySetManagement()
+            ->createInventorySets(10)
+            ->putItemInSet($itemToRemove, 0)
+            ->getCharacter();
+
+        $character = $character->refresh();
+
+        $result = $this->inventorySetService->removeItemFromInventorySet($character, $character->inventorySets()->first()->id, 9898);
+
+        $this->assertEquals('Item does not exist in this set.', $result['message']);
     }
 
     public function testCanRemoveItemFromSetBecauseInventoryIsNotMaxedOut() {
@@ -91,13 +147,17 @@ class InventorySetServiceTest extends TestCase {
             ->inventoryManagement()
             ->getCharacterFactory()
             ->inventorySetManagement()
-            ->createInventorySets(10)
+            ->createInventorySets(10, true)
             ->putItemInSet($itemToRemove, 0)
             ->getCharacter();
 
-        $result = $this->inventorySetService->removeItemFromInventorySet($character->inventorySets()->first(), $itemToRemove);
+        $result = $this->inventorySetService->removeItemFromInventorySet($character, $character->inventorySets()->first()->id, $character->inventorySets()->first()->slots->first()->id);
 
-        $this->assertEquals('Removed ' . $itemToRemove->affix_name . ' from Set.', $result['message']);
+        $character = $character->refresh();
+
+        $setName = $character->inventorySets->first()->name;
+
+        $this->assertEquals('Removed ' . $itemToRemove->affix_name . ' from ' . $setName . ' and placed back into your inventory.', $result['message']);
     }
 
     public function testEquipFullSet() {
@@ -614,7 +674,7 @@ class InventorySetServiceTest extends TestCase {
         $this->assertFalse($this->inventorySetService->isSetEquippable($character->inventorySets->first()));
     }
 
-    public function testIsEquippableForComsic() {
+    public function testIsEquippableForCosmic() {
         $cosmic = [
             WeaponTypes::WEAPON,
         ];
@@ -634,5 +694,188 @@ class InventorySetServiceTest extends TestCase {
         $character = $character->getCharacter();
 
         $this->assertTrue($this->inventorySetService->isSetEquippable($character->inventorySets->first()));
+    }
+
+    public function testFailToMoveItemToSet() {
+        $character = $this->character->getCharacter();
+
+        $result = $this->inventorySetService->moveItemToSet($character, 999, 9999);
+
+        $this->assertEquals(422, $result['status']);
+        $this->assertEquals('Either the slot or the inventory set does not exist.', $result['message']);
+    }
+
+    public function testMoveToSetThatDoesNotHaveAName() {
+        $item = $this->createItem();
+        $character = $this->character->inventoryManagement()->giveItem($item)->getCharacterFactory()->inventorySetManagement()->createInventorySets()->getCharacter();
+
+        $result = $this->inventorySetService->moveItemToSet($character, $character->inventory->slots->first()->id, $character->inventorySets->first()->id);
+
+        $this->assertEquals(200, $result['status']);
+        $this->assertEquals($item->affix_name . ' Has been moved to: Set ' . 1, $result['message']);
+    }
+
+    public function testMoveToSetThatDoesHaveAName() {
+        $item = $this->createItem();
+        $character = $this->character->inventoryManagement()->giveItem($item)->getCharacterFactory()->inventorySetManagement()->createInventorySets(2, true)->getCharacter();
+
+        $result = $this->inventorySetService->moveItemToSet($character, $character->inventory->slots->first()->id, $character->inventorySets->first()->id);
+
+        $character = $character->refresh();
+
+        $setName = $character->inventorySets->first()->name;
+
+        $this->assertEquals(200, $result['status']);
+        $this->assertEquals($item->affix_name . ' Has been moved to: ' . $setName, $result['message']);
+    }
+
+    public function testCannotRenameSetThatDoesNotExist() {
+        $character = $this->character->inventorySetManagement()->createInventorySets(2)->getCharacter();
+
+        $result = $this->inventorySetService->renameInventorySet($character, 9999, 'jdfhjdfh');
+
+        $this->assertEquals(422, $result['status']);
+        $this->assertEquals('Set does not exist.', $result['message']);
+    }
+
+    public function testCannotRenameASetWhenAnotherSetHasTheSameName() {
+        $character = $this->character->inventorySetManagement()->createInventorySets()->getCharacter();
+
+        $set = $character->inventorySets()->first();
+
+        $set->update(['name' => 'sample']);
+
+        $set = $set->refresh();
+        $character = $character->refresh();
+
+        $result = $this->inventorySetService->renameInventorySet($character, $set->id, $set->name);
+
+        $this->assertEquals(422, $result['status']);
+        $this->assertEquals('You already have a set with this name. Pick something else.', $result['message']);
+    }
+
+    public function testRenameTheSet() {
+        $character = $this->character->inventorySetManagement()->createInventorySets()->getCharacter();
+
+        $set = $character->inventorySets()->first();
+
+        $set->update(['name' => 'sample']);
+
+        $set = $set->refresh();
+        $character = $character->refresh();
+
+        $result = $this->inventorySetService->renameInventorySet($character, $set->id, 'Apples');
+
+        $this->assertEquals(200, $result['status']);
+        $this->assertEquals('Renamed set to: Apples', $result['message']);
+    }
+
+    public function testCannotSaveEquippedToANonEmptySet() {
+        $character = $this->character->equipStartingEquipment()->inventorySetManagement()->createInventorySets(1, true)->putItemInSet($this->createItem(), 0)->getCharacter();
+
+        $set = $character->inventorySets->first();
+
+        $result = $this->inventorySetService->saveEquippedItemsToSet($character, $set->id);
+
+        $this->assertEquals(422, $result['status']);
+        $this->assertEquals('Set must be empty.', $result['message']);
+    }
+
+    public function testCanSaveEquippedToAEmptySet() {
+        $character = $this->character->equipStartingEquipment()->inventorySetManagement()->createInventorySets(1, true)->getCharacter();
+
+        $set = $character->inventorySets->first();
+
+        $result = $this->inventorySetService->saveEquippedItemsToSet($character, $set->id);
+
+        $this->assertEquals(200, $result['status']);
+        $this->assertEquals($set->refresh()->name . ' is now equipped (equipment has been moved to the set).', $result['message']);
+    }
+
+    public function testCannotEmptySetWhenInventoryIsMaxed() {
+        $character = $this->character
+            ->equipStartingEquipment()
+            ->inventorySetManagement()
+            ->createInventorySets(1, true)
+            ->putItemInSet($this->createItem(), 0)
+            ->getCharacter();
+
+        $set = $character->inventorySets->first();
+
+        $character->update([
+            'inventory_max' => 0
+        ]);
+
+        $character = $character->refresh();
+
+        $result = $this->inventorySetService->emptySet($character, $set);
+
+        $this->assertEquals(422, $result['status']);
+        $this->assertEquals('Your inventory is full. Cannot remove items from set.', $result['message']);
+    }
+
+    public function testCannotEmptyInventorySetYouDoNotOwn() {
+        $character = $this->character
+            ->equipStartingEquipment()
+            ->inventorySetManagement()
+            ->createInventorySets(1, true)
+            ->putItemInSet($this->createItem(), 0)
+            ->getCharacter();
+
+        $secondaryCharacter = (new CharacterFactory())
+            ->createBaseCharacter()
+            ->givePlayerLocation()
+            ->equipStartingEquipment()
+            ->inventorySetManagement()
+            ->createInventorySets(1, true)
+            ->putItemInSet($this->createItem(), 0)
+            ->getCharacter();
+
+        $set = $secondaryCharacter->inventorySets->first();
+
+        $result = $this->inventorySetService->emptySet($character, $set);
+
+        $this->assertEquals(422, $result['status']);
+        $this->assertEquals('Cannot do that.', $result['message']);
+    }
+
+    public function testCanMoveSomeItemsFromTheSetToInventory() {
+        $character = $this->character
+            ->inventorySetManagement()
+            ->createInventorySets(1, true)
+            ->putItemInSet($this->createItem(), 0)
+            ->putItemInSet($this->createItem(), 0)
+            ->getCharacter();
+
+        $set = $character->inventorySets->first();
+
+        $character->update([
+            'inventory_max' => 1
+        ]);
+
+        $character = $character->refresh();
+
+        $result = $this->inventorySetService->emptySet($character, $set);
+
+        $this->assertEquals(200, $result['status']);
+        $this->assertEquals('Removed ' . 1 . ' of ' . 2 . ' items from ' . $set->name . '. If all items were not moved over, it is because your inventory became full.', $result['message']);
+    }
+
+    public function testCanMoveAllItemsFromSetToInventory() {
+        $character = $this->character
+            ->inventorySetManagement()
+            ->createInventorySets(1, true)
+            ->putItemInSet($this->createItem(), 0)
+            ->putItemInSet($this->createItem(), 0)
+            ->getCharacter();
+
+        $set = $character->inventorySets->first();
+
+        $character = $character->refresh();
+
+        $result = $this->inventorySetService->emptySet($character, $set);
+
+        $this->assertEquals(200, $result['status']);
+        $this->assertEquals('Removed ' . 2 . ' of ' . 2 . ' items from ' . $set->name . '. If all items were not moved over, it is because your inventory became full.', $result['message']);
     }
 }

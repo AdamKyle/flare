@@ -5,6 +5,8 @@ namespace Tests\Setup\Character;
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
 use App\Game\Character\Builders\AttackBuilders\Services\BuildCharacterAttackTypes;
+use Exception;
+use Illuminate\Support\Str;
 use Tests\Traits\CreateInventorySets;
 
 class InventorySetManagement
@@ -47,13 +49,15 @@ class InventorySetManagement
      * Assign x inventory Sets.
      *
      * @param int $amount
+     * @param bool $useName
      * @return $this
      */
-    public function createInventorySets(int $amount = 1): InventorySetManagement
+    public function createInventorySets(int $amount = 1, bool $useName = false): InventorySetManagement
     {
         for ($i = 1; $i <= $amount; $i++) {
             $this->inventorySetIds[] = $this->createInventorySet([
                 'character_id' => $this->character->id,
+                'name' => ($useName ? Str::random(12) : null),
             ])->id;
         }
 
@@ -65,9 +69,10 @@ class InventorySetManagement
      *
      * @param Item $item
      * @param int $setIndex
+     * @param string|null $position
      * @param bool $equipped
      * @return InventorySetManagement
-     * @throws \Exception
+     * @throws Exception
      */
     public function putItemInSet(Item $item, int $setIndex, string $position = null, bool $equipped = false): InventorySetManagement
     {
@@ -91,14 +96,6 @@ class InventorySetManagement
         return $this;
     }
 
-    public function updateSet(int $index, array $options): InventorySetManagement {
-        $setId = $this->getInventorySetId($index);
-
-        $this->character->inventorySets()->find($setId)->update($options);
-
-        return $this;
-    }
-
     /**
      * Get the character.
      *
@@ -114,7 +111,7 @@ class InventorySetManagement
      *
      * @param int $index
      * @return int
-     * @throws \Exception
+     * @throws Exception
      */
     public function getInventorySetId(int $index): int
     {
@@ -122,6 +119,6 @@ class InventorySetManagement
             return $this->inventorySetIds[$index];
         }
 
-        throw new \Exception('Index does not exist for inventory sets on this character.');
+        throw new Exception('Index does not exist for inventory sets on this character.');
     }
 }

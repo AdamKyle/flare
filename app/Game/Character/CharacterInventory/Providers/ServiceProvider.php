@@ -44,9 +44,8 @@ class ServiceProvider extends ApplicationServiceProvider {
 
         $this->app->bind(InventorySetService::class, function ($app) {
             return new InventorySetService(
-                $app->make(
-                    SetHandsValidation::class
-                )
+                $app->make(SetHandsValidation::class),
+                $app->make(CharacterInventoryService::class),
             );
         });
 

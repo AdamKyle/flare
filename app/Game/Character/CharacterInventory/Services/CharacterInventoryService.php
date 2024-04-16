@@ -531,6 +531,102 @@ class CharacterInventoryService {
     }
 
     /**
+     * Delete an item from the inventory.
+     *
+     * @param int $slotId
+     * @return array
+     */
+    public function deleteItem(int $slotId): array {
+        $slot = $this->character->inventory->slots->filter(function ($slot) use ($slotId) {
+            return $slot->id === $slotId;
+        })->first();
+
+        if (is_null($slot)) {
+            return $this->errorResult('You don\'t own that item.');
+        }
+
+        if ($slot->equipped) {
+            return $this->errorResult('Cannot destroy equipped item.');
+        }
+
+        $name = $slot->item->affix_name;
+
+        $item = null;
+
+        if ($slot->item->type === 'artifact' && $slot->item->itemSkillProgressions->isNotEmpty()) {
+            $item = $slot->item;
+        }
+
+        $slot->delete();
+
+        if (!is_null($item)) {
+            $item->itemSkillProgressions()->delete();
+
+            $item->delete();
+        }
+
+        return $this->successResult([
+            'message' => 'Destroyed ' . $name . '.',
+            'inventory' => [
+                'inventory' => $this->getInventoryForType('inventory'),
+            ]
+        ]);
+    }
+
+    /**
+     * Destroy all items in your inventory.
+     *
+     * - Will not destroy sets or items in sets.
+     * - Will not destroy quest items or usable items.
+     *
+     * @return array
+     */
+    public function destroyAllItemsInInventory(): array {
+        $slotIds   = $this->findCharacterInventorySlotIds();
+
+        $items     = $this->character->inventory->slots->where('item.type', 'artifact')->whereNotNull('item.itemSkillProgressions')->pluck('item.id')->toArray();
+
+        $this->character->inventory->slots()->whereIn('id', $slotIds)->delete();
+
+        if (!empty($items)) {
+            $items = Item::whereIn('id', $items)->get();
+
+            foreach ($items as $item) {
+                $item->itemSkillProgressions()->delete();
+
+                $item->delete();
+            }
+        }
+
+        return $this->successResult([
+            'message' => 'Destroyed all items.',
+            'inventory' => [
+                'inventory' => $this->getInventoryForType('inventory'),
+            ]
+        ]);
+    }
+
+    /**
+     * Disenchant all items in the characters inventory.
+     *
+     * @return array
+     */
+    public function disenchantAllItemsInInventory(): array {
+        $slots   = $this->getInventoryCollection()->filter(function ($slot) {
+            return (!is_null($slot->item->item_prefix_id) || !is_null($slot->item->item_suffix_id));
+        })->values();
+
+        if ($slots->isNotEmpty()) {
+
+            return $this->disenchantAllItems($slots, $this->character);
+        }
+
+        return $this->successResult([
+          'message' => 'You have nothing to disenchant.'
+        ]);
+    }
+
+    /**
      * Fetch type based on accepted types.
      *
      * @param string $type

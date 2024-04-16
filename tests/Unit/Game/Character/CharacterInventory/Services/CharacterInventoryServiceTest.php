@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Game\Character\CharacterInventory\Services;
 
+use App\Flare\Models\ItemSkill;
 use App\Flare\Values\WeaponTypes;
 use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Skills\Values\SkillTypeValue;
@@ -239,5 +240,123 @@ class CharacterInventoryServiceTest extends TestCase {
         $character = $this->character->inventorySetManagement()->createInventorySets()->getCharacter();
 
         $this->assertEmpty($this->characterInventoryService->setCharacter($character)->fetchEquipped());
+    }
+
+    public function testCannotDeleteItemThatDoesntExist() {
+        $character = $this->character->getCharacter();
+
+        $result = $this->characterInventoryService->setCharacter($character)->deleteItem(56788);
+
+        $this->assertEquals(422, $result['status']);
+        $this->assertEquals('You don\'t own that item.', $result['message']);
+    }
+
+    public function testCannotDeleteItemThatIsEquipped() {
+
+        $character = $this->character->inventoryManagement()->giveItem($this->createItem(), true, 'left_hand')->getCharacter();
+
+        $result = $this->characterInventoryService->setCharacter($character)->deleteItem($character->inventory->slots()->where('equipped', true)->first()->id);
+
+        $this->assertEquals(422, $result['status']);
+        $this->assertEquals('Cannot destroy equipped item.', $result['message']);
+
+    }
+
+    public function testCanDeleteItemFromInventory() {
+        $item = $this->createItem();
+
+        $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
+
+        $result = $this->characterInventoryService->setCharacter($character)->deleteItem($character->inventory->slots->first()->id);
+
+        $this->assertEquals(200, $result['status']);
+        $this->assertEquals('Destroyed ' . $item->affix_name . '.', $result['message']);
+    }
+
+    public function testCanDeleteArtifactWithItemSkillProgressionFromInventory() {
+        $item = $this->createItem(['type' => 'artifact']);
+
+        $itemSkill  = ItemSkill::create([
+            'name'            => 'parent',
+            'description'     => 'sample',
+            'base_damage_mod' => 0.10,
+            'max_level' => 10,
+            'total_kills_needed' => 100,
+        ]);
+
+        $item->itemSkillProgressions()->create([
+            'item_id' => $item->id,
+            'item_skill_id' => $itemSkill->id,
+            'current_level' => 0,
+            'current_kill' => 0,
+            'is_training' => false,
+        ]);
+
+        $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
+
+        $result = $this->characterInventoryService->setCharacter($character)->deleteItem($character->inventory->slots->first()->id);
+
+        $this->assertEquals(200, $result['status']);
+        $this->assertEquals('Destroyed ' . $item->affix_name . '.', $result['message']);
+    }
+
+    public function testDeleteAllItemsInInventoryWithOutDestroyingUsableOrQuestItems() {
+        $item = $this->createItem(['type' => 'artifact']);
+
+        $itemSkill  = ItemSkill::create([
+            'name'            => 'parent',
+            'description'     => 'sample',
+            'base_damage_mod' => 0.10,
+            'max_level' => 10,
+            'total_kills_needed' => 100,
+        ]);
+
+        $item->itemSkillProgressions()->create([
+            'item_id' => $item->id,
+            'item_skill_id' => $itemSkill->id,
+            'current_level' => 0,
+            'current_kill' => 0,
+            'is_training' => false,
+        ]);
+
+        $regularItem = $this->createItem();
+        $questItem = $this->createItem(['type' => 'quest']);
+        $alchemy = $this->createItem(['type' => 'alchemy']);
+
+        $character = $this->character->inventoryManagement()
+                ->giveItem($item)
+                ->giveItem($regularItem)
+                ->giveItem($questItem)
+                ->giveItem($alchemy)
+                ->getCharacter();
+
+        $result = $this->characterInventoryService->setCharacter($character)->destroyAllItemsInInventory();
+
+        $this->assertEquals(200, $result['status']);
+        $this->assertEquals('Destroyed all items.', $result['message']);
+        $this->assertCount(2, $result['inventory']['inventory']);
+    }
+
+    public function testDisenchantAllItemsHasNothingToDisenchant() {
+        $character = $this->character->getCharacter();
+
+        $result = $this->characterInventoryService->setCharacter($character)->disenchantAllItemsInInventory();
+
+        $this->assertEquals(200, $result['status']);
+        $this->assertEquals('You have nothing to disenchant.', $result['message']);
+    }
+
+    public function testDisenchantAllItems() {
+        $character = $this->character->inventoryManagement()->giveItem($this->createItem([
+            'item_suffix_id' => $this->createItemAffix(['type' => 'suffix'])
+        ]))->getCharacter();
+
+        $result = $this->characterInventoryService->setCharacter($character)->disenchantAllItemsInInventory();
+
+        $this->assertEquals(200, $result['status']);
+
+        $character = $character->refresh();
+
+        $this->assertEmpty($character->inventory->slots);
     }
 }
