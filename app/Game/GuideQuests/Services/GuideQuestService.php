@@ -185,6 +185,14 @@ class GuideQuestService {
         $unlocksAtLevelQuest  = GuideQuest::where('unlock_at_level', '<=', $character->level)->whereNull('only_during_event')->whereNull('parent_id')->orderBy('unlock_at_level', 'asc')->first();
         $nextGuideQuest       = null;
 
+        if (!is_null($winterEvent)) {
+            $unlocksAtLevelQuest  = GuideQuest::where('unlock_at_level', '<=', $character->level)->where('only_during_event', EventType::WINTER_EVENT)->whereNull('parent_id')->orderBy('unlock_at_level', 'asc')->first();
+        }
+
+        if (!is_null($delusionalEvent)) {
+            $unlocksAtLevelQuest  = GuideQuest::where('unlock_at_level', '<=', $character->level)->where('only_during_event', EventType::DELUSIONAL_MEMORIES_EVENT)->whereNull('parent_id')->orderBy('unlock_at_level', 'asc')->first();
+        }
+
         if (!is_null($unlocksAtLevelQuest)) {
             $nextGuideQuest = $this->fetchNextEventQuest($character, $unlocksAtLevelQuest);
         }
@@ -249,18 +257,19 @@ class GuideQuestService {
             return $initialEventGuideQuest;
         }
 
-        $firstCompletedEventQuest = $character->questsCompleted()
-            ->whereHas('guideQuest', function($query) use($initialEventGuideQuest) {
-                $query->where('parent_id', $initialEventGuideQuest->id);
-            })
-            ->orderByDesc('guide_quest_id')
-            ->first();
+        $completedIds = $character->questsCompleted()->whereNotNull('guide_quest_id')->pluck('guide_quest_id')->toArray();
 
-        if (is_null($firstCompletedEventQuest)) {
+        if (!in_array($initialEventGuideQuest->id, $completedIds)) {
             return GuideQuest::where('parent_id', $initialEventGuideQuest->id)->orderBy('id')->first();
         }
 
-        return GuideQuest::where('parent_id', $firstCompletedEventQuest->guide_quest_id)->first();
+        $nextGuideQuest = GuideQuest::where('parent_id', $initialEventGuideQuest->id)->orderBy('id')->first();
+
+        if (is_null($nextGuideQuest)) {
+            return null;
+        }
+
+        return $this->fetchNextEventQuest($character, $nextGuideQuest);
     }
 
     protected function requiredAttributeNames(GuideQuest $quest): array {
