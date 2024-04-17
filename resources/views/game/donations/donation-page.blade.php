@@ -11,7 +11,7 @@
 
         <x-core.cards.card>
             <div class="prose dark:prose my-4">
-                <p>Tlessa needs your help. At a cost of $52 CAD, Tlessa cannot sustain its server costs on its own. Tlessa is a free game, one where there are no cash shops, no ways to buy power. It's a place where your accomplishments are entirely your own, where we as a community come together to shape a world they want to play in, to call home, to quest in.</p>
+                <p>Tlessa needs your help. At a cost of $52 CAD, Tlessa cannot sustain its server costs on its own. Tlessa is a free game, one where there are no cash shops, no ways to buy power. It's a place where your accomplishments are entirely your own, where we as a community come together to shape a world we all want to play in, to call home, to quest in.</p>
 
                 <p>It is for this reason I am here today, before you, asking you to donate whatever you can, as little or as much as you please. Tlessa wants to stay around, to give its players the community they desire and the voice they need when it comes to shaping this living, breathing world of exploration and dark fantasy.</p>
 

@@ -20,6 +20,7 @@ import GamblingSection from "./components/gambling-section";
 import RaidSection from "./components/raid-section";
 import { GameActionState } from "../../lib/game/types/game-state";
 import { updateTimers } from "../../lib/ajax/update-timers";
+import WarningAlert from "../../components/ui/alerts/simple-alerts/warning-alert";
 
 export default class Actions extends React.Component<
     ActionsProps,
@@ -343,6 +344,17 @@ export default class Actions extends React.Component<
         }
 
         return '';
+    }
+
+    canSeeDonationRequest(): boolean {
+        return !this.state.show_exploration &&
+            !this.state.show_celestial_fight &&
+            !this.state.show_duel_fight &&
+            !this.state.show_join_pvp &&
+            !this.state.show_hell_forged_section &&
+            !this.state.show_purgatory_chains_section &&
+            !this.state.show_twisted_earth_section &&
+            !this.state.show_gambling_section;
     }
 
     render() {
