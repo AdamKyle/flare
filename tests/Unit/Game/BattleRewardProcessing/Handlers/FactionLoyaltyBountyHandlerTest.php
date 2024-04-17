@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Game\BattleRewardProcessing\Handlers;
 
+use App\Flare\Values\MapNameValue;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\BattleRewardProcessing\Handlers\FactionLoyaltyBountyHandler;
 use App\Game\Core\Events\UpdateTopBarEvent;
@@ -141,6 +142,52 @@ class FactionLoyaltyBountyHandlerTest extends TestCase {
             'faction_loyalty_id'         => $factionLoyalty->id,
             'faction_loyalty_npc_id'     => $factionLoyaltyNpc->id,
             'fame_tasks'                 => [['sample' => 'key']],
+        ]);
+
+        $this->factionLoyaltyBountyHandler->handleBounty($character->refresh(), $monster);
+
+        Event::assertNotDispatched(ServerMessageEvent::class);
+        Event::assertNotDispatched(UpdateTopBarEvent::class);
+    }
+
+    public function testDoesNotUpdateLoyaltyTasksWhenPlayerIsNotOnTheSameMap() {
+        $monster = $this->createMonster();
+
+        $character = (new CharacterFactory())->createBaseCharacter()
+            ->givePlayerLocation(16, 16, $monster->gameMap)
+            ->assignFactionSystem()
+            ->getCharacter();
+
+        Event::fake();
+
+        $factionLoyalty = $this->createFactionLoyalty([
+            'character_id' => $character->id,
+            'faction_id'   => $character->factions->first(),
+            'is_pledged'   => true
+        ]);
+
+        $npc = $this->createNpc();
+
+        $factionLoyaltyNpc = $this->createFactionLoyaltyNpc([
+            'faction_loyalty_id'            => $factionLoyalty->id,
+            'npc_id'                        => $npc->id,
+            'current_level'                 => 1,
+            'max_level'                     => 25,
+            'next_level_fame'               => 1000,
+            'currently_helping'             => true,
+            'kingdom_item_defence_bonus'    => 0.002,
+        ]);
+
+        $this->createFactionLoyaltyNpcTask([
+            'faction_loyalty_id'         => $factionLoyalty->id,
+            'faction_loyalty_npc_id'     => $factionLoyaltyNpc->id,
+            'fame_tasks'                 => [['sample' => 'key']],
+        ]);
+
+        $character->map()->update([
+            'game_map_id' => $this->createGameMap([
+                'name' => MapNameValue::DELUSIONAL_MEMORIES,
+            ])->id,
         ]);
 
         $this->factionLoyaltyBountyHandler->handleBounty($character->refresh(), $monster);

@@ -70,6 +70,10 @@ class FactionLoyaltyBountyHandler {
              return $character;
         }
 
+        if ($helpingNpc->npc->gameMap->id !== $character->map->game_map_id) {
+            return $character;
+        }
+
         if (!$this->hasMatchingTask($helpingNpc, 'monster_id', $monster->id)) {
             return $character;
         }
