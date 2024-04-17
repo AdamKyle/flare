@@ -46,6 +46,7 @@ class ServiceProvider extends ApplicationServiceProvider {
             return new InventorySetService(
                 $app->make(SetHandsValidation::class),
                 $app->make(CharacterInventoryService::class),
+                $app->make(UpdateCharacterAttackTypesHandler::class),
             );
         });
 
@@ -59,6 +60,7 @@ class ServiceProvider extends ApplicationServiceProvider {
                 $app->make(UsableItemTransformer::class),
                 $app->make(MassDisenchantService::class),
                 $app->make(UpdateCharacterSkillsService::class),
+                $app->make(UpdateCharacterAttackTypesHandler::class),
                 $app->make(Manager::class)
             );
         });

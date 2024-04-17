@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Game\Character\CharacterInventory\Controllers\Api;
 
+use App\Flare\Values\WeaponTypes;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
@@ -213,5 +214,61 @@ class CharacterInventoryControllerTest extends TestCase {
         $jsonData = json_decode($response->getContent(), true);
 
         $this->assertEquals('Removed ' . 2 . ' of ' . 2 . ' items from ' . $set->name . '. If all items were not moved over, it is because your inventory became full.', $jsonData['message']);
+    }
+
+    public function testCannotEquipItem() {
+        $character = $this->character->inventoryManagement()
+            ->giveItemMultipleTimes($this->createItem([
+                'type' => WeaponTypes::WEAPON,
+                'name' => 'To Replace',
+            ]))
+            ->getCharacterFactory()
+            ->inventorySetManagement()
+            ->createInventorySets()
+            ->createInventorySets()
+            ->putItemInSet($this->createItem([
+                'type' => WeaponTypes::WEAPON,
+                'name' => 'Equipped'
+            ]), 0, 'left-hand', true)
+            ->getCharacter();
+
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/character/'.$character->id.'/inventory/equip-item', [
+                'position' => 'left-hand',
+                'equip_type' => $character->inventory->slots->first()->item->type,
+                'slot_id' => 88477,
+            ]);
+
+        $jsonData = json_decode($response->getContent(), true);
+
+        $this->assertEquals('The item you are trying to equip as a replacement, does not exist.', $jsonData['message']);
+    }
+
+    public function testEquipItem() {
+        $character = $this->character->inventoryManagement()
+            ->giveItemMultipleTimes($this->createItem([
+                'type' => WeaponTypes::WEAPON,
+                'name' => 'To Replace',
+            ]))
+            ->getCharacterFactory()
+            ->inventorySetManagement()
+            ->createInventorySets()
+            ->createInventorySets()
+            ->putItemInSet($this->createItem([
+                'type' => WeaponTypes::WEAPON,
+                'name' => 'Equipped'
+            ]), 0, 'left-hand', true)
+            ->getCharacter();
+
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/character/'.$character->id.'/inventory/equip-item', [
+                'position' => 'left-hand',
+                'equip_type' => $character->inventory->slots->first()->item->type,
+                'slot_id' => $character->inventory->slots->first()->id,
+            ]);
+
+        $jsonData = json_decode($response->getContent(), true);
+
+        $this->assertEquals('Equipped item.', $jsonData['message']);
     }
 }

@@ -7,6 +7,7 @@ use App\Flare\Models\InventorySet;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 use App\Flare\Models\SetSlot;
+use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
 use App\Game\Character\CharacterInventory\Validations\SetHandsValidation;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\ResponseBuilder;
@@ -21,15 +22,31 @@ class InventorySetService {
      */
     private SetHandsValidation $setHandsValidation;
 
+    /**
+     * @var CharacterInventoryService $characterInventoryService
+     */
     private CharacterInventoryService $characterInventoryService;
+
+
+    /**
+     * @var UpdateCharacterAttackTypesHandler  $updateCharacterAttackTypesHandler
+     */
+    private UpdateCharacterAttackTypesHandler $updateCharacterAttackTypesHandler;
+
 
     /**
      * @param SetHandsValidation $setHandsValidation
      * @param CharacterInventoryService $characterInventoryService
+     * @param UpdateCharacterAttackTypesHandler $updateCharacterAttackTypesHandler
      */
-    public function __construct(SetHandsValidation $setHandsValidation, CharacterInventoryService $characterInventoryService) {
+    public function __construct(
+        SetHandsValidation $setHandsValidation,
+        CharacterInventoryService $characterInventoryService,
+        UpdateCharacterAttackTypesHandler $updateCharacterAttackTypesHandler
+    ) {
         $this->setHandsValidation = $setHandsValidation;
         $this->characterInventoryService = $characterInventoryService;
+        $this->updateCharacterAttackTypesHandler = $updateCharacterAttackTypesHandler;
     }
 
     /**
@@ -395,6 +412,104 @@ class InventorySetService {
         }
 
         return $this->containsValidSpecialTypeAmount($inventorySet);
+    }
+
+    /**
+     * Unequip a character set.
+     *
+     * @param Character $character
+     * @return array
+     */
+    public function unequipSet(Character $character): array {
+        $inventorySet = $character->inventorySets()->where('is_equipped', true)->first();
+        $inventoryIndex = $character->inventorySets->search(function ($set) {
+            return $set->is_equipped;
+        });
+
+        $this->unEquipInventorySet($inventorySet);
+
+        $this->updateCharacterAttackDataCache($character);
+
+        $inventoryName = 'Set ' . $inventoryIndex + 1;
+
+        if (!is_null($inventorySet->name)) {
+            $inventoryName = $inventorySet->name;
+        }
+
+        $character = $character->refresh();
+
+        $inventory = $this->characterInventoryService->setCharacter($character);
+
+        return $this->successResult([
+            'message' => 'Unequipped ' . $inventoryName . '.',
+            'inventory' => [
+                'inventory'         => $inventory->getInventoryForType('inventory'),
+                'equipped'          => $inventory->getInventoryForType('equipped'),
+                'sets'              => $inventory->getInventoryForType('sets')['sets'],
+                'set_is_equipped'   => false,
+                'set_name_equipped' => $inventory->getEquippedInventorySetName(),
+                'usable_sets'       => $inventory->getUsableSets()
+            ]
+        ]);
+    }
+
+    /**
+     * Equip set.
+     *
+     * @param Character $character
+     * @param InventorySet $inventorySet
+     * @return array
+     */
+    public function equipSet(Character $character, InventorySet $inventorySet): array {
+        if (!$inventorySet->can_be_equipped) {
+            return $this->errorResult('Set cannot be equipped.');
+        }
+
+        if ($inventorySet->character_id !== $character->id) {
+            return $this->errorResult('Cannot do that.');
+        }
+
+        $this->equipInventorySet($character, $inventorySet);
+
+        $character->refresh();
+
+        $setIndex = $character->inventorySets->search(function ($set) {
+            return $set->is_equipped;
+        });
+
+        $character = $character->refresh();
+
+        $this->updateCharacterAttackDataCache($character);
+
+        $characterInventoryService = $this->characterInventoryService->setCharacter($character);
+
+        $inventoryName = 'Set ' . $setIndex + 1;
+        $set = $inventorySet->refresh();
+
+        if (!is_null($set->name)) {
+            $inventoryName = $set->name;
+        }
+
+        return $this->successResult([
+            'message' => $inventoryName .  ' is now equipped',
+            'inventory' => [
+                'equipped'          => $characterInventoryService->getInventoryForType('equipped'),
+                'sets'              => $characterInventoryService->getInventoryForType('sets')['sets'],
+                'set_is_equipped'   => true,
+                'set_name_equipped' => $characterInventoryService->getEquippedInventorySetName(),
+            ]
+        ]);
+    }
+
+    /**
+     * Updates the character stats.
+     *
+     * @param Character $character
+     * @return void
+     * @throws Exception
+     */
+    protected function updateCharacterAttackDataCache(Character $character): void {
+        $this->updateCharacterAttackTypesHandler->updateCache($character);
     }
 
     /**

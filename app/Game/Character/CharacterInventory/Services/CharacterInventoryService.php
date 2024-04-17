@@ -12,6 +12,8 @@ use App\Flare\Transformers\InventoryTransformer;
 use App\Flare\Transformers\UsableItemTransformer;
 use App\Flare\Values\ArmourTypes;
 use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
+use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Skills\Services\MassDisenchantService;
 use App\Game\Skills\Services\UpdateCharacterSkillsService;
@@ -75,6 +77,11 @@ class CharacterInventoryService {
     private UpdateCharacterSkillsService $updateCharacterSkillsService;
 
     /**
+     * @var UpdateCharacterAttackTypesHandler  $updateCharacterAttackTypesHandler
+     */
+    private UpdateCharacterAttackTypesHandler $updateCharacterAttackTypesHandler;
+
+    /**
      * @var Manager $manager
      */
     private Manager $manager;
@@ -84,6 +91,7 @@ class CharacterInventoryService {
      * @param UsableItemTransformer $usableItemTransformer
      * @param MassDisenchantService $massDisenchantService
      * @param UpdateCharacterSkillsService $updateCharacterSkillsService
+     * @param UpdateCharacterAttackTypesHandler $updateCharacterAttackTypesHandler
      * @param Manager $manager
      */
     public function __construct(
@@ -91,13 +99,15 @@ class CharacterInventoryService {
         UsableItemTransformer $usableItemTransformer,
         MassDisenchantService $massDisenchantService,
         UpdateCharacterSkillsService $updateCharacterSkillsService,
-        Manager               $manager,
+        UpdateCharacterAttackTypesHandler $updateCharacterAttackTypesHandler,
+        Manager $manager,
 
     ) {
         $this->inventoryTransformer         = $inventoryTransformer;
         $this->usableItemTransformer        = $usableItemTransformer;
         $this->massDisenchantService        = $massDisenchantService;
         $this->updateCharacterSkillsService = $updateCharacterSkillsService;
+        $this->updateCharacterAttackTypesHandler = $updateCharacterAttackTypesHandler;
         $this->manager                      = $manager;
     }
 
@@ -624,6 +634,153 @@ class CharacterInventoryService {
         return $this->successResult([
           'message' => 'You have nothing to disenchant.'
         ]);
+    }
+
+    /**
+     * Unequip an item from the player.
+     *
+     * @param int $inventorySlotId
+     * @return array
+     * @throws Exception
+     */
+    public function unequipItem(int $inventorySlotId): array {
+        if ($this->character->isInventoryFull()) {
+
+            return $this->errorResult('Your inventory is full. Cannot unequip item. You have no room in your inventory.');
+        }
+
+        $foundItem = $this->character->inventory->slots->find($inventorySlotId);
+
+        if (is_null($foundItem)) {
+            return $this->errorResult('No item found to be unequipped.');
+        }
+
+        $foundItem->update([
+            'equipped' => false,
+            'position' => null,
+        ]);
+
+        $character = $this->character->refresh();
+
+        $this->updateCharacterAttackDataCache($character);
+
+        event(new UpdateTopBarEvent($character->refresh()));
+
+        return $this->successResult([
+            'message' => 'Unequipped item: ' . $foundItem->item->name,
+            'inventory' => [
+                'inventory'         => $this->getInventoryForType('inventory'),
+                'equipped'          => $this->getInventoryForType('equipped'),
+                'sets'              => $this->getInventoryForType('sets')['sets'],
+                'set_is_equipped'   => false,
+                'set_name_equipped' => $this->getEquippedInventorySetName(),
+                'usable_sets'       => $this->getUsableSets()
+            ]
+        ]);
+    }
+
+    /**
+     * Unequip all items.
+     *
+     * @return array
+     * @throws Exception
+     */
+    public function unequipAllItems(): array {
+        if ($this->character->isInventoryFull()) {
+            return $this->errorResult('Your inventory is full. Cannot unequip items You have no room in your inventory.');
+        }
+
+        $this->character->inventory->slots->each(function ($slot) {
+            $slot->update([
+                'equipped' => false,
+                'position' => null,
+            ]);
+        });
+
+        $character = $this->character->refresh();
+
+        $this->updateCharacterAttackDataCache($character);
+
+        return $this->successResult([
+            'message' => 'All items have been removed.',
+            'inventory' => [
+                'inventory'         => $this->getInventoryForType('inventory'),
+                'equipped'          => $this->getInventoryForType('equipped'),
+                'set_is_equipped'   => false,
+                'set_name_equipped' => $this->getEquippedInventorySetName(),
+                'sets'              => $this->getInventoryForType('sets')['sets'],
+                'usable_sets'       => $this->getUsableSets()
+            ]
+        ]);
+    }
+
+    /**
+     * Destroy Alchemy item.
+     *
+     * @param int $slotId
+     * @return array
+     */
+    public function destroyAlchemyItem(int $slotId): array {
+        $slot = $this->character->inventory->slots->filter(function ($slot) use ($slotId) {
+            return $slot->id === $slotId;
+        })->first();
+
+        if (is_null($slot)) {
+
+            return $this->errorResult('No item found.');
+        }
+
+        $name = $slot->item->affix_name;
+
+        $slot->delete();
+
+        $character = $this->character->refresh();
+
+        event(new UpdateTopBarEvent($character));
+
+        return $this->successResult([
+            'message' => 'Destroyed Alchemy Item: ' . $name . '.',
+            'inventory' => [
+                'usable_items' => $this->getInventoryForType('usable_items')
+            ]
+        ]);
+    }
+
+    /**
+     * Destroy all alchemy items.
+     *
+     * @return array
+     */
+    public function destroyAllAlchemyItems(): array {
+        $slots = $this->character->inventory->slots->filter(function ($slot) {
+            return $slot->item->type === 'alchemy';
+        });
+
+        foreach ($slots as $slot) {
+            $slot->delete();
+        }
+
+        $character = $this->character->refresh();
+
+        event(new UpdateTopBarEvent($character));
+
+        return $this->successResult([
+            'message' => 'Destroyed All Alchemy Items.',
+            'inventory' => [
+                'usable_items' => $this->getInventoryForType('usable_items')
+            ]
+        ]);
+    }
+
+    /**
+     * Updates the character stats.
+     *
+     * @param Character $character
+     * @return void
+     * @throws Exception
+     */
+    protected function updateCharacterAttackDataCache(Character $character): void {
+        $this->updateCharacterAttackTypesHandler->updateCache($character);
     }
 
     /**
