@@ -5,6 +5,7 @@ namespace App\Game\Kingdoms\Controllers\Api;
 use App\Flare\Models\KingdomLog;
 use App\Flare\Transformers\KingdomAttackLogsTransformer;
 use App\Game\Kingdoms\Service\UpdateKingdom;
+use App\Game\Kingdoms\Transformers\KingdomTableTransformer;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
 use League\Fractal\Resource\Item;
@@ -44,6 +45,11 @@ class KingdomInformationController extends Controller{
     private KingdomAttackLogsTransformer $kingdomAttackLogsTransformer;
 
     /**
+     * @var KingdomTableTransformer $kingdomTableTransformer
+     */
+    private KingdomTableTransformer $kingdomTableTransformer;
+
+    /**
      * @var UpdateKingdom $updateKingdom
      */
     private UpdateKingdom $updateKingdom;
@@ -53,6 +59,7 @@ class KingdomInformationController extends Controller{
      * @param KingdomTransformer $kingdomTransformer
      * @param KingdomAttackLogsTransformer $kingdomAttackLogsTransformer
      * @param BasicKingdomTransformer $basicKingdomTransformer
+     * @param KingdomTableTransformer $kingdomTableTransformer
      * @param OtherKingdomTransformer $otherKingdomTransformer
      * @param UpdateKingdom $updateKingdom
      */
@@ -60,6 +67,7 @@ class KingdomInformationController extends Controller{
                                 KingdomTransformer $kingdomTransformer,
                                 KingdomAttackLogsTransformer $kingdomAttackLogsTransformer,
                                 BasicKingdomTransformer $basicKingdomTransformer,
+                                KingdomTableTransformer $kingdomTableTransformer,
                                 OtherKingdomTransformer $otherKingdomTransformer,
                                 UpdateKingdom $updateKingdom)
     {
@@ -68,6 +76,7 @@ class KingdomInformationController extends Controller{
         $this->kingdomAttackLogsTransformer = $kingdomAttackLogsTransformer;
         $this->basicKingdomTransformer      = $basicKingdomTransformer;
         $this->otherKingdomTransformer      = $otherKingdomTransformer;
+        $this->kingdomTableTransformer      = $kingdomTableTransformer;
         $this->updateKingdom                = $updateKingdom;
     }
 
@@ -98,11 +107,25 @@ class KingdomInformationController extends Controller{
     public function getKingdomsList(Character $character): JsonResponse {
         return response()->json([
             'kingdoms' => $this->manager->createData(
-                new Collection($character->kingdoms, $this->kingdomTransformer)
+                new Collection($character->kingdoms, $this->kingdomTableTransformer)
             )->toArray(),
             'logs'    => $this->manager->createData(
                 new Collection(KingdomLog::where('character_id', $character->id)->orderBy('id', 'desc')->get(), $this->kingdomAttackLogsTransformer)
             )->toArray(),
+        ]);
+    }
+
+    public function fetchKingdomDetails(Character $character, Kingdom $kingdom) {
+        if ($character->id !== $kingdom->character_id) {
+            return response()->json([
+                'message' => 'Not allowed to do that.'
+            ]);
+        }
+
+        return response()->json([
+            'kingdom' => $this->manager->createData(
+                new Item($kingdom, $this->kingdomTransformer)
+            )->toArray()
         ]);
     }
 

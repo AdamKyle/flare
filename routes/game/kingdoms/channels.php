@@ -15,5 +15,10 @@ Broadcast::channel('refresh-kingdom-queues-{userId}', function($user, $userId) {
     return $user->id === (int) $userId;
 });
 
+// When the kingdoms table should update.
+Broadcast::channel('kingdoms-list-data-{userId}', function($user, $userId) {
+    return $user->id === (int) $userId;
+});
+
 
 

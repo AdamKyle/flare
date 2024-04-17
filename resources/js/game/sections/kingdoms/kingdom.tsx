@@ -9,16 +9,56 @@ import UnitsInQueue from "../../lib/game/kingdoms/units-in-queue";
 import KingdomTabs from "./tabs/kingdom-tabs";
 import InformationSection from "./information-section";
 import InfoAlert from "../../components/ui/alerts/simple-alerts/info-alert";
+import LoadingProgressBar from "../../components/ui/progress-bars/loading-progress-bar";
+import Ajax from "../../lib/ajax/ajax";
+import {AxiosError, AxiosResponse} from "axios";
+import KingdomEventListener from "../../lib/game/event-listeners/kingdom-event-listener";
+import {serviceContainer} from "../../lib/containers/core-container";
+import UpdateKingdomListeners from "../../lib/game/event-listeners/game/update-kingdom-listeners";
 
 export default class Kingdom extends React.Component<KingdomProps, any> {
+
+    private updateKingdomListener: KingdomEventListener;
 
     constructor(props: KingdomProps) {
         super(props);
 
         this.state = {
+            loading: true,
             building_to_view: null,
             unit_to_view: null,
+            error_message: null,
+            kingdom: null,
         }
+
+        this.updateKingdomListener = serviceContainer().fetch<KingdomEventListener>(UpdateKingdomListeners);
+
+        this.updateKingdomListener.initialize(this, this.props.user_id);
+
+        this.updateKingdomListener.register();
+    }
+
+    componentDidMount() {
+        (new Ajax()).setRoute('player-kingdom/'+this.props.kingdom.character_id+'/' + this.props.kingdom.id)
+            .doAjaxCall('GET', (result: AxiosResponse) => {
+                this.setState({
+                    loading: false,
+                    kingdom: result.data.kingdom,
+                });
+            }, (error: AxiosError) => {
+
+                this.setState({loading: false});
+
+                if (typeof error.response !== 'undefined') {
+                    const response = error.response;
+
+                    this.setState({
+                        error_message: response.data.message,
+                    })
+                }
+            });
+
+        this.updateKingdomListener.listen();
     }
 
     manageViewBuilding(building?: BuildingDetails) {
@@ -46,12 +86,12 @@ export default class Kingdom extends React.Component<KingdomProps, any> {
             return false;
         }
 
-        if (this.props.kingdom.building_queue.length === 0) {
+        if (this.state.kingdom.building_queue.length === 0) {
             return false;
         }
 
 
-        return this.props.kingdom.building_queue.filter((queue: BuildingInQueueDetails) => {
+        return this.state.kingdom.building_queue.filter((queue: BuildingInQueueDetails) => {
             return queue.building_id === this.state.building_to_view.id
         }).length > 0;
     }
@@ -61,22 +101,26 @@ export default class Kingdom extends React.Component<KingdomProps, any> {
             return false;
         }
 
-        if (this.props.kingdom.unit_queue.length === 0) {
+        if (this.state.kingdom.unit_queue.length === 0) {
             return false;
         }
 
-        return this.props.kingdom.unit_queue.filter((queue: UnitsInQueue) => {
+        return this.state.kingdom.unit_queue.filter((queue: UnitsInQueue) => {
             return queue.game_unit_id === this.state.unit_to_view.id
         }).length > 0;
     }
 
     render() {
+        if (this.state.loading && this.state.kingdom === null) {
+            return <LoadingProgressBar />
+        }
+
         return (
             <Fragment>
                 {
-                    this.props.kingdom.is_protected ?
+                    this.state.kingdom.is_protected ?
                         <InfoAlert additional_css={'mt-4 mb-4'}>
-                            Your kingdom is under protection from attacks for the next: {this.props.kingdom.protected_days_left} day(s).
+                            Your kingdom is under protection from attacks for the next: {this.state.kingdom.protected_days_left} day(s).
                             This value does not include today.
                         </InfoAlert>
                     : null
@@ -86,7 +130,7 @@ export default class Kingdom extends React.Component<KingdomProps, any> {
                         <div className='text-right cursor-pointer text-red-500'>
                             <button onClick={this.props.close_details}><i className="fas fa-minus-circle"></i></button>
                         </div>
-                        <KingdomDetails kingdom={this.props.kingdom} character_gold={this.props.character_gold} close_details={this.props.close_details}/>
+                        <KingdomDetails kingdom={this.state.kingdom} character_gold={this.props.character_gold} close_details={this.props.close_details}/>
                     </BasicCard>
 
                     <div>
@@ -99,27 +143,27 @@ export default class Kingdom extends React.Component<KingdomProps, any> {
                                     }}
                                     close={this.closeSection.bind(this)}
                                     cost_reduction={{
-                                        kingdom_building_time_reduction: this.props.kingdom.building_time_reduction,
-                                        kingdom_building_cost_reduction: this.props.kingdom.building_cost_reduction,
-                                        kingdom_iron_cost_reduction: this.props.kingdom.iron_cost_reduction,
-                                        kingdom_population_cost_reduction: this.props.kingdom.population_cost_reduction,
-                                        kingdom_current_population: this.props.kingdom.current_population,
-                                        kingdom_unit_cost_reduction: this.props.kingdom.unit_cost_reduction,
-                                        kingdom_unit_time_reduction: this.props.kingdom.unit_time_reduction,
+                                        kingdom_building_time_reduction: this.state.kingdom.building_time_reduction,
+                                        kingdom_building_cost_reduction: this.state.kingdom.building_cost_reduction,
+                                        kingdom_iron_cost_reduction: this.state.kingdom.iron_cost_reduction,
+                                        kingdom_population_cost_reduction: this.state.kingdom.population_cost_reduction,
+                                        kingdom_current_population: this.state.kingdom.current_population,
+                                        kingdom_unit_cost_reduction: this.state.kingdom.unit_cost_reduction,
+                                        kingdom_unit_time_reduction: this.state.kingdom.unit_time_reduction,
                                     }}
-                                    buildings={this.props.kingdom.buildings}
+                                    buildings={this.state.kingdom.buildings}
                                     queue={{
                                         is_building_in_queue: this.isInQueue(),
                                         is_unit_in_queue: this.isUnitInQueue(),
                                     }}
-                                    character_id={this.props.kingdom.character_id}
-                                    kingdom_id={this.props.kingdom.id}
+                                    character_id={this.state.kingdom.character_id}
+                                    kingdom_id={this.state.kingdom.id}
                                     character_gold={this.props.character_gold}
                                     user_id={this.props.user_id}
                                 />
                             :
                                 <KingdomTabs
-                                    kingdom={this.props.kingdom}
+                                    kingdom={this.state.kingdom}
                                     kingdoms={this.props.kingdoms}
                                     dark_tables={this.props.dark_tables}
                                     manage_view_building={this.manageViewBuilding.bind(this)}

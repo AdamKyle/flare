@@ -17,9 +17,9 @@ export default class KingdomListeners implements GameListener {
 
     private kingdomLogUpdate?: Channel;
 
-    private kingdomUpdates?: Channel;
-
     private kingdomsUpdate?: Channel;
+
+    private kingdomsTableUpdate?: Channel;
 
     private npcKingdomsUpdate?: Channel;
 
@@ -38,11 +38,11 @@ export default class KingdomListeners implements GameListener {
         try {
             const echo = this.coreEventListener.getEcho();
 
-            this.kingdomUpdates = echo.private("update-kingdom-" + this.userId);
-
             this.kingdomLogUpdate = echo.private("update-new-kingdom-logs-" + this.userId);
 
             this.kingdomsUpdate = echo.private("add-kingdom-to-map-" + this.userId);
+
+            this.kingdomsTableUpdate = echo.private('kingdoms-list-data-' + this.userId);
 
             this.npcKingdomsUpdate = echo.join("npc-kingdoms-update");
 
@@ -54,7 +54,8 @@ export default class KingdomListeners implements GameListener {
 
     public listen(): void {
         this.listenForKingdomLogUpdates();
-        this.listenToKingdomUpdates();
+
+        this.listenToPlayerKingdomsTableUpdate();
 
         setTimeout(() => {
             this.listenToPlayerKingdomUpdates();
@@ -104,53 +105,6 @@ export default class KingdomListeners implements GameListener {
     }
 
     /**
-     * Listen to when one more kingdoms update.
-     *
-     * @protected
-     */
-    protected listenToKingdomUpdates() {
-        if (!this.kingdomUpdates) {
-            return
-        }
-
-        this.kingdomUpdates.listen(
-            "Game.Kingdoms.Events.UpdateKingdom",
-            (event: { kingdom: KingdomDetails }) => {
-
-                if (!this.component) {
-                    return;
-                }
-
-                const eventKingdom = event.kingdom;
-
-                if (Array.isArray(eventKingdom)) {
-                    this.component.setState({
-                        kingdoms: eventKingdom,
-                    });
-
-                    return;
-                }
-
-                let currentKingdoms = JSON.parse(
-                    JSON.stringify(this.component.state.kingdoms)
-                );
-
-                const index = currentKingdoms.findIndex(
-                    (kingdom: KingdomDetails) => kingdom.id === eventKingdom.id
-                );
-
-                if (index > -1) {
-                    currentKingdoms[index] = eventKingdom;
-                }
-
-                this.component.setState({
-                    kingdoms: currentKingdoms,
-                });
-            }
-        );
-    }
-
-    /**
      * Listen to when a players kingdoms update.
      *
      * @protected
@@ -176,6 +130,33 @@ export default class KingdomListeners implements GameListener {
 
                 this.component.setState({
                     map_data: mapData,
+                });
+            }
+        );
+    }
+
+    /**
+     * Listen to when a players kingdoms update.
+     *
+     * @protected
+     */
+    protected listenToPlayerKingdomsTableUpdate() {
+        if (!this.kingdomsTableUpdate) {
+            return
+        }
+
+        this.kingdomsTableUpdate.listen(
+            "Game.Kingdoms.Events.UpdateKingdomTable",
+            (event: any) => {
+
+                console.log(event);
+
+                if (!this.component) {
+                    return;
+                }
+
+                this.component.setState({
+                    kingdoms: event.kingdoms,
                 });
             }
         );

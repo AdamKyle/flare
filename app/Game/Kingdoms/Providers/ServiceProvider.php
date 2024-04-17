@@ -15,6 +15,7 @@ use App\Game\Kingdoms\Handlers\SettlerHandler;
 use App\Game\Kingdoms\Service\ExpandResourceBuildingService;
 use App\Game\Kingdoms\Service\KingdomQueueService;
 use App\Game\Kingdoms\Service\SteelSmeltingService;
+use App\Game\Kingdoms\Transformers\KingdomTableTransformer;
 use League\Fractal\Manager;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 
@@ -164,6 +165,7 @@ class ServiceProvider extends ApplicationServiceProvider {
         $this->app->bind(UpdateKingdom::class, function($app) {
             return new UpdateKingdom(
                 $app->make(KingdomTransformer::class),
+                $app->make(KingdomTableTransformer::class),
                 $app->make(KingdomAttackLogsTransformer::class),
                 $app->make(Manager::class)
             );

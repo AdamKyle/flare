@@ -274,7 +274,7 @@ class MassDisenchantService {
      * @return int
      */
     protected function updateGoldDust(bool $failedCheck = false): int {
-        $goldDust = !$failedCheck ? rand(2, 15) : 1;
+        $goldDust = !$failedCheck ? rand(2, 1150) : 1;
 
         if (!$failedCheck) {
             $goldDust = $goldDust + $goldDust * $this->disenchantingSkill->bonus;

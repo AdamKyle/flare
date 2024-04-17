@@ -8,6 +8,8 @@ use App\Flare\Models\KingdomLog;
 use App\Flare\Transformers\KingdomAttackLogsTransformer;
 use App\Game\Kingdoms\Events\UpdateKingdomLogs;
 use App\Game\Kingdoms\Events\UpdateKingdomQueues;
+use App\Game\Kingdoms\Events\UpdateKingdomTable;
+use App\Game\Kingdoms\Transformers\KingdomTableTransformer;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
 use League\Fractal\Resource\Item;
@@ -21,6 +23,8 @@ class UpdateKingdom {
      */
     private KingdomTransformer $kingdomTransformer;
 
+    private KingdomTableTransformer $kingdomTableTransformer;
+
     /**
      * @var KingdomAttackLogsTransformer
      */
@@ -33,14 +37,17 @@ class UpdateKingdom {
 
     /**
      * @param KingdomTransformer $kingdomTransformer
+     * @param KingdomTableTransformer $kingdomTableTransformer
      * @param KingdomAttackLogsTransformer $kingdomAttackLogsTransformer
      * @param Manager $manager
      */
     public function __construct(KingdomTransformer $kingdomTransformer,
+                                KingdomTableTransformer $kingdomTableTransformer,
                                 KingdomAttackLogsTransformer $kingdomAttackLogsTransformer,
                                 Manager $manager
     ) {
         $this->kingdomTransformer           = $kingdomTransformer;
+        $this->kingdomTableTransformer      = $kingdomTableTransformer;
         $this->kingdomAttackLogsTransformer = $kingdomAttackLogsTransformer;
         $this->manager                      = $manager;
     }
@@ -68,11 +75,11 @@ class UpdateKingdom {
      * @return void
      */
     public function updateKingdomAllKingdoms(Character $character): void {
-        $kingdomData = new Collection($character->kingdoms, $this->kingdomTransformer);
+        $kingdomData = new Collection($character->kingdoms, $this->kingdomTableTransformer);
 
         $kingdomData = $this->manager->createData($kingdomData)->toArray();
 
-        event(new UpdateKingdomDetails($character->user, $kingdomData));
+        event(new UpdateKingdomTable($character->user, $kingdomData));
     }
 
     /**

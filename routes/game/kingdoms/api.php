@@ -13,6 +13,7 @@ Route::middleware(['auth'])->group(function() {
 
 Route::middleware(['auth', 'is.character.who.they.say.they.are', 'character.owns.kingdom', 'throttle:500,1'])->group(function() {
     Route::get('/player-kingdoms/{character}', ['as' => 'character.kingdoms', 'uses' => 'Api\KingdomInformationController@getKingdomsList']);
+    Route::get('/player-kingdom/{character}/{kingdom}', ['as' => 'character.kingdom', 'uses' => 'Api\KingdomInformationController@fetchKingdomDetails']);
     Route::get('/kingdom/{kingdom}/{character}', ['as' => 'kingdom.character.info', 'uses' => 'Api\KingdomInformationController@getCharacterInfoForKingdom']);
     Route::get('/kingdoms/{character}/{kingdom}', ['as' => 'kingdoms.location', 'uses' => 'Api\KingdomInformationController@getLocationData']);
 });
