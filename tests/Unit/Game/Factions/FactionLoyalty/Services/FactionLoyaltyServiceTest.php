@@ -4,12 +4,15 @@ namespace Tests\Unit\Game\Factions\FactionLoyalty\Services;
 
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Monster;
+use App\Flare\Values\ItemEffectsValue;
+use App\Game\Events\Values\EventType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\Models\Character;
 use App\Flare\Values\MapNameValue;
 use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateEvent;
 use Tests\Traits\CreateFactionLoyalty;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateMonster;
@@ -17,7 +20,7 @@ use Tests\Traits\CreateNpc;
 
 class FactionLoyaltyServiceTest extends TestCase {
 
-    use RefreshDatabase, CreateNpc, CreateFactionLoyalty, CreateMonster, CreateItem;
+    use RefreshDatabase, CreateNpc, CreateFactionLoyalty, CreateMonster, CreateItem, CreateEvent;
 
 
     private ?Character $character = null;
@@ -457,9 +460,263 @@ class FactionLoyaltyServiceTest extends TestCase {
 
         $oldTasks = $npcTask->fame_tasks;
 
-        $newNPCtask = $this->factionLoyaltyService->createNewTasksForNpc($npcTask);
+        $newNPCtask = $this->factionLoyaltyService->createNewTasksForNpc($npcTask, $this->character);
 
         $this->assertNotEquals($oldTasks, $newNPCtask->fame_tasks);
+    }
+
+    public function testCreateNewTasksForNpcLoyaltyTasksWhenOnEventPlaneWithOutPurgatoryItem() {
+
+        $this->createEvent([
+            'type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+        ]);
+
+        $this->character->map()->update([
+            'game_map_id' => $this->createGameMap([
+                'only_during_event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+                'name' => MapNameValue::DELUSIONAL_MEMORIES,
+            ])->id
+        ]);
+
+        $surfaceGameMap = GameMap::where('name', MapNameValue::SURFACE)->first();
+
+        $this->character = $this->character->refresh();
+
+        $npc = $this->createNpc([
+            'game_map_id' => $this->character->map->game_map_id
+        ]);
+
+        $this->createMonster([
+            'game_map_id' => $this->character->map->game_map_id,
+        ]);
+
+        $this->createMonster([
+            'game_map_id' => $this->character->map->game_map_id,
+        ]);
+
+        $this->createMonster([
+            'game_map_id' => $this->character->map->game_map_id,
+        ]);
+
+        $this->createMonster([
+            'game_map_id' => $this->character->map->game_map_id,
+        ]);
+
+        $this->createMonster([
+            'game_map_id' => $this->character->map->game_map_id,
+        ]);
+
+        $this->createMonster([
+            'game_map_id' => $surfaceGameMap->id,
+        ]);
+
+        $this->createMonster([
+            'game_map_id' => $surfaceGameMap->id,
+        ]);
+
+        $this->createMonster([
+            'game_map_id' => $surfaceGameMap->id,
+        ]);
+
+        $this->createMonster([
+            'game_map_id' => $surfaceGameMap->id,
+        ]);
+
+        $this->createMonster([
+            'game_map_id' => $surfaceGameMap->id,
+        ]);
+
+        $this->createItem([
+            'skill_Level_required' => 10,
+            'skill_level_trivial' => 100,
+            'crafting_type' => 'weapon',
+        ]);
+
+        $this->createItem([
+            'skill_Level_required' => 10,
+            'skill_level_trivial' => 100,
+            'crafting_type' => 'armour',
+        ]);
+
+        $this->createItem([
+            'skill_Level_required' => 10,
+            'skill_level_trivial' => 100,
+            'crafting_type' => 'ring',
+        ]);
+
+        $this->createItem([
+            'skill_Level_required' => 10,
+            'skill_level_trivial' => 100,
+            'crafting_type' => 'spell',
+        ]);
+
+        $factionLoyalty = $this->createFactionLoyalty([
+            'faction_id'   => $this->character->factions->first()->id,
+            'character_id' => $this->character->id,
+        ]);
+
+        $factionNpc = $this->createFactionLoyaltyNpc([
+            'faction_loyalty_id'          => $factionLoyalty->id,
+            'npc_id'                      => $npc->id,
+            'current_level'               => 0,
+            'max_level'                   => 25,
+            'next_level_fame'             => 100,
+            'currently_helping'           => false,
+            'kingdom_item_defence_bonus'  => 0.002,
+        ]);
+
+        $npcTask = $this->createFactionLoyaltyNpcTask([
+            'faction_loyalty_id'      => $factionLoyalty->id,
+            'faction_loyalty_npc_id'  => $factionNpc->id,
+            'fame_tasks'              => [],
+        ]);
+
+        $oldTasks = $npcTask->fame_tasks;
+
+        $newNPCtask = $this->factionLoyaltyService->createNewTasksForNpc($npcTask, $this->character);
+
+        $this->assertNotEquals($oldTasks, $newNPCtask->fame_tasks);
+
+        foreach ($newNPCtask->fame_tasks as $task) {
+            if ($task['type'] === 'bounty') {
+                $monster = Monster::find($task['monster_id']);
+
+                $this->assertEquals(MapNameValue::SURFACE, $monster->gameMap->name);
+            }
+        }
+    }
+
+    public function testCreateNewTasksForNpcLoyaltyTasksWhenOnEventPlaneWithPurgatoryItem() {
+
+        $this->createEvent([
+            'type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+        ]);
+
+        $this->character->map()->update([
+            'game_map_id' => $this->createGameMap([
+                'only_during_event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+                'name' => MapNameValue::DELUSIONAL_MEMORIES,
+            ])->id
+        ]);
+
+        $this->character = $this->character->refresh();
+
+        $surfaceGameMap = GameMap::where('name', MapNameValue::SURFACE)->first();
+
+        $item = $this->createItem([
+            'type' => 'quest',
+            'effect' => ItemEffectsValue::PURGATORY,
+        ]);
+
+        $this->character->inventory->slots()->create([
+            'inventory_id' => $this->character->inventory->id,
+            'item_id' => $item->id,
+        ]);
+
+        $this->character = $this->character->refresh();
+
+        $npc = $this->createNpc([
+            'game_map_id' => $this->character->map->game_map_id
+        ]);
+
+        $this->createMonster([
+            'game_map_id' => $this->character->map->game_map_id,
+        ]);
+
+        $this->createMonster([
+            'game_map_id' => $this->character->map->game_map_id,
+        ]);
+
+        $this->createMonster([
+            'game_map_id' => $this->character->map->game_map_id,
+        ]);
+
+        $this->createMonster([
+            'game_map_id' => $this->character->map->game_map_id,
+        ]);
+
+        $this->createMonster([
+            'game_map_id' => $this->character->map->game_map_id,
+        ]);
+
+        $this->createMonster([
+            'game_map_id' => $surfaceGameMap->id,
+        ]);
+
+        $this->createMonster([
+            'game_map_id' => $surfaceGameMap->id,
+        ]);
+
+        $this->createMonster([
+            'game_map_id' => $surfaceGameMap->id,
+        ]);
+
+        $this->createMonster([
+            'game_map_id' => $surfaceGameMap->id,
+        ]);
+
+        $this->createMonster([
+            'game_map_id' => $surfaceGameMap->id,
+        ]);
+
+        $this->createItem([
+            'skill_Level_required' => 10,
+            'skill_level_trivial' => 100,
+            'crafting_type' => 'weapon',
+        ]);
+
+        $this->createItem([
+            'skill_Level_required' => 10,
+            'skill_level_trivial' => 100,
+            'crafting_type' => 'armour',
+        ]);
+
+        $this->createItem([
+            'skill_Level_required' => 10,
+            'skill_level_trivial' => 100,
+            'crafting_type' => 'ring',
+        ]);
+
+        $this->createItem([
+            'skill_Level_required' => 10,
+            'skill_level_trivial' => 100,
+            'crafting_type' => 'spell',
+        ]);
+
+        $factionLoyalty = $this->createFactionLoyalty([
+            'faction_id'   => $this->character->factions->first()->id,
+            'character_id' => $this->character->id,
+        ]);
+
+        $factionNpc = $this->createFactionLoyaltyNpc([
+            'faction_loyalty_id'          => $factionLoyalty->id,
+            'npc_id'                      => $npc->id,
+            'current_level'               => 0,
+            'max_level'                   => 25,
+            'next_level_fame'             => 100,
+            'currently_helping'           => false,
+            'kingdom_item_defence_bonus'  => 0.002,
+        ]);
+
+        $npcTask = $this->createFactionLoyaltyNpcTask([
+            'faction_loyalty_id'      => $factionLoyalty->id,
+            'faction_loyalty_npc_id'  => $factionNpc->id,
+            'fame_tasks'              => [],
+        ]);
+
+        $oldTasks = $npcTask->fame_tasks;
+
+        $newNPCtask = $this->factionLoyaltyService->createNewTasksForNpc($npcTask, $this->character);
+
+        $this->assertNotEquals($oldTasks, $newNPCtask->fame_tasks);
+
+        foreach ($newNPCtask->fame_tasks as $task) {
+            if ($task['type'] === 'bounty') {
+                $monster = Monster::find($task['monster_id']);
+
+                $this->assertEquals(MapNameValue::DELUSIONAL_MEMORIES, $monster->gameMap->name);
+            }
+        }
     }
 
     public function testFailToAssistNpcThatDoesNotBelongToCharacter() {

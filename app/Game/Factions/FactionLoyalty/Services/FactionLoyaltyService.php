@@ -9,9 +9,11 @@ use App\Flare\Models\Faction;
 use App\Flare\Models\FactionLoyalty;
 use App\Flare\Models\FactionLoyaltyNpc;
 use App\Flare\Models\FactionLoyaltyNpcTask;
+use App\Flare\Models\GameMap;
 use App\Flare\Models\Item;
 use App\Flare\Models\Monster;
 use App\Flare\Models\Npc;
+use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\MapNameValue;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Events\Values\EventType;
@@ -203,7 +205,7 @@ class FactionLoyaltyService {
                 'is_pledged'   => true,
             ]);
 
-            $this->createNpcsForLoyalty($factionLoyalty);
+            $this->createNpcsForLoyalty($character, $factionLoyalty);
         }
 
         return $this->successResult([
@@ -221,14 +223,15 @@ class FactionLoyaltyService {
      * Creates new tasks for the Faction Npc Tasks.
      *
      * @param FactionLoyaltyNpcTask $factionLoyaltyNpcTask
+     * @param Character $character
      * @return FactionLoyaltyNpcTask
      * @throws Exception
      */
-    public function createNewTasksForNpc(FactionLoyaltyNpcTask $factionLoyaltyNpcTask): FactionLoyaltyNpcTask {
+    public function createNewTasksForNpc(FactionLoyaltyNpcTask $factionLoyaltyNpcTask, Character $character): FactionLoyaltyNpcTask {
         $npc = $factionLoyaltyNpcTask->factionLoyaltyNpc->npc;
 
         $craftingTasks = $this->createCraftingTasks($npc->gameMap->name);
-        $bountyTasks   = $this->createBountyTasks($npc->game_map_id);
+        $bountyTasks   = $this->createBountyTasks($character, $npc->gameMap);
 
         $tasks = array_merge($craftingTasks, $bountyTasks);
 
@@ -249,19 +252,20 @@ class FactionLoyaltyService {
     /**
      * Create NPC For Loyalty.
      *
+     * @param Character $character
      * @param FactionLoyalty $factionLoyalty
      * @return void
      * @throws Exception
      */
-    protected function createNpcsForLoyalty(FactionLoyalty $factionLoyalty) {
+    protected function createNpcsForLoyalty(Character $character, FactionLoyalty $factionLoyalty): void
+    {
         $npcs = Npc::where('game_map_id', $factionLoyalty->faction->game_map_id)->get();
 
         $totalNpcFame = (1 / $npcs->count()) / 25;
 
         foreach ($npcs as $npc) {
-
             $craftingTasks = $this->createCraftingTasks($npc->gameMap->name);
-            $bountyTasks   = $this->createBountyTasks($npc->game_map_id);
+            $bountyTasks   = $this->createBountyTasks($character, $npc->gameMap);
 
             $factionLoyaltyNpc = FactionLoyaltyNpc::create([
                 'faction_loyalty_id'         => $factionLoyalty->id,
@@ -329,11 +333,26 @@ class FactionLoyaltyService {
     /**
      * Create three bounty tasks.
      *
-     * @param int $gameMapId
+     * @param Character $character
+     * @param GameMap $gameMap
      * @return array
      */
-    protected function createBountyTasks(int $gameMapId): array {
+    protected function createBountyTasks(Character $character, GameMap $gameMap): array {
+
         $tasks = [];
+
+        $gameMapId = $gameMap->id;
+
+        if (!is_null($gameMap->only_during_event_type)) {
+
+            $hasPurgatoryItem = $character->inventory->slots->filter(function($slot) {
+                return $slot->item->type === 'quest' && $slot->item->effect === ItemEffectsValue::PURGATORY;
+            })->first();
+
+            if (is_null($hasPurgatoryItem)) {
+                $gameMapId = GameMap::where('name', MapNameValue::SURFACE)->first()->id;
+            }
+        }
 
         while (count($tasks) < 3) {
 
@@ -341,6 +360,7 @@ class FactionLoyaltyService {
                 ->where('is_raid_monster', false)
                 ->where('is_raid_boss', false)
                 ->where('is_celestial_entity', false)
+                ->whereNull('only_for_location_type')
                 ->inRandomOrder()
                 ->first();
 

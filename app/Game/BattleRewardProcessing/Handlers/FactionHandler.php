@@ -5,6 +5,7 @@ namespace App\Game\BattleRewardProcessing\Handlers;
 
 use App\Flare\Builders\RandomAffixGenerator;
 use App\Flare\Models\Character;
+use App\Flare\Models\Event;
 use App\Flare\Models\Faction;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Inventory;
@@ -17,6 +18,7 @@ use App\Flare\Values\MaxCurrenciesValue;
 use App\Flare\Values\RandomAffixDetails;
 use App\Game\Core\Values\FactionLevel;
 use App\Game\Core\Values\FactionType;
+use App\Game\Events\Values\EventType;
 use App\Game\GuideQuests\Services\GuideQuestService;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
@@ -68,7 +70,7 @@ class FactionHandler {
             return;
         }
 
-        $map     = GameMap::find($monster->game_map_id);
+        $map     = GameMap::find($character->map->game_map_id);
         $faction = Faction::where('character_id', $character->id)->where('game_map_id', $map->id)->first();
 
         if (is_null($faction)) {

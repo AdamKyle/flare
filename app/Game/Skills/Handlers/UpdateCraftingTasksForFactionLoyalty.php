@@ -135,7 +135,7 @@ class UpdateCraftingTasksForFactionLoyalty {
                 'fame_tasks' => []
             ]);
         } else {
-            $this->factionLoyaltyService->createNewTasksForNpc($helpingNpc->factionLoyaltyNpcTasks);
+            $this->factionLoyaltyService->createNewTasksForNpc($helpingNpc->factionLoyaltyNpcTasks, $character);
         }
     }
 
