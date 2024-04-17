@@ -10,7 +10,9 @@ use App\Game\Quests\Handlers\NpcQuestRewardHandler;
 use App\Game\Quests\Handlers\NpcQuestsHandler;
 use App\Game\Quests\Services\BuildQuestCacheService;
 use App\Game\Quests\Services\QuestHandlerService;
+use App\Game\Quests\Transformers\QuestTransformer;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
+use League\Fractal\Manager;
 
 class ServiceProvider extends ApplicationServiceProvider
 {
@@ -44,6 +46,13 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(CanTravelToMap::class),
                 $app->make(MapTileValue::class),
                 $app->make(BuildQuestCacheService::class)
+            );
+        });
+
+        $this->app->bind(BuildQuestCacheService::class, function($app) {
+            return new BuildQuestCacheService(
+                $app->make(QuestTransformer::class),
+                $app->make(Manager::class),
             );
         });
     }

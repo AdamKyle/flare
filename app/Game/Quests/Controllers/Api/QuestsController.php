@@ -28,7 +28,7 @@ class QuestsController extends Controller {
         $eventWithRaid = Event::whereNotNull('raid_id')->first();
 
         return response()->json([
-            'completed_quests' => $character->questsCompleted()->pluck('quest_id'),
+            'completed_quests' => $character->questsCompleted()->whereNotNull('quest_id')->pluck('quest_id'),
             'quests'           => $this->buildQuestCacheService->getRegularQuests(),
             'raid_quests'      => $this->buildQuestCacheService->fetchQuestsForRaid($eventWithRaid),
             'player_plane'     => $character->map->gameMap->name,

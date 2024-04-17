@@ -2,16 +2,24 @@
 
 namespace App\Game\Quests\Services;
 
+use Illuminate\Support\Facades\Cache;
+use League\Fractal\Manager;
 use App\Flare\Models\Event;
 use App\Flare\Models\Quest;
 use App\Flare\Models\Raid;
 use App\Game\Events\Values\EventType;
 use App\Game\Quests\Events\UpdateQuests;
 use App\Game\Quests\Events\UpdateRaidQuests;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Facades\Cache;
+use App\Game\Quests\Transformers\QuestTransformer;
+use League\Fractal\Resource\Collection;
 
 class BuildQuestCacheService {
+
+    /**
+     * @param QuestTransformer $questTransformer
+     * @param Manager $manager
+     */
+    public function __construct(private QuestTransformer $questTransformer, private Manager $manager){}
 
     public function buildQuestCache(bool $sendOffEvent = false): void {
         $quests = Quest::where('is_parent', true)
@@ -20,7 +28,8 @@ class BuildQuestCacheService {
             ->with('childQuests')
             ->get();
 
-        $quests = $quests->toArray();
+        $quests = new Collection($quests, $this->questTransformer);
+        $quests = $this->manager->createData($quests)->toArray();
 
         $eventQuests = [];
         $events = [EventType::WINTER_EVENT, EventType::DELUSIONAL_MEMORIES_EVENT];
@@ -46,12 +55,15 @@ class BuildQuestCacheService {
             return [];
         }
 
-        return Quest::where('is_parent', true)
+        $quests = Quest::where('is_parent', true)
             ->where('only_for_event', $eventType)
             ->whereNull('raid_id')
             ->with('childQuests')
-            ->get()
-            ->toArray();
+            ->get();
+
+        $quests = new Collection($quests, $this->questTransformer);
+
+        return $this->manager->createData($quests)->toArray();
     }
 
     public function buildRaidQuestCache(bool $sendOffEvent = false): void {
@@ -64,18 +76,23 @@ class BuildQuestCacheService {
                 ->with('childQuests')
                 ->get();
 
-            $raidQuests[$raid->id] = $quests->toArray();
+            $quests = new Collection($quests, $this->questTransformer);
+            $quests = $this->manager->createData($quests)->toArray();
+
+            $raidQuests[$raid->id] = $quests;
         }
 
         Cache::put('raid-quests', $raidQuests);
 
         if ($sendOffEvent) {
 
-            $event  = Event::where('type', EventType::WINTER_EVENT)->first();
-            $quests = [];
+            $winterEvent      = Event::where('type', EventType::WINTER_EVENT)->first();
+            $delusionalEvent  = Event::where('type', EventType::DELUSIONAL_MEMORIES_EVENT)->first();
 
-            if (!is_null($event)) {
-                $quests = $this->fetchQuestsForRaid($event);
+            if (!is_null($winterEvent)) {
+                $quests = $this->fetchQuestsForRaid($winterEvent);
+            } else if (!is_null($delusionalEvent)) {
+                $quests = $this->fetchQuestsForRaid($delusionalEvent);
             } else {
                 $quests = $this->fetchQuestsForRaid();
             }
