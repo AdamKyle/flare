@@ -65,4 +65,6 @@ export default interface GameState {
     fame_action_tasks: FameTasks[] | null;
 
     show_guide_quest_completed: boolean;
+
+    hide_donation_alert: boolean;
 }
