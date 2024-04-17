@@ -2,16 +2,9 @@
 
 namespace App\Game\Core\Handlers;
 
-use App\Game\Kingdoms\Handlers\UpdateKingdomHandler;
 use Illuminate\Database\Eloquent\Collection;
 
 class HandleGoldBarsAsACurrency {
-
-    private UpdateKingdomHandler $updateKingdomHandler;
-
-    public function __construct(UpdateKingdomHandler $updateKingdomHandler) {
-        $this->updateKingdomHandler = $updateKingdomHandler;
-    }
 
     /**
      * Can afford the gold bars cost.
@@ -37,8 +30,6 @@ class HandleGoldBarsAsACurrency {
      */
     public function subtractCostFromKingdoms(Collection $kingdoms, int $goldBarCost): void {
 
-        $contributions = [];
-
         $totalGoldBars = $kingdoms->sum('gold_bars');
 
         $kingdomWhoCanAbsorbCost = $kingdoms->where('gold_bars', '>=', $goldBarCost)->first();
@@ -50,33 +41,17 @@ class HandleGoldBarsAsACurrency {
                 'gold_bars' => max($newGoldBars, 0),
             ]);
 
-            $this->updateKingdomHandler->refreshPlayersKingdoms($kingdoms->first()->character->refresh());
-
             return;
         }
 
-        $kingdoms = $kingdoms->filter(function($kingdom) { return $kingdom->gold_bars > 0; });
-
-        foreach ($kingdoms as $kingdom) {
-
-            $contribution = floor($goldBarCost * $kingdom->gold_bars / $totalGoldBars);
-
-            $contribution = min($contribution, $kingdom->gold_bars);
-
-            $contributions[$kingdom->id] = $contribution;
-
-            $goldBarCost -= $contribution;
-            $totalGoldBars -= $kingdom->gold_bars;
-        }
-
-        foreach ($kingdoms as $kingdom) {
-            $newAmount = $kingdom->gold_bars - $contributions[$kingdom->id];
-
-            $kingdom->update([
-                'gold_bars' => max($newAmount, 0),
-            ]);
-        }
-
-        $this->updateKingdomHandler->refreshPlayersKingdoms($kingdoms->first()->character->refresh());
+        $kingdoms->each(function ($kingdom) use (&$goldBarCost, &$totalGoldBars) {
+            if ($kingdom->gold_bars > 0) {
+                $contribution = min(floor($goldBarCost * $kingdom->gold_bars / $totalGoldBars), $kingdom->gold_bars);
+                $goldBarCost -= $contribution;
+                $totalGoldBars -= $kingdom->gold_bars;
+                $newAmount = max($kingdom->gold_bars - $contribution, 0);
+                $kingdom->update(['gold_bars' => $newAmount]);
+            }
+        });
     }
 }
