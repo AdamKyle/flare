@@ -1,5 +1,5 @@
-import SmallCraftingSection from "../../../../sections/game-actions-section/components/small-actions/small-crafting-section";
-import {CraftingOptions} from "../../types/actions/crafting-type-options";
+import SmallCraftingSection from "../../../../components/crafting/general-crafting/small-crafting-section";
+import {CraftingOptions} from "../../../../components/crafting/base-components/types/crafting-type-options";
 import {capitalize} from "lodash";
 
 export default class CraftingSectionManager {

@@ -7,7 +7,7 @@ import RenderAtonementAdjustment from "./components/render-atonement-adjustment"
 import PrimaryButton from "../../../components/ui/buttons/primary-button";
 import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
 import DangerAlert from "../../../components/ui/alerts/simple-alerts/danger-alert";
-import SeerActions from "../../../lib/game/actions/seer-camp/seer-actions";
+import SeerActions from "../../../components/npc-actions/seer-camp/ajax/seer-actions";
 
 export default class RemoveGemComparison extends React.Component<any, any> {
 

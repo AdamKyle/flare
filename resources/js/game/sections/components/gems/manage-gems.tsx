@@ -9,7 +9,7 @@ import AddingTheGem from "./adding-the-gem";
 import ReplacingAGem from "./replacing-a-gem";
 import InfoAlert from "../../../components/ui/alerts/simple-alerts/info-alert";
 import {formatNumber} from "../../../lib/game/format-number";
-import SeerActions from "../../../lib/game/actions/seer-camp/seer-actions";
+import SeerActions from "../../../components/npc-actions/seer-camp/ajax/seer-actions";
 import DangerAlert from "../../../components/ui/alerts/simple-alerts/danger-alert";
 import ManageGemsState from "./types/manage-gems-state";
 import ManageGemsProps from "./types/manage-gems-props";

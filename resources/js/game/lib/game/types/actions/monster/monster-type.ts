@@ -1,5 +1,5 @@
 import ElementalAtonement
-    from "../../../../../sections/game-actions-section/components/deffinitions/elemental-atonement";
+    from "../../../../../components/crafting/gem-crafting/deffinitions/elemental-atonement";
 
 export default interface MonsterType {
     id: number;

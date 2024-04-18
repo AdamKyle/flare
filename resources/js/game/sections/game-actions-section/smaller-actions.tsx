@@ -4,7 +4,7 @@ import SmallActionsState from "./types/small-actions-state";
 import SmallActionsManager from "../../lib/game/actions/small-actions-manager";
 import MonsterActions from "./components/small-actions/monster-actions";
 import ActionsTimers from "./components/actions-timers";
-import SmallCraftingSection from "./components/small-actions/small-crafting-section";
+import SmallCraftingSection from "../../components/crafting/general-crafting/small-crafting-section";
 import SmallExplorationSection from "./components/small-actions/small-exploration-section";
 import JoinPvp from "./components/join-pvp";
 import MapTimer from "../map/map-timer";

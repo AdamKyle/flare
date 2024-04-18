@@ -29,6 +29,8 @@ class ServiceProvider extends ApplicationServiceProvider {
      * @return void
      */
     public function register() {
+
+        // @codeCoverageIgnoreStart
         $this->app->bind(Manager::class, function ($app) {
             $manager = new Manager();
 
@@ -37,6 +39,7 @@ class ServiceProvider extends ApplicationServiceProvider {
 
             return $manager;
         });
+        // @codeCoverageIgnoreEnd
 
         $this->app->bind(SetHandsValidation::class, function () {
             return new SetHandsValidation();

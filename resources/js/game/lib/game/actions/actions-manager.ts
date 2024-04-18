@@ -1,7 +1,7 @@
 import Ajax from "../../ajax/ajax";
 import { AxiosError, AxiosResponse } from "axios";
 import { capitalize } from "lodash";
-import { CraftingOptions } from "../types/actions/crafting-type-options";
+import { CraftingOptions } from "../../../components/crafting/base-components/types/crafting-type-options";
 import Actions from "../../../sections/game-actions-section/actions";
 import PvpCharactersType from "../types/pvp-characters-type";
 import { DateTime } from "luxon";

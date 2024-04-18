@@ -1,4 +1,4 @@
-import ElementalAtonement from "../deffinitions/elemental-atonement";
+import ElementalAtonement from "../../../../components/crafting/gem-crafting/deffinitions/elemental-atonement";
 
 export default interface RaidSelectionState {
 
