@@ -274,11 +274,10 @@ class  CharacterInventoryController extends Controller {
     /**
      * @param Request $request
      * @param Character $character
-     * @param InventorySetService $inventorySetService
      * @return JsonResponse
      * @throws Exception
      */
-    public function unequipAll(Request $request, Character $character, InventorySetService $inventorySetService): JsonResponse {
+    public function unequipAll(Request $request, Character $character): JsonResponse {
 
         if ($request->is_set_equipped) {
             $result = $this->inventorySetService->unequipSet($character);

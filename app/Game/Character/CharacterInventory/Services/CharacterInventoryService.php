@@ -667,7 +667,7 @@ class CharacterInventoryService {
         event(new UpdateTopBarEvent($character->refresh()));
 
         return $this->successResult([
-            'message' => 'Unequipped item: ' . $foundItem->item->name,
+            'message' => 'Unequipped item: ' . $foundItem->item->affix_name,
             'inventory' => [
                 'inventory'         => $this->getInventoryForType('inventory'),
                 'equipped'          => $this->getInventoryForType('equipped'),

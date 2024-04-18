@@ -3,7 +3,9 @@
 namespace Tests\Feature\Game\Character\CharacterInventory\Controllers\Api;
 
 use App\Flare\Values\WeaponTypes;
+use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Queue;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateGem;
@@ -270,5 +272,188 @@ class CharacterInventoryControllerTest extends TestCase {
         $jsonData = json_decode($response->getContent(), true);
 
         $this->assertEquals('Equipped item.', $jsonData['message']);
+    }
+
+    public function testUnequipSet() {
+
+        $character = $this->character->inventorySetManagement()
+            ->createInventorySets(1, true)
+            ->putItemInSet($this->createItem(), 0, 'left-hand', true)
+            ->getCharacter();
+
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/character/'.$character->id.'/inventory/unequip', [
+                'inventory_set_equipped' => true,
+                'item_to_remove' => $character->inventorySets->first()->slots->first()->id,
+            ]);
+
+        $jsonData = json_decode($response->getContent(), true);
+
+        $this->assertEquals('Unequipped ' . $character->inventorySets->first()->name . '.', $jsonData['message']);
+    }
+
+    public function testUnequipItem() {
+
+        $character = $this->character->equipStartingEquipment()
+            ->getCharacter();
+
+        $slot = $character->inventory->slots()->where('equipped', true)->first();
+
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/character/'.$character->id.'/inventory/unequip', [
+                'inventory_set_equipped' => false,
+                'item_to_remove' => $slot->id,
+            ]);
+
+        $jsonData = json_decode($response->getContent(), true);
+
+        $this->assertEquals('Unequipped item: ' . $slot->item->affix_name, $jsonData['message']);
+    }
+
+    public function testWhenUnequipAllUnequipTheSet() {
+        $character = $this->character->inventorySetManagement()
+            ->createInventorySets(1, true)
+            ->putItemInSet($this->createItem(), 0, 'left-hand', true)
+            ->getCharacter();
+
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/character/'.$character->id.'/inventory/unequip-all', [
+                'is_set_equipped' => true,
+            ]);
+
+        $jsonData = json_decode($response->getContent(), true);
+
+        $this->assertEquals('Unequipped ' . $character->inventorySets->first()->name . '.', $jsonData['message']);
+    }
+
+    public function testUnequipAllNonSetItems() {
+        $character = $this->character->equipStartingEquipment()
+            ->getCharacter();
+
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/character/'.$character->id.'/inventory/unequip-all', [
+                'is_set_equipped' => false,
+            ]);
+
+        $jsonData = json_decode($response->getContent(), true);
+
+        $this->assertEquals('All items have been unequipped.', $jsonData['message']);
+    }
+
+    public function testEquipAndItemSet() {
+        $character = $this->character->inventorySetManagement()
+            ->createInventorySets(1, true)
+            ->putItemInSet($this->createItem(), 0)
+            ->getCharacter();
+
+        $set = $character->inventorySets()->first();
+
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/character/'.$character->id.'/inventory-set/equip/' . $set->id);
+
+        $jsonData = json_decode($response->getContent(), true);
+
+        $this->assertEquals($set->name .  ' is now equipped', $jsonData['message']);
+    }
+
+    public function testUseManyItems() {
+
+        Queue::fake();
+
+        $item = $this->createItem([
+            'usable' => true,
+            'lasts_for' => 30,
+            'type' => 'alchemy',
+            'affects_skill_type' => SkillTypeValue::TRAINING,
+        ]);
+
+        $character = (new CharacterFactory())->createBaseCharacter()
+            ->givePlayerLocation()
+            ->inventoryManagement()
+            ->giveItem($item)
+            ->getCharacter();
+
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/character/'.$character->id.'/inventory/use-many-items', [
+                'items_to_use' => [
+                    $character->inventory->slots->first()->id
+                ]
+            ]);
+
+        $jsonData = json_decode($response->getContent(), true);
+
+        $this->assertEquals('Used selected items.', $jsonData['message']);
+    }
+
+    public function testUseSingleAlchemyItem() {
+        Queue::fake();
+
+        $item = $this->createItem([
+            'usable' => true,
+            'lasts_for' => 30,
+            'type' => 'alchemy',
+            'affects_skill_type' => SkillTypeValue::TRAINING,
+        ]);
+
+        $character = (new CharacterFactory())->createBaseCharacter()
+            ->givePlayerLocation()
+            ->inventoryManagement()
+            ->giveItem($item)
+            ->getCharacter();
+
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/character/'.$character->id.'/inventory/use-item/' . $item->id);
+
+        $jsonData = json_decode($response->getContent(), true);
+
+        $this->assertEquals('Used selected item.', $jsonData['message']);
+    }
+
+    public function testDestroyAlchemyItem() {
+        $item = $this->createItem([
+            'usable' => true,
+            'lasts_for' => 30,
+            'type' => 'alchemy',
+            'affects_skill_type' => SkillTypeValue::TRAINING,
+        ]);
+
+        $character = (new CharacterFactory())->createBaseCharacter()
+            ->givePlayerLocation()
+            ->inventoryManagement()
+            ->giveItem($item)
+            ->getCharacter();
+
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/character/'.$character->id.'/inventory/destroy-alchemy-item', [
+                'slot_id' => $character->inventory->slots->first()->id
+            ]);
+
+        $jsonData = json_decode($response->getContent(), true);
+
+        $this->assertEquals('Destroyed Alchemy Item: ' . $item->name . '.', $jsonData['message']);
+    }
+
+    public function testDestroyAllAlchemyItems() {
+        $item = $this->createItem([
+            'usable' => true,
+            'lasts_for' => 30,
+            'type' => 'alchemy',
+            'affects_skill_type' => SkillTypeValue::TRAINING,
+        ]);
+
+        $character = (new CharacterFactory())->createBaseCharacter()
+            ->givePlayerLocation()
+            ->inventoryManagement()
+            ->giveItem($item)
+            ->getCharacter();
+
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/character/'.$character->id.'/inventory/destroy-all-alchemy-items', [
+                'slot_id' => $character->inventory->slots->first()->id
+            ]);
+
+        $jsonData = json_decode($response->getContent(), true);
+
+        $this->assertEquals('Destroyed All Alchemy Items.', $jsonData['message']);
     }
 }
