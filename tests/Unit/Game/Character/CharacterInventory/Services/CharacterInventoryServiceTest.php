@@ -359,4 +359,114 @@ class CharacterInventoryServiceTest extends TestCase {
 
         $this->assertEmpty($character->inventory->slots);
     }
+
+    public function testCannotUnequipItemWhenInventoryIsFull() {
+        $character = $this->character->equipStartingEquipment()->getCharacter();
+
+        $character->update([
+            'inventory_max' => 0,
+        ]);
+
+        $character = $character->refresh();
+
+        $result = $this->characterInventoryService->setCharacter($character)->unequipItem(4);
+
+        $this->assertEquals(422, $result['status']);
+        $this->assertEquals('Your inventory is full. Cannot unequip items. You have no room in your inventory.', $result['message']);
+    }
+
+    public function testCannotUnequipItemWhenItemDoesNotExist() {
+        $character = $this->character->equipStartingEquipment()->getCharacter();
+
+        $result = $this->characterInventoryService->setCharacter($character)->unequipItem(4);
+
+        $this->assertEquals(422, $result['status']);
+        $this->assertEquals('No item found to be unequipped.', $result['message']);
+    }
+
+    public function testCanUnequipItem() {
+        $character = $this->character->equipStartingEquipment()->getCharacter();
+
+        $slot = $character->inventory->slots()->where('equipped', true)->first();
+
+        $result = $this->characterInventoryService->setCharacter($character)->unequipItem($slot->id);
+
+        $this->assertEquals(200, $result['status']);
+        $this->assertEquals('Unequipped item: ' . $slot->item->affix_name, $result['message']);
+
+        $this->assertFalse($slot->refresh()->equipped);
+    }
+
+    public function testInventoryIsFullCannotUnequipItems() {
+        $character = $this->character->equipStartingEquipment()->getCharacter();
+
+        $character->update([
+            'inventory_max' => 0,
+        ]);
+
+        $character = $character->refresh();
+
+        $result = $this->characterInventoryService->setCharacter($character)->unequipAllItems();
+
+        $this->assertEquals(422, $result['status']);
+        $this->assertEquals('Your inventory is full. Cannot unequip items. You have no room in your inventory.', $result['message']);
+    }
+
+    public function testCanUnequipAllItems() {
+        $character = $this->character->equipStartingEquipment()->getCharacter();
+
+        $character = $character->refresh();
+
+        $result = $this->characterInventoryService->setCharacter($character)->unequipAllItems();
+
+        $this->assertEquals(200, $result['status']);
+        $this->assertEquals('All items have been unequipped.', $result['message']);
+
+        $character = $character->refresh();
+
+        $this->assertEmpty($character->inventory->slots()->where('equipped', true)->get());
+    }
+
+    public function testCannotDestroyAlchemyItemYouDoNotHave() {
+        $character = $this->character->getCharacter();
+
+        $result = $this->characterInventoryService->setCharacter($character)->destroyAlchemyItem(1);
+
+        $this->assertEquals(422, $result['status']);
+        $this->assertEquals('No alchemy item found to destroy.', $result['message']);
+    }
+
+    public function testCanDeleteAlchemyItem() {
+        $alchemyItem = $this->createItem([
+            'type' => 'alchemy',
+        ]);
+
+        $character = $this->character->inventoryManagement()->giveItem($alchemyItem)->getCharacter();
+
+        $result = $this->characterInventoryService->setCharacter($character)->destroyAlchemyItem($character->inventory->slots->where('item.type', '=', 'alchemy')->first()->id);
+
+        $this->assertEquals(200, $result['status']);
+        $this->assertEquals('Destroyed Alchemy Item: ' . $alchemyItem->name . '.', $result['message']);
+
+        $character = $character->refresh();
+
+        $this->assertEmpty($character->inventory->slots()->where('equipped', true)->get());
+    }
+
+    public function testCanDeleteAllAlchemyItem() {
+        $alchemyItem = $this->createItem([
+            'type' => 'alchemy',
+        ]);
+
+        $character = $this->character->inventoryManagement()->giveItem($alchemyItem)->getCharacter();
+
+        $result = $this->characterInventoryService->setCharacter($character)->destroyAllAlchemyItems();
+
+        $this->assertEquals(200, $result['status']);
+        $this->assertEquals('Destroyed All Alchemy Items.', $result['message']);
+
+        $character = $character->refresh();
+
+        $this->assertEmpty($character->inventory->slots()->where('equipped', true)->get());
+    }
 }

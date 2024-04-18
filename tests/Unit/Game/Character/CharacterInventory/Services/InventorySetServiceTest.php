@@ -897,4 +897,104 @@ class InventorySetServiceTest extends TestCase {
         $this->assertEquals(200, $result['status']);
         $this->assertEquals('Removed ' . 2 . ' of ' . 2 . ' items from ' . $set->name . '. If all items were not moved over, it is because your inventory became full.', $result['message']);
     }
+
+    public function testDoesUnequipSet() {
+        $character = $this->character
+            ->inventorySetManagement()
+            ->createInventorySets(1, true)
+            ->putItemInSet($this->createItem(), 0, 'left-hand', true)
+            ->putItemInSet($this->createItem(), 0, 'right-hand', true)
+            ->getCharacter();
+
+        $set = $character->inventorySets->first();
+
+        $character = $character->refresh();
+
+        $result = $this->inventorySetService->unequipSet($character, $set);
+
+        $this->assertEquals(200, $result['status']);
+        $this->assertEquals('Unequipped ' . $set->name .'.', $result['message']);
+
+        $character = $character->refresh();
+
+        $this->assertEmpty(
+            $character->inventorySets()->where('is_equipped', true)->get()
+        );
+    }
+
+    public function testCannotEquipSetWhenSetIsNotAllowedToBeEquipped() {
+        $character = $this->character
+            ->inventorySetManagement()
+            ->createInventorySets(1, true)
+            ->putItemInSet($this->createItem(), 0)
+            ->putItemInSet($this->createItem(), 0)
+            ->getCharacter();
+
+        $set = $character->inventorySets->first();
+
+        $set->update([
+            'can_be_equipped' => false,
+        ]);
+
+        $set = $set->refresh();
+
+        $character = $character->refresh();
+
+        $result = $this->inventorySetService->equipSet($character, $set);
+
+        $this->assertEquals(422, $result['status']);
+        $this->assertEquals('Set cannot be equipped. It violates the set rules.', $result['message']);
+    }
+
+    public function testCannotEquipSetWhenYouDoNotOwnTheSet() {
+        $character = $this->character
+            ->inventorySetManagement()
+            ->createInventorySets(1, true)
+            ->putItemInSet($this->createItem(), 0)
+            ->putItemInSet($this->createItem(), 0)
+            ->getCharacter();
+
+        $secondCharacter = (new CharacterFactory())
+            ->createBaseCharacter()
+            ->inventorySetManagement()
+            ->createInventorySets(1, true)
+            ->putItemInSet($this->createItem(), 0)
+            ->putItemInSet($this->createItem(), 0)
+            ->getCharacter();
+
+
+        $set = $secondCharacter->inventorySets->first();
+
+        $character = $character->refresh();
+
+        $result = $this->inventorySetService->equipSet($character, $set);
+
+        $this->assertEquals(422, $result['status']);
+        $this->assertEquals('Cannot do that.', $result['message']);
+    }
+
+    public function testCanEquipSet() {
+        $character = $this->character
+            ->inventorySetManagement()
+            ->createInventorySets(1, true)
+            ->putItemInSet($this->createItem(), 0)
+            ->putItemInSet($this->createItem(), 0)
+            ->getCharacter();
+
+        $set = $character->inventorySets->first();
+
+        $character = $character->refresh();
+
+        $result = $this->inventorySetService->equipSet($character, $set);
+
+        $this->assertEquals(200, $result['status']);
+        $this->assertEquals($set->name .  ' is now equipped', $result['message']);
+
+        $character = $character->refresh();
+
+        $this->assertNotNull(
+            $character->inventorySets()->where('is_equipped', true)->first()
+        );
+    }
+
 }

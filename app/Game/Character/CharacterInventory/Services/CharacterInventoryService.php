@@ -646,7 +646,7 @@ class CharacterInventoryService {
     public function unequipItem(int $inventorySlotId): array {
         if ($this->character->isInventoryFull()) {
 
-            return $this->errorResult('Your inventory is full. Cannot unequip item. You have no room in your inventory.');
+            return $this->errorResult('Your inventory is full. Cannot unequip items. You have no room in your inventory.');
         }
 
         $foundItem = $this->character->inventory->slots->find($inventorySlotId);
@@ -687,7 +687,7 @@ class CharacterInventoryService {
      */
     public function unequipAllItems(): array {
         if ($this->character->isInventoryFull()) {
-            return $this->errorResult('Your inventory is full. Cannot unequip items You have no room in your inventory.');
+            return $this->errorResult('Your inventory is full. Cannot unequip items. You have no room in your inventory.');
         }
 
         $this->character->inventory->slots->each(function ($slot) {
@@ -702,7 +702,7 @@ class CharacterInventoryService {
         $this->updateCharacterAttackDataCache($character);
 
         return $this->successResult([
-            'message' => 'All items have been removed.',
+            'message' => 'All items have been unequipped.',
             'inventory' => [
                 'inventory'         => $this->getInventoryForType('inventory'),
                 'equipped'          => $this->getInventoryForType('equipped'),
@@ -727,7 +727,7 @@ class CharacterInventoryService {
 
         if (is_null($slot)) {
 
-            return $this->errorResult('No item found.');
+            return $this->errorResult('No alchemy item found to destroy.');
         }
 
         $name = $slot->item->affix_name;

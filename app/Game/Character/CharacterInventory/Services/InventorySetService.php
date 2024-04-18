@@ -462,7 +462,7 @@ class InventorySetService {
      */
     public function equipSet(Character $character, InventorySet $inventorySet): array {
         if (!$inventorySet->can_be_equipped) {
-            return $this->errorResult('Set cannot be equipped.');
+            return $this->errorResult('Set cannot be equipped. It violates the set rules.');
         }
 
         if ($inventorySet->character_id !== $character->id) {
