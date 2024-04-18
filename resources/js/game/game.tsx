@@ -32,7 +32,6 @@ import GameEventListeners from "./lib/game/event-listeners/game-event-listeners"
 import ActionSection from "./sections/game-actions-section/action-section";
 import ActionTabs from "./sections/game-actions-section/action-tabs";
 import {FameTasks} from "./sections/faction-loyalty/deffinitions/faction-loaylaty";
-import OrangeButton from "./components/ui/buttons/orange-button";
 import ActiveBoonsActionSection from "./sections/game-actions-section/active-boons-action-section";
 import SuccessAlert from "./components/ui/alerts/simple-alerts/success-alert";
 import WarningAlert from "./components/ui/alerts/simple-alerts/warning-alert";

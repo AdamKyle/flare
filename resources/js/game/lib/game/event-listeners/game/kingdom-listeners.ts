@@ -149,8 +149,6 @@ export default class KingdomListeners implements GameListener {
             "Game.Kingdoms.Events.UpdateKingdomTable",
             (event: any) => {
 
-                console.log(event);
-
                 if (!this.component) {
                     return;
                 }
@@ -257,10 +255,10 @@ export default class KingdomListeners implements GameListener {
                     }
                 );
 
-                mapData.enemy_kingdoms = enemyKingdoms;
+                mapData.enemy_kingdoms.concat(enemyKingdoms);
 
-                mapData.npc_kingdoms = event.npcKingdoms;
-                mapData.player_kingdoms = playerKingdomsFilter;
+                mapData.npc_kingdoms.concat(event.npcKingdoms);
+                mapData.player_kingdoms.concat(playerKingdomsFilter);
 
                 this.component.setState({
                     map_data: mapData

@@ -56,6 +56,11 @@ export default class EnemyKingdoms extends React.Component<KingdomProps, Kingdom
         }
 
         return this.props.kingdoms.map((kingdom) => {
+
+            if (this.props.character_position.game_map_id !== kingdom.game_map_id) {
+                return;
+            }
+
             if (this.props.character_id !== kingdom.character_id) {
                 return <EnemyKingdomPin kingdom={kingdom} color={'#e82b13'} open_kingdom_modal={this.openKingdomModal.bind(this)}/>
             }

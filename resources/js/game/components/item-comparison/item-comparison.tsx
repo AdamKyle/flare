@@ -178,7 +178,6 @@ export default class ItemComparison extends React.Component<ItemComparisonProps,
     }
 
     renderColumns() {
-        console.log(this.props.comparison_info);
         return (
             <div className={
                 clsx({
