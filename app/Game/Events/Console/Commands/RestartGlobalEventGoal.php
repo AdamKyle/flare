@@ -12,7 +12,6 @@ use App\Flare\Models\GlobalEventEnchant;
 use App\Flare\Models\GlobalEventGoal;
 use App\Flare\Models\GlobalEventKill;
 use App\Flare\Models\GlobalEventParticipation;
-use App\Flare\Models\Map;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Events\Events\UpdateEventGoalProgress;
 use App\Game\Events\Services\EventGoalsService;

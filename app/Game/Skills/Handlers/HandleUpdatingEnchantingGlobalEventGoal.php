@@ -3,6 +3,7 @@
 namespace App\Game\Skills\Handlers;
 
 use App\Flare\Models\InventorySlot;
+use App\Game\Events\Events\UpdateEventGoalCurrentProgressForCharacter;
 use Exception;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 use App\Flare\Builders\RandomAffixGenerator;
@@ -72,6 +73,10 @@ class HandleUpdatingEnchantingGlobalEventGoal extends BaseGlobalEventGoalPartici
         }
 
         event(new UpdateEventGoalProgress($this->eventGoalsService->getEventGoalData($character)));
+
+        $amount = $character->globalEventKills->enchants;
+
+        event(new UpdateEventGoalCurrentProgressForCharacter($character->user->id, $amount));
 
         ServerMessageHandler::sendBasicMessage($character->user, '"Thank you child! This enchanted item will help in the fight against The Federation!" The Red Hawk Soldier takes the item from you. Onto the next child.');
 

@@ -59,6 +59,10 @@ trait QuestDetails {
             })
             ->first();
 
+        if (is_null($factionLoyalty)) {
+            return false;
+        }
+
         $assistingNpc = $factionLoyalty->factionLoyaltyNpcs->filter(function($factionLoyaltyNpc) use($quest) {
             return $factionLoyaltyNpc->npc_id === $quest->npc_id;
         })->first();

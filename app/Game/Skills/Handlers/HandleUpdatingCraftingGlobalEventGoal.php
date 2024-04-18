@@ -2,6 +2,7 @@
 
 namespace App\Game\Skills\Handlers;
 
+use App\Game\Events\Events\UpdateEventGoalCurrentProgressForCharacter;
 use Exception;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 use App\Flare\Builders\RandomAffixGenerator;
@@ -80,6 +81,10 @@ class HandleUpdatingCraftingGlobalEventGoal extends BaseGlobalEventGoalParticipa
         }
 
         event(new UpdateEventGoalProgress($this->eventGoalsService->getEventGoalData($character)));
+
+        $amount = $character->globalEventKills->crafts;
+
+        event(new UpdateEventGoalCurrentProgressForCharacter($character->user->id, $amount));
 
         ServerMessageHandler::sendBasicMessage($character->user, '"Thank you child! This item will help in the fight against The Federation! we shall save it for when we are ready for to enchant them!" The Red Hawk Soldier takes the item from you. Onto the next child.');
 

@@ -14,16 +14,22 @@ export default class EventGoalsTab extends React.Component<
 > {
     private eventGoalsUpdate: any;
 
+    private playerEventGoalCurrentAmount: any;
+
     constructor(props: {}) {
         super(props);
 
         this.state = {
             loading: true,
             eventGoal: null,
+            player_amount: 0,
         };
 
         // @ts-ignore
         this.eventGoalsUpdate = Echo.join("update-event-goal-progress");
+
+        // @ts-ignore
+        this.playerEventGoalCurrentAmount = Echo.private('player-current-event-goal-progression-' + this.props.user_id)
     }
 
     componentDidMount(): void {
@@ -33,6 +39,8 @@ export default class EventGoalsTab extends React.Component<
                 this.setState({
                     loading: false,
                     eventGoal: result.data.event_goals,
+                }, () => {
+                    this.setCurrentAmount();
                 });
             },
             (error: AxiosError) => {
@@ -45,6 +53,16 @@ export default class EventGoalsTab extends React.Component<
             (event: { eventGoalData: { event_goals: EventGoal } }) => {
                 this.setState({
                     eventGoal: event.eventGoalData.event_goals,
+                });
+            }
+        );
+
+        this.playerEventGoalCurrentAmount.listen(
+            "Game.Events.Events.UpdateEventGoalCurrentProgressForCharacter",
+            (event: any) => {
+                console.log(event);
+                this.setState({
+                    player_amount: event.amount,
                 });
             }
         );
@@ -170,25 +188,31 @@ export default class EventGoalsTab extends React.Component<
         return 'Unknown Event Step';
     }
 
-    getCurrentAmount(): number {
+    setCurrentAmount() {
 
         if (this.state.eventGoal === null) {
-            return 0;
+            return;
         }
 
         if (this.state.eventGoal.total_kills !== null && this.state.eventGoal.max_kills !== null) {
-            return this.state.eventGoal.current_kills;
+            this.setState({
+                player_amount: this.state.eventGoal.current_kills
+            });
         }
 
         if (this.state.eventGoal.total_crafts !== null && this.state.eventGoal.max_crafts !== null) {
-            return this.state.eventGoal.current_crafts;
+            this.setState({
+                player_amount: this.state.eventGoal.current_crafts
+            });
         }
 
         if (this.state.eventGoal.total_enchants !== null && this.state.eventGoal.max_enchants !== null) {
-            return this.state.eventGoal.current_enchants;
+            this.setState({
+                player_amount: this.state.eventGoal.current_enchants
+            });
         }
 
-        return 0;
+        return;
     }
 
     render() {
@@ -246,7 +270,7 @@ export default class EventGoalsTab extends React.Component<
                             Your current contribution:
                         </span>{" "}
                         {formatNumber(
-                            this.getCurrentAmount()
+                            this.state.player_amount
                         )}
                     </p>
                 </div>
