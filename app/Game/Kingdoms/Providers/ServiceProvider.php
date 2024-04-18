@@ -68,7 +68,7 @@ class ServiceProvider extends ApplicationServiceProvider {
         $this->app->bind(UpdateKingdomHandler::class, function($app) {
             return new UpdateKingdomHandler(
                 $app->make(Manager::class),
-                $app->make(KingdomTransformer::class)
+                $app->make(KingdomTableTransformer::class)
             );
         });
 

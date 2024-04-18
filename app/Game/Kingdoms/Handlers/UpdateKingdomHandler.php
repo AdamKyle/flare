@@ -2,34 +2,34 @@
 
 namespace App\Game\Kingdoms\Handlers;
 
+use App\Game\Kingdoms\Events\UpdateKingdomTable;
+use App\Game\Kingdoms\Transformers\KingdomTableTransformer;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
 use App\Flare\Models\Character;
-use App\Flare\Transformers\KingdomTransformer;
-use App\Game\Kingdoms\Events\UpdateKingdom;
 
 class UpdateKingdomHandler {
 
     private Manager $manager;
 
-    private KingdomTransformer $kingdomTransformer;
+    private KingdomTableTransformer $kingdomTableTransformer;
 
     /**
      * @param Manager $manager
-     * @param KingdomTransformer $kingdomTransformer
+     * @param KingdomTableTransformer $kingdomTableTransformer
      */
-    public function __construct(Manager $manager, KingdomTransformer $kingdomTransformer) {
+    public function __construct(Manager $manager, KingdomTableTransformer $kingdomTableTransformer) {
         $this->manager            = $manager;
-        $this->kingdomTransformer = $kingdomTransformer;
+        $this->kingdomTableTransformer = $kingdomTableTransformer;
     }
 
     public function refreshPlayersKingdoms(Character $character) {
         $kingdoms = $character->kingdoms;
 
-        $collection = new Collection($kingdoms, $this->kingdomTransformer);
+        $collection = new Collection($kingdoms, $this->kingdomTableTransformer);
 
         $kingdoms = $this->manager->createData($collection)->toArray();
 
-        event(new UpdateKingdom($character->user,  $kingdoms));
+        event(new UpdateKingdomTable($character->user,  $kingdoms));
     }
 }

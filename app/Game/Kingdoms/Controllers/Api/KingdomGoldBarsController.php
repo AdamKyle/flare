@@ -82,6 +82,8 @@ class KingdomGoldBarsController extends Controller {
 
         $this->updateKingdom->updateKingdom($kingdom->refresh());
 
+        $this->updateKingdom->updateKingdomAllKingdoms($character->refresh());
+
         event(new UpdateTopBarEvent($character->refresh()));
 
         return response()->json([
