@@ -14,6 +14,7 @@ import Ajax from "../../lib/ajax/ajax";
 import ReincarnationCheckModal from "./components/modals/reincarnation-check-modal";
 import BasicClosableCard from "../../components/ui/cards/basic-closable-card";
 import CharacterAdditionalStatsSection from "./components/tabs/additional-information/sections/character-additional-stats-section";
+import AdditionalStatSection from "../../components/character-sheet/additional-stats-section/additional-stat-section";
 
 export default class CharacterSheet extends React.Component<CharacterSheetProps, any> {
 
@@ -124,9 +125,13 @@ export default class CharacterSheet extends React.Component<CharacterSheetProps,
 
         if (this.state.show_additional_character_data) {
             return (
-                <BasicClosableCard close_action={this.showAdditionalCharacterData.bind(this)}>
-                    <CharacterAdditionalStatsSection character={this.props.character} />
-                </BasicClosableCard>
+                <div>
+                    <AdditionalStatSection character={this.props.character} />
+                    <BasicClosableCard close_action={this.showAdditionalCharacterData.bind(this)} additionalClasses={'my-4'}>
+                        <CharacterAdditionalStatsSection character={this.props.character} />
+                    </BasicClosableCard>
+                </div>
+
             )
         }
 

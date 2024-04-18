@@ -20,6 +20,7 @@ class CharacterResistanceInfoTransformer extends BaseTransformer {
         return [
             'spell_evasion'          => $characterStatBuilder->reductionInfo()->getRingReduction('spell_evasion'),
             'affix_damage_reduction' => $characterStatBuilder->reductionInfo()->getRingReduction('affix_damage_reduction'),
+            'healing_reduction'      => $characterStatBuilder->reductionInfo()->getRingReduction('healing_reduction')
         ];
     }
 }

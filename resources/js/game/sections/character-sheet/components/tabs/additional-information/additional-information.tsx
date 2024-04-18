@@ -123,6 +123,7 @@ export default class AdditionalInformation extends React.Component<any, any> {
 
                     <div id="leftSide" className="pr-4 sm:w-full md:w-1/2">
                         <AdditionalInfoSection
+                            view_port={0}
                             character={this.props.character}
                             is_open={true}
                             manage_modal={() => {}}

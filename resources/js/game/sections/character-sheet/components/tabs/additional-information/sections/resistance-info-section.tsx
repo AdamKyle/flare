@@ -67,10 +67,12 @@ export default class ResistanceInfoSection extends React.Component<AdditionalInf
         return (
             <div>
                 <dl>
-                    <dt>Spell Evasions</dt>
+                    <dt>Spell Evasion</dt>
                     <dd>{(this.state.resistance_info.spell_evasion * 100).toFixed(2)}%</dd>
                     <dt>Affix Damage Reduction</dt>
                     <dd>{(this.state.resistance_info.affix_damage_reduction * 100).toFixed(2)}%</dd>
+                    <dt>Enemy Healing Reduction</dt>
+                    <dd>{(this.state.resistance_info.healing_reduction * 100).toFixed(2)}%</dd>
                 </dl>
             </div>
         );
