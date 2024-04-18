@@ -14,7 +14,7 @@ export enum ItemType {
     BODY = 'body',
     SLEEVES = 'sleeves',
     GLOVES = 'gloves',
-    BOOTS = 'boots',
+    BOOTS = 'feet',
     SHIELD = 'shield',
     HELMET = 'helmet',
     LEGGINGS = 'leggings',
