@@ -43,7 +43,7 @@ class InitiateWeeklyFactionLoyaltyEventTest extends TestCase {
             'event_type' => EventType::WEEKLY_FACTION_LOYALTY_EVENT
         ]);
 
-        InitiateWeeklyCurrencyDropEvent::dispatch($event->id);
+        InitiateWeeklyFactionLoyaltyEvent::dispatch($event->id);
 
         Event::assertDispatched(GlobalMessageEvent::class);
         $this->assertNotEmpty(Announcement::all());
