@@ -74,7 +74,7 @@ class HandleUpdatingEnchantingGlobalEventGoal extends BaseGlobalEventGoalPartici
 
         event(new UpdateEventGoalProgress($this->eventGoalsService->getEventGoalData($character)));
 
-        $amount = $character->globalEventKills->enchants;
+        $amount = $character->globalEventEnchants->enchants;
 
         event(new UpdateEventGoalCurrentProgressForCharacter($character->user->id, $amount));
 
