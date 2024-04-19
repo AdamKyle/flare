@@ -1,6 +1,6 @@
-import ClassSpecialtiesType from "../class-specialties-type";
-import CharacterSpecialsEquippedTyp from "../character-specials-equipped-typ";
-import ClassRankType from "../class-rank-type";
+import ClassSpecialtiesType from "../deffinitions/class-specialties-type";
+import CharacterSpecialsEquippedTyp from "../deffinitions/character-specials-equipped-typ";
+import ClassRankType from "../deffinitions/class-rank-type";
 
 export default interface ClassSpecialtiesState {
 

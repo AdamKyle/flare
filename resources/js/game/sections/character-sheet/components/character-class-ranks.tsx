@@ -6,9 +6,9 @@ import Ajax from "../../../lib/ajax/ajax";
 import {AxiosError, AxiosResponse} from "axios";
 import ComponentLoading from "../../../components/ui/loading/component-loading";
 import CharacterClassRanksState
-    from "../../../lib/game/character-sheet/types/class-ranks/types/character-class-ranks-state";
-import ClassRankType from "../../../lib/game/character-sheet/types/class-ranks/class-rank-type";
-import WeaponMastery from "../../../lib/game/character-sheet/types/class-ranks/weapon-mastery";
+    from "../../../components/character-sheet/additional-stats-section/types/sections/class-ranks/types/character-class-ranks-state";
+import ClassRankType from "../../../components/character-sheet/additional-stats-section/types/sections/class-ranks/deffinitions/class-rank-type";
+import WeaponMastery from "../../../components/character-sheet/additional-stats-section/types/sections/class-ranks/deffinitions/weapon-mastery";
 import PrimaryButton from "../../../components/ui/buttons/primary-button";
 import CharacterClassRankSpecialtiesSection from "../../../components/character-sheet/additional-stats-section/sections/character-class-rank-specialties-section";
 import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
