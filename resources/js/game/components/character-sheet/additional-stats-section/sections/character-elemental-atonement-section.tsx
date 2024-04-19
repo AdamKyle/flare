@@ -1,11 +1,9 @@
 import React, {Fragment} from "react";
-import Dialogue from "../../../../../../components/ui/dialogue/dialogue";
-import RenderAtonementDetails from "../../../../../components/gems/components/render-atonement-details";
-import WarningAlert from "../../../../../../components/ui/alerts/simple-alerts/warning-alert";
-import Ajax from "../../../../../../lib/ajax/ajax";
+import RenderAtonementDetails from "../../../../sections/components/gems/components/render-atonement-details";
+import WarningAlert from "../../../ui/alerts/simple-alerts/warning-alert";
+import Ajax from "../../../../lib/ajax/ajax";
 import { AxiosError, AxiosResponse } from "axios";
-import ComponentLoading from "../../../../../../components/ui/loading/component-loading";
-import LoadingProgressBar from "../../../../../../components/ui/progress-bars/loading-progress-bar";
+import LoadingProgressBar from "../../../ui/progress-bars/loading-progress-bar";
 
 export default class CharacterElementalAtonementSection extends React.Component<any, any> {
 

@@ -1,11 +1,11 @@
 import React from "react";
-import Dialogue from "../../../../../../components/ui/dialogue/dialogue";
-import {AdditionalInfoProps} from "../../../types/additional-info-props";
-import Ajax from "../../../../../../lib/ajax/ajax";
+import Dialogue from "../../../ui/dialogue/dialogue";
+import {AdditionalInfoProps} from "../../../../sections/character-sheet/components/types/additional-info-props";
+import Ajax from "../../../../lib/ajax/ajax";
 import { AxiosError, AxiosResponse } from "axios";
-import ComponentLoading from "../../../../../../components/ui/loading/component-loading";
-import LoadingProgressBar from "../../../../../../components/ui/progress-bars/loading-progress-bar";
-import DangerAlert from "../../../../../../components/ui/alerts/simple-alerts/danger-alert";
+import ComponentLoading from "../../../ui/loading/component-loading";
+import LoadingProgressBar from "../../../ui/progress-bars/loading-progress-bar";
+import DangerAlert from "../../../ui/alerts/simple-alerts/danger-alert";
 
 export default class ResistanceInfoSection extends React.Component<AdditionalInfoProps, any> {
 

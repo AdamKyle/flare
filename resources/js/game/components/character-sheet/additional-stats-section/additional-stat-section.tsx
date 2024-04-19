@@ -1,15 +1,15 @@
 import React from "react";
 import BasicCard from "../../ui/cards/basic-card";
-import AdditionalInfoSection
-    from "../../../sections/character-sheet/components/tabs/additional-information/sections/additional-info-section";
-import CharacterResistances
-    from "../../../sections/character-sheet/components/tabs/additional-information/character-resistances";
-import CharacterElementalAtonement
-    from "../../../sections/character-sheet/components/tabs/additional-information/character-elemental-atonement";
-import CharacterReincarnation
-    from "../../../sections/character-sheet/components/tabs/additional-information/character-reincarnation";
-import CharacterClassRanks
-    from "../../../sections/character-sheet/components/tabs/additional-information/character-class-ranks";
+import CoreCharacterStatsSection
+    from "./sections/core-character-stats-section";
+import ResistanceInfoSection
+    from "./sections/resistance-info-section";
+import CharacterReincarnationSection
+    from "./sections/character-reincarnation-section";
+import CharacterClassRanksSection
+    from "./sections/character-class-ranks-section";
+import CharacterElementalAtonementSection
+    from "./sections/character-elemental-atonement-section";
 
 export default class AdditionalStatSection extends React.Component<any, any> {
 
@@ -24,7 +24,7 @@ export default class AdditionalStatSection extends React.Component<any, any> {
                     <BasicCard>
                         <h3>Character Stats</h3>
                         <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2'></div>
-                        <AdditionalInfoSection
+                        <CoreCharacterStatsSection
                             view_port={0}
                             character={this.props.character}
                             is_open={true}
@@ -40,7 +40,15 @@ export default class AdditionalStatSection extends React.Component<any, any> {
                     <BasicCard>
                         <h3>Class Ranks</h3>
                         <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2'></div>
-                        <CharacterClassRanks character={this.props.character}/>
+                        <CharacterClassRanksSection
+                            view_port={0}
+                            character={this.props.character}
+                            is_open={true}
+                            manage_modal={() => {}}
+                            title={''}
+                            finished_loading={true}
+                            when_tab_changes={() => {}}
+                        />
                         <p className='my-4'>
                             Learn more about: <a href="/information/class-ranks" target="_blank">
                             Class Ranks <i className="fas fa-external-link-alt"></i></a>
@@ -60,7 +68,14 @@ export default class AdditionalStatSection extends React.Component<any, any> {
                                     from enemy enchantments. Finally, <strong>Enemy healing Reduction</strong>, will reduce the amount the enemy heals by.
                                 </p>
                                 <div className='mt-3'>
-                                <CharacterResistances character={this.props.character}/>
+                                    <ResistanceInfoSection
+                                        view_port={0}
+                                        character={this.props.character}
+                                        is_open={true}
+                                        manage_modal={() => {}}
+                                        title={''}
+                                        finished_loading={true}
+                                    />
                                 </div>
                             </div>
                             <div
@@ -68,7 +83,13 @@ export default class AdditionalStatSection extends React.Component<any, any> {
                             <div>
                                 <h3>Elemental Atonement</h3>
                                 <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2'></div>
-                                <CharacterElementalAtonement character={this.props.character}/>
+                                <CharacterElementalAtonementSection
+                                    character={this.props.character}
+                                    is_open={true}
+                                    manage_modal={() => {}}
+                                    title={''}
+                                    finished_loading={true}
+                                />
                             </div>
                         </div>
                     </BasicCard>
@@ -90,7 +111,14 @@ export default class AdditionalStatSection extends React.Component<any, any> {
                             Copper Coins <i className="fas fa-external-link-alt"></i>
                             </a>
                         </p>
-                        <CharacterReincarnation character={this.props.character} />
+                        <CharacterReincarnationSection
+                            view_port={0}
+                            character={this.props.character}
+                            is_open={true}
+                            manage_modal={() => {}}
+                            title={''}
+                            finished_loading={true}
+                        />
                     </BasicCard>
                 </div>
             </div>

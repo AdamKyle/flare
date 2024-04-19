@@ -1,30 +1,30 @@
 import React, {Fragment} from "react";
-import Dialogue from "../../../../../../components/ui/dialogue/dialogue";
-import Tabs from "../../../../../../components/ui/tabs/tabs";
-import TabPanel from "../../../../../../components/ui/tabs/tab-panel";
-import {formatNumber} from "../../../../../../lib/game/format-number";
-import ComponentLoading from "../../../../../../components/ui/loading/component-loading";
+import Dialogue from "../../../ui/dialogue/dialogue";
+import Tabs from "../../../ui/tabs/tabs";
+import TabPanel from "../../../ui/tabs/tab-panel";
+import {formatNumber} from "../../../../lib/game/format-number";
+import ComponentLoading from "../../../ui/loading/component-loading";
 import ClassSpecialtiesEquippedProps
-    from "../../../../../../lib/game/character-sheet/types/modal/class-specialties-equipped-props";
-import Ajax from "../../../../../../lib/ajax/ajax";
+    from "../../../../lib/game/character-sheet/types/modal/class-specialties-equipped-props";
+import Ajax from "../../../../lib/ajax/ajax";
 import {AxiosError, AxiosResponse} from "axios";
 import ClassSpecialtiesState
-    from "../../../../../../lib/game/character-sheet/types/class-ranks/types/class-specialties-state";
-import ClassSpecialtiesType from "../../../../../../lib/game/character-sheet/types/class-ranks/class-specialties-type";
-import PrimaryButton from "../../../../../../components/ui/buttons/primary-button";
+    from "../../../../lib/game/character-sheet/types/class-ranks/types/class-specialties-state";
+import ClassSpecialtiesType from "../../../../lib/game/character-sheet/types/class-ranks/class-specialties-type";
+import PrimaryButton from "../../../ui/buttons/primary-button";
 import {
     watchForDarkModeClassSpecialtyChange
-} from "../../../../../../lib/game/dark-mode-watcher";
-import Table from "../../../../../../components/ui/data-tables/table";
-import LoadingProgressBar from "../../../../../../components/ui/progress-bars/loading-progress-bar";
+} from "../../../../lib/game/dark-mode-watcher";
+import Table from "../../../ui/data-tables/table";
+import LoadingProgressBar from "../../../ui/progress-bars/loading-progress-bar";
 import CharacterSpecialsEquippedTyp
-    from "../../../../../../lib/game/character-sheet/types/class-ranks/character-specials-equipped-typ";
-import SuccessAlert from "../../../../../../components/ui/alerts/simple-alerts/success-alert";
-import DangerAlert from "../../../../../../components/ui/alerts/simple-alerts/danger-alert";
+    from "../../../../lib/game/character-sheet/types/class-ranks/character-specials-equipped-typ";
+import SuccessAlert from "../../../ui/alerts/simple-alerts/success-alert";
+import DangerAlert from "../../../ui/alerts/simple-alerts/danger-alert";
 import {startCase} from "lodash";
 import Select from "react-select";
-import InfoAlert from "../../../../../../components/ui/alerts/simple-alerts/info-alert";
-import ClassRankType from "../../../../../../lib/game/character-sheet/types/class-ranks/class-rank-type";
+import InfoAlert from "../../../ui/alerts/simple-alerts/info-alert";
+import ClassRankType from "../../../../lib/game/character-sheet/types/class-ranks/class-rank-type";
 
 export default class CharacterClassRankSpecialtiesSection extends React.Component<ClassSpecialtiesEquippedProps, ClassSpecialtiesState> {
 

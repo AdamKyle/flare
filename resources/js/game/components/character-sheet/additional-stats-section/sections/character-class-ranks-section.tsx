@@ -1,10 +1,10 @@
 import React from "react";
-import {AdditionalInfoProps} from "../../../types/additional-info-props";
-import CharacterClassRanks from "../../../character-class-ranks";
+import {AdditionalInfoProps} from "../../../../sections/character-sheet/components/types/additional-info-props";
+import CharacterClassRanks from "../../../../sections/character-sheet/components/character-class-ranks";
 import CharacterClassRankSpecialtiesSection from "./character-class-rank-specialties-section";
-import Tabs from "../../../../../../components/ui/tabs/tabs";
-import TabPanel from "../../../../../../components/ui/tabs/tab-panel";
-import DropDown from "../../../../../../components/ui/drop-down/drop-down";
+import Tabs from "../../../ui/tabs/tabs";
+import TabPanel from "../../../ui/tabs/tab-panel";
+import DropDown from "../../../ui/drop-down/drop-down";
 import clsx from "clsx";
 
 export default class CharacterClassRanksSection extends React.Component<AdditionalInfoProps, any> {

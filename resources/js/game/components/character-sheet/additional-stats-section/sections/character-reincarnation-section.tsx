@@ -1,10 +1,9 @@
 import React from "react";
-import Dialogue from "../../../../../../components/ui/dialogue/dialogue";
-import {AdditionalInfoProps} from "../../../types/additional-info-props";
-import {formatNumber} from "../../../../../../lib/game/format-number";
-import Ajax from "../../../../../../lib/ajax/ajax";
+import {AdditionalInfoProps} from "../../../../sections/character-sheet/components/types/additional-info-props";
+import {formatNumber} from "../../../../lib/game/format-number";
+import Ajax from "../../../../lib/ajax/ajax";
 import { AxiosError, AxiosResponse } from "axios";
-import ComponentLoading from "../../../../../../components/ui/loading/component-loading";
+import LoadingProgressBar from "../../../ui/progress-bars/loading-progress-bar";
 
 export default class CharacterReincarnationSection extends React.Component<AdditionalInfoProps, any> {
 
@@ -53,8 +52,8 @@ export default class CharacterReincarnationSection extends React.Component<Addit
             <>
                 {
                     this.state.is_loading ?
-                        <ComponentLoading />
-                        :
+                        <LoadingProgressBar />
+                    :
                         <div>
                             <dl>
                                 <dt>Reincarnated Times</dt>

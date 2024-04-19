@@ -4,7 +4,7 @@ import {Component} from "react";
 import ItemComparison from "../../sections/chat/modals/item-comparison";
 import CharacterClassRanks from "../../sections/character-sheet/components/character-class-ranks";
 import CharacterClassRankSpecialtiesSection
-    from "../../sections/character-sheet/components/tabs/additional-information/sections/character-class-rank-specialties-section";
+    from "../../components/character-sheet/additional-stats-section/sections/character-class-rank-specialties-section";
 import ItemView from "../../components/modals/item-details/item-view";
 
 /**

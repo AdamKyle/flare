@@ -1,12 +1,12 @@
 import React from "react";
-import {AdditionalInfoProps} from "../../../types/additional-info-props";
-import {formatNumber} from "../../../../../../lib/game/format-number";
-import Ajax from "../../../../../../lib/ajax/ajax";
+import {AdditionalInfoProps} from "../../../../sections/character-sheet/components/types/additional-info-props";
+import {formatNumber} from "../../../../lib/game/format-number";
+import Ajax from "../../../../lib/ajax/ajax";
 import { AxiosError, AxiosResponse } from 'axios';
-import LoadingProgressBar from "../../../../../../components/ui/progress-bars/loading-progress-bar";
-import DropDown from "../../../../../../components/ui/drop-down/drop-down";
+import LoadingProgressBar from "../../../ui/progress-bars/loading-progress-bar";
+import DropDown from "../../../ui/drop-down/drop-down";
 
-export default class AdditionalInfoSection extends React.Component<AdditionalInfoProps, any> {
+export default class CoreCharacterStatsSection extends React.Component<AdditionalInfoProps, any> {
 
     constructor(props: AdditionalInfoProps) {
         super(props);
