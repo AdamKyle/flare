@@ -12,9 +12,8 @@ import LoadingProgressBar from "../../components/ui/progress-bars/loading-progre
 import {AxiosError, AxiosResponse} from "axios";
 import Ajax from "../../lib/ajax/ajax";
 import ReincarnationCheckModal from "./components/modals/reincarnation-check-modal";
-import BasicClosableCard from "../../components/ui/cards/basic-closable-card";
-import CharacterAdditionalStatsSection from "./components/tabs/additional-information/sections/character-additional-stats-section";
 import AdditionalStatSection from "../../components/character-sheet/additional-stats-section/additional-stat-section";
+import DangerButton from "../../components/ui/buttons/danger-button";
 
 export default class CharacterSheet extends React.Component<CharacterSheetProps, any> {
 
@@ -126,12 +125,12 @@ export default class CharacterSheet extends React.Component<CharacterSheetProps,
         if (this.state.show_additional_character_data) {
             return (
                 <div>
-                    <AdditionalStatSection character={this.props.character} />
-                    <BasicClosableCard close_action={this.showAdditionalCharacterData.bind(this)} additionalClasses={'my-4'}>
-                        <CharacterAdditionalStatsSection character={this.props.character} />
-                    </BasicClosableCard>
-                </div>
+                    <div className={'max-w-[25%] my-4'}>
+                        <DangerButton button_label={'Close'} on_click={this.showAdditionalCharacterData.bind(this)} />
+                    </div>
 
+                    <AdditionalStatSection character={this.props.character} />
+                </div>
             )
         }
 

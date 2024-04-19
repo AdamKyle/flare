@@ -2,5 +2,5 @@ import {AdditionalInfoProps} from "../../../../../sections/character-sheet/compo
 import ClassRankType from "../class-ranks/class-rank-type";
 
 export default interface ClassSpecialtiesEquippedProps extends AdditionalInfoProps {
-
+    selected_type: string;
 }

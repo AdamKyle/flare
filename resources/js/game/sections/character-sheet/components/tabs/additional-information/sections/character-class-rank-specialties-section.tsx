@@ -582,20 +582,102 @@ export default class CharacterClassRankSpecialtiesSection extends React.Componen
         return (value * 100).toFixed(2);
     }
 
+    renderClassSpecialtiesTable() {
+        return (
+            <div>
+                <div className='mb-4'>
+                    <InfoAlert additional_css='mb-4'>
+                        To reset the table below, select "Please select" when filtering by class.
+                    </InfoAlert>
+                    <div className='flex'>
+                        <div className='mr-4 dark:text-gray-300 mt-[10px]'>Class Filter</div>
+                        <div className='w-1/2'>
+                            <Select
+                                onChange={this.filterTableByClass.bind(this)}
+                                options={this.classOptions(true)}
+                                menuPosition={'absolute'}
+                                menuPlacement={'bottom'}
+                                styles={{menuPortal: (base) => ({...base, zIndex: 9999, color: '#000000'})}}
+                                menuPortalTarget={document.body}
+                                value={[{
+                                    label: this.state.selected_filter !== null ? this.state.selected_filter : 'Please Select',
+                                    value: this.state.selected_filter !== null ? this.state.selected_filter : 'Please Select'
+                                }]}
+                            />
+                        </div>
+                    </div>
+
+                </div>
+                <Table
+                    data={this.state.class_specials_for_table}
+                    columns={this.classSpecialtiesTable()}
+                    dark_table={this.state.dark_tables}
+                />
+            </div>
+        )
+    }
+
+    renderOtherClassMasteries() {
+        return (
+            <div>
+                <InfoAlert additional_css='mb-4'>
+                    These specialties are ones you have progression in but do not have equipped.
+                </InfoAlert>
+                <div className='flex mb-4'>
+                    <div className='mr-4 dark:text-gray-300 mt-[10px]'>Class Filter</div>
+                    <div className='w-1/2'>
+                        <Select
+                            onChange={this.filterOtherSpecialties.bind(this)}
+                            options={this.classOptions(false)}
+                            menuPosition={'absolute'}
+                            menuPlacement={'bottom'}
+                            styles={{menuPortal: (base) => ({...base, zIndex: 9999, color: '#000000'})}}
+                            menuPortalTarget={document.body}
+                            value={[{label: this.state.other_selected_filter !== null ? this.state.other_selected_filter : 'Please Select', value: this.state.other_selected_filter !== null ? this.state.other_selected_filter : 'Please Select'}]}
+                        />
+                    </div>
+                </div>
+                <Table
+                    data={this.state.other_class_specialties}
+                    columns={this.classSpecialtiesEquippedTable(true)}
+                    dark_table={this.state.dark_tables}
+                />
+            </div>
+        )
+    }
+
+
+    renderSelectedType() {
+        switch (this.props.selected_type) {
+            case 'class-specialties':
+                return this.renderClassSpecialtiesTable();
+            case 'equipped-specials':
+                return  <Table
+                    data={this.state.specialties_equipped}
+                    columns={this.classSpecialtiesEquippedTable(false)}
+                    dark_table={this.state.dark_tables}
+                />;
+            case 'other-specialties':
+                return this.renderOtherClassMasteries();
+            default:
+                return this.renderClassSpecialtiesTable();
+        }
+    }
+
     renderSpecialties() {
         return (
             <Fragment>
                 {
                     this.state.equipping ?
-                        <LoadingProgressBar />
-                    : null
+                        <LoadingProgressBar/>
+                        : null
                 }
                 {
                     this.state.success_message !== null ?
                         <SuccessAlert>
                             {this.state.success_message}
                         </SuccessAlert>
-                    : null
+                        : null
                 }
 
                 {
@@ -605,68 +687,9 @@ export default class CharacterClassRankSpecialtiesSection extends React.Componen
                         </DangerAlert>
                         : null
                 }
-                <Tabs tabs={this.tabs}>
-                    <TabPanel key={'class-specialties'}>
-                        <div className='mb-4'>
-                            <InfoAlert additional_css='my-4'>
-                                To reset the table below, select "Please select" when filtering by class.
-                            </InfoAlert>
-                            <div className='flex'>
-                                <div className='mr-4 dark:text-gray-300 mt-[10px]'>Class Filter</div>
-                                <div className='w-1/2'>
-                                    <Select
-                                        onChange={this.filterTableByClass.bind(this)}
-                                        options={this.classOptions(true)}
-                                        menuPosition={'absolute'}
-                                        menuPlacement={'bottom'}
-                                        styles={{menuPortal: (base) => ({...base, zIndex: 9999, color: '#000000'})}}
-                                        menuPortalTarget={document.body}
-                                        value={[{label: this.state.selected_filter !== null ? this.state.selected_filter : 'Please Select', value: this.state.selected_filter !== null ? this.state.selected_filter : 'Please Select'}]}
-                                    />
-                                </div>
-                            </div>
-
-                        </div>
-                        <Table
-                            data={this.state.class_specials_for_table}
-                            columns={this.classSpecialtiesTable()}
-                            dark_table={this.state.dark_tables}
-                        />
-                    </TabPanel>
-
-                    <TabPanel key={'equipped-specialties'}>
-                        <Table
-                            data={this.state.specialties_equipped}
-                            columns={this.classSpecialtiesEquippedTable(false)}
-                            dark_table={this.state.dark_tables}
-                        />
-                    </TabPanel>
-
-                    <TabPanel key={'other-specialties'}>
-                        <InfoAlert additional_css='my-4'>
-                            These specialties are ones you have progression in but do not have equipped.
-                        </InfoAlert>
-                        <div className='flex mb-4'>
-                            <div className='mr-4 dark:text-gray-300 mt-[10px]'>Class Filter</div>
-                            <div className='w-1/2'>
-                                <Select
-                                    onChange={this.filterOtherSpecialties.bind(this)}
-                                    options={this.classOptions(false)}
-                                    menuPosition={'absolute'}
-                                    menuPlacement={'bottom'}
-                                    styles={{menuPortal: (base) => ({...base, zIndex: 9999, color: '#000000'})}}
-                                    menuPortalTarget={document.body}
-                                    value={[{label: this.state.other_selected_filter !== null ? this.state.other_selected_filter : 'Please Select', value: this.state.other_selected_filter !== null ? this.state.other_selected_filter : 'Please Select'}]}
-                                />
-                            </div>
-                        </div>
-                        <Table
-                            data={this.state.other_class_specialties}
-                            columns={this.classSpecialtiesEquippedTable(true)}
-                            dark_table={this.state.dark_tables}
-                        />
-                    </TabPanel>
-                </Tabs>
+                {
+                    this.renderSelectedType()
+                }
             </Fragment>
         )
     }

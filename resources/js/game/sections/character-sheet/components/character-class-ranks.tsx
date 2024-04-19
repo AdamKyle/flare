@@ -164,7 +164,7 @@ export default class CharacterClassRanks extends React.Component<any, CharacterC
         if (this.state.loading) {
             return (
                 <div className='relative my-6 p-[20px]'>
-                    <ComponentLoading />
+                    <LoadingProgressBar />
                 </div>
             )
         }

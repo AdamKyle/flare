@@ -17,8 +17,6 @@ export default class AdditionalStatSection extends React.Component<any, any> {
         super(props);
     }
 
-
-
     render() {
         return (
             <div>
