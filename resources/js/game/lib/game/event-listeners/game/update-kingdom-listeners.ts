@@ -4,11 +4,12 @@ import {Channel} from "laravel-echo";
 import KingdomDetails from "../../kingdoms/kingdom-details";
 import Kingdom from "../../../../sections/kingdoms/kingdom";
 import KingdomEventListener from "../kingdom-event-listener";
+import SmallKingdom from "../../../../sections/kingdoms/small-kingdom";
 
 @injectable()
 export default class UpdateKingdomListeners implements KingdomEventListener {
 
-    private component?: Kingdom;
+    private component?: Kingdom | SmallKingdom;
 
     private userId?: number;
 
@@ -16,7 +17,7 @@ export default class UpdateKingdomListeners implements KingdomEventListener {
 
     constructor(@inject(CoreEventListener) private coreEventListener: CoreEventListener) {}
 
-    public initialize(component: Kingdom, userId: number): void {
+    public initialize(component: Kingdom | SmallKingdom, userId: number): void {
         this.component = component;
         this.userId    = userId;
     }
@@ -56,9 +57,17 @@ export default class UpdateKingdomListeners implements KingdomEventListener {
                     return;
                 }
 
-                this.component.setState({
-                    kingdom: event.kingdom,
-                });
+                if (this.component instanceof Kingdom) {
+                    this.component.setState({
+                        kingdom: event.kingdom,
+                    });
+                }
+
+                if (this.component instanceof SmallKingdom) {
+                    this.component.setState({
+                        kingdom: event.kingdom,
+                    });
+                }
             }
         );
     }
