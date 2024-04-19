@@ -1,5 +1,6 @@
 import Listener from "./listener";
 import Kingdom from "../../../sections/kingdoms/kingdom";
+import SmallKingdom from "../../../sections/kingdoms/small-kingdom";
 
 export default interface KingdomEventListener extends Listener {
 
@@ -10,5 +11,5 @@ export default interface KingdomEventListener extends Listener {
      * @param component
      * @param usrrId
      */
-    initialize: (component: Kingdom, userId: number) => void;
+    initialize: (component: Kingdom | SmallKingdom, userId: number) => void;
 }
