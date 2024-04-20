@@ -30,7 +30,7 @@ export default class StatDetails extends React.Component<any, any> {
     render() {
 
         if (this.state.show_detailed_section && this.state.details_type !== null) {
-            return  <StatBreakDown close_section={this.closeTypeDetails.bind(this)} type={this.state.details_type} />
+            return  <StatBreakDown close_section={this.closeTypeDetails.bind(this)} type={this.state.details_type} character_id={this.props.character.id}/>
         }
 
         return (
@@ -59,17 +59,17 @@ export default class StatDetails extends React.Component<any, any> {
                         <dl>
                             <dt><PrimaryLinkButton button_label={'Modded Str'} on_click={() => {this.showTypeDetails('str')}} /></dt>
                             <dd>{formatNumber(this.props.stat_details.str_modded)}</dd>
-                            <dt><PrimaryLinkButton button_label={'Modded Dex'} on_click={() => {}} /></dt>
+                            <dt><PrimaryLinkButton button_label={'Modded Dex'} on_click={() => {this.showTypeDetails('dex')}} /></dt>
                             <dd>{formatNumber(this.props.stat_details.dex_modded)}</dd>
-                            <dt><PrimaryLinkButton button_label={'Modded Agi'} on_click={() => {}} /></dt>
+                            <dt><PrimaryLinkButton button_label={'Modded Agi'} on_click={() => {this.showTypeDetails('agi')}} /></dt>
                             <dd>{formatNumber(this.props.stat_details.agi_modded)}</dd>
-                            <dt><PrimaryLinkButton button_label={'Modded Chr'} on_click={() => {}} /></dt>
+                            <dt><PrimaryLinkButton button_label={'Modded Chr'} on_click={() => {this.showTypeDetails('chr')}} /></dt>
                             <dd>{formatNumber(this.props.stat_details.chr_modded)}</dd>
-                            <dt><PrimaryLinkButton button_label={'Modded Dur'} on_click={() => {}} /></dt>
+                            <dt><PrimaryLinkButton button_label={'Modded Dur'} on_click={() => {this.showTypeDetails('dur')}} /></dt>
                             <dd>{formatNumber(this.props.stat_details.dur_modded)}</dd>
-                            <dt><PrimaryLinkButton button_label={'Modded Int'} on_click={() => {}} /></dt>
+                            <dt><PrimaryLinkButton button_label={'Modded Int'} on_click={() => {this.showTypeDetails('int')}} /></dt>
                             <dd>{formatNumber(this.props.stat_details.int_modded)}</dd>
-                            <dt><PrimaryLinkButton button_label={'Modded Focus'} on_click={() => {}} /></dt>
+                            <dt><PrimaryLinkButton button_label={'Modded Focus'} on_click={() => {this.showTypeDetails('focus')}} /></dt>
                             <dd>{formatNumber(this.props.stat_details.focus_modded)}</dd>
                         </dl>
                     </div>

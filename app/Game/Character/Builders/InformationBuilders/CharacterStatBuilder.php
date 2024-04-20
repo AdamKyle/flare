@@ -885,7 +885,7 @@ class CharacterStatBuilder {
 
         if ($this->characterBoons->isNotEmpty()) {
             if (is_null($statAttribute)) {
-                $totalPercent = $this->characterBoons->sum('itemUsed.stat_increase');
+                $totalPercent = $this->characterBoons->sum('itemUsed.increase_stat_by');
             } else {
                 $totalPercent = $this->characterBoons->sum('itemUsed.' . $statAttribute);
             }

@@ -15,9 +15,11 @@ use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Flare\Transformers\CharacterStatDetailsTransformer;
 use App\Flare\Transformers\SkillsTransformer;
 use App\Flare\Transformers\UsableItemTransformer;
+use App\Game\Character\Builders\StatDetailsBuilder\StatModifierDetails;
 use App\Game\Character\CharacterInventory\Services\UseItemService;
 use App\Game\Core\Events\GlobalTimeOut;
 use App\Game\Core\Jobs\EndGlobalTimeOut;
+use App\Game\Core\Requests\StatDetailsRequest;
 use App\Game\Core\Services\CharacterPassiveSkills;
 use App\Game\Events\Values\EventType;
 use App\Http\Controllers\Controller;
@@ -34,10 +36,17 @@ class CharacterSheetController extends Controller {
     private Manager $manager;
 
     /**
-     * @param Manager $manager
+     * @var StatModifierDetails
      */
-    public function __construct(Manager $manager) {
+    private StatModifierDetails $statModifierDetails;
+
+    /**
+     * @param Manager $manager
+     * @param StatModifierDetails $statModifierDetails
+     */
+    public function __construct(Manager $manager, StatModifierDetails $statModifierDetails) {
         $this->manager = $manager;
+        $this->statModifierDetails = $statModifierDetails;
     }
 
     public function sheet(Character $character, CharacterSheetBaseInfoTransformer $characterSheetBaseInfoTransformer) {
@@ -92,6 +101,14 @@ class CharacterSheetController extends Controller {
         return response()->json([
             'elemental_atonement_details' => $details,
         ], 200);
+    }
+
+    public function statBreakDown(StatDetailsRequest $request, Character $character) {
+        $breakDownDetails = $this->statModifierDetails->setCharacter($character)->forStat($request->stat_type);
+
+        return response()->json([
+            'break_down' => $breakDownDetails,
+        ]);
     }
 
     public function basicLocationInformation(Character $character) {

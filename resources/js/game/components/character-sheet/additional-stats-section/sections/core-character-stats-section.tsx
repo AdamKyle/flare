@@ -77,7 +77,7 @@ export default class CoreCharacterStatsSection extends React.Component<Additiona
     renderSection() {
         switch (this.state.stat_type_to_show) {
             case 'core-stats':
-                return <StatDetails stat_details={this.state.stat_details} />
+                return <StatDetails stat_details={this.state.stat_details} character={this.props.character}/>
             case 'holy':
                 return <HolyDetails stat_details={this.state.stat_details} />
             case 'ambush':
@@ -85,7 +85,7 @@ export default class CoreCharacterStatsSection extends React.Component<Additiona
             case 'voidance':
                 return <VoidanceDetails stat_details={this.state.stat_details} />
             default:
-                return <StatDetails stat_details={this.state.stat_details} />
+                return <StatDetails stat_details={this.state.stat_details} character={this.props.character}/>
         }
     }
 
