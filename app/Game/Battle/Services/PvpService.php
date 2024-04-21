@@ -250,7 +250,7 @@ class PvpService {
             !$this->mapTileValue->canWalkOnWater($character, $character->map->character_position_x, $character->map->character_position_y) ||
             !$this->mapTileValue->canWalkOnDeathWater($character, $character->map->character_position_x, $character->map->character_position_y) ||
             !$this->mapTileValue->canWalkOnMagma($character, $character->map->character_position_x, $character->map->character_position_y) ||
-            $this->mapTileValue->isPurgatoryWater($this->mapTileValue->getTileColor($character, $character->map->character_position_x, $character->map->character_position_y))
+            $this->mapTileValue->isPurgatoryWater($this->mapTileValue->getTileColor($character->map->gameMap, $character->map->character_position_x, $character->map->character_position_y))
         ) {
 
             $character->map()->update([

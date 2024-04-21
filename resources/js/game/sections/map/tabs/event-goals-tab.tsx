@@ -60,7 +60,6 @@ export default class EventGoalsTab extends React.Component<
         this.playerEventGoalCurrentAmount.listen(
             "Game.Events.Events.UpdateEventGoalCurrentProgressForCharacter",
             (event: any) => {
-
                 this.setState({
                     player_amount: event.amount,
                 });

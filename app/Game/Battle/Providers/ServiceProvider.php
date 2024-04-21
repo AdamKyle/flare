@@ -54,7 +54,12 @@ class ServiceProvider extends ApplicationServiceProvider
         });
 
         $this->app->bind(CelestialFightService::class, function($app) {
-            return new CelestialFightService($app->make(BattleEventHandler::class), $app->make(CharacterCacheData::class), $app->make(MonsterPlayerFight::class));
+            return new CelestialFightService(
+                $app->make(BattleEventHandler::class),
+                $app->make(CharacterCacheData::class),
+                $app->make(MonsterPlayerFight::class),
+                $app->make(MapTileValue::class),
+            );
         });
 
         $this->app->bind(PvpService::class, function($app) {

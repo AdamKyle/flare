@@ -15,7 +15,6 @@ import SuccessOutlineButton from "../../components/ui/buttons/success-outline-bu
 import CallForReinforcements from "./modals/call-for-reinforcements ";
 import SmelterModal from "./modals/smelter-modal";
 import SpecialtyActionsHelpModal from "./modals/specialty-actions-help-modal";
-import LoadingProgressBar from "../../components/ui/progress-bars/loading-progress-bar";
 
 export default class KingdomDetails extends React.Component<KingdomDetailsProps, KingdomDetailsState> {
     constructor(props: KingdomDetailsProps) {

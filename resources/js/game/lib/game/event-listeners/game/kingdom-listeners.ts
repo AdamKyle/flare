@@ -4,7 +4,6 @@ import {inject, injectable} from "tsyringe";
 import CoreEventListener from "../core-event-listener";
 import {Channel} from "laravel-echo";
 import KingdomLogDetails from "../../kingdoms/kingdom-log-details";
-import KingdomDetails from "../../kingdoms/kingdom-details";
 import NpcKingdomsDetails from "../../../../sections/map/types/map/npc-kingdoms-details";
 import PlayerKingdomsDetails from "../../../../sections/map/types/map/player-kingdoms-details";
 
@@ -148,7 +147,6 @@ export default class KingdomListeners implements GameListener {
         this.kingdomsTableUpdate.listen(
             "Game.Kingdoms.Events.UpdateKingdomTable",
             (event: any) => {
-
                 if (!this.component) {
                     return;
                 }

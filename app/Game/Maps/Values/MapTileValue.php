@@ -3,6 +3,7 @@
 namespace App\Game\Maps\Values;
 
 use App\Flare\Models\Character;
+use App\Flare\Models\GameMap;
 use App\Flare\Values\ItemEffectsValue;
 use Illuminate\Support\Facades\Storage;
 
@@ -13,13 +14,13 @@ class MapTileValue {
     /**
      * Get the tile color from the current map.
      *
-     * @param Character $character
+     * @param GameMap $gameMap
      * @param int $xPosition
      * @param int $yPosition
      * @return string
      */
-    public function getTileColor(Character $character, int $xPosition, int $yPosition): string {
-        $contents            = Storage::disk('maps')->get($character->map->gameMap->path);
+    public function getTileColor(GameMap $gameMap, int $xPosition, int $yPosition): string {
+        $contents            = Storage::disk('maps')->get($gameMap->path);
 
         $this->imageResource = imagecreatefromstring($contents);
 
@@ -134,7 +135,7 @@ class MapTileValue {
      * @return bool
      */
     public function canWalkOnDeathWater(Character $character, int $x, int $y): bool {
-        $color = $this->getTileColor($character, $x, $y);
+        $color = $this->getTileColor($character->map->gameMap, $x, $y);
 
         if ($this->isDeathWaterTile((int) $color)) {
             return $character->inventory->slots->filter(function ($slot) {
@@ -156,7 +157,7 @@ class MapTileValue {
      */
     public function canWalkOnWater(Character $character, int $x, int $y): bool {
 
-        $color = $this->getTileColor($character, $x, $y);
+        $color = $this->getTileColor($character->map->gameMap, $x, $y);
 
         if ($this->isWaterTile((int) $color)) {
             return $character->inventory->slots->filter(function ($slot) {
@@ -177,7 +178,7 @@ class MapTileValue {
      * @return bool
      */
     public function canWalkOnMagma(Character $character, int $x, int $y): bool {
-        $color = $this->getTileColor($character, $x, $y);
+        $color = $this->getTileColor($character->map->gameMap, $x, $y);
 
         if ($this->isMagma((int) $color)) {
             return $character->inventory->slots->filter(function ($slot) {
@@ -201,7 +202,7 @@ class MapTileValue {
      */
     public function canWalkOnPurgatoryWater(Character $character, int $x, int $y): bool
     {
-        $color = $this->getTileColor($character, $x, $y);
+        $color = $this->getTileColor($character->map->gameMap, $x, $y);
 
         if ($this->isPurgatoryWater((int) $color)) {
             return false;
@@ -220,7 +221,7 @@ class MapTileValue {
      * @return bool
      */
     public function canWalkOnIcePlaneIce(Character $character, int $x, int $y): bool {
-        $color = $this->getTileColor($character, $x, $y);
+        $color = $this->getTileColor($character->map->gameMap, $x, $y);
 
         if ($this->isIcePlaneIce((int) $color)) {
             return $character->inventory->slots->filter(function ($slot) {
@@ -240,7 +241,7 @@ class MapTileValue {
      * @return bool
      */
     public function canWalkOnDelusionalMemoriesWater(Character $character, int $x, int $y): bool {
-        $color = $this->getTileColor($character, $x, $y);
+        $color = $this->getTileColor($character->map->gameMap, $x, $y);
 
         if ($this->isDelusionalMemoriesWater($color)) {
             return $character->inventory->slots->filter(function ($slot) {
@@ -260,7 +261,7 @@ class MapTileValue {
      * @return bool
      */
     public function canWalkOnTwistedMemoriesWater(Character $character, int $x, int $y): bool {
-        $color = $this->getTileColor($character, $x, $y);
+        $color = $this->getTileColor($character->map->gameMap, $x, $y);
 
         if ($this->isTwistedMemoriesWater($color)) {
             return false;
