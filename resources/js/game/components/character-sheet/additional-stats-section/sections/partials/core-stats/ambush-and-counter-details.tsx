@@ -21,13 +21,13 @@ export default class AmbushAndCounterDetails extends React.Component<any, any> {
                 </p>
                 <dl>
                     <dt>Ambush Chance</dt>
-                    <dd>{(this.state.stat_details.ambush_chance * 100).toFixed(2)}%</dd>
+                    <dd>{(this.props.stat_details.ambush_chance * 100).toFixed(2)}%</dd>
                     <dt>Ambush Resistance</dt>
-                    <dd>{(this.state.stat_details.ambush_resistance_chance * 100).toFixed(2)}%</dd>
+                    <dd>{(this.props.stat_details.ambush_resistance_chance * 100).toFixed(2)}%</dd>
                     <dt>Counter Chance</dt>
-                    <dd>{(this.state.stat_details.counter_chance * 100).toFixed(2)}%</dd>
+                    <dd>{(this.props.stat_details.counter_chance * 100).toFixed(2)}%</dd>
                     <dt>Counter Resistance</dt>
-                    <dd>{(this.state.stat_details.counter_resistance_chance * 100).toFixed(2)}%</dd>
+                    <dd>{(this.props.stat_details.counter_resistance_chance * 100).toFixed(2)}%</dd>
                 </dl>
                 <p className='mt-4'>
                     For more information please see <a href='/information/ambush-and-counter' target='_blank'>Ambush

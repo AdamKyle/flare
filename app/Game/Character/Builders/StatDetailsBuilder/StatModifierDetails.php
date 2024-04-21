@@ -31,8 +31,31 @@ class StatModifierDetails {
         $details['base_value'] = $this->character->{$stat};
         $details['items_equipped'] = array_values($this->fetchItemDetails($stat));
         $details['boon_details'] = $this->fetchBoonDetails($stat);
+        $details['class_specialties'] = $this->fetchClassRankSpecialtiesDetails($stat);
 
         return $details;
+    }
+
+    private function fetchClassRankSpecialtiesDetails(string $stat): array | null {
+
+        if ($this->character->damage_stat === $stat) {
+            $classSpecialties = $this->character->classSpecialsEquipped
+                ->where('equipped', '=', true)
+                ->where('base_damage_stat_increase', '>', 0);
+
+            $details = [];
+
+            foreach ($classSpecialties as $classSpecialty) {
+                $details[] = [
+                    'name' => $classSpecialty->gameClassSpecial->name,
+                    'amount' => $classSpecialty->base_damage_stat_increase,
+                ];
+            }
+
+            return $details;
+        }
+
+        return null;
     }
 
     private function fetchBoonDetails(string $stat): array|null {

@@ -25,13 +25,13 @@ export default class VoidanceDetails extends React.Component<any, any> {
                 </p>
                 <dl>
                     <dt>Devouring Light:</dt>
-                    <dt>{(this.state.stat_details.devouring_light * 100).toFixed(2)}%</dt>
+                    <dt>{(this.props.stat_details.devouring_light * 100).toFixed(2)}%</dt>
                     <dt>Devouring Light Res.:</dt>
-                    <dt>{(this.state.stat_details.devouring_light_res * 100).toFixed(2)}%</dt>
+                    <dt>{(this.props.stat_details.devouring_light_res * 100).toFixed(2)}%</dt>
                     <dt>Devouring Darkness:</dt>
-                    <dt>{(this.state.stat_details.devouring_darkness * 100).toFixed(2)}%</dt>
+                    <dt>{(this.props.stat_details.devouring_darkness * 100).toFixed(2)}%</dt>
                     <dt>Devouring Darkness Res.:</dt>
-                    <dt>{(this.state.stat_details.devouring_darkness_res * 100).toFixed(2)}%</dt>
+                    <dt>{(this.props.stat_details.devouring_darkness_res * 100).toFixed(2)}%</dt>
                 </dl>
                 <p className='mt-4'>
                     For more information please see <a href='/information/voidance' target='_blank'>Voidance

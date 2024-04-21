@@ -15,15 +15,15 @@ export default class HolyDetails extends React.Component<any, any> {
                 </p>
                 <dl>
                     <dt>Holy Bonus:</dt>
-                    <dt>{(this.state.stat_details.holy_bonus * 100).toFixed(2)}%</dt>
+                    <dt>{(this.props.stat_details.holy_bonus * 100).toFixed(2)}%</dt>
                     <dt>Holy Stacks:</dt>
-                    <dt>{this.state.stat_details.current_stacks} / {this.state.stat_details.max_holy_stacks}</dt>
+                    <dt>{this.props.stat_details.current_stacks} / {this.props.stat_details.max_holy_stacks}</dt>
                     <dt>Holy Attack Bonus:</dt>
-                    <dt>{(this.state.stat_details.holy_attack_bonus * 100).toFixed(2)}%</dt>
+                    <dt>{(this.props.stat_details.holy_attack_bonus * 100).toFixed(2)}%</dt>
                     <dt>Holy AC Bonus:</dt>
-                    <dt>{(this.state.stat_details.holy_ac_bonus * 100).toFixed(2)}%</dt>
+                    <dt>{(this.props.stat_details.holy_ac_bonus * 100).toFixed(2)}%</dt>
                     <dt>Holy Healing Bonus:</dt>
-                    <dt>{(this.state.stat_details.holy_healing_bonus * 100).toFixed(2)}%</dt>
+                    <dt>{(this.props.stat_details.holy_healing_bonus * 100).toFixed(2)}%</dt>
                 </dl>
                 <p className='mt-4'>
                     For more information please see <a href='/information/holy-items' target='_blank'>Holy Items
