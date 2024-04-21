@@ -150,7 +150,7 @@ class BaseMovementService {
             $gameMap = GameMap::where('name', MapNameValue::TWISTED_MEMORIES)->first();
 
             if (is_null($gameMap)) {
-                throw new Exception('Could not teleport to Twisted Memories');
+                throw new Exception('Could not teleport to Twisted Gate.');
             }
 
             $this->traverseService->travel($gameMap->id, $character);

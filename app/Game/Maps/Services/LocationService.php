@@ -233,10 +233,11 @@ class LocationService {
      * @return int|null
      */
     protected function getCelestialEntityId(Character $character): int|null {
+
         $fight = CelestialFight::with('monster')->join('monsters', function ($join) use ($character) {
             $join->on('monsters.id', 'celestial_fights.monster_id')
-                ->where('x_position', $character->x_position)
-                ->where('y_position', $character->y_position)
+                ->where('celestial_fights.x_position', $character->map->character_position_x)
+                ->where('celestial_fights.y_position', $character->map->character_position_y)
                 ->where('monsters.game_map_id', $character->map->gameMap->id);
         })->select('celestial_fights.id')->first();
 

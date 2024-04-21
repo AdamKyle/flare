@@ -164,7 +164,7 @@ export default class Actions extends React.Component<
         );
     }
 
-    componentDidUpdate(): void {
+    componentDidUpdate(prevProps: ActionsProps): void {
         if (this.props.action_data !== null && this.state.loading) {
             this.setState({
                 ...this.state,
@@ -193,6 +193,25 @@ export default class Actions extends React.Component<
             this.setState({
                 raid_monsters: this.props.action_data.raid_monsters,
             });
+        }
+
+        if (typeof this.props.character_position === 'undefined') {
+            return;
+        }
+
+        if (typeof prevProps.character_position === 'undefined') {
+            return;
+        }
+
+        if (this.props.character_position !== null && prevProps.character_position !== null) {
+            if ((this.props.character_position.x !== prevProps.character_position.x &&
+                this.props.character_position.y !== prevProps.character_position.y) ||
+                this.props.character_position.game_map_id !== prevProps.character_position.game_map_id
+            ) {
+                this.setState({
+                    show_celestial_fight: false,
+                });
+            }
         }
     }
 
@@ -346,17 +365,6 @@ export default class Actions extends React.Component<
         return '';
     }
 
-    canSeeDonationRequest(): boolean {
-        return !this.state.show_exploration &&
-            !this.state.show_celestial_fight &&
-            !this.state.show_duel_fight &&
-            !this.state.show_join_pvp &&
-            !this.state.show_hell_forged_section &&
-            !this.state.show_purgatory_chains_section &&
-            !this.state.show_twisted_earth_section &&
-            !this.state.show_gambling_section;
-    }
-
     render() {
         if (this.isLoading()) {
             return <ComponentLoading />;
@@ -447,7 +455,8 @@ export default class Actions extends React.Component<
                         {this.props.celestial_id !== 0 &&
                         !this.state.show_exploration &&
                         !this.state.show_duel_fight &&
-                        !this.state.show_join_pvp ? (
+                        !this.state.show_join_pvp &&
+                        this.props.can_engage_celestial ? (
                             <div className="mb-4">
                                 <SuccessOutlineButton
                                     button_label={"Fight Celestial!"}

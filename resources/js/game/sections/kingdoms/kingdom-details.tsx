@@ -84,7 +84,6 @@ export default class KingdomDetails extends React.Component<KingdomDetailsProps,
     }
 
     canManageGoldBars(): boolean {
-        console.log(this.props.kingdom);
         let bankBuilding: BuildingDetails[]|BuildingDetails = this.props.kingdom.buildings.filter((building: BuildingDetails) => {
             return building.name === 'Goblin Coin Bank';
         });

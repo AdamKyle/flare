@@ -136,6 +136,7 @@ class MapController extends Controller {
      * @param TeleportRequest $request
      * @param Character $character
      * @return JsonResponse
+     * @throws Exception
      */
     public function teleport(TeleportRequest $request, Character $character): JsonResponse {
         if (!$character->can_move) {

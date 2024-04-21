@@ -5,6 +5,7 @@ namespace App\Game\Battle\Services;
 use App\Flare\Models\CelestialFight;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterInCelestialFight;
+use App\Flare\Models\Map;
 use App\Flare\ServerFight\MonsterPlayerFight;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Battle\Events\UpdateCelestialFight;
@@ -19,6 +20,7 @@ use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
+use Facades\App\Flare\Cache\CoordinatesCache;
 
 class CelestialFightService {
 
@@ -63,6 +65,11 @@ class CelestialFightService {
 
     public function fight(Character $character, CelestialFight $celestialFight, CharacterInCelestialFight $characterInCelestialFight, string $attackType): array {
 
+        if (!$this->isPlayerAtSameLocationAsCelestialFight($character->map, $celestialFight)) {
+            return $this->errorResult('You are not at the same location as the celestial.
+            Use /pc to see the location or /pct if you have the quest item to be auto transported to the celestial.');
+        }
+
         $result = $this->monsterPlayerFight->setUpFight($character, [
             'attack_type' => $attackType,
             'selected_monster_id' => $celestialFight->monster_id
@@ -95,6 +102,8 @@ class CelestialFightService {
             $this->moveCelestial($character, $celestialFight);
 
             $this->battleEventHandler->processDeadCharacter($character);
+
+            event(new UpdateCelestialFight($character->name, $this->monsterPlayerFight));
         }
 
         $characterInCelestialFight->update([
@@ -135,6 +144,15 @@ class CelestialFightService {
                 ],
             ],
         ]);
+    }
+
+    protected function isPlayerAtSameLocationAsCelestialFight(Map $map, CelestialFight $celestialFight): bool {
+        $characterX = $map->character_position_x;
+        $characterY = $map->character_position_y;
+
+        return $celestialFight->x_position === $characterX &&
+            $celestialFight->y_position === $characterY &&
+            $celestialFight->monster->game_map_id === $map->game_map_id;
     }
 
     protected function handleMonsterDeath(Character $character, CelestialFight $celestialFight) {
@@ -208,6 +226,8 @@ class CelestialFightService {
             'character_max_health'    => $health,
             'character_current_health' => $health,
         ]);
+
+        $this->characterCacheData->deleteCharacterSheet($character);
 
         return $characterInCelestialFight->refresh();
     }
