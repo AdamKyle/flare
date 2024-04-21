@@ -18,6 +18,7 @@ use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use App\Game\Core\Events\UpdateCharacterCelestialTimeOut;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\ResponseBuilder;
+use App\Game\Maps\Values\MapTileValue;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
 use Facades\App\Flare\Cache\CoordinatesCache;
@@ -30,12 +31,19 @@ class CelestialFightService {
 
     private CharacterCacheData $characterCacheData;
 
+    private MapTileValue $mapTileValue;
+
     private ?MonsterPlayerFight $monsterPlayerFight;
 
-    public function __construct(BattleEventHandler $battleEventHandler, CharacterCacheData $characterCacheData, MonsterPlayerFight $monsterPlayerFight) {
+    public function __construct(BattleEventHandler $battleEventHandler,
+                                CharacterCacheData $characterCacheData,
+                                MonsterPlayerFight $monsterPlayerFight,
+                                MapTileValue $mapTileValue
+    ) {
         $this->battleEventHandler = $battleEventHandler;
         $this->characterCacheData = $characterCacheData;
         $this->monsterPlayerFight = $monsterPlayerFight;
+        $this->mapTileValue = $mapTileValue;
     }
 
     public function joinFight(Character $character, CelestialFight $celestialFight): CharacterInCelestialFight {
@@ -235,11 +243,9 @@ class CelestialFightService {
     protected function moveCelestial(Character $character, CelestialFight $celestialFight) {
         $monster = $celestialFight->monster;
 
-        $celestialFight->update([
-            'x_position'      => CoordinatesCache::getFromCache()['x'][rand(CoordinatesCache::getFromCache()['x'][0], (count(CoordinatesCache::getFromCache()['x']) - 1))],
-            'y_position'      => CoordinatesCache::getFromCache()['y'][rand(CoordinatesCache::getFromCache()['y'][0], (count(CoordinatesCache::getFromCache()['y']) - 1))],
+        $celestialFight->update(array_merge([
             'current_health'  => $celestialFight->current_health,
-        ]);
+        ], $this->getCelestialCoordinates($celestialFight)));
 
         $celestialFightType = new CelestialConjureType($celestialFight->type);
 
@@ -248,5 +254,36 @@ class CelestialFightService {
         } else {
             event(new ServerMessageEvent($character->user, 'You Have caused: ' . $monster->name . ' to flee to the far ends of Tlessa (use /pct or /pc to find the new coordinates).'));
         }
+    }
+
+    /**
+     * Move the celestial to valid coordinates for special maps.
+     *
+     * @param CelestialFight $celestialFight
+     * @return array
+     */
+    private function getCelestialCoordinates(CelestialFight $celestialFight): array {
+        $xPosition = CoordinatesCache::getFromCache()['x'][rand(CoordinatesCache::getFromCache()['x'][0], (count(CoordinatesCache::getFromCache()['x']) - 1))];
+        $yPosition = CoordinatesCache::getFromCache()['y'][rand(CoordinatesCache::getFromCache()['y'][0], (count(CoordinatesCache::getFromCache()['y']) - 1))];
+        $gameMap = $celestialFight->monster->gameMap;
+
+        if ($gameMap->mapType()->isTwistedMemories() || $gameMap->mapType()->isDelusionalMemories()) {
+            $isTwistedMemoriesWater = $this->mapTileValue->isTwistedMemoriesWater(
+                $this->mapTileValue->getTileColor($gameMap, $xPosition, $yPosition)
+            );
+
+            $isDelusionalMemoriesWater = $this->mapTileValue->isDelusionalMemoriesWater(
+                $this->mapTileValue->getTileColor($gameMap, $xPosition, $yPosition)
+            );
+
+            if ($isTwistedMemoriesWater || $isDelusionalMemoriesWater) {
+                return $this->getCelestialCoordinates($celestialFight);
+            }
+        }
+
+        return [
+            'x_position' => $xPosition,
+            'y_position' => $yPosition,
+        ];
     }
 }
