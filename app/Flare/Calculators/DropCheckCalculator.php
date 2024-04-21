@@ -60,7 +60,7 @@ class DropCheckCalculator {
      * @return bool
      */
     public function fetchQuestItemDropCheck(Monster $monster, float $lootingChance = 0.0, float $gameMapBonus = 0.0): bool {
-        $totalBonus = $lootingChance + $gameMapBonus + $monster->drop_check;
+        $totalBonus = $lootingChance + $gameMapBonus + $monster->quest_item_drop_chance;
 
         if ($totalBonus >= 1) {
             return true;
