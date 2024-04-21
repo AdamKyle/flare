@@ -64,12 +64,6 @@ export default class CharacterClassRanks extends React.Component<any, any> {
                 to specific levels before being able to switch to those classes. These classes cannot be
                 selected at registration.
             </p>
-            <h3 className="underline">Some Classes Require Other Classes</h3>
-            <p className="dark:text-gray-300 my-4">
-                Some classes like Prisoner or Alcoholic require players to level other class ranks
-                to specific levels before being able to switch to those classes. These classes cannot be
-                selected at registration.
-            </p>
         </div>
     }
 
@@ -112,6 +106,7 @@ export default class CharacterClassRanks extends React.Component<any, any> {
 
                     <div id="leftSide" className="pr-4 sm:w-full md:w-1/2">
                         <CharacterClassRanksSection
+                            view_port={0}
                             character={this.props.character}
                             is_open={true}
                             manage_modal={() => {}}
