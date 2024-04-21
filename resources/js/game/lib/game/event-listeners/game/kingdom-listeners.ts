@@ -148,7 +148,7 @@ export default class KingdomListeners implements GameListener {
         this.kingdomsTableUpdate.listen(
             "Game.Kingdoms.Events.UpdateKingdomTable",
             (event: any) => {
-                console.log(event);
+
                 if (!this.component) {
                     return;
                 }

@@ -107,6 +107,20 @@ export default class StatBreakDown extends React.Component<any, any> {
         })
     }
 
+    renderAncestralItemSkill() {
+        if (this.state.details === null) {
+            return;
+        }
+
+        return this.state.details.ancestral_item_skill_data.map((ancestralItemSkill: any) => {
+            return (
+                <li>
+                    <span className='text-orange-600 dark:text-orange-300'>{ancestralItemSkill.name}</span> <span className='text-green-700 darmk:text-green-500'>(+{(ancestralItemSkill.increase_amount * 100).toFixed(2)}%)</span>
+                </li>
+            )
+        })
+    }
+
     renderClassSpecialtiesStatIncrease() {
         if (this.state.details === null) {
             return;
@@ -141,8 +155,6 @@ export default class StatBreakDown extends React.Component<any, any> {
             return <LoadingProgressBar />
         }
 
-        console.log(this.state.details);
-
         return (
             <div>
                 <div className='flex justify-between'>
@@ -159,16 +171,16 @@ export default class StatBreakDown extends React.Component<any, any> {
                     <div>
                         <h4>Equipped Modifiers</h4>
                         <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2'></div>
-                        <ol className="space-y-4 text-gray-500 list-decimal list-inside dark:text-gray-400">
-                            {
-                                this.state.details.items_equipped.length > 0 ?
-                                    this.renderItemListEffects()
-                                :
-                                    <p>
-                                        You have nothing equipped.
-                                    </p>
-                            }
-                        </ol>
+                        {
+                            this.state.details.items_equipped.length > 0 ?
+                                <ol className="space-y-4 text-gray-500 list-decimal list-inside dark:text-gray-400">
+                                    {this.renderItemListEffects()}
+                                </ol>
+                            :
+                                <p>
+                                    You have nothing equipped.
+                                </p>
+                        }
                     </div>
 
                     <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2 block md:hidden'></div>
@@ -181,7 +193,7 @@ export default class StatBreakDown extends React.Component<any, any> {
                                 <ol className="space-y-4 text-gray-500 list-decimal list-inside dark:text-gray-400">
                                     {this.renderBoonIncreaseAllStatsEffects()}
                                 </ol>
-                                :
+                            :
                                 <p>
                                     There are no boons applied that effect this specific stat.
                                 </p>
@@ -193,12 +205,14 @@ export default class StatBreakDown extends React.Component<any, any> {
                             this.state.details.boon_details !== null ?
 
                                 this.state.details.boon_details.hasOwnProperty('increases_single_stat') ?
-                                    this.renderBoonIncreaseSpecificStatEffects()
-                                    :
+                                    <ul className="space-y-4 text-gray-500 list-disc list-inside dark:text-gray-400">
+                                        {this.renderBoonIncreaseSpecificStatEffects()}
+                                    </ul>
+                                :
                                     <p>
                                         There are no boons applied that effect this specific stat.
                                     </p>
-                                :
+                            :
                                 <p>
                                     There are no boons applied that effect this specific stat.
                                 </p>
@@ -208,10 +222,43 @@ export default class StatBreakDown extends React.Component<any, any> {
                         <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2'></div>
                         {
                             this.state.details.class_specialties !== null ?
-                                this.renderClassSpecialtiesStatIncrease()
+                                <ul className="space-y-4 text-gray-500 list-disc list-inside dark:text-gray-400">
+                                    {this.renderClassSpecialtiesStatIncrease()}
+                                </ul>
                             :
                                 <p>
                                     There are no class specials equipped that effect this stat.
+                                </p>
+                        }
+                        <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-4'></div>
+                        <h4> Ancestral Item Skills That Raise: {this.titelizeType()}</h4>
+                        <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2'></div>
+                        {
+                            this.state.details.ancestral_item_skill_data !== null ?
+                                <ul className="space-y-4 text-gray-500 list-disc list-inside dark:text-gray-400">
+                                    {this.renderAncestralItemSkill()}
+                                </ul>
+                            :
+                                <p>
+                                   There are no Ancestral Item Skills that effect this stat.
+                                </p>
+                        }
+                        <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-4'></div>
+                        <h4> Map Reduction To: {this.titelizeType()}</h4>
+                        <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2'></div>
+                        {
+                            this.state.details.map_reduction !== null ?
+                                <ul className="space-y-4 text-gray-500 list-disc list-inside dark:text-gray-400">
+                                    <li>
+                                        <span
+                                            className='text-slate-700 dark:text-slate-400'>{this.state.details.map_reduction.map_name}</span>{" "}
+                                        <span
+                                            className='text-red-700 darmk:text-red-500'>(-{(this.state.details.map_reduction.reduction_amount * 100).toFixed(2)}%)</span>
+                                    </li>
+                                </ul>
+                            :
+                                <p>
+                                    There are no map reductions applied to this stat.
                                 </p>
                         }
                     </div>

@@ -12,7 +12,7 @@ export default class CharacterElementalAtonementSection extends React.Component<
 
         this.state = {
             is_loading: true,
-            elemental_atonement_details: [],
+            elemental_atonement: null,
             error_message: '',
         };
     }
@@ -21,7 +21,7 @@ export default class CharacterElementalAtonementSection extends React.Component<
         (new Ajax).setRoute('character-sheet/'+this.props.character.id+'/elemental-atonement-info').doAjaxCall('get', (response: AxiosResponse) => {
             this.setState({
                 is_loading: false,
-                elemental_atonement_details: response.data.elemental_atonement_details,
+                elemental_atonement: response.data.elemental_atonement_details.elemental_atonement,
             });
         }, (error: AxiosError) => {
             this.setState({
@@ -52,21 +52,21 @@ export default class CharacterElementalAtonementSection extends React.Component<
                 </p>
 
                 {
-                    this.state.elemental_atonement_details === null ?
+                    this.state.elemental_atonement === null ?
                         <WarningAlert>
                             You have nothing equipped. Cannot calculate your Elemental Atonement. Learn more <a href='/information/atonement' target='_blank'>here: Atonement <i
                             className="fas fa-external-link-alt"></i></a>
                         </WarningAlert>
-                        :
+                    :
                         <Fragment>
-                            <RenderAtonementDetails original_atonement={this.state.elemental_atonement_details.elemental_atonement} />
+                            <RenderAtonementDetails original_atonement={this.state.elemental_atonement} />
                             <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
                             <h4 className='my-4'>Elemental Damage</h4>
                             <dl>
                                 <dt>Element: </dt>
-                                <dd>{this.state.elemental_atonement_details.elemental_atonement.highest_element.name}</dd>
+                                <dd>{this.state.elemental_atonement.highest_element.name}</dd>
                                 <dt>Damage: </dt>
-                                <dd>{(this.state.elemental_atonement_details.elemental_atonement.highest_element.damage * 100).toFixed(2)}%</dd>
+                                <dd>{(this.state.elemental_atonement.highest_element.damage * 100).toFixed(2)}%</dd>
                             </dl>
                             <p className='my-4'>Your elemental damage is a % of damage you will deal as that element in addition to your other attacks
                                 when you attack an enemy. You can learn more about it <a href='/information/atonement' target='_blank'>here: Atonement <i
