@@ -185,7 +185,7 @@ export default class StatBreakDown extends React.Component<any, any> {
 
                     <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2 block md:hidden'></div>
                     <div>
-                        <h4>Increases All Stats Boon Modifiers</h4>
+                        <h4>Boons that increases all stats</h4>
                         <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2'></div>
 
                         {
@@ -199,7 +199,7 @@ export default class StatBreakDown extends React.Component<any, any> {
                                 </p>
                         }
                         <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-4'></div>
-                        <h4>Increases {this.titelizeType()}</h4>
+                        <h4>Boons that increase: {this.titelizeType()}</h4>
                         <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2'></div>
                         {
                             this.state.details.boon_details !== null ?
