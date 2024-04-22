@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Game\Core\Controllers\Api;
+namespace App\Game\Character\CharacterSheet\Controllers\Api;
 
 use App\Admin\Events\UpdateAdminChatEvent;
 use App\Flare\Models\Character;

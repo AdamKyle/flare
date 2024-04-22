@@ -98,6 +98,7 @@ class RouteServiceProvider extends ServiceProvider {
 
         // Game Api Routes
         $this->mapApiRoutes();
+        $this->mapCharacterSheetRoutes();
         $this->mapCharacterInventoryRoutes();
         $this->mapExplorationApiRoutes();
         $this->mapGameCoreApiRoutes();
@@ -150,6 +151,13 @@ class RouteServiceProvider extends ServiceProvider {
             ->middleware('api')
             ->namespace($this->namespace)
             ->group(base_path('routes/api.php'));
+    }
+
+    protected function mapCharacterSheetRoutes() {
+        Route::prefix('api')
+            ->middleware('web')
+            ->namespace('App\Game\Character\CharacterSheet\Controllers')
+            ->group(base_path('routes/game/character/character-sheet/api.php'));
     }
 
     protected function mapCharacterInventoryRoutes() {
