@@ -177,6 +177,20 @@ class DamageBuilder extends BaseAttribute {
         return $damage;
     }
 
+    public function buildSpellDamageBreakDownDetails(bool $voided): array {
+        $details = [];
+
+        $details['attached_affixes'] = $this->getAttributeBonusFromAllItemAffixesDetails('base_damage', $voided);
+        $details['skills_effecting_damage'] = null;
+        $details['base_damage'] = $this->getDamageFromItems('spell-damage', 'both');
+
+        if ($this->shouldIncludeSkillDamage($this->character->class, 'spell')) {
+            $details['skills_effecting_damage'] = $this->fetchBaseAttributeFromSkillsDetails('base_damage');
+        }
+
+        return $details;
+    }
+
     /**
      * Build stacking affix damage.
      *

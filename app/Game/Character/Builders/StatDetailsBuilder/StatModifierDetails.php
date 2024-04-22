@@ -69,6 +69,7 @@ class StatModifierDetails {
             case 'weapon_damage':
                 return $this->buildDamageBreakDown('weapon', $isVodied);
             case 'spell_damage':
+                return $this->buildDamageBreakDown('spell_damage', $isVodied);
             case 'ring_damage':
             case 'heal_for':
             default:
@@ -121,6 +122,7 @@ class StatModifierDetails {
         $details['spell_damage_stat_amount_to_use'] = 0;
         $details['percentage_of_stat_used'] = 0;
         $details['total_damage_for_type'] = number_format($this->character->getInformation()->buildDamage($type, $isVoided));
+        $details['base_damage'] = 0;
 
         $equipped = $this->fetchEquipped($this->character);
 
@@ -145,7 +147,7 @@ class StatModifierDetails {
                 }
             }
 
-            if ($type === 'spell-damage' && $this->character->classType()->isHeretic()) {
+            if ($type === 'spell_damage' && $this->character->classType()->isHeretic()) {
 
                 $value = $damageStatAmount * 0.15;
 
@@ -166,11 +168,12 @@ class StatModifierDetails {
                 $typeAttributes = $this->character->getInformation()->getDamageBuilder()->buildWeaponDamageBreakDown($damageStatAmount, $isVoided);
                 break;
             case 'ring':
-            case 'spell-damage':
+            case 'spell_damage':
+                $typeAttributes = $this->character->getInformation()->getDamageBuilder()->buildSpellDamageBreakDownDetails($isVoided);
+                break;
             default:
                 break;
         }
-
 
         return array_merge($details, $typeAttributes);
     }

@@ -6,7 +6,7 @@ import {AxiosError, AxiosResponse} from "axios";
 import LoadingProgressBar from "../../../../../ui/progress-bars/loading-progress-bar";
 import ItemNameColorationText from "../../../../../items/item-name/item-name-coloration-text";
 
-export default class WeaponDamageBreakDown extends React.Component<any, any> {
+export default class WeaponAndSpellDamageBreakDown extends React.Component<any, any> {
 
     constructor(props: any) {
         super(props);
@@ -132,6 +132,7 @@ export default class WeaponDamageBreakDown extends React.Component<any, any> {
         if (this.state.details === null) {
             return;
         }
+
 
         return this.state.details.skills_effecting_damage.map((skillAffectingDamage: any) => {
             return (
@@ -423,7 +424,7 @@ export default class WeaponDamageBreakDown extends React.Component<any, any> {
                         <h4> Skills That Increase: {this.titelizeType()}</h4>
                         <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2'></div>
                         {
-                            this.state.details.skill_effecting_ac !== null ?
+                            this.state.details.skills_effecting_damage !== null ?
                                 <ul className="space-y-4 text-gray-500 list-disc list-inside dark:text-gray-400">
                                     {this.renderSkillsAffectingDamage()}
                                 </ul>
