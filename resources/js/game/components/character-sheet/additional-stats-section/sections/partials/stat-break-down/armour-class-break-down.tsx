@@ -6,7 +6,7 @@ import {AxiosError, AxiosResponse} from "axios";
 import LoadingProgressBar from "../../../../../ui/progress-bars/loading-progress-bar";
 import ItemNameColorationText from "../../../../../items/item-name/item-name-coloration-text";
 
-export default class StatBreakDown extends React.Component<any, any> {
+export default class ArmourClassBreakDown extends React.Component<any, any> {
 
     constructor(props: any) {
         super(props);
@@ -27,8 +27,9 @@ export default class StatBreakDown extends React.Component<any, any> {
                 return;
             }
 
-            (new Ajax).setRoute('character-sheet/'+this.props.character_id+'/stat-break-down').setParameters({
-                stat_type: this.props.type,
+            (new Ajax).setRoute('character-sheet/'+this.props.character_id+'/specific-attribute-break-down').setParameters({
+                type: this.props.type,
+                is_voided: this.props.is_voided ? 1 : 0,
             }).doAjaxCall('get', (response: AxiosResponse) => {
                 this.setState({
                     is_loading: false,
@@ -55,14 +56,14 @@ export default class StatBreakDown extends React.Component<any, any> {
             return;
         }
 
-        return this.state.details.items_equipped.map((equippedItem: any) => {
+        return this.state.details.attached_affixes.map((equippedItem: any) => {
             return (
                 <li>
-                    <ItemNameColorationText item={equippedItem.item_details} custom_width={false} /> <span className='text-green-700 darmk:text-green-500'>(+{(equippedItem.item_base_stat * 100).toFixed(2)}%)</span>
+                    <ItemNameColorationText item={equippedItem.item_details} custom_width={false} /> <span className='text-green-700 darmk:text-green-500'>(+{equippedItem.base_ac})</span>
                     {
-                        equippedItem.attached_affixes.length > 0 ?
+                        equippedItem.affixes.length > 0 ?
                             <ul className='ps-5 mt-2 space-y-1 list-disc list-inside'>
-                                {this.renderAttachedAffixes(equippedItem.attached_affixes)}
+                                {this.renderAttachedAffixes(equippedItem.affixes)}
                             </ul>
                         : null
                     }
@@ -121,6 +122,20 @@ export default class StatBreakDown extends React.Component<any, any> {
         })
     }
 
+    renderSkillsAffectingAC() {
+        if (this.state.details === null) {
+            return;
+        }
+
+        return this.state.details.skill_effecting_ac.map((skillAffectingAC: any) => {
+            return (
+                <li>
+                    <span className='text-orange-600 dark:text-orange-300'>{skillAffectingAC.name}</span> <span className='text-green-700 darmk:text-green-500'>(+{(skillAffectingAC.amount * 100).toFixed(2)}%)</span>
+                </li>
+            )
+        })
+    }
+
     renderClassSpecialtiesStatIncrease() {
         if (this.state.details === null) {
             return;
@@ -143,7 +158,7 @@ export default class StatBreakDown extends React.Component<any, any> {
         return attachedAffixes.map((attachedAffix: any) => {
             return (
                 <li>
-                    <span className='text-slate-700 dark:text-slate-400'>{attachedAffix.affix_name}</span> <span className='text-green-700 darmk:text-green-500'>(+{(attachedAffix[this.props.type + '_mod'] * 100).toFixed(2)}%);</span>
+                    <span className='text-slate-700 dark:text-slate-400'>{attachedAffix.name}</span> <span className='text-green-700 darmk:text-green-500'>(+{(attachedAffix.amount * 100).toFixed(2)}%);</span>
                 </li>
             );
         })
@@ -159,9 +174,9 @@ export default class StatBreakDown extends React.Component<any, any> {
             <div>
                 <div className='flex justify-between'>
                     <div className="flex items-center">
-                        <h3 className="mr-2">{startCase(this.props.type.replace('-', ' '))}</h3>
+                        <h3 className="mr-2">{(this.props.is_voided ? 'Voided ' : '') + startCase(this.props.type.replace('-', ' '))}</h3>
                         <span className="text-gray-700 dark:text-gray-400">
-                            (Raw: {this.state.details.base_value})
+                            (Base AC: {this.state.details.base_ac})
                         </span>
                     </div>
                     <DangerButton button_label={'Close'} on_click={this.props.close_section}/>
@@ -172,10 +187,26 @@ export default class StatBreakDown extends React.Component<any, any> {
                 <div className='grid md:grid-cols-2 gap-2'>
 
                     <div>
+                        <h4>Armour Class From Items</h4>
+                        <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2'></div>
+                        <ul className="space-y-4 text-gray-500 list-disc list-inside dark:text-gray-400">
+                            <li>
+                                        <span
+                                            className='text-slate-700 dark:text-slate-400'>Ac </span>{" "}
+                                <span
+                                    className='text-green-700 darmk:text-green-500'>(+{this.state.details.ac_from_items})<sup>*</sup></span>
+                            </li>
+                        </ul>
+                        <p className={'my-4'}>
+                            <sup>*</sup> this number is the total Base AC on all armour items divided by the amount of
+                            armour items equipped, before modifiers. This number is used to determine your over all AC
+                            after bonuses.
+                        </p>
+                        <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2'></div>
                         <h4>Equipped Modifiers</h4>
                         <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2'></div>
                         {
-                            this.state.details.items_equipped.length > 0 ?
+                            this.state.details.attached_affixes !== null ?
                                 <ol className="space-y-4 text-gray-500 list-decimal list-inside dark:text-gray-400">
                                     {this.renderItemListEffects()}
                                 </ol>
@@ -188,20 +219,6 @@ export default class StatBreakDown extends React.Component<any, any> {
 
                     <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2 block md:hidden'></div>
                     <div>
-                        <h4>Boons that increases all stats</h4>
-                        <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2'></div>
-
-                        {
-                            this.state.details.boon_details !== null ?
-                                <ol className="space-y-4 text-gray-500 list-decimal list-inside dark:text-gray-400">
-                                    {this.renderBoonIncreaseAllStatsEffects()}
-                                </ol>
-                            :
-                                <p>
-                                    There are no boons applied that effect this specific stat.
-                                </p>
-                        }
-                        <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-4'></div>
                         <h4>Boons that increase: {this.titelizeType()}</h4>
                         <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2'></div>
                         {
@@ -247,21 +264,16 @@ export default class StatBreakDown extends React.Component<any, any> {
                                 </p>
                         }
                         <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-4'></div>
-                        <h4> Map Reduction To: {this.titelizeType()}</h4>
+                        <h4> Skills That Increase: {this.titelizeType()}</h4>
                         <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2'></div>
                         {
-                            this.state.details.map_reduction !== null ?
+                            this.state.details.skill_effecting_ac !== null ?
                                 <ul className="space-y-4 text-gray-500 list-disc list-inside dark:text-gray-400">
-                                    <li>
-                                        <span
-                                            className='text-slate-700 dark:text-slate-400'>{this.state.details.map_reduction.map_name}</span>{" "}
-                                        <span
-                                            className='text-red-700 darmk:text-red-500'>(-{(this.state.details.map_reduction.reduction_amount * 100).toFixed(2)}%)</span>
-                                    </li>
+                                    {this.renderSkillsAffectingAC()}
                                 </ul>
                             :
                                 <p>
-                                    There are no map reductions applied to this stat.
+                                   No Class Skills that effect your AC.
                                 </p>
                         }
                     </div>

@@ -24,7 +24,7 @@ class DefenceBuilder extends BaseAttribute {
         $armourSlots = $this->getItemsWithBaseAC();
         $itemAC      = $this->getACFromItems($armourSlots);
 
-        $hasShield   = $this->character->class->type()->isFighter() && $armourSlots->filter(function($slot) {
+        $hasShield   = $armourSlots->filter(function($slot) {
             return $slot->item->type === 'shield';
         })->isNotEmpty();
 
@@ -42,6 +42,17 @@ class DefenceBuilder extends BaseAttribute {
 
 
         return intval($baseAc + $itemAC);
+    }
+
+    public function buildDefenceBreakDownDetails(bool $voided = false): array {
+        $details = [];
+
+        $details['base_ac'] = $this->character->ac;
+        $details['ac_from_items'] = number_format($this->getACFromItems($this->getItemsWithBaseAC()));
+        $details['skill_effecting_ac'] = $this->fetchBaseAttributeFromSkillsDetails('base_ac');
+        $details['attached_affixes'] = $this->getAttributeBonusFromAllItemAffixesDetails('base_ac', $voided);
+
+        return $details;
     }
 
     /**

@@ -6,13 +6,15 @@ use App\Flare\Models\Character;
 use App\Flare\Models\Item;
 use App\Flare\Traits\IsItemUnique;
 use App\Flare\Values\ItemEffectsValue;
+use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\DefenceBuilder;
+use App\Game\Character\Builders\StatDetailsBuilder\Concerns\BasicItemDetails;
 use App\Game\Character\Concerns\FetchEquipped;
 use Facades\App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ItemSkillAttribute;
 use Illuminate\Support\Collection;
 
 class StatModifierDetails {
 
-    use FetchEquipped, IsItemUnique;
+    use FetchEquipped, BasicItemDetails;
 
     /**
      * @var Collection|null $equipped
@@ -48,7 +50,7 @@ class StatModifierDetails {
     public function forStat(string $stat): array {
         $details = [];
 
-        $details['base_value'] = $this->character->{$stat};
+        $details['base_value'] = number_format($this->character->{$stat});
         $details['items_equipped'] = array_values($this->fetchItemDetails($stat));
         $details['boon_details'] = $this->fetchBoonDetails($stat);
         $details['class_specialties'] = $this->fetchClassRankSpecialtiesDetails($stat);
@@ -56,6 +58,71 @@ class StatModifierDetails {
         $details['map_reduction'] = $this->getMapCharacterReductionsDetails();
 
         return $details;
+    }
+
+    public function buildSpecificBreakDown(string $type, bool $isVodied): array {
+        switch($type) {
+            case 'health':
+                return $this->fetchHealthBreakDown($isVodied);
+            case 'ac':
+                return $this->buildDefenceBreakDown($isVodied);
+            case 'weapon_damage':
+            case 'spell_damage':
+            case 'ring_damage':
+            case 'heal_for':
+            default:
+                return [];
+        }
+    }
+
+    /**
+     * Fetch Health Break Down.
+     *
+     * @param bool $isVoided
+     * @return array
+     */
+    public function fetchHealthBreakDown(bool $isVoided): array {
+        $details = [];
+
+        $details['stat_amount'] = number_format($this->character->getInformation()->statMod('dur', $isVoided));
+        $details['class_specialties'] = $this->fetchClassRankSpecialtiesForHealth();
+
+        return $details;
+    }
+
+    /**
+     * Build Defence Details.
+     *
+     * @param bool $isVoided
+     * @return array
+     */
+    public function buildDefenceBreakDown(bool $isVoided): array {
+
+        $details = [];
+
+        $details['class_bonus_details']       = $this->fetchClassBonusesEffecting('base_ac');
+        $details['boon_details']              = $this->fetchBoonDetails('base_ac');
+        $details['class_specialties']         = $this->fetchClassRankSpecialtiesDetails('base_ac');
+        $details['ancestral_item_skill_data'] = $this->fetchAncestralItemSkills('base_ac');
+
+        return array_merge($details, $this->character->getInformation()->getDefenceBuilder()->buildDefenceBreakDownDetails($isVoided));
+    }
+
+    private function fetchClassBonusesEffecting(string $attribute): array | null {
+        $classBonusSkill = $this->character->skills()
+            ->whereHas('baseSkill', function ($query) {
+                $query->whereNotNull('game_class_id');
+            })
+            ->first();
+
+        if (is_null($classBonusSkill)) {
+            return null;
+        }
+
+        return [
+            'name' => $classBonusSkill->baseSkill->name,
+            'amount' => $classBonusSkill->{$attribute . '_mod'}
+        ];
     }
 
     /**
@@ -132,12 +199,12 @@ class StatModifierDetails {
      */
     private function fetchClassRankSpecialtiesDetails(string $stat): array | null {
 
+        $details = [];
+
         if ($this->character->damage_stat === $stat) {
             $classSpecialties = $this->character->classSpecialsEquipped
                 ->where('equipped', '=', true)
                 ->where('base_damage_stat_increase', '>', 0);
-
-            $details = [];
 
             foreach ($classSpecialties as $classSpecialty) {
                 $details[] = [
@@ -149,7 +216,49 @@ class StatModifierDetails {
             return $details;
         }
 
-        return null;
+        $classSpecialties = $this->character->classSpecialsEquipped
+            ->where('equipped', '=', true)
+            ->where($stat . '_mod', '>', 0);
+
+
+        foreach ($classSpecialties as $classSpecialty) {
+            $details[] = [
+                'name' => $classSpecialty->gameClassSpecial->name,
+                'amount' => $classSpecialty->base_damage_stat_increase,
+            ];
+        }
+
+        if (empty($details)) {
+            return null;
+        }
+
+        return $details;
+    }
+
+    /**
+     * Fetch class rank specialties that can effect your health.
+     *
+     * @return array|null
+     */
+    private function fetchClassRankSpecialtiesForHealth(): array | null {
+        $classSpecialties = $this->character->classSpecialsEquipped
+            ->where('equipped', '=', true)
+            ->where('base_damage_stat_increase', '>', 0);
+
+        $details = [];
+
+        foreach ($classSpecialties as $classSpecialty) {
+            $details[] = [
+                'name' => $classSpecialty->gameClassSpecial->name,
+                'amount' => $classSpecialty->base_damage_stat_increase,
+            ];
+        }
+
+        if (empty($details)) {
+            return null;
+        }
+
+        return $details;
     }
 
     /**
@@ -262,23 +371,5 @@ class StatModifierDetails {
         }
 
         return $details;
-    }
-
-    /**
-     * Create basic item details.
-     *
-     * @param Item $item
-     * @return array
-     */
-    private function getBasicDetailsOfItem(Item $item): array {
-        return [
-            'name' => $item->affix_name,
-            'type' => $item->type,
-            'affix_count' => $item->affix_count,
-            'is_unique' => $this->isUnique($item),
-            'holy_stacks_applied' => $item->holy_stacks_applied,
-            'is_mythic' => $item->is_mythic,
-            'is_cosmic' => $item->is_cosmic,
-        ];
     }
 }

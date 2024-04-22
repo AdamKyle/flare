@@ -324,6 +324,16 @@ class CharacterStatBuilder {
         return $this->elementalAtonement->calculateAtonement();
     }
 
+    public function getDefenceBuilder(): DefenceBuilder {
+        $this->defenceBuilder->initialize(
+            $this->character,
+            $this->skills,
+            $this->equippedItems,
+        );
+
+        return $this->defenceBuilder;
+    }
+
     /**
      * Build Defence.
      *
@@ -339,6 +349,7 @@ class CharacterStatBuilder {
 
         $defence   = $this->defenceBuilder->buildDefence($this->classBonus(), $voided);
         $holyBonus = $this->holyInfo()->fetchDefenceBonus();
+        $defence   = $this->applyBoons($defence, 'base_ac_mod');
 
         $classSpecialsBonus = $this->character->classSpecialsEquipped
             ->where('equipped', true)
@@ -351,7 +362,6 @@ class CharacterStatBuilder {
         if (!is_null($this->equippedItems)) {
             $itemSkillBonus = ItemSkillAttribute::fetchModifier($this->character, 'base_ac');
         }
-
 
         return $defence + ($defence * ($holyBonus + $classSpecialsBonus + $itemSkillBonus));
     }

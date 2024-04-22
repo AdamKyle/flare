@@ -19,6 +19,7 @@ use App\Game\Character\Builders\StatDetailsBuilder\StatModifierDetails;
 use App\Game\Character\CharacterInventory\Services\UseItemService;
 use App\Game\Core\Events\GlobalTimeOut;
 use App\Game\Core\Jobs\EndGlobalTimeOut;
+use App\Game\Core\Requests\SpecificDetailsRequest;
 use App\Game\Core\Requests\StatDetailsRequest;
 use App\Game\Core\Services\CharacterPassiveSkills;
 use App\Game\Events\Values\EventType;
@@ -105,6 +106,14 @@ class CharacterSheetController extends Controller {
 
     public function statBreakDown(StatDetailsRequest $request, Character $character) {
         $breakDownDetails = $this->statModifierDetails->setCharacter($character)->forStat($request->stat_type);
+
+        return response()->json([
+            'break_down' => $breakDownDetails,
+        ]);
+    }
+
+    public function specificStatBreakDown(SpecificDetailsRequest $request, Character $character) {
+        $breakDownDetails = $this->statModifierDetails->setCharacter($character)->buildSpecificBreakDown($request->type, $request->is_voided);
 
         return response()->json([
             'break_down' => $breakDownDetails,

@@ -18,6 +18,7 @@ Route::group(['middleware' => ['is.character.who.they.say.they.are']], function 
     Route::get('/character-sheet/{character}/reincarnation-info', ['uses' => 'Api\CharacterSheetController@reincarnationInfo']);
     Route::get('/character-sheet/{character}/elemental-atonement-info', ['uses' => 'Api\CharacterSheetController@elementalAtonementInfo']);
     Route::get('/character-sheet/{character}/stat-break-down', ['uses' => 'Api\CharacterSheetController@statBreakDown']);
+    Route::get('/character-sheet/{character}/specific-attribute-break-down', ['uses' => 'Api\CharacterSheetController@specificStatBreakDown']);
 
     Route::get('/character-location-data/{character}', ['uses' => 'Api\CharacterSheetController@basicLocationInformation']);
     Route::get('/character-base-data/{character}', ['uses' => 'Api\CharacterSheetController@baseCharacterInformation']);
