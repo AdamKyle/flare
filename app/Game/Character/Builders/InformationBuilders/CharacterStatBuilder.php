@@ -334,6 +334,16 @@ class CharacterStatBuilder {
         return $this->defenceBuilder;
     }
 
+    public function getDamageBuilder(): DamageBuilder {
+        $this->damageBuilder->initialize(
+            $this->character,
+            $this->skills,
+            $this->equippedItems,
+        );
+
+        return $this->damageBuilder;
+    }
+
     /**
      * Build Defence.
      *

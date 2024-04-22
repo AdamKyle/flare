@@ -148,7 +148,7 @@ class FactionLoyaltyBountyHandler {
 
         event(new UpdateTopBarEvent($character->refresh()));
 
-        ServerMessageHandler::sendBasicMessage($character->user, 'Your fame with: ' . $factionLoyaltyNpc->npc->real_name . ' on Plane: ' . $factionLoyaltyNpc->npc->gameMap->name);
+        ServerMessageHandler::sendBasicMessage($character->user, 'Your fame with: ' . $factionLoyaltyNpc->npc->real_name . ' on Plane: ' . $factionLoyaltyNpc->npc->gameMap->name . ' is now level: ' . $factionLoyaltyNpc->current_level . ' out of: ' . $factionLoyaltyNpc->max_level);
     }
 
     protected function handOutXp(Character $character, FactionLoyaltyNpc $factionLoyaltyNpc): void {

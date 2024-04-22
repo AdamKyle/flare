@@ -67,6 +67,7 @@ class StatModifierDetails {
             case 'ac':
                 return $this->buildDefenceBreakDown($isVodied);
             case 'weapon_damage':
+                return $this->buildDamageBreakDown('weapon', $isVodied);
             case 'spell_damage':
             case 'ring_damage':
             case 'heal_for':
@@ -108,6 +109,78 @@ class StatModifierDetails {
         return array_merge($details, $this->character->getInformation()->getDefenceBuilder()->buildDefenceBreakDownDetails($isVoided));
     }
 
+    public function buildDamageBreakDown(string $type, bool $isVoided): array {
+        $details = [];
+
+        $damageStatAmount = $this->character->getInformation()->statMod($this->character->damage_stat, $isVoided);;
+
+        $details['damage_stat_name'] = $this->character->damage_stat;
+        $details['damage_stat_amount'] = number_format($this->character->getInformation()->statMod($this->character->damage_stat, $isVoided));
+        $details['non_equipped_damage_amount'] = 0;
+        $details['non_equipped_percentage_of_stat_used'] = 0;
+        $details['spell_damage_stat_amount_to_use'] = 0;
+        $details['percentage_of_stat_used'] = 0;
+        $details['total_damage_for_type'] = number_format($this->character->getInformation()->buildDamage($type, $isVoided));
+
+        $equipped = $this->fetchEquipped($this->character);
+
+        if (is_null($equipped)) {
+            if ($type === 'weapon') {
+
+                if ($this->character->classType()->isAlcoholic()) {
+                    $value = $damageStatAmount * 0.25;
+
+                    $details['non_equipped_damage_amount'] = number_format(max($value, 5));
+                    $details['non_equipped_percentage_of_stat_used'] = 0.25;
+                } else if ($this->character->classType()->isFighter()) {
+                    $value = $damageStatAmount * 0.05;
+
+                    $details['non_equipped_damage_amount'] = number_format(max($value, 5));
+                    $details['non_equipped_percentage_of_stat_used'] = 0.05;
+                } else {
+                    $value = $damageStatAmount * 0.02;
+
+                    $details['non_equipped_damage_amount'] = number_format(max($value, 5));
+                    $details['non_equipped_percentage_of_stat_used'] = 0.02;
+                }
+            }
+
+            if ($type === 'spell-damage' && $this->character->classType()->isHeretic()) {
+
+                $value = $damageStatAmount * 0.15;
+
+                $details['spell_damage_stat_amount_to_use'] = number_format(max($value, 5));
+                $details['percentage_of_stat_used'] = 0.15;
+            }
+        }
+
+        $details['class_bonus_details']       = $this->fetchClassBonusesEffecting('base_damage');
+        $details['boon_details']              = $this->fetchBoonDetails('base_damage');
+        $details['class_specialties']         = $this->fetchClassRankSpecialtiesDetails('base_damage');
+        $details['ancestral_item_skill_data'] = $this->fetchAncestralItemSkills('base_damage');
+
+        $typeAttributes = [];
+
+        switch ($type) {
+            case 'weapon':
+                $typeAttributes = $this->character->getInformation()->getDamageBuilder()->buildWeaponDamageBreakDown($damageStatAmount, $isVoided);
+                break;
+            case 'ring':
+            case 'spell-damage':
+            default:
+                break;
+        }
+
+
+        return array_merge($details, $typeAttributes);
+    }
+
+    /**
+     * Fetch Class Bonus Effecting the attribute.
+     *
+     * @param string $attribute
+     * @return array|null
+     */
     private function fetchClassBonusesEffecting(string $attribute): array | null {
         $classBonusSkill = $this->character->skills()
             ->whereHas('baseSkill', function ($query) {

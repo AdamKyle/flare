@@ -6,7 +6,7 @@ import {AxiosError, AxiosResponse} from "axios";
 import LoadingProgressBar from "../../../../../ui/progress-bars/loading-progress-bar";
 import ItemNameColorationText from "../../../../../items/item-name/item-name-coloration-text";
 
-export default class ArmourClassBreakDown extends React.Component<any, any> {
+export default class WeaponDamageBreakDown extends React.Component<any, any> {
 
     constructor(props: any) {
         super(props);
@@ -56,10 +56,16 @@ export default class ArmourClassBreakDown extends React.Component<any, any> {
             return;
         }
 
+        if (this.state.details.attached_affixes.length === 0) {
+            return <p className='my-4 text-slate-700 dark:text-slate-400'>
+                There is nothing equipped.
+            </p>
+        }
+
         return this.state.details.attached_affixes.map((equippedItem: any) => {
             return (
                 <li>
-                    <ItemNameColorationText item={equippedItem.item_details} custom_width={false} /> <span className='text-green-700 darmk:text-green-500'>(+{equippedItem.base_ac})</span>
+                    <ItemNameColorationText item={equippedItem.item_details} custom_width={false} /> <span className='text-green-700 darmk:text-green-500'>(+{equippedItem.base_damage})</span>
                     {
                         equippedItem.affixes.length > 0 ?
                             <ul className='ps-5 mt-2 space-y-1 list-disc list-inside'>
@@ -122,15 +128,15 @@ export default class ArmourClassBreakDown extends React.Component<any, any> {
         })
     }
 
-    renderSkillsAffectingAC() {
+    renderSkillsAffectingDamage() {
         if (this.state.details === null) {
             return;
         }
 
-        return this.state.details.skill_effecting_ac.map((skillAffectingAC: any) => {
+        return this.state.details.skills_effecting_damage.map((skillAffectingDamage: any) => {
             return (
                 <li>
-                    <span className='text-orange-600 dark:text-orange-300'>{skillAffectingAC.name}</span> <span className='text-green-700 darmk:text-green-500'>(+{(skillAffectingAC.amount * 100).toFixed(2)}%)</span>
+                    <span className='text-orange-600 dark:text-orange-300'>{skillAffectingDamage.name}</span> <span className='text-green-700 darmk:text-green-500'>(+{(skillAffectingDamage.amount * 100).toFixed(2)}%)</span>
                 </li>
             )
         })
@@ -155,6 +161,7 @@ export default class ArmourClassBreakDown extends React.Component<any, any> {
     }
 
     renderAttachedAffixes(attachedAffixes: any[]) {
+
         return attachedAffixes.map((attachedAffix: any) => {
             return (
                 <li>
@@ -164,10 +171,130 @@ export default class ArmourClassBreakDown extends React.Component<any, any> {
         })
     }
 
+    renderUnequippedDamageDetails() {
+        return (
+            <div>
+                <h4>Non Equipped Damage</h4>
+                <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2'></div>
+                <ul className="space-y-4 text-gray-500 list-disc list-inside dark:text-gray-400">
+                    <li>
+                                        <span
+                                            className='text-slate-700 dark:text-slate-400'>Total Damage </span>{" "}
+                        <span
+                            className='text-green-700 darmk:text-green-500'>(+{this.state.details.non_equipped_damage_amount})</span>
+                    </li>
+                    <li>
+                                        <span
+                                            className='text-slate-700 dark:text-slate-400'>Damage Stat Name </span>{" "}
+                        <span
+                            className='text-green-700 darmk:text-green-500'>({startCase(((this.props.is_voided ? 'Voided ' : '') + this.state.details.damage_stat_name))})</span>
+                    </li>
+                    <li>
+                                        <span
+                                            className='text-slate-700 dark:text-slate-400'>Damage Stat Amount </span>{" "}
+                        <span
+                            className='text-green-700 darmk:text-green-500'>(+{this.state.details.damage_stat_amount})</span>
+                    </li>
+                    <li>
+                                        <span
+                                            className='text-slate-700 dark:text-slate-400'>Percentage of stat used </span>{" "}
+                        <span
+                            className='text-green-700 darmk:text-green-500'>(+{(this.state.details.non_equipped_percentage_of_stat_used * 100).toFixed(2)})</span>
+                    </li>
+                </ul>
+            </div>
+        );
+    }
+
+    renderWeaponDamageDetails() {
+        return (
+            <div>
+                <h4>How base damage is calculated</h4>
+                <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2'></div>
+                <p className='my-4'>
+                    Base damage is what we use to determine your over all damage, this is a portion of your stats,
+                    usually 5%. Some classes can raise this percent higher.
+                </p>
+                <ul className="space-y-4 text-gray-500 list-disc list-inside dark:text-gray-400">
+                    <li>
+                                        <span
+                                            className='text-slate-700 dark:text-slate-400'>Base Damage </span>{" "}
+                        <span
+                            className='text-green-700 darmk:text-green-500'>(+{this.state.details.base_damage})</span>
+                    </li>
+                    <li>
+                                        <span
+                                            className='text-slate-700 dark:text-slate-400'>Amount of stat used </span>{" "}
+                        <span
+                            className='text-green-700 darmk:text-green-500'>(+{(this.state.details.percentage_of_stat * 100).toFixed(2)}%)</span>
+                    </li>
+                </ul>
+                <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2'></div>
+                <h4>Weapon Damage From Items</h4>
+                <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2'></div>
+                <ul className="space-y-4 text-gray-500 list-disc list-inside dark:text-gray-400">
+                    <li>
+                                        <span
+                                            className='text-slate-700 dark:text-slate-400'>Total Weapon Damage </span>{" "}
+                        <span
+                            className='text-green-700 darmk:text-green-500'>(+{this.state.details.total_damage_for_type})</span>
+                    </li>
+                    <li>
+                                        <span
+                                            className='text-slate-700 dark:text-slate-400'>Damage Stat Name </span>{" "}
+                        <span
+                            className='text-green-700 darmk:text-green-500'>({startCase(this.state.details.damage_stat_name)})</span>
+                    </li>
+                    <li>
+                                        <span
+                                            className='text-slate-700 dark:text-slate-400'>Damage Stat Amount </span>{" "}
+                        <span
+                            className='text-green-700 darmk:text-green-500'>(+{this.state.details.damage_stat_amount})</span>
+                    </li>
+                </ul>
+            </div>
+        );
+    }
+
+    renderSpellDamage() {
+        return (
+            <div>
+            <h4>Spell Damage From Items</h4>
+                <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2'></div>
+                <ul className="space-y-4 text-gray-500 list-disc list-inside dark:text-gray-400">
+                    <li>
+                                        <span
+                                            className='text-slate-700 dark:text-slate-400'>Damage Stat Name </span>{" "}
+                        <span
+                            className='text-green-700 darmk:text-green-500'>({startCase(this.state.details.damage_stat_name)})</span>
+                    </li>
+                    <li>
+                                        <span
+                                            className='text-slate-700 dark:text-slate-400'>Damage Stat Amount </span>{" "}
+                        <span
+                            className='text-green-700 darmk:text-green-500'>(+{this.state.details.damage_stat_amount})</span>
+                    </li>
+                    <li>
+                                        <span
+                                            className='text-slate-700 dark:text-slate-400'>Damage stat amount to use </span>{" "}
+                        <span
+                            className='text-green-700 darmk:text-green-500'>(+{this.state.details.spell_damage_stat_amount_to_use})</span>
+                    </li>
+                    <li>
+                                        <span
+                                            className='text-slate-700 dark:text-slate-400'>Percentage of stat used </span>{" "}
+                        <span
+                            className='text-green-700 darmk:text-green-500'>(+{(this.state.details.percentage_of_stat_used * 100).toFixed(2)}%)</span>
+                    </li>
+                </ul>
+            </div>
+        );
+    }
+
     render() {
 
         if (this.state.loading || this.state.details === null) {
-            return <LoadingProgressBar />
+            return <LoadingProgressBar/>
         }
 
         return (
@@ -175,9 +302,13 @@ export default class ArmourClassBreakDown extends React.Component<any, any> {
                 <div className='flex justify-between'>
                     <div className="flex items-center">
                         <h3 className="mr-2">{(this.props.is_voided ? 'Voided ' : '') + startCase(this.props.type.replace('-', ' '))}</h3>
-                        <span className="text-gray-700 dark:text-gray-400">
-                            (Base AC: {this.state.details.base_ac})
-                        </span>
+                        {
+                            this.state.details.non_equipped_damage_amount === 0 ?
+                                <span className="text-gray-700 dark:text-gray-400">
+                                    (Base Damage: {this.state.details.base_damage})
+                                </span>
+                            : null
+                        }
                     </div>
                     <DangerButton button_label={'Close'} on_click={this.props.close_section}/>
                 </div>
@@ -187,34 +318,33 @@ export default class ArmourClassBreakDown extends React.Component<any, any> {
                 {
                     this.props.is_voided ?
                         <p className='my-4 text-blue-700 dark:text-blue-500'>
-                            Voided Armour Class means no enchantments from your gear is used.
-                            Voided Armour Class only comes into play when an enemy voids you in combat.
+                            Voided Weapon Damage means no enchantments from your gear is used.
+                            Voided Weapon Damage only comes into play when an enemy voids you in combat.
                         </p>
                         : null
                 }
 
-                <p className='mb-4'>
-                    Armour Class, or AC, is used to block or reduce (some, like physical) incoming enemy attacks.
-                </p>
-
                 <div className='grid md:grid-cols-2 gap-2'>
-
                     <div>
-                        <h4>Armour Class From Items</h4>
-                        <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2'></div>
-                        <ul className="space-y-4 text-gray-500 list-disc list-inside dark:text-gray-400">
-                            <li>
-                                        <span
-                                            className='text-slate-700 dark:text-slate-400'>Ac </span>{" "}
-                                <span
-                                    className='text-green-700 darmk:text-green-500'>(+{this.state.details.ac_from_items})<sup>*</sup></span>
-                            </li>
-                        </ul>
-                        <p className={'my-4'}>
-                            <sup>*</sup> this number is the total Base AC on all armour items divided by the amount of
-                            armour items equipped, before modifiers. This number is used to determine your over all AC
-                            after bonuses.
-                        </p>
+
+                        {
+                            this.state.details.non_equipped_damage_amount !== 0 ?
+                                this.renderUnequippedDamageDetails()
+                            : null
+                        }
+
+                        {
+                            this.props.type === 'weapon_damage' && this.state.details.non_equipped_damage_amount === 0 ?
+                                this.renderWeaponDamageDetails()
+                            : null
+                        }
+
+                        {
+                            this.props.type === 'spell_damage' && this.state.details.non_equipped_damage_amount === 0 ?
+                                this.renderSpellDamage()
+                            : null
+                        }
+
                         <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2'></div>
                         <h4>Equipped Modifiers</h4>
                         <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2'></div>
@@ -239,7 +369,7 @@ export default class ArmourClassBreakDown extends React.Component<any, any> {
                                 <ul className="space-y-4 text-gray-500 list-disc list-inside dark:text-gray-400">
                                     {this.renderBoonIncreaseAllStatsEffects()}
                                 </ul>
-                            :
+                                :
                                 <p>
                                     There are no boons applied that effect this specific stat.
                                 </p>
@@ -295,7 +425,7 @@ export default class ArmourClassBreakDown extends React.Component<any, any> {
                         {
                             this.state.details.skill_effecting_ac !== null ?
                                 <ul className="space-y-4 text-gray-500 list-disc list-inside dark:text-gray-400">
-                                    {this.renderSkillsAffectingAC()}
+                                    {this.renderSkillsAffectingDamage()}
                                 </ul>
                                 :
                                 <p>

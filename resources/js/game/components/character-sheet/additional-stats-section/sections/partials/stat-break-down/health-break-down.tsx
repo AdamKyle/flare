@@ -85,10 +85,9 @@ export default class HealthBreakDown extends React.Component<any, any> {
 
                 {
                     this.props.is_voided ?
-                        <p className='my-4'>
+                        <p className='my-4 text-blue-700 dark:text-blue-500'>
                             Your modded dur, when voided, is based off a few other aspects such as equipment with out
-                            affixes,
-                            class specialties and other minor factors.
+                            affixes, class specialties and other minor factors. This only comes into effect when the enemy voids you in combat.
                         </p>
                     : null
                 }

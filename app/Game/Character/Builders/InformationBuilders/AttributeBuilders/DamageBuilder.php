@@ -59,6 +59,8 @@ class DamageBuilder extends BaseAttribute {
 
             if ($hasStaveEquipped) {
                 $baseDamage = $damageStat * 0.15;
+            } else {
+                $baseDamage = $damageStat * 0.05;
             }
         } else {
             $baseDamage = $damageStat * 0.05;
@@ -88,6 +90,51 @@ class DamageBuilder extends BaseAttribute {
 
         return $damage;
     }
+
+    public function buildWeaponDamageBreakDown(float $damageStat, bool $voided): array {
+        $details = [];
+
+        if ($this->character->class->type()->isFighter()) {
+            $baseDamage = $damageStat * 0.15;
+
+            $details['base_damage'] = number_format($baseDamage);
+            $details['percentage_of_stat'] = 0.15;
+
+        } else if ($this->character->class->type()->isArcaneAlchemist()) {
+            $hasStaveEquipped = $this->inventory->filter(function ($slot) {
+                return $slot->item->type === WeaponTypes::STAVE;
+            })->isNotEmpty();
+
+            if ($hasStaveEquipped) {
+                $baseDamage = $damageStat * 0.15;
+
+                $details['base_damage'] = number_format($baseDamage);
+                $details['percentage_of_stat'] = 0.15;
+            } else {
+                $baseDamage = $damageStat * 0.05;
+
+                $details['base_damage'] = number_format($baseDamage);
+                $details['percentage_of_stat'] = 0.05;
+            }
+        } else {
+            $baseDamage = $damageStat * 0.05;
+
+            $details['base_damage'] = number_format($baseDamage);
+            $details['percentage_of_stat'] = 0.05;
+        }
+
+        $details['skills_effecting_damage'] = null;
+
+        if ($this->shouldIncludeSkillDamage($this->character->class, 'weapon')) {
+            $details['skills_effecting_damage'] = $this->fetchBaseAttributeFromSkillsDetails('base_damage');
+        }
+
+        $details['attached_affixes'] = $this->getAttributeBonusFromAllItemAffixesDetails('base_damage', $voided);
+
+        return $details;
+    }
+
+
 
     /**
      * Build ring damage.

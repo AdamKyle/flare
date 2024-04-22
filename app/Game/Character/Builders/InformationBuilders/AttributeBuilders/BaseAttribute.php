@@ -55,10 +55,14 @@ class BaseAttribute {
     protected function getAttributeBonusFromAllItemAffixesDetails(string $attribute, bool $voided = false): array {
         $details = [];
 
+        if (is_null($this->inventory)) {
+            return $details;
+        }
+
         foreach ($this->inventory as $slot) {
             $details[] = [
                 'item_details' => $this->getBasicDetailsOfItem($slot->item),
-                'base_ac'      => number_format($slot->item->base_ac),
+                $attribute     => number_format($slot->item->{$attribute}),
                 'affixes'      => $voided ? [] : $this->fetchAffixes($slot->item, $attribute),
             ];
         }

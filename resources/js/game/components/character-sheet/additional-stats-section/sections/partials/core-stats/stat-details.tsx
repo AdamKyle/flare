@@ -4,6 +4,7 @@ import PrimaryLinkButton from "../../../../../ui/buttons/primary-link-button";
 import StatBreakDown from "../stat-break-down/stat-break-down";
 import HealthBreakDown from "../stat-break-down/health-break-down";
 import ArmourClassBreakDown from "../stat-break-down/armour-class-break-down";
+import WeaponDamageBreakDown from "../stat-break-down/weapon-damage-break-down";
 
 export default class StatDetails extends React.Component<any, any> {
 
@@ -63,6 +64,12 @@ export default class StatDetails extends React.Component<any, any> {
                                                      character_id={this.props.character.id}
                                                      is_voided={this.state.show_voided}
                         />
+                    case 'weapon_damage':
+                        return <WeaponDamageBreakDown close_section={this.closeTypeDetails.bind(this)}
+                                                      type={this.state.details_type}
+                                                      character_id={this.props.character.id}
+                                                      is_voided={this.state.show_voided}
+                               />
                     default:
                         return null;
                 }
@@ -137,7 +144,9 @@ export default class StatDetails extends React.Component<any, any> {
 
                     <div>
                         <dl>
-                            <dt><PrimaryLinkButton button_label={'Weapon Damage'} on_click={() => {}} /></dt>
+                            <dt><PrimaryLinkButton button_label={'Weapon Damage'} on_click={() => {
+                                this.showTypeDetails('weapon_damage', false)
+                            }} /></dt>
                             <dd>{formatNumber(this.props.stat_details.weapon_attack)}</dd>
                             <dt><PrimaryLinkButton button_label={'Ring Damage'} on_click={() => {}} /></dt>
                             <dd>{formatNumber(this.props.stat_details.ring_damage)}</dd>
@@ -151,7 +160,9 @@ export default class StatDetails extends React.Component<any, any> {
                         className='border-b-2 block md:hidden border-b-gray-300 dark:border-b-gray-600 my-3'></div>
                     <div>
                         <dl>
-                            <dt>Voided Weapon Damage <sup>*</sup></dt>
+                            <dt><PrimaryLinkButton button_label={'Voided Weapon Damage'} on_click={() => {
+                                this.showTypeDetails('weapon_damage', true)
+                            }} /></dt>
                             <dd>{formatNumber(this.props.stat_details.voided_weapon_attack)}</dd>
                             <dt>Voided Ring Damage <sup>*</sup></dt>
                             <dd>{formatNumber(this.props.stat_details.ring_damage)}</dd>
