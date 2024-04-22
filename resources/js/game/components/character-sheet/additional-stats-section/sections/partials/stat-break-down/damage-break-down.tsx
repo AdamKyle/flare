@@ -6,7 +6,7 @@ import {AxiosError, AxiosResponse} from "axios";
 import LoadingProgressBar from "../../../../../ui/progress-bars/loading-progress-bar";
 import ItemNameColorationText from "../../../../../items/item-name/item-name-coloration-text";
 
-export default class WeaponAndSpellDamageBreakDown extends React.Component<any, any> {
+export default class DamageBreakDown extends React.Component<any, any> {
 
     constructor(props: any) {
         super(props);
@@ -63,9 +63,17 @@ export default class WeaponAndSpellDamageBreakDown extends React.Component<any, 
         }
 
         return this.state.details.attached_affixes.map((equippedItem: any) => {
+            let amount = 0;
+
+            if (typeof equippedItem.base_damage !== 'undefined') {
+                amount = equippedItem.base_damage;
+            } else {
+                amount = equippedItem.base_healing;
+            }
+
             return (
                 <li>
-                    <ItemNameColorationText item={equippedItem.item_details} custom_width={false} /> <span className='text-green-700 darmk:text-green-500'>(+{equippedItem.base_damage})</span>
+                    <ItemNameColorationText item={equippedItem.item_details} custom_width={false} /> <span className='text-green-700 darmk:text-green-500'>(+{amount})</span>
                     {
                         equippedItem.affixes.length > 0 ?
                             <ul className='ps-5 mt-2 space-y-1 list-disc list-inside'>
@@ -80,6 +88,10 @@ export default class WeaponAndSpellDamageBreakDown extends React.Component<any, 
 
     renderBoonIncreaseAllStatsEffects() {
         if (this.state.details === null) {
+            return;
+        }
+
+        if (this.state.details.boon_details.length <= 0) {
             return;
         }
 
@@ -231,7 +243,7 @@ export default class WeaponAndSpellDamageBreakDown extends React.Component<any, 
                     </li>
                 </ul>
                 <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2'></div>
-                <h4>Weapon Damage From Items</h4>
+                <h4>Weapon damage from items</h4>
                 <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2'></div>
                 <ul className="space-y-4 text-gray-500 list-disc list-inside dark:text-gray-400">
                     <li>
@@ -260,7 +272,7 @@ export default class WeaponAndSpellDamageBreakDown extends React.Component<any, 
     renderSpellDamage() {
         return (
             <div>
-            <h4>Spell Damage From Items</h4>
+            <h4>Spell damage from items</h4>
                 <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2'></div>
                 <ul className="space-y-4 text-gray-500 list-disc list-inside dark:text-gray-400">
                     <li>
@@ -292,6 +304,52 @@ export default class WeaponAndSpellDamageBreakDown extends React.Component<any, 
         );
     }
 
+    renderSpellHealing() {
+        return (
+            <div>
+                <h4>Spell healing from items</h4>
+                <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2'></div>
+                <ul className="space-y-4 text-gray-500 list-disc list-inside dark:text-gray-400">
+                    <li>
+                                        <span
+                                            className='text-slate-700 dark:text-slate-400'>Healing Stat Name </span>{" "}
+                        <span
+                            className='text-green-700 darmk:text-green-500'>({startCase(this.state.details.damage_stat_name)})</span>
+                    </li>
+                    <li>
+                                        <span
+                                            className='text-slate-700 dark:text-slate-400'>Healing Stat Amount </span>{" "}
+                        <span
+                            className='text-green-700 darmk:text-green-500'>(+{this.state.details.damage_stat_amount})</span>
+                    </li>
+                    <li>
+                                        <span
+                                            className='text-slate-700 dark:text-slate-400'>Healing stat amount to use </span>{" "}
+                        <span
+                            className='text-green-700 darmk:text-green-500'>(+{this.state.details.spell_damage_stat_amount_to_use})</span>
+                    </li>
+                    <li>
+                                        <span
+                                            className='text-slate-700 dark:text-slate-400'>Percentage of stat used </span>{" "}
+                        <span
+                            className='text-green-700 darmk:text-green-500'>(+{(this.state.details.percentage_of_stat_used * 100).toFixed(2)}%)</span>
+                    </li>
+                </ul>
+                <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2'></div>
+                <h4>Spell healing from items</h4>
+                <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2'></div>
+                <ul className="space-y-4 text-gray-500 list-disc list-inside dark:text-gray-400">
+                    <li>
+                                        <span
+                                            className='text-slate-700 dark:text-slate-400'>Total healing </span>{" "}
+                        <span
+                            className='text-green-700 darmk:text-green-500'>(+{this.state.details.total_damage_for_type})</span>
+                    </li>
+                </ul>
+            </div>
+        );
+    }
+
     render() {
 
         if (this.state.loading || this.state.details === null) {
@@ -306,9 +364,9 @@ export default class WeaponAndSpellDamageBreakDown extends React.Component<any, 
                         {
                             this.state.details.non_equipped_damage_amount === 0 ?
                                 <span className="text-gray-700 dark:text-gray-400">
-                                    (Base Damage: {this.state.details.base_damage})
+                                    (Base {(this.props.type === 'heal_for' ? 'Healing:' : 'Damage:')} {this.state.details.base_damage})
                                 </span>
-                            : null
+                                : null
                         }
                     </div>
                     <DangerButton button_label={'Close'} on_click={this.props.close_section}/>
@@ -330,23 +388,40 @@ export default class WeaponAndSpellDamageBreakDown extends React.Component<any, 
 
                         {
                             this.state.details.non_equipped_damage_amount !== 0 ?
-                                this.renderUnequippedDamageDetails()
+                                <>
+                                    {this.renderUnequippedDamageDetails()}
+                                    <div className = 'border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2'> </div>
+                                </>
                             : null
                         }
 
                         {
                             this.props.type === 'weapon_damage' && this.state.details.non_equipped_damage_amount === 0 ?
-                                this.renderWeaponDamageDetails()
+                                <>
+                                    {this.renderWeaponDamageDetails()}
+                                    <div className = 'border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2'> </div>
+                                </>
                             : null
                         }
 
                         {
                             this.props.type === 'spell_damage' && this.state.details.non_equipped_damage_amount === 0 ?
-                                this.renderSpellDamage()
+                                <>
+                                    {this.renderSpellDamage()}
+                                    <div className = 'border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2'> </div>
+                                </>
                             : null
                         }
 
-                        <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2'></div>
+                        {
+                            this.props.type === 'heal_for' && this.state.details.non_equipped_damage_amount === 0 ?
+                                <>
+                                    {this.renderSpellHealing()}
+                                    <div className = 'border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2'> </div>
+                                </>
+                                : null
+                        }
+
                         <h4>Equipped Modifiers</h4>
                         <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2'></div>
                         {
@@ -405,6 +480,21 @@ export default class WeaponAndSpellDamageBreakDown extends React.Component<any, 
                                 :
                                 <p>
                                     There are no class specials equipped that effect this stat.
+                                </p>
+                        }
+                        <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-4'></div>
+                        <h4> Equipped Class Skill That Raise: {this.titelizeType()}</h4>
+                        <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2'></div>
+                        {
+                            this.state.details.class_bonus_details !== null ?
+                                <ul className="space-y-4 text-gray-500 list-disc list-inside dark:text-gray-400">
+                                    <li>
+                                        <span className='text-slate-600 dark:text-slate-300'>{this.state.details.class_bonus_details.name}</span> <span className='text-green-700 darmk:text-green-500'>(+{(this.state.details.class_bonus_details.amount * 100).toFixed(2)}%)</span>
+                                    </li>
+                                </ul>
+                            :
+                                <p>
+                                    You do not have a class skill that effects this stat.
                                 </p>
                         }
                         <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-4'></div>

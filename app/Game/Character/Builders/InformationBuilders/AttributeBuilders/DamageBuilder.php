@@ -180,13 +180,21 @@ class DamageBuilder extends BaseAttribute {
     public function buildSpellDamageBreakDownDetails(bool $voided): array {
         $details = [];
 
-        $details['attached_affixes'] = $this->getAttributeBonusFromAllItemAffixesDetails('base_damage', $voided);
+        $details['attached_affixes'] = $this->getAttributeBonusFromAllItemAffixesDetails('base_damage', $voided, 'spell-damage');
         $details['skills_effecting_damage'] = null;
-        $details['base_damage'] = $this->getDamageFromItems('spell-damage', 'both');
+        $details['base_damage'] = number_format($this->getDamageFromItems('spell-damage', 'both'));
 
         if ($this->shouldIncludeSkillDamage($this->character->class, 'spell')) {
             $details['skills_effecting_damage'] = $this->fetchBaseAttributeFromSkillsDetails('base_damage');
         }
+
+        return $details;
+    }
+
+    public function buildRingDamageBreakDown(): array {
+        $details['attached_affixes'] = $this->getAttributeBonusFromAllItemAffixesDetails('base_damage', false, 'ring');
+        $details['base_damage'] = $this->getDamageFromItems('ring', 'both');
+        $details['skills_effecting_damage'] = null;
 
         return $details;
     }

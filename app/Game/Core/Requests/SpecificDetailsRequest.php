@@ -22,7 +22,7 @@ class SpecificDetailsRequest extends FormRequest {
      */
     public function rules() {
         return [
-            'type' => 'required|string|in:health,ac,weapon_damage,spell_damage,ring_damage,healing_amount',
+            'type' => 'required|string|in:health,ac,weapon_damage,spell_damage,ring_damage,heal_for',
             'is_voided' => 'required|boolean',
         ];
     }

@@ -69,9 +69,11 @@ class StatModifierDetails {
             case 'weapon_damage':
                 return $this->buildDamageBreakDown('weapon', $isVodied);
             case 'spell_damage':
-                return $this->buildDamageBreakDown('spell_damage', $isVodied);
+                return $this->buildDamageBreakDown('spell-damage', $isVodied);
             case 'ring_damage':
+                return $this->buildDamageBreakDown('ring', $isVodied);
             case 'heal_for':
+                return $this->buildDamageBreakDown('spell-healing', $isVodied);
             default:
                 return [];
         }
@@ -113,7 +115,7 @@ class StatModifierDetails {
     public function buildDamageBreakDown(string $type, bool $isVoided): array {
         $details = [];
 
-        $damageStatAmount = $this->character->getInformation()->statMod($this->character->damage_stat, $isVoided);;
+        $damageStatAmount = $this->character->getInformation()->statMod($this->character->damage_stat, $isVoided);
 
         $details['damage_stat_name'] = $this->character->damage_stat;
         $details['damage_stat_amount'] = number_format($this->character->getInformation()->statMod($this->character->damage_stat, $isVoided));
@@ -156,9 +158,9 @@ class StatModifierDetails {
             }
         }
 
-        $details['class_bonus_details']       = $this->fetchClassBonusesEffecting('base_damage');
-        $details['boon_details']              = $this->fetchBoonDetails('base_damage');
-        $details['class_specialties']         = $this->fetchClassRankSpecialtiesDetails('base_damage');
+        $details['class_bonus_details']       = $type === 'ring' ? null : $this->fetchClassBonusesEffecting('base_damage');
+        $details['boon_details']              = $type === 'ring' ? null : $this->fetchBoonDetails('base_damage');
+        $details['class_specialties']         = $type === 'ring' ? null : $this->fetchClassRankSpecialtiesDetails('base_damage');
         $details['ancestral_item_skill_data'] = $this->fetchAncestralItemSkills('base_damage');
 
         $typeAttributes = [];
@@ -167,10 +169,14 @@ class StatModifierDetails {
             case 'weapon':
                 $typeAttributes = $this->character->getInformation()->getDamageBuilder()->buildWeaponDamageBreakDown($damageStatAmount, $isVoided);
                 break;
-            case 'ring':
-            case 'spell_damage':
+            case 'spell-damage':
                 $typeAttributes = $this->character->getInformation()->getDamageBuilder()->buildSpellDamageBreakDownDetails($isVoided);
                 break;
+            case 'ring':
+                $typeAttributes = $this->character->getInformation()->getDamageBuilder()->buildRingDamageBreakDown();
+                break;
+            case 'spell-healing':
+                $typeAttributes = $this->character->getInformation()->getHealingBuilder()->getHealingBuilder($isVoided);
             default:
                 break;
         }
@@ -192,6 +198,10 @@ class StatModifierDetails {
             ->first();
 
         if (is_null($classBonusSkill)) {
+            return null;
+        }
+
+        if ($classBonusSkill->game_class_id !== $this->character->game_class_id) {
             return null;
         }
 
@@ -300,7 +310,7 @@ class StatModifierDetails {
         foreach ($classSpecialties as $classSpecialty) {
             $details[] = [
                 'name' => $classSpecialty->gameClassSpecial->name,
-                'amount' => $classSpecialty->base_damage_stat_increase,
+                'amount' => $classSpecialty->{$stat . '_mod'},
             ];
         }
 

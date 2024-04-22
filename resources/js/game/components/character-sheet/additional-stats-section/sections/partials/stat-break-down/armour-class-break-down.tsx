@@ -277,6 +277,21 @@ export default class ArmourClassBreakDown extends React.Component<any, any> {
                                 </p>
                         }
                         <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-4'></div>
+                        <h4> Equipped Class Skill That Raise: {this.titelizeType()}</h4>
+                        <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2'></div>
+                        {
+                            this.state.details.class_bonus_details !== null ?
+                                <ul className="space-y-4 text-gray-500 list-disc list-inside dark:text-gray-400">
+                                    <li>
+                                        <span className='text-slate-600 dark:text-slate-300'>{this.state.details.class_bonus_details.name}</span> <span className='text-green-700 darmk:text-green-500'>(+{(this.state.details.class_bonus_details.amount * 100).toFixed(2)}%)</span>
+                                    </li>
+                                </ul>
+                                :
+                                <p>
+                                    You do not have a class skill that effects this stat.
+                                </p>
+                        }
+                        <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-4'></div>
                         <h4> Ancestral Item Skills That Raise: {this.titelizeType()}</h4>
                         <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2'></div>
                         {

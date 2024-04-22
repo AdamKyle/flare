@@ -4,7 +4,7 @@ import PrimaryLinkButton from "../../../../../ui/buttons/primary-link-button";
 import StatBreakDown from "../stat-break-down/stat-break-down";
 import HealthBreakDown from "../stat-break-down/health-break-down";
 import ArmourClassBreakDown from "../stat-break-down/armour-class-break-down";
-import WeaponAndSpellDamageBreakDown from "../stat-break-down/weapon-and-spell-damage-break-down";
+import DamageBreakDown from "../stat-break-down/damage-break-down";
 
 export default class StatDetails extends React.Component<any, any> {
 
@@ -66,10 +66,12 @@ export default class StatDetails extends React.Component<any, any> {
                         />
                     case 'weapon_damage':
                     case 'spell_damage':
-                        return <WeaponAndSpellDamageBreakDown close_section={this.closeTypeDetails.bind(this)}
-                                                              type={this.state.details_type}
-                                                              character_id={this.props.character.id}
-                                                              is_voided={this.state.show_voided}
+                    case 'heal_for':
+                    case 'ring_damage':
+                        return <DamageBreakDown close_section={this.closeTypeDetails.bind(this)}
+                                                type={this.state.details_type}
+                                                character_id={this.props.character.id}
+                                                is_voided={this.state.show_voided}
                                />
                     default:
                         return null;
@@ -149,13 +151,19 @@ export default class StatDetails extends React.Component<any, any> {
                                 this.showTypeDetails('weapon_damage', false)
                             }} /></dt>
                             <dd>{formatNumber(this.props.stat_details.weapon_attack)}</dd>
-                            <dt><PrimaryLinkButton button_label={'Ring Damage'} on_click={() => {}} /></dt>
+                            <dt>
+                                <PrimaryLinkButton button_label={'Ring Damage'} on_click={() => {
+                                    this.showTypeDetails('ring_damage', false)
+                                }} />
+                            </dt>
                             <dd>{formatNumber(this.props.stat_details.ring_damage)}</dd>
                             <dt><PrimaryLinkButton button_label={'Spell Damage'} on_click={() => {
                                 this.showTypeDetails('spell_damage', false)
                             }} /></dt>
                             <dd>{formatNumber(this.props.stat_details.spell_damage)}</dd>
-                            <dt><PrimaryLinkButton button_label={'Healing Amount'} on_click={() => {}} /></dt>
+                            <dt><PrimaryLinkButton button_label={'Healing Amount'} on_click={() => {
+                                this.showTypeDetails('heal_for', false)
+                            }} /></dt>
                             <dd>{formatNumber(this.props.stat_details.healing_amount)}</dd>
                         </dl>
                     </div>
@@ -167,13 +175,19 @@ export default class StatDetails extends React.Component<any, any> {
                                 this.showTypeDetails('weapon_damage', true)
                             }} /></dt>
                             <dd>{formatNumber(this.props.stat_details.voided_weapon_attack)}</dd>
-                            <dt>Voided Ring Damage <sup>*</sup></dt>
+                            <dt>
+                                <PrimaryLinkButton button_label={'Voided Ring Damage'} on_click={() => {
+                                    this.showTypeDetails('ring_damage', true)
+                                }} />
+                            </dt>
                             <dd>{formatNumber(this.props.stat_details.ring_damage)}</dd>
                             <dt><PrimaryLinkButton button_label={'Voided Spell Damage'} on_click={() => {
                                 this.showTypeDetails('spell_damage', true)
                             }} /></dt>
                             <dd>{formatNumber(this.props.stat_details.voided_spell_damage)}</dd>
-                            <dt>Voided Healing Amount <sup>*</sup></dt>
+                            <dt><PrimaryLinkButton button_label={'Voided Healing Amount'} on_click={() => {
+                                this.showTypeDetails('heal_for', true)
+                            }} /></dt>
                             <dd>{formatNumber(this.props.stat_details.voided_healing_amount)}</dd>
                         </dl>
                     </div>

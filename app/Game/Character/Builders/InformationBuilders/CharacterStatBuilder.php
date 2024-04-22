@@ -344,6 +344,16 @@ class CharacterStatBuilder {
         return $this->damageBuilder;
     }
 
+    public function getHealingBuilder(): HealingBuilder {
+        $this->healingBuilder->initialize(
+            $this->character,
+            $this->skills,
+            $this->equippedItems,
+        );
+
+        return $this->healingBuilder;
+    }
+
     /**
      * Build Defence.
      *

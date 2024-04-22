@@ -52,7 +52,7 @@ class BaseAttribute {
             $this->inventory->sum('item.itemSuffix.'.$attribute.'_mod');
     }
 
-    protected function getAttributeBonusFromAllItemAffixesDetails(string $attribute, bool $voided = false): array {
+    protected function getAttributeBonusFromAllItemAffixesDetails(string $attribute, bool $voided = false, string|array $onlyForType = null): array {
         $details = [];
 
         if (is_null($this->inventory)) {
@@ -60,6 +60,24 @@ class BaseAttribute {
         }
 
         foreach ($this->inventory as $slot) {
+
+            if (!is_null($onlyForType)) {
+
+                if (!is_array($onlyForType)) {
+                    if ($slot->item->type !== $onlyForType) {
+
+                        if (!$this->hasAffixesAffectingStat($slot->item, $attribute)) {
+                            continue;
+                        }
+                    }
+                } else {
+                    if (!in_array($slot->item->type, $onlyForType)) {
+                        continue;
+                    }
+                }
+
+            }
+
             $details[] = [
                 'item_details' => $this->getBasicDetailsOfItem($slot->item),
                 $attribute     => number_format($slot->item->{$attribute}),
@@ -68,6 +86,23 @@ class BaseAttribute {
         }
 
         return $details;
+    }
+
+    private function hasAffixesAffectingStat(Item $item, string $attribute): bool {
+        if (!is_null($item->item_prefix_id)) {
+            if ($item->itemPrefix->{$attribute . '_mod'} > 0) {
+                return true;
+            }
+        }
+
+
+        if (!is_null($item->item_suffix_id)) {
+            if ($item->itemSuffix->{$attribute . '_mod'} > 0) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private function fetchAffixes(Item $item, string $attribute): array {
