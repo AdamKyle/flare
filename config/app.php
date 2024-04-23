@@ -238,6 +238,7 @@ return [
         App\Game\Character\Providers\ServiceProvider::class,
         App\Game\Character\Builders\AttackBuilders\Providers\ServiceProvider::class,
         App\Game\Character\Builders\InformationBuilders\Providers\ServiceProvider::class,
+        App\Game\Character\Builders\StatDetailsBuilder\Providers\ServiceProvider::class,
         App\Game\Character\CharacterCreation\Providers\ServiceProvider::class,
         App\Game\Character\CharacterInventory\Providers\ServiceProvider::class,
         App\Game\Core\Providers\ServiceProvider::class,
