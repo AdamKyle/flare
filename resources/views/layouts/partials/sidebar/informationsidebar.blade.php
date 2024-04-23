@@ -118,8 +118,7 @@
                 Reincarnation
             </a>
             <a href="{{ route('info.page', ['pageName' => 'character-xp']) }}">
-                <i class="fas fa-chart-line"></i>
-                Character XP
+                <span class="fas fa-chart-line"></span> Character XP
             </a>
             <hr />
             <h6 class="uppercase">Skills</h6>
