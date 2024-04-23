@@ -155,6 +155,21 @@ export default class DamageBreakDown extends React.Component<any, any> {
         })
     }
 
+    renderClassMasteries() {
+        if (this.state.details === null) {
+            return;
+        }
+
+
+        return this.state.details.masteries.map((mastery: any) => {
+            return (
+                <li>
+                    <span className='text-primary-600 dark:text-primary-300'>{startCase(mastery.name.replace('-', ' '))} for position: {startCase(mastery.position.replace('-', ' '))}</span> <span className='text-green-700 dark:text-green-500'>(+{(mastery.amount * 100).toFixed(2)}%)</span>
+                </li>
+            )
+        })
+    }
+
     renderClassSpecialtiesStatIncrease() {
         if (this.state.details === null) {
             return;
@@ -489,10 +504,13 @@ export default class DamageBreakDown extends React.Component<any, any> {
                             this.state.details.class_bonus_details !== null ?
                                 <ul className="space-y-4 text-gray-500 list-disc list-inside dark:text-gray-400">
                                     <li>
-                                        <span className='text-slate-600 dark:text-slate-300'>{this.state.details.class_bonus_details.name}</span> <span className='text-green-700 dark:text-green-500'>(+{(this.state.details.class_bonus_details.amount * 100).toFixed(2)}%)</span>
+                                        <span
+                                            className='text-slate-600 dark:text-slate-300'>{this.state.details.class_bonus_details.name}</span>
+                                        <span
+                                            className='text-green-700 dark:text-green-500'>(+{(this.state.details.class_bonus_details.amount * 100).toFixed(2)}%)</span>
                                     </li>
                                 </ul>
-                            :
+                                :
                                 <p>
                                     You do not have a class skill that effects this stat.
                                 </p>
@@ -521,6 +539,19 @@ export default class DamageBreakDown extends React.Component<any, any> {
                                 :
                                 <p>
                                     No Class Skills that effect your AC.
+                                </p>
+                        }
+                        <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-4'></div>
+                        <h4> Class Rank Masteries That Increase: {this.titelizeType()}</h4>
+                        <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2'></div>
+                        {
+                            this.state.details.masteries.length > 0 ?
+                                <ul className="space-y-4 text-gray-500 list-disc list-inside dark:text-gray-400">
+                                    {this.renderClassMasteries()}
+                                </ul>
+                                :
+                                <p>
+                                    No Class Masteries that effect this stat.
                                 </p>
                         }
                     </div>

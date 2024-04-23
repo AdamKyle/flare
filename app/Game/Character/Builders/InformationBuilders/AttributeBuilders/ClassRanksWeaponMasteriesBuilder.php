@@ -4,6 +4,8 @@ namespace App\Game\Character\Builders\InformationBuilders\AttributeBuilders;
 
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\SetSlot;
+use App\Flare\Values\SpellTypes;
+use App\Flare\Values\WeaponTypes;
 use App\Game\ClassRanks\Values\WeaponMasteryValue;
 use Exception;
 
@@ -25,6 +27,26 @@ class ClassRanksWeaponMasteriesBuilder extends BaseAttribute {
         $percentageForRightHand = $this->getPercentage($slotFromRightHand);
 
         return $percentageForLeftHand + $percentageForRightHand;
+    }
+
+    public function fetchClassMasteryBreakDownForPosition(string $type, string $position): array {
+
+        $slot = $this->inventory->where('position', $position)->where('item.type', $type)->first();
+
+        if (is_null($slot)) {
+            return [];
+        }
+
+        $classRank = $this->character->classRanks->where('game_class_id', $this->character->game_class_id)->first();
+
+        $mastery   = WeaponMasteryValue::getNumericValueForStringType($slot->item->type);
+        $mastery = $classRank->weaponMasteries->where('weapon_type', $mastery)->where('character_class_rank_id', $classRank->id)->first();
+
+        return [
+            'position' => $position,
+            'name' => $type,
+            'amount' => $mastery->level / 100,
+        ];
     }
 
     public function determineBonusForSpellDamage(string $position = 'both'): float {

@@ -79,6 +79,13 @@ class HealingBuilder extends BaseAttribute {
             $details['skills_effecting_damage'] = $this->fetchBaseAttributeFromSkillsDetails('base_healing');
         }
 
+        $details['masteries'] = [];
+
+        $details['masteries'][] = $this->classRanksWeaponMasteriesBuilder->fetchClassMasteryBreakDownForPosition('spell-healing', 'spell-one');
+        $details['masteries'][] = $this->classRanksWeaponMasteriesBuilder->fetchClassMasteryBreakDownForPosition('spell-healing', 'spell-two');
+
+        $details['masteries'] = array_filter($details['masteries']);
+
         return $details;
     }
 }

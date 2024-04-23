@@ -131,6 +131,27 @@ class DamageBuilder extends BaseAttribute {
 
         $details['attached_affixes'] = $this->getAttributeBonusFromAllItemAffixesDetails('base_damage', $voided);
 
+        $details['masteries'] = [];
+
+        $slots = $this->inventory->filter(function ($slot) {
+            return in_array($slot->item->type, [
+                WeaponTypes::WEAPON,
+                WeaponTypes::STAVE,
+                WeaponTypes::SCRATCH_AWL,
+                WeaponTypes::HAMMER,
+                WeaponTypes::MACE,
+                WeaponTypes::GUN,
+                WeaponTypes::FAN,
+                WeaponTypes::BOW,
+            ]);
+        });
+
+        foreach ($slots as $slot) {
+            $details['masteries'][] = $this->classRanksWeaponMasteriesBuilder->fetchClassMasteryBreakDownForPosition($slot->item->type, $slot->position);
+        }
+
+        $details['masteries'] = array_filter($details['masteries']);
+
         return $details;
     }
 
@@ -188,6 +209,13 @@ class DamageBuilder extends BaseAttribute {
             $details['skills_effecting_damage'] = $this->fetchBaseAttributeFromSkillsDetails('base_damage');
         }
 
+        $details['masteries'] = [];
+
+        $details['masteries'][] = $this->classRanksWeaponMasteriesBuilder->fetchClassMasteryBreakDownForPosition('spell-damage', 'spell-one');
+        $details['masteries'][] = $this->classRanksWeaponMasteriesBuilder->fetchClassMasteryBreakDownForPosition('spell-damage', 'spell-two');
+
+        $details['masteries'] = array_filter($details['masteries']);
+
         return $details;
     }
 
@@ -195,6 +223,7 @@ class DamageBuilder extends BaseAttribute {
         $details['attached_affixes'] = $this->getAttributeBonusFromAllItemAffixesDetails('base_damage', false, 'ring');
         $details['base_damage'] = $this->getDamageFromItems('ring', 'both');
         $details['skills_effecting_damage'] = null;
+        $details['masteries'] = [];
 
         return $details;
     }
