@@ -59,7 +59,7 @@ export default class ArmourClassBreakDown extends React.Component<any, any> {
         return this.state.details.attached_affixes.map((equippedItem: any) => {
             return (
                 <li>
-                    <ItemNameColorationText item={equippedItem.item_details} custom_width={false} /> <span className='text-green-700 darmk:text-green-500'>(+{equippedItem.base_ac})</span>
+                    <ItemNameColorationText item={equippedItem.item_details} custom_width={false} /> <span className='text-green-700 dark:text-green-500'>(+{equippedItem.base_ac})</span>
                     {
                         equippedItem.affixes.length > 0 ?
                             <ul className='ps-5 mt-2 space-y-1 list-disc list-inside'>
@@ -84,7 +84,7 @@ export default class ArmourClassBreakDown extends React.Component<any, any> {
         return this.state.details.boon_details.increases_all_stats.map((boonIncreaseAllStats: any) => {
             return (
                 <li>
-                    <ItemNameColorationText item={boonIncreaseAllStats.item_details} custom_width={false} /> <span className='text-green-700 darmk:text-green-500'>(+{(boonIncreaseAllStats.increase_amount * 100).toFixed(2)}%)</span>
+                    <ItemNameColorationText item={boonIncreaseAllStats.item_details} custom_width={false} /> <span className='text-green-700 dark:text-green-500'>(+{(boonIncreaseAllStats.increase_amount * 100).toFixed(2)}%)</span>
                 </li>
             )
         })
@@ -102,7 +102,7 @@ export default class ArmourClassBreakDown extends React.Component<any, any> {
         return this.state.details.boon_details.increases_single_stat.map((boonIncreaseAllStats: any) => {
             return (
                 <li>
-                    <ItemNameColorationText item={boonIncreaseAllStats.item_details} custom_width={false} /> <span className='text-green-700 darmk:text-green-500'>(+{(boonIncreaseAllStats.increase_amount * 100).toFixed(2)}%)</span>
+                    <ItemNameColorationText item={boonIncreaseAllStats.item_details} custom_width={false} /> <span className='text-green-700 dark:text-green-500'>(+{(boonIncreaseAllStats.increase_amount * 100).toFixed(2)}%)</span>
                 </li>
             )
         })
@@ -116,7 +116,7 @@ export default class ArmourClassBreakDown extends React.Component<any, any> {
         return this.state.details.ancestral_item_skill_data.map((ancestralItemSkill: any) => {
             return (
                 <li>
-                    <span className='text-orange-600 dark:text-orange-300'>{ancestralItemSkill.name}</span> <span className='text-green-700 darmk:text-green-500'>(+{(ancestralItemSkill.increase_amount * 100).toFixed(2)}%)</span>
+                    <span className='text-orange-600 dark:text-orange-300'>{ancestralItemSkill.name}</span> <span className='text-green-700 dark:text-green-500'>(+{(ancestralItemSkill.increase_amount * 100).toFixed(2)}%)</span>
                 </li>
             )
         })
@@ -130,7 +130,7 @@ export default class ArmourClassBreakDown extends React.Component<any, any> {
         return this.state.details.skill_effecting_ac.map((skillAffectingAC: any) => {
             return (
                 <li>
-                    <span className='text-orange-600 dark:text-orange-300'>{skillAffectingAC.name}</span> <span className='text-green-700 darmk:text-green-500'>(+{(skillAffectingAC.amount * 100).toFixed(2)}%)</span>
+                    <span className='text-orange-600 dark:text-orange-300'>{skillAffectingAC.name}</span> <span className='text-green-700 dark:text-green-500'>(+{(skillAffectingAC.amount * 100).toFixed(2)}%)</span>
                 </li>
             )
         })
@@ -148,7 +148,7 @@ export default class ArmourClassBreakDown extends React.Component<any, any> {
         return this.state.details.class_specialties.map((classSpecialty: any) => {
             return (
                 <li>
-                    <span className='text-sky-600 dark:text-sky-500'>{classSpecialty.name}</span> <span className='text-green-700 darmk:text-green-500'>(+{(classSpecialty.amount * 100).toFixed(2)}%)</span>
+                    <span className='text-sky-600 dark:text-sky-500'>{classSpecialty.name}</span> <span className='text-green-700 dark:text-green-500'>(+{(classSpecialty.amount * 100).toFixed(2)}%)</span>
                 </li>
             )
         })
@@ -158,7 +158,7 @@ export default class ArmourClassBreakDown extends React.Component<any, any> {
         return attachedAffixes.map((attachedAffix: any) => {
             return (
                 <li>
-                    <span className='text-slate-700 dark:text-slate-400'>{attachedAffix.name}</span> <span className='text-green-700 darmk:text-green-500'>(+{(attachedAffix.amount * 100).toFixed(2)}%);</span>
+                    <span className='text-slate-700 dark:text-slate-400'>{attachedAffix.name}</span> <span className='text-green-700 dark:text-green-500'>(+{(attachedAffix.amount * 100).toFixed(2)}%);</span>
                 </li>
             );
         })
@@ -207,7 +207,7 @@ export default class ArmourClassBreakDown extends React.Component<any, any> {
                                         <span
                                             className='text-slate-700 dark:text-slate-400'>Ac </span>{" "}
                                 <span
-                                    className='text-green-700 darmk:text-green-500'>(+{this.state.details.ac_from_items})<sup>*</sup></span>
+                                    className='text-green-700 dark:text-green-500'>(+{this.state.details.ac_from_items})<sup>*</sup></span>
                             </li>
                         </ul>
                         <p className={'my-4'}>
@@ -283,7 +283,7 @@ export default class ArmourClassBreakDown extends React.Component<any, any> {
                             this.state.details.class_bonus_details !== null ?
                                 <ul className="space-y-4 text-gray-500 list-disc list-inside dark:text-gray-400">
                                     <li>
-                                        <span className='text-slate-600 dark:text-slate-300'>{this.state.details.class_bonus_details.name}</span> <span className='text-green-700 darmk:text-green-500'>(+{(this.state.details.class_bonus_details.amount * 100).toFixed(2)}%)</span>
+                                        <span className='text-slate-600 dark:text-slate-300'>{this.state.details.class_bonus_details.name}</span> <span className='text-green-700 dark:text-green-500'>(+{(this.state.details.class_bonus_details.amount * 100).toFixed(2)}%)</span>
                                     </li>
                                 </ul>
                                 :

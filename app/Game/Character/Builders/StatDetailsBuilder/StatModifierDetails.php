@@ -412,6 +412,9 @@ class StatModifierDetails {
 
             $details[$slot->item->affix_name]['item_base_stat'] = $slot->item->{$stat . '_mod'} ?? 0;
             $details[$slot->item->affix_name]['item_details'] = $this->getBasicDetailsOfItem($slot->item);
+            $details[$slot->item->affix_name]['item_holy_stacks'] = $slot->item->holy_stacks;
+            $details[$slot->item->affix_name]['item_holy_stacks_applied'] = $slot->item->holy_stacks_applied;
+            $details[$slot->item->affix_name]['total_stat_increase'] = $slot->item->holy_stack_stat_bonus;
             $details[$slot->item->affix_name]['attached_affixes'] = $this->fetchStatDetailsFromEquipment($slot->item, $stat)['attached_affixes'];
         }
 

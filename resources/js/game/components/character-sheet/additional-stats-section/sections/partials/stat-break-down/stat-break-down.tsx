@@ -58,11 +58,20 @@ export default class StatBreakDown extends React.Component<any, any> {
         return this.state.details.items_equipped.map((equippedItem: any) => {
             return (
                 <li>
-                    <ItemNameColorationText item={equippedItem.item_details} custom_width={false} /> <span className='text-green-700 darmk:text-green-500'>(+{(equippedItem.item_base_stat * 100).toFixed(2)}%)</span>
+                    <ItemNameColorationText item={equippedItem.item_details} custom_width={false} /> <span className='text-green-700 dark:text-green-500'>(+{(equippedItem.item_base_stat * 100).toFixed(2)}%)</span>
                     {
                         equippedItem.attached_affixes.length > 0 ?
                             <ul className='ps-5 mt-2 space-y-1 list-disc list-inside'>
                                 {this.renderAttachedAffixes(equippedItem.attached_affixes)}
+                            </ul>
+                        : null
+                    }
+                    {
+                        equippedItem.item_holy_stacks_applied > 0 ?
+                            <ul className='ps-5 mt-2 space-y-1 list-disc list-inside'>
+                                <li className='text-slate-700 dark:text-slate-300'>
+                                    You have applied: {equippedItem.item_holy_stacks_applied} of: {equippedItem.item_holy_stacks_applied} Holy Stacks, which gives you a bonus of: {(equippedItem.total_stat_increase * 100).toFixed(2)}% to {this.titelizeType()}
+                                </li>
                             </ul>
                         : null
                     }
@@ -83,7 +92,7 @@ export default class StatBreakDown extends React.Component<any, any> {
         return this.state.details.boon_details.increases_all_stats.map((boonIncreaseAllStats: any) => {
             return (
                 <li>
-                    <ItemNameColorationText item={boonIncreaseAllStats.item_details} custom_width={false} /> <span className='text-green-700 darmk:text-green-500'>(+{(boonIncreaseAllStats.increase_amount * 100).toFixed(2)}%)</span>
+                    <ItemNameColorationText item={boonIncreaseAllStats.item_details} custom_width={false} /> <span className='text-green-700 dark:text-green-500'>(+{(boonIncreaseAllStats.increase_amount * 100).toFixed(2)}%)</span>
                 </li>
             )
         })
@@ -101,7 +110,7 @@ export default class StatBreakDown extends React.Component<any, any> {
         return this.state.details.boon_details.increases_single_stat.map((boonIncreaseAllStats: any) => {
             return (
                 <li>
-                    <ItemNameColorationText item={boonIncreaseAllStats.item_details} custom_width={false} /> <span className='text-green-700 darmk:text-green-500'>(+{(boonIncreaseAllStats.increase_amount * 100).toFixed(2)}%)</span>
+                    <ItemNameColorationText item={boonIncreaseAllStats.item_details} custom_width={false} /> <span className='text-green-700 dark:text-green-500'>(+{(boonIncreaseAllStats.increase_amount * 100).toFixed(2)}%)</span>
                 </li>
             )
         })
@@ -115,7 +124,7 @@ export default class StatBreakDown extends React.Component<any, any> {
         return this.state.details.ancestral_item_skill_data.map((ancestralItemSkill: any) => {
             return (
                 <li>
-                    <span className='text-orange-600 dark:text-orange-300'>{ancestralItemSkill.name}</span> <span className='text-green-700 darmk:text-green-500'>(+{(ancestralItemSkill.increase_amount * 100).toFixed(2)}%)</span>
+                    <span className='text-orange-600 dark:text-orange-300'>{ancestralItemSkill.name}</span> <span className='text-green-700 dark:text-green-500'>(+{(ancestralItemSkill.increase_amount * 100).toFixed(2)}%)</span>
                 </li>
             )
         })
@@ -133,7 +142,7 @@ export default class StatBreakDown extends React.Component<any, any> {
         return this.state.details.class_specialties.map((classSpecialty: any) => {
             return (
                 <li>
-                    <span className='text-sky-600 dark:text-sky-500'>{classSpecialty.name}</span> <span className='text-green-700 darmk:text-green-500'>(+{(classSpecialty.amount * 100).toFixed(2)}%)</span>
+                    <span className='text-sky-600 dark:text-sky-500'>{classSpecialty.name}</span> <span className='text-green-700 dark:text-green-500'>(+{(classSpecialty.amount * 100).toFixed(2)}%)</span>
                 </li>
             )
         })
@@ -143,7 +152,7 @@ export default class StatBreakDown extends React.Component<any, any> {
         return attachedAffixes.map((attachedAffix: any) => {
             return (
                 <li>
-                    <span className='text-slate-700 dark:text-slate-400'>{attachedAffix.affix_name}</span> <span className='text-green-700 darmk:text-green-500'>(+{(attachedAffix[this.props.type + '_mod'] * 100).toFixed(2)}%);</span>
+                    <span className='text-slate-700 dark:text-slate-400'>{attachedAffix.affix_name}</span> <span className='text-green-700 dark:text-green-500'>(+{(attachedAffix[this.props.type + '_mod'] * 100).toFixed(2)}%);</span>
                 </li>
             );
         })

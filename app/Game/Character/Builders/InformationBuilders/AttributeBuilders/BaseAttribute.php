@@ -64,6 +64,11 @@ class BaseAttribute {
             if (!is_null($onlyForType)) {
 
                 if (!is_array($onlyForType)) {
+
+                    if ($onlyForType === WeaponTypes::RING && $slot->item->type !== $onlyForType) {
+                        continue;
+                    }
+
                     if ($slot->item->type !== $onlyForType) {
 
                         if (!$this->hasAffixesAffectingStat($slot->item, $attribute)) {

@@ -62,7 +62,7 @@ export default class HealthBreakDown extends React.Component<any, any> {
         return this.state.details.class_specialties.map((classSpecialty: any) => {
             return (
                 <li>
-                    <span className='text-sky-600 dark:text-sky-500'>{classSpecialty.name}</span> <span className='text-green-700 darmk:text-green-500'>(+{(classSpecialty.amount * 100).toFixed(2)}%)</span>
+                    <span className='text-sky-600 dark:text-sky-500'>{classSpecialty.name}</span> <span className='text-green-700 dark:text-green-500'>(+{(classSpecialty.amount * 100).toFixed(2)}%)</span>
                 </li>
             )
         })
@@ -98,7 +98,7 @@ export default class HealthBreakDown extends React.Component<any, any> {
                         <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2'></div>
                         <ul className="space-y-4 text-gray-500 list-decimal list-inside dark:text-gray-400">
                             <span className='text-slate-700 dark:text-slate-400'>Durability (Modded Dur)</span> <span
-                            className='text-green-700 darmk:text-green-500'>(+{this.state.details.stat_amount})</span>
+                            className='text-green-700 dark:text-green-500'>(+{this.state.details.stat_amount})</span>
                         </ul>
                     </div>
                     <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2 block md:hidden'></div>

@@ -73,7 +73,7 @@ export default class DamageBreakDown extends React.Component<any, any> {
 
             return (
                 <li>
-                    <ItemNameColorationText item={equippedItem.item_details} custom_width={false} /> <span className='text-green-700 darmk:text-green-500'>(+{amount})</span>
+                    <ItemNameColorationText item={equippedItem.item_details} custom_width={false} /> <span className='text-green-700 dark:text-green-500'>(+{amount})</span>
                     {
                         equippedItem.affixes.length > 0 ?
                             <ul className='ps-5 mt-2 space-y-1 list-disc list-inside'>
@@ -102,7 +102,7 @@ export default class DamageBreakDown extends React.Component<any, any> {
         return this.state.details.boon_details.increases_all_stats.map((boonIncreaseAllStats: any) => {
             return (
                 <li>
-                    <ItemNameColorationText item={boonIncreaseAllStats.item_details} custom_width={false} /> <span className='text-green-700 darmk:text-green-500'>(+{(boonIncreaseAllStats.increase_amount * 100).toFixed(2)}%)</span>
+                    <ItemNameColorationText item={boonIncreaseAllStats.item_details} custom_width={false} /> <span className='text-green-700 dark:text-green-500'>(+{(boonIncreaseAllStats.increase_amount * 100).toFixed(2)}%)</span>
                 </li>
             )
         })
@@ -120,7 +120,7 @@ export default class DamageBreakDown extends React.Component<any, any> {
         return this.state.details.boon_details.increases_single_stat.map((boonIncreaseAllStats: any) => {
             return (
                 <li>
-                    <ItemNameColorationText item={boonIncreaseAllStats.item_details} custom_width={false} /> <span className='text-green-700 darmk:text-green-500'>(+{(boonIncreaseAllStats.increase_amount * 100).toFixed(2)}%)</span>
+                    <ItemNameColorationText item={boonIncreaseAllStats.item_details} custom_width={false} /> <span className='text-green-700 dark:text-green-500'>(+{(boonIncreaseAllStats.increase_amount * 100).toFixed(2)}%)</span>
                 </li>
             )
         })
@@ -134,7 +134,7 @@ export default class DamageBreakDown extends React.Component<any, any> {
         return this.state.details.ancestral_item_skill_data.map((ancestralItemSkill: any) => {
             return (
                 <li>
-                    <span className='text-orange-600 dark:text-orange-300'>{ancestralItemSkill.name}</span> <span className='text-green-700 darmk:text-green-500'>(+{(ancestralItemSkill.increase_amount * 100).toFixed(2)}%)</span>
+                    <span className='text-orange-600 dark:text-orange-300'>{ancestralItemSkill.name}</span> <span className='text-green-700 dark:text-green-500'>(+{(ancestralItemSkill.increase_amount * 100).toFixed(2)}%)</span>
                 </li>
             )
         })
@@ -149,7 +149,7 @@ export default class DamageBreakDown extends React.Component<any, any> {
         return this.state.details.skills_effecting_damage.map((skillAffectingDamage: any) => {
             return (
                 <li>
-                    <span className='text-orange-600 dark:text-orange-300'>{skillAffectingDamage.name}</span> <span className='text-green-700 darmk:text-green-500'>(+{(skillAffectingDamage.amount * 100).toFixed(2)}%)</span>
+                    <span className='text-orange-600 dark:text-orange-300'>{skillAffectingDamage.name}</span> <span className='text-green-700 dark:text-green-500'>(+{(skillAffectingDamage.amount * 100).toFixed(2)}%)</span>
                 </li>
             )
         })
@@ -167,7 +167,7 @@ export default class DamageBreakDown extends React.Component<any, any> {
         return this.state.details.class_specialties.map((classSpecialty: any) => {
             return (
                 <li>
-                    <span className='text-sky-600 dark:text-sky-500'>{classSpecialty.name}</span> <span className='text-green-700 darmk:text-green-500'>(+{(classSpecialty.amount * 100).toFixed(2)}%)</span>
+                    <span className='text-sky-600 dark:text-sky-500'>{classSpecialty.name}</span> <span className='text-green-700 dark:text-green-500'>(+{(classSpecialty.amount * 100).toFixed(2)}%)</span>
                 </li>
             )
         })
@@ -178,7 +178,7 @@ export default class DamageBreakDown extends React.Component<any, any> {
         return attachedAffixes.map((attachedAffix: any) => {
             return (
                 <li>
-                    <span className='text-slate-700 dark:text-slate-400'>{attachedAffix.name}</span> <span className='text-green-700 darmk:text-green-500'>(+{(attachedAffix.amount * 100).toFixed(2)}%);</span>
+                    <span className='text-slate-700 dark:text-slate-400'>{attachedAffix.name}</span> <span className='text-green-700 dark:text-green-500'>(+{(attachedAffix.amount * 100).toFixed(2)}%);</span>
                 </li>
             );
         })
@@ -194,25 +194,25 @@ export default class DamageBreakDown extends React.Component<any, any> {
                                         <span
                                             className='text-slate-700 dark:text-slate-400'>Total Damage </span>{" "}
                         <span
-                            className='text-green-700 darmk:text-green-500'>(+{this.state.details.non_equipped_damage_amount})</span>
+                            className='text-green-700 dark:text-green-500'>(+{this.state.details.non_equipped_damage_amount})</span>
                     </li>
                     <li>
                                         <span
                                             className='text-slate-700 dark:text-slate-400'>Damage Stat Name </span>{" "}
                         <span
-                            className='text-green-700 darmk:text-green-500'>({startCase(((this.props.is_voided ? 'Voided ' : '') + this.state.details.damage_stat_name))})</span>
+                            className='text-green-700 dark:text-green-500'>({startCase(((this.props.is_voided ? 'Voided ' : '') + this.state.details.damage_stat_name))})</span>
                     </li>
                     <li>
                                         <span
                                             className='text-slate-700 dark:text-slate-400'>Damage Stat Amount </span>{" "}
                         <span
-                            className='text-green-700 darmk:text-green-500'>(+{this.state.details.damage_stat_amount})</span>
+                            className='text-green-700 dark:text-green-500'>(+{this.state.details.damage_stat_amount})</span>
                     </li>
                     <li>
                                         <span
                                             className='text-slate-700 dark:text-slate-400'>Percentage of stat used </span>{" "}
                         <span
-                            className='text-green-700 darmk:text-green-500'>(+{(this.state.details.non_equipped_percentage_of_stat_used * 100).toFixed(2)})</span>
+                            className='text-green-700 dark:text-green-500'>(+{(this.state.details.non_equipped_percentage_of_stat_used * 100).toFixed(2)})</span>
                     </li>
                 </ul>
             </div>
@@ -233,13 +233,13 @@ export default class DamageBreakDown extends React.Component<any, any> {
                                         <span
                                             className='text-slate-700 dark:text-slate-400'>Base Damage </span>{" "}
                         <span
-                            className='text-green-700 darmk:text-green-500'>(+{this.state.details.base_damage})</span>
+                            className='text-green-700 dark:text-green-500'>(+{this.state.details.base_damage})</span>
                     </li>
                     <li>
                                         <span
                                             className='text-slate-700 dark:text-slate-400'>Amount of stat used </span>{" "}
                         <span
-                            className='text-green-700 darmk:text-green-500'>(+{(this.state.details.percentage_of_stat * 100).toFixed(2)}%)</span>
+                            className='text-green-700 dark:text-green-500'>(+{(this.state.details.percentage_of_stat * 100).toFixed(2)}%)</span>
                     </li>
                 </ul>
                 <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2'></div>
@@ -250,19 +250,19 @@ export default class DamageBreakDown extends React.Component<any, any> {
                                         <span
                                             className='text-slate-700 dark:text-slate-400'>Total Weapon Damage </span>{" "}
                         <span
-                            className='text-green-700 darmk:text-green-500'>(+{this.state.details.total_damage_for_type})</span>
+                            className='text-green-700 dark:text-green-500'>(+{this.state.details.total_damage_for_type})</span>
                     </li>
                     <li>
                                         <span
                                             className='text-slate-700 dark:text-slate-400'>Damage Stat Name </span>{" "}
                         <span
-                            className='text-green-700 darmk:text-green-500'>({startCase(this.state.details.damage_stat_name)})</span>
+                            className='text-green-700 dark:text-green-500'>({startCase(this.state.details.damage_stat_name)})</span>
                     </li>
                     <li>
                                         <span
                                             className='text-slate-700 dark:text-slate-400'>Damage Stat Amount </span>{" "}
                         <span
-                            className='text-green-700 darmk:text-green-500'>(+{this.state.details.damage_stat_amount})</span>
+                            className='text-green-700 dark:text-green-500'>(+{this.state.details.damage_stat_amount})</span>
                     </li>
                 </ul>
             </div>
@@ -279,25 +279,25 @@ export default class DamageBreakDown extends React.Component<any, any> {
                                         <span
                                             className='text-slate-700 dark:text-slate-400'>Damage Stat Name </span>{" "}
                         <span
-                            className='text-green-700 darmk:text-green-500'>({startCase(this.state.details.damage_stat_name)})</span>
+                            className='text-green-700 dark:text-green-500'>({startCase(this.state.details.damage_stat_name)})</span>
                     </li>
                     <li>
                                         <span
                                             className='text-slate-700 dark:text-slate-400'>Damage Stat Amount </span>{" "}
                         <span
-                            className='text-green-700 darmk:text-green-500'>(+{this.state.details.damage_stat_amount})</span>
+                            className='text-green-700 dark:text-green-500'>(+{this.state.details.damage_stat_amount})</span>
                     </li>
                     <li>
                                         <span
                                             className='text-slate-700 dark:text-slate-400'>Damage stat amount to use </span>{" "}
                         <span
-                            className='text-green-700 darmk:text-green-500'>(+{this.state.details.spell_damage_stat_amount_to_use})</span>
+                            className='text-green-700 dark:text-green-500'>(+{this.state.details.spell_damage_stat_amount_to_use})</span>
                     </li>
                     <li>
                                         <span
                                             className='text-slate-700 dark:text-slate-400'>Percentage of stat used </span>{" "}
                         <span
-                            className='text-green-700 darmk:text-green-500'>(+{(this.state.details.percentage_of_stat_used * 100).toFixed(2)}%)</span>
+                            className='text-green-700 dark:text-green-500'>(+{(this.state.details.percentage_of_stat_used * 100).toFixed(2)}%)</span>
                     </li>
                 </ul>
             </div>
@@ -314,25 +314,25 @@ export default class DamageBreakDown extends React.Component<any, any> {
                                         <span
                                             className='text-slate-700 dark:text-slate-400'>Healing Stat Name </span>{" "}
                         <span
-                            className='text-green-700 darmk:text-green-500'>({startCase(this.state.details.damage_stat_name)})</span>
+                            className='text-green-700 dark:text-green-500'>({startCase(this.state.details.damage_stat_name)})</span>
                     </li>
                     <li>
                                         <span
                                             className='text-slate-700 dark:text-slate-400'>Healing Stat Amount </span>{" "}
                         <span
-                            className='text-green-700 darmk:text-green-500'>(+{this.state.details.damage_stat_amount})</span>
+                            className='text-green-700 dark:text-green-500'>(+{this.state.details.damage_stat_amount})</span>
                     </li>
                     <li>
                                         <span
                                             className='text-slate-700 dark:text-slate-400'>Healing stat amount to use </span>{" "}
                         <span
-                            className='text-green-700 darmk:text-green-500'>(+{this.state.details.spell_damage_stat_amount_to_use})</span>
+                            className='text-green-700 dark:text-green-500'>(+{this.state.details.spell_damage_stat_amount_to_use})</span>
                     </li>
                     <li>
                                         <span
                                             className='text-slate-700 dark:text-slate-400'>Percentage of stat used </span>{" "}
                         <span
-                            className='text-green-700 darmk:text-green-500'>(+{(this.state.details.percentage_of_stat_used * 100).toFixed(2)}%)</span>
+                            className='text-green-700 dark:text-green-500'>(+{(this.state.details.percentage_of_stat_used * 100).toFixed(2)}%)</span>
                     </li>
                 </ul>
                 <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2'></div>
@@ -343,7 +343,7 @@ export default class DamageBreakDown extends React.Component<any, any> {
                                         <span
                                             className='text-slate-700 dark:text-slate-400'>Total healing </span>{" "}
                         <span
-                            className='text-green-700 darmk:text-green-500'>(+{this.state.details.total_damage_for_type})</span>
+                            className='text-green-700 dark:text-green-500'>(+{this.state.details.total_damage_for_type})</span>
                     </li>
                 </ul>
             </div>
@@ -489,7 +489,7 @@ export default class DamageBreakDown extends React.Component<any, any> {
                             this.state.details.class_bonus_details !== null ?
                                 <ul className="space-y-4 text-gray-500 list-disc list-inside dark:text-gray-400">
                                     <li>
-                                        <span className='text-slate-600 dark:text-slate-300'>{this.state.details.class_bonus_details.name}</span> <span className='text-green-700 darmk:text-green-500'>(+{(this.state.details.class_bonus_details.amount * 100).toFixed(2)}%)</span>
+                                        <span className='text-slate-600 dark:text-slate-300'>{this.state.details.class_bonus_details.name}</span> <span className='text-green-700 dark:text-green-500'>(+{(this.state.details.class_bonus_details.amount * 100).toFixed(2)}%)</span>
                                     </li>
                                 </ul>
                             :
