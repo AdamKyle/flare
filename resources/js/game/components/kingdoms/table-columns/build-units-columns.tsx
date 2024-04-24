@@ -1,12 +1,12 @@
-import React, {Fragment} from "react";
-import {formatNumber} from "../format-number";
-import BuildingDetails from "../../../sections/kingdoms/buildings/deffinitions/building-details";
 import clsx from "clsx";
-import UnitDetails from "./unit-details";
-import UnitsInQueue from "./units-in-queue";
-import TimerProgressBar from "../../../components/ui/progress-bars/timer-progress-bar";
-import {DateTime} from "luxon";
-import CurrentUnitDetails from "./current-unit-details";
+import { DateTime } from "luxon";
+import React, { Fragment } from "react";
+import { formatNumber } from "../../../lib/game/format-number";
+import CurrentUnitDetails from "../../../lib/game/kingdoms/deffinitions/current-unit-details";
+import UnitDetails from "../../../lib/game/kingdoms/deffinitions/unit-details";
+import UnitsInQueue from "../../../lib/game/kingdoms/deffinitions/units-in-queue";
+import TimerProgressBar from "../../ui/progress-bars/timer-progress-bar";
+import BuildingDetails from "../buildings/deffinitions/building-details";
 
 /**
  * Build the columns for the units table.

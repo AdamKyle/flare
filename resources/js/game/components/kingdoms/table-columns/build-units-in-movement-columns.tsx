@@ -1,6 +1,7 @@
-import UnitMovementDetails from "../../../sections/kingdoms/queues/deffinitions/unit-movement-details";
+
 import React, { Fragment } from "react";
-import TimerProgressBar from "../../../components/ui/progress-bars/timer-progress-bar";
+import TimerProgressBar from "../../ui/progress-bars/timer-progress-bar";
+import UnitMovementDetails from "../queues/deffinitions/unit-movement-details";
 
 export const BuildUnitsInMovementColumns = (cancelUnitMovement: (queueId: number) => void,
                                             unitsInMovement: UnitMovementDetails[]|[]) => {

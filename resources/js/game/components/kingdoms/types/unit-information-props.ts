@@ -1,6 +1,6 @@
-import UnitDetails from "../unit-details";
-import InformationPropsBase from "../information-props-base";
 import BuildingDetails from "../../../../sections/kingdoms/buildings/deffinitions/building-details";
+import InformationPropsBase from "../deffinitions/information-props-base";
+import UnitDetails from "../deffinitions/unit-details";
 
 export default interface UnitInformationProps extends InformationPropsBase{
 

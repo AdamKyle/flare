@@ -1,5 +1,5 @@
-import KingdomDetails from "../kingdom-details";
-import KingdomLogDetails from "../kingdom-log-details";
+import KingdomDetails from "../deffinitions/kingdom-details";
+import KingdomLogDetails from "../deffinitions/kingdom-log-details";
 
 export default interface KingdomListProps {
 

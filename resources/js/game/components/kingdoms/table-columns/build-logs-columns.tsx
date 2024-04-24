@@ -1,6 +1,6 @@
-import React, {Fragment} from "react";
-import KingdomLogDetails from "./kingdom-log-details";
-import DangerButton from "../../../components/ui/buttons/danger-button";
+import React, { Fragment } from "react";
+import KingdomLogDetails from "../../../lib/game/kingdoms/deffinitions/kingdom-log-details";
+import DangerButton from "../../ui/buttons/danger-button";
 
 export const buildLogsColumns = (onClick: (log: KingdomLogDetails) => void, deleteLog: (log: KingdomLogDetails) => void) => {
     return [

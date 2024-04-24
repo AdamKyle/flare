@@ -1,6 +1,6 @@
+import KingdomDamageSlotItems from "../../deffinitions/kingdom-damage-slot-items";
 import KingdomReinforcementType from "../kingdom-reinforcement-type";
 import SelectedUnitsToCallType from "../selected-units-to-call-type";
-import KingdomDamageSlotItems from "../../kingdom-damage-slot-items";
 
 export default interface AttackKingdomModalState {
 

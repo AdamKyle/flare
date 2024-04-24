@@ -1,19 +1,19 @@
-import React, {Fragment} from "react";
-import Tabs from "../../../components/ui/tabs/tabs";
-import Dialogue from "../../../components/ui/dialogue/dialogue";
-import TabPanel from "../../../components/ui/tabs/tab-panel";
-import ComponentLoading from "../../../components/ui/loading/component-loading";
-import Ajax from "../../../lib/ajax/ajax";
-import {AxiosError, AxiosResponse} from "axios";
-import SelectedUnitsToCallType from "../../../lib/game/kingdoms/types/selected-units-to-call-type";
-import AttackKingdomModalState from "../../../lib/game/kingdoms/types/modals/attack-kingdom-modal-state";
-import UnitMovement from "./partials/unit-movement";
+import { AxiosError, AxiosResponse } from "axios";
+import { parseInt } from "lodash";
+import React, { Fragment } from "react";
 import Select from "react-select";
-import KingdomDamageSlotItems from "../../../lib/game/kingdoms/kingdom-damage-slot-items";
-import {parseInt} from "lodash";
-import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
-import SuccessAlert from "../../../components/ui/alerts/simple-alerts/success-alert";
 import DangerAlert from "../../../components/ui/alerts/simple-alerts/danger-alert";
+import SuccessAlert from "../../../components/ui/alerts/simple-alerts/success-alert";
+import Dialogue from "../../../components/ui/dialogue/dialogue";
+import ComponentLoading from "../../../components/ui/loading/component-loading";
+import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
+import TabPanel from "../../../components/ui/tabs/tab-panel";
+import Tabs from "../../../components/ui/tabs/tabs";
+import Ajax from "../../../lib/ajax/ajax";
+import KingdomDamageSlotItems from "../../../lib/game/kingdoms/deffinitions/kingdom-damage-slot-items";
+import AttackKingdomModalState from "../../../lib/game/kingdoms/types/modals/attack-kingdom-modal-state";
+import SelectedUnitsToCallType from "../../../lib/game/kingdoms/types/selected-units-to-call-type";
+import UnitMovement from "./partials/unit-movement";
 
 
 export default class AttackKingdomModal extends React.Component<any, AttackKingdomModalState> {

@@ -1,11 +1,10 @@
-import React, {Fragment} from "react";
-import {formatNumber} from "../format-number";
-import BuildingDetails from "../../../sections/kingdoms/buildings/deffinitions/building-details";
 import clsx from "clsx";
-import BuildingInQueueDetails from "./building-in-queue-details";
-import TimerProgressBar from "../../../components/ui/progress-bars/timer-progress-bar";
-import {DateTime} from "luxon";
-import DangerLinkButton from "../../../components/ui/buttons/danger-link-button";
+import { DateTime } from "luxon";
+import React, { Fragment } from "react";
+import { formatNumber } from "../../../lib/game/format-number";
+import BuildingInQueueDetails from "../../../lib/game/kingdoms/deffinitions/building-in-queue-details";
+import TimerProgressBar from "../../ui/progress-bars/timer-progress-bar";
+import BuildingDetails from "../buildings/deffinitions/building-details";
 
 /**
  * Build the columns for the buildings table.

@@ -1,14 +1,14 @@
-import React, {Fragment, ReactNode} from "react";
-import BasicCard from "../../../components/ui/cards/basic-card";
-import UnitInformationProps from "../../../lib/game/kingdoms/types/unit-information-props";
-import { formatNumber } from "../../../lib/game/format-number";
-import DangerAlert from "../../../components/ui/alerts/simple-alerts/danger-alert";
 import { parseInt } from "lodash";
+import React, { Fragment, ReactNode } from "react";
+import DangerAlert from "../../../components/ui/alerts/simple-alerts/danger-alert";
+import PrimaryOutlineButton from "../../../components/ui/buttons/primary-outline-button";
+import BasicCard from "../../../components/ui/cards/basic-card";
+import { formatNumber } from "../../../lib/game/format-number";
+import UnitDetails from "../../../lib/game/kingdoms/deffinitions/unit-details";
+import UnitInformationProps from "../../../lib/game/kingdoms/types/unit-information-props";
+import BuildingDetails from "../buildings/deffinitions/building-details";
 import TimeHelpModal from "../modals/time-help-modal";
 import RecruitWithResources from "./recruit-with-resources";
-import UnitDetails from "../../../lib/game/kingdoms/unit-details";
-import BuildingDetails from "../buildings/deffinitions/building-details";
-import PrimaryOutlineButton from "../../../components/ui/buttons/primary-outline-button";
 
 export default class UnitInformation extends React.Component<
     UnitInformationProps,

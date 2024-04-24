@@ -1,24 +1,23 @@
-import React, {Fragment} from "react";
-import KingdomListProps from "../../lib/game/kingdoms/types/kingdom-list-props";
-import ComponentLoading from "../../components/ui/loading/component-loading";
-import Table from "../../components/ui/data-tables/table";
-import {buildKingdomsColumns} from "../../lib/game/kingdoms/build-kingdoms-columns";
-import KingdomDetails from "../../lib/game/kingdoms/kingdom-details";
-import {watchForDarkModeTableChange} from "../../lib/game/dark-mode-watcher";
-import KingdomListState from "../../lib/game/kingdoms/types/kingdom-list-state";
-import BasicCard from "../../components/ui/cards/basic-card";
-import Kingdom from "./kingdom";
-import SmallKingdom from "./small-kingdom";
-import {isEqual} from "lodash";
-import Tabs from "../../components/ui/tabs/tabs";
-import TabPanel from "../../components/ui/tabs/tab-panel";
-import {buildLogsColumns} from "../../lib/game/kingdoms/build-logs-columns";
-import KingdomLogDetailsView from "./kingdom-log-details";
-import KingdomLogDetails from "../../lib/game/kingdoms/kingdom-log-details";
-import Ajax from "../../lib/ajax/ajax";
-import {AxiosError, AxiosResponse} from "axios";
-import LoadingProgressBar from "../../components/ui/progress-bars/loading-progress-bar";
+import { AxiosError, AxiosResponse } from "axios";
+import { isEqual } from "lodash";
+import React, { Fragment } from "react";
 import DangerAlert from "../../components/ui/alerts/simple-alerts/danger-alert";
+import BasicCard from "../../components/ui/cards/basic-card";
+import Table from "../../components/ui/data-tables/table";
+import LoadingProgressBar from "../../components/ui/progress-bars/loading-progress-bar";
+import TabPanel from "../../components/ui/tabs/tab-panel";
+import Tabs from "../../components/ui/tabs/tabs";
+import Ajax from "../../lib/ajax/ajax";
+import { watchForDarkModeTableChange } from "../../lib/game/dark-mode-watcher";
+import KingdomDetails from "../../lib/game/kingdoms/deffinitions/kingdom-details";
+import KingdomLogDetails from "../../lib/game/kingdoms/deffinitions/kingdom-log-details";
+import KingdomListProps from "../../lib/game/kingdoms/types/kingdom-list-props";
+import KingdomListState from "../../lib/game/kingdoms/types/kingdom-list-state";
+import Kingdom from "./kingdom";
+import KingdomLogDetailsView from "./kingdom-log-details";
+import SmallKingdom from "./small-kingdom";
+import { buildKingdomsColumns } from "./table-columns/build-kingdoms-columns";
+import { buildLogsColumns } from "./table-columns/build-logs-columns";
 
 export default class KingdomsList extends React.Component<KingdomListProps, KingdomListState> {
 

@@ -1,9 +1,9 @@
-import BuildingDetails from "../../../sections/kingdoms/buildings/deffinitions/building-details";
-import DataTableBaseData from "../../ui/types/tables/data-table-base-data";
-import UnitDetails from "./unit-details";
+import BuildingDetails from "../../../../components/kingdoms/buildings/deffinitions/building-details";
+import UnitMovementDetails from "../../../../components/kingdoms/queues/deffinitions/unit-movement-details";
+import DataTableBaseData from "../../../ui/types/tables/data-table-base-data";
 import BuildingInQueueDetails from "./building-in-queue-details";
 import CurrentUnitDetails from "./current-unit-details";
-import UnitMovementDetails from "../../../sections/kingdoms/queues/deffinitions/unit-movement-details";
+import UnitDetails from "./unit-details";
 
 export default interface KingdomDetails extends DataTableBaseData {
     building_cost_reduction: number;

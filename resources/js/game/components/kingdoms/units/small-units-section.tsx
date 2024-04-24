@@ -1,11 +1,11 @@
 import React, { Fragment } from "react";
-import UnitInformation from "./unit-information";
-import UnitsInQueue from "../../../lib/game/kingdoms/units-in-queue";
 import BasicCard from "../../../components/ui/cards/basic-card";
-import UnitsTable from "./units-table";
-import UnitDetails from "../../../lib/game/kingdoms/unit-details";
+import UnitDetails from "../../../lib/game/kingdoms/deffinitions/unit-details";
+import UnitsInQueue from "../../../lib/game/kingdoms/deffinitions/units-in-queue";
 import SmallUnitSectionProps from "../../../lib/game/kingdoms/types/small-unit-section-props";
 import SmallUnitsSectionsState from "../../../lib/game/kingdoms/types/small-units-sections-state";
+import UnitInformation from "./unit-information";
+import UnitsTable from "./units-table";
 
 export default class SmallUnitsSection extends React.Component<SmallUnitSectionProps, SmallUnitsSectionsState> {
 

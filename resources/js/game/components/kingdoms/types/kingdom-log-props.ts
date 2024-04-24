@@ -1,4 +1,4 @@
-import KingdomLogDetails from "../kingdom-log-details";
+import KingdomLogDetails from "../deffinitions/kingdom-log-details";
 
 export default interface KingdomLogProps {
     log: KingdomLogDetails;

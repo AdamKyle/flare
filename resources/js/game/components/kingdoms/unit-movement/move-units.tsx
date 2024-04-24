@@ -1,9 +1,9 @@
-import KingdomReinforcementType from "../types/kingdom-reinforcement-type";
-import React, {Fragment} from "react";
-import SelectedUnitsToCallType from "../types/selected-units-to-call-type";
-import UnitReinforcementType from "../types/unit-reinforcement-type";
-import {formatNumber} from "../../format-number";
+import React, { Fragment } from "react";
 import Select from "react-select";
+import { formatNumber } from "../../../lib/game/format-number";
+import KingdomReinforcementType from "../../../lib/game/kingdoms/types/kingdom-reinforcement-type";
+import SelectedUnitsToCallType from "../../../lib/game/kingdoms/types/selected-units-to-call-type";
+import UnitReinforcementType from "../../../lib/game/kingdoms/types/unit-reinforcement-type";
 
 type setUnitAmount = (kingdomId: number, unitId: number, unitAmount: number, e: React.ChangeEvent<HTMLInputElement>) => void;
 

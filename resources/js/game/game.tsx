@@ -1,40 +1,40 @@
-import React, { Fragment } from "react";
 import clsx from "clsx";
-import GameProps from "./lib/game/types/game-props";
-import Tabs from "./components/ui/tabs/tabs";
-import TabPanel from "./components/ui/tabs/tab-panel";
+import React, { Fragment } from "react";
+import KingdomsList from "./components/kingdoms/kingdoms-list";
+import SuccessAlert from "./components/ui/alerts/simple-alerts/success-alert";
+import WarningAlert from "./components/ui/alerts/simple-alerts/warning-alert";
 import BasicCard from "./components/ui/cards/basic-card";
-import MapSection from "./sections/map/map-section";
+import ManualProgressBar from "./components/ui/progress-bars/manual-progress-bar";
+import TabPanel from "./components/ui/tabs/tab-panel";
+import Tabs from "./components/ui/tabs/tabs";
+import { serviceContainer } from "./lib/containers/core-container";
+import FetchGameData from "./lib/game/ajax/FetchGameData";
+import CharacterCurrenciesType from "./lib/game/character/character-currencies-type";
+import GameEventListeners from "./lib/game/event-listeners/game-event-listeners";
+import { removeCommas } from "./lib/game/format-number";
+import KingdomLogDetails from "./lib/game/kingdoms/deffinitions/kingdom-log-details";
+import GameProps from "./lib/game/types/game-props";
 import GameState, {
     GameActionState,
 } from "./lib/game/types/game-state";
-import CharacterTopSection from "./sections/character-top-section/character-top-section";
-import Quests from "./sections/components/quests/quests";
-import ManualProgressBar from "./components/ui/progress-bars/manual-progress-bar";
-import FetchGameData from "./lib/game/ajax/FetchGameData";
-import CharacterSheet from "./sections/character-sheet/character-sheet";
-import GameChat from "./sections/chat/game-chat";
-import ForceNameChange from "./sections/force-name-change/force-name-change";
 import QuestType from "./lib/game/types/quests/quest-type";
-import ScreenRefresh from "./sections/screen-refresh/screen-refresh";
-import PositionType from "./sections/map/types/map/position-type";
-import { removeCommas } from "./lib/game/format-number";
-import CharacterCurrenciesType from "./lib/game/character/character-currencies-type";
-import KingdomLogDetails from "./lib/game/kingdoms/kingdom-log-details";
-import GlobalTimeoutModal from "./sections/game-modals/global-timeout-modal";
-import MapState from "./sections/map/types/map-state";
-import MapData from "./sections/map/lib/request-types/MapData";
-import MapStateManager from "./sections/map/lib/state/map-state-manager";
-import MapTabs from "./sections/map/map-tabs";
-import {serviceContainer} from "./lib/containers/core-container";
-import GameEventListeners from "./lib/game/event-listeners/game-event-listeners";
+import CharacterSheet from "./sections/character-sheet/character-sheet";
+import CharacterTopSection from "./sections/character-top-section/character-top-section";
+import GameChat from "./sections/chat/game-chat";
+import Quests from "./sections/components/quests/quests";
+import { FameTasks } from "./sections/faction-loyalty/deffinitions/faction-loaylaty";
+import ForceNameChange from "./sections/force-name-change/force-name-change";
 import ActionSection from "./sections/game-actions-section/action-section";
 import ActionTabs from "./sections/game-actions-section/action-tabs";
-import {FameTasks} from "./sections/faction-loyalty/deffinitions/faction-loaylaty";
 import ActiveBoonsActionSection from "./sections/game-actions-section/active-boons-action-section";
-import SuccessAlert from "./components/ui/alerts/simple-alerts/success-alert";
-import WarningAlert from "./components/ui/alerts/simple-alerts/warning-alert";
-import KingdomsList from "./components/kingdoms/kingdoms-list";
+import GlobalTimeoutModal from "./sections/game-modals/global-timeout-modal";
+import MapData from "./sections/map/lib/request-types/MapData";
+import MapStateManager from "./sections/map/lib/state/map-state-manager";
+import MapSection from "./sections/map/map-section";
+import MapTabs from "./sections/map/map-tabs";
+import MapState from "./sections/map/types/map-state";
+import PositionType from "./sections/map/types/map/position-type";
+import ScreenRefresh from "./sections/screen-refresh/screen-refresh";
 
 export default class Game extends React.Component<GameProps, GameState> {
 

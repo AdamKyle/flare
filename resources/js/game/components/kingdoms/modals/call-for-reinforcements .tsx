@@ -1,17 +1,17 @@
-import React, {Fragment} from "react";
-import {AxiosError, AxiosResponse} from "axios";
+import { AxiosError, AxiosResponse } from "axios";
+import React, { Fragment } from "react";
+import DangerAlert from "../../../components/ui/alerts/simple-alerts/danger-alert";
+import InfoAlert from "../../../components/ui/alerts/simple-alerts/info-alert";
+import SuccessAlert from "../../../components/ui/alerts/simple-alerts/success-alert";
 import Dialogue from "../../../components/ui/dialogue/dialogue";
 import ComponentLoading from "../../../components/ui/loading/component-loading";
+import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
 import Ajax from "../../../lib/ajax/ajax";
 import CallForReinforcementsProps from "../../../lib/game/kingdoms/types/modals/call-for-reinforcements-props";
-import InfoAlert from "../../../components/ui/alerts/simple-alerts/info-alert";
 import CallForReinforcementsState from "../../../lib/game/kingdoms/types/modals/call-for-reinforcements-state";
-import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
-import MoveUnits from "../../../lib/game/kingdoms/move-units/move-units";
-import UnitMovement from "./partials/unit-movement";
 import SelectedUnitsToCallType from "../../../lib/game/kingdoms/types/selected-units-to-call-type";
-import SuccessAlert from "../../../components/ui/alerts/simple-alerts/success-alert";
-import DangerAlert from "../../../components/ui/alerts/simple-alerts/danger-alert";
+import MoveUnits from "../unit-movement/move-units";
+import UnitMovement from "./partials/unit-movement";
 
 
 export default class CallForReinforcements extends React.Component<CallForReinforcementsProps, CallForReinforcementsState> {

@@ -1,23 +1,23 @@
-import React, {ReactNode} from "react";
-import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
-import {KingdomQueueProps} from "./types/kingdom-queue-props";
-import KingdomQueueState, {BuildingExpansionQueue, BuildingQueue, UnitQueue} from "./types/kingdom-queue-state";
-import TimerProgressBar from "../../../components/ui/progress-bars/timer-progress-bar";
-import UnitMovementDetails from "./deffinitions/unit-movement-details";
-import Ajax from "../../../lib/ajax/ajax";
-import {AxiosError, AxiosResponse} from "axios";
+import { AxiosError, AxiosResponse } from "axios";
+import { Channel } from "laravel-echo";
+import React, { ReactNode } from "react";
 import DangerAlert from "../../../components/ui/alerts/simple-alerts/danger-alert";
-import BasicCard from "../../../components/ui/cards/basic-card";
-import DangerOutlineButton from "../../../components/ui/buttons/danger-outline-button";
-import {serviceContainer} from "../../../lib/containers/core-container";
-import CoreEventListener from "../../../lib/game/event-listeners/core-event-listener";
-import {Channel} from "laravel-echo";
-import CancellationAjax from "./ajax/cancellation-ajax";
-import {CancellationType} from "./enums/cancellation-type";
-import {QueueTypes} from "./enums/queue-types";
 import SuccessAlert from "../../../components/ui/alerts/simple-alerts/success-alert";
-import {unitMovementReasonIcon} from "../helpers/unit-movement-reason-icon";
-import KingdomDetails from "../../../lib/game/kingdoms/kingdom-details";
+import DangerOutlineButton from "../../../components/ui/buttons/danger-outline-button";
+import BasicCard from "../../../components/ui/cards/basic-card";
+import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
+import TimerProgressBar from "../../../components/ui/progress-bars/timer-progress-bar";
+import Ajax from "../../../lib/ajax/ajax";
+import { serviceContainer } from "../../../lib/containers/core-container";
+import CoreEventListener from "../../../lib/game/event-listeners/core-event-listener";
+import KingdomDetails from "../../../lib/game/kingdoms/deffinitions/kingdom-details";
+import { unitMovementReasonIcon } from "../helpers/unit-movement-reason-icon";
+import CancellationAjax from "./ajax/cancellation-ajax";
+import UnitMovementDetails from "./deffinitions/unit-movement-details";
+import { CancellationType } from "./enums/cancellation-type";
+import { QueueTypes } from "./enums/queue-types";
+import { KingdomQueueProps } from "./types/kingdom-queue-props";
+import KingdomQueueState, { BuildingExpansionQueue, BuildingQueue, UnitQueue } from "./types/kingdom-queue-state";
 
 export default class KingdomQueues extends React.Component<KingdomQueueProps, KingdomQueueState> {
 

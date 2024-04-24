@@ -1,10 +1,10 @@
-import {inject, injectable} from "tsyringe";
-import CoreEventListener from "../core-event-listener";
-import {Channel} from "laravel-echo";
-import KingdomDetails from "../../kingdoms/kingdom-details";
-import KingdomEventListener from "../kingdom-event-listener";
+import { Channel } from "laravel-echo";
+import { inject, injectable } from "tsyringe";
 import Kingdom from '../../../../components/kingdoms/kingdom';
 import SmallKingdom from "../../../../components/kingdoms/small-kingdom";
+import KingdomDetails from "../../kingdoms/deffinitions/kingdom-details";
+import CoreEventListener from "../core-event-listener";
+import KingdomEventListener from "../kingdom-event-listener";
 
 @injectable()
 export default class UpdateKingdomListeners implements KingdomEventListener {

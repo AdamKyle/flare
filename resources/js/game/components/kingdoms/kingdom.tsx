@@ -1,20 +1,20 @@
-import React, {Fragment} from "react";
-import BasicCard from "../../components/ui/cards/basic-card";
-import KingdomProps from "../../lib/game/kingdoms/types/kingdom-props";
-import KingdomDetails from "./kingdom-details";
-import BuildingDetails from "./buildings/deffinitions/building-details";
-import BuildingInQueueDetails from "../../lib/game/kingdoms/building-in-queue-details";
-import UnitDetails from "../../lib/game/kingdoms/unit-details";
-import UnitsInQueue from "../../lib/game/kingdoms/units-in-queue";
-import KingdomTabs from "./tabs/kingdom-tabs";
-import InformationSection from "./information-section";
+import { AxiosError, AxiosResponse } from "axios";
+import React, { Fragment } from "react";
 import InfoAlert from "../../components/ui/alerts/simple-alerts/info-alert";
+import BasicCard from "../../components/ui/cards/basic-card";
 import LoadingProgressBar from "../../components/ui/progress-bars/loading-progress-bar";
 import Ajax from "../../lib/ajax/ajax";
-import {AxiosError, AxiosResponse} from "axios";
-import KingdomEventListener from "../../lib/game/event-listeners/kingdom-event-listener";
-import {serviceContainer} from "../../lib/containers/core-container";
+import { serviceContainer } from "../../lib/containers/core-container";
 import UpdateKingdomListeners from "../../lib/game/event-listeners/game/update-kingdom-listeners";
+import KingdomEventListener from "../../lib/game/event-listeners/kingdom-event-listener";
+import BuildingInQueueDetails from "../../lib/game/kingdoms/deffinitions/building-in-queue-details";
+import UnitDetails from "../../lib/game/kingdoms/deffinitions/unit-details";
+import UnitsInQueue from "../../lib/game/kingdoms/deffinitions/units-in-queue";
+import KingdomProps from "../../lib/game/kingdoms/types/kingdom-props";
+import BuildingDetails from "./buildings/deffinitions/building-details";
+import InformationSection from "./information-section";
+import KingdomDetails from "./kingdom-details";
+import KingdomTabs from "./tabs/kingdom-tabs";
 
 export default class Kingdom extends React.Component<KingdomProps, any> {
 

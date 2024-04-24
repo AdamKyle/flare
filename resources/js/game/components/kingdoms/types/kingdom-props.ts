@@ -1,4 +1,4 @@
-import KingdomDetails from "../kingdom-details";
+import KingdomDetails from "../deffinitions/kingdom-details";
 
 export default interface KingdomProps {
 

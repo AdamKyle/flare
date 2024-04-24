@@ -1,15 +1,15 @@
-import React, {Fragment} from "react";
-import Table from "../../../components/ui/data-tables/table";
-import UnitsTableProps from "../../../lib/game/kingdoms/types/units-table-props";
-import {BuildUnitsColumns} from "../../../lib/game/kingdoms/build-units-columns";
-import UnitDetails from "../../../lib/game/kingdoms/unit-details";
-import {AxiosError, AxiosResponse} from "axios";
-import Ajax from "../../../lib/ajax/ajax";
+import { AxiosError, AxiosResponse } from "axios";
+import React, { Fragment } from "react";
 import DangerAlert from "../../../components/ui/alerts/simple-alerts/danger-alert";
 import SuccessAlert from "../../../components/ui/alerts/simple-alerts/success-alert";
+import Table from "../../../components/ui/data-tables/table";
 import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
+import Ajax from "../../../lib/ajax/ajax";
+import UnitDetails from "../../../lib/game/kingdoms/deffinitions/unit-details";
+import UnitsTableProps from "../../../lib/game/kingdoms/types/units-table-props";
 import UpgradeTablesState from "../../../lib/game/kingdoms/types/upgrade-tables-state";
 import BuildingDetails from "../buildings/deffinitions/building-details";
+import { BuildUnitsColumns } from "../table-columns/build-units-columns";
 
 export default class UnitsTable extends React.Component<UnitsTableProps, UpgradeTablesState> {
 

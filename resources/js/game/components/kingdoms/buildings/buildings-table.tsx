@@ -1,14 +1,14 @@
-import React, {Fragment} from "react";
-import Table from "../../../components/ui/data-tables/table";
-import BuildingDetails from "./deffinitions/building-details";
-import {buildBuildingsColumns} from "../../../lib/game/kingdoms/build-buildings-columns";
-import BuildingsTableProps from "../../../lib/game/kingdoms/types/buildings-table-props";
-import {AxiosError, AxiosResponse} from "axios";
-import Ajax from "../../../lib/ajax/ajax";
-import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
-import UpgradeTablesState from "../../../lib/game/kingdoms/types/upgrade-tables-state";
+import { AxiosError, AxiosResponse } from "axios";
+import React, { Fragment } from "react";
 import DangerAlert from "../../../components/ui/alerts/simple-alerts/danger-alert";
 import SuccessAlert from "../../../components/ui/alerts/simple-alerts/success-alert";
+import Table from "../../../components/ui/data-tables/table";
+import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
+import Ajax from "../../../lib/ajax/ajax";
+import BuildingsTableProps from "../../../lib/game/kingdoms/types/buildings-table-props";
+import UpgradeTablesState from "../../../lib/game/kingdoms/types/upgrade-tables-state";
+import { buildBuildingsColumns } from "../table-columns/build-buildings-columns";
+import BuildingDetails from "./deffinitions/building-details";
 
 export default class BuildingsTable extends React.Component<BuildingsTableProps, UpgradeTablesState> {
 

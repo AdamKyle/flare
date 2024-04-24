@@ -1,8 +1,7 @@
-import KingdomDetails from "./kingdom-details";
 import React from "react";
-import {formatNumber} from "../format-number";
-import clsx from "clsx";
-import UnitMovementDetails from "../../../sections/kingdoms/queues/deffinitions/unit-movement-details";
+import { formatNumber } from "../../../lib/game/format-number";
+import KingdomDetails from "../../../lib/game/kingdoms/deffinitions/kingdom-details";
+import UnitMovementDetails from "../queues/deffinitions/unit-movement-details";
 
 export const buildKingdomsColumns = (onClick: (kingdom: KingdomDetails) => void) => {
     return [

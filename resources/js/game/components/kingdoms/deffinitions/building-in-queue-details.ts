@@ -1,4 +1,3 @@
-import DataTableBaseData from "../../ui/types/tables/data-table-base-data";
 
 export default interface BuildingInQueueDetails {
     building_id: number;

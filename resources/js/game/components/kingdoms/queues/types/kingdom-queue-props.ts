@@ -1,4 +1,4 @@
-import KingdomDetails from "../../../../lib/game/kingdoms/kingdom-details";
+import KingdomDetails from "../../../../lib/game/kingdoms/deffinitions/kingdom-details";
 
 
 export interface KingdomQueueProps {

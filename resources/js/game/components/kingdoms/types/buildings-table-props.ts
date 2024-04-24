@@ -1,5 +1,5 @@
 import BuildingDetails from "../../../../sections/kingdoms/buildings/deffinitions/building-details";
-import BuildingInQueueDetails from "../building-in-queue-details";
+import BuildingInQueueDetails from "../deffinitions/building-in-queue-details";
 
 export default interface BuildingsTableProps {
 

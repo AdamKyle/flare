@@ -1,7 +1,7 @@
-import UnitDetails from "../unit-details";
-import UnitsInQueue from "../units-in-queue";
-import CurrentUnitDetails from "../current-unit-details";
 import BuildingDetails from "../../../../sections/kingdoms/buildings/deffinitions/building-details";
+import CurrentUnitDetails from "../deffinitions/current-unit-details";
+import UnitDetails from "../deffinitions/unit-details";
+import UnitsInQueue from "../deffinitions/units-in-queue";
 
 export default interface UnitsTableProps {
 

@@ -1,5 +1,5 @@
 import React from "react";
-import InformationSectionProps from "../../lib/game/kingdoms/information-section-props";
+import InformationSectionProps from "../../lib/game/kingdoms/deffinitions/information-section-props";
 import BuildingInformation from "./buildings/building-information";
 import UnitInformation from "./units/unit-information";
 

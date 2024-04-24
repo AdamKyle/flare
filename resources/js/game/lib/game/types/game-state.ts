@@ -1,14 +1,14 @@
-import { CharacterType } from "../character/character-type";
+import { FameTasks } from "../../../sections/faction-loyalty/deffinitions/faction-loaylaty";
+import MapState from "../../../sections/map/types/map-state";
+import PositionType from "../../../sections/map/types/map/position-type";
 import CharacterCurrenciesType from "../character/character-currencies-type";
 import CharacterStatusType from "../character/character-status-type";
-import QuestType from "./quests/quest-type";
-import KingdomDetails from "../kingdoms/kingdom-details";
-import PositionType from "../../../sections/map/types/map/position-type";
-import KingdomLogDetails from "../kingdoms/kingdom-log-details";
+import { CharacterType } from "../character/character-type";
+import KingdomDetails from "../kingdoms/deffinitions/kingdom-details";
+import KingdomLogDetails from "../kingdoms/deffinitions/kingdom-log-details";
 import MonsterType from "./actions/monster/monster-type";
-import MapState from "../../../sections/map/types/map-state";
 import RaidMonsterType from "./actions/monster/raid-monster-type";
-import {FameTasks} from "../../../sections/faction-loyalty/deffinitions/faction-loaylaty";
+import QuestType from "./quests/quest-type";
 
 export type GameActionState = {
     monsters: MonsterType[];

@@ -1,21 +1,18 @@
-import React, {Fragment} from "react";
-import BasicCard from "../../../components/ui/cards/basic-card";
-import BuildingInformationProps from "./types/building-information-props";
-import {formatNumber} from "../../../lib/game/format-number";
-import TimeHelpModal from "../modals/time-help-modal";
-import UpgradeWithResources from "./upgrade-with-resources";
-import BuildingTimeCalculation from "../../../lib/game/kingdoms/calculations/building-time-calculation";
+import { AxiosError, AxiosResponse } from "axios";
+import React, { Fragment } from "react";
 import DangerAlert from "../../../components/ui/alerts/simple-alerts/danger-alert";
-import PrimaryButton from "../../../components/ui/buttons/primary-button";
-import DangerButton from "../../../components/ui/buttons/danger-button";
-import Ajax from "../../../lib/ajax/ajax";
-import {AxiosError, AxiosResponse} from "axios";
-import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
 import SuccessAlert from "../../../components/ui/alerts/simple-alerts/success-alert";
-import PrimaryOutlineButton from "../../../components/ui/buttons/primary-outline-button";
-import TimerProgressBar from "../../../components/ui/progress-bars/timer-progress-bar";
-import BuildingDetails from "./deffinitions/building-details";
+import DangerButton from "../../../components/ui/buttons/danger-button";
+import PrimaryButton from "../../../components/ui/buttons/primary-button";
+import BasicCard from "../../../components/ui/cards/basic-card";
+import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
+import Ajax from "../../../lib/ajax/ajax";
+import { formatNumber } from "../../../lib/game/format-number";
+import BuildingTimeCalculation from "../helpers/calculations/building-time-calculation";
+import TimeHelpModal from "../modals/time-help-modal";
 import ResourceBuildingExpansion from "./resource-building-expansion";
+import BuildingInformationProps from "./types/building-information-props";
+import UpgradeWithResources from "./upgrade-with-resources";
 
 export default class BuildingInformation extends React.Component<BuildingInformationProps, any> {
 
