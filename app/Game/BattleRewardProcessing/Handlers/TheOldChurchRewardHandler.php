@@ -182,8 +182,8 @@ class TheOldChurchRewardHandler {
      */
     protected function rewardForCharacter(Character $character, bool $isMythic = false) {
         $item = Item::where('specialty_type', ItemSpecialtyType::CORRUPTED_ICE)
-            ->whereIsNull('item_prefix_id')
-            ->whereIsNull('item_suffix_id')
+            ->whereNull('item_prefix_id')
+            ->whereNull('item_suffix_id')
             ->whereDoesntHave('appliedHolyStacks')
             ->whereNotIn('type', ['alchemy', 'artifact', 'trinket'])
             ->inRandomOrder()
@@ -194,7 +194,7 @@ class TheOldChurchRewardHandler {
         }
 
         if (!$isMythic) {
-            $randomAffixGenerator = $this->randomAffixGenerator->setPaidAmount(RandomAffixDetails::MEDIUM);
+            $randomAffixGenerator = $this->randomAffixGenerator->setCharacter($character)->setPaidAmount(RandomAffixDetails::MEDIUM);
 
             $newItem = $item->duplicate();
 

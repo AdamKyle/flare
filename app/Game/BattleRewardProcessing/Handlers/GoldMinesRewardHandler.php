@@ -134,7 +134,6 @@ class GoldMinesRewardHandler {
      * Handle item Reward for player.
      *
      * @param Character $character
-     * @param bool $isMythic
      * @param Event|null $event
      * @return Character
      * @throws Exception
@@ -172,9 +171,9 @@ class GoldMinesRewardHandler {
      * @throws Exception
      */
     protected function rewardForCharacter(Character $character, bool $isMythic = false) {
-        $item = Item::whereIsNull('specialty_type')
-            ->whereIsNull('item_prefix_id')
-            ->whereIsNull('item_suffix_id')
+        $item = Item::whereNull('specialty_type')
+            ->whereNull('item_prefix_id')
+            ->whereNull('item_suffix_id')
             ->whereDoesntHave('appliedHolyStacks')
             ->whereNotIn('type', ['alchemy', 'artifact', 'trinket'])
             ->inRandomOrder()
@@ -185,7 +184,7 @@ class GoldMinesRewardHandler {
         }
 
         if (!$isMythic) {
-            $randomAffixGenerator = $this->randomAffixGenerator->setPaidAmount(RandomAffixDetails::MEDIUM);
+            $randomAffixGenerator = $this->randomAffixGenerator->setCharacter($character)->setPaidAmount(RandomAffixDetails::MEDIUM);
 
             $newItem = $item->duplicate();
 
