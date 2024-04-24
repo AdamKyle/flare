@@ -3,15 +3,14 @@ import LocationDetails from "../../types/location-details";
 import PlayerKingdomsDetails from "../../types/map/player-kingdoms-details";
 import NpcKingdomsDetails from "../../types/map/npc-kingdoms-details";
 
-type LocationState =  {
-    location: LocationDetails | null,
-    player_kingdom_id: number |null,
-    enemy_kingdom_id: number |null,
-    npc_kingdom_id: number |null
-}
+type LocationState = {
+    location: LocationDetails | null;
+    player_kingdom_id: number | null;
+    enemy_kingdom_id: number | null;
+    npc_kingdom_id: number | null;
+};
 
 export default class ViewLocationState {
-
     private component: MapActions;
 
     constructor(component: MapActions) {
@@ -33,9 +32,12 @@ export default class ViewLocationState {
     private updateViewLocationData() {
         const state = this.component.state;
 
-        if (state.location === null && state.player_kingdom_id === null &&
-            state.enemy_kingdom_id === null && state.npc_kingdom_id === null)
-        {
+        if (
+            state.location === null &&
+            state.player_kingdom_id === null &&
+            state.enemy_kingdom_id === null &&
+            state.npc_kingdom_id === null
+        ) {
             this.updateState();
         }
 
@@ -70,18 +72,21 @@ export default class ViewLocationState {
         }
 
         if (props.player_kingdoms === null) {
-            return this.component.setState({player_kingdom_id: null});
+            return this.component.setState({ player_kingdom_id: null });
         }
 
-        const kingdom = props.player_kingdoms.filter((kingdom: PlayerKingdomsDetails) =>
-            kingdom.x_position === props.character_position.x && kingdom.y_position === props.character_position.y);
+        const kingdom = props.player_kingdoms.filter(
+            (kingdom: PlayerKingdomsDetails) =>
+                kingdom.x_position === props.character_position.x &&
+                kingdom.y_position === props.character_position.y,
+        );
 
         if (kingdom.length > 0) {
             if (kingdom[0].id !== state.player_kingdom_id) {
-                return this.component.setState({player_kingdom_id: null});
+                return this.component.setState({ player_kingdom_id: null });
             }
         } else {
-            return this.component.setState({player_kingdom_id: null});
+            return this.component.setState({ player_kingdom_id: null });
         }
     }
 
@@ -102,8 +107,11 @@ export default class ViewLocationState {
             return this.component.setState({ location: null });
         }
 
-        const foundLocation = props.locations.filter((location: LocationDetails) =>
-            location.x === props.character_position.x && location.y === props.character_position.y);
+        const foundLocation = props.locations.filter(
+            (location: LocationDetails) =>
+                location.x === props.character_position.x &&
+                location.y === props.character_position.y,
+        );
 
         if (foundLocation.length > 0) {
             if (foundLocation[0].id !== state.location.id) {
@@ -131,8 +139,11 @@ export default class ViewLocationState {
             return this.component.setState({ enemy_kingdom_id: null });
         }
 
-        const foundEnemyKingdom = props.enemy_kingdoms.filter((kingdom: PlayerKingdomsDetails) =>
-            kingdom.x_position === props.character_position.x && kingdom.y_position === props.character_position.y);
+        const foundEnemyKingdom = props.enemy_kingdoms.filter(
+            (kingdom: PlayerKingdomsDetails) =>
+                kingdom.x_position === props.character_position.x &&
+                kingdom.y_position === props.character_position.y,
+        );
 
         if (foundEnemyKingdom.length > 0) {
             if (foundEnemyKingdom[0].id !== state.enemy_kingdom_id) {
@@ -160,8 +171,11 @@ export default class ViewLocationState {
             return this.component.setState({ npc_kingdom_id: null });
         }
 
-        const npcKingdom = props.npc_kingdoms.filter((kingdom: NpcKingdomsDetails) =>
-            kingdom.x_position === props.character_position.x && kingdom.y_position === props.character_position.y);
+        const npcKingdom = props.npc_kingdoms.filter(
+            (kingdom: NpcKingdomsDetails) =>
+                kingdom.x_position === props.character_position.x &&
+                kingdom.y_position === props.character_position.y,
+        );
 
         if (npcKingdom.length > 0) {
             if (npcKingdom[0].id !== state.npc_kingdom_id) {
@@ -178,33 +192,47 @@ export default class ViewLocationState {
      * @private
      */
     private updateState() {
-
         const props = this.component.props;
 
-        if (props.locations == null || props.player_kingdoms === null ||
-            props.enemy_kingdoms === null || props.npc_kingdoms === null)
-        {
+        if (
+            props.locations == null ||
+            props.player_kingdoms === null ||
+            props.enemy_kingdoms === null ||
+            props.npc_kingdoms === null
+        ) {
             return;
         }
 
-        const foundLocation      = props.locations.filter((location: LocationDetails) =>
-            location.x === props.character_position.x && location.y === props.character_position.y);
+        const foundLocation = props.locations.filter(
+            (location: LocationDetails) =>
+                location.x === props.character_position.x &&
+                location.y === props.character_position.y,
+        );
 
-        const foundPlayerKingdom = props.player_kingdoms.filter((kingdom: PlayerKingdomsDetails) =>
-            kingdom.x_position === props.character_position.x && kingdom.y_position === props.character_position.y);
+        const foundPlayerKingdom = props.player_kingdoms.filter(
+            (kingdom: PlayerKingdomsDetails) =>
+                kingdom.x_position === props.character_position.x &&
+                kingdom.y_position === props.character_position.y,
+        );
 
-        const foundEnemyKingdom  = props.enemy_kingdoms.filter((kingdom: PlayerKingdomsDetails) =>
-            kingdom.x_position === props.character_position.x && kingdom.y_position === props.character_position.y);
+        const foundEnemyKingdom = props.enemy_kingdoms.filter(
+            (kingdom: PlayerKingdomsDetails) =>
+                kingdom.x_position === props.character_position.x &&
+                kingdom.y_position === props.character_position.y,
+        );
 
-        const foundNpcKingdom    = props.npc_kingdoms.filter((kingdom: NpcKingdomsDetails) =>
-            kingdom.x_position === props.character_position.x && kingdom.y_position === props.character_position.y);
+        const foundNpcKingdom = props.npc_kingdoms.filter(
+            (kingdom: NpcKingdomsDetails) =>
+                kingdom.x_position === props.character_position.x &&
+                kingdom.y_position === props.character_position.y,
+        );
 
         let state: LocationState = {
             location: null,
             player_kingdom_id: null,
             enemy_kingdom_id: null,
-            npc_kingdom_id: null
-        }
+            npc_kingdom_id: null,
+        };
 
         if (foundLocation.length > 0) {
             state.location = foundLocation[0];
@@ -222,13 +250,18 @@ export default class ViewLocationState {
             state.npc_kingdom_id = foundNpcKingdom[0].id;
         }
 
-        if (state.location === null && state.player_kingdom_id === null && state.enemy_kingdom_id === null && state.npc_kingdom_id === null) {
+        if (
+            state.location === null &&
+            state.player_kingdom_id === null &&
+            state.enemy_kingdom_id === null &&
+            state.npc_kingdom_id === null
+        ) {
             return;
         }
 
-        let componentState = JSON.parse(JSON.stringify(this.component.state))
+        let componentState = JSON.parse(JSON.stringify(this.component.state));
 
-        componentState = {...componentState, ...state};
+        componentState = { ...componentState, ...state };
 
         this.component.setState(componentState);
     }

@@ -1,5 +1,5 @@
 import Raid from "./raid";
-import {ProcessedEvent} from "@aldabil/react-scheduler/types";
+import { ProcessedEvent } from "@aldabil/react-scheduler/types";
 
 export default interface Event extends ProcessedEvent {
     description: string;

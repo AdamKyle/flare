@@ -1,9 +1,7 @@
 import React from "react";
 
 export default interface TabPanelProperties {
-
-    key: string,
+    key: string;
 
     children?: React.ReactNode;
-
 }

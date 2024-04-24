@@ -5,10 +5,9 @@ import { AxiosResponse } from "axios";
 import MapStateManager from "../../../sections/map/lib/state/map-state-manager";
 import { CharacterType } from "../character/character-type";
 
-type AjaxUrls = { url: string, name: string }[];
+type AjaxUrls = { url: string; name: string }[];
 
 export default class FetchGameData {
-
     private component: Game;
 
     private urls: AjaxUrls | [];
@@ -23,14 +22,14 @@ export default class FetchGameData {
         this.urls = [];
     }
 
-    setUrls(urls: { url: string, name: string }[]): FetchGameData {
+    setUrls(urls: { url: string; name: string }[]): FetchGameData {
         this.urls = urls;
 
         return this;
     }
 
     async doAjaxCalls() {
-        if (typeof this.urls === 'undefined') {
+        if (typeof this.urls === "undefined") {
             return;
         }
 
@@ -43,19 +42,19 @@ export default class FetchGameData {
             const result = await this.makeAjaxCall(url.url);
 
             switch (url.name) {
-                case 'character-sheet':
+                case "character-sheet":
                     this.setCharacterSheet(result);
                     break;
-                case 'actions':
+                case "actions":
                     this.setActionData(result);
                     break;
-                case 'game-map':
+                case "game-map":
                     this.setMapData(result);
                     break;
-                case 'quests':
+                case "quests":
                     this.setQuestData(result);
                     break;
-                case 'kingdoms':
+                case "kingdoms":
                     this.setKingdomsData(result);
                     break;
                 default:
@@ -70,65 +69,71 @@ export default class FetchGameData {
 
     async makeAjaxCall(url: string): Promise<AxiosResponse> {
         return new Promise((resolve, reject) => {
-            (new Ajax()).setRoute(url).doAjaxCall('get', (result: AxiosResponse) => {
-                resolve(result);
-            }, (error: AxiosResponse) => {
-                reject(error);
-            });
+            new Ajax().setRoute(url).doAjaxCall(
+                "get",
+                (result: AxiosResponse) => {
+                    resolve(result);
+                },
+                (error: AxiosResponse) => {
+                    reject(error);
+                },
+            );
         });
     }
 
-
     setCharacterSheet(result: AxiosResponse) {
-
         this.characterSheet = result.data.sheet;
 
-        this.component.setState({
-            character: result.data.sheet,
-            percentage_loaded: .20,
-            secondary_loading_title: 'Fetching Quest Data ...',
-            character_currencies: {
-                gold: result.data.sheet.gold,
-                gold_dust: result.data.sheet.gold_dust,
-                shards: result.data.sheet.shards,
-                copper_coins: result.data.sheet.copper_coins,
+        this.component.setState(
+            {
+                character: result.data.sheet,
+                percentage_loaded: 0.2,
+                secondary_loading_title: "Fetching Quest Data ...",
+                character_currencies: {
+                    gold: result.data.sheet.gold,
+                    gold_dust: result.data.sheet.gold_dust,
+                    shards: result.data.sheet.shards,
+                    copper_coins: result.data.sheet.copper_coins,
+                },
+                character_status: {
+                    can_attack: result.data.sheet.can_attack,
+                    can_attack_again_at: result.data.sheet.can_attack_again_at,
+                    can_craft: result.data.sheet.can_craft,
+                    can_craft_again_at: result.data.sheet.can_craft_again_at,
+                    is_dead: result.data.sheetis_dead,
+                    automation_locked: result.data.sheet.automation_locked,
+                    is_silenced: result.data.sheet.is_silenced,
+                    killed_in_pvp: result.data.sheet.kill_in_pvp,
+                },
+                fame_action_tasks: result.data.sheet.current_fame_tasks,
             },
-            character_status: {
-                can_attack: result.data.sheet.can_attack,
-                can_attack_again_at: result.data.sheet.can_attack_again_at,
-                can_craft: result.data.sheet.can_craft,
-                can_craft_again_at: result.data.sheet.can_craft_again_at,
-                is_dead: result.data.sheetis_dead,
-                automation_locked: result.data.sheet.automation_locked,
-                is_silenced: result.data.sheet.is_silenced,
-                killed_in_pvp: result.data.sheet.kill_in_pvp,
-            },
-            fame_action_tasks: result.data.sheet.current_fame_tasks,
-        }, () => {
-            this.component.setCharacterPosition(result.data.sheet.base_position);
+            () => {
+                this.component.setCharacterPosition(
+                    result.data.sheet.base_position,
+                );
 
-            if (result.data.sheet.is_in_timeout) {
-                (new Ajax()).initiateGlobalTimeOut();
-            }
-        });
+                if (result.data.sheet.is_in_timeout) {
+                    new Ajax().initiateGlobalTimeOut();
+                }
+            },
+        );
     }
 
     setQuestData(result: AxiosResponse) {
         this.component.setState({
             quests: result.data,
-            percentage_loaded: this.component.state.percentage_loaded + .20,
-            secondary_loading_title: 'Fetching Kingdom Data ...',
+            percentage_loaded: this.component.state.percentage_loaded + 0.2,
+            secondary_loading_title: "Fetching Kingdom Data ...",
         });
     }
 
     setKingdomsData(result: AxiosResponse) {
-
         this.component.setState({
             kingdoms: result.data.kingdoms,
             kingdom_logs: result.data.logs,
             loading: false,
-            percentage_loaded: this.component.state.percentage_loaded + .20,
-            secondary_loading_title: 'Fetching Action Data ...',
+            percentage_loaded: this.component.state.percentage_loaded + 0.2,
+            secondary_loading_title: "Fetching Action Data ...",
         });
     }
 
@@ -138,18 +143,21 @@ export default class FetchGameData {
         }
 
         this.component.setState({
-            percentage_loaded: this.component.state.percentage_loaded + .20,
-            secondary_loading_title: 'Fetching Map Data ...',
+            percentage_loaded: this.component.state.percentage_loaded + 0.2,
+            secondary_loading_title: "Fetching Map Data ...",
             action_data: {
                 raid_monsters: [],
                 monsters: result.data.monsters,
-            }
+            },
         });
     }
 
     setMapData(result: AxiosResponse) {
         this.component.setState({
-            map_data: MapStateManager.buildCoreState(result.data, this.component),
+            map_data: MapStateManager.buildCoreState(
+                result.data,
+                this.component,
+            ),
         });
     }
 }

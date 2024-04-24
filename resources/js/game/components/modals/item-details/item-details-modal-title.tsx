@@ -1,18 +1,19 @@
 import React from "react";
 import ItemDetailsModalTitleProps from "./types/item-details-modal-title-props";
 import ItemNameColorationText from "../../items/item-name/item-name-coloration-text";
-import {capitalize} from "lodash";
-import {ItemType} from "../../items/enums/item-type";
+import { capitalize } from "lodash";
+import { ItemType } from "../../items/enums/item-type";
 
-export default class ItemDetailsModalTitle extends React.Component<ItemDetailsModalTitleProps, {  }> {
-
+export default class ItemDetailsModalTitle extends React.Component<
+    ItemDetailsModalTitleProps,
+    {}
+> {
     constructor(props: ItemDetailsModalTitleProps) {
         super(props);
     }
 
     buildItemDetailsForTitle() {
-
-        let name = '';
+        let name = "";
 
         if (!this.props.itemToEquip.affix_name) {
             name = this.props.itemToEquip.name;
@@ -28,10 +29,10 @@ export default class ItemDetailsModalTitle extends React.Component<ItemDetailsMo
             is_mythic: this.props.itemToEquip.is_mythic,
             is_cosmic: this.props.itemToEquip.is_cosmic,
             holy_stacks_applied: this.props.itemToEquip.holy_stacks_applied,
-        }
+        };
     }
 
-    render () {
+    render() {
         return (
             <div className="grid grid-cols-2 gap-2">
                 {this.props.itemToEquip.type === ItemType.GEM ? (
@@ -48,16 +49,13 @@ export default class ItemDetailsModalTitle extends React.Component<ItemDetailsMo
                 <div className="absolute right-[-30px] md:right-0">
                     <span className="pl-3 text-right mr-[70px]">
                         (Type:{" "}
-                        {capitalize(
-                            this.props.itemToEquip.type
-                        )
+                        {capitalize(this.props.itemToEquip.type)
                             .split("-")
                             .join(" ")}
                         )
                     </span>
                 </div>
             </div>
-        )
+        );
     }
-
 }

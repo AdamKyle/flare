@@ -14,11 +14,11 @@ export default interface MapData {
 
     characters_on_map: number;
 
-    coordinates: {x: [number], y: [number]};
+    coordinates: { x: [number]; y: [number] };
 
     locations: LocationDetails[] | [];
 
-    lockedLocationType: null
+    lockedLocationType: null;
 
     map_url: string;
 

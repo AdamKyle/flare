@@ -4,7 +4,6 @@ import PlayerKingdomsDetails from "../../types/map/player-kingdoms-details";
 import NpcKingdomsDetails from "../../types/map/npc-kingdoms-details";
 
 export default class ManageTeleportModalState {
-
     private component: TeleportModal;
 
     constructor(component: TeleportModal) {
@@ -31,8 +30,11 @@ export default class ManageTeleportModalState {
         const state = this.component.state;
 
         if (props.locations !== null && state.current_location === null) {
-            const foundLocation = props.locations.filter((location: LocationDetails) =>
-                location.x === props.character_position.x && location.y === props.character_position.y);
+            const foundLocation = props.locations.filter(
+                (location: LocationDetails) =>
+                    location.x === props.character_position.x &&
+                    location.y === props.character_position.y,
+            );
 
             if (foundLocation.length > 0) {
                 this.component.setState({
@@ -51,9 +53,15 @@ export default class ManageTeleportModalState {
         const props = this.component.props;
         const state = this.component.state;
 
-        if (props.player_kingdoms !== null && state.current_player_kingdom === null) {
-            const foundKingdom = props.player_kingdoms.filter((kingdom: PlayerKingdomsDetails) =>
-                kingdom.x_position === props.character_position.x && kingdom.y_position === props.character_position.y);
+        if (
+            props.player_kingdoms !== null &&
+            state.current_player_kingdom === null
+        ) {
+            const foundKingdom = props.player_kingdoms.filter(
+                (kingdom: PlayerKingdomsDetails) =>
+                    kingdom.x_position === props.character_position.x &&
+                    kingdom.y_position === props.character_position.y,
+            );
 
             if (foundKingdom.length > 0) {
                 this.component.setState({
@@ -72,9 +80,15 @@ export default class ManageTeleportModalState {
         const props = this.component.props;
         const state = this.component.state;
 
-        if (props.enemy_kingdoms !== null && state.current_enemy_kingdom === null) {
-            const foundKingdom = props.enemy_kingdoms.filter((kingdom: PlayerKingdomsDetails) =>
-                kingdom.x_position === props.character_position.x && kingdom.y_position === props.character_position.y);
+        if (
+            props.enemy_kingdoms !== null &&
+            state.current_enemy_kingdom === null
+        ) {
+            const foundKingdom = props.enemy_kingdoms.filter(
+                (kingdom: PlayerKingdomsDetails) =>
+                    kingdom.x_position === props.character_position.x &&
+                    kingdom.y_position === props.character_position.y,
+            );
 
             if (foundKingdom.length > 0) {
                 this.component.setState({
@@ -94,8 +108,11 @@ export default class ManageTeleportModalState {
         const state = this.component.state;
 
         if (props.npc_kingdoms !== null && state.current_npc_kingdom === null) {
-            const foundKingdom = props.npc_kingdoms.filter((kingdom: NpcKingdomsDetails) =>
-                kingdom.x_position === props.character_position.x && kingdom.y_position === props.character_position.y);
+            const foundKingdom = props.npc_kingdoms.filter(
+                (kingdom: NpcKingdomsDetails) =>
+                    kingdom.x_position === props.character_position.x &&
+                    kingdom.y_position === props.character_position.y,
+            );
 
             if (foundKingdom.length > 0) {
                 this.component.setState({

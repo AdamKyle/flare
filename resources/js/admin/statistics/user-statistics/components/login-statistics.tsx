@@ -46,7 +46,7 @@ export default class LoginStatistics extends React.Component<any, any> {
 
     createDataSet(
         data: number[] | [],
-        labels: string[] | []
+        labels: string[] | [],
     ): { login_count: number; date: string }[] {
         const chartData: { login_count: number; date: string }[] = [];
 
@@ -86,7 +86,7 @@ export default class LoginStatistics extends React.Component<any, any> {
                 <div>
                     <DropDown
                         menu_items={this.siteStatisticsAjax.createActionsDropDown(
-                            "all-time-sign-in"
+                            "all-time-sign-in",
                         )}
                         button_title={"Date Filter"}
                     />

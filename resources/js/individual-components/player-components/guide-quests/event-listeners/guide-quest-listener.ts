@@ -1,24 +1,26 @@
-
-import {inject, injectable} from "tsyringe";
-import {Channel} from "laravel-echo";
+import { inject, injectable } from "tsyringe";
+import { Channel } from "laravel-echo";
 import CoreEventListener from "../../../../game/lib/game/event-listeners/core-event-listener";
 import GuideButton from "../guide-button";
 import GuideQuestListenerDefinition from "./guide-quest-listener-definition";
 import Game from "../../../../game/game";
 
 @injectable()
-export default class GuideQuestListener implements GuideQuestListenerDefinition {
-
+export default class GuideQuestListener
+    implements GuideQuestListenerDefinition
+{
     private component?: Game | GuideButton;
     private userId?: number;
 
     private guideQuestButton?: Channel;
 
-    constructor(@inject(CoreEventListener) private coreEventListener: CoreEventListener) {}
+    constructor(
+        @inject(CoreEventListener) private coreEventListener: CoreEventListener,
+    ) {}
 
     initialize(component: Game | GuideButton, userId: number): void {
         this.component = component;
-        this.userId    = userId
+        this.userId = userId;
     }
 
     register(): void {
@@ -28,10 +30,9 @@ export default class GuideQuestListener implements GuideQuestListenerDefinition 
             const echo = this.coreEventListener.getEcho();
 
             this.guideQuestButton = echo.private(
-                "guide-quest-button-" + this.userId
+                "guide-quest-button-" + this.userId,
             );
-
-        } catch (e: any|unknown) {
+        } catch (e: any | unknown) {
             throw new Error(e);
         }
     }
@@ -57,12 +58,12 @@ export default class GuideQuestListener implements GuideQuestListenerDefinition 
                     return;
                 }
 
-                if (this.component instanceof  GuideButton) {
+                if (this.component instanceof GuideButton) {
                     this.component.setState({
                         show_button: false,
                     });
                 }
-            }
+            },
         );
     }
 }

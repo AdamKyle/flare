@@ -13,7 +13,7 @@ import QuestType from "./quests/quest-type";
 export type GameActionState = {
     monsters: MonsterType[];
     raid_monsters: RaidMonsterType[] | [];
-}
+};
 
 export type MapTimerData = {
     time_left: number;
@@ -22,10 +22,9 @@ export type MapTimerData = {
     automation_time_out_started: number;
     celestial_time_out: number;
     celestial_time_out_started: number;
-}
+};
 
 export default interface GameState {
-
     view_port: number;
 
     character_status: CharacterStatusType | null;
@@ -50,13 +49,13 @@ export default interface GameState {
 
     celestial_id: number;
 
-    position: PositionType | null,
+    position: PositionType | null;
 
     disable_tabs: boolean;
 
     show_global_timeout: boolean;
 
-    tabs: { name: string, key: string, has_logs?: boolean }[] | [];
+    tabs: { name: string; key: string; has_logs?: boolean }[] | [];
 
     action_data: GameActionState | null;
 

@@ -37,7 +37,7 @@ export default class GamblingSection extends React.Component<
 
         // @ts-ignore
         this.gamblingTimeOut = Echo.private(
-            "slot-timeout-" + this.props.character.user_id
+            "slot-timeout-" + this.props.character.user_id,
         );
     }
 
@@ -52,7 +52,7 @@ export default class GamblingSection extends React.Component<
             },
             (error: AxiosError) => {
                 console.error(error);
-            }
+            },
         );
 
         // @ts-ignore
@@ -62,13 +62,13 @@ export default class GamblingSection extends React.Component<
                 this.setState({
                     timeoutFor: event.timeoutFor,
                 });
-            }
+            },
         );
     }
 
     spin() {
         const gold: number = parseFloat(
-            this.props.character.gold.replace(/,/g, "")
+            this.props.character.gold.replace(/,/g, ""),
         );
 
         if (gold < this.state.cost) {
@@ -93,7 +93,7 @@ export default class GamblingSection extends React.Component<
                 setTimeout(() => {
                     this.processRoll();
                 }, 1000);
-            }
+            },
         );
     }
 
@@ -121,7 +121,9 @@ export default class GamblingSection extends React.Component<
     processRoll() {
         new Ajax()
             .setRoute(
-                "character/gambler/" + this.props.character.id + "/slot-machine"
+                "character/gambler/" +
+                    this.props.character.id +
+                    "/slot-machine",
             )
             .doAjaxCall(
                 "post",
@@ -142,7 +144,7 @@ export default class GamblingSection extends React.Component<
                             error_message: response.data.message,
                         });
                     }
-                }
+                },
             );
     }
 

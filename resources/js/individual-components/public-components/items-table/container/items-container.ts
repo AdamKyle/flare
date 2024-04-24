@@ -1,19 +1,17 @@
-
-import {container, InjectionToken} from 'tsyringe';
+import { container, InjectionToken } from "tsyringe";
 import ItemTableAjax from "../ajax/item-table-ajax";
 import ItemTableColumns from "../columns/item-table-columns";
 
 class ItemsContainer {
-
     private static instance: ItemsContainer;
 
     public constructor() {
-        this.register('items-ajax', {
-            useClass: ItemTableAjax
+        this.register("items-ajax", {
+            useClass: ItemTableAjax,
         });
 
-        this.register('items-table-columns', {
-            useClass: ItemTableColumns
+        this.register("items-table-columns", {
+            useClass: ItemTableColumns,
         });
     }
 
@@ -60,7 +58,3 @@ const itemsTableServiceContainer = (): ItemsContainer => {
 };
 
 export { itemsTableServiceContainer, ItemsContainer };
-
-
-
-

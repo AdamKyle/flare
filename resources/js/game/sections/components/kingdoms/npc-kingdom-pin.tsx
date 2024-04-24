@@ -1,8 +1,10 @@
 import React from "react";
 import NpcKingdomPinProps from "../../map/types/map/kingdom-pins/npc-kingdom-pin-props";
 
-export default class NpcKingdomPin extends React.Component<NpcKingdomPinProps, {}> {
-
+export default class NpcKingdomPin extends React.Component<
+    NpcKingdomPinProps,
+    {}
+> {
     constructor(props: NpcKingdomPinProps) {
         super(props);
     }
@@ -11,12 +13,14 @@ export default class NpcKingdomPin extends React.Component<NpcKingdomPinProps, {
         return {
             top: this.props.kingdom.y_position,
             left: this.props.kingdom.x_position,
-            '--kingdom-color': this.props.color
+            "--kingdom-color": this.props.color,
         };
     }
 
     openKingdomModal(e: any) {
-        this.props.open_kingdom_modal(parseInt(e.target.getAttribute('data-kingdom-id')));
+        this.props.open_kingdom_modal(
+            parseInt(e.target.getAttribute("data-kingdom-id")),
+        );
     }
 
     render() {
@@ -27,8 +31,7 @@ export default class NpcKingdomPin extends React.Component<NpcKingdomPinProps, {
                 className="kingdom-x-pin"
                 style={this.kingdomStyle()}
                 onClick={this.openKingdomModal.bind(this)}
-            >
-            </div>
+            ></div>
         );
     }
 }

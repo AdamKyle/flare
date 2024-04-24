@@ -6,18 +6,17 @@ import { DateTime } from "luxon";
  * @param timeLeft
  */
 const calculateTimeLeft = (timeLeft: string): number => {
-
     const future = DateTime.fromISO(timeLeft);
-    const now    = DateTime.now();
+    const now = DateTime.now();
 
-    const diff       = future.diff(now, ['seconds']);
+    const diff = future.diff(now, ["seconds"]);
     const objectDiff = diff.toObject();
 
-    if (typeof objectDiff.seconds === 'undefined') {
+    if (typeof objectDiff.seconds === "undefined") {
         return 0;
     }
 
     return parseInt(objectDiff.seconds.toFixed(0));
-}
+};
 
 export { calculateTimeLeft };

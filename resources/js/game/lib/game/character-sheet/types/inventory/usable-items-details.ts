@@ -49,11 +49,11 @@ export default interface UsableItemsDetails extends DataTableBaseData {
 
     increase_skill_training_bonus_by: number | 0;
 
-    kingdom_damage:number | 0;
+    kingdom_damage: number | 0;
 
     lasts_for: number | 0;
 
-    move_time_out_mod_bonus:number | 0;
+    move_time_out_mod_bonus: number | 0;
 
     skills: string[] | [];
 

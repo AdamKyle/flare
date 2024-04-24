@@ -1,7 +1,6 @@
-import {ChildQuestDetails} from "./child-quest-details";
+import { ChildQuestDetails } from "./child-quest-details";
 
 export interface QuestDetails {
-
     id: number;
 
     parent_id: number;

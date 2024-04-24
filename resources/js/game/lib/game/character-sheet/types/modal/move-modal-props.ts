@@ -1,7 +1,6 @@
-import {UsableSets} from "../../../../../components/modals/item-details/types/item-details-modal-state";
+import { UsableSets } from "../../../../../components/modals/item-details/types/item-details-modal-state";
 
 export default interface MoveModalProps {
-
     is_open: boolean;
 
     usable_sets: UsableSets[] | [];

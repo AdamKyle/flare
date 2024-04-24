@@ -14,15 +14,23 @@
  * }
  */
 import CharacterCurrenciesDetails from "../../../lib/game/types/character-currencies-details";
-import {removeCommas} from "../../../lib/game/format-number";
+import { removeCommas } from "../../../lib/game/format-number";
 
-export const fetchCost = (xPosition: number, yPosition: number, characterPosition?: {x: number, y: number}, currencies?: CharacterCurrenciesDetails): {
-    can_afford: boolean,
-    distance: number,
-    cost: number,
-    time_out: number,
-} =>  {
-    if (typeof characterPosition === 'undefined' || typeof currencies === 'undefined') {
+export const fetchCost = (
+    xPosition: number,
+    yPosition: number,
+    characterPosition?: { x: number; y: number },
+    currencies?: CharacterCurrenciesDetails,
+): {
+    can_afford: boolean;
+    distance: number;
+    cost: number;
+    time_out: number;
+} => {
+    if (
+        typeof characterPosition === "undefined" ||
+        typeof currencies === "undefined"
+    ) {
         return {
             can_afford: true,
             distance: 0,
@@ -32,9 +40,9 @@ export const fetchCost = (xPosition: number, yPosition: number, characterPositio
     }
 
     const distance = calculateDistance(xPosition, yPosition, characterPosition);
-    const time     = Math.round(distance / 60);
-    const cost     = time * 1000;
-    let canAfford  = true;
+    const time = Math.round(distance / 60);
+    const cost = time * 1000;
+    let canAfford = true;
 
     if (currencies == null) {
         canAfford = false;
@@ -50,7 +58,7 @@ export const fetchCost = (xPosition: number, yPosition: number, characterPositio
         cost: cost,
         time_out: time,
     };
-}
+};
 
 /**
  * Calculate the distance between where the player is and where they are going.
@@ -61,9 +69,13 @@ export const fetchCost = (xPosition: number, yPosition: number, characterPositio
  * @return number
  * @type [{xPosition: number, yPosition: number, characterPosition: {x: number, y: number}}]
  */
-const calculateDistance = (xPosition: number, yPosition: number, characterPosition: {x: number, y: number}): number =>  {
-    const distanceX = Math.pow((xPosition - characterPosition.x), 2);
-    const distanceY = Math.pow((yPosition - characterPosition.y), 2);
+const calculateDistance = (
+    xPosition: number,
+    yPosition: number,
+    characterPosition: { x: number; y: number },
+): number => {
+    const distanceX = Math.pow(xPosition - characterPosition.x, 2);
+    const distanceY = Math.pow(yPosition - characterPosition.y, 2);
 
     let distance = distanceX + distanceY;
     distance = Math.sqrt(distance);
@@ -73,4 +85,4 @@ const calculateDistance = (xPosition: number, yPosition: number, characterPositi
     }
 
     return Math.round(distance);
-}
+};

@@ -1,7 +1,6 @@
 import KingdomDetails from "../../../../kingdom-details";
 
 export default interface KingdomDetailsProps {
-
     kingdom_id: number;
 
     character_id: number;

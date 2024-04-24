@@ -2,7 +2,10 @@ import React from "react";
 import Select from "react-select";
 import SelectItemToCraftProps from "./types/select-item-to-craft-props";
 
-export default class SelectItemToCraft extends React.Component<SelectItemToCraftProps, any> {
+export default class SelectItemToCraft extends React.Component<
+    SelectItemToCraftProps,
+    any
+> {
     constructor(props: SelectItemToCraftProps) {
         super(props);
     }

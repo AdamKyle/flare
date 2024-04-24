@@ -3,7 +3,6 @@ import SetDetails from "./set-details";
 import UsableItemsDetails from "./usable-items-details";
 
 export default interface Inventory {
-
     equipped: InventoryDetails[] | [];
 
     inventory: InventoryDetails[] | [];
@@ -16,7 +15,14 @@ export default interface Inventory {
 
     usable_sets: SetDetails[] | [];
 
-    sets: {[key: string]: {equippable: boolean; items: InventoryDetails[] | [], set_id: number, equipped: boolean}}
+    sets: {
+        [key: string]: {
+            equippable: boolean;
+            items: InventoryDetails[] | [];
+            set_id: number;
+            equipped: boolean;
+        };
+    };
 
     set_is_equipped: boolean;
 

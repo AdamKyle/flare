@@ -10,13 +10,13 @@ export default class InventoryItemGemDetails extends React.Component<any, any> {
 
     atonementChanges(
         originalAtonement: any,
-        equippedAtonement: any
+        equippedAtonement: any,
     ): JSX.Element[] | [] {
         const atonements = Object.entries(originalAtonement.atonements).map(
-            ([key, value]) => ({ [key]: value })
+            ([key, value]) => ({ [key]: value }),
         );
         const equippedAtonements = Object.entries(equippedAtonement).map(
-            ([key, value]) => ({ [key]: value })
+            ([key, value]) => ({ [key]: value }),
         );
 
         const elements: JSX.Element[] = [];
@@ -27,7 +27,7 @@ export default class InventoryItemGemDetails extends React.Component<any, any> {
 
             const value = this.findAtonementForChange(
                 equippedAtonements,
-                atonementName
+                atonementName,
             );
 
             const total = parseFloat(atonementValue);
@@ -39,7 +39,7 @@ export default class InventoryItemGemDetails extends React.Component<any, any> {
                         <dd className="text-green-700 dark:text-green-500">
                             +{(total * 100).toFixed(0)}%
                         </dd>
-                    </Fragment>
+                    </Fragment>,
                 );
             }
 
@@ -55,7 +55,7 @@ export default class InventoryItemGemDetails extends React.Component<any, any> {
                             ).toFixed(0)}
                             %
                         </dd>
-                    </Fragment>
+                    </Fragment>,
                 );
             }
 
@@ -66,7 +66,7 @@ export default class InventoryItemGemDetails extends React.Component<any, any> {
                         <dd className="text-red-700 dark:text-red-500">
                             -{((total - value) * 100).toFixed(0)}%
                         </dd>
-                    </Fragment>
+                    </Fragment>,
                 );
             }
 
@@ -74,7 +74,7 @@ export default class InventoryItemGemDetails extends React.Component<any, any> {
                 <Fragment>
                     <dt>{atonementName}</dt>
                     <dd>{(total * 100).toFixed(0)}%</dd>
-                </Fragment>
+                </Fragment>,
             );
         });
 
@@ -83,7 +83,7 @@ export default class InventoryItemGemDetails extends React.Component<any, any> {
 
     findAtonementForChange(
         equippedAtonements: any,
-        atonementName: string
+        atonementName: string,
     ): number {
         let matchedValue = 0;
 
@@ -109,7 +109,7 @@ export default class InventoryItemGemDetails extends React.Component<any, any> {
                 <dl>
                     {this.atonementChanges(
                         originalAtonement,
-                        equippedAtonement.data.atonements
+                        equippedAtonement.data.atonements,
                     )}
                 </dl>
             </BasicCard>
@@ -129,9 +129,7 @@ export default class InventoryItemGemDetails extends React.Component<any, any> {
                     <BasicCard>
                         <RenderAtonementDetails
                             title={"This Items Atonement"}
-                            original_atonement={
-                                this.props.item_atonement
-                            }
+                            original_atonement={this.props.item_atonement}
                         />
                         <h4 className="my-4">Elemental Atonement</h4>
                         <dl>
@@ -157,7 +155,7 @@ export default class InventoryItemGemDetails extends React.Component<any, any> {
                     <div>
                         {this.renderAtonementChanges(
                             this.props.item_atonement,
-                            this.props.equipped_atonements[0]
+                            this.props.equipped_atonements[0],
                         )}
 
                         {typeof this.props.equipped_atonements[1] !==
@@ -166,7 +164,7 @@ export default class InventoryItemGemDetails extends React.Component<any, any> {
                                 <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6"></div>
                                 {this.renderAtonementChanges(
                                     this.props.item_atonement,
-                                    this.props.equipped_atonements[1]
+                                    this.props.equipped_atonements[1],
                                 )}
                             </Fragment>
                         ) : null}

@@ -8,5 +8,5 @@ export default interface GuideQuestState {
     quest_data: null | GuideQuest;
     can_hand_in: boolean;
     is_handing_in: boolean;
-    completed_requirements: string[]|[],
+    completed_requirements: string[] | [];
 }

@@ -107,9 +107,8 @@ export default class InventoryTabSection extends React.Component<
     handleEquipBest() {
         this.setState({
             show_equip_best: !this.state.show_equip_best,
-        })
+        });
     }
-
 
     manageDisenchantAll() {
         this.setState({
@@ -197,7 +196,7 @@ export default class InventoryTabSection extends React.Component<
             },
             () => {
                 this.props.update_inventory(inventory);
-            }
+            },
         );
     }
 
@@ -468,29 +467,45 @@ export default class InventoryTabSection extends React.Component<
                         update_inventory={this.props.update_inventory}
                         set_success_message={this.setSuccessMessage.bind(this)}
                     >
-                        <WarningAlert additional_css={'my-4'}>
-                            <p className={'mb-4'}>
-                                This is a highly experimental feature which might break or give unexpected results
+                        <WarningAlert additional_css={"my-4"}>
+                            <p className={"mb-4"}>
+                                This is a highly experimental feature which
+                                might break or give unexpected results
                             </p>
-                            <p className={'mb-4'}>
-                                The core of this feature is to allow you to have the game automatically equip what it think's is
-                                the best equipment. This does not take into account any skills on the item or that you are training and
-                                does not take into account your current class in relation to whats might be best for it.
+                            <p className={"mb-4"}>
+                                The core of this feature is to allow you to have
+                                the game automatically equip what it think's is
+                                the best equipment. This does not take into
+                                account any skills on the item or that you are
+                                training and does not take into account your
+                                current class in relation to whats might be best
+                                for it.
                             </p>
                             <p>
-                                If you encounter issues or bugs please, with as much details as you can, post the issues in {" "}
-                                <a href='https://discord.gg/hcwdqJUerh' target="_blank">
-                                    Discord #bugs <i
-                                    className="fas fa-external-link-alt"></i>
+                                If you encounter issues or bugs please, with as
+                                much details as you can, post the issues in{" "}
+                                <a
+                                    href="https://discord.gg/hcwdqJUerh"
+                                    target="_blank"
+                                >
+                                    Discord #bugs{" "}
+                                    <i className="fas fa-external-link-alt"></i>
                                 </a>
                             </p>
                         </WarningAlert>
                         <p>
-                            Based on equippable positions, what you may or may not have equipped and following <a href='/information/equipment-sets' target="_blank">
-                            Rules of equipment <i
-                            className="fas fa-external-link-alt"></i>
-                        </a>, we will compare whats in your inventory to whats equipped and replace or equip
-                            what's considered better for your character.
+                            Based on equippable positions, what you may or may
+                            not have equipped and following{" "}
+                            <a
+                                href="/information/equipment-sets"
+                                target="_blank"
+                            >
+                                Rules of equipment{" "}
+                                <i className="fas fa-external-link-alt"></i>
+                            </a>
+                            , we will compare whats in your inventory to whats
+                            equipped and replace or equip what's considered
+                            better for your character.
                         </p>
                     </InventoryActionConfirmationModal>
                 ) : null}

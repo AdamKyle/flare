@@ -1,7 +1,6 @@
 import ItemToEquip from "../../../item-comparison/deffinitions/item-to-equip";
 
 export default interface SellModalProps {
-
     is_open: boolean;
 
     manage_modal: () => void;

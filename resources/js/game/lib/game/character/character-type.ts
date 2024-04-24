@@ -137,9 +137,9 @@ export interface CharacterType {
 
     automation_completed_at: number;
 
-    xp: number,
+    xp: number;
 
-    xp_next: number,
+    xp_next: number;
 
     level: string;
 
@@ -227,5 +227,5 @@ export interface CharacterType {
 
     can_see_pledge_tab: boolean;
 
-    pledged_to_faction_id: number | null
+    pledged_to_faction_id: number | null;
 }

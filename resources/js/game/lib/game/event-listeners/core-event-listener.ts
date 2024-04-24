@@ -1,7 +1,6 @@
 import Echo from "laravel-echo";
 
 export default class CoreEventListener {
-
     private echo?: Echo;
 
     /**
@@ -10,25 +9,27 @@ export default class CoreEventListener {
      * @throws Error - if csrf token is missing.
      */
     public initialize(): void {
-        let token: HTMLMetaElement | null = document.head.querySelector('meta[name="csrf-token"]');
+        let token: HTMLMetaElement | null = document.head.querySelector(
+            'meta[name="csrf-token"]',
+        );
 
         if (token === null) {
-            throw new Error('CSRF Token is missing. Failed to initialize.');
+            throw new Error("CSRF Token is missing. Failed to initialize.");
         }
 
         this.echo = new Echo({
-            broadcaster: 'pusher',
+            broadcaster: "pusher",
             key: (import.meta as any).env.VITE_PUSHER_APP_KEY,
             wsHost: window.location.hostname,
             wsPort: 6001,
             wssPort: 6001,
-            enabledTransports: ['ws', 'wss'],
-            namespace: 'App',
+            enabledTransports: ["ws", "wss"],
+            namespace: "App",
             auth: {
                 headers: {
-                    'X-CSRF-TOKEN': token.content
-                }
-            }
+                    "X-CSRF-TOKEN": token.content,
+                },
+            },
         });
     }
 
@@ -42,6 +43,6 @@ export default class CoreEventListener {
             return this.echo;
         }
 
-        throw new Error('Echo has not been initialized.');
+        throw new Error("Echo has not been initialized.");
     }
 }

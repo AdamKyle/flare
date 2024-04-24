@@ -1,5 +1,4 @@
 export default interface KingdomDamageSlotItems {
-
     id: number;
 
     item: {

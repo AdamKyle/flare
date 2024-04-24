@@ -27,7 +27,6 @@ export default class Enchanting extends React.Component<
     EnchantingProps,
     EnchantingState
 > {
-
     private characterStatus: any;
 
     constructor(props: EnchantingProps) {
@@ -54,7 +53,7 @@ export default class Enchanting extends React.Component<
 
         // @ts-ignore
         this.characterStatus = Echo.private(
-            "update-character-status-" + this.props.user_id
+            "update-character-status-" + this.props.user_id,
         );
     }
 
@@ -66,7 +65,8 @@ export default class Enchanting extends React.Component<
                 loading: false,
                 enchantable_items: result.data.affixes.character_inventory,
                 event_items: result.data.affixes.items_for_event,
-                show_enchanting_for_event: result.data.affixes.show_enchanting_for_event,
+                show_enchanting_for_event:
+                    result.data.affixes.show_enchanting_for_event,
                 enchantments: result.data.affixes.affixes,
                 skill_xp: result.data.skill_xp,
             });
@@ -76,9 +76,10 @@ export default class Enchanting extends React.Component<
             "Game.Battle.Events.UpdateCharacterStatus",
             (event: any) => {
                 this.setState({
-                    show_enchanting_for_event: event.characterStatuses.show_enchanting_for_event
+                    show_enchanting_for_event:
+                        event.characterStatuses.show_enchanting_for_event,
                 });
-            }
+            },
         );
     }
 
@@ -95,7 +96,7 @@ export default class Enchanting extends React.Component<
             () => {
                 const url = craftingPostEndPoints(
                     "enchant",
-                    this.props.character_id
+                    this.props.character_id,
                 );
 
                 new Ajax()
@@ -106,13 +107,13 @@ export default class Enchanting extends React.Component<
                             this.state.selected_prefix,
                             this.state.selected_suffix,
                         ],
-                        enchant_for_event: enchantForEvent
+                        enchant_for_event: enchantForEvent,
                     })
                     .doAjaxCall(
                         "post",
                         (result: AxiosResponse) => {
                             const oldEnchantments = JSON.parse(
-                                JSON.stringify(this.state.enchantments)
+                                JSON.stringify(this.state.enchantments),
                             );
 
                             this.setState(
@@ -120,8 +121,11 @@ export default class Enchanting extends React.Component<
                                     loading: false,
                                     enchantable_items:
                                         result.data.affixes.character_inventory,
-                                    event_items: result.data.affixes.items_for_event,
-                                    show_enchanting_for_event: result.data.affixes.show_enchanting_for_event,
+                                    event_items:
+                                        result.data.affixes.items_for_event,
+                                    show_enchanting_for_event:
+                                        result.data.affixes
+                                            .show_enchanting_for_event,
                                     enchantments: result.data.affixes.affixes,
                                     skill_xp: result.data.skill_xp,
                                 },
@@ -129,19 +133,24 @@ export default class Enchanting extends React.Component<
                                     if (
                                         !isEqual(
                                             oldEnchantments,
-                                            result.data.affixes.affixes
+                                            result.data.affixes.affixes,
                                         )
                                     ) {
                                         generateServerMessage(
                                             "new_items",
-                                            "You have new enchantments. Check the list(s)!"
+                                            "You have new enchantments. Check the list(s)!",
                                         );
                                     }
 
-                                    if (result.data.affixes.items_for_event.length > 0 && this.state.selected_type === 'event') {
+                                    if (
+                                        result.data.affixes.items_for_event
+                                            .length > 0 &&
+                                        this.state.selected_type === "event"
+                                    ) {
                                         this.setState({
                                             selected_item:
-                                            result.data.affixes.items_for_event[0].slot_id,
+                                                result.data.affixes
+                                                    .items_for_event[0].slot_id,
                                         });
                                     } else if (
                                         result.data.affixes.character_inventory
@@ -155,17 +164,20 @@ export default class Enchanting extends React.Component<
                                         });
                                     }
 
-                                    if (result.data.affixes.items_for_event.length <= 0) {
+                                    if (
+                                        result.data.affixes.items_for_event
+                                            .length <= 0
+                                    ) {
                                         this.setState({
-                                            selected_type: 'regular',
-                                        })
+                                            selected_type: "regular",
+                                        });
                                     }
-                                }
+                                },
                             );
                         },
-                        (error: AxiosError) => {}
+                        (error: AxiosError) => {},
                     );
-            }
+            },
         );
     }
 
@@ -194,7 +206,6 @@ export default class Enchanting extends React.Component<
     }
 
     renderItemsToEnchantSelection() {
-
         if (this.state.selected_type === null) {
             return this.state.enchantable_items.map((item: any) => {
                 return {
@@ -204,7 +215,7 @@ export default class Enchanting extends React.Component<
             });
         }
 
-        if (this.state.selected_type !== 'regular') {
+        if (this.state.selected_type !== "regular") {
             return this.state.event_items.map((item: any) => {
                 return {
                     label: item.item_name,
@@ -222,13 +233,16 @@ export default class Enchanting extends React.Component<
     }
 
     renderEnchantmentTypes() {
-        return [{
-            label: 'Event',
-            value: 'event'
-        }, {
-            label: 'Regular',
-            value: 'regular',
-        }];
+        return [
+            {
+                label: "Event",
+                value: "event",
+            },
+            {
+                label: "Regular",
+                value: "regular",
+            },
+        ];
     }
 
     resetPrefixes() {
@@ -247,7 +261,7 @@ export default class Enchanting extends React.Component<
         const enchantments = this.state.enchantments.filter(
             (enchantment: any) => {
                 return enchantment.type === type;
-            }
+            },
         );
 
         return enchantments.map((enchantment: any) => {
@@ -276,10 +290,9 @@ export default class Enchanting extends React.Component<
                 };
             }
 
-            foundItem =
-                this.state.event_items.filter((item: any) => {
-                    return item.slot_id === this.state.selected_item;
-                });
+            foundItem = this.state.event_items.filter((item: any) => {
+                return item.slot_id === this.state.selected_item;
+            });
 
             if (foundItem.length > 0) {
                 return {
@@ -324,10 +337,12 @@ export default class Enchanting extends React.Component<
     }
 
     selectedTypeOfEnchantment() {
-
         if (this.state.selected_type !== null) {
             return {
-                label: this.state.selected_type === 'regular' ? 'Regular' : 'Event',
+                label:
+                    this.state.selected_type === "regular"
+                        ? "Regular"
+                        : "Event",
                 value: this.state.selected_type,
             };
         }
@@ -348,32 +363,30 @@ export default class Enchanting extends React.Component<
         );
     }
 
-
     render() {
         return (
             <Fragment>
                 <div className="mt-2 grid lg:grid-cols-3 gap-2 lg:ml-[120px]">
-                    {
-                        this.state.show_enchanting_for_event && this.state.event_items.length > 0 ?
-                            <div className="col-start-1 col-span-2">
-                                <Select
-                                    onChange={this.setTypeOfEnchanting.bind(this)}
-                                    options={this.renderEnchantmentTypes()}
-                                    menuPosition={"absolute"}
-                                    menuPlacement={"bottom"}
-                                    styles={{
-                                        menuPortal: (base: any) => ({
-                                            ...base,
-                                            zIndex: 9999,
-                                            color: "#000000",
-                                        }),
-                                    }}
-                                    menuPortalTarget={document.body}
-                                    value={this.selectedTypeOfEnchantment()}
-                                />
-                            </div>
-                        : null
-                    }
+                    {this.state.show_enchanting_for_event &&
+                    this.state.event_items.length > 0 ? (
+                        <div className="col-start-1 col-span-2">
+                            <Select
+                                onChange={this.setTypeOfEnchanting.bind(this)}
+                                options={this.renderEnchantmentTypes()}
+                                menuPosition={"absolute"}
+                                menuPlacement={"bottom"}
+                                styles={{
+                                    menuPortal: (base: any) => ({
+                                        ...base,
+                                        zIndex: 9999,
+                                        color: "#000000",
+                                    }),
+                                }}
+                                menuPortalTarget={document.body}
+                                value={this.selectedTypeOfEnchantment()}
+                            />
+                        </div>
+                    ) : null}
                     <div className="col-start-1 col-span-2">
                         <Select
                             onChange={this.setSelectedItem.bind(this)}
@@ -390,7 +403,9 @@ export default class Enchanting extends React.Component<
                             menuPortalTarget={document.body}
                             value={this.selectedItemToEnchant()}
                             isDisabled={
-                                (this.state.show_enchanting_for_event && this.state.event_items.length > 0 && this.state.selected_type === null)
+                                this.state.show_enchanting_for_event &&
+                                this.state.event_items.length > 0 &&
+                                this.state.selected_type === null
                             }
                         />
                     </div>
@@ -400,7 +415,7 @@ export default class Enchanting extends React.Component<
                                 <Select
                                     onChange={this.setPrefix.bind(this)}
                                     options={this.renderEnchantmentOptions(
-                                        "prefix"
+                                        "prefix",
                                     )}
                                     menuPosition={"absolute"}
                                     menuPlacement={"bottom"}
@@ -414,8 +429,11 @@ export default class Enchanting extends React.Component<
                                     menuPortalTarget={document.body}
                                     value={this.selectedEnchantment("prefix")}
                                     isDisabled={
-                                        (this.state.show_enchanting_for_event && this.state.event_items.length > 0 && this.state.selected_type === null)
-                                        || this.state.selected_item === null
+                                        (this.state.show_enchanting_for_event &&
+                                            this.state.event_items.length > 0 &&
+                                            this.state.selected_type ===
+                                                null) ||
+                                        this.state.selected_item === null
                                     }
                                 />
                             </div>
@@ -430,7 +448,7 @@ export default class Enchanting extends React.Component<
                             <Select
                                 onChange={this.setPrefix.bind(this)}
                                 options={this.renderEnchantmentOptions(
-                                    "prefix"
+                                    "prefix",
                                 )}
                                 menuPosition={"absolute"}
                                 menuPlacement={"bottom"}
@@ -444,8 +462,10 @@ export default class Enchanting extends React.Component<
                                 menuPortalTarget={document.body}
                                 value={this.selectedEnchantment("prefix")}
                                 isDisabled={
-                                    (this.state.show_enchanting_for_event && this.state.event_items.length > 0 && this.state.selected_type === null)
-                                    || this.state.selected_item === null
+                                    (this.state.show_enchanting_for_event &&
+                                        this.state.event_items.length > 0 &&
+                                        this.state.selected_type === null) ||
+                                    this.state.selected_item === null
                                 }
                             />
                         </div>
@@ -462,7 +482,7 @@ export default class Enchanting extends React.Component<
                                 <Select
                                     onChange={this.setSuffix.bind(this)}
                                     options={this.renderEnchantmentOptions(
-                                        "suffix"
+                                        "suffix",
                                     )}
                                     menuPosition={"absolute"}
                                     menuPlacement={"bottom"}
@@ -476,8 +496,11 @@ export default class Enchanting extends React.Component<
                                     menuPortalTarget={document.body}
                                     value={this.selectedEnchantment("suffix")}
                                     isDisabled={
-                                        (this.state.show_enchanting_for_event && this.state.event_items.length > 0 && this.state.selected_type === null)
-                                        || this.state.selected_item === null
+                                        (this.state.show_enchanting_for_event &&
+                                            this.state.event_items.length > 0 &&
+                                            this.state.selected_type ===
+                                                null) ||
+                                        this.state.selected_item === null
                                     }
                                 />
                             </div>
@@ -492,7 +515,7 @@ export default class Enchanting extends React.Component<
                             <Select
                                 onChange={this.setSuffix.bind(this)}
                                 options={this.renderEnchantmentOptions(
-                                    "suffix"
+                                    "suffix",
                                 )}
                                 menuPosition={"absolute"}
                                 menuPlacement={"bottom"}
@@ -506,8 +529,10 @@ export default class Enchanting extends React.Component<
                                 menuPortalTarget={document.body}
                                 value={this.selectedEnchantment("suffix")}
                                 isDisabled={
-                                    (this.state.show_enchanting_for_event && this.state.event_items.length > 0 && this.state.selected_type === null)
-                                    || this.state.selected_item === null
+                                    (this.state.show_enchanting_for_event &&
+                                        this.state.event_items.length > 0 &&
+                                        this.state.selected_type === null) ||
+                                    this.state.selected_item === null
                                 }
                             />
                         </div>
@@ -528,30 +553,33 @@ export default class Enchanting extends React.Component<
                         </div>
                     ) : null}
                 </div>
-                {
-                    this.state.event_items.length <= 0 && this.state.show_enchanting_for_event ?
-                        <InfoAlert additional_css={'my-4 m-auto lg:w-1/2 relative lg:left-[-60px]'}>
-                            You have no event crafted items. You can craft your own items and either enchant them for
-                            your self or enchant for event and participate in the event for a Legendary item.
-                        </InfoAlert>
-                    : null
-                }
+                {this.state.event_items.length <= 0 &&
+                this.state.show_enchanting_for_event ? (
+                    <InfoAlert
+                        additional_css={
+                            "my-4 m-auto lg:w-1/2 relative lg:left-[-60px]"
+                        }
+                    >
+                        You have no event crafted items. You can craft your own
+                        items and either enchant them for your self or enchant
+                        for event and participate in the event for a Legendary
+                        item.
+                    </InfoAlert>
+                ) : null}
                 <div className={"text-center md:ml-[-100px] mt-3 mb-3"}>
                     <PrimaryButton
                         button_label={"Enchant"}
                         on_click={() => this.enchant(false)}
                         disabled={this.cannotCraft()}
                     />
-                    {
-                        this.state.show_enchanting_for_event ?
-                            <OrangeButton
-                                button_label={"Enchant for event"}
-                                on_click={() => this.enchant(true)}
-                                disabled={this.cannotCraft()}
-                                additional_css={'ml-2'}
-                            />
-                        : null
-                    }
+                    {this.state.show_enchanting_for_event ? (
+                        <OrangeButton
+                            button_label={"Enchant for event"}
+                            on_click={() => this.enchant(true)}
+                            disabled={this.cannotCraft()}
+                            additional_css={"ml-2"}
+                        />
+                    ) : null}
 
                     <DangerButton
                         button_label={"Close"}

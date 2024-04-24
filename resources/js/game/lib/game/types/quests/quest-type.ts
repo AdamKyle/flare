@@ -1,10 +1,9 @@
-import {QuestDetails} from "../../../../sections/map/types/quest-details";
+import { QuestDetails } from "../../../../sections/map/types/quest-details";
 
 export default interface QuestType {
+    quests: QuestDetails[] | [];
 
-    quests: QuestDetails[]|[];
-
-    raid_quests: QuestDetails[]|[];
+    raid_quests: QuestDetails[] | [];
 
     completed_quests: number[];
 

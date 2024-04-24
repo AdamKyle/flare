@@ -5,6 +5,11 @@ export default interface ChatType {
     message: string;
     x: number;
     y: number;
-    type: 'chat' | 'creator-message' | 'global-message' | 'error-message' | 'private-message-sent',
-    hide_location: boolean,
+    type:
+        | "chat"
+        | "creator-message"
+        | "global-message"
+        | "error-message"
+        | "private-message-sent";
+    hide_location: boolean;
 }

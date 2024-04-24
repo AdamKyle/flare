@@ -3,7 +3,7 @@ import ConditionalDataTableRowsStyling from "./conditional-data-table-rows-styli
 
 export default interface DataTableProps {
     columns: DataTableBaseData[] | [];
-    data: any[]|[];
+    data: any[] | [];
     dark_table: boolean;
     conditional_row_styles?: ConditionalDataTableRowsStyling[];
 }

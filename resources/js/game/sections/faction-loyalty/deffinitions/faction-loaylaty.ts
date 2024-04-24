@@ -1,15 +1,14 @@
-
 export interface NPC {
-    id: number,
-    game_map_id: number,
-    name: string,
-    real_name: string,
-    type: number,
-    x_position: number,
-    y_position: number,
+    id: number;
+    game_map_id: number;
+    name: string;
+    real_name: string;
+    type: number;
+    x_position: number;
+    y_position: number;
 }
 
-export interface  FactionLoyalty {
+export interface FactionLoyalty {
     id: number;
     character_id: number;
     faction_id: number;
@@ -18,7 +17,7 @@ export interface  FactionLoyalty {
 }
 
 export interface FactionLoyaltyNpc {
-    id:  number;
+    id: number;
     faction_loyalty_id: number;
     npc_id: number;
     current_level: number;
@@ -28,19 +27,19 @@ export interface FactionLoyaltyNpc {
     kingdom_item_defence_bonus: number;
     current_fame: number;
     current_kingdom_item_defence_bonus: number;
-    npc: NPC,
-    faction_loyalty_npc_tasks: FactionLoyaltyNpcTask,
+    npc: NPC;
+    faction_loyalty_npc_tasks: FactionLoyaltyNpcTask;
 }
 
 export interface FactionLoyaltyNpcTask {
-    id: 1,
-    faction_loyalty_id: 1,
-    faction_loyalty_npc_id: 1,
-    fame_tasks: FameTasks[]|[],
+    id: 1;
+    faction_loyalty_id: 1;
+    faction_loyalty_npc_id: 1;
+    fame_tasks: FameTasks[] | [];
 }
 
 export interface FameTasks {
-    type: 'bounty' | string;
+    type: "bounty" | string;
     monster_id?: number;
     monster_name?: string;
     item_id?: number;

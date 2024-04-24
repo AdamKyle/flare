@@ -1,16 +1,16 @@
 import React, { Fragment } from "react";
-import DateTimePicker from 'react-datetime-picker';
+import DateTimePicker from "react-datetime-picker";
 import Select from "react-select";
 import { setHours, setMinutes } from "date-fns";
 import EventSchedulerFormState from "../types/components/event-scheduler-form-state";
 import EventSchedulerFormProps from "../types/components/event-scheduler-form-props";
 import EventType from "../values/EventType";
-import {Value} from "react-datetime-picker/src/shared/types";
+import { Value } from "react-datetime-picker/src/shared/types";
 
 // Styles for the date picker:
-import 'react-datetime-picker/dist/DateTimePicker.css';
-import 'react-calendar/dist/Calendar.css';
-import 'react-clock/dist/Clock.css';
+import "react-datetime-picker/dist/DateTimePicker.css";
+import "react-calendar/dist/Calendar.css";
+import "react-clock/dist/Clock.css";
 
 export default class EventSchedulerForm extends React.Component<
     EventSchedulerFormProps,
@@ -61,7 +61,7 @@ export default class EventSchedulerForm extends React.Component<
             },
             () => {
                 this.props.update_parent(this.state);
-            }
+            },
         );
     }
 
@@ -72,7 +72,7 @@ export default class EventSchedulerForm extends React.Component<
             },
             () => {
                 this.props.update_parent(this.state);
-            }
+            },
         );
     }
 
@@ -83,7 +83,7 @@ export default class EventSchedulerForm extends React.Component<
             },
             () => {
                 this.props.update_parent(this.state);
-            }
+            },
         );
     }
 
@@ -94,7 +94,7 @@ export default class EventSchedulerForm extends React.Component<
             },
             () => {
                 this.props.update_parent(this.state);
-            }
+            },
         );
     }
 
@@ -109,7 +109,7 @@ export default class EventSchedulerForm extends React.Component<
             },
             () => {
                 this.props.update_parent(this.state);
-            }
+            },
         );
     }
 
@@ -120,7 +120,7 @@ export default class EventSchedulerForm extends React.Component<
                     label: eventType,
                     value: index,
                 };
-            }
+            },
         );
 
         types.unshift({
@@ -151,7 +151,7 @@ export default class EventSchedulerForm extends React.Component<
         const foundValue: string | undefined = this.props.event_types.find(
             (event: string, index: number) => {
                 return index === this.state.selected_event_type;
-            }
+            },
         );
 
         if (typeof foundValue !== "undefined") {
@@ -173,7 +173,7 @@ export default class EventSchedulerForm extends React.Component<
 
     getSelectedRaid() {
         const foundRaid = this.props.raids.find(
-            (raid: any) => raid.id === this.state.selected_raid
+            (raid: any) => raid.id === this.state.selected_raid,
         );
 
         if (typeof foundRaid !== "undefined") {
@@ -197,7 +197,7 @@ export default class EventSchedulerForm extends React.Component<
         const foundValue: string | undefined = this.props.event_types.find(
             (event: string, index: number) => {
                 return index === this.state.selected_event_type;
-            }
+            },
         );
 
         if (typeof foundValue !== "undefined") {
@@ -239,7 +239,7 @@ export default class EventSchedulerForm extends React.Component<
 
                 {EventType.is(
                     EventType.RAID_EVENT,
-                    this.getSelectedEventTypeName()
+                    this.getSelectedEventTypeName(),
                 ) ? (
                     <div className="my-4">
                         <Select
@@ -265,14 +265,20 @@ export default class EventSchedulerForm extends React.Component<
                         <div className="my-3 dark:text-gray-300">
                             <strong>Start Date (and time)</strong>
                         </div>
-                        <DateTimePicker onChange={this.setStartDate.bind(this)} value={this.state.selected_start_date} />
+                        <DateTimePicker
+                            onChange={this.setStartDate.bind(this)}
+                            value={this.state.selected_start_date}
+                        />
                     </div>
 
                     <div className="my-4">
                         <div className="my-3 dark:text-gray-300">
                             <strong>End Date (and time)</strong>
                         </div>
-                        <DateTimePicker onChange={this.setEndDate.bind(this)} value={this.state.selected_end_date} />
+                        <DateTimePicker
+                            onChange={this.setEndDate.bind(this)}
+                            value={this.state.selected_end_date}
+                        />
                     </div>
                 </div>
 

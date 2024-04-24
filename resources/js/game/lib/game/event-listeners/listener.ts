@@ -1,5 +1,4 @@
 export default interface Listener {
-
     /**
      * Use this to register your listener.
      *

@@ -9,9 +9,8 @@ import { DateTime } from "luxon";
  */
 function getRemainingTime(
     timeLeftInSeconds: number,
-    timeStartedInSeconds: number
+    timeStartedInSeconds: number,
 ): number {
-
     if (timeStartedInSeconds <= 0) {
         return timeLeftInSeconds;
     }
@@ -28,4 +27,4 @@ function getRemainingTime(
     return Math.floor(Math.max(seconds_left - timeElapsedInSeconds, 0));
 }
 
-export { getRemainingTime }
+export { getRemainingTime };

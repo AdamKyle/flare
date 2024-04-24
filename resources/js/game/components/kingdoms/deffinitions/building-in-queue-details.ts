@@ -1,4 +1,3 @@
-
 export default interface BuildingInQueueDetails {
     building_id: number;
 

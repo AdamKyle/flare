@@ -1,7 +1,6 @@
-import React, {Fragment, ReactNode} from "react";
+import React, { Fragment, ReactNode } from "react";
 
 export default class RenderAtonementDetails extends React.Component<any, any> {
-
     constructor(props: any) {
         super(props);
     }
@@ -19,15 +18,12 @@ export default class RenderAtonementDetails extends React.Component<any, any> {
         ));
     }
 
-
     render() {
         return (
             <Fragment>
-                <h3 className='my-4'>{this.props.title}</h3>
-                <dl>
-                    {this.renderAtonements(this.props.original_atonement)}
-                </dl>
+                <h3 className="my-4">{this.props.title}</h3>
+                <dl>{this.renderAtonements(this.props.original_atonement)}</dl>
             </Fragment>
-        )
+        );
     }
 }

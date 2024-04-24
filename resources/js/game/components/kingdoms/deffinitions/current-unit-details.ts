@@ -1,5 +1,4 @@
 export default interface CurrentUnitDetails {
-
     amount: number;
 
     game_unit_id: number;

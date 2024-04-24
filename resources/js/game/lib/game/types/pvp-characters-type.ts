@@ -1,5 +1,4 @@
 export default interface PvpCharactersType {
-
     id: number;
 
     name: string;

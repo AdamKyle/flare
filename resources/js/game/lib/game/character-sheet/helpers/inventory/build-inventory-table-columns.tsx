@@ -5,7 +5,7 @@ import ActionsInterface from "./actions-interface";
 import InventoryDetails from "../../types/inventory/inventory-details";
 import UsableItemsDetails from "../../types/inventory/usable-items-details";
 import GemBagDetails from "../../types/inventory/gem-bag-details";
-import {GemBagTable} from "../../../../../sections/character-sheet/components/tabs/inventory-tabs/gem-bag-table";
+import { GemBagTable } from "../../../../../sections/character-sheet/components/tabs/inventory-tabs/gem-bag-table";
 import PrimaryLinkButton from "../../../../../components/ui/buttons/primary-link-button";
 
 /**
@@ -18,28 +18,44 @@ import PrimaryLinkButton from "../../../../../components/ui/buttons/primary-link
  * @param componentName
  * @constructor
  */
-export const BuildInventoryTableColumns = (viewPort: number, component?: ActionsInterface, clickAction?: (item?: InventoryDetails | UsableItemsDetails) => any, manageSkills?: (slotId: number, itemSkills: any[]|[], itemSkillProgressions: any[]) => void, componentName?: string) => {
-
+export const BuildInventoryTableColumns = (
+    viewPort: number,
+    component?: ActionsInterface,
+    clickAction?: (item?: InventoryDetails | UsableItemsDetails) => any,
+    manageSkills?: (
+        slotId: number,
+        itemSkills: any[] | [],
+        itemSkillProgressions: any[],
+    ) => void,
+    componentName?: string,
+) => {
     if (viewPort <= 639) {
         const smallerColumns = [
             {
-                name: 'Name',
-                selector: (row: { item_name: string; }) => row.item_name,
-                cell: (row: any) => <span className='m-auto'><ItemNameColorationButton item={row} on_click={clickAction} /></span>
+                name: "Name",
+                selector: (row: { item_name: string }) => row.item_name,
+                cell: (row: any) => (
+                    <span className="m-auto">
+                        <ItemNameColorationButton
+                            item={row}
+                            on_click={clickAction}
+                        />
+                    </span>
+                ),
             },
             {
-                name: 'Type',
-                selector: (row: { type: string; }) => row.type,
+                name: "Type",
+                selector: (row: { type: string }) => row.type,
                 sortable: true,
             },
         ];
 
-        if (typeof component !== 'undefined') {
+        if (typeof component !== "undefined") {
             smallerColumns.push({
-                name: 'Actions',
-                selector: (row: any) => '',
+                name: "Actions",
+                selector: (row: any) => "",
                 //@ts-ignore
-                cell: (row: any) => component.actions(row)
+                cell: (row: any) => component.actions(row),
             });
         }
 
@@ -48,71 +64,92 @@ export const BuildInventoryTableColumns = (viewPort: number, component?: Actions
 
     const columns = [
         {
-            name: 'Name',
-            selector: (row: { item_name: string; }) => row.item_name,
-            cell: (row: any) => <span className='m-auto'><ItemNameColorationButton item={row} on_click={clickAction} /></span>
+            name: "Name",
+            selector: (row: { item_name: string }) => row.item_name,
+            cell: (row: any) => (
+                <span className="m-auto">
+                    <ItemNameColorationButton
+                        item={row}
+                        on_click={clickAction}
+                    />
+                </span>
+            ),
         },
         {
-            name: 'Type',
-            selector: (row: { type: string; }) => row.type,
+            name: "Type",
+            selector: (row: { type: string }) => row.type,
             sortable: true,
         },
         {
-            name: 'Attack',
-            selector: (row: { attack: number; }) => row.attack,
+            name: "Attack",
+            selector: (row: { attack: number }) => row.attack,
             sortable: true,
-            format: (row: any) => formatNumber(row.attack)
+            format: (row: any) => formatNumber(row.attack),
         },
         {
-            name: 'AC',
-            selector: (row: { ac: number; }) => row.ac,
+            name: "AC",
+            selector: (row: { ac: number }) => row.ac,
             sortable: true,
-            format: (row: any) => formatNumber(row.ac)
+            format: (row: any) => formatNumber(row.ac),
         },
         {
-            name: 'Holy Stacks',
-            selector: (row: { holy_stacks: number; has_holy_stacks_applied: number; }) => row.holy_stacks,
+            name: "Holy Stacks",
+            selector: (row: {
+                holy_stacks: number;
+                has_holy_stacks_applied: number;
+            }) => row.holy_stacks,
             sortable: true,
-            format: (row: any) => row.has_holy_stacks_applied + '/' + row.holy_stacks
+            format: (row: any) =>
+                row.has_holy_stacks_applied + "/" + row.holy_stacks,
         },
-
     ];
 
-    if (typeof componentName !== 'undefined') {
-        if (componentName === 'equipped') {
+    if (typeof componentName !== "undefined") {
+        if (componentName === "equipped") {
             columns.push({
-                name: 'Position',
-                selector: (row: any) => '',
+                name: "Position",
+                selector: (row: any) => "",
                 cell: (row: any) => row.position,
             });
         }
     }
 
-    if (typeof manageSkills !== 'undefined') {
+    if (typeof manageSkills !== "undefined") {
         columns.push({
-            name: 'Item Skills',
+            name: "Item Skills",
             selector: (row: any) => row.item_skill,
-            cell: (row: any) => <span>
-                {
-                    row.item_skill_progressions.length > 0 ?
-                        <PrimaryLinkButton button_label={'Manage Skills'} on_click={() => manageSkills(row.slot_id, row.item_skills, row.item_skill_progressions)} />
-                    : 'N/A'
-                }
-            </span>
+            cell: (row: any) => (
+                <span>
+                    {row.item_skill_progressions.length > 0 ? (
+                        <PrimaryLinkButton
+                            button_label={"Manage Skills"}
+                            on_click={() =>
+                                manageSkills(
+                                    row.slot_id,
+                                    row.item_skills,
+                                    row.item_skill_progressions,
+                                )
+                            }
+                        />
+                    ) : (
+                        "N/A"
+                    )}
+                </span>
+            ),
         });
     }
 
-    if (typeof component !== 'undefined') {
+    if (typeof component !== "undefined") {
         columns.push({
-            name: 'Actions',
-            selector: (row: any) => '',
+            name: "Actions",
+            selector: (row: any) => "",
             // @ts-ignore
-            cell: (row: any) => component.actions(row)
+            cell: (row: any) => component.actions(row),
         });
     }
 
     return columns;
-}
+};
 
 /**
  * Build A limited set of columns.
@@ -122,38 +159,45 @@ export const BuildInventoryTableColumns = (viewPort: number, component?: Actions
  * @param onClick
  * @param usableItem
  */
-export const buildLimitedColumns = (viewPort: number, component?: ActionsInterface, onClick?: (item?: InventoryDetails | UsableItemsDetails) => any, usableItem?: boolean) => {
-
-
+export const buildLimitedColumns = (
+    viewPort: number,
+    component?: ActionsInterface,
+    onClick?: (item?: InventoryDetails | UsableItemsDetails) => any,
+    usableItem?: boolean,
+) => {
     if (viewPort <= 639) {
         const columns = [
             {
-                name: 'Name',
-                selector: (row: { item_name: string; }) => row.item_name,
-                cell: (row: any) => <ItemNameColorationButton item={row} on_click={onClick}/>
+                name: "Name",
+                selector: (row: { item_name: string }) => row.item_name,
+                cell: (row: any) => (
+                    <ItemNameColorationButton item={row} on_click={onClick} />
+                ),
             },
         ];
 
         if (usableItem) {
             columns.push({
-                name: 'Can Stack',
-                selector: (row: any) => '',
-                cell: (row: { can_stack: boolean }) => <span>{row.can_stack ? 'Yes' : 'No'}</span>
-            })
+                name: "Can Stack",
+                selector: (row: any) => "",
+                cell: (row: { can_stack: boolean }) => (
+                    <span>{row.can_stack ? "Yes" : "No"}</span>
+                ),
+            });
         } else {
             columns.push({
-                name: 'Description',
+                name: "Description",
                 selector: (row: any) => row.description,
-                cell: (row: any) => row.description
-            })
+                cell: (row: any) => row.description,
+            });
         }
 
-        if (typeof component !== 'undefined') {
+        if (typeof component !== "undefined") {
             columns.push({
-                name: 'Actions',
-                selector: (row: any) => '',
+                name: "Actions",
+                selector: (row: any) => "",
                 // @ts-ignore
-                cell: (row: any) => component.actions(row)
+                cell: (row: any) => component.actions(row),
             });
         }
 
@@ -162,35 +206,37 @@ export const buildLimitedColumns = (viewPort: number, component?: ActionsInterfa
 
     const columns = [
         {
-            name: 'Name',
-            selector: (row: { item_name: string; }) => row.item_name,
-            cell: (row: any) => <ItemNameColorationButton item={row} on_click={onClick}/>
+            name: "Name",
+            selector: (row: { item_name: string }) => row.item_name,
+            cell: (row: any) => (
+                <ItemNameColorationButton item={row} on_click={onClick} />
+            ),
         },
         {
-            name: 'Description',
-            selector: (row: { description: string; }) => row.description,
-            cell: (row: any) => row.description
+            name: "Description",
+            selector: (row: { description: string }) => row.description,
+            cell: (row: any) => row.description,
         },
     ];
 
     if (usableItem) {
         columns.push({
-            name: 'Can Stack',
-            selector: (row: any) => '',
-            cell: (row: any) => row.can_stack ? 'Yes' : 'No'
-        })
-    }
-
-    if (typeof component !== 'undefined') {
-        columns.push({
-            name: 'Actions',
-            selector: (row: any) => '',
-            cell: (row: any) => component.actions(row)
+            name: "Can Stack",
+            selector: (row: any) => "",
+            cell: (row: any) => (row.can_stack ? "Yes" : "No"),
         });
     }
 
-    return columns
-}
+    if (typeof component !== "undefined") {
+        columns.push({
+            name: "Actions",
+            selector: (row: any) => "",
+            cell: (row: any) => component.actions(row),
+        });
+    }
+
+    return columns;
+};
 
 /**
  * build gem table columns.
@@ -198,52 +244,63 @@ export const buildLimitedColumns = (viewPort: number, component?: ActionsInterfa
  * @param component
  * @param onClick
  */
-export const buildGemColumns = (component: GemBagTable, onClick: (gemSlot: GemBagDetails) => void) => {
+export const buildGemColumns = (
+    component: GemBagTable,
+    onClick: (gemSlot: GemBagDetails) => void,
+) => {
     const columns = [
         {
-            name: 'Name',
+            name: "Name",
             selector: (row: GemBagDetails) => row.name,
-            cell: (row: GemBagDetails) => <button className='text-lime-600 dark:text-lime-500' onClick={() => onClick(row)}>{row.name}</button>
+            cell: (row: GemBagDetails) => (
+                <button
+                    className="text-lime-600 dark:text-lime-500"
+                    onClick={() => onClick(row)}
+                >
+                    {row.name}
+                </button>
+            ),
         },
         {
-            name: 'Tier',
+            name: "Tier",
             selector: (row: GemBagDetails) => row.tier,
-            cell: (row: GemBagDetails) => row.tier
+            cell: (row: GemBagDetails) => row.tier,
         },
         {
-            name: 'Amount',
+            name: "Amount",
             selector: (row: GemBagDetails) => row.amount,
-            cell: (row: GemBagDetails) => row.amount
+            cell: (row: GemBagDetails) => row.amount,
         },
         {
-            name: 'Atoned To',
+            name: "Atoned To",
             selector: (row: GemBagDetails) => row.element_atoned_to,
-            cell: (row: GemBagDetails) => row.element_atoned_to
+            cell: (row: GemBagDetails) => row.element_atoned_to,
         },
         {
-            name: 'Atoned Amount',
+            name: "Atoned Amount",
             selector: (row: GemBagDetails) => row.element_atoned_to_amount,
-            cell: (row: GemBagDetails) => (row.element_atoned_to_amount * 100).toFixed(2) + '%'
+            cell: (row: GemBagDetails) =>
+                (row.element_atoned_to_amount * 100).toFixed(2) + "%",
         },
         {
-            name: 'Strong Against',
+            name: "Strong Against",
             selector: (row: GemBagDetails) => row.strong_against,
-            cell: (row: GemBagDetails) => row.strong_against
+            cell: (row: GemBagDetails) => row.strong_against,
         },
         {
-            name: 'Weak Against',
+            name: "Weak Against",
             selector: (row: GemBagDetails) => row.weak_against,
-            cell: (row: GemBagDetails) => row.weak_against
-        }
+            cell: (row: GemBagDetails) => row.weak_against,
+        },
     ];
 
-    if (typeof component !== 'undefined') {
+    if (typeof component !== "undefined") {
         columns.push({
-            name: 'Actions',
-            selector: (row: any) => '',
-            cell: (row: any) => component.gemActions(row)
+            name: "Actions",
+            selector: (row: any) => "",
+            cell: (row: any) => component.gemActions(row),
         });
     }
 
-    return columns
-}
+    return columns;
+};

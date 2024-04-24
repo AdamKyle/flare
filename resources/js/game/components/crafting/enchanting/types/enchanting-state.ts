@@ -1,7 +1,6 @@
 import SkillXP from "../../base-components/skill-xp/deffinitions/skill-xp";
 
 export interface EnchantingState {
-
     loading: boolean;
 
     selected_item: number | null;
@@ -16,11 +15,11 @@ export interface EnchantingState {
 
     enchantments: ItemToEnchant[];
 
-    event_items: ItemToEnchant[]|[];
+    event_items: ItemToEnchant[] | [];
 
     show_enchanting_for_event: boolean;
 
-    skill_xp: SkillXP
+    skill_xp: SkillXP;
 
     info_message: string | null;
 }
@@ -55,7 +54,7 @@ export type ItemToEnchant = {
     type: string;
 
     usable: boolean;
-}
+};
 
 export type Enchantment = {
     cost: number;
@@ -65,4 +64,4 @@ export type Enchantment = {
     name: string;
 
     type: string;
-}
+};

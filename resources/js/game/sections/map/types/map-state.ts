@@ -7,13 +7,13 @@ export type MapDetails = {
 
     map_id: number | 0;
 
-    map_position: {x: number, y: number};
+    map_position: { x: number; y: number };
 
     map_name: string;
 
     game_map_id: number;
 
-    character_position: {x: number, y: number};
+    character_position: { x: number; y: number };
 
     locations: LocationDetails[] | null;
 
@@ -25,23 +25,23 @@ export type MapDetails = {
 
     npc_kingdoms: NpcKingdomsDetails[] | [];
 
-    coordinates: {x: number[], y: number[]} | null;
+    coordinates: { x: number[]; y: number[] } | null;
 
-    can_player_move: boolean,
+    can_player_move: boolean;
 
-    time_left: number,
+    time_left: number;
 
-    characters_on_map: number,
-}
+    characters_on_map: number;
+};
 
 export default interface MapState extends MapDetails {
     loading: boolean;
 
     automation_time_out: number;
 
-    bottom_bounds: number,
+    bottom_bounds: number;
 
-    right_bounds:  number,
+    right_bounds: number;
 
-    celestial_time_out: number,
+    celestial_time_out: number;
 }

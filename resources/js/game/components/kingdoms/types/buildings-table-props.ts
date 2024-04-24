@@ -2,10 +2,9 @@ import BuildingDetails from "../../../../sections/kingdoms/buildings/deffinition
 import BuildingInQueueDetails from "../deffinitions/building-in-queue-details";
 
 export default interface BuildingsTableProps {
-
     buildings: BuildingDetails[] | [];
 
-    buildings_in_queue: BuildingInQueueDetails[]|[];
+    buildings_in_queue: BuildingInQueueDetails[] | [];
 
     dark_tables: boolean;
 

@@ -1,7 +1,6 @@
 import DataTableBaseData from "../../../../ui/types/tables/data-table-base-data";
 
 export default interface SkillType extends DataTableBaseData {
-
     id: number;
 
     character_id: number;
@@ -29,5 +28,4 @@ export default interface SkillType extends DataTableBaseData {
     xp_towards: number | null;
 
     is_class_skill: boolean;
-
 }

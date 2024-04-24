@@ -1,24 +1,26 @@
-
-import {inject, injectable} from "tsyringe";
-import {Channel} from "laravel-echo";
+import { inject, injectable } from "tsyringe";
+import { Channel } from "laravel-echo";
 import CoreEventListener from "../../../../game/lib/game/event-listeners/core-event-listener";
 import GuideButton from "../guide-button";
 import GuideQuestListenerDefinition from "./guide-quest-listener-definition";
 import Game from "../../../../game/game";
 
 @injectable()
-export default class CompletedGuideQuestListener implements GuideQuestListenerDefinition {
-
+export default class CompletedGuideQuestListener
+    implements GuideQuestListenerDefinition
+{
     private component?: Game | GuideButton;
     private userId?: number;
 
     private guideQuestCompleted?: Channel;
 
-    constructor(@inject(CoreEventListener) private coreEventListener: CoreEventListener) {}
+    constructor(
+        @inject(CoreEventListener) private coreEventListener: CoreEventListener,
+    ) {}
 
     initialize(component: Game | GuideButton, userId: number): void {
         this.component = component;
-        this.userId    = userId
+        this.userId = userId;
     }
 
     register(): void {
@@ -28,9 +30,9 @@ export default class CompletedGuideQuestListener implements GuideQuestListenerDe
             const echo = this.coreEventListener.getEcho();
 
             this.guideQuestCompleted = echo.private(
-                "guide-quest-completed-toast-" + this.userId
+                "guide-quest-completed-toast-" + this.userId,
             );
-        } catch (e: any|unknown) {
+        } catch (e: any | unknown) {
             throw new Error(e);
         }
     }
@@ -38,7 +40,6 @@ export default class CompletedGuideQuestListener implements GuideQuestListenerDe
     listen(): void {
         this.listForGuideQuestToasts();
     }
-
 
     /**
      * Listen for when the guide quest toast should fire.
@@ -68,7 +69,7 @@ export default class CompletedGuideQuestListener implements GuideQuestListenerDe
                         show_guide_quest_completed: event.showQuestCompleted,
                     });
                 }
-            }
+            },
         );
     }
 }

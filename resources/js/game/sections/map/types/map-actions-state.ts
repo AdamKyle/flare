@@ -1,7 +1,6 @@
 import LocationDetails from "./location-details";
 
 export default interface MapActionsState {
-
     show_location_details: boolean;
 
     open_teleport_modal: boolean;
@@ -19,5 +18,4 @@ export default interface MapActionsState {
     npc_kingdom_id: number | null;
 
     location: LocationDetails | null;
-
 }

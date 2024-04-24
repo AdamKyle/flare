@@ -1,7 +1,6 @@
 import Inventory from "./inventory/inventory";
-import ItemSkill from "../../../../../game/sections/character-sheet/components/item-skill-management/types/deffinitions/item-skill"
-import ItemSkillProgressions from "../../../../../game/sections/character-sheet/components/item-skill-management/types/deffinitions/item-skill-progression"
-
+import ItemSkill from "../../../../../game/sections/character-sheet/components/item-skill-management/types/deffinitions/item-skill";
+import ItemSkillProgressions from "../../../../../game/sections/character-sheet/components/item-skill-management/types/deffinitions/item-skill-progression";
 
 export default interface CharacterInventoryTabsState {
     table: string;
@@ -20,4 +19,3 @@ export default interface CharacterInventoryTabsState {
         item_skill_progressions: ItemSkillProgressions[];
     } | null;
 }
-

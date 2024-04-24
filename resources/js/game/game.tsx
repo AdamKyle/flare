@@ -14,9 +14,7 @@ import GameEventListeners from "./lib/game/event-listeners/game-event-listeners"
 import { removeCommas } from "./lib/game/format-number";
 import KingdomLogDetails from "./lib/game/kingdoms/deffinitions/kingdom-log-details";
 import GameProps from "./lib/game/types/game-props";
-import GameState, {
-    GameActionState,
-} from "./lib/game/types/game-state";
+import GameState, { GameActionState } from "./lib/game/types/game-state";
 import QuestType from "./lib/game/types/quests/quest-type";
 import CharacterSheet from "./sections/character-sheet/character-sheet";
 import CharacterTopSection from "./sections/character-top-section/character-top-section";
@@ -37,7 +35,6 @@ import PositionType from "./sections/map/types/map/position-type";
 import ScreenRefresh from "./sections/screen-refresh/screen-refresh";
 
 export default class Game extends React.Component<GameProps, GameState> {
-
     private gameEventListener?: GameEventListeners;
 
     constructor(props: GameProps) {
@@ -131,10 +128,10 @@ export default class Game extends React.Component<GameProps, GameState> {
             this.gameEventListener.listenToEvents();
         }
 
-        if (localStorage.getItem('hide-dontainion') !== null) {
+        if (localStorage.getItem("hide-dontainion") !== null) {
             this.setState({
                 hide_donation_alert: true,
-            })
+            });
         }
     }
 
@@ -151,7 +148,7 @@ export default class Game extends React.Component<GameProps, GameState> {
 
         if (this.state.kingdom_logs.length > 0) {
             const hasLogs = this.state.kingdom_logs.filter(
-                (log: KingdomLogDetails) => !log.opened
+                (log: KingdomLogDetails) => !log.opened,
             );
 
             if (hasLogs.length > 0) {
@@ -200,7 +197,7 @@ export default class Game extends React.Component<GameProps, GameState> {
     updateQuestPlane(plane: string) {
         if (this.state.quests !== null) {
             const quests: QuestType = JSON.parse(
-                JSON.stringify(this.state.quests)
+                JSON.stringify(this.state.quests),
             );
 
             quests.player_plane = plane;
@@ -242,14 +239,14 @@ export default class Game extends React.Component<GameProps, GameState> {
         character.pledged_to_faction_id = factionId;
 
         this.setState({
-            character: character
+            character: character,
         });
     }
 
     updateFactionActionTasks(fameTasks: FameTasks[] | null) {
         this.setState({
             fame_action_tasks: fameTasks,
-        })
+        });
     }
 
     renderLoading() {
@@ -268,11 +265,11 @@ export default class Game extends React.Component<GameProps, GameState> {
     }
 
     closeDonationAlert() {
-        localStorage.setItem('hide-dontainion', 'yes');
+        localStorage.setItem("hide-dontainion", "yes");
 
         this.setState({
             hide_donation_alert: true,
-        })
+        });
     }
 
     render() {
@@ -320,46 +317,65 @@ export default class Game extends React.Component<GameProps, GameState> {
                                         character={this.state.character}
                                         view_port={this.state.view_port}
                                         update_character_status={this.updateCharacterStatus.bind(
-                                            this
+                                            this,
                                         )}
                                         update_character_currencies={this.updateCharacterCurrencies.bind(
-                                            this
+                                            this,
                                         )}
                                     />
                                 </BasicCard>
 
-                                {
-                                    !this.state.hide_donation_alert ?
-                                        <WarningAlert additional_css={'mb-4 mt-[-10px]'} close_alert={this.closeDonationAlert.bind(this)}>
-                                            <p className={'my-2'}>
-                                                <strong>Tlessa needs your help,</strong>
-                                            </p>
+                                {!this.state.hide_donation_alert ? (
+                                    <WarningAlert
+                                        additional_css={"mb-4 mt-[-10px]"}
+                                        close_alert={this.closeDonationAlert.bind(
+                                            this,
+                                        )}
+                                    >
+                                        <p className={"my-2"}>
+                                            <strong>
+                                                Tlessa needs your help,
+                                            </strong>
+                                        </p>
 
-                                            <p className="my-2">
-                                                Tlessa needs your help to survive. Please, consider donating to support the continued development of Planes of Tlessa.
-                                            </p>
+                                        <p className="my-2">
+                                            Tlessa needs your help to survive.
+                                            Please, consider donating to support
+                                            the continued development of Planes
+                                            of Tlessa.
+                                        </p>
 
-                                            <p className="my-2">
-                                                <a href="/tlessa-donations" target="_blank">Learn more here <i className="fas fa-external-link-alt"></i></a>.
-                                                Tlessa and I deeply appreciate your contribution in keeping this amazing game alive!
-                                            </p>
-                                        </WarningAlert>
-                                    : null
+                                        <p className="my-2">
+                                            <a
+                                                href="/tlessa-donations"
+                                                target="_blank"
+                                            >
+                                                Learn more here{" "}
+                                                <i className="fas fa-external-link-alt"></i>
+                                            </a>
+                                            . Tlessa and I deeply appreciate
+                                            your contribution in keeping this
+                                            amazing game alive!
+                                        </p>
+                                    </WarningAlert>
+                                ) : null}
 
-                                }
+                                {this.state.show_guide_quest_completed ? (
+                                    <SuccessAlert additional_css={"mb-4"}>
+                                        You have completed a guide quest. Click
+                                        the button in the top right to collect
+                                        your rewards and move on to the next!
+                                    </SuccessAlert>
+                                ) : null}
 
-                                {
-                                    this.state.show_guide_quest_completed ?
-                                        <SuccessAlert additional_css={'mb-4'}>
-                                            You have completed a guide quest. Click the button in the top right to collect your rewards and move on to the next!
-                                        </SuccessAlert>
-                                    : null
-                                }
-
-                                <div className={clsx({
-                                    'hidden': this.state.view_port > 639
-                                })}>
-                                    <ActiveBoonsActionSection character_id={this.props.characterId} />
+                                <div
+                                    className={clsx({
+                                        hidden: this.state.view_port > 639,
+                                    })}
+                                >
+                                    <ActiveBoonsActionSection
+                                        character_id={this.props.characterId}
+                                    />
                                 </div>
                                 <BasicCard
                                     additionalClasses={clsx("min-h-60", {
@@ -367,26 +383,55 @@ export default class Game extends React.Component<GameProps, GameState> {
                                             this.state.view_port < 1600,
                                     })}
                                 >
-                                    <ActionTabs use_tabs={this.state.character.can_see_pledge_tab}
-                                                character_id={this.props.characterId}
-                                                update_faction_action_tasks={this.updateFactionActionTasks.bind(this)}
+                                    <ActionTabs
+                                        use_tabs={
+                                            this.state.character
+                                                .can_see_pledge_tab
+                                        }
+                                        character_id={this.props.characterId}
+                                        update_faction_action_tasks={this.updateFactionActionTasks.bind(
+                                            this,
+                                        )}
                                     >
                                         <ActionSection
                                             character={this.state.character}
-                                            character_status={this.state.character_status}
-                                            character_position={this.state.position}
-                                            character_currencies={this.state.character_currencies}
-                                            celestial_id={this.state.celestial_id}
-                                            update_celestial={this.updateCelestial.bind(this)}
-                                            update_plane_quests={this.updateQuestPlane.bind(this)}
-                                            update_character_position={this.setCharacterPosition.bind(this)}
+                                            character_status={
+                                                this.state.character_status
+                                            }
+                                            character_position={
+                                                this.state.position
+                                            }
+                                            character_currencies={
+                                                this.state.character_currencies
+                                            }
+                                            celestial_id={
+                                                this.state.celestial_id
+                                            }
+                                            update_celestial={this.updateCelestial.bind(
+                                                this,
+                                            )}
+                                            update_plane_quests={this.updateQuestPlane.bind(
+                                                this,
+                                            )}
+                                            update_character_position={this.setCharacterPosition.bind(
+                                                this,
+                                            )}
                                             view_port={this.state.view_port}
-                                            can_engage_celestial={this.state.character.can_engage_celestials}
+                                            can_engage_celestial={
+                                                this.state.character
+                                                    .can_engage_celestials
+                                            }
                                             action_data={this.state.action_data}
                                             map_data={this.state.map_data}
-                                            update_parent_state={this.setActionState.bind(this)}
-                                            set_map_data={this.setMapState.bind(this)}
-                                            fame_tasks={this.state.fame_action_tasks}
+                                            update_parent_state={this.setActionState.bind(
+                                                this,
+                                            )}
+                                            set_map_data={this.setMapState.bind(
+                                                this,
+                                            )}
+                                            fame_tasks={
+                                                this.state.fame_action_tasks
+                                            }
                                         />
                                     </ActionTabs>
                                 </BasicCard>
@@ -401,7 +446,7 @@ export default class Game extends React.Component<GameProps, GameState> {
                                                     .can_use_event_goals_button,
                                             "max-h-[624px]":
                                                 this.state.character.is_dead,
-                                        }
+                                        },
                                     )}
                                 >
                                     <MapTabs
@@ -414,12 +459,16 @@ export default class Game extends React.Component<GameProps, GameState> {
                                     >
                                         <MapSection
                                             user_id={this.props.userId}
-                                            character_id={this.props.characterId}
+                                            character_id={
+                                                this.props.characterId
+                                            }
                                             view_port={this.state.view_port}
                                             currencies={
                                                 this.state.character_currencies
                                             }
-                                            is_dead={this.state.character.is_dead}
+                                            is_dead={
+                                                this.state.character.is_dead
+                                            }
                                             is_automaton_running={
                                                 this.state.character
                                                     .is_automation_running
@@ -437,18 +486,18 @@ export default class Game extends React.Component<GameProps, GameState> {
                                                     .can_engage_celestials_again_at
                                             }
                                             show_celestial_fight_button={this.updateCelestial.bind(
-                                                this
+                                                this,
                                             )}
                                             set_character_position={this.setCharacterPosition.bind(
-                                                this
+                                                this,
                                             )}
                                             update_character_quests_plane={this.updateQuestPlane.bind(
-                                                this
+                                                this,
                                             )}
                                             disable_bottom_timer={false}
                                             map_data={this.state.map_data}
                                             set_map_data={this.setMapState.bind(
-                                                this
+                                                this,
                                             )}
                                         />
                                     </MapTabs>
@@ -462,10 +511,14 @@ export default class Game extends React.Component<GameProps, GameState> {
                             finished_loading={this.state.finished_loading}
                             view_port={this.state.view_port}
                             update_disable_tabs={this.updateDisabledTabs.bind(
-                                this
+                                this,
                             )}
-                            update_pledge_tab={this.setCanSeeFactionLoyaltyTab.bind(this)}
-                            update_faction_action_tasks={this.updateFactionActionTasks.bind(this)}
+                            update_pledge_tab={this.setCanSeeFactionLoyaltyTab.bind(
+                                this,
+                            )}
+                            update_faction_action_tasks={this.updateFactionActionTasks.bind(
+                                this,
+                            )}
                         />
                     </TabPanel>
                     <TabPanel key={"quests"}>
@@ -474,7 +527,7 @@ export default class Game extends React.Component<GameProps, GameState> {
                                 quest_details={this.state.quests}
                                 character_id={this.props.characterId}
                                 update_quests={this.updateCharacterQuests.bind(
-                                    this
+                                    this,
                                 )}
                             />
                         </BasicCard>
@@ -486,7 +539,7 @@ export default class Game extends React.Component<GameProps, GameState> {
                             logs={this.state.kingdom_logs}
                             view_port={this.state.view_port}
                             character_gold={removeCommas(
-                                this.state.character.gold
+                                this.state.character.gold,
                             )}
                             user_id={this.state.character.user_id}
                         />
@@ -504,7 +557,7 @@ export default class Game extends React.Component<GameProps, GameState> {
                     is_admin={false}
                     view_port={this.state.view_port}
                     update_finished_loading={this.updateFinishedLoading.bind(
-                        this
+                        this,
                     )}
                 />
 

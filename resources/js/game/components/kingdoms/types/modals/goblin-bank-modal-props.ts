@@ -1,7 +1,6 @@
 import BuildingDetails from "../../../../../sections/kingdoms/buildings/deffinitions/building-details";
 
 export default interface GoblinBankModalProps {
-
     is_open: boolean;
 
     handle_close: () => void;

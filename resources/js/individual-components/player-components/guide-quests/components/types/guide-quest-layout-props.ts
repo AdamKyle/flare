@@ -1,5 +1,4 @@
 export default interface GuideQuestLayoutProps {
-
     intro_text: string;
 
     instructions: string;

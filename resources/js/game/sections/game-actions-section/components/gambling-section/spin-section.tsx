@@ -33,13 +33,22 @@ export default class SpinSection extends React.Component<SpinSectionProps, {}> {
                 <div className="max-h-[150px] overflow-hidden mt-4">
                     <div className="grid grid-cols-3">
                         <div>
-                            {renderIcons(this.props.spinning_indexes[0], this.props.icons)}
+                            {renderIcons(
+                                this.props.spinning_indexes[0],
+                                this.props.icons,
+                            )}
                         </div>
                         <div>
-                            {renderIcons(this.props.spinning_indexes[1], this.props.icons)}
+                            {renderIcons(
+                                this.props.spinning_indexes[1],
+                                this.props.icons,
+                            )}
                         </div>
                         <div>
-                            {renderIcons(this.props.spinning_indexes[2], this.props.icons)}
+                            {renderIcons(
+                                this.props.spinning_indexes[2],
+                                this.props.icons,
+                            )}
                         </div>
                     </div>
                 </div>

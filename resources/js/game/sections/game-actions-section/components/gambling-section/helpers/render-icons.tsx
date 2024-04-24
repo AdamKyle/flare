@@ -1,6 +1,5 @@
-import React from 'react'
+import React from "react";
 import IconType from "../../types/icon-type";
-
 
 export const renderIcons = (index: number, icons: IconType[]): JSX.Element => {
     const icon = icons[index];
@@ -14,4 +13,4 @@ export const renderIcons = (index: number, icons: IconType[]): JSX.Element => {
             <p className="text-lg mt-2">{icon.title}</p>
         </div>
     );
-}
+};

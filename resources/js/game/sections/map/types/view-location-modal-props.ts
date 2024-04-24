@@ -1,7 +1,6 @@
 import LocationDetails from "./location-details";
 
 export default interface ViewLocationModalProps {
-
     player_kingdom_id: number | null;
 
     enemy_kingdom_id: number | null;
@@ -14,4 +13,3 @@ export default interface ViewLocationModalProps {
 
     handle_close: () => void;
 }
-

@@ -1,10 +1,10 @@
-import {BattleMessage} from "../../../../../../sections/game-actions-section/components/types/battle-message-type";
+import { BattleMessage } from "../../../../../../sections/game-actions-section/components/types/battle-message-type";
 
 export default interface DuelData {
     attacker_id: number;
     health_object: HealthObject;
     defender_id: number;
-    messages: DuelMessages[]|[];
+    messages: DuelMessages[] | [];
     defender_atonement: string;
     attacker_atonement: string;
 }
@@ -16,4 +16,4 @@ interface HealthObject {
     defender_health: number;
 }
 
-export interface DuelMessages extends BattleMessage {};
+export interface DuelMessages extends BattleMessage {}

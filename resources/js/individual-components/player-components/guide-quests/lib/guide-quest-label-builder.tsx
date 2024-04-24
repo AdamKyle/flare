@@ -2,7 +2,7 @@ import React from "react";
 
 const guideQuestLabelBuilder = (
     key: string,
-    questData: any
+    questData: any,
 ): JSX.Element | string | null => {
     switch (key) {
         case "required_level":
@@ -28,7 +28,7 @@ const guideQuestLabelBuilder = (
                     {buildLabelLink(
                         questData.skill_name,
                         "required_skill",
-                        questData
+                        questData,
                     )}{" "}
                     to level
                 </span>
@@ -42,7 +42,7 @@ const guideQuestLabelBuilder = (
                     {buildLabelLink(
                         questData.secondary_skill_name,
                         "required_secondary_skill",
-                        questData
+                        questData,
                     )}{" "}
                     to level
                 </span>
@@ -72,7 +72,7 @@ const guideQuestLabelBuilder = (
                     {buildLabelLink(
                         questData.passive_name,
                         "required_passive_skill",
-                        questData
+                        questData,
                     )}{" "}
                     to level
                 </span>
@@ -94,9 +94,9 @@ const guideQuestLabelBuilder = (
         case "required_focus":
             return "Get Focus to";
         case "required_specialty_type":
-            return `Purchase a piece of`
+            return `Purchase a piece of`;
         case "required_holy_stacks":
-            return `Applied Holy Oil Amount`
+            return `Applied Holy Oil Amount`;
         case "required_gold":
             return "Obtain Gold amount";
         case "required_gold_dust":
@@ -121,7 +121,7 @@ const guideQuestLabelBuilder = (
 const buildLabelLink = (
     name: string,
     key: string,
-    questData: any
+    questData: any,
 ): JSX.Element | string => {
     switch (key) {
         case "required_skill":
@@ -198,7 +198,7 @@ const getRequirementKey = (labelKey: string): string => {
 const buildValueLink = (
     name: string,
     key: string,
-    questData: any
+    questData: any,
 ): JSX.Element | string | number => {
     switch (key) {
         case "required_quest_id":

@@ -1,26 +1,25 @@
 import ShopAjax from "../ajax/shop-ajax";
 
-import {container, InjectionToken} from 'tsyringe';
+import { container, InjectionToken } from "tsyringe";
 import ShopTableColumns from "../shop-table/colums/shop-table-columns";
 import ShopListener from "../event-listeners/shop-listener";
 
 class ShopContainer {
-
     private static instance: ShopContainer;
 
     public constructor() {
-        this.register('shop-ajax', {
-            useClass: ShopAjax
+        this.register("shop-ajax", {
+            useClass: ShopAjax,
         });
 
-        this.register('shop-table-columns', {
-            useClass: ShopTableColumns
+        this.register("shop-table-columns", {
+            useClass: ShopTableColumns,
         });
 
         // Shop Event Listener
-        this.register('ShopListenerDefinition', {
-            useClass: ShopListener
-        })
+        this.register("ShopListenerDefinition", {
+            useClass: ShopListener,
+        });
     }
 
     /**
@@ -66,7 +65,3 @@ const shopServiceContainer = (): ShopContainer => {
 };
 
 export { shopServiceContainer, ShopContainer };
-
-
-
-

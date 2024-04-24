@@ -6,7 +6,7 @@ import OrangeProgressBar from "../../../components/ui/progress-bars/orange-progr
 import { formatNumber } from "../../../lib/game/format-number";
 import EventGoalsTabState from "./types/event-goals-tab-state";
 import EventGoal from "./definitions/event-goal";
-import {snakeCase} from "lodash";
+import { snakeCase } from "lodash";
 
 export default class EventGoalsTab extends React.Component<
     any,
@@ -29,24 +29,31 @@ export default class EventGoalsTab extends React.Component<
         this.eventGoalsUpdate = Echo.join("update-event-goal-progress");
 
         // @ts-ignore
-        this.playerEventGoalCurrentAmount = Echo.private('player-current-event-goal-progression-' + this.props.user_id)
+        this.playerEventGoalCurrentAmount = Echo.private(
+            "player-current-event-goal-progression-" + this.props.user_id,
+        );
     }
 
     componentDidMount(): void {
-        new Ajax().setRoute("global-event-goals/" + this.props.character_id).doAjaxCall(
-            "get",
-            (result: AxiosResponse) => {
-                this.setState({
-                    loading: false,
-                    eventGoal: result.data.event_goals,
-                }, () => {
-                    this.setCurrentAmount();
-                });
-            },
-            (error: AxiosError) => {
-                console.error(error);
-            }
-        );
+        new Ajax()
+            .setRoute("global-event-goals/" + this.props.character_id)
+            .doAjaxCall(
+                "get",
+                (result: AxiosResponse) => {
+                    this.setState(
+                        {
+                            loading: false,
+                            eventGoal: result.data.event_goals,
+                        },
+                        () => {
+                            this.setCurrentAmount();
+                        },
+                    );
+                },
+                (error: AxiosError) => {
+                    console.error(error);
+                },
+            );
 
         this.eventGoalsUpdate.listen(
             "Game.Events.Events.UpdateEventGoalProgress",
@@ -54,7 +61,7 @@ export default class EventGoalsTab extends React.Component<
                 this.setState({
                     eventGoal: event.eventGoalData.event_goals,
                 });
-            }
+            },
         );
 
         this.playerEventGoalCurrentAmount.listen(
@@ -63,7 +70,7 @@ export default class EventGoalsTab extends React.Component<
                 this.setState({
                     player_amount: event.amount,
                 });
-            }
+            },
         );
     }
 
@@ -80,17 +87,26 @@ export default class EventGoalsTab extends React.Component<
         let current = this.state.eventGoal.reward_every;
         let phase = 1;
 
-        if (this.state.eventGoal.max_kills !== null && this.state.eventGoal.total_kills !== null) {
+        if (
+            this.state.eventGoal.max_kills !== null &&
+            this.state.eventGoal.total_kills !== null
+        ) {
             maxAmount = this.state.eventGoal.max_kills;
             totalDone = this.state.eventGoal.total_kills;
         }
 
-        if (this.state.eventGoal.max_crafts !== null && this.state.eventGoal.total_crafts !== null) {
+        if (
+            this.state.eventGoal.max_crafts !== null &&
+            this.state.eventGoal.total_crafts !== null
+        ) {
             maxAmount = this.state.eventGoal.max_crafts;
             totalDone = this.state.eventGoal.total_crafts;
         }
 
-        if (this.state.eventGoal.max_enchants !== null && this.state.eventGoal.total_enchants !== null) {
+        if (
+            this.state.eventGoal.max_enchants !== null &&
+            this.state.eventGoal.total_enchants !== null
+        ) {
             maxAmount = this.state.eventGoal.max_enchants;
             totalDone = this.state.eventGoal.total_enchants;
         }
@@ -111,7 +127,7 @@ export default class EventGoalsTab extends React.Component<
                         text_override_class="text-md"
                         push_down={true}
                     />
-                </div>
+                </div>,
             );
 
             current += this.state.eventGoal.reward_every;
@@ -122,23 +138,40 @@ export default class EventGoalsTab extends React.Component<
     }
 
     getEventGoalLabel(): string {
-
         if (this.state.eventGoal === null) {
-            return 'ERROR - Missing event goal.';
+            return "ERROR - Missing event goal.";
         }
 
-        let label = 'ERROR - undefined type of total for event goal.';
+        let label = "ERROR - undefined type of total for event goal.";
 
-        if (this.state.eventGoal.total_kills !== null && this.state.eventGoal.max_kills !== null) {
-            label = formatNumber(this.state.eventGoal.total_kills) + "/" + formatNumber(this.state.eventGoal.max_kills)
+        if (
+            this.state.eventGoal.total_kills !== null &&
+            this.state.eventGoal.max_kills !== null
+        ) {
+            label =
+                formatNumber(this.state.eventGoal.total_kills) +
+                "/" +
+                formatNumber(this.state.eventGoal.max_kills);
         }
 
-        if (this.state.eventGoal.total_crafts !== null && this.state.eventGoal.max_crafts !== null) {
-            label = formatNumber(this.state.eventGoal.total_crafts) + "/" + formatNumber(this.state.eventGoal.max_crafts)
+        if (
+            this.state.eventGoal.total_crafts !== null &&
+            this.state.eventGoal.max_crafts !== null
+        ) {
+            label =
+                formatNumber(this.state.eventGoal.total_crafts) +
+                "/" +
+                formatNumber(this.state.eventGoal.max_crafts);
         }
 
-        if (this.state.eventGoal.total_enchants !== null && this.state.eventGoal.max_enchants !== null) {
-            label = formatNumber(this.state.eventGoal.total_enchants) + "/" + formatNumber(this.state.eventGoal.max_enchants)
+        if (
+            this.state.eventGoal.total_enchants !== null &&
+            this.state.eventGoal.max_enchants !== null
+        ) {
+            label =
+                formatNumber(this.state.eventGoal.total_enchants) +
+                "/" +
+                formatNumber(this.state.eventGoal.max_enchants);
         }
 
         return label;
@@ -151,63 +184,97 @@ export default class EventGoalsTab extends React.Component<
 
         let percentageFilled = 0;
 
-        if (this.state.eventGoal.total_kills !== null && this.state.eventGoal.max_kills !== null) {
-            percentageFilled = (this.state.eventGoal.total_kills / this.state.eventGoal.max_kills) * 100;
+        if (
+            this.state.eventGoal.total_kills !== null &&
+            this.state.eventGoal.max_kills !== null
+        ) {
+            percentageFilled =
+                (this.state.eventGoal.total_kills /
+                    this.state.eventGoal.max_kills) *
+                100;
         }
 
-        if (this.state.eventGoal.total_crafts !== null && this.state.eventGoal.max_crafts !== null) {
-            percentageFilled = (this.state.eventGoal.total_crafts / this.state.eventGoal.max_crafts) * 100;
+        if (
+            this.state.eventGoal.total_crafts !== null &&
+            this.state.eventGoal.max_crafts !== null
+        ) {
+            percentageFilled =
+                (this.state.eventGoal.total_crafts /
+                    this.state.eventGoal.max_crafts) *
+                100;
         }
 
-        if (this.state.eventGoal.total_enchants !== null && this.state.eventGoal.max_enchants !== null) {
-            percentageFilled = (this.state.eventGoal.total_enchants / this.state.eventGoal.max_enchants) * 100;
+        if (
+            this.state.eventGoal.total_enchants !== null &&
+            this.state.eventGoal.max_enchants !== null
+        ) {
+            percentageFilled =
+                (this.state.eventGoal.total_enchants /
+                    this.state.eventGoal.max_enchants) *
+                100;
         }
 
         return percentageFilled > 100 ? 100 : percentageFilled;
     }
 
     getTitleForProgressBar(): string {
-
         if (this.state.eventGoal === null) {
-            return  'Unknown Event Step';
+            return "Unknown Event Step";
         }
 
-        if (this.state.eventGoal.total_kills !== null && this.state.eventGoal.max_kills !== null) {
-            return 'Creature Kill'
+        if (
+            this.state.eventGoal.total_kills !== null &&
+            this.state.eventGoal.max_kills !== null
+        ) {
+            return "Creature Kill";
         }
 
-        if (this.state.eventGoal.total_crafts !== null && this.state.eventGoal.max_crafts !== null) {
-            return 'Item Crafting Amount'
+        if (
+            this.state.eventGoal.total_crafts !== null &&
+            this.state.eventGoal.max_crafts !== null
+        ) {
+            return "Item Crafting Amount";
         }
 
-        if (this.state.eventGoal.total_enchants !== null && this.state.eventGoal.max_enchants !== null) {
-            return 'Enchanting Amount'
+        if (
+            this.state.eventGoal.total_enchants !== null &&
+            this.state.eventGoal.max_enchants !== null
+        ) {
+            return "Enchanting Amount";
         }
 
-        return 'Unknown Event Step';
+        return "Unknown Event Step";
     }
 
     setCurrentAmount() {
-
         if (this.state.eventGoal === null) {
             return;
         }
 
-        if (this.state.eventGoal.total_kills !== null && this.state.eventGoal.max_kills !== null) {
+        if (
+            this.state.eventGoal.total_kills !== null &&
+            this.state.eventGoal.max_kills !== null
+        ) {
             this.setState({
-                player_amount: this.state.eventGoal.current_kills
+                player_amount: this.state.eventGoal.current_kills,
             });
         }
 
-        if (this.state.eventGoal.total_crafts !== null && this.state.eventGoal.max_crafts !== null) {
+        if (
+            this.state.eventGoal.total_crafts !== null &&
+            this.state.eventGoal.max_crafts !== null
+        ) {
             this.setState({
-                player_amount: this.state.eventGoal.current_crafts
+                player_amount: this.state.eventGoal.current_crafts,
             });
         }
 
-        if (this.state.eventGoal.total_enchants !== null && this.state.eventGoal.max_enchants !== null) {
+        if (
+            this.state.eventGoal.total_enchants !== null &&
+            this.state.eventGoal.max_enchants !== null
+        ) {
             this.setState({
-                player_amount: this.state.eventGoal.current_enchants
+                player_amount: this.state.eventGoal.current_enchants,
             });
         }
 
@@ -227,7 +294,9 @@ export default class EventGoalsTab extends React.Component<
             <div>
                 <div className="relative top-[-30px]">
                     <OrangeProgressBar
-                        primary_label={"Event Goal - " + this.getTitleForProgressBar()}
+                        primary_label={
+                            "Event Goal - " + this.getTitleForProgressBar()
+                        }
                         secondary_label={this.getEventGoalLabel()}
                         percentage_filled={this.getOverAllProgress()}
                         height_override_class="h-3"
@@ -247,30 +316,44 @@ export default class EventGoalsTab extends React.Component<
                     </p>
                     <dl className="my-2">
                         <dt>Gear Set Name</dt>
-                        <dd><a href={"/information/" + snakeCase(this.state.eventGoal.reward)} target='_blank'>{
-                            this.state.eventGoal.reward
-                        } <i
-                            className="fas fa-external-link-alt"></i></a></dd>
+                        <dd>
+                            <a
+                                href={
+                                    "/information/" +
+                                    snakeCase(this.state.eventGoal.reward)
+                                }
+                                target="_blank"
+                            >
+                                {this.state.eventGoal.reward}{" "}
+                                <i className="fas fa-external-link-alt"></i>
+                            </a>
+                        </dd>
                         <dt>With Legendary Unique Attached?</dt>
-                        <dd>{this.state.eventGoal.should_be_unique ? 'Yes' : 'No'}</dd>
+                        <dd>
+                            {this.state.eventGoal.should_be_unique
+                                ? "Yes"
+                                : "No"}
+                        </dd>
                         <dt>With Mythic Attached?</dt>
-                        <dd>{this.state.eventGoal.should_be_mythic ? 'Yes' : 'No'}</dd>
+                        <dd>
+                            {this.state.eventGoal.should_be_mythic
+                                ? "Yes"
+                                : "No"}
+                        </dd>
                     </dl>
                     <p className="my-2 font-bold">
                         <span className="text-orange-500 dark:text-orange-300">
                             Contribution required for reward:
                         </span>{" "}
                         {formatNumber(
-                            this.state.eventGoal.amount_needed_for_reward
+                            this.state.eventGoal.amount_needed_for_reward,
                         )}
                     </p>
                     <p className="my-2 font-bold">
                         <span className="text-orange-500 dark:text-orange-300">
                             Your current contribution:
                         </span>{" "}
-                        {formatNumber(
-                            this.state.player_amount
-                        )}
+                        {formatNumber(this.state.player_amount)}
                     </p>
                 </div>
                 <div className="max-h-[200px] overflow-y-scroll px-2 relative top-[-10px]">

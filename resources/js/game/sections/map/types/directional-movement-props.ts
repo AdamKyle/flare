@@ -1,12 +1,11 @@
 import MapData from "../lib/request-types/MapData";
 
 export default interface DirectionalMovementProps {
-
     update_map_state: (data: MapData, callback?: () => void) => void;
 
-    character_position: {x: number, y: number};
+    character_position: { x: number; y: number };
 
-    map_position: {x: number, y: number};
+    map_position: { x: number; y: number };
 
     view_port: number;
 

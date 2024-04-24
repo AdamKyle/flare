@@ -1,12 +1,11 @@
 import GameListener from "../game-listener";
-import {inject, injectable} from "tsyringe";
+import { inject, injectable } from "tsyringe";
 import CoreEventListener from "../core-event-listener";
 import Game from "../../../../game";
-import {Channel} from "laravel-echo";
+import { Channel } from "laravel-echo";
 
 @injectable()
 export default class CharacterListeners implements GameListener {
-
     private component?: Game;
     private userId?: number;
 
@@ -18,11 +17,13 @@ export default class CharacterListeners implements GameListener {
     private characterAttackData?: Channel;
     private globalTimeOut?: Channel;
 
-    constructor(@inject(CoreEventListener) private coreEventListener: CoreEventListener) {}
+    constructor(
+        @inject(CoreEventListener) private coreEventListener: CoreEventListener,
+    ) {}
 
     initialize(component: Game, userId: number): void {
         this.component = component;
-        this.userId    = userId
+        this.userId = userId;
     }
 
     register(): void {
@@ -31,14 +32,26 @@ export default class CharacterListeners implements GameListener {
         try {
             const echo = this.coreEventListener.getEcho();
 
-            this.characterTopBar = echo.private("update-top-bar-" + this.userId);
-            this.characterCurrencies = echo.private("update-currencies-" + this.userId);
-            this.characterAttacks = echo.private("update-character-attacks-" + this.userId);
-            this.characterStatus = echo.private("update-character-status-" + this.userId);
-            this.characterRevive = echo.private("character-revive-" + this.userId);
-            this.characterAttackData = echo.private("update-character-attack-" + this.userId);
+            this.characterTopBar = echo.private(
+                "update-top-bar-" + this.userId,
+            );
+            this.characterCurrencies = echo.private(
+                "update-currencies-" + this.userId,
+            );
+            this.characterAttacks = echo.private(
+                "update-character-attacks-" + this.userId,
+            );
+            this.characterStatus = echo.private(
+                "update-character-status-" + this.userId,
+            );
+            this.characterRevive = echo.private(
+                "character-revive-" + this.userId,
+            );
+            this.characterAttackData = echo.private(
+                "update-character-attack-" + this.userId,
+            );
             this.globalTimeOut = echo.private("global-timeout-" + this.userId);
-        } catch (e: any|unknown) {
+        } catch (e: any | unknown) {
             throw new Error(e);
         }
     }
@@ -66,7 +79,6 @@ export default class CharacterListeners implements GameListener {
         this.characterTopBar.listen(
             "Game.Core.Events.UpdateTopBarBroadcastEvent",
             (event: any) => {
-
                 if (!this.component) {
                     return;
                 }
@@ -82,9 +94,9 @@ export default class CharacterListeners implements GameListener {
                         if (event.characterSheet.is_banned) {
                             location.reload();
                         }
-                    }
+                    },
                 );
-            }
+            },
         );
     }
 
@@ -94,7 +106,6 @@ export default class CharacterListeners implements GameListener {
      * @protected
      */
     protected listenToCurrencyUpdates() {
-
         if (!this.characterCurrencies) {
             return;
         }
@@ -102,15 +113,17 @@ export default class CharacterListeners implements GameListener {
         this.characterCurrencies.listen(
             "Game.Core.Events.UpdateCharacterCurrenciesBroadcastEvent",
             (event: any) => {
-
                 if (!this.component) {
                     return;
                 }
 
                 this.component.setState({
-                    character: { ...this.component.state.character, ...event.currencies },
+                    character: {
+                        ...this.component.state.character,
+                        ...event.currencies,
+                    },
                 });
-            }
+            },
         );
     }
 
@@ -127,7 +140,6 @@ export default class CharacterListeners implements GameListener {
         this.characterAttacks.listen(
             "Game.Core.Events.UpdateCharacterAttacks",
             (event: any) => {
-
                 if (!this.component) {
                     return;
                 }
@@ -138,7 +150,7 @@ export default class CharacterListeners implements GameListener {
                         ...event.characterAttacks,
                     },
                 });
-            }
+            },
         );
     }
 
@@ -155,7 +167,6 @@ export default class CharacterListeners implements GameListener {
         this.characterStatus.listen(
             "Game.Battle.Events.UpdateCharacterStatus",
             (event: any) => {
-
                 if (!this.component) {
                     return;
                 }
@@ -167,7 +178,7 @@ export default class CharacterListeners implements GameListener {
                         ...event.characterStatuses,
                     },
                 });
-            }
+            },
         );
     }
 
@@ -184,13 +195,12 @@ export default class CharacterListeners implements GameListener {
         this.characterRevive.listen(
             "Game.Battle.Events.CharacterRevive",
             (event: { health: number }) => {
-
                 if (!this.component) {
                     return;
                 }
 
                 const character = JSON.parse(
-                    JSON.stringify(this.component.state.character)
+                    JSON.stringify(this.component.state.character),
                 );
 
                 character.health = event.health;
@@ -198,7 +208,7 @@ export default class CharacterListeners implements GameListener {
                 this.component.setState({
                     character: character,
                 });
-            }
+            },
         );
     }
 
@@ -220,9 +230,12 @@ export default class CharacterListeners implements GameListener {
                 }
 
                 this.component.setState({
-                    character: { ...this.component.state.character, ...event.attack },
+                    character: {
+                        ...this.component.state.character,
+                        ...event.attack,
+                    },
                 });
-            }
+            },
         );
     }
 
@@ -239,7 +252,6 @@ export default class CharacterListeners implements GameListener {
         this.globalTimeOut.listen(
             "Game.Core.Events.GlobalTimeOut",
             (event: { showTimeOut: boolean }) => {
-
                 if (!this.component) {
                     return;
                 }
@@ -247,7 +259,7 @@ export default class CharacterListeners implements GameListener {
                 this.component.setState({
                     show_global_timeout: event.showTimeOut,
                 });
-            }
+            },
         );
     }
 }

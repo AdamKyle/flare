@@ -10,16 +10,17 @@ import MoveItemModal from "./action-modals/move-item-modal";
 import SellItemModal from "./action-modals/sell-item-modal";
 import ListItemModal from "./action-modals/list-item-modal";
 import InventoryUseDetails from "../../../sections/character-sheet/components/modals/inventory-item-details";
-import InventoryComparisonActionsAjax
-    from "./ajax/inventory-comparison-actions-ajax";
+import InventoryComparisonActionsAjax from "./ajax/inventory-comparison-actions-ajax";
 import ItemToEquip from "../../item-comparison/deffinitions/item-to-equip";
 import ItemActionsProps from "./types/item-actions-props";
-import {serviceContainer} from "../../../lib/containers/core-container";
+import { serviceContainer } from "../../../lib/containers/core-container";
 import DangerAlert from "../../ui/alerts/simple-alerts/danger-alert";
 import SuccessAlert from "../../ui/alerts/simple-alerts/success-alert";
 
-export default class ItemActions extends React.Component<ItemActionsProps, ItemActionsState> {
-
+export default class ItemActions extends React.Component<
+    ItemActionsProps,
+    ItemActionsState
+> {
     private inventoryComparisonAjax: InventoryComparisonActionsAjax;
 
     constructor(props: ItemActionsProps) {
@@ -38,15 +39,14 @@ export default class ItemActions extends React.Component<ItemActionsProps, ItemA
             error_message: null,
             success_message: null,
             has_updated_item: false,
-        }
+        };
 
-        this.inventoryComparisonAjax = serviceContainer().fetch(InventoryComparisonActionsAjax);
+        this.inventoryComparisonAjax = serviceContainer().fetch(
+            InventoryComparisonActionsAjax,
+        );
     }
 
-    isGridSize(
-        size: number,
-        itemToEquip: ItemToEquip
-    ): boolean {
+    isGridSize(size: number, itemToEquip: ItemToEquip): boolean {
         switch (size) {
             case 5:
                 return (
@@ -78,7 +78,6 @@ export default class ItemActions extends React.Component<ItemActionsProps, ItemA
     }
 
     manageSellModal(item?: ItemToEquip) {
-
         if (!item) {
             this.setState({
                 show_sell_modal: !this.state.show_sell_modal,
@@ -123,17 +122,15 @@ export default class ItemActions extends React.Component<ItemActionsProps, ItemA
                 };
 
                 this.inventoryComparisonAjax.equipItem(this, params);
-            }
+            },
         );
     }
 
     moveItem(setId: number) {
-
         this.setState({
             show_loading_label: true,
-            loading_label:
-                "Moving item to selected set ...",
-        })
+            loading_label: "Moving item to selected set ...",
+        });
 
         const params = {
             move_to_set: setId,
@@ -144,12 +141,10 @@ export default class ItemActions extends React.Component<ItemActionsProps, ItemA
     }
 
     sellItem() {
-
         this.setState({
             show_loading_label: true,
-            loading_label:
-                "selling selected item ...",
-        })
+            loading_label: "selling selected item ...",
+        });
 
         const params = {
             slot_id: this.props.comparison_details.itemToEquip.slot_id,
@@ -159,12 +154,10 @@ export default class ItemActions extends React.Component<ItemActionsProps, ItemA
     }
 
     listItem(price: number) {
-
         this.setState({
             show_loading_label: true,
-            loading_label:
-                "Listing selected item ...",
-        })
+            loading_label: "Listing selected item ...",
+        });
 
         const params = {
             list_for: price,
@@ -175,23 +168,19 @@ export default class ItemActions extends React.Component<ItemActionsProps, ItemA
     }
 
     disenchantItem() {
-
         this.setState({
             show_loading_label: true,
-            loading_label:
-                "Disenchanting selected item ...",
-        })
+            loading_label: "Disenchanting selected item ...",
+        });
 
         this.inventoryComparisonAjax.disenchantItem(this);
     }
 
     destroyItem() {
-
         this.setState({
             show_loading_label: true,
-            loading_label:
-                "Destroying item ...",
-        })
+            loading_label: "Destroying item ...",
+        });
 
         const params = {
             slot_id: this.props.comparison_details.itemToEquip.slot_id,
@@ -203,7 +192,7 @@ export default class ItemActions extends React.Component<ItemActionsProps, ItemA
     render() {
         return (
             <div>
-                <div className={'mt-6 mb-4 md:m-auto md:w-3/4 w-full'}>
+                <div className={"mt-6 mb-4 md:m-auto md:w-3/4 w-full"}>
                     {this.state.show_loading_label ? (
                         <LoadingProgressBar
                             show_label={this.state.show_loading_label}
@@ -211,21 +200,17 @@ export default class ItemActions extends React.Component<ItemActionsProps, ItemA
                         />
                     ) : null}
 
-                    {
-                        this.state.error_message !== null ?
-                            <DangerAlert additional_css={'my-4'}>
-                                {this.state.error_message}
-                            </DangerAlert>
-                            : null
-                    }
+                    {this.state.error_message !== null ? (
+                        <DangerAlert additional_css={"my-4"}>
+                            {this.state.error_message}
+                        </DangerAlert>
+                    ) : null}
 
-                    {
-                        this.state.success_message !== null ?
-                            <SuccessAlert additional_css={'my-4'}>
-                                {this.state.success_message}
-                            </SuccessAlert>
-                            : null
-                    }
+                    {this.state.success_message !== null ? (
+                        <SuccessAlert additional_css={"my-4"}>
+                            {this.state.success_message}
+                        </SuccessAlert>
+                    ) : null}
                 </div>
                 <div
                     className={clsx(
@@ -233,26 +218,29 @@ export default class ItemActions extends React.Component<ItemActionsProps, ItemA
                         {
                             "md:grid-cols-7": this.isGridSize(
                                 7,
-                                this.props.comparison_details.itemToEquip
+                                this.props.comparison_details.itemToEquip,
                             ),
                             "md:grid-cols-5": this.isGridSize(
                                 5,
-                                this.props.comparison_details.itemToEquip
+                                this.props.comparison_details.itemToEquip,
                             ),
-                            'hidden':
+                            hidden:
                                 this.props.comparison_details.itemToEquip
                                     .type === "quest",
-                        }
+                        },
                     )}
                 >
                     <PrimaryOutlineButton
                         button_label={"Details"}
                         on_click={() =>
                             this.manageViewItemDetails(
-                                this.props.comparison_details.itemToEquip
+                                this.props.comparison_details.itemToEquip,
                             )
                         }
-                        disabled={this.state.show_loading_label || this.state.has_updated_item}
+                        disabled={
+                            this.state.show_loading_label ||
+                            this.state.has_updated_item
+                        }
                     />
                     <PrimaryOutlineButton
                         button_label={"Equip"}
@@ -267,35 +255,43 @@ export default class ItemActions extends React.Component<ItemActionsProps, ItemA
                     <PrimaryOutlineButton
                         button_label={"Move"}
                         on_click={this.manageMoveModalModal.bind(this)}
-                        disabled={this.state.show_loading_label || this.state.has_updated_item || this.props.is_dead}
+                        disabled={
+                            this.state.show_loading_label ||
+                            this.state.has_updated_item ||
+                            this.props.is_dead
+                        }
                     />
 
                     {this.props.comparison_details.itemToEquip.type !==
-                    "trinket" &&
+                        "trinket" &&
                     this.props.comparison_details.itemToEquip.type !==
-                    "artifact" ? (
+                        "artifact" ? (
                         <SuccessOutlineButton
                             button_label={"Sell"}
                             on_click={() =>
                                 this.manageSellModal(
-                                    this.props.comparison_details.itemToEquip
+                                    this.props.comparison_details.itemToEquip,
                                 )
                             }
-                            disabled={this.state.show_loading_label || this.state.has_updated_item || this.props.is_dead}
+                            disabled={
+                                this.state.show_loading_label ||
+                                this.state.has_updated_item ||
+                                this.props.is_dead
+                            }
                         />
                     ) : null}
 
                     {this.props.comparison_details.itemToEquip.affix_count >
-                    0 ||
+                        0 ||
                     this.props.comparison_details.itemToEquip
                         .holy_stacks_applied > 0 ||
                     this.props.comparison_details.itemToEquip.type ===
-                    "trinket" ? (
+                        "trinket" ? (
                         <SuccessOutlineButton
                             button_label={"List"}
                             on_click={() =>
                                 this.manageListItemModal(
-                                    this.props.comparison_details.itemToEquip
+                                    this.props.comparison_details.itemToEquip,
                                 )
                             }
                             disabled={
@@ -312,14 +308,22 @@ export default class ItemActions extends React.Component<ItemActionsProps, ItemA
                         <DangerOutlineButton
                             button_label={"Disenchant"}
                             on_click={this.disenchantItem.bind(this)}
-                            disabled={this.state.show_loading_label || this.state.has_updated_item || this.props.is_dead}
+                            disabled={
+                                this.state.show_loading_label ||
+                                this.state.has_updated_item ||
+                                this.props.is_dead
+                            }
                         />
                     ) : null}
 
                     <DangerOutlineButton
                         button_label={"Destroy"}
                         on_click={this.destroyItem.bind(this)}
-                        disabled={this.state.show_loading_label || this.state.has_updated_item || this.props.is_dead}
+                        disabled={
+                            this.state.show_loading_label ||
+                            this.state.has_updated_item ||
+                            this.props.is_dead
+                        }
                     />
                 </div>
 
@@ -382,6 +386,6 @@ export default class ItemActions extends React.Component<ItemActionsProps, ItemA
                     />
                 ) : null}
             </div>
-        )
+        );
     }
 }

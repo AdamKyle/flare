@@ -92,7 +92,7 @@ export default class GenerateEventType extends React.Component<
                     new Date(startDate).toISOString(),
                     {
                         zone: "utc",
-                    }
+                    },
                 )
                     .setZone("America/Edmonton")
                     .toISO();
@@ -117,9 +117,9 @@ export default class GenerateEventType extends React.Component<
 
                                 console.error(response);
                             }
-                        }
+                        },
                     );
-            }
+            },
         );
     }
 
@@ -163,7 +163,7 @@ export default class GenerateEventType extends React.Component<
                     parseInt(type.value) ===
                     this.state.form_data.selected_event_type
                 );
-            }
+            },
         );
 
         if (foundType.length > 0) {
@@ -177,7 +177,7 @@ export default class GenerateEventType extends React.Component<
         const foundGenerateType = this.generate_options.filter(
             (item: { label: string; value: string }) => {
                 return item.value === this.state.form_data.generate_every;
-            }
+            },
         );
 
         if (foundGenerateType.length > 0) {
@@ -234,7 +234,6 @@ export default class GenerateEventType extends React.Component<
                                 <div className="my-3 dark:text-gray-300">
                                     <strong>Start Date (and time)</strong>
                                 </div>
-
                                 Missing Date Picker ....
                             </div>
                             <InfoAlert>

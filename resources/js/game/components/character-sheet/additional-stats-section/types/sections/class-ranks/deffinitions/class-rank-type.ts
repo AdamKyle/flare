@@ -6,15 +6,15 @@ export default interface ClassRankType {
     class_name: string;
     current_xp: number;
     game_class: GameClassType;
-    weapon_masteries: WeaponMastery[],
+    weapon_masteries: WeaponMastery[];
     game_class_id: number;
     id: number;
     is_active: boolean;
     is_locked: boolean;
     level: number;
     required_xp: number;
-    primary_class_name: string|null;
-    secondary_class_name: string|null;
-    primary_class_required_level: number|null;
-    secondary_class_required_level: number|null;
+    primary_class_name: string | null;
+    secondary_class_name: string | null;
+    primary_class_required_level: number | null;
+    secondary_class_required_level: number | null;
 }

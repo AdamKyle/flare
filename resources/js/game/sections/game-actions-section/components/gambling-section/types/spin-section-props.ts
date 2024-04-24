@@ -4,5 +4,5 @@ export default interface SpinSectionProps {
     icons: IconType[] | [];
     is_small: boolean;
     spin_action: () => void;
-    spinning_indexes: number[]|[];
+    spinning_indexes: number[] | [];
 }

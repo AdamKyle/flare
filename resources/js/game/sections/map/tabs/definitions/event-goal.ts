@@ -6,7 +6,7 @@ export default interface EventGoal {
     total_crafts: number | null;
     total_enchants: number | null;
     reward_every: number;
-    amount_needed_for_reward: number,
+    amount_needed_for_reward: number;
     current_kills: number;
     current_crafts: number;
     current_enchants: number;

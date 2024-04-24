@@ -3,15 +3,17 @@ import SuccessOutlineButton from "../../../game/components/ui/buttons/success-ou
 import GuideQuest from "./modals/guide-quest";
 import { viewPortWatcher } from "../../../game/lib/view-port-watcher";
 import GuideQuestListenerDefinition from "./event-listeners/guide-quest-listener-definition";
-import {guideQuestServiceContainer} from "./container/guide-quest-container";
+import { guideQuestServiceContainer } from "./container/guide-quest-container";
 import GuideQuestListener from "./event-listeners/guide-quest-listener";
 import GuideButtonProps from "./types/guide-button-props";
 import GuideButtonState from "./types/guide-button-state";
 import clsx from "clsx";
 import CompletedGuideQuestListener from "./event-listeners/completed-guide-quest-listener";
 
-export default class GuideButton extends React.Component<GuideButtonProps, GuideButtonState> {
-
+export default class GuideButton extends React.Component<
+    GuideButtonProps,
+    GuideButtonState
+> {
     private guideQuestListener: GuideQuestListenerDefinition;
     private guideQuestCompletedListener: GuideQuestListenerDefinition;
 
@@ -25,10 +27,13 @@ export default class GuideButton extends React.Component<GuideButtonProps, Guide
             view_port: 0,
         };
 
-        this.guideQuestListener = guideQuestServiceContainer().fetch(GuideQuestListener);
+        this.guideQuestListener =
+            guideQuestServiceContainer().fetch(GuideQuestListener);
         this.guideQuestListener.initialize(this, this.props.user_id);
 
-        this.guideQuestCompletedListener = guideQuestServiceContainer().fetch(CompletedGuideQuestListener);
+        this.guideQuestCompletedListener = guideQuestServiceContainer().fetch(
+            CompletedGuideQuestListener,
+        );
         this.guideQuestCompletedListener.initialize(this, this.props.user_id);
 
         this.guideQuestListener.register();
@@ -42,7 +47,7 @@ export default class GuideButton extends React.Component<GuideButtonProps, Guide
             },
             () => {
                 viewPortWatcher(this);
-            }
+            },
         );
 
         const self = this;
@@ -55,7 +60,7 @@ export default class GuideButton extends React.Component<GuideButtonProps, Guide
                     });
                 }
             },
-            (import.meta as any).env.VITE_APP_ENV === "production" ? 3500 : 500
+            (import.meta as any).env.VITE_APP_ENV === "production" ? 3500 : 500,
         );
 
         this.guideQuestListener.listen();
@@ -75,14 +80,17 @@ export default class GuideButton extends React.Component<GuideButtonProps, Guide
 
         return (
             <Fragment>
-
-                <div className='relative'>
-
-                    <span className={clsx("fa-stack absolute top-[-10px] left-[-15px]", {
-                        'hidden': !this.state.show_guide_quest_completed
-                    })}>
-                      <i className="fas fa-circle fa-stack-2x text-red-700 dark:text-red-500 fa-beat"></i>
-                      <i className="fas fa-exclamation fa-stack-1x text-yellow-500 dark:text-yello-700"></i>
+                <div className="relative">
+                    <span
+                        className={clsx(
+                            "fa-stack absolute top-[-10px] left-[-15px]",
+                            {
+                                hidden: !this.state.show_guide_quest_completed,
+                            },
+                        )}
+                    >
+                        <i className="fas fa-circle fa-stack-2x text-red-700 dark:text-red-500 fa-beat"></i>
+                        <i className="fas fa-exclamation fa-stack-1x text-yellow-500 dark:text-yello-700"></i>
                     </span>
 
                     <SuccessOutlineButton

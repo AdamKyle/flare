@@ -1,12 +1,14 @@
-import React, {Fragment} from "react";
+import React, { Fragment } from "react";
 import KingdomProps from "../../map/types/map/kingdom-pins/kingdom-props";
 import KingdomPin from "./kingdom-pin";
 import KingdomModal from "./modals/kingdom-modal";
 import KingdomState from "../../map/types/map/kingdom-pins/kingdom-state";
-import {viewPortWatcher} from "../../../lib/view-port-watcher";
+import { viewPortWatcher } from "../../../lib/view-port-watcher";
 
-export default class Kingdoms extends React.Component<KingdomProps, KingdomState> {
-
+export default class Kingdoms extends React.Component<
+    KingdomProps,
+    KingdomState
+> {
     constructor(props: KingdomProps) {
         super(props);
 
@@ -14,7 +16,7 @@ export default class Kingdoms extends React.Component<KingdomProps, KingdomState
             open_kingdom_modal: false,
             kingdom_id: 0,
             view_port: null,
-        }
+        };
     }
 
     componentDidMount() {
@@ -46,7 +48,12 @@ export default class Kingdoms extends React.Component<KingdomProps, KingdomState
         });
     }
 
-    teleportPlayer(data: {x: number, y: number, cost: number, timeout: number}) {
+    teleportPlayer(data: {
+        x: number;
+        y: number;
+        cost: number;
+        timeout: number;
+    }) {
         this.props.teleport_player(data);
     }
 
@@ -57,31 +64,33 @@ export default class Kingdoms extends React.Component<KingdomProps, KingdomState
 
         return this.props.kingdoms.map((kingdom) => {
             return (
-                <KingdomPin kingdom={kingdom} open_kingdom_modal={this.openKingdomModal.bind(this)}/>
-            )
-        })
+                <KingdomPin
+                    kingdom={kingdom}
+                    open_kingdom_modal={this.openKingdomModal.bind(this)}
+                />
+            );
+        });
     }
 
     render() {
         return (
             <Fragment>
                 {this.renderKingdomPins()}
-                {
-                    this.state.open_kingdom_modal ?
-                        <KingdomModal is_open={this.state.open_kingdom_modal}
-                                      kingdom_id={this.state.kingdom_id}
-                                      character_id={this.props.character_id}
-                                      currencies={this.props.currencies}
-                                      character_position={this.props.character_position}
-                                      teleport_player={this.teleportPlayer.bind(this)}
-                                      handle_close={this.closeKingdomModal.bind(this)}
-                                      can_move={this.props.can_move}
-                                      is_automation_running={this.props.is_automation_running}
-                                      is_dead={this.props.is_dead}
-                                      show_top_section={true}
-                        />
-                    : null
-                }
+                {this.state.open_kingdom_modal ? (
+                    <KingdomModal
+                        is_open={this.state.open_kingdom_modal}
+                        kingdom_id={this.state.kingdom_id}
+                        character_id={this.props.character_id}
+                        currencies={this.props.currencies}
+                        character_position={this.props.character_position}
+                        teleport_player={this.teleportPlayer.bind(this)}
+                        handle_close={this.closeKingdomModal.bind(this)}
+                        can_move={this.props.can_move}
+                        is_automation_running={this.props.is_automation_running}
+                        is_dead={this.props.is_dead}
+                        show_top_section={true}
+                    />
+                ) : null}
             </Fragment>
         );
     }

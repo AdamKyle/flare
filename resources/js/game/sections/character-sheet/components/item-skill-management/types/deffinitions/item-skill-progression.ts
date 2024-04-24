@@ -17,5 +17,5 @@ export default interface ItemSkillProgression {
     item_id: number;
     item_skill_id: number;
     str_mod: number;
-    item_skill: ItemSkill
+    item_skill: ItemSkill;
 }

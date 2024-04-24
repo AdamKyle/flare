@@ -1,43 +1,42 @@
 export enum ItemType {
-
     // Weapon Types
-    WEAPON = 'weapon',
-    STAVE = 'stave',
-    BOW = 'bow',
-    HAMMER = 'hammer',
-    GUN = 'gun',
-    FAN = 'fan',
-    SCRATCH_AWL = 'scratch-awl',
-    MACE = 'mace',
+    WEAPON = "weapon",
+    STAVE = "stave",
+    BOW = "bow",
+    HAMMER = "hammer",
+    GUN = "gun",
+    FAN = "fan",
+    SCRATCH_AWL = "scratch-awl",
+    MACE = "mace",
 
     // Armour Types
-    BODY = 'body',
-    SLEEVES = 'sleeves',
-    GLOVES = 'gloves',
-    BOOTS = 'feet',
-    SHIELD = 'shield',
-    HELMET = 'helmet',
-    LEGGINGS = 'leggings',
+    BODY = "body",
+    SLEEVES = "sleeves",
+    GLOVES = "gloves",
+    BOOTS = "feet",
+    SHIELD = "shield",
+    HELMET = "helmet",
+    LEGGINGS = "leggings",
 
     // Spells
-    SPELL_DAMAGE = 'spell-damage',
-    SPELL_HEALING = 'spell-healing',
+    SPELL_DAMAGE = "spell-damage",
+    SPELL_HEALING = "spell-healing",
 
     // Rings
-    RING = 'ring',
+    RING = "ring",
 
     // Trinket
-    TRINKET = 'trinket',
+    TRINKET = "trinket",
 
     // Artifact
-    ARTIFACT = 'artifact',
+    ARTIFACT = "artifact",
 
     // Gem
-    GEM = 'gem',
+    GEM = "gem",
 
     // Alchemy items
-    ALCHEMY = 'alchemy',
+    ALCHEMY = "alchemy",
 
     // Quest Items
-    QUEST = 'quest',
+    QUEST = "quest",
 }

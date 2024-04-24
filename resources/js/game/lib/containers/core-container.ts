@@ -1,11 +1,9 @@
-
-import {container, InjectionToken} from 'tsyringe';
+import { container, InjectionToken } from "tsyringe";
 import mainContainer from "./registrations/main-container";
 import gameEventContainer from "./registrations/game-event-container";
-import {containerRegistry} from "../../configuration/container-registry";
+import { containerRegistry } from "../../configuration/container-registry";
 
 class CoreContainer {
-
     private static instance: CoreContainer;
 
     public constructor() {

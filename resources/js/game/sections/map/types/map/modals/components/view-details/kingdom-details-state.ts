@@ -3,7 +3,7 @@ export default interface KingdomDetailsState {
 
     loading: boolean;
 
-    npc_owned: false,
+    npc_owned: false;
 
     action_in_progress: boolean;
 

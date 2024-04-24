@@ -1,8 +1,8 @@
-import {CharacterType} from "../../../lib/game/character/character-type";
+import { CharacterType } from "../../../lib/game/character/character-type";
 import CharacterStatusType from "../../../lib/game/character/character-status-type";
 import PositionType from "../../map/types/map/position-type";
 import { GameActionState } from "../../../lib/game/types/game-state";
-import {FameTasks} from "../../faction-loyalty/deffinitions/faction-loaylaty";
+import { FameTasks } from "../../faction-loyalty/deffinitions/faction-loaylaty";
 
 export default interface ActionsProps {
     character: CharacterType;

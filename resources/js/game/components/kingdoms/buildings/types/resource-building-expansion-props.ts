@@ -1,7 +1,6 @@
 import BuildingDetails from "../deffinitions/building-details";
 
 export default interface ResourceBuildingExpansionProps {
-
     character_id: number;
 
     user_id: number;

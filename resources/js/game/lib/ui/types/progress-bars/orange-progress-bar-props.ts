@@ -1,5 +1,4 @@
 export default interface OrangeProgressBarProps {
-
     primary_label: string;
 
     secondary_label: string;

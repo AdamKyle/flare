@@ -16,10 +16,9 @@ import CraftingTypeSelection from "./crafting-partials/crafting-type-selecting";
 import CraftingActionButtons from "./crafting-partials/crafting-action-buttons";
 import ArmourTypeSelection from "./crafting-partials/armour-type-selection";
 import SelectItemToCraft from "./crafting-partials/select-item-to-craft";
-import {FameTasks} from "../../../sections/faction-loyalty/deffinitions/faction-loaylaty";
+import { FameTasks } from "../../../sections/faction-loyalty/deffinitions/faction-loaylaty";
 
 export default class Crafting extends React.Component<any, any> {
-
     private characterStatus: any;
 
     constructor(props: any) {
@@ -44,7 +43,7 @@ export default class Crafting extends React.Component<any, any> {
 
         // @ts-ignore
         this.characterStatus = Echo.private(
-            "update-character-status-" + this.props.user_id
+            "update-character-status-" + this.props.user_id,
         );
     }
 
@@ -53,9 +52,10 @@ export default class Crafting extends React.Component<any, any> {
             "Game.Battle.Events.UpdateCharacterStatus",
             (event: any) => {
                 this.setState({
-                    show_craft_for_event: event.characterStatuses.show_craft_for_event
+                    show_craft_for_event:
+                        event.characterStatuses.show_craft_for_event,
                 });
-            }
+            },
         );
     }
 
@@ -72,9 +72,11 @@ export default class Crafting extends React.Component<any, any> {
             return false;
         }
 
-        return this.props.fame_tasks.filter((task: FameTasks) => {
-            return task.item_id === this.state.selected_item.id;
-        }).length > 0;
+        return (
+            this.props.fame_tasks.filter((task: FameTasks) => {
+                return task.item_id === this.state.selected_item.id;
+            }).length > 0
+        );
     }
 
     setItemToCraft(data: any) {
@@ -102,7 +104,7 @@ export default class Crafting extends React.Component<any, any> {
                 ) {
                     const url = craftingGetEndPoints(
                         "craft",
-                        this.props.character_id
+                        this.props.character_id,
                     );
 
                     new Ajax()
@@ -117,13 +119,14 @@ export default class Crafting extends React.Component<any, any> {
                                     loading: false,
                                     craftable_items: result.data.items,
                                     skill_xp: result.data.xp,
-                                    show_craft_for_event: result.data.show_craft_for_event
+                                    show_craft_for_event:
+                                        result.data.show_craft_for_event,
                                 });
                             },
-                            (error: AxiosError) => {}
+                            (error: AxiosError) => {},
                         );
                 }
-            }
+            },
         );
     }
 
@@ -196,7 +199,7 @@ export default class Crafting extends React.Component<any, any> {
             () => {
                 const url = craftingPostEndPoints(
                     "craft",
-                    this.props.character_id
+                    this.props.character_id,
                 );
 
                 new Ajax()
@@ -211,7 +214,7 @@ export default class Crafting extends React.Component<any, any> {
                         "post",
                         (result: AxiosResponse) => {
                             const oldCraftableItems = JSON.parse(
-                                JSON.stringify(this.state.craftable_items)
+                                JSON.stringify(this.state.craftable_items),
                             );
 
                             this.setState(
@@ -219,28 +222,29 @@ export default class Crafting extends React.Component<any, any> {
                                     loading: false,
                                     craftable_items: result.data.items,
                                     skill_xp: result.data.xp,
-                                    show_craft_for_event: result.data.show_craft_for_event,
+                                    show_craft_for_event:
+                                        result.data.show_craft_for_event,
                                 },
                                 () => {
                                     if (
                                         !isEqual(
                                             oldCraftableItems,
-                                            result.data.items
+                                            result.data.items,
                                         )
                                     ) {
                                         this.updateSortedArmour();
 
                                         generateServerMessage(
                                             "new_items",
-                                            "You have new items to craft. Check the list!"
+                                            "You have new items to craft. Check the list!",
                                         );
                                     }
-                                }
+                                },
                             );
                         },
-                        (error: AxiosError) => {}
+                        (error: AxiosError) => {},
                     );
-            }
+            },
         );
     }
 
@@ -249,7 +253,7 @@ export default class Crafting extends React.Component<any, any> {
             const filteredArmour = this.state.craftable_items.filter(
                 (item: any) => {
                     return item.type === this.state.armour_craft_type;
-                }
+                },
             );
 
             this.setState({
@@ -282,7 +286,7 @@ export default class Crafting extends React.Component<any, any> {
         const filteredArmour = this.state.craftable_items.filter(
             (item: any) => {
                 return item.type === data.value;
-            }
+            },
         );
 
         this.setState({
@@ -299,14 +303,14 @@ export default class Crafting extends React.Component<any, any> {
                         {this.state.selected_type === null ? (
                             <CraftingTypeSelection
                                 select_type_to_craft={this.setTypeToCraft.bind(
-                                    this
+                                    this,
                                 )}
                             />
                         ) : this.state.selected_type === "armour" ? (
                             this.state.sorted_armour.length > 0 ? (
                                 <SelectItemToCraft
                                     set_item_to_craft={this.setItemToCraft.bind(
-                                        this
+                                        this,
                                     )}
                                     items={this.buildItems()}
                                     default_item={this.defaultItem()}
@@ -314,14 +318,14 @@ export default class Crafting extends React.Component<any, any> {
                             ) : (
                                 <ArmourTypeSelection
                                     select_armour_type_to_craft={this.selectedArmourType.bind(
-                                        this
+                                        this,
                                     )}
                                 />
                             )
                         ) : (
                             <SelectItemToCraft
                                 set_item_to_craft={this.setItemToCraft.bind(
-                                    this
+                                    this,
                                 )}
                                 items={this.buildItems()}
                                 default_item={this.defaultItem()}
@@ -345,7 +349,9 @@ export default class Crafting extends React.Component<any, any> {
                             change_type={this.changeType.bind(this)}
                             clear_crafting={this.clearCrafting.bind(this)}
                             show_craft_for_npc={this.showCraftForNpc()}
-                            show_craft_for_event={this.state.show_craft_for_event}
+                            show_craft_for_event={
+                                this.state.show_craft_for_event
+                            }
                         />
                     </div>
                 ) : (
@@ -358,7 +364,9 @@ export default class Crafting extends React.Component<any, any> {
                             change_type={this.changeType.bind(this)}
                             clear_crafting={this.clearCrafting.bind(this)}
                             show_craft_for_npc={this.showCraftForNpc()}
-                            show_craft_for_event={this.state.show_craft_for_event}
+                            show_craft_for_event={
+                                this.state.show_craft_for_event
+                            }
                         />
                     </div>
                 )}

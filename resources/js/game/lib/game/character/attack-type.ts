@@ -24,7 +24,7 @@ export default interface AttackType {
 
     ring_damage: number;
 
-    special_damage: AttackTypeSpecialDamage|[];
+    special_damage: AttackTypeSpecialDamage | [];
 
     weapon_damage: number;
 }

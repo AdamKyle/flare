@@ -3,24 +3,23 @@ import KingdomReinforcementType from "../kingdom-reinforcement-type";
 import SelectedUnitsToCallType from "../selected-units-to-call-type";
 
 export default interface AttackKingdomModalState {
-
     loading: boolean;
 
     fetching_data: boolean;
 
-    items_to_use: KingdomDamageSlotItems[]|[];
+    items_to_use: KingdomDamageSlotItems[] | [];
 
-    kingdoms: KingdomReinforcementType[]|[];
+    kingdoms: KingdomReinforcementType[] | [];
 
     error_message: string;
 
     success_message: string;
 
-    selected_kingdoms: number[]|[];
+    selected_kingdoms: number[] | [];
 
-    selected_units: SelectedUnitsToCallType[]|[];
+    selected_units: SelectedUnitsToCallType[] | [];
 
-    selected_items: number[]|[];
+    selected_items: number[] | [];
 
     total_damage: number;
 

@@ -1,11 +1,10 @@
-import React, {Fragment} from "react";
+import React, { Fragment } from "react";
 import NpcKingdomPin from "./npc-kingdom-pin";
 import NpcKingdomProps from "../../map/types/map/kingdom-pins/npc-kingdom-props";
-import {viewPortWatcher} from "../../../lib/view-port-watcher";
+import { viewPortWatcher } from "../../../lib/view-port-watcher";
 import KingdomModal from "./modals/kingdom-modal";
 
 export default class NpcKingdoms extends React.Component<NpcKingdomProps, any> {
-
     constructor(props: NpcKingdomProps) {
         super(props);
 
@@ -13,7 +12,7 @@ export default class NpcKingdoms extends React.Component<NpcKingdomProps, any> {
             open_kingdom_modal: false,
             kingdom_id: 0,
             view_port: null,
-        }
+        };
     }
 
     componentDidMount() {
@@ -51,11 +50,22 @@ export default class NpcKingdoms extends React.Component<NpcKingdomProps, any> {
         }
 
         return this.props.kingdoms.map((kingdom) => {
-            return <NpcKingdomPin kingdom={kingdom} color={'#e3d60a'} open_kingdom_modal={this.openKingdomModal.bind(this)}/>
+            return (
+                <NpcKingdomPin
+                    kingdom={kingdom}
+                    color={"#e3d60a"}
+                    open_kingdom_modal={this.openKingdomModal.bind(this)}
+                />
+            );
         });
     }
 
-    teleportPlayer(data: {x: number, y: number, cost: number, timeout: number}) {
+    teleportPlayer(data: {
+        x: number;
+        y: number;
+        cost: number;
+        timeout: number;
+    }) {
         this.props.teleport_player(data);
     }
 
@@ -64,22 +74,21 @@ export default class NpcKingdoms extends React.Component<NpcKingdomProps, any> {
             <Fragment>
                 {this.renderKingdomPins()}
 
-                {
-                    this.state.open_kingdom_modal ?
-                        <KingdomModal is_open={this.state.open_kingdom_modal}
-                                      kingdom_id={this.state.kingdom_id}
-                                      character_id={this.props.character_id}
-                                      currencies={this.props.currencies}
-                                      character_position={this.props.character_position}
-                                      teleport_player={this.teleportPlayer.bind(this)}
-                                      handle_close={this.closeKingdomModal.bind(this)}
-                                      can_move={this.props.can_move}
-                                      is_automation_running={this.props.is_automation_running}
-                                      is_dead={this.props.is_dead}
-                                      show_top_section={false}
-                        />
-                    : null
-                }
+                {this.state.open_kingdom_modal ? (
+                    <KingdomModal
+                        is_open={this.state.open_kingdom_modal}
+                        kingdom_id={this.state.kingdom_id}
+                        character_id={this.props.character_id}
+                        currencies={this.props.currencies}
+                        character_position={this.props.character_position}
+                        teleport_player={this.teleportPlayer.bind(this)}
+                        handle_close={this.closeKingdomModal.bind(this)}
+                        can_move={this.props.can_move}
+                        is_automation_running={this.props.is_automation_running}
+                        is_dead={this.props.is_dead}
+                        show_top_section={false}
+                    />
+                ) : null}
             </Fragment>
         );
     }

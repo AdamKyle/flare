@@ -1,6 +1,6 @@
-import {ProcessedEvent} from "@aldabil/react-scheduler/types";
+import { ProcessedEvent } from "@aldabil/react-scheduler/types";
 
 export default interface EventViewProps {
     deleting: boolean;
-    event: ProcessedEvent
+    event: ProcessedEvent;
 }

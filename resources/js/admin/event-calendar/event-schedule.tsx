@@ -62,7 +62,7 @@ export default class EventSchedule extends React.Component<
             },
             (error: AxiosError) => {
                 console.error(error);
-            }
+            },
         );
 
         this.updateScheduledEvents.listen(
@@ -85,13 +85,13 @@ export default class EventSchedule extends React.Component<
                                         : this.color(event.title);
 
                                     return event;
-                                }
+                                },
                             ),
                             loading: false,
                         });
-                    }
+                    },
                 );
-            }
+            },
         );
     }
 
@@ -116,16 +116,16 @@ export default class EventSchedule extends React.Component<
                                     },
                                     () => {
                                         resolve(result.data);
-                                    }
+                                    },
                                 );
                             },
                             (error: AxiosError) => {
                                 console.error(error);
 
                                 reject(error);
-                            }
+                            },
                         );
-                }
+                },
             );
         });
     }
@@ -177,7 +177,7 @@ export default class EventSchedule extends React.Component<
                     )}
                     viewerExtraComponent={(
                         fields: FieldProps[] | [],
-                        event: ProcessedEvent
+                        event: ProcessedEvent,
                     ) => (
                         <EventView
                             event={event}

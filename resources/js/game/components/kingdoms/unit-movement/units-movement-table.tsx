@@ -8,65 +8,79 @@ import UnitsInMovementTableProps from "../../../lib/game/kingdoms/types/units-in
 import UnitsInMovementTableState from "../../../lib/game/kingdoms/types/units-in-movement-table-state";
 import { BuildUnitsInMovementColumns } from "../table-columns/build-units-in-movement-columns";
 
-export default class UnitsMovementTable extends React.Component<UnitsInMovementTableProps, UnitsInMovementTableState> {
+export default class UnitsMovementTable extends React.Component<
+    UnitsInMovementTableProps,
+    UnitsInMovementTableState
+> {
     constructor(props: UnitsInMovementTableProps) {
         super(props);
 
         this.state = {
             loading: false,
-            error_message: '',
-        }
+            error_message: "",
+        };
     }
 
     cancelUnitRecruitment(queueId: number) {
-        this.setState({
-            error_message: '',
-            loading: true,
-        }, () => {
-            (new Ajax).setRoute('recall-units/'+queueId+'/' + this.props.character_id).doAjaxCall('post', (result: AxiosResponse) => {
-                this.setState({
-                    loading: false,
-                })
-            }, (error: AxiosError) => {
-                this.setState({loading: false});
+        this.setState(
+            {
+                error_message: "",
+                loading: true,
+            },
+            () => {
+                new Ajax()
+                    .setRoute(
+                        "recall-units/" +
+                            queueId +
+                            "/" +
+                            this.props.character_id,
+                    )
+                    .doAjaxCall(
+                        "post",
+                        (result: AxiosResponse) => {
+                            this.setState({
+                                loading: false,
+                            });
+                        },
+                        (error: AxiosError) => {
+                            this.setState({ loading: false });
 
-                if (typeof error.response !== 'undefined') {
-                    const response = error.response;
+                            if (typeof error.response !== "undefined") {
+                                const response = error.response;
 
-                    this.setState({
-                        error_message: response.data.message,
-                    });
-                }
-            })
-        });
+                                this.setState({
+                                    error_message: response.data.message,
+                                });
+                            }
+                        },
+                    );
+            },
+        );
     }
 
     render() {
         return (
             <Fragment>
-                {
-                    this.state.error_message !== '' ?
-                        <div className='mt-4 mb-4'>
-                            <DangerAlert>
-                                {this.state.error_message}
-                            </DangerAlert>
-                        </div>
-                        : null
-                }
-                {
-                    this.state.loading ?
-                        <div className='mt-4 mb-4'>
-                            <LoadingProgressBar />
-                        </div>
-                        : null
-                }
+                {this.state.error_message !== "" ? (
+                    <div className="mt-4 mb-4">
+                        <DangerAlert>{this.state.error_message}</DangerAlert>
+                    </div>
+                ) : null}
+                {this.state.loading ? (
+                    <div className="mt-4 mb-4">
+                        <LoadingProgressBar />
+                    </div>
+                ) : null}
 
-                <Table data={this.props.units_in_movement}
-                       columns={BuildUnitsInMovementColumns(this.cancelUnitRecruitment.bind(this), this.props.units_in_movement)}
-                       dark_table={this.props.dark_tables}
+                <Table
+                    data={this.props.units_in_movement}
+                    columns={BuildUnitsInMovementColumns(
+                        this.cancelUnitRecruitment.bind(this),
+                        this.props.units_in_movement,
+                    )}
+                    dark_table={this.props.dark_tables}
                 />
             </Fragment>
-
         );
     }
 }

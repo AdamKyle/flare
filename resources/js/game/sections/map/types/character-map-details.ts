@@ -1,7 +1,7 @@
 import GameMapDetails from "./game-map-details";
 
 export default interface CharacterMapDetails {
-    character_id:  number;
+    character_id: number;
 
     character_position_x: number;
 
@@ -16,5 +16,4 @@ export default interface CharacterMapDetails {
     position_x: number;
 
     position_y: number;
-
 }

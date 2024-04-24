@@ -1,3 +1,3 @@
 export default interface ChatComponentState {
-    message: string | '';
+    message: string | "";
 }

@@ -1,7 +1,6 @@
 import Items from "../deffinitions/items";
 
 export default interface ManageItemSocketsProps<T> {
-    items: Items[]|[];
+    items: Items[] | [];
     update_parent: (value: T, property: string) => void;
-
 }

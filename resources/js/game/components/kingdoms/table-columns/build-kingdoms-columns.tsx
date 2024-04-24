@@ -1,87 +1,102 @@
 import React from "react";
 import { formatNumber } from "../../../lib/game/format-number";
-import KingdomDetails from "../../../lib/game/kingdoms/deffinitions/kingdom-details";
+import KingdomDetails from "../deffinitions/kingdom-details";
 import UnitMovementDetails from "../queues/deffinitions/unit-movement-details";
 
-export const buildKingdomsColumns = (onClick: (kingdom: KingdomDetails) => void) => {
+export const buildKingdomsColumns = (
+    onClick: (kingdom: KingdomDetails) => void,
+) => {
     return [
         {
-            name: 'Name',
+            name: "Name",
             selector: (row: KingdomDetails) => row.name,
-            cell: (row: any) => <button className='text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-500' onClick={() => onClick(row)}>
-                {iconsToShow(row)} {row.name} {row.is_protected ? ' (Protected) ' : ''}
-            </button>
+            cell: (row: any) => (
+                <button
+                    className="text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-500"
+                    onClick={() => onClick(row)}
+                >
+                    {iconsToShow(row)} {row.name}{" "}
+                    {row.is_protected ? " (Protected) " : ""}
+                </button>
+            ),
         },
         {
-            name: 'Map',
-            selector: (row: KingdomDetails) => row.game_map_name
+            name: "Map",
+            selector: (row: KingdomDetails) => row.game_map_name,
         },
         {
-            name: 'X Position',
-            selector: (row: KingdomDetails) => row.x_position
+            name: "X Position",
+            selector: (row: KingdomDetails) => row.x_position,
         },
         {
-            name: 'Y Position',
-            selector: (row: KingdomDetails) => row.y_position
+            name: "Y Position",
+            selector: (row: KingdomDetails) => row.y_position,
         },
         {
-            name: 'Current Morale',
+            name: "Current Morale",
             selector: (row: KingdomDetails) => row.current_morale,
-            cell: (row: any) => (row.current_morale * 100).toFixed(2) + '%'
+            cell: (row: any) => (row.current_morale * 100).toFixed(2) + "%",
         },
         {
-            name: 'Treasury',
+            name: "Treasury",
             selector: (row: KingdomDetails) => row.treasury,
-            cell: (row: any) => formatNumber(row.treasury)
+            cell: (row: any) => formatNumber(row.treasury),
         },
         {
-            name: 'Gold Bars',
+            name: "Gold Bars",
             selector: (row: KingdomDetails) => row.gold_bars,
-            cell: (row: any) => formatNumber(row.gold_bars)
+            cell: (row: any) => formatNumber(row.gold_bars),
         },
     ];
-}
+};
 
 const iconsToShow = (kingdom: KingdomDetails) => {
     const icons = [];
 
     if (kingdom.is_protected) {
         icons.push(
-            <i className='ra ra-heavy-shield text-blue-500 dark:text-blue-400'></i>
-        )
+            <i className="ra ra-heavy-shield text-blue-500 dark:text-blue-400"></i>,
+        );
     }
 
     if (kingdom.is_under_attack) {
         icons.push(
-            <i className='ra ra-axe text-red-500 dark:text-red-400'></i>
-        )
+            <i className="ra ra-axe text-red-500 dark:text-red-400"></i>,
+        );
     }
 
-    const anyMoving = kingdom.unitsInMovement.filter((unitMovement: UnitMovementDetails) => {
-        const anyMoving = unitMovement.is_returning || unitMovement.is_moving || unitMovement.is_recalled || unitMovement.is_attacking;
-        const fromThisKingdom = kingdom.name === unitMovement.from_kingdom_name;
-        const toThisKingdom = kingdom.name === unitMovement.to_kingdom_name;
+    const anyMoving = kingdom.unitsInMovement.filter(
+        (unitMovement: UnitMovementDetails) => {
+            const anyMoving =
+                unitMovement.is_returning ||
+                unitMovement.is_moving ||
+                unitMovement.is_recalled ||
+                unitMovement.is_attacking;
+            const fromThisKingdom =
+                kingdom.name === unitMovement.from_kingdom_name;
+            const toThisKingdom = kingdom.name === unitMovement.to_kingdom_name;
 
-        return anyMoving && (fromThisKingdom || toThisKingdom);
-    });
+            return anyMoving && (fromThisKingdom || toThisKingdom);
+        },
+    );
 
     if (anyMoving.length > 0) {
         if (anyMoving[0].is_attacking) {
             icons.push(
-                <i className='ra ra-axe text-red-500 dark:text-red-400'></i>
+                <i className="ra ra-axe text-red-500 dark:text-red-400"></i>,
             );
         }
 
         if (anyMoving[0].is_returning || anyMoving[0].is_recalled) {
             icons.push(
-                <i className="fas fa-exchange-alt text-orange-500 dark:text-orange-300"></i>
+                <i className="fas fa-exchange-alt text-orange-500 dark:text-orange-300"></i>,
             );
         } else {
             icons.push(
-                <i className='ra ra-heavy-shield text-blue-500 dark:text-blue-400'></i>
+                <i className="ra ra-heavy-shield text-blue-500 dark:text-blue-400"></i>,
             );
         }
     }
 
     return icons;
-}
+};

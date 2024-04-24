@@ -1,9 +1,8 @@
-import {CharacterType} from "../../../../lib/game/character/character-type";
+import { CharacterType } from "../../../../lib/game/character/character-type";
 import MonsterType from "../../../../lib/game/types/actions/monster/monster-type";
 import FightSection from "../fight-section";
 
 export default interface FightSectionProps {
-
     character: CharacterType;
 
     monster_to_fight: MonsterType;

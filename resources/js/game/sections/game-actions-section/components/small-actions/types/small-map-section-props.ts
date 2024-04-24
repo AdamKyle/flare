@@ -6,7 +6,7 @@ import PositionType from "../../../../map/types/map/position-type";
 export default interface SmallMapSectionProps {
     close_map_section: () => void;
 
-    update_celestial: (id: number | null) => void
+    update_celestial: (id: number | null) => void;
 
     view_port: number;
 

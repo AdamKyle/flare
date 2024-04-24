@@ -1,4 +1,4 @@
-import {DuelMessages} from "../../../../lib/game/types/core/duel-player/definitions/duel-data";
+import { DuelMessages } from "../../../../lib/game/types/core/duel-player/definitions/duel-data";
 
 export default interface DuelPlayerState {
     character_id: number;
@@ -9,8 +9,8 @@ export default interface DuelPlayerState {
     attacker_health: number;
     defender_max_health: number;
     defender_health: number;
-    battle_messages: DuelMessages[]|[]
-    error_message: string|null,
-    defender_atonement: string,
-    attacker_atonement: string,
+    battle_messages: DuelMessages[] | [];
+    error_message: string | null;
+    defender_atonement: string;
+    attacker_atonement: string;
 }

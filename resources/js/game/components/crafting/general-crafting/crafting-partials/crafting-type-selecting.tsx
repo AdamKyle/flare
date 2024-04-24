@@ -1,10 +1,12 @@
-import React, {Fragment} from "react";
+import React, { Fragment } from "react";
 import Select from "react-select";
 import CraftingSelectionTypeProps from "./types/crafting-type-selection-props";
 
-export default class CraftingTypeSelection extends React.Component<CraftingSelectionTypeProps, any> {
-
-    private selectableTypes: {label: string, value: string}[]
+export default class CraftingTypeSelection extends React.Component<
+    CraftingSelectionTypeProps,
+    any
+> {
+    private selectableTypes: { label: string; value: string }[];
 
     constructor(props: CraftingSelectionTypeProps) {
         super(props);
@@ -80,11 +82,10 @@ export default class CraftingTypeSelection extends React.Component<CraftingSelec
                     value={this.defaultCraftingType()}
                 />
                 <p className="mt-3 text-sm">
-                    When it comes to weapons there are general
-                    "weapons" that any one can use, then there
-                    are specialty weapons: Hammers, Staves,
-                    Bows, Guns, Fans, Maces and Scratch Awls for Weapon Crafting. You can craft ANY
-                    of these types to gain levels.
+                    When it comes to weapons there are general "weapons" that
+                    any one can use, then there are specialty weapons: Hammers,
+                    Staves, Bows, Guns, Fans, Maces and Scratch Awls for Weapon
+                    Crafting. You can craft ANY of these types to gain levels.
                 </p>
             </Fragment>
         );

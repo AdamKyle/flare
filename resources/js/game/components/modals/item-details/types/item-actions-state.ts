@@ -1,4 +1,3 @@
-
 import ItemToEquip from "../../../item-comparison/deffinitions/item-to-equip";
 
 export default interface ItemActionsState {
@@ -12,17 +11,17 @@ export default interface ItemActionsState {
 
     show_item_details: boolean;
 
-    item_to_sell: ItemToEquip|null;
+    item_to_sell: ItemToEquip | null;
 
-    item_to_show: ItemToEquip|null;
+    item_to_show: ItemToEquip | null;
 
-    show_loading_label: boolean,
+    show_loading_label: boolean;
 
-    loading_label: string|null,
+    loading_label: string | null;
 
-    error_message: string|null,
+    error_message: string | null;
 
-    success_message: string|null;
+    success_message: string | null;
 
     has_updated_item: boolean;
 }

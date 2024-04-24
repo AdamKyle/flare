@@ -1,17 +1,17 @@
-import {DateTime} from "luxon";
+import { DateTime } from "luxon";
 
 export const getTimeLeftInSeconds = (time: any): number => {
     if (time !== null) {
-        const end   = DateTime.fromISO(time);
+        const end = DateTime.fromISO(time);
         const start = DateTime.now();
 
-        const timeLeft = (end.diff(start, 'seconds')).toObject()
+        const timeLeft = end.diff(start, "seconds").toObject();
 
-        if (typeof timeLeft === 'undefined') {
+        if (typeof timeLeft === "undefined") {
             return 0;
         }
 
-        if (typeof timeLeft.seconds === 'undefined') {
+        if (typeof timeLeft.seconds === "undefined") {
             return 0;
         }
 
@@ -19,4 +19,4 @@ export const getTimeLeftInSeconds = (time: any): number => {
     }
 
     return 0;
-}
+};

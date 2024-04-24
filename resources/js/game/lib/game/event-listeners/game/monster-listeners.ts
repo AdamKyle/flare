@@ -1,23 +1,24 @@
 import GameListener from "../game-listener";
-import {inject, injectable} from "tsyringe";
+import { inject, injectable } from "tsyringe";
 import CoreEventListener from "../core-event-listener";
 import Game from "../../../../game";
-import {Channel} from "laravel-echo";
+import { Channel } from "laravel-echo";
 
 @injectable()
 export default class MonsterListeners implements GameListener {
-
     private component?: Game;
     private userId?: number;
 
     private monsterUpdate?: Channel;
     private raidMonsterUpdate?: Channel;
 
-    constructor(@inject(CoreEventListener) private coreEventListener: CoreEventListener) {}
+    constructor(
+        @inject(CoreEventListener) private coreEventListener: CoreEventListener,
+    ) {}
 
     initialize(component: Game, userId: number): void {
         this.component = component;
-        this.userId    = userId
+        this.userId = userId;
     }
 
     register(): void {
@@ -27,13 +28,13 @@ export default class MonsterListeners implements GameListener {
             const echo = this.coreEventListener.getEcho();
 
             this.monsterUpdate = echo.private(
-                "update-monsters-list-" + this.userId
+                "update-monsters-list-" + this.userId,
             );
 
             this.raidMonsterUpdate = echo.private(
-                "update-raid-monsters-list-" + this.userId
+                "update-raid-monsters-list-" + this.userId,
             );
-        } catch (e: any|unknown) {
+        } catch (e: any | unknown) {
             throw new Error(e);
         }
     }
@@ -56,7 +57,6 @@ export default class MonsterListeners implements GameListener {
         this.monsterUpdate.listen(
             "Game.Maps.Events.UpdateMonsterList",
             (event: any) => {
-
                 if (!this.component) {
                     return;
                 }
@@ -65,14 +65,16 @@ export default class MonsterListeners implements GameListener {
                     return;
                 }
 
-                const actionData = JSON.parse(JSON.stringify(this.component.state.action_data));
+                const actionData = JSON.parse(
+                    JSON.stringify(this.component.state.action_data),
+                );
 
                 actionData.monsters = event.monsters;
 
                 this.component.setState({
                     action_data: actionData,
                 });
-            }
+            },
         );
     }
 
@@ -82,7 +84,6 @@ export default class MonsterListeners implements GameListener {
      * @protected
      */
     protected listenForRaidMonsterUpdates() {
-
         if (!this.raidMonsterUpdate) {
             return;
         }
@@ -90,15 +91,13 @@ export default class MonsterListeners implements GameListener {
         this.raidMonsterUpdate.listen(
             "Game.Maps.Events.UpdateRaidMonsters",
             (event: any) => {
-
                 if (!this.component) {
                     return;
                 }
 
                 const self = this;
 
-                setTimeout(function() {
-
+                setTimeout(function () {
                     if (!self.component) {
                         return;
                     }
@@ -107,16 +106,17 @@ export default class MonsterListeners implements GameListener {
                         return;
                     }
 
-                    const actionData = JSON.parse(JSON.stringify(self.component.state.action_data));
+                    const actionData = JSON.parse(
+                        JSON.stringify(self.component.state.action_data),
+                    );
 
                     actionData.raid_monsters = event.raidMonsters;
 
                     self.component.setState({
-                        action_data: actionData
+                        action_data: actionData,
                     });
                 }, 1000);
-            }
+            },
         );
-
     }
 }

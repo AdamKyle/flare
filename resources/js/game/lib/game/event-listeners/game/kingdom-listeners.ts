@@ -9,7 +9,6 @@ import GameListener from "../game-listener";
 
 @injectable()
 export default class KingdomListeners implements GameListener {
-
     private component?: Game;
 
     private userId?: number;
@@ -24,11 +23,13 @@ export default class KingdomListeners implements GameListener {
 
     private globalMapUpdate?: Channel;
 
-    constructor(@inject(CoreEventListener) private coreEventListener: CoreEventListener) {}
+    constructor(
+        @inject(CoreEventListener) private coreEventListener: CoreEventListener,
+    ) {}
 
     public initialize(component: Game, userId: number): void {
         this.component = component;
-        this.userId    = userId;
+        this.userId = userId;
     }
 
     public register(): void {
@@ -37,16 +38,22 @@ export default class KingdomListeners implements GameListener {
         try {
             const echo = this.coreEventListener.getEcho();
 
-            this.kingdomLogUpdate = echo.private("update-new-kingdom-logs-" + this.userId);
+            this.kingdomLogUpdate = echo.private(
+                "update-new-kingdom-logs-" + this.userId,
+            );
 
-            this.kingdomsUpdate = echo.private("add-kingdom-to-map-" + this.userId);
+            this.kingdomsUpdate = echo.private(
+                "add-kingdom-to-map-" + this.userId,
+            );
 
-            this.kingdomsTableUpdate = echo.private('kingdoms-list-data-' + this.userId);
+            this.kingdomsTableUpdate = echo.private(
+                "kingdoms-list-data-" + this.userId,
+            );
 
             this.npcKingdomsUpdate = echo.join("npc-kingdoms-update");
 
             this.globalMapUpdate = echo.join("global-map-update");
-        } catch (e: any|unknown) {
+        } catch (e: any | unknown) {
             throw new Error(e);
         }
     }
@@ -58,15 +65,15 @@ export default class KingdomListeners implements GameListener {
 
         setTimeout(() => {
             this.listenToPlayerKingdomUpdates();
-        }, 1000)
+        }, 1000);
 
         setTimeout(() => {
             this.listenForNPCKingdomUpdates();
-        }, 1100)
+        }, 1100);
 
         setTimeout(() => {
             this.listenToGlobalKingdomUpdates();
-        }, 1200)
+        }, 1200);
     }
 
     /**
@@ -76,13 +83,12 @@ export default class KingdomListeners implements GameListener {
      */
     protected listenForKingdomLogUpdates() {
         if (!this.kingdomLogUpdate) {
-            return
+            return;
         }
 
         this.kingdomLogUpdate.listen(
             "Game.Kingdoms.Events.UpdateKingdomLogs",
             (event: { logs: KingdomLogDetails[] | [] }) => {
-
                 if (!this.component) {
                     return;
                 }
@@ -97,9 +103,9 @@ export default class KingdomListeners implements GameListener {
                         }
 
                         this.component.updateLogIcon();
-                    }
+                    },
                 );
-            }
+            },
         );
     }
 
@@ -110,27 +116,26 @@ export default class KingdomListeners implements GameListener {
      */
     protected listenToPlayerKingdomUpdates() {
         if (!this.kingdomsUpdate) {
-            return
+            return;
         }
 
         this.kingdomsUpdate.listen(
             "Game.Kingdoms.Events.AddKingdomToMap",
             (event: any) => {
-
                 if (!this.component) {
                     return;
                 }
 
                 let mapData = JSON.parse(
-                    JSON.stringify(this.component.state.map_data)
-                )
+                    JSON.stringify(this.component.state.map_data),
+                );
 
                 mapData.player_kingdoms = event.myKingdoms;
 
                 this.component.setState({
                     map_data: mapData,
                 });
-            }
+            },
         );
     }
 
@@ -141,7 +146,7 @@ export default class KingdomListeners implements GameListener {
      */
     protected listenToPlayerKingdomsTableUpdate() {
         if (!this.kingdomsTableUpdate) {
-            return
+            return;
         }
 
         this.kingdomsTableUpdate.listen(
@@ -154,7 +159,7 @@ export default class KingdomListeners implements GameListener {
                 this.component.setState({
                     kingdoms: event.kingdoms,
                 });
-            }
+            },
         );
     }
 
@@ -165,7 +170,7 @@ export default class KingdomListeners implements GameListener {
      */
     protected listenForNPCKingdomUpdates() {
         if (!this.npcKingdomsUpdate) {
-            return
+            return;
         }
 
         this.npcKingdomsUpdate.listen(
@@ -174,7 +179,6 @@ export default class KingdomListeners implements GameListener {
                 npcKingdoms: NpcKingdomsDetails[] | [];
                 mapName: string;
             }) => {
-
                 if (!this.component) {
                     return;
                 }
@@ -184,9 +188,8 @@ export default class KingdomListeners implements GameListener {
                 }
 
                 if (this.component.state.map_data.map_name === event.mapName) {
-
                     let mapData = JSON.parse(
-                        JSON.stringify(this.component.state.map_data)
+                        JSON.stringify(this.component.state.map_data),
                     );
 
                     mapData.npc_kingdoms = event.npcKingdoms;
@@ -195,7 +198,7 @@ export default class KingdomListeners implements GameListener {
                         map_data: mapData,
                     });
                 }
-            }
+            },
         );
     }
 
@@ -206,13 +209,12 @@ export default class KingdomListeners implements GameListener {
      */
     protected listenToGlobalKingdomUpdates() {
         if (!this.globalMapUpdate) {
-            return
+            return;
         }
 
         this.globalMapUpdate.listen(
             "Game.Kingdoms.Events.UpdateGlobalMap",
             (event: any) => {
-
                 if (!this.component) {
                     return;
                 }
@@ -222,7 +224,7 @@ export default class KingdomListeners implements GameListener {
                 }
 
                 let mapData = JSON.parse(
-                    JSON.stringify(this.component.state.map_data)
+                    JSON.stringify(this.component.state.map_data),
                 );
 
                 const playerKingdomsFilter = mapData.player_kingdoms.filter(
@@ -230,17 +232,16 @@ export default class KingdomListeners implements GameListener {
                         if (
                             !event.npcKingdoms.some(
                                 (kingdom: NpcKingdomsDetails) =>
-                                    kingdom.id === playerKingdom.id
+                                    kingdom.id === playerKingdom.id,
                             )
                         ) {
                             return playerKingdom;
                         }
-                    }
+                    },
                 );
 
                 const enemyKingdoms = event.otherKingdoms.filter(
                     (kingdom: PlayerKingdomsDetails) => {
-
                         if (!this.component) {
                             return false;
                         }
@@ -249,8 +250,11 @@ export default class KingdomListeners implements GameListener {
                             return false;
                         }
 
-                        return kingdom.character_id !== this.component.state.character.id
-                    }
+                        return (
+                            kingdom.character_id !==
+                            this.component.state.character.id
+                        );
+                    },
                 );
 
                 mapData.enemy_kingdoms.concat(enemyKingdoms);
@@ -259,9 +263,9 @@ export default class KingdomListeners implements GameListener {
                 mapData.player_kingdoms.concat(playerKingdomsFilter);
 
                 this.component.setState({
-                    map_data: mapData
+                    map_data: mapData,
                 });
-            }
+            },
         );
     }
 }

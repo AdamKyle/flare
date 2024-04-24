@@ -51,7 +51,7 @@ export default class QuestDetailsModal extends React.Component<any, any> {
 
         new Ajax()
             .setRoute(
-                "quest/" + this.props.quest_id + "/" + this.props.character_id
+                "quest/" + this.props.quest_id + "/" + this.props.character_id,
             )
             .doAjaxCall(
                 "get",
@@ -61,7 +61,7 @@ export default class QuestDetailsModal extends React.Component<any, any> {
                         loading: false,
                     });
                 },
-                (error: AxiosError) => {}
+                (error: AxiosError) => {},
             );
     }
 
@@ -76,7 +76,7 @@ export default class QuestDetailsModal extends React.Component<any, any> {
                         "quest/" +
                             this.props.quest_id +
                             "/hand-in-quest/" +
-                            this.props.character_id
+                            this.props.character_id,
                     )
                     .doAjaxCall(
                         "post",
@@ -97,7 +97,7 @@ export default class QuestDetailsModal extends React.Component<any, any> {
                                 const response = error.response;
 
                                 const message = response.data.hasOwnProperty(
-                                    "message"
+                                    "message",
                                 )
                                     ? response.data.message
                                     : response.data.error;
@@ -107,9 +107,9 @@ export default class QuestDetailsModal extends React.Component<any, any> {
                                     error_message: message,
                                 });
                             }
-                        }
+                        },
                     );
-            }
+            },
         );
     }
 
@@ -127,33 +127,45 @@ export default class QuestDetailsModal extends React.Component<any, any> {
 
     getRequiredQuestDetails() {
         if (this.state.quest_details !== null) {
-
             if (this.state.quest_details.parent_chain_quest !== null) {
+                const questName =
+                    this.state.quest_details.parent_chain_quest.name;
+                const npcName =
+                    this.state.quest_details.parent_chain_quest.npc.real_name;
+                const mapName =
+                    this.state.quest_details.parent_chain_quest
+                        .belongs_to_map_name;
 
-                const questName = this.state.quest_details.parent_chain_quest.name;
-                const npcName = this.state.quest_details.parent_chain_quest.npc.real_name;
-                const mapName = this.state.quest_details.parent_chain_quest.belongs_to_map_name
-
-                return <span>
-                    You must complete another quest first, to start this story line. Complete the quest chain starting with: <strong>{questName}</strong>{" "}
-                    For the NPC: <strong>{npcName}</strong> who resides on: <strong>{mapName}</strong>.
-                </span>
+                return (
+                    <span>
+                        You must complete another quest first, to start this
+                        story line. Complete the quest chain starting with:{" "}
+                        <strong>{questName}</strong> For the NPC:{" "}
+                        <strong>{npcName}</strong> who resides on:{" "}
+                        <strong>{mapName}</strong>.
+                    </span>
+                );
             }
 
             if (this.state.quest_details.required_quest !== null) {
-
                 const questName = this.state.quest_details.required_quest.name;
-                const npcName = this.state.quest_details.required_quest.npc.real_name;
-                const mapName = this.state.quest_details.required_quest.belongs_to_map_name
+                const npcName =
+                    this.state.quest_details.required_quest.npc.real_name;
+                const mapName =
+                    this.state.quest_details.required_quest.belongs_to_map_name;
 
-                return <span>
-                    You must complete another quest first, to start this story line. Complete: <strong>{questName}</strong>{" "}
-                    For the NPC: <strong>{npcName}</strong> who resides on: <strong>{mapName}</strong>.
-                </span>
+                return (
+                    <span>
+                        You must complete another quest first, to start this
+                        story line. Complete: <strong>{questName}</strong> For
+                        the NPC: <strong>{npcName}</strong> who resides on:{" "}
+                        <strong>{mapName}</strong>.
+                    </span>
+                );
             }
         }
 
-        return <span>Something went wrong.</span>
+        return <span>Something went wrong.</span>;
     }
 
     renderPlaneAccessRequirements(map: { map_required_item: any | null }) {
@@ -195,7 +207,7 @@ export default class QuestDetailsModal extends React.Component<any, any> {
                             </dd>
                             {this.renderPlaneAccessRequirements(
                                 map.map_required_item.required_quest.npc
-                                    .game_map
+                                    .game_map,
                             )}
                         </Fragment>
                     ) : null}
@@ -214,7 +226,7 @@ export default class QuestDetailsModal extends React.Component<any, any> {
                                 }
                             </dd>
                             {this.renderPlaneAccessRequirements(
-                                map.map_required_item.required_monster.game_map
+                                map.map_required_item.required_monster.game_map,
                             )}
                         </Fragment>
                     ) : null}
@@ -246,18 +258,18 @@ export default class QuestDetailsModal extends React.Component<any, any> {
     }
 
     getMonsterTypeForRenderingItem(requiredMonster: any): string {
-        let type = 'Regular Monster';
+        let type = "Regular Monster";
 
         if (requiredMonster.is_celestial_entity) {
-            type = 'Celestial';
+            type = "Celestial";
         }
 
         if (requiredMonster.is_raid_monster) {
-            type = 'Raid Monster'
+            type = "Raid Monster";
         }
 
         if (requiredMonster.is_raid_boss) {
-            type = 'Raid Boss'
+            type = "Raid Boss";
         }
 
         return type;
@@ -319,12 +331,16 @@ export default class QuestDetailsModal extends React.Component<any, any> {
                             <dt>Obtained by killing</dt>
                             <dd>
                                 {item.required_monster.name}{" "}
-                                {'(' + this.getMonsterTypeForRenderingItem(item.required_monster) + ')'}
+                                {"(" +
+                                    this.getMonsterTypeForRenderingItem(
+                                        item.required_monster,
+                                    ) +
+                                    ")"}
                             </dd>
                             <dt>Resides on plane</dt>
                             <dd>{item.required_monster.game_map.name}</dd>
                             {this.renderPlaneAccessRequirements(
-                                item.required_monster.game_map
+                                item.required_monster.game_map,
                             )}
                         </Fragment>
                     ) : null}
@@ -343,7 +359,7 @@ export default class QuestDetailsModal extends React.Component<any, any> {
                                 {item.required_quest.npc.y_position}
                             </dd>
                             {this.renderPlaneAccessRequirements(
-                                item.required_quest.npc.game_map
+                                item.required_quest.npc.game_map,
                             )}
                         </Fragment>
                     ) : null}
@@ -361,7 +377,7 @@ export default class QuestDetailsModal extends React.Component<any, any> {
                             <dt>Which is on the plane</dt>
                             <dd>{item.drop_location.map.name}</dd>
                             {this.renderPlaneAccessRequirements(
-                                item.drop_location.map
+                                item.drop_location.map,
                             )}
                         </Fragment>
                     ) : null}
@@ -387,7 +403,7 @@ export default class QuestDetailsModal extends React.Component<any, any> {
 
         if (!this.state.loading) {
             npcPlaneAccess = this.renderPlaneAccessRequirements(
-                this.state.quest_details.npc.game_map
+                this.state.quest_details.npc.game_map,
             );
         }
 
@@ -425,13 +441,11 @@ export default class QuestDetailsModal extends React.Component<any, any> {
                     </div>
                 ) : (
                     <Fragment>
-                        {
-                            !this.props.is_required_quest_complete ?
-                                <WarningAlert additional_css={'my-4'}>
-                                    {this.getRequiredQuestDetails()}
-                                </WarningAlert>
-                            : null
-                        }
+                        {!this.props.is_required_quest_complete ? (
+                            <WarningAlert additional_css={"my-4"}>
+                                {this.getRequiredQuestDetails()}
+                            </WarningAlert>
+                        ) : null}
                         <Tabs tabs={this.tabs} full_width={true}>
                             <TabPanel key={"npc-details"}>
                                 <div
@@ -515,7 +529,8 @@ export default class QuestDetailsModal extends React.Component<any, any> {
                                 <div
                                     className={
                                         "my-4 max-h-[160px] overflow-x-auto border border-slate-200 dark:border-slate-700 rounded-md bg-slate-200 dark:bg-slate-700 p-4 " +
-                                        (!this.props.is_parent_complete || !this.props.is_required_quest_complete
+                                        (!this.props.is_parent_complete ||
+                                        !this.props.is_required_quest_complete
                                             ? " blur-sm"
                                             : "")
                                     }
@@ -525,7 +540,7 @@ export default class QuestDetailsModal extends React.Component<any, any> {
                                             dangerouslySetInnerHTML={{
                                                 __html: this.getText(
                                                     this.state.quest_details
-                                                        .after_completion_description
+                                                        .after_completion_description,
                                                 ),
                                             }}
                                         ></div>
@@ -534,7 +549,7 @@ export default class QuestDetailsModal extends React.Component<any, any> {
                                             dangerouslySetInnerHTML={{
                                                 __html: this.getText(
                                                     this.state.quest_details
-                                                        .before_completion_description
+                                                        .before_completion_description,
                                                 ),
                                             }}
                                         ></div>
@@ -545,7 +560,7 @@ export default class QuestDetailsModal extends React.Component<any, any> {
                                 <CurrencyRequirement
                                     quest={this.state.quest_details}
                                     item_requirements={this.renderItem.bind(
-                                        this
+                                        this,
                                     )}
                                 />
                             </TabPanel>

@@ -1,7 +1,6 @@
 import BuildingDetails from "../../../../sections/kingdoms/buildings/deffinitions/building-details";
 
 export default interface KingdomDetailsState {
-
     show_change_name_modal: boolean;
 
     show_buy_pop_modal: boolean;

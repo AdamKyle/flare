@@ -7,7 +7,11 @@
  */
 import MapSection from "../map-section";
 
-export const getNewYPosition = (characterY: number, mapPositionY: number, viewPort: number): number => {
+export const getNewYPosition = (
+    characterY: number,
+    mapPositionY: number,
+    viewPort: number,
+): number => {
     if (characterY < 288) {
         return 0;
     }
@@ -17,7 +21,7 @@ export const getNewYPosition = (characterY: number, mapPositionY: number, viewPo
     }
 
     return mapPositionY;
-}
+};
 
 /**
  * Get the new X position of the map.
@@ -26,13 +30,16 @@ export const getNewYPosition = (characterY: number, mapPositionY: number, viewPo
  * @param mapPositionX
  * @type [{characterX: number, mapPositionX: number}]
  */
-export const getNewXPosition = (characterX: number, mapPositionX: number, viewPort: number): number => {
+export const getNewXPosition = (
+    characterX: number,
+    mapPositionX: number,
+    viewPort: number,
+): number => {
     if (characterX <= 368) {
         return 0;
     }
 
     if (characterX > 368) {
-
         if (viewPort >= 1920) {
             return 0;
         }
@@ -45,7 +52,7 @@ export const getNewXPosition = (characterX: number, mapPositionX: number, viewPo
     }
 
     return mapPositionX;
-}
+};
 
 /**
  * Returns new position of the map as it is dragged.
@@ -55,8 +62,12 @@ export const getNewXPosition = (characterX: number, mapPositionX: number, viewPo
  * @param rightBounds
  * @type [{position: {x: number, y: number}, bottomBounds: number, rightBounds: number}]
  */
-export const dragMap = (position: {x: number, y: number}, bottomBounds: number, rightBounds: number): object => {
-    const {x, y} = position;
+export const dragMap = (
+    position: { x: number; y: number },
+    bottomBounds: number,
+    rightBounds: number,
+): object => {
+    const { x, y } = position;
     const yBounds = Math.sign(position.y);
     const xBounds = Math.sign(position.x);
     let bottomMapBounds = bottomBounds;
@@ -75,11 +86,11 @@ export const dragMap = (position: {x: number, y: number}, bottomBounds: number, 
     }
 
     return {
-        map_position: {x, y},
+        map_position: { x, y },
         bottom_bounds: bottomMapBounds,
         right_bounds: rightMapBounds,
-    }
-}
+    };
+};
 
 /**
  * Uses the map component props to fetch the bound sof the map.
@@ -87,10 +98,9 @@ export const dragMap = (position: {x: number, y: number}, bottomBounds: number, 
  * @param component
  */
 export const fetchLeftBounds = (component: MapSection): number => {
-
     if (component.props.view_port <= 1600 && component.props.view_port < 1920) {
         return -50;
     }
 
     return 0;
-}
+};

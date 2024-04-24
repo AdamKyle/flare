@@ -3,14 +3,23 @@ import NpcKingdomsDetails from "./npc-kingdoms-details";
 import PlayerKingdomsDetails from "./player-kingdoms-details";
 
 export default interface MapActionsProps {
-
     move_player: (direction: string) => void;
 
     map_id: number | 0;
 
-    teleport_player: (data: {x: number, y: number, cost: number, timeout: number}) => void;
+    teleport_player: (data: {
+        x: number;
+        y: number;
+        cost: number;
+        timeout: number;
+    }) => void;
 
-    set_sail: (data: {x: number, y: number, cost: number, timeout: number}) => void;
+    set_sail: (data: {
+        x: number;
+        y: number;
+        cost: number;
+        timeout: number;
+    }) => void;
 
     can_player_move: boolean;
 
@@ -24,13 +33,13 @@ export default interface MapActionsProps {
 
     enemy_kingdoms: PlayerKingdomsDetails[] | [];
 
-    port_location: LocationDetails| null;
+    port_location: LocationDetails | null;
 
     ports: LocationDetails[] | null;
 
-    coordinates: {x: number[], y: number[]} | null;
+    coordinates: { x: number[]; y: number[] } | null;
 
-    character_position: {x: number, y: number};
+    character_position: { x: number; y: number };
 
     character_id: number;
 
@@ -39,10 +48,10 @@ export default interface MapActionsProps {
     is_dead: boolean;
 
     currencies?: {
-        gold: number,
-        shards: number,
-        gold_dust: number,
-        copper_coins: number,
+        gold: number;
+        shards: number;
+        gold_dust: number;
+        copper_coins: number;
     };
 
     is_automation_running: boolean;

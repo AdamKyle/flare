@@ -2,7 +2,6 @@ import BuildingDetails from "../../../sections/kingdoms/buildings/deffinitions/b
 import DataTableBaseData from "../../../ui/types/tables/data-table-base-data";
 
 export default interface UnitDetails extends DataTableBaseData {
-
     attack: number;
 
     attacker: boolean;
@@ -13,7 +12,7 @@ export default interface UnitDetails extends DataTableBaseData {
 
     cost_per_unit: number;
 
-    current_amount: number|null;
+    current_amount: number | null;
 
     defence: number;
 
@@ -21,7 +20,7 @@ export default interface UnitDetails extends DataTableBaseData {
 
     description: string;
 
-    heal_percentage: number|null;
+    heal_percentage: number | null;
 
     id: number;
 

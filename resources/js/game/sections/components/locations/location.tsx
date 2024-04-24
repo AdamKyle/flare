@@ -47,7 +47,7 @@ export default class Location extends React.Component<
         }
 
         let location = this.props.locations.filter(
-            (location) => location.id === locationId
+            (location) => location.id === locationId,
         );
 
         if (location.length > 0) {
@@ -70,7 +70,7 @@ export default class Location extends React.Component<
                         key={"port-pin-" + location.id}
                         location={location}
                         openLocationDetails={this.openLocationDetails.bind(
-                            this
+                            this,
                         )}
                         pin_class={
                             location.is_corrupted
@@ -85,7 +85,7 @@ export default class Location extends React.Component<
                         key={"port-pin-" + location.id}
                         location={location}
                         openLocationDetails={this.openLocationDetails.bind(
-                            this
+                            this,
                         )}
                         pin_class={
                             location.is_corrupted
@@ -100,7 +100,7 @@ export default class Location extends React.Component<
                         key={"location-pin-" + location.id}
                         location={location}
                         openLocationDetails={this.openLocationDetails.bind(
-                            this
+                            this,
                         )}
                         pin_class={
                             location.is_corrupted

@@ -1,5 +1,5 @@
 export default interface GameProps {
-    userId: number,
+    userId: number;
 
-    characterId: number,
-};
+    characterId: number;
+}

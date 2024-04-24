@@ -16,7 +16,7 @@ export default interface ItemSkill {
     str_mod: number;
     total_kills_needed: number;
     max_level: number;
-    children: ItemSkill[]|[]
-    parent_id: number|null;
-    parent_level_needed: number|null
+    children: ItemSkill[] | [];
+    parent_id: number | null;
+    parent_level_needed: number | null;
 }

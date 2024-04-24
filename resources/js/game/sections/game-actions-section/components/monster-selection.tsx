@@ -56,7 +56,7 @@ export default class MonsterSelection extends React.Component<
     defaultMonster(): { label: string; value: number }[] {
         if (this.state.monster_to_fight !== null) {
             const monster: MonsterType | null = this.findMonster(
-                this.state.monster_to_fight.id
+                this.state.monster_to_fight.id,
             );
 
             if (monster !== null) {
@@ -71,7 +71,7 @@ export default class MonsterSelection extends React.Component<
         const foundMonster: MonsterType[] | [] = this.props.monsters.filter(
             (monster: MonsterType) => {
                 return monster.id === monsterId;
-            }
+            },
         );
 
         if (foundMonster.length > 0) {

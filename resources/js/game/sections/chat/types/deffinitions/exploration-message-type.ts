@@ -1,5 +1,4 @@
 export default interface ExplorationMessageType {
-
     id: number;
 
     message: string;

@@ -2,7 +2,6 @@ import InventoryComparisonAdjustment from "../../../../sections/components/item-
 import ItemToEquip from "../../../item-comparison/deffinitions/item-to-equip";
 
 export default interface EquipModalProps {
-
     is_open: boolean;
 
     manage_modal: () => void;

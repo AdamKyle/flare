@@ -6,7 +6,7 @@ import { isEqual } from "lodash";
 import ComponentLoading from "../../../game/components/ui/loading/component-loading";
 import SuccessButton from "../../../game/components/ui/buttons/success-button";
 import OrangeButton from "../../../game/components/ui/buttons/orange-button";
-import {Editor} from "@tinymce/tinymce-react";
+import { Editor } from "@tinymce/tinymce-react";
 
 export default class InfoSection extends React.Component<any, any> {
     constructor(props: any) {
@@ -30,8 +30,7 @@ export default class InfoSection extends React.Component<any, any> {
                 content: self.props.content.content,
                 selected_live_wire_component:
                     self.props.content.live_wire_component,
-                selected_item_table_type:
-                    self.props.content.item_table_type,
+                selected_item_table_type: self.props.content.item_table_type,
                 image_to_upload: null,
                 order: self.props.content.order,
                 loading: false,
@@ -39,9 +38,7 @@ export default class InfoSection extends React.Component<any, any> {
         }, 500);
     }
 
-    componentDidUpdate(
-        prevProps: Readonly<any>,
-    ) {
+    componentDidUpdate(prevProps: Readonly<any>) {
         if (!isEqual(this.props.content.content, prevProps.content.content)) {
             this.setState({
                 content: this.props.content.content,
@@ -56,7 +53,7 @@ export default class InfoSection extends React.Component<any, any> {
             },
             () => {
                 this.updateParentElement();
-            }
+            },
         );
     }
 
@@ -68,19 +65,18 @@ export default class InfoSection extends React.Component<any, any> {
             },
             () => {
                 this.updateParentElement();
-            }
+            },
         );
     }
 
     setItemTableType(data: any) {
         this.setState(
             {
-                selected_item_table_type:
-                    data.value !== "" ? data.value : null,
+                selected_item_table_type: data.value !== "" ? data.value : null,
             },
             () => {
                 this.updateParentElement();
-            }
+            },
         );
     }
 
@@ -91,7 +87,7 @@ export default class InfoSection extends React.Component<any, any> {
             },
             () => {
                 this.updateParentElement();
-            }
+            },
         );
     }
 
@@ -112,8 +108,8 @@ export default class InfoSection extends React.Component<any, any> {
     buildOptions() {
         return [
             {
-                label: 'Please select',
-                value: '',
+                label: "Please select",
+                value: "",
             },
             {
                 label: "Items",
@@ -245,38 +241,38 @@ export default class InfoSection extends React.Component<any, any> {
     buildItemTableTypes() {
         return [
             {
-                label: 'Please select',
-                value: '',
+                label: "Please select",
+                value: "",
             },
             {
-                label: 'Crafting',
-                value: 'crafting',
+                label: "Crafting",
+                value: "crafting",
             },
             {
-                label: 'Hell Forged',
-                value: 'hell-forged',
+                label: "Hell Forged",
+                value: "hell-forged",
             },
             {
-                label: 'Purgatory Chains',
-                value: 'purgatory-chains',
+                label: "Purgatory Chains",
+                value: "purgatory-chains",
             },
             {
-                label: 'Pirate Lord Leather',
-                value: 'pirate-lord-leather',
+                label: "Pirate Lord Leather",
+                value: "pirate-lord-leather",
             },
             {
-                label: 'Corrupted Ice',
-                value: 'corrupted-ice',
+                label: "Corrupted Ice",
+                value: "corrupted-ice",
             },
             {
-                label: 'Twisted Earth',
-                value: 'twisted-earth',
+                label: "Twisted Earth",
+                value: "twisted-earth",
             },
             {
-                label: 'Delusional Silver',
-                value: 'delusional-silver',
+                label: "Delusional Silver",
+                value: "delusional-silver",
             },
-        ]
+        ];
     }
 
     setFileForUpload(event: React.ChangeEvent<HTMLInputElement>) {
@@ -287,7 +283,7 @@ export default class InfoSection extends React.Component<any, any> {
                 },
                 () => {
                     this.updateParentElement();
-                }
+                },
             );
         }
     }
@@ -296,7 +292,7 @@ export default class InfoSection extends React.Component<any, any> {
         if (this.state.selected_live_wire_component !== null) {
             return this.buildOptions().filter(
                 (option: any) =>
-                    option.value === this.state.selected_live_wire_component
+                    option.value === this.state.selected_live_wire_component,
             );
         }
 
@@ -312,7 +308,7 @@ export default class InfoSection extends React.Component<any, any> {
         if (this.state.selected_item_table_type !== null) {
             return this.buildItemTableTypes().filter(
                 (option: any) =>
-                    option.value === this.state.selected_item_table_type
+                    option.value === this.state.selected_item_table_type,
             );
         }
 
@@ -349,8 +345,9 @@ export default class InfoSection extends React.Component<any, any> {
                 <Editor
                     apiKey={apiKey}
                     init={{
-                        plugins: 'lists link image paste help wordcount',
-                        toolbar: 'undo redo | blocks | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | help'
+                        plugins: "lists link image paste help wordcount",
+                        toolbar:
+                            "undo redo | blocks | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | help",
                     }}
                     initialValue={this.state.content}
                     onEditorChange={this.setValue.bind(this)}
@@ -390,7 +387,7 @@ export default class InfoSection extends React.Component<any, any> {
                     value={this.defaultSelectedAction()}
                 />
 
-                <div className='my-4'>
+                <div className="my-4">
                     <Select
                         onChange={this.setItemTableType.bind(this)}
                         options={this.buildItemTableTypes()}

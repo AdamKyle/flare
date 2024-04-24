@@ -1,5 +1,4 @@
 export default interface ManageTreasuryModalProps {
-
     is_open: boolean;
 
     handle_close: () => void;

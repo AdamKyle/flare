@@ -2,8 +2,7 @@ import UnitDetails from "../../../../lib/game/kingdoms/deffinitions/unit-details
 import DataTableBaseData from "../../../../lib/ui/types/tables/data-table-base-data";
 
 export default interface BuildingDetails extends DataTableBaseData {
-
-    [key:string]: number|string|boolean|null|UnitDetails[]|[];
+    [key: string]: number | string | boolean | null | UnitDetails[] | [];
 
     base_clay_cost: number;
 
@@ -75,7 +74,7 @@ export default interface BuildingDetails extends DataTableBaseData {
 
     name: string;
 
-    passive_skill_name: string|null;
+    passive_skill_name: string | null;
 
     population_increase: number;
 
@@ -103,7 +102,7 @@ export default interface BuildingDetails extends DataTableBaseData {
 
     wood_increase: number;
 
-    units: UnitDetails[]|[];
+    units: UnitDetails[] | [];
 
     additional_pop_cost: number;
 

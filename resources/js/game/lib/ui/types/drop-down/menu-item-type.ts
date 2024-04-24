@@ -1,5 +1,4 @@
 export default interface MenuItemType {
-
     name: string;
 
     icon_class?: string;

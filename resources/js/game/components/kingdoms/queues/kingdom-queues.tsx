@@ -17,10 +17,16 @@ import UnitMovementDetails from "./deffinitions/unit-movement-details";
 import { CancellationType } from "./enums/cancellation-type";
 import { QueueTypes } from "./enums/queue-types";
 import { KingdomQueueProps } from "./types/kingdom-queue-props";
-import KingdomQueueState, { BuildingExpansionQueue, BuildingQueue, UnitQueue } from "./types/kingdom-queue-state";
+import KingdomQueueState, {
+    BuildingExpansionQueue,
+    BuildingQueue,
+    UnitQueue,
+} from "./types/kingdom-queue-state";
 
-export default class KingdomQueues extends React.Component<KingdomQueueProps, KingdomQueueState> {
-
+export default class KingdomQueues extends React.Component<
+    KingdomQueueProps,
+    KingdomQueueState
+> {
     private gameEventListener: CoreEventListener;
 
     private updateKingdomQueues: Channel;
@@ -35,7 +41,7 @@ export default class KingdomQueues extends React.Component<KingdomQueueProps, Ki
             error_message: null,
             success_message: null,
             queues: null,
-        }
+        };
 
         this.gameEventListener = serviceContainer().fetch(CoreEventListener);
 
@@ -43,30 +49,41 @@ export default class KingdomQueues extends React.Component<KingdomQueueProps, Ki
 
         this.gameEventListener.initialize();
 
-        this.updateKingdomQueues = this.gameEventListener.getEcho().private("refresh-kingdom-queues-" + this.props.user_id);
+        this.updateKingdomQueues = this.gameEventListener
+            .getEcho()
+            .private("refresh-kingdom-queues-" + this.props.user_id);
     }
 
     componentDidMount() {
-        (new Ajax()).setRoute('kingdom/queues/'+this.props.kingdom_id+'/' + this.props.character_id)
-            .doAjaxCall('get', (result: AxiosResponse) => {
-                this.setState({
-                    loading: false,
-                    queues: result.data.queues,
-                });
-            }, (error: AxiosError) => {
-
-                this.setState({
-                    loading: false,
-                });
-
-                if (typeof error.response !== 'undefined') {
-                    const result = error.response;
-
+        new Ajax()
+            .setRoute(
+                "kingdom/queues/" +
+                    this.props.kingdom_id +
+                    "/" +
+                    this.props.character_id,
+            )
+            .doAjaxCall(
+                "get",
+                (result: AxiosResponse) => {
                     this.setState({
-                        error_message: result.data.message,
+                        loading: false,
+                        queues: result.data.queues,
                     });
-                }
-            });
+                },
+                (error: AxiosError) => {
+                    this.setState({
+                        loading: false,
+                    });
+
+                    if (typeof error.response !== "undefined") {
+                        const result = error.response;
+
+                        this.setState({
+                            error_message: result.data.message,
+                        });
+                    }
+                },
+            );
 
         this.updateKingdomQueues.listen(
             "Game.Kingdoms.Events.UpdateKingdomQueues",
@@ -76,202 +93,266 @@ export default class KingdomQueues extends React.Component<KingdomQueueProps, Ki
                 }
 
                 this.setState({
-                    queues: event.kingdomQueues
+                    queues: event.kingdomQueues,
                 });
-            }
+            },
         );
     }
 
-    cancelQueue(cancellationType: CancellationType, queueIndex: number, queueKey: QueueTypes) {
-
+    cancelQueue(
+        cancellationType: CancellationType,
+        queueIndex: number,
+        queueKey: QueueTypes,
+    ) {
         if (this.state.queues === null) {
             return;
         }
 
-        this.cancellationAjax.doAjaxCall(this, cancellationType, this.state.queues[queueKey][queueIndex], this.props.character_id);
+        this.cancellationAjax.doAjaxCall(
+            this,
+            cancellationType,
+            this.state.queues[queueKey][queueIndex],
+            this.props.character_id,
+        );
     }
 
-    renderBuildingQueues(): ReactNode[]|[]|null {
+    renderBuildingQueues(): ReactNode[] | [] | null {
         if (this.state.queues === null) {
             return null;
         }
 
-        const buildingQueues = this.state.queues.building_queues.map((buildingQueue: BuildingQueue, index: number) => {
+        const buildingQueues = this.state.queues.building_queues
+            .map((buildingQueue: BuildingQueue, index: number) => {
+                if (buildingQueue.type === "upgrading") {
+                    return (
+                        <BasicCard additionalClasses={"my-2"}>
+                            <div className="bold my-4 text-gray-800 dark:text-gray-300">
+                                Upgrading {buildingQueue.name}
+                            </div>
+                            <TimerProgressBar
+                                time_out_label={
+                                    "From Level: " +
+                                    buildingQueue.from_level +
+                                    " To Level: " +
+                                    buildingQueue.to_level
+                                }
+                                time_remaining={buildingQueue.time_remaining}
+                            />
+                            <DangerOutlineButton
+                                button_label={"Cancel"}
+                                on_click={() => {
+                                    this.cancelQueue(
+                                        CancellationType.BUILDING_IN_QUEUE,
+                                        index,
+                                        QueueTypes.BUILDING_QUEUES,
+                                    );
+                                }}
+                                additional_css={"my-2"}
+                            />
+                        </BasicCard>
+                    );
+                }
 
-            if (buildingQueue.type === 'upgrading') {
-                return (
-                    <BasicCard additionalClasses={'my-2'}>
-                        <div className='bold my-4 text-gray-800 dark:text-gray-300'>
-                            Upgrading {buildingQueue.name}
-                        </div>
-                        <TimerProgressBar  time_out_label={
-                            'From Level: ' + buildingQueue.from_level + ' To Level: ' + buildingQueue.to_level
-                        } time_remaining={buildingQueue.time_remaining} />
-                        <DangerOutlineButton button_label={'Cancel'} on_click={() => {
-                            this.cancelQueue(
-                                CancellationType.BUILDING_IN_QUEUE,
-                                index,
-                                QueueTypes.BUILDING_QUEUES,
-                            )
-                        }} additional_css={'my-2'} />
-                    </BasicCard>
-                )
-            }
-
-            if (buildingQueue.type === 'repairing') {
-                return (
-                    <BasicCard additionalClasses={'my-2'}>
-                        <div className='bold my-2'>
-                            Repairing {buildingQueue.name}
-                        </div>
-                        <TimerProgressBar time_out_label={'Repairing'} time_remaining={buildingQueue.time_remaining} />
-                        <DangerOutlineButton button_label={'Cancel'} on_click={() => {
-                            this.cancelQueue(
-                                CancellationType.BUILDING_IN_QUEUE,
-                                index,
-                                QueueTypes.BUILDING_QUEUES,
-                            )
-                        }} additional_css={'my-2'} />
-                    </BasicCard>
-                )
-            }
-        }).filter((buildingQueueData: ReactNode | undefined) => {
-            return typeof buildingQueueData !== 'undefined'
-        });
+                if (buildingQueue.type === "repairing") {
+                    return (
+                        <BasicCard additionalClasses={"my-2"}>
+                            <div className="bold my-2">
+                                Repairing {buildingQueue.name}
+                            </div>
+                            <TimerProgressBar
+                                time_out_label={"Repairing"}
+                                time_remaining={buildingQueue.time_remaining}
+                            />
+                            <DangerOutlineButton
+                                button_label={"Cancel"}
+                                on_click={() => {
+                                    this.cancelQueue(
+                                        CancellationType.BUILDING_IN_QUEUE,
+                                        index,
+                                        QueueTypes.BUILDING_QUEUES,
+                                    );
+                                }}
+                                additional_css={"my-2"}
+                            />
+                        </BasicCard>
+                    );
+                }
+            })
+            .filter((buildingQueueData: ReactNode | undefined) => {
+                return typeof buildingQueueData !== "undefined";
+            });
 
         return buildingQueues;
     }
 
-    renderUnitRecruitmentQueues(): ReactNode[]|[]|null {
+    renderUnitRecruitmentQueues(): ReactNode[] | [] | null {
         if (this.state.queues === null) {
             return null;
         }
 
-        return this.state.queues.unit_recruitment_queues.map((unitRecruitmentQueue: UnitQueue, index: number) => {
-            return (
-                <BasicCard additionalClasses={'my-2'}>
-                    <div className='bold my-2'>
-                        Recruiting {unitRecruitmentQueue.name}
-                    </div>
-                    <TimerProgressBar time_out_label={
-                        'Rectuiting: ' + unitRecruitmentQueue.recruit_amount
-                    } time_remaining={unitRecruitmentQueue.time_remaining} />
-                    <DangerOutlineButton button_label={'Cancel'} on_click={() => {
-                        this.cancelQueue(
-                            CancellationType.UNIT_RECRUITMENT,
-                            index,
-                            QueueTypes.UNIT_RECRUITMENT_QUEUES,
-                        )
-                    }} additional_css={'my-2'} />
-                </BasicCard>
-            )
-        });
+        return this.state.queues.unit_recruitment_queues.map(
+            (unitRecruitmentQueue: UnitQueue, index: number) => {
+                return (
+                    <BasicCard additionalClasses={"my-2"}>
+                        <div className="bold my-2">
+                            Recruiting {unitRecruitmentQueue.name}
+                        </div>
+                        <TimerProgressBar
+                            time_out_label={
+                                "Rectuiting: " +
+                                unitRecruitmentQueue.recruit_amount
+                            }
+                            time_remaining={unitRecruitmentQueue.time_remaining}
+                        />
+                        <DangerOutlineButton
+                            button_label={"Cancel"}
+                            on_click={() => {
+                                this.cancelQueue(
+                                    CancellationType.UNIT_RECRUITMENT,
+                                    index,
+                                    QueueTypes.UNIT_RECRUITMENT_QUEUES,
+                                );
+                            }}
+                            additional_css={"my-2"}
+                        />
+                    </BasicCard>
+                );
+            },
+        );
     }
 
-    renderUnitMovementQueues(): ReactNode[]|[]|null {
+    renderUnitMovementQueues(): ReactNode[] | [] | null {
         if (this.state.queues === null) {
             return null;
         }
 
-        return this.state.queues.unit_movement_queues.map((unitMovementQueue: UnitMovementDetails, index: number) => {
+        return this.state.queues.unit_movement_queues.map(
+            (unitMovementQueue: UnitMovementDetails, index: number) => {
+                let canCancelAttack = true;
 
-            let canCancelAttack = true;
+                if (unitMovementQueue.reason === "Currently attacking") {
+                    canCancelAttack =
+                        this.props.kingdoms.filter(
+                            (kingdom: KingdomDetails) => {
+                                return (
+                                    kingdom.name ===
+                                    unitMovementQueue.from_kingdom_name
+                                );
+                            },
+                        ).length > 0;
+                }
 
-            if (unitMovementQueue.reason === 'Currently attacking') {
-                canCancelAttack = this.props.kingdoms.filter((kingdom: KingdomDetails) => {
-                    return kingdom.name === unitMovementQueue.from_kingdom_name;
-                }).length > 0;
-            }
+                let canCancelRecall = true;
 
-            let canCancelRecall = true;
+                return (
+                    <BasicCard additionalClasses={"my-2"}>
+                        <div className="bold my-2">Units Are on the move!</div>
+                        <dl className={"my-4"}>
+                            <dt>Why</dt>
+                            <dd>
+                                {unitMovementReasonIcon(unitMovementQueue)}{" "}
+                                {unitMovementQueue.reason}
+                            </dd>
+                            <dt>From:</dt>
+                            <dd>
+                                {unitMovementQueue.from_kingdom_name} (X/Y:{" "}
+                                {unitMovementQueue.from_x}/
+                                {unitMovementQueue.from_y})
+                            </dd>
+                            <dt>To:</dt>
+                            <dd>
+                                {unitMovementQueue.to_kingdom_name} (X/Y:{" "}
+                                {unitMovementQueue.moving_to_y}/
+                                {unitMovementQueue.moving_to_y})
+                            </dd>
+                        </dl>
 
-            return (
-                <BasicCard additionalClasses={'my-2'}>
-                    <div className='bold my-2'>
-                        Units Are on the move!
-                    </div>
-                    <dl className={'my-4'}>
-                        <dt>Why</dt>
-                        <dd>{unitMovementReasonIcon(unitMovementQueue)} {unitMovementQueue.reason}</dd>
-                        <dt>From:</dt>
-                        <dd>{unitMovementQueue.from_kingdom_name} (X/Y: {unitMovementQueue.from_x}/{unitMovementQueue.from_y})</dd>
-                        <dt>To:</dt>
-                        <dd>{unitMovementQueue.to_kingdom_name} (X/Y: {unitMovementQueue.moving_to_y}/{unitMovementQueue.moving_to_y})</dd>
-                    </dl>
+                        <TimerProgressBar
+                            time_out_label={"Units are in movement"}
+                            time_remaining={unitMovementQueue.time_left}
+                        />
 
-                    <TimerProgressBar time_out_label={
-                        'Units are in movement'
-                    } time_remaining={unitMovementQueue.time_left} />
-
-                    <DangerOutlineButton button_label={'Cancel'} on_click={() => {
-                        this.cancelQueue(
-                            CancellationType.UNIT_MOVEMENT,
-                            index,
-                            QueueTypes.UNIT_MOVEMENT_QUEUES,
-                        )
-                    }} additional_css={'my-2'} disabled={
-                        (!canCancelAttack || !canCancelRecall ) && unitMovementQueue.reason === 'Returning from attack' || unitMovementQueue.reason === 'Recalled units'
-                    }/>
-                </BasicCard>
-            )
-        });
+                        <DangerOutlineButton
+                            button_label={"Cancel"}
+                            on_click={() => {
+                                this.cancelQueue(
+                                    CancellationType.UNIT_MOVEMENT,
+                                    index,
+                                    QueueTypes.UNIT_MOVEMENT_QUEUES,
+                                );
+                            }}
+                            additional_css={"my-2"}
+                            disabled={
+                                ((!canCancelAttack || !canCancelRecall) &&
+                                    unitMovementQueue.reason ===
+                                        "Returning from attack") ||
+                                unitMovementQueue.reason === "Recalled units"
+                            }
+                        />
+                    </BasicCard>
+                );
+            },
+        );
     }
 
-    renderBuildingExpansionQueues(): ReactNode[]|[]|null {
-
+    renderBuildingExpansionQueues(): ReactNode[] | [] | null {
         if (this.state.queues === null) {
             return null;
         }
 
-        return this.state.queues.building_expansion_queues.map((buildingExpansionQueue: BuildingExpansionQueue, index: number) => {
-            return (
-                <BasicCard additionalClasses={'my-2'}>
-                    <div className='bold my-2'>
-                        {buildingExpansionQueue.name} Is expanding production
-                    </div>
-                    <TimerProgressBar time_out_label={
-                        'From slot: ' + buildingExpansionQueue.from_slot + ' to slot: ' + buildingExpansionQueue.to_slot
-                    } time_remaining={buildingExpansionQueue.time_remaining} />
-                    <DangerOutlineButton button_label={'Cancel'} on_click={() => {
-                        this.cancelQueue(
-                            CancellationType.BUILDING_EXPANSION,
-                            index,
-                            QueueTypes.BUILDING_EXPANSION_QUEUES,
-                        )
-                    }} additional_css={'my-2'} />
-                </BasicCard>
-            )
-        });
+        return this.state.queues.building_expansion_queues.map(
+            (buildingExpansionQueue: BuildingExpansionQueue, index: number) => {
+                return (
+                    <BasicCard additionalClasses={"my-2"}>
+                        <div className="bold my-2">
+                            {buildingExpansionQueue.name} Is expanding
+                            production
+                        </div>
+                        <TimerProgressBar
+                            time_out_label={
+                                "From slot: " +
+                                buildingExpansionQueue.from_slot +
+                                " to slot: " +
+                                buildingExpansionQueue.to_slot
+                            }
+                            time_remaining={
+                                buildingExpansionQueue.time_remaining
+                            }
+                        />
+                        <DangerOutlineButton
+                            button_label={"Cancel"}
+                            on_click={() => {
+                                this.cancelQueue(
+                                    CancellationType.BUILDING_EXPANSION,
+                                    index,
+                                    QueueTypes.BUILDING_EXPANSION_QUEUES,
+                                );
+                            }}
+                            additional_css={"my-2"}
+                        />
+                    </BasicCard>
+                );
+            },
+        );
     }
 
     render() {
         return (
             <div>
-                <p className='my-2'>
-                    Below you will find the various queues. This could be building expansions,
-                    repairs, upgrades, unit recruitment and movement.
+                <p className="my-2">
+                    Below you will find the various queues. This could be
+                    building expansions, repairs, upgrades, unit recruitment and
+                    movement.
                 </p>
-                <div className='border-b-2 border-b-gray-200 dark:border-b-gray-600 my-3'></div>
-                {
-                    this.state.loading ?
-                        <LoadingProgressBar />
-                    : null
-                }
-                {
-                    this.state.error_message !== null ?
-                        <DangerAlert>
-                            {this.state.error_message}
-                        </DangerAlert>
-                    : null
-                }
-                {
-                    this.state.success_message !== null ?
-                        <SuccessAlert>
-                            {this.state.success_message}
-                        </SuccessAlert>
-                        : null
-                }
-                <div className='w-[90%] mr-auto ml-auto max-h-[600px] overflow-y-auto'>
+                <div className="border-b-2 border-b-gray-200 dark:border-b-gray-600 my-3"></div>
+                {this.state.loading ? <LoadingProgressBar /> : null}
+                {this.state.error_message !== null ? (
+                    <DangerAlert>{this.state.error_message}</DangerAlert>
+                ) : null}
+                {this.state.success_message !== null ? (
+                    <SuccessAlert>{this.state.success_message}</SuccessAlert>
+                ) : null}
+                <div className="w-[90%] mr-auto ml-auto max-h-[600px] overflow-y-auto">
                     {this.renderBuildingQueues()}
                     {this.renderBuildingExpansionQueues()}
                     {this.renderUnitRecruitmentQueues()}

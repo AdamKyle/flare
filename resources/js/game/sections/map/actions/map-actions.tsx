@@ -49,7 +49,7 @@ export default class MapActions extends React.Component<
         new MovePlayer(this).teleportPlayer(
             data,
             this.props.character_id,
-            this.props.update_map_state
+            this.props.update_map_state,
         );
     }
 
@@ -58,7 +58,7 @@ export default class MapActions extends React.Component<
             data,
             this.props.character_id,
             this.props.view_port,
-            this.props.update_map_state
+            this.props.update_map_state,
         );
     }
 
@@ -68,7 +68,7 @@ export default class MapActions extends React.Component<
         }
 
         return this.props.locations.filter(
-            (location: LocationDetails) => location.is_port
+            (location: LocationDetails) => location.is_port,
         );
     }
 

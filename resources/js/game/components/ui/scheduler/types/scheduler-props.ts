@@ -1,12 +1,19 @@
 import Event from "../deffinitions/event";
-import {View} from "@aldabil/react-scheduler/components/nav/Navigation";
-import {FieldProps, ProcessedEvent, SchedulerHelpers} from "@aldabil/react-scheduler/types";
+import { View } from "@aldabil/react-scheduler/components/nav/Navigation";
+import {
+    FieldProps,
+    ProcessedEvent,
+    SchedulerHelpers,
+} from "@aldabil/react-scheduler/types";
 
 export default interface SchedulerProps {
-    events: Event[]|[];
+    events: Event[] | [];
     customEditor?: (scheduler: SchedulerHelpers) => JSX.Element;
-    viewerExtraComponent?: (fields: FieldProps[]|[], event: ProcessedEvent) => JSX.Element;
-    onDelete?: (eventId: number) => Promise<string | number | void>
+    viewerExtraComponent?: (
+        fields: FieldProps[] | [],
+        event: ProcessedEvent,
+    ) => JSX.Element;
+    onDelete?: (eventId: number) => Promise<string | number | void>;
     view: View;
     can_edit: boolean;
 }
@@ -14,4 +21,4 @@ export default interface SchedulerProps {
 type RaidsForSelection = {
     id: number;
     name: string;
-}
+};

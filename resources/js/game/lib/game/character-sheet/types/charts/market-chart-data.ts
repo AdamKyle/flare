@@ -1,6 +1,6 @@
 export default interface MarketChartData {
-    [index: string]: number|string;
+    [index: string]: number | string;
 
-    date: string,
-    price: number,
+    date: string;
+    price: number;
 }

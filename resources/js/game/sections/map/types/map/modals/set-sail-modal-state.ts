@@ -2,13 +2,13 @@ import LocationDetails from "../../location-details";
 import PlayerKingdomsDetails from "../player-kingdoms-details";
 
 export default interface SetSailModalState {
-
     x_position: number;
 
     y_position: number;
 
     character_position: {
-        x: number; y: number;
+        x: number;
+        y: number;
     };
 
     current_location: LocationDetails | null;

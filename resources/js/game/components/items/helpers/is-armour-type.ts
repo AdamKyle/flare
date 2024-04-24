@@ -1,4 +1,4 @@
-import {ItemType} from "../enums/item-type";
+import { ItemType } from "../enums/item-type";
 
 const ARMOUR_TYPES = [
     ItemType.BODY,
@@ -12,4 +12,4 @@ const ARMOUR_TYPES = [
 
 export const isArmourType = (itemType: ItemType) => {
     return ARMOUR_TYPES.includes(itemType);
-}
+};

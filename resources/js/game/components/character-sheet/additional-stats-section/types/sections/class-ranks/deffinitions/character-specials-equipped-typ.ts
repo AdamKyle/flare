@@ -1,7 +1,6 @@
 import ClassSpecialtiesType from "./class-specialties-type";
 
 export default interface CharacterSpecialsEquippedTyp {
-
     base_ac_mod: number;
 
     base_damage_mod: number;
@@ -16,9 +15,9 @@ export default interface CharacterSpecialsEquippedTyp {
 
     current_xp: number;
 
-    equipped: boolean
+    equipped: boolean;
 
-    game_class_special: ClassSpecialtiesType
+    game_class_special: ClassSpecialtiesType;
 
     game_class_special_id: number;
 

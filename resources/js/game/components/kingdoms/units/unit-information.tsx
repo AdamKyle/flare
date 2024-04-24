@@ -91,7 +91,7 @@ export default class UnitInformation extends React.Component<
                     building.game_building_id ===
                     unit.recruited_from.game_building_id
                 );
-            }
+            },
         );
 
         if (building.length === 0) {
@@ -107,27 +107,25 @@ export default class UnitInformation extends React.Component<
     }
 
     renderSelectedSection(): ReactNode {
-
-        if (this.state.upgrade_section === 'resources') {
-            return <RecruitWithResources
-                kingdom_id={this.props.kingdom_id}
-                character_id={this.props.character_id}
-                unit={this.props.unit}
-                unit_cost_reduction={this.props.unit_cost_reduction}
-                kingdom_unit_time_reduction={
-                    this.props.kingdom_unit_time_reduction
-                }
-                manage_help_dialogue={this.manageHelpDialogue.bind(
-                    this
-                )}
-                remove_selection={this.removeSelection.bind(this)}
-                set_resource_amount={this.setResourceAmount.bind(this)}
-            />
+        if (this.state.upgrade_section === "resources") {
+            return (
+                <RecruitWithResources
+                    kingdom_id={this.props.kingdom_id}
+                    character_id={this.props.character_id}
+                    unit={this.props.unit}
+                    unit_cost_reduction={this.props.unit_cost_reduction}
+                    kingdom_unit_time_reduction={
+                        this.props.kingdom_unit_time_reduction
+                    }
+                    manage_help_dialogue={this.manageHelpDialogue.bind(this)}
+                    remove_selection={this.removeSelection.bind(this)}
+                    set_resource_amount={this.setResourceAmount.bind(this)}
+                />
+            );
         }
 
         return null;
     }
-
 
     render() {
         return (
@@ -193,8 +191,8 @@ export default class UnitInformation extends React.Component<
                                         this.calculateCostsForUnit(
                                             this.props.unit.stone_cost,
                                             this.getAmount(),
-                                            false
-                                        )
+                                            false,
+                                        ),
                                     )}
                                 </dd>
                                 <dt>Clay Cost:</dt>
@@ -203,8 +201,8 @@ export default class UnitInformation extends React.Component<
                                         this.calculateCostsForUnit(
                                             this.props.unit.clay_cost,
                                             this.getAmount(),
-                                            false
-                                        )
+                                            false,
+                                        ),
                                     )}
                                 </dd>
                                 <dt>Wood Cost:</dt>
@@ -213,8 +211,8 @@ export default class UnitInformation extends React.Component<
                                         this.calculateCostsForUnit(
                                             this.props.unit.wood_cost,
                                             this.getAmount(),
-                                            false
-                                        )
+                                            false,
+                                        ),
                                     )}
                                 </dd>
                                 <dt>Iron Cost:</dt>
@@ -223,8 +221,8 @@ export default class UnitInformation extends React.Component<
                                         this.calculateCostsForUnit(
                                             this.props.unit.iron_cost,
                                             this.getAmount(),
-                                            true
-                                        )
+                                            true,
+                                        ),
                                     )}
                                 </dd>
                                 <dt>Steel Cost:</dt>
@@ -233,8 +231,8 @@ export default class UnitInformation extends React.Component<
                                         this.calculateCostsForUnit(
                                             this.props.unit.steel_cost,
                                             this.getAmount(),
-                                            false
-                                        )
+                                            false,
+                                        ),
                                     )}
                                 </dd>
                                 <dt>Population Cost:</dt>
@@ -243,51 +241,49 @@ export default class UnitInformation extends React.Component<
                                         this.calculateCostsForUnit(
                                             this.props.unit.required_population,
                                             this.getAmount(),
-                                            false
-                                        )
+                                            false,
+                                        ),
                                     )}
                                 </dd>
                                 <dt>Base Time For One (Seconds):</dt>
                                 <dd>
                                     {formatNumber(
-                                        this.props.unit.time_to_recruit
+                                        this.props.unit.time_to_recruit,
                                     )}
                                 </dd>
-                                {
-                                    this.state.upgrade_section === "resources" ?
-                                        <Fragment>
-                                            <dt>Time Required (Seconds):</dt>
-                                            <dd className="flex items-center">
-                                                <span>
-                                                    {formatNumber(
-                                                        this.state.time_needed
-                                                    )}
-                                                </span>
-                                                <div>
-                                                    <div className="ml-2">
-                                                        <button
-                                                            type={"button"}
-                                                            onClick={() =>
-                                                                this.manageHelpDialogue()
+                                {this.state.upgrade_section === "resources" ? (
+                                    <Fragment>
+                                        <dt>Time Required (Seconds):</dt>
+                                        <dd className="flex items-center">
+                                            <span>
+                                                {formatNumber(
+                                                    this.state.time_needed,
+                                                )}
+                                            </span>
+                                            <div>
+                                                <div className="ml-2">
+                                                    <button
+                                                        type={"button"}
+                                                        onClick={() =>
+                                                            this.manageHelpDialogue()
+                                                        }
+                                                        className="text-blue-500 dark:text-blue-300"
+                                                    >
+                                                        <i
+                                                            className={
+                                                                "fas fa-info-circle"
                                                             }
-                                                            className="text-blue-500 dark:text-blue-300"
-                                                        >
-                                                            <i
-                                                                className={
-                                                                    "fas fa-info-circle"
-                                                                }
-                                                            ></i>{" "}
-                                                            Help
-                                                        </button>
-                                                    </div>
+                                                        ></i>{" "}
+                                                        Help
+                                                    </button>
                                                 </div>
-                                            </dd>
-                                        </Fragment>
-                                    : null
-                                }
+                                            </div>
+                                        </dd>
+                                    </Fragment>
+                                ) : null}
                             </dl>
                             {this.cannotBeRecruited(
-                                this.props.unit
+                                this.props.unit,
                             ) ? null : this.props.is_in_queue ? (
                                 <p className="mb-5 mt-5">
                                     You must wait for the units recruitment to
@@ -302,7 +298,12 @@ export default class UnitInformation extends React.Component<
                                 this.renderSelectedSection()
                             ) : (
                                 <Fragment>
-                                    <PrimaryOutlineButton button_label={'Recruit Units'} on_click={() => this.showSelectedForm('resources')} />
+                                    <PrimaryOutlineButton
+                                        button_label={"Recruit Units"}
+                                        on_click={() =>
+                                            this.showSelectedForm("resources")
+                                        }
+                                    />
                                 </Fragment>
                             )}
                         </div>

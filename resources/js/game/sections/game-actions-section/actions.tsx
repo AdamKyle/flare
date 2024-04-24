@@ -65,22 +65,22 @@ export default class Actions extends React.Component<
 
         // @ts-ignore
         this.attackTimeOut = Echo.private(
-            "show-timeout-bar-" + this.props.character.user_id
+            "show-timeout-bar-" + this.props.character.user_id,
         );
 
         // @ts-ignore
         this.craftingTimeOut = Echo.private(
-            "show-crafting-timeout-bar-" + this.props.character.user_id
+            "show-crafting-timeout-bar-" + this.props.character.user_id,
         );
 
         // @ts-ignore
         this.pvpUpdate = Echo.private(
-            "update-pvp-attack-" + this.props.character.user_id
+            "update-pvp-attack-" + this.props.character.user_id,
         );
 
         // @ts-ignore
         this.traverseUpdate = Echo.private(
-            "update-plane-" + this.props.character.user_id
+            "update-plane-" + this.props.character.user_id,
         );
 
         // @ts-ignore
@@ -97,7 +97,7 @@ export default class Actions extends React.Component<
                 this.setState({
                     attack_time_out: event.forLength,
                 });
-            }
+            },
         );
 
         // @ts-ignore
@@ -107,7 +107,7 @@ export default class Actions extends React.Component<
                 this.setState({
                     crafting_time_out: event.timeout,
                 });
-            }
+            },
         );
 
         // @ts-ignore
@@ -121,17 +121,17 @@ export default class Actions extends React.Component<
                     },
                     () => {
                         const characterLevel = removeCommas(
-                            this.props.character.level
+                            this.props.character.level,
                         );
 
                         if (characterLevel >= 301) {
                             this.actionsManager.setCharactersForDueling(
-                                event.characters
+                                event.characters,
                             );
                         }
-                    }
+                    },
                 );
-            }
+            },
         );
 
         // @ts-ignore
@@ -142,7 +142,7 @@ export default class Actions extends React.Component<
                     show_duel_fight: true,
                     duel_fight_info: event.data,
                 });
-            }
+            },
         );
 
         // @ts-ignore
@@ -151,7 +151,11 @@ export default class Actions extends React.Component<
             (event: any) => {
                 let craftingType = this.state.crafting_type;
 
-                if (craftingType === "workbench" || craftingType === "queen" || craftingType === 'labyrinth-oracle') {
+                if (
+                    craftingType === "workbench" ||
+                    craftingType === "queen" ||
+                    craftingType === "labyrinth-oracle"
+                ) {
                     craftingType = null;
                 }
 
@@ -160,7 +164,7 @@ export default class Actions extends React.Component<
                     show_hell_forged_section: false,
                     show_purgatory_chains_section: false,
                 });
-            }
+            },
         );
     }
 
@@ -177,11 +181,13 @@ export default class Actions extends React.Component<
             return;
         }
 
-        if (this.props.action_data.monsters.length  === 0) {
+        if (this.props.action_data.monsters.length === 0) {
             return;
         }
 
-        if (this.props.action_data.monsters[0].id !== this.state.monsters[0].id) {
+        if (
+            this.props.action_data.monsters[0].id !== this.state.monsters[0].id
+        ) {
             if (this.props.action_data.monsters.length > 0) {
                 this.setState({
                     monsters: this.props.action_data.monsters,
@@ -195,18 +201,25 @@ export default class Actions extends React.Component<
             });
         }
 
-        if (typeof this.props.character_position === 'undefined') {
+        if (typeof this.props.character_position === "undefined") {
             return;
         }
 
-        if (typeof prevProps.character_position === 'undefined') {
+        if (typeof prevProps.character_position === "undefined") {
             return;
         }
 
-        if (this.props.character_position !== null && prevProps.character_position !== null) {
-            if ((this.props.character_position.x !== prevProps.character_position.x &&
-                this.props.character_position.y !== prevProps.character_position.y) ||
-                this.props.character_position.game_map_id !== prevProps.character_position.game_map_id
+        if (
+            this.props.character_position !== null &&
+            prevProps.character_position !== null
+        ) {
+            if (
+                (this.props.character_position.x !==
+                    prevProps.character_position.x &&
+                    this.props.character_position.y !==
+                        prevProps.character_position.y) ||
+                this.props.character_position.game_map_id !==
+                    prevProps.character_position.game_map_id
             ) {
                 this.setState({
                     show_celestial_fight: false,
@@ -238,7 +251,7 @@ export default class Actions extends React.Component<
                     monsters: this.state.monsters,
                     raid_monsters: this.state.raid_monsters,
                 });
-            }
+            },
         );
     }
 
@@ -251,7 +264,7 @@ export default class Actions extends React.Component<
             },
             () => {
                 this.actionsManager.setCraftingType(type);
-            }
+            },
         );
     }
 
@@ -349,20 +362,19 @@ export default class Actions extends React.Component<
     }
 
     getTypeOfSpecialtyGear() {
-
         if (this.state.show_hell_forged_section) {
-            return 'Hell Forged';
+            return "Hell Forged";
         }
 
         if (this.state.show_purgatory_chains_section) {
-            return 'Purgatory Chains';
+            return "Purgatory Chains";
         }
 
         if (this.state.show_twisted_earth_section) {
-            return 'Twisted Earth';
+            return "Twisted Earth";
         }
 
-        return '';
+        return "";
     }
 
     render() {
@@ -379,10 +391,10 @@ export default class Actions extends React.Component<
                         !this.state.show_join_pvp &&
                         !this.state.show_celestial_fight &&
                         this.props.character !== null ? (
-                            <div className='w-1/2'>
+                            <div className="w-1/2">
                                 <DropDown
                                     menu_items={this.actionsManager.buildCraftingList(
-                                        this.openCrafting.bind(this)
+                                        this.openCrafting.bind(this),
                                     )}
                                     button_title={"Craft/Enchant"}
                                     disabled={this.actionsManager.cannotCraft()}
@@ -409,7 +421,7 @@ export default class Actions extends React.Component<
                                 <SuccessOutlineButton
                                     button_label={"Hell Forged Gear"}
                                     on_click={this.manageHellForgedShop.bind(
-                                        this
+                                        this,
                                     )}
                                     additional_css={"w-1/2"}
                                     disabled={this.props.character.is_dead}
@@ -422,7 +434,7 @@ export default class Actions extends React.Component<
                                 <SuccessOutlineButton
                                     button_label={"Purgatory Chains Gear"}
                                     on_click={this.managedPurgatoryChainsShop.bind(
-                                        this
+                                        this,
                                     )}
                                     additional_css={"w-1/2"}
                                     disabled={this.props.character.is_dead}
@@ -435,7 +447,7 @@ export default class Actions extends React.Component<
                                 <SuccessOutlineButton
                                     button_label={"Twisted Earth Gear"}
                                     on_click={this.managedTwistedEarthShop.bind(
-                                        this
+                                        this,
                                     )}
                                     additional_css={"w-1/2"}
                                     disabled={this.props.character.is_dead}
@@ -461,7 +473,7 @@ export default class Actions extends React.Component<
                                 <SuccessOutlineButton
                                     button_label={"Fight Celestial!"}
                                     on_click={this.manageFightCelestial.bind(
-                                        this
+                                        this,
                                     )}
                                     additional_css={"w-1/2"}
                                     disabled={
@@ -522,7 +534,7 @@ export default class Actions extends React.Component<
                                 {this.state.crafting_type !== null ? (
                                     <CraftingSection
                                         remove_crafting={this.removeCraftingType.bind(
-                                            this
+                                            this,
                                         )}
                                         type={this.state.crafting_type}
                                         character_id={this.props.character.id}
@@ -533,24 +545,21 @@ export default class Actions extends React.Component<
                                     />
                                 ) : null}
 
-                                {
-                                    this.state.show_hell_forged_section ||
-                                    this.state.show_purgatory_chains_section ||
-                                    this.state.show_twisted_earth_section ? (
-                                        <Shop
-                                            type={
-                                                this.getTypeOfSpecialtyGear()
-                                            }
-                                            character_id={this.props.character.id}
-                                            close_hell_forged={this.manageHellForgedShop.bind(
-                                                this
-                                            )}
-                                            close_purgatory_chains={this.managedPurgatoryChainsShop.bind(
-                                                this
-                                            )}
-                                            close_twisted_earth={this.managedTwistedEarthShop.bind(
-                                                this
-                                            )}
+                                {this.state.show_hell_forged_section ||
+                                this.state.show_purgatory_chains_section ||
+                                this.state.show_twisted_earth_section ? (
+                                    <Shop
+                                        type={this.getTypeOfSpecialtyGear()}
+                                        character_id={this.props.character.id}
+                                        close_hell_forged={this.manageHellForgedShop.bind(
+                                            this,
+                                        )}
+                                        close_purgatory_chains={this.managedPurgatoryChainsShop.bind(
+                                            this,
+                                        )}
+                                        close_twisted_earth={this.managedTwistedEarthShop.bind(
+                                            this,
+                                        )}
                                     />
                                 ) : null}
                             </MonsterActions>
@@ -576,7 +585,7 @@ export default class Actions extends React.Component<
                                 {this.state.crafting_type !== null ? (
                                     <CraftingSection
                                         remove_crafting={this.removeCraftingType.bind(
-                                            this
+                                            this,
                                         )}
                                         type={this.state.crafting_type}
                                         character_id={this.props.character.id}
@@ -596,10 +605,10 @@ export default class Actions extends React.Component<
                                         }
                                         character_id={this.props.character.id}
                                         close_hell_forged={this.manageHellForgedShop.bind(
-                                            this
+                                            this,
                                         )}
                                         close_purgatory_chains={this.managedPurgatoryChainsShop.bind(
-                                            this
+                                            this,
                                         )}
                                     />
                                 ) : null}
@@ -621,7 +630,7 @@ export default class Actions extends React.Component<
                             <ExplorationSection
                                 character={this.props.character}
                                 manage_exploration={this.manageExploration.bind(
-                                    this
+                                    this,
                                 )}
                                 monsters={this.state.monsters}
                             />
@@ -631,7 +640,7 @@ export default class Actions extends React.Component<
                             <CelestialFight
                                 character={this.props.character}
                                 manage_celestial_fight={this.manageFightCelestial.bind(
-                                    this
+                                    this,
                                 )}
                                 celestial_id={this.props.celestial_id}
                                 update_celestial={this.props.update_celestial}
@@ -649,7 +658,7 @@ export default class Actions extends React.Component<
                             <GamblingSection
                                 character={this.props.character}
                                 close_gambling_section={this.manageGamblingSection.bind(
-                                    this
+                                    this,
                                 )}
                                 is_small={false}
                             />

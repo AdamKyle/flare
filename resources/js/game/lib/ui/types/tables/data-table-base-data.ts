@@ -1,3 +1,1 @@
-export default interface DataTableBaseData {
-
-}
+export default interface DataTableBaseData {}

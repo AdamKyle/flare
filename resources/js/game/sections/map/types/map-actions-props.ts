@@ -5,7 +5,6 @@ import CharacterCurrenciesDetails from "../../../lib/game/types/character-curren
 import MapData from "../lib/request-types/MapData";
 
 export default interface MapActionsProps {
-
     can_move: boolean;
 
     is_dead: boolean;
@@ -18,7 +17,7 @@ export default interface MapActionsProps {
 
     locations: LocationDetails[] | null;
 
-    character_position: {x: number, y: number};
+    character_position: { x: number; y: number };
 
     player_kingdoms: PlayerKingdomsDetails[] | [];
 
@@ -28,7 +27,7 @@ export default interface MapActionsProps {
 
     character_currencies: CharacterCurrenciesDetails;
 
-    coordinates: {x: number[], y: number[]} | null;
+    coordinates: { x: number[]; y: number[] } | null;
 
     view_port: number;
 

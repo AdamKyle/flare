@@ -4,19 +4,19 @@ import DuelData from "../../../lib/game/types/core/duel-player/definitions/duel-
 import RaidMonsterType from "../../../lib/game/types/actions/monster/raid-monster-type";
 
 export default interface ActionsState {
-    monsters: MonsterType[]|[];
+    monsters: MonsterType[] | [];
 
-    raid_monsters: RaidMonsterType[]|[]
+    raid_monsters: RaidMonsterType[] | [];
 
-    characters_for_dueling: PvpCharactersType[]|[];
+    characters_for_dueling: PvpCharactersType[] | [];
 
-    pvp_characters_on_map: PvpCharactersType[]|[];
+    pvp_characters_on_map: PvpCharactersType[] | [];
 
     attack_time_out: number;
 
     crafting_time_out: number;
 
-    crafting_type: string|null;
+    crafting_type: string | null;
 
     duel_fight_info: DuelData | null;
 

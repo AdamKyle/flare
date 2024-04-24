@@ -19,28 +19,33 @@ import SmallKingdom from "./small-kingdom";
 import { buildKingdomsColumns } from "./table-columns/build-kingdoms-columns";
 import { buildLogsColumns } from "./table-columns/build-logs-columns";
 
-export default class KingdomsList extends React.Component<KingdomListProps, KingdomListState> {
-
-    private tabs: {name: string, key: string, has_logs?: boolean;}[];
+export default class KingdomsList extends React.Component<
+    KingdomListProps,
+    KingdomListState
+> {
+    private tabs: { name: string; key: string; has_logs?: boolean }[];
 
     constructor(props: KingdomListProps) {
         super(props);
 
-        this.tabs = [{
-            name: 'Kingdoms',
-            key: 'kingdoms',
-        }, {
-            name: 'Logs',
-            key: 'kingdom-logs',
-            has_logs: false,
-        }]
+        this.tabs = [
+            {
+                name: "Kingdoms",
+                key: "kingdoms",
+            },
+            {
+                name: "Logs",
+                key: "kingdom-logs",
+                has_logs: false,
+            },
+        ];
 
         this.state = {
             loading: true,
             dark_tables: false,
             selected_kingdom: null,
             selected_log: null,
-        }
+        };
     }
 
     componentDidMount() {
@@ -48,31 +53,33 @@ export default class KingdomsList extends React.Component<KingdomListProps, King
 
         const self = this;
 
-        setTimeout(function(){
+        setTimeout(function () {
             self.setState({
                 loading: false,
-            })
+            });
         }, 500);
 
         this.updateIcon();
     }
 
     componentDidUpdate() {
-        const foundKingdom = this.props.my_kingdoms.filter((kingdom: KingdomDetails) => {
-            if (this.state.selected_kingdom === null) {
-                return;
-            }
+        const foundKingdom = this.props.my_kingdoms.filter(
+            (kingdom: KingdomDetails) => {
+                if (this.state.selected_kingdom === null) {
+                    return;
+                }
 
-            return kingdom.id === this.state.selected_kingdom.id;
-        });
+                return kingdom.id === this.state.selected_kingdom.id;
+            },
+        );
 
         if (foundKingdom.length > 0) {
             const kingdom: KingdomDetails = foundKingdom[0];
 
             if (!isEqual(kingdom, this.state.selected_kingdom)) {
                 this.setState({
-                    selected_kingdom: kingdom
-                })
+                    selected_kingdom: kingdom,
+                });
             }
         }
 
@@ -81,9 +88,11 @@ export default class KingdomsList extends React.Component<KingdomListProps, King
 
     updateIcon() {
         if (this.props.logs.length > 0) {
-            const hasUnReadLogs = this.props.logs.filter((log: KingdomLogDetails) => {
-                return !log.opened
-            });
+            const hasUnReadLogs = this.props.logs.filter(
+                (log: KingdomLogDetails) => {
+                    return !log.opened;
+                },
+            );
 
             if (hasUnReadLogs.length > 0) {
                 this.tabs[this.tabs.length - 1].has_logs = true;
@@ -101,13 +110,21 @@ export default class KingdomsList extends React.Component<KingdomListProps, King
 
     viewLogs(log: KingdomLogDetails) {
         if (!log.opened) {
-            (new Ajax).setRoute('kingdom/opened-log/'+log.character_id+'/'+log.id).doAjaxCall('post', (result: AxiosResponse) => {
-                this.setState({
-                    selected_log: log,
-                })
-            }, (error: AxiosError) => {
-                console.error(error);
-            });
+            new Ajax()
+                .setRoute(
+                    "kingdom/opened-log/" + log.character_id + "/" + log.id,
+                )
+                .doAjaxCall(
+                    "post",
+                    (result: AxiosResponse) => {
+                        this.setState({
+                            selected_log: log,
+                        });
+                    },
+                    (error: AxiosError) => {
+                        console.error(error);
+                    },
+                );
         } else {
             this.setState({
                 selected_log: log,
@@ -116,10 +133,15 @@ export default class KingdomsList extends React.Component<KingdomListProps, King
     }
 
     deleteLog(log: KingdomLogDetails) {
-        (new Ajax).setRoute('kingdom/delete-log/'+log.character_id+'/'+log.id).doAjaxCall('post', (result: AxiosResponse) => {
-        }, (error: AxiosError) => {
-            console.error(error);
-        });
+        new Ajax()
+            .setRoute("kingdom/delete-log/" + log.character_id + "/" + log.id)
+            .doAjaxCall(
+                "post",
+                (result: AxiosResponse) => {},
+                (error: AxiosError) => {
+                    console.error(error);
+                },
+            );
     }
 
     closeKingdomDetails() {
@@ -136,93 +158,109 @@ export default class KingdomsList extends React.Component<KingdomListProps, King
 
     render() {
         if (this.state.loading) {
-            return (
-                <LoadingProgressBar />
-            );
+            return <LoadingProgressBar />;
         }
 
         return (
             <Fragment>
-                {
-                    this.props.is_dead ?
-                        <DangerAlert additional_css={'my-4'}>
-                            Christ child! You are dead. Dead people cannot do a lot of things including:{" "}
-                            Manage inventory, Manage Skills - including passives, Manage Boons or even use items.{" "}
-                            And they cannot manage their kingdoms! How sad! Go resurrect child! (head to Game tab and click Revive).
-                        </DangerAlert>
-                    : null
-                }
-                {
-                    this.state.selected_kingdom !== null ?
-                        this.props.view_port < 1600 ?
-                            <SmallKingdom close_details={this.closeKingdomDetails.bind(this)}
-                                          kingdom={this.state.selected_kingdom}
-                                          dark_tables={this.state.dark_tables}
-                                          character_gold={this.props.character_gold}
-                                          view_port={this.props.view_port}
-                                          user_id={this.props.user_id}
-                                          kingdoms={this.props.my_kingdoms}
-                            />
-                        :
-                            <Kingdom close_details={this.closeKingdomDetails.bind(this)}
-                                     kingdom={this.state.selected_kingdom}
-                                     kingdoms={this.props.my_kingdoms}
-                                     dark_tables={this.state.dark_tables}
-                                     character_gold={this.props.character_gold}
-                                     view_port={this.props.view_port}
-                                     user_id={this.props.user_id}
-                            />
-                    : this.state.selected_log !== null ?
-                        <KingdomLogDetailsView
-                            close_details={this.closeLogDetails.bind(this)}
-                            log={this.state.selected_log}
+                {this.props.is_dead ? (
+                    <DangerAlert additional_css={"my-4"}>
+                        Christ child! You are dead. Dead people cannot do a lot
+                        of things including: Manage inventory, Manage Skills -
+                        including passives, Manage Boons or even use items. And
+                        they cannot manage their kingdoms! How sad! Go resurrect
+                        child! (head to Game tab and click Revive).
+                    </DangerAlert>
+                ) : null}
+                {this.state.selected_kingdom !== null ? (
+                    this.props.view_port < 1600 ? (
+                        <SmallKingdom
+                            close_details={this.closeKingdomDetails.bind(this)}
+                            kingdom={this.state.selected_kingdom}
+                            dark_tables={this.state.dark_tables}
+                            character_gold={this.props.character_gold}
+                            view_port={this.props.view_port}
+                            user_id={this.props.user_id}
+                            kingdoms={this.props.my_kingdoms}
                         />
-                    :
-                        <BasicCard additionalClasses={'overflow-x-auto'}>
-                            <Tabs tabs={this.tabs} icon_key={'has_logs'}>
-                                <TabPanel key={'kingdoms'}>
-                                    {
-                                        this.props.my_kingdoms.length > 0 ?
-                                            <div className={'max-w-[390px] md:max-w-full overflow-x-hidden'}>
-                                                <Table data={this.props.my_kingdoms}
-                                                       columns={buildKingdomsColumns(this.viewKingdomDetails.bind(this))}
-                                                       dark_table={this.state.dark_tables}
-                                                />
-                                            </div>
-                                        :
-                                            <Fragment>
-                                                <p className='my-4 text-center'>
-                                                    No Settled Kingdoms.
-                                                </p>
-                                                <p className='text-center'>
-                                                    <a href="/information/kingdoms" target="_blank">
-                                                        What are and how to get kingdoms. <i
-                                                        className="fas fa-external-link-alt"></i>
-                                                    </a>
-                                                </p>
-                                            </Fragment>
-                                    }
-                                </TabPanel>
-                                <TabPanel key={'kingdom-logs'}>
-                                    {
-                                        this.props.logs.length > 0 ?
-                                            <div className={'max-w-[390px] md:max-w-full overflow-x-hidden'}>
-                                                <Table data={this.props.logs}
-                                                       columns={buildLogsColumns(this.viewLogs.bind(this), this.deleteLog.bind(this))}
-                                                       dark_table={this.state.dark_tables}
-                                                />
-                                            </div>
-                                        :
-                                            <p className='my-4 text-center'>
-                                                No Logs.
-                                            </p>
-                                    }
-                                </TabPanel>
-                            </Tabs>
-                        </BasicCard>
-                }
+                    ) : (
+                        <Kingdom
+                            close_details={this.closeKingdomDetails.bind(this)}
+                            kingdom={this.state.selected_kingdom}
+                            kingdoms={this.props.my_kingdoms}
+                            dark_tables={this.state.dark_tables}
+                            character_gold={this.props.character_gold}
+                            view_port={this.props.view_port}
+                            user_id={this.props.user_id}
+                        />
+                    )
+                ) : this.state.selected_log !== null ? (
+                    <KingdomLogDetailsView
+                        close_details={this.closeLogDetails.bind(this)}
+                        log={this.state.selected_log}
+                    />
+                ) : (
+                    <BasicCard additionalClasses={"overflow-x-auto"}>
+                        <Tabs tabs={this.tabs} icon_key={"has_logs"}>
+                            <TabPanel key={"kingdoms"}>
+                                {this.props.my_kingdoms.length > 0 ? (
+                                    <div
+                                        className={
+                                            "max-w-[390px] md:max-w-full overflow-x-hidden"
+                                        }
+                                    >
+                                        <Table
+                                            data={this.props.my_kingdoms}
+                                            columns={buildKingdomsColumns(
+                                                this.viewKingdomDetails.bind(
+                                                    this,
+                                                ),
+                                            )}
+                                            dark_table={this.state.dark_tables}
+                                        />
+                                    </div>
+                                ) : (
+                                    <Fragment>
+                                        <p className="my-4 text-center">
+                                            No Settled Kingdoms.
+                                        </p>
+                                        <p className="text-center">
+                                            <a
+                                                href="/information/kingdoms"
+                                                target="_blank"
+                                            >
+                                                What are and how to get
+                                                kingdoms.{" "}
+                                                <i className="fas fa-external-link-alt"></i>
+                                            </a>
+                                        </p>
+                                    </Fragment>
+                                )}
+                            </TabPanel>
+                            <TabPanel key={"kingdom-logs"}>
+                                {this.props.logs.length > 0 ? (
+                                    <div
+                                        className={
+                                            "max-w-[390px] md:max-w-full overflow-x-hidden"
+                                        }
+                                    >
+                                        <Table
+                                            data={this.props.logs}
+                                            columns={buildLogsColumns(
+                                                this.viewLogs.bind(this),
+                                                this.deleteLog.bind(this),
+                                            )}
+                                            dark_table={this.state.dark_tables}
+                                        />
+                                    </div>
+                                ) : (
+                                    <p className="my-4 text-center">No Logs.</p>
+                                )}
+                            </TabPanel>
+                        </Tabs>
+                    </BasicCard>
+                )}
             </Fragment>
-        )
+        );
     }
-
 }

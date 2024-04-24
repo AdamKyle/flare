@@ -1,5 +1,4 @@
 export default interface UnitMovementDetails {
-
     id: number;
 
     kingdom_id: number;

@@ -1,5 +1,5 @@
 import ItemAtonement from "./item-atonement";
-import {ItemType} from "../enums/item-type";
+import { ItemType } from "../enums/item-type";
 
 export default interface ItemDefinition {
     [key: string]: any;
@@ -55,7 +55,7 @@ export default interface ItemDefinition {
     int_modifier: number;
     is_mythic: boolean;
     is_unique: boolean;
-    item_atonements:ItemAtonement;
+    item_atonements: ItemAtonement;
     item_prefix: any; // specify the type if known
     item_suffix: any; // specify the type if known
     kingdom_damage: number;

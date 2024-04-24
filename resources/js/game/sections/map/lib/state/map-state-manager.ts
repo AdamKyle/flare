@@ -7,7 +7,6 @@ import Game from "../../../../game";
 import MapSection from "../../map-section";
 
 export default class MapStateManager {
-
     /**
      * When new Data comes into the map, via player action, rebuild the state.
      *
@@ -17,17 +16,34 @@ export default class MapStateManager {
      * @param component
      * @returns
      */
-    static buildChangeState(data: MapData, component: MapSection | Game): MapState {
-        let state: MapState = { ...this.setState(data), ...{ map_id: data.character_map.game_map.id } };
+    static buildChangeState(
+        data: MapData,
+        component: MapSection | Game,
+    ): MapState {
+        let state: MapState = {
+            ...this.setState(data),
+            ...{ map_id: data.character_map.game_map.id },
+        };
 
         state.port_location = getPortLocation(state);
 
-        const viewPort: number = component instanceof MapSection ? component.props.view_port : component.state.view_port;
+        const viewPort: number =
+            component instanceof MapSection
+                ? component.props.view_port
+                : component.state.view_port;
 
         state.map_position = {
-            x: getNewXPosition(state.character_position.x, state.map_position.x, viewPort),
-            y: getNewYPosition(state.character_position.y, state.map_position.y, viewPort),
-        }
+            x: getNewXPosition(
+                state.character_position.x,
+                state.map_position.x,
+                viewPort,
+            ),
+            y: getNewYPosition(
+                state.character_position.y,
+                state.map_position.y,
+                viewPort,
+            ),
+        };
 
         if (state.time_left !== 0) {
             state.can_player_move = false;
@@ -39,8 +55,8 @@ export default class MapStateManager {
             component.updateCelestial(data.celestial_id);
         }
 
-
-        let position: { x: number, y: number, game_map_id?: number } = state.character_position;
+        let position: { x: number; y: number; game_map_id?: number } =
+            state.character_position;
 
         position.game_map_id = state.game_map_id;
 
@@ -52,7 +68,6 @@ export default class MapStateManager {
 
         return state;
     }
-
 
     /**
      * Build the core state of the map data.
@@ -66,14 +81,25 @@ export default class MapStateManager {
      * @returns
      */
     static buildCoreState(data: MapData, component: Game): MapState {
-        let state: MapState = { ...this.setState(data), ...{ map_id: data.character_map.game_map.id } };
+        let state: MapState = {
+            ...this.setState(data),
+            ...{ map_id: data.character_map.game_map.id },
+        };
 
         state.port_location = getPortLocation(state);
 
         state.map_position = {
-            x: getNewXPosition(state.character_position.x, state.map_position.x, component.state.view_port),
-            y: getNewYPosition(state.character_position.y, state.map_position.y, component.state.view_port),
-        }
+            x: getNewXPosition(
+                state.character_position.x,
+                state.map_position.x,
+                component.state.view_port,
+            ),
+            y: getNewYPosition(
+                state.character_position.y,
+                state.map_position.y,
+                component.state.view_port,
+            ),
+        };
 
         if (state.time_left !== 0) {
             state.can_player_move = false;
@@ -81,7 +107,8 @@ export default class MapStateManager {
 
         component.updateCelestial(data.celestial_id);
 
-        let position: { x: number, y: number, game_map_id?: number } = state.character_position;
+        let position: { x: number; y: number; game_map_id?: number } =
+            state.character_position;
 
         position.game_map_id = state.game_map_id;
 
@@ -102,10 +129,12 @@ export default class MapStateManager {
             map_name: data.character_map.game_map.name,
             game_map_id: data.character_map.game_map_id,
             map_position: {
-                x: data.character_map.position_x, y: data.character_map.position_y
+                x: data.character_map.position_x,
+                y: data.character_map.position_y,
             },
             character_position: {
-                x: data.character_map.character_position_x, y: data.character_map.character_position_y
+                x: data.character_map.character_position_x,
+                y: data.character_map.character_position_y,
             },
             locations: data.locations,
             player_kingdoms: data.my_kingdoms,
@@ -121,7 +150,7 @@ export default class MapStateManager {
             loading: false,
             automation_time_out: 0,
             celestial_time_out: 0,
-        }
+        };
     }
 
     /**
@@ -133,7 +162,8 @@ export default class MapStateManager {
     static setMapMovementActionsState(data: MapData): any {
         return {
             character_position: {
-                x: data.character_map.character_position_x, y: data.character_map.character_position_y
+                x: data.character_map.character_position_x,
+                y: data.character_map.character_position_y,
             },
             locations: data.locations,
             player_kingdoms: data.my_kingdoms,
@@ -142,7 +172,7 @@ export default class MapStateManager {
             time_left: parseInt(this.getTimeLeftInSeconds(data).toFixed(0)),
             port_location: null,
             coordinates: data.coordinates,
-        }
+        };
     }
 
     /**
@@ -167,9 +197,9 @@ export default class MapStateManager {
             const end = DateTime.fromISO(data.can_move_again_at);
             const start = DateTime.now();
 
-            const timeLeft = (end.diff(start, 'seconds')).toObject()
+            const timeLeft = end.diff(start, "seconds").toObject();
 
-            if (typeof timeLeft === 'undefined') {
+            if (typeof timeLeft === "undefined") {
                 return 0;
             }
 

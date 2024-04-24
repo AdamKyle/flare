@@ -10,8 +10,10 @@ import UpgradeTablesState from "../../../lib/game/kingdoms/types/upgrade-tables-
 import { buildBuildingsColumns } from "../table-columns/build-buildings-columns";
 import BuildingDetails from "./deffinitions/building-details";
 
-export default class BuildingsTable extends React.Component<BuildingsTableProps, UpgradeTablesState> {
-
+export default class BuildingsTable extends React.Component<
+    BuildingsTableProps,
+    UpgradeTablesState
+> {
     constructor(props: BuildingsTableProps) {
         super(props);
 
@@ -19,7 +21,7 @@ export default class BuildingsTable extends React.Component<BuildingsTableProps,
             success_message: null,
             error_message: null,
             loading: false,
-        }
+        };
     }
 
     viewBuilding(building: BuildingDetails) {
@@ -31,79 +33,89 @@ export default class BuildingsTable extends React.Component<BuildingsTableProps,
             {
                 when: (row: BuildingDetails) => row.is_locked,
                 style: {
-                    backgroundColor: '#f4a0a0',
-                    color: 'white',
-                }
-            }
+                    backgroundColor: "#f4a0a0",
+                    color: "white",
+                },
+            },
         ];
     }
 
-    cancelBuildingQueue(queueId: number|null) {
+    cancelBuildingQueue(queueId: number | null) {
         if (queueId === null) {
             return;
         }
 
-        this.setState({
-            loading: true,
-            success_message: null,
-            error_message: null,
-        }, () => {
-            (new Ajax()).setRoute('kingdoms/building-upgrade/cancel').setParameters({
-                queue_id: queueId
-            }).doAjaxCall('post', (response: AxiosResponse) => {
-                this.setState({
-                    success_message: response.data.message,
-                    loading: false,
-                });
-            }, (error: AxiosError) => {
-                if (typeof error.response !== 'undefined') {
-                    const response = error.response;
+        this.setState(
+            {
+                loading: true,
+                success_message: null,
+                error_message: null,
+            },
+            () => {
+                new Ajax()
+                    .setRoute("kingdoms/building-upgrade/cancel")
+                    .setParameters({
+                        queue_id: queueId,
+                    })
+                    .doAjaxCall(
+                        "post",
+                        (response: AxiosResponse) => {
+                            this.setState({
+                                success_message: response.data.message,
+                                loading: false,
+                            });
+                        },
+                        (error: AxiosError) => {
+                            if (typeof error.response !== "undefined") {
+                                const response = error.response;
 
-                    this.setState({
-                        error_message: response.data.message,
-                        loading: false,
-                    });
-                }
-            });
-        });
+                                this.setState({
+                                    error_message: response.data.message,
+                                    loading: false,
+                                });
+                            }
+                        },
+                    );
+            },
+        );
     }
 
     render() {
         return (
             <Fragment>
-                {
-                    this.state.error_message !== null ?
-                        <div className='mt-4 mb-4'>
-                            <DangerAlert>
-                                {this.state.error_message}
-                            </DangerAlert>
-                        </div>
-                    : null
-                }
-                {
-                    this.state.success_message !== null ?
-                        <div className='mt-4 mb-4'>
-                            <SuccessAlert>
-                                {this.state.success_message}
-                            </SuccessAlert>
-                        </div>
-                    : null
-                }
-                {
-                    this.state.loading ?
-                        <div className='mt-4 mb-4'>
-                            <LoadingProgressBar />
-                        </div>
-                    : null
-                }
-                <div className={'max-w-[390px] md:max-w-full overflow-x-hidden'}>
-                    <Table data={this.props.buildings}
-                           columns={buildBuildingsColumns(this.viewBuilding.bind(this), this.cancelBuildingQueue.bind(this), this.props.buildings_in_queue, this.props.view_port)}
-                           dark_table={this.props.dark_tables}
-                           conditional_row_styles={this.createConditionalRowStyles()}
+                {this.state.error_message !== null ? (
+                    <div className="mt-4 mb-4">
+                        <DangerAlert>{this.state.error_message}</DangerAlert>
+                    </div>
+                ) : null}
+                {this.state.success_message !== null ? (
+                    <div className="mt-4 mb-4">
+                        <SuccessAlert>
+                            {this.state.success_message}
+                        </SuccessAlert>
+                    </div>
+                ) : null}
+                {this.state.loading ? (
+                    <div className="mt-4 mb-4">
+                        <LoadingProgressBar />
+                    </div>
+                ) : null}
+                <div
+                    className={"max-w-[390px] md:max-w-full overflow-x-hidden"}
+                >
+                    <Table
+                        data={this.props.buildings}
+                        columns={buildBuildingsColumns(
+                            this.viewBuilding.bind(this),
+                            this.cancelBuildingQueue.bind(this),
+                            this.props.buildings_in_queue,
+                            this.props.view_port,
+                        )}
+                        dark_table={this.props.dark_tables}
+                        conditional_row_styles={this.createConditionalRowStyles()}
                     />
                 </div>
             </Fragment>
-        )
+        );
     }
 }

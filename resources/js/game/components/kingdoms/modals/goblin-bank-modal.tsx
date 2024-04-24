@@ -128,7 +128,7 @@ export default class GoblinBankModal extends React.Component<
                     })
                     .setRoute(
                         "kingdoms/withdraw-bars-as-gold/" +
-                            this.props.kingdom_id
+                            this.props.kingdom_id,
                     )
                     .doAjaxCall(
                         "post",
@@ -159,9 +159,9 @@ export default class GoblinBankModal extends React.Component<
                             }
 
                             console.error(error);
-                        }
+                        },
                     );
-            }
+            },
         );
     }
 
@@ -178,7 +178,7 @@ export default class GoblinBankModal extends React.Component<
                         amount_to_purchase: this.state.amount_to_deposit,
                     })
                     .setRoute(
-                        "kingdoms/purchase-gold-bars/" + this.props.kingdom_id
+                        "kingdoms/purchase-gold-bars/" + this.props.kingdom_id,
                     )
                     .doAjaxCall(
                         "post",
@@ -204,9 +204,9 @@ export default class GoblinBankModal extends React.Component<
                             }
 
                             console.error(error);
-                        }
+                        },
                     );
-            }
+            },
         );
     }
 
@@ -245,11 +245,11 @@ export default class GoblinBankModal extends React.Component<
                                     type="number"
                                     value={this.state.amount_to_deposit}
                                     onChange={this.setAmountToDeposit.bind(
-                                        this
+                                        this,
                                     )}
                                     className="form-control"
                                     disabled={this.isInputDisabled(
-                                        this.props.character_gold
+                                        this.props.character_gold,
                                     )}
                                 />
                             </div>
@@ -286,11 +286,11 @@ export default class GoblinBankModal extends React.Component<
                                     type="number"
                                     value={this.state.amount_to_withdraw}
                                     onChange={this.setAmountToWithdraw.bind(
-                                        this
+                                        this,
                                     )}
                                     className="form-control"
                                     disabled={this.isInputDisabled(
-                                        this.props.gold_bars
+                                        this.props.gold_bars,
                                     )}
                                 />
                             </div>

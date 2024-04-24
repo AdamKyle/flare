@@ -1,6 +1,5 @@
 export interface ChildQuestDetails {
-
-    id: number
+    id: number;
 
     parent_id: number;
 

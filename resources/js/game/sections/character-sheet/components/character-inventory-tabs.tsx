@@ -57,7 +57,7 @@ export default class CharacterInventoryTabs extends React.Component<
 
         // @ts-ignore
         this.updateInventoryListener = Echo.private(
-            "update-inventory-" + this.props.user_id
+            "update-inventory-" + this.props.user_id,
         );
     }
 
@@ -77,7 +77,7 @@ export default class CharacterInventoryTabs extends React.Component<
                     },
                     (error: AxiosError) => {
                         console.error(error);
-                    }
+                    },
                 );
         }
 
@@ -87,7 +87,7 @@ export default class CharacterInventoryTabs extends React.Component<
             (event: any) => {
                 if (this.state.inventory !== null) {
                     const inventoryState = JSON.parse(
-                        JSON.stringify(this.state.inventory)
+                        JSON.stringify(this.state.inventory),
                     );
 
                     inventoryState[event.type] = event.inventory;
@@ -98,10 +98,10 @@ export default class CharacterInventoryTabs extends React.Component<
                         },
                         () => {
                             this.updateItemSkillData();
-                        }
+                        },
                     );
                 }
-            }
+            },
         );
     }
 
@@ -128,7 +128,7 @@ export default class CharacterInventoryTabs extends React.Component<
                 if (typeof this.props.update_disable_tabs !== "undefined") {
                     this.props.update_disable_tabs();
                 }
-            }
+            },
         );
     }
 
@@ -144,14 +144,14 @@ export default class CharacterInventoryTabs extends React.Component<
         const equippedSlot = this.state.inventory.equipped.find(
             (slot: InventoryDetails) => {
                 return slot.slot_id === this.state.item_skill_data?.slot_id;
-            }
+            },
         );
 
         if (typeof equippedSlot !== "undefined") {
             return this.manageItemSkills(
                 equippedSlot.slot_id,
                 equippedSlot.item_skills,
-                equippedSlot.item_skill_progressions
+                equippedSlot.item_skill_progressions,
             );
         }
     }
@@ -159,7 +159,7 @@ export default class CharacterInventoryTabs extends React.Component<
     manageItemSkills(
         slotId: number,
         itemSkills: ItemSkill[],
-        itemSkillProgressions: ItemSkillProgression[]
+        itemSkillProgressions: ItemSkillProgression[],
     ) {
         this.setState({
             item_skill_data: {

@@ -1,7 +1,7 @@
 export default interface BuyPopulationModalState {
     loading: boolean;
 
-    total: string|number;
+    total: string | number;
 
     cost: number;
 

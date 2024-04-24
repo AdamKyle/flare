@@ -44,7 +44,7 @@ export default class RaidSection extends React.Component<
 
         // @ts-ignore
         this.characterRevive = Echo.private(
-            "character-revive-" + this.props.user_id
+            "character-revive-" + this.props.user_id,
         );
     }
 
@@ -58,7 +58,7 @@ export default class RaidSection extends React.Component<
                         monster_current_health: event.raidBossHealth,
                     });
                 }
-            }
+            },
         );
 
         // @ts-ignore
@@ -68,13 +68,11 @@ export default class RaidSection extends React.Component<
                 this.setState({
                     character_current_health: event.health,
                 });
-            }
+            },
         );
     }
 
-    componentDidUpdate(
-        prevProps: Readonly<RaidSelectionProps>
-    ): void {
+    componentDidUpdate(prevProps: Readonly<RaidSelectionProps>): void {
         if (
             this.props.raid_monsters.length !==
                 prevProps.raid_monsters.length &&
@@ -102,7 +100,7 @@ export default class RaidSection extends React.Component<
                     label: raidMonster.name,
                     value: raidMonster.id,
                 };
-            }
+            },
         );
 
         raidMonsters.unshift({
@@ -128,7 +126,7 @@ export default class RaidSection extends React.Component<
                 if (raidMonster.id === this.state.selected_raid_monster_id) {
                     return raidMonster;
                 }
-            }
+            },
         );
 
         if (typeof raidMonster === "undefined") {
@@ -175,7 +173,7 @@ export default class RaidSection extends React.Component<
                         "raid-fight-participation/" +
                             this.props.character_id +
                             "/" +
-                            this.state.selected_raid_monster_id
+                            this.state.selected_raid_monster_id,
                     )
                     .doAjaxCall(
                         "get",
@@ -206,16 +204,16 @@ export default class RaidSection extends React.Component<
                             });
 
                             console.error(error);
-                        }
+                        },
                     );
-            }
+            },
         );
     }
 
     resetUpdate(): void {
         this.setState({
             update_raid_fight: false,
-        })
+        });
     }
 
     fetchRaidMonsterName(): string {
@@ -228,7 +226,7 @@ export default class RaidSection extends React.Component<
                 if (raidMonster.id === this.state.selected_raid_monster_id) {
                     return raidMonster;
                 }
-            }
+            },
         );
 
         if (typeof raidMonster === "undefined") {
@@ -258,9 +256,9 @@ export default class RaidSection extends React.Component<
                             this.setState({ is_fighting: false });
 
                             console.error(error);
-                        }
+                        },
                     );
-            }
+            },
         );
     }
 
@@ -340,7 +338,7 @@ export default class RaidSection extends React.Component<
                         initial_attacks_left={this.state.raid_boss_attacks_left}
                         is_raid_boss={this.state.is_raid_boss}
                         manage_elemental_atonement_modal={this.manageAtonementModal.bind(
-                            this
+                            this,
                         )}
                         update_raid_fight={this.state.update_raid_fight}
                         reset_update={this.resetUpdate.bind(this)}

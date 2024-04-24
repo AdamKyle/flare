@@ -1,10 +1,9 @@
 import React from "react";
 
 export default interface TabProperties {
+    tabs: { key: string; name: string }[];
 
-    tabs: { key: string, name: string}[],
-
-    full_width? : boolean;
+    full_width?: boolean;
 
     icon_key?: string;
 

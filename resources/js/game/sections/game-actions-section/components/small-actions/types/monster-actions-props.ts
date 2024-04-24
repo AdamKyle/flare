@@ -1,5 +1,5 @@
 import MonsterType from "../../../../../lib/game/types/actions/monster/monster-type";
-import {CharacterType} from "../../../../../lib/game/character/character-type";
+import { CharacterType } from "../../../../../lib/game/character/character-type";
 import CharacterStatusType from "../../../../../lib/game/character/character-status-type";
 import React from "react";
 

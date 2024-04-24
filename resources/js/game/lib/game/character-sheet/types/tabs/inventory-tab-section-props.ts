@@ -3,8 +3,8 @@ import CoreInventoryTabProps from "./core-inventory-tab-props";
 import SetDetails from "../inventory/set-details";
 import UsableItemsDetails from "../inventory/usable-items-details";
 
-export default interface InventoryTabSectionProps extends CoreInventoryTabProps {
-
+export default interface InventoryTabSectionProps
+    extends CoreInventoryTabProps {
     inventory: InventoryDetails[] | [];
 
     usable_items: UsableItemsDetails[] | [];
@@ -15,7 +15,11 @@ export default interface InventoryTabSectionProps extends CoreInventoryTabProps 
 
     user_id: number;
 
-    manage_skills: (itemId: number, itemSkills: any[], itemSkillProgressions: any[]) => void;
+    manage_skills: (
+        itemId: number,
+        itemSkills: any[],
+        itemSkillProgressions: any[],
+    ) => void;
 
     view_port: number;
 }

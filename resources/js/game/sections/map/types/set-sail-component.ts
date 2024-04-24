@@ -1,10 +1,9 @@
 import SetSailModal from "../modals/set-sail-modal";
 import LocationDetails from "./location-details";
 import SetSailModalProps from "./map/modals/set-sail-modal-props";
-import {fetchCost} from "../lib/teleportion-costs";
+import { fetchCost } from "../lib/teleportion-costs";
 
 export default class SetSailComponent {
-
     private component: SetSailModal;
 
     constructor(component: SetSailModal) {
@@ -37,25 +36,36 @@ export default class SetSailComponent {
     /**
      * Get the default port value.
      */
-    public getDefaultPortValue(): {label: string, value: number} {
+    public getDefaultPortValue(): { label: string; value: number } {
         const state = this.component.state;
 
         if (state.current_port !== null) {
-            return {label: state.current_port.name + ' (X/Y): ' + state.current_port.x + '/' + state.current_port.y, value: state.current_port.id}
+            return {
+                label:
+                    state.current_port.name +
+                    " (X/Y): " +
+                    state.current_port.x +
+                    "/" +
+                    state.current_port.y,
+                value: state.current_port.id,
+            };
         }
 
-        return  {value: 0, label: ''};
+        return { value: 0, label: "" };
     }
 
     /**
      * Build the select options for the ports.
      */
-    public buildSetSailOptions(): {value: number, label: string}[]|[] {
+    public buildSetSailOptions(): { value: number; label: string }[] | [] {
         const props = this.component.props;
 
         if (props.ports !== null) {
             return props.ports.map((port: LocationDetails) => {
-                return {label: port.name + ' (X/Y): ' + port.x + '/' + port.y, value: port.id}
+                return {
+                    label: port.name + " (X/Y): " + port.x + "/" + port.y,
+                    value: port.id,
+                };
             });
         }
 
@@ -67,26 +77,36 @@ export default class SetSailComponent {
      *
      * @param data
      */
-    public setSelectedPortData(data: {label: string, value: number}) {
+    public setSelectedPortData(data: { label: string; value: number }) {
         const props = this.component.props;
 
         if (props.ports !== null) {
-            const foundLocation = props.ports.filter((ports: LocationDetails) => ports.id === data.value);
+            const foundLocation = props.ports.filter(
+                (ports: LocationDetails) => ports.id === data.value,
+            );
 
             if (foundLocation.length > 0) {
-                this.component.setState({
-                    x_position: foundLocation[0].x,
-                    y_position: foundLocation[0].y,
-                    current_location: foundLocation[0],
-                    current_player_kingdom: null,
-                    current_enemy_kingdom: null
-                }, () => {
-                    const state = this.component.state;
+                this.component.setState(
+                    {
+                        x_position: foundLocation[0].x,
+                        y_position: foundLocation[0].y,
+                        current_location: foundLocation[0],
+                        current_player_kingdom: null,
+                        current_enemy_kingdom: null,
+                    },
+                    () => {
+                        const state = this.component.state;
 
-                    const setSailCosts = fetchCost(state.x_position, state.y_position, state.character_position, props.currencies);
+                        const setSailCosts = fetchCost(
+                            state.x_position,
+                            state.y_position,
+                            state.character_position,
+                            props.currencies,
+                        );
 
-                    this.component.setState(setSailCosts);
-                });
+                        this.component.setState(setSailCosts);
+                    },
+                );
             }
         }
     }
@@ -102,7 +122,7 @@ export default class SetSailComponent {
             x: state.x_position,
             y: state.y_position,
             cost: state.cost,
-            timeout: state.time_out
+            timeout: state.time_out,
         });
 
         props.handle_close();
@@ -119,8 +139,11 @@ export default class SetSailComponent {
             return;
         }
 
-        const foundLocation = props.ports.filter((port: LocationDetails) =>
-            port.x === props.character_position.x && port.y === props.character_position.y);
+        const foundLocation = props.ports.filter(
+            (port: LocationDetails) =>
+                port.x === props.character_position.x &&
+                port.y === props.character_position.y,
+        );
 
         if (foundLocation.length > 0) {
             this.component.setState({

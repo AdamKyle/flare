@@ -2,9 +2,9 @@ import clsx from "clsx";
 import { DateTime } from "luxon";
 import React, { Fragment } from "react";
 import { formatNumber } from "../../../lib/game/format-number";
-import BuildingInQueueDetails from "../../../lib/game/kingdoms/deffinitions/building-in-queue-details";
 import TimerProgressBar from "../../ui/progress-bars/timer-progress-bar";
 import BuildingDetails from "../buildings/deffinitions/building-details";
+import BuildingInQueueDetails from "../deffinitions/building-in-queue-details";
 
 /**
  * Build the columns for the buildings table.
@@ -13,65 +13,105 @@ import BuildingDetails from "../buildings/deffinitions/building-details";
  * @param cancelBuilding
  * @param buildingsInQueue
  */
-export const buildBuildingsColumns = (onClick: (building: BuildingDetails) => void, cancelBuilding: (queueId: number|null) => void, buildingsInQueue: BuildingInQueueDetails[]|[], viewPort: number) => {
+export const buildBuildingsColumns = (
+    onClick: (building: BuildingDetails) => void,
+    cancelBuilding: (queueId: number | null) => void,
+    buildingsInQueue: BuildingInQueueDetails[] | [],
+    viewPort: number,
+) => {
     return [
         {
-            name: 'Name',
+            name: "Name",
             selector: (row: BuildingDetails) => row.name,
-            cell: (row: BuildingDetails) =>
-                <button onClick={() => onClick(row)}
-                        className={clsx({
-                            'text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-500': !row.is_locked,
-                            'text-white underline': row.is_locked
-                        })}
+            cell: (row: BuildingDetails) => (
+                <button
+                    onClick={() => onClick(row)}
+                    className={clsx({
+                        "text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-500":
+                            !row.is_locked,
+                        "text-white underline": row.is_locked,
+                    })}
                 >
                     {row.name}
                 </button>
+            ),
         },
         {
-            name: 'Level',
+            name: "Level",
             selector: (row: BuildingDetails) => row.level,
-            cell: (row: BuildingDetails) => <span>{row.level}/{row.max_level}</span>
+            cell: (row: BuildingDetails) => (
+                <span>
+                    {row.level}/{row.max_level}
+                </span>
+            ),
         },
         {
-            name: 'Defence',
+            name: "Defence",
             selector: (row: BuildingDetails) => row.current_defence,
             cell: (row: BuildingDetails) => formatNumber(row.current_defence),
         },
         {
-            name: 'Durability',
+            name: "Durability",
             selector: (row: BuildingDetails) => row.current_durability,
-            cell: (row: BuildingDetails) => <span>{row.current_durability}/{row.max_durability}</span>
+            cell: (row: BuildingDetails) => (
+                <span>
+                    {row.current_durability}/{row.max_durability}
+                </span>
+            ),
         },
         {
-            name: 'Upgrade Time Left',
-            minWidth: '300px',
-            cell: (row: BuildingDetails) => <Fragment>
-                <div className='w-full mt-2'>
-                    <TimerProgressBar time_remaining={fetchTimeRemaining(row.id, buildingsInQueue)} time_out_label={'Building'} useSmallTimer={viewPort < 800}/>
-                    {
-                        fetchTimeRemaining(row.id, buildingsInQueue) > 0 ?
-                            <div className='mb-2 mt-4'>
-                                <button className={
-                                    'hover:text-red-500 text-red-700 dark:text-red-500 dark:hover:text-red-400 ' +
-                                    'disabled:text-red-400 dark:disabled:bg-red-400 disabled:line-through ' +
-                                    'focus:outline-none focus-visible:ring-2 focus-visible:ring-red-200 dark:focus-visible:ring-white ' +
-                                    'focus-visible:ring-opacity-75'
-                                } onClick={() => cancelBuilding(findBuildingInQueue(row.id, buildingsInQueue))}>Cancel</button>
+            name: "Upgrade Time Left",
+            minWidth: "300px",
+            cell: (row: BuildingDetails) => (
+                <Fragment>
+                    <div className="w-full mt-2">
+                        <TimerProgressBar
+                            time_remaining={fetchTimeRemaining(
+                                row.id,
+                                buildingsInQueue,
+                            )}
+                            time_out_label={"Building"}
+                            useSmallTimer={viewPort < 800}
+                        />
+                        {fetchTimeRemaining(row.id, buildingsInQueue) > 0 ? (
+                            <div className="mb-2 mt-4">
+                                <button
+                                    className={
+                                        "hover:text-red-500 text-red-700 dark:text-red-500 dark:hover:text-red-400 " +
+                                        "disabled:text-red-400 dark:disabled:bg-red-400 disabled:line-through " +
+                                        "focus:outline-none focus-visible:ring-2 focus-visible:ring-red-200 dark:focus-visible:ring-white " +
+                                        "focus-visible:ring-opacity-75"
+                                    }
+                                    onClick={() =>
+                                        cancelBuilding(
+                                            findBuildingInQueue(
+                                                row.id,
+                                                buildingsInQueue,
+                                            ),
+                                        )
+                                    }
+                                >
+                                    Cancel
+                                </button>
                             </div>
-                        : null
-                    }
-                </div>
-            </Fragment>,
-            omit: buildingsInQueue.length === 0
-        }
+                        ) : null}
+                    </div>
+                </Fragment>
+            ),
+            omit: buildingsInQueue.length === 0,
+        },
     ];
-}
+};
 
-const findBuildingInQueue = (buildingId: number, buildingsInQueue: BuildingInQueueDetails[]|[]) => {
-    let foundBuilding = buildingsInQueue.filter((building: BuildingInQueueDetails) => {
-        return building.building_id === buildingId
-    });
+const findBuildingInQueue = (
+    buildingId: number,
+    buildingsInQueue: BuildingInQueueDetails[] | [],
+) => {
+    let foundBuilding = buildingsInQueue.filter(
+        (building: BuildingInQueueDetails) => {
+            return building.building_id === buildingId;
+        },
+    );
 
     if (foundBuilding.length > 0) {
         const buildingInQueue: BuildingInQueueDetails = foundBuilding[0];
@@ -80,13 +120,17 @@ const findBuildingInQueue = (buildingId: number, buildingsInQueue: BuildingInQue
     }
 
     return null;
-}
+};
 
-
-const fetchTimeRemaining = (buildingId: number, buildingsInQueue: BuildingInQueueDetails[]|[]) => {
-    let foundBuilding = buildingsInQueue.filter((building: BuildingInQueueDetails) => {
-        return building.building_id === buildingId
-    });
+const fetchTimeRemaining = (
+    buildingId: number,
+    buildingsInQueue: BuildingInQueueDetails[] | [],
+) => {
+    let foundBuilding = buildingsInQueue.filter(
+        (building: BuildingInQueueDetails) => {
+            return building.building_id === buildingId;
+        },
+    );
 
     if (foundBuilding.length > 0) {
         const buildingInQueue: BuildingInQueueDetails = foundBuilding[0];
@@ -94,13 +138,13 @@ const fetchTimeRemaining = (buildingId: number, buildingsInQueue: BuildingInQueu
         const start = DateTime.now();
         const end = DateTime.fromISO(buildingInQueue.completed_at);
 
-        const difference = end.diff(start, ["seconds"])
+        const difference = end.diff(start, ["seconds"]);
 
-        if (typeof difference === 'undefined') {
+        if (typeof difference === "undefined") {
             return 0;
         }
 
-        if (typeof difference.seconds === 'undefined') {
+        if (typeof difference.seconds === "undefined") {
             return 0;
         }
 
@@ -108,4 +152,4 @@ const fetchTimeRemaining = (buildingId: number, buildingsInQueue: BuildingInQueu
     }
 
     return 0;
-}
+};

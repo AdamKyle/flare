@@ -1,16 +1,15 @@
-import {singleton} from "tsyringe";
+import { singleton } from "tsyringe";
 
 interface EffectsResult {
-   stat_increase: string,
-   devouring_adjustment: string,
+    stat_increase: string;
+    devouring_adjustment: string;
 }
 @singleton()
 export default class ItemHolyEffects {
-
     public determineItemHolyEffects(holyLevel: number): EffectsResult {
         return {
             stat_increase: this.getStatIncrease(holyLevel),
-            devouring_adjustment: this.getDevouringIncrease(holyLevel)
+            devouring_adjustment: this.getDevouringIncrease(holyLevel),
         };
     }
 

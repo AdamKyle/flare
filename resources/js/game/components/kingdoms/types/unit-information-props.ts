@@ -2,8 +2,7 @@ import BuildingDetails from "../../../../sections/kingdoms/buildings/deffinition
 import InformationPropsBase from "../deffinitions/information-props-base";
 import UnitDetails from "../deffinitions/unit-details";
 
-export default interface UnitInformationProps extends InformationPropsBase{
-
+export default interface UnitInformationProps extends InformationPropsBase {
     unit: UnitDetails;
 
     buildings: BuildingDetails[] | [];
@@ -12,5 +11,5 @@ export default interface UnitInformationProps extends InformationPropsBase{
 
     kingdom_id: number;
 
-    character_gold: number
+    character_gold: number;
 }

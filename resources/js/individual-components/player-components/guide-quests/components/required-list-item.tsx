@@ -3,7 +3,7 @@ import RequiredListItemProps from "./types/required-list-item-props";
 
 export default class RequiredListItem extends React.Component<
     RequiredListItemProps,
-    {  }
+    {}
 > {
     constructor(props: any) {
         super(props);

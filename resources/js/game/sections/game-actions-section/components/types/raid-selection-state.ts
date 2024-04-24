@@ -1,10 +1,9 @@
 import ElementalAtonement from "../../../../components/crafting/gem-crafting/deffinitions/elemental-atonement";
 
 export default interface RaidSelectionState {
-
     is_loading: boolean;
     is_fighting: boolean;
-    monster_current_health: number,
+    monster_current_health: number;
     monster_max_health: number;
     character_current_health: number;
     character_max_health: number;

@@ -50,7 +50,7 @@ export default class ListItemModal extends React.Component<any, any> {
                                     .toString(),
                                 price: item.listed_price,
                             };
-                        }
+                        },
                     );
 
                     const now = DateTime.now()
@@ -82,7 +82,7 @@ export default class ListItemModal extends React.Component<any, any> {
                         data: [chartData],
                     });
                 },
-                (error: AxiosError) => {}
+                (error: AxiosError) => {},
             );
     }
 

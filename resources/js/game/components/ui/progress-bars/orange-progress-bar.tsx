@@ -12,7 +12,11 @@ export default class OrangeProgressBar extends React.Component<
 
     render() {
         return (
-            <div className={clsx({"relative top-[24px]" : this.props.push_down})}>
+            <div
+                className={clsx({
+                    "relative top-[24px]": this.props.push_down,
+                })}
+            >
                 <div className="flex justify-between mb-1">
                     <span
                         className={

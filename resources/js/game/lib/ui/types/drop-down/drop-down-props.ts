@@ -1,7 +1,6 @@
 import MenuItemType from "./menu-item-type";
 
 export default interface DropDownProps {
-
     menu_items: MenuItemType[] | [];
 
     selected_name?: string | null;

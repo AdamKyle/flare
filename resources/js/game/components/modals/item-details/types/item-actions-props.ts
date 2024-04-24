@@ -1,5 +1,5 @@
-import {ComparisonData} from "../../../item-comparison/deffinitions/comparison-data";
-import {UsableSets} from "./item-details-modal-state";
+import { ComparisonData } from "../../../item-comparison/deffinitions/comparison-data";
+import { UsableSets } from "./item-details-modal-state";
 import InventoryDetails from "../../../../lib/game/character-sheet/types/inventory/inventory-details";
 
 export default interface ItemActionsProps {
@@ -9,9 +9,11 @@ export default interface ItemActionsProps {
     is_automation_running: boolean;
     is_dead: boolean;
     comparison_details: ComparisonData;
-    usable_sets: UsableSets[]|[];
+    usable_sets: UsableSets[] | [];
 
     manage_modal?: () => void;
-    update_inventory?: (inventory: {[key: string]: InventoryDetails[]}) => void;
+    update_inventory?: (inventory: {
+        [key: string]: InventoryDetails[];
+    }) => void;
     set_success_message?: (message: string) => void;
 }

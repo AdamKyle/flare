@@ -4,27 +4,29 @@
  * @param type
  * @param characterId
  */
-export const craftingGetEndPoints = (type: 'craft' | 'enchant' | 'alchemy' | 'workbench' | 'trinketry' | null, characterId: number): string => {
-
+export const craftingGetEndPoints = (
+    type: "craft" | "enchant" | "alchemy" | "workbench" | "trinketry" | null,
+    characterId: number,
+): string => {
     if (type === null) {
-        return '';
+        return "";
     }
 
-    switch(type) {
-        case 'craft':
-            return 'crafting/' + characterId;
-        case 'enchant':
-            return 'enchanting/' + characterId;
-        case 'alchemy':
-            return 'alchemy/' + characterId;
-        case 'trinketry':
-            return 'trinket-crafting/' + characterId;
-        case 'workbench':
-            return 'character/'+characterId+'/inventory/smiths-workbench'
+    switch (type) {
+        case "craft":
+            return "crafting/" + characterId;
+        case "enchant":
+            return "enchanting/" + characterId;
+        case "alchemy":
+            return "alchemy/" + characterId;
+        case "trinketry":
+            return "trinket-crafting/" + characterId;
+        case "workbench":
+            return "character/" + characterId + "/inventory/smiths-workbench";
         default:
-            return '';
+            return "";
     }
-}
+};
 
 /**
  * Fetch the url for posting crafting.
@@ -32,24 +34,26 @@ export const craftingGetEndPoints = (type: 'craft' | 'enchant' | 'alchemy' | 'wo
  * @param type
  * @param characterId
  */
-export const craftingPostEndPoints = (type: 'craft' | 'enchant' | 'alchemy' | 'workbench' | 'trinketry' | null, characterId: number): string => {
-
+export const craftingPostEndPoints = (
+    type: "craft" | "enchant" | "alchemy" | "workbench" | "trinketry" | null,
+    characterId: number,
+): string => {
     if (type === null) {
-        return '';
+        return "";
     }
 
-    switch(type) {
-        case 'craft':
-            return 'craft/' + characterId;
-        case 'enchant':
-            return 'enchant/' + characterId;
-        case 'alchemy':
-            return 'transmute/' + characterId;
-        case 'trinketry':
-            return 'trinket-craft/' + characterId;
-        case 'workbench':
-            return 'character/'+characterId+'/smithy-workbench/apply';
+    switch (type) {
+        case "craft":
+            return "craft/" + characterId;
+        case "enchant":
+            return "enchant/" + characterId;
+        case "alchemy":
+            return "transmute/" + characterId;
+        case "trinketry":
+            return "trinket-craft/" + characterId;
+        case "workbench":
+            return "character/" + characterId + "/smithy-workbench/apply";
         default:
-            return '';
+            return "";
     }
-}
+};

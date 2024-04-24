@@ -1,5 +1,4 @@
 export default interface ChangeNameModalProps {
-
     name: string;
 
     kingdom_id: number;

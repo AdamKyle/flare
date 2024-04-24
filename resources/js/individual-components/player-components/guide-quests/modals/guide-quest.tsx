@@ -4,24 +4,30 @@ import ComponentLoading from "../../../../game/components/ui/loading/component-l
 import LoadingProgressBar from "../../../../game/components/ui/progress-bars/loading-progress-bar";
 import SuccessAlert from "../../../../game/components/ui/alerts/simple-alerts/success-alert";
 import DangerAlert from "../../../../game/components/ui/alerts/simple-alerts/danger-alert";
-import {buildValueLink, getRequirementKey, guideQuestLabelBuilder,} from "../lib/guide-quest-label-builder";
+import {
+    buildValueLink,
+    getRequirementKey,
+    guideQuestLabelBuilder,
+} from "../lib/guide-quest-label-builder";
 import RequiredListItem from "../components/required-list-item";
-import {questRewardKeys} from "../lib/guide-quests-rewards";
+import { questRewardKeys } from "../lib/guide-quests-rewards";
 import RewardListItem from "../components/reward-list-item";
 import TabLayout from "../components/tab-labout";
 import InfoAlert from "../../../../game/components/ui/alerts/simple-alerts/info-alert";
 import clsx from "clsx";
 import GuideQuestProps from "./types/guide-quest-props";
 import GuideQuestState from "./types/guide-quest-state";
-import GuideQuestAjax, {GUIDE_QUEST_ACTIONS} from "../ajax/guide-quest-ajax";
-import {guideQuestServiceContainer} from "../container/guide-quest-container";
+import GuideQuestAjax, { GUIDE_QUEST_ACTIONS } from "../ajax/guide-quest-ajax";
+import { guideQuestServiceContainer } from "../container/guide-quest-container";
 
 enum EVENT_TYPE {
     WINTER_EVENT = 4,
 }
 
-export default class GuideQuest extends React.Component<GuideQuestProps, GuideQuestState> {
-
+export default class GuideQuest extends React.Component<
+    GuideQuestProps,
+    GuideQuestState
+> {
     private guideQuestAjax: GuideQuestAjax;
 
     constructor(props: GuideQuestProps) {
@@ -38,11 +44,11 @@ export default class GuideQuest extends React.Component<GuideQuestProps, GuideQu
             completed_requirements: [],
         };
 
-        this.guideQuestAjax = guideQuestServiceContainer().fetch(GuideQuestAjax);
+        this.guideQuestAjax =
+            guideQuestServiceContainer().fetch(GuideQuestAjax);
     }
 
     componentDidMount() {
-
         this.guideQuestAjax.doGuideQuestAction(this, GUIDE_QUEST_ACTIONS.FETCH);
     }
 
@@ -66,19 +72,22 @@ export default class GuideQuest extends React.Component<GuideQuestProps, GuideQu
     }
 
     handInQuest() {
-        this.guideQuestAjax.doGuideQuestAction(this, GUIDE_QUEST_ACTIONS.HAND_IN);
+        this.guideQuestAjax.doGuideQuestAction(
+            this,
+            GUIDE_QUEST_ACTIONS.HAND_IN,
+        );
     }
 
     fetchRequiredKeys(): string[] {
-
         if (this.state.quest_data === null) {
-            return ['UNKNOWN']
+            return ["UNKNOWN"];
         }
 
         return Object.keys(this.state.quest_data).filter((key: string) => {
             if (this.state.quest_data !== null) {
                 return (
-                    (key.startsWith("required_") || key.startsWith("secondary_")) &&
+                    (key.startsWith("required_") ||
+                        key.startsWith("secondary_")) &&
                     this.state.quest_data[key] !== null
                 );
             }
@@ -98,7 +107,8 @@ export default class GuideQuest extends React.Component<GuideQuestProps, GuideQu
             if (label !== null) {
                 const requiredKey = getRequirementKey(key);
                 const value = this.state.quest_data[requiredKey];
-                const completedRequirements: string[] = this.state.completed_requirements || [];
+                const completedRequirements: string[] =
+                    this.state.completed_requirements || [];
 
                 const isFinished =
                     completedRequirements.includes(key) ||
@@ -112,9 +122,9 @@ export default class GuideQuest extends React.Component<GuideQuestProps, GuideQu
                         requirement={buildValueLink(
                             value,
                             key,
-                            this.state.quest_data
+                            this.state.quest_data,
                         )}
-                    />
+                    />,
                 );
             }
         });
@@ -140,7 +150,7 @@ export default class GuideQuest extends React.Component<GuideQuestProps, GuideQu
                     <RewardListItem
                         label={label}
                         value={this.state.quest_data[key]}
-                    />
+                    />,
                 );
             }
         });
@@ -153,7 +163,7 @@ export default class GuideQuest extends React.Component<GuideQuestProps, GuideQu
             <Dialogue
                 is_open={this.props.is_open}
                 handle_close={this.props.manage_modal}
-                title={this.buildTitle() + ' [GUIDE QUEST]'}
+                title={this.buildTitle() + " [GUIDE QUEST]"}
                 secondary_actions={{
                     secondary_button_label: "Hand in",
                     secondary_button_disabled: !this.state.can_hand_in,
@@ -178,12 +188,21 @@ export default class GuideQuest extends React.Component<GuideQuestProps, GuideQu
                 ) : (
                     <div className="overflow-y-auto max-h-[450px] lg:max-h-none lg:overflow-visible">
                         <InfoAlert
-                            additional_css={clsx('my-4', {'hidden': this.state.quest_data.only_during_event === null && this.state.quest_data.unlock_at_level === null})}>
+                            additional_css={clsx("my-4", {
+                                hidden:
+                                    this.state.quest_data.only_during_event ===
+                                        null &&
+                                    this.state.quest_data.unlock_at_level ===
+                                        null,
+                            })}
+                        >
                             <p>
-                                These types of Guide Quests only pop up during special events or when new features are
-                                unlocked at specific levels.
-                                You can continue your regular guide quests once you finish this one and any "child"
-                                quests that might folow after it.
+                                These types of Guide Quests only pop up during
+                                special events or when new features are unlocked
+                                at specific levels. You can continue your
+                                regular guide quests once you finish this one
+                                and any "child" quests that might folow after
+                                it.
                             </p>
                         </InfoAlert>
                         {this.state.success_message !== null ? (
@@ -212,8 +231,7 @@ export default class GuideQuest extends React.Component<GuideQuestProps, GuideQu
                                         {this.buildRequirementsList()}
                                     </ul>
                                 </div>
-                                <div
-                                    className="block md:hidden border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3"></div>
+                                <div className="block md:hidden border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3"></div>
                                 <div>
                                     <h3 className="mb-2">Rewards</h3>
                                     <ul className="list-disc ml-[18px]">
@@ -253,12 +271,14 @@ export default class GuideQuest extends React.Component<GuideQuestProps, GuideQu
                         </p>
 
                         <p className={"mt-4 mb-4"}>
-                           You can click the top right button in the header called Guide Quests to re-open this modal.
-                            You can also see previous Guide Quests by opening the top left menu,
-                            selecting Quest Log and then selecting Completed Guide Quests.
+                            You can click the top right button in the header
+                            called Guide Quests to re-open this modal. You can
+                            also see previous Guide Quests by opening the top
+                            left menu, selecting Quest Log and then selecting
+                            Completed Guide Quests.
                         </p>
                         {this.state.is_handing_in ? (
-                            <LoadingProgressBar/>
+                            <LoadingProgressBar />
                         ) : null}
                     </div>
                 )}

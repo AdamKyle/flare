@@ -27,7 +27,7 @@ export default class OtherStatistics extends React.Component<any, any> {
             },
             (error: AxiosError) => {
                 console.error(error);
-            }
+            },
         );
     }
 
@@ -41,7 +41,7 @@ export default class OtherStatistics extends React.Component<any, any> {
                 <Fragment>
                     <dd>{characterName}</dd>
                     <dt>{this.state.data.kingdomHolders[characterName]}</dt>
-                </Fragment>
+                </Fragment>,
             );
         });
 
@@ -77,9 +77,13 @@ export default class OtherStatistics extends React.Component<any, any> {
                             <dt>Average Character Gold:</dt>
                             <dd>{this.state.data.averageCharacterGold}</dd>
                             <dt>Average Quests Completed:</dt>
-                            <dd>{this.state.data.averageRegularQuestsCompleted}</dd>
+                            <dd>
+                                {this.state.data.averageRegularQuestsCompleted}
+                            </dd>
                             <dt>Average Guide Quests Completed:</dt>
-                            <dd>{this.state.data.averageGuideQuestsCompleted}</dd>
+                            <dd>
+                                {this.state.data.averageGuideQuestsCompleted}
+                            </dd>
                         </dl>
                     </BasicCard>
                     <BasicCard>
@@ -97,7 +101,7 @@ export default class OtherStatistics extends React.Component<any, any> {
                             <dd>
                                 {this.state.data.richestCharacter.name} (Gold:{" "}
                                 {formatNumber(
-                                    this.state.data.richestCharacter.gold
+                                    this.state.data.richestCharacter.gold,
                                 )}
                                 )
                             </dd>

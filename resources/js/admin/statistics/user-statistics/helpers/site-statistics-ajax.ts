@@ -4,7 +4,6 @@ import LoginStatistics from "../components/login-statistics";
 import RegistrationStatistics from "../components/registration-statistics";
 
 export default class SiteStatisticsAjax {
-
     private component: LoginStatistics | RegistrationStatistics;
 
     constructor(component: LoginStatistics | RegistrationStatistics) {
@@ -23,14 +22,14 @@ export default class SiteStatisticsAjax {
                     this.component.setState({
                         data: this.component.createDataSet(
                             result.data.stats.data,
-                            result.data.stats.labels
+                            result.data.stats.labels,
                         ),
                         loading: false,
                     });
                 },
                 (error: AxiosError) => {
                     console.error(error);
-                }
+                },
             );
     }
 

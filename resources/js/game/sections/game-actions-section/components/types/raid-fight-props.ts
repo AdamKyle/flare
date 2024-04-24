@@ -1,5 +1,4 @@
 export default interface RaidFightProps {
-
     character_current_health: number;
     character_max_health: number;
     monster_current_health: number;

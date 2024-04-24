@@ -1,4 +1,3 @@
-
 type TimeLeft = (timeLeft: number) => void;
 
 export default interface ActionsTimerProps {

@@ -69,32 +69,33 @@ export default class SmallerActions extends React.Component<
 
         // @ts-ignore
         this.attackTimeOut = Echo.private(
-            "show-timeout-bar-" + this.props.character.user_id
+            "show-timeout-bar-" + this.props.character.user_id,
         );
 
         // @ts-ignore
         this.craftingTimeOut = Echo.private(
-            "show-crafting-timeout-bar-" + this.props.character.user_id
+            "show-crafting-timeout-bar-" + this.props.character.user_id,
         );
 
         // @ts-ignore
         this.mapTimeOut = Echo.private(
-            "show-timeout-move-" + this.props.character.user_id
+            "show-timeout-move-" + this.props.character.user_id,
         );
 
         // @ts-ignore
         this.explorationTimeOut = Echo.private(
-            "exploration-timeout-" + this.props.character.user_id
+            "exploration-timeout-" + this.props.character.user_id,
         );
 
         // @ts-ignore
         this.pvpUpdate = Echo.private(
-            "update-pvp-attack-" + this.props.character.user_id
+            "update-pvp-attack-" + this.props.character.user_id,
         );
 
         // @ts-ignore
         this.celestialTimeout = Echo.private(
-            "update-character-celestial-timeout-" + this.props.character.user_id
+            "update-character-celestial-timeout-" +
+                this.props.character.user_id,
         );
 
         // @ts-ignore
@@ -112,7 +113,7 @@ export default class SmallerActions extends React.Component<
             },
             () => {
                 updateTimers(this.props.character.id);
-            }
+            },
         );
 
         // @ts-ignore
@@ -122,7 +123,7 @@ export default class SmallerActions extends React.Component<
                 this.setState({
                     attack_time_out: event.forLength,
                 });
-            }
+            },
         );
 
         // @ts-ignore
@@ -132,7 +133,7 @@ export default class SmallerActions extends React.Component<
                 this.setState({
                     crafting_time_out: event.timeout,
                 });
-            }
+            },
         );
 
         // @ts-ignore
@@ -142,7 +143,7 @@ export default class SmallerActions extends React.Component<
                 this.setState({
                     movement_time_left: event.forLength,
                 });
-            }
+            },
         );
 
         // @ts-ignore
@@ -152,7 +153,7 @@ export default class SmallerActions extends React.Component<
                 this.setState({
                     celestial_time_out: event.timeOut,
                 });
-            }
+            },
         );
 
         // // @ts-ignore
@@ -166,17 +167,17 @@ export default class SmallerActions extends React.Component<
                     },
                     () => {
                         const characterLevel = removeCommas(
-                            this.props.character.level
+                            this.props.character.level,
                         );
 
                         if (characterLevel >= 301) {
                             this.smallActionsManager.setCharactersForDueling(
-                                event.characters
+                                event.characters,
                             );
                         }
-                    }
+                    },
                 );
-            }
+            },
         );
 
         // @ts-ignore
@@ -187,7 +188,7 @@ export default class SmallerActions extends React.Component<
                     show_duel_fight: true,
                     duel_fight_info: event.data,
                 });
-            }
+            },
         );
 
         // // @ts-ignore
@@ -197,14 +198,14 @@ export default class SmallerActions extends React.Component<
                 this.setState({
                     automation_time_out: event.forLength,
                 });
-            }
+            },
         );
     }
 
     componentDidUpdate(
         prevProps: Readonly<SmallActionsProps>,
         prevState: Readonly<SmallActionsState>,
-        snapshot?: any
+        snapshot?: any,
     ): void {
         if (
             this.props.action_data !== null &&
@@ -221,7 +222,7 @@ export default class SmallerActions extends React.Component<
                         monsters: this.state.monsters,
                         raid_monsters: this.state.raid_monsters,
                     });
-                }
+                },
             );
         }
 
@@ -392,7 +393,7 @@ export default class SmallerActions extends React.Component<
         return (
             <SmallExplorationSection
                 close_exploration_section={this.closeExplorationSection.bind(
-                    this
+                    this,
                 )}
                 character={this.props.character}
                 monsters={this.state.monsters}
@@ -421,7 +422,7 @@ export default class SmallerActions extends React.Component<
             <CelestialFight
                 character={this.props.character}
                 manage_celestial_fight={this.closeFightCelestialSection.bind(
-                    this
+                    this,
                 )}
                 celestial_id={this.props.celestial_id}
                 update_celestial={this.props.update_celestial}
@@ -465,15 +466,15 @@ export default class SmallerActions extends React.Component<
         return (
             <SmallerSpecialtyShop
                 show_hell_forged_section={type === "hell-forged-gear"}
-                show_purgatory_chains_section={type === 'purgatory-chains-gear'}
-                show_twisted_earth_section={type === 'twisted-earth-gear'}
+                show_purgatory_chains_section={type === "purgatory-chains-gear"}
+                show_twisted_earth_section={type === "twisted-earth-gear"}
                 character={this.props.character}
                 manage_hell_forged_shop={this.manageHellForgedShop.bind(this)}
                 manage_purgatory_chain_shop={this.managePurgatoryChainShop.bind(
-                    this
+                    this,
                 )}
                 manage_twisted_earth_shop={this.manageTwistedEarthShop.bind(
-                    this
+                    this,
                 )}
             />
         );
@@ -514,9 +515,11 @@ export default class SmallerActions extends React.Component<
                 {this.state.selected_action !== null ? (
                     <>
                         {this.buildSection()}
-                        <div className='mt-8 mb-4'>
+                        <div className="mt-8 mb-4">
                             <Revive
-                                can_attack={this.props.character_status.can_attack}
+                                can_attack={
+                                    this.props.character_status.can_attack
+                                }
                                 is_character_dead={this.props.character.is_dead}
                                 character_id={this.props.character.id}
                             />
@@ -548,13 +551,15 @@ export default class SmallerActions extends React.Component<
                 )}
 
                 <div className="mt-4 mb-4">
-                    <div className='relative bottom-4'>
+                    <div className="relative bottom-4">
                         <ActionsTimers
                             attack_time_out={this.state.attack_time_out}
                             crafting_time_out={this.state.crafting_time_out}
-                            update_attack_timer={this.updateAttackTimer.bind(this)}
+                            update_attack_timer={this.updateAttackTimer.bind(
+                                this,
+                            )}
                             update_crafting_timer={this.updateCraftingTimer.bind(
-                                this
+                                this,
                             )}
                         />
                     </div>
@@ -564,8 +569,12 @@ export default class SmallerActions extends React.Component<
                         <div className="">
                             <MapTimer
                                 time_left={this.state.movement_time_left}
-                                automation_time_out={this.state.automation_time_out}
-                                celestial_time_out={this.state.celestial_time_out}
+                                automation_time_out={
+                                    this.state.automation_time_out
+                                }
+                                celestial_time_out={
+                                    this.state.celestial_time_out
+                                }
                             />
                         </div>
                     </div>

@@ -1,5 +1,4 @@
 export default interface ClassSpecialtiesType {
-
     base_ac_mod: number | null;
 
     base_damage_mod: number | null;

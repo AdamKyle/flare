@@ -1,10 +1,9 @@
-
 export interface ResourceCosts {
     stone: number;
     wood: number;
     iron: number;
     clay: number;
-    steel: number
+    steel: number;
     population: number;
 }
 

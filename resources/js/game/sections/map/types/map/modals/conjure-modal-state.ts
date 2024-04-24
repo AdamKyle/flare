@@ -3,7 +3,7 @@ import CelestialType from "../../../../../lib/game/types/actions/monster/celesti
 export default interface ConjureModalState {
     loading: boolean;
 
-    celestials: CelestialType[]|[];
+    celestials: CelestialType[] | [];
 
     selected_celestial_id: number | null;
 

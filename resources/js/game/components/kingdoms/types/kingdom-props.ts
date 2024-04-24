@@ -1,7 +1,6 @@
 import KingdomDetails from "../deffinitions/kingdom-details";
 
 export default interface KingdomProps {
-
     close_details: () => void;
 
     kingdom: KingdomDetails;

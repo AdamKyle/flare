@@ -1,9 +1,7 @@
-import {Component} from "react";
-import {Method} from 'axios';
-
+import { Component } from "react";
+import { Method } from "axios";
 
 export default interface AjaxInterface {
-
     /**
      * Set the route.
      *
@@ -33,5 +31,9 @@ export default interface AjaxInterface {
      * @param errorCallBack
      * @type [{method: Method, successCallBack?: Function, errorCallBack?: Function}]
      */
-    doAjaxCall(method: Method, successCallBack?: Function, errorCallBack?: Function): void;
+    doAjaxCall(
+        method: Method,
+        successCallBack?: Function,
+        errorCallBack?: Function,
+    ): void;
 }

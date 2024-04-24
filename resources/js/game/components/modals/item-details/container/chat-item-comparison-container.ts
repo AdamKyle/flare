@@ -1,5 +1,4 @@
-
-import {CoreContainer} from "../../../../lib/containers/core-container";
+import { CoreContainer } from "../../../../lib/containers/core-container";
 import ItemHolyEffects from "../values/item-holy-effects";
 import InventoryComparisonActionsAjax from "../ajax/inventory-comparison-actions-ajax";
 import ItemComparisonAjax from "../ajax/item-comparison-ajax";
@@ -13,16 +12,16 @@ import ItemComparisonAjax from "../ajax/item-comparison-ajax";
  * @param container
  */
 function chatItemComparisonContainer(container: CoreContainer) {
-    container.register('item-details-ajax', {
-        useClass: ItemComparisonAjax
+    container.register("item-details-ajax", {
+        useClass: ItemComparisonAjax,
     });
 
-    container.register('inventory-comparison-action-ajax', {
-        useClass: InventoryComparisonActionsAjax
+    container.register("inventory-comparison-action-ajax", {
+        useClass: InventoryComparisonActionsAjax,
     });
 
-    container.register('item-holy-effects', {
-        useClass: ItemHolyEffects
+    container.register("item-holy-effects", {
+        useClass: ItemHolyEffects,
     });
 }
 

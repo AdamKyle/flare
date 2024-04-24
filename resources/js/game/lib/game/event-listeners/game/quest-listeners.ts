@@ -1,20 +1,21 @@
 import GameListener from "../game-listener";
-import {inject, injectable} from "tsyringe";
+import { inject, injectable } from "tsyringe";
 import CoreEventListener from "../core-event-listener";
 import Game from "../../../../game";
-import {Channel} from "laravel-echo";
+import { Channel } from "laravel-echo";
 import QuestType from "../../types/quests/quest-type";
 
 @injectable()
 export default class QuestListeners implements GameListener {
-
     private component?: Game;
     private userId?: number;
 
     private questUpdate?: Channel;
     private raidQuestUpdate?: Channel;
 
-    constructor(@inject(CoreEventListener) private coreEventListener: CoreEventListener) {}
+    constructor(
+        @inject(CoreEventListener) private coreEventListener: CoreEventListener,
+    ) {}
 
     initialize(component: Game, userId: number): void {
         this.component = component;
@@ -29,7 +30,7 @@ export default class QuestListeners implements GameListener {
             this.questUpdate = echo.join("update-quests");
 
             this.raidQuestUpdate = echo.join("update-raid-quests");
-        } catch (e: any|unknown) {
+        } catch (e: any | unknown) {
             throw new Error(e);
         }
     }
@@ -56,21 +57,21 @@ export default class QuestListeners implements GameListener {
                     return;
                 }
 
-                let quests: QuestType | null = JSON.parse(JSON.stringify(
-                    this.component.state.quests
-                ));
+                let quests: QuestType | null = JSON.parse(
+                    JSON.stringify(this.component.state.quests),
+                );
 
                 if (quests === null) {
                     return;
                 }
 
-                quests.quests          = event.quests;
+                quests.quests = event.quests;
                 quests.is_winter_event = event.isWinterEvent;
 
                 this.component.setState({
                     quests: quests,
                 });
-            }
+            },
         );
     }
 
@@ -80,7 +81,6 @@ export default class QuestListeners implements GameListener {
      * @protected
      */
     protected listenForRaidQuestUpdates() {
-
         if (!this.raidQuestUpdate) {
             return;
         }
@@ -88,14 +88,13 @@ export default class QuestListeners implements GameListener {
         this.raidQuestUpdate.listen(
             "Game.Quests.Events.UpdateRaidQuests",
             (event: any) => {
-
                 if (!this.component) {
                     return;
                 }
 
-                let quests: QuestType | null = JSON.parse(JSON.stringify(
-                    this.component.state.quests
-                ));
+                let quests: QuestType | null = JSON.parse(
+                    JSON.stringify(this.component.state.quests),
+                );
 
                 if (quests === null) {
                     return;
@@ -106,8 +105,7 @@ export default class QuestListeners implements GameListener {
                 this.component.setState({
                     quests: quests,
                 });
-            }
+            },
         );
-
     }
 }

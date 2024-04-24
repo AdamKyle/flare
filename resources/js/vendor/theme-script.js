@@ -1,4 +1,4 @@
-import tippy, {delegate} from 'tippy.js';
+import tippy, { delegate } from "tippy.js";
 
 // Event delegation
 const on = (selector, eventType, childSelector, eventHandler) => {
@@ -18,19 +18,25 @@ const animateCSS = (element, animation, prefix = "animate__") => {
         const animationName = `${prefix}${animation}`;
         const node = element;
 
-        node.classList.add(`${prefix}animated`, `${prefix}faster`, animationName);
+        node.classList.add(
+            `${prefix}animated`,
+            `${prefix}faster`,
+            animationName,
+        );
 
         const handleAnimationEnd = (event) => {
             event.stopPropagation();
             node.classList.remove(
                 `${prefix}animated`,
                 `${prefix}faster`,
-                animationName
+                animationName,
             );
             resolve("Animation Ended.");
         };
 
-        node.addEventListener("animationend", handleAnimationEnd, { once: true });
+        node.addEventListener("animationend", handleAnimationEnd, {
+            once: true,
+        });
     });
 };
 
@@ -52,7 +58,7 @@ window.addEventListener(
     () => {
         setViewportWidth();
     },
-    false
+    false,
 );
 
 // Open Collapse
@@ -80,7 +86,7 @@ const openCollapse = (collapse, callback) => {
 
             if (typeof callback === "function") callback();
         },
-        { once: true }
+        { once: true },
     );
 };
 
@@ -93,7 +99,9 @@ const collapse = () => {
         collapseTrigger.classList.toggle("active");
 
         // Collapse
-        const collapses = document.querySelectorAll(collapseTrigger.dataset.target);
+        const collapses = document.querySelectorAll(
+            collapseTrigger.dataset.target,
+        );
         collapses.forEach((collapse) => {
             if (collapse.classList.contains("open")) {
                 closeCollapse(collapse);
@@ -129,7 +137,6 @@ const collapse = () => {
 
 collapse();
 
-
 // Close Collapse
 const closeCollapse = (collapse, callback) => {
     collapse.style.overflowY = "hidden";
@@ -159,7 +166,7 @@ const closeCollapse = (collapse, callback) => {
 
             if (typeof callback === "function") callback();
         },
-        { once: true }
+        { once: true },
     );
 };
 
@@ -431,8 +438,8 @@ const showActivePage = () => {
 
             const mainMenu = document.querySelector(
                 '.menu-items .link[data-target="[data-menu=' +
-                mainMenuTrigger.dataset.menu +
-                ']"]'
+                    mainMenuTrigger.dataset.menu +
+                    ']"]',
             );
 
             mainMenu.classList.add("active");
@@ -476,7 +483,9 @@ const hideOverlay = () => {
 const sidebar = () => {
     // Toggle Sidebar
     const toggleSidebar = () => {
-        const sidebar = document.querySelector(".sidebar:not(.sidebar_customizer)");
+        const sidebar = document.querySelector(
+            ".sidebar:not(.sidebar_customizer)",
+        );
         if (sidebar.classList.contains("open")) {
             sidebar.classList.remove("open");
             hideOverlay();
@@ -597,13 +606,12 @@ const toggleDarkMode = () => {
             enableDarkMode();
         }
     });
-}
+};
 
 toggleDarkMode();
 
 // Tippy
 const customTippy = () => {
-
     // Menu tooltip
     delegate("body", {
         target: '.menu-icon-only [data-toggle="tooltip-menu"]',
@@ -637,7 +645,12 @@ const customTippy = () => {
             const title = reference.dataset.popoverTitle;
             const content = reference.dataset.popoverContent;
             const popover =
-                "<h5>" + title + "</h5>" + '<div class="mt-5">' + content + "</div>";
+                "<h5>" +
+                title +
+                "</h5>" +
+                '<div class="mt-5">' +
+                content +
+                "</div>";
             return popover;
         },
     });
@@ -705,4 +718,3 @@ const customTippy = () => {
 };
 
 customTippy();
-

@@ -1,4 +1,4 @@
-export default interface WhenReplacing  {
+export default interface WhenReplacing {
     gem_you_have_id: number;
     name: string;
     primary_atonement_amount: number;

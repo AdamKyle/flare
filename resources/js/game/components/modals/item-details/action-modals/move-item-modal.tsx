@@ -19,7 +19,7 @@ export default class MoveItemModal extends React.Component<
     setName(setId: number) {
         this.setState({
             set_name: this.props.usable_sets.filter(
-                (set) => set.id === setId
+                (set) => set.id === setId,
             )[0].name,
             set_id: setId,
         });
@@ -69,8 +69,8 @@ export default class MoveItemModal extends React.Component<
                             <li>
                                 <strong>Hands</strong>: 1 or 2 weapons for
                                 hands, or 1 or 2 shields or 1 duel wielded
-                                weapon (bow, hammer or stave). Guns, Fans, Scratch Awls and Maces
-                                follow the same rules
+                                weapon (bow, hammer or stave). Guns, Fans,
+                                Scratch Awls and Maces follow the same rules
                             </li>
                             <li>
                                 <strong>Armour</strong>: 1 of each type, body,
@@ -97,8 +97,8 @@ export default class MoveItemModal extends React.Component<
                             </li>
                             <li>
                                 <strong>Comsic (light purple items)</strong>: 1
-                                Cosmic, if there is no Unique OR Mythic, regardless of
-                                type.
+                                Cosmic, if there is no Unique OR Mythic,
+                                regardless of type.
                             </li>
                             <li>
                                 <strong>Ancestral Items (purple items)</strong>:

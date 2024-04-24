@@ -1,9 +1,8 @@
 import InventoryDetails from "./inventory/inventory-details";
 import SetDetails from "./inventory/set-details";
-import {UsableSets} from "../../../../components/modals/item-details/types/item-details-modal-state";
+import { UsableSets } from "../../../../components/modals/item-details/types/item-details-modal-state";
 
 export default interface InventoryTabProps {
-
     inventory: InventoryDetails[];
 
     usable_sets: UsableSets[] | [];
@@ -14,13 +13,19 @@ export default interface InventoryTabProps {
 
     is_dead: boolean;
 
-    update_inventory: (inventory: {[key: string]: InventoryDetails[]}) => void;
+    update_inventory: (inventory: {
+        [key: string]: InventoryDetails[];
+    }) => void;
 
     set_success_message: (message: string) => void;
 
     is_automation_running: boolean;
 
-    manage_skills: (itemId: number, itemSkills: any[]|[], itemSkillProgressions: any[]) => void;
+    manage_skills: (
+        itemId: number,
+        itemSkills: any[] | [],
+        itemSkillProgressions: any[],
+    ) => void;
 
     view_port: number;
 }

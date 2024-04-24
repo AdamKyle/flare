@@ -1,5 +1,4 @@
 export default interface AbandonKingdomModalProps {
-
     is_open: boolean;
 
     handle_close: () => void;

@@ -46,20 +46,20 @@ export default class CharacterReincarnationStatistics extends React.Component<
                 this.setState({
                     data: this.createDataSet(
                         result.data.stats.data,
-                        result.data.stats.labels
+                        result.data.stats.labels,
                     ),
                     loading: false,
                 });
             },
             (error: AxiosError) => {
                 console.error(error);
-            }
+            },
         );
     }
 
     createDataSet(
         data: number[] | [],
-        labels: string[] | []
+        labels: string[] | [],
     ): { gold: number; character_name: string }[] {
         const chartData: { gold: number; character_name: string }[] = [];
 

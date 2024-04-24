@@ -33,9 +33,7 @@ export default class UserStatistics extends React.Component<any, any> {
                     <CharacterReincarnationStatistics />
                 </BasicCard>
                 <BasicCard additionalClasses={"mb-5"}>
-                    <h3 className="mb-4">
-                        Character Quest Completion
-                    </h3>
+                    <h3 className="mb-4">Character Quest Completion</h3>
                     <CharacterQuestCompletion />
                 </BasicCard>
                 <BasicCard additionalClasses={"my-4"}>

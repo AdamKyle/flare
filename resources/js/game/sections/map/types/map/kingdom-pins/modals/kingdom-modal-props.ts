@@ -9,11 +9,16 @@ export default interface KingdomModalProps {
 
     character_id: number;
 
-    character_position?: {x: number, y: number};
+    character_position?: { x: number; y: number };
 
     currencies?: CharacterCurrenciesDetails;
 
-    teleport_player?: (data: {x: number, y: number, cost: number, timeout: number}) => void;
+    teleport_player?: (data: {
+        x: number;
+        y: number;
+        cost: number;
+        timeout: number;
+    }) => void;
 
     can_move: boolean;
 

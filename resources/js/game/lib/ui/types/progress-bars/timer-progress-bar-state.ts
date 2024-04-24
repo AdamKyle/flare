@@ -1,6 +1,5 @@
 export default interface TimerProgressBarState {
-
-    time_left: number
+    time_left: number;
 
     percentage_left: number;
 

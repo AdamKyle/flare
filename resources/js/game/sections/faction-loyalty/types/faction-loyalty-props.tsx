@@ -1,4 +1,4 @@
-import {FameTasks} from "../deffinitions/faction-loaylaty";
+import { FameTasks } from "../deffinitions/faction-loaylaty";
 
 export default interface FactionLoyaltyProps {
     character_id: number;

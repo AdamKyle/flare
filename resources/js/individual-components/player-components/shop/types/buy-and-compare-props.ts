@@ -1,7 +1,6 @@
 import ItemDefinition from "../../../../game/components/items/deffinitions/item-definition";
 
 export default interface BuyAndCompareProps {
-
     character_id: number;
 
     item: ItemDefinition;

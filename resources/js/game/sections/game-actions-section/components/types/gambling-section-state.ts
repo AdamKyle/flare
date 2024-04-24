@@ -1,16 +1,15 @@
 import IconType from "./icon-type";
 
 export default interface GamblingSectionState {
-
     loading: boolean;
 
-    icons: IconType[]|[];
+    icons: IconType[] | [];
 
     spinning: boolean;
 
-    spinningIndexes: number[]|[];
+    spinningIndexes: number[] | [];
 
-    roll: number[]|[];
+    roll: number[] | [];
 
     roll_message: string | null;
 

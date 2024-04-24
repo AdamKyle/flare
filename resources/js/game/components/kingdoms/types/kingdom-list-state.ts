@@ -2,7 +2,6 @@ import KingdomDetails from "../deffinitions/kingdom-details";
 import KingdomLogDetails from "../deffinitions/kingdom-log-details";
 
 export default interface KingdomListState {
-
     loading: boolean;
 
     dark_tables: boolean;

@@ -1,32 +1,38 @@
-import { createRoot } from 'react-dom/client';
+import { createRoot } from "react-dom/client";
 import React from "react";
-import "reflect-metadata"
+import "reflect-metadata";
 import GuideButton from "./individual-components/player-components/guide-quests/guide-button";
 
-type UserIdProps = {userId: number;}
+type UserIdProps = { userId: number };
 
-const guideButton = document.getElementById('guide-button');
+const guideButton = document.getElementById("guide-button");
 
 if (guideButton !== null) {
-
-    const player = document.head.querySelector<HTMLMetaElement>('meta[name="player"]');
+    const player = document.head.querySelector<HTMLMetaElement>(
+        'meta[name="player"]',
+    );
 
     const props: UserIdProps = {
         userId: player === null ? 0 : parseInt(player.content),
-    }
+    };
 
-    const element = document.querySelector('#guide-button');
+    const element = document.querySelector("#guide-button");
 
-    const value = element?.getAttribute('data-open-modal');
+    const value = element?.getAttribute("data-open-modal");
 
     let forceOpenModal = false;
 
-    if (typeof value !== 'undefined') {
-        if (value === 'true') {
+    if (typeof value !== "undefined") {
+        if (value === "true") {
             forceOpenModal = true;
         }
     }
 
     const root = createRoot(guideButton);
-    root.render(<GuideButton user_id={props.userId} force_open_modal={forceOpenModal} />,);
+    root.render(
+        <GuideButton
+            user_id={props.userId}
+            force_open_modal={forceOpenModal}
+        />,
+    );
 }

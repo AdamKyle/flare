@@ -5,10 +5,10 @@ export default interface OriginalAtonement {
 
 export interface Atonements {
     name: string;
-    total: number
+    total: number;
 }
 
 export interface ElementalDamage {
     name: string;
-    amount: number
+    amount: number;
 }

@@ -1,5 +1,4 @@
 export default interface CharacterInventoryTabsProps {
-
     character_id: number;
 
     is_dead: boolean;

@@ -4,9 +4,8 @@ import TabsType from "../../../lib/game/types/tabs-type";
 import ExplorationMessageType from "./deffinitions/exploration-message-type";
 
 export default interface GameChatState {
-
     chat: ChatType[] | [];
-    announcements: AnnouncementType[]|[],
+    announcements: AnnouncementType[] | [];
     server_messages: ServerMessageType[] | [];
     exploration_messages: ExplorationMessageType[] | [];
     message: string;
@@ -14,7 +13,7 @@ export default interface GameChatState {
     can_talk_again_at: string | null;
     tabs: TabsType[];
     selected_chat: string;
-    updated_tabs: string[]|[];
+    updated_tabs: string[] | [];
 }
 
 export interface AnnouncementType {

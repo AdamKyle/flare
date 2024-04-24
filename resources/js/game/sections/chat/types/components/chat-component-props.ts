@@ -1,6 +1,6 @@
 import ChatType from "../deffinitions/chat-type";
 
-export default interface ChatComponentProps  {
+export default interface ChatComponentProps {
     is_silenced: boolean;
 
     can_talk_again_at: string | null;

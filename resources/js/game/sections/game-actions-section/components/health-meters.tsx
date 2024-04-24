@@ -3,15 +3,16 @@ import clsx from "clsx";
 import HealthMeterProps from "../../../lib/game/types/actions/health-meter-props";
 import { formatNumber } from "../../../lib/game/format-number";
 
-export default class HealthMeters extends React.Component<HealthMeterProps, any> {
-
+export default class HealthMeters extends React.Component<
+    HealthMeterProps,
+    any
+> {
     constructor(props: HealthMeterProps) {
         super(props);
     }
 
-    abbreviateNumber(stat: number|undefined): string|number {
-
-        if (typeof stat === 'undefined') {
+    abbreviateNumber(stat: number | undefined): string | number {
+        if (typeof stat === "undefined") {
             return 0;
         }
 
@@ -20,10 +21,10 @@ export default class HealthMeters extends React.Component<HealthMeterProps, any>
         const symbol = ["", "k", "M", "B", "T", "Quad.", "Qunit."];
 
         // what tier? (determines SI symbol)
-        var tier = Math.log10(Math.abs(statNumber)) / 3 | 0;
+        var tier = (Math.log10(Math.abs(statNumber)) / 3) | 0;
 
         // if zero, we don't need a suffix
-        if(tier == 0) return statNumber;
+        if (tier == 0) return statNumber;
 
         // get suffix and determine scale
         var suffix = symbol[tier];
@@ -37,11 +38,14 @@ export default class HealthMeters extends React.Component<HealthMeterProps, any>
     }
 
     healthPercent() {
-        if (typeof this.props.current_health === 'undefined' || typeof this.props.max_health === 'undefined') {
+        if (
+            typeof this.props.current_health === "undefined" ||
+            typeof this.props.max_health === "undefined"
+        ) {
             return 0;
         }
 
-        const percentage = (this.props.current_health / this.props.max_health);
+        const percentage = this.props.current_health / this.props.max_health;
 
         if (percentage > 1.0) {
             return 1.0;
@@ -51,29 +55,56 @@ export default class HealthMeters extends React.Component<HealthMeterProps, any>
     }
 
     render() {
-        return(
-            <div className='mb-2'>
+        return (
+            <div className="mb-2">
                 <div className="flex justify-between mb-1">
-                    <span className={clsx("font-medium dark:text-white text-xs", {
-                        'text-red-600 dark:text-red-400': this.props.is_enemy
-                    },{
-                        'text-green-700 dark:text-green-500': !this.props.is_enemy
-                    })}>{this.props.name}</span>
-                    <span className={clsx("font-medium dark:text-white text-xs", {
-                        'text-red-600 dark:text-red-400': this.props.is_enemy
-                    },{
-                        'text-green-700 dark:text-green-500': !this.props.is_enemy
-                    })}>{this.abbreviateNumber(this.props.current_health)} / {this.abbreviateNumber(this.props.max_health)}</span>
+                    <span
+                        className={clsx(
+                            "font-medium dark:text-white text-xs",
+                            {
+                                "text-red-600 dark:text-red-400":
+                                    this.props.is_enemy,
+                            },
+                            {
+                                "text-green-700 dark:text-green-500":
+                                    !this.props.is_enemy,
+                            },
+                        )}
+                    >
+                        {this.props.name}
+                    </span>
+                    <span
+                        className={clsx(
+                            "font-medium dark:text-white text-xs",
+                            {
+                                "text-red-600 dark:text-red-400":
+                                    this.props.is_enemy,
+                            },
+                            {
+                                "text-green-700 dark:text-green-500":
+                                    !this.props.is_enemy,
+                            },
+                        )}
+                    >
+                        {this.abbreviateNumber(this.props.current_health)} /{" "}
+                        {this.abbreviateNumber(this.props.max_health)}
+                    </span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-1.5 dark:bg-gray-700">
-                    <div className={clsx("h-1.5 rounded-full", {
-                        'bg-red-600': this.props.is_enemy
-                    }, {
-                        'bg-green-600': !this.props.is_enemy
-                    })} style={{width: (this.healthPercent() * 100) + '%'}}></div>
+                    <div
+                        className={clsx(
+                            "h-1.5 rounded-full",
+                            {
+                                "bg-red-600": this.props.is_enemy,
+                            },
+                            {
+                                "bg-green-600": !this.props.is_enemy,
+                            },
+                        )}
+                        style={{ width: this.healthPercent() * 100 + "%" }}
+                    ></div>
                 </div>
             </div>
-        )
+        );
     }
-
 }

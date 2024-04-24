@@ -1,4 +1,4 @@
-import React, {Fragment, ReactNode} from "react";
+import React, { Fragment, ReactNode } from "react";
 import ItemNameColorationText from "../../../components/items/item-name/item-name-coloration-text";
 import { capitalize } from "lodash";
 import Dialogue from "../../../components/ui/dialogue/dialogue";
@@ -32,7 +32,7 @@ export default class ItemComparison extends React.Component<any, any> {
             .setRoute(
                 "character/" +
                     this.props.character_id +
-                    "/inventory/comparison-from-chat"
+                    "/inventory/comparison-from-chat",
             )
             .setParameters({
                 id: this.props.slot_id,
@@ -58,7 +58,7 @@ export default class ItemComparison extends React.Component<any, any> {
                             });
                         }
                     }
-                }
+                },
             );
     }
 
@@ -85,7 +85,10 @@ export default class ItemComparison extends React.Component<any, any> {
             <div className="grid grid-cols-2 gap-2">
                 {this.state.comparison_details.itemToEquip.type === "gem" ? (
                     <span className="text-lime-600 dark:text-lime-500">
-                        {this.state.comparison_details.itemToEquip.item.gem.name}
+                        {
+                            this.state.comparison_details.itemToEquip.item.gem
+                                .name
+                        }
                     </span>
                 ) : (
                     <ItemNameColorationText
@@ -103,7 +106,9 @@ export default class ItemComparison extends React.Component<any, any> {
                             is_mythic:
                                 this.state.comparison_details.itemToEquip
                                     .is_mythic,
-                            is_cosmic: this.state.comparison_details.itemtoEquip.is_cosmic,
+                            is_cosmic:
+                                this.state.comparison_details.itemtoEquip
+                                    .is_cosmic,
                             holy_stacks_applied:
                                 this.state.comparison_details.itemToEquip
                                     .holy_stacks_applied,
@@ -115,7 +120,7 @@ export default class ItemComparison extends React.Component<any, any> {
                     <span className="pl-3 text-right mr-[70px]">
                         (Type:{" "}
                         {capitalize(
-                            this.state.comparison_details.itemToEquip.type
+                            this.state.comparison_details.itemToEquip.type,
                         )
                             .split("-")
                             .join(" ")}
@@ -126,10 +131,7 @@ export default class ItemComparison extends React.Component<any, any> {
         );
     }
 
-    isGridSize(
-        size: number,
-        itemToEquip: ItemToEquip
-    ): boolean {
+    isGridSize(size: number, itemToEquip: ItemToEquip): boolean {
         switch (size) {
             case 5:
                 return (
@@ -200,9 +202,7 @@ export default class ItemComparison extends React.Component<any, any> {
                 is_open={this.props.is_open}
                 handle_close={this.props.manage_modal}
                 title={this.buildTitle()}
-                large_modal={
-                    true
-                }
+                large_modal={true}
                 primary_button_disabled={this.state.action_loading}
             >
                 {this.state.loading ? (
@@ -219,7 +219,7 @@ export default class ItemComparison extends React.Component<any, any> {
                             this.renderViewForType(
                                 this.state.comparison_details.itemToEquip.type,
                                 this.state.comparison_details.itemToEquip
-                                    .holy_level
+                                    .holy_level,
                             )
                         )}
                     </Fragment>

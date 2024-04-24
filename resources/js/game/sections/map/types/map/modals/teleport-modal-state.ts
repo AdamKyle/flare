@@ -3,13 +3,13 @@ import PlayerKingdomsDetails from "../player-kingdoms-details";
 import NpcKingdomsDetails from "../npc-kingdoms-details";
 
 export default interface TeleportModalState {
-
     x_position: number;
 
     y_position: number;
 
     character_position: {
-        x: number, y: number
+        x: number;
+        y: number;
     };
 
     cost: number;

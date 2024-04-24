@@ -4,7 +4,7 @@ import RewardListItemProps from "./types/reward-list-item-props";
 
 export default class RewardListItem extends React.Component<
     RewardListItemProps,
-    {  }
+    {}
 > {
     constructor(props: RewardListItemProps) {
         super(props);

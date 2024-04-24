@@ -33,7 +33,7 @@ export default class KingdomPassives extends React.Component<any, any> {
                         skill_in_training: result.data.passive_training,
                     });
                 },
-                (error: AxiosError) => {}
+                (error: AxiosError) => {},
             );
     }
 
@@ -96,7 +96,7 @@ export default class KingdomPassives extends React.Component<any, any> {
         if (this.state.skill_in_training !== null) {
             const start = DateTime.now();
             const end = DateTime.fromISO(
-                this.state.skill_in_training.completed_at
+                this.state.skill_in_training.completed_at,
             );
 
             const diff = end.diff(start, ["seconds"]).toObject();
@@ -126,7 +126,7 @@ export default class KingdomPassives extends React.Component<any, any> {
                             <div className="mb-4">
                                 <SuccessAlert
                                     close_alert={this.closeSuccessAlert.bind(
-                                        this
+                                        this,
                                     )}
                                 >
                                     {this.state.success_message}
@@ -165,7 +165,7 @@ export default class KingdomPassives extends React.Component<any, any> {
                         <KingdomPassiveTree
                             passives={this.state.kingdom_passives[0]}
                             manage_success_message={this.manageSuccessMessage.bind(
-                                this
+                                this,
                             )}
                             update_passives={this.updatePassives.bind(this)}
                             character_id={this.props.character_id}

@@ -1,10 +1,10 @@
-import {CharacterType} from "../../../../lib/game/character/character-type";
+import { CharacterType } from "../../../../lib/game/character/character-type";
 import DuelData from "../../../../lib/game/types/core/duel-player/definitions/duel-data";
 
 export default interface DuelPlayerProps {
     character: CharacterType;
-    characters: CharactersList[]|[];
-    duel_data: DuelData|null;
+    characters: CharactersList[] | [];
+    duel_data: DuelData | null;
     manage_pvp: () => void;
     reset_duel_data: () => void;
     is_small: boolean;

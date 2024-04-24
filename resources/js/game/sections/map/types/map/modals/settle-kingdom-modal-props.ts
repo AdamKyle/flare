@@ -1,5 +1,4 @@
-export default interface SettleKingdomModalProps  {
-
+export default interface SettleKingdomModalProps {
     is_open: boolean;
 
     handle_close: () => void;

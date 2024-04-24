@@ -1,8 +1,7 @@
-import {ClassArray, ClassDictionary} from "clsx";
+import { ClassArray, ClassDictionary } from "clsx";
 import LocationDetails from "../../location-details";
 
 export default interface PurchaseNpcKingdomModalProps {
-
     is_open: boolean;
 
     handle_close: (closeParentModel: boolean) => void;

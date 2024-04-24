@@ -9,7 +9,7 @@ export default interface InformationPropsBase {
 
     kingdom_current_population: number;
 
-    unit_cost_reduction?: number
+    unit_cost_reduction?: number;
 
     character_id: number;
 

@@ -1,5 +1,4 @@
 export default interface CallForReinforcementsProps {
-
     kingdom_id: number;
 
     character_id: number;
@@ -8,5 +7,3 @@ export default interface CallForReinforcementsProps {
 
     handle_close: () => void;
 }
-
-

@@ -4,7 +4,6 @@ import UnitDetails from "../deffinitions/unit-details";
 import UnitsInQueue from "../deffinitions/units-in-queue";
 
 export default interface UnitsTableProps {
-
     units: UnitDetails[] | [];
 
     buildings: BuildingDetails[] | [];
@@ -13,7 +12,7 @@ export default interface UnitsTableProps {
 
     view_unit: (unit?: UnitDetails) => void;
 
-    units_in_queue: UnitsInQueue[]|[]
+    units_in_queue: UnitsInQueue[] | [];
 
-    current_units: CurrentUnitDetails[]|[]
+    current_units: CurrentUnitDetails[] | [];
 }

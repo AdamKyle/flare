@@ -50,7 +50,7 @@ export default class SetsTable
     componentDidUpdate(
         prevProps: Readonly<SetsInventoryTabProps>,
         prevState: Readonly<SetsTableState>,
-        snapshot?: any
+        snapshot?: any,
     ) {
         if (
             this.state.selected_set !== null &&
@@ -59,7 +59,7 @@ export default class SetsTable
             if (
                 !isEqual(
                     this.props.sets[this.state.selected_set].items,
-                    this.state.data
+                    this.state.data,
                 )
             ) {
                 this.setState({
@@ -94,7 +94,7 @@ export default class SetsTable
             for (let i = 0; i < setKeys.length; i++) {
                 if (sets[setKeys[i]].equipped) {
                     setIndex = setKeys.findIndex(
-                        (setKey) => setKey === setKeys[i]
+                        (setKey) => setKey === setKeys[i],
                     );
                     selectedSet = setKeys[setIndex];
                 }
@@ -138,7 +138,7 @@ export default class SetsTable
                             this.props.character_id +
                             "/inventory-set/" +
                             setId +
-                            "/remove-all"
+                            "/remove-all",
                     )
                     .doAjaxCall(
                         "post",
@@ -150,9 +150,9 @@ export default class SetsTable
                                 },
                                 () => {
                                     this.props.update_inventory(
-                                        result.data.inventory
+                                        result.data.inventory,
                                     );
-                                }
+                                },
                             );
                         },
                         (error: AxiosError) => {
@@ -165,9 +165,9 @@ export default class SetsTable
                                     error_message: response.data.message,
                                 });
                             }
-                        }
+                        },
                     );
-            }
+            },
         );
     }
 
@@ -197,7 +197,7 @@ export default class SetsTable
                         "character/" +
                             this.props.character_id +
                             "/inventory-set/equip/" +
-                            setId
+                            setId,
                     )
                     .doAjaxCall(
                         "post",
@@ -209,11 +209,11 @@ export default class SetsTable
                                 },
                                 () => {
                                     this.props.update_inventory(
-                                        result.data.inventory
+                                        result.data.inventory,
                                     );
 
                                     this.props.disable_tabs();
-                                }
+                                },
                             );
                         },
                         (error: AxiosError) => {
@@ -226,9 +226,9 @@ export default class SetsTable
                                     error_message: response.data.message,
                                 });
                             }
-                        }
+                        },
                     );
-            }
+            },
         );
     }
 
@@ -245,7 +245,7 @@ export default class SetsTable
                         .setRoute(
                             "character/" +
                                 this.props.character_id +
-                                "/inventory-set/remove"
+                                "/inventory-set/remove",
                         )
                         .setParameters({
                             inventory_set_id: setId,
@@ -262,9 +262,9 @@ export default class SetsTable
                                     },
                                     () => {
                                         this.props.update_inventory(
-                                            result.data.inventory
+                                            result.data.inventory,
                                         );
-                                    }
+                                    },
                                 );
                             },
                             (error: AxiosError) => {
@@ -277,9 +277,9 @@ export default class SetsTable
                                         error_message: response.data.message,
                                     });
                                 }
-                            }
+                            },
                         );
-                }
+                },
             );
         }
     }
@@ -304,7 +304,7 @@ export default class SetsTable
                     .setRoute(
                         "character/" +
                             this.props.character_id +
-                            "/inventory-set/rename-set"
+                            "/inventory-set/rename-set",
                     )
                     .setParameters({
                         set_id: setId,
@@ -322,9 +322,9 @@ export default class SetsTable
                                     this.setSetData(result.data.inventory.sets);
 
                                     this.props.update_inventory(
-                                        result.data.inventory
+                                        result.data.inventory,
                                     );
-                                }
+                                },
                             );
                         },
                         (error: AxiosError) => {
@@ -336,9 +336,9 @@ export default class SetsTable
                                     error_message: response.data.message,
                                 });
                             }
-                        }
+                        },
                     );
-            }
+            },
         );
     }
 
@@ -420,7 +420,7 @@ export default class SetsTable
                 return (
                     item.item_name.includes(value) || item.type.includes(value)
                 );
-            }
+            },
         );
 
         this.setState({
@@ -572,18 +572,14 @@ export default class SetsTable
                     />
                 ) : null}
 
-                <div
-                    className={
-                        "max-w-full overflow-y-hidden"
-                    }
-                >
+                <div className={"max-w-full overflow-y-hidden"}>
                     <Table
                         data={this.state.data}
                         columns={BuildInventoryTableColumns(
                             this.props.view_port,
                             this,
                             this.viewItem.bind(this),
-                            this.props.manage_skills
+                            this.props.manage_skills,
                         )}
                         dark_table={this.props.dark_tables}
                     />

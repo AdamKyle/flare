@@ -2,7 +2,7 @@ import React from "react";
 import ErrorMessageProps from "./types/error-message-props";
 
 export default class ErrorMessage extends React.Component<
-ErrorMessageProps,
+    ErrorMessageProps,
     {}
 > {
     constructor(props: ErrorMessageProps) {

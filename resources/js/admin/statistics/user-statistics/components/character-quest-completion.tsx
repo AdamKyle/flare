@@ -4,11 +4,11 @@ import ComponentLoading from "../../../../game/components/ui/loading/component-l
 import ResizableBox from "../../../../game/components/ui/resizable-box";
 import DropDown from "../../../../game/components/ui/drop-down/drop-down";
 import Ajax from "../../../../game/lib/ajax/ajax";
-import {AxiosError, AxiosResponse} from "axios";
+import { AxiosError, AxiosResponse } from "axios";
 import PrimaryButton from "../../../../game/components/ui/buttons/primary-button";
 import DangerButton from "../../../../game/components/ui/buttons/danger-button";
 import SuccessButton from "../../../../game/components/ui/buttons/success-button";
-import {capitalize, startCase} from "lodash";
+import { capitalize, startCase } from "lodash";
 
 type QuestCompleted = {
     name: string;
@@ -31,8 +31,10 @@ const secondaryAxes: AxisOptions<any>[] = [
     },
 ];
 
-export default class CharacterQuestCompletion extends React.Component<any, any> {
-
+export default class CharacterQuestCompletion extends React.Component<
+    any,
+    any
+> {
     constructor(props: any) {
         super(props);
 
@@ -40,58 +42,68 @@ export default class CharacterQuestCompletion extends React.Component<any, any> 
             data: [],
             loading: true,
             filter_options: {
-                type: 'quest',
+                type: "quest",
                 limit: undefined,
                 filter: undefined,
-            }
+            },
         };
     }
 
     componentDidMount() {
-        this.fetchChartData('quest');
+        this.fetchChartData("quest");
     }
 
     filterChart() {
         const filter = this.state.filter_options;
 
-        this.fetchChartData(filter.type, filter.limit, filter.filter)
+        this.fetchChartData(filter.type, filter.limit, filter.filter);
     }
 
-    fetchChartData(type: 'quest' | 'guide_quest', limit?: number|undefined, filter?: 'most' | 'some' | 'least' | undefined) {
-        new Ajax().setRoute("admin/site-statistics/quest-completion").setParameters({
-            type: type,
-            limit: limit,
-            filter: filter,
-        }).doAjaxCall(
-            "get",
-            (result: AxiosResponse) => {
-                this.setState({
-                    data: this.createDataSet(
-                        result.data.stats.data,
-                        result.data.stats.labels
-                    ),
-                    loading: false,
-                });
-            },
-            (error: AxiosError) => {
-                console.error(error);
-            }
-        );
+    fetchChartData(
+        type: "quest" | "guide_quest",
+        limit?: number | undefined,
+        filter?: "most" | "some" | "least" | undefined,
+    ) {
+        new Ajax()
+            .setRoute("admin/site-statistics/quest-completion")
+            .setParameters({
+                type: type,
+                limit: limit,
+                filter: filter,
+            })
+            .doAjaxCall(
+                "get",
+                (result: AxiosResponse) => {
+                    this.setState({
+                        data: this.createDataSet(
+                            result.data.stats.data,
+                            result.data.stats.labels,
+                        ),
+                        loading: false,
+                    });
+                },
+                (error: AxiosError) => {
+                    console.error(error);
+                },
+            );
     }
 
     clearFilters() {
-        this.setState({
-            filter_options: {
-                type: 'quest',
-                limit: undefined,
-                filter: undefined,
-            }
-        }, () => {
-            this.fetchChartData('quest');
-        })
+        this.setState(
+            {
+                filter_options: {
+                    type: "quest",
+                    limit: undefined,
+                    filter: undefined,
+                },
+            },
+            () => {
+                this.fetchChartData("quest");
+            },
+        );
     }
 
-    setFilterType(type: 'quest' | 'guide_quest') {
+    setFilterType(type: "quest" | "guide_quest") {
         const filters = JSON.parse(JSON.stringify(this.state.filter_options));
 
         filters.type = type;
@@ -111,7 +123,7 @@ export default class CharacterQuestCompletion extends React.Component<any, any> 
         });
     }
 
-    setFilter(filter: 'most' | 'some' | 'least') {
+    setFilter(filter: "most" | "some" | "least") {
         const filters = JSON.parse(JSON.stringify(this.state.filter_options));
 
         filters.filter = filter;
@@ -123,7 +135,7 @@ export default class CharacterQuestCompletion extends React.Component<any, any> 
 
     createDataSet(
         data: number[] | [],
-        labels: string[] | []
+        labels: string[] | [],
     ): { login_count: number; date: string }[] {
         const chartData: { login_count: number; date: string }[] = [];
 
@@ -142,12 +154,12 @@ export default class CharacterQuestCompletion extends React.Component<any, any> 
             {
                 name: "Completed Quests",
                 icon_class: "ra ra-bottle-vapors",
-                on_click: () => this.setFilterType('quest'),
+                on_click: () => this.setFilterType("quest"),
             },
             {
                 name: "Completed Guide Quests",
                 icon_class: "far fa-trash-alt",
-                on_click: () => this.setFilterType('guide_quest'),
+                on_click: () => this.setFilterType("guide_quest"),
             },
         ];
     }
@@ -157,17 +169,17 @@ export default class CharacterQuestCompletion extends React.Component<any, any> 
             {
                 name: "Most",
                 icon_class: "ra ra-bottle-vapors",
-                on_click: () => this.setFilter('most'),
+                on_click: () => this.setFilter("most"),
             },
             {
                 name: "Some",
                 icon_class: "far fa-trash-alt",
-                on_click: () => this.setFilter('some'),
+                on_click: () => this.setFilter("some"),
             },
             {
                 name: "Least",
                 icon_class: "far fa-trash-alt",
-                on_click: () => this.setFilter('least'),
+                on_click: () => this.setFilter("least"),
             },
         ];
     }
@@ -213,48 +225,66 @@ export default class CharacterQuestCompletion extends React.Component<any, any> 
         ];
 
         // @ts-ignore
-        return <ResizableBox height={650}>
-            <div>
-                <div className="flex flex-wrap justify-between mb-4">
-                    <div className="flex items-center space-x-4 mb-2 md:mb-0">
-                        <DropDown
-                            menu_items={this.createTypeFilterDropDown()}
-                            button_title={"Quest Type"}
-                        />
-                        <DropDown
-                            menu_items={this.createAmountFilterDropDown()}
-                            button_title={"Quest Completion Amount"}
-                        />
-                        <DropDown
-                            menu_items={this.createLimitFilterDropDown()}
-                            button_title={"Character Limit"}
-                        />
-                        <SuccessButton button_label={'Filter Chart'} on_click={this.filterChart.bind(this)}/>
-                        <DangerButton button_label={'Clear filters'} on_click={this.clearFilters.bind(this)}/>
+        return (
+            <ResizableBox height={650}>
+                <div>
+                    <div className="flex flex-wrap justify-between mb-4">
+                        <div className="flex items-center space-x-4 mb-2 md:mb-0">
+                            <DropDown
+                                menu_items={this.createTypeFilterDropDown()}
+                                button_title={"Quest Type"}
+                            />
+                            <DropDown
+                                menu_items={this.createAmountFilterDropDown()}
+                                button_title={"Quest Completion Amount"}
+                            />
+                            <DropDown
+                                menu_items={this.createLimitFilterDropDown()}
+                                button_title={"Character Limit"}
+                            />
+                            <SuccessButton
+                                button_label={"Filter Chart"}
+                                on_click={this.filterChart.bind(this)}
+                            />
+                            <DangerButton
+                                button_label={"Clear filters"}
+                                on_click={this.clearFilters.bind(this)}
+                            />
+                        </div>
                     </div>
+                    <div className="border-b-2 border-b-gray-200 dark:border-b-gray-600 my-3 hidden sm:block"></div>
+                    <h3>Filters Selected</h3>
+                    <div className="border-b-2 border-b-gray-200 dark:border-b-gray-600 my-3 hidden sm:block"></div>
+                    <dl>
+                        <dt>Type</dt>
+                        <dd>{capitalize(this.state.filter_options.type)}</dd>
+                        <dt>Completion Amount</dt>
+                        <dd>
+                            {this.state.filter_options.filter
+                                ? startCase(
+                                      this.state.filter_options.filter,
+                                  ).replace("_", " ")
+                                : "N/A"}
+                        </dd>
+                        <dt>Limit</dt>
+                        <dd>
+                            {this.state.filter_options.limit
+                                ? this.state.filter_options.limit
+                                : 10}
+                        </dd>
+                    </dl>
+                    <div className="border-b-2 border-b-gray-200 dark:border-b-gray-600 my-3 hidden sm:block"></div>
+                    <ResizableBox height={350}>
+                        <Chart
+                            options={{
+                                data: dataForChart,
+                                primaryAxis: primaryAxis,
+                                secondaryAxes: secondaryAxes,
+                            }}
+                        />
+                    </ResizableBox>
                 </div>
-                <div className='border-b-2 border-b-gray-200 dark:border-b-gray-600 my-3 hidden sm:block'></div>
-                <h3>Filters Selected</h3>
-                <div className='border-b-2 border-b-gray-200 dark:border-b-gray-600 my-3 hidden sm:block'></div>
-                <dl>
-                    <dt>Type</dt>
-                    <dd>{capitalize(this.state.filter_options.type)}</dd>
-                    <dt>Completion Amount</dt>
-                    <dd>{this.state.filter_options.filter ? startCase(this.state.filter_options.filter).replace('_', ' ') : 'N/A'}</dd>
-                    <dt>Limit</dt>
-                    <dd>{this.state.filter_options.limit ? this.state.filter_options.limit : 10}</dd>
-                </dl>
-                <div className='border-b-2 border-b-gray-200 dark:border-b-gray-600 my-3 hidden sm:block'></div>
-                <ResizableBox height={350}>
-                    <Chart
-                        options={{
-                            data: dataForChart,
-                            primaryAxis: primaryAxis,
-                            secondaryAxes: secondaryAxes,
-                        }}
-                    />
-                </ResizableBox>
-            </div>
-        </ResizableBox>;
+            </ResizableBox>
+        );
     }
 }

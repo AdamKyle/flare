@@ -4,12 +4,11 @@ import { MapTimerData } from "../../../../lib/game/types/game-state";
 import PositionType from "./position-type";
 
 export default interface MapProps {
+    user_id: number;
 
-    user_id: number,
+    character_id: number;
 
-    character_id: number,
-
-    view_port: number,
+    view_port: number;
 
     currencies: CharacterCurrenciesDetails;
 

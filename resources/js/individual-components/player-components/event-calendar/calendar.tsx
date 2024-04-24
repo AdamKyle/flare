@@ -61,7 +61,7 @@ export default class Calendar extends React.Component<{}, CalendarState> {
             },
             (error: AxiosError) => {
                 console.error(error);
-            }
+            },
         );
 
         this.updateScheduledEvents.listen(
@@ -84,13 +84,13 @@ export default class Calendar extends React.Component<{}, CalendarState> {
                                         : this.color(event.title);
 
                                     return event;
-                                }
+                                },
                             ),
                             loading: false,
                         });
-                    }
+                    },
                 );
-            }
+            },
         );
     }
 
@@ -105,7 +105,7 @@ export default class Calendar extends React.Component<{}, CalendarState> {
                 view={"month"}
                 viewerExtraComponent={(
                     fields: FieldProps[] | [],
-                    event: ProcessedEvent
+                    event: ProcessedEvent,
                 ) => <EventView event={event} deleting={false} />}
                 can_edit={false}
             />

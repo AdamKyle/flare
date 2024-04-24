@@ -32,7 +32,7 @@ export default class Quests extends React.Component<QuestsProps, QuestState> {
         if (
             !isEqual(
                 this.props.quest_details.completed_quests,
-                this.state.completed_quests
+                this.state.completed_quests,
             )
         ) {
             this.setState({

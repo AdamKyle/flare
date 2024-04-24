@@ -47,7 +47,7 @@ export default class RegistrationStatistics extends React.Component<any, any> {
 
     createDataSet(
         data: number[] | [],
-        labels: string[] | []
+        labels: string[] | [],
     ): { registration_count: number; date: string }[] {
         const chartData: { registration_count: number; date: string }[] = [];
 
@@ -85,7 +85,7 @@ export default class RegistrationStatistics extends React.Component<any, any> {
             <div>
                 <DropDown
                     menu_items={this.siteStatisticsAjax.createActionsDropDown(
-                        "all-time-register"
+                        "all-time-register",
                     )}
                     button_title={"Date Filter"}
                 />

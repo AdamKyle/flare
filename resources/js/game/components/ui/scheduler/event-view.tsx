@@ -15,7 +15,7 @@ export default class EventView extends React.Component<EventViewProps, {}> {
                     <p className="my-4">
                         {this.props.event.description.replace(
                             /(<([^>]+)>)/gi,
-                            ""
+                            "",
                         )}
                     </p>
 

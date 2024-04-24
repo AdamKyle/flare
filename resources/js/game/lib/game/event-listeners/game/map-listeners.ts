@@ -1,14 +1,13 @@
 import GameListener from "../game-listener";
 import Game from "../../../../game";
-import {inject, injectable} from "tsyringe";
+import { inject, injectable } from "tsyringe";
 import CoreEventListener from "../core-event-listener";
-import {Channel} from "laravel-echo";
-import {mergeLocations} from "../../../../sections/map/helpers/merge-locations";
+import { Channel } from "laravel-echo";
+import { mergeLocations } from "../../../../sections/map/helpers/merge-locations";
 import MapState from "../../../../sections/map/types/map-state";
 
 @injectable()
 export default class MapListeners implements GameListener {
-
     private component?: Game;
 
     private userId?: number;
@@ -25,11 +24,13 @@ export default class MapListeners implements GameListener {
 
     private corruptedLocations?: Channel;
 
-    constructor(@inject(CoreEventListener) private coreEventListener: CoreEventListener) {}
+    constructor(
+        @inject(CoreEventListener) private coreEventListener: CoreEventListener,
+    ) {}
 
     public initialize(component: Game, userId: number): void {
         this.component = component;
-        this.userId    = userId;
+        this.userId = userId;
     }
 
     public register(): void {
@@ -39,12 +40,20 @@ export default class MapListeners implements GameListener {
             const echo = this.coreEventListener.getEcho();
 
             this.traverseUpdate = echo.private("update-plane-" + this.userId);
-            this.updateCharacterBasePosition = echo.private("update-character-position-" + this.userId);
-            this.updateCraftingTypes = echo.private("update-location-base-crafting-options-" + this.userId);
-            this.updateSpecialShopsAccess = echo.private("update-location-base-shops-" + this.userId);
-            this.updateSpecialEventGoals = echo.private("update-location-base-event-goals-" + this.userId);
+            this.updateCharacterBasePosition = echo.private(
+                "update-character-position-" + this.userId,
+            );
+            this.updateCraftingTypes = echo.private(
+                "update-location-base-crafting-options-" + this.userId,
+            );
+            this.updateSpecialShopsAccess = echo.private(
+                "update-location-base-shops-" + this.userId,
+            );
+            this.updateSpecialEventGoals = echo.private(
+                "update-location-base-event-goals-" + this.userId,
+            );
             this.corruptedLocations = echo.join("corrupt-locations");
-        } catch (e: any|unknown) {
+        } catch (e: any | unknown) {
             throw new Error(e);
         }
     }
@@ -65,7 +74,7 @@ export default class MapListeners implements GameListener {
      */
     protected listenToTraverse() {
         if (!this.traverseUpdate) {
-            return
+            return;
         }
 
         this.traverseUpdate.listen(
@@ -78,9 +87,9 @@ export default class MapListeners implements GameListener {
                 this.component.setStateFromData(event.mapDetails);
 
                 this.component.updateQuestPlane(
-                    event.mapDetails.character_map.game_map.name
+                    event.mapDetails.character_map.game_map.name,
                 );
-            }
+            },
         );
     }
 
@@ -91,7 +100,7 @@ export default class MapListeners implements GameListener {
      */
     protected listenToBasePositionUpdate() {
         if (!this.updateCharacterBasePosition) {
-            return
+            return;
         }
 
         this.updateCharacterBasePosition.listen(
@@ -102,7 +111,7 @@ export default class MapListeners implements GameListener {
                 }
 
                 const character = JSON.parse(
-                    JSON.stringify(this.component.state.character)
+                    JSON.stringify(this.component.state.character),
                 );
 
                 character.base_position = event.basePosition;
@@ -110,7 +119,7 @@ export default class MapListeners implements GameListener {
                 this.component.setState({
                     character: character,
                 });
-            }
+            },
         );
     }
 
@@ -121,29 +130,29 @@ export default class MapListeners implements GameListener {
      */
     protected listForLocationBasedCraftingTypes() {
         if (!this.updateCraftingTypes) {
-            return
+            return;
         }
 
         this.updateCraftingTypes.listen(
             "Game.Maps.Events.UpdateLocationBasedCraftingOptions",
             (event: any) => {
-
                 if (!this.component) {
                     return;
                 }
 
                 const character = JSON.parse(
-                    JSON.stringify(this.component.state.character)
+                    JSON.stringify(this.component.state.character),
                 );
 
                 character.can_use_work_bench = event.canUseWorkBench;
                 character.can_access_queen = event.canUseQueenOfHearts;
-                character.can_access_labyrinth_oracle = event.canAccessLabyrinthOracle;
+                character.can_access_labyrinth_oracle =
+                    event.canAccessLabyrinthOracle;
 
                 this.component.setState({
                     character: character,
                 });
-            }
+            },
         );
     }
 
@@ -153,7 +162,6 @@ export default class MapListeners implements GameListener {
      * @protected
      */
     protected listForUpdatesToSpecialShopsAccess() {
-
         if (!this.updateSpecialShopsAccess) {
             return;
         }
@@ -161,13 +169,12 @@ export default class MapListeners implements GameListener {
         this.updateSpecialShopsAccess.listen(
             "Game.Maps.Events.UpdateLocationBasedSpecialShops",
             (event: any) => {
-
                 if (!this.component) {
                     return;
                 }
 
                 const character = JSON.parse(
-                    JSON.stringify(this.component.state.character)
+                    JSON.stringify(this.component.state.character),
                 );
 
                 character.can_access_hell_forged =
@@ -175,12 +182,12 @@ export default class MapListeners implements GameListener {
                 character.can_access_purgatory_chains =
                     event.canAccessPurgatoryChainsShop;
                 character.can_access_twisted_memories =
-                    event.camAccessTwistedEarthShop
+                    event.camAccessTwistedEarthShop;
 
                 this.component.setState({
                     character: character,
                 });
-            }
+            },
         );
     }
 
@@ -190,7 +197,6 @@ export default class MapListeners implements GameListener {
      * @protected
      */
     protected listenForEventGoalUpdates() {
-
         if (!this.updateSpecialEventGoals) {
             return;
         }
@@ -198,13 +204,12 @@ export default class MapListeners implements GameListener {
         this.updateSpecialEventGoals.listen(
             "Game.Maps.Events.UpdateLocationBasedEventGoals",
             (event: any) => {
-
                 if (!this.component) {
                     return;
                 }
 
                 const character = JSON.parse(
-                    JSON.stringify(this.component.state.character)
+                    JSON.stringify(this.component.state.character),
                 );
 
                 character.can_use_event_goals_button = event.canSeeEventGoals;
@@ -212,7 +217,7 @@ export default class MapListeners implements GameListener {
                 this.component.setState({
                     character: character,
                 });
-            }
+            },
         );
     }
 
@@ -222,7 +227,6 @@ export default class MapListeners implements GameListener {
      * @protected
      */
     protected listenForCorruptedLocationUpdates() {
-
         if (!this.corruptedLocations) {
             return;
         }
@@ -230,24 +234,23 @@ export default class MapListeners implements GameListener {
         this.corruptedLocations.listen(
             "Game.Raids.Events.CorruptLocations",
             (event: any) => {
-
                 if (!this.component) {
                     return;
                 }
 
                 let mapState: MapState = JSON.parse(
-                    JSON.stringify(this.component.state.map_data)
+                    JSON.stringify(this.component.state.map_data),
                 );
 
-                const locations = mapState.locations
+                const locations = mapState.locations;
 
                 if (locations === null) {
                     return;
                 }
 
                 const mergedLocations = mergeLocations(
-                    locations ,
-                    event.corruptedLocations
+                    locations,
+                    event.corruptedLocations,
                 );
 
                 mapState.locations = mergedLocations;
@@ -255,7 +258,7 @@ export default class MapListeners implements GameListener {
                 this.component.setState({
                     map_data: mapState,
                 });
-            }
+            },
         );
     }
 }

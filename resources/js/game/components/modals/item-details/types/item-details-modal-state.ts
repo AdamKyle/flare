@@ -1,4 +1,4 @@
-import {ComparisonData} from "../../../item-comparison/deffinitions/comparison-data";
+import { ComparisonData } from "../../../item-comparison/deffinitions/comparison-data";
 
 export interface UsableSets {
     index: number;
@@ -21,5 +21,5 @@ export interface ItemDetailsModalState {
     dark_charts: boolean;
     error_message: string | null;
     is_showing_expanded_details: boolean;
-    secondary_actions: ChatItemComparisonDialogueSecondaryActions | null
+    secondary_actions: ChatItemComparisonDialogueSecondaryActions | null;
 }

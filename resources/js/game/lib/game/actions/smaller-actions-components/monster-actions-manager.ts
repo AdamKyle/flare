@@ -1,11 +1,10 @@
 import MonsterActions from "../../../../sections/game-actions-section/components/small-actions/monster-actions";
 import MonsterType from "../../types/actions/monster/monster-type";
 import Ajax from "../../../ajax/ajax";
-import {AxiosError, AxiosResponse} from "axios";
+import { AxiosError, AxiosResponse } from "axios";
 import Revive from "../../../../sections/game-actions-section/components/fight-section/revive";
 
 export default class MonsterActionsManager {
-
     private component: MonsterActions | Revive;
 
     constructor(component: MonsterActions | Revive) {
@@ -17,8 +16,7 @@ export default class MonsterActionsManager {
      *
      * @param monster
      */
-    public setSelectedMonster(monster: MonsterType|null) {
-
+    public setSelectedMonster(monster: MonsterType | null) {
         if (this.component instanceof Revive) {
             return;
         }
@@ -61,9 +59,9 @@ export default class MonsterActionsManager {
         if (this.component instanceof Revive) {
             return;
         }
-        
+
         this.component.setState({
-            attack_time_out: attackTimeOut
+            attack_time_out: attackTimeOut,
         });
     }
 
@@ -73,15 +71,17 @@ export default class MonsterActionsManager {
      * @param characterId
      */
     revive(characterId: number | null, callback?: () => void) {
-        (new Ajax()).setRoute('battle-revive/' + characterId).doAjaxCall(
-            'post', (result: AxiosResponse) => {
-                if (typeof callback !== 'undefined') {
+        new Ajax().setRoute("battle-revive/" + characterId).doAjaxCall(
+            "post",
+            (result: AxiosResponse) => {
+                if (typeof callback !== "undefined") {
                     callback();
                 }
             },
             (error: AxiosError) => {
                 console.error(error);
-            });
+            },
+        );
     }
 
     /**
@@ -93,8 +93,7 @@ export default class MonsterActionsManager {
         }
 
         this.component.setState({
-            character_revived: false
+            character_revived: false,
         });
     }
-
 }

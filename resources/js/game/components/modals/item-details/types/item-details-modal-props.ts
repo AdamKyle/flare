@@ -8,6 +8,8 @@ export interface ItemDetailsModalProps {
     is_dead: boolean;
 
     manage_modal: () => void;
-    update_inventory?: (inventory: {[key: string]: InventoryDetails[]}) => void;
+    update_inventory?: (inventory: {
+        [key: string]: InventoryDetails[];
+    }) => void;
     set_success_message?: (message: string) => void;
 }

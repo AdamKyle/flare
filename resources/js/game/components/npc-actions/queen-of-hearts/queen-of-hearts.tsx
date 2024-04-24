@@ -45,14 +45,14 @@ export default class QueenOfHearts extends React.Component<any, any> {
 
         // @ts-ignore
         this.queenOfHearts = Echo.private(
-            "update-queen-of-hearts-panel-" + this.props.user_id
+            "update-queen-of-hearts-panel-" + this.props.user_id,
         );
     }
 
     componentDidMount() {
         new Ajax()
             .setRoute(
-                "character/" + this.props.character_id + "/inventory/uniques"
+                "character/" + this.props.character_id + "/inventory/uniques",
             )
             .doAjaxCall(
                 "get",
@@ -65,7 +65,7 @@ export default class QueenOfHearts extends React.Component<any, any> {
                 },
                 (error: AxiosError) => {
                     console.error(error);
-                }
+                },
             );
 
         // @ts-ignore
@@ -76,7 +76,7 @@ export default class QueenOfHearts extends React.Component<any, any> {
                     character_uniques: event.panelData.unique_slots,
                     character_non_uniques: event.panelData.non_unique_slots,
                 });
-            }
+            },
         );
     }
 
@@ -100,7 +100,7 @@ export default class QueenOfHearts extends React.Component<any, any> {
                     ...{ reroll_option: data.value },
                 },
             },
-            () => this.calculateCost()
+            () => this.calculateCost(),
         );
     }
 
@@ -121,7 +121,7 @@ export default class QueenOfHearts extends React.Component<any, any> {
                     ...{ attribute: data.value },
                 },
             },
-            () => this.calculateCost()
+            () => this.calculateCost(),
         );
     }
 
@@ -144,7 +144,7 @@ export default class QueenOfHearts extends React.Component<any, any> {
             },
             () => {
                 this.calculateMovementCost();
-            }
+            },
         );
     }
 
@@ -195,7 +195,7 @@ export default class QueenOfHearts extends React.Component<any, any> {
         const foundSelected = this.buyItemOptions().filter(
             (option: { label: string; value: string }) => {
                 return option.value === this.state.buy_option;
-            }
+            },
         );
 
         if (foundSelected.length > 0) {
@@ -229,7 +229,7 @@ export default class QueenOfHearts extends React.Component<any, any> {
         let foundSelected = this.state.character_uniques.filter(
             (unique: any) => {
                 return unique.id === this.state.move_options.unique_id;
-            }
+            },
         );
 
         if (foundSelected.length === 0) {
@@ -282,7 +282,7 @@ export default class QueenOfHearts extends React.Component<any, any> {
         const foundSelected = this.moveEnchantOptions().filter(
             (option: any) => {
                 return option.value === this.state.move_options.affix_to_move;
-            }
+            },
         );
 
         if (foundSelected.length > 0) {
@@ -308,7 +308,7 @@ export default class QueenOfHearts extends React.Component<any, any> {
         const foundSelected = this.state.character_uniques.filter(
             (unique: any) => {
                 return unique.id === this.state.reroll_options.item_selected;
-            }
+            },
         );
 
         if (foundSelected.length > 0) {
@@ -354,7 +354,7 @@ export default class QueenOfHearts extends React.Component<any, any> {
         const foundSelected = this.getAttributesForReRoll().filter(
             (option: { label: string; value: string }) => {
                 return option.value === this.state.reroll_options.attribute;
-            }
+            },
         );
 
         if (foundSelected.length > 0) {
@@ -374,7 +374,7 @@ export default class QueenOfHearts extends React.Component<any, any> {
         const foundSelected = this.state.character_uniques.filter(
             (unique: any) => {
                 return unique.id === this.state.move_options.unique_id;
-            }
+            },
         );
 
         if (foundSelected.length > 0) {
@@ -444,7 +444,7 @@ export default class QueenOfHearts extends React.Component<any, any> {
                     .setRoute(
                         "character/" +
                             this.props.character_id +
-                            "/random-enchant/purchase"
+                            "/random-enchant/purchase",
                     )
                     .setParameters({
                         type: this.state.buy_option,
@@ -468,9 +468,9 @@ export default class QueenOfHearts extends React.Component<any, any> {
                                     error_message: response.data.message,
                                 });
                             }
-                        }
+                        },
                     );
-            }
+            },
         );
     }
 
@@ -510,7 +510,7 @@ export default class QueenOfHearts extends React.Component<any, any> {
             let foundSelected = this.state.character_uniques.filter(
                 (unique: any) => {
                     return unique.id === this.state.move_options.unique_id;
-                }
+                },
             );
 
             if (foundSelected.length > 0) {
@@ -556,7 +556,7 @@ export default class QueenOfHearts extends React.Component<any, any> {
                     .setRoute(
                         "character/" +
                             this.props.character_id +
-                            "/random-enchant/reroll"
+                            "/random-enchant/reroll",
                     )
                     .setParameters({
                         selected_slot_id:
@@ -584,9 +584,9 @@ export default class QueenOfHearts extends React.Component<any, any> {
                                     preforming_action: false,
                                 });
                             }
-                        }
+                        },
                     );
-            }
+            },
         );
     }
 
@@ -600,7 +600,7 @@ export default class QueenOfHearts extends React.Component<any, any> {
                     .setRoute(
                         "character/" +
                             this.props.character_id +
-                            "/random-enchant/move"
+                            "/random-enchant/move",
                     )
                     .setParameters({
                         selected_slot_id: this.state.move_options.unique_id,
@@ -634,9 +634,9 @@ export default class QueenOfHearts extends React.Component<any, any> {
                                     preforming_action: false,
                                 });
                             }
-                        }
+                        },
                     );
-            }
+            },
         );
     }
 
@@ -739,7 +739,7 @@ export default class QueenOfHearts extends React.Component<any, any> {
                                     <div className="mt-2">
                                         <Select
                                             onChange={this.setReRollOption.bind(
-                                                this
+                                                this,
                                             )}
                                             options={this.reRollOptions()}
                                             menuPosition={"absolute"}
@@ -764,7 +764,7 @@ export default class QueenOfHearts extends React.Component<any, any> {
                                     <div className="mt-2">
                                         <Select
                                             onChange={this.setAttributeToReRoll.bind(
-                                                this
+                                                this,
                                             )}
                                             options={this.getAttributesForReRoll()}
                                             menuPosition={"absolute"}
@@ -785,12 +785,12 @@ export default class QueenOfHearts extends React.Component<any, any> {
                                                 <strong>Gold Dust Cost</strong>:{" "}
                                                 {formatNumber(
                                                     this.state.reroll_cost
-                                                        .gold_dust_dust
+                                                        .gold_dust_dust,
                                                 )}
                                                 , <strong>Shards Cost</strong>:{" "}
                                                 {formatNumber(
                                                     this.state.reroll_cost
-                                                        .shards
+                                                        .shards,
                                                 )}
                                             </p>
                                         ) : null}
@@ -803,7 +803,7 @@ export default class QueenOfHearts extends React.Component<any, any> {
                             <Fragment>
                                 <Select
                                     onChange={this.setSelectedItemToMove.bind(
-                                        this
+                                        this,
                                     )}
                                     options={this.uniquesToMove()}
                                     menuPosition={"absolute"}
@@ -824,7 +824,7 @@ export default class QueenOfHearts extends React.Component<any, any> {
                                     <div className="mt-2">
                                         <Select
                                             onChange={this.setAffixTypeToMove.bind(
-                                                this
+                                                this,
                                             )}
                                             options={this.moveEnchantOptions()}
                                             menuPosition={"absolute"}
@@ -848,7 +848,7 @@ export default class QueenOfHearts extends React.Component<any, any> {
                                     <div className="mt-2">
                                         <Select
                                             onChange={this.setItemToMove.bind(
-                                                this
+                                                this,
                                             )}
                                             options={this.itemsToMoveTo()}
                                             menuPosition={"absolute"}
@@ -872,11 +872,11 @@ export default class QueenOfHearts extends React.Component<any, any> {
                                         <strong>Gold Dust Cost</strong>:{" "}
                                         {formatNumber(
                                             this.state.movement_cost
-                                                .gold_dust_dust
+                                                .gold_dust_dust,
                                         )}
                                         , <strong>Shards Cost</strong>:{" "}
                                         {formatNumber(
-                                            this.state.movement_cost.shards
+                                            this.state.movement_cost.shards,
                                         )}
                                     </p>
                                 ) : null}

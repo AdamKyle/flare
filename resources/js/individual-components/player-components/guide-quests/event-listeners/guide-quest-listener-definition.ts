@@ -3,7 +3,6 @@ import GuideButton from "../guide-button";
 import Game from "../../../../game/game";
 
 export default interface GuideQuestListenerDefinition extends Listener {
-
     /**
      *
      * @param component

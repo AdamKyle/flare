@@ -1,6 +1,6 @@
 import { Channel } from "laravel-echo";
 import { inject, injectable } from "tsyringe";
-import Kingdom from '../../../../components/kingdoms/kingdom';
+import Kingdom from "../../../../components/kingdoms/kingdom";
 import SmallKingdom from "../../../../components/kingdoms/small-kingdom";
 import KingdomDetails from "../../kingdoms/deffinitions/kingdom-details";
 import CoreEventListener from "../core-event-listener";
@@ -8,18 +8,19 @@ import KingdomEventListener from "../kingdom-event-listener";
 
 @injectable()
 export default class UpdateKingdomListeners implements KingdomEventListener {
-
-    private component?: Kingdom| SmallKingdom;
+    private component?: Kingdom | SmallKingdom;
 
     private userId?: number;
 
     private kingdomUpdates?: Channel;
 
-    constructor(@inject(CoreEventListener) private coreEventListener: CoreEventListener) {}
+    constructor(
+        @inject(CoreEventListener) private coreEventListener: CoreEventListener,
+    ) {}
 
     public initialize(component: Kingdom | SmallKingdom, userId: number): void {
         this.component = component;
-        this.userId    = userId;
+        this.userId = userId;
     }
 
     public register(): void {
@@ -29,8 +30,7 @@ export default class UpdateKingdomListeners implements KingdomEventListener {
             const echo = this.coreEventListener.getEcho();
 
             this.kingdomUpdates = echo.private("update-kingdom-" + this.userId);
-
-        } catch (e: any|unknown) {
+        } catch (e: any | unknown) {
             throw new Error(e);
         }
     }
@@ -46,13 +46,12 @@ export default class UpdateKingdomListeners implements KingdomEventListener {
      */
     protected listenToKingdomUpdates() {
         if (!this.kingdomUpdates) {
-            return
+            return;
         }
 
         this.kingdomUpdates.listen(
             "Game.Kingdoms.Events.UpdateKingdom",
             (event: { kingdom: KingdomDetails }) => {
-
                 if (!this.component) {
                     return;
                 }
@@ -68,7 +67,7 @@ export default class UpdateKingdomListeners implements KingdomEventListener {
                         kingdom: event.kingdom,
                     });
                 }
-            }
+            },
         );
     }
 }

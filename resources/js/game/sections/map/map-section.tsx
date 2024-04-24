@@ -1,5 +1,5 @@
 import React, { Fragment } from "react";
-import Snowfall from 'react-snowfall'
+import Snowfall from "react-snowfall";
 import { dragMap, fetchLeftBounds } from "./lib/map-position";
 import MapProps from "./types/map/map-props";
 import Location from "../components/locations/location";
@@ -10,10 +10,7 @@ import MapStateManager from "./lib/state/map-state-manager";
 import NpcKingdoms from "../components/kingdoms/npc-kingdoms";
 import ComponentLoading from "../../components/ui/loading/component-loading";
 import MapData from "./lib/request-types/MapData";
-import {
-    getStyle,
-    playerIconPosition,
-} from "./lib/map-management";
+import { getStyle, playerIconPosition } from "./lib/map-management";
 import MapTimer from "./map-timer";
 import DirectionalMovement from "./actions/directional-movement";
 import MapActions from "./actions/map-actions";
@@ -23,7 +20,7 @@ import { updateTimers } from "../../lib/ajax/update-timers";
 import { updateLocationBasedActions } from "../../lib/ajax/update-location-based-actions";
 // @ts-ignore
 import Draggable from "react-draggable/build/web/react-draggable.min";
-import {differenceWith, isEqual} from "lodash";
+import { differenceWith, isEqual } from "lodash";
 
 export default class MapSection extends React.Component<MapProps, MapState> {
     private mapTimeOut: any;
@@ -66,34 +63,37 @@ export default class MapSection extends React.Component<MapProps, MapState> {
 
         // @ts-ignore
         this.mapTimeOut = Echo.private(
-            "show-timeout-move-" + this.props.user_id
+            "show-timeout-move-" + this.props.user_id,
         );
 
         // @ts-ignore
         this.explorationTimeOut = Echo.private(
-            "exploration-timeout-" + this.props.user_id
+            "exploration-timeout-" + this.props.user_id,
         );
 
         // @ts-ignore
         this.celestialTimeout = Echo.private(
-            "update-character-celestial-timeout-" + this.props.user_id
+            "update-character-celestial-timeout-" + this.props.user_id,
         );
     }
 
     componentDidMount() {
         if (this.props.map_data !== null) {
-            this.setState({
-                ...this.props.map_data,
-                time_left: 0,
-                automation_time_out: 0,
-                celestial_time_out: 0
-            }, () => {
-                updateTimers(this.props.character_id);
+            this.setState(
+                {
+                    ...this.props.map_data,
+                    time_left: 0,
+                    automation_time_out: 0,
+                    celestial_time_out: 0,
+                },
+                () => {
+                    updateTimers(this.props.character_id);
 
-                updateLocationBasedActions(this.props.character_id);
+                    updateLocationBasedActions(this.props.character_id);
 
-                this.setState({ loading: false });
-            });
+                    this.setState({ loading: false });
+                },
+            );
         }
 
         this.mapTimeOut.listen(
@@ -103,7 +103,7 @@ export default class MapSection extends React.Component<MapProps, MapState> {
                     time_left: event.forLength,
                     can_player_move: event.canMove,
                 });
-            }
+            },
         );
 
         this.explorationTimeOut.listen(
@@ -112,7 +112,7 @@ export default class MapSection extends React.Component<MapProps, MapState> {
                 this.setState({
                     automation_time_out: event.forLength,
                 });
-            }
+            },
         );
 
         this.celestialTimeout.listen(
@@ -121,24 +121,27 @@ export default class MapSection extends React.Component<MapProps, MapState> {
                 this.setState({
                     celestial_time_out: event.timeLeft,
                 });
-            }
+            },
         );
     }
 
     componentDidUpdate(): void {
         if (this.props.map_data !== null && this.state.loading) {
-            this.setState({
-                ...this.props.map_data,
-                time_left: 0,
-                automation_time_out: 0,
-                celestial_time_out: 0
-            }, () => {
-                updateTimers(this.props.character_id);
+            this.setState(
+                {
+                    ...this.props.map_data,
+                    time_left: 0,
+                    automation_time_out: 0,
+                    celestial_time_out: 0,
+                },
+                () => {
+                    updateTimers(this.props.character_id);
 
-                updateLocationBasedActions(this.props.character_id);
+                    updateLocationBasedActions(this.props.character_id);
 
-                this.setState({ loading: false });
-            });
+                    this.setState({ loading: false });
+                },
+            );
         }
 
         if (this.props.map_data !== null) {
@@ -147,11 +150,13 @@ export default class MapSection extends React.Component<MapProps, MapState> {
             }
 
             if (
-                (this.props.map_data.player_kingdoms.length !== this.state.player_kingdoms.length ||
-                this.props.map_data.enemy_kingdoms.length !== this.state.enemy_kingdoms.length ||
-                this.props.map_data.npc_kingdoms.length !== this.state.npc_kingdoms.length)
+                this.props.map_data.player_kingdoms.length !==
+                    this.state.player_kingdoms.length ||
+                this.props.map_data.enemy_kingdoms.length !==
+                    this.state.enemy_kingdoms.length ||
+                this.props.map_data.npc_kingdoms.length !==
+                    this.state.npc_kingdoms.length
             ) {
-
                 this.setState({
                     player_kingdoms: this.props.map_data.player_kingdoms,
                     enemy_kingdoms: this.props.map_data.enemy_kingdoms,
@@ -162,7 +167,7 @@ export default class MapSection extends React.Component<MapProps, MapState> {
             if (!isEqual(this.props.map_data.locations, this.state.locations)) {
                 this.setState({
                     locations: this.props.map_data.locations,
-                })
+                });
             }
         }
     }
@@ -183,7 +188,11 @@ export default class MapSection extends React.Component<MapProps, MapState> {
 
     handleDrag(e: MouseEvent, position: { x: number; y: number }) {
         this.setState(
-            dragMap(position, this.state.bottom_bounds, this.state.right_bounds)
+            dragMap(
+                position,
+                this.state.bottom_bounds,
+                this.state.right_bounds,
+            ),
         );
     }
 
@@ -196,7 +205,7 @@ export default class MapSection extends React.Component<MapProps, MapState> {
         new MovePlayer(this).teleportPlayer(
             data,
             this.props.character_id,
-            this.setStateFromData.bind(this)
+            this.setStateFromData.bind(this),
         );
     }
 
@@ -227,12 +236,9 @@ export default class MapSection extends React.Component<MapProps, MapState> {
                                 className="handle game-map"
                                 style={getStyle(this)}
                             >
-
-                                {
-                                    this.state.map_name === 'The Ice Plane' ?
-                                        <Snowfall />
-                                    : null
-                                }
+                                {this.state.map_name === "The Ice Plane" ? (
+                                    <Snowfall />
+                                ) : null}
 
                                 <Location
                                     locations={this.state.locations}
@@ -241,7 +247,7 @@ export default class MapSection extends React.Component<MapProps, MapState> {
                                     }
                                     currencies={this.props.currencies}
                                     teleport_player={this.handleTeleportPlayer.bind(
-                                        this
+                                        this,
                                     )}
                                     can_move={this.state.can_player_move}
                                     is_dead={this.props.is_dead}
@@ -258,7 +264,7 @@ export default class MapSection extends React.Component<MapProps, MapState> {
                                     }
                                     currencies={this.props.currencies}
                                     teleport_player={this.handleTeleportPlayer.bind(
-                                        this
+                                        this,
                                     )}
                                     can_move={this.state.can_player_move}
                                     is_dead={this.props.is_dead}
@@ -275,7 +281,7 @@ export default class MapSection extends React.Component<MapProps, MapState> {
                                     }
                                     currencies={this.props.currencies}
                                     teleport_player={this.handleTeleportPlayer.bind(
-                                        this
+                                        this,
                                     )}
                                     can_move={this.state.can_player_move}
                                     is_dead={this.props.is_dead}
@@ -292,7 +298,7 @@ export default class MapSection extends React.Component<MapProps, MapState> {
                                     }
                                     currencies={this.props.currencies}
                                     teleport_player={this.handleTeleportPlayer.bind(
-                                        this
+                                        this,
                                     )}
                                     can_move={this.state.can_player_move}
                                     is_dead={this.props.is_dead}
@@ -354,7 +360,7 @@ export default class MapSection extends React.Component<MapProps, MapState> {
                             "border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2",
                             {
                                 hidden: this.props.view_port >= 1600,
-                            }
+                            },
                         )}
                     ></div>
                     <DirectionalMovement

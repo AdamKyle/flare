@@ -2,8 +2,7 @@ import ClassRankType from "../deffinitions/class-rank-type";
 import GameClassType from "../deffinitions/game-class-type";
 
 export default interface CharacterClassRanksState {
-
-    class_ranks: ClassRankType[]|[];
+    class_ranks: ClassRankType[] | [];
 
     dark_tables: boolean;
 
@@ -11,7 +10,7 @@ export default interface CharacterClassRanksState {
 
     open_class_details: boolean;
 
-    class_name_selected: ClassRankType|null;
+    class_name_selected: ClassRankType | null;
 
     show_class_specialties: boolean;
 
@@ -20,5 +19,4 @@ export default interface CharacterClassRanksState {
     success_message: string | null;
 
     error_message: string | null;
-
 }

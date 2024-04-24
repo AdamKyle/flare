@@ -1,7 +1,6 @@
 import BuildingDetails from "../../buildings/deffinitions/building-details";
 
 export default class BuildingTimeCalculation {
-
     /**
      * Convert hours to minutes.
      *
@@ -17,7 +16,7 @@ export default class BuildingTimeCalculation {
      * @param time
      */
     isHours(time: number): boolean {
-        return (time / 60) > 1;
+        return time / 60 > 1;
     }
 
     /**
@@ -27,8 +26,12 @@ export default class BuildingTimeCalculation {
      * @param toLevel
      * @param timeReduction
      */
-    calculateViewTime(building: BuildingDetails, toLevel: number, timeReduction: number) {
-        return this.calculateTimeNeeded(building, toLevel, timeReduction,1);
+    calculateViewTime(
+        building: BuildingDetails,
+        toLevel: number,
+        timeReduction: number,
+    ) {
+        return this.calculateTimeNeeded(building, toLevel, timeReduction, 1);
     }
 
     /**
@@ -38,7 +41,7 @@ export default class BuildingTimeCalculation {
      * @param timeReduction
      */
     calculateRebuildTime(building: BuildingDetails, timeReduction: number) {
-        return (building.rebuild_time - building.rebuild_time * timeReduction);
+        return building.rebuild_time - building.rebuild_time * timeReduction;
     }
 
     /**
@@ -49,11 +52,17 @@ export default class BuildingTimeCalculation {
      * @param timeReduction
      * @param levels
      */
-    calculateTimeNeeded(building: BuildingDetails, toLevel: number, timeReduction: number, levels?: number) {
-        let buildingCurrentLevel   = building.level;
-        const levelsToPurchase     = typeof levels !== 'undefined' ? levels : toLevel;
-        const totalLevels          = buildingCurrentLevel + levelsToPurchase
-        const rawTimeIncrease      = building.raw_time_to_build;
+    calculateTimeNeeded(
+        building: BuildingDetails,
+        toLevel: number,
+        timeReduction: number,
+        levels?: number,
+    ) {
+        let buildingCurrentLevel = building.level;
+        const levelsToPurchase =
+            typeof levels !== "undefined" ? levels : toLevel;
+        const totalLevels = buildingCurrentLevel + levelsToPurchase;
+        const rawTimeIncrease = building.raw_time_to_build;
         let time;
 
         time = totalLevels + rawTimeIncrease;

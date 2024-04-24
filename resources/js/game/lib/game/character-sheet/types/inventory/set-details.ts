@@ -1,8 +1,7 @@
 export default interface SetDetails {
+    id: number;
 
-    id:  number;
-
-    index:  number;
+    index: number;
 
     name: string;
 

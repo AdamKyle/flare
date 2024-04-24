@@ -77,7 +77,6 @@ export default class MonsterActions extends React.Component<
     render() {
         return (
             <div className="relative">
-
                 <MonsterSelection
                     monsters={this.state.monsters}
                     update_monster_to_fight={this.setSelectedMonster.bind(this)}
@@ -110,8 +109,6 @@ export default class MonsterActions extends React.Component<
                         is_small={this.props.is_small}
                     />
                 ) : null}
-
-
             </div>
         );
     }

@@ -1,26 +1,25 @@
-import {container, InjectionToken} from 'tsyringe';
+import { container, InjectionToken } from "tsyringe";
 import GuideQuestListener from "../event-listeners/guide-quest-listener";
 import ShopAjax from "../../shop/ajax/shop-ajax";
 import GuideQuestAjax from "../ajax/guide-quest-ajax";
 import CompletedGuideQuestListener from "../event-listeners/completed-guide-quest-listener";
 
 class GuideQuestContainer {
-
     private static instance: GuideQuestContainer;
 
     public constructor() {
         // Guide Quest Event Listener
-        this.register('GuideQuestListenerDefinition', {
-            useClass: GuideQuestListener
-        })
+        this.register("GuideQuestListenerDefinition", {
+            useClass: GuideQuestListener,
+        });
 
         // Completed Guide Quest Listener
-        this.register('GuideQuestListenerDefinition', {
-            useClass: CompletedGuideQuestListener
-        })
+        this.register("GuideQuestListenerDefinition", {
+            useClass: CompletedGuideQuestListener,
+        });
 
-        this.register('guide-quest-ajax', {
-            useClass: GuideQuestAjax
+        this.register("guide-quest-ajax", {
+            useClass: GuideQuestAjax,
         });
     }
 
@@ -67,7 +66,3 @@ const guideQuestServiceContainer = (): GuideQuestContainer => {
 };
 
 export { guideQuestServiceContainer, GuideQuestContainer };
-
-
-
-

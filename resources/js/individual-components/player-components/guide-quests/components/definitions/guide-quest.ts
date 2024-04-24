@@ -38,7 +38,7 @@ export default interface GuideQuest {
     secondary_quest_item_id: number | null;
     required_skill_type: number | null;
     required_skill_type_level: number | null;
-    required_mercenary_type: number | null
+    required_mercenary_type: number | null;
     required_secondary_mercenary_type: number | null;
     required_mercenary_level: number | null;
     required_secondary_mercenary_level: number | null;

@@ -22,26 +22,22 @@ export default class CraftingActionButtons extends React.Component<
                     on_click={() => this.props.craft(false, false)}
                     disabled={this.props.can_craft}
                 />
-                {
-                    this.props.show_craft_for_npc ?
-                        <SuccessButton
-                            additional_css={"lg:ml-2 mb-2"}
-                            button_label={"Craft for NPC"}
-                            on_click={() => this.props.craft(true, false)}
-                            disabled={this.props.can_craft}
-                        />
-                    : null
-                }
-                {
-                    this.props.show_craft_for_event ?
-                        <OrangeButton
-                            additional_css={"lg:ml-2 mb-2"}
-                            button_label={"Craft for Event"}
-                            on_click={() => this.props.craft(false, true)}
-                            disabled={this.props.can_craft}
-                        />
-                    : null
-                }
+                {this.props.show_craft_for_npc ? (
+                    <SuccessButton
+                        additional_css={"lg:ml-2 mb-2"}
+                        button_label={"Craft for NPC"}
+                        on_click={() => this.props.craft(true, false)}
+                        disabled={this.props.can_craft}
+                    />
+                ) : null}
+                {this.props.show_craft_for_event ? (
+                    <OrangeButton
+                        additional_css={"lg:ml-2 mb-2"}
+                        button_label={"Craft for Event"}
+                        on_click={() => this.props.craft(false, true)}
+                        disabled={this.props.can_craft}
+                    />
+                ) : null}
                 <PrimaryButton
                     button_label={"Change Type"}
                     on_click={this.props.change_type}

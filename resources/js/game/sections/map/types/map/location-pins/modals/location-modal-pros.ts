@@ -10,11 +10,16 @@ export interface LocationModalPros {
 
     location: LocationDetails;
 
-    character_position?: {x: number, y: number};
+    character_position?: { x: number; y: number };
 
     currencies?: CharacterCurrenciesDetails;
 
-    teleport_player?: (data: {x: number, y: number, cost: number, timeout: number}) => void;
+    teleport_player?: (data: {
+        x: number;
+        y: number;
+        cost: number;
+        timeout: number;
+    }) => void;
 
     hide_secondary_button: boolean | null;
 

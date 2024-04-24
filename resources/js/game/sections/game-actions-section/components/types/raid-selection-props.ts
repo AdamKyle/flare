@@ -1,9 +1,7 @@
-
 import RaidMonsterType from "../../../../lib/game/types/actions/monster/raid-monster-type";
 
 export default interface RaidSelectionProps {
-    
-    raid_monsters: RaidMonsterType[]|[]
+    raid_monsters: RaidMonsterType[] | [];
 
     character_id: number;
 

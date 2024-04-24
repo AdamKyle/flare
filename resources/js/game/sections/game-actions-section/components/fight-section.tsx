@@ -74,7 +74,7 @@ export default class FightSection extends React.Component<
                 },
                 () => {
                     this.props.reset_revived();
-                }
+                },
             );
         }
     }
@@ -96,7 +96,7 @@ export default class FightSection extends React.Component<
                         "setup-monster-fight/" +
                             this.props.character.id +
                             "/" +
-                            this.props.monster_to_fight.id
+                            this.props.monster_to_fight.id,
                     )
                     .setParameters({ attack_type: "attack" })
                     .doAjaxCall(
@@ -126,14 +126,13 @@ export default class FightSection extends React.Component<
                                     setting_up_regular_fight: false,
                                 });
                             }
-                        }
+                        },
                     );
-            }
+            },
         );
     }
 
     attack(attackType: string) {
-
         this.setState(
             {
                 processing_regular_fight: true,
@@ -172,14 +171,13 @@ export default class FightSection extends React.Component<
                                     processing_regular_fight: false,
                                 });
                             }
-                        }
+                        },
                     );
-            }
+            },
         );
     }
 
     attackButtonDisabled() {
-
         if (typeof this.state.character_current_health === "undefined") {
             return true;
         }
@@ -216,7 +214,7 @@ export default class FightSection extends React.Component<
                 <div className="flex items-center justify-center">
                     <LoadingProgressBar />
                 </div>
-            )
+            );
         }
 
         if (this.state.error_message !== "") {
@@ -229,20 +227,22 @@ export default class FightSection extends React.Component<
 
         return (
             <div className={clsx({ "ml-[-100px]": !this.props.is_small })}>
-
-                {
-                    this.state.monster_to_fight?.highest_element !== 'UNKNOWN' ?
-                        <div className="flex items-center justify-center">
-                            <div className=" mt-4 mb-4 text-center">
-                                <PrimaryLinkButton button_label={'Elemental Atonement Info'} on_click={this.manageElementalAtonement.bind(this)} />
-                            </div>
+                {this.state.monster_to_fight?.highest_element !== "UNKNOWN" ? (
+                    <div className="flex items-center justify-center">
+                        <div className=" mt-4 mb-4 text-center">
+                            <PrimaryLinkButton
+                                button_label={"Elemental Atonement Info"}
+                                on_click={this.manageElementalAtonement.bind(
+                                    this,
+                                )}
+                            />
                         </div>
-                    : null
-                }
+                    </div>
+                ) : null}
 
                 <div
                     className={clsx("mt-4 mb-4 text-xs text-center", {
-                        'hidden': this.attackButtonDisabled(),
+                        hidden: this.attackButtonDisabled(),
                     })}
                 >
                     <AttackButton
@@ -287,10 +287,9 @@ export default class FightSection extends React.Component<
                     />
                 </div>
                 <div
-                    className={clsx(
-                        "mt-1 text-xs text-center",
-                        { hidden: this.attackButtonDisabled() }
-                    )}
+                    className={clsx("mt-1 text-xs text-center", {
+                        hidden: this.attackButtonDisabled(),
+                    })}
                 >
                     <span className={"w-10 mr-4 ml-4"}>Atk</span>
                     <span className={"w-10 ml-6"}>Cast</span>
@@ -317,9 +316,7 @@ export default class FightSection extends React.Component<
                 ) : null}
                 {this.state.monster_max_health > 0 &&
                 this.props.character !== null ? (
-                    <div
-                        className={clsx("mb-4 max-w-md m-auto mt-4")}
-                    >
+                    <div className={clsx("mb-4 max-w-md m-auto mt-4")}>
                         <HealthMeters
                             is_enemy={true}
                             name={this.props.monster_to_fight.name}
@@ -334,10 +331,15 @@ export default class FightSection extends React.Component<
                         />
                     </div>
                 ) : null}
-                {this.state.open_elemental_atonement && this.state.monster_to_fight !== null ? (
+                {this.state.open_elemental_atonement &&
+                this.state.monster_to_fight !== null ? (
                     <RaidElementInfo
-                        element_atonements={this.state.monster_to_fight.elemental_atonement}
-                        highest_element={this.state.monster_to_fight.highest_element}
+                        element_atonements={
+                            this.state.monster_to_fight.elemental_atonement
+                        }
+                        highest_element={
+                            this.state.monster_to_fight.highest_element
+                        }
                         monster_name={this.state.monster_to_fight.name}
                         is_open={this.state.open_elemental_atonement}
                         manage_modal={this.manageElementalAtonement.bind(this)}

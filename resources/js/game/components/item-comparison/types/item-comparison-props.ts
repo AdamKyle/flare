@@ -1,4 +1,4 @@
-import {ComparisonData} from "../deffinitions/comparison-data";
+import { ComparisonData } from "../deffinitions/comparison-data";
 
 export default interface ItemComparisonProps {
     comparison_info: ComparisonData;

@@ -1,5 +1,5 @@
 import TeleportModal from "../modals/teleport-modal";
-import {fetchCost} from "../lib/teleportion-costs";
+import { fetchCost } from "../lib/teleportion-costs";
 import LocationDetails from "./location-details";
 import PlayerKingdomsDetails from "./map/player-kingdoms-details";
 import NpcKingdomsDetails from "./map/npc-kingdoms-details";
@@ -7,10 +7,9 @@ import NpcKingdomsDetails from "./map/npc-kingdoms-details";
 type SelectedData = {
     label: string;
     value: number;
-}
+};
 
 export default class TeleportComponent {
-
     private component: TeleportModal;
 
     constructor(component: TeleportModal) {
@@ -25,15 +24,18 @@ export default class TeleportComponent {
 
         if (state.current_location !== null) {
             return {
-                label: state.current_location.name + ' (X/Y): ' +
-                    state.current_location.x + '/' +
+                label:
+                    state.current_location.name +
+                    " (X/Y): " +
+                    state.current_location.x +
+                    "/" +
                     state.current_location.y +
-                    (state.current_location.is_corrupted ? ' (Corrupted)' : ''),
-                value: state.current_location.id
-            }
+                    (state.current_location.is_corrupted ? " (Corrupted)" : ""),
+                value: state.current_location.id,
+            };
         }
 
-        return  {value: 0, label: ''};
+        return { value: 0, label: "" };
     }
 
     /**
@@ -44,14 +46,17 @@ export default class TeleportComponent {
 
         if (state.current_player_kingdom !== null) {
             return {
-                label: state.current_player_kingdom.name + ' (X/Y): ' +
-                    state.current_player_kingdom.x_position + '/' +
+                label:
+                    state.current_player_kingdom.name +
+                    " (X/Y): " +
+                    state.current_player_kingdom.x_position +
+                    "/" +
                     state.current_player_kingdom.y_position,
-                value: state.current_player_kingdom.id
-            }
+                value: state.current_player_kingdom.id,
+            };
         }
 
-        return  {value: 0, label: ''};
+        return { value: 0, label: "" };
     }
 
     /**
@@ -62,14 +67,17 @@ export default class TeleportComponent {
 
         if (state.current_enemy_kingdom !== null) {
             return {
-                label: state.current_enemy_kingdom.name + ' (X/Y): ' +
-                    state.current_enemy_kingdom.x_position + '/' +
+                label:
+                    state.current_enemy_kingdom.name +
+                    " (X/Y): " +
+                    state.current_enemy_kingdom.x_position +
+                    "/" +
                     state.current_enemy_kingdom.y_position,
-                value: state.current_enemy_kingdom.id
-            }
+                value: state.current_enemy_kingdom.id,
+            };
         }
 
-        return  {value: 0, label: ''};
+        return { value: 0, label: "" };
     }
 
     /**
@@ -79,13 +87,18 @@ export default class TeleportComponent {
         const state = this.component.state;
 
         if (state.current_npc_kingdom !== null) {
-            return {label: state.current_npc_kingdom.name + ' (X/Y): ' +
-                    state.current_npc_kingdom.x_position + '/' +
+            return {
+                label:
+                    state.current_npc_kingdom.name +
+                    " (X/Y): " +
+                    state.current_npc_kingdom.x_position +
+                    "/" +
                     state.current_npc_kingdom.y_position,
-                value: state.current_npc_kingdom.id}
+                value: state.current_npc_kingdom.id,
+            };
         }
 
-        return  {value: 0, label: ''};
+        return { value: 0, label: "" };
     }
 
     /**
@@ -94,20 +107,28 @@ export default class TeleportComponent {
      * @param data
      */
     setSelectedXPosition(data: SelectedData) {
-        this.component.setState({
-            x_position: data.value,
-            current_location: null,
-            current_player_kingdom: null,
-            current_enemy_kingdom: null,
-            current_npc_kingdom: null,
-        }, () => {
-            const state = this.component.state;
-            const props = this.component.props;
+        this.component.setState(
+            {
+                x_position: data.value,
+                current_location: null,
+                current_player_kingdom: null,
+                current_enemy_kingdom: null,
+                current_npc_kingdom: null,
+            },
+            () => {
+                const state = this.component.state;
+                const props = this.component.props;
 
-            const costState = fetchCost(state.x_position, state.y_position, state.character_position, props.currencies);
+                const costState = fetchCost(
+                    state.x_position,
+                    state.y_position,
+                    state.character_position,
+                    props.currencies,
+                );
 
-            this.component.setState(costState);
-        });
+                this.component.setState(costState);
+            },
+        );
     }
 
     /**
@@ -115,19 +136,27 @@ export default class TeleportComponent {
      *
      * @param data
      */
-    setSelectedYPosition (data: SelectedData) {
-        this.component.setState({
-            y_position: data.value,
-            current_location: null,
-            current_player_kingdom: null,
-        }, () => {
-            const state = this.component.state;
-            const props = this.component.props;
+    setSelectedYPosition(data: SelectedData) {
+        this.component.setState(
+            {
+                y_position: data.value,
+                current_location: null,
+                current_player_kingdom: null,
+            },
+            () => {
+                const state = this.component.state;
+                const props = this.component.props;
 
-            const costState = fetchCost(state.x_position,  data.value, state.character_position, props.currencies);
+                const costState = fetchCost(
+                    state.x_position,
+                    data.value,
+                    state.character_position,
+                    props.currencies,
+                );
 
-            this.component.setState(costState);
-        });
+                this.component.setState(costState);
+            },
+        );
     }
 
     /**
@@ -139,23 +168,33 @@ export default class TeleportComponent {
         const props = this.component.props;
 
         if (props.locations !== null) {
-            const foundLocation = props.locations.filter((location: LocationDetails) => location.id === data.value);
+            const foundLocation = props.locations.filter(
+                (location: LocationDetails) => location.id === data.value,
+            );
 
             if (foundLocation.length > 0) {
-                this.component.setState({
-                    x_position: foundLocation[0].x,
-                    y_position: foundLocation[0].y,
-                    current_location: foundLocation[0],
-                    current_player_kingdom: null,
-                    current_enemy_kingdom: null,
-                    current_npc_kingdom: null,
-                }, () => {
-                    const state = this.component.state;
+                this.component.setState(
+                    {
+                        x_position: foundLocation[0].x,
+                        y_position: foundLocation[0].y,
+                        current_location: foundLocation[0],
+                        current_player_kingdom: null,
+                        current_enemy_kingdom: null,
+                        current_npc_kingdom: null,
+                    },
+                    () => {
+                        const state = this.component.state;
 
-                    const locationTeleportCost = fetchCost(state.x_position, state.y_position, state.character_position, props.currencies);
+                        const locationTeleportCost = fetchCost(
+                            state.x_position,
+                            state.y_position,
+                            state.character_position,
+                            props.currencies,
+                        );
 
-                    this.component.setState(locationTeleportCost);
-                });
+                        this.component.setState(locationTeleportCost);
+                    },
+                );
             }
         }
     }
@@ -169,23 +208,33 @@ export default class TeleportComponent {
         const props = this.component.props;
 
         if (props.player_kingdoms !== null) {
-            const foundKingdom = props.player_kingdoms.filter((location: PlayerKingdomsDetails) => location.id === data.value);
+            const foundKingdom = props.player_kingdoms.filter(
+                (location: PlayerKingdomsDetails) => location.id === data.value,
+            );
 
             if (foundKingdom.length > 0) {
-                this.component.setState({
-                    x_position: foundKingdom[0].x_position,
-                    y_position: foundKingdom[0].y_position,
-                    current_player_kingdom: foundKingdom[0],
-                    current_location: null,
-                    current_enemy_kingdom: null,
-                    current_npc_kingdom: null,
-                }, () => {
-                    const state = this.component.state;
+                this.component.setState(
+                    {
+                        x_position: foundKingdom[0].x_position,
+                        y_position: foundKingdom[0].y_position,
+                        current_player_kingdom: foundKingdom[0],
+                        current_location: null,
+                        current_enemy_kingdom: null,
+                        current_npc_kingdom: null,
+                    },
+                    () => {
+                        const state = this.component.state;
 
-                    const kingdomTeleportCosts = fetchCost(state.x_position, state.y_position, state.character_position, props.currencies);
+                        const kingdomTeleportCosts = fetchCost(
+                            state.x_position,
+                            state.y_position,
+                            state.character_position,
+                            props.currencies,
+                        );
 
-                    this.component.setState(kingdomTeleportCosts);
-                });
+                        this.component.setState(kingdomTeleportCosts);
+                    },
+                );
             }
         }
     }
@@ -199,23 +248,33 @@ export default class TeleportComponent {
         const props = this.component.props;
 
         if (props.enemy_kingdoms !== null) {
-            const foundKingdom = props.enemy_kingdoms.filter((location: PlayerKingdomsDetails) => location.id === data.value);
+            const foundKingdom = props.enemy_kingdoms.filter(
+                (location: PlayerKingdomsDetails) => location.id === data.value,
+            );
 
             if (foundKingdom.length > 0) {
-                this.component.setState({
-                    x_position: foundKingdom[0].x_position,
-                    y_position: foundKingdom[0].y_position,
-                    current_player_kingdom: null,
-                    current_location: null,
-                    current_enemy_kingdom: foundKingdom[0],
-                    current_npc_kingdom: null,
-                }, () => {
-                    const state = this.component.state;
+                this.component.setState(
+                    {
+                        x_position: foundKingdom[0].x_position,
+                        y_position: foundKingdom[0].y_position,
+                        current_player_kingdom: null,
+                        current_location: null,
+                        current_enemy_kingdom: foundKingdom[0],
+                        current_npc_kingdom: null,
+                    },
+                    () => {
+                        const state = this.component.state;
 
-                    const kingdomTeleportCosts = fetchCost(state.x_position, state.y_position, state.character_position, props.currencies);
+                        const kingdomTeleportCosts = fetchCost(
+                            state.x_position,
+                            state.y_position,
+                            state.character_position,
+                            props.currencies,
+                        );
 
-                    this.component.setState(kingdomTeleportCosts);
-                });
+                        this.component.setState(kingdomTeleportCosts);
+                    },
+                );
             }
         }
     }
@@ -229,23 +288,33 @@ export default class TeleportComponent {
         const props = this.component.props;
 
         if (props.npc_kingdoms !== null) {
-            const foundKingdom = props.npc_kingdoms.filter((location: NpcKingdomsDetails) => location.id === data.value);
+            const foundKingdom = props.npc_kingdoms.filter(
+                (location: NpcKingdomsDetails) => location.id === data.value,
+            );
 
             if (foundKingdom.length > 0) {
-                this.component.setState({
-                    x_position: foundKingdom[0].x_position,
-                    y_position: foundKingdom[0].y_position,
-                    current_player_kingdom: null,
-                    current_location: null,
-                    current_enemy_kingdom: null,
-                    current_npc_kingdom: foundKingdom[0]
-                }, () => {
-                    const state = this.component.state;
+                this.component.setState(
+                    {
+                        x_position: foundKingdom[0].x_position,
+                        y_position: foundKingdom[0].y_position,
+                        current_player_kingdom: null,
+                        current_location: null,
+                        current_enemy_kingdom: null,
+                        current_npc_kingdom: foundKingdom[0],
+                    },
+                    () => {
+                        const state = this.component.state;
 
-                    const kingdomTeleportCosts = fetchCost(state.x_position, state.y_position, state.character_position, props.currencies);
+                        const kingdomTeleportCosts = fetchCost(
+                            state.x_position,
+                            state.y_position,
+                            state.character_position,
+                            props.currencies,
+                        );
 
-                    this.component.setState(kingdomTeleportCosts);
-                });
+                        this.component.setState(kingdomTeleportCosts);
+                    },
+                );
             }
         }
     }
@@ -257,19 +326,28 @@ export default class TeleportComponent {
      */
     buildCoordinatesOptions(data: number[]): SelectedData[] {
         return data.map((d) => {
-            return {label: d.toString(), value: d}
+            return { label: d.toString(), value: d };
         });
     }
 
     /**
      * Build the: Location select options.
      */
-    buildLocationOptions(): SelectedData[]|[] {
+    buildLocationOptions(): SelectedData[] | [] {
         const props = this.component.props;
 
         if (props.locations !== null) {
             return props.locations.map((location: LocationDetails) => {
-                return {label: location.name + ' (X/Y): ' + location.x + '/' + location.y + (location.is_corrupted ? ' (Corrupted)' : ''), value: location.id}
+                return {
+                    label:
+                        location.name +
+                        " (X/Y): " +
+                        location.x +
+                        "/" +
+                        location.y +
+                        (location.is_corrupted ? " (Corrupted)" : ""),
+                    value: location.id,
+                };
             });
         }
 
@@ -279,13 +357,23 @@ export default class TeleportComponent {
     /**
      * Build the: My Kingdoms select options.
      */
-    buildMyKingdomsOptions(): SelectedData[]|[] {
+    buildMyKingdomsOptions(): SelectedData[] | [] {
         const props = this.component.props;
 
         if (props.player_kingdoms !== null) {
-            return props.player_kingdoms.map((kingdom: PlayerKingdomsDetails) => {
-                return {label: kingdom.name + ' (X/Y): ' + kingdom.x_position + '/' + kingdom.y_position, value: kingdom.id}
-            });
+            return props.player_kingdoms.map(
+                (kingdom: PlayerKingdomsDetails) => {
+                    return {
+                        label:
+                            kingdom.name +
+                            " (X/Y): " +
+                            kingdom.x_position +
+                            "/" +
+                            kingdom.y_position,
+                        value: kingdom.id,
+                    };
+                },
+            );
         }
 
         return [];
@@ -294,13 +382,23 @@ export default class TeleportComponent {
     /**
      * Build the: Enemy Kingdoms select options.
      */
-    buildEnemyKingdomOptions(): SelectedData[]|[] {
+    buildEnemyKingdomOptions(): SelectedData[] | [] {
         const props = this.component.props;
 
         if (props.enemy_kingdoms !== null) {
-            return props.enemy_kingdoms.map((kingdom: PlayerKingdomsDetails) => {
-                return {label: kingdom.name + ' (X/Y): ' + kingdom.x_position + '/' + kingdom.y_position, value: kingdom.id}
-            });
+            return props.enemy_kingdoms.map(
+                (kingdom: PlayerKingdomsDetails) => {
+                    return {
+                        label:
+                            kingdom.name +
+                            " (X/Y): " +
+                            kingdom.x_position +
+                            "/" +
+                            kingdom.y_position,
+                        value: kingdom.id,
+                    };
+                },
+            );
         }
 
         return [];
@@ -309,12 +407,20 @@ export default class TeleportComponent {
     /**
      * Build the: NPC Kingdoms select options.
      */
-    buildNpcKingdomOptions(): SelectedData[]|[] {
+    buildNpcKingdomOptions(): SelectedData[] | [] {
         const props = this.component.props;
 
         if (props.npc_kingdoms !== null) {
             return props.npc_kingdoms.map((kingdom: NpcKingdomsDetails) => {
-                return {label: kingdom.name + ' (X/Y): ' + kingdom.x_position + '/' + kingdom.y_position, value: kingdom.id}
+                return {
+                    label:
+                        kingdom.name +
+                        " (X/Y): " +
+                        kingdom.x_position +
+                        "/" +
+                        kingdom.y_position,
+                    value: kingdom.id,
+                };
             });
         }
 
