@@ -37,8 +37,15 @@ export default class KingdomDetails extends React.Component<
         };
     }
 
-    componentDidUpdate(prevProps: Readonly<KingdomDetailsProps>, prevState: Readonly<KingdomDetailsState>, snapshot?: any) {
-        if (this.state.show_resource_transfer && this.props.reset_resource_transfer) {
+    componentDidUpdate(
+        prevProps: Readonly<KingdomDetailsProps>,
+        prevState: Readonly<KingdomDetailsState>,
+        snapshot?: any,
+    ) {
+        if (
+            this.state.show_resource_transfer &&
+            this.props.reset_resource_transfer
+        ) {
             this.setState({
                 show_resource_transfer: false,
             });
@@ -81,11 +88,14 @@ export default class KingdomDetails extends React.Component<
     }
 
     showRequestServices() {
-        this.setState({
-            show_resource_transfer: !this.state.show_resource_transfer,
-        }, () => {
-            this.props.show_resource_transfer_card();
-        });
+        this.setState(
+            {
+                show_resource_transfer: !this.state.show_resource_transfer,
+            },
+            () => {
+                this.props.show_resource_transfer_card();
+            },
+        );
     }
 
     showCallForReinforcements() {

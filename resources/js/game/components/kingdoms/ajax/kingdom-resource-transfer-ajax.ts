@@ -1,9 +1,8 @@
-import {inject, injectable} from "tsyringe";
+import { inject, injectable } from "tsyringe";
 import Ajax from "../../../lib/ajax/ajax";
 import AjaxInterface from "../../../lib/ajax/ajax-interface";
 import KingdomResourceTransfer from "../kingdom-resource-transfer";
-import {AxiosError, AxiosResponse} from "axios";
-
+import { AxiosError, AxiosResponse } from "axios";
 
 @injectable()
 export default class KingdomResourceTransferAjax {
@@ -14,9 +13,14 @@ export default class KingdomResourceTransferAjax {
         characterId: number,
         kingdomId: number,
     ): void {
-
         this.ajax
-            .setRoute('/kingdoms/' + kingdomId + '/' + characterId + '/resource-transfer-request')
+            .setRoute(
+                "/kingdoms/" +
+                    kingdomId +
+                    "/" +
+                    characterId +
+                    "/resource-transfer-request",
+            )
             .doAjaxCall(
                 "get",
                 (result: AxiosResponse) => {

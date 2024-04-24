@@ -130,8 +130,10 @@ export default class Kingdom extends React.Component<KingdomProps, any> {
 
     showResourceTransferPanel() {
         this.setState({
-            show_resource_transfer_panel: !this.state.show_resource_transfer_panel,
-            should_reset_resource_transfer: this.state.show_resource_transfer_panel
+            show_resource_transfer_panel:
+                !this.state.show_resource_transfer_panel,
+            should_reset_resource_transfer:
+                this.state.show_resource_transfer_panel,
         });
     }
 
@@ -150,33 +152,42 @@ export default class Kingdom extends React.Component<KingdomProps, any> {
                     </InfoAlert>
                 ) : null}
                 <div className="grid md:grid-cols-2 gap-4">
-                    {
-                        this.state.show_resource_transfer_panel ?
-                            <BasicCard additionalClasses={"max-h-[700px]"}>
-                                <div className="text-right cursor-pointer text-red-500">
-                                    <button onClick={this.showResourceTransferPanel.bind(this)}>
-                                        <i className="fas fa-minus-circle"></i>
-                                    </button>
-                                </div>
-                                <KingdomResourceTransfer character_id={this.props.kingdom.character_id} kingdom_id={this.props.kingdom.id} />
-                            </BasicCard>
-                        :
-                            <BasicCard additionalClasses={"max-h-[700px]"}>
-                                <div className="text-right cursor-pointer text-red-500">
-                                    <button onClick={this.props.close_details}>
-                                        <i className="fas fa-minus-circle"></i>
-                                    </button>
-                                </div>
-                                <KingdomDetails
-                                    kingdom={this.state.kingdom}
-                                    character_gold={this.props.character_gold}
-                                    close_details={this.props.close_details}
-                                    show_resource_transfer_card={this.showResourceTransferPanel.bind(this)}
-                                    reset_resource_transfer={this.state.should_reset_resource_transfer}
-                                />
-                            </BasicCard>
-                    }
-
+                    {this.state.show_resource_transfer_panel ? (
+                        <BasicCard additionalClasses={"max-h-[700px]"}>
+                            <div className="text-right cursor-pointer text-red-500">
+                                <button
+                                    onClick={this.showResourceTransferPanel.bind(
+                                        this,
+                                    )}
+                                >
+                                    <i className="fas fa-minus-circle"></i>
+                                </button>
+                            </div>
+                            <KingdomResourceTransfer
+                                character_id={this.props.kingdom.character_id}
+                                kingdom_id={this.props.kingdom.id}
+                            />
+                        </BasicCard>
+                    ) : (
+                        <BasicCard additionalClasses={"max-h-[700px]"}>
+                            <div className="text-right cursor-pointer text-red-500">
+                                <button onClick={this.props.close_details}>
+                                    <i className="fas fa-minus-circle"></i>
+                                </button>
+                            </div>
+                            <KingdomDetails
+                                kingdom={this.state.kingdom}
+                                character_gold={this.props.character_gold}
+                                close_details={this.props.close_details}
+                                show_resource_transfer_card={this.showResourceTransferPanel.bind(
+                                    this,
+                                )}
+                                reset_resource_transfer={
+                                    this.state.should_reset_resource_transfer
+                                }
+                            />
+                        </BasicCard>
+                    )}
 
                     <div>
                         {this.state.building_to_view !== null ||

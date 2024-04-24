@@ -1,6 +1,5 @@
-
 import KingdomResourceTransferAjax from "../ajax/kingdom-resource-transfer-ajax";
-import {CoreContainer} from "../../../lib/containers/core-container";
+import { CoreContainer } from "../../../lib/containers/core-container";
 import kingdomQueueContainer from "../queues/container/kingdom-queue-container";
 
 /**
@@ -12,7 +11,6 @@ import kingdomQueueContainer from "../queues/container/kingdom-queue-container";
  * @param container
  */
 function kingdomContainer(container: CoreContainer) {
-
     // Let's register other containers here, that might live in sub modules:
     kingdomQueueContainer(container);
 

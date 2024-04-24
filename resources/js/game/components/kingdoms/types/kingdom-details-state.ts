@@ -1,6 +1,5 @@
 import BuildingDetails from "../buildings/deffinitions/building-details";
 
-
 export default interface KingdomDetailsState {
     show_change_name_modal: boolean;
 
