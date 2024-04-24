@@ -93,11 +93,7 @@ class DropCheckCalculator {
     private function attemptToGainReward(int $max, float $chanceOfSuccess): bool {
 
         $roll = RandomNumberGenerator::generateTrueRandomNumber($max, $chanceOfSuccess);
-        $dc = 99;
-
-        if ($max === 1000000) {
-            $dc = 999999;
-        }
+        $dc = $max - 1;
 
         if ($roll >= $dc) {
             return true;
