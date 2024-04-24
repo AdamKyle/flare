@@ -14,7 +14,7 @@ import {parseInt} from "lodash";
 import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
 import SuccessAlert from "../../../components/ui/alerts/simple-alerts/success-alert";
 import DangerAlert from "../../../components/ui/alerts/simple-alerts/danger-alert";
-import KingdomHelpModal from "../../components/kingdoms/modals/kingdom-help-modal";
+
 
 export default class AttackKingdomModal extends React.Component<any, AttackKingdomModalState> {
 

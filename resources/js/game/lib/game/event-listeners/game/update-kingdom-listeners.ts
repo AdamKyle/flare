@@ -2,14 +2,14 @@ import {inject, injectable} from "tsyringe";
 import CoreEventListener from "../core-event-listener";
 import {Channel} from "laravel-echo";
 import KingdomDetails from "../../kingdoms/kingdom-details";
-import Kingdom from "../../../../sections/kingdoms/kingdom";
 import KingdomEventListener from "../kingdom-event-listener";
-import SmallKingdom from "../../../../sections/kingdoms/small-kingdom";
+import Kingdom from '../../../../components/kingdoms/kingdom';
+import SmallKingdom from "../../../../components/kingdoms/small-kingdom";
 
 @injectable()
 export default class UpdateKingdomListeners implements KingdomEventListener {
 
-    private component?: Kingdom | SmallKingdom;
+    private component?: Kingdom| SmallKingdom;
 
     private userId?: number;
 

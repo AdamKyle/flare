@@ -17,7 +17,6 @@ import GameChat from "./sections/chat/game-chat";
 import ForceNameChange from "./sections/force-name-change/force-name-change";
 import QuestType from "./lib/game/types/quests/quest-type";
 import ScreenRefresh from "./sections/screen-refresh/screen-refresh";
-import KingdomsList from "./sections/kingdoms/kingdoms-list";
 import PositionType from "./sections/map/types/map/position-type";
 import { removeCommas } from "./lib/game/format-number";
 import CharacterCurrenciesType from "./lib/game/character/character-currencies-type";
@@ -35,6 +34,7 @@ import {FameTasks} from "./sections/faction-loyalty/deffinitions/faction-loaylat
 import ActiveBoonsActionSection from "./sections/game-actions-section/active-boons-action-section";
 import SuccessAlert from "./components/ui/alerts/simple-alerts/success-alert";
 import WarningAlert from "./components/ui/alerts/simple-alerts/warning-alert";
+import KingdomsList from "./components/kingdoms/kingdoms-list";
 
 export default class Game extends React.Component<GameProps, GameState> {
 

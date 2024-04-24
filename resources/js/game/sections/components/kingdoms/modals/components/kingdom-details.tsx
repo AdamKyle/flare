@@ -11,7 +11,7 @@ import PrimaryOutlineButton from "../../../../../components/ui/buttons/primary-o
 import LoadingProgressBar from "../../../../../components/ui/progress-bars/loading-progress-bar";
 import DangerAlert from "../../../../../components/ui/alerts/simple-alerts/danger-alert";
 import DangerOutlineButton from "../../../../../components/ui/buttons/danger-outline-button";
-import AttackKingdomModal from "../../../../kingdoms/modals/attack-kingdom-modal";
+import AttackKingdomModal from "../../../../../components/kingdoms/modals/attack-kingdom-modal";
 
 export default class KingdomDetails extends React.Component<KingdomDetailsProps, any> {
 
