@@ -134,7 +134,6 @@ class GoldMinesRewardHandler {
      * Handle item Reward for player.
      *
      * @param Character $character
-     * @param bool $isMythic
      * @param Event|null $event
      * @return Character
      * @throws Exception
@@ -185,7 +184,7 @@ class GoldMinesRewardHandler {
         }
 
         if (!$isMythic) {
-            $randomAffixGenerator = $this->randomAffixGenerator->setPaidAmount(RandomAffixDetails::MEDIUM);
+            $randomAffixGenerator = $this->randomAffixGenerator->setCharacter($character)->setPaidAmount(RandomAffixDetails::MEDIUM);
 
             $newItem = $item->duplicate();
 
