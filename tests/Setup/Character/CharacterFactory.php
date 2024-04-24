@@ -79,6 +79,7 @@ class CharacterFactory {
         $user  = $this->createUser();
 
         $this->character = $this->createCharacter([
+            'damage_stat'   => $class->damage_stat,
             'name'          => Str::random(10),
             'user_id'       => $user->id,
             'level'         => 1,

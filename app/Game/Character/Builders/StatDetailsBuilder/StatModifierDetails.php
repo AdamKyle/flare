@@ -299,26 +299,14 @@ class StatModifierDetails {
                 ];
             }
 
+            if (empty($details)) {
+                return null;
+            }
+
             return $details;
         }
 
-        $classSpecialties = $this->character->classSpecialsEquipped
-            ->where('equipped', '=', true)
-            ->where($stat . '_mod', '>', 0);
-
-
-        foreach ($classSpecialties as $classSpecialty) {
-            $details[] = [
-                'name' => $classSpecialty->gameClassSpecial->name,
-                'amount' => $classSpecialty->{$stat . '_mod'},
-            ];
-        }
-
-        if (empty($details)) {
-            return null;
-        }
-
-        return $details;
+        return null;
     }
 
     /**
