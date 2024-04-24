@@ -2,6 +2,7 @@
 
 namespace App\Game\Battle\Services;
 
+use App\Flare\Models\Quest;
 use Illuminate\Support\Facades\Cache;
 use App\Game\Skills\Services\DisenchantService;
 use App\Flare\Builders\RandomItemDropBuilder;
@@ -191,7 +192,17 @@ class BattleDrop {
         if ($items->isNotEmpty()) {
 
             $items = collect($items)->reject(function($item) use($character) {
-               return $character->inventory->slots->where('item_id', $item->id)->isNotEmpty();
+               $alreadyHas = $character->inventory->slots->where('item_id', $item->id)->isNotEmpty();
+
+               $questThatNeedsThisItem = Quest::where('item_id', $item->id)->orWhere('secondary_required_item', $item->id)->first();
+
+                if (!is_null($questThatNeedsThisItem)) {
+                    $completedQuest = $character->questsCompleted()->where('quest_id', $questThatNeedsThisItem->id)->first();
+
+                    return !is_null($completedQuest);
+                }
+
+                return $alreadyHas;
             });
 
             if ($items->isNotEmpty() && DropCheckCalculator::fetchDifficultItemChance($lootingChance, 100)) {
