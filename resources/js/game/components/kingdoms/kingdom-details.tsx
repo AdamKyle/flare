@@ -1,5 +1,4 @@
 import React, { Fragment } from "react";
-import KingdomDetailsProps from "../../lib/game/kingdoms/types/kingdom-details-props";
 import { formatNumber } from "../../lib/game/format-number";
 import PrimaryOutlineButton from "../../components/ui/buttons/primary-outline-button";
 import DangerOutlineButton from "../../components/ui/buttons/danger-outline-button";
@@ -10,11 +9,12 @@ import BuildingDetails from "./buildings/deffinitions/building-details";
 import GoblinBankModal from "./modals/goblin-bank-modal";
 import AbandonKingdomModal from "./modals/abadnon-kingdom-modal";
 import ManageTreasuryModal from "./modals/manage-treasury-modal";
-import KingdomDetailsState from "../../lib/game/kingdoms/types/kingdom-details-state";
 import SuccessOutlineButton from "../../components/ui/buttons/success-outline-button";
 import CallForReinforcements from "./modals/call-for-reinforcements ";
 import SmelterModal from "./modals/smelter-modal";
 import SpecialtyActionsHelpModal from "./modals/specialty-actions-help-modal";
+import KingdomDetailsProps from "./types/kingdom-details-props";
+import KingdomDetailsState from "./types/kingdom-details-state";
 
 export default class KingdomDetails extends React.Component<
     KingdomDetailsProps,
@@ -33,7 +33,16 @@ export default class KingdomDetails extends React.Component<
             show_call_for_reinforcements: false,
             show_smelter: false,
             show_specialty_help: false,
+            show_resource_transfer: false,
         };
+    }
+
+    componentDidUpdate(prevProps: Readonly<KingdomDetailsProps>, prevState: Readonly<KingdomDetailsState>, snapshot?: any) {
+        if (this.state.show_resource_transfer && this.props.reset_resource_transfer) {
+            this.setState({
+                show_resource_transfer: false,
+            });
+        }
     }
 
     showChangeName() {
@@ -71,6 +80,14 @@ export default class KingdomDetails extends React.Component<
         });
     }
 
+    showRequestServices() {
+        this.setState({
+            show_resource_transfer: !this.state.show_resource_transfer,
+        }, () => {
+            this.props.show_resource_transfer_card();
+        });
+    }
+
     showCallForReinforcements() {
         this.setState({
             show_call_for_reinforcements:
@@ -82,10 +99,6 @@ export default class KingdomDetails extends React.Component<
         this.setState({
             show_smelter: !this.state.show_smelter,
         });
-    }
-
-    abandonedKingdom() {
-        this.props.close_details();
     }
 
     canManageGoldBars(): boolean {
@@ -256,6 +269,10 @@ export default class KingdomDetails extends React.Component<
                                 on_click={this.showCallForReinforcements.bind(
                                     this,
                                 )}
+                            />
+                            <SuccessOutlineButton
+                                button_label={"Request Resources"}
+                                on_click={this.showRequestServices.bind(this)}
                             />
                             <PrimaryOutlineButton
                                 button_label={"Buy Population"}

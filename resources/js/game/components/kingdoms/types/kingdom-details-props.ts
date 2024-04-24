@@ -6,4 +6,8 @@ export default interface KingdomDetailsProps {
     character_gold: number;
 
     close_details: () => void;
+
+    show_resource_transfer_card: () => void;
+
+    reset_resource_transfer: boolean;
 }

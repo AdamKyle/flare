@@ -1,4 +1,5 @@
-import BuildingDetails from "../../../../sections/kingdoms/buildings/deffinitions/building-details";
+import BuildingDetails from "../buildings/deffinitions/building-details";
+
 
 export default interface KingdomDetailsState {
     show_change_name_modal: boolean;
@@ -18,4 +19,6 @@ export default interface KingdomDetailsState {
     show_specialty_help: boolean;
 
     goblin_bank_building: BuildingDetails | null;
+
+    show_resource_transfer: boolean;
 }

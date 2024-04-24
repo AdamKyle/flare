@@ -7,14 +7,15 @@ import Ajax from "../../lib/ajax/ajax";
 import { serviceContainer } from "../../lib/containers/core-container";
 import UpdateKingdomListeners from "../../lib/game/event-listeners/game/update-kingdom-listeners";
 import KingdomEventListener from "../../lib/game/event-listeners/kingdom-event-listener";
-import BuildingInQueueDetails from "../../lib/game/kingdoms/deffinitions/building-in-queue-details";
-import UnitDetails from "../../lib/game/kingdoms/deffinitions/unit-details";
-import UnitsInQueue from "../../lib/game/kingdoms/deffinitions/units-in-queue";
-import KingdomProps from "../../lib/game/kingdoms/types/kingdom-props";
 import BuildingDetails from "./buildings/deffinitions/building-details";
 import InformationSection from "./information-section";
 import KingdomDetails from "./kingdom-details";
 import KingdomTabs from "./tabs/kingdom-tabs";
+import KingdomProps from "./types/kingdom-props";
+import UnitDetails from "./deffinitions/unit-details";
+import BuildingInQueueDetails from "./deffinitions/building-in-queue-details";
+import UnitsInQueue from "./deffinitions/units-in-queue";
+import KingdomResourceTransfer from "./kingdom-resource-transfer";
 
 export default class Kingdom extends React.Component<KingdomProps, any> {
     private updateKingdomListener: KingdomEventListener;
@@ -28,6 +29,8 @@ export default class Kingdom extends React.Component<KingdomProps, any> {
             unit_to_view: null,
             error_message: null,
             kingdom: null,
+            show_resource_transfer_panel: false,
+            should_reset_resource_transfer: false,
         };
 
         this.updateKingdomListener =
@@ -125,6 +128,13 @@ export default class Kingdom extends React.Component<KingdomProps, any> {
         );
     }
 
+    showResourceTransferPanel() {
+        this.setState({
+            show_resource_transfer_panel: !this.state.show_resource_transfer_panel,
+            should_reset_resource_transfer: this.state.show_resource_transfer_panel
+        });
+    }
+
     render() {
         if (this.state.loading && this.state.kingdom === null) {
             return <LoadingProgressBar />;
@@ -140,18 +150,33 @@ export default class Kingdom extends React.Component<KingdomProps, any> {
                     </InfoAlert>
                 ) : null}
                 <div className="grid md:grid-cols-2 gap-4">
-                    <BasicCard additionalClasses={"max-h-[700px]"}>
-                        <div className="text-right cursor-pointer text-red-500">
-                            <button onClick={this.props.close_details}>
-                                <i className="fas fa-minus-circle"></i>
-                            </button>
-                        </div>
-                        <KingdomDetails
-                            kingdom={this.state.kingdom}
-                            character_gold={this.props.character_gold}
-                            close_details={this.props.close_details}
-                        />
-                    </BasicCard>
+                    {
+                        this.state.show_resource_transfer_panel ?
+                            <BasicCard additionalClasses={"max-h-[700px]"}>
+                                <div className="text-right cursor-pointer text-red-500">
+                                    <button onClick={this.showResourceTransferPanel.bind(this)}>
+                                        <i className="fas fa-minus-circle"></i>
+                                    </button>
+                                </div>
+                                <KingdomResourceTransfer character_id={this.props.kingdom.character_id} kingdom_id={this.props.kingdom.id} />
+                            </BasicCard>
+                        :
+                            <BasicCard additionalClasses={"max-h-[700px]"}>
+                                <div className="text-right cursor-pointer text-red-500">
+                                    <button onClick={this.props.close_details}>
+                                        <i className="fas fa-minus-circle"></i>
+                                    </button>
+                                </div>
+                                <KingdomDetails
+                                    kingdom={this.state.kingdom}
+                                    character_gold={this.props.character_gold}
+                                    close_details={this.props.close_details}
+                                    show_resource_transfer_card={this.showResourceTransferPanel.bind(this)}
+                                    reset_resource_transfer={this.state.should_reset_resource_transfer}
+                                />
+                            </BasicCard>
+                    }
+
 
                     <div>
                         {this.state.building_to_view !== null ||
