@@ -191,18 +191,18 @@ class BattleDrop {
 
         if ($items->isNotEmpty()) {
 
-            $items = collect($items)->reject(function($item) use($character) {
-               $alreadyHas = $character->inventory->slots->where('item_id', $item->id)->isNotEmpty();
+            $items = collect($items)->filter(function($item) use($character) {
+               $doesntHave = $character->inventory->slots->where('item_id', '=', $item->id)->isEmpty();
 
                $questThatNeedsThisItem = Quest::where('item_id', $item->id)->orWhere('secondary_required_item', $item->id)->first();
 
                 if (!is_null($questThatNeedsThisItem)) {
                     $completedQuest = $character->questsCompleted()->where('quest_id', $questThatNeedsThisItem->id)->first();
 
-                    return !is_null($completedQuest);
+                    return is_null($completedQuest) && $doesntHave;
                 }
 
-                return $alreadyHas;
+                return $doesntHave;
             });
 
             if ($items->isNotEmpty() && DropCheckCalculator::fetchDifficultItemChance($lootingChance, 100)) {
