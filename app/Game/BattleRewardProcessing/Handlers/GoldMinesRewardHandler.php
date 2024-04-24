@@ -172,9 +172,9 @@ class GoldMinesRewardHandler {
      * @throws Exception
      */
     protected function rewardForCharacter(Character $character, bool $isMythic = false) {
-        $item = Item::whereIsNull('specialty_type')
-            ->whereIsNull('item_prefix_id')
-            ->whereIsNull('item_suffix_id')
+        $item = Item::whereNull('specialty_type')
+            ->whereNull('item_prefix_id')
+            ->whereNull('item_suffix_id')
             ->whereDoesntHave('appliedHolyStacks')
             ->whereNotIn('type', ['alchemy', 'artifact', 'trinket'])
             ->inRandomOrder()
