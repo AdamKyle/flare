@@ -15,7 +15,7 @@ export default class KingdomResourceTransferAjax {
     ): void {
         this.ajax
             .setRoute(
-                "/kingdoms/" +
+                "kingdoms/" +
                     kingdomId +
                     "/" +
                     characterId +
@@ -27,6 +27,7 @@ export default class KingdomResourceTransferAjax {
                     component.setState({
                         loading: false,
                         kingdoms: result.data.kingdoms,
+                        can_go_forward: result.data.kingdoms.length > 1,
                     });
                 },
                 (error: AxiosError) => {

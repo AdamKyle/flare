@@ -2,11 +2,11 @@ import React from "react";
 import Dialogue from "../../../components/ui/dialogue/dialogue";
 import DangerAlert from "../../../components/ui/alerts/simple-alerts/danger-alert";
 import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
-import BuyPopulationModalProps from "../../../lib/game/kingdoms/types/modals/buy-population-modal-props";
-import BuyPopulationModalState from "../../../lib/game/kingdoms/types/modals/buy-population-modal-state";
 import { formatNumber } from "../../../lib/game/format-number";
 import Ajax from "../../../lib/ajax/ajax";
 import { AxiosError, AxiosResponse } from "axios";
+import BuyPopulationModalProps from "../types/modals/buy-population-modal-props";
+import BuyPopulationModalState from "../types/modals/buy-population-modal-state";
 
 export default class BuyPopulationModal extends React.Component<
     BuyPopulationModalProps,

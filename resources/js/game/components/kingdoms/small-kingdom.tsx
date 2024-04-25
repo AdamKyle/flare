@@ -1,12 +1,10 @@
 import React, { Fragment } from "react";
 import BasicCard from "../../components/ui/cards/basic-card";
-import KingdomProps from "../../lib/game/kingdoms/types/kingdom-props";
 import KingdomDetails from "./kingdom-details";
 import Select from "react-select";
 import SmallBuildingsSection from "./buildings/small-buildings-section";
 import SmallUnitsSection from "./units/small-units-section";
 import DangerButton from "../../components/ui/buttons/danger-button";
-import SmallKingdomState from "../../lib/game/kingdoms/types/small-kingdom-state";
 import KingdomEventListener from "../../lib/game/event-listeners/kingdom-event-listener";
 import { serviceContainer } from "../../lib/containers/core-container";
 import UpdateKingdomListeners from "../../lib/game/event-listeners/game/update-kingdom-listeners";
@@ -14,6 +12,9 @@ import Ajax from "../../lib/ajax/ajax";
 import { AxiosError, AxiosResponse } from "axios";
 import LoadingProgressBar from "../../components/ui/progress-bars/loading-progress-bar";
 import DangerAlert from "../../components/ui/alerts/simple-alerts/danger-alert";
+import KingdomProps from "./types/kingdom-props";
+import SmallKingdomState from "./types/small-kingdom-state";
+import KingdomResourceTransfer from "./kingdom-resource-transfer";
 
 export default class SmallKingdom extends React.Component<
     KingdomProps,
@@ -30,6 +31,8 @@ export default class SmallKingdom extends React.Component<
             kingdom: null,
             loading: true,
             error_message: null,
+            show_resource_transfer_panel: false,
+            should_reset_resource_transfer: false,
         };
 
         this.updateKingdomListener =
@@ -123,6 +126,15 @@ export default class SmallKingdom extends React.Component<
         }
     }
 
+    showResourceTransferPanel() {
+        this.setState({
+            show_resource_transfer_panel:
+                !this.state.show_resource_transfer_panel,
+            should_reset_resource_transfer:
+            this.state.show_resource_transfer_panel,
+        });
+    }
+
     render() {
         if (this.state.loading || this.state.kingdom === null) {
             return <LoadingProgressBar />;
@@ -157,28 +169,50 @@ export default class SmallKingdom extends React.Component<
                             </div>
                         </div>
                     ) : (
-                        <Fragment>
-                            <div className="grid grid-cols-2 mb-5">
-                                <span>
-                                    <strong>Kingdom Details</strong>
-                                </span>
-                                <div className="text-right cursor-pointer text-red-500">
-                                    <button
-                                        onClick={this.manageKingdomDetails.bind(
-                                            this,
-                                        )}
-                                    >
-                                        <i className="fas fa-minus-circle"></i>
-                                    </button>
+                        this.state.show_resource_transfer_panel ?
+                            <Fragment>
+                                <div className="grid grid-cols-2 mb-5">
+                                    <span>
+                                        <strong>Kingdom Details</strong>
+                                    </span>
+                                    <div className="text-right cursor-pointer text-red-500">
+                                        <button
+                                            onClick={this.showResourceTransferPanel.bind(
+                                                this,
+                                            )}
+                                        >
+                                            <i className="fas fa-minus-circle"></i>
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
 
-                            <KingdomDetails
-                                kingdom={this.state.kingdom}
-                                character_gold={this.props.character_gold}
-                                close_details={this.props.close_details}
-                            />
-                        </Fragment>
+                                <KingdomResourceTransfer kingdom_id={this.props.kingdom.id} character_id={this.props.kingdom.character_id} />
+                            </Fragment>
+                        :
+                            <Fragment>
+                                <div className="grid grid-cols-2 mb-5">
+                                    <span>
+                                        <strong>Kingdom Details</strong>
+                                    </span>
+                                    <div className="text-right cursor-pointer text-red-500">
+                                        <button
+                                            onClick={this.manageKingdomDetails.bind(
+                                                this,
+                                            )}
+                                        >
+                                            <i className="fas fa-minus-circle"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <KingdomDetails
+                                    kingdom={this.state.kingdom}
+                                    character_gold={this.props.character_gold}
+                                    close_details={this.props.close_details}
+                                    show_resource_transfer_card={this.showResourceTransferPanel.bind(this)}
+                                    reset_resource_transfer={this.state.should_reset_resource_transfer}
+                                />
+                            </Fragment>
                     )}
                 </BasicCard>
 

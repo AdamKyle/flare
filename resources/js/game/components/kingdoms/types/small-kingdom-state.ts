@@ -10,4 +10,8 @@ export default interface SmallKingdomState {
     loading: boolean;
 
     error_message: string | null;
+
+    show_resource_transfer_panel: boolean;
+
+    should_reset_resource_transfer: boolean;
 }

@@ -153,7 +153,7 @@ export default class Kingdom extends React.Component<KingdomProps, any> {
                 ) : null}
                 <div className="grid md:grid-cols-2 gap-4">
                     {this.state.show_resource_transfer_panel ? (
-                        <BasicCard additionalClasses={"max-h-[700px]"}>
+                        <BasicCard>
                             <div className="text-right cursor-pointer text-red-500">
                                 <button
                                     onClick={this.showResourceTransferPanel.bind(

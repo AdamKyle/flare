@@ -14,6 +14,7 @@ use App\Game\Kingdoms\Handlers\ReturnSurvivingUnitHandler;
 use App\Game\Kingdoms\Handlers\SettlerHandler;
 use App\Game\Kingdoms\Service\ExpandResourceBuildingService;
 use App\Game\Kingdoms\Service\KingdomQueueService;
+use App\Game\Kingdoms\Service\ResourceTransferService;
 use App\Game\Kingdoms\Service\SteelSmeltingService;
 use App\Game\Kingdoms\Transformers\KingdomTableTransformer;
 use League\Fractal\Manager;
@@ -55,7 +56,14 @@ class ServiceProvider extends ApplicationServiceProvider {
      * @return void
      */
     public function register(): void {
-        $this->app->bind(KingdomBuilder::class, function($app) {
+
+        $this->app->bind(ResourceTransferService::class, function($app) {
+            return new ResourceTransferService(
+                $app->make(DistanceCalculation::class)
+            );
+        });
+
+        $this->app->bind(KingdomBuilder::class, function() {
             return new KingdomBuilder();
         });
 
