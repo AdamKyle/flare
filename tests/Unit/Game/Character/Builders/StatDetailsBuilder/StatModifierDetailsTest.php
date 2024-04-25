@@ -3,33 +3,40 @@
 namespace Tests\Unit\Game\Character\Builders\StatDetailsBuilder;
 
 use App\Flare\Models\Character;
+use App\Flare\Models\GameClass;
 use App\Flare\Models\GameMap;
 use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\MapNameValue;
+use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Game\Character\Builders\StatDetailsBuilder\StatModifierDetails;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateClass;
 use Tests\Traits\CreateGameClassSpecial;
+use Tests\Traits\CreateGameSkill;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateItemAffix;
 
 class StatModifierDetailsTest extends TestCase {
 
-    use RefreshDatabase, CreateItem, CreateItemAffix, CreateGameClassSpecial, CreateClass;
+    use RefreshDatabase, CreateItem, CreateItemAffix, CreateGameClassSpecial, CreateClass, CreateGameSkill;
 
     private ?CharacterFactory $character;
 
     private ?StatModifierDetails $statModifierDetails;
 
+    private ?GameClass $gameClass;
+
     public function setUp(): void {
         parent::setUp();
 
-        $this->character = (new CharacterFactory())->createBaseCharacter([], $this->createClass([
+        $this->gameClass = $this->createClass([
             'damage_stat' => 'dur',
             'to_hit_stat' => 'dur',
-        ]))->givePlayerLocation();
+        ]);
+
+        $this->character = (new CharacterFactory())->createBaseCharacter([], $this->gameClass)->givePlayerLocation();
 
         $this->statModifierDetails = resolve(StatModifierDetails::class);
     }
@@ -39,6 +46,7 @@ class StatModifierDetailsTest extends TestCase {
 
         $this->character = null;
         $this->statModifierDetails = null;
+        $this->gameClass = null;
     }
 
     public function testGetDetailsForStat() {
@@ -80,13 +88,135 @@ class StatModifierDetailsTest extends TestCase {
 
         $data = $this->statModifierDetails->setCharacter($character)->forStat('dur');
 
-        dump($data['class_specialties']);
-
         $this->assertGreaterThan(0, $data['base_value']);
         $this->assertEmpty($data['items_equipped']);
         $this->assertNull($data['class_specialties']);
         $this->assertNull($data['ancestral_item_skill_data']);
         $this->assertNull($data['map_reduction']);
+    }
+
+    public function testGetHealthDetailsWhenNotVoided() {
+        $character = $this->createCharacterForData($this->character);
+
+        $data = $this->statModifierDetails->setCharacter($character)->buildSpecificBreakDown('health', false);
+
+        $this->assertGreaterThan(0, $data['stat_amount']);
+        $this->assertNotNull($data['class_specialties']);
+    }
+
+    public function testGetHealthDetailsWhenVoided() {
+        $character = $this->createCharacterForData($this->character);
+
+        $data = $this->statModifierDetails->setCharacter($character)->buildSpecificBreakDown('health', true);
+
+        $this->assertGreaterThan(0, $data['stat_amount']);
+        $this->assertNotNull($data['class_specialties']);
+    }
+
+    public function testGetACDetailsWhenNotVoided() {
+        $character = $this->createCharacterForData($this->character);
+
+        $data = $this->statModifierDetails->setCharacter($character)->buildDefenceBreakDown(false);
+
+        $this->assertGreaterThan(0, $data['base_ac']);
+        $this->assertGreaterThan(0, $data['ac_from_items']);
+        $this->assertNotNull($data['class_specialties']);
+        $this->assertNotNull($data['class_bonus_details']);
+        $this->assertNotNull($data['boon_details']);
+        $this->assertNotNull($data['ancestral_item_skill_data']);
+        $this->assertNotEmpty($data['skill_effecting_ac']);
+        $this->assertNotEmpty($data['attached_affixes']);
+    }
+
+    public function testGetACDetailsWhenVoided() {
+        $character = $this->createCharacterForData($this->character);
+
+        $data = $this->statModifierDetails->setCharacter($character)->buildDefenceBreakDown(true);
+
+        $this->assertGreaterThan(0, $data['base_ac']);
+        $this->assertGreaterThan(0, $data['ac_from_items']);
+        $this->assertNotNull($data['class_bonus_details']);
+        $this->assertNotNull($data['class_specialties']);
+        $this->assertNotNull($data['ancestral_item_skill_data']);
+        $this->assertNotEmpty($data['skill_effecting_ac']);
+        $this->assertNotEmpty($data['attached_affixes']);
+    }
+
+    public function testGetACDetailsWhenNotVoidedAndNaked() {
+        $character = $this->character->getCharacter();
+
+        $data = $this->statModifierDetails->setCharacter($character)->buildDefenceBreakDown(false);
+
+        $this->assertGreaterThan(0, $data['base_ac']);
+        $this->assertEquals(0, $data['ac_from_items']);
+        $this->assertNull($data['class_bonus_details']);
+        $this->assertNull($data['class_specialties']);
+        $this->assertNull($data['ancestral_item_skill_data']);
+        $this->assertEmpty($data['skill_effecting_ac']);
+        $this->assertEmpty($data['attached_affixes']);
+    }
+
+    public function testGetDamageForWeaponsWhenNotVoided() {
+        $character = $this->createCharacterForData($this->character);
+
+        $data = $this->statModifierDetails->setCharacter($character)->buildDamageBreakDown('weapon', false);
+
+        $this->assertEquals($character->damage_stat, $data['damage_stat_name']);
+        $this->assertGreaterThan(0, $data['damage_stat_amount']);
+        $this->assertEquals(0, $data['non_equipped_damage_amount']);
+        $this->assertEquals(0, $data['non_equipped_percentage_of_stat_used']);
+        $this->assertEquals(0, $data['spell_damage_stat_amount_to_use']);
+        $this->assertGreaterThan(0, $data['percentage_of_stat_used']);
+        $this->assertGreaterThan(0, $data['base_damage']);
+        $this->assertNotNull($data['class_specialties']);
+        $this->assertNotNull($data['class_bonus_details']);
+        $this->assertNotNull($data['boon_details']);
+        $this->assertNotNull($data['ancestral_item_skill_data']);
+        $this->assertNotEmpty($data['skills_effecting_damage']);
+        $this->assertNotEmpty($data['attached_affixes']);
+        $this->assertNotEmpty($data['masteries']);
+    }
+
+    public function testGetDamageForWeaponsWhenVoided() {
+        $character = $this->createCharacterForData($this->character);
+
+        $data = $this->statModifierDetails->setCharacter($character)->buildDamageBreakDown('weapon', true);
+
+        $this->assertEquals($character->damage_stat, $data['damage_stat_name']);
+        $this->assertGreaterThan(0, $data['damage_stat_amount']);
+        $this->assertEquals(0, $data['non_equipped_damage_amount']);
+        $this->assertEquals(0, $data['non_equipped_percentage_of_stat_used']);
+        $this->assertEquals(0, $data['spell_damage_stat_amount_to_use']);
+        $this->assertGreaterThan(0, $data['percentage_of_stat_used']);
+        $this->assertGreaterThan(0, $data['base_damage']);
+        $this->assertNotNull($data['class_specialties']);
+        $this->assertNotNull($data['class_bonus_details']);
+        $this->assertNotNull($data['boon_details']);
+        $this->assertNotNull($data['ancestral_item_skill_data']);
+        $this->assertNotEmpty($data['skills_effecting_damage']);
+        $this->assertNotEmpty($data['attached_affixes']);
+        $this->assertNotEmpty($data['masteries']);
+    }
+
+    public function testGetDamageForWeaponsWhenNotVoidedAndNaked() {
+        $character = $this->character->getCharacter();
+
+        $data = $this->statModifierDetails->setCharacter($character)->buildDamageBreakDown('weapon', false);
+
+        $this->assertEquals($character->damage_stat, $data['damage_stat_name']);
+        $this->assertGreaterThan(0, $data['damage_stat_amount']);
+        $this->assertGreaterThan(0, $data['non_equipped_damage_amount']);
+        $this->assertGreaterThan(0, $data['non_equipped_percentage_of_stat_used']);
+        $this->assertEquals(0, $data['spell_damage_stat_amount_to_use']);
+        $this->assertGreaterThan(0, $data['percentage_of_stat_used']);
+        $this->assertEquals(0, $data['base_damage']);
+        $this->assertNull($data['class_specialties']);
+        $this->assertNull($data['class_bonus_details']);
+        $this->assertNull($data['boon_details']);
+        $this->assertNull($data['ancestral_item_skill_data']);
+        $this->assertEmpty($data['skills_effecting_damage']);
+        $this->assertEmpty($data['attached_affixes']);
+        $this->assertEmpty($data['masteries']);
     }
 
     private function createCharacterForData(CharacterFactory $characterFactory): Character {
@@ -256,6 +386,25 @@ class StatModifierDetailsTest extends TestCase {
                         )
                         ->giveItem($artifact, true, 'artifact')
                         ->getCharacterFactory()
+                        ->assignSkill($this->createGameSkill([
+                            'description' => 'Test Class Skill',
+                            'name' => 'Class Skill',
+                            'max_level' => 999,
+                            'type' => SkillTypeValue::EFFECTS_CLASS,
+                            'game_class_id' => $this->gameClass->id,
+                            'base_damage_mod_bonus_per_level' => 1.0,
+                            'base_healing_mod_bonus_per_level' => 1.0,
+                            'base_ac_mod_bonus_per_level' => 1.0,
+                            'fight_time_out_mod_bonus_per_level' => 1.0,
+                            'move_time_out_mod_bonus_per_level' => 1.0,
+                            'unit_time_reduction' => 1.0,
+                            'building_time_reduction' => 1.0,
+                            'unit_movement_time_reduction' => 1.0,
+                            'can_train' => 1.0,
+                            'skill_bonus_per_level' => 1.0,
+                            'is_locked' => 1.0,
+                            'class_bonus' => 1.0,
+                        ]))
                         ->getCharacter();
 
         $classSpecial = $this->createGameClassSpecial([

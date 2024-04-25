@@ -193,15 +193,14 @@ class StatModifierDetails {
     private function fetchClassBonusesEffecting(string $attribute): array | null {
         $classBonusSkill = $this->character->skills()
             ->whereHas('baseSkill', function ($query) {
-                $query->whereNotNull('game_class_id');
+                $query->whereNotNull('game_class_id')
+                      ->where('game_class_id', $this->character->game_class_id);
             })
             ->first();
 
-        if (is_null($classBonusSkill)) {
-            return null;
-        }
+        dump($classBonusSkill);
 
-        if ($classBonusSkill->game_class_id !== $this->character->game_class_id) {
+        if (is_null($classBonusSkill)) {
             return null;
         }
 
@@ -304,6 +303,23 @@ class StatModifierDetails {
             }
 
             return $details;
+        } else {
+            $classSpecialties = $this->character->classSpecialsEquipped
+                ->where('equipped', '=', true)
+                ->where($stat . '_mod', '>', 0);
+
+            foreach ($classSpecialties as $classSpecialty) {
+                $details[] = [
+                    'name' => $classSpecialty->gameClassSpecial->name,
+                    'amount' => $classSpecialty->base_damage_stat_increase,
+                ];
+            }
+
+            if (empty($details)) {
+                return null;
+            }
+
+            return $details;
         }
 
         return null;
@@ -318,6 +334,12 @@ class StatModifierDetails {
         $classSpecialties = $this->character->classSpecialsEquipped
             ->where('equipped', '=', true)
             ->where('base_damage_stat_increase', '>', 0);
+
+        $healthSpecialties =  $this->character->classSpecialsEquipped
+            ->where('equipped', '=', true)
+            ->where('health_mod', '>', 0);
+
+        $classSpecialties = $classSpecialties->merge($healthSpecialties);
 
         $details = [];
 

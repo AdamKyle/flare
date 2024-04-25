@@ -98,7 +98,7 @@ class DamageBuilder extends BaseAttribute {
             $baseDamage = $damageStat * 0.15;
 
             $details['base_damage'] = number_format($baseDamage);
-            $details['percentage_of_stat'] = 0.15;
+            $details['percentage_of_stat_used'] = 0.15;
 
         } else if ($this->character->class->type()->isArcaneAlchemist()) {
             $hasStaveEquipped = $this->inventory->filter(function ($slot) {
@@ -109,18 +109,18 @@ class DamageBuilder extends BaseAttribute {
                 $baseDamage = $damageStat * 0.15;
 
                 $details['base_damage'] = number_format($baseDamage);
-                $details['percentage_of_stat'] = 0.15;
+                $details['percentage_of_stat_used'] = 0.15;
             } else {
                 $baseDamage = $damageStat * 0.05;
 
                 $details['base_damage'] = number_format($baseDamage);
-                $details['percentage_of_stat'] = 0.05;
+                $details['percentage_of_stat_used'] = 0.05;
             }
         } else {
             $baseDamage = $damageStat * 0.05;
 
             $details['base_damage'] = number_format($baseDamage);
-            $details['percentage_of_stat'] = 0.05;
+            $details['percentage_of_stat_used'] = 0.05;
         }
 
         $details['skills_effecting_damage'] = null;
@@ -132,6 +132,10 @@ class DamageBuilder extends BaseAttribute {
         $details['attached_affixes'] = $this->getAttributeBonusFromAllItemAffixesDetails('base_damage', $voided);
 
         $details['masteries'] = [];
+
+        if (is_null($this->inventory)) {
+            return $details;
+        }
 
         $slots = $this->inventory->filter(function ($slot) {
             return in_array($slot->item->type, [

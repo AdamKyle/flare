@@ -39,10 +39,10 @@ class ItemSkillProgression extends Model {
         'chr_mod',
         'dur_mod',
         'agi_mod',
-        'base_attack_mod',
+        'base_damage_mod',
         'base_ac_mod',
         'base_healing_mod',
-        
+
     ];
 
     public function getStrModAttribute() {
@@ -73,8 +73,8 @@ class ItemSkillProgression extends Model {
         return $this->getModifierBonus('chr');
     }
 
-    public function getBaseAttackModAttribute() {
-        return $this->getModifierBonus('base_attack');
+    public function getBaseDamageModAttribute() {
+        return $this->getModifierBonus('base_damage');
     }
 
     public function getBaseAcModAttribute() {

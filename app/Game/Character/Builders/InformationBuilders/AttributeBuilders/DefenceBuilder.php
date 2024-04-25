@@ -79,6 +79,11 @@ class DefenceBuilder extends BaseAttribute {
      * @return Collection
      */
     protected function getItemsWithBaseAC(): Collection {
+
+        if (is_null($this->inventory)) {
+            return collect();
+        }
+
         return $this->inventory->filter(function ($slot) {
             return $slot->item->base_ac > 0;
         });

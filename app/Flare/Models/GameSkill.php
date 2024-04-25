@@ -30,10 +30,8 @@ class GameSkill extends Model {
         'unit_time_reduction',
         'building_time_reduction',
         'unit_movement_time_reduction',
-        'required_equipment_type',
         'can_train',
         'skill_bonus_per_level',
-        'game_class_id',
         'is_locked',
         'class_bonus',
     ];
