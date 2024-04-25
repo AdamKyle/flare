@@ -31,6 +31,10 @@ class ClassRanksWeaponMasteriesBuilder extends BaseAttribute {
 
     public function fetchClassMasteryBreakDownForPosition(string $type, string $position): array {
 
+        if (is_null($this->inventory)) {
+            return [];
+        }
+
         $slot = $this->inventory->where('position', $position)->where('item.type', $type)->first();
 
         if (is_null($slot)) {

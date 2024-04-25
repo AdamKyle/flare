@@ -149,7 +149,7 @@ class StatModifierDetails {
                 }
             }
 
-            if ($type === 'spell_damage' && $this->character->classType()->isHeretic()) {
+            if ($type === 'spell-damage' && $this->character->classType()->isHeretic()) {
 
                 $value = $damageStatAmount * 0.15;
 
@@ -197,8 +197,6 @@ class StatModifierDetails {
                       ->where('game_class_id', $this->character->game_class_id);
             })
             ->first();
-
-        dump($classBonusSkill);
 
         if (is_null($classBonusSkill)) {
             return null;
