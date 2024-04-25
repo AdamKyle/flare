@@ -9,15 +9,15 @@ import TabPanel from "../../components/ui/tabs/tab-panel";
 import Tabs from "../../components/ui/tabs/tabs";
 import Ajax from "../../lib/ajax/ajax";
 import { watchForDarkModeTableChange } from "../../lib/game/dark-mode-watcher";
-import KingdomDetails from "../../lib/game/kingdoms/deffinitions/kingdom-details";
-import KingdomLogDetails from "../../lib/game/kingdoms/deffinitions/kingdom-log-details";
-import KingdomListProps from "../../lib/game/kingdoms/types/kingdom-list-props";
-import KingdomListState from "../../lib/game/kingdoms/types/kingdom-list-state";
 import Kingdom from "./kingdom";
 import KingdomLogDetailsView from "./kingdom-log-details";
 import SmallKingdom from "./small-kingdom";
 import { buildKingdomsColumns } from "./table-columns/build-kingdoms-columns";
 import { buildLogsColumns } from "./table-columns/build-logs-columns";
+import KingdomListProps from "./types/kingdom-list-props";
+import KingdomListState from "./types/kingdom-list-state";
+import KingdomDetails from "./deffinitions/kingdom-details";
+import KingdomLogDetails from "./deffinitions/kingdom-log-details";
 
 export default class KingdomsList extends React.Component<
     KingdomListProps,
