@@ -131,7 +131,7 @@ export default class SmallKingdom extends React.Component<
             show_resource_transfer_panel:
                 !this.state.show_resource_transfer_panel,
             should_reset_resource_transfer:
-            this.state.show_resource_transfer_panel,
+                this.state.show_resource_transfer_panel,
         });
     }
 
@@ -168,51 +168,57 @@ export default class SmallKingdom extends React.Component<
                                 </button>
                             </div>
                         </div>
+                    ) : this.state.show_resource_transfer_panel ? (
+                        <Fragment>
+                            <div className="grid grid-cols-2 mb-5">
+                                <span>
+                                    <strong>Kingdom Details</strong>
+                                </span>
+                                <div className="text-right cursor-pointer text-red-500">
+                                    <button
+                                        onClick={this.showResourceTransferPanel.bind(
+                                            this,
+                                        )}
+                                    >
+                                        <i className="fas fa-minus-circle"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <KingdomResourceTransfer
+                                kingdom_id={this.props.kingdom.id}
+                                character_id={this.props.kingdom.character_id}
+                            />
+                        </Fragment>
                     ) : (
-                        this.state.show_resource_transfer_panel ?
-                            <Fragment>
-                                <div className="grid grid-cols-2 mb-5">
-                                    <span>
-                                        <strong>Kingdom Details</strong>
-                                    </span>
-                                    <div className="text-right cursor-pointer text-red-500">
-                                        <button
-                                            onClick={this.showResourceTransferPanel.bind(
-                                                this,
-                                            )}
-                                        >
-                                            <i className="fas fa-minus-circle"></i>
-                                        </button>
-                                    </div>
+                        <Fragment>
+                            <div className="grid grid-cols-2 mb-5">
+                                <span>
+                                    <strong>Kingdom Details</strong>
+                                </span>
+                                <div className="text-right cursor-pointer text-red-500">
+                                    <button
+                                        onClick={this.manageKingdomDetails.bind(
+                                            this,
+                                        )}
+                                    >
+                                        <i className="fas fa-minus-circle"></i>
+                                    </button>
                                 </div>
+                            </div>
 
-                                <KingdomResourceTransfer kingdom_id={this.props.kingdom.id} character_id={this.props.kingdom.character_id} />
-                            </Fragment>
-                        :
-                            <Fragment>
-                                <div className="grid grid-cols-2 mb-5">
-                                    <span>
-                                        <strong>Kingdom Details</strong>
-                                    </span>
-                                    <div className="text-right cursor-pointer text-red-500">
-                                        <button
-                                            onClick={this.manageKingdomDetails.bind(
-                                                this,
-                                            )}
-                                        >
-                                            <i className="fas fa-minus-circle"></i>
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <KingdomDetails
-                                    kingdom={this.state.kingdom}
-                                    character_gold={this.props.character_gold}
-                                    close_details={this.props.close_details}
-                                    show_resource_transfer_card={this.showResourceTransferPanel.bind(this)}
-                                    reset_resource_transfer={this.state.should_reset_resource_transfer}
-                                />
-                            </Fragment>
+                            <KingdomDetails
+                                kingdom={this.state.kingdom}
+                                character_gold={this.props.character_gold}
+                                close_details={this.props.close_details}
+                                show_resource_transfer_card={this.showResourceTransferPanel.bind(
+                                    this,
+                                )}
+                                reset_resource_transfer={
+                                    this.state.should_reset_resource_transfer
+                                }
+                            />
+                        </Fragment>
                     )}
                 </BasicCard>
 
