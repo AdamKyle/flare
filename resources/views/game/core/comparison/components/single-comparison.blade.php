@@ -29,7 +29,7 @@
                 @if (in_array($key, $nonFloat))
                     <dd class="{{$value > 0 ? 'text-green-700 dark:text-green-600' : 'text-red-700 dark:text-red-600'}}">{{number_format($value)}}</dd>
                 @else
-                    <dd class="{{$value > 0 ? 'text-green-700 dark:text-green-600' : 'text-red-700 dark:text-red-600'}}">{{$value * 100}} %</dd>
+                    <dd class="{{$value > 0 ? 'text-green-700 dark:text-green-600' : 'text-red-700 dark:text-red-600'}}">{{(float) $value * 100}} %</dd>
                 @endif
             @endif
         @endif
