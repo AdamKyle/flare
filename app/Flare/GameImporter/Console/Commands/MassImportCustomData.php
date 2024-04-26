@@ -39,48 +39,12 @@ class MassImportCustomData extends Command {
      */
     public function handle() {
 
-        GlobalEventGoal::truncate();
-        GlobalEventParticipation::truncate();
-        GlobalEventKill::truncate();
+        Artisan::call('import:game-data "Kingdom Passive Skills"');
 
-        $correctOrder = [
-            "Twisted Memories.jpeg",
-            "Delusional Memories.jpeg",
-        ];
-
-        $this->importGameMaps($correctOrder);
-
-        // Some of these locations have items that are required:
-        Artisan::call('import:game-data "Locations Give Items"');
-
-        Artisan::call('import:game-data Skills');
-        Artisan::call('import:game-data Items');
-
-        Artisan::call('import:game-data "Locations Give Items"');
-
-        Artisan::call('import:game-data Monsters');
-        Artisan::call('import:game-data Locations');
-        Artisan::call('import:game-data Npcs');
-        Artisan::call('import:game-data Raids');
-        Artisan::call('import:game-data Quests');
-
-        // Due to the way quests are ordered, and their dependencies on other quests we have to double import to make
-        // sure all relationships are properly setup.
-        Artisan::call('import:game-data Quests');
-
-        Artisan::call('import:game-data "Admin Section"');
-
-        Artisan::call('assign:new-factions-to-characters');
-        Artisan::call('change:feature-types-on-quests');
-        Artisan::call('give:new-slots-quest-item');
-        Artisan::call('allow:traverse-for-maps');
-
-        Artisan::call('balance:monsters');
+        Artisan::call('assign:new-skills');
         Artisan::call('create:character-attack-data');
         Artisan::call('generate:monster-cache');
         Artisan::call('create:quest-cache');
-
-        Artisan::call('import:game-data "."');
 
         $this->importInformationSection();
     }

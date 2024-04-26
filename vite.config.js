@@ -25,4 +25,9 @@ export default defineConfig({
             tsconfig: 'tsconfig.json'
         }
     },
+    resolve: {
+        alias: {
+            '@mui': '/node_modules/@mui',
+        },
+    },
 });

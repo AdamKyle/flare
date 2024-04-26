@@ -156,6 +156,11 @@ class EventSchedulerService {
             Compete against each other and the last person standing wins a mythic! Afterwords the Celestial Kings will spawn and they even have a chance
             to drop mythics! Players can enrol in PVP from the action section roughly 8 hours before the actual event.';
         }
+
+        if ($type->isWeeklyFactionLoyaltyEvent()) {
+            return 'Once per week players can participate in Faction Loyalty Event where they get 2 points i their faction loyalty tasks be they bounty or crafting.
+            When a player levels up the fame with an NPC of the faction they are pledged to, the new levels requirements will be halved.';
+        }
     }
 
     protected function createEvents(EventType $eventType, array $eventData, int $amount, string $type): Carbon {

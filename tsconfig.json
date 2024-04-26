@@ -8,6 +8,9 @@
         "removeComments": true,
         "sourceMap": true,
         "baseUrl": "./",
+        "paths": {
+            "@mui/*": ["node_modules/@mui/*/"]
+        },
         "strict": true,                 // Enable strict type-checking options
         "skipLibCheck": false,          // Skip type checking of declaration files
         "noImplicitAny": true,
