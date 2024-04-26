@@ -21,7 +21,7 @@
     "@types/luxon": "^2.3.0",
     "@vitejs/plugin-react": "^4.2.1",
     "animate.css": "^4.1.1",
-    "axios": "^0.21.1",
+    "axios": "^1.6.8",
     "browser-sync": "^2.26.13",
     "browser-sync-webpack-plugin": "^2.3.0",
     "cross-env": "^5.1",
