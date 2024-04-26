@@ -45,8 +45,10 @@ export default class CoreCharacterStatsSection extends React.Component<
                 (error: AxiosError) => {
                     this.setState({ is_loading: false });
                     if (typeof error.response !== "undefined") {
+                        const response: AxiosResponse = error.response;
+
                         this.setState({
-                            error_message: error.response.data.message,
+                            error_message: response.data.message,
                         });
                     }
                 },

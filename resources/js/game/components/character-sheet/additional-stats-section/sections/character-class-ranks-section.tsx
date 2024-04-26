@@ -2,8 +2,6 @@ import React from "react";
 import { AdditionalInfoProps } from "../../../../sections/character-sheet/components/types/additional-info-props";
 import CharacterClassRanks from "../../../../sections/character-sheet/components/character-class-ranks";
 import CharacterClassRankSpecialtiesSection from "./character-class-rank-specialties-section";
-import Tabs from "../../../ui/tabs/tabs";
-import TabPanel from "../../../ui/tabs/tab-panel";
 import DropDown from "../../../ui/drop-down/drop-down";
 import clsx from "clsx";
 
@@ -11,8 +9,6 @@ export default class CharacterClassRanksSection extends React.Component<
     AdditionalInfoProps,
     any
 > {
-    private tabs: { key: string; name: string }[];
-
     constructor(props: AdditionalInfoProps) {
         super(props);
 
@@ -20,25 +16,6 @@ export default class CharacterClassRanksSection extends React.Component<
             class_rank_type_to_show: "",
             class_special_type_to_show: "",
         };
-
-        this.tabs = [
-            {
-                key: "class-ranks",
-                name: "Class Ranks",
-            },
-            {
-                key: "class-masteries",
-                name: "Class Masteries",
-            },
-        ];
-    }
-
-    whenTabUpdates(index: number) {
-        if (!this.props.when_tab_changes) {
-            return;
-        }
-
-        this.props.when_tab_changes(index, this.tabs);
     }
 
     setFilterTypeForClassRanks(type: string): void {

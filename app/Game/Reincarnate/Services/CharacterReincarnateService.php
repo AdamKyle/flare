@@ -32,7 +32,7 @@ class CharacterReincarnateService {
         }
 
         if ($character->level < $maxLevel) {
-            return $this->errorResult('You must be at max level to reincarnate.');
+            return $this->errorResult('You must be at max level to reincarnate. Max level is 5,000 which you can level to by obtaining the "Sash of the Heavens" from the "Reach for the stars" Labyrinth one off quest');
         }
 
         $completedQuest = $character->questsCompleted()->whereNotNull('quest_id')->get()->filter(function ($completedQuest) {

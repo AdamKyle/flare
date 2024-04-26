@@ -60,8 +60,10 @@ export default class LabyrinthOracle extends React.Component<
                     this.setState({ loading: false });
 
                     if (typeof error.response !== "undefined") {
+                        const response: AxiosResponse = error.response;
+
                         this.setState({
-                            error_message: error.response.data.message,
+                            error_message: response.data.message,
                         });
                     }
                 },
@@ -171,8 +173,10 @@ export default class LabyrinthOracle extends React.Component<
                             this.setState({ transferring: false });
 
                             if (typeof error.response !== "undefined") {
+                                const response: AxiosResponse = error.response;
+
                                 this.setState({
-                                    error_message: error.response.data.message,
+                                    error_message: response.data.message,
                                 });
                             }
                         },
