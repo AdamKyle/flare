@@ -17,6 +17,7 @@ import KingdomDetailsProps from "./types/kingdom-details-props";
 import KingdomDetailsState from "./types/kingdom-details-state";
 import OrangeButton from "../ui/buttons/orange-button";
 import OrangeOutlineButton from "../ui/buttons/orange-outline-button";
+import MakeCityACapitalModal from "./modals/make-city-a-capital-modal";
 
 export default class KingdomDetails extends React.Component<
     KingdomDetailsProps,
@@ -36,6 +37,7 @@ export default class KingdomDetails extends React.Component<
             show_smelter: false,
             show_specialty_help: false,
             show_resource_transfer: false,
+            show_make_capital_city: false,
         };
     }
 
@@ -132,6 +134,12 @@ export default class KingdomDetails extends React.Component<
         this.setState({
             show_specialty_help: !this.state.show_specialty_help,
         });
+    }
+
+    showMakeCapitalCityModal() {
+        this.setState({
+            show_make_capital_city: !this.state.show_make_capital_city,
+        })
     }
 
     render() {
@@ -336,7 +344,7 @@ export default class KingdomDetails extends React.Component<
                             />
                             <OrangeOutlineButton
                                 button_label={"Make Capital City"}
-                                on_click={() => {}}
+                                on_click={this.showMakeCapitalCityModal.bind(this)}
                             />
                         </div>
                     </div>
@@ -429,6 +437,15 @@ export default class KingdomDetails extends React.Component<
                         handle_close={this.showSpecialtyHelpModal.bind(this)}
                     />
                 ) : null}
+
+                {
+                    this.state.show_make_capital_city ? (
+                        <MakeCityACapitalModal
+                            is_open={true}
+                            handle_close={this.showMakeCapitalCityModal.bind(this)}
+                        />
+                    ) : null
+                }
             </Fragment>
         );
     }

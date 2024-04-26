@@ -20,4 +20,6 @@ export default interface KingdomDetailsState {
     goblin_bank_building: BuildingDetails | null;
 
     show_resource_transfer: boolean;
+
+    show_make_capital_city: boolean;
 }
