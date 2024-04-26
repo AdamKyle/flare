@@ -139,7 +139,7 @@ export default class KingdomDetails extends React.Component<
     showMakeCapitalCityModal() {
         this.setState({
             show_make_capital_city: !this.state.show_make_capital_city,
-        })
+        });
     }
 
     render() {
@@ -344,7 +344,9 @@ export default class KingdomDetails extends React.Component<
                             />
                             <OrangeOutlineButton
                                 button_label={"Make Capital City"}
-                                on_click={this.showMakeCapitalCityModal.bind(this)}
+                                on_click={this.showMakeCapitalCityModal.bind(
+                                    this,
+                                )}
                             />
                         </div>
                     </div>
@@ -438,14 +440,12 @@ export default class KingdomDetails extends React.Component<
                     />
                 ) : null}
 
-                {
-                    this.state.show_make_capital_city ? (
-                        <MakeCityACapitalModal
-                            is_open={true}
-                            handle_close={this.showMakeCapitalCityModal.bind(this)}
-                        />
-                    ) : null
-                }
+                {this.state.show_make_capital_city ? (
+                    <MakeCityACapitalModal
+                        is_open={true}
+                        handle_close={this.showMakeCapitalCityModal.bind(this)}
+                    />
+                ) : null}
             </Fragment>
         );
     }
