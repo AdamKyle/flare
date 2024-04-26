@@ -56,28 +56,34 @@ export default class SpecialtyActionsHelpModal extends React.Component<
                     <div className="my-4">
                         <h3 className="my-3">Resource Request</h3>
                         <p className="mb-2">
-                            Allows you to request resources from a single kingdom. If players select to use an Airship,
-                            the amount of resources
-                            to be transferred can be 10,000 of any or all types. The base amount is 5,000. Players must
-                            own a Market Place in both kingdoms
-                            which can be unlocked via a passive skill called "Moving Resources".
+                            Allows you to request resources from a single
+                            kingdom. If players select to use an Airship, the
+                            amount of resources to be transferred can be 10,000
+                            of any or all types. The base amount is 5,000.
+                            Players must own a Market Place in both kingdoms
+                            which can be unlocked via a passive skill called
+                            "Moving Resources".
                         </p>
                     </div>
 
                     <div className="my-4">
                         <h3 className="my-3">Capital City</h3>
                         <p className="mb-2">
-                            Players can create a Capital City by selecting one kingdom for each plane, to be their
-                            capital city.
-                            From here, the button will change to be called: "Chancellors Quarters". This allows players
-                            to manage various aspects of all kingdoms
-                            on the same plane as that capital city, from upgrading, repeating buildings and recruiting
-                            units and instruct them to be walked, so they don't become
+                            Players can create a Capital City by selecting one
+                            kingdom for each plane, to be their capital city.
+                            From here, the button will change to be called:
+                            "Chancellors Quarters". This allows players to
+                            manage various aspects of all kingdoms on the same
+                            plane as that capital city, from upgrading,
+                            repeating buildings and recruiting units and
+                            instruct them to be walked, so they don't become
                             abandoned.
                         </p>
                         <p className="mb-2">
-                            Players must unlock the passive: "Creating a Realm" and level it up to level one after they complete a small quest line called:
-                            "The Realm is Mine" which starts in Dungeons.
+                            Players must unlock the passive: "Creating a Realm"
+                            and level it up to level one after they complete a
+                            small quest line called: "The Realm is Mine" which
+                            starts in Dungeons.
                         </p>
                     </div>
                 </div>
