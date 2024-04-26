@@ -12,7 +12,6 @@ import FetchGameData from "./lib/game/ajax/FetchGameData";
 import CharacterCurrenciesType from "./lib/game/character/character-currencies-type";
 import GameEventListeners from "./lib/game/event-listeners/game-event-listeners";
 import { removeCommas } from "./lib/game/format-number";
-import KingdomLogDetails from "./lib/game/kingdoms/deffinitions/kingdom-log-details";
 import GameProps from "./lib/game/types/game-props";
 import GameState, { GameActionState } from "./lib/game/types/game-state";
 import QuestType from "./lib/game/types/quests/quest-type";
@@ -33,6 +32,7 @@ import MapTabs from "./sections/map/map-tabs";
 import MapState from "./sections/map/types/map-state";
 import PositionType from "./sections/map/types/map/position-type";
 import ScreenRefresh from "./sections/screen-refresh/screen-refresh";
+import KingdomLogDetails from "./components/kingdoms/deffinitions/kingdom-log-details";
 
 export default class Game extends React.Component<GameProps, GameState> {
     private gameEventListener?: GameEventListeners;

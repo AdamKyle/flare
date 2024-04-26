@@ -161,7 +161,7 @@ class StatModifierDetails {
         $details['class_bonus_details']       = $type === 'ring' ? null : $this->fetchClassBonusesEffecting('base_damage');
         $details['boon_details']              = $type === 'ring' ? null : $this->fetchBoonDetails('base_damage');
         $details['class_specialties']         = $type === 'ring' ? null : $this->fetchClassRankSpecialtiesDetails('base_damage');
-        $details['ancestral_item_skill_data'] = $this->fetchAncestralItemSkills('base_damage');
+        $details['ancestral_item_skill_data'] = $type === 'ring' ? null : $this->fetchAncestralItemSkills('base_damage');
 
         $typeAttributes = [];
 

@@ -15,6 +15,8 @@ import SmelterModal from "./modals/smelter-modal";
 import SpecialtyActionsHelpModal from "./modals/specialty-actions-help-modal";
 import KingdomDetailsProps from "./types/kingdom-details-props";
 import KingdomDetailsState from "./types/kingdom-details-state";
+import OrangeButton from "../ui/buttons/orange-button";
+import OrangeOutlineButton from "../ui/buttons/orange-outline-button";
 
 export default class KingdomDetails extends React.Component<
     KingdomDetailsProps,
@@ -280,10 +282,6 @@ export default class KingdomDetails extends React.Component<
                                     this,
                                 )}
                             />
-                            <SuccessOutlineButton
-                                button_label={"Request Resources"}
-                                on_click={this.showRequestServices.bind(this)}
-                            />
                             <PrimaryOutlineButton
                                 button_label={"Buy Population"}
                                 on_click={this.showBuyPop.bind(this)}
@@ -331,6 +329,14 @@ export default class KingdomDetails extends React.Component<
                                 button_label={"Manage Gold Bars"}
                                 on_click={this.showGoblinBank.bind(this)}
                                 disabled={this.canManageGoldBars()}
+                            />
+                            <SuccessOutlineButton
+                                button_label={"Request Resources"}
+                                on_click={this.showRequestServices.bind(this)}
+                            />
+                            <OrangeOutlineButton
+                                button_label={"Make Capital City"}
+                                on_click={() => {}}
                             />
                         </div>
                     </div>
