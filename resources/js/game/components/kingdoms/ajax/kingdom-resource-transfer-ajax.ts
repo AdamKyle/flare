@@ -27,7 +27,7 @@ export default class KingdomResourceTransferAjax {
                     component.setState({
                         loading: false,
                         kingdoms: result.data.kingdoms,
-                        can_go_forward: result.data.kingdoms.length > 1,
+                        can_go_forward: result.data.kingdoms.length >= 2,
                     });
                 },
                 (error: AxiosError) => {

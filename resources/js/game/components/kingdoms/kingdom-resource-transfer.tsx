@@ -6,6 +6,9 @@ import { formatNumber } from "../../lib/game/format-number";
 import PrimaryButton from "../ui/buttons/primary-button";
 import DropDown from "../ui/drop-down/drop-down";
 import DangerButton from "../ui/buttons/danger-button";
+import { startCase } from "lodash";
+import SuccessButton from "../ui/buttons/success-button";
+import Select from "react-select";
 
 export default class KingdomResourceTransfer extends React.Component<any, any> {
     private kingdomResourceTransferRequestAjax: KingdomResourceTransferAjax;
@@ -19,7 +22,10 @@ export default class KingdomResourceTransfer extends React.Component<any, any> {
             kingdoms: [],
             index_to_view: 0,
             can_go_back: false,
-            can_fo_forward: true,
+            can_go_forward: true,
+            amount_of_resources: "",
+            type: null,
+            use_air_ship: false,
         };
 
         this.kingdomResourceTransferRequestAjax = serviceContainer().fetch(
@@ -35,14 +41,155 @@ export default class KingdomResourceTransfer extends React.Component<any, any> {
         );
     }
 
+    setAmountToRequest(e: React.ChangeEvent<HTMLInputElement>) {
+        let value = parseInt(e.target.value) || 0;
+
+        this.setState(
+            {
+                amount_of_resources: value > 0 ? value : "",
+            },
+            () => {
+                if (value > 0) {
+                    this.setState({
+                        can_go_back: false,
+                        can_go_forward: false,
+                    });
+                } else {
+                    this.setState({
+                        can_go_back: false,
+                        can_go_forward: true,
+                    });
+                }
+            },
+        );
+    }
+
+    useAirShip(e: React.ChangeEvent<HTMLInputElement>) {
+        const value = e.target.checked;
+
+        this.setState(
+            {
+                use_air_ship: value,
+            },
+            () => {
+                if (value) {
+                    this.setState({
+                        can_go_back: false,
+                        can_go_forward: false,
+                    });
+                } else if (this.state.amount_of_resources === "") {
+                    this.setState({
+                        can_go_back: false,
+                        can_go_forward: true,
+                    });
+                }
+            },
+        );
+    }
+
+    setTypeOfResourceToRequest(type: string) {
+        this.setState({
+            type: type,
+        });
+    }
+
+    clearEntry() {
+        this.setState({
+            type: null,
+            amount_of_resources: "",
+            use_air_ship: false,
+            can_go_back: false,
+            can_go_forward: true,
+        });
+    }
+
+    goForward() {
+        let newIndex = this.state.index_to_view + 1;
+
+        if (typeof this.state.kingdoms[newIndex] !== "undefined") {
+            this.setState({
+                index_to_view: newIndex,
+                can_go_back: this.canGoBackward(newIndex),
+                can_go_forward: this.canGoForward(newIndex),
+            });
+        }
+    }
+
+    goBack() {
+        let newIndex = this.state.index_to_view - 1;
+
+        if (typeof this.state.kingdoms[newIndex] !== "undefined") {
+            this.setState({
+                index_to_view: newIndex,
+                can_go_back: this.canGoBackward(newIndex),
+                can_go_forward: this.canGoForward(newIndex),
+            });
+        }
+    }
+
+    canGoForward(index: number) {
+        return typeof this.state.kingdoms[index + 1] !== "undefined";
+    }
+
+    canGoBackward(index: number) {
+        return typeof this.state.kingdoms[index - 1] !== "undefined";
+    }
+
+    createKingdomNameOptions() {
+        return this.state.kingdoms.map((kingdom: any, index: number) => {
+            return {
+                label: kingdom.kingdom_name,
+                value: index,
+            };
+        });
+    }
+
+    setKingdomToView(data: any) {
+        const index = parseInt(data.value) || 0;
+
+        if (index > 0) {
+            if (typeof this.state.kingdoms[index] !== "undefined") {
+                this.setState({
+                    index_to_view: index,
+                    can_go_back: this.canGoBackward(index),
+                    can_go_forward: this.canGoForward(index),
+                });
+            }
+        }
+    }
+
+    defaultKingdomSelection() {
+        const kingdom = this.state.kingdoms[this.state.index_to_view];
+
+        return {
+            label: kingdom.kingdom_name,
+            value: this.state.index_to_view,
+        };
+    }
+
     renderKingdomDetailsForIndex(index: number) {
         const kingdom = this.state.kingdoms[index];
-
         return (
             <div className="grid md:grid-cols-2 gap-2">
                 <dl>
                     <dt>Name</dt>
-                    <dd>{kingdom.kingdom_name}</dd>
+                    <dd>
+                        <Select
+                            onChange={this.setKingdomToView.bind(this)}
+                            options={this.createKingdomNameOptions()}
+                            menuPosition={"absolute"}
+                            menuPlacement={"bottom"}
+                            styles={{
+                                menuPortal: (base) => ({
+                                    ...base,
+                                    zIndex: 9999,
+                                    color: "#000000",
+                                }),
+                            }}
+                            menuPortalTarget={document.body}
+                            value={this.defaultKingdomSelection()}
+                        />
+                    </dd>
                     <dt>X/Y</dt>
                     <dd>
                         {kingdom.x_position}/{kingdom.y_position}
@@ -67,9 +214,32 @@ export default class KingdomResourceTransfer extends React.Component<any, any> {
         );
     }
 
+    sendOffRequest() {
+        const kingdom = this.state.kingdoms[this.state.index_to_view];
+
+        const params = {
+            amount_of_resources: this.state.amount_of_resources,
+            type_of_resource: this.state.type,
+            use_ait_ship: this.state.use_air_ship,
+            from_kingdom_id: kingdom.kingdom_id,
+        };
+
+        console.log(params);
+    }
+
     render() {
         if (this.state.loading) {
             return <LoadingProgressBar />;
+        }
+
+        if (this.state.kingdoms.length <= 0) {
+            return (
+                <p>
+                    You have no other kingdoms on this plane to request
+                    resources for. Or you have no other kingdoms on this plane,
+                    who have Market Places built.
+                </p>
+            );
         }
 
         return (
@@ -93,6 +263,9 @@ export default class KingdomResourceTransfer extends React.Component<any, any> {
                                 this.state.index_to_view,
                             )}
                             <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2"></div>
+                            <p className="text-red-700 dark:text-red-500 italic my-2 text-center">
+                                These two fields are the only required fields.
+                            </p>
                             <div className="flex items-center mb-5">
                                 <label className="w-1/3">
                                     Amount to transfer
@@ -100,10 +273,13 @@ export default class KingdomResourceTransfer extends React.Component<any, any> {
                                 <div className="w-1/3">
                                     <input
                                         type="number"
-                                        value={0}
-                                        onChange={() => {}}
+                                        value={this.state.amount_of_resources}
+                                        onChange={this.setAmountToRequest.bind(
+                                            this,
+                                        )}
                                         className="form-control"
                                         disabled={this.state.loading}
+                                        min={0}
                                     />
                                 </div>
                                 <div className="w-1/3">
@@ -114,36 +290,57 @@ export default class KingdomResourceTransfer extends React.Component<any, any> {
                                                     name: "Wood",
                                                     icon_class:
                                                         "fas fa-shopping-bag",
-                                                    on_click: () => () => {},
+                                                    on_click: () =>
+                                                        this.setTypeOfResourceToRequest(
+                                                            "wood",
+                                                        ),
                                                 },
                                                 {
                                                     name: "Clay",
                                                     icon_class:
                                                         "ra ra-bubbling-potion",
-                                                    on_click: () => () => {},
+                                                    on_click: () =>
+                                                        this.setTypeOfResourceToRequest(
+                                                            "clay",
+                                                        ),
                                                 },
                                                 {
                                                     name: "Stone",
                                                     icon_class: "fas fa-gem",
-                                                    on_click: () => () => {},
+                                                    on_click: () =>
+                                                        this.setTypeOfResourceToRequest(
+                                                            "stone",
+                                                        ),
                                                 },
                                                 {
                                                     name: "Iron",
                                                     icon_class: "fas fa-gem",
-                                                    on_click: () => () => {},
+                                                    on_click: () =>
+                                                        this.setTypeOfResourceToRequest(
+                                                            "iron",
+                                                        ),
                                                 },
                                                 {
                                                     name: "Steel",
                                                     icon_class: "fas fa-gem",
-                                                    on_click: () => () => {},
+                                                    on_click: () =>
+                                                        this.setTypeOfResourceToRequest(
+                                                            "steel",
+                                                        ),
                                                 },
                                                 {
                                                     name: "All",
                                                     icon_class: "fas fa-gem",
-                                                    on_click: () => () => {},
+                                                    on_click: () =>
+                                                        this.setTypeOfResourceToRequest(
+                                                            "all",
+                                                        ),
                                                 },
                                             ]}
-                                            button_title={"Selected: Wood"}
+                                            button_title={
+                                                "Selected: " +
+                                                (this.state.type ?? "None")
+                                            }
                                             selected_name={""}
                                             disabled={false}
                                         />
@@ -158,7 +355,7 @@ export default class KingdomResourceTransfer extends React.Component<any, any> {
                                 <div>
                                     <input
                                         type="checkbox"
-                                        onChange={() => {}}
+                                        onChange={this.useAirShip.bind(this)}
                                         className="form-checkbox"
                                         disabled={this.state.loading}
                                     />
@@ -169,33 +366,48 @@ export default class KingdomResourceTransfer extends React.Component<any, any> {
                             <dl>
                                 <dt>Amount:</dt>
                                 <dd className="text-green-700 dark:text-green-500">
-                                    +9999
+                                    {this.state.amount_of_resources}
                                 </dd>
-                                <dt>For Type:</dt>
+                                <dt>For Resource:</dt>
                                 <dd className="text-orange-700 dark:text-orange-500">
-                                    All
+                                    {this.state.type === null
+                                        ? "None selected"
+                                        : startCase(this.state.type)}
                                 </dd>
                                 <dt>Use Air Ship</dt>
-                                <dd>Yes</dd>
+                                <dd>
+                                    {this.state.use_air_ship ? "Yes" : "No"}
+                                </dd>
                                 <dt>Population Cost</dt>
                                 <dd>50</dd>
                             </dl>
                             <DangerButton
                                 button_label={"Clear"}
-                                on_click={() => {}}
+                                on_click={this.clearEntry.bind(this)}
                                 additional_css={"my-3"}
+                            />
+                            <SuccessButton
+                                button_label={"Request"}
+                                on_click={this.sendOffRequest.bind(this)}
+                                additional_css={"my-3 ml-2"}
+                                disabled={
+                                    !(
+                                        this.state.amount_of_resources !== "" &&
+                                        this.state.type !== null
+                                    )
+                                }
                             />
                             <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2"></div>
                             <div className="my-4 flex justify-between">
                                 <PrimaryButton
                                     button_label={"Previous"}
-                                    on_click={() => {}}
+                                    on_click={this.goBack.bind(this)}
                                     disabled={!this.state.can_go_back}
                                 />
                                 <PrimaryButton
                                     button_label={"Next"}
-                                    on_click={() => {}}
-                                    disabled={!this.state.can_fo_forward}
+                                    on_click={this.goForward.bind(this)}
+                                    disabled={!this.state.can_go_forward}
                                 />
                             </div>
                         </div>
