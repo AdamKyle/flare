@@ -36,4 +36,6 @@ export default interface LocationDetails {
     pin_css_class: string | null;
 
     game_map_name: string;
+
+    game_map_id: number;
 }

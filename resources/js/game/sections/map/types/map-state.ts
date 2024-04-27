@@ -13,7 +13,7 @@ export type MapDetails = {
 
     game_map_id: number;
 
-    character_position: { x: number; y: number };
+    character_position: { x: number; y: number; game_map_id: number };
 
     locations: LocationDetails[] | null;
 

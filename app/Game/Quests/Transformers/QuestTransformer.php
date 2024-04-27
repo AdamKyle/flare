@@ -21,6 +21,7 @@ class QuestTransformer extends TransformerAbstract {
         return [
             'id'                  => $quest->id,
             'name'                => $quest->name,
+            'is_parent'           => $quest->is_parent,
             'parent_quest_id'     => $quest->parent_quest_id,
             'required_quest_id'   => $quest->required_quest_id,
             'belongs_to_map_name' => $quest->belongs_to_map_name,

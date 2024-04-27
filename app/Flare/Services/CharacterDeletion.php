@@ -42,12 +42,8 @@ class CharacterDeletion {
             $this->emptyCharacterGemBag($character->gemBag);
         }
 
-        if (!$character->inventorySets->isEmpty()) {
+        if (!is_null($character->inventorySets)) {
             $this->emptyCharacterInventorySets($character->inventorySets);
-        }
-
-        if (!$character->mercenaries->isEmpty()) {
-            $this->removeMercenaries($character->mercenaries);
         }
 
         $this->deleteCharacterMarketListings($character);

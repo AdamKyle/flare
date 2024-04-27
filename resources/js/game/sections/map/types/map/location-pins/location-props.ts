@@ -4,7 +4,7 @@ import CharacterCurrenciesDetails from "../../../../../lib/game/types/character-
 export default interface LocationProps {
     locations: LocationDetails[] | null;
 
-    character_position: { x: number; y: number };
+    character_position: { x: number; y: number; game_map_id: number };
 
     currencies?: CharacterCurrenciesDetails;
 
