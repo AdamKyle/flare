@@ -187,7 +187,10 @@ class BattleDrop {
 
         $lootingChance = $this->lootingChance > 0.45 ? 0.45 : $this->lootingChance;
 
-        $items = Item::where('drop_location_id', $this->locationWithEffect->id)->where('type', 'quest')->get();
+        $items = Item::where('drop_location_id', $this->locationWithEffect->id)
+                      ->whereNull('item_suffix_id')
+                      ->whereNull('item_prefix_id')
+                      ->where('type', 'quest')->get();
 
         if ($items->isNotEmpty()) {
 
@@ -205,7 +208,9 @@ class BattleDrop {
                 return $doesntHave;
             });
 
-            if ($items->isNotEmpty() && DropCheckCalculator::fetchDifficultItemChance($lootingChance, 100)) {
+            $canHave = DropCheckCalculator::fetchDifficultItemChance($lootingChance, 100);
+
+            if ($items->isNotEmpty() && $canHave) {
                 $this->attemptToPickUpItem($character, $items->random());
             }
         }
@@ -351,9 +356,9 @@ class BattleDrop {
             if ($item->type === 'quest') {
                 $message = $character->name . ' has found: ' . $item->affix_name;
 
-                $character->refresh()->inventory->slots()->where('item_id', $item->id)->first();
+                $slot = $character->refresh()->inventory->slots()->where('item_id', $item->id)->first();
 
-                event(new ServerMessageEvent($character->user, 'You found: ' . $item->affix_name . ' on the enemies corpse.', $item->id, true));
+                event(new ServerMessageEvent($character->user, 'You found: ' . $item->affix_name . ' on the enemies corpse.', $slot->id));
 
                 broadcast(new GlobalMessageEvent($message));
             } else {

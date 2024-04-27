@@ -46,6 +46,7 @@ export default class MapSection extends React.Component<MapProps, MapState> {
             character_position: {
                 x: 0,
                 y: 0,
+                game_map_id: 0,
             },
             game_map_id: 0,
             bottom_bounds: 0,

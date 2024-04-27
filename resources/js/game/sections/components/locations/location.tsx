@@ -4,6 +4,7 @@ import LocationPin from "./location-pin";
 import LocationState from "../../map/types/map/location-pins/location-state";
 import LocationModal from "./modals/location-modal";
 import { viewPortWatcher } from "../../../lib/view-port-watcher";
+import LocationDetails from "../../map/types/location-details";
 
 export default class Location extends React.Component<
     LocationProps,
@@ -63,7 +64,11 @@ export default class Location extends React.Component<
             return;
         }
 
-        return this.props.locations.map((location) => {
+        const locations = this.props.locations.filter((location: LocationDetails) => {
+            return location.game_map_id === this.props.character_position.game_map_id;
+        })
+
+        return locations.map((location: LocationDetails) => {
             if (location.pin_css_class !== null) {
                 return (
                     <LocationPin
