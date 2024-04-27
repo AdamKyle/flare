@@ -64,7 +64,7 @@ class CharacterReincarnationServiceTest extends TestCase {
         $result    = $this->reincarnationService->reincarnate($character);
 
         $this->assertEquals(422, $result['status']);
-        $this->assertEquals('You must be at max level to reincarnate.', $result['message']);
+        $this->assertEquals('You must be at max level to reincarnate. Max level is 5,000 which you can level to by obtaining the "Sash of the Heavens" from the "Reach for the stars" Labyrinth one off quest', $result['message']);
     }
 
     public function testCannotReincarnateWhenQuestNotComplete() {
