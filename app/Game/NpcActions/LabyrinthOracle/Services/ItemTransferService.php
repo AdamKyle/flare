@@ -73,6 +73,14 @@ class ItemTransferService {
             return $this->errorResult('You do not have one of these items.');
         }
 
+        if ($itemIdToTransferFrom->item->type === 'quest') {
+            return $this->errorResult('Not allowed to do this for this item type.');
+        }
+
+        if ($itemSlotToTransferTo->item->type === 'quest') {
+            return $this->errorResult('Not allowed to do this for this item type.');
+        }
+
         if ($this->cannotTransferFrom($itemSlotToTransferFrom->item)) {
             return $this->errorResult('This item has nothing on it to transfer from.');
         }
