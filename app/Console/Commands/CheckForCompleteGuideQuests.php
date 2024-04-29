@@ -30,7 +30,7 @@ class CheckForCompleteGuideQuests extends Command {
     public function handle(GuideQuestService $guideQuestService) {
         $userIds = DB::table('sessions')->pluck('user_id');
 
-        User::whereIn('id', $userIds)->chunkById(50, function($users) use ($guideQuestService) {
+        User::whereIn('id', $userIds)->where('guide_enabled', true)->chunkById(50, function($users) use ($guideQuestService) {
             foreach ($users as $user) {
 
                 $character = $user->character;
