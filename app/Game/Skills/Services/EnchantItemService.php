@@ -7,6 +7,7 @@ use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 use App\Flare\Models\ItemAffix;
 use App\Flare\Models\Skill;
+use App\Flare\Values\RandomAffixDetails;
 use App\Game\Skills\Handlers\HandleUpdatingEnchantingGlobalEventGoal;
 use Exception;
 use Facades\App\Game\Core\Handlers\DuplicateItemHandler;
@@ -143,6 +144,28 @@ class EnchantItemService {
         $clonedItem->{'item_' . $affix->type . '_id'} = $affix->id;
         $clonedItem->market_sellable                  = true;
         $clonedItem->parent_id                        = $item->id;
+        $clonedItem->is_mythic                        = false;
+        $clonedItem->is_cosmic                        = false;
+
+        if ($affix->type === 'suffix') {
+            if ($clonedItem->itemPrefix->cost === RandomAffixDetails::MYTHIC) {
+                $clonedItem->item_prefix_id = null;
+            }
+
+            if ($clonedItem->itemPrefix->cost === RandomAffixDetails::COSMIC) {
+                $clonedItem->item_prefix_id = null;
+            }
+        }
+
+        if ($affix->type === 'prefix') {
+            if ($clonedItem->itemSuffix->cost === RandomAffixDetails::MYTHIC) {
+                $clonedItem->item_suffix_id = null;
+            }
+
+            if ($clonedItem->itemSuffix->cost === RandomAffixDetails::COSMIC) {
+                $clonedItem->item_suffix_id = null;
+            }
+        }
 
         $clonedItem->save();
 
