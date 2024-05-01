@@ -3,11 +3,8 @@ import React, { Fragment } from "react";
 import InfoAlert from "../../components/ui/alerts/simple-alerts/info-alert";
 import BasicCard from "../../components/ui/cards/basic-card";
 import { formatNumber } from "../../lib/game/format-number";
-import {
-    BuildingLogDetails,
-    UnitLogDetails,
-} from "../../lib/game/kingdoms/deffinitions/kingdom-log-details";
-import KingdomLogProps from "../../lib/game/kingdoms/types/kingdom-log-props";
+import {BuildingLogDetails, UnitLogDetails} from "./deffinitions/kingdom-log-details";
+import KingdomLogProps from "./types/kingdom-log-props";
 
 export default class KingdomLogDetails extends React.Component<
     KingdomLogProps,

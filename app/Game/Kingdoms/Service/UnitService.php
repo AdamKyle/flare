@@ -14,7 +14,7 @@ use App\Flare\Models\UnitInQueue;
 use App\Flare\Transformers\KingdomTransformer;
 use App\Game\Kingdoms\Events\UpdateKingdomQueues;
 use App\Game\Kingdoms\Handlers\UpdateKingdomHandler;
-use App\Game\Kingdoms\Jobs\RecruitUnits;
+use App\Game\Kingdoms\Jobs\RequestResources;
 use App\Game\Kingdoms\Values\KingdomMaxValue;
 use App\Game\Kingdoms\Values\UnitCosts;
 use App\Game\Skills\Values\SkillTypeValue;
@@ -97,9 +97,9 @@ class UnitService {
         event(new UpdateKingdomQueues($kingdom));
 
         if ($totalTime > 900) {
-            RecruitUnits::dispatch($gameUnit, $kingdom, $amount, $queue->id)->delay(now()->addMinutes(15));
+            RequestResources::dispatch($gameUnit, $kingdom, $amount, $queue->id)->delay(now()->addMinutes(15));
         } else {
-            RecruitUnits::dispatch($gameUnit, $kingdom, $amount, $queue->id)->delay($timeTillFinished);
+            RequestResources::dispatch($gameUnit, $kingdom, $amount, $queue->id)->delay($timeTillFinished);
         }
     }
 

@@ -22,6 +22,7 @@ class BuildingCosts
     const CALVARY              = 'Calvary Training Grounds';
     const BLACKSMITHS_FURNACE  = 'Blacksmith\'s Furnace';
     const AIRSHIP_FIELDS       = 'Airship Fields';
+    const MARKET_PLACE         = 'Market Place';
 
     public static $values = [
         self::KEEP                => self::KEEP,
@@ -39,6 +40,7 @@ class BuildingCosts
         self::CALVARY             => self::CALVARY,
         self::BLACKSMITHS_FURNACE => self::BLACKSMITHS_FURNACE,
         self::AIRSHIP_FIELDS      => self::AIRSHIP_FIELDS,
+        self::MARKET_PLACE        => self::MARKET_PLACE,
     ];
 
     private $name;
@@ -87,57 +89,5 @@ class BuildingCosts
             default:
                 return 0;
         }
-    }
-
-    public function isKeep(): bool {
-        return $this->name === self::KEEP;
-    }
-
-    public function isFarm(): bool {
-        return $this->name === self::FARM;
-    }
-
-    public function isLumberMill(): bool {
-        return $this->name === self::LUMBER_MILL;
-    }
-
-    public function isStoneQuarry(): bool {
-        return $this->name === self::STONE_QUARRY;
-    }
-
-    public function isClayPit(): bool {
-        return $this->name === self::CLAY_PIT;
-    }
-
-    public function isIronMine(): bool {
-        return $this->name === self::IRON_MINE;
-    }
-
-    public function isWalls(): bool {
-        return $this->name === self::WALLS;
-    }
-
-    public function isChurch(): bool {
-        return $this->name === self::CHURCH;
-    }
-
-    public function isSettlersHall(): bool {
-        return $this->name === self::SETTLERS_HALL;
-    }
-
-    public function isGoblinCoinBank(): bool {
-        return $this->name === self::GOBLIN_COIN_BANK;
-    }
-
-    public function isCannoneerShop(): bool {
-        return $this->name === self::CANNONEER_SHOP;
-    }
-
-    public function isCalvary(): bool {
-        return $this->value === self::CALVARY;
-    }
-
-    public function isBlackSmithsFurnace(): bool {
-        return $this->value === self::BLACKSMITHS_FURNACE;
     }
 }

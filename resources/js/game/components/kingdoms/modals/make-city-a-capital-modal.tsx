@@ -1,5 +1,7 @@
 import React, { Fragment } from "react";
 import Dialogue from "../../../components/ui/dialogue/dialogue";
+import LoadingProgressBar from "../../ui/progress-bars/loading-progress-bar";
+import DangerAlert from "../../ui/alerts/simple-alerts/danger-alert";
 
 export default class MakeCityACapitalModal extends React.Component<any, any> {
     constructor(props: any) {
@@ -24,6 +26,14 @@ export default class MakeCityACapitalModal extends React.Component<any, any> {
                     secondary_button_label: "I am sure",
                 }}
             >
+                {
+                    this.state.error_message !== null ?
+                        <DangerAlert additional_css={'my-2'}>
+                            {this.state.error_message}
+                        </DangerAlert>
+                    : null
+                }
+
                 <p className="my-2">
                     Are you sure you want to make this kingdom your capital
                     city? You can only have city per plane as your capital city.
@@ -38,6 +48,13 @@ export default class MakeCityACapitalModal extends React.Component<any, any> {
                     all your other kingdoms on the same plane will loose 55% of
                     their morale. You can reduce this through passive skills.
                 </p>
+
+                {
+                    this.state.loading ?
+                        <LoadingProgressBar />
+                    : null
+                }
+
             </Dialogue>
         );
     }

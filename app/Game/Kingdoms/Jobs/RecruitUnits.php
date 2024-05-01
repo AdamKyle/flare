@@ -83,7 +83,7 @@ class RecruitUnits implements ShouldQueue {
             }
 
             // @codeCoverageIgnoreStart
-            RecruitUnits::dispatch(
+            RequestResources::dispatch(
                 $this->unit,
                 $this->kingdom,
                 $this->amount,

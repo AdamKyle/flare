@@ -18,6 +18,7 @@ import KingdomDetailsState from "./types/kingdom-details-state";
 import OrangeButton from "../ui/buttons/orange-button";
 import OrangeOutlineButton from "../ui/buttons/orange-outline-button";
 import MakeCityACapitalModal from "./modals/make-city-a-capital-modal";
+import SuccessButton from "../ui/buttons/success-button";
 
 export default class KingdomDetails extends React.Component<
     KingdomDetailsProps,
@@ -342,12 +343,22 @@ export default class KingdomDetails extends React.Component<
                                 button_label={"Request Resources"}
                                 on_click={this.showRequestServices.bind(this)}
                             />
-                            <OrangeOutlineButton
-                                button_label={"Make Capital City"}
-                                on_click={this.showMakeCapitalCityModal.bind(
-                                    this,
-                                )}
-                            />
+                            {
+                                !this.props.kingdom.is_capital ?
+                                    <OrangeOutlineButton
+                                        button_label={"Make Capital City"}
+                                        on_click={this.showMakeCapitalCityModal.bind(
+                                            this,
+                                        )}
+                                    />
+                                :  <SuccessButton
+                                        button_label={"Small Council"}
+                                        on_click={this.showMakeCapitalCityModal.bind(
+                                            this,
+                                        )}
+                                    />
+                            }
+
                         </div>
                     </div>
                 </div>

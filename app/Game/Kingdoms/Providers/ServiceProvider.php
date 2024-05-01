@@ -12,6 +12,7 @@ use App\Game\Kingdoms\Handlers\KingdomSiegeHandler;
 use App\Game\Kingdoms\Handlers\KingdomUnitHandler;
 use App\Game\Kingdoms\Handlers\ReturnSurvivingUnitHandler;
 use App\Game\Kingdoms\Handlers\SettlerHandler;
+use App\Game\Kingdoms\Service\CapitalCityManagementService;
 use App\Game\Kingdoms\Service\ExpandResourceBuildingService;
 use App\Game\Kingdoms\Service\KingdomQueueService;
 use App\Game\Kingdoms\Service\ResourceTransferService;
@@ -60,6 +61,12 @@ class ServiceProvider extends ApplicationServiceProvider {
         $this->app->bind(ResourceTransferService::class, function($app) {
             return new ResourceTransferService(
                 $app->make(DistanceCalculation::class)
+            );
+        });
+
+        $this->app->bind(CapitalCityManagementService::class, function($app) {
+            return new CapitalCityManagementService(
+                $app->make(UpdateKingdom::class)
             );
         });
 

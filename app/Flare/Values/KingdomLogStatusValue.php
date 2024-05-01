@@ -11,29 +11,33 @@ class KingdomLogStatusValue {
      */
     private $value;
 
-    const ATTACKED         = 0;
-    const LOST             = 1;
-    const TAKEN            = 2;
-    const LOST_KINGDOM     = 3;
-    const KINGDOM_ATTACKED = 4;
-    const UNITS_RETURNING  = 5;
-    const BOMBS_DROPPED    = 6;
-    const OVER_POPULATED   = 7;
-    const NOT_WALKED       = 8;
+    const ATTACKED            = 0;
+    const LOST                = 1;
+    const TAKEN               = 2;
+    const LOST_KINGDOM        = 3;
+    const KINGDOM_ATTACKED    = 4;
+    const UNITS_RETURNING     = 5;
+    const BOMBS_DROPPED       = 6;
+    const OVER_POPULATED      = 7;
+    const NOT_WALKED          = 8;
+    const RESOURCES_REQUESTED = 9;
+    const RESOURCES_LOST      = 10;
 
     /**
      * @var string[] $values
      */
     protected static $values = [
-        self::ATTACKED         => 0,
-        self::LOST             => 1,
-        self::TAKEN            => 2,
-        self::LOST_KINGDOM     => 3,
-        self::KINGDOM_ATTACKED => 4,
-        self::UNITS_RETURNING  => 5,
-        self::BOMBS_DROPPED    => 6,
-        self::OVER_POPULATED   => 7,
-        self::NOT_WALKED       => 8,
+        self::ATTACKED            => 0,
+        self::LOST                => 1,
+        self::TAKEN               => 2,
+        self::LOST_KINGDOM        => 3,
+        self::KINGDOM_ATTACKED    => 4,
+        self::UNITS_RETURNING     => 5,
+        self::BOMBS_DROPPED       => 6,
+        self::OVER_POPULATED      => 7,
+        self::NOT_WALKED          => 8,
+        self::RESOURCES_REQUESTED => 9,
+        self::RESOURCES_LOST      => 10,
     ];
 
     /**

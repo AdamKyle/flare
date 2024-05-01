@@ -24,16 +24,10 @@ class MoveUnits implements ShouldQueue {
 
 
     /**
-     * @var int $movementId
-     */
-    public int $movementId;
-
-    /**
      * @param int $movementId
+     * @param array $additionalParams
      */
-    public function __construct(int $movementId) {
-        $this->movementId      = $movementId;
-    }
+    public function __construct(private readonly int $movementId, private readonly array $additionalParams = []) {}
 
     /**
      * @param AttackKingdomWithUnitsHandler $attackKingdomWithUnitsHandler
@@ -89,6 +83,10 @@ class MoveUnits implements ShouldQueue {
             $updateKingdom->updateKingdomAllKingdoms($attackingKingdom->character);
 
             $attackKingdomWithUnitsHandler->attackKingdomWithUnits($kingdom, $attackingKingdom, $unitMovement->units_moving);
+        }
+
+        if ($unitMovement->resources_requested) {
+
         }
     }
 
@@ -261,5 +259,27 @@ class MoveUnits implements ShouldQueue {
         }
 
         return false;
+    }
+
+    private function handleWhenResourceRequested(UnitMovementQueue $unitMovementQueue): void {
+        if (empty($this->additionalParams)) {
+            $unitMovementQueue->delete();
+
+            return;
+        }
+
+        if (!isset($this->additionalParams['amount_of_resources'])) {
+            $unitMovementQueue->delete();
+
+            return;
+        }
+
+        if (!isset($this->additionalParams['additional_log_messages'])) {
+            $unitMovementQueue->delete();
+
+            return;
+        }
+
+        RequestResources::dispatch($unitMovementQueue->to_kingdom_id, $unitMovementQueue->from_kingdom_id, $unitMovementQueue->units_moving, $this->additionalParams['amount_of_resources'], $this->additionalParams['additional_log_messages']);
     }
 }

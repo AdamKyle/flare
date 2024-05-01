@@ -32,6 +32,7 @@ class UnitMovementQueue extends Model {
         'is_recalled',
         'is_returning',
         'is_moving',
+        'resources_requested',
     ];
 
     /**
@@ -47,6 +48,7 @@ class UnitMovementQueue extends Model {
         'is_returning' => 'boolean',
         'is_moving'    => 'boolean',
         'is_attacking' => 'boolean',
+        'resources_requested' => 'boolean',
         'moving_to_x'  => 'integer',
         'moving_to_y'  => 'integer',
         'from_x'       => 'integer',

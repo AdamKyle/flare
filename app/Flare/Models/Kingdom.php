@@ -45,6 +45,7 @@ class Kingdom extends Model {
         'npc_owned',
         'last_walked',
         'protected_until',
+        'is_capital',
         'updated_at'
     ];
 
@@ -75,6 +76,7 @@ class Kingdom extends Model {
         'gold_bars'          => 'integer',
         'published'          => 'boolean',
         'npc_owned'          => 'boolean',
+        'is_capital'         => 'boolean',
         'last_walked'        => 'datetime',
         'protected_until'    => 'datetime',
     ];
