@@ -73,7 +73,7 @@ class ItemTransferService {
             return $this->errorResult('You do not have one of these items.');
         }
 
-        if ($itemIdToTransferFrom->item->type === 'quest') {
+        if ($itemSlotToTransferFrom->item->type === 'quest') {
             return $this->errorResult('Not allowed to do this for this item type.');
         }
 
