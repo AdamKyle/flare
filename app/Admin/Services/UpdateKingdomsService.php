@@ -106,9 +106,15 @@ class UpdateKingdomsService {
      *
      * @param GameBuilding $gameBuilding
      * @param array $selectedUnits
-     * @param int|null $levels
+     * @param int $levels
      */
-    public function updateKingdomKingdomBuildings(GameBuilding $gameBuilding, $selectedUnits = [], int $levels = 0) {
+    public function updateKingdomKingdomBuildings(GameBuilding $gameBuilding, $selectedUnits = [], int $levels = 0): void
+    {
+
+        if (empty($selectedUnits)) {
+            return;
+        }
+
         $gameBuilding = $this->reassignUnits($gameBuilding, $selectedUnits, $levels);
 
         UpdateKingdomBuildings::dispatch($gameBuilding, $selectedUnits, $levels)->delay(now()->addMinutes(1));
@@ -130,7 +136,7 @@ class UpdateKingdomsService {
      *
      * @param GameBuilding $gameBuilding
      * @param array $selectedUnits
-     * @param int|null $levels
+     * @param int $levels
      * @return GameBuilding
      */
     protected function reassignUnits(GameBuilding $gameBuilding, array $selectedUnits = [], int $levels = 0): GameBuilding {
