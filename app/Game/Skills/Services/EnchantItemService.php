@@ -148,22 +148,28 @@ class EnchantItemService {
         $clonedItem->is_cosmic                        = false;
 
         if ($affix->type === 'suffix') {
-            if ($clonedItem->itemPrefix->cost === RandomAffixDetails::MYTHIC) {
-                $clonedItem->item_prefix_id = null;
-            }
 
-            if ($clonedItem->itemPrefix->cost === RandomAffixDetails::COSMIC) {
-                $clonedItem->item_prefix_id = null;
+            if (!is_null($clonedItem->itemPrefix)) {
+                if ($clonedItem->itemPrefix->cost === RandomAffixDetails::MYTHIC) {
+                    $clonedItem->item_prefix_id = null;
+                }
+
+                if ($clonedItem->itemPrefix->cost === RandomAffixDetails::COSMIC) {
+                    $clonedItem->item_prefix_id = null;
+                }
             }
         }
 
         if ($affix->type === 'prefix') {
-            if ($clonedItem->itemSuffix->cost === RandomAffixDetails::MYTHIC) {
-                $clonedItem->item_suffix_id = null;
-            }
 
-            if ($clonedItem->itemSuffix->cost === RandomAffixDetails::COSMIC) {
-                $clonedItem->item_suffix_id = null;
+            if (!is_null($clonedItem->itemSuffix)) {
+                if ($clonedItem->itemSuffix->cost === RandomAffixDetails::MYTHIC) {
+                    $clonedItem->item_suffix_id = null;
+                }
+
+                if ($clonedItem->itemSuffix->cost === RandomAffixDetails::COSMIC) {
+                    $clonedItem->item_suffix_id = null;
+                }
             }
         }
 
