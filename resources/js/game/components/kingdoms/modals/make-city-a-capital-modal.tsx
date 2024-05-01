@@ -26,13 +26,11 @@ export default class MakeCityACapitalModal extends React.Component<any, any> {
                     secondary_button_label: "I am sure",
                 }}
             >
-                {
-                    this.state.error_message !== null ?
-                        <DangerAlert additional_css={'my-2'}>
-                            {this.state.error_message}
-                        </DangerAlert>
-                    : null
-                }
+                {this.state.error_message !== null ? (
+                    <DangerAlert additional_css={"my-2"}>
+                        {this.state.error_message}
+                    </DangerAlert>
+                ) : null}
 
                 <p className="my-2">
                     Are you sure you want to make this kingdom your capital
@@ -49,12 +47,7 @@ export default class MakeCityACapitalModal extends React.Component<any, any> {
                     their morale. You can reduce this through passive skills.
                 </p>
 
-                {
-                    this.state.loading ?
-                        <LoadingProgressBar />
-                    : null
-                }
-
+                {this.state.loading ? <LoadingProgressBar /> : null}
             </Dialogue>
         );
     }

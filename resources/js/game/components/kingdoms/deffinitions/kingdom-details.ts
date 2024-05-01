@@ -6,7 +6,6 @@ import CurrentUnitDetails from "./current-unit-details";
 import UnitDetails from "./unit-details";
 
 export default interface KingdomDetails extends DataTableBaseData {
-
     is_capital: boolean;
 
     building_cost_reduction: number;
