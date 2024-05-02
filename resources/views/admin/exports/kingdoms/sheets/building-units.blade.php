@@ -11,8 +11,8 @@
     @foreach($buildingUnits as $buildingUnit)
         <tr>
             <th>{{$buildingUnit->id}}</th>
-            <td>{{$buildingUnit->gameBuilding->id}}</td>
-            <td>{{$buildingUnit->gameUnit->id}}</td>
+            <td>{{$buildingUnit->gameBuilding->name}}</td>
+            <td>{{$buildingUnit->gameUnit->name}}</td>
             <td>{{$buildingUnit->required_level}}</td>
         </tr>
     @endforeach

@@ -11,6 +11,7 @@ use App\Flare\Models\GameRace;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Item;
 use App\Flare\Models\PassiveSkill;
+use App\Flare\Models\Quest;
 use App\Flare\Models\User;
 use App\Flare\Values\BaseSkillValue;
 use App\Flare\Values\BaseStatValue;
@@ -237,6 +238,12 @@ class CharacterBuilderService {
 
         if (!is_null($parentSkill)) {
             $isLocked = $passiveSkill->unlocks_at_level > $parentSkill->current_level;
+        }
+
+        $foundQuest = Quest::where('unlocks_passive_id', $passiveSkill->id)->first();
+
+        if (!is_null($foundQuest)) {
+            $isLocked = is_null($this->character->questsCompleted->where('quest_id', $foundQuest->id)->first());
         }
 
         return $isLocked;

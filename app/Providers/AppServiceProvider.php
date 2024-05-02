@@ -4,14 +4,10 @@ namespace App\Providers;
 
 use App\Console\AfterDeployment\AddHolyStacksToItems;
 use App\Console\AfterDeployment\AllowTraverseForMaps;
+use App\Console\AfterDeployment\AssignNewBuildingsToExistingKingdoms;
 use App\Console\AfterDeployment\ChangeFeatureTypesOnQuests;
 use App\Console\AfterDeployment\CreateMonsterCache;
-use App\Console\AfterDeployment\FixInfoPageInternalLinks;
-use App\Console\AfterDeployment\GiveNewSlotsQuestItem;
-use App\Console\AfterDeployment\RebalanceQuestCurrencyCostsAndRewards;
-use App\Console\AfterDeployment\ReduceAlchemyItemsCost;
 use App\Console\AfterDeployment\RemoveInvalidQuestItems;
-use App\Console\AfterDeployment\ReRollDelusionalMemoriesNpcBountyTasks;
 use App\Console\AfterDeployment\UpdateCharactersForClassRanks;
 use App\Console\DevelopmentCommands\AssignTopEndGearToPlayer;
 use App\Console\DevelopmentCommands\CompleteGuideQuestForCharacter;
@@ -44,14 +40,10 @@ class AppServiceProvider extends ServiceProvider {
             AddHolyStacksToItems::class,
             CreateMonsterCache::class,
             UpdateCharactersForClassRanks::class,
-            ReduceAlchemyItemsCost::class,
-            RebalanceQuestCurrencyCostsAndRewards::class,
             RemoveInvalidQuestItems::class,
             ChangeFeatureTypesOnQuests::class,
-            GiveNewSlotsQuestItem::class,
             AllowTraverseForMaps::class,
-            FixInfoPageInternalLinks::class,
-            ReRollDelusionalMemoriesNpcBountyTasks::class,
+            AssignNewBuildingsToExistingKingdoms::class,
 
             // Development Commands:
             CreateCharacter::class,

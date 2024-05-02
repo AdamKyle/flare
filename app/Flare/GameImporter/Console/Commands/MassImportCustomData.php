@@ -40,11 +40,13 @@ class MassImportCustomData extends Command {
     public function handle() {
 
         Artisan::call('import:game-data "Items"');
-        Artisan::call('import:game-data "Quests"');
+        Artisan::call('import:game-data "Npcs"');
         Artisan::call('import:game-data "Kingdoms"');
         Artisan::call('import:game-data "Kingdom Passive Skills"');
+        Artisan::call('import:game-data "Quests"');
 
         Artisan::call('assign:new-skills');
+        Artisan::call('assign:new-buildings-to-existing-kingdoms');
         Artisan::call('create:character-attack-data');
         Artisan::call('generate:monster-cache');
         Artisan::call('create:quest-cache');
@@ -68,7 +70,6 @@ class MassImportCustomData extends Command {
         exec($command, $output, $exitCode);
 
         if ($exitCode === 0) {
-            Artisan::call('fix:info-page-internal-links');
             $this->line('Information section images directory copied to public successfully. Information section is now set up.');
         } else {
             $this->line('Failed to copy the information images directory over. You can do this manually from the resources/backup/information-sections-images. Copy the entire directory to app/public');

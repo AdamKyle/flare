@@ -15,18 +15,16 @@ class BuildingsUnitsSheet implements ToCollection {
 
         foreach ($rows as $index => $row) {
             if ($index !== 0) {
-                $buildingUnitData = [
-                    'game_building_id'   => $row[1],
-                    'game_unit_id'       => $row[2],
-                    'required_level'     => $row[3],
-                ];
 
-                $gameBuildingUnit = GameBuildingUnit::find($row[0]);
-                $gameUnit         = GameUnit::find($row[1]);
-                $gameBuilding     = GameBuilding::find($row[2]);
+                $gameBuilding     = GameBuilding::where('name', $row[1])->first();
+                $gameUnit         = GameUnit::where('name', $row[2])->first();
 
-                if (is_null($gameBuildingUnit) && !is_null($gameUnit) && !is_null($gameBuilding)) {
-                    GameBuildingUnit::create($buildingUnitData);
+                if (!is_null($gameUnit) && !is_null($gameBuilding)) {
+                    GameBuildingUnit::create([
+                        'game_building_id'   => $gameBuilding->id,
+                        'game_unit_id'       => $gameUnit->id,
+                        'required_level'     => $row[3],
+                    ]);
                 }
             }
         }
