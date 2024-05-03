@@ -77,7 +77,7 @@ class EnchantItemService {
         if (!is_null($this->item)) {
 
 
-            if ($this->item->appliedHolyStacks()->isEmpty() && $this->item->sockets()->isEmpty()) {
+            if ($this->item->appliedHolyStacks->isEmpty() && $this->item->sockets->isEmpty()) {
                 if ($this->getCountOfMatchingItems() > 1) {
                     $slot->update([
                         'item_id' => $this->findMatchingItemId(),
@@ -96,7 +96,7 @@ class EnchantItemService {
 
                 $slot = $slot->refresh();
             }
-            
+
 
             if ($enchantForEvent) {
                 $character = $slot->inventory->character;
