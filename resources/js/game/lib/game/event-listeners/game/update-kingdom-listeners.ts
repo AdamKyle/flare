@@ -57,7 +57,6 @@ export default class UpdateKingdomListeners implements KingdomEventListener {
                 }
 
                 if (this.component instanceof Kingdom) {
-
                     if (this.component.state.kingdom === null) {
                         return;
                     }
@@ -70,7 +69,6 @@ export default class UpdateKingdomListeners implements KingdomEventListener {
                 }
 
                 if (this.component instanceof SmallKingdom) {
-
                     if (this.component.state.kingdom === null) {
                         return;
                     }
