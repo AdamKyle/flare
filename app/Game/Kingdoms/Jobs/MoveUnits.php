@@ -86,7 +86,7 @@ class MoveUnits implements ShouldQueue {
         }
 
         if ($unitMovement->resources_requested) {
-
+            $this->handleWhenResourceRequested($unitMovement);
         }
     }
 

@@ -46,6 +46,7 @@ class MassImportCustomData extends Command {
         Artisan::call('import:game-data "Quests"');
 
         Artisan::call('assign:new-skills');
+        Artisan::call('assign:new-npcs-to-faction-loyalty');
         Artisan::call('assign:new-buildings-to-existing-kingdoms');
         Artisan::call('create:character-attack-data');
         Artisan::call('generate:monster-cache');
@@ -80,7 +81,7 @@ class MassImportCustomData extends Command {
     protected function importGameMaps(array $orderedMapImages): void {
         $files = Storage::disk('data-maps')->allFiles();
 
-        // Sort the array such that the maps are in the correct order.
+        // Sort the array such that the maps are in the correct order.Shiny
         usort($files, function ($a, $b) use ($orderedMapImages) {
             $indexA = array_search($a, $orderedMapImages);
             $indexB = array_search($b, $orderedMapImages);

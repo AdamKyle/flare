@@ -15,7 +15,6 @@ import SmelterModal from "./modals/smelter-modal";
 import SpecialtyActionsHelpModal from "./modals/specialty-actions-help-modal";
 import KingdomDetailsProps from "./types/kingdom-details-props";
 import KingdomDetailsState from "./types/kingdom-details-state";
-import OrangeButton from "../ui/buttons/orange-button";
 import OrangeOutlineButton from "../ui/buttons/orange-outline-button";
 import MakeCityACapitalModal from "./modals/make-city-a-capital-modal";
 import SuccessButton from "../ui/buttons/success-button";
@@ -342,6 +341,7 @@ export default class KingdomDetails extends React.Component<
                             <SuccessOutlineButton
                                 button_label={"Request Resources"}
                                 on_click={this.showRequestServices.bind(this)}
+                                disabled={!this.props.kingdom.can_access_resource_request}
                             />
                             {!this.props.kingdom.is_capital ? (
                                 <OrangeOutlineButton

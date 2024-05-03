@@ -24,6 +24,8 @@ export default interface KingdomDetails extends DataTableBaseData {
 
     can_access_smelter: boolean;
 
+    can_access_resource_request: boolean;
+
     character_id: number;
 
     color: string;

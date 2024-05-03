@@ -9,6 +9,8 @@ import DangerButton from "../ui/buttons/danger-button";
 import { startCase } from "lodash";
 import SuccessButton from "../ui/buttons/success-button";
 import Select from "react-select";
+import DangerAlert from "../ui/alerts/simple-alerts/danger-alert";
+import SuccessAlert from "../ui/alerts/simple-alerts/success-alert";
 
 export default class KingdomResourceTransfer extends React.Component<any, any> {
     private kingdomResourceTransferRequestAjax: KingdomResourceTransferAjax;
@@ -18,7 +20,9 @@ export default class KingdomResourceTransfer extends React.Component<any, any> {
 
         this.state = {
             error_message: null,
+            success_message: null,
             loading: true,
+            requesting: false,
             kingdoms: [],
             index_to_view: 0,
             can_go_back: false,
@@ -43,6 +47,14 @@ export default class KingdomResourceTransfer extends React.Component<any, any> {
 
     setAmountToRequest(e: React.ChangeEvent<HTMLInputElement>) {
         let value = parseInt(e.target.value) || 0;
+
+        if (value > 5_000 && !this.state.use_air_ship) {
+            value = 5000;
+        }
+
+        if (value > 10000 && this.state.use_air_ship) {
+            value = 10000;
+        }
 
         this.setState(
             {
@@ -220,11 +232,18 @@ export default class KingdomResourceTransfer extends React.Component<any, any> {
         const params = {
             amount_of_resources: this.state.amount_of_resources,
             type_of_resource: this.state.type,
-            use_ait_ship: this.state.use_air_ship,
-            from_kingdom_id: kingdom.kingdom_id,
+            use_air_ship: this.state.use_air_ship,
+            kingdom_requesting: this.props.kingdom_id,
+            kingdom_requesting_from: kingdom.kingdom_id,
         };
 
-        console.log(params);
+        this.setState({
+            success_message: null,
+            error_message: null,
+            requesting: true,
+        }, () => {
+            this.kingdomResourceTransferRequestAjax.requestResources(this, params, this.props.character_id);
+        });
     }
 
     render() {
@@ -252,10 +271,24 @@ export default class KingdomResourceTransfer extends React.Component<any, any> {
                     request from. By default players can request a max of 5,000
                     resources of any or all types. If the kingdom you request
                     from, has Airships, you can use one and increase the max to
-                    10,000 at a time. There are passive skills that allow you to
-                    increase this amount when using an Airship.
+                    10,000 at a time.
                 </p>
                 <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2"></div>
+                {
+                    this.state.error_message !== null ?
+                        <DangerAlert additional_css={'my-3'}>
+                            {this.state.error_message}
+                        </DangerAlert>
+                    : null
+                }
+
+                {
+                    this.state.success_message !== null ?
+                        <SuccessAlert additional_css={'my-3'}>
+                            {this.state.success_message}
+                        </SuccessAlert>
+                    : null
+                }
                 <div className="max-w-full md:max-w-[75%] md:mr-auto md:ml-auto">
                     {this.state.kingdoms.length > 0 ? (
                         <div>
@@ -278,7 +311,7 @@ export default class KingdomResourceTransfer extends React.Component<any, any> {
                                             this,
                                         )}
                                         className="form-control"
-                                        disabled={this.state.loading}
+                                        disabled={this.state.requesting}
                                         min={0}
                                     />
                                 </div>
@@ -342,7 +375,7 @@ export default class KingdomResourceTransfer extends React.Component<any, any> {
                                                 (this.state.type ?? "None")
                                             }
                                             selected_name={""}
-                                            disabled={false}
+                                            disabled={this.state.requesting}
                                         />
                                     </div>
                                 </div>
@@ -357,7 +390,7 @@ export default class KingdomResourceTransfer extends React.Component<any, any> {
                                         type="checkbox"
                                         onChange={this.useAirShip.bind(this)}
                                         className="form-checkbox"
-                                        disabled={this.state.loading}
+                                        disabled={this.state.requesting}
                                     />
                                 </div>
                             </div>
@@ -366,7 +399,7 @@ export default class KingdomResourceTransfer extends React.Component<any, any> {
                             <dl>
                                 <dt>Amount:</dt>
                                 <dd className="text-green-700 dark:text-green-500">
-                                    {this.state.amount_of_resources}
+                                    {this.state.amount_of_resources > 0 ? '+' : ''}{formatNumber(this.state.amount_of_resources > 0 ? this.state.amount_of_resources : 0)}
                                 </dd>
                                 <dt>For Resource:</dt>
                                 <dd className="text-orange-700 dark:text-orange-500">
@@ -380,11 +413,23 @@ export default class KingdomResourceTransfer extends React.Component<any, any> {
                                 </dd>
                                 <dt>Population Cost</dt>
                                 <dd>50</dd>
+                                <dt>Spearmen Cost</dt>
+                                <dd>75</dd>
                             </dl>
+                            <p className='my-2'>
+                                When sending resources, you will also send a "gaurd" with the resources. They will return if the resources are delivered.
+                                They can be killed if the kingdom to be delivered to is no longer in your control.
+                            </p>
+                            {
+                                this.state.requesting ?
+                                    <LoadingProgressBar />
+                                : null
+                            }
                             <DangerButton
                                 button_label={"Clear"}
                                 on_click={this.clearEntry.bind(this)}
                                 additional_css={"my-3"}
+                                disabled={this.state.requesting}
                             />
                             <SuccessButton
                                 button_label={"Request"}
@@ -394,7 +439,7 @@ export default class KingdomResourceTransfer extends React.Component<any, any> {
                                     !(
                                         this.state.amount_of_resources !== "" &&
                                         this.state.type !== null
-                                    )
+                                    ) || this.state.requesting
                                 }
                             />
                             <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2"></div>
@@ -402,12 +447,12 @@ export default class KingdomResourceTransfer extends React.Component<any, any> {
                                 <PrimaryButton
                                     button_label={"Previous"}
                                     on_click={this.goBack.bind(this)}
-                                    disabled={!this.state.can_go_back}
+                                    disabled={!this.state.can_go_back || this.state.requesting}
                                 />
                                 <PrimaryButton
                                     button_label={"Next"}
                                     on_click={this.goForward.bind(this)}
-                                    disabled={!this.state.can_go_forward}
+                                    disabled={!this.state.can_go_forward || this.state.requesting}
                                 />
                             </div>
                         </div>

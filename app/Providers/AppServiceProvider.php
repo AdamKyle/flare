@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Console\AfterDeployment\AddHolyStacksToItems;
 use App\Console\AfterDeployment\AllowTraverseForMaps;
 use App\Console\AfterDeployment\AssignNewBuildingsToExistingKingdoms;
+use App\Console\AfterDeployment\AssignNewNpcsToFactionLoyalty;
 use App\Console\AfterDeployment\ChangeFeatureTypesOnQuests;
 use App\Console\AfterDeployment\CreateMonsterCache;
 use App\Console\AfterDeployment\RemoveInvalidQuestItems;
@@ -44,6 +45,7 @@ class AppServiceProvider extends ServiceProvider {
             ChangeFeatureTypesOnQuests::class,
             AllowTraverseForMaps::class,
             AssignNewBuildingsToExistingKingdoms::class,
+            AssignNewNpcsToFactionLoyalty::class,
 
             // Development Commands:
             CreateCharacter::class,

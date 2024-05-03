@@ -80,7 +80,7 @@ class ResourceTransferService {
         }
 
         if (!$this->hasRequiredSpearmen($requestingKingdom)) {
-            return $this->errorResult('The kingdom you are requesting resources from does not have enough spearmint to guard to the transportation');
+            return $this->errorResult('The kingdom you are requesting resources from does not have enough spearmen to guard to the transportation');
         }
 
         $useAirShip = $params['use_air_ship'];
@@ -123,7 +123,7 @@ class ResourceTransferService {
     }
 
     private function fetchKingdomsForResourceRequests(Character $character, Kingdom $kingdom): array {
-        $kingdoms = $character->kingdoms()->where('id', '!=', $kingdom->id)->get();
+        $kingdoms = $character->kingdoms()->where('id', '!=', $kingdom->id)->where('game_map_id', $character->map->game_map_id)->get();
 
         return $kingdoms->map(function($otherKingdom) use ($kingdom) {
 
@@ -172,7 +172,7 @@ class ResourceTransferService {
             return false;
         }
 
-        return true;
+        return $requestingKingdom->game_map_id === $requestingFromKingdom->game_map_id;
     }
 
     private function hasRequestedResourceAmount(Kingdom $requestFromKingdom, int $amount, string $type): bool {
@@ -195,7 +195,7 @@ class ResourceTransferService {
     }
 
     private function hasRequiredSpearmen(Kingdom $requestFromKingdom): bool {
-        return $requestFromKingdom->units->where('gameUnit.name', '=', UnitNames::SPEARMEN)->count() > 0;
+        return $requestFromKingdom->units->where('gameUnit.name', '=', UnitNames::SPEARMEN)->count() >= self::SPEARMEN_COST;
     }
 
     private function bothKingdomsHaveAMarketPlace(Kingdom $requestingKingdom, Kingdom $requestingFromKingdom): bool {
@@ -219,6 +219,15 @@ class ResourceTransferService {
                     $resourcesToRequest[$resource] = $amount;
 
                     $requestingFromKingdom->{'current_' . $resource} -= $amount;
+                } else {
+
+                    $amount = $requestingFromKingdom->{'current_' . $resource};
+
+                    $resourcesToRequest[$resource] = $requestingFromKingdom->{'current_' . $resource};
+
+                    $requestingFromKingdom->{'current_' . $resource} = 0;
+
+                    $this->additionalMessagesForLog[] = 'only took: ' . number_format($amount) . ' For type: ' . $resource . ' as you do not have enough for (request amount): ' . number_format($amount);
                 }
             }
         } else {
@@ -252,7 +261,7 @@ class ResourceTransferService {
             $this->buildUnitDataForMovement($requestingKingdom, $requestingFromKingdom, $timeToKingdom)
         );
 
-        $this->sendOffEvents($requestingKingdom, $requestingFromKingdom, $unitMovementQueue);
+        $this->sendOffEvents($requestingKingdom, $requestingFromKingdom, $unitMovementQueue, $resourcesToRequest);
     }
 
     private function buildUnitDataForMovement(Kingdom $requestingKingdom, Kingdom $requestingFromKingdom, int $completedAtMinutes): array {
@@ -268,7 +277,7 @@ class ResourceTransferService {
             'units_moving' => [
                 $requestingFromKingdom->name => [
                     [
-                        'unit_id' => $spearmen-> id,
+                        'unit_id' => $spearmen->id,
                         'amount' => self::SPEARMEN_COST,
                     ]
                 ]
@@ -287,7 +296,7 @@ class ResourceTransferService {
         ];
     }
 
-    private function sendOffEvents(Kingdom $requestingKingdom, Kingdom $requestingFromKingdom, UnitMovementQueue $unitMovementQueue): void {
+    private function sendOffEvents(Kingdom $requestingKingdom, Kingdom $requestingFromKingdom, UnitMovementQueue $unitMovementQueue, array $resourcesForRequest): void {
 
         $user = $requestingFromKingdom->character->user;
 
@@ -296,8 +305,11 @@ class ResourceTransferService {
 
         $minutes = (new Carbon($unitMovementQueue->completed_at))->diffInMinutes($unitMovementQueue->started_at);
 
-        MoveUnits::dispatch($unitMovementQueue->id)->delay($minutes);
+        MoveUnits::dispatch($unitMovementQueue->id, [
+            'amount_of_resources' => $resourcesForRequest,
+            'additional_log_messages' => $this->additionalMessagesForLog,
+        ])->delay($minutes);
 
-        event(new ServerMessageEvent($user, 'Your resources are on their way. The Spearmen will guard them on their travels!'));
+        event(new ServerMessageEvent($user, 'Your resources are on their way. The Spearmen will guard them on their travels and return should they not die along the way!'));
     }
 }

@@ -70,6 +70,7 @@ class KingdomTransformer extends TransformerAbstract {
             'smelting_time_reduction'   => $kingdom->fetchSmeltingTimeReduction(),
             'can_access_bank'           => $this->canAccessGoblinCoinBank($kingdom),
             'can_access_smelter'        => $this->canAccessSmelter($kingdom),
+            'can_access_resource_request' => $this->canAccessResourceRequest($kingdom),
             'walls_defence'             => $kingdom->getWallsDefence(),
             'gold_bars_defence'         => $kingdom->fetchGoldBarsDefenceBonus(),
             'defence_bonus'             => $kingdom->fetchKingdomDefenceBonus(),
@@ -197,6 +198,24 @@ class KingdomTransformer extends TransformerAbstract {
         }
 
         return !$building->is_locked && BuildingActions::canAccessSmelter($building);
+    }
+
+    /**
+     * Can Access Resource Request?
+     *
+     * @param Kingdom $kingdom
+     * @return bool
+     */
+    protected function canAccessResourceRequest(Kingdom $kingdom): bool {
+        $building = $kingdom->buildings->filter(function($building) {
+            return $building->name === BuildingActions::MARKET_PLACE;
+        })->first();
+
+        if (is_null($building)) {
+            return false;
+        }
+
+        return !$building->is_locked && BuildingActions::canAccessResourceTransferRequest($building);
     }
 
     /**

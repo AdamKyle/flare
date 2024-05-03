@@ -86,6 +86,7 @@ Route::middleware(['auth', 'is.character.who.they.say.they.are'])->group(functio
 
 Route::middleware(['auth', 'is.character.who.they.say.they.are', 'character.owns.kingdom', 'throttle:500,1', 'is.character.dead', 'is.character.exploring'])->group(function() {
     Route::get('/kingdoms/{kingdom}/{character}/resource-transfer-request', ['as' => 'kingdom.resource-transfer-request', 'uses' => 'Api\ResourceTransferController@getKingdomsForResourceTransferRequest']);
+    Route::post('/kingdom/{character}/send-request-for-resources', ['as' => 'kingdom.send-request-for-resources', 'uses' => 'Api\ResourceTransferController@transferResources']);
 });
 
 Route::middleware([
