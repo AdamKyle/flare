@@ -237,13 +237,20 @@ export default class KingdomResourceTransfer extends React.Component<any, any> {
             kingdom_requesting_from: kingdom.kingdom_id,
         };
 
-        this.setState({
-            success_message: null,
-            error_message: null,
-            requesting: true,
-        }, () => {
-            this.kingdomResourceTransferRequestAjax.requestResources(this, params, this.props.character_id);
-        });
+        this.setState(
+            {
+                success_message: null,
+                error_message: null,
+                requesting: true,
+            },
+            () => {
+                this.kingdomResourceTransferRequestAjax.requestResources(
+                    this,
+                    params,
+                    this.props.character_id,
+                );
+            },
+        );
     }
 
     render() {
@@ -274,21 +281,17 @@ export default class KingdomResourceTransfer extends React.Component<any, any> {
                     10,000 at a time.
                 </p>
                 <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2"></div>
-                {
-                    this.state.error_message !== null ?
-                        <DangerAlert additional_css={'my-3'}>
-                            {this.state.error_message}
-                        </DangerAlert>
-                    : null
-                }
+                {this.state.error_message !== null ? (
+                    <DangerAlert additional_css={"my-3"}>
+                        {this.state.error_message}
+                    </DangerAlert>
+                ) : null}
 
-                {
-                    this.state.success_message !== null ?
-                        <SuccessAlert additional_css={'my-3'}>
-                            {this.state.success_message}
-                        </SuccessAlert>
-                    : null
-                }
+                {this.state.success_message !== null ? (
+                    <SuccessAlert additional_css={"my-3"}>
+                        {this.state.success_message}
+                    </SuccessAlert>
+                ) : null}
                 <div className="max-w-full md:max-w-[75%] md:mr-auto md:ml-auto">
                     {this.state.kingdoms.length > 0 ? (
                         <div>
@@ -399,7 +402,14 @@ export default class KingdomResourceTransfer extends React.Component<any, any> {
                             <dl>
                                 <dt>Amount:</dt>
                                 <dd className="text-green-700 dark:text-green-500">
-                                    {this.state.amount_of_resources > 0 ? '+' : ''}{formatNumber(this.state.amount_of_resources > 0 ? this.state.amount_of_resources : 0)}
+                                    {this.state.amount_of_resources > 0
+                                        ? "+"
+                                        : ""}
+                                    {formatNumber(
+                                        this.state.amount_of_resources > 0
+                                            ? this.state.amount_of_resources
+                                            : 0,
+                                    )}
                                 </dd>
                                 <dt>For Resource:</dt>
                                 <dd className="text-orange-700 dark:text-orange-500">
@@ -416,15 +426,16 @@ export default class KingdomResourceTransfer extends React.Component<any, any> {
                                 <dt>Spearmen Cost</dt>
                                 <dd>75</dd>
                             </dl>
-                            <p className='my-2'>
-                                When sending resources, you will also send a "gaurd" with the resources. They will return if the resources are delivered.
-                                They can be killed if the kingdom to be delivered to is no longer in your control.
+                            <p className="my-2">
+                                When sending resources, you will also send a
+                                "gaurd" with the resources. They will return if
+                                the resources are delivered. They can be killed
+                                if the kingdom to be delivered to is no longer
+                                in your control.
                             </p>
-                            {
-                                this.state.requesting ?
-                                    <LoadingProgressBar />
-                                : null
-                            }
+                            {this.state.requesting ? (
+                                <LoadingProgressBar />
+                            ) : null}
                             <DangerButton
                                 button_label={"Clear"}
                                 on_click={this.clearEntry.bind(this)}
@@ -447,12 +458,18 @@ export default class KingdomResourceTransfer extends React.Component<any, any> {
                                 <PrimaryButton
                                     button_label={"Previous"}
                                     on_click={this.goBack.bind(this)}
-                                    disabled={!this.state.can_go_back || this.state.requesting}
+                                    disabled={
+                                        !this.state.can_go_back ||
+                                        this.state.requesting
+                                    }
                                 />
                                 <PrimaryButton
                                     button_label={"Next"}
                                     on_click={this.goForward.bind(this)}
-                                    disabled={!this.state.can_go_forward || this.state.requesting}
+                                    disabled={
+                                        !this.state.can_go_forward ||
+                                        this.state.requesting
+                                    }
                                 />
                             </div>
                         </div>

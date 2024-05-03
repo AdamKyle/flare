@@ -341,7 +341,10 @@ export default class KingdomDetails extends React.Component<
                             <SuccessOutlineButton
                                 button_label={"Request Resources"}
                                 on_click={this.showRequestServices.bind(this)}
-                                disabled={!this.props.kingdom.can_access_resource_request}
+                                disabled={
+                                    !this.props.kingdom
+                                        .can_access_resource_request
+                                }
                             />
                             {!this.props.kingdom.is_capital ? (
                                 <OrangeOutlineButton
