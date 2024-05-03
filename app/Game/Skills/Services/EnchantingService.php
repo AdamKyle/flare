@@ -202,7 +202,7 @@ class EnchantingService {
      *
      * @param Character $character
      * @param array $params
-     * @param InventorySlot $slot
+     * @param InventorySlot|GlobalEventCraftingInventorySlot $slot
      * @param int $cost
      * @return void
      * @throws Exception

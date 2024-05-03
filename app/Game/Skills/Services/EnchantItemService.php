@@ -190,6 +190,8 @@ class EnchantItemService {
             return Item::where('name', $this->item->name)
                 ->where('item_prefix_id', $this->item->item_prefix_id)
                 ->where('item_suffix_id', $this->item->item_suffix_id)
+                ->whereDoesntHave('appliedHolyStacks')
+                ->whereDoesntHave('sockets')
                 ->count();
         }
 
@@ -210,6 +212,8 @@ class EnchantItemService {
         return Item::where('name', $item->name)
                    ->where('item_prefix_id', $item->item_prefix_id)
                    ->where('item_suffix_id', $item->item_suffix_id)
+                   ->whereDoesntHave('appliedHolyStacks')
+                   ->whereDoesntHave('sockets')
                    ->first()
                    ->id;
     }
