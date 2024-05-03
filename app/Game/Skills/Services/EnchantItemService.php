@@ -76,17 +76,27 @@ class EnchantItemService {
     public function updateSlot(InventorySlot|GlobalEventCraftingInventorySlot $slot, bool $enchantForEvent): void {
         if (!is_null($this->item)) {
 
-            if ($this->getCountOfMatchingItems() > 1) {
-                $slot->update([
-                    'item_id' => $this->findMatchingItemId(),
-                ]);
+
+            if ($this->item->appliedHolyStacks->isEmpty() && $this->item->sockets->isEmpty()) {
+                if ($this->getCountOfMatchingItems() > 1) {
+                    $slot->update([
+                        'item_id' => $this->findMatchingItemId(),
+                    ]);
+                } else {
+                    $slot->update([
+                        'item_id' => $this->item->id,
+                    ]);
+
+                    $slot = $slot->refresh();
+                }
             } else {
                 $slot->update([
                     'item_id' => $this->item->id,
                 ]);
+
+                $slot = $slot->refresh();
             }
 
-            $slot = $slot->refresh();
 
             if ($enchantForEvent) {
                 $character = $slot->inventory->character;
@@ -190,6 +200,8 @@ class EnchantItemService {
             return Item::where('name', $this->item->name)
                 ->where('item_prefix_id', $this->item->item_prefix_id)
                 ->where('item_suffix_id', $this->item->item_suffix_id)
+                ->whereDoesntHave('appliedHolyStacks')
+                ->whereDoesntHave('sockets')
                 ->count();
         }
 
@@ -210,6 +222,8 @@ class EnchantItemService {
         return Item::where('name', $item->name)
                    ->where('item_prefix_id', $item->item_prefix_id)
                    ->where('item_suffix_id', $item->item_suffix_id)
+                   ->whereDoesntHave('appliedHolyStacks')
+                   ->whereDoesntHave('sockets')
                    ->first()
                    ->id;
     }
