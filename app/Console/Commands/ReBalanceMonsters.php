@@ -60,7 +60,7 @@ class ReBalanceMonsters extends Command
                 ->whereNull('only_for_location_type')
                 ->get();
 
-            $this->manageMonsters($celestials, $exponentialAttributeCurve, 500000000, 4000000000, 10000000, 500, $mapName);
+            $this->manageMonsters($celestials, $exponentialAttributeCurve, 25000000, 250000000, 1000000, 5000, $mapName);
         }
 
         $locations = Location::whereNotNull('type')->get();
