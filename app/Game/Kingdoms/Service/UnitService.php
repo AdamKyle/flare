@@ -14,6 +14,7 @@ use App\Flare\Models\UnitInQueue;
 use App\Flare\Transformers\KingdomTransformer;
 use App\Game\Kingdoms\Events\UpdateKingdomQueues;
 use App\Game\Kingdoms\Handlers\UpdateKingdomHandler;
+use App\Game\Kingdoms\Jobs\RecruitUnits;
 use App\Game\Kingdoms\Jobs\RequestResources;
 use App\Game\Kingdoms\Values\KingdomMaxValue;
 use App\Game\Kingdoms\Values\UnitCosts;
@@ -29,14 +30,9 @@ class UnitService {
     use ResponseBuilder;
 
     /**
-     * @var mixed $completed
+     * @var float $totalResources
      */
-    private $completed;
-
-    /**
-     * @var mixed $totalResources
-     */
-    private $totalResources;
+    private float $totalResources;
 
     /**
      * @var UpdateKingdomHandler $updateKingdomHandler
@@ -53,10 +49,8 @@ class UnitService {
     /**
      * @param GameUnit $gameUnit
      * @param Kingdom $kingdom
-     * @param string $recruitmentType
      * @param int $amount
      * @return array
-     * @throws Exception
      */
     public function handlePayment(GameUnit $gameUnit, Kingdom $kingdom, int $amount): array {
         if (ResourceValidation::shouldRedirectUnits($gameUnit, $kingdom, $amount)) {
@@ -97,9 +91,9 @@ class UnitService {
         event(new UpdateKingdomQueues($kingdom));
 
         if ($totalTime > 900) {
-            RequestResources::dispatch($gameUnit, $kingdom, $amount, $queue->id)->delay(now()->addMinutes(15));
+            RecruitUnits::dispatch($gameUnit, $kingdom, $amount, $queue->id)->delay(now()->addMinutes(15));
         } else {
-            RequestResources::dispatch($gameUnit, $kingdom, $amount, $queue->id)->delay($timeTillFinished);
+            RecruitUnits::dispatch($gameUnit, $kingdom, $amount, $queue->id)->delay($timeTillFinished);
         }
     }
 
@@ -193,9 +187,9 @@ class UnitService {
         $end     = Carbon::parse($queue->completed_at)->timestamp;
         $current = Carbon::parse(now())->timestamp;
 
-        $this->completed      = (($current - $start) / ($end - $start));
+        $completed = (($current - $start) / ($end - $start));
 
-        $this->totalResources = 1 - $this->completed;
+        $this->totalResources = 1 - $completed;
     }
 
     /**

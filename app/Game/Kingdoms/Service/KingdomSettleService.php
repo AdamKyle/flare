@@ -242,7 +242,7 @@ class KingdomSettleService {
                 $passive = $character->passiveSkills()->where('passive_skill_id', $building->passive_skill_id)->first();
 
                 if (!is_null($passive)) {
-                    if ($passive->current_level === $building->level_required) {
+                    if ($passive->current_level >= $building->level_required) {
                         $isLocked = false;
                     }
                 }

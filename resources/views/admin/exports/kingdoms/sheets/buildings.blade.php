@@ -74,7 +74,7 @@
             <td>{{$building->is_special}}</td>
             <td>
                 @if (!is_null($building->passive_skill_id))
-                    {{$building->passive_skill_id}}
+                    {{$building->passive->name}}
                 @endif
             </td>
             <td>{{$building->level_required}}</td>

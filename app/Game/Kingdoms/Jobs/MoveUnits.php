@@ -55,6 +55,7 @@ class MoveUnits implements ShouldQueue {
             // @codeCoverageIgnoreStart
             MoveUnits::dispatch(
                 $this->movementId,
+                $this->additionalParams,
             )->delay($time);
 
             return;
@@ -262,6 +263,9 @@ class MoveUnits implements ShouldQueue {
     }
 
     private function handleWhenResourceRequested(UnitMovementQueue $unitMovementQueue): void {
+
+        dump($this->additionalParams);
+
         if (empty($this->additionalParams)) {
             $unitMovementQueue->delete();
 

@@ -42,6 +42,7 @@ class RequestResources implements ShouldQueue {
      * Execute the job.
      *
      * @param UpdateKingdom $updateKingdom
+     * @param DistanceCalculation $distanceCalculation
      * @return void
      */
     public function handle(UpdateKingdom $updateKingdom, DistanceCalculation $distanceCalculation): void {

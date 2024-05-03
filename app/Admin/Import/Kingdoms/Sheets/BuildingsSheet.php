@@ -28,7 +28,7 @@ class BuildingsSheet implements ToCollection {
             if (!is_null($value)) {
 
                 if ($key === 'passive_skill_id') {
-                    $passive = PassiveSkill::find($value);
+                    $passive = PassiveSkill::where('name', $value)->first();
 
                     if (!is_null($passive)) {
                         $value = $passive->id;

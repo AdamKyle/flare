@@ -75,11 +75,11 @@ class ResourceTransferService {
             return $this->errorResult('Both the requesting kingdom and the kingdom to request from must have Market Place built and upgraded to level 5.');
         }
 
-        if (!$this->canAffordPopulationCost($requestingKingdom)) {
+        if (!$this->canAffordPopulationCost($requestingFromKingdom)) {
             return $this->errorResult('The kingdom you are requesting resources from does not have enough population to move this amount of resources.');
         }
 
-        if (!$this->hasRequiredSpearmen($requestingKingdom)) {
+        if (!$this->hasRequiredSpearmen($requestingFromKingdom)) {
             return $this->errorResult('The kingdom you are requesting resources from does not have enough spearmen to guard to the transportation');
         }
 
@@ -123,7 +123,7 @@ class ResourceTransferService {
     }
 
     private function fetchKingdomsForResourceRequests(Character $character, Kingdom $kingdom): array {
-        $kingdoms = $character->kingdoms()->where('id', '!=', $kingdom->id)->where('game_map_id', $character->map->game_map_id)->get();
+        $kingdoms = $character->kingdoms()->where('id', '!=', $kingdom->id)->where('game_map_id', $kingdom->game_map_id)->get();
 
         return $kingdoms->map(function($otherKingdom) use ($kingdom) {
 
@@ -195,7 +195,14 @@ class ResourceTransferService {
     }
 
     private function hasRequiredSpearmen(Kingdom $requestFromKingdom): bool {
-        return $requestFromKingdom->units->where('gameUnit.name', '=', UnitNames::SPEARMEN)->count() >= self::SPEARMEN_COST;
+
+        $spearmen = $requestFromKingdom->units->where('gameUnit.name', '=', UnitNames::SPEARMEN)->first();
+
+        if (is_null($spearmen)) {
+            return false;
+        }
+
+        return $spearmen->amount >= self::SPEARMEN_COST;
     }
 
     private function bothKingdomsHaveAMarketPlace(Kingdom $requestingKingdom, Kingdom $requestingFromKingdom): bool {
@@ -267,21 +274,40 @@ class ResourceTransferService {
     private function buildUnitDataForMovement(Kingdom $requestingKingdom, Kingdom $requestingFromKingdom, int $completedAtMinutes): array {
 
         $spearmen = $requestingFromKingdom->units()->whereHas('gameUnit', function ($query) {
+            $query->where('name', UnitNames::SPEARMEN);
+        })->first();
+
+        $requestingFromKingdom->units()->whereHas('gameUnit', function ($query) {
+            $query->where('name', UnitNames::SPEARMEN);
+        })->update([
+            'amount' => $spearmen->amount - self::SPEARMEN_COST,
+        ]);
+
+        $airShip = $requestingFromKingdom->units()->whereHas('gameUnit', function ($query) {
             $query->where('name', UnitNames::AIRSHIP);
         })->first();
+
+        $unitMovementDetails = [
+            $requestingFromKingdom->name => [
+                [
+                    'unit_id' => $spearmen->id,
+                    'amount' => self::SPEARMEN_COST,
+                ]
+            ]
+        ];
+
+        if (!is_null($airShip)) {
+            $unitMovementDetails[$requestingFromKingdom->name][] = [
+                'unit_id' => $airShip->id,
+                'amount' => 1,
+            ];
+        }
 
         return [
             'character_id' => $requestingFromKingdom->character->id,
             'from_kingdom_id' => $requestingFromKingdom->id,
             'to_kingdom_id' => $requestingKingdom->id,
-            'units_moving' => [
-                $requestingFromKingdom->name => [
-                    [
-                        'unit_id' => $spearmen->id,
-                        'amount' => self::SPEARMEN_COST,
-                    ]
-                ]
-            ],
+            'units_moving' => $unitMovementDetails,
             'completed_at' => now()->addMinutes($completedAtMinutes),
             'started_at' => now(),
             'moving_to_x' => $requestingKingdom->x_position,
