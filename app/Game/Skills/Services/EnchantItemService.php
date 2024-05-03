@@ -76,17 +76,27 @@ class EnchantItemService {
     public function updateSlot(InventorySlot|GlobalEventCraftingInventorySlot $slot, bool $enchantForEvent): void {
         if (!is_null($this->item)) {
 
-            if ($this->getCountOfMatchingItems() > 1) {
-                $slot->update([
-                    'item_id' => $this->findMatchingItemId(),
-                ]);
+
+            if ($this->item->appliedHolyStacks()->isEmpty() && $this->item->sockets()->isEmpty()) {
+                if ($this->getCountOfMatchingItems() > 1) {
+                    $slot->update([
+                        'item_id' => $this->findMatchingItemId(),
+                    ]);
+                } else {
+                    $slot->update([
+                        'item_id' => $this->item->id,
+                    ]);
+
+                    $slot = $slot->refresh();
+                }
             } else {
                 $slot->update([
                     'item_id' => $this->item->id,
                 ]);
-            }
 
-            $slot = $slot->refresh();
+                $slot = $slot->refresh();
+            }
+            
 
             if ($enchantForEvent) {
                 $character = $slot->inventory->character;
