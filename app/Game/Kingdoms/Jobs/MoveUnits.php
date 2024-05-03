@@ -46,20 +46,23 @@ class MoveUnits implements ShouldQueue {
         if (!$unitMovement->completed_at->lessThanOrEqualTo(now())) {
             $timeLeft = $unitMovement->completed_at->diffInMinutes(now());
 
-            if ($timeLeft <= 15) {
-                $time = now()->addMinutes($timeLeft);
-            } else {
-                $time = now()->addMinutes(15);
+
+            if ($timeLeft >= 1) {
+                if ($timeLeft <= 15) {
+                    $time = now()->addMinutes($timeLeft);
+                } else {
+                    $time = now()->addMinutes(15);
+                }
+
+                // @codeCoverageIgnoreStart
+                MoveUnits::dispatch(
+                    $this->movementId,
+                    $this->additionalParams,
+                )->delay($time);
+
+                return;
+                // @codeCoverageIgnoreEnd
             }
-
-            // @codeCoverageIgnoreStart
-            MoveUnits::dispatch(
-                $this->movementId,
-                $this->additionalParams,
-            )->delay($time);
-
-            return;
-            // @codeCoverageIgnoreEnd
         }
 
         if ($unitMovement->is_moving || $unitMovement->is_returning || $unitMovement->is_recalled) {
@@ -264,8 +267,6 @@ class MoveUnits implements ShouldQueue {
 
     private function handleWhenResourceRequested(UnitMovementQueue $unitMovementQueue): void {
 
-        dump($this->additionalParams);
-
         if (empty($this->additionalParams)) {
             $unitMovementQueue->delete();
 
@@ -284,6 +285,6 @@ class MoveUnits implements ShouldQueue {
             return;
         }
 
-        RequestResources::dispatch($unitMovementQueue->to_kingdom_id, $unitMovementQueue->from_kingdom_id, $unitMovementQueue->units_moving, $this->additionalParams['amount_of_resources'], $this->additionalParams['additional_log_messages']);
+        RequestResources::dispatch($unitMovementQueue->character_id, $unitMovementQueue->to_kingdom_id, $unitMovementQueue->from_kingdom_id, $this->additionalParams['amount_of_resources'], $unitMovementQueue->units_moving, $this->additionalParams['additional_log_messages']);
     }
 }

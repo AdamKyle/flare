@@ -63,7 +63,7 @@ class ResourceTransferService {
             return $this->errorResult('Not allowed to do that.');
         }
 
-        if (!$this->onTheSameMapAsTheCharacter($character, $requestingKingdom, $requestingFromKingdom)) {
+        if (!$this->onTheSameMapAsTheCharacter($requestingKingdom, $requestingFromKingdom)) {
             return $this->errorResult('Your kingdoms must both be on the same map.');
         }
 
@@ -160,18 +160,7 @@ class ResourceTransferService {
         return true;
     }
 
-    private function onTheSameMapAsTheCharacter(Character $character, Kingdom $requestingKingdom, Kingdom $requestingFromKingdom): bool {
-
-        $characterGameMapId = $character->map->game_map_id;
-
-        if ($requestingKingdom->game_map_id === $characterGameMapId) {
-            return false;
-        }
-
-        if ($requestingFromKingdom->game_map_id === $characterGameMapId) {
-            return false;
-        }
-
+    private function onTheSameMapAsTheCharacter(Kingdom $requestingKingdom, Kingdom $requestingFromKingdom): bool {
         return $requestingKingdom->game_map_id === $requestingFromKingdom->game_map_id;
     }
 

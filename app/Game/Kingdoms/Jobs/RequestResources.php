@@ -91,11 +91,12 @@ class RequestResources implements ShouldQueue {
             'opened' => false,
             'additional_details' => $logDetails,
             'status' => KingdomLogStatusValue::RESOURCES_REQUESTED,
+            'published' => true,
         ]);
 
         $updateKingdom->updateKingdom($requestedKingdom);
 
-        $updateKingdom->updateKingdomLogs($requestedKingdom->character);
+        $updateKingdom->updateKingdomLogs($requestedKingdom->character, true);
 
         $timeToKingdom = $this->getMinutesForTravel($requestedKingdom, $requestingFromKingdom, $distanceCalculation);
 
@@ -125,10 +126,10 @@ class RequestResources implements ShouldQueue {
             'units_moving' => $this->unitsInMovement,
             'completed_at' => now()->addMinutes($completedAtMinutes),
             'started_at' => now(),
-            'moving_to_x' => $requestedKingdom->x_position,
-            'moving_to_y' => $requestedKingdom->y_position,
-            'from_x' => $requestFromKingdom->x_position,
-            'from_y' => $requestFromKingdom->y_position,
+            'moving_to_x' => $requestFromKingdom->x_position,
+            'moving_to_y' => $requestFromKingdom->y_position,
+            'from_x' => $requestedKingdom->x_position,
+            'from_y' => $requestedKingdom->y_position,
             'is_attacking' => false,
             'is_recalled' => false,
             'is_returning' => true,

@@ -76,6 +76,10 @@ class UnitMovementTransformer extends TransformerAbstract {
             return 'Called for Reinforcement';
         }
 
+        if ($unitMovementQueue->resources_requested) {
+            return 'Resources were requested';
+        }
+
         return 'ERROR: unknown.';
     }
 }
