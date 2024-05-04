@@ -6,7 +6,7 @@ import OrangeProgressBar from "../../../components/ui/progress-bars/orange-progr
 import { formatNumber } from "../../../lib/game/format-number";
 import EventGoalsTabState from "./types/event-goals-tab-state";
 import EventGoal from "./definitions/event-goal";
-import {snakeCase} from "lodash";
+import {kebabCase} from "lodash";
 
 export default class EventGoalsTab extends React.Component<
     any,
@@ -247,7 +247,7 @@ export default class EventGoalsTab extends React.Component<
                     </p>
                     <dl className="my-2">
                         <dt>Gear Set Name</dt>
-                        <dd><a href={"/information/" + snakeCase(this.state.eventGoal.reward)} target='_blank'>{
+                        <dd><a href={"/information/" + kebabCase(this.state.eventGoal.reward)} target='_blank'>{
                             this.state.eventGoal.reward
                         } <i
                             className="fas fa-external-link-alt"></i></a></dd>
