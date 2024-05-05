@@ -22,7 +22,7 @@ export default class VoidanceDetails extends React.Component<any, any> {
                 <p className="mb-6">
                     Devoiding (Devouring Darkness) means that you or the enemy
                     have stopped the other from being able to void you. For
-                    example if you are devoted, you cannot void the enemy and
+                    example if you are devoided, you cannot void the enemy and
                     vice versa.
                 </p>
                 <dl>
