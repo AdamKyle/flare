@@ -66,6 +66,21 @@
         </div>
         <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
 
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label class="custom-checkbox mb-5" for="show_monster_to_low_level_message">
+                    <input type="hidden" name="show_monster_to_low_level_message" value="0"/>
+                    <input type="checkbox" id="show_monster_to_low_level_message" name="show_monster_to_low_level_message" value="1" {{$user->show_monster_to_low_level_message ? 'checked' : ''}}>
+                    <span></span>
+                    <span>Monster to low level message</span>
+                </label>
+            </div>
+            <x-core.alerts.info-alert title="ATTN!">
+                By selecting this, you are stating you want to be alerted, via the Server Message tab, when a monster is to low level for you.
+            </x-core.alerts.info-alert>
+        </div>
+        <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+
 
         <x-core.buttons.primary-button type="submit">Update Chat Settings.</x-core.buttons.primary-button>
     </form>

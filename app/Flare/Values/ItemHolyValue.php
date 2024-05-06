@@ -74,7 +74,7 @@ class ItemHolyValue {
     /**
      * Gets random Devoidance increase based on holy level.
      *
-     * @return int
+     * @return float
      */
     public function getRandomDevoidanceIncrease(): float {
         if ($this->value === self::LEVEL_ONE) {

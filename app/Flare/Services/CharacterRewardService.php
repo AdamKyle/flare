@@ -293,6 +293,10 @@ class CharacterRewardService {
         // Reduce The XP from the monster if needed.
         $xp = XPCalculator::fetchXPFromMonster($monster, $this->character->level);
 
+        if ($this->character->level >= $monster->max_level && $this->character->user->show_monster_to_low_level_message) {
+            ServerMessageHandler::sendBasicMessage($this->character->user, $monster->name . ' has a max level of: ' . number_format($monster->max_level) . '. You are only getting 1/3rd of: '.number_format($monster->xp).' XP before all bonuses. Move down the list child.');
+        }
+
         // Get XP based on the skill in trainings training sacraficial amount, ie, give me back 85% of this xp.
         $xp = $this->skillService->getXpWithSkillTrainingReduction($this->character, $xp);
 
