@@ -78,8 +78,7 @@ class CharacterReincarnateService {
             return $this->errorResult('You have maxed all stats to '.number_format(self::MAX_STATS).'.');
         }
 
-
-
+        
         $newReincarnatedStatBonus = $character->reincarnated_stat_increase + $characterBonus;
 
         if ($newReincarnatedStatBonus > self::MAX_STATS) {

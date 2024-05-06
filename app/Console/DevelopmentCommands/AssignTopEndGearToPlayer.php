@@ -47,7 +47,7 @@ class AssignTopEndGearToPlayer extends Command
         $purgatoryGear = Item::doesntHave('appliedHolyStacks')
                              ->where('item_prefix_id', null)
                              ->where('item_suffix_id', null)
-                             ->where('specialty_type', ItemSpecialtyType::PURGATORY_CHAINS)
+                             ->where('specialty_type', ItemSpecialtyType::DELUSIONAL_SILVER)
                              ->get();
 
         if (empty($purgatoryGear)) {

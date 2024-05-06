@@ -54,7 +54,6 @@ class MaxOutCharacter extends Command
 
         $character = $this->levelSkills($character);
         $character = $this->levelFactions($character);
-        $character = $this->levelMercenaries($character);
         $character = $this->maxOutClassRanks($character);
 
         $character->update([
@@ -146,16 +145,6 @@ class MaxOutCharacter extends Command
             'current_level'    => 5,
             'maxed'            => true,
             'title'            => FactionType::MYTHIC_PROTECTOR,
-        ]);
-
-        return $character->refresh();
-    }
-
-    protected function levelMercenaries(Character $character): Character {
-        $character->mercenaries()->update([
-            'current_level'      => 100,
-            'reincarnated_bonus' => 11,
-            'times_reincarnated' => 10,
         ]);
 
         return $character->refresh();

@@ -213,10 +213,10 @@ class PctService {
      * @return CelestialFight|null
      */
     protected function findCelestialFight(Character $character): ?CelestialFight {
-        $celestial = CelestialFight::where('type', CelestialConjureType::PUBLIC)->first();
+        $celestial = CelestialFight::where('type', CelestialConjureType::PRIVATE)->where('character_id', $character->id)->first();
 
         if (is_null($celestial)) {
-            $celestial = CelestialFight::where('type', CelestialConjureType::PRIVATE)->where('character_id', $character->id)->first();
+            $celestial = CelestialFight::where('type', CelestialConjureType::PUBLIC)->first();
         }
 
         return $celestial;

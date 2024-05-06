@@ -54,21 +54,28 @@ export default class Item extends React.Component<ItemProps, any> {
         return (
             <dl>
                 <dt>Defence</dt>
-                <dd
-                    className={clsx({
-                        "text-green-700 dark:text-green-500":
-                            this.isValueAboveZero(
-                                this.props.item.ac_adjustment,
-                            ),
-                        "text-red-700 dark:text-red-500": this.isValueBeloZero(
-                            this.props.item.ac_adjustment,
-                        ),
-                        "text-gray-700 dark:text-white":
-                            this.props.item.ac_adjustment === 0,
-                    })}
-                >
-                    {formatNumber(this.props.item.ac_adjustment)}
-                </dd>
+                {
+                    this.props.item.ac_adjustment === 0 ?
+                        <dd className="text-green-700 dark:text-green-500">
+                            {formatNumber(this.props.item.base_ac)}
+                        </dd>
+                    :
+                        <dd
+                            className={clsx({
+                                "text-green-700 dark:text-green-500":
+                                    this.isValueAboveZero(
+                                        this.props.item.ac_adjustment,
+                                    ),
+                                "text-red-700 dark:text-red-500": this.isValueBeloZero(
+                                    this.props.item.ac_adjustment,
+                                ),
+                                "text-gray-700 dark:text-white":
+                                    this.props.item.ac_adjustment === 0,
+                            })}
+                        >
+                            {formatNumber(this.props.item.ac_adjustment)}
+                        </dd>
+                }
             </dl>
         );
     }
