@@ -122,6 +122,99 @@ export default class Comparison extends React.Component<ComparisonProps, any> {
         );
     }
 
+    renderAmbushAndCounterChange() {
+        return (
+            <dl>
+                <dt>Ambush Chance</dt>
+                <dd
+                    className={clsx({
+                        "text-green-700 dark:text-green-500":
+                            this.isValueAboveZero(
+                                this.props.comparison.ambush_chance_adjustment,
+                            ),
+                        "text-red-700 dark:text-red-500": this.isValueBeloZero(
+                            this.props.comparison.ambush_chance_adjustment,
+                        ),
+                        "text-gray-700 dark:text-white":
+                            this.props.comparison.ambush_chance_adjustment ===
+                            0,
+                    })}
+                >
+                    {(
+                        this.props.comparison.ambush_chance_adjustment * 100
+                    ).toFixed(2)}
+                    %
+                </dd>
+
+                <dt>Ambush Resistance</dt>
+                <dd
+                    className={clsx({
+                        "text-green-700 dark:text-green-500":
+                            this.isValueAboveZero(
+                                this.props.comparison
+                                    .ambush_resistance_adjustment,
+                            ),
+                        "text-red-700 dark:text-red-500": this.isValueBeloZero(
+                            this.props.comparison.ambush_resistance_adjustment,
+                        ),
+                        "text-gray-700 dark:text-white":
+                            this.props.comparison
+                                .ambush_resistance_adjustment === 0,
+                    })}
+                >
+                    {(
+                        this.props.comparison.ambush_resistance_adjustment * 100
+                    ).toFixed(2)}
+                    %
+                </dd>
+
+                <dt>Counter Chance</dt>
+                <dd
+                    className={clsx({
+                        "text-green-700 dark:text-green-500":
+                            this.isValueAboveZero(
+                                this.props.comparison.counter_chance_adjustment,
+                            ),
+                        "text-red-700 dark:text-red-500": this.isValueBeloZero(
+                            this.props.comparison.counter_chance_adjustment,
+                        ),
+                        "text-gray-700 dark:text-white":
+                            this.props.comparison.counter_chance_adjustment ===
+                            0,
+                    })}
+                >
+                    {(
+                        this.props.comparison.counter_chance_adjustment * 100
+                    ).toFixed(2)}
+                    %
+                </dd>
+
+                <dt>Counter Resistance</dt>
+                <dd
+                    className={clsx({
+                        "text-green-700 dark:text-green-500":
+                            this.isValueAboveZero(
+                                this.props.comparison
+                                    .counter_resistance_adjustment,
+                            ),
+                        "text-red-700 dark:text-red-500": this.isValueBeloZero(
+                            this.props.comparison.counter_resistance_adjustment,
+                        ),
+                        "text-gray-700 dark:text-white":
+                            this.props.comparison
+                                .counter_resistance_adjustment === 0,
+                    })}
+                >
+                    {(
+                        this.props.comparison.counter_resistance_adjustment *
+                        100
+                    ).toFixed(2)}
+                    %
+                </dd>
+            </dl>
+        );
+    }
+
     renderHealingChange() {
         return (
             <dl>
@@ -130,13 +223,13 @@ export default class Comparison extends React.Component<ComparisonProps, any> {
                     className={clsx({
                         "text-green-700 dark:text-green-500":
                             this.isValueAboveZero(
-                                this.props.comparison.ac_adjustment,
+                                this.props.comparison.healing_adjustment,
                             ),
                         "text-red-700 dark:text-red-500": this.isValueBeloZero(
-                            this.props.comparison.ac_adjustment,
+                            this.props.comparison.healing_adjustment,
                         ),
                         "text-gray-700 dark:text-white":
-                            this.props.comparison.ac_adjustment === 0,
+                            this.props.comparison.healing_adjustment === 0,
                     })}
                 >
                     {formatNumber(this.props.comparison.healing_adjustment)}
@@ -146,13 +239,13 @@ export default class Comparison extends React.Component<ComparisonProps, any> {
                     className={clsx({
                         "text-green-700 dark:text-green-500":
                             this.isValueAboveZero(
-                                this.props.comparison.ac_adjustment,
+                                this.props.comparison.base_healing_adjustment,
                             ),
                         "text-red-700 dark:text-red-500": this.isValueBeloZero(
-                            this.props.comparison.ac_adjustment,
+                            this.props.comparison.base_healing_adjustment,
                         ),
                         "text-gray-700 dark:text-white":
-                            this.props.comparison.ac_adjustment === 0,
+                            this.props.comparison.base_healing_adjustment === 0,
                     })}
                 >
                     {(
@@ -165,13 +258,13 @@ export default class Comparison extends React.Component<ComparisonProps, any> {
                     className={clsx({
                         "text-green-700 dark:text-green-500":
                             this.isValueAboveZero(
-                                this.props.comparison.ac_adjustment,
+                                this.props.comparison.res_chance_adjustment,
                             ),
                         "text-red-700 dark:text-red-500": this.isValueBeloZero(
-                            this.props.comparison.ac_adjustment,
+                            this.props.comparison.res_chance_adjustment,
                         ),
                         "text-gray-700 dark:text-white":
-                            this.props.comparison.ac_adjustment === 0,
+                            this.props.comparison.res_chance_adjustment === 0,
                     })}
                 >
                     {(
@@ -204,10 +297,15 @@ export default class Comparison extends React.Component<ComparisonProps, any> {
             return this.renderHealingChange();
         }
 
+        if (this.props.comparison.type === ItemType.TRINKET) {
+            return this.renderAmbushAndCounterChange();
+        }
+
         return this.renderDefenceChange();
     }
 
     render() {
+        console.log(this.props.comparison);
         return (
             <div>
                 <dl>

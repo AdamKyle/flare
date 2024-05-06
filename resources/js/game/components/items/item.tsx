@@ -31,21 +31,28 @@ export default class Item extends React.Component<ItemProps, any> {
         return (
             <dl>
                 <dt>Attack</dt>
-                <dd
-                    className={clsx({
-                        "text-green-700 dark:text-green-500":
-                            this.isValueAboveZero(
-                                this.props.item.damage_adjustment,
-                            ),
-                        "text-red-700 dark:text-red-500": this.isValueBeloZero(
-                            this.props.item.damage_adjustment,
-                        ),
-                        "text-gray-700 dark:text-white":
-                            this.props.item.damage_adjustment === 0,
-                    })}
-                >
-                    {formatNumber(this.props.item.damage_adjustment)}
-                </dd>
+                {typeof this.props.item.damage_adjustment === "undefined" ? (
+                    <dd className="text-green-700 dark:text-green-500">
+                        {formatNumber(this.props.item.base_damage)}
+                    </dd>
+                ) : (
+                    <dd
+                        className={clsx({
+                            "text-green-700 dark:text-green-500":
+                                this.isValueAboveZero(
+                                    this.props.item.damage_adjustment,
+                                ),
+                            "text-red-700 dark:text-red-500":
+                                this.isValueBeloZero(
+                                    this.props.item.damage_adjustment,
+                                ),
+                            "text-gray-700 dark:text-white":
+                                this.props.item.damage_adjustment === 0,
+                        })}
+                    >
+                        {formatNumber(this.props.item.damage_adjustment)}
+                    </dd>
+                )}
             </dl>
         );
     }
@@ -54,7 +61,7 @@ export default class Item extends React.Component<ItemProps, any> {
         return (
             <dl>
                 <dt>Defence</dt>
-                {this.props.item.ac_adjustment === 0 ? (
+                {typeof this.props.item.ac_adjustment === "undefined" ? (
                     <dd className="text-green-700 dark:text-green-500">
                         {formatNumber(this.props.item.base_ac)}
                     </dd>
@@ -81,23 +88,58 @@ export default class Item extends React.Component<ItemProps, any> {
     }
 
     renderHealingChange() {
-        if (this.props.item.base_healing_mod === null) {
-            return;
-        }
+        const baseHealingMod =
+            this.props.item.base_healing_mod !== null
+                ? this.props.item.base_healing_mod
+                : 0;
 
         return (
             <dl>
                 <dt>Base Healing</dt>
                 <dd className="text-green-700 dark:text-green-500">
-                    +{formatNumber(this.props.item.raw_healing)}
+                    +
+                    {this.props.item.raw_healing
+                        ? formatNumber(this.props.item.raw_healing)
+                        : formatNumber(this.props.item.base_healing)}
                 </dd>
                 <dt>Base Healing Mod</dt>
                 <dd className="text-green-700 dark:text-green-500">
-                    +{(this.props.item.base_healing_mod * 100).toFixed(2)}%
+                    +{(baseHealingMod * 100).toFixed(2)}%
                 </dd>
                 <dt>Resurrection Chance</dt>
                 <dd className="text-green-700 dark:text-green-500">
                     +{(this.props.item.resurrection_chance * 100).toFixed(2)}%
+                </dd>
+            </dl>
+        );
+    }
+
+    renderAmbushAndCounterChange() {
+        return (
+            <dl>
+                <dt>Ambush Chance</dt>
+                <dd className="text-green-700 dark:text-green-500">
+                    +{(this.props.item.ambush_chance * 100).toFixed(2)}%
+                </dd>
+                <dt>Ambush Resistance</dt>
+                <dd className="text-green-700 dark:text-green-500">
+                    +
+                    {(this.props.item.ambush_resistance_chance * 100).toFixed(
+                        2,
+                    )}
+                    %
+                </dd>
+                <dt>Counter Chance</dt>
+                <dd className="text-green-700 dark:text-green-500">
+                    +{(this.props.item.counter_chance * 100).toFixed(2)}%
+                </dd>
+                <dt>Counter Resistance</dt>
+                <dd className="text-green-700 dark:text-green-500">
+                    +
+                    {(this.props.item.counter_resistance_chance * 100).toFixed(
+                        2,
+                    )}
+                    %
                 </dd>
             </dl>
         );
@@ -122,6 +164,12 @@ export default class Item extends React.Component<ItemProps, any> {
 
         if (this.props.item.type === ItemType.SPELL_HEALING) {
             return this.renderHealingChange();
+        }
+
+        if (this.props.item.type === ItemType.TRINKET) {
+            console.log(this.props.item);
+
+            return this.renderAmbushAndCounterChange();
         }
 
         return this.renderDefenceChange();
@@ -196,7 +244,7 @@ export default class Item extends React.Component<ItemProps, any> {
                     <div className="border-b-2 border-b-gray-200 dark:border-b-gray-600 my-3 md:hidden sm:block"></div>
                     <div>
                         {this.renderAttackOrDefenceAdjustment()}
-
+                        <div className="border-b-2 border-b-gray-200 dark:border-b-gray-600 my-3"></div>
                         {this.props.item.crafting_type !== null ? (
                             <>
                                 {this.props.item.type !== ItemType.TRINKET ? (
