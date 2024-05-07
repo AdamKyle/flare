@@ -33,15 +33,15 @@ export default class ItemHolyEffects {
     private getDevouringIncrease(holyLevel: number): string {
         switch (holyLevel) {
             case 1:
-                return "1-3";
+                return "0.1-0.3";
             case 2:
-                return "1-5";
+                return "0.1-0.5";
             case 3:
-                return "1-8";
+                return "0.1-0.8";
             case 4:
-                return "1-10";
+                return "0.1-1";
             case 5:
-                return "1-15";
+                return "0.1-1.5";
             default:
                 return "ERROR";
         }

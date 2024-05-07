@@ -44,7 +44,7 @@
                 </div>
             @endif
 
-            @if (!is_null($section['live_wire_component']) && $section['live_wire_component'] !== 'null' && $section['item_table_type'] === null)
+            @if (!is_null($section['live_wire_component']) && $section['live_wire_component'] !== 'null' && ($section['item_table_type'] === null || $section['item_table_type'] === 'null'))
                 <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
 
                 @livewire($section['live_wire_component'])

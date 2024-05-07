@@ -182,6 +182,10 @@ class KingdomAttackLogsTransformer extends TransformerAbstract {
             return 'Kingdom has not been walked';
         }
 
+        if ($logStatus->requestedResources()) {
+            return 'Kingdom requested resources';
+        }
+
         return 'Error. Unknown status';
     }
 }

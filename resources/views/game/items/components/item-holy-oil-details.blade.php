@@ -22,19 +22,19 @@
 
         switch($item->holy_level) {
             case 1:
-                $devouringIncrease = '1-3';
+                $devouringIncrease = '0.1-0.3';
                 break;
             case 2:
-                $devouringIncrease = '1-5';
+                $devouringIncrease = '0.1-0.5';
                 break;
             case 3:
-                $devouringIncrease = '1-8';
+                $devouringIncrease = '0.1-0.8';
                 break;
             case 4:
-                $devouringIncrease = '1-10';
+                $devouringIncrease = '0.1-1';
                 break;
             case 5:
-                $devouringIncrease = '1-15';
+                $devouringIncrease = '0.1-1.5';
                 break;
             default:
                 $devouringIncrease = 'ERROR';

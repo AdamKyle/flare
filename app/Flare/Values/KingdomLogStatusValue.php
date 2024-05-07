@@ -136,4 +136,13 @@ class KingdomLogStatusValue {
     public function notWalked(): bool {
         return $this->value === self::NOT_WALKED;
     }
+
+    /**
+     * Did we request resources?
+     *
+     * @return bool
+     */
+    public function requestedResources(): bool {
+        return $this->value === self::RESOURCES_REQUESTED;
+    }
 }
