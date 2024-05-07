@@ -28,4 +28,6 @@ export default interface UnitMovementDetails {
     is_returning: boolean;
 
     is_attacking: boolean;
+
+    resources_requested: boolean;
 }

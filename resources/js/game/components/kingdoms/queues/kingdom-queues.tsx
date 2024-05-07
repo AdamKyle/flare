@@ -10,7 +10,6 @@ import TimerProgressBar from "../../../components/ui/progress-bars/timer-progres
 import Ajax from "../../../lib/ajax/ajax";
 import { serviceContainer } from "../../../lib/containers/core-container";
 import CoreEventListener from "../../../lib/game/event-listeners/core-event-listener";
-import KingdomDetails from "../../../lib/game/kingdoms/deffinitions/kingdom-details";
 import { unitMovementReasonIcon } from "../helpers/unit-movement-reason-icon";
 import CancellationAjax from "./ajax/cancellation-ajax";
 import UnitMovementDetails from "./deffinitions/unit-movement-details";
@@ -22,6 +21,7 @@ import KingdomQueueState, {
     BuildingQueue,
     UnitQueue,
 } from "./types/kingdom-queue-state";
+import KingdomDetails from "../deffinitions/kingdom-details";
 
 export default class KingdomQueues extends React.Component<
     KingdomQueueProps,
@@ -76,7 +76,7 @@ export default class KingdomQueues extends React.Component<
                     });
 
                     if (typeof error.response !== "undefined") {
-                        const result = error.response;
+                        const result: AxiosResponse = error.response;
 
                         this.setState({
                             error_message: result.data.message,

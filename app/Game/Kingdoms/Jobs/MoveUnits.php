@@ -72,25 +72,17 @@ class MoveUnits implements ShouldQueue {
         }
 
         if ($unitMovement->is_attacking) {
+
             $kingdom          = Kingdom::find($unitMovement->to_kingdom_id);
             $attackingKingdom = Kingdom::find($unitMovement->from_kingdom_id);
 
-            $unitMovement->delete();
-
-            event(new UpdateKingdomQueues($kingdom));
-            event(new UpdateKingdomQueues($attackingKingdom));
-
-            if (!is_null($kingdom->character_id)) {
-                $updateKingdom->updateKingdomAllKingdoms($kingdom->character);
-            }
-
-            $updateKingdom->updateKingdomAllKingdoms($attackingKingdom->character);
+            $this->cleanUpMovementQueue($unitMovement, $updateKingdom);
 
             $attackKingdomWithUnitsHandler->attackKingdomWithUnits($kingdom, $attackingKingdom, $unitMovement->units_moving);
         }
 
         if ($unitMovement->resources_requested) {
-            $this->handleWhenResourceRequested($unitMovement);
+            $this->handleWhenResourceRequested($unitMovement, $updateKingdom);
         }
     }
 
@@ -265,7 +257,7 @@ class MoveUnits implements ShouldQueue {
         return false;
     }
 
-    private function handleWhenResourceRequested(UnitMovementQueue $unitMovementQueue): void {
+    private function handleWhenResourceRequested(UnitMovementQueue $unitMovementQueue, UpdateKingdom $updateKingdom): void {
 
         if (empty($this->additionalParams)) {
             $unitMovementQueue->delete();
@@ -286,5 +278,23 @@ class MoveUnits implements ShouldQueue {
         }
 
         RequestResources::dispatch($unitMovementQueue->character_id, $unitMovementQueue->to_kingdom_id, $unitMovementQueue->from_kingdom_id, $this->additionalParams['amount_of_resources'], $unitMovementQueue->units_moving, $this->additionalParams['additional_log_messages']);
+
+        $this->cleanUpMovementQueue($unitMovementQueue, $updateKingdom);
+    }
+
+    private function cleanUpMovementQueue(UnitMovementQueue $unitMovement, UpdateKingdom $updateKingdom): void {
+        $kingdom          = Kingdom::find($unitMovement->to_kingdom_id);
+        $secondaryKingdom = Kingdom::find($unitMovement->from_kingdom_id);
+
+        $unitMovement->delete();
+
+        event(new UpdateKingdomQueues($kingdom));
+        event(new UpdateKingdomQueues($secondaryKingdom));
+
+        if (!is_null($kingdom->character_id) && $kingdom->character_id !== $secondaryKingdom->character_id) {
+            $updateKingdom->updateKingdomAllKingdoms($kingdom->character);
+        }
+
+        $updateKingdom->updateKingdomAllKingdoms($secondaryKingdom->character);
     }
 }

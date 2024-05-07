@@ -8,6 +8,7 @@ import {
     UnitLogDetails,
 } from "./deffinitions/kingdom-log-details";
 import KingdomLogProps from "./types/kingdom-log-props";
+import { startCase } from "lodash";
 
 export default class KingdomLogDetails extends React.Component<
     KingdomLogProps,
@@ -219,7 +220,76 @@ export default class KingdomLogDetails extends React.Component<
         );
     }
 
+    renderResourcesDeliveredDetails() {
+        const resourceKeys = Object.keys(
+            this.props.log.additional_details.resource_request_log
+                .resource_details,
+        );
+        console.log(
+            this.props.log.additional_details.resource_request_log
+                .resource_details,
+        );
+        return resourceKeys.map((resourceKey) => {
+            return (
+                <>
+                    <dt>{startCase(resourceKey)}</dt>
+                    <dd className="text-green-700 dark:text-green-500">
+                        +
+                        {formatNumber(
+                            this.props.log.additional_details
+                                .resource_request_log.resource_details[
+                                resourceKey
+                            ],
+                        )}
+                    </dd>
+                </>
+            );
+        });
+    }
+
+    renderAdditionalResourceMovementLogDetails() {
+        const additionalMessages =
+            this.props.log.additional_details.resource_request_log
+                .additional_messages;
+
+        return additionalMessages.map((message: string) => {
+            return <li>{message}</li>;
+        });
+    }
+
     render() {
+        if (this.props.log.status === "Kingdom requested resources") {
+            return (
+                <BasicCard>
+                    <div className="text-right cursor-pointer text-red-500">
+                        <button onClick={this.props.close_details}>
+                            <i className="fas fa-minus-circle"></i>
+                        </button>
+                    </div>
+
+                    <p className={"my-4"}>
+                        Kingdom: {this.props.log.to_kingdom_name} has requested
+                        resources from: {this.props.log.from_kingdom_name}.
+                        These have now been delivered.
+                    </p>
+                    <dl>{this.renderResourcesDeliveredDetails()}</dl>
+
+                    {this.props.log.additional_details.resource_request_log
+                        .additional_messages.length > 0 ? (
+                        <div className="my-4">
+                            <p className="text-yellow-700 dark:text-yellow-600 mb-4">
+                                There are additional details about this trip:
+                            </p>
+
+                            <ul className="list-disc ml-4">
+                                {this.renderAdditionalResourceMovementLogDetails()}
+                            </ul>
+                        </div>
+                    ) : null}
+                </BasicCard>
+            );
+        }
+
         if (this.props.log.status === "Kingdom has not been walked") {
             return (
                 <BasicCard>

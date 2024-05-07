@@ -4,9 +4,9 @@ import DangerAlert from "../../../components/ui/alerts/simple-alerts/danger-aler
 import Table from "../../../components/ui/data-tables/table";
 import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
 import Ajax from "../../../lib/ajax/ajax";
-import UnitsInMovementTableProps from "../../../lib/game/kingdoms/types/units-in-movement-table-props";
-import UnitsInMovementTableState from "../../../lib/game/kingdoms/types/units-in-movement-table-state";
 import { BuildUnitsInMovementColumns } from "../table-columns/build-units-in-movement-columns";
+import UnitsInMovementTableProps from "../types/units-in-movement-table-props";
+import UnitsInMovementTableState from "../types/units-in-movement-table-state";
 
 export default class UnitsMovementTable extends React.Component<
     UnitsInMovementTableProps,
@@ -46,7 +46,7 @@ export default class UnitsMovementTable extends React.Component<
                             this.setState({ loading: false });
 
                             if (typeof error.response !== "undefined") {
-                                const response = error.response;
+                                const response: AxiosResponse = error.response;
 
                                 this.setState({
                                     error_message: response.data.message,

@@ -277,16 +277,14 @@ class ResourceTransferService {
         })->first();
 
         $unitMovementDetails = [
-            $requestingFromKingdom->name => [
-                [
-                    'unit_id' => $spearmen->id,
-                    'amount' => self::SPEARMEN_COST,
-                ]
+            [
+                'unit_id' => $spearmen->id,
+                'amount' => self::SPEARMEN_COST,
             ]
         ];
 
         if (!is_null($airShip)) {
-            $unitMovementDetails[$requestingFromKingdom->name][] = [
+            $unitMovementDetails[] = [
                 'unit_id' => $airShip->id,
                 'amount' => 1,
             ];

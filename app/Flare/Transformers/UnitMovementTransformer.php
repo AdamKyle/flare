@@ -30,6 +30,7 @@ class UnitMovementTransformer extends TransformerAbstract {
             'is_returning'      => $unitMovementQueue->is_returning,
             'is_moving'         => $unitMovementQueue->is_moving,
             'is_attacking'      => $unitMovementQueue->is_attacking,
+            'resources_requested' => $unitMovementQueue->resources_requested,
         ];
     }
 
@@ -69,7 +70,7 @@ class UnitMovementTransformer extends TransformerAbstract {
         }
 
         if ($unitMovementQueue->is_returning) {
-            return 'Returning from attack';
+            return 'Returning home';
         }
 
         if ($unitMovementQueue->is_moving) {
