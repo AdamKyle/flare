@@ -305,7 +305,6 @@ export default class Comparison extends React.Component<ComparisonProps, any> {
     }
 
     render() {
-        console.log(this.props.comparison);
         return (
             <div>
                 <dl>

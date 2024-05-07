@@ -22,6 +22,8 @@ export interface EnchantingState {
     skill_xp: SkillXP;
 
     info_message: string | null;
+
+    hide_enchanting_help: boolean;
 }
 
 export type ItemToEnchant = {

@@ -256,10 +256,7 @@ class EnchantingService {
 
     protected function getAvailableAffixes(CharacterStatBuilder $builder, Skill $enchantingSkill, bool $showMerchantMessage = true): Collection {
 
-        $currentInt = $builder->statMod('int');
-
-        $affixes = ItemAffix::select('name', 'cost', 'id', 'type')
-            ->where('int_required', '<=', $currentInt)
+        $affixes = ItemAffix::select('name', 'cost', 'id', 'type', 'int_required')
             ->where('skill_level_required', '<=', $enchantingSkill->level)
             ->where('randomly_generated', false)
             ->orderBy('skill_level_required', 'asc')

@@ -167,8 +167,6 @@ export default class Item extends React.Component<ItemProps, any> {
         }
 
         if (this.props.item.type === ItemType.TRINKET) {
-            console.log(this.props.item);
-
             return this.renderAmbushAndCounterChange();
         }
 

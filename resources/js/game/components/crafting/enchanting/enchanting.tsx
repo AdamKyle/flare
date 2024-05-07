@@ -22,6 +22,7 @@ import EnchantingProps from "./types/enchanting-props";
 import CraftingXp from "../base-components/skill-xp/crafting-xp";
 import OrangeButton from "../../ui/buttons/orange-button";
 import InfoAlert from "../../ui/alerts/simple-alerts/info-alert";
+import clsx from "clsx";
 
 export default class Enchanting extends React.Component<
     EnchantingProps,
@@ -49,6 +50,7 @@ export default class Enchanting extends React.Component<
                 skill_name: "Unknown",
                 level: 1,
             },
+            hide_enchanting_help: false,
         };
 
         // @ts-ignore
@@ -58,6 +60,12 @@ export default class Enchanting extends React.Component<
     }
 
     componentDidMount() {
+        if (localStorage.getItem("hide-enchanting-help") !== null) {
+            this.setState({
+                hide_enchanting_help: true,
+            });
+        }
+
         const url = craftingGetEndPoints("enchant", this.props.character_id);
 
         new Ajax().setRoute(url).doAjaxCall("get", (result: AxiosResponse) => {
@@ -258,18 +266,21 @@ export default class Enchanting extends React.Component<
     }
 
     renderEnchantmentOptions(type: "prefix" | "suffix") {
-        const enchantments = this.state.enchantments.filter(
-            (enchantment: any) => {
+        const enchantments = this.state.enchantments
+            .filter((enchantment: any) => {
                 return enchantment.type === type;
-            },
-        );
+            })
+            .sort((a: any, b: any) => a.cost - b.cost);
 
         return enchantments.map((enchantment: any) => {
             return {
                 label:
                     enchantment.name +
-                    " Cost: " +
-                    formatNumber(enchantment.cost),
+                    " [Cost: " +
+                    formatNumber(enchantment.cost) +
+                    ", INT REQ: " +
+                    formatNumber(enchantment.int_required) +
+                    "]",
                 value: enchantment.id,
             };
         });
@@ -361,6 +372,14 @@ export default class Enchanting extends React.Component<
             (this.state.selected_prefix === null &&
                 this.state.selected_suffix === null)
         );
+    }
+
+    hideEnchantingHelp() {
+        localStorage.setItem("hide-enchanting-help", "true");
+
+        this.setState({
+            hide_enchanting_help: true,
+        });
     }
 
     render() {
@@ -543,6 +562,43 @@ export default class Enchanting extends React.Component<
                             on_click={this.resetSuffixes.bind(this)}
                         />
                     </div>
+                </div>
+                <div className="m-auto lg:w-1/2 relative lg:left-[-60px]">
+                    <InfoAlert
+                        additional_css={clsx("my-4", {
+                            hidden: this.state.hide_enchanting_help,
+                        })}
+                        close_alert={this.hideEnchantingHelp.bind(this)}
+                    >
+                        <p className="my-2">
+                            <strong className="my-2">
+                                Pay attention to your Server Message chat tab.
+                            </strong>
+                        </p>
+                        <p className="mb-2">
+                            Enchanting requires you to raise your character INT
+                            and your Enchanting skill. Players will run into an
+                            issue where they unlock new enchants but cannot
+                            craft them because their INT is too low. You can
+                            raise this, regardless of class, by equipping
+                            staves, damage spells or utilizing the{" "}
+                            <a
+                                href="/information/class-ranks"
+                                target="_blank"
+                                className="ml-2"
+                            >
+                                Class Ranks{" "}
+                                <i className="fas fa-external-link-alt"></i>
+                            </a>{" "}
+                            or equipping Stat Modifier enchants or Spell
+                            Crafting enchants will also raise your INT.
+                        </p>
+                        <p className="mb-2">
+                            Sometimes, you just need to level your character as
+                            well. Never underestimate a bit of grind.
+                        </p>
+                        <p>Click Help below for more info.</p>
+                    </InfoAlert>
                 </div>
                 <div className="m-auto lg:w-1/2 relative lg:left-[-60px]">
                     {this.state.loading ? <LoadingProgressBar /> : null}
