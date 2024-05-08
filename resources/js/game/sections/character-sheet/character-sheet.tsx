@@ -118,7 +118,8 @@ export default class CharacterSheet extends React.Component<
                                 },
                                 () => {
                                     if (typeof error.response !== "undefined") {
-                                        const response: AxiosResponse = error.response;
+                                        const response: AxiosResponse =
+                                            error.response;
 
                                         this.setState({
                                             error_message:
