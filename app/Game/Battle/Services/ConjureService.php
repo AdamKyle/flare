@@ -2,10 +2,12 @@
 
 namespace App\Game\Battle\Services;
 
+use App\Flare\Models\Event;
+use App\Game\Events\Values\EventType;
 use App\Game\Maps\Events\UpdateMap;
+use Exception;
 use Facades\App\Flare\Cache\CoordinatesCache;
 use App\Flare\Models\GameMap;
-use App\Flare\Values\CelestialType;
 use App\Flare\Values\MapNameValue;
 use App\Flare\Models\CelestialFight;
 use App\Flare\Models\Character;
@@ -17,7 +19,6 @@ use App\Game\Messages\Builders\NpcServerMessageBuilder;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Core\Events\UpdateTopBarEvent;
-use App\Game\Maps\Services\LocationService;
 
 class ConjureService {
 
@@ -39,7 +40,7 @@ class ConjureService {
      * @param Character $character
      * @return void
      */
-    public function movementConjure(Character $character) {
+    public function movementConjure(Character $character): void {
 
         if (CelestialFight::where('type', CelestialConjureType::PUBLIC)->get()->isNotEmpty()) {
             return;
@@ -48,31 +49,7 @@ class ConjureService {
         $x = $this->getXPosition();
         $y = $this->getYPosition();
 
-
-        $invalidMaps = GameMap::whereIn('name', [MapNameValue::PURGATORY, MapNameValue::HELL])->pluck('id')->toArray();
-
-        $monster = Monster::where('is_celestial_entity', true)
-                          ->whereNotIn('game_map_id', $invalidMaps)
-                          ->whereNull('celestial_type')
-                          ->inRandomOrder()
-                          ->first();
-
-        $healthRange          = explode('-', $monster->health_range);
-        $currentMonsterHealth = rand($healthRange[0], $healthRange[1]) + 10;
-
-        CelestialFight::create([
-            'monster_id'      => $monster->id,
-            'character_id'    => null,
-            'conjured_at'     => now(),
-            'x_position'      => $x,
-            'y_position'      => $y,
-            'damaged_kingdom' => false,
-            'stole_treasury'  => false,
-            'weakened_morale' => false,
-            'current_health'  => $currentMonsterHealth,
-            'max_health'      => $currentMonsterHealth,
-            'type'            => CelestialConjureType::PUBLIC,
-        ]);
+        $monster = $this->createCelestialRecord($x, $y);
 
         $plane = $monster->gameMap->name;
 
@@ -80,6 +57,26 @@ class ConjureService {
         $randomIndex = rand(0, count($types) - 1);
 
         event(new GlobalMessageEvent($character->name . ' ' . $types[$randomIndex] . ': ' . $monster->name . ' on the ' . $plane . ' plane at (X/Y): ' . $x . '/' . $y));
+
+        if ($this->isEventWithCelestialsRunning()) {
+
+            $currentDate = now();
+
+            $eventsRunning = Event::where('started_at', '<=', $currentDate)->where('ends_at', '>=', $currentDate)->get();
+
+            foreach ($eventsRunning as $event)  {
+                if ($this->isCelestialFromEventMap($event, $monster)) {
+
+                    $x = $this->getXPosition();
+                    $y = $this->getYPosition();
+
+                    $monster = $this->createCelestialRecord($x, $y, [
+                        $monster->gameMap->name
+                    ]);
+                }
+            }
+
+        }
     }
 
     /**
@@ -89,12 +86,9 @@ class ConjureService {
      * @param Character $character
      * @param string $type
      * @return void
-     * @throws \Exception
+     * @throws Exception
      */
-    public function conjure(Monster $monster, Character $character, string $type) {
-        $x = $this->getXPosition();
-        $y = $this->getYPosition();
-
+    public function conjure(Monster $monster, Character $character, string $type): void {
         $healthRange          = explode('-', $monster->health_range);
         $currentMonsterHealth = rand($healthRange[0], $healthRange[1]);
 
@@ -213,5 +207,61 @@ class ConjureService {
      */
     protected function getYPosition(): int {
         return CoordinatesCache::getFromCache()['y'][rand(CoordinatesCache::getFromCache()['y'][0], (count(CoordinatesCache::getFromCache()['y']) - 1))];
+    }
+
+    private function isEventWithCelestialsRunning(): bool {
+        $eventsWithCelestials = [EventType::DELUSIONAL_MEMORIES_EVENT];
+
+        return Event::whereIn('type', $eventsWithCelestials)->count() > 0;
+    }
+
+    private function isCelestialFromEventMap(Event $event, Monster $monster): bool {
+        $monsterGameMapId = $monster->game_map_id;
+
+        $eventType = new EventType($event->type);
+
+        $gameMapId = null;
+
+        if ($eventType->isDelusionalMemoriesEvent()) {
+            $gameMap = GameMap::where('name', MapNameValue::DELUSIONAL_MEMORIES)->first();
+
+            if (is_null($gameMap)) {
+                return false;
+            }
+
+            $gameMapId = $gameMap->id;
+        }
+
+        return $monsterGameMapId === $gameMapId;
+    }
+
+    private function createCelestialRecord(int $x, int $y, array $additionalInvalidMaps = []): Monster {
+
+        $invalidMaps = GameMap::whereIn('name', array_merge([MapNameValue::PURGATORY, MapNameValue::HELL], $additionalInvalidMaps))->pluck('id')->toArray();
+
+        $monster = Monster::where('is_celestial_entity', true)
+            ->whereNotIn('game_map_id', $invalidMaps)
+            ->whereNull('celestial_type')
+            ->inRandomOrder()
+            ->first();
+
+        $healthRange          = explode('-', $monster->health_range);
+        $currentMonsterHealth = rand($healthRange[0], $healthRange[1]) + 10;
+
+        CelestialFight::create([
+            'monster_id'      => $monster->id,
+            'character_id'    => null,
+            'conjured_at'     => now(),
+            'x_position'      => $x,
+            'y_position'      => $y,
+            'damaged_kingdom' => false,
+            'stole_treasury'  => false,
+            'weakened_morale' => false,
+            'current_health'  => $currentMonsterHealth,
+            'max_health'      => $currentMonsterHealth,
+            'type'            => CelestialConjureType::PUBLIC,
+        ]);
+
+        return $monster;
     }
 }

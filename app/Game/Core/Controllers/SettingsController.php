@@ -45,6 +45,7 @@ class SettingsController extends Controller {
             'show_building_upgrade_messages' => $request->has('show_building_upgrade_messages') ? $request->show_building_upgrade_messages : false,
             'show_kingdom_update_messages'   => $request->has('show_kingdom_update_messages') ? $request->show_kingdom_update_messages : false,
             'show_building_rebuilt_messages' => $request->has('show_building_rebuilt_messages') ? $request->show_building_rebuilt_messages : false,
+            'show_monster_to_low_level_message' => $request->has('show_monster_to_low_level_message') ? $request->show_monster_to_low_level_message : false,
         ]);
 
         return redirect()->back()->with('success', 'Updated chat preferences.');

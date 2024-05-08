@@ -80,7 +80,15 @@ class MovementService {
      * Constructor
      *
      * @param PortService $portService
-     * @return void
+     * @param MapTileValue $mapTile
+     * @param CharacterSheetBaseInfoTransformer $characterAttackTransformer
+     * @param CoordinatesCache $coordinatesCache
+     * @param MapPositionValue $mapPositionValue
+     * @param TraverseService $traverseService
+     * @param ConjureService $conjureService
+     * @param BuildMonsterCacheService $buildMonsterCacheService
+     * @param LocationService $locationService
+     * @param Manager $manager
      */
     public function __construct(
         PortService $portService,

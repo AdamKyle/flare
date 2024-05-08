@@ -60,7 +60,13 @@ class ElementalAtonement extends BaseAttribute {
 
             if (!empty($itemAtonements)) {
                 foreach ($itemAtonements as $key => $value) {
-                    $atonements[$key][] = floatval($value);
+                    $value = floatval($value);
+
+                    if ($value <= 0) {
+                        continue;
+                    }
+
+                    $atonements[$key][] = $value;
                 }
             }
         }
