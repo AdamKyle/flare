@@ -222,6 +222,10 @@ class PctService {
 
             $eventMapNames = [MapNameValue::DELUSIONAL_MEMORIES];
 
+            if (is_null($celestial)) {
+                return null;
+            }
+
             if (in_array($celestial->monster->game_map_id, $eventMapNames)) {
                 $questItemSlot = $character->inventory->slots->filter(function($slot) {
                     return $slot->item->type === 'quest' && $slot->item->effect === ItemEffectsValue::PURGATORY;

@@ -46,7 +46,7 @@ class CelestialFight extends Model {
     ];
 
     public function monster() {
-        return $this->belongsTo(Monster::class);
+        return $this->belongsTo(Monster::class, 'monster_id', 'id');
     }
 
     public function character() {
