@@ -5,6 +5,8 @@ namespace App\Game\Maps\Services;
 use App\Flare\Models\CelestialFight;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameMap;
+use App\Flare\Values\ItemEffectsValue;
+use App\Flare\Values\MapNameValue;
 use App\Game\Battle\Values\CelestialConjureType;
 use App\Game\Character\Builders\AttackBuilders\Jobs\CharacterAttackTypesCacheBuilder;
 use App\Game\Maps\Events\UpdateMap;
@@ -217,6 +219,22 @@ class PctService {
 
         if (is_null($celestial)) {
             $celestial = CelestialFight::where('type', CelestialConjureType::PUBLIC)->first();
+
+            $eventMapNames = [MapNameValue::DELUSIONAL_MEMORIES];
+
+            if (in_array($celestial->monstwr->game_map_id, $eventMapNames)) {
+                $questItemSlot = $character->inventory->slots->filter(function($slot) {
+                    return $slot->item->type === 'quest' && $slot->item->effect === ItemEffectsValue::PURGATORY;
+                })->first();
+
+                if (is_null($questItemSlot)) {
+                    $celestial = CelestialFight::where('type', CelestialConjureType::PUBLIC)
+                        ->whereHas('monster', function ($query) use ($eventMapNames) {
+                            $query->whereNotIn('game_map_id', $eventMapNames);
+                        })
+                        ->first();
+                }
+            }
         }
 
         return $celestial;
