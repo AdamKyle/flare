@@ -36,6 +36,7 @@ class AssignNewBuildingsToExistingKingdoms extends Command
     private function assignNewBuildingsToExistingKingdoms(Kingdom $kingdom): void {
         $character = $kingdom->character;
 
+
         foreach(GameBuilding::all() as $building) {
 
             $foundBuilding = $kingdom->buildings()->where('game_building_id', $building->id)->first();
@@ -47,13 +48,15 @@ class AssignNewBuildingsToExistingKingdoms extends Command
             $isLocked  = $building->is_locked;
 
             if ($isLocked) {
-                $passive = $character->passiveSkills()->where('passive_skill_id', $building->passive_skill_id)->first();
 
-                if (!is_null($passive)) {
-                    if ($passive->current_level === $building->level_required) {
-                        $isLocked = false;
+                if (!is_null($character)) {
+                    $passive = $character->passiveSkills()->where('passive_skill_id', $building->passive_skill_id)->first();
+
+                    if (!is_null($passive)) {
+                        $isLocked = !($passive->current_level >= $building->level_required); // We're not locked if we are at or above the level
                     }
                 }
+
             }
 
             $kingdom->buildings()->create([
