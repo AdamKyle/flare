@@ -222,7 +222,7 @@ class PctService {
 
             $eventMapNames = [MapNameValue::DELUSIONAL_MEMORIES];
 
-            if (in_array($celestial->monstwr->game_map_id, $eventMapNames)) {
+            if (in_array($celestial->monster->game_map_id, $eventMapNames)) {
                 $questItemSlot = $character->inventory->slots->filter(function($slot) {
                     return $slot->item->type === 'quest' && $slot->item->effect === ItemEffectsValue::PURGATORY;
                 })->first();
