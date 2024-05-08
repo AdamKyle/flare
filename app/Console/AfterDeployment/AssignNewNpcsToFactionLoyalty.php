@@ -2,7 +2,6 @@
 
 namespace App\Console\AfterDeployment;
 
-use App\Console\Commands\Exception;
 use App\Flare\Models\Character;
 use App\Flare\Models\Event;
 use App\Flare\Models\FactionLoyalty;
@@ -26,6 +25,7 @@ class AssignNewNpcsToFactionLoyalty extends Command
         'ring',
         'spell',
     ];
+
 
     /**
      * The name and signature of the console command.
@@ -60,15 +60,11 @@ class AssignNewNpcsToFactionLoyalty extends Command
 
         $npcs = Npc::where('game_map_id', $factionLoyalty->faction->game_map_id)->get();
 
-        $totalNpcFame = (1 / $npcs->count()) / 25;
-
         foreach ($npcs as $npc) {
 
             $hasNpc = $factionLoyalty->factionLoyaltyNpcs()->where('npc_id', $npc->id)->exists();
 
-            if ($hasNpc) {
-                $factionLoyalty->update(['kingdom_item_defence_bonus' => $totalNpcFame]);
-            } else {
+            if (!$hasNpc) {
                 $craftingTasks = $this->createCraftingTasks($npc->gameMap->name);
                 $bountyTasks   = $this->createBountyTasks($character, $npc->gameMap);
 
@@ -79,7 +75,7 @@ class AssignNewNpcsToFactionLoyalty extends Command
                     'max_level'                  => 25,
                     'next_level_fame'            => collect($craftingTasks)->sum('required_amount') +
                         collect($bountyTasks)->sum('required_amount'),
-                    'kingdom_item_defence_bonus' => $totalNpcFame,
+                    'kingdom_item_defence_bonus' => 0.025,
                     'currently_helping'          => false,
                 ]);
 
@@ -89,6 +85,16 @@ class AssignNewNpcsToFactionLoyalty extends Command
                     'fame_tasks'             => array_merge($bountyTasks, $craftingTasks)
                 ]);
             }
+        }
+
+        $npcs = FactionLoyaltyNpc::where('faction_loyalty_id', $factionLoyalty->id)->get();
+
+        $totalNpcKingdomItemDefencePerLevel = (.95 / $npcs->count()) / 25;
+
+        foreach ($npcs as $npc) {
+            $npc->update([
+                'kingdom_item_defence_bonus' => $totalNpcKingdomItemDefencePerLevel
+            ]);
         }
     }
 

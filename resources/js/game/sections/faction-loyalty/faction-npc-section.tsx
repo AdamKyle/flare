@@ -70,7 +70,7 @@ export default class FactionNpcSection extends React.Component<
                         {(
                             this.props.faction_loyalty_npc
                                 .kingdom_item_defence_bonus * 100
-                        ).toFixed(0)}
+                        ).toFixed(2)}
                         %
                     </dd>
                     <dt>Current Defence Bonus</dt>

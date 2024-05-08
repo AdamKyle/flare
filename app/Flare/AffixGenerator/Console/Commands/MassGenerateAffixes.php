@@ -46,9 +46,6 @@ class MassGenerateAffixes extends Command {
 
         $attributes = $this->selectAttributesForAffixes();
 
-        $attribues[] = 'int_required';
-        $atributes[] = 'cost';
-
         if (in_array('damage', $attributes)) {
             $this->isDamageIrresistable($affixGeneratorDTO);
 

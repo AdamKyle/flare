@@ -5,6 +5,8 @@ export interface QuestDetails {
 
     parent_id: number;
 
+    parent_quest_id: number;
+
     is_parent: boolean;
 
     name: string;

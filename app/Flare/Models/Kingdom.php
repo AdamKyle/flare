@@ -158,7 +158,9 @@ class Kingdom extends Model {
 
         $factionNpcs = $loyalty->factionLoyaltyNpcs;
 
-        return $factionNpcs->sum('current_kingdom_item_defence_bonus');
+        $totalDefence = $factionNpcs->sum('current_kingdom_item_defence_bonus');
+
+        return min($totalDefence, 0.95);
     }
 
     public function getWallsDefence(): float {

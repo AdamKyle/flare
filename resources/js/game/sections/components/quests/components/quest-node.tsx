@@ -33,9 +33,9 @@ export default class QuestNode extends React.Component<QuestNodeProps, any> {
                 return true;
             }
 
-            // @ts-ignore
             return this.props.completed_quests.includes(
-                this.props.quest.parent_quest_id,
+                // @ts-ignore
+                this.props.quest.parent_quest_id as number,
             );
         }
 

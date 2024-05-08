@@ -40,6 +40,7 @@ class MassImportCustomData extends Command {
     public function handle() {
 
         Artisan::call('import:game-data "Items"');
+        Artisan::call('import:game-data "Affixes"');
         Artisan::call('import:game-data "Npcs"');
         Artisan::call('import:game-data "Kingdoms"');
         Artisan::call('import:game-data "Kingdom Passive Skills"');
@@ -48,6 +49,8 @@ class MassImportCustomData extends Command {
         Artisan::call('assign:new-skills');
         Artisan::call('assign:new-npcs-to-faction-loyalty');
         Artisan::call('assign:new-buildings-to-existing-kingdoms');
+        Artisan::call('adjust:affixes-attached-to-items');
+        Artisan::call('balance:monsters');
         Artisan::call('create:character-attack-data');
         Artisan::call('generate:monster-cache');
         Artisan::call('create:quest-cache');

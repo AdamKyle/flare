@@ -164,7 +164,7 @@ class AffixAttributeBuilder {
 
         foreach ($stats as $stat) {
             $amount = $this->getPercentage($this->percentageRange[0], $this->percentageRange[1]) / 100;
-            $statAttributes[$stat] = $amount > 1 ? 1 : $amount;
+            $statAttributes[$stat] = $amount > 1 ? .95 : $amount;
         }
 
         $statAttributes['reduces_enemy_stats'] = true;
@@ -208,8 +208,8 @@ class AffixAttributeBuilder {
         $amount = $this->getPercentage($this->percentageRange[0], $this->percentageRange[1]) / 100;
 
         return [
-            'skill_reduction'      => $amount > 1 ? 1 : $amount,
-            'resistance_reduction' => $amount > 1 ? 1 : $amount,
+            'skill_reduction'      => $amount > 1 ? .95 : $amount,
+            'resistance_reduction' => $amount > 1 ? .95 : $amount,
         ];
     }
 
@@ -237,7 +237,7 @@ class AffixAttributeBuilder {
         $amount = $this->getPercentage($this->percentageRange[0], $this->percentageRange[1]) / 100;
 
         return [
-            'devouring_light' => $amount > 1 ? 1 : $amount,
+            'devouring_light' => $amount > 1 ? .95 : $amount,
         ];
     }
 

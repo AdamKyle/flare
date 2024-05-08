@@ -4,7 +4,6 @@ import React, { ReactNode } from "react";
 export const unitMovementReasonIcon = (
     unitMovementData: UnitMovementDetails,
 ): ReactNode => {
-    console.log(unitMovementData);
     if (unitMovementData.is_moving) {
         return (
             <i className="ra ra-heavy-shield text-blue-500 dark:text-blue-400"></i>

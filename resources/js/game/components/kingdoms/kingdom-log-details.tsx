@@ -225,10 +225,7 @@ export default class KingdomLogDetails extends React.Component<
             this.props.log.additional_details.resource_request_log
                 .resource_details,
         );
-        console.log(
-            this.props.log.additional_details.resource_request_log
-                .resource_details,
-        );
+
         return resourceKeys.map((resourceKey) => {
             return (
                 <>
