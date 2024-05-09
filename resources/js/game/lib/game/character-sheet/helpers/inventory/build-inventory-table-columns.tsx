@@ -16,6 +16,7 @@ import PrimaryLinkButton from "../../../../../components/ui/buttons/primary-link
  * @param clickAction
  * @param manageSkills
  * @param componentName
+ * @param selectMultipleItems
  * @constructor
  */
 export const BuildInventoryTableColumns = (
@@ -28,6 +29,7 @@ export const BuildInventoryTableColumns = (
         itemSkillProgressions: any[],
     ) => void,
     componentName?: string,
+    selectMultipleItems?: (e: React.ChangeEvent<HTMLInputElement>) => void,
 ) => {
     if (viewPort <= 639) {
         const smallerColumns = [
@@ -145,6 +147,25 @@ export const BuildInventoryTableColumns = (
             selector: (row: any) => "",
             // @ts-ignore
             cell: (row: any) => component.actions(row),
+        });
+    }
+
+    if (typeof selectMultipleItems !== "undefined") {
+        columns.unshift({
+            name: "",
+            selector: (row: any) => row.slot_id,
+            cell: (row: any) => (
+                <span className="m-auto">
+                    <input
+                        type="checkbox"
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                            selectMultipleItems(e)
+                        }
+                        className="form-checkbox"
+                        data-slot-id={row.slot_id}
+                    />
+                </span>
+            ),
         });
     }
 

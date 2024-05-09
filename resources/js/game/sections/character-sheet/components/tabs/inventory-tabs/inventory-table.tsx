@@ -19,6 +19,7 @@ export default class InventoryTable extends React.Component<
             view_comparison: false,
             slot_id: 0,
             item_type: "",
+            selected_slots: [],
         };
     }
 
@@ -27,6 +28,38 @@ export default class InventoryTable extends React.Component<
             view_comparison: true,
             slot_id: typeof item !== "undefined" ? item.slot_id : 0,
             item_type: typeof item !== "undefined" ? item.type : "",
+        });
+    }
+
+    manageSelectedItems(e: React.ChangeEvent<HTMLInputElement>): void {
+        const isChecked = e.target.checked;
+        const slotId = parseInt(e.target.dataset.slotId as string, 10) || 0; // Added radix 10
+
+        if (slotId <= 0) {
+            return;
+        }
+
+        const { selected_slots } = this.state;
+        let updatedSlots: number[];
+
+        if (selected_slots.length > 0) {
+            // @ts-ignore
+            const duplicateId = selected_slots.indexOf(slotId);
+
+            if (isChecked && duplicateId !== -1) {
+                // Removed unnecessary condition
+                return;
+            }
+
+            updatedSlots = isChecked
+                ? [...selected_slots, slotId]
+                : selected_slots.filter((id) => id !== slotId);
+        } else {
+            updatedSlots = [slotId];
+        }
+
+        this.setState({
+            selected_slots: updatedSlots,
         });
     }
 
@@ -39,6 +72,8 @@ export default class InventoryTable extends React.Component<
     }
 
     render() {
+        console.log(this.state.selected_slots);
+
         return (
             <Fragment>
                 <InfoAlert additional_css={"mt-4 mb-4"}>
@@ -59,6 +94,8 @@ export default class InventoryTable extends React.Component<
                             undefined,
                             this.viewItem.bind(this),
                             this.props.manage_skills,
+                            undefined,
+                            this.manageSelectedItems.bind(this),
                         )}
                         dark_table={this.props.dark_table}
                     />

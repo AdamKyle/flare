@@ -4,4 +4,6 @@ export default interface InventoryItemsTableState {
     slot_id: number;
 
     item_type: string;
+
+    selected_slots: number[] | [];
 }
