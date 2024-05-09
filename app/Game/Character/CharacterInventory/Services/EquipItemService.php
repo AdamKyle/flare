@@ -104,6 +104,10 @@ class EquipItemService {
                 throw new EquipItemException('Cannot equip another unique.');
             }
 
+            if (!is_null($this->getEquippedTrinket($equippedSet)) && $characterSlot->item->type === 'trinket') {
+                throw new EquipItemException('Only one trinket can be equipped.');
+            }
+
             $this->unequipSlot($characterSlot, $equippedSet);
 
             $equippedSet->slots()->create([
@@ -147,6 +151,12 @@ class EquipItemService {
             if (!is_null($slot->item->item_suffix_id)) {
                 return $slot->item->itemSuffix->randomly_generated && $slot->equipped;
             }
+        })->first();
+    }
+
+    public function getEquippedTrinket(Inventory|InventorySet $equipped): InventorySlot|SetSlot|null {
+        return $equipped->slots->filter(function ($slot) {
+            return $slot->item->type === 'trinket';
         })->first();
     }
 

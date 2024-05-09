@@ -96,7 +96,8 @@ class ResourceTransferService {
         return $this->successResult([
             'message' => 'You have requested: ' . number_format($amountOfResources) . ' of type: ' . $params['type_of_resource'] . ' from: ' .
                 $requestingFromKingdom->name . ' to be transported to: ' . $requestingKingdom->name .
-                '. The resources are on the way, check your queues to see the movement. A log will be delivered once the resources arrive.',
+                '. The resources are on the way, check your queues to see the movement. A log will be delivered once the resources arrive.' .
+            ' (Should the resources you request be more then whats being delivered, the log will also explain why.)',
             'kingdoms' => $this->fetchKingdomsForResourceRequests($requestingKingdom->character, $requestingKingdom),
         ]);
     }

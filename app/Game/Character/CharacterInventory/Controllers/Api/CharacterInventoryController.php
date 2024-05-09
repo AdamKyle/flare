@@ -18,8 +18,6 @@ use App\Game\Character\CharacterInventory\Services\EquipItemService;
 use App\Game\Character\CharacterInventory\Services\InventorySetService;
 use App\Game\Character\CharacterInventory\Services\UseItemService;
 use App\Game\CharacterInventory\Services\EquipBestItemForSlotsTypesService;
-use App\Game\Core\Events\UpdateTopBarEvent;
-use App\Game\NpcActions\LabyrinthOracle\Events\LabyrinthOracleUpdate;
 use App\Http\Controllers\Controller;
 use Exception;
 use Illuminate\Http\JsonResponse;
