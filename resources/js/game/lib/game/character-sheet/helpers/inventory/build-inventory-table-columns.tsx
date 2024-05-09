@@ -61,6 +61,25 @@ export const BuildInventoryTableColumns = (
             });
         }
 
+        if (typeof selectMultipleItems !== "undefined") {
+            smallerColumns.unshift({
+                name: "",
+                selector: (row: any) => row.slot_id,
+                cell: (row: any) => (
+                    <span className="m-auto">
+                        <input
+                            type="checkbox"
+                            onChange={(
+                                e: React.ChangeEvent<HTMLInputElement>,
+                            ) => selectMultipleItems(e)}
+                            className="form-checkbox"
+                            data-slot-id={row.slot_id}
+                        />
+                    </span>
+                ),
+            });
+        }
+
         return smallerColumns;
     }
 
