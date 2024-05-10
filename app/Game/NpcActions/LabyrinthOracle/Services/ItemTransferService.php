@@ -250,7 +250,7 @@ class ItemTransferService {
         if ($this->itemToTransferFromDuplicated->appliedHolyStacks()->count() > 0) {
 
             $totalStacksAllowed = $this->itemToTransferToDuplicated->holy_stacks;
-            $currentStacksApplied = 0;
+            $currentStacksApplied = $this->itemToTransferToDuplicated->appliedHolyStacks()->count();
 
             foreach ($this->itemToTransferFromDuplicated->appliedHolyStacks as $stack) {
 

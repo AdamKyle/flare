@@ -39,6 +39,12 @@ class HolyItemService {
             return $this->errorResult('Trinkets and Artifacts cannot have holy oils applied.');
         }
 
+        if (is_null($alchemySlot)) {
+            return $this->errorResult(
+                'No alchemy items to apply. Craft some.'
+            );
+        }
+
         $cost = $this->getCost($itemSlot->item, $alchemySlot->item);
 
         if ($cost > $character->gold_dust) {
