@@ -314,7 +314,8 @@ export default class WorkBench extends React.Component<any, any> {
                                 ) : null}
                             </Fragment>
                         ) : this.state.selected_item !== null &&
-                          this.state.alchemy_items.length === 0 ? (
+                          this.state.alchemy_items.length === 0 &&
+                          this.state.error_message === null ? (
                             <p className="mt-2 text-red-400 text-red-500 text-center">
                                 No Holy oils to apply. Craft some using alchemy!
                             </p>
