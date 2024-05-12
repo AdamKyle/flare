@@ -15,6 +15,13 @@
             <span class="icon ra ra-wooden-sign"></span>
             <span class="title">Market</span>
         </a>
+        <a href="{{ route('item.world', [
+            'character' => auth()->user()->character->id
+        ]) }}" class="link" data-toggle="tooltip-menu"
+           data-tippy-content="Item World">
+            <span class="icon fas fa-hand-holding-usd"></span>
+            <span class="title">Item World</span>
+        </a>
         <a href="#no-link" class="link" data-target="[data-menu=quests]" data-toggle="tooltip-menu"
             data-tippy-content="Quests">
             <span class="icon fas fa-feather"></span>

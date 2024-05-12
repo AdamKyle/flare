@@ -27,6 +27,9 @@ Route::middleware([
     Route::get('/game/event-calendar', ['as' => 'game.event.calendar', 'uses' => 'EventCalendarController@index']);
 
     Route::get('/settings/{user}', ['as' => 'user.settings', 'uses' => 'SettingsController@index']);
+
+    Route::get('/item-world/{character}', ['as' => 'item.world', 'uses' => 'ItemWorldController@show']);
+
     Route::post('/settings/{user}/auto-disenchant', ['as' => 'user.settings.auto-disenchant', 'uses' => 'SettingsController@autoDisenchantSettings']);
     Route::post('/settings/{user}/disable-attack-pop-overs', ['as' => 'user.settings.disable-attack-pop-overs', 'uses' => 'SettingsController@disableAttackTypePopOvers']);
     Route::post('/settings/{user}/chat-settings', ['as' => 'user.settings.chat', 'uses' => 'SettingsController@chatSettings']);
