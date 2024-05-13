@@ -47,7 +47,6 @@ export default class InventoryTable extends React.Component<
             const duplicateId = selected_slots.indexOf(slotId);
 
             if (isChecked && duplicateId !== -1) {
-                // Removed unnecessary condition
                 return;
             }
 
@@ -58,9 +57,14 @@ export default class InventoryTable extends React.Component<
             updatedSlots = [slotId];
         }
 
-        this.setState({
-            selected_slots: updatedSlots,
-        });
+        this.setState(
+            {
+                selected_slots: updatedSlots,
+            },
+            () => {
+                this.props.manage_selected_items(updatedSlots);
+            },
+        );
     }
 
     closeViewItem() {
@@ -72,8 +76,6 @@ export default class InventoryTable extends React.Component<
     }
 
     render() {
-        console.log(this.state.selected_slots);
-
         return (
             <Fragment>
                 <InfoAlert additional_css={"mt-4 mb-4"}>

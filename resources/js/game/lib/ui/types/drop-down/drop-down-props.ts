@@ -20,4 +20,6 @@ export default interface DropDownProps {
     show_alert?: boolean;
 
     alert_names?: string[];
+
+    greenButton?: boolean;
 }

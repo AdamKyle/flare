@@ -13,14 +13,13 @@ export default class DropDown extends React.Component<DropDownProps, any> {
         if (typeof this.props.alert_names === "undefined") {
             return false;
         }
-
         return this.props.alert_names.includes(name);
     }
 
     renderMenuItems() {
         return this.props.menu_items.map((menuItem) => {
             return (
-                <Menu.Item disabled={this.props.disabled}>
+                <Menu.Item key={menuItem.name} disabled={this.props.disabled}>
                     {({ active }) => (
                         <button
                             className={clsx(
@@ -41,7 +40,7 @@ export default class DropDown extends React.Component<DropDownProps, any> {
                                         menuItem.name,
                                 },
                                 {
-                                    "bg-green-600 dark:bg-green-700 text-white":
+                                    "bg-green-600 dark:bg-green-700 text-white font-semibold":
                                         this.props.secondary_selected ===
                                         menuItem.name,
                                 },
@@ -97,7 +96,6 @@ export default class DropDown extends React.Component<DropDownProps, any> {
         ) {
             return this.props.show_alert && this.props.alert_names.length > 0;
         }
-
         return false;
     }
 
@@ -110,8 +108,11 @@ export default class DropDown extends React.Component<DropDownProps, any> {
                             className={clsx(
                                 "inline-flex justify-center w-full px-4 py-2 text-sm font-medium rounded-small focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-200 dark:focus-visible:ring-white focus-visible:ring-opacity-75 hover:bg-blue-700 hover:drop-shadow-md dark:text-white hover:text-gray-300 bg-blue-600 dark:bg-blue-700 text-white dark:hover:bg-blue-600 dark:hover:text-white font-semibold py-2 px-4 rounded-sm drop-shadow-sm disabled:bg-blue-400 dark:disabled:bg-blue-400",
                                 {
+                                    "bg-green-600 dark:bg-green-700 text-white font-semibold":
+                                        this.props.greenButton,
                                     "focus-visible:ring-orange-200 dark:focus-visible:ring-white focus-visible:ring-opacity-75 hover:bg-orange-700 hover:drop-shadow-md dark:text-white hover:text-gray-300 bg-orange-600 dark:bg-orange-700 text-white dark:hover:bg-orange-600 dark:hover:text-white font-semibold py-2 px-4 rounded-sm drop-shadow-sm disabled:bg-orange-400 dark:disabled:bg-orange-400":
-                                        this.showAlert(),
+                                        this.showAlert() &&
+                                        !this.props.greenButton,
                                 },
                             )}
                             disabled={this.props.disabled}

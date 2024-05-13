@@ -7,17 +7,24 @@ import InventoryActionConfirmationModal from "../modals/inventory-action-confirm
 import { isEqual } from "lodash";
 import SuccessAlert from "../../../../components/ui/alerts/simple-alerts/success-alert";
 import InventoryTabSectionProps from "../../../../lib/game/character-sheet/types/tabs/inventory-tab-section-props";
-import InventoryTabSectionState from "../../../../lib/game/character-sheet/types/tabs/inventory-tab-section-state";
+import InventoryTabSectionState, {
+    SelectItems,
+} from "../../../../lib/game/character-sheet/types/tabs/inventory-tab-section-state";
 import clsx from "clsx";
 import UsableItemsDetails from "../../../../lib/game/character-sheet/types/inventory/usable-items-details";
 import InventoryUseManyItems from "../modals/inventory-use-many-items";
 import { GemBagTable } from "./inventory-tabs/gem-bag-table";
-import WarningAlert from "../../../../components/ui/alerts/simple-alerts/warning-alert";
+import { InventoryActionConfirmationType } from "../../../../components/character-sheet/inventory-action-confirmation-modal/helpers/enums/inventory-action-confirmation-type";
+import BaseInventoryActionConfirmationModal from "../../../../components/character-sheet/inventory-action-confirmation-modal/modals/base-inventory-action-confirmation-modal";
+import ModalPropsBuilder from "../../../../components/character-sheet/inventory-action-confirmation-modal/helpers/modal-props-builder";
+import { serviceContainer } from "../../../../lib/containers/core-container";
 
 export default class InventoryTabSection extends React.Component<
     InventoryTabSectionProps,
     InventoryTabSectionState
 > {
+    private modalPropsBuilder: ModalPropsBuilder;
+
     constructor(props: InventoryTabSectionProps) {
         super(props);
 
@@ -25,6 +32,8 @@ export default class InventoryTabSection extends React.Component<
             table: "inventory",
             data: this.props.inventory,
             usable_items: this.props.usable_items,
+            show_action_confirmation_modal: false,
+            action_confirmation_type: null,
             show_destroy_all: false,
             show_disenchant_all: false,
             show_sell_all: false,
@@ -33,7 +42,10 @@ export default class InventoryTabSection extends React.Component<
             show_equip_best: false,
             success_message: null,
             search_string: "",
+            selected_items: [],
         };
+
+        this.modalPropsBuilder = serviceContainer().fetch(ModalPropsBuilder);
     }
 
     componentDidUpdate() {
@@ -104,21 +116,23 @@ export default class InventoryTabSection extends React.Component<
         }
     }
 
-    handleEquipBest() {
-        this.setState({
-            show_equip_best: !this.state.show_equip_best,
-        });
-    }
-
     manageDisenchantAll() {
         this.setState({
             show_disenchant_all: !this.state.show_disenchant_all,
         });
     }
 
-    manageDestroyAll() {
+    manageConfirmationModal(type?: InventoryActionConfirmationType) {
+        let actionConfirmationType = null;
+
+        if (!this.state.show_action_confirmation_modal && type) {
+            actionConfirmationType = type;
+        }
+
         this.setState({
-            show_destroy_all: !this.state.show_destroy_all,
+            show_action_confirmation_modal:
+                !this.state.show_action_confirmation_modal,
+            action_confirmation_type: actionConfirmationType,
         });
     }
 
@@ -152,7 +166,10 @@ export default class InventoryTabSection extends React.Component<
                 {
                     name: "Destroy All",
                     icon_class: "far fa-trash-alt",
-                    on_click: () => this.manageDestroyAll(),
+                    on_click: () =>
+                        this.manageConfirmationModal(
+                            InventoryActionConfirmationType.DESTROY_ALL,
+                        ),
                 },
                 {
                     name: "Disenchant All",
@@ -181,12 +198,61 @@ export default class InventoryTabSection extends React.Component<
         ];
     }
 
+    createMultiSelectedItemDropDown() {
+        return [
+            {
+                name: "Equip Selected",
+                icon_class: "far fa-trash-alt",
+                on_click: () =>
+                    this.manageConfirmationModal(
+                        InventoryActionConfirmationType.EQUIP_SELECTED,
+                    ),
+            },
+            {
+                name: "Move Selected",
+                icon_class: "fas fa-truck-loading",
+                on_click: () =>
+                    this.manageConfirmationModal(
+                        InventoryActionConfirmationType.MOVE_SELECTED,
+                    ),
+            },
+            {
+                name: "Destroy Selected",
+                icon_class: "far fa-trash-alt",
+                on_click: () =>
+                    this.manageConfirmationModal(
+                        InventoryActionConfirmationType.DESTROY_ALL,
+                    ),
+            },
+            {
+                name: "Disenchant Selected",
+                icon_class: "ra ra-fire",
+                on_click: () =>
+                    this.manageConfirmationModal(
+                        InventoryActionConfirmationType.DISENCHANT_SELECTED,
+                    ),
+            },
+            {
+                name: "Sell Selected",
+                icon_class: "far fa-money-bill-alt",
+                on_click: () =>
+                    this.manageConfirmationModal(
+                        InventoryActionConfirmationType.SELL_SELECTED,
+                    ),
+            },
+        ];
+    }
+
     isDropDownHidden() {
         if (this.state.table === "inventory") {
             return this.state.data.length === 0;
         } else {
             return this.props.usable_items.length === 0;
         }
+    }
+
+    isSelectedDropDownHidden() {
+        return this.state.selected_items.length <= 0;
     }
 
     updateInventory(inventory: { [key: string]: InventoryDetails[] }) {
@@ -198,6 +264,38 @@ export default class InventoryTabSection extends React.Component<
                 this.props.update_inventory(inventory);
             },
         );
+    }
+
+    setSelectedItems(selectedItems: number[] | []) {
+        if (this.state.table !== "inventory") {
+            return;
+        }
+
+        if (this.state.table !== "inventory") {
+            return;
+        }
+
+        const filteredSelectedItems: SelectItems[] = (selectedItems as number[])
+            .map((slotId) => {
+                const foundItem = this.state.data.find((slot) => {
+                    return slot.slot_id === slotId;
+                });
+
+                if (typeof foundItem !== "undefined") {
+                    return {
+                        item_name: foundItem.item_name,
+                        slot_id: foundItem.slot_id,
+                    };
+                }
+                return null;
+            })
+            .filter((item): item is SelectItems => {
+                return item !== null;
+            });
+
+        this.setState({
+            selected_items: filteredSelectedItems,
+        });
     }
 
     renderTables(): JSX.Element | null {
@@ -214,6 +312,7 @@ export default class InventoryTabSection extends React.Component<
                         set_success_message={this.setSuccessMessage.bind(this)}
                         is_automation_running={this.props.is_automation_running}
                         manage_skills={this.props.manage_skills}
+                        manage_selected_items={this.setSelectedItems.bind(this)}
                         view_port={this.props.view_port}
                     />
                 );
@@ -243,7 +342,21 @@ export default class InventoryTabSection extends React.Component<
         }
     }
 
+    getSelectedNames(): string[] | [] {
+        return this.state.selected_items.map(
+            (selectedItem) => selectedItem.item_name,
+        );
+    }
+
     render() {
+        let modalPropsBuilder = null;
+
+        if (this.state.action_confirmation_type !== null) {
+            modalPropsBuilder = this.modalPropsBuilder.setActionType(
+                this.state.action_confirmation_type,
+            );
+        }
+
         return (
             <Fragment>
                 {this.state.success_message !== null ? (
@@ -294,6 +407,19 @@ export default class InventoryTabSection extends React.Component<
                             disabled={this.props.is_dead}
                         />
                     </div>
+                    <div
+                        className={clsx("ml-2", {
+                            hidden: this.isSelectedDropDownHidden(),
+                        })}
+                    >
+                        <DropDown
+                            menu_items={this.createMultiSelectedItemDropDown()}
+                            button_title={"Selected Items (Actions)"}
+                            selected_name={this.state.table}
+                            disabled={this.props.is_dead}
+                            greenButton={true}
+                        />
+                    </div>
                     <div className="sm:ml-4 md:ml-0 my-4 md:my-0 md:absolute md:right-[10px]">
                         <input
                             type="text"
@@ -308,47 +434,30 @@ export default class InventoryTabSection extends React.Component<
 
                 {this.renderTables()}
 
-                {this.state.show_destroy_all ? (
-                    <InventoryActionConfirmationModal
-                        is_open={this.state.show_destroy_all}
-                        manage_modal={this.manageDestroyAll.bind(this)}
-                        title={"Destroy all"}
-                        url={
-                            "character/" +
-                            this.props.character_id +
-                            "/inventory/destroy-all"
-                        }
+                {this.state.show_action_confirmation_modal &&
+                this.state.action_confirmation_type !== null &&
+                modalPropsBuilder !== null ? (
+                    <BaseInventoryActionConfirmationModal
+                        type={this.state.action_confirmation_type}
+                        is_open={this.state.show_action_confirmation_modal}
+                        manage_modal={this.manageConfirmationModal.bind(this)}
+                        title={modalPropsBuilder.fetchModalName()}
                         update_inventory={this.props.update_inventory}
                         set_success_message={this.setSuccessMessage.bind(this)}
-                    >
-                        <p>
-                            Are you sure you want to do this? This action will
-                            destroy all items in your inventory. You cannot undo
-                            this action.
-                        </p>
-                        <p className="mt-2">
-                            Make sure you move any items you want to a set or
-                            equip the items you want, before destroying all.
-                        </p>
-                        <p className="mt-2">
-                            It is advised that players do not destroy enchanted
-                            items (names with *'s) or uniques (green items), but
-                            instead sell them on the market or{" "}
-                            <a
-                                href={"/information/skill-information"}
-                                target="_blank"
-                            >
-                                disenchant{" "}
-                                <i className="fas fa-external-link-alt"></i>
-                            </a>{" "}
-                            them to make{" "}
-                            <a href={"/information/currencies"} target="_blank">
-                                Gold Dust{" "}
-                                <i className="fas fa-external-link-alt"></i>
-                            </a>
-                            .
-                        </p>
-                    </InventoryActionConfirmationModal>
+                        selected_item_names={this.state.selected_items.map(
+                            (selectedItem) => selectedItem.item_name,
+                        )}
+                        data={{
+                            url: modalPropsBuilder.fetchActionUrl(
+                                this.props.character_id,
+                            ),
+                            params: {
+                                slot_ids: this.state.selected_items.map(
+                                    (selectedItem) => selectedItem.slot_id,
+                                ),
+                            },
+                        }}
+                    />
                 ) : null}
 
                 {this.state.show_destroy_all_alchemy ? (
@@ -450,62 +559,6 @@ export default class InventoryTabSection extends React.Component<
                             It is highly recommended you use the market place to
                             sell anything beyond shop gear to make your money
                             back.
-                        </p>
-                    </InventoryActionConfirmationModal>
-                ) : null}
-
-                {this.state.show_equip_best ? (
-                    <InventoryActionConfirmationModal
-                        is_open={this.state.show_equip_best}
-                        manage_modal={this.handleEquipBest.bind(this)}
-                        title={"Equip best in slot"}
-                        url={
-                            "character/" +
-                            this.props.character_id +
-                            "/inventory/equip-best-in-slot"
-                        }
-                        update_inventory={this.props.update_inventory}
-                        set_success_message={this.setSuccessMessage.bind(this)}
-                    >
-                        <WarningAlert additional_css={"my-4"}>
-                            <p className={"mb-4"}>
-                                This is a highly experimental feature which
-                                might break or give unexpected results
-                            </p>
-                            <p className={"mb-4"}>
-                                The core of this feature is to allow you to have
-                                the game automatically equip what it think's is
-                                the best equipment. This does not take into
-                                account any skills on the item or that you are
-                                training and does not take into account your
-                                current class in relation to whats might be best
-                                for it.
-                            </p>
-                            <p>
-                                If you encounter issues or bugs please, with as
-                                much details as you can, post the issues in{" "}
-                                <a
-                                    href="https://discord.gg/hcwdqJUerh"
-                                    target="_blank"
-                                >
-                                    Discord #bugs{" "}
-                                    <i className="fas fa-external-link-alt"></i>
-                                </a>
-                            </p>
-                        </WarningAlert>
-                        <p>
-                            Based on equippable positions, what you may or may
-                            not have equipped and following{" "}
-                            <a
-                                href="/information/equipment-sets"
-                                target="_blank"
-                            >
-                                Rules of equipment{" "}
-                                <i className="fas fa-external-link-alt"></i>
-                            </a>
-                            , we will compare whats in your inventory to whats
-                            equipped and replace or equip what's considered
-                            better for your character.
                         </p>
                     </InventoryActionConfirmationModal>
                 ) : null}

@@ -1,5 +1,6 @@
 import InventoryDetails from "../inventory/inventory-details";
 import UsableItemsDetails from "../inventory/usable-items-details";
+import { InventoryActionConfirmationType } from "../../../../../components/character-sheet/inventory-action-confirmation-modal/helpers/enums/inventory-action-confirmation-type";
 
 export default interface InventoryTabSectionState {
     table: string;
@@ -23,4 +24,15 @@ export default interface InventoryTabSectionState {
     success_message: string | null;
 
     search_string: string;
+
+    selected_items: SelectItems[] | [];
+
+    show_action_confirmation_modal: boolean;
+
+    action_confirmation_type: InventoryActionConfirmationType | null;
+}
+
+export interface SelectItems {
+    slot_id: number;
+    item_name: string;
 }
