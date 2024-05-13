@@ -30,4 +30,34 @@ export default defineConfig({
             '@mui': '/node_modules/@mui',
         },
     },
+    build: {
+        minify: true,
+        terserOptions: {
+            compress: {
+                drop_console: true,
+            },
+        },
+        chunkSizeWarningLimit: 2000,
+        rollupOptions: {
+            output: {
+                manualChunks(id) {
+                    const match = id.match(/node_modules\/([^/]+)/);
+                    if (match) {
+                        const packageName = match[1];
+                        if (id.includes('node_modules/')) {
+                            return `vendor_${packageName}`;
+                        } else {
+                            // Specify specific packages to group into smaller chunks
+                            if (packageName === 'date-fns') {
+                                return 'date_fns'; // Group date-fns into a separate chunk
+                            }
+                            if (packageName.startsWith('game-related-package')) {
+                                return 'game'; // Group game-related packages into a separate chunk
+                            }
+                        }
+                    }
+                },
+            },
+        },
+    },
 });

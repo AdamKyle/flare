@@ -179,7 +179,10 @@ export default class InventoryTabSection extends React.Component<
                 {
                     name: "Sell All",
                     icon_class: "far fa-money-bill-alt",
-                    on_click: () => this.manageSellAll(),
+                    on_click: () =>
+                        this.manageConfirmationModal(
+                            InventoryActionConfirmationType.SELL_ALL,
+                        ),
                 },
             ];
         }

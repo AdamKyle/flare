@@ -21,6 +21,10 @@ export default class ModalPropsBuilder {
                 return "Destroy All";
             case InventoryActionConfirmationType.DESTROY_SELECTED:
                 return "Destroy Selected Items";
+            case InventoryActionConfirmationType.SELL_ALL:
+                return "Sell All";
+            case InventoryActionConfirmationType.SELL_SELECTED:
+                return "Sell Selected";
             default:
                 return "ERROR";
         }
@@ -34,6 +38,10 @@ export default class ModalPropsBuilder {
                 return (
                     "character/" + characterId + "/inventory/destroy-selected"
                 );
+            case InventoryActionConfirmationType.SELL_ALL:
+                return "character/" + characterId + "/inventory/sell-all";
+            case InventoryActionConfirmationType.SELL_SELECTED:
+                return "character/" + characterId + "/inventory/sell-selected";
             default:
                 return "";
         }
