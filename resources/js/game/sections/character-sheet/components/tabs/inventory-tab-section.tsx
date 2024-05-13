@@ -221,7 +221,7 @@ export default class InventoryTabSection extends React.Component<
                 icon_class: "far fa-trash-alt",
                 on_click: () =>
                     this.manageConfirmationModal(
-                        InventoryActionConfirmationType.DESTROY_ALL,
+                        InventoryActionConfirmationType.DESTROY_SELECTED,
                     ),
             },
             {

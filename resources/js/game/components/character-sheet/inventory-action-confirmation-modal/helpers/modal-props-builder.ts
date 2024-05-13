@@ -19,6 +19,8 @@ export default class ModalPropsBuilder {
         switch (this.inventoryActionType) {
             case InventoryActionConfirmationType.DESTROY_ALL:
                 return "Destroy All";
+            case InventoryActionConfirmationType.DESTROY_SELECTED:
+                return "Destroy Selected Items";
             default:
                 return "ERROR";
         }
@@ -28,6 +30,10 @@ export default class ModalPropsBuilder {
         switch (this.inventoryActionType) {
             case InventoryActionConfirmationType.DESTROY_ALL:
                 return "character/" + characterId + "/inventory/destroy-all";
+            case InventoryActionConfirmationType.DESTROY_SELECTED:
+                return (
+                    "character/" + characterId + "/inventory/destroy-selected"
+                );
             default:
                 return "";
         }

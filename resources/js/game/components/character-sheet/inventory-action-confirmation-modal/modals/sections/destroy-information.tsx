@@ -1,6 +1,6 @@
 import React from "react";
 
-export default class DestroyInformation extends React.Component<any, any> {
+export default class DestroyInformation extends React.Component<{}, {}> {
     constructor(props: any) {
         super(props);
     }
@@ -9,29 +9,10 @@ export default class DestroyInformation extends React.Component<any, any> {
         return (
             <>
                 <p>
-                    Are you sure you want to do this? This action will
-                    disenchant all items in your inventory. You cannot undo this
-                    action.
-                </p>
-                <p className="mt-2">
-                    When you disenchant items you will get some{" "}
-                    <a href={"/information/currencies"} target="_blank">
-                        Gold Dust <i className="fas fa-external-link-alt"></i>
-                    </a>{" "}
-                    and experience towards{" "}
-                    <a href={"/information/skill-information"} target="_blank">
-                        Disenchanting{" "}
-                        <i className="fas fa-external-link-alt"></i>
-                    </a>{" "}
-                    and half XP towards Enchanting.
-                </p>
-                <p className="mt-2">
-                    Tip for crafters/enchanters: Equip a set that's full
-                    enchanting when doing your mass disenchanting, because the
-                    XP you get, while only half, can be boosted. For new
-                    players, you should be crafting and enchanting and then
-                    disenchanting or selling your equipment on the market, if it
-                    is not viable for you.
+                    Are you sure? You will destroy all items in your inventory.
+                    Quest Items, Gems and Alchemy Items will be untouched as
+                    will anything in Sets or currently equipped.{" "}
+                    <strong>You cannot undo this action</strong>.
                 </p>
             </>
         );
