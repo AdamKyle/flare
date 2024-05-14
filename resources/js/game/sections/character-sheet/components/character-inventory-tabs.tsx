@@ -106,7 +106,6 @@ export default class CharacterInventoryTabs extends React.Component<
     }
 
     updateInventory(inventory: { [key: string]: InventoryDetails[] }) {
-        console.log("inventory", inventory);
         let stateInventory = JSON.parse(JSON.stringify(this.state.inventory));
 
         const keys = Object.keys(inventory);

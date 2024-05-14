@@ -16,10 +16,6 @@ export default class BaseInventoryActionConfirmationModal extends React.Componen
         };
     }
 
-    componentDidMount() {
-        console.log("props", this.props);
-    }
-
     updateParams(params: any) {
         this.setState({
             params: { ...this.state.params, ...params },
