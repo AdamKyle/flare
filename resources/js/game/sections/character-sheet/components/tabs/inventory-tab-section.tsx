@@ -174,7 +174,10 @@ export default class InventoryTabSection extends React.Component<
                 {
                     name: "Disenchant All",
                     icon_class: "ra ra-fire",
-                    on_click: () => this.manageDisenchantAll(),
+                    on_click: () =>
+                        this.manageConfirmationModal(
+                            InventoryActionConfirmationType.DISENCHANT_ALL,
+                        ),
                 },
                 {
                     name: "Sell All",
@@ -480,88 +483,6 @@ export default class InventoryTabSection extends React.Component<
                             Are you sure you want to do this? This action will
                             destroy all (Alchemy) items in your inventory. You
                             cannot undo this action.
-                        </p>
-                    </InventoryActionConfirmationModal>
-                ) : null}
-
-                {this.state.show_disenchant_all ? (
-                    <InventoryActionConfirmationModal
-                        is_open={this.state.show_disenchant_all}
-                        manage_modal={this.manageDisenchantAll.bind(this)}
-                        title={"Disenchant all"}
-                        url={
-                            "character/" +
-                            this.props.character_id +
-                            "/inventory/disenchant-all"
-                        }
-                        update_inventory={this.props.update_inventory}
-                        set_success_message={this.setSuccessMessage.bind(this)}
-                    >
-                        <p>
-                            Are you sure you want to do this? This action will
-                            disenchant all items in your inventory. You cannot
-                            undo this action.
-                        </p>
-                        <p className="mt-2">
-                            When you disenchant items you will get some{" "}
-                            <a href={"/information/currencies"} target="_blank">
-                                Gold Dust{" "}
-                                <i className="fas fa-external-link-alt"></i>
-                            </a>{" "}
-                            and experience towards{" "}
-                            <a
-                                href={"/information/skill-information"}
-                                target="_blank"
-                            >
-                                Disenchanting{" "}
-                                <i className="fas fa-external-link-alt"></i>
-                            </a>{" "}
-                            and half XP towards Enchanting.
-                        </p>
-                        <p className="mt-2">
-                            Tip for crafters/enchanters: Equip a set that's full
-                            enchanting when doing your mass disenchanting,
-                            because the XP you get, while only half, can be
-                            boosted. For new players, you should be crafting and
-                            enchanting and then disenchanting or selling your
-                            equipment on the market, if it is not viable for
-                            you.
-                        </p>
-                    </InventoryActionConfirmationModal>
-                ) : null}
-
-                {this.state.show_sell_all ? (
-                    <InventoryActionConfirmationModal
-                        is_open={this.state.show_sell_all}
-                        manage_modal={this.manageSellAll.bind(this)}
-                        title={"Sell all"}
-                        url={
-                            "character/" +
-                            this.props.character_id +
-                            "/inventory/sell-all"
-                        }
-                        update_inventory={this.props.update_inventory}
-                        set_success_message={this.setSuccessMessage.bind(this)}
-                    >
-                        <p>
-                            Are you sure? You are about to sell all items in
-                            your inventory (this does not effect Alchemy, Quest
-                            items, Sets or Equipped items). This action cannot
-                            be undone. Also, trinkets cannot be sold to the
-                            shop. They can be listed to the market or destroyed.
-                        </p>
-                        <p className="mt-2">
-                            <strong>Note</strong>: The amount of gold you will
-                            get back for items that are enchanted or crafted
-                            over the price of two billion gold will never be
-                            sold for <strong>more than</strong> two billion
-                            gold. Ie, a 36 billion gold item will only sell for
-                            two billion gold before taxes.
-                        </p>
-                        <p className="mt-2">
-                            It is highly recommended you use the market place to
-                            sell anything beyond shop gear to make your money
-                            back.
                         </p>
                     </InventoryActionConfirmationModal>
                 ) : null}

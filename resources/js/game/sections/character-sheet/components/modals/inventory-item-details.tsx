@@ -37,7 +37,7 @@ export default class InventoryUseDetails extends React.Component<any, any> {
                 },
                 (error: AxiosError) => {
                     if (typeof error.response !== "undefined") {
-                        const response = error.response;
+                        const response: AxiosResponse = error.response;
 
                         this.setState({
                             loading: false,

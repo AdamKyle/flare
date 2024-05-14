@@ -25,6 +25,14 @@ export default class ModalPropsBuilder {
                 return "Sell All";
             case InventoryActionConfirmationType.SELL_SELECTED:
                 return "Sell Selected";
+            case InventoryActionConfirmationType.DISENCHANT_ALL:
+                return "Disenchant All";
+            case InventoryActionConfirmationType.DISENCHANT_SELECTED:
+                return "Disenchant Selected";
+            case InventoryActionConfirmationType.MOVE_SELECTED:
+                return "Move Selected";
+            case InventoryActionConfirmationType.EQUIP_SELECTED:
+                return "Equip Selected";
             default:
                 return "ERROR";
         }
@@ -42,6 +50,18 @@ export default class ModalPropsBuilder {
                 return "character/" + characterId + "/inventory/sell-all";
             case InventoryActionConfirmationType.SELL_SELECTED:
                 return "character/" + characterId + "/inventory/sell-selected";
+            case InventoryActionConfirmationType.DISENCHANT_ALL:
+                return "character/" + characterId + "/inventory/disenchant-all";
+            case InventoryActionConfirmationType.DISENCHANT_SELECTED:
+                return (
+                    "character/" +
+                    characterId +
+                    "/inventory/disenchant-selected"
+                );
+            case InventoryActionConfirmationType.MOVE_SELECTED:
+                return "character/" + characterId + "/inventory/move-selected";
+            case InventoryActionConfirmationType.EQUIP_SELECTED:
+                return "character/" + characterId + "/inventory/equip-selected";
             default:
                 return "";
         }
