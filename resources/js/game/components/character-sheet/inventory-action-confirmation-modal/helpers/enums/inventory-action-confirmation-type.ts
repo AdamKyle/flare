@@ -7,4 +7,5 @@ export enum InventoryActionConfirmationType {
     SELL_SELECTED = "sell-selected",
     MOVE_SELECTED = "move-selected",
     EQUIP_SELECTED = "equip-selected",
+    DESTROY_ALL_ALCHEMY_ITEMS = "destroy-all-alchemy-items",
 }

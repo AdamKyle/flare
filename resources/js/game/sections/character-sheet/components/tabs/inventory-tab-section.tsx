@@ -199,7 +199,10 @@ export default class InventoryTabSection extends React.Component<
             {
                 name: "Destroy All",
                 icon_class: "far fa-trash-alt",
-                on_click: () => this.manageDestroyAllAlchemy(),
+                on_click: () =>
+                    this.manageConfirmationModal(
+                        InventoryActionConfirmationType.DESTROY_ALL_ALCHEMY_ITEMS,
+                    ),
             },
         ];
     }
@@ -465,27 +468,6 @@ export default class InventoryTabSection extends React.Component<
                         }}
                         usable_sets={this.props.usable_sets}
                     />
-                ) : null}
-
-                {this.state.show_destroy_all_alchemy ? (
-                    <InventoryActionConfirmationModal
-                        is_open={this.state.show_destroy_all_alchemy}
-                        manage_modal={this.manageDestroyAllAlchemy.bind(this)}
-                        title={"Destroy all Alchemy Items"}
-                        url={
-                            "character/" +
-                            this.props.character_id +
-                            "/inventory/destroy-all-alchemy-items"
-                        }
-                        update_inventory={this.props.update_inventory}
-                        set_success_message={this.setSuccessMessage.bind(this)}
-                    >
-                        <p>
-                            Are you sure you want to do this? This action will
-                            destroy all (Alchemy) items in your inventory. You
-                            cannot undo this action.
-                        </p>
-                    </InventoryActionConfirmationModal>
                 ) : null}
 
                 {this.state.show_use_many &&

@@ -33,6 +33,8 @@ export default class ModalPropsBuilder {
                 return "Move Selected";
             case InventoryActionConfirmationType.EQUIP_SELECTED:
                 return "Equip Selected";
+            case InventoryActionConfirmationType.DESTROY_ALL_ALCHEMY_ITEMS:
+                return "Destroy All Alchemy Items";
             default:
                 return "ERROR";
         }
@@ -62,6 +64,12 @@ export default class ModalPropsBuilder {
                 return "character/" + characterId + "/inventory/move-selected";
             case InventoryActionConfirmationType.EQUIP_SELECTED:
                 return "character/" + characterId + "/inventory/equip-selected";
+            case InventoryActionConfirmationType.DESTROY_ALL_ALCHEMY_ITEMS:
+                return (
+                    "character/" +
+                    characterId +
+                    "/inventory/destroy-all-alchemy-items"
+                );
             default:
                 return "";
         }

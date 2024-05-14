@@ -9,6 +9,7 @@ import DisenchantInformation from "./disenchant-information";
 import DisenchantSelectedInformation from "./disenchant-selected-information";
 import EquipSelectedInformation from "./equip-selected-information";
 import MoveSelectedInformation from "./move-selected-information";
+import DestroyAlchemyInformation from "./destroy-alchemy-information";
 
 export default class SectionBuilder extends React.Component<
     SectionBuilderProps,
@@ -68,6 +69,8 @@ export default class SectionBuilder extends React.Component<
                         update_api_params={this.props.update_api_params}
                     />
                 );
+            case InventoryActionConfirmationType.DESTROY_ALL_ALCHEMY_ITEMS:
+                return <DestroyAlchemyInformation />;
             default:
                 return null;
         }
