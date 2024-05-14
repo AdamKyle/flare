@@ -12,6 +12,7 @@ use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Character\CharacterInventory\Services\ComparisonService;
 use App\Game\Character\CharacterInventory\Services\EquipItemService;
 use App\Game\Character\CharacterInventory\Services\InventorySetService;
+use App\Game\Character\CharacterInventory\Services\MultiInventoryActionService;
 use App\Game\Character\CharacterInventory\Services\UseItemService;
 use App\Game\Character\CharacterInventory\Validations\SetHandsValidation;
 use App\Game\Core\Values\ValidEquipPositionsValue;
@@ -83,6 +84,12 @@ class ServiceProvider extends ApplicationServiceProvider {
                 $app->make(CharacterInventoryService::class),
                 $app->make(EquipItemService::class),
                 $app->make(ItemAtonements::class)
+            );
+        });
+
+        $this->app->bind(MultiInventoryActionService::class, function($app) {
+            return new MultiInventoryActionService(
+                $app->make(InventorySetService::class),
             );
         });
     }

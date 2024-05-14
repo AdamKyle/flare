@@ -19,4 +19,6 @@ export default interface InventoryActionConfirmationModalProps {
     children?: React.ReactNode;
 
     ajax_params?: any;
+
+    is_large_modal: boolean;
 }

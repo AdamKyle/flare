@@ -64,6 +64,8 @@ export default class SectionBuilder extends React.Component<
                         item_names={
                             this.props.item_names ? this.props.item_names : []
                         }
+                        usable_sets={this.props.usable_sets}
+                        update_api_params={this.props.update_api_params}
                     />
                 );
             default:

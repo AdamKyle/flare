@@ -1,12 +1,18 @@
 import React from "react";
 import { SelectedItemsActionInformationProps } from "../../types/modals/sections/selected-items-action-information-props";
+import DropDown from "../../../../ui/drop-down/drop-down";
 
 export default class MoveSelectedInformation extends React.Component<
     SelectedItemsActionInformationProps,
-    {}
+    any
 > {
     constructor(props: SelectedItemsActionInformationProps) {
         super(props);
+
+        this.state = {
+            set_name: "Select a set",
+            set_id: null,
+        };
     }
 
     renderSelectedItemNames() {
@@ -15,12 +21,61 @@ export default class MoveSelectedInformation extends React.Component<
         });
     }
 
+    setName(setId: number) {
+        if (!this.props.usable_sets) {
+            return;
+        }
+
+        if (!this.props.update_api_params) {
+            return;
+        }
+
+        const setName = this.props.usable_sets.filter(
+            (set) => set.id === setId,
+        )[0].name;
+
+        this.setState(
+            {
+                set_name: setName,
+                set_id: setId,
+            },
+            () => {
+                if (!this.props.usable_sets) {
+                    return;
+                }
+
+                if (!this.props.update_api_params) {
+                    return;
+                }
+
+                this.props.update_api_params({
+                    set_name: setName,
+                    set_id: setId,
+                });
+            },
+        );
+    }
+
+    buildDropDown() {
+        if (!this.props.usable_sets) {
+            return [];
+        }
+
+        return this.props.usable_sets.map((set) => {
+            return {
+                name: set.name,
+                icon_class: "fas fa-shopping-bag",
+                on_click: () => this.setName(set.id),
+            };
+        });
+    }
+
     render() {
         return (
             <>
                 <div
                     className={
-                        "grid grid-cols-2 gap-2 max-h-[450px] lg:max-h-full overflow-y-scroll lg:overflow-y-auto"
+                        "grid grid-cols-2 gap-4 max-h-[450px] lg:max-h-full overflow-y-scroll lg:overflow-y-auto"
                     }
                 >
                     <div>
@@ -29,6 +84,24 @@ export default class MoveSelectedInformation extends React.Component<
                             Are you sure you want to do this? This action will
                             move all selected items below.{" "}
                         </p>
+                        <p className="mb-3">
+                            Below, the list of items to move, you can select
+                            what set to move it to. To the right are a set of
+                            rules for making a set equitable.
+                        </p>
+                        <p className="mb-3">
+                            Only non equipped sets may be chosen.
+                        </p>
+                        {this.props.usable_sets ? (
+                            <DropDown
+                                menu_items={this.buildDropDown()}
+                                button_title={
+                                    this.state.set_name !== null
+                                        ? this.state.set_name
+                                        : "Move to set"
+                                }
+                            />
+                        ) : null}
                         <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3"></div>
                         <span className="mb-3">
                             <strong>Items to Move</strong>

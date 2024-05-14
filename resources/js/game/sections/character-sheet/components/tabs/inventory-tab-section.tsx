@@ -463,6 +463,7 @@ export default class InventoryTabSection extends React.Component<
                                 ),
                             },
                         }}
+                        usable_sets={this.props.usable_sets}
                     />
                 ) : null}
 

@@ -129,6 +129,7 @@ class InventorySetService {
 
             return $this->successResult([
                 'message'   => $itemName . ' Has been moved to: Set ' . $index + 1,
+                'moved_to_set_name' => $inventorySet->name,
                 'inventory' => [
                     'inventory' => $characterInventoryService->getInventoryForType('inventory'),
                     'sets'      => $characterInventoryService->getInventoryForType('sets')['sets']
@@ -138,6 +139,7 @@ class InventorySetService {
 
         return $this->successResult([
             'message'   => $itemName . ' Has been moved to: ' . $inventorySet->name,
+            'moved_to_set_name' => $inventorySet->name,
             'inventory' => [
                 'inventory' => $characterInventoryService->getInventoryForType('inventory'),
                 'sets'      => $characterInventoryService->getInventoryForType('sets')['sets']

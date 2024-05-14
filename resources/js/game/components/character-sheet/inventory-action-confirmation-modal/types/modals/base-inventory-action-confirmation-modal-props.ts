@@ -1,5 +1,6 @@
 import { InventoryActionConfirmationType } from "../../helpers/enums/inventory-action-confirmation-type";
 import InventoryDetails from "../../../../../lib/game/character-sheet/types/inventory/inventory-details";
+import SetDetails from "../../../../../lib/game/character-sheet/types/inventory/set-details";
 
 export default interface BaseInventoryActionConfirmationModalProps {
     type: InventoryActionConfirmationType;
@@ -22,4 +23,6 @@ export default interface BaseInventoryActionConfirmationModalProps {
     };
 
     selected_item_names?: string[] | [];
+
+    usable_sets: SetDetails[] | [];
 }

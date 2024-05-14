@@ -70,6 +70,7 @@ export default class InventoryActionConfirmationModal extends React.Component<
                     secondary_button_label: "Yes. I understand.",
                     handle_action: this.confirm.bind(this),
                 }}
+                large_modal={this.props.is_large_modal}
             >
                 {this.props.children}
 
