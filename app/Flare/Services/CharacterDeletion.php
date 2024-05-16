@@ -115,6 +115,8 @@ class CharacterDeletion {
     }
 
     protected function deleteCharacter(Character $character): void {
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+
         $character->skills()->delete();
 
         $character->kingdomAttackLogs()->delete();
@@ -129,8 +131,6 @@ class CharacterDeletion {
 
         $character->factions()->delete();
 
-        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
-
         $character->passiveSkills()->delete();
 
         $this->deleteClassRanks($character);
@@ -139,13 +139,11 @@ class CharacterDeletion {
 
         $character->classSpecialsEquipped()->delete();
 
-        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
-
-        RankFightTop::where('character_id', $character->id)->delete();
-
         $character->map()->delete();
 
         $character->delete();
+
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
     }
 
     protected function deleteClassRanks(Character $character): void {
