@@ -15,7 +15,12 @@ class  CharacterInventoryMultiController extends Controller {
     }
 
     public function equipSelected(InventoryMultiRequest $request, Character $character) {
+        $result = $this->multiInventoryActionService->equipManyItems($character, $request->slot_ids);
 
+        $status = $result['status'];
+        unset($result['status']);
+
+        return response()->json($result, $status);
     }
 
     public function moveSelected(MoveSelectedItemsRequest $request, Character $character): JsonResponse {

@@ -220,28 +220,13 @@ class  CharacterInventoryController extends Controller {
      * @throws Exception
      */
     public function equipItem(EquipItemValidation $request, Character $character, EquipItemService $equipItemService): JsonResponse {
-        try {
-            $equipItemService->setRequest($request->all())
-                ->setCharacter($character)
-                ->replaceItem();
 
-            $this->updateCharacterAttackDataCache($character);
+        $result = $equipItemService->equipItem($character, $request->all());
 
-            $characterInventoryService = $this->characterInventoryService->setCharacter($character);
+        $status = $result['status'];
+        unset($result['status']);
 
-            return response()->json([
-                'inventory' => [
-                    'inventory' => $characterInventoryService->fetchCharacterInventory(),
-                    'equipped'  => $characterInventoryService->fetchEquipped(),
-                    'sets'      => $characterInventoryService->getCharacterInventorySets(),
-                ],
-                'message'       => 'Equipped item.'
-            ]);
-        } catch (Exception $e) {
-            return response()->json([
-                'message' => $e->getMessage()
-            ], 422);
-        }
+        return response()->json($result, $status);
     }
 
     /**

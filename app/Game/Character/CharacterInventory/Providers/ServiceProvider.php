@@ -8,6 +8,7 @@ use App\Flare\Transformers\InventoryTransformer;
 use App\Flare\Transformers\Serializers\CoreSerializer;
 use App\Flare\Transformers\UsableItemTransformer;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
+use App\Game\Character\CharacterInventory\Builders\EquipManyBuilder;
 use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Character\CharacterInventory\Services\ComparisonService;
 use App\Game\Character\CharacterInventory\Services\EquipItemService;
@@ -55,7 +56,13 @@ class ServiceProvider extends ApplicationServiceProvider {
         });
 
         $this->app->bind(EquipItemService::class, function ($app) {
-            return new EquipItemService($app->make(Manager::class), $app->make(CharacterAttackTransformer::class), $app->make(InventorySetService::class));
+            return new EquipItemService(
+                $app->make(Manager::class),
+                $app->make(CharacterAttackTransformer::class),
+                $app->make(InventorySetService::class),
+                $app->make(CharacterInventoryService::class),
+                $app->make(UpdateCharacterAttackTypesHandler::class)
+            );
         });
 
         $this->app->bind(CharacterInventoryService::class, function ($app) {
@@ -87,9 +94,15 @@ class ServiceProvider extends ApplicationServiceProvider {
             );
         });
 
+        $this->app->bind(EquipManyBuilder::class, function() {
+            return new EquipManyBuilder();
+        });
+
         $this->app->bind(MultiInventoryActionService::class, function($app) {
             return new MultiInventoryActionService(
                 $app->make(InventorySetService::class),
+                $app->make(EquipItemService::class),
+                $app->make(EquipManyBuilder::class)
             );
         });
     }

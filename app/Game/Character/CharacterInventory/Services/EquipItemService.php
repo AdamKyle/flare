@@ -9,14 +9,19 @@ use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 use App\Flare\Models\SetSlot;
 use App\Flare\Transformers\CharacterAttackTransformer;
+use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
 use App\Game\Character\CharacterInventory\Exceptions\EquipItemException;
 use App\Game\Core\Comparison\ItemComparison;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
+use App\Game\Core\Traits\ResponseBuilder;
+use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use League\Fractal\Manager;
 
 
 class EquipItemService {
+
+    use ResponseBuilder;
 
     /**
      * @var Manager $manager
@@ -31,7 +36,11 @@ class EquipItemService {
     /**
      * @var InventorySetService $inventorySetService
      */
-    private $inventorySetService;
+    private InventorySetService $inventorySetService;
+
+    private CharacterInventoryService $characterInventoryService;
+
+    private UpdateCharacterAttackTypesHandler $updateCharacterAttackTypesHandler;
 
     /**
      * @var Character $character
@@ -49,11 +58,14 @@ class EquipItemService {
      * @param Manager $manager
      * @param CharacterAttackTransformer $characterTransformer
      * @param InventorySetService $inventorySetService
+     * @param CharacterInventoryService $characterInventoryService
      */
-    public function __construct(Manager $manager, CharacterAttackTransformer $characterTransformer, InventorySetService $inventorySetService) {
+    public function __construct(Manager $manager, CharacterAttackTransformer $characterTransformer, InventorySetService $inventorySetService, CharacterInventoryService $characterInventoryService, UpdateCharacterAttackTypesHandler $updateCharacterAttackTypesHandler) {
         $this->manager              = $manager;
         $this->characterTransformer = $characterTransformer;
         $this->inventorySetService  = $inventorySetService;
+        $this->characterInventoeryService = $characterInventoryService;
+        $this->updateCharacterAttackTypesHandler = $updateCharacterAttackTypesHandler;
     }
 
     /**
@@ -78,6 +90,37 @@ class EquipItemService {
         $this->character = $character;
 
         return $this;
+    }
+
+    /**
+     * @param Character $character
+     * @param array $requestParams
+     * @return array
+     */
+    public function equipItem(Character $character, array $requestParams): array {
+        try {
+            $this->setRequest($requestParams)
+                ->setCharacter($character)
+                ->replaceItem();
+
+            $this->updateCharacterAttackTypesHandler->updateCache($character);
+
+            $characterInventoryService = $this->characterInventoryService->setCharacter($character);
+
+            $response = $this->successResult([
+                'inventory' => [
+                    'inventory' => $characterInventoryService->fetchCharacterInventory(),
+                    'equipped'  => $characterInventoryService->fetchEquipped(),
+                    'sets'      => $characterInventoryService->getCharacterInventorySets(),
+                ],
+                'message'       => 'Equipped item.'
+            ]);
+        } catch (Exception $e) {
+
+            return $this->errorResult($e->getMessage());
+        }
+
+        return $response;
     }
 
     public function replaceItem(): Item {

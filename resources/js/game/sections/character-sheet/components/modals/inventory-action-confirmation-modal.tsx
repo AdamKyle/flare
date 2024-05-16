@@ -5,6 +5,7 @@ import Ajax from "../../../../lib/ajax/ajax";
 import InventoryActionConfirmationModalProps from "../../../../lib/game/character-sheet/types/modal/inventory-action-confirmation-modal-props";
 import LoadingProgressBar from "../../../../components/ui/progress-bars/loading-progress-bar";
 import InventoryActionConfirmationModalState from "../../../../lib/game/character-sheet/types/modal/inventory-action-confirmation-modal-state";
+import DangerAlert from "../../../../components/ui/alerts/simple-alerts/danger-alert";
 
 export default class InventoryActionConfirmationModal extends React.Component<
     InventoryActionConfirmationModalProps,
@@ -15,6 +16,7 @@ export default class InventoryActionConfirmationModal extends React.Component<
 
         this.state = {
             loading: false,
+            error_message: null,
         };
     }
 
@@ -52,7 +54,17 @@ export default class InventoryActionConfirmationModal extends React.Component<
                             },
                         );
                     },
-                    (error: AxiosError) => {},
+                    (error: AxiosError) => {
+                        this.setState({ loading: false });
+
+                        if (typeof error.response !== "undefined") {
+                            const response: AxiosResponse = error.response;
+
+                            this.setState({
+                                error_message: response.data.message,
+                            });
+                        }
+                    },
                 );
             },
         );
@@ -73,6 +85,10 @@ export default class InventoryActionConfirmationModal extends React.Component<
                 large_modal={this.props.is_large_modal}
             >
                 {this.props.children}
+
+                {this.state.error_message !== null ? (
+                    <DangerAlert>{this.state.error_message}</DangerAlert>
+                ) : null}
 
                 {this.state.loading ? <LoadingProgressBar /> : null}
             </Dialogue>

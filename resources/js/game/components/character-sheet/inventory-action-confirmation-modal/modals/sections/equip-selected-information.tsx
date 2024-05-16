@@ -18,7 +18,7 @@ export default class EquipSelectedInformation extends React.Component<
     render() {
         return (
             <>
-                <p>
+                <p className="mb-3">
                     Below are a list of items you have selected to equip. Each
                     of these items will replace the item of that type in your
                     inventory. Should you have two weapons, shields, spells (of
@@ -26,11 +26,15 @@ export default class EquipSelectedInformation extends React.Component<
                     the two things you have equipped, we will choose the first
                     or left hand to replace by default.
                 </p>
-                <p>
+                <p className="mb-3">
                     For example, lets say you have two weapons equipped, and you
                     select one weapon to equip, we will replace the left hand by
-                    default. If you would like to select a specific hand, or
-                    position - please click the item and then click equip.
+                    default.
+                </p>
+                <p>
+                    If you would like more control over the position to equip,
+                    please close this window, select the desired item and click
+                    equip.
                 </p>
                 <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3"></div>
                 <span className="mb-3">
