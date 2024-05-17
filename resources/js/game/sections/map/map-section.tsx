@@ -221,7 +221,7 @@ export default class MapSection extends React.Component<MapProps, MapState> {
                     <Draggable
                         position={this.state.map_position}
                         bounds={{
-                            top: -200,
+                            top: -2200,
                             left: fetchLeftBounds(this),
                             right: this.state.right_bounds,
                             bottom: this.state.bottom_bounds,

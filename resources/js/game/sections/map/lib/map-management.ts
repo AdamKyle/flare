@@ -33,7 +33,8 @@ export const getStyle = (
     ) {
         return {
             backgroundImage: `url("${component.state.map_url}")`,
-            height: 500,
+            height: 2500,
+            width: 2500,
         };
     }
 
@@ -41,13 +42,14 @@ export const getStyle = (
         return {
             backgroundImage: `url("${component.state.map_url}")`,
             backgroundRepeat: "no-repeat",
-            height: 500,
+            height: 2500,
+            width: 2500,
         };
     }
 
     return {
         backgroundImage: `url("${component.state.map_url}")`,
-        height: 500,
-        width: 500,
+        height: 2500,
+        width: 2500,
     };
 };

@@ -40,10 +40,10 @@ class CreateMap extends Command {
 
         // Surface:
         // $land  = new Color(23, 132, 72);
-        $land = new Color(97, 83, 61);
+        // $land = new Color(97, 83, 61);
 
         // Labyrinth:
-        // $land = new Color(99, 70, 8);
+        $land = new Color(99, 70, 8);
 
         // Dungeon:
         // $land = new Color(94, 74, 73);
@@ -67,7 +67,8 @@ class CreateMap extends Command {
         // $land = new Color(91, 110, 96);
 
         // Surface & Labyrinth:
-        $water = new Color(66, 129, 178);
+        $water = new Color(44, 86, 100);
+        // $water = new Color(66, 129, 178);
 
         // Dungeon Water:
         //$water = new Color(162, 219, 118);
@@ -88,7 +89,7 @@ class CreateMap extends Command {
         // $water = new Color(18, 57, 87);
 
         // Regular Water Level
-        $waterLevel = 30;
+        $waterLevel = 45;
 
         //  Hell Water Level
         // $waterLevel = 55;

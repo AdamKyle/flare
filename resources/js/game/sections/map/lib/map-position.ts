@@ -102,5 +102,5 @@ export const fetchLeftBounds = (component: MapSection): number => {
         return -50;
     }
 
-    return 0;
+    return -2000;
 };

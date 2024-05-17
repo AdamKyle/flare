@@ -131,6 +131,12 @@ class CharacterDeletion {
 
         $character->factions()->delete();
 
+        foreach ($character->factionLoyalties as $loyalty) {
+            $loyalty->factionLoyaltyNpcs()->delete();
+        }
+
+        $character->factionLoyalties()->delete();
+
         $character->passiveSkills()->delete();
 
         $this->deleteClassRanks($character);
