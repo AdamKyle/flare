@@ -37,11 +37,15 @@ export default class DisenchantSelectedInformation extends React.Component<
                         Gold Dust <i className="fas fa-external-link-alt"></i>
                     </a>{" "}
                     and experience towards{" "}
-                    <a href={"/information/skill-information"} target="_blank">
+                    <a href={"/information/disenchanting"} target="_blank">
                         Disenchanting{" "}
                         <i className="fas fa-external-link-alt"></i>
                     </a>{" "}
-                    and half XP towards Enchanting.
+                    and half XP towards{" "}
+                    <a href={"/information/enchanting"} target="_blank">
+                        Enchanting <i className="fas fa-external-link-alt"></i>
+                    </a>
+                    .
                 </p>
                 <p className="mt-2">
                     Tip for crafters/enchanters: Equip a set that's full

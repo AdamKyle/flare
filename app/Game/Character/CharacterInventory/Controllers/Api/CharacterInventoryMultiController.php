@@ -37,7 +37,12 @@ class  CharacterInventoryMultiController extends Controller {
     }
 
     public function disenchantSelected(InventoryMultiRequest $request, Character $character) {
+        $result = $this->multiInventoryActionService->disenchantManyItems($character, $request->slot_ids);
 
+        $status = $result['status'];
+        unset($result['status']);
+
+        return response()->json($result, $status);
     }
 
     public function sellSelected(InventoryMultiRequest $request, Character $character) {

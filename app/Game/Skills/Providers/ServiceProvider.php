@@ -139,7 +139,7 @@ class ServiceProvider extends ApplicationServiceProvider {
         });
 
         $this->app->bind(DisenchantService::class, function ($app) {
-            return new DisenchantService($app->make(SkillCheckService::class));
+            return new DisenchantService($app->make(SkillCheckService::class), $app->make(CharacterInventoryService::class));
         });
 
         $this->app->bind(ItemSkillService::class, function () {

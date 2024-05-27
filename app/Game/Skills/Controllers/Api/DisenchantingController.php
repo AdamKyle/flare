@@ -38,41 +38,12 @@ class DisenchantingController extends Controller {
     }
 
     public function disenchant(Item $item) {
-        $character = auth()->user()->character;
+        $result = $this->disenchantingService->disenchantItem(auth()->user()->character, $item);
 
-        $inventory = Inventory::where('character_id', $character->id)->first();
+        $status = $result['status'];
+        unset($result['status']);
 
-        $foundItem = InventorySlot::where('equipped', false)->where('item_id', $item->id)->where('inventory_id', $inventory->id)->first();
-
-        if (is_null($foundItem)) {
-            event(new ServerMessageEvent($character->user,  'Item cannot be disenchanted.'));
-            return response()->json([]);
-        }
-
-        if (is_null($foundItem->item->item_suffix_id) && is_null($foundItem->item->item_prefix_id)) {
-            event(new ServerMessageEvent($character->user,  'Item cannot be disenchanted.'));
-            return response()->json([]);
-        }
-
-        if (!is_null($foundItem)) {
-            if ($foundItem->item->type === 'quest') {
-                event(new ServerMessageEvent($character->user, 'Item cannot be destroyed or does not exist. (Quest items cannot be destroyed or disenchanted)'));
-                return response()->json([], 200);
-            }
-
-            $this->disenchantingService->setUp($character)->disenchantWithSkill($foundItem);
-
-            event(new UpdateTopBarEvent($character->refresh()));
-        }
-
-        $inventory = $this->characterInventoryService->setCharacter($character->refresh());
-
-        return response()->json([
-            'message'   => 'Disenchanted item ' . $item->affix_name . ' Check server message tab for Gold Dust output.',
-            'inventory' => [
-                'inventory' => $inventory->getInventoryForType('inventory')
-            ]
-        ], 200);
+        return response()->json($result, $status);
     }
 
     public function destroy(Item $item) {
