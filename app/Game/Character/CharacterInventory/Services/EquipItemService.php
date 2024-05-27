@@ -64,7 +64,7 @@ class EquipItemService {
         $this->manager              = $manager;
         $this->characterTransformer = $characterTransformer;
         $this->inventorySetService  = $inventorySetService;
-        $this->characterInventoeryService = $characterInventoryService;
+        $this->characterInventoryService = $characterInventoryService;
         $this->updateCharacterAttackTypesHandler = $updateCharacterAttackTypesHandler;
     }
 
