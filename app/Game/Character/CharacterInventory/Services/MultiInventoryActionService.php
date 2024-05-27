@@ -19,6 +19,7 @@ class MultiInventoryActionService {
         private readonly EquipManyBuilder $equipManyBuilder,
         private readonly ShopService $shopService,
         private readonly DisenchantService $disenchantService,
+        private readonly CharacterInventoryService $characterInventoryService,
     ) {}
 
     /**
@@ -102,7 +103,7 @@ class MultiInventoryActionService {
     }
 
     public function disenchantManyItems(Character $character, array $slotIds): array {
-        $result = $this->errorResult('Nothing happened when trying to sell many items. Did you select anything?');
+        $result = $this->errorResult('Nothing happened when trying to disenchant many items. Did you select anything?');
 
         foreach ($slotIds as $slotId) {
 
@@ -121,6 +122,26 @@ class MultiInventoryActionService {
 
         return $this->successResult([
             'message' => 'Disenchanted all selected items. Check server messages for gold dust awards as well as any skill levels in Disenchanting and/or Enchanting. Mobile players can access Server Messages by tapping Chat Tabs and selecting Server Messages.',
+            'inventory' => $result['inventory'],
+        ]);
+    }
+
+    public function destroyManyItems(Character $character, array $slotIds): array {
+        $result = $this->errorResult('Nothing happened when trying to destroy many items. Did you select anything?');
+
+        $characterInventoryService = $this->characterInventoryService->setCharacter($character);
+
+        foreach ($slotIds as $slotId) {
+
+            $result = $characterInventoryService->deleteItem($slotId);
+
+            if ($result['status'] === 422) {
+                return $result;
+            }
+        }
+
+        return $this->successResult([
+            'message' => 'Destroyed all selected items.',
             'inventory' => $result['inventory'],
         ]);
     }

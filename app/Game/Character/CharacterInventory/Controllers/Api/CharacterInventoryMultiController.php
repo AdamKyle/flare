@@ -33,7 +33,12 @@ class  CharacterInventoryMultiController extends Controller {
     }
 
     public function destroySelected(InventoryMultiRequest $request, Character $character) {
+        $result = $this->multiInventoryActionService->destroyManyItems($character, $request->slot_ids);
 
+        $status = $result['status'];
+        unset($result['status']);
+
+        return response()->json($result, $status);
     }
 
     public function disenchantSelected(InventoryMultiRequest $request, Character $character) {

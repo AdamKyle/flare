@@ -106,7 +106,7 @@ class  CharacterInventoryController extends Controller {
      */
     public function destroy(Request $request, Character $character): JsonResponse {
 
-        $result = $this->characterInventoryService->setCharacter($character->refresh())->deleteItem($request->slot_id);
+        $result = $this->characterInventoryService->setCharacter($character)->deleteItem($request->slot_id);
 
         $status = $result['status'];
         unset($result['status']);

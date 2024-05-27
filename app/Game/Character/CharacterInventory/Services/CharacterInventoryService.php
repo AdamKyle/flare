@@ -575,6 +575,8 @@ class CharacterInventoryService {
             $item->delete();
         }
 
+        $this->character = $this->character->refresh();
+
         return $this->successResult([
             'message' => 'Destroyed ' . $name . '.',
             'inventory' => [
