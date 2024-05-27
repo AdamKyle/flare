@@ -41,6 +41,11 @@ class  CharacterInventoryMultiController extends Controller {
     }
 
     public function sellSelected(InventoryMultiRequest $request, Character $character) {
+        $result = $this->multiInventoryActionService->sellManyItems($character, $request->slot_ids);
 
+        $status = $result['status'];
+        unset($result['status']);
+
+        return response()->json($result, $status);
     }
 }

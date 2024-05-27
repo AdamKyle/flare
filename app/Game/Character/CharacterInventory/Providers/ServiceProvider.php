@@ -18,6 +18,7 @@ use App\Game\Character\CharacterInventory\Services\UseItemService;
 use App\Game\Character\CharacterInventory\Validations\SetHandsValidation;
 use App\Game\Core\Values\ValidEquipPositionsValue;
 use App\Game\Gems\Services\ItemAtonements;
+use App\Game\Shop\Services\ShopService;
 use App\Game\Skills\Services\MassDisenchantService;
 use App\Game\Skills\Services\UpdateCharacterSkillsService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
@@ -102,7 +103,8 @@ class ServiceProvider extends ApplicationServiceProvider {
             return new MultiInventoryActionService(
                 $app->make(InventorySetService::class),
                 $app->make(EquipItemService::class),
-                $app->make(EquipManyBuilder::class)
+                $app->make(EquipManyBuilder::class),
+                $app->make(ShopService::class),
             );
         });
     }

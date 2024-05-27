@@ -7,8 +7,13 @@ use App\Flare\Models\Inventory;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 use App\Flare\Transformers\ItemTransformer;
+use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Character\Builders\AttackBuilders\Jobs\CharacterAttackTypesCacheBuilder;
+use App\Game\Character\CharacterInventory\Exceptions\EquipItemException;
+use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Character\CharacterInventory\Services\EquipItemService;
+use App\Game\Core\Events\UpdateTopBarEvent;
+use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Shop\Events\BuyItemEvent;
 use App\Game\Shop\Events\SellItemEvent;
 use Facades\App\Flare\Calculators\SellItemCalculator;
@@ -17,6 +22,8 @@ use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
 
 class ShopService {
+
+    use ResponseBuilder;
 
     /**
      * @var EquipItemService $equipItemService
@@ -28,6 +35,8 @@ class ShopService {
      */
     private ItemTransformer $itemTransformer;
 
+    private CharacterInventoryService $characterInventoryService;
+
     /**
      * @var Manager $manager
      */
@@ -35,13 +44,16 @@ class ShopService {
 
     /**
      * @param EquipItemService $equipItemService
+     * @param CharacterInventoryService $characterInventoryService
      * @param ItemTransformer $itemTransformer
      * @param Manager $manager
      */
-    public function __construct(EquipItemService $equipItemService, ItemTransformer $itemTransformer, Manager $manager) {
+    public function __construct(EquipItemService $equipItemService, CharacterInventoryService $characterInventoryService, ItemTransformer $itemTransformer, Manager $manager) {
         $this->equipItemService = $equipItemService;
         $this->itemTransformer = $itemTransformer;
         $this->manager  = $manager;
+
+        $this->characterInventoryService = $characterInventoryService;
     }
 
     public function getItemsForShop(): array {
@@ -69,6 +81,77 @@ class ShopService {
         return $items;
     }
 
+    public function sellSpecificItem(Character $character, int $slotId): array {
+        $inventorySlot = $character->inventory->slots->filter(function ($slot) use ($slotId) {
+            return $slot->id === $slotId && !$slot->equipped;
+        })->first();
+
+        if (is_null($inventorySlot)) {
+            return $this->errorResult('Item not found.');
+        }
+
+        $item = $inventorySlot->item;
+
+        if ($item->type === 'trinket' || $item->type === 'artifact') {
+            return $this->errorResult('The shop keeper will not accept this item (Trinkets/Artifacts cannot be sold to the shop).');
+        }
+
+        $totalSoldFor = SellItemCalculator::fetchSalePriceWithAffixes($item);
+
+        $character = $character->refresh();
+
+        event(new SellItemEvent($inventorySlot, $character));
+
+        $inventory = $this->characterInventoryService->setCharacter($character);
+
+        return $this->successResult([
+            'item_name' => $item->affix_name,
+            'sold_for' => $totalSoldFor,
+            'message' => 'Sold: ' . $item->affix_name . ' for: ' . number_format($totalSoldFor) . ' gold.',
+            'inventory' => [
+                'inventory' => $inventory->getInventoryForType('inventory'),
+            ]
+        ]);
+    }
+
+    public function sellAllItems(Character $character): array {
+
+        $totalSoldFor = $this->sellAllItemsInInventory($character);
+
+        $newGold = $character->gold + $totalSoldFor;
+
+        if ($newGold > MaxCurrenciesValue::MAX_GOLD) {
+            $newGold = MaxCurrenciesValue::MAX_GOLD;
+        }
+
+        $character->update([
+            'gold' => $newGold,
+        ]);
+
+        $character = $character->refresh();
+
+        $inventory = $this->characterInventoryService->setCharacter($character);
+
+        if ($totalSoldFor === 0) {
+
+            return $this->successResult([
+                'message' => 'Could not sell any items ...',
+                'inventory' => [
+                    'inventory' => $inventory->getInventoryForType('inventory'),
+                ]
+            ]);
+        }
+
+        event(new UpdateTopBarEvent($character));
+
+        return $this->successResult([
+            'message' => 'Sold all your items for a total of: ' . number_format($totalSoldFor) . ' gold.',
+            'inventory' => [
+                'inventory' => $inventory->getInventoryForType('inventory'),
+            ]
+        ]);
+    }
+
     /**
      * Sell all the items in the inventory.
      *
@@ -77,7 +160,7 @@ class ShopService {
      * @param Character $character
      * @return int
      */
-    public function sellAllItemsInInventory(Character $character): int {
+    private function sellAllItemsInInventory(Character $character): int {
         $invalidTypes = ['alchemy', 'quest', 'trinket'];
 
         $itemsToSell = $character->inventory->slots()->with('item')->get()->filter(function ($slot) use ($invalidTypes) {
@@ -108,6 +191,7 @@ class ShopService {
      * @param Character $character
      * @param array $requestData
      * @return void
+     * @throws EquipItemException
      */
     public function buyAndReplace(Item $item, Character $character, array $requestData): void {
         event(new BuyItemEvent($item, $character));

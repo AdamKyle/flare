@@ -4,6 +4,7 @@ namespace App\Game\Shop\Providers;
 
 use App\Flare\Transformers\ItemTransformer;
 use App\Game\Character\CharacterInventory\Services\CharacterGemBagService;
+use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Character\CharacterInventory\Services\EquipItemService;
 use App\Game\Shop\Services\GemShopService;
 use App\Game\Shop\Services\GoblinShopService;
@@ -22,6 +23,7 @@ class ServiceProvider extends ApplicationServiceProvider {
         $this->app->bind(ShopService::class, function ($app) {
             return new ShopService(
                 $app->make(EquipItemService::class),
+                $app->make(CharacterInventoryService::class),
                 $app->make(ItemTransformer::class),
                 $app->make(Manager::class)
             );

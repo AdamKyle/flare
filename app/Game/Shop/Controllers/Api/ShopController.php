@@ -185,40 +185,13 @@ class ShopController extends Controller {
         ]);
     }
 
-    public function sellAll(Character $character, ShopService $service) {
+    public function sellAll(Character $character) {
 
-        $totalSoldFor = $service->sellAllItemsInInventory($character);
+        $result = $this->shopService->sellAllItems($character);
 
-        $newGold = $character->gold + $totalSoldFor;
+        $status = $result['status'];
+        unset($result['status']);
 
-        if ($newGold > MaxCurrenciesValue::MAX_GOLD) {
-            $newGold = MaxCurrenciesValue::MAX_GOLD;
-        }
-
-        $character->update([
-            'gold' => $newGold,
-        ]);
-
-        $character = $character->refresh();
-
-        $inventory = $this->characterInventoryService->setCharacter($character);
-
-        if ($totalSoldFor === 0) {
-            return response([
-                'message' => 'Could not sell any items ...',
-                'inventory' => [
-                    'inventory' => $inventory->getInventoryForType('inventory'),
-                ]
-            ], 200);
-        }
-
-        event(new UpdateTopBarEvent($character));
-
-        return response([
-            'message' => 'Sold all your items for a total of: ' . number_format($totalSoldFor) . ' gold.',
-            'inventory' => [
-                'inventory' => $inventory->getInventoryForType('inventory'),
-            ]
-        ]);
+        return response()->json($result, $status);
     }
 }
