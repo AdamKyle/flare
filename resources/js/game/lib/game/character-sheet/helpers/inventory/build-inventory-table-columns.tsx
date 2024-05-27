@@ -171,7 +171,7 @@ export const BuildInventoryTableColumns = (
 
     if (typeof selectMultipleItems !== "undefined") {
         columns.unshift({
-            name: "",
+            name: "Select Item(s)",
             selector: (row: any) => row.slot_id,
             cell: (row: any) => (
                 <span className="m-auto">
@@ -180,7 +180,9 @@ export const BuildInventoryTableColumns = (
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                             selectMultipleItems(e)
                         }
-                        className="form-checkbox"
+                        className="form-checkbox w-4 h-4 text-blue-600 focus:ring-2 focus:ring-offset-2 focus:ring-blue-700 dark:focus:ring-blue-500"
+                        aria-label="Select one or items"
+                        aria-describedby="allows you to select one or more items to then do additional actions with."
                         data-slot-id={row.slot_id}
                     />
                 </span>
