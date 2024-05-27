@@ -45,13 +45,13 @@ export const movePlayer = (
         return false;
     }
 
-    if (y > 496) {
+    if (y > 2496) {
         generateServerMessage("cannot_move_down");
 
         return false;
     }
 
-    if (x > 496) {
+    if (x > 2496) {
         generateServerMessage("cannot_move_right");
 
         return false;
