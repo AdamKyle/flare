@@ -1,14 +1,13 @@
+import { AxiosError, AxiosResponse } from "axios";
 import React from "react";
+import DangerAlert from "../../components/ui/alerts/simple-alerts/danger-alert";
+import SuccessAlert from "../../components/ui/alerts/simple-alerts/success-alert";
+import DangerOutlineButton from "../../components/ui/buttons/danger-outline-button";
+import PrimaryOutlineButton from "../../components/ui/buttons/primary-outline-button";
 import DropDown from "../../components/ui/drop-down/drop-down";
 import LoadingProgressBar from "../../components/ui/progress-bars/loading-progress-bar";
 import Ajax from "../../lib/ajax/ajax";
-import { AxiosError, AxiosResponse } from "axios";
-import FactionLoyaltyState, {
-    FactionLoyaltyNpcListItem,
-} from "./types/faction-loyalty-state";
-import FactionLoyaltyProps from "./types/faction-loyalty-props";
-import DangerAlert from "../../components/ui/alerts/simple-alerts/danger-alert";
-import PrimaryOutlineButton from "../../components/ui/buttons/primary-outline-button";
+import ActionsTimers from "../timers/actions-timers";
 import {
     FactionLoyalty,
     FactionLoyaltyNpc,
@@ -16,8 +15,10 @@ import {
 } from "./deffinitions/faction-loaylaty";
 import FactionNpcSection from "./faction-npc-section";
 import FactionNpcTasks from "./faction-npc-tasks";
-import SuccessAlert from "../../components/ui/alerts/simple-alerts/success-alert";
-import DangerOutlineButton from "../../components/ui/buttons/danger-outline-button";
+import FactionLoyaltyProps from "./types/faction-loyalty-props";
+import FactionLoyaltyState, {
+    FactionLoyaltyNpcListItem,
+} from "./types/faction-loyalty-state";
 
 export default class FactionFame extends React.Component<
     FactionLoyaltyProps,
@@ -238,98 +239,103 @@ export default class FactionFame extends React.Component<
         }
 
         return (
-            <div className="py-4">
-                <h2>{this.state.game_map_name} Loyalty</h2>
-                <p className="my-4">
-                    Below you can select an NPC to assist. Each NPC will have
-                    it's own set of tasks to complete. Crafting tasks can be
-                    done any where, bounty tasks must be done manually and on
-                    the map of the NPC you are assisting.
-                </p>
-                <p className="my-4">
-                    In order to gain fame, you must assist the NPC and by
-                    completing their tasks you will level the fame and gain the
-                    rewards as indicated but multiplied by the level of the
-                    npc's fame. You may only assist one NPC at a time and can
-                    freely switch at anytime.
-                </p>
-                <p className="my-4">
-                    <a
-                        href="/information/faction-loyalty"
-                        target="_blank"
-                        className="my-2"
-                    >
-                        Learn more about Faction Loyalties{" "}
-                        <i className="fas fa-external-link-alt"></i>
-                    </a>
-                </p>
-                <div className="my-4">
-                    {this.state.success_message ? (
-                        <SuccessAlert>
-                            {this.state.success_message}
-                        </SuccessAlert>
-                    ) : null}
-                </div>
-                <div className="my-4">
-                    {this.state.is_processing ? <LoadingProgressBar /> : null}
-                </div>
-                <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3"></div>
-                <div className="my-4 flex flex-wrap md:flex-nowrap gap-2">
-                    <div className="flex-none mt-[-25px] md:w-1/2">
-                        <div className="w-full relative left-0 flex flex-wrap">
-                            <div>
-                                <DropDown
-                                    menu_items={this.buildNpcList(
-                                        this.switchToNpc.bind(this),
+            <div>
+                <div className="py-4">
+                    <h2>{this.state.game_map_name} Loyalty</h2>
+                    <p className="my-4">
+                        Below you can select an NPC to assist. Each NPC will
+                        have it's own set of tasks to complete. Crafting tasks
+                        can be done any where, bounty tasks must be done
+                        manually and on the map of the NPC you are assisting.
+                    </p>
+                    <p className="my-4">
+                        In order to gain fame, you must assist the NPC and by
+                        completing their tasks you will level the fame and gain
+                        the rewards as indicated but multiplied by the level of
+                        the npc's fame. You may only assist one NPC at a time
+                        and can freely switch at anytime.
+                    </p>
+                    <p className="my-4">
+                        <a
+                            href="/information/faction-loyalty"
+                            target="_blank"
+                            className="my-2"
+                        >
+                            Learn more about Faction Loyalties{" "}
+                            <i className="fas fa-external-link-alt"></i>
+                        </a>
+                    </p>
+                    <div className="my-4">
+                        {this.state.success_message ? (
+                            <SuccessAlert>
+                                {this.state.success_message}
+                            </SuccessAlert>
+                        ) : null}
+                    </div>
+                    <div className="my-4">
+                        {this.state.is_processing ? (
+                            <LoadingProgressBar />
+                        ) : null}
+                    </div>
+                    <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3"></div>
+                    <div className="my-4 flex flex-wrap md:flex-nowrap gap-2">
+                        <div className="flex-none mt-[-25px] md:w-1/2">
+                            <div className="w-full relative left-0 flex flex-wrap">
+                                <div>
+                                    <DropDown
+                                        menu_items={this.buildNpcList(
+                                            this.switchToNpc.bind(this),
+                                        )}
+                                        button_title={"NPCs"}
+                                        selected_name={this.selectedNpc()}
+                                    />
+                                </div>
+                                <div>
+                                    {this.isAssisting() ? (
+                                        <DangerOutlineButton
+                                            button_label={"Stop Assisting"}
+                                            on_click={() =>
+                                                this.manageAssistingNpc(true)
+                                            }
+                                            additional_css={"mt-[34px] ml-4"}
+                                        />
+                                    ) : (
+                                        <PrimaryOutlineButton
+                                            button_label={"Assist"}
+                                            on_click={() =>
+                                                this.manageAssistingNpc(false)
+                                            }
+                                            additional_css={"mt-[34px] ml-4"}
+                                        />
                                     )}
-                                    button_title={"NPCs"}
-                                    selected_name={this.selectedNpc()}
-                                />
-                            </div>
-                            <div>
-                                {this.isAssisting() ? (
-                                    <DangerOutlineButton
-                                        button_label={"Stop Assisting"}
-                                        on_click={() =>
-                                            this.manageAssistingNpc(true)
-                                        }
-                                        additional_css={"mt-[34px] ml-4"}
-                                    />
-                                ) : (
-                                    <PrimaryOutlineButton
-                                        button_label={"Assist"}
-                                        on_click={() =>
-                                            this.manageAssistingNpc(false)
-                                        }
-                                        additional_css={"mt-[34px] ml-4"}
-                                    />
-                                )}
-                            </div>
-                            <div>
-                                <div className="mt-[38px] ml-4 font-bold">
-                                    <span>{this.selectedNpc()}</span>
+                                </div>
+                                <div>
+                                    <div className="mt-[38px] ml-4 font-bold">
+                                        <span>{this.selectedNpc()}</span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <FactionNpcSection
-                            faction_loyalty_npc={
-                                this.state.selected_faction_loyalty_npc
-                            }
-                            can_craft={this.props.can_craft}
-                            can_attack={this.props.can_attack}
-                        />
-                    </div>
-                    <div className="flex-none md:flex-auto w-full md:w-1/2">
-                        <FactionNpcTasks
-                            faction_loyalty_npc={
-                                this.state.selected_faction_loyalty_npc
-                            }
-                            can_craft={this.props.can_craft}
-                            can_attack={this.props.can_attack}
-                        />
+                            <FactionNpcSection
+                                faction_loyalty_npc={
+                                    this.state.selected_faction_loyalty_npc
+                                }
+                                can_craft={this.props.can_craft}
+                                can_attack={this.props.can_attack}
+                            />
+                        </div>
+                        <div className="flex-none md:flex-auto w-full md:w-1/2">
+                            <FactionNpcTasks
+                                faction_loyalty_npc={
+                                    this.state.selected_faction_loyalty_npc
+                                }
+                                can_craft={this.props.can_craft}
+                                can_attack={this.props.can_attack}
+                            />
+                        </div>
                     </div>
                 </div>
+                <ActionsTimers user_id={this.props.user_id} />
             </div>
         );
     }

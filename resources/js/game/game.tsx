@@ -19,7 +19,6 @@ import CharacterSheet from "./sections/character-sheet/character-sheet";
 import CharacterTopSection from "./sections/character-top-section/character-top-section";
 import GameChat from "./sections/chat/game-chat";
 import Quests from "./sections/components/quests/quests";
-import { FameTasks } from "./sections/faction-loyalty/deffinitions/faction-loaylaty";
 import ForceNameChange from "./sections/force-name-change/force-name-change";
 import ActionSection from "./sections/game-actions-section/action-section";
 import ActionTabs from "./sections/game-actions-section/action-tabs";
@@ -33,6 +32,7 @@ import MapState from "./sections/map/types/map-state";
 import PositionType from "./sections/map/types/map/position-type";
 import ScreenRefresh from "./sections/screen-refresh/screen-refresh";
 import KingdomLogDetails from "./components/kingdoms/deffinitions/kingdom-log-details";
+import { FameTasks } from "./components/faction-loyalty/deffinitions/faction-loaylaty";
 
 export default class Game extends React.Component<GameProps, GameState> {
     private gameEventListener?: GameEventListeners;
@@ -388,6 +388,7 @@ export default class Game extends React.Component<GameProps, GameState> {
                                             this.state.character
                                                 .can_see_pledge_tab
                                         }
+                                        user_id={this.props.userId}
                                         character_id={this.props.characterId}
                                         can_attack={
                                             this.state.character.can_attack

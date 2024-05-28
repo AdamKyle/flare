@@ -1,10 +1,12 @@
 import React from "react";
-import { FameTasks } from "../../faction-loyalty/deffinitions/faction-loaylaty";
+import { FameTasks } from "../../../components/faction-loyalty/deffinitions/faction-loaylaty";
 
 export default interface ActionTabsProps {
     children: React.ReactNode;
 
     character_id: number;
+
+    user_id: number;
 
     use_tabs: boolean;
 

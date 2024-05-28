@@ -1,15 +1,15 @@
-import React, { Fragment } from "react";
-import Ajax from "../../../lib/ajax/ajax";
 import { AxiosError, AxiosResponse } from "axios";
-import { watchForDarkModeTableChange } from "../../../lib/game/dark-mode-watcher";
+import React, { Fragment } from "react";
+import PledgeLoyalty from "../../../components/faction-loyalty/modals/pledge-loyalty";
 import InfoAlert from "../../../components/ui/alerts/simple-alerts/info-alert";
-import Table from "../../../components/ui/data-tables/table";
-import { formatNumber } from "../../../lib/game/format-number";
-import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
-import PrimaryButton from "../../../components/ui/buttons/primary-button";
-import PledgeLoyalty from "../../faction-loyalty/modals/pledge-loyalty";
 import SuccessAlert from "../../../components/ui/alerts/simple-alerts/success-alert";
 import DangerButton from "../../../components/ui/buttons/danger-button";
+import PrimaryButton from "../../../components/ui/buttons/primary-button";
+import Table from "../../../components/ui/data-tables/table";
+import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
+import Ajax from "../../../lib/ajax/ajax";
+import { watchForDarkModeTableChange } from "../../../lib/game/dark-mode-watcher";
+import { formatNumber } from "../../../lib/game/format-number";
 
 export default class CharacterFactions extends React.Component<any, any> {
     constructor(props: any) {

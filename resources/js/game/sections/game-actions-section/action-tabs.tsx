@@ -1,8 +1,8 @@
 import React from "react";
-import Tabs from "../../components/ui/tabs/tabs";
+import FactionFame from "../../components/faction-loyalty/faction-fame";
 import TabPanel from "../../components/ui/tabs/tab-panel";
+import Tabs from "../../components/ui/tabs/tabs";
 import ActionTabsProps from "./types/action-tabs-props";
-import FactionFame from "../faction-loyalty/faction-fame";
 
 type TabDefinition = { key: string; name: string }[];
 
@@ -30,6 +30,7 @@ export default class ActionTabs extends React.Component<ActionTabsProps, {}> {
                 <TabPanel key={"actions"}>{this.props.children}</TabPanel>
                 <TabPanel key={"faction-loyalty"}>
                     <FactionFame
+                        user_id={this.props.user_id}
                         character_id={this.props.character_id}
                         update_faction_action_tasks={
                             this.props.update_faction_action_tasks
