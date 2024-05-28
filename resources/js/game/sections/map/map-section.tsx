@@ -1,26 +1,26 @@
+import clsx from "clsx";
 import React, { Fragment } from "react";
 import Snowfall from "react-snowfall";
-import { dragMap, fetchLeftBounds } from "./lib/map-position";
-import MapProps from "./types/map/map-props";
-import Location from "../components/locations/location";
-import Kingdoms from "../components/kingdoms/kingdoms";
-import EnemyKingdoms from "../components/kingdoms/enemy-kingdoms";
-import MovePlayer from "./lib/ajax/move-player";
-import MapStateManager from "./lib/state/map-state-manager";
-import NpcKingdoms from "../components/kingdoms/npc-kingdoms";
+import MapTimer from "../../components/timers/map-timer";
 import ComponentLoading from "../../components/ui/loading/component-loading";
-import MapData from "./lib/request-types/MapData";
-import { getStyle, playerIconPosition } from "./lib/map-management";
-import MapTimer from "./map-timer";
+import { updateLocationBasedActions } from "../../lib/ajax/update-location-based-actions";
+import { updateTimers } from "../../lib/ajax/update-timers";
+import EnemyKingdoms from "../components/kingdoms/enemy-kingdoms";
+import Kingdoms from "../components/kingdoms/kingdoms";
+import NpcKingdoms from "../components/kingdoms/npc-kingdoms";
+import Location from "../components/locations/location";
 import DirectionalMovement from "./actions/directional-movement";
 import MapActions from "./actions/map-actions";
-import clsx from "clsx";
+import MovePlayer from "./lib/ajax/move-player";
+import { getStyle, playerIconPosition } from "./lib/map-management";
+import { dragMap, fetchLeftBounds } from "./lib/map-position";
+import MapData from "./lib/request-types/MapData";
+import MapStateManager from "./lib/state/map-state-manager";
 import MapState from "./types/map-state";
-import { updateTimers } from "../../lib/ajax/update-timers";
-import { updateLocationBasedActions } from "../../lib/ajax/update-location-based-actions";
+import MapProps from "./types/map/map-props";
 // @ts-ignore
+import { isEqual } from "lodash";
 import Draggable from "react-draggable/build/web/react-draggable.min";
-import { differenceWith, isEqual } from "lodash";
 
 export default class MapSection extends React.Component<MapProps, MapState> {
     private mapTimeOut: any;

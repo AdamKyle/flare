@@ -1,5 +1,5 @@
 import React, { Fragment } from "react";
-import TimerProgressBar from "../../components/ui/progress-bars/timer-progress-bar";
+import TimerProgressBar from "../ui/progress-bars/timer-progress-bar";
 import MapTimerProps from "./types/map-timer-props";
 
 export default class MapTimer extends React.Component<MapTimerProps, {}> {

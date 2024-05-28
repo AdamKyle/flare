@@ -1,24 +1,24 @@
 import React, { Fragment } from "react";
 import Select from "react-select";
-import SmallActionsState from "./types/small-actions-state";
-import SmallActionsManager from "../../lib/game/actions/small-actions-manager";
-import MonsterActions from "./components/small-actions/monster-actions";
-import ActionsTimers from "./components/actions-timers";
 import SmallCraftingSection from "../../components/crafting/general-crafting/small-crafting-section";
-import SmallExplorationSection from "./components/small-actions/small-exploration-section";
-import JoinPvp from "./components/join-pvp";
-import MapTimer from "../map/map-timer";
-import DuelPlayer from "./components/duel-player";
-import SmallMapMovementActions from "./components/small-actions/small-map-movement-actions";
-import SmallActionsProps from "./types/small-actions-props";
-import CelestialFight from "./components/celestial-fight";
-import SmallerSpecialtyShop from "./components/small-actions/smaller-specialty-shop";
-import { removeCommas } from "../../lib/game/format-number";
-import GamblingSection from "./components/gambling-section";
-import Revive from "./components/fight-section/revive";
-import RaidSection from "./components/raid-section";
-import { GameActionState } from "../../lib/game/types/game-state";
+import ActionsTimers from "../../components/timers/actions-timers";
+import MapTimer from "../../components/timers/map-timer";
 import { updateTimers } from "../../lib/ajax/update-timers";
+import SmallActionsManager from "../../lib/game/actions/small-actions-manager";
+import { removeCommas } from "../../lib/game/format-number";
+import { GameActionState } from "../../lib/game/types/game-state";
+import CelestialFight from "./components/celestial-fight";
+import DuelPlayer from "./components/duel-player";
+import Revive from "./components/fight-section/revive";
+import GamblingSection from "./components/gambling-section";
+import JoinPvp from "./components/join-pvp";
+import RaidSection from "./components/raid-section";
+import MonsterActions from "./components/small-actions/monster-actions";
+import SmallExplorationSection from "./components/small-actions/small-exploration-section";
+import SmallMapMovementActions from "./components/small-actions/small-map-movement-actions";
+import SmallerSpecialtyShop from "./components/small-actions/smaller-specialty-shop";
+import SmallActionsProps from "./types/small-actions-props";
+import SmallActionsState from "./types/small-actions-state";
 
 export default class SmallerActions extends React.Component<
     SmallActionsProps,
@@ -262,18 +262,6 @@ export default class SmallerActions extends React.Component<
 
     showAction(data: any) {
         this.smallActionsManager.setSelectedAction(data);
-    }
-
-    updateAttackTimer(timeLeft: number) {
-        this.setState({
-            attack_time_out: timeLeft,
-        });
-    }
-
-    updateCraftingTimer(timeLeft: number) {
-        this.setState({
-            crafting_time_out: timeLeft,
-        });
     }
 
     closeMonsterSection() {
@@ -552,16 +540,7 @@ export default class SmallerActions extends React.Component<
 
                 <div className="mt-4 mb-4">
                     <div className="relative bottom-4">
-                        <ActionsTimers
-                            attack_time_out={this.state.attack_time_out}
-                            crafting_time_out={this.state.crafting_time_out}
-                            update_attack_timer={this.updateAttackTimer.bind(
-                                this,
-                            )}
-                            update_crafting_timer={this.updateCraftingTimer.bind(
-                                this,
-                            )}
-                        />
+                        <ActionsTimers user_id={this.props.character.user_id} />
                     </div>
                 </div>
                 <div className="mt-4">

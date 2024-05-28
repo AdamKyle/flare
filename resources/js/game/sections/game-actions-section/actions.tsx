@@ -1,36 +1,31 @@
 import React from "react";
-import ActionsManager from "../../lib/game/actions/actions-manager";
+import CraftingSection from "../../components/crafting/base-components/crafting-section";
+import { CraftingOptions } from "../../components/crafting/base-components/types/crafting-type-options";
+import ActionsTimers from "../../components/timers/actions-timers";
+import SkyOutlineButton from "../../components/ui/buttons/sky-outline-button";
+import SuccessOutlineButton from "../../components/ui/buttons/success-outline-button";
+import DropDown from "../../components/ui/drop-down/drop-down";
 import ComponentLoading from "../../components/ui/loading/component-loading";
+import { updateTimers } from "../../lib/ajax/update-timers";
+import ActionsManager from "../../lib/game/actions/actions-manager";
+import { removeCommas } from "../../lib/game/format-number";
+import { GameActionState } from "../../lib/game/types/game-state";
+import CelestialFight from "./components/celestial-fight";
+import DuelPlayer from "./components/duel-player";
+import ExplorationSection from "./components/exploration-section";
+import GamblingSection from "./components/gambling-section";
+import JoinPvp from "./components/join-pvp";
+import RaidSection from "./components/raid-section";
 import MonsterActions from "./components/small-actions/monster-actions";
-import ActionsTimers from "./components/actions-timers";
+import Shop from "./components/specialty-shops/shop";
 import ActionsProps from "./types/actions-props";
 import ActionsState from "./types/actions-state";
-import DropDown from "../../components/ui/drop-down/drop-down";
-import { CraftingOptions } from "../../components/crafting/base-components/types/crafting-type-options";
-import CraftingSection from "../../components/crafting/base-components/crafting-section";
-import SuccessOutlineButton from "../../components/ui/buttons/success-outline-button";
-import ExplorationSection from "./components/exploration-section";
-import DuelPlayer from "./components/duel-player";
-import SkyOutlineButton from "../../components/ui/buttons/sky-outline-button";
-import JoinPvp from "./components/join-pvp";
-import CelestialFight from "./components/celestial-fight";
-import Shop from "./components/specialty-shops/shop";
-import { removeCommas } from "../../lib/game/format-number";
-import GamblingSection from "./components/gambling-section";
-import RaidSection from "./components/raid-section";
-import { GameActionState } from "../../lib/game/types/game-state";
-import { updateTimers } from "../../lib/ajax/update-timers";
-import WarningAlert from "../../components/ui/alerts/simple-alerts/warning-alert";
 
 export default class Actions extends React.Component<
     ActionsProps,
     ActionsState
 > {
     private actionsManager: ActionsManager;
-
-    private attackTimeOut: any;
-
-    private craftingTimeOut: any;
 
     private pvpUpdate: any;
 
@@ -64,16 +59,6 @@ export default class Actions extends React.Component<
         this.actionsManager = new ActionsManager(this);
 
         // @ts-ignore
-        this.attackTimeOut = Echo.private(
-            "show-timeout-bar-" + this.props.character.user_id,
-        );
-
-        // @ts-ignore
-        this.craftingTimeOut = Echo.private(
-            "show-crafting-timeout-bar-" + this.props.character.user_id,
-        );
-
-        // @ts-ignore
         this.pvpUpdate = Echo.private(
             "update-pvp-attack-" + this.props.character.user_id,
         );
@@ -89,26 +74,6 @@ export default class Actions extends React.Component<
 
     componentDidMount() {
         this.setUpState();
-
-        // @ts-ignore
-        this.attackTimeOut.listen(
-            "Game.Core.Events.ShowTimeOutEvent",
-            (event: any) => {
-                this.setState({
-                    attack_time_out: event.forLength,
-                });
-            },
-        );
-
-        // @ts-ignore
-        this.craftingTimeOut.listen(
-            "Game.Core.Events.ShowCraftingTimeOutEvent",
-            (event: any) => {
-                this.setState({
-                    crafting_time_out: event.timeout,
-                });
-            },
-        );
 
         // @ts-ignore
         this.duelOptions.listen(
@@ -337,18 +302,6 @@ export default class Actions extends React.Component<
 
     isLoading(): boolean {
         return this.state.loading || this.state.monsters.length === 0;
-    }
-
-    updateAttackTimer(timeLeft: number) {
-        this.setState({
-            attack_time_out: timeLeft,
-        });
-    }
-
-    updateCraftingTimer(timeLeft: number) {
-        this.setState({
-            crafting_time_out: timeLeft,
-        });
     }
 
     removeCraftingType() {
@@ -665,12 +618,7 @@ export default class Actions extends React.Component<
                         ) : null}
                     </div>
                 </div>
-                <ActionsTimers
-                    attack_time_out={this.state.attack_time_out}
-                    crafting_time_out={this.state.crafting_time_out}
-                    update_attack_timer={this.updateAttackTimer.bind(this)}
-                    update_crafting_timer={this.updateCraftingTimer.bind(this)}
-                />
+                <ActionsTimers user_id={this.props.character.user_id} />
             </div>
         );
     }

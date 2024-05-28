@@ -1,16 +1,15 @@
-import { singleton, inject } from "tsyringe";
+import { singleton } from "tsyringe";
+import CompletedGuideQuestListener from "../../../../individual-components/player-components/guide-quests/event-listeners/completed-guide-quest-listener";
+import GuideQuestListenerDefinition from "../../../../individual-components/player-components/guide-quests/event-listeners/guide-quest-listener-definition";
 import Game from "../../../game";
 import { serviceContainer } from "../../containers/core-container";
 import GameListener from "./game-listener";
-import MapListeners from "./game/map-listeners";
-import CharacterListeners from "./game/character-listeners";
-import MonsterListeners from "./game/monster-listeners";
-import KingdomListeners from "./game/kingdom-listeners";
 import ActionListeners from "./game/action-listeners";
+import CharacterListeners from "./game/character-listeners";
+import KingdomListeners from "./game/kingdom-listeners";
+import MapListeners from "./game/map-listeners";
+import MonsterListeners from "./game/monster-listeners";
 import QuestListeners from "./game/quest-listeners";
-import GuideQuestListener from "../../../../individual-components/player-components/guide-quests/event-listeners/guide-quest-listener";
-import GuideQuestListenerDefinition from "../../../../individual-components/player-components/guide-quests/event-listeners/guide-quest-listener-definition";
-import CompletedGuideQuestListener from "../../../../individual-components/player-components/guide-quests/event-listeners/completed-guide-quest-listener";
 
 @singleton()
 export default class GameEventListeners {
