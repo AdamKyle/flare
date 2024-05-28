@@ -51,7 +51,7 @@ export default class ActionsTimers extends React.Component<
             <div className="relative top-[24px]">
                 <div
                     className={clsx("grid gap-2", {
-                        "md:grid-cols-2":
+                        "grid-cols-2":
                             this.state.attack_time_out !== 0 &&
                             this.state.crafting_time_out !== 0,
                     })}
