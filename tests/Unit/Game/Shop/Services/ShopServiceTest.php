@@ -49,7 +49,7 @@ class ShopServiceTest extends TestCase {
                                      ->giveItem($regular)
                                      ->getCharacter();
 
-        $soldFor = $this->shopService->sellAllItemsInInventory($character);
+        $soldFor = $this->shopService->sellAllItems($character);
 
         $this->assertGreaterThan(0, $soldFor);
 
@@ -73,9 +73,9 @@ class ShopServiceTest extends TestCase {
             ->giveItem($quest)
             ->getCharacter();
 
-        $soldFor = $this->shopService->sellAllItemsInInventory($character);
+        $response = $this->shopService->sellAllItems($character);
 
-        $this->assertEquals(0, $soldFor);
+        $this->assertEquals('Could not sell any items ...', $response['message']);
 
         $character       = $character->refresh();
         $invalidItemTypes = ['trinket', 'alchemy', 'quest'];

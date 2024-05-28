@@ -8,6 +8,7 @@ use App\Flare\Values\ItemUsabilityType;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Flare\Values\SpellTypes;
 use App\Flare\Values\WeaponTypes;
+use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Messages\Builders\ServerMessageBuilder;
 use App\Game\Skills\Events\UpdateCharacterEnchantingList;
 use App\Game\Skills\Services\CraftingService;
@@ -171,10 +172,12 @@ class DisenchantServiceTest extends TestCase {
         $skillCheckServiceMock->shouldReceive('getDCCheck')->once()->andReturn(1);
         $skillCheckServiceMock->shouldReceive('characterRoll')->once()->andReturn(100);
 
+        $characterInventoryService = $this->app->make(CharacterInventoryService::class);
+
         // Create a mock for DisenchantService and allow mocking of protected methods
         $disenchantingService = Mockery::mock(
             DisenchantService::class,
-            [$skillCheckServiceMock]
+            [$skillCheckServiceMock, $characterInventoryService]
         )
             ->makePartial()
             ->shouldAllowMockingProtectedMethods()
@@ -210,10 +213,12 @@ class DisenchantServiceTest extends TestCase {
         $skillCheckServiceMock->shouldReceive('getDCCheck')->once()->andReturn(1);
         $skillCheckServiceMock->shouldReceive('characterRoll')->once()->andReturn(100);
 
+        $characterInventoryService = $this->app->make(CharacterInventoryService::class);
+
         // Create a mock for DisenchantService and allow mocking of protected methods
         $disenchantingService = Mockery::mock(
             DisenchantService::class,
-            [$skillCheckServiceMock]
+            [$skillCheckServiceMock, $characterInventoryService]
         )
             ->makePartial()
             ->shouldAllowMockingProtectedMethods()
@@ -286,7 +291,7 @@ class DisenchantServiceTest extends TestCase {
 
         $disenchantingService = \Mockery::mock(DisenchantService::class)->makePartial();
 
-        $disenchantingService->__construct(resolve(SkillCheckService::class));
+        $disenchantingService->__construct(resolve(SkillCheckService::class), resolve(CharacterInventoryService::class));
 
         $disenchantingService->shouldAllowMockingProtectedMethods()
                              ->shouldReceive('fetchDCRoll')
