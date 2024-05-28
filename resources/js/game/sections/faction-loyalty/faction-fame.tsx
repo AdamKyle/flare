@@ -64,7 +64,6 @@ export default class FactionFame extends React.Component<
                     this.setState({ is_loading: false });
 
                     if (error.response) {
-
                         const response: AxiosResponse = error.response;
 
                         this.setState({

@@ -41,19 +41,26 @@ export default class FactionNpcTasks extends React.Component<
                                   fameTask.type +
                                   "]"}
                         </dt>
-                        <dd className='flex flex-justify'>
+                        <dd className="flex flex-justify">
                             <div className="flex-1 mr-2">
                                 {this.showCheckMark(fameTask)}{" "}
                                 {fameTask.current_amount} /{" "}
                                 {fameTask.required_amount}
                             </div>
                             <div className="flex-1 ml-2">
-                                {
-                                    bounties ?
-                                        <PrimaryOutlineButton button_label={'Attack'} on_click={() => {}} disabled={!this.props.can_attack} />
-                                    :
-                                        <SuccessOutlineButton button_label={'Craft'} on_click={() => {}} disabled={!this.props.can_craft} />
-                                }
+                                {bounties ? (
+                                    <PrimaryOutlineButton
+                                        button_label={"Attack"}
+                                        on_click={() => {}}
+                                        disabled={!this.props.can_attack}
+                                    />
+                                ) : (
+                                    <SuccessOutlineButton
+                                        button_label={"Craft"}
+                                        on_click={() => {}}
+                                        disabled={!this.props.can_craft}
+                                    />
+                                )}
                             </div>
                         </dd>
                     </>
