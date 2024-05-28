@@ -9,4 +9,8 @@ export default interface ActionTabsProps {
     use_tabs: boolean;
 
     update_faction_action_tasks: (fameTasks: FameTasks[] | null) => void;
+
+    can_attack: boolean;
+
+    can_craft: boolean;
 }

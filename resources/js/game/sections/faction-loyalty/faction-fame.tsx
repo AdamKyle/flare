@@ -64,8 +64,11 @@ export default class FactionFame extends React.Component<
                     this.setState({ is_loading: false });
 
                     if (error.response) {
+
+                        const response: AxiosResponse = error.response;
+
                         this.setState({
-                            error_message: error.response.data.message,
+                            error_message: response.data.message,
                         });
                     }
                 },
@@ -314,6 +317,8 @@ export default class FactionFame extends React.Component<
                             faction_loyalty_npc={
                                 this.state.selected_faction_loyalty_npc
                             }
+                            can_craft={this.props.can_craft}
+                            can_attack={this.props.can_attack}
                         />
                     </div>
                     <div className="flex-none md:flex-auto w-full md:w-1/2">
@@ -321,6 +326,8 @@ export default class FactionFame extends React.Component<
                             faction_loyalty_npc={
                                 this.state.selected_faction_loyalty_npc
                             }
+                            can_craft={this.props.can_craft}
+                            can_attack={this.props.can_attack}
                         />
                     </div>
                 </div>

@@ -389,6 +389,8 @@ export default class Game extends React.Component<GameProps, GameState> {
                                                 .can_see_pledge_tab
                                         }
                                         character_id={this.props.characterId}
+                                        can_attack={this.state.character.can_attack}
+                                        can_craft={this.state.character.can_craft}
                                         update_faction_action_tasks={this.updateFactionActionTasks.bind(
                                             this,
                                         )}

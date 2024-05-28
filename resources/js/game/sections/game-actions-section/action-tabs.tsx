@@ -34,6 +34,8 @@ export default class ActionTabs extends React.Component<ActionTabsProps, {}> {
                         update_faction_action_tasks={
                             this.props.update_faction_action_tasks
                         }
+                        can_craft={this.props.can_craft}
+                        can_attack={this.props.can_attack}
                     />
                 </TabPanel>
             </Tabs>
