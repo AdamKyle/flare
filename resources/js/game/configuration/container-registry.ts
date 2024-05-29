@@ -3,6 +3,7 @@ import kingdomContainer from "../components/kingdoms/container/kingdom-queue-con
 import chatItemComparisonContainer from "../components/modals/item-details/container/chat-item-comparison-container";
 import timerEventContainer from "../components/timers/container/timer-event-container";
 import { CoreContainer } from "../lib/containers/core-container";
+import factionLoyaltyContainer from "../components/faction-loyalty/container/faction-loyalty-container";
 
 function containerRegistry(coreContainer: CoreContainer): void {
     // Item Comparison
@@ -16,6 +17,9 @@ function containerRegistry(coreContainer: CoreContainer): void {
 
     // Character Sheet component containers.
     characterSheetContainer(coreContainer);
+
+    // Faction Loyalty component
+    factionLoyaltyContainer(coreContainer);
 }
 
 export { containerRegistry };

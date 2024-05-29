@@ -6,6 +6,8 @@ export default interface ActionTabsProps {
 
     character_id: number;
 
+    character_map_id: number | null;
+
     user_id: number;
 
     use_tabs: boolean;

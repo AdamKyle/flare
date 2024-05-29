@@ -81,7 +81,7 @@ class MonsterFightService {
 
         $this->monsterPlayerFight->setCharacter($character);
 
-        $this->monsterPlayerFight->fightMonster(true, false, $attackType);
+        $this->monsterPlayerFight->fightMonster(true, $attackType);
 
         if ($this->monsterPlayerFight->getCharacterHealth() <= 0) {
 

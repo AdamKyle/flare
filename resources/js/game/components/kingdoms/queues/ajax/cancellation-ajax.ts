@@ -35,8 +35,10 @@ export default class CancellationAjax {
                     });
 
                     if (typeof error.response !== "undefined") {
+                        const response: AxiosResponse = error.response;
+
                         component.setState({
-                            error_message: error.response.data.message,
+                            error_message: response.data.message,
                         });
                     }
                 },

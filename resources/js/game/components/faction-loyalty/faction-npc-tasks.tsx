@@ -4,13 +4,67 @@ import OrangeProgressBar from "../../components/ui/progress-bars/orange-progress
 import { FameTasks } from "./deffinitions/faction-loaylaty";
 import SuccessOutlineButton from "../../components/ui/buttons/success-outline-button";
 import PrimaryOutlineButton from "../../components/ui/buttons/primary-outline-button";
+import BountyFightAjax from "./ajax/bounty-fight-ajax";
+import { serviceContainer } from "../../lib/containers/core-container";
+import LoadingProgressBar from "../ui/progress-bars/loading-progress-bar";
+import SuccessAlert from "../ui/alerts/simple-alerts/success-alert";
+import Revive from "../../sections/game-actions-section/components/fight-section/revive";
+import WarningAlert from "../ui/alerts/simple-alerts/warning-alert";
+import DangerAlert from "../ui/alerts/simple-alerts/danger-alert";
 
 export default class FactionNpcTasks extends React.Component<
     FactionNpcSectionProps,
-    {}
+    any
 > {
+    private readonly fightAjax?: BountyFightAjax;
+
     constructor(props: any) {
         super(props);
+
+        this.state = {
+            attacking: false,
+            success_message: null,
+            error_message: null,
+            must_revive: false,
+        };
+
+        this.fightAjax = serviceContainer().fetch(BountyFightAjax);
+    }
+
+    bountyTask(monsterId?: number) {
+        if (!this.fightAjax) {
+            return;
+        }
+
+        if (!monsterId) {
+            return;
+        }
+
+        this.setState(
+            {
+                attacking: true,
+                success_message: null,
+                error_message: null,
+            },
+            () => {
+                if (!this.fightAjax) {
+                    return;
+                }
+
+                if (!monsterId) {
+                    return;
+                }
+
+                this.fightAjax.doAjaxCall(
+                    this,
+                    {
+                        monster_id: monsterId,
+                        npc_id: this.props.faction_loyalty_npc.npc_id,
+                    },
+                    this.props.character_id,
+                );
+            },
+        );
     }
 
     showCheckMark(fameTask: FameTasks): ReactNode {
@@ -21,6 +75,18 @@ export default class FactionNpcTasks extends React.Component<
         }
 
         return;
+    }
+
+    isBountyActionDisabled() {
+        return (
+            !this.props.can_attack ||
+            this.state.attacking ||
+            this.state.must_revive ||
+            !(
+                this.props.faction_loyalty_npc.npc.game_map_id ===
+                this.props.character_map_id
+            )
+        );
     }
 
     renderTasks(fameTasks: FameTasks[], bounties: boolean) {
@@ -51,8 +117,14 @@ export default class FactionNpcTasks extends React.Component<
                                 {bounties ? (
                                     <PrimaryOutlineButton
                                         button_label={"Attack"}
-                                        on_click={() => {}}
-                                        disabled={!this.props.can_attack}
+                                        on_click={() =>
+                                            this.bountyTask(fameTask.monster_id)
+                                        }
+                                        disabled={
+                                            this.isBountyActionDisabled() ||
+                                            fameTask.current_amount ===
+                                                fameTask.required_amount
+                                        }
                                     />
                                 ) : (
                                     <SuccessOutlineButton
@@ -68,9 +140,15 @@ export default class FactionNpcTasks extends React.Component<
             });
     }
 
-    render() {
+    updateMustRevive() {
+        this.setState({
+            must_revive: false,
+        });
+    }
+
+    renderFactionNpcTasks(): ReactNode {
         return (
-            <>
+            <div>
                 <div>
                     <OrangeProgressBar
                         primary_label={
@@ -96,9 +174,27 @@ export default class FactionNpcTasks extends React.Component<
                     />
                 </div>
                 <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3"></div>
+                {this.state.success_message !== null ? (
+                    <SuccessAlert additional_css={"my-2"}>
+                        {this.state.success_message}
+                    </SuccessAlert>
+                ) : null}
+
+                {this.state.error_message !== null ? (
+                    <DangerAlert additional_css={"my-2"}>
+                        {this.state.error_message}
+                    </DangerAlert>
+                ) : null}
                 <div>
                     <div>
                         <h3 className="my-2"> Bounties </h3>
+                        {this.props.character_map_id !==
+                        this.props.faction_loyalty_npc.npc.game_map_id ? (
+                            <WarningAlert additional_css={"my-2"}>
+                                You are not on the same place as this NPC, you
+                                cannot take part in the bounty tasks.
+                            </WarningAlert>
+                        ) : null}
                         <dl>
                             {this.renderTasks(
                                 this.props.faction_loyalty_npc
@@ -106,6 +202,7 @@ export default class FactionNpcTasks extends React.Component<
                                 true,
                             )}
                         </dl>
+                        {this.state.attacking ? <LoadingProgressBar /> : null}
                     </div>
                     <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3"></div>
                     <div>
@@ -123,7 +220,27 @@ export default class FactionNpcTasks extends React.Component<
                     Bounties must be completed on the respective plane and
                     manually. Automation will not work for this.
                 </p>
-            </>
+            </div>
+        );
+    }
+
+    render() {
+        if (!this.state.must_revive) {
+            return this.renderFactionNpcTasks();
+        }
+
+        return (
+            <div>
+                <WarningAlert additional_css={"my-4"}>
+                    {this.state.success_message}
+                </WarningAlert>
+                <Revive
+                    can_attack={this.props.can_attack}
+                    is_character_dead={true}
+                    character_id={this.props.character_id}
+                    revive_call_back={this.updateMustRevive.bind(this)}
+                />
+            </div>
         );
     }
 }

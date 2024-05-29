@@ -6,7 +6,6 @@ import MonsterListeners from "../../game/event-listeners/game/monster-listeners"
 import KingdomListeners from "../../game/event-listeners/game/kingdom-listeners";
 import ActionListeners from "../../game/event-listeners/game/action-listeners";
 import QuestListeners from "../../game/event-listeners/game/quest-listeners";
-import GuideQuestListener from "../../../../individual-components/player-components/guide-quests/event-listeners/guide-quest-listener";
 import CompletedGuideQuestListener from "../../../../individual-components/player-components/guide-quests/event-listeners/completed-guide-quest-listener";
 import UpdateKingdomListeners from "../../game/event-listeners/game/update-kingdom-listeners";
 

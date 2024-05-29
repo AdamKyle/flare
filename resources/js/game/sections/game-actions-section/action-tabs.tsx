@@ -37,6 +37,7 @@ export default class ActionTabs extends React.Component<ActionTabsProps, {}> {
                         }
                         can_craft={this.props.can_craft}
                         can_attack={this.props.can_attack}
+                        character_map_id={this.props.character_map_id}
                     />
                 </TabPanel>
             </Tabs>

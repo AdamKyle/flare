@@ -308,29 +308,16 @@ class MonsterPlayerFight {
      * Use the methods here to determine based on health who won.
      *
      * @param bool $onlyOnce
-     * @param bool $isRankFight
      * @param string|null $attackType
      * @return bool
      */
-    public function fightMonster(bool $onlyOnce = false, bool $isRankFight = false, string $attackType = null): bool {
+    public function fightMonster(bool $onlyOnce = false, string $attackType = null): bool {
 
         if (!is_null($attackType)) {
             $this->attackType = $attackType;
         }
 
-        if ($isRankFight) {
-            if (Cache::has('rank-fight-for-character-' . $this->character->id)) {
-                $data = Cache::get('rank-fight-for-character-' . $this->character->id);
-
-                $this->rank    = $data['rank'];
-                $this->monster = $data['monster'];
-            } else {
-                $data = $this->fightSetUp(true);
-
-                $this->rank    = $data['rank'];
-                $this->monster = $data['monster'];
-            }
-        } else if (Cache::has('monster-fight-' . $this->character->id)) {
+        if (Cache::has('monster-fight-' . $this->character->id)) {
             $data = Cache::get('monster-fight-' . $this->character->id);
 
             $this->monster = $data['monster'];
@@ -340,7 +327,7 @@ class MonsterPlayerFight {
             $this->monster = $data['monster'];
         }
 
-        return $this->processAttack($data, $onlyOnce, $isRankFight);
+        return $this->processAttack($data, $onlyOnce);
     }
 
     /**
@@ -348,10 +335,9 @@ class MonsterPlayerFight {
      *
      * @param array $data
      * @param boolean $onlyOnce
-     * @param boolean $isRankFight
      * @return boolean
      */
-    public function processAttack(array $data, bool $onlyOnce = false, $isRankFight = false): bool {
+    public function processAttack(array $data, bool $onlyOnce = false): bool {
 
         $health         = $data['health'];
         $monster        = $this->buildMonster->setServerMonster(is_array($data['monster']) ? $data['monster'] : $data['monster']->getMonster())->setHealth($health['current_monster_health']);
@@ -376,7 +362,7 @@ class MonsterPlayerFight {
             return true;
         }
 
-        return $this->doAttack($monster, $health, $isPlayerVoided, $isEnemyVoided, $onlyOnce, $isRankFight);
+        return $this->doAttack($monster, $health, $isPlayerVoided, $isEnemyVoided, $onlyOnce);
     }
 
     /**
@@ -390,13 +376,13 @@ class MonsterPlayerFight {
      * @param bool $isRankFight
      * @return bool
      */
-    protected function doAttack(ServerMonster $monster, array $health, bool $isPlayerVoided, bool $isEnemyVoided, bool $onlyOnce, bool $isRankFight = false): bool {
+    protected function doAttack(ServerMonster $monster, array $health, bool $isPlayerVoided, bool $isEnemyVoided, bool $onlyOnce): bool {
 
         $this->attack->setHealth($health)
             ->setIsCharacterVoided($isPlayerVoided)
             ->setIsEnemyVoided($isEnemyVoided)
             ->onlyAttackOnce($onlyOnce)
-            ->attack($this->character, $monster, $this->attackType, 'character', $isRankFight);
+            ->attack($this->character, $monster, $this->attackType, 'character');
 
         $this->mergeMessages($this->attack->getMessages());
 

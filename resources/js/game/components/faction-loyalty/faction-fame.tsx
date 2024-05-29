@@ -19,11 +19,15 @@ import FactionLoyaltyProps from "./types/faction-loyalty-props";
 import FactionLoyaltyState, {
     FactionLoyaltyNpcListItem,
 } from "./types/faction-loyalty-state";
+import FactionLoyaltyListeners from "./event-listeners/faction-loyalty-listeners";
+import { serviceContainer } from "../../lib/containers/core-container";
 
 export default class FactionFame extends React.Component<
     FactionLoyaltyProps,
     FactionLoyaltyState
 > {
+    private factionLoyaltyListeners: FactionLoyaltyListeners;
+
     constructor(props: FactionLoyaltyProps) {
         super(props);
 
@@ -38,6 +42,12 @@ export default class FactionFame extends React.Component<
             faction_loyalty: null,
             selected_faction_loyalty_npc: null,
         };
+
+        this.factionLoyaltyListeners = serviceContainer().fetch(
+            FactionLoyaltyListeners,
+        );
+        this.factionLoyaltyListeners.initialize(this, this.props.user_id);
+        this.factionLoyaltyListeners.register();
     }
 
     componentDidMount() {
@@ -73,6 +83,8 @@ export default class FactionFame extends React.Component<
                     }
                 },
             );
+
+        this.factionLoyaltyListeners.listen();
     }
 
     manageAssistingNpc(isHelping: boolean) {
@@ -317,20 +329,24 @@ export default class FactionFame extends React.Component<
                             </div>
 
                             <FactionNpcSection
+                                character_id={this.props.character_id}
                                 faction_loyalty_npc={
                                     this.state.selected_faction_loyalty_npc
                                 }
                                 can_craft={this.props.can_craft}
                                 can_attack={this.props.can_attack}
+                                character_map_id={this.props.character_map_id}
                             />
                         </div>
                         <div className="flex-none md:flex-auto w-full md:w-1/2">
                             <FactionNpcTasks
+                                character_id={this.props.character_id}
                                 faction_loyalty_npc={
                                     this.state.selected_faction_loyalty_npc
                                 }
                                 can_craft={this.props.can_craft}
                                 can_attack={this.props.can_attack}
+                                character_map_id={this.props.character_map_id}
                             />
                         </div>
                     </div>

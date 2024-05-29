@@ -22,6 +22,8 @@ Route::middleware(['auth', 'is.character.who.they.say.they.are', 'throttle:150,2
 
             Route::get('/raid-fight-participation/{character}/{monster}', ['uses' => 'Api\RaidBattleController@fetchRaidMonster']);
             Route::post('/raid-fight/{character}/{monster}', ['uses' => 'Api\RaidBattleController@fightMonster']);
+
+            Route::post('/faction-loyalty-bounty/{character}', ['uses' => 'Api\FactionLoyaltyBattleController@handleBountyTask']);
         });
 
         Route::get('/celestial-beings/{character}', ['uses' => 'Api\CelestialBattleController@celestialMonsters']);

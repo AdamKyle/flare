@@ -293,6 +293,13 @@ export default class Game extends React.Component<GameProps, GameState> {
             return this.renderLoading();
         }
 
+        const gameMap = this.state.map_data;
+        let gameMapId = null;
+
+        if (gameMap !== null) {
+            gameMapId = gameMap.game_map_id;
+        }
+
         return (
             <Fragment>
                 <ScreenRefresh user_id={this.state.character.user_id} />
@@ -399,6 +406,7 @@ export default class Game extends React.Component<GameProps, GameState> {
                                         update_faction_action_tasks={this.updateFactionActionTasks.bind(
                                             this,
                                         )}
+                                        character_map_id={gameMapId}
                                     >
                                         <ActionSection
                                             character={this.state.character}

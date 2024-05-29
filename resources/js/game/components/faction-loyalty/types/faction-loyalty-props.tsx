@@ -10,4 +10,6 @@ export default interface FactionLoyaltyProps {
     can_craft: boolean;
 
     can_attack: boolean;
+
+    character_map_id: number | null;
 }

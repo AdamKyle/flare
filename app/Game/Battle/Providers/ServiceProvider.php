@@ -10,9 +10,11 @@ use App\Flare\ServerFight\Pvp\PvpAttack;
 use App\Flare\Services\BuildMonsterCacheService;
 use App\Game\Battle\Console\Commands\ClearCelestials;
 use App\Game\Battle\Handlers\BattleEventHandler;
+use App\Game\Battle\Request\FactionLoyaltyFight;
 use App\Game\Battle\Services\BattleDrop;
 use App\Game\Battle\Services\CelestialFightService;
 use App\Game\Battle\Services\ConjureService;
+use App\Game\Battle\Services\FactionLoyaltyFightService;
 use App\Game\Battle\Services\MonthlyPvpFightService;
 use App\Game\Battle\Services\MonthlyPvpService;
 use App\Game\Battle\Services\PvpService;
@@ -22,6 +24,7 @@ use App\Game\BattleRewardProcessing\Services\SecondaryRewardService;
 use App\Game\BattleRewardProcessing\Services\WeeklyBattleService;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use App\Game\Core\Services\GoldRush;
+use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
 use App\Game\Maps\Values\MapTileValue;
 use App\Game\Messages\Builders\NpcServerMessageBuilder;
 use App\Game\Skills\Services\DisenchantService;
@@ -98,6 +101,14 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(BattleRewardService::class),
                 $app->make(SecondaryRewardService::class),
                 $app->make(WeeklyBattleService::class),
+            );
+        });
+
+        $this->app->bind(FactionLoyaltyFightService::class, function($app) {
+            return new FactionLoyaltyFightService(
+                $app->make(MonsterPlayerFight::class),
+                $app->make(BattleEventHandler::class),
+                $app->make(FactionLoyaltyService::class)
             );
         });
 
