@@ -47,13 +47,13 @@ class CraftingController extends Controller {
             return response()->json(['message' => 'invalid input.'], 429);
         }
 
-        $craftingService->craft($character, $request->all());
-
+        $crafted = $craftingService->craft($character, $request->all());
 
         return response()->json([
             'items' => $this->craftingService->fetchCraftableItems($character->refresh(), ['crafting_type' => $request->type], false),
             'xp'    => $this->craftingService->getCraftingXP($character, $request->type),
             'show_craft_for_event' => $this->shouldShowCraftingEventButton($character),
+            'crafted_item' => $crafted,
         ], 200);
     }
 }

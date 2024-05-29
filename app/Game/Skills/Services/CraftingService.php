@@ -11,6 +11,8 @@ use App\Flare\Values\SpellTypes;
 use App\Flare\Values\WeaponTypes;
 use App\Game\Core\Events\CraftedItemTimeOutEvent;
 use App\Game\Core\Traits\ResponseBuilder;
+use App\Game\Factions\FactionLoyalty\Events\FactionLoyaltyUpdate;
+use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\NpcActions\QueenOfHeartsActions\Services\RandomEnchantmentService;
 use App\Game\Skills\Handlers\HandleUpdatingCraftingGlobalEventGoal;
@@ -80,6 +82,7 @@ class CraftingService {
         SkillCheckService $skillCheckService,
         UpdateCraftingTasksForFactionLoyalty $updateCraftingTasksForFactionLoyalty,
         HandleUpdatingCraftingGlobalEventGoal $handleUpdatingCraftingGlobalEventGoal,
+        private readonly FactionLoyaltyService $factionLoyaltyService,
     ) {
         $this->randomEnchantmentService              = $randomEnchantmentService;
         $this->skillService                          = $skillService;
@@ -410,6 +413,8 @@ class CraftingService {
             if ($updateGoldCost) {
                 $this->updateCharacterGold($character, $item);
             }
+
+            event(new FactionLoyaltyUpdate($character->user, $this->factionLoyaltyService->getLoyaltyInfoForPlane($character)));
 
             return true;
         }

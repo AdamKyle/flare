@@ -6,7 +6,6 @@ import {
 import Ajax from "../../../lib/ajax/ajax";
 import { AxiosError, AxiosResponse } from "axios";
 import { formatNumber } from "../../../lib/game/format-number";
-import Select from "react-select";
 import LoadingProgressBar from "../../ui/progress-bars/loading-progress-bar";
 import { getCraftingType } from "./helpers/crafting-types";
 import { isEqual } from "lodash";
@@ -16,7 +15,7 @@ import CraftingTypeSelection from "./crafting-partials/crafting-type-selecting";
 import CraftingActionButtons from "./crafting-partials/crafting-action-buttons";
 import ArmourTypeSelection from "./crafting-partials/armour-type-selection";
 import SelectItemToCraft from "./crafting-partials/select-item-to-craft";
-import { FameTasks } from "../../../sections/faction-loyalty/deffinitions/faction-loaylaty";
+import { FameTasks } from "../../faction-loyalty/deffinitions/faction-loaylaty";
 
 export default class Crafting extends React.Component<any, any> {
     private characterStatus: any;

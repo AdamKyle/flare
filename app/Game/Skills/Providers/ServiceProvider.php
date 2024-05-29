@@ -81,6 +81,7 @@ class ServiceProvider extends ApplicationServiceProvider {
                 $app->make(SkillCheckService::class),
                 $app->make(UpdateCraftingTasksForFactionLoyalty::class),
                 $app->make(HandleUpdatingCraftingGlobalEventGoal::class),
+                $app->make(FactionLoyaltyService::class)
             );
         });
 

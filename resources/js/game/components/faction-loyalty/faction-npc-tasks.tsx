@@ -11,31 +11,34 @@ import SuccessAlert from "../ui/alerts/simple-alerts/success-alert";
 import Revive from "../../sections/game-actions-section/components/fight-section/revive";
 import WarningAlert from "../ui/alerts/simple-alerts/warning-alert";
 import DangerAlert from "../ui/alerts/simple-alerts/danger-alert";
+import HandleCraftingAjax from "./ajax/handle-crafting-ajax";
+import { ItemType } from "../items/enums/item-type";
 
 export default class FactionNpcTasks extends React.Component<
     FactionNpcSectionProps,
     any
 > {
-    private readonly fightAjax?: BountyFightAjax;
+    private readonly fightAjax: BountyFightAjax;
+
+    private readonly craftingAjax: HandleCraftingAjax;
 
     constructor(props: any) {
         super(props);
 
         this.state = {
             attacking: false,
+            crafting: false,
             success_message: null,
             error_message: null,
             must_revive: false,
         };
 
         this.fightAjax = serviceContainer().fetch(BountyFightAjax);
+
+        this.craftingAjax = serviceContainer().fetch(HandleCraftingAjax);
     }
 
     bountyTask(monsterId?: number) {
-        if (!this.fightAjax) {
-            return;
-        }
-
         if (!monsterId) {
             return;
         }
@@ -47,10 +50,6 @@ export default class FactionNpcTasks extends React.Component<
                 error_message: null,
             },
             () => {
-                if (!this.fightAjax) {
-                    return;
-                }
-
                 if (!monsterId) {
                     return;
                 }
@@ -60,6 +59,54 @@ export default class FactionNpcTasks extends React.Component<
                     {
                         monster_id: monsterId,
                         npc_id: this.props.faction_loyalty_npc.npc_id,
+                    },
+                    this.props.character_id,
+                );
+            },
+        );
+    }
+
+    craftingTask(itemType: string, itemId?: number) {
+        if (!itemId) {
+            return;
+        }
+
+        const armourTypes = [
+            ItemType.BODY,
+            ItemType.SHIELD,
+            ItemType.LEGGINGS,
+            ItemType.BOOTS,
+            ItemType.SLEEVES,
+            ItemType.GLOVES,
+            ItemType.HELMET,
+        ];
+
+        const spellTypes = [ItemType.SPELL_DAMAGE, ItemType.SPELL_HEALING];
+
+        let typeToCraft = itemType;
+
+        if (armourTypes.includes(itemType as ItemType)) {
+            typeToCraft = "armour";
+        }
+
+        if (spellTypes.includes(itemType as ItemType)) {
+            typeToCraft = "spell";
+        }
+
+        this.setState(
+            {
+                crafting: true,
+                success_message: null,
+                error_message: null,
+            },
+            () => {
+                this.craftingAjax.doAjaxCall(
+                    this,
+                    {
+                        item_to_craft: itemId,
+                        type: typeToCraft,
+                        craft_for_event: false,
+                        craft_for_npc: true,
                     },
                     this.props.character_id,
                 );
@@ -85,7 +132,8 @@ export default class FactionNpcTasks extends React.Component<
             !(
                 this.props.faction_loyalty_npc.npc.game_map_id ===
                 this.props.character_map_id
-            )
+            ) ||
+            !this.props.faction_loyalty_npc.currently_helping
         );
     }
 
@@ -129,8 +177,21 @@ export default class FactionNpcTasks extends React.Component<
                                 ) : (
                                     <SuccessOutlineButton
                                         button_label={"Craft"}
-                                        on_click={() => {}}
-                                        disabled={!this.props.can_craft}
+                                        on_click={() => {
+                                            this.craftingTask(
+                                                fameTask.type,
+                                                fameTask.item_id,
+                                            );
+                                        }}
+                                        disabled={
+                                            !this.props.can_craft ||
+                                            this.state.crafting ||
+                                            this.state.must_revive ||
+                                            fameTask.current_amount ===
+                                                fameTask.required_amount ||
+                                            !this.props.faction_loyalty_npc
+                                                .currently_helping
+                                        }
                                     />
                                 )}
                             </div>
@@ -214,6 +275,7 @@ export default class FactionNpcTasks extends React.Component<
                                 false,
                             )}
                         </dl>
+                        {this.state.crafting ? <LoadingProgressBar /> : null}
                     </div>
                 </div>
                 <p className="my-4">
