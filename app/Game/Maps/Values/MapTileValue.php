@@ -40,15 +40,7 @@ class MapTileValue {
      * @return bool
      */
     public function isWaterTile(int $color): bool {
-        // These represents water:
-        $invalidColors = [
-            115217255, 114217255, 112219255, 112217247, 106222255, 117217251,
-            115223255, 111219255, 112219253, 117216245, 110220255, 110222255,
-            105222255, 114218255, 104223255, 118218252, 115218251, 114217255,
-            114216255, 110219255, 138215221, 109218255, 112219255, 109218255,
-        ];
-
-        return in_array($color, $invalidColors);
+        return in_array($color, [3]);
     }
 
     /**
@@ -58,19 +50,15 @@ class MapTileValue {
      * @return bool
      */
     public function isDeathWaterTile(int $color): bool {
-        $invalidColors = [
-            255255200,
-        ];
-
-        return in_array($color, $invalidColors);
+        return in_array($color, [2]);
     }
 
     public function isMagma(int $color): bool {
-        return in_array($color, [164027]);
+        return in_array($color, [2]);
     }
 
     public function isPurgatoryWater(int $color): bool {
-        return in_array($color, [255255255]);
+        return in_array($color, [1]);
     }
 
     public function isIcePlaneIce(int $color): bool {
@@ -82,7 +70,7 @@ class MapTileValue {
     }
 
     public function isDelusionalMemoriesWater(int $color): bool {
-        return in_array($color, [112219255]);
+        return in_array($color, [2]);
     }
 
     public function canWalk(Character $character, int $x, int $y) {
