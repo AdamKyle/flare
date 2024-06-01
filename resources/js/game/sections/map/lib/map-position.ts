@@ -16,6 +16,22 @@ export const getNewYPosition = (
         return 0;
     }
 
+    if (characterY > 1424) {
+        return -1410;
+    }
+
+    if (characterY > 1120) {
+        return -1110;
+    }
+
+    if (characterY > 816) {
+        return -810;
+    }
+
+    if (characterY > 513) {
+        return -500;
+    }
+
     if (characterY > 288) {
         return -200;
     }

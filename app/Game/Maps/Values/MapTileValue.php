@@ -11,6 +11,16 @@ class MapTileValue {
 
     private $imageResource;
 
+    const WATER_TILES = [
+        74146170, // Surface, Labyrinth
+        255255200, // Dungeons
+        164027, // Hell
+        255255255, // Purgatory
+        255255255, // Ice Plane
+        3096147, // Twisted Memories
+        112219255, // Delusional Memories
+    ];
+
     /**
      * Get the tile color from the current map.
      *
@@ -24,13 +34,11 @@ class MapTileValue {
 
         $this->imageResource = imagecreatefromstring($contents);
 
-        $rgb                 = imagecolorat($this->imageResource, $xPosition, $yPosition);
+        $rgbIndex            = imagecolorat($this->imageResource, $xPosition, $yPosition);
 
-        $r = ($rgb >> 16) & 0xFF;
-        $g = ($rgb >> 8) & 0xFF;
-        $b = $rgb & 0xFF;
+        $rgbArray            = imagecolorsforindex($this->imageResource, $rgbIndex);
 
-        return $r . $g . $b;
+        return $rgbArray['red'] . $rgbArray['green'] . $rgbArray['blue'];
     }
 
     /**
@@ -40,7 +48,7 @@ class MapTileValue {
      * @return bool
      */
     public function isWaterTile(int $color): bool {
-        return in_array($color, [3]);
+        return in_array($color, [74146170]);
     }
 
     /**
@@ -50,15 +58,15 @@ class MapTileValue {
      * @return bool
      */
     public function isDeathWaterTile(int $color): bool {
-        return in_array($color, [2]);
+        return in_array($color, [255255200]);
     }
 
     public function isMagma(int $color): bool {
-        return in_array($color, [2]);
+        return in_array($color, [164027]);
     }
 
     public function isPurgatoryWater(int $color): bool {
-        return in_array($color, [1]);
+        return in_array($color, [255255255]);
     }
 
     public function isIcePlaneIce(int $color): bool {
@@ -70,7 +78,7 @@ class MapTileValue {
     }
 
     public function isDelusionalMemoriesWater(int $color): bool {
-        return in_array($color, [2]);
+        return in_array($color, [112219255]);
     }
 
     public function canWalk(Character $character, int $x, int $y) {
