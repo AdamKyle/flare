@@ -1,16 +1,8 @@
 import CharacterCurrenciesDetails from "../../../../../lib/game/types/character-currencies-details";
+import PlayerKingdomsDetails from "../player-kingdoms-details";
 
 export default interface KingdomProps {
-    kingdoms:
-        | {
-              id: number;
-              x_position: number;
-              y_position: number;
-              color: string;
-              character_id: number;
-              game_map_id: number;
-          }[]
-        | null;
+    kingdoms: PlayerKingdomsDetails[] | [];
 
     character_id: number;
 

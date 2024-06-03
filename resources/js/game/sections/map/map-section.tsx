@@ -18,8 +18,9 @@ import MapData from "./lib/request-types/MapData";
 import MapStateManager from "./lib/state/map-state-manager";
 import MapState from "./types/map-state";
 import MapProps from "./types/map/map-props";
-// @ts-ignore
 import { isEqual } from "lodash";
+
+// @ts-ignore
 import Draggable from "react-draggable/build/web/react-draggable.min";
 
 export default class MapSection extends React.Component<MapProps, MapState> {

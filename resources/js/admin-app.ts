@@ -22,3 +22,8 @@ import "./admin/info-management/info-management-init";
  * Renders the event calendar for the admin to manage.
  */
 import "./admin/calendar";
+
+/**
+ * Renders the map manager for the admin to place new locations.
+ */
+import "./admin/map-manager-location";

@@ -5,6 +5,7 @@ namespace App\Game\Maps\Services;
 use App\Flare\Cache\CoordinatesCache;
 use App\Flare\Models\CelestialFight;
 use App\Flare\Models\Character;
+use App\Flare\Models\GameMap;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\Location;
 use App\Flare\Models\Raid;
@@ -137,6 +138,18 @@ class LocationService {
      */
     public function fetchLocationData(Character $character): Collection {
         $locations = Location::with('questRewardItem')->where('game_map_id', $character->map->game_map_id)->get();
+
+        return $this->transformLocationData($locations);
+    }
+
+    /**
+     * Fetch locations based on map.
+     *
+     * @param GameMap $map
+     * @return Collection
+     */
+    public function fetchLocationsForMap(GameMap $map): Collection {
+        $locations = Location::with('questRewardItem')->where('game_map_id', $map->id)->get();
 
         return $this->transformLocationData($locations);
     }

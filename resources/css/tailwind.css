@@ -7,6 +7,7 @@
 @import "./chat-global-message-colors.css";
 @import "./cosmetic-text-colors.css";
 @import "./icon-animations.css";
+@import "./map-manager.css";
 @import "../../vendor/rappasoft/laravel-livewire-tables/resources/css/laravel-livewire-tables.min.css";
 
 #perPage {

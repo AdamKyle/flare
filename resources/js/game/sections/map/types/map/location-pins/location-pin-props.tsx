@@ -4,4 +4,6 @@ export default interface LocationPinProps {
     openLocationDetails: Function;
 
     pin_class: string;
+
+    onMouseEnter?: () => void;
 }

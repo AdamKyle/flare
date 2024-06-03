@@ -10,4 +10,6 @@ export default interface PlayerKingdomsDetails {
     character_id: number;
 
     name: string;
+
+    game_map_id: number;
 }

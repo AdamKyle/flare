@@ -1,0 +1,34 @@
+.image-container {
+    position: relative;
+    display: inline-block;
+    overflow: hidden; /* Disable scrolling */
+}
+
+.background-image {
+    display: block;
+}
+
+.grid-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+}
+
+.grid-cell {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-sizing: border-box;
+}
+
+.coordinates {
+    position: fixed;
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    padding: 5px;
+    border-radius: 3px;
+    pointer-events: none; /* Prevent the tooltip from interfering with mouse events */
+    z-index: 999; /* Ensure the tooltip appears above other elements */
+}
