@@ -6,4 +6,5 @@ export default interface FactionNpcSectionProps {
     can_craft: boolean;
     can_attack: boolean;
     character_map_id: number | null;
+    attack_type: string | null;
 }

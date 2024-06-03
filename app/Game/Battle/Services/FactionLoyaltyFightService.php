@@ -24,7 +24,7 @@ class FactionLoyaltyFightService {
 
         $params = [
             'selected_monster_id' => $monsterId,
-            'attack_type' => $character->classType()->isCaster() ? AttackTypeValue::ATTACK_AND_CAST : AttackTypeValue::ATTACK,
+            'attack_type' => $character->classType()->isCaster() ? AttackTypeValue::CAST_AND_ATTACK : AttackTypeValue::ATTACK,
         ];
 
         event(new AttackTimeOutEvent($character));

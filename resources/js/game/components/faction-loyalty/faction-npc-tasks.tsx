@@ -13,6 +13,7 @@ import WarningAlert from "../ui/alerts/simple-alerts/warning-alert";
 import DangerAlert from "../ui/alerts/simple-alerts/danger-alert";
 import HandleCraftingAjax from "./ajax/handle-crafting-ajax";
 import { ItemType } from "../items/enums/item-type";
+import InfoAlert from "../ui/alerts/simple-alerts/info-alert";
 
 export default class FactionNpcTasks extends React.Component<
     FactionNpcSectionProps,
@@ -207,6 +208,47 @@ export default class FactionNpcTasks extends React.Component<
         });
     }
 
+    renderTaskSection(): ReactNode {
+        return (
+            <div>
+                <div>
+                    <h3 className="my-2"> Bounties </h3>
+                    {this.props.character_map_id !==
+                    this.props.faction_loyalty_npc.npc.game_map_id ? (
+                        <WarningAlert additional_css={"my-2"}>
+                            You are not on the same place as this NPC, you
+                            cannot take part in the bounty tasks.
+                        </WarningAlert>
+                    ) : null}
+                    <InfoAlert additional_css={"my-2"}>
+                        You attack type, when doing bounties via this tab, will
+                        be: <strong>{this.props.attack_type}</strong>
+                    </InfoAlert>
+                    <dl>
+                        {this.renderTasks(
+                            this.props.faction_loyalty_npc
+                                .faction_loyalty_npc_tasks.fame_tasks,
+                            true,
+                        )}
+                    </dl>
+                    {this.state.attacking ? <LoadingProgressBar /> : null}
+                </div>
+                <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3"></div>
+                <div>
+                    <h3 className="my-2"> Crafting </h3>
+                    <dl>
+                        {this.renderTasks(
+                            this.props.faction_loyalty_npc
+                                .faction_loyalty_npc_tasks.fame_tasks,
+                            false,
+                        )}
+                    </dl>
+                    {this.state.crafting ? <LoadingProgressBar /> : null}
+                </div>
+            </div>
+        );
+    }
+
     renderFactionNpcTasks(): ReactNode {
         return (
             <div>
@@ -246,42 +288,26 @@ export default class FactionNpcTasks extends React.Component<
                         {this.state.error_message}
                     </DangerAlert>
                 ) : null}
-                <div>
+
+                {this.props.faction_loyalty_npc.faction_loyalty_npc_tasks
+                    .fame_tasks.length > 0 ? (
                     <div>
-                        <h3 className="my-2"> Bounties </h3>
-                        {this.props.character_map_id !==
-                        this.props.faction_loyalty_npc.npc.game_map_id ? (
-                            <WarningAlert additional_css={"my-2"}>
-                                You are not on the same place as this NPC, you
-                                cannot take part in the bounty tasks.
-                            </WarningAlert>
-                        ) : null}
-                        <dl>
-                            {this.renderTasks(
-                                this.props.faction_loyalty_npc
-                                    .faction_loyalty_npc_tasks.fame_tasks,
-                                true,
-                            )}
-                        </dl>
-                        {this.state.attacking ? <LoadingProgressBar /> : null}
+                        {this.renderTaskSection()}
+                        <p className="my-4">
+                            Bounties must be completed on the respective plane
+                            and manually. Automation will not work for this.
+                        </p>
                     </div>
-                    <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3"></div>
-                    <div>
-                        <h3 className="my-2"> Crafting </h3>
-                        <dl>
-                            {this.renderTasks(
-                                this.props.faction_loyalty_npc
-                                    .faction_loyalty_npc_tasks.fame_tasks,
-                                false,
-                            )}
-                        </dl>
-                        {this.state.crafting ? <LoadingProgressBar /> : null}
-                    </div>
-                </div>
-                <p className="my-4">
-                    Bounties must be completed on the respective plane and
-                    manually. Automation will not work for this.
-                </p>
+                ) : (
+                    <SuccessAlert additional_css={"my-2"}>
+                        You have completed all this NPC's tasks. By being
+                        aligned to this Faction, your kingdoms for the plane the
+                        NPC lives on, will receive a Item Defence bonus based on
+                        the level of the NPC and the amount of NPC's you have
+                        helped! This bonus is automatically applied to all
+                        present and future kingdoms.
+                    </SuccessAlert>
+                )}
             </div>
         );
     }

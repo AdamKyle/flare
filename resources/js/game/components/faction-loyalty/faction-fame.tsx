@@ -41,6 +41,7 @@ export default class FactionFame extends React.Component<
             game_map_name: null,
             faction_loyalty: null,
             selected_faction_loyalty_npc: null,
+            attack_type: null,
         };
 
         this.factionLoyaltyListeners = serviceContainer().fetch(
@@ -62,6 +63,7 @@ export default class FactionFame extends React.Component<
                             npcs: result.data.npcs,
                             game_map_name: result.data.map_name,
                             faction_loyalty: result.data.faction_loyalty,
+                            attack_type: result.data.attack_type,
                         },
                         () => {
                             this.setInitialSelectedFactionInfo(
@@ -336,6 +338,7 @@ export default class FactionFame extends React.Component<
                                 can_craft={this.props.can_craft}
                                 can_attack={this.props.can_attack}
                                 character_map_id={this.props.character_map_id}
+                                attack_type={this.state.attack_type}
                             />
                         </div>
                         <div className="flex-none md:flex-auto w-full md:w-1/2">
@@ -347,6 +350,7 @@ export default class FactionFame extends React.Component<
                                 can_craft={this.props.can_craft}
                                 can_attack={this.props.can_attack}
                                 character_map_id={this.props.character_map_id}
+                                attack_type={this.state.attack_type}
                             />
                         </div>
                     </div>

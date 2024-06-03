@@ -18,4 +18,5 @@ export default interface FactionLoyaltyState {
     game_map_name: string | null;
     faction_loyalty: FactionLoyalty | null;
     selected_faction_loyalty_npc: FactionLoyaltyNpc | null;
+    attack_type: string | null;
 }

@@ -60,6 +60,8 @@ class FactionLoyaltyService {
             'npcs'            => $npcNames,
             'faction_loyalty' => $factionLoyalty,
             'map_name'        => $factionLoyalty->faction->gameMap->name,
+            'must_revive'     => $character->is_dead,
+            'attack_type'     => $character->classType()->isCaster() ? 'Cast and Attack' : 'Attack',
         ]);
     }
 

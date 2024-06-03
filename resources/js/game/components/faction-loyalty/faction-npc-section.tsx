@@ -62,7 +62,8 @@ export default class FactionNpcSection extends React.Component<
 
                 <h4>Kingdom Item Defence Bonus</h4>
                 <p className="my-4">
-                    Slowly accumulates as you level this NPC's fame.
+                    Slowly accumulates as you level this NPC's fame. Stacks with
+                    other NPCs on the same plane to a max of 95%.
                 </p>
                 <dl>
                     <dt>Defence Bonus per level</dt>
