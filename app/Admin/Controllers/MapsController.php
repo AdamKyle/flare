@@ -98,4 +98,8 @@ class MapsController extends Controller {
 
         return redirect()->route('map', ['gameMap' => $gameMap->id])->with('success', $gameMap->name . ' now has bonuses.');
     }
+
+    public function manageMapLocations(GameMap $gameMap) {
+        return view('admin.maps.map-locations', ['map' => $gameMap]);
+    }
 }

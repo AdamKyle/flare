@@ -14,7 +14,7 @@
     @endphp
 
     <x-core.cards.card-with-title title="{{ $map->name }}" buttons="true" backUrl="{{ $backUrl }}"
-        editUrl="{{ route('map.bonuses', [$map->id]) }}">
+        editUrl="{{ route('map.bonuses', [$map->id]) }}" secondaryLabel="Manage Locations" secondaryUrl="{{route('map.manage-locations', ['gameMap' => $map->id])}}">
         <div class="grid md:grid-cols-2 gap-2">
             <div>
                 <img src="{{ $mapUrl }}" width="500"

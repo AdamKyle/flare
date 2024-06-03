@@ -5,6 +5,8 @@
     'buttons'     => 'false',
     'backUrl'     => '#',
     'editUrl'     => '#',
+    'secondaryUrl' => '#',
+    'secondaryLabel' => '',
 ])
 
 <div class="mb-4">
@@ -23,6 +25,12 @@
                         <x-core.buttons.link-buttons.primary-button href="{{$editUrl}}">
                             Edit
                         </x-core.buttons.link-buttons.primary-button>
+                    @endif
+
+                    @if (auth()->user()->hasRole('Admin') && $secondaryUrl !== '#')
+                        <x-core.buttons.link-buttons.orange-button href="{{$secondaryUrl}}">
+                            {{$secondaryLabel}}
+                        </x-core.buttons.link-buttons.orange-button>
                     @endif
                 @endif
                 <x-core.buttons.link-buttons.success-button href="{{$backUrl}}">

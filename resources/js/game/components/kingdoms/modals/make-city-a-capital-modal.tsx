@@ -1,4 +1,4 @@
-import React, { Fragment } from "react";
+import React from "react";
 import Dialogue from "../../../components/ui/dialogue/dialogue";
 import LoadingProgressBar from "../../ui/progress-bars/loading-progress-bar";
 import DangerAlert from "../../ui/alerts/simple-alerts/danger-alert";
@@ -9,7 +9,7 @@ export default class MakeCityACapitalModal extends React.Component<any, any> {
 
         this.state = {
             loading: false,
-            error_message: "",
+            error_message: null,
         };
     }
 

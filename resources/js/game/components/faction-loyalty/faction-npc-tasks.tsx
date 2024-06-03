@@ -216,7 +216,7 @@ export default class FactionNpcTasks extends React.Component<
                     {this.props.character_map_id !==
                     this.props.faction_loyalty_npc.npc.game_map_id ? (
                         <WarningAlert additional_css={"my-2"}>
-                            You are not on the same place as this NPC, you
+                            You are not on the same plane as this NPC, you
                             cannot take part in the bounty tasks.
                         </WarningAlert>
                     ) : null}
