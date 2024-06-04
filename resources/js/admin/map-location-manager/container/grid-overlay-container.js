@@ -10,7 +10,7 @@ var GridOverlayContainer = (function () {
         this.register("tool-tip-handler", {
             useClass: ToolTipHandler,
         });
-        this.register('ajax-interface', {
+        this.register("ajax-interface", {
             useClass: InitializeMapAjax,
         });
     }

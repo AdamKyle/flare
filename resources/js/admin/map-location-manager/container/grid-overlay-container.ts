@@ -15,7 +15,7 @@ class GridOverlayContainer {
             useClass: ToolTipHandler,
         });
 
-        this.register('ajax-interface', {
+        this.register("ajax-interface", {
             useClass: InitializeMapAjax,
         });
     }

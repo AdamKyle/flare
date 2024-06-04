@@ -7,13 +7,12 @@ import MapManagerProps from "./types/map-manager-props";
 import MapManagerState from "./types/map-manager-state";
 import DangerAlert from "../../game/components/ui/alerts/simple-alerts/danger-alert";
 import InitializeMapAjax from "./ajax/initialize-map-ajax";
-import {gridOverLayContainer} from "./container/grid-overlay-container";
+import { gridOverLayContainer } from "./container/grid-overlay-container";
 
 export default class MapManager extends Component<
     MapManagerProps,
     MapManagerState
 > {
-
     private initializeMap: InitializeMapAjax;
 
     constructor(props: MapManagerProps) {
@@ -31,7 +30,6 @@ export default class MapManager extends Component<
     }
 
     componentDidMount() {
-
         this.initializeMap.initializeMap(this, this.props.mapId);
     }
 
@@ -41,9 +39,7 @@ export default class MapManager extends Component<
         }
 
         if (this.state.error_message !== null) {
-            return <DangerAlert>
-                {this.state.error_message}
-            </DangerAlert>
+            return <DangerAlert>{this.state.error_message}</DangerAlert>;
         }
 
         return (

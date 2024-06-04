@@ -32,7 +32,7 @@ var InitializeMapAjax = (function () {
             component.setState({
                 loading: false,
             });
-            if (typeof error.response !== 'undefined') {
+            if (typeof error.response !== "undefined") {
                 var response = error.response;
                 component.setState({
                     error_message: response.data.message,

@@ -2,16 +2,13 @@ import { inject, injectable } from "tsyringe";
 import MapManager from "../map-manager";
 import Ajax from "../../../game/lib/ajax/ajax";
 import AjaxInterface from "../../../game/lib/ajax/ajax-interface";
-import {AxiosError, AxiosResponse} from "axios";
+import { AxiosError, AxiosResponse } from "axios";
 
 @injectable()
 export default class InitializeMapAjax {
     constructor(@inject(Ajax) private ajax: AjaxInterface) {}
 
-    public initializeMap(
-        component: MapManager,
-        mapId: number,
-    ) {
+    public initializeMap(component: MapManager, mapId: number) {
         this.ajax.setRoute("admin/map-manager/" + mapId).doAjaxCall(
             "get",
             (result: AxiosResponse) => {
@@ -32,12 +29,12 @@ export default class InitializeMapAjax {
                     loading: false,
                 });
 
-                if (typeof error.response !== 'undefined') {
+                if (typeof error.response !== "undefined") {
                     const response: AxiosResponse = error.response;
 
                     component.setState({
                         error_message: response.data.message,
-                    })
+                    });
                 }
             },
         );
