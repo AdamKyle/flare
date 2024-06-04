@@ -27,7 +27,7 @@ var GridOverlayContainer = (function () {
         container.register(key, { useValue: service });
     };
     return GridOverlayContainer;
-}());
+})();
 var dependencyRegistry;
 var gridOverLayContainer = function () {
     if (!dependencyRegistry) {
