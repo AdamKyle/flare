@@ -2,6 +2,7 @@ import { container, InjectionToken } from "tsyringe";
 import MouseHandlers from "../grid/mouse-handlers";
 import ToolTipHandler from "../grid/tool-tip-handler";
 import InitializeMapAjax from "../ajax/initialize-map-ajax";
+import MoveLocationAjax from "../ajax/move-location-ajax";
 
 class GridOverlayContainer {
     private static instance: GridOverlayContainer;
@@ -17,6 +18,10 @@ class GridOverlayContainer {
 
         this.register("ajax-interface", {
             useClass: InitializeMapAjax,
+        });
+
+        this.register("ajax-interface", {
+            useClass: MoveLocationAjax,
         });
     }
 

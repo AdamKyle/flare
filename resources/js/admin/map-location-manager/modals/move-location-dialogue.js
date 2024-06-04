@@ -52,13 +52,19 @@ import React from "react";
 import Dialogue from "../../../game/components/ui/dialogue/dialogue";
 import Select from "react-select";
 import PrimaryButton from "../../../game/components/ui/buttons/primary-button";
+import LoadingProgressBar from "../../../game/components/ui/progress-bars/loading-progress-bar";
+import MoveLocationAjax from "../ajax/move-location-ajax";
+import { gridOverLayContainer } from "../container/grid-overlay-container";
 var MoveLocationDialogue = (function (_super) {
     __extends(MoveLocationDialogue, _super);
     function MoveLocationDialogue(props) {
         var _this = _super.call(this, props) || this;
         _this.state = {
             selected_location_id: 0,
+            error_message: null,
+            processing: false,
         };
+        _this.moveLocationAjax = gridOverLayContainer().fetch(MoveLocationAjax);
         return _this;
     }
     MoveLocationDialogue.prototype.setSelectedLocation = function (data) {
@@ -98,6 +104,21 @@ var MoveLocationDialogue = (function (_super) {
                 value: 0,
             },
         ];
+    };
+    MoveLocationDialogue.prototype.moveLocation = function () {
+        var _this = this;
+        this.setState(
+            {
+                processing: true,
+            },
+            function () {
+                _this.moveLocationAjax.moveLocation(
+                    _this,
+                    _this.state.selected_location_id,
+                    _this.props.coordinates,
+                );
+            },
+        );
     };
     MoveLocationDialogue.prototype.render = function () {
         return React.createElement(
@@ -140,10 +161,15 @@ var MoveLocationDialogue = (function (_super) {
                 className:
                     "border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3",
             }),
+            this.state.processing
+                ? React.createElement(LoadingProgressBar, null)
+                : null,
             React.createElement(PrimaryButton, {
                 button_label: "Move Location",
-                on_click: function () {},
-                disabled: this.state.selected_location_id === 0,
+                on_click: this.moveLocation.bind(this),
+                disabled:
+                    this.state.processing ||
+                    this.state.selected_location_id === 0,
             }),
         );
     };

@@ -4,4 +4,5 @@ export default interface GridOverlayProps {
     coordinates: { x: number[] | []; y: number[] | [] };
     mapSrc: string | null;
     locations: LocationDetails[] | [];
+    updateLocations: (locations: LocationDetails[] | []) => void;
 }

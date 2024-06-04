@@ -213,6 +213,7 @@ var GridOverlay = (function (_super) {
                       closeModal: this.manageModal.bind(this),
                       coordinates: coordinates,
                       locations: this.props.locations,
+                      updateLocations: this.props.updateLocations,
                   })
                 : null,
         );

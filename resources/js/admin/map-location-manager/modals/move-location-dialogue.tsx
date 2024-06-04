@@ -3,28 +3,40 @@ import Dialogue from "../../../game/components/ui/dialogue/dialogue";
 import Select from "react-select";
 import LocationDetails from "../../../game/sections/map/types/location-details";
 import PrimaryButton from "../../../game/components/ui/buttons/primary-button";
+import LoadingProgressBar from "../../../game/components/ui/progress-bars/loading-progress-bar";
+import MoveLocationAjax from "../ajax/move-location-ajax";
+import { gridOverLayContainer } from "../container/grid-overlay-container";
 
 interface MoveLocationDialogueProps {
     is_open: boolean;
     closeModal: () => void;
     coordinates: { x: number; y: number };
     locations: LocationDetails[] | [];
+    updateLocations: (locations: LocationDetails[] | []) => void;
 }
 
 interface MoveLocationDialogueState {
     selected_location_id: number;
+    error_message: string | null;
+    processing: boolean;
 }
 
 export default class MoveLocationDialogue extends React.Component<
     MoveLocationDialogueProps,
     MoveLocationDialogueState
 > {
+    private moveLocationAjax: MoveLocationAjax;
+
     constructor(props: MoveLocationDialogueProps) {
         super(props);
 
         this.state = {
             selected_location_id: 0,
+            error_message: null,
+            processing: false,
         };
+
+        this.moveLocationAjax = gridOverLayContainer().fetch(MoveLocationAjax);
     }
 
     setSelectedLocation(data: any) {
@@ -72,6 +84,21 @@ export default class MoveLocationDialogue extends React.Component<
         ];
     }
 
+    moveLocation() {
+        this.setState(
+            {
+                processing: true,
+            },
+            () => {
+                this.moveLocationAjax.moveLocation(
+                    this,
+                    this.state.selected_location_id,
+                    this.props.coordinates,
+                );
+            },
+        );
+    }
+
     render() {
         return (
             <Dialogue
@@ -101,10 +128,16 @@ export default class MoveLocationDialogue extends React.Component<
                     value={this.getDefaultOption()}
                 />
                 <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3"></div>
+
+                {this.state.processing ? <LoadingProgressBar /> : null}
+
                 <PrimaryButton
                     button_label={"Move Location"}
-                    on_click={() => {}}
-                    disabled={this.state.selected_location_id === 0}
+                    on_click={this.moveLocation.bind(this)}
+                    disabled={
+                        this.state.processing ||
+                        this.state.selected_location_id === 0
+                    }
                 />
             </Dialogue>
         );

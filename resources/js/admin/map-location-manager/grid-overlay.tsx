@@ -186,6 +186,7 @@ export default class GridOverlay extends Component<
                         closeModal={this.manageModal.bind(this)}
                         coordinates={coordinates}
                         locations={this.props.locations}
+                        updateLocations={this.props.updateLocations}
                     />
                 ) : null}
             </div>

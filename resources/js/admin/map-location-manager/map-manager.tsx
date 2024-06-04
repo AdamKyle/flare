@@ -1,13 +1,12 @@
 import React, { Component } from "react";
 import GridOverlay from "./grid-overlay";
-import Ajax from "../../game/lib/ajax/ajax";
-import { AxiosError, AxiosResponse } from "axios";
 import LoadingProgressBar from "../../game/components/ui/progress-bars/loading-progress-bar";
 import MapManagerProps from "./types/map-manager-props";
 import MapManagerState from "./types/map-manager-state";
 import DangerAlert from "../../game/components/ui/alerts/simple-alerts/danger-alert";
 import InitializeMapAjax from "./ajax/initialize-map-ajax";
 import { gridOverLayContainer } from "./container/grid-overlay-container";
+import LocationDetails from "../../game/sections/map/types/location-details";
 
 export default class MapManager extends Component<
     MapManagerProps,
@@ -33,6 +32,12 @@ export default class MapManager extends Component<
         this.initializeMap.initializeMap(this, this.props.mapId);
     }
 
+    updateLocations(locations: LocationDetails[] | []) {
+        this.setState({
+            locations: locations,
+        });
+    }
+
     render() {
         if (this.state.loading) {
             return <LoadingProgressBar />;
@@ -48,6 +53,7 @@ export default class MapManager extends Component<
                     coordinates={this.state.coordinates}
                     mapSrc={this.state.imgSrc}
                     locations={this.state.locations}
+                    updateLocations={this.updateLocations.bind(this)}
                 />
             </div>
         );

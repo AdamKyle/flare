@@ -55,6 +55,11 @@ var MapManager = (function (_super) {
     MapManager.prototype.componentDidMount = function () {
         this.initializeMap.initializeMap(this, this.props.mapId);
     };
+    MapManager.prototype.updateLocations = function (locations) {
+        this.setState({
+            locations: locations,
+        });
+    };
     MapManager.prototype.render = function () {
         if (this.state.loading) {
             return React.createElement(LoadingProgressBar, null);
@@ -73,6 +78,7 @@ var MapManager = (function (_super) {
                 coordinates: this.state.coordinates,
                 mapSrc: this.state.imgSrc,
                 locations: this.state.locations,
+                updateLocations: this.updateLocations.bind(this),
             }),
         );
     };
