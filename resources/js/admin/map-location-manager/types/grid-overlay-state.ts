@@ -6,4 +6,5 @@ export default interface GridOverlayState {
     showTooltip: boolean;
     tooltipPosition: string;
     snapped: boolean;
+    showModal: boolean;
 }

@@ -1,53 +1,29 @@
-var __extends =
-    (this && this.__extends) ||
-    (function () {
-        var extendStatics = function (d, b) {
-            extendStatics =
-                Object.setPrototypeOf ||
-                ({ __proto__: [] } instanceof Array &&
-                    function (d, b) {
-                        d.__proto__ = b;
-                    }) ||
-                function (d, b) {
-                    for (var p in b)
-                        if (Object.prototype.hasOwnProperty.call(b, p))
-                            d[p] = b[p];
-                };
-            return extendStatics(d, b);
-        };
-        return function (d, b) {
-            if (typeof b !== "function" && b !== null)
-                throw new TypeError(
-                    "Class extends value " +
-                        String(b) +
-                        " is not a constructor or null",
-                );
-            extendStatics(d, b);
-            function __() {
-                this.constructor = d;
-            }
-            d.prototype =
-                b === null
-                    ? Object.create(b)
-                    : ((__.prototype = b.prototype), new __());
-        };
-    })();
-var __assign =
-    (this && this.__assign) ||
-    function () {
-        __assign =
-            Object.assign ||
-            function (t) {
-                for (var s, i = 1, n = arguments.length; i < n; i++) {
-                    s = arguments[i];
-                    for (var p in s)
-                        if (Object.prototype.hasOwnProperty.call(s, p))
-                            t[p] = s[p];
-                }
-                return t;
-            };
-        return __assign.apply(this, arguments);
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
     };
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 import React, { Fragment } from "react";
 import LoadingProgressBar from "../../ui/progress-bars/loading-progress-bar";
 import Select from "react-select";
@@ -117,19 +93,13 @@ var SeerCamp = (function (_super) {
             });
         }
         if (action === "roll-sockets") {
-            this.setState(
-                {
-                    error_message: null,
-                    success_message: null,
-                    trading_with_seer: true,
-                },
-                function () {
-                    SeerActions.manageSocketsOnItem(
-                        _this,
-                        _this.state.item_selected,
-                    );
-                },
-            );
+            this.setState({
+                error_message: null,
+                success_message: null,
+                trading_with_seer: true,
+            }, function () {
+                SeerActions.manageSocketsOnItem(_this, _this.state.item_selected);
+            });
         }
         if (action === "attach-gem") {
             this.setState({
@@ -192,10 +162,7 @@ var SeerCamp = (function (_super) {
     SeerCamp.prototype.updateParent = function (value, property) {
         this.setState(function (prevState) {
             var _a;
-            return __assign(
-                __assign({}, prevState),
-                ((_a = {}), (_a[property] = value), _a),
-            );
+            return (__assign(__assign({}, prevState), (_a = {}, _a[property] = value, _a)));
         });
     };
     SeerCamp.prototype.getItemInfo = function (key) {
@@ -215,195 +182,49 @@ var SeerCamp = (function (_super) {
         });
         if (gemSlot.length > 0) {
             var gem = gemSlot[0];
-            return React.createElement(
-                "span",
-                { className: "text-lime-600 dark:text-lime-500" },
-                gem.name,
-            );
+            return (React.createElement("span", { className: "text-lime-600 dark:text-lime-500" }, gem.name));
         }
         return null;
     };
     SeerCamp.prototype.render = function () {
         var _this = this;
-        return React.createElement(
-            Fragment,
-            null,
-            React.createElement(
-                "div",
-                {
-                    className:
-                        "mt-2 lg:grid lg:grid-cols-3 lg:gap-2 lg:ml-[120px]",
-                },
-                React.createElement(
-                    "div",
-                    { className: "lg:cols-start-1 lg:col-span-2" },
-                    this.state.is_loading
-                        ? React.createElement(LoadingProgressBar, null)
-                        : React.createElement(
-                              Fragment,
-                              null,
-                              React.createElement(Select, {
-                                  onChange: this.setSeerAction.bind(this),
-                                  options: this.seerActions(),
-                                  menuPosition: "absolute",
-                                  menuPlacement: "bottom",
-                                  styles: {
-                                      menuPortal: function (base) {
-                                          return __assign(__assign({}, base), {
-                                              zIndex: 9999,
-                                              color: "#000000",
-                                          });
-                                      },
-                                  },
-                                  menuPortalTarget: document.body,
-                                  value: this.seerAction(),
-                              }),
-                              this.state.selected_seer_action ===
-                                  "manage-sockets"
-                                  ? React.createElement(
-                                        "div",
-                                        { className: "mt-3 mb-2" },
-                                        React.createElement(ManageItemSockets, {
-                                            items: this.state.items,
-                                            update_parent:
-                                                this.updateParent.bind(this),
-                                        }),
-                                    )
-                                  : null,
-                              this.state.selected_seer_action === "attach-gem"
-                                  ? React.createElement(
-                                        "div",
-                                        { className: "mt-3 mb-2" },
-                                        React.createElement(AddGemsToItem, {
-                                            items: this.state.items,
-                                            gems: this.state.gems,
-                                            update_parent:
-                                                this.updateParent.bind(this),
-                                            item_selected:
-                                                this.state.item_selected,
-                                            gem_selected:
-                                                this.state.gem_selected,
-                                        }),
-                                    )
-                                  : null,
-                              this.state.selected_seer_action === "remove-gem"
-                                  ? React.createElement(
-                                        "div",
-                                        { className: "mt-3 mb-2" },
-                                        React.createElement(RemoveGem, {
-                                            character_id:
-                                                this.props.character_id,
-                                            update_parent:
-                                                this.updateParent.bind(this),
-                                        }),
-                                    )
-                                  : null,
-                              this.state.item_selected !== 0 &&
-                                  this.state.selected_seer_action ===
-                                      "manage-sockets"
-                                  ? React.createElement(ManageItemSocketsCost, {
-                                        socket_cost: this.state.socket_cost,
-                                        get_item_info:
-                                            this.getItemInfo.bind(this),
-                                    })
-                                  : null,
-                              this.state.trading_with_seer
-                                  ? React.createElement(
-                                        LoadingProgressBar,
-                                        null,
-                                    )
-                                  : null,
-                              this.state.error_message !== null
-                                  ? React.createElement(
-                                        DangerAlert,
-                                        { additional_css: "mt-4 mb-4" },
-                                        this.state.error_message,
-                                    )
-                                  : null,
-                              this.state.success_message !== null
-                                  ? React.createElement(
-                                        SuccessAlert,
-                                        { additional_css: "mt-4 mb-4" },
-                                        this.state.success_message,
-                                    )
-                                  : null,
-                          ),
-                ),
-            ),
-            React.createElement(
-                "div",
-                null,
-                React.createElement(
-                    "div",
-                    { className: "text-center lg:ml-[-100px] mt-3 mb-3" },
-                    this.state.selected_seer_action === "manage-sockets"
-                        ? React.createElement(
-                              Fragment,
-                              null,
-                              React.createElement(
-                                  ManageItemSocketsActions,
-                                  {
-                                      do_action: this.doAction.bind(this),
-                                      is_disabled:
-                                          this.isManageSocketsDisabled(),
-                                      is_loading: this.state.trading_with_seer,
-                                  },
-                                  React.createElement(DangerButton, {
-                                      button_label: "Leave Seer Camp",
-                                      on_click: this.props.leave_seer_camp,
-                                      additional_css: "ml-2",
-                                      disabled: this.state.trading_with_seer,
-                                  }),
-                              ),
-                          )
-                        : null,
-                    this.state.selected_seer_action === "attach-gem"
-                        ? React.createElement(
-                              Fragment,
-                              null,
-                              React.createElement(
-                                  AddGemsToItemActions,
-                                  {
-                                      do_action: this.doAction.bind(this),
-                                      is_disabled: this.isAddGemsDisabled(),
-                                      is_loading: this.state.trading_with_seer,
-                                  },
-                                  React.createElement(DangerButton, {
-                                      button_label: "Leave Seer Camp",
-                                      on_click: this.props.leave_seer_camp,
-                                      additional_css: "ml-2",
-                                      disabled: this.state.trading_with_seer,
-                                  }),
-                              ),
-                          )
-                        : null,
+        return (React.createElement(Fragment, null,
+            React.createElement("div", { className: "mt-2 lg:grid lg:grid-cols-3 lg:gap-2 lg:ml-[120px]" },
+                React.createElement("div", { className: "lg:cols-start-1 lg:col-span-2" }, this.state.is_loading ? (React.createElement(LoadingProgressBar, null)) : (React.createElement(Fragment, null,
+                    React.createElement(Select, { onChange: this.setSeerAction.bind(this), options: this.seerActions(), menuPosition: "absolute", menuPlacement: "bottom", styles: {
+                            menuPortal: function (base) { return (__assign(__assign({}, base), { zIndex: 9999, color: "#000000" })); },
+                        }, menuPortalTarget: document.body, value: this.seerAction() }),
+                    this.state.selected_seer_action ===
+                        "manage-sockets" ? (React.createElement("div", { className: "mt-3 mb-2" },
+                        React.createElement(ManageItemSockets, { items: this.state.items, update_parent: this.updateParent.bind(this) }))) : null,
+                    this.state.selected_seer_action ===
+                        "attach-gem" ? (React.createElement("div", { className: "mt-3 mb-2" },
+                        React.createElement(AddGemsToItem, { items: this.state.items, gems: this.state.gems, update_parent: this.updateParent.bind(this), item_selected: this.state.item_selected, gem_selected: this.state.gem_selected }))) : null,
+                    this.state.selected_seer_action ===
+                        "remove-gem" ? (React.createElement("div", { className: "mt-3 mb-2" },
+                        React.createElement(RemoveGem, { character_id: this.props.character_id, update_parent: this.updateParent.bind(this) }))) : null,
+                    this.state.item_selected !== 0 &&
+                        this.state.selected_seer_action ===
+                            "manage-sockets" ? (React.createElement(ManageItemSocketsCost, { socket_cost: this.state.socket_cost, get_item_info: this.getItemInfo.bind(this) })) : null,
+                    this.state.trading_with_seer ? (React.createElement(LoadingProgressBar, null)) : null,
+                    this.state.error_message !== null ? (React.createElement(DangerAlert, { additional_css: "mt-4 mb-4" }, this.state.error_message)) : null,
+                    this.state.success_message !== null ? (React.createElement(SuccessAlert, { additional_css: "mt-4 mb-4" }, this.state.success_message)) : null)))),
+            React.createElement("div", null,
+                React.createElement("div", { className: "text-center lg:ml-[-100px] mt-3 mb-3" },
+                    this.state.selected_seer_action ===
+                        "manage-sockets" ? (React.createElement(Fragment, null,
+                        React.createElement(ManageItemSocketsActions, { do_action: this.doAction.bind(this), is_disabled: this.isManageSocketsDisabled(), is_loading: this.state.trading_with_seer },
+                            React.createElement(DangerButton, { button_label: "Leave Seer Camp", on_click: this.props.leave_seer_camp, additional_css: "ml-2", disabled: this.state.trading_with_seer })))) : null,
+                    this.state.selected_seer_action === "attach-gem" ? (React.createElement(Fragment, null,
+                        React.createElement(AddGemsToItemActions, { do_action: this.doAction.bind(this), is_disabled: this.isAddGemsDisabled(), is_loading: this.state.trading_with_seer },
+                            React.createElement(DangerButton, { button_label: "Leave Seer Camp", on_click: this.props.leave_seer_camp, additional_css: "ml-2", disabled: this.state.trading_with_seer })))) : null,
                     this.state.selected_seer_action === null ||
-                        this.state.selected_seer_action === "remove-gem"
-                        ? React.createElement(DangerButton, {
-                              button_label: "Leave Seer Camp",
-                              on_click: this.props.leave_seer_camp,
-                              additional_css: "ml-2",
-                              disabled: this.state.is_loading,
-                          })
-                        : null,
-                ),
-            ),
-            this.state.manage_gems_on_item
-                ? React.createElement(ManageGems, {
-                      character_id: this.props.character_id,
-                      selected_item: this.state.item_selected,
-                      selected_gem: this.state.gem_selected,
-                      cost: this.state.attach_gem,
-                      manage_model: function () {
-                          return _this.setState({ manage_gems_on_item: false });
-                      },
-                      update_parent: this.updateParent.bind(this),
-                      is_open: true,
-                  })
-                : null,
-        );
+                        this.state.selected_seer_action === "remove-gem" ? (React.createElement(DangerButton, { button_label: "Leave Seer Camp", on_click: this.props.leave_seer_camp, additional_css: "ml-2", disabled: this.state.is_loading })) : null)),
+            this.state.manage_gems_on_item ? (React.createElement(ManageGems, { character_id: this.props.character_id, selected_item: this.state.item_selected, selected_gem: this.state.gem_selected, cost: this.state.attach_gem, manage_model: function () {
+                    return _this.setState({ manage_gems_on_item: false });
+                }, update_parent: this.updateParent.bind(this), is_open: true })) : null));
     };
     return SeerCamp;
-})(React.Component);
+}(React.Component));
 export default SeerCamp;
 //# sourceMappingURL=seer-camp.js.map

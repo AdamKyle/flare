@@ -230,7 +230,7 @@ var FetchGameData = (function () {
         });
     };
     FetchGameData.prototype.makeAjaxCall = function (url) {
-        return __awaiter(this, void 0, Promise, function () {
+        return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 return [
                     2,

@@ -37,27 +37,23 @@ import LocationPin from "../../game/sections/components/locations/location-pin";
 import MouseHandlers from "./grid/mouse-handlers";
 import { gridOverLayContainer } from "./container/grid-overlay-container";
 import ToolTipHandler from "./grid/tool-tip-handler";
+import MoveLocationDialogue from "./modals/move-location-dialogue";
 var GridOverlay = (function (_super) {
     __extends(GridOverlay, _super);
     function GridOverlay(props) {
         var _this = _super.call(this, props) || this;
-        _this.handleGridCellClick = function (x, y) {
-            console.log(
-                "Grid cell clicked at coordinates: ("
-                    .concat(x, ", ")
-                    .concat(y, ")"),
-            );
-        };
         _this.state = {
             coordinates: { x: 0, y: 0 },
             showTooltip: false,
             tooltipPosition: "top",
             snapped: false,
             hoveredGridCell: { x: null, y: null },
+            showModal: false,
         };
         _this.mouseHandlers = gridOverLayContainer().fetch(MouseHandlers);
         _this.toolTipHandler = gridOverLayContainer().fetch(ToolTipHandler);
         _this.mouseHandlers = _this.mouseHandlers.initialize(_this);
+        _this.gridContainer = React.createRef();
         return _this;
     }
     GridOverlay.prototype.renderGrid = function () {
@@ -76,7 +72,7 @@ var GridOverlay = (function (_super) {
                 var isHovered =
                     hoveredGridCell.x === xPos && hoveredGridCell.y === yPos;
                 gridCells.push(
-                    React.createElement("div", {
+                    React.createElement("button", {
                         key: "".concat(xPos, "-").concat(yPos),
                         className: "grid-cell",
                         style: {
@@ -85,6 +81,7 @@ var GridOverlay = (function (_super) {
                             width: "16px",
                             height: "16px",
                             position: "absolute",
+                            cursor: "pointer",
                         },
                         onMouseEnter: function () {
                             return _this.mouseHandlers.handleGridCellMouseEnter(
@@ -147,6 +144,11 @@ var GridOverlay = (function (_super) {
             });
         });
     };
+    GridOverlay.prototype.manageModal = function () {
+        this.setState({
+            showModal: !this.state.showModal,
+        });
+    };
     GridOverlay.prototype.render = function () {
         var mapSrc = this.props.mapSrc;
         var _a = this.state,
@@ -173,6 +175,7 @@ var GridOverlay = (function (_super) {
                 onMouseMove: this.mouseHandlers.handleMouseMove,
                 onMouseLeave: this.mouseHandlers.handleMouseLeave,
                 style: { position: "relative" },
+                ref: this.gridContainer,
             },
             React.createElement("img", {
                 src: mapSrc,
@@ -200,9 +203,18 @@ var GridOverlay = (function (_super) {
                         backgroundColor: "rgba(255, 0, 0, 0.5)",
                         left: coordinates.x - 8,
                         top: coordinates.y,
-                        pointerEvents: "none",
+                        cursor: "pointer",
                     },
+                    onClick: this.manageModal.bind(this),
                 }),
+            this.state.showModal
+                ? React.createElement(MoveLocationDialogue, {
+                      is_open: this.state.showModal,
+                      closeModal: this.manageModal.bind(this),
+                      coordinates: coordinates,
+                      locations: this.props.locations,
+                  })
+                : null,
         );
     };
     return GridOverlay;

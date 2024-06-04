@@ -38,18 +38,6 @@ import { injectable } from "tsyringe";
 var MouseHandlers = (function () {
     function MouseHandlers() {
         var _this = this;
-        this.handleMouseLeave = function () {
-            if (!_this.component) {
-                throw new Error(
-                    "Component is not registered. Call initialize first.",
-                );
-            }
-            _this.component.setState({
-                showTooltip: false,
-                snapped: false,
-                hoveredGridCell: { x: null, y: null },
-            });
-        };
         this.handleLocationMouseEnter = function (x, y) {
             if (!_this.component) {
                 throw new Error(
@@ -74,6 +62,7 @@ var MouseHandlers = (function () {
             });
         };
         this.handleMouseMove = this.handleMouseMove.bind(this);
+        this.handleMouseLeave = this.handleMouseLeave.bind(this);
     }
     MouseHandlers.prototype.initialize = function (component) {
         this.component = component;
@@ -84,6 +73,9 @@ var MouseHandlers = (function () {
             throw new Error(
                 "Component is not registered. Call initialize first.",
             );
+        }
+        if (this.component.state.showModal) {
+            return;
         }
         var clientX = e.clientX,
             clientY = e.clientY;
@@ -133,6 +125,18 @@ var MouseHandlers = (function () {
             showTooltip: true,
             tooltipPosition: this.getTooltipPosition(closestX, closestY),
             snapped: true,
+        });
+    };
+    MouseHandlers.prototype.handleMouseLeave = function () {
+        if (!this.component) {
+            throw new Error(
+                "Component is not registered. Call initialize first.",
+            );
+        }
+        this.component.setState({
+            showTooltip: false,
+            snapped: false,
+            hoveredGridCell: { x: null, y: null },
         });
     };
     MouseHandlers.prototype.getTooltipPosition = function (x, y) {

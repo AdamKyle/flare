@@ -1,6 +1,7 @@
 import { container } from "tsyringe";
 import MouseHandlers from "../grid/mouse-handlers";
 import ToolTipHandler from "../grid/tool-tip-handler";
+import InitializeMapAjax from "../ajax/initialize-map-ajax";
 var GridOverlayContainer = (function () {
     function GridOverlayContainer() {
         this.register("mouse-handlers", {
@@ -8,6 +9,9 @@ var GridOverlayContainer = (function () {
         });
         this.register("tool-tip-handler", {
             useClass: ToolTipHandler,
+        });
+        this.register('ajax-interface', {
+            useClass: InitializeMapAjax,
         });
     }
     GridOverlayContainer.getInstance = function () {
@@ -23,7 +27,7 @@ var GridOverlayContainer = (function () {
         container.register(key, { useValue: service });
     };
     return GridOverlayContainer;
-})();
+}());
 var dependencyRegistry;
 var gridOverLayContainer = function () {
     if (!dependencyRegistry) {

@@ -6,6 +6,7 @@ import LocationPin from "../../game/sections/components/locations/location-pin";
 import MouseHandlers from "./grid/mouse-handlers";
 import { gridOverLayContainer } from "./container/grid-overlay-container";
 import ToolTipHandler from "./grid/tool-tip-handler";
+import MoveLocationDialogue from "./modals/move-location-dialogue";
 
 export default class GridOverlay extends Component<
     GridOverlayProps,
@@ -14,6 +15,8 @@ export default class GridOverlay extends Component<
     private mouseHandlers: MouseHandlers;
 
     private toolTipHandler: ToolTipHandler;
+
+    private gridContainer: React.RefObject<HTMLDivElement>;
 
     constructor(props: GridOverlayProps) {
         super(props);
@@ -24,17 +27,16 @@ export default class GridOverlay extends Component<
             tooltipPosition: "top",
             snapped: false,
             hoveredGridCell: { x: null, y: null },
+            showModal: false,
         };
 
         this.mouseHandlers = gridOverLayContainer().fetch(MouseHandlers);
         this.toolTipHandler = gridOverLayContainer().fetch(ToolTipHandler);
 
         this.mouseHandlers = this.mouseHandlers.initialize(this);
-    }
 
-    handleGridCellClick = (x: number, y: number) => {
-        console.log(`Grid cell clicked at coordinates: (${x}, ${y})`);
-    };
+        this.gridContainer = React.createRef();
+    }
 
     renderGrid() {
         const { coordinates } = this.props;
@@ -54,7 +56,7 @@ export default class GridOverlay extends Component<
                     hoveredGridCell.x === xPos && hoveredGridCell.y === yPos;
 
                 gridCells.push(
-                    <div
+                    <button
                         key={`${xPos}-${yPos}`} // Unique key for each grid cell
                         className="grid-cell" // Tailwind CSS class for grid cell
                         style={{
@@ -63,6 +65,7 @@ export default class GridOverlay extends Component<
                             width: "16px",
                             height: "16px",
                             position: "absolute", // Make sure grid cells are positioned absolutely
+                            cursor: "pointer",
                         }}
                         onMouseEnter={() =>
                             this.mouseHandlers.handleGridCellMouseEnter(
@@ -71,7 +74,7 @@ export default class GridOverlay extends Component<
                             )
                         }
                         onMouseLeave={this.mouseHandlers.handleMouseLeave}
-                    ></div>,
+                    ></button>,
                 );
             }
         }
@@ -123,6 +126,12 @@ export default class GridOverlay extends Component<
         });
     }
 
+    manageModal() {
+        this.setState({
+            showModal: !this.state.showModal,
+        });
+    }
+
     render() {
         const { mapSrc } = this.props;
         const { coordinates, showTooltip, tooltipPosition, snapped } =
@@ -144,6 +153,7 @@ export default class GridOverlay extends Component<
                 onMouseMove={this.mouseHandlers.handleMouseMove}
                 onMouseLeave={this.mouseHandlers.handleMouseLeave}
                 style={{ position: "relative" }}
+                ref={this.gridContainer}
             >
                 <img
                     src={mapSrc}
@@ -165,10 +175,19 @@ export default class GridOverlay extends Component<
                             backgroundColor: "rgba(255, 0, 0, 0.5)",
                             left: coordinates.x - 8,
                             top: coordinates.y,
-                            pointerEvents: "none",
+                            cursor: "pointer",
                         }}
+                        onClick={this.manageModal.bind(this)}
                     ></div>
                 )}
+                {this.state.showModal ? (
+                    <MoveLocationDialogue
+                        is_open={this.state.showModal}
+                        closeModal={this.manageModal.bind(this)}
+                        coordinates={coordinates}
+                        locations={this.props.locations}
+                    />
+                ) : null}
             </div>
         );
     }

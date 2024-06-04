@@ -5,4 +5,5 @@ export default interface MapManagerState {
     imgSrc: string | null;
     coordinates: { x: number[] | []; y: number[] | [] };
     locations: LocationDetails[] | [];
+    error_message: string | null;
 }

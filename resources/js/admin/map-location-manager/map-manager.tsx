@@ -5,11 +5,17 @@ import { AxiosError, AxiosResponse } from "axios";
 import LoadingProgressBar from "../../game/components/ui/progress-bars/loading-progress-bar";
 import MapManagerProps from "./types/map-manager-props";
 import MapManagerState from "./types/map-manager-state";
+import DangerAlert from "../../game/components/ui/alerts/simple-alerts/danger-alert";
+import InitializeMapAjax from "./ajax/initialize-map-ajax";
+import {gridOverLayContainer} from "./container/grid-overlay-container";
 
 export default class MapManager extends Component<
     MapManagerProps,
     MapManagerState
 > {
+
+    private initializeMap: InitializeMapAjax;
+
     constructor(props: MapManagerProps) {
         super(props);
 
@@ -18,32 +24,26 @@ export default class MapManager extends Component<
             imgSrc: null,
             coordinates: { x: [], y: [] },
             locations: [],
+            error_message: null,
         };
+
+        this.initializeMap = gridOverLayContainer().fetch(InitializeMapAjax);
     }
 
     componentDidMount() {
-        new Ajax().setRoute("admin/map-manager/" + this.props.mapId).doAjaxCall(
-            "get",
-            (result: AxiosResponse) => {
-                const coordinates = {
-                    x: result.data.x_coordinates,
-                    y: result.data.y_coordinates,
-                };
 
-                this.setState({
-                    loading: false,
-                    imgSrc: result.data.path,
-                    coordinates: coordinates,
-                    locations: result.data.locations,
-                });
-            },
-            (error: AxiosError) => {},
-        );
+        this.initializeMap.initializeMap(this, this.props.mapId);
     }
 
     render() {
         if (this.state.loading) {
             return <LoadingProgressBar />;
+        }
+
+        if (this.state.error_message !== null) {
+            return <DangerAlert>
+                {this.state.error_message}
+            </DangerAlert>
         }
 
         return (

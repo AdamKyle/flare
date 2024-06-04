@@ -10,6 +10,7 @@ export default class MouseHandlers {
     constructor() {
         // We need to bind this to the following method:
         this.handleMouseMove = this.handleMouseMove.bind(this);
+        this.handleMouseLeave = this.handleMouseLeave.bind(this);
     }
 
     initialize(
@@ -25,6 +26,11 @@ export default class MouseHandlers {
             throw new Error(
                 "Component is not registered. Call initialize first.",
             );
+        }
+
+        // Check if the modal is open and return early if it is
+        if (this.component.state.showModal) {
+            return;
         }
 
         const { clientX, clientY } = e;
@@ -76,7 +82,7 @@ export default class MouseHandlers {
         });
     }
 
-    handleMouseLeave = () => {
+    handleMouseLeave() {
         if (!this.component) {
             throw new Error(
                 "Component is not registered. Call initialize first.",
@@ -88,7 +94,7 @@ export default class MouseHandlers {
             snapped: false, // Reset snapped state on mouse leave
             hoveredGridCell: { x: null, y: null }, // Reset hovered grid cell
         });
-    };
+    }
 
     handleLocationMouseEnter = (x: number, y: number) => {
         if (!this.component) {
