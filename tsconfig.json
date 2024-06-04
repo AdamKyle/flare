@@ -25,5 +25,6 @@
             "dom.iterable"
         ]
     },
-    "include": ["resources/js/**/*"]  // Frontend paths pattern
+    "include": ["resources/js/**/*"],
+    "exclude": ["node_modules"]
 }

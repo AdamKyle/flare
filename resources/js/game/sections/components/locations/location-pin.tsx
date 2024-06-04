@@ -24,6 +24,7 @@ export default class LocationPin extends React.Component<LocationPinProps, {}> {
                 }}
                 onClick={this.openLocationInformation.bind(this)}
                 onMouseEnter={this.props.onMouseEnter}
+                onMouseLeave={this.props.onMouseLeave}
             ></button>
         );
     }

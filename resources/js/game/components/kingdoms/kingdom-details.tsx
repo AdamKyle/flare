@@ -39,6 +39,7 @@ export default class KingdomDetails extends React.Component<
             show_resource_transfer: false,
             show_make_capital_city: false,
         };
+        CallForReinforcements;
     }
 
     componentDidUpdate(

@@ -1,13 +1,14 @@
 {
   "private": true,
   "main": "resources/js/app.ts",
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "prettier": "prettier --write resources/js/",
-    "prepare": "husky"
-  },
-  "devDependencies": {
+    "scripts": {
+        "dev": "vite",
+        "cleanup": "prettier --write resources/js/",
+        "build": "yarn run cleanup && vite build",
+        "prepare": "husky"
+    },
+
+    "devDependencies": {
     "@emotion/react": "11.11.4",
     "@emotion/styled": "11.11.5",
     "@glidejs/glide": "^3.4.1",

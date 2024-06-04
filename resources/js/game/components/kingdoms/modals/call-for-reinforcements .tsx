@@ -7,11 +7,11 @@ import Dialogue from "../../../components/ui/dialogue/dialogue";
 import ComponentLoading from "../../../components/ui/loading/component-loading";
 import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
 import Ajax from "../../../lib/ajax/ajax";
-import CallForReinforcementsProps from "../../../lib/game/kingdoms/types/modals/call-for-reinforcements-props";
-import CallForReinforcementsState from "../../../lib/game/kingdoms/types/modals/call-for-reinforcements-state";
-import SelectedUnitsToCallType from "../../../lib/game/kingdoms/types/selected-units-to-call-type";
 import MoveUnits from "../unit-movement/move-units";
 import UnitMovement from "./partials/unit-movement";
+import SelectedUnitsToCallType from "../types/selected-units-to-call-type";
+import CallForReinforcementsProps from "../types/modals/call-for-reinforcements-props";
+import CallForReinforcementsState from "../types/modals/call-for-reinforcements-state";
 
 export default class CallForReinforcements extends React.Component<
     CallForReinforcementsProps,
@@ -86,7 +86,7 @@ export default class CallForReinforcements extends React.Component<
                             this.setState({ processing_unit_request: false });
 
                             if (typeof error.response != "undefined") {
-                                const response = error.response;
+                                const response: AxiosResponse = error.response;
 
                                 let message = response.data.message;
 

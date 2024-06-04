@@ -6,4 +6,6 @@ export default interface LocationPinProps {
     pin_class: string;
 
     onMouseEnter?: () => void;
+
+    onMouseLeave?: () => void;
 }

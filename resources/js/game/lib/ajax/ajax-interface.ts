@@ -1,4 +1,3 @@
-import { Component } from "react";
 import { Method } from "axios";
 
 export default interface AjaxInterface {
