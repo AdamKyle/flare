@@ -39,8 +39,11 @@ class MassImportCustomData extends Command {
      */
     public function handle() {
 
+        $this->importGameMaps();
+
         Artisan::call('import:game-data "Items"');
         Artisan::call('import:game-data "Affixes"');
+        Artisan::call('import:game-data "Locations"');
         Artisan::call('import:game-data "Npcs"');
         Artisan::call('import:game-data "Kingdoms"');
         Artisan::call('import:game-data "Kingdom Passive Skills"');
@@ -81,35 +84,54 @@ class MassImportCustomData extends Command {
 
     }
 
-    protected function importGameMaps(array $orderedMapImages): void {
+    protected function importGameMaps(): void {
         $files = Storage::disk('data-maps')->allFiles();
 
-        // Sort the array such that the maps are in the correct order.Shiny
-        usort($files, function ($a, $b) use ($orderedMapImages) {
-            $indexA = array_search($a, $orderedMapImages);
-            $indexB = array_search($b, $orderedMapImages);
+        $corectOrder = [
+            "Surface.png",
+            "Labyrinth.png",
+            "Dungeons.png",
+            "Shadow Plane.png",
+            "Hell.png",
+            "Purgatory.png",
+            "IcePlane.png",
+            "Twisted Memories.png",
+            "Delusional Memories.png",
+        ];
+
+        // Sort the array such that the maps are in the correct order.
+        usort($files, function ($a, $b) use ($corectOrder) {
+            $indexA = array_search($a, $corectOrder);
+            $indexB = array_search($b, $corectOrder);
 
             return $indexA - $indexB;
         });
 
         foreach ($files as $file) {
+            $fileName = pathinfo($file, PATHINFO_FILENAME);
 
-            if (in_array($file, $orderedMapImages)) {
-                $fileName = pathinfo($file, PATHINFO_FILENAME);
+            $path     = Storage::disk('maps')->putFile($fileName, new File(resource_path('maps') . '/' . $file));
 
-                $path     = Storage::disk('maps')->putFile($fileName, new File(resource_path('maps') . '/' . $file));
+            $mapValue = new MapNameValue($fileName);
 
-                $mapValue = new MapNameValue($fileName);
+            $gameMap = GameMap::where('name', $fileName)->first();
 
-                $gameMapData = array_merge([
-                    'name'          => $fileName,
-                    'path'          => $path,
-                    'default'       => $mapValue->isSurface(),
-                    'kingdom_color' => MapNameValue::$kingdomColors[$fileName],
-                ], (new MapNameValue($fileName))->getMapModifers());
+            if (!is_null($gameMap)) {
+                $gameMap->update([
+                    'path' => $path,
+                ]);
 
-                GameMap::create($gameMapData);
+                continue;
             }
+
+            $gameMapData = array_merge([
+                'name'          => $fileName,
+                'path'          => $path,
+                'default'       => $mapValue->isSurface(),
+                'kingdom_color' => MapNameValue::$kingdomColors[$fileName],
+            ], (new MapNameValue($fileName))->getMapModifers());
+
+            GameMap::create($gameMapData);
         }
     }
 }

@@ -10,10 +10,21 @@ import MapSection from "../map-section";
 export const getNewYPosition = (
     characterY: number,
     mapPositionY: number,
-    viewPort: number,
 ): number => {
     if (characterY < 288) {
         return 0;
+    }
+
+    if (characterY > 2320) {
+        return -2210;
+    }
+
+    if (characterY > 2016) {
+        return -2010;
+    }
+
+    if (characterY > 1712) {
+        return -1710;
     }
 
     if (characterY > 1424) {
@@ -44,6 +55,7 @@ export const getNewYPosition = (
  *
  * @param characterX
  * @param mapPositionX
+ * @param viewPort
  * @type [{characterX: number, mapPositionX: number}]
  */
 export const getNewXPosition = (
@@ -51,20 +63,24 @@ export const getNewXPosition = (
     mapPositionX: number,
     viewPort: number,
 ): number => {
-    if (characterX <= 368) {
+    if (characterX <= 496) {
         return 0;
     }
 
-    if (characterX > 368) {
-        if (viewPort >= 1920) {
-            return 0;
-        }
+    if (characterX > 2000) {
+        return -2010;
+    }
 
-        if (viewPort <= 1600) {
-            return -50;
-        }
+    if (characterX > 1500) {
+        return -1510;
+    }
 
-        return 0;
+    if (characterX > 1008) {
+        return -1010;
+    }
+
+    if (characterX > 496) {
+        return -510;
     }
 
     return mapPositionX;

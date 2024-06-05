@@ -1,6 +1,15 @@
-export var getNewYPosition = function (characterY, mapPositionY, viewPort) {
+export var getNewYPosition = function (characterY, mapPositionY) {
     if (characterY < 288) {
         return 0;
+    }
+    if (characterY > 2320) {
+        return -2210;
+    }
+    if (characterY > 2016) {
+        return -2010;
+    }
+    if (characterY > 1712) {
+        return -1710;
     }
     if (characterY > 1424) {
         return -1410;
@@ -20,17 +29,20 @@ export var getNewYPosition = function (characterY, mapPositionY, viewPort) {
     return mapPositionY;
 };
 export var getNewXPosition = function (characterX, mapPositionX, viewPort) {
-    if (characterX <= 368) {
+    if (characterX <= 496) {
         return 0;
     }
-    if (characterX > 368) {
-        if (viewPort >= 1920) {
-            return 0;
-        }
-        if (viewPort <= 1600) {
-            return -50;
-        }
-        return 0;
+    if (characterX > 2000) {
+        return -2010;
+    }
+    if (characterX > 1500) {
+        return -1510;
+    }
+    if (characterX > 1008) {
+        return -1010;
+    }
+    if (characterX > 496) {
+        return -510;
     }
     return mapPositionX;
 };

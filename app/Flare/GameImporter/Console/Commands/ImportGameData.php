@@ -2,6 +2,7 @@
 
 namespace App\Flare\GameImporter\Console\Commands;
 
+use Exception;
 use Illuminate\Support\Str;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\InfoPage;
@@ -191,21 +192,21 @@ class ImportGameData extends Command {
      * Import the game maps.
      *
      * @return void
-     * @throws \Exception
+     * @throws Exception
      */
     protected function importGameMaps(): void {
         $files = Storage::disk('data-maps')->allFiles();
 
         $corectOrder = [
-            "Surface.jpg",
-            "Labyrinth.jpeg",
-            "Dungeons.jpeg",
-            "Shadow Plane.jpeg",
-            "Hell.jpeg",
-            "Purgatory.jpeg",
-            "IcePlane.jpeg",
-            "Twisted Memories.jpeg",
-            "Delusional Memories.jpeg",
+            "Surface.png",
+            "Labyrinth.png",
+            "Dungeons.png",
+            "Shadow Plane.png",
+            "Hell.png",
+            "Purgatory.png",
+            "IcePlane.png",
+            "Twisted Memories.png",
+            "Delusional Memories.png",
         ];
 
         // Sort the array such that the maps are in the correct order.
@@ -222,6 +223,16 @@ class ImportGameData extends Command {
             $path     = Storage::disk('maps')->putFile($fileName, new File(resource_path('maps') . '/' . $file));
 
             $mapValue = new MapNameValue($fileName);
+
+            $gameMap = GameMap::where('name', $fileName)->first();
+
+            if (!is_null($gameMap)) {
+                $gameMap->update([
+                    'path' => $path,
+                ]);
+
+                continue;
+            }
 
             $gameMapData = array_merge([
                 'name'          => $fileName,

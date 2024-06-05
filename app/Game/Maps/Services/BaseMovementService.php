@@ -223,7 +223,7 @@ class BaseMovementService {
     protected function validateCoordinates(): bool {
         $coordinates = $this->coordinatesCache->getFromCache();
 
-        if (!in_array($this->x, $coordinates['x']) && !in_array($this->y, $coordinates['y'])) {
+        if (!in_array($this->x, $coordinates['x']) || !in_array($this->y, $coordinates['y'])) {
             return false;
         }
 
