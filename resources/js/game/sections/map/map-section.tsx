@@ -218,7 +218,7 @@ export default class MapSection extends React.Component<MapProps, MapState> {
 
         return (
             <Fragment>
-                <div className="overflow-hidden max-h-[315px] sm:max-w-[315px] md:max-w-[44%] sm:border-2 lg:border-0 sm:mr-auto sm:ml-auto lg:max-w-full lg:mr-0 lg:ml-0">
+                <div className="overflow-hidden max-h-[315px] max-w-[460px] md:max-w-[44%] sm:border-2 lg:border-0 sm:mr-auto sm:ml-auto lg:max-w-full lg:mr-0 lg:ml-0">
                     <Draggable
                         position={this.state.map_position}
                         bounds={{
