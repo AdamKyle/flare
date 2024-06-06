@@ -667,7 +667,7 @@ var GameChat = (function (_super) {
             null,
             React.createElement(
                 "div",
-                { className: "mt-4 mb-4 lg:hidden" },
+                { className: "mt-4 mb-4 md:hidden" },
                 React.createElement(DropDown, {
                     menu_items: this.renderDropDownOptions(),
                     button_title: "Chat Tabs",
@@ -683,7 +683,7 @@ var GameChat = (function (_super) {
             ),
             React.createElement(
                 "div",
-                { className: "mt-4 mb-4 hidden lg:block" },
+                { className: "mt-4 mb-4 hidden md:block" },
                 React.createElement(
                     Tabs,
                     {

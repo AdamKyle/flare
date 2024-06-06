@@ -232,7 +232,7 @@ var MapSection = (function (_super) {
                 "div",
                 {
                     className:
-                        "overflow-hidden max-h-[315px] max-w-[460px] md:max-w-[44%] sm:border-2 lg:border-0 sm:mr-auto sm:ml-auto lg:max-w-full lg:mr-0 lg:ml-0",
+                        "overflow-hidden max-h-[315px] max-w-[460px] md:max-w-[514px] sm:border-2 lg:border-0 sm:mr-auto sm:ml-auto lg:max-w-full lg:mr-0 lg:ml-0",
                 },
                 React.createElement(
                     Draggable,

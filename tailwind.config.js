@@ -100,15 +100,7 @@ export default {
 
                 'md': '1024px',
 
-                'md-lg': '1280px',
-
-                '1376': '1376px',
-
                 'lg': '1600px',
-
-                'xl': '1920px',
-
-                '2xl': '2600px',
             },
             colors: {
                 orange: {

@@ -44,7 +44,7 @@ var ActionSection = (function (_super) {
         return React.createElement(
             Fragment,
             null,
-            this.props.view_port < 1600
+            this.props.view_port < 1024
                 ? React.createElement(SmallerActions, {
                       character: this.props.character,
                       character_status: this.props.character_status,

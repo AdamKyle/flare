@@ -74,6 +74,7 @@ import MapStateManager from "./sections/map/lib/state/map-state-manager";
 import MapSection from "./sections/map/map-section";
 import MapTabs from "./sections/map/map-tabs";
 import ScreenRefresh from "./sections/screen-refresh/screen-refresh";
+import IsTabletInPortraitDisplayAlert from "./components/ui/alerts/tablet-portrait-detector/is-tablet-in-portrait-display-alert";
 var Game = (function (_super) {
     __extends(Game, _super);
     function Game(props) {
@@ -309,13 +310,14 @@ var Game = (function (_super) {
             React.createElement(ScreenRefresh, {
                 user_id: this.state.character.user_id,
             }),
+            React.createElement(IsTabletInPortraitDisplayAlert, null),
             React.createElement(
                 Tabs,
                 {
                     tabs: this.state.tabs,
                     disabled: this.state.disable_tabs,
                     additonal_css: clsx({
-                        "ml-[40px]": this.state.view_port >= 1600,
+                        "ml-[40px]": this.state.view_port >= 1024,
                     }),
                     icon_key: "has_logs",
                 },
@@ -325,13 +327,13 @@ var Game = (function (_super) {
                     React.createElement(
                         "div",
                         {
-                            className: clsx("grid lg:grid-cols-3 gap-3", {
-                                "ml-[40px]": this.state.view_port >= 1600,
+                            className: clsx("grid md:grid-cols-3 md:gap-3", {
+                                "ml-[40px]": this.state.view_port >= 1024,
                             }),
                         },
                         React.createElement(
                             "div",
-                            { className: "w-full col-span-3 lg:col-span-2" },
+                            { className: "w-full col-span-3 md:col-span-2" },
                             React.createElement(
                                 BasicCard,
                                 { additionalClasses: "mb-10" },
@@ -401,7 +403,7 @@ var Game = (function (_super) {
                                 "div",
                                 {
                                     className: clsx({
-                                        hidden: this.state.view_port > 639,
+                                        hidden: this.state.view_port > 932,
                                     }),
                                 },
                                 React.createElement(ActiveBoonsActionSection, {
@@ -413,7 +415,7 @@ var Game = (function (_super) {
                                 {
                                     additionalClasses: clsx("min-h-60", {
                                         "ml-auto mr-auto":
-                                            this.state.view_port < 1600,
+                                            this.state.view_port < 1024,
                                     }),
                                 },
                                 React.createElement(
@@ -473,7 +475,7 @@ var Game = (function (_super) {
                                 BasicCard,
                                 {
                                     additionalClasses: clsx(
-                                        "hidden lg:block md:mt-0 lg:col-start-3 lg:col-end-3 max-h-[630px] max-w-[555px]",
+                                        "hidden md:block md:mt-0 lg:col-start-3 lg:col-end-3 max-h-[630px] max-w-[555px]",
                                         {
                                             "max-h-[700px]":
                                                 this.state.character

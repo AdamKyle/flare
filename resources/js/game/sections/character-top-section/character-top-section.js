@@ -54,7 +54,7 @@ var CharacterTopSection = (function (_super) {
         prevProps,
         prevState,
     ) {
-        if (this.props.view_port >= 1600 && this.state.hide_top_bar) {
+        if (this.props.view_port >= 1024 && this.state.hide_top_bar) {
             this.setState({
                 hide_top_bar: false,
             });
@@ -83,7 +83,7 @@ var CharacterTopSection = (function (_super) {
         if (this.props.character === null) {
             return null;
         }
-        if (this.state.hide_top_bar && this.props.view_port < 1600) {
+        if (this.state.hide_top_bar && this.props.view_port < 1024) {
             return React.createElement(
                 Fragment,
                 null,

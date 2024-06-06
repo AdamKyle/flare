@@ -14,7 +14,7 @@ export default class ActionSection extends React.Component<
     render() {
         return (
             <Fragment>
-                {this.props.view_port < 1600 ? (
+                {this.props.view_port < 1024 ? (
                     <SmallerActions
                         character={this.props.character}
                         character_status={this.props.character_status}

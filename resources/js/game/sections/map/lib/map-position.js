@@ -1,5 +1,6 @@
 export var getNewYPosition = function (characterY, mapPositionY) {
-    if (characterY < 288) {
+    console.log(characterY);
+    if (characterY <= 512) {
         return 0;
     }
     if (characterY > 2320) {
@@ -22,9 +23,6 @@ export var getNewYPosition = function (characterY, mapPositionY) {
     }
     if (characterY > 513) {
         return -500;
-    }
-    if (characterY > 288) {
-        return -200;
     }
     return mapPositionY;
 };
@@ -70,9 +68,6 @@ export var dragMap = function (position, bottomBounds, rightBounds) {
     };
 };
 export var fetchLeftBounds = function (component) {
-    if (component.props.view_port <= 1600 && component.props.view_port < 1920) {
-        return -50;
-    }
     return -2000;
 };
 //# sourceMappingURL=map-position.js.map

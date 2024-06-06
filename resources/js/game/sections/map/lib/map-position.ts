@@ -11,7 +11,8 @@ export const getNewYPosition = (
     characterY: number,
     mapPositionY: number,
 ): number => {
-    if (characterY < 288) {
+    console.log(characterY);
+    if (characterY <= 512) {
         return 0;
     }
 
@@ -41,10 +42,6 @@ export const getNewYPosition = (
 
     if (characterY > 513) {
         return -500;
-    }
-
-    if (characterY > 288) {
-        return -200;
     }
 
     return mapPositionY;
@@ -130,9 +127,5 @@ export const dragMap = (
  * @param component
  */
 export const fetchLeftBounds = (component: MapSection): number => {
-    if (component.props.view_port <= 1600 && component.props.view_port < 1920) {
-        return -50;
-    }
-
     return -2000;
 };

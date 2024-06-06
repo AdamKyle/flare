@@ -609,7 +609,7 @@ export default class GameChat extends React.Component<
 
         return (
             <Fragment>
-                <div className="mt-4 mb-4 lg:hidden">
+                <div className="mt-4 mb-4 md:hidden">
                     <DropDown
                         menu_items={this.renderDropDownOptions()}
                         button_title={"Chat Tabs"}
@@ -619,7 +619,7 @@ export default class GameChat extends React.Component<
                     />
                     <div className="my-4">{this.renderSelectedTab()}</div>
                 </div>
-                <div className="mt-4 mb-4 hidden lg:block">
+                <div className="mt-4 mb-4 hidden md:block">
                     <Tabs
                         tabs={this.state.tabs}
                         icon_key={"updated"}

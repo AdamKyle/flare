@@ -33,6 +33,7 @@ import PositionType from "./sections/map/types/map/position-type";
 import ScreenRefresh from "./sections/screen-refresh/screen-refresh";
 import KingdomLogDetails from "./components/kingdoms/deffinitions/kingdom-log-details";
 import { FameTasks } from "./components/faction-loyalty/deffinitions/faction-loaylaty";
+import IsTabletInPortraitDisplayAlert from "./components/ui/alerts/tablet-portrait-detector/is-tablet-in-portrait-display-alert";
 
 export default class Game extends React.Component<GameProps, GameState> {
     private gameEventListener?: GameEventListeners;
@@ -304,21 +305,23 @@ export default class Game extends React.Component<GameProps, GameState> {
             <Fragment>
                 <ScreenRefresh user_id={this.state.character.user_id} />
 
+                <IsTabletInPortraitDisplayAlert />
+
                 <Tabs
                     tabs={this.state.tabs}
                     disabled={this.state.disable_tabs}
                     additonal_css={clsx({
-                        "ml-[40px]": this.state.view_port >= 1600,
+                        "ml-[40px]": this.state.view_port >= 1024,
                     })}
                     icon_key={"has_logs"}
                 >
                     <TabPanel key={"game"}>
                         <div
-                            className={clsx("grid lg:grid-cols-3 gap-3", {
-                                "ml-[40px]": this.state.view_port >= 1600,
+                            className={clsx("grid md:grid-cols-3 md:gap-3", {
+                                "ml-[40px]": this.state.view_port >= 1024,
                             })}
                         >
-                            <div className="w-full col-span-3 lg:col-span-2">
+                            <div className="w-full col-span-3 md:col-span-2">
                                 <BasicCard additionalClasses={"mb-10"}>
                                     <CharacterTopSection
                                         character={this.state.character}
@@ -377,7 +380,7 @@ export default class Game extends React.Component<GameProps, GameState> {
 
                                 <div
                                     className={clsx({
-                                        hidden: this.state.view_port > 639,
+                                        hidden: this.state.view_port > 932,
                                     })}
                                 >
                                     <ActiveBoonsActionSection
@@ -387,7 +390,7 @@ export default class Game extends React.Component<GameProps, GameState> {
                                 <BasicCard
                                     additionalClasses={clsx("min-h-60", {
                                         "ml-auto mr-auto":
-                                            this.state.view_port < 1600,
+                                            this.state.view_port < 1024,
                                     })}
                                 >
                                     <ActionTabs
@@ -454,7 +457,7 @@ export default class Game extends React.Component<GameProps, GameState> {
                             <div>
                                 <BasicCard
                                     additionalClasses={clsx(
-                                        "hidden lg:block md:mt-0 lg:col-start-3 lg:col-end-3 max-h-[630px] max-w-[555px]",
+                                        "hidden md:block md:mt-0 lg:col-start-3 lg:col-end-3 max-h-[630px] max-w-[555px]",
                                         {
                                             "max-h-[700px]":
                                                 this.state.character

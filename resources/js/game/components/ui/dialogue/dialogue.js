@@ -112,7 +112,7 @@ var Dialogue = (function (_super) {
                                     "div",
                                     {
                                         className: clsx(
-                                            "inline-block w-full p-6 my-8 text-left align-middle transition-all transform bg-white dark:bg-gray-700 drop-shadow-2xl rounded-md",
+                                            "inline-block w-full p-6 my-8 text-left align-middle transition-all transform bg-white dark:bg-gray-700 drop-shadow-xl rounded-md",
                                             {
                                                 "max-w-7xl":
                                                     this.props.large_modal &&

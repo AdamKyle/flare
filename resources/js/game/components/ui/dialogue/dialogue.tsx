@@ -57,7 +57,7 @@ export default class Dialogue extends React.Component<DialogueTypes, any> {
                                 <div className="flex min-h-full min-w-full items-center justify-center">
                                     <div
                                         className={clsx(
-                                            "inline-block w-full p-6 my-8 text-left align-middle transition-all transform bg-white dark:bg-gray-700 drop-shadow-2xl rounded-md",
+                                            "inline-block w-full p-6 my-8 text-left align-middle transition-all transform bg-white dark:bg-gray-700 drop-shadow-xl rounded-md",
                                             {
                                                 "max-w-7xl":
                                                     this.props.large_modal &&
