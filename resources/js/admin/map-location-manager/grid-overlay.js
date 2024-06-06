@@ -68,16 +68,18 @@ var GridOverlay = (function (_super) {
         var _loop_1 = function (yIndex) {
             var yPos = yCoords[yIndex];
             var _loop_2 = function (xIndex) {
-                var xPos = xCoords[xIndex];
+                var xPos = xCoords[xIndex] - 8;
                 var isHovered =
                     hoveredGridCell.x === xPos && hoveredGridCell.y === yPos;
                 gridCells.push(
                     React.createElement("button", {
                         key: "".concat(xPos, "-").concat(yPos),
-                        className: "grid-cell",
+                        className: "grid-cell ".concat(
+                            isHovered ? "hovered" : "",
+                        ),
                         style: {
-                            left: xPos - 8 + "px",
-                            top: yPos + "px",
+                            left: "".concat(xPos, "px"),
+                            top: "".concat(yPos, "px"),
                             width: "16px",
                             height: "16px",
                             position: "absolute",
@@ -174,13 +176,18 @@ var GridOverlay = (function (_super) {
                 className: "image-container game-map",
                 onMouseMove: this.mouseHandlers.handleMouseMove,
                 onMouseLeave: this.mouseHandlers.handleMouseLeave,
-                style: { position: "relative" },
+                style: {
+                    position: "relative",
+                    width: "2500px",
+                    height: "2500px",
+                },
                 ref: this.gridContainer,
             },
             React.createElement("img", {
                 src: mapSrc,
                 alt: "Background",
                 className: "background-image",
+                style: { width: "100%", height: "100%" },
             }),
             this.renderGrid(),
             this.renderLocationPins(),

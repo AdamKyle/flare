@@ -51,17 +51,17 @@ export default class GridOverlay extends Component<
 
             // Loop through the x coordinates to fill in columns within each row
             for (let xIndex = 0; xIndex < xCoords.length; xIndex++) {
-                const xPos = xCoords[xIndex];
+                const xPos = xCoords[xIndex] - 8;
                 const isHovered =
                     hoveredGridCell.x === xPos && hoveredGridCell.y === yPos;
 
                 gridCells.push(
                     <button
                         key={`${xPos}-${yPos}`} // Unique key for each grid cell
-                        className="grid-cell" // Tailwind CSS class for grid cell
+                        className={`grid-cell ${isHovered ? "hovered" : ""}`} // Tailwind CSS class for grid cell
                         style={{
-                            left: xPos - 8 + "px",
-                            top: yPos + "px",
+                            left: `${xPos}px`,
+                            top: `${yPos}px`,
                             width: "16px",
                             height: "16px",
                             position: "absolute", // Make sure grid cells are positioned absolutely
@@ -152,13 +152,18 @@ export default class GridOverlay extends Component<
                 className="image-container game-map"
                 onMouseMove={this.mouseHandlers.handleMouseMove}
                 onMouseLeave={this.mouseHandlers.handleMouseLeave}
-                style={{ position: "relative" }}
+                style={{
+                    position: "relative",
+                    width: "2500px",
+                    height: "2500px",
+                }}
                 ref={this.gridContainer}
             >
                 <img
                     src={mapSrc}
                     alt="Background"
                     className="background-image"
+                    style={{ width: "100%", height: "100%" }}
                 />
                 {this.renderGrid()}
                 {this.renderLocationPins()}
