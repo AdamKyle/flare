@@ -60,8 +60,8 @@ export default class GridOverlay extends Component<
                         key={`${xPos}-${yPos}`} // Unique key for each grid cell
                         className="grid-cell" // Tailwind CSS class for grid cell
                         style={{
-                            left: xPos - 8,
-                            top: yPos,
+                            left: xPos - 8 + "px",
+                            top: yPos + "px",
                             width: "16px",
                             height: "16px",
                             position: "absolute", // Make sure grid cells are positioned absolutely
