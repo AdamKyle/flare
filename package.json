@@ -3,7 +3,7 @@
   "main": "resources/js/app.ts",
     "scripts": {
         "dev": "vite",
-        "cleanup": "prettier --write resources/js/",
+        "cleanup": "prettier --write 'resources/js/**/*.{ts,tsx}'",
         "build": "yarn run cleanup && vite build",
         "prepare": "husky"
     },
