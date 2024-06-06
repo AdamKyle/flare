@@ -32,6 +32,8 @@ export default defineConfig({
     },
     build: {
         minify: true,
+        sourcemap: false,
+        inlineDynamicImports: true,
         terserOptions: {
             compress: {
                 drop_console: true,
