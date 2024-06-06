@@ -1,1 +1,0 @@
-{"version":3,"file":"kingdom-queue-container.js","sourceRoot":"","sources":["kingdom-queue-container.ts"],"names":[],"mappings":"AACA,OAAO,gBAAgB,MAAM,2BAA2B,CAAC;AAUzD,SAAS,qBAAqB,CAAC,SAAwB;IACnD,SAAS,CAAC,QAAQ,CAAC,2BAA2B,EAAE;QAC5C,QAAQ,EAAE,gBAAgB;KAC7B,CAAC,CAAC;AACP,CAAC;AAED,eAAe,qBAAqB,CAAC"}

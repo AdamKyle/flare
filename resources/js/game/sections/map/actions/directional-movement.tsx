@@ -39,7 +39,7 @@ export default class DirectionalMovement extends React.Component<
         return (
             <Fragment>
                 <div className="border-b-2 border-b-gray-200 dark:border-b-gray-600 my-3 hidden sm:block"></div>
-                <div className="grid gap-2 md:grid-cols-5 gap-4">
+                <div className="grid gap-2 lg:grid-cols-5 gap-4">
                     <PrimaryOutlineButton
                         disabled={!this.props.can_move || this.props.is_dead}
                         button_label={"North"}

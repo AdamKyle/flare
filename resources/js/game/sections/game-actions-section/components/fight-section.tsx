@@ -119,7 +119,7 @@ export default class FightSection extends React.Component<
                         },
                         (error: AxiosError) => {
                             if (typeof error.response !== "undefined") {
-                                const response = error.response;
+                                const response: AxiosResponse = error.response;
 
                                 this.setState({
                                     error_message: response.data.message,
@@ -164,7 +164,7 @@ export default class FightSection extends React.Component<
                         },
                         (error: AxiosError) => {
                             if (typeof error.response !== "undefined") {
-                                const response = error.response;
+                                const response: AxiosResponse = error.response;
 
                                 this.setState({
                                     error_message: response.data.message,
@@ -197,8 +197,7 @@ export default class FightSection extends React.Component<
                 this.state.monster_current_health <= 0
                     ? 0
                     : this.state.monster_max_health,
-            show_clear_message:
-                this.state.monster_current_health <= 0 ? false : true,
+            show_clear_message: this.state.monster_current_health > 0,
         });
     }
 
@@ -211,7 +210,7 @@ export default class FightSection extends React.Component<
     render() {
         if (this.state.setting_up_regular_fight) {
             return (
-                <div className="flex items-center justify-center">
+                <div className="flex items-center justify-center my-4">
                     <LoadingProgressBar />
                 </div>
             );
@@ -219,17 +218,17 @@ export default class FightSection extends React.Component<
 
         if (this.state.error_message !== "") {
             return (
-                <div className="ml-auto mr-auto my-4 md:max-w-[75%]">
+                <div className="ml-auto mr-auto my-4 md:max-w-3/4">
                     <DangerAlert>{this.state.error_message}</DangerAlert>
                 </div>
             );
         }
 
         return (
-            <div className={clsx({ "ml-[-100px]": !this.props.is_small })}>
-                {this.state.monster_to_fight?.highest_element !== "UNKNOWN" ? (
-                    <div className="flex items-center justify-center">
-                        <div className=" mt-4 mb-4 text-center">
+            <div className="m-auto max-w-[75%]">
+                {this.state.monster_to_fight?.highest_element !== "UNKNOWN" && (
+                    <div className="flex items-center justify-center mt-4 mb-4">
+                        <div className="text-center">
                             <PrimaryLinkButton
                                 button_label={"Elemental Atonement Info"}
                                 on_click={this.manageElementalAtonement.bind(
@@ -238,85 +237,92 @@ export default class FightSection extends React.Component<
                             />
                         </div>
                     </div>
-                ) : null}
+                )}
 
                 <div
-                    className={clsx("mt-4 mb-4 text-xs text-center", {
+                    className={clsx("mt-4 mb-4 text-center", {
                         hidden: this.attackButtonDisabled(),
                     })}
                 >
-                    <AttackButton
-                        is_small={this.props.is_small}
-                        type={"Atk"}
-                        additional_css={"btn-attack"}
-                        icon_class={"ra ra-sword"}
-                        on_click={() => this.attack("attack")}
-                        disabled={this.attackButtonDisabled()}
-                    />
-                    <AttackButton
-                        is_small={this.props.is_small}
-                        type={"Cast"}
-                        additional_css={"btn-cast"}
-                        icon_class={"ra ra-burning-book"}
-                        on_click={() => this.attack("cast")}
-                        disabled={this.attackButtonDisabled()}
-                    />
-                    <AttackButton
-                        is_small={this.props.is_small}
-                        type={"Cast & Atk"}
-                        additional_css={"btn-cast-attack"}
-                        icon_class={"ra ra-lightning-sword"}
-                        on_click={() => this.attack("cast_and_attack")}
-                        disabled={this.attackButtonDisabled()}
-                    />
-                    <AttackButton
-                        is_small={this.props.is_small}
-                        type={"Atk & Cast"}
-                        additional_css={"btn-attack-cast"}
-                        icon_class={"ra ra-lightning-sword"}
-                        on_click={() => this.attack("attack_and_cast")}
-                        disabled={this.attackButtonDisabled()}
-                    />
-                    <AttackButton
-                        is_small={this.props.is_small}
-                        type={"Defend"}
-                        additional_css={"btn-defend"}
-                        icon_class={"ra ra-round-shield"}
-                        on_click={() => this.attack("defend")}
-                        disabled={this.attackButtonDisabled()}
-                    />
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
+                        <AttackButton
+                            is_small={this.props.is_small}
+                            type={"Atk"}
+                            additional_css={"btn-attack"}
+                            icon_class={"ra ra-sword"}
+                            on_click={() => this.attack("attack")}
+                            disabled={this.attackButtonDisabled()}
+                        />
+                        <AttackButton
+                            is_small={this.props.is_small}
+                            type={"Cast"}
+                            additional_css={"btn-cast"}
+                            icon_class={"ra ra-burning-book"}
+                            on_click={() => this.attack("cast")}
+                            disabled={this.attackButtonDisabled()}
+                        />
+                        <AttackButton
+                            is_small={this.props.is_small}
+                            type={"Cast & Atk"}
+                            additional_css={"btn-cast-attack"}
+                            icon_class={"ra ra-lightning-sword"}
+                            on_click={() => this.attack("cast_and_attack")}
+                            disabled={this.attackButtonDisabled()}
+                        />
+                        <AttackButton
+                            is_small={this.props.is_small}
+                            type={"Atk & Cast"}
+                            additional_css={"btn-attack-cast"}
+                            icon_class={"ra ra-lightning-sword"}
+                            on_click={() => this.attack("attack_and_cast")}
+                            disabled={this.attackButtonDisabled()}
+                        />
+                        <AttackButton
+                            is_small={this.props.is_small}
+                            type={"Defend"}
+                            additional_css={"btn-defend"}
+                            icon_class={"ra ra-round-shield"}
+                            on_click={() => this.attack("defend")}
+                            disabled={this.attackButtonDisabled()}
+                        />
+                    </div>
                 </div>
+
                 <div
-                    className={clsx("mt-1 text-xs text-center", {
+                    className={clsx("mt-1 text-center", {
                         hidden: this.attackButtonDisabled(),
                     })}
                 >
-                    <span className={"w-10 mr-4 ml-4"}>Atk</span>
-                    <span className={"w-10 ml-6"}>Cast</span>
-                    <span className={"w-10 ml-4"}>Cast & Atk</span>
-                    <span className={"w-10 ml-2"}>Atk & Cast</span>
-                    <span className={"w-10 ml-2"}>Defend</span>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
+                        <span className="w-full">Atk</span>
+                        <span className="w-full">Cast</span>
+                        <span className="w-full">Cast & Atk</span>
+                        <span className="w-full">Atk & Cast</span>
+                        <span className="w-full">Defend</span>
+                    </div>
                 </div>
-                {this.state.processing_rank_battle ||
-                this.state.processing_regular_fight ? (
+
+                {(this.state.processing_rank_battle ||
+                    this.state.processing_regular_fight) && (
                     <div className="w-1/2 mx-auto">
                         <LoadingProgressBar />
                     </div>
-                ) : null}
+                )}
+
                 {this.attackButtonDisabled() &&
-                this.state.show_clear_message ? (
-                    <div className="text-center mt-4">
-                        <button
-                            onClick={this.clearBattleMessages.bind(this)}
-                            className="text-red-500 dark:text-red-400 underline hover:text-red-600 dark:hover:text-red-500"
-                        >
-                            Clear
-                        </button>
-                    </div>
-                ) : null}
-                {this.state.monster_max_health > 0 &&
-                this.props.character !== null ? (
-                    <div className={clsx("mb-4 max-w-md m-auto mt-4")}>
+                    this.state.show_clear_message && (
+                        <div className="text-center mt-4">
+                            <button
+                                onClick={this.clearBattleMessages.bind(this)}
+                                className="text-red-500 dark:text-red-400 underline hover:text-red-600 dark:hover:text-red-500"
+                            >
+                                Clear
+                            </button>
+                        </div>
+                    )}
+
+                {this.state.monster_max_health > 0 && this.props.character && (
+                    <div className="mb-4 max-w-md mx-auto mt-4">
                         <HealthMeters
                             is_enemy={true}
                             name={this.props.monster_to_fight.name}
@@ -330,21 +336,25 @@ export default class FightSection extends React.Component<
                             max_health={this.state.character_max_health}
                         />
                     </div>
-                ) : null}
+                )}
+
                 {this.state.open_elemental_atonement &&
-                this.state.monster_to_fight !== null ? (
-                    <RaidElementInfo
-                        element_atonements={
-                            this.state.monster_to_fight.elemental_atonement
-                        }
-                        highest_element={
-                            this.state.monster_to_fight.highest_element
-                        }
-                        monster_name={this.state.monster_to_fight.name}
-                        is_open={this.state.open_elemental_atonement}
-                        manage_modal={this.manageElementalAtonement.bind(this)}
-                    />
-                ) : null}
+                    this.state.monster_to_fight && (
+                        <RaidElementInfo
+                            element_atonements={
+                                this.state.monster_to_fight.elemental_atonement
+                            }
+                            highest_element={
+                                this.state.monster_to_fight.highest_element
+                            }
+                            monster_name={this.state.monster_to_fight.name}
+                            is_open={this.state.open_elemental_atonement}
+                            manage_modal={this.manageElementalAtonement.bind(
+                                this,
+                            )}
+                        />
+                    )}
+
                 <div className="italic text-center">
                     <BattleMesages
                         battle_messages={this.state.battle_messages}

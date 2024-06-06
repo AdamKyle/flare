@@ -1,1 +1,0 @@
-{"version":3,"file":"inventory-action-confirmation-container.js","sourceRoot":"","sources":["inventory-action-confirmation-container.ts"],"names":[],"mappings":"AAAA,OAAO,iBAAiB,MAAM,gCAAgC,CAAC;AAW/D,SAAS,oCAAoC,CAAC,SAAwB;IAClE,SAAS,CAAC,QAAQ,CAAC,qBAAqB,EAAE;QACtC,QAAQ,EAAE,iBAAiB;KAC9B,CAAC,CAAC;AACP,CAAC;AAED,eAAe,oCAAoC,CAAC"}

@@ -1,1 +1,0 @@
-{"version":3,"file":"timer-event-container.js","sourceRoot":"","sources":["timer-event-container.ts"],"names":[],"mappings":"AACA,OAAO,oBAAoB,MAAM,2CAA2C,CAAC;AAO7E,SAAS,mBAAmB,CAAC,SAAwB;IACjD,SAAS,CAAC,QAAQ,CAAC,qBAAqB,EAAE;QACtC,QAAQ,EAAE,oBAAoB;KACjC,CAAC,CAAC;AACP,CAAC;AAED,eAAe,mBAAmB,CAAC"}

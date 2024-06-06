@@ -11,8 +11,7 @@ export const getNewYPosition = (
     characterY: number,
     mapPositionY: number,
 ): number => {
-    console.log(characterY);
-    if (characterY <= 512) {
+    if (characterY <= 304) {
         return 0;
     }
 
@@ -40,8 +39,8 @@ export const getNewYPosition = (
         return -810;
     }
 
-    if (characterY > 513) {
-        return -500;
+    if (characterY > 304) {
+        return -300;
     }
 
     return mapPositionY;

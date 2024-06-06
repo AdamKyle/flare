@@ -140,7 +140,7 @@ export default class MapActions extends React.Component<
     render() {
         return (
             <Fragment>
-                <div className="grid md:grid-cols-5 gap-2">
+                <div className="grid lg:grid-cols-5 gap-2">
                     <PrimaryOutlineButton
                         button_label={"View Location Details"}
                         on_click={this.manageViewLocation.bind(this)}

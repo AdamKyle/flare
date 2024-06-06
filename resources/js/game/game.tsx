@@ -302,289 +302,260 @@ export default class Game extends React.Component<GameProps, GameState> {
         }
 
         return (
-            <Fragment>
-                <ScreenRefresh user_id={this.state.character.user_id} />
+            <div className="flex flex-col">
+                <div>
+                    <ScreenRefresh user_id={this.state.character.user_id} />
 
-                <IsTabletInPortraitDisplayAlert />
+                    <IsTabletInPortraitDisplayAlert />
 
-                <Tabs
-                    tabs={this.state.tabs}
-                    disabled={this.state.disable_tabs}
-                    additonal_css={clsx({
-                        "ml-[40px]": this.state.view_port >= 1024,
-                    })}
-                    icon_key={"has_logs"}
-                >
-                    <TabPanel key={"game"}>
-                        <div
-                            className={clsx("grid md:grid-cols-3 md:gap-3", {
-                                "ml-[40px]": this.state.view_port >= 1024,
-                            })}
-                        >
-                            <div className="w-full col-span-3 md:col-span-2">
-                                <BasicCard additionalClasses={"mb-10"}>
-                                    <CharacterTopSection
-                                        character={this.state.character}
-                                        view_port={this.state.view_port}
-                                        update_character_status={this.updateCharacterStatus.bind(
-                                            this,
-                                        )}
-                                        update_character_currencies={this.updateCharacterCurrencies.bind(
-                                            this,
-                                        )}
-                                    />
-                                </BasicCard>
-
-                                {!this.state.hide_donation_alert ? (
-                                    <WarningAlert
-                                        additional_css={"mb-4 mt-[-10px]"}
-                                        close_alert={this.closeDonationAlert.bind(
-                                            this,
-                                        )}
-                                    >
-                                        <p className={"my-2"}>
-                                            <strong>
-                                                Tlessa needs your help,
-                                            </strong>
-                                        </p>
-
-                                        <p className="my-2">
-                                            Tlessa needs your help to survive.
-                                            Please, consider donating to support
-                                            the continued development of Planes
-                                            of Tlessa.
-                                        </p>
-
-                                        <p className="my-2">
-                                            <a
-                                                href="/tlessa-donations"
-                                                target="_blank"
-                                            >
-                                                Learn more here{" "}
-                                                <i className="fas fa-external-link-alt"></i>
-                                            </a>
-                                            . Tlessa and I deeply appreciate
-                                            your contribution in keeping this
-                                            amazing game alive!
-                                        </p>
-                                    </WarningAlert>
-                                ) : null}
-
-                                {this.state.show_guide_quest_completed ? (
-                                    <SuccessAlert additional_css={"mb-4"}>
-                                        You have completed a guide quest. Click
-                                        the button in the top right to collect
-                                        your rewards and move on to the next!
-                                    </SuccessAlert>
-                                ) : null}
-
-                                <div
-                                    className={clsx({
-                                        hidden: this.state.view_port > 932,
-                                    })}
-                                >
-                                    <ActiveBoonsActionSection
-                                        character_id={this.props.characterId}
-                                    />
-                                </div>
-                                <BasicCard
-                                    additionalClasses={clsx("min-h-60", {
-                                        "ml-auto mr-auto":
-                                            this.state.view_port < 1024,
-                                    })}
-                                >
-                                    <ActionTabs
-                                        use_tabs={
-                                            this.state.character
-                                                .can_see_pledge_tab
-                                        }
-                                        user_id={this.props.userId}
-                                        character_id={this.props.characterId}
-                                        can_attack={
-                                            this.state.character.can_attack
-                                        }
-                                        can_craft={
-                                            this.state.character.can_craft
-                                        }
-                                        update_faction_action_tasks={this.updateFactionActionTasks.bind(
-                                            this,
-                                        )}
-                                        character_map_id={gameMapId}
-                                    >
-                                        <ActionSection
+                    <Tabs
+                        tabs={this.state.tabs}
+                        disabled={this.state.disable_tabs}
+                        additonal_css={clsx({
+                            "ml-[40px]": this.state.view_port >= 1024,
+                        })}
+                        icon_key={"has_logs"}
+                    >
+                        <TabPanel key={"game"}>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="md:col-span-1">
+                                    <BasicCard additionalClasses="w-full">
+                                        <CharacterTopSection
                                             character={this.state.character}
-                                            character_status={
-                                                this.state.character_status
-                                            }
-                                            character_position={
-                                                this.state.position
-                                            }
-                                            character_currencies={
-                                                this.state.character_currencies
-                                            }
-                                            celestial_id={
-                                                this.state.celestial_id
-                                            }
-                                            update_celestial={this.updateCelestial.bind(
-                                                this,
-                                            )}
-                                            update_plane_quests={this.updateQuestPlane.bind(
-                                                this,
-                                            )}
-                                            update_character_position={this.setCharacterPosition.bind(
-                                                this,
-                                            )}
                                             view_port={this.state.view_port}
-                                            can_engage_celestial={
-                                                this.state.character
-                                                    .can_engage_celestials
-                                            }
-                                            action_data={this.state.action_data}
-                                            map_data={this.state.map_data}
-                                            update_parent_state={this.setActionState.bind(
+                                            update_character_status={this.updateCharacterStatus.bind(
                                                 this,
                                             )}
-                                            set_map_data={this.setMapState.bind(
+                                            update_character_currencies={this.updateCharacterCurrencies.bind(
                                                 this,
                                             )}
-                                            fame_tasks={
-                                                this.state.fame_action_tasks
+                                        />
+                                    </BasicCard>
+                                    {!this.state.hide_donation_alert && (
+                                        <WarningAlert
+                                            additional_css="mb-4 mt-[-10px]"
+                                            close_alert={this.closeDonationAlert.bind(
+                                                this,
+                                            )}
+                                        >
+                                            {/* Content of warning alert */}
+                                        </WarningAlert>
+                                    )}
+                                    {this.state.show_guide_quest_completed && (
+                                        <SuccessAlert additional_css="mb-4">
+                                            {/* Content of success alert */}
+                                        </SuccessAlert>
+                                    )}
+                                    <div
+                                        className={clsx({
+                                            hidden: this.state.view_port > 932,
+                                        })}
+                                    >
+                                        <ActiveBoonsActionSection
+                                            character_id={
+                                                this.props.characterId
                                             }
                                         />
-                                    </ActionTabs>
-                                </BasicCard>
-                            </div>
-                            <div>
-                                <BasicCard
-                                    additionalClasses={clsx(
-                                        "hidden md:block md:mt-0 lg:col-start-3 lg:col-end-3 max-h-[630px] max-w-[555px]",
-                                        {
-                                            "max-h-[700px]":
+                                    </div>
+                                    <BasicCard additionalClasses="min-h-60 mt-4">
+                                        <ActionTabs
+                                            use_tabs={
                                                 this.state.character
-                                                    .can_use_event_goals_button,
-                                            "max-h-[624px]":
-                                                this.state.character.is_dead,
-                                        },
-                                    )}
-                                >
-                                    <MapTabs
-                                        use_tabs={
-                                            this.state.character
-                                                .can_use_event_goals_button
-                                        }
-                                        character_id={this.state.character.id}
-                                        user_id={this.state.character.user_id}
-                                    >
-                                        <MapSection
+                                                    .can_see_pledge_tab
+                                            }
                                             user_id={this.props.userId}
                                             character_id={
                                                 this.props.characterId
                                             }
-                                            view_port={this.state.view_port}
-                                            currencies={
-                                                this.state.character_currencies
+                                            can_attack={
+                                                this.state.character.can_attack
                                             }
-                                            is_dead={
-                                                this.state.character.is_dead
+                                            can_craft={
+                                                this.state.character.can_craft
                                             }
-                                            is_automaton_running={
-                                                this.state.character
-                                                    .is_automation_running
-                                            }
-                                            can_engage_celestial={
-                                                this.state.character
-                                                    .can_engage_celestials
-                                            }
-                                            automation_completed_at={
-                                                this.state.character
-                                                    .automation_completed_at
-                                            }
-                                            can_engage_celestials_again_at={
-                                                this.state.character
-                                                    .can_engage_celestials_again_at
-                                            }
-                                            show_celestial_fight_button={this.updateCelestial.bind(
+                                            update_faction_action_tasks={this.updateFactionActionTasks.bind(
                                                 this,
                                             )}
-                                            set_character_position={this.setCharacterPosition.bind(
-                                                this,
-                                            )}
-                                            update_character_quests_plane={this.updateQuestPlane.bind(
-                                                this,
-                                            )}
-                                            disable_bottom_timer={false}
-                                            map_data={this.state.map_data}
-                                            set_map_data={this.setMapState.bind(
-                                                this,
-                                            )}
-                                        />
-                                    </MapTabs>
-                                </BasicCard>
+                                            character_map_id={gameMapId}
+                                        >
+                                            <ActionSection
+                                                character={this.state.character}
+                                                character_status={
+                                                    this.state.character_status
+                                                }
+                                                character_position={
+                                                    this.state.position
+                                                }
+                                                character_currencies={
+                                                    this.state
+                                                        .character_currencies
+                                                }
+                                                celestial_id={
+                                                    this.state.celestial_id
+                                                }
+                                                update_celestial={this.updateCelestial.bind(
+                                                    this,
+                                                )}
+                                                update_plane_quests={this.updateQuestPlane.bind(
+                                                    this,
+                                                )}
+                                                update_character_position={this.setCharacterPosition.bind(
+                                                    this,
+                                                )}
+                                                view_port={this.state.view_port}
+                                                can_engage_celestial={
+                                                    this.state.character
+                                                        .can_engage_celestials
+                                                }
+                                                action_data={
+                                                    this.state.action_data
+                                                }
+                                                map_data={this.state.map_data}
+                                                update_parent_state={this.setActionState.bind(
+                                                    this,
+                                                )}
+                                                set_map_data={this.setMapState.bind(
+                                                    this,
+                                                )}
+                                                fame_tasks={
+                                                    this.state.fame_action_tasks
+                                                }
+                                            />
+                                        </ActionTabs>
+                                    </BasicCard>
+                                </div>
+                                <div className="md:col-span-1">
+                                    <BasicCard additionalClasses="lg:max-h-[630px] max-w-[555px]">
+                                        <MapTabs
+                                            use_tabs={
+                                                this.state.character
+                                                    .can_use_event_goals_button
+                                            }
+                                            character_id={
+                                                this.state.character.id
+                                            }
+                                            user_id={
+                                                this.state.character.user_id
+                                            }
+                                        >
+                                            <MapSection
+                                                user_id={this.props.userId}
+                                                character_id={
+                                                    this.props.characterId
+                                                }
+                                                view_port={this.state.view_port}
+                                                currencies={
+                                                    this.state
+                                                        .character_currencies
+                                                }
+                                                is_dead={
+                                                    this.state.character.is_dead
+                                                }
+                                                is_automaton_running={
+                                                    this.state.character
+                                                        .is_automation_running
+                                                }
+                                                can_engage_celestial={
+                                                    this.state.character
+                                                        .can_engage_celestials
+                                                }
+                                                automation_completed_at={
+                                                    this.state.character
+                                                        .automation_completed_at
+                                                }
+                                                can_engage_celestials_again_at={
+                                                    this.state.character
+                                                        .can_engage_celestials_again_at
+                                                }
+                                                show_celestial_fight_button={this.updateCelestial.bind(
+                                                    this,
+                                                )}
+                                                set_character_position={this.setCharacterPosition.bind(
+                                                    this,
+                                                )}
+                                                update_character_quests_plane={this.updateQuestPlane.bind(
+                                                    this,
+                                                )}
+                                                disable_bottom_timer={false}
+                                                map_data={this.state.map_data}
+                                                set_map_data={this.setMapState.bind(
+                                                    this,
+                                                )}
+                                            />
+                                        </MapTabs>
+                                    </BasicCard>
+                                </div>
                             </div>
-                        </div>
-                    </TabPanel>
-                    <TabPanel key={"character-sheet"}>
-                        <CharacterSheet
-                            character={this.state.character}
-                            finished_loading={this.state.finished_loading}
-                            view_port={this.state.view_port}
-                            update_disable_tabs={this.updateDisabledTabs.bind(
-                                this,
-                            )}
-                            update_pledge_tab={this.setCanSeeFactionLoyaltyTab.bind(
-                                this,
-                            )}
-                            update_faction_action_tasks={this.updateFactionActionTasks.bind(
-                                this,
-                            )}
-                        />
-                    </TabPanel>
-                    <TabPanel key={"quests"}>
-                        <BasicCard>
-                            <Quests
-                                quest_details={this.state.quests}
-                                character_id={this.props.characterId}
-                                update_quests={this.updateCharacterQuests.bind(
+                        </TabPanel>
+                        <TabPanel key={"character-sheet"}>
+                            <CharacterSheet
+                                character={this.state.character}
+                                finished_loading={this.state.finished_loading}
+                                view_port={this.state.view_port}
+                                update_disable_tabs={this.updateDisabledTabs.bind(
+                                    this,
+                                )}
+                                update_pledge_tab={this.setCanSeeFactionLoyaltyTab.bind(
+                                    this,
+                                )}
+                                update_faction_action_tasks={this.updateFactionActionTasks.bind(
                                     this,
                                 )}
                             />
-                        </BasicCard>
-                    </TabPanel>
-                    <TabPanel key={"kingdoms"}>
-                        <KingdomsList
-                            is_dead={this.state.character_status.is_dead}
-                            my_kingdoms={this.state.kingdoms}
-                            logs={this.state.kingdom_logs}
-                            view_port={this.state.view_port}
-                            character_gold={removeCommas(
-                                this.state.character.gold,
-                            )}
-                            user_id={this.state.character.user_id}
+                        </TabPanel>
+                        <TabPanel key={"quests"}>
+                            <BasicCard>
+                                <Quests
+                                    quest_details={this.state.quests}
+                                    character_id={this.props.characterId}
+                                    update_quests={this.updateCharacterQuests.bind(
+                                        this,
+                                    )}
+                                />
+                            </BasicCard>
+                        </TabPanel>
+                        <TabPanel key={"kingdoms"}>
+                            <KingdomsList
+                                is_dead={this.state.character_status.is_dead}
+                                my_kingdoms={this.state.kingdoms}
+                                logs={this.state.kingdom_logs}
+                                view_port={this.state.view_port}
+                                character_gold={removeCommas(
+                                    this.state.character.gold,
+                                )}
+                                user_id={this.state.character.user_id}
+                            />
+                        </TabPanel>
+                    </Tabs>
+
+                    <GameChat
+                        user_id={this.props.userId}
+                        character_id={this.state.character.id}
+                        is_silenced={this.state.character.is_silenced}
+                        can_talk_again_at={
+                            this.state.character.can_talk_again_at
+                        }
+                        is_automation_running={
+                            this.state.character.is_automation_running
+                        }
+                        is_admin={false}
+                        view_port={this.state.view_port}
+                        update_finished_loading={this.updateFinishedLoading.bind(
+                            this,
+                        )}
+                    />
+
+                    {this.state.character.force_name_change ? (
+                        <ForceNameChange
+                            character_id={this.state.character.id}
                         />
-                    </TabPanel>
-                </Tabs>
+                    ) : null}
 
-                <GameChat
-                    user_id={this.props.userId}
-                    character_id={this.state.character.id}
-                    is_silenced={this.state.character.is_silenced}
-                    can_talk_again_at={this.state.character.can_talk_again_at}
-                    is_automation_running={
-                        this.state.character.is_automation_running
-                    }
-                    is_admin={false}
-                    view_port={this.state.view_port}
-                    update_finished_loading={this.updateFinishedLoading.bind(
-                        this,
-                    )}
-                />
-
-                {this.state.character.force_name_change ? (
-                    <ForceNameChange character_id={this.state.character.id} />
-                ) : null}
-
-                {this.state.show_global_timeout ? <GlobalTimeoutModal /> : null}
-            </Fragment>
+                    {this.state.show_global_timeout ? (
+                        <GlobalTimeoutModal />
+                    ) : null}
+                </div>
+            </div>
         );
     }
 }
