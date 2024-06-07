@@ -244,61 +244,66 @@ export default class FightSection extends React.Component<
                         hidden: this.attackButtonDisabled(),
                     })}
                 >
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
-                        <AttackButton
-                            is_small={this.props.is_small}
-                            type={"Atk"}
-                            additional_css={"btn-attack"}
-                            icon_class={"ra ra-sword"}
-                            on_click={() => this.attack("attack")}
-                            disabled={this.attackButtonDisabled()}
-                        />
-                        <AttackButton
-                            is_small={this.props.is_small}
-                            type={"Cast"}
-                            additional_css={"btn-cast"}
-                            icon_class={"ra ra-burning-book"}
-                            on_click={() => this.attack("cast")}
-                            disabled={this.attackButtonDisabled()}
-                        />
-                        <AttackButton
-                            is_small={this.props.is_small}
-                            type={"Cast & Atk"}
-                            additional_css={"btn-cast-attack"}
-                            icon_class={"ra ra-lightning-sword"}
-                            on_click={() => this.attack("cast_and_attack")}
-                            disabled={this.attackButtonDisabled()}
-                        />
-                        <AttackButton
-                            is_small={this.props.is_small}
-                            type={"Atk & Cast"}
-                            additional_css={"btn-attack-cast"}
-                            icon_class={"ra ra-lightning-sword"}
-                            on_click={() => this.attack("attack_and_cast")}
-                            disabled={this.attackButtonDisabled()}
-                        />
-                        <AttackButton
-                            is_small={this.props.is_small}
-                            type={"Defend"}
-                            additional_css={"btn-defend"}
-                            icon_class={"ra ra-round-shield"}
-                            on_click={() => this.attack("defend")}
-                            disabled={this.attackButtonDisabled()}
-                        />
-                    </div>
-                </div>
-
-                <div
-                    className={clsx("mt-1 text-center", {
-                        hidden: this.attackButtonDisabled(),
-                    })}
-                >
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
-                        <span className="w-full">Atk</span>
-                        <span className="w-full">Cast</span>
-                        <span className="w-full">Cast & Atk</span>
-                        <span className="w-full">Atk & Cast</span>
-                        <span className="w-full">Defend</span>
+                    <div className="flex justify-center space-x-2 md:space-x-2 lg:space-x-3">
+                        <div className="flex flex-col items-center">
+                            <AttackButton
+                                is_small={this.props.is_small}
+                                type={"Atk"}
+                                additional_css={"btn-attack"}
+                                icon_class={"ra ra-sword"}
+                                on_click={() => this.attack("attack")}
+                                disabled={this.attackButtonDisabled()}
+                            />
+                            <span className="w-full text-center">Atk</span>
+                        </div>
+                        <div className="flex flex-col items-center">
+                            <AttackButton
+                                is_small={this.props.is_small}
+                                type={"Cast"}
+                                additional_css={"btn-cast"}
+                                icon_class={"ra ra-burning-book"}
+                                on_click={() => this.attack("cast")}
+                                disabled={this.attackButtonDisabled()}
+                            />
+                            <span className="w-full text-center">Cast</span>
+                        </div>
+                        <div className="flex flex-col items-center">
+                            <AttackButton
+                                is_small={this.props.is_small}
+                                type={"Cast & Atk"}
+                                additional_css={"btn-cast-attack"}
+                                icon_class={"ra ra-lightning-sword"}
+                                on_click={() => this.attack("cast_and_attack")}
+                                disabled={this.attackButtonDisabled()}
+                            />
+                            <span className="w-full text-center">
+                                Cast & Atk
+                            </span>
+                        </div>
+                        <div className="flex flex-col items-center">
+                            <AttackButton
+                                is_small={this.props.is_small}
+                                type={"Atk & Cast"}
+                                additional_css={"btn-attack-cast"}
+                                icon_class={"ra ra-lightning-sword"}
+                                on_click={() => this.attack("attack_and_cast")}
+                                disabled={this.attackButtonDisabled()}
+                            />
+                            <span className="w-full text-center">
+                                Atk & Cast
+                            </span>
+                        </div>
+                        <div className="flex flex-col items-center">
+                            <AttackButton
+                                is_small={this.props.is_small}
+                                type={"Defend"}
+                                additional_css={"btn-defend"}
+                                icon_class={"ra ra-round-shield"}
+                                on_click={() => this.attack("defend")}
+                                disabled={this.attackButtonDisabled()}
+                            />
+                            <span className="w-full text-center">Defend</span>
+                        </div>
                     </div>
                 </div>
 

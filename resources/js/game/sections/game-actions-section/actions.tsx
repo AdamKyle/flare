@@ -424,7 +424,7 @@ export default class Actions extends React.Component<
                             !this.state.show_duel_fight &&
                             !this.state.show_join_pvp &&
                             this.props.can_engage_celestial && (
-                                <div className="w-full md:w-3/4">
+                                <div className="w-full lg:w-3/4">
                                     <SuccessOutlineButton
                                         button_label={"Fight Celestial!"}
                                         on_click={this.manageFightCelestial.bind(
@@ -445,7 +445,7 @@ export default class Actions extends React.Component<
                             !this.state.show_exploration &&
                             !this.state.show_join_pvp &&
                             !this.state.show_celestial_fight && (
-                                <div className="w-full md:w-3/4">
+                                <div className="w-full lg:w-3/4">
                                     <SuccessOutlineButton
                                         button_label={"Duel!"}
                                         on_click={this.manageDuel.bind(this)}
@@ -464,7 +464,7 @@ export default class Actions extends React.Component<
                             !this.state.show_duel_fight &&
                             !this.state.show_exploration &&
                             !this.state.show_celestial_fight && (
-                                <div className="w-full md:w-3/4">
+                                <div className="w-full lg:w-3/4">
                                     <SkyOutlineButton
                                         button_label={"Join PVP"}
                                         on_click={this.manageJoinPvp.bind(this)}
