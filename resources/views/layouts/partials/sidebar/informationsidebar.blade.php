@@ -251,6 +251,10 @@
                 <span class="fas fa-expand-arrows-alt"></span>
                 Kingdom Resource Expansion
             </a>
+            <a href="{{ route('info.page', ['pageName' => 'resource-request']) }}">
+                <span class="fas fa-people-carry"></span>
+                Kingdom Resource Expansion
+            </a>
         </div>
     </div>
 
