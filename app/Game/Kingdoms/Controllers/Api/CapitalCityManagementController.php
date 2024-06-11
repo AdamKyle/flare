@@ -12,7 +12,7 @@ class CapitalCityManagementController extends Controller {
 
     public function __construct(private readonly CapitalCityManagementService $capitalCityManagementService) {}
 
-    public function makeCapitalCity(Kingdom $kingdom): JsonResponse {
+    public function makeCapitalCity(Kingdom $kingdom, Character $character): JsonResponse {
         $result = $this->capitalCityManagementService->makeCapitalCity($kingdom);
 
         $status = $result['status'];

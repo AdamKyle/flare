@@ -39,7 +39,6 @@ export default class KingdomDetails extends React.Component<
             show_resource_transfer: false,
             show_make_capital_city: false,
         };
-        CallForReinforcements;
     }
 
     componentDidUpdate(
@@ -355,7 +354,7 @@ export default class KingdomDetails extends React.Component<
                                     )}
                                 />
                             ) : (
-                                <SuccessButton
+                                <SuccessOutlineButton
                                     button_label={"Small Council"}
                                     on_click={this.showMakeCapitalCityModal.bind(
                                         this,
@@ -458,6 +457,8 @@ export default class KingdomDetails extends React.Component<
                     <MakeCityACapitalModal
                         is_open={true}
                         handle_close={this.showMakeCapitalCityModal.bind(this)}
+                        kingdom_id={this.props.kingdom.id}
+                        character_id={this.props.kingdom.character_id}
                     />
                 ) : null}
             </Fragment>

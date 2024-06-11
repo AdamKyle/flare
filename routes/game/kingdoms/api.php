@@ -93,6 +93,8 @@ Route::middleware([
     'auth', 'is.character.who.they.say.they.are', 'character.owns.kingdom'
 ])->group(function() {
     Route::get('/kingdom/queues/{kingdom}/{character}', ['as' => 'kingdom.queues', 'uses' => 'Api\KingdomQueueController@fetchQueuesForKingdom']);
+
+    Route::post('/kingdom/make-capital-city/{kingdom}/{character}', ['as' => 'kingdom.make.capital.city', 'uses' => 'Api\CapitalCityManagementController@makeCapitalCity']);
 });
 
 
