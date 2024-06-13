@@ -5,10 +5,10 @@ import SuccessAlert from "../../../components/ui/alerts/simple-alerts/success-al
 import Table from "../../../components/ui/data-tables/table";
 import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
 import Ajax from "../../../lib/ajax/ajax";
-import BuildingsTableProps from "../../../lib/game/kingdoms/types/buildings-table-props";
-import UpgradeTablesState from "../../../lib/game/kingdoms/types/upgrade-tables-state";
 import { buildBuildingsColumns } from "../table-columns/build-buildings-columns";
 import BuildingDetails from "./deffinitions/building-details";
+import BuildingsTableProps from "../types/buildings-table-props";
+import UpgradeTablesState from "../types/upgrade-tables-state";
 
 export default class BuildingsTable extends React.Component<
     BuildingsTableProps,
@@ -67,7 +67,7 @@ export default class BuildingsTable extends React.Component<
                         },
                         (error: AxiosError) => {
                             if (typeof error.response !== "undefined") {
-                                const response = error.response;
+                                const response: AxiosResponse = error.response;
 
                                 this.setState({
                                     error_message: response.data.message,

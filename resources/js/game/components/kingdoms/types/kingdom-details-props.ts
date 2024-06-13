@@ -9,5 +9,7 @@ export default interface KingdomDetailsProps {
 
     show_resource_transfer_card: () => void;
 
+    show_small_council: () => void;
+
     reset_resource_transfer: boolean;
 }

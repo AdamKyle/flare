@@ -16,6 +16,7 @@ import UnitDetails from "./deffinitions/unit-details";
 import BuildingInQueueDetails from "./deffinitions/building-in-queue-details";
 import UnitsInQueue from "./deffinitions/units-in-queue";
 import KingdomResourceTransfer from "./kingdom-resource-transfer";
+import SmallCouncil from "./capital-city/small-council";
 
 export default class Kingdom extends React.Component<KingdomProps, any> {
     private updateKingdomListener: KingdomEventListener;
@@ -31,6 +32,7 @@ export default class Kingdom extends React.Component<KingdomProps, any> {
             kingdom: null,
             show_resource_transfer_panel: false,
             should_reset_resource_transfer: false,
+            show_small_council: false,
         };
 
         this.updateKingdomListener =
@@ -73,6 +75,12 @@ export default class Kingdom extends React.Component<KingdomProps, any> {
             );
 
         this.updateKingdomListener.listen();
+    }
+
+    manageSmallCouncil() {
+        this.setState({
+            show_small_council: !this.state.show_small_council,
+        });
     }
 
     manageViewBuilding(building?: BuildingDetails) {
@@ -142,6 +150,10 @@ export default class Kingdom extends React.Component<KingdomProps, any> {
             return <LoadingProgressBar />;
         }
 
+        if (this.state.show_small_council) {
+            return <SmallCouncil />;
+        }
+
         return (
             <Fragment>
                 {this.state.kingdom.is_protected ? (
@@ -180,6 +192,9 @@ export default class Kingdom extends React.Component<KingdomProps, any> {
                                 character_gold={this.props.character_gold}
                                 close_details={this.props.close_details}
                                 show_resource_transfer_card={this.showResourceTransferPanel.bind(
+                                    this,
+                                )}
+                                show_small_council={this.manageSmallCouncil.bind(
                                     this,
                                 )}
                                 reset_resource_transfer={

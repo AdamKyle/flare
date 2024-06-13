@@ -17,7 +17,6 @@ import KingdomDetailsProps from "./types/kingdom-details-props";
 import KingdomDetailsState from "./types/kingdom-details-state";
 import OrangeOutlineButton from "../ui/buttons/orange-outline-button";
 import MakeCityACapitalModal from "./modals/make-city-a-capital-modal";
-import SuccessButton from "../ui/buttons/success-button";
 
 export default class KingdomDetails extends React.Component<
     KingdomDetailsProps,
@@ -356,9 +355,7 @@ export default class KingdomDetails extends React.Component<
                             ) : (
                                 <SuccessOutlineButton
                                     button_label={"Small Council"}
-                                    on_click={this.showMakeCapitalCityModal.bind(
-                                        this,
-                                    )}
+                                    on_click={this.props.show_small_council}
                                 />
                             )}
                         </div>
