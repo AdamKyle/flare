@@ -1,5 +1,5 @@
-import UnitDetails from "../../../../lib/game/kingdoms/deffinitions/unit-details";
 import DataTableBaseData from "../../../../lib/ui/types/tables/data-table-base-data";
+import UnitDetails from "../../deffinitions/unit-details";
 
 export default interface BuildingDetails extends DataTableBaseData {
     [key: string]: number | string | boolean | null | UnitDetails[] | [];

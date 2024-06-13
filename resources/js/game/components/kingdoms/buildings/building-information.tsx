@@ -9,14 +9,14 @@ import LoadingProgressBar from "../../../components/ui/progress-bars/loading-pro
 import Ajax from "../../../lib/ajax/ajax";
 import { formatNumber } from "../../../lib/game/format-number";
 import BuildingTimeCalculation from "../helpers/calculations/building-time-calculation";
-import TimeHelpModal from "../modals/time-help-modal";
 import ResourceBuildingExpansion from "./resource-building-expansion";
 import BuildingInformationProps from "./types/building-information-props";
 import UpgradeWithResources from "./upgrade-with-resources";
+import BuildingInformationState from "./types/building-information-state";
 
 export default class BuildingInformation extends React.Component<
     BuildingInformationProps,
-    any
+    BuildingInformationState
 > {
     private buildingTimeCalculation: BuildingTimeCalculation;
 
@@ -28,6 +28,7 @@ export default class BuildingInformation extends React.Component<
             success_message: "",
             error_message: "",
             loading: false,
+            to_level: 0,
         };
 
         this.buildingTimeCalculation = new BuildingTimeCalculation();
@@ -40,6 +41,12 @@ export default class BuildingInformation extends React.Component<
         ) {
             this.setState({
                 upgrade_section: "repair-building",
+            });
+        }
+
+        if (!this.props.building.is_maxed) {
+            this.setState({
+                to_level: this.props.building.level + 1,
             });
         }
     }
@@ -59,12 +66,6 @@ export default class BuildingInformation extends React.Component<
     showSelectedForm(type: string) {
         this.setState({
             upgrade_section: type,
-        });
-    }
-
-    manageHelpDialogue() {
-        this.setState({
-            show_time_help: !this.state.show_time_help,
         });
     }
 
@@ -108,7 +109,7 @@ export default class BuildingInformation extends React.Component<
                             this.setState({ loading: false });
 
                             if (typeof error.response !== "undefined") {
-                                const response = error.response;
+                                const response: AxiosResponse = error.response;
 
                                 this.setState({
                                     error_message: response.data.message,
@@ -290,8 +291,8 @@ export default class BuildingInformation extends React.Component<
                                           .kingdom_building_time_reduction,
                                   )
                                   .toFixed(2),
-                          )
-                        : this.getRebuildTime()}
+                          ) + " Minutes"
+                        : this.getRebuildTime() + " Minutes"}
                 </dd>
             </dl>
         );
@@ -427,14 +428,6 @@ export default class BuildingInformation extends React.Component<
                         </div>
                     </div>
                 </BasicCard>
-                {this.state.show_time_help ? (
-                    <TimeHelpModal
-                        is_in_minutes={true}
-                        is_in_seconds={false}
-                        manage_modal={this.manageHelpDialogue.bind(this)}
-                        time={this.state.time_needed}
-                    />
-                ) : null}
             </Fragment>
         );
     }

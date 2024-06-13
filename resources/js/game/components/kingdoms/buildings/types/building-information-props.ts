@@ -1,5 +1,5 @@
-import InformationPropsBase from "../../../../lib/game/kingdoms/deffinitions/information-props-base";
 import BuildingDetails from "../deffinitions/building-details";
+import InformationPropsBase from "../../deffinitions/information-props-base";
 
 export default interface BuildingInformationProps extends InformationPropsBase {
     user_id: number;

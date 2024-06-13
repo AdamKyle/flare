@@ -49,7 +49,7 @@ export default class UpgradeWithResources extends React.Component<any, any> {
                         },
                         (error: AxiosError) => {
                             if (typeof error.response !== "undefined") {
-                                const response = error.response;
+                                const response: AxiosResponse = error.response;
 
                                 let message = response.data.message;
 
