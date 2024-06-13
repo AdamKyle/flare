@@ -123,16 +123,17 @@ var Kingdom = (function (_super) {
         if (this.state.loading && this.state.kingdom === null) {
             return React.createElement(LoadingProgressBar, null);
         }
-        if (this.state.show_small_council) {
-            return React.createElement(SmallCouncil, null);
-        }
         return (React.createElement(Fragment, null,
             this.state.kingdom.is_protected ? (React.createElement(InfoAlert, { additional_css: "mt-4 mb-4" },
                 "Your kingdom is under protection from attacks for the next: ",
                 this.state.kingdom.protected_days_left,
                 " day(s). This value does not include today.")) : null,
             React.createElement("div", { className: "grid md:grid-cols-2 gap-4" },
-                this.state.show_resource_transfer_panel ? (React.createElement(BasicCard, null,
+                this.state.show_small_council ? (React.createElement(BasicCard, null,
+                    React.createElement("div", { className: "text-right cursor-pointer text-red-500" },
+                        React.createElement("button", { onClick: this.manageSmallCouncil.bind(this) },
+                            React.createElement("i", { className: "fas fa-minus-circle" }))),
+                    React.createElement(SmallCouncil, { character_id: this.props.kingdom.character_id }))) : this.state.show_resource_transfer_panel ? (React.createElement(BasicCard, null,
                     React.createElement("div", { className: "text-right cursor-pointer text-red-500" },
                         React.createElement("button", { onClick: this.showResourceTransferPanel.bind(this) },
                             React.createElement("i", { className: "fas fa-minus-circle" }))),

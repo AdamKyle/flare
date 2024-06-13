@@ -150,10 +150,6 @@ export default class Kingdom extends React.Component<KingdomProps, any> {
             return <LoadingProgressBar />;
         }
 
-        if (this.state.show_small_council) {
-            return <SmallCouncil />;
-        }
-
         return (
             <Fragment>
                 {this.state.kingdom.is_protected ? (
@@ -164,7 +160,20 @@ export default class Kingdom extends React.Component<KingdomProps, any> {
                     </InfoAlert>
                 ) : null}
                 <div className="grid md:grid-cols-2 gap-4">
-                    {this.state.show_resource_transfer_panel ? (
+                    {this.state.show_small_council ? (
+                        <BasicCard>
+                            <div className="text-right cursor-pointer text-red-500">
+                                <button
+                                    onClick={this.manageSmallCouncil.bind(this)}
+                                >
+                                    <i className="fas fa-minus-circle"></i>
+                                </button>
+                            </div>
+                            <SmallCouncil
+                                character_id={this.props.kingdom.character_id}
+                            />
+                        </BasicCard>
+                    ) : this.state.show_resource_transfer_panel ? (
                         <BasicCard>
                             <div className="text-right cursor-pointer text-red-500">
                                 <button
