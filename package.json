@@ -1,15 +1,14 @@
 {
   "private": true,
   "main": "resources/js/app.ts",
-    "scripts": {
-        "dev": "vite",
-        "cleanup": "prettier --write 'resources/js/**/*.{ts,tsx}' && yarn removeMapFiles",
-        "removeMapFiles": "find ./resources/js -type f \\( -name \"*.js\" -o -name \"*.js.map\" \\) -not -path \"./resources/js/vendor/*\" -not -path \"./resources/js/bootstrap.js\" -delete\n",
-        "build": "yarn run cleanup && vite build && yarn removeMapFiles",
-        "prepare": "husky"
-    },
-
-    "devDependencies": {
+  "scripts": {
+    "dev": "vite",
+    "cleanup": "prettier --write 'resources/js/**/*.{ts,tsx}' && yarn removeMapFiles",
+    "removeMapFiles": "find ./resources/js -type f \\( -name \"*.js\" -o -name \"*.js.map\" \\) -not -path \"./resources/js/vendor/*\" -not -path \"./resources/js/bootstrap.js\" -delete\n",
+    "build": "yarn run cleanup && vite build && yarn removeMapFiles",
+    "prepare": "husky"
+  },
+  "devDependencies": {
     "@emotion/react": "11.11.4",
     "@emotion/styled": "11.11.5",
     "@glidejs/glide": "^3.4.1",
