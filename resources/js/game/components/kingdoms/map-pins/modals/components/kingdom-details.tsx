@@ -4,13 +4,13 @@ import { AxiosError, AxiosResponse } from "axios";
 import { formatNumber, percent } from "../../../../../lib/game/format-number";
 import KingdomHelpModal from "../kingdom-help-modal";
 import KingdomTopSection from "./kingdom-top-section";
-import KingdomDetailsProps from "../../../../map/types/map/kingdom-pins/modals/components/kingdom-details-props";
 import ComponentLoading from "../../../../../components/ui/loading/component-loading";
 import PrimaryOutlineButton from "../../../../../components/ui/buttons/primary-outline-button";
 import LoadingProgressBar from "../../../../../components/ui/progress-bars/loading-progress-bar";
 import DangerAlert from "../../../../../components/ui/alerts/simple-alerts/danger-alert";
 import DangerOutlineButton from "../../../../../components/ui/buttons/danger-outline-button";
 import AttackKingdomModal from "../../../../../components/kingdoms/modals/attack-kingdom-modal";
+import KingdomDetailsProps from "../../../../../sections/map/types/map/kingdom-pins/modals/components/kingdom-details-props";
 
 export default class KingdomDetails extends React.Component<
     KingdomDetailsProps,
@@ -93,7 +93,7 @@ export default class KingdomDetails extends React.Component<
                     });
 
                     if (typeof error.response !== "undefined") {
-                        const response = error.response;
+                        const response: AxiosResponse = error.response;
 
                         if (response.status === 422) {
                             this.setState({

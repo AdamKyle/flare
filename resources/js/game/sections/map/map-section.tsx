@@ -5,9 +5,6 @@ import MapTimer from "../../components/timers/map-timer";
 import ComponentLoading from "../../components/ui/loading/component-loading";
 import { updateLocationBasedActions } from "../../lib/ajax/update-location-based-actions";
 import { updateTimers } from "../../lib/ajax/update-timers";
-import EnemyKingdoms from "../components/kingdoms/enemy-kingdoms";
-import Kingdoms from "../components/kingdoms/kingdoms";
-import NpcKingdoms from "../components/kingdoms/npc-kingdoms";
 import Location from "../components/locations/location";
 import DirectionalMovement from "./actions/directional-movement";
 import MapActions from "./actions/map-actions";
@@ -19,6 +16,9 @@ import MapStateManager from "./lib/state/map-state-manager";
 import MapState from "./types/map-state";
 import MapProps from "./types/map/map-props";
 import { isEqual } from "lodash";
+import NpcKingdoms from "../../components/kingdoms/map-pins/npc-kingdoms";
+import EnemyKingdoms from "../../components/kingdoms/map-pins/enemy-kingdoms";
+import Kingdoms from "../../components/kingdoms/map-pins/kingdoms";
 
 // @ts-ignore
 import Draggable from "react-draggable/build/web/react-draggable.min";

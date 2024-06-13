@@ -3,6 +3,7 @@
 namespace App\Game\Kingdoms\Providers;
 
 
+use App\Flare\Transformers\KingdomBuildingTransformer;
 use App\Flare\Transformers\UnitMovementTransformer;
 use App\Game\Kingdoms\Handlers\AttackLogHandler;
 use App\Game\Kingdoms\Handlers\DefenderArcherHandler;
@@ -66,7 +67,9 @@ class ServiceProvider extends ApplicationServiceProvider {
 
         $this->app->bind(CapitalCityManagementService::class, function($app) {
             return new CapitalCityManagementService(
-                $app->make(UpdateKingdom::class)
+                $app->make(UpdateKingdom::class),
+                $app->make(KingdomBuildingTransformer::class),
+                $app->make(Manager::class)
             );
         });
 

@@ -1,5 +1,5 @@
 import React from "react";
-import EnemyKingdomPinProps from "../../map/types/map/kingdom-pins/enemy-kingdom-pin-props";
+import EnemyKingdomPinProps from "../../../sections/map/types/map/kingdom-pins/enemy-kingdom-pin-props";
 
 export default class EnemyKingdomPin extends React.Component<
     EnemyKingdomPinProps,

@@ -22,7 +22,12 @@ class CapitalCityManagementController extends Controller {
     }
 
     public function fetchKingdomsWithUpgradableBuildingType(Character $character, Kingdom $kingdom) {
+        $result = $this->capitalCityManagementService->fetchBuildingsForUpgradesOrRepairs($character, $kingdom);
 
+        $status = $result['status'];
+        unset($result['status']);
+
+        return response()->json($result, $status);
     }
 
     public function fetchKingdomsWithRecruitableUnitType(Character $character, Kingdom $kingdom) {
