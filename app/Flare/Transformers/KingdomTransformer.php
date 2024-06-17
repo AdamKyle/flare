@@ -81,6 +81,7 @@ class KingdomTransformer extends TransformerAbstract {
             'protected_days_left'       => !is_null($kingdom->protected_until) ? now()->diffInDays($kingdom->protected_until) : 0,
             'is_under_attack'           => $this->isKingdomUnderAttack($kingdom),
             'is_capital'                => $kingdom->is_capital,
+            'auto_walked'               => $kingdom->auto_walked,
         ];
     }
 

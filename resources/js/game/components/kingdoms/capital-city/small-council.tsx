@@ -1,4 +1,5 @@
 import React from "react";
+import ClickableIconCard from "../../ui/cards/clickable-icon-card";
 
 export default class SmallCouncil extends React.Component<any, any> {
     constructor(props: any) {
@@ -24,13 +25,13 @@ export default class SmallCouncil extends React.Component<any, any> {
                     to do.
                 </p>
                 <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-4"></div>
-                <div className="shadow-lg rounded-lg bg-white mx-auto m-8 p-4 flex dark:bg-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 cursor-pointer">
-                    <div className="pr-2">
-                        <i className="ra ra-cycle relative top-[5px]" />
-                    </div>
-                    <div>
-                        <div className="text-lg pb-2">Walk Kingdoms</div>
-                        <div className="text-md">
+                <div className="border-2 border-gray-500 dark:border-gray-600 bg-gray-700 dark:bg-gray-600 mr-auto ml-auto p-4 rounded shadow-lg">
+                    <ClickableIconCard
+                        title={"Walk Kingdoms"}
+                        icon_class={"ra ra-cycle"}
+                        on_click={() => {}}
+                    >
+                        <p className="mb-2">
                             Clicking this command will automatically send off
                             kingdoms to be walked. This can be accessed once per
                             day. Players only need to walk their kingdoms once
@@ -38,8 +39,40 @@ export default class SmallCouncil extends React.Component<any, any> {
                             90 or more days, the kingdom will be made into an
                             NPC kingdom, up for grabs for 30 days before
                             crumbling.
-                        </div>
-                    </div>
+                        </p>
+
+                        {this.props.has_been_walked ? (
+                            <p className="text-red-500 dark:text-red-300">
+                                You have already walked your kingdoms today. You
+                                can do so again tomorrow.
+                            </p>
+                        ) : null}
+                    </ClickableIconCard>
+                    <ClickableIconCard
+                        title={"Upgrade/Repair Buildings"}
+                        icon_class={"ra ra-heart-tower"}
+                        on_click={() => {}}
+                    >
+                        Clicking this card will allow you to see two lists of
+                        buildings: Those that need to be repaired and those that
+                        can be upgraded. A building can be upgraded if it does
+                        not need to be repaired, is unlocked and is not max
+                        level. With that in hand, we have already filtered the
+                        buildings you can upgrade across all your kingdoms on
+                        this plane.
+                    </ClickableIconCard>
+                    <ClickableIconCard
+                        title={"Recruit Units"}
+                        icon_class={"ra ra-crossed-swords"}
+                        on_click={() => {}}
+                    >
+                        Clicking this card will allow you to recruit units
+                        across all your kingdoms. You can specify which kingdoms
+                        get what units, or recruit units across all kingdoms. A
+                        unit can be recruited if you have not met the max amount
+                        of that unit and have the unit unlocked. As a result
+                        units you can recruit have been filtered.
+                    </ClickableIconCard>
                 </div>
             </div>
         );

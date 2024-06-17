@@ -46,7 +46,8 @@ class Kingdom extends Model {
         'last_walked',
         'protected_until',
         'is_capital',
-        'updated_at'
+        'updated_at',
+        'auto_walked',
     ];
 
     /**
