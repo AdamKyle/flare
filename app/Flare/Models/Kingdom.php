@@ -78,6 +78,7 @@ class Kingdom extends Model {
         'published'          => 'boolean',
         'npc_owned'          => 'boolean',
         'is_capital'         => 'boolean',
+        'auto_walked'        => 'boolean',
         'last_walked'        => 'datetime',
         'protected_until'    => 'datetime',
     ];

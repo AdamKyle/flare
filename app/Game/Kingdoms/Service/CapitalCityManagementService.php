@@ -6,6 +6,7 @@ use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
 use App\Flare\Transformers\KingdomBuildingTransformer;
 use App\Game\Core\Traits\ResponseBuilder;
+use DB;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
 
@@ -39,18 +40,25 @@ class CapitalCityManagementService {
     }
 
     public function fetchBuildingsForUpgradesOrRepairs(Character $character, Kingdom $kingdom): array {
-        $kingdoms = Kingdom::where('character_id', $character->id)->where('is_locked', false)->get();
+
+        $kingdoms = $character->kingdoms()->where('id', '!=', $kingdom->id)->get();
 
         $kingdomBuildingData = [];
 
         foreach ($kingdoms as $kingdom) {
 
             $buildings = $kingdom->buildings()
-                ->where('is_maxed', false)
+                ->where('is_locked', false)
                 ->whereNotIn('id', function ($query) use ($kingdom) {
                     $query->select('building_id')
                         ->from('buildings_in_queue')
                         ->where('kingdom_id', $kingdom->id);
+                })
+                ->whereExists(function ($query) {
+                    $query->select(DB::raw(1))
+                        ->from('game_buildings')
+                        ->whereColumn('game_buildings.id', 'kingdom_buildings.game_building_id')
+                        ->whereColumn('game_buildings.max_level', '!=', 'kingdom_buildings.level');
                 })
                 ->get();
 
@@ -68,5 +76,19 @@ class CapitalCityManagementService {
         }
 
         return $this->successResult($kingdomBuildingData);
+    }
+
+    public function walkAllKingdoms(Character $character, Kingdom $kingdom): array {
+
+        $character->kingdoms()->update([
+            'last_walked' => now(),
+            'auto_walked' => true,
+        ]);
+
+        $this->updateKingdom->updateKingdom($kingdom);
+
+        return $this->successResult([
+            'message' => 'All kingdoms walked!'
+        ]);
     }
 }

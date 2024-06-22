@@ -118,7 +118,6 @@ export default class Tabs extends React.Component<TabProperties, any> {
     }
 
     render() {
-        console.log(this.props.additonal_css);
         return (
             <Tab.Group onChange={this.props.listen_for_change}>
                 <Tab.List

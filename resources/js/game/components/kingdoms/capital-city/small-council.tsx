@@ -1,14 +1,73 @@
 import React from "react";
 import ClickableIconCard from "../../ui/cards/clickable-icon-card";
+import WalkAllKingdomsAjax from "../ajax/walk-all-kingdoms-ajax";
+import { serviceContainer } from "../../../lib/containers/core-container";
+import LoadingProgressBar from "../../ui/progress-bars/loading-progress-bar";
+import SuccessAlert from "../../ui/alerts/simple-alerts/success-alert";
+import DangerAlert from "../../ui/alerts/simple-alerts/danger-alert";
+import ManageKingdomBuildings from "./manage-kingdom-buildings";
 
 export default class SmallCouncil extends React.Component<any, any> {
+    private walkAllKingdomsAjax: WalkAllKingdomsAjax;
+
     constructor(props: any) {
         super(props);
 
-        this.state = {};
+        this.state = {
+            walking_kingdoms: false,
+            success_message: null,
+            error_message: null,
+            show_building_management: false,
+            show_unit_recruitment: false,
+        };
+
+        this.walkAllKingdomsAjax =
+            serviceContainer().fetch(WalkAllKingdomsAjax);
+    }
+
+    walkKingdoms() {
+        if (this.props.kingdom.auto_walked) {
+            return;
+        }
+
+        this.setState(
+            {
+                walking_kingdoms: true,
+            },
+            () => {
+                this.walkAllKingdomsAjax.walkKingdoms(
+                    this,
+                    this.props.kingdom.character_id,
+                    this.props.kingdom.id,
+                );
+            },
+        );
+    }
+
+    manageShowBuildingManagement() {
+        this.setState({
+            show_building_management: !this.state.show_building_management,
+        });
+    }
+
+    manageShowUnitRecruitment() {
+        this.setState({
+            show_unit_recruitment: !this.state.show_unit_recruitment,
+        });
     }
 
     render() {
+        if (this.state.show_building_management) {
+            return (
+                <ManageKingdomBuildings
+                    kingdom={this.props.kingdom}
+                    manage_building_section={this.manageShowBuildingManagement.bind(
+                        this,
+                    )}
+                />
+            );
+        }
+
         return (
             <div>
                 <h3>Oversee your kingdoms</h3>
@@ -25,11 +84,21 @@ export default class SmallCouncil extends React.Component<any, any> {
                     to do.
                 </p>
                 <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-4"></div>
+                {this.state.success_message !== null ? (
+                    <SuccessAlert additional_css={"my-2"}>
+                        {this.state.success_message}
+                    </SuccessAlert>
+                ) : null}
+                {this.state.error_message !== null ? (
+                    <DangerAlert additional_css={"my-2"}>
+                        {this.state.error_message}
+                    </DangerAlert>
+                ) : null}
                 <div className="border-2 border-gray-500 dark:border-gray-600 bg-gray-700 dark:bg-gray-600 mr-auto ml-auto p-4 rounded shadow-lg">
                     <ClickableIconCard
                         title={"Walk Kingdoms"}
                         icon_class={"ra ra-cycle"}
-                        on_click={() => {}}
+                        on_click={this.walkKingdoms.bind(this)}
                     >
                         <p className="mb-2">
                             Clicking this command will automatically send off
@@ -41,7 +110,11 @@ export default class SmallCouncil extends React.Component<any, any> {
                             crumbling.
                         </p>
 
-                        {this.props.has_been_walked ? (
+                        {this.state.walking_kingdoms ? (
+                            <LoadingProgressBar />
+                        ) : null}
+
+                        {this.props.kingdom.auto_walked ? (
                             <p className="text-red-500 dark:text-red-300">
                                 You have already walked your kingdoms today. You
                                 can do so again tomorrow.
@@ -51,7 +124,7 @@ export default class SmallCouncil extends React.Component<any, any> {
                     <ClickableIconCard
                         title={"Upgrade/Repair Buildings"}
                         icon_class={"ra ra-heart-tower"}
-                        on_click={() => {}}
+                        on_click={this.manageShowBuildingManagement.bind(this)}
                     >
                         Clicking this card will allow you to see two lists of
                         buildings: Those that need to be repaired and those that

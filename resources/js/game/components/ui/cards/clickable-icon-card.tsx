@@ -11,7 +11,11 @@ export default class ClickableIconCard extends React.Component<
 
     render() {
         return (
-            <div className="mb-4 shadow-lg rounded-lg bg-white mx-auto m-8 p-4 flex dark:bg-gray-700 dark:text-gray-200 hover:bg-green-100 dark:hover:bg-green-500 cursor-pointer">
+            <div
+                className="mb-4 shadow-lg rounded-lg bg-white mx-auto m-8 p-4 flex dark:bg-gray-700
+            dark:text-gray-200 hover:bg-green-100 dark:hover:bg-green-500 cursor-pointer"
+                onClick={this.props.on_click}
+            >
                 <div className="pr-2">
                     <i
                         className={

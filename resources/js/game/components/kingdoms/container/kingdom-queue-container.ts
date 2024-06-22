@@ -2,6 +2,9 @@ import KingdomResourceTransferAjax from "../ajax/kingdom-resource-transfer-ajax"
 import { CoreContainer } from "../../../lib/containers/core-container";
 import kingdomQueueContainer from "../queues/container/kingdom-queue-container";
 import MakeCapitalCityAjax from "../ajax/make-capigtal-city-ajax";
+import WalkAllKingdomsAjax from "../ajax/walk-all-kingdoms-ajax";
+import FetchUpgradableKingdomsAjax from "../ajax/fetch-upgradable-kingdoms-ajax";
+import ProcessUpgradeBuildingsAjax from "../ajax/process-upgrade-buildings-ajax";
 
 /**
  * Register core dependencies here.
@@ -21,6 +24,18 @@ function kingdomContainer(container: CoreContainer) {
 
     container.register("make-capital-city-ajax", {
         useClass: MakeCapitalCityAjax,
+    });
+
+    container.register("walk-all-kingdoms-ajax", {
+        useClass: WalkAllKingdomsAjax,
+    });
+
+    container.register("fetch-upgradable-kingdoms-ajax", {
+        useClass: FetchUpgradableKingdomsAjax,
+    });
+
+    container.register("process-upgrade-buildings-ajax", {
+        useClass: ProcessUpgradeBuildingsAjax,
     });
 }
 
