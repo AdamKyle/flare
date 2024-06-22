@@ -1,5 +1,7 @@
 <?php
 
+namespace Tests\Unit\Game\BattleRewardProcessing\Services;
+
 use App\Flare\Models\Event as ModelsEvent;
 use App\Flare\Models\GameSkill;
 use App\Flare\Values\ItemSpecialtyType;

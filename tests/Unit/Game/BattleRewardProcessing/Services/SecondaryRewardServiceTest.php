@@ -1,5 +1,7 @@
 <?php
 
+namespace Tests\Unit\Game\BattleRewardProcessing\Services;
+
 use Tests\TestCase;
 use Tests\Traits\CreateGameMap;
 use Tests\Traits\CreateMonster;
