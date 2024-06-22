@@ -14,6 +14,8 @@ class FeatureTypes {
 
     const EXTEND_SETS = 3;
 
+    const CAPITAL_CITIES = 4;
+
     /**
      * @var int $value
      */
@@ -27,13 +29,15 @@ class FeatureTypes {
         1 => self::COSMETIC_TEXT,
         2 => self::NAME_TAGS,
         3 => self::EXTEND_SETS,
+        4 => self::CAPITAL_CITIES,
     ];
 
     protected static array $valueNames = [
         self::REINCARNATION => 'Reincarnation',
         self::COSMETIC_TEXT => 'Cosmetic Text',
         self::NAME_TAGS     => 'Name Tags',
-        self::EXTEND_SETS   => 'Give 10 additional sets'
+        self::EXTEND_SETS   => 'Give 10 additional sets',
+        self::CAPITAL_CITIES => 'Capital Cities',
     ];
 
     /**
@@ -72,5 +76,9 @@ class FeatureTypes {
 
     public function isExtendSets(): bool {
         return $this->value === self::EXTEND_SETS;
+    }
+
+    public function isCapitalCities(): bool {
+        return $this->value === self::CAPITAL_CITIES;
     }
 }

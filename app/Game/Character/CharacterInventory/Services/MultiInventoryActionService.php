@@ -32,16 +32,25 @@ class MultiInventoryActionService {
 
         $result = [];
 
-        foreach ($slotIds as $slotId) {
-            $result = $this->inventorySetService->moveItemToSet($character, $slotId, $setId);
+        $lastIndex = count($slotIds) - 1;
+
+        foreach ($slotIds as $index => $slotId) {
+
+            $isLast = false;
+
+            if ($index === $lastIndex) {
+                $isLast = true;
+            }
+
+            $result = $this->inventorySetService->moveItemToSet($character, $slotId, $setId, false, $isLast);
+
+            if (is_null($result)) {
+                continue;
+            }
 
             if ($result['status'] === 422) {
                 return $result;
             }
-        }
-
-        if (empty($result)) {
-            return $this->errorResult('Nothing was moved, nothing selected.');
         }
 
         return $this->successResult([

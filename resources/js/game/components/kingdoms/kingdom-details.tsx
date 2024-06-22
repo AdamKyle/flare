@@ -351,6 +351,10 @@ export default class KingdomDetails extends React.Component<
                                     on_click={this.showMakeCapitalCityModal.bind(
                                         this,
                                     )}
+                                    disabled={
+                                        !this.props.kingdom
+                                            .can_access_capital_city
+                                    }
                                 />
                             ) : (
                                 <SuccessOutlineButton

@@ -113,4 +113,6 @@ export default interface KingdomDetails extends DataTableBaseData {
     smelting_completed_at: string;
 
     item_resistance_bonus: number;
+
+    can_access_capital_city: boolean;
 }

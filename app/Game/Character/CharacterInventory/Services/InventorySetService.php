@@ -99,9 +99,10 @@ class InventorySetService {
      * @param Character $character
      * @param int $slotId
      * @param int $setId
-     * @return array
+     * @param bool $fireEvents
+     * @return array|null
      */
-    public function moveItemToSet(Character $character, int $slotId, int $setId): array {
+    public function moveItemToSet(Character $character, int $slotId, int $setId, bool $fireEvents = true, bool $isLast = false): array|null {
         $slot         = $character->inventory->slots()->find($slotId);
         $inventorySet = $character->inventorySets()->find($setId);
 
@@ -116,19 +117,30 @@ class InventorySetService {
 
         $character = $character->refresh();
 
-        event(new UpdateTopBarEvent($character));
+        if ($fireEvents) {
+            event(new UpdateTopBarEvent($character));
 
-        event(new LabyrinthOracleUpdate($character));
+            event(new LabyrinthOracleUpdate($character));
 
-        $characterInventoryService = $this->characterInventoryService->setCharacter($character);
+            $characterInventoryService = $this->characterInventoryService->setCharacter($character);
 
-        if (is_null($inventorySet->name)) {
-            $index     = $character->inventorySets->search(function ($set) use ($setId) {
-                return $set->id === $setId;
-            });
+            if (is_null($inventorySet->name)) {
+                $index     = $character->inventorySets->search(function ($set) use ($setId) {
+                    return $set->id === $setId;
+                });
+
+                return $this->successResult([
+                    'message'   => $itemName . ' Has been moved to: Set ' . $index + 1,
+                    'moved_to_set_name' => $inventorySet->name,
+                    'inventory' => [
+                        'inventory' => $characterInventoryService->getInventoryForType('inventory'),
+                        'sets'      => $characterInventoryService->getInventoryForType('sets')['sets']
+                    ]
+                ]);
+            }
 
             return $this->successResult([
-                'message'   => $itemName . ' Has been moved to: Set ' . $index + 1,
+                'message'   => $itemName . ' Has been moved to: ' . $inventorySet->name,
                 'moved_to_set_name' => $inventorySet->name,
                 'inventory' => [
                     'inventory' => $characterInventoryService->getInventoryForType('inventory'),
@@ -137,14 +149,29 @@ class InventorySetService {
             ]);
         }
 
-        return $this->successResult([
-            'message'   => $itemName . ' Has been moved to: ' . $inventorySet->name,
-            'moved_to_set_name' => $inventorySet->name,
-            'inventory' => [
-                'inventory' => $characterInventoryService->getInventoryForType('inventory'),
-                'sets'      => $characterInventoryService->getInventoryForType('sets')['sets']
-            ]
-        ]);
+        if ($isLast) {
+            $characterInventoryService = $this->characterInventoryService->setCharacter($character);
+
+            if (is_null($inventorySet->name)) {
+                $index = $character->inventorySets->search(function ($set) use ($setId) {
+                    return $set->id === $setId;
+                });
+
+                $setName = 'Set ' + $index;
+            } else {
+                $setName = $inventorySet->name;
+            }
+
+            return $this->successResult([
+                'moved_to_set_name' => $setName,
+                'inventory' => [
+                    'inventory' => $characterInventoryService->getInventoryForType('inventory'),
+                    'sets' => $characterInventoryService->getInventoryForType('sets')['sets']
+                ]
+            ]);
+        }
+
+        return null;
     }
 
     /**

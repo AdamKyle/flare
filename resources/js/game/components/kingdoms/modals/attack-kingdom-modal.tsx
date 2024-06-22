@@ -10,10 +10,11 @@ import LoadingProgressBar from "../../../components/ui/progress-bars/loading-pro
 import TabPanel from "../../../components/ui/tabs/tab-panel";
 import Tabs from "../../../components/ui/tabs/tabs";
 import Ajax from "../../../lib/ajax/ajax";
-import KingdomDamageSlotItems from "../../../lib/game/kingdoms/deffinitions/kingdom-damage-slot-items";
-import AttackKingdomModalState from "../../../lib/game/kingdoms/types/modals/attack-kingdom-modal-state";
-import SelectedUnitsToCallType from "../../../lib/game/kingdoms/types/selected-units-to-call-type";
 import UnitMovement from "./partials/unit-movement";
+import KingdomHelpModal from "../map-pins/modals/kingdom-help-modal";
+import KingdomDamageSlotItems from "../deffinitions/kingdom-damage-slot-items";
+import SelectedUnitsToCallType from "../types/selected-units-to-call-type";
+import AttackKingdomModalState from "../types/modals/attack-kingdom-modal-state";
 
 export default class AttackKingdomModal extends React.Component<
     any,
@@ -121,7 +122,7 @@ export default class AttackKingdomModal extends React.Component<
                             this.setState({ loading: false });
 
                             if (typeof error.response !== "undefined") {
-                                const response = error.response;
+                                const response: AxiosResponse = error.response;
 
                                 let message = response.data.message;
 
@@ -177,7 +178,7 @@ export default class AttackKingdomModal extends React.Component<
                             this.setState({ loading: false });
 
                             if (typeof error.response !== "undefined") {
-                                const response = error.response;
+                                const response: AxiosResponse = error.response;
 
                                 this.setState({
                                     success_message: response.data.message,

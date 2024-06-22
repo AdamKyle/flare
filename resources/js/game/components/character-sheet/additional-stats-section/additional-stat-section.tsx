@@ -96,10 +96,10 @@ export default class AdditionalStatSection extends React.Component<any, any> {
                     </BasicCard>
                     <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3 block md:hidden"></div>
                     <BasicCard>
-                        <h3>Resistances</h3>
+                        <h3>Reincarnation</h3>
                         <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2"></div>
                         <p className="my-3">
-                            This shows you: How many times you have
+                            This shows you, how many times you have
                             reincarnated, the stats we apply to your character
                             when they reincarnate back to level one. The damage
                             stat modifier and the base damage stat modifier as

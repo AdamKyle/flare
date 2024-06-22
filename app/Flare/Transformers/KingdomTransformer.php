@@ -4,6 +4,7 @@ namespace App\Flare\Transformers;
 
 use App\Flare\Models\PassiveSkill;
 use App\Flare\Models\SmeltingProgress;
+use App\Flare\Values\FeatureTypes;
 use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
 use League\Fractal\Resource\Collection;
 use League\Fractal\TransformerAbstract;
@@ -71,6 +72,7 @@ class KingdomTransformer extends TransformerAbstract {
             'can_access_bank'           => $this->canAccessGoblinCoinBank($kingdom),
             'can_access_smelter'        => $this->canAccessSmelter($kingdom),
             'can_access_resource_request' => $this->canAccessResourceRequest($kingdom),
+            'can_access_capital_city'   => $this->canAccessCapitalCity($kingdom),
             'walls_defence'             => $kingdom->getWallsDefence(),
             'gold_bars_defence'         => $kingdom->fetchGoldBarsDefenceBonus(),
             'defence_bonus'             => $kingdom->fetchKingdomDefenceBonus(),
@@ -217,6 +219,16 @@ class KingdomTransformer extends TransformerAbstract {
         }
 
         return !$building->is_locked && BuildingActions::canAccessResourceTransferRequest($building);
+    }
+
+    protected function canAccessCapitalCity(Kingdom $kingdom): bool {
+        $character = $kingdom->character;
+
+        $completedQuest = $character->questsCompleted->filter(function ($completedQuest) {
+            return $completedQuest->quest->unlocks_feature === FeatureTypes::CAPITAL_CITIES;
+        })->first();
+
+        return !is_null($completedQuest);
     }
 
     /**
