@@ -78,6 +78,12 @@ class CapitalCityManagementService {
         return $this->successResult($kingdomBuildingData);
     }
 
+    public function fetchKingdomsForSelection(Character $character, Kingdom $kingdom): array {
+        return $this->successResult([
+            'kingdoms' => Kingdom::where('id', '!=', $kingdom->id)->select('name', 'id')->get()->toArray(),
+        ]);
+    }
+
     public function walkAllKingdoms(Character $character, Kingdom $kingdom): array {
 
         $character->kingdoms()->update([

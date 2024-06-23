@@ -224,7 +224,7 @@ class KingdomTransformer extends TransformerAbstract {
     protected function canAccessCapitalCity(Kingdom $kingdom): bool {
         $character = $kingdom->character;
 
-        $completedQuest = $character->questsCompleted->filter(function ($completedQuest) {
+        $completedQuest = $character->questsCompleted->whereNotNull('quest_id')->filter(function ($completedQuest) {
             return $completedQuest->quest->unlocks_feature === FeatureTypes::CAPITAL_CITIES;
         })->first();
 

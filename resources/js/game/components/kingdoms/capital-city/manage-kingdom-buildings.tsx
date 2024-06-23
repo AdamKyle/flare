@@ -66,7 +66,8 @@ export default class ManageKingdomBuildings extends React.Component<any, any> {
                     <h3>Oversee your kingdoms buildings</h3>
                     <SuccessOutlineButton
                         button_label={
-                            this.state.show_upgrade_buildings_list
+                            this.state.show_upgrade_buildings_list ||
+                            this.state.show_repair_building_list
                                 ? "Back to Building Overview"
                                 : "Back to council"
                         }

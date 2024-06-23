@@ -1,0 +1,15 @@
+export enum UnitTypes {
+    SPEARMEN = "Spearmen",
+    ARCHER = "Archer",
+    SWORDSMEN = "Swordsmen",
+    RAM = "Ram",
+    TREBUCHET = "Trebuchet",
+    MOUNTED_KNIGHTS = "Mounted Knights",
+    MOUNTED_ARCHERS = "Mounted Archers",
+    CANNON = "Cannon",
+    PRIEST = "Priest",
+    CLERIC = "Cleric",
+    PALADIN = "Paladin",
+    SETTLER = "Settler",
+    AIRSHIP = "Ariship",
+}

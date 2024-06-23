@@ -6,6 +6,7 @@ import LoadingProgressBar from "../../ui/progress-bars/loading-progress-bar";
 import SuccessAlert from "../../ui/alerts/simple-alerts/success-alert";
 import DangerAlert from "../../ui/alerts/simple-alerts/danger-alert";
 import ManageKingdomBuildings from "./manage-kingdom-buildings";
+import UnitRecruitment from "./unit-recruitment";
 
 export default class SmallCouncil extends React.Component<any, any> {
     private walkAllKingdomsAjax: WalkAllKingdomsAjax;
@@ -62,6 +63,17 @@ export default class SmallCouncil extends React.Component<any, any> {
                 <ManageKingdomBuildings
                     kingdom={this.props.kingdom}
                     manage_building_section={this.manageShowBuildingManagement.bind(
+                        this,
+                    )}
+                />
+            );
+        }
+
+        if (this.state.show_unit_recruitment) {
+            return (
+                <UnitRecruitment
+                    kingdom={this.props.kingdom}
+                    manage_unit_section={this.manageShowUnitRecruitment.bind(
                         this,
                     )}
                 />
@@ -137,7 +149,7 @@ export default class SmallCouncil extends React.Component<any, any> {
                     <ClickableIconCard
                         title={"Recruit Units"}
                         icon_class={"ra ra-crossed-swords"}
-                        on_click={() => {}}
+                        on_click={this.manageShowUnitRecruitment.bind(this)}
                     >
                         Clicking this card will allow you to recruit units
                         across all your kingdoms. You can specify which kingdoms

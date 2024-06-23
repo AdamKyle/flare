@@ -32,7 +32,12 @@ class CapitalCityManagementController extends Controller {
     }
 
     public function fetchKingdomsWithRecruitableUnitType(Character $character, Kingdom $kingdom) {
+        $result = $this->capitalCityManagementService->fetchKingdomsForSelection($character, $kingdom);
 
+        $status = $result['status'];
+        unset($result['status']);
+
+        return response()->json($result, $status);
     }
 
     public function walkAllKingdoms(Character $character, Kingdom $kingdom) {
