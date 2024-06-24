@@ -169,7 +169,10 @@ export default class Kingdom extends React.Component<KingdomProps, any> {
                                     <i className="fas fa-minus-circle"></i>
                                 </button>
                             </div>
-                            <SmallCouncil kingdom={this.state.kingdom} />
+                            <SmallCouncil
+                                kingdom={this.state.kingdom}
+                                user_id={this.props.user_id}
+                            />
                         </BasicCard>
                     ) : this.state.show_resource_transfer_panel ? (
                         <BasicCard>

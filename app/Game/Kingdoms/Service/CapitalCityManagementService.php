@@ -16,6 +16,7 @@ class CapitalCityManagementService {
 
     public function __construct(
         private readonly UpdateKingdom $updateKingdom,
+        private readonly CapitalCityBuildingManagement $capitalCityBuildingManagement,
         private readonly KingdomBuildingTransformer $kingdomBuildingTransformer,
         private readonly Manager $manager
     ) {}
@@ -39,7 +40,7 @@ class CapitalCityManagementService {
         ]);
     }
 
-    public function fetchBuildingsForUpgradesOrRepairs(Character $character, Kingdom $kingdom): array {
+    public function fetchBuildingsForUpgradesOrRepairs(Character $character, Kingdom $kingdom, bool $returnArray = false): array {
 
         $kingdoms = $character->kingdoms()->where('id', '!=', $kingdom->id)->get();
 
@@ -75,6 +76,10 @@ class CapitalCityManagementService {
             ];
         }
 
+        if ($returnArray) {
+            return $kingdomBuildingData;
+        }
+
         return $this->successResult($kingdomBuildingData);
     }
 
@@ -96,5 +101,9 @@ class CapitalCityManagementService {
         return $this->successResult([
             'message' => 'All kingdoms walked!'
         ]);
+    }
+
+    public function sendoffBuildingRequests(Character $character, Kingdom $kingdom, array $params, string $type): array {
+       return $this->capitalCityBuildingManagement->createBuildingUpgradeRequestQueue($character, $kingdom, $params, $type);
     }
 }

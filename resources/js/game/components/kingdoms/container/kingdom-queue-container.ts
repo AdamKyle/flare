@@ -7,6 +7,7 @@ import FetchUpgradableKingdomsAjax from "../ajax/fetch-upgradable-kingdoms-ajax"
 import ProcessUpgradeBuildingsAjax from "../ajax/process-upgrade-buildings-ajax";
 import FetchKingdomsForSelectionAjax from "../ajax/fetch-kingdoms-for-selection-ajax";
 import ProcessUnitRequestAjax from "../ajax/process-unit-request-ajax";
+import kingdomEventContainer from "./kingdom-event-container";
 
 /**
  * Register core dependencies here.
@@ -17,8 +18,11 @@ import ProcessUnitRequestAjax from "../ajax/process-unit-request-ajax";
  * @param container
  */
 function kingdomContainer(container: CoreContainer) {
-    // Let's register other containers here, that might live in sub modules:
+    // Let's register other container.
     kingdomQueueContainer(container);
+
+    // Register the event container.
+    kingdomEventContainer(container);
 
     container.register("kingdom-resource-transfer-request-ajax", {
         useClass: KingdomResourceTransferAjax,

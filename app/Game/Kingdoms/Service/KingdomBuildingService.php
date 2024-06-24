@@ -143,7 +143,34 @@ class KingdomBuildingService {
         return $building->kingdom->refresh();
     }
 
+    /**
+     * Updates the kingdom with the costs of the building upgrade.
+     *
+     * @param KingdomBuilding $building
+     * @return Kingdom
+     */
     public function updateKingdomResourcesForRebuildKingdomBuilding(KingdomBuilding $building): Kingdom {
+        $costs = $this->getBuildingCosts($building);
+
+        $building->kingdom->update([
+            'current_wood'       => $building->kingdom->current_wood - $costs['wood'],
+            'current_clay'       => $building->kingdom->current_clay - $costs['clay'],
+            'current_stone'      => $building->kingdom->current_stone - $costs['stone'],
+            'current_iron'       => $building->kingdom->current_iron - $costs['iron'],
+            'current_population' => $building->kingdom->current_population - $costs['population'],
+            'current_steel'      => $building->kingdom->current_steel - $costs['steel'],
+        ]);
+
+        return $building->kingdom->refresh();
+    }
+
+    /**
+     * Returns the building costs minus any reductions from passive skills.
+     *
+     * @param KingdomBuilding $building
+     * @return float[]|int[]
+     */
+    public function getBuildingCosts(KingdomBuilding $building): array {
         $buildingCostReduction   = $building->kingdom->fetchBuildingCostReduction();
         $ironCostReduction       = $building->kingdom->fetchIronCostReduction();
         $populationCostReduction = $building->kingdom->fetchPopulationCostReduction();
@@ -162,17 +189,14 @@ class KingdomBuildingService {
         $populationCost -= $populationCost * ($buildingCostReduction + $populationCostReduction);
         $steelCost      -= $steelCost * $buildingCostReduction;
 
-
-        $building->kingdom->update([
-            'current_wood'       => $building->kingdom->current_wood - $woodCost,
-            'current_clay'       => $building->kingdom->current_clay - $clayCost,
-            'current_stone'      => $building->kingdom->current_stone - $stoneCost,
-            'current_iron'       => $building->kingdom->current_iron - $ironCost,
-            'current_population' => $building->kingdom->current_population - $populationCost,
-            'current_steel'      => $building->kingdom->current_steel - $steelCost,
-        ]);
-
-        return $building->kingdom->refresh();
+        return [
+            'wood' => $woodCost,
+            'clay' => $clayCost,
+            'stone' => $stoneCost,
+            'iron' => $ironCost,
+            'population' => $populationCost,
+            'steel' => $steelCost,
+        ];
     }
 
     /**

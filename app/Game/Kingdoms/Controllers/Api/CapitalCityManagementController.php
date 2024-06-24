@@ -52,6 +52,8 @@ class CapitalCityManagementController extends Controller {
 
     public function upgradeBuildings(BuildingUpgradeRequestsRequest $buildingUpgradeRequestsRequest, Character $character, Kingdom $kingdom) {
         dump($buildingUpgradeRequestsRequest->all());
+
+        $result = $this->capitalCityManagementService->sendoffBuildingRequests($character, $kingdom, $buildingUpgradeRequestsRequest->request_data, $buildingUpgradeRequestsRequest->request_type);
     }
 
     public function recruitUnits(RecruitUnitRequestsRequest $recruitUnitRequestsRequest, Character $character, Kingdom $kingdom) {

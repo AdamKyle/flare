@@ -61,6 +61,7 @@ export default class SmallCouncil extends React.Component<any, any> {
         if (this.state.show_building_management) {
             return (
                 <ManageKingdomBuildings
+                    user_id={this.props.user_id}
                     kingdom={this.props.kingdom}
                     manage_building_section={this.manageShowBuildingManagement.bind(
                         this,

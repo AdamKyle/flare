@@ -24,6 +24,8 @@ import {
     CompressedData,
     Kingdom,
 } from "./deffinitions/kingdom_building_data";
+import CapitalCityBuildingUpgradeRepairTableEventDefinition from "../event-listeners/capital-city-building-upgrade-repair-table-event-definition";
+import CapitalCityBuildingUpgradeRepairTableEvent from "../event-listeners/capital-city-building-upgrade-repair-table-event";
 
 enum SortType {
     KINGDOM_NAME = "kingdom-name",
@@ -36,6 +38,8 @@ export default class BuildingsToUpgradeSection extends React.Component<
     any
 > {
     private fetchUpgradableKingdomsAjax: FetchUpgradableKingdomsAjax;
+
+    private updateBuildingTable: CapitalCityBuildingUpgradeRepairTableEventDefinition;
 
     constructor(props: any) {
         super(props);
@@ -55,6 +59,15 @@ export default class BuildingsToUpgradeSection extends React.Component<
         this.fetchUpgradableKingdomsAjax = serviceContainer().fetch(
             FetchUpgradableKingdomsAjax,
         );
+
+        this.updateBuildingTable =
+            serviceContainer().fetch<CapitalCityBuildingUpgradeRepairTableEventDefinition>(
+                CapitalCityBuildingUpgradeRepairTableEvent,
+            );
+
+        this.updateBuildingTable.initialize(this, this.props.user_id);
+
+        this.updateBuildingTable.register();
     }
 
     componentDidMount() {
@@ -63,6 +76,8 @@ export default class BuildingsToUpgradeSection extends React.Component<
             this.props.kingdom.character_id,
             this.props.kingdom.id,
         );
+
+        this.updateBuildingTable.listen();
     }
 
     compressArray(sortedData: Kingdom[], returnData: boolean) {

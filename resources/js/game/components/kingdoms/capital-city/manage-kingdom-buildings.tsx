@@ -95,11 +95,13 @@ export default class ManageKingdomBuildings extends React.Component<any, any> {
                 </p>
                 {this.state.show_upgrade_buildings_list ? (
                     <BuildingsToUpgradeSection
+                        user_id={this.props.user_id}
                         kingdom={this.props.kingdom}
                         repair={false}
                     />
                 ) : this.state.show_repair_building_list ? (
                     <BuildingsToUpgradeSection
+                        user_id={this.props.user_id}
                         kingdom={this.props.kingdom}
                         repair={true}
                     />
