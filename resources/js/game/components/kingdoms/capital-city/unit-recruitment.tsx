@@ -8,6 +8,7 @@ import FetchKingdomsForSelectionAjax from "../ajax/fetch-kingdoms-for-selection-
 import { serviceContainer } from "../../../lib/containers/core-container";
 import PrimaryOutlineButton from "../../ui/buttons/primary-outline-button";
 import DangerOutlineButton from "../../ui/buttons/danger-outline-button";
+import SendUnitRecruitmentRequestModal from "./modals/send-unit-recruitment-request-modal";
 
 export default class UnitRecruitment extends React.Component<any, any> {
     private fetchKingdomsForSelection: FetchKingdomsForSelectionAjax;
@@ -18,6 +19,7 @@ export default class UnitRecruitment extends React.Component<any, any> {
         this.state = {
             processing_request: false,
             loading: true,
+            show_unit_recruitment_confirmation: false,
             error_message: null,
             success_message: null,
             unit_recruitment_data: [],
@@ -35,6 +37,13 @@ export default class UnitRecruitment extends React.Component<any, any> {
             this.props.kingdom.character_id,
             this.props.kingdom.id,
         );
+    }
+
+    manageUnitRecruitment() {
+        this.setState({
+            show_unit_recruitment_confirmation:
+                !this.state.show_unit_recruitment_confirmation,
+        });
     }
 
     kingdomSelectOptions() {
@@ -251,10 +260,21 @@ export default class UnitRecruitment extends React.Component<any, any> {
                 <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-4"></div>
                 <p className="my-2">
                     Below, for each unit type, you may enter a number between 1
-                    and 1,000,000. It is vital you train Kingdom Passives such
-                    as: <strong>Unit Management</strong>, and your own Character
-                    Skill: <strong>Kinggmanship</strong> which helps reduce the
-                    time it takes to recruit large amounts of units.
+                    and 1,000,000. It is vital you train{" "}
+                    <a
+                        href="/information/kingdom-passive-skills"
+                        target="_blank"
+                    >
+                        Kingdom Passives{" "}
+                        <i className="fas fa-external-link-alt"></i>
+                    </a>{" "}
+                    such as: <strong>Unit Management</strong>, and your own{" "}
+                    <a href="/information/skill-information" target="_blank">
+                        Character Skill{" "}
+                        <i className="fas fa-external-link-alt"></i>
+                    </a>
+                    : <strong>Kinggmanship</strong> which helps reduce the time
+                    it takes to recruit large amounts of units.
                 </p>
                 <p className="my-2">
                     Should you not have the people to purchase that amount you
@@ -267,9 +287,7 @@ export default class UnitRecruitment extends React.Component<any, any> {
                 <div className="flex space-x-2 items-center">
                     <PrimaryOutlineButton
                         button_label={"Send Recruitment Orders"}
-                        on_click={() =>
-                            console.log(this.state.unit_recruitment_data)
-                        }
+                        on_click={this.manageUnitRecruitment.bind(this)}
                         additional_css={"py-2 px-3 flex-shrink-0"}
                         disabled={this.isSendButtonDisabled()}
                     />
@@ -283,7 +301,21 @@ export default class UnitRecruitment extends React.Component<any, any> {
                 </div>
 
                 <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-4"></div>
+                <p className="text-blue-700 dark:text-blue-500">
+                    You must select at least one kingdom for each type of unit
+                    you want to request.
+                </p>
+                <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-4"></div>
                 {this.renderUnitSections()}
+                {this.state.show_unit_recruitment_confirmation ? (
+                    <SendUnitRecruitmentRequestModal
+                        is_open={this.state.show_unit_recruitment_confirmation}
+                        manage_modal={this.manageUnitRecruitment.bind(this)}
+                        character_id={this.props.kingdom.character_id}
+                        kingdom_id={this.props.kingdom.id}
+                        params={this.state.unit_recruitment_data}
+                    />
+                ) : null}
             </div>
         );
     }

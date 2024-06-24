@@ -80,7 +80,7 @@ class CapitalCityManagementService {
 
     public function fetchKingdomsForSelection(Character $character, Kingdom $kingdom): array {
         return $this->successResult([
-            'kingdoms' => Kingdom::where('id', '!=', $kingdom->id)->select('name', 'id')->get()->toArray(),
+            'kingdoms' => Kingdom::where('id', '!=', $kingdom->id)->whereDoesntHave('unitsQueue')->select('name', 'id')->get()->toArray(),
         ]);
     }
 
