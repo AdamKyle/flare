@@ -8,7 +8,7 @@ export default class RecruitUnitsSections extends React.Component<any, any> {
 
     render() {
         return (
-            <div>
+            <div className="overflow-y-auto max-h-[450px]">
                 <p className="my-2">
                     You are about to send off the request orders for the units
                     below. If you are sure about the amount click "Yes. I
@@ -23,34 +23,37 @@ export default class RecruitUnitsSections extends React.Component<any, any> {
                     processes all their unit requests.
                 </p>
 
-                <p className='my-2'>
-                    As you recruit units,
-                    your Kingdom list will change to filter out those who have
-                    units in queue or have orders on the way to recruit units.
+                <p className="my-2">
+                    As you recruit units, your Kingdom list will change to
+                    filter out those who have units in queue or have orders on
+                    the way to recruit units.
                 </p>
 
                 <p className="my-2">
-                    When you recruit units this way, you will eventually get logs for each kingdom to tell you what they recruited, or failed to
-                    and how much of each unit was recruited for that kingdom.
+                    When you recruit units this way, you will eventually get
+                    logs for each kingdom to tell you what they recruited, or
+                    failed to and how much of each unit was recruited for that
+                    kingdom.
                 </p>
 
                 <p className="my-2">
-                    <strong>If you do not have</strong> enough{" "}
+                    <strong>If you do not have</strong> enough resources ,{" "}
                     <a href="/information/resource-request" target="_blank">
-                        resources <i className="fas fa-external-link-alt"></i>
+                        the kingdom will request them{" "}
+                        <i className="fas fa-external-link-alt"></i>
                     </a>
-                    , we will request it.
+                    .
                 </p>
 
                 <p className="my-2">
-                    If you do not have enough population, we will buy -{" "}
-                    <strong>out of your kingdoms treasury</strong>, population.
+                    If you do not have enough population, the kingdom will buy -{" "}
+                    <strong>out of it's treasury</strong>, population needed,
+                    assuming you have enough treasury.
                 </p>
 
                 <p className="my-2 text-red-700 dark:text-red-500">
                     If you do not have the building leveled, or unlocked for the
-                    specific unit, we will not recruit it. The more units, the
-                    more time it takes to recruit.
+                    specific unit, we will not recruit it.
                 </p>
 
                 <p className="my-2">

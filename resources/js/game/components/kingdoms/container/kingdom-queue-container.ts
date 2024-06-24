@@ -6,6 +6,7 @@ import WalkAllKingdomsAjax from "../ajax/walk-all-kingdoms-ajax";
 import FetchUpgradableKingdomsAjax from "../ajax/fetch-upgradable-kingdoms-ajax";
 import ProcessUpgradeBuildingsAjax from "../ajax/process-upgrade-buildings-ajax";
 import FetchKingdomsForSelectionAjax from "../ajax/fetch-kingdoms-for-selection-ajax";
+import ProcessUnitRequestAjax from "../ajax/process-unit-request-ajax";
 
 /**
  * Register core dependencies here.
@@ -41,6 +42,10 @@ function kingdomContainer(container: CoreContainer) {
 
     container.register("process-upgrade-buildings-ajax", {
         useClass: ProcessUpgradeBuildingsAjax,
+    });
+
+    container.register("process-recruit-units-ajax", {
+        useClass: ProcessUnitRequestAjax,
     });
 }
 

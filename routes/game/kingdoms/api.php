@@ -98,6 +98,7 @@ Route::middleware([
     Route::get('/kingdom/capital-city/manage-units/{character}/{kingdom}', ['as' => 'kingdom.capital-city.manage.units', 'uses' => 'Api\CapitalCityManagementController@fetchKingdomsWithRecruitableUnitType']);
     Route::post('/kingdom/capital-city/walk-all-cities/{character}/{kingdom}', ['as' => 'capital.city.walk-kingdoms', 'uses' => 'Api\CapitalCityManagementController@walkAllKingdoms']);
     Route::post('/kingdom/capital-city/upgrade-building-requests/{character}/{kingdom}', ['as' => 'capital.city.building-upgrade-request', 'uses' => 'Api\CapitalCityManagementController@upgradeBuildings']);
+    Route::post('/kingdom/capital-city/recruit-unit-requests/{character}/{kingdom}', ['as' => 'capital.city.recruit-unit-request', 'uses' => 'Api\CapitalCityManagementController@recruitUnits']);
 });
 
 

@@ -7,11 +7,30 @@ import { serviceContainer } from "../../../../lib/containers/core-container";
 import RepairHelpSection from "./partials/repair-help-section";
 import UpgradeHelpSection from "./partials/upgrade-help-section";
 import RecruitUnitsSections from "./partials/recruit-units-sections";
+import ProcessUnitRequestAjax from "../../ajax/process-unit-request-ajax";
+
+interface Unit {
+    name: string;
+    amount: number;
+    kingdom_ids: number[];
+}
+
+interface UnitRequest {
+    unit_name: string;
+    unit_amount: number;
+}
+
+interface KingdomUnits {
+    kingdom_id: number;
+    unit_requests: UnitRequest[];
+}
 
 export default class SendUnitRecruitmentRequestModal extends React.Component<
     any,
     any
 > {
+    private processUnitRecruitmentAjax: ProcessUnitRequestAjax;
+
     constructor(props: any) {
         super(props);
 
@@ -20,6 +39,10 @@ export default class SendUnitRecruitmentRequestModal extends React.Component<
             error_message: null,
             success_message: null,
         };
+
+        this.processUnitRecruitmentAjax = serviceContainer().fetch(
+            ProcessUnitRequestAjax,
+        );
     }
 
     sendRequest() {
@@ -28,7 +51,35 @@ export default class SendUnitRecruitmentRequestModal extends React.Component<
                 loading: true,
             },
             () => {
-                console.log("Ajax...");
+                const kingdomUnitsMap: { [key: number]: UnitRequest[] } = {};
+
+                this.props.params.forEach(
+                    (unit: { kingdom_ids: any[]; name: any; amount: any }) => {
+                        unit.kingdom_ids.forEach((kingdom_id) => {
+                            if (!kingdomUnitsMap[kingdom_id]) {
+                                kingdomUnitsMap[kingdom_id] = [];
+                            }
+                            kingdomUnitsMap[kingdom_id].push({
+                                unit_name: unit.name,
+                                unit_amount: unit.amount,
+                            });
+                        });
+                    },
+                );
+
+                const kingdomUnits: KingdomUnits[] = Object.keys(
+                    kingdomUnitsMap,
+                ).map((key: string) => ({
+                    kingdom_id: parseInt(key, 10),
+                    unit_requests: kingdomUnitsMap[key as any],
+                }));
+
+                this.processUnitRecruitmentAjax.processRequest(
+                    this,
+                    this.props.character_id,
+                    this.props.kingdom_id,
+                    kingdomUnits,
+                );
             },
         );
     }
