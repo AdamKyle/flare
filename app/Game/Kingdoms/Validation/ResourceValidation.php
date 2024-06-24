@@ -41,6 +41,25 @@ class ResourceValidation {
     }
 
     /**
+     * Get the missing costs for the building trying to upgrade.
+     *
+     * @param KingdomBuilding $building
+     * @param Kingdom $kingdom
+     * @return array
+     */
+    public function getMissingCosts(KingdomBuilding $building, Kingdom $kingdom): array {
+
+        return [
+            'wood' => $kingdom->current_wood - $this->getBuildingCost($kingdom, $building->base_wood_cost),
+            'clay' => $kingdom->current_clay - $this->getBuildingCost($kingdom, $building->base_clay_cost),
+            'stone' => $kingdom->current_stone - $this->getBuildingCost($kingdom, $building->base_stone_cost),
+            'steel' => $kingdom->current_steel - $this->getBuildingCost($kingdom, $building->steel_cost),
+            'iron' => $kingdom->current_iron - $this->getBuildingCost($kingdom, $building->base_iron_cost, false, true),
+            'population' => $kingdom->current_population - $this->getBuildingCost($kingdom, $building->base_population, true),
+        ];
+    }
+
+    /**
      * Do we have enough resources to recruit the units?
      *
      * @param GameUnit $unit
