@@ -98,8 +98,6 @@ class CapitalCityManagementService
         return $this->capitalCityBuildingManagement->createBuildingUpgradeRequestQueue($character, $kingdom, $params, $type);
     }
 
-    // Private Methods
-
     /**
      * Ensure only one capital city exists per game plane.
      *
@@ -184,7 +182,7 @@ class CapitalCityManagementService
 
     /**
      * Filters out buildings who are currently in the Capital City Building Queue.
-     * 
+     *
      * @param EloquentCollection $kingdomBuildings
      * @return SupportCollection
      */
