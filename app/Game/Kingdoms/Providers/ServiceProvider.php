@@ -69,6 +69,7 @@ class ServiceProvider extends ApplicationServiceProvider {
         $this->app->bind(CapitalCityManagementService::class, function($app) {
             return new CapitalCityManagementService(
                 $app->make(UpdateKingdom::class),
+                $app->make(CapitalCityBuildingManagement::class),
                 $app->make(KingdomBuildingTransformer::class),
                 $app->make(Manager::class)
             );
@@ -76,7 +77,10 @@ class ServiceProvider extends ApplicationServiceProvider {
 
         $this->app->bind(CapitalCityBuildingManagement::class, function($app) {
             return new CapitalCityBuildingManagement(
-                $app->make(KingdomBuildingService::class)
+                $app->make(KingdomBuildingService::class),
+                $app->make(UnitMovementService::class),
+                $app->make(ResourceTransferService::class),
+                $app->make(UpdateKingdom::class),
             );
         });
 
