@@ -2,6 +2,9 @@
 
 namespace App\Game\Kingdoms\Jobs;
 
+use App\Flare\Models\CapitalCityBuildingQueue;
+use App\Game\Kingdoms\Service\CapitalCityBuildingManagement;
+use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -30,22 +33,27 @@ class RequestResources implements ShouldQueue {
      * @param array $resourcesToTransfer
      * @param array $unitsInMovement
      * @param array $additionalMessagesForLog
+     * @param int|null $capitalCityQueueId
+     * @param int|null $buildingId
      */
     public function __construct(private readonly int $characterId,
                                 private readonly int $requestingKingdomId,
                                 private readonly int $requestingFromKingdomId,
                                 private readonly array $resourcesToTransfer,
                                 private readonly array $unitsInMovement,
-                                private readonly array $additionalMessagesForLog) {}
+                                private readonly array $additionalMessagesForLog,
+                                private readonly int|null $capitalCityQueueId = null,
+                                private readonly int|null $buildingId = null) {}
 
     /**
      * Execute the job.
      *
      * @param UpdateKingdom $updateKingdom
      * @param DistanceCalculation $distanceCalculation
+     * @param CapitalCityBuildingManagement $capitalCityBuildingManagement
      * @return void
      */
-    public function handle(UpdateKingdom $updateKingdom, DistanceCalculation $distanceCalculation): void {
+    public function handle(UpdateKingdom $updateKingdom, DistanceCalculation $distanceCalculation, CapitalCityBuildingManagement $capitalCityBuildingManagement): void {
 
         $requestedKingdom = Kingdom::find($this->requestingKingdomId);
         $requestingFromKingdom = Kingdom::find($this->requestingFromKingdomId);
@@ -103,6 +111,27 @@ class RequestResources implements ShouldQueue {
         $unitMovementQueue =  UnitMovementQueue::create(
             $this->buildUnitMovementQueue($requestedKingdom, $requestingFromKingdom, $timeToKingdom)
         );
+
+        $capitalCityBuildingQueue = CapitalCityBuildingQueue::find($this->capitalCityQueueId);
+
+        if (!is_null($capitalCityBuildingQueue) && !is_null($this->buildingId)) {
+
+            $buildingRequestQueue = $capitalCityBuildingQueue->building_request_data;
+
+            foreach ($buildingRequestQueue as $index => $requestData) {
+                if ($requestData['building_id'] === $this->buildingId) {
+                    $buildingRequestQueue[$index]['secondary_status'] = CapitalCityQueueStatus::BUILDING;
+                }
+            }
+
+            $capitalCityBuildingQueue->update([
+                'building_request_data' => $buildingRequestQueue,
+            ]);
+
+            $capitalCityBuildingQueue = $capitalCityBuildingManagement->refresh();
+
+            $capitalCityBuildingManagement->handleBuildingManagement($capitalCityBuildingQueue);
+        }
 
         $this->sendOffEvents($requestedKingdom, $requestingFromKingdom, $unitMovementQueue);
     }

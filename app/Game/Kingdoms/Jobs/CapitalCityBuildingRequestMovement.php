@@ -21,6 +21,7 @@ class CapitalCityBuildingRequestMovement implements ShouldQueue {
     public function __construct(private readonly int $capitalCityQueueId, private readonly int $characterId) {}
 
     /**
+     * @param CapitalCityBuildingManagement $capitalCityBuildingManagement
      * @return void
      */
     public function handle(CapitalCityBuildingManagement $capitalCityBuildingManagement): void {

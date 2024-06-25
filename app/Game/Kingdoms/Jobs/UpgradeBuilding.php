@@ -2,7 +2,8 @@
 
 namespace App\Game\Kingdoms\Jobs;
 
-use League\Fractal\Manager;
+use App\Flare\Models\CapitalCityBuildingQueue;
+use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -12,7 +13,6 @@ use App\Flare\Models\BuildingInQueue;
 use App\Flare\Models\User;
 use App\Flare\Models\KingdomBuilding;
 use App\Flare\Models\Kingdom;
-use App\Flare\Transformers\KingdomTransformer;
 use App\Game\Kingdoms\Service\UpdateKingdom;
 use Facades\App\Flare\Values\UserOnlineValue;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
@@ -29,19 +29,21 @@ class UpgradeBuilding implements ShouldQueue {
     /**
      * @var KingdomBuilding $building
      */
-    protected $building;
+    protected KingdomBuilding $building;
 
     /**
      * @var int queueId
      */
-    protected $queueId;
+    protected int $queueId;
 
     /**
      * @var array $resourceType
      */
-    protected $resourceTypes = [
+    protected array $resourceTypes = [
         'wood', 'clay', 'stone', 'iron',
     ];
+
+    protected int|null $capitalCityQueueId = null;
 
     /**
      * Create a new job instance.
@@ -49,22 +51,23 @@ class UpgradeBuilding implements ShouldQueue {
      * @param KingdomBuilding $building
      * @param User $user
      * @param int $queueId
-     * @return void
+     * @param int|null $capitalCityQueueId
      */
-    public function __construct(KingdomBuilding $building, User $user, int $queueId)
+    public function __construct(KingdomBuilding $building, User $user, int $queueId, int $capitalCityQueueId = null)
     {
         $this->user     = $user;
 
         $this->building = $building;
 
         $this->queueId  = $queueId;
+
+        $this->capitalCityQueueId = $capitalCityQueueId;
     }
 
     /**
      * Execute the job.
      *
-     * @param Manager $manager
-     * @param KingdomTransformer $kingdomTransformer
+     * @param UpdateKingdom $updateKingdom
      * @return void
      */
     public function handle(UpdateKingdom $updateKingdom)
@@ -161,6 +164,23 @@ class UpgradeBuilding implements ShouldQueue {
 
                 ServerMessageHandler::handleMessage($this->user, 'building_upgrade_finished', $message);
             }
+        }
+
+        if (!is_null($this->capitalCityQueueId)) {
+            $capitalCityQueue = CapitalCityBuildingQueue::find($this->capitalCityQueueId);
+
+            $buildingRequestData = $capitalCityQueue->building_request_data;
+
+            foreach ($buildingRequestData as $index => $requestData) {
+                if ($requestData['building_id'] === $this->building->id) {
+                    $buildingRequestData[$index]['secondary_status'] = CapitalCityQueueStatus::FINISHED;
+                    $buildingRequestData[$index]['messages'][] = 'Building finished upgrading. Kingdom log will be generated when all buildings for this kingdom are upgraded.';
+                }
+            }
+
+            $capitalCityQueue->update([
+                'building_request_data' => $buildingRequestData
+            ]);
         }
     }
 

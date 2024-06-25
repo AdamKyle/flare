@@ -49,7 +49,7 @@ class KingdomBuildingService {
      * @param Character $character
      * @return void
      */
-    public function upgradeKingdomBuilding(KingdomBuilding $building, Character $character): void {
+    public function upgradeKingdomBuilding(KingdomBuilding $building, Character $character, int $capitalCityQueueId = null): void {
         $timeToComplete = now()->addMinutes($this->calculateBuildingTimeReduction($building));
 
         $queue = BuildingInQueue::create([
@@ -64,7 +64,7 @@ class KingdomBuildingService {
 
         event(new UpdateKingdomQueues($building->kingdom));
 
-        UpgradeBuilding::dispatch($building, $character->user, $queue->id)->delay($timeToComplete);
+        UpgradeBuilding::dispatch($building, $character->user, $queue->id, $capitalCityQueueId)->delay($timeToComplete);
     }
 
     /**

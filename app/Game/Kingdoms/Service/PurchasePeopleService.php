@@ -50,9 +50,9 @@ class PurchasePeopleService {
      */
     public function purchasePeople(int $amountToPurchase): void {
 
-        $amountToBuy = $this->getAmountToPurchase($amountToPurchase);
+        $character = $this->updateCharacterGold($amountToPurchase);
 
-        $character = $this->updateCharacterGold($amountToBuy);
+        $amountToBuy = $this->getAmountToPurchase($amountToPurchase);
 
         $this->kingdom->update([
             'current_population' => $amountToBuy,
