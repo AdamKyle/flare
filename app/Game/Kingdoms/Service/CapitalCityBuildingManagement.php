@@ -101,15 +101,17 @@ class CapitalCityBuildingManagement {
         $kingdom = $capitalCityBuildingQueue->kingdom;
         $character = $capitalCityBuildingQueue->character;
 
+
         foreach ($requestData as $index => $buildingUpgradeRequest) {
 
             $building = $kingdom->buildings()->where('id', $buildingUpgradeRequest['building_id'])->first();
+            $buildingUpgradeRequest = $this->processPotentialResourceRequests($capitalCityBuildingQueue, $kingdom, $building, $character, $buildingUpgradeRequest);
 
-            $requestData = $this->processPotentialResourceRequests($capitalCityBuildingQueue, $kingdom, $building, $character, $requestData, $index);
+            $requestData[$index] = $buildingUpgradeRequest;
         }
 
         $capitalCityBuildingQueue->update([
-            'building_queue_data' => $requestData,
+            'building_request_data' => $requestData,
             'messages' => $this->messages,
         ]);
 
@@ -118,12 +120,12 @@ class CapitalCityBuildingManagement {
         $requestData = $capitalCityBuildingQueue->building_request_data;
 
         foreach ($requestData as $buildingUpgradeRequest) {
-
             if ($buildingUpgradeRequest['secondary_status'] === CapitalCityQueueStatus::BUILDING) {
                 $this->handleBuildingManagement($capitalCityBuildingQueue);
             }
         }
 
+        dump('Was anything done? - end of execution');
 
     }
 
@@ -137,27 +139,30 @@ class CapitalCityBuildingManagement {
 
                 $building = $kingdom->buildings()->where('id', $queueData['building_id'])->first();
 
-                $buildingsInQueue = $this->processPotentialResourceRequests($capitalCityBuildingQueue, $kingdom, $building, $character, $buildingsInQueue, $index);
+                $buildingsInQueue = $this->processPotentialResourceRequests($capitalCityBuildingQueue, $kingdom, $building, $character, $queueData);
+                $buildingsInQueue[$index] = $buildingsInQueue;
 
-                if ($buildingsInQueue['building_request_data'][$index]['secondary_status'] === CapitalCityQueueStatus::BUILDING) {
+                if ($buildingsInQueue['secondary_status'] === CapitalCityQueueStatus::BUILDING) {
 
-                    $population = $buildingsInQueue['building_request_data'][$index]['missing_costs']['population'];
-                    $cost = (new UnitCosts(UnitCosts::PERSON))->fetchCost() * $population;
-                    $treasury = $kingdom->treasury;
+                    if (isset($buildingsInQueue['missing_costs']['population'])) {
+                        $population = $buildingsInQueue['missing_costs']['population'];
+                        $cost = (new UnitCosts(UnitCosts::PERSON))->fetchCost() * $population;
+                        $treasury = $kingdom->treasury;
 
-                    $treasury = $treasury - $cost;
+                        $treasury = $treasury - $cost;
 
-                    $kingdom->update([
-                        'treasury' => $treasury,
-                    ]);
+                        $kingdom->update([
+                            'treasury' => $treasury,
+                        ]);
 
-                    $kingdom->refresh();
+                        $kingdom->refresh();
+                    }
 
-                    $this->kingdomBuildingService->updateKingdomResourcesForRebuildKingdomBuilding($building);
+                    $kingdom = $this->kingdomBuildingService->updateKingdomResourcesForRebuildKingdomBuilding($building);
 
                     $this->kingdomBuildingService->upgradeKingdomBuilding($building, $character, $capitalCityBuildingQueue->id);
 
-                    $this->updateKingdom->updateKingdom($kingdom->refresh());
+                    $this->updateKingdom->updateKingdom($kingdom);
                 }
             }
         }
@@ -177,7 +182,7 @@ class CapitalCityBuildingManagement {
         return true;
     }
 
-    private function processPotentialResourceRequests(CapitalCityBuildingQueue $capitalCityBuildingQueue, Kingdom $kingdom, KingdomBuilding $building, Character $character, array $requestData, int $index): array {
+    private function processPotentialResourceRequests(CapitalCityBuildingQueue $capitalCityBuildingQueue, Kingdom $kingdom, KingdomBuilding $building, Character $character, array $buildingUpgradeRequest): array {
         if (ResourceValidation::shouldRedirectRebuildKingdomBuilding($building, $kingdom)) {
             $missingResources = ResourceValidation::getMissingCosts($building, $kingdom);
 
@@ -193,21 +198,21 @@ class CapitalCityBuildingManagement {
                     $missingResources['population'] . ' population.';
             }
 
-            $requestData[$index]['missing_costs'] = $missingResources;
+            $buildingUpgradeRequest['missing_costs'] = $missingResources;
 
             if ($canAffordPopulation) {
                 $this->processResourceRequests($capitalCityBuildingQueue, $kingdom, $character, $building, $missingResources);
             }
 
 
-            $requestData[$index]['secondary_status'] = $canAffordPopulation ? CapitalCityQueueStatus::REQUESTING : CapitalCityQueueStatus::REJECTED;
+            $buildingUpgradeRequest['secondary_status'] = $canAffordPopulation ? CapitalCityQueueStatus::REQUESTING : CapitalCityQueueStatus::REJECTED;
 
-            return $requestData;
+            return $buildingUpgradeRequest;
         }
 
-        $requestData[$index]['secondary_status'] = CapitalCityQueueStatus::BUILDING;
+        $buildingUpgradeRequest['secondary_status'] = CapitalCityQueueStatus::BUILDING;
 
-        return $requestData;
+        return $buildingUpgradeRequest;
     }
 
 
@@ -219,7 +224,7 @@ class CapitalCityBuildingManagement {
 
     private function sendOffResourceRequests(CapitalCityBuildingQueue $queue, Kingdom $kingdom, Character $character, KingdomBuilding $building, string $resourceName, int $resourceAmount): void {
 
-        $kingdom = $character->kingdoms()->where('kingdom_id', '!=', $kingdom->id)->where('current_' . $resourceName, '>=', $resourceAmount)->first();
+        $kingdom = $character->kingdoms()->where('id', '!=', $kingdom->id)->where('current_' . $resourceName, '>=', $resourceAmount)->first();
 
         if (is_null($kingdom)) {
 
