@@ -49,19 +49,23 @@ class CapitalCityManagementService {
         foreach ($kingdoms as $kingdom) {
 
             $buildings = $kingdom->buildings()
-                ->where('is_locked', false)
-                ->whereNotIn('id', function ($query) use ($kingdom) {
+                ->join('game_buildings', 'game_buildings.id', '=', 'kingdom_buildings.game_building_id')
+                ->where('kingdom_buildings.is_locked', false)
+                ->whereNotIn('kingdom_buildings.id', function ($query) use ($kingdom) {
                     $query->select('building_id')
                         ->from('buildings_in_queue')
                         ->where('kingdom_id', $kingdom->id);
                 })
-                ->whereExists(function ($query) {
+                ->whereColumn('game_buildings.max_level', '>', 'kingdom_buildings.level')
+                ->whereNotExists(function ($query) use ($kingdom) {
                     $query->select(DB::raw(1))
-                        ->from('game_buildings')
-                        ->whereColumn('game_buildings.id', 'kingdom_buildings.game_building_id')
-                        ->whereColumn('game_buildings.max_level', '!=', 'kingdom_buildings.level');
+                        ->from('capital_city_building_queues')
+                        ->where('capital_city_building_queues.kingdom_id', $kingdom->id)
+                        ->whereJsonDoesntContain('building_request_data', ['building_id' => DB::raw('CAST(kingdom_buildings.id AS CHAR)')]);
                 })
+                ->select('kingdom_buildings.*') // Ensure the select is from kingdom_buildings
                 ->get();
+
 
             $buildings = new Collection($buildings, $this->kingdomBuildingTransformer);
             $buildings = $this->manager->createData($buildings)->toArray();
@@ -83,7 +87,7 @@ class CapitalCityManagementService {
         return $this->successResult($kingdomBuildingData);
     }
 
-    public function fetchKingdomsForSelection(Character $character, Kingdom $kingdom): array {
+    public function fetchKingdomsForSelection(Kingdom $kingdom): array {
         return $this->successResult([
             'kingdoms' => Kingdom::where('id', '!=', $kingdom->id)->whereDoesntHave('unitsQueue')->select('name', 'id')->get()->toArray(),
         ]);

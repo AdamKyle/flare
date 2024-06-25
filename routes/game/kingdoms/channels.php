@@ -21,7 +21,7 @@ Broadcast::channel('kingdoms-list-data-{userId}', function($user, $userId) {
 });
 
 // When the kingdoms capital city building upgrade/repair table should update.
-Broadcast::channel('update-kingdom-building-data-{userId}', function($user, $userId) {
+Broadcast::channel('capital-city-update-kingdom-building-data-{userId}', function($user, $userId) {
     return $user->id === (int) $userId;
 });
 

@@ -8,8 +8,9 @@ use App\Flare\Models\Kingdom;
 use App\Flare\Models\KingdomBuilding;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Kingdoms\Events\UpdateBuildingUpgrades;
+use App\Game\Kingdoms\Events\UpdateCapitalCityBuildingUpgrades;
 use App\Game\Kingdoms\Jobs\CapitalCityBuildingRequestMovement;
-use App\Game\Kingdoms\Validation\ResourceValidation;
+use Facades\App\Game\Kingdoms\Validation\ResourceValidation;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use App\Game\Kingdoms\Values\UnitCosts;
 
@@ -38,8 +39,8 @@ class CapitalCityBuildingManagement {
 
         foreach ($requests as $request) {
 
-            $kingdomId = $request['kingdom_id'];
-            $buildingIds = $request['building_ids'];
+            $kingdomId = $request['kingdomId'];
+            $buildingIds = $request['buildingIds'];
 
             $buildings = KingdomBuilding::where('kingdom_id', $kingdomId)->whereIn('id', $buildingIds)->get();
 
@@ -50,12 +51,12 @@ class CapitalCityBuildingManagement {
             $minutes       = now()->addMinutes($time);
 
             $queueData = [
-                'kingdom_id' => $request['kingdom_id'],
-                'building_upgrade_requests' => [],
+                'kingdom_id' => $kingdomId,
+                'building_request_data' => [],
             ];
 
             foreach ($buildings as $building) {
-                $queueData['building_upgrade_requests'][] = [
+                $queueData['building_request_data'][] = [
                     'building_id'   => $building->id,
                     'costs'         => $this->kingdomBuildingService->getBuildingCosts($building),
                     'type'          => $type,
@@ -64,18 +65,19 @@ class CapitalCityBuildingManagement {
                 ];
             }
 
-            $delayTime  = now()->addMinutes($minutes);
-
+            $queueData['character_id'] = $character->id;
             $queueData['status'] = CapitalCityQueueStatus::TRAVELING;
             $queueData['started_at'] = now();
-            $queueData['completed_at'] = $delayTime;
+            $queueData['completed_at'] = $minutes;
+
+
 
             $capitalCityBuildingQueue = CapitalCityBuildingQueue::create($queueData);
 
-            CapitalCityBuildingRequestMovement::dispatch($capitalCityBuildingQueue->id, $character->id)->delay($delayTime);
+            CapitalCityBuildingRequestMovement::dispatch($capitalCityBuildingQueue->id, $character->id)->delay($minutes);
         }
 
-        event(new UpdateBuildingUpgrades($character, $kingdom));
+        event(new UpdateCapitalCityBuildingUpgrades($character, $kingdom));
 
         return $this->successResult([
             'message' => 'Building upgrades have been sent off to their respective kingdoms.

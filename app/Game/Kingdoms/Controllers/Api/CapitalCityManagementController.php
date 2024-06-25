@@ -33,7 +33,7 @@ class CapitalCityManagementController extends Controller {
     }
 
     public function fetchKingdomsWithRecruitableUnitType(Character $character, Kingdom $kingdom) {
-        $result = $this->capitalCityManagementService->fetchKingdomsForSelection($character, $kingdom);
+        $result = $this->capitalCityManagementService->fetchKingdomsForSelection($kingdom);
 
         $status = $result['status'];
         unset($result['status']);
@@ -51,9 +51,12 @@ class CapitalCityManagementController extends Controller {
     }
 
     public function upgradeBuildings(BuildingUpgradeRequestsRequest $buildingUpgradeRequestsRequest, Character $character, Kingdom $kingdom) {
-        dump($buildingUpgradeRequestsRequest->all());
-
         $result = $this->capitalCityManagementService->sendoffBuildingRequests($character, $kingdom, $buildingUpgradeRequestsRequest->request_data, $buildingUpgradeRequestsRequest->request_type);
+
+        $status = $result['status'];
+        unset($result['status']);
+
+        return response()->json($result, $status);
     }
 
     public function recruitUnits(RecruitUnitRequestsRequest $recruitUnitRequestsRequest, Character $character, Kingdom $kingdom) {

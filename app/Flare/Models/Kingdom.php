@@ -205,6 +205,10 @@ class Kingdom extends Model {
         return $this->hasMany(BuildingInQueue::class, 'kingdom_id', 'id');
     }
 
+    public function capitalCityBuildingQueue() {
+        return $this->hasMany(CapitalCityBuildingQueue::class, 'kingdom_id', 'id');
+    }
+
     public function unitsQueue() {
         return $this->hasMany(UnitInQueue::class, 'kingdom_id', 'id');
     }

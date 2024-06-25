@@ -19,6 +19,7 @@ class CapitalCityBuildingQueue extends Model {
         'character_id',
         'kingdom_id',
         'building_request_data',
+        'messages',
         'completed_at',
         'started_at',
     ];
@@ -30,6 +31,7 @@ class CapitalCityBuildingQueue extends Model {
      */
     protected $casts = [
         'building_request_data' => 'array',
+        'messages' => 'array',
         'completed_at' => 'datetime',
         'started_at'   => 'datetime',
     ];

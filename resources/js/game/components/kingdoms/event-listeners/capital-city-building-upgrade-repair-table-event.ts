@@ -33,7 +33,7 @@ export default class CapitalCityBuildingUpgradeRepairTableEvent
             const echo = this.coreEventListener.getEcho();
 
             this.capitalCityBuildingUpgradeRepairTableEvent = echo.private(
-                "update-kingdom-building-data-" + this.userId,
+                "capital-city-update-kingdom-building-data-" + this.userId,
             );
         } catch (e: any | unknown) {
             throw new Error(e);
@@ -55,7 +55,7 @@ export default class CapitalCityBuildingUpgradeRepairTableEvent
         }
 
         this.capitalCityBuildingUpgradeRepairTableEvent.listen(
-            "Game.Kingdoms.Events.UpdateBuildingUpgrades",
+            "Game.Kingdoms.Events.UpdateCapitalCityBuildingUpgrades",
             (event: any) => {
                 if (!this.component) {
                     return;

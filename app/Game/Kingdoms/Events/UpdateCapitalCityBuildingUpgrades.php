@@ -14,7 +14,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use App\Flare\Models\Character;
 use App\Game\Core\Traits\KingdomCache;
 
-class UpdateBuildingUpgrades implements ShouldBroadcastNow {
+class UpdateCapitalCityBuildingUpgrades implements ShouldBroadcastNow {
 
     use Dispatchable, InteractsWithSockets, SerializesModels, KingdomCache;
 
@@ -49,6 +49,6 @@ class UpdateBuildingUpgrades implements ShouldBroadcastNow {
      * @return Channel|array
      */
     public function broadcastOn(): Channel|array {
-        return new PrivateChannel('update-kingdom-building-data-' . $this->user->id);
+        return new PrivateChannel('capital-city-update-kingdom-building-data-' . $this->user->id);
     }
 }

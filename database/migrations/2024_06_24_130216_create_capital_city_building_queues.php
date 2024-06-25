@@ -16,6 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('character_id');
             $table->unsignedBigInteger('kingdom_id');
             $table->json('building_request_data');
+            $table->json('messages')->nullable();
             $table->dateTime('completed_at');
             $table->dateTime('started_at');
             $table->timestamps();
