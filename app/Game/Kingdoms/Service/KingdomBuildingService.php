@@ -153,12 +153,12 @@ class KingdomBuildingService {
         $costs = $this->getBuildingCosts($building);
 
         $building->kingdom->update([
-            'current_wood'       => $building->kingdom->current_wood - $costs['wood'],
-            'current_clay'       => $building->kingdom->current_clay - $costs['clay'],
-            'current_stone'      => $building->kingdom->current_stone - $costs['stone'],
-            'current_iron'       => $building->kingdom->current_iron - $costs['iron'],
-            'current_population' => $building->kingdom->current_population - $costs['population'],
-            'current_steel'      => $building->kingdom->current_steel - $costs['steel'],
+            'current_wood'       => max($building->kingdom->current_wood - $costs['wood'], 0),
+            'current_clay'       => max($building->kingdom->current_clay - $costs['clay'], 0),
+            'current_stone'      => max($building->kingdom->current_stone - $costs['stone'], 0),
+            'current_iron'       => max($building->kingdom->current_iron - $costs['iron'], 0),
+            'current_population' => max($building->kingdom->current_population - $costs['population'], 0),
+            'current_steel'      => max($building->kingdom->current_steel - $costs['steel'], 0),
         ]);
 
         return $building->kingdom->refresh();

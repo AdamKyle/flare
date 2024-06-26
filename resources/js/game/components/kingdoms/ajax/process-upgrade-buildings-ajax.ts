@@ -2,14 +2,13 @@ import { inject, injectable } from "tsyringe";
 import Ajax from "../../../lib/ajax/ajax";
 import AjaxInterface from "../../../lib/ajax/ajax-interface";
 import { AxiosError, AxiosResponse } from "axios";
-import BuildingsToUpgradeSection from "../capital-city/buildings-to-upgrade-section";
 import SendRequestConfirmationModal from "../capital-city/modals/send-request-confirmation-modal";
 
 @injectable()
 export default class ProcessUpgradeBuildingsAjax {
     constructor(@inject(Ajax) private ajax: AjaxInterface) {}
 
-    public fetchDetails(
+    public sendBuildingRequests(
         component: SendRequestConfirmationModal,
         characterId: number,
         kingdomId: number,
@@ -35,10 +34,15 @@ export default class ProcessUpgradeBuildingsAjax {
             .doAjaxCall(
                 "post",
                 (result: AxiosResponse) => {
-                    component.setState({
-                        loading: false,
-                        success_message: result.data.message,
-                    });
+                    component.setState(
+                        {
+                            loading: false,
+                            success_message: result.data.message,
+                        },
+                        () => {
+                            component.props.reset_table_forms();
+                        },
+                    );
                 },
                 (error: AxiosError) => {
                     component.setState({

@@ -35,7 +35,7 @@ export default class SendRequestConfirmationModal extends React.Component<
                 loading: true,
             },
             () => {
-                this.processBuildingRequestsAjax.fetchDetails(
+                this.processBuildingRequestsAjax.sendBuildingRequests(
                     this,
                     this.props.character_id,
                     this.props.kingdom_id,
@@ -57,7 +57,9 @@ export default class SendRequestConfirmationModal extends React.Component<
                 }
                 primary_button_disabled={this.state.loading}
                 secondary_actions={{
-                    secondary_button_disabled: this.state.loading,
+                    secondary_button_disabled:
+                        this.state.loading &&
+                        this.state.success_message === null,
                     secondary_button_label: "Yes. I understand.",
                     handle_action: this.sendRequest.bind(this),
                 }}

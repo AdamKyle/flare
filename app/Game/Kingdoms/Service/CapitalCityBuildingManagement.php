@@ -70,8 +70,6 @@ class CapitalCityBuildingManagement {
             $queueData['started_at'] = now();
             $queueData['completed_at'] = $minutes;
 
-
-
             $capitalCityBuildingQueue = CapitalCityBuildingQueue::create($queueData);
 
             CapitalCityBuildingRequestMovement::dispatch($capitalCityBuildingQueue->id, $character->id)->delay($minutes);
@@ -96,76 +94,60 @@ class CapitalCityBuildingManagement {
      * @return void
      */
     public function processBuildingRequest(CapitalCityBuildingQueue $capitalCityBuildingQueue): void {
-
         $requestData = $capitalCityBuildingQueue->building_request_data;
         $kingdom = $capitalCityBuildingQueue->kingdom;
         $character = $capitalCityBuildingQueue->character;
 
-
         foreach ($requestData as $index => $buildingUpgradeRequest) {
-
             $building = $kingdom->buildings()->where('id', $buildingUpgradeRequest['building_id'])->first();
             $buildingUpgradeRequest = $this->processPotentialResourceRequests($capitalCityBuildingQueue, $kingdom, $building, $character, $buildingUpgradeRequest);
 
             $requestData[$index] = $buildingUpgradeRequest;
+
+            $capitalCityBuildingQueue->update([
+                'building_request_data' => $requestData,
+            ]);
+
+            $capitalCityBuildingQueue = $capitalCityBuildingQueue->refresh();
+
+            if ($buildingUpgradeRequest['secondary_status'] === CapitalCityQueueStatus::REQUESTING) {
+                continue;
+            }
+
+            // If the request is ready for building, handle it immediately
+            if ($buildingUpgradeRequest['secondary_status'] === CapitalCityQueueStatus::BUILDING) {
+                $this->handleBuildingRequest($capitalCityBuildingQueue, $building, $character);
+            }
         }
 
         $capitalCityBuildingQueue->update([
             'building_request_data' => $requestData,
             'messages' => $this->messages,
         ]);
-
-        $capitalCityBuildingQueue = $capitalCityBuildingQueue->refresh();
-
-        $requestData = $capitalCityBuildingQueue->building_request_data;
-
-        foreach ($requestData as $buildingUpgradeRequest) {
-            if ($buildingUpgradeRequest['secondary_status'] === CapitalCityQueueStatus::BUILDING) {
-                $this->handleBuildingManagement($capitalCityBuildingQueue);
-            }
-        }
-
-        dump('Was anything done? - end of execution');
-
     }
 
-    public function handleBuildingManagement(CapitalCityBuildingQueue $capitalCityBuildingQueue): void {
-        $buildingsInQueue = $capitalCityBuildingQueue->building_request_data;
+    private function handleBuildingRequest(CapitalCityBuildingQueue $capitalCityBuildingQueue, KingdomBuilding $building, Character $character): void {
         $kingdom = $capitalCityBuildingQueue->kingdom;
-        $character = $capitalCityBuildingQueue->character;
 
-        foreach ($buildingsInQueue as $index => $queueData) {
-            if ($queueData['secondary_status'] === CapitalCityQueueStatus::BUILDING) {
+        if ($this->needsPopulationCost($building)) {
+            $population = $building->missing_costs['population'];
+            $cost = (new UnitCosts(UnitCosts::PERSON))->fetchCost() * $population;
+            $treasury = $kingdom->treasury;
 
-                $building = $kingdom->buildings()->where('id', $queueData['building_id'])->first();
+            $treasury -= $cost;
 
-                $buildingsInQueue = $this->processPotentialResourceRequests($capitalCityBuildingQueue, $kingdom, $building, $character, $queueData);
-                $buildingsInQueue[$index] = $buildingsInQueue;
-
-                if ($buildingsInQueue['secondary_status'] === CapitalCityQueueStatus::BUILDING) {
-
-                    if (isset($buildingsInQueue['missing_costs']['population'])) {
-                        $population = $buildingsInQueue['missing_costs']['population'];
-                        $cost = (new UnitCosts(UnitCosts::PERSON))->fetchCost() * $population;
-                        $treasury = $kingdom->treasury;
-
-                        $treasury = $treasury - $cost;
-
-                        $kingdom->update([
-                            'treasury' => $treasury,
-                        ]);
-
-                        $kingdom->refresh();
-                    }
-
-                    $kingdom = $this->kingdomBuildingService->updateKingdomResourcesForRebuildKingdomBuilding($building);
-
-                    $this->kingdomBuildingService->upgradeKingdomBuilding($building, $character, $capitalCityBuildingQueue->id);
-
-                    $this->updateKingdom->updateKingdom($kingdom);
-                }
-            }
+            $kingdom->update([
+                'treasury' => $treasury,
+            ]);
         }
+
+        $kingdom = $this->kingdomBuildingService->updateKingdomResourcesForRebuildKingdomBuilding($building);
+        $this->kingdomBuildingService->upgradeKingdomBuilding($building, $character, $capitalCityBuildingQueue->id);
+        $this->updateKingdom->updateKingdom($kingdom);
+    }
+
+    private function needsPopulationCost(KingdomBuilding $building): bool {
+        return isset($building->missing_costs['population']) && $building->missing_costs['population'] > 0;
     }
 
     private function canAffordPopulationCost(Kingdom $kingdom, int $populationAmount): bool {

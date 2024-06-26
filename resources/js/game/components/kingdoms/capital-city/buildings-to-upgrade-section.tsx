@@ -26,6 +26,7 @@ import {
 } from "./deffinitions/kingdom_building_data";
 import CapitalCityBuildingUpgradeRepairTableEventDefinition from "../event-listeners/capital-city-building-upgrade-repair-table-event-definition";
 import CapitalCityBuildingUpgradeRepairTableEvent from "../event-listeners/capital-city-building-upgrade-repair-table-event";
+import clsx from "clsx";
 
 enum SortType {
     KINGDOM_NAME = "kingdom-name",
@@ -54,6 +55,7 @@ export default class BuildingsToUpgradeSection extends React.Component<
             order_type: null,
             upgrade_queue: [],
             show_review_modal: false,
+            kingdom_search: "",
         };
 
         this.fetchUpgradableKingdomsAjax = serviceContainer().fetch(
@@ -78,6 +80,15 @@ export default class BuildingsToUpgradeSection extends React.Component<
         );
 
         this.updateBuildingTable.listen();
+    }
+
+    resetTableForms() {
+        this.setState({
+            sort_type: null,
+            order_type: null,
+            upgrade_queue: [],
+            kingdom_search: "",
+        });
     }
 
     compressArray(sortedData: Kingdom[], returnData: boolean) {
@@ -151,8 +162,9 @@ export default class BuildingsToUpgradeSection extends React.Component<
     resetSort() {
         this.setState(
             {
-                order_type: null,
                 sort_type: null,
+                order_type: null,
+                kingdom_search: "",
             },
             () => {
                 this.compressArray(this.state.building_data, false);
@@ -163,6 +175,41 @@ export default class BuildingsToUpgradeSection extends React.Component<
     manageReviewModal() {
         this.setState({
             show_review_modal: !this.state.show_review_modal,
+        });
+    }
+
+    filterKingdomsTable(event: React.ChangeEvent<HTMLInputElement>): void {
+        const value = event.target.value;
+
+        let sortedData = JSON.parse(JSON.stringify(this.state.building_data));
+
+        sortedData = this.compressArray(sortedData, true);
+
+        if (value === "") {
+            this.setState({
+                sort_type: null,
+                order_type: null,
+                upgrade_queue: [],
+                kingdom_search: "",
+                table_data: sortedData,
+            });
+
+            return;
+        }
+
+        sortedData = sortedData.filter((tableData: any) => {
+            return (
+                tableData.kingdom_name.includes(value) ||
+                tableData.building_name.includes(value)
+            );
+        });
+
+        this.setState({
+            sort_type: null,
+            order_type: null,
+            upgrade_queue: [],
+            kingdom_search: value,
+            table_data: sortedData,
         });
     }
 
@@ -187,13 +234,17 @@ export default class BuildingsToUpgradeSection extends React.Component<
 
                 <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-4"></div>
 
-                <div className="flex items-center">
+                <div className="flex items-center flex-wrap">
                     <PrimaryOutlineButton
                         button_label={"Queue All Buildings"}
                         on_click={() => {
                             addAllBuildingsToQueue(this);
                         }}
-                        additional_css={"flex-1 py-2 px-4"}
+                        additional_css={"flex-1 py-2 px-4 min-w-[120px]"} // Set minimum width
+                        disabled={
+                            this.state.table_data.length <= 0 &&
+                            this.state.kingdom_search === ""
+                        }
                     />
 
                     {this.state.upgrade_queue.length > 0 ? (
@@ -201,46 +252,91 @@ export default class BuildingsToUpgradeSection extends React.Component<
                             <SuccessOutlineButton
                                 button_label={"Review/Send Orders"}
                                 on_click={this.manageReviewModal.bind(this)}
-                                additional_css={"flex-1 py-2 px-3 ml-2"}
+                                additional_css={
+                                    "flex-1 py-2 px-3 ml-2 min-w-[120px]"
+                                } // Set minimum width
+                                disabled={
+                                    this.state.table_data.length <= 0 &&
+                                    this.state.kingdom_search === ""
+                                }
                             />
                             <DangerOutlineButton
                                 button_label={"Remove All From Queue"}
                                 on_click={() => removeAllFromQueue(this)}
-                                additional_css={"flex-1 py-2 px-3 ml-2"}
+                                additional_css={
+                                    "flex-1 py-2 px-3 ml-2 min-w-[120px]"
+                                } // Set minimum width
+                                disabled={
+                                    this.state.table_data.length <= 0 &&
+                                    this.state.kingdom_search === ""
+                                }
                             />
                         </Fragment>
                     ) : null}
+                </div>
 
-                    <div className="border-r-2 border-r-gray-300 dark:border-r-gray-600 mx-2 h-6"></div>
+                <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-4"></div>
 
-                    <div className="flex space-x-2 items-center">
-                        <PrimaryOutlineButton
-                            button_label={"Sort by Kingdom Name"}
-                            on_click={() =>
-                                this.sortTable(SortType.KINGDOM_NAME, "asc")
-                            }
-                            additional_css={"py-2 px-3 flex-shrink-0"}
-                        />
-                        <SuccessOutlineButton
-                            button_label={"Sort by Building Name"}
-                            on_click={() =>
-                                this.sortTable(SortType.BUILDING_NAME, "asc")
-                            }
-                            additional_css={"py-2 px-3 flex-shrink-0"}
-                        />
-                        <OrangeOutlineButton
-                            button_label={"Sort by Building Level"}
-                            on_click={() =>
-                                this.sortTable(SortType.BUILDING_LEVEL, "asc")
-                            }
-                            additional_css={"py-2 px-3 flex-shrink-0"}
-                        />
-                        <DangerOutlineButton
-                            button_label={"Reset Sort"}
-                            on_click={() => this.resetSort()}
-                            additional_css={"py-2 px-3 flex-shrink-0"} // Added flex-shrink-0 to prevent buttons from shrinking
-                        />
-                    </div>
+                <div
+                    className={clsx(
+                        "flex space-x-2 items-center flex-wrap my-2",
+                    )}
+                >
+                    <PrimaryOutlineButton
+                        button_label={"Sort by Kingdom Name"}
+                        on_click={() =>
+                            this.sortTable(SortType.KINGDOM_NAME, "asc")
+                        }
+                        additional_css={"py-2 px-3 flex-shrink-0 min-w-[120px]"} // Set minimum width
+                        disabled={
+                            this.state.table_data.length <= 0 &&
+                            this.state.kingdom_search === ""
+                        }
+                    />
+                    <SuccessOutlineButton
+                        button_label={"Sort by Building Name"}
+                        on_click={() =>
+                            this.sortTable(SortType.BUILDING_NAME, "asc")
+                        }
+                        additional_css={"py-2 px-3 flex-shrink-0 min-w-[120px]"} // Set minimum width
+                        disabled={
+                            this.state.table_data.length <= 0 &&
+                            this.state.kingdom_search === ""
+                        }
+                    />
+                    <OrangeOutlineButton
+                        button_label={"Sort by Building Level"}
+                        on_click={() =>
+                            this.sortTable(SortType.BUILDING_LEVEL, "asc")
+                        }
+                        additional_css={"py-2 px-3 flex-shrink-0 min-w-[120px]"} // Set minimum width
+                        disabled={
+                            this.state.table_data.length <= 0 &&
+                            this.state.kingdom_search === ""
+                        }
+                    />
+                    <DangerOutlineButton
+                        button_label={"Reset Filters/Search"}
+                        on_click={() => this.resetSort()}
+                        additional_css={"py-2 px-3 flex-shrink-0 min-w-[120px]"} // Set minimum width
+                        disabled={
+                            this.state.table_data.length <= 0 &&
+                            this.state.kingdom_search === ""
+                        }
+                    />
+                </div>
+
+                <div className="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-4 my-4">
+                    <label className="block text-gray-700 w-32 md:w-20 dark:text-gray-100">
+                        Search
+                    </label>
+                    <input
+                        type="text"
+                        value={this.state.kingdom_search}
+                        className="block border border-gray-500 dark:border-gray-200 rounded p-2 w-full md:w-80 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-400 dark:focus:ring-gray-600"
+                        onChange={this.filterKingdomsTable.bind(this)}
+                        placeholder="Enter Kingdom/Building Name"
+                    />
                 </div>
 
                 <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-4"></div>
@@ -259,6 +355,7 @@ export default class BuildingsToUpgradeSection extends React.Component<
                         kingdom_id={this.props.kingdom.id}
                         params={this.state.upgrade_queue}
                         repair={this.props.repair}
+                        reset_table_forms={this.resetTableForms.bind(this)}
                     />
                 ) : null}
             </div>

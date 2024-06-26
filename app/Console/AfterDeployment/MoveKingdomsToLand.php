@@ -31,7 +31,6 @@ class MoveKingdomsToLand extends Command
     {
         Character::whereHas('kingdoms')->orderBy('id')->chunk(100, function ($characters) {
             foreach ($characters as $character) {
-                dump("Processing character: {$character->name}");
                 $this->moveKingdoms($character);
             }
         });
@@ -39,17 +38,14 @@ class MoveKingdomsToLand extends Command
 
     protected function moveKingdoms(Character $character): void
     {
-        dump("Moving kingdoms for character: {$character->name}");
 
         $firstWaterTile = $this->findFirstWaterTileForMap($character);
 
         if (empty($firstWaterTile)) {
-            dump("No water tile found for character: {$character->name}");
             return;
         }
 
         if (!$this->mapTileValue->canWalk($character, $firstWaterTile['x'], $firstWaterTile['y'])) {
-            dump("Character {$character->name} cannot walk on water. Moving kingdoms...");
             $this->moveWaterKingdoms($character->kingdoms);
         }
     }
@@ -57,20 +53,17 @@ class MoveKingdomsToLand extends Command
     private function moveWaterKingdoms($kingdoms)
     {
         foreach ($kingdoms as $kingdom) {
-            dump("Processing kingdom: {$kingdom->name} at position ({$kingdom->x_position}, {$kingdom->y_position})");
 
             try {
                 $tileColor = $this->mapTileValue->getTileColor($kingdom->gameMap, $kingdom->x_position, $kingdom->y_position);
-                dump("Tile color for kingdom {$kingdom->name} at position ({$kingdom->x_position}, {$kingdom->y_position}): {$tileColor}");
 
                 if (in_array($tileColor, MapTileValue::WATER_TILES)) {
                     $nearestLand = $this->findNearestLand($kingdom->gameMap, $kingdom->x_position, $kingdom->y_position);
-                    dump($nearestLand);
+
                     $kingdom->update([
                         'x_position' => $nearestLand['x'],
                         'y_position' => $nearestLand['y'],
                     ]);
-                    dump("Kingdom {$kingdom->name} moved to land. New position: {$nearestLand['x']}, {$nearestLand['y']}");
                 } else {
                     dump("Kingdom {$kingdom->name} is already on land.");
                 }
@@ -82,7 +75,6 @@ class MoveKingdomsToLand extends Command
 
     private function findNearestLand(GameMap $map, int $x, int $y): array
     {
-        dump('findNearestLand');
         $coordinates = CoordinatesCache::getFromCache();
         $spiralCoordinates = $this->generateSpiralCoordinates($coordinates, $x, $y);
 
@@ -92,7 +84,6 @@ class MoveKingdomsToLand extends Command
             $positionIsOccupied = $this->isPositionOccupied($map, $coords['x'], $coords['y']);
 
             if (!$isWater && !$positionIsOccupied) {
-                dump("Nearest land found: {$coords['x']}, {$coords['y']}");
                 return ['x' => $coords['x'], 'y' => $coords['y']];
             }
         }
@@ -162,15 +153,13 @@ class MoveKingdomsToLand extends Command
             $x = $coordinates['x'][$coords[0]];
             $y = $coordinates['y'][$coords[1]];
             $tileColor = $this->mapTileValue->getTileColor($map, $x, $y);
-            dump("Tile color at ({$x}, {$y}): {$tileColor}");
+
             if (in_array($tileColor, MapTileValue::WATER_TILES)) {
                 $waterTile = ['x' => $x, 'y' => $y];
-                dump("First water tile found: {$waterTile['x']}, {$waterTile['y']}");
                 return $waterTile;
             }
         }
 
-        dump('No water tile found ...');
         return [];
     }
 }

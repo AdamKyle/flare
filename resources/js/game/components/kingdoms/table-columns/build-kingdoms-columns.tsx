@@ -98,5 +98,11 @@ const iconsToShow = (kingdom: KingdomDetails) => {
         }
     }
 
+    if (kingdom.is_capital) {
+        icons.push(
+            <i className="fas fa-crown text-orange-500 dark:text-orange-400"></i>,
+        );
+    }
+
     return icons;
 };

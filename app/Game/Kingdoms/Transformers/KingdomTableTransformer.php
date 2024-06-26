@@ -25,6 +25,7 @@ class KingdomTableTransformer extends TransformerAbstract {
             'current_morale' => $kingdom->current_morale,
             'treasury'       => $kingdom->treasury,
             'gold_bars'      => $kingdom->gold_bars,
+            'is_capital'     => $kingdom->is_capital,
         ];
     }
 

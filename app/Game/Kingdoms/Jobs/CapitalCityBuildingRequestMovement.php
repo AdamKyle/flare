@@ -26,14 +26,13 @@ class CapitalCityBuildingRequestMovement implements ShouldQueue {
      */
     public function handle(CapitalCityBuildingManagement $capitalCityBuildingManagement): void {
         $queueData = CapitalCityBuildingQueue::find($this->capitalCityQueueId);
-        dump($queueData);
+
         if (is_null($queueData)) {
             return;
         }
 
         if (!$queueData->completed_at->lessThanOrEqualTo(now())) {
             $timeLeft = $queueData->completed_at->diffInMinutes(now());
-
 
             if ($timeLeft >= 1) {
                 if ($timeLeft <= 15) {
