@@ -115,7 +115,9 @@ class CapitalCityBuildingManagement {
             }
 
             // If the request is ready for building, handle it immediately
-            if ($buildingUpgradeRequest['secondary_status'] === CapitalCityQueueStatus::BUILDING) {
+            if ($buildingUpgradeRequest['secondary_status'] === CapitalCityQueueStatus::BUILDING ||
+                $buildingUpgradeRequest['secondary_status'] === CapitalCityQueueStatus::REPAIRING)
+            {
                 $this->handleBuildingRequest($capitalCityBuildingQueue, $building, $character);
             }
         }
@@ -128,8 +130,9 @@ class CapitalCityBuildingManagement {
 
     private function handleBuildingRequest(CapitalCityBuildingQueue $capitalCityBuildingQueue, KingdomBuilding $building, Character $character): void {
         $kingdom = $capitalCityBuildingQueue->kingdom;
+        $buildingData = $capitalCityBuildingQueue->building_request_data;
 
-        if ($this->needsPopulationCost($building)) {
+        if ($this->needsPopulationCost($building, $buildingData)) {
             $population = $building->missing_costs['population'];
             $cost = (new UnitCosts(UnitCosts::PERSON))->fetchCost() * $population;
             $treasury = $kingdom->treasury;
@@ -142,12 +145,36 @@ class CapitalCityBuildingManagement {
         }
 
         $kingdom = $this->kingdomBuildingService->updateKingdomResourcesForRebuildKingdomBuilding($building);
-        $this->kingdomBuildingService->upgradeKingdomBuilding($building, $character, $capitalCityBuildingQueue->id);
+
+        if ($this->isRepairRequest($building, $buildingData)) {
+            $this->kingdomBuildingService->rebuildKingdomBuilding($building, $character, $capitalCityBuildingQueue->id);
+        } else {
+            $this->kingdomBuildingService->upgradeKingdomBuilding($building, $character, $capitalCityBuildingQueue->id);
+        }
+
         $this->updateKingdom->updateKingdom($kingdom);
     }
 
-    private function needsPopulationCost(KingdomBuilding $building): bool {
-        return isset($building->missing_costs['population']) && $building->missing_costs['population'] > 0;
+    private function needsPopulationCost(KingdomBuilding $building, array $buildingData): bool {
+
+        foreach ($buildingData as $requestData) {
+            if ($requestData['building_id'] === $building->id) {
+                return isset($requestData['missing_costs']['population']) && $requestData['missing_costs']['population'] > 0;
+            }
+        }
+
+        return false;
+    }
+
+    private function isRepairRequest(KingdomBuilding $building, array $buildingData): bool {
+
+        foreach ($buildingData as $requestData) {
+            if ($requestData['building_id'] === $building->id) {
+                return $requestData['type'] === 'repair';
+            }
+        }
+
+        return false;
     }
 
     private function canAffordPopulationCost(Kingdom $kingdom, int $populationAmount): bool {
@@ -192,7 +219,7 @@ class CapitalCityBuildingManagement {
             return $buildingUpgradeRequest;
         }
 
-        $buildingUpgradeRequest['secondary_status'] = CapitalCityQueueStatus::BUILDING;
+        $buildingUpgradeRequest['secondary_status'] = $buildingUpgradeRequest['type'] === 'repair' ? CapitalCityQueueStatus::REPAIRING : CapitalCityQueueStatus::BUILDING;
 
         return $buildingUpgradeRequest;
     }

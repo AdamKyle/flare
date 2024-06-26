@@ -2,6 +2,8 @@
 
 namespace App\Game\Kingdoms\Jobs;
 
+use App\Flare\Models\CapitalCityBuildingQueue;
+use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -28,6 +30,8 @@ class RebuildBuilding implements ShouldQueue {
      */
     protected KingdomBuilding $building;
 
+    protected int|null $capitalCityBuildingQueueId = null;
+
     /**
      * @var int queueId
      */
@@ -39,14 +43,16 @@ class RebuildBuilding implements ShouldQueue {
      * @param KingdomBuilding $building
      * @param User $user
      * @param int $queueId
-     * @return void
+     * @param int|null $capitalCityBuildingQueueId
      */
-    public function __construct(KingdomBuilding $building, User $user, int $queueId) {
+    public function __construct(KingdomBuilding $building, User $user, int $queueId, int $capitalCityBuildingQueueId = null) {
         $this->user     = $user;
 
         $this->building = $building;
 
         $this->queueId  = $queueId;
+
+        $this->capitalCityBuildingQueueId = $capitalCityBuildingQueueId;
     }
 
     /**
@@ -98,6 +104,27 @@ class RebuildBuilding implements ShouldQueue {
                 $this->building->kingdom->name . ' on plane: '.$plane.' At: (X/Y) '.$x.'/'.$y.'.';
 
             ServerMessageHandler::handleMessage($this->user, 'building_repair_finished', $message);
+        }
+
+        if (!is_null($this->capitalCityBuildingQueueId)) {
+            $capitalCityQueue = CapitalCityBuildingQueue::find($this->capitalCityBuildingQueueId);
+
+            if (is_null($capitalCityQueue)) {
+                return;
+            }
+
+            $buildingRequestData = $capitalCityQueue->building_request_data;
+
+            foreach ($buildingRequestData as $index => $requestData) {
+                if ($requestData['building_id'] === $this->building->id) {
+                    $buildingRequestData[$index]['secondary_status'] = CapitalCityQueueStatus::FINISHED;
+                    $buildingRequestData[$index]['messages'][] = 'Building finished repairing. Kingdom log will be generated when all buildings for this kingdom are repaired.';
+                }
+            }
+
+            $capitalCityQueue->update([
+                'building_request_data' => $buildingRequestData
+            ]);
         }
     }
 }

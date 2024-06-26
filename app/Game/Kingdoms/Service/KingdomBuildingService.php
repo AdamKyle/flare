@@ -72,8 +72,9 @@ class KingdomBuildingService {
      *
      * @param KingdomBuilding $building
      * @param Character $character
+     * @param int|null $capitalCityBuildingQueueId
      */
-    public function rebuildKingdomBuilding(KingdomBuilding $building, Character $character) {
+    public function rebuildKingdomBuilding(KingdomBuilding $building, Character $character, int $capitalCityBuildingQueueId = null) {
 
         $timeReduction    = $building->kingdom->fetchKingBasedSkillValue('building_time_reduction');
         $minutesToRebuild = $building->rebuild_time;
@@ -92,7 +93,7 @@ class KingdomBuildingService {
             'started_at'   => now(),
         ]);
 
-        RebuildBuilding::dispatch($building, $character->user, $queue->id)->delay($timeToComplete);
+        RebuildBuilding::dispatch($building, $character->user, $queue->id, $capitalCityBuildingQueueId)->delay($timeToComplete);
     }
 
     /**
