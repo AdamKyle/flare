@@ -14,7 +14,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use App\Flare\Models\Character;
 use App\Game\Core\Traits\KingdomCache;
 
-class UpdateCapitalCityBuildingUpgrades implements ShouldBroadcastNow {
+class UpdateCapitalCityBuildingQueueTable implements ShouldBroadcastNow {
 
     use Dispatchable, InteractsWithSockets, SerializesModels, KingdomCache;
 
@@ -24,9 +24,9 @@ class UpdateCapitalCityBuildingUpgrades implements ShouldBroadcastNow {
     private User $user;
 
     /**
-     * @var array $kingdomBuildingData
+     * @var array $buildingQueueData
      */
-    public array $kingdomBuildingData;
+    public array $buildingQueueData;
 
     /**
      * Create a new event instance.
@@ -34,13 +34,13 @@ class UpdateCapitalCityBuildingUpgrades implements ShouldBroadcastNow {
      * @param Character $character
      * @param Kingdom $kingdom
      */
-    public function __construct(Character $character, Kingdom $kingdom) {
+    public function __construct(Character $character, Kingdom $kingdom = null) {
 
         $kingdomBuildingData = resolve(CapitalCityManagementService::class)
-                ->fetchBuildingsForUpgradesOrRepairs($character, $kingdom, true);
+                ->fetchBuildingQueueData($character, $kingdom);
 
-        $this->user                 = $character->user;
-        $this->kingdomBuildingData  = $kingdomBuildingData;
+        $this->user               = $character->user;
+        $this->buildingQueueData  = $kingdomBuildingData;
     }
 
     /**
@@ -49,6 +49,6 @@ class UpdateCapitalCityBuildingUpgrades implements ShouldBroadcastNow {
      * @return Channel|array
      */
     public function broadcastOn(): Channel|array {
-        return new PrivateChannel('capital-city-update-kingdom-building-data-' . $this->user->id);
+        return new PrivateChannel('capital-city-building-queue-data-' . $this->user->id);
     }
 }

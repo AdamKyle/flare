@@ -5,8 +5,10 @@ namespace App\Game\Kingdoms\Service;
 use App\Flare\Models\CapitalCityBuildingQueue;
 use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
+use App\Flare\Models\KingdomBuilding;
 use App\Flare\Transformers\KingdomBuildingTransformer;
 use App\Game\Core\Traits\ResponseBuilder;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection as SupportCollection;
 use League\Fractal\Manager;
@@ -96,6 +98,48 @@ class CapitalCityManagementService
     public function sendoffBuildingRequests(Character $character, Kingdom $kingdom, array $params, string $type): array
     {
         return $this->capitalCityBuildingManagement->createBuildingUpgradeRequestQueue($character, $kingdom, $params, $type);
+    }
+
+    public function fetchBuildingQueueData(Character $character, Kingdom $kingdom = null): array {
+
+        $queues = CapitalCityBuildingQueue::where('character_id', $character->id);
+
+        if (!is_null($kingdom)) {
+            $queues = $queues->where('kingdom_id', '!=', $kingdom->id);
+        }
+
+        $queues = $queues->get();
+
+        $data = [];
+
+        foreach ($queues as $queue) {
+            $kingdom = $queue->kingdom;
+
+            $end = Carbon::parse($queue->completed_at)->timestamp;
+            $current = Carbon::now()->timestamp;
+
+            $timeLeftInSeconds = $end - $current;
+
+            $buildingRequestData = $queue->building_request_data;
+
+            foreach ($buildingRequestData as $buildingRequest) {
+
+                $building = KingdomBuilding::where('kingdom_id', $kingdom->id)->where('id', $buildingRequest['building_id'])->first();
+
+                $queueData = [
+                    'kingdom_name' => $kingdom->name . '(X/Y: '.$kingdom->x_position.'/'.$kingdom->y_position.')',
+                    'status' => $queue->status,
+                    'messages' => $queue->messages,
+                    'time_left_seconds' => $timeLeftInSeconds > 0 ? $timeLeftInSeconds : 0,
+                    'building_name' => $building->name,
+                    'secondary_status' => $buildingRequest['secondary_status'],
+                ];
+
+                $data[] = $queueData;
+            }
+        }
+
+        return $data;
     }
 
     /**

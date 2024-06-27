@@ -234,9 +234,19 @@ export default class BuildingsToUpgradeSection extends React.Component<
 
                 <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-4"></div>
 
+                <h4>
+                    {this.props.repair ? "Repair orders" : "Upgrade Orders"}
+                </h4>
+
+                <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-4"></div>
+
                 <div className="flex items-center flex-wrap">
                     <PrimaryOutlineButton
-                        button_label={"Queue All Buildings"}
+                        button_label={
+                            "Queue All Buildings (" +
+                            (this.props.repair ? "Repair" : "Upgrade") +
+                            ")"
+                        }
                         on_click={() => {
                             addAllBuildingsToQueue(this);
                         }}

@@ -13,8 +13,10 @@ return new class extends Migration
     {
         Schema::create('capital_city_building_queues', function (Blueprint $table) {
             $table->bigIncrements('id');
+            $table->string('status');
             $table->unsignedBigInteger('character_id');
             $table->unsignedBigInteger('kingdom_id');
+            $table->unsignedBigInteger('requested_kingdom');
             $table->json('building_request_data');
             $table->json('messages')->nullable();
             $table->dateTime('completed_at');

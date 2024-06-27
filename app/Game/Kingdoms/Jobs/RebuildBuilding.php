@@ -3,6 +3,7 @@
 namespace App\Game\Kingdoms\Jobs;
 
 use App\Flare\Models\CapitalCityBuildingQueue;
+use App\Game\Kingdoms\Service\CapitalCityBuildingManagement;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -61,7 +62,7 @@ class RebuildBuilding implements ShouldQueue {
      * @param UpdateKingdom $updateKingdom
      * @return void
      */
-    public function handle(UpdateKingdom $updateKingdom): void {
+    public function handle(UpdateKingdom $updateKingdom, CapitalCityBuildingManagement $capitalCityBuildingManagement): void {
         $queue = BuildingInQueue::find($this->queueId);
 
         if (is_null($queue)) {
@@ -125,6 +126,10 @@ class RebuildBuilding implements ShouldQueue {
             $capitalCityQueue->update([
                 'building_request_data' => $buildingRequestData
             ]);
+
+            $capitalCityQueue = $capitalCityQueue->refresh();
+
+            $capitalCityBuildingManagement->possiblyCreateLogForQueue($capitalCityQueue);
         }
     }
 }

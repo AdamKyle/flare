@@ -22,6 +22,7 @@ class KingdomLogStatusValue {
     const NOT_WALKED          = 8;
     const RESOURCES_REQUESTED = 9;
     const RESOURCES_LOST      = 10;
+    const CAPITAL_CITY_REQUEST = 11;
 
     /**
      * @var string[] $values
@@ -38,6 +39,7 @@ class KingdomLogStatusValue {
         self::NOT_WALKED          => 8,
         self::RESOURCES_REQUESTED => 9,
         self::RESOURCES_LOST      => 10,
+        self::CAPITAL_CITY_REQUEST => 11,
     ];
 
     /**
@@ -144,5 +146,14 @@ class KingdomLogStatusValue {
      */
     public function requestedResources(): bool {
         return $this->value === self::RESOURCES_REQUESTED;
+    }
+
+    /**
+     * Did we get a capital city request?
+     *
+     * @return bool
+     */
+    public function capitalCityRequest(): bool {
+        return $this->value === self::CAPITAL_CITY_REQUEST;
     }
 }

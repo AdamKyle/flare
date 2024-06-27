@@ -2,6 +2,7 @@ import React from "react";
 import PrimaryOutlineButton from "../../ui/buttons/primary-outline-button";
 import SuccessOutlineButton from "../../ui/buttons/success-outline-button";
 import BuildingsToUpgradeSection from "./buildings-to-upgrade-section";
+import BuildingQueuesTable from "./building-queues-table";
 
 export default class ManageKingdomBuildings extends React.Component<any, any> {
     constructor(props: any) {
@@ -28,14 +29,16 @@ export default class ManageKingdomBuildings extends React.Component<any, any> {
 
     renderActionButtons() {
         return (
-            <div className="text-center">
+            <div className="text-center flex flex-col md:flex-row items-center justify-center">
                 <PrimaryOutlineButton
-                    additional_css={"mr-4"}
-                    button_label={"Upgrade"}
+                    additional_css="mr-0 md:mr-4 lg:text-5xl md:text-4xl sm:text-3xl text-xl lg:py-6 md:py-4 sm:py-3 py-2 lg:px-10 md:px-8 sm:px-6 px-4"
+                    button_label="Upgrade"
                     on_click={this.manageShowUpgradeBuildingList.bind(this)}
                 />
+                <div className="border-t-2 md:border-t-0 md:border-r-2 border-gray-500 h-0 md:h-16 mx-0 md:mx-4 my-4 md:my-0"></div>
                 <PrimaryOutlineButton
-                    button_label={"Repair"}
+                    additional_css="lg:text-5xl md:text-4xl sm:text-3xl text-xl lg:py-6 md:py-4 sm:py-3 py-2 lg:px-10 md:px-8 sm:px-6 px-4"
+                    button_label="Repair"
                     on_click={this.manageShowRepairList.bind(this)}
                 />
             </div>
@@ -77,22 +80,19 @@ export default class ManageKingdomBuildings extends React.Component<any, any> {
                 </div>
                 <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-4"></div>
                 <p className="my-2">
-                    Below you can choose to repair buildings or upgrade
-                    buildings. Repairing only shows you damaged buildings, some
-                    of these like the Farm and the Walls are essential to
-                    rebuild to stop loosing morale per hour. You can also
-                    upgrade buildings, to increase their levels. Clicking that
-                    button will only show you buildings who do not need to be
-                    repaired, are not max level and are unlocked via that
-                    passive tree.
+                    Choose to repair or upgrade buildings. Repairing shows only
+                    damaged buildings, like the Farm and Walls, which are
+                    essential to rebuild to prevent morale loss. Upgrading shows
+                    buildings that are not damaged, not max level, and unlocked
+                    through the passive tree.
                 </p>
                 <p className="my-2">
-                    For upgrading and repairing, population will be
-                    automatically purchased if needed, resources will be
-                    requested should you have the resources, population and
-                    spearmen. Kingdoms with airships will automatically use one
-                    when requesting resources.
+                    When upgrading or repairing, population will be purchased if
+                    needed, and resources will be requested if available.
+                    Kingdoms with airships will automatically use one when
+                    requesting resources.
                 </p>
+
                 {this.state.show_upgrade_buildings_list ? (
                     <BuildingsToUpgradeSection
                         user_id={this.props.user_id}
@@ -106,7 +106,15 @@ export default class ManageKingdomBuildings extends React.Component<any, any> {
                         repair={true}
                     />
                 ) : (
-                    this.renderActionButtons()
+                    <>
+                        {this.renderActionButtons()}
+                        <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-4"></div>
+                        <BuildingQueuesTable
+                            user_id={this.props.user_id}
+                            kingdom_id={this.props.kingdom.id}
+                            character_id={this.props.kingdom.character_id}
+                        />
+                    </>
                 )}
             </div>
         );

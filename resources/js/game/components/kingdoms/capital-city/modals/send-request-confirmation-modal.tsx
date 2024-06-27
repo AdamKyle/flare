@@ -52,14 +52,14 @@ export default class SendRequestConfirmationModal extends React.Component<
                 handle_close={this.props.manage_modal}
                 title={
                     this.props.repair
-                        ? "Send Upgrade Requests"
-                        : "Send Repair Requests"
+                        ? "Send Repair Requests"
+                        : "Send Upgrade Requests"
                 }
                 primary_button_disabled={this.state.loading}
                 secondary_actions={{
                     secondary_button_disabled:
-                        this.state.loading &&
-                        this.state.success_message === null,
+                        this.state.loading ||
+                        this.state.success_message !== null,
                     secondary_button_label: "Yes. I understand.",
                     handle_action: this.sendRequest.bind(this),
                 }}

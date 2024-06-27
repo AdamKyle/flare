@@ -186,6 +186,10 @@ class KingdomAttackLogsTransformer extends TransformerAbstract {
             return 'Kingdom requested resources';
         }
 
+        if ($logStatus->capitalCityRequest()) {
+            return 'Capital City Request';
+        }
+
         return 'Error. Unknown status';
     }
 }

@@ -14,4 +14,6 @@ export default interface KingdomProps {
     view_port: number;
 
     user_id: number;
+
+    has_capital_city: boolean;
 }

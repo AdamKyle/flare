@@ -345,23 +345,25 @@ export default class KingdomDetails extends React.Component<
                                         .can_access_resource_request
                                 }
                             />
-                            {!this.props.kingdom.is_capital ? (
-                                <OrangeOutlineButton
-                                    button_label={"Make Capital City"}
-                                    on_click={this.showMakeCapitalCityModal.bind(
-                                        this,
-                                    )}
-                                    disabled={
-                                        !this.props.kingdom
-                                            .can_access_capital_city
-                                    }
-                                />
-                            ) : (
-                                <SuccessOutlineButton
-                                    button_label={"Small Council"}
-                                    on_click={this.props.show_small_council}
-                                />
-                            )}
+                            {!this.props.has_capital_city ? (
+                                !this.props.kingdom.is_capital ? (
+                                    <OrangeOutlineButton
+                                        button_label={"Make Capital City"}
+                                        on_click={this.showMakeCapitalCityModal.bind(
+                                            this,
+                                        )}
+                                        disabled={
+                                            !this.props.kingdom
+                                                .can_access_capital_city
+                                        }
+                                    />
+                                ) : (
+                                    <SuccessOutlineButton
+                                        button_label={"Small Council"}
+                                        on_click={this.props.show_small_council}
+                                    />
+                                )
+                            ) : null}
                         </div>
                     </div>
                 </div>

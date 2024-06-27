@@ -129,6 +129,9 @@ class WeeklyBattleService {
             $this->locationSpecialtyHandler->handleMonsterFromSpecialLocation($character, $weeklyMonsterFight);
         }
 
+        if ($locationType->isLordsStrongHold()) {
+            $this->locationSpecialtyHandler->handleMonsterFromSpecialLocation($character, $weeklyMonsterFight, false);
+        }
 
         return $character->refresh();
     }

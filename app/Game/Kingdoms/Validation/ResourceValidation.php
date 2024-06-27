@@ -50,12 +50,12 @@ class ResourceValidation {
     public function getMissingCosts(KingdomBuilding $building, Kingdom $kingdom): array {
 
         return [
-            'wood' => $kingdom->current_wood - $this->getBuildingCost($kingdom, $building->base_wood_cost),
-            'clay' => $kingdom->current_clay - $this->getBuildingCost($kingdom, $building->base_clay_cost),
-            'stone' => $kingdom->current_stone - $this->getBuildingCost($kingdom, $building->base_stone_cost),
-            'steel' => $kingdom->current_steel - $this->getBuildingCost($kingdom, $building->steel_cost),
-            'iron' => $kingdom->current_iron - $this->getBuildingCost($kingdom, $building->base_iron_cost, false, true),
-            'population' => $kingdom->current_population - $this->getBuildingCost($kingdom, $building->base_population, true),
+            'wood' => abs($kingdom->current_wood - $this->getBuildingCost($kingdom, $building->base_wood_cost)),
+            'clay' => abs($kingdom->current_clay - $this->getBuildingCost($kingdom, $building->base_clay_cost)),
+            'stone' => abs($kingdom->current_stone - $this->getBuildingCost($kingdom, $building->base_stone_cost)),
+            'steel' => abs($kingdom->current_steel - $this->getBuildingCost($kingdom, $building->steel_cost)),
+            'iron' => abs($kingdom->current_iron - $this->getBuildingCost($kingdom, $building->base_iron_cost, false, true)),
+            'population' => abs($kingdom->current_population - $this->getBuildingCost($kingdom, $building->base_population, true)),
         ];
     }
 

@@ -128,13 +128,18 @@ export default class FetchGameData {
     }
 
     setKingdomsData(result: AxiosResponse) {
-        this.component.setState({
-            kingdoms: result.data.kingdoms,
-            kingdom_logs: result.data.logs,
-            loading: false,
-            percentage_loaded: this.component.state.percentage_loaded + 0.2,
-            secondary_loading_title: "Fetching Action Data ...",
-        });
+        this.component.setState(
+            {
+                kingdoms: result.data.kingdoms,
+                kingdom_logs: result.data.logs,
+                loading: false,
+                percentage_loaded: this.component.state.percentage_loaded + 0.2,
+                secondary_loading_title: "Fetching Action Data ...",
+            },
+            () => {
+                this.component.updateLogIcon();
+            },
+        );
     }
 
     setActionData(result: AxiosResponse) {

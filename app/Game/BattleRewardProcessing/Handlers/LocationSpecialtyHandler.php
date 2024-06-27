@@ -22,7 +22,7 @@ class LocationSpecialtyHandler {
         $this->randomAffixGenerator = $randomAffixGenerator;
     }
 
-    public function handleMonsterFromSpecialLocation(Character $character, WeeklyMonsterFight $weeklyMonsterFight): void {
+    public function handleMonsterFromSpecialLocation(Character $character, WeeklyMonsterFight $weeklyMonsterFight, bool $mainItemIsCosmic = true): void {
 
         $lootingDropChance = $character->skills->where('baseSkill.name', '=', 'Looting')->first()->skill_bonus;
 
@@ -35,22 +35,22 @@ class LocationSpecialtyHandler {
         $chance = 0.01 + ($lootingDropChance < 0 ? 0 : $lootingDropChance);
 
         if (DropCheckCalculator::fetchDifficultItemChance($chance, 100)) {
-            $this->giveItemReward($character);
+            $this->giveItemReward($character, $mainItemIsCosmic);
         }
 
         for($i = 1; $i <= 3; $i++) {
-            $character = $this->handOverAward($character, false);
+            $character = $this->handOverAward($character, false, $mainItemIsCosmic);
         }
     }
 
-    private function giveItemReward(Character $character): void {
-        $character = $this->handOverAward($character);
+    private function giveItemReward(Character $character, $isCosmic = true): void {
+        $character = $this->handOverAward($character, $isCosmic);
 
         event(new GlobalMessageEvent($character->name . ' Has slaughtered a beast beyond comprehension and been rewarded with a cosmic gift!'));
     }
 
-    private function handOverAward(Character $character, bool $isCosmic = true): Character {
-        $item = $this->giveCharacterRandomItem($character, $isCosmic);
+    private function handOverAward(Character $character, bool $isCosmic = true, bool $secondaryIsLegendary = false): Character {
+        $item = $this->giveCharacterRandomItem($character, $isCosmic, $secondaryIsLegendary);
 
         $character->inventory->slots()->create([
             'inventory_id' => $character->inventory->id,
@@ -68,7 +68,7 @@ class LocationSpecialtyHandler {
         return $character->refresh();
     }
 
-    private function giveCharacterRandomItem(Character $character, bool $isCosmic = true): Item {
+    private function giveCharacterRandomItem(Character $character, bool $isCosmic = true, bool $secondaryIsLegendary = false): Item {
         $item = Item::where('specialty_type', ItemSpecialtyType::DELUSIONAL_SILVER)
             ->whereNull('item_prefix_id')
             ->whereNull('item_suffix_id')
@@ -80,7 +80,7 @@ class LocationSpecialtyHandler {
 
         $randomAffix = $this->randomAffixGenerator
             ->setCharacter($character)
-            ->setPaidAmount(RandomAffixDetails::COSMIC);
+            ->setPaidAmount((!$secondaryIsLegendary ? RandomAffixDetails::LEGENDARY : ($isCosmic ? RandomAffixDetails::COSMIC : RandomAffixDetails::MYTHIC)));
 
         $duplicateItem = $item->duplicate();
 

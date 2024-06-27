@@ -13,4 +13,6 @@ export default interface KingdomListProps {
     user_id: number;
 
     is_dead: boolean;
+
+    character_id: number;
 }

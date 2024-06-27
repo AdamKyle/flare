@@ -64,7 +64,7 @@ class ResourceTransferService {
         }
 
         if (!$this->onTheSameMapAsTheCharacter($requestingKingdom, $requestingFromKingdom)) {
-            return $this->errorResult('Your kingdoms must both be on the same map.');
+            return $this->errorResult('Your kingdoms ('.$requestingKingdom->name.' and '.$requestingFromKingdom->name.') must both be on the same map.');
         }
 
         if (!$this->hasRequestedResourceAmount($requestingFromKingdom, $params['amount_of_resources'], $params['type_of_resource'])) {
@@ -72,15 +72,15 @@ class ResourceTransferService {
         }
 
         if (!$this->bothKingdomsHaveAMarketPlace($requestingKingdom, $requestingFromKingdom)) {
-            return $this->errorResult('Both the requesting kingdom and the kingdom to request from must have Market Place built and upgraded to level 5.');
+            return $this->errorResult('Both the requesting kingdom ('.$requestingKingdom->name.') and the kingdom ('.$requestingFromKingdom->name.') to request from must have Market Place built and upgraded to level 5.');
         }
 
         if (!$this->canAffordPopulationCost($requestingFromKingdom)) {
-            return $this->errorResult('The kingdom you are requesting resources from does not have enough population to move this amount of resources.');
+            return $this->errorResult('The kingdom: '.$requestingFromKingdom->name.' you are requesting resources from does not have enough population to move this amount of resources.');
         }
 
         if (!$this->hasRequiredSpearmen($requestingFromKingdom)) {
-            return $this->errorResult('The kingdom you are requesting resources from does not have enough spearmen to guard to the transportation');
+            return $this->errorResult('The kingdom: '.$requestingFromKingdom->name.' you are requesting resources from does not have enough spearmen to guard to the transportation');
         }
 
         $useAirShip = $params['use_air_ship'];

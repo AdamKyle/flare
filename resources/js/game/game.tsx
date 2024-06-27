@@ -157,6 +157,8 @@ export default class Game extends React.Component<GameProps, GameState> {
             } else {
                 tabs[tabs.length - 1].has_logs = false;
             }
+        } else {
+            tabs[tabs.length - 1].has_logs = false;
         }
 
         this.setState({
@@ -511,6 +513,7 @@ export default class Game extends React.Component<GameProps, GameState> {
                                 this.state.character.gold,
                             )}
                             user_id={this.state.character.user_id}
+                            character_id={this.state.character.id}
                         />
                     </TabPanel>
                 </Tabs>

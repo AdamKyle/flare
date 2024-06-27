@@ -77,8 +77,6 @@ export const addAllBuildingsToQueue = (
 ): void => {
     const upgradeQueue: any[] = [];
 
-    console.log("table data", component.state.table_data);
-
     component.state.table_data.forEach((data: any) => {
         if (upgradeQueue.length <= 0) {
             upgradeQueue.push({

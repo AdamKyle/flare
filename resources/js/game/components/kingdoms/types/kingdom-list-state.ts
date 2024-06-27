@@ -9,4 +9,6 @@ export default interface KingdomListState {
     selected_kingdom: KingdomDetails | null;
 
     selected_log: KingdomLogDetails | null;
+
+    already_has_capital_city: boolean;
 }

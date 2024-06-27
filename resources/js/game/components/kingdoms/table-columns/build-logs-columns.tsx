@@ -8,19 +8,8 @@ export const buildLogsColumns = (
 ) => {
     return [
         {
-            name: "Title",
-            selector: (row: KingdomLogDetails) => row.status,
-            cell: (row: KingdomLogDetails) => (
-                <button
-                    className="text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-500"
-                    onClick={() => onClick(row)}
-                >
-                    {row.status}
-                </button>
-            ),
-        },
-        {
             name: "Read",
+            selector: (row: KingdomLogDetails) => row.opened,
             cell: (row: KingdomLogDetails) => (
                 <span>
                     {row.opened ? (
@@ -34,19 +23,36 @@ export const buildLogsColumns = (
                     )}
                 </span>
             ),
+            sortable: true,
         },
         {
-            name: "Kingdom Attacked",
+            name: "Title",
+            selector: (row: KingdomLogDetails) => row.status,
+            cell: (row: KingdomLogDetails) => (
+                <button
+                    className="text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-500"
+                    onClick={() => onClick(row)}
+                >
+                    {row.status}
+                </button>
+            ),
+            sortable: true,
+        },
+        {
+            name: "Affects Kingdom",
             selector: (row: KingdomLogDetails) => row.to_kingdom_name,
+            sortable: true,
         },
         {
-            name: "Attacked From",
+            name: "Sent from",
             selector: (row: KingdomLogDetails) =>
                 row.from_kingdom_name === null ? "N/A" : row.from_kingdom_name,
+            sortable: true,
         },
         {
             name: "Created At",
             selector: (row: KingdomLogDetails) => row.created_at,
+            sortable: true,
         },
         {
             name: "Actions",

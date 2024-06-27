@@ -1,5 +1,5 @@
 import { CharacterType } from "../../character/character-type";
-import { FameTasks } from "../../../../sections/faction-loyalty/deffinitions/faction-loaylaty";
+import { FameTasks } from "../../../../components/faction-loyalty/deffinitions/faction-loaylaty";
 
 export default interface CharacterSheetProps {
     character: CharacterType | null;

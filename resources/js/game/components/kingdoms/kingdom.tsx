@@ -210,6 +210,7 @@ export default class Kingdom extends React.Component<KingdomProps, any> {
                                 reset_resource_transfer={
                                     this.state.should_reset_resource_transfer
                                 }
+                                has_capital_city={this.props.has_capital_city}
                             />
                         </BasicCard>
                     )}

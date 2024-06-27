@@ -25,5 +25,12 @@ Broadcast::channel('capital-city-update-kingdom-building-data-{userId}', functio
     return $user->id === (int) $userId;
 });
 
+// When the kingdoms capital city queue table updates
+Broadcast::channel('capital-city-building-queue-data-{userId}', function($user, $userId) {
+    return $user->id === (int) $userId;
+});
+
+
+
 
 

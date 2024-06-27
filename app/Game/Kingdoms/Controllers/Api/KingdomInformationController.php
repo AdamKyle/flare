@@ -107,7 +107,7 @@ class KingdomInformationController extends Controller{
     public function getKingdomsList(Character $character): JsonResponse {
         return response()->json([
             'kingdoms' => $this->manager->createData(
-                new Collection($character->kingdoms, $this->kingdomTableTransformer)
+                new Collection($character->kingdoms()->orderByDesc('is_capital')->get(), $this->kingdomTableTransformer)
             )->toArray(),
             'logs'    => $this->manager->createData(
                 new Collection(KingdomLog::where('character_id', $character->id)->orderBy('id', 'desc')->get(), $this->kingdomAttackLogsTransformer)
@@ -172,6 +172,18 @@ class KingdomInformationController extends Controller{
         }
 
         $kingdomLog->delete();
+
+        $this->updateKingdom->updateKingdomLogs($character->refresh());
+
+        return response()->json();
+    }
+
+    /**
+     * @param Character $character
+     * @return JsonResponse
+     */
+    public function deleteAllLogs(Character $character): JsonResponse {
+        KingdomLog::where('character_id', $character->id)->delete();
 
         $this->updateKingdom->updateKingdomLogs($character->refresh());
 

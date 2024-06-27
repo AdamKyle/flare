@@ -1,11 +1,11 @@
 import React, { Fragment } from "react";
 import BasicCard from "../../../components/ui/cards/basic-card";
-import BuildingInQueueDetails from "../../../lib/game/kingdoms/deffinitions/building-in-queue-details";
-import SmallBuildingsSectionsProps from "../../../lib/game/kingdoms/types/small-buildings-sections-props";
-import SmallBuildingsSectionsState from "../../../lib/game/kingdoms/types/small-buildings-sections-state";
 import BuildingInformation from "./building-information";
 import BuildingsTable from "./buildings-table";
 import BuildingDetails from "./deffinitions/building-details";
+import SmallBuildingsSectionsProps from "../types/small-buildings-sections-props";
+import SmallBuildingsSectionsState from "../types/small-buildings-sections-state";
+import BuildingInQueueDetails from "../deffinitions/building-in-queue-details";
 
 export default class SmallBuildingsSection extends React.Component<
     SmallBuildingsSectionsProps,

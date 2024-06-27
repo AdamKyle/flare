@@ -18,6 +18,7 @@ import KingdomListProps from "./types/kingdom-list-props";
 import KingdomListState from "./types/kingdom-list-state";
 import KingdomDetails from "./deffinitions/kingdom-details";
 import KingdomLogDetails from "./deffinitions/kingdom-log-details";
+import DangerButton from "../ui/buttons/danger-button";
 
 export default class KingdomsList extends React.Component<
     KingdomListProps,
@@ -45,6 +46,7 @@ export default class KingdomsList extends React.Component<
             dark_tables: false,
             selected_kingdom: null,
             selected_log: null,
+            already_has_capital_city: false,
         };
     }
 
@@ -103,8 +105,26 @@ export default class KingdomsList extends React.Component<
     }
 
     viewKingdomDetails(kingdom: KingdomDetails) {
+        console.log(
+            this.props.my_kingdoms,
+            this.props.my_kingdoms.filter((myKingdom: any) => {
+                return (
+                    myKingdom.game_map_id === kingdom.game_map_id &&
+                    myKingdom.is_capital
+                );
+            }),
+            kingdom,
+        );
         this.setState({
             selected_kingdom: kingdom,
+            already_has_capital_city:
+                this.props.my_kingdoms.filter((myKingdom: any) => {
+                    return (
+                        myKingdom.id !== kingdom.id &&
+                        myKingdom.game_map_name === kingdom.game_map_name &&
+                        myKingdom.is_capital
+                    );
+                }).length > 0 && !kingdom.is_capital,
         });
     }
 
@@ -144,9 +164,22 @@ export default class KingdomsList extends React.Component<
             );
     }
 
+    deleteAllLogs() {
+        new Ajax()
+            .setRoute("kingdom/delete-all-logs/" + this.props.character_id)
+            .doAjaxCall(
+                "post",
+                (result: AxiosResponse) => {},
+                (error: AxiosError) => {
+                    console.error(error);
+                },
+            );
+    }
+
     closeKingdomDetails() {
         this.setState({
             selected_kingdom: null,
+            already_has_capital_city: false,
         });
     }
 
@@ -182,11 +215,17 @@ export default class KingdomsList extends React.Component<
                             view_port={this.props.view_port}
                             user_id={this.props.user_id}
                             kingdoms={this.props.my_kingdoms}
+                            has_capital_city={
+                                this.state.already_has_capital_city
+                            }
                         />
                     ) : (
                         <Kingdom
                             close_details={this.closeKingdomDetails.bind(this)}
                             kingdom={this.state.selected_kingdom}
+                            has_capital_city={
+                                this.state.already_has_capital_city
+                            }
                             kingdoms={this.props.my_kingdoms}
                             dark_tables={this.state.dark_tables}
                             character_gold={this.props.character_gold}
@@ -201,7 +240,14 @@ export default class KingdomsList extends React.Component<
                     />
                 ) : (
                     <BasicCard additionalClasses={"overflow-x-auto"}>
-                        <Tabs tabs={this.tabs} icon_key={"has_logs"}>
+                        <Tabs
+                            tabs={this.tabs}
+                            icon_key={
+                                this.props.logs.length > 0
+                                    ? "has_logs"
+                                    : undefined
+                            }
+                        >
                             <TabPanel key={"kingdoms"}>
                                 {this.props.my_kingdoms.length > 0 ? (
                                     <div
@@ -244,6 +290,14 @@ export default class KingdomsList extends React.Component<
                                             "max-w-[390px] md:max-w-full overflow-x-hidden"
                                         }
                                     >
+                                        <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3"></div>
+                                        <DangerButton
+                                            button_label={"Delete All Logs"}
+                                            on_click={this.deleteAllLogs.bind(
+                                                this,
+                                            )}
+                                        />
+                                        <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3"></div>
                                         <Table
                                             data={this.props.logs}
                                             columns={buildLogsColumns(

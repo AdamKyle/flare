@@ -65,7 +65,7 @@ export default class SmallKingdom extends React.Component<
                     this.setState({ loading: false });
 
                     if (typeof error.response !== "undefined") {
-                        const response = error.response;
+                        const response: AxiosResponse = error.response;
 
                         this.setState({
                             error_message: response.data.message,
@@ -208,6 +208,7 @@ export default class SmallKingdom extends React.Component<
                             </div>
 
                             <KingdomDetails
+                                show_small_council={() => true}
                                 kingdom={this.state.kingdom}
                                 character_gold={this.props.character_gold}
                                 close_details={this.props.close_details}

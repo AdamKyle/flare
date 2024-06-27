@@ -6,8 +6,11 @@ use App\Flare\Models\CapitalCityBuildingQueue;
 use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\KingdomBuilding;
+use App\Flare\Models\KingdomLog;
+use App\Flare\Values\KingdomLogStatusValue;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Kingdoms\Events\UpdateBuildingUpgrades;
+use App\Game\Kingdoms\Events\UpdateCapitalCityBuildingQueueTable;
 use App\Game\Kingdoms\Events\UpdateCapitalCityBuildingUpgrades;
 use App\Game\Kingdoms\Jobs\CapitalCityBuildingRequestMovement;
 use Facades\App\Game\Kingdoms\Validation\ResourceValidation;
@@ -52,16 +55,27 @@ class CapitalCityBuildingManagement {
 
             $queueData = [
                 'kingdom_id' => $kingdomId,
+                'requested_kingdom' => $kingdom->id,
                 'building_request_data' => [],
             ];
 
             foreach ($buildings as $building) {
+                $fromLevel = null;
+                $toLevel = null;
+
+                if ($type === 'upgrade') {
+                    $fromLevel = $building->level;
+                    $toLevel = $building->level + 1;
+                }
+
                 $queueData['building_request_data'][] = [
                     'building_id'   => $building->id,
                     'costs'         => $this->kingdomBuildingService->getBuildingCosts($building),
                     'type'          => $type,
                     'missing_costs' => [],
                     'secondary_status' => null,
+                    'from_level' => $fromLevel,
+                    'to_level' => $toLevel,
                 ];
             }
 
@@ -76,6 +90,8 @@ class CapitalCityBuildingManagement {
         }
 
         event(new UpdateCapitalCityBuildingUpgrades($character, $kingdom));
+
+        event(new UpdateCapitalCityBuildingQueueTable($character, $kingdom));
 
         return $this->successResult([
             'message' => 'Building upgrades have been sent off to their respective kingdoms.
@@ -102,6 +118,8 @@ class CapitalCityBuildingManagement {
             $building = $kingdom->buildings()->where('id', $buildingUpgradeRequest['building_id'])->first();
             $buildingUpgradeRequest = $this->processPotentialResourceRequests($capitalCityBuildingQueue, $kingdom, $building, $character, $buildingUpgradeRequest);
 
+            $capitalCityBuildingQueue = $capitalCityBuildingQueue->refresh();
+
             $requestData[$index] = $buildingUpgradeRequest;
 
             $capitalCityBuildingQueue->update([
@@ -126,8 +144,75 @@ class CapitalCityBuildingManagement {
             'building_request_data' => $requestData,
             'messages' => $this->messages,
         ]);
+
+        $capitalCityBuildingQueue = $capitalCityBuildingQueue->refresh();
+
+        event(new UpdateCapitalCityBuildingQueueTable($capitalCityBuildingQueue->character));
+
+        $this->possiblyCreateLogForQueue($capitalCityBuildingQueue);
     }
 
+    /**
+     * Send a log if all the buildings are done or rejected (or both)
+     *
+     * @param CapitalCityBuildingQueue $capitalCityBuildingQueue
+     * @return void
+     */
+    public function possiblyCreateLogForQueue(CapitalCityBuildingQueue $capitalCityBuildingQueue): void {
+
+        $requestData = $capitalCityBuildingQueue->building_request_data;
+        $kingdom = $capitalCityBuildingQueue->kingdom;
+        $character = $capitalCityBuildingQueue->character;
+
+        $buildingData = [];
+
+        foreach($requestData as $data) {
+            if ($data['secondary_status'] === CapitalCityQueueStatus::REJECTED ||
+                $data['secondary_status'] === CapitalCityQueueStatus::FINISHED
+            ) {
+
+                $building = KingdomBuilding::where('kingdom_id', $kingdom->id)->where('id', $data['building_id'])->first();
+
+                $buildingData[] = [
+                    'building_name' => $building->name,
+                    'from_level' => $data['from_level'],
+                    'to_level' => $data['to_level'],
+                    'type'  => $data['type'],
+                    'status' => $data['secondary_status'],
+                ];
+            }
+        }
+
+        if (count($buildingData) === count($requestData)) {
+            KingdomLog::create([
+                'character_id' => $character->id,
+                'from_kingdom_id' => $capitalCityBuildingQueue->requested_kingdom,
+                'to_kingdom_id' => $kingdom->id,
+                'opened' => false,
+                'additional_details' => [
+                    'messages' => $capitalCityBuildingQueue->messages,
+                    'building_data' => $buildingData,
+                ],
+                'status' => KingdomLogStatusValue::CAPITAL_CITY_REQUEST,
+                'published' => true,
+            ]);
+
+            $this->updateKingdom->updateKingdomLogs($kingdom->character, true);
+
+            $capitalCityBuildingQueue->delete();
+
+            event(new UpdateCapitalCityBuildingQueueTable($character));
+        }
+    }
+
+    /**
+     * Handle the actual building request.
+     *
+     * @param CapitalCityBuildingQueue $capitalCityBuildingQueue
+     * @param KingdomBuilding $building
+     * @param Character $character
+     * @return void
+     */
     private function handleBuildingRequest(CapitalCityBuildingQueue $capitalCityBuildingQueue, KingdomBuilding $building, Character $character): void {
         $kingdom = $capitalCityBuildingQueue->kingdom;
         $buildingData = $capitalCityBuildingQueue->building_request_data;
@@ -155,6 +240,13 @@ class CapitalCityBuildingManagement {
         $this->updateKingdom->updateKingdom($kingdom);
     }
 
+    /**
+     * Do we need to handle the population cost?
+     *
+     * @param KingdomBuilding $building
+     * @param array $buildingData
+     * @return bool
+     */
     private function needsPopulationCost(KingdomBuilding $building, array $buildingData): bool {
 
         foreach ($buildingData as $requestData) {
@@ -166,6 +258,13 @@ class CapitalCityBuildingManagement {
         return false;
     }
 
+    /**
+     * Are we a repair request?
+     *
+     * @param KingdomBuilding $building
+     * @param array $buildingData
+     * @return bool
+     */
     private function isRepairRequest(KingdomBuilding $building, array $buildingData): bool {
 
         foreach ($buildingData as $requestData) {
@@ -177,6 +276,13 @@ class CapitalCityBuildingManagement {
         return false;
     }
 
+    /**
+     * Can we afford, kingdom treasury, the population cost?
+     *
+     * @param Kingdom $kingdom
+     * @param int $populationAmount
+     * @return bool
+     */
     private function canAffordPopulationCost(Kingdom $kingdom, int $populationAmount): bool {
         if ($kingdom->treasury <= 0) {
             return false;
@@ -191,11 +297,23 @@ class CapitalCityBuildingManagement {
         return true;
     }
 
+    /**
+     * If we need to request resources, lets send that off.
+     *
+     * If we do not need resources, we mark as either rejected or ready to build.
+     *
+     * @param CapitalCityBuildingQueue $capitalCityBuildingQueue
+     * @param Kingdom $kingdom
+     * @param KingdomBuilding $building
+     * @param Character $character
+     * @param array $buildingUpgradeRequest
+     * @return array
+     */
     private function processPotentialResourceRequests(CapitalCityBuildingQueue $capitalCityBuildingQueue, Kingdom $kingdom, KingdomBuilding $building, Character $character, array $buildingUpgradeRequest): array {
         if (ResourceValidation::shouldRedirectRebuildKingdomBuilding($building, $kingdom)) {
             $missingResources = ResourceValidation::getMissingCosts($building, $kingdom);
 
-            $canAffordPopulation = true;
+            $canAffordPopulation = false;
 
             if ($missingResources['population'] > 0) {
                 $canAffordPopulation = $this->canAffordPopulationCost($kingdom, $missingResources['population']);
@@ -205,16 +323,22 @@ class CapitalCityBuildingManagement {
                 $this->messages[] = $building->name . ' has been rejected for reason of: Cannot afford to use: ' .
                     $kingdom->name . '\'s treasury to purchase an extra: ' .
                     $missingResources['population'] . ' population.';
+
+                $buildingUpgradeRequest['secondary_status'] = CapitalCityQueueStatus::REJECTED;
+
+                return $buildingUpgradeRequest;
             }
 
             $buildingUpgradeRequest['missing_costs'] = $missingResources;
 
+            $processResult = true;
+
             if ($canAffordPopulation) {
-                $this->processResourceRequests($capitalCityBuildingQueue, $kingdom, $character, $building, $missingResources);
+                $processResult = $this->processResourceRequests($capitalCityBuildingQueue, $kingdom, $character, $building, $missingResources);
             }
 
 
-            $buildingUpgradeRequest['secondary_status'] = $canAffordPopulation ? CapitalCityQueueStatus::REQUESTING : CapitalCityQueueStatus::REJECTED;
+            $buildingUpgradeRequest['secondary_status'] = ($canAffordPopulation && $processResult) ? CapitalCityQueueStatus::REQUESTING : CapitalCityQueueStatus::REJECTED;
 
             return $buildingUpgradeRequest;
         }
@@ -224,14 +348,51 @@ class CapitalCityBuildingManagement {
         return $buildingUpgradeRequest;
     }
 
-
-    private function processResourceRequests(CapitalCityBuildingQueue $capitalCityBuildingQueue, Kingdom $kingdom, Character $character, KingdomBuilding $building, array $missingResources): void {
+    /**
+     * Process sending off resource requests.
+     *
+     * @param CapitalCityBuildingQueue $capitalCityBuildingQueue
+     * @param Kingdom $kingdom
+     * @param Character $character
+     * @param KingdomBuilding $building
+     * @param array $missingResources
+     * @return bool
+     */
+    private function processResourceRequests(CapitalCityBuildingQueue $capitalCityBuildingQueue, Kingdom $kingdom, Character $character, KingdomBuilding $building, array $missingResources): bool {
         foreach ($missingResources as $key => $amount) {
-            $this->sendOffResourceRequests($capitalCityBuildingQueue, $kingdom, $character, $building, $key, $amount);
+            $result = $this->sendOffResourceRequests($capitalCityBuildingQueue, $kingdom, $character, $building, $key, $amount);
+
+            if (!$result) {
+
+                $buildingQueues = $capitalCityBuildingQueue->building_request_data;
+
+                foreach ($buildingQueues as $index => $queueData) {
+                    if ($queueData['building_id'] === $building->id) {
+                        $buildingQueues[$index]['secondary_status'] = CapitalCityQueueStatus::REJECTED;
+                    }
+                }
+
+                return false;
+            }
         }
+
+        return true;
     }
 
-    private function sendOffResourceRequests(CapitalCityBuildingQueue $queue, Kingdom $kingdom, Character $character, KingdomBuilding $building, string $resourceName, int $resourceAmount): void {
+    /**
+     * Send off the resource request based on what we need. This can and will send multiple requests.
+     *
+     * Returns true or false if the request was sent.
+     *
+     * @param CapitalCityBuildingQueue $queue
+     * @param Kingdom $kingdom
+     * @param Character $character
+     * @param KingdomBuilding $building
+     * @param string $resourceName
+     * @param int $resourceAmount
+     * @return bool
+     */
+    private function sendOffResourceRequests(CapitalCityBuildingQueue $queue, Kingdom $kingdom, Character $character, KingdomBuilding $building, string $resourceName, int $resourceAmount): bool {
 
         $kingdom = $character->kingdoms()->where('id', '!=', $kingdom->id)->where('current_' . $resourceName, '>=', $resourceAmount)->first();
 
@@ -239,7 +400,7 @@ class CapitalCityBuildingManagement {
 
             $this->messages[] = 'No kingdom found to request resources from for: ' . $building->name;
 
-            return;
+            return false;
         }
 
         $result = $this->resourceTransferService->sendOffResourceRequest($character, [
@@ -254,9 +415,9 @@ class CapitalCityBuildingManagement {
 
             $this->messages[] = $result['message'];
 
-            return;
+            return false;
         }
 
-        $this->messages[] = 'Requesting resources for: ' . $building->name;
+        return true;
     }
 }

@@ -12,4 +12,6 @@ export default interface KingdomDetailsProps {
     show_small_council: () => void;
 
     reset_resource_transfer: boolean;
+
+    has_capital_city: boolean;
 }

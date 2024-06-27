@@ -44,6 +44,7 @@ class MassImportCustomData extends Command {
         Artisan::call('import:game-data "Items"');
         Artisan::call('import:game-data "Affixes"');
         Artisan::call('import:game-data "Locations"');
+        Artisan::call('import:game-data "Monsters"');
         Artisan::call('import:game-data "Npcs"');
         Artisan::call('import:game-data "Kingdoms"');
         Artisan::call('import:game-data "Kingdom Passive Skills"');

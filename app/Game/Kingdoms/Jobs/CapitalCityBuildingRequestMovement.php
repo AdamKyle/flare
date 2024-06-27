@@ -3,6 +3,7 @@
 namespace App\Game\Kingdoms\Jobs;
 
 use App\Flare\Models\CapitalCityBuildingQueue;
+use App\Game\Kingdoms\Events\UpdateCapitalCityBuildingQueueTable;
 use App\Game\Kingdoms\Service\CapitalCityBuildingManagement;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use Illuminate\Bus\Queueable;
@@ -57,6 +58,8 @@ class CapitalCityBuildingRequestMovement implements ShouldQueue {
         ]);
 
         $queueData = $queueData->refresh();
+
+        event(new UpdateCapitalCityBuildingQueueTable($queueData->character));
 
         $capitalCityBuildingManagement->processBuildingRequest(
             $queueData

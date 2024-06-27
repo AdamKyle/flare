@@ -19,6 +19,7 @@ class LocationType {
     const THE_OLD_CHURCH        = 5;
     const TWISTED_GATE          = 6;
     const ALCHEMY_CHURCH        = 7;
+    const LORDS_STRONG_HOLD     = 8;
 
     protected static $values = [
         0 => self::PURGATORY_SMITH_HOUSE,
@@ -29,6 +30,7 @@ class LocationType {
         5 => self::THE_OLD_CHURCH,
         6 => self::TWISTED_GATE,
         7 => self::ALCHEMY_CHURCH,
+        8 => self::LORDS_STRONG_HOLD,
     ];
 
     /**
@@ -43,6 +45,7 @@ class LocationType {
         self::THE_OLD_CHURCH        => 'The Old Church',
         self::TWISTED_GATE          => 'The Twisted Gate',
         self::ALCHEMY_CHURCH        => 'Alchemy Church',
+        self::LORDS_STRONG_HOLD     => 'Lords Strong Hold',
     ];
 
     /**
@@ -128,5 +131,9 @@ class LocationType {
      */
     public function isAlchemyChurch(): bool {
         return $this->value === self::ALCHEMY_CHURCH;
+    }
+
+    public function isLordsStrongHold(): bool {
+        return $this->value === self::LORDS_STRONG_HOLD;
     }
 }
