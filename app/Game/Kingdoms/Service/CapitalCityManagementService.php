@@ -278,6 +278,7 @@ class CapitalCityManagementService
     private function getSelectableKingdoms(Kingdom $kingdom): array
     {
         return Kingdom::where('id', '!=', $kingdom->id)
+            ->where('character_id', $kingdom->character_id)
             ->whereDoesntHave('unitsQueue')
             ->select('name', 'id')
             ->get()
