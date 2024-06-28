@@ -13,6 +13,7 @@ class CapitalCityQueueStatus
     const REQUESTING = 'requesting';
     const BUILDING = 'building';
     const REPAIRING = 'repairing';
+    const RECRUITING = 'recruiting';
     const REJECTED = 'rejected';
     const FINISHED = 'finished';
 }

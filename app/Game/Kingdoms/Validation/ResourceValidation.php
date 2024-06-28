@@ -76,6 +76,16 @@ class ResourceValidation {
                ($kingdom->current_population < $this->getUnitCost($kingdom, ($unit->required_population * $amount), true));
     }
 
+    public function getMissingResources(GameUnit $unit, Kingdom $kingdom, int $amount): array {
+        return [
+            'wood' => $this->getUnitCost($kingdom, ($unit->wood_cost * $amount)) - $kingdom->current_wood,
+            'clay' => $this->getUnitCost($kingdom, ($unit->clay_cost * $amount)) - $kingdom->current_clay,
+            'stone' => $this->getUnitCost($kingdom, ($unit->stone_cost * $amount)) - $kingdom->current_stone,
+            'steel' => $this->getUnitCost($kingdom, ($unit->steel_cost * $amount)) - $kingdom->current_steel,
+            'iron' => $this->getUnitCost($kingdom, ($unit->iron_cost * $amount)) - $kingdom->current_iron,
+        ];
+    }
+
     /**
      * Fetch the real cost of the units.
      *

@@ -54,7 +54,7 @@ class ResourceTransferService {
      * @param array $params
      * @return array
      */
-    public function sendOffResourceRequest(Character $character, array $params, int $capitalCityQueueId = null, int $buildingId = null): array {
+    public function sendOffResourceRequest(Character $character, array $params, int $capitalCityQueueId = null, int $buildingId = null, int $unitId = null): array {
 
         $requestingKingdom = Kingdom::find($params['kingdom_requesting']);
         $requestingFromKingdom = Kingdom::find($params['kingdom_requesting_from']);
@@ -91,7 +91,7 @@ class ResourceTransferService {
 
         $amountOfResources = $this->getActualAmount($params['amount_of_resources'], $useAirShip);
 
-        $this->sendOffRequestForResources($requestingKingdom, $requestingFromKingdom, $amountOfResources, $params['type_of_resource'], $useAirShip, $capitalCityQueueId, $buildingId);
+        $this->sendOffRequestForResources($requestingKingdom, $requestingFromKingdom, $amountOfResources, $params['type_of_resource'], $useAirShip, $capitalCityQueueId, $buildingId, $unitId);
 
         return $this->successResult([
             'message' => 'You have requested: ' . number_format($amountOfResources) . ' of type: ' . $params['type_of_resource'] . ' from: ' .
@@ -203,7 +203,7 @@ class ResourceTransferService {
         return !is_null($requestingMarketPlace) && !is_null($requestingFromMarketPlace);
     }
 
-    private function sendOffRequestForResources(Kingdom $requestingKingdom, Kingdom $requestingFromKingdom, int $amount, string $type, bool $useAirShip, int $capitalCityQueueId = null, int $buildingId = null): void {
+    private function sendOffRequestForResources(Kingdom $requestingKingdom, Kingdom $requestingFromKingdom, int $amount, string $type, bool $useAirShip, int $capitalCityQueueId = null, int $buildingId = null, int $unitId = null): void {
 
         $resources = ['wood', 'stone', 'clay', 'iron', 'steel'];
 
@@ -258,7 +258,7 @@ class ResourceTransferService {
             $this->buildUnitDataForMovement($requestingKingdom, $requestingFromKingdom, $timeToKingdom)
         );
 
-        $this->sendOffEvents($requestingKingdom, $requestingFromKingdom, $unitMovementQueue, $resourcesToRequest, $capitalCityQueueId, $buildingId);
+        $this->sendOffEvents($requestingKingdom, $requestingFromKingdom, $unitMovementQueue, $resourcesToRequest, $capitalCityQueueId, $buildingId, $unitId);
     }
 
     private function buildUnitDataForMovement(Kingdom $requestingKingdom, Kingdom $requestingFromKingdom, int $completedAtMinutes): array {
@@ -310,7 +310,7 @@ class ResourceTransferService {
         ];
     }
 
-    private function sendOffEvents(Kingdom $requestingKingdom, Kingdom $requestingFromKingdom, UnitMovementQueue $unitMovementQueue, array $resourcesForRequest, int $capitalCityQueueId = null, int $buildingId = null): void {
+    private function sendOffEvents(Kingdom $requestingKingdom, Kingdom $requestingFromKingdom, UnitMovementQueue $unitMovementQueue, array $resourcesForRequest, int $capitalCityQueueId = null, int $buildingId = null, int $unitId = null): void {
 
         $user = $requestingFromKingdom->character->user;
 
@@ -323,7 +323,8 @@ class ResourceTransferService {
             'amount_of_resources' => $resourcesForRequest,
             'additional_log_messages' => $this->additionalMessagesForLog,
             'capital_city_queue_id' => $capitalCityQueueId,
-            'building_id' => $buildingId
+            'building_id' => $buildingId,
+            'unit_id' => $unitId
         ])->delay($minutes);
 
         event(new ServerMessageEvent($user, 'Your resources are on their way. The Spearmen will guard them on their travels and return should they not die along the way!'));

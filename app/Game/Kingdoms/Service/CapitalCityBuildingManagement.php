@@ -213,7 +213,7 @@ class CapitalCityBuildingManagement {
      * @param Character $character
      * @return void
      */
-    private function handleBuildingRequest(CapitalCityBuildingQueue $capitalCityBuildingQueue, KingdomBuilding $building, Character $character): void {
+    public function handleBuildingRequest(CapitalCityBuildingQueue $capitalCityBuildingQueue, KingdomBuilding $building, Character $character): void {
         $kingdom = $capitalCityBuildingQueue->kingdom;
         $buildingData = $capitalCityBuildingQueue->building_request_data;
 

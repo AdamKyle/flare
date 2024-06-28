@@ -70,8 +70,6 @@ class UnitService {
      * @param Kingdom $kingdom
      * @param GameUnit $gameUnit
      * @param int $amount
-     * @param bool $paidGold
-     * @throws Exception
      */
     public function recruitUnits(Kingdom $kingdom, GameUnit $gameUnit, int $amount): void {
         $character        = $kingdom->character;
@@ -97,17 +95,7 @@ class UnitService {
         }
     }
 
-    /**
-     * Update the kingdom resources based on the cost.
-     *
-     * Subtracts cost from current amount.
-     *
-     * @param Kingdom $kingdom
-     * @param GameUnit $gameUnit
-     * @param int $amount
-     * @return Kingdom
-     */
-    public function updateKingdomResources(Kingdom $kingdom, GameUnit $gameUnit, int $amount): Kingdom {
+    public function getCostsRequired(Kingdom $kingdom, GameUnit $gameUnit, int $amount): array {
         $kingdomUnitCostReduction = $kingdom->fetchUnitCostReduction();
         $ironCostReduction        = $kingdom->fetchIronCostReduction();
 
@@ -129,12 +117,36 @@ class UnitService {
         $populationRequired = ($gameUnit->required_population * $amount);
         $populationRequired -= $populationRequired * $kingdomUnitCostReduction;
 
-        $newWood  = $kingdom->current_wood - $woodRequired;
-        $newClay  = $kingdom->current_clay - $clayRequired;
-        $newStone = $kingdom->current_stone - $stoneRequired;
-        $newIron  = $kingdom->current_iron - $ironRequired;
-        $newPop   = $kingdom->current_population - $populationRequired;
-        $newSteel = $kingdom->current_steel - $steelCost;
+        return [
+            'wood' => $woodRequired,
+            'clay' => $clayRequired,
+            'stone' => $stoneRequired,
+            'iron' => $ironRequired,
+            'steel' => $steelCost,
+            'population' => $populationRequired,
+        ];
+    }
+
+    /**
+     * Update the kingdom resources based on the cost.
+     *
+     * Subtracts cost from current amount.
+     *
+     * @param Kingdom $kingdom
+     * @param GameUnit $gameUnit
+     * @param int $amount
+     * @return Kingdom
+     */
+    public function updateKingdomResources(Kingdom $kingdom, GameUnit $gameUnit, int $amount): Kingdom {
+
+        $costs = $this->getCostsRequired($kingdom, $gameUnit, $amount);
+
+        $newWood  = $kingdom->current_wood - $costs['wood'];
+        $newClay  = $kingdom->current_clay - $costs['clay'];
+        $newStone = $kingdom->current_stone - $costs['stone'];
+        $newIron  = $kingdom->current_iron - $costs['iron'];
+        $newPop   = $kingdom->current_population - $costs['population'];
+        $newSteel = $kingdom->current_steel - $costs['steel'];
 
         $kingdom->update([
             'current_wood'       => $newWood > 0 ? $newWood : 0,
@@ -198,7 +210,7 @@ class UnitService {
      * @param Character $character
      * @return Skill
      */
-    protected function fetchTimeReduction(Character $character): Skill  {
+    public function fetchTimeReduction(Character $character): Skill  {
         return $character->skills->filter(function($skill) {
             return $skill->baseSkill->type === SkillTypeValue::EFFECTS_KINGDOM;
         })->first();

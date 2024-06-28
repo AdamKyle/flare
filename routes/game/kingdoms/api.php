@@ -97,7 +97,7 @@ Route::middleware([
     Route::get('/kingdom/make-capital-city/{character}/{kingdom}', ['as' => 'kingdom.capital-city.manage.buildings', 'uses' => 'Api\CapitalCityManagementController@makeCapitalCity']);
     Route::get('/kingdom/capital-city/manage-buildings/{character}/{kingdom}', ['as' => 'kingdom.capital-city.manage.buildings', 'uses' => 'Api\CapitalCityManagementController@fetchKingdomsWithUpgradableBuildingType']);
     Route::get('/kingdom/capital-city/manage-units/{character}/{kingdom}', ['as' => 'kingdom.capital-city.manage.units', 'uses' => 'Api\CapitalCityManagementController@fetchKingdomsWithRecruitableUnitType']);
-    Route::get('/kingdom/capital-city/building-queues/{character}/{kingdom}', ['as' => 'kingdom.capital-city.building-queues.units', 'uses' => 'Api\CapitalCityManagementController@fetchKingdomBvuildingManagementQueues']);
+    Route::get('/kingdom/capital-city/building-queues/{character}/{kingdom}', ['as' => 'kingdom.capital-city.building-queues.units', 'uses' => 'Api\CapitalCityManagementController@fetchKingdomBuildingManagementQueues']);
     Route::post('/kingdom/capital-city/walk-all-cities/{character}/{kingdom}', ['as' => 'capital.city.walk-kingdoms', 'uses' => 'Api\CapitalCityManagementController@walkAllKingdoms']);
     Route::post('/kingdom/capital-city/upgrade-building-requests/{character}/{kingdom}', ['as' => 'capital.city.building-upgrade-request', 'uses' => 'Api\CapitalCityManagementController@upgradeBuildings']);
     Route::post('/kingdom/capital-city/recruit-unit-requests/{character}/{kingdom}', ['as' => 'capital.city.recruit-unit-request', 'uses' => 'Api\CapitalCityManagementController@recruitUnits']);

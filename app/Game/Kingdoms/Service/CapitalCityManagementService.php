@@ -100,6 +100,10 @@ class CapitalCityManagementService
         return $this->capitalCityBuildingManagement->createBuildingUpgradeRequestQueue($character, $kingdom, $params, $type);
     }
 
+    public function sendOffUnitRecruitmentOrders(Character $character, Kingdom $kingdom, array $requestData): array {
+
+    }
+
     public function fetchBuildingQueueData(Character $character, Kingdom $kingdom = null): array {
 
         $queues = CapitalCityBuildingQueue::where('character_id', $character->id);
