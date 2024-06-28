@@ -3,6 +3,8 @@ import PrimaryOutlineButton from "../../ui/buttons/primary-outline-button";
 import SuccessOutlineButton from "../../ui/buttons/success-outline-button";
 import BuildingsToUpgradeSection from "./buildings-to-upgrade-section";
 import BuildingQueuesTable from "./building-queues-table";
+import ClickableIconCard from "../../ui/cards/clickable-icon-card";
+import LoadingProgressBar from "../../ui/progress-bars/loading-progress-bar";
 
 export default class ManageKingdomBuildings extends React.Component<any, any> {
     constructor(props: any) {
@@ -29,18 +31,34 @@ export default class ManageKingdomBuildings extends React.Component<any, any> {
 
     renderActionButtons() {
         return (
-            <div className="text-center flex flex-col md:flex-row items-center justify-center">
-                <PrimaryOutlineButton
-                    additional_css="mr-0 md:mr-4 lg:text-5xl md:text-4xl sm:text-3xl text-xl lg:py-6 md:py-4 sm:py-3 py-2 lg:px-10 md:px-8 sm:px-6 px-4"
-                    button_label="Upgrade"
+            <div className="border-2 border-gray-500 dark:border-gray-600 bg-gray-700 dark:bg-gray-600 mr-auto ml-auto p-4 rounded shadow-lg">
+                <ClickableIconCard
+                    title={"Upgrade Buildings"}
+                    icon_class={"ra ra-forging"}
                     on_click={this.manageShowUpgradeBuildingList.bind(this)}
-                />
-                <div className="border-t-2 md:border-t-0 md:border-r-2 border-gray-500 h-0 md:h-16 mx-0 md:mx-4 my-4 md:my-0"></div>
-                <PrimaryOutlineButton
-                    additional_css="lg:text-5xl md:text-4xl sm:text-3xl text-xl lg:py-6 md:py-4 sm:py-3 py-2 lg:px-10 md:px-8 sm:px-6 px-4"
-                    button_label="Repair"
+                >
+                    <p className="mb-2">
+                        Clicking this card will allow you to select buildings to
+                        upgrade. This will send each building request, grouped
+                        together, to the associated kingdom. Resources will auto
+                        be requested, population is purchased from the kingdom
+                        treasury. All automatically. Below will be a table of
+                        the request queues. Each kingdom will get a log stating
+                        what was or wasn't upgraded.
+                    </p>
+                </ClickableIconCard>
+                <ClickableIconCard
+                    title={"Upgrade/Repair Buildings"}
+                    icon_class={"ra ra-guarded-tower"}
                     on_click={this.manageShowRepairList.bind(this)}
-                />
+                >
+                    Clicking this card will let you repair broken buildings
+                    across your kingdoms on this plane.Resources will auto be
+                    requested, population is purchased from the kingdom
+                    treasury. All automatically. Below will be a table of the
+                    request queues. Each kingdom will get a log stating what was
+                    or wasn't upgraded.
+                </ClickableIconCard>
             </div>
         );
     }
@@ -79,19 +97,6 @@ export default class ManageKingdomBuildings extends React.Component<any, any> {
                     />
                 </div>
                 <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-4"></div>
-                <p className="my-2">
-                    Choose to repair or upgrade buildings. Repairing shows only
-                    damaged buildings, like the Farm and Walls, which are
-                    essential to rebuild to prevent morale loss. Upgrading shows
-                    buildings that are not damaged, not max level, and unlocked
-                    through the passive tree.
-                </p>
-                <p className="my-2">
-                    When upgrading or repairing, population will be purchased if
-                    needed, and resources will be requested if available.
-                    Kingdoms with airships will automatically use one when
-                    requesting resources.
-                </p>
 
                 {this.state.show_upgrade_buildings_list ? (
                     <BuildingsToUpgradeSection
@@ -109,6 +114,7 @@ export default class ManageKingdomBuildings extends React.Component<any, any> {
                     <>
                         {this.renderActionButtons()}
                         <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-4"></div>
+                        <h3 className={"my-2"}>Queue Info</h3>
                         <BuildingQueuesTable
                             user_id={this.props.user_id}
                             kingdom_id={this.props.kingdom.id}

@@ -2,6 +2,9 @@
 
 namespace App\Game\Kingdoms\Jobs;
 
+use App\Flare\Models\CapitalCityUnitQueue;
+use App\Game\Kingdoms\Service\CapitalCityUnitManagement;
+use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use App\Game\Kingdoms\Values\KingdomMaxValue;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -20,52 +23,29 @@ class RecruitUnits implements ShouldQueue {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     /**
-     * @var Kingdom $kingdom
-     */
-    protected Kingdom $kingdom;
-
-    /**
-     * @var GameUnit $unit
-     */
-    protected GameUnit $unit;
-
-    /**
-     * @var int queueId
-     */
-    protected int $queueId;
-
-    /**
-     * @var int $amount
-     */
-    protected int $amount;
-
-    /**
      * Create a new job instance.
      *
      * @param GameUnit $unit
      * @param Kingdom $kingdom
      * @param int $amount
      * @param int $queueId
-     * @return void
+     * @param int|null $capitalCityQueueId
      */
-    public function __construct(GameUnit $unit, Kingdom $kingdom, int $amount, int $queueId)
-    {
-        $this->kingdom  = $kingdom;
-
-        $this->unit     = $unit;
-
-        $this->queueId  = $queueId;
-
-        $this->amount   = $amount;
-    }
+    public function __construct(private readonly GameUnit $unit,
+                                private readonly Kingdom $kingdom,
+                                private readonly int $amount,
+                                private readonly int $queueId,
+                                private readonly int|null $capitalCityQueueId = null
+    ){ }
 
     /**
      * Execute the job.
      *
      * @param UpdateKingdom $updateKingdom
+     * @param CapitalCityUnitManagement $capitalCityUnitManagement
      * @return void
      */
-    public function handle(UpdateKingdom $updateKingdom): void {
+    public function handle(UpdateKingdom $updateKingdom, CapitalCityUnitManagement $capitalCityUnitManagement): void {
 
         $queue = UnitInQueue::find($this->queueId);
 
@@ -145,6 +125,26 @@ class RecruitUnits implements ShouldQueue {
 
                 ServerMessageHandler::handleMessage($user, 'unit_recruitment_finished', $message);
             }
+        }
+
+        if (!is_null($this->capitalCityQueueId)) {
+            $capitalCityQueue = CapitalCityUnitQueue::find($this->capitalCityQueueId);
+
+            $unitRequests = $capitalCityQueue->unit_request_data;
+
+            foreach ($unitRequests as $index => $request) {
+                if ($request['unit_name'] === $this->unit->name) {
+                    $unitRequests[$index] = CapitalCityQueueStatus::FINISHED;
+                }
+            }
+
+            $capitalCityQueue->update([
+                'unit_request_data' => $unitRequests
+            ]);
+
+            $capitalCityQueue = $capitalCityQueue->refresh();
+
+            $capitalCityUnitManagement->possiblyCreateKingdomLog($capitalCityQueue);
         }
     }
 }

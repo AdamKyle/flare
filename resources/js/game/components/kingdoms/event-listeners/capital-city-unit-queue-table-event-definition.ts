@@ -1,8 +1,9 @@
 import Listener from "../../../lib/game/event-listeners/listener";
-import UnitRecruitment from "../capital-city/unit-recruitment";
 import BuildingQueuesTable from "../capital-city/building-queues-table";
+import UnitQueuesTable from "../capital-city/unit-queues-table";
+import UnitRecruitment from "../capital-city/unit-recruitment";
 
-export default interface CapitalCityBuildingQueueTableEventDefinition
+export default interface CapitalCityUnitQueueTableEventDefinition
     extends Listener {
     /**
      *
@@ -11,5 +12,5 @@ export default interface CapitalCityBuildingQueueTableEventDefinition
      * @param component
      * @param usrrId
      */
-    initialize: (component: BuildingQueuesTable, userId: number) => void;
+    initialize: (component: UnitRecruitment, userId: number) => void;
 }

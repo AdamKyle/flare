@@ -10,13 +10,14 @@ import BuildingQueuesTable from "../capital-city/building-queues-table";
 import BuildingDetails from "../buildings/deffinitions/building-details";
 import TimerProgressBar from "../../ui/progress-bars/timer-progress-bar";
 import DangerButton from "../../ui/buttons/danger-button";
+import UnitQueuesTable from "../capital-city/unit-queues-table";
 
 /**
  *
  * @param component
  */
-export const buildSmallCouncilBuildingsQueuesTableColumns = (
-    component: BuildingQueuesTable,
+export const buildSmallCouncilUnitQueuesTableColumns = (
+    component: UnitQueuesTable,
 ) => {
     return [
         {
@@ -25,9 +26,9 @@ export const buildSmallCouncilBuildingsQueuesTableColumns = (
             cell: (row: any) => <span>{row.kingdom_name}</span>,
         },
         {
-            name: "Building Name",
-            selector: (row: any) => row.building_name,
-            cell: (row: any) => <span>{row.building_name}</span>,
+            name: "Unit Name",
+            selector: (row: any) => row.unit_name,
+            cell: (row: any) => <span>{row.unit_name}</span>,
         },
         {
             name: "Request Status",

@@ -9,9 +9,21 @@ import { serviceContainer } from "../../../lib/containers/core-container";
 import PrimaryOutlineButton from "../../ui/buttons/primary-outline-button";
 import DangerOutlineButton from "../../ui/buttons/danger-outline-button";
 import SendUnitRecruitmentRequestModal from "./modals/send-unit-recruitment-request-modal";
+import FetchUnitQueuesAjax from "../ajax/fetch-unit-queues-ajax";
+import TabPanel from "../../ui/tabs/tab-panel";
+import Tabs from "../../ui/tabs/tabs";
+import UnitQueuesTable from "./unit-queues-table";
+import CapitalCityUnitQueueTableEventDefinition from "../event-listeners/capital-city-unit-queue-table-event-definition";
+import CapitalCityUnitQueuesTableEvent from "../event-listeners/capital-city-unit-queues-table-event";
 
 export default class UnitRecruitment extends React.Component<any, any> {
     private fetchKingdomsForSelection: FetchKingdomsForSelectionAjax;
+
+    private fetchUnitQueueData: FetchUnitQueuesAjax;
+
+    private updateUnitQueueTableEvent: CapitalCityUnitQueueTableEventDefinition;
+
+    private tabs: { name: string; key: string }[];
 
     constructor(props: any) {
         super(props);
@@ -24,11 +36,34 @@ export default class UnitRecruitment extends React.Component<any, any> {
             success_message: null,
             unit_recruitment_data: [],
             kingdoms_for_selection: [],
+            unit_queues: [],
         };
+
+        this.tabs = [
+            {
+                key: "recruitment",
+                name: "Recruitment",
+            },
+            {
+                key: "qeues",
+                name: "Queues",
+            },
+        ];
 
         this.fetchKingdomsForSelection = serviceContainer().fetch(
             FetchKingdomsForSelectionAjax,
         );
+
+        this.fetchUnitQueueData = serviceContainer().fetch(FetchUnitQueuesAjax);
+
+        this.updateUnitQueueTableEvent =
+            serviceContainer().fetch<CapitalCityUnitQueueTableEventDefinition>(
+                CapitalCityUnitQueuesTableEvent,
+            );
+
+        this.updateUnitQueueTableEvent.initialize(this, this.props.user_id);
+
+        this.updateUnitQueueTableEvent.register();
     }
 
     componentDidMount() {
@@ -37,6 +72,14 @@ export default class UnitRecruitment extends React.Component<any, any> {
             this.props.kingdom.character_id,
             this.props.kingdom.id,
         );
+
+        this.fetchUnitQueueData.fetchUnitQueueData(
+            this,
+            this.props.kingdom.character_id,
+            this.props.kingdom.id,
+        );
+
+        this.updateUnitQueueTableEvent.listen();
     }
 
     manageUnitRecruitment() {
@@ -230,11 +273,20 @@ export default class UnitRecruitment extends React.Component<any, any> {
         );
     }
 
-    render() {
-        if (this.state.loading) {
-            return <LoadingProgressBar />;
-        }
+    renderRecruitmentAndQueueTabs() {
+        return (
+            <Tabs tabs={this.tabs} full_width={true}>
+                <TabPanel key={"recruitment"}>
+                    {this.renderRecruitmentSection()}
+                </TabPanel>
+                <TabPanel key={"queues"}>
+                    <UnitQueuesTable unit_queues={this.state.unit_queues} />
+                </TabPanel>
+            </Tabs>
+        );
+    }
 
+    renderRecruitmentSection() {
         return (
             <div>
                 <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-4"></div>
@@ -318,5 +370,17 @@ export default class UnitRecruitment extends React.Component<any, any> {
                 ) : null}
             </div>
         );
+    }
+
+    render() {
+        if (this.state.loading) {
+            return <LoadingProgressBar />;
+        }
+
+        if (this.state.unit_queues.length > 0) {
+            return this.renderRecruitmentAndQueueTabs();
+        }
+
+        return this.renderRecruitmentSection();
     }
 }

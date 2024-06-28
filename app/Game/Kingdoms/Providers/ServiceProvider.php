@@ -15,6 +15,7 @@ use App\Game\Kingdoms\Handlers\ReturnSurvivingUnitHandler;
 use App\Game\Kingdoms\Handlers\SettlerHandler;
 use App\Game\Kingdoms\Service\CapitalCityBuildingManagement;
 use App\Game\Kingdoms\Service\CapitalCityManagementService;
+use App\Game\Kingdoms\Service\CapitalCityUnitManagement;
 use App\Game\Kingdoms\Service\ExpandResourceBuildingService;
 use App\Game\Kingdoms\Service\KingdomQueueService;
 use App\Game\Kingdoms\Service\ResourceTransferService;
@@ -22,7 +23,6 @@ use App\Game\Kingdoms\Service\SteelSmeltingService;
 use App\Game\Kingdoms\Transformers\KingdomTableTransformer;
 use League\Fractal\Manager;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
-
 use App\Flare\Transformers\KingdomAttackLogsTransformer;
 use App\Flare\Transformers\KingdomTransformer;
 use App\Game\Kingdoms\Console\Commands\DeleteKingdomLogs;
@@ -70,6 +70,7 @@ class ServiceProvider extends ApplicationServiceProvider {
             return new CapitalCityManagementService(
                 $app->make(UpdateKingdom::class),
                 $app->make(CapitalCityBuildingManagement::class),
+                $app->make(CapitalCityUnitManagement::class),
                 $app->make(KingdomBuildingTransformer::class),
                 $app->make(Manager::class)
             );
@@ -78,6 +79,15 @@ class ServiceProvider extends ApplicationServiceProvider {
         $this->app->bind(CapitalCityBuildingManagement::class, function($app) {
             return new CapitalCityBuildingManagement(
                 $app->make(KingdomBuildingService::class),
+                $app->make(UnitMovementService::class),
+                $app->make(ResourceTransferService::class),
+                $app->make(UpdateKingdom::class),
+            );
+        });
+
+        $this->app->bind(CapitalCityUnitManagement::class, function($app) {
+            return new CapitalCityUnitManagement(
+                $app->make(UnitService::class),
                 $app->make(UnitMovementService::class),
                 $app->make(ResourceTransferService::class),
                 $app->make(UpdateKingdom::class),

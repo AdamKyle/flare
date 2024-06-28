@@ -9,6 +9,7 @@ import FetchKingdomsForSelectionAjax from "../ajax/fetch-kingdoms-for-selection-
 import ProcessUnitRequestAjax from "../ajax/process-unit-request-ajax";
 import kingdomEventContainer from "./kingdom-event-container";
 import FetchBuildingQueuesAjax from "../ajax/fetch-building-queues-ajax";
+import FetchUnitQueuesAjax from "../ajax/fetch-unit-queues-ajax";
 
 /**
  * Register core dependencies here.
@@ -55,6 +56,10 @@ function kingdomContainer(container: CoreContainer) {
 
     container.register("fetch-building-queues-ajax", {
         useClass: FetchBuildingQueuesAjax,
+    });
+
+    container.register("fetch-unit-queues-ajax", {
+        useClass: FetchUnitQueuesAjax,
     });
 }
 

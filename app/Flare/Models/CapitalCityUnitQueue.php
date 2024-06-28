@@ -32,7 +32,7 @@ class CapitalCityUnitQueue extends Model {
      * @var array
      */
     protected $casts = [
-        'building_request_data' => 'array',
+        'unit_request_data' => 'array',
         'messages' => 'array',
         'completed_at' => 'datetime',
         'started_at'   => 'datetime',

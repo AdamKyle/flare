@@ -14,4 +14,6 @@ export default interface SmallKingdomState {
     show_resource_transfer_panel: boolean;
 
     should_reset_resource_transfer: boolean;
+
+    show_small_council: boolean;
 }

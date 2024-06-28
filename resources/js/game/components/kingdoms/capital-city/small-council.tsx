@@ -73,6 +73,7 @@ export default class SmallCouncil extends React.Component<any, any> {
         if (this.state.show_unit_recruitment) {
             return (
                 <UnitRecruitment
+                    user_id={this.props.user_id}
                     kingdom={this.props.kingdom}
                     manage_unit_section={this.manageShowUnitRecruitment.bind(
                         this,

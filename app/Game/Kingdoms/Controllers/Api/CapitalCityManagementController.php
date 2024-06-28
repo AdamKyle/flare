@@ -67,6 +67,14 @@ class CapitalCityManagementController extends Controller {
         ]);
     }
 
+    public function fetchKingdomUnitManagementQueues(Character $character, Kingdom $kingdom) {
+        $data = $this->capitalCityManagementService->fetchUnitQueueData($character, $kingdom);
+
+        return response()->json([
+            'unit_queues' => $data,
+        ]);
+    }
+
     public function recruitUnits(RecruitUnitRequestsRequest $recruitUnitRequestsRequest, Character $character, Kingdom $kingdom) {
         $result = $this->capitalCityManagementService->sendOffUnitRecruitmentOrders($character, $kingdom, $recruitUnitRequestsRequest->request_data);
 

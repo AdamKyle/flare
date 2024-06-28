@@ -6,7 +6,11 @@ use App\Flare\Models\CapitalCityUnitQueue;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameUnit;
 use App\Flare\Models\Kingdom;
+use App\Flare\Models\KingdomLog;
+use App\Flare\Values\KingdomLogStatusValue;
 use App\Game\Core\Traits\ResponseBuilder;
+use App\Game\Kingdoms\Events\UpdateCapitalCityUnitQueueTable;
+use App\Game\Kingdoms\Jobs\CapitalCityUnitRequestMovement;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use App\Game\Kingdoms\Values\KingdomMaxValue;
 use App\Game\Kingdoms\Values\UnitCosts;
@@ -36,13 +40,10 @@ class CapitalCityUnitManagement {
 
             $minutes       = now()->addMinutes($time);
 
-            $unit = GameUnit::where('name', $data['name'])->first();
-
             $queueData = [
                 'requested_kingdom' => $kingdom->id,
                 'character_id' => $character->id,
                 'kingdom_id'   => $data['kingdom_id'],
-                'unit_request_data' => [],
                 'status' => CapitalCityQueueStatus::TRAVELING,
                 'messages' => null,
                 'started_at' => now(),
@@ -52,17 +53,23 @@ class CapitalCityUnitManagement {
             $unitRequests = [];
 
             foreach($data['unit_requests'] as $unitRequest) {
+                $unit = GameUnit::where('name', $unitRequest['unit_name'])->first();
+
                 $unitRequests[] = [
                     'name' => $unitRequest['unit_name'],
-                    'amount' => $unitRequest['amount'],
+                    'amount' => $unitRequest['unit_amount'],
                     'secondary_status' => null,
-                    'costs' => $this->unitService->getCostsRequired($toKingdom, $unit, $unitRequest['amount']),
+                    'costs' => $this->unitService->getCostsRequired($toKingdom, $unit, $unitRequest['unit_amount']),
                 ];
             }
 
-            $queueData['unit_request_data'][] = $unitRequests;
+            $queueData['unit_request_data'] = $unitRequests;
 
-            $queueData = CapitalCityUnitQueue::create($queueData);
+            $queue = CapitalCityUnitQueue::create($queueData);
+
+            event(new UpdateCapitalCityUnitQueueTable($character, $kingdom));
+
+            CapitalCityUnitRequestMovement::dispatch($queue->id, $character->id)->delay($minutes);
 
             $this->updateKingdom->updateKingdom($kingdom);
         }
@@ -123,11 +130,107 @@ class CapitalCityUnitManagement {
             'unit_request_data' => $unitRequests,
         ]);
 
-        $this->recruitUnits($capitalCityUnitQueue->refresh());
+        $capitalCityUnitQueue = $capitalCityUnitQueue->refresh();
+
+        $capitalCityUnitQueue = $this->recruitUnits($capitalCityUnitQueue);
+
+        event(new UpdateCapitalCityUnitQueueTable($character));
+
+        $this->possiblyCreateKingdomLog($capitalCityUnitQueue);
+
     }
 
-    public function recruitUnits(CapitalCityUnitQueue $capitalCityUnitQueue) {
+    public function recruitUnits(CapitalCityUnitQueue $capitalCityUnitQueue): CapitalCityUnitQueue {
+        $unitRequests = $capitalCityUnitQueue->unit_request_data;
+        $kingdom = $capitalCityUnitQueue->kingdom;
 
+        foreach ($unitRequests as $index => $unitRequest) {
+
+            if ($unitRequest['secondary_status'] === CapitalCityQueueStatus::RECRUITING) {
+
+                $gameUnit = GameUnit::where('name', $unitRequest['name'])->first();
+
+                $purchased = $this->purchasePeopleForRecruitment($kingdom, $gameUnit, $unitRequest['amount']);
+
+                if (!$purchased) {
+                    $this->messages[] = 'Cannot recruit: ' . number_format($unitRequest['amount']) . ' units from ' . $kingdom->name . ' as you do not have have enough treasury to purchase the needed population.';
+
+                    $unitRequests[$index]['secondary_status'] = CapitalCityQueueStatus::REJECTED;
+
+                    continue;
+                }
+
+                $this->unitService->handlePayment($gameUnit, $unitRequest['amount']);
+
+                $this->unitService->recruitUnits($kingdom, $gameUnit, $unitRequest['amount'], $capitalCityUnitQueue->id);
+            }
+        }
+
+        $capitalCityUnitQueue->update([
+            'unit_request_data' => $unitRequests,
+            'messages' => $this->messages,
+        ]);
+
+        return $capitalCityUnitQueue->refresh();
+    }
+
+    public function possiblyCreateKingdomLog(CapitalCityUnitQueue $capitalCityUnitQueue): void {
+        $requestData = $capitalCityUnitQueue->unit_request_data;
+        $kingdom = $capitalCityUnitQueue->kingdom;
+        $character = $capitalCityUnitQueue->character;
+
+        $unitData = [];
+
+        foreach($requestData as $data) {
+            if ($data['secondary_status'] === CapitalCityQueueStatus::REJECTED ||
+                $data['secondary_status'] === CapitalCityQueueStatus::FINISHED
+            ) {
+
+                $unitData[] = [
+                    'unit_name' => $data['name'],
+                    'amount_requested' => $data['amount'],
+                    'type'  => $data['type'],
+                    'status' => $data['secondary_status'],
+                ];
+            }
+        }
+
+        if (count($unitData) === count($requestData)) {
+            KingdomLog::create([
+                'character_id' => $character->id,
+                'from_kingdom_id' => $capitalCityUnitQueue->requested_kingdom,
+                'to_kingdom_id' => $kingdom->id,
+                'opened' => false,
+                'additional_details' => [
+                    'messages' => $capitalCityUnitQueue->messages,
+                    'unit_data' => $unitData,
+                ],
+                'status' => KingdomLogStatusValue::CAPITAL_CITY_REQUEST,
+                'published' => true,
+            ]);
+
+            $this->updateKingdom->updateKingdomLogs($kingdom->character, true);
+
+            $capitalCityUnitQueue->delete();
+
+            event(new UpdateCapitalCityUnitQueueTable($character));
+        }
+    }
+
+    private function purchasePeopleForRecruitment(Kingdom $kingdom, GameUnit $gameUnit, int $amount): bool {
+        $populationCost = $amount * (new UnitCosts(UnitCosts::PERSON))->fetchCost();
+
+        if ($kingdom->treasury <= 0) {
+            return false;
+        }
+
+        $newTreasury = $kingdom->treasury - $populationCost;
+
+        $kingdom->update([
+            'treasury' => $newTreasury > 0 ? $newTreasury : 0,
+        ]);
+
+        return true;
     }
 
     private function sendOffResourceRequest(Character $character, Kingdom $kingdom, string $resourceName, int $resourceAmount, int $queueId, int $unitId): bool {
@@ -214,7 +317,7 @@ class CapitalCityUnitManagement {
         return 0;
     }
 
-    private function getTimeForRecruitment(Character $character, Kingdom $kingdom, GameUnit $gameUnit, int $amount): Carbon {
+    private function getTimeForRecruitment(Character $character, GameUnit $gameUnit, int $amount): Carbon {
         $totalTime        = $gameUnit->time_to_recruit * $amount;
         $totalTime        = $totalTime - $totalTime * $this->unitService->fetchTimeReduction($character)->unit_time_reduction;
 

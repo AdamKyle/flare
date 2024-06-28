@@ -3,6 +3,7 @@
 namespace App\Game\Kingdoms\Service;
 
 use App\Flare\Models\CapitalCityBuildingQueue;
+use App\Flare\Models\CapitalCityUnitQueue;
 use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\KingdomBuilding;
@@ -21,6 +22,7 @@ class CapitalCityManagementService
     public function __construct(
         private readonly UpdateKingdom $updateKingdom,
         private readonly CapitalCityBuildingManagement $capitalCityBuildingManagement,
+        private readonly CapitalCityUnitManagement $capitalCityUnitManagement,
         private readonly KingdomBuildingTransformer $kingdomBuildingTransformer,
         private readonly Manager $manager
     ) {}
@@ -100,8 +102,14 @@ class CapitalCityManagementService
         return $this->capitalCityBuildingManagement->createBuildingUpgradeRequestQueue($character, $kingdom, $params, $type);
     }
 
+    /**
+     * @param Character $character
+     * @param Kingdom $kingdom
+     * @param array $requestData
+     * @return array
+     */
     public function sendOffUnitRecruitmentOrders(Character $character, Kingdom $kingdom, array $requestData): array {
-
+        return $this->capitalCityUnitManagement->createUnitRequests($character, $kingdom, $requestData);
     }
 
     public function fetchBuildingQueueData(Character $character, Kingdom $kingdom = null): array {
@@ -137,6 +145,45 @@ class CapitalCityManagementService
                     'time_left_seconds' => $timeLeftInSeconds > 0 ? $timeLeftInSeconds : 0,
                     'building_name' => $building->name,
                     'secondary_status' => $buildingRequest['secondary_status'],
+                ];
+
+                $data[] = $queueData;
+            }
+        }
+
+        return $data;
+    }
+
+    public function fetchUnitQueueData(Character $character, Kingdom $kingdom = null): array {
+
+        $queues = CapitalCityUnitQueue::where('character_id', $character->id);
+
+        if (!is_null($kingdom)) {
+            $queues = $queues->where('kingdom_id', '!=', $kingdom->id);
+        }
+
+        $queues = $queues->get();
+
+        $data = [];
+
+        foreach ($queues as $queue) {
+            $kingdom = $queue->kingdom;
+
+            $end = Carbon::parse($queue->completed_at)->timestamp;
+            $current = Carbon::now()->timestamp;
+
+            $timeLeftInSeconds = $end - $current;
+
+            $unitRequestData = $queue->unit_request_data;
+
+            foreach ($unitRequestData as $unitRequest) {
+
+                $queueData = [
+                    'kingdom_name' => $kingdom->name . '(X/Y: '.$kingdom->x_position.'/'.$kingdom->y_position.')',
+                    'status' => $queue->status,
+                    'time_left_seconds' => $timeLeftInSeconds > 0 ? $timeLeftInSeconds : 0,
+                    'unit_name' => $unitRequest['name'],
+                    'secondary_status' => $unitRequest['secondary_status'],
                 ];
 
                 $data[] = $queueData;

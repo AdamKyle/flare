@@ -92,7 +92,9 @@ export default class SendUnitRecruitmentRequestModal extends React.Component<
                 title={"Send Unit Recruitment Request"}
                 primary_button_disabled={this.state.loading}
                 secondary_actions={{
-                    secondary_button_disabled: this.state.loading,
+                    secondary_button_disabled:
+                        this.state.loading ||
+                        this.state.success_message !== null,
                     secondary_button_label: "Yes. I understand.",
                     handle_action: this.sendRequest.bind(this),
                 }}
@@ -107,7 +109,7 @@ export default class SendUnitRecruitmentRequestModal extends React.Component<
 
                 {this.state.success_message !== null ? (
                     <DangerAlert additional_css={"my-4"}>
-                        {this.state.error_message}
+                        {this.state.success_message}
                     </DangerAlert>
                 ) : null}
 

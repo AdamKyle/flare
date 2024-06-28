@@ -66,20 +66,6 @@ export default class BuildingQueuesTable extends React.Component<any, any> {
                 {this.state.error_message !== null ? (
                     <DangerAlert>{this.state.error_message}</DangerAlert>
                 ) : null}
-                <p className="my-2">
-                    This section lists all your building orders, whether repairs
-                    or upgrades. You can cancel during the travel stage if the
-                    destination is more than a minute away, or during the
-                    requesting or building stages, although this requires a
-                    cancellation request that may be rejected if the original
-                    order is almost complete.
-                </p>
-
-                <p className="my-2">
-                    Once all tasks for a kingdom are completed in real time, a
-                    log will be created and sent to you, detailing everything
-                    done or not done and the reasons why.
-                </p>
 
                 <Table
                     columns={buildSmallCouncilBuildingsQueuesTableColumns(this)}

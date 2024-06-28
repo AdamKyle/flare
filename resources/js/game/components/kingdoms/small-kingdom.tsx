@@ -15,6 +15,7 @@ import DangerAlert from "../../components/ui/alerts/simple-alerts/danger-alert";
 import KingdomProps from "./types/kingdom-props";
 import SmallKingdomState from "./types/small-kingdom-state";
 import KingdomResourceTransfer from "./kingdom-resource-transfer";
+import SmallCouncil from "./capital-city/small-council";
 
 export default class SmallKingdom extends React.Component<
     KingdomProps,
@@ -33,6 +34,7 @@ export default class SmallKingdom extends React.Component<
             error_message: null,
             show_resource_transfer_panel: false,
             should_reset_resource_transfer: false,
+            show_small_council: false,
         };
 
         this.updateKingdomListener =
@@ -75,6 +77,12 @@ export default class SmallKingdom extends React.Component<
             );
 
         this.updateKingdomListener.listen();
+    }
+
+    manageSmallCouncil() {
+        this.setState({
+            show_small_council: !this.state.show_small_council,
+        });
     }
 
     manageKingdomDetails() {
@@ -153,7 +161,21 @@ export default class SmallKingdom extends React.Component<
         return (
             <Fragment>
                 <BasicCard>
-                    {!this.state.show_kingdom_details ? (
+                    {this.state.show_small_council ? (
+                        <BasicCard>
+                            <div className="text-right cursor-pointer text-red-500">
+                                <button
+                                    onClick={this.manageSmallCouncil.bind(this)}
+                                >
+                                    <i className="fas fa-minus-circle"></i>
+                                </button>
+                            </div>
+                            <SmallCouncil
+                                kingdom={this.state.kingdom}
+                                user_id={this.props.user_id}
+                            />
+                        </BasicCard>
+                    ) : !this.state.show_kingdom_details ? (
                         <div className="grid grid-cols-2">
                             <span>
                                 <strong>Kingdom Details</strong>
@@ -218,6 +240,7 @@ export default class SmallKingdom extends React.Component<
                                 reset_resource_transfer={
                                     this.state.should_reset_resource_transfer
                                 }
+                                has_capital_city={this.props.has_capital_city}
                             />
                         </Fragment>
                     )}

@@ -71,7 +71,7 @@ class UnitService {
      * @param GameUnit $gameUnit
      * @param int $amount
      */
-    public function recruitUnits(Kingdom $kingdom, GameUnit $gameUnit, int $amount): void {
+    public function recruitUnits(Kingdom $kingdom, GameUnit $gameUnit, int $amount, int $capitalCityQueueId = null): void {
         $character        = $kingdom->character;
         $totalTime        = $gameUnit->time_to_recruit * $amount;
         $totalTime        = $totalTime - $totalTime * $this->fetchTimeReduction($character)->unit_time_reduction;
@@ -89,9 +89,9 @@ class UnitService {
         event(new UpdateKingdomQueues($kingdom));
 
         if ($totalTime > 900) {
-            RecruitUnits::dispatch($gameUnit, $kingdom, $amount, $queue->id)->delay(now()->addMinutes(15));
+            RecruitUnits::dispatch($gameUnit, $kingdom, $amount, $queue->id, $capitalCityQueueId)->delay(now()->addMinutes(15));
         } else {
-            RecruitUnits::dispatch($gameUnit, $kingdom, $amount, $queue->id)->delay($timeTillFinished);
+            RecruitUnits::dispatch($gameUnit, $kingdom, $amount, $queue->id, $capitalCityQueueId)->delay($timeTillFinished);
         }
     }
 
