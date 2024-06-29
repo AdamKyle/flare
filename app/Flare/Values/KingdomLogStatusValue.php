@@ -22,7 +22,8 @@ class KingdomLogStatusValue {
     const NOT_WALKED          = 8;
     const RESOURCES_REQUESTED = 9;
     const RESOURCES_LOST      = 10;
-    const CAPITAL_CITY_REQUEST = 11;
+    const CAPITAL_CITY_BUILDING_REQUEST = 11;
+    const CAPITAL_CITY_UNIT_REQUEST = 12;
 
     /**
      * @var string[] $values
@@ -38,8 +39,8 @@ class KingdomLogStatusValue {
         self::OVER_POPULATED      => 7,
         self::NOT_WALKED          => 8,
         self::RESOURCES_REQUESTED => 9,
-        self::RESOURCES_LOST      => 10,
-        self::CAPITAL_CITY_REQUEST => 11,
+        self::CAPITAL_CITY_BUILDING_REQUEST => 11,
+        self::CAPITAL_CITY_UNIT_REQUEST => 12,
     ];
 
     /**
@@ -153,7 +154,16 @@ class KingdomLogStatusValue {
      *
      * @return bool
      */
-    public function capitalCityRequest(): bool {
-        return $this->value === self::CAPITAL_CITY_REQUEST;
+    public function capitalCityBuildingRequest(): bool {
+        return $this->value === self::CAPITAL_CITY_BUILDING_REQUEST;
+    }
+
+    /**
+     * Did we get a capital city request?
+     *
+     * @return bool
+     */
+    public function capitalCityUnitRequest(): bool {
+        return $this->value === self::CAPITAL_CITY_UNIT_REQUEST;
     }
 }

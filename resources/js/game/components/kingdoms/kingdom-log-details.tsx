@@ -262,7 +262,7 @@ export default class KingdomLogDetails extends React.Component<
         });
     }
 
-    renderCapitalCityUpgrade() {
+    renderCapitalCityBuildingUpgrade() {
         const buildingData = this.props.log.additional_details.building_data;
 
         return buildingData.map((data: any) => {
@@ -305,8 +305,37 @@ export default class KingdomLogDetails extends React.Component<
         });
     }
 
+    renderCapitalCityUnitUpgrade() {
+        const unitData = this.props.log.additional_details.unit_data;
+
+        return unitData.map((data: any) => {
+            return (
+                <dl
+                    className="mb-4 shadow-lg rounded-lg bg-gray-300 mx-auto m-8 p-4 flex dark:bg-gray-700
+            dark:text-gray-200"
+                >
+                    <dt>Unit Name</dt>
+                    <dd>{data.unit_name}</dd>
+                    <dt>Amount requested</dt>
+                    <dd>{data.amount_requested}</dd>
+                    <dt>Status</dt>
+                    <dd
+                        className={clsx({
+                            "text-red-700 dark:text-red-500":
+                                data.status === "rejected",
+                            "text-green-700 dark:text-green-500":
+                                data.status === "finished",
+                        })}
+                    >
+                        {capitalize(data.status)}
+                    </dd>
+                </dl>
+            );
+        });
+    }
+
     render() {
-        if (this.props.log.status === "Capital City Request") {
+        if (this.props.log.status === "Capital City Building Request") {
             return (
                 <BasicCard>
                     <div className="text-right cursor-pointer text-red-500">
@@ -330,7 +359,61 @@ export default class KingdomLogDetails extends React.Component<
                                 }
                             ></div>
                             <div className={"my-4"}>
-                                {this.renderCapitalCityUpgrade()}
+                                {this.renderCapitalCityBuildingUpgrade()}
+                            </div>
+                        </div>
+
+                        <div>
+                            <h4>Messages</h4>
+                            <div
+                                className={
+                                    "border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3 "
+                                }
+                            ></div>
+                            {this.props.log.additional_details.messages.length >
+                            0 ? (
+                                <InfoAlert additional_css={"my-4"}>
+                                    <p className="text-yellow-700 dark:text-yellow-600 mb-4">
+                                        There are additional details about this
+                                        request from the Capital City:
+                                    </p>
+
+                                    <ul className="list-disc ml-4">
+                                        {this.renderAdditionalCapitalCityMessages()}
+                                    </ul>
+                                </InfoAlert>
+                            ) : null}
+                        </div>
+                    </div>
+                </BasicCard>
+            );
+        }
+
+        if (this.props.log.status === "Capital City Unit Request") {
+            return (
+                <BasicCard>
+                    <div className="text-right cursor-pointer text-red-500">
+                        <button onClick={this.props.close_details}>
+                            <i className="fas fa-minus-circle"></i>
+                        </button>
+                    </div>
+                    <h3 className="mb-4">{this.props.log.status}</h3>
+                    <p className={"my-4"}>
+                        Capital City: {this.props.log.from_kingdom_name} has
+                        sent orders to: {this.props.log.to_kingdom_name}. These
+                        have now been delivered.
+                    </p>
+
+                    <div className="grid md:grid-cols-2 gap-4">
+                        <div>
+                            <h4>Request Info</h4>
+                            <div
+                                className={
+                                    "border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3 "
+                                }
+                            ></div>
+                            <div className={"my-4"}>
+                                {this.renderCapitalCityUnitUpgrade()}
                             </div>
                         </div>
 

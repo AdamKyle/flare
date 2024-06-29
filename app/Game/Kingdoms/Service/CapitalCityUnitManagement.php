@@ -75,7 +75,7 @@ class CapitalCityUnitManagement {
         }
 
         return $this->successResult([
-            'messages' => 'Units requests have been queued up and sent off. If you close this modal you should now see
+            'message' => 'Units requests have been queued up and sent off. If you close this modal you should now see
             a Unit Queue tab which will show you the progress of your requests. Kingdom logs will be generated
             foreach kingdom to details what was or was not recruited.'
         ]);
@@ -189,7 +189,6 @@ class CapitalCityUnitManagement {
                 $unitData[] = [
                     'unit_name' => $data['name'],
                     'amount_requested' => $data['amount'],
-                    'type'  => $data['type'],
                     'status' => $data['secondary_status'],
                 ];
             }
@@ -205,7 +204,7 @@ class CapitalCityUnitManagement {
                     'messages' => $capitalCityUnitQueue->messages,
                     'unit_data' => $unitData,
                 ],
-                'status' => KingdomLogStatusValue::CAPITAL_CITY_REQUEST,
+                'status' => KingdomLogStatusValue::CAPITAL_CITY_UNIT_REQUEST,
                 'published' => true,
             ]);
 

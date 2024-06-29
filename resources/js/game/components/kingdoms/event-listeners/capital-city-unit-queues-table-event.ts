@@ -6,12 +6,13 @@ import CapitalCityBuildingQueueTableEventDefinition from "./capital-city-buildin
 import UnitQueuesTable from "../capital-city/unit-queues-table";
 import UnitRecruitment from "../capital-city/unit-recruitment";
 import CapitalCityUnitQueueTableEventDefinition from "./capital-city-unit-queue-table-event-definition";
+import { Unit } from "chart.js/dist/scales/scale.time";
 
 @injectable()
 export default class CapitalCityUnitQueuesTableEvent
     implements CapitalCityUnitQueueTableEventDefinition
 {
-    private component?: UnitRecruitment;
+    private component?: UnitQueuesTable;
 
     private userId?: number;
 
@@ -21,7 +22,7 @@ export default class CapitalCityUnitQueuesTableEvent
         @inject(CoreEventListener) private coreEventListener: CoreEventListener,
     ) {}
 
-    public initialize(component: UnitRecruitment, userId: number): void {
+    public initialize(component: UnitQueuesTable, userId: number): void {
         this.component = component;
         this.userId = userId;
     }

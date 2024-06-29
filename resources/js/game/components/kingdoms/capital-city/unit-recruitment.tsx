@@ -15,13 +15,10 @@ import Tabs from "../../ui/tabs/tabs";
 import UnitQueuesTable from "./unit-queues-table";
 import CapitalCityUnitQueueTableEventDefinition from "../event-listeners/capital-city-unit-queue-table-event-definition";
 import CapitalCityUnitQueuesTableEvent from "../event-listeners/capital-city-unit-queues-table-event";
+import OrangeOutlineButton from "../../ui/buttons/orange-outline-button";
 
 export default class UnitRecruitment extends React.Component<any, any> {
     private fetchKingdomsForSelection: FetchKingdomsForSelectionAjax;
-
-    private fetchUnitQueueData: FetchUnitQueuesAjax;
-
-    private updateUnitQueueTableEvent: CapitalCityUnitQueueTableEventDefinition;
 
     private tabs: { name: string; key: string }[];
 
@@ -32,6 +29,7 @@ export default class UnitRecruitment extends React.Component<any, any> {
             processing_request: false,
             loading: true,
             show_unit_recruitment_confirmation: false,
+            show_unit_queue_table: false,
             error_message: null,
             success_message: null,
             unit_recruitment_data: [],
@@ -53,17 +51,6 @@ export default class UnitRecruitment extends React.Component<any, any> {
         this.fetchKingdomsForSelection = serviceContainer().fetch(
             FetchKingdomsForSelectionAjax,
         );
-
-        this.fetchUnitQueueData = serviceContainer().fetch(FetchUnitQueuesAjax);
-
-        this.updateUnitQueueTableEvent =
-            serviceContainer().fetch<CapitalCityUnitQueueTableEventDefinition>(
-                CapitalCityUnitQueuesTableEvent,
-            );
-
-        this.updateUnitQueueTableEvent.initialize(this, this.props.user_id);
-
-        this.updateUnitQueueTableEvent.register();
     }
 
     componentDidMount() {
@@ -72,14 +59,6 @@ export default class UnitRecruitment extends React.Component<any, any> {
             this.props.kingdom.character_id,
             this.props.kingdom.id,
         );
-
-        this.fetchUnitQueueData.fetchUnitQueueData(
-            this,
-            this.props.kingdom.character_id,
-            this.props.kingdom.id,
-        );
-
-        this.updateUnitQueueTableEvent.listen();
     }
 
     manageUnitRecruitment() {
@@ -256,6 +235,12 @@ export default class UnitRecruitment extends React.Component<any, any> {
         );
     }
 
+    manageUnitQueueTable() {
+        this.setState({
+            show_unit_queue_table: !this.state.show_unit_queue_table,
+        });
+    }
+
     renderUnitSections(): ReactNode[] {
         return Object.values(UnitTypes).map((unit) =>
             this.renderUnitRecruitmentSection(unit),
@@ -275,14 +260,24 @@ export default class UnitRecruitment extends React.Component<any, any> {
 
     renderRecruitmentAndQueueTabs() {
         return (
-            <Tabs tabs={this.tabs} full_width={true}>
-                <TabPanel key={"recruitment"}>
-                    {this.renderRecruitmentSection()}
-                </TabPanel>
-                <TabPanel key={"queues"}>
-                    <UnitQueuesTable unit_queues={this.state.unit_queues} />
-                </TabPanel>
-            </Tabs>
+            <div>
+                <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-4"></div>
+                <div className="flex items-center relative">
+                    <h3>Capital City Unit Request Queue</h3>
+                    <SuccessOutlineButton
+                        button_label={"Back to manage units"}
+                        on_click={this.manageUnitQueueTable.bind(this)}
+                        additional_css={"absolute right-0"}
+                    />
+                </div>
+                <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-4"></div>
+                <UnitQueuesTable
+                    unit_queues={this.state.unit_queues}
+                    kingdom_id={this.props.kingdom.id}
+                    character_id={this.props.kingdom.character_id}
+                    user_id={this.props.user_id}
+                />
+            </div>
         );
     }
 
@@ -343,6 +338,11 @@ export default class UnitRecruitment extends React.Component<any, any> {
                         additional_css={"py-2 px-3 flex-shrink-0"}
                         disabled={this.isSendButtonDisabled()}
                     />
+                    <OrangeOutlineButton
+                        button_label={"View Queue"}
+                        on_click={this.manageUnitQueueTable.bind(this)}
+                        additional_css={"py-2 px-3 flex-shrink-0"}
+                    />
                     <DangerOutlineButton
                         button_label={"Reset Form"}
                         on_click={() =>
@@ -366,6 +366,9 @@ export default class UnitRecruitment extends React.Component<any, any> {
                         character_id={this.props.kingdom.character_id}
                         kingdom_id={this.props.kingdom.id}
                         params={this.state.unit_recruitment_data}
+                        reset_request_form={() => {
+                            this.setState({ unit_recruitment_data: [] });
+                        }}
                     />
                 ) : null}
             </div>
@@ -377,7 +380,7 @@ export default class UnitRecruitment extends React.Component<any, any> {
             return <LoadingProgressBar />;
         }
 
-        if (this.state.unit_queues.length > 0) {
+        if (this.state.show_unit_queue_table) {
             return this.renderRecruitmentAndQueueTabs();
         }
 

@@ -8,6 +8,8 @@ import RepairHelpSection from "./partials/repair-help-section";
 import UpgradeHelpSection from "./partials/upgrade-help-section";
 import RecruitUnitsSections from "./partials/recruit-units-sections";
 import ProcessUnitRequestAjax from "../../ajax/process-unit-request-ajax";
+import SuccessMessage from "../../../../sections/game-actions-section/components/gambling-section/success-message";
+import SuccessAlert from "../../../ui/alerts/simple-alerts/success-alert";
 
 interface Unit {
     name: string;
@@ -108,9 +110,9 @@ export default class SendUnitRecruitmentRequestModal extends React.Component<
                 ) : null}
 
                 {this.state.success_message !== null ? (
-                    <DangerAlert additional_css={"my-4"}>
+                    <SuccessAlert additional_css={"my-4"}>
                         {this.state.success_message}
-                    </DangerAlert>
+                    </SuccessAlert>
                 ) : null}
 
                 {this.state.loading ? <LoadingProgressBar /> : null}

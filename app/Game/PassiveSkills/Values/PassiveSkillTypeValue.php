@@ -23,6 +23,8 @@ class PassiveSkillTypeValue {
     const AIRSHIP_UNIT_DEFENCE            = 9;
     const RESOURCE_INCREASE               = 10;
     const STEEL_INCREASE                  = 11;
+    const CAPITAL_CITY_REQUEST_BUILD_TRAVEL_TIME_REDUCTION = 12;
+    const CAPITAL_CITY_REQUEST_UNIT_TRAVEL_TIME_REDUCTION = 13;
 
 
     /**
@@ -41,6 +43,8 @@ class PassiveSkillTypeValue {
         self::AIRSHIP_UNIT_DEFENCE            => 9,
         self::RESOURCE_INCREASE               => 10,
         self::STEEL_INCREASE                  => 11,
+        self::CAPITAL_CITY_REQUEST_BUILD_TRAVEL_TIME_REDUCTION => 12,
+        self::CAPITAL_CITY_REQUEST_UNIT_TRAVEL_TIME_REDUCTION => 13,
     ];
 
     /**
@@ -59,6 +63,8 @@ class PassiveSkillTypeValue {
         9  => 'Airship Unit Defence',
         10 => 'Resource Increase',
         11 => 'Steel Increase',
+        12 => 'Capital City Building Request Travel Time Reduction',
+        13 => 'Capital City Unit Request Travel Time Reduction'
     ];
 
     /**
@@ -147,24 +153,6 @@ class PassiveSkillTypeValue {
      */
     public function isSteelSmeltingTimeReduction(): bool {
         return $this->value === self::STEEL_SMELTING_TIME_REDUCTION;
-    }
-
-    /**
-     * Is resource increase?
-     *
-     * @return bool
-     */
-    public function isResourceIncrease(): bool {
-        return $this->value === self::RESOURCE_INCREASE;
-    }
-
-    /**
-     * Is steel increase?
-     *
-     * @return bool
-     */
-    public function isSteelIncrease(): bool {
-        return $this->value === self::STEEL_INCREASE;
     }
 
     /**

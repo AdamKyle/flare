@@ -5,13 +5,14 @@ import { AxiosError, AxiosResponse } from "axios";
 import BuildingsToUpgradeSection from "../capital-city/buildings-to-upgrade-section";
 import BuildingQueuesTable from "../capital-city/building-queues-table";
 import UnitRecruitment from "../capital-city/unit-recruitment";
+import UnitQueuesTable from "../capital-city/unit-queues-table";
 
 @injectable()
 export default class FetchUnitQueuesAjax {
     constructor(@inject(Ajax) private ajax: AjaxInterface) {}
 
     public fetchUnitQueueData(
-        component: UnitRecruitment,
+        component: UnitQueuesTable,
         characterId: number,
         kingdomId: number,
     ): void {

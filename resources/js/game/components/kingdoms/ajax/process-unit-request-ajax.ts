@@ -29,10 +29,15 @@ export default class ProcessUnitRequestAjax {
             .doAjaxCall(
                 "post",
                 (result: AxiosResponse) => {
-                    component.setState({
-                        loading: false,
-                        success_message: result.data.message,
-                    });
+                    component.setState(
+                        {
+                            loading: false,
+                            success_message: result.data.message,
+                        },
+                        () => {
+                            component.props.reset_request_form();
+                        },
+                    );
                 },
                 (error: AxiosError) => {
                     component.setState({

@@ -193,7 +193,7 @@ class CapitalCityBuildingManagement {
                     'messages' => $capitalCityBuildingQueue->messages,
                     'building_data' => $buildingData,
                 ],
-                'status' => KingdomLogStatusValue::CAPITAL_CITY_REQUEST,
+                'status' => KingdomLogStatusValue::CAPITAL_CITY_BUILDING_REQUEST,
                 'published' => true,
             ]);
 

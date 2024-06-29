@@ -129,7 +129,7 @@ class WeeklyBattleService {
             $this->locationSpecialtyHandler->handleMonsterFromSpecialLocation($character, $weeklyMonsterFight);
         }
 
-        if ($locationType->isLordsStrongHold()) {
+        if ($locationType->isLordsStrongHold() || $locationType->isHellsBrokenAnvil()) {
             $this->locationSpecialtyHandler->handleMonsterFromSpecialLocation($character, $weeklyMonsterFight, false);
         }
 

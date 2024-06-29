@@ -18,6 +18,8 @@
                   <x-core.forms.key-value-select :model="$skill" label="Effects:" modelKey="effect_type" name="effect_type" :options="$effects"/>
                   <x-core.forms.input :model="$skill" label="Bonus per level (%):" modelKey="bonus_per_level" name="bonus_per_level" />
                   <x-core.forms.input :model="$skill" label="Bonus resources per level (optional):" modelKey="resource_bonus_per_level" name="resource_bonus_per_level" />
+                  <x-core.forms.input :model="$skill" label="Capital City Building Travel Time Reduction % (Optional):" modelKey="capital_city_building_request_travel_time_reduction" name="capital_city_building_request_travel_time_reduction" />
+                  <x-core.forms.input :model="$skill" label="Capital City Building Travel Time Reduction % (Optional):" modelKey="capital_city_unit_request_travel_time_reduction" name="capital_city_unit_request_travel_time_reduction" />
                   <x-core.forms.key-value-select :model="$skill" label="Belongs to Skill:" modelKey="parent_skill_id" name="parent_skill_id" :options="$parentSkills"/>
                   <x-core.forms.input :model="$skill" label="Unlocks at level:" modelKey="unlocks_at_level" name="unlocks_at_level" />
                   <x-core.forms.input :model="$skill" label="Hours per level:" modelKey="hours_per_level" name="hours_per_level" />

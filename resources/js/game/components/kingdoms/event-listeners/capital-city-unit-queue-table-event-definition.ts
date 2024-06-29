@@ -12,5 +12,5 @@ export default interface CapitalCityUnitQueueTableEventDefinition
      * @param component
      * @param usrrId
      */
-    initialize: (component: UnitRecruitment, userId: number) => void;
+    initialize: (component: UnitQueuesTable, userId: number) => void;
 }
