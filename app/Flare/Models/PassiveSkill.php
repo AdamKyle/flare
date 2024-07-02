@@ -31,6 +31,7 @@ class PassiveSkill extends Model {
         'unlocks_game_building_id',
         'capital_city_building_request_travel_time_reduction',
         'capital_city_unit_request_travel_time_reduction',
+        'resource_request_time_reduction',
     ];
 
     /**
@@ -51,6 +52,7 @@ class PassiveSkill extends Model {
         'resource_bonus_per_level' => 'integer',
         'capital_city_building_request_travel_time_reduction' => 'float',
         'capital_city_unit_request_travel_time_reduction' => 'float',
+        'resource_request_time_reduction' => 'float',
     ];
 
     public function passiveType(): PassiveSkillTypeValue {

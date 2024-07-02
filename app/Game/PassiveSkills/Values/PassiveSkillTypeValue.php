@@ -25,6 +25,7 @@ class PassiveSkillTypeValue {
     const STEEL_INCREASE                  = 11;
     const CAPITAL_CITY_REQUEST_BUILD_TRAVEL_TIME_REDUCTION = 12;
     const CAPITAL_CITY_REQUEST_UNIT_TRAVEL_TIME_REDUCTION = 13;
+    const RESOURCE_REQUEST_TIME_REDUCTION = 14;
 
 
     /**
@@ -45,6 +46,7 @@ class PassiveSkillTypeValue {
         self::STEEL_INCREASE                  => 11,
         self::CAPITAL_CITY_REQUEST_BUILD_TRAVEL_TIME_REDUCTION => 12,
         self::CAPITAL_CITY_REQUEST_UNIT_TRAVEL_TIME_REDUCTION => 13,
+        self::RESOURCE_REQUEST_TIME_REDUCTION => 14,
     ];
 
     /**
@@ -64,7 +66,8 @@ class PassiveSkillTypeValue {
         10 => 'Resource Increase',
         11 => 'Steel Increase',
         12 => 'Capital City Building Request Travel Time Reduction',
-        13 => 'Capital City Unit Request Travel Time Reduction'
+        13 => 'Capital City Unit Request Travel Time Reduction',
+        14 => 'Resource Request Time Reduction',
     ];
 
     /**

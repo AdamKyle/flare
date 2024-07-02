@@ -14,6 +14,8 @@ use App\Game\Kingdoms\Jobs\CapitalCityUnitRequestMovement;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use App\Game\Kingdoms\Values\KingdomMaxValue;
 use App\Game\Kingdoms\Values\UnitCosts;
+use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
+use App\Game\Skills\Values\SkillTypeValue;
 use Carbon\Carbon;
 use Facades\App\Game\Kingdoms\Validation\ResourceValidation;
 
@@ -36,7 +38,7 @@ class CapitalCityUnitManagement {
 
             $toKingdom = $character->kingdoms->find($data['kingdom_id']);
 
-            $time          = $this->unitMovementService->determineTimeRequired($character, $toKingdom, $kingdom->id);
+            $time          = $this->unitMovementService->determineTimeRequired($character, $toKingdom, $kingdom->id, PassiveSkillTypeValue::CAPITAL_CITY_REQUEST_UNIT_TRAVEL_TIME_REDUCTION);
 
             $minutes       = now()->addMinutes($time);
 

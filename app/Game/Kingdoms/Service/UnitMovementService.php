@@ -10,6 +10,7 @@ use App\Game\Kingdoms\Jobs\MoveUnits;
 use App\Game\Kingdoms\Validators\MoveUnitsValidator;
 use App\Game\Kingdoms\Values\KingdomMaxValue;
 use App\Game\Messages\Events\ServerMessageEvent;
+use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
 use App\Game\Skills\Values\SkillTypeValue;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
@@ -295,10 +296,10 @@ class UnitMovementService {
      * @param int $fromKingdomId
      * @return int
      */
-    public function determineTimeRequired(Character $character, Kingdom $kingdom, int $fromKingdomId): int {
+    public function determineTimeRequired(Character $character, Kingdom $kingdom, int $fromKingdomId, int $passiveSkillType = null): int {
         $fromKingdom = $character->kingdoms()->find($fromKingdomId);
 
-        return $this->getDistanceTime($character, $kingdom, $fromKingdom);
+        return $this->getDistanceTime($character, $kingdom, $fromKingdom, $passiveSkillType);
     }
 
     /**
@@ -307,9 +308,10 @@ class UnitMovementService {
      * @param Character $character
      * @param Kingdom $kingdom
      * @param Kingdom $fromKingdom
+     * @param int|null $passiveSkillType
      * @return int
      */
-    public function getDistanceTime(Character $character, Kingdom $kingdom, Kingdom $fromKingdom): int {
+    public function getDistanceTime(Character $character, Kingdom $kingdom, Kingdom $fromKingdom, int $passiveSkillType = null): int {
         $pixelDistance = $this->distanceCalculation->calculatePixel(
             $fromKingdom->x_position,
             $fromKingdom->y_position,
@@ -319,9 +321,56 @@ class UnitMovementService {
 
         $timeToKingdom = $this->distanceCalculation->calculateMinutes($pixelDistance);
 
-        $skill = $character->skills()->where('skill_type', SkillTypeValue::EFFECTS_KINGDOM)->first();
+        if (is_null($passiveSkillType)) {
+            $skill = $character->skills()->where('skill_type', SkillTypeValue::EFFECTS_KINGDOM)->first();
 
-        $timeToKingdom -= ($timeToKingdom * $skill->unit_movement_time_reduction);
+            $timeToKingdom -= ($timeToKingdom * $skill->unit_movement_time_reduction);
+
+            if ($timeToKingdom < 1) {
+                $timeToKingdom = 1;
+            }
+
+            return $timeToKingdom;
+        }
+
+        if ($passiveSkillType === PassiveSkillTypeValue::CAPITAL_CITY_REQUEST_BUILD_TRAVEL_TIME_REDUCTION) {
+
+            $skill = $character->passiveSkills->where('passiveSkillTypeValue.effect_type', PassiveSkillTypeValue::CAPITAL_CITY_REQUEST_BUILD_TRAVEL_TIME_REDUCTION)->first();
+
+            $timeToKingdom -= ($timeToKingdom * $skill->capital_city_building_request_travel_time_reduction);
+
+            if ($timeToKingdom < 1) {
+                $timeToKingdom = 1;
+            }
+
+            return $timeToKingdom;
+        }
+
+        if ($passiveSkillType === PassiveSkillTypeValue::CAPITAL_CITY_REQUEST_UNIT_TRAVEL_TIME_REDUCTION) {
+
+            $skill = $character->passiveSkills->where('passiveSkillTypeValue.effect_type', PassiveSkillTypeValue::CAPITAL_CITY_REQUEST_UNIT_TRAVEL_TIME_REDUCTION)->first();
+
+            $timeToKingdom -= ($timeToKingdom * $skill->capital_city_unit_request_travel_time_reduction);
+
+            if ($timeToKingdom < 1) {
+                $timeToKingdom = 1;
+            }
+
+            return $timeToKingdom;
+        }
+
+        if ($passiveSkillType === PassiveSkillTypeValue::RESOURCE_REQUEST_TIME_REDUCTION) {
+
+            $skill = $character->passiveSkills->where('passiveSkillTypeValue.effect_type', PassiveSkillTypeValue::RESOURCE_REQUEST_TIME_REDUCTION)->first();
+
+            $timeToKingdom -= ($timeToKingdom * $skill->resource_request_time_reduction);
+
+            if ($timeToKingdom < 1) {
+                $timeToKingdom = 1;
+            }
+
+            return $timeToKingdom;
+        }
 
         if ($timeToKingdom < 1) {
             $timeToKingdom = 1;
