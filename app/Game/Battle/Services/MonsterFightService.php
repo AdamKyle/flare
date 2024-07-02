@@ -97,8 +97,6 @@ class MonsterFightService {
 
         $cache['health']['current_character_health'] = $characterHealth;
         $cache['health']['current_monster_health']   = $monsterHealth;
-        $cache['health']['current_character_health'] = $characterHealth;
-        $cache['health']['current_monster_health']   = $monsterHealth;
         $cache['messages'] = $this->monsterPlayerFight->getBattleMessages();
 
         if ($monsterHealth >= 0) {
@@ -119,7 +117,7 @@ class MonsterFightService {
 
         if (!is_null($monster->only_for_location_type)) {
 
-            $location = Location::where('type', LocationType::ALCHEMY_CHURCH)->where(
+            $location = Location::where('type', $monster->only_for_location_type)->where(
                 'game_map_id', $character->map->game_map_id
             )->where('x', $character->map->character_position_x)->where('y', $character->map->character_position_y)->first();
 

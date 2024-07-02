@@ -21,6 +21,8 @@ class WeeklyBattleService {
      */
     private array $validLocationTypes = [
         LocationType::ALCHEMY_CHURCH,
+        LocationType::LORDS_STRONG_HOLD,
+        LocationType::BROKEN_ANVIL,
     ];
 
     /**

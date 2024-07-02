@@ -107,7 +107,7 @@ class KingdomInformationController extends Controller{
     public function getKingdomsList(Character $character): JsonResponse {
         return response()->json([
             'kingdoms' => $this->manager->createData(
-                new Collection($character->kingdoms()->orderByDesc('is_capital')->get(), $this->kingdomTableTransformer)
+                new Collection($character->kingdoms()->orderByDesc('is_capital')->orderBy('game_map_id')->orderBy('id')->get(), $this->kingdomTableTransformer)
             )->toArray(),
             'logs'    => $this->manager->createData(
                 new Collection(KingdomLog::where('character_id', $character->id)->orderBy('id', 'desc')->get(), $this->kingdomAttackLogsTransformer)

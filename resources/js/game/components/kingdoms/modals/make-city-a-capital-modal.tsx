@@ -30,6 +30,8 @@ export default class MakeCityACapitalModal extends React.Component<
         this.setState(
             {
                 loading: true,
+                error_message: null,
+                success_message: null,
             },
             () => {
                 this.capitalCityAjax.makeCapitalCity(
@@ -47,7 +49,9 @@ export default class MakeCityACapitalModal extends React.Component<
                 is_open={this.props.is_open}
                 handle_close={this.props.handle_close}
                 title={"Make Capital City"}
-                primary_button_disabled={this.state.loading}
+                primary_button_disabled={
+                    this.state.loading || this.state.success_message! == null
+                }
                 secondary_actions={{
                     handle_action: this.makeCapitalCity.bind(this),
                     secondary_button_disabled: this.state.loading,

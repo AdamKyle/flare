@@ -26,6 +26,8 @@ class LocationSpecialtyHandler {
 
         $lootingDropChance = $character->skills->where('baseSkill.name', '=', 'Looting')->first()->skill_bonus;
 
+        $lootingDropChance = min($lootingDropChance, 0.15);
+
         if ($weeklyMonsterFight->character_deaths > 0) {
             $reduction = 0.02 * $weeklyMonsterFight->character_deaths;
 
@@ -39,7 +41,7 @@ class LocationSpecialtyHandler {
         }
 
         for($i = 1; $i <= 3; $i++) {
-            $character = $this->handOverAward($character, false, $mainItemIsCosmic);
+            $character = $this->handOverAward($character, false, !$mainItemIsCosmic);
         }
     }
 
@@ -59,10 +61,13 @@ class LocationSpecialtyHandler {
 
         $slot = $character->inventory->slots->where('item_id', '=', $item->id)->first();
 
-        if ($isCosmic) {
-            event(new ServerMessageEvent($character->user, 'You have received a cosmic item! How exciting! Rewarded with: ' . $slot->item->affix_name, $slot->id));
+
+        if ($secondaryIsLegendary) {
+            event(new ServerMessageEvent($character->user, 'You have received a Legendary item! How exciting! Rewarded with: ' . $slot->item->affix_name, $slot->id));
+        } else if ($isCosmic) {
+            event(new ServerMessageEvent($character->user, 'You have received a Cosmic item! How exciting! Rewarded with: ' . $slot->item->affix_name, $slot->id));
         } else {
-            event(new ServerMessageEvent($character->user, 'You have received a mythical item! How exciting! Rewarded with: ' . $slot->item->affix_name, $slot->id));
+            event(new ServerMessageEvent($character->user, 'You have received a Mythical item! How exciting! Rewarded with: ' . $slot->item->affix_name, $slot->id));
         }
 
         return $character->refresh();
@@ -80,7 +85,7 @@ class LocationSpecialtyHandler {
 
         $randomAffix = $this->randomAffixGenerator
             ->setCharacter($character)
-            ->setPaidAmount((!$secondaryIsLegendary ? RandomAffixDetails::LEGENDARY : ($isCosmic ? RandomAffixDetails::COSMIC : RandomAffixDetails::MYTHIC)));
+            ->setPaidAmount(($secondaryIsLegendary ? RandomAffixDetails::LEGENDARY : ($isCosmic ? RandomAffixDetails::COSMIC : RandomAffixDetails::MYTHIC)));
 
         $duplicateItem = $item->duplicate();
 
@@ -95,6 +100,10 @@ class LocationSpecialtyHandler {
             ]);
         }
         // @codeCoverageIgnoreEnd
+
+        if ($secondaryIsLegendary) {
+            return $duplicateItem->refresh();
+        }
 
         if ($isCosmic) {
             $duplicateItem->update([

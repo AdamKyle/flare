@@ -28,7 +28,7 @@ export default class HandleCraftingAjax {
                             if (result.data.crafted_item) {
                                 component.setState({
                                     success_message:
-                                        "The Npc is joyful that you were able to craft the item!",
+                                        "The Npc is joyful that you were able to craft the item! (Check Server Messages for more details and additional messages. On mobile, you can select Server Messages from the Orange Chat Tabs drop down below)",
                                 });
                             }
 
