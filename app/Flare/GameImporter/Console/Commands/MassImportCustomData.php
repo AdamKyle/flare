@@ -5,6 +5,7 @@ namespace App\Flare\GameImporter\Console\Commands;
 use App\Flare\Models\Event;
 use App\Flare\Models\FactionLoyalty;
 use App\Flare\Models\FactionLoyaltyNpc;
+use App\Flare\Models\FactionLoyaltyNpcTask;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\GlobalEventGoal;
 use App\Flare\Models\GlobalEventKill;
@@ -41,6 +42,14 @@ class MassImportCustomData extends Command {
 
         $this->importGameMaps();
 
+        $factionLoyaltyIds = FactionLoyalty::first()->whereDoesntHave('faction')->whereDoesntHave('character')->pluck('id');
+        $factionLoyaltyNpcIds = FactionLoyaltyNpc::whereIn('faction_loyalty_id', $factionLoyaltyIds->toArray())->pluck('id');
+
+        FactionLoyaltyNpcTask::whereIn('faction_loyalty_npc_id', $factionLoyaltyNpcIds)->delete();
+        FactionLoyaltyNpc::whereIn('faction_loyalty_id', $factionLoyaltyIds->toArray())->delete();
+        FactionLoyalty::first()->whereDoesntHave('faction')->whereDoesntHave('character')->delete();
+
+        Artisan::call('delete:flagged-users');
         Artisan::call('import:game-data "Items"');
         Artisan::call('import:game-data "Affixes"');
         Artisan::call('import:game-data "Locations"');

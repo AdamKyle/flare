@@ -44,7 +44,7 @@ class CharacterPassiveSkill extends Model {
         return $this->belongsTo(Character::class);
     }
 
-    public function PassiveSkillTypeValue() {
+    public function passiveSkill() {
         return $this->belongsTo(PassiveSkill::class, 'passive_skill_id', 'id');
     }
 
