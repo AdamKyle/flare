@@ -33,6 +33,8 @@ export default class SendRequestConfirmationModal extends React.Component<
         this.setState(
             {
                 loading: true,
+                success_message: null,
+                error_message: null,
             },
             () => {
                 this.processBuildingRequestsAjax.sendBuildingRequests(

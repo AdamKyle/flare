@@ -16,4 +16,6 @@ class CapitalCityQueueStatus
     const RECRUITING = 'recruiting';
     const REJECTED = 'rejected';
     const FINISHED = 'finished';
+    const CANCELLED = 'cancelled';
+    const CANCELLATION_REJECTED = 'cancellation_rejected';
 }

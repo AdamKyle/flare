@@ -15,7 +15,6 @@ use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use App\Game\Kingdoms\Values\KingdomMaxValue;
 use App\Game\Kingdoms\Values\UnitCosts;
 use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
-use App\Game\Skills\Values\SkillTypeValue;
 use Carbon\Carbon;
 use Facades\App\Game\Kingdoms\Validation\ResourceValidation;
 
@@ -88,6 +87,7 @@ class CapitalCityUnitManagement {
         $character = $capitalCityUnitQueue->character;
         $kingdom = $capitalCityUnitQueue->kingdom;
 
+
         foreach ($unitRequests as $index => $unitRequest) {
 
             $gameUnit = GameUnit::where('name', $unitRequest['name'])->first();
@@ -111,6 +111,8 @@ class CapitalCityUnitManagement {
                 continue;
             }
 
+            $currentIndex = $index;
+
             if (ResourceValidation::shouldRedirectUnits($gameUnit, $kingdom, $amount)) {
                 $missingCosts = ResourceValidation::getMissingResources($gameUnit, $kingdom, $amount);
 
@@ -118,14 +120,16 @@ class CapitalCityUnitManagement {
                     $result = $this->sendOffResourceRequest($character, $kingdom, $resourceName, $amount, $capitalCityUnitQueue->id, $gameUnit->id);
 
                     if (!$result) {
-                        $unitRequests[$index]['secondary_status'] = CapitalCityQueueStatus::REJECTED;
+                        $unitRequests[$currentIndex]['secondary_status'] = CapitalCityQueueStatus::REJECTED;
 
                         break;
                     }
 
-                    $unitRequests[$index]['secondary_status'] = CapitalCityQueueStatus::RECRUITING;
+                    $unitRequests[$currentIndex]['secondary_status'] = CapitalCityQueueStatus::REQUESTING;
                 }
             }
+
+            $unitRequests[$index]['secondary_status'] = CapitalCityQueueStatus::RECRUITING;
         }
 
         $capitalCityUnitQueue->update([
@@ -162,7 +166,7 @@ class CapitalCityUnitManagement {
                     continue;
                 }
 
-                $this->unitService->handlePayment($gameUnit, $unitRequest['amount']);
+                $this->unitService->handlePayment($gameUnit, $kingdom, $unitRequest['amount']);
 
                 $this->unitService->recruitUnits($kingdom, $gameUnit, $unitRequest['amount'], $capitalCityUnitQueue->id);
             }

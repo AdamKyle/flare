@@ -105,16 +105,6 @@ export default class KingdomsList extends React.Component<
     }
 
     viewKingdomDetails(kingdom: KingdomDetails) {
-        console.log(
-            this.props.my_kingdoms,
-            this.props.my_kingdoms.filter((myKingdom: any) => {
-                return (
-                    myKingdom.game_map_id === kingdom.game_map_id &&
-                    myKingdom.is_capital
-                );
-            }),
-            kingdom,
-        );
         this.setState({
             selected_kingdom: kingdom,
             already_has_capital_city:

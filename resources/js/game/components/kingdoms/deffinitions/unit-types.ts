@@ -11,5 +11,5 @@ export enum UnitTypes {
     CLERIC = "Cleric",
     PALADIN = "Paladin",
     SETTLER = "Settler",
-    AIRSHIP = "Ariship",
+    AIRSHIP = "Airship",
 }

@@ -2,13 +2,9 @@ import React from "react";
 import DangerAlert from "../../../ui/alerts/simple-alerts/danger-alert";
 import LoadingProgressBar from "../../../ui/progress-bars/loading-progress-bar";
 import Dialogue from "../../../ui/dialogue/dialogue";
-import ProcessUpgradeBuildingsAjax from "../../ajax/process-upgrade-buildings-ajax";
 import { serviceContainer } from "../../../../lib/containers/core-container";
-import RepairHelpSection from "./partials/repair-help-section";
-import UpgradeHelpSection from "./partials/upgrade-help-section";
 import RecruitUnitsSections from "./partials/recruit-units-sections";
 import ProcessUnitRequestAjax from "../../ajax/process-unit-request-ajax";
-import SuccessMessage from "../../../../sections/game-actions-section/components/gambling-section/success-message";
 import SuccessAlert from "../../../ui/alerts/simple-alerts/success-alert";
 
 interface Unit {
@@ -51,6 +47,8 @@ export default class SendUnitRecruitmentRequestModal extends React.Component<
         this.setState(
             {
                 loading: true,
+                success_message: null,
+                error_message: null,
             },
             () => {
                 const kingdomUnitsMap: { [key: number]: UnitRequest[] } = {};

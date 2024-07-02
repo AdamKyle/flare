@@ -2,13 +2,17 @@
 
 namespace App\Game\Kingdoms\Service;
 
+use App\Flare\Models\BuildingInQueue;
 use App\Flare\Models\CapitalCityBuildingQueue;
 use App\Flare\Models\CapitalCityUnitQueue;
 use App\Flare\Models\Character;
+use App\Flare\Models\GameUnit;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\KingdomBuilding;
+use App\Flare\Models\UnitInQueue;
 use App\Flare\Transformers\KingdomBuildingTransformer;
 use App\Game\Core\Traits\ResponseBuilder;
+use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection as SupportCollection;
@@ -138,6 +142,15 @@ class CapitalCityManagementService
 
                 $building = KingdomBuilding::where('kingdom_id', $kingdom->id)->where('id', $buildingRequest['building_id'])->first();
 
+                if ($buildingRequest['secondary_status'] === CapitalCityQueueStatus::BUILDING || $buildingRequest['secondary_status'] === CapitalCityQueueStatus::REPAIRING) {
+                    $buildingQueue = BuildingInQueue::where('building_id', $buildingRequest['building_id'])->where('kingdom_id', $kingdom->id)->first();
+
+                    $end = Carbon::parse($buildingQueue->completed_at)->timestamp;
+                    $current = Carbon::now()->timestamp;
+
+                    $timeLeftInSeconds = $end - $current;
+                }
+
                 $queueData = [
                     'kingdom_name' => $kingdom->name . '(X/Y: '.$kingdom->x_position.'/'.$kingdom->y_position.')',
                     'status' => $queue->status,
@@ -178,12 +191,24 @@ class CapitalCityManagementService
 
             foreach ($unitRequestData as $unitRequest) {
 
+                if ($unitRequest['secondary_status'] === CapitalCityQueueStatus::RECRUITING) {
+                    $gameUnit = GameUnit::where('name', $unitRequest['name'])->first();
+
+                    $unitInQueue = UnitInQueue::where('game_unit_id', $gameUnit->id)->where('kingdom_id', $kingdom->id)->first();
+
+                    $end = Carbon::parse($unitInQueue->completed_at)->timestamp;
+                    $current = Carbon::now()->timestamp;
+
+                    $timeLeftInSeconds = $end - $current;
+                }
+
                 $queueData = [
                     'kingdom_name' => $kingdom->name . '(X/Y: '.$kingdom->x_position.'/'.$kingdom->y_position.')',
                     'status' => $queue->status,
                     'time_left_seconds' => $timeLeftInSeconds > 0 ? $timeLeftInSeconds : 0,
                     'unit_name' => $unitRequest['name'],
                     'secondary_status' => $unitRequest['secondary_status'],
+                    'amount' => $unitRequest['amount'],
                 ];
 
                 $data[] = $queueData;

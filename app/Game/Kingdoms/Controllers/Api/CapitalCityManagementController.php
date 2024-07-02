@@ -83,4 +83,12 @@ class CapitalCityManagementController extends Controller {
 
         return response()->json($result, $status);
     }
+
+    public function cancelUnitRecruitOrders(RecruitUnitCancellationRequest $request, Character $character, Kingdom $kingdom) {
+
+    }
+
+    public function cancelBuildingOrdersOrders(CancelBuildingUpgradeRequestRequest $request, Character $character, Kingdom $kingdom) {
+
+    }
 }

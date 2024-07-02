@@ -335,7 +335,7 @@ class UnitMovementService {
 
         if ($passiveSkillType === PassiveSkillTypeValue::CAPITAL_CITY_REQUEST_BUILD_TRAVEL_TIME_REDUCTION) {
 
-            $skill = $character->passiveSkills->where('passiveSkillTypeValue.effect_type', PassiveSkillTypeValue::CAPITAL_CITY_REQUEST_BUILD_TRAVEL_TIME_REDUCTION)->first();
+            $skill = $character->passiveSkills->where('passiveSkill.effect_type', PassiveSkillTypeValue::CAPITAL_CITY_REQUEST_BUILD_TRAVEL_TIME_REDUCTION)->first();
 
             $timeToKingdom -= ($timeToKingdom * $skill->capital_city_building_request_travel_time_reduction);
 
@@ -348,7 +348,7 @@ class UnitMovementService {
 
         if ($passiveSkillType === PassiveSkillTypeValue::CAPITAL_CITY_REQUEST_UNIT_TRAVEL_TIME_REDUCTION) {
 
-            $skill = $character->passiveSkills->where('passiveSkillTypeValue.effect_type', PassiveSkillTypeValue::CAPITAL_CITY_REQUEST_UNIT_TRAVEL_TIME_REDUCTION)->first();
+            $skill = $character->passiveSkills->where('passiveSkill.effect_type', PassiveSkillTypeValue::CAPITAL_CITY_REQUEST_UNIT_TRAVEL_TIME_REDUCTION)->first();
 
             $timeToKingdom -= ($timeToKingdom * $skill->capital_city_unit_request_travel_time_reduction);
 

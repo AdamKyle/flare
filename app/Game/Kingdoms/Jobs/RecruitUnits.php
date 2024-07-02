@@ -133,8 +133,8 @@ class RecruitUnits implements ShouldQueue {
             $unitRequests = $capitalCityQueue->unit_request_data;
 
             foreach ($unitRequests as $index => $request) {
-                if ($request['unit_name'] === $this->unit->name) {
-                    $unitRequests[$index] = CapitalCityQueueStatus::FINISHED;
+                if ($request['name'] === $this->unit->name) {
+                    $unitRequests[$index]['secondary_status'] = CapitalCityQueueStatus::FINISHED;
                 }
             }
 

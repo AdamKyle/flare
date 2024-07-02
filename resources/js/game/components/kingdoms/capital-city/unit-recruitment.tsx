@@ -9,18 +9,11 @@ import { serviceContainer } from "../../../lib/containers/core-container";
 import PrimaryOutlineButton from "../../ui/buttons/primary-outline-button";
 import DangerOutlineButton from "../../ui/buttons/danger-outline-button";
 import SendUnitRecruitmentRequestModal from "./modals/send-unit-recruitment-request-modal";
-import FetchUnitQueuesAjax from "../ajax/fetch-unit-queues-ajax";
-import TabPanel from "../../ui/tabs/tab-panel";
-import Tabs from "../../ui/tabs/tabs";
 import UnitQueuesTable from "./unit-queues-table";
-import CapitalCityUnitQueueTableEventDefinition from "../event-listeners/capital-city-unit-queue-table-event-definition";
-import CapitalCityUnitQueuesTableEvent from "../event-listeners/capital-city-unit-queues-table-event";
 import OrangeOutlineButton from "../../ui/buttons/orange-outline-button";
 
 export default class UnitRecruitment extends React.Component<any, any> {
     private fetchKingdomsForSelection: FetchKingdomsForSelectionAjax;
-
-    private tabs: { name: string; key: string }[];
 
     constructor(props: any) {
         super(props);
@@ -36,17 +29,6 @@ export default class UnitRecruitment extends React.Component<any, any> {
             kingdoms_for_selection: [],
             unit_queues: [],
         };
-
-        this.tabs = [
-            {
-                key: "recruitment",
-                name: "Recruitment",
-            },
-            {
-                key: "qeues",
-                name: "Queues",
-            },
-        ];
 
         this.fetchKingdomsForSelection = serviceContainer().fetch(
             FetchKingdomsForSelectionAjax,
