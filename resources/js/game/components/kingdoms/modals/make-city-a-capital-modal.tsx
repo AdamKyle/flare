@@ -49,12 +49,12 @@ export default class MakeCityACapitalModal extends React.Component<
                 is_open={this.props.is_open}
                 handle_close={this.props.handle_close}
                 title={"Make Capital City"}
-                primary_button_disabled={
-                    this.state.loading || this.state.success_message! == null
-                }
+                primary_button_disabled={this.state.loading}
                 secondary_actions={{
                     handle_action: this.makeCapitalCity.bind(this),
-                    secondary_button_disabled: this.state.loading,
+                    secondary_button_disabled:
+                        this.state.loading ||
+                        this.state.success_message !== null,
                     secondary_button_label: "I am sure",
                 }}
             >
@@ -78,11 +78,6 @@ export default class MakeCityACapitalModal extends React.Component<
                     Capital cities allow you to manage your other kingdoms on
                     the same plane, by issuing orders such as repair, upgrade
                     and recruit units.
-                </p>
-                <p className="my-2">
-                    Should you make this city your capital city and it falls,
-                    all your other kingdoms on the same plane will loose 55% of
-                    their morale. You can reduce this through passive skills.
                 </p>
 
                 {this.state.loading ? <LoadingProgressBar /> : null}

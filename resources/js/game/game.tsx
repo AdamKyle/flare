@@ -419,7 +419,16 @@ export default class Game extends React.Component<GameProps, GameState> {
                                 </BasicCard>
                             </div>
                             <div className="md:col-span-1">
-                                <BasicCard additionalClasses="lg:max-h-[630px] max-w-[555px]">
+                                <BasicCard
+                                    additionalClasses={clsx(
+                                        "lg:max-h-[630px] max-w-[555px]",
+                                        {
+                                            "lg:max-h-[695px]":
+                                                this.state.character
+                                                    .can_use_event_goals_button,
+                                        },
+                                    )}
+                                >
                                     <MapTabs
                                         use_tabs={
                                             this.state.character

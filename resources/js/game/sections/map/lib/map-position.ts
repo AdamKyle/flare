@@ -15,28 +15,32 @@ export const getNewYPosition = (
         return 0;
     }
 
-    if (characterY > 2320) {
-        return -2210;
+    if (characterY > 2416) {
+        return -2150;
     }
 
-    if (characterY > 2016) {
-        return -2010;
+    if (characterY > 2112) {
+        return -2100;
     }
 
-    if (characterY > 1712) {
-        return -1710;
+    if (characterY > 1808) {
+        return -1800;
     }
 
-    if (characterY > 1424) {
-        return -1410;
+    if (characterY > 1504) {
+        return -1500;
     }
 
-    if (characterY > 1120) {
-        return -1110;
+    if (characterY > 1216) {
+        return -1200;
     }
 
-    if (characterY > 816) {
-        return -810;
+    if (characterY > 912) {
+        return -910;
+    }
+
+    if (characterY > 608) {
+        return -600;
     }
 
     if (characterY > 304) {
@@ -51,13 +55,11 @@ export const getNewYPosition = (
  *
  * @param characterX
  * @param mapPositionX
- * @param viewPort
  * @type [{characterX: number, mapPositionX: number}]
  */
 export const getNewXPosition = (
     characterX: number,
     mapPositionX: number,
-    viewPort: number,
 ): number => {
     if (characterX <= 496) {
         return 0;

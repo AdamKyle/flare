@@ -6,7 +6,6 @@ import ProcessUpgradeBuildingsAjax from "../../ajax/process-upgrade-buildings-aj
 import { serviceContainer } from "../../../../lib/containers/core-container";
 import RepairHelpSection from "./partials/repair-help-section";
 import UpgradeHelpSection from "./partials/upgrade-help-section";
-import SuccessMessage from "../../../../sections/game-actions-section/components/gambling-section/success-message";
 import SuccessAlert from "../../../ui/alerts/simple-alerts/success-alert";
 
 export default class SendRequestConfirmationModal extends React.Component<

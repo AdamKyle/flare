@@ -352,7 +352,7 @@ class CapitalCityBuildingManagement {
 
             $buildingUpgradeRequest['missing_costs'] = $missingResources;
 
-            $processResult = true;
+            $processResult = false;
 
             if ($canAffordPopulation) {
                 $processResult = $this->processResourceRequests($capitalCityBuildingQueue, $kingdom, $character, $building, $missingResources);

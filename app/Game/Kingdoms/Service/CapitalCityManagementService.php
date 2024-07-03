@@ -145,10 +145,12 @@ class CapitalCityManagementService
                 if ($buildingRequest['secondary_status'] === CapitalCityQueueStatus::BUILDING || $buildingRequest['secondary_status'] === CapitalCityQueueStatus::REPAIRING) {
                     $buildingQueue = BuildingInQueue::where('building_id', $buildingRequest['building_id'])->where('kingdom_id', $kingdom->id)->first();
 
-                    $end = Carbon::parse($buildingQueue->completed_at)->timestamp;
-                    $current = Carbon::now()->timestamp;
+                    if (!is_null($buildingQueue)) {
+                        $end = Carbon::parse($buildingQueue->completed_at)->timestamp;
+                        $current = Carbon::now()->timestamp;
 
-                    $timeLeftInSeconds = $end - $current;
+                        $timeLeftInSeconds = $end - $current;
+                    }
                 }
 
                 $queueData = [
@@ -164,7 +166,7 @@ class CapitalCityManagementService
             }
         }
 
-        return $data;
+        return array_values(collect($data)->sortByDesc('time_left_seconds')->toArray());
     }
 
     public function fetchUnitQueueData(Character $character, Kingdom $kingdom = null): array {
@@ -200,6 +202,12 @@ class CapitalCityManagementService
                     $current = Carbon::now()->timestamp;
 
                     $timeLeftInSeconds = $end - $current;
+                }
+
+                if ($unitRequestData['secondary_status'] === CapitalCityQueueStatus::REJECTED ||
+                    $unitRequestData['secondary_status'] === CapitalCityQueueStatus::FINISHED
+                ) {
+                    $timeLeftInSeconds = 0;
                 }
 
                 $queueData = [

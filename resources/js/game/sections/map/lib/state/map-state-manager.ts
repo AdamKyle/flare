@@ -36,12 +36,10 @@ export default class MapStateManager {
             x: getNewXPosition(
                 state.character_position.x,
                 state.map_position.x,
-                viewPort,
             ),
             y: getNewYPosition(
                 state.character_position.y,
                 state.map_position.y,
-                viewPort,
             ),
         };
 
@@ -92,12 +90,10 @@ export default class MapStateManager {
             x: getNewXPosition(
                 state.character_position.x,
                 state.map_position.x,
-                component.state.view_port,
             ),
             y: getNewYPosition(
                 state.character_position.y,
                 state.map_position.y,
-                component.state.view_port,
             ),
         };
 
@@ -135,6 +131,7 @@ export default class MapStateManager {
             character_position: {
                 x: data.character_map.character_position_x,
                 y: data.character_map.character_position_y,
+                game_map_id: data.character_map.game_map_id,
             },
             locations: data.locations,
             player_kingdoms: data.my_kingdoms,

@@ -40,51 +40,64 @@ export const buildSmallCouncilBuildingsQueuesTableColumns = (
             cell: (row: any) => <span>{row.secondary_status}</span>,
         },
         {
-            name: "Actions",
-            cell: (row: any) => (
-                <Fragment>
-                    <DangerButton
-                        button_label={"Cancel Action"}
-                        on_click={() => console.log("Cancel Action")}
-                        disabled={
-                            row.status !== "progressing" &&
-                            row.secondary_status === "rejected"
-                        }
-                    />
-                </Fragment>
-            ),
-        },
-        {
             name: "Time Left",
             minWidth: "300px",
             cell: (row: any) => (
                 <Fragment>
                     <div className="w-full mt-2">
-                        <TimerProgressBar
-                            time_remaining={row.time_left_seconds}
-                            time_out_label={"Traveling"}
-                            useSmallTimer={component.state.view_port < 800}
-                        />
-                        {row.time_left_seconds > 0 ? (
-                            <div className="mb-2 mt-4">
-                                <button
-                                    className={
-                                        "hover:text-red-500 text-red-700 dark:text-red-500 dark:hover:text-red-400 " +
-                                        "disabled:text-red-400 dark:disabled:bg-red-400 disabled:line-through " +
-                                        "focus:outline-none focus-visible:ring-2 focus-visible:ring-red-200 dark:focus-visible:ring-white " +
-                                        "focus-visible:ring-opacity-75"
+                        {row.secondary_status === "finished" ||
+                        row.secondary_status === "rejected" ? (
+                            <p>
+                                No time remaining. Log will be generated when
+                                other requests for this kingdom are done.
+                            </p>
+                        ) : (
+                            <>
+                                <TimerProgressBar
+                                    time_remaining={row.time_left_seconds}
+                                    time_out_label={buildTimerTitle(row)}
+                                    useSmallTimer={
+                                        component.state.view_port < 800
                                     }
-                                    onClick={() =>
-                                        console.log("cancel the travel")
-                                    }
-                                >
-                                    Cancel
-                                </button>
-                            </div>
-                        ) : null}
+                                />
+                                {row.time_left_seconds > 0 ? (
+                                    <div className="mb-2 mt-4">
+                                        <button
+                                            className={
+                                                "hover:text-red-500 text-red-700 dark:text-red-500 dark:hover:text-red-400 " +
+                                                "disabled:text-red-400 dark:disabled:bg-red-400 disabled:line-through " +
+                                                "focus:outline-none focus-visible:ring-2 focus-visible:ring-red-200 dark:focus-visible:ring-white " +
+                                                "focus-visible:ring-opacity-75"
+                                            }
+                                            onClick={() =>
+                                                console.log("cancel the travel")
+                                            }
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
+                                ) : null}
+                            </>
+                        )}
                     </div>
                 </Fragment>
             ),
         },
     ];
+};
+
+const buildTimerTitle = (row: any): string => {
+    if (row.status === "traveling") {
+        return "Traveling";
+    }
+
+    if (row.secondary_status === "repairing") {
+        return "Repairing";
+    }
+
+    if (row.secondary_status === "building") {
+        return "Upgrading";
+    }
+
+    return "UNKNOWN";
 };

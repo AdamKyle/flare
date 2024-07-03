@@ -43,9 +43,9 @@ export default class RepairHelpSection extends React.Component<any, any> {
                 </p>
 
                 <p className="my-2">
-                    <strong>Requesting Resources</strong>, means the kingdom has
-                    sent out a request for resources for that specific building
-                    and thus the building is on hold.
+                    <strong>Requesting</strong>, means the kingdom has sent out
+                    a request for resources for that specific building and thus
+                    the building is on hold.
                 </p>
 
                 <p className="my-2">
