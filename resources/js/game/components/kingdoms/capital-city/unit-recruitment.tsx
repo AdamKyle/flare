@@ -65,7 +65,12 @@ export default class UnitRecruitment extends React.Component<any, any> {
         event: React.ChangeEvent<HTMLInputElement>,
         unitName: string,
     ) => {
-        const value = Math.min(parseInt(event.target.value, 10) || 0, 1000000);
+        let value = Math.min(parseInt(event.target.value, 10) || 0, 1000000);
+
+        if (value < 0) {
+            return;
+        }
+
         this.setState((prevState: any) => {
             let updatedData = prevState.unit_recruitment_data.map(
                 (unit: { name: string; kingdom_ids: number[] }) => {
@@ -335,12 +340,21 @@ export default class UnitRecruitment extends React.Component<any, any> {
                 </div>
 
                 <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-4"></div>
-                <p className="text-blue-700 dark:text-blue-500">
-                    You must select at least one kingdom for each type of unit
-                    you want to request.
-                </p>
-                <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-4"></div>
-                {this.renderUnitSections()}
+                {this.state.kingdoms_for_selection.length <= 0 ? (
+                    <p className="text-center italic">
+                        All your kingdoms seem to be busy in this regard. Check:
+                        View Queues to see whats going on.
+                    </p>
+                ) : (
+                    <>
+                        <p className="text-blue-700 dark:text-blue-500">
+                            You must select at least one kingdom for each type
+                            of unit you want to request.
+                        </p>
+                        <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-4"></div>
+                        {this.renderUnitSections()}
+                    </>
+                )}
                 {this.state.show_unit_recruitment_confirmation ? (
                     <SendUnitRecruitmentRequestModal
                         is_open={this.state.show_unit_recruitment_confirmation}

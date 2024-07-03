@@ -277,7 +277,7 @@ class MoveUnits implements ShouldQueue {
             return;
         }
 
-        RequestResources::dispatch($unitMovementQueue->character_id, $unitMovementQueue->to_kingdom_id, $unitMovementQueue->from_kingdom_id, $this->additionalParams['amount_of_resources'], $unitMovementQueue->units_moving, $this->additionalParams['additional_log_messages'], $this->additionalParams['capital_city_queue_id'], $this->additionalParams['building_id'], $this->additionalParams['unit_id']);
+        RequestResources::dispatch($unitMovementQueue->character, $unitMovementQueue->to_kingdom_id, $unitMovementQueue->from_kingdom_id, $this->additionalParams['amount_of_resources'], $unitMovementQueue->units_moving, $this->additionalParams['additional_log_messages'], $this->additionalParams['capital_city_queue_id'], $this->additionalParams['building_id'], $this->additionalParams['unit_id']);
 
         $this->cleanUpMovementQueue($unitMovementQueue, $updateKingdom);
     }

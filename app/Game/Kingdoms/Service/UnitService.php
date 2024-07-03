@@ -70,6 +70,7 @@ class UnitService {
      * @param Kingdom $kingdom
      * @param GameUnit $gameUnit
      * @param int $amount
+     * @param int|null $capitalCityQueueId
      */
     public function recruitUnits(Kingdom $kingdom, GameUnit $gameUnit, int $amount, int $capitalCityQueueId = null): void {
         $character        = $kingdom->character;

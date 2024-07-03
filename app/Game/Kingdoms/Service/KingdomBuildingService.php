@@ -47,6 +47,7 @@ class KingdomBuildingService {
      *
      * @param KingdomBuilding $building
      * @param Character $character
+     * @param int|null $capitalCityQueueId
      * @return void
      */
     public function upgradeKingdomBuilding(KingdomBuilding $building, Character $character, int $capitalCityQueueId = null): void {

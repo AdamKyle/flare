@@ -117,8 +117,8 @@ class RequestResources implements ShouldQueue {
             $this->buildUnitMovementQueue($requestedKingdom, $requestingFromKingdom, $timeToKingdom)
         );
 
-        $capitalCityBuildingQueue = CapitalCityBuildingQueue::find($this->capitalCityQueueId)->where('kingdom_id', $requestedKingdom->kingdom_id)->first();
-        $capitalCityUnitQueue = CapitalCityUnitQueue::find($this->capitalCityQueueId)->where('kingdom_id', $requestingFromKingdom->id)->first();
+        $capitalCityBuildingQueue = CapitalCityBuildingQueue::where('id', $this->capitalCityQueueId)->where('kingdom_id', $requestedKingdom->kingdom_id)->first();
+        $capitalCityUnitQueue = CapitalCityUnitQueue::where('id', $this->capitalCityQueueId)->where('kingdom_id', $requestingFromKingdom->id)->first();
 
         if (!is_null($capitalCityBuildingQueue) && !is_null($this->buildingId)) {
 

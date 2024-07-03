@@ -317,7 +317,7 @@ export default class KingdomLogDetails extends React.Component<
                     <dt>Unit Name</dt>
                     <dd>{data.unit_name}</dd>
                     <dt>Amount requested</dt>
-                    <dd>{data.amount_requested}</dd>
+                    <dd>{formatNumber(data.amount_requested)}</dd>
                     <dt>Status</dt>
                     <dd
                         className={clsx({

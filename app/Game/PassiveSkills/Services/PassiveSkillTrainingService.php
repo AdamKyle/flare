@@ -32,6 +32,10 @@ class PassiveSkillTrainingService {
     public function trainSkill(CharacterPassiveSkill $skill, Character $character): void {
         $time = now()->addHours($skill->hours_to_next);
 
+        if (env('APP_ENV') === 'local') {
+            $time = now()->addMinute();
+        }
+
         $skill->update([
             'started_at'   => now(),
             'completed_at' => $time,

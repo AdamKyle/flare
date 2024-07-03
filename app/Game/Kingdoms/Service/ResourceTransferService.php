@@ -8,8 +8,6 @@ use App\Flare\Models\UnitMovementQueue;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Kingdoms\Events\UpdateKingdomQueues;
 use App\Game\Kingdoms\Jobs\MoveUnits;
-use App\Game\Kingdoms\Jobs\RequestResources;
-use App\Game\Kingdoms\Values\BuildingActions;
 use App\Game\Kingdoms\Values\BuildingCosts;
 use App\Game\Kingdoms\Values\UnitNames;
 use App\Game\Maps\Calculations\DistanceCalculation;
@@ -52,12 +50,17 @@ class ResourceTransferService {
     /**
      * @param Character $character
      * @param array $params
+     * @param int|null $capitalCityQueueId
+     * @param int|null $buildingId
+     * @param int|null $unitId
      * @return array
      */
     public function sendOffResourceRequest(Character $character, array $params, int $capitalCityQueueId = null, int $buildingId = null, int $unitId = null): array {
 
         $requestingKingdom = Kingdom::find($params['kingdom_requesting']);
         $requestingFromKingdom = Kingdom::find($params['kingdom_requesting_from']);
+
+
 
         if (!$this->ownsKingdom($character, $requestingKingdom, $requestingFromKingdom)) {
             return $this->errorResult('Not allowed to do that.');
@@ -173,7 +176,7 @@ class ResourceTransferService {
 
         $currentAmountFromKingdom = $requestFromKingdom->{$type . '_current'};
 
-        return $amount >= $currentAmountFromKingdom;
+        return $amount <= $currentAmountFromKingdom;
     }
 
     private function canAffordPopulationCost(Kingdom $requestFromKingdom): bool {

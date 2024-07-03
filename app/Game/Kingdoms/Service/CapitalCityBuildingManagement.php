@@ -137,7 +137,11 @@ class CapitalCityBuildingManagement {
             if ($buildingUpgradeRequest['secondary_status'] === CapitalCityQueueStatus::BUILDING ||
                 $buildingUpgradeRequest['secondary_status'] === CapitalCityQueueStatus::REPAIRING)
             {
-                $this->handleBuildingRequest($capitalCityBuildingQueue, $building, $character);
+                $result = $this->handleBuildingRequest($capitalCityBuildingQueue, $building, $character);
+
+                if (!$result) {
+                    $requestData[$index]['secondary_status'] = CapitalCityQueueStatus::REJECTED;
+                }
             }
         }
 
@@ -212,9 +216,9 @@ class CapitalCityBuildingManagement {
      * @param CapitalCityBuildingQueue $capitalCityBuildingQueue
      * @param KingdomBuilding $building
      * @param Character $character
-     * @return void
+     * @return bool
      */
-    public function handleBuildingRequest(CapitalCityBuildingQueue $capitalCityBuildingQueue, KingdomBuilding $building, Character $character): void {
+    public function handleBuildingRequest(CapitalCityBuildingQueue $capitalCityBuildingQueue, KingdomBuilding $building, Character $character): bool {
         $kingdom = $capitalCityBuildingQueue->kingdom;
         $buildingData = $capitalCityBuildingQueue->building_request_data;
 
@@ -235,10 +239,26 @@ class CapitalCityBuildingManagement {
         if ($this->isRepairRequest($building, $buildingData)) {
             $this->kingdomBuildingService->rebuildKingdomBuilding($building, $character, $capitalCityBuildingQueue->id);
         } else {
+
+            if ($building->is_locked) {
+
+                $this->messages[] = 'Building is locked and cannot be upgraded for: ' . $kingdom->name . '.';
+
+                return false;
+            }
+
+            if ($building->current_level >= $building->gameBuilding->max_level) {
+                $this->messages[] = 'Building is already max level and cannot be upgraded for: ' . $kingdom->name . '.';
+
+                return false;
+            }
+
             $this->kingdomBuildingService->upgradeKingdomBuilding($building, $character, $capitalCityBuildingQueue->id);
         }
 
         $this->updateKingdom->updateKingdom($kingdom);
+
+        return true;
     }
 
     /**
