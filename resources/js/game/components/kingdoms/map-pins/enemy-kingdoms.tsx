@@ -21,6 +21,8 @@ export default class EnemyKingdoms extends React.Component<
 
     componentDidMount() {
         viewPortWatcher(this);
+
+        console.log(this.props.kingdoms);
     }
 
     componentDidUpdate() {

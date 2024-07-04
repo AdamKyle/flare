@@ -223,11 +223,6 @@ export default class KingdomsList extends React.Component<
                             user_id={this.props.user_id}
                         />
                     )
-                ) : this.state.selected_log !== null ? (
-                    <KingdomLogDetailsView
-                        close_details={this.closeLogDetails.bind(this)}
-                        log={this.state.selected_log}
-                    />
                 ) : (
                     <BasicCard additionalClasses={"overflow-x-auto"}>
                         <Tabs
@@ -281,21 +276,41 @@ export default class KingdomsList extends React.Component<
                                         }
                                     >
                                         <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3"></div>
-                                        <DangerButton
-                                            button_label={"Delete All Logs"}
-                                            on_click={this.deleteAllLogs.bind(
-                                                this,
-                                            )}
-                                        />
-                                        <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3"></div>
-                                        <Table
-                                            data={this.props.logs}
-                                            columns={buildLogsColumns(
-                                                this.viewLogs.bind(this),
-                                                this.deleteLog.bind(this),
-                                            )}
-                                            dark_table={this.state.dark_tables}
-                                        />
+
+                                        {this.state.selected_log !== null ? (
+                                            <KingdomLogDetailsView
+                                                close_details={this.closeLogDetails.bind(
+                                                    this,
+                                                )}
+                                                log={this.state.selected_log}
+                                            />
+                                        ) : (
+                                            <>
+                                                <DangerButton
+                                                    button_label={
+                                                        "Delete All Logs"
+                                                    }
+                                                    on_click={this.deleteAllLogs.bind(
+                                                        this,
+                                                    )}
+                                                />
+                                                <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3"></div>
+                                                <Table
+                                                    data={this.props.logs}
+                                                    columns={buildLogsColumns(
+                                                        this.viewLogs.bind(
+                                                            this,
+                                                        ),
+                                                        this.deleteLog.bind(
+                                                            this,
+                                                        ),
+                                                    )}
+                                                    dark_table={
+                                                        this.state.dark_tables
+                                                    }
+                                                />
+                                            </>
+                                        )}
                                     </div>
                                 ) : (
                                     <p className="my-4 text-center">No Logs.</p>

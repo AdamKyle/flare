@@ -392,9 +392,9 @@ export default class KingdomLogDetails extends React.Component<
         if (this.props.log.status === "Capital City Unit Request") {
             return (
                 <BasicCard>
-                    <div className="text-right cursor-pointer text-red-500">
+                    <div className="text-right text-red-500">
                         <button onClick={this.props.close_details}>
-                            <i className="fas fa-minus-circle"></i>
+                            <i className="fas fa-minus-circle cursor-pointer"></i>
                         </button>
                     </div>
                     <h3 className="mb-4">{this.props.log.status}</h3>

@@ -60,8 +60,6 @@ class ResourceTransferService {
         $requestingKingdom = Kingdom::find($params['kingdom_requesting']);
         $requestingFromKingdom = Kingdom::find($params['kingdom_requesting_from']);
 
-
-
         if (!$this->ownsKingdom($character, $requestingKingdom, $requestingFromKingdom)) {
             return $this->errorResult('Not allowed to do that.');
         }

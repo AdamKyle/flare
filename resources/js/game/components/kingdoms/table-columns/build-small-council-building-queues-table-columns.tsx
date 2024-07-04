@@ -10,6 +10,7 @@ import BuildingQueuesTable from "../capital-city/building-queues-table";
 import BuildingDetails from "../buildings/deffinitions/building-details";
 import TimerProgressBar from "../../ui/progress-bars/timer-progress-bar";
 import DangerButton from "../../ui/buttons/danger-button";
+import { capitalize } from "lodash";
 
 /**
  *
@@ -32,12 +33,18 @@ export const buildSmallCouncilBuildingsQueuesTableColumns = (
         {
             name: "Request Status",
             selector: (row: any) => row.status,
-            cell: (row: any) => <span>{row.status}</span>,
+            cell: (row: any) => <span>{capitalize(row.status)}</span>,
         },
         {
             name: "Building Status",
             selector: (row: any) => row.secondary_status,
-            cell: (row: any) => <span>{row.secondary_status}</span>,
+            cell: (row: any) => (
+                <span>
+                    {row.secondary_status !== null
+                        ? capitalize(row.secondary_status)
+                        : "N/A"}
+                </span>
+            ),
         },
         {
             name: "Time Left",

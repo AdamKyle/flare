@@ -1,5 +1,6 @@
 <?php
 Route::get('/', ['as' => 'welcome', 'uses' => 'WelcomeController@welcome']);
+Route::get('/game-event-info', ['as' => 'event.type', 'uses' => 'WelcomeController@showEventPage']);
 
 Route::get('/information/search', ['as' => 'info.search', 'uses' => 'InfoPageController@search']);
 Route::get('/information/{pageName}', ['as' => 'info.page', 'uses' => 'InfoPageController@viewPage']);

@@ -134,7 +134,11 @@ class CapitalCityManagementService
             $end = Carbon::parse($queue->completed_at)->timestamp;
             $current = Carbon::now()->timestamp;
 
-            $timeLeftInSeconds = $end - $current;
+            $timeLeftInSeconds = 0;
+
+            if (!now()->gt($queue->completed_at)) {
+                $timeLeftInSeconds = $end - $current;
+            }
 
             $buildingRequestData = $queue->building_request_data;
 
@@ -152,6 +156,7 @@ class CapitalCityManagementService
                         $timeLeftInSeconds = $end - $current;
                     }
                 }
+
 
                 $queueData = [
                     'kingdom_name' => $kingdom->name . '(X/Y: '.$kingdom->x_position.'/'.$kingdom->y_position.')',

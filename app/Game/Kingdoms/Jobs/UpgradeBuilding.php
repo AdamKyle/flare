@@ -168,7 +168,11 @@ class UpgradeBuilding implements ShouldQueue {
         }
 
         if (!is_null($this->capitalCityQueueId)) {
-            $capitalCityQueue = CapitalCityBuildingQueue::find($this->capitalCityQueueId);
+            $capitalCityQueue = CapitalCityBuildingQueue::where('id', $this->capitalCityQueueId)->where('kingdom_id', $building->kingdom_id);
+
+            if (is_null($capitalCityQueue)) {
+                dump($this->capitalCityQueueId);
+            }
 
             $buildingRequestData = $capitalCityQueue->building_request_data;
 

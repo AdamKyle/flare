@@ -13,6 +13,7 @@ use App\Game\Kingdoms\Events\UpdateBuildingUpgrades;
 use App\Game\Kingdoms\Events\UpdateCapitalCityBuildingQueueTable;
 use App\Game\Kingdoms\Events\UpdateCapitalCityBuildingUpgrades;
 use App\Game\Kingdoms\Jobs\CapitalCityBuildingRequestMovement;
+use App\Game\Kingdoms\Values\BuildingCosts;
 use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
 use Facades\App\Game\Kingdoms\Validation\ResourceValidation;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
@@ -230,7 +231,7 @@ class CapitalCityBuildingManagement {
             $treasury -= $cost;
 
             $kingdom->update([
-                'treasury' => $treasury,
+                'treasury' => max($treasury, 0),
             ]);
         }
 
@@ -352,19 +353,14 @@ class CapitalCityBuildingManagement {
 
             $buildingUpgradeRequest['missing_costs'] = $missingResources;
 
-            $processResult = false;
+            $processResult = $this->processResourceRequests($capitalCityBuildingQueue, $kingdom, $character, $building, $missingResources);
 
-            if ($canAffordPopulation) {
-                $processResult = $this->processResourceRequests($capitalCityBuildingQueue, $kingdom, $character, $building, $missingResources);
-            }
-
-
-            $buildingUpgradeRequest['secondary_status'] = ($canAffordPopulation && $processResult) ? CapitalCityQueueStatus::REQUESTING : CapitalCityQueueStatus::REJECTED;
+            $buildingUpgradeRequest['secondary_status'] = ($processResult ? CapitalCityQueueStatus::REQUESTING : CapitalCityQueueStatus::REJECTED);
 
             return $buildingUpgradeRequest;
         }
 
-        $buildingUpgradeRequest['secondary_status'] = $buildingUpgradeRequest['type'] === 'repair' ? CapitalCityQueueStatus::REPAIRING : CapitalCityQueueStatus::BUILDING;
+        $buildingUpgradeRequest['secondary_status'] = ($buildingUpgradeRequest['type'] === 'repair' ? CapitalCityQueueStatus::REPAIRING : CapitalCityQueueStatus::BUILDING);
 
         return $buildingUpgradeRequest;
     }

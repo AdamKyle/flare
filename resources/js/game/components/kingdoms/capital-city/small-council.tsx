@@ -97,6 +97,13 @@ export default class SmallCouncil extends React.Component<any, any> {
                     send off an action or open a new view for you to choose what
                     to do.
                 </p>
+                <p className="my-4">
+                    Learn more{" "}
+                    <a href="/information/capital-cities" target="_blank">
+                        Capital Cities here{" "}
+                        <i className="fas fa-external-link-alt">.</i>
+                    </a>
+                </p>
                 <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-4"></div>
                 {this.state.success_message !== null ? (
                     <SuccessAlert additional_css={"my-2"}>

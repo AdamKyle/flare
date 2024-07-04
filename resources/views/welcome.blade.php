@@ -125,9 +125,14 @@
             </x-core.cards.feature-card>
         </div>
 
-        <div class="grid md:grid-cols-2 gap-3 mt-5 w-full mt-10 mx-auto lg:w-2/3 md:mt-20">
-            <img src="{{ asset('promotion/map.png') }}"
-                class="shadow rounded max-w-full h-auto align-middle border-none img-fluid w-100 mb-5" />
+        <div class="grid md:grid-cols-2 gap-6 mt-5 w-full mt-10 mx-auto lg:w-3/4 md:mt-20">
+            <div class="mt-4 lg:mt-0">
+                <img src="{{ asset('promotion/map.png') }}"
+                    class="shadow rounded max-w-full h-auto align-middle border-none img-fluid glightbox w-100 mb-5 cursor-pointer" />
+                <div class="text-center text-sm">
+                    Click to make larger.
+                </div>
+            </div>
             <div class="md:flex md:items-center text-center md:text-left">
                 <div>
                     <h2 class="mb-5 font-thin text-2xl lg:text-5xl dark:text-gray-300 text-gray-800">See where you're going!
@@ -160,7 +165,7 @@
             </p>
         </div>
 
-        <div class="grid md:grid-cols-2 gap-3 mt-5 w-full mt-10 mx-auto lg:w-2/3 md:mt-20">
+        <div class="grid md:grid-cols-2 gap-6 mt-5 w-full mt-10 mx-auto lg:w-3/4 md:mt-20">
             <div class="mt-4 lg:mt-0">
                 <img src="{{ asset('promotion/corrupted-locations.png') }}"
                     class="shadow rounded max-w-full h-auto align-middle border-none img-fluid glightbox w-100 mb-5 cursor-pointer" />

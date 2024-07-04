@@ -48,7 +48,7 @@ export default class ManageKingdomBuildings extends React.Component<any, any> {
                     </p>
                 </ClickableIconCard>
                 <ClickableIconCard
-                    title={"Upgrade/Repair Buildings"}
+                    title={"Repair Buildings"}
                     icon_class={"ra ra-guarded-tower"}
                     on_click={this.manageShowRepairList.bind(this)}
                 >
