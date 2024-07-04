@@ -13,7 +13,6 @@ use App\Game\Kingdoms\Events\UpdateBuildingUpgrades;
 use App\Game\Kingdoms\Events\UpdateCapitalCityBuildingQueueTable;
 use App\Game\Kingdoms\Events\UpdateCapitalCityBuildingUpgrades;
 use App\Game\Kingdoms\Jobs\CapitalCityBuildingRequestMovement;
-use App\Game\Kingdoms\Values\BuildingCosts;
 use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
 use Facades\App\Game\Kingdoms\Validation\ResourceValidation;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;

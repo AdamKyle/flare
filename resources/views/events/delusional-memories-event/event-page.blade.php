@@ -73,8 +73,7 @@
         <div class="text-center w-full lg:w-2/4 mx-auto mt-20">
             <h2 class="mb-5 font-thin text-2xl lg:text-5xl dark:text-gray-300 text-gray-800">
                 <span class="fa-stack">
-                    <i class="far fa-credit-card fa-stack-1x"></i>
-                    <i class="fas fa-ban fa-stack-2x text-red-500"></i>
+                    <i class="ra ra-monster-skull mr-2"></i>
                 </span>
                 Monsters scale to your ability
             </h2>
@@ -109,35 +108,60 @@
         <div class="text-center w-full lg:w-2/4 mx-auto mt-20">
             <h2 class="mb-5 font-thin text-2xl lg:text-5xl dark:text-gray-300 text-gray-800">
                 <i class="fas fa-mouse-pointer mr-2"></i>
-                Some Clicking Required!
+                New <a href="/information/quests">Quests</a> and new story!
             </h2>
             <p class="mb-10 dark:text-gray-300 text-gray-800">
-                Tlessa is not an idle game. We do offer <a href="/information/exploration">Exploration</a> to make the
-                progression a bit easier,
-                however, players should be prepared to not put the game on autopilot and walk away. <a
-                    href="/information/some-clicking-required">Learn more</a>,
+                With this event we dive into the delusional machinations of a mad Jester ever on the search for his brother.
+                His own delusional fantasies play out before you! What's real and whats not?!
             </p>
         </div>
 
-        <div class="grid md:grid-cols-2 gap-6 mt-5 w-full mt-10 mx-auto lg:w-3/4 md:mt-20">
-            <div class="mt-4 lg:mt-0">
-                <img src="{{ asset('promotion/delusional-memories-event/delusional-memories-quests.png') }}"
-                     class="shadow rounded max-w-full h-auto align-middle border-none img-fluid glightbox w-100 mb-5 cursor-pointer" />
-                <div class="text-center text-sm">
-                    Click to make larger.
-                </div>
-            </div>
-            <div class="md:flex md:items-center text-center md:text-left">
-                <div>
-                    <h2 class="mb-5 font-thin text-2xl lg:text-5xl dark:text-gray-300 text-gray-800">New Quests
-                    </h2>
-                    <p class="mb-10 dark:text-gray-300 text-gray-800">If you are a new player or a returning player, there are a whole set of new
-                        quests that can be done down here to give the world more life and progress the story. Players no matter how new,
-                        or veteran can participate. the stories are done such that you don't need the context to participate!</p>
-                </div>
-            </div>
-        </div>
 
+        <div class="grid md:grid-cols-3 gap-3 w-full md:w-2/3 m-auto">
+            <x-core.cards.feature-card>
+                <x-slot:icon>
+                    <i class="ra ra-player text-primary-600 relative top-[10px] right-[10px]"></i>
+                </x-slot:icon>
+                <x-slot:title>
+                    <a
+                        href="/information/monsters?table-filters[maps]=Delusional+Memories">New Monsters To Fight</a>
+                </x-slot:title>
+
+                <p>
+                    If you have access to <a href="/information/planes">Purgatory</a>, fight powerful new monsters that test your might and courage!
+                </p>
+            </x-core.cards.feature-card>
+            <x-core.cards.feature-card>
+                <x-slot:icon>
+                    <i class="ra ra-player-king text-primary-600 relative top-[10px] right-[10px]"></i>
+                </x-slot:icon>
+                <x-slot:title>
+                    <a
+                        href="{{ route('info.page', [
+                            'pageName' => 'weekly-fights',
+                        ]) }}">Cosmic Gear & Weekly Fights</a>
+                </x-slot:title>
+
+                <p>
+                    Looking for more of a challenge for high level players? Take on weekly fights and earn <a href="/information/cosmic-items">Cosmic gear</a>!
+                </p>
+            </x-core.cards.feature-card>
+            <x-core.cards.feature-card>
+                <x-slot:icon>
+                    <i class="ra ra-trail text-primary-600 relative top-[10px] right-[10px]"></i>
+                </x-slot:icon>
+                <x-slot:title>
+                    <a
+                        href="{{ route('info.page', [
+                            'pageName' => 'exploration',
+                        ]) }}">Brand new raid: Jester of Time</a>
+                </x-slot:title>
+
+                <p>
+                    Fight the Jester of Time and his minions for a chance at wining the new tier of gear: <a href="http://127.0.0.1:8000/information/delusional-silver">Delusional Silver</a>!
+                </p>
+            </x-core.cards.feature-card>
+        </div>
 
         <div class="w-full lg:w-2/4 mx-auto mt-10 lg:mt-20 mb-10 mt-4 lg:mt-0">
             <h2 class="mb-5 font-thin text-center text-5xl dark:text-gray-300 text-gray-800">
@@ -160,6 +184,12 @@
                 <dd>
                     Yes and no. While all players can participate in the event goals and earn these pieces of gear, the gear will only take you so far as, you will need to level your character and take advantage of
                     a variety of other systems in game in order to take full advantage of the gear.
+                </dd>
+                <dt>Lots of this sounds like high level content, what can new players do?</dt>
+                <dd>
+                    New players can join in on the quests and the new story line, they can also participate in the global events. As stated before those with out access to end game content, will
+                    face early game monsters to make it fair and inviting to all. Players, even new players, can get Mythical and Legendary gear down here by participating in the global events,
+                    this will take them a long way until they understand more systems in the game.
                 </dd>
             </dl>
         </div>

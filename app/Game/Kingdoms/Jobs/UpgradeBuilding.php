@@ -5,6 +5,7 @@ namespace App\Game\Kingdoms\Jobs;
 use App\Flare\Models\CapitalCityBuildingQueue;
 use App\Game\Kingdoms\Service\CapitalCityBuildingManagement;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
+use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -69,7 +70,9 @@ class UpgradeBuilding implements ShouldQueue {
      * Execute the job.
      *
      * @param UpdateKingdom $updateKingdom
+     * @param CapitalCityBuildingManagement $capitalCityBuildingManagement
      * @return void
+     * @throws Exception
      */
     public function handle(UpdateKingdom $updateKingdom, CapitalCityBuildingManagement $capitalCityBuildingManagement)
     {
@@ -168,16 +171,16 @@ class UpgradeBuilding implements ShouldQueue {
         }
 
         if (!is_null($this->capitalCityQueueId)) {
-            $capitalCityQueue = CapitalCityBuildingQueue::where('id', $this->capitalCityQueueId)->where('kingdom_id', $building->kingdom_id);
+            $capitalCityQueue = CapitalCityBuildingQueue::where('id', $this->capitalCityQueueId)->where('kingdom_id', $building->kingdom_id)->first();
 
             if (is_null($capitalCityQueue)) {
-                dump($this->capitalCityQueueId);
+                throw new Exception('Capital City Queue is Null: ', $this->capitalCityQueueId, $building->kingdom_id);
             }
 
             $buildingRequestData = $capitalCityQueue->building_request_data;
 
             foreach ($buildingRequestData as $index => $requestData) {
-                if ($requestData['building_id'] === $this->building->id) {
+                if ($requestData['building_id'] === $building->id) {
                     $buildingRequestData[$index]['secondary_status'] = CapitalCityQueueStatus::FINISHED;
                     $buildingRequestData[$index]['messages'][] = 'Building finished upgrading. Kingdom log will be generated when all buildings for this kingdom are upgraded.';
                 }
