@@ -209,8 +209,9 @@ class CapitalCityManagementService
                     $timeLeftInSeconds = $end - $current;
                 }
 
-                if ($unitRequestData['secondary_status'] === CapitalCityQueueStatus::REJECTED ||
-                    $unitRequestData['secondary_status'] === CapitalCityQueueStatus::FINISHED
+
+                if ($unitRequest['secondary_status'] === CapitalCityQueueStatus::REJECTED ||
+                    $unitRequest['secondary_status'] === CapitalCityQueueStatus::FINISHED
                 ) {
                     $timeLeftInSeconds = 0;
                 }
@@ -228,7 +229,7 @@ class CapitalCityManagementService
             }
         }
 
-        return $data;
+        return array_values(collect($data)->sortByDesc('time_left_seconds')->toArray());
     }
 
     /**
@@ -266,9 +267,8 @@ class CapitalCityManagementService
      * @param Kingdom $kingdom
      * @return EloquentCollection
      */
-    private function getOtherKingdoms(Character $character, Kingdom $kingdom)
-    {
-        return $character->kingdoms()->where('id', '!=', $kingdom->id)->get();
+    private function getOtherKingdoms(Character $character, Kingdom $kingdom): EloquentCollection{
+        return $character->kingdoms()->where('id', '!=', $kingdom->id)->where('game_map_id', $kingdom->game_map_id)->get();
     }
 
     /**
@@ -368,6 +368,7 @@ class CapitalCityManagementService
     {
         return Kingdom::where('id', '!=', $kingdom->id)
             ->where('character_id', $kingdom->character_id)
+            ->where('game_map_id', $kingdom->game_map_id)
             ->whereDoesntHave('unitsQueue')
             ->select('name', 'id')
             ->get()

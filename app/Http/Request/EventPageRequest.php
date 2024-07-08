@@ -24,7 +24,7 @@ class EventPageRequest extends FormRequest
     public function rules()
     {
         return [
-            'event_type'      => 'required|int',
+            'event_type'      => 'required',
         ];
     }
 

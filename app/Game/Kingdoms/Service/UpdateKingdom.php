@@ -75,7 +75,9 @@ class UpdateKingdom {
      * @return void
      */
     public function updateKingdomAllKingdoms(Character $character): void {
-        $kingdomData = new Collection($character->kingdoms, $this->kingdomTableTransformer);
+        $kingdoms = $character->kingdoms()->orderByDesc('is_capital')->orderBy('game_map_id')->orderBy('id')->get();
+
+        $kingdomData = new Collection($kingdoms, $this->kingdomTableTransformer);
 
         $kingdomData = $this->manager->createData($kingdomData)->toArray();
 

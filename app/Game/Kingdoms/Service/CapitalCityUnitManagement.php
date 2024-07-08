@@ -4,6 +4,7 @@ namespace App\Game\Kingdoms\Service;
 
 use App\Flare\Models\CapitalCityUnitQueue;
 use App\Flare\Models\Character;
+use App\Flare\Models\GameBuildingUnit;
 use App\Flare\Models\GameUnit;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\KingdomLog;
@@ -35,7 +36,7 @@ class CapitalCityUnitManagement {
     public function createUnitRequests(Character $character, Kingdom $kingdom, array $requestData): array {
         foreach ($requestData as $data) {
 
-            $toKingdom = $character->kingdoms->find($data['kingdom_id']);
+            $toKingdom     = $character->kingdoms->find($data['kingdom_id']);
 
             $time          = $this->unitMovementService->determineTimeRequired($character, $toKingdom, $kingdom->id, PassiveSkillTypeValue::CAPITAL_CITY_REQUEST_UNIT_TRAVEL_TIME_REDUCTION);
 
@@ -87,10 +88,27 @@ class CapitalCityUnitManagement {
         $character = $capitalCityUnitQueue->character;
         $kingdom = $capitalCityUnitQueue->kingdom;
 
-
         foreach ($unitRequests as $index => $unitRequest) {
 
             $gameUnit = GameUnit::where('name', $unitRequest['name'])->first();
+            $gameBuildingRelation = GameBuildingUnit::where('game_unit_id', $gameUnit->id)->first();
+            $building = $kingdom->buildings()->where('game_building_id', $gameBuildingRelation->game_building_id)->first();
+
+            if ($building->is_locked) {
+                $unitRequests[$index]['secondary_status'] = CapitalCityQueueStatus::REJECTED;
+
+                $this->messages[] = 'Building is locked in ' . $kingdom->name . '. You need to unlock the building: ' . $building->name . ' first by leveling a passive of the same name to level 1.';
+
+                continue;
+            }
+
+            if ($building->level < $gameBuildingRelation->required_level) {
+                $unitRequests[$index]['secondary_status'] = CapitalCityQueueStatus::REJECTED;
+
+                $this->messages[] = 'Building is under level in ' . $kingdom->name . '. You need to level the building: ' . $building->name . ' to level: ' . $gameBuildingRelation->required_level . ' first.';
+
+                continue;
+            }
 
             $amount = $this->updateAmount($kingdom, $gameUnit, $unitRequest['amount']);
 
@@ -115,7 +133,7 @@ class CapitalCityUnitManagement {
 
             if (ResourceValidation::shouldRedirectUnits($gameUnit, $kingdom, $amount)) {
                 $missingCosts = ResourceValidation::getMissingResources($gameUnit, $kingdom, $amount);
-
+                dump($missingCosts, $kingdom);
                 foreach ($missingCosts as $resourceName => $amount) {
                     $result = $this->sendOffResourceRequest($character, $kingdom, $resourceName, $amount, $capitalCityUnitQueue->id, $gameUnit->id);
 
@@ -128,8 +146,6 @@ class CapitalCityUnitManagement {
                     $unitRequests[$currentIndex]['secondary_status'] = CapitalCityQueueStatus::REQUESTING;
                 }
             }
-
-            $unitRequests[$index]['secondary_status'] = CapitalCityQueueStatus::RECRUITING;
         }
 
         $capitalCityUnitQueue->update([

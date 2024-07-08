@@ -26,7 +26,11 @@
     }
 
     if ($eventRunning->getTitleOfEvent() === 'Delusional Memories Event') {
-        $href = route('event.type', ['event_type' => EventType::DELUSIONAL_MEMORIES_EVENT]);
+        $href = route('event.type', ['event_type' => 'delusional-memories']);
+    }
+
+    if ($eventRunning->getTitleOfEvent() === 'The Jester of Time') {
+        $href = route('event.type', ['event_type' => 'jester-of-time']);
     }
 @endphp
 

@@ -73,15 +73,15 @@ class ResourceTransferService {
         }
 
         if (!$this->bothKingdomsHaveAMarketPlace($requestingKingdom, $requestingFromKingdom)) {
-            return $this->errorResult('Both the requesting kingdom ('.$requestingKingdom->name.') and the kingdom ('.$requestingFromKingdom->name.') to request from must have Market Place built and upgraded to level 5.');
+            return $this->errorResult('Both the requesting kingdom ('.$requestingKingdom->name.') and the kingdom ('.$requestingFromKingdom->name.') need to build a Market Place which can be researched on the passive tree and then built to level 5 in order to request resources. It is ideal all your kingdoms have a maxed out Market Place.');
         }
 
         if (!$this->canAffordPopulationCost($requestingFromKingdom)) {
-            return $this->errorResult('The kingdom: '.$requestingFromKingdom->name.' you are requesting resources from does not have enough population to move this amount of resources.');
+            return $this->errorResult('The kingdom: '.$requestingFromKingdom->name.' you are requesting resources from does not have enough population to move this amount of resources. You need at least 50 people in: ' . $requestingFromKingdom->name);
         }
 
         if (!$this->hasRequiredSpearmen($requestingFromKingdom)) {
-            return $this->errorResult('The kingdom: '.$requestingFromKingdom->name.' you are requesting resources from does not have enough spearmen to guard to the transportation');
+            return $this->errorResult('The kingdom: '.$requestingFromKingdom->name.' you are requesting resources from does not have enough spearmen (you need 75) to guard to the transportation');
         }
 
         $useAirShip = $params['use_air_ship'];
@@ -167,12 +167,11 @@ class ResourceTransferService {
     }
 
     private function hasRequestedResourceAmount(Kingdom $requestFromKingdom, int $amount, string $type): bool {
-
         if ($type === 'all') {
             return true;
         }
 
-        $currentAmountFromKingdom = $requestFromKingdom->{$type . '_current'};
+        $currentAmountFromKingdom = $requestFromKingdom->{'current_' . $type};
 
         return $amount <= $currentAmountFromKingdom;
     }
@@ -198,8 +197,8 @@ class ResourceTransferService {
 
     private function bothKingdomsHaveAMarketPlace(Kingdom $requestingKingdom, Kingdom $requestingFromKingdom): bool {
 
-        $requestingMarketPlace = $requestingKingdom->buildings->where('gameBuilding.name', '=', BuildingCosts::MARKET_PLACE)->where('level', '>=', 5);
-        $requestingFromMarketPlace = $requestingFromKingdom->buildings->where('gameBuilding.name', '=', BuildingCosts::MARKET_PLACE)->where('level', '>=', 5);
+        $requestingMarketPlace = $requestingKingdom->buildings->where('gameBuilding.name', '=', BuildingCosts::MARKET_PLACE)->where('level', '>=', 5)->first();
+        $requestingFromMarketPlace = $requestingFromKingdom->buildings->where('gameBuilding.name', '=', BuildingCosts::MARKET_PLACE)->where('level', '>=', 5)->first();
 
         return !is_null($requestingMarketPlace) && !is_null($requestingFromMarketPlace);
     }

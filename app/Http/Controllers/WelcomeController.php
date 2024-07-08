@@ -29,14 +29,37 @@ class WelcomeController extends Controller {
 
     public function showEventPage(EventPageRequest $request) {
 
-        $type = (new EventType($request->event_type));
+        $eventType = $request->event_type;
+        $raids = ['jester-of-time'];
+        $events = ['delusional-memories'];
 
-        $event = ScheduledEvent::where('event_type', $request->event_type)->first();
+        if (in_array($eventType, $raids)) {
 
-        if ($type->isDelusionalMemoriesEvent()) {
-            return view('events.delusional-memories-event.event-page', [
-                'event' => $event,
-            ]);
+            $event = ScheduledEvent::where('event_type', EventType::RAID_EVENT)->where('currently_running', true)->first();
+
+            switch($eventType) {
+                case 'jester-of-time':
+                    return view('events.jester-of-time-raid.event-page', [
+                        'event' => $event,
+                    ]);
+                default:
+                    return redirect()->to(route('welcome'));
+            }
+        }
+
+
+        if (in_array($eventType, $events)) {
+
+            $event = ScheduledEvent::where('event_type', EventType::DELUSIONAL_MEMORIES_EVENT)->where('currently_running', true)->first();
+
+            switch($eventType) {
+                case 'delusional-memories':
+                    return view('events.delusional-memories-event.event-page', [
+                        'event' => $event,
+                    ]);
+                default:
+                    return redirect()->to(route('welcome'));
+            }
         }
 
         return redirect()->to(route('welcome'));

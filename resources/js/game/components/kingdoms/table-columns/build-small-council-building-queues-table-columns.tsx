@@ -37,7 +37,10 @@ export const buildSmallCouncilBuildingsQueuesTableColumns = (
         },
         {
             name: "Building Status",
-            selector: (row: any) => row.secondary_status,
+            selector: (row: any) =>
+                row.secondary_status !== null
+                    ? capitalize(row.secondary_status)
+                    : "N/A",
             cell: (row: any) => (
                 <span>
                     {row.secondary_status !== null

@@ -24,7 +24,7 @@ class UpdateKingdomHandler {
     }
 
     public function refreshPlayersKingdoms(Character $character) {
-        $kingdoms = $character->kingdoms;
+        $kingdoms = $character->kingdoms()->orderByDesc('is_capital')->orderBy('game_map_id')->orderBy('id')->get();
 
         $collection = new Collection($kingdoms, $this->kingdomTableTransformer);
 

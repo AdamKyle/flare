@@ -410,9 +410,9 @@ class CapitalCityBuildingManagement {
      */
     private function sendOffResourceRequests(CapitalCityBuildingQueue $queue, Kingdom $kingdom, Character $character, KingdomBuilding $building, string $resourceName, int $resourceAmount): bool {
 
-        $kingdom = $character->kingdoms()->where('id', '!=', $kingdom->id)->where('current_' . $resourceName, '>=', $resourceAmount)->first();
+        $kingdomWithResource = $character->kingdoms()->where('game_map_id', $kingdom->game_map_id)->where('id', '!=', $kingdom->id)->where('current_' . $resourceName, '>=', $resourceAmount)->first();
 
-        if (is_null($kingdom)) {
+        if (is_null($kingdomWithResource)) {
 
             $this->messages[] = 'No kingdom found to request resources from for: ' . $building->name;
 
@@ -421,7 +421,7 @@ class CapitalCityBuildingManagement {
 
         $result = $this->resourceTransferService->sendOffResourceRequest($character, [
             'kingdom_requesting' => $kingdom->id,
-            'kingdom_requesting_from' => $kingdom->id,
+            'kingdom_requesting_from' => $kingdomWithResource->id,
             'amount_of_resources' => $resourceAmount,
             'use_air_ship' => true,
             'type_of_resource' => $resourceName,
