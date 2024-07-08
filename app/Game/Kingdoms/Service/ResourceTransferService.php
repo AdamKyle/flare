@@ -73,7 +73,7 @@ class ResourceTransferService {
         }
 
         if (!$this->bothKingdomsHaveAMarketPlace($requestingKingdom, $requestingFromKingdom)) {
-            return $this->errorResult('Both the requesting kingdom ('.$requestingKingdom->name.') and the kingdom ('.$requestingFromKingdom->name.') need to build a Market Place which can be researched on the passive tree and then built to level 5 in order to request resources. It is ideal all your kingdoms have a maxed out Market Place.');
+            return $this->errorResult('You need: '.number_format($params['amount_of_resources']).' of resource type: '.$params['type_of_resource'].' however, both the requesting kingdom ('.$requestingKingdom->name.') and the kingdom ('.$requestingFromKingdom->name.') need to build a Market Place which can be researched on the passive tree and then built to level 5 in order to request resources. It is ideal all your kingdoms have a maxed out Market Place.');
         }
 
         if (!$this->canAffordPopulationCost($requestingFromKingdom)) {

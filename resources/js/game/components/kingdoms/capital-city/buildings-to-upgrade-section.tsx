@@ -189,7 +189,6 @@ export default class BuildingsToUpgradeSection extends React.Component<
             this.setState({
                 sort_type: null,
                 order_type: null,
-                upgrade_queue: [],
                 kingdom_search: "",
                 table_data: sortedData,
             });
@@ -207,7 +206,6 @@ export default class BuildingsToUpgradeSection extends React.Component<
         this.setState({
             sort_type: null,
             order_type: null,
-            upgrade_queue: [],
             kingdom_search: value,
             table_data: sortedData,
         });
@@ -250,7 +248,7 @@ export default class BuildingsToUpgradeSection extends React.Component<
                         on_click={() => {
                             addAllBuildingsToQueue(this);
                         }}
-                        additional_css={"flex-1 py-2 px-4 min-w-[120px]"} // Set minimum width
+                        additional_css={"flex-1 py-2 px-4 min-w-[120px]"}
                         disabled={
                             this.state.table_data.length <= 0 &&
                             this.state.kingdom_search === ""
@@ -264,7 +262,7 @@ export default class BuildingsToUpgradeSection extends React.Component<
                                 on_click={this.manageReviewModal.bind(this)}
                                 additional_css={
                                     "flex-1 py-2 px-3 ml-2 min-w-[120px]"
-                                } // Set minimum width
+                                }
                                 disabled={
                                     this.state.table_data.length <= 0 &&
                                     this.state.kingdom_search === ""
@@ -275,7 +273,7 @@ export default class BuildingsToUpgradeSection extends React.Component<
                                 on_click={() => removeAllFromQueue(this)}
                                 additional_css={
                                     "flex-1 py-2 px-3 ml-2 min-w-[120px]"
-                                } // Set minimum width
+                                }
                                 disabled={
                                     this.state.table_data.length <= 0 &&
                                     this.state.kingdom_search === ""
@@ -297,7 +295,7 @@ export default class BuildingsToUpgradeSection extends React.Component<
                         on_click={() =>
                             this.sortTable(SortType.KINGDOM_NAME, "asc")
                         }
-                        additional_css={"py-2 px-3 flex-shrink-0 min-w-[120px]"} // Set minimum width
+                        additional_css={"py-2 px-3 flex-shrink-0 min-w-[120px]"}
                         disabled={
                             this.state.table_data.length <= 0 &&
                             this.state.kingdom_search === ""
@@ -308,7 +306,7 @@ export default class BuildingsToUpgradeSection extends React.Component<
                         on_click={() =>
                             this.sortTable(SortType.BUILDING_NAME, "asc")
                         }
-                        additional_css={"py-2 px-3 flex-shrink-0 min-w-[120px]"} // Set minimum width
+                        additional_css={"py-2 px-3 flex-shrink-0 min-w-[120px]"}
                         disabled={
                             this.state.table_data.length <= 0 &&
                             this.state.kingdom_search === ""
@@ -319,7 +317,7 @@ export default class BuildingsToUpgradeSection extends React.Component<
                         on_click={() =>
                             this.sortTable(SortType.BUILDING_LEVEL, "asc")
                         }
-                        additional_css={"py-2 px-3 flex-shrink-0 min-w-[120px]"} // Set minimum width
+                        additional_css={"py-2 px-3 flex-shrink-0 min-w-[120px]"}
                         disabled={
                             this.state.table_data.length <= 0 &&
                             this.state.kingdom_search === ""
@@ -328,7 +326,7 @@ export default class BuildingsToUpgradeSection extends React.Component<
                     <DangerOutlineButton
                         button_label={"Reset Filters/Search"}
                         on_click={() => this.resetSort()}
-                        additional_css={"py-2 px-3 flex-shrink-0 min-w-[120px]"} // Set minimum width
+                        additional_css={"py-2 px-3 flex-shrink-0 min-w-[120px]"}
                         disabled={
                             this.state.table_data.length <= 0 &&
                             this.state.kingdom_search === ""

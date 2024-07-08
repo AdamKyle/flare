@@ -258,7 +258,7 @@ export default class KingdomLogDetails extends React.Component<
         const additionalMessages = this.props.log.additional_details.messages;
 
         return additionalMessages.map((message: string) => {
-            return <li>{message}</li>;
+            return <li className={"my-4"}>{message}</li>;
         });
     }
 
