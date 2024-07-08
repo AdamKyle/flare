@@ -133,7 +133,7 @@ class CapitalCityUnitManagement {
 
             if (ResourceValidation::shouldRedirectUnits($gameUnit, $kingdom, $amount)) {
                 $missingCosts = ResourceValidation::getMissingResources($gameUnit, $kingdom, $amount);
-                dump($missingCosts, $kingdom);
+
                 foreach ($missingCosts as $resourceName => $amount) {
                     $result = $this->sendOffResourceRequest($character, $kingdom, $resourceName, $amount, $capitalCityUnitQueue->id, $gameUnit->id);
 
