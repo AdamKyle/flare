@@ -159,6 +159,15 @@ class PassiveSkillTypeValue {
     }
 
     /**
+     * Is this a resource request?
+     *
+     * @return bool
+     */
+    public function isResourceIncrease(): bool {
+        return $this->value === self::RESOURCE_INCREASE;
+    }
+
+    /**
      * See if the name exists in a named value.
      *
      * If it does return it, if not throw an exception.

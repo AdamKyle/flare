@@ -45,6 +45,10 @@ class PassiveSkillTrainingService {
 
         $delayTime = now()->addMinutes(15);
 
+        if (env('APP_ENV') === 'local') {
+            $delayTime = now()->addMinute();
+        }
+
         $character = $character->refresh();
 
         TrainPassiveSkill::dispatch($character, $skill)->delay($delayTime);

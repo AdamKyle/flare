@@ -103,7 +103,7 @@ export default class KingdomPassives extends React.Component<any, any> {
 
             if (diff.hasOwnProperty("seconds")) {
                 if (typeof diff.seconds !== "undefined") {
-                    return diff.seconds;
+                    return Math.round(diff.seconds);
                 }
             }
 

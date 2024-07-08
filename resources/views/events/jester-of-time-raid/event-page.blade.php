@@ -34,7 +34,7 @@
                 The Jester plays around with your own delusions
             </h2>
             <p class="mb-10 dark:text-gray-300 text-gray-800">
-                During this raid players have a chance to participate in raid quests that flush out more of the story from Delusional Memories event.
+                During this <a href="#">raid</a> players have a chance to participate in raid quests that flush out more of the story from <a href="#">Delusional Memories</a> event.
                 Players can enter corrupted locations and put their might to the test as they work together to take down the raid boss!
             </p>
 
@@ -67,12 +67,12 @@
                 <span class="fa-stack">
                     <i class="ra ra-monster-skull mr-2"></i>
                 </span>
-                New Quests!
+                New <a href="#">Quests</a>!
             </h2>
             <p class="mb-10 dark:text-gray-300 text-gray-800">
                Participate in two branches of quests! One will tell the story of The Jester and requires your ability to kill raid monsters to get the quest items,
-                and the other quest line will lead to a cosmetic unlock.
-                In this case Players get an additional 10 sets to put items into clearing up even more space in your inventory. Defeat the Raid boss and gain Delusional Silver gear pieces.
+                and the other quest line will lead to a cosmetic unlock. In this case Players get an additional 10 sets to put
+                items into clearing up even more space in your inventory. Defeat the Raid boss and gain Delusional Silver gear pieces.
             </p>
         </div>
 
@@ -81,7 +81,7 @@
                 <div>
                     <h2 class="mb-5 font-thin md:text-4xl lg:text-5xl dark:text-gray-300 text-gray-800">Put your skill to the test!</h2>
                     <p class="mb-10 dark:text-gray-300 text-gray-800">
-                        Raid Critters and bosses are much stronger then you might be use to. While the Raid Boss needs players to take it down, the raid critters will
+                        <a href="#">"Raid Critters</a> are much stronger then you might be use to. While the <a href="#">"Raid Boss</a> needs players to take it down, the raid critters will
                         put your gear to the test. Just take a look for your self.
                     </p>
                 </div>
