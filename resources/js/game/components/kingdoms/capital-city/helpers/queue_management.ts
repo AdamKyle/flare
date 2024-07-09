@@ -75,7 +75,9 @@ export const addToQueue = (
 export const addAllBuildingsToQueue = (
     component: BuildingsToUpgradeSection,
 ): void => {
-    const upgradeQueue: any[] = [];
+    const upgradeQueue: any[] = JSON.parse(
+        JSON.stringify(component.state.upgrade_queue),
+    );
 
     component.state.table_data.slice(0, 200).forEach((data: any) => {
         if (upgradeQueue.length <= 0) {

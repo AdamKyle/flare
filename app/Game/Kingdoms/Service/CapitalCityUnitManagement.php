@@ -146,6 +146,13 @@ class CapitalCityUnitManagement {
                     $unitRequests[$currentIndex]['secondary_status'] = CapitalCityQueueStatus::REQUESTING;
                 }
             }
+
+            /**
+             * At this stage we are basically ready to go recruit.
+             */
+            if (is_null($unitRequests[$index]['secondary_status'])) {
+                $unitRequests[$index]['secondary_status'] = CapitalCityQueueStatus::RECRUITING;
+            }
         }
 
         $capitalCityUnitQueue->update([
