@@ -9,6 +9,7 @@ import { buildSmallCouncilBuildingsQueuesTableColumns } from "../table-columns/b
 import { viewPortWatcher } from "../../../lib/view-port-watcher";
 import CapitalCityBuildingQueueTableEventDefinition from "../event-listeners/capital-city-building-queue-table-event-definition";
 import CapitalCityBuildingQueuesTableEvent from "../event-listeners/capital-city-building-queues-table-event";
+import SendBuildingUpgradeCancellationRequestModal from "./modals/send-building-upgrade-cancellation-request-modal";
 
 export default class BuildingQueuesTable extends React.Component<any, any> {
     private fetchBuildingQueueAjax: FetchBuildingQueuesAjax;
@@ -23,6 +24,8 @@ export default class BuildingQueuesTable extends React.Component<any, any> {
             success_message: null,
             error_message: null,
             building_queues: [],
+            building_data_for_cancellation: null,
+            show_cancellation_modal: false,
             view_port: 0,
         };
 
@@ -52,6 +55,27 @@ export default class BuildingQueuesTable extends React.Component<any, any> {
         this.queueListener.listen();
     }
 
+    manageCancelModal(buildingId?: number): void {
+        let buildingData: any = null;
+
+        if (buildingId) {
+            const foundData = this.state.building_queues.filter(
+                (queue: any) => {
+                    return queue.building_id === buildingId;
+                },
+            );
+
+            if (foundData.length > 0) {
+                buildingData = foundData[0];
+            }
+        }
+
+        this.setState({
+            show_cancellation_modal: !this.state.show_cancellation_modal,
+            building_data_for_cancellation: buildingData,
+        });
+    }
+
     render() {
         if (this.state.loading) {
             return <LoadingProgressBar />;
@@ -72,6 +96,14 @@ export default class BuildingQueuesTable extends React.Component<any, any> {
                     data={this.state.building_queues}
                     dark_table={false}
                 />
+
+                {this.state.show_cancellation_modal ? (
+                    <SendBuildingUpgradeCancellationRequestModal
+                        is_open={this.state.show_cancellation_modal}
+                        manage_modal={this.manageCancelModal.bind(this)}
+                        queue_data={this.state.building_data_for_cancellation}
+                    />
+                ) : null}
             </div>
         );
     }

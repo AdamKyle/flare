@@ -377,6 +377,11 @@ class CapitalCityBuildingManagement {
      */
     private function processResourceRequests(CapitalCityBuildingQueue $capitalCityBuildingQueue, Kingdom $kingdom, Character $character, KingdomBuilding $building, array $missingResources): bool {
         foreach ($missingResources as $key => $amount) {
+
+            if ($amount <= 0) {
+                continue;
+            }
+
             $result = $this->sendOffResourceRequests($capitalCityBuildingQueue, $kingdom, $character, $building, $key, $amount);
 
             if (!$result) {

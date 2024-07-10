@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Game\BattleRewardProcessing\Services;
 
+use Mockery;
 use Tests\TestCase;
 use Tests\Traits\CreateGameMap;
 use Tests\Traits\CreateMonster;

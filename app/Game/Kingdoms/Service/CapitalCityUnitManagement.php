@@ -135,6 +135,11 @@ class CapitalCityUnitManagement {
                 $missingCosts = ResourceValidation::getMissingResources($gameUnit, $kingdom, $amount);
 
                 foreach ($missingCosts as $resourceName => $amount) {
+
+                    if ($amount <= 0) {
+                        continue;
+                    }
+
                     $result = $this->sendOffResourceRequest($character, $kingdom, $resourceName, $amount, $capitalCityUnitQueue->id, $gameUnit->id);
 
                     if (!$result) {

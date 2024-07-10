@@ -72,6 +72,7 @@ class ServiceProvider extends ApplicationServiceProvider {
                 $app->make(CapitalCityBuildingManagement::class),
                 $app->make(CapitalCityUnitManagement::class),
                 $app->make(KingdomBuildingTransformer::class),
+                $app->make(UnitMovementService::class),
                 $app->make(Manager::class)
             );
         });

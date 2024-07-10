@@ -193,8 +193,6 @@ class CapitalCityManagementService
                 return $this->errorResult('Nothing to cancel for this queue. Maybe it\'s done?');
             }
 
-            // send off cancellation job
-
             CapitalCityBuildingRequestCancellationMovement::dispatch($capitalCityBuildingQueue->id, $capitalCityBuildingQueue->character_id, [
                 'building_ids' => $buildingIds,
             ])->delay($time);
@@ -304,6 +302,9 @@ class CapitalCityManagementService
                     'time_left_seconds' => $timeLeftInSeconds > 0 ? $timeLeftInSeconds : 0,
                     'building_name' => $building->name,
                     'secondary_status' => $buildingRequest['secondary_status'],
+                    'kingdom_id' => $kingdom->id,
+                    'building_id' => $building->id,
+                    'queue_id' => $queue->id,
                 ];
 
                 $data[] = $queueData;
