@@ -7,6 +7,7 @@ import { buildSmallCouncilUnitQueuesTableColumns } from "../table-columns/build-
 import FetchUnitQueuesAjax from "../ajax/fetch-unit-queues-ajax";
 import CapitalCityUnitQueueTableEventDefinition from "../event-listeners/capital-city-unit-queue-table-event-definition";
 import CapitalCityUnitQueuesTableEvent from "../event-listeners/capital-city-unit-queues-table-event";
+import { watchForDarkMode } from "../../ui/helpers/watch-for-dark-mode";
 
 export default class UnitQueuesTable extends React.Component<any, any> {
     private fetchUnitQueueData: FetchUnitQueuesAjax;
@@ -20,6 +21,7 @@ export default class UnitQueuesTable extends React.Component<any, any> {
             loading: true,
             view_port: 0,
             unit_queues: [],
+            dark_tables: false,
         };
 
         this.fetchUnitQueueData = serviceContainer().fetch(FetchUnitQueuesAjax);
@@ -36,6 +38,7 @@ export default class UnitQueuesTable extends React.Component<any, any> {
 
     componentDidMount() {
         viewPortWatcher(this);
+        watchForDarkMode(this);
 
         this.fetchUnitQueueData.fetchUnitQueueData(
             this,
@@ -56,7 +59,7 @@ export default class UnitQueuesTable extends React.Component<any, any> {
                 <Table
                     columns={buildSmallCouncilUnitQueuesTableColumns(this)}
                     data={this.state.unit_queues}
-                    dark_table={false}
+                    dark_table={this.state.dark_tables}
                 />
             </div>
         );

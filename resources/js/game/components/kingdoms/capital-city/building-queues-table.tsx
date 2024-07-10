@@ -10,6 +10,7 @@ import { viewPortWatcher } from "../../../lib/view-port-watcher";
 import CapitalCityBuildingQueueTableEventDefinition from "../event-listeners/capital-city-building-queue-table-event-definition";
 import CapitalCityBuildingQueuesTableEvent from "../event-listeners/capital-city-building-queues-table-event";
 import SendBuildingUpgradeCancellationRequestModal from "./modals/send-building-upgrade-cancellation-request-modal";
+import { watchForDarkMode } from "../../ui/helpers/watch-for-dark-mode";
 
 export default class BuildingQueuesTable extends React.Component<any, any> {
     private fetchBuildingQueueAjax: FetchBuildingQueuesAjax;
@@ -27,6 +28,7 @@ export default class BuildingQueuesTable extends React.Component<any, any> {
             building_data_for_cancellation: null,
             show_cancellation_modal: false,
             view_port: 0,
+            dark_tables: false,
         };
 
         this.fetchBuildingQueueAjax = serviceContainer().fetch(
@@ -45,6 +47,7 @@ export default class BuildingQueuesTable extends React.Component<any, any> {
 
     componentDidMount() {
         viewPortWatcher(this);
+        watchForDarkMode(this);
 
         this.fetchBuildingQueueAjax.fetchQueueData(
             this,
@@ -94,7 +97,7 @@ export default class BuildingQueuesTable extends React.Component<any, any> {
                 <Table
                     columns={buildSmallCouncilBuildingsQueuesTableColumns(this)}
                     data={this.state.building_queues}
-                    dark_table={false}
+                    dark_table={this.state.dark_tables}
                 />
 
                 {this.state.show_cancellation_modal ? (

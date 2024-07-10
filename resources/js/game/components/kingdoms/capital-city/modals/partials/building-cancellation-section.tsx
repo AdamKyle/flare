@@ -20,7 +20,7 @@ export default class BuildingCancellationSection extends React.Component<
 
     render() {
         return (
-            <div className="overflow-y-auto max-h-[450px]">
+            <div>
                 <p className="my-2">
                     Are you sure you want to do this? Below you will find some
                     data about your current request status. You are currently

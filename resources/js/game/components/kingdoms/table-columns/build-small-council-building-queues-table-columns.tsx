@@ -80,7 +80,9 @@ export const buildSmallCouncilBuildingsQueuesTableColumns = (
                                                 "focus-visible:ring-opacity-75"
                                             }
                                             onClick={() =>
-                                                component.manageCancelModal()
+                                                component.manageCancelModal(
+                                                    row.building_id,
+                                                )
                                             }
                                         >
                                             Cancel

@@ -67,34 +67,38 @@ export default class SendBuildingUpgradeCancellationRequestModal extends React.C
                     secondary_button_disabled:
                         this.state.loading ||
                         this.state.success_message !== null,
-                    secondary_button_label: "Yes. I understand.",
+                    secondary_button_label: "Cancel just this building",
                     handle_action: this.sendRequest.bind(this),
                 }}
             >
-                <BuildingCancellationSection
-                    queue_data={this.props.queue_data}
-                />
-
-                <div className="my-4 text-center">
-                    <PrimaryOutlineButton
-                        button_label={"Cancel Entire Queue For This Kingdom"}
-                        on_click={this.sendRequest.bind(this)}
+                <div className="overflow-y-auto max-h-[450px]">
+                    <BuildingCancellationSection
+                        queue_data={this.props.queue_data}
                     />
+
+                    <div className="my-4 text-center">
+                        <PrimaryOutlineButton
+                            button_label={
+                                "Cancel Entire Queue For This Kingdom"
+                            }
+                            on_click={this.sendRequest.bind(this)}
+                        />
+                    </div>
+
+                    {this.state.error_message !== null ? (
+                        <DangerAlert additional_css={"my-4"}>
+                            {this.state.error_message}
+                        </DangerAlert>
+                    ) : null}
+
+                    {this.state.success_message !== null ? (
+                        <SuccessAlert additional_css={"my-4"}>
+                            {this.state.success_message}
+                        </SuccessAlert>
+                    ) : null}
+
+                    {this.state.loading ? <LoadingProgressBar /> : null}
                 </div>
-
-                {this.state.error_message !== null ? (
-                    <DangerAlert additional_css={"my-4"}>
-                        {this.state.error_message}
-                    </DangerAlert>
-                ) : null}
-
-                {this.state.success_message !== null ? (
-                    <SuccessAlert additional_css={"my-4"}>
-                        {this.state.success_message}
-                    </SuccessAlert>
-                ) : null}
-
-                {this.state.loading ? <LoadingProgressBar /> : null}
             </Dialogue>
         );
     }

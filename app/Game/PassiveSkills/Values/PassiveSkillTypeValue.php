@@ -168,6 +168,15 @@ class PassiveSkillTypeValue {
     }
 
     /**
+     * Is this steel increase?
+     *
+     * @return bool
+     */
+    public function isSteelIncrease(): bool {
+        return $this->value === self::STEEL_INCREASE;
+    }
+
+    /**
      * See if the name exists in a named value.
      *
      * If it does return it, if not throw an exception.
