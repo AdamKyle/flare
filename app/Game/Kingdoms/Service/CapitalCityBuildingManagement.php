@@ -173,7 +173,8 @@ class CapitalCityBuildingManagement {
 
         foreach($requestData as $data) {
             if ($data['secondary_status'] === CapitalCityQueueStatus::REJECTED ||
-                $data['secondary_status'] === CapitalCityQueueStatus::FINISHED
+                $data['secondary_status'] === CapitalCityQueueStatus::FINISHED ||
+                $data['secondary_status'] === CapitalCityQueueStatus::CANCELLED
             ) {
 
                 $building = KingdomBuilding::where('kingdom_id', $kingdom->id)->where('id', $data['building_id'])->first();

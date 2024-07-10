@@ -5,6 +5,8 @@ namespace App\Game\Kingdoms\Controllers\Api;
 use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
 use App\Game\Kingdoms\Requests\BuildingUpgradeRequestsRequest;
+use App\Game\Kingdoms\Requests\CancelBuildingUpgradeRequestRequest;
+use App\Game\Kingdoms\Requests\RecruitUnitCancellationRequest;
 use App\Game\Kingdoms\Requests\RecruitUnitRequestsRequest;
 use App\Game\Kingdoms\Service\CapitalCityManagementService;
 use App\Http\Controllers\Controller;
