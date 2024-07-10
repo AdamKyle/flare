@@ -9,7 +9,7 @@ import TimerProgressBar from "../../../components/ui/progress-bars/timer-progres
 import ResourceBuildingExpansionState from "./types/resource-building-expansion-state";
 import clsx from "clsx";
 import Ajax from "../../../lib/ajax/ajax";
-import {Axios, AxiosError, AxiosResponse} from "axios";
+import { Axios, AxiosError, AxiosResponse } from "axios";
 import { formatNumber } from "../../../lib/game/format-number";
 import Echo from "laravel-echo";
 import { serviceContainer } from "../../../lib/containers/core-container";
