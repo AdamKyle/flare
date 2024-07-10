@@ -9,7 +9,7 @@ import TimerProgressBar from "../../../components/ui/progress-bars/timer-progres
 import ResourceBuildingExpansionState from "./types/resource-building-expansion-state";
 import clsx from "clsx";
 import Ajax from "../../../lib/ajax/ajax";
-import { AxiosError, AxiosResponse } from "axios";
+import {Axios, AxiosError, AxiosResponse} from "axios";
 import { formatNumber } from "../../../lib/game/format-number";
 import Echo from "laravel-echo";
 import { serviceContainer } from "../../../lib/containers/core-container";
@@ -66,7 +66,7 @@ export default class ResourceBuildingExpansion extends React.Component<
                     this.setState({ loading: false });
 
                     if (typeof error.response != "undefined") {
-                        const response = error.response;
+                        const response: AxiosResponse = error.response;
 
                         this.setState({
                             error_message: response.data.message,
@@ -141,7 +141,7 @@ export default class ResourceBuildingExpansion extends React.Component<
                             this.setState({ expanding: false });
 
                             if (typeof error.response != "undefined") {
-                                const response = error.response;
+                                const response: AxiosResponse = error.response;
 
                                 let message = response.data.message;
 

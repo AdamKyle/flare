@@ -79,7 +79,7 @@ export const addAllBuildingsToQueue = (
         JSON.stringify(component.state.upgrade_queue),
     );
 
-    component.state.table_data.slice(0, 200).forEach((data: any) => {
+    component.state.table_data.forEach((data: any) => {
         if (upgradeQueue.length <= 0) {
             upgradeQueue.push({
                 kingdomId: data.kingdom_id,

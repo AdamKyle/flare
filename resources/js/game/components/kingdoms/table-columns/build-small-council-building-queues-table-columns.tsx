@@ -111,5 +111,9 @@ const buildTimerTitle = (row: any): string => {
         return "Upgrading";
     }
 
+    if (row.secondary_status === "requesting") {
+        return "Requesting";
+    }
+
     return "UNKNOWN";
 };

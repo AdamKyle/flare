@@ -335,7 +335,7 @@ class CapitalCityBuildingManagement {
         if (ResourceValidation::shouldRedirectRebuildKingdomBuilding($building, $kingdom)) {
             $missingResources = ResourceValidation::getMissingCosts($building, $kingdom);
 
-            $canAffordPopulation = false;
+            $canAffordPopulation = $missingResources['population'] === 0;
 
             if ($missingResources['population'] > 0) {
                 $canAffordPopulation = $this->canAffordPopulationCost($kingdom, $missingResources['population']);
@@ -384,9 +384,9 @@ class CapitalCityBuildingManagement {
 
             $result = $this->sendOffResourceRequests($capitalCityBuildingQueue, $kingdom, $character, $building, $key, $amount);
 
-            if (!$result) {
+            $buildingQueues = $capitalCityBuildingQueue->building_request_data;
 
-                $buildingQueues = $capitalCityBuildingQueue->building_request_data;
+            if (!$result) {
 
                 foreach ($buildingQueues as $index => $queueData) {
                     if ($queueData['building_id'] === $building->id) {
@@ -396,6 +396,18 @@ class CapitalCityBuildingManagement {
 
                 return false;
             }
+
+            foreach ($buildingQueues as $index => $queueData) {
+                if ($queueData['building_id'] === $building->id) {
+                    $buildingQueues[$index]['secondary_status'] = CapitalCityQueueStatus::REQUESTING;
+                }
+            }
+
+            $capitalCityBuildingQueue->update([
+                'building_request_data' => $buildingQueues
+            ]);
+
+            event(new UpdateCapitalCityBuildingQueueTable($capitalCityBuildingQueue->character, $capitalCityBuildingQueue->requestedKingdom));
         }
 
         return true;
