@@ -2,7 +2,7 @@ import React from "react";
 import BasicCard from "../../../game/components/ui/cards/basic-card";
 import Select from "react-select";
 import PrimaryButton from "../../../game/components/ui/buttons/primary-button";
-import { isEqual } from "lodash";
+import { isEqual, debounce } from "lodash";
 import ComponentLoading from "../../../game/components/ui/loading/component-loading";
 import SuccessButton from "../../../game/components/ui/buttons/success-button";
 import OrangeButton from "../../../game/components/ui/buttons/orange-button";
@@ -20,6 +20,8 @@ export default class InfoSection extends React.Component<any, any> {
             order: "",
             loading: true,
         };
+
+        this.setValue = debounce(this.setValue.bind(this), 300);
     }
 
     componentDidMount() {
@@ -350,7 +352,7 @@ export default class InfoSection extends React.Component<any, any> {
                             "undo redo | blocks | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | help",
                     }}
                     initialValue={this.state.content}
-                    onEditorChange={this.setValue.bind(this)}
+                    onEditorChange={this.setValue}
                 />
 
                 <div className="my-5">

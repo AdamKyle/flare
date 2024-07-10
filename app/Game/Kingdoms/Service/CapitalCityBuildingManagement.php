@@ -410,7 +410,10 @@ class CapitalCityBuildingManagement {
      */
     private function sendOffResourceRequests(CapitalCityBuildingQueue $queue, Kingdom $kingdom, Character $character, KingdomBuilding $building, string $resourceName, int $resourceAmount): bool {
 
-        $kingdomWithResource = $character->kingdoms()->where('game_map_id', $kingdom->game_map_id)->where('id', '!=', $kingdom->id)->where('current_' . $resourceName, '>=', $resourceAmount)->first();
+        $kingdomWithResource = $character->kingdoms()->where('game_map_id', $kingdom->game_map_id)
+            ->where('id', '!=', $kingdom->id)
+            ->where('current_' . $resourceName, '>=', $resourceAmount)
+            ->first();
 
         if (is_null($kingdomWithResource)) {
 

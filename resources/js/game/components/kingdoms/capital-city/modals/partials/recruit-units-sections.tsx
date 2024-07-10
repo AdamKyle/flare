@@ -29,11 +29,12 @@ export default class RecruitUnitsSections extends React.Component<any, any> {
                     recruitment will not occur.
                 </p>
                 <p className="my-2">
-                    Click View Queue to see the orders en route and their
-                    various statuses. Clicking Cancel on any one of them cancels
-                    all for that kingdom. You may only cancel during the{" "}
-                    <strong>Traveling</strong>, <strong>Requesting</strong> or{" "}
-                    <strong>recruiting</strong> phase.
+                    <strong>Click View Queue (Orange Button)</strong> to see the
+                    orders en route and their various statuses. Clicking Cancel
+                    on any one of them cancels all for that kingdom. You may
+                    only cancel during the <strong>Traveling</strong>,{" "}
+                    <strong>Requesting</strong> or <strong>recruiting</strong>{" "}
+                    phase.
                 </p>
             </div>
         );

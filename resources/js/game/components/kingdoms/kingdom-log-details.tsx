@@ -349,7 +349,13 @@ export default class KingdomLogDetails extends React.Component<
                         sent orders to: {this.props.log.to_kingdom_name}. These
                         have now been delivered.
                     </p>
-
+                    <p className={"my-4 italic"}>
+                        I am writing to you to day, from the capital city of:{" "}
+                        {this.props.log.from_kingdom_name} to order the building
+                        or repair of the following buildings. By upgrading or
+                        repairing these buildings our realm will look as
+                        beautiful as it is formidable.
+                    </p>
                     <div className="grid md:grid-cols-2 gap-4">
                         <div>
                             <h4>Request Info</h4>
@@ -403,7 +409,12 @@ export default class KingdomLogDetails extends React.Component<
                         sent orders to: {this.props.log.to_kingdom_name}. These
                         have now been delivered.
                     </p>
-
+                    <p className={"my-4 italic"}>
+                        I am writing to you to day, from the capital city of:{" "}
+                        {this.props.log.from_kingdom_name} to order the
+                        recruitment of soldiers for both defensive and offensive
+                        reasons.
+                    </p>
                     <div className="grid md:grid-cols-2 gap-4">
                         <div>
                             <h4>Request Info</h4>

@@ -262,7 +262,11 @@ class CapitalCityUnitManagement {
     }
 
     private function sendOffResourceRequest(Character $character, Kingdom $kingdom, string $resourceName, int $resourceAmount, int $queueId, int $unitId): bool {
-        $kingdom = $character->kingdoms()->where('id', '!=', $kingdom->id)->where('current_' . $resourceName, '>=', $resourceAmount)->first();
+        $kingdom = $character->kingdoms()
+            ->where('game_map_id', $kingdom->game_map_id)
+            ->where('id', '!=', $kingdom->id)
+            ->where('current_' . $resourceName, '>=', $resourceAmount)
+            ->first();
 
         if (is_null($kingdom)) {
 

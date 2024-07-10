@@ -366,13 +366,36 @@ class CapitalCityManagementService
      */
     private function getSelectableKingdoms(Kingdom $kingdom): array
     {
-        return Kingdom::where('id', '!=', $kingdom->id)
+        $kingdoms = Kingdom::where('id', '!=', $kingdom->id)
             ->where('character_id', $kingdom->character_id)
             ->where('game_map_id', $kingdom->game_map_id)
             ->whereDoesntHave('unitsQueue')
             ->select('name', 'id')
-            ->get()
-            ->toArray();
+            ->get();
+
+        return $this->filterOutCapitalCityUnitsInQueue($kingdoms)->toArray();
+    }
+
+    /**
+     * Filters out buildings who are currently in the Capital City Building Queue.
+     *
+     * @param EloquentCollection $kingdomUnits
+     * @return SupportCollection
+     */
+    private function filterOutCapitalCityUnitsInQueue(EloquentCollection $kingdomUnits): SupportCollection
+    {
+        $unitsIds = $kingdomUnits->pluck('id')->toArray();
+
+        $capitalCityUnitQueue = CapitalCityUnitQueue::whereIn('kingdom_id', $kingdomUnits->pluck('id'))
+            ->get();
+
+        $invalidUnitIds = $capitalCityUnitQueue->flatMap(function ($queue) use ($unitsIds) {
+            return collect($queue->building_request_data)->pluck('building_id')->intersect($unitsIds);
+        })->unique()->toArray();
+
+        return $kingdomUnits->reject(function ($unit) use ($invalidUnitIds) {
+            return in_array($unit->id, $invalidUnitIds);
+        });
     }
 
     /**
