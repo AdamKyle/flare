@@ -133,6 +133,10 @@ class CapitalCityBuildingManagement {
                 continue;
             }
 
+            if ($buildingUpgradeRequest['secondary_status'] === CapitalCityQueueStatus::CANCELLED) {
+                continue;
+            }
+
             // If the request is ready for building, handle it immediately
             if ($buildingUpgradeRequest['secondary_status'] === CapitalCityQueueStatus::BUILDING ||
                 $buildingUpgradeRequest['secondary_status'] === CapitalCityQueueStatus::REPAIRING)

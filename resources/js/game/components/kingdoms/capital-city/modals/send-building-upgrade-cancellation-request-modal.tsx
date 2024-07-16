@@ -3,33 +3,16 @@ import DangerAlert from "../../../ui/alerts/simple-alerts/danger-alert";
 import LoadingProgressBar from "../../../ui/progress-bars/loading-progress-bar";
 import Dialogue from "../../../ui/dialogue/dialogue";
 import { serviceContainer } from "../../../../lib/containers/core-container";
-import RecruitUnitsSections from "./partials/recruit-units-sections";
-import ProcessUnitRequestAjax from "../../ajax/process-unit-request-ajax";
 import SuccessAlert from "../../../ui/alerts/simple-alerts/success-alert";
 import PrimaryOutlineButton from "../../../ui/buttons/primary-outline-button";
 import BuildingCancellationSection from "./partials/building-cancellation-section";
-
-interface Unit {
-    name: string;
-    amount: number;
-    kingdom_ids: number[];
-}
-
-interface UnitRequest {
-    unit_name: string;
-    unit_amount: number;
-}
-
-interface KingdomUnits {
-    kingdom_id: number;
-    unit_requests: UnitRequest[];
-}
+import CancelBuildingRequestAjax from "../../ajax/cancel-building-request-ajax";
 
 export default class SendBuildingUpgradeCancellationRequestModal extends React.Component<
     any,
     any
 > {
-    private processUnitRecruitmentAjax: ProcessUnitRequestAjax;
+    private processBuildingCancellationRequest: CancelBuildingRequestAjax;
 
     constructor(props: any) {
         super(props);
@@ -40,19 +23,28 @@ export default class SendBuildingUpgradeCancellationRequestModal extends React.C
             success_message: null,
         };
 
-        this.processUnitRecruitmentAjax = serviceContainer().fetch(
-            ProcessUnitRequestAjax,
+        this.processBuildingCancellationRequest = serviceContainer().fetch(
+            CancelBuildingRequestAjax,
         );
     }
 
-    sendRequest() {
+    sendRequest(deleteQueue: boolean, buildingId?: number) {
         this.setState(
             {
                 loading: true,
                 success_message: null,
                 error_message: null,
             },
-            () => {},
+            () => {
+                this.processBuildingCancellationRequest.cancelBuildingRequest(
+                    this,
+                    this.props.character_id,
+                    this.props.queue_data.kingdom_id,
+                    this.props.queue_datata.queue_id,
+                    deleteQueue,
+                    buildingId,
+                );
+            },
         );
     }
 

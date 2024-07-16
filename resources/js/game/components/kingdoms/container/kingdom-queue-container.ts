@@ -10,6 +10,7 @@ import ProcessUnitRequestAjax from "../ajax/process-unit-request-ajax";
 import kingdomEventContainer from "./kingdom-event-container";
 import FetchBuildingQueuesAjax from "../ajax/fetch-building-queues-ajax";
 import FetchUnitQueuesAjax from "../ajax/fetch-unit-queues-ajax";
+import CancelBuildingRequestAjax from "../ajax/cancel-building-request-ajax";
 
 /**
  * Register core dependencies here.
@@ -60,6 +61,10 @@ function kingdomContainer(container: CoreContainer) {
 
     container.register("fetch-unit-queues-ajax", {
         useClass: FetchUnitQueuesAjax,
+    });
+
+    container.register("cancel-building-request-ajax", {
+        useClass: CancelBuildingRequestAjax,
     });
 }
 

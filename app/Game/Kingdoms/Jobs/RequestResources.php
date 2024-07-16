@@ -4,6 +4,7 @@ namespace App\Game\Kingdoms\Jobs;
 
 use App\Flare\Models\CapitalCityBuildingQueue;
 use App\Flare\Models\CapitalCityUnitQueue;
+use App\Game\Kingdoms\Events\UpdateCapitalCityBuildingQueueTable;
 use App\Game\Kingdoms\Service\CapitalCityBuildingManagement;
 use App\Game\Kingdoms\Service\CapitalCityUnitManagement;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
@@ -136,6 +137,10 @@ class RequestResources implements ShouldQueue {
                 'building_request_data' => $buildingRequestQueue,
             ]);
 
+            $capitalCityBuildingQueue = $capitalCityBuildingManagement->refresh();
+
+            event(new UpdateCapitalCityBuildingQueueTable($capitalCityBuildingQueue->character, $capitalCityBuildingQueue->requestingKingdom));
+
             $capitalCityBuildingManagement->handleBuildingRequest($capitalCityBuildingQueue->refresh(), $building, $requestingFromKingdom->character);
         }
 
@@ -207,6 +212,6 @@ class RequestResources implements ShouldQueue {
 
         MoveUnits::dispatch($unitMovementQueue->id)->delay($minutes);
 
-        event(new ServerMessageEvent($user, 'Your resources were dropped of and now the spearmen are headed home again.'));
+        event(new ServerMessageEvent($user, 'Your resources were dropped off and now the spearmen and (possibly - if sent along) Airship are headed home again.'));
     }
 }
