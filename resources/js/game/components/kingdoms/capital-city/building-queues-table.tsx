@@ -105,6 +105,7 @@ export default class BuildingQueuesTable extends React.Component<any, any> {
                         is_open={this.state.show_cancellation_modal}
                         manage_modal={this.manageCancelModal.bind(this)}
                         queue_data={this.state.building_data_for_cancellation}
+                        character_id={this.props.character_id}
                     />
                 ) : null}
             </div>

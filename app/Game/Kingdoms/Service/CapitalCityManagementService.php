@@ -13,10 +13,7 @@ use App\Flare\Models\KingdomBuilding;
 use App\Flare\Models\UnitInQueue;
 use App\Flare\Transformers\KingdomBuildingTransformer;
 use App\Game\Core\Traits\ResponseBuilder;
-use App\Game\Kingdoms\Events\UpdateCapitalCityBuildingQueueTable;
-use App\Game\Kingdoms\Jobs\CapitalCityBuildingRequestCancellationMovement;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
-use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection as SupportCollection;
@@ -206,13 +203,14 @@ class CapitalCityManagementService
                     'kingdom_id' => $kingdom->id,
                     'building_id' => $building->id,
                     'queue_id' => $queue->id,
+                    'is_cancel_request' => false,
                 ];
 
                 $data[] = $queueData;
             }
         }
 
-        return array_values(collect(array_merge($data, $this->fetchBuildingCancellationQueueData($character)))->sortByDesc('time_left_seconds')->toArray());
+        return array_values(collect(array_merge($this->fetchBuildingCancellationQueueData($character), $data))->sortByDesc('time_left_seconds')->sortByDesc('is_cancel_request')->toArray());
     }
 
     /**
@@ -307,11 +305,12 @@ class CapitalCityManagementService
                 'kingdom_name' => $queue->kingdom->name . '(X/Y: '.$queue->kingdom->x_position.'/'.$queue->kingdom->y_position.')',
                 'status' => $queue->status,
                 'building_name' => $building->name,
-                'secondary_status' => null,
+                'secondary_status' => 'Cancellation request',
                 'kingdom_id' => $queue->kingdom_id,
                 'building_id' => $building->id,
                 'queue_id' => $queue->id,
                 'time_left_seconds' => max($timeLeftInSeconds, 0),
+                'is_cancel_request' => true,
             ];
         }
 

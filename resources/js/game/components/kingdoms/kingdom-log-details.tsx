@@ -280,6 +280,8 @@ export default class KingdomLogDetails extends React.Component<
                         className={clsx({
                             "text-red-700 dark:text-red-500":
                                 data.status === "rejected",
+                            "text-orange-700 dark:text-orange-500":
+                                data.status === "cancelled",
                             "text-green-700 dark:text-green-500":
                                 data.status === "finished",
                         })}
@@ -323,6 +325,8 @@ export default class KingdomLogDetails extends React.Component<
                         className={clsx({
                             "text-red-700 dark:text-red-500":
                                 data.status === "rejected",
+                            "text-orange-700 dark:text-orange-500":
+                                data.status === "cancelled",
                             "text-green-700 dark:text-green-500":
                                 data.status === "finished",
                         })}

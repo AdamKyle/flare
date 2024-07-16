@@ -2,6 +2,7 @@
 
 namespace App\Game\Kingdoms\Service;
 
+use App\Game\Core\Traits\ResponseBuilder;
 use Carbon\Carbon;
 use App\Flare\Models\CapitalCityBuildingQueue;
 use App\Flare\Models\Character;
@@ -13,6 +14,8 @@ use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
 
 class CancelBuildingRequestService {
+
+    use ResponseBuilder;
 
     /**
      * @param UnitMovementService $unitMovementService
@@ -30,6 +33,7 @@ class CancelBuildingRequestService {
     public function handleCancelRequest(Character $character, Kingdom $kingdom, array $requestData): array
     {
         $queue = $this->getBuildingQueue($character, $kingdom, $requestData['capital_city_building_queue_id']);
+
         if (is_null($queue)) {
             return $this->errorResult('What are you trying to cancel child?');
         }
@@ -64,7 +68,7 @@ class CancelBuildingRequestService {
     private function getBuildingQueue(Character $character, Kingdom $kingdom, int $queueId): ?CapitalCityBuildingQueue {
         return CapitalCityBuildingQueue::where('id', $queueId)
             ->where('character_id', $character->id)
-            ->where('requested_kingdom', $kingdom->id)
+            ->where('kingdom_id', $kingdom->id)
             ->first();
     }
 
@@ -152,7 +156,9 @@ class CancelBuildingRequestService {
             'kingdom_id' => $kingdom->id,
             'character_id' => $character->id,
             'capital_city_building_queue_id' => $queue->id,
-            'status' => CapitalCityQueueStatus::TRAVELING
+            'status' => CapitalCityQueueStatus::TRAVELING,
+            'request_kingdom_id' => $queue->requested_kingdom,
+            'travel_time_completed_at' => $time,
         ]);
 
         CapitalCityBuildingRequestCancellationMovement::dispatch($capitalCityBuildingCancellation->id, $queue->id, $queue->character_id, ['building_ids' => [$buildingToDelete]])->delay($time);
@@ -225,33 +231,17 @@ class CancelBuildingRequestService {
             'character_id' => $character->id,
             'capital_city_building_queue_id' => $queue->id,
             'status' => CapitalCityQueueStatus::TRAVELING,
+            'request_kingdom_id' => $queue->requested_kingdom,
+            'travel_time_completed_at' => $time,
         ], $buildingIds);
 
         foreach ($cancellationData as $data) {
+
             $capitalCityBuildingCancellation = CapitalCityBuildingCancellation::create($data);
 
             CapitalCityBuildingRequestCancellationMovement::dispatch($capitalCityBuildingCancellation->id, $queue->id, $queue->character_id, ['building_ids' => $buildingIds])->delay($time);
+
             event(new UpdateCapitalCityBuildingQueueTable($character->refresh(), $kingdom));
         }
-    }
-
-    /**
-     * Create a success result.
-     *
-     * @param array $data
-     * @return array
-     */
-    private function successResult(array $data): array {
-        return array_merge(['status' => 'success'], $data);
-    }
-
-    /**
-     * Create an error result.
-     *
-     * @param string $message
-     * @return string[]
-     */
-    private function errorResult(string $message): array {
-        return ['status' => 'error', 'message' => $message];
     }
 }

@@ -17,6 +17,7 @@ class CapitalCityBuildingCancellation extends Model
         'capital_city_building_queue_id',
         'status',
         'travel_time_completed_at',
+        'request_kingdom_id',
     ];
 
     protected $casts = [

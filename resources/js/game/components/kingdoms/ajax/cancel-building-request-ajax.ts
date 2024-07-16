@@ -26,16 +26,18 @@ export default class CancelBuildingRequestAjax {
                     kingdomId,
             )
             .setParameters({
-                delete_queue: deleteWholeQueue,
-                building_id: buildingId,
-                capital_city_building_queue_id: queueId,
+                request_data: {
+                    delete_queue: deleteWholeQueue,
+                    building_id: buildingId,
+                    capital_city_building_queue_id: queueId,
+                },
             })
             .doAjaxCall(
-                "get",
+                "post",
                 (result: AxiosResponse) => {
                     component.setState({
                         loading: false,
-                        success_message: result.data.success_message,
+                        success_message: result.data.message,
                     });
                 },
                 (error: AxiosError) => {

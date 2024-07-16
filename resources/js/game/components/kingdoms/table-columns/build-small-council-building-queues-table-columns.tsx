@@ -71,7 +71,8 @@ export const buildSmallCouncilBuildingsQueuesTableColumns = (
                                         component.state.view_port < 800
                                     }
                                 />
-                                {row.time_left_seconds > 0 ? (
+                                {row.time_left_seconds > 0 &&
+                                showCancellationButton(row, component) ? (
                                     <div className="mb-2 mt-4">
                                         <button
                                             className={
@@ -84,16 +85,6 @@ export const buildSmallCouncilBuildingsQueuesTableColumns = (
                                                 component.manageCancelModal(
                                                     row.building_id,
                                                 )
-                                            }
-                                            disabled={
-                                                row.secondary_status ===
-                                                    "cancelled" ||
-                                                row.secondary_status ===
-                                                    "requesting" ||
-                                                row.secondary_status ===
-                                                    "finished" ||
-                                                row.secondary_status ===
-                                                    "rejected"
                                             }
                                         >
                                             Cancel
@@ -127,4 +118,41 @@ const buildTimerTitle = (row: any): string => {
     }
 
     return "UNKNOWN";
+};
+
+const showCancellationButton = (row: any, component: any): boolean => {
+    if (row.secondary_status === "cancelled") {
+        return false;
+    }
+
+    if (row.secondary_status === "requesting") {
+        return false;
+    }
+
+    if (row.secondary_status === "finished") {
+        return false;
+    }
+
+    if (row.secondary_status === "rejected") {
+        return false;
+    }
+
+    console.log(
+        row.time_left_seconds,
+        component.state.building_queues.filter((queueData: any) => {
+            return (
+                queueData.building_id === row.building_id &&
+                row.is_cancel_request
+            );
+        }).length,
+    );
+
+    return (
+        component.state.building_queues.filter((queueData: any) => {
+            return (
+                queueData.building_id === row.building_id &&
+                row.is_cancel_request
+            );
+        }).length === 0
+    );
 };

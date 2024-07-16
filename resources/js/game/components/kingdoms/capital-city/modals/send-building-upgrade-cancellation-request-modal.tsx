@@ -40,7 +40,7 @@ export default class SendBuildingUpgradeCancellationRequestModal extends React.C
                     this,
                     this.props.character_id,
                     this.props.queue_data.kingdom_id,
-                    this.props.queue_datata.queue_id,
+                    this.props.queue_data.queue_id,
                     deleteQueue,
                     buildingId,
                 );
@@ -60,7 +60,11 @@ export default class SendBuildingUpgradeCancellationRequestModal extends React.C
                         this.state.loading ||
                         this.state.success_message !== null,
                     secondary_button_label: "Cancel just this building",
-                    handle_action: this.sendRequest.bind(this),
+                    handle_action: () =>
+                        this.sendRequest(
+                            false,
+                            this.props.queue_data.building_id,
+                        ),
                 }}
             >
                 <div className="overflow-y-auto max-h-[450px]">
@@ -73,7 +77,7 @@ export default class SendBuildingUpgradeCancellationRequestModal extends React.C
                             button_label={
                                 "Cancel Entire Queue For This Kingdom"
                             }
-                            on_click={this.sendRequest.bind(this)}
+                            on_click={() => this.sendRequest(true)}
                         />
                     </div>
 

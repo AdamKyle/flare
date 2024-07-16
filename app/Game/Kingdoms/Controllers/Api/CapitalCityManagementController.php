@@ -94,6 +94,11 @@ class CapitalCityManagementController extends Controller {
     }
 
     public function cancelBuildingOrdersOrders(CancelBuildingUpgradeRequestRequest $request, Character $character, Kingdom $kingdom) {
-        $this->cancelBuildingRequestService->handleCancelRequest($character, $kingdom, $request->all());
+        $result = $this->cancelBuildingRequestService->handleCancelRequest($character, $kingdom, $request->all()['request_data']);
+
+        $status = $result['status'];
+        unset($result['status']);
+
+        return response()->json($result, $status);
     }
 }
