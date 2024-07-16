@@ -183,14 +183,13 @@ class CapitalCityManagementService
             foreach ($buildingRequestData as $data) {
                 if (in_array($data['secondary_status'], [
                     CapitalCityQueueStatus::RECRUITING,
-                    CapitalCityQueueStatus::REQUESTING,
                 ])) {
                     $buildingIds[] = $data['building_id'];
                 }
             }
 
             if (empty($buildingIds)) {
-                return $this->errorResult('Nothing to cancel for this queue. Maybe it\'s done?');
+                return $this->errorResult('Nothing to cancel for this queue. Maybe it\'s done or are we currently requesting resources?');
             }
 
             CapitalCityBuildingRequestCancellationMovement::dispatch($capitalCityBuildingQueue->id, $capitalCityBuildingQueue->character_id, [

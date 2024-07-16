@@ -2,6 +2,7 @@
 
 namespace App\Game\Kingdoms\Controllers\Api;
 
+use Exception;
 use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
 use App\Flare\Models\Character;
@@ -42,7 +43,7 @@ class KingdomTreasuryController extends Controller {
      * @param KingdomEmbezzleRequest $request
      * @param Kingdom $kingdom
      * @return JsonResponse
-     * @throws \Exception
+     * @throws Exception
      */
     public function embezzle(KingdomEmbezzleRequest $request, Kingdom $kingdom): JsonResponse
     {

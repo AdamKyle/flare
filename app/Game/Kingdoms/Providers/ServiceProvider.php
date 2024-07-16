@@ -13,6 +13,7 @@ use App\Game\Kingdoms\Handlers\KingdomSiegeHandler;
 use App\Game\Kingdoms\Handlers\KingdomUnitHandler;
 use App\Game\Kingdoms\Handlers\ReturnSurvivingUnitHandler;
 use App\Game\Kingdoms\Handlers\SettlerHandler;
+use App\Game\Kingdoms\Service\CancelBuildingRequestService;
 use App\Game\Kingdoms\Service\CapitalCityBuildingManagement;
 use App\Game\Kingdoms\Service\CapitalCityManagementService;
 use App\Game\Kingdoms\Service\CapitalCityUnitManagement;
@@ -92,6 +93,12 @@ class ServiceProvider extends ApplicationServiceProvider {
                 $app->make(UnitMovementService::class),
                 $app->make(ResourceTransferService::class),
                 $app->make(UpdateKingdom::class),
+            );
+        });
+
+        $this->app->bind(CancelBuildingRequestService::class, function($app) {
+            return new CancelBuildingRequestService(
+                $app->make(UnitMovementService::class)
             );
         });
 

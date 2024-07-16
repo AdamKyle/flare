@@ -21,11 +21,16 @@ class CapitalCityBuildingRequestCancellationMovement implements ShouldQueue {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     /**
+     * @param int $capitalCityCancellationQueueId
      * @param int $capitalCityQueueId
      * @param int $characterId
      * @param array $dataForCancellation
      */
-    public function __construct(private readonly int $capitalCityQueueId, private readonly int $characterId, private readonly array $dataForCancellation) {}
+    public function __construct(private readonly int $capitalCityCancellationQueueId,
+                                private readonly int $capitalCityQueueId,
+                                private readonly int $characterId,
+                                private readonly array $dataForCancellation
+    ) {}
 
     /**
      * @param CapitalCityBuildingManagement $capitalCityBuildingManagement

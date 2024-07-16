@@ -8,13 +8,16 @@ use App\Game\Kingdoms\Requests\BuildingUpgradeRequestsRequest;
 use App\Game\Kingdoms\Requests\CancelBuildingUpgradeRequestRequest;
 use App\Game\Kingdoms\Requests\RecruitUnitCancellationRequest;
 use App\Game\Kingdoms\Requests\RecruitUnitRequestsRequest;
+use App\Game\Kingdoms\Service\CancelBuildingRequestService;
 use App\Game\Kingdoms\Service\CapitalCityManagementService;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 
 class CapitalCityManagementController extends Controller {
 
-    public function __construct(private readonly CapitalCityManagementService $capitalCityManagementService) {}
+    public function __construct(private readonly CapitalCityManagementService $capitalCityManagementService,
+                                private readonly CancelBuildingRequestService $cancelBuildingRequestService
+    ) {}
 
     public function makeCapitalCity(Kingdom $kingdom, Character $character): JsonResponse {
         $result = $this->capitalCityManagementService->makeCapitalCity($kingdom);
@@ -91,6 +94,6 @@ class CapitalCityManagementController extends Controller {
     }
 
     public function cancelBuildingOrdersOrders(CancelBuildingUpgradeRequestRequest $request, Character $character, Kingdom $kingdom) {
-
+        $this->cancelBuildingRequestService->handleCancelRequest($character, $kingdom, $request->all());
     }
 }
