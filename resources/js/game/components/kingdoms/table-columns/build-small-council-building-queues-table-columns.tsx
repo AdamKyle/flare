@@ -56,7 +56,8 @@ export const buildSmallCouncilBuildingsQueuesTableColumns = (
                 <Fragment>
                     <div className="w-full mt-2">
                         {row.secondary_status === "finished" ||
-                        row.secondary_status === "rejected" ? (
+                        row.secondary_status === "rejected"  ||
+                        row.secondary_status === "cancelled" ? (
                             <p>
                                 No time remaining. Log will be generated when
                                 other requests for this kingdom are done.
@@ -83,6 +84,12 @@ export const buildSmallCouncilBuildingsQueuesTableColumns = (
                                                 component.manageCancelModal(
                                                     row.building_id,
                                                 )
+                                            }
+                                            disabled={
+                                                row.secondary_status === "cancelled" ||
+                                                row.secondary_status === "requesting" ||
+                                                row.secondary_status === "finished" ||
+                                                row.secondary_status === "rejected"
                                             }
                                         >
                                             Cancel

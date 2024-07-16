@@ -156,7 +156,7 @@ class CancelBuildingRequestService {
             'status' => CapitalCityQueueStatus::TRAVELING
         ]);
 
-        CapitalCityBuildingRequestCancellationMovement::dispatch($queue->id, $queue->character_id, ['building_ids' => [$buildingToDelete]])->delay($time);
+        CapitalCityBuildingRequestCancellationMovement::dispatch($capitalCityBuildingCancellation->id, $queue->id, $queue->character_id, ['building_ids' => [$buildingToDelete]])->delay($time);
 
         event(new UpdateCapitalCityBuildingQueueTable($character->refresh(), $kingdom));
 
