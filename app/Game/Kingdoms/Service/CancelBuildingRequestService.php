@@ -223,7 +223,8 @@ class CancelBuildingRequestService {
             'building_id' => $id,
             'kingdom_id' => $kingdom->id,
             'character_id' => $character->id,
-            'capital_city_building_queue_id' => $queue->id
+            'capital_city_building_queue_id' => $queue->id,
+            'status' => CapitalCityQueueStatus::TRAVELING,
         ], $buildingIds);
 
         foreach ($cancellationData as $data) {

@@ -16,6 +16,11 @@ class CapitalCityBuildingCancellation extends Model
         'character_id',
         'capital_city_building_queue_id',
         'status',
+        'travel_time_completed_at',
+    ];
+
+    protected $casts = [
+        'travel_time_completed_at' => 'datetime',
     ];
 
     public function building(): HasOne {

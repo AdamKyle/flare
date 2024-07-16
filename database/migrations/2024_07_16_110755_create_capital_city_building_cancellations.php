@@ -19,6 +19,7 @@ return new class extends Migration
             $table->unsignedBigInteger('request_kingdom_id');
             $table->unsignedBigInteger('character_id');
             $table->unsignedBigInteger('capital_city_building_queue_id');
+            $table->dateTime('travel_time_completed_at')->nullable();
             $table->timestamps();
         });
     }

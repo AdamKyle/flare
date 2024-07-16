@@ -32,7 +32,7 @@ class UpdateCapitalCityBuildingQueueTable implements ShouldBroadcastNow {
      * Create a new event instance.
      *
      * @param Character $character
-     * @param Kingdom $kingdom
+     * @param Kingdom|null $kingdom
      */
     public function __construct(Character $character, Kingdom $kingdom = null) {
 

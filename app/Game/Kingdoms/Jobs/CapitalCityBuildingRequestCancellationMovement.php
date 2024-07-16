@@ -55,6 +55,8 @@ class CapitalCityBuildingRequestCancellationMovement implements ShouldQueue
             return;
         }
 
+        CapitalCityBuildingQueue::where('id', $this->capitalCityQueueId)->update(['status' => CapitalCityQueueStatus::PROCESSING]);
+
         $responseData = $this->processCancellations($queueData, $kingdomBuildingService);
         $this->updateQueueData($queueData, $responseData);
 
