@@ -129,9 +129,8 @@ class CancelBuildingRequestService {
             return $this->errorResult('Nothing to cancel for this queue. Maybe it\'s done or are we currently requesting resources?');
         }
 
-        $this->storeCancellationData($buildingIds, $kingdom, $character, $queue);
-        CapitalCityBuildingRequestCancellationMovement::dispatch($queue->id, $queue->character_id, ['building_ids' => $buildingIds])->delay($time);
-        event(new UpdateCapitalCityBuildingQueueTable($character->refresh(), $kingdom));
+        $this->storeCancellationData($buildingIds, $kingdom, $character, $queue, $time);
+
 
         return $this->successResult(['message' => 'Request cancellation for all buildings has been sent off. You can see this in the building queue table.']);
     }
@@ -216,9 +215,10 @@ class CancelBuildingRequestService {
      * @param Kingdom $kingdom
      * @param Character $character
      * @param CapitalCityBuildingQueue $queue
+     * @param Carbon $time
      * @return void
      */
-    private function storeCancellationData(array $buildingIds, Kingdom $kingdom, Character $character, CapitalCityBuildingQueue $queue): void {
+    private function storeCancellationData(array $buildingIds, Kingdom $kingdom, Character $character, CapitalCityBuildingQueue $queue, Carbon $time): void {
         $cancellationData = array_map(fn($id) => [
             'building_id' => $id,
             'kingdom_id' => $kingdom->id,
@@ -227,7 +227,10 @@ class CancelBuildingRequestService {
         ], $buildingIds);
 
         foreach ($cancellationData as $data) {
-            CapitalCityBuildingCancellation::create($data);
+            $capitalCityBuildingCancellation = CapitalCityBuildingCancellation::create($data);
+
+            CapitalCityBuildingRequestCancellationMovement::dispatch($capitalCityBuildingCancellation->id, $queue->id, $queue->character_id, ['building_ids' => $buildingIds])->delay($time);
+            event(new UpdateCapitalCityBuildingQueueTable($character->refresh(), $kingdom));
         }
     }
 
