@@ -3,6 +3,7 @@
 namespace App\Game\Kingdoms\Jobs;
 
 use App\Flare\Models\CapitalCityBuildingQueue;
+use App\Game\Kingdoms\Events\UpdateCapitalCityBuildingQueueTable;
 use App\Game\Kingdoms\Service\CapitalCityBuildingManagement;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use Exception;
@@ -174,7 +175,7 @@ class UpgradeBuilding implements ShouldQueue {
             $capitalCityQueue = CapitalCityBuildingQueue::where('id', $this->capitalCityQueueId)->where('kingdom_id', $building->kingdom_id)->first();
 
             if (is_null($capitalCityQueue)) {
-                throw new Exception('Capital City Queue is Null: ', $this->capitalCityQueueId, $building->kingdom_id);
+                throw new Exception('Capital City Queue is Null: Building Id: '  . $this->capitalCityQueueId . ' Kingdom Id: ' . $building->kingdom_id);
             }
 
             $buildingRequestData = $capitalCityQueue->building_request_data;
@@ -191,6 +192,8 @@ class UpgradeBuilding implements ShouldQueue {
             ]);
 
             $capitalCityQueue = $capitalCityQueue->refresh();
+
+            event(new UpdateCapitalCityBuildingQueueTable($capitalCityQueue->character));
 
             $capitalCityBuildingManagement->possiblyCreateLogForQueue($capitalCityQueue);
         }

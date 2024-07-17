@@ -210,6 +210,11 @@ class CapitalCityManagementService
             }
         }
 
+        dump(
+            $data,
+            $this->fetchBuildingCancellationQueueData($character)
+        );
+
         return array_values(collect(array_merge($this->fetchBuildingCancellationQueueData($character), $data))->sortByDesc('time_left_seconds')->sortByDesc('is_cancel_request')->toArray());
     }
 
@@ -248,6 +253,10 @@ class CapitalCityManagementService
                     $gameUnit = GameUnit::where('name', $unitRequest['name'])->first();
 
                     $unitInQueue = UnitInQueue::where('game_unit_id', $gameUnit->id)->where('kingdom_id', $kingdom->id)->first();
+
+                    if (is_null($unitInQueue)) {
+                        continue;
+                    }
 
                     $end = Carbon::parse($unitInQueue->completed_at)->timestamp;
                     $current = Carbon::now()->timestamp;

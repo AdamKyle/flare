@@ -105,14 +105,14 @@ class CancelBuildingRequestService {
         if ($deleteQueue) {
             $queue->delete();
 
-            event(new UpdateCapitalCityBuildingQueueTable($character->refresh(), $kingdom));
+            event(new UpdateCapitalCityBuildingQueueTable($character));
 
             return $this->successResult(['message' => 'All orders have been canceled.']);
         }
 
         $this->updateBuildingRequestData($queue, $buildingToDelete);
         $deleted = $this->possiblyDeleteBuildingQueue($queue->refresh());
-        event(new UpdateCapitalCityBuildingQueueTable($character->refresh(), $kingdom));
+        event(new UpdateCapitalCityBuildingQueueTable($character));
 
         $message = $deleted ? 'The last of your orders has been canceled.' : 'The selected building has been stricken from the request.';
         return $this->successResult(['message' => $message]);
@@ -165,7 +165,7 @@ class CancelBuildingRequestService {
 
         CapitalCityBuildingRequestCancellationMovement::dispatch($capitalCityBuildingCancellation->id, $queue->id, $queue->character_id, ['building_ids' => [$buildingToDelete]])->delay($time);
 
-        event(new UpdateCapitalCityBuildingQueueTable($character->refresh(), $kingdom));
+        event(new UpdateCapitalCityBuildingQueueTable($character));
 
         return $this->successResult(['message' => 'Request cancellation for the specified building has been sent off. You can see this in the building queue table.']);
     }
@@ -243,7 +243,7 @@ class CancelBuildingRequestService {
 
             CapitalCityBuildingRequestCancellationMovement::dispatch($capitalCityBuildingCancellation->id, $queue->id, $queue->character_id, ['building_ids' => $buildingIds])->delay($time);
 
-            event(new UpdateCapitalCityBuildingQueueTable($character->refresh(), $kingdom));
+            event(new UpdateCapitalCityBuildingQueueTable($character));
         }
     }
 }

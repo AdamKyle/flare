@@ -3,7 +3,6 @@
 namespace App\Game\Kingdoms\Jobs;
 
 use App\Flare\Models\CapitalCityBuildingCancellation;
-use App\Flare\Models\KingdomBuilding;
 use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -17,7 +16,7 @@ use App\Game\Kingdoms\Service\CapitalCityBuildingManagement;
 use App\Game\Kingdoms\Service\KingdomBuildingService;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 
-class CapitalCityBuildingRequestCancellationMovement implements ShouldQueue
+class CapitalCityUnitRequestCancellationMovement implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -52,7 +51,7 @@ class CapitalCityBuildingRequestCancellationMovement implements ShouldQueue
 
             CapitalCityBuildingQueue::where('id', $this->capitalCityCancellationQueueId)->update(['status' => CapitalCityQueueStatus::CANCELLATION_REJECTED]);
 
-            event(new UpdateCapitalCityBuildingQueueTable($queueData->character));
+            event(new UpdateCapitalCityBuildingQueueTable($queueData->character, $queueData->requestedKingdom));
 
             return;
         }
@@ -64,14 +63,9 @@ class CapitalCityBuildingRequestCancellationMovement implements ShouldQueue
         CapitalCityBuildingQueue::where('id', $this->capitalCityQueueId)->update(['status' => CapitalCityQueueStatus::PROCESSING]);
 
         $responseData = $this->processCancellations($queueData, $kingdomBuildingService);
-
-        if (empty($responseData)) {
-            return;
-        }
-
         $this->updateQueueData($queueData, $responseData);
 
-        event(new UpdateCapitalCityBuildingQueueTable($queueData->character));
+        event(new UpdateCapitalCityBuildingQueueTable($queueData->character, $queueData->requestingKingdom));
         $capitalCityBuildingManagement->possiblyCreateLogForQueue($queueData);
 
         $this->cleanupCancellationRecords($responseData);
@@ -92,7 +86,7 @@ class CapitalCityBuildingRequestCancellationMovement implements ShouldQueue
                 $time = now()->addMinutes($timeLeft <= 15 ? $timeLeft : 15);
 
                 // @codeCoverageIgnoreStart
-                CapitalCityBuildingRequestCancellationMovement::dispatch(
+                CapitalCityUnitRequestCancellationMovement::dispatch(
                     $this->capitalCityQueueId,
                     $this->characterId
                 )->delay($time);
@@ -115,30 +109,19 @@ class CapitalCityBuildingRequestCancellationMovement implements ShouldQueue
      */
     private function processCancellations(CapitalCityBuildingQueue $queueData, KingdomBuildingService $kingdomBuildingService): array
     {
-        $character = $queueData->character;
-        $queueDataMessages = $queueData->messages;
-
-
-        return collect($this->dataForCancellation['building_ids'])->map(function ($buildingId) use ($kingdomBuildingService, $queueData, $character, $queueDataMessages) {
+        return collect($this->dataForCancellation['building_ids'])->map(function ($buildingId) use ($kingdomBuildingService, $queueData) {
             $buildingInQueue = BuildingInQueue::where('kingdom_id', $queueData->kingdom_id)
                 ->where('character_id', $this->characterId)
                 ->where('building_id', $buildingId)
                 ->first();
 
-            $building = KingdomBuilding::find($buildingId);
-
-
             if (is_null($buildingInQueue)) {
 
                 CapitalCityBuildingQueue::where('id', $this->capitalCityCancellationQueueId)->update(['status' => CapitalCityQueueStatus::CANCELLATION_REJECTED]);
 
-                event(new UpdateCapitalCityBuildingQueueTable($character));
+                event(new UpdateCapitalCityBuildingQueueTable($queueData->character, $queueData->requestingKingdom));
 
-                $queueDataMessages[] = 'Failed to cancel the request for building: ' . $building->name . '. The building finished before the cancellation could arrive.';
-
-                $queueData->update(['messages' => $queueDataMessages]);
-
-                return [];
+                throw new Exception('No building queue data found for building: ' . $buildingId . ' for kingdom ' .  $queueData->kingdom_id);
             }
 
             $result = $kingdomBuildingService->cancelKingdomBuildingUpgrade($buildingInQueue);
@@ -190,18 +173,12 @@ class CapitalCityBuildingRequestCancellationMovement implements ShouldQueue
      */
     private function cleanupCancellationRecords(array $responseData): void
     {
-        $capitalCityBuildingCancellationQueue = CapitalCityBuildingCancellation::where('id', $this->capitalCityCancellationQueueId)->first();
-
-        $character = $capitalCityBuildingCancellationQueue->character;
-
         foreach ($responseData as $response) {
             if ($response['status'] === CapitalCityQueueStatus::CANCELLED) {
-                $capitalCityBuildingCancellationQueue->delete();
+                CapitalCityBuildingCancellation::where('id', $this->capitalCityCancellationQueueId)->delete();
             } elseif ($response['status'] === CapitalCityQueueStatus::CANCELLATION_REJECTED) {
-                $capitalCityBuildingCancellationQueue->update(['status' => CapitalCityQueueStatus::CANCELLATION_REJECTED]);
+                CapitalCityBuildingQueue::where('id', $this->capitalCityQueueId)->update(['status' => CapitalCityQueueStatus::CANCELLATION_REJECTED]);
             }
-
-            event(new UpdateCapitalCityBuildingQueueTable($character));
         }
     }
 }
