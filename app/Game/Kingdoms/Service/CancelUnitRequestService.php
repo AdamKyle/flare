@@ -2,6 +2,7 @@
 
 namespace App\Game\Kingdoms\Service;
 
+use App\Flare\Models\GameUnit;
 use App\Game\Core\Traits\ResponseBuilder;
 use Carbon\Carbon;
 use App\Flare\Models\CapitalCityUnitQueue;
@@ -105,14 +106,14 @@ class CancelUnitRequestService {
         if ($deleteQueue) {
             $queue->delete();
 
-            event(new UpdateCapitalCityUnitQueueTable($character->refresh(), $kingdom));
+            event(new UpdateCapitalCityUnitQueueTable($character));
 
             return $this->successResult(['message' => 'All orders have been canceled.']);
         }
 
         $this->updateUnitRequestData($queue, $unitToDelete);
         $deleted = $this->possiblyDeleteUnitQueue($queue->refresh());
-        event(new UpdateCapitalCityUnitQueueTable($character->refresh(), $kingdom));
+        event(new UpdateCapitalCityUnitQueueTable($character));
 
         $message = $deleted ? 'The last of your orders has been canceled.' : 'The selected unit has been stricken from the request.';
         return $this->successResult(['message' => $message]);
@@ -164,7 +165,7 @@ class CancelUnitRequestService {
 
         CapitalCityUnitRequestCancellationMovement::dispatch($capitalCityUnitCancellation->id, $queue->id, $queue->character_id, ['unit_ids' => [$unitToDelete]])->delay($time);
 
-        event(new UpdateCapitalCityUnitQueueTable($character->refresh(), $kingdom));
+        event(new UpdateCapitalCityUnitQueueTable($character));
 
         return $this->successResult(['message' => 'Request cancellation for the specified unit has been sent off. You can see this in the unit queue table.']);
     }
@@ -178,8 +179,11 @@ class CancelUnitRequestService {
      */
     private function updateUnitRequestData(CapitalCityUnitQueue $queue, ?int $unitToDelete): void {
         $unitRequestData = $queue->unit_request_data;
+
         foreach ($unitRequestData as $index => $data) {
-            if ($data['unit_id'] === $unitToDelete) {
+            $gameUnit = GameUnit::where('name', $data['name'])->first();
+
+            if ($gameUnit->id === $unitToDelete) {
                 $unitRequestData[$index]['secondary_status'] = CapitalCityQueueStatus::CANCELLED;
                 break;
             }
@@ -212,7 +216,11 @@ class CancelUnitRequestService {
      * @return array
      */
     private function getUnitIdsForCancellation(CapitalCityUnitQueue $queue): array {
-        return array_column(array_filter($queue->unit_request_data, fn($data) => $data['secondary_status'] === CapitalCityQueueStatus::BUILDING || $data['secondary_status'] === CapitalCityQueueStatus::REPAIRING), 'unit_id');
+        $names = array_column(array_filter($queue->unit_request_data, fn($data) => $data['secondary_status'] === CapitalCityQueueStatus::RECRUITING), 'name');
+
+        $gameUnitIds = GameUnit::whereIn('name', $names)->pluck('id')->toarray();
+
+        return $gameUnitIds;
     }
 
     /**
@@ -242,7 +250,7 @@ class CancelUnitRequestService {
 
             CapitalCityUnitRequestCancellationMovement::dispatch($capitalCityUnitCancellation->id, $queue->id, $queue->character_id, ['unit_ids' => $unitIds])->delay($time);
 
-            event(new UpdateCapitalCityUnitQueueTable($character->refresh(), $kingdom));
+            event(new UpdateCapitalCityUnitQueueTable($character));
         }
     }
 }

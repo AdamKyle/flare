@@ -2,10 +2,7 @@ import React from "react";
 import WarningAlert from "../../../../ui/alerts/simple-alerts/warning-alert";
 import { capitalize } from "lodash";
 
-export default class BuildingCancellationSection extends React.Component<
-    any,
-    any
-> {
+export default class UnitCancellationSection extends React.Component<any, any> {
     constructor(props: any) {
         super(props);
     }
@@ -24,17 +21,17 @@ export default class BuildingCancellationSection extends React.Component<
                 <p className="my-2">
                     Are you sure you want to do this? Below you will find some
                     data about your current request status. You are currently
-                    asking to cancel: {this.props.queue_data.building_name}{" "}
-                    request. However, you may request all orders of this queue
-                    be canceled. If so, click the button below entitled: "Cancel
+                    asking to cancel: {this.props.queue_data.unit_name} request.
+                    However, you may request all orders of this queue be
+                    canceled. If so, click the button below entitled: "Cancel
                     Entire Queue For This Kingdom."
                 </p>
                 <p className="my-2">
-                    Should your request status be with in building then we will
-                    have to send the request to the kingdom, which may result in
-                    the request being completed before the request to cancel
-                    gets there. Traveling, will just cancel the current request
-                    - be it the building selected or the entire request.
+                    Should your request status be with in Recruiting then we
+                    will have to send the request to the kingdom, which may
+                    result in the request being completed before the request to
+                    cancel gets there. Traveling, will just cancel the current
+                    request - be it the building selected or the entire request.
                 </p>
                 <dl>
                     <dt>Building Name</dt>

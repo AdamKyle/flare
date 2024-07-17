@@ -195,7 +195,7 @@ class ReBalanceMonsters extends Command
             ->whereNull('only_for_location_type')
             ->get();
 
-        $this->manageMonsters($monsters, $exponentialAttributeCurve, 8000000000000, 10000000000000, 1000000000000, 500000000000, $gameMap->name, true);
+        $this->manageMonsters($monsters, $exponentialAttributeCurve, 5000000000000000, 10000000000000000, 10000000000000, 50000000000000, $gameMap->name, true);
 
 
         // Ice Plane Raid Monsters
@@ -219,7 +219,7 @@ class ReBalanceMonsters extends Command
             ->whereNull('only_for_location_type')
             ->get();
 
-        $this->manageMonsters($monsters, $exponentialAttributeCurve, 14000000000000, 15000000000000, 1000000000000, 500000000000, $gameMap->name, true);
+        $this->manageMonsters($monsters, $exponentialAttributeCurve, 15000000000000000, 30000000000000000, 10000000000000, 50000000000000, $gameMap->name, true);
 
 
         // Delusional Memories Raid Monsters:
@@ -242,7 +242,7 @@ class ReBalanceMonsters extends Command
             ->whereNull('only_for_location_type')
             ->get();
 
-        $this->manageMonsters($monsters, $exponentialAttributeCurve, 32000000000000, 36000000000000, 1000000000000, 500000000000, $gameMap->name, true);
+        $this->manageMonsters($monsters, $exponentialAttributeCurve, 30000000000000000, 60000000000000000, 10000000000000, 50000000000000, $gameMap->name, true);
     }
 
     protected function manageMonsters(Collection $monsters, ExponentialAttributeCurve $exponentialAttributeCurve, int $min, int $max, int $increase, int $range, string $mapName, bool $isSpecialMonster = false): void {

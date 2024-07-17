@@ -53,10 +53,15 @@ export default class UpgradeHelpSection extends React.Component<any, any> {
                     the building.
                 </p>
 
+                <p className="my-2">
+                    <strong>Repairing</strong>, means the kingdom is repairing
+                    the building.
+                </p>
+
                 <WarningAlert>
                     The only time you can cancel this process is: Traveling,
-                    Requesting Resources or Building, you will see these options
-                    when you viewing the building request queue.
+                    Building or Repairing. You will see these options when you
+                    viewing the building request queue.
                 </WarningAlert>
             </div>
         );

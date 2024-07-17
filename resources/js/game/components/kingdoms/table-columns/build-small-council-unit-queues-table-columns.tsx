@@ -62,7 +62,8 @@ export const buildSmallCouncilUnitQueuesTableColumns = (
                             time_out_label={getTimerTitle(row)}
                             useSmallTimer={component.state.view_port < 800}
                         />
-                        {row.time_left_seconds > 0 ? (
+                        {row.time_left_seconds > 0 &&
+                        showCancellationButton(row, component) ? (
                             <div className="mb-2 mt-4">
                                 <button
                                     className={
@@ -72,10 +73,13 @@ export const buildSmallCouncilUnitQueuesTableColumns = (
                                         "focus-visible:ring-opacity-75"
                                     }
                                     onClick={() =>
-                                        console.log("cancel the travel")
+                                        component.manageCancelModal(
+                                            row.unit_id,
+                                            row.kingdom_id,
+                                        )
                                     }
                                 >
-                                    {getCancelTimerTitle(row)}
+                                    Cancel
                                 </button>
                             </div>
                         ) : null}
@@ -102,18 +106,30 @@ const getTimerTitle = (row: any): string => {
     return "UNKNOWN";
 };
 
-const getCancelTimerTitle = (row: any): string => {
-    if (row.status === "traveling") {
-        return "Cancel traveling";
-    }
-
-    if (row.secondary_status === "recruiting") {
-        return "Cancel recruiting";
+const showCancellationButton = (row: any, component: any): boolean => {
+    if (row.secondary_status === "cancelled") {
+        return false;
     }
 
     if (row.secondary_status === "requesting") {
-        return "Cancel requesting";
+        return false;
     }
 
-    return "UNKNOWN";
+    if (row.secondary_status === "finished") {
+        return false;
+    }
+
+    if (row.secondary_status === "rejected") {
+        return false;
+    }
+
+    return (
+        component.state.unit_queues.filter((queueData: any) => {
+            return (
+                queueData.unit_id === row.unit_id &&
+                queueData.is_cancel_request &&
+                queueData.kingdom_id === row.kingdom_id
+            );
+        }).length === 0
+    );
 };

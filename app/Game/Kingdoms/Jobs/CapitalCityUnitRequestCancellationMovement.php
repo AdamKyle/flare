@@ -2,18 +2,18 @@
 
 namespace App\Game\Kingdoms\Jobs;
 
-use App\Flare\Models\CapitalCityBuildingCancellation;
+use App\Flare\Models\UnitInQueue;
+use App\Game\Kingdoms\Service\CapitalCityUnitManagement;
+use App\Game\Kingdoms\Service\UnitService;
 use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use App\Flare\Models\BuildingInQueue;
-use App\Flare\Models\CapitalCityBuildingQueue;
-use App\Game\Kingdoms\Events\UpdateCapitalCityBuildingQueueTable;
-use App\Game\Kingdoms\Service\CapitalCityBuildingManagement;
-use App\Game\Kingdoms\Service\KingdomBuildingService;
+use App\Flare\Models\CapitalCityUnitCancellation;
+use App\Flare\Models\CapitalCityUnitQueue;
+use App\Game\Kingdoms\Events\UpdateCapitalCityUnitQueueTable;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 
 class CapitalCityUnitRequestCancellationMovement implements ShouldQueue
@@ -36,22 +36,22 @@ class CapitalCityUnitRequestCancellationMovement implements ShouldQueue
     /**
      * Handle the job.
      *
-     * @param CapitalCityBuildingManagement $capitalCityBuildingManagement
-     * @param KingdomBuildingService $kingdomBuildingService
+     * @param CapitalCityUnitManagement $capitalCityUnitManagement
+     * @param UnitService $unitService
      * @return void
      * @throws Exception
      */
     public function handle(
-        CapitalCityBuildingManagement $capitalCityBuildingManagement,
-        KingdomBuildingService $kingdomBuildingService
+        CapitalCityUnitManagement $capitalCityUnitManagement,
+        UnitService $unitService
     ): void {
-        $queueData = CapitalCityBuildingQueue::find($this->capitalCityQueueId);
+        $queueData = CapitalCityUnitQueue::find($this->capitalCityQueueId);
 
         if (is_null($queueData)) {
 
-            CapitalCityBuildingQueue::where('id', $this->capitalCityCancellationQueueId)->update(['status' => CapitalCityQueueStatus::CANCELLATION_REJECTED]);
+            CapitalCityUnitQueue::where('id', $this->capitalCityCancellationQueueId)->update(['status' => CapitalCityQueueStatus::CANCELLATION_REJECTED]);
 
-            event(new UpdateCapitalCityBuildingQueueTable($queueData->character, $queueData->requestedKingdom));
+            event(new UpdateCapitalCityUnitQueueTable($queueData->character));
 
             return;
         }
@@ -60,13 +60,18 @@ class CapitalCityUnitRequestCancellationMovement implements ShouldQueue
             return;
         }
 
-        CapitalCityBuildingQueue::where('id', $this->capitalCityQueueId)->update(['status' => CapitalCityQueueStatus::PROCESSING]);
+        CapitalCityUnitQueue::where('id', $this->capitalCityQueueId)->update(['status' => CapitalCityQueueStatus::PROCESSING]);
 
-        $responseData = $this->processCancellations($queueData, $kingdomBuildingService);
+        $responseData = $this->processCancellations($queueData, $unitService);
+
+        if (empty($responseData)) {
+            return;
+        }
+
         $this->updateQueueData($queueData, $responseData);
 
-        event(new UpdateCapitalCityBuildingQueueTable($queueData->character, $queueData->requestingKingdom));
-        $capitalCityBuildingManagement->possiblyCreateLogForQueue($queueData);
+        event(new UpdateCapitalCityUnitQueueTable($queueData->character));
+        $capitalCityUnitManagement->possiblyCreateKingdomLog($queueData);
 
         $this->cleanupCancellationRecords($responseData);
     }
@@ -74,10 +79,10 @@ class CapitalCityUnitRequestCancellationMovement implements ShouldQueue
     /**
      * Determine if the cancellation should be delayed.
      *
-     * @param CapitalCityBuildingQueue $queueData
+     * @param CapitalCityUnitQueue $queueData
      * @return bool
      */
-    private function shouldDelayCancellation(CapitalCityBuildingQueue $queueData): bool
+    private function shouldDelayCancellation(CapitalCityUnitQueue $queueData): bool
     {
         if (!$queueData->completed_at->lessThanOrEqualTo(now())) {
             $timeLeft = $queueData->completed_at->diffInMinutes(now());
@@ -102,32 +107,38 @@ class CapitalCityUnitRequestCancellationMovement implements ShouldQueue
     /**
      * Process the cancellations for the buildings in the queue.
      *
-     * @param CapitalCityBuildingQueue $queueData
-     * @param KingdomBuildingService $kingdomBuildingService
+     * @param CapitalCityUnitQueue $queueData
+     * @param UnitService $unitService
      * @return array
-     * @throws Exception
      */
-    private function processCancellations(CapitalCityBuildingQueue $queueData, KingdomBuildingService $kingdomBuildingService): array
+    private function processCancellations(CapitalCityUnitQueue $queueData, UnitService $unitService): array
     {
-        return collect($this->dataForCancellation['building_ids'])->map(function ($buildingId) use ($kingdomBuildingService, $queueData) {
-            $buildingInQueue = BuildingInQueue::where('kingdom_id', $queueData->kingdom_id)
+
+        $messages = $queueData->messages;
+
+        return collect($this->dataForCancellation['unit_ids'])->map(function ($unitId) use ($unitService, $queueData, $messages) {
+            $unitQueue = UnitInQueue::where('kingdom_id', $queueData->kingdom_id)
                 ->where('character_id', $this->characterId)
-                ->where('building_id', $buildingId)
+                ->where('game_unit_id', $unitId)
                 ->first();
 
-            if (is_null($buildingInQueue)) {
+            if (is_null($unitQueue)) {
 
-                CapitalCityBuildingQueue::where('id', $this->capitalCityCancellationQueueId)->update(['status' => CapitalCityQueueStatus::CANCELLATION_REJECTED]);
+                CapitalCityUnitQueue::where('id', $this->capitalCityCancellationQueueId)->update(['status' => CapitalCityQueueStatus::CANCELLATION_REJECTED]);
 
-                event(new UpdateCapitalCityBuildingQueueTable($queueData->character, $queueData->requestingKingdom));
+                $messages[] = 'Failed to cancel unit recruitment. Seems it must already be done for unit: ' . $unitQueue->unit->name;
 
-                throw new Exception('No building queue data found for building: ' . $buildingId . ' for kingdom ' .  $queueData->kingdom_id);
+                $queueData->update(['messages' => $messages]);
+
+                event(new UpdateCapitalCityUnitQueueTable($queueData->character));
+
+                return [];
             }
 
-            $result = $kingdomBuildingService->cancelKingdomBuildingUpgrade($buildingInQueue);
+            $result = $unitService->cancelRecruit($unitQueue);
 
             return [
-                'building_id' => $buildingInQueue->building_id,
+                'unit_id' => $unitQueue->game_unit_id,
                 'status' => $result ? CapitalCityQueueStatus::CANCELLED : CapitalCityQueueStatus::CANCELLATION_REJECTED,
             ];
         })->toArray();
@@ -136,11 +147,11 @@ class CapitalCityUnitRequestCancellationMovement implements ShouldQueue
     /**
      * Update the queue data with the cancellation statuses.
      *
-     * @param CapitalCityBuildingQueue $queueData
+     * @param CapitalCityUnitQueue $queueData
      * @param array $responseData
      * @return void
      */
-    private function updateQueueData(CapitalCityBuildingQueue $queueData, array $responseData): void
+    private function updateQueueData(CapitalCityUnitQueue $queueData, array $responseData): void
     {
         $responseLookup = collect($responseData)
             ->reject(fn($response) => $response['status'] === CapitalCityQueueStatus::CANCELLATION_REJECTED)
@@ -175,9 +186,9 @@ class CapitalCityUnitRequestCancellationMovement implements ShouldQueue
     {
         foreach ($responseData as $response) {
             if ($response['status'] === CapitalCityQueueStatus::CANCELLED) {
-                CapitalCityBuildingCancellation::where('id', $this->capitalCityCancellationQueueId)->delete();
+                CapitalCityUnitCancellation::where('id', $this->capitalCityCancellationQueueId)->delete();
             } elseif ($response['status'] === CapitalCityQueueStatus::CANCELLATION_REJECTED) {
-                CapitalCityBuildingQueue::where('id', $this->capitalCityQueueId)->update(['status' => CapitalCityQueueStatus::CANCELLATION_REJECTED]);
+                CapitalCityUnitCancellation::where('id', $this->capitalCityQueueId)->update(['status' => CapitalCityQueueStatus::CANCELLATION_REJECTED]);
             }
         }
     }

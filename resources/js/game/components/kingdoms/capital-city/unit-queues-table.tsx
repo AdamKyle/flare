@@ -8,6 +8,9 @@ import FetchUnitQueuesAjax from "../ajax/fetch-unit-queues-ajax";
 import CapitalCityUnitQueueTableEventDefinition from "../event-listeners/capital-city-unit-queue-table-event-definition";
 import CapitalCityUnitQueuesTableEvent from "../event-listeners/capital-city-unit-queues-table-event";
 import { watchForDarkMode } from "../../ui/helpers/watch-for-dark-mode";
+import SuccessAlert from "../../ui/alerts/simple-alerts/success-alert";
+import DangerAlert from "../../ui/alerts/simple-alerts/danger-alert";
+import SendUnitRequestCancellationRequestModal from "./modals/send-unit-request-cancellation-request-modal";
 
 export default class UnitQueuesTable extends React.Component<any, any> {
     private fetchUnitQueueData: FetchUnitQueuesAjax;
@@ -22,6 +25,10 @@ export default class UnitQueuesTable extends React.Component<any, any> {
             view_port: 0,
             unit_queues: [],
             dark_tables: false,
+            show_cancellation_modal: false,
+            success_message: null,
+            error_message: null,
+            unit_data_for_cancellation: null,
         };
 
         this.fetchUnitQueueData = serviceContainer().fetch(FetchUnitQueuesAjax);
@@ -49,6 +56,29 @@ export default class UnitQueuesTable extends React.Component<any, any> {
         this.updateUnitQueueTableEvent.listen();
     }
 
+    manageCancelModal(unitId?: number, kingdomId?: number): void {
+        let unitData: any = null;
+
+        console.log(this.state.unit_queues, unitId);
+
+        if (unitId && kingdomId) {
+            const foundData = this.state.unit_queues.filter((queue: any) => {
+                return (
+                    queue.unit_id === unitId && queue.kingdom_id === kingdomId
+                );
+            });
+
+            if (foundData.length > 0) {
+                unitData = foundData[0];
+            }
+        }
+
+        this.setState({
+            show_cancellation_modal: !this.state.show_cancellation_modal,
+            unit_data_for_cancellation: unitData,
+        });
+    }
+
     render() {
         if (this.state.loading) {
             return <LoadingProgressBar />;
@@ -56,11 +86,28 @@ export default class UnitQueuesTable extends React.Component<any, any> {
 
         return (
             <div>
+                {this.state.success_message !== null ? (
+                    <SuccessAlert>{this.state.success_message}</SuccessAlert>
+                ) : null}
+
+                {this.state.error_message !== null ? (
+                    <DangerAlert>{this.state.error_message}</DangerAlert>
+                ) : null}
+
                 <Table
                     columns={buildSmallCouncilUnitQueuesTableColumns(this)}
                     data={this.state.unit_queues}
                     dark_table={this.state.dark_tables}
                 />
+
+                {this.state.show_cancellation_modal ? (
+                    <SendUnitRequestCancellationRequestModal
+                        is_open={this.state.show_cancellation_modal}
+                        manage_modal={this.manageCancelModal.bind(this)}
+                        queue_data={this.state.unit_data_for_cancellation}
+                        character_id={this.props.character_id}
+                    />
+                ) : null}
             </div>
         );
     }

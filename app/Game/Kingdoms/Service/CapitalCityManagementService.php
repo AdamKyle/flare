@@ -5,6 +5,7 @@ namespace App\Game\Kingdoms\Service;
 use App\Flare\Models\BuildingInQueue;
 use App\Flare\Models\CapitalCityBuildingCancellation;
 use App\Flare\Models\CapitalCityBuildingQueue;
+use App\Flare\Models\CapitalCityUnitCancellation;
 use App\Flare\Models\CapitalCityUnitQueue;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameUnit;
@@ -119,32 +120,6 @@ class CapitalCityManagementService
     }
 
     /**
-     * Possibly delete building queue.
-     *
-     * @param CapitalCityBuildingQueue $capitalCityBuildingQueue
-     * @return bool
-     */
-    public function possiblyDeleteBuildingQueue(CapitalCityBuildingQueue $capitalCityBuildingQueue): bool {
-        $buildingRequestData = $capitalCityBuildingQueue->building_request_data;
-        $buildingQueuesCanceled = [];
-
-        foreach ($buildingRequestData as $index => $data) {
-            if ($data['secondary_status'] === CapitalCityQueueStatus::CANCELLED) {
-
-                $buildingQueuesCanceled[] = $data;
-            }
-        }
-
-        if (count($buildingQueuesCanceled) === count($buildingRequestData)) {
-            $capitalCityBuildingQueue->delete();
-
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
      * Fetch the building queue data.
      *
      * @param Character $character
@@ -210,11 +185,6 @@ class CapitalCityManagementService
             }
         }
 
-        dump(
-            $data,
-            $this->fetchBuildingCancellationQueueData($character)
-        );
-
         return array_values(collect(array_merge($this->fetchBuildingCancellationQueueData($character), $data))->sortByDesc('time_left_seconds')->sortByDesc('is_cancel_request')->toArray());
     }
 
@@ -271,6 +241,8 @@ class CapitalCityManagementService
                     $timeLeftInSeconds = 0;
                 }
 
+                $gameUnit = GameUnit::where('name', $unitRequest['name'])->first();
+
                 $queueData = [
                     'kingdom_name' => $kingdom->name . '(X/Y: '.$kingdom->x_position.'/'.$kingdom->y_position.')',
                     'status' => $queue->status,
@@ -278,13 +250,56 @@ class CapitalCityManagementService
                     'unit_name' => $unitRequest['name'],
                     'secondary_status' => $unitRequest['secondary_status'],
                     'amount' => $unitRequest['amount'],
+                    'kingdom_id' => $kingdom->id,
+                    'unit_id' => $gameUnit->id,
+                    'queue_id' => $queue->id,
+                    'is_cancel_request' => false,
                 ];
 
                 $data[] = $queueData;
             }
         }
 
-        return array_values(collect($data)->sortByDesc('time_left_seconds')->toArray());
+        return array_values(collect(array_merge($this->fetchUnitCancellationQueueData($character), $data))->sortByDesc('time_left_seconds')->sortByDesc('is_cancel_request')->toArray());
+    }
+
+    /**
+     * Fetch unit cancellation queue data.
+     *
+     * @param Character $character
+     * @return array
+     */
+    private function fetchUnitCancellationQueueData(Character $character): array {
+        $queues = CapitalCityUnitCancellation::where('character_id', $character->id)->whereNotNull('travel_time_completed_at')->get();
+
+        $data = [];
+
+        foreach ($queues as $queue) {
+            $unit = GameUnit::where('id', $queue->unit_id)->first();
+
+            $end = Carbon::parse($queue->travel_time_completed_at)->timestamp;
+            $current = Carbon::now()->timestamp;
+
+            $timeLeftInSeconds = 0;
+
+            if (!now()->gt($queue->completed_at)) {
+                $timeLeftInSeconds = $end - $current;
+            }
+
+            $data[] = [
+                'kingdom_name' => $queue->kingdom->name . '(X/Y: '.$queue->kingdom->x_position.'/'.$queue->kingdom->y_position.')',
+                'status' => $queue->status,
+                'unit_name' => $unit->name,
+                'secondary_status' => $queue->status === CapitalCityQueueStatus::CANCELLATION_REJECTED ? 'Cancellation was rejected. Building is either close to or has already finished.' : 'Cancellation request',
+                'kingdom_id' => $queue->kingdom_id,
+                'unit_id' => $unit->id,
+                'queue_id' => $queue->id,
+                'time_left_seconds' => max($timeLeftInSeconds, 0),
+                'is_cancel_request' => true,
+            ];
+        }
+
+        return $data;
     }
 
     /**
