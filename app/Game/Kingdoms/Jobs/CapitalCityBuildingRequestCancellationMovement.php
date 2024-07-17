@@ -48,6 +48,11 @@ class CapitalCityBuildingRequestCancellationMovement implements ShouldQueue
         $queueData = CapitalCityBuildingQueue::find($this->capitalCityQueueId);
 
         if (is_null($queueData)) {
+
+            CapitalCityBuildingQueue::where('id', $this->capitalCityCancellationQueueId)->update(['status' => CapitalCityQueueStatus::CANCELLATION_REJECTED]);
+
+            event(new UpdateCapitalCityBuildingQueueTable($queueData->character, $queueData->requestedKingdom));
+
             return;
         }
 
@@ -111,6 +116,11 @@ class CapitalCityBuildingRequestCancellationMovement implements ShouldQueue
                 ->first();
 
             if (is_null($buildingInQueue)) {
+
+                CapitalCityBuildingQueue::where('id', $this->capitalCityQueueId)->update(['status' => CapitalCityQueueStatus::CANCELLATION_REJECTED]);
+
+                event(new UpdateCapitalCityBuildingQueueTable($queueData->character, $queueData->requestingKingdom));
+
                 throw new Exception('No building queue data found for building: ' . $buildingId . ' for kingdom ' .  $queueData->kingdom_id);
             }
 

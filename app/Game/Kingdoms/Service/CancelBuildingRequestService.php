@@ -39,7 +39,7 @@ class CancelBuildingRequestService {
         }
 
         $deleteQueue = $requestData['delete_queue'];
-        $buildingToDelete = $requestData['building_id'];
+        $buildingToDelete = $requestData['building_id'] ?? null;
         $time = $this->calculateTime($character, $queue);
 
         if ($queue->status === CapitalCityQueueStatus::TRAVELING) {
@@ -104,7 +104,9 @@ class CancelBuildingRequestService {
     {
         if ($deleteQueue) {
             $queue->delete();
+
             event(new UpdateCapitalCityBuildingQueueTable($character->refresh(), $kingdom));
+
             return $this->successResult(['message' => 'All orders have been canceled.']);
         }
 
@@ -211,7 +213,7 @@ class CancelBuildingRequestService {
      * @return array
      */
     private function getBuildingIdsForCancellation(CapitalCityBuildingQueue $queue): array {
-        return array_column(array_filter($queue->building_request_data, fn($data) => $data['secondary_status'] === CapitalCityQueueStatus::RECRUITING), 'building_id');
+        return array_column(array_filter($queue->building_request_data, fn($data) => $data['secondary_status'] === CapitalCityQueueStatus::BUILDING || $data['secondary_status'] === CapitalCityQueueStatus::REPAIRING), 'building_id');
     }
 
     /**

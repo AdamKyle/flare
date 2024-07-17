@@ -305,7 +305,7 @@ class CapitalCityManagementService
                 'kingdom_name' => $queue->kingdom->name . '(X/Y: '.$queue->kingdom->x_position.'/'.$queue->kingdom->y_position.')',
                 'status' => $queue->status,
                 'building_name' => $building->name,
-                'secondary_status' => 'Cancellation request',
+                'secondary_status' => $queue->status === CapitalCityQueueStatus::CANCELLATION_REJECTED ? 'Cancellation was rejected. Building is either close to or has already finished.' : 'Cancellation request',
                 'kingdom_id' => $queue->kingdom_id,
                 'building_id' => $building->id,
                 'queue_id' => $queue->id,

@@ -137,21 +137,11 @@ const showCancellationButton = (row: any, component: any): boolean => {
         return false;
     }
 
-    console.log(
-        row.time_left_seconds,
-        component.state.building_queues.filter((queueData: any) => {
-            return (
-                queueData.building_id === row.building_id &&
-                row.is_cancel_request
-            );
-        }).length,
-    );
-
     return (
         component.state.building_queues.filter((queueData: any) => {
             return (
                 queueData.building_id === row.building_id &&
-                row.is_cancel_request
+                queueData.is_cancel_request
             );
         }).length === 0
     );
