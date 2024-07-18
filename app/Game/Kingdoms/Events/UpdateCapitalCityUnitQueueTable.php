@@ -37,7 +37,7 @@ class UpdateCapitalCityUnitQueueTable implements ShouldBroadcastNow {
     public function __construct(Character $character, Kingdom $kingdom = null) {
 
         $kingdomUnitQueueData = resolve(CapitalCityManagementService::class)
-                ->fetchUnitQueueData($character, $kingdom);
+                ->fetchUnitQueueData($character->refresh(), $kingdom);
 
         $this->user               = $character->user;
         $this->unitQueueData  = $kingdomUnitQueueData;

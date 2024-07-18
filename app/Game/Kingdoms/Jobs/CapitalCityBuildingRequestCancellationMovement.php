@@ -74,7 +74,7 @@ class CapitalCityBuildingRequestCancellationMovement implements ShouldQueue
         event(new UpdateCapitalCityBuildingQueueTable($queueData->character));
         $capitalCityBuildingManagement->possiblyCreateLogForQueue($queueData);
 
-        $this->cleanupCancellationRecords($responseData);
+        $this->cleanupCancellationRecords();
     }
 
     /**
@@ -185,23 +185,16 @@ class CapitalCityBuildingRequestCancellationMovement implements ShouldQueue
     /**
      * Cleanup cancellation records based on the response data.
      *
-     * @param array $responseData
      * @return void
      */
-    private function cleanupCancellationRecords(array $responseData): void
+    private function cleanupCancellationRecords(): void
     {
         $capitalCityBuildingCancellationQueue = CapitalCityBuildingCancellation::where('id', $this->capitalCityCancellationQueueId)->first();
 
         $character = $capitalCityBuildingCancellationQueue->character;
 
-        foreach ($responseData as $response) {
-            if ($response['status'] === CapitalCityQueueStatus::CANCELLED) {
-                $capitalCityBuildingCancellationQueue->delete();
-            } elseif ($response['status'] === CapitalCityQueueStatus::CANCELLATION_REJECTED) {
-                $capitalCityBuildingCancellationQueue->update(['status' => CapitalCityQueueStatus::CANCELLATION_REJECTED]);
-            }
+        $capitalCityBuildingCancellationQueue->delete();
 
-            event(new UpdateCapitalCityBuildingQueueTable($character));
-        }
+        event(new UpdateCapitalCityBuildingQueueTable($character));
     }
 }

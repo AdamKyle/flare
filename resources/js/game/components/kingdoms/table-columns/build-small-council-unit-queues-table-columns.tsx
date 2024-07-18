@@ -49,7 +49,11 @@ export const buildSmallCouncilUnitQueuesTableColumns = (
         },
         {
             name: "Amount",
-            cell: (row: any) => <span>{formatNumber(row.amount)}</span>,
+            cell: (row: any) => (
+                <span>
+                    {row.is_cancel_request ? "N/A" : formatNumber(row.amount)}
+                </span>
+            ),
         },
         {
             name: "Time Left",

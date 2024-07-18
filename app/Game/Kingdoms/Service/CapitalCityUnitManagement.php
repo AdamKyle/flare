@@ -228,6 +228,15 @@ class CapitalCityUnitManagement {
             }
         }
 
+        if (count($unitData) === 0 && count($requestData) === 0) {
+
+            $capitalCityUnitQueue->delete();
+
+            event(new UpdateCapitalCityUnitQueueTable($character));
+
+            return;
+        }
+
         if (count($unitData) === count($requestData)) {
             KingdomLog::create([
                 'character_id' => $character->id,
