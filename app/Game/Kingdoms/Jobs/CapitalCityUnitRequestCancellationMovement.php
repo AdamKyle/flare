@@ -171,7 +171,7 @@ class CapitalCityUnitRequestCancellationMovement implements ShouldQueue
             ->toArray();
 
         $unitRequestData = collect($queueData->unit_request_data)->map(function ($request) use ($responseLookup) {
-            $gameUnit = GameUnit::where('name', $request['unit_name'])->first();
+            $gameUnit = GameUnit::where('name', $request['name'])->first();
 
             if (isset($responseLookup[$gameUnit->id])) {
                 $request['secondary_status'] = CapitalCityQueueStatus::CANCELLED;

@@ -229,6 +229,8 @@ class CapitalCityUnitManagement {
             }
         }
 
+        dump($requestData, $unitData);
+
         if (count($unitData) === 0 && count($requestData) === 0) {
 
             $capitalCityUnitQueue->delete();
@@ -239,6 +241,7 @@ class CapitalCityUnitManagement {
         }
 
         if (count($unitData) === count($requestData)) {
+
             KingdomLog::create([
                 'character_id' => $character->id,
                 'from_kingdom_id' => $capitalCityUnitQueue->requested_kingdom,

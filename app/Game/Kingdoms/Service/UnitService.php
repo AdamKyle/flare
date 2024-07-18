@@ -226,13 +226,14 @@ class UnitService {
      * @return Kingdom
      */
     protected function updateKingdomAfterCancellation(Kingdom $kingdom, GameUnit $unit, UnitInQueue $queue): Kingdom {
+
         $kingdom->update([
-            'current_wood'       => $kingdom->current_wood + (($unit->wood_cost * $queue->amount) * $this->totalResources),
-            'current_clay'       => $kingdom->current_clay + (($unit->clay_cost * $queue->amount) * $this->totalResources),
-            'current_stone'      => $kingdom->current_stone + (($unit->stone_cost * $queue->amount) * $this->totalResources),
-            'current_iron'       => $kingdom->current_iron + (($unit->iron_cost * $queue->amount) * $this->totalResources),
-            'current_steel'      => $kingdom->current_steel + (($unit->steel_cost * $queue->amount) * $this->totalResources),
-            'current_population' => $kingdom->current_population + (($unit->required_population * $queue->amount) * $this->totalResources)
+            'current_wood'       => min($kingdom->current_wood + (($unit->wood_cost * $queue->amount) * $this->totalResources), $kingdom->max_wood),
+            'current_clay'       => min($kingdom->current_clay + (($unit->clay_cost * $queue->amount) * $this->totalResources), $kingdom->max_clay),
+            'current_stone'      => min($kingdom->current_stone + (($unit->stone_cost * $queue->amount) * $this->totalResources), $kingdom->max_stone),
+            'current_iron'       => min($kingdom->current_iron + (($unit->iron_cost * $queue->amount) * $this->totalResources), $kingdom->max_iron),
+            'current_steel'      => min($kingdom->current_steel + (($unit->steel_cost * $queue->amount) * $this->totalResources), $kingdom->max_steel),
+            'current_population' => min($kingdom->current_population + (($unit->required_population * $queue->amount) * $this->totalResources), $kingdom->max_population)
         ]);
 
         return $kingdom->refresh();

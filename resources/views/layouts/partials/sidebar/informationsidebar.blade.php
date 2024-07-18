@@ -253,7 +253,11 @@
             </a>
             <a href="{{ route('info.page', ['pageName' => 'resource-request']) }}">
                 <span class="fas fa-people-carry"></span>
-                Kingdom Resource Expansion
+                Kingdom Resource Requests
+            </a>
+            <a href="{{ route('info.page', ['pageName' => 'capital-cities']) }}">
+                <span class="fas fa-university"></span>
+                Capital Cities
             </a>
         </div>
     </div>

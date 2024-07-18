@@ -68,6 +68,7 @@ class RecruitUnits implements ShouldQueue {
                 $this->kingdom,
                 $this->amount,
                 $this->queueId,
+                $this->capitalCityQueueId,
             )->delay($time);
 
             return;

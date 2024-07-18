@@ -213,7 +213,11 @@ class CapitalCityManagementService
             $end = Carbon::parse($queue->completed_at)->timestamp;
             $current = Carbon::now()->timestamp;
 
-            $timeLeftInSeconds = $end - $current;
+            $timeLeftInSeconds = 0;
+
+            if (!now()->gt($queue->completed_at)) {
+                $timeLeftInSeconds = $end - $current;
+            }
 
             $unitRequestData = $queue->unit_request_data;
 
@@ -236,7 +240,8 @@ class CapitalCityManagementService
 
 
                 if ($unitRequest['secondary_status'] === CapitalCityQueueStatus::REJECTED ||
-                    $unitRequest['secondary_status'] === CapitalCityQueueStatus::FINISHED
+                    $unitRequest['secondary_status'] === CapitalCityQueueStatus::FINISHED ||
+                    $unitRequest['secondary_status'] === CapitalCityQueueStatus::CANCELLED
                 ) {
                     $timeLeftInSeconds = 0;
                 }
