@@ -229,8 +229,6 @@ class CapitalCityUnitManagement {
             }
         }
 
-        dump($requestData, $unitData);
-
         if (count($unitData) === 0 && count($requestData) === 0) {
 
             $capitalCityUnitQueue->delete();
