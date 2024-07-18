@@ -217,7 +217,8 @@ class CapitalCityUnitManagement {
 
         foreach($requestData as $data) {
             if ($data['secondary_status'] === CapitalCityQueueStatus::REJECTED ||
-                $data['secondary_status'] === CapitalCityQueueStatus::FINISHED
+                $data['secondary_status'] === CapitalCityQueueStatus::FINISHED ||
+                $data['secondary_status'] === CapitalCityQueueStatus::CANCELLED
             ) {
 
                 $unitData[] = [

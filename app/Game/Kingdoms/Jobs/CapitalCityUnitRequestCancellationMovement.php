@@ -48,8 +48,6 @@ class CapitalCityUnitRequestCancellationMovement implements ShouldQueue
     ): void {
         $queueData = CapitalCityUnitQueue::find($this->capitalCityQueueId);
 
-        dump($queueData, $this->capitalCityCancellationQueueId, $this->capitalCityQueueId);
-
         if (is_null($queueData)) {
 
             $cancellationQueue = CapitalCityUnitCancellation::where('id', $this->capitalCityCancellationQueueId)->first();
@@ -59,8 +57,6 @@ class CapitalCityUnitRequestCancellationMovement implements ShouldQueue
             $cancellationQueue->delete();
 
             event(new UpdateCapitalCityUnitQueueTable($character));
-
-            dump('Here?');
 
             return;
         }
@@ -74,8 +70,6 @@ class CapitalCityUnitRequestCancellationMovement implements ShouldQueue
         event(new UpdateCapitalCityUnitQueueTable($queueData->character));
 
         $responseData = $this->processCancellations($queueData, $unitService);
-
-        dump($responseData);
 
         if (empty($responseData)) {
 
@@ -131,15 +125,11 @@ class CapitalCityUnitRequestCancellationMovement implements ShouldQueue
 
         $messages = $queueData->messages;
 
-        dump($this->dataForCancellation);
-
         return collect($this->dataForCancellation['unit_ids'])->map(function ($unitId) use ($unitService, $queueData, $messages) {
             $unitQueue = UnitInQueue::where('kingdom_id', $queueData->kingdom_id)
                 ->where('character_id', $this->characterId)
                 ->where('game_unit_id', $unitId)
                 ->first();
-
-            dump($unitQueue);
 
             $gameUnit = GameUnit::find($unitId);
 
@@ -152,8 +142,6 @@ class CapitalCityUnitRequestCancellationMovement implements ShouldQueue
                 $queueData->update(['messages' => $messages]);
 
                 event(new UpdateCapitalCityUnitQueueTable($queueData->character));
-
-                dump('here?');
 
                 return [];
             }
@@ -177,17 +165,15 @@ class CapitalCityUnitRequestCancellationMovement implements ShouldQueue
     private function updateQueueData(CapitalCityUnitQueue $queueData, array $responseData): void
     {
 
-        dump($responseData);
-
-        dump('END ====');
-
         $responseLookup = collect($responseData)
             ->reject(fn($response) => $response['status'] === CapitalCityQueueStatus::CANCELLATION_REJECTED)
             ->pluck('status', 'unit_id')
             ->toArray();
 
-        $unitRequestData = collect($queueData->building_request_data)->map(function ($request) use ($responseLookup) {
-            if (isset($responseLookup[$request['unit_id']])) {
+        $unitRequestData = collect($queueData->unit_request_data)->map(function ($request) use ($responseLookup) {
+            $gameUnit = GameUnit::where('name', $request['unit_name'])->first();
+
+            if (isset($responseLookup[$gameUnit->id])) {
                 $request['secondary_status'] = CapitalCityQueueStatus::CANCELLED;
             }
             return $request;
