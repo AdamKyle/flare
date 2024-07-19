@@ -9,7 +9,7 @@ export const updateLocationBasedActions = (characterId: number) => {
             (result: AxiosResponse) => {},
             (error: AxiosError) => {
                 if (error.hasOwnProperty("response")) {
-                    const response = error.response;
+                    const response: AxiosResponse = error.response;
 
                     if (typeof response === "undefined") {
                         return;

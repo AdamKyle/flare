@@ -94,7 +94,7 @@ export default class QuestDetailsModal extends React.Component<any, any> {
                         },
                         (error: AxiosError) => {
                             if (typeof error.response !== "undefined") {
-                                const response = error.response;
+                                const response: AxiosResponse = error.response;
 
                                 const message = response.data.hasOwnProperty(
                                     "message",

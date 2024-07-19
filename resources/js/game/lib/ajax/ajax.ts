@@ -20,7 +20,7 @@ export default class Ajax implements AjaxInterface {
                 })
                 .catch((error: AxiosError) => {
                     if (typeof error.response !== "undefined") {
-                        const response = error.response;
+                        const response: AxiosResponse = error.response;
 
                         if (response.status === 401) {
                             window.location.reload();
@@ -42,7 +42,7 @@ export default class Ajax implements AjaxInterface {
                 })
                 .catch((error: AxiosError) => {
                     if (typeof error.response !== "undefined") {
-                        const response = error.response;
+                        const response: AxiosResponse = error.response;
 
                         if (response.status === 401) {
                             window.location.reload();

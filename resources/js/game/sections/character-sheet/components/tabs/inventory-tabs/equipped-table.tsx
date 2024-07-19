@@ -203,7 +203,7 @@ export default class EquippedTable
                             );
                         },
                         (error: AxiosError) => {
-                            const response = error.response;
+                            const response: AxiosResponse = error.response;
 
                             if (response) {
                                 this.setState(
@@ -256,7 +256,7 @@ export default class EquippedTable
                             );
                         },
                         (error: AxiosError) => {
-                            const response = error.response;
+                            const response: AxiosResponse = error.response;
 
                             if (response) {
                                 this.setState(

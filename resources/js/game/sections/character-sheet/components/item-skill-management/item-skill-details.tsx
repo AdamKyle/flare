@@ -55,7 +55,7 @@ export default class ItemSkillDetails extends React.Component<
                                 loading: false,
                             });
 
-                            const response = error.response;
+                            const response: AxiosResponse = error.response;
 
                             if (typeof response != "undefined") {
                                 this.setState({
@@ -96,7 +96,7 @@ export default class ItemSkillDetails extends React.Component<
                                 loading: false,
                             });
 
-                            const response = error.response;
+                            const response: AxiosResponse = error.response;
 
                             if (typeof response != "undefined") {
                                 this.setState({

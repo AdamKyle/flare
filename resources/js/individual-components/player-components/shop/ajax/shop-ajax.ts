@@ -96,7 +96,7 @@ export default class ShopAjax {
                     });
 
                     if (typeof error.response !== "undefined") {
-                        const response = error.response;
+                        const response: AxiosResponse = error.response;
 
                         component.setState({
                             error_message: response.data.message,
@@ -131,7 +131,7 @@ export default class ShopAjax {
                     });
 
                     if (typeof error.response !== "undefined") {
-                        const response = error.response;
+                        const response: AxiosResponse = error.response;
 
                         component.setState({
                             error_message: response.data.message,
@@ -170,7 +170,7 @@ export default class ShopAjax {
                     });
 
                     if (typeof error.response !== "undefined") {
-                        const response = error.response;
+                        const response: AxiosResponse = error.response;
 
                         component.setState({
                             error_message: response.data.message,
@@ -205,7 +205,7 @@ export default class ShopAjax {
                     });
 
                     if (typeof error.response !== "undefined") {
-                        const response = error.response;
+                        const response: AxiosResponse = error.response;
 
                         component.setState({
                             error_message: response.data.message,
@@ -248,7 +248,7 @@ export default class ShopAjax {
                     });
 
                     if (typeof error.response !== "undefined") {
-                        const response = error.response;
+                        const response: AxiosResponse = error.response;
 
                         component.setState({
                             error_message: response.data.message,

@@ -462,7 +462,7 @@ export default class QueenOfHearts extends React.Component<any, any> {
                                     preforming_action: false,
                                 });
 
-                                const response = error.response;
+                                const response: AxiosResponse = error.response;
 
                                 this.setState({
                                     error_message: response.data.message,
@@ -577,7 +577,7 @@ export default class QueenOfHearts extends React.Component<any, any> {
                         },
                         (error: AxiosError) => {
                             if (typeof error.response !== "undefined") {
-                                const response = error.response;
+                                const response: AxiosResponse = error.response;
 
                                 this.setState({
                                     error_message: response.data.message,
@@ -625,7 +625,7 @@ export default class QueenOfHearts extends React.Component<any, any> {
                         },
                         (error: AxiosError) => {
                             if (typeof error.response !== "undefined") {
-                                const response = error.response;
+                                const response: AxiosResponse = error.response;
 
                                 this.clearAll();
 

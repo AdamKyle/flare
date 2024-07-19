@@ -11,7 +11,7 @@ import LoadingProgressBar from "../../../components/ui/progress-bars/loading-pro
 import ManageTreasuryModalProps from "../../../lib/game/kingdoms/types/modals/manage-treasury-modal-props";
 import ManageTreasuryModalState from "../../../lib/game/kingdoms/types/modals/manage-treasury-modal-state";
 import Ajax from "../../../lib/ajax/ajax";
-import { AxiosError, AxiosResponse } from "axios";
+import { Axios, AxiosError, AxiosResponse } from "axios";
 
 export default class ManageTreasuryModal extends React.Component<
     ManageTreasuryModalProps,
@@ -148,7 +148,7 @@ export default class ManageTreasuryModal extends React.Component<
                             this.setState({ loading: false });
 
                             if (typeof error.response !== "undefined") {
-                                const response = error.response;
+                                const response: AxiosResponse = error.response;
 
                                 let message = response.data.message;
 
@@ -192,7 +192,7 @@ export default class ManageTreasuryModal extends React.Component<
                             this.setState({ loading: false });
 
                             if (typeof error.response !== "undefined") {
-                                const response = error.response;
+                                const response: AxiosResponse = error.response;
 
                                 if (response.status === 422) {
                                     this.setState({
@@ -233,7 +233,7 @@ export default class ManageTreasuryModal extends React.Component<
                             this.setState({ loading: false });
 
                             if (typeof error.response !== "undefined") {
-                                const response = error.response;
+                                const response: AxiosResponse = error.response;
 
                                 if (response.status === 422) {
                                     this.setState({

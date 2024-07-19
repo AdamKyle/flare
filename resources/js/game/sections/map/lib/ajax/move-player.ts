@@ -122,7 +122,7 @@ export default class MovePlayer {
     }
 
     handleErrors(error: AxiosError) {
-        const response = error.response;
+        const response: AxiosResponse = error.response;
 
         if (typeof response === "undefined") {
             return;

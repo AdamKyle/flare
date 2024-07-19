@@ -61,7 +61,7 @@ export default class SettleKingdomModal extends React.Component<
                         },
                         (error: AxiosError) => {
                             if (typeof error.response !== "undefined") {
-                                const response = error.response;
+                                const response: AxiosResponse = error.response;
 
                                 this.setState({
                                     loading: false,

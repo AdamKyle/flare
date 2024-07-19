@@ -36,7 +36,7 @@ export default class TraverseModal extends React.Component<any, any> {
             },
             (error: AxiosError) => {
                 if (typeof error.response !== "undefined") {
-                    const response = error.response;
+                    const response: AxiosResponse = error.response;
 
                     this.setState({
                         loading: false,
@@ -126,7 +126,7 @@ export default class TraverseModal extends React.Component<any, any> {
                 },
                 (error: AxiosError) => {
                     if (typeof error.response !== "undefined") {
-                        const response = error.response;
+                        const response: AxiosResponse = error.response;
 
                         this.setState({
                             is_traversing: false,

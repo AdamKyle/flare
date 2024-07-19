@@ -159,7 +159,7 @@ export default class SetsTable
                             this.setState({ loading: false });
 
                             if (typeof error.response !== "undefined") {
-                                const response = error.response;
+                                const response: AxiosResponse = error.response;
 
                                 this.setState({
                                     error_message: response.data.message,
@@ -220,7 +220,7 @@ export default class SetsTable
                             this.setState({ loading: false });
 
                             if (typeof error.response !== "undefined") {
-                                const response = error.response;
+                                const response: AxiosResponse = error.response;
 
                                 this.setState({
                                     error_message: response.data.message,
@@ -271,7 +271,8 @@ export default class SetsTable
                                 this.setState({ loading: false });
 
                                 if (typeof error.response !== "undefined") {
-                                    const response = error.response;
+                                    const response: AxiosResponse =
+                                        error.response;
 
                                     this.setState({
                                         error_message: response.data.message,
@@ -329,7 +330,7 @@ export default class SetsTable
                         },
                         (error: AxiosError) => {
                             if (typeof error.response !== "undefined") {
-                                const response = error.response;
+                                const response: AxiosResponse = error.response;
 
                                 this.setState({
                                     loading: false,

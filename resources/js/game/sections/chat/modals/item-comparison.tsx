@@ -48,7 +48,7 @@ export default class ItemComparison extends React.Component<any, any> {
                 },
                 (error: AxiosError) => {
                     if (typeof error.response !== "undefined") {
-                        const response = error.response;
+                        const response: AxiosResponse = error.response;
 
                         if (response.status === 404) {
                             this.setState({

@@ -4,7 +4,7 @@ import DangerAlert from "../../../components/ui/alerts/simple-alerts/danger-aler
 import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
 import { formatNumber } from "../../../lib/game/format-number";
 import Ajax from "../../../lib/ajax/ajax";
-import { AxiosError, AxiosResponse } from "axios";
+import { Axios, AxiosError, AxiosResponse } from "axios";
 import clsx from "clsx";
 import TimerProgressBar from "../../../components/ui/progress-bars/timer-progress-bar";
 import DangerButton from "../../../components/ui/buttons/danger-button";
@@ -92,7 +92,7 @@ export default class SmelterModal extends React.Component<any, any> {
                             this.setState({ loading: false });
 
                             if (typeof error.response !== "undefined") {
-                                const response = error.response;
+                                const response: AxiosResponse = error.response;
 
                                 let message = response.data.message;
 
@@ -135,7 +135,7 @@ export default class SmelterModal extends React.Component<any, any> {
                             this.setState({ loading: false });
 
                             if (typeof error.response !== "undefined") {
-                                const response = error.response;
+                                const response: AxiosResponse = error.response;
 
                                 if (response.status === 422) {
                                     this.setState({

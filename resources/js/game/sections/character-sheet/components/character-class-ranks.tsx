@@ -90,7 +90,7 @@ export default class CharacterClassRanks extends React.Component<
                             this.setState({ switching_class: false });
 
                             if (typeof error.response !== "undefined") {
-                                const response = error.response;
+                                const response: AxiosResponse = error.response;
 
                                 this.setState({
                                     error_message:
