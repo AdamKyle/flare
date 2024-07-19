@@ -252,9 +252,11 @@ class EndScheduledEvent extends Command {
 
         $announcement = Announcement::where('event_id', $event->id)->first();
 
-        event(new DeleteAnnouncementEvent($announcement->id));
+        if (!is_null($announcement)) {
+            event(new DeleteAnnouncementEvent($announcement->id));
 
-        $announcement->delete();
+            $announcement->delete();
+        }
 
         $event->delete();
     }
@@ -271,9 +273,11 @@ class EndScheduledEvent extends Command {
 
         $announcement = Announcement::where('event_id', $event->id)->first();
 
-        event(new DeleteAnnouncementEvent($announcement->id));
+        if (is_null($announcement)) {
+            event(new DeleteAnnouncementEvent($announcement->id));
 
-        $announcement->delete();
+            $announcement->delete();
+        }
 
         $event->delete();
     }
@@ -467,6 +471,10 @@ class EndScheduledEvent extends Command {
             $factionLoyalty = $character->factionLoyalties()
                 ->where('faction_id', $faction->id)
                 ->first();
+
+            if (is_null($factionLoyalty)) {
+                return;
+            }
 
             $assistingNpc = $factionLoyalty
                 ->factionLoyaltyNpcs()

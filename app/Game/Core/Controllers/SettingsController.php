@@ -116,9 +116,9 @@ class SettingsController extends Controller {
 
     public function cosmeticNametag(NameTagRequest $request, User $user) {
 
-        if ($user->character->questsCompleted->where('quest.unlocks_feature', FeatureTypes::NAME_TAGS)->count() <= 0) {
-            return redirect()->back()->with('error', 'Missing required quest completion for that action.');
-        }
+//        if ($user->character->questsCompleted->where('quest.unlocks_feature', FeatureTypes::NAME_TAGS)->count() <= 0) {
+//            return redirect()->back()->with('error', 'Missing required quest completion for that action.');
+//        }
 
         $nameTag = $request->name_tag;
 

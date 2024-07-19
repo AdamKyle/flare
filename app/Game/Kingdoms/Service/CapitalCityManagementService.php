@@ -89,7 +89,7 @@ class CapitalCityManagementService
      */
     public function walkAllKingdoms(Character $character, Kingdom $kingdom): array
     {
-        $this->updateWalkedKingdoms($character);
+        $this->updateWalkedKingdoms($character, $kingdom);
         $this->updateKingdom($kingdom);
 
         return $this->successResult(['message' => 'All kingdoms walked!']);
@@ -371,7 +371,11 @@ class CapitalCityManagementService
      */
     private function updateKingdom(Kingdom $kingdom): void
     {
-        $this->updateKingdom->updateKingdom($kingdom->refresh());
+
+        $kingdom = $kingdom->refresh();
+
+        $this->updateKingdom->updateKingdom($kingdom);
+        $this->updateKingdom->updateKingdomAllKingdoms($kingdom->character);
     }
 
     /**
@@ -516,11 +520,12 @@ class CapitalCityManagementService
      * Update all kingdoms owned by the character as walked.
      *
      * @param Character $character
+     * @param Kingdom $kingdom
      * @return void
      */
-    private function updateWalkedKingdoms(Character $character): void
+    private function updateWalkedKingdoms(Character $character, Kingdom $kingdom): void
     {
-        $character->kingdoms()->update([
+        $character->kingdoms()->where('game_map_id', $kingdom->game_map_id)->update([
             'last_walked' => now(),
             'auto_walked' => true,
         ]);

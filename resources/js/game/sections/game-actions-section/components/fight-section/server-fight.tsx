@@ -104,7 +104,9 @@ export default class ServerFight extends React.Component<ServerFightProps, {}> {
                             is_enemy={true}
                             name={this.props.monster_name}
                             current_health={Math.floor(
-                                this.props.monster_health,
+                                this.props.monster_health > 0
+                                    ? this.props.monster_health
+                                    : 0,
                             )}
                             max_health={Math.floor(
                                 this.props.monster_max_health,
@@ -114,7 +116,9 @@ export default class ServerFight extends React.Component<ServerFightProps, {}> {
                             is_enemy={false}
                             name={this.props.character_name}
                             current_health={Math.floor(
-                                this.props.character_health,
+                                this.props.character_health > 0
+                                    ? this.props.character_health
+                                    : 0,
                             )}
                             max_health={Math.floor(
                                 this.props.character_max_health,

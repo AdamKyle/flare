@@ -25,11 +25,14 @@
                 'uses' => $user,
             ])
         @endif
-        @if ($cosmeticNameTag)
-            @include('game.core.settings.partials.cosmetic-name-tags', [
-                'uses' => $user,
-            ])
-        @endif
+        @include('game.core.settings.partials.cosmetic-name-tags', [
+    'uses' => $user,
+])
+{{--        @if ($cosmeticNameTag)--}}
+{{--            @include('game.core.settings.partials.cosmetic-name-tags', [--}}
+{{--                'uses' => $user,--}}
+{{--            ])--}}
+{{--        @endif--}}
         @include('game.core.settings.partials.auto-disenchant-settings', [
             'user' => $user,
         ])

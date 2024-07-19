@@ -30,11 +30,11 @@
 
         <div class="text-center w-full lg:w-2/4 mx-auto mt-20">
             <h2 class="mb-5 font-thin text-2xl lg:text-5xl dark:text-gray-300 text-gray-800">
-                <i class="fas fa-globe-americas"></i>
+                <i class="ra ra-death-skull"></i>
                 The Jester plays around with your own delusions
             </h2>
             <p class="mb-10 dark:text-gray-300 text-gray-800">
-                During this <a href="#">raid</a> players have a chance to participate in raid quests that flush out more of the story from <a href="#">Delusional Memories</a> event.
+                During this <a href="/information/raids">raid</a> players have a chance to participate in raid quests that flush out more of the story from <a href="/information/planes">Delusional Memories</a> event.
                 Players can enter corrupted locations and put their might to the test as they work together to take down the raid boss!
             </p>
 
@@ -67,7 +67,7 @@
                 <span class="fa-stack">
                     <i class="ra ra-monster-skull mr-2"></i>
                 </span>
-                New <a href="#">Quests</a>!
+                New <a href="/information/quests">Quests</a>!
             </h2>
             <p class="mb-10 dark:text-gray-300 text-gray-800">
                Participate in two branches of quests! One will tell the story of The Jester and requires your ability to kill raid monsters to get the quest items,
@@ -81,7 +81,7 @@
                 <div>
                     <h2 class="mb-5 font-thin md:text-4xl lg:text-5xl dark:text-gray-300 text-gray-800">Put your skill to the test!</h2>
                     <p class="mb-10 dark:text-gray-300 text-gray-800">
-                        <a href="#">"Raid Critters</a> are much stronger then you might be use to. While the <a href="#">"Raid Boss</a> needs players to take it down, the raid critters will
+                        <a href="/information/monsters?table-filters[maps]=Delusional+Memories+Raid+Monsters#no-link">Raid Critters</a> are much stronger then you might be use to. While the <a href="/information/monsters?table-filters[maps]=Delusional+Memories+Raid+Bosses">Raid Boss</a> needs players to take it down, the raid critters will
                         put your gear to the test. Just take a look for your self.
                     </p>
                 </div>
@@ -131,7 +131,7 @@
                 <x-slot:title>
                     <a
                         href="{{ route('info.page', [
-                            'pageName' => 'weekly-fights',
+                            'pageName' => 'delusional-silver',
                         ]) }}">Gain Delusional Silver</a>
                 </x-slot:title>
 
@@ -146,7 +146,7 @@
                 <x-slot:title>
                     <a
                         href="{{ route('info.page', [
-                            'pageName' => 'exploration',
+                            'pageName' => 'raids',
                         ]) }}">Band together to take down the Jester</a>
                 </x-slot:title>
 
@@ -154,6 +154,19 @@
                     Band together with other players and take down the raid boss: Jester of Time
                 </p>
             </x-core.cards.feature-card>
+        </div>
+
+        <div class="text-center w-full lg:w-2/4 mx-auto mt-20 mb-20">
+            <h2 class="mb-5 font-thin text-2xl lg:text-5xl dark:text-gray-300 text-gray-800">
+                <span class="fa-stack">
+                    <i class="fas fa-shopping-bag"></i>
+                </span>
+                Gain and <a href="/information/ancestral-items">Ancestral Artifact</a>!
+            </h2>
+            <p class="mb-10 dark:text-gray-300 text-gray-800">
+                Gain a new powerful ancestral item specific to this raid! You only have to be the first player who kills the raid boss,
+                to get such a powerful and unique item!
+            </p>
         </div>
 
         <div class="w-full lg:w-2/4 mx-auto mt-10 lg:mt-20 mb-10 mt-4 lg:mt-0">

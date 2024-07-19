@@ -8,8 +8,8 @@
 @section('content')
     <div class="container mx-auto lg:px-4 mb-5">
         <div class="text-center mb-10 lg:mt-10">
-            <h3 class="mb-5 font-thin text-5xl dark:text-gray-300 text-gray-800 text-4xl md:text-7xl">Delusional Memory Event</h3>
-            <p class="mb-5 dark:text-gray-300 text-gray-800 italic">A plane with a story of living deep with in ones own delusions.</p>
+            <h3 class="mb-5 font-thin text-5xl dark:text-gray-300 text-gray-800 text-4xl md:text-7xl">A mother trapped in her own pain</h3>
+            <p class="mb-5 dark:text-gray-300 text-gray-800 italic">Her pain keeps her trapped in her own memories. Time to put down this grieving mother!</p>
             <p class="mb-10 text-orange-600 dark:text-orange-300 my-2">
                 <strong>Runs from</strong>: {{$event->start_date->format('l, j \of F, Y \a\t g:iA')}}
                 <strong>until</strong>: {{$event->end_date->format('l, j \of F, Y \a\t g:iA')}}
@@ -28,22 +28,14 @@
             </div>
         </div>
 
-        <div>
-            <img src="{{ asset('promotion/delusional-memories-event/delusional-event.png') }}"
-                 class="shadow rounded max-w-full h-auto align-middle border-none img-fluid lg:max-w-[60%] my-4 m-auto glightbox cursor-pointer" />
-            <div class="text-sm text-center">
-                Click to make larger.
-            </div>
-        </div>
-
         <div class="text-center w-full lg:w-2/4 mx-auto mt-20">
             <h2 class="mb-5 font-thin text-2xl lg:text-5xl dark:text-gray-300 text-gray-800">
-                <i class="fas fa-globe-americas"></i>
-                A temporary place to explore full of riches and wonders
+                <i class="ra ra-death-skull"></i>
+                Icy Death Awaits!
             </h2>
             <p class="mb-10 dark:text-gray-300 text-gray-800">
-                During the Delusional Memories event, players of all levels and equipment can venture down - through traversing - to the new
-                plane where they can participate in global events to earn mid game gear to help your progression through Tlessa!
+                During this <a href="/information/raids">raid</a> players have a chance to participate in raid quests that flush out more of the story from <a href="/information/planes">The Ice Plane</a> event.
+                Players can enter corrupted locations and put their might to the test as they work together to take down the raid boss!
             </p>
 
             <p class="mb-10 dark:text-gray-300 text-gray-800">
@@ -54,7 +46,7 @@
 
         <div class="grid md:grid-cols-2 gap-6 mt-5 w-full mt-10 mx-auto lg:w-3/4 md:mt-20">
             <div class="mt-4 lg:mt-0">
-                <img src="{{ asset('promotion/delusional-memories-event/delusional-memories-map.png') }}"
+                <img src="{{ asset('promotion/ice-queen-raid-event/ice-queen-raid-locations.png') }}"
                      class="shadow rounded max-w-full h-auto align-middle border-none img-fluid glightbox w-100 mb-5 cursor-pointer" />
                 <div class="text-center text-sm">
                     Click to make larger.
@@ -62,10 +54,10 @@
             </div>
             <div class="md:flex md:items-center text-center md:text-left">
                 <div>
-                    <h2 class="mb-5 font-thin text-2xl lg:text-5xl dark:text-gray-300 text-gray-800">New Map
+                    <h2 class="mb-5 font-thin text-2xl lg:text-5xl dark:text-gray-300 text-gray-800">Raid icons appear!
                     </h2>
-                    <p class="mb-10 dark:text-gray-300 text-gray-800">Adventure on a new map and explore new locations! There are new places to settle in this
-                        land controlled by The Federation and The Corrupted Church! What could the secrets of a Jester hide in this land?</p>
+                    <p class="mb-10 dark:text-gray-300 text-gray-800">During the raid, specific locations will become corrupted. This means the monsters are much stronger
+                    and the reward is that much greater. One of these locations contains the raid boss that players work together to take down</p>
                 </div>
             </div>
         </div>
@@ -75,28 +67,26 @@
                 <span class="fa-stack">
                     <i class="ra ra-monster-skull mr-2"></i>
                 </span>
-                Monsters scale to your ability
+                New <a href="/information/quests">Quests</a>!
             </h2>
             <p class="mb-10 dark:text-gray-300 text-gray-800">
-               Returning player who has Access to end game content like Purgatory? Prepare your self for a challenge as the monsters down here are much stronger
-                then what you might use to! new player who wants to participate? Do not worry your monster list will be that of basic monsters allowing you to participate
-                in all aspects!
+               Participate in two branches of quests! One will tell the story of The Jester and requires your ability to kill raid monsters to get the quest items,
+                and the other quest line will lead to a cosmetic unlock. In this case Players get the ability to select a name tag that will show up when they use the public chat!
             </p>
         </div>
 
         <div class="grid md:grid-cols-2 gap-6 mt-5 w-full mt-10 mx-auto lg:w-3/4 md:mt-20">
             <div class="md:flex md:items-center text-center md:text-left">
                 <div>
-                    <h2 class="mb-5 font-thin md:text-4xl lg:text-5xl dark:text-gray-300 text-gray-800">Global Events!</h2>
+                    <h2 class="mb-5 font-thin md:text-4xl lg:text-5xl dark:text-gray-300 text-gray-800">Put your skill to the test!</h2>
                     <p class="mb-10 dark:text-gray-300 text-gray-800">
-                        Join together with other players and complete phases of global events, be they Battling, Crafting or Enchanting!
-                        Players who participate can be rewarded with mythical items for the battle phase and Legendary Uniques for
-                        participating in the crafting and enchanting phase.
+                        <a href="/information/monsters?table-filters[maps]=The+Ice+Plane+Raid+Monsters#no-link">Raid Critters</a> are much stronger then you might be use to. While the <a href="/information/monsters?table-filters[maps]=The+Ice+Plane+Raid+Monsters">Raid Boss</a> needs players to take it down, the raid critters will
+                        put your gear to the test. Just take a look for your self.
                     </p>
                 </div>
             </div>
             <div class="mt-4 lg:mt-0">
-                <img src="{{ asset('promotion/delusional-memories-event/delusional-memories-events.png') }}"
+                <img src="{{ asset('promotion/ice-queen-raid-event/ice-queen-attack.png') }}"
                      class="shadow rounded max-w-full h-auto align-middle border-none img-fluid glightbox w-100 mb-5 cursor-pointer" />
                 <div class="text-center text-sm">
                     Click to make larger.
@@ -105,17 +95,37 @@
 
         </div>
 
-        <div class="text-center w-full lg:w-2/4 mx-auto mt-20">
+
+        <div class="text-center w-full lg:w-2/4 mx-auto mt-20 mb-20">
             <h2 class="mb-5 font-thin text-2xl lg:text-5xl dark:text-gray-300 text-gray-800">
-                <i class="fas fa-mouse-pointer mr-2"></i>
-                New <a href="/information/quests">Quests</a> and new story!
+                <span class="fa-stack">
+                    <i class="fas fa-shopping-bag"></i>
+                </span>
+                Gain and <a href="/information/ancestral-items">Ancestral Artifact</a>!
             </h2>
             <p class="mb-10 dark:text-gray-300 text-gray-800">
-                With this event we dive into the delusional machinations of a mad Jester ever on the search for his brother.
-                His own delusional fantasies play out before you! What's real and whats not?!
+                Gain a new powerful ancestral item specific to this raid! You only have to be the first player who kills the raid boss,
+                to get such a powerful and unique item!
             </p>
         </div>
 
+        <div class="grid md:grid-cols-2 gap-6 mt-5 w-full mt-10 mx-auto lg:w-3/4 my-20">
+            <div class="mt-4 lg:mt-0">
+                <img src="{{ asset('promotion/ice-queen-raid-event/name-tag.png') }}"
+                     class="shadow rounded max-w-full h-auto align-middle border-none img-fluid glightbox w-100 mb-5 cursor-pointer" />
+                <div class="text-center text-sm">
+                    Click to make larger.
+                </div>
+            </div>
+            <div class="md:flex md:items-center text-center md:text-left">
+                <div>
+                    <h2 class="mb-5 font-thin text-2xl lg:text-5xl dark:text-gray-300 text-gray-800">Gain the new Name Tag!
+                    </h2>
+                    <p class="mb-10 dark:text-gray-300 text-gray-800">You can select, from your settings, a name tag to appear when you
+                        use the in game chat! You get this fro completing the last Quest from the raid quests when this raid is active!</p>
+                </div>
+            </div>
+        </div>
 
         <div class="grid md:grid-cols-3 gap-3 w-full md:w-2/3 m-auto">
             <x-core.cards.feature-card>
@@ -124,11 +134,11 @@
                 </x-slot:icon>
                 <x-slot:title>
                     <a
-                        href="/information/monsters?table-filters[maps]=Delusional+Memories">New Monsters To Fight</a>
+                        href="/information/monsters?table-filters[maps]=The+Ice+Plane+Raid+Monsters#no-link">New Monsters To Fight</a>
                 </x-slot:title>
 
                 <p>
-                    If you have access to <a href="/information/planes">Purgatory</a>, fight powerful new monsters that test your might and courage!
+                    Raid locations come with new monsters to fight that drop quest items related to the Raid Quests!
                 </p>
             </x-core.cards.feature-card>
             <x-core.cards.feature-card>
@@ -138,12 +148,12 @@
                 <x-slot:title>
                     <a
                         href="{{ route('info.page', [
-                            'pageName' => 'weekly-fights',
-                        ]) }}">Cosmic Gear & Weekly Fights</a>
+                            'pageName' => 'corrupted-ice',
+                        ]) }}">Gain Corrupted Ice</a>
                 </x-slot:title>
 
                 <p>
-                    Looking for more of a challenge for high level players? Take on weekly fights and earn <a href="/information/cosmic-items">Cosmic gear</a>!
+                    gain the next piece of your gear progression: Corrupted Ice. This gear comes with no enchantments allowing you to make it your own!
                 </p>
             </x-core.cards.feature-card>
             <x-core.cards.feature-card>
@@ -153,12 +163,12 @@
                 <x-slot:title>
                     <a
                         href="{{ route('info.page', [
-                            'pageName' => 'exploration',
-                        ]) }}">Brand new raid: Jester of Time</a>
+                            'pageName' => 'raids',
+                        ]) }}">Band together to take down the Jester</a>
                 </x-slot:title>
 
                 <p>
-                    Fight the Jester of Time and his minions for a chance at wining the new tier of gear: <a href="/information/delusional-silver">Delusional Silver</a>!
+                    Band together with other players and take down the raid boss: Jester of Time
                 </p>
             </x-core.cards.feature-card>
         </div>
@@ -167,29 +177,15 @@
             <h2 class="mb-5 font-thin text-center text-5xl dark:text-gray-300 text-gray-800">
                 <i class="far fa-question-circle"></i>
                 FAQ
-            </h2>
+            </h2>Delusional Silver
             <dl class="mt-3">
                 <dt>How do I access the event?</dt>
                 <dd>
-                    Simply log in or create a new character and once you are in, click Traverse under the map. If you are on mobile, select Map Movement
-                    from the drop down of actions. From here - under the map - is a traverse button, click that to then select Delusional Memories and enter the
-                    event.
+                    Simply log in and head down to the Ice Plane and search for a skull location. One of these locations will have the raid boss as the first critter in the list.
                 </dd>
-                <dt>What happens when the event is over?</dt>
+                <dt>What level should I be?</dt>
                 <dd>
-                    When the event ends players wil be moved to Surface - the starting map. All kingdoms settled on Delusional Memories will fall to the ground and
-                    the player with the most kingdoms gets a full set of end game gear: Delusional Silver.
-                </dd>
-                <dt>Mythical, Legendary and End Game Gear - Seems Easy!</dt>
-                <dd>
-                    Yes and no. While all players can participate in the event goals and earn these pieces of gear, the gear will only take you so far as, you will need to level your character and take advantage of
-                    a variety of other systems in game in order to take full advantage of the gear.
-                </dd>
-                <dt>Lots of this sounds like high level content, what can new players do?</dt>
-                <dd>
-                    New players can join in on the quests and the new story line, they can also participate in the global events. As stated before those with out access to end game content, will
-                    face early game monsters to make it fair and inviting to all. Players, even new players, can get Mythical and Legendary gear down here by participating in the global events,
-                    this will take them a long way until they understand more systems in the game.
+                    You should have reincarnated your character at least twice to make any meaningful damage as well as made use of a few class specialties.
                 </dd>
             </dl>
         </div>

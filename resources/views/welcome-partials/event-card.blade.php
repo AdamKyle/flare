@@ -6,14 +6,17 @@
 
     if ($eventRunning->getTitleOfEvent() === 'Weekly Celestials') {
         $icon = 'ra-bleeding-eye';
+        $href = route('event.type', ['event_type' => 'weekly-celestials']);
     }
 
     if ($eventRunning->getTitleOfEvent() === 'Weekly Currency Drops') {
         $icon = 'ra-gem';
+        $href = route('event.type', ['event_type' => 'weekly-currency-drops']);
     }
 
     if ($eventRunning->getTitleOfEvent() === 'Weekly Faction Loyalty Event') {
         $icon = 'ra-sheriff';
+        $href = route('event.type', ['event_type' => 'weekly-faction-loyalty']);
     }
 
     if ($eventRunning->getTitleOfEvent() === 'Monthly PVP') {
@@ -31,6 +34,14 @@
 
     if ($eventRunning->getTitleOfEvent() === 'The Jester of Time') {
         $href = route('event.type', ['event_type' => 'jester-of-time']);
+    }
+
+        if ($eventRunning->getTitleOfEvent() === 'The Smugglers Are Back!') {
+        $href = route('event.type', ['event_type' => 'the-smugglers-are-back-raid']);
+    }
+
+    if ($eventRunning->getTitleOfEvent() === 'The Ice Queens Reign') {
+        $href = route('event.type', ['event_type' => 'ice-queen-raid']);
     }
 @endphp
 
