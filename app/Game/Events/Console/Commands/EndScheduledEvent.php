@@ -275,7 +275,7 @@ class EndScheduledEvent extends Command {
 
         $announcement = Announcement::where('event_id', $event->id)->first();
 
-        if (is_null($announcement)) {
+        if (!is_null($announcement)) {
             event(new DeleteAnnouncementEvent($announcement->id));
 
             $announcement->delete();
