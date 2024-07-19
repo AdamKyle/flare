@@ -1,6 +1,6 @@
 import InventoryItemComparison from "../../../../sections/components/item-details/comparison/inventory-item-comparison";
 import Ajax from "../../../../lib/ajax/ajax";
-import { AxiosError, AxiosResponse } from "axios";
+import {Axios, AxiosError, AxiosResponse} from "axios";
 import ComparisonSection from "../../../../sections/components/item-details/comparison/comparison-section";
 import ItemActions from "../item-actions";
 import { inject, singleton } from "tsyringe";
@@ -173,7 +173,9 @@ export default class InventoryComparisonActionsAjax {
         });
 
         if (typeof error.response !== "undefined") {
-            component.setState({ error_message: error.response.data.message });
+            const response: AxiosResponse = error.response;
+
+            component.setState({ error_message: response.data.message });
         }
     }
 }

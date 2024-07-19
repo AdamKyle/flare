@@ -4,7 +4,7 @@ import {
     craftingPostEndPoints,
 } from "../../crafting/general-crafting/helpers/crafting-type-url";
 import Ajax from "../../../lib/ajax/ajax";
-import { AxiosError, AxiosResponse } from "axios";
+import {Axios, AxiosError, AxiosResponse} from "axios";
 import Select from "react-select";
 import LoadingProgressBar from "../../ui/progress-bars/loading-progress-bar";
 import PrimaryButton from "../../ui/buttons/primary-button";
@@ -108,9 +108,11 @@ export default class WorkBench extends React.Component<any, any> {
                         (error: AxiosError) => {
                             this.setState({ applying_oil: false });
 
-                            if (error.response) {
+                            if (typeof error.response !== 'undefined') {
+                                const response: AxiosResponse = error.response;
+
                                 this.setState({
-                                    error_message: error.response.data.message,
+                                    error_message: response.data.message,
                                 });
                             }
                         },

@@ -49,8 +49,10 @@ export default class ResistanceInfoSection extends React.Component<
                             this.setState({ is_loading: false });
 
                             if (typeof error.response !== "undefined") {
+                                const response: AxiosResponse = error.response;
+
                                 this.setState({
-                                    error_message: error.response.data.mmessage,
+                                    error_message: response.data.mmessage,
                                 });
                             }
                         },

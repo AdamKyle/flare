@@ -1,5 +1,5 @@
 import UnitDetails from "./unit-details";
-import BuildingDetails from "../../../sections/kingdoms/buildings/deffinitions/building-details";
+import BuildingDetails from "../buildings/deffinitions/building-details";
 
 export default interface InformationSectionProps {
     sections: {

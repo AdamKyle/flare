@@ -31,7 +31,7 @@ export default class ItemComparisonAjax {
                     component.setState({ loading: false });
 
                     if (typeof error.response !== "undefined") {
-                        const response = error.response;
+                        const response: AxiosResponse = error.response;
 
                         if (response.status === 404) {
                             component.setState({
@@ -43,7 +43,7 @@ export default class ItemComparisonAjax {
                         }
 
                         component.setState({
-                            error_message: error.response.data.message,
+                            error_message: response.data.message,
                         });
                     }
                 },

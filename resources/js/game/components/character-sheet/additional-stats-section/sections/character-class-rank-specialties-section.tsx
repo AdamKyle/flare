@@ -306,10 +306,14 @@ export default class CharacterClassRankSpecialtiesSection extends React.Componen
                         (error: AxiosError) => {
                             this.setState({ equipping: false });
 
-                            if (typeof error.response !== "undefined") {
-                                this.setState({
-                                    error_message: error.response.data.message,
-                                });
+                            if (typeof error.response !== 'undefined') {
+                                const response: AxiosResponse = error.response;
+
+                                if (typeof error.response !== "undefined") {
+                                    this.setState({
+                                        error_message: response.data.message,
+                                    });
+                                }
                             }
                         },
                     );
@@ -365,8 +369,11 @@ export default class CharacterClassRankSpecialtiesSection extends React.Componen
                             this.setState({ equipping: false });
 
                             if (typeof error.response !== "undefined") {
+
+                                const response: AxiosResponse = error.response;
+
                                 this.setState({
-                                    error_message: error.response.data.message,
+                                    error_message: response.data.message,
                                 });
                             }
                         },

@@ -28,7 +28,7 @@ export default class GenerateEventType extends React.Component<
             action_in_progress: false,
             form_data: {
                 selected_event_type: null,
-                generate_every: null,
+                generate_every: new Date(),
                 selected_start_date: setHours(setMinutes(new Date(), 0), 9),
             },
             error_message: null,
@@ -95,7 +95,7 @@ export default class GenerateEventType extends React.Component<
                     },
                 )
                     .setZone("America/Edmonton")
-                    .toISO();
+                    .toISO() ?? '';
 
                 ajax.setRoute("admin/create-multiple-events")
                     .setParameters(this.state.form_data)

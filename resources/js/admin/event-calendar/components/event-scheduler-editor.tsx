@@ -9,7 +9,7 @@ import Ajax from "../../../game/lib/ajax/ajax";
 import EventForm from "../types/deffinitions/components/event-form";
 import EventSchedulerEditorProps from "../types/components/event-scheduler-editor-props";
 import EventSchedulerEditorState from "../types/components/event-scheduler-editor-state";
-import format from "date-fns/format";
+import {format} from "date-fns";
 
 export default class EventSchedulerEditor extends React.Component<
     EventSchedulerEditorProps,
@@ -83,8 +83,11 @@ export default class EventSchedulerEditor extends React.Component<
                 },
                 (error: AxiosError) => {
                     if (typeof error.response !== "undefined") {
+
+                        const response: AxiosResponse = error.response;
+
                         this.setState({
-                            error_message: error.response.data.message,
+                            error_message: response.data.message,
                             is_saving: false,
                         });
                     }

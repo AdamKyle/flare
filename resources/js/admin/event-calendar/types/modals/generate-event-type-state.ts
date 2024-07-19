@@ -3,8 +3,8 @@ export default interface GenerateExtentTypeState {
 
     form_data: {
         selected_event_type: number | null;
-        generate_every: string | null;
-        selected_start_date: Date | string;
+        generate_every: string | Date;
+        selected_start_date: string | Date;
     };
 
     error_message: string | null;
