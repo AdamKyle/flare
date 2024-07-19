@@ -67,6 +67,7 @@ class MassImportCustomData extends Command {
         Artisan::call('create:character-attack-data');
         Artisan::call('generate:monster-cache');
         Artisan::call('create:quest-cache');
+        Artisan::call('end:scheduled-event');
 
         $this->importInformationSection();
     }
