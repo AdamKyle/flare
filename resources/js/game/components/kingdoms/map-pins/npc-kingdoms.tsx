@@ -1,8 +1,11 @@
 import React, { Fragment } from "react";
 import NpcKingdomPin from "./npc-kingdom-pin";
-import NpcKingdomProps from "../../map/types/map/kingdom-pins/npc-kingdom-props";
 import { viewPortWatcher } from "../../../lib/view-port-watcher";
 import KingdomModal from "./modals/kingdom-modal";
+import NpcKingdomProps, {
+    NpcKingdomDefinition,
+} from "../../../sections/map/types/map/kingdom-pins/npc-kingdom-props";
+import PlayerKingdomsDetails from "../../../sections/map/types/map/player-kingdoms-details";
 
 export default class NpcKingdoms extends React.Component<NpcKingdomProps, any> {
     constructor(props: NpcKingdomProps) {
@@ -49,7 +52,7 @@ export default class NpcKingdoms extends React.Component<NpcKingdomProps, any> {
             return;
         }
 
-        return this.props.kingdoms.map((kingdom) => {
+        return this.props.kingdoms.map((kingdom: NpcKingdomDefinition) => {
             return (
                 <NpcKingdomPin
                     kingdom={kingdom}

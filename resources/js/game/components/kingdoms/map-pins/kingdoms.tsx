@@ -1,6 +1,6 @@
 import React, { Fragment } from "react";
 import KingdomPin from "./kingdom-pin";
-import KingdomModal from "./modals/kingdom-modal";;
+import KingdomModal from "./modals/kingdom-modal";
 import { viewPortWatcher } from "../../../lib/view-port-watcher";
 import KingdomProps from "../../../sections/map/types/map/kingdom-pins/kingdom-props";
 import KingdomState from "../../../sections/map/types/map/kingdom-pins/kingdom-state";

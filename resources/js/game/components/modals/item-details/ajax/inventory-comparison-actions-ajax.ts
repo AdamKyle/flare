@@ -1,7 +1,5 @@
-import InventoryItemComparison from "../../../../sections/components/item-details/comparison/inventory-item-comparison";
 import Ajax from "../../../../lib/ajax/ajax";
-import {Axios, AxiosError, AxiosResponse} from "axios";
-import ComparisonSection from "../../../../sections/components/item-details/comparison/comparison-section";
+import { AxiosError, AxiosResponse } from "axios";
 import ItemActions from "../item-actions";
 import { inject, singleton } from "tsyringe";
 
@@ -22,7 +20,7 @@ type ListItem = { list_for: number; slot_id: number };
 export default class InventoryComparisonActionsAjax {
     constructor(@inject(Ajax) private ajax: Ajax) {}
 
-    equipItem(component: ComparisonSection | ItemActions, params: EquipParams) {
+    equipItem(component: ItemActions, params: EquipParams) {
         this.ajax
             .setRoute(
                 "character/" +
@@ -41,10 +39,7 @@ export default class InventoryComparisonActionsAjax {
             );
     }
 
-    moveItem(
-        component: ComparisonSection | ItemActions,
-        params: MoveItemParams,
-    ) {
+    moveItem(component: ItemActions, params: MoveItemParams) {
         this.ajax
             .setRoute(
                 "character/" +
@@ -63,7 +58,7 @@ export default class InventoryComparisonActionsAjax {
             );
     }
 
-    sellItem(component: ComparisonSection | ItemActions, params: SellItem) {
+    sellItem(component: ItemActions, params: SellItem) {
         this.ajax
             .setRoute(
                 "character/" +
@@ -82,7 +77,7 @@ export default class InventoryComparisonActionsAjax {
             );
     }
 
-    listItem(component: ComparisonSection | ItemActions, params: ListItem) {
+    listItem(component: ItemActions, params: ListItem) {
         this.ajax
             .setRoute("market-board/sell-item/" + component.props.character_id)
             .setParameters(params)
@@ -97,7 +92,7 @@ export default class InventoryComparisonActionsAjax {
             );
     }
 
-    disenchantItem(component: ComparisonSection | ItemActions) {
+    disenchantItem(component: ItemActions) {
         this.ajax
             .setRoute(
                 "disenchant/" +
@@ -114,10 +109,7 @@ export default class InventoryComparisonActionsAjax {
             );
     }
 
-    destroyItem(
-        component: ComparisonSection | ItemActions,
-        params: DestroyItem,
-    ) {
+    destroyItem(component: ItemActions, params: DestroyItem) {
         this.ajax
             .setRoute(
                 "character/" +
@@ -137,7 +129,7 @@ export default class InventoryComparisonActionsAjax {
     }
 
     protected handleSuccess(
-        component: ComparisonSection | ItemActions,
+        component: ItemActions,
         result: AxiosResponse,
     ): void {
         component.setState({
@@ -163,10 +155,7 @@ export default class InventoryComparisonActionsAjax {
         }
     }
 
-    protected handleError(
-        component: ComparisonSection | ItemActions,
-        error: AxiosError,
-    ): void {
+    protected handleError(component: ItemActions, error: AxiosError): void {
         component.setState({
             show_loading_label: false,
             loading_label: null,

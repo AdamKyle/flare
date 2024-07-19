@@ -66,7 +66,7 @@ export default class BuyPopulationModal extends React.Component<
                             this.setState({ loading: false });
 
                             if (typeof error.response !== "undefined") {
-                                const response = error.response;
+                                const response: AxiosResponse = error.response;
 
                                 let message = response.data.message;
 

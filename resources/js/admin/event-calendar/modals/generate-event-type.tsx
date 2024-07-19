@@ -88,14 +88,12 @@ export default class GenerateEventType extends React.Component<
 
                 const startDate = formData.selected_start_date.toString();
 
-                formData.selected_start_date = DateTime.fromISO(
-                    new Date(startDate).toISOString(),
-                    {
+                formData.selected_start_date =
+                    DateTime.fromISO(new Date(startDate).toISOString(), {
                         zone: "utc",
-                    },
-                )
-                    .setZone("America/Edmonton")
-                    .toISO() ?? '';
+                    })
+                        .setZone("America/Edmonton")
+                        .toISO() ?? "";
 
                 ajax.setRoute("admin/create-multiple-events")
                     .setParameters(this.state.form_data)

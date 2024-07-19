@@ -3,9 +3,9 @@ import DangerAlert from "../../../components/ui/alerts/simple-alerts/danger-aler
 import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
 import Dialogue from "../../../components/ui/dialogue/dialogue";
 import Ajax from "../../../lib/ajax/ajax";
-import { AxiosError, AxiosResponse } from "axios";
-import ChangeNameModalProps from "../../../lib/game/kingdoms/types/modals/change-name-modal-props";
-import ChangeNameState from "../../../lib/game/kingdoms/types/modals/change-name-state";
+import { Axios, AxiosError, AxiosResponse } from "axios";
+import ChangeNameModalProps from "../types/modals/change-name-modal-props";
+import ChangeNameState from "../types/modals/change-name-state";
 
 export default class ChangeNameModal extends React.Component<
     ChangeNameModalProps,
@@ -55,7 +55,7 @@ export default class ChangeNameModal extends React.Component<
                             this.setState({ loading: false });
 
                             if (typeof error.response !== "undefined") {
-                                const response = error.response;
+                                const response: AxiosResponse = error.response;
 
                                 let message = response.data.message;
 

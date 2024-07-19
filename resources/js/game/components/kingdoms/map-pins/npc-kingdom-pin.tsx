@@ -1,5 +1,5 @@
 import React from "react";
-import NpcKingdomPinProps from "../../map/types/map/kingdom-pins/npc-kingdom-pin-props";
+import NpcKingdomPinProps from "../../../sections/map/types/map/kingdom-pins/npc-kingdom-pin-props";
 
 export default class NpcKingdomPin extends React.Component<
     NpcKingdomPinProps,

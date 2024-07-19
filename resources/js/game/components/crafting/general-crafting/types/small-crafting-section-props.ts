@@ -1,6 +1,6 @@
 import { CharacterType } from "../../../../lib/game/character/character-type";
 import CharacterStatusType from "../../../../lib/game/character/character-status-type";
-import {FameTasks} from "../../../faction-loyalty/deffinitions/faction-loaylaty";
+import { FameTasks } from "../../../faction-loyalty/deffinitions/faction-loaylaty";
 
 export default interface SmallCraftingSectionProps {
     close_crafting_section: () => void;

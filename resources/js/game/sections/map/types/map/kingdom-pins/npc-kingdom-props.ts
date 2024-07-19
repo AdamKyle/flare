@@ -1,14 +1,14 @@
 import CharacterCurrenciesDetails from "../../../../../lib/game/types/character-currencies-details";
 
+export interface NpcKingdomDefinition {
+    id: number;
+    x_position: number;
+    y_position: number;
+    npc_owned: boolean;
+}
+
 export default interface NpcKingdomProps {
-    kingdoms:
-        | {
-              id: number;
-              x_position: number;
-              y_position: number;
-              npc_owned: boolean;
-          }[]
-        | null;
+    kingdoms: NpcKingdomDefinition[] | null;
 
     character_id: number;
 

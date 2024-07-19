@@ -49,7 +49,6 @@ export default class DamageBreakDown extends React.Component<any, any> {
                             this.setState({ is_loading: false });
 
                             if (typeof error.response !== "undefined") {
-
                                 const response: AxiosResponse = error.response;
 
                                 this.setState({

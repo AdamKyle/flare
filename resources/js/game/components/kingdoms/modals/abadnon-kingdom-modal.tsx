@@ -2,10 +2,10 @@ import React from "react";
 import DangerAlert from "../../../components/ui/alerts/simple-alerts/danger-alert";
 import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
 import Dialogue from "../../../components/ui/dialogue/dialogue";
-import AbandonKingdomModalProps from "../../../lib/game/kingdoms/types/modals/abandon-kingdom-modal-props";
-import AbandonKingdomModalState from "../../../lib/game/kingdoms/types/modals/abandon-kingdom-modal-state";
 import { AxiosError, AxiosResponse } from "axios";
 import Ajax from "../../../lib/ajax/ajax";
+import AbandonKingdomModalProps from "../types/modals/abandon-kingdom-modal-props";
+import AbandonKingdomModalState from "../types/modals/abandon-kingdom-modal-state";
 
 export default class AbandonKingdomModal extends React.Component<
     AbandonKingdomModalProps,
@@ -45,7 +45,7 @@ export default class AbandonKingdomModal extends React.Component<
                             this.setState({ loading: false });
 
                             if (typeof error.response !== "undefined") {
-                                const response = error.response;
+                                const response: AxiosResponse = error.response;
 
                                 let message = response.data.message;
 

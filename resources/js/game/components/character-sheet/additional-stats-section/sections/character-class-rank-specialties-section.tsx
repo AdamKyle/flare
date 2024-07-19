@@ -306,7 +306,7 @@ export default class CharacterClassRankSpecialtiesSection extends React.Componen
                         (error: AxiosError) => {
                             this.setState({ equipping: false });
 
-                            if (typeof error.response !== 'undefined') {
+                            if (typeof error.response !== "undefined") {
                                 const response: AxiosResponse = error.response;
 
                                 if (typeof error.response !== "undefined") {
@@ -369,7 +369,6 @@ export default class CharacterClassRankSpecialtiesSection extends React.Componen
                             this.setState({ equipping: false });
 
                             if (typeof error.response !== "undefined") {
-
                                 const response: AxiosResponse = error.response;
 
                                 this.setState({
