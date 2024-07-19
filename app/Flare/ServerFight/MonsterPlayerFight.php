@@ -373,7 +373,6 @@ class MonsterPlayerFight {
      * @param bool $isPlayerVoided
      * @param bool $isEnemyVoided
      * @param bool $onlyOnce
-     * @param bool $isRankFight
      * @return bool
      */
     protected function doAttack(ServerMonster $monster, array $health, bool $isPlayerVoided, bool $isEnemyVoided, bool $onlyOnce): bool {
