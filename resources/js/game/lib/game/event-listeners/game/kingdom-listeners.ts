@@ -5,7 +5,7 @@ import NpcKingdomsDetails from "../../../../sections/map/types/map/npc-kingdoms-
 import PlayerKingdomsDetails from "../../../../sections/map/types/map/player-kingdoms-details";
 import CoreEventListener from "../core-event-listener";
 import GameListener from "../game-listener";
-import KingdomLogDetails from "../../../../components/kingdoms/kingdom-log-details";
+import KingdomLogDetails from "../../../../components/kingdoms/deffinitions/kingdom-log-details";
 
 @injectable()
 export default class KingdomListeners implements GameListener {

@@ -141,6 +141,7 @@ export default class UsableItemsTable
 
                 {this.state.show_destroy_item ? (
                     <InventoryActionConfirmationModal
+                        is_large_modal={false}
                         is_open={this.state.show_destroy_item}
                         manage_modal={this.showDestroyConfirmation.bind(this)}
                         title={"Destroy " + this.state.item_to_destroy_name}

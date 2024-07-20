@@ -1,8 +1,6 @@
-import { ClassArray, ClassDictionary } from "clsx";
 import LocationDetails from "../../location-details";
 import PlayerKingdomsDetails from "../player-kingdoms-details";
 import CharacterCurrenciesType from "../../../../../lib/game/character/character-currencies-type";
-import NpcKingdoms from "../../../../components/kingdoms/npc-kingdoms";
 import NpcKingdomsDetails from "../npc-kingdoms-details";
 
 export default interface TeleportModalProps {

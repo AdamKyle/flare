@@ -1,4 +1,3 @@
-import InventoryComparisonAdjustment from "../../../../sections/components/item-details/comparison/definitions/inventory-comparison-adjustment";
 import ItemToEquip from "../../../item-comparison/deffinitions/item-to-equip";
 
 export default interface EquipModalProps {

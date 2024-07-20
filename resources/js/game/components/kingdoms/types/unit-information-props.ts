@@ -1,4 +1,4 @@
-import BuildingDetails from "../../../../sections/kingdoms/buildings/deffinitions/building-details";
+import BuildingDetails from "../buildings/deffinitions/building-details";
 import InformationPropsBase from "../deffinitions/information-props-base";
 import UnitDetails from "../deffinitions/unit-details";
 

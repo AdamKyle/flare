@@ -8,10 +8,10 @@ import PrimaryButton from "../../../components/ui/buttons/primary-button";
 import DangerAlert from "../../../components/ui/alerts/simple-alerts/danger-alert";
 import SuccessAlert from "../../../components/ui/alerts/simple-alerts/success-alert";
 import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
-import ManageTreasuryModalProps from "../../../lib/game/kingdoms/types/modals/manage-treasury-modal-props";
-import ManageTreasuryModalState from "../../../lib/game/kingdoms/types/modals/manage-treasury-modal-state";
 import Ajax from "../../../lib/ajax/ajax";
-import { Axios, AxiosError, AxiosResponse } from "axios";
+import { AxiosError, AxiosResponse } from "axios";
+import ManageTreasuryModalProps from "../types/modals/manage-treasury-modal-props";
+import ManageTreasuryModalState from "../types/modals/manage-treasury-modal-state";
 
 export default class ManageTreasuryModal extends React.Component<
     ManageTreasuryModalProps,

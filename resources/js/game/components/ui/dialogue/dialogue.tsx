@@ -1,5 +1,5 @@
 import React, { Fragment } from "react";
-import { Dialog, Transition } from "@headlessui/react";
+import { Dialog, DialogBackdrop, Transition } from "@headlessui/react";
 import DialogueTypes from "../../../lib/ui/types/dialogue/dialogue-types";
 import DangerButton from "../buttons/danger-button";
 import PrimaryButton from "../buttons/primary-button";
@@ -29,7 +29,7 @@ export default class Dialogue extends React.Component<DialogueTypes, any> {
                         this.closeModal();
                     }}
                 >
-                    <Dialog.Overlay className="fixed inset-0 bg-black opacity-30" />
+                    <DialogBackdrop className="fixed inset-0 bg-black/30" />
 
                     <div className="min-h-screen px-4 text-center">
                         <Transition.Child
@@ -41,7 +41,7 @@ export default class Dialogue extends React.Component<DialogueTypes, any> {
                             leaveFrom="opacity-100"
                             leaveTo="opacity-0"
                         >
-                            <Dialog.Overlay className="fixed inset-0" />
+                            <DialogBackdrop className="fixed inset-0 bg-black/30" />
                         </Transition.Child>
 
                         <Transition.Child

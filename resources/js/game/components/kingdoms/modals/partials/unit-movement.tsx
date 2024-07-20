@@ -1,8 +1,8 @@
 import React, { Fragment } from "react";
 import InfoAlert from "../../../../components/ui/alerts/simple-alerts/info-alert";
-import UnitMovementProps from "../../../../lib/game/kingdoms/types/modals/partials/unit-movement-props";
-import UnitMovementState from "../../../../lib/game/kingdoms/types/modals/partials/unit-movement-state";
 import MoveUnits from "../../unit-movement/move-units";
+import UnitMovementProps from "../../types/modals/partials/unit-movement-props";
+import UnitMovementState from "../../types/modals/partials/unit-movement-state";
 
 export default class UnitMovement extends React.Component<
     UnitMovementProps,

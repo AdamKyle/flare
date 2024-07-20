@@ -44,7 +44,7 @@ export default class ForceNameChange extends React.Component<any, any> {
                             this.setState({ loading: false });
 
                             if (typeof error.response !== "undefined") {
-                                response = error.response;
+                                const response: AxiosResponse = error.response;
 
                                 this.setState({
                                     error_message: response.data.errors.name[0],

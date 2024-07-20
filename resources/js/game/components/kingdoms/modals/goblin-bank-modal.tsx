@@ -4,8 +4,6 @@ import LoadingProgressBar from "../../../components/ui/progress-bars/loading-pro
 import Dialogue from "../../../components/ui/dialogue/dialogue";
 import Tabs from "../../../components/ui/tabs/tabs";
 import TabPanel from "../../../components/ui/tabs/tab-panel";
-import GoblinBankModalProps from "../../../lib/game/kingdoms/types/modals/goblin-bank-modal-props";
-import GoblinCoinBankModalState from "../../../lib/game/kingdoms/types/modals/goblin-coin-bank-modal-state";
 import { formatNumber } from "../../../lib/game/format-number";
 import PrimaryButton from "../../../components/ui/buttons/primary-button";
 import InfoAlert from "../../../components/ui/alerts/simple-alerts/info-alert";
@@ -14,6 +12,8 @@ import { AxiosError, AxiosResponse } from "axios";
 import SuccessAlert from "../../../components/ui/alerts/simple-alerts/success-alert";
 import WarningAlert from "../../../components/ui/alerts/simple-alerts/warning-alert";
 import { parseInt } from "lodash";
+import GoblinCoinBankModalState from "../types/modals/goblin-coin-bank-modal-state";
+import GoblinBankModalProps from "../types/modals/goblin-bank-modal-props";
 
 export default class GoblinBankModal extends React.Component<
     GoblinBankModalProps,

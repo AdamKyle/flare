@@ -122,11 +122,11 @@ export default class MovePlayer {
     }
 
     handleErrors(error: AxiosError) {
-        const response: AxiosResponse = error.response;
-
-        if (typeof response === "undefined") {
+        if (typeof error.response === "undefined") {
             return;
         }
+
+        const response: AxiosResponse = error.response;
 
         if (response.status === 401) {
             return location.reload();

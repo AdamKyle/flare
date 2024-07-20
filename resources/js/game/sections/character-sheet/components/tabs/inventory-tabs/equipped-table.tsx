@@ -203,9 +203,9 @@ export default class EquippedTable
                             );
                         },
                         (error: AxiosError) => {
-                            const response: AxiosResponse = error.response;
+                            if (typeof error.response !== "undefined") {
+                                const response: AxiosResponse = error.response;
 
-                            if (response) {
                                 this.setState(
                                     {
                                         loading: false,
@@ -256,9 +256,9 @@ export default class EquippedTable
                             );
                         },
                         (error: AxiosError) => {
-                            const response: AxiosResponse = error.response;
+                            if (typeof error.response !== "undefined") {
+                                const response: AxiosResponse = error.response;
 
-                            if (response) {
                                 this.setState(
                                     {
                                         loading: false,

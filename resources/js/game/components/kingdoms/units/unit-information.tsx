@@ -4,11 +4,11 @@ import DangerAlert from "../../../components/ui/alerts/simple-alerts/danger-aler
 import PrimaryOutlineButton from "../../../components/ui/buttons/primary-outline-button";
 import BasicCard from "../../../components/ui/cards/basic-card";
 import { formatNumber } from "../../../lib/game/format-number";
-import UnitDetails from "../../../lib/game/kingdoms/deffinitions/unit-details";
-import UnitInformationProps from "../../../lib/game/kingdoms/types/unit-information-props";
 import BuildingDetails from "../buildings/deffinitions/building-details";
 import TimeHelpModal from "../modals/time-help-modal";
 import RecruitWithResources from "./recruit-with-resources";
+import UnitInformationProps from "../types/unit-information-props";
+import UnitDetails from "../deffinitions/unit-details";
 
 export default class UnitInformation extends React.Component<
     UnitInformationProps,

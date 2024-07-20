@@ -113,7 +113,7 @@ export default class RaidFight extends React.Component<
                         (error: AxiosError) => {
                             console.error(error);
 
-                            let response = null;
+                            let response: AxiosResponse | null = null;
 
                             if (typeof error.response !== "undefined") {
                                 response = error.response;
