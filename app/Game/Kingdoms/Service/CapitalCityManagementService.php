@@ -131,7 +131,9 @@ class CapitalCityManagementService
         $queues = CapitalCityBuildingQueue::where('character_id', $character->id);
 
         if (!is_null($kingdom)) {
-            $queues = $queues->where('kingdom_id', '!=', $kingdom->id);
+            $queues = $queues->whereHas('kingdom', function($query) use ($kingdom) {
+                $query->where('game_map_id', $kingdom->game_map_id);
+            })->where('kingdom_id', '!=', $kingdom->id);
         }
 
         $queues = $queues->get();
