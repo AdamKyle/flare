@@ -2,6 +2,9 @@ import { defineConfig } from 'vite';
 import laravel from 'laravel-vite-plugin';
 import react from '@vitejs/plugin-react';
 
+// Determine if we are in development mode
+const isDevelopment = process.env.NODE_ENV === 'development';
+
 export default defineConfig({
     plugins: [
         laravel([
@@ -31,12 +34,12 @@ export default defineConfig({
         },
     },
     build: {
-        minify: true,
-        sourcemap: false,
-        inlineDynamicImports: true,
+        minify: !isDevelopment,
+        sourcemap: isDevelopment,
+        inlineDynamicImports: !isDevelopment,
         terserOptions: {
             compress: {
-                drop_console: true,
+                drop_console: !isDevelopment,
             },
         },
         chunkSizeWarningLimit: 2000,

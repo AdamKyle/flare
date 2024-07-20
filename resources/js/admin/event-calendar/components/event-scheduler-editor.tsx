@@ -30,7 +30,7 @@ export default class EventSchedulerEditor extends React.Component<
             return;
         }
 
-        if (!this.state.form_data.hasOwnProperty("selected_start_date")) {
+        if (!Object.prototype.hasOwnProperty.call(this.state.form_data, "selected_start_date")) {
             this.setState({
                 error_message: "Missing start date of the event.",
             });
@@ -38,7 +38,7 @@ export default class EventSchedulerEditor extends React.Component<
             return;
         }
 
-        if (!this.state.form_data.hasOwnProperty("selected_end_date")) {
+        if (!Object.prototype.hasOwnProperty.call(this.state.form_data, "selected_end_date")) {
             this.setState({
                 error_message: "Missing end date of the event.",
             });
@@ -67,9 +67,9 @@ export default class EventSchedulerEditor extends React.Component<
             selected_end_date:
                 this.state.form_data.selected_end_date !== null
                     ? format(
-                          this.state.form_data.selected_end_date,
-                          "yyyy/MM/dd HH:mm:ss",
-                      ).toString()
+                        this.state.form_data.selected_end_date,
+                        "yyyy/MM/dd HH:mm:ss",
+                    ).toString()
                     : null,
         };
 
@@ -78,7 +78,7 @@ export default class EventSchedulerEditor extends React.Component<
             .setParameters(postData)
             .doAjaxCall(
                 "post",
-                (result: AxiosResponse) => {
+                () => {
                     this.props.scheduler.close();
                 },
                 (error: AxiosError) => {

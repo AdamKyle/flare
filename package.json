@@ -4,12 +4,14 @@
   "scripts": {
     "dev": "vite",
     "cleanup": "prettier --write 'resources/js/**/*.{ts,tsx}'",
-    "build": "yarn run cleanup && vite build",
+    "build": "yarn run cleanup && NODE_ENV=production  vite build",
+    "build:dev": "NODE_ENV=development vite build",
     "prepare": "husky"
   },
   "devDependencies": {
     "@emotion/react": "11.12.0",
     "@emotion/styled": "11.12.0",
+    "@eslint/js": "^9.7.0",
     "@glidejs/glide": "^3.4.1",
     "@mui/icons-material": "5.16.4",
     "@mui/material": "5.16.4",
@@ -17,12 +19,14 @@
     "@tailwindcss/aspect-ratio": "^0.4.2",
     "@tailwindcss/jit": "^0.1.18",
     "@tailwindcss/typography": "^0.5.0-alpha.2",
+    "@types/eslint__js": "^8.42.3",
     "@types/luxon": "^3.4.2",
     "@vitejs/plugin-react": "^4.2.1",
     "animate.css": "^4.1.1",
     "axios": "^1.6.8",
     "cross-env": "^7.0.3",
     "date-fns": "3.6.0",
+    "eslint": "^9.7.0",
     "husky": "^9.0.11",
     "laravel-vite-plugin": "^1.0.1",
     "line-awesome": "^1.3.0",
@@ -41,7 +45,8 @@
     "tailwindcss-dir": "^4.0.0",
     "tippy.js": "^6.3.1",
     "ts-loader": "9.5.1",
-    "typescript": "^5.0.4",
+    "typescript": "^5.5.3",
+    "typescript-eslint": "^7.16.1",
     "vite": "^5.1.3"
   },
   "dependencies": {

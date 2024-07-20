@@ -4,7 +4,7 @@ import DangerAlert from "../../../components/ui/alerts/simple-alerts/danger-aler
 import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
 import { formatNumber } from "../../../lib/game/format-number";
 import Ajax from "../../../lib/ajax/ajax";
-import { Axios, AxiosError, AxiosResponse } from "axios";
+import { AxiosError, AxiosResponse } from "axios";
 import clsx from "clsx";
 import TimerProgressBar from "../../../components/ui/progress-bars/timer-progress-bar";
 import DangerButton from "../../../components/ui/buttons/danger-button";
