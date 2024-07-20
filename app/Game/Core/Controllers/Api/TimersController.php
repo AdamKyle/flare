@@ -3,15 +3,21 @@
 namespace App\Game\Core\Controllers\Api;
 
 use App\Flare\Models\Character;
+use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Core\Events\ShowCraftingTimeOutEvent;
 use App\Game\Core\Events\ShowTimeOutEvent as EventsShowTimeOutEvent;
 use App\Game\Exploration\Events\ExplorationTimeOut;
 use App\Game\Maps\Events\ShowTimeOutEvent;
 use App\Http\Controllers\Controller;
+use Illuminate\Http\JsonResponse;
 
 class TimersController extends Controller {
 
-    public function updateTimersForCharacter(Character $character) {
+    /**
+     * @param Character $character
+     * @return JsonResponse
+     */
+    public function updateTimersForCharacter(Character $character): JsonResponse {
         $characterAutomation = $character->currentAutomations()->first();
 
         if ($characterAutomation) {
@@ -29,6 +35,8 @@ class TimersController extends Controller {
         if (!is_null($character->can_attack_again_at)) {
             event(new EventsShowTimeOutEvent($character->user, now()->diffInSeconds($character->can_attack_again_at)));
         }
+
+        event(new UpdateCharacterStatus($character));
 
         return response()->json();
     }

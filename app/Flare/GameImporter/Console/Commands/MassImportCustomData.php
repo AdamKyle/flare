@@ -41,35 +41,6 @@ class MassImportCustomData extends Command {
     public function handle() {
 
         $this->importGameMaps();
-
-        $factionLoyaltyIds = FactionLoyalty::first()->whereDoesntHave('faction')->whereDoesntHave('character')->pluck('id');
-        $factionLoyaltyNpcIds = FactionLoyaltyNpc::whereIn('faction_loyalty_id', $factionLoyaltyIds->toArray())->pluck('id');
-
-        FactionLoyaltyNpcTask::whereIn('faction_loyalty_npc_id', $factionLoyaltyNpcIds)->delete();
-        FactionLoyaltyNpc::whereIn('faction_loyalty_id', $factionLoyaltyIds->toArray())->delete();
-        FactionLoyalty::first()->whereDoesntHave('faction')->whereDoesntHave('character')->delete();
-
-        Artisan::call('delete:flagged-users');
-        Artisan::call('import:game-data "Items"');
-        Artisan::call('import:game-data "Affixes"');
-        Artisan::call('import:game-data "Locations"');
-        Artisan::call('import:game-data "Monsters"');
-        Artisan::call('import:game-data "Npcs"');
-        Artisan::call('import:game-data "Kingdoms"');
-        Artisan::call('import:game-data "Kingdom Passive Skills"');
-        Artisan::call('import:game-data "Quests"');
-
-        Artisan::call('assign:new-skills');
-        Artisan::call('assign:new-npcs-to-faction-loyalty');
-        Artisan::call('assign:new-buildings-to-existing-kingdoms');
-        Artisan::call('adjust:affixes-attached-to-items');
-        Artisan::call('balance:monsters');
-        Artisan::call('create:character-attack-data');
-        Artisan::call('generate:monster-cache');
-        Artisan::call('create:quest-cache');
-        Artisan::call('end:scheduled-event');
-
-        $this->importInformationSection();
     }
 
     protected function importInformationSection(): void {

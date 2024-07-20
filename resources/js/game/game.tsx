@@ -438,6 +438,10 @@ export default class Game extends React.Component<GameProps, GameState> {
                                         user_id={this.state.character.user_id}
                                     >
                                         <MapSection
+                                            can_move={
+                                                this.state.character_status
+                                                    .can_move
+                                            }
                                             user_id={this.props.userId}
                                             character_id={
                                                 this.props.characterId

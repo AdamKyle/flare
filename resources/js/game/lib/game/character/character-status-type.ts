@@ -5,6 +5,8 @@ export default interface CharacterStatusType {
 
     can_craft: boolean;
 
+    can_move: boolean;
+
     can_craft_again_at: number;
 
     is_dead: boolean;

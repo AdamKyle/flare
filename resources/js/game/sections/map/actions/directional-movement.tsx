@@ -36,6 +36,7 @@ export default class DirectionalMovement extends React.Component<
     }
 
     render() {
+
         return (
             <Fragment>
                 <div className="border-b-2 border-b-gray-200 dark:border-b-gray-600 my-3 hidden sm:block"></div>

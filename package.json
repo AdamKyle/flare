@@ -4,7 +4,8 @@
   "scripts": {
     "dev": "vite",
     "cleanup": "prettier --write 'resources/js/**/*.{ts,tsx}'",
-    "build": "yarn run cleanup && vite build",
+    "build": "yarn run cleanup && NODE_ENV=production  vite build",
+    "build:dev": "NODE_ENV=development vite build",
     "prepare": "husky"
   },
   "devDependencies": {
