@@ -4,11 +4,12 @@ namespace App\Flare\ServerFight\Pvp;
 
 use App\Flare\Models\Character;
 use App\Flare\ServerFight\Fight\CharacterAttacks\BaseCharacterAttack;
+use App\Flare\ServerFight\Fight\CharacterAttacks\PlayerHealing;
+use App\Flare\Values\AttackTypeValue;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 
 class PvpAttack extends PvpBase {
 
-    private $setUpFight;
 
     private array $battleMessages = [
         'attacker' => [],
@@ -22,11 +23,8 @@ class PvpAttack extends PvpBase {
 
     private BaseCharacterAttack $characterAttack;
 
-    public function __construct(CharacterCacheData $characterCacheData, SetUpFight $setUpFight, BaseCharacterAttack $characterAttack) {
+    public function __construct(private readonly CharacterCacheData $characterCacheData, private readonly SetUpFight $setUpFight, private readonly PlayerHealing $playerHealing) {
         parent::__construct($characterCacheData);
-
-        $this->setUpFight      = $setUpFight;
-        $this->characterAttack = $characterAttack;
     }
 
     public function getMessages() {
@@ -62,6 +60,11 @@ class PvpAttack extends PvpBase {
 
         $attackerHealth = $response->getCharacterHealth();
         $defenderHealth = $response->getMonsterHealth();
+
+        $defenderCastAttackData = $this->characterCacheData->getDataFromAttackCache($defender, AttackTypeValue::CAST);
+
+        $this->playerHealing->healInBattle($defender, $defenderCastAttackData);
+        $this->playerHealing->lifeSteal($defender, true);;
 
         if ($defenderHealth <= 0) {
             $defenderHealth = 0;
