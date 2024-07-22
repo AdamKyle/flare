@@ -49,6 +49,7 @@ use App\Flare\ServerFight\Monster\MonsterSpecialAttack;
 use App\Flare\ServerFight\Monster\ServerMonster;
 use App\Flare\ServerFight\MonsterPlayerFight;
 use App\Flare\ServerFight\Pvp\PvpAttack;
+use App\Flare\ServerFight\Pvp\PvpHealing;
 use App\Flare\ServerFight\Pvp\SetUpFight;
 use App\Flare\Services\BuildMonsterCacheService;
 use App\Flare\Services\CanUserEnterSiteService;
@@ -436,7 +437,7 @@ class ServiceProvider extends ApplicationServiceProvider
             return new PvpAttack(
                 $app->make(CharacterCacheData::class),
                 $app->make(SetUpFight::class),
-                $app->make(BaseCharacterAttack::class),
+                $app->make(PvpHealing::class),
             );
         });
 

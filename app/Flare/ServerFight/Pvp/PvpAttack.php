@@ -21,7 +21,7 @@ class PvpAttack extends PvpBase {
         'defender_health' => 0,
     ];
 
-    public function __construct(private readonly CharacterCacheData $characterCacheData,
+    public function __construct(CharacterCacheData $characterCacheData,
                                 private readonly SetUpFight $setUpFight,
                                 private readonly PvpHealing $pvpHealing) {
         parent::__construct($characterCacheData);
