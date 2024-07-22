@@ -64,7 +64,7 @@ class PvpAttack extends PvpBase {
         $defenderCastAttackData = $this->characterCacheData->getDataFromAttackCache($defender, AttackTypeValue::CAST);
 
         $this->playerHealing->healInBattle($defender, $defenderCastAttackData);
-        $this->playerHealing->lifeSteal($defender, true);;
+        $this->playerHealing->lifeSteal($defender, true);
 
         if ($defenderHealth <= 0) {
             $defenderHealth = 0;
