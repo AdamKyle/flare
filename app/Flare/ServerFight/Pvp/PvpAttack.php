@@ -16,23 +16,19 @@ class PvpAttack extends PvpBase {
         'defender' => [],
     ];
 
-    private $healthObject = [
+    private array $healthObject = [
         'attacker_health' => 0,
         'defender_health' => 0,
     ];
 
-    private BaseCharacterAttack $characterAttack;
-
-    public function __construct(private readonly CharacterCacheData $characterCacheData, private readonly SetUpFight $setUpFight, private readonly PlayerHealing $playerHealing) {
+    public function __construct(private readonly CharacterCacheData $characterCacheData,
+                                private readonly SetUpFight $setUpFight,
+                                private readonly PvpHealing $pvpHealing) {
         parent::__construct($characterCacheData);
     }
 
-    public function getMessages() {
+    public function getMessages(): array {
         return $this->battleMessages;
-    }
-
-    public function getHealthObject() {
-        return $this->healthObject;
     }
 
     public function setUpPvpFight(Character $attacker, Character $defender, array $healthObject): array {
@@ -49,7 +45,8 @@ class PvpAttack extends PvpBase {
         return $healthObject;
     }
 
-    public function attackPlayer(Character $attacker, Character $defender, array $healthObject, string $attackType) {
+    public function attackPlayer(Character $attacker, Character $defender, array $healthObject, string $attackType): void
+    {
         $attackerVoided = $this->setUpFight->isAttackerVoided();
         $defenderVoided = $this->setUpFight->isEnemyVoided();
 
@@ -61,10 +58,22 @@ class PvpAttack extends PvpBase {
         $attackerHealth = $response->getCharacterHealth();
         $defenderHealth = $response->getMonsterHealth();
 
-        $defenderCastAttackData = $this->characterCacheData->getDataFromAttackCache($defender, AttackTypeValue::CAST);
+        $pvpHealing = $this->pvpHealing($defender, $attacker, $attackerHealth, $defenderHealth, $defenderVoided);
 
-        $this->playerHealing->healInBattle($defender, $defenderCastAttackData);
-        $this->playerHealing->lifeSteal($defender, true);
+        $defenderHealth = $pvpHealing->getAttackerHealth();
+        $attackerHealth = $pvpHealing->getDefenderHealth();
+
+        $this->mergeMessages($pvpHealing->getAttackerMessages(), 'defender');
+        $this->mergeMessages($pvpHealing->getDefenderMessages(), 'attacker');
+
+        $pvpLifeStealing = $this->pvpLifeStealing($defender, $attacker, $attackerHealth, $defenderHealth, $defenderVoided);
+
+        $defenderHealth = $pvpLifeStealing->getAttackerHealth();
+        $attackerHealth = $pvpLifeStealing->getDefenderHealth();
+
+        $this->mergeMessages($pvpLifeStealing->getAttackerMessages(), 'defender');
+        $this->mergeMessages($pvpLifeStealing->getDefenderMessages(), 'attacker');
+
 
         if ($defenderHealth <= 0) {
             $defenderHealth = 0;
@@ -108,7 +117,30 @@ class PvpAttack extends PvpBase {
         return $this->healthObject['defender_health'];
     }
 
-    protected function mergeMessages(array $messages, string $key) {
+    protected function mergeMessages(array $messages, string $key): void
+    {
         $this->battleMessages[$key] = array_merge($this->battleMessages[$key], $messages);
+    }
+
+    private function pvpHealing(Character $defender, Character $attacker, int $attackerHealth, int $defenderHealth, bool $isVoided): PvpHealing {
+        $this->pvpHealing->setAttacker($defender);
+        $this->pvpHealing->setDefender($attacker);
+        $this->pvpHealing->setDefenderHealth($attackerHealth);
+        $this->pvpHealing->setAttackerHealth($defenderHealth);
+        $this->pvpHealing->setDefenderIsVoided($isVoided);
+        $this->pvpHealing->defenderHeal($defender);
+
+        return $this->pvpHealing;
+    }
+
+    private function pvpLifeStealing(Character $defender, Character $attacker, int $attackerHealth, int $defenderHealth, bool $isVoided): PvpHealing {
+        $this->pvpHealing->setAttacker($defender);
+        $this->pvpHealing->setDefender($attacker);
+        $this->pvpHealing->setDefenderHealth($attackerHealth);
+        $this->pvpHealing->setAttackerHealth($defenderHealth);
+        $this->pvpHealing->setDefenderIsVoided($isVoided);
+        $this->pvpHealing->stealLife($defender);
+
+        return $this->pvpHealing;
     }
 }
