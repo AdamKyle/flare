@@ -72,6 +72,7 @@ class CharacterAttackBuilder {
         $attack = $this->baseAttack(AttackTypeValue::CAST, $voided);
 
         $attack['spell_damage'] = $this->characterStatBuilder->buildDamage('spell-damage', $voided);
+        $attack['heal_for'] = $this->characterStatBuilder->buildHealing($voided);
 
         return $attack;
     }

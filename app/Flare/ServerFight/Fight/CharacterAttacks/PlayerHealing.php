@@ -37,12 +37,12 @@ class PlayerHealing extends BattleBase {
         return false;
     }
 
-    public function healInBattle(array $attackType) {
+    public function healInBattle(Character $character, array $attackType) {
         $this->castType->setMonsterHealth($this->monsterHealth);
         $this->castType->setCharacterHealth($this->characterHealth);
-        $this->castType->setCharacterAttackData($this->character, $this->isVoided, AttackTypeValue::ATTACK);
+        $this->castType->setCharacterAttackData($character, $this->isVoided, AttackTypeValue::ATTACK);
 
-        $this->castType->healDuringFight($this->character);
+        $this->castType->healDuringFight($character);
 
         $this->monsterHealth = $this->castType->getMonsterHealth();
         $this->characterHealth = $this->castType->getCharacterHealth();

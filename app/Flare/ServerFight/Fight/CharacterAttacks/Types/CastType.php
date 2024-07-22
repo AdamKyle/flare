@@ -121,6 +121,9 @@ class CastType extends BattleBase
     public function castAttack(Character $character, ServerMonster $monster) {
 
         $spellDamage = $this->attackData['spell_damage'];
+        $healFor = $this->attackData['heal_for'];
+
+        dump($this->attackData);
 
         if ($spellDamage <= 0) {
 
@@ -138,6 +141,10 @@ class CastType extends BattleBase
         if ($this->isEnemyEntranced) {
             $this->doSpellDamage($character, $monster, $spellDamage, true);
 
+            if ($healFor > 0) {
+                $this->heal($character);
+            }
+
             return $this;
         }
 
@@ -146,19 +153,31 @@ class CastType extends BattleBase
 
             $this->doSpellDamage($character, $monster, $spellDamage, true);
 
+            if ($healFor > 0) {
+                $this->heal($character);
+            }
+
             return $this;
         }
 
         if ($this->canHit->canPlayerCastSpell($character, $monster, $this->isVoided)) {
             if ($monster->getMonsterStat('ac') > $spellDamage) {
-                $this->addMessage('Your spell was blocked!', 'enemy-action');
+                $this->addMessage('Your damage spell was blocked!', 'enemy-action');
+
+                if ($healFor > 0) {
+                    $this->heal($character);
+                }
 
                 $this->doSecondaryAttacks($character, $monster);
             } else {
                 $this->doSpellDamage($character, $monster, $spellDamage);
             }
         } else {
-            $this->addMessage('Your spell fizzled and failed!', 'enemy-action');
+            $this->addMessage('Your damage spell(s) fizzled and failed!', 'enemy-action');
+
+            if ($healFor > 0) {
+                $this->heal($character);
+            }
 
             $this->doSecondaryAttacks($character, $monster);
         }

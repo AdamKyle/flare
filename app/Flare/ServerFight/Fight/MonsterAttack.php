@@ -61,7 +61,7 @@ class MonsterAttack extends BattleBase {
         $this->playerBattleHealing($character, $previousAttackType);
 
         if ($this->characterHealth <= 0) {
-            $this->playerResurrection($monster, $character, $previousAttackType);
+            $this->playerResurrection($character, $previousAttackType);
         }
     }
 
@@ -150,7 +150,7 @@ class MonsterAttack extends BattleBase {
 
         $this->playerHealing->setMonsterHealth($this->monsterHealth);
         $this->playerHealing->setCharacterHealth($this->characterHealth);
-        $this->playerHealing->healInBattle($previousAttackType);
+        $this->playerHealing->healInBattle($character, $previousAttackType);
 
         $this->characterHealth = $this->playerHealing->getCharacterHealth();
         $characterHealth       = $this->characterCacheData->getCachedCharacterData($character, 'health');
