@@ -1,7 +1,7 @@
+import NpcKingdomsDetails from "../../../../components/kingdoms/types/map/npc-kingdoms-details";
+import PlayerKingdomsDetails from "../../../../components/kingdoms/types/map/player-kingdoms-details";
 import TeleportModal from "../../modals/teleport-modal";
 import LocationDetails from "../../types/location-details";
-import PlayerKingdomsDetails from "../../types/map/player-kingdoms-details";
-import NpcKingdomsDetails from "../../types/map/npc-kingdoms-details";
 
 export default class ManageTeleportModalState {
     private component: TeleportModal;

@@ -1,12 +1,12 @@
 import React, { Component, CSSProperties, ReactNode } from "react";
-import GridOverlayProps from "./types/grid-overlay-props";
-import GridOverlayState from "./types/grid-overlay-state";
-import LocationDetails from "../../game/sections/map/types/location-details";
 import LocationPin from "../../game/sections/components/locations/location-pin";
-import MouseHandlers from "./grid/mouse-handlers";
+import LocationDetails from "../../game/sections/map/types/location-details";
 import { gridOverLayContainer } from "./container/grid-overlay-container";
+import MouseHandlers from "./grid/mouse-handlers";
 import ToolTipHandler from "./grid/tool-tip-handler";
 import MoveLocationDialogue from "./modals/move-location-dialogue";
+import GridOverlayProps from "./types/grid-overlay-props";
+import GridOverlayState from "./types/grid-overlay-state";
 
 export default class GridOverlay extends Component<
     GridOverlayProps,

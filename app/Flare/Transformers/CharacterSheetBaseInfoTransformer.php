@@ -69,6 +69,7 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer {
             'can_craft'                   => $character->can_craft,
             'can_attack'                  => $character->can_attack,
             'can_spin'                    => $character->can_spin,
+            'can_move'                    => $character->can_move,
             'can_engage_celestials'       => $character->can_engage_celestials,
             'can_engage_celestials_again_at' => now()->diffInSeconds($character->can_engage_celestials_again_at),
             'can_attack_again_at'         => now()->diffInSeconds($character->can_attack_again_at),

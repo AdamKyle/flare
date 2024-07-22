@@ -1,8 +1,8 @@
-import LocationDetails from "./location-details";
-import PlayerKingdomsDetails from "./map/player-kingdoms-details";
-import NpcKingdomsDetails from "./map/npc-kingdoms-details";
+import NpcKingdomsDetails from "../../../components/kingdoms/types/map/npc-kingdoms-details";
+import PlayerKingdomsDetails from "../../../components/kingdoms/types/map/player-kingdoms-details";
 import CharacterCurrenciesDetails from "../../../lib/game/types/character-currencies-details";
 import MapData from "../lib/request-types/MapData";
+import LocationDetails from "./location-details";
 
 export default interface MapActionsProps {
     can_move: boolean;

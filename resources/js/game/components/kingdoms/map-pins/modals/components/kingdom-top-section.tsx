@@ -1,6 +1,6 @@
 import React, { Fragment } from "react";
 import { formatNumber } from "../../../../../lib/game/format-number";
-import KingdomTopSectionProps from "../../../../../sections/map/types/map/kingdom-pins/modals/components/kingdom-top-section-props";
+import KingdomTopSectionProps from "../../../types/map/kingdom-pins/modals/components/kingdom-top-section-props";
 
 export default class KingdomTopSection extends React.Component<
     KingdomTopSectionProps,

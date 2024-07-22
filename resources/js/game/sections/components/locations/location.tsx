@@ -1,10 +1,10 @@
-import React, { Fragment, SyntheticEvent } from "react";
-import LocationProps from "../../map/types/map/location-pins/location-props";
-import LocationPin from "./location-pin";
-import LocationState from "../../map/types/map/location-pins/location-state";
-import LocationModal from "./modals/location-modal";
+import React, { Fragment } from "react";
 import { viewPortWatcher } from "../../../lib/view-port-watcher";
 import LocationDetails from "../../map/types/location-details";
+import LocationProps from "../../map/types/map/location-pins/location-props";
+import LocationState from "../../map/types/map/location-pins/location-state";
+import LocationPin from "./location-pin";
+import LocationModal from "./modals/location-modal";
 
 export default class Location extends React.Component<
     LocationProps,

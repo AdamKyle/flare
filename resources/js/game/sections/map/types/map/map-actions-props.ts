@@ -1,6 +1,6 @@
+import NpcKingdomsDetails from "../../../../components/kingdoms/types/map/npc-kingdoms-details";
+import PlayerKingdomsDetails from "../../../../components/kingdoms/types/map/player-kingdoms-details";
 import LocationDetails from "../location-details";
-import NpcKingdomsDetails from "./npc-kingdoms-details";
-import PlayerKingdomsDetails from "./player-kingdoms-details";
 
 export default interface MapActionsProps {
     move_player: (direction: string) => void;

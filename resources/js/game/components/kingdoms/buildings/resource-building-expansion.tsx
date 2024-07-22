@@ -1,26 +1,25 @@
+import clsx from "clsx";
 import React from "react";
-import BuildingDetails from "./deffinitions/building-details";
-import ResourceBuildingExpansionProps from "./types/resource-building-expansion-props";
 import DangerAlert from "../../../components/ui/alerts/simple-alerts/danger-alert";
 import SuccessAlert from "../../../components/ui/alerts/simple-alerts/success-alert";
-import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
 import PrimaryOutlineButton from "../../../components/ui/buttons/primary-outline-button";
+import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
 import TimerProgressBar from "../../../components/ui/progress-bars/timer-progress-bar";
-import ResourceBuildingExpansionState from "./types/resource-building-expansion-state";
-import clsx from "clsx";
-import Ajax from "../../../lib/ajax/ajax";
-import { Axios, AxiosError, AxiosResponse } from "axios";
-import { formatNumber } from "../../../lib/game/format-number";
-import Echo from "laravel-echo";
 import { serviceContainer } from "../../../lib/containers/core-container";
-import GameEventListeners from "../../../lib/game/event-listeners/game-event-listeners";
 import CoreEventListener from "../../../lib/game/event-listeners/core-event-listener";
+import { formatNumber } from "../../../lib/game/format-number";
+import ResourceBuildingExpansionAjax from "../ajax/resource-building-expansion-ajax";
+import BuildingDetails from "./deffinitions/building-details";
+import ResourceBuildingExpansionProps from "./types/resource-building-expansion-props";
+import ResourceBuildingExpansionState from "./types/resource-building-expansion-state";
 
 export default class ResourceBuildingExpansion extends React.Component<
     ResourceBuildingExpansionProps,
     ResourceBuildingExpansionState
 > {
     private gameEventListener: CoreEventListener;
+
+    private fetchBuildingResourceExpnasionData: ResourceBuildingExpansionAjax;
 
     private updateExpansionDetails: any;
 
@@ -38,6 +37,10 @@ export default class ResourceBuildingExpansion extends React.Component<
 
         this.gameEventListener = serviceContainer().fetch(CoreEventListener);
 
+        this.fetchBuildingResourceExpnasionData = serviceContainer().fetch(
+            ResourceBuildingExpansionAjax,
+        );
+
         this.gameEventListener.initialize();
 
         this.updateExpansionDetails = this.gameEventListener
@@ -46,34 +49,11 @@ export default class ResourceBuildingExpansion extends React.Component<
     }
 
     componentDidMount() {
-        new Ajax()
-            .setRoute(
-                "kingdom/building-expansion/details/" +
-                    this.props.building.id +
-                    "/" +
-                    this.props.character_id,
-            )
-            .doAjaxCall(
-                "get",
-                (result: AxiosResponse) => {
-                    this.setState({
-                        loading: false,
-                        expansion_details: result.data.expansion_details,
-                        time_remaining_for_expansion: result.data.time_left,
-                    });
-                },
-                (error: AxiosError) => {
-                    this.setState({ loading: false });
-
-                    if (typeof error.response != "undefined") {
-                        const response: AxiosResponse = error.response;
-
-                        this.setState({
-                            error_message: response.data.message,
-                        });
-                    }
-                },
-            );
+        this.fetchBuildingResourceExpnasionData.fetchResourceExpansionData(
+            this,
+            this.props.character_id,
+            this.props.building.id,
+        );
 
         this.updateExpansionDetails.listen(
             "Game.Kingdoms.Events.UpdateBuildingExpansion",
@@ -120,42 +100,11 @@ export default class ResourceBuildingExpansion extends React.Component<
                 expanding: true,
             },
             () => {
-                new Ajax()
-                    .setRoute(
-                        "kingdom/building-expansion/expand/" +
-                            this.props.building.id +
-                            "/" +
-                            this.props.character_id,
-                    )
-                    .doAjaxCall(
-                        "post",
-                        (result: AxiosResponse) => {
-                            this.setState({
-                                expanding: false,
-                                success_message: result.data.message,
-                                time_remaining_for_expansion:
-                                    result.data.time_left,
-                            });
-                        },
-                        (error: AxiosError) => {
-                            this.setState({ expanding: false });
-
-                            if (typeof error.response != "undefined") {
-                                const response: AxiosResponse = error.response;
-
-                                let message = response.data.message;
-
-                                if (response.data.error) {
-                                    message = response.data.error;
-                                }
-
-                                this.setState({
-                                    loading: false,
-                                    error_message: message,
-                                });
-                            }
-                        },
-                    );
+                this.fetchBuildingResourceExpnasionData.expandBuilding(
+                    this,
+                    this.props.character_id,
+                    this.props.building.id,
+                );
             },
         );
     }

@@ -1,15 +1,17 @@
-import React, { Fragment } from "react";
-import SuccessAlert from "../../../components/ui/alerts/simple-alerts/success-alert";
-import DangerAlert from "../../../components/ui/alerts/simple-alerts/danger-alert";
-import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
-import PrimaryButton from "../../../components/ui/buttons/primary-button";
-import DangerButton from "../../../components/ui/buttons/danger-button";
 import { upperFirst } from "lodash";
+import React, { Fragment } from "react";
+import DangerAlert from "../../../components/ui/alerts/simple-alerts/danger-alert";
+import SuccessAlert from "../../../components/ui/alerts/simple-alerts/success-alert";
+import DangerButton from "../../../components/ui/buttons/danger-button";
+import PrimaryButton from "../../../components/ui/buttons/primary-button";
+import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
+import { serviceContainer } from "../../../lib/containers/core-container";
 import { formatNumber } from "../../../lib/game/format-number";
-import Ajax from "../../../lib/ajax/ajax";
-import { AxiosError, AxiosResponse } from "axios";
+import UpgradeWithResourcesAjax from "../ajax/upgrade-with-resources-ajax";
 
 export default class UpgradeWithResources extends React.Component<any, any> {
+    private upgradeBuildingAjax: UpgradeWithResourcesAjax;
+
     constructor(props: any) {
         super(props);
 
@@ -18,6 +20,10 @@ export default class UpgradeWithResources extends React.Component<any, any> {
             error_message: null,
             loading: false,
         };
+
+        this.upgradeBuildingAjax = serviceContainer().fetch(
+            UpgradeWithResourcesAjax,
+        );
     }
 
     upgradeBuilding() {
@@ -28,42 +34,13 @@ export default class UpgradeWithResources extends React.Component<any, any> {
                 loading: true,
             },
             () => {
-                new Ajax()
-                    .setRoute(
-                        "kingdoms/" +
-                            this.props.character_id +
-                            "/upgrade-building/" +
-                            this.props.building.id,
-                    )
-                    .setParameters({
-                        to_level: 1,
-                        paying_with_gold: false,
-                    })
-                    .doAjaxCall(
-                        "post",
-                        (response: AxiosResponse) => {
-                            this.setState({
-                                loading: false,
-                                success_message: response.data.message,
-                            });
-                        },
-                        (error: AxiosError) => {
-                            if (typeof error.response !== "undefined") {
-                                const response: AxiosResponse = error.response;
-
-                                let message = response.data.message;
-
-                                if (response.data.error) {
-                                    message = response.data.error;
-                                }
-
-                                this.setState({
-                                    loading: false,
-                                    error_message: message,
-                                });
-                            }
-                        },
-                    );
+                this.upgradeBuildingAjax.upgradeBuilding(
+                    this,
+                    this.props.character_id,
+                    this.props.buildind.id,
+                    1,
+                    false,
+                );
             },
         );
     }

@@ -1,10 +1,10 @@
 import React, { Fragment } from "react";
+import { viewPortWatcher } from "../../../lib/view-port-watcher";
+import KingdomProps from "../types/map/kingdom-pins/kingdom-props";
+import KingdomState from "../types/map/kingdom-pins/kingdom-state";
+import PlayerKingdomsDetails from "../types/map/player-kingdoms-details";
 import KingdomPin from "./kingdom-pin";
 import KingdomModal from "./modals/kingdom-modal";
-import { viewPortWatcher } from "../../../lib/view-port-watcher";
-import KingdomProps from "../../../sections/map/types/map/kingdom-pins/kingdom-props";
-import KingdomState from "../../../sections/map/types/map/kingdom-pins/kingdom-state";
-import PlayerKingdomsDetails from "../../../sections/map/types/map/player-kingdoms-details";
 
 export default class Kingdoms extends React.Component<
     KingdomProps,

@@ -1,11 +1,11 @@
 import { Channel } from "laravel-echo";
 import { inject, injectable } from "tsyringe";
+import KingdomLogDetails from "../../../../components/kingdoms/deffinitions/kingdom-log-details";
+import NpcKingdomsDetails from "../../../../components/kingdoms/types/map/npc-kingdoms-details";
+import PlayerKingdomsDetails from "../../../../components/kingdoms/types/map/player-kingdoms-details";
 import Game from "../../../../game";
-import NpcKingdomsDetails from "../../../../sections/map/types/map/npc-kingdoms-details";
-import PlayerKingdomsDetails from "../../../../sections/map/types/map/player-kingdoms-details";
 import CoreEventListener from "../core-event-listener";
 import GameListener from "../game-listener";
-import KingdomLogDetails from "../../../../components/kingdoms/deffinitions/kingdom-log-details";
 
 @injectable()
 export default class KingdomListeners implements GameListener {

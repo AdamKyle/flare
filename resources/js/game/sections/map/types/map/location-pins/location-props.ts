@@ -1,5 +1,5 @@
-import LocationDetails from "../../location-details";
 import CharacterCurrenciesDetails from "../../../../../lib/game/types/character-currencies-details";
+import LocationDetails from "../../location-details";
 
 export default interface LocationProps {
     locations: LocationDetails[] | null;

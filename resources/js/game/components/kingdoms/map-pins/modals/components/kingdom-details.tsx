@@ -1,16 +1,16 @@
-import React, { Fragment } from "react";
-import Ajax from "../../../../../lib/ajax/ajax";
 import { AxiosError, AxiosResponse } from "axios";
-import { formatNumber, percent } from "../../../../../lib/game/format-number";
-import KingdomHelpModal from "../kingdom-help-modal";
-import KingdomTopSection from "./kingdom-top-section";
-import ComponentLoading from "../../../../../components/ui/loading/component-loading";
-import PrimaryOutlineButton from "../../../../../components/ui/buttons/primary-outline-button";
-import LoadingProgressBar from "../../../../../components/ui/progress-bars/loading-progress-bar";
+import React, { Fragment } from "react";
+import AttackKingdomModal from "../../../../../components/kingdoms/modals/attack-kingdom-modal";
 import DangerAlert from "../../../../../components/ui/alerts/simple-alerts/danger-alert";
 import DangerOutlineButton from "../../../../../components/ui/buttons/danger-outline-button";
-import AttackKingdomModal from "../../../../../components/kingdoms/modals/attack-kingdom-modal";
-import KingdomDetailsProps from "../../../../../sections/map/types/map/kingdom-pins/modals/components/kingdom-details-props";
+import PrimaryOutlineButton from "../../../../../components/ui/buttons/primary-outline-button";
+import ComponentLoading from "../../../../../components/ui/loading/component-loading";
+import LoadingProgressBar from "../../../../../components/ui/progress-bars/loading-progress-bar";
+import Ajax from "../../../../../lib/ajax/ajax";
+import { formatNumber, percent } from "../../../../../lib/game/format-number";
+import KingdomDetailsProps from "../../../types/map/kingdom-pins/modals/components/kingdom-details-props";
+import KingdomHelpModal from "../kingdom-help-modal";
+import KingdomTopSection from "./kingdom-top-section";
 
 export default class KingdomDetails extends React.Component<
     KingdomDetailsProps,

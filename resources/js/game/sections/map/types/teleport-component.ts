@@ -1,8 +1,8 @@
-import TeleportModal from "../modals/teleport-modal";
+import NpcKingdomsDetails from "../../../components/kingdoms/types/map/npc-kingdoms-details";
+import PlayerKingdomsDetails from "../../../components/kingdoms/types/map/player-kingdoms-details";
 import { fetchCost } from "../lib/teleportion-costs";
+import TeleportModal from "../modals/teleport-modal";
 import LocationDetails from "./location-details";
-import PlayerKingdomsDetails from "./map/player-kingdoms-details";
-import NpcKingdomsDetails from "./map/npc-kingdoms-details";
 
 type SelectedData = {
     label: string;

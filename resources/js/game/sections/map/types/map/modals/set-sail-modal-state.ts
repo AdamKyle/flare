@@ -1,5 +1,5 @@
+import PlayerKingdomsDetails from "../../../../../components/kingdoms/types/map/player-kingdoms-details";
 import LocationDetails from "../../location-details";
-import PlayerKingdomsDetails from "../player-kingdoms-details";
 
 export default interface SetSailModalState {
     x_position: number;

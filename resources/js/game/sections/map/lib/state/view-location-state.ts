@@ -1,7 +1,7 @@
+import NpcKingdomsDetails from "../../../../components/kingdoms/types/map/npc-kingdoms-details";
+import PlayerKingdomsDetails from "../../../../components/kingdoms/types/map/player-kingdoms-details";
 import MapActions from "../../actions/map-actions";
 import LocationDetails from "../../types/location-details";
-import PlayerKingdomsDetails from "../../types/map/player-kingdoms-details";
-import NpcKingdomsDetails from "../../types/map/npc-kingdoms-details";
 
 type LocationState = {
     location: LocationDetails | null;

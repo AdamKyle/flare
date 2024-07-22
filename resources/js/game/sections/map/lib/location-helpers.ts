@@ -1,8 +1,8 @@
-import MapState from "../types/map-state";
-import LocationDetails from "../types/location-details";
-import PlayerKingdomsDetails from "../types/map/player-kingdoms-details";
-import NpcKingdomsDetails from "../types/map/npc-kingdoms-details";
+import NpcKingdomsDetails from "../../../components/kingdoms/types/map/npc-kingdoms-details";
+import PlayerKingdomsDetails from "../../../components/kingdoms/types/map/player-kingdoms-details";
 import MapActions from "../actions/map-actions";
+import LocationDetails from "../types/location-details";
+import MapState from "../types/map-state";
 
 /**
  * Gets the current port that the player is on.

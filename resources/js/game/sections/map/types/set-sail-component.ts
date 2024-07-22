@@ -1,7 +1,7 @@
+import { fetchCost } from "../lib/teleportion-costs";
 import SetSailModal from "../modals/set-sail-modal";
 import LocationDetails from "./location-details";
 import SetSailModalProps from "./map/modals/set-sail-modal-props";
-import { fetchCost } from "../lib/teleportion-costs";
 
 export default class SetSailComponent {
     private component: SetSailModal;

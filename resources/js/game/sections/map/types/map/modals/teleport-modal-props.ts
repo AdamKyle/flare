@@ -1,7 +1,7 @@
-import LocationDetails from "../../location-details";
-import PlayerKingdomsDetails from "../player-kingdoms-details";
+import NpcKingdomsDetails from "../../../../../components/kingdoms/types/map/npc-kingdoms-details";
+import PlayerKingdomsDetails from "../../../../../components/kingdoms/types/map/player-kingdoms-details";
 import CharacterCurrenciesType from "../../../../../lib/game/character/character-currencies-type";
-import NpcKingdomsDetails from "../npc-kingdoms-details";
+import LocationDetails from "../../location-details";
 
 export default interface TeleportModalProps {
     is_open: boolean;

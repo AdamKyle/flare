@@ -1,5 +1,5 @@
-import LocationDetails from "../../../location-details";
 import CharacterCurrenciesDetails from "../../../../../../lib/game/types/character-currencies-details";
+import LocationDetails from "../../../location-details";
 
 export interface LocationModalPros {
     is_open: boolean;

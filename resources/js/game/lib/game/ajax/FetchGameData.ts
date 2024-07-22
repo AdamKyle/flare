@@ -1,8 +1,7 @@
-import { setDefaultResultOrder } from "dns";
-import Game from "../../../game";
-import Ajax from "../../ajax/ajax";
 import { AxiosResponse } from "axios";
+import Game from "../../../game";
 import MapStateManager from "../../../sections/map/lib/state/map-state-manager";
+import Ajax from "../../ajax/ajax";
 import { CharacterType } from "../character/character-type";
 
 type AjaxUrls = { url: string; name: string }[];
@@ -100,6 +99,7 @@ export default class FetchGameData {
                     can_attack_again_at: result.data.sheet.can_attack_again_at,
                     can_craft: result.data.sheet.can_craft,
                     can_craft_again_at: result.data.sheet.can_craft_again_at,
+                    can_move: result.data.sheet.can_move,
                     is_dead: result.data.sheetis_dead,
                     automation_locked: result.data.sheet.automation_locked,
                     is_silenced: result.data.sheet.is_silenced,

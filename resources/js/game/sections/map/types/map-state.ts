@@ -1,5 +1,5 @@
-import NpcKingdomsDetails from "./map/npc-kingdoms-details";
-import PlayerKingdomsDetails from "./map/player-kingdoms-details";
+import NpcKingdomsDetails from "../../../components/kingdoms/types/map/npc-kingdoms-details";
+import PlayerKingdomsDetails from "../../../components/kingdoms/types/map/player-kingdoms-details";
 import LocationDetails from "./location-details";
 
 export type MapDetails = {

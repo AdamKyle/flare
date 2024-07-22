@@ -1,8 +1,8 @@
 import React, { Fragment } from "react";
-import EnemyKingdomPin from "./enemy-kingdom-pin";
-import KingdomProps from "../../../sections/map/types/map/kingdom-pins/kingdom-props";
-import KingdomState from "../../../sections/map/types/map/kingdom-pins/kingdom-state";
 import { viewPortWatcher } from "../../../lib/view-port-watcher";
+import KingdomProps from "../types/map/kingdom-pins/kingdom-props";
+import KingdomState from "../types/map/kingdom-pins/kingdom-state";
+import EnemyKingdomPin from "./enemy-kingdom-pin";
 import KingdomModal from "./modals/kingdom-modal";
 
 export default class EnemyKingdoms extends React.Component<

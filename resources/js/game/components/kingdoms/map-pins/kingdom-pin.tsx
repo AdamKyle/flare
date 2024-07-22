@@ -1,5 +1,5 @@
 import React from "react";
-import KingdomPinProps from "../../../sections/map/types/map/kingdom-pins/kingdom-pin-props";
+import KingdomPinProps from "../types/map/kingdom-pins/kingdom-pin-props";
 
 export default class KingdomPin extends React.Component<KingdomPinProps, any> {
     constructor(props: KingdomPinProps) {

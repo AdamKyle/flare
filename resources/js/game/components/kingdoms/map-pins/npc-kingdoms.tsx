@@ -1,11 +1,10 @@
 import React, { Fragment } from "react";
-import NpcKingdomPin from "./npc-kingdom-pin";
 import { viewPortWatcher } from "../../../lib/view-port-watcher";
-import KingdomModal from "./modals/kingdom-modal";
 import NpcKingdomProps, {
     NpcKingdomDefinition,
-} from "../../../sections/map/types/map/kingdom-pins/npc-kingdom-props";
-import PlayerKingdomsDetails from "../../../sections/map/types/map/player-kingdoms-details";
+} from "../types/map/kingdom-pins/npc-kingdom-props";
+import KingdomModal from "./modals/kingdom-modal";
+import NpcKingdomPin from "./npc-kingdom-pin";
 
 export default class NpcKingdoms extends React.Component<NpcKingdomProps, any> {
     constructor(props: NpcKingdomProps) {

@@ -1,19 +1,21 @@
-import { AxiosError, AxiosResponse } from "axios";
 import React, { Fragment } from "react";
 import DangerAlert from "../../../components/ui/alerts/simple-alerts/danger-alert";
 import SuccessAlert from "../../../components/ui/alerts/simple-alerts/success-alert";
 import Table from "../../../components/ui/data-tables/table";
 import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
-import Ajax from "../../../lib/ajax/ajax";
+import { serviceContainer } from "../../../lib/containers/core-container";
+import CancelBuildingInQueueAjax from "../ajax/cancel-building-in-queue-ajax";
 import { buildBuildingsColumns } from "../table-columns/build-buildings-columns";
-import BuildingDetails from "./deffinitions/building-details";
 import BuildingsTableProps from "../types/buildings-table-props";
 import UpgradeTablesState from "../types/upgrade-tables-state";
+import BuildingDetails from "./deffinitions/building-details";
 
 export default class BuildingsTable extends React.Component<
     BuildingsTableProps,
     UpgradeTablesState
 > {
+    private cancelBuildingQueueAjax: CancelBuildingInQueueAjax;
+
     constructor(props: BuildingsTableProps) {
         super(props);
 
@@ -22,6 +24,10 @@ export default class BuildingsTable extends React.Component<
             error_message: null,
             loading: false,
         };
+
+        this.cancelBuildingQueueAjax = serviceContainer().fetch(
+            CancelBuildingInQueueAjax,
+        );
     }
 
     viewBuilding(building: BuildingDetails) {
@@ -52,30 +58,7 @@ export default class BuildingsTable extends React.Component<
                 error_message: null,
             },
             () => {
-                new Ajax()
-                    .setRoute("kingdoms/building-upgrade/cancel")
-                    .setParameters({
-                        queue_id: queueId,
-                    })
-                    .doAjaxCall(
-                        "post",
-                        (response: AxiosResponse) => {
-                            this.setState({
-                                success_message: response.data.message,
-                                loading: false,
-                            });
-                        },
-                        (error: AxiosError) => {
-                            if (typeof error.response !== "undefined") {
-                                const response: AxiosResponse = error.response;
-
-                                this.setState({
-                                    error_message: response.data.message,
-                                    loading: false,
-                                });
-                            }
-                        },
-                    );
+                this.cancelBuildingQueueAjax.cancelQueue(this, queueId);
             },
         );
     }

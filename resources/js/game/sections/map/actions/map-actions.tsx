@@ -1,16 +1,16 @@
 import React, { Fragment } from "react";
 import PrimaryOutlineButton from "../../../components/ui/buttons/primary-outline-button";
-import MapActionsProps from "../types/map-actions-props";
-import { canSettleHere } from "../lib/location-helpers";
-import MapActionsState from "../types/map-actions-state";
-import ViewLocationState from "../lib/state/view-location-state";
-import TeleportModal from "../modals/teleport-modal";
 import MovePlayer from "../lib/ajax/move-player";
-import SetSailModal from "../modals/set-sail-modal";
-import LocationDetails from "../types/location-details";
+import { canSettleHere } from "../lib/location-helpers";
+import ViewLocationState from "../lib/state/view-location-state";
 import Conjuration from "../modals/conjuration";
+import SetSailModal from "../modals/set-sail-modal";
 import SettleKingdomModal from "../modals/settle-kingdom-modal";
+import TeleportModal from "../modals/teleport-modal";
 import ViewLocationModal from "../modals/view-location-modal";
+import LocationDetails from "../types/location-details";
+import MapActionsProps from "../types/map-actions-props";
+import MapActionsState from "../types/map-actions-state";
 
 export default class MapActions extends React.Component<
     MapActionsProps,

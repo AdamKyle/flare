@@ -1,4 +1,4 @@
-import LocationModalState from "../../location-pins/modals/location-modal-state";
+import LocationModalState from "../../../../../../sections/map/types/map/location-pins/modals/location-modal-state";
 
 export default interface KingdomModalState extends LocationModalState {
     loading: boolean;
