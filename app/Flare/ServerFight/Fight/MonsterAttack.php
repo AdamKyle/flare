@@ -37,6 +37,8 @@ class MonsterAttack extends BattleBase {
         if ($this->canHit->canMonsterHitPlayer($character, $monster, $this->isVoided)) {
             $this->attackPlayer($monster, $character, $previousAttackType);
 
+            $this->playerBattleHealing($character, $previousAttackType);
+
             $this->doPlayerCounterMonster($character, $monster);
         } else {
             $this->addMessage($monster->getName() . ' misses!', 'enemy-action');
@@ -48,11 +50,15 @@ class MonsterAttack extends BattleBase {
 
         if (!$this->isEnemyVoided) {
             $this->fireEnchantments($monster, $character);
+            $this->playerBattleHealing($character, $previousAttackType);
             $this->castSpells($monster, $character, $previousAttackType);
+            $this->playerBattleHealing($character, $previousAttackType);
         }
 
         $this->monsterElementalAttack($monster, $character);
+        $this->playerBattleHealing($character, $previousAttackType);
         $this->monsterSpecialAttack($monster, $character);
+        $this->playerBattleHealing($character, $previousAttackType);
 
         if ($this->characterHealth <= 0) {
             $this->playerResurrection($monster, $character, $previousAttackType);
