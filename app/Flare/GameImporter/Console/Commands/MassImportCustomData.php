@@ -40,7 +40,7 @@ class MassImportCustomData extends Command {
      */
     public function handle() {
 
-        $this->importGameMaps();
+        $this->importInformationSection();
     }
 
     protected function importInformationSection(): void {
