@@ -332,21 +332,50 @@ export default class Game extends React.Component<GameProps, GameState> {
                                         )}
                                     />
                                 </BasicCard>
-                                {!this.state.hide_donation_alert && (
+                                {!this.state.hide_donation_alert ? (
                                     <WarningAlert
-                                        additional_css="mb-4 mt-[-10px]"
+                                        additional_css={"mb-4 mt-[15px]"}
                                         close_alert={this.closeDonationAlert.bind(
                                             this,
                                         )}
                                     >
-                                        {/* Content of warning alert */}
+                                        <p className={"my-2"}>
+                                            <strong>
+                                                Tlessa needs your help,
+                                            </strong>
+                                        </p>
+
+                                        <p className="my-2">
+                                            Tlessa needs your help to survive.
+                                            Please, consider donating to support
+                                            the continued development of Planes
+                                            of Tlessa.
+                                        </p>
+
+                                        <p className="my-2">
+                                            <a
+                                                href="/tlessa-donations"
+                                                target="_blank"
+                                            >
+                                                Learn more here{" "}
+                                                <i className="fas fa-external-link-alt"></i>
+                                            </a>
+                                            . Tlessa and I deeply appreciate
+                                            your contribution in keeping this
+                                            amazing game alive!
+                                        </p>
                                     </WarningAlert>
-                                )}
-                                {this.state.show_guide_quest_completed && (
-                                    <SuccessAlert additional_css="mb-4">
-                                        {/* Content of success alert */}
+                                ) : null}
+
+                                {this.state.show_guide_quest_completed ? (
+                                    <SuccessAlert
+                                        additional_css={"mb-4 mt-[15px]"}
+                                    >
+                                        You have completed a guide quest. Click
+                                        the button in the top right to collect
+                                        your rewards and move on to the next!
                                     </SuccessAlert>
-                                )}
+                                ) : null}
                                 <div
                                     className={clsx({
                                         hidden: this.state.view_port > 932,
