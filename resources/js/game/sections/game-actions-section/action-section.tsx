@@ -35,6 +35,9 @@ export default class ActionSection extends React.Component<
                         update_parent_state={this.props.update_parent_state}
                         set_map_data={this.props.set_map_data}
                         fame_tasks={this.props.fame_tasks}
+                        update_show_map_mobile={
+                            this.props.update_show_map_mobile
+                        }
                     />
                 ) : (
                     <Actions

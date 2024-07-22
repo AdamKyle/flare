@@ -66,4 +66,6 @@ export default interface GameState {
     show_guide_quest_completed: boolean;
 
     hide_donation_alert: boolean;
+
+    show_map: boolean;
 }

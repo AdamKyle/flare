@@ -15,10 +15,10 @@ import JoinPvp from "./components/join-pvp";
 import RaidSection from "./components/raid-section";
 import MonsterActions from "./components/small-actions/monster-actions";
 import SmallExplorationSection from "./components/small-actions/small-exploration-section";
-import SmallMapMovementActions from "./components/small-actions/small-map-movement-actions";
 import SmallerSpecialtyShop from "./components/small-actions/smaller-specialty-shop";
 import SmallActionsProps from "./types/small-actions-props";
 import SmallActionsState from "./types/small-actions-state";
+import DangerOutlineButton from "../../components/ui/buttons/danger-outline-button";
 
 export default class SmallerActions extends React.Component<
     SmallActionsProps,
@@ -113,6 +113,8 @@ export default class SmallerActions extends React.Component<
             },
             () => {
                 updateTimers(this.props.character.id);
+
+                this.props.update_show_map_mobile(false);
             },
         );
 
@@ -250,16 +252,6 @@ export default class SmallerActions extends React.Component<
         });
     }
 
-    setUpState(): void {
-        if (this.props.action_data === null) {
-            return;
-        }
-
-        let actionData: GameActionState = this.props.action_data;
-
-        this.setState({ ...this.state, ...actionData, ...{ loading: false } });
-    }
-
     showAction(data: any) {
         this.smallActionsManager.setSelectedAction(data);
     }
@@ -277,9 +269,14 @@ export default class SmallerActions extends React.Component<
     }
 
     closeMapSection() {
-        this.setState({
-            selected_action: null,
-        });
+        this.setState(
+            {
+                selected_action: null,
+            },
+            () => {
+                this.props.update_show_map_mobile(false);
+            },
+        );
     }
 
     closeExplorationSection() {
@@ -391,17 +388,15 @@ export default class SmallerActions extends React.Component<
 
     showMapMovement() {
         return (
-            <SmallMapMovementActions
-                close_map_section={this.closeMapSection.bind(this)}
-                update_celestial={(id: number | null) => {}}
-                view_port={this.props.view_port}
-                character={this.props.character}
-                character_currencies={this.props.character_currencies}
-                update_plane_quests={this.props.update_plane_quests}
-                update_character_position={this.props.update_character_position}
-                map_data={this.props.map_data}
-                set_map_data={this.props.set_map_data}
-            />
+            <div>
+                <p className="my-4 text-center">Scroll down to see the map.</p>
+                <div className="text-center">
+                    <DangerOutlineButton
+                        button_label={"Close Map"}
+                        on_click={this.closeMapSection.bind(this)}
+                    />
+                </div>
+            </div>
         );
     }
 

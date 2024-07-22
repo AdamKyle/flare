@@ -68,6 +68,7 @@ export default class Game extends React.Component<GameProps, GameState> {
             fame_action_tasks: null,
             show_guide_quest_completed: false,
             hide_donation_alert: false,
+            show_map: true,
             tabs: [
                 {
                     key: "game",
@@ -249,6 +250,12 @@ export default class Game extends React.Component<GameProps, GameState> {
     updateFactionActionTasks(fameTasks: FameTasks[] | null) {
         this.setState({
             fame_action_tasks: fameTasks,
+        });
+    }
+
+    updateMapVisibility(showMap: boolean) {
+        this.setState({
+            show_map: showMap,
         });
     }
 
@@ -443,6 +450,9 @@ export default class Game extends React.Component<GameProps, GameState> {
                                             fame_tasks={
                                                 this.state.fame_action_tasks
                                             }
+                                            update_show_map_mobile={this.updateMapVisibility.bind(
+                                                this,
+                                            )}
                                         />
                                     </ActionTabs>
                                 </BasicCard>
@@ -455,6 +465,9 @@ export default class Game extends React.Component<GameProps, GameState> {
                                             "lg:max-h-[695px]":
                                                 this.state.character
                                                     .can_use_event_goals_button,
+                                        },
+                                        {
+                                            hidden: !this.state.show_map,
                                         },
                                     )}
                                 >
