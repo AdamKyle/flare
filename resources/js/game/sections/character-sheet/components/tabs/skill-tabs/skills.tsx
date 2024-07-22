@@ -27,9 +27,10 @@ export default class Skills extends React.Component<SkillsProps, any> {
     }
 
     manageTrainSkill(row: any) {
+        console.log("manageTrainSkill");
         this.setState({
             show_train_skill: !this.state.show_train_skill,
-            skill: typeof row !== "undefined" ? row : null,
+            skill: row || null,
         });
     }
 
@@ -70,19 +71,13 @@ export default class Skills extends React.Component<SkillsProps, any> {
     manageSkillDetails(row?: any) {
         this.setState({
             show_skill_details: !this.state.show_skill_details,
-            skill: typeof row !== "undefined" ? row : null,
+            skill: row || null,
         });
     }
 
     setSuccessMessage(message: string) {
         this.setState({
             success_message: message,
-        });
-    }
-
-    closeSuccessMessage() {
-        this.setState({
-            success_message: null,
         });
     }
 

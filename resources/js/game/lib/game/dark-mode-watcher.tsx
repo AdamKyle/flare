@@ -16,19 +16,12 @@ export const watchForDarkModeInventoryChange = (
     component: CharacterInventoryTabs,
 ) => {
     window.setInterval(() => {
-        if (
-            window.localStorage.hasOwnProperty("scheme") &&
-            component.state.dark_tables !== true
-        ) {
+        const isDarkMode = window.localStorage.getItem("scheme") === "dark";
+        const shouldUpdate = isDarkMode !== component.state.dark_tables;
+
+        if (shouldUpdate) {
             component.setState({
-                dark_tables: window.localStorage.scheme === "dark",
-            });
-        } else if (
-            !window.localStorage.hasOwnProperty("scheme") &&
-            component.state.dark_tables
-        ) {
-            component.setState({
-                dark_tables: false,
+                dark_tables: isDarkMode,
             });
         }
     }, 10);
@@ -38,19 +31,12 @@ export const watchForDarkModeClassRankChange = (
     component: CharacterClassRanks,
 ) => {
     window.setInterval(() => {
-        if (
-            window.localStorage.hasOwnProperty("scheme") &&
-            component.state.dark_tables !== true
-        ) {
+        const isDarkMode = window.localStorage.getItem("scheme") === "dark";
+        const shouldUpdate = isDarkMode !== component.state.dark_tables;
+
+        if (shouldUpdate) {
             component.setState({
-                dark_tables: window.localStorage.scheme === "dark",
-            });
-        } else if (
-            !window.localStorage.hasOwnProperty("scheme") &&
-            component.state.dark_tables
-        ) {
-            component.setState({
-                dark_tables: false,
+                dark_tables: isDarkMode,
             });
         }
     }, 10);
@@ -60,19 +46,12 @@ export const watchForDarkModeClassSpecialtyChange = (
     component: CharacterClassRankSpecialtiesSection,
 ) => {
     window.setInterval(() => {
-        if (
-            window.localStorage.hasOwnProperty("scheme") &&
-            component.state.dark_tables !== true
-        ) {
+        const isDarkMode = window.localStorage.getItem("scheme") === "dark";
+        const shouldUpdate = isDarkMode !== component.state.dark_tables;
+
+        if (shouldUpdate) {
             component.setState({
-                dark_tables: window.localStorage.scheme === "dark",
-            });
-        } else if (
-            !window.localStorage.hasOwnProperty("scheme") &&
-            component.state.dark_tables
-        ) {
-            component.setState({
-                dark_tables: false,
+                dark_tables: isDarkMode,
             });
         }
     }, 10);
@@ -82,19 +61,12 @@ export const watchForChatDarkModeComparisonChange = (
     component: ItemComparison,
 ) => {
     window.setInterval(() => {
-        if (
-            window.localStorage.hasOwnProperty("scheme") &&
-            component.state.dark_charts !== true
-        ) {
+        const isDarkMode = window.localStorage.getItem("scheme") === "dark";
+        const shouldUpdate = isDarkMode !== component.state.dark_charts;
+
+        if (shouldUpdate) {
             component.setState({
-                dark_charts: window.localStorage.scheme === "dark",
-            });
-        } else if (
-            !window.localStorage.hasOwnProperty("scheme") &&
-            component.state.dark_charts
-        ) {
-            component.setState({
-                dark_charts: false,
+                dark_charts: isDarkMode,
             });
         }
     }, 10);
@@ -102,19 +74,12 @@ export const watchForChatDarkModeComparisonChange = (
 
 export const watchForChatDarkModeItemViewChange = (component: ItemView) => {
     window.setInterval(() => {
-        if (
-            window.localStorage.hasOwnProperty("scheme") &&
-            component.state.dark_charts !== true
-        ) {
+        const isDarkMode = window.localStorage.getItem("scheme") === "dark";
+        const shouldUpdate = isDarkMode !== component.state.dark_charts;
+
+        if (shouldUpdate) {
             component.setState({
-                dark_charts: window.localStorage.scheme === "dark",
-            });
-        } else if (
-            !window.localStorage.hasOwnProperty("scheme") &&
-            component.state.dark_charts
-        ) {
-            component.setState({
-                dark_charts: false,
+                dark_charts: isDarkMode,
             });
         }
     }, 10);
@@ -124,19 +89,12 @@ export const watchForDarkModeSkillsChange = (
     component: CharacterSkillsTabs,
 ) => {
     window.setInterval(() => {
-        if (
-            window.localStorage.hasOwnProperty("scheme") &&
-            component.state.dark_tables !== true
-        ) {
+        const isDarkMode = window.localStorage.getItem("scheme") === "dark";
+        const shouldUpdate = isDarkMode !== component.state.dark_tables;
+
+        if (shouldUpdate) {
             component.setState({
-                dark_tables: window.localStorage.scheme === "dark",
-            });
-        } else if (
-            !window.localStorage.hasOwnProperty("scheme") &&
-            component.state.dark_tables
-        ) {
-            component.setState({
-                dark_tables: false,
+                dark_tables: isDarkMode,
             });
         }
     }, 10);
@@ -145,29 +103,13 @@ export const watchForDarkModeSkillsChange = (
 export const watchForDarkModeTableChange = (
     component: Component<any, { dark_tables: boolean }>,
 ) => {
-    let previousScheme = window.localStorage.scheme;
-
     window.setInterval(() => {
-        if (window.localStorage.hasOwnProperty("scheme")) {
-            const currentScheme = window.localStorage.scheme;
+        const isDarkMode = window.localStorage.getItem("scheme") === "dark";
+        const shouldUpdate = isDarkMode !== component.state.dark_tables;
 
-            if (currentScheme === "dark" && !component.state.dark_tables) {
-                component.setState({
-                    dark_tables: true,
-                });
-            } else if (
-                currentScheme !== "dark" &&
-                component.state.dark_tables
-            ) {
-                component.setState({
-                    dark_tables: false,
-                });
-            }
-
-            previousScheme = currentScheme;
-        } else if (component.state.dark_tables) {
+        if (shouldUpdate) {
             component.setState({
-                dark_tables: false,
+                dark_tables: isDarkMode,
             });
         }
     }, 10);

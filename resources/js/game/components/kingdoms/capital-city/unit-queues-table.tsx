@@ -59,8 +59,6 @@ export default class UnitQueuesTable extends React.Component<any, any> {
     manageCancelModal(unitId?: number, kingdomId?: number): void {
         let unitData: any = null;
 
-        console.log(this.state.unit_queues, unitId);
-
         if (unitId && kingdomId) {
             const foundData = this.state.unit_queues.filter((queue: any) => {
                 return (
