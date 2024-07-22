@@ -27,7 +27,7 @@ export default class ActiveBoonsActionSection extends React.Component<
     render() {
         return (
             <>
-                <div className={"mb-4 mt-[-20px] text-center"}>
+                <div className={"mb-4 mt-[20px] text-center"}>
                     {!this.state.viewing_active_boons ? (
                         <OrangeButton
                             button_label={"Active Boons"}
