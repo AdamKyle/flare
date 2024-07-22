@@ -19,4 +19,8 @@ If you have no healing spells equipped you will still do 30% healing of your chr
     as your healing spells will never miss. Your healing spells also have a chance at auto resurrecting you, the better the healing spell,
     the better the chance, two combined will stack the chance.
 </p>
-<p>Prophets will want either Dryad or High Elf as their race.</p>
+
+<p>Prophets will want either Dryad or High Elf as their race, to get the most of their class.</p>
+
+<p>You will also want to check out how <a href="/information/how-healing-works">healing works</a> within Tlessa. In a nut shell, healing spells only heal you, Prophets can become almost useless when all you do is heal your self. As a result, if you do not need to be healed,
+when you attack, we create a "reserve" to then be used - automatically - when the enemy attacks, making the combination of healing and damage spells beneficial. Gain a little life, take a little life.</p>

@@ -40,7 +40,7 @@ class PlayerHealing extends BattleBase {
     public function healInBattle(Character $character, array $attackType) {
         $this->castType->setMonsterHealth($this->monsterHealth);
         $this->castType->setCharacterHealth($this->characterHealth);
-        $this->castType->setCharacterAttackData($character, $this->isVoided, AttackTypeValue::ATTACK);
+        $this->castType->setCharacterAttackData($character, $this->isVoided, $attackType['attack_type']);
 
         $this->castType->healDuringFight($character);
 
@@ -52,14 +52,21 @@ class PlayerHealing extends BattleBase {
         $this->castType->clearMessages();
     }
 
-    protected function lifeSteal(Character $character, array $attackType) {
-        $damage = $this->affixes->getAffixLifeSteal($character, $attackType, $this->monsterHealth);
+    public function lifeSteal(Character $character, bool $isPvp = false) {
 
-        $this->monsterHealth -= $damage;
-        $this->characterHealth += $damage;
+        if ($character->classType()->isVampire()) {
 
-        $this->mergeMessages($this->affixes->getMessages());
+            $damage = $this->characterCacheData->getCachedCharacterData($character, 'dur_modded') * 0.05;
 
-        $this->affixes->clearMessages();
+            $this->monsterHealth -= $damage;
+            $this->characterHealth += $damage;
+
+            if ($isPvp) {
+                $this->addAttackerMessage('You lash out in rage and grip the enemies neck. Take what you need child! You deal and heal for: ' . number_format($damage), 'player-action');
+                $this->addDefenderMessage('The enemy feels the pain of your attack, alas they need your valuable blood to survive! You take: ' . number_format($damage) . ' damage.', 'enemy-action');
+            } else {
+                $this->addMessage('You lash out in rage and grip the enemies neck. Take what you need child! You deal and heal for: ' . number_format($damage), 'player-action');
+            }
+        }
     }
 }

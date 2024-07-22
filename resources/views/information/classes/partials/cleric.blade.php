@@ -37,3 +37,7 @@
 <p>
     Your special can proc if you have leveled your <a href='/information/class-skils'>Class Skill</a> and have a high enough skill bonus.
 </p>
+
+<p>You will also want to check out how <a href="/information/how-healing-works">healing works</a> within Tlessa. In a nut shell, healing spells only heal you, Clerics can become almost useless when all you do is heal your self. As a result, if you do not need to be healed,
+    when you attack, we create a "reserve" to then be used - automatically - when the enemy attacks, making the combination of healing and damage spells beneficial. Gain a little life, take a little life.</p>
+

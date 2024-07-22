@@ -368,7 +368,6 @@ class CastType extends BattleBase
         if ($healFor > 0) {
             $healFor = $this->getPotentialCriticalHealAmount($character, $healFor, $isPvp);
 
-
             $healFor += $this->doubleCastHealingAmount($character, $isPvp);
 
             if ($this->characterHealth < $maxHealth) {
@@ -400,6 +399,13 @@ class CastType extends BattleBase
 
         if ($cachedHealFor > 0) {
             if ($this->characterHealth < $maxHealth) {
+
+                $needToHealAmount = $maxHealth - $this->characterHealth;
+
+                $healFor = $this->healForAllAmount($needToHealAmount, $cachedHealFor, $maxHealth, $isPvp);
+                $healFor = $this->partialHeal($needToHealAmount, $healFor, $maxHealth, $isPvp);
+
+                Cache::put('character-' . $character->id . '-healing-amount', min($healFor, 0));
 
                 if ($isPvp) {
                     $this->addAttackerMessage('You reserved healing bursts forward and you feel life flowing through your veins.', 'player-action');

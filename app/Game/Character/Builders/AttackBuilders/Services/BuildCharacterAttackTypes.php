@@ -2,6 +2,7 @@
 
 namespace App\Game\Character\Builders\AttackBuilders\Services;
 
+use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use Exception;
 use Illuminate\Support\Facades\Cache;
 use App\Flare\Models\Character;
@@ -13,15 +14,10 @@ class BuildCharacterAttackTypes {
     use SkillsTransformerTrait;
 
     /**
-     * @var CharacterAttackBuilder $characterAttackBuilder
-     */
-    private CharacterAttackBuilder $characterAttackBuilder;
-
-    /**
      * @param CharacterAttackBuilder $characterAttackBuilder
+     * @param CharacterCacheData $characterCacheData
      */
-    public function __construct(CharacterAttackBuilder $characterAttackBuilder) {
-        $this->characterAttackBuilder = $characterAttackBuilder;
+    public function __construct(private readonly CharacterAttackBuilder $characterAttackBuilder, private readonly CharacterCacheData $characterCacheData) {
     }
 
     /**
@@ -53,6 +49,8 @@ class BuildCharacterAttackTypes {
             ],
             'damage_stat_amount'     => $character->getInformation()->statMod($character->damage_stat),
         ]);
+
+        $this->characterCacheData->deleteCharacterSheet($character);
 
         return Cache::get('character-attack-data-' . $character->id);
     }

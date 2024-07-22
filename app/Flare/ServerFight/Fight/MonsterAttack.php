@@ -38,6 +38,7 @@ class MonsterAttack extends BattleBase {
             $this->attackPlayer($monster, $character, $previousAttackType);
 
             $this->playerBattleHealing($character, $previousAttackType);
+            $this->vampiricHealing($character);
 
             $this->doPlayerCounterMonster($character, $monster);
         } else {
@@ -51,14 +52,18 @@ class MonsterAttack extends BattleBase {
         if (!$this->isEnemyVoided) {
             $this->fireEnchantments($monster, $character);
             $this->playerBattleHealing($character, $previousAttackType);
+            $this->vampiricHealing($character);
             $this->castSpells($monster, $character, $previousAttackType);
             $this->playerBattleHealing($character, $previousAttackType);
+            $this->vampiricHealing($character);
         }
 
         $this->monsterElementalAttack($monster, $character);
         $this->playerBattleHealing($character, $previousAttackType);
+        $this->vampiricHealing($character);
         $this->monsterSpecialAttack($monster, $character);
         $this->playerBattleHealing($character, $previousAttackType);
+        $this->vampiricHealing($character);
 
         if ($this->characterHealth <= 0) {
             $this->playerResurrection($character, $previousAttackType);
@@ -151,6 +156,26 @@ class MonsterAttack extends BattleBase {
         $this->playerHealing->setMonsterHealth($this->monsterHealth);
         $this->playerHealing->setCharacterHealth($this->characterHealth);
         $this->playerHealing->healInBattle($character, $previousAttackType);
+
+        $this->characterHealth = $this->playerHealing->getCharacterHealth();
+        $characterHealth       = $this->characterCacheData->getCachedCharacterData($character, 'health');
+
+        if ($this->characterHealth > $characterHealth) {
+            $this->characterHealth = $characterHealth;
+        }
+
+        $this->monsterHealth = $this->playerHealing->getMonsterHealth();
+
+        $this->mergeMessages($this->playerHealing->getMessages());
+
+        $this->playerHealing->clearMessages();
+    }
+
+    protected function vampiricHealing(Character $character) {
+
+        $this->playerHealing->setMonsterHealth($this->monsterHealth);
+        $this->playerHealing->setCharacterHealth($this->characterHealth);
+        $this->playerHealing->lifeSteal($character);
 
         $this->characterHealth = $this->playerHealing->getCharacterHealth();
         $characterHealth       = $this->characterCacheData->getCachedCharacterData($character, 'health');

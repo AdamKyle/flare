@@ -69,7 +69,7 @@ class MonsterSpecialAttack extends BattleBase {
 
         $this->addMessage('The enemy lashes out in a physical rage. Their muscles bulging, their eyes blood shot! Death has come today child!', 'enemy-action');
         $this->addMessage('You block: ' . number_format($ac) . ' of the enemies special attack damage!', 'player-action');
-        $this->addMessage('You take: ' . $newDamage . ' damage from the enemies special attack (Physical)!', 'enemy-action');
+        $this->addMessage('You take: ' . number_format($newDamage) . ' damage from the enemies special attack (Physical)!', 'enemy-action');
     }
 
     /**
@@ -94,7 +94,7 @@ class MonsterSpecialAttack extends BattleBase {
 
         $this->addMessage('The enemy begins their chant, the air gets colder - chilly. Your breath is seen on the air, your flesh begins to freeze!', 'enemy-action');
         $this->addMessage('You block: ' . number_format($ac) . ' of the enemies special attack damage!', 'player-action');
-        $this->addMessage('You take: ' . $newDamage . ' damage from the enemies special attack (Magical)!', 'enemy-action');
+        $this->addMessage('You take: ' . number_format($newDamage) . ' damage from the enemies special attack (Magical)!', 'enemy-action');
     }
 
     protected function doDelusionalMemoriesAttack(int $damageStat, int $ac): void {

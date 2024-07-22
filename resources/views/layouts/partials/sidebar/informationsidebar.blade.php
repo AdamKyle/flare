@@ -154,6 +154,10 @@
                 <span class="ra ra-archer"></span>
                 Combat
             </a>
+            <a href="{{ route('info.page', ['pageName' => 'how-healing-works']) }}">
+                <span class="ra ra-archer"></span>
+                Healing & Resurrection
+            </a>
             <a href="{{ route('info.page', ['pageName' => 'ambush-and-counter']) }}">
                 <span class="ra ra-muscle-fat"></span>
                 Ambush and Counter

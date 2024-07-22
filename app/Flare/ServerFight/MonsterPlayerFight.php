@@ -177,7 +177,7 @@ class MonsterPlayerFight {
     public function getBattleMessages(): array {
         $messages = $this->battleMessages;
 
-        $this->removeDuplicateMessages($messages);
+        // $this->removeDuplicateMessages($messages);
 
         return $messages;
     }
@@ -266,9 +266,9 @@ class MonsterPlayerFight {
         $health = $ambush->getHealthObject();
 
         $health['max_character_health']     = (int) $this->characterCacheData->getCachedCharacterData($this->character, 'health');
-        $health['current_character_health'] = $health['current_character_health'] <= 0 ? 0 : $health['current_character_health'];
+        $health['current_character_health'] = max($health['current_character_health'], 0);
         $health['max_monster_health']       = $monster->getHealth();
-        $health['current_monster_health']   = $health['current_monster_health'] <= 0 ? 0 : $health['current_monster_health'];
+        $health['current_monster_health']   = max($health['current_monster_health'], 0);
 
         $this->mergeMessages($this->ambush->getMessages());
 
@@ -283,7 +283,7 @@ class MonsterPlayerFight {
             $monster['highest_element']    = $highestElement;
         }
 
-        $data = [
+        return  [
             'health'                => $health,
             'player_voided'         => $isPlayerVoided,
             'enemy_voided'          => $isEnemyVoided,
@@ -291,12 +291,6 @@ class MonsterPlayerFight {
             'opening_messages'      => $this->getBattleMessages(),
             'rank'                  => $rank,
         ];
-
-        if ($isRankFight && ($data['health']['current_character_health'] > 0 && $data['health']['current_monster_health'] > 0)) {
-            Cache::put('rank-fight-for-character-' . $this->character->id, $data);
-        }
-
-        return $data;
     }
 
     /**
@@ -547,23 +541,5 @@ class MonsterPlayerFight {
      */
     protected function mergeMessages(array $messages): void {
         $this->battleMessages = array_merge($this->battleMessages, $messages);
-    }
-
-    /**
-     * Remove duplicate messages.
-     *
-     * @param array $array
-     * @return void
-     */
-    protected function removeDuplicateMessages(array &$array): void {
-        $uniqueMessages = [];
-
-        $array = array_reduce($array, function ($result, $item) use (&$uniqueMessages) {
-            if (!in_array($item['message'], $uniqueMessages)) {
-                $uniqueMessages[] = $item['message'];
-                $result[] = $item;
-            }
-            return $result;
-        }, []);
     }
 }
