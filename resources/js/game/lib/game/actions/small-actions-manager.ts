@@ -129,6 +129,10 @@ export default class SmallActionsManager {
                         show_duel_fight: true,
                     });
                 }
+
+                if (data.value === "map-movement") {
+                    this.component.props.update_show_map_mobile(true);
+                }
             },
         );
     }

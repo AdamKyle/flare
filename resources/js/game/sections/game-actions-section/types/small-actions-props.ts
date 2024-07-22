@@ -15,4 +15,6 @@ export default interface SmallActionsProps extends ActionsProps {
     map_data: MapState | null;
 
     set_map_data: (mapData: MapState) => void;
+
+    update_show_map_mobile: (showMap: boolean) => void;
 }
