@@ -64,6 +64,7 @@ class CastType extends BattleBase
     public function pvpCastAttack(Character $attacker, Character $defender) {
 
         $spellDamage = $this->attackData['spell_damage'];
+        $healFor = $this->attackData['heal_for'];
 
         if ($spellDamage > 0) {
             $this->heal($attacker, $defender, true);
@@ -81,6 +82,10 @@ class CastType extends BattleBase
             if ($this->isEnemyEntranced) {
                 $this->pvpSpellDamage($attacker, $defender, $spellDamage);
 
+                if ($healFor > 0) {
+                    $this->heal($attacker, $defender, true);
+                }
+
                 if ($this->allowSecondaryAttacks) {
                     $this->secondaryAttack($attacker, null, $this->characterCacheData->getCachedCharacterData($defender, 'affix_damage_reduction'), true);
                 }
@@ -89,6 +94,10 @@ class CastType extends BattleBase
             }
         } else if ($this->isEnemyEntranced) {
             $this->pvpSpellDamage($attacker, $defender, $spellDamage);
+
+            if ($healFor > 0) {
+                $this->heal($attacker, $defender, true);
+            }
 
             if ($this->allowSecondaryAttacks) {
                 $this->secondaryAttack($attacker, null, $this->characterCacheData->getCachedCharacterData($defender, 'affix_damage_reduction'), true);
@@ -99,16 +108,24 @@ class CastType extends BattleBase
 
         if ($this->canHit->canPlayerCastSpellOnPlayer($attacker, $defender, $this->isVoided)) {
             if ($this->characterCacheData->getCachedCharacterData($defender, 'ac') > $spellDamage) {
-                $this->addAttackerMessage('Your spell was blocked!', 'enemy-action');
+                $this->addAttackerMessage('Your damage spell was blocked!', 'enemy-action');
             } else {
                 $this->pvpSpellDamage($attacker, $defender, $spellDamage);
+
+                if ($healFor > 0) {
+                    $this->heal($attacker, $defender, true);
+                }
 
                 if ($this->allowSecondaryAttacks) {
                     $this->secondaryAttack($attacker, null, $this->characterCacheData->getCachedCharacterData($defender, 'affix_damage_reduction'), true);
                 }
             }
         } else {
-            $this->addAttackerMessage('Your spell fizzled and failed!', 'enemy-action');
+            $this->addAttackerMessage('Your damage spell fizzled and failed!', 'enemy-action');
+
+            if ($healFor > 0) {
+                $this->heal($attacker, $defender, true);
+            }
 
             if ($this->allowSecondaryAttacks) {
                 $this->secondaryAttack($attacker, null, $this->characterCacheData->getCachedCharacterData($defender, 'affix_damage_reduction'), true);
@@ -122,8 +139,6 @@ class CastType extends BattleBase
 
         $spellDamage = $this->attackData['spell_damage'];
         $healFor = $this->attackData['heal_for'];
-
-        dump($this->attackData);
 
         if ($spellDamage <= 0) {
 
