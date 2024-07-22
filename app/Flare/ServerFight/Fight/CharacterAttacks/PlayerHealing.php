@@ -5,37 +5,25 @@ namespace App\Flare\ServerFight\Fight\CharacterAttacks;
 use App\Flare\Models\Character;
 use App\Flare\ServerFight\BattleBase;
 use App\Flare\ServerFight\Fight\Affixes;
+use App\Flare\ServerFight\Fight\CharacterAttacks\Types\CastType;
 use App\Flare\ServerFight\Monster\ServerMonster;
+use App\Flare\Values\AttackTypeValue;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 
 class PlayerHealing extends BattleBase {
 
     private Affixes $affixes;
 
-    public function __construct(CharacterCacheData $characterCacheData, Affixes $affixes) {
+    private CastType $castType;
+
+    public function __construct(CharacterCacheData $characterCacheData, Affixes $affixes, CastType $castType) {
         parent::__construct($characterCacheData);
 
         $this->affixes = $affixes;
+        $this->castType = $castType;
     }
 
-    public function healingPhase(Character $character, ServerMonster $monster, array $attackType, bool $isVoided) {
-        if ($this->characterHealth <= 0) {
-            if ($this->ressurect($character, $attackType)) {
-
-                if (!$isVoided) {
-                    $this->lifeSteal($character, $attackType);
-                }
-
-                return;
-            }
-        }
-
-        if (!$isVoided) {
-            $this->lifeSteal($character, $attackType);
-        }
-    }
-
-    protected function ressurect(Character $character, array $attackType): bool {
+    public function resurrect(array $attackType): bool {
         $chance = $attackType['res_chance'];
 
         if (rand(1, 100) > (100 - 100 * $chance)) {
@@ -47,6 +35,21 @@ class PlayerHealing extends BattleBase {
         }
 
         return false;
+    }
+
+    public function healInBattle(array $attackType) {
+        $this->castType->setMonsterHealth($this->monsterHealth);
+        $this->castType->setCharacterHealth($this->characterHealth);
+        $this->castType->setCharacterAttackData($this->character, $this->isVoided, AttackTypeValue::ATTACK);
+
+        $this->castType->healDuringFight($this->character);
+
+        $this->monsterHealth = $this->castType->getMonsterHealth();
+        $this->characterHealth = $this->castType->getCharacterHealth();
+
+        $this->mergeMessages($this->castType->getMessages());
+
+        $this->castType->clearMessages();
     }
 
     protected function lifeSteal(Character $character, array $attackType) {

@@ -33,6 +33,11 @@ class SpecialAttacks extends BattleMessages {
      */
     private int $monsterHealth;
 
+    /**
+     * @var int $healFor
+     */
+    private int $healFor = 0;
+
 
     public function __construct() {
         parent::__construct();
@@ -78,6 +83,15 @@ class SpecialAttacks extends BattleMessages {
      */
     public function getMonsterHealth(): int {
         return $this->monsterHealth;
+    }
+
+    /**
+     * Get how much we should heal for.
+     *
+     * @return int
+     */
+    public function getHealFor(): int {
+        return $this->healFor;
     }
 
     /**
@@ -170,13 +184,15 @@ class SpecialAttacks extends BattleMessages {
      * @param Character $character
      * @param array $attackData
      * @param bool $isPvp
-     * @return void|null
+     * @return SpecialAttacks
      * @throws Exception
      */
-    public function doCastHealSpecials(Character $character, array $attackData, bool $isPvp = false) {
+    public function doCastHealSpecials(Character $character, array $attackData, bool $isPvp = false): SpecialAttacks {
         if ($character->classType()->isProphet()) {
-            $this->doubleHeal($character, $attackData, $isPvp);
+            $this->healFor += $this->doubleHeal($character, $attackData, $isPvp);
         }
+
+        return $this;
     }
 
     /**
@@ -351,11 +367,11 @@ class SpecialAttacks extends BattleMessages {
      * @param bool $isPvp
      * @return void
      */
-    public function doubleHeal(Character $character, array $attackData, bool $isPvp = false) {
+    public function doubleHeal(Character $character, array $attackData, bool $isPvp = false): int {
         $doubleCast = resolve(DoubleHeal::class);
 
         $doubleCast->setCharacterHealth($this->characterHealth);
-        $doubleCast->handleHeal($character, $attackData, $isPvp);
+        $healForAmount = $doubleCast->handleHeal($character, $attackData, $isPvp);
 
         if (!$isPvp) {
             $this->mergeMessages($doubleCast->getMessages());
@@ -363,9 +379,9 @@ class SpecialAttacks extends BattleMessages {
             $this->mergeAttackerMessages($doubleCast->getAttackerMessages());
         }
 
-        $this->characterHealth = $doubleCast->getCharacterHealth();
-
         $doubleCast->clearMessages();
+
+        return $healForAmount;
     }
 
     /**

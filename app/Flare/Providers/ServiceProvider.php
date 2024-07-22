@@ -81,6 +81,7 @@ use App\Game\Character\CharacterCreation\Services\CharacterBuilderService;
 use App\Game\Core\Services\CharacterService;
 use App\Game\Kingdoms\Handlers\GiveKingdomsToNpcHandler;
 use App\Game\Quests\Services\BuildQuestCacheService;
+use App\Game\Quests\Transformers\QuestTransformer;
 use App\Game\Skills\Services\SkillService;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
@@ -345,7 +346,8 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(PlayerHealing::class, function($app) {
            return new PlayerHealing(
                $app->make(CharacterCacheData::class),
-               $app->make(Affixes::class)
+               $app->make(Affixes::class),
+               $app->make(CastType::class),
            );
         });
 
@@ -450,8 +452,11 @@ class ServiceProvider extends ApplicationServiceProvider
            return new EventSchedulerService();
         });
 
-        $this->app->bind(BuildQuestCacheService::class, function() {
-            return new BuildQuestCacheService();
+        $this->app->bind(BuildQuestCacheService::class, function($app) {
+            return new BuildQuestCacheService(
+                $app->make(QuestTransformer::class),
+                $app->make(Manager::class),
+            );
         });
     }
 

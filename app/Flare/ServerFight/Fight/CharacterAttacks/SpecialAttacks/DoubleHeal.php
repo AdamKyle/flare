@@ -8,14 +8,14 @@ use App\Flare\ServerFight\BattleBase;
 
 class DoubleHeal extends BattleBase {
 
-    public function handleHeal(Character $character, array $attackData, bool $isPvp = false) {
+    public function handleHeal(Character $character, array $attackData, bool $isPvp = false): int {
         $extraActionData = $this->characterCacheData->getCachedCharacterData($character, 'extra_action_chance');
 
         if ($extraActionData['has_item']) {
 
             if (!($extraActionData['chance'] >= 1)) {
                 if (!(rand(1, 100) > (100 - 100 * $extraActionData['chance']))) {
-                    return;
+                    return 0;
                 }
             }
 
@@ -27,20 +27,14 @@ class DoubleHeal extends BattleBase {
             if (rand(1, 100) > (100 - 100 * $criticality)) {
                 $this->addMessage('The heavens open and your wounds start to heal over (Critical heal!)', 'regular', $isPvp);
 
-                $healFor *= 2;
+                return $healFor *= 2;
             }
 
             $healFor = $healFor + $healFor * 0.15;
 
-            $this->characterHealth += $healFor;
-
-            $originalHealth = $this->characterCacheData->getCachedCharacterData($character, 'health');
-
-            if ($this->characterHealth > $originalHealth) {
-                $this->characterHealth = $originalHealth;
-            }
-
             $this->addMessage('Your healing spell(s) heals for an additional: ' . number_format($healFor), 'player-action', $isPvp);
+
+            return $healFor;
         }
     }
 }

@@ -724,18 +724,30 @@ class CharacterStatBuilder {
 
         $chance = $this->equippedItems->where('item.type', '=', 'spell-healing')->sum('item.resurrection_chance');
 
-        if ($this->character->classType()->isProphet()) {
+        if ($this->character->classType()->isProphet() || $this->character->classType()->isCleric()) {
             $chance += 0.05;
         }
 
         if ($chance > 0) {
-            if ($this->character->map->gameMap->mapType()->isPurgatory() && $chance > 0.45) {
+            if (($this->character->map->gameMap->mapType()->isPurgatory() || $this->character->map->gameMap->mapType()->isTwistedMemories()) && $chance > 0.45) {
                 if ($this->character->classType()->isProphet()) {
                     $chance = min($chance, 0.65);
                 } else {
                     $chance = min($chance, 0.45);
                 }
             }
+        }
+
+        if (!$this->character->classType()->isVampire() && $chance > 0.95) {
+            return 0.95;
+        }
+
+        if ((!$this->character->classType()->isProphet() || !$this->character->classType()->isCleric()) && $chance > 0.75) {
+            return 0.75;
+        }
+
+        if ($chance > 1.0) {
+            return 1.0;
         }
 
         return $chance;

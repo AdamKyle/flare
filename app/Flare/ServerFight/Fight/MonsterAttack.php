@@ -54,8 +54,8 @@ class MonsterAttack extends BattleBase {
         $this->monsterElementalAttack($monster, $character);
         $this->monsterSpecialAttack($monster, $character);
 
-        if ($this->characterHealth > 0) {
-            $this->playerHealing($monster, $character, $previousAttackType);
+        if ($this->characterHealth <= 0) {
+            $this->playerResurrection($monster, $character, $previousAttackType);
         }
     }
 
@@ -118,12 +118,33 @@ class MonsterAttack extends BattleBase {
         }
     }
 
-    protected function playerHealing(ServerMonster $monster, Character $character, string $previousAttackType) {
+    protected function playerResurrection(Character $character, string $previousAttackType) {
         $previousAttackType = $this->characterCacheData->getDataFromAttackCache($character, $previousAttackType);
 
         $this->playerHealing->setMonsterHealth($this->monsterHealth);
         $this->playerHealing->setCharacterHealth($this->characterHealth);
-        $this->playerHealing->healingPhase($character, $monster, $previousAttackType, $this->isVoided);
+        $this->playerHealing->resurrect($previousAttackType);
+
+        $this->characterHealth = $this->playerHealing->getCharacterHealth();
+        $characterHealth       = $this->characterCacheData->getCachedCharacterData($character, 'health');
+
+        if ($this->characterHealth > $characterHealth) {
+            $this->characterHealth = $characterHealth;
+        }
+
+        $this->monsterHealth = $this->playerHealing->getMonsterHealth();
+
+        $this->mergeMessages($this->playerHealing->getMessages());
+
+        $this->playerHealing->clearMessages();
+    }
+
+    protected function playerBattleHealing(Character $character, string $previousAttackType) {
+        $previousAttackType = $this->characterCacheData->getDataFromAttackCache($character, $previousAttackType);
+
+        $this->playerHealing->setMonsterHealth($this->monsterHealth);
+        $this->playerHealing->setCharacterHealth($this->characterHealth);
+        $this->playerHealing->healInBattle($previousAttackType);
 
         $this->characterHealth = $this->playerHealing->getCharacterHealth();
         $characterHealth       = $this->characterCacheData->getCachedCharacterData($character, 'health');
