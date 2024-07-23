@@ -70,7 +70,7 @@
             </p>
         </div>
 
-        <div class="grid md:grid-cols-3 gap-3 w-full md:w-2/3 m-auto">
+        <div class="grid lg:grid-cols-3 gap-3 w-full md:w-2/3 m-auto">
             <x-core.cards.feature-card>
                 <x-slot:icon>
                     <i class="ra ra-player text-primary-600 relative top-[10px] right-[10px]"></i>
@@ -212,7 +212,7 @@
             </p>
         </div>
 
-        <div class="grid md:grid-cols-3 gap-3 mt-20 w-full md:w-2/3 m-auto">
+        <div class="grid lg:grid-cols-3 gap-3 mt-20 w-full md:w-2/3 m-auto">
             <x-core.cards.feature-card>
                 <x-slot:icon>
                     <i class="ra ra-anvil text-primary-600 relative top-[10px] right-[10px]"></i>
@@ -259,7 +259,7 @@
             </x-core.cards.feature-card>
         </div>
 
-        <div class="grid md:grid-cols-3 gap-3 mt-2 w-full md:w-2/3 m-auto">
+        <div class="grid lg:grid-cols-3 gap-3 mt-2 w-full md:w-2/3 m-auto">
             <x-core.cards.feature-card>
                 <x-slot:icon>
                     <i class="ra ra-bone-bite text-primary-600 relative top-[10px] right-[10px]"></i>
