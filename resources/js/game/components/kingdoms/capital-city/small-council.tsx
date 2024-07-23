@@ -7,6 +7,7 @@ import SuccessAlert from "../../ui/alerts/simple-alerts/success-alert";
 import DangerAlert from "../../ui/alerts/simple-alerts/danger-alert";
 import ManageKingdomBuildings from "./manage-kingdom-buildings";
 import UnitRecruitment from "./unit-recruitment";
+import WarningAlert from "../../ui/alerts/simple-alerts/warning-alert";
 
 export default class SmallCouncil extends React.Component<any, any> {
     private walkAllKingdomsAjax: WalkAllKingdomsAjax;
@@ -166,6 +167,19 @@ export default class SmallCouncil extends React.Component<any, any> {
                         unit can be recruited if you have not met the max amount
                         of that unit and have the unit unlocked. As a result
                         units you can recruit have been filtered.
+                    </ClickableIconCard>
+                    <ClickableIconCard
+                        title={"Manage Gold Bars"}
+                        icon_class={"ra ra-crossed-swords"}
+                        on_click={this.manageShowUnitRecruitment.bind(this)}
+                    >
+                        <WarningAlert>
+                            You must complete the quest: x before being able to use this feature.
+                        </WarningAlert>
+                        
+                        Clicking this card allows you to manage your gold bars across all kingdoms on the same plane
+                        as this capital city. When you deposit, we will evenly split the gold bars across the
+                        kingdoms. When you withdraw, we will evenly take from every kingdom.
                     </ClickableIconCard>
                 </div>
             </div>
