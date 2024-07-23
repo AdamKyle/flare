@@ -1,7 +1,5 @@
-import React, { ReactNode } from "react";
-import { isWeaponType } from "./helpers/is-weapon-type";
+import React from "react";
 import { formatNumber } from "../../lib/game/format-number";
-import { isArmourType } from "./helpers/is-armour-type";
 import { startCase } from "lodash";
 import ItemDefinition from "./deffinitions/item-definition";
 import { ItemType } from "./enums/item-type";
