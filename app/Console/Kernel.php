@@ -62,6 +62,9 @@ class Kernel extends ConsoleKernel {
         // Update kingdoms every hour.
         $schedule->command('update:kingdoms')->hourly()->timezone(config('app.timezone'));
 
+        // Reset every day at 11:59 pm.
+        $schedule->command('reset:capital-city-walking-status')->dailyAt('23:59')->timezone(config('app.timezone'));
+
         // Start the monthly pvp event.
         $schedule->command('start:pvp-monthly-event')->lastDayOfMonth('18:30')->timezone(config('app.timezone'));
 

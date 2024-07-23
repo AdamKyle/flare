@@ -5,6 +5,7 @@ namespace App\Game\Kingdoms\Providers;
 
 use App\Flare\Transformers\KingdomBuildingTransformer;
 use App\Flare\Transformers\UnitMovementTransformer;
+use App\Game\Kingdoms\Console\Commands\ResetCapitalCityWalkingStatus;
 use App\Game\Kingdoms\Handlers\AttackLogHandler;
 use App\Game\Kingdoms\Handlers\DefenderArcherHandler;
 use App\Game\Kingdoms\Handlers\DefenderSiegeHandler;
@@ -284,6 +285,7 @@ class ServiceProvider extends ApplicationServiceProvider {
         $this->commands([
             DeleteKingdomLogs::class,
             UpdateKingdoms::class,
+            ResetCapitalCityWalkingStatus::class
         ]);
     }
 
