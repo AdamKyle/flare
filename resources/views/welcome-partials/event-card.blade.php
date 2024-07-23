@@ -45,21 +45,20 @@
     }
 @endphp
 
-
 <x-core.cards.feature-card>
     <x-slot:icon>
-        <i class="ra {{$icon}} text-primary-600 relative top-[10px] right-[10px]"></i>
+        <i class="ra {{ $icon }} text-primary-600 relative top-2 md:top-4 right-2 md:right-4"></i>
     </x-slot:icon>
     <x-slot:title>
-        <h3>{{$eventRunning->getTitleOfEvent()}}</h3>
+        <h3 class="text-xl md:text-2xl">{{ $eventRunning->getTitleOfEvent() }}</h3>
     </x-slot:title>
 
-    <p class="text-orange-600 dark:text-orange-300 my-2">
-        <strong>Runs from</strong>: {{$eventRunning->start_date->format('l, j \of F, Y \a\t g:iA')}}
-        <strong>until</strong>: {{$eventRunning->end_date->format('l, j \of F, Y \a\t g:iA')}}
+    <p class="text-orange-600 dark:text-orange-300 my-2 text-sm md:text-base">
+        <strong>Runs from</strong>: {{ $eventRunning->start_date->format('l, j \of F, Y \a\t g:iA') }}
+        <strong>until</strong>: {{ $eventRunning->end_date->format('l, j \of F, Y \a\t g:iA') }}
     </p>
 
-    <p class="mb-4">
+    <p class="mb-4 text-sm md:text-base">
         @if ($eventRunning->getTitleOfEvent() === 'Weekly Celestials')
             Join the Celestials battle! Take them down and gain valuable currencies! Celestials spawn with an 80%
             chance. Just move around the map to engage!
@@ -106,7 +105,7 @@
         @endif
     </p>
     <div class="text-center">
-        <x-core.buttons.link-buttons.primary-button href="{{$href}}">
+        <x-core.buttons.link-buttons.primary-button href="{{ $href }}">
             View More Info
         </x-core.buttons.link-buttons.primary-button>
     </div>

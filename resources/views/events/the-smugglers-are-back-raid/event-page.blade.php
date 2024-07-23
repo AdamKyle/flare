@@ -14,7 +14,7 @@
                 <strong>Runs from</strong>: {{$event->start_date->format('l, j \of F, Y \a\t g:iA')}}
                 <strong>until</strong>: {{$event->end_date->format('l, j \of F, Y \a\t g:iA')}}
             </p>
-            <div class="grid md:grid-cols-3 gap-2 md:w-2/3 w-full mr-auto ml-auto">
+            <div class="grid lg:grid-cols-3 gap-2 md:w-2/3 w-full mr-auto ml-auto">
                 <x-core.buttons.link-buttons.primary-button css="mr-2" href="{{ route('register') }}">
                     Join Today!
                 </x-core.buttons.link-buttons.primary-button>
