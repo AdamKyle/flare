@@ -123,6 +123,14 @@ trait ItemsShowInformation {
             if ($effect->mercenarySlotBonus()) {
                 $effects = 'Allows you to gain +50% towards currency rewards from playing slots and +5% from Copper Coins that drop in Purgatory Dungeons';
             }
+
+            if ($effect->walkOnDelusionalMemoriesWater()) {
+                $effects = 'Allows you to walk on water on the Delusional Memories plane';
+            }
+
+            if ($effect->accessTwistedMemories()) {
+                $effects = 'Allows entrance into the Twisted Dimensional Gate in Hell, to be automatically traversed to Twisted Memories!';
+            }
         }
 
         if ($item->usable && !is_null($item->affects_skill_type)) {

@@ -82,6 +82,7 @@ class ItemsService {
                 ItemEffectsValue::HIDE_CHAT_LOCATION,
                 ItemeffectsValue::SETTLE_IN_ICE_PLANE,
                 ItemEffectsValue::MERCENARY_SLOT_BONUS,
+                ItemEffectsValue::TWISTED_TREE_BRANCH,
             ],
             'specialtyTypes' => [
                 ItemSpecialtyType::HELL_FORGED,

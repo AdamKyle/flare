@@ -83,6 +83,8 @@ class GameMap extends Model {
                 return Item::where('effect', ItemEffectsValue::HELL)->first();
             case 'Purgatory':
                 return Item::where('effect', ItemEffectsValue::PURGATORY)->first();
+            case 'Twisted Memories':
+                return Item::where('effect', ItemEffectsValue::TWISTED_TREE_BRANCH)->first();
             case 'Surface':
             default:
                 return null;

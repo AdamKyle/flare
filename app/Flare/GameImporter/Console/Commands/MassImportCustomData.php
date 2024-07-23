@@ -40,7 +40,11 @@ class MassImportCustomData extends Command {
      */
     public function handle() {
 
+        Artisan::call('import:game-data Items');
+
         $this->importInformationSection();
+
+        Artisan::call('create:quest-cache');
     }
 
     protected function importInformationSection(): void {

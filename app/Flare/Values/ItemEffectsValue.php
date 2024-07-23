@@ -32,6 +32,7 @@ class ItemEffectsValue {
     const THE_OLD_CHURCH        = 'the-old-church';
     const MERCENARY_SLOT_BONUS  = 'mercenary-slot-bonus';
     const WALK_ON_DELUSIONAL_MEMORIES_WATER = 'walk-on-delusional-memories-water';
+    const TWISTED_TREE_BRANCH = 'access-twisted-memories';
 
     /**
      * @var string[] $values
@@ -60,6 +61,7 @@ class ItemEffectsValue {
         self::THE_OLD_CHURCH        => 'the-old-church',
         self::MERCENARY_SLOT_BONUS  => 'mercenary-slot-bonus',
         self::WALK_ON_DELUSIONAL_MEMORIES_WATER => 'walk-on-delusional-memories-water',
+        self::TWISTED_TREE_BRANCH => 'access-twisted-memories',
     ];
 
     /**
@@ -276,5 +278,14 @@ class ItemEffectsValue {
      */
     public function walkOnDelusionalMemoriesWater(): bool {
         return $this->value === self::WALK_ON_DELUSIONAL_MEMORIES_WATER;
+    }
+
+    /**
+     * Is an item that allows us to walk on the delusional memories water?
+     *
+     * @return bool
+     */
+    public function accessTwistedMemories(): bool {
+        return $this->value === self::TWISTED_TREE_BRANCH;
     }
 }
