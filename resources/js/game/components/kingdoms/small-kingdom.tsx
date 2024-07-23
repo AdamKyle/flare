@@ -212,6 +212,20 @@ export default class SmallKingdom extends React.Component<
                                 character_id={this.props.kingdom.character_id}
                             />
                         </Fragment>
+                    ) : this.state.show_small_council ? (
+                        <BasicCard>
+                            <div className="text-right cursor-pointer text-red-500">
+                                <button
+                                    onClick={this.manageSmallCouncil.bind(this)}
+                                >
+                                    <i className="fas fa-minus-circle"></i>
+                                </button>
+                            </div>
+                            <SmallCouncil
+                                kingdom={this.state.kingdom}
+                                user_id={this.props.user_id}
+                            />
+                        </BasicCard>
                     ) : (
                         <Fragment>
                             <div className="grid grid-cols-2 mb-5">
@@ -230,7 +244,9 @@ export default class SmallKingdom extends React.Component<
                             </div>
 
                             <KingdomDetails
-                                show_small_council={() => true}
+                                show_small_council={this.manageSmallCouncil.bind(
+                                    this,
+                                )}
                                 kingdom={this.state.kingdom}
                                 character_gold={this.props.character_gold}
                                 close_details={this.props.close_details}
