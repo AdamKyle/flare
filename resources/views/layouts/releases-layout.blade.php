@@ -71,7 +71,7 @@
 </header>
 
 <!-- Workspace -->
-<main class="workspace scrolling-section">
+<main class="workspace">
 
     @guest
         @include('layouts.partials.alerts')
