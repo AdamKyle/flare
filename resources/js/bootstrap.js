@@ -1,3 +1,5 @@
+import 'remixicon/fonts/remixicon.css'
+
 import Echo from "laravel-echo"
 import 'reflect-metadata'
 

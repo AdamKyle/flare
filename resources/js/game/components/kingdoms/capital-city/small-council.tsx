@@ -21,6 +21,7 @@ export default class SmallCouncil extends React.Component<any, any> {
             error_message: null,
             show_building_management: false,
             show_unit_recruitment: false,
+            show_gold_bars_section: false,
         };
 
         this.walkAllKingdomsAjax =
@@ -58,6 +59,39 @@ export default class SmallCouncil extends React.Component<any, any> {
         });
     }
 
+    showGoldBarsAlert() {
+        if (this.props.kingdom.small_council_data !== null) {
+            return this.props.kingdom.small_council_data.capital_city_gold_bars
+                .can_use;
+        }
+
+        return false;
+    }
+
+    renderAlertData() {
+        const capitalCityGoldBars =
+            this.props.kingdom.small_council_data.capital_city_gold_bars;
+
+        return (
+            <span>
+                You need to complete the quest:{" "}
+                {capitalCityGoldBars.required_quest_name} to be completed first.
+                The NPC: {capitalCityGoldBars.for_npc_name} who lives on the
+                plane: {capitalCityGoldBars.on_plane}
+            </span>
+        );
+    }
+
+    manageGoldBars() {
+        if (this.showGoldBarsAlert()) {
+            return;
+        }
+
+        this.setState({
+            show_gold_bars_section: !this.state.show_gold_bars_section,
+        });
+    }
+
     render() {
         if (this.state.show_building_management) {
             return (
@@ -72,6 +106,18 @@ export default class SmallCouncil extends React.Component<any, any> {
         }
 
         if (this.state.show_unit_recruitment) {
+            return (
+                <UnitRecruitment
+                    user_id={this.props.user_id}
+                    kingdom={this.props.kingdom}
+                    manage_unit_section={this.manageShowUnitRecruitment.bind(
+                        this,
+                    )}
+                />
+            );
+        }
+
+        if (this.state.show_gold_bars) {
             return (
                 <UnitRecruitment
                     user_id={this.props.user_id}
@@ -170,16 +216,19 @@ export default class SmallCouncil extends React.Component<any, any> {
                     </ClickableIconCard>
                     <ClickableIconCard
                         title={"Manage Gold Bars"}
-                        icon_class={"ra ra-crossed-swords"}
-                        on_click={this.manageShowUnitRecruitment.bind(this)}
+                        icon_class={"ri-copper-coin-fill"}
+                        on_click={this.manageGoldBars.bind(this)}
                     >
-                        <WarningAlert>
-                            You must complete the quest: x before being able to use this feature.
-                        </WarningAlert>
-                        
-                        Clicking this card allows you to manage your gold bars across all kingdoms on the same plane
-                        as this capital city. When you deposit, we will evenly split the gold bars across the
-                        kingdoms. When you withdraw, we will evenly take from every kingdom.
+                        {this.showGoldBarsAlert() ? (
+                            <WarningAlert additional_css={"mb-4"}>
+                                {this.renderAlertData()}
+                            </WarningAlert>
+                        ) : null}
+                        Clicking this card allows you to manage your gold bars
+                        across all kingdoms on the same plane as this capital
+                        city. When you deposit, we will evenly split the gold
+                        bars across the kingdoms. When you withdraw, we will
+                        evenly take from every kingdom.
                     </ClickableIconCard>
                 </div>
             </div>

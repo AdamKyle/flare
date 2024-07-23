@@ -3,6 +3,7 @@
 namespace App\Flare\Transformers;
 
 use App\Flare\Models\PassiveSkill;
+use App\Flare\Models\Quest;
 use App\Flare\Models\SmeltingProgress;
 use App\Flare\Values\FeatureTypes;
 use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
@@ -84,6 +85,7 @@ class KingdomTransformer extends TransformerAbstract {
             'is_under_attack'           => $this->isKingdomUnderAttack($kingdom),
             'is_capital'                => $kingdom->is_capital,
             'auto_walked'               => $kingdom->auto_walked,
+            'small_council_data'        => $this->getSmallCouncilData($kingdom),
         ];
     }
 
@@ -250,6 +252,41 @@ class KingdomTransformer extends TransformerAbstract {
         })->first();
 
         return $skill->{$timeReductionAttribute};
+    }
+
+    protected function getSmallCouncilData(Kingdom $kingdom): array | null {
+        $features = [];
+
+        if (!$kingdom->is_capital) {
+            return null;
+        }
+
+        $completedQuest = $kingdom->character->questsCompleted->filter(function($completedQuest)  {
+            return $completedQuest->unlocks_feature === FeatureTypes::CAPITAL_CITY_GOLD_BARS;
+        })->first();
+
+
+        if (is_null($completedQuest)) {
+            $quest = Quest::where('unlocks_feature', FeatureTypes::CAPITAL_CITY_GOLD_BARS)->first();
+
+            if (is_null($quest)) {
+                $features['capital_city_gold_bars'] = [
+                    'can_use' => false,
+                    'required_quest_name' => $quest->name,
+                    'for_npc_name' => $quest->npc->real_name,
+                    'on_plane' => $quest->npc->gameMap->name,
+                ];
+            }
+        } else {
+            $features['capital_city_gold_bars'] = [
+                'can_use' => true,
+                'required_quest_name' => $$completedQuest->quest->name,
+                'for_npc_name' => $$completedQuest->quest->npc->real_name,
+                'on_plane' => $$completedQuest->quest->npc->gameMap->name,
+            ];
+        }
+
+        return $features;
     }
 
     /**

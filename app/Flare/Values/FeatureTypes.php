@@ -16,6 +16,8 @@ class FeatureTypes {
 
     const CAPITAL_CITIES = 4;
 
+    const CAPITAL_CITY_GOLD_BARS = 5;
+
     /**
      * @var int $value
      */
@@ -30,6 +32,7 @@ class FeatureTypes {
         2 => self::NAME_TAGS,
         3 => self::EXTEND_SETS,
         4 => self::CAPITAL_CITIES,
+        5 => self::CAPITAL_CITY_GOLD_BARS,
     ];
 
     protected static array $valueNames = [
@@ -38,6 +41,7 @@ class FeatureTypes {
         self::NAME_TAGS     => 'Name Tags',
         self::EXTEND_SETS   => 'Give 10 additional sets',
         self::CAPITAL_CITIES => 'Capital Cities',
+        self::CAPITAL_CITY_GOLD_BARS => 'Capital City Gold Bars',
     ];
 
     /**
