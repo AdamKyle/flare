@@ -50,28 +50,29 @@ export default class GuideButton extends React.Component<
             },
         );
 
-        const self = this;
-
         setTimeout(
-            function () {
-                if (self.props.force_open_modal) {
-                    self.setState({
+            () => {
+                if (this.props.force_open_modal) {
+                    this.setState({
                         is_modal_open: true,
                     });
                 }
             },
-            (import.meta as any).env.VITE_APP_ENV === "production" ? 3500 : 500,
+            (import.meta as unknown as { env: { VITE_APP_ENV: string } }).env
+                .VITE_APP_ENV === "production"
+                ? 3500
+                : 500,
         );
 
         this.guideQuestListener.listen();
         this.guideQuestCompletedListener.listen();
     }
 
-    manageGuideQuestModal() {
+    manageGuideQuestModal = () => {
         this.setState({
             is_modal_open: !this.state.is_modal_open,
         });
-    }
+    };
 
     render() {
         if (!this.state.show_button) {
@@ -95,7 +96,7 @@ export default class GuideButton extends React.Component<
 
                     <SuccessOutlineButton
                         button_label={"Guide Quests"}
-                        on_click={this.manageGuideQuestModal.bind(this)}
+                        on_click={this.manageGuideQuestModal}
                         additional_css={"mr-4"}
                     />
                 </div>
@@ -103,7 +104,7 @@ export default class GuideButton extends React.Component<
                 {this.state.is_modal_open ? (
                     <GuideQuest
                         is_open={this.state.is_modal_open}
-                        manage_modal={this.manageGuideQuestModal.bind(this)}
+                        manage_modal={this.manageGuideQuestModal}
                         user_id={this.props.user_id}
                         view_port={this.state.view_port}
                     />
