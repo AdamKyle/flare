@@ -98,6 +98,7 @@ Route::middleware([
     Route::get('/kingdom/capital-city/manage-units/{character}/{kingdom}', ['as' => 'kingdom.capital-city.manage.units', 'uses' => 'Api\CapitalCityManagementController@fetchKingdomsWithRecruitableUnitType']);
     Route::get('/kingdom/capital-city/building-queues/{character}/{kingdom}', ['as' => 'kingdom.capital-city.building-queues.units', 'uses' => 'Api\CapitalCityManagementController@fetchKingdomBuildingManagementQueues']);
     Route::get('/kingdom/capital-city/unit-queues/{character}/{kingdom}', ['as' => 'kingdom.capital-city.unit-queues.units', 'uses' => 'Api\CapitalCityManagementController@fetchKingdomUnitManagementQueues']);
+    Route::get('/kingdom/capital-city/{character}/{kingdom}/gold-bar-details', ['as' => 'kingdom.capital-city.gold-bar-management', 'uses' => 'Api\CapitalCityManagementController@fetchGoldBarData']);
     Route::post('/kingdom/make-capital-city/{kingdom}/{character}', ['as' => 'kingdom.make.capital-city', 'uses' => 'Api\CapitalCityManagementController@makeCapitalCity']);
     Route::post('/kingdom/capital-city/walk-all-cities/{character}/{kingdom}', ['as' => 'capital.city.walk-kingdoms', 'uses' => 'Api\CapitalCityManagementController@walkAllKingdoms']);
     Route::post('/kingdom/capital-city/upgrade-building-requests/{character}/{kingdom}', ['as' => 'capital.city.building-upgrade-request', 'uses' => 'Api\CapitalCityManagementController@upgradeBuildings']);

@@ -8,6 +8,7 @@ import DangerAlert from "../../ui/alerts/simple-alerts/danger-alert";
 import ManageKingdomBuildings from "./manage-kingdom-buildings";
 import UnitRecruitment from "./unit-recruitment";
 import WarningAlert from "../../ui/alerts/simple-alerts/warning-alert";
+import GoldBarManagement from "./gold-bar-management";
 
 export default class SmallCouncil extends React.Component<any, any> {
     private walkAllKingdomsAjax: WalkAllKingdomsAjax;
@@ -61,7 +62,7 @@ export default class SmallCouncil extends React.Component<any, any> {
 
     showGoldBarsAlert() {
         if (this.props.kingdom.small_council_data !== null) {
-            return this.props.kingdom.small_council_data.capital_city_gold_bars
+            return !this.props.kingdom.small_council_data.capital_city_gold_bars
                 .can_use;
         }
 
@@ -75,9 +76,13 @@ export default class SmallCouncil extends React.Component<any, any> {
         return (
             <span>
                 You need to complete the quest:{" "}
-                {capitalCityGoldBars.required_quest_name} to be completed first.
-                The NPC: {capitalCityGoldBars.for_npc_name} who lives on the
-                plane: {capitalCityGoldBars.on_plane}
+                <strong>{capitalCityGoldBars.required_quest_name}</strong>{" "}
+                first, for The NPC:{" "}
+                <strong>{capitalCityGoldBars.for_npc_name}</strong> who lives on
+                the plane: <strong>{capitalCityGoldBars.on_plane}</strong>.{" "}
+                <span className={"italic"}>
+                    (This will be a One Off (Tab) Quest)
+                </span>
             </span>
         );
     }
@@ -117,14 +122,12 @@ export default class SmallCouncil extends React.Component<any, any> {
             );
         }
 
-        if (this.state.show_gold_bars) {
+        if (this.state.show_gold_bars_section) {
             return (
-                <UnitRecruitment
-                    user_id={this.props.user_id}
+                <GoldBarManagement
+                    character_id={this.props.kingdom.character_id}
                     kingdom={this.props.kingdom}
-                    manage_unit_section={this.manageShowUnitRecruitment.bind(
-                        this,
-                    )}
+                    manage_gold_bar_management={this.manageGoldBars.bind(this)}
                 />
             );
         }

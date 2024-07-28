@@ -261,15 +261,17 @@ class KingdomTransformer extends TransformerAbstract {
             return null;
         }
 
-        $completedQuest = $kingdom->character->questsCompleted->filter(function($completedQuest)  {
-            return $completedQuest->unlocks_feature === FeatureTypes::CAPITAL_CITY_GOLD_BARS;
+        $completedQuest = $kingdom->character->questsCompleted()->whereNotNull(
+            'quest_id'
+        )->get()->filter(function($completedQuest)  {
+            return $completedQuest->quest->unlocks_feature === FeatureTypes::CAPITAL_CITY_GOLD_BARS;
         })->first();
 
 
         if (is_null($completedQuest)) {
             $quest = Quest::where('unlocks_feature', FeatureTypes::CAPITAL_CITY_GOLD_BARS)->first();
 
-            if (is_null($quest)) {
+            if (!is_null($quest)) {
                 $features['capital_city_gold_bars'] = [
                     'can_use' => false,
                     'required_quest_name' => $quest->name,
@@ -280,11 +282,13 @@ class KingdomTransformer extends TransformerAbstract {
         } else {
             $features['capital_city_gold_bars'] = [
                 'can_use' => true,
-                'required_quest_name' => $$completedQuest->quest->name,
-                'for_npc_name' => $$completedQuest->quest->npc->real_name,
-                'on_plane' => $$completedQuest->quest->npc->gameMap->name,
+                'required_quest_name' => $completedQuest->quest->name,
+                'for_npc_name' => $completedQuest->quest->npc->real_name,
+                'on_plane' => $completedQuest->quest->npc->gameMap->name,
             ];
         }
+
+        dump($features);
 
         return $features;
     }

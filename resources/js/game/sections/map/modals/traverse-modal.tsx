@@ -78,7 +78,18 @@ export default class TraverseModal extends React.Component<any, any> {
         )[0];
 
         if (!playerMap) {
-            return { label: "Please select", value: 0 };
+            const map = this.state.game_maps.filter(
+                (map: any) => map.id === this.state.map,
+            )[0];
+
+            if (!map) {
+                return { label: "Please select", value: 0 };
+            }
+
+            return {
+                label: map.name,
+                value: map.id,
+            };
         }
 
         if (this.state.map === 0) {

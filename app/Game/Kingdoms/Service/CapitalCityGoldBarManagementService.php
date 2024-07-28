@@ -3,11 +3,13 @@
 namespace App\Game\Kingdoms\Service;
 
 use App\Flare\Models\Character;
+use App\Flare\Models\GameBuilding;
 use App\Flare\Models\Kingdom;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Gambler\Values\CurrencyValue;
+use App\Game\Kingdoms\Values\BuildingCosts;
 use Facades\App\Game\Core\Handlers\HandleGoldBarsAsACurrency;
 
 class CapitalCityGoldBarManagementService {
@@ -18,11 +20,25 @@ class CapitalCityGoldBarManagementService {
 
     public function fetchGoldBarDetails(Character $character, Kingdom $kingdom): array {
 
-        $kingdoms = $character->kingdoms()->where('game_map_id', $kingdom->game_map_id)->get();
+        $goblinBank = GameBuilding::where('name', BuildingCosts::GOBLIN_COIN_BANK)->first();
+
+        $kingdoms = $character->kingdoms()
+            ->where('game_map_id', $kingdom->game_map_id)
+            ->whereHas('buildings', function($query) use ($goblinBank) {
+                $query->where('game_building_id', $goblinBank->id);
+            })
+            ->get();
+
+        $allBuildingsLevelFive = $kingdoms->every(function ($kingdom) use ($goblinBank) {
+            $building = $kingdom->buildings->firstWhere('game_building_id', $goblinBank->id);
+            return $building && $building->level >= 5;
+        });
 
         $data = [
             'total_gold_bars' => $kingdoms->sum('gold_bars'),
             'character_gold' => $character->gold,
+            'total_kingdoms' => $kingdoms->count(),
+            'goblin_banks_level_five' => $allBuildingsLevelFive,
         ];
 
         return $this->successResult([

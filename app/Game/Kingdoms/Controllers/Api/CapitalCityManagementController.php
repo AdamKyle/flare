@@ -11,6 +11,7 @@ use App\Game\Kingdoms\Requests\RecruitUnitCancellationRequest;
 use App\Game\Kingdoms\Requests\RecruitUnitRequestsRequest;
 use App\Game\Kingdoms\Service\CancelBuildingRequestService;
 use App\Game\Kingdoms\Service\CancelUnitRequestService;
+use App\Game\Kingdoms\Service\CapitalCityGoldBarManagementService;
 use App\Game\Kingdoms\Service\CapitalCityManagementService;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
@@ -19,7 +20,8 @@ class CapitalCityManagementController extends Controller {
 
     public function __construct(private readonly CapitalCityManagementService $capitalCityManagementService,
                                 private readonly CancelBuildingRequestService $cancelBuildingRequestService,
-                                private readonly CancelUnitRequestService $cancelUnitRequestService
+                                private readonly CancelUnitRequestService $cancelUnitRequestService,
+                                private readonly CapitalCityGoldBarManagementService $capitalCityGoldBarManagementService,
     ) {}
 
     public function makeCapitalCity(Kingdom $kingdom, Character $character): JsonResponse {
@@ -103,6 +105,15 @@ class CapitalCityManagementController extends Controller {
 
     public function cancelBuildingOrdersOrders(CancelUnitRequestRequest $request, Character $character, Kingdom $kingdom) {
         $result = $this->cancelBuildingRequestService->handleCancelRequest($character, $kingdom, $request->all()['request_data']);
+
+        $status = $result['status'];
+        unset($result['status']);
+
+        return response()->json($result, $status);
+    }
+
+    public function fetchGoldBarData(Character $character, Kingdom $kingdom) {
+        $result = $this->capitalCityGoldBarManagementService->fetchGoldBarDetails($character, $kingdom);
 
         $status = $result['status'];
         unset($result['status']);

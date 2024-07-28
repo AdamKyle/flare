@@ -59,7 +59,7 @@ export default class GoblinBankModal extends React.Component<
         }
 
         if (value > 1000) {
-            value === 1000;
+            value = 1000;
         }
 
         if (value > this.props.gold_bars) {

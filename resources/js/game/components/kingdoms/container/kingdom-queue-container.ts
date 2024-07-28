@@ -15,6 +15,7 @@ import UpgradeWithResourcesAjax from "../ajax/upgrade-with-resources-ajax";
 import WalkAllKingdomsAjax from "../ajax/walk-all-kingdoms-ajax";
 import kingdomQueueContainer from "../queues/container/kingdom-queue-container";
 import kingdomEventContainer from "./kingdom-event-container";
+import GetCapitalCityGoldBarData from "../ajax/get-capital-city-gold-bar-data";
 
 /**
  * Register core dependencies here.
@@ -85,6 +86,10 @@ function kingdomContainer(container: CoreContainer) {
 
     container.register("upgrade-with-resources-ajax", {
         useClass: UpgradeWithResourcesAjax,
+    });
+
+    container.register("get-capital-city-gold-bar-data", {
+        useClass: GetCapitalCityGoldBarData,
     });
 }
 
