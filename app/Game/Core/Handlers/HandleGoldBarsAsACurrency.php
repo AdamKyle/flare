@@ -54,4 +54,43 @@ class HandleGoldBarsAsACurrency {
             }
         });
     }
+
+    /**
+     * Add gold bars to kingdoms.
+     *
+     * @param Collection $kingdoms
+     * @param int $goldBarsToDeposit
+     * @return void
+     */
+    public function addGoldBarsToKingdoms(Collection $kingdoms, int $goldBarsToDeposit): void {
+
+        $kingdomCount = $kingdoms->count();
+        $perKingdom = intdiv($goldBarsToDeposit, $kingdomCount);
+        $remainder = $goldBarsToDeposit % $kingdomCount;
+
+        $kingdoms->each(function ($kingdom) use (&$perKingdom, &$remainder) {
+            $newAmount = min($kingdom->gold_bars + $perKingdom, 1000);
+            $kingdom->update(['gold_bars' => $newAmount]);
+
+
+            if ($newAmount < $kingdom->gold_bars + $perKingdom) {
+                $excess = ($kingdom->gold_bars + $perKingdom) - 1000;
+                $remainder += $excess;
+            }
+        });
+
+        $kingdoms->each(function ($kingdom) use (&$remainder) {
+            if ($remainder <= 0) {
+                return false;
+            }
+
+            $additional = min($remainder, 1000 - $kingdom->gold_bars);
+            $newAmount = $kingdom->gold_bars + $additional;
+            $kingdom->update(['gold_bars' => $newAmount]);
+
+            $remainder -= $additional;
+        });
+    }
+
+
 }

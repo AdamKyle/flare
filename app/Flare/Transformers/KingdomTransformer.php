@@ -288,8 +288,6 @@ class KingdomTransformer extends TransformerAbstract {
             ];
         }
 
-        dump($features);
-
         return $features;
     }
 

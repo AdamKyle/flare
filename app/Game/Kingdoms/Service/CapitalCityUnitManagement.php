@@ -134,22 +134,27 @@ class CapitalCityUnitManagement {
             if (ResourceValidation::shouldRedirectUnits($gameUnit, $kingdom, $amount)) {
                 $missingCosts = ResourceValidation::getMissingResources($gameUnit, $kingdom, $amount);
 
-                foreach ($missingCosts as $resourceName => $amount) {
+                if (empty($missingCosts)) {
+                    $unitRequests[$currentIndex]['secondary_status'] = CapitalCityQueueStatus::RECRUITING;
+                } else {
+                    foreach ($missingCosts as $resourceName => $amount) {
 
-                    if ($amount <= 0) {
-                        continue;
+                        if ($amount <= 0) {
+                            continue;
+                        }
+
+                        $result = $this->sendOffResourceRequest($character, $kingdom, $resourceName, $amount, $capitalCityUnitQueue->id, $gameUnit->id);
+
+                        if (!$result) {
+                            $unitRequests[$currentIndex]['secondary_status'] = CapitalCityQueueStatus::REJECTED;
+
+                            break;
+                        }
+
+                        $unitRequests[$currentIndex]['secondary_status'] = CapitalCityQueueStatus::REQUESTING;
                     }
-
-                    $result = $this->sendOffResourceRequest($character, $kingdom, $resourceName, $amount, $capitalCityUnitQueue->id, $gameUnit->id);
-
-                    if (!$result) {
-                        $unitRequests[$currentIndex]['secondary_status'] = CapitalCityQueueStatus::REJECTED;
-
-                        break;
-                    }
-
-                    $unitRequests[$currentIndex]['secondary_status'] = CapitalCityQueueStatus::REQUESTING;
                 }
+
             }
 
             /**

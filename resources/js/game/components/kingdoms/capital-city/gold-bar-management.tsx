@@ -12,12 +12,17 @@ import Tabs from "../../ui/tabs/tabs";
 import { parseInt } from "lodash";
 import WarningAlert from "../../ui/alerts/simple-alerts/warning-alert";
 import SuccessOutlineButton from "../../ui/buttons/success-outline-button";
+import CapitalCityManageGoldBarsAjax from "../ajax/capital-city-manage-gold-bars-ajax";
+import SuccessAlert from "../../ui/alerts/simple-alerts/success-alert";
+import DangerAlert from "../../ui/alerts/simple-alerts/danger-alert";
 
 export default class GoldBarManagement extends React.Component<
     GoldBarManagementProps,
     GoldBarManagementState
 > {
     private fetchGoldBarData: GetCapitalCityGoldBarData;
+
+    private manageGoldBars: CapitalCityManageGoldBarsAjax;
 
     private tabs: { key: string; name: string }[];
 
@@ -29,9 +34,10 @@ export default class GoldBarManagement extends React.Component<
             success_message: null,
             error_message: null,
             gold_bar_data: null,
-            amount_of_gold_bars_to_buy: 0,
-            amount_of_gold_bars_to_sell: 0,
+            amount_of_gold_bars_to_buy: "",
+            amount_of_gold_bars_to_sell: "",
             max_gold_bars_allowed: 0,
+            processing: false,
         };
 
         this.tabs = [
@@ -48,6 +54,10 @@ export default class GoldBarManagement extends React.Component<
         this.fetchGoldBarData = serviceContainer().fetch(
             GetCapitalCityGoldBarData,
         );
+
+        this.manageGoldBars = serviceContainer().fetch(
+            CapitalCityManageGoldBarsAjax,
+        );
     }
 
     componentDidMount() {
@@ -59,11 +69,15 @@ export default class GoldBarManagement extends React.Component<
     }
 
     calculateCost(): number {
-        return this.state.amount_of_gold_bars_to_buy * 2_000_000_000;
+        return (
+            (this.state.amount_of_gold_bars_to_buy as number) * 2_000_000_000
+        );
     }
 
     calculateGain(): number {
-        return this.state.amount_of_gold_bars_to_sell * 2_000_000_000;
+        return (
+            (this.state.amount_of_gold_bars_to_sell as number) * 2_000_000_000
+        );
     }
 
     setAmountToWithdraw(e: React.ChangeEvent<HTMLInputElement>) {
@@ -71,16 +85,16 @@ export default class GoldBarManagement extends React.Component<
 
         if (value === 0) {
             return this.setState({
-                success_message: "",
-                error_message: "",
+                success_message: null,
+                error_message: null,
                 amount_of_gold_bars_to_sell: 0,
             });
         }
 
         if (this.state.gold_bar_data === null) {
             return this.setState({
-                success_message: "",
-                error_message: "",
+                success_message: null,
+                error_message: null,
                 amount_of_gold_bars_to_sell: 0,
             });
         }
@@ -90,8 +104,8 @@ export default class GoldBarManagement extends React.Component<
         }
 
         this.setState({
-            success_message: "",
-            error_message: "",
+            success_message: null,
+            error_message: null,
             amount_of_gold_bars_to_sell: value,
         });
     }
@@ -105,16 +119,16 @@ export default class GoldBarManagement extends React.Component<
     setAmount(value: number) {
         if (value === 0) {
             return this.setState({
-                success_message: "",
-                error_message: "",
+                success_message: null,
+                error_message: null,
                 amount_of_gold_bars_to_buy: 0,
             });
         }
 
         if (this.state.gold_bar_data === null) {
             return this.setState({
-                success_message: "",
-                error_message: "",
+                success_message: null,
+                error_message: null,
                 amount_of_gold_bars_to_sell: 0,
             });
         }
@@ -132,8 +146,8 @@ export default class GoldBarManagement extends React.Component<
         }
 
         this.setState({
-            success_message: "",
-            error_message: "",
+            success_message: null,
+            error_message: null,
             amount_of_gold_bars_to_buy: value,
         });
     }
@@ -150,9 +164,51 @@ export default class GoldBarManagement extends React.Component<
         return amount === 0;
     }
 
-    deposit() {}
+    deposit() {
+        if (this.state.amount_of_gold_bars_to_buy === "") {
+            return;
+        }
 
-    withdraw() {}
+        if ((this.state.amount_of_gold_bars_to_buy as number) <= 0) {
+            return;
+        }
+
+        this.setState({
+            error_message: null,
+            success_message: null,
+            processing: true,
+        });
+
+        this.manageGoldBars.depositGoldBars(
+            this,
+            this.props.character_id,
+            this.props.kingdom.id,
+            this.state.amount_of_gold_bars_to_buy as number,
+        );
+    }
+
+    withdraw() {
+        if (this.state.amount_of_gold_bars_to_sell === "") {
+            return;
+        }
+
+        if ((this.state.amount_of_gold_bars_to_sell as number) <= 0) {
+            return;
+        }
+
+        this.setState({
+            error_message: null,
+            success_message: null,
+            processing: true,
+        });
+
+        this.manageGoldBars.withdrawGoldBars(
+            this,
+            this.props.character_id,
+            this.props.kingdom.id,
+            this.state.amount_of_gold_bars_to_sell as number,
+        );
+    }
 
     manageView() {
         this.props.manage_gold_bar_management();
@@ -184,13 +240,35 @@ export default class GoldBarManagement extends React.Component<
                         building and leveling the Goblin Bank.
                     </WarningAlert>
                 ) : null}
+                {this.state.success_message !== null ? (
+                    <SuccessAlert additional_css={"my-4"}>
+                        {this.state.success_message}
+                    </SuccessAlert>
+                ) : null}
+                {this.state.error_message !== null ? (
+                    <DangerAlert additional_css={"my-4"}>
+                        {this.state.error_message}
+                    </DangerAlert>
+                ) : null}
+                {this.state.processing ? (
+                    <div className="my-4">
+                        <LoadingProgressBar />
+                    </div>
+                ) : null}
                 <Tabs tabs={this.tabs} disabled={this.state.loading}>
                     <TabPanel key={"deposit"}>
                         <InfoAlert>
-                            Cost to buy is 2 Billion Gold per Rune. You may have
-                            a total of 1000 Gold Bars per kingdom. Depositing
-                            Gold Bars will deposit across all your kingdoms on
-                            this plane.
+                            <p>
+                                Cost to buy is 2 Billion Gold per Rune. You may
+                                have a total of 1000 Gold Bars per kingdom.
+                                Depositing Gold Bars will deposit across all
+                                your kingdoms on this plane.
+                            </p>
+                            <p className="my-2">
+                                Please note that depositing gold bars will not
+                                deposit into this kingdom, it will do so for all
+                                OTHER kingdoms on this plane that you own.
+                            </p>
                         </InfoAlert>
                         <div className="flex items-center my-4">
                             <label className="w-1/2">Amount to deposit</label>
@@ -230,15 +308,18 @@ export default class GoldBarManagement extends React.Component<
                             button_label={"Deposit Amount"}
                             on_click={this.deposit.bind(this)}
                             disabled={
-                                this.state.amount_of_gold_bars_to_buy <= 0 ||
-                                this.state.gold_bar_data.character_gold <= 0
+                                (this.state
+                                    .amount_of_gold_bars_to_buy as number) <=
+                                    0 ||
+                                (this.state.gold_bar_data
+                                    .character_gold as number) <= 0
                             }
                         />
                     </TabPanel>
                     <TabPanel key={"withdrawal"}>
                         <InfoAlert>
-                            Withdrawing Gold Bars will subtract them fro all
-                            your kingdoms on this plane.
+                            Withdrawing Gold Bars will subtract them from all,
+                            but this kingdom, kingdoms you own on this plane.
                         </InfoAlert>
                         <div className="flex items-center my-4">
                             <label className="w-1/2">Amount to withdraw</label>
@@ -273,8 +354,11 @@ export default class GoldBarManagement extends React.Component<
                             button_label={"Withdraw Amount"}
                             on_click={this.withdraw.bind(this)}
                             disabled={
-                                this.state.amount_of_gold_bars_to_sell <= 0 ||
-                                this.state.gold_bar_data.total_gold_bars <= 0
+                                (this.state
+                                    .amount_of_gold_bars_to_sell as number) <=
+                                    0 ||
+                                (this.state.gold_bar_data
+                                    .total_gold_bars as number) <= 0
                             }
                         />
                     </TabPanel>

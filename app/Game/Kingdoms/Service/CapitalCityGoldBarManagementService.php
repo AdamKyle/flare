@@ -18,11 +18,12 @@ class CapitalCityGoldBarManagementService {
 
     public function __construct( private readonly UpdateKingdom $updateKingdom){}
 
-    public function fetchGoldBarDetails(Character $character, Kingdom $kingdom): array {
+    public function fetchGoldBarDetails(Character $character, Kingdom $kingdom, bool $returnResponse = true): array {
 
         $goblinBank = GameBuilding::where('name', BuildingCosts::GOBLIN_COIN_BANK)->first();
 
         $kingdoms = $character->kingdoms()
+            ->where('id', '!=', $kingdom->id)
             ->where('game_map_id', $kingdom->game_map_id)
             ->whereHas('buildings', function($query) use ($goblinBank) {
                 $query->where('game_building_id', $goblinBank->id);
@@ -41,6 +42,10 @@ class CapitalCityGoldBarManagementService {
             'goblin_banks_level_five' => $allBuildingsLevelFive,
         ];
 
+        if (!$returnResponse) {
+            return $data;
+        }
+
         return $this->successResult([
             'gold_bar_details' => $data,
         ]);
@@ -48,6 +53,7 @@ class CapitalCityGoldBarManagementService {
 
     public function convertGoldBars(Character $character, Kingdom $kingdom, int $goldBars): array {
         $kingdoms = $character->kingdoms()->where('game_map_id', $kingdom->game_map_id)
+            ->where('id', '!=', $kingdom->id)
             ->whereRaw('(SELECT SUM(gold_bars) FROM kingdoms WHERE gold_bars > 0) >= ?', [$goldBars])
             ->groupBy('kingdoms.id', 'kingdoms.character_id', 'kingdoms.name')
             ->selectRaw('*, SUM(gold_bars) as gold_bars_sum')
@@ -82,6 +88,50 @@ class CapitalCityGoldBarManagementService {
         event(new UpdateTopBarEvent($character));
 
         $this->updateKingdom->updateKingdomAllKingdoms($character);
+
+        return $this->successResult([
+            'message' => 'Withdrew: ' . number_format($goldBars) . ' Gold Bars.',
+            'gold_bar_details' => $this->fetchGoldBarDetails($character, $kingdom, false),
+        ]);
     }
 
+    public function depositGoldBars(Character $character, Kingdom $kingdom, int $amountToPurchase): array {
+        $cost = 2000000000 * $amountToPurchase;
+
+        if ($cost > $character->gold) {
+            return $this->errorResult('Far too much gold is required. You do not have enough.');
+        }
+
+        $kingdoms = $character->kingdoms()->where('game_map_id', $kingdom->game_map_id)->where('id', '!=', $kingdom->id)->get();
+
+        $allowedGoldBars = $kingdoms->count() * 1000;
+        $currentGoldBars = $kingdoms->sum('gold_bars');
+
+        if ($amountToPurchase > $allowedGoldBars) {
+            return $this->errorResult('You are only allowed to have: ' . number_format($allowedGoldBars) . ' total Gold Bars. Settle more kingdoms or spend some.');
+        }
+
+        $newAmount = $currentGoldBars + $amountToPurchase;
+
+        if ($newAmount > $allowedGoldBars) {
+            return $this->errorResult('You are only allowed to have: ' . number_format($allowedGoldBars) . ' total Gold Bars. Settle more kingdoms or spend some.');
+        }
+
+        HandleGoldBarsAsACurrency::addGoldBarsToKingdoms($kingdoms, $amountToPurchase);
+
+        $character->update([
+            'gold' => $character->gold - $cost,
+        ]);
+
+        $character = $character->refresh();
+
+        event(new UpdateTopBarEvent($character));
+
+        $this->updateKingdom->updateKingdomAllKingdoms($character);
+
+        return $this->successResult([
+            'message' => 'Deposited: ' . number_format($amountToPurchase) . ' Gold Bars.',
+            'gold_bar_details' => $this->fetchGoldBarDetails($character, $kingdom, false),
+        ]);
+    }
 }

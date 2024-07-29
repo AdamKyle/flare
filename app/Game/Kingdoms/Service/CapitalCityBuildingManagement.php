@@ -339,6 +339,12 @@ class CapitalCityBuildingManagement {
         if (ResourceValidation::shouldRedirectRebuildKingdomBuilding($building, $kingdom)) {
             $missingResources = ResourceValidation::getMissingCosts($building, $kingdom);
 
+            if (empty($missingResources)) {
+                $buildingUpgradeRequest['secondary_status'] = CapitalCityQueueStatus::BUILDING;
+
+                return $buildingUpgradeRequest;
+            }
+
             $canAffordPopulation = $missingResources['population'] === 0;
 
             if ($missingResources['population'] > 0) {

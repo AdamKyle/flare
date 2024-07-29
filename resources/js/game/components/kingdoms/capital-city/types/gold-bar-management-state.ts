@@ -5,7 +5,8 @@ export default interface GoldBarManagementState {
     success_message: string | null;
     error_message: string | null;
     gold_bar_data: GoldBarData | null;
-    amount_of_gold_bars_to_buy: number;
-    amount_of_gold_bars_to_sell: number;
+    amount_of_gold_bars_to_buy: number | string;
+    amount_of_gold_bars_to_sell: number | string;
     max_gold_bars_allowed: number;
+    processing: boolean;
 }

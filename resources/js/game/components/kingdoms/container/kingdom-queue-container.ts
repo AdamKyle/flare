@@ -16,6 +16,7 @@ import WalkAllKingdomsAjax from "../ajax/walk-all-kingdoms-ajax";
 import kingdomQueueContainer from "../queues/container/kingdom-queue-container";
 import kingdomEventContainer from "./kingdom-event-container";
 import GetCapitalCityGoldBarData from "../ajax/get-capital-city-gold-bar-data";
+import CapitalCityManageGoldBarsAjax from "../ajax/capital-city-manage-gold-bars-ajax";
 
 /**
  * Register core dependencies here.
@@ -90,6 +91,10 @@ function kingdomContainer(container: CoreContainer) {
 
     container.register("get-capital-city-gold-bar-data", {
         useClass: GetCapitalCityGoldBarData,
+    });
+
+    container.register("capital-cit-manage-gold-bars-ajax", {
+        useClass: CapitalCityManageGoldBarsAjax,
     });
 }
 

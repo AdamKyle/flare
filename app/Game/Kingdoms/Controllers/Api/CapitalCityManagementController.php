@@ -7,8 +7,10 @@ use App\Flare\Models\Kingdom;
 use App\Game\Kingdoms\Requests\BuildingUpgradeRequestsRequest;
 use App\Game\Kingdoms\Requests\CancelBuildingUpgradeRequestRequest;
 use App\Game\Kingdoms\Requests\CancelUnitRequestRequest;
+use App\Game\Kingdoms\Requests\PurchaseGoldBarsRequest;
 use App\Game\Kingdoms\Requests\RecruitUnitCancellationRequest;
 use App\Game\Kingdoms\Requests\RecruitUnitRequestsRequest;
+use App\Game\Kingdoms\Requests\WithdrawGoldBarsRequest;
 use App\Game\Kingdoms\Service\CancelBuildingRequestService;
 use App\Game\Kingdoms\Service\CancelUnitRequestService;
 use App\Game\Kingdoms\Service\CapitalCityGoldBarManagementService;
@@ -114,6 +116,24 @@ class CapitalCityManagementController extends Controller {
 
     public function fetchGoldBarData(Character $character, Kingdom $kingdom) {
         $result = $this->capitalCityGoldBarManagementService->fetchGoldBarDetails($character, $kingdom);
+
+        $status = $result['status'];
+        unset($result['status']);
+
+        return response()->json($result, $status);
+    }
+
+    public function withDrawGoldBars(WithdrawGoldBarsRequest $request, Character $character, Kingdom $kingdom) {
+        $result = $this->capitalCityGoldBarManagementService->convertGoldBars($character, $kingdom, $request->amount_to_withdraw);
+
+        $status = $result['status'];
+        unset($result['status']);
+
+        return response()->json($result, $status);
+    }
+
+    public function depositGoldBars(PurchaseGoldBarsRequest $request, Character $character, Kingdom $kingdom) {
+        $result = $this->capitalCityGoldBarManagementService->depositGoldBars($character, $kingdom, $request->amount_to_purchase);
 
         $status = $result['status'];
         unset($result['status']);

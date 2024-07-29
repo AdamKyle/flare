@@ -105,6 +105,8 @@ Route::middleware([
     Route::post('/kingdom/capital-city/recruit-unit-requests/{character}/{kingdom}', ['as' => 'capital.city.recruit-unit-request', 'uses' => 'Api\CapitalCityManagementController@recruitUnits']);
     Route::post('/kingdom/capital-city/cancel-building-request/{character}/{kingdom}', ['as' => 'capital.city-cancel-building-request', 'uses' => 'Api\CapitalCityManagementController@cancelBuildingOrdersOrders']);
     Route::post('/kingdom/capital-city/cancel-unit-request/{character}/{kingdom}', ['as' => 'capital.city-cancel-unit-request', 'uses' => 'Api\CapitalCityManagementController@cancelUnitRecruitOrders']);
+    Route::post('/kingdom/capital-city/deposit-gold-bars/{character}/{kingdom}', ['as' => 'capital.city.deposit.gold.bars', 'uses' => 'Api\CapitalCityManagementController@depositGoldBars']);
+    Route::post('/kingdom/capital-city/withdraw-gold-bars/{character}/{kingdom}', ['as' => 'capital.city.withdraw.gold.bars', 'uses' => 'Api\CapitalCityManagementController@withDrawGoldBars']);
 });
 
 

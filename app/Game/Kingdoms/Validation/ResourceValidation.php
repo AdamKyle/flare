@@ -49,7 +49,7 @@ class ResourceValidation {
      */
     public function getMissingCosts(KingdomBuilding $building, Kingdom $kingdom): array {
 
-        return [
+        $result = [
             'wood' => max($kingdom->current_wood - $this->getBuildingCost($kingdom, $building->base_wood_cost), 0),
             'clay' => max($kingdom->current_clay - $this->getBuildingCost($kingdom, $building->base_clay_cost), 0),
             'stone' => max($kingdom->current_stone - $this->getBuildingCost($kingdom, $building->base_stone_cost), 0),
@@ -57,6 +57,12 @@ class ResourceValidation {
             'iron' => max($kingdom->current_iron - $this->getBuildingCost($kingdom, $building->base_iron_cost, false, true), 0),
             'population' => max($kingdom->current_population - $this->getBuildingCost($kingdom, $building->base_population, true), 0),
         ];
+
+        $filteredResult = array_filter($result, function($value) {
+            return $value > 0;
+        });
+
+        return $filteredResult;
 
     }
 
@@ -78,13 +84,20 @@ class ResourceValidation {
     }
 
     public function getMissingResources(GameUnit $unit, Kingdom $kingdom, int $amount): array {
-        return [
+        $result = [
             'wood' => abs($kingdom->current_wood - $this->getUnitCost($kingdom, ($unit->wood_cost * $amount))),
             'clay' => abs($kingdom->current_clay - $this->getUnitCost($kingdom, ($unit->clay_cost * $amount))),
             'stone' => abs($kingdom->current_stone - $this->getUnitCost($kingdom, ($unit->stone_cost * $amount))),
             'steel' => abs($kingdom->current_steel - $this->getUnitCost($kingdom, ($unit->steel_cost * $amount))),
             'iron' => abs($kingdom->current_iron - $this->getUnitCost($kingdom, ($unit->iron_cost * $amount))),
         ];
+
+        $filteredResult = array_filter($result, function($value) {
+            return $value > 0;
+        });
+
+        return $filteredResult;
+
     }
 
     /**
