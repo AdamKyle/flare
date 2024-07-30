@@ -13,4 +13,5 @@ export default interface DuelPlayerState {
     error_message: string | null;
     defender_atonement: string;
     attacker_atonement: string;
+    selected_character_to_fight: number;
 }

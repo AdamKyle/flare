@@ -338,11 +338,10 @@ class CastType extends BattleBase
 
     public function heal(Character $character, Character $defender = null, bool $isPvp = false) {
         $cachedHealFor = $this->getCachedHealingAmount($character);
-        $maxHealth = $this->characterCacheData->getCachedCharacterData($character, 'health');
+        $maxHealth = floor($this->characterCacheData->getCachedCharacterData($character, 'health'));
 
         if ($cachedHealFor > 0) {
             if ($this->characterHealth < $maxHealth) {
-
                 if ($isPvp) {
                     $this->addAttackerMessage('You reserved healing bursts forward and you feel life flowing through your veins.', 'player-action');
                 } else {
@@ -408,7 +407,7 @@ class CastType extends BattleBase
                 Cache::put('character-' . $character->id . '-healing-amount', min($healFor, 0));
 
                 if ($isPvp) {
-                    $this->addAttackerMessage('You reserved healing bursts forward and you feel life flowing through your veins.', 'player-action');
+                    $this->addDefenderMessage('You reserved healing bursts forward and you feel life flowing through your veins.', 'player-action');
                 } else {
                     $this->addMessage('You reserved healing bursts forward and you feel life flowing through your veins.', 'player-action');
                 }
@@ -433,7 +432,8 @@ class CastType extends BattleBase
 
     private function dealChrDamage(Character $character, bool $isPvp): void {
         $isValidHealer = ($character->classType()->isProphet() || $character->classType()->isCleric());
-        $chrDamage = $this->attackData['chr_modded'] * ($isValidHealer ? 0.25 : 0.05);
+
+        $chrDamage = $this->characterCacheData->getCachedCharacterData($character, 'chr_modded') * ($isValidHealer ? 0.25 : 0.05);
 
         $this->monsterHealth -= $chrDamage;
 
@@ -504,7 +504,6 @@ class CastType extends BattleBase
         if ($needToHealAmount >= $healFor) {
 
             $this->characterHealth += min($healFor, $maxHealth);
-
 
             if ($isPvp) {
                 $this->addAttackerMessage('Your healing spell(s) heals you completely for: ' . number_format($healFor), 'player-action');

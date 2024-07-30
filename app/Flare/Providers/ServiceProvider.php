@@ -438,6 +438,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(CharacterCacheData::class),
                 $app->make(SetUpFight::class),
                 $app->make(PvpHealing::class),
+                $app->make(BaseCharacterAttack::class)
             );
         });
 

@@ -58,9 +58,4 @@ class PvpBase {
     public function getDefenderHealth(): int {
         return $this->defenderHealth;
     }
-
-    public function deleteCharacterCache(): void {
-        $this->characterCacheData->deleteCharacterSheet($this->attacker);
-        $this->characterCacheData->deleteCharacterSheet($this->defender);
-    }
 }

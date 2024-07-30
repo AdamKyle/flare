@@ -113,8 +113,6 @@ export default class CharacterSkillsTabs extends React.Component<
             );
         }
 
-        console.log("rendering character-skills-tab");
-
         return (
             <Tabs tabs={this.tabs} full_width={true}>
                 <TabPanel key={"skills"}>

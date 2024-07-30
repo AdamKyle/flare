@@ -9,10 +9,8 @@ import HealthMeters from "./health-meters";
 import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
 import DangerButton from "../../../components/ui/buttons/danger-button";
 import DangerAlert from "../../../components/ui/alerts/simple-alerts/danger-alert";
-import { BattleMessageType } from "./types/battle-message-type";
 import DuelPlayerProps, { CharactersList } from "./types/duel-player-props";
 import DuelPlayerState from "./types/duel-player-state";
-import { DuelMessages } from "../../../lib/game/types/core/duel-player/definitions/duel-data";
 import BattleMesages from "./fight-section/battle-mesages";
 
 export default class DuelPlayer extends React.Component<
@@ -35,6 +33,7 @@ export default class DuelPlayer extends React.Component<
             error_message: null,
             defender_atonement: "N/A",
             attacker_atonement: "N/A",
+            selected_character_to_fight: 0,
         };
     }
 
@@ -104,14 +103,14 @@ export default class DuelPlayer extends React.Component<
 
     setCharacterToFight(data: any) {
         this.setState({
-            character_id: data.value !== "" ? data.value : 0,
+            selected_character_to_fight: data.value !== "" ? data.value : 0,
         });
     }
 
     defaultCharacter() {
         const foundCharacter = this.props.characters.filter(
             (character: { id: number; name: string }) => {
-                return character.id === this.state.character_id;
+                return character.id === this.state.selected_character_to_fight;
             },
         );
 
@@ -154,7 +153,7 @@ export default class DuelPlayer extends React.Component<
                         "attack-player/get-health/" + this.props.character.id,
                     )
                     .setParameters({
-                        defender_id: this.state.character_id,
+                        defender_id: this.state.selected_character_to_fight,
                     })
                     .doAjaxCall("get", (result: AxiosResponse) => {
                         this.setState({
@@ -270,7 +269,7 @@ export default class DuelPlayer extends React.Component<
                             disabled={
                                 this.props.character.is_automation_running ||
                                 this.props.character.is_dead ||
-                                this.state.character_id === 0
+                                this.state.selected_character_to_fight === 0
                             }
                         />
                     </div>

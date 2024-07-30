@@ -77,12 +77,12 @@ class SetUpFight extends PvpMessages {
 
         if ($attackerResult) {
             $this->addAttackerMessage('You caused the enemy to thrash around like a lunatic. Skills reduced!', 'player-action');
-            $this->addDefenderMessage($attacker->name . ' Causes you to thrash around blindly. (Core skills reduced!)', 'enemy-action');
+            $this->addDefenderMessage($attacker->name . ' causes you to thrash around blindly. (Core skills reduced!)', 'enemy-action');
         }
 
         if ($defenderResult) {
             $this->addDefenderMessage('You caused the enemy to thrash around like a lunatic. Skills reduced!', 'player-action');
-            $this->addAttackerMessage($defender->name . ' Causes you to thrash around blindly. (Core skills reduced!)', 'enemy-action');
+            $this->addAttackerMessage($defender->name . ' causes you to thrash around blindly. (Core skills reduced!)', 'enemy-action');
         }
     }
 
@@ -92,12 +92,12 @@ class SetUpFight extends PvpMessages {
 
         if ($attackerResult) {
             $this->addAttackerMessage('You make the enemy shudder in fear. Resistances reduced!', 'player-action');
-            $this->addDefenderMessage($attacker->name . ' Causes you to cry out in agony (Core resistances reduced!)', 'enemy-action');
+            $this->addDefenderMessage($attacker->name . ' causes you to cry out in agony (Core resistances reduced!)', 'enemy-action');
         }
 
         if ($defenderResult) {
             $this->addDefenderMessage('You make the enemy shudder in fear. Resistances reduced!', 'player-action');
-            $this->addAttackerMessage($defender->name . ' Causes you to cry out in agony (Core resistances reduced!)', 'enemy-action');
+            $this->addAttackerMessage($defender->name . ' causes you to cry out in agony (Core resistances reduced!)', 'enemy-action');
         }
     }
 

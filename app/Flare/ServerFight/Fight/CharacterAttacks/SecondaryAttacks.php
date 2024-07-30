@@ -79,9 +79,9 @@ class SecondaryAttacks extends BattleBase {
         }
 
         if ($isPvp) {
-            $damage = $damage - $damage * $defenderDamageReduction;
+            $damage = max($damage - $damage * $defenderDamageReduction, 0);
 
-            $this->addAttackerMessage('The enemy is able to reduce the damage of your (damaging, resistible/non resistible) enchantment damage to: ' . number_format($damage), 'enemy-action');
+            $this->addAttackerMessage('The enemy is able to reduce the damage of your (damaging, resistible/non resistible) enchantment damage coming in to: ' . number_format($damage), 'enemy-action');
             $this->addDefenderMessage('You manage resist the (damaging, resistible/non resistible) enchantment damage coming in to: ' . number_format($damage), 'regular');
         }
 
@@ -160,10 +160,10 @@ class SecondaryAttacks extends BattleBase {
         }
 
         if ($isPvp && $affixDamageReduction > 0.0) {
-            $lifeStealingDamage = $lifeStealingDamage - $lifeStealingDamage * $affixDamageReduction;
+            $lifeStealingDamage = max($lifeStealingDamage - $lifeStealingDamage * $affixDamageReduction, 0);
 
-            $this->addAttackerMessage('The enemy reduced your life stealing enchantments damage to: ' . number_format($lifeStealingDamage), 'enemy-action');
-            $this->addDefenderMessage('You manage, by the skin of your teeth, to use the last of your magics to reduce their life stealing (enchantment) damage to: ' . number_format($lifeStealingDamage), 'regular');
+            $this->addAttackerMessage('The enemy reduced your life stealing enchantments incoming damage to: ' . number_format($lifeStealingDamage), 'enemy-action');
+            $this->addDefenderMessage('You manage, by the skin of your teeth, to use the last of your magics to reduce their life stealing (enchantment) damage (coming in) to: ' . number_format($lifeStealingDamage), 'regular');
         }
 
         if ($lifeStealingDamage > 0) {

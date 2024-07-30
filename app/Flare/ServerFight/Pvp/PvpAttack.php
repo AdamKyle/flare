@@ -4,6 +4,7 @@ namespace App\Flare\ServerFight\Pvp;
 
 use App\Flare\Models\Character;
 use App\Flare\ServerFight\Fight\CharacterAttacks\BaseCharacterAttack;
+use App\Flare\ServerFight\Fight\CharacterAttacks\CharacterAttack;
 use App\Flare\ServerFight\Fight\CharacterAttacks\PlayerHealing;
 use App\Flare\Values\AttackTypeValue;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
@@ -23,7 +24,8 @@ class PvpAttack extends PvpBase {
 
     public function __construct(CharacterCacheData $characterCacheData,
                                 private readonly SetUpFight $setUpFight,
-                                private readonly PvpHealing $pvpHealing) {
+                                private readonly PvpHealing $pvpHealing,
+                                private readonly BaseCharacterAttack $characterAttack) {
         parent::__construct($characterCacheData);
     }
 
@@ -125,8 +127,8 @@ class PvpAttack extends PvpBase {
     private function pvpHealing(Character $defender, Character $attacker, int $attackerHealth, int $defenderHealth, bool $isVoided): PvpHealing {
         $this->pvpHealing->setAttacker($defender);
         $this->pvpHealing->setDefender($attacker);
-        $this->pvpHealing->setDefenderHealth($attackerHealth);
-        $this->pvpHealing->setAttackerHealth($defenderHealth);
+        $this->pvpHealing->setDefenderHealth($defenderHealth);
+        $this->pvpHealing->setAttackerHealth($attackerHealth);
         $this->pvpHealing->setDefenderIsVoided($isVoided);
         $this->pvpHealing->defenderHeal($defender);
 

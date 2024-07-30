@@ -175,6 +175,17 @@ export default class MapSection extends React.Component<MapProps, MapState> {
             if (this.state.can_player_move !== this.props.can_move) {
                 this.setState({ can_player_move: this.props.can_move });
             }
+
+            if (
+                !isEqual(
+                    this.state.character_position,
+                    this.props.map_data.character_position,
+                )
+            ) {
+                this.setState({
+                    character_position: this.props.map_data.character_position,
+                });
+            }
         }
     }
 

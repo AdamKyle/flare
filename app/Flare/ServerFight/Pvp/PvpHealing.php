@@ -32,17 +32,18 @@ class PvpHealing extends PvpBase {
     }
 
     public function defenderHeal(Character $defender) {
-        $this->castType->setMonsterHealth($this->monsterHealth);
-        $this->castType->setCharacterHealth($this->characterHealth);
+
+        $this->castType->setMonsterHealth($this->attackerHealth);
+        $this->castType->setCharacterHealth($this->defenderHealth);
         $this->castType->setCharacterAttackData($defender, $this->isDefenderVoided, ($this->isDefenderVoided ? AttackTypeValue::VOIDED_CAST : AttackTypeValue::CAST));
 
         $this->castType->healDuringFight($defender, true);
 
         $this->defenderHealth = $this->castType->getMonsterHealth();
-        $this->attackerHealth = $this->castType->getCharacterHealth();
+        $this->attackerHealth = $this->castType->getCharacterHealth();;
 
-        $this->mergeMessages($this->castType->getDefenderMessages(), 'attacker');
-        $this->mergeMessages($this->castType->getAttackerMessages(), 'defender');
+        $this->mergeMessages($this->castType->getDefenderMessages(), 'defender');
+        $this->mergeMessages($this->castType->getAttackerMessages(), 'attacker');
 
         $this->castType->clearMessages();
     }
@@ -75,6 +76,11 @@ class PvpHealing extends PvpBase {
     }
 
     protected function mergeMessages(array $messages, string $key) {
+
+        if (!isset($this->battleMessages[$key])) {
+            $this->battleMessages[$key] = [];
+        }
+
         $this->battleMessages[$key] = array_merge($this->battleMessages[$key], $messages);
     }
 }

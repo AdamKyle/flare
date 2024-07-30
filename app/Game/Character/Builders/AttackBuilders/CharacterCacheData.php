@@ -57,7 +57,7 @@ class CharacterCacheData extends CharacterPvpCacheData {
         Cache::delete('character-defence-' . $character->id);
 
         if (Cache::has('character-sheet-' . $character->id)) {
-            return Cache::delete('character-sheet-' . $character->id);
+            Cache::delete('character-sheet-' . $character->id);
         }
     }
 
@@ -111,6 +111,7 @@ class CharacterCacheData extends CharacterPvpCacheData {
 
         $characterSheet['weapon_attack'] = $this->characterStatBuilder->buildDamage('weapon');
         $characterSheet['spell_attack'] = $this->characterStatBuilder->buildDamage('spell-damage');
+        $characterSheet['heal_for'] = $this->characterStatBuilder->buildHealing();
 
         Cache::put('character-sheet-' . $characterId, $characterSheet);
 

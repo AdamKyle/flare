@@ -27,7 +27,6 @@ export default class Skills extends React.Component<SkillsProps, any> {
     }
 
     manageTrainSkill(row: any) {
-        console.log("manageTrainSkill");
         this.setState({
             show_train_skill: !this.state.show_train_skill,
             skill: row || null,
