@@ -16,7 +16,7 @@ export const getNewYPosition = (
     }
 
     if (characterY > 2416) {
-        return -2150;
+        return -2160;
     }
 
     if (characterY > 2112) {

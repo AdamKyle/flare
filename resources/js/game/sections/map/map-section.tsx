@@ -10,7 +10,12 @@ import DirectionalMovement from "./actions/directional-movement";
 import MapActions from "./actions/map-actions";
 import MovePlayer from "./lib/ajax/move-player";
 import { getStyle, playerIconPosition } from "./lib/map-management";
-import { dragMap, fetchLeftBounds } from "./lib/map-position";
+import {
+    dragMap,
+    fetchLeftBounds,
+    getNewXPosition,
+    getNewYPosition,
+} from "./lib/map-position";
 import MapData from "./lib/request-types/MapData";
 import MapStateManager from "./lib/state/map-state-manager";
 import MapState from "./types/map-state";
@@ -184,6 +189,16 @@ export default class MapSection extends React.Component<MapProps, MapState> {
             ) {
                 this.setState({
                     character_position: this.props.map_data.character_position,
+                    map_position: {
+                        x: getNewXPosition(
+                            this.props.map_data.character_position.x,
+                            this.state.map_data.map_position.x,
+                        ),
+                        y: getNewYPosition(
+                            this.props.map_data.character_position.y,
+                            this.state.map_data.map_position.y,
+                        ),
+                    },
                 });
             }
         }

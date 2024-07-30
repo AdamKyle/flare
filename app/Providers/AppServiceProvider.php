@@ -8,7 +8,6 @@ use App\Console\AfterDeployment\AssignNewBuildingsToExistingKingdoms;
 use App\Console\AfterDeployment\AssignNewNpcsToFactionLoyalty;
 use App\Console\AfterDeployment\ChangeFeatureTypesOnQuests;
 use App\Console\AfterDeployment\CreateMonsterCache;
-use App\Console\AfterDeployment\MoveKingdomsToLand;
 use App\Console\AfterDeployment\RemoveInvalidQuestItems;
 use App\Console\AfterDeployment\UpdateCharactersForClassRanks;
 use App\Console\DevelopmentCommands\AssignTopEndGearToPlayer;
@@ -47,7 +46,6 @@ class AppServiceProvider extends ServiceProvider {
             AllowTraverseForMaps::class,
             AssignNewBuildingsToExistingKingdoms::class,
             AssignNewNpcsToFactionLoyalty::class,
-            MoveKingdomsToLand::class,
 
             // Development Commands:
             CreateCharacter::class,
