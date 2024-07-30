@@ -478,7 +478,7 @@ class CastType extends BattleBase
         if ($isPvp) {
             $this->addAttackerMessage('Your healing spell(s) erupt around you for: ' . number_format($healFor), 'player-action');
         } else {
-            $this->addMessage('Your healing spell(s) heals erupt around you for: ' . number_format($healFor), 'player-action');
+            $this->addMessage('Your healing spell(s) erupt around you for: ' . number_format($healFor), 'player-action');
         }
 
         return $healFor;
@@ -502,13 +502,14 @@ class CastType extends BattleBase
 
     private function healForAllAmount(int $needToHealAmount, int$healFor, int $maxHealth, bool $isPvp): int {
         if ($needToHealAmount >= $healFor) {
+
             $this->characterHealth += min($healFor, $maxHealth);
 
 
             if ($isPvp) {
-                $this->addAttackerMessage('Your healing spell(s) heals you for: ' . number_format($healFor), 'player-action');
+                $this->addAttackerMessage('Your healing spell(s) heals you completely for: ' . number_format($healFor), 'player-action');
             } else {
-                $this->addMessage('Your healing spell(s) heals you for: ' . number_format($healFor), 'player-action');
+                $this->addMessage('Your healing spell(s) heals you completely for: ' . number_format($healFor), 'player-action');
             }
 
             return 0;
@@ -517,20 +518,19 @@ class CastType extends BattleBase
         return $healFor;
     }
 
-    private function partialHeal(int $needToHealAmount, int$healFor, int $maxHealth, bool $isPvp): int {
-        if ($needToHealAmount < $healFor && $healFor > 0) {
-            $amountToUse = $healFor - $needToHealAmount;
+    private function partialHeal(int $needToHealAmount, int $healFor, int $maxHealth, bool $isPvp): int {
+        if ($needToHealAmount > 0 && $healFor > 0) {
+            $amountToHeal = min($needToHealAmount, $healFor, $maxHealth - $this->characterHealth);
 
-            $this->characterHealth += min($healFor, $maxHealth);
-
+            $this->characterHealth += $amountToHeal;
 
             if ($isPvp) {
-                $this->addAttackerMessage('Your healing spell(s) heals you for: ' . number_format($amountToUse), 'player-action');
+                $this->addAttackerMessage('Your healing spell(s) partially heals you for: ' . number_format($amountToHeal), 'player-action');
             } else {
-                $this->addMessage('Your healing spell(s) heals you for: ' . number_format($amountToUse), 'player-action');
+                $this->addMessage('Your healing spell(s) partially heals you for: ' . number_format($amountToHeal), 'player-action');
             }
 
-            $healFor = min($healFor - $amountToUse, 0);
+            $healFor -= $amountToHeal;
         }
 
         return $healFor;
