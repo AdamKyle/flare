@@ -66,6 +66,7 @@ export default class MapSection extends React.Component<MapProps, MapState> {
             time_left: 0,
             automation_time_out: 0,
             celestial_time_out: 0,
+            is_event_based: false,
         };
 
         // @ts-ignore
@@ -182,23 +183,18 @@ export default class MapSection extends React.Component<MapProps, MapState> {
             }
 
             if (
+                this.props.map_data.is_event_based !==
+                    this.state.is_event_based &&
                 !isEqual(
-                    this.state.character_position,
                     this.props.map_data.character_position,
+                    this.state.character_position,
                 )
             ) {
+                console.log("Here?");
                 this.setState({
                     character_position: this.props.map_data.character_position,
-                    map_position: {
-                        x: getNewXPosition(
-                            this.props.map_data.character_position.x,
-                            this.state.map_data.map_position.x,
-                        ),
-                        y: getNewYPosition(
-                            this.props.map_data.character_position.y,
-                            this.state.map_data.map_position.y,
-                        ),
-                    },
+                    is_event_based: this.state.is_event_based,
+                    map_position: this.props.map_data.map_position,
                 });
             }
         }

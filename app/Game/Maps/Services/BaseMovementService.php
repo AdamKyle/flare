@@ -316,6 +316,10 @@ class BaseMovementService {
             return $this->mapTileValue->canWalkOnMagma($character, $this->x, $this->y);
         }
 
+        if ($gameMap->mapType()->isTheIcePlane()) {
+
+        }
+
         if ($gameMap->mapType()->isPurgatory()) {
             return $this->mapTileValue->canWalkOnPurgatoryWater($character, $this->x, $this->y);
         }
@@ -358,8 +362,22 @@ class BaseMovementService {
             return;
         }
 
+        if ($gameMap->mapType()->isTheIcePlane()) {
+            $this->createServerMessageForCannotWalk($character->user);
+
+            return;
+        }
+
+        if ($gameMap->mapType()->isDelusionalMemories()) {
+            $this->createServerMessageForCannotWalk($character->user);
+        }
+
         if ($gameMap->mapType()->isPurgatory()) {
             event(new ServerMessageEvent($character->user, 'You would slip away into the void if you tried to go that way, child!'));
+        }
+
+        if ($gameMap->mapType()->isTwistedMemories()) {
+            event(new ServerMessageEvent($character->user, 'Your own memories would become too distorted and you would be lost to your darkness child!'));
         }
     }
 

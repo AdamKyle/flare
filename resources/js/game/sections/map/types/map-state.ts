@@ -32,6 +32,8 @@ export type MapDetails = {
     time_left: number;
 
     characters_on_map: number;
+
+    is_event_based: boolean;
 };
 
 export default interface MapState extends MapDetails {

@@ -34,11 +34,11 @@ export default class MapStateManager {
 
         state.map_position = {
             x: getNewXPosition(
-                state.character_position.x,
+                data.character_map.character_position_x,
                 state.map_position.x,
             ),
             y: getNewYPosition(
-                state.character_position.y,
+                data.character_map.character_position_y,
                 state.map_position.y,
             ),
         };
@@ -63,6 +63,11 @@ export default class MapStateManager {
         } else {
             component.setCharacterPosition(position);
         }
+
+        state.character_position.x = data.character_map.character_position_x;
+        state.character_position.y = data.character_map.character_position_y;
+
+        state.is_event_based = data.is_event_based;
 
         return state;
     }
@@ -147,6 +152,7 @@ export default class MapStateManager {
             loading: false,
             automation_time_out: 0,
             celestial_time_out: 0,
+            is_event_based: data.is_event_based,
         };
     }
 

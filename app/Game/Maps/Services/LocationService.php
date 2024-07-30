@@ -54,6 +54,8 @@ class LocationService {
      */
     private bool $canSettle = false;
 
+    private bool $isEventBasedUpdate = false;
+
     /**
      * @param CoordinatesCache $coordinatesCache
      * @param CharacterCacheData $characterCacheData
@@ -63,6 +65,12 @@ class LocationService {
         $this->coordinatesCache           = $coordinatesCache;
         $this->characterCacheData         = $characterCacheData;
         $this->updateCharacterAttackTypes = $updateCharacterAttackTypes;
+    }
+
+    public function setIsEventBasedUpdate(bool $isEventBased): LocationService {
+        $this->isEventBasedUpdate = $isEventBased;
+
+        return $this;
     }
 
     /**
@@ -94,6 +102,7 @@ class LocationService {
             'other_kingdoms'         => $this->getEnemyKingdoms($character),
             'characters_on_map'      => $this->getActiveUsersCountForMap($character),
             'lockedLocationType'     => is_null($lockedLocation) ? null : $lockedLocation->type,
+            'is_event_based'         => $this->isEventBasedUpdate,
         ];
     }
 

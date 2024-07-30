@@ -33,7 +33,7 @@ class UpdateMap implements ShouldBroadcastNow
      */
     public function __construct(User $user) {
         $character        = $user->character->refresh();
-        $this->mapDetails = resolve(LocationService::class)->getLocationData($character);
+        $this->mapDetails = resolve(LocationService::class)->setIsEventBasedUpdate(true)->getLocationData($character);
         $this->user       = $user;
     }
 

@@ -27,4 +27,6 @@ export default interface MapData {
     npc_kingdoms: [];
 
     other_kingdoms: [];
+
+    is_event_based: boolean;
 }
