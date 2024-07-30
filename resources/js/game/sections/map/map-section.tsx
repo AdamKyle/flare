@@ -190,7 +190,6 @@ export default class MapSection extends React.Component<MapProps, MapState> {
                     this.state.character_position,
                 )
             ) {
-                console.log("Here?");
                 this.setState({
                     character_position: this.props.map_data.character_position,
                     is_event_based: this.state.is_event_based,

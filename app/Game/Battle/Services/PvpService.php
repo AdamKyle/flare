@@ -266,7 +266,7 @@ class PvpService {
 
         $character = $character->refresh();
 
-        event(new UpdateMap($character->user));
+        event(new UpdateMap($character->user, true));
 
         return $character->refresh();
     }

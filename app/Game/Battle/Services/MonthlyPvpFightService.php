@@ -214,29 +214,6 @@ class MonthlyPvpFightService {
     }
 
     /**
-     * Kick inactive player.
-     *
-     * @param Character $character
-     * @return void
-     */
-    protected function kickCheacterWhoLoggedOut(Character $character) {
-        $character->update([
-            'can_move'   => true,
-            'can_attack' => true,
-        ]);
-
-        CharacterAutomation::where('character_id', $character->id)->delete();
-
-        MonthlyPvpParticipant::where('character_id', $character->id)->delete();
-
-        $character = $character->refresh();
-
-        event(new UpdateCharacterStatus($character));
-
-        event(new UpdateMap($character->user));
-    }
-
-    /**
      * Mark the loser as can attack and move.
      *
      * @param Character $character

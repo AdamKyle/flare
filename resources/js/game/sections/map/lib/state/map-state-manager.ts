@@ -64,10 +64,14 @@ export default class MapStateManager {
             component.setCharacterPosition(position);
         }
 
-        state.character_position.x = data.character_map.character_position_x;
-        state.character_position.y = data.character_map.character_position_y;
+        if (data.is_event_based) {
+            state.character_position.x =
+                data.character_map.character_position_x;
+            state.character_position.y =
+                data.character_map.character_position_y;
 
-        state.is_event_based = data.is_event_based;
+            state.is_event_based = data.is_event_based;
+        }
 
         return state;
     }
