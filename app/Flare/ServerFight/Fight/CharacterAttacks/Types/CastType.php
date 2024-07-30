@@ -541,29 +541,4 @@ class CastType extends BattleBase
             $this->secondaryAttack($character, $monster);
         }
     }
-
-    protected function entrancePlayer(Character $attacker, Character $defender, int $spellDamage) {
-        $this->entrance->attackerEntrancesDefender($attacker, $this->attackData, $this->isVoided);
-
-        $this->mergeAttackerMessages($this->entrance->getAttackerMessages());
-        $this->mergeDefenderMessages($this->entrance->getDefenderMessages());
-
-        return $this->doEntrancePvpDamage($attacker, $defender, $spellDamage);
-    }
-
-    protected function doEntrancePvpDamage($attacker, $defender, $spellDamage) {
-        if ($this->entrance->isEnemyEntranced()) {
-            $this->isEnemyEntranced = true;
-
-            $this->pvpSpellDamage($attacker, $defender, $spellDamage);
-
-            if ($this->allowSecondaryAttacks) {
-                $this->secondaryAttack($attacker, null, $this->characterCacheData->getCachedCharacterData($defender, 'affix_damage_reduction'), true);
-            }
-
-            return true;
-        }
-
-        return false;
-    }
 }
