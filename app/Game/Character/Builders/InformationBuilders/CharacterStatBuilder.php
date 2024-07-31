@@ -724,34 +724,40 @@ class CharacterStatBuilder {
 
         $chance = $this->equippedItems->where('item.type', '=', 'spell-healing')->sum('item.resurrection_chance');
 
+        // Add bonus for Prophet or Cleric
         if ($this->character->classType()->isProphet() || $this->character->classType()->isCleric()) {
             $chance += 0.05;
         }
 
+        // Handle map type restrictions
         if ($chance > 0) {
             if (($this->character->map->gameMap->mapType()->isPurgatory() || $this->character->map->gameMap->mapType()->isTwistedMemories()) && $chance > 0.45) {
                 if ($this->character->classType()->isProphet()) {
-                    $chance = min($chance, 0.65);
+                    return min($chance, 0.65);
                 } else {
-                    $chance = min($chance, 0.45);
+                    return min($chance, 0.45);
                 }
             }
         }
 
-        if (!$this->character->classType()->isVampire() && $chance > 0.95) {
+        // Cap chance for Vampires at 0.95
+        if ($this->character->classType()->isVampire() && $chance > 0.95) {
             return 0.95;
         }
 
-        if ((!$this->character->classType()->isProphet() || !$this->character->classType()->isCleric()) && $chance > 0.75) {
+        // Cap chance for non-Prophet and non-Cleric classes at 0.75
+        if (!$this->character->classType()->isProphet() && !$this->character->classType()->isCleric() && $chance > 0.75) {
             return 0.75;
         }
 
+        // Cap chance at 1.0
         if ($chance > 1.0) {
-            return 1.0;
+            $chance = 1.0;
         }
 
         return $chance;
     }
+
 
     /**
      * Build affix damage based on type.

@@ -1054,9 +1054,11 @@ class CharacterStatBuilderTest extends TestCase {
             ->equipItem('spell-one', 'weapon')
             ->getCharacter();
 
+        dump($character->class->name);
+
         $resChance = $this->characterStatBuilder->setCharacter($character)->buildResurrectionChance();
 
-        $this->assertEquals(1.0, $resChance);
+        $this->assertEquals(.75, $resChance);
     }
 
     public function testResurrectionChanceWithItemsAsProphet() {
@@ -1082,7 +1084,33 @@ class CharacterStatBuilderTest extends TestCase {
 
         $resChance = $this->characterStatBuilder->setCharacter($character)->buildResurrectionChance();
 
-        $this->assertEquals(1.05, $resChance);
+        $this->assertEquals(1.0, $resChance);
+    }
+
+    public function testResurrectionChanceWithItemsAsVampire() {
+        $item = $this->createItem([
+            'name'                => 'weapon',
+            'type'                => 'spell-healing',
+            'base_healing'        => 100,
+            'resurrection_chance' => 1.0,
+        ]);
+
+        $character = $this->character->inventoryManagement()
+            ->giveItem($item)
+            ->equipItem('spell-one', 'weapon')
+            ->getCharacter();
+
+        $class = $this->createClass(['name' => 'Vampire']);
+
+        $character->update([
+            'game_class_id' => $class->id
+        ]);
+
+        $character = $character->refresh();
+
+        $resChance = $this->characterStatBuilder->setCharacter($character)->buildResurrectionChance();
+
+        $this->assertEquals(.95, $resChance);
     }
 
     public function testResurrectionChanceWithItemsAsProphetInPurgatory() {
