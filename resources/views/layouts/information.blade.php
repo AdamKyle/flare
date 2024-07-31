@@ -10,6 +10,8 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
+    @laravelPWA
+
     @guest
     @else
         <meta name="player" content="{{ auth()->user()->id }}">
