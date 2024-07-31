@@ -64,6 +64,8 @@ export default class MapStateManager {
             component.setCharacterPosition(position);
         }
 
+        console.log(data);
+
         if (data.is_event_based) {
             state.character_position.x =
                 data.character_map.character_position_x;
