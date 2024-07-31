@@ -2,6 +2,9 @@
 
 namespace App\Game\Character\CharacterInventory\Services;
 
+use Exception;
+use Illuminate\Database\Eloquent\Collection;
+use League\Fractal\Manager;
 use App\Flare\Models\Character;
 use App\Flare\Models\Inventory;
 use App\Flare\Models\InventorySet;
@@ -14,10 +17,6 @@ use App\Game\Character\CharacterInventory\Exceptions\EquipItemException;
 use App\Game\Core\Comparison\ItemComparison;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use App\Game\Core\Traits\ResponseBuilder;
-use Exception;
-use Illuminate\Database\Eloquent\Collection;
-use League\Fractal\Manager;
-
 
 class EquipItemService {
 
@@ -26,12 +25,12 @@ class EquipItemService {
     /**
      * @var Manager $manager
      */
-    private $manager;
+    private Manager $manager;
 
     /**
      * @var CharacterAttackTransformer $characterTransformer
      */
-    private $characterTransformer;
+    private CharacterAttackTransformer $characterTransformer;
 
     /**
      * @var InventorySetService $inventorySetService
@@ -59,6 +58,7 @@ class EquipItemService {
      * @param CharacterAttackTransformer $characterTransformer
      * @param InventorySetService $inventorySetService
      * @param CharacterInventoryService $characterInventoryService
+     * @param UpdateCharacterAttackTypesHandler $updateCharacterAttackTypesHandler
      */
     public function __construct(Manager $manager, CharacterAttackTransformer $characterTransformer, InventorySetService $inventorySetService, CharacterInventoryService $characterInventoryService, UpdateCharacterAttackTypesHandler $updateCharacterAttackTypesHandler) {
         $this->manager              = $manager;
@@ -102,6 +102,8 @@ class EquipItemService {
             $this->setRequest($requestParams)
                 ->setCharacter($character)
                 ->replaceItem();
+
+            $character = $character->refresh();
 
             $this->updateCharacterAttackTypesHandler->updateCache($character);
 
@@ -287,7 +289,7 @@ class EquipItemService {
      *
      * @return void
      */
-    public function unequipBothHands() {
+    public function unequipBothHands(): void {
         $slots = $this->character->inventory->slots->filter(function ($slot) {
             return $slot->equipped;
         });

@@ -19,12 +19,12 @@ class UpdateCharacterAttackBroadcastEvent implements ShouldBroadcastNow
      *
      * @var array
      */
-    public $attack;
+    public array $attack;
 
     /**
      * @var User $users
      */
-    private $user;
+    private User $user;
 
     /**
      * Create a new event instance.
@@ -44,8 +44,7 @@ class UpdateCharacterAttackBroadcastEvent implements ShouldBroadcastNow
      *
      * @return Channel|array
      */
-    public function broadcastOn()
-    {
+    public function broadcastOn(): Channel|array {
         return new PrivateChannel('update-character-attack-' . $this->user->id);
     }
 }

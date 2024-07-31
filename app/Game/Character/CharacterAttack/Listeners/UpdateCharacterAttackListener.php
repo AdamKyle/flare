@@ -20,7 +20,7 @@ class UpdateCharacterAttackListener
     /**
      * @var CharacterAttackTransformer $characterAttackTransformer
      */
-    private $characterAttackTransformer;
+    private CharacterAttackTransformer $characterAttackTransformer;
 
     /**
      * Constructor
@@ -48,6 +48,6 @@ class UpdateCharacterAttackListener
         $attack = new Item($event->character, $this->characterAttackTransformer);
         $attack = $this->manager->createData($attack)->toArray();
 
-        broadcast(new UpdateCharacterAttackBroadcastEvent($attack, $event->character->user));
+        event(new UpdateCharacterAttackBroadcastEvent($attack, $event->character->user));
     }
 }

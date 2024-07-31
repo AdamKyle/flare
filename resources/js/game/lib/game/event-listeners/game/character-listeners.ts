@@ -144,6 +144,8 @@ export default class CharacterListeners implements GameListener {
                     return;
                 }
 
+                console.log(this.component.state.character, event);
+
                 this.component.setState({
                     character: {
                         ...this.component.state.character,
@@ -223,11 +225,13 @@ export default class CharacterListeners implements GameListener {
         }
 
         this.characterAttackData.listen(
-            "Flare.Events.UpdateCharacterAttackBroadcastEvent",
+            "Game.Character.CharacterAttack.Events.UpdateCharacterAttackBroadcastEvent",
             (event: any) => {
                 if (!this.component) {
                     return;
                 }
+
+                console.log(event);
 
                 this.component.setState({
                     character: {

@@ -30,7 +30,7 @@ class BuildCharacterAttackTypes {
      */
     public function buildCache(Character $character, bool $ignoreReductions = false): array {
 
-        $characterAttack = $this->characterAttackBuilder->setCharacter($character->refresh(), $ignoreReductions);
+        $characterAttack = $this->characterAttackBuilder->setCharacter($character, $ignoreReductions);
 
         Cache::put('character-attack-data-' . $character->id, [
             'attack_types' => [

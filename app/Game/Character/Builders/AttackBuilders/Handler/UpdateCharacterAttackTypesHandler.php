@@ -2,11 +2,10 @@
 
 namespace App\Game\Character\Builders\AttackBuilders\Handler;
 
+use Exception;
 use App\Flare\Models\Character;
 use App\Game\Character\Builders\AttackBuilders\Services\BuildCharacterAttackTypes;
 use App\Game\Character\CharacterAttack\Events\UpdateCharacterAttackEvent;
-use App\Game\Core\Events\UpdateCharacterAttacks;
-use Exception;
 
 class UpdateCharacterAttackTypesHandler {
 
@@ -29,19 +28,17 @@ class UpdateCharacterAttackTypesHandler {
      * @throws Exception
      */
     public function updateCache(Character $character, bool $ignoreReductions = false): void {
-        $cache = $this->buildCharacterAttackTypes->buildCache($character, $ignoreReductions);
+        $this->buildCharacterAttackTypes->buildCache($character, $ignoreReductions);
 
-        $this->updateCharacterStats($character, $cache, $ignoreReductions);
+        $this->updateCharacterStats($character, $ignoreReductions);
     }
 
     /**
      * @param Character $character
-     * @param array $attackDataCache
      * @param bool $ignoreReductions
      * @return void
      */
-    protected function updateCharacterStats(Character $character, array $attackDataCache, bool $ignoreReductions = false): void {
-        event(new UpdateCharacterAttacks($character->user, $attackDataCache));
+    protected function updateCharacterStats(Character $character, bool $ignoreReductions = false): void {
 
         event(new UpdateCharacterAttackEvent($character, $ignoreReductions));
     }
