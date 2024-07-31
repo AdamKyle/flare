@@ -2,15 +2,14 @@
 
 namespace Tests\Unit\Game\Character\Builders\AttackBuilders\Handlers;
 
+use Cache;
+use Event;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\Models\Character;
 use App\Flare\Values\SpellTypes;
 use App\Flare\Values\WeaponTypes;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
 use App\Game\Character\CharacterAttack\Events\UpdateCharacterAttackEvent;
-use App\Game\Core\Events\UpdateCharacterAttacks;
-use Cache;
-use Event;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateClass;
@@ -66,7 +65,6 @@ class UpdateCharacterAttackTypesHandlerTest extends TestCase {
 
         $this->updateCharacterAttackTypesHandler->updateCache($character);
 
-        Event::assertDispatched(UpdateCharacterAttacks::class);
         Event::assertDispatched(UpdateCharacterAttackEvent::class);
     }
 
