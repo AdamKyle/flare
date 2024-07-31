@@ -1,9 +1,7 @@
 import React from "react";
-import Dialogue from "../../../ui/dialogue/dialogue";
 import { AdditionalInfoProps } from "../../../../sections/character-sheet/components/types/additional-info-props";
 import Ajax from "../../../../lib/ajax/ajax";
 import { AxiosError, AxiosResponse } from "axios";
-import ComponentLoading from "../../../ui/loading/component-loading";
 import LoadingProgressBar from "../../../ui/progress-bars/loading-progress-bar";
 import DangerAlert from "../../../ui/alerts/simple-alerts/danger-alert";
 

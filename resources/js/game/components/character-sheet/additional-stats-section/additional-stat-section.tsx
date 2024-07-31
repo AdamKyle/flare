@@ -5,6 +5,7 @@ import ResistanceInfoSection from "./sections/resistance-info-section";
 import CharacterReincarnationSection from "./sections/character-reincarnation-section";
 import CharacterClassRanksSection from "./sections/character-class-ranks-section";
 import CharacterElementalAtonementSection from "./sections/character-elemental-atonement-section";
+import ResurrectionChance from "./sections/resurrection-chance";
 
 export default class AdditionalStatSection extends React.Component<any, any> {
     constructor(props: any) {
@@ -12,6 +13,7 @@ export default class AdditionalStatSection extends React.Component<any, any> {
     }
 
     render() {
+        console.log(this.props.character);
         return (
             <div>
                 <div className="grid md:grid-cols-2 gap-2">
@@ -77,6 +79,20 @@ export default class AdditionalStatSection extends React.Component<any, any> {
                                         manage_modal={() => {}}
                                         title={""}
                                         finished_loading={true}
+                                    />
+                                    <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3"></div>
+                                    <h3>Resurrection Chance</h3>
+                                    <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2"></div>
+                                    <p className={"my-3"}>
+                                        Resurrection chance is calculated by
+                                        equipping Healing Spells. Having two
+                                        healing spells increases the chance for
+                                        a character to be resurrected when they
+                                        die in battle, with the exception of
+                                        PVP.
+                                    </p>
+                                    <ResurrectionChance
+                                        character={this.props.character}
                                     />
                                 </div>
                             </div>

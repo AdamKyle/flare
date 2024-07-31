@@ -93,6 +93,7 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer {
             'can_see_pledge_tab'          => !is_null($factionLoyalty),
             'pledged_to_faction_id'       => !is_null($factionLoyalty) ? $factionLoyalty->faction_id : null,
             'current_fame_tasks'          => $this->getFactionTasks($factionLoyalty),
+            'resurrection_chance'         => $characterStatBuilder->buildResurrectionChance(),
         ];
     }
 
