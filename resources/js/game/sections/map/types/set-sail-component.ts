@@ -93,6 +93,7 @@ export default class SetSailComponent {
                         current_location: foundLocation[0],
                         current_player_kingdom: null,
                         current_enemy_kingdom: null,
+                        current_port: foundLocation[0],
                     },
                     () => {
                         const state = this.component.state;
