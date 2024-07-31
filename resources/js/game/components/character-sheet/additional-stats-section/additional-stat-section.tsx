@@ -13,7 +13,6 @@ export default class AdditionalStatSection extends React.Component<any, any> {
     }
 
     render() {
-        console.log(this.props.character);
         return (
             <div>
                 <div className="grid md:grid-cols-2 gap-2">
