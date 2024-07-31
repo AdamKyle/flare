@@ -48,8 +48,6 @@ class CharacterAttackTypesCacheBuilderWithDeductions implements ShouldQueue
 
         $buildCharacterAttackTypes->buildCache($this->character);
 
-        $attackData = Cache::get('character-attack-data-' . $this->character->id);
-
         $this->updateCharacterStats($this->character);
     }
 
@@ -60,6 +58,6 @@ class CharacterAttackTypesCacheBuilderWithDeductions implements ShouldQueue
      * @return void
      */
     protected function updateCharacterStats(Character $character) {
-        event(new UpdateCharacterAttackEvent($character->user, false));
+        event(new UpdateCharacterAttackEvent($character, false));
     }
 }
