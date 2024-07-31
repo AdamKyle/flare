@@ -4,7 +4,7 @@ namespace App\Game\Character\Builders\AttackBuilders\Jobs;
 
 use App\Flare\Models\Character;
 use App\Game\Character\Builders\AttackBuilders\Services\BuildCharacterAttackTypes;
-use App\Game\Core\Events\UpdateCharacterAttacks;
+use App\Game\Character\CharacterAttack\Events\UpdateCharacterAttackEvent;
 use App\Game\Core\Traits\UpdateMarketBoard;
 use Cache;
 use Exception;
@@ -50,17 +50,16 @@ class CharacterAttackTypesCacheBuilderWithDeductions implements ShouldQueue
 
         $attackData = Cache::get('character-attack-data-' . $this->character->id);
 
-        $this->updateCharacterStats($this->character, $attackData);
+        $this->updateCharacterStats($this->character);
     }
 
     /**
      * Update the character attack stats
      *
      * @param Character $character
-     * @param array $attackDataCache
      * @return void
      */
-    protected function updateCharacterStats(Character $character, array $attackDataCache) {
-        event(new UpdateCharacterAttacks($character->user, $attackDataCache));
+    protected function updateCharacterStats(Character $character) {
+        event(new UpdateCharacterAttackEvent($character->user, false));
     }
 }
