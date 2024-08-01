@@ -584,7 +584,7 @@ class UseItemServiceTest extends TestCase {
 
         $this->assertEquals(200, $result['status']);
         $this->assertEquals('Used selected items.', $result['message']);
-        
+
         Event::assertDispatched(UpdateCharacterAttackEvent::class);
         Event::assertDispatched(UpdateTopBarEvent::class);
 
