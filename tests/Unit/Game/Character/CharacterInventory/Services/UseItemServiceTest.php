@@ -6,7 +6,6 @@ use App\Game\Character\CharacterAttack\Events\UpdateCharacterAttackEvent;
 use App\Game\Character\CharacterInventory\Events\CharacterBoonsUpdateBroadcastEvent;
 use App\Game\Character\CharacterInventory\Services\UseItemService;
 use App\Game\Core\Events\UpdateBaseCharacterInformation;
-use App\Game\Core\Events\UpdateCharacterAttacks;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Skills\Values\SkillTypeValue;
@@ -66,7 +65,6 @@ class UseItemServiceTest extends TestCase {
         $this->assertEquals(200, $result['status']);
         $this->assertEquals('Used selected item.', $result['message']);
 
-        Event::assertDispatched(UpdateCharacterAttacks::class);
         Event::assertDispatched(UpdateCharacterAttackEvent::class);
         Event::assertDispatched(UpdateTopBarEvent::class);
 
@@ -109,7 +107,6 @@ class UseItemServiceTest extends TestCase {
         $this->assertEquals(422, $result['status']);
         $this->assertEquals('You can only have a maximum of ten boons applied. Check active boons to see which ones you have. You can always cancel one by clicking on the row.', $result['message']);
 
-        Event::assertNotDispatched(UpdateCharacterAttacks::class);
         Event::assertNotDispatched(UpdateCharacterAttackEvent::class);
         Event::assertNotDispatched(UpdateTopBarEvent::class);
 
@@ -153,7 +150,6 @@ class UseItemServiceTest extends TestCase {
         $this->assertEquals(422, $result['status']);
         $this->assertEquals('Cannot use requested item. Items may stack to a multiple of 10 or a max of 8 hours. Non stacking items cannot be used more then once, while another one is running.', $result['message']);
 
-        Event::assertNotDispatched(UpdateCharacterAttacks::class);
         Event::assertNotDispatched(UpdateCharacterAttackEvent::class);
         Event::assertNotDispatched(UpdateTopBarEvent::class);
 
@@ -197,7 +193,6 @@ class UseItemServiceTest extends TestCase {
         $this->assertEquals(422, $result['status']);
         $this->assertEquals('Cannot use requested item. Items may stack to a multiple of 10 or a max of 8 hours. Non stacking items cannot be used more then once, while another one is running.', $result['message']);
 
-        Event::assertNotDispatched(UpdateCharacterAttacks::class);
         Event::assertNotDispatched(UpdateCharacterAttackEvent::class);
         Event::assertNotDispatched(UpdateTopBarEvent::class);
 
@@ -228,7 +223,6 @@ class UseItemServiceTest extends TestCase {
         $this->assertEquals(422, $result['status']);
         $this->assertEquals('Could not find the selected items you wanted to use in your inventory. Are you sure you have them?', $result['message']);
 
-        Event::assertNotDispatched(UpdateCharacterAttacks::class);
         Event::assertNotDispatched(UpdateCharacterAttackEvent::class);
         Event::assertNotDispatched(UpdateTopBarEvent::class);
 
@@ -340,7 +334,6 @@ class UseItemServiceTest extends TestCase {
         $this->assertEquals(200, $result['status']);
         $this->assertEquals('Used selected items.', $result['message']);
 
-        Event::assertDispatched(UpdateCharacterAttacks::class);
         Event::assertDispatched(UpdateCharacterAttackEvent::class);
         Event::assertDispatched(UpdateTopBarEvent::class);
 
@@ -378,7 +371,6 @@ class UseItemServiceTest extends TestCase {
         $this->assertEquals(200, $result['status']);
         $this->assertEquals('Used selected items. Some items were not able to be used because of the amount of boons you have. You can check your usable items section to see which ones are left.', $result['message']);
 
-        Event::assertDispatched(UpdateCharacterAttacks::class);
         Event::assertDispatched(UpdateCharacterAttackEvent::class);
         Event::assertDispatched(UpdateTopBarEvent::class);
 
@@ -420,7 +412,6 @@ class UseItemServiceTest extends TestCase {
         $this->assertEquals(200, $result['status']);
         $this->assertEquals('Used selected items. Some items were not able to be used because of the amount of boons you have. You can check your usable items section to see which ones are left.', $result['message']);
 
-        Event::assertDispatched(UpdateCharacterAttacks::class);
         Event::assertDispatched(UpdateCharacterAttackEvent::class);
         Event::assertDispatched(UpdateTopBarEvent::class);
 
@@ -473,7 +464,6 @@ class UseItemServiceTest extends TestCase {
         $this->assertEquals(200, $result['status']);
         $this->assertEquals('Used selected items. Some items were not able to be used because of the amount of boons you have. You can check your usable items section to see which ones are left.', $result['message']);
 
-        Event::assertDispatched(UpdateCharacterAttacks::class);
         Event::assertDispatched(UpdateCharacterAttackEvent::class);
         Event::assertDispatched(UpdateTopBarEvent::class);
 
@@ -528,7 +518,6 @@ class UseItemServiceTest extends TestCase {
         $this->assertEquals(422, $result['status']);
         $this->assertEquals('You can only have a maximum of ten boons applied. Check active boons to see which ones you have. You can always cancel one by clicking on the row.', $result['message']);
 
-        Event::assertNotDispatched(UpdateCharacterAttacks::class);
         Event::assertNotDispatched(UpdateCharacterAttackEvent::class);
         Event::assertNotDispatched(UpdateTopBarEvent::class);
 
@@ -548,7 +537,6 @@ class UseItemServiceTest extends TestCase {
         $this->assertEquals(422, $result['status']);
         $this->assertEquals('Could not find the selected items you wanted to use in your inventory. Are you sure you have them?', $result['message']);
 
-        Event::assertNotDispatched(UpdateCharacterAttacks::class);
         Event::assertNotDispatched(UpdateCharacterAttackEvent::class);
         Event::assertNotDispatched(UpdateTopBarEvent::class);
 
@@ -596,8 +584,7 @@ class UseItemServiceTest extends TestCase {
 
         $this->assertEquals(200, $result['status']);
         $this->assertEquals('Used selected items.', $result['message']);
-
-        Event::assertDispatched(UpdateCharacterAttacks::class);
+        
         Event::assertDispatched(UpdateCharacterAttackEvent::class);
         Event::assertDispatched(UpdateTopBarEvent::class);
 

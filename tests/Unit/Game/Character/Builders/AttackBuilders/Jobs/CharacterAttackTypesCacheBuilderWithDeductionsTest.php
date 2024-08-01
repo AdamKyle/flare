@@ -2,15 +2,14 @@
 
 namespace Tests\Unit\Game\Character\Builders\AttackBuilders\Jobs;
 
-use App\Flare\Models\Character;
-use App\Flare\Values\SpellTypes;
-use App\Flare\Values\WeaponTypes;
-use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
-use App\Game\Character\Builders\AttackBuilders\Jobs\CharacterAttackTypesCacheBuilderWithDeductions;
-use App\Game\Core\Events\UpdateCharacterAttacks;
+use App\Game\Character\CharacterAttack\Events\UpdateCharacterAttackEvent;
 use Cache;
 use Event;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use App\Flare\Models\Character;
+use App\Flare\Values\SpellTypes;
+use App\Flare\Values\WeaponTypes;
+use App\Game\Character\Builders\AttackBuilders\Jobs\CharacterAttackTypesCacheBuilderWithDeductions;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateItem;
@@ -57,7 +56,7 @@ class CharacterAttackTypesCacheBuilderWithDeductionsTest extends TestCase {
 
         CharacterAttackTypesCacheBuilderWithDeductions::dispatch($character);
 
-        Event::assertDispatched(UpdateCharacterAttacks::class);
+        Event::assertDispatched(UpdateCharacterAttackEvent::class);
     }
 
     public function testCharacterAttackTypesCacheBuilderWithDeductions() {
