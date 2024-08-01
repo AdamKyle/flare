@@ -144,8 +144,6 @@ export default class CharacterListeners implements GameListener {
                     return;
                 }
 
-                console.log(this.component.state.character, event);
-
                 this.component.setState({
                     character: {
                         ...this.component.state.character,
@@ -230,8 +228,6 @@ export default class CharacterListeners implements GameListener {
                 if (!this.component) {
                     return;
                 }
-
-                console.log(event);
 
                 this.component.setState({
                     character: {

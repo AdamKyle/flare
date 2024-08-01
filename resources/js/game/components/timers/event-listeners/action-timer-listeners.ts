@@ -34,6 +34,8 @@ export default class ActionTimerListeners implements ActionTimerListener {
             this.craftingTimeout = echo.private(
                 "show-crafting-timeout-bar-" + this.userId,
             );
+
+            console.log(this.attackTimeout);
         } catch (e: any | unknown) {
             throw new Error(e);
         }
