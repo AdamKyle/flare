@@ -14,11 +14,8 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterPassiveSkill;
-use App\Flare\Models\Notification as Notification;
 use App\Flare\Transformers\KingdomTransformer;
-use App\Game\Core\Events\UpdateNotificationsBroadcastEvent;
 use App\Game\Kingdoms\Events\UpdateKingdom;
-use App\Game\PassiveSkills\Events\UpdatePassiveSkillTimer;
 
 
 class TrainPassiveSkill implements ShouldQueue

@@ -1,10 +1,10 @@
-import CharacterInventoryTabs from "../../sections/character-sheet/components/character-inventory-tabs";
-import CharacterSkillsTabs from "../../sections/character-sheet/components/character-skills-tabs";
 import { Component } from "react";
-import ItemComparison from "../../sections/chat/modals/item-comparison";
-import CharacterClassRanks from "../../sections/character-sheet/components/character-class-ranks";
 import CharacterClassRankSpecialtiesSection from "../../components/character-sheet/additional-stats-section/sections/character-class-rank-specialties-section";
+import CharacterSkillsTabs from "../../components/character-sheet/character-skills-tabs/character-skills-tabs";
 import ItemView from "../../components/modals/item-details/item-view";
+import CharacterClassRanks from "../../sections/character-sheet/components/character-class-ranks";
+import CharacterInventoryTabs from "../../sections/character-sheet/components/character-inventory-tabs";
+import ItemComparison from "../../sections/chat/modals/item-comparison";
 
 /**
  * When dark mode is enabled set the dark_table to true on the table.

@@ -1,19 +1,19 @@
+import { AxiosError, AxiosResponse } from "axios";
 import React, { Fragment } from "react";
-import BasicCard from "../../components/ui/cards/basic-card";
-import CharacterTabs from "./components/character-tabs";
-import CharacterSkillsTabs from "./components/character-skills-tabs";
-import CharacterInventoryTabs from "./components/character-inventory-tabs";
-import CharacterSheetProps from "../../lib/game/character-sheet/types/character-sheet-props";
+import Select from "react-select";
+import AdditionalStatSection from "../../components/character-sheet/additional-stats-section/additional-stat-section";
+import CharacterSkillsTabs from "../../components/character-sheet/character-skills-tabs/character-skills-tabs";
 import DangerAlert from "../../components/ui/alerts/simple-alerts/danger-alert";
 import WarningAlert from "../../components/ui/alerts/simple-alerts/warning-alert";
-import Select from "react-select";
-import PrimaryButton from "../../components/ui/buttons/primary-button";
-import LoadingProgressBar from "../../components/ui/progress-bars/loading-progress-bar";
-import { AxiosError, AxiosResponse } from "axios";
-import Ajax from "../../lib/ajax/ajax";
-import ReincarnationCheckModal from "./components/modals/reincarnation-check-modal";
-import AdditionalStatSection from "../../components/character-sheet/additional-stats-section/additional-stat-section";
 import DangerButton from "../../components/ui/buttons/danger-button";
+import PrimaryButton from "../../components/ui/buttons/primary-button";
+import BasicCard from "../../components/ui/cards/basic-card";
+import LoadingProgressBar from "../../components/ui/progress-bars/loading-progress-bar";
+import Ajax from "../../lib/ajax/ajax";
+import CharacterSheetProps from "../../lib/game/character-sheet/types/character-sheet-props";
+import CharacterInventoryTabs from "./components/character-inventory-tabs";
+import CharacterTabs from "./components/character-tabs";
+import ReincarnationCheckModal from "./components/modals/reincarnation-check-modal";
 
 export default class CharacterSheet extends React.Component<
     CharacterSheetProps,
