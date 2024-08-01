@@ -2,7 +2,6 @@ import { AxiosError, AxiosResponse } from "axios";
 import { inject, injectable } from "tsyringe";
 import Ajax from "../../../lib/ajax/ajax";
 import AjaxInterface from "../../../lib/ajax/ajax-interface";
-import BuildingsTable from "../buildings/buildings-table";
 import GoldBarManagement from "../capital-city/gold-bar-management";
 
 @injectable()

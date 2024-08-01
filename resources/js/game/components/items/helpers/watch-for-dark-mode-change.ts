@@ -2,17 +2,17 @@ import ItemTable from "../item-table";
 
 export const watchForDarkModeChange = (component: ItemTable) => {
     window.setInterval(() => {
-        if (
-            window.localStorage.hasOwnProperty("scheme") &&
-            component.state.dark_tables !== true
-        ) {
+        const hasScheme = Object.prototype.hasOwnProperty.call(
+            window.localStorage,
+            "scheme",
+        );
+        const isDarkMode = hasScheme && window.localStorage.scheme === "dark";
+
+        if (hasScheme && component.state.dark_tables !== true) {
             component.setState({
-                dark_tables: window.localStorage.scheme === "dark",
+                dark_tables: isDarkMode,
             });
-        } else if (
-            !window.localStorage.hasOwnProperty("scheme") &&
-            component.state.dark_tables
-        ) {
+        } else if (!hasScheme && component.state.dark_tables) {
             component.setState({
                 dark_tables: false,
             });

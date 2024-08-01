@@ -19,7 +19,7 @@ export default interface BaseInventoryActionConfirmationModalProps {
 
     data: {
         url: string;
-        params?: {};
+        params?: Record<string, any>;
     };
 
     selected_item_names?: string[] | [];

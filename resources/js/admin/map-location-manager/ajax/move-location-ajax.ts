@@ -1,5 +1,4 @@
 import { inject, injectable } from "tsyringe";
-import MapManager from "../map-manager";
 import Ajax from "../../../game/lib/ajax/ajax";
 import AjaxInterface from "../../../game/lib/ajax/ajax-interface";
 import { AxiosError, AxiosResponse } from "axios";
@@ -23,11 +22,6 @@ export default class MoveLocationAjax {
             .doAjaxCall(
                 "post",
                 (result: AxiosResponse) => {
-                    const coordinates = {
-                        x: result.data.x_coordinates,
-                        y: result.data.y_coordinates,
-                    };
-
                     component.setState(
                         {
                             processing: false,

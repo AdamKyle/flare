@@ -5,5 +5,5 @@ export default interface EnchantingProps {
 
     cannot_craft: boolean;
 
-    remove_crafting: () => {};
+    remove_crafting: () => void;
 }

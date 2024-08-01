@@ -6,7 +6,8 @@
     "cleanup": "prettier --write 'resources/js/**/*.{ts,tsx}'",
     "build": "yarn run cleanup && NODE_ENV=production  vite build",
     "build:dev": "NODE_ENV=development vite build",
-    "prepare": "husky"
+    "prepare": "husky",
+    "lint": "yarn eslint 'resources/js/**/*.{ts, tsx}'"
   },
   "devDependencies": {
     "@emotion/react": "11.12.0",

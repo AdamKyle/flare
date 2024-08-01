@@ -1,5 +1,4 @@
 import ClassRankType from "../deffinitions/class-rank-type";
-import GameClassType from "../deffinitions/game-class-type";
 
 export default interface CharacterClassRanksState {
     class_ranks: ClassRankType[] | [];

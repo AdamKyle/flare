@@ -13,4 +13,4 @@ function characterSheetContainer(container: CoreContainer) {
     inventoryActionConfirmationContainer(container);
 }
 
-export default inventoryActionConfirmationContainer;
+export default characterSheetContainer;

@@ -8,5 +8,5 @@ export default interface SectionBuilderProps {
 
     usable_sets: SetDetails[] | [];
 
-    update_api_params: (params: any) => void;
+    update_api_params: (params: unknown) => void;
 }
