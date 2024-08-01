@@ -43,12 +43,6 @@ class ServiceProvider extends ApplicationServiceProvider {
             );
         });
 
-        $this->app->bind(GlobalEventParticipation::class, function($app) {
-            return new GlobalEventParticipation(
-                $app->make(RandomAffixGenerator::class),
-            );
-        });
-
         $this->app->bind(PurgatorySmithHouseRewardHandler::class, function($app) {
             return new PurgatorySmithHouseRewardHandler(
                 $app->make(RandomAffixGenerator::class),
