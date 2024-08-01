@@ -4,7 +4,7 @@ import clsx from "clsx";
 import SkillsProps from "./types/tables/skills-props";
 import Ajax from "../../../lib/ajax/ajax";
 import SkillType from "./deffinitions/skill-type";
-import {formatNumber} from "../../../lib/game/format-number";
+import { formatNumber } from "../../../lib/game/format-number";
 import DangerButton from "../../ui/buttons/danger-button";
 import PrimaryButton from "../../ui/buttons/primary-button";
 import WarningAlert from "../../ui/alerts/simple-alerts/warning-alert";

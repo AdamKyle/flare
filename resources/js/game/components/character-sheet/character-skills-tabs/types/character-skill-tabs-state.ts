@@ -1,6 +1,5 @@
 import SkillType from "../deffinitions/skill-type";
 
-
 export default interface CharacterSkillTabsState {
     loading: boolean;
 
