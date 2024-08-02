@@ -28,7 +28,6 @@
         "maatwebsite/excel": "^3.1",
         "pusher/pusher-php-server": "7.0.2",
         "rappasoft/laravel-livewire-tables": "^3.2",
-        "silviolleite/laravelpwa": "^2.0",
         "spatie/laravel-collection-macros": "^7.12.3",
         "spatie/laravel-permission": "^5.9.1",
         "spatie/laravel-short-schedule": "^1.5"
