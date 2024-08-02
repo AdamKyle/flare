@@ -36,9 +36,7 @@ export default class CharacterTopSection extends React.Component<
         }
     }
 
-    componentDidUpdate() {
-
-    }
+    componentDidUpdate() {}
 
     getXpPercentage(): number {
         const xpNext = this.props.character.xp_next;
@@ -118,16 +116,13 @@ export default class CharacterTopSection extends React.Component<
 
         return (
             <Fragment>
-                {
-                    this.props.view_port <= 1024 ?
-                        <div className="text-right cursor-pointer text-red-500 block">
-                            <button onClick={this.hideTopBar.bind(this)}>
-                                <i className="fas fa-minus-circle"></i>
-                            </button>
-                        </div>
-                        : null
-                }
-
+                {this.props.view_port <= 1024 ? (
+                    <div className="text-right cursor-pointer text-red-500 block">
+                        <button onClick={this.hideTopBar.bind(this)}>
+                            <i className="fas fa-minus-circle"></i>
+                        </button>
+                    </div>
+                ) : null}
 
                 <div className="grid md:grid-cols-4">
                     <span className={"mb-2 sm:mb-0"}>
