@@ -194,7 +194,7 @@ export default class CharacterSheet extends React.Component<
                     </WarningAlert>
                 ) : null}
 
-                <div className="flex flex-col lg:flex-row w-full gap-2">
+                <div className="flex flex-col lg:flex-row w-full gap-2 mt-2">
                     {this.showSection() || this.state.show_top_section ? (
                         <Fragment>
                             <BasicCard
