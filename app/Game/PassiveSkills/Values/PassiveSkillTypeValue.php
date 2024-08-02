@@ -26,6 +26,12 @@ class PassiveSkillTypeValue {
     const CAPITAL_CITY_REQUEST_BUILD_TRAVEL_TIME_REDUCTION = 12;
     const CAPITAL_CITY_REQUEST_UNIT_TRAVEL_TIME_REDUCTION = 13;
     const RESOURCE_REQUEST_TIME_REDUCTION = 14;
+    const MASTER_FARMER = 15;
+    const MASTER_STONE_MASON = 16;
+    const MASTER_WOOD_WORKER = 17;
+    const MASTER_IRON_MINER = 18;
+    const MASTER_POTTER = 19;
+    const MASTER_STEEL_SMITH = 20;
 
 
     /**
@@ -47,6 +53,12 @@ class PassiveSkillTypeValue {
         self::CAPITAL_CITY_REQUEST_BUILD_TRAVEL_TIME_REDUCTION => 12,
         self::CAPITAL_CITY_REQUEST_UNIT_TRAVEL_TIME_REDUCTION => 13,
         self::RESOURCE_REQUEST_TIME_REDUCTION => 14,
+        self::MASTER_FARMER => 15,
+        self::MASTER_STONE_MASON => 16,
+        self::MASTER_WOOD_WORKER => 17,
+        self::MASTER_IRON_MINER => 18,
+        self::MASTER_POTTER => 19,
+        self::MASTER_STEEL_SMITH => 20,
     ];
 
     /**
@@ -68,6 +80,12 @@ class PassiveSkillTypeValue {
         12 => 'Capital City Building Request Travel Time Reduction',
         13 => 'Capital City Unit Request Travel Time Reduction',
         14 => 'Resource Request Time Reduction',
+        15 => 'Master Farmer',
+        16 => 'Master Stone Mason',
+        17 => 'Master Wood Worker',
+        18 => 'Master Iron Miner',
+        19 => 'Master Potter',
+        20 => 'Master Steel Smith',
     ];
 
     /**

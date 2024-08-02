@@ -2,7 +2,7 @@ import { AxiosError, AxiosResponse } from "axios";
 import React, { Fragment } from "react";
 import Select from "react-select";
 import AdditionalStatSection from "../../components/character-sheet/additional-stats-section/additional-stat-section";
-import CharacterSkillsTabs from "../../components/character-sheet/character-skills-tabs/character-skills-tabs";
+import CharacterSkillsTabs from "../../components/character-sheet/character-skills/character-skills-tabs";
 import DangerAlert from "../../components/ui/alerts/simple-alerts/danger-alert";
 import WarningAlert from "../../components/ui/alerts/simple-alerts/warning-alert";
 import DangerButton from "../../components/ui/buttons/danger-button";

@@ -12,8 +12,12 @@ import InfoAlert from "../../ui/alerts/simple-alerts/info-alert";
 import Table from "../../ui/data-tables/table";
 import SkillInformation from "./modals/skill-information";
 import TrainSkill from "./modals/train-skill";
+import CharacterSkillsAjax from "./ajax/character-skills-ajax";
+import { serviceContainer } from "../../../lib/containers/core-container";
 
 export default class Skills extends React.Component<SkillsProps, any> {
+    private characterSkillsAjax: CharacterSkillsAjax;
+
     constructor(props: SkillsProps) {
         super(props);
 
@@ -24,6 +28,9 @@ export default class Skills extends React.Component<SkillsProps, any> {
             stopping: false,
             success_message: null,
         };
+
+        this.characterSkillsAjax =
+            serviceContainer().fetch(CharacterSkillsAjax);
     }
 
     manageTrainSkill(row: any) {
@@ -39,30 +46,11 @@ export default class Skills extends React.Component<SkillsProps, any> {
                 stopping: true,
             },
             () => {
-                new Ajax()
-                    .setRoute(
-                        "skill/cancel-train/" +
-                            this.props.character_id +
-                            "/" +
-                            row.id,
-                    )
-                    .doAjaxCall(
-                        "post",
-                        (result: AxiosResponse) => {
-                            this.setState(
-                                {
-                                    stopping: false,
-                                    success_message: result.data.message,
-                                },
-                                () => {
-                                    this.props.update_skills(
-                                        result.data.skills,
-                                    );
-                                },
-                            );
-                        },
-                        (error: AxiosError) => {},
-                    );
+                this.characterSkillsAjax.stopTrainingSkill(
+                    this,
+                    this.props.character_id,
+                    row.id,
+                );
             },
         );
     }

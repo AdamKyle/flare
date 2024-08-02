@@ -1,11 +1,13 @@
 import React, { Fragment } from "react";
 import Dialogue from "../../../../ui/dialogue/dialogue";
-import { AxiosError, AxiosResponse } from "axios";
-import Ajax from "../../../../../lib/ajax/ajax";
 import LoadingProgressBar from "../../../../ui/progress-bars/loading-progress-bar";
 import DangerAlert from "../../../../ui/alerts/simple-alerts/danger-alert";
+import { serviceContainer } from "../../../../../lib/containers/core-container";
+import KingdomPassivesAjax from "../../ajax/kingdom-passives-ajax";
 
 export default class TrainPassive extends React.Component<any, any> {
+    private kingdomPassiveAjax: KingdomPassivesAjax;
+
     constructor(props: any) {
         super(props);
 
@@ -13,6 +15,8 @@ export default class TrainPassive extends React.Component<any, any> {
             loading: false,
             error_message: "",
         };
+
+        this.kingdomPassiveAjax = serviceContainer().fetch(KingdomPassivesAjax);
     }
 
     trainSkill() {
@@ -21,44 +25,11 @@ export default class TrainPassive extends React.Component<any, any> {
                 loading: true,
             },
             () => {
-                new Ajax()
-                    .setRoute(
-                        "train/passive/" +
-                            this.props.skill.id +
-                            "/" +
-                            this.props.character_id,
-                    )
-                    .doAjaxCall(
-                        "post",
-                        (result: AxiosResponse) => {
-                            this.setState(
-                                {
-                                    loading: false,
-                                },
-                                () => {
-                                    this.props.manage_success_message(
-                                        result.data.message,
-                                    );
-                                    this.props.update_passives(
-                                        result.data.kingdom_passives,
-                                        result.data.passive_training,
-                                    );
-                                    this.props.manage_modal();
-                                },
-                            );
-                        },
-                        (error: AxiosError) => {
-                            this.setState({ loading: false });
-
-                            if (typeof error.response !== "undefined") {
-                                const response: AxiosResponse = error.response;
-
-                                this.setState({
-                                    error_message: response.data.message,
-                                });
-                            }
-                        },
-                    );
+                this.kingdomPassiveAjax.trainPassiveSkill(
+                    this,
+                    this.props.character_id,
+                    this.props.skill.id,
+                );
             },
         );
     }
@@ -69,33 +40,11 @@ export default class TrainPassive extends React.Component<any, any> {
                 loading: true,
             },
             () => {
-                new Ajax()
-                    .setRoute(
-                        "stop-training/passive/" +
-                            this.props.skill.id +
-                            "/" +
-                            this.props.character_id,
-                    )
-                    .doAjaxCall(
-                        "post",
-                        (result: AxiosResponse) => {
-                            this.setState(
-                                {
-                                    loading: false,
-                                },
-                                () => {
-                                    this.props.manage_success_message(
-                                        result.data.message,
-                                    );
-                                    this.props.update_passives(
-                                        result.data.kingdom_passives,
-                                    );
-                                    this.props.manage_modal();
-                                },
-                            );
-                        },
-                        (error: AxiosError) => {},
-                    );
+                this.kingdomPassiveAjax.stopTrainingPassiveSkill(
+                    this,
+                    this.props.character_id,
+                    this.props.skill.id,
+                );
             },
         );
     }

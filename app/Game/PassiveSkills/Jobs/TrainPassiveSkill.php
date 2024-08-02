@@ -3,6 +3,7 @@
 namespace App\Game\PassiveSkills\Jobs;
 
 use App\Flare\Models\GameBuilding;
+use App\Game\Core\Services\CharacterPassiveSkills;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\PassiveSkills\Events\UpdatePassiveTree;
 use League\Fractal\Manager;
@@ -41,7 +42,7 @@ class TrainPassiveSkill implements ShouldQueue
      *
      * @return void
      */
-    public function handle(Manager $manager, KingdomTransformer $kingdomTransformer) {
+    public function handle(Manager $manager, KingdomTransformer $kingdomTransformer, CharacterPassiveSkills $characterPassiveSkills) {
 
         if (is_null($this->characterPassiveSkill->started_at)) {
             return;
@@ -153,6 +154,6 @@ class TrainPassiveSkill implements ShouldQueue
 
         event(new ServerMessageEvent($character->user, $newPassive->passiveSkill->name . ' skill has gained a new level! Check your character sheet!'));
 
-        event(new UpdatePassiveTree($character->user, $character->passiveSkills));
+        event(new UpdatePassiveTree($character->user, $characterPassiveSkills->getPassiveSkills($character)));
     }
 }

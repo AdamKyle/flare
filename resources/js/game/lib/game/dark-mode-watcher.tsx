@@ -1,6 +1,6 @@
 import { Component } from "react";
 import CharacterClassRankSpecialtiesSection from "../../components/character-sheet/additional-stats-section/sections/character-class-rank-specialties-section";
-import CharacterSkillsTabs from "../../components/character-sheet/character-skills-tabs/character-skills-tabs";
+import CharacterSkillsTabs from "../../components/character-sheet/character-skills/character-skills-tabs";
 import ItemView from "../../components/modals/item-details/item-view";
 import CharacterClassRanks from "../../sections/character-sheet/components/character-class-ranks";
 import CharacterInventoryTabs from "../../sections/character-sheet/components/character-inventory-tabs";

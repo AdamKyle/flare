@@ -4,11 +4,13 @@ import DangerAlert from "../../../ui/alerts/simple-alerts/danger-alert";
 import { formatNumber } from "../../../../lib/game/format-number";
 import Select from "react-select";
 import LoadingProgressBar from "../../../ui/progress-bars/loading-progress-bar";
-import { AxiosError, AxiosResponse } from "axios";
-import Ajax from "../../../../lib/ajax/ajax";
 import SkillHelpModal from "./skill-help-modal";
+import CharacterSkillsAjax from "../ajax/character-skills-ajax";
+import { serviceContainer } from "../../../../lib/containers/core-container";
 
 export default class TrainSkill extends React.Component<any, any> {
+    private characterSkillAjax: CharacterSkillsAjax;
+
     constructor(props: any) {
         super(props);
 
@@ -18,6 +20,8 @@ export default class TrainSkill extends React.Component<any, any> {
             loading: false,
             show_help: false,
         };
+
+        this.characterSkillAjax = serviceContainer().fetch(CharacterSkillsAjax);
     }
 
     setSkillToTrain(data: any) {
@@ -39,32 +43,12 @@ export default class TrainSkill extends React.Component<any, any> {
                 loading: true,
             },
             () => {
-                new Ajax()
-                    .setRoute("skill/train/" + this.props.character_id)
-                    .setParameters({
-                        skill_id: this.props.skill.id,
-                        xp_percentage: this.state.selected_value,
-                    })
-                    .doAjaxCall(
-                        "post",
-                        (result: AxiosResponse) => {
-                            this.setState(
-                                {
-                                    loading: false,
-                                },
-                                () => {
-                                    this.props.set_success_message(
-                                        result.data.message,
-                                    );
-                                    this.props.update_skills(
-                                        result.data.skills,
-                                    );
-                                    this.props.manage_modal();
-                                },
-                            );
-                        },
-                        (error: AxiosError) => {},
-                    );
+                this.characterSkillAjax.trainSkill(
+                    this,
+                    this.props.character_id,
+                    this.props.skill.id,
+                    this.state.selected_value,
+                );
             },
         );
     }

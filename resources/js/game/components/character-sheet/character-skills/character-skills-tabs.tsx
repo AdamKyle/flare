@@ -134,6 +134,7 @@ export default class CharacterSkillsTabs extends React.Component<
                 <TabPanel key={"kingdom-passives"}>
                     <KingdomPassives
                         is_dead={this.props.is_dead}
+                        user_id={this.props.user_id}
                         character_id={this.props.character_id}
                         is_automation_running={this.props.is_automation_running}
                     />

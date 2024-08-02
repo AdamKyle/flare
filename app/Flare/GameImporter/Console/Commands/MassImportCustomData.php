@@ -41,11 +41,14 @@ class MassImportCustomData extends Command {
     public function handle() {
 
         Artisan::call('import:game-data Items');
+        Artisan::call('import:game-data "Kingdom Passive Skills"');
         Artisan::call('import:game-data Quests');
 
         $this->importInformationSection();
 
+        Artisan::call('assign:new-skills');
         Artisan::call('create:quest-cache');
+        Artisan::call('create:character-attack-data');
     }
 
     protected function importInformationSection(): void {

@@ -1,15 +1,22 @@
 import React, { Fragment } from "react";
-import { AxiosError, AxiosResponse } from "axios";
 import { DateTime } from "luxon";
-import Ajax from "../../../lib/ajax/ajax";
 import ComponentLoading from "../../ui/loading/component-loading";
 import SuccessAlert from "../../ui/alerts/simple-alerts/success-alert";
 import InfoAlert from "../../ui/alerts/simple-alerts/info-alert";
 import WarningAlert from "../../ui/alerts/simple-alerts/warning-alert";
 import TimerProgressBar from "../../ui/progress-bars/timer-progress-bar";
 import KingdomPassiveTree from "./skill-tree/kingdom-passive-tree";
+import DangerAlert from "../../ui/alerts/simple-alerts/danger-alert";
+import KingdomPassivesAjax from "./ajax/kingdom-passives-ajax";
+import { serviceContainer } from "../../../lib/containers/core-container";
+import KingdomPassiveSkillsEventDefinition from "./event-listeners/kingdom-passive-skills-event-definition";
+import KingdomPassiveSkillsEvent from "./event-listeners/kingdom-passive-skills-event";
 
 export default class KingdomPassives extends React.Component<any, any> {
+    private kingdomPassiveTreeAjax: KingdomPassivesAjax;
+
+    private kingdomPassiveSkillEvent: KingdomPassiveSkillsEventDefinition;
+
     constructor(props: any) {
         super(props);
 
@@ -17,24 +24,29 @@ export default class KingdomPassives extends React.Component<any, any> {
             loading: true,
             kingdom_passives: [],
             success_message: null,
+            error_message: null,
             skill_in_training: null,
         };
+
+        this.kingdomPassiveTreeAjax =
+            serviceContainer().fetch(KingdomPassivesAjax);
+
+        this.kingdomPassiveSkillEvent =
+            serviceContainer().fetch<KingdomPassiveSkillsEventDefinition>(
+                KingdomPassiveSkillsEvent,
+            );
+
+        this.kingdomPassiveSkillEvent.initialize(this, this.props.user_id);
+        this.kingdomPassiveSkillEvent.register();
     }
 
     componentDidMount() {
-        new Ajax()
-            .setRoute("character/kingdom-passives/" + this.props.character_id)
-            .doAjaxCall(
-                "get",
-                (result: AxiosResponse) => {
-                    this.setState({
-                        loading: false,
-                        kingdom_passives: result.data.kingdom_passives,
-                        skill_in_training: result.data.passive_training,
-                    });
-                },
-                (error: AxiosError) => {},
-            );
+        this.kingdomPassiveTreeAjax.fetchPassiveTree(
+            this,
+            this.props.character_id,
+        );
+
+        this.kingdomPassiveSkillEvent.listen();
     }
 
     manageSuccessMessage(message: string) {
@@ -54,42 +66,6 @@ export default class KingdomPassives extends React.Component<any, any> {
             kingdom_passives: passives,
             skill_in_training: passiveInTraining,
         });
-    }
-
-    findSkillInTraining(passive: any): void {
-        if (this.updatePassiveTrainingState(passive)) {
-            return;
-        }
-
-        if (passive.children.length > 0) {
-            for (let i = 0; i < passive.children.length; i++) {
-                const child = passive.children[i];
-
-                if (child.children.length > 0) {
-                    this.findSkillInTraining(child);
-                }
-
-                if (this.updatePassiveTrainingState(child)) {
-                    return;
-                }
-            }
-        }
-    }
-
-    updatePassiveTrainingState(passive: any): boolean {
-        if (passive.started_at !== null) {
-            this.setState({
-                skill_in_training: passive,
-            });
-
-            return true;
-        } else {
-            this.setState({
-                skill_in_training: null,
-            });
-
-            return false;
-        }
     }
 
     getTimeLeftInSeconds(): number {
@@ -131,6 +107,14 @@ export default class KingdomPassives extends React.Component<any, any> {
                                 >
                                     {this.state.success_message}
                                 </SuccessAlert>
+                            </div>
+                        ) : null}
+
+                        {this.state.error_message !== null ? (
+                            <div className="mb-4">
+                                <DangerAlert>
+                                    {this.state.error_message}
+                                </DangerAlert>
                             </div>
                         ) : null}
 
