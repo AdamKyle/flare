@@ -22,17 +22,22 @@ export default class CharacterTopSection extends React.Component<
         });
     }
 
-    componentDidMount() {}
-
-    componentDidUpdate(
-        prevProps: CharacterTopSectionProps,
-        prevState: CharacterTopSectionState,
-    ) {
-        if (this.props.view_port >= 1024 && this.state.hide_top_bar) {
+    componentDidMount() {
+        if (this.props.view_port > 1024) {
             this.setState({
                 hide_top_bar: false,
             });
         }
+
+        if (this.props.view_port <= 1024) {
+            this.setState({
+                hide_top_bar: true,
+            });
+        }
+    }
+
+    componentDidUpdate() {
+
     }
 
     getXpPercentage(): number {
@@ -75,7 +80,7 @@ export default class CharacterTopSection extends React.Component<
             return null;
         }
 
-        if (this.state.hide_top_bar && this.props.view_port < 1024) {
+        if (this.state.hide_top_bar && this.props.view_port <= 1024) {
             return (
                 <Fragment>
                     <div className="grid grid-cols-2">
@@ -113,11 +118,16 @@ export default class CharacterTopSection extends React.Component<
 
         return (
             <Fragment>
-                <div className="text-right cursor-pointer text-red-500 block lg:hidden">
-                    <button onClick={this.hideTopBar.bind(this)}>
-                        <i className="fas fa-minus-circle"></i>
-                    </button>
-                </div>
+                {
+                    this.props.view_port <= 1024 ?
+                        <div className="text-right cursor-pointer text-red-500 block">
+                            <button onClick={this.hideTopBar.bind(this)}>
+                                <i className="fas fa-minus-circle"></i>
+                            </button>
+                        </div>
+                        : null
+                }
+
 
                 <div className="grid md:grid-cols-4">
                     <span className={"mb-2 sm:mb-0"}>

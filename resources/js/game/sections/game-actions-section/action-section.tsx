@@ -14,7 +14,7 @@ export default class ActionSection extends React.Component<
     render() {
         return (
             <Fragment>
-                {this.props.view_port < 1024 ? (
+                {this.props.view_port <= 1024 ? (
                     <SmallerActions
                         character={this.props.character}
                         character_status={this.props.character_status}
@@ -52,6 +52,9 @@ export default class ActionSection extends React.Component<
                         action_data={this.props.action_data}
                         update_parent_state={this.props.update_parent_state}
                         fame_tasks={this.props.fame_tasks}
+                        update_show_map_mobile={
+                            this.props.update_show_map_mobile
+                        }
                     />
                 )}
             </Fragment>
