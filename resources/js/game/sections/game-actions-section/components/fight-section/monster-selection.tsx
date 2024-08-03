@@ -16,7 +16,7 @@ export default class MonsterSelection extends React.Component<
         return (
             <div className="mt-4 lg:mt-2 lg:ml-[120px]">
                 <div className="lg:grid lg:grid-cols-3 lg:gap-2">
-                    <div className="lg:cols-start-1 lg:col-span-2">
+                    <div className="w-full md:w-2/3 lg:w-full mr-auto ml-auto lg:ml-0 lg:mr-0 lg:col-start-1 lg:col-span-2">
                         <Select
                             onChange={this.props.set_monster_to_fight}
                             options={this.props.monsters}
@@ -33,6 +33,7 @@ export default class MonsterSelection extends React.Component<
                             value={this.props.default_monster}
                         />
                     </div>
+
                     <div className="text-center mt-4 lg:mt-0 lg:text-left lg:cols-start-3 lg:cols-end-3">
                         <PrimaryButton
                             button_label={"Attack"}

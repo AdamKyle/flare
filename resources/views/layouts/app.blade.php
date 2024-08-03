@@ -21,7 +21,7 @@
 
     <title>{{ config('app.name', 'Laravel') }}</title>
 
-    @laravelPWA
+    <x-core.pwa-meta-tags.meta-tags title="Planes of Tlessa" />
 
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.gstatic.com">

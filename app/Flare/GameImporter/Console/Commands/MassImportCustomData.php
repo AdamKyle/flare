@@ -46,6 +46,8 @@ class MassImportCustomData extends Command {
 
         $this->importInformationSection();
 
+        $this->importGameMaps();
+
         Artisan::call('assign:new-skills');
         Artisan::call('create:quest-cache');
         Artisan::call('create:character-attack-data');

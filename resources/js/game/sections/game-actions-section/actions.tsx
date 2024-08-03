@@ -75,6 +75,8 @@ export default class Actions extends React.Component<
     componentDidMount() {
         this.setUpState();
 
+        this.props.update_show_map_mobile(true);
+
         // @ts-ignore
         this.duelOptions.listen(
             "Game.Maps.Events.UpdateDuelAtPosition",
@@ -344,7 +346,7 @@ export default class Actions extends React.Component<
                             !this.state.show_join_pvp &&
                             !this.state.show_celestial_fight &&
                             this.props.character !== null && (
-                                <div className="w-full md:w-3/4">
+                                <div className="w-full">
                                     <DropDown
                                         menu_items={this.actionsManager.buildCraftingList(
                                             this.openCrafting.bind(this),
@@ -359,7 +361,7 @@ export default class Actions extends React.Component<
                         {!this.state.show_duel_fight &&
                             !this.state.show_join_pvp &&
                             !this.state.show_celestial_fight && (
-                                <div className="w-full md:w-3/4">
+                                <div className="w-full">
                                     <SuccessOutlineButton
                                         button_label={"Exploration"}
                                         on_click={this.manageExploration.bind(
@@ -372,7 +374,7 @@ export default class Actions extends React.Component<
                             )}
 
                         {this.props.character.can_access_hell_forged && (
-                            <div className="w-full md:w-3/4">
+                            <div className="w-full">
                                 <SuccessOutlineButton
                                     button_label={"Hell Forged Gear"}
                                     on_click={this.manageHellForgedShop.bind(
@@ -385,7 +387,7 @@ export default class Actions extends React.Component<
                         )}
 
                         {this.props.character.can_access_purgatory_chains && (
-                            <div className="w-full md:w-3/4">
+                            <div className="w-full">
                                 <SuccessOutlineButton
                                     button_label={"Purgatory Chains Gear"}
                                     on_click={this.managedPurgatoryChainsShop.bind(
@@ -398,7 +400,7 @@ export default class Actions extends React.Component<
                         )}
 
                         {this.props.character.can_access_twisted_memories && (
-                            <div className="w-full md:w-3/4">
+                            <div className="w-full">
                                 <SuccessOutlineButton
                                     button_label={"Twisted Earth Gear"}
                                     on_click={this.managedTwistedEarthShop.bind(
@@ -410,7 +412,7 @@ export default class Actions extends React.Component<
                             </div>
                         )}
 
-                        <div className="w-full md:w-3/4">
+                        <div className="w-full">
                             <SuccessOutlineButton
                                 button_label={"Slots"}
                                 on_click={this.manageGamblingSection.bind(this)}
@@ -424,7 +426,7 @@ export default class Actions extends React.Component<
                             !this.state.show_duel_fight &&
                             !this.state.show_join_pvp &&
                             this.props.can_engage_celestial && (
-                                <div className="w-full lg:w-3/4">
+                                <div className="w-full">
                                     <SuccessOutlineButton
                                         button_label={"Fight Celestial!"}
                                         on_click={this.manageFightCelestial.bind(
@@ -445,7 +447,7 @@ export default class Actions extends React.Component<
                             !this.state.show_exploration &&
                             !this.state.show_join_pvp &&
                             !this.state.show_celestial_fight && (
-                                <div className="w-full lg:w-3/4">
+                                <div className="w-full">
                                     <SuccessOutlineButton
                                         button_label={"Duel!"}
                                         on_click={this.manageDuel.bind(this)}
@@ -464,7 +466,7 @@ export default class Actions extends React.Component<
                             !this.state.show_duel_fight &&
                             !this.state.show_exploration &&
                             !this.state.show_celestial_fight && (
-                                <div className="w-full lg:w-3/4">
+                                <div className="w-full">
                                     <SkyOutlineButton
                                         button_label={"Join PVP"}
                                         on_click={this.manageJoinPvp.bind(this)}
@@ -474,7 +476,7 @@ export default class Actions extends React.Component<
                                 </div>
                             )}
                     </div>
-                    <div className="md:col-span-3 mt-1">
+                    <div className="md:col-span-3 mt-4">
                         {!this.state.show_exploration &&
                             !this.state.show_duel_fight &&
                             !this.state.show_join_pvp &&

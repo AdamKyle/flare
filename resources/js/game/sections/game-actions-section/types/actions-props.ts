@@ -22,4 +22,6 @@ export default interface ActionsProps {
     update_parent_state: (stateData: GameActionState) => void;
 
     fame_tasks: FameTasks[] | null;
+
+    update_show_map_mobile: (showMap: boolean) => void;
 }
