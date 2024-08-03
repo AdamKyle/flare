@@ -5,7 +5,8 @@ namespace Database\Factories;
 use App\Flare\Models\FactionLoyalty;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class FactionLoyaltyFactory extends Factory {
+class FactionLoyaltyFactory extends Factory
+{
     /**
      * The name of the factory's corresponding model.
      *
@@ -18,11 +19,12 @@ class FactionLoyaltyFactory extends Factory {
      *
      * @return array
      */
-    public function definition() {
+    public function definition()
+    {
         return [
-            'faction_id'    => null,
-            'character_id'  => null,
-            'is_pledged'    => true,
+            'faction_id' => null,
+            'character_id' => null,
+            'is_pledged' => true,
         ];
     }
 }

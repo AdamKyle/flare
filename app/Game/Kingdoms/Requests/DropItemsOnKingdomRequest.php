@@ -24,14 +24,15 @@ class DropItemsOnKingdomRequest extends FormRequest
     public function rules()
     {
         return [
-            'slots'   => 'required|array',
+            'slots' => 'required|array',
             'slots.*' => 'required|integer|exists:inventory_slots,id',
         ];
     }
 
-    public function messages() {
+    public function messages()
+    {
         return [
-            'slots.required'  => 'You are missing items to use.',
+            'slots.required' => 'You are missing items to use.',
             'slots.*.integer' => 'Each item must be an integer.',
         ];
     }

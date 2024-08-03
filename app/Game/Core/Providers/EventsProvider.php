@@ -1,25 +1,25 @@
 <?php
+
 namespace App\Game\Core\Providers;
 
-use App\Game\Core\Events\DropsCheckEvent;
-use App\Game\Core\Events\UpdateTopBarEvent;
-use App\Game\Core\Events\GoldRushCheckEvent;
-use App\Game\Core\Events\UpdateCharacterEvent;
 use App\Game\Core\Events\CharacterLevelUpEvent;
-use App\Game\Core\Listeners\DropsCheckListener;
 use App\Game\Core\Events\CraftedItemTimeOutEvent;
-use App\Game\Core\Listeners\UpdateTopBarListener;
-use App\Game\Core\Listeners\GoldRushCheckListener;
-use App\Game\Core\Listeners\UpdateCharacterListener;
+use App\Game\Core\Events\DropsCheckEvent;
+use App\Game\Core\Events\GoldRushCheckEvent;
+use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
+use App\Game\Core\Events\UpdateCharacterEvent;
+use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Listeners\CharacterLevelUpListener;
 use App\Game\Core\Listeners\CraftedItemTimeOutListener;
-use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
+use App\Game\Core\Listeners\DropsCheckListener;
+use App\Game\Core\Listeners\GoldRushCheckListener;
 use App\Game\Core\Listeners\UpdateCharacterCurrenciesListener;
+use App\Game\Core\Listeners\UpdateCharacterListener;
+use App\Game\Core\Listeners\UpdateTopBarListener;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 
-
-class EventsProvider extends ServiceProvider {
-
+class EventsProvider extends ServiceProvider
+{
     protected $listen = [
 
         // When the character levels up, update the top bar:
@@ -52,11 +52,10 @@ class EventsProvider extends ServiceProvider {
             GoldRushCheckListener::class,
         ],
 
-
         // When the character levels up:
         CharacterLevelUpEvent::class => [
             CharacterLevelUpListener::class,
-        ]
+        ],
     ];
 
     /**

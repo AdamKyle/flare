@@ -2,14 +2,14 @@
 
 namespace App\Game\Core\Events;
 
+use App\Flare\Models\User;
 use Illuminate\Broadcasting\Channel;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
-Use App\Flare\Models\User;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\SerializesModels;
 
 class UpdateCharacterFactions implements ShouldBroadcastNow
 {
@@ -18,22 +18,21 @@ class UpdateCharacterFactions implements ShouldBroadcastNow
     public $factions;
 
     /**
-     * @param User $user
+     * @param  User  $user
      */
     private $user;
 
     /**
      * Create a new event instance.
      *
-     * @param User $user
-     * @param array $marketListings
-     * @param int $characterGold
+     * @param  array  $marketListings
+     * @param  int  $characterGold
      * @return void
      */
     public function __construct(User $user, Collection $factions)
     {
         $this->factions = $factions;
-        $this->user     = $user;
+        $this->user = $user;
     }
 
     /**
@@ -43,6 +42,6 @@ class UpdateCharacterFactions implements ShouldBroadcastNow
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('update-factions-' . $this->user->id);
+        return new PrivateChannel('update-factions-'.$this->user->id);
     }
 }

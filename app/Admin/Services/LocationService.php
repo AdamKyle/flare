@@ -9,38 +9,36 @@ use App\Flare\Models\Location;
 use App\Flare\Values\LocationEffectValue;
 use App\Flare\Values\LocationType;
 
-class LocationService {
-
+class LocationService
+{
     private CoordinatesCache $coordinatesCache;
 
-    /**
-     * @param CoordinatesCache $coordinatesCache
-     */
-    public function __construct(CoordinatesCache $coordinatesCache) {
+    public function __construct(CoordinatesCache $coordinatesCache)
+    {
         $this->coordinatesCache = $coordinatesCache;
     }
 
     /**
      * Get view variables.
-     *
-     * @return array
      */
-    public function getViewVariables(Location $location = null): array {
+    public function getViewVariables(?Location $location = null): array
+    {
         return [
-            'coordinates'     => $this->coordinatesCache->getFromCache(),
-            'gameMaps'        => GameMap::pluck('name', 'id')->toArray(),
+            'coordinates' => $this->coordinatesCache->getFromCache(),
+            'gameMaps' => GameMap::pluck('name', 'id')->toArray(),
             'locationEffects' => LocationEffectValue::getNamedValues(),
-            'questItems'      => Item::where('type', 'quest')->pluck('name', 'id')->toArray(),
-            'locationTypes'   => LocationType::getNamedValues(),
-            'location'        => $location,
-            'specialCssPins'  => $this->getLocationCssPins(),
+            'questItems' => Item::where('type', 'quest')->pluck('name', 'id')->toArray(),
+            'locationTypes' => LocationType::getNamedValues(),
+            'location' => $location,
+            'specialCssPins' => $this->getLocationCssPins(),
         ];
     }
 
-    protected function getLocationCssPins(): array {
+    protected function getLocationCssPins(): array
+    {
         return [
             'christmas-tree-x-pin' => 'Christmas Tree',
-            'snowman-x-pin'        => 'Snowman',
+            'snowman-x-pin' => 'Snowman',
         ];
     }
 }

@@ -6,9 +6,8 @@ use Exception;
 
 class NpcTypes
 {
-
     /**
-     * @var string $value
+     * @var string
      */
     private $value;
 
@@ -21,7 +20,7 @@ class NpcTypes
     const SPECIAL_ENCHANTS = 3;
 
     /**
-     * @var string[] $values
+     * @var string[]
      */
     protected static $values = [
         self::KINGDOM_HOLDER => 0,
@@ -31,7 +30,7 @@ class NpcTypes
     ];
 
     /**
-     * @var string[] $namedValues
+     * @var string[]
      */
     protected static $namedValues = [
         0 => 'Kingdom Holder',
@@ -45,13 +44,12 @@ class NpcTypes
      *
      * Throws if the value does not exist in the array of const values.
      *
-     * @param int $value
      * @throws Exception
      */
     public function __construct(int $value)
     {
-        if (!in_array($value, self::$values)) {
-            throw new Exception($value . ' does not exist.');
+        if (! in_array($value, self::$values)) {
+            throw new Exception($value.' does not exist.');
         }
 
         $this->value = $value;
@@ -62,7 +60,8 @@ class NpcTypes
      *
      * @return string[]
      */
-    public static function getNamedValues(): array {
+    public static function getNamedValues(): array
+    {
         return self::$namedValues;
     }
 
@@ -70,26 +69,29 @@ class NpcTypes
      * See if the name exists in a named value.
      *
      * If it does return it, if not throw an exception.
-     *
-     * @return string
      */
-    public function getNamedValue(): string {
+    public function getNamedValue(): string
+    {
         return self::$namedValues[$this->value];
     }
 
-    public function isKingdomHolder(): bool {
+    public function isKingdomHolder(): bool
+    {
         return $this->value === self::KINGDOM_HOLDER;
     }
 
-    public function isQuestHolder(): bool {
+    public function isQuestHolder(): bool
+    {
         return $this->value === self::QUEST_GIVER;
     }
 
-    public function isConjurer(): bool {
+    public function isConjurer(): bool
+    {
         return $this->value === self::SUMMONER;
     }
 
-    public function isEnchantress(): bool {
+    public function isEnchantress(): bool
+    {
         return $this->value === self::SPECIAL_ENCHANTS;
     }
 }

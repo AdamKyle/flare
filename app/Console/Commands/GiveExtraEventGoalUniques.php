@@ -29,7 +29,8 @@ class GiveExtraEventGoalUniques extends Command
     /**
      * Execute the console command.
      */
-    public function handle(RandomAffixGenerator $randomAffixGenerator) {
+    public function handle(RandomAffixGenerator $randomAffixGenerator)
+    {
 
         $participatingPlayerIds = GlobalEventParticipation::pluck('character_id')->toArray();
 
@@ -40,21 +41,23 @@ class GiveExtraEventGoalUniques extends Command
         }
     }
 
-    protected function handOutFiveItems(Character $character, RandomAffixGenerator $randomAffixGenerator) {
+    protected function handOutFiveItems(Character $character, RandomAffixGenerator $randomAffixGenerator)
+    {
 
         for ($i = 1; $i <= 5; $i++) {
             $item = $this->generateItem($character, $randomAffixGenerator);
 
             $character->inventory->slots()->create([
                 'inventory_id' => $character->inventory->id,
-                'item_id'      => $item->id,
+                'item_id' => $item->id,
             ]);
 
             $character = $character->refresh();
         }
     }
 
-    protected function generateItem(Character $character, RandomAffixGenerator $randomAffixGenerator): Item {
+    protected function generateItem(Character $character, RandomAffixGenerator $randomAffixGenerator): Item
+    {
         $item = Item::where('specialty_type', ItemSpecialtyType::CORRUPTED_ICE)
             ->whereNull('item_prefix_id')
             ->whereNull('item_suffix_id')

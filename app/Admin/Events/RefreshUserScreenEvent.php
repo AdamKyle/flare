@@ -2,14 +2,13 @@
 
 namespace App\Admin\Events;
 
-use Illuminate\Broadcasting\Channel;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Foundation\Events\Dispatchable;
-use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
-
 use App\Flare\Models\User;
+use Illuminate\Broadcasting\Channel;
+use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Broadcasting\PrivateChannel;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\SerializesModels;
 
 class RefreshUserScreenEvent implements ShouldBroadcastNow
 {
@@ -17,23 +16,18 @@ class RefreshUserScreenEvent implements ShouldBroadcastNow
 
     /**
      * User to be banned.
-     *
-     * @var User $user
      */
     private User $user;
 
-    /**
-     * @var bool $refresh
-     */
     public bool $refresh = true;
 
     /**
      * Create a new event instance.
      *
-     * @param User $user
      * @return void
      */
-    public function __construct(User $user) {
+    public function __construct(User $user)
+    {
         $this->user = $user;
     }
 
@@ -42,7 +36,8 @@ class RefreshUserScreenEvent implements ShouldBroadcastNow
      *
      * @return Channel|array
      */
-    public function broadcastOn() {
-        return new PrivateChannel('refresh-listener-' . $this->user->id);
+    public function broadcastOn()
+    {
+        return new PrivateChannel('refresh-listener-'.$this->user->id);
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 Route::get('/', ['as' => 'welcome', 'uses' => 'WelcomeController@welcome']);
 Route::get('/game-event-info', ['as' => 'event.type', 'uses' => 'WelcomeController@showEventPage']);
 
@@ -21,10 +22,8 @@ Route::get('/information/class-specials/{gameClassSpecial}', ['as' => 'info.page
 Route::get('/information/raids/{raid}', ['as' => 'info.page.raid', 'uses' => 'InfoPageController@viewRaid']);
 Route::get('/information/item-skills/skill/{itemSkill}', ['as' => 'info.page.item-skill.skill', 'uses' => 'InfoPageController@itemSkill']);
 
-
 Route::get('/releases', ['as' => 'releases.list', 'uses' => 'ReleasesController@index']);
 Route::get('/features', ['as' => 'game.features', 'uses' => 'MarketingPagesController@features']);
-
 
 Route::get('/un-ban-request', ['as' => 'un.ban.request', 'uses' => 'UnbanRequestController@unbanRequest']);
 Route::get('/un-ban/request-form/{user}', ['as' => 'un.ban.request.form', 'uses' => 'UnbanRequestController@requestForm']);

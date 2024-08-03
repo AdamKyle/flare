@@ -27,7 +27,7 @@ class EventsImportRequest extends FormRequest
     public function rules()
     {
         return [
-            'scheduled_events' => 'required|mimes:xlsx|max:2048'
+            'scheduled_events' => 'required|mimes:xlsx|max:2048',
         ];
     }
 
@@ -36,11 +36,12 @@ class EventsImportRequest extends FormRequest
      *
      * @return array
      */
-    public function messages() {
+    public function messages()
+    {
         return [
-            'scheduled_events.required'   => 'Scheduled Events import file is required.',
-            'scheduled_events.mime'       => 'The system only accepts xlsx files.',
-            'scheduled_events.max'        => 'File to large, the system only accepts a max size of 2MB.',
+            'scheduled_events.required' => 'Scheduled Events import file is required.',
+            'scheduled_events.mime' => 'The system only accepts xlsx files.',
+            'scheduled_events.max' => 'File to large, the system only accepts a max size of 2MB.',
         ];
     }
 }

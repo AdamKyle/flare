@@ -4,7 +4,8 @@ namespace App\Game\NpcActions\SeerActions\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class RemoveGemFromItemRequest extends FormRequest {
+class RemoveGemFromItemRequest extends FormRequest
+{
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -24,14 +25,15 @@ class RemoveGemFromItemRequest extends FormRequest {
     {
         return [
             'slot_id' => 'required|integer',
-            'gem_id'  => 'required|integer',
+            'gem_id' => 'required|integer',
         ];
     }
 
-    public function messages() {
+    public function messages()
+    {
         return [
             'slot_id.required' => 'Error. Invalid Input.',
-            'gem_id.required'  => 'Error. Invalid Input',
+            'gem_id.required' => 'Error. Invalid Input',
         ];
     }
 }

@@ -24,11 +24,12 @@ class KingdomUpgradeBuildingRequest extends FormRequest
     public function rules()
     {
         return [
-            'to_level'         => 'required|int',
+            'to_level' => 'required|int',
         ];
     }
 
-    public function messages() {
+    public function messages()
+    {
         return [
             'to_level.required' => 'What level do you want to go to?',
         ];

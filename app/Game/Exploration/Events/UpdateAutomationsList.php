@@ -2,42 +2,37 @@
 
 namespace App\Game\Exploration\Events;
 
-use Illuminate\Broadcasting\Channel;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Broadcasting\PresenceChannel;
-use Illuminate\Foundation\Events\Dispatchable;
-use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use App\Flare\Models\User;
+use Illuminate\Broadcasting\Channel;
+use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Broadcasting\PrivateChannel;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\SerializesModels;
 
 class UpdateAutomationsList implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     /**
-     * @var User $user
+     * @var User
      */
     public $user;
 
     /**
-     * @var Collection $automations
+     * @var Collection
      */
     public $automations;
 
     /**
-     * @var bool $activateBar
+     * @var bool
      */
     public $activateBar;
 
-    /**
-     * @param User $user
-     * @param Collection $automations
-     */
     public function __construct(User $user, Collection $automations)
     {
-        $this->user        = $user;
+        $this->user = $user;
         $this->automations = $automations;
     }
 
@@ -48,6 +43,6 @@ class UpdateAutomationsList implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('automations-list-' . $this->user->id);
+        return new PrivateChannel('automations-list-'.$this->user->id);
     }
 }

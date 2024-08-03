@@ -1,20 +1,20 @@
 <?php
 
-
 namespace App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks;
 
 use App\Flare\Models\Character;
 use App\Flare\ServerFight\BattleBase;
 
-class BloodyPuke extends BattleBase {
-
-    public function handleAttack(Character $character, array $attackData, bool $isPvp = false) {
+class BloodyPuke extends BattleBase
+{
+    public function handleAttack(Character $character, array $attackData, bool $isPvp = false)
+    {
         $extraActionData = $this->characterCacheData->getCachedCharacterData($character, 'extra_action_chance');
 
         if ($extraActionData['has_item']) {
 
-            if (!($extraActionData['chance'] >= 1)) {
-                if (!(rand(1, 100) > (100 - 100 * $extraActionData['chance']))) {
+            if (! ($extraActionData['chance'] >= 1)) {
+                if (! (rand(1, 100) > (100 - 100 * $extraActionData['chance']))) {
                     return;
                 }
             }
@@ -23,7 +23,7 @@ class BloodyPuke extends BattleBase {
 
             $durModded = $character->getInformation()->statMod('dur');
 
-            $damage         = $durModded * 0.30;
+            $damage = $durModded * 0.30;
             $damageToSuffer = $durModded * 0.15;
 
             if ($attackData['damage_deduction'] > 0.0) {
@@ -38,14 +38,15 @@ class BloodyPuke extends BattleBase {
         }
     }
 
-    protected function doBaseAttack(int $damage, int $damageToSuffer, bool $isPvp = false) {
+    protected function doBaseAttack(int $damage, int $damageToSuffer, bool $isPvp = false)
+    {
         $this->monsterHealth -= $damage;
 
         $this->addMessage('You cannot hold it in, you vomit blood and bile so acidic your enemy cannot handle it! (You dealt: '.number_format($damage).')', 'player-action', $isPvp);
         $this->addMessage('You lost a lot of blood in your attack. (You took: '.number_format($damageToSuffer).')', 'enemy-action');
 
         if ($isPvp) {
-            $this->addDefenderMessage('The enemy has vomited their bloody acidic bile all over you! The smell alone makes you vomit. Damage dealt: ' . number_format($damage), 'enemy-action');
+            $this->addDefenderMessage('The enemy has vomited their bloody acidic bile all over you! The smell alone makes you vomit. Damage dealt: '.number_format($damage), 'enemy-action');
         }
     }
 }

@@ -2,12 +2,12 @@
 
 namespace App\Flare\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Database\Factories\KingdomBuildingFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
-class KingdomBuilding extends Model {
-
+class KingdomBuilding extends Model
+{
     use HasFactory;
 
     /**
@@ -32,12 +32,12 @@ class KingdomBuilding extends Model {
      * @var array
      */
     protected $casts = [
-        'level'              => 'integer',
-        'current_defence'    => 'integer',
+        'level' => 'integer',
+        'current_defence' => 'integer',
         'current_durability' => 'integer',
-        'max_defence'        => 'integer',
-        'max_durability'     => 'integer',
-        'is_locked'          => 'boolean',
+        'max_defence' => 'integer',
+        'max_durability' => 'integer',
+        'is_locked' => 'boolean',
     ];
 
     protected $appends = [
@@ -81,15 +81,18 @@ class KingdomBuilding extends Model {
         'is_at_max_level',
     ];
 
-    public function getNameAttribute() {
+    public function getNameAttribute()
+    {
         return $this->gameBuilding->name;
     }
 
-    public function getDescriptionAttribute() {
+    public function getDescriptionAttribute()
+    {
         return $this->gameBuilding->description;
     }
 
-    public function getDurabilityAttribute() {
+    public function getDurabilityAttribute()
+    {
         if ($this->level > 1) {
             return ($this->level * $this->gameBuilding->increase_durability_amount) + $this->gameBuilding->base_durability;
         }
@@ -97,7 +100,8 @@ class KingdomBuilding extends Model {
         return $this->gameBuilding->base_durability;
     }
 
-    public function getDefenceAttribute() {
+    public function getDefenceAttribute()
+    {
         if ($this->level > 1) {
             return ($this->level * $this->gameBuilding->increase_defence_amount) + $this->gameBuilding->base_defence;
         }
@@ -105,209 +109,248 @@ class KingdomBuilding extends Model {
         return $this->gameBuilding->base_defence;
     }
 
-    public function getFutureDurabilityAttribute() {
+    public function getFutureDurabilityAttribute()
+    {
         return (($this->level + 1) * $this->gameBuilding->increase_durability_amount) + $this->gameBuilding->base_durability;
     }
 
-    public function getFutureDefenceAttribute() {
+    public function getFutureDefenceAttribute()
+    {
         return (($this->level + 1) * $this->gameBuilding->increase_defence_amount) + $this->gameBuilding->base_defence;
     }
 
-    public function getRequiredPopulationAttribute() {
+    public function getRequiredPopulationAttribute()
+    {
         return ($this->level + 1) * $this->gameBuilding->required_population;
     }
 
-    public function getBasePopulationAttribute() {
+    public function getBasePopulationAttribute()
+    {
         return $this->gameBuilding->required_population;
     }
 
-    public function getIsWallsAttribute() {
+    public function getIsWallsAttribute()
+    {
         return $this->gameBuilding->is_walls;
     }
 
-    public function getIsFarmAttribute() {
+    public function getIsFarmAttribute()
+    {
         return $this->gameBuilding->is_farm;
     }
 
-    public function getIsChurchAttribute() {
+    public function getIsChurchAttribute()
+    {
         return $this->gameBuilding->is_church;
     }
 
-    public function getGivesResourcesAttribute() {
+    public function getGivesResourcesAttribute()
+    {
         return $this->gameBuilding->is_resource_building;
     }
 
-    public function getTrainsUnitsAttribute() {
+    public function getTrainsUnitsAttribute()
+    {
         return $this->gameBuilding->trains_units;
     }
 
-    public function getWoodCostAttribute() {
+    public function getWoodCostAttribute()
+    {
 
-        if ($this->is_max_level)  {
+        if ($this->is_max_level) {
             return $this->level * $this->gameBuilding->wood_cost;
         }
 
         return ($this->level + 1) * $this->gameBuilding->wood_cost;
     }
 
-    public function getClayCostAttribute() {
+    public function getClayCostAttribute()
+    {
 
-        if ($this->is_max_level)  {
+        if ($this->is_max_level) {
             return $this->level * $this->gameBuilding->clay_cost;
         }
 
         return ($this->level + 1) * $this->gameBuilding->clay_cost;
     }
 
-    public function getStoneCostAttribute() {
+    public function getStoneCostAttribute()
+    {
 
-        if ($this->is_max_level)  {
+        if ($this->is_max_level) {
             return $this->level * $this->gameBuilding->stone_cost;
         }
 
         return ($this->level + 1) * $this->gameBuilding->stone_cost;
     }
 
-    public function getIronCostAttribute() {
+    public function getIronCostAttribute()
+    {
 
-        if ($this->is_max_level)  {
+        if ($this->is_max_level) {
             return $this->level * $this->gameBuilding->iron_cost;
         }
 
         return ($this->level + 1) * $this->gameBuilding->iron_cost;
     }
 
-    public function getSteelCostAttribute() {
+    public function getSteelCostAttribute()
+    {
 
-        if ($this->is_max_level)  {
+        if ($this->is_max_level) {
             return $this->level * $this->gameBuilding->steel_cost;
         }
 
         return ($this->level + 1) * $this->gameBuilding->steel_cost;
     }
 
-    public function getBaseWoodCostAttribute() {
+    public function getBaseWoodCostAttribute()
+    {
         return $this->gameBuilding->wood_cost;
     }
 
-    public function getBaseClayCostAttribute() {
+    public function getBaseClayCostAttribute()
+    {
         return $this->gameBuilding->clay_cost;
     }
 
-    public function getBaseStoneCostAttribute() {
+    public function getBaseStoneCostAttribute()
+    {
         return $this->gameBuilding->stone_cost;
     }
 
-    public function getBaseIronCostAttribute() {
+    public function getBaseIronCostAttribute()
+    {
         return $this->gameBuilding->iron_cost;
     }
 
-    public function getBaseSteelCostAttribute() {
+    public function getBaseSteelCostAttribute()
+    {
         return $this->gameBuilding->steel_cost;
     }
 
-    public function getPopulationIncreaseAttribute() {
+    public function getPopulationIncreaseAttribute()
+    {
         return $this->level * $this->gameBuilding->increase_population_amount;
     }
 
-    public function getFuturePopulationIncreaseAttribute() {
+    public function getFuturePopulationIncreaseAttribute()
+    {
         return ($this->level + 1) * $this->gameBuilding->increase_population_amount;
     }
 
-    public function getTimeIncreaseAttribute() {
-        $nextLevel    = $this->level + 1;
+    public function getTimeIncreaseAttribute()
+    {
+        $nextLevel = $this->level + 1;
         $timeIncrease = $this->gameBuilding->time_to_build;
-        $time         = $nextLevel + $timeIncrease;
-        $time         = $time + $time * $this->gameBuilding->time_increase_amount;
+        $time = $nextLevel + $timeIncrease;
+        $time = $time + $time * $this->gameBuilding->time_increase_amount;
 
-        $now  = now();
+        $now = now();
         $time = $now->diffInMinutes($now->copy()->addMinutes($time));
 
         return $time;
     }
 
-    public function fetchTimeForMultipleLevels(int $level): int {
-        $nextLevel    = $this->level + $level;
+    public function fetchTimeForMultipleLevels(int $level): int
+    {
+        $nextLevel = $this->level + $level;
         $timeIncrease = $this->gameBuilding->time_to_build;
-        $time         = $nextLevel + $timeIncrease;
-        $time         = $time + $time * $this->gameBuilding->time_increase_amount;
+        $time = $nextLevel + $timeIncrease;
+        $time = $time + $time * $this->gameBuilding->time_increase_amount;
 
-        $now  = now();
+        $now = now();
         $time = $now->diffInMinutes($now->copy()->addMinutes($time));
 
         return $time;
     }
 
-    public function getRebuildTimeAttribute() {
+    public function getRebuildTimeAttribute()
+    {
         $time = ($this->level * $this->gameBuilding->time_to_build);
 
         if ($this->level > 1) {
             $time = ($this->level * ($this->gameBuilding->time_to_build) * (1 + $this->gameBuilding->time_increase_amount));
         }
 
-        $now  = now();
+        $now = now();
         $time = $now->diffInMinutes($now->copy()->addMinutes($time));
 
         return $time;
     }
 
-    public function getMoraleIncreaseAttribute() {
+    public function getMoraleIncreaseAttribute()
+    {
         return $this->gameBuilding->increase_morale_amount;
     }
 
-    public function getMoraleDecreaseAttribute() {
+    public function getMoraleDecreaseAttribute()
+    {
         return $this->gameBuilding->decrease_morale_amount;
     }
 
-    public function getIncreaseInWoodAttribute() {
+    public function getIncreaseInWoodAttribute()
+    {
         return $this->level * $this->gameBuilding->increase_wood_amount;
     }
 
-    public function getFutureIncreaseInWoodAttribute() {
+    public function getFutureIncreaseInWoodAttribute()
+    {
         return ($this->level + 1) * $this->gameBuilding->increase_wood_amount;
     }
 
-    public function getIncreaseInClayAttribute() {
+    public function getIncreaseInClayAttribute()
+    {
         return $this->level * $this->gameBuilding->increase_clay_amount;
     }
 
-    public function getFutureIncreaseInClayAttribute() {
+    public function getFutureIncreaseInClayAttribute()
+    {
         return ($this->level + 1) * $this->gameBuilding->increase_clay_amount;
     }
 
-    public function getIncreaseInStoneAttribute() {
+    public function getIncreaseInStoneAttribute()
+    {
         return $this->level * $this->gameBuilding->increase_stone_amount;
     }
 
-    public function getFutureIncreaseInStoneAttribute() {
+    public function getFutureIncreaseInStoneAttribute()
+    {
         return ($this->level + 1) * $this->gameBuilding->increase_stone_amount;
     }
 
-    public function getIncreaseInIronAttribute() {
+    public function getIncreaseInIronAttribute()
+    {
         return $this->level * $this->gameBuilding->increase_iron_amount;
     }
 
-    public function getFutureIncreaseInIronAttribute() {
+    public function getFutureIncreaseInIronAttribute()
+    {
         return ($this->level + 1) * $this->gameBuilding->increase_iron_amount;
     }
 
-    public function getIsAtMaxLevelAttribute() {
+    public function getIsAtMaxLevelAttribute()
+    {
         return $this->gameBuilding->max_level === $this->level;
     }
 
-    public function gameBuilding() {
+    public function gameBuilding()
+    {
         return $this->belongsTo(GameBuilding::class, 'game_building_id', 'id');
     }
 
-    public function kingdom() {
+    public function kingdom()
+    {
         return $this->belongsTo(Kingdom::class, 'kingdom_id', 'id');
     }
 
-    public function buildingExpansion() {
+    public function buildingExpansion()
+    {
         return $this->hasOne(KingdomBuildingExpansion::class);
     }
 
-    protected static function newFactory() {
+    protected static function newFactory()
+    {
         return KingdomBuildingFactory::new();
     }
 }

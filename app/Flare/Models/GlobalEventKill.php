@@ -7,8 +7,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class GlobalEventKill extends Model {
-
+class GlobalEventKill extends Model
+{
     use HasFactory;
 
     protected $table = 'event_goal_participation_kills';
@@ -31,19 +31,22 @@ class GlobalEventKill extends Model {
      */
     protected $casts = [
         'global_event_goal_id' => 'integer',
-        'character_id'         => 'integer',
-        'kills'                => 'integer',
+        'character_id' => 'integer',
+        'kills' => 'integer',
     ];
 
-    public function globalEventGoal(): BelongsTo {
+    public function globalEventGoal(): BelongsTo
+    {
         return $this->belongsTo(GlobalEventGoal::class, 'global_event_goal_id', 'id');
     }
 
-    public function character(): BelongsTo {
+    public function character(): BelongsTo
+    {
         return $this->belongsTo(Character::class, 'character_id', 'id');
     }
 
-    protected static function newFactory() {
+    protected static function newFactory()
+    {
         return GlobalEventKillFactory::new();
     }
 }

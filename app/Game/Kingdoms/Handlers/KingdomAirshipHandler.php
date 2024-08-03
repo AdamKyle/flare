@@ -2,40 +2,27 @@
 
 namespace App\Game\Kingdoms\Handlers;
 
-
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\KingdomBuilding;
 use App\Game\Kingdoms\Values\UnitNames;
 
-class KingdomAirshipHandler {
+class KingdomAirshipHandler
+{
+    private array $newBuildings = [];
 
-    /**
-     * @var array $newBuildings
-     */
-    private array $newBuildings      = [];
+    private array $attackingUnits = [];
 
-    /**
-     * @var array $attackingUnits
-     */
-    private array $attackingUnits    = [];
-
-    /**
-     * @var array $newAttackingUnits
-     */
     private array $newAttackingUnits = [];
 
-    /**
-     * @var array $newUnits
-     */
-    private array $newUnits          = [];
+    private array $newUnits = [];
 
     /**
      * Set attacking units.
      *
-     * @param array $attackingUnits
      * @return $this
      */
-    public function setAttackingUnits(array $attackingUnits): KingdomAirshipHandler {
+    public function setAttackingUnits(array $attackingUnits): KingdomAirshipHandler
+    {
         $this->attackingUnits = $attackingUnits;
 
         return $this;
@@ -43,28 +30,25 @@ class KingdomAirshipHandler {
 
     /**
      * Get new defending buildings
-     *
-     * @return array
      */
-    public function getNewBuildings(): array {
+    public function getNewBuildings(): array
+    {
         return $this->newBuildings;
     }
 
     /**
      * Get new defending units.
-     *
-     * @return array
      */
-    public function getNewUnits(): array {
+    public function getNewUnits(): array
+    {
         return $this->newUnits;
     }
 
     /**
      * Get new attacking units.
-     *
-     * @return array
      */
-    public function getNewAttackingUnits(): array {
+    public function getNewAttackingUnits(): array
+    {
         return $this->newAttackingUnits;
     }
 
@@ -72,13 +56,9 @@ class KingdomAirshipHandler {
      * Handle airships.
      *
      * - Defenders airships are attacked first, then buildings.
-     *
-     * @param Kingdom $attackingKingdom
-     * @param Kingdom $kingdom
-     * @param float $damageReduction
-     * @return Kingdom
      */
-    public function handleAirships(Kingdom $attackingKingdom, Kingdom $kingdom, float $damageReduction): Kingdom {
+    public function handleAirships(Kingdom $attackingKingdom, Kingdom $kingdom, float $damageReduction): Kingdom
+    {
 
         $kingdom = $this->handleUnits($attackingKingdom, $kingdom, UnitNames::AIRSHIP, $damageReduction);
 
@@ -97,7 +77,7 @@ class KingdomAirshipHandler {
                 return $kingdom;
             }
 
-            if ($building->current_durability <= 0 ) {
+            if ($building->current_durability <= 0) {
                 $this->setNewAirshipUnits($airships);
 
                 continue;
@@ -117,17 +97,14 @@ class KingdomAirshipHandler {
 
     /**
      * Damage defender buildings.
-     *
-     * @param KingdomBuilding $building
-     * @param int $damage
-     * @return void
      */
-    protected function damageBuildings(KingdomBuilding $building, int $damage): void {
+    protected function damageBuildings(KingdomBuilding $building, int $damage): void
+    {
 
         if ($damage > $building->current_defence) {
             $damagePercentToBuilding = $building->current_defence / $damage;
         } else {
-            $damagePercentToBuilding = $damage / $building->current_defence;;
+            $damagePercentToBuilding = $damage / $building->current_defence;
         }
 
         $newDurability = $building->current_durability;
@@ -145,21 +122,16 @@ class KingdomAirshipHandler {
         $building = $building->refresh();
 
         $this->newBuildings[] = [
-            'name'       => $building->name,
+            'name' => $building->name,
             'durability' => $building->current_durability,
         ];
     }
 
     /**
      * Handle unit damage.
-     *
-     * @param Kingdom $attackingKingdom
-     * @param Kingdom $kingdom
-     * @param string $siegeWeaponName
-     * @param float $damageReduction
-     * @return Kingdom
      */
-    protected function handleUnits(Kingdom $attackingKingdom, Kingdom $kingdom, string $siegeWeaponName, float $damageReduction): Kingdom {
+    protected function handleUnits(Kingdom $attackingKingdom, Kingdom $kingdom, string $siegeWeaponName, float $damageReduction): Kingdom
+    {
 
         foreach ($kingdom->units as $unit) {
             $siegeWeapons = $this->getAirships($siegeWeaponName);
@@ -207,8 +179,8 @@ class KingdomAirshipHandler {
 
             $this->newUnits[] = [
                 'unit_id' => $unit->id,
-                'amount'  => $unit->amount,
-                'name'    => $unit->gameUnit->name,
+                'amount' => $unit->amount,
+                'name' => $unit->gameUnit->name,
             ];
         }
 
@@ -219,13 +191,9 @@ class KingdomAirshipHandler {
      * Get the total attack for siege weapons.
      *
      * - Also deals with kingdom defence damage reduction.
-     *
-     * @param Kingdom $attackingKingdom
-     * @param array $siegeWeaponDetails
-     * @param float $damageReduction
-     * @return int
      */
-    protected function getAirShipAttack(Kingdom $attackingKingdom, array $siegeWeaponDetails, float $damageReduction): int {
+    protected function getAirShipAttack(Kingdom $attackingKingdom, array $siegeWeaponDetails, float $damageReduction): int
+    {
 
         foreach ($attackingKingdom->units as $unit) {
 
@@ -243,13 +211,11 @@ class KingdomAirshipHandler {
 
     /**
      * Get the airship unit info based on the name.
-     *
-     * @param string $name
-     * @return array
      */
-    protected function getAirships(string $name): array {
+    protected function getAirships(string $name): array
+    {
 
-        if (!empty($this->newAttackingUnits)) {
+        if (! empty($this->newAttackingUnits)) {
             $index = array_search($name, array_column($this->newAttackingUnits, 'name'));
 
             if ($index !== false) {
@@ -257,7 +223,7 @@ class KingdomAirshipHandler {
             }
         }
 
-        $index    = array_search($name, array_column($this->attackingUnits, 'name'));
+        $index = array_search($name, array_column($this->attackingUnits, 'name'));
         $unitData = [];
 
         if ($index !== false) {
@@ -270,14 +236,12 @@ class KingdomAirshipHandler {
     /**
      * Updates the siege weapons with the new amount.
      *
-     * @param array $siegeWeapon
-     * @param int $damage
-     * @param int $buildingDefence
      * @return void
      */
-    protected function updateSiegeWeapons(array $siegeWeapon, int $damage, int $buildingDefence) {
+    protected function updateSiegeWeapons(array $siegeWeapon, int $damage, int $buildingDefence)
+    {
 
-        $damageToUnits = $buildingDefence / $damage;;
+        $damageToUnits = $buildingDefence / $damage;
 
         if ($damageToUnits > 1) {
             $damageToUnits = 1;
@@ -293,10 +257,10 @@ class KingdomAirshipHandler {
     /**
      * Set the siege weapon to the new attacking units.
      *
-     * @param array $siegeWeapon
      * @return void
      */
-    protected function setNewAirshipUnits(array $siegeWeapon) {
+    protected function setNewAirshipUnits(array $siegeWeapon)
+    {
         if (empty($this->newAttackingUnits)) {
             $this->newAttackingUnits[] = $siegeWeapon;
         } else {

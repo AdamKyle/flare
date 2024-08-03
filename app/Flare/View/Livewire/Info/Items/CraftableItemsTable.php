@@ -10,59 +10,64 @@ use Rappasoft\LaravelLivewireTables\Views\Filters\SelectFilter;
 
 class CraftableItemsTable extends DataTableComponent
 {
-    public function configure(): void {
+    public function configure(): void
+    {
         $this->setPrimaryKey('id');
     }
 
-    public function builder(): Builder {
+    public function builder(): Builder
+    {
         return Item::whereNull('item_prefix_id')
             ->whereNull('item_suffix_id')
             ->where('can_craft', true)
             ->whereNotIn('type', ['quest', 'alchemy', 'trinket', 'artifact']);
     }
 
-    public function filters(): array {
+    public function filters(): array
+    {
         return [
             SelectFilter::make('Types')
                 ->options($this->buildOptions())
-                ->filter(function(Builder $builder, string $value) {
+                ->filter(function (Builder $builder, string $value) {
                     return $builder->where('type', $value);
                 }),
         ];
     }
 
-    protected function buildOptions(): array {
+    protected function buildOptions(): array
+    {
         $options = [
-            ''              => 'Please Select',
-            'weapon'        => 'Weapons',
-            'bow'           => 'Bows',
-            'gun'           => 'Guns',
-            'fan'           => 'Fans',
-            'scratch-awl'   => 'Scratch Awls',
-            'mace'          => 'Maces',
-            'stave'         => 'Staves',
-            'hammer'        => 'Hammers',
-            'body'          => 'Body',
-            'helmet'        => 'Helmets',
-            'shield'        => 'Shields',
-            'sleeves'       => 'Sleeves',
-            'gloves'        => 'Gloves',
-            'leggings'      => 'Leggings',
-            'feet'          => 'Feet',
-            'ring'          => 'Rings',
+            '' => 'Please Select',
+            'weapon' => 'Weapons',
+            'bow' => 'Bows',
+            'gun' => 'Guns',
+            'fan' => 'Fans',
+            'scratch-awl' => 'Scratch Awls',
+            'mace' => 'Maces',
+            'stave' => 'Staves',
+            'hammer' => 'Hammers',
+            'body' => 'Body',
+            'helmet' => 'Helmets',
+            'shield' => 'Shields',
+            'sleeves' => 'Sleeves',
+            'gloves' => 'Gloves',
+            'leggings' => 'Leggings',
+            'feet' => 'Feet',
+            'ring' => 'Rings',
             'spell-healing' => 'Healing Spells',
-            'spell-damage'  => 'Damage Spells',
+            'spell-damage' => 'Damage Spells',
         ];
 
         return $options;
     }
 
-    public function columns(): array {
+    public function columns(): array
+    {
         return [
             Column::make('Name')->searchable()->format(function ($value, $row) {
                 $itemId = Item::where('name', $value)->first()->id;
 
-                return '<a href="/items/'. $itemId.'" >'.$row->name . '</a>';
+                return '<a href="/items/'.$itemId.'" >'.$row->name.'</a>';
             })->html(),
             Column::make('Type')->searchable()->format(function ($value) {
                 return ucfirst(str_replace('-', ' ', $value));

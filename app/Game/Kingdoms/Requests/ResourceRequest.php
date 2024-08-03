@@ -32,7 +32,8 @@ class ResourceRequest extends FormRequest
         ];
     }
 
-    public function messages() {
+    public function messages()
+    {
         return [
             'kingdom_requesting.required' => 'Who is requesting?',
             'kingdom_requesting_from.required' => 'Where is it going?',

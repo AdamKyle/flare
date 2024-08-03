@@ -2,40 +2,43 @@
 
 namespace Tests\Unit\Game\Messages\Services;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\Models\Character;
 use App\Game\Messages\Models\Message;
 use App\Game\Messages\Services\FetchMessages;
 use App\Game\Messages\Values\MapChatColor;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateMessage;
 use Tests\Traits\CreateRole;
 use Tests\Traits\CreateUser;
 
-class FetchMessagesTest extends TestCase {
-
-    use RefreshDatabase, CreateMessage, CreateUser, CreateRole;
+class FetchMessagesTest extends TestCase
+{
+    use CreateMessage, CreateRole, CreateUser, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
     private ?FetchMessages $fetchMessagesService;
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
-        $this->character            = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
-        $this->fetchMessagesService = new FetchMessages();
+        $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
+        $this->fetchMessagesService = new FetchMessages;
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
 
-        $this->character            = null;
+        $this->character = null;
         $this->fetchMessagesService = null;
     }
 
-    public function testMessageMapNameIsSur() {
+    public function testMessageMapNameIsSur()
+    {
         $character = $this->character->getCharacter();
 
         $this->createMessageForTest($character, MapChatColor::SURFACE);
@@ -45,7 +48,8 @@ class FetchMessagesTest extends TestCase {
         $this->assertEquals('SUR', $message->map);
     }
 
-    public function testMessageMapNameIsLaby() {
+    public function testMessageMapNameIsLaby()
+    {
         $character = $this->character->getCharacter();
 
         $this->createMessageForTest($character, MapChatColor::LABYRINTH);
@@ -55,7 +59,8 @@ class FetchMessagesTest extends TestCase {
         $this->assertEquals('LABY', $message->map);
     }
 
-    public function testMessageMapNameIsDUN() {
+    public function testMessageMapNameIsDUN()
+    {
         $character = $this->character->getCharacter();
 
         $this->createMessageForTest($character, MapChatColor::DUNGEONS);
@@ -65,7 +70,8 @@ class FetchMessagesTest extends TestCase {
         $this->assertEquals('DUN', $message->map);
     }
 
-    public function testMessageMapNameIsHELL() {
+    public function testMessageMapNameIsHELL()
+    {
         $character = $this->character->getCharacter();
 
         $this->createMessageForTest($character, MapChatColor::HELL);
@@ -75,7 +81,8 @@ class FetchMessagesTest extends TestCase {
         $this->assertEquals('HELL', $message->map);
     }
 
-    public function testMessageMapNameIsShp() {
+    public function testMessageMapNameIsShp()
+    {
         $character = $this->character->getCharacter();
 
         $this->createMessageForTest($character, MapChatColor::SHP);
@@ -85,7 +92,8 @@ class FetchMessagesTest extends TestCase {
         $this->assertEquals('SHP', $message->map);
     }
 
-    public function testMessageMapNameIsPURG() {
+    public function testMessageMapNameIsPURG()
+    {
         $character = $this->character->getCharacter();
 
         $this->createMessageForTest($character, MapChatColor::PURGATORY);
@@ -95,7 +103,8 @@ class FetchMessagesTest extends TestCase {
         $this->assertEquals('PURG', $message->map);
     }
 
-    public function testMessageMapNameIsICE() {
+    public function testMessageMapNameIsICE()
+    {
         $character = $this->character->getCharacter();
 
         $this->createMessageForTest($character, MapChatColor::ICE_PLANE);
@@ -105,7 +114,8 @@ class FetchMessagesTest extends TestCase {
         $this->assertEquals('ICE', $message->map);
     }
 
-    public function testMessageMapNameIsDefaultSurface() {
+    public function testMessageMapNameIsDefaultSurface()
+    {
         $character = $this->character->getCharacter();
 
         $this->createMessageForTest($character, '#0001');
@@ -115,16 +125,17 @@ class FetchMessagesTest extends TestCase {
         $this->assertEquals('SUR', $message->map);
     }
 
-    public function testMessageIsAdmin() {
+    public function testMessageIsAdmin()
+    {
         $user = $this->createAdmin($this->createAdminRole());
 
         $this->createMessage($user, [
-            'message'       => 'Test Message',
-            'from_user'     => null,
-            'to_user'       => null,
-            'x_position'    => null,
-            'y_position'    => null,
-            'color'         => MapChatColor::SURFACE,
+            'message' => 'Test Message',
+            'from_user' => null,
+            'to_user' => null,
+            'x_position' => null,
+            'y_position' => null,
+            'color' => MapChatColor::SURFACE,
             'hide_location' => false,
         ]);
 
@@ -133,14 +144,15 @@ class FetchMessagesTest extends TestCase {
         $this->assertEquals('The Creator', $message->name);
     }
 
-    protected function createMessageForTest(Character $character, string $color): Message {
+    protected function createMessageForTest(Character $character, string $color): Message
+    {
         return $this->createMessage($character->user, [
-            'message'       => 'Test Message',
-            'from_user'     => null,
-            'to_user'       => null,
-            'x_position'    => $character->map->position_x,
-            'y_position'    => $character->map->position_y,
-            'color'         => $color,
+            'message' => 'Test Message',
+            'from_user' => null,
+            'to_user' => null,
+            'x_position' => $character->map->position_x,
+            'y_position' => $character->map->position_y,
+            'color' => $color,
             'hide_location' => false,
         ]);
     }

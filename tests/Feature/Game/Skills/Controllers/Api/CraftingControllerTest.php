@@ -2,7 +2,6 @@
 
 namespace Tests\Feature\Game\Skills\Controllers\Api;
 
-
 use App\Flare\Models\Character;
 use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -13,13 +12,14 @@ use Tests\Traits\CreateGameSkill;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateNpc;
 
-class CraftingControllerTest extends TestCase {
-
-    use RefreshDatabase, CreateNpc, CreateItem, CreateFactionLoyalty, CreateGameSkill;
+class CraftingControllerTest extends TestCase
+{
+    use CreateFactionLoyalty, CreateGameSkill, CreateItem, CreateNpc, RefreshDatabase;
 
     private ?Character $character = null;
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
         $craftingSkill = $this->createGameSkill([
@@ -27,7 +27,7 @@ class CraftingControllerTest extends TestCase {
             'type' => SkillTypeValue::CRAFTING,
         ]);
 
-        $this->character = (new CharacterFactory())->createBaseCharacter()
+        $this->character = (new CharacterFactory)->createBaseCharacter()
             ->givePlayerLocation()
             ->assignFactionSystem()
             ->assignSkill(
@@ -36,15 +36,17 @@ class CraftingControllerTest extends TestCase {
             ->getCharacter();
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
 
         $this->character = null;
     }
 
-    public function testFetchItemsToCraftWithTheAbilityToShowCraftForNpc() {
+    public function testFetchItemsToCraftWithTheAbilityToShowCraftForNpc()
+    {
         $npc = $this->createNpc([
-            'game_map_id' => $this->character->map->game_map_id
+            'game_map_id' => $this->character->map->game_map_id,
         ]);
 
         $item = $this->createItem([
@@ -55,37 +57,37 @@ class CraftingControllerTest extends TestCase {
         ]);
 
         $factionLoyalty = $this->createFactionLoyalty([
-            'faction_id'   => $this->character->factions->first()->id,
+            'faction_id' => $this->character->factions->first()->id,
             'character_id' => $this->character->id,
-            'is_pledged'   => true,
+            'is_pledged' => true,
         ]);
 
         $factionNpc = $this->createFactionLoyaltyNpc([
-            'faction_loyalty_id'          => $factionLoyalty->id,
-            'npc_id'                      => $npc->id,
-            'current_level'               => 0,
-            'max_level'                   => 25,
-            'next_level_fame'             => 100,
-            'currently_helping'           => true,
-            'kingdom_item_defence_bonus'  => 0.002,
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'npc_id' => $npc->id,
+            'current_level' => 0,
+            'max_level' => 25,
+            'next_level_fame' => 100,
+            'currently_helping' => true,
+            'kingdom_item_defence_bonus' => 0.002,
         ]);
 
         $this->createFactionLoyaltyNpcTask([
-            'faction_loyalty_id'         => $factionLoyalty->id,
-            'faction_loyalty_npc_id'     => $factionNpc->id,
-            'fame_tasks'                 => [[
-                'type'            => $item->crafting_type,
-                'item_name'       => $item->affix_name,
-                'item_id'         => $item->id,
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'faction_loyalty_npc_id' => $factionNpc->id,
+            'fame_tasks' => [[
+                'type' => $item->crafting_type,
+                'item_name' => $item->affix_name,
+                'item_id' => $item->id,
                 'required_amount' => rand(10, 50),
-                'current_amount'  => 0,
+                'current_amount' => 0,
             ]],
         ]);
 
         $character = $this->character->refresh();
 
         $response = $this->actingAs($this->character->user)
-            ->call('GET', '/api/crafting/' . $this->character->id, [
+            ->call('GET', '/api/crafting/'.$this->character->id, [
                 'crafting_type' => $item->crafting_type,
             ]);
 

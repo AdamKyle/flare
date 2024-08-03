@@ -2,20 +2,21 @@
 
 namespace App\Admin\Import\GuideQuests\Sheets;
 
-use App\Flare\Models\Item;
-use App\Flare\Models\Quest;
 use App\Flare\Models\Faction;
 use App\Flare\Models\GameBuilding;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\GuideQuest;
+use App\Flare\Models\Item;
 use App\Flare\Models\PassiveSkill;
+use App\Flare\Models\Quest;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToCollection;
 
-class GuideQuestsSheet implements ToCollection {
-
-    public function collection(Collection $rows) {
+class GuideQuestsSheet implements ToCollection
+{
+    public function collection(Collection $rows)
+    {
         foreach ($rows as $index => $row) {
             if ($index !== 0) {
                 $guideQuest = array_combine($rows[0]->toArray(), $row->toArray());
@@ -27,7 +28,7 @@ class GuideQuestsSheet implements ToCollection {
                 } else {
                     $foundGuideQuest = GuideQuest::where('name', $guideQuestData['name'])->first();
 
-                    if (!is_null($foundGuideQuest)) {
+                    if (! is_null($foundGuideQuest)) {
                         $foundGuideQuest->update($guideQuestData);
                     } else {
                         GuideQuest::create($guideQuestData);
@@ -37,32 +38,33 @@ class GuideQuestsSheet implements ToCollection {
         }
     }
 
-    protected function returnCleanAffix(array $data) {
+    protected function returnCleanAffix(array $data)
+    {
 
-        $gameMap         = GameMap::where('name', $data['required_game_map_id'])->first();
-        $beOnMap         = GameMap::where('name', $data['be_on_game_map'])->first();
-        $skill           = GameSkill::where('name', $data['required_skill'])->first();
-        $secondarySkill  = GameSkill::where('name', $data['required_secondary_skill'])->first();
-        $passiveSkill    = PassiveSkill::where('name', $data['required_passive_skill'])->first();
-        $faction         = Faction::whereHas('gameMap', function ($query) use ($data) {
+        $gameMap = GameMap::where('name', $data['required_game_map_id'])->first();
+        $beOnMap = GameMap::where('name', $data['be_on_game_map'])->first();
+        $skill = GameSkill::where('name', $data['required_skill'])->first();
+        $secondarySkill = GameSkill::where('name', $data['required_secondary_skill'])->first();
+        $passiveSkill = PassiveSkill::where('name', $data['required_passive_skill'])->first();
+        $faction = Faction::whereHas('gameMap', function ($query) use ($data) {
             $query->where('name', $data['required_faction_id']);
         })->first();
-        $requiredItem    = Item::where('name', $data['required_quest_item_id'])->where('type', 'quest')->first();
-        $secondaryItem   = Item::where('name', $data['secondary_quest_item_id'])->where('type', 'quest')->first();
-        $quest           = Quest::where('name', $data['required_quest_id'])->first();
+        $requiredItem = Item::where('name', $data['required_quest_item_id'])->where('type', 'quest')->first();
+        $secondaryItem = Item::where('name', $data['secondary_quest_item_id'])->where('type', 'quest')->first();
+        $quest = Quest::where('name', $data['required_quest_id'])->first();
         $kingdomBuilding = GameBuilding::where('name', $data['required_kingdom_building_id'])->first();
         $parentGuideQuest = GuideQuest::where('name', $data['parent_id'])->first();
 
         if (is_null($skill)) {
             $data['required_skill_level'] = null;
-            $data['required_skill']       = null;
+            $data['required_skill'] = null;
         } else {
             $data['required_skill'] = $skill->id;
         }
 
         if (is_null($secondarySkill)) {
             $data['required_secondary_skill_level'] = null;
-            $data['required_secondary_skill']       = null;
+            $data['required_secondary_skill'] = null;
         } else {
             $data['required_secondary_skill'] = $secondarySkill->id;
         }
@@ -75,7 +77,7 @@ class GuideQuestsSheet implements ToCollection {
         }
 
         if (is_null($faction)) {
-            $data['required_faction_id']    = null;
+            $data['required_faction_id'] = null;
             $data['required_faction_level'] = null;
         } else {
             $data['required_faction_id'] = $faction->id;

@@ -2,8 +2,8 @@
 
 namespace Database\Factories;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Flare\Models\BuildingInQueue;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 class BuildingInQueueFactory extends Factory
 {
@@ -23,11 +23,11 @@ class BuildingInQueueFactory extends Factory
     {
         return [
             'character_id' => null,
-            'kingdom_id'   => null,
-            'building_id'  => null,
-            'to_level'     => null,
+            'kingdom_id' => null,
+            'building_id' => null,
+            'to_level' => null,
             'completed_at' => now(),
-            'started_at'   => now()->subMinutes(10),
+            'started_at' => now()->subMinutes(10),
         ];
     }
 }

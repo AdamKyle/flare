@@ -7,13 +7,15 @@ use Illuminate\Foundation\Http\FormRequest;
 /**
  * @codeCoverageIgnore
  */
-class SiteAccessStatisticsRequest extends FormRequest {
+class SiteAccessStatisticsRequest extends FormRequest
+{
     /**
      * Determine if the user is authorized to make this request.
      *
      * @return bool
      */
-    public function authorize() {
+    public function authorize()
+    {
         return true;
     }
 
@@ -22,9 +24,10 @@ class SiteAccessStatisticsRequest extends FormRequest {
      *
      * @return array
      */
-    public function rules() {
+    public function rules()
+    {
         return [
-            'daysPast' => 'required|in:0,6,13,30'
+            'daysPast' => 'required|in:0,6,13,30',
         ];
     }
 
@@ -33,7 +36,8 @@ class SiteAccessStatisticsRequest extends FormRequest {
      *
      * @return array
      */
-    public function messages() {
+    public function messages()
+    {
         return [
             'daysPast' => 'Invalid option',
         ];

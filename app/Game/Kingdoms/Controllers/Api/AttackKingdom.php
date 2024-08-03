@@ -12,43 +12,25 @@ use App\Game\Kingdoms\Service\UnitMovementService;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 
-class AttackKingdom extends Controller {
-
-    /**
-     * @var UnitMovementService $unitMovementService
-     */
+class AttackKingdom extends Controller
+{
     private UnitMovementService $unitMovementService;
 
-    /**
-     * @var AttackWithItemsService $attackWithItemsService
-     */
     private AttackWithItemsService $attackWithItemsService;
 
-    /**
-     * @var KingdomAttackService $kingdomAttackService
-     */
     private KingdomAttackService $kingdomAttackService;
 
-    /**
-     * @param UnitMovementService $unitMovementService
-     * @param AttackWithItemsService $attackWithItemsService
-     * @param KingdomAttackService $kingdomAttackService
-     */
     public function __construct(UnitMovementService $unitMovementService,
-                                AttackWithItemsService $attackWithItemsService,
-                                KingdomAttackService $kingdomAttackService)
+        AttackWithItemsService $attackWithItemsService,
+        KingdomAttackService $kingdomAttackService)
     {
-        $this->unitMovementService          = $unitMovementService;
-        $this->attackWithItemsService       = $attackWithItemsService;
-        $this->kingdomAttackService         = $kingdomAttackService;
+        $this->unitMovementService = $unitMovementService;
+        $this->attackWithItemsService = $attackWithItemsService;
+        $this->kingdomAttackService = $kingdomAttackService;
     }
 
-    /**
-     * @param Kingdom $kingdom
-     * @param Character $character
-     * @return JsonResponse
-     */
-    public function fetchAttackingData(Kingdom $kingdom, Character $character): JsonResponse {
+    public function fetchAttackingData(Kingdom $kingdom, Character $character): JsonResponse
+    {
         $kingdomsToSelect = $this->unitMovementService->getKingdomUnitTravelData($character, $kingdom);
 
         $itemsToUse = $character->inventory->slots->filter(function ($slot) {
@@ -58,18 +40,13 @@ class AttackKingdom extends Controller {
         });
 
         return response()->json([
-            'kingdoms'     => $kingdomsToSelect,
+            'kingdoms' => $kingdomsToSelect,
             'items_to_use' => array_values($itemsToUse->toArray()),
         ]);
     }
 
-    /**
-     * @param DropItemsOnKingdomRequest $request
-     * @param Kingdom $kingdom
-     * @param Character $character
-     * @return JsonResponse
-     */
-    public function dropItems(DropItemsOnKingdomRequest $request, Kingdom $kingdom, Character $character): JsonResponse {
+    public function dropItems(DropItemsOnKingdomRequest $request, Kingdom $kingdom, Character $character): JsonResponse
+    {
         $response = $this->attackWithItemsService->useItemsOnKingdom($character, $kingdom, $request->slots);
 
         $status = $response['status'];
@@ -79,13 +56,8 @@ class AttackKingdom extends Controller {
         return response()->json($response, $status);
     }
 
-    /**
-     * @param AttackRequest $request
-     * @param Kingdom $kingdom
-     * @param Character $character
-     * @return JsonResponse
-     */
-    public function attackWithUnits(AttackRequest $request, Kingdom $kingdom, Character $character): JsonResponse {
+    public function attackWithUnits(AttackRequest $request, Kingdom $kingdom, Character $character): JsonResponse
+    {
         $response = $this->kingdomAttackService->attackKingdom($character, $kingdom, $request->all());
 
         $status = $response['status'];

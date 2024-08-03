@@ -2,9 +2,9 @@
 
 namespace App\Game\Messages\Console\Commands;
 
+use App\Game\Messages\Models\Message;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
-use App\Game\Messages\Models\Message;
 
 class CleanChat extends Command
 {
@@ -39,8 +39,8 @@ class CleanChat extends Command
      */
     public function handle()
     {
-        Message::where('created_at', '<=', Carbon::today()->subDays(90))->chunkById(100, function($messages) {
-            foreach($messages as $message) {
+        Message::where('created_at', '<=', Carbon::today()->subDays(90))->chunkById(100, function ($messages) {
+            foreach ($messages as $message) {
                 $message->delete();
             }
         });

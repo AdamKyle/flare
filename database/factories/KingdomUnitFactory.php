@@ -2,8 +2,8 @@
 
 namespace Database\Factories;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Flare\Models\KingdomUnit;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 class KingdomUnitFactory extends Factory
 {
@@ -22,9 +22,9 @@ class KingdomUnitFactory extends Factory
     public function definition()
     {
         return [
-            'kingdom_id'   => null,
+            'kingdom_id' => null,
             'game_unit_id' => null,
-            'amount'       => 1000,
+            'amount' => 1000,
         ];
     }
 }

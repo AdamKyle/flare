@@ -5,11 +5,12 @@ namespace Tests\Setup;
 use App\Game\Adventures\Builders\RewardBuilder;
 use Tests\Traits\CreateItem;
 
-class MockRewardBuilder {
-
+class MockRewardBuilder
+{
     use CreateItem;
 
-    public function mockRewardBuilder($app) {
+    public function mockRewardBuilder($app)
+    {
         $rewardBuilder = \Mockery::mock(RewardBuilder::class)->makePartial();
 
         $app->instance(RewardBuilder::class, $rewardBuilder);

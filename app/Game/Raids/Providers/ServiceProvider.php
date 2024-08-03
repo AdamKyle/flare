@@ -13,9 +13,10 @@ class ServiceProvider extends ApplicationServiceProvider
      *
      * @return void
      */
-    public function register() {
-        $this->app->bind(RaidEventService::class, function() {
-            return new RaidEventService();
+    public function register()
+    {
+        $this->app->bind(RaidEventService::class, function () {
+            return new RaidEventService;
         });
 
         $this->commands([

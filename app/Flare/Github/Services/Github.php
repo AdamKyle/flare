@@ -3,23 +3,18 @@
 namespace App\Flare\Github\Services;
 
 use Exception;
-use Github\Client;
 use Github\AuthMethod;
+use Github\Client;
 
-class Github {
-
-    /**
-     * @var Client|null $client
-     */
+class Github
+{
     private ?Client $client = null;
 
     /**
      * Inject a client object.
-     *
-     * @param Client $client
-     * @return Github
      */
-    public function injectClient(Client $client): Github {
+    public function injectClient(Client $client): Github
+    {
         $this->client = $client;
 
         return $this;
@@ -28,10 +23,10 @@ class Github {
     /**
      * Initiate the client, either with or without authentication.
      *
-     * @param bool $withAuth
      * @return $this
      */
-    public function initiateClient(bool $withAuth = false): Github {
+    public function initiateClient(bool $withAuth = false): Github
+    {
         $client = new Client;
 
         if ($withAuth) {
@@ -46,10 +41,10 @@ class Github {
     /**
      * Fetch the latest release.
      *
-     * @return array
      * @throws Exception
      */
-    public function fetchLatestRelease(): array {
+    public function fetchLatestRelease(): array
+    {
         if (is_null($this->client)) {
             throw new Exception('Client is not initiated. Please call initiateClient first');
         }
@@ -60,10 +55,10 @@ class Github {
     /**
      * Fetch all releases from github.
      *
-     * @return array
      * @throws Exception
      */
-    public function fetchAllReleases(): array {
+    public function fetchAllReleases(): array
+    {
         if (is_null($this->client)) {
             throw new Exception('Client is not initiated. Please call initiateClient first');
         }

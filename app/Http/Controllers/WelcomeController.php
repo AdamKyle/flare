@@ -2,19 +2,19 @@
 
 namespace App\Http\Controllers;
 
-
 use App\Flare\Models\ScheduledEvent;
 use App\Game\Events\Values\EventType;
 use App\Http\Request\EventPageRequest;
 use Auth;
 
-class WelcomeController extends Controller {
-
-    public function welcome() {
+class WelcomeController extends Controller
+{
+    public function welcome()
+    {
 
         $scheduledEvents = ScheduledEvent::where('currently_running', true)->get();
 
-        if (!Auth::check()) {
+        if (! Auth::check()) {
             return view('welcome', [
                 'scheduledEventsRunning' => $scheduledEvents,
             ]);
@@ -27,7 +27,8 @@ class WelcomeController extends Controller {
         return redirect()->route('game');
     }
 
-    public function showEventPage(EventPageRequest $request) {
+    public function showEventPage(EventPageRequest $request)
+    {
 
         $eventType = $request->event_type;
         $raids = ['jester-of-time', 'the-smugglers-are-back-raid', 'ice-queen-raid'];
@@ -38,7 +39,7 @@ class WelcomeController extends Controller {
             $events = ScheduledEvent::where('event_type', EventType::RAID_EVENT)->where('currently_running', true)->get();
 
             foreach ($events as $event) {
-                switch($eventType) {
+                switch ($eventType) {
                     case 'jester-of-time':
                         return view('events.jester-of-time-raid.event-page', [
                             'event' => $event,
@@ -58,10 +59,9 @@ class WelcomeController extends Controller {
 
         }
 
-
         if (in_array($eventType, $events)) {
 
-            switch($eventType) {
+            switch ($eventType) {
                 case 'delusional-memories':
                     return view('events.delusional-memories-event.event-page', [
                         'event' => ScheduledEvent::where('event_type', EventType::DELUSIONAL_MEMORIES_EVENT)->where('currently_running', true)->first(),

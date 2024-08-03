@@ -10,7 +10,6 @@ use App\Flare\ServerFight\Pvp\PvpAttack;
 use App\Flare\Services\BuildMonsterCacheService;
 use App\Game\Battle\Console\Commands\ClearCelestials;
 use App\Game\Battle\Handlers\BattleEventHandler;
-use App\Game\Battle\Request\FactionLoyaltyFight;
 use App\Game\Battle\Services\BattleDrop;
 use App\Game\Battle\Services\CelestialFightService;
 use App\Game\Battle\Services\ConjureService;
@@ -39,24 +38,24 @@ class ServiceProvider extends ApplicationServiceProvider
      */
     public function register()
     {
-        $this->app->bind(ConjureService::class, function($app) {
+        $this->app->bind(ConjureService::class, function ($app) {
             return new ConjureService(
                 $app->make(NpcServerMessageBuilder::class),
             );
         });
 
-        $this->app->bind(GoldRush::class, function($app) {
-            return new GoldRush();
+        $this->app->bind(GoldRush::class, function ($app) {
+            return new GoldRush;
         });
 
-        $this->app->bind(BattleDrop::class, function($app) {
+        $this->app->bind(BattleDrop::class, function ($app) {
             return new BattleDrop(
                 $app->make(RandomItemDropBuilder::class),
                 $app->make(DisenchantService::class)
             );
         });
 
-        $this->app->bind(CelestialFightService::class, function($app) {
+        $this->app->bind(CelestialFightService::class, function ($app) {
             return new CelestialFightService(
                 $app->make(BattleEventHandler::class),
                 $app->make(CharacterCacheData::class),
@@ -65,7 +64,7 @@ class ServiceProvider extends ApplicationServiceProvider
             );
         });
 
-        $this->app->bind(PvpService::class, function($app) {
+        $this->app->bind(PvpService::class, function ($app) {
             return new PvpService(
                 $app->make(PvpAttack::class),
                 $app->make(BattleEventHandler::class),
@@ -74,7 +73,7 @@ class ServiceProvider extends ApplicationServiceProvider
             );
         });
 
-        $this->app->bind(MonthlyPvpFightService::class, function($app) {
+        $this->app->bind(MonthlyPvpFightService::class, function ($app) {
             return new MonthlyPvpFightService(
                 $app->make(PvpService::class),
                 $app->make(ConjureService::class),
@@ -82,11 +81,11 @@ class ServiceProvider extends ApplicationServiceProvider
             );
         });
 
-        $this->app->bind(MonthlyPvpService::class, function($app) {
-            return new MonthlyPvpService();
+        $this->app->bind(MonthlyPvpService::class, function ($app) {
+            return new MonthlyPvpService;
         });
 
-        $this->app->bind(RaidBattleService::class, function($app) {
+        $this->app->bind(RaidBattleService::class, function ($app) {
             return new RaidBattleService(
                 $app->make(BuildMonster::class),
                 $app->make(CharacterCacheData::class),
@@ -96,7 +95,7 @@ class ServiceProvider extends ApplicationServiceProvider
             );
         });
 
-        $this->app->bind(BattleEventHandler::class, function($app) {
+        $this->app->bind(BattleEventHandler::class, function ($app) {
             return new BattleEventHandler(
                 $app->make(BattleRewardService::class),
                 $app->make(SecondaryRewardService::class),
@@ -104,7 +103,7 @@ class ServiceProvider extends ApplicationServiceProvider
             );
         });
 
-        $this->app->bind(FactionLoyaltyFightService::class, function($app) {
+        $this->app->bind(FactionLoyaltyFightService::class, function ($app) {
             return new FactionLoyaltyFightService(
                 $app->make(MonsterPlayerFight::class),
                 $app->make(BattleEventHandler::class),
@@ -122,7 +121,8 @@ class ServiceProvider extends ApplicationServiceProvider
      *
      * @return void
      */
-    public function boot() {
+    public function boot()
+    {
         // ...
     }
 }

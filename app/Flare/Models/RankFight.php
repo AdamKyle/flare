@@ -4,15 +4,15 @@ namespace App\Flare\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class RankFight extends Model {
-
+class RankFight extends Model
+{
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
     protected $fillable = [
-        'current_rank'
+        'current_rank',
     ];
 
     /**
@@ -21,6 +21,6 @@ class RankFight extends Model {
      * @var array
      */
     protected $casts = [
-        'current_rank' => 'integer'
+        'current_rank' => 'integer',
     ];
 }

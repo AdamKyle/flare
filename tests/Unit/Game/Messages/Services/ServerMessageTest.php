@@ -2,12 +2,11 @@
 
 namespace Tests\Unit\Game\Messages\Services;
 
-
-use Illuminate\Support\Facades\Event;
+use App\Game\Messages\Events\ServerMessageEvent;
+use App\Game\Messages\Services\ServerMessage;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
-use App\Game\Messages\Services\ServerMessage;
-use App\Game\Messages\Events\ServerMessageEvent;
+use Illuminate\Support\Facades\Event;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateItem;
@@ -16,29 +15,32 @@ use Tests\Traits\CreateNpc;
 use Tests\Traits\CreateRole;
 use Tests\Traits\CreateUser;
 
-class ServerMessageTest extends TestCase {
-
-    use RefreshDatabase, CreateMessage, CreateUser, CreateRole, CreateNpc, CreateItem;
+class ServerMessageTest extends TestCase
+{
+    use CreateItem, CreateMessage, CreateNpc, CreateRole, CreateUser, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
     private ?ServerMessage $serverMessage;
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
-        $this->character     = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
+        $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
         $this->serverMessage = resolve(ServerMessage::class);
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
 
-        $this->character     = null;
+        $this->character = null;
         $this->serverMessage = null;
     }
 
-    public function testGenerateServerMessageForChattingTooMuch() {
+    public function testGenerateServerMessageForChattingTooMuch()
+    {
 
         $user = $this->character->getUser();
 
@@ -51,7 +53,8 @@ class ServerMessageTest extends TestCase {
         $this->assertEquals(1, $user->message_throttle_count);
     }
 
-    public function testGenerateServerMessageOfType() {
+    public function testGenerateServerMessageOfType()
+    {
 
         $user = $this->character->getUser();
 
@@ -61,12 +64,13 @@ class ServerMessageTest extends TestCase {
 
         $this->serverMessage->generateServerMessage('message_length_0');
 
-        Event::assertDispatched(function(ServerMessageEvent $event) {
+        Event::assertDispatched(function (ServerMessageEvent $event) {
             return $event->message === 'Your message cannot be empty.';
         });
     }
 
-    public function testGenerateCustomServerMessage() {
+    public function testGenerateCustomServerMessage()
+    {
 
         $user = $this->character->getUser();
 
@@ -76,9 +80,8 @@ class ServerMessageTest extends TestCase {
 
         $this->serverMessage->generateServerMessageForCustomMessage('Test Custom Message');
 
-        Event::assertDispatched(function(ServerMessageEvent $event) {
+        Event::assertDispatched(function (ServerMessageEvent $event) {
             return $event->message === 'Test Custom Message';
         });
     }
-
 }

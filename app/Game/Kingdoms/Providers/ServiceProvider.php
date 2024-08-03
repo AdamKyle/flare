@@ -2,73 +2,71 @@
 
 namespace App\Game\Kingdoms\Providers;
 
-
+use App\Flare\Transformers\KingdomAttackLogsTransformer;
 use App\Flare\Transformers\KingdomBuildingTransformer;
+use App\Flare\Transformers\KingdomTransformer;
 use App\Flare\Transformers\UnitMovementTransformer;
+use App\Game\Kingdoms\Builders\KingdomBuilder;
+use App\Game\Kingdoms\Console\Commands\DeleteKingdomLogs;
 use App\Game\Kingdoms\Console\Commands\ResetCapitalCityWalkingStatus;
+use App\Game\Kingdoms\Console\Commands\UpdateKingdoms;
+use App\Game\Kingdoms\Handlers\AttackKingdomWithUnitsHandler;
 use App\Game\Kingdoms\Handlers\AttackLogHandler;
 use App\Game\Kingdoms\Handlers\DefenderArcherHandler;
 use App\Game\Kingdoms\Handlers\DefenderSiegeHandler;
+use App\Game\Kingdoms\Handlers\GiveKingdomsToNpcHandler;
 use App\Game\Kingdoms\Handlers\KingdomAirshipHandler;
 use App\Game\Kingdoms\Handlers\KingdomSiegeHandler;
 use App\Game\Kingdoms\Handlers\KingdomUnitHandler;
 use App\Game\Kingdoms\Handlers\ReturnSurvivingUnitHandler;
 use App\Game\Kingdoms\Handlers\SettlerHandler;
+use App\Game\Kingdoms\Handlers\TooMuchPopulationHandler;
+use App\Game\Kingdoms\Handlers\UpdateKingdomHandler;
+use App\Game\Kingdoms\Middleware\DoesKingdomBelongToAuthorizedUser;
+use App\Game\Kingdoms\Service\AbandonKingdomService;
+use App\Game\Kingdoms\Service\AttackWithItemsService;
 use App\Game\Kingdoms\Service\CancelBuildingRequestService;
 use App\Game\Kingdoms\Service\CapitalCityBuildingManagement;
 use App\Game\Kingdoms\Service\CapitalCityManagementService;
 use App\Game\Kingdoms\Service\CapitalCityUnitManagement;
 use App\Game\Kingdoms\Service\ExpandResourceBuildingService;
-use App\Game\Kingdoms\Service\KingdomQueueService;
-use App\Game\Kingdoms\Service\ResourceTransferService;
-use App\Game\Kingdoms\Service\SteelSmeltingService;
-use App\Game\Kingdoms\Transformers\KingdomTableTransformer;
-use League\Fractal\Manager;
-use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
-use App\Flare\Transformers\KingdomAttackLogsTransformer;
-use App\Flare\Transformers\KingdomTransformer;
-use App\Game\Kingdoms\Console\Commands\DeleteKingdomLogs;
-use App\Game\Kingdoms\Service\UnitRecallService;
-use App\Game\Kingdoms\Builders\KingdomBuilder;
-use App\Game\Kingdoms\Service\UnitReturnService;
-use App\Game\Kingdoms\Service\AttackWithItemsService;
-use App\Game\Kingdoms\Service\KingdomBuildingService;
-use App\Game\Kingdoms\Service\KingdomService;
-use App\Game\Kingdoms\Service\UnitService;
 use App\Game\Kingdoms\Service\KingdomAttackService;
-use App\Game\Kingdoms\Transformers\SelectedKingdom;
-use App\Game\Kingdoms\Handlers\GiveKingdomsToNpcHandler;
-use App\Game\Kingdoms\Console\Commands\UpdateKingdoms;
-use App\Game\Kingdoms\Handlers\TooMuchPopulationHandler;
-use App\Game\Kingdoms\Handlers\UpdateKingdomHandler;
-use App\Game\Kingdoms\Middleware\DoesKingdomBelongToAuthorizedUser;
-use App\Game\Kingdoms\Service\AbandonKingdomService;
+use App\Game\Kingdoms\Service\KingdomBuildingService;
+use App\Game\Kingdoms\Service\KingdomQueueService;
+use App\Game\Kingdoms\Service\KingdomService;
 use App\Game\Kingdoms\Service\KingdomSettleService;
 use App\Game\Kingdoms\Service\KingdomUpdateService;
 use App\Game\Kingdoms\Service\PurchasePeopleService;
-use App\Game\Kingdoms\Service\UpdateKingdom;
-use App\Game\Kingdoms\Handlers\AttackKingdomWithUnitsHandler;
+use App\Game\Kingdoms\Service\ResourceTransferService;
+use App\Game\Kingdoms\Service\SteelSmeltingService;
 use App\Game\Kingdoms\Service\UnitMovementService;
+use App\Game\Kingdoms\Service\UnitRecallService;
+use App\Game\Kingdoms\Service\UnitReturnService;
+use App\Game\Kingdoms\Service\UnitService;
+use App\Game\Kingdoms\Service\UpdateKingdom;
+use App\Game\Kingdoms\Transformers\KingdomTableTransformer;
+use App\Game\Kingdoms\Transformers\SelectedKingdom;
 use App\Game\Kingdoms\Validators\MoveUnitsValidator;
 use App\Game\Maps\Calculations\DistanceCalculation;
 use App\Game\Maps\Services\LocationService;
+use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
+use League\Fractal\Manager;
 
-class ServiceProvider extends ApplicationServiceProvider {
-
+class ServiceProvider extends ApplicationServiceProvider
+{
     /**
      * Register any application services.
-     *
-     * @return void
      */
-    public function register(): void {
+    public function register(): void
+    {
 
-        $this->app->bind(ResourceTransferService::class, function($app) {
+        $this->app->bind(ResourceTransferService::class, function ($app) {
             return new ResourceTransferService(
                 $app->make(DistanceCalculation::class)
             );
         });
 
-        $this->app->bind(CapitalCityManagementService::class, function($app) {
+        $this->app->bind(CapitalCityManagementService::class, function ($app) {
             return new CapitalCityManagementService(
                 $app->make(UpdateKingdom::class),
                 $app->make(CapitalCityBuildingManagement::class),
@@ -79,7 +77,7 @@ class ServiceProvider extends ApplicationServiceProvider {
             );
         });
 
-        $this->app->bind(CapitalCityBuildingManagement::class, function($app) {
+        $this->app->bind(CapitalCityBuildingManagement::class, function ($app) {
             return new CapitalCityBuildingManagement(
                 $app->make(KingdomBuildingService::class),
                 $app->make(UnitMovementService::class),
@@ -88,7 +86,7 @@ class ServiceProvider extends ApplicationServiceProvider {
             );
         });
 
-        $this->app->bind(CapitalCityUnitManagement::class, function($app) {
+        $this->app->bind(CapitalCityUnitManagement::class, function ($app) {
             return new CapitalCityUnitManagement(
                 $app->make(UnitService::class),
                 $app->make(UnitMovementService::class),
@@ -97,41 +95,41 @@ class ServiceProvider extends ApplicationServiceProvider {
             );
         });
 
-        $this->app->bind(CancelBuildingRequestService::class, function($app) {
+        $this->app->bind(CancelBuildingRequestService::class, function ($app) {
             return new CancelBuildingRequestService(
                 $app->make(UnitMovementService::class)
             );
         });
 
-        $this->app->bind(KingdomBuilder::class, function() {
-            return new KingdomBuilder();
+        $this->app->bind(KingdomBuilder::class, function () {
+            return new KingdomBuilder;
         });
 
-        $this->app->bind(SteelSmeltingService::class, function($app) {
+        $this->app->bind(SteelSmeltingService::class, function ($app) {
             return new SteelSmeltingService(
                 $app->make(UpdateKingdom::class)
             );
         });
 
-        $this->app->bind(UpdateKingdomHandler::class, function($app) {
+        $this->app->bind(UpdateKingdomHandler::class, function ($app) {
             return new UpdateKingdomHandler(
                 $app->make(Manager::class),
                 $app->make(KingdomTableTransformer::class)
             );
         });
 
-        $this->app->bind(KingdomBuildingService::class, function($app) {
+        $this->app->bind(KingdomBuildingService::class, function ($app) {
             return new KingdomBuildingService($app->make(UpdateKingdomHandler::class));
         });
 
-        $this->app->bind(KingdomSettleService::class, function($app) {
+        $this->app->bind(KingdomSettleService::class, function ($app) {
             return new KingdomSettleService(
                 $app->make(KingdomBuilder::class),
                 $app->make(UpdateKingdomHandler::class),
             );
         });
 
-        $this->app->bind(UnitMovementService::class, function($app) {
+        $this->app->bind(UnitMovementService::class, function ($app) {
             return new UnitMovementService(
                 $app->make(DistanceCalculation::class),
                 $app->make(MoveUnitsValidator::class),
@@ -139,29 +137,29 @@ class ServiceProvider extends ApplicationServiceProvider {
             );
         });
 
-        $this->app->bind(MoveUnitsValidator::class, function() {
-            return new MoveUnitsValidator();
+        $this->app->bind(MoveUnitsValidator::class, function () {
+            return new MoveUnitsValidator;
         });
 
-        $this->app->bind(UnitService::class, function($app) {
+        $this->app->bind(UnitService::class, function ($app) {
             return new UnitService($app->make(UpdateKingdomHandler::class));
         });
 
-        $this->app->bind(KingdomService::class, function($app) {
+        $this->app->bind(KingdomService::class, function ($app) {
             return new KingdomService(
                 $app->make(UpdateKingdomHandler::class),
             );
         });
 
-        $this->app->bind(UnitRecallService::class, function($app) {
-           return new UnitRecallService();
+        $this->app->bind(UnitRecallService::class, function ($app) {
+            return new UnitRecallService;
         });
 
-        $this->app->bind(TooMuchPopulationHandler::class, function() {
-            return new TooMuchPopulationHandler();
+        $this->app->bind(TooMuchPopulationHandler::class, function () {
+            return new TooMuchPopulationHandler;
         });
 
-        $this->app->bind(KingdomUpdateService::class, function($app) {
+        $this->app->bind(KingdomUpdateService::class, function ($app) {
             return new KingdomUpdateService(
                 $app->make(GiveKingdomsToNpcHandler::class),
                 $app->make(TooMuchPopulationHandler::class),
@@ -169,25 +167,25 @@ class ServiceProvider extends ApplicationServiceProvider {
             );
         });
 
-        $this->app->bind(SelectedKingdom::class, function() {
+        $this->app->bind(SelectedKingdom::class, function () {
             return new SelectedKingdom;
         });
 
-        $this->app->bind(KingdomTransformer::class, function() {
+        $this->app->bind(KingdomTransformer::class, function () {
             return new KingdomTransformer;
         });
 
-        $this->app->bind(AttackWithItemsService::class, function($app) {
+        $this->app->bind(AttackWithItemsService::class, function ($app) {
             return new AttackWithItemsService(
                 $app->make(UpdateKingdom::class),
             );
         });
 
-        $this->app->bind(UnitReturnService::class, function($app) {
-           return new UnitReturnService();
+        $this->app->bind(UnitReturnService::class, function ($app) {
+            return new UnitReturnService;
         });
 
-        $this->app->bind(KingdomAttackService::class, function($app) {
+        $this->app->bind(KingdomAttackService::class, function ($app) {
             return new KingdomAttackService(
                 $app->make(SelectedKingdom::class),
                 $app->make(Manager::class),
@@ -195,22 +193,22 @@ class ServiceProvider extends ApplicationServiceProvider {
             );
         });
 
-        $this->app->bind(GiveKingdomsToNpcHandler::class, function($app) {
+        $this->app->bind(GiveKingdomsToNpcHandler::class, function ($app) {
             return new GiveKingdomsToNpcHandler($app->make(LocationService::class));
         });
 
-        $this->app->bind(PurchasePeopleService::class, function($app) {
-           return new PurchasePeopleService($app->make(UpdateKingdom::class));
+        $this->app->bind(PurchasePeopleService::class, function ($app) {
+            return new PurchasePeopleService($app->make(UpdateKingdom::class));
         });
 
-        $this->app->bind(AbandonKingdomService::class, function($app) {
+        $this->app->bind(AbandonKingdomService::class, function ($app) {
             return new AbandonKingdomService(
                 $app->make(UpdateKingdom::class),
                 $app->make(GiveKingdomsToNpcHandler::class),
             );
         });
 
-        $this->app->bind(UpdateKingdom::class, function($app) {
+        $this->app->bind(UpdateKingdom::class, function ($app) {
             return new UpdateKingdom(
                 $app->make(KingdomTransformer::class),
                 $app->make(KingdomTableTransformer::class),
@@ -219,48 +217,48 @@ class ServiceProvider extends ApplicationServiceProvider {
             );
         });
 
-        $this->app->bind(KingdomAttackService::class, function($app) {
-           return new KingdomAttackService(
-               $app->make(UnitMovementService::class),
-               $app->make(MoveUnitsValidator::class),
-               $app->make(UpdateKingdom::class)
-           );
+        $this->app->bind(KingdomAttackService::class, function ($app) {
+            return new KingdomAttackService(
+                $app->make(UnitMovementService::class),
+                $app->make(MoveUnitsValidator::class),
+                $app->make(UpdateKingdom::class)
+            );
         });
 
-        $this->app->bind(KingdomSiegeHandler::class, function() {
-           return new KingdomSiegeHandler();
+        $this->app->bind(KingdomSiegeHandler::class, function () {
+            return new KingdomSiegeHandler;
         });
 
-        $this->app->bind(DefenderSiegeHandler::class, function() {
-            return new DefenderSiegeHandler();
+        $this->app->bind(DefenderSiegeHandler::class, function () {
+            return new DefenderSiegeHandler;
         });
 
-        $this->app->bind(DefenderArcherHandler::class, function() {
-            return new DefenderArcherHandler();
+        $this->app->bind(DefenderArcherHandler::class, function () {
+            return new DefenderArcherHandler;
         });
 
-        $this->app->bind(KingdomUnitHandler::class, function($app) {
+        $this->app->bind(KingdomUnitHandler::class, function ($app) {
             return new KingdomUnitHandler(
                 $app->make(DefenderSiegeHandler::class),
                 $app->make(DefenderArcherHandler::class),
             );
         });
 
-        $this->app->bind(AttackLogHandler::class, function($app) {
+        $this->app->bind(AttackLogHandler::class, function ($app) {
             return new AttackLogHandler(
                 $app->make(UpdateKingdom::class)
             );
         });
 
-        $this->app->bind(ReturnSurvivingUnitHandler::class, function($app) {
+        $this->app->bind(ReturnSurvivingUnitHandler::class, function ($app) {
             return new ReturnSurvivingUnitHandler($app->make(UnitMovementService::class));
         });
 
-        $this->app->bind(SettlerHandler::class, function() {
-            return new SettlerHandler();
+        $this->app->bind(SettlerHandler::class, function () {
+            return new SettlerHandler;
         });
 
-        $this->app->bind(AttackKingdomWithUnitsHandler::class, function($app) {
+        $this->app->bind(AttackKingdomWithUnitsHandler::class, function ($app) {
             return new AttackKingdomWithUnitsHandler(
                 $app->make(KingdomSiegeHandler::class),
                 $app->make(KingdomUnitHandler::class),
@@ -271,11 +269,11 @@ class ServiceProvider extends ApplicationServiceProvider {
             );
         });
 
-        $this->app->bind(ExpandResourceBuildingService::class, function($app) {
+        $this->app->bind(ExpandResourceBuildingService::class, function ($app) {
             return new ExpandResourceBuildingService($app->make(UpdateKingdom::class));
         });
 
-        $this->app->bind(KingdomQueueService::class, function($app) {
+        $this->app->bind(KingdomQueueService::class, function ($app) {
             return new KingdomQueueService(
                 $app->make(Manager::class),
                 $app->make(UnitMovementTransformer::class)
@@ -285,16 +283,15 @@ class ServiceProvider extends ApplicationServiceProvider {
         $this->commands([
             DeleteKingdomLogs::class,
             UpdateKingdoms::class,
-            ResetCapitalCityWalkingStatus::class
+            ResetCapitalCityWalkingStatus::class,
         ]);
     }
 
     /**
      * Bootstrap any application services.
-     *
-     * @return void
      */
-    public function boot(): void {
+    public function boot(): void
+    {
         $router = $this->app['router'];
 
         $router->aliasMiddleware('character.owns.kingdom', DoesKingdomBelongToAuthorizedUser::class);

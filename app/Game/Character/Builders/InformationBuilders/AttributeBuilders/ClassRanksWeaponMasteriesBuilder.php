@@ -4,32 +4,31 @@ namespace App\Game\Character\Builders\InformationBuilders\AttributeBuilders;
 
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\SetSlot;
-use App\Flare\Values\SpellTypes;
-use App\Flare\Values\WeaponTypes;
 use App\Game\ClassRanks\Values\WeaponMasteryValue;
 use Exception;
 
-class ClassRanksWeaponMasteriesBuilder extends BaseAttribute {
-
-    public function determineBonusForWeapon(string $position = 'both'): float {
+class ClassRanksWeaponMasteriesBuilder extends BaseAttribute
+{
+    public function determineBonusForWeapon(string $position = 'both'): float
+    {
 
         if ($position !== 'both') {
             $slot = $this->inventory->where('position', $position)->first();
-
 
             return $this->getPercentage($slot);
         }
 
         $slotFromRightHand = $this->inventory->where('position', 'right-hand')->first();
-        $slotFromLeftHand  = $this->inventory->where('position', 'left-hand')->first();
+        $slotFromLeftHand = $this->inventory->where('position', 'left-hand')->first();
 
-        $percentageForLeftHand  = $this->getPercentage($slotFromLeftHand);
+        $percentageForLeftHand = $this->getPercentage($slotFromLeftHand);
         $percentageForRightHand = $this->getPercentage($slotFromRightHand);
 
         return $percentageForLeftHand + $percentageForRightHand;
     }
 
-    public function fetchClassMasteryBreakDownForPosition(string $type, string $position): array {
+    public function fetchClassMasteryBreakDownForPosition(string $type, string $position): array
+    {
 
         if (is_null($this->inventory)) {
             return [];
@@ -43,7 +42,7 @@ class ClassRanksWeaponMasteriesBuilder extends BaseAttribute {
 
         $classRank = $this->character->classRanks->where('game_class_id', $this->character->game_class_id)->first();
 
-        $mastery   = WeaponMasteryValue::getNumericValueForStringType($slot->item->type);
+        $mastery = WeaponMasteryValue::getNumericValueForStringType($slot->item->type);
         $mastery = $classRank->weaponMasteries->where('weapon_type', $mastery)->where('character_class_rank_id', $classRank->id)->first();
 
         return [
@@ -53,10 +52,10 @@ class ClassRanksWeaponMasteriesBuilder extends BaseAttribute {
         ];
     }
 
-    public function determineBonusForSpellDamage(string $position = 'both'): float {
+    public function determineBonusForSpellDamage(string $position = 'both'): float
+    {
         if ($position !== 'both') {
             $slot = $this->inventory->where('position', $position)->where('item.type', 'spell-damage')->first();
-
 
             return $this->getPercentage($slot);
         }
@@ -68,17 +67,16 @@ class ClassRanksWeaponMasteriesBuilder extends BaseAttribute {
             return $this->getPercentage($spellSlotTwo);
         }
 
-        $percentageForLeftHand  = $this->getPercentage($spellSlotOne);
+        $percentageForLeftHand = $this->getPercentage($spellSlotOne);
         $percentageForRightHand = $this->getPercentage($spellSlotTwo);
-
 
         return $percentageForLeftHand + $percentageForRightHand;
     }
 
-    public function determineBonusForSpellHealing(string $position = 'both'): float {
+    public function determineBonusForSpellHealing(string $position = 'both'): float
+    {
         if ($position !== 'both') {
             $slot = $this->inventory->where('position', $position)->where('item.type', 'spell-healing')->first();
-
 
             return $this->getPercentage($slot);
         }
@@ -90,20 +88,21 @@ class ClassRanksWeaponMasteriesBuilder extends BaseAttribute {
             return $this->getPercentage($spellSlotTwo);
         }
 
-        $percentageForLeftHand  = $this->getPercentage($spellSlotOne);
+        $percentageForLeftHand = $this->getPercentage($spellSlotOne);
         $percentageForRightHand = $this->getPercentage($spellSlotTwo);
 
         return $percentageForLeftHand + $percentageForRightHand;
     }
 
-    protected function getPercentage(InventorySlot|SetSlot $slot = null): float {
+    protected function getPercentage(InventorySlot|SetSlot|null $slot = null): float
+    {
         if (is_null($slot)) {
             return 0.0;
         }
 
         try {
             $weaponMasteryType = WeaponMasteryValue::getNumericValueForStringType($slot->item->type);
-            $classRank         = $this->character->classRanks->where('game_class_id', $this->character->game_class_id)->first();
+            $classRank = $this->character->classRanks->where('game_class_id', $this->character->game_class_id)->first();
 
             if (is_null($classRank)) {
                 return 0.0;
@@ -118,8 +117,8 @@ class ClassRanksWeaponMasteriesBuilder extends BaseAttribute {
     }
 
     protected function isTheSameTypeEquipped(
-        InventorySlot|SetSlot $slotOne = null,
-        InventorySlot|SetSlot $slotTwo = null
+        InventorySlot|SetSlot|null $slotOne = null,
+        InventorySlot|SetSlot|null $slotTwo = null
     ): bool {
 
         if (is_null($slotOne)) {
@@ -129,7 +128,6 @@ class ClassRanksWeaponMasteriesBuilder extends BaseAttribute {
         if (is_null($slotTwo)) {
             return false;
         }
-
 
         return $slotOne->item->type === $slotTwo->item->type;
     }

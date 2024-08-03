@@ -9,15 +9,15 @@ use Spatie\ShortSchedule\ShortSchedule;
 /**
  * @codeCoverageIgnore
  */
-class Kernel extends ConsoleKernel {
-
+class Kernel extends ConsoleKernel
+{
     /**
      * Define the application's command schedule.
      *
-     * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
      * @return void
      */
-    protected function schedule(Schedule $schedule) {
+    protected function schedule(Schedule $schedule)
+    {
 
         // Delete the flagged users once a month.
         $schedule->command('delete:flagged-users')->monthly()->timezone(config('app.timezone'));
@@ -91,10 +91,9 @@ class Kernel extends ConsoleKernel {
      * Spatties short scheduler
      *
      * This allows commands to run very fast, as opposed to every minute at the least.
-     *
-     * @param ShortSchedule $schedule
      */
-    protected function shortSchedule(ShortSchedule $schedule) {
+    protected function shortSchedule(ShortSchedule $schedule)
+    {
         $schedule->command('update:map-count')->everySeconds(5);
     }
 

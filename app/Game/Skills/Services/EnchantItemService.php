@@ -12,47 +12,31 @@ use App\Game\Skills\Handlers\HandleUpdatingEnchantingGlobalEventGoal;
 use Exception;
 use Facades\App\Game\Core\Handlers\DuplicateItemHandler;
 
-class EnchantItemService {
-
-    /**
-     * @var Item|null $item
-     */
+class EnchantItemService
+{
     private ?Item $item = null;
 
-    /**
-     * @var int $dcIncrease
-     */
     private int $dcIncrease = 0;
 
-    /**
-     * @var SkillCheckService $skillCheckService;
-     */
     private SkillCheckService $skillCheckService;
 
     private HandleUpdatingEnchantingGlobalEventGoal $handleUpdatingEnchantingGlobalEventGoal;
 
-    /**
-     * @param SkillCheckService $skillCheckService
-     */
-    public function __construct(SkillCheckService $skillCheckService, HandleUpdatingEnchantingGlobalEventGoal $handleUpdatingEnchantingGlobalEventGoal) {
+    public function __construct(SkillCheckService $skillCheckService, HandleUpdatingEnchantingGlobalEventGoal $handleUpdatingEnchantingGlobalEventGoal)
+    {
         $this->skillCheckService = $skillCheckService;
         $this->handleUpdatingEnchantingGlobalEventGoal = $handleUpdatingEnchantingGlobalEventGoal;
     }
 
     /**
      * Attach the affix to the item
-     *
-     * @param Item $item
-     * @param ItemAffix $affix
-     * @param Skill $enchantingSkill
-     * @param bool $tooEasy
-     * @return bool
      */
-    public function attachAffix(Item $item, ItemAffix $affix, Skill $enchantingSkill, bool $tooEasy = false): bool {
+    public function attachAffix(Item $item, ItemAffix $affix, Skill $enchantingSkill, bool $tooEasy = false): bool
+    {
         if ($tooEasy) {
             $this->enchantItem($item, $affix);
         } else {
-            $dcCheck       = $this->skillCheckService->getDCCheck($enchantingSkill, $this->dcIncrease);
+            $dcCheck = $this->skillCheckService->getDCCheck($enchantingSkill, $this->dcIncrease);
             $characterRoll = $this->skillCheckService->characterRoll($enchantingSkill);
 
             if ($dcCheck > $characterRoll) {
@@ -68,14 +52,11 @@ class EnchantItemService {
     /**
      * Update the slot.
      *
-     * @param InventorySlot|GlobalEventCraftingInventorySlot $slot
-     * @param bool $enchantForEvent
-     * @return void
      * @throws Exception
      */
-    public function updateSlot(InventorySlot|GlobalEventCraftingInventorySlot $slot, bool $enchantForEvent): void {
-        if (!is_null($this->item)) {
-
+    public function updateSlot(InventorySlot|GlobalEventCraftingInventorySlot $slot, bool $enchantForEvent): void
+    {
+        if (! is_null($this->item)) {
 
             if ($this->item->appliedHolyStacks->isEmpty() && $this->item->sockets->isEmpty()) {
                 if ($this->getCountOfMatchingItems() > 1) {
@@ -97,7 +78,6 @@ class EnchantItemService {
                 $slot = $slot->refresh();
             }
 
-
             if ($enchantForEvent) {
                 $character = $slot->inventory->character;
 
@@ -108,14 +88,12 @@ class EnchantItemService {
 
     /**
      * Delete the slot.
-     *
-     * @param InventorySlot $slot
-     * @return void
      */
-    public function deleteSlot(InventorySlot $slot): void {
+    public function deleteSlot(InventorySlot $slot): void
+    {
         $slot->delete();
 
-        if (!is_null($this->item)) {
+        if (! is_null($this->item)) {
             $this->item->delete();
 
             $this->item = null;
@@ -124,22 +102,20 @@ class EnchantItemService {
 
     /**
      * Get the item.
-     *
-     * @return Item|null
      */
-    public function getItem(): ?Item {
+    public function getItem(): ?Item
+    {
         return $this->item;
     }
 
     /**
      * Enchant the item.
      *
-     * @param Item $item
-     * @param ItemAffix $affix
      * @return void
      */
-    protected function enchantItem(Item $item, ItemAffix $affix) {
-        if (!is_null($this->item)) {
+    protected function enchantItem(Item $item, ItemAffix $affix)
+    {
+        if (! is_null($this->item)) {
             $this->cloneItem($this->item, $affix);
 
             return;
@@ -148,18 +124,19 @@ class EnchantItemService {
         $this->cloneItem($item, $affix);
     }
 
-    protected function cloneItem(Item $item, ItemAffix $affix) {
+    protected function cloneItem(Item $item, ItemAffix $affix)
+    {
         $clonedItem = DuplicateItemHandler::duplicateItem($item);
 
-        $clonedItem->{'item_' . $affix->type . '_id'} = $affix->id;
-        $clonedItem->market_sellable                  = true;
-        $clonedItem->parent_id                        = $item->id;
-        $clonedItem->is_mythic                        = false;
-        $clonedItem->is_cosmic                        = false;
+        $clonedItem->{'item_'.$affix->type.'_id'} = $affix->id;
+        $clonedItem->market_sellable = true;
+        $clonedItem->parent_id = $item->id;
+        $clonedItem->is_mythic = false;
+        $clonedItem->is_cosmic = false;
 
         if ($affix->type === 'suffix') {
 
-            if (!is_null($clonedItem->itemPrefix)) {
+            if (! is_null($clonedItem->itemPrefix)) {
                 if ($clonedItem->itemPrefix->cost === RandomAffixDetails::MYTHIC) {
                     $clonedItem->item_prefix_id = null;
                 }
@@ -172,7 +149,7 @@ class EnchantItemService {
 
         if ($affix->type === 'prefix') {
 
-            if (!is_null($clonedItem->itemSuffix)) {
+            if (! is_null($clonedItem->itemSuffix)) {
                 if ($clonedItem->itemSuffix->cost === RandomAffixDetails::MYTHIC) {
                     $clonedItem->item_suffix_id = null;
                 }
@@ -190,10 +167,9 @@ class EnchantItemService {
 
     /**
      * Count the matching items.
-     *
-     * @return int
      */
-    protected function getCountOfMatchingItems(): int {
+    protected function getCountOfMatchingItems(): int
+    {
         // Holy stacks are random, so we want a matching
         // item only if this item has no stacks on it.
         if ($this->item->appliedHolyStacks()->count() === 0) {
@@ -210,21 +186,20 @@ class EnchantItemService {
 
     /**
      * Fetch matching item id.
-     *
-     * @return int
      */
-    protected function findMatchingItemId(): int {
+    protected function findMatchingItemId(): int
+    {
         $item = $this->item;
 
         $this->item->delete();
         $this->item = null;
 
         return Item::where('name', $item->name)
-                   ->where('item_prefix_id', $item->item_prefix_id)
-                   ->where('item_suffix_id', $item->item_suffix_id)
-                   ->whereDoesntHave('appliedHolyStacks')
-                   ->whereDoesntHave('sockets')
-                   ->first()
+            ->where('item_prefix_id', $item->item_prefix_id)
+            ->where('item_suffix_id', $item->item_suffix_id)
+            ->whereDoesntHave('appliedHolyStacks')
+            ->whereDoesntHave('sockets')
+            ->first()
                    ->id;
     }
 }

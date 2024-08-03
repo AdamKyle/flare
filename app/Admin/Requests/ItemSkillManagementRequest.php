@@ -27,11 +27,11 @@ class ItemSkillManagementRequest extends FormRequest
     public function rules()
     {
         return [
-            'id'                 => 'nullable|integer',
-            'parent_id'          => 'nullable|integer',
-            'name'               => 'required',
-            'description'        => 'required',
-            'max_level'          => 'required|integer',
+            'id' => 'nullable|integer',
+            'parent_id' => 'nullable|integer',
+            'name' => 'required',
+            'description' => 'required',
+            'max_level' => 'required|integer',
             'total_kills_needed' => 'required|integer',
         ];
     }
@@ -41,12 +41,13 @@ class ItemSkillManagementRequest extends FormRequest
      *
      * @return array
      */
-    public function messages() {
+    public function messages()
+    {
         return [
-            'name.required'               => 'Missing Name',
-            'description.required'        => 'Missing Description',
-            'max_levels.required'         => 'Missing leveles needed',
-            'total_kills_needed.required' => 'Missing Total Kills Needed'
+            'name.required' => 'Missing Name',
+            'description.required' => 'Missing Description',
+            'max_levels.required' => 'Missing leveles needed',
+            'total_kills_needed.required' => 'Missing Total Kills Needed',
         ];
     }
 }

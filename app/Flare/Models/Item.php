@@ -2,15 +2,15 @@
 
 namespace App\Flare\Models;
 
+use App\Flare\Models\Traits\CalculateSkillBonus;
 use Bkwld\Cloner\Cloneable;
 use Database\Factories\ItemFactory;
-use Illuminate\Database\Eloquent\Model;
-use App\Flare\Models\Traits\CalculateSkillBonus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
-class Item extends Model {
-
-    use Cloneable, HasFactory, CalculateSkillBonus;
+class Item extends Model
+{
+    use CalculateSkillBonus, Cloneable, HasFactory;
 
     /**
      * The attributes that are mass assignable.
@@ -104,72 +104,72 @@ class Item extends Model {
      * @var array
      */
     protected $casts = [
-        'base_damage'                      => 'integer',
-        'base_healing'                     => 'integer',
-        'base_ac'                          => 'integer',
-        'cost'                             => 'integer',
-        'gold_dust_cost'                   => 'integer',
-        'shards_cost'                      => 'integer',
-        'copper_coin_cost'                 => 'integer',
-        'parent_id'                        => 'integer',
-        'holy_level'                       => 'integer',
-        'holy_stacks'                      => 'integer',
-        'gold_bars_cost'                   => 'integer',
-        'unlocks_class_id'                 => 'integer',
-        'socket_count'                     => 'integer',
-        'base_damage_mod'                  => 'float',
-        'base_healing_mod'                 => 'float',
-        'base_ac_mod'                      => 'float',
-        'str_mod'                          => 'float',
-        'dur_mod'                          => 'float',
-        'dex_mod'                          => 'float',
-        'chr_mod'                          => 'float',
-        'int_mod'                          => 'float',
-        'agi_mod'                          => 'float',
-        'focus_mod'                        => 'float',
-        'skill_training_bonus'             => 'float',
-        'skill_bonus'                      => 'float',
-        'base_damage_mod_bonus'            => 'float',
-        'base_healing_mod_bonus'           => 'float',
-        'base_ac_mod_bonus'                => 'float',
-        'fight_time_out_mod_bonus'         => 'float',
-        'move_time_out_mod_bonus'          => 'float',
-        'can_craft'                        => 'boolean',
-        'can_resurrect'                    => 'boolean',
-        'randomly_generated'               => 'boolean',
-        'has_gems_socketed'                => 'boolean',
-        'skill_level_required'             => 'integer',
-        'skill_level_trivial'              => 'integer',
-        'craft_only'                       => 'boolean',
-        'can_drop'                         => 'boolean',
-        'market_sellable'                  => 'boolean',
-        'usable'                           => 'boolean',
-        'damages_kingdoms'                 => 'boolean',
-        'ignores_caps'                     => 'boolean',
-        'stat_increase'                    => 'boolean',
-        'can_use_on_other_items'           => 'boolean',
-        'is_mythic'                        => 'boolean',
-        'can_stack'                        => 'boolean',
-        'gains_additional_level'           => 'boolean',
-        'kingdom_damage'                   => 'float',
-        'lasts_for'                        => 'integer',
-        'increase_stat_by'                 => 'float',
-        'affects_skill_type'               => 'integer',
-        'increase_skill_bonus_by'          => 'float',
+        'base_damage' => 'integer',
+        'base_healing' => 'integer',
+        'base_ac' => 'integer',
+        'cost' => 'integer',
+        'gold_dust_cost' => 'integer',
+        'shards_cost' => 'integer',
+        'copper_coin_cost' => 'integer',
+        'parent_id' => 'integer',
+        'holy_level' => 'integer',
+        'holy_stacks' => 'integer',
+        'gold_bars_cost' => 'integer',
+        'unlocks_class_id' => 'integer',
+        'socket_count' => 'integer',
+        'base_damage_mod' => 'float',
+        'base_healing_mod' => 'float',
+        'base_ac_mod' => 'float',
+        'str_mod' => 'float',
+        'dur_mod' => 'float',
+        'dex_mod' => 'float',
+        'chr_mod' => 'float',
+        'int_mod' => 'float',
+        'agi_mod' => 'float',
+        'focus_mod' => 'float',
+        'skill_training_bonus' => 'float',
+        'skill_bonus' => 'float',
+        'base_damage_mod_bonus' => 'float',
+        'base_healing_mod_bonus' => 'float',
+        'base_ac_mod_bonus' => 'float',
+        'fight_time_out_mod_bonus' => 'float',
+        'move_time_out_mod_bonus' => 'float',
+        'can_craft' => 'boolean',
+        'can_resurrect' => 'boolean',
+        'randomly_generated' => 'boolean',
+        'has_gems_socketed' => 'boolean',
+        'skill_level_required' => 'integer',
+        'skill_level_trivial' => 'integer',
+        'craft_only' => 'boolean',
+        'can_drop' => 'boolean',
+        'market_sellable' => 'boolean',
+        'usable' => 'boolean',
+        'damages_kingdoms' => 'boolean',
+        'ignores_caps' => 'boolean',
+        'stat_increase' => 'boolean',
+        'can_use_on_other_items' => 'boolean',
+        'is_mythic' => 'boolean',
+        'can_stack' => 'boolean',
+        'gains_additional_level' => 'boolean',
+        'kingdom_damage' => 'float',
+        'lasts_for' => 'integer',
+        'increase_stat_by' => 'float',
+        'affects_skill_type' => 'integer',
+        'increase_skill_bonus_by' => 'float',
         'increase_skill_training_bonus_by' => 'float',
-        'resurrection_chance'              => 'float',
-        'spell_evasion'                    => 'float',
-        'artifact_annulment'               => 'float',
-        'healing_reduction'                => 'float',
-        'affix_damage_reduction'           => 'float',
-        'devouring_light'                  => 'float',
-        'devouring_darkness'               => 'float',
-        'xp_bonus'                         => 'float',
-        'ambush_chance'                    => 'float',
-        'ambush_resistance'                => 'float',
-        'counter_chance'                   => 'float',
-        'counter_resistance'               => 'float',
-        'is_cosmic'                        => 'boolean',
+        'resurrection_chance' => 'float',
+        'spell_evasion' => 'float',
+        'artifact_annulment' => 'float',
+        'healing_reduction' => 'float',
+        'affix_damage_reduction' => 'float',
+        'devouring_light' => 'float',
+        'devouring_darkness' => 'float',
+        'xp_bonus' => 'float',
+        'ambush_chance' => 'float',
+        'ambush_resistance' => 'float',
+        'counter_chance' => 'float',
+        'counter_resistance' => 'float',
+        'is_cosmic' => 'boolean',
     ];
 
     protected $appends = [
@@ -184,59 +184,73 @@ class Item extends Model {
         'is_unique',
     ];
 
-    public function itemSkill() {
+    public function itemSkill()
+    {
         return $this->hasOne(ItemSkill::class, 'id', 'item_skill_id')->with('children');
     }
 
-    public function itemSkillProgressions() {
+    public function itemSkillProgressions()
+    {
         return $this->hasMany(ItemSkillProgression::class, 'item_id', 'id');
     }
 
-    public function inventorySlots() {
+    public function inventorySlots()
+    {
         return $this->hasMany(InventorySlot::class, 'item_id', 'id');
     }
 
-    public function inventorySetSlots() {
+    public function inventorySetSlots()
+    {
         return $this->hasMany(SetSlot::class, 'item_id', 'id');
     }
 
-    public function marketListings() {
+    public function marketListings()
+    {
         return $this->hasMany(MarketBoard::class, 'item_id', 'id');
     }
 
-    public function marketHistory() {
+    public function marketHistory()
+    {
         return $this->hasMany(MarketHistory::class, 'item_id', 'id');
     }
 
-    public function itemSuffix() {
+    public function itemSuffix()
+    {
         return $this->hasOne(ItemAffix::class, 'id', 'item_suffix_id');
     }
 
-    public function itemPrefix() {
+    public function itemPrefix()
+    {
         return $this->hasOne(ItemAffix::class, 'id', 'item_prefix_id');
     }
 
-    public function appliedHolyStacks() {
+    public function appliedHolyStacks()
+    {
         return $this->hasMany(HolyStack::class, 'item_id', 'id');
     }
 
-    public function sockets() {
+    public function sockets()
+    {
         return $this->hasMany(ItemSocket::class, 'item_id', 'id');
     }
 
-    public function dropLocation() {
+    public function dropLocation()
+    {
         return $this->hasOne(Location::class, 'id', 'drop_location_id')->with('map');
     }
 
-    public function unlocksClass() {
+    public function unlocksClass()
+    {
         return $this->hasOne(GameClass::class, 'id', 'unlocks_class_id');
     }
 
-    public function children() {
+    public function children()
+    {
         return $this->hasMany($this, 'parent_id')->with('children');
     }
 
-    public function parent() {
+    public function parent()
+    {
         return $this->belongsTo($this, 'parent_id');
     }
 
@@ -245,20 +259,21 @@ class Item extends Model {
      *
      * When calling affix_name on the item, it will return the name with all affixes applied.
      */
-    public function getAffixNameAttribute() {
+    public function getAffixNameAttribute()
+    {
         $itemPrefix = ItemAffix::find($this->item_prefix_id);
         $itemSuffix = ItemAffix::find($this->item_suffix_id);
-        $itemName   = '';
+        $itemName = '';
 
-        if (!is_null($itemPrefix)) {
-            $itemName = '*' . $itemPrefix->name . '* ' . $this->name;
+        if (! is_null($itemPrefix)) {
+            $itemName = '*'.$itemPrefix->name.'* '.$this->name;
         }
 
-        if (!is_null($itemSuffix)) {
+        if (! is_null($itemSuffix)) {
             if ($itemName !== '') {
-                $itemName .= ' *' . $itemSuffix->name . '*';
+                $itemName .= ' *'.$itemSuffix->name.'*';
             } else {
-                $itemName = $this->name . ' *' . $itemSuffix->name . '*';
+                $itemName = $this->name.' *'.$itemSuffix->name.'*';
             }
         }
 
@@ -269,26 +284,28 @@ class Item extends Model {
         return $itemName;
     }
 
-    public function getAffixCountAttribute() {
-        if (!is_null($this->item_prefix_id) && !is_null($this->item_suffix_id)) {
+    public function getAffixCountAttribute()
+    {
+        if (! is_null($this->item_prefix_id) && ! is_null($this->item_suffix_id)) {
             return 2;
         }
 
-        if (is_null($this->item_prefix_id) && !is_null($this->item_suffix_id)) {
+        if (is_null($this->item_prefix_id) && ! is_null($this->item_suffix_id)) {
             return 1;
         }
 
-        if (!is_null($this->item_prefix_id) && is_null($this->item_suffix_id)) {
+        if (! is_null($this->item_prefix_id) && is_null($this->item_suffix_id)) {
             return 1;
         }
 
         return 0;
     }
 
-    public function getIsUniqueAttribute() {
+    public function getIsUniqueAttribute()
+    {
         $value = false;
 
-        if (!is_null($this->itemPrefix)) {
+        if (! is_null($this->itemPrefix)) {
             $value = $this->itemPrefix->randomly_generated;
         }
 
@@ -296,14 +313,15 @@ class Item extends Model {
             return $value;
         }
 
-        if (!is_null($this->itemSuffix)) {
+        if (! is_null($this->itemSuffix)) {
             $value = $this->itemSuffix->randomly_generated;
         }
 
         return $value;
     }
 
-    public function getRequiredMonsterAttribute() {
+    public function getRequiredMonsterAttribute()
+    {
         if ($this->type === 'quest') {
             return Monster::where('quest_item_id', $this->id)->with('gameMap')->first();
         }
@@ -311,7 +329,8 @@ class Item extends Model {
         return null;
     }
 
-    public function getRequiredQuestAttribute() {
+    public function getRequiredQuestAttribute()
+    {
         if ($this->type === 'quest') {
             return Quest::where('reward_item', $this->id)->with('npc', 'npc.gameMap', 'item')->first();
         }
@@ -319,7 +338,8 @@ class Item extends Model {
         return null;
     }
 
-    public function getLocationsAttribute() {
+    public function getLocationsAttribute()
+    {
         if ($this->type === 'quest') {
             return Location::where('quest_reward_item_id', $this->id)->with('map')->get();
         }
@@ -327,7 +347,8 @@ class Item extends Model {
         return [];
     }
 
-    public function getHolyStackDevouringDarknessAttribute() {
+    public function getHolyStackDevouringDarknessAttribute()
+    {
         if ($this->appliedHolyStacks->isNotEmpty()) {
             return $this->appliedHolyStacks->sum('devouring_darkness_bonus');
         }
@@ -335,7 +356,8 @@ class Item extends Model {
         return 0.0;
     }
 
-    public function getHolyStackStatBonusAttribute() {
+    public function getHolyStackStatBonusAttribute()
+    {
         if ($this->appliedHolyStacks->isNotEmpty()) {
             return $this->appliedHolyStacks->sum('stat_increase_bonus');
         }
@@ -343,7 +365,8 @@ class Item extends Model {
         return 0.0;
     }
 
-    public function getHolyStacksAppliedAttribute() {
+    public function getHolyStacksAppliedAttribute()
+    {
         if ($this->appliedHolyStacks->isNotEmpty()) {
             return $this->appliedHolyStacks->count();
         }
@@ -365,19 +388,20 @@ class Item extends Model {
      *
      * @return int.
      */
-    public function scopeGetTotalDamage(): int {
+    public function scopeGetTotalDamage(): int
+    {
         $baseDamage = is_null($this->base_damage) ? 0 : $this->base_damage;
-        $damage     = $baseDamage;
+        $damage = $baseDamage;
 
-        if (!is_null($this->itemPrefix)) {
+        if (! is_null($this->itemPrefix)) {
             $damage += ($damage * $this->itemPrefix->base_damage_mod);
         }
 
-        if (!is_null($this->itemSuffix)) {
+        if (! is_null($this->itemSuffix)) {
             $damage += ($damage * $this->itemSuffix->base_damage_mod);
         }
 
-        if (!is_null($this->base_damage_mod)) {
+        if (! is_null($this->base_damage_mod)) {
             $damage += ($damage * $this->base_damage_mod);
         }
 
@@ -398,15 +422,16 @@ class Item extends Model {
      *
      * @return int.
      */
-    public function scopeGetTotalDefence(): int {
+    public function scopeGetTotalDefence(): int
+    {
         $baseAc = is_null($this->base_ac) ? 0 : $this->base_ac;
-        $ac     = $baseAc;
+        $ac = $baseAc;
 
-        if (!is_null($this->itemPrefix)) {
+        if (! is_null($this->itemPrefix)) {
             $ac += $ac * $this->itemPrefix->base_ac_mod;
         }
 
-        if (!is_null($this->itemSuffix)) {
+        if (! is_null($this->itemSuffix)) {
             $ac += $ac * $this->itemSuffix->base_ac_mod;
         }
 
@@ -429,51 +454,47 @@ class Item extends Model {
      *
      * @return int.
      */
-    public function scopeGetTotalHealing(): int {
+    public function scopeGetTotalHealing(): int
+    {
         $baseHealing = is_null($this->base_healing) ? 0 : $this->base_healing;
-        $healFor     = $baseHealing;
+        $healFor = $baseHealing;
 
-        if (!is_null($this->itemPrefix)) {
+        if (! is_null($this->itemPrefix)) {
             $healFor += ($healFor * $this->itemPrefix->base_healing_mod);
         }
 
-        if (!is_null($this->itemSuffix)) {
+        if (! is_null($this->itemSuffix)) {
             $healFor += ($healFor * $this->itemSuffix->base_healing_mod);
         }
 
         return ceil($healFor);
     }
 
-    /**
-     * @return float
-     */
-    public function scopeGetTotalFightTimeOutMod(): float {
+    public function scopeGetTotalFightTimeOutMod(): float
+    {
         return is_null($this->fight_time_out_mod_bonus) ? 0.0 : $this->fight_time_out_mod_bonus;
     }
 
     /**
      * Get the total Base Damage Mode
-     *
-     * @return float
      */
-    public function scopeGetTotalBaseDamageMod(): float {
+    public function scopeGetTotalBaseDamageMod(): float
+    {
         return is_null($this->base_damage_mod_bonus) ? 0.0 : $this->base_damage_mod_bonus;
     }
 
     /**
      * Can get attributes off the attached affix.
-     *
-     * @param string $attribute
-     * @return float
      */
-    public function getAffixAttribute(string $attribute): float {
+    public function getAffixAttribute(string $attribute): float
+    {
         $base = 0.0;
 
-        if (!is_null($this->itemPrefix)) {
+        if (! is_null($this->itemPrefix)) {
             $base += $this->itemPrefix->{$attribute};
         }
 
-        if (!is_null($this->itemSuffix)) {
+        if (! is_null($this->itemSuffix)) {
             $base += $this->itemSuffix->{$attribute};
         }
 
@@ -482,21 +503,19 @@ class Item extends Model {
 
     /**
      * Gets the total percentage increase for a stat.
-     *
-     * @param string $stat
-     * @return float
      */
-    public function getTotalPercentageForStat(string $stat): float {
-        $baseStat = is_null($this->{$stat . '_mod'}) ? 0.0 : $this->{$stat . '_mod'};
+    public function getTotalPercentageForStat(string $stat): float
+    {
+        $baseStat = is_null($this->{$stat.'_mod'}) ? 0.0 : $this->{$stat.'_mod'};
 
-        if (!is_null($this->itemPrefix)) {
-            $statBonus  = $this->itemPrefix->{$stat . '_mod'};
-            $baseStat  += !is_null($statBonus) ? $statBonus : 0.0;
+        if (! is_null($this->itemPrefix)) {
+            $statBonus = $this->itemPrefix->{$stat.'_mod'};
+            $baseStat += ! is_null($statBonus) ? $statBonus : 0.0;
         }
 
-        if (!is_null($this->itemSuffix)) {
-            $statBonus = $this->itemSuffix->{$stat . '_mod'};
-            $baseStat += !is_null($statBonus) ? $statBonus : 0.0;
+        if (! is_null($this->itemSuffix)) {
+            $statBonus = $this->itemSuffix->{$stat.'_mod'};
+            $baseStat += ! is_null($statBonus) ? $statBonus : 0.0;
         }
 
         if ($this->holy_stack_stat_bonus > 0) {
@@ -508,42 +527,41 @@ class Item extends Model {
 
     /**
      * Gets the total skill training bonus (XP bonus)
-     *
-     * @param GameSkill $gameSkill
-     * @return float
      */
-    public function getSkillTrainingBonus(GameSkill $gameSkill): float {
+    public function getSkillTrainingBonus(GameSkill $gameSkill): float
+    {
         return $this->calculateTrainingBonus($this, $gameSkill);
     }
 
-    public function scopeGetItemSkills($query): array {
+    public function scopeGetItemSkills($query): array
+    {
         $skills = [];
 
-        if (!is_null($this->itemPrefix)) {
-            if (!is_null($this->itemPrefix->skill_name)) {
+        if (! is_null($this->itemPrefix)) {
+            if (! is_null($this->itemPrefix->skill_name)) {
                 $skills[] = [
-                    'skill_name'           => $this->itemPrefix->skill_name,
+                    'skill_name' => $this->itemPrefix->skill_name,
                     'skill_training_bonus' => $this->itemPrefix->skill_training_bonus,
-                    'skill_bonus'          => $this->itemPrefix->skill_bonus,
+                    'skill_bonus' => $this->itemPrefix->skill_bonus,
                 ];
             }
         }
 
-        if (!is_null($this->itemSuffix)) {
-            if (!is_null($this->itemSuffix->skill_name)) {
+        if (! is_null($this->itemSuffix)) {
+            if (! is_null($this->itemSuffix->skill_name)) {
                 $skills[] = [
-                    'skill_name'           => $this->itemSuffix->skill_name,
+                    'skill_name' => $this->itemSuffix->skill_name,
                     'skill_training_bonus' => $this->itemSuffix->skill_training_bonus,
-                    'skill_bonus'          => $this->itemSuffix->skill_bonus,
+                    'skill_bonus' => $this->itemSuffix->skill_bonus,
                 ];
             }
         }
 
-        if (!is_null($this->skill_name)) {
+        if (! is_null($this->skill_name)) {
             $skills[] = [
-                'skill_name'           => $this->skill_name,
+                'skill_name' => $this->skill_name,
                 'skill_training_bonus' => $this->skill_training_bonus,
-                'skill_bonus'          => $this->skill_bonus,
+                'skill_bonus' => $this->skill_bonus,
             ];
         }
 
@@ -552,15 +570,14 @@ class Item extends Model {
 
     /**
      * Gets the total skill training bonus (Bonus when using)
-     *
-     * @param GameSkill $gameSkill
-     * @return float
      */
-    public function getSkillBonus(GameSkill $gameSkill): float {
+    public function getSkillBonus(GameSkill $gameSkill): float
+    {
         return $this->calculateBonus($this, $gameSkill);
     }
 
-    protected static function newFactory() {
+    protected static function newFactory()
+    {
         return ItemFactory::new();
     }
 }

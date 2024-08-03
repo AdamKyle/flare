@@ -6,24 +6,24 @@ use App\Flare\Models\Character;
 use App\Flare\ServerFight\BattleBase;
 use App\Flare\ServerFight\Fight\Affixes;
 use App\Flare\ServerFight\Fight\CharacterAttacks\Types\CastType;
-use App\Flare\ServerFight\Monster\ServerMonster;
-use App\Flare\Values\AttackTypeValue;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 
-class PlayerHealing extends BattleBase {
-
+class PlayerHealing extends BattleBase
+{
     private Affixes $affixes;
 
     private CastType $castType;
 
-    public function __construct(CharacterCacheData $characterCacheData, Affixes $affixes, CastType $castType) {
+    public function __construct(CharacterCacheData $characterCacheData, Affixes $affixes, CastType $castType)
+    {
         parent::__construct($characterCacheData);
 
         $this->affixes = $affixes;
         $this->castType = $castType;
     }
 
-    public function resurrect(array $attackType): bool {
+    public function resurrect(array $attackType): bool
+    {
         $chance = $attackType['res_chance'];
 
         if (rand(1, 100) > (100 - 100 * $chance)) {
@@ -37,7 +37,8 @@ class PlayerHealing extends BattleBase {
         return false;
     }
 
-    public function healInBattle(Character $character, array $attackType) {
+    public function healInBattle(Character $character, array $attackType)
+    {
         $this->castType->setMonsterHealth($this->monsterHealth);
         $this->castType->setCharacterHealth($this->characterHealth);
         $this->castType->setCharacterAttackData($character, $this->isVoided, $attackType['attack_type']);
@@ -52,7 +53,8 @@ class PlayerHealing extends BattleBase {
         $this->castType->clearMessages();
     }
 
-    public function lifeSteal(Character $character, bool $isPvp = false) {
+    public function lifeSteal(Character $character, bool $isPvp = false)
+    {
 
         if ($character->classType()->isVampire()) {
 
@@ -62,10 +64,10 @@ class PlayerHealing extends BattleBase {
             $this->characterHealth += $damage;
 
             if ($isPvp) {
-                $this->addAttackerMessage('You lash out in rage and grip the enemies neck. Take what you need child! You deal and heal for: ' . number_format($damage), 'player-action');
-                $this->addDefenderMessage('The enemy feels the pain of your attack, alas they need your valuable blood to survive! You take: ' . number_format($damage) . ' damage.', 'enemy-action');
+                $this->addAttackerMessage('You lash out in rage and grip the enemies neck. Take what you need child! You deal and heal for: '.number_format($damage), 'player-action');
+                $this->addDefenderMessage('The enemy feels the pain of your attack, alas they need your valuable blood to survive! You take: '.number_format($damage).' damage.', 'enemy-action');
             } else {
-                $this->addMessage('You lash out in rage and grip the enemies neck. Take what you need child! You deal and heal for: ' . number_format($damage), 'player-action');
+                $this->addMessage('You lash out in rage and grip the enemies neck. Take what you need child! You deal and heal for: '.number_format($damage), 'player-action');
             }
         }
     }

@@ -28,7 +28,8 @@ class SaveEquipmentAsSet extends FormRequest
         ];
     }
 
-    public function messages() {
+    public function messages()
+    {
         return [
             'move_to_set.required' => 'Which set do you want to move this equipment to?',
         ];

@@ -1,14 +1,15 @@
 <?php
+
 namespace App\Game\Character\CharacterAttack\Providers;
 
-use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use App\Game\Character\CharacterAttack\Events\UpdateCharacterAttackEvent;
 use App\Game\Character\CharacterAttack\Listeners\UpdateCharacterAttackListener;
+use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 
-class EventsProvider extends ServiceProvider {
-
+class EventsProvider extends ServiceProvider
+{
     /**
-     * @var array[] $listen
+     * @var array[]
      */
     protected $listen = [
 
@@ -20,10 +21,9 @@ class EventsProvider extends ServiceProvider {
 
     /**
      * Bootstrap services.
-     *
-     * @return void
      */
-    public function boot(): void {
+    public function boot(): void
+    {
         parent::boot();
     }
 }

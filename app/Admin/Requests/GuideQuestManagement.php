@@ -27,10 +27,10 @@ class GuideQuestManagement extends FormRequest
     public function rules()
     {
         return [
-            'name'         => 'required',
-            'intro_text'   => 'required',
+            'name' => 'required',
+            'intro_text' => 'required',
             'instructions' => 'required',
-            'xp_reward'    => 'required|integer'
+            'xp_reward' => 'required|integer',
         ];
     }
 
@@ -39,12 +39,13 @@ class GuideQuestManagement extends FormRequest
      *
      * @return array
      */
-    public function messages() {
+    public function messages()
+    {
         return [
-            'name.required'         => 'Missing Name',
-            'intro_text.required'   => 'Missing Intro Text',
+            'name.required' => 'Missing Name',
+            'intro_text.required' => 'Missing Intro Text',
             'instructions.required' => 'Missing Instructions',
-            'xp_reward.required'    => 'Missing XP Reward',
+            'xp_reward.required' => 'Missing XP Reward',
         ];
     }
 }

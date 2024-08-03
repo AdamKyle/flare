@@ -12,27 +12,21 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
-class CapitalCityBuildingRequestMovement implements ShouldQueue {
+class CapitalCityBuildingRequestMovement implements ShouldQueue
+{
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    /**
-     * @param int $capitalCityQueueId
-     * @param int $characterId
-     */
     public function __construct(private readonly int $capitalCityQueueId, private readonly int $characterId) {}
 
-    /**
-     * @param CapitalCityBuildingManagement $capitalCityBuildingManagement
-     * @return void
-     */
-    public function handle(CapitalCityBuildingManagement $capitalCityBuildingManagement): void {
+    public function handle(CapitalCityBuildingManagement $capitalCityBuildingManagement): void
+    {
         $queueData = CapitalCityBuildingQueue::find($this->capitalCityQueueId);
 
         if (is_null($queueData)) {
             return;
         }
 
-        if (!$queueData->completed_at->lessThanOrEqualTo(now())) {
+        if (! $queueData->completed_at->lessThanOrEqualTo(now())) {
             $timeLeft = $queueData->completed_at->diffInMinutes(now());
 
             if ($timeLeft >= 1) {

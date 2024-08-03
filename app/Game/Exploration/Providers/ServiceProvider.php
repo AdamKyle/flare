@@ -2,7 +2,6 @@
 
 namespace App\Game\Exploration\Providers;
 
-
 use App\Flare\ServerFight\MonsterPlayerFight;
 use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
@@ -17,10 +16,10 @@ class ServiceProvider extends ApplicationServiceProvider
      *
      * @return void
      */
-    public function register() {
+    public function register()
+    {
 
-
-        $this->app->bind(ExplorationAutomationService::class, function($app) {
+        $this->app->bind(ExplorationAutomationService::class, function ($app) {
             return new ExplorationAutomationService(
                 $app->make(MonsterPlayerFight::class),
                 $app->make(BattleEventHandler::class),

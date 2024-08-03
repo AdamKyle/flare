@@ -7,9 +7,9 @@ use App\Flare\Models\GameClass;
 use App\Flare\Models\GameMap;
 use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\MapNameValue;
+use App\Game\Character\Builders\StatDetailsBuilder\StatModifierDetails;
 use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Game\Character\Builders\StatDetailsBuilder\StatModifierDetails;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateClass;
@@ -18,9 +18,9 @@ use Tests\Traits\CreateGameSkill;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateItemAffix;
 
-class StatModifierDetailsTest extends TestCase {
-
-    use RefreshDatabase, CreateItem, CreateItemAffix, CreateGameClassSpecial, CreateClass, CreateGameSkill;
+class StatModifierDetailsTest extends TestCase
+{
+    use CreateClass, CreateGameClassSpecial, CreateGameSkill, CreateItem, CreateItemAffix, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -28,7 +28,8 @@ class StatModifierDetailsTest extends TestCase {
 
     private ?GameClass $gameClass;
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
         $this->gameClass = $this->createClass([
@@ -36,12 +37,13 @@ class StatModifierDetailsTest extends TestCase {
             'to_hit_stat' => 'dur',
         ]);
 
-        $this->character = (new CharacterFactory())->createBaseCharacter([], $this->gameClass)->givePlayerLocation();
+        $this->character = (new CharacterFactory)->createBaseCharacter([], $this->gameClass)->givePlayerLocation();
 
         $this->statModifierDetails = resolve(StatModifierDetails::class);
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
 
         $this->character = null;
@@ -49,7 +51,8 @@ class StatModifierDetailsTest extends TestCase {
         $this->gameClass = null;
     }
 
-    public function testGetDetailsForStat() {
+    public function testGetDetailsForStat()
+    {
         $character = $this->createCharacterForData($this->character);
 
         GameMap::find($character->map->game_map_id)->update([
@@ -66,7 +69,8 @@ class StatModifierDetailsTest extends TestCase {
         $this->assertNotNull($data['map_reduction']);
     }
 
-    public function testGetDetailsForStatWhenOnEventMap() {
+    public function testGetDetailsForStatWhenOnEventMap()
+    {
         $character = $this->createCharacterForData($this->character);
 
         GameMap::find($character->map->game_map_id)->update([
@@ -83,7 +87,8 @@ class StatModifierDetailsTest extends TestCase {
         $this->assertNotNull($data['map_reduction']);
     }
 
-    public function testGetDetailsForStatWhenOnNormalMapAndNaked() {
+    public function testGetDetailsForStatWhenOnNormalMapAndNaked()
+    {
         $character = $this->character->getCharacter();
 
         $data = $this->statModifierDetails->setCharacter($character)->forStat('dur');
@@ -95,7 +100,8 @@ class StatModifierDetailsTest extends TestCase {
         $this->assertNull($data['map_reduction']);
     }
 
-    public function testGetHealthDetailsWhenNotVoided() {
+    public function testGetHealthDetailsWhenNotVoided()
+    {
         $character = $this->createCharacterForData($this->character);
 
         $data = $this->statModifierDetails->setCharacter($character)->buildSpecificBreakDown('health', false);
@@ -104,7 +110,8 @@ class StatModifierDetailsTest extends TestCase {
         $this->assertNotNull($data['class_specialties']);
     }
 
-    public function testGetHealthDetailsWhenVoided() {
+    public function testGetHealthDetailsWhenVoided()
+    {
         $character = $this->createCharacterForData($this->character);
 
         $data = $this->statModifierDetails->setCharacter($character)->buildSpecificBreakDown('health', true);
@@ -113,7 +120,8 @@ class StatModifierDetailsTest extends TestCase {
         $this->assertNotNull($data['class_specialties']);
     }
 
-    public function testGetACDetailsWhenNotVoided() {
+    public function testGetACDetailsWhenNotVoided()
+    {
         $character = $this->createCharacterForData($this->character);
 
         $data = $this->statModifierDetails->setCharacter($character)->buildDefenceBreakDown(false);
@@ -128,7 +136,8 @@ class StatModifierDetailsTest extends TestCase {
         $this->assertNotEmpty($data['attached_affixes']);
     }
 
-    public function testGetACDetailsWhenVoided() {
+    public function testGetACDetailsWhenVoided()
+    {
         $character = $this->createCharacterForData($this->character);
 
         $data = $this->statModifierDetails->setCharacter($character)->buildDefenceBreakDown(true);
@@ -142,7 +151,8 @@ class StatModifierDetailsTest extends TestCase {
         $this->assertNotEmpty($data['attached_affixes']);
     }
 
-    public function testGetACDetailsWhenNotVoidedAndNaked() {
+    public function testGetACDetailsWhenNotVoidedAndNaked()
+    {
         $character = $this->character->getCharacter();
 
         $data = $this->statModifierDetails->setCharacter($character)->buildDefenceBreakDown(false);
@@ -156,7 +166,8 @@ class StatModifierDetailsTest extends TestCase {
         $this->assertEmpty($data['attached_affixes']);
     }
 
-    public function testGetDamageForWeaponsWhenNotVoided() {
+    public function testGetDamageForWeaponsWhenNotVoided()
+    {
         $character = $this->createCharacterForData($this->character);
 
         $data = $this->statModifierDetails->setCharacter($character)->buildDamageBreakDown('weapon', false);
@@ -177,7 +188,8 @@ class StatModifierDetailsTest extends TestCase {
         $this->assertNotEmpty($data['masteries']);
     }
 
-    public function testGetDamageForSpellDamageWhenNotVoided() {
+    public function testGetDamageForSpellDamageWhenNotVoided()
+    {
         $character = $this->createCharacterForData($this->character);
 
         $data = $this->statModifierDetails->setCharacter($character)->buildDamageBreakDown('spell-damage', false);
@@ -198,7 +210,8 @@ class StatModifierDetailsTest extends TestCase {
         $this->assertNotEmpty($data['masteries']);
     }
 
-    public function testGetDamageForSpellDamageWhenClassIsHereticAndNotVoided() {
+    public function testGetDamageForSpellDamageWhenClassIsHereticAndNotVoided()
+    {
 
         $this->gameClass = $this->createClass([
             'name' => 'Heretic',
@@ -206,7 +219,7 @@ class StatModifierDetailsTest extends TestCase {
             'to_hit_stat' => 'dur',
         ]);
 
-        $character = (new CharacterFactory())->createBaseCharacter([], $this->gameClass)->givePlayerLocation();
+        $character = (new CharacterFactory)->createBaseCharacter([], $this->gameClass)->givePlayerLocation();
 
         $character = $this->createCharacterForData($character);
 
@@ -228,7 +241,8 @@ class StatModifierDetailsTest extends TestCase {
         $this->assertNotEmpty($data['masteries']);
     }
 
-    public function testGetDamageForWeaponsWhenVoided() {
+    public function testGetDamageForWeaponsWhenVoided()
+    {
         $character = $this->createCharacterForData($this->character);
 
         $data = $this->statModifierDetails->setCharacter($character)->buildDamageBreakDown('weapon', true);
@@ -249,7 +263,8 @@ class StatModifierDetailsTest extends TestCase {
         $this->assertNotEmpty($data['masteries']);
     }
 
-    public function testGetDamageForSpellDamageWhenVoided() {
+    public function testGetDamageForSpellDamageWhenVoided()
+    {
         $character = $this->createCharacterForData($this->character);
 
         $data = $this->statModifierDetails->setCharacter($character)->buildDamageBreakDown('spell-damage', false);
@@ -270,7 +285,8 @@ class StatModifierDetailsTest extends TestCase {
         $this->assertNotEmpty($data['masteries']);
     }
 
-    public function testGetDamageForSpellDamageWhenClassIsHereticAndVoided() {
+    public function testGetDamageForSpellDamageWhenClassIsHereticAndVoided()
+    {
 
         $this->gameClass = $this->createClass([
             'name' => 'Heretic',
@@ -278,7 +294,7 @@ class StatModifierDetailsTest extends TestCase {
             'to_hit_stat' => 'dur',
         ]);
 
-        $character = (new CharacterFactory())->createBaseCharacter([], $this->gameClass)->givePlayerLocation();
+        $character = (new CharacterFactory)->createBaseCharacter([], $this->gameClass)->givePlayerLocation();
 
         $character = $this->createCharacterForData($character);
 
@@ -300,7 +316,8 @@ class StatModifierDetailsTest extends TestCase {
         $this->assertNotEmpty($data['masteries']);
     }
 
-    public function testGetDamageForWeaponsWhenNotVoidedAndNaked() {
+    public function testGetDamageForWeaponsWhenNotVoidedAndNaked()
+    {
         $character = $this->character->getCharacter();
 
         $data = $this->statModifierDetails->setCharacter($character)->buildDamageBreakDown('weapon', false);
@@ -321,7 +338,8 @@ class StatModifierDetailsTest extends TestCase {
         $this->assertEmpty($data['masteries']);
     }
 
-    public function testGetDamageForSpellDamageWhenNotVoidedAndNaked() {
+    public function testGetDamageForSpellDamageWhenNotVoidedAndNaked()
+    {
         $character = $this->character->getCharacter();
 
         $data = $this->statModifierDetails->setCharacter($character)->buildDamageBreakDown('spell-damage', false);
@@ -342,7 +360,8 @@ class StatModifierDetailsTest extends TestCase {
         $this->assertEmpty($data['masteries']);
     }
 
-    public function testGetDamageForSpellDamageWhenClassIsHereticAndNotVoidedAndNaked() {
+    public function testGetDamageForSpellDamageWhenClassIsHereticAndNotVoidedAndNaked()
+    {
 
         $this->gameClass = $this->createClass([
             'name' => 'Heretic',
@@ -350,7 +369,7 @@ class StatModifierDetailsTest extends TestCase {
             'to_hit_stat' => 'dur',
         ]);
 
-        $character = (new CharacterFactory())->createBaseCharacter([], $this->gameClass)->givePlayerLocation()->getCharacter();
+        $character = (new CharacterFactory)->createBaseCharacter([], $this->gameClass)->givePlayerLocation()->getCharacter();
 
         $data = $this->statModifierDetails->setCharacter($character)->buildDamageBreakDown('spell-damage', false);
 
@@ -370,9 +389,10 @@ class StatModifierDetailsTest extends TestCase {
         $this->assertEmpty($data['masteries']);
     }
 
-    public function testGetDamageForRingDamageWhenNotVoided() {
+    public function testGetDamageForRingDamageWhenNotVoided()
+    {
 
-        $character =  $this->createCharacterForData($this->character);
+        $character = $this->createCharacterForData($this->character);
 
         $data = $this->statModifierDetails->setCharacter($character)->buildDamageBreakDown('ring', false);
 
@@ -392,7 +412,8 @@ class StatModifierDetailsTest extends TestCase {
         $this->assertEmpty($data['masteries']);
     }
 
-    public function testGetDamageForRingDamageWhenNaked() {
+    public function testGetDamageForRingDamageWhenNaked()
+    {
 
         $character = $this->character->getCharacter();
 
@@ -414,7 +435,8 @@ class StatModifierDetailsTest extends TestCase {
         $this->assertEmpty($data['masteries']);
     }
 
-    public function testGetDamageForSpellHealingWhenNotVoided() {
+    public function testGetDamageForSpellHealingWhenNotVoided()
+    {
         $character = $this->createCharacterForData($this->character);
 
         $data = $this->statModifierDetails->setCharacter($character)->buildDamageBreakDown('spell-healing', false);
@@ -435,7 +457,8 @@ class StatModifierDetailsTest extends TestCase {
         $this->assertNotEmpty($data['masteries']);
     }
 
-    public function testGetDamageForSpellHealingWhenVoided() {
+    public function testGetDamageForSpellHealingWhenVoided()
+    {
         $character = $this->createCharacterForData($this->character);
 
         $data = $this->statModifierDetails->setCharacter($character)->buildDamageBreakDown('spell-healing', true);
@@ -456,14 +479,15 @@ class StatModifierDetailsTest extends TestCase {
         $this->assertNotEmpty($data['masteries']);
     }
 
-    public function testDamageWhenNotEquipped() {
+    public function testDamageWhenNotEquipped()
+    {
         $this->gameClass = $this->createClass([
             'name' => 'Heretic',
             'damage_stat' => 'dur',
             'to_hit_stat' => 'dur',
         ]);
 
-        $character = (new CharacterFactory())->createBaseCharacter([], $this->gameClass)->givePlayerLocation();
+        $character = (new CharacterFactory)->createBaseCharacter([], $this->gameClass)->givePlayerLocation();
 
         $character = $this->createCharacterForData($character);
 
@@ -477,14 +501,15 @@ class StatModifierDetailsTest extends TestCase {
         $this->assertGreaterThan(0, $data['non_equipped_percentage_of_stat_used']);
     }
 
-    public function testDamageWhenNotEquippedAndFighter() {
+    public function testDamageWhenNotEquippedAndFighter()
+    {
         $this->gameClass = $this->createClass([
             'name' => 'Fighter',
             'damage_stat' => 'dur',
             'to_hit_stat' => 'dur',
         ]);
 
-        $character = (new CharacterFactory())->createBaseCharacter([], $this->gameClass)->givePlayerLocation();
+        $character = (new CharacterFactory)->createBaseCharacter([], $this->gameClass)->givePlayerLocation();
 
         $character = $this->createCharacterForData($character);
 
@@ -498,14 +523,15 @@ class StatModifierDetailsTest extends TestCase {
         $this->assertGreaterThan(0, $data['non_equipped_percentage_of_stat_used']);
     }
 
-    public function testDamageWhenNotEquippedAndAlcoholic() {
+    public function testDamageWhenNotEquippedAndAlcoholic()
+    {
         $this->gameClass = $this->createClass([
             'name' => 'Alcoholic',
             'damage_stat' => 'dur',
             'to_hit_stat' => 'dur',
         ]);
 
-        $character = (new CharacterFactory())->createBaseCharacter([], $this->gameClass)->givePlayerLocation();
+        $character = (new CharacterFactory)->createBaseCharacter([], $this->gameClass)->givePlayerLocation();
 
         $character = $this->createCharacterForData($character);
 
@@ -519,7 +545,8 @@ class StatModifierDetailsTest extends TestCase {
         $this->assertGreaterThan(0, $data['non_equipped_percentage_of_stat_used']);
     }
 
-    private function createCharacterForData(CharacterFactory $characterFactory): Character {
+    private function createCharacterForData(CharacterFactory $characterFactory): Character
+    {
 
         $item = $this->createItem([
             'type' => 'weapon',
@@ -587,125 +614,125 @@ class StatModifierDetailsTest extends TestCase {
         $artifact = $artifact->refresh();
 
         $character = $characterFactory->inventoryManagement()
-                        ->giveItem(
-                            $item, true, 'left-hand'
-                        )
-                        ->giveItem(
-                            $this->createItem([
-                                'type' => 'weapon',
-                                'item_suffix_id' => $this->createItemAffix([
-                                    'type' => 'suffix',
-                                    'dur_mod' => 1.0,
-                                    'base_damage_mod' => 1.0,
-                                    'base_healing_mod' => 1.0,
-                                    'base_ac_mod' => 1.0,
-                                ])->id,
-                                'item_prefix_id' => $this->createItemAffix([
-                                    'type' => 'prefix',
-                                    'dur_mod' => 1.0,
-                                    'base_damage_mod' => 1.0,
-                                    'base_healing_mod' => 1.0,
-                                    'base_ac_mod' => 1.0,
-                                ])->id,
-                                'base_damage' => 10,
-                                'dur_mod' => .10,
-                            ]), true, 'right-hand'
-                        )
-                        ->giveItem(
-                            $this->createItem([
-                                'type' => 'spell-damage',
-                                'item_suffix_id' => $this->createItemAffix([
-                                    'type' => 'suffix',
-                                    'dur_mod' => 1.0,
-                                    'base_damage_mod' => 1.0,
-                                    'base_healing_mod' => 1.0,
-                                    'base_ac_mod' => 1.0,
-                                ])->id,
-                                'item_prefix_id' => $this->createItemAffix([
-                                    'type' => 'prefix',
-                                    'dur_mod' => 1.0,
-                                    'base_damage_mod' => 1.0,
-                                    'base_healing_mod' => 1.0,
-                                    'base_ac_mod' => 1.0,
-                                ])->id,
-                                'base_damage' => 10,
-                            ]), true, 'spell-one'
-                        )
-                        ->giveItem(
-                            $this->createItem([
-                                'type' => 'spell-healing',
-                                'item_suffix_id' => $this->createItemAffix([
-                                    'type' => 'suffix',
-                                    'dur_mod' => 1.0,
-                                    'base_damage_mod' => 1.0,
-                                    'base_healing_mod' => 1.0,
-                                    'base_ac_mod' => 1.0,
-                                ])->id,
-                                'item_prefix_id' => $this->createItemAffix([
-                                    'type' => 'prefix',
-                                    'dur_mod' => 1.0,
-                                    'base_damage_mod' => 1.0,
-                                    'base_healing_mod' => 1.0,
-                                    'base_ac_mod' => 1.0,
-                                ])->id,
-                                'base_healing' => 10,
-                            ]), true, 'spell-two'
-                        )
-                        ->giveItem(
-                            $this->createItem([
-                                'type' => 'body',
-                                'item_suffix_id' => $this->createItemAffix([
-                                    'type' => 'suffix',
-                                    'dur_mod' => 1.0,
-                                    'base_damage_mod' => 1.0,
-                                    'base_healing_mod' => 1.0,
-                                    'base_ac_mod' => 1.0,
-                                ])->id,
-                                'item_prefix_id' => $this->createItemAffix([
-                                    'type' => 'prefix',
-                                    'dur_mod' => 1.0,
-                                    'base_damage_mod' => 1.0,
-                                    'base_healing_mod' => 1.0,
-                                    'base_ac_mod' => 1.0,
-                                ])->id,
-                                'base_ac' => 10,
-                                'dur_mod' => .20,
-                            ]), true, 'body'
-                        )
-                        ->giveItem(
-                            $this->createItem([
-                                'type' => 'ring',
-                                'base_healing' => 10,
-                            ]), true, 'ring-one'
-                        )
-                        ->giveItem(
-                            $this->createItem([
-                                'type' => 'quest',
-                                'effect' => ItemEffectsValue::PURGATORY,
-                            ])
-                        )
-                        ->giveItem($artifact, true, 'artifact')
-                        ->getCharacterFactory()
-                        ->assignSkill($this->createGameSkill([
-                            'description' => 'Test Class Skill',
-                            'name' => 'Class Skill',
-                            'max_level' => 999,
-                            'type' => SkillTypeValue::EFFECTS_CLASS,
-                            'game_class_id' => $this->gameClass->id,
-                            'base_damage_mod_bonus_per_level' => 1.0,
-                            'base_healing_mod_bonus_per_level' => 1.0,
-                            'base_ac_mod_bonus_per_level' => 1.0,
-                            'fight_time_out_mod_bonus_per_level' => 1.0,
-                            'move_time_out_mod_bonus_per_level' => 1.0,
-                            'unit_time_reduction' => 1.0,
-                            'building_time_reduction' => 1.0,
-                            'unit_movement_time_reduction' => 1.0,
-                            'can_train' => 1.0,
-                            'skill_bonus_per_level' => 1.0,
-                            'is_locked' => 1.0,
-                            'class_bonus' => 1.0,
-                        ]))
-                        ->getCharacter();
+            ->giveItem(
+                $item, true, 'left-hand'
+            )
+            ->giveItem(
+                $this->createItem([
+                    'type' => 'weapon',
+                    'item_suffix_id' => $this->createItemAffix([
+                        'type' => 'suffix',
+                        'dur_mod' => 1.0,
+                        'base_damage_mod' => 1.0,
+                        'base_healing_mod' => 1.0,
+                        'base_ac_mod' => 1.0,
+                    ])->id,
+                    'item_prefix_id' => $this->createItemAffix([
+                        'type' => 'prefix',
+                        'dur_mod' => 1.0,
+                        'base_damage_mod' => 1.0,
+                        'base_healing_mod' => 1.0,
+                        'base_ac_mod' => 1.0,
+                    ])->id,
+                    'base_damage' => 10,
+                    'dur_mod' => .10,
+                ]), true, 'right-hand'
+            )
+            ->giveItem(
+                $this->createItem([
+                    'type' => 'spell-damage',
+                    'item_suffix_id' => $this->createItemAffix([
+                        'type' => 'suffix',
+                        'dur_mod' => 1.0,
+                        'base_damage_mod' => 1.0,
+                        'base_healing_mod' => 1.0,
+                        'base_ac_mod' => 1.0,
+                    ])->id,
+                    'item_prefix_id' => $this->createItemAffix([
+                        'type' => 'prefix',
+                        'dur_mod' => 1.0,
+                        'base_damage_mod' => 1.0,
+                        'base_healing_mod' => 1.0,
+                        'base_ac_mod' => 1.0,
+                    ])->id,
+                    'base_damage' => 10,
+                ]), true, 'spell-one'
+            )
+            ->giveItem(
+                $this->createItem([
+                    'type' => 'spell-healing',
+                    'item_suffix_id' => $this->createItemAffix([
+                        'type' => 'suffix',
+                        'dur_mod' => 1.0,
+                        'base_damage_mod' => 1.0,
+                        'base_healing_mod' => 1.0,
+                        'base_ac_mod' => 1.0,
+                    ])->id,
+                    'item_prefix_id' => $this->createItemAffix([
+                        'type' => 'prefix',
+                        'dur_mod' => 1.0,
+                        'base_damage_mod' => 1.0,
+                        'base_healing_mod' => 1.0,
+                        'base_ac_mod' => 1.0,
+                    ])->id,
+                    'base_healing' => 10,
+                ]), true, 'spell-two'
+            )
+            ->giveItem(
+                $this->createItem([
+                    'type' => 'body',
+                    'item_suffix_id' => $this->createItemAffix([
+                        'type' => 'suffix',
+                        'dur_mod' => 1.0,
+                        'base_damage_mod' => 1.0,
+                        'base_healing_mod' => 1.0,
+                        'base_ac_mod' => 1.0,
+                    ])->id,
+                    'item_prefix_id' => $this->createItemAffix([
+                        'type' => 'prefix',
+                        'dur_mod' => 1.0,
+                        'base_damage_mod' => 1.0,
+                        'base_healing_mod' => 1.0,
+                        'base_ac_mod' => 1.0,
+                    ])->id,
+                    'base_ac' => 10,
+                    'dur_mod' => .20,
+                ]), true, 'body'
+            )
+            ->giveItem(
+                $this->createItem([
+                    'type' => 'ring',
+                    'base_healing' => 10,
+                ]), true, 'ring-one'
+            )
+            ->giveItem(
+                $this->createItem([
+                    'type' => 'quest',
+                    'effect' => ItemEffectsValue::PURGATORY,
+                ])
+            )
+            ->giveItem($artifact, true, 'artifact')
+            ->getCharacterFactory()
+            ->assignSkill($this->createGameSkill([
+                'description' => 'Test Class Skill',
+                'name' => 'Class Skill',
+                'max_level' => 999,
+                'type' => SkillTypeValue::EFFECTS_CLASS,
+                'game_class_id' => $this->gameClass->id,
+                'base_damage_mod_bonus_per_level' => 1.0,
+                'base_healing_mod_bonus_per_level' => 1.0,
+                'base_ac_mod_bonus_per_level' => 1.0,
+                'fight_time_out_mod_bonus_per_level' => 1.0,
+                'move_time_out_mod_bonus_per_level' => 1.0,
+                'unit_time_reduction' => 1.0,
+                'building_time_reduction' => 1.0,
+                'unit_movement_time_reduction' => 1.0,
+                'can_train' => 1.0,
+                'skill_bonus_per_level' => 1.0,
+                'is_locked' => 1.0,
+                'class_bonus' => 1.0,
+            ]))
+            ->getCharacter();
 
         $classSpecial = $this->createGameClassSpecial([
             'game_class_id' => $character->game_class_id,
@@ -735,7 +762,7 @@ class StatModifierDetailsTest extends TestCase {
             'level' => 10,
             'current_xp' => 15,
             'required_xp' => 1000000,
-            'equipped' => true
+            'equipped' => true,
         ]);
 
         $character = $character->refresh();

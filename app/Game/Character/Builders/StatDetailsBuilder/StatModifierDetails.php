@@ -4,35 +4,27 @@ namespace App\Game\Character\Builders\StatDetailsBuilder;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
-use App\Flare\Traits\IsItemUnique;
 use App\Flare\Values\ItemEffectsValue;
-use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\DefenceBuilder;
 use App\Game\Character\Builders\StatDetailsBuilder\Concerns\BasicItemDetails;
 use App\Game\Character\Concerns\FetchEquipped;
 use Facades\App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ItemSkillAttribute;
 use Illuminate\Support\Collection;
 
-class StatModifierDetails {
+class StatModifierDetails
+{
+    use BasicItemDetails, FetchEquipped;
 
-    use FetchEquipped, BasicItemDetails;
+    private ?Collection $equipped = null;
 
-    /**
-     * @var Collection|null $equipped
-     */
-    private Collection|null $equipped = null;
-
-    /**
-     * @var Character|null $character
-     */
     private ?Character $character = null;
 
     /**
      * Set the character.
      *
-     * @param Character $character
      * @return $this
      */
-    public function setCharacter(Character $character): StatModifierDetails {
+    public function setCharacter(Character $character): StatModifierDetails
+    {
 
         $this->character = $character;
 
@@ -43,11 +35,9 @@ class StatModifierDetails {
 
     /**
      * Get stat details for a specific stat.
-     *
-     * @param string $stat
-     * @return array
      */
-    public function forStat(string $stat): array {
+    public function forStat(string $stat): array
+    {
         $details = [];
 
         $details['base_value'] = number_format($this->character->{$stat});
@@ -60,8 +50,9 @@ class StatModifierDetails {
         return $details;
     }
 
-    public function buildSpecificBreakDown(string $type, bool $isVodied): array {
-        switch($type) {
+    public function buildSpecificBreakDown(string $type, bool $isVodied): array
+    {
+        switch ($type) {
             case 'health':
                 return $this->fetchHealthBreakDown($isVodied);
             case 'ac':
@@ -81,11 +72,9 @@ class StatModifierDetails {
 
     /**
      * Fetch Health Break Down.
-     *
-     * @param bool $isVoided
-     * @return array
      */
-    public function fetchHealthBreakDown(bool $isVoided): array {
+    public function fetchHealthBreakDown(bool $isVoided): array
+    {
         $details = [];
 
         $details['stat_amount'] = number_format($this->character->getInformation()->statMod('dur', $isVoided));
@@ -96,23 +85,22 @@ class StatModifierDetails {
 
     /**
      * Build Defence Details.
-     *
-     * @param bool $isVoided
-     * @return array
      */
-    public function buildDefenceBreakDown(bool $isVoided): array {
+    public function buildDefenceBreakDown(bool $isVoided): array
+    {
 
         $details = [];
 
-        $details['class_bonus_details']       = $this->fetchClassBonusesEffecting('base_ac');
-        $details['boon_details']              = $this->fetchBoonDetails('base_ac');
-        $details['class_specialties']         = $this->fetchClassRankSpecialtiesDetails('base_ac');
+        $details['class_bonus_details'] = $this->fetchClassBonusesEffecting('base_ac');
+        $details['boon_details'] = $this->fetchBoonDetails('base_ac');
+        $details['class_specialties'] = $this->fetchClassRankSpecialtiesDetails('base_ac');
         $details['ancestral_item_skill_data'] = $this->fetchAncestralItemSkills('base_ac');
 
         return array_merge($details, $this->character->getInformation()->getDefenceBuilder()->buildDefenceBreakDownDetails($isVoided));
     }
 
-    public function buildDamageBreakDown(string $type, bool $isVoided): array {
+    public function buildDamageBreakDown(string $type, bool $isVoided): array
+    {
         $details = [];
 
         $damageStatAmount = $this->character->getInformation()->statMod($this->character->damage_stat, $isVoided);
@@ -136,7 +124,7 @@ class StatModifierDetails {
 
                     $details['non_equipped_damage_amount'] = number_format(max($value, 5));
                     $details['non_equipped_percentage_of_stat_used'] = 0.25;
-                } else if ($this->character->classType()->isFighter()) {
+                } elseif ($this->character->classType()->isFighter()) {
                     $value = $damageStatAmount * 0.05;
 
                     $details['non_equipped_damage_amount'] = number_format(max($value, 5));
@@ -158,9 +146,9 @@ class StatModifierDetails {
             }
         }
 
-        $details['class_bonus_details']       = $type === 'ring' ? null : $this->fetchClassBonusesEffecting('base_damage');
-        $details['boon_details']              = $type === 'ring' ? null : $this->fetchBoonDetails('base_damage');
-        $details['class_specialties']         = $type === 'ring' ? null : $this->fetchClassRankSpecialtiesDetails('base_damage');
+        $details['class_bonus_details'] = $type === 'ring' ? null : $this->fetchClassBonusesEffecting('base_damage');
+        $details['boon_details'] = $type === 'ring' ? null : $this->fetchBoonDetails('base_damage');
+        $details['class_specialties'] = $type === 'ring' ? null : $this->fetchClassRankSpecialtiesDetails('base_damage');
         $details['ancestral_item_skill_data'] = $type === 'ring' ? null : $this->fetchAncestralItemSkills('base_damage');
 
         $typeAttributes = [];
@@ -186,15 +174,13 @@ class StatModifierDetails {
 
     /**
      * Fetch Class Bonus Effecting the attribute.
-     *
-     * @param string $attribute
-     * @return array|null
      */
-    private function fetchClassBonusesEffecting(string $attribute): array | null {
+    private function fetchClassBonusesEffecting(string $attribute): ?array
+    {
         $classBonusSkill = $this->character->skills()
             ->whereHas('baseSkill', function ($query) {
                 $query->whereNotNull('game_class_id')
-                      ->where('game_class_id', $this->character->game_class_id);
+                    ->where('game_class_id', $this->character->game_class_id);
             })
             ->first();
 
@@ -204,16 +190,15 @@ class StatModifierDetails {
 
         return [
             'name' => $classBonusSkill->baseSkill->name,
-            'amount' => $classBonusSkill->{$attribute . '_mod'}
+            'amount' => $classBonusSkill->{$attribute.'_mod'},
         ];
     }
 
     /**
      * Get map reductions that effect said stat.
-     *
-     * @return array|null
      */
-    private function getMapCharacterReductionsDetails(): array | null {
+    private function getMapCharacterReductionsDetails(): ?array
+    {
         $map = $this->character->map->gameMap;
 
         if ($map->mapType()->isHell() ||
@@ -226,11 +211,11 @@ class StatModifierDetails {
             ];
         }
 
-        $purgatoryQuestItem = $this->character->inventory->slots->filter(function($slot) {
+        $purgatoryQuestItem = $this->character->inventory->slots->filter(function ($slot) {
             return $slot->item->effect === ItemEffectsValue::PURGATORY;
         })->first();
 
-        if (!is_null($purgatoryQuestItem)) {
+        if (! is_null($purgatoryQuestItem)) {
 
             if ($map->mapType()->isTheIcePlane() || $map->mapType()->isDelusionalMemories()) {
                 return [
@@ -245,11 +230,9 @@ class StatModifierDetails {
 
     /**
      * Fetch Ancestral Item Skill Details that effect the stat.
-     *
-     * @param $stat
-     * @return array|null
      */
-    private function fetchAncestralItemSkills($stat): array | null {
+    private function fetchAncestralItemSkills($stat): ?array
+    {
         $artifact = ItemSkillAttribute::fetchArtifactItemEquipped($this->character);
 
         if (is_null($artifact)) {
@@ -267,7 +250,7 @@ class StatModifierDetails {
         foreach ($itemSkills as $itemSkill) {
             $details[] = [
                 'name' => $itemSkill->itemSkill->name,
-                'increase_amount' => $itemSkill->{$stat . '_mod'},
+                'increase_amount' => $itemSkill->{$stat.'_mod'},
             ];
         }
 
@@ -276,11 +259,9 @@ class StatModifierDetails {
 
     /**
      * Fetch class ranks specialties details.
-     *
-     * @param string $stat
-     * @return array|null
      */
-    private function fetchClassRankSpecialtiesDetails(string $stat): array | null {
+    private function fetchClassRankSpecialtiesDetails(string $stat): ?array
+    {
 
         $details = [];
 
@@ -304,7 +285,7 @@ class StatModifierDetails {
         } else {
             $classSpecialties = $this->character->classSpecialsEquipped
                 ->where('equipped', '=', true)
-                ->where($stat . '_mod', '>', 0);
+                ->where($stat.'_mod', '>', 0);
 
             foreach ($classSpecialties as $classSpecialty) {
                 $details[] = [
@@ -325,15 +306,14 @@ class StatModifierDetails {
 
     /**
      * Fetch class rank specialties that can effect your health.
-     *
-     * @return array|null
      */
-    private function fetchClassRankSpecialtiesForHealth(): array | null {
+    private function fetchClassRankSpecialtiesForHealth(): ?array
+    {
         $classSpecialties = $this->character->classSpecialsEquipped
             ->where('equipped', '=', true)
             ->where('base_damage_stat_increase', '>', 0);
 
-        $healthSpecialties =  $this->character->classSpecialsEquipped
+        $healthSpecialties = $this->character->classSpecialsEquipped
             ->where('equipped', '=', true)
             ->where('health_mod', '>', 0);
 
@@ -357,17 +337,15 @@ class StatModifierDetails {
 
     /**
      * Fetch boon details.
-     *
-     * @param string $stat
-     * @return array|null
      */
-    private function fetchBoonDetails(string $stat): array|null {
+    private function fetchBoonDetails(string $stat): ?array
+    {
         $boonDetails = [];
 
         $characterBoons = $this->character->boons;
 
         $applyToAllStats = $characterBoons->where('itemUsed.increase_stat_by', '>', 0);
-        $applyToSpecificStat = $characterBoons->where('itemUsed.' . $stat . '_mod', '>', 0);
+        $applyToSpecificStat = $characterBoons->where('itemUsed.'.$stat.'_mod', '>', 0);
 
         if ($applyToAllStats->isNotEmpty()) {
 
@@ -390,7 +368,7 @@ class StatModifierDetails {
 
                 $boonDetails['increases_single_stat'][] = [
                     'item_details' => $this->getBasicDetailsOfItem($boon->itemUsed),
-                    'increase_amount' => $boon->itemUsed->{$stat . '_mod'},
+                    'increase_amount' => $boon->itemUsed->{$stat.'_mod'},
                 ];
             }
         }
@@ -404,11 +382,9 @@ class StatModifierDetails {
 
     /**
      * Fetch Item Details that effect the stat.
-     *
-     * @param string $stat
-     * @return array
      */
-    private function fetchItemDetails(string $stat): array {
+    private function fetchItemDetails(string $stat): array
+    {
         if (is_null($this->equipped)) {
             return [];
         }
@@ -418,7 +394,7 @@ class StatModifierDetails {
         foreach ($this->equipped as $slot) {
             $details[$slot->item->affix_name] = [];
 
-            $details[$slot->item->affix_name]['item_base_stat'] = $slot->item->{$stat . '_mod'} ?? 0;
+            $details[$slot->item->affix_name]['item_base_stat'] = $slot->item->{$stat.'_mod'} ?? 0;
             $details[$slot->item->affix_name]['item_details'] = $this->getBasicDetailsOfItem($slot->item);
             $details[$slot->item->affix_name]['item_holy_stacks'] = $slot->item->holy_stacks;
             $details[$slot->item->affix_name]['item_holy_stacks_applied'] = $slot->item->holy_stacks_applied;
@@ -431,12 +407,9 @@ class StatModifierDetails {
 
     /**
      * Fetch stat details from equipped items.
-     *
-     * @param Item $item
-     * @param string $stat
-     * @return array
      */
-    private function fetchStatDetailsFromEquipment(Item $item, string $stat): array {
+    private function fetchStatDetailsFromEquipment(Item $item, string $stat): array
+    {
         $details = [];
 
         $itemPrefix = $item->itemPrefix;
@@ -444,25 +417,25 @@ class StatModifierDetails {
 
         $details['attached_affixes'] = [];
 
-        if (!is_null($itemPrefix)) {
+        if (! is_null($itemPrefix)) {
 
-            $statAmount = $itemPrefix->{$stat . '_mod'};
+            $statAmount = $itemPrefix->{$stat.'_mod'};
 
             if ($statAmount > 0) {
                 $details['attached_affixes'][] = [
                     'affix_name' => $itemPrefix->name,
-                    $stat . '_mod' => $itemPrefix->{$stat . '_mod'}
+                    $stat.'_mod' => $itemPrefix->{$stat.'_mod'},
                 ];
             }
         }
 
-        if (!is_null($itemSuffix)) {
-            $statAmount = $itemSuffix->{$stat . '_mod'};
+        if (! is_null($itemSuffix)) {
+            $statAmount = $itemSuffix->{$stat.'_mod'};
 
             if ($statAmount > 0) {
                 $details['attached_affixes'][] = [
                     'affix_name' => $itemSuffix->name,
-                    $stat . '_mod' => $itemSuffix->{$stat . '_mod'}
+                    $stat.'_mod' => $itemSuffix->{$stat.'_mod'},
                 ];
             }
         }

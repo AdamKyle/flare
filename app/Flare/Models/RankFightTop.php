@@ -4,8 +4,8 @@ namespace App\Flare\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class RankFightTop extends Model {
-
+class RankFightTop extends Model
+{
     /**
      * The attributes that are mass assignable.
      *
@@ -23,12 +23,13 @@ class RankFightTop extends Model {
      * @var array
      */
     protected $casts = [
-        'character_id'          => 'integer',
-        'current_rank'          => 'integer',
-        'rank_achievement_date' => 'datetime'
+        'character_id' => 'integer',
+        'current_rank' => 'integer',
+        'rank_achievement_date' => 'datetime',
     ];
 
-    public function character() {
+    public function character()
+    {
         return $this->belongsTo(Character::class, 'character_id', 'id');
     }
 }

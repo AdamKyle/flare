@@ -4,28 +4,24 @@ namespace App\Flare\Values;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\GameSkill;
-use App\Flare\Models\Monster;
 
-class BaseSkillValue {
-
+class BaseSkillValue
+{
     /**
      * Get the base character skill value for a character.
-     *
-     * @param Character $character
-     * @param GameSkill $skill
-     * @return array
      */
-    public function getBaseCharacterSkillValue(Character $character, GameSkill $skill): array {
+    public function getBaseCharacterSkillValue(Character $character, GameSkill $skill): array
+    {
 
-       return [
-            'character_id'       => $character->id,
-            'game_skill_id'      => $skill->id,
+        return [
+            'character_id' => $character->id,
+            'game_skill_id' => $skill->id,
             'currently_training' => false,
-            'level'              => 1,
-            'xp'                 => 0,
-            'xp_max'             => $skill->can_train ? 100 : rand(100, 350),
-            'is_locked'          => $skill->is_locked,
-            'skill_type'         => $skill->type,
+            'level' => 1,
+            'xp' => 0,
+            'xp_max' => $skill->can_train ? 100 : rand(100, 350),
+            'is_locked' => $skill->is_locked,
+            'skill_type' => $skill->type,
         ];
     }
 }

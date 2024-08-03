@@ -2,8 +2,8 @@
 
 namespace Database\Factories;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Flare\Models\UnitInQueue;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 class UnitInQueueFactory extends Factory
 {
@@ -23,11 +23,11 @@ class UnitInQueueFactory extends Factory
     {
         return [
             'character_id' => null,
-            'kingdom_id'   => null,
+            'kingdom_id' => null,
             'game_unit_id' => null,
-            'amount'       => null,
+            'amount' => null,
             'completed_at' => now(),
-            'started_at'   => now()->subMinutes(60),
+            'started_at' => now()->subMinutes(60),
         ];
     }
 }

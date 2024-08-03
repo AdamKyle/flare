@@ -28,7 +28,8 @@ class GetRankTopRequest extends FormRequest
         ];
     }
 
-    public function messages() {
+    public function messages()
+    {
         return [
             'rank.required' => 'Error. Invalid Input.',
         ];

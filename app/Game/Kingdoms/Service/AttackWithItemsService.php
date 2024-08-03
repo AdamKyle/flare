@@ -12,159 +12,132 @@ use App\Game\Kingdoms\Traits\CalculateMorale;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
 
-class AttackWithItemsService {
+class AttackWithItemsService
+{
+    use CalculateMorale, ResponseBuilder;
 
-    use ResponseBuilder, CalculateMorale;
-
-    /**
-     * @var UpdateKingdom $updateKingdom
-     */
     private UpdateKingdom $updateKingdom;
 
-    /**
-     * @var array $oldBuildings
-     */
     private array $oldBuildings = [];
 
-    /**
-     * @var array $newBuildings
-     */
     private array $newBuildings = [];
 
-    /**
-     * @var array $oldUnits
-     */
     private array $oldUnits = [];
 
-    /**
-     * @var array $newUnits
-     */
     private array $newUnits = [];
 
-    /**
-     * @param UpdateKingdom $updateKingdom
-     */
-    public function __construct(UpdateKingdom $updateKingdom) {
+    public function __construct(UpdateKingdom $updateKingdom)
+    {
         $this->updateKingdom = $updateKingdom;
     }
 
     /**
      * Use items on a kingdom.
-     *
-     * @param Character $character
-     * @param Kingdom $kingdom
-     * @param array $slots
-     * @return array
      */
-    public function useItemsOnKingdom(Character $character, Kingdom $kingdom, array $slots): array {
+    public function useItemsOnKingdom(Character $character, Kingdom $kingdom, array $slots): array
+    {
 
-       if (!$this->doesCharacterHaveItems($character->inventory, $slots)) {
-           return $this->errorResult('You are not allowed to do that.');
-       }
+        if (! $this->doesCharacterHaveItems($character->inventory, $slots)) {
+            return $this->errorResult('You are not allowed to do that.');
+        }
 
-       if ($character->id === $kingdom->character_id) {
-           return $this->errorResult('You are not allowed to do that.');
-       }
+        if ($character->id === $kingdom->character_id) {
+            return $this->errorResult('You are not allowed to do that.');
+        }
 
-       if (!is_null($kingdom->protected_until)) {
-           return $this->errorResult('You are not allowed to do that.');
-       }
+        if (! is_null($kingdom->protected_until)) {
+            return $this->errorResult('You are not allowed to do that.');
+        }
 
-       if ($character->map->game_map_id !== $kingdom->game_map_id) {
-           return $this->errorResult('You are not allowed to do that.');
-       }
+        if ($character->map->game_map_id !== $kingdom->game_map_id) {
+            return $this->errorResult('You are not allowed to do that.');
+        }
 
-       $itemDefence = $kingdom->kingdomItemResistanceBonus();
+        $itemDefence = $kingdom->kingdomItemResistanceBonus();
 
-       if ($itemDefence >= 1.0) {
+        if ($itemDefence >= 1.0) {
 
-           event(new GlobalMessageEvent($character->name . ' tried to drop items on a kingdom: ' .
-               $kingdom->name . ' on the plane: ' . $kingdom->gameMap->name . ' At (X/Y): ' . $kingdom->x_position . '/' . $kingdom->y_position .
-               ' but this kingdom is well defended against such tricks. The armies prepare for battle!'
-           ));
+            event(new GlobalMessageEvent($character->name.' tried to drop items on a kingdom: '.
+                $kingdom->name.' on the plane: '.$kingdom->gameMap->name.' At (X/Y): '.$kingdom->x_position.'/'.$kingdom->y_position.
+                ' but this kingdom is well defended against such tricks. The armies prepare for battle!'
+            ));
 
-           return $this->successResult([
-               'message' => 'You dropped the items but they did nothing. This kingdom is resistant tro the damage. No ogs created.'
-           ]);
-       }
+            return $this->successResult([
+                'message' => 'You dropped the items but they did nothing. This kingdom is resistant tro the damage. No ogs created.',
+            ]);
+        }
 
-       $this->setOldBuildings($kingdom);
-       $this->setOldUnits($kingdom);
+        $this->setOldBuildings($kingdom);
+        $this->setOldUnits($kingdom);
 
-       $damage    = $this->gatherDamage($character->inventory, $slots);
-       $reduction = $this->getReductionToDamage($kingdom) / 100;
+        $damage = $this->gatherDamage($character->inventory, $slots);
+        $reduction = $this->getReductionToDamage($kingdom) / 100;
 
-       $damage -= ($damage * $reduction);
+        $damage -= ($damage * $reduction);
 
-       if ($itemDefence > 0) {
-           $damage -= ($damage * $itemDefence);
-       }
+        if ($itemDefence > 0) {
+            $damage -= ($damage * $itemDefence);
+        }
 
-       $currentMorale = $kingdom->current_morale;
+        $currentMorale = $kingdom->current_morale;
 
-       $kingdom = $this->damageBuildings($kingdom, ($damage / 2));
-       $kingdom = $this->damageUnits($kingdom, ($damage / 2));
+        $kingdom = $this->damageBuildings($kingdom, ($damage / 2));
+        $kingdom = $this->damageUnits($kingdom, ($damage / 2));
 
-       $newMorale  = $this->calculateNewMorale($kingdom->refresh(), $currentMorale);
+        $newMorale = $this->calculateNewMorale($kingdom->refresh(), $currentMorale);
 
-       $kingdom->update(['current_morale' => $newMorale]);
+        $kingdom->update(['current_morale' => $newMorale]);
 
-       $kingdom = $kingdom->refresh();
+        $kingdom = $kingdom->refresh();
 
-       if ($newMorale <= 0.0) {
-           $moraleLoss = 1.0;
-       } else {
-           $moraleLoss = $currentMorale - $newMorale;
-       }
+        if ($newMorale <= 0.0) {
+            $moraleLoss = 1.0;
+        } else {
+            $moraleLoss = $currentMorale - $newMorale;
+        }
 
-       event(new GlobalMessageEvent($character->name . ' has done devastating damage to the kingdom: ' .
-           $kingdom->name . ' on the plane: ' . $kingdom->gameMap->name . ' At (X/Y): ' . $kingdom->x_position . '/' . $kingdom->y_position .
-           ' doing a total of: ' . number_format($damage * 100) . '% damage.'
-       ));
+        event(new GlobalMessageEvent($character->name.' has done devastating damage to the kingdom: '.
+            $kingdom->name.' on the plane: '.$kingdom->gameMap->name.' At (X/Y): '.$kingdom->x_position.'/'.$kingdom->y_position.
+            ' doing a total of: '.number_format($damage * 100).'% damage.'
+        ));
 
-       $this->createLogs($character, $kingdom, $damage, $moraleLoss);
+        $this->createLogs($character, $kingdom, $damage, $moraleLoss);
 
-       $character->inventory->slots()->whereIn('id', $slots)->delete();
+        $character->inventory->slots()->whereIn('id', $slots)->delete();
 
-       return $this->successResult([
-           'message' => 'Dropped items on kingdom!'
-       ]);
+        return $this->successResult([
+            'message' => 'Dropped items on kingdom!',
+        ]);
     }
-
 
     /**
      * Create the logs for both defender and attacker.
      *
      * - If the defender is not an NPC kingdom we create the log for them.
-     *
-     * @param Character $character
-     * @param Kingdom $kingdom
-     * @param float $damageDone
-     * @param float $moraleLoss
-     * @return void
      */
-    protected function createLogs(Character $character, Kingdom $kingdom, float $damageDone, float $moraleLoss): void {
+    protected function createLogs(Character $character, Kingdom $kingdom, float $damageDone, float $moraleLoss): void
+    {
         $attributes = [
-            'to_kingdom_id'  => $kingdom->id,
-            'status'         => KingdomLogStatusValue::BOMBS_DROPPED,
-            'old_buildings'  => $this->oldBuildings,
-            'new_buildings'  => $this->newBuildings,
-            'old_units'      => $this->oldUnits,
-            'new_units'      => $this->newUnits,
-            'item_damage'    => $damageDone,
-            'morale_loss'    => $moraleLoss,
-            'published'      => true,
+            'to_kingdom_id' => $kingdom->id,
+            'status' => KingdomLogStatusValue::BOMBS_DROPPED,
+            'old_buildings' => $this->oldBuildings,
+            'new_buildings' => $this->newBuildings,
+            'old_units' => $this->oldUnits,
+            'new_units' => $this->newUnits,
+            'item_damage' => $damageDone,
+            'morale_loss' => $moraleLoss,
+            'published' => true,
         ];
 
-        if (!$kingdom->npc_owned) {
-            $attributes['character_id']           = $kingdom->character_id;
+        if (! $kingdom->npc_owned) {
+            $attributes['character_id'] = $kingdom->character_id;
             $attributes['attacking_character_id'] = $character->id;
 
             KingdomLog::create($attributes);
 
-            event(new ServerMessageEvent($kingdom->character->user, $character->name . ' has dropped bombs on your kingdom: ' .
-                $kingdom->name . ' on the plane: ' . $kingdom->gameMap->name . ' At (X/Y): ' . $kingdom->x_position . '/' . $kingdom->y_position .
-                ' doing a total of: ' . number_format($damageDone * 100) . '% damage.'));
+            event(new ServerMessageEvent($kingdom->character->user, $character->name.' has dropped bombs on your kingdom: '.
+                $kingdom->name.' on the plane: '.$kingdom->gameMap->name.' At (X/Y): '.$kingdom->x_position.'/'.$kingdom->y_position.
+                ' doing a total of: '.number_format($damageDone * 100).'% damage.'));
 
             $kingdom = $kingdom->refresh();
 
@@ -176,40 +149,34 @@ class AttackWithItemsService {
 
         KingdomLog::create($attributes);
 
-        event(new ServerMessageEvent($character->user, 'You have dropped bombs on a kingdom: ' .
-            $kingdom->name . ' on the plane: ' . $kingdom->gameMap->name . ' At (X/Y): ' . $kingdom->x_position . '/' . $kingdom->y_position .
-            ' doing a total of: ' . number_format($damageDone * 100) . '% damage.'));
+        event(new ServerMessageEvent($character->user, 'You have dropped bombs on a kingdom: '.
+            $kingdom->name.' on the plane: '.$kingdom->gameMap->name.' At (X/Y): '.$kingdom->x_position.'/'.$kingdom->y_position.
+            ' doing a total of: '.number_format($damageDone * 100).'% damage.'));
 
         $this->updateKingdom->updateKingdomLogs($character->refresh());
     }
 
     /**
      * Validate that the character has the items selected.
-     *
-     * @param Inventory $inventory
-     * @param array $slots
-     * @return bool
      */
-    protected function doesCharacterHaveItems(Inventory $inventory, array $slots): bool {
-       $missingItems = [];
+    protected function doesCharacterHaveItems(Inventory $inventory, array $slots): bool
+    {
+        $missingItems = [];
 
-       foreach ($slots as $slotId) {
-           if (is_null($inventory->slots->where('id', $slotId)->first())) {
-               array_push($missingItems, $slotId);
-           }
-       }
+        foreach ($slots as $slotId) {
+            if (is_null($inventory->slots->where('id', $slotId)->first())) {
+                array_push($missingItems, $slotId);
+            }
+        }
 
-       return count($missingItems) > 0 ? false : true;
+        return count($missingItems) > 0 ? false : true;
     }
 
     /**
      * Damage the buildings.
-     *
-     * @param Kingdom $kingdom
-     * @param float $damage
-     * @return Kingdom
      */
-    protected function  damageBuildings(Kingdom $kingdom, float $damage): Kingdom {
+    protected function damageBuildings(Kingdom $kingdom, float $damage): Kingdom
+    {
         foreach ($kingdom->buildings as $building) {
             $newDurability = $building->current_durability - ($building->current_durability * $damage);
 
@@ -224,7 +191,7 @@ class AttackWithItemsService {
             $building = $building->refresh();
 
             $this->newBuildings[] = [
-                'name'       => $building->name,
+                'name' => $building->name,
                 'durability' => $building->current_durability,
             ];
         }
@@ -234,12 +201,9 @@ class AttackWithItemsService {
 
     /**
      * Damage the units.
-     *
-     * @param Kingdom $kingdom
-     * @param float $damage
-     * @return Kingdom
      */
-    protected function damageUnits(Kingdom $kingdom, float $damage): Kingdom {
+    protected function damageUnits(Kingdom $kingdom, float $damage): Kingdom
+    {
         foreach ($kingdom->units as $unit) {
             $newAmount = $unit->amount - ($unit->amount * $damage);
 
@@ -254,7 +218,7 @@ class AttackWithItemsService {
             $unit = $unit->refresh();
 
             $this->newUnits[] = [
-                'name'   => $unit->gameUnit->name,
+                'name' => $unit->gameUnit->name,
                 'amount' => $unit->amount,
             ];
         }
@@ -264,14 +228,12 @@ class AttackWithItemsService {
 
     /**
      * Set the old building data.
-     *
-     * @param Kingdom $kingdom
-     * @return void
      */
-    protected function setOldBuildings(Kingdom $kingdom): void {
+    protected function setOldBuildings(Kingdom $kingdom): void
+    {
         foreach ($kingdom->buildings as $building) {
             $this->oldBuildings[] = [
-                'name'       => $building->name,
+                'name' => $building->name,
                 'durability' => $building->current_durability,
             ];
         }
@@ -279,14 +241,12 @@ class AttackWithItemsService {
 
     /**
      * set the old unit data.
-     *
-     * @param Kingdom $kingdom
-     * @return void
      */
-    protected function setOldUnits(Kingdom $kingdom): void {
+    protected function setOldUnits(Kingdom $kingdom): void
+    {
         foreach ($kingdom->units as $unit) {
             $this->oldUnits[] = [
-                'name'   => $unit->gameUnit->name,
+                'name' => $unit->gameUnit->name,
                 'amount' => $unit->amount,
             ];
         }
@@ -294,42 +254,37 @@ class AttackWithItemsService {
 
     /**
      * Gathers item damage from selected items.
-     *
-     * @param Inventory $inventory
-     * @param $slots
-     * @return float
      */
-    protected function gatherDamage(Inventory $inventory, $slots): float {
-       $damage = 0.0;
+    protected function gatherDamage(Inventory $inventory, $slots): float
+    {
+        $damage = 0.0;
 
-       foreach ($slots as $slotId) {
-           $slot = $inventory->slots->where('id', $slotId)->first();
+        foreach ($slots as $slotId) {
+            $slot = $inventory->slots->where('id', $slotId)->first();
 
-           $damage += $slot->item->kingdom_damage;
-       }
+            $damage += $slot->item->kingdom_damage;
+        }
 
-       return $damage;
+        return $damage;
     }
 
     /**
      * get the reduction in damage.
-     *
-     * @param Kingdom $kingdom
-     * @return float
      */
-    protected function getReductionToDamage(Kingdom $kingdom): float {
-       $totalDefence = $kingdom->fetchKingdomDefenceBonus();
+    protected function getReductionToDamage(Kingdom $kingdom): float
+    {
+        $totalDefence = $kingdom->fetchKingdomDefenceBonus();
 
-       $reduction    = 0.0;
+        $reduction = 0.0;
 
-       if ($totalDefence > 1) {
-           $reduction = ($totalDefence - 1) / 0.05;
+        if ($totalDefence > 1) {
+            $reduction = ($totalDefence - 1) / 0.05;
 
-           if ($reduction < 0.05) {
-               return 0.05;
-           }
-       }
+            if ($reduction < 0.05) {
+                return 0.05;
+            }
+        }
 
-       return $reduction;
+        return $reduction;
     }
 }

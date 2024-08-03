@@ -11,57 +11,40 @@ use App\Http\Controllers\Controller;
 use Exception;
 use Illuminate\Http\JsonResponse;
 
-class ClassRanksController extends Controller {
-
-    /**
-     * @var ClassRankService $classRankService
-     */
+class ClassRanksController extends Controller
+{
     private ClassRankService $classRankService;
 
-    /**
-     * @var UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes
-     */
     private UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes;
 
-    /**
-     * @param ClassRankService $classRankService
-     * @param UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes
-     */
-    public function __construct(ClassRankService $classRankService, UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes) {
-        $this->classRankService           = $classRankService;
+    public function __construct(ClassRankService $classRankService, UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes)
+    {
+        $this->classRankService = $classRankService;
         $this->updateCharacterAttackTypes = $updateCharacterAttackTypes;
     }
 
-    /**
-     * @param Character $character
-     * @return JsonResponse
-     */
-    public function getCharacterClassRanks(Character $character): JsonResponse {
+    public function getCharacterClassRanks(Character $character): JsonResponse
+    {
 
         $response = $this->classRankService->getClassRanks($character);
-        $status   = $response['status'];
+        $status = $response['status'];
 
         unset($response['status']);
 
         return response()->json($response, $status);
     }
 
-    /**
-     * @param Character $character
-     * @return JsonResponse
-     */
-    public function getCharacterClassSpecialties(Character $character): JsonResponse {
+    public function getCharacterClassSpecialties(Character $character): JsonResponse
+    {
 
         return response()->json($this->classRankService->getSpecials($character));
     }
 
     /**
-     * @param Character $character
-     * @param GameClassSpecial $gameClassSpecial
-     * @return JsonResponse
      * @throws Exception
      */
-    public function equipSpecial(Character $character, GameClassSpecial $gameClassSpecial): JsonResponse {
+    public function equipSpecial(Character $character, GameClassSpecial $gameClassSpecial): JsonResponse
+    {
         $response = $this->classRankService->equipSpecialty($character, $gameClassSpecial);
 
         $status = $response['status'];
@@ -72,12 +55,10 @@ class ClassRanksController extends Controller {
     }
 
     /**
-     * @param Character $character
-     * @param CharacterClassSpecialtiesEquipped $classSpecialEquipped
-     * @return JsonResponse
      * @throws Exception
      */
-    public function unequipSpecial(Character $character, CharacterClassSpecialtiesEquipped $classSpecialEquipped): JsonResponse {
+    public function unequipSpecial(Character $character, CharacterClassSpecialtiesEquipped $classSpecialEquipped): JsonResponse
+    {
 
         $response = $this->classRankService->unequipSpecial($character, $classSpecialEquipped);
 

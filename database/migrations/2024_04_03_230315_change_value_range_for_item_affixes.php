@@ -9,7 +9,8 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void {
+    public function up(): void
+    {
         Schema::table('item_affixes', function (Blueprint $table) {
             $table->decimal('str_mod', 50, 8)->change();
             $table->decimal('dex_mod', 50, 8)->change();

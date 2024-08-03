@@ -4,9 +4,10 @@ namespace Tests\Traits;
 
 use App\Flare\Models\Role;
 
-trait CreateRole {
-
-    public function createAdminRole(): Role {
+trait CreateRole
+{
+    public function createAdminRole(): Role
+    {
         $role = Role::where('name', 'Admin')->first();
 
         if (is_null($role)) {

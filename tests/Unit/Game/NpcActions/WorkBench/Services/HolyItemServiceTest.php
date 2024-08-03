@@ -11,32 +11,35 @@ use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateItem;
 
-class HolyItemServiceTest extends TestCase {
-
-    use RefreshDatabase, CreateItem;
+class HolyItemServiceTest extends TestCase
+{
+    use CreateItem, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
     private ?HolyItemService $holyItemService;
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
-        $this->character       = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
+        $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
         $this->holyItemService = resolve(HolyItemService::class);
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
 
-        $this->character       = null;
+        $this->character = null;
         $this->holyItemService = null;
     }
 
-    public function fetchSmithingItems() {
+    public function fetchSmithingItems()
+    {
         $character = $this->character->inventoryManagement()->giveItem(
             $this->createItem([
-                'type'        => 'weapon',
+                'type' => 'weapon',
                 'holy_stacks' => 20,
             ])
         )->giveItem($this->createItem([
@@ -51,12 +54,13 @@ class HolyItemServiceTest extends TestCase {
         $this->assertNotEmpty($result['alchemy_items']);
     }
 
-    public function testCannotAffordToApplyOil() {
+    public function testCannotAffordToApplyOil()
+    {
         Event::fake();
 
         $character = $this->character->inventoryManagement()->giveItem(
             $this->createItem([
-                'type'        => 'weapon',
+                'type' => 'weapon',
                 'holy_stacks' => 20,
             ])
         )->giveItem($this->createItem([
@@ -81,12 +85,13 @@ class HolyItemServiceTest extends TestCase {
         $this->assertEquals(422, $result['status']);
     }
 
-    public function testCannotApplyOilWhenInvalidItemType() {
+    public function testCannotApplyOilWhenInvalidItemType()
+    {
         Event::fake();
 
         $character = $this->character->inventoryManagement()->giveItem(
             $this->createItem([
-                'type'        => 'artifact',
+                'type' => 'artifact',
                 'holy_stacks' => 20,
             ])
         )->giveItem($this->createItem([
@@ -120,10 +125,11 @@ class HolyItemServiceTest extends TestCase {
         $this->assertEquals('Trinkets and Artifacts cannot have holy oils applied.', $result['message']);
     }
 
-    public function testCannotApplyHolyOilWhenNoStacks() {
+    public function testCannotApplyHolyOilWhenNoStacks()
+    {
         $character = $this->character->inventoryManagement()->giveItem(
             $this->createItem([
-                'type'        => 'weapon',
+                'type' => 'weapon',
                 'holy_stacks' => 0,
             ])
         )->giveItem($this->createItem([
@@ -155,10 +161,11 @@ class HolyItemServiceTest extends TestCase {
         $this->assertEquals(422, $result['status']);
     }
 
-    public function testApplyHolyOilToItem() {
+    public function testApplyHolyOilToItem()
+    {
         $character = $this->character->inventoryManagement()->giveItem(
             $this->createItem([
-                'type'        => 'weapon',
+                'type' => 'weapon',
                 'holy_stacks' => 20,
             ])
         )->giveItem($this->createItem([
@@ -195,12 +202,13 @@ class HolyItemServiceTest extends TestCase {
         $this->assertEquals(200, $result['status']);
     }
 
-    public function testApplyHolyOilToItemWithOneStack() {
+    public function testApplyHolyOilToItemWithOneStack()
+    {
         Event::fake();
 
         $character = $this->character->inventoryManagement()->giveItem(
             $this->createItem([
-                'type'        => 'weapon',
+                'type' => 'weapon',
                 'holy_stacks' => 1,
             ])
         )->giveItem($this->createItem([
@@ -239,16 +247,17 @@ class HolyItemServiceTest extends TestCase {
         Event::assertDispatched(ServerMessageEvent::class);
     }
 
-    public function testApplyOilToItemWithStack() {
+    public function testApplyOilToItemWithStack()
+    {
         $item = $this->createItem([
-            'type'        => 'weapon',
+            'type' => 'weapon',
             'holy_stacks' => 20,
         ]);
 
         $item->appliedHolyStacks()->create([
-            'item_id'                   => $item->id,
-            'devouring_darkness_bonus'  => 0.10,
-            'stat_increase_bonus'       => 0.10,
+            'item_id' => $item->id,
+            'devouring_darkness_bonus' => 0.10,
+            'stat_increase_bonus' => 0.10,
         ]);
 
         $item = $item->refresh();

@@ -29,49 +29,24 @@ use Illuminate\Support\Facades\Cache;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
 
-class TraverseService {
-
+class TraverseService
+{
     use UpdateRaidMonstersForLocation;
 
-    /**
-     * @var Manager $manager
-     */
     private Manager $manager;
 
-    /**
-     * @var MonsterTransformer $monsterTransformer
-     */
     private MonsterTransformer $monsterTransformer;
 
-    /**
-     * @var LocationService $locationService
-     */
     private LocationService $locationService;
 
-    /**
-     * @var MapTileValue $mapTileValue
-     */
     private MapTileValue $mapTileValue;
 
-    /**
-     * @var BuildCharacterAttackTypes  $buildCharacterAttackTypes
-     */
     private BuildCharacterAttackTypes $buildCharacterAttackTypes;
 
-    /**
-     * @var CharacterSheetBaseInfoTransformer $characterSheetBaseInfoTransformer
-     */
     private CharacterSheetBaseInfoTransformer $characterSheetBaseInfoTransformer;
 
     /**
      * TraverseService constructor.
-     *
-     * @param Manager $manager
-     * @param CharacterSheetBaseInfoTransformer $characterSheetBaseInfoTransformer
-     * @param BuildCharacterAttackTypes $buildCharacterAttackTypes
-     * @param MonsterTransformer $monsterTransformer
-     * @param LocationService $locationService
-     * @param MapTileValue $mapTileValue
      */
     public function __construct(
         Manager $manager,
@@ -81,22 +56,19 @@ class TraverseService {
         LocationService $locationService,
         MapTileValue $mapTileValue
     ) {
-        $this->manager                           = $manager;
+        $this->manager = $manager;
         $this->characterSheetBaseInfoTransformer = $characterSheetBaseInfoTransformer;
-        $this->buildCharacterAttackTypes         = $buildCharacterAttackTypes;
-        $this->monsterTransformer                = $monsterTransformer;
-        $this->locationService                   = $locationService;
-        $this->mapTileValue                      = $mapTileValue;
+        $this->buildCharacterAttackTypes = $buildCharacterAttackTypes;
+        $this->monsterTransformer = $monsterTransformer;
+        $this->locationService = $locationService;
+        $this->mapTileValue = $mapTileValue;
     }
 
     /**
      * Can you travel to another plane?
-     *
-     * @param int $mapId
-     * @param Character $character
-     * @return bool
      */
-    public function canTravel(int $mapId, Character $character): bool {
+    public function canTravel(int $mapId, Character $character): bool
+    {
         $gameMap = GameMap::find($mapId);
 
         if ($gameMap->mapType()->isLabyrinth()) {
@@ -104,7 +76,7 @@ class TraverseService {
                 return $slot->item->effect === ItemEffectsValue::LABYRINTH;
             })->all();
 
-            return !empty($hasItem);
+            return ! empty($hasItem);
         }
 
         if ($gameMap->mapType()->isDungeons()) {
@@ -112,7 +84,7 @@ class TraverseService {
                 return $slot->item->effect === ItemEffectsValue::DUNGEON;
             })->all();
 
-            return !empty($hasItem);
+            return ! empty($hasItem);
         }
 
         if ($gameMap->mapType()->isShadowPlane()) {
@@ -120,7 +92,7 @@ class TraverseService {
                 return $slot->item->effect === ItemEffectsValue::SHADOW_PLANE;
             })->all();
 
-            return !empty($hasItem);
+            return ! empty($hasItem);
         }
 
         if ($gameMap->mapType()->isHell()) {
@@ -128,7 +100,7 @@ class TraverseService {
                 return $slot->item->effect === ItemEffectsValue::HELL;
             })->all();
 
-            return !empty($hasItem);
+            return ! empty($hasItem);
         }
 
         if ($gameMap->mapType()->isPurgatory()) {
@@ -136,10 +108,10 @@ class TraverseService {
                 return $slot->item->effect === ItemEffectsValue::PURGATORY;
             })->all();
 
-            return !empty($hasItem);
+            return ! empty($hasItem);
         }
 
-        if (!is_null($gameMap->only_during_event_type)) {
+        if (! is_null($gameMap->only_during_event_type)) {
             $event = Event::where('type', $gameMap->only_during_event_type)->first();
 
             if (is_null($event)) {
@@ -158,11 +130,9 @@ class TraverseService {
 
     /**
      * Travel to another plane of existence.
-     *
-     * @param int $mapId
-     * @param Character $character
      */
-    public function travel(int $mapId, Character $character): void {
+    public function travel(int $mapId, Character $character): void
+    {
         $this->updateCharacterTimeOut($character);
 
         $oldMap = $character->map->gameMap;
@@ -179,7 +149,7 @@ class TraverseService {
 
         $this->updateMonstersList($character, $location);
 
-        $message = 'You have traveled to: ' . $character->map->gameMap->name;
+        $message = 'You have traveled to: '.$character->map->gameMap->name;
 
         ServerMessageHandler::handleMessage($character->user, 'plane_transfer', $message);
 
@@ -191,31 +161,31 @@ class TraverseService {
             feel the presence of death as it creeps ever closer.
             (Characters can walk on water here.)';
 
-            event(new ServerMessageEvent($character->user,  $message));
+            event(new ServerMessageEvent($character->user, $message));
 
-            event(new GlobalMessageEvent('The gates have opened for: ' . $character->name . '. They have entered the realm of shadows!'));
+            event(new GlobalMessageEvent('The gates have opened for: '.$character->name.'. They have entered the realm of shadows!'));
         }
 
         if ($gameMap->mapType()->isHell()) {
             $message = 'The stench of sulfur fills your nose. The heat of the magma oceans bathes over you. Demonic shadows and figures move about the land. Tormented souls cry out in anguish!';
 
-            event(new ServerMessageEvent($character->user,  $message));
+            event(new ServerMessageEvent($character->user, $message));
 
-            event(new GlobalMessageEvent('Hell\'s gates swing wide for: ' . $character->name . '. May the light of The Poet, be their guide through such darkness!'));
+            event(new GlobalMessageEvent('Hell\'s gates swing wide for: '.$character->name.'. May the light of The Poet, be their guide through such darkness!'));
         }
 
         if ($gameMap->mapType()->isPurgatory()) {
             $message = 'The silence of death fills your very being and chills you to bone. Nothing moves amongst the decay and death of this land.';
 
-            event(new ServerMessageEvent($character->user,  $message));
+            event(new ServerMessageEvent($character->user, $message));
 
-            event(new GlobalMessageEvent('Thunder claps in the sky: ' . $character->name . ' has called forth The Creator\'s gates of despair! The Creator is Furious! "Hear me, child! I shall face you in the depths of my despair and crush the soul from your bones!" the lands fall silent, the children no longer have faith and the fabric of time rips open...'));
+            event(new GlobalMessageEvent('Thunder claps in the sky: '.$character->name.' has called forth The Creator\'s gates of despair! The Creator is Furious! "Hear me, child! I shall face you in the depths of my despair and crush the soul from your bones!" the lands fall silent, the children no longer have faith and the fabric of time rips open...'));
         }
 
         if ($gameMap->mapType()->isTheIcePlane()) {
             $message = 'The air becomes bitter and cold, the ice starts to form on the ground around you. Everything seems so frozen in place.';
 
-            event(new ServerMessageEvent($character->user,  $message));
+            event(new ServerMessageEvent($character->user, $message));
 
             event(new GlobalMessageEvent('"Have you seen my son?" the call of the Ice Queen is heard across the lands of Tlessa. The Poet turns in his study: "So she has breached our reality."'));
         }
@@ -223,17 +193,17 @@ class TraverseService {
         if ($gameMap->mapType()->isTwistedMemories()) {
             $message = 'Your mind becomes a fog as you enter into a land where even your own thoughts become twisted into a darkness never before experienced by mortals before.';
 
-            event(new ServerMessageEvent($character->user,  $message));
+            event(new ServerMessageEvent($character->user, $message));
 
-            event(new GlobalMessageEvent('"She is the reason the world is trapped in these lies." ' . $character->name . ' enters into a place where their own heart becomes a memory that is twisted into hate.'));
+            event(new GlobalMessageEvent('"She is the reason the world is trapped in these lies." '.$character->name.' enters into a place where their own heart becomes a memory that is twisted into hate.'));
         }
 
         if ($gameMap->mapType()->isDelusionalMemories()) {
             $message = 'The delusions of a mad man are heavy on the air here ...';
 
-            event(new ServerMessageEvent($character->user,  $message));
+            event(new ServerMessageEvent($character->user, $message));
 
-            event(new GlobalMessageEvent('"Fliniguss has gone mad."  the Red Hawk Soldier states. "Help us put him down!" ' . $character->name . ' enters into a place where the war of the ages past never ended.'));
+            event(new GlobalMessageEvent('"Fliniguss has gone mad."  the Red Hawk Soldier states. "Help us put him down!" '.$character->name.' enters into a place where the war of the ages past never ended.'));
         }
 
         event(new UpdateCharacterStatus($character));
@@ -243,11 +213,9 @@ class TraverseService {
      * Returns the location at the coordinates the player wants to move too.
      *
      * - Location can be null.
-     *
-     * @param Character $character
-     * @return Location|null
      */
-    protected function getLocationForCoordinates(Character $character): ?Location {
+    protected function getLocationForCoordinates(Character $character): ?Location
+    {
         $gameMapId = $character->map->game_map_id;
 
         return Location::where('x', $character->map->character_position_x)->where('y', $character->map->character_position_y)->where('game_map_id', $gameMapId)->first();
@@ -255,11 +223,9 @@ class TraverseService {
 
     /**
      * Update the players kingdom at specified location.
-     *
-     * @param Character $character
-     * @return void
      */
-    protected function updateKingdomOwnedKingdom(Character $character): void {
+    protected function updateKingdomOwnedKingdom(Character $character): void
+    {
         $mapId = $character->map->game_map_id;
 
         $x = $character->map->character_position_x;
@@ -279,14 +245,11 @@ class TraverseService {
      *
      * If the character is on a map tile where they do not have access, such as water, we move them off it
      * and keep doing this till we fnd land.
-     *
-     * @param Character $character
-     * @param int $mapId
-     * @return void
      */
-    protected function updateCharactersPosition(Character $character, int $mapId): void {
+    protected function updateCharactersPosition(Character $character, int $mapId): void
+    {
         $character->map()->update([
-            'game_map_id' => $mapId
+            'game_map_id' => $mapId,
         ]);
 
         $character = $character->refresh();
@@ -320,20 +283,17 @@ class TraverseService {
      * Change the players' location if they cannot walk on the planes water.
      *
      * We do this till we find ground.
-     *
-     * @param Character $character
-     * @param array $cache
-     * @return Character
      */
-    protected function changeLocation(Character $character, array $cache): Character {
+    protected function changeLocation(Character $character, array $cache): Character
+    {
 
         $x = $cache['x'];
         $y = $cache['y'];
 
         if (
-            !$this->mapTileValue->canWalkOnWater($character, $character->map->character_position_x, $character->map->character_position_y) ||
-            !$this->mapTileValue->canWalkOnDeathWater($character, $character->map->character_position_x, $character->map->character_position_y) ||
-            !$this->mapTileValue->canWalkOnMagma($character, $character->map->character_position_x, $character->map->character_position_y) ||
+            ! $this->mapTileValue->canWalkOnWater($character, $character->map->character_position_x, $character->map->character_position_y) ||
+            ! $this->mapTileValue->canWalkOnDeathWater($character, $character->map->character_position_x, $character->map->character_position_y) ||
+            ! $this->mapTileValue->canWalkOnMagma($character, $character->map->character_position_x, $character->map->character_position_y) ||
             $this->mapTileValue->isPurgatoryWater((int) $this->mapTileValue->getTileColor($character->map->gameMap, $character->map->character_position_x, $character->map->character_position_y)) ||
             $this->mapTileValue->isTwistedMemoriesWater((int) $this->mapTileValue->getTileColor($character->map->gameMap, $character->map->character_position_x, $character->map->character_position_y)) ||
             $this->mapTileValue->isDelusionalMemoriesWater((int) $this->mapTileValue->getTileColor($character->map->gameMap, $character->map->character_position_x, $character->map->character_position_y))
@@ -350,8 +310,8 @@ class TraverseService {
 
         $location = Location::where('x', $character->map->character_position_x)->where('y', $character->map->character_position_y)->where('game_map_id', $character->map->game_map_id)->first();
 
-        if (!is_null($location)) {
-            if (!$location->can_players_enter) {
+        if (! is_null($location)) {
+            if (! $location->can_players_enter) {
                 $character->map()->update([
                     'character_position_x' => $x[rand(0, count($x) - 1)],
                     'character_position_y' => $y[rand(0, count($y) - 1)],
@@ -366,13 +326,11 @@ class TraverseService {
 
     /**
      * Set the timeout for the character.
-     *
-     * @param Character $character
-     * @return Character
      */
-    protected function updateCharacterTimeOut(Character $character): Character {
+    protected function updateCharacterTimeOut(Character $character): Character
+    {
         $character->update([
-            'can_move'          => false,
+            'can_move' => false,
             'can_move_again_at' => now()->addSeconds(10),
         ]);
 
@@ -387,14 +345,11 @@ class TraverseService {
 
     /**
      * Update character map-actions.
-     *
-     * @param int $mapId
-     * @param Character $character
-     * @param GameMap $oldGameMap
      */
-    public function updateActions(int $mapId, Character $character, GameMap $oldGameMap): void {
-        $user         = $character->user;
-        $gameMap      = GameMap::find($mapId);
+    public function updateActions(int $mapId, Character $character, GameMap $oldGameMap): void
+    {
+        $user = $character->user;
+        $gameMap = GameMap::find($mapId);
 
         $this->updateActionsForMap($gameMap, $oldGameMap, $character);
 
@@ -413,26 +368,22 @@ class TraverseService {
 
     /**
      * Updates the character attack data based on map type.
-     *
-     * @param GameMap $gameMap
-     * @param GameMap $oldGameMap
-     * @param Character $character
-     * @return void
      */
-    protected function updateActionsForMap(GameMap $gameMap, GameMap $oldGameMap, Character $character): void {
+    protected function updateActionsForMap(GameMap $gameMap, GameMap $oldGameMap, Character $character): void
+    {
         if ($gameMap->mapType()->isShadowPlane()) {
             $this->updateActionTypeCache($character, $gameMap->character_attack_reduction);
-        } else if ($gameMap->mapType()->isHell()) {
+        } elseif ($gameMap->mapType()->isHell()) {
             $this->updateActionTypeCache($character, $gameMap->character_attack_reduction);
-        } else if ($gameMap->mapType()->isPurgatory()) {
+        } elseif ($gameMap->mapType()->isPurgatory()) {
             $this->updateActionTypeCache($character, $gameMap->character_attack_reduction);
-        } else if ($gameMap->mapType()->isTheIcePlane()) {
+        } elseif ($gameMap->mapType()->isTheIcePlane()) {
             $this->updateActionTypeCache($character, $gameMap->character_attack_reduction);
-        } else if ($gameMap->mapType()->isTwistedMemories()) {
+        } elseif ($gameMap->mapType()->isTwistedMemories()) {
             $this->updateActionTypeCache($character, $gameMap->character_attack_reduction);
-        } else if ($gameMap->mapType()->isDelusionalMemories()) {
+        } elseif ($gameMap->mapType()->isDelusionalMemories()) {
             $this->updateActionTypeCache($character, $gameMap->character_attack_reduction);
-        } else if (
+        } elseif (
             $oldGameMap->mapType()->isPurgatory() ||
             $oldGameMap->mapType()->isHell() ||
             $oldGameMap->mapType()->isShadowPlane() ||
@@ -444,8 +395,9 @@ class TraverseService {
         }
     }
 
-    protected function getMonstersForMap(Map $characterMap, int $mapId): array {
-        $locationWithEffect   = Location::whereNotNull('enemy_strength_type')
+    protected function getMonstersForMap(Map $characterMap, int $mapId): array
+    {
+        $locationWithEffect = Location::whereNotNull('enemy_strength_type')
             ->where('x', $characterMap->character_position_x)
             ->where('y', $characterMap->character_position_y)
             ->where('game_map_id', $characterMap->game_map_id)
@@ -455,7 +407,7 @@ class TraverseService {
 
         $monsters = Cache::get('monsters')[GameMap::find($mapId)->name];
 
-        if (!is_null($locationWithEffect)) {
+        if (! is_null($locationWithEffect)) {
 
             if ($characterMap->gameMap->only_during_event_type && $canAccessPurgatory) {
                 return Cache::get('monsters')[$locationWithEffect->name];
@@ -479,21 +431,17 @@ class TraverseService {
 
     /**
      * Update the map-actions cache.
-     *
-     * @param Character $character
-     * @param float $deduction
-     * @return void
      */
-    protected function updateActionTypeCache(Character $character, float $deduction): void {
+    protected function updateActionTypeCache(Character $character, float $deduction): void
+    {
         CharacterAttackTypesCacheBuilderWithDeductions::dispatch($character, $deduction);
     }
 
     /**
      * Update the map to reflect the new plane.
-     *
-     * @param Character $character
      */
-    protected function updateMap(Character $character): void {
+    protected function updateMap(Character $character): void
+    {
         event(new UpdateMap($character->user));
     }
 }

@@ -4,16 +4,13 @@ namespace App\Game\Core\Handlers;
 
 use Illuminate\Database\Eloquent\Collection;
 
-class HandleGoldBarsAsACurrency {
-
+class HandleGoldBarsAsACurrency
+{
     /**
      * Can afford the gold bars cost.
-     *
-     * @param Collection $kingdoms
-     * @param int $cost
-     * @return bool
      */
-    public function hasTheGoldBars(Collection $kingdoms, int $cost): bool {
+    public function hasTheGoldBars(Collection $kingdoms, int $cost): bool
+    {
         if ($kingdoms->sum('gold_bars') < $cost) {
             return false;
         }
@@ -23,18 +20,15 @@ class HandleGoldBarsAsACurrency {
 
     /**
      * Subtract the cost from kingdoms gold bars.
-     *
-     * @param Collection $kingdoms
-     * @param int $goldBarCost
-     * @return void
      */
-    public function subtractCostFromKingdoms(Collection $kingdoms, int $goldBarCost): void {
+    public function subtractCostFromKingdoms(Collection $kingdoms, int $goldBarCost): void
+    {
 
         $totalGoldBars = $kingdoms->sum('gold_bars');
 
         $kingdomWhoCanAbsorbCost = $kingdoms->where('gold_bars', '>=', $goldBarCost)->first();
 
-        if (!is_null($kingdomWhoCanAbsorbCost)) {
+        if (! is_null($kingdomWhoCanAbsorbCost)) {
             $newGoldBars = $kingdomWhoCanAbsorbCost->gold_bars - $goldBarCost;
 
             $kingdomWhoCanAbsorbCost->update([
@@ -57,12 +51,9 @@ class HandleGoldBarsAsACurrency {
 
     /**
      * Add gold bars to kingdoms.
-     *
-     * @param Collection $kingdoms
-     * @param int $goldBarsToDeposit
-     * @return void
      */
-    public function addGoldBarsToKingdoms(Collection $kingdoms, int $goldBarsToDeposit): void {
+    public function addGoldBarsToKingdoms(Collection $kingdoms, int $goldBarsToDeposit): void
+    {
 
         $kingdomCount = $kingdoms->count();
         $perKingdom = intdiv($goldBarsToDeposit, $kingdomCount);
@@ -71,7 +62,6 @@ class HandleGoldBarsAsACurrency {
         $kingdoms->each(function ($kingdom) use (&$perKingdom, &$remainder) {
             $newAmount = min($kingdom->gold_bars + $perKingdom, 1000);
             $kingdom->update(['gold_bars' => $newAmount]);
-
 
             if ($newAmount < $kingdom->gold_bars + $perKingdom) {
                 $excess = ($kingdom->gold_bars + $perKingdom) - 1000;
@@ -91,6 +81,4 @@ class HandleGoldBarsAsACurrency {
             $remainder -= $additional;
         });
     }
-
-
 }

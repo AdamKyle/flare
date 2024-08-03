@@ -13,23 +13,25 @@ use Tests\Traits\CreateItem;
 use Tests\Traits\CreateMonster;
 use Tests\Traits\CreateWeeklyMonsterFight;
 
-class WeeklyBattleServiceTest extends TestCase {
-
-    use RefreshDatabase, CreateMonster, CreateWeeklyMonsterFight, CreateItem;
+class WeeklyBattleServiceTest extends TestCase
+{
+    use CreateItem, CreateMonster, CreateWeeklyMonsterFight, RefreshDatabase;
 
     private ?WeeklyBattleService $weeklyBattleService;
 
     private ?CharacterFactory $characterFactory;
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
         $this->weeklyBattleService = resolve(WeeklyBattleService::class);
 
-        $this->characterFactory    = (new CharacterFactory())->createBaseCharacter();
+        $this->characterFactory = (new CharacterFactory)->createBaseCharacter();
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
 
         parent::tearDown();
 
@@ -38,7 +40,8 @@ class WeeklyBattleServiceTest extends TestCase {
         $this->characterFactory = null;
     }
 
-    public function testCreateRecordForCharacterDeath() {
+    public function testCreateRecordForCharacterDeath()
+    {
 
         $character = $this->characterFactory->getCharacter();
 
@@ -55,7 +58,8 @@ class WeeklyBattleServiceTest extends TestCase {
         $this->assertEquals(1, $weeklyBattleFight->character_deaths);
     }
 
-    public function testDoesNotCreateRecordForCharacterDeathWhenMonsterLocationTypeIsInvalid() {
+    public function testDoesNotCreateRecordForCharacterDeathWhenMonsterLocationTypeIsInvalid()
+    {
 
         $character = $this->characterFactory->getCharacter();
 
@@ -70,7 +74,8 @@ class WeeklyBattleServiceTest extends TestCase {
         $this->assertNull($weeklyBattleFight);
     }
 
-    public function testUpdateRecordForCharacterDeath() {
+    public function testUpdateRecordForCharacterDeath()
+    {
 
         $character = $this->characterFactory->getCharacter();
 
@@ -80,7 +85,7 @@ class WeeklyBattleServiceTest extends TestCase {
 
         $weeklyFight = $this->createWeeklyMonsterFight([
             'character_id' => $character->id,
-            'monster_id'   => $monster->id,
+            'monster_id' => $monster->id,
             'character_deaths' => 10,
         ]);
 
@@ -91,17 +96,18 @@ class WeeklyBattleServiceTest extends TestCase {
         $this->assertEquals(11, $weeklyBattleFight->character_deaths);
     }
 
-    public function testDoesNotUpdateRecordForCharacterDeathWhenMonsterLocationTypeIsInvalid() {
+    public function testDoesNotUpdateRecordForCharacterDeathWhenMonsterLocationTypeIsInvalid()
+    {
 
         $character = $this->characterFactory->getCharacter();
 
         $monster = $this->createMonster([
-            'only_for_location_type' => null
+            'only_for_location_type' => null,
         ]);
 
         $weeklyFight = $this->createWeeklyMonsterFight([
             'character_id' => $character->id,
-            'monster_id'   => $monster->id,
+            'monster_id' => $monster->id,
             'character_deaths' => 10,
         ]);
 
@@ -112,13 +118,14 @@ class WeeklyBattleServiceTest extends TestCase {
         $this->assertEquals(10, $weeklyBattleFight->character_deaths);
     }
 
-    public function testMarkMonsterAsKilled() {
+    public function testMarkMonsterAsKilled()
+    {
 
         $character = $this->characterFactory->getCharacter();
 
         $this->createItem([
             'type' => 'weapon',
-            'specialty_type' => ItemSpecialtyType::DELUSIONAL_SILVER
+            'specialty_type' => ItemSpecialtyType::DELUSIONAL_SILVER,
         ]);
 
         $monster = $this->createMonster([
@@ -127,7 +134,7 @@ class WeeklyBattleServiceTest extends TestCase {
 
         $weeklyFight = $this->createWeeklyMonsterFight([
             'character_id' => $character->id,
-            'monster_id'   => $monster->id,
+            'monster_id' => $monster->id,
             'character_deaths' => 10,
         ]);
 
@@ -138,7 +145,8 @@ class WeeklyBattleServiceTest extends TestCase {
         $this->assertTrue($weeklyBattleFight->monster_was_killed);
     }
 
-    public function testCreateRecordMonsterWasKilled() {
+    public function testCreateRecordMonsterWasKilled()
+    {
 
         DropCheckCalculator::partialMock()->shouldReceive('fetchDifficultItemChance')->andReturn(true);
 
@@ -146,7 +154,7 @@ class WeeklyBattleServiceTest extends TestCase {
 
         $this->createItem([
             'type' => 'weapon',
-            'specialty_type' => ItemSpecialtyType::DELUSIONAL_SILVER
+            'specialty_type' => ItemSpecialtyType::DELUSIONAL_SILVER,
         ]);
 
         $monster = $this->createMonster([
@@ -163,12 +171,13 @@ class WeeklyBattleServiceTest extends TestCase {
 
         $this->assertTrue($weeklyBattleFight->monster_was_killed);
 
-        $this->assertNotNull($character->inventory->slots->filter(function($slot) {
+        $this->assertNotNull($character->inventory->slots->filter(function ($slot) {
             return $slot->item->is_cosmic;
         })->first());
     }
 
-    public function testDoNotCreateRecordMonsterWasKilledForInvalidLocationType() {
+    public function testDoNotCreateRecordMonsterWasKilledForInvalidLocationType()
+    {
 
         $character = $this->characterFactory->getCharacter();
 
@@ -185,14 +194,16 @@ class WeeklyBattleServiceTest extends TestCase {
         $this->assertNull($weeklyBattleFight);
     }
 
-    public function testCanFightMonster() {
+    public function testCanFightMonster()
+    {
         $character = $this->characterFactory->getCharacter();
         $monster = $this->createMonster();
 
         $this->assertTrue($this->weeklyBattleService->canFightMonster($character, $monster));
     }
 
-    public function testCannotFightMonster() {
+    public function testCannotFightMonster()
+    {
         $character = $this->characterFactory->getCharacter();
         $monster = $this->createMonster([
             'only_for_location_type' => LocationType::ALCHEMY_CHURCH,
@@ -200,7 +211,7 @@ class WeeklyBattleServiceTest extends TestCase {
 
         $this->createWeeklyMonsterFight([
             'character_id' => $character->id,
-            'monster_id'   => $monster->id,
+            'monster_id' => $monster->id,
             'character_deaths' => 10,
             'monster_was_killed' => true,
         ]);

@@ -10,7 +10,6 @@ use Tests\Setup\AttackDataCacheSetUp;
 
 abstract class TestCase extends BaseTestCase
 {
-
     use CreatesApplication;
 
     protected bool $useMockForAttackDataCache = true;
@@ -25,13 +24,14 @@ abstract class TestCase extends BaseTestCase
         parent::setUp();
 
         if ($this->useMockForAttackDataCache) {
-            $this->attackDataCacheSetUp = new AttackDataCacheSetUp();
+            $this->attackDataCacheSetUp = new AttackDataCacheSetUp;
 
             $this->attackDataCacheSetUp->mockCacheBuilder($this->app);
         }
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
 
         $this->attackDataCacheSetUp = null;
 
@@ -48,12 +48,11 @@ abstract class TestCase extends BaseTestCase
      * Loop over any database table that has more than 0 records and delete them.
      *
      * We do this with no regard to foreign keys.
-     *
-     * @return void
      */
-    private function cleanUp(): void {
+    private function cleanUp(): void
+    {
         $parentDirectory = dirname(__DIR__);
-        $path = $parentDirectory . '/app/Flare/Models';
+        $path = $parentDirectory.'/app/Flare/Models';
 
         $files = File::files($path);
 
@@ -62,7 +61,7 @@ abstract class TestCase extends BaseTestCase
         foreach ($files as $file) {
             $className = pathinfo($file, PATHINFO_FILENAME);
 
-            $fullyQualifiedClassName = '\\App\\Flare\\Models\\' . $className;
+            $fullyQualifiedClassName = '\\App\\Flare\\Models\\'.$className;
 
             if (class_exists($fullyQualifiedClassName) && is_subclass_of($fullyQualifiedClassName, Model::class)) {
                 if ($fullyQualifiedClassName::count() > 0) {

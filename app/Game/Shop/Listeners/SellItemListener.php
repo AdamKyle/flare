@@ -10,10 +10,10 @@ use Facades\App\Flare\Calculators\SellItemCalculator;
 
 class SellItemListener
 {
-
     private $enchantingService;
 
-    public function __construct(EnchantingService $enchantingService) {
+    public function __construct(EnchantingService $enchantingService)
+    {
         $this->enchantingService = $enchantingService;
     }
 
@@ -35,6 +35,4 @@ class SellItemListener
 
         event(new UpdateCharacterCurrenciesEvent($event->character->refresh()));
     }
-
-
 }

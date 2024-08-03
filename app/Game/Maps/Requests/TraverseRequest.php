@@ -24,13 +24,14 @@ class TraverseRequest extends FormRequest
     public function rules()
     {
         return [
-            'map_id'       => 'required|integer',
+            'map_id' => 'required|integer',
         ];
     }
 
-    public function messages() {
+    public function messages()
+    {
         return [
-            'map_id.required'       => 'Map id is required.',
+            'map_id.required' => 'Map id is required.',
         ];
     }
 }

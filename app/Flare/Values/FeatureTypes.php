@@ -4,8 +4,8 @@ namespace App\Flare\Values;
 
 use Exception;
 
-class FeatureTypes {
-
+class FeatureTypes
+{
     const REINCARNATION = 0;
 
     const COSMETIC_TEXT = 1;
@@ -18,13 +18,10 @@ class FeatureTypes {
 
     const CAPITAL_CITY_GOLD_BARS = 5;
 
-    /**
-     * @var int $value
-     */
     private int $value;
 
     /**
-     * @var int[] $values
+     * @var int[]
      */
     protected static array $values = [
         0 => self::REINCARNATION,
@@ -38,8 +35,8 @@ class FeatureTypes {
     protected static array $valueNames = [
         self::REINCARNATION => 'Reincarnation',
         self::COSMETIC_TEXT => 'Cosmetic Text',
-        self::NAME_TAGS     => 'Name Tags',
-        self::EXTEND_SETS   => 'Give 10 additional sets',
+        self::NAME_TAGS => 'Name Tags',
+        self::EXTEND_SETS => 'Give 10 additional sets',
         self::CAPITAL_CITIES => 'Capital Cities',
         self::CAPITAL_CITY_GOLD_BARS => 'Capital City Gold Bars',
     ];
@@ -47,42 +44,49 @@ class FeatureTypes {
     /**
      * Throws if the value does not exist in the array of const values.
      *
-     * @param int $value
      * @throws Exception
      */
-    public function __construct(int $value) {
-        if (!in_array($value, self::$values)) {
-            throw new Exception($value . ' does not exist.');
+    public function __construct(int $value)
+    {
+        if (! in_array($value, self::$values)) {
+            throw new Exception($value.' does not exist.');
         }
 
         $this->value = $value;
     }
 
-    public static function getSelectable(): array {
+    public static function getSelectable(): array
+    {
         return self::$valueNames;
     }
 
-    public function getNameOfFeature(): string {
+    public function getNameOfFeature(): string
+    {
         return self::$valueNames[$this->value];
     }
 
-    public function isReincarnation(): bool {
+    public function isReincarnation(): bool
+    {
         return $this->value === self::REINCARNATION;
     }
 
-    public function isCosmeticText(): bool {
+    public function isCosmeticText(): bool
+    {
         return $this->value === self::COSMETIC_TEXT;
     }
 
-    public function isNameTag(): bool {
+    public function isNameTag(): bool
+    {
         return $this->value === self::NAME_TAGS;
     }
 
-    public function isExtendSets(): bool {
+    public function isExtendSets(): bool
+    {
         return $this->value === self::EXTEND_SETS;
     }
 
-    public function isCapitalCities(): bool {
+    public function isCapitalCities(): bool
+    {
         return $this->value === self::CAPITAL_CITIES;
     }
 }

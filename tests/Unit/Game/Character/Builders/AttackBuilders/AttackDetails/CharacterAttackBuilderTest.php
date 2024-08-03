@@ -16,47 +16,51 @@ use Tests\Traits\CreateGameSkill;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateItemAffix;
 
-class CharacterAttackBuilderTest extends TestCase {
-
-    use RefreshDatabase, CreateItem, CreateItemAffix, CreateGameMap, CreateClass, CreateGameSkill, CreateGameClassSpecial;
+class CharacterAttackBuilderTest extends TestCase
+{
+    use CreateClass, CreateGameClassSpecial, CreateGameMap, CreateGameSkill, CreateItem, CreateItemAffix, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
     private ?CharacterAttackBuilder $characterAttackBuilder;
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
-        $this->character              = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
+        $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
 
         $this->characterAttackBuilder = resolve(CharacterAttackBuilder::class);
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
 
-        $this->character              = null;
+        $this->character = null;
         $this->characterAttackBuilder = null;
     }
 
-    private function setUpCharacterForTests(): Character {
+    private function setUpCharacterForTests(): Character
+    {
         $item = $this->createItem([
-            'type'        => WeaponTypes::STAVE,
+            'type' => WeaponTypes::STAVE,
             'base_damage' => 10,
         ]);
 
         $spellDamage = $this->createItem([
-            'type'        => SpellTypes::DAMAGE,
+            'type' => SpellTypes::DAMAGE,
             'base_damage' => 10,
         ]);
 
         return $this->character->inventoryManagement()
-                               ->giveItem($item, true, 'left-hand')
-                               ->giveItem($spellDamage, true, 'spell-one')
-                               ->getCharacter();
+            ->giveItem($item, true, 'left-hand')
+            ->giveItem($spellDamage, true, 'spell-one')
+            ->getCharacter();
     }
 
-    public function testBuildWeaponDamage() {
+    public function testBuildWeaponDamage()
+    {
         $character = $this->setUpCharacterForTests();
 
         $attack = $this->characterAttackBuilder->setCharacter($character)->buildAttack();
@@ -64,7 +68,8 @@ class CharacterAttackBuilderTest extends TestCase {
         $this->assertGreaterThan(0, $attack['weapon_damage']);
     }
 
-    public function testBuildCastDamage() {
+    public function testBuildCastDamage()
+    {
         $character = $this->setUpCharacterForTests();
 
         $attack = $this->characterAttackBuilder->setCharacter($character)->buildCastAttack();
@@ -72,7 +77,8 @@ class CharacterAttackBuilderTest extends TestCase {
         $this->assertGreaterThan(0, $attack['spell_damage']);
     }
 
-    public function testBuildCastAndAttackDamage() {
+    public function testBuildCastAndAttackDamage()
+    {
         $character = $this->setUpCharacterForTests();
 
         $attack = $this->characterAttackBuilder->setCharacter($character)->buildCastAndAttack();
@@ -82,7 +88,8 @@ class CharacterAttackBuilderTest extends TestCase {
         $this->assertEquals(0, $attack['heal_for']);
     }
 
-    public function testBuildAttackAndCastDamage() {
+    public function testBuildAttackAndCastDamage()
+    {
         $character = $this->setUpCharacterForTests();
 
         $attack = $this->characterAttackBuilder->setCharacter($character)->buildAttackAndCast();
@@ -92,7 +99,8 @@ class CharacterAttackBuilderTest extends TestCase {
         $this->assertEquals(0, $attack['heal_for']);
     }
 
-    public function testBuildDefend() {
+    public function testBuildDefend()
+    {
         $character = $this->setUpCharacterForTests();
 
         $attack = $this->characterAttackBuilder->setCharacter($character)->buildDefend();
@@ -100,23 +108,24 @@ class CharacterAttackBuilderTest extends TestCase {
         $this->assertGreaterThan(0, $attack['defence']);
     }
 
-    public function testShouldHaveClassSpecialtyDamageWhenBuildingAttack() {
+    public function testShouldHaveClassSpecialtyDamageWhenBuildingAttack()
+    {
         $character = $this->setUpCharacterForTests();
 
         $classSpecial = $this->createGameClassSpecial([
-            'game_class_id'                            => $character->game_class_id,
-            'specialty_damage'                         => 50000,
-            'increase_specialty_damage_per_level'      => 50,
+            'game_class_id' => $character->game_class_id,
+            'specialty_damage' => 50000,
+            'increase_specialty_damage_per_level' => 50,
             'specialty_damage_uses_damage_stat_amount' => 0.10,
         ]);
 
         $character->classSpecialsEquipped()->create([
-            'character_id'            => $character->id,
-            'game_class_special_id'   => $classSpecial->id,
-            'level'                   => 0,
-            'current_xp'              => 0,
-            'required_xp'             => 100,
-            'equipped'                => true,
+            'character_id' => $character->id,
+            'game_class_special_id' => $classSpecial->id,
+            'level' => 0,
+            'current_xp' => 0,
+            'required_xp' => 100,
+            'equipped' => true,
         ]);
 
         $character = $character->refresh();
@@ -127,7 +136,8 @@ class CharacterAttackBuilderTest extends TestCase {
         $this->assertNotEmpty($attack['special_damage']);
     }
 
-    public function testShouldNotHaveClassSpecialtyDamageWhenBuildingAttack() {
+    public function testShouldNotHaveClassSpecialtyDamageWhenBuildingAttack()
+    {
         $character = $this->setUpCharacterForTests();
 
         $character = $character->refresh();

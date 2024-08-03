@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Flare\Providers;
 
 use App\Flare\Listeners\UserLoggedInListener;
@@ -9,10 +10,9 @@ use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 
-class EventsProvider extends ServiceProvider {
-
+class EventsProvider extends ServiceProvider
+{
     protected $listen = [
-
 
         // When a character trains a skill:
         UpdateSkillEvent::class => [
@@ -27,7 +27,7 @@ class EventsProvider extends ServiceProvider {
         // When a user is registered.
         Registered::class => [
             UserRegisteredListener::class,
-        ]
+        ],
     ];
 
     /**

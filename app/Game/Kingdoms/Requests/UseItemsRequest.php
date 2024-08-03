@@ -25,16 +25,17 @@ class UseItemsRequest extends FormRequest
     {
         return [
             'slots_selected' => 'required|array',
-            'defender_id'    => 'required|exists:kingdoms,id',
+            'defender_id' => 'required|exists:kingdoms,id',
         ];
     }
 
-    public function messages() {
+    public function messages()
+    {
         return [
             'slots_selected.required' => 'Slots selected is required',
-            'slots_selected.array'    => 'Slots selected must be an array',
-            'defender_id.required'    => 'Missing defender id.',
-            'defender_id.exists'      => 'Defender does not exist.',
+            'slots_selected.array' => 'Slots selected must be an array',
+            'defender_id.required' => 'Missing defender id.',
+            'defender_id.exists' => 'Defender does not exist.',
         ];
     }
 }

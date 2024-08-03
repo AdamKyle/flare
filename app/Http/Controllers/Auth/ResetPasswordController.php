@@ -2,15 +2,10 @@
 
 namespace App\Http\Controllers\Auth;
 
-
-use Auth;
-use Cache;
-use Hash;
+use App\Flare\Models\User;
+use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\ResetsPasswords;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
-use App\Flare\Events\SiteAccessedEvent;
-use App\Flare\Models\User;
 use Password;
 
 /**

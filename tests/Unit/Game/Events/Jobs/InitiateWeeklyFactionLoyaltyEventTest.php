@@ -6,27 +6,28 @@ use App\Flare\Models\Announcement;
 use App\Flare\Models\Event as ModelsEvent;
 use App\Game\Events\Jobs\InitiateWeeklyFactionLoyaltyEvent;
 use App\Game\Events\Values\EventType;
-use App\Game\Events\Jobs\InitiateWeeklyCelestialSpawnEvent;
-use App\Game\Events\Jobs\InitiateWeeklyCurrencyDropEvent;
+use App\Game\Messages\Events\GlobalMessageEvent;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
-use App\Game\Messages\Events\GlobalMessageEvent;
 use Tests\TestCase;
 use Tests\Traits\CreateScheduledEvent;
 
-class InitiateWeeklyFactionLoyaltyEventTest extends TestCase {
+class InitiateWeeklyFactionLoyaltyEventTest extends TestCase
+{
+    use CreateScheduledEvent, RefreshDatabase;
 
-    use RefreshDatabase, CreateScheduledEvent;
-
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
     }
 
-    public function testWeeklyCurrencyEventDoesNotTrigger() {
+    public function testWeeklyCurrencyEventDoesNotTrigger()
+    {
         Event::fake();
 
         InitiateWeeklyFactionLoyaltyEvent::dispatch(3);
@@ -36,11 +37,12 @@ class InitiateWeeklyFactionLoyaltyEventTest extends TestCase {
         $this->assertEmpty(ModelsEvent::all());
     }
 
-    public function testWeeklyCurrencyEventDoesTrigger() {
+    public function testWeeklyCurrencyEventDoesTrigger()
+    {
         Event::fake();
 
         $event = $this->createScheduledEvent([
-            'event_type' => EventType::WEEKLY_FACTION_LOYALTY_EVENT
+            'event_type' => EventType::WEEKLY_FACTION_LOYALTY_EVENT,
         ]);
 
         InitiateWeeklyFactionLoyaltyEvent::dispatch($event->id);

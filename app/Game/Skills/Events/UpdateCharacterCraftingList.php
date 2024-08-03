@@ -11,29 +11,29 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class UpdateCharacterCraftingList implements ShouldBroadcastNow {
+class UpdateCharacterCraftingList implements ShouldBroadcastNow
+{
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-
     /**
-     * @var array $items
+     * @var array
      */
     public $items;
 
     /**
-     * @var User $users
+     * @var User
      */
     public $user;
 
     /**
      * Create a new event instance.
      *
-     * @param User $user
-     * @param array $items
+     * @param  array  $items
      */
-    public function __construct(User $user, Collection $items) {
-        $this->user      = $user;
-        $this->items     = $items;
+    public function __construct(User $user, Collection $items)
+    {
+        $this->user = $user;
+        $this->items = $items;
     }
 
     /**
@@ -41,7 +41,8 @@ class UpdateCharacterCraftingList implements ShouldBroadcastNow {
      *
      * @return Channel|array
      */
-    public function broadcastOn() {
-        return new PrivateChannel('update-crafting-list-' . $this->user->id);
+    public function broadcastOn()
+    {
+        return new PrivateChannel('update-crafting-list-'.$this->user->id);
     }
 }

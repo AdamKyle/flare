@@ -2,16 +2,16 @@
 
 namespace App\Flare\Models;
 
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Spatie\Permission\Traits\HasRoles;
 use App\Game\Messages\Models\Message;
 use Database\Factories\UserFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable {
-
-    use Notifiable, HasRoles, HasFactory;
+class User extends Authenticatable
+{
+    use HasFactory, HasRoles, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -46,7 +46,7 @@ class User extends Authenticatable {
         'chat_text_color',
         'chat_is_bold',
         'chat_is_italic',
-        'name_tag'
+        'name_tag',
     ];
 
     /**
@@ -64,37 +64,40 @@ class User extends Authenticatable {
      * @var array
      */
     protected $casts = [
-        'email_verified_at'              => 'datetime',
-        'can_speak_again_at'             => 'datetime',
-        'last_logged_in'                 => 'datetime',
-        'is_silenced'                    => 'boolean',
-        'ignored_unban_request'          => 'boolean',
-        'message_throttle_count'         => 'integer',
-        'is_banned'                      => 'boolean',
-        'unbanned_at'                    => 'datetime',
-        'timeout_until'                  => 'datetime',
+        'email_verified_at' => 'datetime',
+        'can_speak_again_at' => 'datetime',
+        'last_logged_in' => 'datetime',
+        'is_silenced' => 'boolean',
+        'ignored_unban_request' => 'boolean',
+        'message_throttle_count' => 'integer',
+        'is_banned' => 'boolean',
+        'unbanned_at' => 'datetime',
+        'timeout_until' => 'datetime',
         'show_unit_recruitment_messages' => 'boolean',
         'show_building_upgrade_messages' => 'boolean',
-        'show_kingdom_update_messages'   => 'boolean',
+        'show_kingdom_update_messages' => 'boolean',
         'show_building_rebuilt_messages' => 'boolean',
         'show_monster_to_low_level_message' => 'boolean',
-        'auto_disenchant'                => 'boolean',
-        'disable_attack_type_popover'    => 'boolean',
-        'will_be_deleted'                => 'boolean',
-        'guide_enabled'                  => 'boolean',
-        'chat_is_bold'                   => 'boolean',
-        'chat_is_italic'                 => 'boolean',
+        'auto_disenchant' => 'boolean',
+        'disable_attack_type_popover' => 'boolean',
+        'will_be_deleted' => 'boolean',
+        'guide_enabled' => 'boolean',
+        'chat_is_bold' => 'boolean',
+        'chat_is_italic' => 'boolean',
     ];
 
-    public function character() {
+    public function character()
+    {
         return $this->hasOne(Character::class);
     }
 
-    public function messages() {
+    public function messages()
+    {
         return $this->hasMany(Message::class);
     }
 
-    protected static function newFactory() {
+    protected static function newFactory()
+    {
         return UserFactory::new();
     }
 }

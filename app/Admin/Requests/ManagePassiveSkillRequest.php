@@ -27,15 +27,15 @@ class ManagePassiveSkillRequest extends FormRequest
     public function rules()
     {
         return [
-            'name'                 => 'required|string',
-            'description'          => 'required|string',
-            'max_level'            => 'required|integer',
-            'effect_type'          => 'required|integer',
-            'hours_per_level'      => 'required|integer',
-            'parent_skill_id'      => 'nullable|integer',
-            'unlocks_at_level'     => 'nullable|integer',
-            'is_locked'            => 'nullable',
-            'is_parent'            => 'nullable',
+            'name' => 'required|string',
+            'description' => 'required|string',
+            'max_level' => 'required|integer',
+            'effect_type' => 'required|integer',
+            'hours_per_level' => 'required|integer',
+            'parent_skill_id' => 'nullable|integer',
+            'unlocks_at_level' => 'nullable|integer',
+            'is_locked' => 'nullable',
+            'is_parent' => 'nullable',
         ];
     }
 
@@ -44,13 +44,14 @@ class ManagePassiveSkillRequest extends FormRequest
      *
      * @return array
      */
-    public function messages() {
+    public function messages()
+    {
         return [
-            'name.required'                 => 'Missing name.',
-            'description.required'          => 'Missing description.',
-            'max_level.required'            => 'Missing max level.',
-            'effect_type.required'          => 'Missing effect type.',
-            'hours_per_level.required'      => 'Missing length of time per level.'
+            'name.required' => 'Missing name.',
+            'description.required' => 'Missing description.',
+            'max_level.required' => 'Missing max level.',
+            'effect_type.required' => 'Missing effect type.',
+            'hours_per_level.required' => 'Missing length of time per level.',
         ];
     }
 }

@@ -3,13 +3,14 @@
 namespace App\Admin\Import\Skills\Sheets;
 
 use App\Flare\Models\GameClass;
+use App\Flare\Models\GameSkill;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToCollection;
-use App\Flare\Models\GameSkill;
 
-class SkillsSheet implements ToCollection {
-
-    public function collection(Collection $rows) {
+class SkillsSheet implements ToCollection
+{
+    public function collection(Collection $rows)
+    {
 
         foreach ($rows as $index => $row) {
             if ($index !== 0) {
@@ -23,10 +24,10 @@ class SkillsSheet implements ToCollection {
                     $skill['is_locked'] = false;
                 }
 
-                if (!is_null($skill['game_class_id'])) {
+                if (! is_null($skill['game_class_id'])) {
                     $class = GameClass::find($skill['game_class_id']);
 
-                    if (!is_null($class)) {
+                    if (! is_null($class)) {
                         $skill['game_class_id'] = $class->id;
                     } else {
                         unset($skill['game_class_id']);

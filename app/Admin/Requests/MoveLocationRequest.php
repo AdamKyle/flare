@@ -37,7 +37,8 @@ class MoveLocationRequest extends FormRequest
      *
      * @return array
      */
-    public function messages() {
+    public function messages()
+    {
         return [
             'x.required' => 'Missing x position',
             'y.required' => 'Missing y position',

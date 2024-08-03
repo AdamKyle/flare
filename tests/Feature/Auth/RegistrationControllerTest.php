@@ -2,36 +2,34 @@
 
 namespace Tests\Feature\Auth;
 
-use App\Flare\Models\Character;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use App\Flare\Models\GameClass;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\GameRace;
-use App\Flare\Models\GameClass;
 use App\Flare\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabaseState;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateCharacter;
+use Tests\Traits\CreateClass;
 use Tests\Traits\CreateGameSkill;
+use Tests\Traits\CreateItem;
 use Tests\Traits\CreatePassiveSkill;
 use Tests\Traits\CreateRace;
-use Tests\Traits\CreateClass;
-use Tests\Traits\CreateCharacter;
 use Tests\Traits\CreateUser;
-use Tests\Traits\CreateItem;
-use Tests\Setup\Character\CharacterFactory;
 
 class RegistrationControllerTest extends TestCase
 {
-    use RefreshDatabase,
-        CreateRace,
+    use CreateCharacter,
         CreateClass,
-        CreateUser,
-        CreateItem,
-        CreateCharacter,
         CreateGameSkill,
-        CreatePassiveSkill;
+        CreateItem,
+        CreatePassiveSkill,
+        CreateRace,
+        CreateUser,
+        RefreshDatabase;
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
         $this->createItem([
@@ -43,11 +41,13 @@ class RegistrationControllerTest extends TestCase
         $this->createPassiveSkill();
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
     }
 
-    public function testCanSeeRegistration() {
+    public function testCanSeeRegistration()
+    {
         $this->visit('/login')
             ->click('Register')
             ->see('E-Mail Address')
@@ -61,15 +61,16 @@ class RegistrationControllerTest extends TestCase
             ->see('Register');
     }
 
-    public function testCanRegister() {
+    public function testCanRegister()
+    {
         GameMap::create([
-            'name'          => 'Surface',
-            'path'          => 'test path',
-            'default'       => true,
+            'name' => 'Surface',
+            'path' => 'test path',
+            'default' => true,
             'kingdom_color' => '#ffffff',
         ]);
 
-        $race  = $this->createRace([
+        $race = $this->createRace([
             'dex_mod' => 2,
         ]);
 
@@ -81,12 +82,12 @@ class RegistrationControllerTest extends TestCase
         $this->visit('/login')
             ->click('Register')
             ->submitForm('Register', [
-                'email'                 => 'a@example.net',
-                'password'              => 'TestExamplePassword',
+                'email' => 'a@example.net',
+                'password' => 'TestExamplePassword',
                 'password_confirmation' => 'TestExamplePassword',
-                'name'                  => 'bobtest',
-                'race'                  => $race->id,
-                'class'                 => $class->id,
+                'name' => 'bobtest',
+                'race' => $race->id,
+                'class' => $class->id,
             ])->dontSee('The name has already been taken.');
 
         $user = User::where('email', 'a@example.net')->first();
@@ -96,17 +97,18 @@ class RegistrationControllerTest extends TestCase
         $this->assertEquals($class->name, $user->character->class->name);
     }
 
-    public function testCannotRegisterWhenBanned() {
+    public function testCannotRegisterWhenBanned()
+    {
         GameMap::create([
-            'name'          => 'Surface',
-            'path'          => 'test path',
-            'default'       => true,
+            'name' => 'Surface',
+            'path' => 'test path',
+            'default' => true,
             'kingdom_color' => '#ffffff',
         ]);
 
         $this->createUser(['is_banned' => true]);
 
-        $race  = $this->createRace([
+        $race = $this->createRace([
             'dex_mod' => 2,
         ]);
 
@@ -118,19 +120,19 @@ class RegistrationControllerTest extends TestCase
         $this->visit('/login')
             ->click('Register')
             ->submitForm('Register', [
-                'email'                 => 'a@example.net',
-                'password'              => 'TestExamplePassword',
+                'email' => 'a@example.net',
+                'password' => 'TestExamplePassword',
                 'password_confirmation' => 'TestExamplePassword',
-                'name'                  => 'bobtest',
-                'race'                  => $race->id,
-                'class'                 => $class->id,
+                'name' => 'bobtest',
+                'race' => $race->id,
+                'class' => $class->id,
             ])->see('You have been banned until: ');
     }
 
+    public function testCannotRegisterWhenNoMap()
+    {
 
-    public function testCannotRegisterWhenNoMap() {
-
-        $race  = $this->createRace([
+        $race = $this->createRace([
             'dex_mod' => 2,
         ]);
 
@@ -142,24 +144,25 @@ class RegistrationControllerTest extends TestCase
         $this->visit('/login')
             ->click('Register')
             ->submitForm('Register', [
-                'email'                 => 'a@example.net',
-                'password'              => 'TestExamplePassword',
+                'email' => 'a@example.net',
+                'password' => 'TestExamplePassword',
                 'password_confirmation' => 'TestExamplePassword',
-                'name'                  => 'TestExample',
-                'race'                  => $race->id,
-                'class'                 => $class->id,
+                'name' => 'TestExample',
+                'race' => $race->id,
+                'class' => $class->id,
             ])->see('No game map has been set as default or created. Registration is disabled.');
     }
 
-    public function testCannotRegisterWhenCharacterExists() {
+    public function testCannotRegisterWhenCharacterExists()
+    {
         GameMap::create([
-            'name'          => 'Surface',
-            'path'          => 'test path',
-            'default'       => true,
+            'name' => 'Surface',
+            'path' => 'test path',
+            'default' => true,
             'kingdom_color' => '#ffffff',
         ]);
 
-        $race  = $this->createRace([
+        $race = $this->createRace([
             'dex_mod' => 2,
         ]);
 
@@ -173,20 +176,21 @@ class RegistrationControllerTest extends TestCase
         $this->visit('/login')
             ->click('Register')
             ->submitForm('Register', [
-                'email'                 => 'apples@apples.com',
-                'password'              => 'ReallyLongPassword',
+                'email' => 'apples@apples.com',
+                'password' => 'ReallyLongPassword',
                 'password_confirmation' => 'ReallyLongPassword',
-                'name'                  => $character->name,
-                'race'                  => $race->id,
-                'class'                 => $class->id,
+                'name' => $character->name,
+                'race' => $race->id,
+                'class' => $class->id,
             ])->see('The name has already been taken.');
     }
 
-    public function testCannotRegisterAnyMore() {
+    public function testCannotRegisterAnyMore()
+    {
         GameMap::create([
-            'name'          => 'Surface',
-            'path'          => 'test path',
-            'default'       => true,
+            'name' => 'Surface',
+            'path' => 'test path',
+            'default' => true,
             'kingdom_color' => '#ffffff',
         ]);
 
@@ -195,18 +199,19 @@ class RegistrationControllerTest extends TestCase
         $this->visit('/login')
             ->click('Register')
             ->submitForm('Register', [
-                'email'                 => 'a@example.net',
-                'password'              => 'TestExamplePassword',
+                'email' => 'a@example.net',
+                'password' => 'TestExamplePassword',
                 'password_confirmation' => 'TestExamplePassword',
-                'name'                  => 'bobtest',
-                'race'                  => GameRace::first()->id,
-                'class'                 => GameClass::first()->id,
+                'name' => 'bobtest',
+                'race' => GameRace::first()->id,
+                'class' => GameClass::first()->id,
             ])->see('You cannot register anymore characters.');
     }
 
-    protected function setupCharacters() {
+    protected function setupCharacters()
+    {
         for ($i = 1; $i <= 10; $i++) {
-            (new CharacterFactory())->createBaseCharacter();
+            (new CharacterFactory)->createBaseCharacter();
         }
     }
 }

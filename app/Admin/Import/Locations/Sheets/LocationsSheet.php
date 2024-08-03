@@ -2,32 +2,34 @@
 
 namespace App\Admin\Import\Locations\Sheets;
 
+use App\Flare\Models\GameMap;
+use App\Flare\Models\Item;
+use App\Flare\Models\Location;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToCollection;
-use App\Flare\Models\Item;
-use App\Flare\Models\GameMap;
-use App\Flare\Models\Location;
 
-class LocationsSheet implements ToCollection {
-
-    public function collection(Collection $rows) {
+class LocationsSheet implements ToCollection
+{
+    public function collection(Collection $rows)
+    {
         foreach ($rows as $index => $row) {
             if ($index !== 0) {
                 $data = array_combine($rows[0]->toArray(), $row->toArray());
                 $data = $this->returnCleanData($data);
 
-                if (!empty($data)) {
+                if (! empty($data)) {
                     Location::updateOrCreate(['name' => $data['name']], $data);
                 }
             }
         }
     }
 
-    protected function returnCleanData(array $locations): array {
+    protected function returnCleanData(array $locations): array
+    {
         $cleanData = [];
 
         foreach ($locations as $key => $value) {
-            if (!is_null($value)) {
+            if (! is_null($value)) {
                 if ($key === 'game_map_id') {
                     $gameMap = GameMap::where('name', $value)->first();
 
@@ -42,7 +44,7 @@ class LocationsSheet implements ToCollection {
                     $item = Item::where('name', $value)->first();
 
                     if (is_null($item)) {
-                        return[];
+                        return [];
                     }
 
                     $value = $item->id;
@@ -52,7 +54,7 @@ class LocationsSheet implements ToCollection {
                     $item = Item::where('name', $value)->first();
 
                     if (is_null($item)) {
-                        return[];
+                        return [];
                     }
 
                     $value = $item->id;
@@ -62,11 +64,11 @@ class LocationsSheet implements ToCollection {
             }
         }
 
-        if (!isset($cleanData['can_players_enter'])) {
+        if (! isset($cleanData['can_players_enter'])) {
             $cleanData['can_players_enter'] = false;
         }
 
-        if (!isset($cleanData['can_auto_battle'])) {
+        if (! isset($cleanData['can_auto_battle'])) {
             $cleanData['can_auto_battle'] = false;
         }
 

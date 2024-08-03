@@ -7,23 +7,25 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 
-class CharacterGemBagServiceTest extends TestCase {
-
+class CharacterGemBagServiceTest extends TestCase
+{
     use RefreshDatabase;
 
     private ?CharacterFactory $character;
 
     private ?CharacterGemBagService $characterGemBagService;
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
-        $this->character = (new CharacterFactory())->createBaseCharacter();
+        $this->character = (new CharacterFactory)->createBaseCharacter();
 
         $this->characterGemBagService = resolve(CharacterGemBagService::class);
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
 
         $this->character = null;
@@ -31,7 +33,8 @@ class CharacterGemBagServiceTest extends TestCase {
         $this->characterGemBagService = null;
     }
 
-    public function testGetCharacterGems() {
+    public function testGetCharacterGems()
+    {
         $character = $this->character->gemBagManagement()->assignGemsToBag()->getCharacter();
 
         $result = $this->characterGemBagService->getGems($character);
@@ -40,7 +43,8 @@ class CharacterGemBagServiceTest extends TestCase {
         $this->assertNotEmpty($result['gem_slots']);
     }
 
-    public function testGetGemData() {
+    public function testGetGemData()
+    {
         $character = $this->character->gemBagManagement()->assignGemsToBag()->getCharacter();
 
         $result = $this->characterGemBagService->getGemData($character, $character->gemBag->gemSlots->first());
@@ -49,10 +53,11 @@ class CharacterGemBagServiceTest extends TestCase {
         $this->assertNotEmpty($result['gem']);
     }
 
-    public function testCannotGetGemData() {
+    public function testCannotGetGemData()
+    {
         $character = $this->character->gemBagManagement()->assignGemsToBag()->getCharacter();
 
-        $secondCharacter = (new CharacterFactory())->createBaseCharacter()->gemBagManagement()->assignGemsToBag()->getCharacter();
+        $secondCharacter = (new CharacterFactory)->createBaseCharacter()->gemBagManagement()->assignGemsToBag()->getCharacter();
 
         $result = $this->characterGemBagService->getGemData($character, $secondCharacter->gemBag->gemSlots->first());
 

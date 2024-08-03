@@ -25,49 +25,37 @@ use App\Game\Maps\Services\Common\UpdateRaidMonstersForLocation;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
 
-class LocationService {
+class LocationService
+{
+    use CanPlayerMassEmbezzle, KingdomCache, LiveCharacterCount, UpdateRaidMonstersForLocation;
 
-    use KingdomCache, LiveCharacterCount, CanPlayerMassEmbezzle, UpdateRaidMonstersForLocation;
-
-    /**
-     * @var CoordinatesCache $coordinatesCache
-     */
     private CoordinatesCache $coordinatesCache;
 
-    /**
-     * @var CharacterCacheData $characterCacheData
-     */
     private CharacterCacheData $characterCacheData;
 
-    /**
-     * @var UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes
-     */
     private UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes;
 
     /**
-     * @var ?Location $location | null
+     * @var ?Location | null
      */
     private ?Location $location;
 
     /**
-     * @var bool $canSettle | false
+     * @var bool | false
      */
     private bool $canSettle = false;
 
     private bool $isEventBasedUpdate = false;
 
-    /**
-     * @param CoordinatesCache $coordinatesCache
-     * @param CharacterCacheData $characterCacheData
-     * @param UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes
-     */
-    public function __construct(CoordinatesCache $coordinatesCache, CharacterCacheData $characterCacheData, UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes) {
-        $this->coordinatesCache           = $coordinatesCache;
-        $this->characterCacheData         = $characterCacheData;
+    public function __construct(CoordinatesCache $coordinatesCache, CharacterCacheData $characterCacheData, UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes)
+    {
+        $this->coordinatesCache = $coordinatesCache;
+        $this->characterCacheData = $characterCacheData;
         $this->updateCharacterAttackTypes = $updateCharacterAttackTypes;
     }
 
-    public function setIsEventBasedUpdate(bool $isEventBased): LocationService {
+    public function setIsEventBasedUpdate(bool $isEventBased): LocationService
+    {
         $this->isEventBasedUpdate = $isEventBased;
 
         return $this;
@@ -75,12 +63,9 @@ class LocationService {
 
     /**
      * Get location data
-     *
-     * @param Character $character
-     * @param Raid|null $raid
-     * @return array
      */
-    public function getLocationData(Character $character, ?Raid $raid = null): array {
+    public function getLocationData(Character $character, ?Raid $raid = null): array
+    {
 
         $this->locationBasedEvents($character);
 
@@ -89,30 +74,28 @@ class LocationService {
         $lockedLocation = $this->getLockedLocation($character);
 
         return [
-            'map_url'                => Storage::disk('maps')->url($character->map_url),
-            'character_map'          => $character->map,
-            'locations'              => $this->fetchLocationData($character)->merge($this->fetchCorruptedLocationData($raid)),
-            'can_move'               => $character->can_move,
-            'can_move_again_at'      => $character->can_move_again_at,
-            'coordinates'            => $this->coordinatesCache->getFromCache(),
-            'celestial_id'           => $this->getCelestialEntityId($character),
-            'can_settle_kingdom'     => $this->canSettle,
-            'my_kingdoms'            => $this->getKingdoms($character),
-            'npc_kingdoms'           => Kingdom::select('id', 'x_position', 'y_position', 'npc_owned', 'name')->whereNull('character_id')->where('game_map_id', $character->map->game_map_id)->where('npc_owned', true)->get(),
-            'other_kingdoms'         => $this->getEnemyKingdoms($character),
-            'characters_on_map'      => $this->getActiveUsersCountForMap($character),
-            'lockedLocationType'     => is_null($lockedLocation) ? null : $lockedLocation->type,
-            'is_event_based'         => $this->isEventBasedUpdate,
+            'map_url' => Storage::disk('maps')->url($character->map_url),
+            'character_map' => $character->map,
+            'locations' => $this->fetchLocationData($character)->merge($this->fetchCorruptedLocationData($raid)),
+            'can_move' => $character->can_move,
+            'can_move_again_at' => $character->can_move_again_at,
+            'coordinates' => $this->coordinatesCache->getFromCache(),
+            'celestial_id' => $this->getCelestialEntityId($character),
+            'can_settle_kingdom' => $this->canSettle,
+            'my_kingdoms' => $this->getKingdoms($character),
+            'npc_kingdoms' => Kingdom::select('id', 'x_position', 'y_position', 'npc_owned', 'name')->whereNull('character_id')->where('game_map_id', $character->map->game_map_id)->where('npc_owned', true)->get(),
+            'other_kingdoms' => $this->getEnemyKingdoms($character),
+            'characters_on_map' => $this->getActiveUsersCountForMap($character),
+            'lockedLocationType' => is_null($lockedLocation) ? null : $lockedLocation->type,
+            'is_event_based' => $this->isEventBasedUpdate,
         ];
     }
 
     /**
      * Fire off location based events.
-     *
-     * @param Character $character
-     * @return void
      */
-    public function locationBasedEvents(Character $character): void {
+    public function locationBasedEvents(Character $character): void
+    {
         $this->processLocation($character);
 
         // In case automation is running, this way the timer updates.
@@ -141,11 +124,9 @@ class LocationService {
 
     /**
      * Fetch the locations for this map the characters on.
-     *
-     * @param Character $character
-     * @return Collection
      */
-    public function fetchLocationData(Character $character): Collection {
+    public function fetchLocationData(Character $character): Collection
+    {
         $locations = Location::with('questRewardItem')->where('game_map_id', $character->map->game_map_id)->get();
 
         return $this->transformLocationData($locations);
@@ -153,27 +134,23 @@ class LocationService {
 
     /**
      * Fetch locations based on map.
-     *
-     * @param GameMap $map
-     * @return Collection
      */
-    public function fetchLocationsForMap(GameMap $map): Collection {
+    public function fetchLocationsForMap(GameMap $map): Collection
+    {
         $locations = Location::with('questRewardItem')->where('game_map_id', $map->id)->get();
 
         return $this->transformLocationData($locations);
     }
-
 
     /**
      * Fetch corrupted locatuions based on the raid.
      *
      * If no raid is set, return an empty collection.
      *
-     * @param ?Raid $raid
-     * @return Collection
-     *
+     * @param  ?Raid  $raid
      */
-    public function fetchCorruptedLocationData(?Raid $raid = null): Collection {
+    public function fetchCorruptedLocationData(?Raid $raid = null): Collection
+    {
 
         if (is_null($raid)) {
             return collect();
@@ -190,18 +167,16 @@ class LocationService {
 
     /**
      * Add additional data to the location data.
-     *
-     * @param Collection $locations
-     * @return Collection
      */
-    protected function transformLocationData(Collection $locations): Collection {
+    protected function transformLocationData(Collection $locations): Collection
+    {
         return $locations->transform(function ($location) {
 
-            $location->increases_enemy_stats_by      = null;
-            $location->increase_enemy_percentage_by  = null;
-            $location->type_name                     = null;
+            $location->increases_enemy_stats_by = null;
+            $location->increase_enemy_percentage_by = null;
+            $location->type_name = null;
 
-            if (!is_null($location->type)) {
+            if (! is_null($location->type)) {
                 if ((new LocationType($location->type))->isPurgatorySmithHouse()) {
                     $location->type_name = 'Purgatory Smiths House';
                 }
@@ -215,11 +190,11 @@ class LocationService {
                 }
             }
 
-            if (!is_null($location->enemy_strength_type)) {
-                $location->increases_enemy_stats_by     = LocationEffectValue::getIncreaseByAmount($location->enemy_strength_type);
+            if (! is_null($location->enemy_strength_type)) {
+                $location->increases_enemy_stats_by = LocationEffectValue::getIncreaseByAmount($location->enemy_strength_type);
                 $location->increase_enemy_percentage_by = LocationEffectValue::fetchPercentageIncrease($location->enemy_strength_type);
 
-                if (!is_null($location->type)) {
+                if (! is_null($location->type)) {
                     $locationType = new LocationType($location->type);
 
                     if ($locationType->isGoldMines()) {
@@ -238,7 +213,7 @@ class LocationService {
 
             $location->required_quest_item_name = null;
 
-            if (!is_null($location->required_quest_item_id)) {
+            if (! is_null($location->required_quest_item_id)) {
                 $location->required_quest_item_name = $location->requiredQuestItem->name;
             }
 
@@ -250,11 +225,9 @@ class LocationService {
 
     /**
      * Is there a celestial entity at the characters' location?
-     *
-     * @param Character $character
-     * @return int|null
      */
-    protected function getCelestialEntityId(Character $character): int|null {
+    protected function getCelestialEntityId(Character $character): ?int
+    {
 
         $fight = CelestialFight::with('monster')->join('monsters', function ($join) use ($character) {
             $join->on('monsters.id', 'celestial_fights.monster_id')
@@ -263,7 +236,7 @@ class LocationService {
                 ->where('monsters.game_map_id', $character->map->gameMap->id);
         })->select('celestial_fights.id')->first();
 
-        if (!is_null($fight)) {
+        if (! is_null($fight)) {
             return $fight->id;
         }
 
@@ -276,11 +249,9 @@ class LocationService {
      * We will fetch the location information for the character position.
      *
      * This includes port details and any relevant adventures the location might have.
-     *
-     * @param Character $character
-     * @return void
      */
-    protected function processLocation(Character $character): void {
+    protected function processLocation(Character $character): void
+    {
         $this->location = Location::where('x', $character->x_position)
             ->where('y', $character->y_position)
             ->where('game_map_id', $character->map->game_map_id)
@@ -293,11 +264,9 @@ class LocationService {
      * Based on the character position, if there is a kingdom or not.
      * We determine the action the player can take. That is, can they settle?
      * Can they attack the kingdom or can they manage the kingdom?
-     *
-     * @param Character $character
-     * @return void
      */
-    protected function kingdomManagement(Character $character): void {
+    protected function kingdomManagement(Character $character): void
+    {
         if (is_null($this->location)) {
             $this->canSettle = true;
         }
@@ -305,11 +274,9 @@ class LocationService {
 
     /**
      * Gets locked location details.
-     *
-     * @param Character $character
-     * @return Location|null
      */
-    protected function getLockedLocation(Character $character): ?Location {
+    protected function getLockedLocation(Character $character): ?Location
+    {
         return Location::where('x', $character->map->character_position_x)
             ->where('y', $character->map->character_position_y)
             ->where('game_map_id', $character->map->game_map_id)

@@ -28,7 +28,8 @@ class UseManyItemsValidation extends FormRequest
         ];
     }
 
-    public function messages() {
+    public function messages()
+    {
         return [
             'items_to_use.required' => 'You must select some items to use.',
         ];

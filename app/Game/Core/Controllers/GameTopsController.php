@@ -6,16 +6,18 @@ use App\Flare\Models\Character;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Cache;
 
-class GameTopsController extends Controller {
-
-    public function tops() {
+class GameTopsController extends Controller
+{
+    public function tops()
+    {
         return view('game.tops.characters');
     }
 
-    public function characterStats(Character $character) {
+    public function characterStats(Character $character)
+    {
         return view('game.tops.character-info', [
-            'character'  => $character,
-            'attackData' => Cache::get('character-attack-data-' . $character->id)['attack_types'],
+            'character' => $character,
+            'attackData' => Cache::get('character-attack-data-'.$character->id)['attack_types'],
         ]);
     }
 }

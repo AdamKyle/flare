@@ -5,13 +5,12 @@ namespace App\Flare\Middleware;
 use App\Flare\Models\Character;
 use Closure;
 
-class IsCharacterWhoTheySayTheyAreMiddleware {
-
+class IsCharacterWhoTheySayTheyAreMiddleware
+{
     /**
      * Handle an incoming request.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
      * @param  string|null  $guard
      * @return mixed
      */
@@ -40,35 +39,35 @@ class IsCharacterWhoTheySayTheyAreMiddleware {
 
         $character = $request->route('character');
 
-        $user      = $request->route('user');
+        $user = $request->route('user');
         $canAccess = true;
 
         // REMINDER: Chances are the method (on the controller) does not exist if you need to uncomment this.
         // or, you forgot to pass character to the controller action
-//        if (is_string($character)) {
-//            $character = Character::find($character);
-//            dump($character);
-//        }
+        //        if (is_string($character)) {
+        //            $character = Character::find($character);
+        //            dump($character);
+        //        }
 
-        if (!is_null($character)) {
+        if (! is_null($character)) {
             if (auth()->user()->character->id !== $character->id) {
                 $canAccess = false;
             }
         }
 
-        if (!is_null($user)) {
+        if (! is_null($user)) {
             if (auth()->user()->id !== $user->id) {
                 $canAccess = false;
             }
         }
 
         if ($request->wantsJson()) {
-            if (!$canAccess) {
+            if (! $canAccess) {
                 return response()->json([
                     'error' => 'You don\'t have permission to do that.',
                 ], 422);
             }
-        } else if (!$canAccess) {
+        } elseif (! $canAccess) {
             return redirect()->route('game')->with('error', 'You don\'t have permission to do that.');
         }
 

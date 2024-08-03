@@ -3,8 +3,8 @@
 namespace App\Game\Core\Listeners;
 
 use App\Game\Battle\Events\UpdateCharacterStatus;
-use App\Game\Core\Events\ShowCraftingTimeOutEvent;
 use App\Game\Core\Events\CraftedItemTimeOutEvent;
+use App\Game\Core\Events\ShowCraftingTimeOutEvent;
 use App\Game\Core\Jobs\CraftTimeOutJob;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 
@@ -16,8 +16,7 @@ class CraftedItemTimeOutListener
 
         if (is_null($event->setTime)) {
 
-
-            if (!is_null($event->extraTime)) {
+            if (! is_null($event->extraTime)) {
                 switch ($event->extraTime) {
                     case 'double':
                         $timeOut = 20;
@@ -35,12 +34,12 @@ class CraftedItemTimeOutListener
             }
         }
 
-        if (!is_null($event->setTime)) {
+        if (! is_null($event->setTime)) {
             $timeOut = $event->setTime;
         }
 
         $event->character->update([
-            'can_craft'          => false,
+            'can_craft' => false,
             'can_craft_again_at' => now()->addSeconds($timeOut),
         ]);
 

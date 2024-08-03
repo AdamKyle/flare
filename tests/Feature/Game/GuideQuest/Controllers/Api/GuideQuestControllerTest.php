@@ -9,39 +9,42 @@ use Tests\TestCase;
 use Tests\Traits\CreateGuideQuest;
 use Tests\Traits\CreateItem;
 
-class GuideQuestControllerTest extends TestCase {
-
-    use RefreshDatabase, CreateGuideQuest, CreateItem;
+class GuideQuestControllerTest extends TestCase
+{
+    use CreateGuideQuest, CreateItem, RefreshDatabase;
 
     private ?CharacterFactory $character = null;
 
     private ?Item $item = null;
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
-        $this->character = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
+        $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
 
         $this->item = $this->createItem(['type' => 'quest']);
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
 
         $this->character = null;
-        $this->item      = null;
+        $this->item = null;
     }
 
-    public function testNextGuideQuestHasOneOfTheRequirementsWhenCompletingThePreviousQuest() {
+    public function testNextGuideQuestHasOneOfTheRequirementsWhenCompletingThePreviousQuest()
+    {
         $guideQuestToHandIn = $this->createGuideQuest([
-            'name'           => 'hand in',
+            'name' => 'hand in',
             'required_level' => 1,
         ]);
 
         $this->createGuideQuest([
-            'name'                   => 'secondary guide quest',
+            'name' => 'secondary guide quest',
             'required_quest_item_id' => $this->item->id,
-            'required_level'         => 20,
+            'required_level' => 20,
         ]);
 
         $character = $this->character->updateUser(['guide_enabled' => true])
@@ -50,8 +53,8 @@ class GuideQuestControllerTest extends TestCase {
             ->getCharacter();
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/guide-quests/hand-in/' . $character->user->id . '/' . $guideQuestToHandIn->id, [
-                '_token' => csrf_token()
+            ->call('POST', '/api/guide-quests/hand-in/'.$character->user->id.'/'.$guideQuestToHandIn->id, [
+                '_token' => csrf_token(),
             ]);
 
         $jsonData = json_decode($response->getContent(), true);

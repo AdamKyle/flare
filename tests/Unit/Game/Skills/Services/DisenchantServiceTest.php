@@ -2,26 +2,19 @@
 
 namespace Tests\Unit\Game\Skills\Services;
 
-use App\Flare\Values\ArmourTypes;
+use App\Flare\Models\GameSkill;
+use App\Flare\Models\Item;
 use App\Flare\Values\ItemEffectsValue;
-use App\Flare\Values\ItemUsabilityType;
 use App\Flare\Values\MaxCurrenciesValue;
-use App\Flare\Values\SpellTypes;
-use App\Flare\Values\WeaponTypes;
 use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Messages\Builders\ServerMessageBuilder;
+use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Skills\Events\UpdateCharacterEnchantingList;
-use App\Game\Skills\Services\CraftingService;
 use App\Game\Skills\Services\DisenchantService;
 use App\Game\Skills\Services\SkillCheckService;
-use Illuminate\Support\Facades\Event;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Flare\Models\Item;
-use App\Flare\Values\CharacterClassValue;
-use App\Flare\Models\GameSkill;
 use App\Game\Skills\Values\SkillTypeValue;
-use App\Game\Messages\Events\ServerMessageEvent;
-use App\Game\Skills\Services\AlchemyService;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Event;
 use Mockery;
 use Mockery\MockInterface;
 use Tests\Setup\Character\CharacterFactory;
@@ -31,9 +24,9 @@ use Tests\Traits\CreateGameSkill;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateItemAffix;
 
-class DisenchantServiceTest extends TestCase {
-
-    use RefreshDatabase, CreateItem, CreateClass, CreateGameSkill, CreateItemAffix;
+class DisenchantServiceTest extends TestCase
+{
+    use CreateClass, CreateGameSkill, CreateItem, CreateItemAffix, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -45,7 +38,8 @@ class DisenchantServiceTest extends TestCase {
 
     private ?GameSkill $disenchantingSkill;
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
         $this->enchantingSkill = $this->createGameSkill([
@@ -58,40 +52,42 @@ class DisenchantServiceTest extends TestCase {
             'type' => SkillTypeValue::DISENCHANTING,
         ]);
 
-        $this->character = (new CharacterFactory())->createBaseCharacter()->assignSkill(
+        $this->character = (new CharacterFactory)->createBaseCharacter()->assignSkill(
             $this->disenchantingSkill
         )->assignSkill($this->enchantingSkill)->givePlayerLocation();
 
         $this->disenchantService = resolve(DisenchantService::class);
 
         $this->itemToDisenchant = $this->createItem([
-            'cost'                 => 1000,
+            'cost' => 1000,
             'skill_level_required' => 1,
-            'skill_level_trivial'  => 100,
-            'crafting_type'        => 'weapon',
-            'type'                 => 'weapon',
-            'can_craft'            => true,
-            'default_position'     => 'hammer',
-            'item_prefix_id'       => $this->createItemAffix([
+            'skill_level_trivial' => 100,
+            'crafting_type' => 'weapon',
+            'type' => 'weapon',
+            'can_craft' => true,
+            'default_position' => 'hammer',
+            'item_prefix_id' => $this->createItemAffix([
                 'type' => 'prefix',
             ]),
-            'item_suffix_id'       => $this->createItemAffix([
+            'item_suffix_id' => $this->createItemAffix([
                 'type' => 'prefix',
-            ])
+            ]),
         ]);
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
 
-        $this->character         = null;
+        $this->character = null;
         $this->disenchantService = null;
-        $this->itemToDisenchant  = null;
+        $this->itemToDisenchant = null;
         $this->disenchantingSkill = null;
-        $this->enchantingSkill   = null;
+        $this->enchantingSkill = null;
     }
 
-    public function testDisenchantTheItemAndRemoveTheItemFromTheInventory() {
+    public function testDisenchantTheItemAndRemoveTheItemFromTheInventory()
+    {
         Event::fake();
 
         $character = $this->character->inventoryManagement()->giveItem($this->itemToDisenchant)->getCharacter();
@@ -107,7 +103,8 @@ class DisenchantServiceTest extends TestCase {
         Event::assertDispatched(UpdateCharacterEnchantingList::class);
     }
 
-    public function testDisenchantTheItemAndRemoveTheItemFromTheInventoryWithQuestItemForGoldDustRush() {
+    public function testDisenchantTheItemAndRemoveTheItemFromTheInventoryWithQuestItemForGoldDustRush()
+    {
         Event::fake();
 
         $this->instance(
@@ -122,7 +119,7 @@ class DisenchantServiceTest extends TestCase {
 
         $character = $this->character->inventoryManagement()->giveItem($this->itemToDisenchant)->giveItem(
             $this->createItem([
-                'type'   => 'quest',
+                'type' => 'quest',
                 'effect' => ItemEffectsValue::GOLD_DUST_RUSH,
             ])
         )->getCharacter();
@@ -138,7 +135,8 @@ class DisenchantServiceTest extends TestCase {
         Event::assertDispatched(UpdateCharacterEnchantingList::class);
     }
 
-    public function testDisenchantItemSuccessfully() {
+    public function testDisenchantItemSuccessfully()
+    {
         Event::fake();
 
         $this->instance(
@@ -165,7 +163,8 @@ class DisenchantServiceTest extends TestCase {
         Event::assertDispatched(UpdateCharacterEnchantingList::class);
     }
 
-    public function testDisenchantItemSuccessfullyAndGetMaxGoldDustFromARush() {
+    public function testDisenchantItemSuccessfullyAndGetMaxGoldDustFromARush()
+    {
         Event::fake();
 
         $skillCheckServiceMock = Mockery::mock(SkillCheckService::class);
@@ -206,7 +205,8 @@ class DisenchantServiceTest extends TestCase {
         Event::assertDispatched(UpdateCharacterEnchantingList::class);
     }
 
-    public function testDisenchantItemSuccessfullyAndDoNotGetAGoldRushButDoMaxGoldDust() {
+    public function testDisenchantItemSuccessfullyAndDoNotGetAGoldRushButDoMaxGoldDust()
+    {
         Event::fake();
 
         $skillCheckServiceMock = Mockery::mock(SkillCheckService::class);
@@ -247,7 +247,8 @@ class DisenchantServiceTest extends TestCase {
         Event::assertDispatched(UpdateCharacterEnchantingList::class);
     }
 
-    public function testDisenchantFailToItem() {
+    public function testDisenchantFailToItem()
+    {
         Event::fake();
 
         $this->instance(
@@ -273,12 +274,13 @@ class DisenchantServiceTest extends TestCase {
 
         Event::assertDispatched(UpdateCharacterEnchantingList::class);
 
-        Event::assertDispatched(function (ServerMessageEvent $event) use($character) {
+        Event::assertDispatched(function (ServerMessageEvent $event) {
             return $event->message === resolve(ServerMessageBuilder::class)->build('failed_to_disenchant');
         });
     }
 
-    public function testGivePlayerGoldDustRush() {
+    public function testGivePlayerGoldDustRush()
+    {
         Event::fake();
 
         $this->instance(
@@ -294,8 +296,8 @@ class DisenchantServiceTest extends TestCase {
         $disenchantingService->__construct(resolve(SkillCheckService::class), resolve(CharacterInventoryService::class));
 
         $disenchantingService->shouldAllowMockingProtectedMethods()
-                             ->shouldReceive('fetchDCRoll')
-                             ->andReturn(1000);
+            ->shouldReceive('fetchDCRoll')
+            ->andReturn(1000);
 
         $character = $this->character->inventoryManagement()->giveItem($this->itemToDisenchant)->giveItem($this->createItem([
             'type' => 'quest',
@@ -316,7 +318,8 @@ class DisenchantServiceTest extends TestCase {
         Event::assertDispatched(ServerMessageEvent::class);
     }
 
-    public function testGivePlayerGoldDustRushWhenGoldDustCapped() {
+    public function testGivePlayerGoldDustRushWhenGoldDustCapped()
+    {
         Event::fake();
 
         $disenchantingService = resolve(DisenchantService::class);
@@ -344,7 +347,8 @@ class DisenchantServiceTest extends TestCase {
         Event::assertDispatched(UpdateCharacterEnchantingList::class);
     }
 
-    public function testCallDisenchantItemAndSucceed() {
+    public function testCallDisenchantItemAndSucceed()
+    {
         Event::fake();
 
         $this->instance(
@@ -366,7 +370,8 @@ class DisenchantServiceTest extends TestCase {
         $this->assertGreaterThan(0, $character->gold_dust);
     }
 
-    public function testCallDisenchantItemAndSucceedButGetNoGoldDustWhenMaxed() {
+    public function testCallDisenchantItemAndSucceedButGetNoGoldDustWhenMaxed()
+    {
         Event::fake();
 
         $this->instance(
@@ -392,7 +397,8 @@ class DisenchantServiceTest extends TestCase {
         $this->assertEquals(MaxCurrenciesValue::MAX_GOLD_DUST, $character->gold_dust);
     }
 
-    public function testCallDisenchantItemAndFail() {
+    public function testCallDisenchantItemAndFail()
+    {
         Event::fake();
 
         $character = $this->character->getCharacter();
@@ -414,7 +420,7 @@ class DisenchantServiceTest extends TestCase {
         $this->assertEmpty($character->inventory->slots);
         $this->assertEquals(1, $character->gold_dust);
 
-        Event::assertDispatched(function (ServerMessageEvent $event) use($character) {
+        Event::assertDispatched(function (ServerMessageEvent $event) {
             return $event->message === resolve(ServerMessageBuilder::class)->build('failed_to_disenchant');
         });
     }

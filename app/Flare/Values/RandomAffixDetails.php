@@ -4,22 +4,25 @@ namespace App\Flare\Values;
 
 use Exception;
 
-class RandomAffixDetails {
-
+class RandomAffixDetails
+{
     /**
-     * @var string $value
+     * @var string
      */
     private $value;
 
-    const BASIC     = 2000000000;
-    const MEDIUM    = 4000000000;
-    const LEGENDARY = 80000000000;
-    const MYTHIC    = 500000000000;
-    const COSMIC    = 1000000000000;
+    const BASIC = 2000000000;
 
+    const MEDIUM = 4000000000;
+
+    const LEGENDARY = 80000000000;
+
+    const MYTHIC = 500000000000;
+
+    const COSMIC = 1000000000000;
 
     /**
-     * @var int[] $values
+     * @var int[]
      */
     protected static $values = [
         0 => self::BASIC,
@@ -32,18 +35,19 @@ class RandomAffixDetails {
     /**
      * Throws if the value does not exist in the array of const values.
      *
-     * @param int $value
      * @throws Exception
      */
-    public function __construct(int $value) {
-        if (!in_array($value, self::$values)) {
-            throw new Exception($value . ' does not exist.');
+    public function __construct(int $value)
+    {
+        if (! in_array($value, self::$values)) {
+            throw new Exception($value.' does not exist.');
         }
 
         $this->value = $value;
     }
 
-    public function getPercentageRange(): array {
+    public function getPercentageRange(): array
+    {
         switch ($this->value) {
             case self::MEDIUM:
                 return [50, 150];
@@ -59,7 +63,8 @@ class RandomAffixDetails {
         }
     }
 
-    public function getDamageRange(): array {
+    public function getDamageRange(): array
+    {
         switch ($this->value) {
             case self::MEDIUM:
                 return [35, 85];
@@ -75,7 +80,8 @@ class RandomAffixDetails {
         }
     }
 
-    public static function names(): array {
+    public static function names(): array
+    {
         return [
             'Petrifying Hatred of Disease',
             'Almighty Rage of the Dead',
@@ -94,7 +100,7 @@ class RandomAffixDetails {
             'Tranquility Gift',
             'Putrefaction of Mortality',
             'Beam of Lightning',
-            'Burst of Precision'
+            'Burst of Precision',
         ];
     }
 }

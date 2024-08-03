@@ -3,8 +3,8 @@
 namespace App\Game\Kingdoms\Console\Commands;
 
 use App\Flare\Jobs\UpdateKingdomJob;
-use Illuminate\Console\Command;
 use App\Flare\Models\Kingdom;
+use Illuminate\Console\Command;
 
 class UpdateKingdoms extends Command
 {
@@ -39,7 +39,7 @@ class UpdateKingdoms extends Command
      */
     public function handle()
     {
-        Kingdom::chunkById(250, function($kingdoms) {
+        Kingdom::chunkById(250, function ($kingdoms) {
             foreach ($kingdoms as $kingdom) {
                 UpdateKingdomJob::dispatch($kingdom->id)->onConnection('kingdom_jobs');
             }

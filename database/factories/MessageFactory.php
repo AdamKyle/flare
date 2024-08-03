@@ -2,8 +2,8 @@
 
 namespace Database\Factories;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Game\Messages\Models\Message;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 class MessageFactory extends Factory
 {
@@ -22,10 +22,10 @@ class MessageFactory extends Factory
     public function definition()
     {
         return [
-            'user_id'    => null,
-            'message'    => 'Test message',
-            'from_user'  => null,
-            'to_user'    => null,
+            'user_id' => null,
+            'message' => 'Test message',
+            'from_user' => null,
+            'to_user' => null,
             'x_position' => 16,
             'y_position' => 16,
         ];

@@ -22,23 +22,25 @@ use Tests\Traits\CreateGameMap;
 use Tests\Traits\CreateGlobalEventGoal;
 use Tests\Traits\CreateMonster;
 
-class BattleRewardServiceTest extends TestCase {
-
-    use RefreshDatabase, CreateMonster, CreateGameMap, CreateEvent, CreateGlobalEventGoal;
+class BattleRewardServiceTest extends TestCase
+{
+    use CreateEvent, CreateGameMap, CreateGlobalEventGoal, CreateMonster, RefreshDatabase;
 
     private ?BattleRewardService $battleRewardService;
 
     private ?CharacterFactory $characterFactory;
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
         $this->battleRewardService = resolve(BattleRewardService::class);
 
-        $this->characterFactory    = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
+        $this->characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         if (ModelsEvent::count() > 0) {
             foreach (ModelsEvent::all() as $event) {
                 $event->delete();
@@ -52,10 +54,11 @@ class BattleRewardServiceTest extends TestCase {
         $this->characterFactory = null;
     }
 
-    public function testShouldNotUpdateCharacterCurrenciesWhenNotLoggedIn() {
+    public function testShouldNotUpdateCharacterCurrenciesWhenNotLoggedIn()
+    {
         $character = $this->characterFactory->getCharacter();
 
-        $monster   = $this->createMonster([
+        $monster = $this->createMonster([
             'game_map_id' => $character->map->game_map_id,
         ]);
 
@@ -68,7 +71,8 @@ class BattleRewardServiceTest extends TestCase {
         Event::assertNotDispatched(UpdateCharacterCurrenciesEvent::class);
     }
 
-    public function testShouldReceiveLessXpWhenTrainingASkill() {
+    public function testShouldReceiveLessXpWhenTrainingASkill()
+    {
         $character = $this->characterFactory->getCharacter();
 
         $character->skills()->where('game_skill_id', GameSkill::where('name', 'Accuracy')->first()->id)->update([
@@ -78,19 +82,19 @@ class BattleRewardServiceTest extends TestCase {
 
         $character = $character->refresh();
 
-        $monster   = $this->createMonster([
+        $monster = $this->createMonster([
             'game_map_id' => $character->map->game_map_id,
-            'xp'          => 50,
+            'xp' => 50,
         ]);
 
         DB::table('sessions')->truncate();
 
         DB::table('sessions')->insert([[
-            'id'           => '1',
-            'user_id'      => $character->refresh()->user->id,
-            'ip_address'   => '1',
-            'user_agent'   => '1',
-            'payload'      => '1',
+            'id' => '1',
+            'user_id' => $character->refresh()->user->id,
+            'ip_address' => '1',
+            'user_agent' => '1',
+            'payload' => '1',
             'last_activity' => 1602801731,
         ]]);
 
@@ -107,7 +111,8 @@ class BattleRewardServiceTest extends TestCase {
         $this->assertLessThan($monster->xp, $character->xp);
     }
 
-    public function testShouldReceiveFullXpWhenTrainingASkillThatIsMaxLevel() {
+    public function testShouldReceiveFullXpWhenTrainingASkillThatIsMaxLevel()
+    {
         $character = $this->characterFactory->getCharacter();
 
         $accuracySkill = GameSkill::where('name', 'Accuracy')->first();
@@ -115,25 +120,25 @@ class BattleRewardServiceTest extends TestCase {
         $character->skills()->where('game_skill_id', $accuracySkill->id)->update([
             'currently_training' => true,
             'xp_towards' => 0.10,
-            'level' => $accuracySkill->max_level
+            'level' => $accuracySkill->max_level,
         ]);
 
         $character = $character->refresh();
 
-        $monster   = $this->createMonster([
+        $monster = $this->createMonster([
             'game_map_id' => $character->map->game_map_id,
-            'xp'          => 50,
-            'max_level'   => 9999,
+            'xp' => 50,
+            'max_level' => 9999,
         ]);
 
         DB::table('sessions')->truncate();
 
         DB::table('sessions')->insert([[
-            'id'           => '1',
-            'user_id'      => $character->refresh()->user->id,
-            'ip_address'   => '1',
-            'user_agent'   => '1',
-            'payload'      => '1',
+            'id' => '1',
+            'user_id' => $character->refresh()->user->id,
+            'ip_address' => '1',
+            'user_agent' => '1',
+            'payload' => '1',
             'last_activity' => 1602801731,
         ]]);
 
@@ -150,21 +155,22 @@ class BattleRewardServiceTest extends TestCase {
         $this->assertEquals($monster->xp, $character->xp);
     }
 
-    public function testShouldUpdateCharacterCurrenciesWhenLoggedIn() {
+    public function testShouldUpdateCharacterCurrenciesWhenLoggedIn()
+    {
         $character = $this->characterFactory->getCharacter();
 
-        $monster   = $this->createMonster([
+        $monster = $this->createMonster([
             'game_map_id' => $character->map->game_map_id,
         ]);
 
         DB::table('sessions')->truncate();
 
         DB::table('sessions')->insert([[
-            'id'           => '1',
-            'user_id'      => $character->refresh()->user->id,
-            'ip_address'   => '1',
-            'user_agent'   => '1',
-            'payload'      => '1',
+            'id' => '1',
+            'user_id' => $character->refresh()->user->id,
+            'ip_address' => '1',
+            'user_agent' => '1',
+            'payload' => '1',
             'last_activity' => 1602801731,
         ]]);
 
@@ -177,10 +183,11 @@ class BattleRewardServiceTest extends TestCase {
         Event::assertDispatched(UpdateCharacterCurrenciesEvent::class);
     }
 
-    public function testBattleItemRewardHandlerIsDispatched() {
+    public function testBattleItemRewardHandlerIsDispatched()
+    {
         $character = $this->characterFactory->getCharacter();
 
-        $monster   = $this->createMonster([
+        $monster = $this->createMonster([
             'game_map_id' => $character->map->game_map_id,
         ]);
 
@@ -193,10 +200,11 @@ class BattleRewardServiceTest extends TestCase {
         Queue::assertPushed(BattleItemHandler::class);
     }
 
-    public function testShouldGetFactionPoints() {
+    public function testShouldGetFactionPoints()
+    {
         $character = $this->characterFactory->assignFactionSystem()->getCharacter();
 
-        $monster   = $this->createMonster([
+        $monster = $this->createMonster([
             'game_map_id' => $character->map->game_map_id,
         ]);
 
@@ -215,10 +223,11 @@ class BattleRewardServiceTest extends TestCase {
         $this->assertGreaterThan(0, $faction->current_points);
     }
 
-    public function testShouldNotUpdateGlobalEventParticipationWhenNoEventIsRunning() {
+    public function testShouldNotUpdateGlobalEventParticipationWhenNoEventIsRunning()
+    {
         $character = $this->characterFactory->getCharacter();
 
-        $monster   = $this->createMonster([
+        $monster = $this->createMonster([
             'game_map_id' => $character->map->game_map_id,
         ]);
 
@@ -233,15 +242,16 @@ class BattleRewardServiceTest extends TestCase {
         $this->assertNull($character->globalEventParticipation);
     }
 
-    public function testShouldNotUpdateGlobalEventParticipationWhenNoGlobalEventIsRunning() {
+    public function testShouldNotUpdateGlobalEventParticipationWhenNoGlobalEventIsRunning()
+    {
         $character = $this->characterFactory->getCharacter();
 
-        $monster   = $this->createMonster([
+        $monster = $this->createMonster([
             'game_map_id' => $character->map->game_map_id,
         ]);
 
         $this->createEvent([
-            'type' => EventType::WINTER_EVENT
+            'type' => EventType::WINTER_EVENT,
         ]);
 
         Event::fake();
@@ -255,30 +265,31 @@ class BattleRewardServiceTest extends TestCase {
         $this->assertNull($character->globalEventParticipation);
     }
 
-    public function testShouldUpdateGlobalEventParticipation() {
+    public function testShouldUpdateGlobalEventParticipation()
+    {
         $character = $this->characterFactory->getCharacter();
 
         $character->map()->update([
-            'game_map_id' =>  $this->createGameMap([
-                'name' => MapNameValue::ICE_PLANE
+            'game_map_id' => $this->createGameMap([
+                'name' => MapNameValue::ICE_PLANE,
             ])->id,
         ]);
 
         $character = $character->refresh();
 
-        $monster   = $this->createMonster([
+        $monster = $this->createMonster([
             'game_map_id' => $character->map->game_map_id,
         ]);
 
         $this->createEvent([
-            'type' => EventType::WINTER_EVENT
+            'type' => EventType::WINTER_EVENT,
         ]);
 
         $this->createGlobalEventGoal([
-            'max_kills'                       => 100,
-            'event_type'                      => EventType::WINTER_EVENT,
-            'item_specialty_type_reward'      => ItemSpecialtyType::CORRUPTED_ICE,
-            'unique_type'                     => RandomAffixDetails::LEGENDARY,
+            'max_kills' => 100,
+            'event_type' => EventType::WINTER_EVENT,
+            'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE,
+            'unique_type' => RandomAffixDetails::LEGENDARY,
         ]);
 
         Event::fake();
@@ -292,44 +303,45 @@ class BattleRewardServiceTest extends TestCase {
         $this->assertNotNull($character->globalEventParticipation);
     }
 
-    public function testShouldUpdateGlobalEventParticipationWhenParticipationExists() {
+    public function testShouldUpdateGlobalEventParticipationWhenParticipationExists()
+    {
 
         $character = $this->characterFactory->getCharacter();
 
         $character->map()->update([
-            'game_map_id' =>  $this->createGameMap([
-                'name' => MapNameValue::ICE_PLANE
+            'game_map_id' => $this->createGameMap([
+                'name' => MapNameValue::ICE_PLANE,
             ])->id,
         ]);
 
         $character = $character->refresh();
 
-        $monster   = $this->createMonster([
+        $monster = $this->createMonster([
             'game_map_id' => $character->map->game_map_id,
         ]);
 
         $this->createEvent([
-            'type' => EventType::WINTER_EVENT
+            'type' => EventType::WINTER_EVENT,
         ]);
 
         $eventGoal = $this->createGlobalEventGoal([
-            'max_kills'                       => 100,
-            'event_type'                      => EventType::WINTER_EVENT,
-            'item_specialty_type_reward'      => ItemSpecialtyType::CORRUPTED_ICE,
-            'unique_type'                     => RandomAffixDetails::LEGENDARY,
+            'max_kills' => 100,
+            'event_type' => EventType::WINTER_EVENT,
+            'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE,
+            'unique_type' => RandomAffixDetails::LEGENDARY,
         ]);
 
         $this->createGlobalEventParticipation([
             'global_event_goal_id' => $eventGoal->id,
-            'character_id'         => $character->id,
-            'current_kills'        => 1,
-            'current_crafts'       => null,
+            'character_id' => $character->id,
+            'current_kills' => 1,
+            'current_crafts' => null,
         ]);
 
         $this->createGlobalEventKill([
-            'global_event_goal_id'  => $eventGoal->id,
-            'character_id'          => $character->id,
-            'kills'                 => 1,
+            'global_event_goal_id' => $eventGoal->id,
+            'character_id' => $character->id,
+            'kills' => 1,
         ]);
 
         Event::fake();
@@ -344,16 +356,17 @@ class BattleRewardServiceTest extends TestCase {
         $this->assertEquals(2, $character->globalEventKills->kills);
     }
 
-    public function testNoFactionRewardsGivenWhenCharacterIsInPurgatory() {
+    public function testNoFactionRewardsGivenWhenCharacterIsInPurgatory()
+    {
         $character = $this->characterFactory->assignFactionSystem()->getCharacter();
 
         $character->map()->update([
             'game_map_id' => $this->createGameMap([
-                'name' => MapNameValue::PURGATORY
-            ])->id
+                'name' => MapNameValue::PURGATORY,
+            ])->id,
         ]);
 
-        $monster   = $this->createMonster([
+        $monster = $this->createMonster([
             'game_map_id' => $character->map->game_map_id,
         ]);
 

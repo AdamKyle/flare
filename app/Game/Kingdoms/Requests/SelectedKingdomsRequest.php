@@ -24,17 +24,18 @@ class SelectedKingdomsRequest extends FormRequest
     public function rules()
     {
         return [
-            'selected_kingdoms'   => 'required|array',
+            'selected_kingdoms' => 'required|array',
             'selected_kingdoms.*' => 'required|integer',
         ];
     }
 
-    public function messages() {
+    public function messages()
+    {
         return [
-            'selected_kingdoms.required'   => 'Selected kingdoms is required.',
-            'selected_kingdoms.array'      => 'Selected kingdoms must be an array.',
+            'selected_kingdoms.required' => 'Selected kingdoms is required.',
+            'selected_kingdoms.array' => 'Selected kingdoms must be an array.',
             'selected_kingdoms.*.required' => 'Selected kingdoms cannot be an empty array',
-            'selected_kingdoms.*.integer'  => 'Selected kingdoms array values must be of type int.',
+            'selected_kingdoms.*.integer' => 'Selected kingdoms array values must be of type int.',
         ];
     }
 }

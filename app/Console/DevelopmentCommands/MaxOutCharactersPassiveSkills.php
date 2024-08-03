@@ -26,7 +26,8 @@ class MaxOutCharactersPassiveSkills extends Command
     /**
      * Execute the console command.
      */
-    public function handle() {
+    public function handle()
+    {
         $characterName = $this->argument('characterName');
 
         $character = Character::where('name', $characterName)->first();
@@ -58,7 +59,7 @@ class MaxOutCharactersPassiveSkills extends Command
             foreach ($kingdom->buildings as $building) {
                 $building->update([
                     'is_locked' => false,
-                    'level' => $building->gameBuilding->max_level
+                    'level' => $building->gameBuilding->max_level,
                 ]);
             }
         }

@@ -11,7 +11,8 @@ class RecallUnitsRequest extends FormRequest
      *
      * @return bool
      */
-    public function authorize() {
+    public function authorize()
+    {
         return true;
     }
 
@@ -27,7 +28,8 @@ class RecallUnitsRequest extends FormRequest
         ];
     }
 
-    public function messages() {
+    public function messages()
+    {
         return [
             'unit_movement_queue_id.required' => 'Unit Movement Queue is required.',
         ];

@@ -2,8 +2,8 @@
 
 namespace Database\Factories;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Flare\Models\GameBuildingUnit;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 class GameBuildingUnitFactory extends Factory
 {
@@ -23,8 +23,8 @@ class GameBuildingUnitFactory extends Factory
     {
         return [
             'game_building_id' => 0,
-            'game_unit_id'     => 0,
-            'required_level'   => 0,
+            'game_unit_id' => 0,
+            'required_level' => 0,
         ];
     }
 }

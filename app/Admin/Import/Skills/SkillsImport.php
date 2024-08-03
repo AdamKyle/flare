@@ -2,16 +2,15 @@
 
 namespace App\Admin\Import\Skills;
 
-use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 use App\Admin\Import\Skills\Sheets\SkillsSheet;
+use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 
 class SkillsImport implements WithMultipleSheets
 {
-
     public function sheets(): array
     {
         return [
-            0 => new SkillsSheet(),
+            0 => new SkillsSheet,
         ];
     }
 }

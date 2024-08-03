@@ -2,19 +2,17 @@
 
 namespace App\Admin\Exports\Races;
 
+use App\Admin\Exports\Races\Sheets\RacesSheet;
 use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
-use App\Admin\Exports\Races\Sheets\RacesSheet;
 
-class RacesExport implements WithMultipleSheets {
-
+class RacesExport implements WithMultipleSheets
+{
     use Exportable;
 
-    /**
-     * @return array
-     */
-    public function sheets(): array {
-        $sheets   = [];
+    public function sheets(): array
+    {
+        $sheets = [];
 
         $sheets[] = new RacesSheet;
 

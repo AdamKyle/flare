@@ -2,51 +2,54 @@
 
 namespace Tests\Unit\Game\NpcActions\QueenOfHeartsActions\Services;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use App\Flare\Builders\RandomAffixGenerator;
 use App\Flare\Models\Item;
 use App\Flare\Values\RandomAffixDetails;
-use App\Flare\Builders\RandomAffixGenerator;
 use App\Game\NpcActions\QueenOfHeartsActions\Services\RandomEnchantmentService;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateGameMap;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateItemAffix;
 
-class RandomEnchantmentServiceTest extends TestCase {
-
-    use RefreshDatabase, CreateItem, CreateGameMap, CreateItemAffix;
+class RandomEnchantmentServiceTest extends TestCase
+{
+    use CreateGameMap, CreateItem, CreateItemAffix, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
     private ?RandomEnchantmentService $randomEnchantmentService;
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
 
         parent::setUp();
 
-        $this->character                = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
+        $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
         $this->randomEnchantmentService = resolve(RandomEnchantmentService::class);
 
         // For the generating of the item with affixes attached
         $this->createItem(['type' => 'weapon']);
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
 
         parent::tearDown();
 
-        $this->character                = null;
+        $this->character = null;
         $this->randomEnchantmentService = null;
     }
 
-    public function testGenerateItemForEachType() {
+    public function testGenerateItemForEachType()
+    {
         $character = $this->character->getCharacter();
 
-        $basicItem     = $this->randomEnchantmentService->generateForType($character, 'basic');
-        $mediumItem    = $this->randomEnchantmentService->generateForType($character, 'medium');
+        $basicItem = $this->randomEnchantmentService->generateForType($character, 'basic');
+        $mediumItem = $this->randomEnchantmentService->generateForType($character, 'medium');
         $legendaryItem = $this->randomEnchantmentService->generateForType($character, 'legendary');
-        $default       = $this->randomEnchantmentService->generateForType($character, '');
+        $default = $this->randomEnchantmentService->generateForType($character, '');
 
         $this->assertInstanceOf(Item::class, $basicItem);
         $this->assertInstanceOf(Item::class, $mediumItem);
@@ -54,7 +57,8 @@ class RandomEnchantmentServiceTest extends TestCase {
         $this->assertInstanceOf(Item::class, $default);
     }
 
-    public function testGenerateWithBothSuffixAndPrefix() {
+    public function testGenerateWithBothSuffixAndPrefix()
+    {
         $character = $this->character->getCharacter();
 
         $randomEnchantmentService = \Mockery::mock(RandomEnchantmentService::class)->makePartial();
@@ -71,9 +75,10 @@ class RandomEnchantmentServiceTest extends TestCase {
         $this->assertNotNull($basicItem->item_prefix_id);
     }
 
-    public function testGetCostForEachType() {
-        $basicCost     = $this->randomEnchantmentService->getCost('basic');
-        $mediumCost    = $this->randomEnchantmentService->getCost('medium');
+    public function testGetCostForEachType()
+    {
+        $basicCost = $this->randomEnchantmentService->getCost('basic');
+        $mediumCost = $this->randomEnchantmentService->getCost('medium');
         $legendaryCost = $this->randomEnchantmentService->getCost('legendary');
 
         $this->assertEquals(RandomAffixDetails::BASIC, $basicCost);
@@ -81,7 +86,8 @@ class RandomEnchantmentServiceTest extends TestCase {
         $this->assertEquals(RandomAffixDetails::LEGENDARY, $legendaryCost);
     }
 
-    public function testFetchAllUniqueItems() {
+    public function testFetchAllUniqueItems()
+    {
         $character = $this->character->inventoryManagement()->giveItem($this->createItem([
             'item_suffix_id' => $this->createItemAffix(['randomly_generated' => true])->id,
         ]))->giveItem($this->createItem([
@@ -91,7 +97,8 @@ class RandomEnchantmentServiceTest extends TestCase {
         $this->assertCount(2, $this->randomEnchantmentService->fetchUniquesFromCharactersInventory($character));
     }
 
-    public function testFetchDataForApiCall() {
+    public function testFetchDataForApiCall()
+    {
         $character = $this->character->inventoryManagement()->giveItem($this->createItem([
             'item_suffix_id' => $this->createItemAffix(['randomly_generated' => true])->id,
         ]))->giveItem($this->createItem([
@@ -108,7 +115,8 @@ class RandomEnchantmentServiceTest extends TestCase {
         $this->assertCount(2, $data['non_unique_slots']);
     }
 
-    public function testFetchNonUniqueItems() {
+    public function testFetchNonUniqueItems()
+    {
         $character = $this->character->inventoryManagement()->giveItem($this->createItem([
             'item_prefix_id' => $this->createItemAffix(['randomly_generated' => false])->id,
         ]))->giveItem($this->createItem([

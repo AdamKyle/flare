@@ -3,11 +3,11 @@
 namespace App\Flare\Models;
 
 use Database\Factories\MaxLevelConfigurationFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
-class MaxLevelConfiguration extends Model {
-
+class MaxLevelConfiguration extends Model
+{
     use HasFactory;
 
     /**
@@ -28,13 +28,13 @@ class MaxLevelConfiguration extends Model {
      * @var array
      */
     protected $casts = [
-        'half_way'       => 'integer',
+        'half_way' => 'integer',
         'three_quarters' => 'integer',
-        'last_leg'       => 'integer',
+        'last_leg' => 'integer',
     ];
 
-    protected static function newFactory() {
+    protected static function newFactory()
+    {
         return MaxLevelConfigurationFactory::new();
     }
-
 }

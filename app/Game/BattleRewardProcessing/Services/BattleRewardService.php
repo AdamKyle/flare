@@ -9,9 +9,9 @@ use App\Flare\Models\GlobalEventGoal;
 use App\Flare\Models\Monster;
 use App\Flare\Services\CharacterRewardService;
 use App\Flare\Values\MapNameValue;
+use App\Game\BattleRewardProcessing\Handlers\BattleGlobalEventParticipationHandler;
 use App\Game\BattleRewardProcessing\Handlers\FactionHandler;
 use App\Game\BattleRewardProcessing\Handlers\FactionLoyaltyBountyHandler;
-use App\Game\BattleRewardProcessing\Handlers\BattleGlobalEventParticipationHandler;
 use App\Game\BattleRewardProcessing\Handlers\GoldMinesRewardHandler;
 use App\Game\BattleRewardProcessing\Handlers\PurgatorySmithHouseRewardHandler;
 use App\Game\BattleRewardProcessing\Handlers\TheOldChurchRewardHandler;
@@ -19,55 +19,68 @@ use App\Game\BattleRewardProcessing\Jobs\BattleItemHandler;
 use App\Game\Core\Services\GoldRush;
 use App\Game\Events\Values\EventType;
 
-class BattleRewardService {
-
+class BattleRewardService
+{
     private GameMap $gameMap;
+
     private Monster $monster;
+
     private Character $character;
+
     private FactionHandler $factionHandler;
+
     private CharacterRewardService $characterRewardService;
+
     private GoldRush $goldRush;
+
     private BattleGlobalEventParticipationHandler $globalEventParticipationHandler;
+
     private PurgatorySmithHouseRewardHandler $purgatorySmithHouseRewardHandler;
+
     private GoldMinesRewardHandler $goldMinesRewardHandler;
+
     private FactionLoyaltyBountyHandler $factionLoyaltyBountyHandler;
+
     private TheOldChurchRewardHandler $theOldChurchRewardHandler;
+
     private WeeklyBattleService $weeklyBattleService;
 
     public function __construct(
-        FactionHandler                        $factionHandler,
-        CharacterRewardService                $characterRewardService,
-        GoldRush                              $goldRush,
+        FactionHandler $factionHandler,
+        CharacterRewardService $characterRewardService,
+        GoldRush $goldRush,
         BattleGlobalEventParticipationHandler $globalEventParticipationHandler,
-        PurgatorySmithHouseRewardHandler      $purgatorySmithHouseRewardHandler,
-        GoldMinesRewardHandler                $goldMinesRewardHandler,
-        FactionLoyaltyBountyHandler           $factionLoyaltyBountyHandler,
-        TheOldChurchRewardHandler             $theOldChurchRewardHandler,
-        WeeklyBattleService                   $weeklyBattleService,
+        PurgatorySmithHouseRewardHandler $purgatorySmithHouseRewardHandler,
+        GoldMinesRewardHandler $goldMinesRewardHandler,
+        FactionLoyaltyBountyHandler $factionLoyaltyBountyHandler,
+        TheOldChurchRewardHandler $theOldChurchRewardHandler,
+        WeeklyBattleService $weeklyBattleService,
     ) {
-        $this->factionHandler                   = $factionHandler;
-        $this->characterRewardService           = $characterRewardService;
-        $this->goldRush                         = $goldRush;
-        $this->globalEventParticipationHandler  = $globalEventParticipationHandler;
+        $this->factionHandler = $factionHandler;
+        $this->characterRewardService = $characterRewardService;
+        $this->goldRush = $goldRush;
+        $this->globalEventParticipationHandler = $globalEventParticipationHandler;
         $this->purgatorySmithHouseRewardHandler = $purgatorySmithHouseRewardHandler;
-        $this->goldMinesRewardHandler           = $goldMinesRewardHandler;
-        $this->factionLoyaltyBountyHandler      = $factionLoyaltyBountyHandler;
-        $this->theOldChurchRewardHandler        = $theOldChurchRewardHandler;
-        $this->weeklyBattleService              = $weeklyBattleService;
+        $this->goldMinesRewardHandler = $goldMinesRewardHandler;
+        $this->factionLoyaltyBountyHandler = $factionLoyaltyBountyHandler;
+        $this->theOldChurchRewardHandler = $theOldChurchRewardHandler;
+        $this->weeklyBattleService = $weeklyBattleService;
     }
 
-    public function setUp(Monster $monster, Character $character): BattleRewardService {
+    public function setUp(Monster $monster, Character $character): BattleRewardService
+    {
 
         $this->character = $character;
-        $this->monster   = $monster;
-        $this->gameMap   = $monster->gameMap;
+        $this->monster = $monster;
+        $this->gameMap = $monster->gameMap;
 
         $this->characterRewardService->setCharacter($character);
 
         return $this;
     }
 
-    public function handleBaseRewards() {
+    public function handleBaseRewards()
+    {
 
         $this->handleFactionRewards();
 
@@ -97,7 +110,8 @@ class BattleRewardService {
         BattleItemHandler::dispatch($character, $this->monster);
     }
 
-    protected function handleFactionRewards() {
+    protected function handleFactionRewards()
+    {
         if ($this->gameMap->mapType()->isPurgatory()) {
             return;
         }
@@ -107,7 +121,8 @@ class BattleRewardService {
         $this->character = $this->character->refresh();
     }
 
-    protected function handleGlobalEventGoals() {
+    protected function handleGlobalEventGoals()
+    {
         $event = Event::whereIn('type', [
             EventType::WINTER_EVENT,
             EventType::DELUSIONAL_MEMORIES_EVENT,
@@ -124,7 +139,7 @@ class BattleRewardService {
             MapNameValue::DELUSIONAL_MEMORIES,
         ])->pluck('id')->toArray();
 
-        if (is_null($globalEventGoal) || !in_array($this->character->map->game_map_id, $gameMapArrays)) {
+        if (is_null($globalEventGoal) || ! in_array($this->character->map->game_map_id, $gameMapArrays)) {
             return;
         }
 

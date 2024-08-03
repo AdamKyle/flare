@@ -9,47 +9,43 @@ use App\Game\Kingdoms\Builders\AttackedKingdomBuilder;
 use App\Game\Kingdoms\Builders\KingdomAttackedBuilder;
 use App\Game\Kingdoms\Builders\TookKingdomBuilder;
 
-class KingdomLogService {
-
+class KingdomLogService
+{
     /**
-     * @var KingdomLog $log
+     * @var KingdomLog
      */
     private $log;
 
     /**
-     * @var KingdomAttackedBuilder $kingdomAttacked
+     * @var KingdomAttackedBuilder
      */
     private $kingdomAttacked;
 
     /**
-     * @var AttackedKingdomBuilder $attackedKingdom
+     * @var AttackedKingdomBuilder
      */
     private $attackedKingdom;
 
     /**
-     * @var TookKingdomBuilder $tookKingdom
+     * @var TookKingdomBuilder
      */
     private $tookKingdom;
 
     /**
      * KingdomLogService constructor.
-     *
-     * @param KingdomAttackedBuilder $kingdomAttacked
-     * @param AttackedKingdomBuilder $attackedKingdom
      */
-    public function __construct(KingdomAttackedBuilder $kingdomAttacked, AttackedKingdomBuilder $attackedKingdom, TookKingdomBuilder $tookKingdom) {
+    public function __construct(KingdomAttackedBuilder $kingdomAttacked, AttackedKingdomBuilder $attackedKingdom, TookKingdomBuilder $tookKingdom)
+    {
         $this->kingdomAttacked = $kingdomAttacked;
         $this->attackedKingdom = $attackedKingdom;
-        $this->tookKingdom    = $tookKingdom;
+        $this->tookKingdom = $tookKingdom;
     }
 
     /**
      * Sets the log.
-     *
-     * @param KingdomLog $log
-     * @return KingdomLogService
      */
-    public function setLog(KingdomLog $log): KingdomLogService {
+    public function setLog(KingdomLog $log): KingdomLogService
+    {
         $this->log = $log;
 
         return $this;
@@ -58,10 +54,10 @@ class KingdomLogService {
     /**
      * Builds the attack report.
      *
-     * @return array
      * @throws \Exception
      */
-    public function attackReport(): array {
+    public function attackReport(): array
+    {
         $value = new KingdomLogStatusValue($this->log->status);
 
         $data = [];
@@ -70,20 +66,20 @@ class KingdomLogService {
         $newDefender = $this->log->new_defender;
 
         if ($value->kingdomWasAttacked() || $value->bombsDropped()) {
-            $kingdomAttacked   = $this->kingdomAttacked->setLog($this->log);
+            $kingdomAttacked = $this->kingdomAttacked->setLog($this->log);
 
-            $data['kingdom']   = $this->fetchKingdomInformation($oldDefender, $newDefender);
+            $data['kingdom'] = $this->fetchKingdomInformation($oldDefender, $newDefender);
             $data['buildings'] = $kingdomAttacked->fetchBuildingDamageReport();
-            $data['units']     = $kingdomAttacked->fetchUnitDamageReport();
+            $data['units'] = $kingdomAttacked->fetchUnitDamageReport();
             $data['defender_units'] = $kingdomAttacked->fetchUnitKillReport();
             $data['defender_buildings'] = [];
-        } else if ($value->attackedKingdom() || $value->lostAttack()) {
-            $attackedKingdom            = $this->attackedKingdom->setLog($this->log);
+        } elseif ($value->attackedKingdom() || $value->lostAttack()) {
+            $attackedKingdom = $this->attackedKingdom->setLog($this->log);
 
-            $data['units']              = $attackedKingdom->attackedKingdomReport();
-            $data['defender_units']     = $attackedKingdom->fetchUnitDamageReport();
+            $data['units'] = $attackedKingdom->attackedKingdomReport();
+            $data['defender_units'] = $attackedKingdom->fetchUnitDamageReport();
             $data['defender_buildings'] = $attackedKingdom->fetchBuildingsDamageReport();
-        } else if ($value->tookKingdom()) {
+        } elseif ($value->tookKingdom()) {
             $tookKingdom = $this->tookKingdom->setLog($this->log);
 
             $data = $tookKingdom->fetchChanges();
@@ -96,36 +92,32 @@ class KingdomLogService {
 
     /**
      * Fetches the kingdom information for the attack log.
-     *
-     * @param array $oldDefender
-     * @param array $newDefender
-     * @return array
      */
-    protected function fetchKingdomInformation(array $oldDefender, array $newDefender = []): array {
+    protected function fetchKingdomInformation(array $oldDefender, array $newDefender = []): array
+    {
         $kingdom = Kingdom::find($oldDefender['id']);
 
         $moraleIncrease = 0;
         $moraleDecrease = 0;
 
-        foreach($kingdom->buildings as $building) {
+        foreach ($kingdom->buildings as $building) {
             if ($building->current_durability > 0) {
                 $moraleIncrease += $building->morale_increase;
-            } else if ($building->current_durability === 0) {
+            } elseif ($building->current_durability === 0) {
                 $moraleDecrease += $building->morale_decrease;
             }
         }
 
         $data = [
-            'old_morale'      => empty($newDefender) ? $kingdom->current_morale : $oldDefender['current_morale'],
+            'old_morale' => empty($newDefender) ? $kingdom->current_morale : $oldDefender['current_morale'],
             'morale_increase' => $moraleIncrease,
             'morale_decrease' => $moraleDecrease,
         ];
 
-        if (!empty($newDefender)) {
+        if (! empty($newDefender)) {
             $data['new_morale'] = $newDefender['current_morale'];
         }
 
         return $data;
     }
-
 }

@@ -19,12 +19,13 @@ use Tests\Traits\CreateRaid;
 
 class ResetDailyRaidAttackLimitsTest extends TestCase
 {
-    use RefreshDatabase, CreateItem, CreateItemAffix, CreateMonster, CreateItem, CreateLocation, CreateRaid, CreateEvent;
+    use CreateEvent, CreateItem, CreateItem, CreateItemAffix, CreateLocation, CreateMonster, CreateRaid, RefreshDatabase;
 
-    public function testResetRaidFight() {
+    public function testResetRaidFight()
+    {
         Event::fake();
 
-        $character = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
         $monster = $this->createMonster();
         $item = $this->createItem();
@@ -32,11 +33,11 @@ class ResetDailyRaidAttackLimitsTest extends TestCase
         $location = $this->createLocation();
 
         $raid = $this->createRaid([
-            'raid_boss_id'                   => $monster->id,
-            'raid_monster_ids'               => [$monster->id],
-            'raid_boss_location_id'          => $location->id,
-            'corrupted_location_ids'         => [$location->id],
-            'artifact_item_id'               => $item->id,
+            'raid_boss_id' => $monster->id,
+            'raid_monster_ids' => [$monster->id],
+            'raid_boss_location_id' => $location->id,
+            'corrupted_location_ids' => [$location->id],
+            'artifact_item_id' => $item->id,
         ]);
 
         $this->createEvent([
@@ -59,7 +60,8 @@ class ResetDailyRaidAttackLimitsTest extends TestCase
         Event::assertDispatched(GlobalMessageEvent::class);
     }
 
-    public function testDoNotResetRaidFightWhenNoEvent() {
+    public function testDoNotResetRaidFightWhenNoEvent()
+    {
         Event::fake();
 
         Artisan::call('reset:daily-raid-attack-limits');
@@ -67,10 +69,11 @@ class ResetDailyRaidAttackLimitsTest extends TestCase
         Event::assertNotDispatched(GlobalMessageEvent::class);
     }
 
-    public function testDoNotresetRaidFightWhenRaidBossNotDead() {
+    public function testDoNotresetRaidFightWhenRaidBossNotDead()
+    {
         Event::fake();
 
-        $character = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
         $monster = $this->createMonster();
         $item = $this->createItem();
@@ -78,11 +81,11 @@ class ResetDailyRaidAttackLimitsTest extends TestCase
         $location = $this->createLocation();
 
         $raid = $this->createRaid([
-            'raid_boss_id'                   => $monster->id,
-            'raid_monster_ids'               => [$monster->id],
-            'raid_boss_location_id'          => $location->id,
-            'corrupted_location_ids'         => [$location->id],
-            'artifact_item_id'               => $item->id,
+            'raid_boss_id' => $monster->id,
+            'raid_monster_ids' => [$monster->id],
+            'raid_boss_location_id' => $location->id,
+            'corrupted_location_ids' => [$location->id],
+            'artifact_item_id' => $item->id,
         ]);
 
         $this->createEvent([

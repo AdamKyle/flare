@@ -4,16 +4,17 @@ namespace Tests\Feature\Auth;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
-use Tests\Traits\CreateUser;
 use Tests\Traits\CreateRole;
+use Tests\Traits\CreateUser;
 
 class ResetPasswordControllerTest extends TestCase
 {
-    use RefreshDatabase,
+    use CreateRole,
         CreateUser,
-        CreateRole;
+        RefreshDatabase;
 
-    public function testCanSeeResetPasswordPage() {
+    public function testCanSeeResetPasswordPage()
+    {
         $user = $this->createUser();
 
         $this->createAdminRole();

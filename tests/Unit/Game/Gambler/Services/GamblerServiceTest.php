@@ -5,39 +5,42 @@ namespace Tests\Unit\Game\Gambler\Services;
 use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Events\Values\EventType;
-use Mockery;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Game\Gambler\Handlers\SpinHandler;
 use App\Game\Gambler\Services\GamblerService;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Mockery;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateEvent;
 use Tests\Traits\CreateGameSkill;
 use Tests\Traits\CreateItem;
 
-class GamblerServiceTest extends TestCase {
-
-    use RefreshDatabase, CreateItem, CreateGameSkill, CreateEvent;
+class GamblerServiceTest extends TestCase
+{
+    use CreateEvent, CreateGameSkill, CreateItem, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
     private ?GamblerService $gamblerService;
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
-        $this->character      = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
+        $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
         $this->gamblerService = resolve(GamblerService::class);
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
 
-        $this->character      = null;
+        $this->character = null;
         $this->gamblerService = null;
     }
 
-    public function testHasEnoughGoldToSpin() {
+    public function testHasEnoughGoldToSpin()
+    {
         $character = $this->character->getCharacter();
 
         $character->update(['gold' => 1000000]);
@@ -52,7 +55,8 @@ class GamblerServiceTest extends TestCase {
         $this->assertEquals(200, $response['status']);
     }
 
-    public function testDoesNotHasEnoughGoldToSpin() {
+    public function testDoesNotHasEnoughGoldToSpin()
+    {
         $character = $this->character->getCharacter();
 
         $character->update(['gold' => 0]);
@@ -67,11 +71,12 @@ class GamblerServiceTest extends TestCase {
         $this->assertEquals(422, $response['status']);
     }
 
-    public function testFailedToMatchAny() {
+    public function testFailedToMatchAny()
+    {
         $mock = Mockery::mock(SpinHandler::class)->makePartial();
 
         $mock->shouldReceive('roll')->andReturn([
-            'rolls'      => [1, 2, 3],
+            'rolls' => [1, 2, 3],
             'difference' => [],
         ]);
 
@@ -91,11 +96,12 @@ class GamblerServiceTest extends TestCase {
         $this->assertEquals('Darn! Better luck next time child! Spin again!', $response['message']);
     }
 
-    public function testRolledAllThreeOfGoldDust() {
+    public function testRolledAllThreeOfGoldDust()
+    {
         $mock = Mockery::mock(SpinHandler::class)->makePartial();
 
         $mock->shouldReceive('roll')->andReturn([
-            'rolls'      => [0, 0, 0],
+            'rolls' => [0, 0, 0],
             'difference' => [0, 0],
         ]);
 
@@ -116,11 +122,12 @@ class GamblerServiceTest extends TestCase {
         $this->assertEquals(5000, $character->gold_dust);
     }
 
-    public function testRolledAllThreeOfShards() {
+    public function testRolledAllThreeOfShards()
+    {
         $mock = Mockery::mock(SpinHandler::class)->makePartial();
 
         $mock->shouldReceive('roll')->andReturn([
-            'rolls'      => [1, 1, 1],
+            'rolls' => [1, 1, 1],
             'difference' => [1, 1],
         ]);
 
@@ -141,11 +148,12 @@ class GamblerServiceTest extends TestCase {
         $this->assertEquals(5000, $character->shards);
     }
 
-    public function testRolledAllThreeOfCopperCoinsWithItem() {
+    public function testRolledAllThreeOfCopperCoinsWithItem()
+    {
         $mock = Mockery::mock(SpinHandler::class)->makePartial();
 
         $mock->shouldReceive('roll')->andReturn([
-            'rolls'      => [2, 2, 2],
+            'rolls' => [2, 2, 2],
             'difference' => [2, 2],
         ]);
 
@@ -155,7 +163,7 @@ class GamblerServiceTest extends TestCase {
         $item = $this->createItem([
             'name' => 'Copper Coins',
             'type' => 'quest',
-            'effect' => ItemEffectsValue::GET_COPPER_COINS
+            'effect' => ItemEffectsValue::GET_COPPER_COINS,
         ]);
 
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
@@ -172,11 +180,12 @@ class GamblerServiceTest extends TestCase {
         $this->assertEquals(5000, $character->copper_coins);
     }
 
-    public function testRolledAllThreeOfCopperCoinsWithItemAndQuestItemThatGivesBonus() {
+    public function testRolledAllThreeOfCopperCoinsWithItemAndQuestItemThatGivesBonus()
+    {
         $mock = Mockery::mock(SpinHandler::class)->makePartial();
 
         $mock->shouldReceive('roll')->andReturn([
-            'rolls'      => [2, 2, 2],
+            'rolls' => [2, 2, 2],
             'difference' => [2, 2],
         ]);
 
@@ -186,13 +195,13 @@ class GamblerServiceTest extends TestCase {
         $item = $this->createItem([
             'name' => 'Copper Coins',
             'type' => 'quest',
-            'effect' => ItemEffectsValue::GET_COPPER_COINS
+            'effect' => ItemEffectsValue::GET_COPPER_COINS,
         ]);
 
         $mercenarySlotItem = $this->createItem([
             'name' => 'Copper Coins',
             'type' => 'quest',
-            'effect' => ItemEffectsValue::MERCENARY_SLOT_BONUS
+            'effect' => ItemEffectsValue::MERCENARY_SLOT_BONUS,
         ]);
 
         $character = $this->character->inventoryManagement()->giveItem($item)->giveItem($mercenarySlotItem)->getCharacter();
@@ -208,11 +217,12 @@ class GamblerServiceTest extends TestCase {
         $this->assertGreaterThan(5000, $character->copper_coins);
     }
 
-    public function testRolledAllThreeOfCopperCoinsWithItemAndWeeklyCurrencyEvent() {
+    public function testRolledAllThreeOfCopperCoinsWithItemAndWeeklyCurrencyEvent()
+    {
         $mock = Mockery::mock(SpinHandler::class)->makePartial();
 
         $mock->shouldReceive('roll')->andReturn([
-            'rolls'      => [2, 2, 2],
+            'rolls' => [2, 2, 2],
             'difference' => [2, 2],
         ]);
 
@@ -222,11 +232,11 @@ class GamblerServiceTest extends TestCase {
         $item = $this->createItem([
             'name' => 'Copper Coins',
             'type' => 'quest',
-            'effect' => ItemEffectsValue::GET_COPPER_COINS
+            'effect' => ItemEffectsValue::GET_COPPER_COINS,
         ]);
 
         $this->createEvent([
-            'type' => EventType::WEEKLY_CURRENCY_DROPS
+            'type' => EventType::WEEKLY_CURRENCY_DROPS,
         ]);
 
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
@@ -242,11 +252,12 @@ class GamblerServiceTest extends TestCase {
         $this->assertGreaterThan(5000, $character->copper_coins);
     }
 
-    public function testRolledAllThreeOfCopperCoinsWithoutItem() {
+    public function testRolledAllThreeOfCopperCoinsWithoutItem()
+    {
         $mock = Mockery::mock(SpinHandler::class)->makePartial();
 
         $mock->shouldReceive('roll')->andReturn([
-            'rolls'      => [2, 2, 2],
+            'rolls' => [2, 2, 2],
             'difference' => [2, 2],
         ]);
 
@@ -267,11 +278,12 @@ class GamblerServiceTest extends TestCase {
         $this->assertEquals(0, $character->copper_coins);
     }
 
-    public function testRolledTwoOfGoldDust() {
+    public function testRolledTwoOfGoldDust()
+    {
         $mock = Mockery::mock(SpinHandler::class)->makePartial();
 
         $mock->shouldReceive('roll')->andReturn([
-            'rolls'      => [0, 0, 1],
+            'rolls' => [0, 0, 1],
             'difference' => [0],
         ]);
 
@@ -292,11 +304,12 @@ class GamblerServiceTest extends TestCase {
         $this->assertEquals(1000, $character->gold_dust);
     }
 
-    public function testRolledTwoOfShards() {
+    public function testRolledTwoOfShards()
+    {
         $mock = Mockery::mock(SpinHandler::class)->makePartial();
 
         $mock->shouldReceive('roll')->andReturn([
-            'rolls'      => [1, 1, 2],
+            'rolls' => [1, 1, 2],
             'difference' => [1],
         ]);
 
@@ -317,11 +330,12 @@ class GamblerServiceTest extends TestCase {
         $this->assertEquals(1000, $character->shards);
     }
 
-    public function testRolledTwoOfCopperCoinsWithItem() {
+    public function testRolledTwoOfCopperCoinsWithItem()
+    {
         $mock = Mockery::mock(SpinHandler::class)->makePartial();
 
         $mock->shouldReceive('roll')->andReturn([
-            'rolls'      => [2, 2, 3],
+            'rolls' => [2, 2, 3],
             'difference' => [2],
         ]);
 
@@ -331,7 +345,7 @@ class GamblerServiceTest extends TestCase {
         $item = $this->createItem([
             'name' => 'Copper Coins',
             'type' => 'quest',
-            'effect' => ItemEffectsValue::GET_COPPER_COINS
+            'effect' => ItemEffectsValue::GET_COPPER_COINS,
         ]);
 
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
@@ -348,11 +362,12 @@ class GamblerServiceTest extends TestCase {
         $this->assertEquals(1000, $character->copper_coins);
     }
 
-    public function testRolledTwoOfGoldDustWithMaxGoldDust() {
+    public function testRolledTwoOfGoldDustWithMaxGoldDust()
+    {
         $mock = Mockery::mock(SpinHandler::class)->makePartial();
 
         $mock->shouldReceive('roll')->andReturn([
-            'rolls'      => [0, 0, 1],
+            'rolls' => [0, 0, 1],
             'difference' => [0],
         ]);
 
@@ -373,11 +388,12 @@ class GamblerServiceTest extends TestCase {
         $this->assertEquals(MaxCurrenciesValue::MAX_GOLD_DUST, $character->gold_dust);
     }
 
-    public function testRolledTwoOfShardsWithMaxShards() {
+    public function testRolledTwoOfShardsWithMaxShards()
+    {
         $mock = Mockery::mock(SpinHandler::class)->makePartial();
 
         $mock->shouldReceive('roll')->andReturn([
-            'rolls'      => [1, 1, 2],
+            'rolls' => [1, 1, 2],
             'difference' => [1],
         ]);
 
@@ -398,11 +414,12 @@ class GamblerServiceTest extends TestCase {
         $this->assertEquals(MaxCurrenciesValue::MAX_SHARDS, $character->shards);
     }
 
-    public function testRolledTwoOfCopperCoinsWithItemWithMaxCopperCoins() {
+    public function testRolledTwoOfCopperCoinsWithItemWithMaxCopperCoins()
+    {
         $mock = Mockery::mock(SpinHandler::class)->makePartial();
 
         $mock->shouldReceive('roll')->andReturn([
-            'rolls'      => [2, 2, 3],
+            'rolls' => [2, 2, 3],
             'difference' => [2],
         ]);
 
@@ -412,7 +429,7 @@ class GamblerServiceTest extends TestCase {
         $item = $this->createItem([
             'name' => 'Copper Coins',
             'type' => 'quest',
-            'effect' => ItemEffectsValue::GET_COPPER_COINS
+            'effect' => ItemEffectsValue::GET_COPPER_COINS,
         ]);
 
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();

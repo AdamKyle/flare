@@ -24,13 +24,14 @@ class PvpFightInfo extends FormRequest
     public function rules()
     {
         return [
-            'defender_id'  => 'int|required'
+            'defender_id' => 'int|required',
         ];
     }
 
-    public function messages() {
+    public function messages()
+    {
         return [
-            'defender_id.required'  => 'Error. Invalid Input',
+            'defender_id.required' => 'Error. Invalid Input',
         ];
     }
 }

@@ -1,22 +1,22 @@
 <?php
 
-
 namespace Tests\Console\Admin;
 
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Symfony\Component\Console\Exception\RuntimeException;
 use App\Admin\Mail\GeneratedAdmin;
 use App\Flare\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Mail;
+use Symfony\Component\Console\Exception\RuntimeException;
 use Tests\TestCase;
 use Tests\Traits\CreateRole;
 use Tests\Traits\CreateUser;
 
 class CreateAdminAccountTest extends TestCase
 {
-    use RefreshDatabase, CreateRole, CreateUser;
+    use CreateRole, CreateUser, RefreshDatabase;
 
-    public function testCreateAdmin() {
+    public function testCreateAdmin()
+    {
         Mail::fake();
 
         $this->createAdminRole();
@@ -30,7 +30,8 @@ class CreateAdminAccountTest extends TestCase
         $this->assertTrue(User::first()->hasRole('Admin'));
     }
 
-    public function testFailToCreateAdmin() {
+    public function testFailToCreateAdmin()
+    {
 
         $this->expectException(RuntimeException::class);
 
@@ -45,11 +46,11 @@ class CreateAdminAccountTest extends TestCase
         $this->assertCount(0, User::all());
     }
 
-    public function testFailToCreateDuplicateAdmin() {
-
+    public function testFailToCreateDuplicateAdmin()
+    {
 
         $this->createAdmin($this->createAdminRole(), [
-            'email' => 'sample@void.com'
+            'email' => 'sample@void.com',
         ]);
 
         Mail::fake();
@@ -61,7 +62,6 @@ class CreateAdminAccountTest extends TestCase
         /**
          * There should only be one admin. Not two.
          */
-
         $this->assertCount(1, User::all());
 
         $this->assertTrue(User::first()->hasRole('Admin'));

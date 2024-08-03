@@ -15,61 +15,48 @@ use App\Game\Maps\Values\MapTileValue;
 use App\Game\Messages\Events\ServerMessageEvent;
 use Cache;
 
-class PvpService {
-
-    /**
-     * @var PvpAttack $pvpAttack
-     */
+class PvpService
+{
     private PvpAttack $pvpAttack;
 
-    /**
-     * @var BattleEventHandler $battleEventHandler
-     */
     private BattleEventHandler $battleEventHandler;
 
-    /**
-     * @var MapTileValue $mapTileValue
-     */
     private MapTileValue $mapTileValue;
 
-    /**
-     * @var BuildMythicItem $buildMythicItem
-     */
     private BuildMythicItem $buildMythicItem;
 
-    /**
-     * @param PvpAttack $pvpAttack
-     * @param BattleEventHandler $battleEventHandler
-     * @param MapTileValue $mapTileValue
-     * @param BuildMythicItem $buildMythicItem
-     */
-    public function __construct(PvpAttack $pvpAttack, BattleEventHandler $battleEventHandler, MapTileValue $mapTileValue, BuildMythicItem $buildMythicItem) {
-        $this->pvpAttack            = $pvpAttack;
-        $this->battleEventHandler   = $battleEventHandler;
-        $this->mapTileValue         = $mapTileValue;
-        $this->buildMythicItem      = $buildMythicItem;
+    public function __construct(PvpAttack $pvpAttack, BattleEventHandler $battleEventHandler, MapTileValue $mapTileValue, BuildMythicItem $buildMythicItem)
+    {
+        $this->pvpAttack = $pvpAttack;
+        $this->battleEventHandler = $battleEventHandler;
+        $this->mapTileValue = $mapTileValue;
+        $this->buildMythicItem = $buildMythicItem;
     }
 
-    public function battleEventHandler(): BattleEventHandler {
+    public function battleEventHandler(): BattleEventHandler
+    {
         return $this->battleEventHandler;
     }
 
-    public function cache(): CharacterCacheData {
+    public function cache(): CharacterCacheData
+    {
         return $this->pvpAttack->cache();
     }
 
-    public function isDefenderAtPlayersLocation(Character $attacker, Character $defender) {
+    public function isDefenderAtPlayersLocation(Character $attacker, Character $defender)
+    {
         $attackerMap = $attacker->map;
         $defenderMap = $defender->map;
 
         $xPositionMatches = $attackerMap->character_position_x === $defenderMap->character_position_x;
         $yPositionMatches = $attackerMap->character_position_y === $defenderMap->character_position_y;
-        $samePlane        = $attackerMap->game_map_id          === $defenderMap->game_map_id;
+        $samePlane = $attackerMap->game_map_id === $defenderMap->game_map_id;
 
         return $xPositionMatches && $yPositionMatches && $samePlane && $defender->currentAutomations->isEmpty();
     }
 
-    public function getHealthObject(Character $attacker, Character $defender) {
+    public function getHealthObject(Character $attacker, Character $defender)
+    {
         $cache = $this->pvpAttack->cache()->fetchPvpCacheObject($attacker, $defender);
 
         // We need a clean cache object.
@@ -79,42 +66,45 @@ class PvpService {
         $defenderElementalData = $defender->getInformation()->buildElementalAtonement();
         $attackerElementalData = $attacker->getInformation()->buildElementalAtonement();
 
-        if (!is_null($cache)) {
+        if (! is_null($cache)) {
             return [
-                'attacker_health'     => $cache['attacker_health'],
+                'attacker_health' => $cache['attacker_health'],
                 'attacker_max_health' => $this->pvpAttack->cache()->getCachedCharacterData($attacker, 'health'),
-                'defender_health'     => $cache['defender_health'],
+                'defender_health' => $cache['defender_health'],
                 'defender_max_health' => $this->pvpAttack->cache()->getCachedCharacterData($defender, 'health'),
-                'defender_id'         => $defender->id,
-                'attacker_id'         => $attacker->id,
-                'defender_atonement'  => !is_null($defenderElementalData) ? $defenderElementalData['highest_element']['name'] : 'N/A',
-                'attacker_atonement'  => !is_null($attackerElementalData) ? $attackerElementalData['highest_element']['name'] : 'N/A',
+                'defender_id' => $defender->id,
+                'attacker_id' => $attacker->id,
+                'defender_atonement' => ! is_null($defenderElementalData) ? $defenderElementalData['highest_element']['name'] : 'N/A',
+                'attacker_atonement' => ! is_null($attackerElementalData) ? $attackerElementalData['highest_element']['name'] : 'N/A',
             ];
         }
 
         return [
-            'attacker_health'     => $this->pvpAttack->cache()->getCachedCharacterData($attacker, 'health'),
+            'attacker_health' => $this->pvpAttack->cache()->getCachedCharacterData($attacker, 'health'),
             'attacker_max_health' => $this->pvpAttack->cache()->getCachedCharacterData($attacker, 'health'),
-            'defender_health'     => $this->pvpAttack->cache()->getCachedCharacterData($defender, 'health'),
+            'defender_health' => $this->pvpAttack->cache()->getCachedCharacterData($defender, 'health'),
             'defender_max_health' => $this->pvpAttack->cache()->getCachedCharacterData($defender, 'health'),
-            'defender_id'         => $defender->id,
-            'attacker_id'         => $attacker->id,
-            'defender_atonement'  => !is_null($defenderElementalData) ? $defenderElementalData['highest_element']['name'] : 'N/A',
-            'attacker_atonement'  => !is_null($attackerElementalData) ? $attackerElementalData['highest_element']['name'] : 'N/A',
+            'defender_id' => $defender->id,
+            'attacker_id' => $attacker->id,
+            'defender_atonement' => ! is_null($defenderElementalData) ? $defenderElementalData['highest_element']['name'] : 'N/A',
+            'attacker_atonement' => ! is_null($attackerElementalData) ? $attackerElementalData['highest_element']['name'] : 'N/A',
         ];
     }
 
-    public function getRemainingAttackerHealth(): int {
+    public function getRemainingAttackerHealth(): int
+    {
         return $this->pvpAttack->getAttackerHealth();
     }
 
-    public function getRemainingDefenderHealth(): int {
+    public function getRemainingDefenderHealth(): int
+    {
         return $this->pvpAttack->getDefenderHealth();
     }
 
-    public function attack(Character $attacker, Character $defender, string $attackType, bool $ignoreSetUp = false, bool $ignoreNonWinningMessages = false): bool {
+    public function attack(Character $attacker, Character $defender, string $attackType, bool $ignoreSetUp = false, bool $ignoreNonWinningMessages = false): bool
+    {
 
-        if (!$ignoreSetUp) {
+        if (! $ignoreSetUp) {
             $healthObject = $this->pvpAttack->setUpPvpFight($attacker, $defender, $this->getHealthObject($attacker, $defender));
         } else {
             $healthObject = $this->getHealthObject($attacker, $defender);
@@ -152,7 +142,7 @@ class PvpService {
 
         $this->updateCacheHealthForPVPFight($attacker, $defender);
 
-        if (!$ignoreNonWinningMessages) {
+        if (! $ignoreNonWinningMessages) {
             $this->updateAttackerPvpInfo($attacker, $healthObject, $defender->id, $this->pvpAttack->getDefenderHealth());
             $this->updateDefenderPvpInfo($defender, $healthObject, $attacker->id, $this->pvpAttack->getDefenderHealth());
         }
@@ -160,9 +150,10 @@ class PvpService {
         return false;
     }
 
-    protected function processBattleWin(Character $attacker, Character $defender, array $healthObject) {
-        event(new ServerMessageEvent($attacker->user, 'You have killed: ' . $defender->name));
-        event(new ServerMessageEvent($defender->user, 'You have been killed by: ' . $attacker->name));
+    protected function processBattleWin(Character $attacker, Character $defender, array $healthObject)
+    {
+        event(new ServerMessageEvent($attacker->user, 'You have killed: '.$defender->name));
+        event(new ServerMessageEvent($defender->user, 'You have been killed by: '.$attacker->name));
 
         $this->battleEventHandler->processDeadCharacter($defender);
 
@@ -178,49 +169,53 @@ class PvpService {
         $this->handleDefenderDeath($defender);
     }
 
-    protected function updateCacheHealthForPVPFight(Character $attacker, Character $defender) {
+    protected function updateCacheHealthForPVPFight(Character $attacker, Character $defender)
+    {
         $this->pvpAttack->cache()->setPvpData($attacker, $defender, $this->pvpAttack->getAttackerHealth(), $this->pvpAttack->getDefenderHealth());
     }
 
-    protected function updateAttackerPvpInfo(Character $attacker, array $healthObject, int $defenderId, int $remainingDefenderHealth = 0) {
+    protected function updateAttackerPvpInfo(Character $attacker, array $healthObject, int $defenderId, int $remainingDefenderHealth = 0)
+    {
         $attackerElementalAtonement = $attacker->getInformation()->buildElementalAtonement();
         $defenderElementalAtonement = Character::find($defenderId)->getInformation()->buildElementalAtonement();
 
         event(new UpdateCharacterPvpAttack($attacker->user, [
             'health_object' => [
                 'attacker_max_health' => $healthObject['attacker_health'],
-                'attacker_health'     => $this->pvpAttack->getAttackerHealth(),
-                'defender_health'     => $remainingDefenderHealth,
+                'attacker_health' => $this->pvpAttack->getAttackerHealth(),
+                'defender_health' => $remainingDefenderHealth,
                 'defender_max_health' => $healthObject['defender_health'],
             ],
-            'messages'    => $this->pvpAttack->getMessages()['attacker'],
+            'messages' => $this->pvpAttack->getMessages()['attacker'],
             'attacker_id' => $attacker->id,
             'defender_id' => $defenderId,
-            'attacker_atonement' => !is_null($attackerElementalAtonement) ? $attackerElementalAtonement['highest_element']['name'] : 'N/A',
-            'defender_atonement' => !is_null($defenderElementalAtonement) ? $defenderElementalAtonement['highest_element']['name'] : 'N/A'
+            'attacker_atonement' => ! is_null($attackerElementalAtonement) ? $attackerElementalAtonement['highest_element']['name'] : 'N/A',
+            'defender_atonement' => ! is_null($defenderElementalAtonement) ? $defenderElementalAtonement['highest_element']['name'] : 'N/A',
         ]));
     }
 
-    protected function updateDefenderPvpInfo(Character $defender, array $healthObject, int $attackerId, int $remainingDefenderHealth = 0) {
+    protected function updateDefenderPvpInfo(Character $defender, array $healthObject, int $attackerId, int $remainingDefenderHealth = 0)
+    {
         $defenderElementalAtonement = $defender->getInformation()->buildElementalAtonement();
         $attackerElementalAtonement = Character::find($attackerId)->getInformation()->buildElementalAtonement();
 
         event(new UpdateCharacterPvpAttack($defender->user, [
             'health_object' => [
                 'attacker_max_health' => $healthObject['defender_health'],
-                'attacker_health'     => $remainingDefenderHealth,
-                'defender_health'     => $this->pvpAttack->getAttackerHealth(),
+                'attacker_health' => $remainingDefenderHealth,
+                'defender_health' => $this->pvpAttack->getAttackerHealth(),
                 'defender_max_health' => $healthObject['attacker_health'],
             ],
-            'messages'    => $this->pvpAttack->getMessages()['defender'],
+            'messages' => $this->pvpAttack->getMessages()['defender'],
             'attacker_id' => $defender->id,
             'defender_id' => $attackerId,
-            'attacker_atonement' => !is_null($attackerElementalAtonement) ? $attackerElementalAtonement['highest_element']['name'] : 'N/A',
-            'defender_atonement' => !is_null($defenderElementalAtonement) ? $defenderElementalAtonement['highest_element']['name'] : 'N/A'
+            'attacker_atonement' => ! is_null($attackerElementalAtonement) ? $attackerElementalAtonement['highest_element']['name'] : 'N/A',
+            'defender_atonement' => ! is_null($defenderElementalAtonement) ? $defenderElementalAtonement['highest_element']['name'] : 'N/A',
         ]));
     }
 
-    protected function handleDefenderDeath(Character $defender) {
+    protected function handleDefenderDeath(Character $defender)
+    {
         $defender->update([
             'killed_in_pvp' => true,
         ]);
@@ -232,7 +227,8 @@ class PvpService {
         RemoveKilledInPvpFromUser::dispatch($defender)->delay(now()->addMinutes(2));
     }
 
-    private function movePlayerToNewLocation(Character $character): Character {
+    private function movePlayerToNewLocation(Character $character): Character
+    {
 
         $cache = Cache::get('coordinates');
 
@@ -247,12 +243,12 @@ class PvpService {
         $character = $character->refresh();
 
         if (
-            !$this->mapTileValue->canWalkOnWater($character, $character->map->character_position_x, $character->map->character_position_y) ||
-            !$this->mapTileValue->canWalkOnDeathWater($character, $character->map->character_position_x, $character->map->character_position_y) ||
-            !$this->mapTileValue->canWalkOnMagma($character, $character->map->character_position_x, $character->map->character_position_y) ||
-            !$this->mapTileValue->canWalkOnDelusionalMemoriesWater($character, $character->map->character_position_x, $character->map->character_position_y) ||
-            !$this->mapTileValue->canWalkOnIcePlaneIce($character, $character->map->character_position_x, $character->map->character_position_y) ||
-            !$this->mapTileValue->canWalkOnTwistedMemoriesWater($character, $character->map->character_position_x, $character->map->character_position_y) ||
+            ! $this->mapTileValue->canWalkOnWater($character, $character->map->character_position_x, $character->map->character_position_y) ||
+            ! $this->mapTileValue->canWalkOnDeathWater($character, $character->map->character_position_x, $character->map->character_position_y) ||
+            ! $this->mapTileValue->canWalkOnMagma($character, $character->map->character_position_x, $character->map->character_position_y) ||
+            ! $this->mapTileValue->canWalkOnDelusionalMemoriesWater($character, $character->map->character_position_x, $character->map->character_position_y) ||
+            ! $this->mapTileValue->canWalkOnIcePlaneIce($character, $character->map->character_position_x, $character->map->character_position_y) ||
+            ! $this->mapTileValue->canWalkOnTwistedMemoriesWater($character, $character->map->character_position_x, $character->map->character_position_y) ||
             $this->mapTileValue->isPurgatoryWater($this->mapTileValue->getTileColor($character->map->gameMap, $character->map->character_position_x, $character->map->character_position_y))
         ) {
 

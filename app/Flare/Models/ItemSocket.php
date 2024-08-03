@@ -4,8 +4,8 @@ namespace App\Flare\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class ItemSocket extends Model {
-
+class ItemSocket extends Model
+{
     /**
      * The attributes that are mass assignable.
      *
@@ -23,14 +23,16 @@ class ItemSocket extends Model {
      */
     protected $casts = [
         'item_id' => 'integer',
-        'gem_id'  => 'integer',
+        'gem_id' => 'integer',
     ];
 
-    public function item() {
+    public function item()
+    {
         return $this->belongsTo(Item::class, 'item_id', 'id');
     }
 
-    public function gem() {
+    public function gem()
+    {
         return $this->belongsTo(Gem::class, 'gem_id', 'id');
     }
 }

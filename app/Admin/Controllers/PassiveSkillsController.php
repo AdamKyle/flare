@@ -8,40 +8,45 @@ use App\Admin\Requests\ManagePassiveSkillRequest;
 use App\Admin\Requests\PassivesImportRequest;
 use App\Flare\Models\PassiveSkill;
 use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
-use Maatwebsite\Excel\Facades\Excel;
 use App\Http\Controllers\Controller;
+use Maatwebsite\Excel\Facades\Excel;
 
-class PassiveSkillsController extends Controller {
-
-    public function index() {
+class PassiveSkillsController extends Controller
+{
+    public function index()
+    {
         return view('admin.passive-skills.index');
     }
 
-    public function show(PassiveSkill $passiveSkill) {
+    public function show(PassiveSkill $passiveSkill)
+    {
         return view('admin.passive-skills.show', [
             'skill' => $passiveSkill,
         ]);
     }
 
-    public function create() {
+    public function create()
+    {
         return view('admin.passive-skills.manage', [
-            'skill'   => null,
+            'skill' => null,
             'editing' => false,
             'effects' => PassiveSkillTypeValue::getNamedValues(),
             'parentSkills' => PassiveSkill::pluck('name', 'id')->toArray(),
         ]);
     }
 
-    public function edit(PassiveSkill $passiveSkill) {
+    public function edit(PassiveSkill $passiveSkill)
+    {
         return view('admin.passive-skills.manage', [
-            'skill'   => $passiveSkill,
+            'skill' => $passiveSkill,
             'editing' => true,
             'effects' => PassiveSkillTypeValue::getNamedValues(),
             'parentSkills' => PassiveSkill::pluck('name', 'id')->toArray(),
         ]);
     }
 
-    public function store(ManagePassiveSkillRequest $request) {
+    public function store(ManagePassiveSkillRequest $request)
+    {
         $data = $request->all();
 
         $data['is_locked'] = $request->has('is_locked');
@@ -51,10 +56,11 @@ class PassiveSkillsController extends Controller {
 
         return response()->redirectTo(route('passive.skills.skill', [
             'passiveSkill' => $passiveSkill->id,
-        ]))->with('success', 'Created: ' . $passiveSkill->name);
+        ]))->with('success', 'Created: '.$passiveSkill->name);
     }
 
-    public function update(ManagePassiveSkillRequest $request, PassiveSkill $passiveSkill) {
+    public function update(ManagePassiveSkillRequest $request, PassiveSkill $passiveSkill)
+    {
         $data = $request->all();
 
         $data['is_locked'] = $request->has('is_locked');
@@ -66,22 +72,25 @@ class PassiveSkillsController extends Controller {
 
         return response()->redirectTo(route('passive.skills.skill', [
             'passiveSkill' => $passiveSkill->id,
-        ]))->with('success', 'Updated: ' . $passiveSkill->name);
+        ]))->with('success', 'Updated: '.$passiveSkill->name);
     }
 
-    public function exportPassives() {
+    public function exportPassives()
+    {
         return view('admin.passive-skills.export');
     }
 
-    public function importPassives() {
+    public function importPassives()
+    {
         return view('admin.passive-skills.import');
     }
 
     /**
      * @codeCoverageIgnore
      */
-    public function export() {
-        $response = Excel::download(new PassiveSkillsExport(), 'passive_skills.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+    public function export()
+    {
+        $response = Excel::download(new PassiveSkillsExport, 'passive_skills.xlsx', \Maatwebsite\Excel\Excel::XLSX);
         ob_end_clean();
 
         return $response;
@@ -90,8 +99,9 @@ class PassiveSkillsController extends Controller {
     /**
      * @codeCoverageIgnore
      */
-    public function importData(PassivesImportRequest $request) {
-        Excel::import(new PassiveSkillsImport(), $request->passives_import);
+    public function importData(PassivesImportRequest $request)
+    {
+        Excel::import(new PassiveSkillsImport, $request->passives_import);
 
         return redirect()->back()->with('success', 'Imported passive skill data.');
     }

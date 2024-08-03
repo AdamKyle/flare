@@ -2,8 +2,8 @@
 
 namespace Database\Factories;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Flare\Models\MarketBoard;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 class MarketBoardFactory extends Factory
 {
@@ -23,7 +23,7 @@ class MarketBoardFactory extends Factory
     {
         return [
             'character_id' => null,
-            'item_id'      => null,
+            'item_id' => null,
             'listed_price' => null,
         ];
     }

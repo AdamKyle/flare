@@ -3,29 +3,28 @@
 namespace App\Game\Kingdoms\Service;
 
 use App\Flare\Models\BuildingExpansionQueue;
-use App\Flare\Models\BuildingInQueue;
 use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\KingdomBuilding;
-use App\Flare\Models\KingdomBuildingExpansion;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Kingdoms\Events\UpdateKingdomQueues;
 use App\Game\Kingdoms\Jobs\ExpandResourceBuilding;
-use App\Game\Kingdoms\Values\KingdomMaxValue;
 use App\Game\Kingdoms\Values\ResourceBuildingExpansionBaseValue;
 use Carbon\Carbon;
 
-class ExpandResourceBuildingService {
-
+class ExpandResourceBuildingService
+{
     use ResponseBuilder;
 
     private UpdateKingdom $updateKingdom;
 
-    public function __construct(UpdateKingdom $updateKingdom) {
+    public function __construct(UpdateKingdom $updateKingdom)
+    {
         $this->updateKingdom = $updateKingdom;
     }
 
-    public function fetchExpansionDetails(KingdomBuilding $building, Character $character): array {
+    public function fetchExpansionDetails(KingdomBuilding $building, Character $character): array
+    {
 
         if ($character->id !== $building->kingdom->character_id) {
             return $this->errorResult('You do not own that.');
@@ -35,7 +34,7 @@ class ExpandResourceBuildingService {
 
         if (is_null($buildingExpansion)) {
             return $this->successResult([
-                'expansion_details' =>[
+                'expansion_details' => [
                     'resource_costs' => ResourceBuildingExpansionBaseValue::resourceCostsForExpansion(),
                     'gold_bars_cost' => ResourceBuildingExpansionBaseValue::BASE_GOLD_BARS_REQUIRED,
                     'minutes_until_next_expansion' => ResourceBuildingExpansionBaseValue::BASE_MINUTES_REQUIRED,
@@ -54,11 +53,12 @@ class ExpandResourceBuildingService {
 
     }
 
-    protected function getTimeLeft(KingdomBuilding $building): int {
+    protected function getTimeLeft(KingdomBuilding $building): int
+    {
         $queue = BuildingExpansionQueue::where('building_id', $building->id)->first();
         $timeLeft = 0;
 
-        if (!is_null($queue)) {
+        if (! is_null($queue)) {
             $end = $queue->completed_at;
             $current = now();
 
@@ -68,7 +68,8 @@ class ExpandResourceBuildingService {
         return $timeLeft;
     }
 
-    public function startExpansion(KingdomBuilding $building): array {
+    public function startExpansion(KingdomBuilding $building): array
+    {
 
         $buildingExpansion = $building->buildingExpansion;
 
@@ -76,17 +77,17 @@ class ExpandResourceBuildingService {
 
         $kingdomGoldBars = $building->kingdom->gold_bars;
 
-        if (!is_null($expansionInQueueForBuilding)) {
+        if (! is_null($expansionInQueueForBuilding)) {
             return $this->errorResult('You already have an expansion in progress for this building.');
         }
 
-        if (!is_null($buildingExpansion)) {
+        if (! is_null($buildingExpansion)) {
 
             if ($buildingExpansion->expansions_left <= 0) {
                 return $this->errorResult('You cannot expand this building any further.');
             }
 
-            if (!$this->canAffordResourceCost($building) || $kingdomGoldBars < $buildingExpansion->gold_bars_cost) {
+            if (! $this->canAffordResourceCost($building) || $kingdomGoldBars < $buildingExpansion->gold_bars_cost) {
                 return $this->errorResult('You cannot afford to expand this building.');
             }
 
@@ -96,27 +97,27 @@ class ExpandResourceBuildingService {
 
             $expansionInQueueForBuilding = BuildingExpansionQueue::create([
                 'character_id' => $building->kingdom->character_id,
-                'kingdom_id'   => $building->kingdom_id,
-                'building_id'  => $building->id,
+                'kingdom_id' => $building->kingdom_id,
+                'building_id' => $building->id,
                 'completed_at' => $timeNeeded,
-                'started_at'   => now(),
+                'started_at' => now(),
             ]);
 
             ExpandResourceBuilding::dispatch($building, $building->kingdom->character->user, $expansionInQueueForBuilding->id)->delay($timeNeeded);
 
             return $this->successResult([
                 'time_left' => $timeNeeded->diffInSeconds(),
-                'message' => 'Currently expanding your building!'
+                'message' => 'Currently expanding your building!',
             ]);
         }
 
-        if (!$this->canAffordResourceCost($building) ) {
+        if (! $this->canAffordResourceCost($building)) {
             return $this->errorResult('You cannot afford to expand this building.');
         }
 
-         if ($kingdomGoldBars < ResourceBuildingExpansionBaseValue::BASE_GOLD_BARS_REQUIRED) {
-             return $this->errorResult('You cannot afford to expand this building.');
-         }
+        if ($kingdomGoldBars < ResourceBuildingExpansionBaseValue::BASE_GOLD_BARS_REQUIRED) {
+            return $this->errorResult('You cannot afford to expand this building.');
+        }
 
         $this->subtractBaseCostFromKingdom($building->kingdom);
 
@@ -124,21 +125,22 @@ class ExpandResourceBuildingService {
 
         $expansionInQueueForBuilding = BuildingExpansionQueue::create([
             'character_id' => $building->kingdom->character_id,
-            'kingdom_id'   => $building->kingdom_id,
-            'building_id'  => $building->id,
+            'kingdom_id' => $building->kingdom_id,
+            'building_id' => $building->id,
             'completed_at' => $timeNeeded,
-            'started_at'   => now(),
+            'started_at' => now(),
         ]);
 
         ExpandResourceBuilding::dispatch($building, $building->kingdom->character->user, $expansionInQueueForBuilding->id)->delay($timeNeeded);
 
         return $this->successResult([
             'time_left' => $timeNeeded->diffInSeconds(),
-            'message' => 'Currently expanding your building!'
+            'message' => 'Currently expanding your building!',
         ]);
     }
 
-    public function cancelExpansion(KingdomBuilding $building): array {
+    public function cancelExpansion(KingdomBuilding $building): array
+    {
 
         $buildingExpansion = $building->buildingExpansion;
         $queue = BuildingExpansionQueue::where('building');
@@ -161,13 +163,13 @@ class ExpandResourceBuildingService {
 
         foreach ($buildingExpansion->resource_costs as $key => $value) {
 
-            $newValue = $kingdom->{'current_' . $key} + ($kingdom->{'current_' . $key}  * $resourcesToGainBack);
+            $newValue = $kingdom->{'current_'.$key} + ($kingdom->{'current_'.$key} * $resourcesToGainBack);
 
-            if ($newValue > $kingdom->{'max_' . $key}) {
-                $newValue = $kingdom->{'max_' . $key};
+            if ($newValue > $kingdom->{'max_'.$key}) {
+                $newValue = $kingdom->{'max_'.$key};
             }
 
-            $kingdom->{'current_' . $key} = $newValue;
+            $kingdom->{'current_'.$key} = $newValue;
         }
 
         $kingdom->save();
@@ -179,14 +181,15 @@ class ExpandResourceBuildingService {
         event(new UpdateKingdomQueues($kingdom));
 
         return $this->successResult([
-            'message' => 'Expansion has been canceled. You got back: ' . number_format($resourcesToGainBack * 100) . '% of your resources spent - with the exception of Gold Bars.',
-            'expansion_details' => $buildingExpansion->refresh()
+            'message' => 'Expansion has been canceled. You got back: '.number_format($resourcesToGainBack * 100).'% of your resources spent - with the exception of Gold Bars.',
+            'expansion_details' => $buildingExpansion->refresh(),
         ]);
     }
 
-    protected function resourceCancellationCalculation(BuildingExpansionQueue $queue): float {
-        $start   = Carbon::parse($queue->started_at)->timestamp;
-        $end     = Carbon::parse($queue->completed_at)->timestamp;
+    protected function resourceCancellationCalculation(BuildingExpansionQueue $queue): float
+    {
+        $start = Carbon::parse($queue->started_at)->timestamp;
+        $end = Carbon::parse($queue->completed_at)->timestamp;
         $current = Carbon::parse(now())->timestamp;
 
         $completed = (($current - $start) / ($end - $start));
@@ -198,34 +201,36 @@ class ExpandResourceBuildingService {
         }
     }
 
-    protected function canAffordResourceCost(KingdomBuilding $building): bool {
+    protected function canAffordResourceCost(KingdomBuilding $building): bool
+    {
         $buildingExpansion = $building->buildingExpansion;
         $resourceCosts = ResourceBuildingExpansionBaseValue::resourceCostsForExpansion();
 
-        if (!is_null($buildingExpansion)) {
+        if (! is_null($buildingExpansion)) {
             $resourceCosts = $buildingExpansion->resource_costs;
         }
 
         $kingdom = $building->kingdom;
 
         $costs = collect($resourceCosts)->filter(function ($key, $value) use ($kingdom) {
-            return $kingdom->{'current_' . $value} >= $key;
+            return $kingdom->{'current_'.$value} >= $key;
         });
 
         return $costs->isNotEmpty() && $costs->count() === count($resourceCosts);
     }
 
-    protected function subtractCostFromKingdom(KingdomBuilding $building): void {
+    protected function subtractCostFromKingdom(KingdomBuilding $building): void
+    {
 
         $buildingExpansion = $building->buildingExpansion;
         $kingdom = $building->kingdom;
 
         $result = collect($buildingExpansion->resource_costs)->map(function ($key, $value) use ($kingdom) {
-            $remainingValue = $kingdom->{'current_' . $value} - $key;
+            $remainingValue = $kingdom->{'current_'.$value} - $key;
 
             $remainingValue = $remainingValue > 0 ? $remainingValue : 0;
 
-            return ['current_' . $value => $remainingValue];
+            return ['current_'.$value => $remainingValue];
         })->collapse()->all();
 
         $kingdom->update($result);
@@ -233,13 +238,14 @@ class ExpandResourceBuildingService {
         $this->updateKingdom->updateKingdom($kingdom->refresh());
     }
 
-    protected function subtractBaseCostFromKingdom(Kingdom $kingdom): void {
+    protected function subtractBaseCostFromKingdom(Kingdom $kingdom): void
+    {
         $result = collect(ResourceBuildingExpansionBaseValue::resourceCostsForExpansion())->map(function ($key, $value) use ($kingdom) {
-            $remainingValue = $kingdom->{'current_' . $value} - $key;
+            $remainingValue = $kingdom->{'current_'.$value} - $key;
 
             $remainingValue = $remainingValue > 0 ? $remainingValue : 0;
 
-            return ['current_' . $value => $remainingValue];
+            return ['current_'.$value => $remainingValue];
         })->collapse()->all();
 
         $kingdom->update($result);

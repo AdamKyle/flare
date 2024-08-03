@@ -9,8 +9,6 @@ class NpcCommandTypeHelper
     /**
      * Wrapper to get the NPC Command Type name.
      *
-     * @param int $type
-     * @return string
      * @throws \Exception
      */
     public static function statusType(int $type): string

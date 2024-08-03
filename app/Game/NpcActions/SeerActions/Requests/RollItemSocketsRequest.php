@@ -28,7 +28,8 @@ class RollItemSocketsRequest extends FormRequest
         ];
     }
 
-    public function messages() {
+    public function messages()
+    {
         return [
             'slot_id.required' => 'Error. Invalid Input.',
         ];

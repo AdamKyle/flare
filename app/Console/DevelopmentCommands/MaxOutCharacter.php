@@ -28,16 +28,15 @@ class MaxOutCharacter extends Command
 
     /**
      * Execute the console command.
-     *
-     * @return void
      */
-    public function handle(): void {
+    public function handle(): void
+    {
         $characterName = $this->argument('name');
 
         $character = Character::where('name', $characterName)->first();
 
         if (is_null($character)) {
-            $this->error('No character found for name: ' . $characterName);
+            $this->error('No character found for name: '.$characterName);
 
             return;
         }
@@ -57,20 +56,21 @@ class MaxOutCharacter extends Command
         $character = $this->maxOutClassRanks($character);
 
         $character->update([
-            'gold'         => MaxCurrenciesValue::MAX_GOLD,
-            'gold_dust'    => MaxCurrenciesValue::MAX_GOLD_DUST,
-            'shards'       => MaxCurrenciesValue::MAX_SHARDS,
-            'copper_coins' => MaxCurrenciesValue::MAX_COPPER
+            'gold' => MaxCurrenciesValue::MAX_GOLD,
+            'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
+            'shards' => MaxCurrenciesValue::MAX_SHARDS,
+            'copper_coins' => MaxCurrenciesValue::MAX_COPPER,
         ]);
 
         $character = $character->refresh();
 
-        Artisan::call('level:character ' . $character->id . ' ' . 4999);
+        Artisan::call('level:character '.$character->id.' '. 4999);
 
-        Artisan::call('assign:top-end-gear ' . $character->name);
+        Artisan::call('assign:top-end-gear '.$character->name);
     }
 
-    protected function findItemsToGive(): array {
+    protected function findItemsToGive(): array
+    {
         $items = [];
 
         $itemNames = [
@@ -94,9 +94,9 @@ class MaxOutCharacter extends Command
 
             if (is_null($item)) {
 
-                $this->error('Could not find item: ' . $itemName);
+                $this->error('Could not find item: '.$itemName);
 
-                return[];
+                return [];
             }
 
             $items[] = $item;
@@ -105,16 +105,18 @@ class MaxOutCharacter extends Command
         return $items;
     }
 
-    protected function giveQuestItemToPlayer(Character $character, Item $item): Character {
+    protected function giveQuestItemToPlayer(Character $character, Item $item): Character
+    {
         $character->inventory->slots()->create([
             'character_inventory_id' => $character->inventory->id,
-            'item_id'                => $item->id,
+            'item_id' => $item->id,
         ]);
 
         return $character->refresh();
     }
 
-    protected function levelSkills(Character $character): Character {
+    protected function levelSkills(Character $character): Character
+    {
         foreach ($character->skills as $skill) {
 
             if ($skill->baseSkill->type === SkillTypeValue::TRAINING) {
@@ -123,8 +125,7 @@ class MaxOutCharacter extends Command
 
             if ($skill->baseSkill->type === SkillTypeValue::CRAFTING ||
                 $skill->baseSkill->type === SkillTypeValue::DISENCHANTING ||
-                $skill->baseSkill->type === SkillTypeValue::ENCHANTING)
-            {
+                $skill->baseSkill->type === SkillTypeValue::ENCHANTING) {
                 $skill->update(['level' => 400, 'is_hidden' => false, 'is_locked' => false]);
             }
 
@@ -140,17 +141,19 @@ class MaxOutCharacter extends Command
         return $character->refresh();
     }
 
-    protected function levelFactions(Character $character): Character {
+    protected function levelFactions(Character $character): Character
+    {
         $character->factions()->update([
-            'current_level'    => 5,
-            'maxed'            => true,
-            'title'            => FactionType::MYTHIC_PROTECTOR,
+            'current_level' => 5,
+            'maxed' => true,
+            'title' => FactionType::MYTHIC_PROTECTOR,
         ]);
 
         return $character->refresh();
     }
 
-    protected function maxOutClassRanks(Character $character): Character {
+    protected function maxOutClassRanks(Character $character): Character
+    {
         foreach ($character->classRanks as $rank) {
             $rank->weaponMasteries()->update([
                 'level' => 100,

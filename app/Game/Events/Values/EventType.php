@@ -4,36 +4,32 @@ namespace App\Game\Events\Values;
 
 use Exception;
 
-class EventType {
+class EventType
+{
+    const WEEKLY_CELESTIALS = 0;
 
+    const MONTHLY_PVP = 1;
 
-    const WEEKLY_CELESTIALS           = 0;
+    const WEEKLY_CURRENCY_DROPS = 2;
 
-    const MONTHLY_PVP                 = 1;
+    const RAID_EVENT = 3;
 
-    const WEEKLY_CURRENCY_DROPS       = 2;
+    const WINTER_EVENT = 4;
 
-    const RAID_EVENT                  = 3;
+    const PURGATORY_SMITH_HOUSE = 5;
 
-    const WINTER_EVENT                = 4;
+    const GOLD_MINES = 6;
 
-    const PURGATORY_SMITH_HOUSE       = 5;
+    const THE_OLD_CHURCH = 7;
 
-    const GOLD_MINES                  = 6;
-
-    const THE_OLD_CHURCH              = 7;
-
-    const DELUSIONAL_MEMORIES_EVENT   = 8;
+    const DELUSIONAL_MEMORIES_EVENT = 8;
 
     const WEEKLY_FACTION_LOYALTY_EVENT = 9;
 
-    /**
-     * @var int $value
-     */
     private int $value;
 
     /**
-     * @var int[] $values
+     * @var int[]
      */
     protected static array $values = [
         0 => self::WEEKLY_CELESTIALS,
@@ -64,12 +60,12 @@ class EventType {
     /**
      * Throws if the value does not exist in the array of const values.
      *
-     * @param int $value
      * @throws Exception
      */
-    public function __construct(int $value) {
-        if (!in_array($value, self::$values)) {
-            throw new Exception($value . ' does not exist.');
+    public function __construct(int $value)
+    {
+        if (! in_array($value, self::$values)) {
+            throw new Exception($value.' does not exist.');
         }
 
         $this->value = $value;
@@ -77,109 +73,97 @@ class EventType {
 
     /**
      * Return values for selection on the front end.
-     *
-     * @return array
      */
-    public static function getOptionsForSelect(): array {
+    public static function getOptionsForSelect(): array
+    {
         return self::$selection;
     }
 
     /**
      * Gets the name of the event.
-     *
-     * @return string
      */
-    public function getNameForEvent(): string {
+    public function getNameForEvent(): string
+    {
         return self::$selection[$this->value];
     }
 
     /**
      * Is weekly celestials?
-     *
-     * @return bool
      */
-    public function isWeeklyCelestials(): bool {
+    public function isWeeklyCelestials(): bool
+    {
         return $this->value === self::WEEKLY_CELESTIALS;
     }
 
     /**
      * Is monthly pvp?
-     *
-     * @return bool
      */
-    public function isMonthlyPVP(): bool {
+    public function isMonthlyPVP(): bool
+    {
         return $this->value === self::MONTHLY_PVP;
     }
 
     /**
      * Is weekly currency drops?
-     *
-     * @return bool
      */
-    public function isWeeklyCurrencyDrops(): bool {
+    public function isWeeklyCurrencyDrops(): bool
+    {
         return $this->value === self::WEEKLY_CURRENCY_DROPS;
     }
 
     /**
      * Are we a raid event?
-     *
-     * @return bool
      */
-    public function isRaidEvent(): bool {
+    public function isRaidEvent(): bool
+    {
         return $this->value === self::RAID_EVENT;
     }
 
     /**
      * Are we a winter event?
-     *
-     * @return boolean
      */
-    public function isWinterEvent(): bool {
+    public function isWinterEvent(): bool
+    {
         return $this->value === self::WINTER_EVENT;
     }
 
     /**
      * Is purgatory smith house event?
-     *
-     * @return bool
      */
-    public function isPurgatorySmithHouseEvent(): bool {
+    public function isPurgatorySmithHouseEvent(): bool
+    {
         return $this->value === self::PURGATORY_SMITH_HOUSE;
     }
 
     /**
      * Is Gold Mines event?
-     *
-     * @return bool
      */
-    public function isGoldMinesEvent(): bool {
+    public function isGoldMinesEvent(): bool
+    {
         return $this->value === self::GOLD_MINES;
     }
 
     /**
      * Is The Old Church Event?
-     *
-     * @return bool
      */
-    public function isTheOldChurchEvent(): bool {
+    public function isTheOldChurchEvent(): bool
+    {
         return $this->value === self::THE_OLD_CHURCH;
     }
 
     /**
      * Is Delusional Memories Event?
-     *
-     * @return bool
      */
-    public function isDelusionalMemoriesEvent(): bool {
+    public function isDelusionalMemoriesEvent(): bool
+    {
         return $this->value === self::DELUSIONAL_MEMORIES_EVENT;
     }
 
     /**
      * Is Delusional Memories Event?
-     *
-     * @return bool
      */
-    public function isWeeklyFactionLoyaltyEvent(): bool {
+    public function isWeeklyFactionLoyaltyEvent(): bool
+    {
         return $this->value === self::WEEKLY_FACTION_LOYALTY_EVENT;
     }
 }

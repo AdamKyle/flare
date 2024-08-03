@@ -7,11 +7,10 @@ use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 
 class RaidsImport implements WithMultipleSheets
 {
-
     public function sheets(): array
     {
         return [
-            0 => new RaidSheet(),
+            0 => new RaidSheet,
         ];
     }
 }

@@ -12,16 +12,17 @@ use App\Flare\Models\Raid;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToCollection;
 
-class QuestsSheet implements ToCollection {
-
-    public function collection(Collection $rows) {
+class QuestsSheet implements ToCollection
+{
+    public function collection(Collection $rows)
+    {
         $questsWhichRequireOtherQuests = [];
 
         foreach ($rows as $index => $row) {
             if ($index !== 0) {
                 $quest = array_combine($rows[0]->toArray(), $row->toArray());
 
-                if (!is_null($quest['required_quest_id'])) {
+                if (! is_null($quest['required_quest_id'])) {
                     $questsWhichRequireOtherQuests[] = $quest;
 
                     $quest['required_quest_id'] = null;
@@ -29,7 +30,7 @@ class QuestsSheet implements ToCollection {
 
                 $questData = $this->returnCleanItem($quest);
 
-                if (!empty($questData)) {
+                if (! empty($questData)) {
                     Quest::updateOrCreate(['name' => $questData['name']], $questData);
                 }
             }
@@ -42,7 +43,8 @@ class QuestsSheet implements ToCollection {
         }
     }
 
-    protected function returnCleanItem(array $quest) {
+    protected function returnCleanItem(array $quest)
+    {
 
         $npc = Npc::where('name', $quest['npc_id'])->first();
 
@@ -88,7 +90,7 @@ class QuestsSheet implements ToCollection {
             $quest['reward_item'] = null;
         }
 
-        if (!isset($quest['unlocks_skill'])) {
+        if (! isset($quest['unlocks_skill'])) {
             $quest['unlocks_skill'] = false;
         } else {
             $skill = GameSkill::where('name', $quest['unlocks_skill'])->first();
@@ -100,7 +102,7 @@ class QuestsSheet implements ToCollection {
             }
         }
 
-        if (!isset($quest['parent_quest_id'])) {
+        if (! isset($quest['parent_quest_id'])) {
             $quest['parent_quest_id'] = null;
         } else {
             $foundQuest = Quest::where('name', $quest['parent_quest_id'])->first();
@@ -112,7 +114,7 @@ class QuestsSheet implements ToCollection {
             }
         }
 
-        if (!isset($quest['faction_game_map_id'])) {
+        if (! isset($quest['faction_game_map_id'])) {
             $quest['faction_game_map_id'] = null;
         } else {
             $map = GameMap::where('name', $quest['faction_game_map_id'])->first();
@@ -124,15 +126,15 @@ class QuestsSheet implements ToCollection {
             }
         }
 
-        if (!isset($quest['required_faction_level'])) {
+        if (! isset($quest['required_faction_level'])) {
             $quest['required_faction_level'] = null;
         }
 
-        if (!isset($quest['is_parent'])) {
+        if (! isset($quest['is_parent'])) {
             $quest['is_parent'] = false;
         }
 
-        if (!isset($quest['unlocks_passive_id'])) {
+        if (! isset($quest['unlocks_passive_id'])) {
             $quest['required_passive_level'] = null;
         } else {
             $passive = PassiveSkill::where('name', $quest['unlocks_passive_id'])->first();
@@ -144,7 +146,7 @@ class QuestsSheet implements ToCollection {
             }
         }
 
-        if (!isset($quest['raid_id'])) {
+        if (! isset($quest['raid_id'])) {
             $quest['raid_id'] = null;
         } else {
             $raid = Raid::where('name', $quest['raid_id'])->first();
@@ -156,7 +158,7 @@ class QuestsSheet implements ToCollection {
             }
         }
 
-        if (!isset($quest['required_quest_id'])) {
+        if (! isset($quest['required_quest_id'])) {
             $quest['required_quest_id'] = null;
         } else {
             $requiredQuest = Quest::where('name', $quest['required_quest_id'])->first();
@@ -168,7 +170,7 @@ class QuestsSheet implements ToCollection {
             }
         }
 
-        if (!isset($quest['parent_chain_quest_id'])) {
+        if (! isset($quest['parent_chain_quest_id'])) {
             $quest['parent_chain_quest_id'] = null;
         } else {
             $parentChainQuest = Quest::where('name', $quest['parent_chain_quest_id'])->first();
@@ -180,11 +182,11 @@ class QuestsSheet implements ToCollection {
             }
         }
 
-        if (!isset($quest['assisting_npc_id'])) {
+        if (! isset($quest['assisting_npc_id'])) {
             $quest['assisting_npc_id'] = null;
             $quest['requested_fame_level'] = null;
         } else {
-            $npc = Npc::where('name', $quest['assisting_npc_id'] )->first();
+            $npc = Npc::where('name', $quest['assisting_npc_id'])->first();
 
             if (is_null($npc)) {
                 $quest['assisting_npc_id'] = null;

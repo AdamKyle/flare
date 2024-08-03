@@ -2,21 +2,16 @@
 
 namespace Tests\Unit\Game\Character\Builders\AttackBuilders;
 
-use App\Flare\Values\AttackTypeValue;
-use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use App\Game\Character\Builders\AttackBuilders\CharacterPvpCacheData;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Flare\Models\Character;
-use App\Flare\Values\SpellTypes;
-use App\Flare\Values\WeaponTypes;
 use Illuminate\Support\Facades\Cache;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateItem;
 
-class CharacterPvpCacheDataTest extends TestCase {
-
-    use RefreshDatabase, CreateItem;
+class CharacterPvpCacheDataTest extends TestCase
+{
+    use CreateItem, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -24,17 +19,19 @@ class CharacterPvpCacheDataTest extends TestCase {
 
     private ?CharacterPvpCacheData $characterPvpCacheData;
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
-        $this->character = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
+        $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
 
-        $this->defender = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
+        $this->defender = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
 
         $this->characterPvpCacheData = resolve(CharacterPvpCacheData::class);
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
 
         $this->character = null;
@@ -42,21 +39,23 @@ class CharacterPvpCacheDataTest extends TestCase {
         $this->characterPvpCacheData = null;
     }
 
-    public function testSetAndFetchHealth() {
+    public function testSetAndFetchHealth()
+    {
 
         $character = $this->character->getCharacter();
         $defender = $this->defender->getCharacter();
 
         $this->characterPvpCacheData->setPvpData($character, $defender, 100, 10);
 
-        $attackerHealth = Cache::get('pvp-cache-' . $character->id);
-        $defenderHealth = Cache::get('pvp-cache-' . $defender->id);
+        $attackerHealth = Cache::get('pvp-cache-'.$character->id);
+        $defenderHealth = Cache::get('pvp-cache-'.$defender->id);
 
         $this->assertEquals(100, $attackerHealth);
         $this->assertEquals(10, $defenderHealth);
     }
 
-    public function testDeleteDefenderCacheData() {
+    public function testDeleteDefenderCacheData()
+    {
 
         $character = $this->character->getCharacter();
         $defender = $this->defender->getCharacter();
@@ -65,12 +64,13 @@ class CharacterPvpCacheDataTest extends TestCase {
 
         $this->characterPvpCacheData->removeFromPvpCache($defender);
 
-        $defenderHealth = Cache::get('pvp-cache-' . $defender->id);
+        $defenderHealth = Cache::get('pvp-cache-'.$defender->id);
 
         $this->assertNull($defenderHealth);
     }
 
-    public function testGetNullForCacheObjectWhenDefenderCacheDoesNotExist() {
+    public function testGetNullForCacheObjectWhenDefenderCacheDoesNotExist()
+    {
 
         $character = $this->character->getCharacter();
         $defender = $this->defender->getCharacter();
@@ -84,7 +84,8 @@ class CharacterPvpCacheDataTest extends TestCase {
         $this->assertNull($data);
     }
 
-    public function testGetHealthObjectForPvpCacheData() {
+    public function testGetHealthObjectForPvpCacheData()
+    {
 
         $character = $this->character->getCharacter();
         $defender = $this->defender->getCharacter();
@@ -99,7 +100,8 @@ class CharacterPvpCacheDataTest extends TestCase {
         ], $data);
     }
 
-    public function testUpdatePlayerHealth() {
+    public function testUpdatePlayerHealth()
+    {
 
         $character = $this->character->getCharacter();
         $defender = $this->defender->getCharacter();
@@ -116,7 +118,8 @@ class CharacterPvpCacheDataTest extends TestCase {
         ], $data);
     }
 
-    public function testCacheObjectDoesExistForBothDefenderAndAttacker() {
+    public function testCacheObjectDoesExistForBothDefenderAndAttacker()
+    {
 
         $character = $this->character->getCharacter();
         $defender = $this->defender->getCharacter();
@@ -127,5 +130,4 @@ class CharacterPvpCacheDataTest extends TestCase {
 
         $this->assertTrue($exists);
     }
-
 }

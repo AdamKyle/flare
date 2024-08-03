@@ -27,13 +27,13 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\ServiceProvider;
 
-class AppServiceProvider extends ServiceProvider {
+class AppServiceProvider extends ServiceProvider
+{
     /**
      * Register any application services.
-     *
-     * @return void
      */
-    public function register(): void {
+    public function register(): void
+    {
 
         // Register development based commands.
         $this->commands([
@@ -66,10 +66,9 @@ class AppServiceProvider extends ServiceProvider {
 
     /**
      * Bootstrap any application services.
-     *
-     * @return void
      */
-    public function boot(): void {
+    public function boot(): void
+    {
 
         Blade::componentNamespace('App\\View\\Components', 'core');
 
@@ -81,7 +80,7 @@ class AppServiceProvider extends ServiceProvider {
 
             $headers = [
                 'Content-type' => 'text/json',
-                'Content-Disposition' => "attachment; filename=" . $fileName . ".json",
+                'Content-Disposition' => 'attachment; filename='.$fileName.'.json',
             ];
 
             return \Response::make($content, 200, $headers);

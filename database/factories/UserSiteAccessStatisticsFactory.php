@@ -7,8 +7,6 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 
 class UserSiteAccessStatisticsFactory extends Factory
 {
-
-
     /**
      * The name of the factory's corresponding model.
      *
@@ -24,10 +22,10 @@ class UserSiteAccessStatisticsFactory extends Factory
     public function definition()
     {
         return [
-            'amount_signed_in'  => 0,
+            'amount_signed_in' => 0,
             'amount_registered' => 0,
-            'created_at'        => now(),
-            'updated_at'        => now(),
+            'created_at' => now(),
+            'updated_at' => now(),
         ];
     }
 }

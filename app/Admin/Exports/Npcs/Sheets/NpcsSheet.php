@@ -8,21 +8,17 @@ use Maatwebsite\Excel\Concerns\FromView;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithTitle;
 
-class NpcsSheet implements FromView, WithTitle, ShouldAutoSize {
-
-    /**
-     * @return View
-     */
-    public function view(): View {
+class NpcsSheet implements FromView, ShouldAutoSize, WithTitle
+{
+    public function view(): View
+    {
         return view('admin.exports.npcs.sheets.npcs', [
             'npcs' => Npc::all(),
         ]);
     }
 
-    /**
-     * @return string
-     */
-    public function title(): string {
+    public function title(): string
+    {
         return 'NPCs';
     }
 }

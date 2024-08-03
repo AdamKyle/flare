@@ -2,34 +2,32 @@
 
 namespace App\Game\Shop\Events;
 
-use Illuminate\Queue\SerializesModels;
 use App\Flare\Models\Character;
 use App\Flare\Models\InventorySlot;
+use Illuminate\Queue\SerializesModels;
 
 class SellItemEvent
 {
     use SerializesModels;
 
     /**
-     * @var InventorySlot $inventorySlot
+     * @var InventorySlot
      */
     public $inventorySlot;
 
     /**
-     * @var Character $character
+     * @var Character
      */
     public $character;
 
     /**
      * Constructor
      *
-     * @param InventorySlot $inventorySlot
-     * @param Character $character
      * @return void
      */
     public function __construct(InventorySlot $inventorySlot, Character $character)
     {
-        $this->inventorySlot      = $inventorySlot;
-        $this->character          = $character;
+        $this->inventorySlot = $inventorySlot;
+        $this->character = $character;
     }
 }

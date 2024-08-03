@@ -2,14 +2,12 @@
 
 namespace App\Flare\MapGenerator\Providers;
 
-use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
-use Illuminate\Contracts\Support\DeferrableProvider;
-use ChristianEssl\LandmapGeneration\Settings\MapSettings;
-use ChristianEssl\LandmapGeneration\Color\Shader\DetailShader;
-use App\Flare\MapGenerator\Builders\MapBuilder;
 use App\Flare\MapGenerator\Builders\ImageBuilder;
+use App\Flare\MapGenerator\Builders\MapBuilder;
 use App\Flare\MapGenerator\Console\Commands\CreateMap;
-use App\Flare\Console\Commands\CreateAdminAccount;
+use ChristianEssl\LandmapGeneration\Settings\MapSettings;
+use Illuminate\Contracts\Support\DeferrableProvider;
+use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 
 class ServiceProvider extends ApplicationServiceProvider implements DeferrableProvider
 {
@@ -21,7 +19,7 @@ class ServiceProvider extends ApplicationServiceProvider implements DeferrablePr
     public function register()
     {
         $this->app->singleton(MapSettings::class, function ($app) {
-            return new MapSettings();
+            return new MapSettings;
         });
 
         $this->app->singleton(MapBuilder::class, function ($app) {

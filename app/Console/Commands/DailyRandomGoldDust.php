@@ -38,7 +38,8 @@ class DailyRandomGoldDust extends Command
     /**
      * Execute the console command.
      */
-    public function handle(DailyGoldDustService $dailyGoldDustService) {
+    public function handle(DailyGoldDustService $dailyGoldDustService)
+    {
         $characterIds = Character::where('level', '>=', 500)->pluck('id')->toArray();
 
         Cache::delete('daily-gold-dust-lottery-won');
@@ -53,9 +54,9 @@ class DailyRandomGoldDust extends Command
 
         $dailyGoldDustService->handleWonDailyLottery($character);
 
-        $progressBar = new ProgressBar(new ConsoleOutput(), Character::count());
+        $progressBar = new ProgressBar(new ConsoleOutput, Character::count());
 
-        Character::chunkById(100, function($characters) use ($characterWhoWon, $dailyGoldDustService, $progressBar) {
+        Character::chunkById(100, function ($characters) use ($characterWhoWon, $dailyGoldDustService, $progressBar) {
             foreach ($characters as $character) {
                 if ($character->id !== $characterWhoWon) {
                     $dailyGoldDustService->handleRegularDailyGoldDust($character);

@@ -24,7 +24,8 @@ class ResetWeeklyFights extends Command
     /**
      * Execute the console command.
      */
-    public function handle() {
+    public function handle()
+    {
         WeeklyMonsterFight::truncate();
     }
 }

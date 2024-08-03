@@ -5,17 +5,15 @@ namespace App\Game\Character\Builders\StatDetailsBuilder\Concerns;
 use App\Flare\Models\Item;
 use App\Flare\Traits\IsItemUnique;
 
-trait BasicItemDetails {
-
+trait BasicItemDetails
+{
     use IsItemUnique;
 
     /**
      * Create basic item details.
-     *
-     * @param Item $item
-     * @return array
      */
-    protected function getBasicDetailsOfItem(Item $item): array {
+    protected function getBasicDetailsOfItem(Item $item): array
+    {
         return [
             'name' => $item->affix_name,
             'type' => $item->type,

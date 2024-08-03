@@ -2,21 +2,22 @@
 
 namespace App\Flare\GameImporter\Providers;
 
-use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use App\Flare\GameImporter\Console\Commands\ImportGameData;
 use App\Flare\GameImporter\Console\Commands\MassImportCustomData;
 use App\Flare\GameImporter\Values\ExcelMapper;
+use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 
-class ServiceProvider extends ApplicationServiceProvider {
-
+class ServiceProvider extends ApplicationServiceProvider
+{
     /**
      * Register any application services.
      *
      * @return void
      */
-    public function register() {
+    public function register()
+    {
         $this->app->bind(ExcelMapper::class, function () {
-            return new ExcelMapper();
+            return new ExcelMapper;
         });
 
         $this->commands([
@@ -30,6 +31,5 @@ class ServiceProvider extends ApplicationServiceProvider {
      *
      * @return voiduse App\Flare\AffixGenerator\Console\Commands\GenerateAffixes;
      */
-    public function boot() {
-    }
+    public function boot() {}
 }

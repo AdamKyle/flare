@@ -2,7 +2,6 @@
 
 namespace App\Game\NpcActions\WorkBench\Services;
 
-
 use App\Flare\Models\Character;
 use App\Flare\Models\Inventory;
 use App\Flare\Models\InventorySlot;
@@ -15,24 +14,26 @@ use App\Game\Messages\Events\ServerMessageEvent;
 use Illuminate\Database\Eloquent\Collection as DBCollection;
 use Illuminate\Support\Collection;
 
-class HolyItemService {
-
+class HolyItemService
+{
     use ResponseBuilder;
 
-    public function fetchSmithingItems(Character $character): array {
+    public function fetchSmithingItems(Character $character): array
+    {
         $slots = $this->getSlots($character);
 
         return $this->successResult([
-            'items'         => $this->fetchValidItems($slots)->reverse()->values(),
+            'items' => $this->fetchValidItems($slots)->reverse()->values(),
             'alchemy_items' => $this->fetchAlchemyItems($slots)->values(),
         ]);
     }
 
-    public function applyOil(Character $character, array $params): array {
+    public function applyOil(Character $character, array $params): array
+    {
         event(new CraftedItemTimeOutEvent($character));
 
-        $inventory   = Inventory::where('character_id', $character->id)->first();
-        $itemSlot    = InventorySlot::where('inventory_id', $inventory->id)->where('item_id', $params['item_id'])->first();
+        $inventory = Inventory::where('character_id', $character->id)->first();
+        $itemSlot = InventorySlot::where('inventory_id', $inventory->id)->where('item_id', $params['item_id'])->first();
         $alchemySlot = InventorySlot::where('inventory_id', $inventory->id)->where('item_id', $params['alchemy_item_id'])->first();
 
         if ($itemSlot->item->type === 'trinket' || $itemSlot->item->type === 'artifact') {
@@ -52,7 +53,7 @@ class HolyItemService {
             return $this->errorResult('Not enough gold dust to apply this oil.');
         }
 
-        if (!$this->canApplyAdditionalStacks($itemSlot->item)) {
+        if (! $this->canApplyAdditionalStacks($itemSlot->item)) {
             return $this->errorResult('Error: No stacks left.');
         }
 
@@ -64,7 +65,7 @@ class HolyItemService {
 
         $character = $character->refresh();
 
-        event(new ServerMessageEvent($character->user, 'Applied Holy Oil to: ' . $slot->item->affix_name, $slot->id));
+        event(new ServerMessageEvent($character->user, 'Applied Holy Oil to: '.$slot->item->affix_name, $slot->id));
 
         event(new UpdateCharacterCurrenciesEvent($character));
 
@@ -75,20 +76,23 @@ class HolyItemService {
         return $this->fetchSmithingItems($character);
     }
 
-    protected function getCost(Item $item, Item $alchemyItem): int {
-        $baseCost  = $item->holy_stacks * 100;
+    protected function getCost(Item $item, Item $alchemyItem): int
+    {
+        $baseCost = $item->holy_stacks * 100;
         $totalCost = $baseCost * $alchemyItem->holy_level;
 
         return $totalCost;
     }
 
-    protected function canApplyAdditionalStacks(Item $item): bool {
+    protected function canApplyAdditionalStacks(Item $item): bool
+    {
         $stacksLeft = $item->holy_stacks - $item->holy_stacks_applied;
 
         return $stacksLeft > 0;
     }
 
-    protected function applyStack(InventorySlot $itemSlot, InventorySlot $alchemyItemSlot): InventorySlot {
+    protected function applyStack(InventorySlot $itemSlot, InventorySlot $alchemyItemSlot): InventorySlot
+    {
         $holyItemEffect = new ItemHolyValue($alchemyItemSlot->item->holy_level);
 
         if ($itemSlot->item->appliedHolyStacks->isEmpty()) {
@@ -96,14 +100,14 @@ class HolyItemService {
 
             $newItem->update([
                 'market_sellable' => true,
-                'is_mythic'       => $itemSlot->item->is_mythic,
-                'is_cosmic'       => $itemSlot->item->is_cosmic,
+                'is_mythic' => $itemSlot->item->is_mythic,
+                'is_cosmic' => $itemSlot->item->is_cosmic,
             ]);
 
             $newItem->appliedHolyStacks()->create([
-                'item_id'                  => $newItem->id,
+                'item_id' => $newItem->id,
                 'devouring_darkness_bonus' => $holyItemEffect->getRandomDevoidanceIncrease(),
-                'stat_increase_bonus'      => $holyItemEffect->getRandomStatIncrease() / 100,
+                'stat_increase_bonus' => $holyItemEffect->getRandomStatIncrease() / 100,
             ]);
 
             $inventory = Inventory::find($itemSlot->inventory_id);
@@ -114,34 +118,37 @@ class HolyItemService {
 
             return $inventory->slots()->create([
                 'inventory_id' => $inventory->id,
-                'item_id'      => $newItem->id,
+                'item_id' => $newItem->id,
             ]);
         }
 
         $alchemyItemSlot->delete();
 
         $itemSlot->item->appliedHolyStacks()->create([
-            'item_id'                  => $itemSlot->item->id,
+            'item_id' => $itemSlot->item->id,
             'devouring_darkness_bonus' => $holyItemEffect->getRandomDevoidanceIncrease(),
-            'stat_increase_bonus'      => $holyItemEffect->getRandomStatIncrease() / 100,
+            'stat_increase_bonus' => $holyItemEffect->getRandomStatIncrease() / 100,
         ]);
 
         return $itemSlot->refresh();
     }
 
-    protected function fetchAlchemyItems(DBCollection $slots): Collection {
-        return $slots->filter(function($slot) {
+    protected function fetchAlchemyItems(DBCollection $slots): Collection
+    {
+        return $slots->filter(function ($slot) {
             return $slot->item->can_use_on_other_items;
         });
     }
 
-    protected function fetchValidItems(DBCollection $slots): Collection {
-        return $slots->filter(function($slot) {
+    protected function fetchValidItems(DBCollection $slots): Collection
+    {
+        return $slots->filter(function ($slot) {
             return ($slot->item->holy_stacks - $slot->item->holy_stacks_applied) > 0;
         });
     }
 
-    protected function getSlots(Character $character): DBCollection {
+    protected function getSlots(Character $character): DBCollection
+    {
         $inventory = Inventory::where('character_id', $character->id)->first();
 
         return InventorySlot::where('inventory_slots.inventory_id', $inventory->id)->where('inventory_slots.equipped', false)->get();

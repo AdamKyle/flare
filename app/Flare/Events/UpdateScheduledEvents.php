@@ -3,14 +3,14 @@
 namespace App\Flare\Events;
 
 use Illuminate\Broadcasting\Channel;
-use Illuminate\Broadcasting\PresenceChannel;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\SerializesModels;
 
-class UpdateScheduledEvents implements ShouldBroadcastNow {
-
+class UpdateScheduledEvents implements ShouldBroadcastNow
+{
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public array $eventData;
@@ -20,7 +20,8 @@ class UpdateScheduledEvents implements ShouldBroadcastNow {
      *
      * @return void
      */
-    public function __construct(array $eventData) {
+    public function __construct(array $eventData)
+    {
         $this->eventData = $eventData;
     }
 
@@ -29,7 +30,8 @@ class UpdateScheduledEvents implements ShouldBroadcastNow {
      *
      * @return Channel|array
      */
-    public function broadcastOn() {
+    public function broadcastOn()
+    {
         return new PresenceChannel('update-event-schedule');
     }
 }

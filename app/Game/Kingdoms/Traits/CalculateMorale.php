@@ -4,18 +4,15 @@ namespace App\Game\Kingdoms\Traits;
 
 use App\Flare\Models\Kingdom;
 
-trait CalculateMorale {
-
+trait CalculateMorale
+{
     /**
      * Calculate new morale.
      *
      * - Skip buildings who do not increase or decrease morale.
-     *
-     * @param Kingdom $kingdom
-     * @param float $morale
-     * @return float
      */
-    public function calculateNewMorale(Kingdom $kingdom, float $morale): float {
+    public function calculateNewMorale(Kingdom $kingdom, float $morale): float
+    {
 
         $buildings = $kingdom->buildings;
 
@@ -26,7 +23,7 @@ trait CalculateMorale {
             }
 
             $currentDurability = $building->current_durability;
-            $maxDurability     = $building->max_durability;
+            $maxDurability = $building->max_durability;
 
             if ($currentDurability < $maxDurability) {
                 $morale -= $building->morale_decrease;

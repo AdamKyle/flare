@@ -2,25 +2,16 @@
 
 namespace App\Flare\GameImporter\Console\Commands;
 
-use App\Flare\Models\Event;
-use App\Flare\Models\FactionLoyalty;
-use App\Flare\Models\FactionLoyaltyNpc;
-use App\Flare\Models\FactionLoyaltyNpcTask;
 use App\Flare\Models\GameMap;
-use App\Flare\Models\GlobalEventGoal;
-use App\Flare\Models\GlobalEventKill;
-use App\Flare\Models\GlobalEventParticipation;
 use App\Flare\Models\InfoPage;
 use App\Flare\Values\MapNameValue;
-use App\Game\Events\Values\EventType;
-use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Http\File;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Storage;
 
-class MassImportCustomData extends Command {
-
+class MassImportCustomData extends Command
+{
     /**
      * The name and signature of the console command.
      *
@@ -38,7 +29,8 @@ class MassImportCustomData extends Command {
     /**
      * Execute the console command.
      */
-    public function handle() {
+    public function handle()
+    {
 
         Artisan::call('import:game-data Items');
         Artisan::call('import:game-data Quests');
@@ -48,7 +40,8 @@ class MassImportCustomData extends Command {
         Artisan::call('create:quest-cache');
     }
 
-    protected function importInformationSection(): void {
+    protected function importInformationSection(): void
+    {
         $data = Storage::disk('data-imports')->get('Admin Section/information.json');
 
         $data = json_decode(trim($data), true);
@@ -57,10 +50,10 @@ class MassImportCustomData extends Command {
             InfoPage::updateOrCreate(['id' => $modelEntry['id']], $modelEntry);
         }
 
-        $sourceDirectory      = resource_path('backup/info-sections-images');
+        $sourceDirectory = resource_path('backup/info-sections-images');
         $destinationDirectory = storage_path('app/public');
 
-        $command = 'cp -R ' . escapeshellarg($sourceDirectory) . ' ' . escapeshellarg($destinationDirectory);
+        $command = 'cp -R '.escapeshellarg($sourceDirectory).' '.escapeshellarg($destinationDirectory);
         exec($command, $output, $exitCode);
 
         if ($exitCode === 0) {
@@ -71,19 +64,20 @@ class MassImportCustomData extends Command {
 
     }
 
-    protected function importGameMaps(): void {
+    protected function importGameMaps(): void
+    {
         $files = Storage::disk('data-maps')->allFiles();
 
         $corectOrder = [
-            "Surface.png",
-            "Labyrinth.png",
-            "Dungeons.png",
-            "Shadow Plane.png",
-            "Hell.png",
-            "Purgatory.png",
-            "IcePlane.png",
-            "Twisted Memories.png",
-            "Delusional Memories.png",
+            'Surface.png',
+            'Labyrinth.png',
+            'Dungeons.png',
+            'Shadow Plane.png',
+            'Hell.png',
+            'Purgatory.png',
+            'IcePlane.png',
+            'Twisted Memories.png',
+            'Delusional Memories.png',
         ];
 
         // Sort the array such that the maps are in the correct order.
@@ -97,13 +91,13 @@ class MassImportCustomData extends Command {
         foreach ($files as $file) {
             $fileName = pathinfo($file, PATHINFO_FILENAME);
 
-            $path     = Storage::disk('maps')->putFile($fileName, new File(resource_path('maps') . '/' . $file));
+            $path = Storage::disk('maps')->putFile($fileName, new File(resource_path('maps').'/'.$file));
 
             $mapValue = new MapNameValue($fileName);
 
             $gameMap = GameMap::where('name', $fileName)->first();
 
-            if (!is_null($gameMap)) {
+            if (! is_null($gameMap)) {
                 $gameMap->update([
                     'path' => $path,
                 ]);
@@ -112,9 +106,9 @@ class MassImportCustomData extends Command {
             }
 
             $gameMapData = array_merge([
-                'name'          => $fileName,
-                'path'          => $path,
-                'default'       => $mapValue->isSurface(),
+                'name' => $fileName,
+                'path' => $path,
+                'default' => $mapValue->isSurface(),
                 'kingdom_color' => MapNameValue::$kingdomColors[$fileName],
             ], (new MapNameValue($fileName))->getMapModifers());
 

@@ -24,15 +24,16 @@ class InventoryMultiRequest extends FormRequest
     public function rules()
     {
         return [
-            'slot_ids'    => 'array|required',
-            'slot_ids.*'  => 'integer',
+            'slot_ids' => 'array|required',
+            'slot_ids.*' => 'integer',
         ];
     }
 
-    public function messages() {
+    public function messages()
+    {
         return [
-            'slot_ids.*.integer'   => 'must be a set of slot ids',
-            'slot_ids.required'    => 'missing slot ids array',
+            'slot_ids.*.integer' => 'must be a set of slot ids',
+            'slot_ids.required' => 'missing slot ids array',
         ];
     }
 }

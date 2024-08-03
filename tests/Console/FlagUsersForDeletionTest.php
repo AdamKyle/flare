@@ -2,22 +2,17 @@
 
 namespace Tests\Console;
 
-
-use App\Flare\Jobs\DailyGoldDustJob;
-use App\Flare\Mail\GenericMail;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
-use Tests\Setup\Character\CharacterFactory;
 use Tests\Traits\CreateUser;
 
-class FlagUsersForDeletionTest extends TestCase {
+class FlagUsersForDeletionTest extends TestCase
+{
+    use CreateUser, RefreshDatabase;
 
-    use RefreshDatabase, CreateUser;
-
-    public function testFlagsUsersForDeletion() {
+    public function testFlagsUsersForDeletion()
+    {
 
         Mail::fake();
 
@@ -33,7 +28,8 @@ class FlagUsersForDeletionTest extends TestCase {
 
     }
 
-    public function testDoesNotFlagValidUsers() {
+    public function testDoesNotFlagValidUsers()
+    {
 
         Mail::fake();
 

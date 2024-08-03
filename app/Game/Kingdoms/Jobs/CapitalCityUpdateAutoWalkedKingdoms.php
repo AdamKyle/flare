@@ -17,19 +17,15 @@ class CapitalCityUpdateAutoWalkedKingdoms implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-
-    /**
-     * @param Kingdom $kingdom
-     */
     public function __construct(
         private readonly Kingdom $kingdom,
     ) {}
 
-
-    public function handle(KingdomTransformer $kingdomTransformer, Manager $manager): void {
+    public function handle(KingdomTransformer $kingdomTransformer, Manager $manager): void
+    {
         $kingdomData = new Item($this->kingdom, $kingdomTransformer);
         $kingdomData = $manager->createData($kingdomData)->toArray();
-        $user        = $this->kingdom->character->user;
+        $user = $this->kingdom->character->user;
 
         event(new UpdateKingdom($user, $kingdomData));
     }

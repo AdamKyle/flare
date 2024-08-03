@@ -2,8 +2,8 @@
 
 namespace Database\Factories;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Flare\Models\KingdomBuilding;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 class KingdomBuildingFactory extends Factory
 {
@@ -22,14 +22,14 @@ class KingdomBuildingFactory extends Factory
     public function definition()
     {
         return [
-            'game_building_id'   => null,
-            'kingdom_id'         => null,
-            'level'              => 1,
-            'current_defence'    => 300,
+            'game_building_id' => null,
+            'kingdom_id' => null,
+            'level' => 1,
+            'current_defence' => 300,
             'current_durability' => 300,
-            'max_defence'        => 300,
-            'max_durability'     => 300,
-            'is_locked'          => false,
+            'max_defence' => 300,
+            'max_durability' => 300,
+            'is_locked' => false,
         ];
     }
 }

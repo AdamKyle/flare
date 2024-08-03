@@ -4,16 +4,15 @@ namespace App\Game\Skills\Services;
 
 use App\Flare\Models\Skill;
 
-class SkillCheckService {
-
+class SkillCheckService
+{
     /**
      * Fetches the DC check.
      *
-     * @param Skill $skill
-     * @param int $dcIncrease | 0
-     * @return int
+     * @param  int  $dcIncrease  | 0
      */
-    public function getDCCheck(Skill $skill, int $dcIncrease = 0): int {
+    public function getDCCheck(Skill $skill, int $dcIncrease = 0): int
+    {
 
         $dcCheck = (rand(1, 400) + ($dcIncrease !== 0 ? $dcIncrease : 0)) - $skill->level;
 
@@ -21,7 +20,7 @@ class SkillCheckService {
             // @codeCoverageIgnoreStart
             return 399;
             // @codeCoverageIgnoreEnd
-        } else if ($dcCheck <= 0) {
+        } elseif ($dcCheck <= 0) {
             // @codeCoverageIgnoreStart
             return 1;
             // @codeCoverageIgnoreEnd
@@ -32,12 +31,10 @@ class SkillCheckService {
 
     /**
      * Fetches the characters roll.
-     *
-     * @param Skill $skill
-     * @return float|int
      */
-    public function characterRoll(Skill $skill): float|int {
-        if ( $skill->skill_bonus >= 1.0) {
+    public function characterRoll(Skill $skill): float|int
+    {
+        if ($skill->skill_bonus >= 1.0) {
             return 401;
         }
 

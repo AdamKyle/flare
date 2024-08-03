@@ -2,8 +2,8 @@
 
 namespace Database\Factories;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Flare\Models\Skill;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 class SkillFactory extends Factory
 {
@@ -22,12 +22,12 @@ class SkillFactory extends Factory
     public function definition()
     {
         return [
-            'character_id'          => null,
-            'currently_training'    => false,
-            'level'                 => 1,
-            'xp'                    => 0,
-            'xp_max'                => rand(100, 1000),
-            'xp_towards'            => 0.0,
+            'character_id' => null,
+            'currently_training' => false,
+            'level' => 1,
+            'xp' => 0,
+            'xp_max' => rand(100, 1000),
+            'xp_towards' => 0.0,
         ];
     }
 }

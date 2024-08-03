@@ -4,7 +4,8 @@ namespace App\Game\Market\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class ChangeItemTypeRequest extends FormRequest {
+class ChangeItemTypeRequest extends FormRequest
+{
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -20,7 +21,8 @@ class ChangeItemTypeRequest extends FormRequest {
      *
      * @return array
      */
-    public function rules() {
+    public function rules()
+    {
         return [
             'item_id' => 'integer|required',
         ];

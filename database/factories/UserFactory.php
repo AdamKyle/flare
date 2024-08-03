@@ -2,10 +2,10 @@
 
 namespace Database\Factories;
 
+use App\Flare\Models\User;
 use Hash;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
-use App\Flare\Models\User;
 
 class UserFactory extends Factory
 {
@@ -24,21 +24,21 @@ class UserFactory extends Factory
     public function definition()
     {
         return [
-            'email'                   => $this->faker->unique()->safeEmail,
-            'email_verified_at'       => now(),
-            'password'                => Hash::make('ReallyLongPassword'),
-            'remember_token'          => Str::random(10),
-            'message_throttle_count'  => 0,
-            'is_silenced'             => false,
-            'can_speak_again_at'      => null,
-            'is_banned'               => false,
-            'unbanned_at'             => null,
-            'ip_address'              => '127.0.0.1',
-            'banned_reason'           => null,
-            'un_ban_request'          => null,
+            'email' => $this->faker->unique()->safeEmail,
+            'email_verified_at' => now(),
+            'password' => Hash::make('ReallyLongPassword'),
+            'remember_token' => Str::random(10),
+            'message_throttle_count' => 0,
+            'is_silenced' => false,
+            'can_speak_again_at' => null,
+            'is_banned' => false,
+            'unbanned_at' => null,
+            'ip_address' => '127.0.0.1',
+            'banned_reason' => null,
+            'un_ban_request' => null,
             'upgraded_building_email' => true,
-            'rebuilt_building_email'  => true,
-            'kingdom_attack_email'    => true,
+            'rebuilt_building_email' => true,
+            'kingdom_attack_email' => true,
         ];
     }
 }

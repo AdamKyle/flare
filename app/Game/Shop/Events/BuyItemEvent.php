@@ -2,34 +2,32 @@
 
 namespace App\Game\Shop\Events;
 
-use Illuminate\Queue\SerializesModels;
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
+use Illuminate\Queue\SerializesModels;
 
 class BuyItemEvent
 {
     use SerializesModels;
 
     /**
-     * @var Item $item
+     * @var Item
      */
     public $item;
 
     /**
-     * @var Character $character
+     * @var Character
      */
     public $character;
 
     /**
      * Constructor
      *
-     * @param Item $item
-     * @param Character $character
      * @return void
      */
     public function __construct(Item $item, Character $character)
     {
-        $this->item      = $item;
+        $this->item = $item;
         $this->character = $character;
     }
 }

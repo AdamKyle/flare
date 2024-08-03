@@ -2,7 +2,6 @@
 
 namespace App\Game\Skills\Controllers\Api;
 
-
 use App\Flare\Models\Inventory;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
@@ -14,30 +13,23 @@ use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Skills\Services\DisenchantService;
 use App\Http\Controllers\Controller;
 
-class DisenchantingController extends Controller {
-
-    /**
-     * @var DisenchantService $disenchantingService
-     */
+class DisenchantingController extends Controller
+{
     private DisenchantService $disenchantingService;
 
-    /**
-     * @var CharacterInventoryService $characterInventoryService
-     */
     private CharacterInventoryService $characterInventoryService;
 
     /**
      * Constructor
-     *
-     * @param DisenchantService $disenchantService
-     * @param CharacterInventoryService $characterInventoryService
      */
-    public function __construct(DisenchantService $disenchantService, CharacterInventoryService $characterInventoryService) {
-        $this->disenchantingService      = $disenchantService;
+    public function __construct(DisenchantService $disenchantService, CharacterInventoryService $characterInventoryService)
+    {
+        $this->disenchantingService = $disenchantService;
         $this->characterInventoryService = $characterInventoryService;
     }
 
-    public function disenchant(Item $item) {
+    public function disenchant(Item $item)
+    {
         $result = $this->disenchantingService->disenchantItem(auth()->user()->character, $item);
 
         $status = $result['status'];
@@ -46,16 +38,18 @@ class DisenchantingController extends Controller {
         return response()->json($result, $status);
     }
 
-    public function destroy(Item $item) {
+    public function destroy(Item $item)
+    {
         $character = auth()->user()->character;
 
         $inventory = Inventory::where('character_id', $character->id)->first();
 
         $foundSlot = InventorySlot::where('item_id', $item->id)->where('inventory_id', $inventory->id)->first();
 
-        if (!is_null($foundSlot)) {
+        if (! is_null($foundSlot)) {
             if ($foundSlot->item->type === 'quest') {
                 event(new ServerMessageEvent($character->user, 'Item cannot be destroyed or does not exist. (Quest items cannot be destroyed or disenchanted)'));
+
                 return response()->json([], 200);
             }
 
@@ -63,7 +57,7 @@ class DisenchantingController extends Controller {
 
             $foundSlot->delete();
 
-            event(new ServerMessageEvent($character->user, 'Destroyed: ' . $name));
+            event(new ServerMessageEvent($character->user, 'Destroyed: '.$name));
 
             event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'inventory'));
 

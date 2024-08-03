@@ -27,7 +27,7 @@ class RaidImportRequest extends FormRequest
     public function rules()
     {
         return [
-            'raids' => 'required|mimes:xlsx|max:2048'
+            'raids' => 'required|mimes:xlsx|max:2048',
         ];
     }
 
@@ -36,11 +36,12 @@ class RaidImportRequest extends FormRequest
      *
      * @return array
      */
-    public function messages() {
+    public function messages()
+    {
         return [
-            'raids.required'   => 'Raid import file is required.',
-            'raids.mime'       => 'The system only accepts xlsx files.',
-            'raids.max'        => 'File to large, the system only accepts a max size of 2MB.',
+            'raids.required' => 'Raid import file is required.',
+            'raids.mime' => 'The system only accepts xlsx files.',
+            'raids.max' => 'File to large, the system only accepts a max size of 2MB.',
         ];
     }
 }

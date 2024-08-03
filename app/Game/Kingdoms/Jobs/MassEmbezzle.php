@@ -2,17 +2,17 @@
 
 namespace App\Game\Kingdoms\Jobs;
 
-use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;
+use App\Flare\Models\Kingdom;
+use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\Core\Events\UpdateTopBarEvent;
+use App\Game\Kingdoms\Service\KingdomService;
+use App\Game\Messages\Events\ServerMessageEvent;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use App\Flare\Models\Kingdom;
-use App\Flare\Values\MaxCurrenciesValue;
-use App\Game\Kingdoms\Service\KingdomService;
-use App\Game\Messages\Events\ServerMessageEvent;
 use Illuminate\Support\Collection;
 
 class MassEmbezzle implements ShouldQueue
@@ -23,18 +23,20 @@ class MassEmbezzle implements ShouldQueue
 
     public $amount;
 
-    public function __construct(Character $character, int $amount) {
+    public function __construct(Character $character, int $amount)
+    {
         $this->character = $character;
-        $this->amount    = $amount;
+        $this->amount = $amount;
     }
 
-    public function handle(KingdomService $kingdomService) {
+    public function handle(KingdomService $kingdomService)
+    {
 
-        if (!$this->character->is_mass_embezzling) {
+        if (! $this->character->is_mass_embezzling) {
             return;
         }
 
-        $mapId          = $this->character->map->game_map_id;
+        $mapId = $this->character->map->game_map_id;
 
         $kingdomsForMap = $this->character->kingdoms()->where('game_map_id', $mapId)->orderBy('id')->get();
 
@@ -80,11 +82,13 @@ class MassEmbezzle implements ShouldQueue
         }
     }
 
-    protected function isFinalKingdom(Collection $kingdoms, Kingdom $kingdom) {
+    protected function isFinalKingdom(Collection $kingdoms, Kingdom $kingdom)
+    {
         return $kingdoms->last()->id === $kingdom->id;
     }
 
-    protected function cannotGiveCurrency(Kingdom $kingdom) {
+    protected function cannotGiveCurrency(Kingdom $kingdom)
+    {
         $newGoldAmount = $this->character->gold + $this->amount;
         $maxCurrencies = new MaxCurrenciesValue($newGoldAmount, MaxCurrenciesValue::GOLD);
 
@@ -95,8 +99,8 @@ class MassEmbezzle implements ShouldQueue
                 'is_mass_embezzling' => false,
             ]);
 
-            $message = 'Stopping!: ' . $kingdom->name . ' At: (X/Y) ' . $kingdom->x_position . '/' . $kingdom->y_position .
-                ' On the ' . $kingdom->gameMap->name . ' Plane. Reason: Embezzling would waste gold.';
+            $message = 'Stopping!: '.$kingdom->name.' At: (X/Y) '.$kingdom->x_position.'/'.$kingdom->y_position.
+                ' On the '.$kingdom->gameMap->name.' Plane. Reason: Embezzling would waste gold.';
 
             event(new ServerMessageEvent($this->character->user, $message));
 
@@ -106,11 +110,12 @@ class MassEmbezzle implements ShouldQueue
         return false;
     }
 
-    protected function skipForMorale(Kingdom $kingdom) {
+    protected function skipForMorale(Kingdom $kingdom)
+    {
         if ($kingdom->current_morale <= 0.15) {
 
-            $message = 'Skipping: ' . $kingdom->name . ' At: (X/Y) ' . $kingdom->x_position . '/' . $kingdom->y_position .
-                ' On the ' . $kingdom->gameMap->name . ' Plane. Reason: Morale too low: ' . $kingdom->current_morale;
+            $message = 'Skipping: '.$kingdom->name.' At: (X/Y) '.$kingdom->x_position.'/'.$kingdom->y_position.
+                ' On the '.$kingdom->gameMap->name.' Plane. Reason: Morale too low: '.$kingdom->current_morale;
 
             event(new ServerMessageEvent($this->character->user, $message));
 
@@ -120,12 +125,13 @@ class MassEmbezzle implements ShouldQueue
         return false;
     }
 
-    protected function skipForLowTreasury(Kingdom $kingdom) {
+    protected function skipForLowTreasury(Kingdom $kingdom)
+    {
         $newTreasuryAmount = $kingdom->treasury - $this->amount;
 
         if ($newTreasuryAmount < 0) {
-            $message = 'Skipping: ' . $kingdom->name . ' At: (X/Y) ' . $kingdom->x_position . '/' . $kingdom->y_position .
-                ' On the ' . $kingdom->gameMap->name . ' Plane. Reason: No gold to embezzle';
+            $message = 'Skipping: '.$kingdom->name.' At: (X/Y) '.$kingdom->x_position.'/'.$kingdom->y_position.
+                ' On the '.$kingdom->gameMap->name.' Plane. Reason: No gold to embezzle';
 
             event(new ServerMessageEvent($this->character->user, $message));
 
@@ -135,9 +141,10 @@ class MassEmbezzle implements ShouldQueue
         return false;
     }
 
-    protected function embezzle(KingdomService $kingdomService, Kingdom $kingdom) {
+    protected function embezzle(KingdomService $kingdomService, Kingdom $kingdom)
+    {
 
-        $amountLeft    = $kingdom->treasury - $this->amount;
+        $amountLeft = $kingdom->treasury - $this->amount;
 
         $kingdomService->embezzleFromKingdom($kingdom, $this->amount);
 
@@ -145,14 +152,15 @@ class MassEmbezzle implements ShouldQueue
 
         $character = $this->character->refresh();
 
-        $message = 'Embezzled!: ' . $kingdom->name . ' At: (X/Y) ' . $kingdom->x_position . '/' . $kingdom->y_position .
-            ' On the ' . $kingdom->gameMap->name . ' Plane. Amount: ' . number_format($this->amount) . ' You\'re new gold: ' . number_format($character->gold) .
-            '. Kingdom Gold Left: '.number_format($amountLeft).' Morale has been reduced 15% to: ' . ($kingdom->current_morale * 100) . '%';
+        $message = 'Embezzled!: '.$kingdom->name.' At: (X/Y) '.$kingdom->x_position.'/'.$kingdom->y_position.
+            ' On the '.$kingdom->gameMap->name.' Plane. Amount: '.number_format($this->amount).' You\'re new gold: '.number_format($character->gold).
+            '. Kingdom Gold Left: '.number_format($amountLeft).' Morale has been reduced 15% to: '.($kingdom->current_morale * 100).'%';
 
         event(new ServerMessageEvent($this->character->user, $message));
     }
 
-    protected function hasFinished() {
+    protected function hasFinished()
+    {
         $message = 'Embezzling has finished.';
 
         $this->character->update([

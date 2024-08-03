@@ -8,26 +8,30 @@ use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateGameSkill;
 
-class AssignNewSkillsToPlayersTest extends TestCase {
-    use RefreshDatabase, CreateGameSkill;
+class AssignNewSkillsToPlayersTest extends TestCase
+{
+    use CreateGameSkill, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
-        $this->character = (new CharacterFactory())->createBaseCharacter();
+        $this->character = (new CharacterFactory)->createBaseCharacter();
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
 
         $this->character = null;
     }
 
-    public function testAssignNewSkillToPlayer() {
+    public function testAssignNewSkillToPlayer()
+    {
         $gameSkill = $this->createGameSkill([
-            'name' => 'Sample Skill'
+            'name' => 'Sample Skill',
         ]);
 
         $character = $this->character->getCharacter();

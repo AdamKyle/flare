@@ -3,30 +3,22 @@
 namespace App\Game\NpcActions\LabyrinthOracle\Controllers\Api;
 
 use App\Flare\Models\Character;
-use App\Game\NpcActions\LabyrinthOracle\Services\ItemTransferService;
 use App\Game\NpcActions\LabyrinthOracle\Requests\ItemTransferRequest;
+use App\Game\NpcActions\LabyrinthOracle\Services\ItemTransferService;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 
-class LabyrinthOracleController extends Controller {
-
-    /**
-     * @var ItemTransferService $itemTransferService
-     */
+class LabyrinthOracleController extends Controller
+{
     private ItemTransferService $itemTransferService;
 
-    /**
-     * @param ItemTransferService $itemTransferService
-     */
-    public function __construct(ItemTransferService $itemTransferService) {
+    public function __construct(ItemTransferService $itemTransferService)
+    {
         $this->itemTransferService = $itemTransferService;
     }
 
-    /**
-     * @param Character $character
-     * @return JsonResponse
-     */
-    public function inventoryItems(Character $character): JsonResponse {
+    public function inventoryItems(Character $character): JsonResponse
+    {
 
         return response()->json([
             'inventory' => $this->itemTransferService->fetchInventoryItems($character),
@@ -34,11 +26,10 @@ class LabyrinthOracleController extends Controller {
     }
 
     /**
-     * @param ItemTransferRequest $request
-     * @param Character $character
      * @return JsonResponse
      */
-    public function transferItem(ItemTransferRequest $request, Character $character) {
+    public function transferItem(ItemTransferRequest $request, Character $character)
+    {
         $result = $this->itemTransferService->transferItemEnhancements(
             $character,
             $request->item_id_from,
@@ -50,5 +41,4 @@ class LabyrinthOracleController extends Controller {
 
         return response()->json($result, $status);
     }
-
 }

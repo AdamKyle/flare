@@ -2,38 +2,39 @@
 
 namespace App\Flare\Listeners;
 
-use Carbon\Carbon;
-use Illuminate\Auth\Events\Login;
 use App\Flare\Events\UpdateSiteStatisticsChart;
 use App\Flare\Models\User;
 use App\Flare\Models\UserSiteAccessStatistics;
+use Carbon\Carbon;
+use Illuminate\Auth\Events\Login;
 use Illuminate\Broadcasting\PendingBroadcast;
 
-class UserLoggedInListener {
-
-
+class UserLoggedInListener
+{
     /**
      * Handle the event.
      *
-     * @param Login $event
      * @return PendingBroadcast|void
      */
-    public function handle(Login $event) {
+    public function handle(Login $event)
+    {
 
-        $event->user->last_logged_in  = now();
+        $event->user->last_logged_in = now();
         $event->user->will_be_deleted = false;
         $event->user->save();
 
         if (is_null(UserSiteAccessStatistics::first())) {
 
             UserSiteAccessStatistics::create([
-                'amount_signed_in'  => 1,
+                'amount_signed_in' => 1,
                 'amount_registered' => 0,
-                'invalid_ips'       => [$event->user->ip_address],
-                'invalid_user_ids'  => [$event->user->id],
+                'invalid_ips' => [$event->user->ip_address],
+                'invalid_user_ids' => [$event->user->id],
             ]);
 
-            $adminUser = User::with('roles')->whereHas('roles', function($q) { $q->where('name', 'Admin'); })->first();
+            $adminUser = User::with('roles')->whereHas('roles', function ($q) {
+                $q->where('name', 'Admin');
+            })->first();
 
             if (is_null($adminUser)) {
                 return;
@@ -46,26 +47,26 @@ class UserLoggedInListener {
 
         if ($lastRecord->created_at->lt(Carbon::today(config('app.timezone')))) {
             UserSiteAccessStatistics::create([
-                'amount_signed_in'  => 1,
+                'amount_signed_in' => 1,
                 'amount_registered' => 0,
-                'invalid_ips'       => [$event->user->ip_address],
-                'invalid_user_ids'  => [$event->user->id],
+                'invalid_ips' => [$event->user->ip_address],
+                'invalid_user_ids' => [$event->user->id],
             ]);
         } else {
 
-            $invalidIps     = $lastRecord->invalid_ips;
+            $invalidIps = $lastRecord->invalid_ips;
             $invalidUserIds = $lastRecord->invalid_user_ids;
 
             if (is_null($invalidUserIds)) {
                 UserSiteAccessStatistics::create([
-                    'amount_signed_in'  => $lastRecord->amount_signed_in + 1,
+                    'amount_signed_in' => $lastRecord->amount_signed_in + 1,
                     'amount_registered' => $lastRecord->amount_registered,
-                    'invalid_ips'       => [$event->user->ip_address],
-                    'invalid_user_ids'  => [$event->user->id],
+                    'invalid_ips' => [$event->user->ip_address],
+                    'invalid_user_ids' => [$event->user->id],
                 ]);
-            } else if (!in_array($event->user->id, $invalidUserIds)) {
-                $invalidIps[]     = $event->user->ip_address;
-                $userId           = $event->user->id;
+            } elseif (! in_array($event->user->id, $invalidUserIds)) {
+                $invalidIps[] = $event->user->ip_address;
+                $userId = $event->user->id;
 
                 if (is_null($invalidUserIds)) {
                     $invalidUserIds = [$userId];
@@ -74,14 +75,13 @@ class UserLoggedInListener {
                 }
 
                 UserSiteAccessStatistics::create([
-                    'amount_signed_in'  => $lastRecord->amount_signed_in + 1,
+                    'amount_signed_in' => $lastRecord->amount_signed_in + 1,
                     'amount_registered' => $lastRecord->amount_registered,
-                    'invalid_ips'       => $invalidIps,
-                    'invalid_user_ids'  => $invalidUserIds,
+                    'invalid_ips' => $invalidIps,
+                    'invalid_user_ids' => $invalidUserIds,
                 ]);
             }
         }
-
 
         $adminUser = User::with('roles')->whereHas('roles', function ($q) {
             $q->where('name', 'Admin');

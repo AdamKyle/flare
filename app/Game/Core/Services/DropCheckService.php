@@ -3,77 +3,50 @@
 namespace App\Game\Core\Services;
 
 use App\Flare\Builders\BuildMythicItem;
+use App\Flare\Models\Character;
+use App\Flare\Models\Location;
+use App\Flare\Models\Map;
+use App\Flare\Models\Monster;
 use App\Flare\Values\CelestialType;
 use App\Flare\Values\LocationType;
 use App\Game\Battle\Services\BattleDrop;
 use Exception;
 use Facades\App\Flare\Calculators\DropCheckCalculator;
-use Facades\App\Flare\RandomNumber\RandomNumberGenerator;
-use App\Flare\Models\Character;
-use App\Flare\Models\Location;
-use App\Flare\Models\Map;
-use App\Flare\Models\Monster;
-use App\Flare\Values\LocationEffectValue;
 
-class DropCheckService {
-
-    /**
-     * @var BattleDrop $battleDrop
-     */
+class DropCheckService
+{
     private BattleDrop $battleDrop;
 
-    /**
-     * @var Monster $monster
-     */
     private Monster $monster;
 
-    /**
-     * @var Location|null $locationWithEffect
-     */
     private ?Location $locationWithEffect;
 
-    /**
-     * @var BuildMythicItem $buildMythicItem
-     */
     private BuildMythicItem $buildMythicItem;
 
-    /**
-     * @var float $lootingChance
-     */
     private float $lootingChance = 0.0;
 
-    /**
-     * @var float $gameMapBonus
-     */
     private float $gameMapBonus = 0.0;
 
-
-    /**
-     * @param BattleDrop $battleDrop
-     * @param BuildMythicItem $buildMythicItem
-     */
-    public function __construct(BattleDrop $battleDrop, BuildMythicItem $buildMythicItem) {
-        $this->battleDrop      = $battleDrop;
+    public function __construct(BattleDrop $battleDrop, BuildMythicItem $buildMythicItem)
+    {
+        $this->battleDrop = $battleDrop;
         $this->buildMythicItem = $buildMythicItem;
     }
-
 
     /**
      * Process the drop check.
      *
-     * @param Character $character
-     * @param Monster $monster
-     * @return void
      * @throws Exception
      */
-    public function process(Character $character, Monster $monster): void {
-        $this->lootingChance  = $character->skills->where('name', '=', 'Looting')->first()->skill_bonus;
-        $this->monster        = $monster;
+    public function process(Character $character, Monster $monster): void
+    {
+        $this->lootingChance = $character->skills->where('name', '=', 'Looting')->first()->skill_bonus;
+        $this->monster = $monster;
 
-        $gameMap              = $character->map->gameMap;
-        $characterMap         = $character->map;
+        $gameMap = $character->map->gameMap;
+        $characterMap = $character->map;
 
-        if (!is_null($gameMap->drop_chance_bonus)) {
+        if (! is_null($gameMap->drop_chance_bonus)) {
             $this->gameMapBonus = $gameMap->drop_chance_bonus;
         }
 
@@ -90,8 +63,8 @@ class DropCheckService {
             $this->handleMythicDrop($character, true);
         }
 
-        if (!is_null($this->locationWithEffect)) {
-            if (!is_null($this->locationWithEffect->type)) {
+        if (! is_null($this->locationWithEffect)) {
+            if (! is_null($this->locationWithEffect->type)) {
                 $locationType = new LocationType($this->locationWithEffect->type);
 
                 if ($locationType->isPurgatoryDungeons() && $character->currentAutomations->isEmpty()) {
@@ -104,12 +77,12 @@ class DropCheckService {
     /**
      * See if the player can have a mythic drop.
      *
-     * @param Character $character
-     * @param bool $useLootingChance
      * @return void
+     *
      * @throws Exception
      */
-    public function handleMythicDrop(Character $character, bool $useLootingChance = false) {
+    public function handleMythicDrop(Character $character, bool $useLootingChance = false)
+    {
         $canGetDrop = $this->canHaveMythic($useLootingChance);
 
         if ($canGetDrop) {
@@ -122,29 +95,28 @@ class DropCheckService {
     /**
      * Handles the drops themselves based on chance.
      *
-     * @param Character $character
      * @return void
+     *
      * @throws Exception
      */
-    public function handleDropChance(Character $character) {
+    public function handleDropChance(Character $character)
+    {
         $canGetDrop = $this->canHaveDrop($character);
 
         $this->battleDrop->handleDrop($character, $canGetDrop);
 
         $this->battleDrop->handleMonsterQuestDrop($character);
 
-        if (!is_null($this->locationWithEffect)) {
+        if (! is_null($this->locationWithEffect)) {
             $this->battleDrop->handleSpecialLocationQuestItem($character);
         }
     }
 
     /**
      * Are we at a location with an effect (special location)?
-     *
-     * @param Map $map
-     * @return void
      */
-    public function findLocationWithEffect(Map $map): void {
+    public function findLocationWithEffect(Map $map): void
+    {
         $this->locationWithEffect = Location::whereNotNull('enemy_strength_type')
             ->where('x', $map->character_position_x)
             ->where('y', $map->character_position_y)
@@ -154,11 +126,9 @@ class DropCheckService {
 
     /**
      * Can we get the mythic item?
-     *
-     * @param bool $useLooting
-     * @return bool
      */
-    protected function canHaveMythic(bool $useLooting = false): bool {
+    protected function canHaveMythic(bool $useLooting = false): bool
+    {
         $chance = $this->lootingChance;
 
         if ($useLooting) {
@@ -176,12 +146,11 @@ class DropCheckService {
     /**
      * Can we have the drop?
      *
-     * @param Character $character
-     * @return bool
      * @throws Exception
      */
-    protected function canHaveDrop(Character $character): bool {
-        if (!is_null($this->locationWithEffect)) {
+    protected function canHaveDrop(Character $character): bool
+    {
+        if (! is_null($this->locationWithEffect)) {
 
             $lootingBonus = $this->lootingChance;
 

@@ -2,8 +2,8 @@
 
 namespace Database\Factories;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Flare\Models\Role;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 class RoleFactory extends Factory
 {

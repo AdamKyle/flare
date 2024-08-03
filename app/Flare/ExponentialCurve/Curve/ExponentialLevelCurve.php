@@ -2,20 +2,18 @@
 
 namespace App\Flare\ExponentialCurve\Curve;
 
-class ExponentialLevelCurve {
-
+class ExponentialLevelCurve
+{
     /**
      * Generate the skill levels required for the affix.
      *
-     * @param int $min
-     * @param int $max
-     * @param int $sizeLimit (25)
-     * @return array
+     * @param  int  $sizeLimit  (25)
      */
-    public function generateSkillLevels(int $min = 1, int $max = 400, int $sizeLimit = 25): array {
+    public function generateSkillLevels(int $min = 1, int $max = 400, int $sizeLimit = 25): array
+    {
         $skillLevels = [
             'required' => [],
-            'trivial'  => [],
+            'trivial' => [],
         ];
 
         $distance = ceil(($max - $min) / ($sizeLimit - 1)); // Calculate the distance between numbers
@@ -36,7 +34,7 @@ class ExponentialLevelCurve {
             }
 
             $skillLevels['required'][] = $required;
-            $skillLevels['trivial'][]  = $trivial;
+            $skillLevels['trivial'][] = $trivial;
             $counter += 1;
 
             if ($counter >= $sizeLimit) {

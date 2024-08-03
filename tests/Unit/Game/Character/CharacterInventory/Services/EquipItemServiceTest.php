@@ -11,23 +11,25 @@ use Tests\TestCase;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateItemAffix;
 
-class EquipItemServiceTest extends TestCase {
-
-    use RefreshDatabase, CreateItem, CreateItemAffix;
+class EquipItemServiceTest extends TestCase
+{
+    use CreateItem, CreateItemAffix, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
     private ?EquipItemService $equipItemService;
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
-        $this->character = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
+        $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
 
         $this->equipItemService = resolve(EquipItemService::class);
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
 
         $this->character = null;
@@ -35,7 +37,8 @@ class EquipItemServiceTest extends TestCase {
         $this->equipItemService = null;
     }
 
-    public function testThrowErrorWhenItemToReplaceDoesNotExistInInventory() {
+    public function testThrowErrorWhenItemToReplaceDoesNotExistInInventory()
+    {
         $character = $this->character->getCharacter();
 
         $equipItemService = $this->equipItemService->setCharacter($character)->setRequest([
@@ -48,7 +51,8 @@ class EquipItemServiceTest extends TestCase {
         $equipItemService->replaceItem();
     }
 
-    public function testInventoryIsFullWhenTryingToReplaceInventorySetItem() {
+    public function testInventoryIsFullWhenTryingToReplaceInventorySetItem()
+    {
         $character = $this->character->inventoryManagement()
             ->giveItemMultipleTimes($this->createItem([
                 'type' => WeaponTypes::WEAPON,
@@ -72,13 +76,14 @@ class EquipItemServiceTest extends TestCase {
         $equipItemService->replaceItem();
     }
 
-    public function testCannotEquipAnotherUnique() {
+    public function testCannotEquipAnotherUnique()
+    {
         $character = $this->character->inventoryManagement()
             ->giveItemMultipleTimes($this->createItem([
                 'type' => WeaponTypes::WEAPON,
                 'item_prefix_id' => $this->createItemAffix([
                     'randomly_generated' => true,
-                    'type' => 'prefix'
+                    'type' => 'prefix',
                 ])->id,
             ]))
             ->getCharacterFactory()
@@ -89,8 +94,8 @@ class EquipItemServiceTest extends TestCase {
                 'type' => WeaponTypes::WEAPON,
                 'item_prefix_id' => $this->createItemAffix([
                     'randomly_generated' => true,
-                    'type' => 'prefix'
-                ])->id
+                    'type' => 'prefix',
+                ])->id,
             ]), 0, 'right-hand', true)
             ->putItemInSet($this->createItem([
                 'type' => WeaponTypes::WEAPON,
@@ -107,7 +112,8 @@ class EquipItemServiceTest extends TestCase {
         $equipItemService->replaceItem();
     }
 
-    public function testReplaceItemInSet() {
+    public function testReplaceItemInSet()
+    {
         $character = $this->character->inventoryManagement()
             ->giveItemMultipleTimes($this->createItem([
                 'type' => WeaponTypes::WEAPON,
@@ -119,7 +125,7 @@ class EquipItemServiceTest extends TestCase {
             ->createInventorySets()
             ->putItemInSet($this->createItem([
                 'type' => WeaponTypes::WEAPON,
-                'name' => 'Equipped'
+                'name' => 'Equipped',
             ]), 0, 'left-hand', true)
             ->getCharacter();
 
@@ -136,7 +142,8 @@ class EquipItemServiceTest extends TestCase {
         $this->assertEquals('To Replace', $character->inventorySets->first()->slots->first()->item->name);
     }
 
-    public function testCannotEquipUniqueForNonSet() {
+    public function testCannotEquipUniqueForNonSet()
+    {
         $character = $this->character
             ->inventoryManagement()
             ->giveItem($this->createItem([
@@ -146,17 +153,16 @@ class EquipItemServiceTest extends TestCase {
                 'type' => WeaponTypes::WEAPON,
                 'item_prefix_id' => $this->createItemAffix([
                     'randomly_generated' => true,
-                    'type' => 'prefix'
-                ])->id
+                    'type' => 'prefix',
+                ])->id,
             ]), true, 'right-hand')
             ->giveItem($this->createItem([
                 'type' => WeaponTypes::WEAPON,
                 'item_prefix_id' => $this->createItemAffix([
                     'randomly_generated' => true,
-                    'type' => 'prefix'
+                    'type' => 'prefix',
                 ])->id,
             ]))->getCharacter();
-
 
         $equipItemService = $this->equipItemService->setCharacter($character)->setRequest([
             'slot_id' => $character->inventory->slots->where('equipped', false)->first()->id,
@@ -168,7 +174,8 @@ class EquipItemServiceTest extends TestCase {
         $equipItemService->replaceItem();
     }
 
-    public function testGetUniqueItemFromSetByPrefix() {
+    public function testGetUniqueItemFromSetByPrefix()
+    {
         $character = $this->character
             ->inventorySetManagement()
             ->createInventorySets()
@@ -176,8 +183,8 @@ class EquipItemServiceTest extends TestCase {
                 'type' => WeaponTypes::WEAPON,
                 'item_prefix_id' => $this->createItemAffix([
                     'randomly_generated' => true,
-                    'type' => 'prefix'
-                ])->id
+                    'type' => 'prefix',
+                ])->id,
             ]), 0, 'right-hand', true)
             ->getCharacter();
 
@@ -186,7 +193,8 @@ class EquipItemServiceTest extends TestCase {
         )->item->type);
     }
 
-    public function testGetUniqueItemFromSetBySuffix() {
+    public function testGetUniqueItemFromSetBySuffix()
+    {
         $character = $this->character
             ->inventorySetManagement()
             ->createInventorySets()
@@ -194,8 +202,8 @@ class EquipItemServiceTest extends TestCase {
                 'type' => WeaponTypes::WEAPON,
                 'item_suffix_id' => $this->createItemAffix([
                     'randomly_generated' => true,
-                    'type' => 'suffix'
-                ])->id
+                    'type' => 'suffix',
+                ])->id,
             ]), 0, 'right-hand', true)
             ->getCharacter();
 
@@ -204,41 +212,44 @@ class EquipItemServiceTest extends TestCase {
         )->item->type);
     }
 
-    public function testItemIsUniquePrefix() {
+    public function testItemIsUniquePrefix()
+    {
         $this->assertTrue(
             $this->equipItemService->isItemToEquipUnique(
                 $this->createItem([
                     'type' => WeaponTypes::WEAPON,
                     'item_prefix_id' => $this->createItemAffix([
                         'randomly_generated' => true,
-                        'type' => 'prefix'
-                    ])->id
+                        'type' => 'prefix',
+                    ])->id,
                 ])
             )
         );
     }
 
-    public function testItemIsUniqueSuffix() {
+    public function testItemIsUniqueSuffix()
+    {
         $this->assertTrue(
             $this->equipItemService->isItemToEquipUnique(
                 $this->createItem([
                     'type' => WeaponTypes::WEAPON,
                     'item_suffix_id' => $this->createItemAffix([
                         'randomly_generated' => true,
-                        'type' => 'suffix'
-                    ])->id
+                        'type' => 'suffix',
+                    ])->id,
                 ])
             )
         );
     }
 
-    public function testItemToBeReplacedIsUniquePrefix() {
+    public function testItemToBeReplacedIsUniquePrefix()
+    {
         $character = $this->character->inventoryManagement()
             ->giveItemMultipleTimes($this->createItem([
                 'type' => WeaponTypes::WEAPON,
                 'item_prefix_id' => $this->createItemAffix([
                     'randomly_generated' => true,
-                    'type' => 'prefix'
+                    'type' => 'prefix',
                 ])->id,
             ]))
             ->getCharacterFactory()
@@ -248,11 +259,10 @@ class EquipItemServiceTest extends TestCase {
                 'type' => WeaponTypes::WEAPON,
                 'item_prefix_id' => $this->createItemAffix([
                     'randomly_generated' => true,
-                    'type' => 'prefix'
-                ])->id
+                    'type' => 'prefix',
+                ])->id,
             ]), 0, 'right-hand', true)
             ->getCharacter();
-
 
         $equipItemService = $this->equipItemService->setCharacter($character)->setRequest([
             'slot_id' => $character->inventory->slots->where('equipped', false)->first()->id,
@@ -264,13 +274,14 @@ class EquipItemServiceTest extends TestCase {
         ));
     }
 
-    public function testItemToBeReplacedIsUniqueSuffix() {
+    public function testItemToBeReplacedIsUniqueSuffix()
+    {
         $character = $this->character->inventoryManagement()
             ->giveItemMultipleTimes($this->createItem([
                 'type' => WeaponTypes::WEAPON,
                 'item_suffix_id' => $this->createItemAffix([
                     'randomly_generated' => true,
-                    'type' => 'suffix'
+                    'type' => 'suffix',
                 ])->id,
             ]))
             ->getCharacterFactory()
@@ -280,11 +291,10 @@ class EquipItemServiceTest extends TestCase {
                 'type' => WeaponTypes::WEAPON,
                 'item_suffix_id' => $this->createItemAffix([
                     'randomly_generated' => true,
-                    'type' => 'suffix'
-                ])->id
+                    'type' => 'suffix',
+                ])->id,
             ]), 0, 'right-hand', true)
             ->getCharacter();
-
 
         $equipItemService = $this->equipItemService->setCharacter($character)->setRequest([
             'slot_id' => $character->inventory->slots->where('equipped', false)->first()->id,
@@ -296,20 +306,21 @@ class EquipItemServiceTest extends TestCase {
         ));
     }
 
-    public function testUnequipBow() {
+    public function testUnequipBow()
+    {
         $character = $this->character
             ->inventoryManagement()
             ->giveItem($this->createItem([
                 'type' => WeaponTypes::BOW,
                 'item_suffix_id' => $this->createItemAffix([
                     'randomly_generated' => true,
-                    'type' => 'suffix'
-                ])->id
+                    'type' => 'suffix',
+                ])->id,
             ]), true, 'right-hand')
             ->getCharacter();
 
         $this->equipItemService->setCharacter($character)->setRequest([
-            'position' => 'right-hand'
+            'position' => 'right-hand',
         ])->unequipSlot(
             $character->inventory->slots->first(),
             $character->inventory,
@@ -320,20 +331,21 @@ class EquipItemServiceTest extends TestCase {
         $this->assertFalse($character->inventory->slots->first()->equipped);
     }
 
-    public function testUnequipHammer() {
+    public function testUnequipHammer()
+    {
         $character = $this->character
             ->inventoryManagement()
             ->giveItem($this->createItem([
                 'type' => WeaponTypes::HAMMER,
                 'item_suffix_id' => $this->createItemAffix([
                     'randomly_generated' => true,
-                    'type' => 'suffix'
-                ])->id
+                    'type' => 'suffix',
+                ])->id,
             ]), true, 'right-hand')
             ->getCharacter();
 
         $this->equipItemService->setCharacter($character)->setRequest([
-            'position' => 'right-hand'
+            'position' => 'right-hand',
         ])->unequipSlot(
             $character->inventory->slots->first(),
             $character->inventory,
@@ -344,20 +356,21 @@ class EquipItemServiceTest extends TestCase {
         $this->assertFalse($character->inventory->slots->first()->equipped);
     }
 
-    public function testUnequipStave() {
+    public function testUnequipStave()
+    {
         $character = $this->character
             ->inventoryManagement()
             ->giveItem($this->createItem([
                 'type' => WeaponTypes::STAVE,
                 'item_suffix_id' => $this->createItemAffix([
                     'randomly_generated' => true,
-                    'type' => 'suffix'
-                ])->id
+                    'type' => 'suffix',
+                ])->id,
             ]), true, 'right-hand')
             ->getCharacter();
 
         $this->equipItemService->setCharacter($character)->setRequest([
-            'position' => 'right-hand'
+            'position' => 'right-hand',
         ])->unequipSlot(
             $character->inventory->slots->first(),
             $character->inventory,
@@ -368,7 +381,8 @@ class EquipItemServiceTest extends TestCase {
         $this->assertFalse($character->inventory->slots->first()->equipped);
     }
 
-    public function testUnequipStaveFromSet() {
+    public function testUnequipStaveFromSet()
+    {
         $character = $this->character
             ->inventoryManagement()
             ->giveItem(
@@ -376,8 +390,8 @@ class EquipItemServiceTest extends TestCase {
                     'type' => WeaponTypes::STAVE,
                     'item_suffix_id' => $this->createItemAffix([
                         'randomly_generated' => true,
-                        'type' => 'suffix'
-                    ])->id
+                        'type' => 'suffix',
+                    ])->id,
                 ])
             )
             ->getCharacterFactory()
@@ -387,13 +401,13 @@ class EquipItemServiceTest extends TestCase {
                 'type' => WeaponTypes::STAVE,
                 'item_suffix_id' => $this->createItemAffix([
                     'randomly_generated' => true,
-                    'type' => 'suffix'
-                ])->id
+                    'type' => 'suffix',
+                ])->id,
             ]), 0, 'right-hand', true)
             ->getCharacter();
 
         $this->equipItemService->setCharacter($character)->setRequest([
-            'position' => 'right-hand'
+            'position' => 'right-hand',
         ])->unequipSlot(
             $character->inventory->slots->first(),
             $character->inventorySets->first(),

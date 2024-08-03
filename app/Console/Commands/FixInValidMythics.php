@@ -27,10 +27,11 @@ class FixInValidMythics extends Command
     /**
      * Execute the console command.
      */
-    public function handle() {
-        InventorySlot::whereHas('item', function($query) {
+    public function handle()
+    {
+        InventorySlot::whereHas('item', function ($query) {
             $query->where('is_mythic', true);
-        })->chunkById(250, function($inventorySlots) {
+        })->chunkById(250, function ($inventorySlots) {
             foreach ($inventorySlots as $slot) {
 
                 if ($this->isValidMythic($slot->item)) {
@@ -44,9 +45,9 @@ class FixInValidMythics extends Command
             }
         });
 
-        SetSlot::whereHas('item', function($query) {
+        SetSlot::whereHas('item', function ($query) {
             $query->where('is_mythic', true);
-        })->chunkById(250, function($inventorySlots) {
+        })->chunkById(250, function ($inventorySlots) {
             foreach ($inventorySlots as $slot) {
 
                 if ($this->isValidMythic($slot->item)) {
@@ -61,15 +62,16 @@ class FixInValidMythics extends Command
         });
     }
 
-    private function isValidMythic(Item $item): bool {
+    private function isValidMythic(Item $item): bool
+    {
 
-        if (!is_null($item->item_prefix_id)) {
+        if (! is_null($item->item_prefix_id)) {
             if ($item->itemPrefix->cost !== RandomAffixDetails::MYTHIC) {
                 return false;
             }
         }
 
-        if (!is_null($item->item_suffix_id)) {
+        if (! is_null($item->item_suffix_id)) {
             if ($item->itemSuffix->cost !== RandomAffixDetails::MYTHIC) {
                 return false;
             }

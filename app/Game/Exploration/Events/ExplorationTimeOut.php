@@ -2,45 +2,43 @@
 
 namespace App\Game\Exploration\Events;
 
-use Illuminate\Broadcasting\Channel;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Broadcasting\PresenceChannel;
-use Illuminate\Foundation\Events\Dispatchable;
-use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use App\Flare\Models\User;
+use Illuminate\Broadcasting\Channel;
+use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Broadcasting\PrivateChannel;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\SerializesModels;
 
 class ExplorationTimeOut implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     /**
-     * @var User $user
+     * @var User
      */
     private $user;
 
     /**
-     * @var int $forLength
+     * @var int
      */
     public $forLength;
 
     /**
-     * @var bool $activateBar
+     * @var bool
      */
     public $activateBar;
 
     /**
      * Create a new event instance.
      *
-     * @param User $user
-     * @param int $forLength | 0
+     * @param  int  $forLength  | 0
      * @return void
      */
     public function __construct(User $user, int $forLength = 0)
     {
-        $this->user        = $user;
-        $this->forLength   = $forLength;
+        $this->user = $user;
+        $this->forLength = $forLength;
     }
 
     /**
@@ -50,6 +48,6 @@ class ExplorationTimeOut implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('exploration-timeout-' . $this->user->id);
+        return new PrivateChannel('exploration-timeout-'.$this->user->id);
     }
 }

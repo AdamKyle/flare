@@ -6,8 +6,8 @@ use App\Flare\Services\BuildMonsterCacheService;
 use Illuminate\Console\Command;
 use Psr\SimpleCache\InvalidArgumentException;
 
-class CreateMonsterCache extends Command {
-
+class CreateMonsterCache extends Command
+{
     /**
      * The name and signature of the console command.
      *
@@ -25,8 +25,6 @@ class CreateMonsterCache extends Command {
     /**
      * Execute the console command.
      *
-     * @param BuildMonsterCacheService $buildMonsterCacheService
-     * @return void
      * @throws InvalidArgumentException
      */
     public function handle(BuildMonsterCacheService $buildMonsterCacheService): void

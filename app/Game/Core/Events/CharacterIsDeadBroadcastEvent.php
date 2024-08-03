@@ -2,36 +2,34 @@
 
 namespace App\Game\Core\Events;
 
+use App\Flare\Models\User;
 use Illuminate\Broadcasting\Channel;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
-Use App\Flare\Models\User;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\SerializesModels;
 
 class CharacterIsDeadBroadcastEvent implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-
     public $isDead = false;
 
     /**
-     * @var User $users
+     * @var User
      */
     private $user;
 
     /**
      * Create a new event instance.
      *
-     * @param User $user
-     * @param bool $isDead | false
+     * @param  bool  $isDead  | false
      * @return void
      */
     public function __construct(User $user, bool $isDead = false)
     {
-        $this->user   = $user;
+        $this->user = $user;
         $this->isDead = $isDead;
     }
 
@@ -42,6 +40,6 @@ class CharacterIsDeadBroadcastEvent implements ShouldBroadcastNow
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('character-is-dead-' . $this->user->id);
+        return new PrivateChannel('character-is-dead-'.$this->user->id);
     }
 }

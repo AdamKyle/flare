@@ -30,24 +30,27 @@ class UpdateUsersForDevelopment extends Command
      *
      * @return int
      */
-    public function handle() {
-        $progressBar = new ProgressBar(new ConsoleOutput(), User::count());
+    public function handle()
+    {
+        $progressBar = new ProgressBar(new ConsoleOutput, User::count());
 
-        User::chunkById(100, function($users) use ($progressBar) {
+        User::chunkById(100, function ($users) use ($progressBar) {
             foreach ($users as $user) {
                 if ($user->hasRole('Admin')) {
                     $progressBar->advance();
+
                     continue;
                 }
 
                 if ($user->character->name === 'Credence') {
                     $progressBar->advance();
+
                     continue;
                 }
 
                 $user->update([
-                    'email'    => Str::random(10) . '@test.com',
-                    'password' => Hash::make(Str::random(10))
+                    'email' => Str::random(10).'@test.com',
+                    'password' => Hash::make(Str::random(10)),
                 ]);
 
                 $progressBar->advance();

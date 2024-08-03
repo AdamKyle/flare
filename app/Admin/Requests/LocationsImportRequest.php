@@ -27,7 +27,7 @@ class LocationsImportRequest extends FormRequest
     public function rules()
     {
         return [
-            'locations_import' => 'required|mimes:xlsx|max:2048'
+            'locations_import' => 'required|mimes:xlsx|max:2048',
         ];
     }
 
@@ -36,11 +36,12 @@ class LocationsImportRequest extends FormRequest
      *
      * @return array
      */
-    public function messages() {
+    public function messages()
+    {
         return [
-            'locations_import.required'   => 'Locations import file is required.',
-            'locations_import.mime'       => 'The system only accepts xlsx files.',
-            'locations_import.max'        => 'File to large, the system only accepts a max size of 2MB.',
+            'locations_import.required' => 'Locations import file is required.',
+            'locations_import.mime' => 'The system only accepts xlsx files.',
+            'locations_import.max' => 'File to large, the system only accepts a max size of 2MB.',
         ];
     }
 }

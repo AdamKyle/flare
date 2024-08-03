@@ -32,20 +32,22 @@ use App\Game\Skills\Services\UpdateCharacterSkillsService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use League\Fractal\Manager;
 
-class ServiceProvider extends ApplicationServiceProvider {
+class ServiceProvider extends ApplicationServiceProvider
+{
     /**
      * Register any application services.
      *
      * @return void
      */
-    public function register() {
+    public function register()
+    {
 
         $this->app->bind(ItemListCostTransformerService::class, function () {
-            return new ItemListCostTransformerService();
+            return new ItemListCostTransformerService;
         });
 
         $this->app->bind(SkillCheckService::class, function () {
-            return new SkillCheckService();
+            return new SkillCheckService;
         });
 
         $this->app->bind(EnchantItemService::class, function ($app) {
@@ -128,7 +130,7 @@ class ServiceProvider extends ApplicationServiceProvider {
             );
         });
 
-        $this->app->bind(UpdateCraftingTasksForFactionLoyalty::class, function($app) {
+        $this->app->bind(UpdateCraftingTasksForFactionLoyalty::class, function ($app) {
             return new UpdateCraftingTasksForFactionLoyalty(
                 $app->make(RandomAffixGenerator::class),
                 $app->make(FactionLoyaltyService::class)
@@ -136,7 +138,7 @@ class ServiceProvider extends ApplicationServiceProvider {
         });
 
         $this->app->bind(GemBuilder::class, function () {
-            return new GemBuilder();
+            return new GemBuilder;
         });
 
         $this->app->bind(DisenchantService::class, function ($app) {
@@ -144,7 +146,7 @@ class ServiceProvider extends ApplicationServiceProvider {
         });
 
         $this->app->bind(ItemSkillService::class, function () {
-            return new ItemSkillService();
+            return new ItemSkillService;
         });
 
         $this->app->bind(UpdateItemSkill::class, function ($app) {

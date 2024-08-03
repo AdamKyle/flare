@@ -2,8 +2,8 @@
 
 namespace Database\Factories;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Flare\Models\ReleaseNote;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 class ReleaseNoteFactory extends Factory
 {
@@ -22,10 +22,10 @@ class ReleaseNoteFactory extends Factory
     public function definition()
     {
         return [
-            'name'         => null,
-            'url'          => null,
+            'name' => null,
+            'url' => null,
             'release_date' => null,
-            'body'         => null,
+            'body' => null,
         ];
     }
 }

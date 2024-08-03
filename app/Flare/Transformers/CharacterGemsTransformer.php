@@ -7,16 +7,17 @@ use App\Game\Gems\Values\GemTypeValue;
 use Exception;
 use League\Fractal\TransformerAbstract;
 
-class CharacterGemsTransformer extends TransformerAbstract {
-
+class CharacterGemsTransformer extends TransformerAbstract
+{
     /**
      * Gets the response data for the inventory sheet
      *
-     * @param Gem $gem gem
-     * @return array
+     * @param  Gem  $gem  gem
+     *
      * @throws Exception
      */
-    public function transform(Gem $gem): array {
+    public function transform(Gem $gem): array
+    {
 
         $highestValue = collect([
             $gem->primary_atonement_amount,
@@ -35,19 +36,19 @@ class CharacterGemsTransformer extends TransformerAbstract {
         };
 
         return [
-            'id'                         => $gem->id,
-            'tier'                       => $gem->tier,
-            'name'                       => $gem->name,
-            'primary_atonement_name'     => $primaryAtonementName,
-            'secondary_atonement_name'   => $secondaryAtonementName,
-            'tertiary_atonement_name'    => $tertiaryAtonementName,
-            'primary_atonement_amount'   => $gem->primary_atonement_amount,
+            'id' => $gem->id,
+            'tier' => $gem->tier,
+            'name' => $gem->name,
+            'primary_atonement_name' => $primaryAtonementName,
+            'secondary_atonement_name' => $secondaryAtonementName,
+            'tertiary_atonement_name' => $tertiaryAtonementName,
+            'primary_atonement_amount' => $gem->primary_atonement_amount,
             'secondary_atonement_amount' => $gem->secondary_atonement_amount,
-            'tertiary_atonement_amount'  => $gem->tertiary_atonement_amount,
-            'weak_against'               => GemTypeValue::getOppsiteForHalfDamage($highestValueName),
-            'strong_against'             => GemTypeValue::getOppsiteForDoubleDamage($highestValueName),
-            'element_atoned_to'          => $highestValueName,
-            'element_atoned_to_amount'   => $highestValue,
+            'tertiary_atonement_amount' => $gem->tertiary_atonement_amount,
+            'weak_against' => GemTypeValue::getOppsiteForHalfDamage($highestValueName),
+            'strong_against' => GemTypeValue::getOppsiteForDoubleDamage($highestValueName),
+            'element_atoned_to' => $highestValueName,
+            'element_atoned_to_amount' => $highestValue,
         ];
     }
 }

@@ -3,39 +3,39 @@
 namespace Tests\Feature\Game\NpcActions\LabyrinthOracle\Controllers\Api;
 
 use App\Flare\Values\MaxCurrenciesValue;
-use App\Flare\Values\WeaponTypes;
-use App\Game\Gambler\Values\CurrencyValue;
 use App\Game\Messages\Events\ServerMessageEvent;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
-use Tests\Traits\CreateGameMap;
 use Tests\Traits\CreateGem;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateItemAffix;
 
-class LabyrinthOracleControllerTest extends TestCase {
-
-    use RefreshDatabase, CreateItem, CreateGem, CreateItemAffix;
+class LabyrinthOracleControllerTest extends TestCase
+{
+    use CreateGem, CreateItem, CreateItemAffix, RefreshDatabase;
 
     private ?CharacterFactory $character = null;
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
-        $this->character = (new CharacterFactory())->createBaseCharacter();
+        $this->character = (new CharacterFactory)->createBaseCharacter();
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
 
         $this->character = null;
     }
 
-    public function testInventoryItems() {
+    public function testInventoryItems()
+    {
         $basicItem = $this->createItem([
-            'name' => 'basic item'
+            'name' => 'basic item',
         ]);
         $artifactItem = $this->createItem([
             'name' => 'artifact item',
@@ -61,16 +61,17 @@ class LabyrinthOracleControllerTest extends TestCase {
             ->getCharacter();
 
         $response = $this->actingAs($character->user)
-            ->call('GET', '/api/character/'. $character->id .'/labyrinth-oracle');
+            ->call('GET', '/api/character/'.$character->id.'/labyrinth-oracle');
 
         $jsonData = json_decode($response->getContent(), true);
 
         $this->assertCount(2, $jsonData['inventory']);
     }
 
-    public function testInventoryItemsWithOneOfEach() {
+    public function testInventoryItemsWithOneOfEach()
+    {
         $basicItem = $this->createItem([
-            'name' => 'basic item'
+            'name' => 'basic item',
         ]);
         $artifactItem = $this->createItem([
             'name' => 'artifact item',
@@ -122,22 +123,23 @@ class LabyrinthOracleControllerTest extends TestCase {
             ->getCharacter();
 
         $response = $this->actingAs($character->user)
-            ->call('GET', '/api/character/'. $character->id .'/labyrinth-oracle');
+            ->call('GET', '/api/character/'.$character->id.'/labyrinth-oracle');
 
         $jsonData = json_decode($response->getContent(), true);
 
         $this->assertCount(4, $jsonData['inventory']);
     }
 
-    public function testUseLabyrinthOracleToTransferItem() {
+    public function testUseLabyrinthOracleToTransferItem()
+    {
         Event::fake();
 
         $attachedSuffix = $this->createItemAffix([
-            'type' => 'suffix'
+            'type' => 'suffix',
         ]);
 
         $attachedPrefix = $this->createItemAffix([
-            'type' => 'prefix'
+            'type' => 'prefix',
         ]);
 
         $itemToTransferFrom = $this->createItem([
@@ -162,7 +164,7 @@ class LabyrinthOracleControllerTest extends TestCase {
         ]);
 
         $itemToTransferFrom = $itemToTransferFrom->refresh();
-        $itemToTransferTo   = $this->createItem();
+        $itemToTransferTo = $this->createItem();
 
         $character = $this->character
             ->inventoryManagement()
@@ -179,11 +181,10 @@ class LabyrinthOracleControllerTest extends TestCase {
         $character = $character->refresh();
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/character/'. $character->id .'/transfer-attributes', [
+            ->call('POST', '/api/character/'.$character->id.'/transfer-attributes', [
                 'item_id_from' => $itemToTransferFrom->id,
                 'item_id_to' => $itemToTransferTo->id,
             ]);
-
 
         $jsonData = json_decode($response->getContent(), true);
 

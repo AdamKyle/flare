@@ -2,8 +2,8 @@
 
 namespace Database\Factories;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Flare\Models\QuestItemSlot;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 class QuestItemSlotFactory extends Factory
 {
@@ -23,7 +23,7 @@ class QuestItemSlotFactory extends Factory
     {
         return [
             'inventory_id' => null,
-            'item_id'      => null,
+            'item_id' => null,
         ];
     }
 }

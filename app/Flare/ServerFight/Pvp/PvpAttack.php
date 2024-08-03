@@ -4,14 +4,10 @@ namespace App\Flare\ServerFight\Pvp;
 
 use App\Flare\Models\Character;
 use App\Flare\ServerFight\Fight\CharacterAttacks\BaseCharacterAttack;
-use App\Flare\ServerFight\Fight\CharacterAttacks\CharacterAttack;
-use App\Flare\ServerFight\Fight\CharacterAttacks\PlayerHealing;
-use App\Flare\Values\AttackTypeValue;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 
-class PvpAttack extends PvpBase {
-
-
+class PvpAttack extends PvpBase
+{
     private array $battleMessages = [
         'attacker' => [],
         'defender' => [],
@@ -23,17 +19,20 @@ class PvpAttack extends PvpBase {
     ];
 
     public function __construct(CharacterCacheData $characterCacheData,
-                                private readonly SetUpFight $setUpFight,
-                                private readonly PvpHealing $pvpHealing,
-                                private readonly BaseCharacterAttack $characterAttack) {
+        private readonly SetUpFight $setUpFight,
+        private readonly PvpHealing $pvpHealing,
+        private readonly BaseCharacterAttack $characterAttack)
+    {
         parent::__construct($characterCacheData);
     }
 
-    public function getMessages(): array {
+    public function getMessages(): array
+    {
         return $this->battleMessages;
     }
 
-    public function setUpPvpFight(Character $attacker, Character $defender, array $healthObject): array {
+    public function setUpPvpFight(Character $attacker, Character $defender, array $healthObject): array
+    {
 
         if ($this->cache()->pvpCacheExists($attacker, $defender)) {
             return $this->cache()->fetchPvpCacheObject($attacker, $defender);
@@ -76,18 +75,17 @@ class PvpAttack extends PvpBase {
         $this->mergeMessages($pvpLifeStealing->getAttackerMessages(), 'defender');
         $this->mergeMessages($pvpLifeStealing->getDefenderMessages(), 'attacker');
 
-
         if ($defenderHealth <= 0) {
             $defenderHealth = 0;
 
             $this->mergeMessages([[
                 'message' => 'You have been slain and must revive',
-                'type'    => 'enemy-action',
+                'type' => 'enemy-action',
             ]], 'defender');
 
             $this->mergeMessages([[
                 'message' => 'You have slaughtered the player. They have been moved away.',
-                'type'    => 'enemy-action',
+                'type' => 'enemy-action',
             ]], 'attacker');
         }
 
@@ -96,12 +94,12 @@ class PvpAttack extends PvpBase {
 
             $this->mergeMessages([[
                 'message' => 'You have been slain and must revive',
-                'type'    => 'enemy-action',
+                'type' => 'enemy-action',
             ]], 'defender');
 
             $this->mergeMessages([[
                 'message' => 'You have slaughtered the player. They have been moved away.',
-                'type'    => 'enemy-action',
+                'type' => 'enemy-action',
             ]], 'attacker');
         }
 
@@ -111,11 +109,13 @@ class PvpAttack extends PvpBase {
         ];
     }
 
-    public function getAttackerHealth(): int {
+    public function getAttackerHealth(): int
+    {
         return $this->healthObject['attacker_health'];
     }
 
-    public function getDefenderHealth(): int {
+    public function getDefenderHealth(): int
+    {
         return $this->healthObject['defender_health'];
     }
 
@@ -124,7 +124,8 @@ class PvpAttack extends PvpBase {
         $this->battleMessages[$key] = array_merge($this->battleMessages[$key], $messages);
     }
 
-    private function pvpHealing(Character $defender, Character $attacker, int $attackerHealth, int $defenderHealth, bool $isVoided): PvpHealing {
+    private function pvpHealing(Character $defender, Character $attacker, int $attackerHealth, int $defenderHealth, bool $isVoided): PvpHealing
+    {
         $this->pvpHealing->setAttacker($defender);
         $this->pvpHealing->setDefender($attacker);
         $this->pvpHealing->setDefenderHealth($defenderHealth);
@@ -135,7 +136,8 @@ class PvpAttack extends PvpBase {
         return $this->pvpHealing;
     }
 
-    private function pvpLifeStealing(Character $defender, Character $attacker, int $attackerHealth, int $defenderHealth, bool $isVoided): PvpHealing {
+    private function pvpLifeStealing(Character $defender, Character $attacker, int $attackerHealth, int $defenderHealth, bool $isVoided): PvpHealing
+    {
         $this->pvpHealing->setAttacker($defender);
         $this->pvpHealing->setDefender($attacker);
         $this->pvpHealing->setDefenderHealth($attackerHealth);

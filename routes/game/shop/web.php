@@ -4,9 +4,9 @@ Route::middleware([
     'is.player.banned',
     'is.character.who.they.say.they.are',
     'is.globally.timed.out',
-])->group(function() {
+])->group(function () {
 
-    Route::middleware(['is.character.exploring'])->group(function() {
+    Route::middleware(['is.character.exploring'])->group(function () {
         Route::get('/goblin-shop/{character}', ['as' => 'game.goblin-shop.shop', 'uses' => 'GoblinShopController@listItems']);
         Route::post('/goblin-shop/buy/{character}/{item}', ['as' => 'game.goblin-shop.buy', 'uses' => 'GoblinShopController@buyItem']);
 

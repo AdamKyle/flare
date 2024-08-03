@@ -7,7 +7,6 @@ Route::get('/character/{character}/inventory/comparison-from-chat', ['uses' => '
 Route::get('/character/{character}/gem-bag', ['uses' => 'Api\CharacterGemBagController@getGemSlots']);
 Route::get('/character/{character}/gem-details/{gemBagSlot}', ['uses' => 'Api\CharacterGemBagController@getGem']);
 
-
 Route::group(['middleware' => ['is.character.dead']], function () {
     Route::get('/character/{character}/inventory/item/{item}', ['uses' => 'Api\CharacterInventoryController@itemDetails']);
 
@@ -24,7 +23,6 @@ Route::group(['middleware' => ['is.character.dead']], function () {
 
     Route::post('/character/{character}/inventory/destroy-all-alchemy-items', ['uses' => 'Api\CharacterInventoryController@destroyAllAlchemyItems']);
     Route::post('/character/{character}/inventory/destroy-alchemy-item', ['uses' => 'Api\CharacterInventoryController@destroyAlchemyItem']);
-
 
     Route::post('/character/{character}/inventory/destroy', ['uses' => 'Api\CharacterInventoryController@destroy']);
     Route::post('/character/{character}/inventory-set/remove', ['uses' => 'Api\CharacterInventoryController@removeFromSet']);

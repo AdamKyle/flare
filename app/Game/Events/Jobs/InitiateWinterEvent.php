@@ -18,29 +18,22 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
-class InitiateWinterEvent implements ShouldQueue {
-
+class InitiateWinterEvent implements ShouldQueue
+{
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    /**
-     * @var int $eventId
-     */
     protected int $eventId;
 
     /**
      * Create a new job instance.
-     *
-     * @param int $eventId
      */
-    public function __construct(int $eventId) {
+    public function __construct(int $eventId)
+    {
         $this->eventId = $eventId;
     }
 
-    /**
-     * @param BuildQuestCacheService $buildQuestCacheService
-     * @return void
-     */
-    public function handle(BuildQuestCacheService $buildQuestCacheService): void {
+    public function handle(BuildQuestCacheService $buildQuestCacheService): void
+    {
 
         $event = ScheduledEvent::find($this->eventId);
 
@@ -54,9 +47,9 @@ class InitiateWinterEvent implements ShouldQueue {
         ]);
 
         Event::create([
-            'type'       => EventType::WINTER_EVENT,
+            'type' => EventType::WINTER_EVENT,
             'started_at' => now(),
-            'ends_at'    => $event->end_date
+            'ends_at' => $event->end_date,
         ]);
 
         event(new GlobalMessageEvent('A winter chill sets over you. You turn and see the gates to the Ice Queens Realm is open. Do you dare enter? (Players just have to traverse to the new plane, you can do with this the traverse on desktop or Map Movement -> Traverse on Mobile.)'));
@@ -70,10 +63,8 @@ class InitiateWinterEvent implements ShouldQueue {
         $buildQuestCacheService->buildQuestCache(true);
     }
 
-    /**
-     * @return void
-     */
-    public function kickOffGlobalEventGoal(): void {
+    public function kickOffGlobalEventGoal(): void
+    {
         $globalEventGoalData = GlobalEventForEventTypeValue::returnGlobalEventInfoForSeasonalEvents(EventType::WINTER_EVENT);
 
         GlobalEventGoal::create($globalEventGoalData);
@@ -82,9 +73,9 @@ class InitiateWinterEvent implements ShouldQueue {
 
         event(new GlobalMessageEvent('While on the The Ice Plane, characters who kill: ANY CREATURE in either manual or exploration, will increase the new: Global Event Goal. Players will be rewarded with random Corrupted Ice Gear when specific milestones are reached.'));
 
-        event(new GlobalMessageEvent('Players can participate by going to the map: ' . $gameMap->name .
-            ' via Traverse (under the map for desktop, under the map inside Map Movement action drop down for mobile)' . ' ' .
-            'And completing either Fighting monsters, Crafting: Weapons, Spells, Armour and Rings or enchanting the already crafted items.' .
+        event(new GlobalMessageEvent('Players can participate by going to the map: '.$gameMap->name.
+            ' via Traverse (under the map for desktop, under the map inside Map Movement action drop down for mobile)'.' '.
+            'And completing either Fighting monsters, Crafting: Weapons, Spells, Armour and Rings or enchanting the already crafted items.'.
             ' You can see the event goal for the map specified by being on the map and clicking the Event Goal tab from the map.'));
     }
 }

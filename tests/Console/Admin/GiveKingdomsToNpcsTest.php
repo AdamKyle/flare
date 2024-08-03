@@ -1,18 +1,17 @@
 <?php
 
-
 namespace Tests\Console\Admin;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\Models\Kingdom;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateNpc;
-use Tests\Setup\Character\CharacterFactory;
 
 class GiveKingdomsToNpcsTest extends TestCase
 {
-    use RefreshDatabase, CreateNpc;
+    use CreateNpc, RefreshDatabase;
 
     private $character;
 
@@ -20,25 +19,26 @@ class GiveKingdomsToNpcsTest extends TestCase
     {
         parent::setUp();
 
-        (new CharacterFactory())->createBaseCharacter()
-                                ->updateCharacter([
-                                    'name' => 'SampleCharacter'
-                                ])
-                                ->givePlayerLocation()
-                                ->kingdomManagement()
-                                ->assignKingdom()
-                                ->assignBuilding()
-                                ->assignKingdom()
-                                ->getCharacterFactory()
-                                ->banCharacter('Sample Reason');
+        (new CharacterFactory)->createBaseCharacter()
+            ->updateCharacter([
+                'name' => 'SampleCharacter',
+            ])
+            ->givePlayerLocation()
+            ->kingdomManagement()
+            ->assignKingdom()
+            ->assignBuilding()
+            ->assignKingdom()
+            ->getCharacterFactory()
+            ->banCharacter('Sample Reason');
 
         $this->createNpc();
 
     }
 
-    public function testGiveBannedPlayerKingdomsToNPC() {
+    public function testGiveBannedPlayerKingdomsToNPC()
+    {
         DB::table('users')->update([
-            'updated_at' => now()->subDays(50)
+            'updated_at' => now()->subDays(50),
         ]);
 
         $this->assertEquals(0, $this->artisan('npc:take-kingdoms'));

@@ -13,21 +13,22 @@ use Exception;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
 
-
-class GemComparison {
-
-    use ResponseBuilder, GetItemAtonements;
+class GemComparison
+{
+    use GetItemAtonements, ResponseBuilder;
 
     private Manager $manager;
 
     private CharacterGemsTransformer $characterGemsTransformer;
 
-    public function __construct(CharacterGemsTransformer $characterGemsTransformer, Manager $manager) {
+    public function __construct(CharacterGemsTransformer $characterGemsTransformer, Manager $manager)
+    {
         $this->characterGemsTransformer = $characterGemsTransformer;
-        $this->manager                  = $manager;
+        $this->manager = $manager;
     }
 
-    public function compareGemForItem(Character $character, int $inventorySlotId, int $gemSlotId): array {
+    public function compareGemForItem(Character $character, int $inventorySlotId, int $gemSlotId): array
+    {
         $slot = $character->inventory->slots()->with('item')->find($inventorySlotId);
 
         if (is_null($slot)) {
@@ -41,9 +42,9 @@ class GemComparison {
         }
 
         $itemSocketData = [
-            'item_sockets'       => $slot->item->socket_count,
+            'item_sockets' => $slot->item->socket_count,
             'current_used_slots' => $slot->item->sockets->count(),
-            'item_name'          => $slot->item->affix_name,
+            'item_name' => $slot->item->affix_name,
         ];
 
         if ($slot->item->sockets->isEmpty()) {
@@ -53,58 +54,59 @@ class GemComparison {
             unset($gem['updated_at']);
 
             return $this->successResult([
-                'attached_gems'      => [],
-                'socket_data'        => $itemSocketData,
-                'has_gems_on_item'   => false,
-                'gem_to_attach'      => $this->manager->createData(new Item($gemSlot->gem, $this->characterGemsTransformer))->toArray(),
-                'when_replacing'     => [],
-                'if_replaced'        => [],
+                'attached_gems' => [],
+                'socket_data' => $itemSocketData,
+                'has_gems_on_item' => false,
+                'gem_to_attach' => $this->manager->createData(new Item($gemSlot->gem, $this->characterGemsTransformer))->toArray(),
+                'when_replacing' => [],
+                'if_replaced' => [],
             ]);
         }
 
         $comparisonData = [
-            'when_replacing'          => [],
-            'if_replaced_atonements'  => [],
+            'when_replacing' => [],
+            'if_replaced_atonements' => [],
         ];
 
         foreach ($slot->item->sockets as $socket) {
-            if (!is_null($socket->gem)) {
+            if (! is_null($socket->gem)) {
 
                 $gemComparison = $this->compareGems($gemSlot->gem, $socket->gem);
 
-                if (!empty($gemComparison['when_replacing'])) {
+                if (! empty($gemComparison['when_replacing'])) {
                     $comparisonData['when_replacing'][] = $gemComparison['when_replacing'];
                 }
 
                 $comparisonData['if_replaced_atonements'][] = [
                     'name_to_replace' => $socket->gem->name,
-                    'gem_id'          => $socket->gem_id,
-                    'data'            => $this->ifReplaced($gemSlot->gem, $slot->item, $socket->gem->id),
+                    'gem_id' => $socket->gem_id,
+                    'data' => $this->ifReplaced($gemSlot->gem, $slot->item, $socket->gem->id),
                 ];
             }
         }
 
         return $this->successResult([
-            'attached_gems'      => array_values($slot->item->sockets->map(function ($itemSocket) {
+            'attached_gems' => array_values($slot->item->sockets->map(function ($itemSocket) {
                 $gem = new Item($itemSocket->gem, $this->characterGemsTransformer);
 
                 return $this->manager->createData($gem)->toArray();
             })->toArray()),
-            'socket_data'             => $itemSocketData,
-            'has_gems_on_item'        => true,
-            'gem_to_attach'           => $this->manager->createData(new Item($gemSlot->gem, $this->characterGemsTransformer))->toArray(),
-            'when_replacing'          => $comparisonData['when_replacing'],
+            'socket_data' => $itemSocketData,
+            'has_gems_on_item' => true,
+            'gem_to_attach' => $this->manager->createData(new Item($gemSlot->gem, $this->characterGemsTransformer))->toArray(),
+            'when_replacing' => $comparisonData['when_replacing'],
             'if_replacing_atonements' => $comparisonData['if_replaced_atonements'],
-            'original_atonement'      => $this->getElementAtonement($socket->item)
+            'original_atonement' => $this->getElementAtonement($socket->item),
         ]);
     }
 
-    public function ifItemGemsAreRemoved(FlareItem $item): array {
+    public function ifItemGemsAreRemoved(FlareItem $item): array
+    {
         $gems = $item->sockets->pluck('gem')->toArray();
 
         $atonementChanges = [
             'original_atonement' => $this->getElementAtonement($item),
-            'atonement_changes'  => [],
+            'atonement_changes' => [],
         ];
 
         foreach ($gems as $index => $gem) {
@@ -114,7 +116,7 @@ class GemComparison {
 
             $atonementChanges['atonement_changes'][] = [
                 'gem_id_to_remove' => $gem['id'],
-                'comparisons'      => $this->getElementAtonementFromArray($newListOfGems),
+                'comparisons' => $this->getElementAtonementFromArray($newListOfGems),
             ];
         }
 
@@ -124,12 +126,10 @@ class GemComparison {
     /**
      * Compare two gems.
      *
-     * @param Gem $gemToCompare
-     * @param Gem $gemYouHave
-     * @return array
      * @throws Exception
      */
-    public function compareGems(Gem $gemToCompare, Gem $gemYouHave): array {
+    public function compareGems(Gem $gemToCompare, Gem $gemYouHave): array
+    {
 
         $nonMatchingComparison = [];
 
@@ -140,9 +140,9 @@ class GemComparison {
         ];
 
         foreach ($atonements as $atonement) {
-            $data = $this->getComparisonForReplacing($gemToCompare, $gemYouHave, $atonement . '_type', $atonement . '_amount');
+            $data = $this->getComparisonForReplacing($gemToCompare, $gemYouHave, $atonement.'_type', $atonement.'_amount');
 
-            if (!empty($data)) {
+            if (! empty($data)) {
                 $nonMatchingComparison = [...$nonMatchingComparison, ...$data];
             }
         }
@@ -152,16 +152,11 @@ class GemComparison {
         ];
     }
 
-    /**
-     * @param Gem $gemToCompare
-     * @param FlareItem $item
-     * @param int $gemToReplace
-     * @return array
-     */
-    protected function ifReplaced(Gem $gemToCompare, FlareItem $item, int $gemToReplace): array {
+    protected function ifReplaced(Gem $gemToCompare, FlareItem $item, int $gemToReplace): array
+    {
 
         $gemToCompareAttributes = $gemToCompare->getAttributes();
-        $itemsAttachedGems      = $item->sockets->pluck('gem')->toArray();
+        $itemsAttachedGems = $item->sockets->pluck('gem')->toArray();
 
         foreach ($itemsAttachedGems as $index => $attachedGem) {
             if ($attachedGem['id'] === $gemToReplace) {
@@ -175,24 +170,20 @@ class GemComparison {
     /**
      * Get Comparison data when the types on the gems do not match.
      *
-     * @param Gem $gemToCompare
-     * @param Gem $gemYouHave
-     * @param string $type
-     * @param string $attribute
-     * @return array
      * @throws Exception
      */
-    protected function getComparisonForReplacing(Gem $gemToCompare, Gem $gemYouHave, string $type, string $attribute): array {
+    protected function getComparisonForReplacing(Gem $gemToCompare, Gem $gemYouHave, string $type, string $attribute): array
+    {
         $comparisonOfAttribute = [];
 
         if ($gemToCompare->{$type} === $gemYouHave->{$type}) {
-            $comparisonOfAttribute[$type]               = (new GemTypeValue($gemToCompare->{$type}))->getNameOfAtonement();
-            $comparisonOfAttribute[$attribute]          = $gemToCompare->{$attribute} - $gemYouHave->{$attribute};
+            $comparisonOfAttribute[$type] = (new GemTypeValue($gemToCompare->{$type}))->getNameOfAtonement();
+            $comparisonOfAttribute[$attribute] = $gemToCompare->{$attribute} - $gemYouHave->{$attribute};
         }
 
         $comparisonOfAttribute['gem_you_have_id'] = $gemYouHave->id;
-        $comparisonOfAttribute['tier']            = $gemToCompare->tier;
-        $comparisonOfAttribute['name']            = $gemToCompare->name;
+        $comparisonOfAttribute['tier'] = $gemToCompare->tier;
+        $comparisonOfAttribute['name'] = $gemToCompare->name;
 
         return $comparisonOfAttribute;
     }

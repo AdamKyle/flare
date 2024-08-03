@@ -6,8 +6,8 @@ use Database\Factories\AnnouncementFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Announcement extends Model {
-
+class Announcement extends Model
+{
     use HasFactory;
 
     /**
@@ -25,11 +25,13 @@ class Announcement extends Model {
         'expires_at' => 'date',
     ];
 
-    public function event() {
+    public function event()
+    {
         return $this->belongsTo(Event::class, 'event_id', 'id');
     }
 
-    protected static function newFactory() {
+    protected static function newFactory()
+    {
         return AnnouncementFactory::new();
     }
 }

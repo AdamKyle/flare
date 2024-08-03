@@ -2,11 +2,11 @@
 
 namespace App\Flare\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
-class HolyStack extends Model {
-
+class HolyStack extends Model
+{
     use HasFactory;
 
     /**
@@ -22,10 +22,11 @@ class HolyStack extends Model {
 
     protected $casts = [
         'devouring_darkness_bonus' => 'float',
-        'stat_increase_bonus'      => 'float',
+        'stat_increase_bonus' => 'float',
     ];
 
-    public function item() {
+    public function item()
+    {
         return $this->belongsTo(Item::class, 'id', 'item_id');
     }
 }

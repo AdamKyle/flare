@@ -2,13 +2,13 @@
 
 namespace App\Flare\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Database\Factories\GameSkillFactory;
 use App\Game\Skills\Values\SkillTypeValue;
+use Database\Factories\GameSkillFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
-class GameSkill extends Model {
-
+class GameSkill extends Model
+{
     use HasFactory;
 
     /**
@@ -42,30 +42,33 @@ class GameSkill extends Model {
      * @var array
      */
     protected $casts = [
-        'base_damage_mod_bonus_per_level'    => 'float',
-        'base_healing_mod_bonus_per_level'   => 'float',
-        'base_ac_mod_bonus_per_level'        => 'float',
+        'base_damage_mod_bonus_per_level' => 'float',
+        'base_healing_mod_bonus_per_level' => 'float',
+        'base_ac_mod_bonus_per_level' => 'float',
         'fight_time_out_mod_bonus_per_level' => 'float',
-        'move_time_out_mod_bonus_per_level'  => 'float',
-        'skill_bonus_per_level'              => 'float',
-        'unit_time_reduction'                => 'float',
-        'building_time_reduction'            => 'float',
-        'unit_movement_time_reduction'       => 'float',
-        'class_bonus'                        => 'float',
-        'can_train'                          => 'boolean',
-        'is_locked'                          => 'integer',
-        'type'                               => 'integer',
+        'move_time_out_mod_bonus_per_level' => 'float',
+        'skill_bonus_per_level' => 'float',
+        'unit_time_reduction' => 'float',
+        'building_time_reduction' => 'float',
+        'unit_movement_time_reduction' => 'float',
+        'class_bonus' => 'float',
+        'can_train' => 'boolean',
+        'is_locked' => 'integer',
+        'type' => 'integer',
     ];
 
-    public function skillType(): SkillTypeValue {
+    public function skillType(): SkillTypeValue
+    {
         return new SkillTypeValue($this->type);
     }
 
-    public function gameClass() {
+    public function gameClass()
+    {
         return $this->belongsTo(GameClass::class, 'game_class_id', 'id');
     }
 
-    protected static function newFactory() {
+    protected static function newFactory()
+    {
         return GameSkillFactory::new();
     }
 }

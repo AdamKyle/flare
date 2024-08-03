@@ -2,17 +2,17 @@
 
 namespace Tests\Unit\Game\GuideQuests\Services;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\Models\Item;
 use App\Game\GuideQuests\Services\GuideQuestService;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateGuideQuest;
 use Tests\Traits\CreateItem;
 
-class GuideQuestServiceTest extends TestCase {
-
-    use RefreshDatabase, CreateGuideQuest, CreateItem;
+class GuideQuestServiceTest extends TestCase
+{
+    use CreateGuideQuest, CreateItem, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -20,26 +20,28 @@ class GuideQuestServiceTest extends TestCase {
 
     private ?Item $item;
 
-
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
-        $this->character = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
+        $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
 
         $this->guideQuestService = resolve(GuideQuestService::class);
 
         $this->item = $this->createItem(['type' => 'quest']);
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
 
-        $this->character         = null;
-        $this->item              = null;
+        $this->character = null;
+        $this->item = null;
         $this->guideQuestService = null;
     }
 
-    public function testCharacterHasARequirementFromTheGuideQuest() {
+    public function testCharacterHasARequirementFromTheGuideQuest()
+    {
         $this->createGuideQuest([
             'required_quest_item_id' => $this->item->id,
         ]);
@@ -54,7 +56,8 @@ class GuideQuestServiceTest extends TestCase {
         $this->assertNotEmpty($questDetails['completed_requirements']);
     }
 
-    public function testHandInGuideQuestAndAlreadyHaveOneOfTheRequirements() {
+    public function testHandInGuideQuestAndAlreadyHaveOneOfTheRequirements()
+    {
 
         $guideQuestToHandIn = $this->createGuideQuest([
             'required_level' => 1,

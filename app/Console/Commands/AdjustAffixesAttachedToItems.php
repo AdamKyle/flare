@@ -5,8 +5,8 @@ namespace App\Console\Commands;
 use App\Flare\Models\ItemAffix;
 use Illuminate\Console\Command;
 
-class AdjustAffixesAttachedToItems extends Command {
-
+class AdjustAffixesAttachedToItems extends Command
+{
     /**
      * The name and signature of the console command.
      *
@@ -24,7 +24,8 @@ class AdjustAffixesAttachedToItems extends Command {
     /**
      * Execute the console command.
      */
-    public function handle() {
+    public function handle()
+    {
 
         ItemAffix::where('str_reduction', '>=', 1)->update([
             'str_reduction' => 0.95,

@@ -6,8 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
-class GemBagSlot extends Model {
-
+class GemBagSlot extends Model
+{
     /**
      * The attributes that are mass assignable.
      *
@@ -26,15 +26,17 @@ class GemBagSlot extends Model {
      */
     protected $casts = [
         'character_id' => 'integer',
-        'gem_id'       => 'integer',
-        'amount'       => 'integer',
+        'gem_id' => 'integer',
+        'amount' => 'integer',
     ];
 
-    public function gem(): HasOne {
+    public function gem(): HasOne
+    {
         return $this->hasOne(Gem::class, 'id', 'gem_id');
     }
 
-    public function gemBag(): BelongsTo {
+    public function gemBag(): BelongsTo
+    {
         return $this->belongsTo(GemBag::class, 'gem_bag_id', 'id');
     }
 }

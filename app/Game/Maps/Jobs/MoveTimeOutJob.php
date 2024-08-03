@@ -2,28 +2,28 @@
 
 namespace App\Game\Maps\Jobs;
 
+use App\Flare\Models\Character;
 use App\Game\Battle\Events\UpdateCharacterStatus;
+use App\Game\Maps\Events\ShowTimeOutEvent;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use App\Flare\Models\Character;
-use App\Game\Maps\Events\ShowTimeOutEvent;
 
 class MoveTimeOutJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     /**
-     * @var Character $character
+     * @var Character
      */
     protected $characterId;
 
     /**
      * Create a new job instance.
      *
-     * @param Character $character
+     * @param  Character  $character
      * @return void
      */
     public function __construct(int $characterId)

@@ -2,40 +2,37 @@
 
 namespace App\Game\Kingdoms\Events;
 
-use App\Flare\Models\Kingdom;
+use App\Flare\Models\User;
 use Illuminate\Broadcasting\Channel;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
-Use App\Flare\Models\User;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\SerializesModels;
 
 class UpdateKingdom implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     /**
-     * @var array $kingdom
+     * @var array
      */
     public $kingdom;
 
     /**
-     * @var User $users
+     * @var User
      */
     private $user;
 
     /**
      * Create a new event instance.
      *
-     * @param User $user
-     * @param array $kingdom
      * @return void
      */
     public function __construct(User $user, array $kingdom)
     {
-        $this->user     = $user;
-        $this->kingdom  = $kingdom;
+        $this->user = $user;
+        $this->kingdom = $kingdom;
     }
 
     /**
@@ -45,6 +42,6 @@ class UpdateKingdom implements ShouldBroadcastNow
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('update-kingdom-' . $this->user->id);
+        return new PrivateChannel('update-kingdom-'.$this->user->id);
     }
 }

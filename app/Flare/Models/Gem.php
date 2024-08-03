@@ -8,8 +8,8 @@ use Database\Factories\GemFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Gem extends Model {
-
+class Gem extends Model
+{
     use HasFactory;
 
     /**
@@ -34,32 +34,37 @@ class Gem extends Model {
      * @var array
      */
     protected $casts = [
-        'tier'                       => 'integer',
-        'primary_atonement_type'     => 'integer',
-        'secondary_atonement_type'   => 'integer',
-        'tertiary_atonement_type'    => 'integer',
-        'primary_atonement_amount'   => 'float',
+        'tier' => 'integer',
+        'primary_atonement_type' => 'integer',
+        'secondary_atonement_type' => 'integer',
+        'tertiary_atonement_type' => 'integer',
+        'primary_atonement_amount' => 'float',
         'secondary_atonement_amount' => 'float',
-        'tertiary_atonement_amount'  => 'float',
+        'tertiary_atonement_amount' => 'float',
     ];
 
-    public function primaryAtonement(): GemTypeValue {
+    public function primaryAtonement(): GemTypeValue
+    {
         return new GemTypeValue($this->primary_atonement_type);
     }
 
-    public function secondaryAtonementType(): GemTypeValue {
+    public function secondaryAtonementType(): GemTypeValue
+    {
         return new GemTypeValue($this->secondary_atonement_type);
     }
 
-    public function tertiaryAtonementType(): GemTypeValue {
+    public function tertiaryAtonementType(): GemTypeValue
+    {
         return new GemTypeValue($this->tertiary_atonement_type);
     }
 
-    public function gemTier(): GemTierValue {
+    public function gemTier(): GemTierValue
+    {
         return new GemTierValue($this->tier);
     }
 
-    protected static function newFactory() {
+    protected static function newFactory()
+    {
         return GemFactory::new();
     }
 }

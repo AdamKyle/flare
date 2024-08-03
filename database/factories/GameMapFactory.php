@@ -2,8 +2,8 @@
 
 namespace Database\Factories;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Flare\Models\GameMap;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 class GameMapFactory extends Factory
 {
@@ -22,9 +22,9 @@ class GameMapFactory extends Factory
     public function definition()
     {
         return [
-            'name'          => 'Surface',
-            'path'          => 'path',
-            'default'       => true,
+            'name' => 'Surface',
+            'path' => 'path',
+            'default' => true,
             'kingdom_color' => '#ffffff',
         ];
     }

@@ -13,8 +13,9 @@ class ServiceProvider extends ApplicationServiceProvider
      *
      * @return void
      */
-    public function register() {
-        $this->app->bind(CharacterReincarnateService::class, function($app) {
+    public function register()
+    {
+        $this->app->bind(CharacterReincarnateService::class, function ($app) {
             return new CharacterReincarnateService(
                 $app->make(UpdateCharacterAttackTypesHandler::class)
             );

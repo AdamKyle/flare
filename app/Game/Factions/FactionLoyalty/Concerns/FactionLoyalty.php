@@ -6,59 +6,43 @@ use App\Flare\Models\Character;
 use App\Flare\Models\Event;
 use App\Flare\Models\FactionLoyalty as FactionLoyaltyModel;
 use App\Flare\Models\FactionLoyaltyNpc;
-use App\Flare\Models\ScheduledEvent;
 use App\Game\Events\Values\EventType;
 
-trait FactionLoyalty {
-
-    /**
-     * @var bool $updatedMatchingTaskAmount
-     */
+trait FactionLoyalty
+{
     private bool $updatedMatchingTaskAmount = false;
 
     /**
      * Get faction loyalty that the character is pledged to.
-     *
-     * @param Character $character
-     * @return FactionLoyaltyModel|null
      */
-    public function getFactionLoyalty(Character $character): ?FactionLoyaltyModel  {
-       return $character->factionLoyalties()->where('is_pledged', true)->first();
+    public function getFactionLoyalty(Character $character): ?FactionLoyaltyModel
+    {
+        return $character->factionLoyalties()->where('is_pledged', true)->first();
     }
 
     /**
      * Get the current npc that the player is helping.
-     *
-     * @param FactionLoyaltyModel $factionLoyalty
-     * @return FactionLoyaltyNpc|null
      */
-    public function getNpcCurrentlyHelping(FactionLoyaltyModel $factionLoyalty): ?FactionLoyaltyNpc {
+    public function getNpcCurrentlyHelping(FactionLoyaltyModel $factionLoyalty): ?FactionLoyaltyNpc
+    {
         return $factionLoyalty->factionLoyaltyNpcs->where('currently_helping', true)->first();
     }
 
     /**
      * Does the NPC have a matching task?
-     *
-     * @param FactionLoyaltyNpc $helpingNpc
-     * @param string $key
-     * @param int $id
-     * @return bool
      */
-    public function hasMatchingTask(FactionLoyaltyNpc $helpingNpc, string $key, int $id): bool {
-        return collect($helpingNpc->factionLoyaltyNpcTasks->fame_tasks)->filter(function($task) use ($key, $id) {
+    public function hasMatchingTask(FactionLoyaltyNpc $helpingNpc, string $key, int $id): bool
+    {
+        return collect($helpingNpc->factionLoyaltyNpcTasks->fame_tasks)->filter(function ($task) use ($key, $id) {
             return isset($task[$key]) && $task[$key] === $id;
         })->isNotEmpty();
     }
 
     /**
      * Updates a matching helping task.
-     *
-     * @param FactionLoyaltyNpc $helpingNpc
-     * @param string $key
-     * @param int $id
-     * @return FactionLoyaltyNpc
      */
-    public function updateMatchingHelpTask(FactionLoyaltyNpc $helpingNpc, string $key, int $id): FactionLoyaltyNpc {
+    public function updateMatchingHelpTask(FactionLoyaltyNpc $helpingNpc, string $key, int $id): FactionLoyaltyNpc
+    {
 
         $existingFame = $helpingNpc->current_fame;
 
@@ -68,7 +52,7 @@ trait FactionLoyalty {
 
             $event = Event::where('type', EventType::WEEKLY_FACTION_LOYALTY_EVENT)->first();
 
-            if (!is_null($event)) {
+            if (! is_null($event)) {
                 $amount = min($task['current_amount'] + 2, $task['required_amount']);
             }
 
@@ -78,7 +62,7 @@ trait FactionLoyalty {
         }, $helpingNpc->factionLoyaltyNpcTasks->fame_tasks);
 
         $helpingNpc->factionLoyaltyNpcTasks()->update([
-            'fame_tasks' => $tasks
+            'fame_tasks' => $tasks,
         ]);
 
         $helpingNpc = $helpingNpc->refresh();
@@ -92,13 +76,9 @@ trait FactionLoyalty {
 
     /**
      * get the matching task.
-     *
-     * @param FactionLoyaltyNpc $helpingNpc
-     * @param $key
-     * @param $id
-     * @return array
      */
-    public function getMatchingTask(FactionLoyaltyNpc $helpingNpc, $key, $id): array {
+    public function getMatchingTask(FactionLoyaltyNpc $helpingNpc, $key, $id): array
+    {
         return current(array_filter($helpingNpc->factionLoyaltyNpcTasks->fame_tasks, function ($task) use ($key, $id) {
             return isset($task[$key]) && $task[$key] === $id;
         })) ?: [];
@@ -106,21 +86,17 @@ trait FactionLoyalty {
 
     /**
      * Was the current matching task, if any fund, updated?
-     *
-     * @return bool
      */
-    public function wasCurrentFameForTaskUpdated(): bool {
+    public function wasCurrentFameForTaskUpdated(): bool
+    {
         return $this->updatedMatchingTaskAmount;
     }
 
     /**
      * Should we show the npc craft button?
-     *
-     * @param Character $character
-     * @param string $craftingType
-     * @return bool
      */
-    public function showCraftForNpcButton(Character $character, string $craftingType): bool {
+    public function showCraftForNpcButton(Character $character, string $craftingType): bool
+    {
 
         $pledgedFaction = $character->factionLoyalties()->where('is_pledged', true)->first();
 

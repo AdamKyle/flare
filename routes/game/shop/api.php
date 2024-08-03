@@ -4,7 +4,7 @@ Route::group(['middleware' => [
     'auth',
     'is.character.who.they.say.they.are',
     'is.player.banned',
-]], function() {
+]], function () {
     Route::get('/character/{character}/visit-shop', ['uses' => 'Api\ShopController@fetchItemsForShop']);
 });
 
@@ -12,8 +12,8 @@ Route::group(['middleware' => [
     'auth',
     'is.character.who.they.say.they.are',
     'is.player.banned',
-    'is.character.dead'
-]], function() {
+    'is.character.dead',
+]], function () {
 
     Route::get('/shop/view/comparison/{character}', ['uses' => 'Api\ShopController@shopCompare']);
 

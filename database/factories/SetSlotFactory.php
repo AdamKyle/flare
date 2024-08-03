@@ -2,8 +2,8 @@
 
 namespace Database\Factories;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Flare\Models\SetSlot;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 class SetSlotFactory extends Factory
 {
@@ -22,10 +22,10 @@ class SetSlotFactory extends Factory
     public function definition()
     {
         return [
-            'item_id'           => null,
-            'inventory_set_id'  => null,
-            'equipped'          => false,
-            'position'          => null,
+            'item_id' => null,
+            'inventory_set_id' => null,
+            'equipped' => false,
+            'position' => null,
         ];
     }
 }

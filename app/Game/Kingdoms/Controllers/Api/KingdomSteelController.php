@@ -7,21 +7,17 @@ use App\Game\Kingdoms\Requests\SteelSmeltingRequest;
 use App\Game\Kingdoms\Service\SteelSmeltingService;
 use App\Http\Controllers\Controller;
 
-class KingdomSteelController extends Controller {
-
-    /**
-     * @var SteelSmeltingService $kingdomSmeltingService
-     */
+class KingdomSteelController extends Controller
+{
     private SteelSmeltingService $kingdomSmeltingService;
 
-    /**
-     * @param SteelSmeltingService $kingdomSmeltingService
-     */
-    public function __construct(SteelSmeltingService $kingdomSmeltingService) {
+    public function __construct(SteelSmeltingService $kingdomSmeltingService)
+    {
         $this->kingdomSmeltingService = $kingdomSmeltingService;
     }
 
-    public function smeltSteel(SteelSmeltingRequest $request, Kingdom $kingdom) {
+    public function smeltSteel(SteelSmeltingRequest $request, Kingdom $kingdom)
+    {
         $result = $this->kingdomSmeltingService->smeltSteel($request->amount_to_smelt, $kingdom);
 
         $status = $result['status'];
@@ -31,7 +27,8 @@ class KingdomSteelController extends Controller {
         return response()->json($result, $status);
     }
 
-    public function cancelSmelting(Kingdom $kingdom) {
+    public function cancelSmelting(Kingdom $kingdom)
+    {
         $result = $this->kingdomSmeltingService->cancelSmeltingEvent($kingdom);
 
         $status = $result['status'];
@@ -40,5 +37,4 @@ class KingdomSteelController extends Controller {
 
         return response()->json($result, $status);
     }
-
 }

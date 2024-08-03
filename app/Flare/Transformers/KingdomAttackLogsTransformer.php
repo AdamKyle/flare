@@ -9,65 +9,57 @@ use App\Flare\Values\KingdomLogStatusValue;
 use Exception;
 use League\Fractal\TransformerAbstract;
 
-class KingdomAttackLogsTransformer extends TransformerAbstract {
-
-    /**
-     * @var int|null $characterId
-     */
+class KingdomAttackLogsTransformer extends TransformerAbstract
+{
     private ?int $characterId = null;
 
     /**
      * Set the characterId.
-     *
-     * @param int $characterId
-     * @return KingdomAttackLogsTransformer
      */
-    public function setCharacterId(int $characterId): KingdomAttackLogsTransformer {
+    public function setCharacterId(int $characterId): KingdomAttackLogsTransformer
+    {
         $this->characterId = $characterId;
 
         return $this;
     }
 
     /**
-     * @param KingdomLog $log
-     * @return array
      * @throws Exception
      */
-    public function transform(KingdomLog $log): array {
+    public function transform(KingdomLog $log): array
+    {
         return [
-            'id'                       => $log->id,
-            'character_id'             => $log->character_id,
-            'is_mine'                  => $this->isMyLog($log),
+            'id' => $log->id,
+            'character_id' => $log->character_id,
+            'is_mine' => $this->isMyLog($log),
             'attacking_character_name' => $this->getAttackingCharacterName($log->attacking_character_id),
-            'from_kingdom_name'        => $this->getKingdomName($log->from_kingdom_id),
-            'to_kingdom_name'          => $this->getKingdomName($log->to_kingdom_id),
-            'to_x'                     => $this->getKingdomXPosition($log->to_kingdom_id),
-            'to_y'                     => $this->getKingdomYPosition($log->to_kingdom_id),
-            'from_x'                   => $this->getKingdomXPosition($log->to_kingdom_id),
-            'from_y'                   => $this->getKingdomYPosition($log->to_kingdom_id),
-            'status'                   => $this->getStatusName($log->status),
-            'units_sent'               => !is_null($log->units_sent) ? $log->units_sent : [],
-            'units_survived'           => !is_null($log->units_survived) ? $log->units_survived : [],
-            'old_buildings'            => $log->old_buildings,
-            'new_buildings'            => $log->new_buildings,
-            'old_units'                => $log->old_units,
-            'new_units'                => $log->new_units,
-            'item_damage'              => $log->item_damage,
-            'morale_loss'              => $log->morale_loss,
-            'opened'                   => $log->opened,
-            'created_at'               => $log->created_at->setTimezone(env('TIME_ZONE'))->format('Y-m-d H:m:s'),
-            'took_kingdom'             => (new KingdomLogStatusValue($log->status))->tookKingdom(),
-            'additional_details'       => $log->additional_details,
+            'from_kingdom_name' => $this->getKingdomName($log->from_kingdom_id),
+            'to_kingdom_name' => $this->getKingdomName($log->to_kingdom_id),
+            'to_x' => $this->getKingdomXPosition($log->to_kingdom_id),
+            'to_y' => $this->getKingdomYPosition($log->to_kingdom_id),
+            'from_x' => $this->getKingdomXPosition($log->to_kingdom_id),
+            'from_y' => $this->getKingdomYPosition($log->to_kingdom_id),
+            'status' => $this->getStatusName($log->status),
+            'units_sent' => ! is_null($log->units_sent) ? $log->units_sent : [],
+            'units_survived' => ! is_null($log->units_survived) ? $log->units_survived : [],
+            'old_buildings' => $log->old_buildings,
+            'new_buildings' => $log->new_buildings,
+            'old_units' => $log->old_units,
+            'new_units' => $log->new_units,
+            'item_damage' => $log->item_damage,
+            'morale_loss' => $log->morale_loss,
+            'opened' => $log->opened,
+            'created_at' => $log->created_at->setTimezone(env('TIME_ZONE'))->format('Y-m-d H:m:s'),
+            'took_kingdom' => (new KingdomLogStatusValue($log->status))->tookKingdom(),
+            'additional_details' => $log->additional_details,
         ];
     }
 
     /**
      * Get kingdom X position.
-     *
-     * @param int|null $kingdomId
-     * @return int|null
      */
-    public function getKingdomXPosition(?int $kingdomId): ?int {
+    public function getKingdomXPosition(?int $kingdomId): ?int
+    {
         if (is_null($kingdomId)) {
             return null;
         }
@@ -77,11 +69,9 @@ class KingdomAttackLogsTransformer extends TransformerAbstract {
 
     /**
      * Get kingdom Y position.
-     *
-     * @param int|null $kingdomId
-     * @return int|null
      */
-    public function getKingdomYPosition(?int $kingdomId): ?int {
+    public function getKingdomYPosition(?int $kingdomId): ?int
+    {
         if (is_null($kingdomId)) {
             return null;
         }
@@ -89,11 +79,8 @@ class KingdomAttackLogsTransformer extends TransformerAbstract {
         return Kingdom::find($kingdomId)->y_position;
     }
 
-    /**
-     * @param KingdomLog $log
-     * @return bool
-     */
-    protected function isMyLog(KingdomLog $log): bool {
+    protected function isMyLog(KingdomLog $log): bool
+    {
 
         $user = auth()->user();
 
@@ -109,17 +96,14 @@ class KingdomAttackLogsTransformer extends TransformerAbstract {
 
         $attackedKingdom = Kingdom::find($log->to_kingdom_id);
 
-
         return $attackedKingdom->character_id === $character->id;
     }
 
     /**
      * Get kingdom name.
-     *
-     * @param int|null $kingdomId
-     * @return string|null
      */
-    protected function getKingdomName(?int $kingdomId = null): ?string {
+    protected function getKingdomName(?int $kingdomId = null): ?string
+    {
 
         if (is_null($kingdomId)) {
             return null;
@@ -130,11 +114,9 @@ class KingdomAttackLogsTransformer extends TransformerAbstract {
 
     /**
      * Get the character name of the attacker.
-     *
-     * @param int|null $characterId
-     * @return string|null
      */
-    protected function getAttackingCharacterName(?int $characterId = null): ?string {
+    protected function getAttackingCharacterName(?int $characterId = null): ?string
+    {
         if (is_null($characterId)) {
             return null;
         }
@@ -143,11 +125,10 @@ class KingdomAttackLogsTransformer extends TransformerAbstract {
     }
 
     /**
-     * @param int $status
-     * @return string
      * @throws Exception
      */
-    protected function getStatusName(int $status): string {
+    protected function getStatusName(int $status): string
+    {
         $logStatus = new KingdomLogStatusValue($status);
 
         if ($logStatus->attackedKingdom()) {

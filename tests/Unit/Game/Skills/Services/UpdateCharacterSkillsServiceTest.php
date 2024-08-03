@@ -2,11 +2,11 @@
 
 namespace Tests\Unit\Game\Skills\Services;
 
+use App\Flare\Models\GameSkill;
 use App\Game\Skills\Events\UpdateCharacterSkills;
 use App\Game\Skills\Services\UpdateCharacterSkillsService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Flare\Models\GameSkill;
 use App\Game\Skills\Values\SkillTypeValue;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
@@ -14,8 +14,7 @@ use Tests\Traits\CreateGameSkill;
 
 class UpdateCharacterSkillsServiceTest extends TestCase
 {
-
-    use RefreshDatabase, CreateGameSkill;
+    use CreateGameSkill, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -23,31 +22,34 @@ class UpdateCharacterSkillsServiceTest extends TestCase
 
     private ?GameSkill $skill;
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
         $this->skill = $this->createGameSkill([
-            'name'        => 'skill',
-            'type'        => SkillTypeValue::TRAINING,
-            'can_train'   => true,
+            'name' => 'skill',
+            'type' => SkillTypeValue::TRAINING,
+            'can_train' => true,
         ]);
 
-        $this->character = (new CharacterFactory())->createBaseCharacter()->assignSkill(
+        $this->character = (new CharacterFactory)->createBaseCharacter()->assignSkill(
             $this->skill
         )->givePlayerLocation();
 
         $this->updateCharacterSkills = resolve(UpdateCharacterSkillsService::class);
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
 
-        $this->character              = null;
-        $this->skill                  = null;
-        $this->updateCharacterSkills  = null;
+        $this->character = null;
+        $this->skill = null;
+        $this->updateCharacterSkills = null;
     }
 
-    public function testUpdateCharacterTrainingSkills() {
+    public function testUpdateCharacterTrainingSkills()
+    {
         Event::fake();
 
         $character = $this->character->getCharacter();
@@ -57,7 +59,8 @@ class UpdateCharacterSkillsServiceTest extends TestCase
         Event::assertDispatched(UpdateCharacterSkills::class);
     }
 
-    public function testUpdateCharactercraftingSkills() {
+    public function testUpdateCharactercraftingSkills()
+    {
         Event::fake();
 
         $character = $this->character->getCharacter();
@@ -66,5 +69,4 @@ class UpdateCharacterSkillsServiceTest extends TestCase
 
         Event::assertDispatched(UpdateCharacterSkills::class);
     }
-
 }

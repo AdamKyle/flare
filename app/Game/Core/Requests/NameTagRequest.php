@@ -4,13 +4,15 @@ namespace App\Game\Core\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class NameTagRequest extends FormRequest {
+class NameTagRequest extends FormRequest
+{
     /**
      * Determine if the user is authorized to make this request.
      *
      * @return bool
      */
-    public function authorize() {
+    public function authorize()
+    {
         return true;
     }
 
@@ -19,13 +21,15 @@ class NameTagRequest extends FormRequest {
      *
      * @return array
      */
-    public function rules() {
+    public function rules()
+    {
         return [
             'name_tag' => 'nullable|string',
         ];
     }
 
-    public function messages() {
+    public function messages()
+    {
         return [];
     }
 }

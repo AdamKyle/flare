@@ -7,15 +7,15 @@ use Illuminate\Database\Eloquent\Builder;
 use Rappasoft\LaravelLivewireTables\DataTableComponent;
 use Rappasoft\LaravelLivewireTables\Views\Column;
 
-class QuestsTable extends DataTableComponent {
-
-
+class QuestsTable extends DataTableComponent
+{
     public function configure(): void
     {
         $this->setPrimaryKey('id');
     }
 
-    public function builder(): Builder {
+    public function builder(): Builder
+    {
         return Quest::query();
     }
 
@@ -23,10 +23,10 @@ class QuestsTable extends DataTableComponent {
     {
         return [
             Column::make('id')->hideIf(true),
-            Column::make('Name')->searchable()->format(function($value, $row) {
+            Column::make('Name')->searchable()->format(function ($value, $row) {
                 return '<a href="/admin/quests/'.$row->id.'">'.$value.'</a>';
             })->html(),
-            Column::make('From NPC', 'npc_id')->searchable()->format(function($value, $row) {
+            Column::make('From NPC', 'npc_id')->searchable()->format(function ($value, $row) {
                 return '<a href="/admin/npcs/'.$row->npc_id.'">'.$row->npc->real_name.'</a>';
             })->html(),
         ];

@@ -3,12 +3,13 @@
 namespace App\Providers;
 
 use Illuminate\Cache\RateLimiting\Limit;
-use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
 
-class RouteServiceProvider extends ServiceProvider {
+class RouteServiceProvider extends ServiceProvider
+{
     /**
      * This namespace is applied to your controller routes.
      *
@@ -23,7 +24,8 @@ class RouteServiceProvider extends ServiceProvider {
      *
      * @return void
      */
-    public function boot() {
+    public function boot()
+    {
         $this->configureRateLimiting();
 
         parent::boot();
@@ -32,7 +34,8 @@ class RouteServiceProvider extends ServiceProvider {
     /**
      * Custom Rate Limiters go here.
      */
-    protected function configureRateLimiting() {
+    protected function configureRateLimiting()
+    {
 
         // When sending public or private messages
         RateLimiter::for('chat', function (Request $request) {
@@ -69,7 +72,8 @@ class RouteServiceProvider extends ServiceProvider {
      *
      * @return void
      */
-    public function map() {
+    public function map()
+    {
 
         // Map Routes:
         $this->mapWebRoutes();
@@ -125,7 +129,8 @@ class RouteServiceProvider extends ServiceProvider {
      *
      * @return void
      */
-    protected function mapWebRoutes() {
+    protected function mapWebRoutes()
+    {
         Route::middleware('web')
             ->namespace($this->namespace)
             ->group(base_path('routes/web.php'));
@@ -138,237 +143,271 @@ class RouteServiceProvider extends ServiceProvider {
      *
      * @return void
      */
-
-    protected function mapGemRoutes() {
+    protected function mapGemRoutes()
+    {
         Route::prefix('api')
             ->middleware('web')
             ->namespace('App\Game\Gems\Controllers')
             ->group(base_path('routes/game/gems/api.php'));
     }
 
-    protected function mapApiRoutes() {
+    protected function mapApiRoutes()
+    {
         Route::prefix('api')
             ->middleware('api')
             ->namespace($this->namespace)
             ->group(base_path('routes/api.php'));
     }
 
-    protected function mapCharacterSheetRoutes() {
+    protected function mapCharacterSheetRoutes()
+    {
         Route::prefix('api')
             ->middleware('web')
             ->namespace('App\Game\Character\CharacterSheet\Controllers')
             ->group(base_path('routes/game/character/character-sheet/api.php'));
     }
 
-    protected function mapCharacterInventoryRoutes() {
+    protected function mapCharacterInventoryRoutes()
+    {
         Route::prefix('api')
             ->middleware('web')
             ->namespace('App\Game\Character\CharacterInventory\Controllers')
             ->group(base_path('routes/game/character/character-inventory/api.php'));
     }
 
-    protected function mapExplorationApiRoutes() {
+    protected function mapExplorationApiRoutes()
+    {
         Route::prefix('api')
             ->middleware('web')
             ->namespace('App\Game\Exploration\Controllers')
             ->group(base_path('routes/game/exploration/api.php'));
     }
 
-    protected function mapGameKingdomApiRoutes() {
+    protected function mapGameKingdomApiRoutes()
+    {
         Route::prefix('api')
             ->middleware('web')
             ->namespace('App\Game\Kingdoms\Controllers')
             ->group(base_path('routes/game/kingdoms/api.php'));
     }
 
-    protected function mapGameSkillsApiRoutes() {
+    protected function mapGameSkillsApiRoutes()
+    {
         Route::prefix('api')
             ->middleware('web')
             ->namespace('App\Game\Skills\Controllers')
             ->group(base_path('routes/game/skills/api.php'));
     }
 
-    protected function mapShopApiRoutes() {
+    protected function mapShopApiRoutes()
+    {
         Route::prefix('api')
             ->middleware('web')
             ->namespace('App\Game\Shop\Controllers')
             ->group(base_path('routes/game/shop/api.php'));
     }
 
-    protected function mapAdminRoutes() {
+    protected function mapAdminRoutes()
+    {
         Route::middleware('web')
             ->namespace('App\Admin\Controllers')
             ->group(base_path('routes/admin/web.php'));
     }
 
-    protected function mapAdminApiRoutes() {
+    protected function mapAdminApiRoutes()
+    {
         Route::prefix('api')
             ->middleware('web')
             ->namespace('App\Admin\Controllers')
             ->group(base_path('routes/admin/api.php'));
     }
 
-    protected function mapGameCoreRoutes() {
+    protected function mapGameCoreRoutes()
+    {
         Route::middleware('web')
             ->namespace('App\Game\Core\Controllers')
             ->group(base_path('routes/game/web.php'));
     }
 
-    protected function mapKingdomRoutes() {
+    protected function mapKingdomRoutes()
+    {
         Route::middleware('web')
             ->namespace('App\Game\Kingdoms\Controllers')
             ->group(base_path('routes/game/kingdoms/web.php'));
     }
 
-    protected function mapGameMarketRoutes() {
+    protected function mapGameMarketRoutes()
+    {
         Route::middleware('web')
             ->namespace('App\Game\Market\Controllers')
             ->group(base_path('routes/game/market-board/web.php'));
     }
 
-    protected function mapQuestRoutes() {
+    protected function mapQuestRoutes()
+    {
         Route::middleware('web')
             ->namespace('App\Game\Quests\Controllers')
             ->group(base_path('routes/game/quests/web.php'));
     }
 
-    protected function mapGuideQuestsRoutes() {
+    protected function mapGuideQuestsRoutes()
+    {
         Route::middleware('web')
             ->namespace('App\Game\GuideQuests\Controllers')
             ->group(base_path('routes/game/guide-quests/web.php'));
     }
 
-    protected function mapShopRoutes() {
+    protected function mapShopRoutes()
+    {
         Route::middleware('web')
             ->namespace('App\Game\Shop\Controllers')
             ->group(base_path('routes/game/shop/web.php'));
     }
 
-    protected function mapCharacterPassiveSkillsRoutes() {
+    protected function mapCharacterPassiveSkillsRoutes()
+    {
         Route::middleware('web')
             ->namespace('App\Game\PassiveSkills\Controllers')
             ->group(base_path('routes/game/passive-skills/web.php'));
     }
 
-    protected function mapGamblingRoutes() {
+    protected function mapGamblingRoutes()
+    {
         Route::prefix('api')
             ->middleware('web')
             ->namespace('App\Game\Gambler\Controllers')
             ->group(base_path('routes/game/gambler/api.php'));
     }
 
-    protected function mapGameCoreApiRoutes() {
+    protected function mapGameCoreApiRoutes()
+    {
         Route::prefix('api')
             ->middleware('web')
             ->namespace('App\Game\Core\Controllers')
             ->group(base_path('routes/game/api.php'));
     }
 
-    protected function mapGameMessageApiRoutes() {
+    protected function mapGameMessageApiRoutes()
+    {
         Route::prefix('api')
             ->middleware('web')
             ->namespace('App\Game\Messages\Controllers')
             ->group(base_path('routes/game/messages/api.php'));
     }
 
-    protected function mapGameBattleApiRoutes() {
+    protected function mapGameBattleApiRoutes()
+    {
         Route::prefix('api')
             ->middleware('web')
             ->namespace('App\Game\Battle\Controllers')
             ->group(base_path('routes/game/battle/api.php'));
     }
 
-    protected function mapGameMapApiRoutes() {
+    protected function mapGameMapApiRoutes()
+    {
         Route::prefix('api')
             ->middleware('web')
             ->namespace('App\Game\Maps\Controllers')
             ->group(base_path('routes/game/maps/api.php'));
     }
 
-    protected function mapGameMarketApiRoutes() {
+    protected function mapGameMarketApiRoutes()
+    {
         Route::prefix('api')
             ->middleware('web')
             ->namespace('App\Game\Market\Controllers')
             ->group(base_path('routes/game/market-board/api.php'));
     }
 
-    protected function mapQuestApiRoutes() {
+    protected function mapQuestApiRoutes()
+    {
         Route::middleware('web')
             ->namespace('App\Game\Quests\Controllers')
             ->group(base_path('routes/game/quests/api.php'));
     }
 
-    protected function mapGamePassiveSkillApiRoutes() {
+    protected function mapGamePassiveSkillApiRoutes()
+    {
         Route::prefix('api')
             ->middleware('web')
             ->namespace('App\Game\PassiveSkills\Controllers')
             ->group(base_path('routes/game/passive-skills/api.php'));
     }
 
-    protected function mapGameGuideQuestsApiRoutes() {
+    protected function mapGameGuideQuestsApiRoutes()
+    {
         Route::prefix('api')
             ->middleware('web')
             ->namespace('App\Game\GuideQuests\Controllers')
             ->group(base_path('routes/game/guide-quests/api.php'));
     }
 
-    protected function mapSpecialtyShopApiRoutes() {
+    protected function mapSpecialtyShopApiRoutes()
+    {
         Route::prefix('api')
             ->middleware('web')
             ->namespace('App\Game\SpecialtyShops\Controllers')
             ->group(base_path('routes/game/specialty-shops/api.php'));
     }
 
-    protected function mapReincarnateApiRoutes() {
+    protected function mapReincarnateApiRoutes()
+    {
         Route::prefix('api')
             ->middleware('web')
             ->namespace('App\Game\Reincarnate\Controllers')
             ->group(base_path('routes/game/reincarnate/api.php'));
     }
 
-    protected function mapClassRanksApiRoutes() {
+    protected function mapClassRanksApiRoutes()
+    {
         Route::prefix('api')
             ->middleware('web')
             ->namespace('App\Game\ClassRanks\Controllers')
             ->group(base_path('routes/game/class-ranks/api.php'));
     }
 
-    protected function mapSeerActions() {
+    protected function mapSeerActions()
+    {
         Route::prefix('api')
             ->middleware('web')
             ->namespace('App\Game\NpcActions\SeerActions\Controllers')
             ->group(base_path('routes/game/npc-actions/seer-actions/api.php'));
     }
 
-    protected function mapQueenOfHeartsActions() {
+    protected function mapQueenOfHeartsActions()
+    {
         Route::prefix('api')
             ->middleware('web')
             ->namespace('App\Game\NpcActions\QueenOfHeartsActions\Controllers')
             ->group(base_path('routes/game/npc-actions/queen-of-hearts/api.php'));
     }
 
-    protected function mapLabyrinthOracleRoutes() {
+    protected function mapLabyrinthOracleRoutes()
+    {
         Route::prefix('api')
             ->middleware('web')
             ->namespace('App\Game\NpcActions\LabyrinthOracle\Controllers')
             ->group(base_path('routes/game/npc-actions/labyrinth-oracle/api.php'));
     }
 
-    protected function mapWorkBenchActions() {
+    protected function mapWorkBenchActions()
+    {
         Route::prefix('api')
             ->middleware('web')
             ->namespace('App\Game\NpcActions\WorkBench\Controllers')
             ->group(base_path('routes/game/npc-actions/work-bench/api.php'));
     }
 
-    protected function mapEvents() {
+    protected function mapEvents()
+    {
         Route::prefix('api')
             ->middleware('web')
             ->namespace('App\Game\Events\Controllers')
             ->group(base_path('routes/game/events/api.php'));
     }
 
-    protected function mapFactionLoyaltyApiRoutes() {
+    protected function mapFactionLoyaltyApiRoutes()
+    {
         Route::prefix('api')
             ->middleware('web')
             ->namespace('App\Game\Factions\FactionLoyalty\Controllers')

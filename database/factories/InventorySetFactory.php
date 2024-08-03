@@ -2,8 +2,8 @@
 
 namespace Database\Factories;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Flare\Models\InventorySet;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 class InventorySetFactory extends Factory
 {
@@ -22,8 +22,8 @@ class InventorySetFactory extends Factory
     public function definition()
     {
         return [
-            'character_id'    => null,
-            'is_equipped'     => false,
+            'character_id' => null,
+            'is_equipped' => false,
             'can_be_equipped' => true,
         ];
     }

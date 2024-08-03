@@ -28,7 +28,8 @@ class RecruitUnitRequestsRequest extends FormRequest
         ];
     }
 
-    public function messages() {
+    public function messages()
+    {
         return [
             'request_data.required' => 'Missing request data',
         ];

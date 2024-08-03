@@ -9,40 +9,41 @@ use App\Flare\Models\GameRace;
 use App\Flare\Models\GemBag;
 use App\Flare\Models\Inventory;
 use App\Flare\Models\MarketBoard;
-use App\Flare\Models\RankFightTop;
 use App\Flare\Models\User;
 use App\Game\Character\CharacterCreation\Services\CharacterBuilderService;
 use App\Game\Kingdoms\Handlers\GiveKingdomsToNpcHandler;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
-class CharacterDeletion {
-
+class CharacterDeletion
+{
     private GiveKingdomsToNpcHandler $giveKingdomsToNpcHandler;
 
     private CharacterBuilderService $characterBuilder;
 
-    public function __construct(GiveKingdomsToNpcHandler $giveKingdomsToNpcHandler, CharacterBuilderService $characterBuilder) {
+    public function __construct(GiveKingdomsToNpcHandler $giveKingdomsToNpcHandler, CharacterBuilderService $characterBuilder)
+    {
         $this->giveKingdomsToNpcHandler = $giveKingdomsToNpcHandler;
-        $this->characterBuilder         = $characterBuilder;
+        $this->characterBuilder = $characterBuilder;
     }
 
-    public function deleteCharacterFromUser(Character $character, array $params = []) {
+    public function deleteCharacterFromUser(Character $character, array $params = [])
+    {
         $user = $character->user;
 
         foreach ($character->kingdoms as $kingdom) {
             $this->giveKingdomsToNpcHandler->giveKingdomToNPC($kingdom);
         }
 
-        if (!is_null($character->inventory)) {
+        if (! is_null($character->inventory)) {
             $this->emptyCharacterInventory($character->inventory);
         }
 
-        if (!is_null($character->gemBag)) {
+        if (! is_null($character->gemBag)) {
             $this->emptyCharacterGemBag($character->gemBag);
         }
 
-        if (!is_null($character->inventorySets)) {
+        if (! is_null($character->inventorySets)) {
             $this->emptyCharacterInventorySets($character->inventorySets);
         }
 
@@ -50,45 +51,48 @@ class CharacterDeletion {
 
         $this->deleteCharacter($character);
 
-        if (!empty($params)) {
+        if (! empty($params)) {
             $this->createCharacter($user->refresh(), $params);
         }
     }
 
-
-    protected function createCharacter(User $user, array $params): void {
-        $race  = GameRace::find($params['race_id']);
+    protected function createCharacter(User $user, array $params): void
+    {
+        $race = GameRace::find($params['race_id']);
         $class = GameClass::find($params['class_id']);
-        $map   = GameMap::where('default', true)->first();
+        $map = GameMap::where('default', true)->first();
 
         $this->characterBuilder->setRace($race)
-                              ->setClass($class)
-                              ->createCharacter($user, $map, $params['name'])
-                              ->assignSkills()
-                              ->assignPassiveSkills()
-                              ->buildCharacterCache();
+            ->setClass($class)
+            ->createCharacter($user, $map, $params['name'])
+            ->assignSkills()
+            ->assignPassiveSkills()
+            ->buildCharacterCache();
 
         $user->refresh()->update([
-            'guide_enabled' => $params['guide']
+            'guide_enabled' => $params['guide'],
         ]);
     }
 
-    protected function removeMercenaries(Collection $mercenaries): void {
+    protected function removeMercenaries(Collection $mercenaries): void
+    {
         foreach ($mercenaries as $merc) {
             $merc->delete();
         }
     }
 
-    protected function deleteCharacterMarketListings(Character $character): void {
+    protected function deleteCharacterMarketListings(Character $character): void
+    {
 
-        MarketBoard::where('character_id', $character->id)->chunkById(250, function($marketListings) {
+        MarketBoard::where('character_id', $character->id)->chunkById(250, function ($marketListings) {
             foreach ($marketListings as $marketListing) {
                 $marketListing->delete();
             }
         });
     }
 
-    protected function emptyCharacterInventory(Inventory $inventory): void {
+    protected function emptyCharacterInventory(Inventory $inventory): void
+    {
         foreach ($inventory->slots as $slot) {
             $slot->delete();
         }
@@ -96,7 +100,8 @@ class CharacterDeletion {
         $inventory->delete();
     }
 
-    protected function emptyCharacterGemBag(GemBag $gemBag): void {
+    protected function emptyCharacterGemBag(GemBag $gemBag): void
+    {
         foreach ($gemBag->gemSlots as $slot) {
             $slot->delete();
         }
@@ -104,7 +109,8 @@ class CharacterDeletion {
         $gemBag->delete();
     }
 
-    protected function emptyCharacterInventorySets(Collection $inventorySets): void {
+    protected function emptyCharacterInventorySets(Collection $inventorySets): void
+    {
         foreach ($inventorySets as $set) {
             foreach ($set->slots as $slot) {
                 $slot->delete();
@@ -114,7 +120,8 @@ class CharacterDeletion {
         }
     }
 
-    protected function deleteCharacter(Character $character): void {
+    protected function deleteCharacter(Character $character): void
+    {
         DB::statement('SET FOREIGN_KEY_CHECKS=0;');
 
         $character->skills()->delete();
@@ -158,7 +165,8 @@ class CharacterDeletion {
         DB::statement('SET FOREIGN_KEY_CHECKS=1;');
     }
 
-    protected function deleteClassRanks(Character $character): void {
+    protected function deleteClassRanks(Character $character): void
+    {
         foreach ($character->classRanks as $classRank) {
             $classRank->weaponMasteries()->delete();
             $classRank->delete();

@@ -2,38 +2,35 @@
 
 namespace App\Game\Core\Events;
 
+use App\Flare\Models\User;
 use Illuminate\Broadcasting\Channel;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Broadcasting\PresenceChannel;
-use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
-Use App\Flare\Models\User;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\SerializesModels;
 
 class UpdateBaseCharacterInformation implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     /**
-     * @param array $character
+     * @param  array  $character
      */
     public $baseStats;
 
     /**
-     * @var User $user
-     *
+     * @var User
      */
     private $user;
 
     /**
      * Create a new event instance.
-     *
-     * @param User $user
      */
-    public function __construct(User $user, array $baseStats, ) {
+    public function __construct(User $user, array $baseStats)
+    {
         $this->baseStats = $baseStats;
-        $this->user      = $user;
+        $this->user = $user;
     }
 
     /**
@@ -41,7 +38,8 @@ class UpdateBaseCharacterInformation implements ShouldBroadcastNow
      *
      * @return Channel|array
      */
-    public function broadcastOn() {
-        return new PrivateChannel('update-character-base-stats-' . $this->user->id);
+    public function broadcastOn()
+    {
+        return new PrivateChannel('update-character-base-stats-'.$this->user->id);
     }
 }

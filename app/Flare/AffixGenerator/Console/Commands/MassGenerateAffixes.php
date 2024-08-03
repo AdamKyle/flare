@@ -2,14 +2,15 @@
 
 namespace App\Flare\AffixGenerator\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Flare\AffixGenerator\DTO\AffixGeneratorDTO;
 use App\Flare\AffixGenerator\Generator\GenerateAffixes;
 use App\Flare\AffixGenerator\Values\AffixGeneratorTypes;
 use App\Flare\Models\GameSkill;
 use App\Flare\Values\ItemAffixType;
+use Illuminate\Console\Command;
 
-class MassGenerateAffixes extends Command {
+class MassGenerateAffixes extends Command
+{
     /**
      * The name and signature of the console command.
      *
@@ -27,7 +28,8 @@ class MassGenerateAffixes extends Command {
     /**
      * Execute the console command.
      */
-    public function handle(AffixGeneratorDTO $affixGeneratorDTO, GenerateAffixes $generateAffixes) {
+    public function handle(AffixGeneratorDTO $affixGeneratorDTO, GenerateAffixes $generateAffixes)
+    {
         $this->line('Hello and welcome. I will guide you through generating Affixes in mass. Please note all names and descriptions are randomly generated.');
         $this->line('For this reason it is suggested you export the affixes you generate and rename the names and update descriptions.');
         $this->newLine();
@@ -38,7 +40,7 @@ class MassGenerateAffixes extends Command {
 
         $skill = $this->skillForAffixes();
 
-        if (!is_null($skill)) {
+        if (! is_null($skill)) {
             $affixGeneratorDTO->setSkillName($skill);
         }
 
@@ -54,14 +56,15 @@ class MassGenerateAffixes extends Command {
 
         $affixGeneratorDTO->setAttributes($attributes);
 
-        $sizeLimit = intVal($this->argument('amount'));
+        $sizeLimit = intval($this->argument('amount'));
 
         $generateAffixes->generate($affixGeneratorDTO, $sizeLimit);
     }
 
-    protected function isDamageIrresistable(AffixGeneratorDTO $affixGeneratorDTO) {
+    protected function isDamageIrresistable(AffixGeneratorDTO $affixGeneratorDTO)
+    {
         $choice = $this->choice('You selected damage as one of the attributes, would you like to make the damage irresistable?', [
-            'Y', 'N'
+            'Y', 'N',
         ]);
 
         if ($choice === 'Y') {
@@ -71,9 +74,10 @@ class MassGenerateAffixes extends Command {
         }
     }
 
-    protected function isDamageStackable(AffixGeneratorDTO $affixGeneratorDTO) {
+    protected function isDamageStackable(AffixGeneratorDTO $affixGeneratorDTO)
+    {
         $choice = $this->choice('You selected damage as one of the attributes, would you like to make the damage stack?', [
-            'Y', 'N'
+            'Y', 'N',
         ]);
 
         if ($choice === 'Y') {
@@ -85,21 +89,19 @@ class MassGenerateAffixes extends Command {
 
     /**
      * What type of affix are we generating
-     *
-     * @return string
      */
-    protected function prefixOrSuffix(): string {
+    protected function prefixOrSuffix(): string
+    {
         return $this->choice('What type do these affixes have?', [
-            'prefix', 'suffix'
+            'prefix', 'suffix',
         ]);
     }
 
     /**
      * What type of affix are we generating
-     *
-     * @return int
      */
-    protected function affixType(): int {
+    protected function affixType(): int
+    {
         $value = $this->choice('What type do these affixes have?', ItemAffixType::$dropDownValues);
 
         return ItemAffixType::convertNameToType($value);
@@ -107,12 +109,11 @@ class MassGenerateAffixes extends Command {
 
     /**
      * Does the batch of affixes effect a skill?
-     *
-     * @return string|null
      */
-    protected function skillForAffixes(): ?string {
+    protected function skillForAffixes(): ?string
+    {
         $effects = $this->choice('Do these affixes effect skills?', [
-            'Y', 'N'
+            'Y', 'N',
         ]);
 
         if ($effects === 'Y') {
@@ -126,10 +127,9 @@ class MassGenerateAffixes extends Command {
 
     /**
      * Select attributes for the affixes
-     *
-     * @return array
      */
-    protected function selectAttributesForAffixes(): array {
+    protected function selectAttributesForAffixes(): array
+    {
         $this->newLine();
         $this->line('Please select a set of attributes you want for these affixes. Keep in mind that if you choose any of the stat reducting attributes');
         $this->line('then the logic states: ');

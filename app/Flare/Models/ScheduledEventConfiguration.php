@@ -4,8 +4,8 @@ namespace App\Flare\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class ScheduledEventConfiguration extends Model {
-
+class ScheduledEventConfiguration extends Model
+{
     /**
      * The attributes that are mass assignable.
      *
@@ -15,14 +15,14 @@ class ScheduledEventConfiguration extends Model {
         'event_type',
         'start_date',
         'last_time_generated',
-        'generate_amount'
+        'generate_amount',
     ];
 
     protected $casts = [
-        'event_type'          => 'integer',
-        'start_date'          => 'datetime',
-        'generate_every'      => 'string',
-        'generate_amount'     => 'integer',
-        'last_time_generated' => 'date'
+        'event_type' => 'integer',
+        'start_date' => 'datetime',
+        'generate_every' => 'string',
+        'generate_amount' => 'integer',
+        'last_time_generated' => 'date',
     ];
 }

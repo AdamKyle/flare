@@ -6,7 +6,8 @@ use App\Flare\Models\ScheduledEventConfiguration;
 use App\Flare\Services\EventSchedulerService;
 use Illuminate\Console\Command;
 
-class GenerateScheduledEvents extends Command {
+class GenerateScheduledEvents extends Command
+{
     /**
      * The name and signature of the console command.
      *
@@ -24,7 +25,8 @@ class GenerateScheduledEvents extends Command {
     /**
      * Execute the console command.
      */
-    public function handle(EventSchedulerService $eventSchedulerService) {
+    public function handle(EventSchedulerService $eventSchedulerService)
+    {
 
         // Bail if we have none.
         if (ScheduledEventConfiguration::count() === 0) {
@@ -45,7 +47,8 @@ class GenerateScheduledEvents extends Command {
         }
     }
 
-    protected function handleWeeklyEvents(ScheduledEventConfiguration $scheduledEventConfiguration, EventSchedulerService $eventSchedulerService): void {
+    protected function handleWeeklyEvents(ScheduledEventConfiguration $scheduledEventConfiguration, EventSchedulerService $eventSchedulerService): void
+    {
         $futureLastGenerated = $scheduledEventConfiguration->last_time_generated->copy()->addWeeks(2);
 
         if (now()->gte($futureLastGenerated)) {
@@ -53,7 +56,8 @@ class GenerateScheduledEvents extends Command {
         }
     }
 
-    protected function handleMonthlyEvents(ScheduledEventConfiguration $scheduledEventConfiguration, EventSchedulerService $eventSchedulerService): void {
+    protected function handleMonthlyEvents(ScheduledEventConfiguration $scheduledEventConfiguration, EventSchedulerService $eventSchedulerService): void
+    {
         $futureLastGenerated = $scheduledEventConfiguration->last_time_generated->copy()->addMonths(2);
 
         if (now()->gte($futureLastGenerated)) {

@@ -11,8 +11,8 @@ use App\Flare\ServerFight\Fight\CharacterAttacks\Types\WeaponType;
 use App\Flare\ServerFight\Monster\ServerMonster;
 use App\Flare\Values\AttackTypeValue;
 
-class CharacterAttack {
-
+class CharacterAttack
+{
     private WeaponType $weaponType;
 
     private CastType $castType;
@@ -25,15 +25,17 @@ class CharacterAttack {
 
     private mixed $type;
 
-    public function __construct(WeaponType $weaponType, CastType $castType, AttackAndCast $attackAndCast, CastAndAttack $castAndAttack, Defend $defend) {
-        $this->weaponType    = $weaponType;
-        $this->castType      = $castType;
+    public function __construct(WeaponType $weaponType, CastType $castType, AttackAndCast $attackAndCast, CastAndAttack $castAndAttack, Defend $defend)
+    {
+        $this->weaponType = $weaponType;
+        $this->castType = $castType;
         $this->attackAndCast = $attackAndCast;
         $this->castAndAttack = $castAndAttack;
-        $this->defend        = $defend;
+        $this->defend = $defend;
     }
 
-    public function pvpAttack(Character $attacker, Character $defender, bool $isAttackerVoided, bool $isEnemyVoided, array $healthObject): CharacterAttack {
+    public function pvpAttack(Character $attacker, Character $defender, bool $isAttackerVoided, bool $isEnemyVoided, array $healthObject): CharacterAttack
+    {
         $this->weaponType->setCharacterHealth($healthObject['attacker_health']);
         $this->weaponType->setMonsterHealth($healthObject['defender_health']);
         $this->weaponType->setCharacterAttackData($attacker, $isAttackerVoided, AttackTypeValue::ATTACK);
@@ -46,7 +48,8 @@ class CharacterAttack {
         return $this;
     }
 
-    public function attack(Character $character, ServerMonster $monster, bool $isPlayerVoided, int $characterHealth, int $monsterHealth): CharacterAttack {
+    public function attack(Character $character, ServerMonster $monster, bool $isPlayerVoided, int $characterHealth, int $monsterHealth): CharacterAttack
+    {
         $this->weaponType->setCharacterHealth($characterHealth);
         $this->weaponType->setMonsterHealth($monsterHealth);
         $this->weaponType->setCharacterAttackData($character, $isPlayerVoided, AttackTypeValue::ATTACK);
@@ -58,7 +61,8 @@ class CharacterAttack {
         return $this;
     }
 
-    public function pvpCast(Character $attacker, Character $defender, bool $isAttackerVoided, bool $isEnemyVoided, array $healthObject): CharacterAttack {
+    public function pvpCast(Character $attacker, Character $defender, bool $isAttackerVoided, bool $isEnemyVoided, array $healthObject): CharacterAttack
+    {
         $this->castType->setCharacterHealth($healthObject['attacker_health']);
         $this->castType->setMonsterHealth($healthObject['defender_health']);
         $this->castType->setCharacterAttackData($attacker, $isAttackerVoided, AttackTypeValue::CAST);
@@ -71,7 +75,8 @@ class CharacterAttack {
         return $this;
     }
 
-    public function cast(Character $character, ServerMonster $monster, bool $isPlayerVoided, int $characterHealth, int $monsterHealth): CharacterAttack {
+    public function cast(Character $character, ServerMonster $monster, bool $isPlayerVoided, int $characterHealth, int $monsterHealth): CharacterAttack
+    {
         $this->castType->setCharacterHealth($characterHealth);
         $this->castType->setMonsterHealth($monsterHealth);
         $this->castType->setCharacterAttackData($character, $isPlayerVoided, AttackTypeValue::CAST);
@@ -79,13 +84,13 @@ class CharacterAttack {
 
         $this->castType->castAttack($character, $monster);
 
-
         $this->type = $this->castType;
 
         return $this;
     }
 
-    public function pvpAttackAndCast(Character $attacker, Character $defender, bool $isAttackerVoided, bool $isEnemyVoided, array $healthObject): CharacterAttack {
+    public function pvpAttackAndCast(Character $attacker, Character $defender, bool $isAttackerVoided, bool $isEnemyVoided, array $healthObject): CharacterAttack
+    {
         $this->attackAndCast->setCharacterHealth($healthObject['attacker_health']);
         $this->attackAndCast->setMonsterHealth($healthObject['defender_health']);
         $this->attackAndCast->setCharacterAttackData($attacker, $isAttackerVoided, AttackTypeValue::ATTACK_AND_CAST);
@@ -98,7 +103,8 @@ class CharacterAttack {
         return $this;
     }
 
-    public function attackAndCast(Character $character, ServerMonster $monster, bool $isPlayerVoided, int $characterHealth, int $monsterHealth): CharacterAttack {
+    public function attackAndCast(Character $character, ServerMonster $monster, bool $isPlayerVoided, int $characterHealth, int $monsterHealth): CharacterAttack
+    {
         $this->attackAndCast->setCharacterHealth($characterHealth);
         $this->attackAndCast->setMonsterHealth($monsterHealth);
         $this->attackAndCast->setCharacterAttackData($character, $isPlayerVoided, AttackTypeValue::ATTACK_AND_CAST);
@@ -109,7 +115,8 @@ class CharacterAttack {
         return $this;
     }
 
-    public function pvpCastAndAttack(Character $attacker, Character $defender, bool $isAttackerVoided, bool $isEnemyVoided, array $healthObject): CharacterAttack {
+    public function pvpCastAndAttack(Character $attacker, Character $defender, bool $isAttackerVoided, bool $isEnemyVoided, array $healthObject): CharacterAttack
+    {
         $this->castAndAttack->setCharacterHealth($healthObject['attacker_health']);
         $this->castAndAttack->setMonsterHealth($healthObject['defender_health']);
         $this->castAndAttack->setCharacterCastAndAttackkData($attacker, $isAttackerVoided);
@@ -122,7 +129,8 @@ class CharacterAttack {
         return $this;
     }
 
-    public function castAndAttack(Character $character, ServerMonster $monster, bool $isPlayerVoided, int $characterHealth, int $monsterHealth): CharacterAttack {
+    public function castAndAttack(Character $character, ServerMonster $monster, bool $isPlayerVoided, int $characterHealth, int $monsterHealth): CharacterAttack
+    {
         $this->castAndAttack->setCharacterHealth($characterHealth);
         $this->castAndAttack->setMonsterHealth($monsterHealth);
         $this->castAndAttack->setCharacterCastAndAttackkData($character, $isPlayerVoided);
@@ -133,7 +141,8 @@ class CharacterAttack {
         return $this;
     }
 
-    public function pvpDefend(Character $attacker, Character $defender, bool $isAttackerVoided, bool $isEnemyVoided, array $healthObject): CharacterAttack {
+    public function pvpDefend(Character $attacker, Character $defender, bool $isAttackerVoided, bool $isEnemyVoided, array $healthObject): CharacterAttack
+    {
         $this->defend->setCharacterHealth($healthObject['attacker_health']);
         $this->defend->setMonsterHealth($healthObject['defender_health']);
         $this->defend->setCharacterAttackData($attacker, $isAttackerVoided);
@@ -146,7 +155,8 @@ class CharacterAttack {
         return $this;
     }
 
-    public function defend(Character $character, ServerMonster $monster, bool $isPlayerVoided, int $characterHealth, int $monsterHealth): CharacterAttack {
+    public function defend(Character $character, ServerMonster $monster, bool $isPlayerVoided, int $characterHealth, int $monsterHealth): CharacterAttack
+    {
         $this->defend->setCharacterHealth($characterHealth);
         $this->defend->setMonsterHealth($monsterHealth);
         $this->defend->setCharacterAttackData($character, $isPlayerVoided);
@@ -157,27 +167,33 @@ class CharacterAttack {
         return $this;
     }
 
-    public function getMessages() {
+    public function getMessages()
+    {
         return $this->type->getMessages();
     }
 
-    public function getAttackerMessages() {
+    public function getAttackerMessages()
+    {
         return $this->type->getAttackerMessages();
     }
 
-    public function getDefenderMessages() {
+    public function getDefenderMessages()
+    {
         return $this->type->getDefenderMessages();
     }
 
-    public function resetMessages() {
+    public function resetMessages()
+    {
         $this->type->resetMessages();
     }
 
-    public function getCharacterHealth() {
+    public function getCharacterHealth()
+    {
         return $this->type->getCharacterHealth();
     }
 
-    public function getMonsterHealth() {
+    public function getMonsterHealth()
+    {
         return $this->type->getMonsterHealth();
     }
 }

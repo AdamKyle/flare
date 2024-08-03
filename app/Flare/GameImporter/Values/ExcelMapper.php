@@ -5,7 +5,6 @@ namespace App\Flare\GameImporter\Values;
 use App\Admin\Import\Affixes\AffixesImport;
 use App\Admin\Import\Classes\ClassImport;
 use App\Admin\Import\ClassSpecials\ClassSpecialsImport;
-use App\Admin\Import\Events\EventsImport;
 use App\Admin\Import\GuideQuests\GuideQuests;
 use App\Admin\Import\Items\ItemsImport;
 use App\Admin\Import\ItemSkills\ItemSkillsImport;
@@ -20,45 +19,38 @@ use App\Admin\Import\Raids\RaidsImport;
 use App\Admin\Import\Skills\SkillsImport;
 use Maatwebsite\Excel\Facades\Excel;
 
-class ExcelMapper {
-
-    /**
-     * @var array $map
-     */
+class ExcelMapper
+{
     private array $map = [
         'Admin Section' => GuideQuests::class,
-        'Raids'         => RaidsImport::class,
-        'Affixes'       => AffixesImport::class,
-        'Core Imports'  => [
+        'Raids' => RaidsImport::class,
+        'Affixes' => AffixesImport::class,
+        'Core Imports' => [
             ClassImport::class,
             RacesImport::class,
         ],
-        'Items'         => ItemsImport::class,
-        'Monsters'      => MonstersImport::class,
-        'Skills'        => [
+        'Items' => ItemsImport::class,
+        'Monsters' => MonstersImport::class,
+        'Skills' => [
             ItemSkillsImport::class,
             SkillsImport::class,
         ],
-        'Kingdoms'      => KingdomsImport::class,
+        'Kingdoms' => KingdomsImport::class,
         'Kingdom Passive Skills' => PassiveSkillsImport::class,
-        'Quests'        => QuestsImport::class,
+        'Quests' => QuestsImport::class,
         'Locations Give Items' => LocationsImport::class,
         'Locations' => LocationsImport::class,
         'Npcs' => NpcsImport::class,
-        '.'             => [
+        '.' => [
             ClassSpecialsImport::class,
-        ]
+        ],
     ];
 
     /**
      * Import the files based on the directory.
-     *
-     * @param string $dirName
-     * @param string $path
-     * @param integer $index
-     * @return void
      */
-    public function importFile(string $dirName, string $path, int $index): void {
+    public function importFile(string $dirName, string $path, int $index): void
+    {
         foreach ($this->map as $directory => $importMap) {
             if ($directory === $dirName) {
                 if (is_array($importMap)) {

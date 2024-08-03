@@ -2,18 +2,18 @@
 
 namespace App\Flare\GameImporter\Console\Commands;
 
-use Exception;
-use Illuminate\Support\Str;
+use App\Flare\GameImporter\Values\ExcelMapper;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\InfoPage;
-use Illuminate\Console\Command;
 use App\Flare\Values\MapNameValue;
+use Exception;
+use Illuminate\Console\Command;
 use Illuminate\Http\File;
 use Illuminate\Support\Facades\Storage;
-use App\Flare\GameImporter\Values\ExcelMapper;
+use Illuminate\Support\Str;
 
-class ImportGameData extends Command {
-
+class ImportGameData extends Command
+{
     /**
      * The name and signature of the console command.
      *
@@ -31,7 +31,8 @@ class ImportGameData extends Command {
     /**
      * Execute the console command.
      */
-    public function handle(ExcelMapper $excelMapper) {
+    public function handle(ExcelMapper $excelMapper)
+    {
 
         ini_set('memory_limit', '-1');
 
@@ -41,16 +42,16 @@ class ImportGameData extends Command {
 
         $dirNameForReImport = $this->argument('dirName');
 
-        if (!is_null($dirNameForReImport)) {
+        if (! is_null($dirNameForReImport)) {
 
             $dirNameForReImport = Str::title($dirNameForReImport);
 
-            if (!isset($files[$dirNameForReImport])) {
+            if (! isset($files[$dirNameForReImport])) {
 
-                return $this->error('No directory in data-imports for: ' . $dirNameForReImport);
+                return $this->error('No directory in data-imports for: '.$dirNameForReImport);
             }
 
-            $this->line('Re importing: ' . $dirNameForReImport);
+            $this->line('Re importing: '.$dirNameForReImport);
 
             $this->import($excelMapper, $files[$dirNameForReImport], $dirNameForReImport);
 
@@ -118,19 +119,18 @@ class ImportGameData extends Command {
      *
      * The mapper used to import these files expect the file list to be in a specific
      * order, in some instances, so we sort and make sure the admin section is reversed.
-     *
-     * @return array
      */
-    protected function fetchFiles(): array {
-        $files   = Storage::disk('data-imports')->allFiles();
+    protected function fetchFiles(): array
+    {
+        $files = Storage::disk('data-imports')->allFiles();
 
-        $result  = [];
+        $result = [];
 
         foreach ($files as $file) {
             if (pathinfo($file, PATHINFO_EXTENSION) === 'xlsx') {
                 $path = pathinfo($file, PATHINFO_DIRNAME);
 
-                if (!isset($result[$path])) {
+                if (! isset($result[$path])) {
                     $result[$path] = [];
                 }
 
@@ -147,15 +147,11 @@ class ImportGameData extends Command {
 
     /**
      * Import th excel files.
-     *
-     * @param ExcelMapper $excelMapper
-     * @param array $files
-     * @param string $directoryName
-     * @return void
      */
-    protected function import(ExcelMapper $excelMapper, array $files, string $directoryName): void {
+    protected function import(ExcelMapper $excelMapper, array $files, string $directoryName): void
+    {
         foreach ($files as $index => $path) {
-            $path = resource_path('data-imports') . '/' . $path;
+            $path = resource_path('data-imports').'/'.$path;
 
             $excelMapper->importFile($directoryName, $path, $index);
         }
@@ -163,10 +159,9 @@ class ImportGameData extends Command {
 
     /**
      * Import the information section.
-     *
-     * @return void
      */
-    protected function importInformationSection(): void {
+    protected function importInformationSection(): void
+    {
         $data = Storage::disk('data-imports')->get('Admin Section/information.json');
 
         $data = json_decode(trim($data), true);
@@ -175,10 +170,10 @@ class ImportGameData extends Command {
             InfoPage::updateOrCreate(['id' => $modelEntry['id']], $modelEntry);
         }
 
-        $sourceDirectory      = resource_path('backup/info-sections-images');
+        $sourceDirectory = resource_path('backup/info-sections-images');
         $destinationDirectory = storage_path('app/public');
 
-        $command = 'cp -R ' . escapeshellarg($sourceDirectory) . ' ' . escapeshellarg($destinationDirectory);
+        $command = 'cp -R '.escapeshellarg($sourceDirectory).' '.escapeshellarg($destinationDirectory);
         exec($command, $output, $exitCode);
 
         if ($exitCode === 0) {
@@ -191,22 +186,22 @@ class ImportGameData extends Command {
     /**
      * Import the game maps.
      *
-     * @return void
      * @throws Exception
      */
-    protected function importGameMaps(): void {
+    protected function importGameMaps(): void
+    {
         $files = Storage::disk('data-maps')->allFiles();
 
         $corectOrder = [
-            "Surface.png",
-            "Labyrinth.png",
-            "Dungeons.png",
-            "Shadow Plane.png",
-            "Hell.png",
-            "Purgatory.png",
-            "IcePlane.png",
-            "Twisted Memories.png",
-            "Delusional Memories.png",
+            'Surface.png',
+            'Labyrinth.png',
+            'Dungeons.png',
+            'Shadow Plane.png',
+            'Hell.png',
+            'Purgatory.png',
+            'IcePlane.png',
+            'Twisted Memories.png',
+            'Delusional Memories.png',
         ];
 
         // Sort the array such that the maps are in the correct order.
@@ -220,13 +215,13 @@ class ImportGameData extends Command {
         foreach ($files as $file) {
             $fileName = pathinfo($file, PATHINFO_FILENAME);
 
-            $path     = Storage::disk('maps')->putFile($fileName, new File(resource_path('maps') . '/' . $file));
+            $path = Storage::disk('maps')->putFile($fileName, new File(resource_path('maps').'/'.$file));
 
             $mapValue = new MapNameValue($fileName);
 
             $gameMap = GameMap::where('name', $fileName)->first();
 
-            if (!is_null($gameMap)) {
+            if (! is_null($gameMap)) {
                 $gameMap->update([
                     'path' => $path,
                 ]);
@@ -235,9 +230,9 @@ class ImportGameData extends Command {
             }
 
             $gameMapData = array_merge([
-                'name'          => $fileName,
-                'path'          => $path,
-                'default'       => $mapValue->isSurface(),
+                'name' => $fileName,
+                'path' => $path,
+                'default' => $mapValue->isSurface(),
                 'kingdom_color' => MapNameValue::$kingdomColors[$fileName],
             ], (new MapNameValue($fileName))->getMapModifers());
 

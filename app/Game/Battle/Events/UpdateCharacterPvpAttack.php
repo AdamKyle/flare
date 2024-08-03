@@ -2,17 +2,16 @@
 
 namespace App\Game\Battle\Events;
 
-use App\Flare\Models\CelestialFight;
 use App\Flare\Models\User;
 use Illuminate\Broadcasting\Channel;
-use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Broadcasting\PresenceChannel;
-use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\SerializesModels;
 
-class UpdateCharacterPvpAttack implements ShouldBroadcastNow {
+class UpdateCharacterPvpAttack implements ShouldBroadcastNow
+{
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     private User $user;
@@ -21,13 +20,11 @@ class UpdateCharacterPvpAttack implements ShouldBroadcastNow {
 
     /**
      * Create a new event instance.
-     *
-     * @param User $user
-     * @param array $data
      */
-    public function __construct(User $user, array $data) {
-       $this->user = $user;
-       $this->data = $data;
+    public function __construct(User $user, array $data)
+    {
+        $this->user = $user;
+        $this->data = $data;
     }
 
     /**
@@ -35,7 +32,8 @@ class UpdateCharacterPvpAttack implements ShouldBroadcastNow {
      *
      * @return Channel|array
      */
-    public function broadcastOn() {
-        return new PrivateChannel('update-pvp-attack-' . $this->user->id);
+    public function broadcastOn()
+    {
+        return new PrivateChannel('update-pvp-attack-'.$this->user->id);
     }
 }

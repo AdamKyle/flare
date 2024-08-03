@@ -9,8 +9,8 @@ use Exception;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Character extends Model {
-
+class Character extends Model
+{
     use HasFactory;
 
     /**
@@ -71,166 +71,196 @@ class Character extends Model {
      * @var array
      */
     protected $casts = [
-        'inventory_max'               => 'integer',
-        'can_attack'                  => 'boolean',
-        'can_move'                    => 'boolean',
-        'can_craft'                   => 'boolean',
-        'can_spin'                    => 'boolean',
-        'is_dead'                     => 'boolean',
-        'force_name_change'           => 'boolean',
+        'inventory_max' => 'integer',
+        'can_attack' => 'boolean',
+        'can_move' => 'boolean',
+        'can_craft' => 'boolean',
+        'can_spin' => 'boolean',
+        'is_dead' => 'boolean',
+        'force_name_change' => 'boolean',
         'is_attack_automation_locked' => 'boolean',
-        'killed_in_pvp'               => 'boolean',
-        'can_engage_celestials'       => 'boolean',
-        'can_move_again_at'           => 'datetime',
-        'can_attack_again_at'         => 'datetime',
-        'can_craft_again_at'          => 'datetime',
-        'can_settle_again_at'         => 'datetime',
-        'can_spin_again_at'           => 'datetime',
+        'killed_in_pvp' => 'boolean',
+        'can_engage_celestials' => 'boolean',
+        'can_move_again_at' => 'datetime',
+        'can_attack_again_at' => 'datetime',
+        'can_craft_again_at' => 'datetime',
+        'can_settle_again_at' => 'datetime',
+        'can_spin_again_at' => 'datetime',
         'can_engage_celestials_again_at' => 'datetime',
-        'level'                       => 'integer',
-        'xp'                          => 'integer',
-        'xp_next'                     => 'integer',
-        'xp_penalty'                  => 'float',
-        'str'                         => 'integer',
-        'dur'                         => 'integer',
-        'dex'                         => 'integer',
-        'chr'                         => 'integer',
-        'int'                         => 'integer',
-        'agi'                         => 'integer',
-        'focus'                       => 'integer',
-        'ac'                          => 'integer',
-        'gold'                        => 'integer',
-        'gold_dust'                   => 'integer',
-        'shards'                      => 'integer',
-        'copper_coins'                => 'integer',
-        'reincarnated_stat_increase'  => 'integer',
-        'times_reincarnated'          => 'integer',
-        'base_stat_mod'               => 'float',
-        'base_damage_stat_mod'        => 'float',
+        'level' => 'integer',
+        'xp' => 'integer',
+        'xp_next' => 'integer',
+        'xp_penalty' => 'float',
+        'str' => 'integer',
+        'dur' => 'integer',
+        'dex' => 'integer',
+        'chr' => 'integer',
+        'int' => 'integer',
+        'agi' => 'integer',
+        'focus' => 'integer',
+        'ac' => 'integer',
+        'gold' => 'integer',
+        'gold_dust' => 'integer',
+        'shards' => 'integer',
+        'copper_coins' => 'integer',
+        'reincarnated_stat_increase' => 'integer',
+        'times_reincarnated' => 'integer',
+        'base_stat_mod' => 'float',
+        'base_damage_stat_mod' => 'float',
     ];
 
     protected $appends = [
         'is_auto_battling',
     ];
 
-    public function race() {
+    public function race()
+    {
         return $this->belongsTo(GameRace::class, 'game_race_id', 'id');
     }
 
-    public function class() {
+    public function class()
+    {
         return $this->belongsTo(GameClass::class, 'game_class_id', 'id');
     }
 
-    public function skills() {
+    public function skills()
+    {
         return $this->hasMany(Skill::class);
     }
 
-    public function user() {
+    public function user()
+    {
         return $this->belongsTo(User::class);
     }
 
-    public function inventory() {
+    public function inventory()
+    {
         return $this->hasOne(Inventory::class, 'character_id', 'id');
     }
 
-    public function inventorySets() {
+    public function inventorySets()
+    {
         return $this->hasMany(InventorySet::class, 'character_id', 'id');
     }
 
-    public function gemBag() {
+    public function gemBag()
+    {
         return $this->hasOne(GemBag::class, 'character_id', 'id');
     }
 
-    public function factions() {
+    public function factions()
+    {
         return $this->hasMany(Faction::class, 'character_id', 'id');
     }
 
-    public function rankTop() {
+    public function rankTop()
+    {
         return $this->hasOne(RankFightTop::class, 'character_id', 'id');
     }
 
-    public function factionLoyalties() {
+    public function factionLoyalties()
+    {
         return $this->hasMany(FactionLoyalty::class, 'character_id', 'id');
     }
 
-    public function map() {
+    public function map()
+    {
         return $this->hasOne(Map::class);
     }
 
-    public function getXPositionAttribute() {
+    public function getXPositionAttribute()
+    {
         return $this->map->character_position_x;
     }
 
-    public function getYPositionAttribute() {
+    public function getYPositionAttribute()
+    {
         return $this->map->character_position_y;
     }
 
-    public function getMapUrlAttribute() {
+    public function getMapUrlAttribute()
+    {
         return $this->map->gameMap->path;
     }
 
-    public function getKingdomsCountAttribute() {
+    public function getKingdomsCountAttribute()
+    {
         return $this->kingdoms->count();
     }
 
-    public function kingdoms() {
+    public function kingdoms()
+    {
         return $this->hasMany(Kingdom::class, 'character_id', 'id');
     }
 
-    public function kingdomAttackLogs() {
+    public function kingdomAttackLogs()
+    {
         return $this->hasMany(KingdomLog::class);
     }
 
-    public function unitMovementQueues() {
+    public function unitMovementQueues()
+    {
         return $this->hasMany(UnitMovementQueue::class);
     }
 
-    public function boons() {
+    public function boons()
+    {
         return $this->hasMany(CharacterBoon::class);
     }
 
-    public function questsCompleted() {
+    public function questsCompleted()
+    {
         return $this->hasMany(QuestsCompleted::class);
     }
 
-    public function currentAutomations() {
+    public function currentAutomations()
+    {
         return $this->hasMany(CharacterAutomation::class);
     }
 
-    public function passiveSkills() {
+    public function passiveSkills()
+    {
         return $this->hasMany(CharacterPassiveSkill::class);
     }
 
-    public function classRanks() {
+    public function classRanks()
+    {
         return $this->hasMany(CharacterClassRank::class);
     }
 
-    public function classSpecialsEquipped() {
+    public function classSpecialsEquipped()
+    {
         return $this->hasMany(CharacterClassSpecialtiesEquipped::class);
     }
 
-    public function globalEventParticipation() {
+    public function globalEventParticipation()
+    {
         return $this->hasOne(GlobalEventParticipation::class, 'character_id', 'id');
     }
 
-    public function globalEventKills() {
+    public function globalEventKills()
+    {
         return $this->hasOne(GlobalEventKill::class, 'character_id', 'id');
     }
 
-    public function globalEventCrafts() {
+    public function globalEventCrafts()
+    {
         return $this->hasOne(GlobalEventCraft::class, 'character_id', 'id');
     }
 
-    public function globalEventEnchants() {
+    public function globalEventEnchants()
+    {
         return $this->hasOne(GlobalEventEnchant::class, 'character_id', 'id');
     }
 
-    public function weeklyBattleFights() {
+    public function weeklyBattleFights()
+    {
         return $this->hasMany(WeeklyMonsterFight::class, 'character_id', 'id');
     }
 
-    public function getIsAutoBattlingAttribute() {
-        return !is_null(CharacterAutomation::where('character_id', $this->id)->first());
+    public function getIsAutoBattlingAttribute()
+    {
+        return ! is_null(CharacterAutomation::where('character_id', $this->id)->first());
     }
 
     /**
@@ -238,10 +268,9 @@ class Character extends Model {
      *
      * By returning the CharacterStatBuilder class, we can allow you to get
      * multiple calculated sets of data.
-     *
-     * @return CharacterStatBuilder
      */
-    public function getInformation(): CharacterStatBuilder {
+    public function getInformation(): CharacterStatBuilder
+    {
         $info = resolve(CharacterStatBuilder::class);
 
         return $info->setCharacter($this);
@@ -250,19 +279,18 @@ class Character extends Model {
     /**
      * Returns the character class value.
      *
-     * @return CharacterClassValue
      * @throws Exception
      */
-    public function classType(): CharacterClassValue {
+    public function classType(): CharacterClassValue
+    {
         return new CharacterClassValue($this->class->name);
     }
 
     /**
      * Is the character logged in?
-     *
-     * @return boolean
      */
-    public function isLoggedIn(): bool {
+    public function isLoggedIn(): bool
+    {
         return Session::where('user_id', $this->user_id)->exists();
     }
 
@@ -270,39 +298,39 @@ class Character extends Model {
      * Gets the inventory count.
      *
      * Excludes quest and equipped items.
-     *
-     * @return int
      */
-    public function getInventoryCount(): int {
+    public function getInventoryCount(): int
+    {
         $inventory = Inventory::where('character_id', $this->id)->first();
 
         return InventorySlot::select('inventory_slots.*')
-                            ->where('inventory_slots.inventory_id', $inventory->id)
-                            ->where('inventory_slots.equipped', false)
-                            ->join('items', function($join) {
-                                $join->on('items.id', '=', 'inventory_slots.item_id')
-                                     ->where('items.type', '!=', 'quest');
-                           })->count() + $this->gemBag->gemSlots->sum('amount');
+            ->where('inventory_slots.inventory_id', $inventory->id)
+            ->where('inventory_slots.equipped', false)
+            ->join('items', function ($join) {
+                $join->on('items.id', '=', 'inventory_slots.item_id')
+                    ->where('items.type', '!=', 'quest');
+            })->count() + $this->gemBag->gemSlots->sum('amount');
     }
 
     /**
      * Is the inventory full?
-     *
-     * @return bool
      */
-    public function isInventoryFull(): bool {
+    public function isInventoryFull(): bool
+    {
         $gemCount = $this->gemBag->gemSlots->sum('amount');
 
         return ($this->getInventoryCount() + $gemCount) >= $this->inventory_max;
     }
 
-    public function totalInventoryCount(): int {
+    public function totalInventoryCount(): int
+    {
         $gemCount = $this->gemBag->gemSlots->sum('amount');
 
         return $this->getInventoryCount() + $gemCount;
     }
 
-    protected static function newFactory() {
+    protected static function newFactory()
+    {
         return CharacterFactory::new();
     }
 }

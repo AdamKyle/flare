@@ -13,91 +13,43 @@ use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\DefenceBui
 use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ElementalAtonement;
 use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\HealingBuilder;
 use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\HolyBuilder;
-use Facades\App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ItemSkillAttribute;
 use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ReductionsBuilder;
 use App\Game\Character\Concerns\Boons;
 use App\Game\Character\Concerns\FetchEquipped;
 use Exception;
-
+use Facades\App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ItemSkillAttribute;
 use Illuminate\Support\Collection;
 
-class CharacterStatBuilder {
+class CharacterStatBuilder
+{
+    use Boons, ElementAttackData, FetchEquipped;
 
-    use FetchEquipped, Boons, ElementAttackData;
-
-    /**
-     * @var Character $character
-     */
     private Character $character;
 
-    /**
-     * @var Collection|null $equippedItems
-     */
     private ?Collection $equippedItems;
 
-    /**
-     * @var Collection $questItems
-     */
     private Collection $questItems;
 
-    /**
-     * @var Collection $characterBoons
-     */
     private Collection $characterBoons;
 
-    /**
-     * @var Collection $skills
-     */
     private Collection $skills;
 
-    /**
-     * @var GameMap $map
-     */
     private GameMap $map;
 
-    /**
-     * @var DefenceBuilder $defenceBuilder
-     */
     private DefenceBuilder $defenceBuilder;
 
-    /**
-     * @var DamageBuilder $damageBuilder
-     */
     private DamageBuilder $damageBuilder;
 
-    /**
-     * @var HealingBuilder $healingBuilder
-     */
     private HealingBuilder $healingBuilder;
 
-    /**
-     * @var HolyBuilder $holyBuilder
-     */
     private HolyBuilder $holyBuilder;
 
-    /**
-     * @var ReductionsBuilder $reductionsBuilder
-     */
     private ReductionsBuilder $reductionsBuilder;
 
-    /**
-     * @var ElementalAtonement $elementalAtonement
-     */
     private ElementalAtonement $elementalAtonement;
 
-    /**
-     * @var bool $ignoreReductions
-     */
     private bool $ignoreReductions = false;
 
-    /**
-     * @param DefenceBuilder $defenceBuilder
-     * @param DamageBuilder $damageBuilder
-     * @param HealingBuilder $healingBuilder
-     * @param HolyBuilder $holyBuilder
-     * @param ReductionsBuilder $reductionsBuilder
-     * @param ElementalAtonement $elementalAtonement
-     */
     public function __construct(
         DefenceBuilder $defenceBuilder,
         DamageBuilder $damageBuilder,
@@ -106,37 +58,34 @@ class CharacterStatBuilder {
         ReductionsBuilder $reductionsBuilder,
         ElementalAtonement $elementalAtonement
     ) {
-        $this->defenceBuilder     = $defenceBuilder;
-        $this->damageBuilder      = $damageBuilder;
-        $this->healingBuilder     = $healingBuilder;
-        $this->holyBuilder        = $holyBuilder;
-        $this->reductionsBuilder  = $reductionsBuilder;
+        $this->defenceBuilder = $defenceBuilder;
+        $this->damageBuilder = $damageBuilder;
+        $this->healingBuilder = $healingBuilder;
+        $this->holyBuilder = $holyBuilder;
+        $this->reductionsBuilder = $reductionsBuilder;
         $this->elementalAtonement = $elementalAtonement;
     }
 
     /**
      * Set the character and their inventory.
-     *
-     * @param Character $character
-     * @param bool $ignoreReductions
-     * @return CharacterStatBuilder
      */
-    public function setCharacter(Character $character, bool $ignoreReductions = false): CharacterStatBuilder {
+    public function setCharacter(Character $character, bool $ignoreReductions = false): CharacterStatBuilder
+    {
         $this->ignoreReductions = $ignoreReductions;
 
-        $this->character      = $character;
+        $this->character = $character;
 
-        $this->equippedItems  = $this->fetchEquipped($character);
+        $this->equippedItems = $this->fetchEquipped($character);
 
-        $this->questItems     = $character->inventory->slots->filter(function ($slot) {
+        $this->questItems = $character->inventory->slots->filter(function ($slot) {
             return $slot->item->type === 'quest';
         });
 
         $this->characterBoons = $this->fetchCharacterBoons($character);
 
-        $this->map            = $this->character->map->gameMap;
+        $this->map = $this->character->map->gameMap;
 
-        $this->skills         = $this->character->skills;
+        $this->skills = $this->character->skills;
 
         $this->damageBuilder->initialize(
             $this->character,
@@ -161,19 +110,17 @@ class CharacterStatBuilder {
 
     /**
      * Return the character.
-     *
-     * @return Character
      */
-    public function character(): Character {
+    public function character(): Character
+    {
         return $this->character;
     }
 
     /**
      * Fetch inventory.
-     *
-     * @return Collection
      */
-    public function fetchInventory(): Collection {
+    public function fetchInventory(): Collection
+    {
         if (empty($this->equippedItems)) {
             return collect();
         }
@@ -185,10 +132,9 @@ class CharacterStatBuilder {
      * Get class bonus.
      *
      * - Default bonus is 5%.
-     *
-     * @return float
      */
-    public function classBonus(): float {
+    public function classBonus(): float
+    {
         $classBonusSkill = $this->character->skills()
             ->whereHas('baseSkill', function ($query) {
                 $query->whereNotNull('game_class_id');
@@ -206,50 +152,44 @@ class CharacterStatBuilder {
 
     /**
      * Get instance of Holy Builder.
-     *
-     * @return HolyBuilder
      */
-    public function holyInfo(): HolyBuilder {
+    public function holyInfo(): HolyBuilder
+    {
         return $this->holyBuilder;
     }
 
     /**
      * Get instance of reduction builder.
-     *
-     * @return ReductionsBuilder
      */
-    public function reductionInfo(): ReductionsBuilder {
+    public function reductionInfo(): ReductionsBuilder
+    {
         return $this->reductionsBuilder;
     }
 
     /**
      * Can the characters affixes be resisted?
-     *
-     * @return bool
      */
-    public function canAffixesBeResisted(): bool {
+    public function canAffixesBeResisted(): bool
+    {
         if ($this->questItems->isEmpty()) {
             return false;
         }
 
-        return !is_null($this->questItems->where('item.effect', ItemEffectsValue::AFFIXES_IRRESISTIBLE)->first());
+        return ! is_null($this->questItems->where('item.effect', ItemEffectsValue::AFFIXES_IRRESISTIBLE)->first());
     }
 
     /**
      * Get modded stat.
-     *
-     * @param string $stat
-     * @param bool $voided
-     * @return float
      */
-    public function statMod(string $stat, bool $voided = false): float {
+    public function statMod(string $stat, bool $voided = false): float
+    {
         $baseStat = $this->character->{$stat};
 
         $baseStat = $baseStat + $baseStat * $this->fetchStatFromEquipment($stat, $voided);
 
-        $baseStat =  $this->applyBoons($baseStat);
-        $baseStat =  $this->applyBoons($baseStat, $stat . '_mod');
-        $baseStat += ItemSkillAttribute::fetchModifier($this->character, $stat . '_mod');
+        $baseStat = $this->applyBoons($baseStat);
+        $baseStat = $this->applyBoons($baseStat, $stat.'_mod');
+        $baseStat += ItemSkillAttribute::fetchModifier($this->character, $stat.'_mod');
 
         if ($stat === $this->character->damage_stat) {
             $classSpecialsBonus = $this->character->classSpecialsEquipped
@@ -269,10 +209,9 @@ class CharacterStatBuilder {
 
     /**
      * Get map reductions for characters.
-     *
-     * @return float
      */
-    protected function getMapCharacterReductions(): float {
+    protected function getMapCharacterReductions(): float
+    {
         if ($this->ignoreReductions) {
             return 0;
         }
@@ -284,11 +223,11 @@ class CharacterStatBuilder {
             return $this->map->character_attack_reduction;
         }
 
-        $purgatoryQuestItem = $this->character->inventory->slots->filter(function($slot) {
+        $purgatoryQuestItem = $this->character->inventory->slots->filter(function ($slot) {
             return $slot->item->effect === ItemEffectsValue::PURGATORY;
         })->first();
 
-        if (!is_null($purgatoryQuestItem)) {
+        if (! is_null($purgatoryQuestItem)) {
 
             if ($this->map->mapType()->isTheIcePlane() || $this->map->mapType()->isDelusionalMemories()) {
                 return $this->map->character_attack_reduction;
@@ -300,11 +239,9 @@ class CharacterStatBuilder {
 
     /**
      * Build health based off durability stat.
-     *
-     * @param bool $voided
-     * @return float
      */
-    public function buildHealth(bool $voided = false): float {
+    public function buildHealth(bool $voided = false): float
+    {
         $classSpecialsBonus = $this->character->classSpecialsEquipped
             ->where('equipped', true)
             ->where('health_mod', '>', 0)
@@ -312,19 +249,19 @@ class CharacterStatBuilder {
 
         $health = $this->statMod('dur', $voided);
 
-        return ($health + ($health * $classSpecialsBonus));
+        return $health + ($health * $classSpecialsBonus);
     }
 
     /**
      * Build the characters over all elemental atonement.
-     *
-     * @return array|null
      */
-    public function buildElementalAtonement(): array|null {
+    public function buildElementalAtonement(): ?array
+    {
         return $this->elementalAtonement->calculateAtonement();
     }
 
-    public function getDefenceBuilder(): DefenceBuilder {
+    public function getDefenceBuilder(): DefenceBuilder
+    {
         $this->defenceBuilder->initialize(
             $this->character,
             $this->skills,
@@ -334,7 +271,8 @@ class CharacterStatBuilder {
         return $this->defenceBuilder;
     }
 
-    public function getDamageBuilder(): DamageBuilder {
+    public function getDamageBuilder(): DamageBuilder
+    {
         $this->damageBuilder->initialize(
             $this->character,
             $this->skills,
@@ -344,7 +282,8 @@ class CharacterStatBuilder {
         return $this->damageBuilder;
     }
 
-    public function getHealingBuilder(): HealingBuilder {
+    public function getHealingBuilder(): HealingBuilder
+    {
         $this->healingBuilder->initialize(
             $this->character,
             $this->skills,
@@ -356,30 +295,27 @@ class CharacterStatBuilder {
 
     /**
      * Build Defence.
-     *
-     * @param bool $voided
-     * @return float
      */
-    public function buildDefence(bool $voided = false): float {
+    public function buildDefence(bool $voided = false): float
+    {
         $this->defenceBuilder->initialize(
             $this->character,
             $this->skills,
             $this->equippedItems,
         );
 
-        $defence   = $this->defenceBuilder->buildDefence($this->classBonus(), $voided);
+        $defence = $this->defenceBuilder->buildDefence($this->classBonus(), $voided);
         $holyBonus = $this->holyInfo()->fetchDefenceBonus();
-        $defence   = $this->applyBoons($defence, 'base_ac_mod');
+        $defence = $this->applyBoons($defence, 'base_ac_mod');
 
         $classSpecialsBonus = $this->character->classSpecialsEquipped
             ->where('equipped', true)
             ->where('base_ac_mod', '>', 0)
             ->sum('base_ac_mod');
 
-
         $itemSkillBonus = 0;
 
-        if (!is_null($this->equippedItems)) {
+        if (! is_null($this->equippedItems)) {
             $itemSkillBonus = ItemSkillAttribute::fetchModifier($this->character, 'base_ac');
         }
 
@@ -388,23 +324,19 @@ class CharacterStatBuilder {
 
     /**
      * Build time out modifier bonus for type.
-     *
-     * @param string $type
-     * @return float
      */
-    public function buildTimeOutModifier(string $type): float {
+    public function buildTimeOutModifier(string $type): float
+    {
         return $this->damageBuilder->fetchBaseAttributeFromSkills($type);
     }
 
     /**
      * Build damage.
      *
-     * @param string $type
-     * @param bool $voided
-     * @return int
      * @throws Exception
      */
-    public function buildDamage(string $type, bool $voided = false): int {
+    public function buildDamage(string $type, bool $voided = false): int
+    {
 
         $stat = $this->statMod($this->character->damage_stat, $voided);
 
@@ -453,13 +385,12 @@ class CharacterStatBuilder {
 
         $itemSkillBonus = 0;
 
-        if (!is_null($this->equippedItems)) {
+        if (! is_null($this->equippedItems)) {
             $itemSkillBonus = ItemSkillAttribute::fetchModifier($this->character, 'base_damage');
         }
 
         return ceil($damage + ($damage * ($this->holyInfo()->fetchAttackBonus() + $classSpecialsBonus + $itemSkillBonus)));
     }
-
 
     /**
      * Add bonus to spell damage.
@@ -467,12 +398,10 @@ class CharacterStatBuilder {
      * - Class should be heretic or arcane alchemist.
      * - Adds 30% of their int to the damage.
      *
-     * @param int $damage
-     * @param bool $voided
-     * @return int
      * @throws Exception
      */
-    protected function spellDamageBonus(int $damage, bool $voided = false): int {
+    protected function spellDamageBonus(int $damage, bool $voided = false): int
+    {
         if ($this->character->class->type()->isHeretic() || $this->character->class->type()->isArcaneAlchemist()) {
             $intMod = $this->statMod('int', $voided) * 0.30;
 
@@ -491,12 +420,9 @@ class CharacterStatBuilder {
      *
      * - Prophets get 30% of their CHR
      * - Arcane Alchemists get 10% of their CHR
-     *
-     * @param int $healing
-     * @param bool $voided
-     * @return int
      */
-    protected function healingBonus(int $healing, bool $voided = false): int {
+    protected function healingBonus(int $healing, bool $voided = false): int
+    {
         if ($this->character->class->type()->isProphet()) {
             $chrMod = $this->statMod('chr', $voided) * 0.30;
 
@@ -529,13 +455,13 @@ class CharacterStatBuilder {
      *
      * Includes: Weapons, Rings and Spell Damage.
      *
-     * @return int
      * @throws Exception
      */
-    public function buildTotalAttack(): int {
+    public function buildTotalAttack(): int
+    {
         $weaponDamage = $this->buildDamage('weapon') + $this->buildDamage('weapon');
-        $ringDamage   = $this->buildDamage('ring') + $this->buildDamage('ring');
-        $spellDamage  = $this->buildDamage('spell-damage') + $this->buildDamage('spell-damage');
+        $ringDamage = $this->buildDamage('ring') + $this->buildDamage('ring');
+        $spellDamage = $this->buildDamage('spell-damage') + $this->buildDamage('spell-damage');
 
         return $weaponDamage + $ringDamage + $spellDamage;
     }
@@ -543,12 +469,10 @@ class CharacterStatBuilder {
     /**
      * Build Positional Weapon Damage.
      *
-     * @param string $weaponPosition
-     * @param bool $voided
-     * @return int
      * @throws Exception
      */
-    public function positionalWeaponDamage(string $weaponPosition, bool $voided = false): int {
+    public function positionalWeaponDamage(string $weaponPosition, bool $voided = false): int
+    {
         $stat = $this->statMod($this->character->damage_stat, $voided);
 
         if (is_null($this->equippedItems)) {
@@ -570,12 +494,10 @@ class CharacterStatBuilder {
     /**
      * Build Positional Spell Damage.
      *
-     * @param string $spellPosition
-     * @param bool $voided
-     * @return int
      * @throws Exception
      */
-    public function positionalSpellDamage(string $spellPosition, bool $voided = false): int {
+    public function positionalSpellDamage(string $spellPosition, bool $voided = false): int
+    {
         $stat = $this->statMod($this->character->damage_stat, $voided);
 
         if (is_null($this->equippedItems)) {
@@ -601,18 +523,17 @@ class CharacterStatBuilder {
     /**
      * Build positional healing.
      *
-     * @param string $spellPosition
-     * @param bool $voided
-     * @return int
      * @throws Exception
      */
-    public function positionalHealing(string $spellPosition, bool $voided = false): int {
+    public function positionalHealing(string $spellPosition, bool $voided = false): int
+    {
 
         $stat = $this->statMod($this->character->damage_stat, $voided);
 
         if (is_null($this->equippedItems)) {
             if ($this->character->classType()->isProphet()) {
                 $value = $stat / 2;
+
                 return $value < 5 ? 5 : $value;
             }
 
@@ -632,11 +553,10 @@ class CharacterStatBuilder {
     /**
      * Build total healing.
      *
-     * @param bool $voided
-     * @return int
      * @throws Exception
      */
-    public function buildHealing(bool $voided = false): int {
+    public function buildHealing(bool $voided = false): int
+    {
 
         $stat = $this->statMod($this->character->damage_stat, $voided);
 
@@ -659,7 +579,7 @@ class CharacterStatBuilder {
 
         $itemSkillBonus = 0;
 
-        if (!is_null($this->equippedItems)) {
+        if (! is_null($this->equippedItems)) {
             $itemSkillBonus = ItemSkillAttribute::fetchModifier($this->character, 'base_healing');
         }
 
@@ -670,16 +590,14 @@ class CharacterStatBuilder {
      * Build Devouring info for type.
      *
      * type can be Devouring Darkness or Devouring Light
-     *
-     * @param string $type
-     * @return float
      */
-    public function  buildDevouring(string $type): float {
+    public function buildDevouring(string $type): float
+    {
 
         $itemDevouring = 0;
 
         if ($this->questItems->isNotEmpty()) {
-            $itemDevouring = $this->questItems->sum('item.' . $type);
+            $itemDevouring = $this->questItems->sum('item.'.$type);
         }
 
         if (empty($this->equippedItems)) {
@@ -692,11 +610,11 @@ class CharacterStatBuilder {
             return $itemDevouring;
         }
 
-        $prefixDevouring  = $this->equippedItems->pluck('item.itemPrefix.' . $type)->toArray();
-        $suffixDevouring  = $this->equippedItems->pluck('item.itemSuffix.' . $type)->toArray();
+        $prefixDevouring = $this->equippedItems->pluck('item.itemPrefix.'.$type)->toArray();
+        $suffixDevouring = $this->equippedItems->pluck('item.itemSuffix.'.$type)->toArray();
 
         $bestAffixDevouring = max(array_merge($prefixDevouring, $suffixDevouring));
-        $amount             = $itemDevouring + $bestAffixDevouring;
+        $amount = $itemDevouring + $bestAffixDevouring;
 
         if ($this->character->map->gameMap->mapType()->isPurgatory()) {
             if ($amount >= 0.45) {
@@ -714,12 +632,12 @@ class CharacterStatBuilder {
     /**
      * Build resurrection chance.
      *
-     * @return float
      * @throws Exception
      */
-    public function buildResurrectionChance(): float {
+    public function buildResurrectionChance(): float
+    {
         if (empty($this->equippedItems)) {
-            return  0;
+            return 0;
         }
 
         $chance = $this->equippedItems->where('item.type', '=', 'spell-healing')->sum('item.resurrection_chance');
@@ -746,7 +664,7 @@ class CharacterStatBuilder {
         }
 
         // Cap chance for non-Prophet and non-Cleric classes at 0.75
-        if (!$this->character->classType()->isProphet() && !$this->character->classType()->isCleric() && $chance > 0.75) {
+        if (! $this->character->classType()->isProphet() && ! $this->character->classType()->isCleric() && $chance > 0.75) {
             return 0.75;
         }
 
@@ -758,15 +676,11 @@ class CharacterStatBuilder {
         return $chance;
     }
 
-
     /**
      * Build affix damage based on type.
-     *
-     * @param string $type
-     * @param bool $voided
-     * @return float|int
      */
-    public function buildAffixDamage(string $type, bool $voided = false): float|int {
+    public function buildAffixDamage(string $type, bool $voided = false): float|int
+    {
         switch ($type) {
             case 'affix-stacking-damage':
                 return $this->damageBuilder->buildAffixStackingDamage($voided);
@@ -781,11 +695,9 @@ class CharacterStatBuilder {
 
     /**
      * Build entrancing chance.
-     *
-     * @param bool $voided
-     * @return float
      */
-    public function buildEntrancingChance(bool $voided = false): float {
+    public function buildEntrancingChance(bool $voided = false): float
+    {
 
         if ($voided || is_null($this->equippedItems)) {
             return 0;
@@ -805,11 +717,9 @@ class CharacterStatBuilder {
 
     /**
      * Build Resistance Chance
-     *
-     * @param boolean $voided
-     * @return float
      */
-    public function buildResistanceReductionChance(bool $voided = false): float {
+    public function buildResistanceReductionChance(bool $voided = false): float
+    {
         if ($voided || is_null($this->equippedItems)) {
             return 0;
         }
@@ -827,17 +737,16 @@ class CharacterStatBuilder {
      * Get stat reducing prefix.
      *
      * Takes the Highest one.
-     *
-     * @return ItemAffix|null
      */
-    public function getStatReducingPrefix(): ?ItemAffix {
+    public function getStatReducingPrefix(): ?ItemAffix
+    {
 
         if (is_null($this->equippedItems)) {
             return null;
         }
 
         foreach ($this->equippedItems as $slot) {
-            if (!is_null($slot->item->itemPrefix)) {
+            if (! is_null($slot->item->itemPrefix)) {
                 if ($slot->item->itemPrefix->reduces_enemy_stats) {
                     return $slot->item->itemPrefix;
                 }
@@ -849,10 +758,9 @@ class CharacterStatBuilder {
 
     /**
      * Get all stat reducing suffixes
-     *
-     * @return array
      */
-    public function getStatReducingSuffixes(): array {
+    public function getStatReducingSuffixes(): array
+    {
 
         if (is_null($this->equippedItems)) {
             return [];
@@ -861,7 +769,7 @@ class CharacterStatBuilder {
         $suffixes = [];
 
         foreach ($this->equippedItems as $slot) {
-            if (!is_null($slot->item->itemSuffix)) {
+            if (! is_null($slot->item->itemSuffix)) {
                 if ($slot->item->itemSuffix->reduces_enemy_stats) {
                     $suffixes[] = $slot->item->itemSuffix;
                 }
@@ -875,11 +783,9 @@ class CharacterStatBuilder {
      * Build ambush based off trinkets.
      *
      * - Builds chance or resistance
-     *
-     * @param string $type
-     * @return float
      */
-    public function buildAmbush(string $type = 'chance'): float {
+    public function buildAmbush(string $type = 'chance'): float
+    {
 
         if (is_null($this->equippedItems)) {
             return 0;
@@ -900,11 +806,9 @@ class CharacterStatBuilder {
      * Build counter based off trinkets.
      *
      * - Builds chance or resistance
-     *
-     * @param string $type
-     * @return float
      */
-    public function buildCounter(string $type = 'chance'): float {
+    public function buildCounter(string $type = 'chance'): float
+    {
 
         if (is_null($this->equippedItems)) {
             return 0;
@@ -923,19 +827,16 @@ class CharacterStatBuilder {
 
     /**
      * Apply boons.
-     *
-     * @param float $base
-     * @param string|null $statAttribute
-     * @return float
      */
-    protected function applyBoons(float $base, ?string $statAttribute = null): float {
+    protected function applyBoons(float $base, ?string $statAttribute = null): float
+    {
         $totalPercent = 0;
 
         if ($this->characterBoons->isNotEmpty()) {
             if (is_null($statAttribute)) {
                 $totalPercent = $this->characterBoons->sum('itemUsed.increase_stat_by');
             } else {
-                $totalPercent = $this->characterBoons->sum('itemUsed.' . $statAttribute);
+                $totalPercent = $this->characterBoons->sum('itemUsed.'.$statAttribute);
             }
         }
 
@@ -944,12 +845,9 @@ class CharacterStatBuilder {
 
     /**
      * Fetch stat from equipment.
-     *
-     * @param string $stat
-     * @param bool $voided
-     * @return float
      */
-    protected function fetchStatFromEquipment(string $stat, bool $voided = false): float {
+    protected function fetchStatFromEquipment(string $stat, bool $voided = false): float
+    {
         $totalPercentFromEquipped = 0;
 
         if (is_null($this->equippedItems)) {
@@ -965,15 +863,11 @@ class CharacterStatBuilder {
 
     /**
      * Fetch modded stat
-     *
-     * @param Item $item
-     * @param string $stat
-     * @param bool $voided
-     * @return float
      */
-    private function fetchModdedStat(Item $item, string $stat, bool $voided = false): float {
-        $staMod          = $item->{$stat . '_mod'};
-        $totalPercentage = !is_null($staMod) ? $staMod : 0.0;
+    private function fetchModdedStat(Item $item, string $stat, bool $voided = false): float
+    {
+        $staMod = $item->{$stat.'_mod'};
+        $totalPercentage = ! is_null($staMod) ? $staMod : 0.0;
 
         if ($voided) {
             return $totalPercentage;
@@ -982,14 +876,14 @@ class CharacterStatBuilder {
         $itemPrefix = $item->itemPrefix;
         $itemSuffix = $item->itemSuffix;
 
-        if (!is_null($itemPrefix)) {
-            $prefixMod        = $itemPrefix->{$stat . '_mod'};
-            $totalPercentage += !is_null($prefixMod) ? $prefixMod : 0.0;
+        if (! is_null($itemPrefix)) {
+            $prefixMod = $itemPrefix->{$stat.'_mod'};
+            $totalPercentage += ! is_null($prefixMod) ? $prefixMod : 0.0;
         }
 
-        if (!is_null($itemSuffix)) {
-            $suffixMod        = $itemSuffix->{$stat . '_mod'};
-            $totalPercentage += !is_null($suffixMod) ? $suffixMod : 0.0;
+        if (! is_null($itemSuffix)) {
+            $suffixMod = $itemSuffix->{$stat.'_mod'};
+            $totalPercentage += ! is_null($suffixMod) ? $suffixMod : 0.0;
         }
 
         $totalPercentage += $item->holy_stack_stat_bonus;

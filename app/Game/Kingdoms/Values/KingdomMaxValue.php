@@ -3,10 +3,9 @@
 namespace App\Game\Kingdoms\Values;
 
 use App\Flare\Models\Kingdom;
-use App\Flare\Models\KingdomUnit;
 
-class KingdomMaxValue {
-
+class KingdomMaxValue
+{
     const MAX_TREASURY = 2000000000;
 
     const MAX_UNIT = 100000;
@@ -15,7 +14,8 @@ class KingdomMaxValue {
 
     const MAX_GOLD_BARS = 1000;
 
-    public static function isTreasuryAtMax(Kingdom $kingdom): bool {
+    public static function isTreasuryAtMax(Kingdom $kingdom): bool
+    {
         return $kingdom->treasury === self::MAX_TREASURY;
     }
 }

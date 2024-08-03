@@ -2,32 +2,23 @@
 
 namespace App\Game\Character\Builders\InformationBuilders\AttributeBuilders;
 
-
 use App\Flare\Models\Character;
 use Illuminate\Support\Collection;
 
-class HealingBuilder extends BaseAttribute {
-
-    /**
-     * @var ClassRanksWeaponMasteriesBuilder $classRanksWeaponMasteriesBuilder
-     */
+class HealingBuilder extends BaseAttribute
+{
     private ClassRanksWeaponMasteriesBuilder $classRanksWeaponMasteriesBuilder;
 
-    /**
-     * @param ClassRanksWeaponMasteriesBuilder $classRanksWeaponMasteriesBuilder
-     */
-    public function __construct(ClassRanksWeaponMasteriesBuilder $classRanksWeaponMasteriesBuilder) {
+    public function __construct(ClassRanksWeaponMasteriesBuilder $classRanksWeaponMasteriesBuilder)
+    {
         $this->classRanksWeaponMasteriesBuilder = $classRanksWeaponMasteriesBuilder;
     }
 
     /**
-     * @inheritDoc
-     * @param Character $character
-     * @param Collection $skills
-     * @param Collection|null $inventory
-     * @return void
+     * {@inheritDoc}
      */
-    public function initialize(Character $character, Collection $skills, ?Collection $inventory): void {
+    public function initialize(Character $character, Collection $skills, ?Collection $inventory): void
+    {
         parent::initialize($character, $skills, $inventory);
 
         $this->classRanksWeaponMasteriesBuilder->initialize($this->character, $this->skills, $this->inventory);
@@ -35,19 +26,16 @@ class HealingBuilder extends BaseAttribute {
 
     /**
      * Build the healing.
-     *
-     * @param bool $voided
-     * @param string $position
-     * @return float
      */
-    public function buildHealing(bool $voided = false, string $position = 'both'): float {
+    public function buildHealing(bool $voided = false, string $position = 'both'): float
+    {
         $class = $this->character->class;
 
-        $itemHealing      = $this->getHealingFromItems('spell-healing', $position);
+        $itemHealing = $this->getHealingFromItems('spell-healing', $position);
 
         $skillPercentage = 0;
 
-        if ($this->shouldIncludeSkillDamage($class,'healing')) {
+        if ($this->shouldIncludeSkillDamage($class, 'healing')) {
             $skillPercentage = $this->fetchBaseAttributeFromSkills('base_healing');
         }
 
@@ -68,7 +56,8 @@ class HealingBuilder extends BaseAttribute {
         return $healing;
     }
 
-    public function getHealingBuilder(bool $isVoided): array {
+    public function getHealingBuilder(bool $isVoided): array
+    {
         $details = [];
 
         $details['base_damage'] = $this->getHealingFromItems('spell-healing', 'both');

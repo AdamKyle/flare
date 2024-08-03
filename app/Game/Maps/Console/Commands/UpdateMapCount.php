@@ -2,9 +2,9 @@
 
 namespace App\Game\Maps\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Flare\Models\GameMap;
 use App\Game\Maps\Events\UpdateGlobalCharacterCountBroadcast;
+use Illuminate\Console\Command;
 
 class UpdateMapCount extends Command
 {

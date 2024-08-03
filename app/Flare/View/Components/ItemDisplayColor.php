@@ -6,16 +6,10 @@ use App\Flare\Models\Item;
 use Illuminate\View\Component;
 use Illuminate\View\View;
 
-class ItemDisplayColor extends Component {
-
-    /**
-     * @var Item $item
-     */
+class ItemDisplayColor extends Component
+{
     public Item $item;
 
-    /**
-     * @var string
-     */
     public string $color;
 
     /**
@@ -23,22 +17,22 @@ class ItemDisplayColor extends Component {
      *
      * @return void
      */
-    public function __construct(Item $item) {
+    public function __construct(Item $item)
+    {
         $this->item = $item;
     }
 
     /**
      * Get the view / contents that represent the component.
-     *
-     * @return string|View
      */
-    public function render(): string|View{
+    public function render(): string|View
+    {
         $isEitherRandomlyGenerated = $this->isEitherEnchantRandomlyGenerated();
 
         if ($isEitherRandomlyGenerated) {
             if ($this->item->is_cosmic) {
                 $this->color = 'cosmic';
-            } else if ($this->item->is_mythic) {
+            } elseif ($this->item->is_mythic) {
                 $this->color = 'mythic';
             } else {
                 $this->color = 'unique-item';
@@ -46,19 +40,19 @@ class ItemDisplayColor extends Component {
         } else {
             if ($this->item->type === 'artifact') {
                 $this->color = 'artifact';
-            } else if ($this->item->type === 'trinket') {
+            } elseif ($this->item->type === 'trinket') {
                 $this->color = 'trinket';
-            } else if ($this->item->appliedHolyStacks->isNotEmpty()) {
+            } elseif ($this->item->appliedHolyStacks->isNotEmpty()) {
                 $this->color = 'holy-item';
-            } else if (!is_null($this->item->itemSuffix) && !is_null($this->item->itemPrefix)) {
+            } elseif (! is_null($this->item->itemSuffix) && ! is_null($this->item->itemPrefix)) {
                 $this->color = 'two-enchant';
-            } else if (!is_null($this->item->itemSuffix) || !is_null($this->item->itemPrefix)) {
+            } elseif (! is_null($this->item->itemSuffix) || ! is_null($this->item->itemPrefix)) {
                 $this->color = 'one-enchant';
             } elseif ($this->item->type === 'quest') {
                 $this->color = 'quest-item';
             } elseif ($this->item->usable || $this->item->can_use_on_other_items) {
                 $this->color = 'usable-item';
-            }  else {
+            } else {
                 $this->color = 'normal-item';
             }
         }
@@ -66,12 +60,13 @@ class ItemDisplayColor extends Component {
         return view('components.item-display-color');
     }
 
-    protected function isEitherEnchantRandomlyGenerated(): bool {
-        if (!is_null($this->item->itemSuffix)) {
+    protected function isEitherEnchantRandomlyGenerated(): bool
+    {
+        if (! is_null($this->item->itemSuffix)) {
             return $this->item->itemSuffix->randomly_generated;
         }
 
-        if (!is_null($this->item->itemPrefix)) {
+        if (! is_null($this->item->itemPrefix)) {
             return $this->item->itemPrefix->randomly_generated;
         }
 

@@ -16,33 +16,22 @@ use App\Game\Skills\Events\UpdateCharacterEnchantingList;
 use App\Game\Skills\Events\UpdateSkillEvent;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 
-class DisenchantService {
-
+class DisenchantService
+{
     use ResponseBuilder;
 
-    /**
-     * @var EnchantingService $enchantingService
-     */
     private EnchantingService $enchantingService;
 
-    /**
-     * @var Character $character
-     */
     private Character $character;
 
-    /**
-     * @var Skill $disenchantingSkill
-     */
     private Skill $disenchantingSkill;
 
-    /**
-     * @var SkillCheckService $skillCheckService
-     */
     private SkillCheckService $skillCheckService;
 
-    private CharacterInventoryService  $characterInventoryService;
+    private CharacterInventoryService $characterInventoryService;
 
-    public function __construct(SkillCheckService $skillCheckService, CharacterInventoryService $characterInventoryService) {
+    public function __construct(SkillCheckService $skillCheckService, CharacterInventoryService $characterInventoryService)
+    {
         $this->skillCheckService = $skillCheckService;
 
         $this->characterInventoryService = $characterInventoryService;
@@ -50,21 +39,20 @@ class DisenchantService {
 
     /**
      * Set up the service.
-     *
-     * @param Character $character
-     * @return DisenchantService
      */
-    public function setUp(Character $character): DisenchantService {
+    public function setUp(Character $character): DisenchantService
+    {
         $this->character = $character;
 
-        $this->disenchantingSkill = $character->skills->filter(function($skill) {
+        $this->disenchantingSkill = $character->skills->filter(function ($skill) {
             return $skill->type()->isDisenchanting();
         })->first();
 
         return $this;
     }
 
-    public function disenchantItem(Character $character, Item $item): array {
+    public function disenchantItem(Character $character, Item $item): array
+    {
 
         $inventory = Inventory::where('character_id', $character->id)->first();
 
@@ -72,15 +60,15 @@ class DisenchantService {
 
         if (is_null($foundItem)) {
 
-            return $this->errorResult($item->affix_name . ' Cannot be disenchanted. Not found in inventory.');
+            return $this->errorResult($item->affix_name.' Cannot be disenchanted. Not found in inventory.');
         }
 
         if (is_null($foundItem->item->item_suffix_id) && is_null($foundItem->item->item_prefix_id)) {
 
-            return $this->errorResult($item->affix_name . ' Cannot be disenchanted. Has no enchantments attached.');
+            return $this->errorResult($item->affix_name.' Cannot be disenchanted. Has no enchantments attached.');
         }
 
-        if (!is_null($foundItem)) {
+        if (! is_null($foundItem)) {
             if ($foundItem->item->type === 'quest') {
 
                 return $this->errorResult('Quest items cannot be disenchanted.');
@@ -94,20 +82,18 @@ class DisenchantService {
         $inventory = $this->characterInventoryService->setCharacter($character->refresh());
 
         return $this->successResult([
-            'message'   => 'Disenchanted item ' . $item->affix_name . ' Check server message tab for Gold Dust output.',
+            'message' => 'Disenchanted item '.$item->affix_name.' Check server message tab for Gold Dust output.',
             'inventory' => [
-                'inventory' => $inventory->getInventoryForType('inventory')
-            ]
+                'inventory' => $inventory->getInventoryForType('inventory'),
+            ],
         ]);
     }
 
     /**
      * Disenchant the item.
-     *
-     * @param InventorySlot $slot
-     * @return void
      */
-    public function disenchantWithSkill(InventorySlot $slot): void {
+    public function disenchantWithSkill(InventorySlot $slot): void
+    {
         if ($this->character->gold_dust >= MaxCurrenciesValue::MAX_GOLD_DUST) {
             $slot->delete();
 
@@ -123,7 +109,7 @@ class DisenchantService {
         }
 
         $characterRoll = $this->skillCheckService->characterRoll($this->disenchantingSkill);
-        $dcCheck       = $this->skillCheckService->getDCCheck($this->disenchantingSkill);
+        $dcCheck = $this->skillCheckService->getDCCheck($this->disenchantingSkill);
 
         if ($characterRoll > $dcCheck) {
             $goldDust = $this->updateGoldDust($this->character);
@@ -151,13 +137,12 @@ class DisenchantService {
 
     /**
      * Disenchant item with skill.
-     *
-     * @return void
      */
-    public function disenchantItemWithSkill(): void {
+    public function disenchantItemWithSkill(): void
+    {
 
         $characterRoll = $this->skillCheckService->characterRoll($this->disenchantingSkill);
-        $dcCheck       = $this->skillCheckService->getDCCheck($this->disenchantingSkill);
+        $dcCheck = $this->skillCheckService->getDCCheck($this->disenchantingSkill);
 
         $characterCurrentGoldDust = $this->character->gold_dust;
 
@@ -185,21 +170,18 @@ class DisenchantService {
 
     /**
      * Update the characters gold dust.
-     *
-     * @param Character $character
-     * @param bool $failedCheck
-     * @return int
      */
-    protected function updateGoldDust(Character $character, bool $failedCheck = false): int {
+    protected function updateGoldDust(Character $character, bool $failedCheck = false): int
+    {
 
-        $goldDust = !$failedCheck ? rand(2, 1150) : 1;
+        $goldDust = ! $failedCheck ? rand(2, 1150) : 1;
 
-        $goldDust = $goldDust + $goldDust *  $this->disenchantingSkill->bonus;
+        $goldDust = $goldDust + $goldDust * $this->disenchantingSkill->bonus;
 
         $characterTotalGoldDust = $character->gold_dust + $goldDust;
-        if (!$failedCheck) {
+        if (! $failedCheck) {
 
-            $dc   = 500 - 500 * 0.10;
+            $dc = 500 - 500 * 0.10;
             $roll = $this->fetchDCRoll();
 
             if ($roll >= $dc) {
@@ -210,7 +192,7 @@ class DisenchantService {
 
                     event(new ServerMessageEvent($character->user, 'Gold Dust Rush! You gained 5% interest on your total gold dust. You are now capped!'));
                 } else {
-                    event(new ServerMessageEvent($character->user, 'Gold Dust Rush! You gained 5% interest on your total gold dust. Your new total is: ' . number_format($characterTotalGoldDust)));
+                    event(new ServerMessageEvent($character->user, 'Gold Dust Rush! You gained 5% interest on your total gold dust. Your new total is: '.number_format($characterTotalGoldDust)));
                 }
             }
         }
@@ -220,7 +202,7 @@ class DisenchantService {
         }
 
         $character->update([
-            'gold_dust' => $characterTotalGoldDust
+            'gold_dust' => $characterTotalGoldDust,
         ]);
 
         event(new UpdateTopBarEvent($character->refresh()));
@@ -230,10 +212,9 @@ class DisenchantService {
 
     /**
      * fetch the DC roll.
-     *
-     * @return int
      */
-    protected function fetchDCRoll(): int {
+    protected function fetchDCRoll(): int
+    {
         return rand(1, 500);
     }
 }

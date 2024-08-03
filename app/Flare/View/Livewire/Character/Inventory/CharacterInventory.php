@@ -7,14 +7,16 @@ use Illuminate\Database\Eloquent\Builder;
 use Rappasoft\LaravelLivewireTables\DataTableComponent;
 use Rappasoft\LaravelLivewireTables\Views\Column;
 
-class CharacterInventory extends DataTableComponent {
-
-    public function configure(): void {
+class CharacterInventory extends DataTableComponent
+{
+    public function configure(): void
+    {
         $this->setPrimaryKey('id');
     }
 
-    public function builder(): Builder {
-        return auth()->user()->character->inventory->slots()->join('items', function($join) {
+    public function builder(): Builder
+    {
+        return auth()->user()->character->inventory->slots()->join('items', function ($join) {
             $join->on('inventory_slots.item_id', '=', 'items.id')
                 ->whereNotIn('items.type', ['quest', 'alchemy', 'trinket'])
                 ->where('items.usable', false);
@@ -28,7 +30,7 @@ class CharacterInventory extends DataTableComponent {
             Column::make('Name', 'item.name')->format(function ($value, $row) {
                 $item = Item::where('name', $value)->first();
 
-                return '<a href="/items/'. $item->id.'">'.$item->affix_name . '</a>';
+                return '<a href="/items/'.$item->id.'">'.$item->affix_name.'</a>';
             })->html(),
             Column::make('Type', 'item.type')->searchable()->format(function ($value) {
                 return ucfirst(str_replace('-', ' ', $value));
@@ -46,8 +48,8 @@ class CharacterInventory extends DataTableComponent {
                 return number_format($value);
             })->sortable(),
             Column::make('Actions')->label(
-                fn($row, Column $column)  => view('game.shop.actions.sell-actions', [
-                    'character' => auth()->user()->character
+                fn ($row, Column $column) => view('game.shop.actions.sell-actions', [
+                    'character' => auth()->user()->character,
                 ])->withRow($row)
             ),
         ];

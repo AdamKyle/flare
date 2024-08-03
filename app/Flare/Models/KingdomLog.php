@@ -3,11 +3,11 @@
 namespace App\Flare\Models;
 
 use Database\Factories\KingdomLogFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
-class KingdomLog extends Model {
-
+class KingdomLog extends Model
+{
     use HasFactory;
 
     /**
@@ -41,18 +41,18 @@ class KingdomLog extends Model {
      * @var array
      */
     protected $casts = [
-        'units_sent'         => 'array',
-        'units_survived'     => 'array',
-        'old_buildings'      => 'array',
-        'new_buildings'      => 'array',
-        'old_units'          => 'array',
-        'new_units'          => 'array',
+        'units_sent' => 'array',
+        'units_survived' => 'array',
+        'old_buildings' => 'array',
+        'new_buildings' => 'array',
+        'old_units' => 'array',
+        'new_units' => 'array',
         'additional_details' => 'array',
-        'published'          => 'boolean',
-        'opened'             => 'boolean',
-        'item_damage'        => 'float',
-        'morale_loss'        => 'float',
-        'status'             => 'integer',
+        'published' => 'boolean',
+        'opened' => 'boolean',
+        'item_damage' => 'float',
+        'morale_loss' => 'float',
+        'status' => 'integer',
     ];
 
     protected $appends = [
@@ -60,47 +60,58 @@ class KingdomLog extends Model {
         'to_kingdom',
     ];
 
-    public function character() {
+    public function character()
+    {
         return $this->belongsTo(Character::class);
     }
 
-    public function getFromKingdomAttribute() {
+    public function getFromKingdomAttribute()
+    {
         return Kingdom::find($this->from_kingdom_id);
     }
 
-    public function getToKingdomAttribute() {
+    public function getToKingdomAttribute()
+    {
         return Kingdom::find($this->to_kingdom_id);
     }
 
-    public function setUnitsSentAttribute($value) {
+    public function setUnitsSentAttribute($value)
+    {
         $this->attributes['units_sent'] = json_encode($value);
     }
 
-    public function setUnitsSurvivedAttribute($value) {
+    public function setUnitsSurvivedAttribute($value)
+    {
         $this->attributes['units_survived'] = json_encode($value);
     }
 
-    public function setOldBuildingsAttribute($value) {
+    public function setOldBuildingsAttribute($value)
+    {
         $this->attributes['old_buildings'] = json_encode($value);
     }
 
-    public function setNewBuildingsUnitsAttribute($value) {
+    public function setNewBuildingsUnitsAttribute($value)
+    {
         $this->attributes['new_buildings'] = json_encode($value);
     }
 
-    public function setOldUnitsAttribute($value) {
+    public function setOldUnitsAttribute($value)
+    {
         $this->attributes['old_units'] = json_encode($value);
     }
 
-    public function setNewUnitsUnitsAttribute($value) {
+    public function setNewUnitsUnitsAttribute($value)
+    {
         $this->attributes['new_units'] = json_encode($value);
     }
 
-    public function setAdditionalDetailsAttribute($value) {
+    public function setAdditionalDetailsAttribute($value)
+    {
         $this->attributes['additional_details'] = json_encode($value);
     }
 
-    protected static function newFactory() {
-        return new KingdomLogFactory();
+    protected static function newFactory()
+    {
+        return new KingdomLogFactory;
     }
 }

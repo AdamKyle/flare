@@ -2,39 +2,37 @@
 
 namespace App\Game\Core\Events;
 
+use App\Flare\Models\User;
 use Illuminate\Broadcasting\Channel;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
-Use App\Flare\Models\User;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\SerializesModels;
 
 class UpdateCharacterCurrenciesBroadcastEvent implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     /**
-     * @var array $currencies
+     * @var array
      */
     public $currencies;
 
     /**
-     * @var User $user
+     * @var User
      */
     private $user;
 
     /**
      * Create a new event instance.
      *
-     * @param array $currencies
-     * @param User $user
      * @return void
      */
     public function __construct(array $currencies, User $user)
     {
         $this->currencies = $currencies;
-        $this->user           = $user;
+        $this->user = $user;
     }
 
     /**
@@ -44,6 +42,6 @@ class UpdateCharacterCurrenciesBroadcastEvent implements ShouldBroadcastNow
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('update-currencies-' . $this->user->id);
+        return new PrivateChannel('update-currencies-'.$this->user->id);
     }
 }

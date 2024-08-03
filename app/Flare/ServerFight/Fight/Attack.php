@@ -6,8 +6,8 @@ use App\Flare\Models\Character;
 use App\Flare\ServerFight\Fight\CharacterAttacks\BaseCharacterAttack;
 use App\Flare\ServerFight\Monster\ServerMonster;
 
-class Attack {
-
+class Attack
+{
     private bool $isCharacterVoided;
 
     private bool $isEnemyVoided = false;
@@ -30,65 +30,77 @@ class Attack {
 
     private MonsterAttack $monsterAttack;
 
-    public function __construct(BaseCharacterAttack $baseCharacterAttack, MonsterAttack $monsterAttack) {
+    public function __construct(BaseCharacterAttack $baseCharacterAttack, MonsterAttack $monsterAttack)
+    {
 
         $this->baseCharacterAttack = $baseCharacterAttack;
-        $this->monsterAttack       = $monsterAttack;
+        $this->monsterAttack = $monsterAttack;
 
         $this->battleMessages = [];
     }
 
-    public function setIsCharacterVoided(bool $isVoided): Attack {
+    public function setIsCharacterVoided(bool $isVoided): Attack
+    {
         $this->isCharacterVoided = $isVoided;
-        $this->attackCounter     = 0;
+        $this->attackCounter = 0;
 
         return $this;
     }
 
-    public function setIsEnemyVoided(bool $isVoided): Attack {
+    public function setIsEnemyVoided(bool $isVoided): Attack
+    {
         $this->isEnemyVoided = $isVoided;
 
         return $this;
     }
 
-    public function setHealth(array $healthObject): Attack {
+    public function setHealth(array $healthObject): Attack
+    {
         $this->characterHealth = $healthObject['current_character_health'];
-        $this->monsterHealth   = $healthObject['current_monster_health'];
+        $this->monsterHealth = $healthObject['current_monster_health'];
 
         return $this;
     }
 
-    public function onlyAttackOnce(bool $once): Attack {
+    public function onlyAttackOnce(bool $once): Attack
+    {
         $this->attackOnlyOnce = $once;
 
         return $this;
     }
 
-    public function mergeBattleMessages(array $messages): void {
+    public function mergeBattleMessages(array $messages): void
+    {
         $this->battleMessages = array_merge($this->battleMessages, $messages);
     }
 
-    public function resetBattleMessages(): void {
+    public function resetBattleMessages(): void
+    {
         $this->battleMessages = [];
     }
 
-    public function tookTooLong(): bool {
+    public function tookTooLong(): bool
+    {
         return $this->tookTooLong;
     }
 
-    public function getMessages(): array {
+    public function getMessages(): array
+    {
         return $this->battleMessages;
     }
 
-    public function getCharacterHealth(): int {
+    public function getCharacterHealth(): int
+    {
         return $this->characterHealth;
     }
 
-    public function getMonsterHealth(): int {
+    public function getMonsterHealth(): int
+    {
         return $this->monsterHealth;
     }
 
-    public function attack(Character $character, ServerMonster $serverMonster, string $attackType, string $whoAttacks) {
+    public function attack(Character $character, ServerMonster $serverMonster, string $attackType, string $whoAttacks)
+    {
         if ($this->characterHealth <= 0) {
             $this->battleMessages[] = ['message' => 'You must resurrect first!', 'type' => 'enemy-action'];
 
@@ -96,7 +108,7 @@ class Attack {
         }
 
         if ($this->monsterHealth <= 0) {
-            $this->battleMessages[] = ['message' => $serverMonster->getName() . ' has been defeated!', 'type' => 'enemy-action'];
+            $this->battleMessages[] = ['message' => $serverMonster->getName().' has been defeated!', 'type' => 'enemy-action'];
 
             return;
         }
@@ -121,7 +133,7 @@ class Attack {
             $this->mergeBattleMessages($response->getMessages());
 
             $this->characterHealth = $response->getCharacterHealth();
-            $this->monsterHealth   = $response->getMonsterHealth();
+            $this->monsterHealth = $response->getMonsterHealth();
 
             $response->resetMessages();
 
@@ -140,7 +152,7 @@ class Attack {
             $this->mergeBattleMessages($this->monsterAttack->getMessages());
 
             $this->characterHealth = $this->monsterAttack->getCharacterHealth();
-            $this->monsterHealth   = $this->monsterAttack->getMonsterHealth();
+            $this->monsterHealth = $this->monsterAttack->getMonsterHealth();
 
             if ($this->monsterHealth > $serverMonster->getHealth()) {
                 $this->monsterHealth = $serverMonster->getHealth();

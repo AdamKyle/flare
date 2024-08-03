@@ -4,14 +4,15 @@ namespace App\Game\Messages\Request;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class PublicMessageRequest extends FormRequest {
-
+class PublicMessageRequest extends FormRequest
+{
     /**
      * Determine if the user is authorized to make this request.
      *
      * @return bool
      */
-    public function authorize() {
+    public function authorize()
+    {
         return true;
     }
 
@@ -20,7 +21,8 @@ class PublicMessageRequest extends FormRequest {
      *
      * @return string[]
      */
-    public function rules(): array {
+    public function rules(): array
+    {
         return [
             'message' => 'required|string|max:240',
         ];
@@ -29,11 +31,12 @@ class PublicMessageRequest extends FormRequest {
     /**
      * @return string[]
      */
-    public function messages(): array {
+    public function messages(): array
+    {
         return [
             'message.required' => 'You cannot post empty messages.',
-            'message.string'   => 'Message must be a string.',
-            'message.max'      => 'Message is too long. Max is 240 characters.'
+            'message.string' => 'Message must be a string.',
+            'message.max' => 'Message is too long. Max is 240 characters.',
         ];
     }
 }

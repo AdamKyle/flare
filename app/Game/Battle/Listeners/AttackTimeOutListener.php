@@ -2,7 +2,6 @@
 
 namespace App\Game\Battle\Listeners;
 
-
 use App\Game\Battle\Events\AttackTimeOutEvent;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Battle\Jobs\AttackTimeOutJob;
@@ -10,28 +9,22 @@ use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
 use App\Game\Core\Events\ShowTimeOutEvent;
 use Exception;
 
-class AttackTimeOutListener {
-
-    /**
-     * @var CharacterStatBuilder $classBonuses
-     */
+class AttackTimeOutListener
+{
     private CharacterStatBuilder $characterStatBuilder;
 
-    /**
-     * @param CharacterStatBuilder $characterStatBuilder
-     */
-    public function __construct(CharacterStatBuilder $characterStatBuilder) {
+    public function __construct(CharacterStatBuilder $characterStatBuilder)
+    {
         $this->characterStatBuilder = $characterStatBuilder;
     }
 
     /**
      * Handle the event.
      *
-     * @param AttackTimeOutEvent $event
-     * @return void
      * @throws Exception
      */
-    public function handle(AttackTimeOutEvent $event): void {
+    public function handle(AttackTimeOutEvent $event): void
+    {
         $time = $event->character->is_dead ? 20 : 10;
 
         if ($time === 10) {
@@ -43,7 +36,7 @@ class AttackTimeOutListener {
         }
 
         $event->character->update([
-            'can_attack'          => false,
+            'can_attack' => false,
             'can_attack_again_at' => now()->addSeconds($time),
         ]);
 

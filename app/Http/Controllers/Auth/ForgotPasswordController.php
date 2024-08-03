@@ -2,15 +2,13 @@
 
 namespace App\Http\Controllers\Auth;
 
-use Cache;
-use Hash;
-use Mail;
-use Password;
-use Illuminate\Foundation\Auth\SendsPasswordResetEmails;
-use Illuminate\Http\Request;
 use App\Flare\Mail\ResetPassword;
 use App\Flare\Models\User;
 use App\Http\Controllers\Controller;
+use Illuminate\Foundation\Auth\SendsPasswordResetEmails;
+use Illuminate\Http\Request;
+use Mail;
+use Password;
 
 class ForgotPasswordController extends Controller
 {

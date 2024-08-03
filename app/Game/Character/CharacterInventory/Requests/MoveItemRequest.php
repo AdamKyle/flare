@@ -25,15 +25,16 @@ class MoveItemRequest extends FormRequest
     {
         return [
             'move_to_set' => 'required',
-            'slot_id'     => 'integer|required',
+            'slot_id' => 'integer|required',
         ];
     }
 
-    public function messages() {
+    public function messages()
+    {
         return [
             'move_to_set.required' => 'Which set do you want to move this too?',
-            'slot_id.integer'      => 'The slot id must be an integer',
-            'slot_id.required'     => 'The slot id is required',
+            'slot_id.integer' => 'The slot id must be an integer',
+            'slot_id.required' => 'The slot id is required',
         ];
     }
 }

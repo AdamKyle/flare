@@ -2,7 +2,6 @@
 
 namespace Tests\Console;
 
-
 use App\Game\Character\Builders\AttackBuilders\Jobs\CreateCharacterAttackData;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Queue;
@@ -18,7 +17,7 @@ class CreateCharacterAttackDataCacheTest extends TestCase
 
         Queue::fake();
 
-        $character = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation()->getCharacter(false);
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter(false);
 
         $this->assertEquals(0, $this->artisan('create:character-attack-data'));
 

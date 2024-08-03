@@ -6,8 +6,8 @@ use Database\Factories\CelestialFightFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class CelestialFight extends Model {
-
+class CelestialFight extends Model
+{
     use HasFactory;
 
     /**
@@ -35,33 +35,38 @@ class CelestialFight extends Model {
      * @var array
      */
     protected $casts = [
-        'conjured_at'     => 'date',
-        'x_position'      => 'integer',
-        'y_position'      => 'integer',
+        'conjured_at' => 'date',
+        'x_position' => 'integer',
+        'y_position' => 'integer',
         'damaged_kingdom' => 'boolean',
-        'stole_treasury'  => 'boolean',
+        'stole_treasury' => 'boolean',
         'weakened_morale' => 'boolean',
-        'current_health'  => 'integer',
-        'max_health'      => 'integer',
+        'current_health' => 'integer',
+        'max_health' => 'integer',
     ];
 
-    public function monster() {
+    public function monster()
+    {
         return $this->belongsTo(Monster::class, 'monster_id', 'id');
     }
 
-    public function character() {
+    public function character()
+    {
         return $this->belongsTo(Character::class);
     }
 
-    public function charactersInFight() {
+    public function charactersInFight()
+    {
         return $this->charactersInFight(CharacterInCelestialFight::class);
     }
 
-    public function gameMapName(): string {
+    public function gameMapName(): string
+    {
         return $this->monster->gameMap->name;
     }
 
-    protected static function newFactory() {
+    protected static function newFactory()
+    {
         return CelestialFightFactory::new();
     }
 }

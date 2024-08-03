@@ -2,9 +2,6 @@
 
 namespace App\Game\Character\CharacterInventory\Services;
 
-use Exception;
-use Illuminate\Database\Eloquent\Collection;
-use League\Fractal\Manager;
 use App\Flare\Models\Character;
 use App\Flare\Models\Inventory;
 use App\Flare\Models\InventorySet;
@@ -17,64 +14,45 @@ use App\Game\Character\CharacterInventory\Exceptions\EquipItemException;
 use App\Game\Core\Comparison\ItemComparison;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use App\Game\Core\Traits\ResponseBuilder;
+use Exception;
+use Illuminate\Database\Eloquent\Collection;
+use League\Fractal\Manager;
 
-class EquipItemService {
-
+class EquipItemService
+{
     use ResponseBuilder;
 
-    /**
-     * @var Manager $manager
-     */
     private Manager $manager;
 
-    /**
-     * @var CharacterAttackTransformer $characterTransformer
-     */
     private CharacterAttackTransformer $characterTransformer;
 
-    /**
-     * @var InventorySetService $inventorySetService
-     */
     private InventorySetService $inventorySetService;
 
     private CharacterInventoryService $characterInventoryService;
 
     private UpdateCharacterAttackTypesHandler $updateCharacterAttackTypesHandler;
 
-    /**
-     * @var Character $character
-     */
     private Character $character;
 
-    /**
-     * @var array $request
-     */
     private array $request;
 
     /**
      * EquipItemService constructor.
-     *
-     * @param Manager $manager
-     * @param CharacterAttackTransformer $characterTransformer
-     * @param InventorySetService $inventorySetService
-     * @param CharacterInventoryService $characterInventoryService
-     * @param UpdateCharacterAttackTypesHandler $updateCharacterAttackTypesHandler
      */
-    public function __construct(Manager $manager, CharacterAttackTransformer $characterTransformer, InventorySetService $inventorySetService, CharacterInventoryService $characterInventoryService, UpdateCharacterAttackTypesHandler $updateCharacterAttackTypesHandler) {
-        $this->manager              = $manager;
+    public function __construct(Manager $manager, CharacterAttackTransformer $characterTransformer, InventorySetService $inventorySetService, CharacterInventoryService $characterInventoryService, UpdateCharacterAttackTypesHandler $updateCharacterAttackTypesHandler)
+    {
+        $this->manager = $manager;
         $this->characterTransformer = $characterTransformer;
-        $this->inventorySetService  = $inventorySetService;
+        $this->inventorySetService = $inventorySetService;
         $this->characterInventoryService = $characterInventoryService;
         $this->updateCharacterAttackTypesHandler = $updateCharacterAttackTypesHandler;
     }
 
     /**
      * Set the request
-     *
-     * @param array $request
-     * @return EquipItemService
      */
-    public function setRequest(array $request): EquipItemService {
+    public function setRequest(array $request): EquipItemService
+    {
         $this->request = $request;
 
         return $this;
@@ -82,22 +60,16 @@ class EquipItemService {
 
     /**
      * Set the character
-     *
-     * @param Character $character
-     * @return EquipItemService
      */
-    public function setCharacter(Character $character): EquipItemService {
+    public function setCharacter(Character $character): EquipItemService
+    {
         $this->character = $character;
 
         return $this;
     }
 
-    /**
-     * @param Character $character
-     * @param array $requestParams
-     * @return array
-     */
-    public function equipItem(Character $character, array $requestParams): array {
+    public function equipItem(Character $character, array $requestParams): array
+    {
         try {
             $this->setRequest($requestParams)
                 ->setCharacter($character)
@@ -112,10 +84,10 @@ class EquipItemService {
             $response = $this->successResult([
                 'inventory' => [
                     'inventory' => $characterInventoryService->fetchCharacterInventory(),
-                    'equipped'  => $characterInventoryService->fetchEquipped(),
-                    'sets'      => $characterInventoryService->getCharacterInventorySets(),
+                    'equipped' => $characterInventoryService->fetchEquipped(),
+                    'sets' => $characterInventoryService->getCharacterInventorySets(),
                 ],
-                'message'       => 'Equipped item.'
+                'message' => 'Equipped item.',
             ]);
         } catch (Exception $e) {
 
@@ -125,9 +97,10 @@ class EquipItemService {
         return $response;
     }
 
-    public function replaceItem(): Item {
+    public function replaceItem(): Item
+    {
         $characterSlot = $this->character->inventory->slots->filter(function ($slot) {
-            return $slot->id === (int) $this->request['slot_id'] && !$slot->equipped;
+            return $slot->id === (int) $this->request['slot_id'] && ! $slot->equipped;
         })->first();
 
         if (is_null($characterSlot)) {
@@ -136,20 +109,20 @@ class EquipItemService {
 
         $equippedSet = $this->character->inventorySets()->where('is_equipped', true)->first();
 
-        if (!is_null($equippedSet)) {
+        if (! is_null($equippedSet)) {
             if ($this->character->isInventoryFull()) {
                 throw new EquipItemException('Inventory is full. Cannot replace a set item. Please make some room.');
             }
 
-            $uniqueSlot            = $this->getUniqueFromSet($equippedSet);
-            $isItemToEquipUnique   = $this->isItemToEquipUnique($characterSlot->item);
+            $uniqueSlot = $this->getUniqueFromSet($equippedSet);
+            $isItemToEquipUnique = $this->isItemToEquipUnique($characterSlot->item);
             $isItemToReplaceUnique = $this->isItemToBeReplacedUnique($equippedSet);
 
-            if (!is_null($uniqueSlot) && $isItemToEquipUnique && !$isItemToReplaceUnique) {
+            if (! is_null($uniqueSlot) && $isItemToEquipUnique && ! $isItemToReplaceUnique) {
                 throw new EquipItemException('Cannot equip another unique.');
             }
 
-            if (!is_null($this->getEquippedTrinket($equippedSet)) && $characterSlot->item->type === 'trinket') {
+            if (! is_null($this->getEquippedTrinket($equippedSet)) && $characterSlot->item->type === 'trinket') {
                 throw new EquipItemException('Only one trinket can be equipped.');
             }
 
@@ -157,18 +130,18 @@ class EquipItemService {
 
             $equippedSet->slots()->create([
                 'inventory_set_id' => $equippedSet->id,
-                'item_id'  => $characterSlot->item->id,
+                'item_id' => $characterSlot->item->id,
                 'equipped' => true,
                 'position' => $this->request['position'],
             ]);
 
             $characterSlot->delete();
         } else {
-            $uniqueSlot          = $this->getUniqueFromSet($this->character->inventory);
+            $uniqueSlot = $this->getUniqueFromSet($this->character->inventory);
             $isItemToEquipUnique = $this->isItemToEquipUnique($characterSlot->item);
             $isItemToReplaceUnique = $this->isItemToBeReplacedUnique($this->character->inventory);
 
-            if (!is_null($uniqueSlot) && $isItemToEquipUnique && !$isItemToReplaceUnique) {
+            if (! is_null($uniqueSlot) && $isItemToEquipUnique && ! $isItemToReplaceUnique) {
                 throw new EquipItemException('Cannot equip another unique.');
             }
 
@@ -187,37 +160,41 @@ class EquipItemService {
         return $characterSlot->item;
     }
 
-    public function getUniqueFromSet(Inventory|InventorySet $equipped): InventorySlot|SetSlot|null {
+    public function getUniqueFromSet(Inventory|InventorySet $equipped): InventorySlot|SetSlot|null
+    {
         return $equipped->slots->filter(function ($slot) {
-            if (!is_null($slot->item->item_prefix_id)) {
+            if (! is_null($slot->item->item_prefix_id)) {
                 return $slot->item->itemPrefix->randomly_generated && $slot->equipped;
             }
 
-            if (!is_null($slot->item->item_suffix_id)) {
+            if (! is_null($slot->item->item_suffix_id)) {
                 return $slot->item->itemSuffix->randomly_generated && $slot->equipped;
             }
         })->first();
     }
 
-    public function getEquippedTrinket(Inventory|InventorySet $equipped): InventorySlot|SetSlot|null {
+    public function getEquippedTrinket(Inventory|InventorySet $equipped): InventorySlot|SetSlot|null
+    {
         return $equipped->slots->filter(function ($slot) {
             return $slot->item->type === 'trinket';
         })->first();
     }
 
-    public function isItemToEquipUnique(Item $item): bool {
-        if (!is_null($item->item_prefix_id)) {
+    public function isItemToEquipUnique(Item $item): bool
+    {
+        if (! is_null($item->item_prefix_id)) {
             return $item->itemPrefix->randomly_generated;
         }
 
-        if (!is_null($item->item_suffix_id)) {
+        if (! is_null($item->item_suffix_id)) {
             return $item->itemSuffix->randomly_generated;
         }
 
         return false;
     }
 
-    public function isItemToBeReplacedUnique(Inventory|InventorySet $inventory): bool {
+    public function isItemToBeReplacedUnique(Inventory|InventorySet $inventory): bool
+    {
         $item = $inventory->slots->filter(function ($slot) {
             return $slot->position === $this->request['position'] && $slot->equipped;
         })->first();
@@ -228,11 +205,11 @@ class EquipItemService {
 
         $item = $item->item;
 
-        if (!is_null($item->item_prefix_id)) {
+        if (! is_null($item->item_prefix_id)) {
             return $item->itemPrefix->randomly_generated;
         }
 
-        if (!is_null($item->item_suffix_id)) {
+        if (! is_null($item->item_suffix_id)) {
             return $item->itemSuffix->randomly_generated;
         }
 
@@ -241,29 +218,24 @@ class EquipItemService {
 
     /**
      * Get Item stats
-     *
-     * @param Item $toCompare
-     * @param Collection $inventorySlots
-     * @param Character $character
-     * @return array
      */
-    public function getItemStats(Item $toCompare, Collection $inventorySlots, Character $character): array {
+    public function getItemStats(Item $toCompare, Collection $inventorySlots, Character $character): array
+    {
         return resolve(ItemComparison::class)->fetchDetails($toCompare, $inventorySlots, $character);
     }
 
     /**
      * Unequipped a slot.
      *
-     * @param InventorySlot $characterSlot
-     * @param Inventory|InventorySet $inventory
      * @return void
      */
-    public function unequipSlot(InventorySlot $characterSlot, Inventory|InventorySet $inventory) {
+    public function unequipSlot(InventorySlot $characterSlot, Inventory|InventorySet $inventory)
+    {
         if ($characterSlot->item->type === 'bow') {
             $this->unequipBothHands();
-        } else if ($characterSlot->item->type === 'hammer') {
+        } elseif ($characterSlot->item->type === 'hammer') {
             $this->unequipBothHands();
-        } else if ($characterSlot->item->type === 'stave') {
+        } elseif ($characterSlot->item->type === 'stave') {
             $this->unequipBothHands();
         } else {
 
@@ -271,7 +243,7 @@ class EquipItemService {
                 return $slot->position === $this->request['position'] && $slot->equipped;
             })->first();
 
-            if (!is_null($itemForPosition)) {
+            if (! is_null($itemForPosition)) {
                 $itemForPosition->update(['equipped' => false]);
 
                 $this->character->inventory->slots()->create([
@@ -286,10 +258,9 @@ class EquipItemService {
 
     /**
      * Unequip both hands.
-     *
-     * @return void
      */
-    public function unequipBothHands(): void {
+    public function unequipBothHands(): void
+    {
         $slots = $this->character->inventory->slots->filter(function ($slot) {
             return $slot->equipped;
         });
@@ -299,7 +270,7 @@ class EquipItemService {
         if ($slots->isEmpty()) {
             $equippedSet = $this->character->inventorySets()->where('is_equipped', true)->first();
 
-            if (!is_null($equippedSet)) {
+            if (! is_null($equippedSet)) {
                 $slots = $equippedSet->slots->filter(function ($slot) {
                     return $slot->equipped;
                 });
@@ -315,7 +286,7 @@ class EquipItemService {
                 if ($removedFromSet) {
                     $this->character->inventory->slots()->create([
                         'inventory_id' => $this->character->inventory->id,
-                        'item_id'      => $slot->item->id,
+                        'item_id' => $slot->item->id,
                     ]);
 
                     $slot->delete();

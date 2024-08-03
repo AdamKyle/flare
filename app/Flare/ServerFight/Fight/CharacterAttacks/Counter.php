@@ -7,23 +7,26 @@ use App\Flare\ServerFight\BattleBase;
 use App\Flare\ServerFight\Monster\ServerMonster;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 
-class Counter extends BattleBase {
-
-    public function __construct(CharacterCacheData $characterCacheData) {
+class Counter extends BattleBase
+{
+    public function __construct(CharacterCacheData $characterCacheData)
+    {
         parent::__construct($characterCacheData);
     }
 
-    public function setIsAttackerVoided(bool $voided) {
+    public function setIsAttackerVoided(bool $voided)
+    {
         $this->isVoided = $voided;
     }
 
-    public function pvpCounter(Character $attacker, Character $defender) {
+    public function pvpCounter(Character $attacker, Character $defender)
+    {
         $defenderAttackData = $this->characterCacheData->getDataFromAttackCache($defender, $this->isEnemyVoided ? 'voided_attack' : 'attack');
-        $weaponDamage       = $defenderAttackData['weapon_damage'];
-        $attackerAc         = $this->characterCacheData->getCachedCharacterData($attacker, 'ac');
+        $weaponDamage = $defenderAttackData['weapon_damage'];
+        $attackerAc = $this->characterCacheData->getCachedCharacterData($attacker, 'ac');
 
         $attackerCounterResistance = $this->characterCacheData->getCachedCharacterData($attacker, 'counter_resistance_chance');
-        $defenderCounterChance     = $this->characterCacheData->getCachedCharacterData($defender, 'counter_chance');
+        $defenderCounterChance = $this->characterCacheData->getCachedCharacterData($defender, 'counter_chance');
 
         if ($defenderCounterChance <= 0.0) {
             return false;
@@ -37,15 +40,15 @@ class Counter extends BattleBase {
 
         $canCounter = $this->canCounter($defenderCounterChance);
 
-        if (!$canCounter) {
+        if (! $canCounter) {
             return;
         }
 
         if ($weaponDamage > $attackerAc) {
             $this->characterHealth -= $weaponDamage;
 
-            $this->addAttackerMessage('You counter the enemies attack for: ' . number_format($weaponDamage), 'player-action');
-            $this->addDefenderMessage('You were countered in your attack for: '. number_format($weaponDamage), 'enemy-action');
+            $this->addAttackerMessage('You counter the enemies attack for: '.number_format($weaponDamage), 'player-action');
+            $this->addDefenderMessage('You were countered in your attack for: '.number_format($weaponDamage), 'enemy-action');
 
         } else {
             $this->addDefenderMessage('Your counter as blocked!', 'player-action');
@@ -53,24 +56,25 @@ class Counter extends BattleBase {
         }
     }
 
-    public function monsterCounter(Character $character, ServerMonster $monster) {
+    public function monsterCounter(Character $character, ServerMonster $monster)
+    {
         $characterAc = $this->characterCacheData->getCachedCharacterData($character, 'ac');
 
         $characterCounterResistance = $this->characterCacheData->getCachedCharacterData($character, 'counter_resistance_chance');
-        $monsterCounterChance       = $monster->getMonsterStat('counter_chance');
+        $monsterCounterChance = $monster->getMonsterStat('counter_chance');
 
         $monsterCounterChance -= $characterCounterResistance;
 
         $canCounter = $this->canCounter($monsterCounterChance);
 
-        if (!$canCounter) {
+        if (! $canCounter) {
             return;
         }
 
         $monsterAttack = $monster->buildAttack();
 
         if ($monsterAttack > $characterAc) {
-            $this->addMessage('The enemy counters your attack for: ' . number_format($monsterAttack), 'enemy-action');
+            $this->addMessage('The enemy counters your attack for: '.number_format($monsterAttack), 'enemy-action');
 
             $this->characterHealth -= $monsterAttack;
         } else {
@@ -79,14 +83,15 @@ class Counter extends BattleBase {
 
     }
 
-    public function playerCounter(Character $character, ServerMonster $monster) {
-        $monsterAc                = $monster->getMonsterStat('ac');
+    public function playerCounter(Character $character, ServerMonster $monster)
+    {
+        $monsterAc = $monster->getMonsterStat('ac');
         $monsterCounterResistance = $monster->getMonsterStat('counter_resistance_chance');
-        $characterCounterChance   = $this->characterCacheData->getCachedCharacterData($character, 'counter_chance');
+        $characterCounterChance = $this->characterCacheData->getCachedCharacterData($character, 'counter_chance');
 
         $characterCounterChance -= $monsterCounterResistance;
 
-        if (!$this->canCounter($characterCounterChance)) {
+        if (! $this->canCounter($characterCounterChance)) {
             return;
         }
 
@@ -95,13 +100,14 @@ class Counter extends BattleBase {
         if ($weaponDamage > $monsterAc) {
             $this->monsterHealth -= $weaponDamage;
 
-            $this->addMessage('You counter the enemies attack for: ' . number_format($weaponDamage), 'player-action');
+            $this->addMessage('You counter the enemies attack for: '.number_format($weaponDamage), 'player-action');
         } else {
-            $this->addMessage('The enemy managed to block your counter!','enemy-action');
+            $this->addMessage('The enemy managed to block your counter!', 'enemy-action');
         }
     }
 
-    protected function canCounter($chance) {
+    protected function canCounter($chance)
+    {
 
         if ($chance > 0.0) {
             $roll = rand(1, 100);

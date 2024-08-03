@@ -6,7 +6,7 @@ Route::get('/locations/{location}', ['as' => 'game.locations.location', 'uses' =
 
 Route::middleware([
     'auth',
-])->group(function() {
+])->group(function () {
     Route::get('/game/tops', ['as' => 'game.tops', 'uses' => 'GameTopsController@tops']);
     Route::get('/game/tops/{character}', ['as' => 'game.tops.character.stats', 'uses' => 'GameTopsController@characterStats']);
 
@@ -17,7 +17,7 @@ Route::middleware([
     'is.player.banned',
     'is.character.who.they.say.they.are',
     'is.globally.timed.out',
-])->group(function() {
+])->group(function () {
 
     // Core routes for the game related stuff:
     Route::get('/game', ['as' => 'game', 'uses' => 'GameController@game']);

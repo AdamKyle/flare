@@ -2,31 +2,33 @@
 
 namespace App\Admin\Controllers;
 
-use App\Flare\Models\User;
-use App\Http\Controllers\Controller;
 use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
+use App\Flare\Models\User;
+use App\Http\Controllers\Controller;
 
-class StatisticsController extends Controller {
-
-    public function index() {
+class StatisticsController extends Controller
+{
+    public function index()
+    {
 
         return view('admin.statistics.dashboard', [
-            'averageCharacterLevel'       => number_format(Character::avg('level'), 2),
-            'averageCharacterGold'        => number_format(Character::avg('gold')),
-            'kingdomCount'                => number_format(Kingdom::count()),
-            'richestCharacter'            => Character::orderBy('gold', 'desc')->first(),
-            'highestLevelCharacter'       => Character::orderBy('level', 'desc')->first(),
-            'topTenKingdoms'              => $this->fetchTopKingdomHolders(),
-            'lastLoggedInCount'           => User::whereDate('last_logged_in', now())->count(),
+            'averageCharacterLevel' => number_format(Character::avg('level'), 2),
+            'averageCharacterGold' => number_format(Character::avg('gold')),
+            'kingdomCount' => number_format(Kingdom::count()),
+            'richestCharacter' => Character::orderBy('gold', 'desc')->first(),
+            'highestLevelCharacter' => Character::orderBy('level', 'desc')->first(),
+            'topTenKingdoms' => $this->fetchTopKingdomHolders(),
+            'lastLoggedInCount' => User::whereDate('last_logged_in', now())->count(),
             'lastFiveMonthsLoggedInCount' => User::whereBetween('last_logged_in', [now()->subMonths(5), now()])->count(),
-            'neverLoggedInCount'          => User::whereNull('last_logged_in')->count(),
-            'totalLoggedInAllTime'        => User::whereNotNull('last_logged_in')->count(),
-            'willBeDeletedCount'          => User::where('will_be_deleted', true)->count(),
+            'neverLoggedInCount' => User::whereNull('last_logged_in')->count(),
+            'totalLoggedInAllTime' => User::whereNotNull('last_logged_in')->count(),
+            'willBeDeletedCount' => User::where('will_be_deleted', true)->count(),
         ]);
     }
 
-    protected function fetchTopKingdomHolders(): array {
+    protected function fetchTopKingdomHolders(): array
+    {
         $onlyCharactersWithKingdoms = Character::whereHas('kingdoms')->get();
 
         $array = [];

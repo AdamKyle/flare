@@ -10,8 +10,8 @@ use App\Flare\ServerFight\Fight\Entrance;
 use App\Flare\ServerFight\Monster\ServerMonster;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 
-class BattleBase extends BattleMessages {
-
+class BattleBase extends BattleMessages
+{
     protected int $characterHealth;
 
     protected int $monsterHealth;
@@ -32,45 +32,55 @@ class BattleBase extends BattleMessages {
 
     protected CharacterCacheData $characterCacheData;
 
-    public function __construct(CharacterCacheData $characterCacheData) {
+    public function __construct(CharacterCacheData $characterCacheData)
+    {
         parent::__construct();
 
         $this->characterCacheData = $characterCacheData;
     }
 
-    public function setCharacterHealth(int $characterHealth) {
+    public function setCharacterHealth(int $characterHealth)
+    {
         $this->characterHealth = $characterHealth;
     }
 
-    public function setMonsterHealth(int $monsterHealth) {
+    public function setMonsterHealth(int $monsterHealth)
+    {
         $this->monsterHealth = $monsterHealth;
     }
 
-    public function getCharacterHealth(): int {
+    public function getCharacterHealth(): int
+    {
         return $this->characterHealth;
     }
 
-    public function getMonsterHealth(): int {
+    public function getMonsterHealth(): int
+    {
         return $this->monsterHealth;
     }
 
-    public function doNotAllowSecondaryAttacks() {
+    public function doNotAllowSecondaryAttacks()
+    {
         $this->allowSecondaryAttacks = false;
     }
 
-    public function setEntranced() {
+    public function setEntranced()
+    {
         $this->isEnemyEntranced = true;
     }
 
-    public function setIsEnemyVoided(bool $isVoided) {
+    public function setIsEnemyVoided(bool $isVoided)
+    {
         $this->isEnemyVoided = $isVoided;
     }
 
-    public function setDefenderId(int $defenderId) {
+    public function setDefenderId(int $defenderId)
+    {
         $this->defenderId = $defenderId;
     }
 
-    protected function doPvpEntrance(Character $attacker, Entrance $entrance) {
+    protected function doPvpEntrance(Character $attacker, Entrance $entrance)
+    {
         $entrance->attackerEntrancesDefender($attacker, $this->attackData, $this->isVoided);
 
         $this->mergeAttackerMessages($entrance->getAttackerMessages());
@@ -81,7 +91,8 @@ class BattleBase extends BattleMessages {
         }
     }
 
-    protected function doEnemyEntrance(Character $character, ServerMonster $monster, Entrance $entrance) {
+    protected function doEnemyEntrance(Character $character, ServerMonster $monster, Entrance $entrance)
+    {
         $entrance->playerEntrance($character, $monster, $this->attackData);
 
         $this->mergeMessages($entrance->getMessages());
@@ -91,7 +102,8 @@ class BattleBase extends BattleMessages {
         }
     }
 
-    protected function secondaryAttack(Character $character, ServerMonster $monster = null, float $affixReduction = 0.0, bool $isPvp = false) {
+    protected function secondaryAttack(Character $character, ?ServerMonster $monster = null, float $affixReduction = 0.0, bool $isPvp = false)
+    {
         $secondaryAttacks = resolve(SecondaryAttacks::class);
 
         $secondaryAttacks->setMonsterHealth($this->monsterHealth);
@@ -103,7 +115,7 @@ class BattleBase extends BattleMessages {
 
         $secondaryAttacks->doSecondaryAttack($character, $monster, $affixReduction, $isPvp);
 
-        $this->monsterHealth   = $secondaryAttacks->getMonsterHealth();
+        $this->monsterHealth = $secondaryAttacks->getMonsterHealth();
         $this->characterHealth = $secondaryAttacks->getCharacterHealth();
 
         if ($isPvp) {
@@ -116,7 +128,8 @@ class BattleBase extends BattleMessages {
         $secondaryAttacks->clearMessages();
     }
 
-    protected function elementalAttack(Character $character, ServerMonster $monster, string $damageType) {
+    protected function elementalAttack(Character $character, ServerMonster $monster, string $damageType)
+    {
 
         $elementalAttack = resolve(ElementalAttack::class);
 
@@ -138,12 +151,13 @@ class BattleBase extends BattleMessages {
         $this->mergeMessages($elementalAttack->getMessages());
 
         $this->characterHealth = $elementalAttack->getCharacterHealth();
-        $this->monsterHealth   = $elementalAttack->getMonsterHealth();
+        $this->monsterHealth = $elementalAttack->getMonsterHealth();
 
         $elementalAttack->clearMessages();
     }
 
-    protected function pvpCounter(Character $attacker, Character $defender) {
+    protected function pvpCounter(Character $attacker, Character $defender)
+    {
         $counter = resolve(Counter::class);
 
         $counter->setCharacterHealth($this->characterHealth);
@@ -156,12 +170,13 @@ class BattleBase extends BattleMessages {
         $this->mergeDefenderMessages($counter->getDefenderMessages());
 
         $this->characterHealth = $counter->getCharacterHealth();
-        $this->monsterHealth   = $counter->getMonsterHealth();
+        $this->monsterHealth = $counter->getMonsterHealth();
 
         $counter->clearMessages();
     }
 
-    protected function doMonsterCounter(Character $character, ServerMonster $monster) {
+    protected function doMonsterCounter(Character $character, ServerMonster $monster)
+    {
 
         if ($this->getMonsterHealth() < 0) {
             return;
@@ -177,12 +192,13 @@ class BattleBase extends BattleMessages {
         $this->mergeMessages($counter->getMessages());
 
         $this->characterHealth = $counter->getCharacterHealth();
-        $this->monsterHealth   = $counter->getMonsterHealth();
+        $this->monsterHealth = $counter->getMonsterHealth();
 
         $counter->clearMessages();
     }
 
-    protected function doPlayerCounterMonster(Character $character, ServerMonster $monster) {
+    protected function doPlayerCounterMonster(Character $character, ServerMonster $monster)
+    {
         $counter = resolve(Counter::class);
 
         $counter->setCharacterHealth($this->characterHealth);
@@ -193,22 +209,24 @@ class BattleBase extends BattleMessages {
         $this->mergeMessages($counter->getMessages());
 
         $this->characterHealth = $counter->getCharacterHealth();
-        $this->monsterHealth   = $counter->getMonsterHealth();
+        $this->monsterHealth = $counter->getMonsterHealth();
 
         $counter->clearMessages();
     }
 
-    protected function getPvpCharacterAc(Character $defender) {
+    protected function getPvpCharacterAc(Character $defender)
+    {
         $defence = $this->characterCacheData->getCharacterDefenceAc($defender);
 
-        if (!is_null($defence)) {
+        if (! is_null($defence)) {
             return $defence;
         }
 
         return $this->characterCacheData->getCachedCharacterData($defender, 'ac');
     }
 
-    protected function canBlock(int $damage, int $ac) {
+    protected function canBlock(int $damage, int $ac)
+    {
         return $ac > $damage;
     }
 }

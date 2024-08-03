@@ -2,27 +2,29 @@
 
 namespace Tests\Feature;
 
-use Mail;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
-use Tests\Traits\CreateUser;
-use Tests\Traits\CreateRole;
+use Mail;
 use Tests\Setup\Character\CharacterFactory;
+use Tests\TestCase;
+use Tests\Traits\CreateRole;
+use Tests\Traits\CreateUser;
 
 class ForgotPasswordControllerTest extends TestCase
 {
-    use RefreshDatabase,
+    use CreateRole,
         CreateUser,
-        CreateRole;
+        RefreshDatabase;
 
-    public function testCanSeeResetPasswordPage() {
+    public function testCanSeeResetPasswordPage()
+    {
 
         $this->visit('/login')
             ->click('Forgot Your Password?')
             ->see('Reset Password');
     }
 
-    public function testAdminCanResetNoSecurityQuestions() {
+    public function testAdminCanResetNoSecurityQuestions()
+    {
 
         Mail::fake();
 
@@ -39,7 +41,8 @@ class ForgotPasswordControllerTest extends TestCase
             ])->see('Sent you an email to begin the reset process.');
     }
 
-    public function testUserGoesThroughSecurityQuestions() {
+    public function testUserGoesThroughSecurityQuestions()
+    {
 
         $user = $this->createUserWithCharacter()->getUser();
 
@@ -51,8 +54,8 @@ class ForgotPasswordControllerTest extends TestCase
             ])->see('Sent you an email to begin the reset process.');
     }
 
-
-    public function testFailWithUnknownEmail() {
+    public function testFailWithUnknownEmail()
+    {
 
         $this->visit('/login')
             ->click('Forgot Your Password?')
@@ -62,7 +65,8 @@ class ForgotPasswordControllerTest extends TestCase
             ])->see('This email does not match our records.');
     }
 
-    protected function createUserWithCharacter() {
+    protected function createUserWithCharacter()
+    {
         return (new CharacterFactory)->createBaseCharacter();
     }
 }

@@ -17,27 +17,22 @@ use Facades\App\Flare\Calculators\SkillXPCalculator;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item as ResourceItem;
 
-class UpdateSkillListener {
-
-    /**
-     * @var SkillService $skillService
-     */
+class UpdateSkillListener
+{
     private SkillService $skillService;
 
-    /**
-     * @param SkillService $skillService
-     */
-    public function __construct(SkillService $skillService) {
+    public function __construct(SkillService $skillService)
+    {
         $this->skillService = $skillService;
     }
 
     /**
      * Handle the event.
      *
-     * @param  UpdateSkillEvent $event
      * @return void
      */
-    public function handle(UpdateSkillEvent $event) {
+    public function handle(UpdateSkillEvent $event)
+    {
         if ($event->skill->level >= $event->skill->baseSkill->max_level) {
             return;
         }
@@ -59,19 +54,21 @@ class UpdateSkillListener {
         }
     }
 
-    protected function getSkillXp(Skill $skill, Monster $monster = null): float|int {
+    protected function getSkillXp(Skill $skill, ?Monster $monster = null): float|int
+    {
         $gameMap = $skill->character->map->gameMap;
 
         $skillXP = SkillXPCalculator::fetchSkillXP($skill, $monster);
 
-        if (!is_null($gameMap->skill_training_bonus)) {
+        if (! is_null($gameMap->skill_training_bonus)) {
             $skillXP = $skillXP + $skillXP * $gameMap->skill_training_bonus;
         }
 
         return $skillXP;
     }
 
-    protected function updateSkill(Skill $skill, int $skillXP) {
+    protected function updateSkill(Skill $skill, int $skillXP)
+    {
         $skill->update([
             'xp' => $skill->xp + $skillXP,
         ]);
@@ -88,15 +85,15 @@ class UpdateSkillListener {
             }
 
             $skill->update([
-                'level'              => $level,
-                'xp_max'             => $skill->can_train ? $level * 10 : rand(100, 350),
-                'base_damage_mod'    => $skill->base_damage_mod + $skill->baseSkill->base_damage_mod_bonus_per_level,
-                'base_healing_mod'   => $skill->base_healing_mod + $skill->baseSkill->base_healing_mod_bonus_per_level,
-                'base_ac_mod'        => $skill->base_ac_mod + $skill->baseSkill->base_ac_mod_bonus_per_level,
+                'level' => $level,
+                'xp_max' => $skill->can_train ? $level * 10 : rand(100, 350),
+                'base_damage_mod' => $skill->base_damage_mod + $skill->baseSkill->base_damage_mod_bonus_per_level,
+                'base_healing_mod' => $skill->base_healing_mod + $skill->baseSkill->base_healing_mod_bonus_per_level,
+                'base_ac_mod' => $skill->base_ac_mod + $skill->baseSkill->base_ac_mod_bonus_per_level,
                 'fight_time_out_mod' => $skill->fight_time_out_mod + $skill->baseSkill->fight_time_out_mod_bonus_per_level,
-                'move_time_out_mod'  => $skill->mov_time_out_mod + $skill->baseSkill->mov_time_out_mod_bonus_per_level,
-                'skill_bonus'        => $bonus,
-                'xp'                 => 0,
+                'move_time_out_mod' => $skill->mov_time_out_mod + $skill->baseSkill->mov_time_out_mod_bonus_per_level,
+                'skill_bonus' => $bonus,
+                'xp' => 0,
             ]);
 
             $character = $skill->character->refresh();
@@ -109,31 +106,33 @@ class UpdateSkillListener {
         }
     }
 
-    protected function shouldUpdateCharacterAttackData(GameSkill $skill): bool {
-        if (!is_null($skill->base_damage_mod_bonus_per_level)) {
+    protected function shouldUpdateCharacterAttackData(GameSkill $skill): bool
+    {
+        if (! is_null($skill->base_damage_mod_bonus_per_level)) {
             return false;
         }
 
-        if (!is_null($skill->base_healing_mod_bonus_per_level)) {
+        if (! is_null($skill->base_healing_mod_bonus_per_level)) {
             return false;
         }
 
-        if (!is_null($skill->base_ac_mod_bonus_per_level)) {
+        if (! is_null($skill->base_ac_mod_bonus_per_level)) {
             return false;
         }
 
-        if (!is_null($skill->fight_time_out_mod_bonus_per_level)) {
+        if (! is_null($skill->fight_time_out_mod_bonus_per_level)) {
             return false;
         }
 
-        if (!is_null($skill->move_time_out_mod_bonus_per_level)) {
+        if (! is_null($skill->move_time_out_mod_bonus_per_level)) {
             return false;
         }
 
         return true;
     }
 
-    protected function updateCharacterAttackDataCache(Character $character) {
+    protected function updateCharacterAttackDataCache(Character $character)
+    {
         resolve(BuildCharacterAttackTypes::class)->buildCache($character);
 
         $characterData = new ResourceItem($character->refresh(), resolve(CharacterSheetBaseInfoTransformer::class));

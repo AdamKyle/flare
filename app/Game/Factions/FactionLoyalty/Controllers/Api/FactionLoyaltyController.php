@@ -10,25 +10,17 @@ use App\Http\Controllers\Controller;
 use Exception;
 use Illuminate\Http\JsonResponse;
 
-class FactionLoyaltyController extends Controller {
-
-    /**
-     * @var FactionLoyaltyService $factionLoyaltyService
-     */
+class FactionLoyaltyController extends Controller
+{
     private FactionLoyaltyService $factionLoyaltyService;
 
-    /**
-     * @param FactionLoyaltyService $factionLoyaltyService
-     */
-    public function __construct(FactionLoyaltyService $factionLoyaltyService) {
+    public function __construct(FactionLoyaltyService $factionLoyaltyService)
+    {
         $this->factionLoyaltyService = $factionLoyaltyService;
     }
 
-    /**
-     * @param Character $character
-     * @return JsonResponse
-     */
-    public function fetchLoyaltyInfo(Character $character): JsonResponse {
+    public function fetchLoyaltyInfo(Character $character): JsonResponse
+    {
 
         $response = $this->factionLoyaltyService->getLoyaltyInfoForPlane($character);
 
@@ -39,12 +31,10 @@ class FactionLoyaltyController extends Controller {
     }
 
     /**
-     * @param Character $character
-     * @param Faction $faction
-     * @return JsonResponse
      * @throws Exception
      */
-    public function pledgeLoyalty(Character $character, Faction $faction): JsonResponse {
+    public function pledgeLoyalty(Character $character, Faction $faction): JsonResponse
+    {
 
         $response = $this->factionLoyaltyService->pledgeLoyalty($character, $faction);
 
@@ -54,12 +44,8 @@ class FactionLoyaltyController extends Controller {
         return response()->json($response, $status);
     }
 
-    /**
-     * @param Character $character
-     * @param Faction $faction
-     * @return JsonResponse
-     */
-    public function removePledge(Character $character, Faction $faction): JsonResponse {
+    public function removePledge(Character $character, Faction $faction): JsonResponse
+    {
 
         $response = $this->factionLoyaltyService->removePledge($character, $faction);
 
@@ -69,12 +55,8 @@ class FactionLoyaltyController extends Controller {
         return response()->json($response, $status);
     }
 
-    /**
-     * @param Character $character
-     * @param FactionLoyaltyNpc $factionLoyaltyNpc
-     * @return JsonResponse
-     */
-    public function assistNpc(Character $character, FactionLoyaltyNpc $factionLoyaltyNpc): JsonResponse {
+    public function assistNpc(Character $character, FactionLoyaltyNpc $factionLoyaltyNpc): JsonResponse
+    {
         $response = $this->factionLoyaltyService->assistNpc($character, $factionLoyaltyNpc);
 
         $status = $response['status'];
@@ -83,12 +65,8 @@ class FactionLoyaltyController extends Controller {
         return response()->json($response, $status);
     }
 
-    /**
-     * @param Character $character
-     * @param FactionLoyaltyNpc $factionLoyaltyNpc
-     * @return JsonResponse
-     */
-    public function stopAssistingNpc(Character $character, FactionLoyaltyNpc $factionLoyaltyNpc): JsonResponse {
+    public function stopAssistingNpc(Character $character, FactionLoyaltyNpc $factionLoyaltyNpc): JsonResponse
+    {
         $response = $this->factionLoyaltyService->stopAssistingNpc($character, $factionLoyaltyNpc);
 
         $status = $response['status'];

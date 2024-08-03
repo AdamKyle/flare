@@ -25,15 +25,16 @@ class ComparisonValidation extends FormRequest
     {
         return [
             'item_to_equip_type' => 'nullable|in:weapon,gun,fan,scratch-awl,mace,trinket,hammer,bow,stave,body,shield,leggings,feet,sleeves,helmet,gloves,ring,spell-damage,spell-healing,artifact',
-            'slot_id'            => 'required',
+            'slot_id' => 'required',
         ];
     }
 
-    public function messages() {
+    public function messages()
+    {
         return [
             'item_to_equip_type.required' => 'Error. Invalid Input.',
-            'item_to_equip_type.in'       => 'Error. Invalid Input.',
-            'slot_id.required'            => 'Error. Invalid Input.',
+            'item_to_equip_type.in' => 'Error. Invalid Input.',
+            'slot_id.required' => 'Error. Invalid Input.',
         ];
     }
 }

@@ -28,9 +28,10 @@ class SteelSmeltingRequest extends FormRequest
         ];
     }
 
-    public function messages() {
+    public function messages()
+    {
         return [
-            'amount_to_smelt.required'     => 'How much steel are we smelting?',
+            'amount_to_smelt.required' => 'How much steel are we smelting?',
         ];
     }
 }

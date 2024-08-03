@@ -2,32 +2,35 @@
 
 namespace Tests\Unit\Game\Messages\Handlers;
 
-use Illuminate\Support\Facades\Event;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Messages\Handlers\ServerMessageHandler;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 use Tests\Traits\CreateUser;
 
-class ServerMessageHandlerTest extends TestCase {
-
-    use RefreshDatabase, CreateUser;
+class ServerMessageHandlerTest extends TestCase
+{
+    use CreateUser, RefreshDatabase;
 
     private ?ServerMessageHandler $serverMessageHandler;
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
         $this->serverMessageHandler = resolve(ServerMessageHandler::class);
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
 
         $this->serverMessageHandler = null;
     }
 
-    public function testHandleMessage() {
+    public function testHandleMessage()
+    {
         $user = $this->createUser();
 
         Event::fake();
@@ -37,7 +40,8 @@ class ServerMessageHandlerTest extends TestCase {
         Event::assertDispatched(ServerMessageEvent::class);
     }
 
-    public function testSendBasicMessage() {
+    public function testSendBasicMessage()
+    {
         $user = $this->createUser();
 
         Event::fake();

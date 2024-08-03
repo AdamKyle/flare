@@ -2,8 +2,8 @@
 
 namespace Database\Factories;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Flare\Models\CharacterBoon;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 class CharacterBoonFactory extends Factory
 {

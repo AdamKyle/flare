@@ -28,9 +28,10 @@ class ShopSellValidation extends FormRequest
         ];
     }
 
-    public function messages() {
+    public function messages()
+    {
         return [
-            'slot_id.required'    => 'What are you trying to sell to me child?',
+            'slot_id.required' => 'What are you trying to sell to me child?',
         ];
     }
 }

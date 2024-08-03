@@ -1,4 +1,5 @@
 <?php
+
 Route::group(['middleware' => ['auth']], function () {
     Route::get('/calendar/events', ['uses' => 'Api\EventCalendarController@loadEvents']);
 });

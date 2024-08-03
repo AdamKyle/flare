@@ -5,20 +5,21 @@ namespace App\Flare\MapGenerator\Schemes;
 use ChristianEssl\LandmapGeneration\Color\DefaultColorScheme;
 use ChristianEssl\LandmapGeneration\Color\Shader\NullShader;
 use ChristianEssl\LandmapGeneration\Color\Shader\ShaderInterface;
-use ChristianEssl\LandmapGeneration\Struct\Color;
 use ChristianEssl\LandmapGeneration\Enum\FillType;
+use ChristianEssl\LandmapGeneration\Struct\Color;
 
-class MapColorScheme extends DefaultColorScheme {
-
+class MapColorScheme extends DefaultColorScheme
+{
     /**
      * Constructor
      *
-     * @param ShaderInterface $shader | null
-     * @param mixed $land | null
-     * @param mixed $water | null
+     * @param  ShaderInterface  $shader  | null
+     * @param  mixed  $land  | null
+     * @param  mixed  $water  | null
      * @return void
      */
-    public function __construct(ShaderInterface $shader = null, $land = null, $water = null) {
+    public function __construct(?ShaderInterface $shader = null, $land = null, $water = null)
+    {
         if (is_null($land)) {
             $this->colors[FillType::LAND] = new Color(2, 98, 6);
         } else {
@@ -32,7 +33,7 @@ class MapColorScheme extends DefaultColorScheme {
         }
 
         if (is_null($shader)) {
-            $shader = new NullShader();
+            $shader = new NullShader;
         }
 
         $this->shader = $shader;

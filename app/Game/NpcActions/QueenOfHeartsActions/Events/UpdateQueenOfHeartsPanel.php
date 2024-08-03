@@ -10,29 +10,24 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class UpdateQueenOfHeartsPanel implements ShouldBroadcastNow {
+class UpdateQueenOfHeartsPanel implements ShouldBroadcastNow
+{
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     /**
-     * @param array $panelData
+     * @param  array  $panelData
      */
     public array $panelData;
 
-    /**
-     * @var User $user
-     *
-     */
     private User $user;
 
     /**
      * Create a new event instance.
-     *
-     * @param User $user
-     * @param array $panelData
      */
-    public function __construct(User $user, array $panelData, ) {
+    public function __construct(User $user, array $panelData)
+    {
         $this->panelData = $panelData;
-        $this->user      = $user;
+        $this->user = $user;
     }
 
     /**
@@ -40,7 +35,8 @@ class UpdateQueenOfHeartsPanel implements ShouldBroadcastNow {
      *
      * @return Channel|array
      */
-    public function broadcastOn() {
-        return new PrivateChannel('update-queen-of-hearts-panel-' . $this->user->id);
+    public function broadcastOn()
+    {
+        return new PrivateChannel('update-queen-of-hearts-panel-'.$this->user->id);
     }
 }

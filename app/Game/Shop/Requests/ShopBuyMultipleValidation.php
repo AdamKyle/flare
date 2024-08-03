@@ -25,11 +25,12 @@ class ShopBuyMultipleValidation extends FormRequest
     {
         return [
             'item_name' => 'required|string|exists:items,name',
-            'amount'    => 'required|int'
+            'amount' => 'required|int',
         ];
     }
 
-    public function messages() {
+    public function messages()
+    {
         return [
             'item_name.required' => 'What are you trying to buy multiple of child?',
             'item_name.exists' => 'Item does not exist at all ...Huh?',

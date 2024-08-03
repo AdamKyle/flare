@@ -24,9 +24,9 @@ class BanUserRequest extends FormRequest
     public function rules()
     {
         return [
-            'ban_for'     => 'required|string',
+            'ban_for' => 'required|string',
             'ban_message' => 'required|string',
-            'user_id'     => 'required|integer|exists:users,id'
+            'user_id' => 'required|integer|exists:users,id',
         ];
     }
 
@@ -35,11 +35,12 @@ class BanUserRequest extends FormRequest
      *
      * @return array
      */
-    public function messages() {
+    public function messages()
+    {
         return [
-            'ban_for.required'     => 'Ban For is required',
+            'ban_for.required' => 'Ban For is required',
             'ban_message.required' => 'Ban Message is required',
-            'user_id.required'     => 'User is required',
+            'user_id.required' => 'User is required',
         ];
     }
 }

@@ -5,7 +5,8 @@ namespace App\Game\Quests\Console\Commands;
 use App\Game\Quests\Services\BuildQuestCacheService;
 use Illuminate\Console\Command;
 
-class CreateQuestCache extends Command {
+class CreateQuestCache extends Command
+{
     /**
      * The name and signature of the console command.
      *
@@ -23,7 +24,8 @@ class CreateQuestCache extends Command {
     /**
      * Execute the console command.
      */
-    public function handle(BuildQuestCacheService $buildQuestCacheService) {
+    public function handle(BuildQuestCacheService $buildQuestCacheService)
+    {
         $this->line('Building regular quest cache ...');
         $buildQuestCacheService->buildQuestCache();
 

@@ -2,12 +2,12 @@
 
 namespace App\Flare\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Database\Factories\GameRaceFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
-class GameRace extends Model {
-
+class GameRace extends Model
+{
     use HasFactory;
 
     /**
@@ -36,21 +36,21 @@ class GameRace extends Model {
      * @var array
      */
     protected $casts = [
-        'str_mod'      => 'integer',
-        'dur_mod'      => 'integer',
-        'dex_mod'      => 'integer',
-        'chr_mod'      => 'integer',
-        'int_mod'      => 'integer',
-        'agi_mod'      => 'integer',
-        'focus_mod'    => 'integer',
+        'str_mod' => 'integer',
+        'dur_mod' => 'integer',
+        'dex_mod' => 'integer',
+        'chr_mod' => 'integer',
+        'int_mod' => 'integer',
+        'agi_mod' => 'integer',
+        'focus_mod' => 'integer',
         'accuracy_mod' => 'float',
-        'dodge_mod'    => 'float',
-        'defense_mod'  => 'float',
-        'looting_mod'  => 'float',
+        'dodge_mod' => 'float',
+        'defense_mod' => 'float',
+        'looting_mod' => 'float',
     ];
 
-    protected static function newFactory() {
+    protected static function newFactory()
+    {
         return GameRaceFactory::new();
     }
-
 }

@@ -2,15 +2,15 @@
 
 namespace App\Flare\Models;
 
-
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Database\Factories\KingdomFactory;
 use App\Game\Kingdoms\Values\KingdomMaxValue;
 use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
 use App\Game\Skills\Values\SkillTypeValue;
+use Database\Factories\KingdomFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
-class Kingdom extends Model {
+class Kingdom extends Model
+{
     use HasFactory;
 
     /**
@@ -56,102 +56,117 @@ class Kingdom extends Model {
      * @var array
      */
     protected $casts = [
-        'color'              => 'array',
-        'max_stone'          => 'integer',
-        'max_wood'           => 'integer',
-        'max_clay'           => 'integer',
-        'max_iron'           => 'integer',
-        'max_steel'          => 'integer',
-        'current_steel'      => 'integer',
-        'current_stone'      => 'integer',
-        'current_wood'       => 'integer',
-        'current_clay'       => 'integer',
-        'current_iron'       => 'integer',
+        'color' => 'array',
+        'max_stone' => 'integer',
+        'max_wood' => 'integer',
+        'max_clay' => 'integer',
+        'max_iron' => 'integer',
+        'max_steel' => 'integer',
+        'current_steel' => 'integer',
+        'current_stone' => 'integer',
+        'current_wood' => 'integer',
+        'current_clay' => 'integer',
+        'current_iron' => 'integer',
         'current_population' => 'integer',
-        'max_population'     => 'integer',
-        'x_position'         => 'integer',
-        'y_position'         => 'integer',
-        'current_morale'     => 'float',
-        'max_morale'         => 'float',
-        'treasury'           => 'integer',
-        'gold_bars'          => 'integer',
-        'published'          => 'boolean',
-        'npc_owned'          => 'boolean',
-        'is_capital'         => 'boolean',
-        'auto_walked'        => 'boolean',
-        'last_walked'        => 'datetime',
-        'protected_until'    => 'datetime',
+        'max_population' => 'integer',
+        'x_position' => 'integer',
+        'y_position' => 'integer',
+        'current_morale' => 'float',
+        'max_morale' => 'float',
+        'treasury' => 'integer',
+        'gold_bars' => 'integer',
+        'published' => 'boolean',
+        'npc_owned' => 'boolean',
+        'is_capital' => 'boolean',
+        'auto_walked' => 'boolean',
+        'last_walked' => 'datetime',
+        'protected_until' => 'datetime',
     ];
 
     /**
      * Update the last walked automatically.
      */
-    public function updateLastWalked() {
+    public function updateLastWalked()
+    {
         $this->update([
             'last_walked' => now(),
         ]);
     }
 
-    public function fetchDefenceBonusFromPassive(): float {
+    public function fetchDefenceBonusFromPassive(): float
+    {
         return $this->getPercentageForPassive(PassiveSkillTypeValue::KINGDOM_DEFENCE);
     }
 
-    public function fetchResourceBonus(): float {
+    public function fetchResourceBonus(): float
+    {
         return $this->getPercentageForPassive(PassiveSkillTypeValue::KINGDOM_RESOURCE_GAIN);
     }
 
-    public function fetchUnitCostReduction(): float {
+    public function fetchUnitCostReduction(): float
+    {
         return $this->getPercentageForPassive(PassiveSkillTypeValue::KINGDOM_UNIT_COST_REDUCTION);
     }
 
-    public function fetchBuildingCostReduction(): float {
+    public function fetchBuildingCostReduction(): float
+    {
         return $this->getPercentageForPassive(PassiveSkillTypeValue::KINGDOM_BUILDING_COST_REDUCTION);
     }
 
-    public function fetchIronCostReduction(): float {
+    public function fetchIronCostReduction(): float
+    {
         return $this->getPercentageForPassive(PassiveSkillTypeValue::IRON_COST_REDUCTION);
     }
 
-    public function fetchSmeltingTimeReduction(): float {
+    public function fetchSmeltingTimeReduction(): float
+    {
         return $this->getPercentageForPassive(PassiveSkillTypeValue::STEEL_SMELTING_TIME_REDUCTION);
     }
 
-    public function fetchPopulationCostReduction(): float {
+    public function fetchPopulationCostReduction(): float
+    {
         return $this->getPercentageForPassive(PassiveSkillTypeValue::POPULATION_COST_REDUCTION);
     }
 
-    public function fetchAirShipAttackIncrease(): float {
+    public function fetchAirShipAttackIncrease(): float
+    {
         return $this->getPercentageForPassive(PassiveSkillTypeValue::AIRSHIP_ATTACK_INCREASE);
     }
 
-    public function fetchAirShipDefenceIncrease(): float {
+    public function fetchAirShipDefenceIncrease(): float
+    {
         return $this->getPercentageForPassive(PassiveSkillTypeValue::AIRSHIP_UNIT_DEFENCE);
     }
 
-    public function fetchKingBasedSkillValue(string $attribute): float {
-        return $this->character->skills->filter(function($skill) {
-           return $skill->skill_type === SkillTypeValue::EFFECTS_KINGDOM;
+    public function fetchKingBasedSkillValue(string $attribute): float
+    {
+        return $this->character->skills->filter(function ($skill) {
+            return $skill->skill_type === SkillTypeValue::EFFECTS_KINGDOM;
         })->first()->{$attribute};
     }
 
-    public function fetchKingdomDefenceBonus(): float {
+    public function fetchKingdomDefenceBonus(): float
+    {
         $passiveBonus = $this->fetchDefenceBonusFromPassive();
-        $treasury     = $this->fetchTreasuryDefenceBonus();
-        $walls        = $this->getWallsDefence();
-        $goldBars     = $this->fetchGoldBarsDefenceBonus();
+        $treasury = $this->fetchTreasuryDefenceBonus();
+        $walls = $this->getWallsDefence();
+        $goldBars = $this->fetchGoldBarsDefenceBonus();
 
         return $walls + $treasury + $goldBars + $passiveBonus;
     }
 
-    public function fetchTreasuryDefenceBonus(): float {
+    public function fetchTreasuryDefenceBonus(): float
+    {
         return $this->treasury / KingdomMaxValue::MAX_TREASURY;
     }
 
-    public function fetchGoldBarsDefenceBonus(): float {
+    public function fetchGoldBarsDefenceBonus(): float
+    {
         return $this->gold_bars / KingdomMaxValue::MAX_GOLD_BARS;
     }
 
-    public function kingdomItemResistanceBonus(): float {
+    public function kingdomItemResistanceBonus(): float
+    {
         $loyalty = $this->character->factionLoyalties()->where('is_pledged', true)->first();
 
         if (is_null($loyalty)) {
@@ -165,8 +180,9 @@ class Kingdom extends Model {
         return min($totalDefence, 0.95);
     }
 
-    public function getWallsDefence(): float {
-        $walls = $this->buildings->filter(function($building) {
+    public function getWallsDefence(): float
+    {
+        $walls = $this->buildings->filter(function ($building) {
             return $building->gameBuilding->is_walls;
         })->first();
 
@@ -180,8 +196,8 @@ class Kingdom extends Model {
 
         if ($walls->current_durability < $walls->max_durability) {
             $wallDefenceReduction = 1.0 - ($walls->current_durability / $walls->max_durability);
-            $baseDefence          = ($walls->level / $walls->gameBuilding->max_level) * 100;
-            $totalDefence         = ($baseDefence - $baseDefence * $wallDefenceReduction) / 100;
+            $baseDefence = ($walls->level / $walls->gameBuilding->max_level) * 100;
+            $totalDefence = ($baseDefence - $baseDefence * $wallDefenceReduction) / 100;
 
             if ($totalDefence < 0) {
                 return 0;
@@ -193,50 +209,60 @@ class Kingdom extends Model {
         return $walls->level / $walls->gameBuilding->max_level;
     }
 
-    public function gameMap() {
+    public function gameMap()
+    {
         return $this->belongsTo(GameMap::class, 'game_map_id', 'id');
     }
 
-    public function buildings() {
+    public function buildings()
+    {
         return $this->hasMany(KingdomBuilding::class, 'kingdom_id', 'id');
     }
 
-    public function buildingsQueue() {
+    public function buildingsQueue()
+    {
         return $this->hasMany(BuildingInQueue::class, 'kingdom_id', 'id');
     }
 
-    public function capitalCityBuildingQueue() {
+    public function capitalCityBuildingQueue()
+    {
         return $this->hasMany(CapitalCityBuildingQueue::class, 'kingdom_id', 'id');
     }
 
-    public function unitsQueue() {
+    public function unitsQueue()
+    {
         return $this->hasMany(UnitInQueue::class, 'kingdom_id', 'id');
     }
 
-    public function unitsMovementQueue() {
+    public function unitsMovementQueue()
+    {
         return $this->hasMany(UnitMovementQueue::class, 'from_kingdom_id', 'id');
     }
 
-    public function character() {
+    public function character()
+    {
         return $this->belongsTo(Character::class, 'character_id', 'id');
     }
 
-    public function units() {
+    public function units()
+    {
         return $this->hasMany(KingdomUnit::class, 'kingdom_id', 'id');
     }
 
-    protected static function newFactory() {
+    protected static function newFactory()
+    {
         return KingdomFactory::new();
     }
 
-    protected function getPercentageForPassive(int $passiveType): float {
-        $character    = $this->character;
+    protected function getPercentageForPassive(int $passiveType): float
+    {
+        $character = $this->character;
 
         if (is_null($character)) {
-             return 0.0;
+            return 0.0;
         }
 
-        $passive = $character->passiveSkills->filter(function($passiveSkill) use($passiveType) {
+        $passive = $character->passiveSkills->filter(function ($passiveSkill) use ($passiveType) {
             return $passiveSkill->passiveSkill->effect_type === $passiveType;
         })->first();
 

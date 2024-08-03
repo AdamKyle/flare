@@ -2,21 +2,18 @@
 
 namespace App\Game\Messages\Services;
 
-use App\Flare\Models\User;
-use App\Flare\Models\Announcement;
 use App\Flare\Values\NameTags;
 use App\Game\Messages\Models\Message;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Collection as SupportCollection;
 
-class FetchMessages {
-
+class FetchMessages
+{
     /**
      * Fetch all messages from the previous 24 hours.
-     *
-     * @return SupportCollection
      */
-    public function fetchMessages(): SupportCollection {
+    public function fetchMessages(): SupportCollection
+    {
         $messages = Message::with(['user', 'user.roles', 'user.character'])
             ->where('from_user', null)
             ->where('to_user', null)
@@ -30,17 +27,15 @@ class FetchMessages {
 
     /**
      * Transform the messages.
-     *
-     * @param Collection $messages
-     * @return SupportCollection
      */
-    protected function transformMessages(Collection $messages): SupportCollection {
+    protected function transformMessages(Collection $messages): SupportCollection
+    {
         return $messages->transform(function ($message) {
 
-            $message->x     = $message->x_position;
-            $message->y     = $message->y_position;
+            $message->x = $message->x_position;
+            $message->y = $message->y_position;
 
-            if (!is_null($message->color)) {
+            if (! is_null($message->color)) {
                 $message->map = $this->getMapNameFromColor($message->color);
             }
 
@@ -52,11 +47,9 @@ class FetchMessages {
 
     /**
      * Set the name of the person who sent the message.
-     *
-     * @param Message $message
-     * @return Message
      */
-    protected function setMessageName(Message $message): Message {
+    protected function setMessageName(Message $message): Message
+    {
 
         $user = $message->user;
 
@@ -68,16 +61,17 @@ class FetchMessages {
 
         $nameTag = $message->user->name_tag;
 
-        $message->name     = $message->user->character->name;
-        $message->name_tag = is_null($nameTag) ? null :NameTags::$valueNames[$nameTag];
+        $message->name = $message->user->character->name;
+        $message->name_tag = is_null($nameTag) ? null : NameTags::$valueNames[$nameTag];
 
         return $message;
     }
 
-    protected function setUpCustomOverRides(Message $message): Message {
+    protected function setUpCustomOverRides(Message $message): Message
+    {
 
-        $message->custom_class   = $message->user->chat_text_color;
-        $message->is_chat_bold   = $message->user->chat_is_bold;
+        $message->custom_class = $message->user->chat_text_color;
+        $message->is_chat_bold = $message->user->chat_is_bold;
         $message->is_chat_italic = $message->user->chat_is_italic;
 
         return $message;
@@ -85,11 +79,9 @@ class FetchMessages {
 
     /**
      * Get the map name from the color on the message.
-     *
-     * @param string $color
-     * @return string
      */
-    protected function getMapNameFromColor(string $color): string {
+    protected function getMapNameFromColor(string $color): string
+    {
         switch ($color) {
             case '#ffad47':
                 return 'LABY';

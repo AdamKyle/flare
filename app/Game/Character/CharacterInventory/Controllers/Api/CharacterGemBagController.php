@@ -8,27 +8,18 @@ use App\Game\Character\CharacterInventory\Services\CharacterGemBagService;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 
-
-class CharacterGemBagController extends Controller {
-
-    /**
-     * @var CharacterGemBagService $characterGemBagService
-     */
+class CharacterGemBagController extends Controller
+{
     private CharacterGemBagService $characterGemBagService;
 
-    /**
-     * @param CharacterGemBagService $characterGemBagService
-     */
-    public function __construct(CharacterGemBagService $characterGemBagService) {
+    public function __construct(CharacterGemBagService $characterGemBagService)
+    {
 
         $this->characterGemBagService = $characterGemBagService;
     }
 
-    /**
-     * @param Character $character
-     * @return JsonResponse
-     */
-    public function getGemSlots(Character $character): JsonResponse {
+    public function getGemSlots(Character $character): JsonResponse
+    {
 
         $result = $this->characterGemBagService->getGems($character);
         $status = $result['status'];
@@ -38,12 +29,8 @@ class CharacterGemBagController extends Controller {
         return response()->json($result, $status);
     }
 
-    /**
-     * @param Character $character
-     * @param GemBagSlot $gemBagSlot
-     * @return JsonResponse
-     */
-    public function getGem(Character $character, GemBagSlot $gemBagSlot): JsonResponse {
+    public function getGem(Character $character, GemBagSlot $gemBagSlot): JsonResponse
+    {
         $result = $this->characterGemBagService->getGemData($character, $gemBagSlot);
         $status = $result['status'];
 

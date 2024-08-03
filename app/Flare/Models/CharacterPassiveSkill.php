@@ -4,8 +4,8 @@ namespace App\Flare\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class CharacterPassiveSkill extends Model {
-
+class CharacterPassiveSkill extends Model
+{
     /**
      * The attributes that are mass assignable.
      *
@@ -28,39 +28,45 @@ class CharacterPassiveSkill extends Model {
      * @var array
      */
     protected $casts = [
-        'current_level'    => 'integer',
-        'hours_to_next'    => 'integer',
+        'current_level' => 'integer',
+        'hours_to_next' => 'integer',
         'passive_skill_id' => 'integer',
-        'started_at'       => 'datetime',
-        'completed_at'     => 'datetime',
-        'is_locked'        => 'boolean',
+        'started_at' => 'datetime',
+        'completed_at' => 'datetime',
+        'is_locked' => 'boolean',
     ];
 
     protected $appends = [
         'name',
     ];
 
-    public function character() {
+    public function character()
+    {
         return $this->belongsTo(Character::class);
     }
 
-    public function passiveSkill() {
+    public function passiveSkill()
+    {
         return $this->belongsTo(PassiveSkill::class, 'passive_skill_id', 'id');
     }
 
-    public function children() {
+    public function children()
+    {
         return $this->hasMany($this, 'parent_skill_id')->with('children');
     }
 
-    public function getIsMaxedLevelAttribute() {
+    public function getIsMaxedLevelAttribute()
+    {
         return $this->current_level === $this->passiveSkill->max_level;
     }
 
-    public function getCurrentBonusAttribute() {
+    public function getCurrentBonusAttribute()
+    {
         return $this->current_level * $this->passiveSkill->bonus_per_level;
     }
 
-    public function getNameAttribute() {
+    public function getNameAttribute()
+    {
         return $this->passiveSkill->name;
     }
 }

@@ -24,17 +24,18 @@ class ReplaceGemOnItemRequest extends FormRequest
     public function rules()
     {
         return [
-            'slot_id'             => 'required|integer',
-            'gem_slot_id'         => 'required|integer',
-            'gem_slot_to_replace' => 'required|integer'
+            'slot_id' => 'required|integer',
+            'gem_slot_id' => 'required|integer',
+            'gem_slot_to_replace' => 'required|integer',
         ];
     }
 
-    public function messages() {
+    public function messages()
+    {
         return [
-            'slot_id.required'              => 'Error. Invalid Input.',
-            'gem_slot_id.required'          => 'Error. Invalid Input',
-            'gem_slot_to_replace.required'  => 'Error. Invalid Input',
+            'slot_id.required' => 'Error. Invalid Input.',
+            'gem_slot_id.required' => 'Error. Invalid Input',
+            'gem_slot_to_replace.required' => 'Error. Invalid Input',
         ];
     }
 }

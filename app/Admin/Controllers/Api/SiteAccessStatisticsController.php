@@ -13,18 +13,20 @@ use App\Flare\Values\SiteAccessStatisticValue;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
 
-class SiteAccessStatisticsController extends Controller {
-
-
-    public function fetchLoggedInAllTime(SiteAccessStatisticsRequest $request) {
+class SiteAccessStatisticsController extends Controller
+{
+    public function fetchLoggedInAllTime(SiteAccessStatisticsRequest $request)
+    {
         return response()->json(['stats' => SiteAccessStatisticValue::getSignedIn($request->daysPast)], 200);
     }
 
-    public function fetchRegisteredAllTime(SiteAccessStatisticsRequest $request) {
+    public function fetchRegisteredAllTime(SiteAccessStatisticsRequest $request)
+    {
         return response()->json(['stats' => SiteAccessStatisticValue::getRegistered($request->daysPast)], 200);
     }
 
-    public function fetchCompletedQuests(CompletedQuestsStatisticsRequest $request) {
+    public function fetchCompletedQuests(CompletedQuestsStatisticsRequest $request)
+    {
         $type = $request->type ?? 'quest';
         $limit = $request->limit ?? 10;
         $filter = $request->filter ?? 'most';
@@ -35,10 +37,10 @@ class SiteAccessStatisticsController extends Controller {
         // Initialize the query
         $query = Character::query()
             ->whereHas('questsCompleted', function ($query) use ($type) {
-                $query->whereNotNull($type . '_id');
+                $query->whereNotNull($type.'_id');
             })
             ->withCount(['questsCompleted as quests_count' => function ($query) use ($type) {
-                $query->whereNotNull($type . '_id');
+                $query->whereNotNull($type.'_id');
             }]);
 
         // Apply filters based on the 'filter' request parameter
@@ -60,24 +62,25 @@ class SiteAccessStatisticsController extends Controller {
         return response()->json([
             'stats' => [
                 'labels' => $charactersWithQuests->pluck('name')->toArray(),
-                'data'   => $charactersWithQuests->pluck('quests_count')->toArray(),
-            ]
+                'data' => $charactersWithQuests->pluck('quests_count')->toArray(),
+            ],
         ]);
     }
 
-
-    public function fetchReincarnationChart() {
+    public function fetchReincarnationChart()
+    {
         $charactersWithHighGold = Character::where('times_reincarnated', '>=', 1)->get();
 
         return response()->json([
             'stats' => [
                 'labels' => $charactersWithHighGold->pluck('name')->toArray(),
-                'data'   => $charactersWithHighGold->pluck('times_reincarnated')->toArray(),
-            ]
+                'data' => $charactersWithHighGold->pluck('times_reincarnated')->toArray(),
+            ],
         ]);
     }
 
-    public function otherDetails() {
+    public function otherDetails()
+    {
         $averageRegularQuestsCompleted = Character::query()
             ->join('quests_completed', 'characters.id', '=', 'quests_completed.character_id')
             ->whereNotNull('quests_completed.quest_id')
@@ -95,24 +98,25 @@ class SiteAccessStatisticsController extends Controller {
             ->avg('guide_quest_count');
 
         return response()->json([
-            'averageCharacterLevel'         => number_format(Character::avg('level')),
-            'averageCharacterGold'          => number_format(Character::avg('gold')),
+            'averageCharacterLevel' => number_format(Character::avg('level')),
+            'averageCharacterGold' => number_format(Character::avg('gold')),
             'averageRegularQuestsCompleted' => number_format($averageRegularQuestsCompleted),
-            'averageGuideQuestsCompleted'   => number_format($averageGuideQuestsCompleted),
-            'characterKingdomCount'       => number_format(Kingdom::whereNotNull('character_id')->count()),
-            'npcKingdomCount'             => number_format(Kingdom::whereNull('character_id')->count()),
-            'richestCharacter'            => Character::orderBy('gold', 'desc')->select('name', 'gold')->first(),
-            'highestLevelCharacter'       => Character::orderBy('gold', 'desc')->select('name', 'level')->first(),
-            'kingdomHolders'              => $this->fetchKingdomHolders(),
-            'lastLoggedInCount'           => User::whereDate('last_logged_in', now())->count(),
+            'averageGuideQuestsCompleted' => number_format($averageGuideQuestsCompleted),
+            'characterKingdomCount' => number_format(Kingdom::whereNotNull('character_id')->count()),
+            'npcKingdomCount' => number_format(Kingdom::whereNull('character_id')->count()),
+            'richestCharacter' => Character::orderBy('gold', 'desc')->select('name', 'gold')->first(),
+            'highestLevelCharacter' => Character::orderBy('gold', 'desc')->select('name', 'level')->first(),
+            'kingdomHolders' => $this->fetchKingdomHolders(),
+            'lastLoggedInCount' => User::whereDate('last_logged_in', now())->count(),
             'lastFiveMonthsLoggedInCount' => User::whereBetween('last_logged_in', [now()->subMonths(5), now()])->count(),
-            'neverLoggedInCount'          => User::whereNull('last_logged_in')->count(),
-            'totalCharactersRegistered'   => User::count(),
-            'willBeDeletedCount'          => User::where('will_be_deleted', true)->count(),
+            'neverLoggedInCount' => User::whereNull('last_logged_in')->count(),
+            'totalCharactersRegistered' => User::count(),
+            'willBeDeletedCount' => User::where('will_be_deleted', true)->count(),
         ]);
     }
 
-    protected function fetchKingdomHolders(): array {
+    protected function fetchKingdomHolders(): array
+    {
         $onlyCharactersWithKingdoms = Character::whereHas('kingdoms')->get();
 
         $array = [];
@@ -126,7 +130,8 @@ class SiteAccessStatisticsController extends Controller {
         return $array;
     }
 
-    public function getTotalGoldIncludingKingdomsForCharacters() {
+    public function getTotalGoldIncludingKingdomsForCharacters()
+    {
         $data = Character::select(
             'characters.name as character_name',
             \DB::raw('characters.gold + SUM(kingdoms.treasury) + SUM(kingdoms.gold_bars) * 2000000000 as total_gold')
@@ -139,7 +144,7 @@ class SiteAccessStatisticsController extends Controller {
 
         return response()->json([
             'data' => $data->pluck('total_gold')->toArray(),
-            'labels' => $data->pluck('character_name')->toArray()
+            'labels' => $data->pluck('character_name')->toArray(),
         ]);
     }
 }

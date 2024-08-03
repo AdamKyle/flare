@@ -2,12 +2,12 @@
 
 namespace App\Flare\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Database\Factories\KingdomUnitFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
-class KingdomUnit extends Model {
-
+class KingdomUnit extends Model
+{
     use HasFactory;
 
     /**
@@ -30,15 +30,18 @@ class KingdomUnit extends Model {
         'amount' => 'integer',
     ];
 
-    public function kingdom() {
+    public function kingdom()
+    {
         return $this->belongsTo(Kingdom::class, 'kingdom_id', 'id');
     }
 
-    public function gameUnit() {
+    public function gameUnit()
+    {
         return $this->hasOne(GameUnit::class, 'id', 'game_unit_id');
     }
 
-    protected static function newFactory() {
+    protected static function newFactory()
+    {
         return KingdomUnitFactory::new();
     }
 }

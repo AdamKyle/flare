@@ -2,23 +2,24 @@
 
 namespace App\Admin\Import\Monsters\Sheets;
 
-use Illuminate\Support\Collection;
-use Maatwebsite\Excel\Concerns\ToCollection;
-use App\Flare\Models\Monster;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Item;
+use App\Flare\Models\Monster;
+use Illuminate\Support\Collection;
+use Maatwebsite\Excel\Concerns\ToCollection;
 
-class MonstersSheet implements ToCollection {
-
-    public function collection(Collection $rows) {
+class MonstersSheet implements ToCollection
+{
+    public function collection(Collection $rows)
+    {
 
         foreach ($rows as $index => $row) {
             if ($index !== 0) {
 
                 $originalMonster = array_combine($rows[0]->toArray(), $row->toArray());
-                $monster         = $this->returnCleanMonster($originalMonster);
+                $monster = $this->returnCleanMonster($originalMonster);
 
-                if (is_null($monster) || !isset($monster['name'])) {
+                if (is_null($monster) || ! isset($monster['name'])) {
                     continue;
                 }
 
@@ -37,7 +38,8 @@ class MonstersSheet implements ToCollection {
         }
     }
 
-    protected function returnCleanMonster(array $monster) {
+    protected function returnCleanMonster(array $monster)
+    {
 
         $cleanData = [];
 
@@ -48,7 +50,7 @@ class MonstersSheet implements ToCollection {
         }
 
         foreach ($monster as $key => $value) {
-            if (!is_null($value)) {
+            if (! is_null($value)) {
 
                 if ($key === 'quest_item_name') {
                     $questItem = Item::where('name', $value)->first();
@@ -58,7 +60,7 @@ class MonstersSheet implements ToCollection {
                     } else {
                         $value = $questItem->id;
                     }
-                } else if ($key === 'game_map_id') {
+                } elseif ($key === 'game_map_id') {
                     $gameMap = GameMap::where('name', $value)->first();
 
                     if (is_null($gameMap)) {
@@ -69,11 +71,11 @@ class MonstersSheet implements ToCollection {
                 }
 
                 if ($key === 'health_range_min') {
-                    $cleanData['health_range'] = $monster['health_range_min'] . '-' . $monster['health_range_max'];
+                    $cleanData['health_range'] = $monster['health_range_min'].'-'.$monster['health_range_max'];
                 }
 
                 if ($key === 'attack_range_min') {
-                    $cleanData['attack_range'] = $monster['attack_range_min'] . '-' . $monster['attack_range_max'];
+                    $cleanData['attack_range'] = $monster['attack_range_min'].'-'.$monster['attack_range_max'];
                 }
 
                 if ($key === 'health_range_max') {

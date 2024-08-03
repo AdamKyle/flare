@@ -2,42 +2,45 @@
 
 namespace Tests\Unit\Game\Shop\Services;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Game\Shop\Services\GoblinShopService;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateItem;
 
-class GoblinShopServiceTest extends TestCase {
-
-    use RefreshDatabase, CreateItem;
+class GoblinShopServiceTest extends TestCase
+{
+    use CreateItem, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
     private ?GoblinShopService $shopService;
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
-        $this->character   = (new CharacterFactory())->createBaseCharacter()
-                                                     ->givePlayerLocation()
-                                                     ->kingdomManagement()
-                                                     ->assignKingdom(['gold_bars' => 1000])
-                                                     ->assignKingdom(['gold_bars' => 1000])
-                                                     ->assignKingdom(['gold_bars' => 1000])
-                                                     ->getCharacterFactory();
+        $this->character = (new CharacterFactory)->createBaseCharacter()
+            ->givePlayerLocation()
+            ->kingdomManagement()
+            ->assignKingdom(['gold_bars' => 1000])
+            ->assignKingdom(['gold_bars' => 1000])
+            ->assignKingdom(['gold_bars' => 1000])
+            ->getCharacterFactory();
 
         $this->shopService = resolve(GoblinShopService::class);
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
 
-        $this->character   = null;
+        $this->character = null;
         $this->shopService = null;
     }
 
-    public function testBuyItemWhereKingdomAbsorbsTheCost() {
+    public function testBuyItemWhereKingdomAbsorbsTheCost()
+    {
         $item = $this->createItem(['gold_bars_cost' => 500]);
 
         $character = $this->character->getCharacter();
@@ -46,7 +49,7 @@ class GoblinShopServiceTest extends TestCase {
 
         $character = $character->refresh();
 
-        $hasItem = $character->inventory->slots->filter(function($slot) {
+        $hasItem = $character->inventory->slots->filter(function ($slot) {
             return $slot->item->gold_bars_cost > 0;
         })->first();
 
@@ -54,7 +57,8 @@ class GoblinShopServiceTest extends TestCase {
         $this->assertNotNull($character->kingdoms->where('gold_bars', 500)->first());
     }
 
-    public function testBuyItemWhereAllKingdomsAbsorbTheCost() {
+    public function testBuyItemWhereAllKingdomsAbsorbTheCost()
+    {
         $item = $this->createItem(['gold_bars_cost' => 2000]);
 
         $character = $this->character->getCharacter();
@@ -63,7 +67,7 @@ class GoblinShopServiceTest extends TestCase {
 
         $character = $character->refresh();
 
-        $hasItem = $character->inventory->slots->filter(function($slot) {
+        $hasItem = $character->inventory->slots->filter(function ($slot) {
             return $slot->item->gold_bars_cost > 0;
         })->first();
 
@@ -71,7 +75,8 @@ class GoblinShopServiceTest extends TestCase {
         $this->assertCount(3, $character->kingdoms->where('gold_bars', '>', 0)->toArray());
     }
 
-    public function testBuyReduceAllKingdomsToZero() {
+    public function testBuyReduceAllKingdomsToZero()
+    {
         $item = $this->createItem(['gold_bars_cost' => 1000]);
 
         $character = $this->character->getCharacter();
@@ -97,7 +102,7 @@ class GoblinShopServiceTest extends TestCase {
 
         $character = $character->refresh();
 
-        $hasItem = $character->inventory->slots->filter(function($slot) {
+        $hasItem = $character->inventory->slots->filter(function ($slot) {
             return $slot->item->gold_bars_cost > 0;
         })->first();
 
@@ -105,7 +110,8 @@ class GoblinShopServiceTest extends TestCase {
         $this->assertCount(0, $character->kingdoms->where('gold_bars', '>', 0)->toArray());
     }
 
-    public function testPurchaseMultipleItemsTillAtFiftyRunesLeft() {
+    public function testPurchaseMultipleItemsTillAtFiftyRunesLeft()
+    {
         $item = $this->createItem(['gold_bars_cost' => 2000]);
 
         $character = $this->character->getCharacter();
@@ -137,7 +143,8 @@ class GoblinShopServiceTest extends TestCase {
         $this->assertEquals(150, $character->kingdoms->sum('gold_bars'));
     }
 
-    public function testPurchaseMultipleItemsThatCostOneThousandTillZeroGoldBarsLeft() {
+    public function testPurchaseMultipleItemsThatCostOneThousandTillZeroGoldBarsLeft()
+    {
         $item = $this->createItem(['gold_bars_cost' => 2000]);
 
         $character = $this->character->getCharacter();
@@ -157,16 +164,17 @@ class GoblinShopServiceTest extends TestCase {
         $this->assertEquals(0, $character->kingdoms->sum('gold_bars'));
     }
 
-    public function testPurchaseWhenMultipleKingdomsHaveVariableGoldBars() {
+    public function testPurchaseWhenMultipleKingdomsHaveVariableGoldBars()
+    {
         $item = $this->createItem(['gold_bars_cost' => 1000]);
 
-        $character   = (new CharacterFactory())->createBaseCharacter()
-                                               ->givePlayerLocation()
-                                               ->kingdomManagement()
-                                               ->assignKingdom(['gold_bars' => 500])
-                                               ->assignKingdom(['gold_bars' => 500])
-                                               ->assignKingdom(['gold_bars' => 400])
-                                               ->getCharacterFactory();
+        $character = (new CharacterFactory)->createBaseCharacter()
+            ->givePlayerLocation()
+            ->kingdomManagement()
+            ->assignKingdom(['gold_bars' => 500])
+            ->assignKingdom(['gold_bars' => 500])
+            ->assignKingdom(['gold_bars' => 400])
+            ->getCharacterFactory();
 
         $character = $character->getCharacter();
 
@@ -176,18 +184,19 @@ class GoblinShopServiceTest extends TestCase {
 
         $character = $character->refresh();
 
-        $hasItem = $character->inventory->slots->filter(function($slot) use ($item) {
-           return $slot->item_id === $item->id;
+        $hasItem = $character->inventory->slots->filter(function ($slot) use ($item) {
+            return $slot->item_id === $item->id;
         })->first();
 
         $this->assertNotNull($hasItem);
         $this->assertEquals(400, $character->kingdoms->sum('gold_bars'));
     }
 
-    public function testPurchaseWhenMultipleKingdomsHaveVariableGoldBarsAndOneHasNoGoldBars() {
+    public function testPurchaseWhenMultipleKingdomsHaveVariableGoldBarsAndOneHasNoGoldBars()
+    {
         $item = $this->createItem(['gold_bars_cost' => 1000]);
 
-        $character   = (new CharacterFactory())->createBaseCharacter()
+        $character = (new CharacterFactory)->createBaseCharacter()
             ->givePlayerLocation()
             ->kingdomManagement()
             ->assignKingdom(['gold_bars' => 500])
@@ -204,7 +213,7 @@ class GoblinShopServiceTest extends TestCase {
 
         $character = $character->refresh();
 
-        $hasItem = $character->inventory->slots->filter(function($slot) use ($item) {
+        $hasItem = $character->inventory->slots->filter(function ($slot) use ($item) {
             return $slot->item_id === $item->id;
         })->first();
 

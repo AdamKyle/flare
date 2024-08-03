@@ -3,7 +3,6 @@
 namespace Tests\Unit\Game\Events\Jobs;
 
 use App\Flare\Models\Announcement;
-use App\Flare\Models\Event as ModelsEvent;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Events\Jobs\InitiateMonthlyPVPEvent;
 use App\Game\Messages\Events\GlobalMessageEvent;
@@ -14,21 +13,24 @@ use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateScheduledEvent;
 
-class InitiateMonthlyPVPEventTest extends TestCase {
-
-    use RefreshDatabase, CreateScheduledEvent;
+class InitiateMonthlyPVPEventTest extends TestCase
+{
+    use CreateScheduledEvent, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
     }
 
-    public function testMonthlyPVPEventDoesNotInitiate() {
+    public function testMonthlyPVPEventDoesNotInitiate()
+    {
         Event::fake();
 
         InitiateMonthlyPVPEvent::dispatch(3);
@@ -37,7 +39,8 @@ class InitiateMonthlyPVPEventTest extends TestCase {
         $this->assertEmpty(Announcement::all());
     }
 
-    public function testInitiateMonthlyPVP() {
+    public function testInitiateMonthlyPVP()
+    {
         Event::fake();
 
         $event = $this->createScheduledEvent();
@@ -48,10 +51,11 @@ class InitiateMonthlyPVPEventTest extends TestCase {
         $this->assertNotEmpty(Announcement::all());
     }
 
-    public function testInitiateMonthlyPVPWhenUsersOnLine() {
+    public function testInitiateMonthlyPVPWhenUsersOnLine()
+    {
         Event::fake();
 
-        $character = (new CharacterFactory())->createBaseCharacter()->getCharacter();
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
 
         $character->update(['level' => 302]);
 
@@ -60,11 +64,11 @@ class InitiateMonthlyPVPEventTest extends TestCase {
         DB::table('sessions')->truncate();
 
         DB::table('sessions')->insert([[
-            'id'           => '1',
-            'user_id'      => $character->refresh()->user->id,
-            'ip_address'   => '1',
-            'user_agent'   => '1',
-            'payload'      => '1',
+            'id' => '1',
+            'user_id' => $character->refresh()->user->id,
+            'ip_address' => '1',
+            'user_agent' => '1',
+            'payload' => '1',
             'last_activity' => 1602801731,
         ]]);
 

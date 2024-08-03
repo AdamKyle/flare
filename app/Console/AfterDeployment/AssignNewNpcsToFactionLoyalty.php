@@ -18,14 +18,12 @@ use Illuminate\Console\Command;
 
 class AssignNewNpcsToFactionLoyalty extends Command
 {
-
     const CRAFTING_TYPES = [
         'weapon',
         'armour',
         'ring',
         'spell',
     ];
-
 
     /**
      * The name and signature of the console command.
@@ -44,9 +42,10 @@ class AssignNewNpcsToFactionLoyalty extends Command
     /**
      * Execute the console command.
      */
-    public function handle() {
+    public function handle()
+    {
 
-        FactionLoyalty::chunkById(50, function($factionLoyalties) {
+        FactionLoyalty::chunkById(50, function ($factionLoyalties) {
 
             foreach ($factionLoyalties as $factionLoyalty) {
                 $this->updateNpcsForFactionLOyalty($factionLoyalty);
@@ -54,7 +53,8 @@ class AssignNewNpcsToFactionLoyalty extends Command
         });
     }
 
-    private function updateNpcsForFactionLOyalty(FactionLoyalty $factionLoyalty) {
+    private function updateNpcsForFactionLOyalty(FactionLoyalty $factionLoyalty)
+    {
 
         $character = $factionLoyalty->character;
 
@@ -64,25 +64,25 @@ class AssignNewNpcsToFactionLoyalty extends Command
 
             $hasNpc = $factionLoyalty->factionLoyaltyNpcs()->where('npc_id', $npc->id)->exists();
 
-            if (!$hasNpc) {
+            if (! $hasNpc) {
                 $craftingTasks = $this->createCraftingTasks($npc->gameMap->name);
-                $bountyTasks   = $this->createBountyTasks($character, $npc->gameMap);
+                $bountyTasks = $this->createBountyTasks($character, $npc->gameMap);
 
                 $factionLoyaltyNpc = FactionLoyaltyNpc::create([
-                    'faction_loyalty_id'         => $factionLoyalty->id,
-                    'npc_id'                     => $npc->id,
-                    'current_level'              => 0,
-                    'max_level'                  => 25,
-                    'next_level_fame'            => collect($craftingTasks)->sum('required_amount') +
+                    'faction_loyalty_id' => $factionLoyalty->id,
+                    'npc_id' => $npc->id,
+                    'current_level' => 0,
+                    'max_level' => 25,
+                    'next_level_fame' => collect($craftingTasks)->sum('required_amount') +
                         collect($bountyTasks)->sum('required_amount'),
                     'kingdom_item_defence_bonus' => 0.025,
-                    'currently_helping'          => false,
+                    'currently_helping' => false,
                 ]);
 
                 FactionLoyaltyNpcTask::create([
-                    'faction_loyalty_id'     => $factionLoyalty->id,
+                    'faction_loyalty_id' => $factionLoyalty->id,
                     'faction_loyalty_npc_id' => $factionLoyaltyNpc->id,
-                    'fame_tasks'             => array_merge($bountyTasks, $craftingTasks)
+                    'fame_tasks' => array_merge($bountyTasks, $craftingTasks),
                 ]);
             }
         }
@@ -93,7 +93,7 @@ class AssignNewNpcsToFactionLoyalty extends Command
 
         foreach ($npcs as $npc) {
             $npc->update([
-                'kingdom_item_defence_bonus' => $totalNpcKingdomItemDefencePerLevel
+                'kingdom_item_defence_bonus' => $totalNpcKingdomItemDefencePerLevel,
             ]);
         }
     }
@@ -101,12 +101,11 @@ class AssignNewNpcsToFactionLoyalty extends Command
     /**
      * Create three crafting tasks.
      *
-     * @param string $gameMapName
-     * @return array
      * @throws Exception
      */
-    protected function createCraftingTasks(string $gameMapName): array {
-        $tasks       = [];
+    protected function createCraftingTasks(string $gameMapName): array
+    {
+        $tasks = [];
 
         while (count($tasks) < 3) {
 
@@ -122,7 +121,7 @@ class AssignNewNpcsToFactionLoyalty extends Command
 
             $event = Event::where('type', EventType::WEEKLY_FACTION_LOYALTY_EVENT)->first();
 
-            if (!is_null($event)) {
+            if (! is_null($event)) {
                 $amount = ceil($amount / 2);
             }
 
@@ -131,11 +130,11 @@ class AssignNewNpcsToFactionLoyalty extends Command
             }
 
             $tasks[] = [
-                'type'            => $item->type,
-                'item_name'       => $item->affix_name,
-                'item_id'         => $item->id,
+                'type' => $item->type,
+                'item_name' => $item->affix_name,
+                'item_id' => $item->id,
                 'required_amount' => $amount,
-                'current_amount'  => 0,
+                'current_amount' => 0,
             ];
         }
 
@@ -144,20 +143,17 @@ class AssignNewNpcsToFactionLoyalty extends Command
 
     /**
      * Create three bounty tasks.
-     *
-     * @param Character $character
-     * @param GameMap $gameMap
-     * @return array
      */
-    protected function createBountyTasks(Character $character, GameMap $gameMap): array {
+    protected function createBountyTasks(Character $character, GameMap $gameMap): array
+    {
 
         $tasks = [];
 
         $gameMapId = $gameMap->id;
 
-        if (!is_null($gameMap->only_during_event_type)) {
+        if (! is_null($gameMap->only_during_event_type)) {
 
-            $hasPurgatoryItem = $character->inventory->slots->filter(function($slot) {
+            $hasPurgatoryItem = $character->inventory->slots->filter(function ($slot) {
                 return $slot->item->type === 'quest' && $slot->item->effect === ItemEffectsValue::PURGATORY;
             })->first();
 
@@ -184,7 +180,7 @@ class AssignNewNpcsToFactionLoyalty extends Command
 
             $event = Event::where('type', EventType::WEEKLY_FACTION_LOYALTY_EVENT)->first();
 
-            if (!is_null($event)) {
+            if (! is_null($event)) {
                 $amount = ceil($amount / 2);
             }
 
@@ -193,18 +189,19 @@ class AssignNewNpcsToFactionLoyalty extends Command
             }
 
             $tasks[] = [
-                'type'            => 'bounty',
-                'monster_name'    => $monster->name,
-                'monster_id'      => $monster->id,
+                'type' => 'bounty',
+                'monster_name' => $monster->name,
+                'monster_id' => $monster->id,
                 'required_amount' => $amount,
-                'current_amount'  => 0,
+                'current_amount' => 0,
             ];
         }
 
         return $tasks;
     }
 
-    private function hasTaskAlready(array $tasks, string $key, int $id): bool {
+    private function hasTaskAlready(array $tasks, string $key, int $id): bool
+    {
         foreach ($tasks as $task) {
             if ($task[$key] === $id) {
                 return true;
@@ -219,12 +216,10 @@ class AssignNewNpcsToFactionLoyalty extends Command
      *
      * - Make sure its level appropriate for the plane.
      *
-     * @param string $type
-     * @param string $gamMapName
-     * @return Item
      * @throws Exception
      */
-    private function getItemForCraftingTask(string $type, string $gamMapName): Item {
+    private function getItemForCraftingTask(string $type, string $gamMapName): Item
+    {
 
         $gameMapValue = new MapNameValue($gamMapName);
 

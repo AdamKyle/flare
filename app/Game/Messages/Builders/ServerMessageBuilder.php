@@ -2,17 +2,13 @@
 
 namespace App\Game\Messages\Builders;
 
-use App\Game\Messages\Events\ServerMessageEvent as ServerMessage;
-
-class ServerMessageBuilder {
-
+class ServerMessageBuilder
+{
     /**
      * Build the server message
-     *
-     * @param string $type
-     * @return string
      */
-    public function build(string $type): string {
+    public function build(string $type): string
+    {
         switch ($type) {
             case 'message_length_0':
                 return 'Your message cannot be empty.';
@@ -81,31 +77,27 @@ class ServerMessageBuilder {
         }
     }
 
-    /**
-     * @param string $type
-     * @param string|int|null $forMessage
-     * @return string
-     */
-    public function buildWithAdditionalInformation(string $type, string|int $forMessage = null): string {
-        switch($type) {
+    public function buildWithAdditionalInformation(string $type, string|int|null $forMessage = null): string
+    {
+        switch ($type) {
             case 'level_up':
-                return 'You are now level: ' . $forMessage . '!';
+                return 'You are now level: '.$forMessage.'!';
             case 'gold_rush':
-                return 'Gold Rush! Your gold is now: ' . $forMessage . ' Gold! 5% of your total gold has been awarded to you.';
+                return 'Gold Rush! Your gold is now: '.$forMessage.' Gold! 5% of your total gold has been awarded to you.';
             case 'crafted':
-                return 'You crafted a: ' . $forMessage . '!';
+                return 'You crafted a: '.$forMessage.'!';
             case 'new_damage_stat':
-                return 'The Creator has changed your classes damage stat to: ' . $forMessage . '. Please adjust your gear accordingly for maximum damage.';
+                return 'The Creator has changed your classes damage stat to: '.$forMessage.'. Please adjust your gear accordingly for maximum damage.';
             case 'disenchanted':
-                return 'Disenchanted the item and got: ' . $forMessage . ' Gold Dust.';
+                return 'Disenchanted the item and got: '.$forMessage.' Gold Dust.';
             case 'lotto_max':
-                return 'You won the daily Gold Dust Lottery! Congrats! You won: ' . $forMessage . ' Gold Dust';
+                return 'You won the daily Gold Dust Lottery! Congrats! You won: '.$forMessage.' Gold Dust';
             case 'daily_lottery':
-                return 'You got: ' . $forMessage . ' Gold Dust from the daily lottery';
+                return 'You got: '.$forMessage.' Gold Dust from the daily lottery';
             case 'transmuted':
-                return 'You transmuted a new: ' . $forMessage . ' It shines with a powerful glow!';
+                return 'You transmuted a new: '.$forMessage.' It shines with a powerful glow!';
             case 'crafted_gem':
-                return 'You buff, polish, cut, inspect and are finally proud to call this gem your own! You created a: ' . $forMessage;
+                return 'You buff, polish, cut, inspect and are finally proud to call this gem your own! You created a: '.$forMessage;
             case 'enchantment_failed':
             case 'silenced':
             case 'deleted_affix':

@@ -2,37 +2,29 @@
 
 namespace App\Game\Core\Events;
 
+use App\Flare\Models\User;
 use Illuminate\Broadcasting\Channel;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
-Use App\Flare\Models\User;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\SerializesModels;
 
 class UpdateCharacterCelestialTimeOut implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    /**
-     * @var User $user
-     */
     private User $user;
 
-    /**
-     * @var int
-     */
     public int $timeLeft;
 
     /**
      * Create a new event instance.
-     *
-     * @param User $user
-     * @param int $timeLeft
      */
-    public function __construct(User $user, int $timeLeft) {
+    public function __construct(User $user, int $timeLeft)
+    {
         $this->timeLeft = $timeLeft;
-        $this->user     = $user;
+        $this->user = $user;
     }
 
     /**
@@ -40,7 +32,8 @@ class UpdateCharacterCelestialTimeOut implements ShouldBroadcastNow
      *
      * @return Channel|array
      */
-    public function broadcastOn() {
-        return new PrivateChannel('update-character-celestial-timeout-' . $this->user->id);
+    public function broadcastOn()
+    {
+        return new PrivateChannel('update-character-celestial-timeout-'.$this->user->id);
     }
 }

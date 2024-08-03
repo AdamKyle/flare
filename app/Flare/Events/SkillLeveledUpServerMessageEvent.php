@@ -2,37 +2,32 @@
 
 namespace App\Flare\Events;
 
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Http\Request;
-use App\Flare\Models\GameRace;
-use App\Flare\Models\GameClass;
 use App\Flare\Models\Skill;
 use App\Flare\Models\User;
+use Illuminate\Queue\SerializesModels;
 
 class SkillLeveledUpServerMessageEvent
 {
     use SerializesModels;
 
     /**
-     * @var Skill $skill
+     * @var Skill
      */
     public $skill;
 
     /**
-     * @var User $user
+     * @var User
      */
     public $user;
 
     /**
      * Create a new event instance.
      *
-     * @param  User $user
-     * @param Skill $skill
      * @return void
      */
     public function __construct(User $user, Skill $skill)
     {
-        $this->skill        = $skill;
-        $this->user         = $user;
+        $this->skill = $skill;
+        $this->user = $user;
     }
 }

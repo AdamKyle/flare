@@ -2,36 +2,30 @@
 
 namespace App\Game\Kingdoms\Jobs;
 
+use App\Flare\Models\BuildingInQueue;
 use App\Flare\Models\CapitalCityBuildingQueue;
+use App\Flare\Models\KingdomBuilding;
+use App\Flare\Models\User;
 use App\Game\Kingdoms\Service\CapitalCityBuildingManagement;
+use App\Game\Kingdoms\Service\UpdateKingdom;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
+use Facades\App\Flare\Values\UserOnlineValue;
+use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use App\Flare\Models\BuildingInQueue;
-use App\Flare\Models\User;
-use App\Flare\Models\KingdomBuilding;
-use Facades\App\Flare\Values\UserOnlineValue;
-use App\Game\Kingdoms\Service\UpdateKingdom;
-use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 
-class RebuildBuilding implements ShouldQueue {
-
+class RebuildBuilding implements ShouldQueue
+{
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    /**
-     * @var User $user
-     */
     protected User $user;
 
-    /**
-     * @var KingdomBuilding $building
-     */
     protected KingdomBuilding $building;
 
-    protected int|null $capitalCityBuildingQueueId = null;
+    protected ?int $capitalCityBuildingQueueId = null;
 
     /**
      * @var int queueId
@@ -40,29 +34,23 @@ class RebuildBuilding implements ShouldQueue {
 
     /**
      * Create a new job instance.
-     *
-     * @param KingdomBuilding $building
-     * @param User $user
-     * @param int $queueId
-     * @param int|null $capitalCityBuildingQueueId
      */
-    public function __construct(KingdomBuilding $building, User $user, int $queueId, int $capitalCityBuildingQueueId = null) {
-        $this->user     = $user;
+    public function __construct(KingdomBuilding $building, User $user, int $queueId, ?int $capitalCityBuildingQueueId = null)
+    {
+        $this->user = $user;
 
         $this->building = $building;
 
-        $this->queueId  = $queueId;
+        $this->queueId = $queueId;
 
         $this->capitalCityBuildingQueueId = $capitalCityBuildingQueueId;
     }
 
     /**
      * Execute the job.
-     *
-     * @param UpdateKingdom $updateKingdom
-     * @return void
      */
-    public function handle(UpdateKingdom $updateKingdom, CapitalCityBuildingManagement $capitalCityBuildingManagement): void {
+    public function handle(UpdateKingdom $updateKingdom, CapitalCityBuildingManagement $capitalCityBuildingManagement): void
+    {
         $queue = BuildingInQueue::find($this->queueId);
 
         if (is_null($queue)) {
@@ -74,7 +62,7 @@ class RebuildBuilding implements ShouldQueue {
         ]);
 
         $building = $this->building->refresh();
-        $kingdom  = $building->kingdom;
+        $kingdom = $building->kingdom;
 
         if ($building->morale_increase > 0) {
             $kingdom = $building->kingdom;
@@ -97,17 +85,17 @@ class RebuildBuilding implements ShouldQueue {
         $updateKingdom->updateKingdom($kingdom);
 
         if (UserOnlineValue::isOnline($this->user)) {
-            $x       = $kingdom->x_position;
-            $y       = $kingdom->y_position;
-            $plane   = $kingdom->gameMap->name;
+            $x = $kingdom->x_position;
+            $y = $kingdom->y_position;
+            $plane = $kingdom->gameMap->name;
 
-            $message = $this->building->name . ' finished being rebuilt for kingdom: ' .
-                $this->building->kingdom->name . ' on plane: '.$plane.' At: (X/Y) '.$x.'/'.$y.'.';
+            $message = $this->building->name.' finished being rebuilt for kingdom: '.
+                $this->building->kingdom->name.' on plane: '.$plane.' At: (X/Y) '.$x.'/'.$y.'.';
 
             ServerMessageHandler::handleMessage($this->user, 'building_repair_finished', $message);
         }
 
-        if (!is_null($this->capitalCityBuildingQueueId)) {
+        if (! is_null($this->capitalCityBuildingQueueId)) {
             $capitalCityQueue = CapitalCityBuildingQueue::find($this->capitalCityBuildingQueueId);
 
             if (is_null($capitalCityQueue)) {
@@ -124,7 +112,7 @@ class RebuildBuilding implements ShouldQueue {
             }
 
             $capitalCityQueue->update([
-                'building_request_data' => $buildingRequestData
+                'building_request_data' => $buildingRequestData,
             ]);
 
             $capitalCityQueue = $capitalCityQueue->refresh();

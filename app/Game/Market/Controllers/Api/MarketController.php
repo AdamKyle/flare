@@ -16,9 +16,9 @@ use Facades\App\Flare\Calculators\SellItemCalculator;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
 
-class  MarketController extends Controller {
-
-    use UpdateMarketBoard, IsItemUnique;
+class MarketController extends Controller
+{
+    use IsItemUnique, UpdateMarketBoard;
 
     private $manager;
 
@@ -26,13 +26,15 @@ class  MarketController extends Controller {
 
     private $characterInventoryService;
 
-    public function __construct(Manager $manager, MarketItemsTransformer $transformer, CharacterInventoryService $characterInventoryService) {
-        $this->manager                   = $manager;
-        $this->transformer               = $transformer;
+    public function __construct(Manager $manager, MarketItemsTransformer $transformer, CharacterInventoryService $characterInventoryService)
+    {
+        $this->manager = $manager;
+        $this->transformer = $transformer;
         $this->characterInventoryService = $characterInventoryService;
     }
 
-    public function marketItems(ChangeItemTypeRequest $request) {
+    public function marketItems(ChangeItemTypeRequest $request)
+    {
         $items = MarketBoard::where('is_locked', false)
             ->where('item_id', $request->item_id)
             ->select('market_board.*')
@@ -43,11 +45,12 @@ class  MarketController extends Controller {
 
         return response()->json([
             'items' => $items,
-            'gold'  => auth()->user()->character->gold,
+            'gold' => auth()->user()->character->gold,
         ], 200);
     }
 
-    public function sellItem(ListPriceRequest $request, Character $character) {
+    public function sellItem(ListPriceRequest $request, Character $character)
+    {
 
         $slot = $character->inventory->slots()->find($request->slot_id);
 
@@ -58,7 +61,7 @@ class  MarketController extends Controller {
         $minCost = SellItemCalculator::fetchMinPrice($slot->item);
 
         if ($minCost !== 0 && $minCost > $request->list_for) {
-            return response()->json(['message' => 'No! The minimum selling price is: ' . number_format($minCost) . ' Gold.'], 422);
+            return response()->json(['message' => 'No! The minimum selling price is: '.number_format($minCost).' Gold.'], 422);
         }
 
         $listPrice = $request->list_for;
@@ -69,7 +72,7 @@ class  MarketController extends Controller {
 
         MarketBoard::create([
             'character_id' => auth()->user()->character->id,
-            'item_id'      => $slot->item->id,
+            'item_id' => $slot->item->id,
             'listed_price' => $listPrice,
         ]);
 
@@ -82,11 +85,11 @@ class  MarketController extends Controller {
         $inventory = $this->characterInventoryService->setCharacter($character->refresh());
 
         return response()->json([
-            'message'   => 'Listed: ' . $itemName . ' For: ' . number_format($listPrice) . ' Gold.',
+            'message' => 'Listed: '.$itemName.' For: '.number_format($listPrice).' Gold.',
             'inventory' => [
                 'inventory' => $inventory->getInventoryForType('inventory'),
                 'usable_items' => $inventory->getInventoryForType('usable_items'),
-            ]
+            ],
         ]);
     }
 }

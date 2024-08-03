@@ -2,18 +2,19 @@
 
 namespace App\Game\Events\Console\Commands;
 
-use App\Game\Events\Jobs\InitiateDelusionalMemoriesEvent;
-use App\Game\Events\Jobs\InitiateWeeklyFactionLoyaltyEvent;
-use Illuminate\Console\Command;
 use App\Flare\Models\ScheduledEvent;
-use App\Game\Events\Values\EventType;
+use App\Game\Events\Jobs\InitiateDelusionalMemoriesEvent;
 use App\Game\Events\Jobs\InitiateMonthlyPVPEvent;
-use App\Game\Raids\Jobs\InitiateRaid;
 use App\Game\Events\Jobs\InitiateWeeklyCelestialSpawnEvent;
 use App\Game\Events\Jobs\InitiateWeeklyCurrencyDropEvent;
+use App\Game\Events\Jobs\InitiateWeeklyFactionLoyaltyEvent;
 use App\Game\Events\Jobs\InitiateWinterEvent;
+use App\Game\Events\Values\EventType;
+use App\Game\Raids\Jobs\InitiateRaid;
+use Illuminate\Console\Command;
 
-class ProcessScheduledEvents extends Command {
+class ProcessScheduledEvents extends Command
+{
     /**
      * The name and signature of the console command.
      *
@@ -31,7 +32,8 @@ class ProcessScheduledEvents extends Command {
     /**
      * Execute the console command.
      */
-    public function handle() {
+    public function handle()
+    {
         $targetEventStart = now()->copy()->addMinutes(5);
 
         $scheduledEvents = ScheduledEvent::where('start_date', '>=', now())

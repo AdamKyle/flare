@@ -2,21 +2,18 @@
 
 namespace App\Flare\RandomNumber;
 
-class RandomNumberGenerator {
-
+class RandomNumberGenerator
+{
     /**
      * Generate a random number using a randomly generated seed.
-     *
-     * @param integer $min
-     * @param integer $max
-     * @return integer
      */
-    public function generateRandomNumber(int $min = 1, int $max = 1000): int {
+    public function generateRandomNumber(int $min = 1, int $max = 1000): int
+    {
         $seed = mt_rand();
 
         mt_srand($seed);
 
-        $randomNumbers = array();
+        $randomNumbers = [];
 
         for ($i = 0; $i < 10; $i++) {
             $randomNumbers[] = mt_rand($min, $max);
@@ -29,11 +26,9 @@ class RandomNumberGenerator {
 
     /**
      * Generates a true random number.
-     * @param int $max
-     * @param float $chance
-     * @return int
      */
-    public function generateTrueRandomNumber(int $max, float $chance = 0): int {
+    public function generateTrueRandomNumber(int $max, float $chance = 0): int
+    {
 
         if ($chance >= 1.0) {
             return $max;
@@ -54,7 +49,7 @@ class RandomNumberGenerator {
         if ($isBonusSuccessful) {
 
             if ($max > 100) {
-                $randomNumber += (int)round($fraction * $bonus);
+                $randomNumber += (int) round($fraction * $bonus);
             } else {
                 $randomNumber += $bonus;
             }
@@ -64,5 +59,4 @@ class RandomNumberGenerator {
 
         return $randomNumber;
     }
-
 }

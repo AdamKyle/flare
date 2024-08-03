@@ -12,23 +12,25 @@ use Tests\TestCase;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateItemAffix;
 
-class ComparisonServiceTest extends TestCase {
-
-    use RefreshDatabase, CreateItem, CreateItemAffix;
+class ComparisonServiceTest extends TestCase
+{
+    use CreateItem, CreateItemAffix, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
     private ?ComparisonService $comparisonService;
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
-        $this->character = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
+        $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
 
         $this->comparisonService = resolve(ComparisonService::class);
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
 
         $this->character = null;
@@ -36,7 +38,8 @@ class ComparisonServiceTest extends TestCase {
         $this->comparisonService = null;
     }
 
-    public function testItemComparisonDetailsIsEmptyWhenNothingEquipped() {
+    public function testItemComparisonDetailsIsEmptyWhenNothingEquipped()
+    {
         $item = $this->createItem(['type' => WeaponTypes::WEAPON]);
 
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
@@ -48,7 +51,8 @@ class ComparisonServiceTest extends TestCase {
         $this->assertEmpty($comparisonData['details']);
     }
 
-    public function testItemComparisonDetailsIsEmptyWhenSomethingEquippedButComparingForQuest() {
+    public function testItemComparisonDetailsIsEmptyWhenSomethingEquippedButComparingForQuest()
+    {
         $item = $this->createItem(['type' => 'quest']);
 
         $character = $this->character->inventoryManagement()->giveItem($item)->giveItem(
@@ -67,7 +71,8 @@ class ComparisonServiceTest extends TestCase {
         $this->assertEquals($item->affix_name, $comparisonData['itemToEquip']['name']);
     }
 
-    public function testItemComparisonDetailsIsEmptyWhenSomethingEquippedButComparingForUsableItem() {
+    public function testItemComparisonDetailsIsEmptyWhenSomethingEquippedButComparingForUsableItem()
+    {
         $item = $this->createItem(['type' => 'alchemy']);
 
         $character = $this->character->inventoryManagement()->giveItem($item)->giveItem(
@@ -86,7 +91,8 @@ class ComparisonServiceTest extends TestCase {
         $this->assertEquals($item->affix_name, $comparisonData['itemToEquip']['affix_name']);
     }
 
-    public function testItemComparisonDetailsIsNotEmptyWhenSomethingEquipped() {
+    public function testItemComparisonDetailsIsNotEmptyWhenSomethingEquipped()
+    {
         $item = $this->createItem(['type' => WeaponTypes::WEAPON]);
 
         $character = $this->character->inventoryManagement()->giveItem($item)->giveItem(
@@ -104,7 +110,8 @@ class ComparisonServiceTest extends TestCase {
         $this->assertNotEmpty($comparisonData['details']);
     }
 
-    public function testBuildShopDataForBow() {
+    public function testBuildShopDataForBow()
+    {
         $item = $this->createItem(['type' => WeaponTypes::BOW]);
 
         $character = $this->character->inventoryManagement()->giveItem(
@@ -120,7 +127,8 @@ class ComparisonServiceTest extends TestCase {
         $this->assertEquals($item->affix_name, $comparisonData['itemToEquip']['affix_name']);
     }
 
-    public function testBuildShopDataForArmourType() {
+    public function testBuildShopDataForArmourType()
+    {
         $item = $this->createItem(['type' => ArmourTypes::SHIELD]);
 
         $character = $this->character->inventoryManagement()->giveItem(
@@ -136,7 +144,8 @@ class ComparisonServiceTest extends TestCase {
         $this->assertEquals($item->affix_name, $comparisonData['itemToEquip']['affix_name']);
     }
 
-    public function testBuildShopDataForSpell() {
+    public function testBuildShopDataForSpell()
+    {
         $item = $this->createItem(['type' => SpellTypes::DAMAGE]);
 
         $character = $this->character->inventoryManagement()->giveItem(
@@ -152,7 +161,8 @@ class ComparisonServiceTest extends TestCase {
         $this->assertEquals($item->affix_name, $comparisonData['itemToEquip']['affix_name']);
     }
 
-    public function testBuildShopDataForSpellInEquippedSet() {
+    public function testBuildShopDataForSpellInEquippedSet()
+    {
         $item = $this->createItem(['type' => SpellTypes::DAMAGE]);
 
         $character = $this->character->inventorySetManagement()->createInventorySets(10)->putItemInSet($this->createItem([

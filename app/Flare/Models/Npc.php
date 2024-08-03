@@ -2,13 +2,13 @@
 
 namespace App\Flare\Models;
 
+use App\Flare\Values\NpcTypes;
+use Database\Factories\NpcFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Database\Factories\NpcFactory;
-use App\Flare\Values\NpcTypes;
 
-class Npc extends Model {
-
+class Npc extends Model
+{
     use HasFactory;
 
     protected $table = 'npcs';
@@ -28,30 +28,35 @@ class Npc extends Model {
     ];
 
     protected $casts = [
-        'moves_around_map'         => 'boolean',
+        'moves_around_map' => 'boolean',
         'must_be_at_same_location' => 'boolean',
-        'x_position'               => 'integer',
-        'y_position'               => 'integer',
-        'type'                     => 'integer',
+        'x_position' => 'integer',
+        'y_position' => 'integer',
+        'type' => 'integer',
     ];
 
-    public function type(): NpcTypes {
-        return (new NpcTypes($this->type));
+    public function type(): NpcTypes
+    {
+        return new NpcTypes($this->type);
     }
 
-    public function gameMap() {
+    public function gameMap()
+    {
         return $this->hasOne(GameMap::class, 'id', 'game_map_id');
     }
 
-    public function gameMapName(): string {
+    public function gameMapName(): string
+    {
         return $this->gameMap->name;
     }
 
-    public function quests() {
+    public function quests()
+    {
         return $this->hasMany(Quest::class, 'npc_id', 'id');
     }
 
-    protected static function newFactory() {
+    protected static function newFactory()
+    {
         return NpcFactory::new();
     }
 }

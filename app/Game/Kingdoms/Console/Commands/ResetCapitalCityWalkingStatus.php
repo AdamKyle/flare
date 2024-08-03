@@ -2,14 +2,11 @@
 
 namespace App\Game\Kingdoms\Console\Commands;
 
-use App\Flare\Jobs\UpdateKingdomJob;
+use App\Flare\Models\Kingdom;
 use App\Flare\Transformers\KingdomTransformer;
-use App\Game\Kingdoms\Events\UpdateKingdom;
 use App\Game\Kingdoms\Jobs\CapitalCityUpdateAutoWalkedKingdoms;
 use Illuminate\Console\Command;
-use App\Flare\Models\Kingdom;
 use League\Fractal\Manager;
-use League\Fractal\Resource\Item;
 
 class ResetCapitalCityWalkingStatus extends Command
 {
@@ -46,7 +43,7 @@ class ResetCapitalCityWalkingStatus extends Command
     {
         Kingdom::where('npc_owned', false)->update(['auto_walked' => false]);
 
-        Kingdom::where('npc_owned', false)->whereNotNull('character_id')->chunkById(100, function ($kingdoms) use($kingdomTransformer, $manager) {
+        Kingdom::where('npc_owned', false)->whereNotNull('character_id')->chunkById(100, function ($kingdoms) {
             foreach ($kingdoms as $kingdom) {
                 CapitalCityUpdateAutoWalkedKingdoms::dispatch($kingdom);
             }

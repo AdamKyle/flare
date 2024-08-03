@@ -24,14 +24,15 @@ class ChangeFeatureTypesOnQuests extends Command
     /**
      * Execute the console command.
      */
-    public function handle() {
+    public function handle()
+    {
         $oldReincarnation = 1;
-        $oldCosmeticText  = 2;
-        $oldNameTag       = 3;
+        $oldCosmeticText = 2;
+        $oldNameTag = 3;
 
         $newReincarnation = 0;
-        $newCosmeticText  = 1;
-        $newNameTag       = 2;
+        $newCosmeticText = 1;
+        $newNameTag = 2;
 
         Quest::where('unlocks_feature', $oldReincarnation)->update(['unlocks_feature' => $newReincarnation]);
         Quest::where('unlocks_feature', $oldCosmeticText)->update(['unlocks_feature' => $newCosmeticText]);

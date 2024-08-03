@@ -9,23 +9,23 @@ use Tests\Traits\CreateUser;
 
 class CreateAdminTest extends TestCase
 {
+    use CreateRole,
+        CreateUser,
+        RefreshDatabase;
 
-    use RefreshDatabase,
-        CreateRole,
-        CreateUser;
-
-    public function testCreateAdmin() {
+    public function testCreateAdmin()
+    {
         $this->createAdminRole();
 
         $this->assertEquals(0, $this->artisan('create:admin test@gmail.com'));
     }
 
-    public function testCreateAdminUserExists() {
+    public function testCreateAdminUserExists()
+    {
         $this->createAdminRole();
 
         $user = $this->createUser();
 
-        $this->assertEquals(0, $this->artisan('create:admin ' . $user->email));
+        $this->assertEquals(0, $this->artisan('create:admin '.$user->email));
     }
-
 }

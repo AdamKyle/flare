@@ -2,39 +2,28 @@
 
 namespace App\Game\Battle\Controllers\Api;
 
-use App\Flare\Models\Monster;
-use App\Flare\Models\Location;
 use App\Flare\Models\Character;
-use App\Flare\Values\LocationType;
-use App\Game\Battle\Handlers\BattleEventHandler;
-use App\Game\BattleRewardProcessing\Services\WeeklyBattleService;
-use Illuminate\Http\JsonResponse;
-use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Cache;
-use App\Game\Battle\Events\AttackTimeOutEvent;
-use App\Game\Battle\Request\AttackTypeRequest;
+use App\Flare\Models\Location;
+use App\Flare\Models\Monster;
 use App\Flare\Services\BuildMonsterCacheService;
 use App\Flare\Values\ItemEffectsValue;
+use App\Game\Battle\Events\AttackTimeOutEvent;
 use App\Game\Battle\Events\UpdateCharacterStatus;
+use App\Game\Battle\Handlers\BattleEventHandler;
+use App\Game\Battle\Request\AttackTypeRequest;
 use App\Game\Battle\Services\MonsterFightService;
+use App\Http\Controllers\Controller;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Cache;
 
-class BattleController extends Controller {
-
-    /**
-     * @var MonsterFightService $monsterFightService
-     */
+class BattleController extends Controller
+{
     private MonsterFightService $monsterFightService;
 
-    /**
-     * @var BattleEventHandler $battleEventHandler
-     */
     private BattleEventHandler $battleEventHandler;
 
-    /**
-     * @param MonsterFightService $monsterFightService
-     * @param BattleEventHandler $battleEventHandler
-     */
-    public function __construct(MonsterFightService $monsterFightService, BattleEventHandler $battleEventHandler) {
+    public function __construct(MonsterFightService $monsterFightService, BattleEventHandler $battleEventHandler)
+    {
         $this->middleware('is.character.dead')->except(['revive', 'index']);
 
         $this->monsterFightService = $monsterFightService;
@@ -42,12 +31,9 @@ class BattleController extends Controller {
         $this->battleEventHandler = $battleEventHandler;
     }
 
-    /**
-     * @param Character $character
-     * @return JsonResponse
-     */
-    public function index(Character $character): JsonResponse {
-        $characterMap       = $character->map;
+    public function index(Character $character): JsonResponse
+    {
+        $characterMap = $character->map;
 
         $locationWithEffect = Location::whereNotNull('enemy_strength_type')
             ->where('x', $characterMap->character_position_x)
@@ -61,19 +47,18 @@ class BattleController extends Controller {
             ->where('game_map_id', $characterMap->game_map_id)
             ->first();
 
-        if (!Cache::has('monsters')) {
+        if (! Cache::has('monsters')) {
             resolve(BuildMonsterCacheService::class)->buildCache();
         }
 
-        $isTheIcePlane        = $character->map->gameMap->mapType()->isTheIcePlane();
+        $isTheIcePlane = $character->map->gameMap->mapType()->isTheIcePlane();
         $isDelusionalMemories = $character->map->gameMap->mapType()->isDelusionalMemories();
-        $hasPurgatoryAccess   = $character->inventory->slots->where('item.effect', ItemEffectsValue::PURGATORY)->count() > 0;
-        $monsters             = Cache::get('monsters')[$character->map->gameMap->name];
+        $hasPurgatoryAccess = $character->inventory->slots->where('item.effect', ItemEffectsValue::PURGATORY)->count() > 0;
+        $monsters = Cache::get('monsters')[$character->map->gameMap->name];
 
-
-        if (!is_null($locationWithEffect) && !$isTheIcePlane) {
+        if (! is_null($locationWithEffect) && ! $isTheIcePlane) {
             $monsters = Cache::get('monsters')[$locationWithEffect->name];
-        } else if (!is_null($locationWithEffect) && $isTheIcePlane) {
+        } elseif (! is_null($locationWithEffect) && $isTheIcePlane) {
 
             if ($hasPurgatoryAccess) {
                 $monsters = Cache::get('monsters')[$locationWithEffect->name];
@@ -84,21 +69,21 @@ class BattleController extends Controller {
 
         if ($isTheIcePlane && $hasPurgatoryAccess) {
             $monsters = Cache::get('monsters')[$character->map->gameMap->name]['regular'];
-        } else if ($isTheIcePlane && !$hasPurgatoryAccess) {
+        } elseif ($isTheIcePlane && ! $hasPurgatoryAccess) {
             $monsters = Cache::get('monsters')[$character->map->gameMap->name]['easier'];
         }
 
         if ($isDelusionalMemories && $hasPurgatoryAccess) {
             $monsters = Cache::get('monsters')[$character->map->gameMap->name]['regular'];
-        } else if ($isDelusionalMemories && !$hasPurgatoryAccess) {
+        } elseif ($isDelusionalMemories && ! $hasPurgatoryAccess) {
             $monsters = Cache::get('monsters')[$character->map->gameMap->name]['easier'];
         }
 
-        if (!is_null($locationWithType)) {
+        if (! is_null($locationWithType)) {
             $monstersForLocation = Cache::get('special-location-monsters');
 
-            if (isset($monstersForLocation['location-type-' . $locationWithType->type])) {
-                $monsters = $monstersForLocation['location-type-' . $locationWithType->type];
+            if (isset($monstersForLocation['location-type-'.$locationWithType->type])) {
+                $monsters = $monstersForLocation['location-type-'.$locationWithType->type];
             }
         }
 
@@ -107,38 +92,32 @@ class BattleController extends Controller {
         $monsters = collect($monsters);
 
         return response()->json([
-            'monsters'  => $monsters->map(function ($monster) {
+            'monsters' => $monsters->map(function ($monster) {
                 return [
-                    'id'   => $monster['id'],
-                    'name' => $monster['name']
+                    'id' => $monster['id'],
+                    'name' => $monster['name'],
                 ];
             }),
         ]);
     }
 
-    /**
-     * @param AttackTypeRequest $attackTypeRequest
-     * @param Character $character
-     * @param Monster $monster
-     * @return JsonResponse
-     */
-    public function setupMonster(AttackTypeRequest $attackTypeRequest, Character $character, Monster $monster): JsonResponse {
+    public function setupMonster(AttackTypeRequest $attackTypeRequest, Character $character, Monster $monster): JsonResponse
+    {
 
-
-        if (!$this->monsterFightService->isAtMonstersLocation($character, $monster->id)) {
+        if (! $this->monsterFightService->isAtMonstersLocation($character, $monster->id)) {
             return response()->json([
-                'message' => 'You cannot fight a creature of this magnitude with out being at it\'s location.'
+                'message' => 'You cannot fight a creature of this magnitude with out being at it\'s location.',
             ], 422);
         }
 
-        if (!$this->monsterFightService->isMonsterAlreadyDefeatedThisWeek($character, $monster->id)) {
+        if (! $this->monsterFightService->isMonsterAlreadyDefeatedThisWeek($character, $monster->id)) {
             return response()->json([
-                'message' => 'You already defeated this monster. Reset is on Sundays at 3am America/Edmonton.'
+                'message' => 'You already defeated this monster. Reset is on Sundays at 3am America/Edmonton.',
             ], 422);
         }
 
         $result = $this->monsterFightService->setupMonster($character, [
-            'attack_type'         => $attackTypeRequest->attack_type,
+            'attack_type' => $attackTypeRequest->attack_type,
             'selected_monster_id' => $monster->id,
         ]);
 
@@ -148,12 +127,8 @@ class BattleController extends Controller {
         return response()->json($result, $status);
     }
 
-    /**
-     * @param AttackTypeRequest $attackTypeRequest
-     * @param Character $character
-     * @return JsonResponse
-     */
-    public function fightMonster(AttackTypeRequest $attackTypeRequest, Character $character): JsonResponse {
+    public function fightMonster(AttackTypeRequest $attackTypeRequest, Character $character): JsonResponse
+    {
 
         $result = $this->monsterFightService->fightMonster($character, $attackTypeRequest->attack_type);
 
@@ -171,11 +146,8 @@ class BattleController extends Controller {
         return response()->json($result, $status);
     }
 
-    /**
-     * @param Character $character
-     * @return JsonResponse
-     */
-    public function revive(Character $character): JsonResponse {
+    public function revive(Character $character): JsonResponse
+    {
         $this->battleEventHandler->processRevive($character);
 
         return response()->json([]);

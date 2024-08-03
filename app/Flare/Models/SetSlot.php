@@ -3,11 +3,11 @@
 namespace App\Flare\Models;
 
 use Database\Factories\SetSlotFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
-class SetSlot extends Model {
-
+class SetSlot extends Model
+{
     use HasFactory;
 
     /**
@@ -29,15 +29,18 @@ class SetSlot extends Model {
      */
     protected $casts = [];
 
-    public function inventorySet() {
+    public function inventorySet()
+    {
         return $this->belongsTo(InventorySet::class);
     }
 
-    public function item() {
+    public function item()
+    {
         return $this->hasOne(Item::class, 'id', 'item_id');
     }
 
-    protected static function newFactory() {
+    protected static function newFactory()
+    {
         return SetSlotFactory::new();
     }
 }

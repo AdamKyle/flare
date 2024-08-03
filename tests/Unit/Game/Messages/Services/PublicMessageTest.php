@@ -2,15 +2,14 @@
 
 namespace Tests\Unit\Game\Messages\Services;
 
-
+use App\Flare\Models\User;
 use App\Flare\Values\ItemEffectsValue;
+use App\Game\Messages\Events\MessageSentEvent;
+use App\Game\Messages\Models\Message;
+use App\Game\Messages\Services\PublicMessage;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Event;
-use App\Flare\Models\User;
-use App\Game\Messages\Services\PublicMessage;
-use App\Game\Messages\Models\Message;
-use App\Game\Messages\Events\MessageSentEvent;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateItem;
@@ -19,9 +18,9 @@ use Tests\Traits\CreateNpc;
 use Tests\Traits\CreateRole;
 use Tests\Traits\CreateUser;
 
-class PublicMessageTest extends TestCase {
-
-    use RefreshDatabase, CreateMessage, CreateUser, CreateRole, CreateNpc, CreateItem;
+class PublicMessageTest extends TestCase
+{
+    use CreateItem, CreateMessage, CreateNpc, CreateRole, CreateUser, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -29,23 +28,26 @@ class PublicMessageTest extends TestCase {
 
     private ?User $admin;
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
-        $this->character     = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
-        $this->publicMessage = new PublicMessage();
-        $this->admin         = $this->createAdmin($this->createAdminRole());
+        $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
+        $this->publicMessage = new PublicMessage;
+        $this->admin = $this->createAdmin($this->createAdminRole());
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
 
-        $this->character     = null;
+        $this->character = null;
         $this->publicMessage = null;
-        $this->admin         = null;
+        $this->admin = null;
     }
 
-    public function testSendPublicMessage() {
+    public function testSendPublicMessage()
+    {
         Event::fake();
 
         $character = $this->character->getCharacter();
@@ -59,13 +61,14 @@ class PublicMessageTest extends TestCase {
         $this->assertGreaterThan(0, Message::count());
     }
 
-    public function testSendPublicMessageForSurfaceColor() {
+    public function testSendPublicMessageForSurfaceColor()
+    {
         Event::fake();
 
         $character = $this->character->getCharacter();
 
         $gameMap = $this->createGameMap([
-            'name' => 'Surface'
+            'name' => 'Surface',
         ]);
 
         $character->map()->update([
@@ -78,20 +81,21 @@ class PublicMessageTest extends TestCase {
 
         $this->publicMessage->postPublicMessage('Test');
 
-        Event::assertDispatched(function(MessageSentEvent $event) {
+        Event::assertDispatched(function (MessageSentEvent $event) {
             return $event->message->map_name === 'SUR';
         });
 
         $this->assertGreaterThan(0, Message::count());
     }
 
-    public function testSendPublicMessageForLabyrinthColor() {
+    public function testSendPublicMessageForLabyrinthColor()
+    {
         Event::fake();
 
         $character = $this->character->getCharacter();
 
         $gameMap = $this->createGameMap([
-            'name' => 'Labyrinth'
+            'name' => 'Labyrinth',
         ]);
 
         $character->map()->update([
@@ -104,20 +108,21 @@ class PublicMessageTest extends TestCase {
 
         $this->publicMessage->postPublicMessage('Test');
 
-        Event::assertDispatched(function(MessageSentEvent $event) {
+        Event::assertDispatched(function (MessageSentEvent $event) {
             return $event->message->map_name === 'LABY';
         });
 
         $this->assertGreaterThan(0, Message::count());
     }
 
-    public function testSendPublicMessageForDungeonColor() {
+    public function testSendPublicMessageForDungeonColor()
+    {
         Event::fake();
 
         $character = $this->character->getCharacter();
 
         $gameMap = $this->createGameMap([
-            'name' => 'Dungeons'
+            'name' => 'Dungeons',
         ]);
 
         $character->map()->update([
@@ -130,20 +135,21 @@ class PublicMessageTest extends TestCase {
 
         $this->publicMessage->postPublicMessage('Test');
 
-        Event::assertDispatched(function(MessageSentEvent $event) {
+        Event::assertDispatched(function (MessageSentEvent $event) {
             return $event->message->map_name === 'DUN';
         });
 
         $this->assertGreaterThan(0, Message::count());
     }
 
-    public function testSendPublicMessageForHellColor() {
+    public function testSendPublicMessageForHellColor()
+    {
         Event::fake();
 
         $character = $this->character->getCharacter();
 
         $gameMap = $this->createGameMap([
-            'name' => 'Hell'
+            'name' => 'Hell',
         ]);
 
         $character->map()->update([
@@ -156,20 +162,21 @@ class PublicMessageTest extends TestCase {
 
         $this->publicMessage->postPublicMessage('Test');
 
-        Event::assertDispatched(function(MessageSentEvent $event) {
+        Event::assertDispatched(function (MessageSentEvent $event) {
             return $event->message->map_name === 'HELL';
         });
 
         $this->assertGreaterThan(0, Message::count());
     }
 
-    public function testSendPublicMessageForShadowPlaneColor() {
+    public function testSendPublicMessageForShadowPlaneColor()
+    {
         Event::fake();
 
         $character = $this->character->getCharacter();
 
         $gameMap = $this->createGameMap([
-            'name' => 'Shadow Plane'
+            'name' => 'Shadow Plane',
         ]);
 
         $character->map()->update([
@@ -182,20 +189,21 @@ class PublicMessageTest extends TestCase {
 
         $this->publicMessage->postPublicMessage('Test');
 
-        Event::assertDispatched(function(MessageSentEvent $event) {
+        Event::assertDispatched(function (MessageSentEvent $event) {
             return $event->message->map_name === 'SHP';
         });
 
         $this->assertGreaterThan(0, Message::count());
     }
 
-    public function testSendPublicMessageForPurgatoryColor() {
+    public function testSendPublicMessageForPurgatoryColor()
+    {
         Event::fake();
 
         $character = $this->character->getCharacter();
 
         $gameMap = $this->createGameMap([
-            'name' => 'Purgatory'
+            'name' => 'Purgatory',
         ]);
 
         $character->map()->update([
@@ -208,20 +216,21 @@ class PublicMessageTest extends TestCase {
 
         $this->publicMessage->postPublicMessage('Test');
 
-        Event::assertDispatched(function(MessageSentEvent $event) {
+        Event::assertDispatched(function (MessageSentEvent $event) {
             return $event->message->map_name === 'PURG';
         });
 
         $this->assertGreaterThan(0, Message::count());
     }
 
-    public function testSendPublicMessageDefaultToSurfaceColor() {
+    public function testSendPublicMessageDefaultToSurfaceColor()
+    {
         Event::fake();
 
         $character = $this->character->getCharacter();
 
         $gameMap = $this->createGameMap([
-            'name' => 'Some Map'
+            'name' => 'Some Map',
         ]);
 
         $character->map()->update([
@@ -234,14 +243,15 @@ class PublicMessageTest extends TestCase {
 
         $this->publicMessage->postPublicMessage('Test');
 
-        Event::assertDispatched(function(MessageSentEvent $event) {
+        Event::assertDispatched(function (MessageSentEvent $event) {
             return $event->message->map_name === 'SUR';
         });
 
         $this->assertGreaterThan(0, Message::count());
     }
 
-    public function testSendPublicMessageWhenKilledInPvp() {
+    public function testSendPublicMessageWhenKilledInPvp()
+    {
         Event::fake();
 
         $character = $this->character->getCharacter();
@@ -263,11 +273,12 @@ class PublicMessageTest extends TestCase {
         $this->assertEquals(0, Message::first()->y_position);
     }
 
-    public function testSendPublicMessageWithLocationHidden() {
+    public function testSendPublicMessageWithLocationHidden()
+    {
         Event::fake();
 
         $item = $this->createItem([
-            'type'   => 'quest',
+            'type' => 'quest',
             'effect' => ItemEffectsValue::HIDE_CHAT_LOCATION,
         ]);
 
@@ -285,7 +296,8 @@ class PublicMessageTest extends TestCase {
         $this->assertNotNull($message);
     }
 
-    public function testSendAdminPublicMessage() {
+    public function testSendAdminPublicMessage()
+    {
         Event::fake();
 
         $user = $this->createAdmin($this->createAdminRole());

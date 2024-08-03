@@ -20,8 +20,8 @@ use App\Game\Events\Values\GlobalEventSteps;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use Illuminate\Console\Command;
 
-class RestartGlobalEventGoal extends Command {
-
+class RestartGlobalEventGoal extends Command
+{
     /**
      * The name and signature of the console command.
      *
@@ -38,27 +38,25 @@ class RestartGlobalEventGoal extends Command {
 
     /**
      * Execute the console command.
-     *
-     * @param EventGoalsService $eventGoalsService
-     * @return void
      */
-    public function handle(EventGoalsService $eventGoalsService): void {
+    public function handle(EventGoalsService $eventGoalsService): void
+    {
 
         $globalEvent = GlobalEventGoal::first();
 
-        if (!is_null($globalEvent->max_kills)) {
+        if (! is_null($globalEvent->max_kills)) {
             if ($globalEvent->total_kills < $globalEvent->max_kills) {
                 return;
             }
         }
 
-        if (!is_null($globalEvent->max_crafts)) {
+        if (! is_null($globalEvent->max_crafts)) {
             if ($globalEvent->total_crafts < $globalEvent->max_crafts) {
                 return;
             }
         }
 
-        if (!is_null($globalEvent->max_enchants)) {
+        if (! is_null($globalEvent->max_enchants)) {
             if ($globalEvent->total_enchants < $globalEvent->max_enchants) {
                 return;
             }
@@ -72,7 +70,7 @@ class RestartGlobalEventGoal extends Command {
 
         $characterParticipationIds = GlobalEventParticipation::pluck('character_id')->toArray();
 
-        if (!is_null($event->event_goal_steps)) {
+        if (! is_null($event->event_goal_steps)) {
 
             $this->handleStepBaseGlobalEvent($event);
 
@@ -88,20 +86,16 @@ class RestartGlobalEventGoal extends Command {
 
     /**
      * Update all characters global map events on the map of the event.
-     *
-     * @param EventGoalsService $eventGoalsService
-     * @param GlobalEventGoal $globalEventGoal
-     * @param array $characterIds
-     * @return void
      */
-    private function updateCharactersGlobalMapEvents(EventGoalsService $eventGoalsService, GlobalEventGoal $globalEventGoal, array $characterIds): void {
+    private function updateCharactersGlobalMapEvents(EventGoalsService $eventGoalsService, GlobalEventGoal $globalEventGoal, array $characterIds): void
+    {
         $gameMap = GameMap::where('only_during_event_type', $globalEventGoal->event_type)->first();
 
         if (is_null($gameMap)) {
             return;
         }
 
-        Character::whereIn('id', $characterIds)->chunkById(250, function($characters) use ($eventGoalsService) {
+        Character::whereIn('id', $characterIds)->chunkById(250, function ($characters) use ($eventGoalsService) {
             foreach ($characters as $character) {
                 event(
                     new UpdateEventGoalProgress(
@@ -116,11 +110,9 @@ class RestartGlobalEventGoal extends Command {
 
     /**
      * Handle regular global events.
-     *
-     * @param GlobalEventGoal $globalEventGoal
-     * @return void
      */
-    private function handleRegularGlobalEvent(GlobalEventGoal $globalEventGoal): void {
+    private function handleRegularGlobalEvent(GlobalEventGoal $globalEventGoal): void
+    {
         if ($globalEventGoal->total_kills < $globalEventGoal->max_kills) {
             return;
         }
@@ -135,19 +127,17 @@ class RestartGlobalEventGoal extends Command {
         $globalEvent->globalEventKills()->truncate();
 
         event(new GlobalMessageEvent(
-            'Global Event Goal for: ' . $globalEvent->eventType()->getNameForEvent(). ' Players can now participate again and earn
+            'Global Event Goal for: '.$globalEvent->eventType()->getNameForEvent().' Players can now participate again and earn
             Rewards for meeting the various phases! How exciting!'
         ));
     }
 
     /**
      * Set up the base global event
-     *
-     * @param Event $event
-     * @return void
      */
-    private function handleStepBaseGlobalEvent(Event $event): void {
-        $steps       = $event->event_goal_steps;
+    private function handleStepBaseGlobalEvent(Event $event): void
+    {
+        $steps = $event->event_goal_steps;
         $currentStep = $event->current_event_goal_step;
 
         $index = array_search($currentStep, $steps);
@@ -158,7 +148,7 @@ class RestartGlobalEventGoal extends Command {
 
         $newIndex = $index + 1;
 
-        if (!isset($steps[$newIndex])) {
+        if (! isset($steps[$newIndex])) {
             $newStep = $steps[0];
         } else {
             $newStep = $steps[$newIndex];
@@ -195,11 +185,11 @@ class RestartGlobalEventGoal extends Command {
 
         $gameMap = GameMap::where('only_during_event_type', $event->type)->first();
 
-        event(new GlobalMessageEvent('Global Event Goal for: ' . $globalEventGoal->eventType()->getNameForEvent() .
-            ' Players can now participate in the new step: ' . strtoupper($newStep) . '! How exciting!'));
-        event(new GlobalMessageEvent('Players can participate by going to the map: ' . $gameMap->name .
-            ' via Traverse (under the map for desktop, under the map inside Map Movement action drop down for mobile)' . ' ' .
-        'And completing either Fighting monsters, Crafting: Weapons, Spells, Armour and Rings or enchanting the already crafted items.' .
+        event(new GlobalMessageEvent('Global Event Goal for: '.$globalEventGoal->eventType()->getNameForEvent().
+            ' Players can now participate in the new step: '.strtoupper($newStep).'! How exciting!'));
+        event(new GlobalMessageEvent('Players can participate by going to the map: '.$gameMap->name.
+            ' via Traverse (under the map for desktop, under the map inside Map Movement action drop down for mobile)'.' '.
+        'And completing either Fighting monsters, Crafting: Weapons, Spells, Armour and Rings or enchanting the already crafted items.'.
             ' You can see the event goal for the map specified by being on the map and clicking the Event Goal tab from the map.'));
 
     }

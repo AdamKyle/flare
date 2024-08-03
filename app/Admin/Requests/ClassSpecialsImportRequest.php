@@ -27,7 +27,7 @@ class ClassSpecialsImportRequest extends FormRequest
     public function rules()
     {
         return [
-            'class_specials_import' => 'required|mimes:xlsx|max:2048'
+            'class_specials_import' => 'required|mimes:xlsx|max:2048',
         ];
     }
 
@@ -36,11 +36,12 @@ class ClassSpecialsImportRequest extends FormRequest
      *
      * @return array
      */
-    public function messages() {
+    public function messages()
+    {
         return [
-            'class_specials_import.required'   => 'Class Specials import file is required.',
-            'class_specials_import.mime'       => 'The system only accepts xlsx files.',
-            'class_specials_import.max'        => 'File to large, the system only accepts a max size of 2MB.',
+            'class_specials_import.required' => 'Class Specials import file is required.',
+            'class_specials_import.mime' => 'The system only accepts xlsx files.',
+            'class_specials_import.max' => 'File to large, the system only accepts a max size of 2MB.',
         ];
     }
 }

@@ -2,24 +2,20 @@
 
 namespace App\Game\PassiveSkills\Jobs;
 
+use App\Flare\Models\Character;
+use App\Flare\Models\CharacterPassiveSkill;
 use App\Flare\Models\GameBuilding;
+use App\Flare\Transformers\KingdomTransformer;
+use App\Game\Kingdoms\Events\UpdateKingdom;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\PassiveSkills\Events\UpdatePassiveTree;
-use League\Fractal\Manager;
-use League\Fractal\Resource\Item;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use App\Flare\Models\Character;
-use App\Flare\Models\CharacterPassiveSkill;
-use App\Flare\Models\Notification as Notification;
-use App\Flare\Transformers\KingdomTransformer;
-use App\Game\Core\Events\UpdateNotificationsBroadcastEvent;
-use App\Game\Kingdoms\Events\UpdateKingdom;
-use App\Game\PassiveSkills\Events\UpdatePassiveSkillTimer;
-
+use League\Fractal\Manager;
+use League\Fractal\Resource\Item;
 
 class TrainPassiveSkill implements ShouldQueue
 {
@@ -29,13 +25,9 @@ class TrainPassiveSkill implements ShouldQueue
 
     private CharacterPassiveSkill $characterPassiveSkill;
 
-    /**
-     * @param Character $character
-     * @param CharacterPassiveSkill $characterPassiveSkill
-     */
     public function __construct(Character $character, CharacterPassiveSkill $characterPassiveSkill)
     {
-        $this->character             = $character;
+        $this->character = $character;
         $this->characterPassiveSkill = $characterPassiveSkill;
     }
 
@@ -44,13 +36,14 @@ class TrainPassiveSkill implements ShouldQueue
      *
      * @return void
      */
-    public function handle(Manager $manager, KingdomTransformer $kingdomTransformer) {
+    public function handle(Manager $manager, KingdomTransformer $kingdomTransformer)
+    {
 
         if (is_null($this->characterPassiveSkill->started_at)) {
             return;
         }
 
-        if (!$this->characterPassiveSkill->completed_at->lessThanOrEqualTo(now())) {
+        if (! $this->characterPassiveSkill->completed_at->lessThanOrEqualTo(now())) {
             // @codeCoverageIgnoreStart
             $timeLeft = $this->characterPassiveSkill->completed_at->diffInMinutes(now());
 
@@ -76,21 +69,21 @@ class TrainPassiveSkill implements ShouldQueue
         }
 
         $this->characterPassiveSkill->update([
-            'started_at'    => null,
-            'completed_at'  => null,
+            'started_at' => null,
+            'completed_at' => null,
             'current_level' => $newLevel,
             'hours_to_next' => ($newLevel + 1) * $this->characterPassiveSkill->passiveSkill->hours_per_level,
         ]);
 
         $newPassive = $this->characterPassiveSkill->refresh();
 
-        $children   = $newPassive->passiveSkill->childSkills;
+        $children = $newPassive->passiveSkill->childSkills;
 
         foreach ($children as $child) {
             if ($newPassive->current_level >= $child->unlocks_at_level) {
                 $foundChild = $this->character->passiveSkills()->where('passive_skill_id', $child->id)->first();
 
-                if (!is_null($foundChild)) {
+                if (! is_null($foundChild)) {
                     $foundChild->update([
                         'is_locked' => false,
                     ]);
@@ -99,7 +92,7 @@ class TrainPassiveSkill implements ShouldQueue
         }
 
         if ($newPassive->passiveSkill->passiveType()->unlocksBuilding()) {
-            $kingdoms     = $this->character->kingdoms;
+            $kingdoms = $this->character->kingdoms;
             $gameBuilding = GameBuilding::where('name', $newPassive->passiveSkill->name)->first();
 
             foreach ($kingdoms as $kingdom) {
@@ -108,9 +101,9 @@ class TrainPassiveSkill implements ShouldQueue
                     'is_locked' => false,
                 ]);
 
-                $kingdom  = new Item($kingdom->refresh(), $kingdomTransformer);
-                $kingdom  = $manager->createData($kingdom)->toArray();
-                $user     = $this->character->user;
+                $kingdom = new Item($kingdom->refresh(), $kingdomTransformer);
+                $kingdom = $manager->createData($kingdom)->toArray();
+                $user = $this->character->user;
 
                 event(new UpdateKingdom($user, $kingdom));
             }
@@ -128,9 +121,9 @@ class TrainPassiveSkill implements ShouldQueue
                     'max_population' => $kingdom->max_population + $newPassive->passiveSkill->resource_bonus_per_level,
                 ]);
 
-                $kingdom  = new Item($kingdom->refresh(), $kingdomTransformer);
-                $kingdom  = $manager->createData($kingdom)->toArray();
-                $user     = $this->character->user;
+                $kingdom = new Item($kingdom->refresh(), $kingdomTransformer);
+                $kingdom = $manager->createData($kingdom)->toArray();
+                $user = $this->character->user;
 
                 event(new UpdateKingdom($user, $kingdom));
             }
@@ -144,9 +137,9 @@ class TrainPassiveSkill implements ShouldQueue
                     'max_steel' => $kingdom->max_steel + $newPassive->passiveSkill->resource_bonus_per_level,
                 ]);
 
-                $kingdom  = new Item($kingdom->refresh(), $kingdomTransformer);
-                $kingdom  = $manager->createData($kingdom)->toArray();
-                $user     = $this->character->user;
+                $kingdom = new Item($kingdom->refresh(), $kingdomTransformer);
+                $kingdom = $manager->createData($kingdom)->toArray();
+                $user = $this->character->user;
 
                 event(new UpdateKingdom($user, $kingdom));
             }
@@ -154,7 +147,7 @@ class TrainPassiveSkill implements ShouldQueue
 
         $character = $this->character->Refresh();
 
-        event(new ServerMessageEvent($character->user, $newPassive->passiveSkill->name . ' skill has gained a new level! Check your character sheet!'));
+        event(new ServerMessageEvent($character->user, $newPassive->passiveSkill->name.' skill has gained a new level! Check your character sheet!'));
 
         event(new UpdatePassiveTree($character->user, $character->passiveSkills));
     }

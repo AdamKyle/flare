@@ -2,40 +2,32 @@
 
 namespace App\Game\Messages\Services;
 
-use Exception;
-use Illuminate\Support\Facades\Log;
 use App\Flare\Models\Character;
 use App\Flare\Models\User;
 use App\Flare\Values\ItemEffectsValue;
 use App\Game\Maps\Services\PctService;
 use App\Game\Messages\Events\ServerMessageEvent;
+use Exception;
+use Illuminate\Support\Facades\Log;
 
-class PublicEntityCommand {
-
-    /**
-     * @var Character|null $character
-     */
+class PublicEntityCommand
+{
     private ?Character $character = null;
 
-    /**
-     * @var PctService $pctService
-     */
     private PctService $pctService;
 
-    /**
-     * @param PctService $pctService
-     */
-    public function __construct(PctService $pctService) {
+    public function __construct(PctService $pctService)
+    {
         $this->pctService = $pctService;
     }
 
     /**
      * Set the character from the user object.
      *
-     * @param User $user
      * @return $this
      */
-    public function setCharacter(User $user): PublicEntityCommand {
+    public function setCharacter(User $user): PublicEntityCommand
+    {
         $this->character = $user->character;
 
         return $this;
@@ -49,10 +41,10 @@ class PublicEntityCommand {
      *
      * If the character is null, we simply return.
      *
-     * @return void
      * @see PctService
      */
-    public function usPCCommand(): void {
+    public function usPCCommand(): void
+    {
 
         if (is_null($this->character)) {
             return;
@@ -60,7 +52,7 @@ class PublicEntityCommand {
 
         $success = $this->pctService->usePCT($this->character);
 
-        if (!$success) {
+        if (! $success) {
             event(new ServerMessageEvent($this->character->user, 'There are no celestials in the world right now, child!'));
         }
     }
@@ -72,16 +64,16 @@ class PublicEntityCommand {
      *  - If the check for the quest item fails, we alert the player and log and error with the exception.
      *  - If we fail to find a celestial, we simply state there are none.
      *
-     * @return void
      * @see PctService
      */
-    public function usePCTCommand(): void {
+    public function usePCTCommand(): void
+    {
         if (is_null($this->character)) {
             return;
         }
 
         try {
-            if (!$this->hasQuestItemForPCT()) {
+            if (! $this->hasQuestItemForPCT()) {
                 broadcast(new ServerMessageEvent($this->character->user, 'You are missing a quest item to use /PCT. You need to complete the Quest: Hunting Expedition on Surface.'));
 
                 return;
@@ -89,7 +81,7 @@ class PublicEntityCommand {
 
             $success = $this->pctService->usePCT($this->character, true);
 
-            if (!$success) {
+            if (! $success) {
                 event(new ServerMessageEvent($this->character->user, 'There are no celestials in the world right now, child!'));
             }
 
@@ -108,12 +100,12 @@ class PublicEntityCommand {
      *
      * - Can throw an exception if the items effect type is invalid.
      *
-     * @return bool
      * @throws Exception
      */
-    protected function hasQuestItemForPCT(): bool {
+    protected function hasQuestItemForPCT(): bool
+    {
         return $this->character->inventory->slots->filter(function ($slot) {
-            if ($slot->item->type === 'quest' && !is_null($slot->item->effect)) {
+            if ($slot->item->type === 'quest' && ! is_null($slot->item->effect)) {
                 return (new ItemEffectsValue($slot->item->effect))->teleportToCelestial();
             }
         })->isNotEmpty();

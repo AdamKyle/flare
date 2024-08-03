@@ -4,10 +4,9 @@ namespace App\Flare\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Database\Factories\UnitInQueueFactory;
 
-class BuildingExpansionQueue extends Model {
-
+class BuildingExpansionQueue extends Model
+{
     use HasFactory;
 
     /**
@@ -30,18 +29,21 @@ class BuildingExpansionQueue extends Model {
      */
     protected $casts = [
         'completed_at' => 'datetime',
-        'started_at'   => 'datetime',
+        'started_at' => 'datetime',
     ];
 
-    public function character() {
+    public function character()
+    {
         return $this->belongsTo(Character::class);
     }
 
-    public function building() {
+    public function building()
+    {
         return $this->belongsTo(KingdomBuilding::class, 'building_id', 'id');
     }
 
-    public function kingdom() {
+    public function kingdom()
+    {
         return $this->belongsTo(Kingdom::class);
     }
 }

@@ -2,12 +2,12 @@
 
 namespace App\Flare\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Database\Factories\MarketBoardFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
-class MarketBoard extends Model {
-
+class MarketBoard extends Model
+{
     use HasFactory;
 
     protected $table = 'market_board';
@@ -31,20 +31,22 @@ class MarketBoard extends Model {
      */
     protected $casts = [
         'listed_price' => 'integer',
-        'is_locked'    => 'boolean',
+        'is_locked' => 'boolean',
         'character_id' => 'integer',
     ];
 
-    public function item() {
+    public function item()
+    {
         return $this->belongsTo(Item::class, 'item_id', 'id');
     }
 
-    public function character() {
+    public function character()
+    {
         return $this->hasOne(Character::class, 'id', 'character_id');
     }
 
-    protected static function newFactory() {
+    protected static function newFactory()
+    {
         return MarketBoardFactory::new();
     }
-
 }

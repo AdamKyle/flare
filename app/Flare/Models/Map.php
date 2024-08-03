@@ -2,12 +2,12 @@
 
 namespace App\Flare\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Database\Factories\MapFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
-class Map extends Model {
-
+class Map extends Model
+{
     use HasFactory;
 
     /**
@@ -30,21 +30,24 @@ class Map extends Model {
      * @var array
      */
     protected $casts = [
-        'position_x'           => 'integer',
-        'position_y'           => 'integer',
+        'position_x' => 'integer',
+        'position_y' => 'integer',
         'character_position_x' => 'integer',
         'character_position_y' => 'integer',
     ];
 
-    public function character() {
+    public function character()
+    {
         return $this->belongsTo(Character::class, 'character_id', 'id');
     }
 
-    public function gameMap() {
+    public function gameMap()
+    {
         return $this->belongsTo(GameMap::class, 'game_map_id', 'id');
     }
 
-    protected static function newFactory() {
+    protected static function newFactory()
+    {
         return MapFactory::new();
     }
 }

@@ -2,8 +2,8 @@
 
 namespace Database\Factories;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Flare\Models\CharacterSnapShot;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 class CharacterSnapShotFactory extends Factory
 {
@@ -22,9 +22,9 @@ class CharacterSnapShotFactory extends Factory
     public function definition()
     {
         return [
-            'character_id'               => 1,
-            'snap_shot'                  => [],
-            'battle_simmulation_data'    => [],
+            'character_id' => 1,
+            'snap_shot' => [],
+            'battle_simmulation_data' => [],
             'adventure_simmulation_data' => [],
         ];
     }

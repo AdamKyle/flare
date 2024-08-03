@@ -25,9 +25,10 @@ class ResetEnemyKingdomCache extends Command
     /**
      * Execute the console command.
      */
-    public function handle() {
+    public function handle()
+    {
         foreach (MapNameValue::$values as $name) {
-            Cache::delete('enemy-kingdoms-' . $name);
+            Cache::delete('enemy-kingdoms-'.$name);
         }
     }
 }

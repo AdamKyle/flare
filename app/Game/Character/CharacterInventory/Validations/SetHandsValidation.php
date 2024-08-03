@@ -7,8 +7,8 @@ use App\Flare\Values\ArmourTypes;
 use App\Flare\Values\WeaponTypes;
 use Illuminate\Support\Collection;
 
-class SetHandsValidation {
-
+class SetHandsValidation
+{
     const SINGLE_HANDED_TYPES = [
         WeaponTypes::WEAPON,
         WeaponTypes::MACE,
@@ -37,7 +37,7 @@ class SetHandsValidation {
                 WeaponTypes::STAVE => 0,
                 WeaponTypes::HAMMER => 0,
                 WeaponTypes::BOW => 0,
-            ]
+            ],
         ],
         'duel-handed-types' => [
             'max' => 1,
@@ -51,11 +51,12 @@ class SetHandsValidation {
                 WeaponTypes::STAVE => 0,
                 WeaponTypes::HAMMER => 0,
                 WeaponTypes::BOW => 0,
-            ]
-        ]
+            ],
+        ],
     ];
 
-    public function isInventorySetHandPositionsValid(InventorySet $inventorySet): bool {
+    public function isInventorySetHandPositionsValid(InventorySet $inventorySet): bool
+    {
 
         $slots = $inventorySet->slots;
 
@@ -67,7 +68,7 @@ class SetHandsValidation {
                 default => false,
             };
 
-            if (!$isValid) {
+            if (! $isValid) {
                 return false;
             }
 
@@ -76,9 +77,10 @@ class SetHandsValidation {
         return true;
     }
 
-    protected function validateSingleHandedTypes(Collection $slots, array $itemTypeRules): bool {
-        forEach (self::SINGLE_HANDED_TYPES as $type) {
-            if (!$this->isTypeValid($slots, $type, $itemTypeRules)) {
+    protected function validateSingleHandedTypes(Collection $slots, array $itemTypeRules): bool
+    {
+        foreach (self::SINGLE_HANDED_TYPES as $type) {
+            if (! $this->isTypeValid($slots, $type, $itemTypeRules)) {
                 return false;
             }
         }
@@ -86,9 +88,10 @@ class SetHandsValidation {
         return true;
     }
 
-    protected function validateDuelHandedTypes(Collection $slots, array $itemTypeRules): bool {
-        forEach (self::DUEL_HANDED_TYPES as $type) {
-            if (!$this->isTypeValid($slots, $type, $itemTypeRules)) {
+    protected function validateDuelHandedTypes(Collection $slots, array $itemTypeRules): bool
+    {
+        foreach (self::DUEL_HANDED_TYPES as $type) {
+            if (! $this->isTypeValid($slots, $type, $itemTypeRules)) {
                 return false;
             }
         }
@@ -96,11 +99,12 @@ class SetHandsValidation {
         return true;
     }
 
-    protected function isTypeValid(Collection $slots, string $type,  array $itemTypeRules): bool {
+    protected function isTypeValid(Collection $slots, string $type, array $itemTypeRules): bool
+    {
 
         $matchingSlots = $slots->where('item.type', $type);
         $itemTypeCount = $matchingSlots->count();
-        $itemIds       = $matchingSlots->pluck('item.id')->toArray();
+        $itemIds = $matchingSlots->pluck('item.id')->toArray();
 
         if ($itemTypeCount === 0) {
             return true;
@@ -110,21 +114,22 @@ class SetHandsValidation {
             return false;
         }
 
-        if (!$this->isSecondaryHandValid($slots, $type, $itemTypeRules, $itemIds, $itemTypeCount)) {
+        if (! $this->isSecondaryHandValid($slots, $type, $itemTypeRules, $itemIds, $itemTypeCount)) {
             return false;
         }
 
         return true;
     }
 
-    protected function isSecondaryHandValid(Collection $slots, string $primaryType, array $itemTypeRules, array $matchingItemIds, int $primaryTypeCount): bool {
+    protected function isSecondaryHandValid(Collection $slots, string $primaryType, array $itemTypeRules, array $matchingItemIds, int $primaryTypeCount): bool
+    {
         $hasSecondaryValidItem = false;
 
         foreach ($itemTypeRules['valid_secondary'] as $secondaryType => $maxAllowed) {
 
             if ($primaryType === $secondaryType) {
-                $secondaryItemCount = $slots->filter(function($slot) use($matchingItemIds, $primaryType) {
-                    return !in_array($slot->item_id, $matchingItemIds) && $slot->item->type === $primaryType;
+                $secondaryItemCount = $slots->filter(function ($slot) use ($matchingItemIds, $primaryType) {
+                    return ! in_array($slot->item_id, $matchingItemIds) && $slot->item->type === $primaryType;
                 })->count();
             } else {
                 $secondaryItemCount = $slots->where('item.type', $secondaryType)->count();
@@ -151,5 +156,4 @@ class SetHandsValidation {
 
         return true;
     }
-
 }

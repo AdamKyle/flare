@@ -3,31 +3,27 @@
 namespace App\Game\Messages\Services;
 
 use App\Flare\Models\User;
-use App\Flare\Models\Character;
-use App\Game\Messages\Models\Message;
 use App\Flare\Values\ItemEffectsValue;
-use App\Admin\Events\UpdateAdminChatEvent;
-use App\Game\Messages\Values\MapChatColor;
 use App\Game\Messages\Events\MessageSentEvent;
+use App\Game\Messages\Models\Message;
+use App\Game\Messages\Values\MapChatColor;
 
-class PublicMessage {
-
+class PublicMessage
+{
     /**
      * Post a public message.
-     *
-     * @param string $message
-     * @return void
      */
-    public function postPublicMessage(string $message): void {
+    public function postPublicMessage(string $message): void
+    {
         $user = auth()->user();
 
         $killedInPVP = $this->wasKilledInPVP($user);
 
         $newMessage = $user->messages()->create([
-            'message'       => $message,
-            'x_position'    => $killedInPVP ? 0 : $this->getXPosition($user),
-            'y_position'    => $killedInPVP ? 0 : $this->getYPosition($user),
-            'color'         => $this->getColor($user),
+            'message' => $message,
+            'x_position' => $killedInPVP ? 0 : $this->getXPosition($user),
+            'y_position' => $killedInPVP ? 0 : $this->getYPosition($user),
+            'color' => $this->getColor($user),
             'hide_location' => $this->hideLocation($user),
         ]);
 
@@ -40,15 +36,12 @@ class PublicMessage {
 
     /**
      * Set the custom over rides on the text
-     *
-     * @param User $user
-     * @param Message $message
-     * @return Message
      */
-    protected function setUpCustomOverRides(User $user, Message $message): Message {
+    protected function setUpCustomOverRides(User $user, Message $message): Message
+    {
 
-        $message->custom_class   = $user->chat_text_color;
-        $message->is_chat_bold   = $user->chat_is_bold;
+        $message->custom_class = $user->chat_text_color;
+        $message->is_chat_bold = $user->chat_is_bold;
         $message->is_chat_italic = $user->chat_is_italic;
 
         return $message;
@@ -56,13 +49,11 @@ class PublicMessage {
 
     /**
      * Get the X Position of the user.
-     *
-     * @param User $user
-     * @return int
      */
-    protected function getXPosition(User $user): int {
+    protected function getXPosition(User $user): int
+    {
 
-        if (!$user->hasRole('Admin')) {
+        if (! $user->hasRole('Admin')) {
             return $user->character->map->character_position_x;
         }
 
@@ -71,13 +62,11 @@ class PublicMessage {
 
     /**
      * Get the Y position of the user.
-     *
-     * @param User $user
-     * @return int
      */
-    protected function getYPosition(User $user): int {
+    protected function getYPosition(User $user): int
+    {
 
-        if (!$user->hasRole('Admin')) {
+        if (! $user->hasRole('Admin')) {
             return $user->character->map->character_position_y;
         }
 
@@ -86,13 +75,11 @@ class PublicMessage {
 
     /**
      * Was the user killed in PVP?
-     *
-     * @param User $user
-     * @return bool
      */
-    protected function wasKilledInPVP(User $user): bool {
+    protected function wasKilledInPVP(User $user): bool
+    {
 
-        if (!$user->hasRole('Admin')) {
+        if (! $user->hasRole('Admin')) {
             return $user->character->killed_in_pvp;
         }
 
@@ -101,11 +88,9 @@ class PublicMessage {
 
     /**
      * Get the shortened name of the map the player is on.
-     *
-     * @param User $user
-     * @return string|null
      */
-    protected function shortenedMapName(User $user): ?string {
+    protected function shortenedMapName(User $user): ?string
+    {
         $user = auth()->user();
 
         if ($user->hasRole('Admin')) {
@@ -139,11 +124,9 @@ class PublicMessage {
 
     /**
      * Get the predefined hex code color of the message based on map name.
-     *
-     * @param User $user
-     * @return string|null
      */
-    protected function getColor(User $user): ?string {
+    protected function getColor(User $user): ?string
+    {
         if ($user->hasRole('Admin')) {
             return null;
         }
@@ -151,12 +134,13 @@ class PublicMessage {
         return (new MapChatColor($user->character->map->gameMap->name))->getColor();
     }
 
-    protected function hideLocation(User $user): bool {
+    protected function hideLocation(User $user): bool
+    {
         if ($user->hasRole('Admin')) {
             return false;
         }
 
-        return $user->character->inventory->slots->filter(function($slot) {
+        return $user->character->inventory->slots->filter(function ($slot) {
             return $slot->item->effect === ItemEffectsValue::HIDE_CHAT_LOCATION;
         })->isNotEmpty();
     }

@@ -11,7 +11,6 @@ use Tests\Traits\CreateInventorySets;
 
 class InventorySetManagement
 {
-
     use CreateInventorySets;
 
     private Character $character;
@@ -24,21 +23,16 @@ class InventorySetManagement
 
     /**
      * Constructor
-     *
-     * @param Character $character
-     * @param CharacterFactory|null $characterFactory
      */
-    public function __construct(Character $character, CharacterFactory $characterFactory = null)
+    public function __construct(Character $character, ?CharacterFactory $characterFactory = null)
     {
-        $this->character                = $character;
-        $this->characterFactory         = $characterFactory;
+        $this->character = $character;
+        $this->characterFactory = $characterFactory;
         $this->buildCharacterAttackData = resolve(BuildCharacterAttackTypes::class);
     }
 
     /**
      * Get the character factory.
-     *
-     * @return CharacterFactory
      */
     public function getCharacterFactory(): CharacterFactory
     {
@@ -48,8 +42,6 @@ class InventorySetManagement
     /**
      * Assign x inventory Sets.
      *
-     * @param int $amount
-     * @param bool $useName
      * @return $this
      */
     public function createInventorySets(int $amount = 1, bool $useName = false): InventorySetManagement
@@ -67,14 +59,9 @@ class InventorySetManagement
     /**
      * Puts an item in the characters inventory set.
      *
-     * @param Item $item
-     * @param int $setIndex
-     * @param string|null $position
-     * @param bool $equipped
-     * @return InventorySetManagement
      * @throws Exception
      */
-    public function putItemInSet(Item $item, int $setIndex, string $position = null, bool $equipped = false): InventorySetManagement
+    public function putItemInSet(Item $item, int $setIndex, ?string $position = null, bool $equipped = false): InventorySetManagement
     {
         $setId = $this->getInventorySetId($setIndex);
 
@@ -98,8 +85,6 @@ class InventorySetManagement
 
     /**
      * Get the character.
-     *
-     * @return Character
      */
     public function getCharacter(): Character
     {
@@ -109,8 +94,6 @@ class InventorySetManagement
     /**
      * Gets the ID or throws an exception.
      *
-     * @param int $index
-     * @return int
      * @throws Exception
      */
     public function getInventorySetId(int $index): int

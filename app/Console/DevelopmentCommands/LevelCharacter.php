@@ -59,6 +59,6 @@ class LevelCharacter extends Command
 
         $this->newLine(1);
 
-        $this->line('All Done! Character leveled to: ' . $this->argument('levels') + 1);
+        $this->line('All Done! Character leveled to: '.$this->argument('levels') + 1);
     }
 }

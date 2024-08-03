@@ -2,7 +2,6 @@
 
 namespace App\Game\Kingdoms\Handlers;
 
-
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\User;
 use App\Game\Core\Traits\KingdomCache;
@@ -10,36 +9,29 @@ use App\Game\Kingdoms\Events\UpdateGlobalMap;
 use App\Game\Maps\Events\UpdateMapDetailsBroadcast;
 use App\Game\Maps\Services\LocationService;
 
-class GiveKingdomsToNpcHandler {
-
+class GiveKingdomsToNpcHandler
+{
     use KingdomCache;
 
-    /**
-     * @var LocationService $locationService
-     */
     private LocationService $locationService;
 
-    /**
-     * @param LocationService $locationService
-     */
-    public function __construct(LocationService $locationService) {
+    public function __construct(LocationService $locationService)
+    {
         $this->locationService = $locationService;
     }
 
     /**
      * Give a single kingdom to the NPC.
-     *
-     * @param Kingdom $kingdom
-     * @return void
      */
-    public function giveKingdomToNPC(Kingdom $kingdom): void {
+    public function giveKingdomToNPC(Kingdom $kingdom): void
+    {
         $character = $kingdom->character;
 
         $this->removeKingdomFromCache($character, $kingdom);
 
         $kingdom->update([
-            'character_id'   => null,
-            'npc_owned'      => true,
+            'character_id' => null,
+            'npc_owned' => true,
             'current_morale' => 0.01,
         ]);
 
@@ -52,11 +44,9 @@ class GiveKingdomsToNpcHandler {
 
     /**
      * Give all users kingdoms to the NPC.
-     *
-     * @param User $user
-     * @return void
      */
-    public function giveKingdoms(User $user): void {
+    public function giveKingdoms(User $user): void
+    {
         $kingdoms = $user->character->kingdoms;
 
         if ($kingdoms->isEmpty()) {
@@ -66,8 +56,8 @@ class GiveKingdomsToNpcHandler {
         foreach ($kingdoms as $kingdom) {
 
             $kingdom->update([
-                'character_id'   => null,
-                'npc_owned'      => true,
+                'character_id' => null,
+                'npc_owned' => true,
                 'current_morale' => 0.01,
             ]);
         }

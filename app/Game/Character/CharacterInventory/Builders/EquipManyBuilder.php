@@ -7,8 +7,8 @@ use App\Game\Core\Traits\ResponseBuilder;
 use Exception;
 use Illuminate\Support\Collection;
 
-class EquipManyBuilder {
-
+class EquipManyBuilder
+{
     use ResponseBuilder;
 
     private array $itemsByType = [
@@ -40,12 +40,13 @@ class EquipManyBuilder {
         'ring-one' => 'ring-two',
         'right-hand' => 'left-hand',
         'spell-two' => 'spell-one',
-        'ring-two' => 'ring-one'
+        'ring-two' => 'ring-one',
     ];
 
     private array $singlePositionTypes = ['body', 'helmet', 'artifact', 'trinket', 'leggings', 'sleeves', 'gloves', 'feet'];
 
-    public function buildEquipmentArray(Character $character, array $slotIds): array {
+    public function buildEquipmentArray(Character $character, array $slotIds): array
+    {
         $inventory = $character->inventory;
 
         $slots = $inventory->slots->whereIn('id', $slotIds);
@@ -59,7 +60,8 @@ class EquipManyBuilder {
         return $itemsToEquip;
     }
 
-    private function categorizeItems(Collection $slots): array {
+    private function categorizeItems(Collection $slots): array
+    {
         foreach ($slots as $slot) {
             $item = $slot->item;
             $type = $item->type;
@@ -72,21 +74,21 @@ class EquipManyBuilder {
                     continue;
                 }
 
-                if (!is_null($oppositePosition) && !in_array($position, $this->singlePositionTypes)) {
+                if (! is_null($oppositePosition) && ! in_array($position, $this->singlePositionTypes)) {
 
-                    if ($this->hasPositionAlready($this->itemsByType, $position) && !$this->hasPositionAlready($this->itemsByType, $oppositePosition)) {
+                    if ($this->hasPositionAlready($this->itemsByType, $position) && ! $this->hasPositionAlready($this->itemsByType, $oppositePosition)) {
                         $position = $oppositePosition;
                     }
                 }
 
                 if (is_array($position)) {
-                    $type             = $position['type'];
-                    $equipPosition    = $position['position'];
+                    $type = $position['type'];
+                    $equipPosition = $position['position'];
 
                     if (array_key_exists($equipPosition, $this->oppositePositions)) {
                         $oppositePosition = $this->oppositePositions[$equipPosition];
 
-                        if (!is_null($oppositePosition)) {
+                        if (! is_null($oppositePosition)) {
                             $this->itemsByType[$type][] = [
                                 'type' => $type,
                                 'position' => $oppositePosition,
@@ -123,7 +125,8 @@ class EquipManyBuilder {
         return $this->itemsByType;
     }
 
-    private function hasPositionAlready(array $itemTypes, string $position): bool {
+    private function hasPositionAlready(array $itemTypes, string $position): bool
+    {
 
         $foundItems = [];
 
@@ -133,10 +136,10 @@ class EquipManyBuilder {
                 if (is_array($positionToEquip)) {
 
                     // Check if the key "position" exists in the current element
-                    if (array_key_exists("position", $positionToEquip)) {
+                    if (array_key_exists('position', $positionToEquip)) {
 
                         // Check if the value associated with the key "position" matches $x
-                        if ($positionToEquip["position"] === $position) {
+                        if ($positionToEquip['position'] === $position) {
                             $foundItems[$key] = $positions;
                         }
                     }
@@ -145,10 +148,11 @@ class EquipManyBuilder {
             }
         }
 
-        return !empty($foundItems);
+        return ! empty($foundItems);
     }
 
-    private function organizeItems(array $itemsByType): array {
+    private function organizeItems(array $itemsByType): array
+    {
         $organizedItems = [];
 
         foreach ($itemsByType as $type => $positions) {
@@ -162,7 +166,8 @@ class EquipManyBuilder {
         return $organizedItems;
     }
 
-    private function validateEquippableItems(array $itemsToEquip): void {
+    private function validateEquippableItems(array $itemsToEquip): void
+    {
         $positionCount = [];
 
         foreach ($itemsToEquip as $item) {
@@ -174,7 +179,7 @@ class EquipManyBuilder {
                 continue;
             }
 
-            if (!isset($positionCount[$position])) {
+            if (! isset($positionCount[$position])) {
                 $positionCount[$position] = 1;
             } else {
                 $positionCount[$position]++;
@@ -183,9 +188,8 @@ class EquipManyBuilder {
 
         foreach ($positionCount as $position => $count) {
             if ($count > 1) {
-                throw new Exception('You are trying to equip too many items for the position: ' . ucwords(str_replace('-', ' ', $position)));
+                throw new Exception('You are trying to equip too many items for the position: '.ucwords(str_replace('-', ' ', $position)));
             }
         }
     }
 }
-

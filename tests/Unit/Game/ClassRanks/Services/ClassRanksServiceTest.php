@@ -15,20 +15,21 @@ use Tests\Traits\CreateClass;
 use Tests\Traits\CreateGameClassSpecial;
 use Tests\Traits\CreateGameSkill;
 
-class ClassRanksServiceTest extends TestCase {
-
-    use RefreshDatabase, CreateGameClassSpecial, CreateClass, CreateGameSkill, CreateCharacterClassRank, CreateCharacterClassSpecialitiesEquipped;
+class ClassRanksServiceTest extends TestCase
+{
+    use CreateCharacterClassRank, CreateCharacterClassSpecialitiesEquipped, CreateClass, CreateGameClassSpecial, CreateGameSkill, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
     private ?ClassRankService $classRankService;
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
-        $this->character        = (new CharacterFactory())->createBaseCharacter()->assignSkill(
+        $this->character = (new CharacterFactory)->createBaseCharacter()->assignSkill(
             $this->createGameSkill([
-                'class_bonus' => 0.01
+                'class_bonus' => 0.01,
             ]),
             5
         )->givePlayerLocation();
@@ -36,35 +37,38 @@ class ClassRanksServiceTest extends TestCase {
         $this->classRankService = resolve(ClassRankService::class);
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
 
-        $this->character        = null;
+        $this->character = null;
         $this->classRankService = null;
     }
 
-    public function testGetClassRanks() {
+    public function testGetClassRanks()
+    {
         $response = $this->classRankService->getClassRanks($this->character->getCharacter());
 
         $this->assertEquals(200, $response['status']);
         $this->assertNotEmpty($response['class_ranks']);
     }
 
-    public function testOneOfTheClassesIsLocked() {
-        $heretic     = $this->createClass([
+    public function testOneOfTheClassesIsLocked()
+    {
+        $heretic = $this->createClass([
             'name' => 'Heretic',
         ]);
 
-        $thief       = $this->createClass([
+        $thief = $this->createClass([
             'name' => 'Thief',
         ]);
 
         $prisonerClass = $this->createClass([
-            'name'                            => 'Prisoner',
-            'primary_required_class_id'       => $heretic->id,
-            'secondary_required_class_id'     => $thief->id,
-            'primary_required_class_level'    => 10,
-            'secondary_required_class_level'  => 20,
+            'name' => 'Prisoner',
+            'primary_required_class_id' => $heretic->id,
+            'secondary_required_class_id' => $thief->id,
+            'primary_required_class_level' => 10,
+            'secondary_required_class_level' => 20,
         ]);
 
         $character = $this->character->addAdditionalClassRanks([$heretic->id, $thief->id, $prisonerClass->id])
@@ -81,14 +85,15 @@ class ClassRanksServiceTest extends TestCase {
         $this->assertNotFalse($index);
     }
 
-    public function testCannotEquipMoreThenThreeSpecialties() {
+    public function testCannotEquipMoreThenThreeSpecialties()
+    {
         $character = $this->character->getCharacter();
 
-        $classSpecialOne   = $this->createGameClassSpecial([
+        $classSpecialOne = $this->createGameClassSpecial([
             'game_class_id' => $character->game_class_id,
         ]);
 
-        $classSpecialTwo   = $this->createGameClassSpecial([
+        $classSpecialTwo = $this->createGameClassSpecial([
             'game_class_id' => $character->game_class_id,
         ]);
 
@@ -97,35 +102,35 @@ class ClassRanksServiceTest extends TestCase {
         ]);
 
         $character->classSpecialsEquipped()->create([
-            'character_id'            => $character->id,
-            'game_class_special_id'   => $classSpecialOne->id,
-            'level'                   => 0,
-            'current_xp'              => 0,
-            'required_xp'             => 100,
-            'equipped'                => true,
+            'character_id' => $character->id,
+            'game_class_special_id' => $classSpecialOne->id,
+            'level' => 0,
+            'current_xp' => 0,
+            'required_xp' => 100,
+            'equipped' => true,
         ]);
 
         $character->classSpecialsEquipped()->create([
-            'character_id'            => $character->id,
-            'game_class_special_id'   => $classSpecialTwo->id,
-            'level'                   => 0,
-            'current_xp'              => 0,
-            'required_xp'             => 100,
-            'equipped'                => true,
+            'character_id' => $character->id,
+            'game_class_special_id' => $classSpecialTwo->id,
+            'level' => 0,
+            'current_xp' => 0,
+            'required_xp' => 100,
+            'equipped' => true,
         ]);
 
         $character->classSpecialsEquipped()->create([
-            'character_id'            => $character->id,
-            'game_class_special_id'   => $classSpecialThree->id,
-            'level'                   => 0,
-            'current_xp'              => 0,
-            'required_xp'             => 100,
-            'equipped'                => true,
+            'character_id' => $character->id,
+            'game_class_special_id' => $classSpecialThree->id,
+            'level' => 0,
+            'current_xp' => 0,
+            'required_xp' => 100,
+            'equipped' => true,
         ]);
 
         $character = $character->refresh();
 
-        $classSpecialFour   = $this->createGameClassSpecial([
+        $classSpecialFour = $this->createGameClassSpecial([
             'game_class_id' => $character->game_class_id,
         ]);
 
@@ -135,31 +140,32 @@ class ClassRanksServiceTest extends TestCase {
         $this->assertEquals('You have the maximum amount of specials (3) equipped. You cannot equip anymore.', $response['message']);
     }
 
-    public function testCannotEquipAnotherDamageSpecial() {
+    public function testCannotEquipAnotherDamageSpecial()
+    {
         $character = $this->character->getCharacter();
 
         $classSpecial = $this->createGameClassSpecial([
-            'game_class_id'                            => $character->game_class_id,
-            'specialty_damage'                         => 50000,
-            'increase_specialty_damage_per_level'      => 50,
+            'game_class_id' => $character->game_class_id,
+            'specialty_damage' => 50000,
+            'increase_specialty_damage_per_level' => 50,
             'specialty_damage_uses_damage_stat_amount' => 0.10,
         ]);
 
         $character->classSpecialsEquipped()->create([
-            'character_id'            => $character->id,
-            'game_class_special_id'   => $classSpecial->id,
-            'level'                   => 0,
-            'current_xp'              => 0,
-            'required_xp'             => 100,
-            'equipped'                => true,
+            'character_id' => $character->id,
+            'game_class_special_id' => $classSpecial->id,
+            'level' => 0,
+            'current_xp' => 0,
+            'required_xp' => 100,
+            'equipped' => true,
         ]);
 
         $character = $character->refresh();
 
-        $classSpecialTwo   = $this->createGameClassSpecial([
-            'game_class_id'                            => $character->game_class_id,
-            'specialty_damage'                         => 50000,
-            'increase_specialty_damage_per_level'      => 50,
+        $classSpecialTwo = $this->createGameClassSpecial([
+            'game_class_id' => $character->game_class_id,
+            'specialty_damage' => 50000,
+            'increase_specialty_damage_per_level' => 50,
             'specialty_damage_uses_damage_stat_amount' => 0.10,
         ]);
 
@@ -169,15 +175,16 @@ class ClassRanksServiceTest extends TestCase {
         $this->assertEquals('You already have a damage specialty equipped and cannot equip another one.', $response['message']);
     }
 
-    public function testCannotEquipSpecialWhenLevelNotMet() {
+    public function testCannotEquipSpecialWhenLevelNotMet()
+    {
         $character = $this->character->getCharacter();
 
         $classSpecial = $this->createGameClassSpecial([
-            'game_class_id'                            => $character->game_class_id,
-            'specialty_damage'                         => 50000,
-            'increase_specialty_damage_per_level'      => 50,
+            'game_class_id' => $character->game_class_id,
+            'specialty_damage' => 50000,
+            'increase_specialty_damage_per_level' => 50,
             'specialty_damage_uses_damage_stat_amount' => 0.10,
-            'requires_class_rank_level'                => 10,
+            'requires_class_rank_level' => 10,
         ]);
 
         $response = $this->classRankService->equipSpecialty($character, $classSpecial);
@@ -186,24 +193,26 @@ class ClassRanksServiceTest extends TestCase {
         $this->assertEquals('You do not have the required class rank level for this.', $response['message']);
     }
 
-    public function testEquipClassSpecial() {
+    public function testEquipClassSpecial()
+    {
         $character = $this->character->getCharacter();
 
         $classSpecial = $this->createGameClassSpecial([
-            'game_class_id'                            => $character->game_class_id,
-            'specialty_damage'                         => 50000,
-            'increase_specialty_damage_per_level'      => 50,
+            'game_class_id' => $character->game_class_id,
+            'specialty_damage' => 50000,
+            'increase_specialty_damage_per_level' => 50,
             'specialty_damage_uses_damage_stat_amount' => 0.10,
         ]);
 
         $response = $this->classRankService->equipSpecialty($character, $classSpecial);
 
         $this->assertEquals(200, $response['status']);
-        $this->assertEquals('Equipped class special: ' . $classSpecial->name, $response['message']);
+        $this->assertEquals('Equipped class special: '.$classSpecial->name, $response['message']);
         $this->assertNotEmpty($response['specials_equipped']);
     }
 
-    public function testEquipAnotherClassSpecialty() {
+    public function testEquipAnotherClassSpecialty()
+    {
         $character = $this->character->getCharacter();
 
         $gameClass = $this->createClass(['name' => 'Heretic', 'damage_stat' => 'int']);
@@ -218,7 +227,7 @@ class ClassRanksServiceTest extends TestCase {
 
         $classSpecial = $this->createGameClassSpecial([
             'game_class_id' => $gameClass->id,
-            'requires_class_rank_level' => 50
+            'requires_class_rank_level' => 50,
         ]);
 
         $this->createCharacterClassRankSpecial([
@@ -227,13 +236,13 @@ class ClassRanksServiceTest extends TestCase {
             'level' => 100,
             'current_xp' => 1,
             'required_xp' => 10,
-            'equipped' => false
+            'equipped' => false,
         ]);
 
         $response = $this->classRankService->equipSpecialty($character, $classSpecial);
 
         $this->assertEquals(200, $response['status']);
-        $this->assertEquals('Equipped class special: ' . $classSpecial->name, $response['message']);
+        $this->assertEquals('Equipped class special: '.$classSpecial->name, $response['message']);
         $this->assertNotEmpty($response['specials_equipped']);
 
         $character = $character->refresh();
@@ -241,23 +250,24 @@ class ClassRanksServiceTest extends TestCase {
         $this->assertEquals(1, $character->classSpecialsEquipped->count());
     }
 
-    public function testRequipSpecialty() {
+    public function testRequipSpecialty()
+    {
         $character = $this->character->getCharacter();
 
         $classSpecial = $this->createGameClassSpecial([
-            'game_class_id'                            => $character->game_class_id,
-            'specialty_damage'                         => 50000,
-            'increase_specialty_damage_per_level'      => 50,
+            'game_class_id' => $character->game_class_id,
+            'specialty_damage' => 50000,
+            'increase_specialty_damage_per_level' => 50,
             'specialty_damage_uses_damage_stat_amount' => 0.10,
         ]);
 
         $character->classSpecialsEquipped()->create([
-            'character_id'            => $character->id,
-            'game_class_special_id'   => $classSpecial->id,
-            'level'                   => 0,
-            'current_xp'              => 0,
-            'required_xp'             => 100,
-            'equipped'                => false,
+            'character_id' => $character->id,
+            'game_class_special_id' => $classSpecial->id,
+            'level' => 0,
+            'current_xp' => 0,
+            'required_xp' => 100,
+            'equipped' => false,
         ]);
 
         $character = $character->refresh();
@@ -265,7 +275,7 @@ class ClassRanksServiceTest extends TestCase {
         $response = $this->classRankService->equipSpecialty($character, $classSpecial);
 
         $this->assertEquals(200, $response['status']);
-        $this->assertEquals('Equipped class special: ' . $classSpecial->name, $response['message']);
+        $this->assertEquals('Equipped class special: '.$classSpecial->name, $response['message']);
         $this->assertNotEmpty($response['specials_equipped']);
 
         $character = $character->refresh();
@@ -273,24 +283,25 @@ class ClassRanksServiceTest extends TestCase {
         $this->assertEquals(1, $character->classSpecialsEquipped->count());
     }
 
-    public function testCannotUnequipSpecialtyYouDoNotOwn() {
-        $character    = $this->character->getCharacter();
-        $characterTwo = (new CharacterFactory())->createBaseCharacter()->getCharacter();
+    public function testCannotUnequipSpecialtyYouDoNotOwn()
+    {
+        $character = $this->character->getCharacter();
+        $characterTwo = (new CharacterFactory)->createBaseCharacter()->getCharacter();
 
         $classSpecial = $this->createGameClassSpecial([
-            'game_class_id'                            => $characterTwo->game_class_id,
-            'specialty_damage'                         => 50000,
-            'increase_specialty_damage_per_level'      => 50,
+            'game_class_id' => $characterTwo->game_class_id,
+            'specialty_damage' => 50000,
+            'increase_specialty_damage_per_level' => 50,
             'specialty_damage_uses_damage_stat_amount' => 0.10,
         ]);
 
         $classSpecialEquipped = $characterTwo->classSpecialsEquipped()->create([
-            'character_id'            => $characterTwo->id,
-            'game_class_special_id'   => $classSpecial->id,
-            'level'                   => 0,
-            'current_xp'              => 0,
-            'required_xp'             => 100,
-            'equipped'                => false,
+            'character_id' => $characterTwo->id,
+            'game_class_special_id' => $classSpecial->id,
+            'level' => 0,
+            'current_xp' => 0,
+            'required_xp' => 100,
+            'equipped' => false,
         ]);
 
         $characterTwo->refresh();
@@ -301,23 +312,24 @@ class ClassRanksServiceTest extends TestCase {
         $this->assertEquals('You do not own that.', $response['message']);
     }
 
-    public function testCanUnequipSpecialty() {
-        $character    = $this->character->getCharacter();
+    public function testCanUnequipSpecialty()
+    {
+        $character = $this->character->getCharacter();
 
         $classSpecial = $this->createGameClassSpecial([
-            'game_class_id'                            => $character->game_class_id,
-            'specialty_damage'                         => 50000,
-            'increase_specialty_damage_per_level'      => 50,
+            'game_class_id' => $character->game_class_id,
+            'specialty_damage' => 50000,
+            'increase_specialty_damage_per_level' => 50,
             'specialty_damage_uses_damage_stat_amount' => 0.10,
         ]);
 
         $classSpecialEquipped = $character->classSpecialsEquipped()->create([
-            'character_id'            => $character->id,
-            'game_class_special_id'   => $classSpecial->id,
-            'level'                   => 0,
-            'current_xp'              => 0,
-            'required_xp'             => 100,
-            'equipped'                => true,
+            'character_id' => $character->id,
+            'game_class_special_id' => $classSpecial->id,
+            'level' => 0,
+            'current_xp' => 0,
+            'required_xp' => 100,
+            'equipped' => true,
         ]);
 
         $character = $character->refresh();
@@ -325,11 +337,12 @@ class ClassRanksServiceTest extends TestCase {
         $response = $this->classRankService->unequipSpecial($character, $classSpecialEquipped);
 
         $this->assertEquals(200, $response['status']);
-        $this->assertEquals('Unequipped class special: ' . $classSpecialEquipped->gameClassSpecial->name, $response['message']);
+        $this->assertEquals('Unequipped class special: '.$classSpecialEquipped->gameClassSpecial->name, $response['message']);
         $this->assertEmpty($response['specials_equipped']);
     }
 
-    public function testNoXpForMaxLevel() {
+    public function testNoXpForMaxLevel()
+    {
         $character = $this->character->getCharacter();
 
         $character->classRanks()->update(['level' => ClassRankValue::MAX_LEVEL]);
@@ -345,7 +358,8 @@ class ClassRanksServiceTest extends TestCase {
         }
     }
 
-    public function testNoExpForNoInventory() {
+    public function testNoExpForNoInventory()
+    {
         $character = $this->character->getCharacter();
 
         $character->inventory->slots()->update(['equipped' => false]);
@@ -361,7 +375,8 @@ class ClassRanksServiceTest extends TestCase {
         }
     }
 
-    public function testGainLevelInClassRank() {
+    public function testGainLevelInClassRank()
+    {
         $character = $this->character->getCharacter();
 
         $currentlevel = $character->classRanks->first()->level;
@@ -375,23 +390,24 @@ class ClassRanksServiceTest extends TestCase {
         $this->assertNotEquals($currentlevel, $newLevel);
     }
 
-    public function testDoNotLevelUpSpecialtyWhenAtMax() {
-        $character    = $this->character->getCharacter();
+    public function testDoNotLevelUpSpecialtyWhenAtMax()
+    {
+        $character = $this->character->getCharacter();
 
         $classSpecial = $this->createGameClassSpecial([
-            'game_class_id'                            => $character->game_class_id,
-            'specialty_damage'                         => 50000,
-            'increase_specialty_damage_per_level'      => 50,
+            'game_class_id' => $character->game_class_id,
+            'specialty_damage' => 50000,
+            'increase_specialty_damage_per_level' => 50,
             'specialty_damage_uses_damage_stat_amount' => 0.10,
         ]);
 
         $classSpecialEquipped = $character->classSpecialsEquipped()->create([
-            'character_id'            => $character->id,
-            'game_class_special_id'   => $classSpecial->id,
-            'level'                   => ClassSpecialValue::MAX_LEVEL,
-            'current_xp'              => 0,
-            'required_xp'             => 100,
-            'equipped'                => true,
+            'character_id' => $character->id,
+            'game_class_special_id' => $classSpecial->id,
+            'level' => ClassSpecialValue::MAX_LEVEL,
+            'current_xp' => 0,
+            'required_xp' => 100,
+            'equipped' => true,
         ]);
 
         $currentLevel = $classSpecialEquipped->level;
@@ -407,23 +423,24 @@ class ClassRanksServiceTest extends TestCase {
         $this->assertEquals($currentLevel, $newlevel);
     }
 
-    public function testLevelUpSpecialty() {
-        $character    = $this->character->getCharacter();
+    public function testLevelUpSpecialty()
+    {
+        $character = $this->character->getCharacter();
 
         $classSpecial = $this->createGameClassSpecial([
-            'game_class_id'                            => $character->game_class_id,
-            'specialty_damage'                         => 50000,
-            'increase_specialty_damage_per_level'      => 50,
+            'game_class_id' => $character->game_class_id,
+            'specialty_damage' => 50000,
+            'increase_specialty_damage_per_level' => 50,
             'specialty_damage_uses_damage_stat_amount' => 0.10,
         ]);
 
         $classSpecialEquipped = $character->classSpecialsEquipped()->create([
-            'character_id'            => $character->id,
-            'game_class_special_id'   => $classSpecial->id,
-            'level'                   => 0,
-            'current_xp'              => 0,
-            'required_xp'             => 100,
-            'equipped'                => true,
+            'character_id' => $character->id,
+            'game_class_special_id' => $classSpecial->id,
+            'level' => 0,
+            'current_xp' => 0,
+            'required_xp' => 100,
+            'equipped' => true,
         ]);
 
         $currentLevel = $classSpecialEquipped->level;
@@ -439,13 +456,14 @@ class ClassRanksServiceTest extends TestCase {
         $this->assertNotequals($currentLevel, $newlevel);
     }
 
-    public function testDoNotLevelWeaponSpeacitlyWhenAtMaxLevel() {
+    public function testDoNotLevelWeaponSpeacitlyWhenAtMaxLevel()
+    {
         $character = $this->character->equipStartingEquipment()->getCharacter();
 
         foreach ($character->classRanks as $rank) {
             foreach ($rank->weaponMasteries as $mastery) {
                 $mastery->update([
-                    'level' => WeaponMasteryValue::MAX_LEVEL
+                    'level' => WeaponMasteryValue::MAX_LEVEL,
                 ]);
             }
         }
@@ -463,7 +481,8 @@ class ClassRanksServiceTest extends TestCase {
         }
     }
 
-    public function testDoNotGiveXPToMasteriesWhenNoInventory() {
+    public function testDoNotGiveXPToMasteriesWhenNoInventory()
+    {
         $character = $this->character->equipStartingEquipment()->getCharacter();
 
         $character->inventory->slots()->update(['equipped' => false]);
@@ -481,13 +500,14 @@ class ClassRanksServiceTest extends TestCase {
         }
     }
 
-    public function testLevelWeaponSpeacitly() {
+    public function testLevelWeaponSpeacitly()
+    {
         $character = $this->character->equipStartingEquipment()->getCharacter();
 
         foreach ($character->classRanks as $rank) {
             foreach ($rank->weaponMasteries as $mastery) {
                 $mastery->update([
-                    'level' => 0
+                    'level' => 0,
                 ]);
             }
         }

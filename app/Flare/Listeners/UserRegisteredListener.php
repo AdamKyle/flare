@@ -2,32 +2,32 @@
 
 namespace App\Flare\Listeners;
 
-use Carbon\Carbon;
-use Illuminate\Auth\Events\Registered;
 use App\Flare\Events\UpdateSiteStatisticsChart;
 use App\Flare\Models\User;
 use App\Flare\Models\UserSiteAccessStatistics;
+use Carbon\Carbon;
+use Illuminate\Auth\Events\Registered;
 
-class UserRegisteredListener {
-
-
+class UserRegisteredListener
+{
     /**
      * Handle the event.
-     *
-     * @param Registered $event
      */
-    public function handle(Registered $event) {
+    public function handle(Registered $event)
+    {
 
         if (is_null(UserSiteAccessStatistics::first())) {
 
             UserSiteAccessStatistics::create([
-                'amount_signed_in'  => 1,
+                'amount_signed_in' => 1,
                 'amount_registered' => 1,
-                'invalid_ips'       => [$event->user->ip_address],
-                'invalid_user_ids'  => [$event->user->id],
+                'invalid_ips' => [$event->user->ip_address],
+                'invalid_user_ids' => [$event->user->id],
             ]);
 
-            $adminUser = User::with('roles')->whereHas('roles', function($q) { $q->where('name', 'Admin'); })->first();
+            $adminUser = User::with('roles')->whereHas('roles', function ($q) {
+                $q->where('name', 'Admin');
+            })->first();
 
             if (is_null($adminUser)) {
                 return;
@@ -40,25 +40,25 @@ class UserRegisteredListener {
 
         if ($lastRecord->created_at->lt(Carbon::today(config('app.timezone')))) {
             UserSiteAccessStatistics::create([
-                'amount_signed_in'  => 1,
+                'amount_signed_in' => 1,
                 'amount_registered' => 1,
-                'invalid_ips'       => [$event->user->ip_address],
-                'invalid_user_ids'  => [$event->user->id]
+                'invalid_ips' => [$event->user->ip_address],
+                'invalid_user_ids' => [$event->user->id],
             ]);
         } else {
 
             $invalidUsers = $lastRecord->invalid_user_ids;
-            $invalidIps   = $lastRecord->invalid_ips;
+            $invalidIps = $lastRecord->invalid_ips;
 
             if (is_null($invalidUsers)) {
 
                 UserSiteAccessStatistics::create([
-                    'amount_signed_in'  => $lastRecord->amount_signed_in + 1,
+                    'amount_signed_in' => $lastRecord->amount_signed_in + 1,
                     'amount_registered' => $lastRecord->amount_registered + 1,
-                    'invalid_ips'       => [$event->user->ip_address],
-                    'invalid_user_ids'  => [$event->user->id]
+                    'invalid_ips' => [$event->user->ip_address],
+                    'invalid_user_ids' => [$event->user->id],
                 ]);
-            } else if (!in_array($event->user->id, $invalidUsers)) {
+            } elseif (! in_array($event->user->id, $invalidUsers)) {
                 $invalidIps[] = $event->user->ip_address;
                 $userId = $event->user->id;
 
@@ -69,10 +69,10 @@ class UserRegisteredListener {
                 }
 
                 UserSiteAccessStatistics::create([
-                    'amount_signed_in'  => $lastRecord->amount_signed_in + 1,
+                    'amount_signed_in' => $lastRecord->amount_signed_in + 1,
                     'amount_registered' => $lastRecord->amount_registered + 1,
-                    'invalid_ips'       => $invalidIps,
-                    'invalid_user_ids'  => $invalidUsers,
+                    'invalid_ips' => $invalidIps,
+                    'invalid_user_ids' => $invalidUsers,
                 ]);
             }
         }

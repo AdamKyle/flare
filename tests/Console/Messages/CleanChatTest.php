@@ -2,18 +2,19 @@
 
 namespace Tests\Console\Messages;
 
+use App\Game\Messages\Models\Message;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
-use App\Game\Messages\Models\Message;
 use Tests\TestCase;
 use Tests\Traits\CreateMessage;
 use Tests\Traits\CreateUser;
 
 class CleanChatTest extends TestCase
 {
-    use RefreshDatabase, CreateMessage, CreateUser;
+    use CreateMessage, CreateUser, RefreshDatabase;
 
-    public function testClearChat() {
+    public function testClearChat()
+    {
         $this->createMessage($this->createUser());
 
         DB::table('messages')->update([

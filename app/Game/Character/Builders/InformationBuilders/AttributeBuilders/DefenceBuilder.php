@@ -4,31 +4,28 @@ namespace App\Game\Character\Builders\InformationBuilders\AttributeBuilders;
 
 use Illuminate\Support\Collection;
 
-class DefenceBuilder extends BaseAttribute {
-
+class DefenceBuilder extends BaseAttribute
+{
     /**
      * Build defence.
-     *
-     * @param float $classBonus
-     * @param bool $voided
-     * @return int
      */
-    public function buildDefence(float $classBonus, bool $voided = false): int {
-        $baseAc      = $this->character->ac;
-        $skillBonus  = $this->fetchBaseAttributeFromSkills('base_ac');
+    public function buildDefence(float $classBonus, bool $voided = false): int
+    {
+        $baseAc = $this->character->ac;
+        $skillBonus = $this->fetchBaseAttributeFromSkills('base_ac');
 
         if (is_null($this->inventory)) {
             return $baseAc + $baseAc * $skillBonus;
         }
 
         $armourSlots = $this->getItemsWithBaseAC();
-        $itemAC      = $this->getACFromItems($armourSlots);
+        $itemAC = $this->getACFromItems($armourSlots);
 
-        $hasShield   = $armourSlots->filter(function($slot) {
+        $hasShield = $armourSlots->filter(function ($slot) {
             return $slot->item->type === 'shield';
         })->isNotEmpty();
 
-        if (!$hasShield) {
+        if (! $hasShield) {
             $classBonus = 0.0;
         }
 
@@ -40,11 +37,11 @@ class DefenceBuilder extends BaseAttribute {
 
         $itemAC = $itemAC + $itemAC * ($skillBonus + $affixBonus + $classBonus);
 
-
         return intval($baseAc + $itemAC);
     }
 
-    public function buildDefenceBreakDownDetails(bool $voided = false): array {
+    public function buildDefenceBreakDownDetails(bool $voided = false): array
+    {
         $details = [];
 
         $details['base_ac'] = $this->character->ac;
@@ -57,11 +54,9 @@ class DefenceBuilder extends BaseAttribute {
 
     /**
      * Get base ac from items and divide by amount of armour equipped.
-     *
-     * @param Collection $slots
-     * @return int
      */
-    protected function getACFromItems(Collection $slots): int {
+    protected function getACFromItems(Collection $slots): int
+    {
         $ac = 0;
 
         if ($slots->isEmpty()) {
@@ -75,10 +70,9 @@ class DefenceBuilder extends BaseAttribute {
 
     /**
      * Get all items with a base AC.
-     *
-     * @return Collection
      */
-    protected function getItemsWithBaseAC(): Collection {
+    protected function getItemsWithBaseAC(): Collection
+    {
 
         if (is_null($this->inventory)) {
             return collect();

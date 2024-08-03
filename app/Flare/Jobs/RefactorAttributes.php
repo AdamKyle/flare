@@ -2,18 +2,15 @@
 
 namespace App\Flare\Jobs;
 
-use App\Flare\Models\Event;
 use App\Flare\Models\ItemAffix;
-use App\Game\Events\Values\EventType;
-use App\Game\Messages\Events\GlobalMessageEvent;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
-class RefactorAttributes implements ShouldQueue {
-
+class RefactorAttributes implements ShouldQueue
+{
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     private array $affixIds;
@@ -27,20 +24,21 @@ class RefactorAttributes implements ShouldQueue {
     /**
      * Create a new job instance.
      */
-    public function __construct(array $affixIds, array $curve, string $attribute) {
-        $this->affixIds  = $affixIds;
-        $this->curve     = $curve;
+    public function __construct(array $affixIds, array $curve, string $attribute)
+    {
+        $this->affixIds = $affixIds;
+        $this->curve = $curve;
         $this->attribute = $attribute;
     }
 
-    public function handle() {
+    public function handle()
+    {
         $itemAffixes = ItemAffix::whereIn('id', $this->affixIds)->get();
-
 
         foreach ($itemAffixes as $index => $affix) {
 
             $affix->update([
-                $this->attribute => $this->curve[$index]
+                $this->attribute => $this->curve[$index],
             ]);
         }
     }

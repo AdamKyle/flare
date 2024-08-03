@@ -3,17 +3,13 @@
 namespace App\Console\Commands;
 
 use App\Flare\Models\HolyStack;
-use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 use App\Flare\Models\ItemSocket;
-use App\Flare\Models\Kingdom;
-use App\Flare\Models\MarketBoard;
-use App\Flare\Models\MarketHistory;
 use App\Flare\Models\Raid;
-use App\Flare\Models\SetSlot;
 use Illuminate\Console\Command;
 
-class CleanupUnusedItems extends Command {
+class CleanupUnusedItems extends Command
+{
     /**
      * The name and signature of the console command.
      *
@@ -30,10 +26,9 @@ class CleanupUnusedItems extends Command {
 
     /**
      * Execute the console command.
-     *
-     * @return void
      */
-    public function handle(): void {
+    public function handle(): void
+    {
 
         ini_set('memory_limit', '3G');
 
@@ -49,7 +44,7 @@ class CleanupUnusedItems extends Command {
 
         $prefixCount = count($prefixItems);
 
-        $this->line('Cleaning Prefixes (' . $prefixCount . ') ...');
+        $this->line('Cleaning Prefixes ('.$prefixCount.') ...');
         $this->newLine();
 
         $chunkedPrefixItems = array_chunk($prefixItems, 10);
@@ -72,7 +67,7 @@ class CleanupUnusedItems extends Command {
             ->where('type', '!=', 'artifact')
             ->pluck('id')->toArray();
 
-        $this->line('Cleaning Suffixes (' . count($suffixItems) . ') ...');
+        $this->line('Cleaning Suffixes ('.count($suffixItems).') ...');
         $this->newLine();
 
         $chunkedSuffixItems = array_chunk($suffixItems, 10);
@@ -106,7 +101,7 @@ class CleanupUnusedItems extends Command {
 
                 $raid = Raid::where('artifact_item_id', $item->id)->first();
 
-                if (!is_null($raid)) {
+                if (! is_null($raid)) {
                     continue;
                 }
 

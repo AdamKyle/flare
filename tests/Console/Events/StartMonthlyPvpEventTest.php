@@ -2,7 +2,6 @@
 
 namespace Tests\Console\Events;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\Models\Announcement;
 use App\Flare\Models\Event;
 use App\Game\Battle\Events\UpdateCharacterStatus;
@@ -10,6 +9,7 @@ use App\Game\Battle\Jobs\MonthlyPvpAutomation;
 use App\Game\Events\Values\EventType;
 use App\Game\Messages\Events\DeleteAnnouncementEvent;
 use App\Game\Messages\Events\GlobalMessageEvent;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event as FacadesEvent;
 use Illuminate\Support\Facades\Queue;
 use Tests\Setup\Character\CharacterFactory;
@@ -23,18 +23,20 @@ use Tests\Traits\CreateMonster;
 use Tests\Traits\CreateRaid;
 use Tests\Traits\CreateScheduledEvent;
 
-class StartMonthlyPvpEventTest extends TestCase {
-    use RefreshDatabase,
-        CreateScheduledEvent,
-        CreateRaid,
-        CreateMonster,
+class StartMonthlyPvpEventTest extends TestCase
+{
+    use CreateAnnouncement,
+        CreateEvent,
+        CreateGameMap,
         CreateItem,
         CreateLocation,
-        CreateGameMap,
-        CreateEvent,
-        CreateAnnouncement;
+        CreateMonster,
+        CreateRaid,
+        CreateScheduledEvent,
+        RefreshDatabase;
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
         $announcements = Announcement::all();
@@ -50,17 +52,19 @@ class StartMonthlyPvpEventTest extends TestCase {
         }
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
     }
 
-    public function testStartPvpEvent() {
-        (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
+    public function testStartPvpEvent()
+    {
+        (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
 
         $event = $this->createEvent([
-            'type'        => EventType::MONTHLY_PVP,
-            'started_at'  => now(),
-            'ends_at'     => now()->subMinute(10),
+            'type' => EventType::MONTHLY_PVP,
+            'started_at' => now(),
+            'ends_at' => now()->subMinute(10),
         ]);
 
         $this->createAnnouncement([

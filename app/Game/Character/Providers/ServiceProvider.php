@@ -7,14 +7,15 @@ use App\Game\Character\Console\Commands\AssignNewSkillsToPlayers;
 use App\Game\Character\Console\Commands\CreateCharacterAttackDataCache;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 
-class ServiceProvider extends ApplicationServiceProvider {
-
+class ServiceProvider extends ApplicationServiceProvider
+{
     /**
      * Register any application services.
      *
      * @return void
      */
-    public function register() {
+    public function register()
+    {
         $this->commands([
             CreateCharacterAttackDataCache::class,
             AssignNewFactionsToCharacters::class,
@@ -27,6 +28,5 @@ class ServiceProvider extends ApplicationServiceProvider {
      *
      * @return void
      */
-    public function boot() {
-    }
+    public function boot() {}
 }

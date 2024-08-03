@@ -2,41 +2,30 @@
 
 namespace App\Game\Maps\Events;
 
-use Illuminate\Broadcasting\Channel;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Foundation\Events\Dispatchable;
-use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use App\Game\Core\Traits\KingdomCache;
-Use App\Flare\Models\User;
+use Illuminate\Broadcasting\Channel;
+use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Broadcasting\PrivateChannel;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\SerializesModels;
 
 class UpdateCharacterBasePosition implements ShouldBroadcastNow
 {
-    use Dispatchable, InteractsWithSockets, SerializesModels, KingdomCache;
+    use Dispatchable, InteractsWithSockets, KingdomCache, SerializesModels;
 
-    /**
-     * @var array $basePosition
-     */
     public array $basePosition;
 
-    /**
-     * @var int $userId
-     */
     private int $userId;
 
     /**
      * Create a new event instance.
-     *
-     * @param int $userId
-     * @param int $x
-     * @param int $y
-     * @param int $gameMapId
      */
-    public function __construct(int $userId, int $x, int $y, int $gameMapId) {
+    public function __construct(int $userId, int $x, int $y, int $gameMapId)
+    {
         $this->basePosition = [
-            'x'           => $x,
-            'y'           => $y,
+            'x' => $x,
+            'y' => $y,
             'game_map_id' => $gameMapId,
         ];
 
@@ -45,10 +34,9 @@ class UpdateCharacterBasePosition implements ShouldBroadcastNow
 
     /**
      * Get the channels the event should broadcast on.
-     *
-     * @return Channel|array
      */
-    public function broadcastOn(): Channel|array {
-        return new PrivateChannel('update-character-position-' . $this->userId);
+    public function broadcastOn(): Channel|array
+    {
+        return new PrivateChannel('update-character-position-'.$this->userId);
     }
 }

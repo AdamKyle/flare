@@ -8,24 +8,28 @@ use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateGameSkill;
 
-class AssignNewFactionsToCharactersTest extends TestCase {
-    use RefreshDatabase, CreateGameSkill;
+class AssignNewFactionsToCharactersTest extends TestCase
+{
+    use CreateGameSkill, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
-        $this->character = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
+        $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
 
         $this->character = null;
     }
 
-    public function testAssignNewFaction() {
+    public function testAssignNewFaction()
+    {
         $character = $this->character->getCharacter();
 
         Artisan::call('assign:new-factions-to-characters');
@@ -35,7 +39,8 @@ class AssignNewFactionsToCharactersTest extends TestCase {
         $this->assertNotNull($character->factions->isNotEmpty());
     }
 
-    public function testDoNotAssignNewFaction() {
+    public function testDoNotAssignNewFaction()
+    {
         $character = $this->character->getCharacter();
 
         $character->factions()->create([

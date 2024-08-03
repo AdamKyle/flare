@@ -4,54 +4,58 @@ namespace App\Flare\Values;
 
 use Exception;
 
-class MaxCurrenciesValue {
+class MaxCurrenciesValue
+{
+    const MAX_GOLD = 2000000000000;
 
-    const MAX_GOLD      = 2000000000000;
     const MAX_GOLD_DUST = 1000000;
-    const MAX_SHARDS    = 1000000;
-    const MAX_COPPER    = 1000000;
 
-    const GOLD      = 0;
+    const MAX_SHARDS = 1000000;
+
+    const MAX_COPPER = 1000000;
+
+    const GOLD = 0;
+
     const GOLD_DUST = 1;
-    const SHARDS    = 2;
-    const COPPER    = 3;
+
+    const SHARDS = 2;
+
+    const COPPER = 3;
 
     private $value;
 
     private $amount;
 
     /**
-     * @var string[] $values
+     * @var string[]
      */
     protected static $values = [
         self::GOLD => 0,
         self::GOLD_DUST => 1,
         self::SHARDS => 2,
-        self::COPPER => 3
+        self::COPPER => 3,
     ];
 
     /**
      * MaxLevel constructor.
      *
-     * @param int $amount
-     * @param int $value
      * @throws Exception
      */
-    public function __construct(int $amount, int $value) {
-        if (!in_array($value, self::$values)) {
-            throw new Exception($value . ' does not exist.');
+    public function __construct(int $amount, int $value)
+    {
+        if (! in_array($value, self::$values)) {
+            throw new Exception($value.' does not exist.');
         }
 
-        $this->value  = $value;
+        $this->value = $value;
         $this->amount = $amount;
     }
 
     /**
      * Are we not allowed to give this currency?
-     *
-     * @return bool
      */
-    public function canNotGiveCurrency(): bool {
+    public function canNotGiveCurrency(): bool
+    {
         if ($this->isGold()) {
             return $this->amount >= self::MAX_GOLD;
         }
@@ -74,37 +78,33 @@ class MaxCurrenciesValue {
 
     /**
      * Are we gold?
-     *
-     * @return bool
      */
-    public function isGold(): bool {
+    public function isGold(): bool
+    {
         return $this->value === self::GOLD;
     }
 
     /**
      * Are we gold dust?
-     *
-     * @return bool
      */
-    public function isGoldDust(): bool {
+    public function isGoldDust(): bool
+    {
         return $this->value === self::GOLD_DUST;
     }
 
     /**
      * Are we shards?
-     *
-     * @return bool
      */
-    public function isShards(): bool {
+    public function isShards(): bool
+    {
         return $this->value === self::SHARDS;
     }
 
     /**
      * Is Copper Coins?
-     *
-     * @return bool
      */
-    public function isCopper(): bool {
+    public function isCopper(): bool
+    {
         return $this->value === self::COPPER;
     }
 }

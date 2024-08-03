@@ -2,7 +2,6 @@
 
 namespace App\Game\Character\Builders\InformationBuilders\AttributeBuilders;
 
-
 use App\Flare\Models\Character;
 use App\Flare\Models\GameMap;
 use App\Flare\Values\ItemEffectsValue;
@@ -10,28 +9,20 @@ use App\Flare\Values\WeaponTypes;
 use Exception;
 use Illuminate\Support\Collection;
 
-class DamageBuilder extends BaseAttribute {
-
-    /**
-     * @var ClassRanksWeaponMasteriesBuilder $classRanksWeaponMasteriesBuilder
-     */
+class DamageBuilder extends BaseAttribute
+{
     private ClassRanksWeaponMasteriesBuilder $classRanksWeaponMasteriesBuilder;
 
-    /**
-     * @param ClassRanksWeaponMasteriesBuilder $classRanksWeaponMasteriesBuilder
-     */
-    public function __construct(ClassRanksWeaponMasteriesBuilder $classRanksWeaponMasteriesBuilder) {
+    public function __construct(ClassRanksWeaponMasteriesBuilder $classRanksWeaponMasteriesBuilder)
+    {
         $this->classRanksWeaponMasteriesBuilder = $classRanksWeaponMasteriesBuilder;
     }
 
     /**
-     * @inheritDoc
-     * @param Character $character
-     * @param Collection $skills
-     * @param Collection|null $inventory
-     * @return void
+     * {@inheritDoc}
      */
-    public function initialize(Character $character, Collection $skills, ?Collection $inventory): void {
+    public function initialize(Character $character, Collection $skills, ?Collection $inventory): void
+    {
         parent::initialize($character, $skills, $inventory);
 
         $this->classRanksWeaponMasteriesBuilder->initialize($this->character, $this->skills, $this->inventory);
@@ -40,19 +31,16 @@ class DamageBuilder extends BaseAttribute {
     /**
      * Build weapon damage.
      *
-     * @param float $damageStat
-     * @param bool $voided
-     * @param string $position
-     * @return float
      * @throws Exception
      */
-    public function buildWeaponDamage(float $damageStat, bool $voided = false, string $position = 'both'): float {
-        $class      = $this->character->class;
+    public function buildWeaponDamage(float $damageStat, bool $voided = false, string $position = 'both'): float
+    {
+        $class = $this->character->class;
         $baseDamage = 0;
 
         if ($this->character->class->type()->isFighter()) {
             $baseDamage = $damageStat * 0.15;
-        } else if ($this->character->class->type()->isArcaneAlchemist()) {
+        } elseif ($this->character->class->type()->isArcaneAlchemist()) {
             $hasStaveEquipped = $this->inventory->filter(function ($slot) {
                 return $slot->item->type === WeaponTypes::STAVE;
             })->isNotEmpty();
@@ -66,7 +54,7 @@ class DamageBuilder extends BaseAttribute {
             $baseDamage = $damageStat * 0.05;
         }
 
-        $itemDamage      = $this->getDamageFromWeapons($position);
+        $itemDamage = $this->getDamageFromWeapons($position);
         $skillPercentage = 0;
 
         if ($this->shouldIncludeSkillDamage($class, 'weapon')) {
@@ -79,7 +67,7 @@ class DamageBuilder extends BaseAttribute {
             return $totalDamage + $totalDamage * $skillPercentage;
         }
 
-        $affixPercentage         = $this->getAttributeBonusFromAllItemAffixes('base_damage');
+        $affixPercentage = $this->getAttributeBonusFromAllItemAffixes('base_damage');
         $weaponMasteryPercentage = $this->classRanksWeaponMasteriesBuilder->determineBonusForWeapon($position);
 
         $damage = $totalDamage + $totalDamage * ($skillPercentage + $affixPercentage + $weaponMasteryPercentage);
@@ -91,7 +79,8 @@ class DamageBuilder extends BaseAttribute {
         return $damage;
     }
 
-    public function buildWeaponDamageBreakDown(float $damageStat, bool $voided): array {
+    public function buildWeaponDamageBreakDown(float $damageStat, bool $voided): array
+    {
         $details = [];
 
         if ($this->character->class->type()->isFighter()) {
@@ -100,7 +89,7 @@ class DamageBuilder extends BaseAttribute {
             $details['base_damage'] = number_format($baseDamage);
             $details['percentage_of_stat_used'] = 0.15;
 
-        } else if ($this->character->class->type()->isArcaneAlchemist()) {
+        } elseif ($this->character->class->type()->isArcaneAlchemist()) {
             $hasStaveEquipped = $this->inventory->filter(function ($slot) {
                 return $slot->item->type === WeaponTypes::STAVE;
             })->isNotEmpty();
@@ -159,29 +148,24 @@ class DamageBuilder extends BaseAttribute {
         return $details;
     }
 
-
-
     /**
      * Build ring damage.
-     *
-     * @return int
      */
-    public function buildRingDamage(): int {
+    public function buildRingDamage(): int
+    {
         return $this->getDamageFromItems('ring', 'both');
     }
 
     /**
      * Build spell damage.
      *
-     * @param bool $voided
-     * @param string $position
-     * @return float
      * @throws Exception
      */
-    public function buildSpellDamage(bool $voided = false, string $position = 'both'): float {
+    public function buildSpellDamage(bool $voided = false, string $position = 'both'): float
+    {
         $class = $this->character->class;
 
-        $itemDamage      = $this->getDamageFromItems('spell-damage', $position);
+        $itemDamage = $this->getDamageFromItems('spell-damage', $position);
 
         $skillPercentage = 0;
 
@@ -202,7 +186,8 @@ class DamageBuilder extends BaseAttribute {
         return $damage;
     }
 
-    public function buildSpellDamageBreakDownDetails(bool $voided): array {
+    public function buildSpellDamageBreakDownDetails(bool $voided): array
+    {
         $details = [];
 
         $details['attached_affixes'] = $this->getAttributeBonusFromAllItemAffixesDetails('base_damage', $voided, 'spell-damage');
@@ -223,7 +208,8 @@ class DamageBuilder extends BaseAttribute {
         return $details;
     }
 
-    public function buildRingDamageBreakDown(): array {
+    public function buildRingDamageBreakDown(): array
+    {
         $details['attached_affixes'] = $this->getAttributeBonusFromAllItemAffixesDetails('base_damage', false, 'ring');
         $details['base_damage'] = $this->getDamageFromItems('ring', 'both');
         $details['skills_effecting_damage'] = null;
@@ -235,10 +221,10 @@ class DamageBuilder extends BaseAttribute {
     /**
      * Build stacking affix damage.
      *
-     * @param bool $voided
      * @return int
      */
-    public function buildAffixStackingDamage(bool $voided = false): float {
+    public function buildAffixStackingDamage(bool $voided = false): float
+    {
 
         if ($voided || is_null($this->inventory)) {
             return 0;
@@ -253,10 +239,10 @@ class DamageBuilder extends BaseAttribute {
     /**
      * Build affix non stacking damage.
      *
-     * @param bool $voided
      * @return int
      */
-    public function buildAffixNonStackingDamage(bool $voided = false): float {
+    public function buildAffixNonStackingDamage(bool $voided = false): float
+    {
 
         if ($voided || is_null($this->inventory)) {
             return 0;
@@ -276,28 +262,25 @@ class DamageBuilder extends BaseAttribute {
 
     /**
      * Build life stealing.
-     *
-     * @param bool $voided
-     * @return float
      */
-    public function buildLifeStealingDamage(bool $voided = false): float {
+    public function buildLifeStealingDamage(bool $voided = false): float
+    {
 
         if ($voided || is_null($this->inventory)) {
             return 0;
         }
 
-        $class   = $this->character->class;
+        $class = $this->character->class;
         $gameMap = $this->character->map->gameMap;
 
         if ($class->type()->isVampire()) {
             $itemSuffix = $this->inventory->sum('item.itemSuffix.steal_life_amount');
             $itemPrefix = $this->inventory->sum('item.itemPrefix.steal_life_amount');
 
-            $lifeStealAmount  = $itemSuffix + $itemPrefix;
-
+            $lifeStealAmount = $itemSuffix + $itemPrefix;
 
             if ($lifeStealAmount >= 1) {
-                $lifeStealAmount =  0.99;
+                $lifeStealAmount = 0.99;
             }
 
             $lifeStealAmount = $this->getLifeStealAfterPlaneReductions($gameMap, $lifeStealAmount);
@@ -323,7 +306,8 @@ class DamageBuilder extends BaseAttribute {
         return max($lifeStealAmount, 0);
     }
 
-    protected function getLifeStealAfterPlaneReductions(GameMap $gameMap, float $lifeSteal): float {
+    protected function getLifeStealAfterPlaneReductions(GameMap $gameMap, float $lifeSteal): float
+    {
 
         if ($gameMap->mapType()->isHell()) {
             return $lifeSteal - ($lifeSteal * .10);
@@ -337,11 +321,11 @@ class DamageBuilder extends BaseAttribute {
             return $lifeSteal - ($lifeSteal * .25);
         }
 
-        $hasPurgatoryItem = $this->character->inventory->slots->filter(function($slot) {
+        $hasPurgatoryItem = $this->character->inventory->slots->filter(function ($slot) {
             return $slot->item->type === 'quest' && $slot->item->effect === ItemEffectsValue::PURGATORY;
         })->first();
 
-        if (!is_null($hasPurgatoryItem)) {
+        if (! is_null($hasPurgatoryItem)) {
             if ($gameMap->mapType()->isTheIcePlane()) {
                 return $lifeSteal - ($lifeSteal * .20);
             }

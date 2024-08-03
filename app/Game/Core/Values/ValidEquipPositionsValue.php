@@ -5,16 +5,14 @@ namespace App\Game\Core\Values;
 use App\Flare\Models\Item;
 use App\Flare\Values\ArmourTypes;
 
-class ValidEquipPositionsValue {
-
+class ValidEquipPositionsValue
+{
     /**
      * Get positions for an item
-     *
-     * @param Item $item
-     * @return array
      */
-    public function getPositions(Item $item): array {
-        if (!is_null($item->default_position)) {
+    public function getPositions(Item $item): array
+    {
+        if (! is_null($item->default_position)) {
             if (in_array($item->default_position, array_merge(
                 ArmourTypes::armourTypes(),
             ))) {
@@ -24,7 +22,7 @@ class ValidEquipPositionsValue {
 
         $positions = [];
 
-        switch($item->type) {
+        switch ($item->type) {
             case 'weapon':
             case 'stave':
             case 'bow':

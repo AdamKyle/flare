@@ -2,11 +2,12 @@
 
 namespace Database\Factories;
 
-use Illuminate\Support\Str;
 use App\Flare\Models\Announcement;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
-class AnnouncementFactory extends Factory {
+class AnnouncementFactory extends Factory
+{
     /**
      * The name of the factory's corresponding model.
      *
@@ -19,11 +20,12 @@ class AnnouncementFactory extends Factory {
      *
      * @return array
      */
-    public function definition() {
+    public function definition()
+    {
         return [
-            'message'     => Str::random(100),
-            'expires_at'  => now(),
-            'event_id'    => null,
+            'message' => Str::random(100),
+            'expires_at' => now(),
+            'event_id' => null,
         ];
     }
 }

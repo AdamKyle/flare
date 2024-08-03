@@ -2,47 +2,39 @@
 
 namespace App\Game\Character\Builders\AttackBuilders\Jobs;
 
+use App\Flare\Models\Character;
+use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
+use App\Game\Core\Traits\UpdateMarketBoard;
+use App\Game\Exploration\Events\ExplorationLogUpdate;
 use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use App\Flare\Models\Character;
-use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
-use App\Game\Core\Traits\UpdateMarketBoard;
-use App\Game\Exploration\Events\ExplorationLogUpdate;
 
-class CharacterAttackTypesCacheBuilder implements ShouldQueue {
+class CharacterAttackTypesCacheBuilder implements ShouldQueue
+{
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, UpdateMarketBoard;
 
-    /**
-     * @var Character $character
-     */
     public Character $character;
 
-    /**
-     * @var bool $alertStatsUpdated
-     */
     public bool $alertStatsUpdated;
 
     /**
      * Create a new job instance.
-     *
-     * @param Character $character
-     * @param bool $alertStatsUpdated
      */
-    public function __construct(Character $character, bool $alertStatsUpdated = false) {
-        $this->character         = $character;
+    public function __construct(Character $character, bool $alertStatsUpdated = false)
+    {
+        $this->character = $character;
         $this->alertStatsUpdated = $alertStatsUpdated;
     }
 
     /**
-     * @param UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes
-     * @return void
      * @throws Exception
      */
-    public function handle(UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes): void {
+    public function handle(UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes): void
+    {
 
         $updateCharacterAttackTypes->updateCache($this->character);
 

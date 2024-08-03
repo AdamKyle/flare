@@ -4,8 +4,8 @@ namespace App\Flare\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class ItemSkill extends Model {
-
+class ItemSkill extends Model
+{
     /**
      * The attributes that are mass assignable.
      *
@@ -36,30 +36,32 @@ class ItemSkill extends Model {
      * @var array
      */
     protected $casts = [
-        'str_mod'             => 'float',
-        'dex_mod'             => 'float',
-        'dur_mod'             => 'float',
-        'chr_mod'             => 'float',
-        'focus_mod'           => 'float',
-        'int_mod'             => 'float',
-        'agi_mod'             => 'float',
-        'base_damage_mod'     => 'float',
-        'base_ac_mod'         => 'float',
-        'base_healing_mod'    => 'float',
-        'max_level'           => 'integer',
-        'total_kills_needed'  => 'integer',
-        'parent_id'           => 'integer',
-        'parent_level_needed' => 'integer'
+        'str_mod' => 'float',
+        'dex_mod' => 'float',
+        'dur_mod' => 'float',
+        'chr_mod' => 'float',
+        'focus_mod' => 'float',
+        'int_mod' => 'float',
+        'agi_mod' => 'float',
+        'base_damage_mod' => 'float',
+        'base_ac_mod' => 'float',
+        'base_healing_mod' => 'float',
+        'max_level' => 'integer',
+        'total_kills_needed' => 'integer',
+        'parent_id' => 'integer',
+        'parent_level_needed' => 'integer',
     ];
 
-    public function parent() {
+    public function parent()
+    {
         return $this->belongsTo($this, 'parent_id');
     }
 
-    public function children() {
+    public function children()
+    {
         return $this->hasMany($this, 'parent_id')
-                    ->with(
-                        'children'
-                    );
+            ->with(
+                'children'
+            );
     }
 }

@@ -11,7 +11,7 @@ class ResetPasswordEmail extends Mailable
     use Queueable, SerializesModels;
 
     /**
-     * @var string $token
+     * @var string
      */
     public $token;
 
@@ -33,9 +33,9 @@ class ResetPasswordEmail extends Mailable
     public function build()
     {
         return $this->from(config('mail.username'), 'Planes of Tlessa Admin')
-                    ->subject('Password Reset Requested')
-                    ->view('admin.email.admin-reset-user-password', [
-                        'token' => $this->token,
-                    ]);
+            ->subject('Password Reset Requested')
+            ->view('admin.email.admin-reset-user-password', [
+                'token' => $this->token,
+            ]);
     }
 }

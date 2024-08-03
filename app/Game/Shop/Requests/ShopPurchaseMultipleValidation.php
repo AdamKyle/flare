@@ -25,14 +25,15 @@ class ShopPurchaseMultipleValidation extends FormRequest
     {
         return [
             'item_id' => 'required|integer|exists:items,id',
-            'amount'  => 'required|integer',
+            'amount' => 'required|integer',
         ];
     }
 
-    public function messages() {
+    public function messages()
+    {
         return [
             'item_id.required' => 'What are you trying to buy multiple of child?',
-            'amount.required'  => 'How many do you want?'
+            'amount.required' => 'How many do you want?',
         ];
     }
 }

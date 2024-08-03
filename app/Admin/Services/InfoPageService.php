@@ -6,19 +6,22 @@ use App\Flare\Models\InfoPage;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
-class InfoPageService {
-
-    public function createPage(array $params): InfoPage {
+class InfoPageService
+{
+    public function createPage(array $params): InfoPage
+    {
         return $this->create($params);
     }
 
-    protected function create(array $params): InfoPage {
+    protected function create(array $params): InfoPage
+    {
         $section = $this->createSection($params);
 
         return $this->storeContents($params['page_name'], $section);
     }
 
-    public function formatForEditor(array $sections): array {
+    public function formatForEditor(array $sections): array
+    {
         $sections = array_values($sections);
 
         foreach ($sections as $index => $section) {
@@ -32,18 +35,19 @@ class InfoPageService {
         return $sections;
     }
 
-    protected function storeContents(string $pageName, array $sections): InfoPage {
+    protected function storeContents(string $pageName, array $sections): InfoPage
+    {
 
         $page = InfoPage::where('page_name', Str::kebab(strtolower($pageName)))->first();
 
-        if (!is_null($page)) {
-            $pageSections   = array_values($page->page_sections);
+        if (! is_null($page)) {
+            $pageSections = array_values($page->page_sections);
 
             $pageSections[] = $sections;
 
             $page->update(['page_sections' => $pageSections]);
         } else {
-            $pageSections   = [];
+            $pageSections = [];
             $pageSections[] = $sections;
 
             $page = InfoPage::create([
@@ -55,20 +59,23 @@ class InfoPageService {
         return $page->refresh();
     }
 
-    public function deleteStoredImages(array $sections, string $pageName) {
+    public function deleteStoredImages(array $sections, string $pageName)
+    {
         foreach ($sections as $section) {
-            if (!is_null($section['content_image_path'])) {
-                Storage::disk('info-sections-images')->delete('/' . $pageName . $section['content_image_path']);
+            if (! is_null($section['content_image_path'])) {
+                Storage::disk('info-sections-images')->delete('/'.$pageName.$section['content_image_path']);
             }
         }
     }
 
-    public function updatePage(InfoPage $page, array $params) {
+    public function updatePage(InfoPage $page, array $params)
+    {
         return $this->updateOrCreateSection($page, $params);
     }
 
-    public function deleteSectionFromPage(InfoPage $page, int $order): InfoPage {
-        $sections     = $page->page_sections;
+    public function deleteSectionFromPage(InfoPage $page, int $order): InfoPage
+    {
+        $sections = $page->page_sections;
         $sectionIndex = null;
 
         foreach ($sections as $index => $section) {
@@ -77,14 +84,13 @@ class InfoPageService {
             }
         }
 
-        if (!is_null($sectionIndex)) {
+        if (! is_null($sectionIndex)) {
             $section = $sections[$sectionIndex];
 
-            Storage::disk('info-sections-images')->delete('/' . $page->name . $section['content_image_path']);
+            Storage::disk('info-sections-images')->delete('/'.$page->name.$section['content_image_path']);
 
             unset($sections[$sectionIndex]);
         }
-
 
         $sections = $this->reOrderSectionAfterSectionDeletion($sections);
 
@@ -95,36 +101,37 @@ class InfoPageService {
         return $page->refresh();
     }
 
-    protected function updateOrCreateSection(InfoPage $page, array $params) {
-        $sections        = array_values($page->page_sections);
+    protected function updateOrCreateSection(InfoPage $page, array $params)
+    {
+        $sections = array_values($page->page_sections);
         $sectionToUpdate = null;
-        $sectionIndex    = null;
+        $sectionIndex = null;
 
         foreach ($sections as $index => $section) {
             if ((int) $section['order'] === (int) $params['order']) {
                 $sectionToUpdate = $section;
-                $sectionIndex    = $index;
+                $sectionIndex = $index;
 
                 break;
             }
         }
 
-        if (!is_null($sectionToUpdate)) {
+        if (! is_null($sectionToUpdate)) {
             $sectionToUpdate = $this->uploadNewImage($section, $params, $page->page_name);
 
             $content = str_replace('<p><br></p>', '', $params['content']);
             $content = str_replace('<p>&nbsp;</p>', '', $content);
             $content = str_replace('../../', '/', $content);
 
-            $sectionToUpdate['content']             = $content;
+            $sectionToUpdate['content'] = $content;
             $sectionToUpdate['live_wire_component'] = $params['live_wire_component'];
-            $sectionToUpdate['item_table_type']     = $params['item_table_type'];
-            $sectionToUpdate['order']               = (int) $params['order'];
+            $sectionToUpdate['item_table_type'] = $params['item_table_type'];
+            $sectionToUpdate['order'] = (int) $params['order'];
 
             $sections[$sectionIndex] = $sectionToUpdate;
 
             $page->update([
-                'page_sections' => $sections
+                'page_sections' => $sections,
             ]);
         }
 
@@ -134,14 +141,15 @@ class InfoPageService {
             $sections[] = $section;
 
             $page->update([
-                'page_sections' => $sections
+                'page_sections' => $sections,
             ]);
         }
     }
 
-    protected function uploadNewImage(array $section, array $params, string $pageName) {
+    protected function uploadNewImage(array $section, array $params, string $pageName)
+    {
         if (isset($params['content_image'])) {
-            Storage::disk('info-sections-images')->delete('/' . $pageName . $section['content_image_path']);
+            Storage::disk('info-sections-images')->delete('/'.$pageName.$section['content_image_path']);
             $path = Storage::disk('info-sections-images')->putFile($pageName, $params['content_image']);
 
             $section['content_image_path'] = $path;
@@ -150,7 +158,8 @@ class InfoPageService {
         return $section;
     }
 
-    protected function reOrderSectionAfterSectionDeletion(array $sections): array {
+    protected function reOrderSectionAfterSectionDeletion(array $sections): array
+    {
         $currentOrder = null;
 
         foreach ($sections as $index => $section) {
@@ -160,7 +169,7 @@ class InfoPageService {
                 continue;
             }
 
-            if (!is_null($currentOrder)) {
+            if (! is_null($currentOrder)) {
                 $sections[$index]['order'] = $currentOrder;
 
                 $currentOrder++;
@@ -170,9 +179,10 @@ class InfoPageService {
         return $sections;
     }
 
-    protected function createSection(array $params): array {
+    protected function createSection(array $params): array
+    {
         $pageName = $params['page_name'];
-        $path     = null;
+        $path = null;
 
         if (isset($params['content_image'])) {
             $path = Storage::disk('info-sections-images')->putFile(Str::kebab(strtolower($pageName)), $params['content_image']);
@@ -182,11 +192,11 @@ class InfoPageService {
         $content = str_replace('<p>&nbsp;</p>', '', $content);
 
         $sections = [
-            'order'               => (int) $params['order'],
-            'content'             => $content,
-            'content_image_path'  => $path,
+            'order' => (int) $params['order'],
+            'content' => $content,
+            'content_image_path' => $path,
             'live_wire_component' => $params['live_wire_component'] !== 'null' ? $params['live_wire_component'] : null,
-            'item_table_type'     => $params['item_table_type'] !== 'null' ? $params['item_table_type'] : null,
+            'item_table_type' => $params['item_table_type'] !== 'null' ? $params['item_table_type'] : null,
         ];
 
         return $sections;

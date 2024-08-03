@@ -22,10 +22,10 @@ class MaxLevelConfigurationFactory extends Factory
     public function definition()
     {
         return [
-            'max_level'      => 1,
-            'half_way'       => 1,
+            'max_level' => 1,
+            'half_way' => 1,
             'three_quarters' => 1,
-            'last_leg'       => 1,
+            'last_leg' => 1,
         ];
     }
 }

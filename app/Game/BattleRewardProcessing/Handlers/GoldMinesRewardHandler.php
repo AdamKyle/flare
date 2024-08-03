@@ -3,38 +3,33 @@
 namespace App\Game\BattleRewardProcessing\Handlers;
 
 use App\Flare\Builders\RandomAffixGenerator;
-use Facades\App\Flare\Calculators\DropCheckCalculator;
 use App\Flare\Models\Character;
 use App\Flare\Models\Event;
 use App\Flare\Models\Item;
 use App\Flare\Models\Location;
 use App\Flare\Models\Monster;
-use Facades\App\Flare\RandomNumber\RandomNumberGenerator;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Flare\Values\RandomAffixDetails;
-use Facades\App\Game\Core\Handlers\AnnouncementHandler;
 use App\Game\Events\Values\EventType;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
 use Exception;
+use Facades\App\Flare\Calculators\DropCheckCalculator;
+use Facades\App\Flare\RandomNumber\RandomNumberGenerator;
+use Facades\App\Game\Core\Handlers\AnnouncementHandler;
 use Illuminate\Support\Facades\Cache;
 
-class GoldMinesRewardHandler {
-
-
-    /**
-     * @var RandomAffixGenerator $randomAffixGenerator
-     */
+class GoldMinesRewardHandler
+{
     private RandomAffixGenerator $randomAffixGenerator;
 
-    /**
-     * @param RandomAffixGenerator $randomAffixGenerator
-     */
-    public function __construct(RandomAffixGenerator $randomAffixGenerator) {
+    public function __construct(RandomAffixGenerator $randomAffixGenerator)
+    {
         $this->randomAffixGenerator = $randomAffixGenerator;
     }
 
-    public function handleFightingAtGoldMines(Character $character, Monster $monster): Character {
+    public function handleFightingAtGoldMines(Character $character, Monster $monster): Character
+    {
 
         if ($character->currentAutomations->isNotEmpty()) {
             return $character;
@@ -49,8 +44,8 @@ class GoldMinesRewardHandler {
             return $character;
         }
 
-        if (!$location->locationType()->isGoldMines()) {
-             return $character;
+        if (! $location->locationType()->isGoldMines()) {
+            return $character;
         }
 
         $event = Event::where('type', EventType::GOLD_MINES)->first();
@@ -66,12 +61,9 @@ class GoldMinesRewardHandler {
 
     /**
      * is the monster at least halfway down the list?
-     *
-     * @param Location $location
-     * @param Monster $monster
-     * @return bool
      */
-    protected function isMonsterAtLeastHalfWayOrMore(Location $location, Monster $monster): bool {
+    protected function isMonsterAtLeastHalfWayOrMore(Location $location, Monster $monster): bool
+    {
 
         $monsters = Cache::get('monsters')[$location->name];
 
@@ -87,27 +79,24 @@ class GoldMinesRewardHandler {
      * Reward the character with currencies.
      *
      * - Only gives copper coins if the character has
-     *
-     * @param Character $character
-     * @param Event|null $event
-     * @return Character
      */
-    public function currencyReward(Character $character, Event $event = null): Character {
+    public function currencyReward(Character $character, ?Event $event = null): Character
+    {
         $maximumAmount = 500;
         $maximumGold = 10000;
 
-        if (!is_null($event)) {
+        if (! is_null($event)) {
             $maximumAmount = 2000;
             $maximumGold = 20000;
         }
 
         $goldDust = RandomNumberGenerator::generateRandomNumber(1, $maximumAmount);
-        $shards   = RandomNumberGenerator::generateRandomNumber(1, $maximumAmount);
-        $gold     = RandomNumberGenerator::generateRandomNumber(1, $maximumGold);
+        $shards = RandomNumberGenerator::generateRandomNumber(1, $maximumAmount);
+        $gold = RandomNumberGenerator::generateRandomNumber(1, $maximumGold);
 
-        $gold        += $character->gold;
-        $goldDust    += $character->gold_dust;
-        $shards      += $character->shards;
+        $gold += $character->gold;
+        $goldDust += $character->gold_dust;
+        $shards += $character->shards;
 
         if ($goldDust > MaxCurrenciesValue::MAX_GOLD_DUST) {
             $goldDust = MaxCurrenciesValue::MAX_GOLD_DUST;
@@ -133,12 +122,10 @@ class GoldMinesRewardHandler {
     /**
      * Handle item Reward for player.
      *
-     * @param Character $character
-     * @param Event|null $event
-     * @return Character
      * @throws Exception
      */
-    protected function handleItemReward(Character $character, Event $event = null): Character {
+    protected function handleItemReward(Character $character, ?Event $event = null): Character
+    {
         $lootingChance = $character->skills->where('baseSkill.name', 'Looting')->first()->skill_bonus;
         $maxRoll = 1000000;
 
@@ -146,13 +133,13 @@ class GoldMinesRewardHandler {
             $lootingChance = 0.15;
         }
 
-        if (!is_null($event)) {
+        if (! is_null($event)) {
             $lootingChance = .30;
             $maxRoll = $maxRoll / 2;
         }
 
         if (DropCheckCalculator::fetchDifficultItemChance($lootingChance, $maxRoll)) {
-            if (!$character->isInventoryFull()) {
+            if (! $character->isInventoryFull()) {
                 $this->rewardForCharacter($character);
             }
         }
@@ -165,12 +152,12 @@ class GoldMinesRewardHandler {
     /**
      * Reward player with item.
      *
-     * @param Character $character
-     * @param bool $isMythic
      * @return void
+     *
      * @throws Exception
      */
-    protected function rewardForCharacter(Character $character, bool $isMythic = false) {
+    protected function rewardForCharacter(Character $character, bool $isMythic = false)
+    {
         $item = Item::whereNull('specialty_type')
             ->whereNull('item_prefix_id')
             ->whereNull('item_suffix_id')
@@ -183,7 +170,7 @@ class GoldMinesRewardHandler {
             return;
         }
 
-        if (!$isMythic) {
+        if (! $isMythic) {
             $randomAffixGenerator = $this->randomAffixGenerator->setCharacter($character)->setPaidAmount(RandomAffixDetails::MEDIUM);
 
             $newItem = $item->duplicate();
@@ -195,10 +182,10 @@ class GoldMinesRewardHandler {
 
             $slot = $character->inventory->slots()->create([
                 'inventory_id' => $character->inventory->id,
-                'item_id'      => $newItem->id,
+                'item_id' => $newItem->id,
             ]);
 
-            event(new ServerMessageEvent($character->user, 'You found something MEDIUM but still unique, in the mines child: ' . $item->affix_name, $slot->id));
+            event(new ServerMessageEvent($character->user, 'You found something MEDIUM but still unique, in the mines child: '.$item->affix_name, $slot->id));
         }
     }
 
@@ -207,7 +194,8 @@ class GoldMinesRewardHandler {
      *
      * @return void
      */
-    protected function createPossibleEvent() {
+    protected function createPossibleEvent()
+    {
 
         if (Event::where('type', EventType::GOLD_MINES)->exists()) {
             return;
@@ -215,9 +203,9 @@ class GoldMinesRewardHandler {
 
         if (RandomNumberGenerator::generateTrueRandomNumber(1000000) >= 1000000) {
             Event::create([
-                'type'        => EventType::GOLD_MINES,
-                'started_at'  => now(),
-                'ends_at'     => now()->addHour(),
+                'type' => EventType::GOLD_MINES,
+                'started_at' => now(),
+                'ends_at' => now()->addHour(),
             ]);
 
             AnnouncementHandler::createAnnouncement('gold_mines');

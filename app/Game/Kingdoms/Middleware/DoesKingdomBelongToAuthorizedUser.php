@@ -2,8 +2,6 @@
 
 namespace App\Game\Kingdoms\Middleware;
 
-use App\Flare\Values\AutomationType;
-use App\Game\Messages\Events\ServerMessageEvent;
 use Closure;
 
 class DoesKingdomBelongToAuthorizedUser
@@ -12,29 +10,28 @@ class DoesKingdomBelongToAuthorizedUser
      * Handle an incoming request.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
      * @param  string|null  $guard
      * @return mixed
      */
     public function handle($request, Closure $next, $guard = null)
     {
-        $kingdom   = $request->has('kingdom') ? $request->kingdom : null;
+        $kingdom = $request->has('kingdom') ? $request->kingdom : null;
 
         if (is_null($kingdom)) {
             $building = $request->has('building') ? $request->building : null;
 
-            if (!is_null($building)) {
+            if (! is_null($building)) {
                 $kingdom = $building->kingdom;
             }
         }
 
         $character = $request->has('character') ? $request->character : null;
-        $message   = null;
+        $message = null;
 
-        if (!is_null($kingdom)) {
+        if (! is_null($kingdom)) {
 
             // Character was passed in with the kingdom:
-            if (!is_null($character)) {
+            if (! is_null($character)) {
                 if ($character->id !== $kingdom->character->id) {
                     $message = 'Nope. Not allowed to do that.';
                 }
@@ -46,7 +43,7 @@ class DoesKingdomBelongToAuthorizedUser
             }
 
             // Do something with the message:
-            if (!is_null($message)) {
+            if (! is_null($message)) {
                 if ($request->wantsJson()) {
                     return response()->json([
                         'error' => $message,
@@ -56,7 +53,6 @@ class DoesKingdomBelongToAuthorizedUser
                 }
             }
         }
-
 
         return $next($request);
     }

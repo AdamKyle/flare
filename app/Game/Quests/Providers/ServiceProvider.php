@@ -21,26 +21,27 @@ class ServiceProvider extends ApplicationServiceProvider
      *
      * @return void
      */
-    public function register() {
+    public function register()
+    {
 
         $this->commands([
             CreateQuestCache::class,
         ]);
 
-        $this->app->bind(NpcQuestsHandler::class, function($app) {
+        $this->app->bind(NpcQuestsHandler::class, function ($app) {
             return new NpcQuestsHandler(
                 $app->make(NpcServerMessageBuilder::class),
                 $app->make(NpcQuestRewardHandler::class),
             );
         });
 
-        $this->app->bind(NpcQuestRewardHandler::class, function($app) {
+        $this->app->bind(NpcQuestRewardHandler::class, function ($app) {
             return new NpcQuestRewardHandler(
                 $app->make(NpcServerMessageBuilder::class),
             );
         });
 
-        $this->app->bind(QuestHandlerService::class, function($app) {
+        $this->app->bind(QuestHandlerService::class, function ($app) {
             return new QuestHandlerService(
                 $app->make(NpcQuestsHandler::class),
                 $app->make(CanTravelToMap::class),
@@ -49,7 +50,7 @@ class ServiceProvider extends ApplicationServiceProvider
             );
         });
 
-        $this->app->bind(BuildQuestCacheService::class, function($app) {
+        $this->app->bind(BuildQuestCacheService::class, function ($app) {
             return new BuildQuestCacheService(
                 $app->make(QuestTransformer::class),
                 $app->make(Manager::class),

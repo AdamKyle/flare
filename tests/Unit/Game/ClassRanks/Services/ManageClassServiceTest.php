@@ -10,51 +10,54 @@ use Tests\TestCase;
 use Tests\Traits\CreateClass;
 use Tests\Traits\CreateGameSkill;
 
-class ManageClassServiceTest extends TestCase {
-
-    use RefreshDatabase, CreateClass, CreateGameSkill;
+class ManageClassServiceTest extends TestCase
+{
+    use CreateClass, CreateGameSkill, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
     private ?ManageClassService $manageClassService;
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
-        $this->character          = (new CharacterFactory())->createBaseCharacter()->assignSkill(
+        $this->character = (new CharacterFactory)->createBaseCharacter()->assignSkill(
             $this->createGameSkill([
-                'class_bonus' => 0.01
+                'class_bonus' => 0.01,
             ]), 5
         )->givePlayerLocation();
         $this->manageClassService = resolve(ManageClassService::class);
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
 
-        $this->character          = null;
+        $this->character = null;
         $this->manageClassService = null;
     }
 
-    public function testCannotSwitchToClassThatIsLocked() {
-        $heretic     = $this->createClass([
+    public function testCannotSwitchToClassThatIsLocked()
+    {
+        $heretic = $this->createClass([
             'name' => 'Heretic',
         ]);
 
-        $thief       = $this->createClass([
+        $thief = $this->createClass([
             'name' => 'Thief',
         ]);
 
         $prisonerClass = $this->createClass([
-            'name'                            => 'Prisoner',
-            'primary_required_class_id'       => $heretic->id,
-            'secondary_required_class_id'     => $thief->id,
-            'primary_required_class_level'    => 10,
-            'secondary_required_class_level'  => 20,
+            'name' => 'Prisoner',
+            'primary_required_class_id' => $heretic->id,
+            'secondary_required_class_id' => $thief->id,
+            'primary_required_class_level' => 10,
+            'secondary_required_class_level' => 20,
         ]);
 
         $character = $this->character->addAdditionalClassRanks([$heretic->id, $thief->id, $prisonerClass->id])
-                                     ->getCharacter();
+            ->getCharacter();
 
         $response = $this->manageClassService->switchClass($character, $prisonerClass);
 
@@ -62,11 +65,12 @@ class ManageClassServiceTest extends TestCase {
         $this->assertEquals('This class is locked. You must level this classes required classes to the specified levels.', $response['message']);
     }
 
-    public function testSwitchCharacterClass() {
+    public function testSwitchCharacterClass()
+    {
         $character = $this->character->getCharacter();
-        $skill     = $this->createGameSkill(['name' => 'Class Skill', 'game_class_id' => $character->game_class_id]);
+        $skill = $this->createGameSkill(['name' => 'Class Skill', 'game_class_id' => $character->game_class_id]);
 
-        $skillData              = (new BaseSkillValue())->getBaseCharacterSkillValue($character, $skill);
+        $skillData = (new BaseSkillValue)->getBaseCharacterSkillValue($character, $skill);
         $skillData['is_locked'] = false;
 
         $character->skills()->create($skillData);
@@ -85,11 +89,12 @@ class ManageClassServiceTest extends TestCase {
         $this->assertEquals($character->damage_stat, $gameClass->damage_stat);
     }
 
-    public function testReactivateSkill() {
+    public function testReactivateSkill()
+    {
         $character = $this->character->getCharacter();
-        $skill     = $this->createGameSkill(['name' => 'Class Skill', 'game_class_id' => $character->game_class_id]);
+        $skill = $this->createGameSkill(['name' => 'Class Skill', 'game_class_id' => $character->game_class_id]);
 
-        $skillData              = (new BaseSkillValue())->getBaseCharacterSkillValue($character, $skill);
+        $skillData = (new BaseSkillValue)->getBaseCharacterSkillValue($character, $skill);
         $skillData['is_locked'] = false;
         $skillData['is_hidden'] = true;
 

@@ -2,56 +2,44 @@
 
 namespace App\Game\Kingdoms\Controllers\Api;
 
-use Illuminate\Http\JsonResponse;
-use App\Http\Controllers\Controller;
 use App\Flare\Models\GameUnit;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\UnitInQueue;
+use App\Game\Kingdoms\Requests\CancelUnitRequest;
 use App\Game\Kingdoms\Requests\KingdomUnitRecruitmentRequest;
-use App\Game\Kingdoms\Values\KingdomMaxValue;
 use App\Game\Kingdoms\Service\UnitService;
 use App\Game\Kingdoms\Service\UpdateKingdom;
-use App\Game\Kingdoms\Requests\CancelUnitRequest;
+use App\Game\Kingdoms\Values\KingdomMaxValue;
+use App\Http\Controllers\Controller;
+use Illuminate\Http\JsonResponse;
 
-class KingdomUnitsController extends Controller {
-
-    /**
-     * @var UpdateKingdom $updateKingdom
-     */
+class KingdomUnitsController extends Controller
+{
     private UpdateKingdom $updateKingdom;
 
-    /**
-     * @var UnitService $unitService
-     */
     private UnitService $unitService;
 
-    /**
-     * @param UpdateKingdom $updateKingdom
-     * @param UnitService $unitService
-     */
-    public function __construct(UpdateKingdom $updateKingdom, UnitService $unitService) {
+    public function __construct(UpdateKingdom $updateKingdom, UnitService $unitService)
+    {
 
-        $this->updateKingdom    = $updateKingdom;
-        $this->unitService      = $unitService;
+        $this->updateKingdom = $updateKingdom;
+        $this->unitService = $unitService;
     }
 
     /**
-     * @param KingdomUnitRecruitmentRequest $request
-     * @param Kingdom $kingdom
-     * @param GameUnit $gameUnit
-     * @return JsonResponse
      * @throws \Exception
      */
-    public function recruitUnits(KingdomUnitRecruitmentRequest $request, Kingdom $kingdom, GameUnit $gameUnit): JsonResponse {
+    public function recruitUnits(KingdomUnitRecruitmentRequest $request, Kingdom $kingdom, GameUnit $gameUnit): JsonResponse
+    {
         if ($request->amount > KingdomMaxValue::MAX_UNIT) {
             return response()->json([
-                'message' => 'Too many units'
+                'message' => 'Too many units',
             ], 422);
         }
 
         if ($request->amount <= 0) {
             return response()->json([
-                'message' => 'Too few units to recruit.'
+                'message' => 'Too few units to recruit.',
             ], 422);
         }
 
@@ -59,9 +47,9 @@ class KingdomUnitsController extends Controller {
 
         $response = $this->unitService->handlePayment($gameUnit, $kingdom, $amount);
 
-        if (!empty($response)) {
+        if (! empty($response)) {
             return response()->json([
-                'message' => $response['message']
+                'message' => $response['message'],
             ], 422);
         }
 
@@ -74,15 +62,11 @@ class KingdomUnitsController extends Controller {
         ]);
     }
 
-    /**
-     * @param CancelUnitRequest $request
-     * @return JsonResponse
-     */
-    public function cancelRecruit(CancelUnitRequest $request): JsonResponse {
+    public function cancelRecruit(CancelUnitRequest $request): JsonResponse
+    {
 
         $queue = UnitInQueue::find($request->queue_id);
         $user = auth()->user();
-
 
         if (is_null($queue)) {
             return response()->json(['message' => 'Invalid Input.'], 422);
@@ -96,14 +80,14 @@ class KingdomUnitsController extends Controller {
 
         if (is_null($kingdom)) {
             return response()->json([
-                'message' => 'Your units are almost done. You can\'t cancel this late in the process.'
+                'message' => 'Your units are almost done. You can\'t cancel this late in the process.',
             ], 422);
         }
 
         $this->updateKingdom->updateKingdom($kingdom);
 
         return response()->json([
-            'message' => 'Your units have been disbanded. You got a % of some of the cost back in either resources or gold.'
+            'message' => 'Your units have been disbanded. You got a % of some of the cost back in either resources or gold.',
         ]);
     }
 }

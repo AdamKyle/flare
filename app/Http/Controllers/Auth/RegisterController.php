@@ -22,8 +22,8 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
-class RegisterController extends Controller {
-
+class RegisterController extends Controller
+{
     /*
     |--------------------------------------------------------------------------
     | Register Controller
@@ -37,23 +37,17 @@ class RegisterController extends Controller {
 
     use RegistersUsers;
 
-    /**
-     * @var CanUserEnterSiteService $canUserEnterSiteService
-     */
     private CanUserEnterSiteService $canUserEnterSiteService;
 
-    /**
-     * @var string
-     */
     protected string $redirectTo = '/';
-
 
     /**
      * Create a new controller instance.
      *
      * @return void
      */
-    public function __construct(CanUserEnterSiteService $canUserEnterSiteService) {
+    public function __construct(CanUserEnterSiteService $canUserEnterSiteService)
+    {
 
         $this->canUserEnterSiteService = $canUserEnterSiteService;
 
@@ -62,36 +56,32 @@ class RegisterController extends Controller {
 
     /**
      * Get a validator for an incoming registration request.
-     *
-     * @param  array  $data
-     * @return RequestValidator
      */
-    protected function validator(array $data): RequestValidator {
+    protected function validator(array $data): RequestValidator
+    {
         return Validator::make($data, [
-            'email'        => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password'     => ['required', 'string', 'min:10', 'confirmed'],
-            'name'         => ['required', 'string', 'min:5', 'max:15', 'unique:characters', 'regex:/^[a-zA-Z0-9]+$/', 'unique:characters'],
-            'race'         => ['required'],
-            'class'        => ['required'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'password' => ['required', 'string', 'min:10', 'confirmed'],
+            'name' => ['required', 'string', 'min:5', 'max:15', 'unique:characters', 'regex:/^[a-zA-Z0-9]+$/', 'unique:characters'],
+            'race' => ['required'],
+            'class' => ['required'],
         ]);
     }
 
     /**
      * Create a new user instance after a valid registration.
      *
-     * @param array $data
-     * @param string $ip
-     * @return User
      * @throws Exception
      */
-    protected function create(array $data, string $ip): User {
+    protected function create(array $data, string $ip): User
+    {
 
         $user = User::where('ip_address', $ip)->where('is_banned', true)->first();
 
         if ($user) {
-            $until = !is_null($user->unbanned_at) ? $user->unbanned_at->format('l jS \\of F Y h:i:s A') . ' ' . $user->unbanned_at->timezoneName . '.' : 'Forever.';
+            $until = ! is_null($user->unbanned_at) ? $user->unbanned_at->format('l jS \\of F Y h:i:s A').' '.$user->unbanned_at->timezoneName.'.' : 'Forever.';
 
-            throw new Exception('You have been banned until: ' . $until);
+            throw new Exception('You have been banned until: '.$until);
         }
 
         // Allows characters to create 10 accounts.
@@ -100,22 +90,21 @@ class RegisterController extends Controller {
         }
 
         return User::create([
-            'email'            => $data['email'],
-            'password'         => Hash::make($data['password']),
-            'ip_address'       => $ip,
-            'last_logged_in'   => now(),
-            'guide_enabled'    => true
+            'email' => $data['email'],
+            'password' => Hash::make($data['password']),
+            'ip_address' => $ip,
+            'last_logged_in' => now(),
+            'guide_enabled' => true,
         ]);
     }
 
     /**
      * Handle a registration request for the application.
      *
-     * @param Request $request
-     * @return RedirectResponse
      * @throws ValidationException
      */
-    public function register(Request $request): RedirectResponse {
+    public function register(Request $request): RedirectResponse
+    {
         $map = GameMap::where('default', true)->first();
 
         if (is_null($map)) {
@@ -124,7 +113,7 @@ class RegisterController extends Controller {
 
         $this->validator($request->all())->validate();
 
-        if (!$this->canUserEnterSiteService->canUserEnterSite($request->email)) {
+        if (! $this->canUserEnterSiteService->canUserEnterSite($request->email)) {
             return redirect()->back()->with('error', 'I am sorry, right now the Registration and Login has been disabled while server maintenance and stability testing is taking place. We will be back up and running soon!');
         }
 
@@ -135,7 +124,7 @@ class RegisterController extends Controller {
         }
 
         if ($user->guide_enabled) {
-            Cache::put('user-show-guide-initial-message-' . $user->id, 'true');
+            Cache::put('user-show-guide-initial-message-'.$user->id, 'true');
         }
 
         event(new Registered($user));
@@ -152,17 +141,15 @@ class RegisterController extends Controller {
 
     /**
      * Show the application registration form.
-     *
-     * @return View
      */
-    public function showRegistrationForm(): View {
-
+    public function showRegistrationForm(): View
+    {
 
         return view('auth.register', [
-            'races'   => GameRace::pluck('name', 'id'),
+            'races' => GameRace::pluck('name', 'id'),
             'classes' => GameClass::whereNull('primary_required_class_id')
-                                  ->whereNull('secondary_required_class_id')
-                                  ->pluck('name', 'id'),
+                ->whereNull('secondary_required_class_id')
+                ->pluck('name', 'id'),
         ]);
     }
 }

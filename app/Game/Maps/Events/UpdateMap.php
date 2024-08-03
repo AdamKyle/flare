@@ -2,48 +2,39 @@
 
 namespace App\Game\Maps\Events;
 
+use App\Flare\Models\User;
+use App\Game\Core\Traits\KingdomCache;
 use App\Game\Maps\Services\LocationService;
 use Illuminate\Broadcasting\Channel;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
-Use App\Flare\Models\User;
-use App\Game\Core\Traits\KingdomCache;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\SerializesModels;
 
 class UpdateMap implements ShouldBroadcastNow
 {
-    use Dispatchable, InteractsWithSockets, SerializesModels, KingdomCache;
+    use Dispatchable, InteractsWithSockets, KingdomCache, SerializesModels;
 
-    /**
-     * @var array $mapDetails
-     */
     public array $mapDetails;
 
-    /**
-     * @var User $user
-     */
     private User $user;
 
     /**
      * Create a new event instance.
-     *
-     * @param User $user
-     * @param bool $pvpMapUpdate
      */
-    public function __construct(User $user, bool $pvpMapUpdate = false) {
-        $character        = $user->character->refresh();
+    public function __construct(User $user, bool $pvpMapUpdate = false)
+    {
+        $character = $user->character->refresh();
         $this->mapDetails = resolve(LocationService::class)->setIsEventBasedUpdate($pvpMapUpdate)->getLocationData($character);
-        $this->user       = $user;
+        $this->user = $user;
     }
 
     /**
      * Get the channels the event should broadcast on.
-     *
-     * @return Channel|array
      */
-    public function broadcastOn(): Channel|array {
-        return new PrivateChannel('update-plane-' . $this->user->id);
+    public function broadcastOn(): Channel|array
+    {
+        return new PrivateChannel('update-plane-'.$this->user->id);
     }
 }

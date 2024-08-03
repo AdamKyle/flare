@@ -10,30 +10,32 @@ use App\Flare\ServerFight\Monster\ServerMonster;
 use App\Flare\Values\AttackTypeValue;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 
-class MonsterAttack extends BattleBase {
-
+class MonsterAttack extends BattleBase
+{
     private PlayerHealing $playerHealing;
 
     private Entrance $entrance;
 
     private CanHit $canHit;
 
-
-    public function __construct(CharacterCacheData $characterCacheData, PlayerHealing $playerHealing, Entrance $entrance, CanHit $canHit) {
+    public function __construct(CharacterCacheData $characterCacheData, PlayerHealing $playerHealing, Entrance $entrance, CanHit $canHit)
+    {
         parent::__construct($characterCacheData);
 
-        $this->entrance           = $entrance;
-        $this->canHit             = $canHit;
-        $this->playerHealing      = $playerHealing;
+        $this->entrance = $entrance;
+        $this->canHit = $canHit;
+        $this->playerHealing = $playerHealing;
     }
 
-    public function setIsCharacterVoided(bool $isVoided): MonsterAttack {
+    public function setIsCharacterVoided(bool $isVoided): MonsterAttack
+    {
         $this->isVoided = $isVoided;
 
         return $this;
     }
 
-    public function monsterAttack(ServerMonster $monster, Character $character, string $previousAttackType) {
+    public function monsterAttack(ServerMonster $monster, Character $character, string $previousAttackType)
+    {
         if ($this->canHit->canMonsterHitPlayer($character, $monster, $this->isVoided)) {
             $this->attackPlayer($monster, $character, $previousAttackType);
 
@@ -42,14 +44,14 @@ class MonsterAttack extends BattleBase {
 
             $this->doPlayerCounterMonster($character, $monster);
         } else {
-            $this->addMessage($monster->getName() . ' misses!', 'enemy-action');
+            $this->addMessage($monster->getName().' misses!', 'enemy-action');
         }
 
         if ($this->monsterHealth <= 0) {
             return;
         }
 
-        if (!$this->isEnemyVoided) {
+        if (! $this->isEnemyVoided) {
             $this->fireEnchantments($monster, $character);
             $this->playerBattleHealing($character, $previousAttackType);
             $this->vampiricHealing($character);
@@ -70,7 +72,8 @@ class MonsterAttack extends BattleBase {
         }
     }
 
-    protected function monsterElementalAttack(ServerMonster $monster, Character $character) {
+    protected function monsterElementalAttack(ServerMonster $monster, Character $character)
+    {
         if (
             $monster->getMonsterStat('is_raid_monster') ||
             $monster->getMonsterStat('is_raid_boss') ||
@@ -92,7 +95,7 @@ class MonsterAttack extends BattleBase {
             $elementalAttack->doElementalAttack($elementalData, $monster->getElementData(), $monster->buildAttack(), true);
 
             $this->characterHealth = $elementalAttack->getCharacterHealth();
-            $this->monsterHealth   = $elementalAttack->getMonsterHealth();
+            $this->monsterHealth = $elementalAttack->getMonsterHealth();
 
             $this->mergeMessages($elementalAttack->getMessages());
 
@@ -100,7 +103,8 @@ class MonsterAttack extends BattleBase {
         }
     }
 
-    protected function monsterSpecialAttack(ServerMonster $monster, Character $character) {
+    protected function monsterSpecialAttack(ServerMonster $monster, Character $character)
+    {
         if (
             $monster->getMonsterStat('is_raid_monster') ||
             $monster->getMonsterStat('is_raid_boss') ||
@@ -114,14 +118,14 @@ class MonsterAttack extends BattleBase {
             $monsterSpecialAttack->setCharacterHealth($this->characterHealth);
 
             $specialAttackType = $monster->getMonsterStat('raid_special_attack_type');
-            $damageStatAmount  = $monster->getMonsterStat($monster->getMonsterStat('damage_stat'));
+            $damageStatAmount = $monster->getMonsterStat($monster->getMonsterStat('damage_stat'));
 
-            if (!is_null($specialAttackType)) {
+            if (! is_null($specialAttackType)) {
                 $monsterSpecialAttack->doSpecialAttack($specialAttackType, $damageStatAmount, $ac);
             }
 
             $this->characterHealth = $monsterSpecialAttack->getCharacterHealth();
-            $this->monsterHealth   = $monsterSpecialAttack->getMonsterHealth();
+            $this->monsterHealth = $monsterSpecialAttack->getMonsterHealth();
 
             $this->mergeMessages($monsterSpecialAttack->getMessages());
 
@@ -129,7 +133,8 @@ class MonsterAttack extends BattleBase {
         }
     }
 
-    protected function playerResurrection(Character $character, string $previousAttackType) {
+    protected function playerResurrection(Character $character, string $previousAttackType)
+    {
         $previousAttackType = $this->characterCacheData->getDataFromAttackCache($character, $previousAttackType);
 
         $this->playerHealing->setMonsterHealth($this->monsterHealth);
@@ -137,7 +142,7 @@ class MonsterAttack extends BattleBase {
         $this->playerHealing->resurrect($previousAttackType);
 
         $this->characterHealth = $this->playerHealing->getCharacterHealth();
-        $characterHealth       = $this->characterCacheData->getCachedCharacterData($character, 'health');
+        $characterHealth = $this->characterCacheData->getCachedCharacterData($character, 'health');
 
         if ($this->characterHealth > $characterHealth) {
             $this->characterHealth = $characterHealth;
@@ -150,7 +155,8 @@ class MonsterAttack extends BattleBase {
         $this->playerHealing->clearMessages();
     }
 
-    protected function playerBattleHealing(Character $character, string $previousAttackType) {
+    protected function playerBattleHealing(Character $character, string $previousAttackType)
+    {
         $previousAttackType = $this->characterCacheData->getDataFromAttackCache($character, $previousAttackType);
 
         $this->playerHealing->setMonsterHealth($this->monsterHealth);
@@ -158,7 +164,7 @@ class MonsterAttack extends BattleBase {
         $this->playerHealing->healInBattle($character, $previousAttackType);
 
         $this->characterHealth = $this->playerHealing->getCharacterHealth();
-        $characterHealth       = $this->characterCacheData->getCachedCharacterData($character, 'health');
+        $characterHealth = $this->characterCacheData->getCachedCharacterData($character, 'health');
 
         if ($this->characterHealth > $characterHealth) {
             $this->characterHealth = $characterHealth;
@@ -171,14 +177,15 @@ class MonsterAttack extends BattleBase {
         $this->playerHealing->clearMessages();
     }
 
-    protected function vampiricHealing(Character $character) {
+    protected function vampiricHealing(Character $character)
+    {
 
         $this->playerHealing->setMonsterHealth($this->monsterHealth);
         $this->playerHealing->setCharacterHealth($this->characterHealth);
         $this->playerHealing->lifeSteal($character);
 
         $this->characterHealth = $this->playerHealing->getCharacterHealth();
-        $characterHealth       = $this->characterCacheData->getCachedCharacterData($character, 'health');
+        $characterHealth = $this->characterCacheData->getCachedCharacterData($character, 'health');
 
         if ($this->characterHealth > $characterHealth) {
             $this->characterHealth = $characterHealth;
@@ -191,11 +198,12 @@ class MonsterAttack extends BattleBase {
         $this->playerHealing->clearMessages();
     }
 
-    protected function attackPlayer(ServerMonster $monster, Character $character, string $previousAttackType) {
+    protected function attackPlayer(ServerMonster $monster, Character $character, string $previousAttackType)
+    {
         $attack = $monster->buildAttack();
 
         if (rand(1, 100) > (100 - 100 * $monster->getMonsterStat('criticality'))) {
-            $this->addMessage($monster->getName() . ' grows enraged and lashes out with all fury! (Critical Strike!)', 'regular');
+            $this->addMessage($monster->getName().' grows enraged and lashes out with all fury! (Critical Strike!)', 'regular');
 
             $attack *= 2;
         }
@@ -223,17 +231,18 @@ class MonsterAttack extends BattleBase {
 
         $attack -= $ac;
 
-        $this->addMessage('You reduced the incoming (Physical) damage with your armour by: ' . number_format($ac), 'player-action');
+        $this->addMessage('You reduced the incoming (Physical) damage with your armour by: '.number_format($ac), 'player-action');
 
         $this->characterHealth -= $attack;
 
-        $this->addMessage($monster->getName() . ' hits for: ' . number_format($attack), 'enemy-action');
+        $this->addMessage($monster->getName().' hits for: '.number_format($attack), 'enemy-action');
     }
 
-    protected function fireEnchantments(ServerMonster $monster, Character $character) {
-        $maxAffixDamage  = $monster->getMonsterStat('max_affix_damage');
-        $maxAffixDamage  = rand(1, $maxAffixDamage);
-        $damageReduction =  $this->characterCacheData->getCachedCharacterData($character, 'affix_damage_reduction');
+    protected function fireEnchantments(ServerMonster $monster, Character $character)
+    {
+        $maxAffixDamage = $monster->getMonsterStat('max_affix_damage');
+        $maxAffixDamage = rand(1, $maxAffixDamage);
+        $damageReduction = $this->characterCacheData->getCachedCharacterData($character, 'affix_damage_reduction');
 
         $maxAffixDamage = $maxAffixDamage - $maxAffixDamage * $damageReduction;
 
@@ -244,24 +253,24 @@ class MonsterAttack extends BattleBase {
         if ($maxAffixDamage > 0) {
             $this->characterHealth -= $maxAffixDamage;
 
-            $this->addMessage($monster->getName() . '\'s enchantments glow, lashing out for: ' . number_format($maxAffixDamage), 'enemy-action');
+            $this->addMessage($monster->getName().'\'s enchantments glow, lashing out for: '.number_format($maxAffixDamage), 'enemy-action');
         }
     }
 
-    protected function castSpells(ServerMonster $monster, Character $character, string $previousAttackType) {
-        if (!$this->canHit->canMonsterCastSpell($character, $monster, $this->isVoided)) {
-            $this->addMessage($monster->getName() . '\'s Spells fizzle and fail to fire.', 'regular');
+    protected function castSpells(ServerMonster $monster, Character $character, string $previousAttackType)
+    {
+        if (! $this->canHit->canMonsterCastSpell($character, $monster, $this->isVoided)) {
+            $this->addMessage($monster->getName().'\'s Spells fizzle and fail to fire.', 'regular');
 
             return;
         }
 
         $spellDamage = $monster->getMonsterStat('spell_damage');
 
-
         if ($spellDamage > 0) {
             $spellEvasion = $this->characterCacheData->getCachedCharacterData($character, 'spell_evasion');
-            $dc           = 100 - 100 * $spellEvasion;
-            $roll         = rand(1, 100);
+            $dc = 100 - 100 * $spellEvasion;
+            $roll = rand(1, 100);
 
             if ($spellEvasion >= 1 || $roll > $dc) {
                 $this->addMessage('You evade the enemy\'s spells!', 'player-action');
@@ -272,7 +281,7 @@ class MonsterAttack extends BattleBase {
             $criticality = $monster->getMonsterStat('criticality');
 
             if (rand(1, 100) > (100 - 100 * $criticality)) {
-                $this->addMessage($monster->getName() . ' With a fury of hatred their spells fly viciously at you! (Critical Strike!)', 'regular');
+                $this->addMessage($monster->getName().' With a fury of hatred their spells fly viciously at you! (Critical Strike!)', 'regular');
 
                 $spellDamage *= 2;
             }
@@ -285,7 +294,7 @@ class MonsterAttack extends BattleBase {
 
             $this->characterHealth -= $spellDamage;
 
-            $this->addMessage($monster->getName() . '\'s spells burst toward you doing: ' . number_format($spellDamage), 'enemy-action');
+            $this->addMessage($monster->getName().'\'s spells burst toward you doing: '.number_format($spellDamage), 'enemy-action');
         }
     }
 }

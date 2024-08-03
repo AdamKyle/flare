@@ -2,8 +2,8 @@
 
 namespace Database\Factories;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Flare\Models\KingdomLog;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 class KingdomLogFactory extends Factory
 {
@@ -22,22 +22,22 @@ class KingdomLogFactory extends Factory
     public function definition()
     {
         return [
-            'character_id'           => null,
+            'character_id' => null,
             'attacking_character_id' => null,
-            'from_kingdom_id'        => null,
-            'to_kingdom_id'          => null,
-            'status'                 => null,
-            'units_sent'             => null,
-            'units_survived'         => null,
-            'old_buildings'          => null,
-            'new_buildings'          => null,
-            'old_units'              => null,
-            'new_units'              => null,
-            'item_damage'            => null,
-            'morale_loss'            => null,
-            'published'              => null,
-            'opened'                 => null,
-            'created_at'             => now(),
+            'from_kingdom_id' => null,
+            'to_kingdom_id' => null,
+            'status' => null,
+            'units_sent' => null,
+            'units_survived' => null,
+            'old_buildings' => null,
+            'new_buildings' => null,
+            'old_units' => null,
+            'new_units' => null,
+            'item_damage' => null,
+            'morale_loss' => null,
+            'published' => null,
+            'opened' => null,
+            'created_at' => now(),
         ];
     }
 }

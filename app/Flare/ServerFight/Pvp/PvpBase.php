@@ -5,8 +5,8 @@ namespace App\Flare\ServerFight\Pvp;
 use App\Flare\Models\Character;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 
-class PvpBase {
-
+class PvpBase
+{
     private CharacterCacheData $characterCacheData;
 
     private Character $attacker;
@@ -15,24 +15,29 @@ class PvpBase {
 
     protected int $defenderHealth;
 
-    public function __construct(CharacterCacheData $characterCacheData) {
+    public function __construct(CharacterCacheData $characterCacheData)
+    {
         $this->characterCacheData = $characterCacheData;
     }
 
-    public function cache(): CharacterCacheData {
+    public function cache(): CharacterCacheData
+    {
         return $this->characterCacheData;
     }
 
-    public function setAttacker(Character $attacker): void {
+    public function setAttacker(Character $attacker): void
+    {
         $this->attacker = $attacker;
     }
 
-    public function setDefender(Character $character): void {
+    public function setDefender(Character $character): void
+    {
         $this->defender = $character;
     }
 
-    public function setAttackerHealth(int $attackerHealth = null): void {
-        if (!is_null($attackerHealth)) {
+    public function setAttackerHealth(?int $attackerHealth = null): void
+    {
+        if (! is_null($attackerHealth)) {
             $this->attackerHealth = $attackerHealth;
 
             return;
@@ -41,8 +46,9 @@ class PvpBase {
         $this->attackerHealth = $this->characterCacheData->getCachedCharacterData($this->attacker);
     }
 
-    public function setDefenderHealth(int $defenderHealth = null): void {
-        if (!is_null($defenderHealth)) {
+    public function setDefenderHealth(?int $defenderHealth = null): void
+    {
+        if (! is_null($defenderHealth)) {
             $this->defenderHealth = $defenderHealth;
 
             return;
@@ -51,11 +57,13 @@ class PvpBase {
         $this->defenderHealth = $this->characterCacheData->getCachedCharacterData($this->defender);
     }
 
-    public function getAttackerHealth(): int {
+    public function getAttackerHealth(): int
+    {
         return $this->attackerHealth;
     }
 
-    public function getDefenderHealth(): int {
+    public function getDefenderHealth(): int
+    {
         return $this->defenderHealth;
     }
 }

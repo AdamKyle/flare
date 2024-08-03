@@ -12,13 +12,15 @@ use App\Game\Shop\Services\ShopService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use League\Fractal\Manager;
 
-class ServiceProvider extends ApplicationServiceProvider {
+class ServiceProvider extends ApplicationServiceProvider
+{
     /**
      * Register any application services.
      *
      * @return void
      */
-    public function register() {
+    public function register()
+    {
 
         $this->app->bind(ShopService::class, function ($app) {
             return new ShopService(
@@ -30,7 +32,7 @@ class ServiceProvider extends ApplicationServiceProvider {
         });
 
         $this->app->bind(GoblinShopService::class, function () {
-            return new GoblinShopService();
+            return new GoblinShopService;
         });
 
         $this->app->bind(GemShopService::class, function ($app) {

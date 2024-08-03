@@ -10,33 +10,37 @@ use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateItem;
 
-class CharacterBoonJobTest extends TestCase {
-
-    use RefreshDatabase, CreateItem;
+class CharacterBoonJobTest extends TestCase
+{
+    use CreateItem, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
-        $this->character = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
+        $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
 
         Event::fake();
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
 
         $this->character = null;
     }
 
-    public function testNoBoonToRemove() {
+    public function testNoBoonToRemove()
+    {
         CharacterBoonJob::dispatch(6764);
 
         Event::assertNotDispatched(ServerMessageEvent::class);
     }
 
-    public function testRemoveBoon() {
+    public function testRemoveBoon()
+    {
         $character = $this->character->getCharacter();
 
         $character->boons()->create([

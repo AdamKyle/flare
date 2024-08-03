@@ -21,42 +21,26 @@ use App\Game\ClassRanks\Values\WeaponMasteryValue;
 use App\Game\Core\Values\FactionLevel;
 use Exception;
 
-class CharacterBuilderService {
-
-    /**
-     * @var GameRace $race
-     */
+class CharacterBuilderService
+{
     private GameRace $race;
 
-    /**
-     * @var GameClass $class
-     */
     private GameClass $class;
 
-    /**
-     * @var Character $character
-     */
     private Character $character;
 
-    /**
-     * @var BuildCharacterAttackTypes $buildCharacterAttackTypes
-     */
     private BuildCharacterAttackTypes $buildCharacterAttackTypes;
 
-    /**
-     * @param BuildCharacterAttackTypes $buildCharacterAttackTypes
-     */
-    public function __construct(BuildCharacterAttackTypes $buildCharacterAttackTypes) {
+    public function __construct(BuildCharacterAttackTypes $buildCharacterAttackTypes)
+    {
         $this->buildCharacterAttackTypes = $buildCharacterAttackTypes;
     }
 
     /**
      * Set the chosen race
-     *
-     * @param GameRace $race
-     * @return CharacterBuilderService
      */
-    public function setRace(GameRace $race): CharacterBuilderService {
+    public function setRace(GameRace $race): CharacterBuilderService
+    {
         $this->race = $race;
 
         return $this;
@@ -64,11 +48,9 @@ class CharacterBuilderService {
 
     /**
      * Set the chosen class
-     *
-     * @param GameClass $class
-     * @return CharacterBuilderService
      */
-    public function setClass(GameClass $class): CharacterBuilderService {
+    public function setClass(GameClass $class): CharacterBuilderService
+    {
         $this->class = $class;
 
         return $this;
@@ -77,10 +59,10 @@ class CharacterBuilderService {
     /**
      * Set the character for assigning new skills.
      *
-     * @param Character $character
      * @return $this
      */
-    public function setCharacter(Character $character): CharacterBuilderService {
+    public function setCharacter(Character $character): CharacterBuilderService
+    {
         $this->character = $character;
 
         return $this;
@@ -94,59 +76,56 @@ class CharacterBuilderService {
      *
      * We also set the characters base stats based on any racial and class modifications.
      *
-     * @param User $user
-     * @param GameMap $map
-     * @param string $name
-     * @return CharacterBuilderService
      * @throws Exception
      */
-    public function createCharacter(User $user, GameMap $map, string $name): CharacterBuilderService {
+    public function createCharacter(User $user, GameMap $map, string $name): CharacterBuilderService
+    {
         $baseStat = resolve(BaseStatValue::class)->setRace($this->race)->setClass($this->class);
 
         $this->character = Character::create([
-            'user_id'       => $user->id,
-            'game_race_id'  => $this->race->id,
+            'user_id' => $user->id,
+            'game_race_id' => $this->race->id,
             'game_class_id' => $this->class->id,
-            'name'          => $name,
-            'damage_stat'   => $this->class->damage_stat,
-            'xp'            => 0,
-            'xp_next'       => 100,
-            'str'           => $baseStat->str(),
-            'dur'           => $baseStat->dur(),
-            'dex'           => $baseStat->dex(),
-            'chr'           => $baseStat->chr(),
-            'int'           => $baseStat->int(),
-            'agi'           => $baseStat->agi(),
-            'focus'         => $baseStat->focus(),
-            'ac'            => $baseStat->ac(),
-            'gold'          => 1000,
+            'name' => $name,
+            'damage_stat' => $this->class->damage_stat,
+            'xp' => 0,
+            'xp_next' => 100,
+            'str' => $baseStat->str(),
+            'dur' => $baseStat->dur(),
+            'dex' => $baseStat->dex(),
+            'chr' => $baseStat->chr(),
+            'int' => $baseStat->int(),
+            'agi' => $baseStat->agi(),
+            'focus' => $baseStat->focus(),
+            'ac' => $baseStat->ac(),
+            'gold' => 1000,
         ]);
 
         $this->character->gemBag()->create(['character_id' => $this->character->id]);
 
         $this->character->inventory()->create([
-            'character_id' => $this->character->id
+            'character_id' => $this->character->id,
         ]);
 
         $starterWeaponId = Item::where('type', 'weapon')->whereNull('item_suffix_id')->whereNull('item_prefix_id')->orderBy('cost', 'asc')->first()->id;
 
         $this->character->inventory->slots()->create([
             'inventory_id' => $this->character->inventory->id,
-            'item_id'      => $starterWeaponId,
-            'equipped'     => true,
-            'position'     => 'left-hand',
+            'item_id' => $starterWeaponId,
+            'equipped' => true,
+            'position' => 'left-hand',
         ]);
 
         for ($i = 1; $i <= 10; $i++) {
             $this->character->inventorySets()->create([
-                'character_id'    => $this->character->id,
+                'character_id' => $this->character->id,
                 'can_be_equipped' => true,
             ]);
         }
 
         $this->character->map()->create([
             'character_id' => $this->character->id,
-            'game_map_id'  => $map->id,
+            'game_map_id' => $map->id,
         ]);
 
         $this->assignFactions();
@@ -162,10 +141,9 @@ class CharacterBuilderService {
      * Assign skills to the user.
      *
      * This assigns all skills in the database.
-     *
-     * @return CharacterBuilderService
      */
-    public function assignSkills(): CharacterBuilderService {
+    public function assignSkills(): CharacterBuilderService
+    {
         foreach (GameSkill::whereNull('game_class_id')->get() as $skill) {
 
             $existingSkill = $this->character->skills()->where('game_skill_id', $skill->id)->first();
@@ -200,25 +178,26 @@ class CharacterBuilderService {
      *
      * @return $this
      */
-    public function assignPassiveSkills(): CharacterBuilderService {
+    public function assignPassiveSkills(): CharacterBuilderService
+    {
         foreach (PassiveSkill::all() as $passiveSkill) {
             $characterPassive = $this->character->passiveSkills()->where('passive_skill_id', $passiveSkill->id)->first();
 
             $parentId = $passiveSkill->parent_skill_id;
-            $parent   = null;
+            $parent = null;
 
-            if (!is_null($parentId)) {
+            if (! is_null($parentId)) {
                 $parent = $this->character->passiveSkills()->where('passive_skill_id', $parentId)->first();
             }
 
             if (is_null($characterPassive)) {
                 $this->character->passiveSkills()->create([
-                    'character_id'     => $this->character->id,
+                    'character_id' => $this->character->id,
                     'passive_skill_id' => $passiveSkill->id,
-                    'current_level'    => 0,
-                    'hours_to_next'    => $passiveSkill->hours_per_level,
-                    'is_locked'        => $this->getIsSkillLocked($passiveSkill, $parent),
-                    'parent_skill_id'  => !is_null($parent) ? $parent->id : null,
+                    'current_level' => 0,
+                    'hours_to_next' => $passiveSkill->hours_per_level,
+                    'is_locked' => $this->getIsSkillLocked($passiveSkill, $parent),
+                    'parent_skill_id' => ! is_null($parent) ? $parent->id : null,
                 ]);
             } else {
                 $characterPassive->update([
@@ -232,17 +211,18 @@ class CharacterBuilderService {
         return $this;
     }
 
-    protected function getIsSkillLocked(PassiveSkill $passiveSkill, ?CharacterPassiveSkill $parentSkill = null): bool {
+    protected function getIsSkillLocked(PassiveSkill $passiveSkill, ?CharacterPassiveSkill $parentSkill = null): bool
+    {
 
         $isLocked = $passiveSkill->is_locked;
 
-        if (!is_null($parentSkill)) {
+        if (! is_null($parentSkill)) {
             $isLocked = $passiveSkill->unlocks_at_level > $parentSkill->current_level;
         }
 
         $foundQuest = Quest::where('unlocks_passive_id', $passiveSkill->id)->first();
 
-        if (!is_null($foundQuest)) {
+        if (! is_null($foundQuest)) {
             $isLocked = is_null($this->character->questsCompleted->where('quest_id', $foundQuest->id)->first());
         }
 
@@ -251,15 +231,14 @@ class CharacterBuilderService {
 
     /**
      * Assign the factions to the character, one for each map.
-     *
-     * @return CharacterBuilderService
      */
-    public function assignFactions(): CharacterBuilderService {
+    public function assignFactions(): CharacterBuilderService
+    {
         $gameMaps = GameMap::all();
 
         foreach ($gameMaps as $gameMap) {
 
-            if (!$gameMap->mapType()->isPurgatory()) {
+            if (! $gameMap->mapType()->isPurgatory()) {
                 $this->character->factions()->create([
                     'character_id' => $this->character->id,
                     'game_map_id' => $gameMap->id,
@@ -276,19 +255,19 @@ class CharacterBuilderService {
     /**
      * Assign Class Ranks to a character.
      *
-     * @return CharacterBuilderService
      * @throws Exception
      */
-    public function assignClassRanks(): CharacterBuilderService {
+    public function assignClassRanks(): CharacterBuilderService
+    {
         $gameClasses = GameClass::all();
 
         foreach ($gameClasses as $gameClass) {
             $classRank = $this->character->classRanks()->create([
-                'character_id'   => $this->character->id,
-                'game_class_id'  => $gameClass->id,
-                'current_xp'     => 0,
-                'required_xp'    => ClassRankValue::XP_PER_LEVEL,
-                'level'          => 0,
+                'character_id' => $this->character->id,
+                'game_class_id' => $gameClass->id,
+                'current_xp' => 0,
+                'required_xp' => ClassRankValue::XP_PER_LEVEL,
+                'level' => 0,
             ]);
 
             $this->assignWeaponMasteriesToClassRanks($classRank);
@@ -301,9 +280,11 @@ class CharacterBuilderService {
 
     /**
      * @return $this
+     *
      * @throws Exception
      */
-    public function buildCharacterCache(): CharacterBuilderService {
+    public function buildCharacterCache(): CharacterBuilderService
+    {
         $this->buildCharacterAttackTypes->buildCache($this->character);
 
         return $this;
@@ -311,28 +292,26 @@ class CharacterBuilderService {
 
     /**
      * Get the character object
-     *
-     * @return Character
      */
-    public function character(): Character {
+    public function character(): Character
+    {
         return $this->character;
     }
 
     /**
      * Assigns weapon masteries to class ranks.
      *
-     * @param CharacterClassRank $classRank
-     * @return void
      * @throws Exception
      */
-    protected function assignWeaponMasteriesToClassRanks(CharacterClassRank $classRank): void {
+    protected function assignWeaponMasteriesToClassRanks(CharacterClassRank $classRank): void
+    {
         foreach (WeaponMasteryValue::getTypes() as $type) {
             $classRank->weaponMasteries()->create([
-                'character_class_rank_id'   => $classRank->id,
-                'weapon_type'               => $type,
-                'current_xp'                => 0,
-                'required_xp'               => WeaponMasteryValue::XP_PER_LEVEL,
-                'level'                     => $this->getDefaultLevel($classRank, $type),
+                'character_class_rank_id' => $classRank->id,
+                'weapon_type' => $type,
+                'current_xp' => 0,
+                'required_xp' => WeaponMasteryValue::XP_PER_LEVEL,
+                'level' => $this->getDefaultLevel($classRank, $type),
             ]);
         }
     }
@@ -340,17 +319,16 @@ class CharacterBuilderService {
     /**
      * Get default level for weapon mastery.
      *
-     * @param CharacterClassRank $classRank
-     * @param int $type
      * @return int
+     *
      * @throws Exception
      */
-    protected function getDefaultLevel(CharacterClassRank $classRank, int $type) {
+    protected function getDefaultLevel(CharacterClassRank $classRank, int $type)
+    {
         if (($classRank->gameClass->type()->isFighter() ||
                 $classRank->gameClass->type()->isThief() ||
                 $classRank->gameClass->type()->isVampire() ||
-                $classRank->gameClass->type()->isBlackSmith()) && (new WeaponMasteryValue($type))->isWeapon())
-        {
+                $classRank->gameClass->type()->isBlackSmith()) && (new WeaponMasteryValue($type))->isWeapon()) {
             return 5;
         }
 

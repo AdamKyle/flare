@@ -10,10 +10,9 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class RemoveGuideQuestButton implements ShouldBroadcastNow {
-
+class RemoveGuideQuestButton implements ShouldBroadcastNow
+{
     use Dispatchable, InteractsWithSockets, SerializesModels;
-
     use SerializesModels;
 
     private User $user;
@@ -22,11 +21,10 @@ class RemoveGuideQuestButton implements ShouldBroadcastNow {
 
     /**
      * Constructor
-     *
-     * @param User $user
      */
-    public function __construct(User $user) {
-        $this->user          = $user;
+    public function __construct(User $user)
+    {
+        $this->user = $user;
         $this->disableButton = true;
     }
 
@@ -35,7 +33,8 @@ class RemoveGuideQuestButton implements ShouldBroadcastNow {
      *
      * @return Channel|array
      */
-    public function broadcastOn() {
-        return new PrivateChannel('guide-quest-button-' . $this->user->id);
+    public function broadcastOn()
+    {
+        return new PrivateChannel('guide-quest-button-'.$this->user->id);
     }
 }

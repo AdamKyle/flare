@@ -25,16 +25,17 @@ class TrainSkillValidation extends FormRequest
     public function rules()
     {
         return [
-            'skill_id'           => 'integer|required',
-            'xp_percentage'      => ['required', new SkillXPPercentage],
+            'skill_id' => 'integer|required',
+            'xp_percentage' => ['required', new SkillXPPercentage],
         ];
     }
 
-    public function messages() {
+    public function messages()
+    {
         return [
-            'skill_id.required'      => 'Error. Invalid Input.',
+            'skill_id.required' => 'Error. Invalid Input.',
             'xp_percentage.required' => 'Error. Invalid Input.',
-            'xp_percentage.decimal'  => 'Error. Invalid Input.',
+            'xp_percentage.decimal' => 'Error. Invalid Input.',
         ];
     }
 }

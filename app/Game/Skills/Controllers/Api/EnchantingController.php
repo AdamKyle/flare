@@ -2,39 +2,41 @@
 
 namespace App\Game\Skills\Controllers\Api;
 
-use App\Http\Controllers\Controller;
 use App\Flare\Models\Character;
 use App\Game\Core\Events\CraftedItemTimeOutEvent;
 use App\Game\Skills\Requests\EnchantingValidation;
 use App\Game\Skills\Services\EnchantingService;
+use App\Http\Controllers\Controller;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 
-class  EnchantingController extends Controller {
-
+class EnchantingController extends Controller
+{
     /**
-     * @var EnchantingService $enchantingService
+     * @var EnchantingService
      */
     private $enchantingService;
 
     /**
      * Constructor
      *
-     * @param EnchantingService $enchantingService
      * @return void
      */
-    public function __construct(EnchantingService $enchantingService) {
+    public function __construct(EnchantingService $enchantingService)
+    {
         $this->enchantingService = $enchantingService;
     }
 
-    public function fetchAffixes(Character $character) {
+    public function fetchAffixes(Character $character)
+    {
         return response()->json([
             'affixes' => $this->enchantingService->fetchAffixes($character, true),
             'skill_xp' => $this->enchantingService->getEnchantingXP($character),
         ]);
     }
 
-    public function enchant(EnchantingValidation $request, Character $character) {
-        if (!$character->can_craft) {
+    public function enchant(EnchantingValidation $request, Character $character)
+    {
+        if (! $character->can_craft) {
             return response()->json(['message' => 'Cannot Craft.'], 429);
         }
 
@@ -63,7 +65,7 @@ class  EnchantingController extends Controller {
         $this->enchantingService->enchant($character, $request->all(), $slot, $cost);
 
         return response()->json([
-            'affixes'  => $this->enchantingService->fetchAffixes($character->refresh(), true, false),
+            'affixes' => $this->enchantingService->fetchAffixes($character->refresh(), true, false),
             'skill_xp' => $this->enchantingService->getEnchantingXP($character),
         ]);
     }

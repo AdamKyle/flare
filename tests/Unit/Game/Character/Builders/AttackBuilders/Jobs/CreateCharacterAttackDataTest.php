@@ -5,43 +5,42 @@ namespace Tests\Unit\Game\Character\Builders\AttackBuilders\Jobs;
 use App\Flare\Models\Character;
 use App\Flare\Values\SpellTypes;
 use App\Flare\Values\WeaponTypes;
-use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
-use App\Game\Character\Builders\AttackBuilders\Jobs\CharacterAttackTypesCacheBuilderWithDeductions;
 use App\Game\Character\Builders\AttackBuilders\Jobs\CreateCharacterAttackData;
-use App\Game\Core\Events\UpdateCharacterAttacks;
 use Cache;
-use Event;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateItem;
 
-class CreateCharacterAttackDataTest extends TestCase {
-
-    use RefreshDatabase, CreateItem;
+class CreateCharacterAttackDataTest extends TestCase
+{
+    use CreateItem, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
-        $this->character = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
+        $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
 
-        $this->character                         = null;
+        $this->character = null;
     }
 
-    private function setUpCharacterForTests(): Character {
+    private function setUpCharacterForTests(): Character
+    {
         $item = $this->createItem([
-            'type'        => WeaponTypes::STAVE,
+            'type' => WeaponTypes::STAVE,
             'base_damage' => 10,
         ]);
 
         $spellDamage = $this->createItem([
-            'type'        => SpellTypes::DAMAGE,
+            'type' => SpellTypes::DAMAGE,
             'base_damage' => 10,
         ]);
 
@@ -51,14 +50,15 @@ class CreateCharacterAttackDataTest extends TestCase {
             ->getCharacter();
     }
 
-    public function testCreateCharacterAttackData() {
+    public function testCreateCharacterAttackData()
+    {
 
         $character = $this->setUpCharacterForTests();
 
         CreateCharacterAttackData::dispatch($character->id);
 
         $this->assertNotNull(
-            Cache::get('character-attack-data-' . $character->id)
+            Cache::get('character-attack-data-'.$character->id)
         );
     }
 }

@@ -18,34 +18,37 @@ use Tests\Traits\CreateItem;
 use Tests\Traits\CreateMonster;
 use Tests\Traits\CreateNpc;
 
-class FactionLoyaltyBountyHandlerTest extends TestCase {
-
-    use RefreshDatabase, CreateMonster, CreateFactionLoyalty, CreateNpc, CreateItem, CreateEvent;
+class FactionLoyaltyBountyHandlerTest extends TestCase
+{
+    use CreateEvent, CreateFactionLoyalty, CreateItem, CreateMonster, CreateNpc, RefreshDatabase;
 
     private ?FactionLoyaltyBountyHandler $factionLoyaltyBountyHandler;
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
         $this->factionLoyaltyBountyHandler = resolve(FactionLoyaltyBountyHandler::class);
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
 
-        $this->factionLoyaltyBountyHandler  = null;
+        $this->factionLoyaltyBountyHandler = null;
     }
 
-    public function testDoesNotHandleBountyWhenAutomationIsRunning() {
+    public function testDoesNotHandleBountyWhenAutomationIsRunning()
+    {
 
         $monster = $this->createMonster();
 
-        $character = (new CharacterFactory())->createBaseCharacter()
-                                             ->givePlayerLocation()
-                                             ->assignAutomation([
-                                                'monster_id' => $monster->id
-                                             ])
-                                             ->getCharacter();
+        $character = (new CharacterFactory)->createBaseCharacter()
+            ->givePlayerLocation()
+            ->assignAutomation([
+                'monster_id' => $monster->id,
+            ])
+            ->getCharacter();
         Event::fake();
 
         $this->factionLoyaltyBountyHandler->handleBounty($character, $monster);
@@ -54,10 +57,11 @@ class FactionLoyaltyBountyHandlerTest extends TestCase {
         Event::assertNotDispatched(UpdateTopBarEvent::class);
     }
 
-    public function testDoesNotHandleBountyWhenCharacterIsNotPledgedToAFaction() {
+    public function testDoesNotHandleBountyWhenCharacterIsNotPledgedToAFaction()
+    {
         $monster = $this->createMonster();
 
-        $character = (new CharacterFactory())->createBaseCharacter()
+        $character = (new CharacterFactory)->createBaseCharacter()
             ->givePlayerLocation(16, 16, $monster->gameMap)
             ->assignFactionSystem()
             ->getCharacter();
@@ -66,8 +70,8 @@ class FactionLoyaltyBountyHandlerTest extends TestCase {
 
         $this->createFactionLoyalty([
             'character_id' => $character->id,
-            'faction_id'   => $character->factions->first(),
-            'is_pledged'   => false
+            'faction_id' => $character->factions->first(),
+            'is_pledged' => false,
         ]);
 
         $this->factionLoyaltyBountyHandler->handleBounty($character->refresh(), $monster);
@@ -76,10 +80,11 @@ class FactionLoyaltyBountyHandlerTest extends TestCase {
         Event::assertNotDispatched(UpdateTopBarEvent::class);
     }
 
-    public function testDoesNotHandleBountyWhenCharacterIsNotHelpingAnNpc() {
+    public function testDoesNotHandleBountyWhenCharacterIsNotHelpingAnNpc()
+    {
         $monster = $this->createMonster();
 
-        $character = (new CharacterFactory())->createBaseCharacter()
+        $character = (new CharacterFactory)->createBaseCharacter()
             ->givePlayerLocation(16, 16, $monster->gameMap)
             ->assignFactionSystem()
             ->getCharacter();
@@ -88,20 +93,20 @@ class FactionLoyaltyBountyHandlerTest extends TestCase {
 
         $factionLoyalty = $this->createFactionLoyalty([
             'character_id' => $character->id,
-            'faction_id'   => $character->factions->first(),
-            'is_pledged'   => true
+            'faction_id' => $character->factions->first(),
+            'is_pledged' => true,
         ]);
 
         $npc = $this->createNpc();
 
         $this->createFactionLoyaltyNpc([
-            'faction_loyalty_id'            => $factionLoyalty->id,
-            'npc_id'                        => $npc->id,
-            'current_level'                 => 1,
-            'max_level'                     => 25,
-            'next_level_fame'               => 1000,
-            'currently_helping'             => false,
-            'kingdom_item_defence_bonus'    => 0.002,
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'npc_id' => $npc->id,
+            'current_level' => 1,
+            'max_level' => 25,
+            'next_level_fame' => 1000,
+            'currently_helping' => false,
+            'kingdom_item_defence_bonus' => 0.002,
         ]);
 
         $this->factionLoyaltyBountyHandler->handleBounty($character->refresh(), $monster);
@@ -110,10 +115,11 @@ class FactionLoyaltyBountyHandlerTest extends TestCase {
         Event::assertNotDispatched(UpdateTopBarEvent::class);
     }
 
-    public function testDoesNotUpdateLoyaltyTasksWhenNoBountyTaskFound() {
+    public function testDoesNotUpdateLoyaltyTasksWhenNoBountyTaskFound()
+    {
         $monster = $this->createMonster();
 
-        $character = (new CharacterFactory())->createBaseCharacter()
+        $character = (new CharacterFactory)->createBaseCharacter()
             ->givePlayerLocation(16, 16, $monster->gameMap)
             ->assignFactionSystem()
             ->getCharacter();
@@ -122,26 +128,26 @@ class FactionLoyaltyBountyHandlerTest extends TestCase {
 
         $factionLoyalty = $this->createFactionLoyalty([
             'character_id' => $character->id,
-            'faction_id'   => $character->factions->first(),
-            'is_pledged'   => true
+            'faction_id' => $character->factions->first(),
+            'is_pledged' => true,
         ]);
 
         $npc = $this->createNpc();
 
         $factionLoyaltyNpc = $this->createFactionLoyaltyNpc([
-            'faction_loyalty_id'            => $factionLoyalty->id,
-            'npc_id'                        => $npc->id,
-            'current_level'                 => 1,
-            'max_level'                     => 25,
-            'next_level_fame'               => 1000,
-            'currently_helping'             => true,
-            'kingdom_item_defence_bonus'    => 0.002,
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'npc_id' => $npc->id,
+            'current_level' => 1,
+            'max_level' => 25,
+            'next_level_fame' => 1000,
+            'currently_helping' => true,
+            'kingdom_item_defence_bonus' => 0.002,
         ]);
 
         $this->createFactionLoyaltyNpcTask([
-            'faction_loyalty_id'         => $factionLoyalty->id,
-            'faction_loyalty_npc_id'     => $factionLoyaltyNpc->id,
-            'fame_tasks'                 => [['sample' => 'key']],
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'faction_loyalty_npc_id' => $factionLoyaltyNpc->id,
+            'fame_tasks' => [['sample' => 'key']],
         ]);
 
         $this->factionLoyaltyBountyHandler->handleBounty($character->refresh(), $monster);
@@ -150,10 +156,11 @@ class FactionLoyaltyBountyHandlerTest extends TestCase {
         Event::assertNotDispatched(UpdateTopBarEvent::class);
     }
 
-    public function testDoesNotUpdateLoyaltyTasksWhenPlayerIsNotOnTheSameMap() {
+    public function testDoesNotUpdateLoyaltyTasksWhenPlayerIsNotOnTheSameMap()
+    {
         $monster = $this->createMonster();
 
-        $character = (new CharacterFactory())->createBaseCharacter()
+        $character = (new CharacterFactory)->createBaseCharacter()
             ->givePlayerLocation(16, 16, $monster->gameMap)
             ->assignFactionSystem()
             ->getCharacter();
@@ -162,26 +169,26 @@ class FactionLoyaltyBountyHandlerTest extends TestCase {
 
         $factionLoyalty = $this->createFactionLoyalty([
             'character_id' => $character->id,
-            'faction_id'   => $character->factions->first(),
-            'is_pledged'   => true
+            'faction_id' => $character->factions->first(),
+            'is_pledged' => true,
         ]);
 
         $npc = $this->createNpc();
 
         $factionLoyaltyNpc = $this->createFactionLoyaltyNpc([
-            'faction_loyalty_id'            => $factionLoyalty->id,
-            'npc_id'                        => $npc->id,
-            'current_level'                 => 1,
-            'max_level'                     => 25,
-            'next_level_fame'               => 1000,
-            'currently_helping'             => true,
-            'kingdom_item_defence_bonus'    => 0.002,
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'npc_id' => $npc->id,
+            'current_level' => 1,
+            'max_level' => 25,
+            'next_level_fame' => 1000,
+            'currently_helping' => true,
+            'kingdom_item_defence_bonus' => 0.002,
         ]);
 
         $this->createFactionLoyaltyNpcTask([
-            'faction_loyalty_id'         => $factionLoyalty->id,
-            'faction_loyalty_npc_id'     => $factionLoyaltyNpc->id,
-            'fame_tasks'                 => [['sample' => 'key']],
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'faction_loyalty_npc_id' => $factionLoyaltyNpc->id,
+            'fame_tasks' => [['sample' => 'key']],
         ]);
 
         $character->map()->update([
@@ -196,10 +203,11 @@ class FactionLoyaltyBountyHandlerTest extends TestCase {
         Event::assertNotDispatched(UpdateTopBarEvent::class);
     }
 
-    public function testDoesNotHandleBountyWhenMonsterIsNotApartOfTheBountyList() {
+    public function testDoesNotHandleBountyWhenMonsterIsNotApartOfTheBountyList()
+    {
         $monster = $this->createMonster();
 
-        $character = (new CharacterFactory())->createBaseCharacter()
+        $character = (new CharacterFactory)->createBaseCharacter()
             ->givePlayerLocation(16, 16, $monster->gameMap)
             ->assignFactionSystem()
             ->getCharacter();
@@ -208,31 +216,31 @@ class FactionLoyaltyBountyHandlerTest extends TestCase {
 
         $factionLoyalty = $this->createFactionLoyalty([
             'character_id' => $character->id,
-            'faction_id'   => $character->factions->first(),
-            'is_pledged'   => true
+            'faction_id' => $character->factions->first(),
+            'is_pledged' => true,
         ]);
 
         $npc = $this->createNpc();
 
         $factionLoyaltyNpc = $this->createFactionLoyaltyNpc([
-            'faction_loyalty_id'            => $factionLoyalty->id,
-            'npc_id'                        => $npc->id,
-            'current_level'                 => 1,
-            'max_level'                     => 25,
-            'next_level_fame'               => 1000,
-            'currently_helping'             => true,
-            'kingdom_item_defence_bonus'    => 0.002,
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'npc_id' => $npc->id,
+            'current_level' => 1,
+            'max_level' => 25,
+            'next_level_fame' => 1000,
+            'currently_helping' => true,
+            'kingdom_item_defence_bonus' => 0.002,
         ]);
 
         $this->createFactionLoyaltyNpcTask([
-            'faction_loyalty_id'         => $factionLoyalty->id,
-            'faction_loyalty_npc_id'     => $factionLoyaltyNpc->id,
-            'fame_tasks'                 => [[
-                'type'            => 'bounty',
-                'monster_name'    => 'sample',
-                'monster_id'      => 99999,
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'faction_loyalty_npc_id' => $factionLoyaltyNpc->id,
+            'fame_tasks' => [[
+                'type' => 'bounty',
+                'monster_name' => 'sample',
+                'monster_id' => 99999,
                 'required_amount' => rand(10, 50),
-                'current_amount'  => 0,
+                'current_amount' => 0,
             ]],
         ]);
 
@@ -244,10 +252,11 @@ class FactionLoyaltyBountyHandlerTest extends TestCase {
         $this->assertEquals(0, $character->factionLoyalties->first()->factionLoyaltyNpcs->first()->factionLoyaltyNpcTasks->fame_tasks[0]['current_amount']);
     }
 
-    public function testUpdatesTheCurrentAmountOnABountyButDoesNotLevelUpTheFame() {
+    public function testUpdatesTheCurrentAmountOnABountyButDoesNotLevelUpTheFame()
+    {
         $monster = $this->createMonster();
 
-        $character = (new CharacterFactory())->createBaseCharacter()
+        $character = (new CharacterFactory)->createBaseCharacter()
             ->givePlayerLocation(16, 16, $monster->gameMap)
             ->assignFactionSystem()
             ->getCharacter();
@@ -256,31 +265,31 @@ class FactionLoyaltyBountyHandlerTest extends TestCase {
 
         $factionLoyalty = $this->createFactionLoyalty([
             'character_id' => $character->id,
-            'faction_id'   => $character->factions->first(),
-            'is_pledged'   => true
+            'faction_id' => $character->factions->first(),
+            'is_pledged' => true,
         ]);
 
         $npc = $this->createNpc();
 
         $factionLoyaltyNpc = $this->createFactionLoyaltyNpc([
-            'faction_loyalty_id'            => $factionLoyalty->id,
-            'npc_id'                        => $npc->id,
-            'current_level'                 => 1,
-            'max_level'                     => 25,
-            'next_level_fame'               => 1000,
-            'currently_helping'             => true,
-            'kingdom_item_defence_bonus'    => 0.002,
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'npc_id' => $npc->id,
+            'current_level' => 1,
+            'max_level' => 25,
+            'next_level_fame' => 1000,
+            'currently_helping' => true,
+            'kingdom_item_defence_bonus' => 0.002,
         ]);
 
         $this->createFactionLoyaltyNpcTask([
-            'faction_loyalty_id'         => $factionLoyalty->id,
-            'faction_loyalty_npc_id'     => $factionLoyaltyNpc->id,
-            'fame_tasks'                 => [[
-                'type'            => 'bounty',
-                'monster_name'    => $monster->name,
-                'monster_id'      => $monster->id,
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'faction_loyalty_npc_id' => $factionLoyaltyNpc->id,
+            'fame_tasks' => [[
+                'type' => 'bounty',
+                'monster_name' => $monster->name,
+                'monster_id' => $monster->id,
                 'required_amount' => rand(10, 50),
-                'current_amount'  => 0,
+                'current_amount' => 0,
             ]],
         ]);
 
@@ -297,14 +306,15 @@ class FactionLoyaltyBountyHandlerTest extends TestCase {
         );
     }
 
-    public function testUpdatesTheCurrentAmountOnABountyButDoesNotLevelUpTheFameDuringTheWeeklyEvent() {
+    public function testUpdatesTheCurrentAmountOnABountyButDoesNotLevelUpTheFameDuringTheWeeklyEvent()
+    {
         $monster = $this->createMonster();
 
         $this->createEvent([
             'type' => EventType::WEEKLY_FACTION_LOYALTY_EVENT,
         ]);
 
-        $character = (new CharacterFactory())->createBaseCharacter()
+        $character = (new CharacterFactory)->createBaseCharacter()
             ->givePlayerLocation(16, 16, $monster->gameMap)
             ->assignFactionSystem()
             ->getCharacter();
@@ -313,31 +323,31 @@ class FactionLoyaltyBountyHandlerTest extends TestCase {
 
         $factionLoyalty = $this->createFactionLoyalty([
             'character_id' => $character->id,
-            'faction_id'   => $character->factions->first(),
-            'is_pledged'   => true
+            'faction_id' => $character->factions->first(),
+            'is_pledged' => true,
         ]);
 
         $npc = $this->createNpc();
 
         $factionLoyaltyNpc = $this->createFactionLoyaltyNpc([
-            'faction_loyalty_id'            => $factionLoyalty->id,
-            'npc_id'                        => $npc->id,
-            'current_level'                 => 1,
-            'max_level'                     => 25,
-            'next_level_fame'               => 1000,
-            'currently_helping'             => true,
-            'kingdom_item_defence_bonus'    => 0.002,
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'npc_id' => $npc->id,
+            'current_level' => 1,
+            'max_level' => 25,
+            'next_level_fame' => 1000,
+            'currently_helping' => true,
+            'kingdom_item_defence_bonus' => 0.002,
         ]);
 
         $this->createFactionLoyaltyNpcTask([
-            'faction_loyalty_id'         => $factionLoyalty->id,
-            'faction_loyalty_npc_id'     => $factionLoyaltyNpc->id,
-            'fame_tasks'                 => [[
-                'type'            => 'bounty',
-                'monster_name'    => $monster->name,
-                'monster_id'      => $monster->id,
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'faction_loyalty_npc_id' => $factionLoyaltyNpc->id,
+            'fame_tasks' => [[
+                'type' => 'bounty',
+                'monster_name' => $monster->name,
+                'monster_id' => $monster->id,
                 'required_amount' => rand(10, 50),
-                'current_amount'  => 0,
+                'current_amount' => 0,
             ]],
         ]);
 
@@ -354,18 +364,19 @@ class FactionLoyaltyBountyHandlerTest extends TestCase {
         );
     }
 
-    public function testLevelUpFame() {
+    public function testLevelUpFame()
+    {
         $monster = $this->createMonster();
 
         $this->createMonster([
-            'game_map_id' => $monster->game_map_id
+            'game_map_id' => $monster->game_map_id,
         ]);
 
         $this->createMonster([
-            'game_map_id' => $monster->game_map_id
+            'game_map_id' => $monster->game_map_id,
         ]);
 
-        $character = (new CharacterFactory())->createBaseCharacter()
+        $character = (new CharacterFactory)->createBaseCharacter()
             ->givePlayerLocation(16, 16, $monster->gameMap)
             ->assignFactionSystem()
             ->getCharacter();
@@ -404,31 +415,31 @@ class FactionLoyaltyBountyHandlerTest extends TestCase {
 
         $factionLoyalty = $this->createFactionLoyalty([
             'character_id' => $character->id,
-            'faction_id'   => $character->factions->first(),
-            'is_pledged'   => true
+            'faction_id' => $character->factions->first(),
+            'is_pledged' => true,
         ]);
 
         $npc = $this->createNpc();
 
         $factionLoyaltyNpc = $this->createFactionLoyaltyNpc([
-            'faction_loyalty_id'            => $factionLoyalty->id,
-            'npc_id'                        => $npc->id,
-            'current_level'                 => 1,
-            'max_level'                     => 25,
-            'next_level_fame'               => 1,
-            'currently_helping'             => true,
-            'kingdom_item_defence_bonus'    => 0.002,
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'npc_id' => $npc->id,
+            'current_level' => 1,
+            'max_level' => 25,
+            'next_level_fame' => 1,
+            'currently_helping' => true,
+            'kingdom_item_defence_bonus' => 0.002,
         ]);
 
         $this->createFactionLoyaltyNpcTask([
-            'faction_loyalty_id'         => $factionLoyalty->id,
-            'faction_loyalty_npc_id'     => $factionLoyaltyNpc->id,
-            'fame_tasks'                 => [[
-                'type'            => 'bounty',
-                'monster_name'    => $monster->name,
-                'monster_id'      => $monster->id,
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'faction_loyalty_npc_id' => $factionLoyaltyNpc->id,
+            'fame_tasks' => [[
+                'type' => 'bounty',
+                'monster_name' => $monster->name,
+                'monster_id' => $monster->id,
                 'required_amount' => rand(10, 50),
-                'current_amount'  => 200000,
+                'current_amount' => 200000,
             ]],
         ]);
 
@@ -443,7 +454,8 @@ class FactionLoyaltyBountyHandlerTest extends TestCase {
         $this->assertEquals(100, $character->shards);
     }
 
-    public function testLevelUpFameDuringTheWeeklyEvent() {
+    public function testLevelUpFameDuringTheWeeklyEvent()
+    {
         $monster = $this->createMonster();
 
         $this->createEvent([
@@ -451,14 +463,14 @@ class FactionLoyaltyBountyHandlerTest extends TestCase {
         ]);
 
         $this->createMonster([
-            'game_map_id' => $monster->game_map_id
+            'game_map_id' => $monster->game_map_id,
         ]);
 
         $this->createMonster([
-            'game_map_id' => $monster->game_map_id
+            'game_map_id' => $monster->game_map_id,
         ]);
 
-        $character = (new CharacterFactory())->createBaseCharacter()
+        $character = (new CharacterFactory)->createBaseCharacter()
             ->givePlayerLocation(16, 16, $monster->gameMap)
             ->assignFactionSystem()
             ->getCharacter();
@@ -497,31 +509,31 @@ class FactionLoyaltyBountyHandlerTest extends TestCase {
 
         $factionLoyalty = $this->createFactionLoyalty([
             'character_id' => $character->id,
-            'faction_id'   => $character->factions->first(),
-            'is_pledged'   => true
+            'faction_id' => $character->factions->first(),
+            'is_pledged' => true,
         ]);
 
         $npc = $this->createNpc();
 
         $factionLoyaltyNpc = $this->createFactionLoyaltyNpc([
-            'faction_loyalty_id'            => $factionLoyalty->id,
-            'npc_id'                        => $npc->id,
-            'current_level'                 => 1,
-            'max_level'                     => 25,
-            'next_level_fame'               => 1,
-            'currently_helping'             => true,
-            'kingdom_item_defence_bonus'    => 0.002,
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'npc_id' => $npc->id,
+            'current_level' => 1,
+            'max_level' => 25,
+            'next_level_fame' => 1,
+            'currently_helping' => true,
+            'kingdom_item_defence_bonus' => 0.002,
         ]);
 
         $this->createFactionLoyaltyNpcTask([
-            'faction_loyalty_id'         => $factionLoyalty->id,
-            'faction_loyalty_npc_id'     => $factionLoyaltyNpc->id,
-            'fame_tasks'                 => [[
-                'type'            => 'bounty',
-                'monster_name'    => $monster->name,
-                'monster_id'      => $monster->id,
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'faction_loyalty_npc_id' => $factionLoyaltyNpc->id,
+            'fame_tasks' => [[
+                'type' => 'bounty',
+                'monster_name' => $monster->name,
+                'monster_id' => $monster->id,
                 'required_amount' => rand(10, 50),
-                'current_amount'  => 200000,
+                'current_amount' => 200000,
             ]],
         ]);
 
@@ -536,18 +548,19 @@ class FactionLoyaltyBountyHandlerTest extends TestCase {
         $this->assertEquals(100, $character->shards);
     }
 
-    public function testDoNotGiveMoreCurrenciesThenMaxAllowed() {
+    public function testDoNotGiveMoreCurrenciesThenMaxAllowed()
+    {
         $monster = $this->createMonster();
 
         $this->createMonster([
-            'game_map_id' => $monster->game_map_id
+            'game_map_id' => $monster->game_map_id,
         ]);
 
         $this->createMonster([
-            'game_map_id' => $monster->game_map_id
+            'game_map_id' => $monster->game_map_id,
         ]);
 
-        $character = (new CharacterFactory())->createBaseCharacter()
+        $character = (new CharacterFactory)->createBaseCharacter()
             ->givePlayerLocation(16, 16, $monster->gameMap)
             ->assignFactionSystem()
             ->getCharacter();
@@ -588,31 +601,31 @@ class FactionLoyaltyBountyHandlerTest extends TestCase {
 
         $factionLoyalty = $this->createFactionLoyalty([
             'character_id' => $character->id,
-            'faction_id'   => $character->factions->first(),
-            'is_pledged'   => true
+            'faction_id' => $character->factions->first(),
+            'is_pledged' => true,
         ]);
 
         $npc = $this->createNpc();
 
         $factionLoyaltyNpc = $this->createFactionLoyaltyNpc([
-            'faction_loyalty_id'            => $factionLoyalty->id,
-            'npc_id'                        => $npc->id,
-            'current_level'                 => 1,
-            'max_level'                     => 25,
-            'next_level_fame'               => 1,
-            'currently_helping'             => true,
-            'kingdom_item_defence_bonus'    => 0.002,
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'npc_id' => $npc->id,
+            'current_level' => 1,
+            'max_level' => 25,
+            'next_level_fame' => 1,
+            'currently_helping' => true,
+            'kingdom_item_defence_bonus' => 0.002,
         ]);
 
         $this->createFactionLoyaltyNpcTask([
-            'faction_loyalty_id'         => $factionLoyalty->id,
-            'faction_loyalty_npc_id'     => $factionLoyaltyNpc->id,
-            'fame_tasks'                 => [[
-                'type'            => 'bounty',
-                'monster_name'    => $monster->name,
-                'monster_id'      => $monster->id,
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'faction_loyalty_npc_id' => $factionLoyaltyNpc->id,
+            'fame_tasks' => [[
+                'type' => 'bounty',
+                'monster_name' => $monster->name,
+                'monster_id' => $monster->id,
                 'required_amount' => rand(10, 50),
-                'current_amount'  => 200000,
+                'current_amount' => 200000,
             ]],
         ]);
 
@@ -627,10 +640,11 @@ class FactionLoyaltyBountyHandlerTest extends TestCase {
         $this->assertEquals(MaxCurrenciesValue::MAX_SHARDS, $character->shards);
     }
 
-    public function testDoNotAssignTasksForMaxLevelFame() {
+    public function testDoNotAssignTasksForMaxLevelFame()
+    {
         $monster = $this->createMonster();
 
-        $character = (new CharacterFactory())->createBaseCharacter()
+        $character = (new CharacterFactory)->createBaseCharacter()
             ->givePlayerLocation(16, 16, $monster->gameMap)
             ->assignFactionSystem()
             ->getCharacter();
@@ -671,31 +685,31 @@ class FactionLoyaltyBountyHandlerTest extends TestCase {
 
         $factionLoyalty = $this->createFactionLoyalty([
             'character_id' => $character->id,
-            'faction_id'   => $character->factions->first(),
-            'is_pledged'   => true
+            'faction_id' => $character->factions->first(),
+            'is_pledged' => true,
         ]);
 
         $npc = $this->createNpc();
 
         $factionLoyaltyNpc = $this->createFactionLoyaltyNpc([
-            'faction_loyalty_id'            => $factionLoyalty->id,
-            'npc_id'                        => $npc->id,
-            'current_level'                 => 24,
-            'max_level'                     => 25,
-            'next_level_fame'               => 1,
-            'currently_helping'             => true,
-            'kingdom_item_defence_bonus'    => 0.002,
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'npc_id' => $npc->id,
+            'current_level' => 24,
+            'max_level' => 25,
+            'next_level_fame' => 1,
+            'currently_helping' => true,
+            'kingdom_item_defence_bonus' => 0.002,
         ]);
 
         $this->createFactionLoyaltyNpcTask([
-            'faction_loyalty_id'         => $factionLoyalty->id,
-            'faction_loyalty_npc_id'     => $factionLoyaltyNpc->id,
-            'fame_tasks'                 => [[
-                'type'            => 'bounty',
-                'monster_name'    => $monster->name,
-                'monster_id'      => $monster->id,
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'faction_loyalty_npc_id' => $factionLoyaltyNpc->id,
+            'fame_tasks' => [[
+                'type' => 'bounty',
+                'monster_name' => $monster->name,
+                'monster_id' => $monster->id,
                 'required_amount' => rand(10, 50),
-                'current_amount'  => 200000,
+                'current_amount' => 200000,
             ]],
         ]);
 
@@ -711,10 +725,11 @@ class FactionLoyaltyBountyHandlerTest extends TestCase {
         $this->assertCount(0, $character->factionLoyalties()->first()->factionLoyaltyNpcs->first()->factionLoyaltyNpcTasks->fame_tasks);
     }
 
-    public function testCannotLevelFameAnyMore() {
+    public function testCannotLevelFameAnyMore()
+    {
         $monster = $this->createMonster();
 
-        $character = (new CharacterFactory())->createBaseCharacter()
+        $character = (new CharacterFactory)->createBaseCharacter()
             ->givePlayerLocation(16, 16, $monster->gameMap)
             ->assignFactionSystem()
             ->getCharacter();
@@ -755,31 +770,31 @@ class FactionLoyaltyBountyHandlerTest extends TestCase {
 
         $factionLoyalty = $this->createFactionLoyalty([
             'character_id' => $character->id,
-            'faction_id'   => $character->factions->first(),
-            'is_pledged'   => true
+            'faction_id' => $character->factions->first(),
+            'is_pledged' => true,
         ]);
 
         $npc = $this->createNpc();
 
         $factionLoyaltyNpc = $this->createFactionLoyaltyNpc([
-            'faction_loyalty_id'            => $factionLoyalty->id,
-            'npc_id'                        => $npc->id,
-            'current_level'                 => 25,
-            'max_level'                     => 25,
-            'next_level_fame'               => 1,
-            'currently_helping'             => true,
-            'kingdom_item_defence_bonus'    => 0.002,
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'npc_id' => $npc->id,
+            'current_level' => 25,
+            'max_level' => 25,
+            'next_level_fame' => 1,
+            'currently_helping' => true,
+            'kingdom_item_defence_bonus' => 0.002,
         ]);
 
         $this->createFactionLoyaltyNpcTask([
-            'faction_loyalty_id'         => $factionLoyalty->id,
-            'faction_loyalty_npc_id'     => $factionLoyaltyNpc->id,
-            'fame_tasks'                 => [[
-                'type'            => 'bounty',
-                'monster_name'    => $monster->name,
-                'monster_id'      => $monster->id,
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'faction_loyalty_npc_id' => $factionLoyaltyNpc->id,
+            'fame_tasks' => [[
+                'type' => 'bounty',
+                'monster_name' => $monster->name,
+                'monster_id' => $monster->id,
                 'required_amount' => rand(10, 50),
-                'current_amount'  => 200000,
+                'current_amount' => 200000,
             ]],
         ]);
 

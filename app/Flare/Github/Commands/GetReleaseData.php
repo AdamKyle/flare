@@ -5,12 +5,11 @@ namespace App\Flare\Github\Commands;
 use App\Flare\Github\Services\Github;
 use App\Flare\Models\ReleaseNote;
 use Carbon\Carbon;
-use Illuminate\Console\Command;
 use Exception;
+use Illuminate\Console\Command;
 
-
-class GetReleaseData extends Command {
-
+class GetReleaseData extends Command
+{
     /**
      * The name and signature of the console command.
      *
@@ -30,20 +29,20 @@ class GetReleaseData extends Command {
      *
      * @return void
      */
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
     }
 
     /**
      * Execute the console command.
      *
-     * @param Github $github
-     * @return void
      * @throws Exception
-     * @codeCoverageIgnore
      *
+     * @codeCoverageIgnore
      */
-    public function handle(Github $github): void {
+    public function handle(Github $github): void
+    {
 
         if (ReleaseNote::count() === 0) {
             $releases = $github->initiateClient(true)->fetchAllReleases();
@@ -64,16 +63,17 @@ class GetReleaseData extends Command {
         $this->storeRelease($releaseData);
     }
 
-    public function storeRelease(array $releaseData): void {
-        $notes  = ReleaseNote::where('url', $releaseData['html_url'])->first();
+    public function storeRelease(array $releaseData): void
+    {
+        $notes = ReleaseNote::where('url', $releaseData['html_url'])->first();
 
         if (is_null($notes)) {
             ReleaseNote::create([
-                'name'         => $releaseData['name'],
-                'version'      => $releaseData['tag_name'],
-                'url'          => $releaseData['html_url'],
+                'name' => $releaseData['name'],
+                'version' => $releaseData['tag_name'],
+                'url' => $releaseData['html_url'],
                 'release_date' => Carbon::parse($releaseData['published_at']),
-                'body'         => $releaseData['body'],
+                'body' => $releaseData['body'],
             ]);
         }
     }

@@ -4,8 +4,8 @@ namespace App\Game\Market\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class ListPriceRequest extends FormRequest {
-
+class ListPriceRequest extends FormRequest
+{
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -21,10 +21,11 @@ class ListPriceRequest extends FormRequest {
      *
      * @return array
      */
-    public function rules() {
+    public function rules()
+    {
         return [
             'list_for' => 'integer|required',
-            'slot_id'  => 'integer|required',
+            'slot_id' => 'integer|required',
         ];
     }
 }

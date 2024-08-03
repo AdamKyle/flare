@@ -19,7 +19,7 @@ return [
     // fall within +-4 of the 15 for a timeout to potentially trigger.
     //
     // ============================
-    'battle_time'  => env('BATTLE_TIME', 1),
+    'battle_time' => env('BATTLE_TIME', 1),
 
     // ======= POSSIBLY CHEATING COUNT =======
     //

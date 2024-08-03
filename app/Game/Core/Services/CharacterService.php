@@ -2,19 +2,13 @@
 
 namespace App\Game\Core\Services;
 
-use App;
 use App\Flare\Models\Character;
-use App\Flare\Models\MaxLevelConfiguration;
 use App\Game\Core\Values\LevelUpValue;
 
 class CharacterService
 {
     /**
      * Level up the character.
-     *
-     * @param Character $character
-     * @param int $leftOverXP
-     * @return void
      */
     public function levelUpCharacter(Character $character, int $leftOverXP): void
     {
@@ -31,11 +25,9 @@ class CharacterService
 
     /**
      * Get next level XP requirement.
-     *
-     * @param int $nextLevel
-     * @return int
      */
-    protected function getXPForNextLevel(int $nextLevel): int {
+    protected function getXPForNextLevel(int $nextLevel): int
+    {
         if ($nextLevel > 999) {
             $xpAtLevel1000 = 1000;
 
@@ -44,7 +36,7 @@ class CharacterService
             $xpRequired = $xpAtLevel1000 + $baseXPFactor * pow(($nextLevel - 1000), 3);
             $xpRequired = min($xpRequired, 1000000);
 
-            return (int)$xpRequired;
+            return (int) $xpRequired;
         }
 
         return 100;

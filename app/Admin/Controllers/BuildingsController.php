@@ -10,52 +10,51 @@ use App\Flare\Models\GameUnit;
 use App\Flare\Models\PassiveSkill;
 use App\Http\Controllers\Controller;
 use Exception;
-use Illuminate\Http\Request;
 
-class BuildingsController extends Controller {
-
-    /**
-     * @var UpdateKingdomsService $updateKingdomService
-     */
+class BuildingsController extends Controller
+{
     private UpdateKingdomsService $updateKingdomService;
 
-    /**
-     * @param UpdateKingdomsService $updateKingdomsService
-     */
-    public function __construct(UpdateKingdomsService $updateKingdomsService) {
+    public function __construct(UpdateKingdomsService $updateKingdomsService)
+    {
         $this->updateKingdomService = $updateKingdomsService;
     }
 
-    public function index() {
+    public function index()
+    {
         return view('admin.kingdoms.buildings.buildings');
     }
 
-    public function create() {
-        return view ('admin.kingdoms.buildings.manage', [
-            'building'         => null,
-            'editing'          => false,
-            'passiveSkills'    => PassiveSkill::all(),
+    public function create()
+    {
+        return view('admin.kingdoms.buildings.manage', [
+            'building' => null,
+            'editing' => false,
+            'passiveSkills' => PassiveSkill::all(),
             'recruitableUnits' => GameUnit::all(),
             'unitsForBuilding' => [],
         ]);
     }
 
-    public function show(GameBuilding $building) {
+    public function show(GameBuilding $building)
+    {
         return view('admin.kingdoms.buildings.building', [
-            'building' => $building
+            'building' => $building,
         ]);
     }
 
-    public function edit(GameBuilding $building) {
-        return view ('admin.kingdoms.buildings.manage', [
-            'building'         => $building,
-            'passiveSkills'    => PassiveSkill::all(),
+    public function edit(GameBuilding $building)
+    {
+        return view('admin.kingdoms.buildings.manage', [
+            'building' => $building,
+            'passiveSkills' => PassiveSkill::all(),
             'unitsForBuilding' => GameBuildingUnit::where('game_building_id', $building->id)->pluck('game_unit_id')->toArray(),
             'recruitableUnits' => GameUnit::all(),
         ]);
     }
 
-    public function store(KingdomBuildingManagementRequest $request) {
+    public function store(KingdomBuildingManagementRequest $request)
+    {
         try {
             $data = $this->updateKingdomService->cleanRequestData($request->all());
 
@@ -71,7 +70,6 @@ class BuildingsController extends Controller {
             return redirect()->back()->with('error', $e->getMessage());
         }
 
-        return redirect()->back()->with('success', $gameBuilding->name . ' saved!');
+        return redirect()->back()->with('success', $gameBuilding->name.' saved!');
     }
-
 }

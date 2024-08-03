@@ -10,20 +10,17 @@ use App\Game\Character\Concerns\FetchEquipped;
 use App\Game\Core\Traits\ResponseBuilder;
 use Exception;
 
-class ItemSkillService {
-
-    use ResponseBuilder, FetchEquipped;
+class ItemSkillService
+{
+    use FetchEquipped, ResponseBuilder;
 
     /**
      * Set the skill to being trained.
      *
-     * @param Character $character
-     * @param integer $itemId
-     * @param integer $itemSkillProgressionId
-     * @return array
      * @throws Exception
      */
-    public function trainSkill(Character $character, int $itemId, int $itemSkillProgressionId): array {
+    public function trainSkill(Character $character, int $itemId, int $itemSkillProgressionId): array
+    {
 
         $foundItem = $this->fetchItemWithSkill($character, $itemId);
 
@@ -37,7 +34,7 @@ class ItemSkillService {
             return $this->errorResult('No skill found on said item.');
         }
 
-        if (!$this->canTrainSkill($foundSkill)) {
+        if (! $this->canTrainSkill($foundSkill)) {
             return $this->errorResult('You must train the parent skill first.');
         }
 
@@ -54,19 +51,15 @@ class ItemSkillService {
         $foundSkill = $foundSkill->refresh();
 
         return $this->successResult([
-            'message' => 'You are now training: ' . $foundSkill->itemSkill->name
+            'message' => 'You are now training: '.$foundSkill->itemSkill->name,
         ]);
     }
 
     /**
      * Stop training the skill
-     *
-     * @param Character $character
-     * @param integer $itemId
-     * @param integer $itemSkillProgressionId
-     * @return array
      */
-    public function stopTrainingSkill(Character $character, int $itemId, int $itemSkillProgressionId): array {
+    public function stopTrainingSkill(Character $character, int $itemId, int $itemSkillProgressionId): array
+    {
         $foundItem = $this->fetchItemWithSkill($character, $itemId);
 
         if (is_null($foundItem)) {
@@ -86,7 +79,7 @@ class ItemSkillService {
         event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'equipped'));
 
         return $this->successResult([
-            'message' => 'You stopped training: ' . $foundSkill->itemSkill->name
+            'message' => 'You stopped training: '.$foundSkill->itemSkill->name,
         ]);
     }
 
@@ -94,11 +87,9 @@ class ItemSkillService {
      * Can we train the skill?
      *
      * - Check to make sure the parent skill is trained if needed.
-     *
-     * @param ItemSkillProgression $itemSkillProgression
-     * @return bool
      */
-    protected function canTrainSkill(ItemSkillProgression $itemSkillProgression): bool {
+    protected function canTrainSkill(ItemSkillProgression $itemSkillProgression): bool
+    {
         $itemSkill = $itemSkillProgression->itemSkill;
 
         $parentSkill = $itemSkill->parent;
@@ -114,12 +105,9 @@ class ItemSkillService {
 
     /**
      * Fetch the item with the skill from the equipped inventory
-     *
-     * @param Character $character
-     * @param integer $itemId
-     * @return Item|null
      */
-    protected function fetchItemWithSkill(Character $character, int $itemId): ?Item {
+    protected function fetchItemWithSkill(Character $character, int $itemId): ?Item
+    {
         $equippedItems = $this->fetchEquipped($character);
 
         if (is_null($equippedItems)) {
@@ -138,11 +126,10 @@ class ItemSkillService {
     /**
      * fetch the skill progression record from the item
      *
-     * @param Item $item
      * @param [type] $itemSkillProgressionId
-     * @return ItemSkillProgression|null
      */
-    protected function fetchItemSkillProgression(Item $item, $itemSkillProgressionId): ?ItemSkillProgression {
+    protected function fetchItemSkillProgression(Item $item, $itemSkillProgressionId): ?ItemSkillProgression
+    {
 
         if ($item->itemSkillProgressions->isEmpty()) {
             return null;
@@ -153,11 +140,9 @@ class ItemSkillService {
 
     /**
      * Stop training all skills.
-     *
-     * @param Item $item
-     * @return void
      */
-    protected function stopTrainingOtherSkills(Item $item): void {
+    protected function stopTrainingOtherSkills(Item $item): void
+    {
         $item->itemSkillProgressions()->update(['is_training' => false]);
     }
 }

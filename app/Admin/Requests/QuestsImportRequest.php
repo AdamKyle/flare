@@ -27,7 +27,7 @@ class QuestsImportRequest extends FormRequest
     public function rules()
     {
         return [
-            'quests_import' => 'required|mimes:xlsx|max:2048'
+            'quests_import' => 'required|mimes:xlsx|max:2048',
         ];
     }
 
@@ -36,11 +36,12 @@ class QuestsImportRequest extends FormRequest
      *
      * @return array
      */
-    public function messages() {
+    public function messages()
+    {
         return [
-            'quests_import.required'   => 'Npcs import file is required.',
-            'quests_import.mime'       => 'The system only accepts xlsx files.',
-            'quests_import.max'        => 'File to large, the system only accepts a max size of 2MB.',
+            'quests_import.required' => 'Npcs import file is required.',
+            'quests_import.mime' => 'The system only accepts xlsx files.',
+            'quests_import.max' => 'File to large, the system only accepts a max size of 2MB.',
         ];
     }
 }

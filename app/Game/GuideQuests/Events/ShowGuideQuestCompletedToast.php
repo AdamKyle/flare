@@ -10,10 +10,9 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class ShowGuideQuestCompletedToast implements ShouldBroadcastNow {
-
+class ShowGuideQuestCompletedToast implements ShouldBroadcastNow
+{
     use Dispatchable, InteractsWithSockets, SerializesModels;
-
     use SerializesModels;
 
     private User $user;
@@ -22,11 +21,9 @@ class ShowGuideQuestCompletedToast implements ShouldBroadcastNow {
 
     /**
      * Constructor
-     *
-     * @param User $user
-     * @param bool $showToast
      */
-    public function __construct(User $user, bool $showToast) {
+    public function __construct(User $user, bool $showToast)
+    {
         $this->user = $user;
         $this->showQuestCompleted = $showToast;
     }
@@ -36,7 +33,8 @@ class ShowGuideQuestCompletedToast implements ShouldBroadcastNow {
      *
      * @return Channel|array
      */
-    public function broadcastOn() {
-        return new PrivateChannel('guide-quest-completed-toast-' . $this->user->id);
+    public function broadcastOn()
+    {
+        return new PrivateChannel('guide-quest-completed-toast-'.$this->user->id);
     }
 }

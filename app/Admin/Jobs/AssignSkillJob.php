@@ -21,19 +21,13 @@ class AssignSkillJob implements ShouldQueue
 
     /**
      * Create a new job instance.
-     *
-     * @param int $characterId
-     * @param int $skillId
      */
     public function __construct(int $characterId, int $skillId)
     {
         $this->characterId = $characterId;
-        $this->skillId     = $skillId;
+        $this->skillId = $skillId;
     }
 
-    /**
-     * @param BaseSkillValue $baseSkillValue
-     */
     public function handle(BaseSkillValue $baseSkillValue)
     {
         $character = Character::find($this->characterId);

@@ -8,7 +8,8 @@ use App\Flare\Models\QuestsCompleted;
 use App\Game\GuideQuests\Services\GuideQuestService;
 use Illuminate\Console\Command;
 
-class CompleteGuideQuestForCharacter extends Command {
+class CompleteGuideQuestForCharacter extends Command
+{
     /**
      * The name and signature of the console command.
      *
@@ -26,7 +27,8 @@ class CompleteGuideQuestForCharacter extends Command {
     /**
      * Execute the console command.
      */
-    public function handle(GuideQuestService $guideQuestService) {
+    public function handle(GuideQuestService $guideQuestService)
+    {
         $character = Character::where('name', $this->argument('characterName'))->first();
 
         if (is_null($character)) {
@@ -47,10 +49,11 @@ class CompleteGuideQuestForCharacter extends Command {
         $this->line('Guide quest has been advanced for this character. Refresh in game.');
     }
 
-    protected function getNextQuest(GuideQuestService $guideQuestService, Character $character): GuideQuest | null {
+    protected function getNextQuest(GuideQuestService $guideQuestService, Character $character): ?GuideQuest
+    {
         $data = $guideQuestService->fetchQuestForCharacter($character);
 
-        if (!is_null($data)) {
+        if (! is_null($data)) {
 
             $quest = $data['quest'];
 

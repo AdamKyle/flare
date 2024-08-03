@@ -4,15 +4,15 @@ namespace App\Flare\Traits;
 
 use App\Game\Gems\Values\GemTypeValue;
 
-trait ElementAttackData {
-
+trait ElementAttackData
+{
     /**
      * Get the highest elemental value.
      *
-     * @param array $elementData
-     * @return integer
+     * @return int
      */
-    public function getHighestElementDamage(array $elementData): float {
+    public function getHighestElementDamage(array $elementData): float
+    {
         $maxValue = 0;
 
         foreach ($elementData as $name => $item) {
@@ -22,7 +22,7 @@ trait ElementAttackData {
                 if ($value > $maxValue) {
                     $maxValue = $value;
                 }
-            } else if ($item > $maxValue) {
+            } elseif ($item > $maxValue) {
                 $maxValue = $item;
             }
         }
@@ -33,11 +33,10 @@ trait ElementAttackData {
     /**
      * Get the name of teh highest element.
      *
-     * @param array $elementData
-     * @param integer $highestElementForAttack
-     * @return string
+     * @param  int  $highestElementForAttack
      */
-    public function getHighestElementName(array $elementData, float $highestElementForAttack): string {
+    public function getHighestElementName(array $elementData, float $highestElementForAttack): string
+    {
         foreach ($elementData as $name => $item) {
 
             if (is_array($item)) {
@@ -46,7 +45,7 @@ trait ElementAttackData {
                 if ($innerValue === floatval($highestElementForAttack)) {
                     return $name;
                 }
-            } else if ($item === floatval($highestElementForAttack)) {
+            } elseif ($item === floatval($highestElementForAttack)) {
                 return $name;
             }
         }
@@ -58,12 +57,9 @@ trait ElementAttackData {
      * Is the attacking element only going to do half damage?
      *
      * Example: Fire vs Water.
-     *
-     * @param array $elementData
-     * @param string $attackingElementName
-     * @return boolean
      */
-    public function isHalfDamage(array $elementData, string $attackingElementName): bool {
+    public function isHalfDamage(array $elementData, string $attackingElementName): bool
+    {
 
         $name = $this->getHighestElementName($elementData, $this->getHighestElementDamage($elementData));
 
@@ -71,40 +67,35 @@ trait ElementAttackData {
             return false;
         }
 
-        return GemTypeValue::getOppsiteForHalfDamage($name)  === $attackingElementName;
+        return GemTypeValue::getOppsiteForHalfDamage($name) === $attackingElementName;
     }
 
     /**
      * Is the attacking element going to do double damage?
      *
      * Example: Water vs Fire
-     *
-     * @param array $elementData
-     * @param string $attackingElementName
-     * @return boolean
      */
-    public function isDoubleDamage(array $elementData, string $attackingElementName): bool {
+    public function isDoubleDamage(array $elementData, string $attackingElementName): bool
+    {
         $name = $this->getHighestElementName($elementData, $this->getHighestElementDamage($elementData));
 
         if ($name === 'UNKNOWN') {
             return false;
         }
 
-        return GemTypeValue::getOppsiteForDoubleDamage($name)  === $attackingElementName;
+        return GemTypeValue::getOppsiteForDoubleDamage($name) === $attackingElementName;
     }
 
     /**
      * Get an array that contains the highest element name and its value.
-     *
-     * @param array $elementData
-     * @return array
      */
-    public function getHighestElementalValue(array $elementData): array {
+    public function getHighestElementalValue(array $elementData): array
+    {
         $highestValue = $this->getHighestElementDamage($elementData);
-        $key          = $this->getHighestElementName($elementData, $highestValue);
+        $key = $this->getHighestElementName($elementData, $highestValue);
 
         $result = [
-            substr($key, 0, strpos($key, '_')) => $highestValue
+            substr($key, 0, strpos($key, '_')) => $highestValue,
         ];
 
         return $result;

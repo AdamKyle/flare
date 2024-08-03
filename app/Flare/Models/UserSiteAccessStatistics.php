@@ -6,8 +6,8 @@ use Database\Factories\UserSiteAccessStatisticsFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class UserSiteAccessStatistics extends Model {
-
+class UserSiteAccessStatistics extends Model
+{
     use HasFactory;
 
     /**
@@ -19,7 +19,7 @@ class UserSiteAccessStatistics extends Model {
         'amount_signed_in',
         'amount_registered',
         'invalid_ips',
-        'invalid_user_ids'
+        'invalid_user_ids',
     ];
 
     /**
@@ -28,13 +28,14 @@ class UserSiteAccessStatistics extends Model {
      * @var array
      */
     protected $casts = [
-        'amount_signed_in'  => 'integer',
+        'amount_signed_in' => 'integer',
         'amount_registered' => 'integer',
-        'invalid_ips'       => 'array',
-        'invalid_user_ids'  => 'array',
+        'invalid_ips' => 'array',
+        'invalid_user_ids' => 'array',
     ];
 
-    protected static function newFactory() {
+    protected static function newFactory()
+    {
         return UserSiteAccessStatisticsFactory::new();
     }
 }

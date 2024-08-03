@@ -11,19 +11,21 @@ use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\CharacterMaxLevel;
 use App\Game\Core\Traits\ResponseBuilder;
 
-class CharacterReincarnateService {
-
+class CharacterReincarnateService
+{
     const MAX_STATS = 9999999999;
 
-    use ResponseBuilder, CharacterMaxLevel;
+    use CharacterMaxLevel, ResponseBuilder;
 
     private UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes;
 
-    public function __construct(UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes) {
+    public function __construct(UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes)
+    {
         $this->updateCharacterAttackTypes = $updateCharacterAttackTypes;
     }
 
-    public function reincarnate(Character $character): array {
+    public function reincarnate(Character $character): array
+    {
 
         $maxLevel = MaxLevelConfiguration::first()->max_level;
 
@@ -50,10 +52,11 @@ class CharacterReincarnateService {
         return $this->doReincarnation($character);
     }
 
-    public function doReincarnation(Character $character): array {
-        $baseStats    = ['str', 'dur', 'dex', 'chr', 'int', 'agi', 'focus'];
+    public function doReincarnation(Character $character): array
+    {
+        $baseStats = ['str', 'dur', 'dex', 'chr', 'int', 'agi', 'focus'];
         $updatedStats = [];
-        $baseStat     = resolve(BaseStatValue::class)->setRace($character->race)->setClass($character->class);
+        $baseStat = resolve(BaseStatValue::class)->setRace($character->race)->setClass($character->class);
 
         foreach ($baseStats as $stat) {
 
@@ -63,9 +66,9 @@ class CharacterReincarnateService {
                 continue;
             }
 
-            $base            = $baseStat->{$stat}() + $character->reincarnated_stat_increase;
-            $characterBonus  = $characterStat * 0.20;
-            $base            = $base + $characterBonus;
+            $base = $baseStat->{$stat}() + $character->reincarnated_stat_increase;
+            $characterBonus = $characterStat * 0.20;
+            $base = $base + $characterBonus;
 
             if ($base >= self::MAX_STATS) {
                 $base = self::MAX_STATS;
@@ -78,7 +81,6 @@ class CharacterReincarnateService {
             return $this->errorResult('You have maxed all stats to '.number_format(self::MAX_STATS).'.');
         }
 
-        
         $newReincarnatedStatBonus = $character->reincarnated_stat_increase + $characterBonus;
 
         if ($newReincarnatedStatBonus > self::MAX_STATS) {
@@ -103,15 +105,14 @@ class CharacterReincarnateService {
 
         $xpPenalty = $character->xp_penalty + $baseXpPenalty;
 
-
         $additionalUpdates = [
-            'xp_penalty'                 => $xpPenalty,
-            'level'                      => 1,
-            'xp'                         => 0,
-            'xp_next'                    => 100 + 100 * $xpPenalty,
-            'copper_coins'               => $character->copper_coins > 0 ? $character->copper_coins - 50000 : 0,
+            'xp_penalty' => $xpPenalty,
+            'level' => 1,
+            'xp' => 0,
+            'xp_next' => 100 + 100 * $xpPenalty,
+            'copper_coins' => $character->copper_coins > 0 ? $character->copper_coins - 50000 : 0,
             'reincarnated_stat_increase' => $newReincarnatedStatBonus,
-            'times_reincarnated'         => $timesReincarnated,
+            'times_reincarnated' => $timesReincarnated,
         ];
 
         $character->update(array_merge($updatedStats, $additionalUpdates));
@@ -123,7 +124,7 @@ class CharacterReincarnateService {
         event(new UpdateTopBarEvent($character));
 
         return $this->successResult([
-            'message' => 'Reincarnated character and applied 20% of your current level (base) stats toward your new (base) stats.'
+            'message' => 'Reincarnated character and applied 20% of your current level (base) stats toward your new (base) stats.',
         ]);
     }
 }

@@ -2,25 +2,22 @@
 
 namespace App\Game\Maps\Services\Common;
 
+use App\Flare\Models\Character;
 use App\Flare\Models\Event;
 use App\Flare\Models\Location;
-use App\Flare\Models\Character;
 use App\Flare\Values\ItemEffectsValue;
-use Illuminate\Support\Facades\Cache;
 use App\Game\Maps\Events\UpdateMonsterList;
 use App\Game\Maps\Events\UpdateRaidMonsters;
 use App\Game\Messages\Events\ServerMessageEvent;
+use Illuminate\Support\Facades\Cache;
 
-trait UpdateRaidMonstersForLocation {
-
+trait UpdateRaidMonstersForLocation
+{
     /**
      * Updates the monster list when a player enters a special location.
-     *
-     * @param Character $character
-     * @param Location|null $location
-     * @return void
      */
-    public function updateMonstersList(Character $character, ?Location $location = null): void {
+    public function updateMonstersList(Character $character, ?Location $location = null): void
+    {
 
         if (is_null($character->map)) {
             return;
@@ -30,8 +27,8 @@ trait UpdateRaidMonstersForLocation {
 
         $hasAccessToPurgatory = $character->inventory->slots->where('item.effect', ItemEffectsValue::PURGATORY)->count() > 0;
 
-        if (!is_null($character->map->gameMap->only_during_event_type)) {
-            if (!$hasAccessToPurgatory) {
+        if (! is_null($character->map->gameMap->only_during_event_type)) {
+            if (! $hasAccessToPurgatory) {
                 $monsters = $monsters['easier'];
             } else {
                 $monsters = $monsters['regular'];
@@ -46,11 +43,11 @@ trait UpdateRaidMonstersForLocation {
             return;
         }
 
-        if (!is_null($location)) {
-            if (!is_null($location->enemy_strength_type)) {
+        if (! is_null($location)) {
+            if (! is_null($location->enemy_strength_type)) {
                 $locationMonsters = Cache::get('monsters')[$location->name];
 
-                if (!$hasAccessToPurgatory && !is_null($character->map->gameMap->only_during_event_type)) {
+                if (! $hasAccessToPurgatory && ! is_null($character->map->gameMap->only_during_event_type)) {
                     event(new ServerMessageEvent(
                         $character->user,
                         'You have entered a special location in a place that is hostile and dangerous. Alas because you are so squishy,
@@ -80,16 +77,13 @@ trait UpdateRaidMonstersForLocation {
 
     /**
      * Update Monsters for a possible raid at a possible location for a character.
-     *
-     * @param Character $character
-     * @param Location|null $location
-     * @return bool
      */
-    protected function updateMonstersForRaid(Character $character, ?Location $location = null): bool {
+    protected function updateMonstersForRaid(Character $character, ?Location $location = null): bool
+    {
         $raidEvent = Event::whereNotNull('raid_id')->first();
 
-        if (!is_null($raidEvent) && !is_null($location)) {
-            $locationIds        = array_map('intval', $raidEvent->raid->corrupted_location_ids);
+        if (! is_null($raidEvent) && ! is_null($location)) {
+            $locationIds = array_map('intval', $raidEvent->raid->corrupted_location_ids);
             $raidBossLocationId = $raidEvent->raid->raid_boss_location_id;
 
             if ($location->id !== $raidBossLocationId) {
@@ -115,23 +109,20 @@ trait UpdateRaidMonstersForLocation {
 
     /**
      * Update the monsters list for a special location type, if it has monsters.
-     *
-     * @param Character $character
-     * @param Location|null $location
-     * @return bool
      */
-    protected function updateMonsterForLocationType(Character $character, ?Location $location = null): bool {
+    protected function updateMonsterForLocationType(Character $character, ?Location $location = null): bool
+    {
         if (is_null($location)) {
             return false;
         }
 
         $cache = Cache::get('special-location-monsters');
 
-        if (!isset($cache['location-type-' . $location->type])) {
+        if (! isset($cache['location-type-'.$location->type])) {
             return false;
         }
 
-        $monsters = $cache['location-type-' . $location->type];
+        $monsters = $cache['location-type-'.$location->type];
 
         event(new UpdateMonsterList($monsters, $character->user));
         event(new UpdateRaidMonsters([], $character->user));

@@ -28,7 +28,8 @@ class PurchasePeopleRequest extends FormRequest
         ];
     }
 
-    public function messages() {
+    public function messages()
+    {
         return [
             'amount_to_purchase.required' => 'Amount to purchase is required.',
         ];

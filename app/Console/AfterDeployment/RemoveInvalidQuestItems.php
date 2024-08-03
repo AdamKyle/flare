@@ -25,8 +25,9 @@ class RemoveInvalidQuestItems extends Command
     /**
      * Execute the console command.
      */
-    public function handle() {
-        Character::chunkById(100, function($characters) {
+    public function handle()
+    {
+        Character::chunkById(100, function ($characters) {
             foreach ($characters as $character) {
 
                 if (is_null($character->inventory)) {

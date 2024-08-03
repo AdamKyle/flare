@@ -19,7 +19,6 @@ Route::middleware(['auth', 'is.admin'])->group(function () {
     Route::post('/admin/maps/process-upload', ['as' => 'upload.map', 'uses' => 'MapsController@upload']);
     Route::post('/admin/maps/{gameMap}/post-bonuses', ['as' => 'add.map.bonuses', 'uses' => 'MapsController@postBonuses']);
 
-
     Route::get('/admin/locations/export-locations', ['as' => 'locations.export', 'uses' => 'LocationsController@exportLocations']);
     Route::get('/admin/locations/import-locations', ['as' => 'locations.import', 'uses' => 'LocationsController@importLocations']);
     Route::post('/admin/locations/export-data', ['as' => 'locations.export-data', 'uses' => 'LocationsController@export']);
@@ -135,7 +134,6 @@ Route::middleware(['auth', 'is.admin'])->group(function () {
     Route::get('/admin/classes/create', ['as' => 'classes.create', 'uses' => 'ClassesController@create']);
     Route::get('/admin/classes/{class}', ['as' => 'classes.class', 'uses' => 'ClassesController@show']);
     Route::get('/admin/classes/{class}/edit', ['as' => 'classes.edit', 'uses' => 'ClassesController@edit']);
-
 
     Route::get('/admin/kingdoms/buildings/create', ['as' => 'buildings.create', 'uses' => 'BuildingsController@create']);
     Route::get('/admin/kingdoms/buildings', ['as' => 'buildings.list', 'uses' => 'BuildingsController@index']);

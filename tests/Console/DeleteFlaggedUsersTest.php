@@ -2,32 +2,32 @@
 
 namespace Tests\Console;
 
+use App\Flare\Jobs\AccountDeletionJob;
+use App\Flare\Models\GameMap;
+use App\Flare\Models\UserSiteAccessStatistics;
+use App\Flare\Values\NpcTypes;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Queue;
-use Tests\TestCase;
 use Tests\Setup\Character\CharacterFactory;
+use Tests\TestCase;
 use Tests\Traits\CreateGameSkill;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateNpc;
 use Tests\Traits\CreateRole;
 use Tests\Traits\CreateUser;
-use App\Flare\Jobs\AccountDeletionJob;
-use App\Flare\Models\GameMap;
-use App\Flare\Models\UserSiteAccessStatistics;
-use App\Flare\Values\NpcTypes;
-
 
 class DeleteFlaggedUsersTest extends TestCase
 {
-    use RefreshDatabase, CreateUser, CreateRole, CreateGameSkill, CreateNpc, CreateItem;
+    use CreateGameSkill, CreateItem, CreateNpc, CreateRole, CreateUser, RefreshDatabase;
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
         $this->createAdmin($this->createAdminRole());
 
-        $this->character = (new CharacterFactory())->createBaseCharacter()
+        $this->character = (new CharacterFactory)->createBaseCharacter()
             ->givePlayerLocation()
             ->equipStartingEquipment()
             ->createMarketListing()
@@ -44,11 +44,11 @@ class DeleteFlaggedUsersTest extends TestCase
 
         $this->createNpc([
             'game_map_id' => GameMap::first()->id,
-            'type'        => NpcTypes::KINGDOM_HOLDER,
+            'type' => NpcTypes::KINGDOM_HOLDER,
         ]);
 
         UserSiteAccessStatistics::create([
-            'amount_signed_in'  => 1,
+            'amount_signed_in' => 1,
             'amount_registered' => 1,
         ]);
 
@@ -57,7 +57,8 @@ class DeleteFlaggedUsersTest extends TestCase
         Queue::fake();
     }
 
-    public function testDeleteInactiveFlaggedUsers() {
+    public function testDeleteInactiveFlaggedUsers()
+    {
         $this->character->user()->update([
             'will_be_deleted' => true,
         ]);
@@ -67,7 +68,8 @@ class DeleteFlaggedUsersTest extends TestCase
         Queue::assertPushed(AccountDeletionJob::class);
     }
 
-    public function testDoNotDeletedNonFlaggedUsers() {
+    public function testDoNotDeletedNonFlaggedUsers()
+    {
         $this->assertEquals(0, $this->artisan('delete:flagged-users'));
 
         Queue::assertNotPushed(AccountDeletionJob::class);

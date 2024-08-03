@@ -9,8 +9,8 @@ use App\Game\Shop\Services\ShopService;
 use App\Game\Skills\Services\DisenchantService;
 use Exception;
 
-class MultiInventoryActionService {
-
+class MultiInventoryActionService
+{
     use ResponseBuilder;
 
     public function __construct(
@@ -22,13 +22,8 @@ class MultiInventoryActionService {
         private readonly CharacterInventoryService $characterInventoryService,
     ) {}
 
-    /**
-     * @param Character $character
-     * @param int $setId
-     * @param array $slotIds
-     * @return array
-     */
-    public function moveManyItemsToSelectedSet(Character $character, int $setId, array $slotIds): array {
+    public function moveManyItemsToSelectedSet(Character $character, int $setId, array $slotIds): array
+    {
 
         $result = [];
 
@@ -59,7 +54,8 @@ class MultiInventoryActionService {
         ]);
     }
 
-    public function equipManyItems(Character $character, array $slotIds): array {
+    public function equipManyItems(Character $character, array $slotIds): array
+    {
 
         try {
             $itemsToEquip = $this->equipManyBuilder->buildEquipmentArray($character, $slotIds);
@@ -73,7 +69,7 @@ class MultiInventoryActionService {
         foreach ($itemsToEquip as $toEquipItem) {
             $result = $this->equipItemService->equipItem($character, [
                 'position' => $toEquipItem['position'],
-                'slot_id'  => $toEquipItem['slot_id'],
+                'slot_id' => $toEquipItem['slot_id'],
                 'equip_type' => $toEquipItem['type'],
             ]);
 
@@ -85,7 +81,8 @@ class MultiInventoryActionService {
         return $result;
     }
 
-    public function sellManyItems(Character $character, array $slotIds): array {
+    public function sellManyItems(Character $character, array $slotIds): array
+    {
 
         $result = $this->errorResult('Nothing happened when trying to sell many items. Did you select anything?');
 
@@ -106,12 +103,13 @@ class MultiInventoryActionService {
         $names = implode(', ', $itemNames); // Convert array of item names to a string
 
         return $this->successResult([
-            'message' => 'Sold the following items: ' . $names . ' for a total of: ' . number_format($soldFor) . ' Gold. (After 5% tax is taken)',
+            'message' => 'Sold the following items: '.$names.' for a total of: '.number_format($soldFor).' Gold. (After 5% tax is taken)',
             'inventory' => $result['inventory'],
         ]);
     }
 
-    public function disenchantManyItems(Character $character, array $slotIds): array {
+    public function disenchantManyItems(Character $character, array $slotIds): array
+    {
         $result = $this->errorResult('Nothing happened when trying to disenchant many items. Did you select anything?');
 
         foreach ($slotIds as $slotId) {
@@ -135,7 +133,8 @@ class MultiInventoryActionService {
         ]);
     }
 
-    public function destroyManyItems(Character $character, array $slotIds): array {
+    public function destroyManyItems(Character $character, array $slotIds): array
+    {
         $result = $this->errorResult('Nothing happened when trying to destroy many items. Did you select anything?');
 
         $characterInventoryService = $this->characterInventoryService->setCharacter($character);
@@ -154,5 +153,4 @@ class MultiInventoryActionService {
             'inventory' => $result['inventory'],
         ]);
     }
-
 }

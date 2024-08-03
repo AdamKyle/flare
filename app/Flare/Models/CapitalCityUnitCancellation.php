@@ -24,19 +24,23 @@ class CapitalCityUnitCancellation extends Model
         'travel_time_completed_at' => 'datetime',
     ];
 
-    public function unit(): HasOne {
+    public function unit(): HasOne
+    {
         return $this->hasOne(GameUnit::class, 'id', 'unit_id');
     }
 
-    public function kingdom(): HasOne {
+    public function kingdom(): HasOne
+    {
         return $this->hasOne(Kingdom::class, 'id', 'kingdom_id');
     }
 
-    public function character(): HasOne {
+    public function character(): HasOne
+    {
         return $this->hasOne(Character::class, 'id', 'character_id');
     }
 
-    public function capitalCityUnitQueue(): HasOne {
+    public function capitalCityUnitQueue(): HasOne
+    {
         return $this->hasOne(CapitalCityUnitQueue::class, 'id', 'capital_city_unit_queue_id');
     }
 }

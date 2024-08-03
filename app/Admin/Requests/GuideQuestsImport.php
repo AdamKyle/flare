@@ -27,7 +27,7 @@ class GuideQuestsImport extends FormRequest
     public function rules()
     {
         return [
-            'guide_quests_import' => 'required|mimes:xlsx|max:2048'
+            'guide_quests_import' => 'required|mimes:xlsx|max:2048',
         ];
     }
 
@@ -36,11 +36,12 @@ class GuideQuestsImport extends FormRequest
      *
      * @return array
      */
-    public function messages() {
+    public function messages()
+    {
         return [
-            'guide_quests_import.required'   => 'Guide Quests import file is required.',
-            'guide_quests_import.mime'       => 'The system only accepts xlsx files.',
-            'guide_quests_import.max'        => 'File to large, the system only accepts a max size of 2MB.',
+            'guide_quests_import.required' => 'Guide Quests import file is required.',
+            'guide_quests_import.mime' => 'The system only accepts xlsx files.',
+            'guide_quests_import.max' => 'File to large, the system only accepts a max size of 2MB.',
         ];
     }
 }

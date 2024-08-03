@@ -2,8 +2,8 @@
 
 namespace Database\Factories;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Flare\Models\CelestialFight;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 class CelestialFightFactory extends Factory
 {
@@ -22,17 +22,17 @@ class CelestialFightFactory extends Factory
     public function definition()
     {
         return [
-            'monster_id'      => null,
-            'character_id'    => null,
-            'conjured_at'     => null,
-            'x_position'      => null,
-            'y_position'      => null,
+            'monster_id' => null,
+            'character_id' => null,
+            'conjured_at' => null,
+            'x_position' => null,
+            'y_position' => null,
             'damaged_kingdom' => null,
-            'stole_treasury'  => null,
+            'stole_treasury' => null,
             'weakened_morale' => null,
-            'current_health'  => null,
-            'max_health'      => null,
-            'type'            => null,
+            'current_health' => null,
+            'max_health' => null,
+            'type' => null,
         ];
     }
 }

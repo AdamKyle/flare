@@ -2,14 +2,14 @@
 
 namespace App\Flare\Services;
 
-
 use App\Flare\Models\User;
 
-class CanUserEnterSiteService {
+class CanUserEnterSiteService
+{
+    public function canUserEnterSite(string $email): bool
+    {
 
-    public function canUserEnterSite(string $email) : bool {
-
-        if (!config('app.disabled_reg_and_login')) {
+        if (! config('app.disabled_reg_and_login')) {
             return true;
         }
 

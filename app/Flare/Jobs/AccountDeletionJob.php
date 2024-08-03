@@ -2,45 +2,36 @@
 
 namespace App\Flare\Jobs;
 
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Log;
+use App\Flare\Events\UpdateSiteStatisticsChart;
+use App\Flare\Mail\GenericMail;
+use App\Flare\Models\User;
+use App\Flare\Models\UserSiteAccessStatistics;
+use App\Flare\Services\CharacterDeletion;
+use App\Game\Core\Traits\UpdateMarketBoard;
+use App\Game\Messages\Events\GlobalMessageEvent;
+use App\Game\Messages\Models\Message;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use App\Flare\Services\CharacterDeletion;
-use App\Flare\Models\User;
-use App\Flare\Events\UpdateSiteStatisticsChart;
-use App\Flare\Mail\GenericMail;
-use App\Flare\Models\UserSiteAccessStatistics;
-use App\Game\Core\Traits\UpdateMarketBoard;
-use App\Game\Messages\Events\GlobalMessageEvent;
-use App\Game\Messages\Models\Message;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class AccountDeletionJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, UpdateMarketBoard;
 
-    /**
-     * @var User $user
-     */
     protected User $user;
 
-    /**
-     * @var bool $emailUser
-     */
     protected bool $emailUser;
-
 
     /**
      * Create a new job instance.
-     *
-     * @param User $user
-     * @param bool $emailUser
      */
-    public function __construct(User $user, bool $emailUser = false) {
-        $this->user      = $user;
+    public function __construct(User $user, bool $emailUser = false)
+    {
+        $this->user = $user;
         $this->emailUser = $emailUser;
     }
 
@@ -49,12 +40,12 @@ class AccountDeletionJob implements ShouldQueue
      *
      * - Only email the user if they have manually deleted themselves.
      *
-     * @param CharacterDeletion $characterDeletion
      * @return void
      */
-    public function handle(CharacterDeletion $characterDeletion) {
+    public function handle(CharacterDeletion $characterDeletion)
+    {
         try {
-            $user          = $this->user;
+            $user = $this->user;
             $characterName = $user->character->name;
 
             $characterDeletion->deleteCharacterFromUser($user->character);
@@ -62,7 +53,7 @@ class AccountDeletionJob implements ShouldQueue
             $siteAccessStatistic = UserSiteAccessStatistics::orderBy('created_at', 'desc')->first();
 
             UserSiteAccessStatistics::create([
-                'amount_signed_in'  => $siteAccessStatistic->amount_signed_in - 1,
+                'amount_signed_in' => $siteAccessStatistic->amount_signed_in - 1,
                 'amount_registered' => $siteAccessStatistic->amount_registered - 1,
             ]);
 
@@ -79,7 +70,7 @@ class AccountDeletionJob implements ShouldQueue
 
                 Mail::to($user->email)->send(new GenericMail($user, $message, 'Account Deletion', true));
 
-                event(new GlobalMessageEvent('The Creator is sad today: ' . $characterName . ' has decided to call it quits. We wish them the best on their journeys'));
+                event(new GlobalMessageEvent('The Creator is sad today: '.$characterName.' has decided to call it quits. We wish them the best on their journeys'));
             }
 
             Message::where('user_id', $user->id)->delete();

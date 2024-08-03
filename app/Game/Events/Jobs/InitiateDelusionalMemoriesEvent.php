@@ -19,29 +19,22 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
-class InitiateDelusionalMemoriesEvent implements ShouldQueue {
-
+class InitiateDelusionalMemoriesEvent implements ShouldQueue
+{
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    /**
-     * @var int $eventId
-     */
     protected int $eventId;
 
     /**
      * Create a new job instance.
-     *
-     * @param int $eventId
      */
-    public function __construct(int $eventId) {
+    public function __construct(int $eventId)
+    {
         $this->eventId = $eventId;
     }
 
-    /**
-     * @param BuildQuestCacheService $buildQuestCacheService
-     * @return void
-     */
-    public function handle(BuildQuestCacheService $buildQuestCacheService): void {
+    public function handle(BuildQuestCacheService $buildQuestCacheService): void
+    {
 
         $event = ScheduledEvent::find($this->eventId);
 
@@ -54,9 +47,9 @@ class InitiateDelusionalMemoriesEvent implements ShouldQueue {
         ]);
 
         Event::create([
-            'type'       => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'type' => EventType::DELUSIONAL_MEMORIES_EVENT,
             'started_at' => now(),
-            'ends_at'    => $event->end_date,
+            'ends_at' => $event->end_date,
             'event_goal_steps' => [
                 GlobalEventSteps::BATTLE,
                 GlobalEventSteps::CRAFT,
@@ -76,10 +69,8 @@ class InitiateDelusionalMemoriesEvent implements ShouldQueue {
         $buildQuestCacheService->buildQuestCache(true);
     }
 
-    /**
-     * @return void
-     */
-    public function kickOffGlobalEventGoal(): void {
+    public function kickOffGlobalEventGoal(): void
+    {
         $globalEventGoalData = GlobalEventForEventTypeValue::returnGlobalEventInfoForSeasonalEvents(EventType::DELUSIONAL_MEMORIES_EVENT);
 
         GlobalEventGoal::create($globalEventGoalData);
@@ -88,13 +79,13 @@ class InitiateDelusionalMemoriesEvent implements ShouldQueue {
 
         event(new GlobalMessageEvent('"Child! We need you!" The Red Hawk Soldier looks at you. There is a fear in his eyes. "Please child. Fight with us!"', 'raid-global-message'));
 
-        event(new GlobalMessageEvent('While on the Delusional Memories Plane, characters who kill: ANY CREATURE in either manual or exploration, will increase the new: Global Event Goal. ' .
-            'Players will be rewarded with random Corrupted Ice Gear when specific milestones are reached. ' .
+        event(new GlobalMessageEvent('While on the Delusional Memories Plane, characters who kill: ANY CREATURE in either manual or exploration, will increase the new: Global Event Goal. '.
+            'Players will be rewarded with random Corrupted Ice Gear when specific milestones are reached. '.
             'Players who participate and help the battle progress, will move the event forward to a crafting and then enchanting and then back to fighting - and around we go again.'));
 
-        event(new GlobalMessageEvent('Players can participate by going to the map: ' . $gameMap->name .
-            ' via Traverse (under the map for desktop, under the map inside Map Movement action drop down for mobile)' . ' ' .
-            'And completing either Fighting monsters, Crafting: Weapons, Spells, Armour and Rings or enchanting the already crafted items.' .
+        event(new GlobalMessageEvent('Players can participate by going to the map: '.$gameMap->name.
+            ' via Traverse (under the map for desktop, under the map inside Map Movement action drop down for mobile)'.' '.
+            'And completing either Fighting monsters, Crafting: Weapons, Spells, Armour and Rings or enchanting the already crafted items.'.
             ' You can see the event goal for the map specified by being on the map and clicking the Event Goal tab from the map.'));
     }
 }

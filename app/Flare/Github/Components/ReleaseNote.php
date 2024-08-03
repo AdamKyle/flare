@@ -2,17 +2,13 @@
 
 namespace App\Flare\Github\Components;
 
-
-use Illuminate\View\Component;
-use Illuminate\View\View;
 use App\Flare\Github\Services\Markdown;
 use App\Flare\Models\ReleaseNote as ReleaseNoteModel;
+use Illuminate\View\Component;
+use Illuminate\View\View;
 
-class ReleaseNote extends Component {
-
-    /**
-     * @var ReleaseNoteModel $releaseNote
-     */
+class ReleaseNote extends Component
+{
     public ReleaseNoteModel $releaseNote;
 
     /**
@@ -20,21 +16,21 @@ class ReleaseNote extends Component {
      *
      * @return void
      */
-    public function __construct(ReleaseNoteModel $releaseNote) {
+    public function __construct(ReleaseNoteModel $releaseNote)
+    {
         $this->releaseNote = $releaseNote;
     }
 
     /**
      * Get the view / contents that represent the component.
-     *
-     * @return string|View
      */
-    public function render(): string|View{
+    public function render(): string|View
+    {
         $content = resolve(Markdown::class)->convertToHtml($this->releaseNote->body);
 
         return view('components.release-note', [
             'release' => $this->releaseNote,
-            'content' => $content
+            'content' => $content,
         ]);
     }
 }

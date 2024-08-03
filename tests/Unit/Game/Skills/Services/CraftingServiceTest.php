@@ -2,28 +2,25 @@
 
 namespace Tests\Unit\Game\Skills\Services;
 
+use App\Flare\Models\GameSkill;
 use App\Flare\Models\GlobalEventCraftingInventory;
 use App\Flare\Models\GlobalEventCraftingInventorySlot;
+use App\Flare\Models\Item;
 use App\Flare\Values\ArmourTypes;
+use App\Flare\Values\CharacterClassValue;
 use App\Flare\Values\ItemSpecialtyType;
-use App\Flare\Values\ItemUsabilityType;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Flare\Values\SpellTypes;
 use App\Flare\Values\WeaponTypes;
-use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Events\Values\EventType;
 use App\Game\Events\Values\GlobalEventSteps;
 use App\Game\Messages\Builders\ServerMessageBuilder;
+use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Skills\Services\CraftingService;
 use App\Game\Skills\Services\SkillCheckService;
-use Illuminate\Support\Facades\Event;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Flare\Models\Item;
-use App\Flare\Values\CharacterClassValue;
-use App\Flare\Models\GameSkill;
 use App\Game\Skills\Values\SkillTypeValue;
-use App\Game\Messages\Events\ServerMessageEvent;
-use App\Game\Skills\Services\AlchemyService;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Event;
 use Mockery;
 use Mockery\MockInterface;
 use Tests\Setup\Character\CharacterFactory;
@@ -36,9 +33,9 @@ use Tests\Traits\CreateGlobalEventGoal;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateNpc;
 
-class CraftingServiceTest extends TestCase {
-
-    use RefreshDatabase, CreateItem, CreateClass, CreateGameSkill, CreateFactionLoyalty, CreateNpc, CreateEvent, CreateGlobalEventGoal;
+class CraftingServiceTest extends TestCase
+{
+    use CreateClass, CreateEvent, CreateFactionLoyalty, CreateGameSkill, CreateGlobalEventGoal, CreateItem, CreateNpc, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -48,7 +45,8 @@ class CraftingServiceTest extends TestCase {
 
     private ?GameSkill $craftingSkill;
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
         $this->craftingSkill = $this->createGameSkill([
@@ -56,33 +54,35 @@ class CraftingServiceTest extends TestCase {
             'type' => SkillTypeValue::CRAFTING,
         ]);
 
-        $this->character = (new CharacterFactory())->createBaseCharacter()->assignSkill(
+        $this->character = (new CharacterFactory)->createBaseCharacter()->assignSkill(
             $this->craftingSkill
         )->givePlayerLocation();
 
         $this->craftingService = resolve(CraftingService::class);
 
         $this->craftingItem = $this->createItem([
-            'cost'                 => 1000,
+            'cost' => 1000,
             'skill_level_required' => 1,
-            'skill_level_trivial'  => 100,
-            'crafting_type'        => 'weapon',
-            'type'                 => 'weapon',
-            'can_craft'            => true,
-            'default_position'     => 'hammer',
+            'skill_level_trivial' => 100,
+            'crafting_type' => 'weapon',
+            'type' => 'weapon',
+            'can_craft' => true,
+            'default_position' => 'hammer',
         ]);
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
 
-        $this->character       = null;
+        $this->character = null;
         $this->craftingService = null;
-        $this->craftingItem    = null;
-        $this->craftingSkill   = null;
+        $this->craftingItem = null;
+        $this->craftingSkill = null;
     }
 
-    public function testFetchCraftableItems() {
+    public function testFetchCraftableItems()
+    {
         $character = $this->character->getCharacter();
 
         $result = $this->craftingService->fetchCraftableItems($character, [
@@ -92,18 +92,19 @@ class CraftingServiceTest extends TestCase {
         $this->assertNotEmpty($result);
     }
 
-    public function testFetchCraftableItemsForArmour() {
+    public function testFetchCraftableItemsForArmour()
+    {
         $character = $this->character->assignSkill($this->createGameSkill([
             'name' => 'Armour Crafting',
             'type' => SkillTypeValue::CRAFTING,
         ]))->getCharacter();
 
         $this->createItem([
-            'type'                 => ArmourTypes::SHIELD,
-            'crafting_type'        => 'armour',
+            'type' => ArmourTypes::SHIELD,
+            'crafting_type' => 'armour',
             'skill_level_required' => 1,
-            'skill_level_trivial'  => 100,
-            'can_craft'            => true,
+            'skill_level_trivial' => 100,
+            'can_craft' => true,
         ]);
 
         $result = $this->craftingService->fetchCraftableItems($character, [
@@ -113,15 +114,16 @@ class CraftingServiceTest extends TestCase {
         $this->assertNotEmpty($result);
     }
 
-    public function testFetchCraftableItemsForRegularWeapon() {
+    public function testFetchCraftableItemsForRegularWeapon()
+    {
         $character = $this->character->getCharacter();
 
         $this->createItem([
-            'type'                 => WeaponTypes::WEAPON,
-            'crafting_type'        => 'weapon',
+            'type' => WeaponTypes::WEAPON,
+            'crafting_type' => 'weapon',
             'skill_level_required' => 1,
-            'skill_level_trivial'  => 100,
-            'can_craft'            => true,
+            'skill_level_trivial' => 100,
+            'can_craft' => true,
         ]);
 
         $result = $this->craftingService->fetchCraftableItems($character, [
@@ -131,18 +133,19 @@ class CraftingServiceTest extends TestCase {
         $this->assertNotEmpty($result);
     }
 
-    public function testFetchCraftableItemsForRegularSpells() {
+    public function testFetchCraftableItemsForRegularSpells()
+    {
         $character = $this->character->assignSkill($this->createGameSkill([
             'name' => 'Spell Crafting',
             'type' => SkillTypeValue::CRAFTING,
         ]))->getCharacter();
 
         $this->createItem([
-            'type'                 => SpellTypes::DAMAGE,
-            'crafting_type'        => 'spell',
+            'type' => SpellTypes::DAMAGE,
+            'crafting_type' => 'spell',
             'skill_level_required' => 1,
-            'skill_level_trivial'  => 100,
-            'can_craft'            => true,
+            'skill_level_trivial' => 100,
+            'can_craft' => true,
         ]);
 
         $result = $this->craftingService->fetchCraftableItems($character, [
@@ -152,11 +155,12 @@ class CraftingServiceTest extends TestCase {
         $this->assertNotEmpty($result);
     }
 
-    public function testFetchCraftableItemsAsBlackSmith() {
+    public function testFetchCraftableItemsAsBlackSmith()
+    {
         Event::fake();
 
-        $character = (new CharacterFactory())->createBaseCharacter([], $this->createClass([
-            'name' => CharacterClassValue::BLACKSMITH
+        $character = (new CharacterFactory)->createBaseCharacter([], $this->createClass([
+            'name' => CharacterClassValue::BLACKSMITH,
         ]))->assignSkill(
             $this->craftingSkill
         )->givePlayerLocation()->getCharacter();
@@ -171,11 +175,12 @@ class CraftingServiceTest extends TestCase {
         Event::assertDispatched(ServerMessageEvent::class);
     }
 
-    public function testFetchCraftableItemsAsMerhant() {
+    public function testFetchCraftableItemsAsMerhant()
+    {
         Event::fake();
 
-        $character = (new CharacterFactory())->createBaseCharacter([], $this->createClass([
-            'name' => CharacterClassValue::MERCHANT
+        $character = (new CharacterFactory)->createBaseCharacter([], $this->createClass([
+            'name' => CharacterClassValue::MERCHANT,
         ]))->assignSkill(
             $this->craftingSkill
         )->givePlayerLocation()->getCharacter();
@@ -190,11 +195,12 @@ class CraftingServiceTest extends TestCase {
         Event::assertDispatched(ServerMessageEvent::class);
     }
 
-    public function testFetchCraftableItemsAsArcaneAlchemist() {
+    public function testFetchCraftableItemsAsArcaneAlchemist()
+    {
         Event::fake();
 
-        $character = (new CharacterFactory())->createBaseCharacter([], $this->createClass([
-            'name' => CharacterClassValue::ARCANE_ALCHEMIST
+        $character = (new CharacterFactory)->createBaseCharacter([], $this->createClass([
+            'name' => CharacterClassValue::ARCANE_ALCHEMIST,
         ]))->assignSkill(
             $this->craftingSkill
         )->givePlayerLocation()->getCharacter();
@@ -209,7 +215,8 @@ class CraftingServiceTest extends TestCase {
         Event::assertNotDispatched(ServerMessageEvent::class);
     }
 
-    public function testFetchCraftableItemsAsArcaneAlchemistWhenCraftingSpells() {
+    public function testFetchCraftableItemsAsArcaneAlchemistWhenCraftingSpells()
+    {
         Event::fake();
 
         $spellCraftingSkill = $this->createGameSkill([
@@ -217,8 +224,8 @@ class CraftingServiceTest extends TestCase {
             'type' => SkillTypeValue::CRAFTING,
         ]);
 
-        $character = (new CharacterFactory())->createBaseCharacter([], $this->createClass([
-            'name' => CharacterClassValue::ARCANE_ALCHEMIST
+        $character = (new CharacterFactory)->createBaseCharacter([], $this->createClass([
+            'name' => CharacterClassValue::ARCANE_ALCHEMIST,
         ]))->assignSkill(
             $this->craftingSkill
         )->assignSkill(
@@ -243,14 +250,15 @@ class CraftingServiceTest extends TestCase {
         Event::assertDispatched(ServerMessageEvent::class);
     }
 
-    public function testFailToCraftForItemThatDoesNotExist() {
+    public function testFailToCraftForItemThatDoesNotExist()
+    {
         Event::fake();
 
         $character = $this->character->getCharacter();
 
         $result = $this->craftingService->craft($character, [
             'item_to_craft' => 10,
-            'type'          => 'hammer',
+            'type' => 'hammer',
             'craft_for_npc' => false,
             'craft_for_event' => false,
         ]);
@@ -260,14 +268,15 @@ class CraftingServiceTest extends TestCase {
         $this->assertFalse($result);
     }
 
-    public function testCannotAffordToCraftItem() {
+    public function testCannotAffordToCraftItem()
+    {
         Event::fake();
 
         $character = $this->character->getCharacter();
 
         $result = $this->craftingService->craft($character, [
             'item_to_craft' => $this->craftingItem->id,
-            'type'          => 'hammer',
+            'type' => 'hammer',
             'craft_for_npc' => false,
             'craft_for_event' => false,
         ]);
@@ -279,13 +288,14 @@ class CraftingServiceTest extends TestCase {
         $this->assertFalse($result);
     }
 
-    public function testItemToHardToCraft() {
+    public function testItemToHardToCraft()
+    {
         Event::fake();
 
         $character = $this->character->getCharacter();
 
         $character->update([
-            'gold' => MaxCurrenciesValue::MAX_GOLD
+            'gold' => MaxCurrenciesValue::MAX_GOLD,
         ]);
 
         $character = $character->refresh();
@@ -296,7 +306,7 @@ class CraftingServiceTest extends TestCase {
 
         $result = $this->craftingService->craft($character, [
             'item_to_craft' => $this->craftingItem->refresh()->id,
-            'type'          => 'hammer',
+            'type' => 'hammer',
             'craft_for_npc' => false,
             'craft_for_event' => false,
         ]);
@@ -308,13 +318,14 @@ class CraftingServiceTest extends TestCase {
         $this->assertFalse($result);
     }
 
-    public function testItemToEasyToCraft() {
+    public function testItemToEasyToCraft()
+    {
         Event::fake();
 
         $character = $this->character->getCharacter();
 
         $character->update([
-            'gold' => MaxCurrenciesValue::MAX_GOLD
+            'gold' => MaxCurrenciesValue::MAX_GOLD,
         ]);
 
         $character = $character->refresh();
@@ -325,7 +336,7 @@ class CraftingServiceTest extends TestCase {
 
         $result = $this->craftingService->craft($character, [
             'item_to_craft' => $this->craftingItem->refresh()->id,
-            'type'          => 'hammer',
+            'type' => 'hammer',
             'craft_for_npc' => false,
             'craft_for_event' => false,
         ]);
@@ -337,18 +348,19 @@ class CraftingServiceTest extends TestCase {
         $this->assertTrue($result);
     }
 
-    public function testGeneralCraft() {
+    public function testGeneralCraft()
+    {
         $character = $this->character->getCharacter();
 
         $character->update([
-            'gold' => MaxCurrenciesValue::MAX_GOLD
+            'gold' => MaxCurrenciesValue::MAX_GOLD,
         ]);
 
         $character = $character->refresh();
 
         $this->craftingService->craft($character, [
             'item_to_craft' => $this->craftingItem->id,
-            'type'          => 'hammer',
+            'type' => 'hammer',
             'craft_for_npc' => false,
             'craft_for_event' => false,
         ]);
@@ -358,7 +370,8 @@ class CraftingServiceTest extends TestCase {
         $this->assertLessThan(MaxCurrenciesValue::MAX_GOLD, $character->gold);
     }
 
-    public function testGeneralCraftInventoryIsFull() {
+    public function testGeneralCraftInventoryIsFull()
+    {
         Event::fake();
 
         $this->instance(
@@ -382,7 +395,7 @@ class CraftingServiceTest extends TestCase {
 
         $craftingService->craft($character, [
             'item_to_craft' => $this->craftingItem->id,
-            'type'          => 'hammer',
+            'type' => 'hammer',
             'craft_for_npc' => false,
             'craft_for_event' => false,
         ]);
@@ -392,7 +405,8 @@ class CraftingServiceTest extends TestCase {
         });
     }
 
-    public function  testFailToCraft() {
+    public function testFailToCraft()
+    {
         Event::fake();
 
         $this->instance(
@@ -406,7 +420,7 @@ class CraftingServiceTest extends TestCase {
         $character = $this->character->getCharacter();
 
         $character->update([
-            'gold' => MaxCurrenciesValue::MAX_GOLD
+            'gold' => MaxCurrenciesValue::MAX_GOLD,
         ]);
 
         $character = $character->refresh();
@@ -415,7 +429,7 @@ class CraftingServiceTest extends TestCase {
 
         $craftingService->craft($character, [
             'item_to_craft' => $this->craftingItem->id,
-            'type'          => 'hammer',
+            'type' => 'hammer',
             'craft_for_npc' => false,
             'craft_for_event' => false,
         ]);
@@ -425,7 +439,8 @@ class CraftingServiceTest extends TestCase {
         });
     }
 
-    public function testSucceedInCrafting() {
+    public function testSucceedInCrafting()
+    {
         $this->instance(
             SkillCheckService::class,
             Mockery::mock(SkillCheckService::class, function (MockInterface $mock) {
@@ -437,7 +452,7 @@ class CraftingServiceTest extends TestCase {
         $character = $this->character->getCharacter();
 
         $character->update([
-            'gold' => MaxCurrenciesValue::MAX_GOLD
+            'gold' => MaxCurrenciesValue::MAX_GOLD,
         ]);
 
         $character = $character->refresh();
@@ -446,7 +461,7 @@ class CraftingServiceTest extends TestCase {
 
         $craftingService->craft($character, [
             'item_to_craft' => $this->craftingItem->id,
-            'type'          => 'hammer',
+            'type' => 'hammer',
             'craft_for_npc' => false,
             'craft_for_event' => false,
         ]);
@@ -454,7 +469,8 @@ class CraftingServiceTest extends TestCase {
         $this->assertCount(1, $character->inventory->slots);
     }
 
-    public function testCraftAsBlackSmith() {
+    public function testCraftAsBlackSmith()
+    {
         Event::fake();
 
         $this->instance(
@@ -465,19 +481,19 @@ class CraftingServiceTest extends TestCase {
             })
         );
 
-        $character = (new CharacterFactory())->createBaseCharacter([], $this->createClass([
-            'name' => CharacterClassValue::BLACKSMITH
+        $character = (new CharacterFactory)->createBaseCharacter([], $this->createClass([
+            'name' => CharacterClassValue::BLACKSMITH,
         ]))->assignSkill($this->craftingSkill)->givePlayerLocation()->getCharacter();
 
         $character->update([
-            'gold' => MaxCurrenciesValue::MAX_GOLD
+            'gold' => MaxCurrenciesValue::MAX_GOLD,
         ]);
 
         $craftingService = $this->app->make(CraftingService::class);
 
         $craftingService->craft($character, [
             'item_to_craft' => $this->craftingItem->id,
-            'type'          => 'hammer',
+            'type' => 'hammer',
             'craft_for_npc' => false,
             'craft_for_event' => false,
         ]);
@@ -487,7 +503,8 @@ class CraftingServiceTest extends TestCase {
         Event::assertDispatched(ServerMessageEvent::class);
     }
 
-    public function testCraftSpellAsBlackSmith() {
+    public function testCraftSpellAsBlackSmith()
+    {
         Event::fake();
 
         $this->instance(
@@ -498,28 +515,28 @@ class CraftingServiceTest extends TestCase {
             })
         );
 
-        $character = (new CharacterFactory())->createBaseCharacter([], $this->createClass([
-            'name' => CharacterClassValue::BLACKSMITH
+        $character = (new CharacterFactory)->createBaseCharacter([], $this->createClass([
+            'name' => CharacterClassValue::BLACKSMITH,
         ]))->assignSkill($this->createGameSkill([
             'name' => 'Spell Crafting',
             'type' => SkillTypeValue::CRAFTING,
         ]))->givePlayerLocation()->getCharacter();
 
         $character->update([
-            'gold' => MaxCurrenciesValue::MAX_GOLD
+            'gold' => MaxCurrenciesValue::MAX_GOLD,
         ]);
 
         $craftingService = $this->app->make(CraftingService::class);
 
         $craftingService->craft($character, [
             'item_to_craft' => $this->createItem([
-                'type'                 => 'spell-damage',
-                'crafting_type'        => 'spell-damage',
+                'type' => 'spell-damage',
+                'crafting_type' => 'spell-damage',
                 'skill_level_required' => 1,
-                'skill_level_trivial'  => 10,
-                'cost'                 => 10,
+                'skill_level_trivial' => 10,
+                'cost' => 10,
             ])->id,
-            'type'          => 'spell',
+            'type' => 'spell',
             'craft_for_npc' => false,
             'craft_for_event' => false,
         ]);
@@ -531,7 +548,8 @@ class CraftingServiceTest extends TestCase {
         });
     }
 
-    public function testCraftAsMerchant() {
+    public function testCraftAsMerchant()
+    {
         Event::fake();
 
         $this->instance(
@@ -542,19 +560,19 @@ class CraftingServiceTest extends TestCase {
             })
         );
 
-        $character = (new CharacterFactory())->createBaseCharacter([], $this->createClass([
-            'name' => CharacterClassValue::MERCHANT
+        $character = (new CharacterFactory)->createBaseCharacter([], $this->createClass([
+            'name' => CharacterClassValue::MERCHANT,
         ]))->assignSkill($this->craftingSkill)->givePlayerLocation()->getCharacter();
 
         $character->update([
-            'gold' => MaxCurrenciesValue::MAX_GOLD
+            'gold' => MaxCurrenciesValue::MAX_GOLD,
         ]);
 
         $craftingService = $this->app->make(CraftingService::class);
 
         $craftingService->craft($character, [
             'item_to_craft' => $this->craftingItem->id,
-            'type'          => 'hammer',
+            'type' => 'hammer',
             'craft_for_npc' => false,
             'craft_for_event' => false,
         ]);
@@ -564,7 +582,8 @@ class CraftingServiceTest extends TestCase {
         Event::assertDispatched(ServerMessageEvent::class);
     }
 
-    public function testCraftSpellAsArcaneAlchemist() {
+    public function testCraftSpellAsArcaneAlchemist()
+    {
         Event::fake();
 
         $this->instance(
@@ -575,12 +594,12 @@ class CraftingServiceTest extends TestCase {
             })
         );
 
-        $character = (new CharacterFactory())->createBaseCharacter([], $this->createClass([
-            'name' => CharacterClassValue::ARCANE_ALCHEMIST
+        $character = (new CharacterFactory)->createBaseCharacter([], $this->createClass([
+            'name' => CharacterClassValue::ARCANE_ALCHEMIST,
         ]))->assignSkill($this->craftingSkill)->givePlayerLocation()->getCharacter();
 
         $character->update([
-            'gold' => MaxCurrenciesValue::MAX_GOLD
+            'gold' => MaxCurrenciesValue::MAX_GOLD,
         ]);
 
         $character = $character->refresh();
@@ -589,7 +608,7 @@ class CraftingServiceTest extends TestCase {
 
         $craftingService->craft($character, [
             'item_to_craft' => $this->craftingItem->id,
-            'type'          => 'hammer',
+            'type' => 'hammer',
             'craft_for_npc' => false,
             'craft_for_event' => false,
         ]);
@@ -599,7 +618,8 @@ class CraftingServiceTest extends TestCase {
         Event::assertDispatched(ServerMessageEvent::class);
     }
 
-    public function testCraftSpellAsArcaneAlchemsit() {
+    public function testCraftSpellAsArcaneAlchemsit()
+    {
         Event::fake();
 
         $this->instance(
@@ -610,28 +630,28 @@ class CraftingServiceTest extends TestCase {
             })
         );
 
-        $character = (new CharacterFactory())->createBaseCharacter([], $this->createClass([
-            'name' => CharacterClassValue::ARCANE_ALCHEMIST
+        $character = (new CharacterFactory)->createBaseCharacter([], $this->createClass([
+            'name' => CharacterClassValue::ARCANE_ALCHEMIST,
         ]))->assignSkill($this->createGameSkill([
             'name' => 'Spell Crafting',
             'type' => SkillTypeValue::CRAFTING,
         ]))->givePlayerLocation()->getCharacter();
 
         $character->update([
-            'gold' => MaxCurrenciesValue::MAX_GOLD
+            'gold' => MaxCurrenciesValue::MAX_GOLD,
         ]);
 
         $craftingService = $this->app->make(CraftingService::class);
 
         $craftingService->craft($character, [
             'item_to_craft' => $this->createItem([
-                'type'                 => 'spell-damage',
-                'crafting_type'        => 'spell-damage',
+                'type' => 'spell-damage',
+                'crafting_type' => 'spell-damage',
                 'skill_level_required' => 1,
-                'skill_level_trivial'  => 10,
-                'cost'                 => 10,
+                'skill_level_trivial' => 10,
+                'cost' => 10,
             ])->id,
-            'type'          => 'spell',
+            'type' => 'spell',
             'craft_for_npc' => false,
             'craft_for_event' => false,
         ]);
@@ -643,7 +663,8 @@ class CraftingServiceTest extends TestCase {
         });
     }
 
-    public function testFetchCharacterWeaponCraftingXP() {
+    public function testFetchCharacterWeaponCraftingXP()
+    {
         $character = $this->character->getCharacter();
 
         $weaponCraftingXpData = $this->craftingService->getCraftingXP($character, 'hammer');
@@ -660,8 +681,8 @@ class CraftingServiceTest extends TestCase {
         $this->assertEquals($weaponCraftingXpData, $expected);
     }
 
-    public function testItemIsGivenToNpcWhenDoingFactionLoyaltyCrafting() {
-
+    public function testItemIsGivenToNpcWhenDoingFactionLoyaltyCrafting()
+    {
 
         $this->instance(
             SkillCheckService::class,
@@ -671,7 +692,7 @@ class CraftingServiceTest extends TestCase {
             })
         );
 
-        $character = (new CharacterFactory())
+        $character = (new CharacterFactory)
             ->createBaseCharacter()
             ->assignFactionSystem()
             ->assignSkill($this->craftingSkill)
@@ -679,7 +700,7 @@ class CraftingServiceTest extends TestCase {
             ->getCharacter();
 
         $character->update([
-            'gold' => MaxCurrenciesValue::MAX_GOLD
+            'gold' => MaxCurrenciesValue::MAX_GOLD,
         ]);
 
         $craftingService = $this->app->make(CraftingService::class);
@@ -688,31 +709,31 @@ class CraftingServiceTest extends TestCase {
 
         $factionLoyalty = $this->createFactionLoyalty([
             'character_id' => $character->id,
-            'faction_id'   => $character->factions->first(),
-            'is_pledged'   => true
+            'faction_id' => $character->factions->first(),
+            'is_pledged' => true,
         ]);
 
         $npc = $this->createNpc();
 
         $factionLoyaltyNpc = $this->createFactionLoyaltyNpc([
-            'faction_loyalty_id'            => $factionLoyalty->id,
-            'npc_id'                        => $npc->id,
-            'current_level'                 => 1,
-            'max_level'                     => 25,
-            'next_level_fame'               => 1000,
-            'currently_helping'             => true,
-            'kingdom_item_defence_bonus'    => 0.002,
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'npc_id' => $npc->id,
+            'current_level' => 1,
+            'max_level' => 25,
+            'next_level_fame' => 1000,
+            'currently_helping' => true,
+            'kingdom_item_defence_bonus' => 0.002,
         ]);
 
         $this->createFactionLoyaltyNpcTask([
-            'faction_loyalty_id'         => $factionLoyalty->id,
-            'faction_loyalty_npc_id'     => $factionLoyaltyNpc->id,
-            'fame_tasks'                 => [[
-                'type'            => $this->craftingItem->crafting_type,
-                'item_name'    => $this->craftingItem->name,
-                'item_id'      => $this->craftingItem->id,
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'faction_loyalty_npc_id' => $factionLoyaltyNpc->id,
+            'fame_tasks' => [[
+                'type' => $this->craftingItem->crafting_type,
+                'item_name' => $this->craftingItem->name,
+                'item_id' => $this->craftingItem->id,
                 'required_amount' => rand(10, 50),
-                'current_amount'  => 0,
+                'current_amount' => 0,
             ]],
         ]);
 
@@ -720,7 +741,7 @@ class CraftingServiceTest extends TestCase {
 
         $craftingService->craft($character, [
             'item_to_craft' => $this->craftingItem->id,
-            'type'          => 'hammer',
+            'type' => 'hammer',
             'craft_for_npc' => true,
             'craft_for_event' => false,
         ]);
@@ -737,7 +758,8 @@ class CraftingServiceTest extends TestCase {
         );
     }
 
-    public function testCraftWhileParticipatingInEventGoal() {
+    public function testCraftWhileParticipatingInEventGoal()
+    {
         $this->instance(
             SkillCheckService::class,
             Mockery::mock(SkillCheckService::class, function (MockInterface $mock) {
@@ -749,32 +771,32 @@ class CraftingServiceTest extends TestCase {
         $craftingService = $this->app->make(CraftingService::class);
 
         $this->createEvent([
-            'type'                    => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'type' => EventType::DELUSIONAL_MEMORIES_EVENT,
             'current_event_goal_step' => GlobalEventSteps::CRAFT,
         ]);
 
         $this->createGlobalEventGoal([
-            'event_type'                  => EventType::DELUSIONAL_MEMORIES_EVENT,
-            'max_crafts'                  => 100,
-            'reward_every'                => 10,
-            'next_reward_at'              => 10,
-            'item_specialty_type_reward'  => ItemSpecialtyType::DELUSIONAL_SILVER,
-            'should_be_unique'            => false,
-            'should_be_mythic'            => true,
+            'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'max_crafts' => 100,
+            'reward_every' => 10,
+            'next_reward_at' => 10,
+            'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER,
+            'should_be_unique' => false,
+            'should_be_mythic' => true,
         ]);
 
         $character = $this->character->getCharacter();
 
         $character->update([
-            'gold' => MaxCurrenciesValue::MAX_GOLD
+            'gold' => MaxCurrenciesValue::MAX_GOLD,
         ]);
 
         $character = $character->refresh();
 
         $craftingService->craft($character, [
-            'item_to_craft'   => $this->craftingItem->id,
-            'type'            => 'hammer',
-            'craft_for_npc'   => false,
+            'item_to_craft' => $this->craftingItem->id,
+            'type' => 'hammer',
+            'craft_for_npc' => false,
             'craft_for_event' => true,
         ]);
 

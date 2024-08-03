@@ -17,17 +17,19 @@ use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Quests\Events\UnlockSkillEvent;
 
-class NpcQuestRewardHandler {
-
+class NpcQuestRewardHandler
+{
     use HandleCharacterLevelUp;
 
     private NpcServerMessageBuilder $npcServerMessageBuilder;
 
-    public function __construct(NpcServerMessageBuilder $npcServerMessageBuilder) {
+    public function __construct(NpcServerMessageBuilder $npcServerMessageBuilder)
+    {
         $this->npcServerMessageBuilder = $npcServerMessageBuilder;
     }
 
-    public function processReward(Quest $quest, Npc $npc, Character $character): void {
+    public function processReward(Quest $quest, Npc $npc, Character $character): void
+    {
 
         if ($this->questHasRewardItem($quest)) {
             $this->giveItem($character, $quest, $npc);
@@ -63,10 +65,10 @@ class NpcQuestRewardHandler {
             $passive = $passive->refresh();
 
             event(new ServerMessageEvent($character->user, 'You unlocked a new Kingdom passive! head to your skills section
-            to learn more. You have unlocked: ' . $passive->passiveSkill->name));
+            to learn more. You have unlocked: '.$passive->passiveSkill->name));
         }
 
-        if (!is_null($quest->unlocks_feature)) {
+        if (! is_null($quest->unlocks_feature)) {
 
             if ($quest->unlocksFeature()->isReincarnation()) {
 
@@ -74,21 +76,21 @@ class NpcQuestRewardHandler {
                 you to set your character level back to level 1 and keep 20% of your base stats, but you are penalized by having 5% (that stacks per reincarnation)
                 added to your XP. You can now use this feature on your Character Sheet!'));
 
-                GlobalMessageEvent::dispatch($character->name . ' has unlocked: Reincarnation! A powerful new way to grow!');
+                GlobalMessageEvent::dispatch($character->name.' has unlocked: Reincarnation! A powerful new way to grow!');
             }
 
             if ($quest->unlocksFeature()->isCosmeticText()) {
                 event(new ServerMessageEvent($character->user, 'You can now use a new feature in your settings (Hover/Tap Top Right User Icon) to change your chat text
                 to a color of your choice as well as italize or bold your text for public chat messages. How exciting!'));
 
-                event(new GlobalMessageEvent($character->name . ' Has unlocked an epic gift! Cosmetic Text! They can truly stand out from the rest of you now!'));
+                event(new GlobalMessageEvent($character->name.' Has unlocked an epic gift! Cosmetic Text! They can truly stand out from the rest of you now!'));
             }
 
             if ($quest->unlocksFeature()->isNameTag()) {
                 event(new ServerMessageEvent($character->user, 'You can now select name tags fro your character to show off in chat by selecting one from your settings page (Hover/Tap To Right User Icon) to change the tag
                 that shows beside your character name in chat!'));
 
-                event(new GlobalMessageEvent($character->name . ' Has unlocked an epic gift! Name Tags! Their deeds have not gone unnoticed in the land of Tlessa!'));
+                event(new GlobalMessageEvent($character->name.' Has unlocked an epic gift! Name Tags! Their deeds have not gone unnoticed in the land of Tlessa!'));
             }
 
             if ($quest->unlocksFeature()->isExtendSets()) {
@@ -97,44 +99,52 @@ class NpcQuestRewardHandler {
 
                 event(new ServerMessageEvent($character->user, 'You now have an additional 10 sets. If you head to your Character Sheet, and visit your inventory, under the sets tab you have ten additional sets you can add items to.'));
 
-                event(new GlobalMessageEvent($character->name . ' Has unlocked an epic gift! 10 additional sets! Their deeds have not gone unnoticed in the land of Tlessa!'));
+                event(new GlobalMessageEvent($character->name.' Has unlocked an epic gift! 10 additional sets! Their deeds have not gone unnoticed in the land of Tlessa!'));
             }
         }
 
         $this->createQuestLog($character, $quest);
     }
 
-    public function questHasRewardItem(Quest $quest): bool {
-        return !is_null($quest->reward_item);
+    public function questHasRewardItem(Quest $quest): bool
+    {
+        return ! is_null($quest->reward_item);
     }
 
-    public function questUnlocksSkill(Quest $quest): bool {
+    public function questUnlocksSkill(Quest $quest): bool
+    {
         return $quest->unlocks_skill;
     }
 
-    public function questRewardsGold(Quest $quest): bool {
-        return !is_null($quest->reward_gold);
+    public function questRewardsGold(Quest $quest): bool
+    {
+        return ! is_null($quest->reward_gold);
     }
 
-    public function questRewardsGoldDust(Quest $quest): bool {
-        return !is_null($quest->reward_gold_dust);
+    public function questRewardsGoldDust(Quest $quest): bool
+    {
+        return ! is_null($quest->reward_gold_dust);
     }
 
-    public function questRewardsShards(Quest $quest): bool {
-        return !is_null($quest->reward_shards);
+    public function questRewardsShards(Quest $quest): bool
+    {
+        return ! is_null($quest->reward_shards);
     }
 
-    public function questRewardsXP(Quest $quest): bool {
-        return !is_null($quest->reward_xp);
+    public function questRewardsXP(Quest $quest): bool
+    {
+        return ! is_null($quest->reward_xp);
     }
 
-    public function questRewardsPassive(Quest $quest): bool {
-        return !is_null($quest->unlocks_passive_id);
+    public function questRewardsPassive(Quest $quest): bool
+    {
+        return ! is_null($quest->unlocks_passive_id);
     }
 
-    public function giveXP(Character $character, Quest $quest): void {
+    public function giveXP(Character $character, Quest $quest): void
+    {
         $character->update([
-            'xp' => $quest->reward_xp
+            'xp' => $quest->reward_xp,
         ]);
 
         $character = $character->refresh();
@@ -142,9 +152,10 @@ class NpcQuestRewardHandler {
         $this->handlePossibleLevelUp($character);
     }
 
-    public function giveItem(Character $character, Quest $quest, Npc $npc): void {
+    public function giveItem(Character $character, Quest $quest, Npc $npc): void
+    {
 
-        if (!is_null($quest->rewardItem->effect)) {
+        if (! is_null($quest->rewardItem->effect)) {
             $effectType = new ItemEffectsValue($quest->rewardItem->effect);
 
             if ($effectType->getCopperCoins()) {
@@ -156,25 +167,26 @@ class NpcQuestRewardHandler {
 
         $slot = $character->inventory->slots()->create([
             'inventory_id' => $character->inventory->id,
-            'item_id'      => $quest->reward_item,
+            'item_id' => $quest->reward_item,
         ]);
 
-        if (!is_null($quest->rewardItem->devouring_darkness) || !is_null($quest->rewardItem->devouring_light)) {
+        if (! is_null($quest->rewardItem->devouring_darkness) || ! is_null($quest->rewardItem->devouring_light)) {
             $this->updateCharacterAttackDataCache($character);
         }
 
         $this->npcServerMessage($npc, $character, 'given_item');
 
-        broadcast(new ServerMessageEvent($character->user, 'Received: ' . $quest->rewardItem->name, $slot->id));
+        broadcast(new ServerMessageEvent($character->user, 'Received: '.$quest->rewardItem->name, $slot->id));
     }
 
-    public function unlockSkill(Quest $quest, Character $character, Npc $npc): void {
+    public function unlockSkill(Quest $quest, Character $character, Npc $npc): void
+    {
         $gameSkill = GameSkill::where('type', $quest->unlocks_skill_type)->first();
 
         $characterSkill = $character->skills()->where('game_skill_id', $gameSkill->id)->where('is_locked', true)->first();
 
         $characterSkill->update([
-            'is_locked' => false
+            'is_locked' => false,
         ]);
 
         $character = $character->refresh();
@@ -183,14 +195,15 @@ class NpcQuestRewardHandler {
 
         $this->npcServerMessage($npc, $character, 'skill_unlocked');
 
-        event(new ServerMessageEvent($character->user, 'Unlocked: ' . $gameSkill->name . ' This skill can now be leveled!'));
+        event(new ServerMessageEvent($character->user, 'Unlocked: '.$gameSkill->name.' This skill can now be leveled!'));
 
         event(new UnlockSkillEvent($character->user));
 
         event(new UpdateCharacterStatus($character));
     }
 
-    public function giveGold(Character $character, Quest $quest, Npc $npc): void {
+    public function giveGold(Character $character, Quest $quest, Npc $npc): void
+    {
 
         $newValue = $character->gold + $quest->reward_gold;
 
@@ -199,15 +212,16 @@ class NpcQuestRewardHandler {
         }
 
         $character->update([
-            'gold' => $newValue
+            'gold' => $newValue,
         ]);
 
         $this->npcServerMessage($npc, $character, 'currency_given');
 
-        broadcast(new ServerMessageEvent($character->user, 'Received: ' . number_format($quest->reward_gold) . ' gold from: ' . $npc->real_name));
+        broadcast(new ServerMessageEvent($character->user, 'Received: '.number_format($quest->reward_gold).' gold from: '.$npc->real_name));
     }
 
-    public function giveGoldDust(Character $character, Quest $quest, Npc $npc): void {
+    public function giveGoldDust(Character $character, Quest $quest, Npc $npc): void
+    {
 
         $newValue = $character->gold_dust + $quest->reward_gold_dust;
 
@@ -216,15 +230,16 @@ class NpcQuestRewardHandler {
         }
 
         $character->update([
-            'gold_dust' => $newValue
+            'gold_dust' => $newValue,
         ]);
 
         $this->npcServerMessage($npc, $character, 'currency_given');
 
-        broadcast(new ServerMessageEvent($character->user, 'Received: ' . number_format($quest->reward_gold_dust) . ' gold dust from: ' . $npc->real_name));
+        broadcast(new ServerMessageEvent($character->user, 'Received: '.number_format($quest->reward_gold_dust).' gold dust from: '.$npc->real_name));
     }
 
-    public function giveShards(Character $character, Quest $quest, Npc $npc): void {
+    public function giveShards(Character $character, Quest $quest, Npc $npc): void
+    {
 
         $newValue = $character->shards + $quest->reward_shards;
 
@@ -233,39 +248,43 @@ class NpcQuestRewardHandler {
         }
 
         $character->update([
-            'shards' => $newValue
+            'shards' => $newValue,
         ]);
 
         $this->npcServerMessage($npc, $character, 'currency_given');
 
-        broadcast(new ServerMessageEvent($character->user, 'Received: ' . number_format($quest->reward_shards) . ' shards from: ' . $npc->real_name));
+        broadcast(new ServerMessageEvent($character->user, 'Received: '.number_format($quest->reward_shards).' shards from: '.$npc->real_name));
     }
 
-    public function npcServerMessage(Npc $npc, Character $character, string $type): void {
+    public function npcServerMessage(Npc $npc, Character $character, string $type): void
+    {
         broadcast(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build($type, $npc)));
     }
 
-    public function updateCharacterAttackDataCache(Character $character): void {
+    public function updateCharacterAttackDataCache(Character $character): void
+    {
         CharacterAttackTypesCacheBuilder::dispatch($character);
     }
 
-    public function createQuestLog(Character $character, Quest $quest): void {
+    public function createQuestLog(Character $character, Quest $quest): void
+    {
         $character->questsCompleted()->create([
             'character_id' => $character->id,
-            'quest_id'     => $quest->id,
+            'quest_id' => $quest->id,
         ]);
 
         $character = $character->refresh();
 
-        broadcast(new ServerMessageEvent($character->user, 'Quest: ' . $quest->name . ' completed. Check quest logs under quest logs section.'));
+        broadcast(new ServerMessageEvent($character->user, 'Quest: '.$quest->name.' completed. Check quest logs under quest logs section.'));
 
         event(new UpdateTopBarEvent($character));
     }
 
-    private function giveAdditionalSetsToCharacter(Character $character): Character {
+    private function giveAdditionalSetsToCharacter(Character $character): Character
+    {
         for ($i = 1; $i <= 10; $i++) {
             $character->inventorySets()->create([
-                'character_id'    => $this->character->id,
+                'character_id' => $this->character->id,
                 'can_be_equipped' => true,
             ]);
 

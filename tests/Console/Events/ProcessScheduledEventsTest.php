@@ -2,12 +2,12 @@
 
 namespace Tests\Console\Events;
 
-use App\Flare\Values\MapNameValue;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\Models\Announcement;
 use App\Flare\Models\Event;
 use App\Flare\Models\GlobalEventGoal;
+use App\Flare\Values\MapNameValue;
 use App\Game\Events\Values\EventType;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use Tests\Traits\CreateGameMap;
 use Tests\Traits\CreateItem;
@@ -16,18 +16,22 @@ use Tests\Traits\CreateMonster;
 use Tests\Traits\CreateRaid;
 use Tests\Traits\CreateScheduledEvent;
 
-class ProcessScheduledEventsTest extends TestCase {
-    use RefreshDatabase, CreateScheduledEvent, CreateRaid, CreateMonster, CreateItem, CreateLocation, CreateGameMap;
+class ProcessScheduledEventsTest extends TestCase
+{
+    use CreateGameMap, CreateItem, CreateLocation, CreateMonster, CreateRaid, CreateScheduledEvent, RefreshDatabase;
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
     }
 
-    public function testRaidEventTriggers() {
+    public function testRaidEventTriggers()
+    {
         $gameMap = $this->createGameMap();
 
         $monster = $this->createMonster([
@@ -41,17 +45,17 @@ class ProcessScheduledEventsTest extends TestCase {
         ]);
 
         $raid = $this->createRaid([
-            'raid_boss_id'                   => $monster->id,
-            'raid_monster_ids'               => [$monster->id],
-            'raid_boss_location_id'          => $location->id,
-            'corrupted_location_ids'         => [$location->id],
-            'artifact_item_id'               => $item->id,
+            'raid_boss_id' => $monster->id,
+            'raid_monster_ids' => [$monster->id],
+            'raid_boss_location_id' => $location->id,
+            'corrupted_location_ids' => [$location->id],
+            'artifact_item_id' => $item->id,
         ]);
 
         $this->createScheduledEvent([
             'event_type' => EventType::RAID_EVENT,
             'start_date' => now()->addMinutes(5),
-            'raid_id'    => $raid->id,
+            'raid_id' => $raid->id,
         ]);
 
         $this->artisan('process:scheduled-events');
@@ -60,7 +64,8 @@ class ProcessScheduledEventsTest extends TestCase {
         $this->assertGreaterThan(0, Announcement::count());
     }
 
-    public function testWeeklyCurrencyEventTriggers() {
+    public function testWeeklyCurrencyEventTriggers()
+    {
         $this->createScheduledEvent([
             'event_type' => EventType::WEEKLY_CURRENCY_DROPS,
             'start_date' => now()->addMinutes(5),
@@ -72,7 +77,8 @@ class ProcessScheduledEventsTest extends TestCase {
         $this->assertGreaterThan(0, Announcement::count());
     }
 
-    public function testWeeklyCelestialEventTriggers() {
+    public function testWeeklyCelestialEventTriggers()
+    {
         $this->createScheduledEvent([
             'event_type' => EventType::WEEKLY_CELESTIALS,
             'start_date' => now()->addMinutes(5),
@@ -84,7 +90,8 @@ class ProcessScheduledEventsTest extends TestCase {
         $this->assertGreaterThan(0, Announcement::count());
     }
 
-    public function testMonthlyEventTriggers() {
+    public function testMonthlyEventTriggers()
+    {
         $this->createScheduledEvent([
             'event_type' => EventType::MONTHLY_PVP,
             'start_date' => now()->addMinutes(5),
@@ -96,7 +103,8 @@ class ProcessScheduledEventsTest extends TestCase {
         $this->assertGreaterThan(0, Announcement::count());
     }
 
-    public function testWinterEvent() {
+    public function testWinterEvent()
+    {
         $this->createGameMap([
             'name' => MapNameValue::ICE_PLANE,
         ]);
@@ -113,7 +121,8 @@ class ProcessScheduledEventsTest extends TestCase {
         $this->assertGreaterThan(0, GlobalEventGoal::count());
     }
 
-    public function testDelusionalMemoriesEvent() {
+    public function testDelusionalMemoriesEvent()
+    {
         $this->createGameMap([
             'name' => MapNameValue::DELUSIONAL_MEMORIES,
         ]);
@@ -129,5 +138,4 @@ class ProcessScheduledEventsTest extends TestCase {
         $this->assertGreaterThan(0, Announcement::count());
         $this->assertGreaterThan(0, GlobalEventGoal::count());
     }
-
 }

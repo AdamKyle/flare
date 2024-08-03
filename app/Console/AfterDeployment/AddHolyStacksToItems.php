@@ -28,24 +28,25 @@ class AddHolyStacksToItems extends Command
      *
      * @return void
      */
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
     }
 
     /**
      * Execute the console command.
      *
-     * @return void
      * @throws Exception
      */
-    public function handle(): void {
+    public function handle(): void
+    {
         Item::whereNotIn('type', ['quest', 'alchemy', 'trinket', 'artifact'])
-            ->chunkById(250, function($items) {
+            ->chunkById(250, function ($items) {
                 foreach ($items as $item) {
 
                     $maxStacks = 0;
 
-                    if (!is_null($item->specialty_type)) {
+                    if (! is_null($item->specialty_type)) {
                         $type = new ItemSpecialtyType($item->specialty_type);
 
                         if ($type->isHellForged() || $type->isPurgatoryChains() || $type->isPirateLordLeather() || $type->isCorruptedIce() || $type->isDelusionalSilver() || $type->isTwistedEarth()) {
@@ -66,7 +67,7 @@ class AddHolyStacksToItems extends Command
                     }
 
                     $item->update([
-                        'holy_stacks' => $maxStacks
+                        'holy_stacks' => $maxStacks,
                     ]);
                 }
             });

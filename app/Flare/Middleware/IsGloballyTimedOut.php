@@ -11,13 +11,12 @@ class IsGloballyTimedOut
      * Handle an incoming request.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
      * @param  string|null  $guard
      * @return mixed
      */
     public function handle($request, Closure $next, $guard = null)
     {
-        if (!is_null(auth()->user()->timeout_until)) {
+        if (! is_null(auth()->user()->timeout_until)) {
             if ($request->wantsJson()) {
                 return response()->json([], 422);
             }

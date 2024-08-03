@@ -10,8 +10,8 @@ use App\Game\Kingdoms\Events\UpdateGlobalMap;
 use App\Game\Kingdoms\Events\UpdateNPCKingdoms;
 use App\Game\Messages\Events\GlobalMessageEvent;
 
-Trait DestroyKingdom {
-
+trait DestroyKingdom
+{
     use KingdomCache;
 
     /**
@@ -19,15 +19,12 @@ Trait DestroyKingdom {
      *
      * - Updates the maps.
      * - If it is a character kingdom, refresh them to update their kingdoms.
-     *
-     * @param Kingdom $kingdom
-     * @param Character|null $character
-     * @return void
      */
-    public function destroyKingdom(Kingdom $kingdom, ?Character $character = null): void {
+    public function destroyKingdom(Kingdom $kingdom, ?Character $character = null): void
+    {
 
-        $x       = $kingdom->x_position;
-        $y       = $kingdom->y_position;
+        $x = $kingdom->x_position;
+        $y = $kingdom->y_position;
         $gameMap = $kingdom->gameMap;
 
         $kingdom->buildingsQueue()->delete();
@@ -38,12 +35,12 @@ Trait DestroyKingdom {
 
         $kingdom->refresh()->delete();
 
-        event(new GlobalMessageEvent('A kingdom at: (X/Y) ' .
-            $x . '/' . $y . ' on ' .
-            $gameMap->name .' Plane has crumbled to the earth clearing up space for a new kingdom'
+        event(new GlobalMessageEvent('A kingdom at: (X/Y) '.
+            $x.'/'.$y.' on '.
+            $gameMap->name.' Plane has crumbled to the earth clearing up space for a new kingdom'
         ));
 
-        if (!is_null($character)) {
+        if (! is_null($character)) {
             $character = $character->refresh();
 
             $this->rebuildCharacterKingdomCache($character);
