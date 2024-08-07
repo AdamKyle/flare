@@ -112,3 +112,11 @@ dd {
     }
 }
 
+@media (min-width: 640px) {
+    .menu-bar.menu-sticky {
+        position: absolute !important;
+        top: 0 !important;
+        height: calc(100vh - 5rem);
+    }
+}
+
