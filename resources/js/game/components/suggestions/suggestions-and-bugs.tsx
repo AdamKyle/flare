@@ -6,6 +6,7 @@ import { capitalize } from "lodash";
 import DangerButton from "../ui/buttons/danger-button";
 import SuccessButton from "../ui/buttons/success-button";
 import { FileUploader } from "react-drag-drop-files";
+import DangerAlert from "../ui/alerts/simple-alerts/danger-alert";
 
 const fileTypes = ["JPG", "PNG", "GIF"];
 
@@ -17,6 +18,8 @@ interface ClassNameProps {
 
 interface FileWithPreview extends File {
     preview?: string;
+    name: string;
+    size: number;
 }
 
 interface ClassNameState {
@@ -101,6 +104,8 @@ export default class SuggestionsAndBugs extends React.Component<
         const filesWithPreview = validFiles.map((file) => ({
             ...file,
             preview: URL.createObjectURL(file),
+            name: file.name,
+            size: file.size,
         }));
 
         this.setState((prevState) => ({
@@ -177,6 +182,7 @@ export default class SuggestionsAndBugs extends React.Component<
         const showDots = this.state.files.length > 1;
 
         const overlayImage = this.state.overlayImage;
+        console.log("overlayImage", overlayImage);
         const imageName = overlayImage ? overlayImage.name : "";
         const imageSize = overlayImage
             ? `${(overlayImage.size / 1024).toFixed(2)} KB`
@@ -202,7 +208,7 @@ export default class SuggestionsAndBugs extends React.Component<
                         Below you can submit a bug report or a suggestion to
                         help make the game better. Any and all feedback is
                         welcome. You may also upload images to help with bug
-                        reports or flush out your suggestions.
+                        reports or flush out your suggestions.{" "}
                         <strong>Please be as descriptive as possible</strong>
                     </p>
 
@@ -244,16 +250,17 @@ export default class SuggestionsAndBugs extends React.Component<
                             <div className="w-full md:w-3/4">
                                 <Select
                                     id="type"
-                                    onChange={(option) => {}}
+                                    onChange={(option) => {
+                                    }}
                                     options={[
                                         {
                                             label: "Bug",
-                                            value: "bug",
+                                            value: "bug"
                                         },
                                         {
                                             label: "Suggestion",
-                                            value: "suggestion",
-                                        },
+                                            value: "suggestion"
+                                        }
                                     ]}
                                     menuPosition={"absolute"}
                                     menuPlacement={"bottom"}
@@ -261,8 +268,8 @@ export default class SuggestionsAndBugs extends React.Component<
                                         menuPortal: (base: any) => ({
                                             ...base,
                                             zIndex: 9999,
-                                            color: "#000000",
-                                        }),
+                                            color: "#000000"
+                                        })
                                     }}
                                     menuPortalTarget={document.body}
                                     value={this.getTypeValue()}
@@ -282,20 +289,21 @@ export default class SuggestionsAndBugs extends React.Component<
                             <div className="w-full md:w-3/4">
                                 <Select
                                     id="platform"
-                                    onChange={(option) => {}}
+                                    onChange={(option) => {
+                                    }}
                                     options={[
                                         {
                                             label: "Mobile",
-                                            value: "mobile",
+                                            value: "mobile"
                                         },
                                         {
                                             label: "Desktop",
-                                            value: "desktop",
+                                            value: "desktop"
                                         },
                                         {
                                             label: "Both",
-                                            value: "both",
-                                        },
+                                            value: "both"
+                                        }
                                     ]}
                                     menuPosition={"absolute"}
                                     menuPlacement={"bottom"}
@@ -303,8 +311,8 @@ export default class SuggestionsAndBugs extends React.Component<
                                         menuPortal: (base: any) => ({
                                             ...base,
                                             zIndex: 9999,
-                                            color: "#000000",
-                                        }),
+                                            color: "#000000"
+                                        })
                                     }}
                                     menuPortalTarget={document.body}
                                     value={this.getPlatformValue()}
@@ -321,148 +329,159 @@ export default class SuggestionsAndBugs extends React.Component<
                                     Description
                                 </label>
                             </div>
-                            <div className="w-full md:w-3/4 p-4 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-md focus-within:bg-white focus-within:dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                            <div className="w-full md:w-3/4">
                                 <MarkdownElement
-                                    onChange={(content) =>
-                                        this.setState({ description: content })
+                                    onChange={(value) =>
+                                        this.setState({ description: value })
                                     }
                                 />
                             </div>
                         </div>
+                    </div>
 
-                        <div className="flex flex-col items-center my-4">
-                            <label
-                                className="label block mb-2 text-gray-900 dark:text-gray-300"
-                                htmlFor="fileUploader"
-                            >
-                                Upload or drop a file right here
-                                <br />
-                                JPG, PNG, GIF
+                    <div className="flex flex-col md:flex-row items-start gap-4 my-2">
+                        <div className="w-full md:w-1/4">
+                            <label className="label block mb-2 md:mb-0">
+                                Attach Images
                             </label>
-                            <div className="flex justify-center w-full">
-                                <FileUploader
-                                    id="fileUploader"
-                                    handleChange={this.handleFileChange}
-                                    name="files"
-                                    types={fileTypes}
-                                    multiple={true}
-                                    classes="w-full p-4 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-md text-gray-900 dark:text-gray-100"
-                                />
-                            </div>
-                            {this.state.files.length > 0 && (
-                                <div className="flex flex-wrap mt-4 items-center justify-center gap-2">
-                                    {this.state.files.map((file, index) => (
-                                        <div
-                                            key={index}
-                                            className="relative w-1/4 p-2"
+                        </div>
+                        <div className="w-full md:w-3/4">
+                            <p
+                                className={
+                                    "mb-4 text-blue-700 dark:text-blue-500"
+                                }
+                            >
+                                You can upload multiple images, click them to
+                                preview and use the right/left arrow keys to
+                                navigate and press esc to close the preview.
+                            </p>
+                            <FileUploader
+                                handleChange={this.handleFileChange}
+                                name="file"
+                                types={fileTypes}
+                                multiple
+                                hoverTitle="Drop Here"
+                            />
+                            <div className="mt-2 flex flex-wrap gap-2">
+                                {this.state.files.map((file, index) => (
+                                    <div
+                                        key={index}
+                                        className="relative cursor-pointer"
+                                        onClick={() =>
+                                            this.handleImageClick(index)
+                                        }
+                                    >
+                                        <img
+                                            src={file.preview}
+                                            alt={file.name}
+                                            className="w-20 h-20 object-contain"
+                                        />
+                                        <button
+                                            className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1"
+                                            onClick={(event) =>
+                                                this.handleRemoveFile(
+                                                    index,
+                                                    event
+                                                )
+                                            }
                                         >
-                                            <img
-                                                src={file.preview}
-                                                alt={`preview-${index}`}
-                                                className="w-full h-auto cursor-pointer"
-                                                onClick={() =>
-                                                    this.handleImageClick(index)
-                                                }
-                                            />
-                                            <button
-                                                type="button"
-                                                className="absolute top-0 right-0 p-1 bg-red-600 text-white rounded-full"
-                                                onClick={(e) =>
-                                                    this.handleRemoveFile(
-                                                        index,
-                                                        e,
-                                                    )
-                                                }
-                                            >
-                                                <i className="fas fa-times"></i>
-                                            </button>
-                                        </div>
+                                            <i className="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="border-b-2 border-b-gray-200 dark:border-b-gray-600 my-3"></div>
+
+                    <p className={"my-4 italic"}>
+                        Abusing this system by submitting spam can and will get
+                        your account banned. Please only use this system to
+                        submit bugs and suggestions to improve the game.
+                    </p>
+
+                    <div className="flex justify-end">
+                        <SuccessButton
+                            button_label="Submit"
+                            on_click={this.props.submit}
+                            additional_css={"mr-2"}
+                        />
+                        <DangerButton
+                            button_label="Cancel"
+                            on_click={this.props.cancel}
+                        />
+                    </div>
+                </BasicCard>
+
+                {this.state.overlayImage && (
+                    <div
+                        ref={this.overlayRef} // Assign the ref to the overlay div
+                        className="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50"
+                        tabIndex={0}
+                        onKeyDown={this.handleKeyDown}
+                        onClick={this.closeOverlay}
+                    >
+                        <div
+                            className="relative p-8 bg-white dark:bg-gray-800 rounded"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <button
+                                className="absolute top-0 right-0 m-2 p-2 bg-red-500 text-white rounded-full"
+                                onClick={this.closeOverlay}
+                            >
+                                <i className="fas fa-times"></i>
+                            </button>
+
+                            {showArrows && (
+                                <button
+                                    className="absolute left-0 top-1/2 transform -translate-y-1/2 p-2 bg-gray-700 text-white rounded-full"
+                                    onClick={this.goToPreviousImage}
+                                >
+                                    <i className="fas fa-chevron-left"></i>
+                                </button>
+                            )}
+
+                            <img
+                                src={this.state.overlayImage.preview}
+                                alt={imageName}
+                                className="max-w-full max-h-[calc(100vh-12rem)] object-contain"
+                            />
+                            <div className="text-center mt-2">
+                                <p>{imageName}</p>
+                                <p>{imageSize}</p>
+                            </div>
+
+                            {showArrows && (
+                                <button
+                                    className="absolute right-0 top-1/2 transform -translate-y-1/2 p-2 bg-gray-700 text-white rounded-full"
+                                    onClick={this.goToNextImage}
+                                >
+                                    <i className="fas fa-chevron-right"></i>
+                                </button>
+                            )}
+
+                            {showDots && (
+                                <div className="absolute bottom-[-8px] left-0 right-0 mb-4 flex justify-center space-x-2">
+                                    {this.state.files.map((_, index) => (
+                                        <span
+                                            key={index}
+                                            className={`w-3 h-3 rounded-full cursor-pointer ${
+                                                index ===
+                                                this.state.currentImageIndex
+                                                    ? "bg-white"
+                                                    : "bg-gray-400"
+                                            }`}
+                                            onClick={() =>
+                                                this.setCurrentImage(index)
+                                            }
+                                        ></span>
                                     ))}
                                 </div>
                             )}
                         </div>
-
-                        {this.state.overlayImage && (
-                            <div
-                                className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50"
-                                onKeyDown={this.handleKeyDown}
-                                ref={this.overlayRef}
-                                tabIndex={-1}
-                            >
-                                <div className="relative w-11/12 md:w-1/2 bg-white dark:bg-gray-800 rounded-lg p-4">
-                                    {showArrows && (
-                                        <>
-                                            <button
-                                                type="button"
-                                                className="absolute top-1/2 left-0 transform -translate-y-1/2 p-2 bg-gray-800 text-white rounded-full cursor-pointer"
-                                                onClick={this.goToPreviousImage}
-                                            >
-                                                <i className="fas fa-chevron-left"></i>
-                                            </button>
-                                            <button
-                                                type="button"
-                                                className="absolute top-1/2 right-0 transform -translate-y-1/2 p-2 bg-gray-800 text-white rounded-full cursor-pointer"
-                                                onClick={this.goToNextImage}
-                                            >
-                                                <i className="fas fa-chevron-right"></i>
-                                            </button>
-                                        </>
-                                    )}
-                                    <img
-                                        src={overlayImage.preview}
-                                        alt="Overlay"
-                                        className="w-full h-auto"
-                                    />
-                                    <div className="absolute top-2 right-2">
-                                        <button
-                                            type="button"
-                                            className="p-2 bg-gray-700 text-red-500 rounded-full"
-                                            onClick={this.closeOverlay}
-                                        >
-                                            <i className="fas fa-minus-circle"></i>
-                                        </button>
-                                    </div>
-                                    <div className="flex flex-col items-center mt-4">
-                                        <div className="text-gray-900 dark:text-gray-100 mb-2">
-                                            <span className="block text-sm">
-                                                {imageName}
-                                            </span>
-                                            <span className="block text-sm">
-                                                {imageSize}
-                                            </span>
-                                        </div>
-                                        {showDots && (
-                                            <div className="flex justify-center mt-2">
-                                                {this.state.files.map(
-                                                    (_, index) => (
-                                                        <button
-                                                            key={index}
-                                                            type="button"
-                                                            className={`w-3 h-3 mx-1 rounded-full cursor-pointer ${
-                                                                index ===
-                                                                this.state
-                                                                    .currentImageIndex
-                                                                    ? "bg-blue-500"
-                                                                    : "bg-gray-400"
-                                                            }`}
-                                                            onClick={() =>
-                                                                this.setCurrentImage(
-                                                                    index,
-                                                                )
-                                                            }
-                                                        ></button>
-                                                    ),
-                                                )}
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
-                        )}
                     </div>
-
-                    <div className="text-right mt-4"></div>
-                </BasicCard>
+                )}
             </div>
         );
     }
