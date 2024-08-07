@@ -1,9 +1,25 @@
 import React, { Component } from "react";
-import MarkdownEditor from "@uiw/react-markdown-editor";
+import {
+    MDXEditor,
+    headingsPlugin,
+    quotePlugin,
+    listsPlugin,
+    thematicBreakPlugin,
+    UndoRedo,
+    BoldItalicUnderlineToggles,
+    toolbarPlugin,
+    linkPlugin,
+    linkDialogPlugin,
+    tablePlugin,
+    InsertTable,
+    BlockTypeSelect,
+} from "@mdxeditor/editor";
 import debounce from "lodash/debounce";
 import { DebouncedFunction } from "./types/debounc";
 import MarkdownElementProps from "./types/markdown-element-props";
 import MarkdownElementState from "./types/markdown-element-state";
+
+import "@mdxeditor/editor/style.css";
 
 export default class MarkdownElement extends Component<
     MarkdownElementProps,
@@ -35,9 +51,30 @@ export default class MarkdownElement extends Component<
 
     render() {
         return (
-            <MarkdownEditor
-                value={this.state.content}
+            <MDXEditor
+                contentEditableClassName={"prose"}
+                markdown={this.state.content}
                 onChange={this.handleEditorChange}
+                plugins={[
+                    headingsPlugin(),
+                    listsPlugin(),
+                    quotePlugin(),
+                    thematicBreakPlugin(),
+                    linkPlugin(),
+                    linkDialogPlugin(),
+                    tablePlugin(),
+                    toolbarPlugin({
+                        toolbarContents: () => (
+                            <>
+                                {" "}
+                                <UndoRedo />
+                                <BlockTypeSelect />
+                                <BoldItalicUnderlineToggles />
+                                <InsertTable />
+                            </>
+                        ),
+                    }),
+                ]}
             />
         );
     }

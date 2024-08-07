@@ -35,6 +35,7 @@ import KingdomLogDetails from "./components/kingdoms/deffinitions/kingdom-log-de
 import { FameTasks } from "./components/faction-loyalty/deffinitions/faction-loaylaty";
 import IsTabletInPortraitDisplayAlert from "./components/ui/alerts/tablet-portrait-detector/is-tablet-in-portrait-display-alert";
 import OrangeButton from "./components/ui/buttons/orange-button";
+import SuggestionsAndBugs from "./components/suggestions/suggestions-and-bugs";
 
 export default class Game extends React.Component<GameProps, GameState> {
     private gameEventListener?: GameEventListeners;
@@ -316,6 +317,16 @@ export default class Game extends React.Component<GameProps, GameState> {
 
         if (this.state.character_status === null) {
             return this.renderLoading();
+        }
+
+        if (this.state.show_suggestions_and_bugs) {
+            return (
+                <SuggestionsAndBugs
+                    manage_suggestions_and_bugs={this.manageBugsAndSuggestions.bind(
+                        this,
+                    )}
+                />
+            );
         }
 
         const gameMap = this.state.map_data;
