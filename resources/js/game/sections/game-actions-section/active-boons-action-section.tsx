@@ -19,9 +19,16 @@ export default class ActiveBoonsActionSection extends React.Component<
     }
 
     manageViewingActiveBoons() {
-        this.setState({
-            viewing_active_boons: !this.state.viewing_active_boons,
-        });
+        this.setState(
+            {
+                viewing_active_boons: !this.state.viewing_active_boons,
+            },
+            () => {
+                this.props.update_is_showing_boons(
+                    this.state.viewing_active_boons,
+                );
+            },
+        );
     }
 
     render() {

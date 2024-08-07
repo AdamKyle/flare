@@ -34,6 +34,7 @@ import ScreenRefresh from "./sections/screen-refresh/screen-refresh";
 import KingdomLogDetails from "./components/kingdoms/deffinitions/kingdom-log-details";
 import { FameTasks } from "./components/faction-loyalty/deffinitions/faction-loaylaty";
 import IsTabletInPortraitDisplayAlert from "./components/ui/alerts/tablet-portrait-detector/is-tablet-in-portrait-display-alert";
+import OrangeButton from "./components/ui/buttons/orange-button";
 
 export default class Game extends React.Component<GameProps, GameState> {
     private gameEventListener?: GameEventListeners;
@@ -69,6 +70,8 @@ export default class Game extends React.Component<GameProps, GameState> {
             show_guide_quest_completed: false,
             hide_donation_alert: false,
             show_map: true,
+            show_suggestions_and_bugs: false,
+            is_showing_active_boons: false,
             tabs: [
                 {
                     key: "game",
@@ -282,6 +285,18 @@ export default class Game extends React.Component<GameProps, GameState> {
         });
     }
 
+    manageBugsAndSuggestions() {
+        this.setState({
+            show_suggestions_and_bugs: !this.state.show_suggestions_and_bugs,
+        });
+    }
+
+    updateIsShowingActiveBoons(isShowing: boolean) {
+        this.setState({
+            is_showing_active_boons: isShowing,
+        });
+    }
+
     render() {
         if (this.state.loading) {
             return this.renderLoading();
@@ -391,14 +406,37 @@ export default class Game extends React.Component<GameProps, GameState> {
                                         your rewards and move on to the next!
                                     </SuccessAlert>
                                 ) : null}
-                                <div
-                                    className={clsx({
-                                        hidden: this.state.view_port > 932,
-                                    })}
-                                >
-                                    <ActiveBoonsActionSection
-                                        character_id={this.props.characterId}
-                                    />
+                                <div className="flex justify-center items-center space-x-4">
+                                    <div
+                                        className={clsx({
+                                            hidden: this.state.view_port > 932,
+                                        })}
+                                    >
+                                        <ActiveBoonsActionSection
+                                            character_id={
+                                                this.props.characterId
+                                            }
+                                            update_is_showing_boons={this.updateIsShowingActiveBoons.bind(
+                                                this,
+                                            )}
+                                        />
+                                    </div>
+                                    {!this.state.is_showing_active_boons ? (
+                                        <OrangeButton
+                                            button_label={
+                                                "Submit Bug/Suggestions"
+                                            }
+                                            on_click={this.manageBugsAndSuggestions.bind(
+                                                this,
+                                            )}
+                                            additional_css={clsx({
+                                                "relative top-[10px]":
+                                                    this.state.view_port > 932,
+                                                "mt-[5px]":
+                                                    this.state.view_port <= 932,
+                                            })}
+                                        />
+                                    ) : null}
                                 </div>
                                 <BasicCard additionalClasses="min-h-60 mt-4">
                                     <ActionTabs
