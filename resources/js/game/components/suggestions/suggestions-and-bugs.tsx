@@ -125,6 +125,22 @@ export default class SuggestionsAndBugs extends React.Component<
         console.log(params);
     }
 
+    isSubmitDisabled() {
+        if (this.state.title === "") {
+            return true;
+        }
+
+        if (this.state.type === "") {
+            return true;
+        }
+
+        if (this.state.platform === "") {
+            return true;
+        }
+
+        return this.state.description === "";
+    }
+
     render() {
         return (
             <div className="mr-auto ml-auto w-full md:w-1/2">
@@ -148,6 +164,11 @@ export default class SuggestionsAndBugs extends React.Component<
                         welcome. You may also upload images to help with bug
                         reports or flush out your suggestions.{" "}
                         <strong>Please be as descriptive as possible</strong>
+                    </p>
+
+                    <p className="mb-4">
+                        <strong>For bug reports</strong>: Please list out as
+                        many steps as possible to replicate the issue.
                     </p>
 
                     {this.state.processing_submission ? (
@@ -322,12 +343,13 @@ export default class SuggestionsAndBugs extends React.Component<
                     <div className="flex justify-end">
                         <DangerButton
                             button_label="Cancel"
+                            additional_css={"mr-2"}
                             on_click={this.props.manage_suggestions_and_bugs}
                         />
                         <SuccessButton
                             button_label="Submit"
                             on_click={this.submitForum.bind(this)}
-                            additional_css={"mr-2"}
+                            disabled={this.isSubmitDisabled()}
                         />
                     </div>
                 </BasicCard>

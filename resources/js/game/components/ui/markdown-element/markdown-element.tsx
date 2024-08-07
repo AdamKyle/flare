@@ -75,7 +75,7 @@ export default class MarkdownElement extends Component<
                             ),
                         }),
                     ]}
-                    placeholder="Tell me your thoughts..."
+                    placeholder="Click to start typing."
                 />
             </div>
         );
