@@ -51,31 +51,33 @@ export default class MarkdownElement extends Component<
 
     render() {
         return (
-            <MDXEditor
-                contentEditableClassName={"prose dark:text-gray-100"}
-                markdown={this.state.content}
-                onChange={this.handleEditorChange}
-                plugins={[
-                    headingsPlugin(),
-                    listsPlugin(),
-                    quotePlugin(),
-                    thematicBreakPlugin(),
-                    linkPlugin(),
-                    linkDialogPlugin(),
-                    tablePlugin(),
-                    toolbarPlugin({
-                        toolbarContents: () => (
-                            <>
-                                {" "}
-                                <UndoRedo />
-                                <BlockTypeSelect />
-                                <BoldItalicUnderlineToggles />
-                                <InsertTable />
-                            </>
-                        ),
-                    }),
-                ]}
-            />
+            <div className="border border-gray-300 dark:border-gray-700 rounded-md p-4 min-h-[400px] bg-white dark:bg-gray-900">
+                <MDXEditor
+                    contentEditableClassName="prose dark:prose-dark min-h-[350px] p-2 text-gray-900 dark:text-gray-100 caret-current"
+                    markdown={this.state.content}
+                    onChange={this.handleEditorChange}
+                    plugins={[
+                        headingsPlugin(),
+                        listsPlugin(),
+                        quotePlugin(),
+                        thematicBreakPlugin(),
+                        linkPlugin(),
+                        linkDialogPlugin(),
+                        tablePlugin(),
+                        toolbarPlugin({
+                            toolbarContents: () => (
+                                <>
+                                    <UndoRedo />
+                                    <BlockTypeSelect />
+                                    <BoldItalicUnderlineToggles />
+                                    <InsertTable />
+                                </>
+                            ),
+                        }),
+                    ]}
+                    placeholder="Tell me your thoughts..."
+                />
+            </div>
         );
     }
 }

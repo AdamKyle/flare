@@ -1,44 +1,27 @@
 import React, { createRef } from "react";
-import Select from "react-select";
+import Select, { ActionMeta, SingleValue } from "react-select";
 import BasicCard from "../ui/cards/basic-card";
 import MarkdownElement from "../ui/markdown-element/markdown-element";
 import { capitalize } from "lodash";
 import DangerButton from "../ui/buttons/danger-button";
 import SuccessButton from "../ui/buttons/success-button";
-import { FileUploader } from "react-drag-drop-files";
+import FileUploaderElement from "../ui/file-uploader/file-uploader-element";
+import FileWithPreview from "../ui/file-uploader/deffinitions/file-with-preview";
+import SuggestionsAndBugsProps from "./types/suggestions-and-bugs-props";
+import SuggestionsAndBugsState from "./types/suggestions-and-bugs-state";
+import SuccessAlert from "../ui/alerts/simple-alerts/success-alert";
 import DangerAlert from "../ui/alerts/simple-alerts/danger-alert";
+import LoadingProgressBar from "../ui/progress-bars/loading-progress-bar";
 
-const fileTypes = ["JPG", "PNG", "GIF"];
-
-interface ClassNameProps {
-    manage_suggestions_and_bugs: () => void;
-    cancel: () => void;
-    submit: () => void;
-}
-
-interface FileWithPreview extends File {
-    preview?: string;
-    name: string;
-    size: number;
-}
-
-interface ClassNameState {
-    title: string;
-    type: string;
-    platform: string;
-    description: string;
-    files: FileWithPreview[];
-    overlayImage: FileWithPreview | null;
-    currentImageIndex: number;
-}
+const file_types = ["JPG", "PNG", "GIF"];
 
 export default class SuggestionsAndBugs extends React.Component<
-    ClassNameProps,
-    ClassNameState
+    SuggestionsAndBugsProps,
+    SuggestionsAndBugsState
 > {
-    overlayRef = createRef<HTMLDivElement>(); // Create a ref for the overlay
+    overlay_ref = createRef<HTMLDivElement>(); // Create a ref for the overlay
 
-    constructor(props: ClassNameProps) {
+    constructor(props: SuggestionsAndBugsProps) {
         super(props);
 
         this.state = {
@@ -47,8 +30,11 @@ export default class SuggestionsAndBugs extends React.Component<
             platform: "",
             description: "",
             files: [],
-            overlayImage: null,
-            currentImageIndex: 0,
+            overlay_image: null,
+            current_image_index: 0,
+            processing_submission: false,
+            error_message: null,
+            success_message: null,
         };
     }
 
@@ -88,106 +74,58 @@ export default class SuggestionsAndBugs extends React.Component<
         ];
     }
 
-    handleFileChange = (files: FileList | File | null) => {
-        if (!files) return;
-
-        // Convert FileList to an array if necessary
-        const fileArray =
-            files instanceof FileList
-                ? Array.from(files)
-                : files instanceof File
-                  ? [files]
-                  : [];
-
-        const validFiles = fileArray.filter((file) => file instanceof File);
-
-        const filesWithPreview = validFiles.map((file) => ({
-            ...file,
-            preview: URL.createObjectURL(file),
-            name: file.name,
-            size: file.size,
-        }));
-
-        this.setState((prevState) => ({
-            files: [...prevState.files, ...filesWithPreview],
-        }));
-    };
-
-    handleRemoveFile = (
-        index: number,
-        event: React.MouseEvent<HTMLButtonElement>,
-    ) => {
-        event.stopPropagation();
-        const files = [...this.state.files];
-        URL.revokeObjectURL(files[index].preview || ""); // Clean up URL object
-        files.splice(index, 1);
-        this.setState({ files });
-    };
-
-    handleImageClick = (index: number) => {
-        this.setState(
-            {
-                overlayImage: this.state.files[index],
-                currentImageIndex: index,
-            },
-            () => {
-                // Focus on the overlay when it opens
-                this.overlayRef.current?.focus();
-            },
-        );
-    };
-
-    handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
-        if (event.key === "Escape") {
-            this.closeOverlay();
-        } else if (event.key === "ArrowLeft") {
-            this.goToPreviousImage();
-        } else if (event.key === "ArrowRight") {
-            this.goToNextImage();
+    setSelectedType(
+        newValue: SingleValue<{ label: string; value: string }>,
+        actionMeta: ActionMeta<{ label: string; value: string }>,
+    ) {
+        if (newValue == null) {
+            return;
         }
-    };
 
-    closeOverlay = () => {
-        this.setState({ overlayImage: null });
-    };
+        if (newValue.value === "") {
+            return;
+        }
 
-    goToPreviousImage = () => {
-        const prevIndex =
-            (this.state.currentImageIndex - 1 + this.state.files.length) %
-            this.state.files.length;
         this.setState({
-            currentImageIndex: prevIndex,
-            overlayImage: this.state.files[prevIndex],
+            type: newValue.value,
         });
-    };
+    }
 
-    goToNextImage = () => {
-        const nextIndex =
-            (this.state.currentImageIndex + 1) % this.state.files.length;
-        this.setState({
-            currentImageIndex: nextIndex,
-            overlayImage: this.state.files[nextIndex],
-        });
-    };
+    setSelectedPlatform(
+        newValue: SingleValue<{ label: string; value: string }>,
+        actionMeta: ActionMeta<{ label: string; value: string }>,
+    ) {
+        if (newValue === null) {
+            return;
+        }
 
-    setCurrentImage = (index: number) => {
+        if (newValue.value === "") {
+            return;
+        }
+
         this.setState({
-            currentImageIndex: index,
-            overlayImage: this.state.files[index],
+            platform: newValue.value,
         });
-    };
+    }
+
+    updateFiles(files: File[] | []) {
+        this.setState({
+            files: files,
+        });
+    }
+
+    submitForum() {
+        const params = {
+            title: this.state.title,
+            type: this.state.type,
+            platform: this.state.platform,
+            description: this.state.description,
+            files: this.state.files,
+        };
+        console.log(params);
+    }
 
     render() {
-        const showArrows = this.state.files.length > 1;
-        const showDots = this.state.files.length > 1;
-
-        const overlayImage = this.state.overlayImage;
-        console.log("overlayImage", overlayImage);
-        const imageName = overlayImage ? overlayImage.name : "";
-        const imageSize = overlayImage
-            ? `${(overlayImage.size / 1024).toFixed(2)} KB`
-            : "";
-
         return (
             <div className="mr-auto ml-auto w-full md:w-1/2">
                 <BasicCard>
@@ -211,6 +149,20 @@ export default class SuggestionsAndBugs extends React.Component<
                         reports or flush out your suggestions.{" "}
                         <strong>Please be as descriptive as possible</strong>
                     </p>
+
+                    {this.state.processing_submission ? (
+                        <LoadingProgressBar />
+                    ) : null}
+
+                    {this.state.success_message != null ? (
+                        <SuccessAlert>
+                            {this.state.success_message}
+                        </SuccessAlert>
+                    ) : null}
+
+                    {this.state.error_message != null ? (
+                        <DangerAlert>{this.state.error_message}</DangerAlert>
+                    ) : null}
 
                     <div className="border-b-2 border-b-gray-200 dark:border-b-gray-600 my-3"></div>
 
@@ -250,17 +202,16 @@ export default class SuggestionsAndBugs extends React.Component<
                             <div className="w-full md:w-3/4">
                                 <Select
                                     id="type"
-                                    onChange={(option) => {
-                                    }}
+                                    onChange={this.setSelectedType.bind(this)}
                                     options={[
                                         {
                                             label: "Bug",
-                                            value: "bug"
+                                            value: "bug",
                                         },
                                         {
                                             label: "Suggestion",
-                                            value: "suggestion"
-                                        }
+                                            value: "suggestion",
+                                        },
                                     ]}
                                     menuPosition={"absolute"}
                                     menuPlacement={"bottom"}
@@ -268,8 +219,8 @@ export default class SuggestionsAndBugs extends React.Component<
                                         menuPortal: (base: any) => ({
                                             ...base,
                                             zIndex: 9999,
-                                            color: "#000000"
-                                        })
+                                            color: "#000000",
+                                        }),
                                     }}
                                     menuPortalTarget={document.body}
                                     value={this.getTypeValue()}
@@ -289,21 +240,22 @@ export default class SuggestionsAndBugs extends React.Component<
                             <div className="w-full md:w-3/4">
                                 <Select
                                     id="platform"
-                                    onChange={(option) => {
-                                    }}
+                                    onChange={this.setSelectedPlatform.bind(
+                                        this,
+                                    )}
                                     options={[
                                         {
                                             label: "Mobile",
-                                            value: "mobile"
+                                            value: "mobile",
                                         },
                                         {
                                             label: "Desktop",
-                                            value: "desktop"
+                                            value: "desktop",
                                         },
                                         {
                                             label: "Both",
-                                            value: "both"
-                                        }
+                                            value: "both",
+                                        },
                                     ]}
                                     menuPosition={"absolute"}
                                     menuPlacement={"bottom"}
@@ -311,8 +263,8 @@ export default class SuggestionsAndBugs extends React.Component<
                                         menuPortal: (base: any) => ({
                                             ...base,
                                             zIndex: 9999,
-                                            color: "#000000"
-                                        })
+                                            color: "#000000",
+                                        }),
                                     }}
                                     menuPortalTarget={document.body}
                                     value={this.getPlatformValue()}
@@ -351,45 +303,11 @@ export default class SuggestionsAndBugs extends React.Component<
                                     "mb-4 text-blue-700 dark:text-blue-500"
                                 }
                             >
-                                You can upload multiple images, click them to
-                                preview and use the right/left arrow keys to
-                                navigate and press esc to close the preview.
+                                You can upload multiple images.
                             </p>
-                            <FileUploader
-                                handleChange={this.handleFileChange}
-                                name="file"
-                                types={fileTypes}
-                                multiple
-                                hoverTitle="Drop Here"
+                            <FileUploaderElement
+                                on_files_change={this.updateFiles.bind(this)}
                             />
-                            <div className="mt-2 flex flex-wrap gap-2">
-                                {this.state.files.map((file, index) => (
-                                    <div
-                                        key={index}
-                                        className="relative cursor-pointer"
-                                        onClick={() =>
-                                            this.handleImageClick(index)
-                                        }
-                                    >
-                                        <img
-                                            src={file.preview}
-                                            alt={file.name}
-                                            className="w-20 h-20 object-contain"
-                                        />
-                                        <button
-                                            className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1"
-                                            onClick={(event) =>
-                                                this.handleRemoveFile(
-                                                    index,
-                                                    event
-                                                )
-                                            }
-                                        >
-                                            <i className="fas fa-times"></i>
-                                        </button>
-                                    </div>
-                                ))}
-                            </div>
                         </div>
                     </div>
 
@@ -402,86 +320,17 @@ export default class SuggestionsAndBugs extends React.Component<
                     </p>
 
                     <div className="flex justify-end">
-                        <SuccessButton
-                            button_label="Submit"
-                            on_click={this.props.submit}
-                            additional_css={"mr-2"}
-                        />
                         <DangerButton
                             button_label="Cancel"
-                            on_click={this.props.cancel}
+                            on_click={this.props.manage_suggestions_and_bugs}
+                        />
+                        <SuccessButton
+                            button_label="Submit"
+                            on_click={this.submitForum.bind(this)}
+                            additional_css={"mr-2"}
                         />
                     </div>
                 </BasicCard>
-
-                {this.state.overlayImage && (
-                    <div
-                        ref={this.overlayRef} // Assign the ref to the overlay div
-                        className="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50"
-                        tabIndex={0}
-                        onKeyDown={this.handleKeyDown}
-                        onClick={this.closeOverlay}
-                    >
-                        <div
-                            className="relative p-8 bg-white dark:bg-gray-800 rounded"
-                            onClick={(e) => e.stopPropagation()}
-                        >
-                            <button
-                                className="absolute top-0 right-0 m-2 p-2 bg-red-500 text-white rounded-full"
-                                onClick={this.closeOverlay}
-                            >
-                                <i className="fas fa-times"></i>
-                            </button>
-
-                            {showArrows && (
-                                <button
-                                    className="absolute left-0 top-1/2 transform -translate-y-1/2 p-2 bg-gray-700 text-white rounded-full"
-                                    onClick={this.goToPreviousImage}
-                                >
-                                    <i className="fas fa-chevron-left"></i>
-                                </button>
-                            )}
-
-                            <img
-                                src={this.state.overlayImage.preview}
-                                alt={imageName}
-                                className="max-w-full max-h-[calc(100vh-12rem)] object-contain"
-                            />
-                            <div className="text-center mt-2">
-                                <p>{imageName}</p>
-                                <p>{imageSize}</p>
-                            </div>
-
-                            {showArrows && (
-                                <button
-                                    className="absolute right-0 top-1/2 transform -translate-y-1/2 p-2 bg-gray-700 text-white rounded-full"
-                                    onClick={this.goToNextImage}
-                                >
-                                    <i className="fas fa-chevron-right"></i>
-                                </button>
-                            )}
-
-                            {showDots && (
-                                <div className="absolute bottom-[-8px] left-0 right-0 mb-4 flex justify-center space-x-2">
-                                    {this.state.files.map((_, index) => (
-                                        <span
-                                            key={index}
-                                            className={`w-3 h-3 rounded-full cursor-pointer ${
-                                                index ===
-                                                this.state.currentImageIndex
-                                                    ? "bg-white"
-                                                    : "bg-gray-400"
-                                            }`}
-                                            onClick={() =>
-                                                this.setCurrentImage(index)
-                                            }
-                                        ></span>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                )}
             </div>
         );
     }
