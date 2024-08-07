@@ -62,6 +62,13 @@ return [
             'visibility' => 'public',
         ],
 
+        'suggestions-and-bugs' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/suggestions_bugs_screen_shots'),
+            'url' => env('APP_URL').'/storage/suggestions_bugs_screen_shots',
+            'visibility' => 'public',
+        ],
+
         'info-sections-images' => [
             'driver' => 'local',
             'root' => storage_path('app/public/info-sections-images'),
