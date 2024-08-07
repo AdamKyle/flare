@@ -52,7 +52,7 @@ export default class MarkdownElement extends Component<
     render() {
         return (
             <MDXEditor
-                contentEditableClassName={"prose"}
+                contentEditableClassName={"prose dark:text-gray-100"}
                 markdown={this.state.content}
                 onChange={this.handleEditorChange}
                 plugins={[

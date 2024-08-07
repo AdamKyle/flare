@@ -20,18 +20,3 @@
     ])
 @endsection
 
-@push('scripts')
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            var form  = document.getElementById('search-form');
-            var input = form.querySelector('input[name="info-search"]');
-
-            input.addEventListener('keypress', function (event) {
-                if (event.key === 'Enter') {
-                    event.preventDefault();
-                    form.submit();
-                }
-            });
-        });
-    </script>
-@endpush
