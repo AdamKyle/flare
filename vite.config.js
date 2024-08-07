@@ -8,7 +8,6 @@ const isDevelopment = process.env.NODE_ENV === 'development';
 export default defineConfig({
     plugins: [
         laravel([
-            'resources/sass/app.scss',
             'resources/css/tailwind.css',
             'resources/js/app.ts',
             'resources/js/admin-app.ts',

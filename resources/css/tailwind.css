@@ -1,3 +1,7 @@
+@import url('//fonts.googleapis.com/css?family=Roboto:400,300,700,500,100');
+
+@import "../../node_modules/rpg-awesome/css/rpg-awesome.css";
+
 @import "../vendor/theme/assets/css/style.css";
 @import "./map.css";
 @import "./fight-buttons.css";
