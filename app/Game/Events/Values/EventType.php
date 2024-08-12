@@ -26,6 +26,8 @@ class EventType
 
     const WEEKLY_FACTION_LOYALTY_EVENT = 9;
 
+    const FEEDBACK_EVENT = 10;
+
     private int $value;
 
     /**
@@ -42,6 +44,7 @@ class EventType
         7 => self::THE_OLD_CHURCH,
         8 => self::DELUSIONAL_MEMORIES_EVENT,
         9 => self::WEEKLY_FACTION_LOYALTY_EVENT,
+        10 => self::FEEDBACK_EVENT,
     ];
 
     protected static array $selection = [
@@ -55,6 +58,7 @@ class EventType
         7 => 'The Old Church',
         8 => 'Delusional Memories Event',
         9 => 'Weekly Faction Loyalty Event',
+        10 => 'Tlessa\'s Feedback Event'
     ];
 
     /**
@@ -165,5 +169,15 @@ class EventType
     public function isWeeklyFactionLoyaltyEvent(): bool
     {
         return $this->value === self::WEEKLY_FACTION_LOYALTY_EVENT;
+    }
+
+    /**
+     * Are we a feedback based event?
+     *
+     * @return bool
+     */
+    public function isFeedbackEvent(): bool
+    {
+        return $this->value === self::FEEDBACK_EVENT;
     }
 }

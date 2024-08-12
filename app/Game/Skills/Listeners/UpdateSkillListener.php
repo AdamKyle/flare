@@ -6,10 +6,12 @@ use App\Flare\Events\SkillLeveledUpServerMessageEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Monster;
+use App\Flare\Models\ScheduledEvent;
 use App\Flare\Models\Skill;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Game\Character\Builders\AttackBuilders\Services\BuildCharacterAttackTypes;
 use App\Game\Core\Events\UpdateBaseCharacterInformation;
+use App\Game\Events\Values\EventType;
 use App\Game\Skills\Events\UpdateSkillEvent;
 use App\Game\Skills\Services\SkillService;
 use App\Game\Skills\Values\SkillTypeValue;
@@ -69,13 +71,15 @@ class UpdateSkillListener
 
     protected function updateSkill(Skill $skill, int $skillXP)
     {
-        $skill->update([
-            'xp' => $skill->xp + $skillXP,
-        ]);
+        $newXp = $skill->xp + $skillXP;
 
-        $skill = $skill->refresh();
+        $event = ScheduledEvent::where('type', EventType::FEEDBACK_EVENT)->where('currently_running', true)->first();
 
-        if ($skill->xp >= $skill->xp_max) {
+        if (!is_null($event)) {
+            $newXp += 150;
+        }
+
+        while ($newXp >= $skill->xp_max) {
             $level = $skill->level + 1;
 
             $bonus = $skill->skill_bonus + $skill->baseSkill->skill_bonus_per_level;
@@ -83,6 +87,8 @@ class UpdateSkillListener
             if ($skill->baseSkill->max_level === $level) {
                 $bonus = 1.0;
             }
+
+            $newXp -= $skill->xp_max;
 
             $skill->update([
                 'level' => $level,
@@ -103,8 +109,16 @@ class UpdateSkillListener
             if ($this->shouldUpdateCharacterAttackData($skill->baseSkill)) {
                 $this->updateCharacterAttackDataCache($character);
             }
+
+            if ($skill->level >= $skill->baseSkill->max_level) {
+                $newXp = 0;
+                break;
+            }
         }
+
+        $skill->update(['xp' => $newXp]);
     }
+
 
     protected function shouldUpdateCharacterAttackData(GameSkill $skill): bool
     {

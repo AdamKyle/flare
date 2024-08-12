@@ -11,6 +11,7 @@ use App\Flare\Models\Item as ItemModel;
 use App\Flare\Models\Location;
 use App\Flare\Models\Map;
 use App\Flare\Models\Monster;
+use App\Flare\Models\ScheduledEvent;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\LocationType;
@@ -137,7 +138,7 @@ class CharacterRewardService
      */
     public function currencyEventReward(Monster $monster): CharacterRewardService
     {
-        $event = Event::where('type', EventType::WEEKLY_CURRENCY_DROPS)->first();
+        $event = ScheduledEvent::where('type', EventType::WEEKLY_CURRENCY_DROPS)->where('currently_running', true)->first();
 
         if (! is_null($event) && ! $monster->is_celestial_entity) {
 
@@ -251,6 +252,8 @@ class CharacterRewardService
     protected function distributeXP(Monster $monster)
     {
 
+        $addBonus = true;
+
         if (! $this->characterXpService->canCharacterGainXP($this->character)) {
             return;
         }
@@ -260,10 +263,28 @@ class CharacterRewardService
 
         if ($this->character->level >= $monster->max_level && $this->character->user->show_monster_to_low_level_message) {
             ServerMessageHandler::sendBasicMessage($this->character->user, $monster->name.' has a max level of: '.number_format($monster->max_level).'. You are only getting 1/3rd of: '.number_format($monster->xp).' XP before all bonuses. Move down the list child.');
+
+            $addBonus = false;
         }
 
-        // Get XP based on the skill in trainings training sacraficial amount, ie, give me back 85% of this xp.
+        // Get XP based on the skill in trainings training sacrificial amount, ie, give me back 85% of this xp.
         $xp = $this->skillService->getXpWithSkillTrainingReduction($this->character, $xp);
+
+        $event = ScheduledEvent::where('type', EventType::FEEDBACK_EVENT)->where('currently_running', true)->first();
+
+        if (is_null($event)) {
+            $addBonus = false;
+        }
+
+        if ($addBonus) {
+            if ($this->character->times_reincarnated > 0) {
+                $xp += 1000;
+            } else if ($this->character->level > 1000 && $this->character->level <= 5000) {
+                $xp += 500;
+            } else {
+                $xp += 250;
+            }
+        }
 
         if ($xp === 0) {
             return;

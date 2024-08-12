@@ -5,11 +5,13 @@ namespace App\Game\Skills\Services;
 use App\Flare\Events\SkillLeveledUpServerMessageEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameMap;
+use App\Flare\Models\ScheduledEvent;
 use App\Flare\Models\Skill;
 use App\Flare\Transformers\BasicSkillsTransformer;
 use App\Flare\Transformers\SkillsTransformer;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
 use App\Game\Core\Traits\ResponseBuilder;
+use App\Game\Events\Values\EventType;
 use Exception;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
@@ -102,13 +104,14 @@ class SkillService
     /**
      * Assign XP to a training skill.
      *
-     * @return int
-     *
+     * @param Character $character
+     * @param int $xp
+     * @return void
      * @throws Exception
      */
-    public function assignXPToTrainingSkill(Character $character, int $xp): void
-    {
+    public function assignXPToTrainingSkill(Character $character, int $xp): void {
         $skillInTraining = $character->skills->where('currently_training', true)->first();
+        $event = ScheduledEvent::where('type', EventType::FEEDBACK_EVENT)->where('currently_running', true)->first();
 
         if (is_null($skillInTraining)) {
             return;
@@ -122,11 +125,23 @@ class SkillService
         $skillXp = $skillXp + $skillXp * ($skillInTraining->skill_training_bonus + $character->map->gameMap->skill_training_bonus);
         $skillXp += 5;
 
-        $skillInTraining->update([
-            'xp' => $skillInTraining->xp + $skillXp,
-        ]);
+        if (!is_null($event)) {
+            $skillXp += 150;
+        }
 
-        $this->levelUpSkill($skillInTraining->refresh());
+        $newXp = $skillInTraining->xp + $skillXp;
+
+        while ($newXp >= $skillInTraining->xp_max) {
+            $newXp -= $skillInTraining->xp_max;
+            $this->levelUpSkill($skillInTraining->refresh());
+
+            if ($skillInTraining->level === $skillInTraining->baseSkill->max_level) {
+                $newXp = 0;
+                break;
+            }
+        }
+
+        $skillInTraining->update(['xp' => $newXp]);
     }
 
     /**
@@ -148,7 +163,7 @@ class SkillService
     }
 
     /**
-     * Assign xp to crafting skills.
+     * Assign XP to crafting skills.
      *
      * - Uses a base of 25
      * - Applies skill training bonuses
@@ -158,7 +173,6 @@ class SkillService
      */
     public function assignXpToCraftingSkill(GameMap $gameMap, Skill $skill): void
     {
-
         if ($skill->level >= 400) {
             return;
         }
@@ -166,13 +180,19 @@ class SkillService
         $xp = 25;
         $xp = $xp + $xp * ($skill->skill_training_bonus + $gameMap->skill_training_bonus);
 
-        $skill->update([
-            'xp' => $skill->xp + $xp,
-        ]);
+        $newXp = $skill->xp + $xp;
 
-        $skill = $skill->refresh();
+        while ($newXp >= $skill->xp_max) {
+            $newXp -= $skill->xp_max;
+            $this->levelUpSkill($skill->refresh());
 
-        $this->levelUpSkill($skill);
+            if ($skill->level >= 400) {
+                $newXp = 0;
+                break;
+            }
+        }
+
+        $skill->update(['xp' => $newXp]);
     }
 
     /**
