@@ -15,7 +15,11 @@ class SuggestionAndBugsService {
 
     public function createEntry(Character $character, array $params): array {
 
-        $paths = $this->storeImages($params['files'], Str::snake($params['title']));
+        $paths = [];
+
+        if (isset($params['files'])) {
+            $paths = $this->storeImages($params['files'], Str::snake($params['title']));
+        }
 
         SuggestionAndBugs::create([
             'character_id' => $character->id,

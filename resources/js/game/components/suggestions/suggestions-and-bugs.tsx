@@ -208,8 +208,6 @@ export default class SuggestionsAndBugs extends React.Component<
             ? this.state.error_message.split(" ")
             : [];
 
-        console.log("content", this.state.description);
-
         return (
             <div className="mr-auto ml-auto w-full md:w-1/2">
                 <BasicCard>
