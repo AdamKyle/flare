@@ -24,7 +24,7 @@ class SuggestionsAndBugsRequest extends FormRequest
     public function rules()
     {
         return [
-            'title' => 'required|unique|string|max:255',
+            'title' => 'required|unique:suggestion_and_bugs,title|string|max:255',
             'type' => 'required|string|in:bug,suggestion',
             'platform' => 'required|string|in:mobile,desktop,both',
             'description' => 'required|string',

@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, createRef } from "react";
 import {
     MDXEditor,
     headingsPlugin,
@@ -13,6 +13,7 @@ import {
     tablePlugin,
     InsertTable,
     BlockTypeSelect,
+    MDXEditorMethods,
 } from "@mdxeditor/editor";
 import debounce from "lodash/debounce";
 import { DebouncedFunction } from "./types/debounc";
@@ -27,6 +28,9 @@ export default class MarkdownElement extends Component<
 > {
     private debouncedHandleChange: DebouncedFunction;
 
+    private editorRef: React.RefObject<MDXEditorMethods> =
+        createRef<MDXEditorMethods>();
+
     constructor(props: MarkdownElementProps) {
         super(props);
         this.state = {
@@ -35,6 +39,14 @@ export default class MarkdownElement extends Component<
 
         // Debounce function to handle delay in updating state
         this.debouncedHandleChange = debounce(this.handleChange, 500);
+    }
+
+    componentDidUpdate() {
+        if (this.props.should_reset && this.editorRef.current) {
+            this.editorRef.current.setMarkdown("");
+
+            this.props.on_reset();
+        }
     }
 
     handleChange = (content: string) => {
@@ -56,6 +68,7 @@ export default class MarkdownElement extends Component<
                     contentEditableClassName="prose dark:prose-dark min-h-[350px] p-2 text-gray-900 dark:text-gray-100 caret-current"
                     markdown={this.state.content}
                     onChange={this.handleEditorChange}
+                    ref={this.editorRef}
                     plugins={[
                         headingsPlugin(),
                         listsPlugin(),

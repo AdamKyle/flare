@@ -21,8 +21,6 @@ export default class SuggestionsAndBugsAjax {
         characterId: number,
         params: SuggestionsAndBugsAjaxParams,
     ): void {
-        console.log(params);
-
         const formParams = new FormData();
 
         formParams.set("title", params.title);
@@ -46,6 +44,12 @@ export default class SuggestionsAndBugsAjax {
                     component.setState({
                         success_message: result.data.message,
                         processing_submission: false,
+                        title: "",
+                        type: "",
+                        platform: "",
+                        description: "",
+                        files: [],
+                        should_reset_markdown_element: true,
                     });
                 },
                 (error: AxiosError) => {

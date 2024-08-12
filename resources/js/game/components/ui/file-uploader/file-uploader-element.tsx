@@ -2,8 +2,8 @@ import React from "react";
 import { FileUploader } from "react-drag-drop-files";
 import FileUploaderElementProps from "./types/file-uploader-element-props";
 import FileUploaderElementState from "./types/file-uploader-element-state";
-import FileWithPreview from "./deffinitions/file-with-preview";
 import ImagePreviewer from "./compoents/image-previewer";
+import FileWithPreview from "./deffinitions/file-with-preview";
 
 const file_types = ["JPG", "PNG", "GIF"];
 
@@ -106,6 +106,7 @@ export default class FileUploaderElement extends React.Component<
 
     render() {
         const { files, show_preview, preview_index } = this.state;
+        const fileErrors = this.props.file_errors || [];
 
         return (
             <div>
@@ -117,28 +118,36 @@ export default class FileUploaderElement extends React.Component<
                     hoverTitle="Drop Here"
                 />
                 <div className="mt-2 flex flex-wrap gap-2">
-                    {files.map((file, index) => (
-                        <div
-                            key={index}
-                            className="relative cursor-pointer"
-                            onClick={() => this.handleImageClick(index)}
-                        >
-                            <img
-                                src={file.preview_url} // Ensure using 'preview_url'
-                                alt={file.name}
-                                className="w-20 h-20 object-contain cursor-pointer"
-                            />
-                            <button
-                                className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1 cursor-pointer"
-                                onClick={(e) => {
-                                    e.stopPropagation(); // Prevent the click event from propagating to the thumbnail
-                                    this.handleRemoveFile(index);
-                                }}
+                    {files.map((file, index) => {
+                        const hasError = fileErrors.some(
+                            (error) => error.fileName === file.name,
+                        );
+                        return (
+                            <div
+                                key={index}
+                                className="relative cursor-pointer"
+                                onClick={() => this.handleImageClick(index)}
                             >
-                                <i className="fas fa-times"></i>
-                            </button>
-                        </div>
-                    ))}
+                                <img
+                                    src={file.preview_url} // Ensure using 'preview_url'
+                                    alt={file.name}
+                                    className={`w-20 h-20 object-contain cursor-pointer ${hasError ? "filter bg-red-500 bg-opacity-75" : ""}`}
+                                />
+                                {hasError && (
+                                    <i className="fas fa-exclamation absolute inset-0 flex items-center justify-center text-yellow-600 text-3xl pointer-events-none"></i>
+                                )}
+                                <button
+                                    className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1 cursor-pointer"
+                                    onClick={(e) => {
+                                        e.stopPropagation(); // Prevent the click event from propagating to the thumbnail
+                                        this.handleRemoveFile(index);
+                                    }}
+                                >
+                                    <i className="fas fa-times"></i>
+                                </button>
+                            </div>
+                        );
+                    })}
                 </div>
 
                 {show_preview && (

@@ -1,4 +1,4 @@
-import React, { createRef } from "react";
+import React from "react";
 import Select, { ActionMeta, SingleValue } from "react-select";
 import BasicCard from "../ui/cards/basic-card";
 import MarkdownElement from "../ui/markdown-element/markdown-element";
@@ -13,6 +13,12 @@ import DangerAlert from "../ui/alerts/simple-alerts/danger-alert";
 import LoadingProgressBar from "../ui/progress-bars/loading-progress-bar";
 import SuggestionsAndBugsAjax from "./ajax/suggestions-and-bugs-ajax";
 import { serviceContainer } from "../../lib/containers/core-container";
+
+interface FileError {
+    fileName: string;
+    sizeKB: number;
+    errorMessage: string;
+}
 
 export default class SuggestionsAndBugs extends React.Component<
     SuggestionsAndBugsProps,
@@ -29,11 +35,13 @@ export default class SuggestionsAndBugs extends React.Component<
             platform: "",
             description: "",
             files: [],
+            file_errors: [], // Added state
             overlay_image: null,
             current_image_index: 0,
             processing_submission: false,
             error_message: null,
             success_message: null,
+            should_reset_markdown_element: false,
         };
 
         this.suggestionsAndBugsAjax = serviceContainer().fetch(
@@ -77,15 +85,8 @@ export default class SuggestionsAndBugs extends React.Component<
         ];
     }
 
-    setSelectedType(
-        newValue: SingleValue<{ label: string; value: string }>,
-        actionMeta: ActionMeta<{ label: string; value: string }>,
-    ) {
-        if (newValue == null) {
-            return;
-        }
-
-        if (newValue.value === "") {
+    setSelectedType(newValue: SingleValue<{ label: string; value: string }>) {
+        if (newValue == null || newValue.value === "") {
             return;
         }
 
@@ -97,11 +98,7 @@ export default class SuggestionsAndBugs extends React.Component<
     setSelectedPlatform(
         newValue: SingleValue<{ label: string; value: string }>,
     ) {
-        if (newValue === null) {
-            return;
-        }
-
-        if (newValue.value === "") {
+        if (newValue === null || newValue.value === "") {
             return;
         }
 
@@ -110,10 +107,42 @@ export default class SuggestionsAndBugs extends React.Component<
         });
     }
 
-    updateFiles(files: File[] | []) {
-        this.setState({
-            files: files,
+    validateFileSizes(files: File[]): {
+        validFiles: File[];
+        fileErrors: FileError[];
+    } {
+        const maxSizeKB = 2048;
+        const maxSizeBytes = maxSizeKB * 1024;
+        const fileErrors: FileError[] = [];
+
+        const validFiles = files.filter((file) => {
+            if (file.size > maxSizeBytes) {
+                fileErrors.push({
+                    fileName: file.name,
+                    sizeKB: Math.round(file.size / 1024),
+                    errorMessage: `${file.name} is larger than ${maxSizeKB}kb - actual size: ${Math.round(file.size / 1024)}kb`,
+                });
+                return false;
+            }
+            return true;
         });
+
+        return { validFiles, fileErrors };
+    }
+
+    updateFiles(files: File[] | []) {
+        if (Array.isArray(files)) {
+            const { validFiles, fileErrors } = this.validateFileSizes(files);
+            const isSubmitDisabled =
+                fileErrors.length > 0 || this.isSubmitDisabled();
+
+            this.setState({
+                files: validFiles,
+                file_errors: fileErrors,
+                error_message:
+                    fileErrors.length > 0 ? null : this.state.error_message,
+            });
+        }
     }
 
     submitForum() {
@@ -128,6 +157,8 @@ export default class SuggestionsAndBugs extends React.Component<
         this.setState(
             {
                 processing_submission: true,
+                error_message: null,
+                success_message: null,
             },
             () => {
                 this.suggestionsAndBugsAjax.submitFeedback(
@@ -152,10 +183,26 @@ export default class SuggestionsAndBugs extends React.Component<
             return true;
         }
 
+        if (this.state.file_errors.length > 0) {
+            return true;
+        }
+
         return this.state.description === "";
     }
 
+    onMarkdownElementReset() {
+        this.setState({
+            should_reset_markdown_element: false,
+        });
+    }
+
     render() {
+        const errorMessages = this.state.error_message
+            ? this.state.error_message.split(" ")
+            : [];
+
+        console.log("content", this.state.description);
+
         return (
             <div className="mr-auto ml-auto w-full md:w-1/2">
                 <BasicCard>
@@ -187,6 +234,16 @@ export default class SuggestionsAndBugs extends React.Component<
 
                     {this.state.processing_submission ? (
                         <LoadingProgressBar />
+                    ) : null}
+
+                    {this.state.file_errors.length > 0 ? (
+                        <DangerAlert>
+                            <ul className="list-disc pl-5">
+                                {this.state.file_errors.map((error, index) => (
+                                    <li key={index}>{error.errorMessage}</li>
+                                ))}
+                            </ul>
+                        </DangerAlert>
                     ) : null}
 
                     {this.state.success_message != null ? (
@@ -321,50 +378,54 @@ export default class SuggestionsAndBugs extends React.Component<
                                     onChange={(value) =>
                                         this.setState({ description: value })
                                     }
+                                    initialValue={this.state.description}
+                                    should_reset={
+                                        this.state.should_reset_markdown_element
+                                    }
+                                    on_reset={this.onMarkdownElementReset.bind(
+                                        this,
+                                    )}
                                 />
                             </div>
                         </div>
-                    </div>
 
-                    <div className="flex flex-col md:flex-row items-start gap-4 my-2">
-                        <div className="w-full md:w-1/4">
-                            <label className="label block mb-2 md:mb-0">
-                                Attach Images
-                            </label>
+                        <div className="flex flex-col md:flex-row items-start gap-4 my-2">
+                            <div className="w-full md:w-1/4">
+                                <label className="label block mb-2 md:mb-0">
+                                    Attach Images
+                                </label>
+                            </div>
+                            <div className="w-full md:w-3/4">
+                                <p
+                                    className={
+                                        "mb-4 text-blue-700 dark:text-blue-500"
+                                    }
+                                >
+                                    You can upload multiple images.
+                                </p>
+                                <FileUploaderElement
+                                    on_files_change={this.updateFiles.bind(
+                                        this,
+                                    )}
+                                    file_errors={this.state.file_errors}
+                                />
+                            </div>
                         </div>
-                        <div className="w-full md:w-3/4">
-                            <p
-                                className={
-                                    "mb-4 text-blue-700 dark:text-blue-500"
+
+                        <div className="flex justify-end gap-4 mt-4">
+                            <DangerButton
+                                button_label="Cancel"
+                                additional_css={"mr-2"}
+                                on_click={
+                                    this.props.manage_suggestions_and_bugs
                                 }
-                            >
-                                You can upload multiple images.
-                            </p>
-                            <FileUploaderElement
-                                on_files_change={this.updateFiles.bind(this)}
+                            />
+                            <SuccessButton
+                                button_label="Submit"
+                                on_click={this.submitForum.bind(this)}
+                                disabled={this.isSubmitDisabled()}
                             />
                         </div>
-                    </div>
-
-                    <div className="border-b-2 border-b-gray-200 dark:border-b-gray-600 my-3"></div>
-
-                    <p className={"my-4 italic"}>
-                        Abusing this system by submitting spam can and will get
-                        your account banned. Please only use this system to
-                        submit bugs and suggestions to improve the game.
-                    </p>
-
-                    <div className="flex justify-end">
-                        <DangerButton
-                            button_label="Cancel"
-                            additional_css={"mr-2"}
-                            on_click={this.props.manage_suggestions_and_bugs}
-                        />
-                        <SuccessButton
-                            button_label="Submit"
-                            on_click={this.submitForum.bind(this)}
-                            disabled={this.isSubmitDisabled()}
-                        />
                     </div>
                 </BasicCard>
             </div>
