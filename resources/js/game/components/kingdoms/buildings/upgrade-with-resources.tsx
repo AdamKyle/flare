@@ -37,7 +37,7 @@ export default class UpgradeWithResources extends React.Component<any, any> {
                 this.upgradeBuildingAjax.upgradeBuilding(
                     this,
                     this.props.character_id,
-                    this.props.buildind.id,
+                    this.props.building.id,
                     1,
                     false,
                 );
