@@ -60,6 +60,8 @@ export default class ImagePreviewer extends React.Component<
             ? `${(current_file.size / 1024).toFixed(2)} KB`
             : "";
 
+        console.log(this.props.error_message);
+
         return (
             <div
                 ref={this.containerRef} // Attach ref to container div
@@ -97,6 +99,12 @@ export default class ImagePreviewer extends React.Component<
                     )}
 
                     <div className="text-center mt-2">
+                        {this.props.error_message !== "" ? (
+                            <p className="text-red-500">
+                                {this.props.error_message}
+                            </p>
+                        ) : null}
+
                         <p>{image_name}</p>
                         <p>{image_size}</p>
                     </div>

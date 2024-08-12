@@ -2,8 +2,8 @@ import React from "react";
 import { FileUploader } from "react-drag-drop-files";
 import FileUploaderElementProps from "./types/file-uploader-element-props";
 import FileUploaderElementState from "./types/file-uploader-element-state";
-import ImagePreviewer from "./compoents/image-previewer";
 import FileWithPreview from "./deffinitions/file-with-preview";
+import ImagePreviewer from "./compoents/image-previewer";
 
 const file_types = ["JPG", "PNG", "GIF"];
 
@@ -18,6 +18,7 @@ export default class FileUploaderElement extends React.Component<
             uploaded_files: [],
             show_preview: false,
             preview_index: 0,
+            error_message: "", // Add error_message to the state
         };
     }
 
@@ -29,6 +30,7 @@ export default class FileUploaderElement extends React.Component<
                     uploaded_files: [],
                     show_preview: false,
                     preview_index: 0,
+                    error_message: "", // Reset error_message
                 },
                 () => {
                     this.props.on_reset();
@@ -94,9 +96,14 @@ export default class FileUploaderElement extends React.Component<
     };
 
     handleImageClick = (index: number) => {
+        const selected_file = this.state.files[index];
+        const file_error = this.props.file_errors?.find(
+            (error) => error.fileName === selected_file.name,
+        );
         this.setState({
             show_preview: true,
             preview_index: index,
+            error_message: file_error?.errorMessage || "", // Add error_message handling
         });
     };
 
@@ -104,6 +111,7 @@ export default class FileUploaderElement extends React.Component<
         this.setState({
             show_preview: false,
             preview_index: 0,
+            error_message: "", // Reset error_message on close
         });
     };
 
@@ -113,15 +121,30 @@ export default class FileUploaderElement extends React.Component<
             direction === "previous"
                 ? (preview_index - 1 + files.length) % files.length
                 : (preview_index + 1) % files.length;
-        this.setState({ preview_index: new_index });
+        const selected_file = files[new_index];
+        const file_error = this.props.file_errors?.find(
+            (error) => error.fileName === selected_file.name,
+        );
+        this.setState({
+            preview_index: new_index,
+            error_message: file_error?.errorMessage || "", // Update error_message on navigation
+        });
     };
 
     selectPreview = (index: number) => {
-        this.setState({ preview_index: index });
+        const selected_file = this.state.files[index];
+        const file_error = this.props.file_errors?.find(
+            (error) => error.fileName === selected_file.name,
+        );
+        this.setState({
+            preview_index: index,
+            error_message: file_error?.errorMessage || "", // Update error_message on selection
+        });
     };
 
     render() {
-        const { files, show_preview, preview_index } = this.state;
+        const { files, show_preview, preview_index, error_message } =
+            this.state;
         const fileErrors = this.props.file_errors || [];
 
         return (
@@ -173,6 +196,7 @@ export default class FileUploaderElement extends React.Component<
                         on_close={this.closePreview.bind(this)}
                         on_navigate={this.navigatePreview.bind(this)}
                         on_select={this.selectPreview.bind(this)}
+                        error_message={error_message} // Pass the error message
                     />
                 )}
             </div>

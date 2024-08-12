@@ -6,4 +6,5 @@ export default interface ImagePreviewerProps {
     on_close: () => void;
     on_navigate: (direction: "previous" | "next") => void;
     on_select: (index: number) => void;
+    error_message: string;
 }
