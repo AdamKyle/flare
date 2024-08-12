@@ -6,20 +6,19 @@ import { capitalize } from "lodash";
 import DangerButton from "../ui/buttons/danger-button";
 import SuccessButton from "../ui/buttons/success-button";
 import FileUploaderElement from "../ui/file-uploader/file-uploader-element";
-import FileWithPreview from "../ui/file-uploader/deffinitions/file-with-preview";
 import SuggestionsAndBugsProps from "./types/suggestions-and-bugs-props";
 import SuggestionsAndBugsState from "./types/suggestions-and-bugs-state";
 import SuccessAlert from "../ui/alerts/simple-alerts/success-alert";
 import DangerAlert from "../ui/alerts/simple-alerts/danger-alert";
 import LoadingProgressBar from "../ui/progress-bars/loading-progress-bar";
-
-const file_types = ["JPG", "PNG", "GIF"];
+import SuggestionsAndBugsAjax from "./ajax/suggestions-and-bugs-ajax";
+import { serviceContainer } from "../../lib/containers/core-container";
 
 export default class SuggestionsAndBugs extends React.Component<
     SuggestionsAndBugsProps,
     SuggestionsAndBugsState
 > {
-    overlay_ref = createRef<HTMLDivElement>(); // Create a ref for the overlay
+    private readonly suggestionsAndBugsAjax: SuggestionsAndBugsAjax;
 
     constructor(props: SuggestionsAndBugsProps) {
         super(props);
@@ -36,6 +35,10 @@ export default class SuggestionsAndBugs extends React.Component<
             error_message: null,
             success_message: null,
         };
+
+        this.suggestionsAndBugsAjax = serviceContainer().fetch(
+            SuggestionsAndBugsAjax,
+        );
     }
 
     getTypeValue() {
@@ -93,7 +96,6 @@ export default class SuggestionsAndBugs extends React.Component<
 
     setSelectedPlatform(
         newValue: SingleValue<{ label: string; value: string }>,
-        actionMeta: ActionMeta<{ label: string; value: string }>,
     ) {
         if (newValue === null) {
             return;
@@ -122,7 +124,19 @@ export default class SuggestionsAndBugs extends React.Component<
             description: this.state.description,
             files: this.state.files,
         };
-        console.log(params);
+
+        this.setState(
+            {
+                processing_submission: true,
+            },
+            () => {
+                this.suggestionsAndBugsAjax.submitFeedback(
+                    this,
+                    this.props.character_id,
+                    params,
+                );
+            },
+        );
     }
 
     isSubmitDisabled() {

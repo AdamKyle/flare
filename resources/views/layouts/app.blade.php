@@ -28,6 +28,13 @@
     <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
 
+    @auth
+        @if(auth()->user()->hasRole('Admin'))
+            <script src="https://cdn.jsdelivr.net/gh/mcstudios/glightbox/dist/js/glightbox.min.js"></script>
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css" />
+        @endif
+    @endauth
+
     @vite('resources/css/tailwind.css')
 
     @livewireStyles
@@ -154,6 +161,10 @@
             @vite('resources/js/app.ts')
         @else
             @vite('resources/js/admin-app.ts')
+
+            <script>
+                const lightbox = GLightbox();
+            </script>
         @endif
     @endif
 

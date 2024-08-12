@@ -4,6 +4,7 @@ import chatItemComparisonContainer from "../components/modals/item-details/conta
 import timerEventContainer from "../components/timers/container/timer-event-container";
 import { CoreContainer } from "../lib/containers/core-container";
 import factionLoyaltyContainer from "../components/faction-loyalty/container/faction-loyalty-container";
+import suggestionsContainer from "../components/suggestions/container/suggestions-container";
 
 function containerRegistry(coreContainer: CoreContainer): void {
     // Item Comparison
@@ -20,6 +21,9 @@ function containerRegistry(coreContainer: CoreContainer): void {
 
     // Faction Loyalty component
     factionLoyaltyContainer(coreContainer);
+
+    // Suggestions and Bugs component
+    suggestionsContainer(coreContainer);
 }
 
 export { containerRegistry };

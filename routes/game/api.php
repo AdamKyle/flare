@@ -11,5 +11,5 @@ Route::group(['middleware' => ['is.character.who.they.say.they.are']], function 
 
     Route::get('/maps/{character}', ['uses' => 'Api\MapsController@index']);
 
-    Route::post('/suggestions-and-bugs/{character}', ['uses' => 'Api\SuggestionsController@submitEntry']);
+    Route::post('/suggestions-and-bugs/{character}', ['uses' => 'Api\SuggestionsAndBugsController@submitEntry']);
 });

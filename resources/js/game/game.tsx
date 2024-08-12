@@ -325,6 +325,7 @@ export default class Game extends React.Component<GameProps, GameState> {
                     manage_suggestions_and_bugs={this.manageBugsAndSuggestions.bind(
                         this,
                     )}
+                    character_id={this.props.characterId}
                 />
             );
         }

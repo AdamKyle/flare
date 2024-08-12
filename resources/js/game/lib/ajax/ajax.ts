@@ -1,5 +1,5 @@
 import AjaxInterface from "./ajax-interface";
-import axios, { AxiosError, AxiosResponse, Method } from "axios";
+import axios, { AxiosError, AxiosHeaders, AxiosResponse, Method } from "axios";
 import { injectable } from "tsyringe";
 
 @injectable()
@@ -8,6 +8,10 @@ export default class Ajax implements AjaxInterface {
 
     private route: string = "";
 
+    private headers: AxiosHeaders = new AxiosHeaders({
+        "Content-Type": "application/json",
+    });
+
     doAjaxCall(
         method: Method,
         successCallBack: (result: AxiosResponse) => void,
@@ -15,11 +19,9 @@ export default class Ajax implements AjaxInterface {
     ): void {
         if (method.toLowerCase() === "get") {
             this.getRequest(this.route, this.params)
-                .then((result: AxiosResponse) => {
-                    return successCallBack(result);
-                })
+                .then((result: AxiosResponse) => successCallBack(result))
                 .catch((error: AxiosError) => {
-                    if (typeof error.response !== "undefined") {
+                    if (error.response) {
                         const response: AxiosResponse = error.response;
 
                         if (response.status === 401) {
@@ -37,11 +39,9 @@ export default class Ajax implements AjaxInterface {
 
         if (method.toLowerCase() === "post") {
             this.postRequest(this.route, this.params)
-                .then((result: AxiosResponse) => {
-                    return successCallBack(result);
-                })
+                .then((result: AxiosResponse) => successCallBack(result))
                 .catch((error: AxiosError) => {
-                    if (typeof error.response !== "undefined") {
+                    if (error.response) {
                         const response: AxiosResponse = error.response;
 
                         if (response.status === 401) {
@@ -70,12 +70,21 @@ export default class Ajax implements AjaxInterface {
         return this;
     }
 
+    setAdditionalHeaders(headers: Partial<AxiosHeaders>): AjaxInterface {
+        this.headers = new AxiosHeaders({
+            ...this.headers,
+            ...headers,
+        });
+
+        return this;
+    }
+
     getRequest(url: string, params?: any): Promise<AxiosResponse<any>> {
         return axios.get("/api/" + url, { params: params });
     }
 
     postRequest(url: string, params?: any): Promise<AxiosResponse<any>> {
-        return axios.post("/api/" + url, params);
+        return axios.post("/api/" + url, params, { headers: this.headers });
     }
 
     initiateGlobalTimeOut() {

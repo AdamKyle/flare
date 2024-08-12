@@ -50,6 +50,16 @@
                 <span class="fas fa-list"></span>
                 Event Scheduler
             </a>
+            <hr />
+            <h6 class="uppercase">Feedback</h6>
+            <a href="{{route('admin.feedback.bugs')}}">
+                <span class="fas fa-bug"></span>
+                Bugs
+            </a>
+            <a href="{{route('admin.feedback.suggestions')}}">
+                <span class="far fa-lightbulb"></span>
+                Suggestions
+            </a>
 
         </div>
     </div>

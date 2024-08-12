@@ -4,9 +4,9 @@ namespace App\Flare\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class SuggestionAndBugs extends Model
-{
-    protected $table = 'smelting_progress';
+class SuggestionAndBugs extends Model {
+
+    protected $table = 'suggestion_and_bugs';
 
     /**
      * The attributes that are mass assignable.
