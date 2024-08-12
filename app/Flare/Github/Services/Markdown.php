@@ -4,8 +4,28 @@ namespace App\Flare\Github\Services;
 
 use League\CommonMark\GithubFlavoredMarkdownConverter;
 
-class Markdown
-{
+class Markdown {
+
+    /**
+     * Clean up the string that contains markdown.
+     *
+     * @param string $markdown
+     * @return string
+     */
+    public function cleanMarkdown(string $markdown): string
+    {
+        $markdown = trim($markdown);
+
+        $markdown = str_replace('\\', '', $markdown);
+
+        $markdown = preg_replace("/\r\n|\r|\n/", "\n", $markdown);
+
+        $markdown = html_entity_decode($markdown, ENT_QUOTES, 'UTF-8');
+
+        return $markdown;
+    }
+
+
     /**
      * Convert markdown to html.
      */
@@ -18,4 +38,6 @@ class Markdown
 
         return $converter->convert($text)->getContent();
     }
+
+
 }

@@ -229,4 +229,5 @@ Route::middleware(['auth', 'is.admin'])->group(function () {
     Route::get('/admin/feedback/bugs', ['as' => 'admin.feedback.bugs', 'uses' => 'FeedbackController@bugs']);
     Route::get('/admin/feedback/bug/{bug}', ['as' => 'admin.feedback.bug', 'uses' => 'FeedbackController@bug']);
     Route::get('/admin/feedback/suggestions', ['as' => 'admin.feedback.suggestions', 'uses' => 'FeedbackController@suggestions']);
+    Route::get('/admin/feedback/suggestion/{suggestion}', ['as' => 'admin.feedback.suggestion', 'uses' => 'FeedbackController@suggestion']);
 });

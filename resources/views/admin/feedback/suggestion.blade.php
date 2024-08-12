@@ -5,12 +5,12 @@
         <x-core.cards.card-with-title
             title="{{$foundBug->title}}"
             buttons="true"
-            backUrl="{{route('admin.feedback.bugs')}}"
+            backUrl="{{route('admin.feedback.suggestions')}}"
         >
             <div class="space-y-4">
                 <div class="bg-gray-100 dark:bg-gray-800 p-4 rounded-md">
                     <dl>
-                        <dt class="font-semibold text-gray-700 dark:text-white">Affecting Platform:</dt>
+                        <dt class="font-semibold text-gray-700 dark:text-white">For Platform:</dt>
                         <dd class="text-gray-500 dark:text-gray-300">{{Str::title($foundBug->platform)}}</dd>
                     </dl>
                 </div>
