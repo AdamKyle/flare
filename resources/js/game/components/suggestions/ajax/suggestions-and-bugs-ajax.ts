@@ -50,6 +50,7 @@ export default class SuggestionsAndBugsAjax {
                         description: "",
                         files: [],
                         should_reset_markdown_element: true,
+                        should_reset_file_upload: true,
                     });
                 },
                 (error: AxiosError) => {

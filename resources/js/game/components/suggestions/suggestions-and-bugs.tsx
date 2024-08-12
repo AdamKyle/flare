@@ -42,6 +42,7 @@ export default class SuggestionsAndBugs extends React.Component<
             error_message: null,
             success_message: null,
             should_reset_markdown_element: false,
+            should_reset_file_upload: false,
         };
 
         this.suggestionsAndBugsAjax = serviceContainer().fetch(
@@ -193,6 +194,12 @@ export default class SuggestionsAndBugs extends React.Component<
     onMarkdownElementReset() {
         this.setState({
             should_reset_markdown_element: false,
+        });
+    }
+
+    fileUploaderElementReset() {
+        this.setState({
+            should_reset_file_upload: false,
         });
     }
 
@@ -408,6 +415,12 @@ export default class SuggestionsAndBugs extends React.Component<
                                         this,
                                     )}
                                     file_errors={this.state.file_errors}
+                                    should_reset={
+                                        this.state.should_reset_file_upload
+                                    }
+                                    on_reset={this.fileUploaderElementReset.bind(
+                                        this,
+                                    )}
                                 />
                             </div>
                         </div>

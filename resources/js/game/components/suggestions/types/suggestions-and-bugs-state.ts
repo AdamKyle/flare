@@ -13,4 +13,5 @@ export default interface SuggestionsAndBugsState {
     error_message: string | null;
     success_message: string | null;
     should_reset_markdown_element: boolean;
+    should_reset_file_upload: boolean;
 }

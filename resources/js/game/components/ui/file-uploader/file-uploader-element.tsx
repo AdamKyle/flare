@@ -21,6 +21,22 @@ export default class FileUploaderElement extends React.Component<
         };
     }
 
+    componentDidUpdate() {
+        if (this.props.should_reset && this.state.files.length > 0) {
+            this.setState(
+                {
+                    files: [],
+                    uploaded_files: [],
+                    show_preview: false,
+                    preview_index: 0,
+                },
+                () => {
+                    this.props.on_reset();
+                },
+            );
+        }
+    }
+
     handleFileChange = (files: FileList | File | null) => {
         if (!files) return;
 
