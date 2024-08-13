@@ -24,4 +24,6 @@ Route::middleware(['auth', 'is.admin'])->group(function () {
 
     route::get('admin/map-manager/{gameMap}', ['uses' => 'Api\MapManagerController@getMapData']);
     route::post('admin/map-manager/move-location/{location}', ['uses' => 'Api\MapManagerController@moveLocation']);
+
+    route::post('admin/create-new-survey', ['uses' => 'Api\SurveyController@createSurvey']);
 });

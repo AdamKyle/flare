@@ -1,5 +1,5 @@
 /**
- * Boot strap the application.
+ * Bootstrap the application.
  */
 import "./bootstrap";
 
@@ -27,3 +27,8 @@ import "./admin/calendar";
  * Renders the map manager for the admin to place new locations.
  */
 import "./admin/map-manager-location";
+
+/**
+ * Renders the survey builder for the admin section.
+ */
+import "./admin/admin-survey-builder";
