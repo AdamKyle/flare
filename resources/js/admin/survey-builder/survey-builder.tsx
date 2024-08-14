@@ -97,6 +97,8 @@ export default class SurveyBuilder extends React.Component<
         this.setState(
             {
                 processing: true,
+                success_message: null,
+                error_message: null,
             },
             () => {
                 this.createSurveyAjax.createNewSurvey(this);

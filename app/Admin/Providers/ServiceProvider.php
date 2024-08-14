@@ -13,6 +13,7 @@ use App\Admin\Services\ItemsService;
 use App\Admin\Services\LocationService;
 use App\Admin\Services\QuestService;
 use App\Admin\Services\SuggestionAndBugsService;
+use App\Admin\Services\SurveyService;
 use App\Admin\Services\UpdateCharacterStatsService;
 use App\Admin\Services\UserService;
 use App\Flare\Cache\CoordinatesCache;
@@ -63,6 +64,10 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(SuggestionAndBugsService::class, function() {
             return new SuggestionAndBugsService;
+        });
+
+        $this->app->bind(SurveyService::class, function() {
+            return new SurveyService;
         });
 
         $this->commands([CreateAdminAccount::class, GiveKingdomsToNpcs::class]);

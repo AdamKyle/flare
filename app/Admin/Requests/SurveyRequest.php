@@ -14,7 +14,7 @@ class SurveyRequest extends FormRequest
     public function rules()
     {
         return [
-            'title' => 'required|string|max:255',
+            'title' => 'required|string|max:255|unique:surveys,title',
             'description' => 'nullable|string',
             'sections' => 'required|array',
             'sections.*.title' => 'required_with:sections|string|max:255',
@@ -30,6 +30,7 @@ class SurveyRequest extends FormRequest
     public function messages()
     {
         return [
+            'title.unique' => 'Title of survey must be unique.',
             'title.required' => 'The survey title is required.',
             'sections.required' => 'At least one section is required.',
             'sections.*.title.required_with' => 'Each section must have a title.',

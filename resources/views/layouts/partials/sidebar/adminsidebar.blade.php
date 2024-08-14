@@ -62,6 +62,10 @@
             </a>
             <hr />
             <h6 class="uppercase">Survey Builder</h6>
+            <a href="{{route('admin.surveys')}}">
+                <span class="fas fa-poll-h"></span>
+                Surveys
+            </a>
             <a href="{{route('admin.survey-builder.create-survey')}}">
                 <span class="fas fa-poll"></span>
                 Survey Builder (Create)
