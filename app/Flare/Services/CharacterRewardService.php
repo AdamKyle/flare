@@ -138,7 +138,7 @@ class CharacterRewardService
      */
     public function currencyEventReward(Monster $monster): CharacterRewardService
     {
-        $event = ScheduledEvent::where('type', EventType::WEEKLY_CURRENCY_DROPS)->where('currently_running', true)->first();
+        $event = ScheduledEvent::where('event_type', EventType::WEEKLY_CURRENCY_DROPS)->where('currently_running', true)->first();
 
         if (! is_null($event) && ! $monster->is_celestial_entity) {
 
