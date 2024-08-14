@@ -24,8 +24,8 @@ export default class CreateNewSurvey {
                             processing: false,
                             success_message: result.data.message,
                             sections: [],
-                            title: '',
-                            description: '',
+                            title: "",
+                            description: "",
                         },
                         () => {},
                     );

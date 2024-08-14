@@ -111,7 +111,7 @@ class SkillService
      */
     public function assignXPToTrainingSkill(Character $character, int $xp): void {
         $skillInTraining = $character->skills->where('currently_training', true)->first();
-        $event = ScheduledEvent::where('type', EventType::FEEDBACK_EVENT)->where('currently_running', true)->first();
+        $event = ScheduledEvent::where('event_type', EventType::FEEDBACK_EVENT)->where('currently_running', true)->first();
 
         if (is_null($skillInTraining)) {
             return;

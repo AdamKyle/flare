@@ -73,7 +73,7 @@ class UpdateSkillListener
     {
         $newXp = $skill->xp + $skillXP;
 
-        $event = ScheduledEvent::where('type', EventType::FEEDBACK_EVENT)->where('currently_running', true)->first();
+        $event = ScheduledEvent::where('event_type', EventType::FEEDBACK_EVENT)->where('currently_running', true)->first();
 
         if (!is_null($event)) {
             $newXp += 150;
