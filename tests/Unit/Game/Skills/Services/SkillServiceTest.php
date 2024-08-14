@@ -158,9 +158,11 @@ class SkillServiceTest extends TestCase
             'xp_towards' => 0.10,
         ]);
 
-        $this->skillService->assignXPToTrainingSkill($character->refresh(), 10);
+        $character = $character->refresh();
 
-        $skill = $character->refresh()->skills->first();
+        $this->skillService->assignXPToTrainingSkill($character, 10);
+
+        $skill = $character->refresh()->skills->where('currently_training', true)->first();
 
         $this->assertGreaterThan(10, $skill->xp);
     }
@@ -178,11 +180,13 @@ class SkillServiceTest extends TestCase
             'xp_towards' => 0.10,
         ]);
 
-        $this->skillService->assignXPToTrainingSkill($character->refresh(), 1500);
+        $character = $character->refresh();
 
-        $skill = $character->refresh()->skills->first();
+        $this->skillService->assignXPToTrainingSkill($character, 1500);
 
-        $this->assertEquals(2, $skill->level);
+        $skill = $character->refresh()->skills->where('currently_training', true)->first();
+
+        $this->assertGreaterThan(2, $skill->level); // should be enough xp to go two or more levels.
 
         Event::assertDispatched(SkillLeveledUpServerMessageEvent::class);
     }

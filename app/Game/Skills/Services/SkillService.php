@@ -131,17 +131,32 @@ class SkillService
 
         $newXp = $skillInTraining->xp + $skillXp;
 
+        $skillInTraining->update(['xp' => $newXp]);
+        $skillInTraining = $skillInTraining->refresh();
+
         while ($newXp >= $skillInTraining->xp_max) {
             $newXp -= $skillInTraining->xp_max;
-            $this->levelUpSkill($skillInTraining->refresh());
+
+            $skillInTraining = $this->levelUpSkill($skillInTraining);
 
             if ($skillInTraining->level === $skillInTraining->baseSkill->max_level) {
                 $newXp = 0;
+
+                $skillInTraining->update(['xp' => $newXp]);
+
+                $skillInTraining = $skillInTraining->refresh();
+
                 break;
             }
+
+            $skillInTraining->update(['xp' => $newXp]);
+
+            $skillInTraining = $skillInTraining->refresh();
         }
 
-        $skillInTraining->update(['xp' => $newXp]);
+        if ($newXp > 0) {
+            $skillInTraining->update(['xp' => $newXp]);
+        }
     }
 
     /**
@@ -183,16 +198,26 @@ class SkillService
         $newXp = $skill->xp + $xp;
 
         while ($newXp >= $skill->xp_max) {
-            $newXp -= $skill->xp_max;
-            $this->levelUpSkill($skill->refresh());
 
             if ($skill->level >= 400) {
                 $newXp = 0;
                 break;
             }
+
+            $skill->update([
+                'xp' => $newXp,
+            ]);
+
+            $newXp -= $skill->xp_max;
+
+            $skill = $skill->refresh();
+
+            $skill = $this->levelUpSkill($skill);
         }
 
-        $skill->update(['xp' => $newXp]);
+        if ($newXp > 0) {
+            $skill->update(['xp' => $newXp]);
+        }
     }
 
     /**
@@ -200,9 +225,10 @@ class SkillService
      *
      * @throws Exception
      */
-    protected function levelUpSkill(Skill $skill): void
+    protected function levelUpSkill(Skill $skill): Skill
     {
         if ($skill->xp >= $skill->xp_max) {
+
             $level = $skill->level + 1;
 
             $bonus = $skill->skill_bonus + $skill->baseSkill->skill_bonus_per_level;
@@ -231,5 +257,7 @@ class SkillService
                 $this->updateCharacterAttackTypes->updateCache($character);
             }
         }
+
+        return $skill->refresh();
     }
 }
