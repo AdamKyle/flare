@@ -28,7 +28,8 @@ class EventTypeTest extends TestCase
             EventType::THE_OLD_CHURCH => 'The Old Church',
             EventType::DELUSIONAL_MEMORIES_EVENT => 'Delusional Memories Event',
             EventType::WEEKLY_FACTION_LOYALTY_EVENT => 'Weekly Faction Loyalty Event',
-            EventType::FEEDBACK_EVENT => 'Feedback Event',
+            EventType::FEEDBACK_EVENT => 'Tlessa\'s Feedback Event',
+
         ];
 
         $this->assertEquals($expected, EventType::getOptionsForSelect());
