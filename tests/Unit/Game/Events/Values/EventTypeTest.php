@@ -28,6 +28,7 @@ class EventTypeTest extends TestCase
             EventType::THE_OLD_CHURCH => 'The Old Church',
             EventType::DELUSIONAL_MEMORIES_EVENT => 'Delusional Memories Event',
             EventType::WEEKLY_FACTION_LOYALTY_EVENT => 'Weekly Faction Loyalty Event',
+            EventType::FEEDBACK_EVENT => 'Feedback Event',
         ];
 
         $this->assertEquals($expected, EventType::getOptionsForSelect());
@@ -76,5 +77,10 @@ class EventTypeTest extends TestCase
     public function testIsWeeklyFactionLoyaltyEvent()
     {
         $this->assertTrue((new EventType(EventType::WEEKLY_FACTION_LOYALTY_EVENT))->isWeeklyFactionLoyaltyEvent());
+    }
+
+    public function testIsFeedBackEvent()
+    {
+        $this->assertTrue((new EventType(EventType::FEEDBACK_EVENT))->isFeedbackEvent());
     }
 }
