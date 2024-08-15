@@ -40,4 +40,16 @@ class FeedbackController extends Controller
 
         return view('admin.feedback.suggestion', compact('foundBug', 'renderedHtml'));
     }
+
+    public function deleteFeedback(int $feedbackId) {
+        $foundFeedback = SuggestionAndBugs::find($feedbackId);
+
+        if (is_null($foundFeedback)) {
+            return redirect()->back()->with('error', 'Feedback not found.');
+        }
+
+        $foundFeedback->delete();
+
+        return redirect()->back()->with('success', 'Feedback deleted.');
+    }
 }

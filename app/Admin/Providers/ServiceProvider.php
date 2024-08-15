@@ -6,6 +6,7 @@ use App\Admin\Console\Commands\CreateAdminAccount;
 use App\Admin\Console\Commands\GiveKingdomsToNpcs;
 use App\Admin\Middleware\IsAdminMiddleware;
 use App\Admin\Services\AssignSkillService;
+use App\Admin\Services\FeedbackService;
 use App\Admin\Services\GuideQuestService;
 use App\Admin\Services\InfoPageService;
 use App\Admin\Services\ItemAffixService;
@@ -68,6 +69,10 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(SurveyService::class, function() {
             return new SurveyService;
+        });
+
+        $this->app->bind(FeedbackService::class, function() {
+            return new FeedbackService;
         });
 
         $this->commands([CreateAdminAccount::class, GiveKingdomsToNpcs::class]);

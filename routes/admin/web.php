@@ -230,8 +230,10 @@ Route::middleware(['auth', 'is.admin'])->group(function () {
     Route::get('/admin/feedback/bug/{bug}', ['as' => 'admin.feedback.bug', 'uses' => 'FeedbackController@bug']);
     Route::get('/admin/feedback/suggestions', ['as' => 'admin.feedback.suggestions', 'uses' => 'FeedbackController@suggestions']);
     Route::get('/admin/feedback/suggestion/{suggestion}', ['as' => 'admin.feedback.suggestion', 'uses' => 'FeedbackController@suggestion']);
+    Route::post('/admin/feedback/delete/{feedbackId}', ['as' => 'admin.feedback.delete', 'uses' => 'FeedbackController@deleteFeedback']);
 
     Route::get('/admin/survey-builder/create-survey', ['as' => 'admin.survey-builder.create-survey', 'uses' => 'SurveyBuilderController@createSurvey']);
     Route::get('/admin/surveys', ['as' => 'admin.surveys', 'uses' => 'SurveyBuilderController@listSurveys']);
     Route::get('/admin/view-survey/{survey}', ['as' => 'admin.single.survey', 'uses' => 'SurveyBuilderController@viewSurvey']);
+
 });

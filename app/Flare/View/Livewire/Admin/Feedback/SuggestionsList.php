@@ -45,6 +45,10 @@ class SuggestionsList extends DataTableComponent
             Column::make('Created At')->sortable()->format(function ($value) {
                 return $value->format('M j Y h:i A');
             }),
+
+            Column::make('Actions')->label(
+                fn ($row, Column $column) => view('admin.feedback.partials.table.delete-action')->withRow($row)
+            ),
         ];
     }
 }
