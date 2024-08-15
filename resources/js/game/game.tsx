@@ -36,6 +36,7 @@ import { FameTasks } from "./components/faction-loyalty/deffinitions/faction-loa
 import IsTabletInPortraitDisplayAlert from "./components/ui/alerts/tablet-portrait-detector/is-tablet-in-portrait-display-alert";
 import OrangeButton from "./components/ui/buttons/orange-button";
 import SuggestionsAndBugs from "./components/suggestions/suggestions-and-bugs";
+import IntroSlides from "./components/intro-section/intro-slides";
 
 export default class Game extends React.Component<GameProps, GameState> {
     private gameEventListener?: GameEventListeners;
@@ -73,6 +74,7 @@ export default class Game extends React.Component<GameProps, GameState> {
             show_map: true,
             show_suggestions_and_bugs: false,
             is_showing_active_boons: false,
+            show_intro_page: false,
             tabs: [
                 {
                     key: "game",
@@ -99,6 +101,7 @@ export default class Game extends React.Component<GameProps, GameState> {
         this.setState({
             view_port:
                 window.innerWidth || document.documentElement.clientWidth,
+            show_intro_page: this.props.showIntroPage,
         });
 
         window.addEventListener("resize", () => {
@@ -141,6 +144,12 @@ export default class Game extends React.Component<GameProps, GameState> {
         }
     }
 
+    resetShowIntroPage() {
+        this.setState({
+            show_intro_page: false,
+        });
+    }
+
     setStateFromData(data: MapData) {
         const state = MapStateManager.buildChangeState(data, this);
 
@@ -157,11 +166,7 @@ export default class Game extends React.Component<GameProps, GameState> {
                 (log: KingdomLogDetails) => !log.opened,
             );
 
-            if (hasLogs.length > 0) {
-                tabs[tabs.length - 1].has_logs = true;
-            } else {
-                tabs[tabs.length - 1].has_logs = false;
-            }
+            tabs[tabs.length - 1].has_logs = hasLogs.length > 0;
         } else {
             tabs[tabs.length - 1].has_logs = false;
         }
@@ -299,6 +304,14 @@ export default class Game extends React.Component<GameProps, GameState> {
     }
 
     render() {
+        if (this.state.show_intro_page) {
+            return (
+                <IntroSlides
+                    reset_show_intro={this.resetShowIntroPage.bind(this)}
+                />
+            );
+        }
+
         if (this.state.loading) {
             return this.renderLoading();
         }

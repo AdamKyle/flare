@@ -72,4 +72,6 @@ export default interface GameState {
     show_suggestions_and_bugs: boolean;
 
     is_showing_active_boons: boolean;
+
+    show_intro_page: boolean;
 }

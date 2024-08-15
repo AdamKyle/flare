@@ -1,18 +1,7 @@
 import React from "react";
-import { Section } from "../survey-builder";
 import MarkdownElement from "../../../game/components/ui/markdown-element/markdown-element";
-
-interface Field {
-    type: "text" | "select" | "markdown" | "radio" | "checkbox";
-    label: string;
-    options?: string[];
-}
-
-interface SurveyPreviewProps {
-    sections: Section[];
-    survey_title: string;
-    survey_description: string;
-}
+import SurveyPreviewProps from "../types/survey-preview-props";
+import Field from "../deffinitions/field";
 
 export default class SurveyPreview extends React.Component<SurveyPreviewProps> {
     previewRef: React.RefObject<HTMLDivElement>;

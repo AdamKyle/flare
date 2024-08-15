@@ -1,8 +1,4 @@
 import React from "react";
-import InputFieldComponent, {
-    InputField,
-    InputType,
-} from "./component/input-field-component";
 import SurveyPreview from "./component/survey-preview";
 import PrimaryOutlineButton from "../../game/components/ui/buttons/primary-outline-button";
 import SuccessOutlineButton from "../../game/components/ui/buttons/success-outline-button";
@@ -14,28 +10,11 @@ import CreateNewSurvey from "./ajax/create-new-survey";
 import { surveyBuilderContainer } from "./container/survey-builder-container";
 import EditSurvey from "./ajax/edit-survey";
 import { serviceContainer } from "../../game/lib/containers/core-container";
-
-export interface Section {
-    title: string;
-    description?: string;
-    input_types: InputField[];
-}
-
-interface SurveyBuilderState {
-    title: string;
-    description: string;
-    sections: Section[];
-    showPreview: boolean;
-    loading: boolean;
-    processing: boolean;
-    success_message: string | null;
-    error_message: string | null;
-}
-
-interface SurveyBuilderProps {
-    user_id: number;
-    survey_id?: number;
-}
+import SurveyBuilderState from "./types/survey-builder-state";
+import SurveyBuilderProps from "./types/survey-builder-props";
+import InputField from "./deffinitions/input-field";
+import { InputType } from "./deffinitions/input-type";
+import InputFieldComponent from "./component/input-field-component";
 
 export default class SurveyBuilder extends React.Component<
     SurveyBuilderProps,

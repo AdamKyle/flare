@@ -1,30 +1,6 @@
 import React from "react";
-
-export enum InputType {
-    Text = "text",
-    Radio = "radio",
-    Checkbox = "checkbox",
-    Markdown = "markdown",
-    Select = "select",
-}
-
-export interface InputField {
-    type: InputType;
-    label: string;
-    options?: string[];
-}
-
-export interface InputFieldProps {
-    sectionIndex: number;
-    fieldIndex: number;
-    field: InputField;
-    onUpdateField: (
-        sectionIndex: number,
-        fieldIndex: number,
-        updatedField: InputField,
-    ) => void;
-    onRemoveField: (sectionIndex: number, fieldIndex: number) => void;
-}
+import { InputType } from "../deffinitions/input-type";
+import InputFieldProps from "../types/input-field-props";
 
 export default class InputFieldComponent extends React.Component<InputFieldProps> {
     handleFieldTypeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {

@@ -14,8 +14,15 @@ if (game !== null) {
     const props: GameProps = {
         userId: player === null ? 0 : parseInt(player.content),
         characterId: character === null ? 0 : parseInt(character.content),
+        showIntroPage: game.dataset.showIntroPage === "1",
     };
 
     const root: Root = createRoot(game);
-    root.render(<Game characterId={props.characterId} userId={props.userId} />);
+    root.render(
+        <Game
+            characterId={props.characterId}
+            userId={props.userId}
+            showIntroPage={props.showIntroPage}
+        />,
+    );
 }

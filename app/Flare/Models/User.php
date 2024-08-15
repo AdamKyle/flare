@@ -47,6 +47,7 @@ class User extends Authenticatable
         'chat_is_bold',
         'chat_is_italic',
         'name_tag',
+        'show_intro_page',
     ];
 
     /**
@@ -84,6 +85,7 @@ class User extends Authenticatable
         'guide_enabled' => 'boolean',
         'chat_is_bold' => 'boolean',
         'chat_is_italic' => 'boolean',
+        'show_intro_page' => 'boolean',
     ];
 
     public function character()
