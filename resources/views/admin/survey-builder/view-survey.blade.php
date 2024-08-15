@@ -5,10 +5,16 @@
         <div class="m-auto">
             <x-core.page-title
                 title="{{ $survey['title'] }}"
-                route="{{ url()->previous() }}"
+                route="{{ route('admin.surveys') }}"
                 link="Back"
                 color="success"
             >
+                <x-core.buttons.link-buttons.primary-button
+                    href="{{route('admin.edit.survey', ['survey' => $survey['id']])}}"
+                    css="tw-ml-2"
+                >
+                    Edit
+                </x-core.buttons.link-buttons.primary-button>
             </x-core.page-title>
         </div>
         <x-core.cards.card>
@@ -17,6 +23,8 @@
             @foreach ($survey['sections'] as $section)
                 <div class="mb-8">
                     <h2 class="text-2xl font-semibold mb-4">{{ $section['title'] }}</h2>
+
+                    <p class="mb-6 text-lg">{{ $section['description'] }}</p>
 
                     <div class="space-y-4 pl-4 border-l-4 border-gray-300 dark:border-gray-700">
                         @foreach ($section['input_types'] as $field)

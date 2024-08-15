@@ -235,5 +235,7 @@ Route::middleware(['auth', 'is.admin'])->group(function () {
     Route::get('/admin/survey-builder/create-survey', ['as' => 'admin.survey-builder.create-survey', 'uses' => 'SurveyBuilderController@createSurvey']);
     Route::get('/admin/surveys', ['as' => 'admin.surveys', 'uses' => 'SurveyBuilderController@listSurveys']);
     Route::get('/admin/view-survey/{survey}', ['as' => 'admin.single.survey', 'uses' => 'SurveyBuilderController@viewSurvey']);
+    Route::get('/admin/edit-survey/{survey}', ['as' => 'admin.edit.survey', 'uses' => 'SurveyBuilderController@editSurvey']);
+    Route::post('/admin/delete/survey/{survey}', ['as' => 'admin.surveys.delete', 'uses' => 'SurveyBuilderController@deleteSurvey']);
 
 });

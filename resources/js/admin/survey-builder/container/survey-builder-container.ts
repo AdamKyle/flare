@@ -1,5 +1,6 @@
 import { container, InjectionToken } from "tsyringe";
 import CreateNewSurvey from "../ajax/create-new-survey";
+import EditSurvey from "../ajax/edit-survey";
 
 class SurveyBuilderContainer {
     private static instance: SurveyBuilderContainer;
@@ -7,6 +8,10 @@ class SurveyBuilderContainer {
     public constructor() {
         this.register("create-new-survey-ajax", {
             useClass: CreateNewSurvey,
+        });
+
+        this.register("edit-survey-ajax", {
+            useClass: EditSurvey,
         });
     }
 

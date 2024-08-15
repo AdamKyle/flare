@@ -28,9 +28,17 @@ class SurveyList extends DataTableComponent
                 return '<a href="/admin/view-survey/'.$survey->id.'">'.$value.'</a>';
             })->html(),
 
+            Column::make('Description', 'description')->format(function ($value) {
+                return '<div style="text-wrap: pretty;">'.$value.'</div>';
+            })->html(),
+
             Column::make('Created At')->sortable()->format(function ($value) {
                 return $value->format('M j Y h:i A');
             }),
+
+            Column::make('Actions')->label(
+                fn ($row, Column $column) => view('admin.survey-builder.partials.table.delete-action')->withRow($row)
+            ),
         ];
     }
 }

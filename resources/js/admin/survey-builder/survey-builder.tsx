@@ -12,6 +12,8 @@ import DangerAlert from "../../game/components/ui/alerts/simple-alerts/danger-al
 import SuccessAlert from "../../game/components/ui/alerts/simple-alerts/success-alert";
 import CreateNewSurvey from "./ajax/create-new-survey";
 import { surveyBuilderContainer } from "./container/survey-builder-container";
+import EditSurvey from "./ajax/edit-survey";
+import { serviceContainer } from "../../game/lib/containers/core-container";
 
 export interface Section {
     title: string;
@@ -24,6 +26,7 @@ interface SurveyBuilderState {
     description: string;
     sections: Section[];
     showPreview: boolean;
+    loading: boolean;
     processing: boolean;
     success_message: string | null;
     error_message: string | null;
@@ -31,6 +34,7 @@ interface SurveyBuilderState {
 
 interface SurveyBuilderProps {
     user_id: number;
+    survey_id?: number;
 }
 
 export default class SurveyBuilder extends React.Component<
@@ -39,19 +43,29 @@ export default class SurveyBuilder extends React.Component<
 > {
     private createSurveyAjax: CreateNewSurvey;
 
+    private editSurveyAjax: EditSurvey;
+
     constructor(props: SurveyBuilderProps) {
         super(props);
+
         this.state = {
             title: "",
             description: "",
             sections: [],
             showPreview: false,
             processing: false,
+            loading: false,
             success_message: null,
             error_message: null,
         };
 
         this.createSurveyAjax = surveyBuilderContainer().fetch(CreateNewSurvey);
+
+        this.editSurveyAjax = serviceContainer().fetch(EditSurvey);
+    }
+
+    componentDidMount() {
+        this.editSurveyAjax.fetchSurvey(this);
     }
 
     handleAddSection = () => {
@@ -91,9 +105,7 @@ export default class SurveyBuilder extends React.Component<
         this.setState({ sections });
     };
 
-    handleCreateSurvey = () => {
-        const { title, description, sections } = this.state;
-
+    manageSurvey = () => {
         this.setState(
             {
                 processing: true,
@@ -101,6 +113,12 @@ export default class SurveyBuilder extends React.Component<
                 error_message: null,
             },
             () => {
+                if (this.props.survey_id) {
+                    this.editSurveyAjax.saveSurvey(this);
+
+                    return;
+                }
+
                 this.createSurveyAjax.createNewSurvey(this);
             },
         );
@@ -125,6 +143,10 @@ export default class SurveyBuilder extends React.Component<
     };
 
     render() {
+        if (this.state.loading) {
+            return <LoadingProgressBar />;
+        }
+
         const { title, description, sections, showPreview } = this.state;
 
         // Determine if form is ready for buttons
@@ -255,8 +277,12 @@ export default class SurveyBuilder extends React.Component<
                             disabled={!isTitlePresent}
                         />
                         <PrimaryOutlineButton
-                            button_label={"Create New Survey"}
-                            on_click={this.handleCreateSurvey.bind(this)}
+                            button_label={
+                                this.props.survey_id
+                                    ? "Save Survey"
+                                    : "Create New Survey"
+                            }
+                            on_click={this.manageSurvey.bind(this)}
                             disabled={!isPreviewEnabled}
                         />
                         <OrangeOutlineButton
