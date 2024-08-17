@@ -12,7 +12,7 @@ export default class SurveyComponent extends React.Component<any, any> {
 
         this.state = {
             show_survey: false,
-            survey_id: 0,
+            survey_id: 2,
         };
 
         this.surveyEventListener =
@@ -27,7 +27,7 @@ export default class SurveyComponent extends React.Component<any, any> {
             show_survey: false,
         });
 
-        this.props.manage_survey();
+        this.props.close_survey();
     }
 
     componentDidMount() {

@@ -16,15 +16,21 @@ interface SuggestionsAndBugsAjaxParams {
 export default class SurveyAjax {
     constructor(@inject(Ajax) private ajax: AjaxInterface) {}
 
-    public submitFeedback(component: SurveyDialogue, survey_id: number): void {
+    public getSurvey(component: SurveyDialogue, survey_id: number): void {
         this.ajax.setRoute("survey/" + survey_id).doAjaxCall(
-            "post",
+            "get",
             (result: AxiosResponse) => {
                 component.setState({
-                    survey: result.data.survey,
+                    survey: {
+                        title: result.data.title,
+                        description: result.data.description,
+                        sections: result.data.sections,
+                    },
+                    loading: false,
                 });
             },
             (error: AxiosError) => {
+                console.log(error);
                 component.setState({
                     loading: false,
                 });

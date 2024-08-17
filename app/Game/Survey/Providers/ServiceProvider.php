@@ -2,8 +2,8 @@
 
 namespace App\Game\Survey\Providers;
 
-
 use App\Game\Survey\Console\Commands\StartSurvey;
+use App\Game\Survey\Services\SurveyService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 
 class ServiceProvider extends ApplicationServiceProvider
@@ -17,6 +17,10 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->commands([
             StartSurvey::class,
         ]);
+
+        $this->app->bind(SurveyService::class, function () {
+            return new SurveyService;
+        });
     }
 
     /**

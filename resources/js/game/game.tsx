@@ -162,7 +162,13 @@ export default class Game extends React.Component<GameProps, GameState> {
 
     manageSurveyModal() {
         this.setState({
-            open_survey_modal: !this.state.open_survey_modal,
+            open_survey_modal: true,
+        });
+    }
+
+    closeSurveyModal() {
+        this.setState({
+            open_survey_modal: false,
         });
     }
 
@@ -389,7 +395,7 @@ export default class Game extends React.Component<GameProps, GameState> {
                     user_id={this.state.character.user_id}
                     show_survey_button={this.showSurveyButton.bind(this)}
                     open_survey={this.state.open_survey_modal}
-                    manage_survey={this.manageSurveyModal.bind(this)}
+                    close_survey={this.closeSurveyModal.bind(this)}
                 />
 
                 <IsTabletInPortraitDisplayAlert />

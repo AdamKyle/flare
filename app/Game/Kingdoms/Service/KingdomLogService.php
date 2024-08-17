@@ -5,42 +5,9 @@ namespace App\Game\Kingdoms\Service;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\KingdomLog;
 use App\Flare\Values\KingdomLogStatusValue;
-use App\Game\Kingdoms\Builders\AttackedKingdomBuilder;
-use App\Game\Kingdoms\Builders\KingdomAttackedBuilder;
-use App\Game\Kingdoms\Builders\TookKingdomBuilder;
 
 class KingdomLogService
 {
-    /**
-     * @var KingdomLog
-     */
-    private $log;
-
-    /**
-     * @var KingdomAttackedBuilder
-     */
-    private $kingdomAttacked;
-
-    /**
-     * @var AttackedKingdomBuilder
-     */
-    private $attackedKingdom;
-
-    /**
-     * @var TookKingdomBuilder
-     */
-    private $tookKingdom;
-
-    /**
-     * KingdomLogService constructor.
-     */
-    public function __construct(KingdomAttackedBuilder $kingdomAttacked, AttackedKingdomBuilder $attackedKingdom, TookKingdomBuilder $tookKingdom)
-    {
-        $this->kingdomAttacked = $kingdomAttacked;
-        $this->attackedKingdom = $attackedKingdom;
-        $this->tookKingdom = $tookKingdom;
-    }
-
     /**
      * Sets the log.
      */
