@@ -37,9 +37,12 @@ import IsTabletInPortraitDisplayAlert from "./components/ui/alerts/tablet-portra
 import OrangeButton from "./components/ui/buttons/orange-button";
 import SuggestionsAndBugs from "./components/suggestions/suggestions-and-bugs";
 import IntroSlides from "./components/intro-section/intro-slides";
+import TurnOffUserIntroFlag from "./lib/game/ajax/turn-off-user-intro-flag";
 
 export default class Game extends React.Component<GameProps, GameState> {
     private gameEventListener?: GameEventListeners;
+
+    private turnOffIntroFlagAjax: TurnOffUserIntroFlag;
 
     constructor(props: GameProps) {
         super(props);
@@ -95,6 +98,9 @@ export default class Game extends React.Component<GameProps, GameState> {
                 },
             ],
         };
+
+        this.turnOffIntroFlagAjax =
+            serviceContainer().fetch(TurnOffUserIntroFlag);
     }
 
     componentDidMount() {
@@ -145,9 +151,17 @@ export default class Game extends React.Component<GameProps, GameState> {
     }
 
     resetShowIntroPage() {
-        this.setState({
-            show_intro_page: false,
-        });
+        this.setState(
+            {
+                show_intro_page: false,
+            },
+            () => {
+                this.turnOffIntroFlagAjax.turnOffIntro(
+                    this,
+                    this.props.characterId,
+                );
+            },
+        );
     }
 
     setStateFromData(data: MapData) {
