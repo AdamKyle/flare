@@ -307,6 +307,7 @@ export default class Game extends React.Component<GameProps, GameState> {
         if (this.state.show_intro_page) {
             return (
                 <IntroSlides
+                    view_port={this.state.view_port}
                     reset_show_intro={this.resetShowIntroPage.bind(this)}
                 />
             );
