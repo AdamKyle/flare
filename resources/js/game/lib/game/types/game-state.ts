@@ -74,4 +74,8 @@ export default interface GameState {
     is_showing_active_boons: boolean;
 
     show_intro_page: boolean;
+
+    show_survey_button: boolean;
+
+    open_survey_modal: boolean;
 }

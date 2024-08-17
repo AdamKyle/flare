@@ -262,6 +262,7 @@ return [
         App\Game\NpcActions\WorkBench\Providers\ServiceProvider::class,
         App\Game\Raids\Providers\ServiceProvider::class,
         App\Game\Factions\FactionLoyalty\Providers\ServiceProvider::class,
+        App\Game\Survey\Providers\ServiceProvider::class,
     ],
 
     /*

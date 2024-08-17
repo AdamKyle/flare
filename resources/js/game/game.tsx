@@ -38,6 +38,8 @@ import OrangeButton from "./components/ui/buttons/orange-button";
 import SuggestionsAndBugs from "./components/suggestions/suggestions-and-bugs";
 import IntroSlides from "./components/intro-section/intro-slides";
 import TurnOffUserIntroFlag from "./lib/game/ajax/turn-off-user-intro-flag";
+import SurveyComponent from "./components/survey/survey-component";
+import PrimaryButton from "./components/ui/buttons/primary-button";
 
 export default class Game extends React.Component<GameProps, GameState> {
     private gameEventListener?: GameEventListeners;
@@ -78,6 +80,8 @@ export default class Game extends React.Component<GameProps, GameState> {
             show_suggestions_and_bugs: false,
             is_showing_active_boons: false,
             show_intro_page: false,
+            show_survey_button: false,
+            open_survey_modal: false,
             tabs: [
                 {
                     key: "game",
@@ -148,6 +152,18 @@ export default class Game extends React.Component<GameProps, GameState> {
                 hide_donation_alert: true,
             });
         }
+    }
+
+    showSurveyButton(showSurvey: boolean) {
+        this.setState({
+            show_survey_button: showSurvey,
+        });
+    }
+
+    manageSurveyModal() {
+        this.setState({
+            open_survey_modal: !this.state.open_survey_modal,
+        });
     }
 
     resetShowIntroPage() {
@@ -369,6 +385,13 @@ export default class Game extends React.Component<GameProps, GameState> {
             <div>
                 <ScreenRefresh user_id={this.state.character.user_id} />
 
+                <SurveyComponent
+                    user_id={this.state.character.user_id}
+                    show_survey_button={this.showSurveyButton.bind(this)}
+                    open_survey={this.state.open_survey_modal}
+                    manage_survey={this.manageSurveyModal.bind(this)}
+                />
+
                 <IsTabletInPortraitDisplayAlert />
 
                 <Tabs
@@ -467,6 +490,21 @@ export default class Game extends React.Component<GameProps, GameState> {
                                                 "Submit Bug/Suggestions"
                                             }
                                             on_click={this.manageBugsAndSuggestions.bind(
+                                                this,
+                                            )}
+                                            additional_css={clsx({
+                                                "relative top-[10px]":
+                                                    this.state.view_port > 932,
+                                                "mt-[5px]":
+                                                    this.state.view_port <= 932,
+                                            })}
+                                        />
+                                    ) : null}
+                                    {this.state.show_survey_button &&
+                                    !this.state.is_showing_active_boons ? (
+                                        <PrimaryButton
+                                            button_label={"Complete survey"}
+                                            on_click={this.manageSurveyModal.bind(
                                                 this,
                                             )}
                                             additional_css={clsx({

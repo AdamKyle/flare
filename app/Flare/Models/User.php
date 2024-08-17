@@ -48,6 +48,7 @@ class User extends Authenticatable
         'chat_is_italic',
         'name_tag',
         'show_intro_page',
+        'is_showing_survey',
     ];
 
     /**
@@ -86,6 +87,7 @@ class User extends Authenticatable
         'chat_is_bold' => 'boolean',
         'chat_is_italic' => 'boolean',
         'show_intro_page' => 'boolean',
+        'is_showing_survey' => 'boolean',
     ];
 
     public function character()
