@@ -42,12 +42,9 @@ export default class SmallerSpecialtyShop extends React.Component<
             <Shop
                 type={type}
                 character_id={this.props.character.id}
-                close_hell_forged={this.props.manage_hell_forged_shop.bind(
-                    this,
-                )}
-                close_purgatory_chains={this.props.manage_purgatory_chain_shop.bind(
-                    this,
-                )}
+                close_hell_forged={this.props.manage_hell_forged_shop}
+                close_purgatory_chains={this.props.manage_purgatory_chain_shop}
+                close_twisted_earth={this.props.manage_twisted_earth_shop}
             />
         );
     }
