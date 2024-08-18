@@ -384,6 +384,8 @@ export default class SurveyForm extends React.Component<
                       : Boolean(value);
             });
 
+        console.log(currentSection);
+
         return (
             <Dialogue
                 is_open={is_open}
@@ -425,7 +427,14 @@ export default class SurveyForm extends React.Component<
                         provide as much feedback as possible to help Tlessa
                         become the best PBBG around!
                     </InfoAlert>
-
+                    <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2"></div>
+                    <h4 className="text-lg font-semibold mb-4">
+                        {currentSection?.title}
+                    </h4>
+                    <p className="text-gray-600 dark:text-gray-300 mb-6">
+                        {currentSection?.description}
+                    </p>
+                    <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2"></div>
                     {currentSection?.input_types.map(this.renderInputField)}
 
                     <div className="flex justify-between mt-6">
