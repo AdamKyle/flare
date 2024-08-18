@@ -228,4 +228,6 @@ export interface CharacterType {
     can_see_pledge_tab: boolean;
 
     pledged_to_faction_id: number | null;
+
+    is_showing_survey: boolean;
 }

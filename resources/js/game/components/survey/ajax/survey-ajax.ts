@@ -30,7 +30,6 @@ export default class SurveyAjax {
                 });
             },
             (error: AxiosError) => {
-                console.log(error);
                 component.setState({
                     loading: false,
                 });

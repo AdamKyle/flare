@@ -10,7 +10,7 @@
                 color="success"
             >
                 <x-core.buttons.link-buttons.primary-button
-                    href="{{route('admin.edit.survey', ['survey' => $survey['id']])}}"
+                    href="{{ route('admin.edit.survey', ['survey' => $survey['id']]) }}"
                     css="tw-ml-2"
                 >
                     Edit
@@ -36,6 +36,7 @@
                                     <label class="block text-lg font-medium">{{ $field['label'] }}</label>
                                     <textarea class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm dark:bg-gray-800 dark:border-gray-700 placeholder-gray-400 dark:placeholder-gray-600" rows="3" placeholder="This will be a Markdown component in the game."></textarea>
                                 @elseif ($field['type'] === 'checkbox')
+                                    <label class="block text-lg font-medium">{{ $field['label'] }}</label>
                                     @foreach ($field['options'] as $index => $option)
                                         <div class="flex items-center mt-1">
                                             <input id="checkbox-{{ $index }}" type="checkbox" class="h-4 w-4 text-indigo-600 border-gray-300 rounded dark:bg-gray-800 dark:border-gray-700">
@@ -43,12 +44,20 @@
                                         </div>
                                     @endforeach
                                 @elseif ($field['type'] === 'radio')
+                                    <label class="block text-lg font-medium">{{ $field['label'] }}</label>
                                     @foreach ($field['options'] as $index => $option)
                                         <div class="flex items-center mt-1">
                                             <input id="radio-{{ $index }}" type="radio" name="{{ $field['label'] }}" class="h-4 w-4 text-indigo-600 border-gray-300 dark:bg-gray-800 dark:border-gray-700">
                                             <label for="radio-{{ $index }}" class="ml-2">{{ $option }}</label>
                                         </div>
                                     @endforeach
+                                @elseif ($field['type'] === 'select')
+                                    <label class="block text-lg font-medium">{{ $field['label'] }}</label>
+                                    <select class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300">
+                                        @foreach ($field['options'] as $index => $option)
+                                            <option value="{{ $option }}">{{ $option }}</option>
+                                        @endforeach
+                                    </select>
                                 @elseif ($field['type'] === 'markdown')
                                     <label class="block text-lg font-medium">{{ $field['label'] }}</label>
                                     <textarea class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm dark:bg-gray-800 dark:border-gray-700 placeholder-gray-400 dark:placeholder-gray-600 p-6" rows="3" placeholder="This will be a Markdown component in the game."></textarea>
