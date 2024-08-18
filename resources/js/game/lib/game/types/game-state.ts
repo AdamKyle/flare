@@ -78,4 +78,6 @@ export default interface GameState {
     show_survey_button: boolean;
 
     open_survey_modal: boolean;
+
+    survey_success_message: string | null;
 }

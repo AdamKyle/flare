@@ -90,6 +90,12 @@ export default class SurveyDialogue extends React.Component<
         this.props.manage_modal();
     };
 
+    confirmCloseWithSuccessMessage = (message: string) => {
+        this.setState({ showCloseConfirmation: false });
+        this.props.manage_modal();
+        this.props.set_success_message(message);
+    };
+
     retrieveInput(inputs: {
         [index: number]: {
             [key: string]: {

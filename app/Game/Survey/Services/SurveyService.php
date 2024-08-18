@@ -2,6 +2,7 @@
 
 namespace App\Game\Survey\Services;
 
+use App\Flare\Builders\RandomAffixGenerator;
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
 use App\Flare\Models\SubmittedSurveys;
@@ -16,7 +17,7 @@ class SurveyService {
 
     use ResponseBuilder;
 
-    public function __construct(private readonly SurveyValidator $surveyValidator, private readonly RandomAffixDetails $randomAffixDetails) {
+    public function __construct(private readonly SurveyValidator $surveyValidator, private readonly RandomAffixGenerator $randomAffixGenerator) {
     }
 
     public function saveSurvey(Character $character, Survey $survey, array $params): array {
@@ -70,6 +71,7 @@ class SurveyService {
         $newItem->update([
             'item_prefix_id' => $randomAffixGenerator->generateAffix('prefix')->id,
             'item_suffix_id' => $randomAffixGenerator->generateAffix('suffix')->id,
+            'is_mythic'      => true,
         ]);
 
         $slot = $character->inventory->slots()->create([

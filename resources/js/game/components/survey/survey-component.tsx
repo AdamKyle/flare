@@ -42,6 +42,7 @@ export default class SurveyComponent extends React.Component<any, any> {
                     is_open={true}
                     manage_modal={this.closeModal.bind(this)}
                     character_id={this.props.character_id}
+                    set_success_message={this.props.set_success_message}
                 />
             );
         }

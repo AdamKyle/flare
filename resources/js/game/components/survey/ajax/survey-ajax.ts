@@ -61,6 +61,10 @@ export default class SurveyAjax {
                     component.setState({
                         saving_survey: false,
                     });
+
+                    component.confirmCloseWithSuccessMessage(
+                        result.data.message,
+                    );
                 },
                 (error: AxiosError) => {
                     component.setState({

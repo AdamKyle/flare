@@ -2,7 +2,7 @@
 
 namespace App\Game\Survey\Providers;
 
-use App\Flare\Values\RandomAffixDetails;
+use App\Flare\Builders\RandomAffixGenerator;
 use App\Game\Survey\Console\Commands\StartSurvey;
 use App\Game\Survey\Services\SurveyService;
 use App\Game\Survey\Validator\SurveyValidator;
@@ -27,7 +27,7 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(SurveyService::class, function ($app) {
             return new SurveyService(
                 $app->make(SurveyValidator::class),
-                $app->make(RandomAffixDetails::class)
+                $app->make(RandomAffixGenerator::class)
             );
         });
     }
