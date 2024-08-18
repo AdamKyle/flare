@@ -1,11 +1,6 @@
 import React from "react";
 import Dialogue from "../../ui/dialogue/dialogue";
-
-interface CloseSurveyProps {
-    is_open: boolean;
-    handle_close: () => void;
-    confirm_close: () => void;
-}
+import CloseSurveyProps from "./types/close-survey-props";
 
 export default class CloseSurvey extends React.Component<CloseSurveyProps> {
     render() {

@@ -1,10 +1,7 @@
 import React from "react";
 import Dialogue from "../../ui/dialogue/dialogue";
 import LoadingProgressBar from "../../ui/progress-bars/loading-progress-bar";
-
-interface SurveyLoadingProps {
-    is_open: boolean;
-}
+import SurveyLoadingProps from "./types/survey-loading-props";
 
 export default class SurveyLoading extends React.Component<SurveyLoadingProps> {
     constructor(props: SurveyLoadingProps) {

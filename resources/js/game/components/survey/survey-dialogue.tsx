@@ -5,32 +5,11 @@ import { serviceContainer } from "../../lib/containers/core-container";
 import CloseSurvey from "./partials/close-survey";
 import SurveyLoading from "./partials/survey-loading";
 import SurveyForm from "./partials/survey-form";
-
-interface SurveyDialogueState {
-    loading: boolean;
-    error_message: string | null;
-    success_message: string | null;
-    survey: {
-        id: number;
-        title: string;
-        description: string;
-        sections: any[];
-    };
-    section_inputs: {
-        [index: number]: {
-            [key: string]: {
-                value: string | boolean | string[];
-                type: string;
-            };
-        };
-    };
-    all_sections_filled: boolean;
-    showCloseConfirmation: boolean;
-    saving_survey: boolean;
-}
+import SurveyDialogueProps from "./types/survey-dialogue-props";
+import SurveyDialogueState from "./types/survey-dialogue-state";
 
 export default class SurveyDialogue extends React.Component<
-    any,
+    SurveyDialogueProps,
     SurveyDialogueState
 > {
     private surveyAjax: SurveyAjax;

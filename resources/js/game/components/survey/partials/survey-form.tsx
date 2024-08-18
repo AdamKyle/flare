@@ -1,6 +1,5 @@
 import React from "react";
 import Select from "react-select";
-import Section from "../../../../admin/survey-builder/deffinitions/section";
 import PrimaryOutlineButton from "../../ui/buttons/primary-outline-button";
 import MarkdownElement from "../../ui/markdown-element/markdown-element";
 import SuccessOutlineButton from "../../ui/buttons/success-outline-button";
@@ -9,56 +8,9 @@ import DangerAlert from "../../ui/alerts/simple-alerts/danger-alert";
 import SuccessAlert from "../../ui/alerts/simple-alerts/success-alert";
 import InfoAlert from "../../ui/alerts/simple-alerts/info-alert";
 import LoadingProgressBar from "../../ui/progress-bars/loading-progress-bar";
-
-interface SurveyFormProps {
-    is_open: boolean;
-    survey: {
-        title: string;
-        description: string;
-        sections: Section[];
-    };
-    section_inputs: {
-        [index: number]: {
-            [key: string]: {
-                value: string | boolean | string[];
-                type: string;
-            };
-        };
-    };
-    all_sections_filled: boolean;
-    loading: boolean;
-    submitSurvey: () => void;
-    handleClose: () => void;
-    error_message: string | null;
-    success_message: string | null;
-    retrieve_input: (input: {
-        [index: number]: {
-            [key: string]: {
-                value: string | boolean | string[];
-                type: string;
-            };
-        };
-    }) => void;
-    saving_survey: boolean;
-}
-
-interface SurveyFormState {
-    current_section_index: number;
-    all_sections_filled: boolean;
-    survey_input: {
-        [index: number]: {
-            [key: string]: {
-                value: string | boolean | string[];
-                type: string;
-            };
-        };
-    };
-}
-
-interface SelectOption {
-    value: string;
-    label: string;
-}
+import SurveyFormProps from "./types/survey-form-props";
+import SurveyFormState from "./types/survey-form-state";
+import SelectOption from "./deffinitions/selection-option";
 
 export default class SurveyForm extends React.Component<
     SurveyFormProps,
