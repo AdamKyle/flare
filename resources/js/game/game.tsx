@@ -155,8 +155,17 @@ export default class Game extends React.Component<GameProps, GameState> {
     }
 
     showSurveyButton(showSurvey: boolean) {
+        if (this.state.character === null) {
+            return;
+        }
+
+        const character = JSON.parse(JSON.stringify(this.state.character));
+
+        character.is_showing_survey = showSurvey;
+
         this.setState({
             show_survey_button: showSurvey,
+            character: character,
         });
     }
 
@@ -393,6 +402,7 @@ export default class Game extends React.Component<GameProps, GameState> {
 
                 <SurveyComponent
                     user_id={this.state.character.user_id}
+                    character_id={this.state.character.id}
                     show_survey_button={this.showSurveyButton.bind(this)}
                     open_survey={this.state.open_survey_modal}
                     close_survey={this.closeSurveyModal.bind(this)}

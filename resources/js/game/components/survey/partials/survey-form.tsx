@@ -8,6 +8,7 @@ import Dialogue from "../../ui/dialogue/dialogue";
 import DangerAlert from "../../ui/alerts/simple-alerts/danger-alert";
 import SuccessAlert from "../../ui/alerts/simple-alerts/success-alert";
 import InfoAlert from "../../ui/alerts/simple-alerts/info-alert";
+import LoadingProgressBar from "../../ui/progress-bars/loading-progress-bar";
 
 interface SurveyFormProps {
     is_open: boolean;
@@ -38,6 +39,7 @@ interface SurveyFormProps {
             };
         };
     }) => void;
+    saving_survey: boolean;
 }
 
 interface SurveyFormState {
@@ -438,6 +440,8 @@ export default class SurveyForm extends React.Component<
                             disabled={isNextDisabled}
                         />
                     </div>
+
+                    {this.props.saving_survey ? <LoadingProgressBar /> : null}
 
                     {error_message && (
                         <DangerAlert>{error_message}</DangerAlert>

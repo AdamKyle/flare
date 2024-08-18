@@ -4,6 +4,7 @@ namespace App\Flare\GameImporter\Console\Commands;
 
 use App\Flare\Models\GameMap;
 use App\Flare\Models\InfoPage;
+use App\Flare\Models\Survey;
 use App\Flare\Values\MapNameValue;
 use Illuminate\Console\Command;
 use Illuminate\Http\File;
@@ -33,6 +34,7 @@ class MassImportCustomData extends Command
     {
 
         $this->importInformationSection();
+        $this->importSurveys();
         $this->importGameMaps();
     }
 
@@ -58,6 +60,24 @@ class MassImportCustomData extends Command
             $this->line('Failed to copy the information images directory over. You can do this manually from the resources/backup/information-sections-images. Copy the entire directory to app/public');
         }
 
+    }
+
+    /**
+     * Import surveys.
+     *
+     * @return void
+     */
+    protected function importSurveys(): void
+    {
+        $data = Storage::disk('data-imports')->get('Admin Section/survey.json');
+
+        $data = json_decode(trim($data), true);
+
+        foreach ($data as $modelEntry) {
+            Survey::updateOrCreate(['id' => $modelEntry['id']], $modelEntry);
+        }
+
+        $this->line('Surveys have been imported!');
     }
 
     protected function importGameMaps(): void

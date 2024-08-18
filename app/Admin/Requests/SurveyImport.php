@@ -7,7 +7,7 @@ use Illuminate\Foundation\Http\FormRequest;
 /**
  * @codeCoverageIgnore
  */
-class InfoImport extends FormRequest
+class SurveyImport extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -27,7 +27,7 @@ class InfoImport extends FormRequest
     public function rules()
     {
         return [
-            'info_import' => 'required|file|mimetypes:application/json',
+            'survey_import' => 'required|file|mimetypes:application/json',
         ];
     }
 
@@ -39,9 +39,9 @@ class InfoImport extends FormRequest
     public function messages()
     {
         return [
-            'info_import.required' => 'Items import file is required.',
-            'info_import.mime' => 'The system only accepts json files.',
-            'info_import.max' => 'File to large, the system only accepts a max size of 2MB.',
+            'survey_import.required' => 'Items import file is required.',
+            'survey_import.mime' => 'The system only accepts json files.',
+            'survey_import.max' => 'File to large, the system only accepts a max size of 2MB.',
         ];
     }
 }

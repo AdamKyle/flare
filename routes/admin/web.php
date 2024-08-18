@@ -229,10 +229,14 @@ Route::middleware(['auth', 'is.admin'])->group(function () {
     Route::get('/admin/feedback/suggestion/{suggestion}', ['as' => 'admin.feedback.suggestion', 'uses' => 'FeedbackController@suggestion']);
     Route::post('/admin/feedback/delete/{feedbackId}', ['as' => 'admin.feedback.delete', 'uses' => 'FeedbackController@deleteFeedback']);
 
+    Route::post('/admin/surveys/export', ['as' => 'admin.survey-builder.export', 'uses' => 'SurveyBuilderController@export']);
+    Route::post('/admin/surveys/import', ['as' => 'admin.survey-builder.import', 'uses' => 'SurveyBuilderController@import']);
+
     Route::get('/admin/survey-builder/create-survey', ['as' => 'admin.survey-builder.create-survey', 'uses' => 'SurveyBuilderController@createSurvey']);
     Route::get('/admin/surveys', ['as' => 'admin.surveys', 'uses' => 'SurveyBuilderController@listSurveys']);
     Route::get('/admin/view-survey/{survey}', ['as' => 'admin.single.survey', 'uses' => 'SurveyBuilderController@viewSurvey']);
     Route::get('/admin/edit-survey/{survey}', ['as' => 'admin.edit.survey', 'uses' => 'SurveyBuilderController@editSurvey']);
     Route::post('/admin/delete/survey/{survey}', ['as' => 'admin.surveys.delete', 'uses' => 'SurveyBuilderController@deleteSurvey']);
-
+    Route::get('/admin/surveys/export-data', ['as' => 'admin.survey-builder.export-data', 'uses' => 'SurveyBuilderController@exportInfo']);
+    Route::get('/admin/surveys/import-data', ['as' => 'admin.survey-builder.import-data', 'uses' => 'SurveyBuilderController@importInfo']);
 });

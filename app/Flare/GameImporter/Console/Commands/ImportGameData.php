@@ -5,6 +5,7 @@ namespace App\Flare\GameImporter\Console\Commands;
 use App\Flare\GameImporter\Values\ExcelMapper;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\InfoPage;
+use App\Flare\Models\Survey;
 use App\Flare\Values\MapNameValue;
 use Exception;
 use Illuminate\Console\Command;
@@ -106,12 +107,17 @@ class ImportGameData extends Command
         // sure all relationships are properly setup.
         $this->import($excelMapper, $files['Quests'], 'Quests');
 
-        $this->line('Importing Infromation section ...');
+        $this->line('Importing Information section ...');
 
         // Import the information wiki
         $this->importInformationSection();
 
-        $this->line('Finished the import ...');
+        $this->line('Importing Surveys ...');
+
+        // Import the surveys.
+        $this->importSurveys();
+
+        $this->line('All done! :D - Enjoy!');
     }
 
     /**
@@ -181,6 +187,24 @@ class ImportGameData extends Command
         } else {
             $this->line('Failed to copy the information images directory over. You can do this manually from the resources/backup/information-sections-images. Copy the entire directory to app/public');
         }
+    }
+
+    /**
+     * Import surveys.
+     *
+     * @return void
+     */
+    protected function importSurveys(): void
+    {
+        $data = Storage::disk('data-imports')->get('Admin Section/survey.json');
+
+        $data = json_decode(trim($data), true);
+
+        foreach ($data as $modelEntry) {
+            Survey::updateOrCreate(['id' => $modelEntry['id']], $modelEntry);
+        }
+
+        $this->line('Surveys have been imported!');
     }
 
     /**

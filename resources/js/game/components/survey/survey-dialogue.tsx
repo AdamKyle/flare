@@ -11,6 +11,7 @@ interface SurveyDialogueState {
     error_message: string | null;
     success_message: string | null;
     survey: {
+        id: number;
         title: string;
         description: string;
         sections: any[];
@@ -25,6 +26,7 @@ interface SurveyDialogueState {
     };
     all_sections_filled: boolean;
     showCloseConfirmation: boolean;
+    saving_survey: boolean;
 }
 
 export default class SurveyDialogue extends React.Component<
@@ -38,9 +40,11 @@ export default class SurveyDialogue extends React.Component<
 
         this.state = {
             loading: true,
+            saving_survey: false,
             error_message: null,
             success_message: null,
             survey: {
+                id: 0,
                 title: "",
                 description: "",
                 sections: [],
@@ -60,7 +64,21 @@ export default class SurveyDialogue extends React.Component<
     submitSurvey = () => {
         const { section_inputs } = this.state;
 
-        console.log(section_inputs);
+        this.setState(
+            {
+                saving_survey: true,
+                error_message: null,
+                success_message: null,
+            },
+            () => {
+                this.surveyAjax.saveSurvey(
+                    this,
+                    this.state.survey.id,
+                    this.props.character_id,
+                    section_inputs,
+                );
+            },
+        );
     };
 
     handleClose = () => {
@@ -111,6 +129,7 @@ export default class SurveyDialogue extends React.Component<
                             error_message={this.state.error_message}
                             success_message={this.state.success_message}
                             retrieve_input={this.retrieveInput.bind(this)}
+                            saving_survey={this.state.saving_survey}
                         />
 
                         <CloseSurvey

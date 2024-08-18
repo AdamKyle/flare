@@ -16,12 +16,13 @@ interface SuggestionsAndBugsAjaxParams {
 export default class SurveyAjax {
     constructor(@inject(Ajax) private ajax: AjaxInterface) {}
 
-    public getSurvey(component: SurveyDialogue, survey_id: number): void {
-        this.ajax.setRoute("survey/" + survey_id).doAjaxCall(
+    public getSurvey(component: SurveyDialogue, surveyId: number): void {
+        this.ajax.setRoute("survey/" + surveyId).doAjaxCall(
             "get",
             (result: AxiosResponse) => {
                 component.setState({
                     survey: {
+                        id: result.data.id,
                         title: result.data.title,
                         description: result.data.description,
                         sections: result.data.sections,
@@ -43,5 +44,37 @@ export default class SurveyAjax {
                 }
             },
         );
+    }
+
+    public saveSurvey(
+        component: SurveyDialogue,
+        surveyId: number,
+        characterId: number,
+        params: any,
+    ): void {
+        this.ajax
+            .setRoute(`survey/submit/${surveyId}/${characterId}`)
+            .setParameters(params)
+            .doAjaxCall(
+                "post",
+                (result: AxiosResponse) => {
+                    component.setState({
+                        saving_survey: false,
+                    });
+                },
+                (error: AxiosError) => {
+                    component.setState({
+                        saving_survey: false,
+                    });
+
+                    if (typeof error.response !== "undefined") {
+                        const response: AxiosResponse = error.response;
+
+                        component.setState({
+                            error_message: response.data.message,
+                        });
+                    }
+                },
+            );
     }
 }

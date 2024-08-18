@@ -15,6 +15,20 @@
                 >
                     Create New Survey
                 </x-core.buttons.link-buttons.primary-button>
+
+                <x-core.buttons.link-buttons.primary-button
+                    href="{{route('admin.survey-builder.export-data')}}"
+                    css="tw-ml-2"
+                >
+                    <i class="fas fa-file-export"></i> Export
+                </x-core.buttons.link-buttons.primary-button>
+
+                <x-core.buttons.link-buttons.primary-button
+                    href="{{route('admin.survey-builder.import-data')}}"
+                    css="tw-ml-2"
+                >
+                    <i class="fas fa-file-upload"></i> Import
+                </x-core.buttons.link-buttons.primary-button>
             </x-core.page-title>
         </div>
         @livewire('admin.survey.survey-list')
