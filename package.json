@@ -4,7 +4,7 @@
   "scripts": {
     "dev": "vite",
     "cleanup": "prettier --write 'resources/js/**/*.{ts,tsx}'",
-    "build": "yarn run cleanup && NODE_ENV=production  vite build",
+    "build": "NODE_ENV=production vite build",
     "build:dev": "NODE_ENV=development vite build",
     "prepare": "husky"
   },
@@ -41,6 +41,7 @@
     "sortablejs": "^1.13.0",
     "tailwindcss": "^3.4.6",
     "tailwindcss-dir": "^4.0.0",
+    "terser": "^5.31.6",
     "tippy.js": "^6.3.1",
     "ts-loader": "9.5.1",
     "typescript": "^5.5.3",
