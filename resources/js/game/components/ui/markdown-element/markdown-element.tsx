@@ -41,8 +41,15 @@ export default class MarkdownElement extends Component<
         this.debouncedHandleChange = debounce(this.handleChange, 500);
     }
 
-    componentDidUpdate() {
+    componentDidUpdate(prevProps: MarkdownElementProps) {
+        if (this.props.initialValue !== prevProps.initialValue) {
+            this.setState({ content: this.props.initialValue || "" });
+        }
+
         if (this.props.should_reset && this.editorRef.current) {
+
+            console.log('resetting', this.state.content, this.props.initialValue);
+
             this.editorRef.current.setMarkdown("");
 
             this.props.on_reset();
@@ -62,6 +69,12 @@ export default class MarkdownElement extends Component<
     };
 
     render() {
+
+        if (this.editorRef.current) {
+            console.log('setting content: ', this.state.content);
+            this.editorRef.current.setMarkdown(this.state.content);
+        }
+        
         return (
             <div className="border border-gray-300 dark:border-gray-700 rounded-md p-4 min-h-[400px] bg-white dark:bg-gray-900">
                 <MDXEditor

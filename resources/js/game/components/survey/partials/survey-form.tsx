@@ -170,7 +170,7 @@ export default class SurveyForm extends React.Component<
 
         const sectionInput =
             section_inputs[current_section_index]?.[input.label];
-        const value = sectionInput ? sectionInput.value : undefined;
+        const value = sectionInput ? sectionInput.value : "";
 
         switch (input.type) {
             case "radio":
@@ -384,8 +384,6 @@ export default class SurveyForm extends React.Component<
                       : Boolean(value);
             });
 
-        console.log(currentSection);
-
         return (
             <Dialogue
                 is_open={is_open}
@@ -446,7 +444,11 @@ export default class SurveyForm extends React.Component<
                         <SuccessOutlineButton
                             on_click={this.goToNextSection}
                             button_label="Next"
-                            disabled={isNextDisabled}
+                            disabled={
+                                isNextDisabled ||
+                                current_section_index ===
+                                    survey.sections.length - 1
+                            }
                         />
                     </div>
 
