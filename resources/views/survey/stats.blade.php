@@ -54,11 +54,11 @@
                                     </select>
                                 @elseif ($field['type'] === 'markdown')
                                     <label class="block text-lg font-medium">{{ $field['label'] }}</label>
-                                    <p class="my-4">
-                                        <a href="/information/ranked-fights" target="_blank">
-                                            See all responses here. <i class="fas fa-external-link-alt"></i>
-                                        </a>
-                                    </p>
+                                    <form class="mt-4" action="{{route('survey.question-response', ['surveySnapshot' => $surveySnapShotId])}}" method="POST" enctype="multipart/form-data">
+                                        @csrf
+                                        <input type="hidden" name="survey_question" value="{{$field['label']}}" />
+                                        <x-core.buttons.primary-button type="submit">See all responses</x-core.buttons.primary-button>
+                                    </form>
                                 @endif
                             </div>
                         @endforeach

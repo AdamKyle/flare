@@ -30,6 +30,13 @@
             <span class="icon far fa-calendar-alt"></span>
             <span class="title">Event Calendar</span>
         </a>
+        @if (SurveyStats::canShowSurveyMenuOption())
+            <a href="{{ route('survey.stats') }}" class="link" data-toggle="tooltip-menu"
+               data-tippy-content="Survey Stats">
+                <span class="icon fas fa-poll"></span>
+                <span class="title">Latest Survey Stats</span>
+            </a>
+        @endif
         <a href="{{ route('tlessa.donations') }}" class="link" data-toggle="tooltip-menu"
            data-tippy-content="Events">
             <span class="icon fas fa-hand-holding-usd"></span>

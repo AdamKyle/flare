@@ -317,12 +317,9 @@ return [
         /**
          * Game Related
          */
-        'KingdomLogStatus' => \App\Flare\Values\Wrappers\KingdomLogStatusHelper::class,
-        'NpcCommandType' => \App\Flare\Values\Wrappers\NpcCommandTypeHelper::class,
-        'ItemEffects' => \App\Flare\Values\Wrappers\ItemEffectsHelper::class,
         'GameVersion' => \App\Flare\Values\GameVersionHelper::class,
-        'AdventureRewards' => \App\Game\Adventures\View\AdventureCompletedRewards::class,
         'GuideQuests' => \App\Flare\Values\Wrappers\HasGuideQuestsCompletedOrEnabled::class,
+        'SurveyStats' => \App\Flare\Values\Wrappers\ShowSurveySnapshots::class,
     ],
 
 ];

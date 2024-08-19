@@ -6,7 +6,7 @@ use Illuminate\Console\Command;
 use App\Flare\Models\Survey;
 use App\Flare\Models\SubmittedSurvey;
 use App\Flare\Models\Character;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Http;
 
 class GenerateSurveys extends Command
 {
@@ -87,7 +87,16 @@ class GenerateSurveys extends Command
 
     protected function generateRandomMarkdown()
     {
-        return Str::random(50);
+        $response = Http::get('https://brettterpstra.com/md-lipsum/api/1/long');
+
+        if ($response->successful()) {
+            return $response->body();
+        }
+
+        $errorMessage = 'Failed to generate markdown content.';
+        $this->error($errorMessage);
+
+        return $errorMessage;
     }
 
     protected function getRandomCharacterId(array $characterIds)
@@ -95,3 +104,4 @@ class GenerateSurveys extends Command
         return $characterIds[array_rand($characterIds)];
     }
 }
+
