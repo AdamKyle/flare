@@ -18,7 +18,7 @@ export default class FileUploaderElement extends React.Component<
             uploaded_files: [],
             show_preview: false,
             preview_index: 0,
-            error_message: "", // Add error_message to the state
+            error_message: "",
         };
     }
 
@@ -30,7 +30,7 @@ export default class FileUploaderElement extends React.Component<
                     uploaded_files: [],
                     show_preview: false,
                     preview_index: 0,
-                    error_message: "", // Reset error_message
+                    error_message: "",
                 },
                 () => {
                     this.props.on_reset();
@@ -84,14 +84,15 @@ export default class FileUploaderElement extends React.Component<
         const uploaded_files = [...this.state.uploaded_files];
 
         if (files[index].preview_url) {
-            URL.revokeObjectURL(files[index].preview_url); // Ensure using 'preview_url'
+            URL.revokeObjectURL(files[index].preview_url!);
         }
+
 
         files.splice(index, 1);
         uploaded_files.splice(index, 1);
 
         this.setState({ files, uploaded_files });
-        // Pass the updated list of original File objects to parent
+
         this.props.on_files_change(uploaded_files);
     };
 
@@ -103,7 +104,7 @@ export default class FileUploaderElement extends React.Component<
         this.setState({
             show_preview: true,
             preview_index: index,
-            error_message: file_error?.errorMessage || "", // Add error_message handling
+            error_message: file_error?.errorMessage || "",
         });
     };
 
@@ -127,7 +128,7 @@ export default class FileUploaderElement extends React.Component<
         );
         this.setState({
             preview_index: new_index,
-            error_message: file_error?.errorMessage || "", // Update error_message on navigation
+            error_message: file_error?.errorMessage || "",
         });
     };
 
@@ -138,7 +139,7 @@ export default class FileUploaderElement extends React.Component<
         );
         this.setState({
             preview_index: index,
-            error_message: file_error?.errorMessage || "", // Update error_message on selection
+            error_message: file_error?.errorMessage || "",
         });
     };
 
@@ -178,7 +179,7 @@ export default class FileUploaderElement extends React.Component<
                                 <button
                                     className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1 cursor-pointer"
                                     onClick={(e) => {
-                                        e.stopPropagation(); // Prevent the click event from propagating to the thumbnail
+                                        e.stopPropagation();
                                         this.handleRemoveFile(index);
                                     }}
                                 >
@@ -196,7 +197,7 @@ export default class FileUploaderElement extends React.Component<
                         on_close={this.closePreview.bind(this)}
                         on_navigate={this.navigatePreview.bind(this)}
                         on_select={this.selectPreview.bind(this)}
-                        error_message={error_message} // Pass the error message
+                        error_message={error_message}
                     />
                 )}
             </div>

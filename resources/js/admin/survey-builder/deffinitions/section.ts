@@ -1,4 +1,4 @@
-import { InputField } from "../component/input-field-component";
+import InputField from "./input-field";
 
 export default interface Section {
     title: string;

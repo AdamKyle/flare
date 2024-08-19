@@ -6,7 +6,10 @@ import SurveyDialogue from "./survey-dialogue";
 import SurveyComponentProps from "./types/survey-component-props";
 import SurveyComponentState from "./types/survey-component-state";
 
-export default class SurveyComponent extends React.Component<SurveyComponentProps, SurveyComponentState> {
+export default class SurveyComponent extends React.Component<
+    SurveyComponentProps,
+    SurveyComponentState
+> {
     private surveyEventListener: SurveyEventDefinition;
 
     constructor(props: SurveyComponentProps) {

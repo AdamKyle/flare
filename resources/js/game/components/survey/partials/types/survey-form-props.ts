@@ -8,7 +8,7 @@ export default interface SurveyFormProps {
         description: string;
         sections: Section[];
     };
-    section_inputs: SurveyInput
+    section_inputs: SurveyInput;
     all_sections_filled: boolean;
     loading: boolean;
     submitSurvey: () => void;

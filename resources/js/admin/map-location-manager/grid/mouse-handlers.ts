@@ -8,7 +8,6 @@ export default class MouseHandlers {
     private component?: Component<GridOverlayProps, GridOverlayState>;
 
     constructor() {
-        // We need to bind this to the following method:
         this.handleMouseMove = this.handleMouseMove.bind(this);
         this.handleMouseLeave = this.handleMouseLeave.bind(this);
     }
@@ -17,7 +16,6 @@ export default class MouseHandlers {
         component: Component<GridOverlayProps, GridOverlayState>,
     ): MouseHandlers {
         this.component = component;
-
         return this;
     }
 
@@ -28,7 +26,6 @@ export default class MouseHandlers {
             );
         }
 
-        // Check if the modal is open and return early if it is
         if (this.component.state.showModal) {
             return;
         }
@@ -40,12 +37,16 @@ export default class MouseHandlers {
 
         const { x: xCoords, y: yCoords } = this.component.props.coordinates;
 
-        // Find the closest grid coordinates
-        const closestX = xCoords.reduce((prev, curr) =>
-            Math.abs(curr - mouseX) < Math.abs(prev - mouseX) ? curr : prev,
+        const closestX = (xCoords as number[]).reduce<number>(
+            (prev, curr) =>
+                Math.abs(curr - mouseX) < Math.abs(prev - mouseX) ? curr : prev,
+            xCoords[0] as number,
         );
-        const closestY = yCoords.reduce((prev, curr) =>
-            Math.abs(curr - mouseY) < Math.abs(prev - mouseY) ? curr : prev,
+
+        const closestY = (yCoords as number[]).reduce<number>(
+            (prev, curr) =>
+                Math.abs(curr - mouseY) < Math.abs(prev - mouseY) ? curr : prev,
+            yCoords[0] as number,
         );
 
         this.component.setState({
@@ -66,12 +67,16 @@ export default class MouseHandlers {
 
         const { x: xCoords, y: yCoords } = this.component.props.coordinates;
 
-        // Find the closest grid coordinates
-        const closestX = xCoords.reduce((prev, curr) =>
-            Math.abs(curr - x) < Math.abs(prev - x) ? curr : prev,
+        const closestX = (xCoords as number[]).reduce<number>(
+            (prev, curr) =>
+                Math.abs(curr - x) < Math.abs(prev - x) ? curr : prev,
+            xCoords[0] as number,
         );
-        const closestY = yCoords.reduce((prev, curr) =>
-            Math.abs(curr - y) < Math.abs(prev - y) ? curr : prev,
+
+        const closestY = (yCoords as number[]).reduce<number>(
+            (prev, curr) =>
+                Math.abs(curr - y) < Math.abs(prev - y) ? curr : prev,
+            yCoords[0] as number,
         );
 
         this.component.setState({
@@ -91,8 +96,8 @@ export default class MouseHandlers {
 
         this.component.setState({
             showTooltip: false,
-            snapped: false, // Reset snapped state on mouse leave
-            hoveredGridCell: { x: null, y: null }, // Reset hovered grid cell
+            snapped: false,
+            hoveredGridCell: { x: null, y: null },
         });
     }
 
@@ -119,7 +124,7 @@ export default class MouseHandlers {
 
         this.component.setState({
             snapped: false,
-            hoveredGridCell: { x: null, y: null }, // Reset hovered grid cell on mouse leave
+            hoveredGridCell: { x: null, y: null },
         });
     };
 

@@ -25,6 +25,7 @@
             "dom.iterable"
         ]
     },
+    "skipLibCheck": true,
     "include": ["resources/js/**/*"],
-    "exclude": ["node_modules"]
+    "exclude": ["node_modules", "**/node_modules/*"]
 }

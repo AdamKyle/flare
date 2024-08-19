@@ -47,11 +47,6 @@ export default class MarkdownElement extends Component<
         }
 
         if (this.props.should_reset && this.editorRef.current) {
-            console.log(
-                "resetting",
-                this.state.content,
-                this.props.initialValue,
-            );
 
             this.editorRef.current.setMarkdown("");
 
@@ -73,7 +68,6 @@ export default class MarkdownElement extends Component<
 
     render() {
         if (this.editorRef.current) {
-            console.log("setting content: ", this.state.content);
             this.editorRef.current.setMarkdown(this.state.content);
         }
 
