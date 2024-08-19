@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class SubmittedSurveys extends Model
+class UserLoginDuration extends Model
 {
     use HasFactory;
 
@@ -16,9 +16,10 @@ class SubmittedSurveys extends Model
      * @var array
      */
     protected $fillable = [
-        'character_id',
-        'survey_id',
-        'survey_response',
+        'user_id',
+        'logged_in_at',
+        'logged_out_at',
+        'duration_in_seconds',
     ];
 
     /**
@@ -27,14 +28,12 @@ class SubmittedSurveys extends Model
      * @var array
      */
     protected $casts = [
-        'survey_response' => 'array'
+        'logged_in_at' => 'datetime',
+        'logged_out_at' => 'datetime',
+        'duration_in_seconds' => 'integer',
     ];
 
-    public function character(): BelongsTo {
-        return $this->belongsTo(Character::class);
-    }
-
-    public function survey(): BelongsTo {
-        return $this->belongsTo(Survey::class);
+    public function user(): BelongsTo {
+        return $this->belongsTo(User::class);
     }
 }

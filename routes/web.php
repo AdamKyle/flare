@@ -33,4 +33,6 @@ Route::post('/request-submit/{user}', ['as' => 'un.ban.request.submit', 'uses' =
 Route::post('/delete-account/{user}', ['as' => 'delete.account', 'uses' => 'AccountDeletionController@deleteAccount']);
 Route::post('/reset-account/{user}', ['as' => 'reset.account', 'uses' => 'AccountDeletionController@resetAccount']);
 
+Route::get('/survey-stats', ['as' => 'survey.stats', 'uses' => 'SurveyStatsController@getLatestSurveyData']);
+
 Auth::routes();

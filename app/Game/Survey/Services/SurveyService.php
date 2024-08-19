@@ -5,7 +5,7 @@ namespace App\Game\Survey\Services;
 use App\Flare\Builders\RandomAffixGenerator;
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
-use App\Flare\Models\SubmittedSurveys;
+use App\Flare\Models\SubmittedSurvey;
 use App\Flare\Models\Survey;
 use App\Flare\Values\RandomAffixDetails;
 use App\Game\Core\Traits\ResponseBuilder;
@@ -28,7 +28,7 @@ class SurveyService {
             return $this->errorResult('All fields, except editor fields, must be filled in. Please review your survey.');
         }
 
-        SubmittedSurveys::create([
+        SubmittedSurvey::create([
             'character_id'    => $character->id,
             'survey_id'       => $survey->id,
             'survey_response' => $params,

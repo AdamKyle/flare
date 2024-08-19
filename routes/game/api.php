@@ -13,3 +13,7 @@ Route::group(['middleware' => ['is.character.who.they.say.they.are']], function 
 
     Route::post('/update-player-flags/turn-off-intro/{character}', ['uses' => 'Api\UpdateCharacterFlagsController@turnOffIntro']);
 });
+
+Route::group(['middleware' => ['auth', 'session.time.tracking']], function () {
+    Route::post('/game-heart-beat', ['uses' => 'Api\GameHeartBeatController@heartBeat']);
+});

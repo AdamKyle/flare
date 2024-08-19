@@ -159,6 +159,12 @@
     @if (!is_null(auth()->user()))
         @if (!auth()->user()->hasRole('Admin'))
             @vite('resources/js/app.ts')
+
+                        <script>
+                            setInterval(() => {
+                                fetch('/api/game-heart-beat', { method: 'POST', headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' } });
+                            }, 30000);
+                        </script>
         @else
             @vite('resources/js/admin-app.ts')
 
