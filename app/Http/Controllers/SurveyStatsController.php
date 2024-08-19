@@ -28,7 +28,7 @@ class SurveyStatsController extends Controller
     public function getResponseDataForQuestion(Request $request, SurveySnapshot $surveySnapshot) {
         $label = $request->get('survey_question');
 
-        $values = SurveySnapshot::whereRaw(
+        $values = $surveySnapshot->whereRaw(
             "JSON_SEARCH(
                 JSON_EXTRACT(snap_shot_data, '$.sections[*].input_types[*].label'),
                 'one',
@@ -52,9 +52,10 @@ class SurveyStatsController extends Controller
             });
         })->toArray();
 
-
-        dump($values);
-
         return view('survey.responses', ['responses' => $values, 'questionLabel' => $label]);
+    }
+
+    public function getCreatorResponse() {
+        return view('survey.creators-response');
     }
 }

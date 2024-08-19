@@ -7,7 +7,7 @@
         <x-core.cards.card-with-title
             title="Survey Stats"
             buttons="true"
-            backUrl="{{route('home')}}"
+            backUrl="{{route('welcome')}}"
         >
             <h1>{{$survey['title']}}</h1>
             <p class="mb-6 text-lg">{{ $survey['description'] }}</p>
@@ -65,6 +65,11 @@
                     </div>
                 </div>
             @endforeach
+            <div class="my-6 text-center">
+                <x-core.buttons.link-buttons.success-button href="{{route('survey.creator-response')}}">
+                    The Creators Response!
+                </x-core.buttons.link-buttons.success-button>
+            </div>
         </x-core.cards.card-with-title>
 
     </x-core.layout.info-container>

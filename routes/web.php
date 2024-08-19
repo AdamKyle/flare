@@ -35,6 +35,7 @@ Route::post('/reset-account/{user}', ['as' => 'reset.account', 'uses' => 'Accoun
 
 Route::post('/survey-responses', ['as' => 'survey.question-response', 'uses' => 'SurveyStatsController@getResponseDataForQuestion']);
 Route::get('/survey-stats', ['as' => 'survey.stats', 'uses' => 'SurveyStatsController@getLatestSurveyData']);
+Route::get('/survey-stats/creators-response', ['as' => 'survey.creator-response', 'uses' => 'SurveyStatsController@getCreatorResponse']);
 
 
 Auth::routes();

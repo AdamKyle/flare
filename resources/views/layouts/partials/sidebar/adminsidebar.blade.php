@@ -70,10 +70,12 @@
                 <span class="fas fa-poll"></span>
                 Survey Builder (Create)
             </a>
-            <a href="{{route('survey.stats')}}">
-                <span class="fas fa-poll"></span>
-                Survey Stats (Latest)
-            </a>
+            @if (SurveyStats::canShowSurveyMenuOption())
+                <a href="{{ route('survey.stats') }}" >
+                    <span class="fas fa-poll"></span>
+                    Latest Survey Stats
+                </a>
+            @endif
         </div>
     </div>
 
