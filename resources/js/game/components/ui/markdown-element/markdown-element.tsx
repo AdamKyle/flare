@@ -47,7 +47,6 @@ export default class MarkdownElement extends Component<
         }
 
         if (this.props.should_reset && this.editorRef.current) {
-
             this.editorRef.current.setMarkdown("");
 
             this.props.on_reset();

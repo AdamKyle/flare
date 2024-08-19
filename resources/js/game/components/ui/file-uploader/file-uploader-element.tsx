@@ -87,7 +87,6 @@ export default class FileUploaderElement extends React.Component<
             URL.revokeObjectURL(files[index].preview_url!);
         }
 
-
         files.splice(index, 1);
         uploaded_files.splice(index, 1);
 
