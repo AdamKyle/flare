@@ -19,6 +19,8 @@ use App\Flare\Models\Raid;
 use App\Flare\Models\RaidBoss;
 use App\Flare\Models\RaidBossParticipation;
 use App\Flare\Models\ScheduledEvent;
+use App\Flare\Models\SubmittedSurvey;
+use App\Flare\Services\CreateSurveySnapshot;
 use App\Flare\Services\EventSchedulerService;
 use App\Flare\Values\MapNameValue;
 use App\Game\Battle\Events\UpdateCharacterStatus;
@@ -34,6 +36,7 @@ use App\Game\Messages\Events\DeleteAnnouncementEvent;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Quests\Services\BuildQuestCacheService;
 use App\Game\Raids\Events\CorruptLocations;
+use App\Game\Survey\Events\ShowSurvey;
 use Exception;
 use Illuminate\Console\Command;
 
@@ -68,6 +71,7 @@ class EndScheduledEvent extends Command
         ExplorationAutomationService $explorationAutomationService,
         BuildQuestCacheService $buildQuestCacheService,
         FactionLoyaltyService $factionLoyaltyService,
+        CreateSurveySnapshot $createSurveySnapshot
     ): void {
         $this->endScheduledEvent(
             $locationService,
@@ -77,7 +81,8 @@ class EndScheduledEvent extends Command
             $traverseService,
             $explorationAutomationService,
             $buildQuestCacheService,
-            $factionLoyaltyService
+            $factionLoyaltyService,
+            $createSurveySnapshot,
         );
     }
 
@@ -94,7 +99,8 @@ class EndScheduledEvent extends Command
         TraverseService $traverseService,
         ExplorationAutomationService $explorationAutomationService,
         BuildQuestCacheService $buildQuestCacheService,
-        FactionLoyaltyService $factionLoyaltyService
+        FactionLoyaltyService $factionLoyaltyService,
+        CreateSurveySnapshot $createSurveySnapshot
     ): void {
 
         $scheduledEvents = ScheduledEvent::where('end_date', '<=', now())->get();
@@ -189,6 +195,10 @@ class EndScheduledEvent extends Command
                 ]);
 
                 event(new UpdateScheduledEvents($eventSchedulerService->fetchEvents()));
+            }
+
+            if ($eventType->isFeedbackEvent()) {
+                $this->endFeedBackEvent($createSurveySnapshot);
             }
 
             $announcement = Announcement::where('event_id', $currentEvent->id)->first();
@@ -413,6 +423,32 @@ class EndScheduledEvent extends Command
         $this->cleanUpEventGoals();
 
         $this->updateAllCharacterStatuses();
+    }
+
+    protected function endFeedBackEvent(CreateSurveySnapshot $createSurveySnapshot): void {
+        event(new GlobalMessageEvent('The Creator thanks all his players for their valuable feedback. At this time the survey has closed! Feedback is being gathered as we speak'));
+
+        $createSurveySnapshot->createSnapShop();
+
+        SubmittedSurvey::truncate();
+
+        Character::chunkById(250, function($characters) {
+            foreach ($characters as $character) {
+                $character->user()->update([
+                    'is_showing_survey' => false,
+                ]);
+
+                $character = $character->refresh();
+
+                event(new ShowSurvey($character->user, false));
+            }
+        });
+
+        event(new GlobalMessageEvent('Survey stats have been generated. The Creator has yet to leave a response. You can see these stats by
+        refreshing and clicking the left side bar, there will be a new menu option for the survey stats. Once The Creator has a chance to look
+        at them, you will find a button at the bottom called The Creators Response, this will be a detailed post about how the stats impact the
+        direction Tlessa goes in, in order for it be the best PBBG out there!'));
+
     }
 
     private function updateAllCharacterStatuses(): void

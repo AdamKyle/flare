@@ -5,6 +5,7 @@ namespace App\Flare\Services;
 use App\Flare\Models\SubmittedSurvey;
 use App\Flare\Models\Survey;
 use App\Flare\Models\SurveySnapshot;
+use Carbon\Carbon;
 use PHPUnit\Event\Telemetry\Snapshot;
 
 class CreateSurveySnapshot {
@@ -12,6 +13,8 @@ class CreateSurveySnapshot {
     private array $survey = [];
 
     private int $surveySnapShotId = 0;
+
+    private Carbon|null $createdAt = null;
 
     /**
      * Execute the process of creating a survey snapshot.
@@ -37,6 +40,8 @@ class CreateSurveySnapshot {
 
         $this->surveySnapShotId = $surveySnapShot->id;
 
+        $this->createdAt = $surveySnapShot->created_at;
+
         $this->survey = $results;
 
         return $this;
@@ -58,6 +63,15 @@ class CreateSurveySnapshot {
      */
     public function getSurveySnapShotId(): int {
         return $this->surveySnapShotId;
+    }
+
+    /**
+     * Get when the survey snapshot was created.
+     *
+     * @return Carbon|null
+     */
+    public function getCreatedAt(): Carbon|null {
+        return $this->createdAt;
     }
 
     /**

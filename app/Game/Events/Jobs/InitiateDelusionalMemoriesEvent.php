@@ -64,7 +64,7 @@ class InitiateDelusionalMemoriesEvent implements ShouldQueue
 
         $this->kickOffGlobalEventGoal();
 
-        event(new GlobalMessageEvent('Players who have Guide Quests enabled will also see a set of new quests to introduce them to the Delusional Memories Event. These are geared at new and existing players.'));
+        event(new GlobalMessageEvent('Guide quests will also have a set of new quests to introduce them to the Delusional Memories Event. These are geared at new and existing players.'));
 
         $buildQuestCacheService->buildQuestCache(true);
     }

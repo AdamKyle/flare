@@ -13,8 +13,10 @@
             <p class="mb-6 text-lg">{{ $survey['description'] }}</p>
             <div class="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2"></div>
             <p class="my-4"><strong>Total player percentage who completed the survey:</strong> {{$characterWhoCompleted * 100}}%</p>
+            <p class="my-4"><strong>Survey Results Posted On:</strong> {{$dateGenerated->format('M d Y')}}</p>
             <x-core.alerts.info-alert title="Quick note">
-                Scroll down to see the responses of the server. At the bottom of the survey you will find The Creators response to the survey results.
+                <p>Scroll down to see the responses of the server. At the bottom of the survey you will find The Creators response to the survey results.</p>
+                <p class="my-2">%'s beside the questions indicates how many people chose that option for said question.</p>
             </x-core.alerts.info-alert>
             <div class="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2"></div>
             @foreach ($survey['sections'] as $section)

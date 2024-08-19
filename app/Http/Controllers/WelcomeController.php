@@ -32,7 +32,7 @@ class WelcomeController extends Controller
 
         $eventType = $request->event_type;
         $raids = ['jester-of-time', 'the-smugglers-are-back-raid', 'ice-queen-raid'];
-        $events = ['delusional-memories', 'weekly-celestials', 'weekly-currency-drops', 'weekly-faction-loyalty'];
+        $events = ['delusional-memories', 'weekly-celestials', 'weekly-currency-drops', 'weekly-faction-loyalty', 'tlessas-feedback-event'];
 
         if (in_array($eventType, $raids)) {
 
@@ -77,6 +77,10 @@ class WelcomeController extends Controller
                 case 'weekly-faction-loyalty':
                     return view('events.weekly-faction-loyalty-event.event-page', [
                         'event' => ScheduledEvent::where('event_type', EventType::WEEKLY_FACTION_LOYALTY_EVENT)->where('currently_running', true)->first(),
+                    ]);
+                case 'feedback-event':
+                    return view('events.feedback-event.event-page', [
+                        'event' => ScheduledEvent::where('event_type', EventType::FEEDBACK_EVENT)->where('currently_running', true)->first(),
                     ]);
                 default:
                     return redirect()->to(route('welcome'));

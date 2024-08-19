@@ -278,11 +278,11 @@ class CharacterRewardService
 
         if ($addBonus) {
             if ($this->character->times_reincarnated > 0) {
-                $xp += 1000;
-            } else if ($this->character->level > 1000 && $this->character->level <= 5000) {
                 $xp += 500;
+            } else if ($this->character->level > 1000 && $this->character->level <= 5000) {
+                $xp += 150;
             } else {
-                $xp += 250;
+                $xp += 25;
             }
         }
 

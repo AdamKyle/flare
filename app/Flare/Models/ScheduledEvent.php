@@ -70,6 +70,10 @@ class ScheduledEvent extends Model
             return 'Delusional Memories Event';
         }
 
+        if ($type->isFeedbackEvent()) {
+            return 'Tlessa\'s Feedback Event';
+        }
+
         return 'Event Name';
     }
 

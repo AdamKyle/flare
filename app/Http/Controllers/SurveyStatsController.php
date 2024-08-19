@@ -22,7 +22,7 @@ class SurveyStatsController extends Controller
 
         $totalCharactersWhoCompleted = number_format($surveysSubmittedCount / Character::count(), 2);
 
-        return view('survey.stats', ['survey' => $results, 'characterWhoCompleted' => $totalCharactersWhoCompleted, 'surveySnapShotId' => $this->createSurveySnapshot->getSurveySnapShotId()]);
+        return view('survey.stats', ['survey' => $results, 'characterWhoCompleted' => $totalCharactersWhoCompleted, 'surveySnapShotId' => $this->createSurveySnapshot->getSurveySnapShotId(), 'dateGenerated' => $this->createSurveySnapshot->getCreatedAt()]);
     }
 
     public function getResponseDataForQuestion(Request $request, SurveySnapshot $surveySnapshot) {
