@@ -19,6 +19,7 @@ use App\Flare\Models\Raid;
 use App\Flare\Models\RaidBoss;
 use App\Flare\Models\RaidBossParticipation;
 use App\Flare\Models\ScheduledEvent;
+use App\Flare\Models\UserLoginDuration;
 use App\Flare\Services\EventSchedulerService;
 use App\Flare\Values\MapNameValue;
 use App\Game\Battle\Events\UpdateCharacterStatus;
@@ -45,7 +46,7 @@ class StartSurvey extends Command
      *
      * @var string
      */
-    protected $signature = 'start:survey';
+    protected $signature = 'start:survey {overrideCharacterId?}';
 
     /**
      * The console command description.
@@ -56,11 +57,28 @@ class StartSurvey extends Command
 
     public function handle(): void {
 
-        Character::chunk(250, function($characters) {
+        $scheduledEvent = ScheduledEvent::where('event_type', EventType::FEEDBACK_EVENT)->where('currently_running', true)->first();
+
+        if (is_null($scheduledEvent)) {
+            return;
+        }
+
+        $overrideCharacterId = $this->argument('overrideCharacterId');
+
+        Character::chunk(250, function($characters) use($overrideCharacterId) {
             foreach ($characters as $character) {
 
                 if ($character->user->is_showing_survey) {
-                    return;
+                    continue;
+                }
+
+                $totalLoginDuration = UserLoginDuration::where('character_id', $character->id)->sum('duration_in_seconds');
+                $totalHoursLoggedIn = $totalLoginDuration / 3600;
+
+                $overrideCharacter = Character::find($overrideCharacterId);
+
+                if ($totalHoursLoggedIn < 6 && is_null($overrideCharacter)) {
+                    continue;
                 }
 
                 $character->user()->update([

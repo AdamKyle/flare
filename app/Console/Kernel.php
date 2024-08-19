@@ -55,6 +55,9 @@ class Kernel extends ConsoleKernel
         // Determine if we should alert on new guide quest.
         $schedule->command('check:for-complete-guide-quests')->everySecond();
 
+        // See if we need to start a survey for a player while the feddback event is running.
+        $schedule->command('start:survey')->everyMinute();
+
         /**
          * Game Events:
          */
