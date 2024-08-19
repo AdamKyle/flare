@@ -8,6 +8,7 @@ use App\Flare\Models\UserLoginDuration;
 use App\Flare\Models\UserSiteAccessStatistics;
 use Carbon\Carbon;
 use Illuminate\Auth\Events\Login;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Broadcasting\PendingBroadcast;
 
 class RecordUserLoginTimeListener
@@ -15,7 +16,7 @@ class RecordUserLoginTimeListener
     /**
      * Handle the event.
      */
-    public function handle(Login $event)
+    public function handle(Login|Registered $event)
     {
 
         $user = $event->user;
