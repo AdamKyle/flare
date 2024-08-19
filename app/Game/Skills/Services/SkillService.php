@@ -197,6 +197,17 @@ class SkillService
 
         $newXp = $skill->xp + $xp;
 
+        $event = ScheduledEvent::where('event_type', EventType::FEEDBACK_EVENT)->where('currently_running', true)->first();
+
+        if (!is_null($event)) {
+
+            if ($skill->type()->isEnchanting() || $skill->type()->isCrafting() || $skill->type()->isAlchemy() || $skill->type()->isGemCrafting()) {
+                $newXp += 175;
+            } else {
+                $newXp += 150;
+            }
+        }
+
         while ($newXp >= $skill->xp_max) {
 
             if ($skill->level >= 400) {

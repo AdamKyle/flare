@@ -39,8 +39,6 @@ class SkillTypeValue
 
     const GEM_CRAFTING = 14;
 
-    const TRINKET_CRAFTING = 15;
-
     /**
      * @var string[]
      */
@@ -60,7 +58,6 @@ class SkillTypeValue
         self::EFFECTS_KINGDOM => 12,
         self::EFFECTS_CLASS => 13,
         self::GEM_CRAFTING => 14,
-        self::TRINKET_CRAFTING => 15,
     ];
 
     public static $namedValues = [
@@ -79,7 +76,6 @@ class SkillTypeValue
         12 => 'Effects Kingdoms',
         13 => 'Effects Class',
         14 => 'Gem Crafting',
-        15 => 'Trinket Crafting',
     ];
 
     /**
@@ -196,6 +192,10 @@ class SkillTypeValue
         return $this->value === self::EFFECTS_SPELL_EVASION;
     }
 
+    public function isGemCrafting(): bool {
+        return $this->value === self::GEM_CRAFTING;
+    }
+
     /**
      * Does this effect the kingdom?
      */
@@ -243,7 +243,6 @@ class SkillTypeValue
             12 => 'Effects Kingdoms',
             13 => 'Effects Class',
             14 => 'Gem Crafting',
-            15 => 'Trinket Crafting',
         ];
     }
 }

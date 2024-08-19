@@ -76,8 +76,14 @@ class UpdateSkillListener
         $event = ScheduledEvent::where('event_type', EventType::FEEDBACK_EVENT)->where('currently_running', true)->first();
 
         if (!is_null($event)) {
-            $newXp += 150;
+
+            if ($skill->type()->isEnchanting() || $skill->type()->isCrafting() || $skill->type()->isAlchemy() || $skill->type()->isGemCrafting()) {
+                $newXp += 175;
+            } else {
+                $newXp += 150;
+            }
         }
+
 
         while ($newXp >= $skill->xp_max) {
             $level = $skill->level + 1;

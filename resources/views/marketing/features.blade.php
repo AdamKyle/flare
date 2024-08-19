@@ -37,7 +37,7 @@
                 <x-slot:title>
                     <a href="{{route('info.page', [
                                 'pageName' => 'races-and-classes'
-                            ])}}">Various Races and Clases!</a>
+                            ])}}">Various Races and Classes!</a>
                 </x-slot:title>
 
                 <p>
