@@ -1,4 +1,5 @@
 <x-core.layout.info-container>
+
     <x-core.page-title
         title="{{$pageTitle}}"
         route="{{url()->previous()}}"

@@ -196,7 +196,7 @@ class ImportGameData extends Command
      */
     protected function importSurveys(): void
     {
-        $data = Storage::disk('data-imports')->get('Admin Section/survey.json');
+        $data = Storage::disk('data-imports')->get('Admin Section/surveys.json');
 
         $data = json_decode(trim($data), true);
 

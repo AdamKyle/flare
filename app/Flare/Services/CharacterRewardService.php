@@ -282,7 +282,7 @@ class CharacterRewardService
             } else if ($this->character->level > 1000 && $this->character->level <= 5000) {
                 $xp += 150;
             } else {
-                $xp += 25;
+                $xp += 75;
             }
         }
 

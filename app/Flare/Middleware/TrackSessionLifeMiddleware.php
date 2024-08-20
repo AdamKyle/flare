@@ -28,6 +28,8 @@ class TrackSessionLifeMiddleware {
             $minutesSinceConfirmed = now()->diffInMinutes($foundLoginDetails->logged_in_at);
             $sessionLifeTime = (int) config('session.lifetime');
 
+            dump($minutesSinceConfirmed, $sessionLifeTime);
+
             if ($minutesSinceConfirmed >= $sessionLifeTime) {
 
                 $now = now();

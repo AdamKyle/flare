@@ -58,8 +58,6 @@ class CreateCharacter extends Command
             ->assignPassiveSkills()
             ->buildCharacterCache();
 
-        Cache::put('user-show-guide-initial-message-'.$user->id, 'true');
-
         $this->line('Character '.$this->argument('characterName').' has been created!');
     }
 }
