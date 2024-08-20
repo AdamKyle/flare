@@ -36,7 +36,7 @@ export default class GuideQuestListener
             );
 
             this.openGuideQuestButton = echo.private(
-                'force-open-guide-quest-modal-' + this.userId,
+                "force-open-guide-quest-modal-" + this.userId,
             );
         } catch (e: any | unknown) {
             throw new Error(e);
@@ -94,8 +94,11 @@ export default class GuideQuestListener
                             });
                         }
                     },
-                    (import.meta as unknown as { env: { VITE_APP_ENV: string } }).env
-                        .VITE_APP_ENV === "production"
+                    (
+                        import.meta as unknown as {
+                            env: { VITE_APP_ENV: string };
+                        }
+                    ).env.VITE_APP_ENV === "production"
                         ? 3500
                         : 500,
                 );

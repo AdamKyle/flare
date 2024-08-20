@@ -109,7 +109,6 @@ export default class GameChat extends React.Component<
         new Ajax().setRoute("last-chats").doAjaxCall(
             "get",
             (result: AxiosResponse) => {
-
                 const chats = result.data.chat_messages
                     .map((chat: any) => {
                         if (chat.name === "The Creator") {
@@ -147,7 +146,7 @@ export default class GameChat extends React.Component<
                     },
                     () => {
                         if (result.data.announcements.length > 0) {
-                            this.setTabToUpdated('announcements-messages');
+                            this.setTabToUpdated("announcements-messages");
                         }
 
                         if (
