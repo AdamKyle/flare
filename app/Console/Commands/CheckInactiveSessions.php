@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Flare\Models\UserLoginDuration;
+use DB;
 use Illuminate\Console\Command;
 
 class CheckInactiveSessions extends Command
