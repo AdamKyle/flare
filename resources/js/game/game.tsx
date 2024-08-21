@@ -540,7 +540,8 @@ export default class Game extends React.Component<GameProps, GameState> {
                                     ) : null}
                                     {this.state.show_survey_button ||
                                     (this.state.character.is_showing_survey &&
-                                        this.state.character.survey_id !== null &&
+                                        this.state.character.survey_id !==
+                                            null &&
                                         !this.state.is_showing_active_boons) ? (
                                         <PrimaryButton
                                             button_label={"Complete survey"}

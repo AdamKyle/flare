@@ -39,15 +39,15 @@ export default class SurveyComponent extends React.Component<
         this.surveyEventListener.listen();
 
         this.setState({
-            survey_id: this.props.survey_id
-        })
+            survey_id: this.props.survey_id,
+        });
     }
 
     componentDidUpdate(prevProps: SurveyComponentProps) {
         if (this.props.survey_id !== null && this.state.survey_id === null) {
             this.setState({
                 survey_id: this.props.survey_id,
-            })
+            });
         }
     }
 

@@ -61,7 +61,10 @@ export default class SurveyEvent implements SurveyEventDefinition {
                     survey_id: event.surveyId,
                 });
 
-                this.component.props.show_survey_button(showSurvey, event.surveyId);
+                this.component.props.show_survey_button(
+                    showSurvey,
+                    event.surveyId,
+                );
             },
         );
     }
