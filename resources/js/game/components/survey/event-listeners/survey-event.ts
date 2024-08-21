@@ -58,7 +58,7 @@ export default class SurveyEvent implements SurveyEventDefinition {
 
                 this.component.setState({
                     show_survey: showSurvey,
-                    survey_id: event.surveyId
+                    survey_id: event.surveyId,
                 });
 
                 this.component.props.show_survey_button(showSurvey);
