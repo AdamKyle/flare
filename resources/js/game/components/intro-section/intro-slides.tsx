@@ -85,24 +85,6 @@ export default class IntroSlides extends React.Component<
         ];
     }
 
-    componentDidMount() {
-        // Add swipe event listeners for mobile support
-        const swipeHandler = (event: TouchEvent) => {
-            const xDist =
-                event.changedTouches[0].clientX - event.touches[0].clientX;
-            const direction = xDist > 0 ? "left" : "right";
-            this.handleSwipe(direction);
-        };
-
-        document.addEventListener("touchstart", swipeHandler);
-        document.addEventListener("touchend", swipeHandler);
-
-        return () => {
-            document.removeEventListener("touchstart", swipeHandler);
-            document.removeEventListener("touchend", swipeHandler);
-        };
-    }
-
     previewFiles(filesToPreview?: PreviewFiles[]) {
         if (!this.state.is_preview_open && filesToPreview) {
             this.setState({
