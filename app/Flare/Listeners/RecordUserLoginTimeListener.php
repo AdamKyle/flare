@@ -21,9 +21,15 @@ class RecordUserLoginTimeListener
 
         $user = $event->user;
 
+        if ($user->hasRole('Admin')) {
+            return;
+        }
+
         UserLoginDuration::create([
             'user_id' => $user->id,
             'logged_in_at' => now(),
+            'last_heart_beat' => now(),
+            'last_activity' => now(),
         ]);
     }
 }

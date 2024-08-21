@@ -58,6 +58,9 @@ class Kernel extends ConsoleKernel
         // See if we need to start a survey for a player while the feddback event is running.
         $schedule->command('start:survey')->everyMinute();
 
+        // See if we have inactive sessions that need to be filled out.
+        $schedule->command('check:inactive-sessions')->everyFifteenMinutes();
+
         /**
          * Game Events:
          */

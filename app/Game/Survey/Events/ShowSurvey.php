@@ -19,13 +19,16 @@ class ShowSurvey implements ShouldBroadcastNow
 
     public bool $showSurvey;
 
+    public int|null $surveyId = null;
+
     /**
      * Create a new event instance.
      */
-    public function __construct(User $user, bool $showSurvey)
+    public function __construct(User $user, int $surveyId = null)
     {
         $this->user = $user;
-        $this->showSurvey = $showSurvey;
+        $this->surveyId = $surveyId;
+        $this->showSurvey = !is_null($surveyId);
     }
 
     /**

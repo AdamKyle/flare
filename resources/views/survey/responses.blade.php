@@ -10,13 +10,20 @@
 
 
         <div class="prose dark:prose-invert mr-auto ml-auto max-w-5xl lg:max-w-7xl">
-            @foreach($responses as $response)
+            @forelse($responses as $response)
                 <x-core.cards.card>
 
                         {!! $response !!}
 
                 </x-core.cards.card>
-            @endforeach
+            @empty
+
+                <x-core.cards.card>
+
+                    There seems to be no responses to this question.
+
+                </x-core.cards.card>
+            @endforelse
         </div>
     </div>
 @endsection

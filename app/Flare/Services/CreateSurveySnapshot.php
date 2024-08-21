@@ -35,7 +35,8 @@ class CreateSurveySnapshot {
 
         $surveySnapShot = SurveySnapshot::updateOrCreate(['survey_id' => $survey->id], [
             'survey_id' => $survey->id,
-            'snap_shot_data' => $results
+            'snap_shot_data' => $results,
+            'submitted_survey_count' => SubmittedSurvey::count(),
         ]);
 
         $this->surveySnapShotId = $surveySnapShot->id;

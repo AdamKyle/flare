@@ -19,7 +19,9 @@ class UserLoginDuration extends Model
         'user_id',
         'logged_in_at',
         'logged_out_at',
+        'last_activity',
         'duration_in_seconds',
+        'last_heart_beat',
     ];
 
     /**
@@ -30,7 +32,9 @@ class UserLoginDuration extends Model
     protected $casts = [
         'logged_in_at' => 'datetime',
         'logged_out_at' => 'datetime',
+        'last_heart_beat' => 'datetime',
         'duration_in_seconds' => 'integer',
+        'last_activity' => 'datetime',
     ];
 
     public function user(): BelongsTo {

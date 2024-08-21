@@ -16,6 +16,10 @@ class RecordUserLogOutTimeListener
             return;
         }
 
+        if ($event->user->hasRole('Admin')) {
+            return;
+        }
+
         $user = $event->user;
 
         $foundRecord = UserLoginDuration::where('user_id', $user->id)->whereNull('logged_out_at')->first();
@@ -29,6 +33,8 @@ class RecordUserLogOutTimeListener
         $foundRecord->update([
             'logged_out_at' => $now,
             'duration_in_seconds' => $now->diffInSeconds($foundRecord->logged_in_at),
+            'last_heart_beat' => now(),
+            'last_activity' => now(),
         ]);
     }
 }

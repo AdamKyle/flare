@@ -44,49 +44,44 @@
         <div class="grid lg:grid-cols-3 gap-3 w-full md:w-2/3 m-auto my-10">
             <x-core.cards.feature-card>
                 <x-slot:icon>
-                    <i class="ra ra-hand text-primary-600 relative top-[10px] right-[10px]"></i>
+                    <i class="ra ra-muscle-fat text-primary-600 relative top-[10px] right-[10px]"></i>
                 </x-slot:icon>
                 <x-slot:title>
-                    <a
-                        href="/information/faction-loyalty">Battle XP Bonuses</a>
+                    <a href="/information/character-xp">Battle XP Bonuses</a>
                 </x-slot:title>
 
                 <p>
-                    Players level 1-1000 will get an additional 75 more XP per kill, assuming the monster is not too low.
-                    Players above level 1,000 who have not reincarnated will gain 250 more XP per kill and players who have reincarnated once will receive 500 more XP per kill.
+                    Levels 1-1000 get 75 extra XP per kill. Above 1000, non-reincarnated players earn 250 more XP; reincarnated players get 500 more.
                 </p>
             </x-core.cards.feature-card>
+
             <x-core.cards.feature-card>
                 <x-slot:icon>
-                    <i class="ra ra-queen-crown text-primary-600 relative top-[10px] right-[10px]"></i>
+                    <i class="ra ra-player-dodge text-primary-600 relative top-[10px] right-[10px]"></i>
                 </x-slot:icon>
                 <x-slot:title>
-                    <a
-                        href="{{ route('info.page', [
-                            'pageName' => 'factions',
-                        ]) }}">Training Skill XP Bonuses</a>
+                    <a href="{{ route('info.page', ['pageName' => 'skill-information']) }}">Training Skill XP Bonuses</a>
                 </x-slot:title>
 
                 <p>
-                    Players participating during the event will gain 150XP more when training a skills like Accuracy when they train a specific skill!
+                    Event participants gain 150 extra XP when training skills like Accuracy. Perfect for leveling up!
                 </p>
             </x-core.cards.feature-card>
+
             <x-core.cards.feature-card>
                 <x-slot:icon>
-                    <i class="fas fa-clock text-primary-600 relative top-[10px] right-[10px]"></i>
+                    <i class="ra ra-flat-hammer text-primary-600 relative top-[10px] right-[10px]"></i>
                 </x-slot:icon>
                 <x-slot:title>
-                    <a
-                        href="{{ route('info.page', [
-                            'pageName' => 'events',
-                        ]) }}">Crafting Skills XP Bonuses</a>
+                    <a href="{{ route('info.page', ['pageName' => 'crafting']) }}">Crafting Skills XP Bonuses</a>
                 </x-slot:title>
 
                 <p>
-                    Since crafting is vital, these skills will see an increase of 175XP per successful craft OR enchant. Double enchanting is key here!
+                    Crafting skills earn 175 extra XP per successful craft or enchant. Double enchanting is highly rewarding!
                 </p>
             </x-core.cards.feature-card>
         </div>
+
 
         <div class="text-center w-full lg:w-2/4 mx-auto my-10">
             <h2 class="mb-5 font-thin text-2xl lg:text-5xl dark:text-gray-300 text-gray-800">

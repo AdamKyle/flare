@@ -25,10 +25,8 @@ class TrackSessionLifeMiddleware {
                 return $next($request);
             }
 
-            $minutesSinceConfirmed = now()->diffInMinutes($foundLoginDetails->logged_in_at);
+            $minutesSinceConfirmed = now()->diffInMinutes($foundLoginDetails->last_activity);
             $sessionLifeTime = (int) config('session.lifetime');
-
-            dump($minutesSinceConfirmed, $sessionLifeTime);
 
             if ($minutesSinceConfirmed >= $sessionLifeTime) {
 
@@ -37,6 +35,7 @@ class TrackSessionLifeMiddleware {
                 $foundLoginDetails->update([
                     'logged_out_at' => $now,
                     'duration_in_seconds' => $now->diffInSeconds($foundLoginDetails->logged_in_at),
+                    'last_heart_beat' => now(),
                 ]);
 
                 Auth::logout();

@@ -4,11 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Flare\Github\Services\Markdown;
 use App\Flare\Models\Character;
+use App\Flare\Models\ScheduledEvent;
 use App\Flare\Models\SubmittedSurvey;
 use App\Flare\Models\SurveySnapshot;
 use App\Flare\Services\CreateSurveySnapshot;
 use App\Game\Events\Values\EventType;
-use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Http\Request;
 
 class SurveyStatsController extends Controller
@@ -19,25 +19,24 @@ class SurveyStatsController extends Controller
 
     public function getLatestSurveyData()
     {
-        $scheduledEvent = Schedule::where('event_type', EventType::FEEDBACK_EVENT)->where('is_currently_running', true)->first();
+        $scheduledEvent = ScheduledEvent::where('event_type', EventType::FEEDBACK_EVENT)->where('currently_running', true)->first();
 
         if (!is_null($scheduledEvent)) {
             return view('survey.stats', ['surveyExists' => false]);
         }
 
         $surveySnapShot = SurveySnapshot::latest()->first();
-        $surveysSubmittedCount = SubmittedSurvey::count();
+        $surveysSubmittedCount = $surveySnapShot->submitted_survey_count;
 
-        if (is_null($surveySnapShot)) {
-            $surveySnapShot = $this->createSurveySnapshot->createSnapShop()->getSurvey();
-
-        } else {
-            $surveySnapShot = $surveySnapShot->snap_shot_data;
+        if ($surveysSubmittedCount <= 0) {
+            return view('survey.stats', ['surveyExists' => false]);
         }
+
+        $surveySnapShotData = $surveySnapShot->snap_shot_data;
 
         $totalCharactersWhoCompleted = number_format($surveysSubmittedCount / Character::count(), 2);
 
-        return view('survey.stats', ['survey' => $surveySnapShot, 'characterWhoCompleted' => $totalCharactersWhoCompleted, 'surveySnapShotId' => $this->createSurveySnapshot->getSurveySnapShotId(), 'dateGenerated' => $this->createSurveySnapshot->getCreatedAt(), 'surveyExists' => true]);
+        return view('survey.stats', ['survey' => $surveySnapShotData, 'characterWhoCompleted' => $totalCharactersWhoCompleted, 'surveySnapShotId' => $this->createSurveySnapshot->getSurveySnapShotId(), 'dateGenerated' => $surveySnapShot->created_at, 'surveyExists' => true]);
     }
 
     public function getResponseDataForQuestion(Request $request, SurveySnapshot $surveySnapshot) {

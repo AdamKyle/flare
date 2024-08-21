@@ -1,10 +1,10 @@
 <?php
 
-Route::group(['middleware' => ['auth']], function () {
+Route::group(['middleware' => ['auth', 'update.player-activity']], function () {
     Route::get('/calendar/events', ['uses' => 'Api\EventCalendarController@loadEvents']);
 });
 
-Route::group(['middleware' => ['is.character.who.they.say.they.are']], function () {
+Route::group(['middleware' => ['is.character.who.they.say.they.are', 'update.player-activity']], function () {
     Route::get('/update-character-timers/{character}', ['uses' => 'Api\TimersController@updateTimersForCharacter']);
 
     Route::get('/maps/{character}', ['uses' => 'Api\MapsController@index']);

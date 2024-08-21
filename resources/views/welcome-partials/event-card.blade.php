@@ -36,12 +36,17 @@
         $href = route('event.type', ['event_type' => 'jester-of-time']);
     }
 
-        if ($eventRunning->getTitleOfEvent() === 'The Smugglers Are Back!') {
+    if ($eventRunning->getTitleOfEvent() === 'The Smugglers Are Back!') {
         $href = route('event.type', ['event_type' => 'the-smugglers-are-back-raid']);
     }
 
     if ($eventRunning->getTitleOfEvent() === 'The Ice Queens Reign') {
         $href = route('event.type', ['event_type' => 'ice-queen-raid']);
+    }
+
+    if ($eventRunning->getTitleOfEvent() === 'Tlessa\'s Feedback Event') {
+        $href = route('event.type', ['event_type' => 'tlessas-feedback-event']);
+        $icon = 'ra-campfire';
     }
 @endphp
 

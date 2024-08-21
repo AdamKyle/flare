@@ -103,7 +103,7 @@ class EndScheduledEvent extends Command
         CreateSurveySnapshot $createSurveySnapshot
     ): void {
 
-        $scheduledEvents = ScheduledEvent::where('end_date', '<=', now())->get();
+        $scheduledEvents = ScheduledEvent::where('end_date', '<=', now())->where('currently_running', true)->get();
 
         foreach ($scheduledEvents as $event) {
 
@@ -198,7 +198,14 @@ class EndScheduledEvent extends Command
             }
 
             if ($eventType->isFeedbackEvent()) {
+
                 $this->endFeedBackEvent($createSurveySnapshot);
+
+                $event->update([
+                    'currently_running' => false,
+                ]);
+
+                event(new UpdateScheduledEvents($eventSchedulerService->fetchEvents()));
             }
 
             $announcement = Announcement::where('event_id', $currentEvent->id)->first();
@@ -440,7 +447,7 @@ class EndScheduledEvent extends Command
 
                 $character = $character->refresh();
 
-                event(new ShowSurvey($character->user, false));
+                event(new ShowSurvey($character->user));
             }
         });
 

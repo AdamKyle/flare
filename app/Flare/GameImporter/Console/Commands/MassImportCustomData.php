@@ -34,6 +34,7 @@ class MassImportCustomData extends Command
     {
 
         $this->importInformationSection();
+        Artisan::call('import:game-data "Admin Section"');
         $this->importSurveys();
         $this->importGameMaps();
     }

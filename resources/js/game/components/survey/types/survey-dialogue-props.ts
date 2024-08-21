@@ -1,5 +1,5 @@
 export default interface SurveyDialogueProps {
-    survey_id: number;
+    survey_id: number | null;
     is_open: boolean;
     manage_modal: () => void;
     character_id: number;

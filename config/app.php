@@ -183,7 +183,6 @@ return [
         App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\HorizonServiceProvider::class,
-        App\Providers\RouteServiceProvider::class,
 
         /**
          * Flare Related
@@ -263,6 +262,11 @@ return [
         App\Game\Raids\Providers\ServiceProvider::class,
         App\Game\Factions\FactionLoyalty\Providers\ServiceProvider::class,
         App\Game\Survey\Providers\ServiceProvider::class,
+
+        // App Main Router Provider
+        //
+        // Moved here in order to allow for middleware in flare and or game to be used at a top level if needed
+        App\Providers\RouteServiceProvider::class,
     ],
 
     /*

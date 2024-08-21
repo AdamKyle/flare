@@ -147,7 +147,7 @@ class RouteServiceProvider extends ServiceProvider
     protected function mapGemRoutes()
     {
         Route::prefix('api')
-            ->middleware('web')
+            ->middleware(['web', 'update.player-activity'])
             ->namespace('App\Game\Gems\Controllers')
             ->group(base_path('routes/game/gems/api.php'));
     }
@@ -155,7 +155,7 @@ class RouteServiceProvider extends ServiceProvider
     protected function mapApiRoutes()
     {
         Route::prefix('api')
-            ->middleware('api')
+            ->middleware(['api', 'update.player-activity'])
             ->namespace($this->namespace)
             ->group(base_path('routes/api.php'));
     }
@@ -163,7 +163,7 @@ class RouteServiceProvider extends ServiceProvider
     protected function mapCharacterSheetRoutes()
     {
         Route::prefix('api')
-            ->middleware('web')
+            ->middleware(['web', 'update.player-activity'])
             ->namespace('App\Game\Character\CharacterSheet\Controllers')
             ->group(base_path('routes/game/character/character-sheet/api.php'));
     }
@@ -171,7 +171,7 @@ class RouteServiceProvider extends ServiceProvider
     protected function mapCharacterInventoryRoutes()
     {
         Route::prefix('api')
-            ->middleware('web')
+            ->middleware(['web', 'update.player-activity'])
             ->namespace('App\Game\Character\CharacterInventory\Controllers')
             ->group(base_path('routes/game/character/character-inventory/api.php'));
     }
@@ -179,7 +179,7 @@ class RouteServiceProvider extends ServiceProvider
     protected function mapExplorationApiRoutes()
     {
         Route::prefix('api')
-            ->middleware('web')
+            ->middleware(['web', 'update.player-activity'])
             ->namespace('App\Game\Exploration\Controllers')
             ->group(base_path('routes/game/exploration/api.php'));
     }
@@ -187,7 +187,7 @@ class RouteServiceProvider extends ServiceProvider
     protected function mapGameKingdomApiRoutes()
     {
         Route::prefix('api')
-            ->middleware('web')
+            ->middleware(['web', 'update.player-activity'])
             ->namespace('App\Game\Kingdoms\Controllers')
             ->group(base_path('routes/game/kingdoms/api.php'));
     }
@@ -195,7 +195,7 @@ class RouteServiceProvider extends ServiceProvider
     protected function mapGameSkillsApiRoutes()
     {
         Route::prefix('api')
-            ->middleware('web')
+            ->middleware(['web', 'update.player-activity'])
             ->namespace('App\Game\Skills\Controllers')
             ->group(base_path('routes/game/skills/api.php'));
     }
@@ -203,7 +203,7 @@ class RouteServiceProvider extends ServiceProvider
     protected function mapShopApiRoutes()
     {
         Route::prefix('api')
-            ->middleware('web')
+            ->middleware(['web', 'update.player-activity'])
             ->namespace('App\Game\Shop\Controllers')
             ->group(base_path('routes/game/shop/api.php'));
     }
@@ -218,7 +218,7 @@ class RouteServiceProvider extends ServiceProvider
     protected function mapAdminApiRoutes()
     {
         Route::prefix('api')
-            ->middleware('web')
+            ->middleware(['web', 'update.player-activity'])
             ->namespace('App\Admin\Controllers')
             ->group(base_path('routes/admin/api.php'));
     }
@@ -275,7 +275,7 @@ class RouteServiceProvider extends ServiceProvider
     protected function mapGamblingRoutes()
     {
         Route::prefix('api')
-            ->middleware('web')
+            ->middleware(['web', 'update.player-activity'])
             ->namespace('App\Game\Gambler\Controllers')
             ->group(base_path('routes/game/gambler/api.php'));
     }
@@ -283,7 +283,7 @@ class RouteServiceProvider extends ServiceProvider
     protected function mapGameCoreApiRoutes()
     {
         Route::prefix('api')
-            ->middleware('web')
+            ->middleware(['web'])
             ->namespace('App\Game\Core\Controllers')
             ->group(base_path('routes/game/api.php'));
     }
@@ -299,7 +299,7 @@ class RouteServiceProvider extends ServiceProvider
     protected function mapGameBattleApiRoutes()
     {
         Route::prefix('api')
-            ->middleware('web')
+            ->middleware(['web', 'update.player-activity'])
             ->namespace('App\Game\Battle\Controllers')
             ->group(base_path('routes/game/battle/api.php'));
     }
@@ -315,14 +315,14 @@ class RouteServiceProvider extends ServiceProvider
     protected function mapGameMarketApiRoutes()
     {
         Route::prefix('api')
-            ->middleware('web')
+            ->middleware(['web', 'update.player-activity'])
             ->namespace('App\Game\Market\Controllers')
             ->group(base_path('routes/game/market-board/api.php'));
     }
 
     protected function mapQuestApiRoutes()
     {
-        Route::middleware('web')
+        Route::middleware(['web', 'update.player-activity'])
             ->namespace('App\Game\Quests\Controllers')
             ->group(base_path('routes/game/quests/api.php'));
     }
@@ -338,7 +338,7 @@ class RouteServiceProvider extends ServiceProvider
     protected function mapGameGuideQuestsApiRoutes()
     {
         Route::prefix('api')
-            ->middleware('web')
+            ->middleware(['web', 'update.player-activity'])
             ->namespace('App\Game\GuideQuests\Controllers')
             ->group(base_path('routes/game/guide-quests/api.php'));
     }
@@ -346,7 +346,7 @@ class RouteServiceProvider extends ServiceProvider
     protected function mapSpecialtyShopApiRoutes()
     {
         Route::prefix('api')
-            ->middleware('web')
+            ->middleware(['web', 'update.player-activity'])
             ->namespace('App\Game\SpecialtyShops\Controllers')
             ->group(base_path('routes/game/specialty-shops/api.php'));
     }
@@ -354,7 +354,7 @@ class RouteServiceProvider extends ServiceProvider
     protected function mapReincarnateApiRoutes()
     {
         Route::prefix('api')
-            ->middleware('web')
+            ->middleware(['web', 'update.player-activity'])
             ->namespace('App\Game\Reincarnate\Controllers')
             ->group(base_path('routes/game/reincarnate/api.php'));
     }
@@ -362,7 +362,7 @@ class RouteServiceProvider extends ServiceProvider
     protected function mapClassRanksApiRoutes()
     {
         Route::prefix('api')
-            ->middleware('web')
+            ->middleware(['web', 'update.player-activity'])
             ->namespace('App\Game\ClassRanks\Controllers')
             ->group(base_path('routes/game/class-ranks/api.php'));
     }
@@ -370,7 +370,7 @@ class RouteServiceProvider extends ServiceProvider
     protected function mapSeerActions()
     {
         Route::prefix('api')
-            ->middleware('web')
+            ->middleware(['web', 'update.player-activity'])
             ->namespace('App\Game\NpcActions\SeerActions\Controllers')
             ->group(base_path('routes/game/npc-actions/seer-actions/api.php'));
     }
@@ -378,7 +378,7 @@ class RouteServiceProvider extends ServiceProvider
     protected function mapQueenOfHeartsActions()
     {
         Route::prefix('api')
-            ->middleware('web')
+            ->middleware(['web', 'update.player-activity'])
             ->namespace('App\Game\NpcActions\QueenOfHeartsActions\Controllers')
             ->group(base_path('routes/game/npc-actions/queen-of-hearts/api.php'));
     }
@@ -386,7 +386,7 @@ class RouteServiceProvider extends ServiceProvider
     protected function mapLabyrinthOracleRoutes()
     {
         Route::prefix('api')
-            ->middleware('web')
+            ->middleware(['web', 'update.player-activity'])
             ->namespace('App\Game\NpcActions\LabyrinthOracle\Controllers')
             ->group(base_path('routes/game/npc-actions/labyrinth-oracle/api.php'));
     }
@@ -394,7 +394,7 @@ class RouteServiceProvider extends ServiceProvider
     protected function mapWorkBenchActions()
     {
         Route::prefix('api')
-            ->middleware('web')
+            ->middleware(['web', 'update.player-activity'])
             ->namespace('App\Game\NpcActions\WorkBench\Controllers')
             ->group(base_path('routes/game/npc-actions/work-bench/api.php'));
     }
@@ -402,7 +402,7 @@ class RouteServiceProvider extends ServiceProvider
     protected function mapEvents()
     {
         Route::prefix('api')
-            ->middleware('web')
+            ->middleware(['web', 'update.player-activity'])
             ->namespace('App\Game\Events\Controllers')
             ->group(base_path('routes/game/events/api.php'));
     }
@@ -410,7 +410,7 @@ class RouteServiceProvider extends ServiceProvider
     protected function mapFactionLoyaltyApiRoutes()
     {
         Route::prefix('api')
-            ->middleware('web')
+            ->middleware(['web', 'update.player-activity'])
             ->namespace('App\Game\Factions\FactionLoyalty\Controllers')
             ->group(base_path('routes/game/factions/faction-loyalty/api.php'));
     }
@@ -418,7 +418,7 @@ class RouteServiceProvider extends ServiceProvider
     protected function mapSurveyApiRoutes()
     {
         Route::prefix('api')
-            ->middleware('web')
+            ->middleware(['web', 'update.player-activity'])
             ->namespace('App\Game\Survey\Controllers')
             ->group(base_path('routes/game/survey/api.php'));
     }

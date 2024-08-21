@@ -14,6 +14,7 @@ use App\Flare\Middleware\IsCharacterWhoTheySayTheyAreMiddleware;
 use App\Flare\Middleware\IsGloballyTimedOut;
 use App\Flare\Middleware\IsPlayerBannedMiddleware;
 use App\Flare\Middleware\TrackSessionLifeMiddleware;
+use App\Flare\Middleware\UpdatePlayerSessionActivity;
 use App\Flare\ServerFight\Fight\Affixes;
 use App\Flare\ServerFight\Fight\Ambush;
 use App\Flare\ServerFight\Fight\Attack;
@@ -481,6 +482,7 @@ class ServiceProvider extends ApplicationServiceProvider
         $router->aliasMiddleware('is.character.logged.in', IsCharacterLoggedInMiddleware::class);
         $router->aliasMiddleware('is.globally.timed.out', IsGloballyTimedOut::class);
         $router->aliasMiddleware('session.time.tracking', TrackSessionLifeMiddleware::class);
+        $router->aliasMiddleware('update.player-activity', UpdatePlayerSessionActivity::class);
 
         // Blade Components - Cross System:
         Blade::component('item-display-color', ItemDisplayColor::class);

@@ -19,6 +19,8 @@ use App\Flare\Models\Raid;
 use App\Flare\Models\RaidBoss;
 use App\Flare\Models\RaidBossParticipation;
 use App\Flare\Models\ScheduledEvent;
+use App\Flare\Models\SubmittedSurvey;
+use App\Flare\Models\Survey;
 use App\Flare\Models\UserLoginDuration;
 use App\Flare\Services\EventSchedulerService;
 use App\Flare\Values\MapNameValue;
@@ -72,7 +74,7 @@ class StartSurvey extends Command
                     continue;
                 }
 
-                $totalLoginDuration = UserLoginDuration::where('character_id', $character->id)->sum('duration_in_seconds');
+                $totalLoginDuration = UserLoginDuration::where('user_id', $character->user->id)->sum('duration_in_seconds');
                 $totalHoursLoggedIn = $totalLoginDuration / 3600;
 
                 $overrideCharacter = Character::find($overrideCharacterId);
@@ -81,11 +83,19 @@ class StartSurvey extends Command
                     continue;
                 }
 
+                $submittedSurvey = SubmittedSurvey::where('character_id', $character->id)->first();
+
+                if (!is_null($submittedSurvey)) {
+                    continue;
+                }
+
                 $character->user()->update([
                     'is_showing_survey' => true,
                 ]);
 
-                event(new ShowSurvey($character->user, true));
+                $surveyToComplete = Survey::latest()->first();
+
+                event(new ShowSurvey($character->user, $surveyToComplete->id));
             }
         });
     }

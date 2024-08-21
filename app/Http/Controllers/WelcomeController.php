@@ -78,7 +78,7 @@ class WelcomeController extends Controller
                     return view('events.weekly-faction-loyalty-event.event-page', [
                         'event' => ScheduledEvent::where('event_type', EventType::WEEKLY_FACTION_LOYALTY_EVENT)->where('currently_running', true)->first(),
                     ]);
-                case 'feedback-event':
+                case 'tlessas-feedback-event':
                     return view('events.feedback-event.event-page', [
                         'event' => ScheduledEvent::where('event_type', EventType::FEEDBACK_EVENT)->where('currently_running', true)->first(),
                     ]);

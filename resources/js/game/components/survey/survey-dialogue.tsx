@@ -37,6 +37,11 @@ export default class SurveyDialogue extends React.Component<
     }
 
     componentDidMount() {
+
+        if (this.props.survey_id === null) {
+            return;
+        }
+
         this.surveyAjax.getSurvey(this, this.props.survey_id);
     }
 

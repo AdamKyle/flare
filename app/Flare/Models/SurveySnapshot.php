@@ -18,6 +18,7 @@ class SurveySnapshot extends Model
     protected $fillable = [
         'survey_id',
         'snap_shot_data',
+        'submitted_survey_count',
     ];
 
     /**
@@ -26,7 +27,8 @@ class SurveySnapshot extends Model
      * @var array
      */
     protected $casts = [
-        'snap_shot_data' => 'array'
+        'snap_shot_data' => 'array',
+        'submitted_survey_count' => 'integer',
     ];
 
     public function survey(): BelongsTo {

@@ -47,11 +47,13 @@ class InitiateFeedbackEvent implements ShouldQueue
             'ends_at' => now()->addDay(),
         ]);
 
-        event(new GlobalMessageEvent('The feedback event has started!' . ' '.
-            'Players who are new and old will gain 75 more xp per kill under level 1,000, 150 more xp under level 5000 and for those who have reincarnated, you will gain 500 more xp per kill.'. ' '.
-            'Players will also gain +150 XP in training skills and in crafting skills, including alchemy and enchanting, they will also see a raise of +175xp per craft/enchant!'.' '.
-            'After 6 hours of combined (does NOT need to be consecutive) - players of all skill types and play times will be asked to participate in a survey to help Tlessa become a better game. Once you complete the survey you will be rewarded with a mythical item!'. ' '
+        event(new GlobalMessageEvent(
+            'The feedback event has started! ' .
+            'New and returning players will gain +75 XP per kill under level 1,000, and +150 XP from Level 1,000 - 5,000. For those who have reincarnated, you will gain +500 XP per kill. ' .
+            'Players will also gain +150 XP in training skills such as Accuracy, Looting and so on, with a bonus of +175 XP per crafting skills such as trinketry, gem crafting, regular crafting and enchanting as well as other crafting skills ' .
+            'After 6 hours of combined playtime (does NOT need to be consecutive), players of all skill levels will be asked to participate in a survey to help make Tlessa a better game. Upon completing the survey, you will be rewarded with a Mythical Item!'
         ));
+
 
         AnnouncementHandler::createAnnouncement('tlessas_feedback_event');
     }
