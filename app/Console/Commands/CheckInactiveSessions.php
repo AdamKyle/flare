@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Flare\Models\UserLoginDuration;
+use Carbon\Carbon;
 use DB;
 use Illuminate\Console\Command;
 
@@ -27,13 +28,30 @@ class CheckInactiveSessions extends Command
      */
     public function handle() {
 
-        $threshold = now()->subHour();
+        $threshold = Carbon::now()->subMinutes(30); // example threshold, adjust as needed
+
+        UserLoginDuration::whereNull('logged_out_at')
+            ->where('last_heart_beat', '<', $threshold) // Correct column name
+            ->get()
+            ->each(function ($login) {
+                $loggedInAt = Carbon::parse($login->logged_in_at);
+                $lastHeartbeat = Carbon::parse($login->last_heart_beat); // Correct column name
+
+                $login->logged_out_at = Carbon::now();
+                $login->duration_in_seconds = $lastHeartbeat->diffInSeconds($loggedInAt);
+                $login->save();
+            });$threshold = now()->subHour();
 
         UserLoginDuration::whereNull('logged_out_at')
             ->where('last_heartbeat_at', '<', $threshold)
-            ->update([
-                'logged_out_at' => now(),
-                'duration_in_seconds' => DB::raw('TIMESTAMPDIFF(SECOND, logged_in_at, last_heartbeat_at)'),
-            ]);
+            ->get()
+            ->each(function ($login) {
+                $loggedInAt = Carbon::parse($login->logged_in_at);
+                $lastHeartbeat = Carbon::parse($login->last_heartbeat_at);
+
+                $login->logged_out_at = Carbon::now();
+                $login->duration_in_seconds = $lastHeartbeat->diffInSeconds($loggedInAt);
+                $login->save();
+            });
     }
 }

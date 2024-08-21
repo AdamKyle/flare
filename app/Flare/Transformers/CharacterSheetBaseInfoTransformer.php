@@ -7,6 +7,7 @@ use App\Flare\Models\FactionLoyalty;
 use App\Flare\Models\GameClass;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Skill;
+use App\Flare\Models\Survey;
 use App\Flare\Values\AutomationType;
 use App\Flare\Values\ClassAttackValue;
 use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
@@ -79,7 +80,6 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
             'automation_completed_at' => $this->getTimeLeftOnAutomation($character),
             'is_silenced' => $character->user->is_silenced,
             'can_talk_again_at' => $character->user->can_talk_again_at,
-            'can_move' => $character->can_move,
             'can_move_again_at' => now()->diffInSeconds($character->can_move_again_at),
             'force_name_change' => $character->force_name_change,
             'is_alchemy_locked' => $this->isAlchemyLocked($character),
@@ -95,6 +95,7 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
             'current_fame_tasks' => $this->getFactionTasks($factionLoyalty),
             'resurrection_chance' => $characterStatBuilder->buildResurrectionChance(),
             'is_showing_survey' => $character->user->is_showing_survey,
+            'survey_id' => $character->user->is_showing_survey ? Survey::latest()->first()->id : null,
         ];
     }
 

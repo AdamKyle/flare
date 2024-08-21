@@ -155,7 +155,7 @@ export default class Game extends React.Component<GameProps, GameState> {
         }
     }
 
-    showSurveyButton(showSurvey: boolean) {
+    showSurveyButton(showSurvey: boolean, surveyId: number | null) {
         if (this.state.character === null) {
             return;
         }
@@ -163,6 +163,7 @@ export default class Game extends React.Component<GameProps, GameState> {
         const character = JSON.parse(JSON.stringify(this.state.character));
 
         character.is_showing_survey = showSurvey;
+        character.survey_id = surveyId;
 
         this.setState({
             show_survey_button: showSurvey,
@@ -410,6 +411,7 @@ export default class Game extends React.Component<GameProps, GameState> {
                 <SurveyComponent
                     user_id={this.state.character.user_id}
                     character_id={this.state.character.id}
+                    survey_id={this.state.character.survey_id}
                     show_survey_button={this.showSurveyButton.bind(this)}
                     open_survey={this.state.open_survey_modal}
                     close_survey={this.closeSurveyModal.bind(this)}
@@ -538,6 +540,7 @@ export default class Game extends React.Component<GameProps, GameState> {
                                     ) : null}
                                     {this.state.show_survey_button ||
                                     (this.state.character.is_showing_survey &&
+                                        this.state.character.survey_id !== null &&
                                         !this.state.is_showing_active_boons) ? (
                                         <PrimaryButton
                                             button_label={"Complete survey"}

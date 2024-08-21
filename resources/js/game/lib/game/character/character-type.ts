@@ -230,4 +230,6 @@ export interface CharacterType {
     pledged_to_faction_id: number | null;
 
     is_showing_survey: boolean;
+
+    survey_id: number | null;
 }
