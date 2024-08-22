@@ -27,6 +27,10 @@ class AffixesTable extends DataTableComponent
             SelectFilter::make('Types')
                 ->options($this->buildOptions())
                 ->filter(function (Builder $builder, string $value) {
+                    if ($value === 'Please select') {
+                        return $builder->where('randomly_generated', false);
+                    }
+
                     return (new ItemAffixType(intval($value)))->query($builder);
                 }),
         ];
@@ -34,7 +38,7 @@ class AffixesTable extends DataTableComponent
 
     protected function buildOptions(): array
     {
-        return ItemAffixType::$dropDownValues;
+        return array_merge(['Please select' => 'please select'], ItemAffixType::$dropDownValues);
     }
 
     public function columns(): array

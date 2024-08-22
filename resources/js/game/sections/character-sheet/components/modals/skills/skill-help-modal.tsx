@@ -20,17 +20,27 @@ export default class SkillHelpModal extends React.Component<any, any> {
                     amount will then be applied to the skill XP.
                 </p>
                 <p className="my-2 text-gray-700 dark:text-gray-200">
-                    As you level these skills the XP will go up by 100 per skill
-                    level, that is at level 1, you need 100XP, but at level 10,
-                    you need 1000.
+                    For example, if you set this at 10% - recommended for new
+                    players - and then kill a monster giving you 100 XP, you
+                    will get 90 XP + all modifiers and bonuses.
                 </p>
                 <p className="my-2 text-gray-700 dark:text-gray-200">
-                    Because skills xp will get out of control fast, there are
-                    various books and quests that increase the XP bonus per
-                    kill, players are also suggested to use Exploration for
-                    levels 5 and beyond. Do not try and master a skill, instead
-                    rely on quest items and enchantments while leveling other
-                    skills.
+                    As you advance in the game and get more established by being
+                    able to kill harder creatures for more xp, you will be in a
+                    better position to sacrifice more of your XP to level the
+                    skill faster.
+                </p>
+                <p className="my-2 text-gray-700 dark:text-gray-200">
+                    There are various Enchantments that can help level skills as
+                    well. For example,{" "}
+                    <a
+                        href="/information/enchanting?table-filters[types]=7"
+                        target="_blank"
+                    >
+                        <i className="fas fa-external-link-alt"></i> here's the
+                        Accuracy enchantments, scroll down after clicking to see
+                        them.
+                    </a>
                 </p>
             </HelpDialogue>
         );

@@ -7,6 +7,8 @@ import { upperFirst } from "lodash";
 import { AxiosError, AxiosResponse } from "axios";
 import Ajax from "../../../../../lib/ajax/ajax";
 import ComponentLoading from "../../../../../components/ui/loading/component-loading";
+import SkillHelpModal from "./skill-help-modal";
+import SkillBonusBreakDown from "./skill-bonus-break-down";
 
 export default class SkillInformation extends React.Component<any, any> {
     constructor(props: any) {
@@ -15,6 +17,8 @@ export default class SkillInformation extends React.Component<any, any> {
         this.state = {
             loading: true,
             skill_data: {},
+            show_help: false,
+            bonus_type: null,
         };
     }
 
@@ -36,6 +40,13 @@ export default class SkillInformation extends React.Component<any, any> {
                 },
                 (error: AxiosError) => {},
             );
+    }
+
+    manageHelpDialogue(bonusType: string | null) {
+        this.setState({
+            show_help: !this.state.show_help,
+            bonus_type: bonusType,
+        });
     }
 
     getFilteredFields() {
@@ -116,18 +127,37 @@ export default class SkillInformation extends React.Component<any, any> {
                                     <dd>{this.state.skill_data.level}</dd>
                                     <dt>Max Level</dt>
                                     <dd>{this.state.skill_data.max_level}</dd>
-                                    <dt>XP Towards</dt>
-                                    <dd>
-                                        {this.state.skill_data.xp_towards !==
-                                        null
-                                            ? (
-                                                  this.state.skill_data
-                                                      .xp_towards * 100
-                                              ).toFixed(2)
-                                            : 0.0}
-                                        %
-                                    </dd>
-                                    <dt>Skill Bonus</dt>
+                                    {this.props.is_trainable ? (
+                                        <>
+                                            <dt>XP Towards</dt>
+                                            <dd>
+                                                {this.state.skill_data
+                                                    .xp_towards !== null
+                                                    ? (
+                                                          this.state.skill_data
+                                                              .xp_towards * 100
+                                                      ).toFixed(2)
+                                                    : 0.0}
+                                                %
+                                            </dd>
+                                        </>
+                                    ) : null}
+
+                                    <dt>
+                                        Skill Bonus{" "}
+                                        <button
+                                            type={"button"}
+                                            onClick={() =>
+                                                this.manageHelpDialogue("skill")
+                                            }
+                                            className="text-blue-500 dark:text-blue-300"
+                                        >
+                                            <i
+                                                className={"fas fa-info-circle"}
+                                            ></i>{" "}
+                                            Help
+                                        </button>
+                                    </dt>
                                     <dd>
                                         {(
                                             this.state.skill_data.skill_bonus *
@@ -135,7 +165,21 @@ export default class SkillInformation extends React.Component<any, any> {
                                         ).toFixed(2)}
                                         %
                                     </dd>
-                                    <dt>Skill XP Bonus</dt>
+                                    <dt>
+                                        Skill XP Bonus{" "}
+                                        <button
+                                            type={"button"}
+                                            onClick={() =>
+                                                this.manageHelpDialogue("xp")
+                                            }
+                                            className="text-blue-500 dark:text-blue-300"
+                                        >
+                                            <i
+                                                className={"fas fa-info-circle"}
+                                            ></i>{" "}
+                                            Help
+                                        </button>
+                                    </dt>
                                     <dd>
                                         {(
                                             this.state.skill_data
@@ -157,6 +201,27 @@ export default class SkillInformation extends React.Component<any, any> {
                                 <div>{this.renderSkillDetails()}</div>
                             ) : null}
                         </div>
+
+                        {this.state.show_help ? (
+                            <SkillBonusBreakDown
+                                manage_modal={this.manageHelpDialogue.bind(
+                                    this,
+                                )}
+                                title={
+                                    this.state.bonus_type === "xp"
+                                        ? "Skill Xp Bonus Breakdown"
+                                        : "Skill Bonus Breakdown"
+                                }
+                                bonus_type={this.state.bonus_type}
+                                items={
+                                    this.state.bonus_type === "xp"
+                                        ? this.state.skill_data
+                                              .skill_xp_bonus_break_down
+                                        : this.state.skill_data
+                                              .skill_bonus_break_down
+                                }
+                            />
+                        ) : null}
                     </Fragment>
                 )}
             </Dialogue>

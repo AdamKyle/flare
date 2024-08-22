@@ -70,6 +70,10 @@ class Skill extends Model
         return $this->belongsTo(Character::class);
     }
 
+    public function getItemSkillBreakdown(string $skillAttribute = 'skill_bonus'): array {
+        return $this->getItemBonusBreakDown($this->baseSkill, $skillAttribute);
+    }
+
     public function getNameAttribute()
     {
         return $this->baseSkill->name;
@@ -348,6 +352,56 @@ class Skill extends Model
         }
 
         return empty($bonuses) ? 0.0 : array_sum($bonuses);
+    }
+
+    protected function getItemBonusBreakDown(GameSkill $skill, string $skillAttribute = 'skill_bonus'): array {
+        $itemsThatEffectBonus = [];
+
+        $equippedSlots = $this->fetchSlotsWithEquipment();
+
+        foreach ($equippedSlots as $slot) {
+
+            $bonus =  $this->calculateBonus($slot->item, $skill, $skillAttribute);
+
+            if ($bonus > 0) {
+                $itemsThatEffectBonus[] = [
+                    'name' => $slot->item->affix_name,
+                    'type' => $slot->item->type,
+                    'position' => $slot->position,
+                    'affix_count' => $slot->item->affix_count,
+                    'is_unique' => $slot->item->is_unique,
+                    'is_mythic' => $slot->item->is_mythic,
+                    'is_cosmic' => $slot->item->is_comsmic,
+                    'holy_stacks_applied' => $slot->item->holy_stacks_applied,
+                    $skillAttribute => $bonus,
+                ];
+            }
+        }
+
+        $slots = $this->character->inventory->slots;
+
+        foreach ($slots as $slot) {
+            if ($slot->item->type === 'quest' && $slot->item->skill_name === $this->baseSkill->name) {
+
+                $bonus =  $this->calculateBonus($slot->item, $skill, $skillAttribute);
+
+                if ($bonus > 0) {
+                    $itemsThatEffectBonus[] = [
+                        'name' => $slot->item->affix_name,
+                        'type' => $slot->item->type,
+                        'position' => $slot->position,
+                        'affix_count' => $slot->item->affix_count,
+                        'is_unique' => $slot->item->is_unique,
+                        'is_mythic' => $slot->item->is_mythic,
+                        'is_cosmic' => $slot->item->is_comsmic,
+                        'holy_stacks_applied' => $slot->item->holy_stacks_applied,
+                        $skillAttribute => $bonus,
+                    ];
+                }
+            }
+        }
+
+        return $itemsThatEffectBonus;
     }
 
     protected function getCharacterBoonsBonus(string $skillBonusAttribute)

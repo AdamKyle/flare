@@ -37,6 +37,8 @@ class SkillsTransformer extends TransformerAbstract
             'fight_timeout_mod' => $skill->fight_timeout_mod,
             'move_timeout_mod' => $skill->move_timeout_mod,
             'class_bonus' => $skill->class_bonus,
+            'skill_bonus_break_down' => $skill->getItemSkillBreakdown(),
+            'skill_xp_bonus_break_down' => $skill->getItemSkillBreakdown('skill_training_bonus'),
         ];
     }
 }
