@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Flare\Models\Character;
+use App\Flare\Values\MaxCurrenciesValue;
 use Illuminate\Console\Command;
 
 class RewardPlayer extends Command
@@ -44,6 +45,15 @@ class RewardPlayer extends Command
 
         // Give the max gold bars to all kingdoms
         $character->kingdoms()->update(['gold_bars' => 1000]);
+
+        $character->update([
+            'gold' => MaxCurrenciesValue::MAX_GOLD,
+            'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
+            'shards' => MaxCurrenciesValue::MAX_SHARDS,
+            'copper_coins' => MaxCurrenciesValue::MAX_COPPER,
+        ]);
+
+        $character = $character->refresh();
 
         $factionLoyalties = $character->factionLoyalties;
 
