@@ -56,7 +56,7 @@ class GemService
             return $this->successResult();
         }
 
-        if (! $this->canCraft($characterSkill, (new GemTierValue($tier))->maxForTier()['chance'])) {
+        if (!$this->canCraft($characterSkill, (new GemTierValue($tier))->maxForTier()['chance'])) {
 
             ServerMessageHandler::sendBasicMessage($character->user, 'You failed to craft the gem, the item explodes before you into a pile of wasted effort and time.');
 
@@ -200,6 +200,11 @@ class GemService
      */
     protected function canCraft(Skill $skill, float $chance): bool
     {
+
+        if ($skill->level >= $skill->baseSkill->max_level) {
+            return true;
+        }
+
         $roll = rand(1, 100);
 
         $roll = $roll + $roll * $skill->skill_bonus;
