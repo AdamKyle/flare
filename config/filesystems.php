@@ -76,6 +76,13 @@ return [
             'visibility' => 'public',
         ],
 
+        'generated-monsters-and-bugs' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/generated-monsters-and-bugs'),
+            'url' => env('APP_URL').'/storage/generated-monsters-and-bugs',
+            'visibility' => 'public',
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),

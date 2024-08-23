@@ -199,6 +199,7 @@ return [
          * Component Related
          */
         App\Flare\Github\Providers\ServiceProvider::class,
+        App\Flare\ImageGeneration\Providers\ServiceProvider::class,
 
         /**
          * Admin Related

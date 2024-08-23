@@ -40,6 +40,10 @@ class TrackSessionLifeMiddleware {
 
                 Auth::logout();
             }
+
+            $foundLoginDetails->update([
+                'last_heart_beat' => now(),
+            ]);
         }
 
         return $next($request);

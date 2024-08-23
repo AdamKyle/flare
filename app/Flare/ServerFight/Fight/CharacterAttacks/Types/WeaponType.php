@@ -4,10 +4,12 @@ namespace App\Flare\ServerFight\Fight\CharacterAttacks\Types;
 
 use App\Flare\Models\Character;
 use App\Flare\ServerFight\BattleBase;
+use App\Flare\ServerFight\Fight\Attack;
 use App\Flare\ServerFight\Fight\CanHit;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks;
 use App\Flare\ServerFight\Fight\Entrance;
 use App\Flare\ServerFight\Monster\ServerMonster;
+use App\Flare\Values\AttackTypeValue;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 
 class WeaponType extends BattleBase
@@ -32,7 +34,19 @@ class WeaponType extends BattleBase
     public function setCharacterAttackData(Character $character, bool $isVoided, string $type): WeaponType
     {
 
-        $attackType = $isVoided ? 'voided_'.$type : $type;
+        $voidedTypes = [
+            AttackTypeValue::VOIDED_ATTACK,
+            AttackTypeValue::VOIDED_CAST,
+            AttackTypeValue::VOIDED_ATTACK_AND_CAST,
+            AttackTypeValue::VOIDED_CAST_AND_ATTACK,
+            AttackTypeValue::VOIDED_DEFEND,
+        ];
+
+        if ($isVoided && !in_array($type, $voidedTypes)) {
+            $attackType = 'voided_'.$type;
+        } else {
+            $attackType = $type;
+        }
 
         $this->attackData = $this->characterCacheData->getDataFromAttackCache($character, $attackType);
         $this->isVoided = $isVoided;
