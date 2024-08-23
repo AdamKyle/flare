@@ -48,12 +48,12 @@ class SurveyBuilderController extends Controller {
     public function import(SurveyImport $request)
     {
 
-        $data = json_decode(trim($request->file('info_import')->get()), true);
+        $data = json_decode(trim($request->file('survey_import')->get()), true);
 
         foreach ($data as $modelEntry) {
             Survey::updateOrCreate(['id' => $modelEntry['id']], $modelEntry);
         }
 
-        return response()->redirectToRoute('admin.info-management')->with('success', 'Surveys have been imported.');
+        return response()->redirectToRoute('admin.surveys')->with('success', 'Surveys have been imported.');
     }
 }

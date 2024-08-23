@@ -35,6 +35,7 @@ class MassImportCustomData extends Command
 
         $this->importInformationSection();
         $this->importGameMaps();
+        $this->importSurveys();
     }
 
     protected function importInformationSection(): void
