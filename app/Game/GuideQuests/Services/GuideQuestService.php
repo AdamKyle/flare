@@ -30,17 +30,32 @@ class GuideQuestService
     public function fetchQuestForCharacter(Character $character): ?array
     {
 
-        $quest = $this->fetchNextGuideQuest($character);
+        $quests = $this->fetchNextGuideQuest($character);
 
-        if (is_null($quest)) {
+        if (is_null($quests)) {
             return null;
         }
 
-        $canHandIn = $this->canHandInQuest($character, $quest, true);
+        $canHandIn = [];
+        $completedAttributes = [];
+
+        foreach ($quests as $quest) {
+            $canHandInQuest = $this->canHandInQuest($character, $quest, true);
+
+            $canHandIn[] = [
+                'quest_id' => $quest->id,
+                'can_hand_in' => $canHandInQuest,
+            ];
+
+            $completedAttributes[] = [
+                'quest_id' => $quest->id,
+                'completed_requirements' => $this->completedAttributes,
+            ];
+        }
 
         return [
-            'quest' => $quest,
-            'completed_requirements' => $this->completedAttributes,
+            'quests' => $quests,
+            'completed_requirements' => $completedAttributes,
             'can_hand_in' => $canHandIn,
         ];
     }
@@ -182,7 +197,7 @@ class GuideQuestService
         return false;
     }
 
-    protected function fetchNextGuideQuest(Character $character): ?GuideQuest
+    protected function fetchNextGuideQuest(Character $character): array
     {
 
         $winterEvent = Event::where('type', EventType::WINTER_EVENT)->first();
@@ -210,7 +225,7 @@ class GuideQuestService
             }
         }
 
-        if (! is_null($delusionalEvent) && is_null($nextGuideQuest)) {
+        if (!is_null($delusionalEvent) && is_null($nextGuideQuest)) {
             $delusionalEventQuest = GuideQuest::where('only_during_event', EventType::DELUSIONAL_MEMORIES_EVENT)->whereNull('parent_id')->first();
 
             if (! is_null($delusionalEventQuest)) {
@@ -218,11 +233,20 @@ class GuideQuestService
             }
         }
 
-        if (! is_null($nextGuideQuest)) {
-            return $nextGuideQuest;
+        $regularGuideQuest = $this->fetchNextRegularGuideQuest($character);
+        $newFeatureGuideQuest = $nextGuideQuest;
+
+        $guideQuests = [];
+
+        if (!is_null($regularGuideQuest)) {
+            $guideQuests[] = $regularGuideQuest;
         }
 
-        return $this->fetchNextRegularGuideQuest($character);
+        if (!is_null($newFeatureGuideQuest)) {
+            $guideQuests[] = $newFeatureGuideQuest;
+        }
+
+        return $guideQuests;
     }
 
     protected function fetchNextRegularGuideQuest(Character $character): ?GuideQuest

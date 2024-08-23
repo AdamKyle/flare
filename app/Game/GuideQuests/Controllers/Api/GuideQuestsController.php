@@ -35,8 +35,8 @@ class GuideQuestsController extends Controller
         }
 
         return response()->json([
-            'message' => 'Oh christ, something is wrong. Quick call The Creator!',
-        ]);
+            'message' => 'Oh christ, something is wrong. Quick call The Creator! Submit a bug report indicating the guide quest failed to load.',
+        ], 422);
     }
 
     /**
@@ -46,34 +46,7 @@ class GuideQuestsController extends Controller
     {
         $data = $this->guideQuestService->fetchQuestForCharacter($character);
 
-        if (! is_null($data)) {
 
-            $quest = $data['quest'];
-
-            $quest->intro_text = nl2br($quest->intro_text);
-            $quest->instructions = nl2br($quest->instructions);
-            $quest->desktop_instructions = nl2br($quest->desktop_instructions);
-            $quest->mobile_instructions = nl2br($quest->mobile_instructions);
-
-            $response = [
-                'quest' => $quest,
-                'can_hand_in' => $data['can_hand_in'],
-                'completed_requirements' => $data['completed_requirements'],
-            ];
-
-            if ($message !== '') {
-                $response['message'] = $message;
-            }
-
-            return response()->json($response);
-        }
-
-        $response = [
-            'quest' => null,
-            'can_hand_in' => false,
-            'completed_requirements' => [],
-        ];
-
-        return response()->json($response);
+        return response()->json([...$data, 'message' => $message]);
     }
 }
