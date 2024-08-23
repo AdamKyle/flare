@@ -156,8 +156,10 @@ export default class Game extends React.Component<GameProps, GameState> {
     }
 
     componentDidUpdate() {
-        if (this.state.show_survey_button && this.state.survey_success_message !== null) {
-
+        if (
+            this.state.show_survey_button &&
+            this.state.survey_success_message !== null
+        ) {
             const character = JSON.parse(JSON.stringify(this.state.character));
 
             character.is_showing_survey = false;
@@ -166,7 +168,7 @@ export default class Game extends React.Component<GameProps, GameState> {
             this.setState({
                 show_survey_button: false,
                 character: character,
-            })
+            });
         }
     }
 
