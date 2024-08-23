@@ -90,7 +90,7 @@
             </h2>
             <p class="mb-10 dark:text-gray-300 text-gray-800">
                 This event is designed to draw a lot of players in who will play and take advantage of the increased XP as well as other events that run during this time like Currency Day
-                where you get more currency from kills! Players who play for a combined minimum of 6 hours (does not have to be consecutive) will be asked to do a survey to give their feed back,
+                where you get more currency from kills! Players who play for a combined minimum of 1 hour (does not have to be consecutive) will be asked to do a survey to give their feed back,
                 upon completing said survey you will be rewarded with a shiny mythical item!
             </p>
         </div>
@@ -107,7 +107,7 @@
                 </dd>
                 <dt>Can I use automation for this?</dt>
                 <dd>
-                    There is exploration - which automates your fights, but crafting will have to be done manually.
+                    There is <a href="/information/exploration">Exploration</a> - which automates your fights, but crafting will have to be done manually.
                 </dd>
                 <dt>What rewards do I get?</dt>
                 <dd>

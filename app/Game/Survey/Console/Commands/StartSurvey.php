@@ -75,11 +75,12 @@ class StartSurvey extends Command
                 }
 
                 $totalLoginDuration = UserLoginDuration::where('user_id', $character->user->id)->sum('duration_in_seconds');
+
                 $totalHoursLoggedIn = $totalLoginDuration / 3600;
 
                 $overrideCharacter = Character::find($overrideCharacterId);
 
-                if ($totalHoursLoggedIn < 6 && is_null($overrideCharacter)) {
+                if ($totalHoursLoggedIn < 1 && is_null($overrideCharacter)) {
                     continue;
                 }
 
