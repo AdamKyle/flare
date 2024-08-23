@@ -39,6 +39,8 @@ class TrackSessionLifeMiddleware {
                 ]);
 
                 Auth::logout();
+
+                return $next($request);
             }
 
             $foundLoginDetails->update([
