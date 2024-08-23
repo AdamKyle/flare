@@ -42,12 +42,7 @@ export default class GuideQuest extends React.Component<
     }
 
     componentDidMount() {
-        console.log("Huh?");
         this.guideQuestAjax.doGuideQuestAction(this, GUIDE_QUEST_ACTIONS.FETCH);
-    }
-
-    componentDidUpdate(prevProps: GuideQuestProps, prevState: GuideQuestState) {
-        console.log(prevState, this.state);
     }
 
     buildTitle() {

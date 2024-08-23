@@ -254,7 +254,7 @@ class CharacterRewardService
 
         $addBonus = true;
 
-        if (! $this->characterXpService->canCharacterGainXP($this->character)) {
+        if (!$this->characterXpService->canCharacterGainXP($this->character)) {
             return;
         }
 

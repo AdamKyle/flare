@@ -66,8 +66,6 @@ export default class GuideQuestAjax {
                         selectedGuideQuest = result.data.quests[0];
                     }
 
-                    console.log(result.data.quests);
-
                     component.setState({
                         loading: false,
                         quest_data: result.data.quests,

@@ -74,13 +74,22 @@ class StartSurvey extends Command
                     continue;
                 }
 
-                $totalLoginDuration = UserLoginDuration::where('user_id', $character->user->id)->sum('duration_in_seconds');
+                $userLoginDuration = UserLoginDuration::where('user_id', $character->user->id)->latest()->first();
+
+                if (is_null($userLoginDuration)) {
+                    continue;
+                }
+
+                $totalLoginDuration      = (int) UserLoginDuration::where('user_id', $character->user->id)->sum('duration_in_seconds');
+                $hoursSinceLastHeartBeat = $userLoginDuration->last_heart_beat->diffInHours($userLoginDuration->logged_in_at);
+                $hoursSinceLastActivity  = $userLoginDuration->last_activity->diffInHours($userLoginDuration->logged_in_at);
 
                 $totalHoursLoggedIn = $totalLoginDuration / 3600;
 
                 $overrideCharacter = Character::find($overrideCharacterId);
 
-                if ($totalHoursLoggedIn < 1 && is_null($overrideCharacter)) {
+                if (($hoursSinceLastActivity < 1 && $hoursSinceLastHeartBeat < 1 && $totalHoursLoggedIn < 1) && is_null($overrideCharacter)) {
+
                     continue;
                 }
 

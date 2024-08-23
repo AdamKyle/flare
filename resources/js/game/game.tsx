@@ -155,6 +155,21 @@ export default class Game extends React.Component<GameProps, GameState> {
         }
     }
 
+    componentDidUpdate() {
+        if (this.state.show_survey_button && this.state.survey_success_message !== null) {
+
+            const character = JSON.parse(JSON.stringify(this.state.character));
+
+            character.is_showing_survey = false;
+            character.survey_id = null;
+
+            this.setState({
+                show_survey_button: false,
+                character: character,
+            })
+        }
+    }
+
     showSurveyButton(showSurvey: boolean, surveyId: number | null) {
         if (this.state.character === null) {
             return;

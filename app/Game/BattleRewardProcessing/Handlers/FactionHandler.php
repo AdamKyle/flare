@@ -91,14 +91,19 @@ class FactionHandler
                 return;
             }
 
-            $guideQuest = $guideQuest['quest'];
+            $guideQuests = $guideQuest['quests'];
 
-            if (! is_null($guideQuest)) {
-                if (! is_null($guideQuest->faction_points_per_kill) && ! is_null($guideQuest->required_faction_level)) {
-                    if ($faction->game_map_id === $guideQuest->required_faction_id && $guideQuest->required_faction_level !== $faction->current_level) {
-                        $faction->current_points += $guideQuest->faction_points_per_kill;
+            if (!empty($guideQuest)) {
 
-                        event(new ServerMessageEvent($character->user, 'You gained additional '.$guideQuest->faction_points_per_kill.' faction points for the current guide quest. This will end once you reach the faction level requirements.'));
+                foreach ($guideQuests as $guideQuest) {
+                    if (! is_null($guideQuest->faction_points_per_kill) && ! is_null($guideQuest->required_faction_level)) {
+                        if ($faction->game_map_id === $guideQuest->required_faction_id && $guideQuest->required_faction_level !== $faction->current_level) {
+                            $faction->current_points += $guideQuest->faction_points_per_kill;
+
+                            event(new ServerMessageEvent($character->user, 'You gained additional '.$guideQuest->faction_points_per_kill.' faction points for the current guide quest. This will end once you reach the faction level requirements.'));
+
+                            break;
+                        }
                     }
                 }
             }

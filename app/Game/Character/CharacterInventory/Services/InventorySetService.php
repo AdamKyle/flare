@@ -130,7 +130,7 @@ class InventorySetService
                     return $set->id === $setId;
                 });
 
-                $setName = 'Set ' + $index;
+                $setName = 'Set ' . $index;
             } else {
                 $setName = $inventorySet->name;
             }

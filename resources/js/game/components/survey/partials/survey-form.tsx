@@ -352,7 +352,7 @@ export default class SurveyForm extends React.Component<
             >
                 <div
                     ref={this.scrollContainerRef}
-                    className="p-4 max-h-[450px] overflow-y-scroll"
+                    className="p-4 max-h-[650px] overflow-y-scroll"
                 >
                     {error_message && (
                         <DangerAlert>{error_message}</DangerAlert>
