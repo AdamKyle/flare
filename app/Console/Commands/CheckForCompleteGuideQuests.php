@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Flare\Models\GuideQuest;
 use App\Flare\Models\User;
 use App\Game\GuideQuests\Events\ShowGuideQuestCompletedToast;
 use App\Game\GuideQuests\Services\GuideQuestService;
@@ -38,14 +39,24 @@ class CheckForCompleteGuideQuests extends Command
 
                 $data = $guideQuestService->fetchQuestForCharacter($character);
 
-                if (is_null($data)) {
-                    return;
-                }
+                foreach ($data['quests'] as $quest) {
+                    if ($this->canHandIn($quest, $data['can_hand_in'])) {
+                        event(new ShowGuideQuestCompletedToast($user, true));
 
-                if ($data['can_hand_in']) {
-                    event(new ShowGuideQuestCompletedToast($user, true));
+                        return;
+                    }
                 }
             }
         });
+    }
+
+    protected function canHandIn(GuideQuest $guideQuest, array $canHandIn) {
+        foreach ($canHandIn as $handIn) {
+            if ($handIn['quest_id'] === $guideQuest['id']) {
+                return $handIn['can_hand_in'];
+            }
+        }
+
+        return false;
     }
 }
