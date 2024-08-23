@@ -42,7 +42,7 @@ export default class GuideQuest extends React.Component<
     }
 
     componentDidMount() {
-        console.log('Huh?');
+        console.log("Huh?");
         this.guideQuestAjax.doGuideQuestAction(this, GUIDE_QUEST_ACTIONS.FETCH);
     }
 
@@ -51,7 +51,6 @@ export default class GuideQuest extends React.Component<
     }
 
     buildTitle() {
-
         if (this.state.loading) {
             return "One moment ...";
         }
@@ -94,8 +93,8 @@ export default class GuideQuest extends React.Component<
             this.state.can_hand_in.filter((canHandIn: any) => {
                 return (
                     canHandIn.quest_id ===
-                    this.state.selected_quest_data_to_show?.id &&
-                        canHandIn.can_hand_in
+                        this.state.selected_quest_data_to_show?.id &&
+                    canHandIn.can_hand_in
                 );
             }).length > 0
         );
@@ -104,13 +103,13 @@ export default class GuideQuest extends React.Component<
     showQuest(quest: any) {
         this.setState({
             selected_quest_data_to_show: quest,
-        })
+        });
     }
 
     viewQuests() {
         this.setState({
             selected_quest_data_to_show: null,
-        })
+        });
     }
 
     renderButtons(): JSX.Element[] | [] {
@@ -119,20 +118,28 @@ export default class GuideQuest extends React.Component<
         }
 
         return this.state.quest_data.map((questData: any) => {
-
-            const isQuestComplete = this.state.can_hand_in.filter((canHandIn: any) => {
-                return canHandIn.quest_id === questData.id && canHandIn.can_hand_in;
-            }).length > 0
+            const isQuestComplete =
+                this.state.can_hand_in.filter((canHandIn: any) => {
+                    return (
+                        canHandIn.quest_id === questData.id &&
+                        canHandIn.can_hand_in
+                    );
+                }).length > 0;
 
             if (questData.unlock_at_level > 0) {
                 return (
                     <div className={"w-full my-2"}>
                         <SuccessOutlineButton
-                            button_label={"New Feature: " + questData.name + ' ' + (isQuestComplete ? ' ✓' : '')}
+                            button_label={
+                                "New Feature: " +
+                                questData.name +
+                                " " +
+                                (isQuestComplete ? " ✓" : "")
+                            }
                             on_click={() => {
                                 this.showQuest(questData);
                             }}
-                            additional_css={'w-full'}
+                            additional_css={"w-full"}
                         />
                     </div>
                 );
@@ -142,11 +149,16 @@ export default class GuideQuest extends React.Component<
                 return (
                     <div className={"w-full my-2"}>
                         <SuccessOutlineButton
-                            button_label={"New Feature: " + questData.name + ' ' + (isQuestComplete ? ' ✓' : '')}
+                            button_label={
+                                "New Feature: " +
+                                questData.name +
+                                " " +
+                                (isQuestComplete ? " ✓" : "")
+                            }
                             on_click={() => {
                                 this.showQuest(questData);
                             }}
-                            additional_css={'w-full'}
+                            additional_css={"w-full"}
                         />
                     </div>
                 );
@@ -154,12 +166,17 @@ export default class GuideQuest extends React.Component<
 
             return (
                 <div className={"w-full"}>
-                <PrimaryOutlineButton
-                        button_label={"Next Quest: " + questData.name + ' ' + (isQuestComplete ? ' ✓' : '')}
+                    <PrimaryOutlineButton
+                        button_label={
+                            "Next Quest: " +
+                            questData.name +
+                            " " +
+                            (isQuestComplete ? " ✓" : "")
+                        }
                         on_click={() => {
                             this.showQuest(questData);
                         }}
-                        additional_css={'w-full'}
+                        additional_css={"w-full"}
                     />
                 </div>
             );
@@ -178,9 +195,11 @@ export default class GuideQuest extends React.Component<
                     handle_action: this.handInQuest.bind(this),
                 }}
                 tertiary_actions={{
-                    tertiary_button_label: 'View Quests',
+                    tertiary_button_label: "View Quests",
                     handle_action: this.viewQuests.bind(this),
-                    tertiary_button_disabled: this.state.quest_data.length <= 1 || this.state.selected_quest_data_to_show === null,
+                    tertiary_button_disabled:
+                        this.state.quest_data.length <= 1 ||
+                        this.state.selected_quest_data_to_show === null,
                 }}
                 medium_modal={this.state.quest_data.length > 0}
                 primary_button_disabled={this.state.action_loading}
@@ -216,48 +235,59 @@ export default class GuideQuest extends React.Component<
                         ) : (
                             <div>
                                 {this.state.success_message !== null ? (
-                                    <SuccessAlert close_alert={this.closeMessage.bind(this)}>
+                                    <SuccessAlert
+                                        close_alert={this.closeMessage.bind(
+                                            this,
+                                        )}
+                                    >
                                         {this.state.success_message}
                                     </SuccessAlert>
                                 ) : null}
 
                                 {this.state.error_message !== null ? (
-                                    <DangerAlert close_alert={this.closeMessage.bind(this)}>
+                                    <DangerAlert
+                                        close_alert={this.closeMessage.bind(
+                                            this,
+                                        )}
+                                    >
                                         {this.state.error_message}
                                     </DangerAlert>
                                 ) : null}
 
-                                <div className={"mr-auto ml-auto w-full md:w-1/2 "}>
+                                <div
+                                    className={
+                                        "mr-auto ml-auto w-full md:w-1/2 "
+                                    }
+                                >
                                     <p className="mb-2">
-                                        Below are two or more quests for you to do. There are two types: Regular and New
+                                        Below are two or more quests for you to
+                                        do. There are two types: Regular and New
                                         Feature.
                                     </p>
                                     <p className="mb-2">
-                                        <strong>New Features</strong> are those that Tlessa has released and players can
-                                        begin to dive into
-                                        them in a guided way.
+                                        <strong>New Features</strong> are those
+                                        that Tlessa has released and players can
+                                        begin to dive into them in a guided way.
                                     </p>
                                     <p className="mb-2">
-                                        <strong>Regular</strong> quests are those that advance your learning of Tlessa
-                                        and
-                                        it's various
-                                        mechanics.
+                                        <strong>Regular</strong> quests are
+                                        those that advance your learning of
+                                        Tlessa and it's various mechanics.
                                     </p>
                                     <p className="mb-2">
-                                        You can choose which ever to do. If you are new, I would recommend continuing
-                                        with
-                                        the Regular Quests.
+                                        You can choose which ever to do. If you
+                                        are new, I would recommend continuing
+                                        with the Regular Quests.
                                     </p>
                                     <p className="mb-2">
-                                        If you see a checkmark beside the name of the quest, it means it's complete and
+                                        If you see a checkmark beside the name
+                                        of the quest, it means it's complete and
                                         you can hand it in.
                                     </p>
-                                    <div
-                                        className="border-b-2 border-b-gray-200 dark:border-b-gray-600 my-3"></div>
+                                    <div className="border-b-2 border-b-gray-200 dark:border-b-gray-600 my-3"></div>
                                     {this.renderButtons()}
                                 </div>
                             </div>
-
                         )}
 
                         <div className="overflow-y-auto max-h-[450px] lg:max-h-none lg:overflow-visible">

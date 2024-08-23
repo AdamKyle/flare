@@ -58,14 +58,21 @@ export default class GuideQuestDetails extends React.Component<GuideQuestDetails
                 const requiredKey = getRequirementKey(key);
                 const value = this.props.guide_quest[requiredKey];
 
-                const matchingCompletedRequirements: any = this.props.completed_requirements.filter((completedRequirements: any) => {
-                    return completedRequirements.quest_id === this.props.guide_quest.id
-                });
+                const matchingCompletedRequirements: any =
+                    this.props.completed_requirements.filter(
+                        (completedRequirements: any) => {
+                            return (
+                                completedRequirements.quest_id ===
+                                this.props.guide_quest.id
+                            );
+                        },
+                    );
 
                 let completedRequirements: string[] = [];
 
                 if (matchingCompletedRequirements.length > 0) {
-                    completedRequirements = matchingCompletedRequirements[0].completed_requirements;
+                    completedRequirements =
+                        matchingCompletedRequirements[0].completed_requirements;
                 }
 
                 const isFinished =
@@ -117,7 +124,6 @@ export default class GuideQuestDetails extends React.Component<GuideQuestDetails
     }
 
     render() {
-
         return (
             <>
                 <InfoAlert
