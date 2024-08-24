@@ -2,11 +2,12 @@ import { AxiosError, AxiosResponse } from "axios";
 import Ajax from "../../../../game/lib/ajax/ajax";
 import LoginStatistics from "../components/login-statistics";
 import RegistrationStatistics from "../components/registration-statistics";
+import LoginDurationStatistics from "../components/login-duration-statistics";
 
 export default class SiteStatisticsAjax {
-    private component: LoginStatistics | RegistrationStatistics;
+    private component: LoginStatistics | RegistrationStatistics | LoginDurationStatistics;
 
-    constructor(component: LoginStatistics | RegistrationStatistics) {
+    constructor(component: LoginStatistics | RegistrationStatistics | LoginDurationStatistics) {
         this.component = component;
     }
 
@@ -43,17 +44,17 @@ export default class SiteStatisticsAjax {
             {
                 name: "Last 7 Days",
                 icon_class: "far fa-trash-alt",
-                on_click: () => this.fetchStatisticalData(routeName, 6),
+                on_click: () => this.fetchStatisticalData(routeName, 7),
             },
             {
                 name: "Last 14 Days",
                 icon_class: "far fa-trash-alt",
-                on_click: () => this.fetchStatisticalData(routeName, 13),
+                on_click: () => this.fetchStatisticalData(routeName, 14),
             },
             {
                 name: "Last Month",
                 icon_class: "far fa-trash-alt",
-                on_click: () => this.fetchStatisticalData(routeName, 30),
+                on_click: () => this.fetchStatisticalData(routeName, 31),
             },
         ];
     }

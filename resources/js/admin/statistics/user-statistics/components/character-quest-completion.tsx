@@ -5,7 +5,6 @@ import ResizableBox from "../../../../game/components/ui/resizable-box";
 import DropDown from "../../../../game/components/ui/drop-down/drop-down";
 import Ajax from "../../../../game/lib/ajax/ajax";
 import { AxiosError, AxiosResponse } from "axios";
-import PrimaryButton from "../../../../game/components/ui/buttons/primary-button";
 import DangerButton from "../../../../game/components/ui/buttons/danger-button";
 import SuccessButton from "../../../../game/components/ui/buttons/success-button";
 import { capitalize, startCase } from "lodash";

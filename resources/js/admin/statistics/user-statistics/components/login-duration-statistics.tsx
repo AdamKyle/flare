@@ -26,7 +26,7 @@ const secondaryAxes: AxisOptions<any>[] = [
     },
 ];
 
-export default class LoginStatistics extends React.Component<any, any> {
+export default class LoginDurationStatistics extends React.Component<any, any> {
     private siteStatisticsAjax: SiteStatisticsAjax;
 
     constructor(props: any) {
@@ -41,7 +41,7 @@ export default class LoginStatistics extends React.Component<any, any> {
     }
 
     componentDidMount() {
-        this.siteStatisticsAjax.fetchStatisticalData("all-time-sign-in", 0);
+        this.siteStatisticsAjax.fetchStatisticalData("login-duration", 0);
     }
 
     createDataSet(
@@ -68,24 +68,24 @@ export default class LoginStatistics extends React.Component<any, any> {
         if (this.state.data.length === 0) {
             return (
                 <p className="text-center p-4 text-red-700 dark:text-red-400">
-                    No Login Data
+                    No Login Duration Data
                 </p>
             );
         }
 
         const dataForChart: Series[] = [
             {
-                label: "Login Count",
+                label: "Login Duration",
                 data: this.state.data,
             },
         ];
 
         return (
-            <ResizableBox height={350}>
+            <ResizableBox height={450}>
                 <div>
                     <DropDown
                         menu_items={this.siteStatisticsAjax.createActionsDropDown(
-                            "all-time-sign-in",
+                            "login-duration",
                         )}
                         button_title={"Date Filter"}
                     />
