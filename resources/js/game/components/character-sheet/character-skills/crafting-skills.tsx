@@ -4,7 +4,6 @@ import SkillType from "./deffinitions/skill-type";
 import InfoAlert from "../../ui/alerts/simple-alerts/info-alert";
 import SkillInformation from "./modals/skill-information";
 
-
 export default class CraftingSkills extends React.Component<
     CraftingSkillsProps,
     any
