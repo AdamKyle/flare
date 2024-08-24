@@ -30,9 +30,7 @@ export default class UserStatistics extends React.Component<any, any> {
                 </div>
                 <div className="grid lg:grid-cols-2 gap-3 mb-5">
                     <BasicCard additionalClasses={"mb-5"}>
-                        <h3 className="mb-4">
-                            Login Duration Info
-                        </h3>
+                        <h3 className="mb-4">Login Duration Info</h3>
                         <LoginDurationStatistics />
                     </BasicCard>
                     <BasicCard>

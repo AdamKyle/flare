@@ -3,11 +3,7 @@ import ComponentLoading from "../../../../game/components/ui/loading/component-l
 import Ajax from "../../../../game/lib/ajax/ajax";
 import { AxiosError, AxiosResponse } from "axios";
 
-
-export default class CharactersOnlineList extends React.Component<
-    any,
-    any
-> {
+export default class CharactersOnlineList extends React.Component<any, any> {
     constructor(props: any) {
         super(props);
 
@@ -21,8 +17,7 @@ export default class CharactersOnlineList extends React.Component<
         this.fetchCharactersOnline();
     }
 
-    fetchCharactersOnline(
-    ) {
+    fetchCharactersOnline() {
         new Ajax()
             .setRoute("admin/site-statistics/characters-online")
             .doAjaxCall(
@@ -58,13 +53,16 @@ export default class CharactersOnlineList extends React.Component<
                     <div key={index}>
                         <div className="flex items-center space-x-2">
                             <i className="fas fa-circle text-green-500"></i>
-                            <span className="font-bold">{characterOnline.name}</span>
-                            <span>Logged in for {characterOnline.duration}h</span>
+                            <span className="font-bold">
+                                {characterOnline.name}
+                            </span>
+                            <span>
+                                Logged in for {characterOnline.duration}h
+                            </span>
                         </div>
 
                         {index < this.state.data.length - 1 && (
-                            <div
-                                className="border-b-2 block lg:hidden border-b-gray-300 dark:border-b-gray-600 my-3"></div>
+                            <div className="border-b-2 block lg:hidden border-b-gray-300 dark:border-b-gray-600 my-3"></div>
                         )}
                     </div>
                 ))}
