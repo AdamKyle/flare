@@ -12,7 +12,6 @@ class RecordUserLogOutTimeListener
      */
     public function handle(Logout $event)
     {
-        dump($event);
         if (is_null($event->user)) {
             return;
         }
