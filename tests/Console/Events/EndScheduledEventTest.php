@@ -192,7 +192,8 @@ class EndScheduledEventTest extends TestCase
         $this->createScheduledEvent([
             'event_type' => EventType::WEEKLY_CELESTIALS,
             'start_date' => now()->addMinutes(5),
-            'currently_running' => false,
+            'end_date' => now()->subMinutes(10),
+            'currently_running' => true,
         ]);
 
         $event = $this->createEvent([
