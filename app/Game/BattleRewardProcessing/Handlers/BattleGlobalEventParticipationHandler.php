@@ -11,13 +11,10 @@ use App\Game\Events\Handlers\BaseGlobalEventGoalParticipationHandler;
 use App\Game\Events\Services\EventGoalsService;
 use Exception;
 
-class BattleGlobalEventParticipationHandler extends BaseGlobalEventGoalParticipationHandler {
-
-    /**
-     * @param RandomAffixGenerator $randomAffixGenerator
-     * @param EventGoalsService $eventGoalService
-     */
-    public function __construct(RandomAffixGenerator $randomAffixGenerator, EventGoalsService $eventGoalService) {
+class BattleGlobalEventParticipationHandler extends BaseGlobalEventGoalParticipationHandler
+{
+    public function __construct(RandomAffixGenerator $randomAffixGenerator, EventGoalsService $eventGoalService)
+    {
 
         parent::__construct($randomAffixGenerator, $eventGoalService);
     }
@@ -25,12 +22,12 @@ class BattleGlobalEventParticipationHandler extends BaseGlobalEventGoalParticipa
     /**
      * Handle updating the global; event participation
      *
-     * @param Character $character
-     * @param GlobalEventGoal $globalEventGoal
      * @return void
+     *
      * @throws Exception
      */
-    public function handleGlobalEventParticipation(Character $character, GlobalEventGoal $globalEventGoal) {
+    public function handleGlobalEventParticipation(Character $character, GlobalEventGoal $globalEventGoal)
+    {
         if ($globalEventGoal->total_kills >= $globalEventGoal->max_kills) {
             return;
         }
@@ -50,7 +47,6 @@ class BattleGlobalEventParticipationHandler extends BaseGlobalEventGoalParticipa
                 'next_reward_at' => $newAmount >= $globalEventGoal->max_kills ? $globalEventGoal->max_kills : $newAmount,
             ]);
         }
-
 
         event(new UpdateEventGoalProgress($this->eventGoalsService->getEventGoalData($character)));
 

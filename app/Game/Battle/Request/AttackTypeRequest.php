@@ -24,13 +24,14 @@ class AttackTypeRequest extends FormRequest
     public function rules()
     {
         return [
-            'attack_type' => 'string|required|in:attack,cast,attack_and_cast,cast_and_attack,defend'
+            'attack_type' => 'string|required|in:attack,cast,attack_and_cast,cast_and_attack,defend',
         ];
     }
 
-    public function messages() {
+    public function messages()
+    {
         return [
-            'attack_type.in' => 'Invalid Input.'
+            'attack_type.in' => 'Invalid Input.',
         ];
     }
 }

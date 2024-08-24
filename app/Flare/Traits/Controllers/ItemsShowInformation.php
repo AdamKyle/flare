@@ -2,8 +2,6 @@
 
 namespace App\Flare\Traits\Controllers;
 
-use Auth;
-use Illuminate\Contracts\View\View;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Item;
 use App\Flare\Models\Location;
@@ -11,33 +9,33 @@ use App\Flare\Models\Monster;
 use App\Flare\Models\Quest;
 use App\Flare\Values\ItemEffectsValue;
 use App\Game\Skills\Values\SkillTypeValue;
+use Illuminate\Contracts\View\View;
 
-trait ItemsShowInformation {
-
+trait ItemsShowInformation
+{
     /**
      * Renders show view.
      *
-     * @param string $viewName
-     * @param Item $item
      * @return View
+     *
      * @throws \Exception
      */
-    public function renderItemShow(string $viewName, Item $item) {
+    public function renderItemShow(string $viewName, Item $item)
+    {
         return view($viewName, $this->itemShowDetails($item));
     }
 
     /**
      * Get base details.
      *
-     * @param Item $item
-     * @return array
      * @throws \Exception
      */
-    public function itemShowDetails(Item $item): array {
+    public function itemShowDetails(Item $item): array
+    {
         $effects = 'N/A';
-        $skills  = [];
+        $skills = [];
 
-        if (!is_null($item->effect)) {
+        if (! is_null($item->effect)) {
             $effect = new ItemEffectsValue($item->effect);
 
             if ($effect->walkOnWater()) {
@@ -133,7 +131,7 @@ trait ItemsShowInformation {
             }
         }
 
-        if ($item->usable && !is_null($item->affects_skill_type)) {
+        if ($item->usable && ! is_null($item->affects_skill_type)) {
             $type = new SkillTypeValue($item->affects_skill_type);
 
             $query = GameSkill::where('type', $item->affects_skill_type);
@@ -145,14 +143,13 @@ trait ItemsShowInformation {
             $skills = $query->pluck('name')->toArray();
         }
 
-
         return [
-            'item'      => $item,
-            'monster'   => Monster::where('quest_item_id', $item->id)->first(),
-            'quest'     => Quest::where('item_id', $item->id)->orWhere('reward_item', $item->id)->first(),
-            'location'  => Location::where('quest_reward_item_id', $item->id)->first(),
-            'effects'   => $effects,
-            'skills'    => $skills,
+            'item' => $item,
+            'monster' => Monster::where('quest_item_id', $item->id)->first(),
+            'quest' => Quest::where('item_id', $item->id)->orWhere('reward_item', $item->id)->first(),
+            'location' => Location::where('quest_reward_item_id', $item->id)->first(),
+            'effects' => $effects,
+            'skills' => $skills,
         ];
     }
 }

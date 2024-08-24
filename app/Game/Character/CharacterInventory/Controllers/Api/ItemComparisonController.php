@@ -12,22 +12,24 @@ use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Character\CharacterInventory\Services\ComparisonService;
 use App\Http\Controllers\Controller;
 
-class ItemComparisonController extends Controller {
-
+class ItemComparisonController extends Controller
+{
     private ComparisonService $comparisonService;
 
     private CharacterInventoryService $characterInventoryService;
 
     private $gemBagService;
 
-    public function __construct(ComparisonService $comparisonService, CharacterInventoryService $characterInventoryService, CharacterGemBagService $gemBagService) {
-        $this->comparisonService         = $comparisonService;
+    public function __construct(ComparisonService $comparisonService, CharacterInventoryService $characterInventoryService, CharacterGemBagService $gemBagService)
+    {
+        $this->comparisonService = $comparisonService;
         $this->characterInventoryService = $characterInventoryService;
-        $this->gemBagService             = $gemBagService;
+        $this->gemBagService = $gemBagService;
     }
 
-    public function compareItem(ComparisonValidation $request, Character $character) {
-        $inventory   = Inventory::where('character_id', $character->id)->first();
+    public function compareItem(ComparisonValidation $request, Character $character)
+    {
+        $inventory = Inventory::where('character_id', $character->id)->first();
         $itemToEquip = InventorySlot::where('inventory_id', $inventory->id)->where('id', $request->slot_id)->first();
 
         if (is_null($itemToEquip)) {
@@ -45,23 +47,24 @@ class ItemComparisonController extends Controller {
         return response()->json($data);
     }
 
-    public function compareItemFromChat(ComparisonFromChatValidate $request, Character $character) {
-        $inventory   = Inventory::where('character_id', $character->id)->first();
+    public function compareItemFromChat(ComparisonFromChatValidate $request, Character $character)
+    {
+        $inventory = Inventory::where('character_id', $character->id)->first();
         $itemToEquip = InventorySlot::where('inventory_id', $inventory->id)->where('id', $request->id)->first();
 
         if (is_null($itemToEquip)) {
 
-            $gemSlot  = $character->gemBag->gemSlots->find($request->id);
+            $gemSlot = $character->gemBag->gemSlots->find($request->id);
 
-            if (!is_null($gemSlot)) {
+            if (! is_null($gemSlot)) {
                 return response()->json([
                     'comparison_data' => [
                         'itemToEquip' => [
                             'item' => $this->gemBagService->getGemData($character, $gemSlot),
                             'type' => 'gem',
-                        ]
+                        ],
                     ],
-                    'usable_sets'     => $this->characterInventoryService->setCharacter($character)->getInventoryForType('usable_sets')
+                    'usable_sets' => $this->characterInventoryService->setCharacter($character)->getInventoryForType('usable_sets'),
                 ]);
             }
         }
@@ -84,7 +87,7 @@ class ItemComparisonController extends Controller {
 
         return response()->json([
             'comparison_data' => $data,
-            'usable_sets'     => $this->characterInventoryService->setCharacter($character)->getInventoryForType('usable_sets')
+            'usable_sets' => $this->characterInventoryService->setCharacter($character)->getInventoryForType('usable_sets'),
         ]);
     }
 }

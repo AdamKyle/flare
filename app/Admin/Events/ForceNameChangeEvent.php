@@ -4,11 +4,11 @@ namespace App\Admin\Events;
 
 use App\Flare\Models\Character;
 use Illuminate\Broadcasting\Channel;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\SerializesModels;
 
 class ForceNameChangeEvent implements ShouldBroadcastNow
 {
@@ -17,14 +17,13 @@ class ForceNameChangeEvent implements ShouldBroadcastNow
     /**
      * Character whose name is being changed.
      *
-     * @var Character $character
+     * @var Character
      */
     public $character;
 
     /**
      * Create a new event instance.
      *
-     * @param Character $character
      * @return void
      */
     public function __construct(Character $character)
@@ -39,6 +38,6 @@ class ForceNameChangeEvent implements ShouldBroadcastNow
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('force-name-change-' . $this->character->user->id);
+        return new PrivateChannel('force-name-change-'.$this->character->user->id);
     }
 }

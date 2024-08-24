@@ -2,41 +2,34 @@
 
 namespace App\Game\Events\Jobs;
 
-use Illuminate\Bus\Queueable;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Bus\Dispatchable;
-use App\Flare\Jobs\WeeklyCelestialSpawnEvent as SpawnCancelingJob;
 use App\Flare\Models\Event;
 use App\Flare\Models\ScheduledEvent;
 use App\Game\Events\Values\EventType;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use Facades\App\Game\Core\Handlers\AnnouncementHandler;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Cache;
 
-class InitiateWeeklyCelestialSpawnEvent implements ShouldQueue {
-
+class InitiateWeeklyCelestialSpawnEvent implements ShouldQueue
+{
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    /**
-     * @var int $eventId
-     */
     protected int $eventId;
 
     /**
      * Create a new job instance.
-     *
-     * @param int $eventId
      */
-    public function __construct(int $eventId) {
-        $this->eventId   = $eventId;
+    public function __construct(int $eventId)
+    {
+        $this->eventId = $eventId;
     }
 
-    /**
-     * @return void
-     */
-    public function handle(): void {
+    public function handle(): void
+    {
 
         $event = ScheduledEvent::find($this->eventId);
 
@@ -53,9 +46,9 @@ class InitiateWeeklyCelestialSpawnEvent implements ShouldQueue {
         Cache::put('celestial-event-date', now()->addDay());
 
         Event::create([
-            'type'       => EventType::WEEKLY_CELESTIALS,
+            'type' => EventType::WEEKLY_CELESTIALS,
             'started_at' => now(),
-            'ends_at'    => now()->addDay()
+            'ends_at' => now()->addDay(),
         ]);
 
         event(new GlobalMessageEvent(

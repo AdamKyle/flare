@@ -22,80 +22,45 @@ use Illuminate\Database\Eloquent\Collection;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection as LeagueCollection;
 
-class CharacterInventoryService {
-
+class CharacterInventoryService
+{
     use ResponseBuilder;
 
     /**
-     * @var Character $character
+     * @var Character
      */
     private $character;
 
     /**
-     * @var InventorySlot $inventorySlot
+     * @var InventorySlot
      */
     private $inventorySlot;
 
     /**
-     * @var array $positions
+     * @var array
      */
     private $positions;
 
-    /**
-     * @var bool $isInventorySetIsEquipped
-     */
     private bool $isInventorySetIsEquipped = false;
 
-    /**
-     * @var string $inventorySetEquippedName
-     */
     private string $inventorySetEquippedName = '';
 
-    /**
-     * @var Collection $inventory
-     */
     private Collection $inventory;
 
-    /**
-     * @var InventoryTransformer $inventoryTransformer
-     */
     private InventoryTransformer $inventoryTransformer;
 
-    /**
-     * @var UsableItemTransformer $usableItemTransformer
-     */
     private UsableItemTransformer $usableItemTransformer;
 
-    /**
-     * @var MassDisenchantService $massDisenchantService
-     */
     private MassDisenchantService $massDisenchantService;
 
-    /**
-     * @var UpdateCharacterSkillsService $updateCharacterSkillsService
-     */
     private UpdateCharacterSkillsService $updateCharacterSkillsService;
 
-    /**
-     * @var UpdateCharacterAttackTypesHandler  $updateCharacterAttackTypesHandler
-     */
     private UpdateCharacterAttackTypesHandler $updateCharacterAttackTypesHandler;
 
-    /**
-     * @var Manager $manager
-     */
     private Manager $manager;
 
-    /**
-     * @param InventoryTransformer $inventoryTransformer
-     * @param UsableItemTransformer $usableItemTransformer
-     * @param MassDisenchantService $massDisenchantService
-     * @param UpdateCharacterSkillsService $updateCharacterSkillsService
-     * @param UpdateCharacterAttackTypesHandler $updateCharacterAttackTypesHandler
-     * @param Manager $manager
-     */
     public function __construct(
-        InventoryTransformer  $inventoryTransformer,
+        InventoryTransformer $inventoryTransformer,
         UsableItemTransformer $usableItemTransformer,
         MassDisenchantService $massDisenchantService,
         UpdateCharacterSkillsService $updateCharacterSkillsService,
@@ -103,21 +68,19 @@ class CharacterInventoryService {
         Manager $manager,
 
     ) {
-        $this->inventoryTransformer         = $inventoryTransformer;
-        $this->usableItemTransformer        = $usableItemTransformer;
-        $this->massDisenchantService        = $massDisenchantService;
+        $this->inventoryTransformer = $inventoryTransformer;
+        $this->usableItemTransformer = $usableItemTransformer;
+        $this->massDisenchantService = $massDisenchantService;
         $this->updateCharacterSkillsService = $updateCharacterSkillsService;
         $this->updateCharacterAttackTypesHandler = $updateCharacterAttackTypesHandler;
-        $this->manager                      = $manager;
+        $this->manager = $manager;
     }
 
     /**
      * Set the character
-     *
-     * @param Character $character
-     * @return CharacterInventoryService
      */
-    public function setCharacter(Character $character): CharacterInventoryService {
+    public function setCharacter(Character $character): CharacterInventoryService
+    {
         $this->character = $character;
 
         return $this;
@@ -125,11 +88,9 @@ class CharacterInventoryService {
 
     /**
      * Set the inventory slot
-     *
-     * @param InventorySlot $inventorySlot
-     * @return CharacterInventoryService
      */
-    public function setInventorySlot(InventorySlot $inventorySlot): CharacterInventoryService {
+    public function setInventorySlot(InventorySlot $inventorySlot): CharacterInventoryService
+    {
         $this->inventorySlot = $inventorySlot;
 
         return $this;
@@ -137,11 +98,9 @@ class CharacterInventoryService {
 
     /**
      * Set the positions
-     *
-     * @param array $positions
-     * @return CharacterInventoryService
      */
-    public function setPositions(array $positions): CharacterInventoryService {
+    public function setPositions(array $positions): CharacterInventoryService
+    {
         $this->positions = $positions;
 
         return $this;
@@ -149,31 +108,27 @@ class CharacterInventoryService {
 
     /**
      * Get api response.
-     *
-     * @return array
      */
-    public function getInventoryForApi(): array {
-        $equipped   = $this->fetchEquipped();
+    public function getInventoryForApi(): array
+    {
+        $equipped = $this->fetchEquipped();
         $usableSets = $this->getUsableSets();
 
         return [
-            'inventory'         => $this->fetchCharacterInventory(),
-            'usable_sets'       => $usableSets,
-            'savable_sets'      => $usableSets,
-            'equipped'          => !is_null($equipped) ? $equipped : [],
-            'sets'              => $this->getCharacterInventorySets(),
-            'quest_items'       => $this->getQuestItems(),
-            'usable_items'      => $this->getUsableItems(),
-            'set_is_equipped'   => $this->isInventorySetIsEquipped,
+            'inventory' => $this->fetchCharacterInventory(),
+            'usable_sets' => $usableSets,
+            'savable_sets' => $usableSets,
+            'equipped' => ! is_null($equipped) ? $equipped : [],
+            'sets' => $this->getCharacterInventorySets(),
+            'quest_items' => $this->getQuestItems(),
+            'usable_items' => $this->getUsableItems(),
+            'set_is_equipped' => $this->isInventorySetIsEquipped,
             'set_name_equipped' => $this->inventorySetEquippedName,
         ];
     }
 
-    /**
-     * @param string $type
-     * @return Collection|array
-     */
-    public function getInventoryForType(string $type): Collection|array {
+    public function getInventoryForType(string $type): Collection|array
+    {
         switch ($type) {
             case 'inventory':
                 return $this->fetchCharacterInventory();
@@ -181,11 +136,12 @@ class CharacterInventoryService {
             case 'savable_sets':
                 return $this->getUsableSets();
             case 'equipped':
-                $equipped   = $this->fetchEquipped();
-                return !is_null($equipped) ? $equipped : [];
+                $equipped = $this->fetchEquipped();
+
+                return ! is_null($equipped) ? $equipped : [];
             case 'sets':
                 return [
-                    'sets'         => $this->getCharacterInventorySets(),
+                    'sets' => $this->getCharacterInventorySets(),
                     'set_equipped' => InventorySet::where('character_id', $this->character->id)->where('is_equipped', true)->count() > 0,
                 ];
             case 'quest_items':
@@ -199,19 +155,16 @@ class CharacterInventoryService {
 
     /**
      * Gets the slot that holds the item, for its details.
-     *
-     * @param Character $character
-     * @param Item $item
-     * @return InventorySlot|SetSlot|null
      */
-    public function getSlotForItemDetails(Character $character, Item $item): InventorySlot | SetSlot | null {
+    public function getSlotForItemDetails(Character $character, Item $item): InventorySlot|SetSlot|null
+    {
 
         $slot = Inventory::where('character_id', $character->id)->first()->slots()->where('item_id', $item->id)->first();
 
         if (is_null($slot)) {
 
             $desiredSlot = $character->inventorySets()
-                ->whereHas('slots', function($query) use ($item) {
+                ->whereHas('slots', function ($query) use ($item) {
                     $query->where('item_id', $item->id);
                 })->first();
 
@@ -229,44 +182,40 @@ class CharacterInventoryService {
 
     /**
      * Disenchant all items in an inventory.
-     *
-     * @param Collection $slots
-     * @param Character $character
-     * @return array
      */
-    public function disenchantAllItems(Collection $slots, Character $character): array {
+    public function disenchantAllItems(Collection $slots, Character $character): array
+    {
 
         $maxedOutGoldDust = $character->gold_dust >= MaxCurrenciesValue::MAX_GOLD_DUST;
 
         $this->massDisenchantService->setUp($character)->disenchantItems($slots);
 
         $totalDisenchantingLevels = $this->massDisenchantService->getDisenchantingTimesLeveled();
-        $totalEnchantingLevels    = $this->massDisenchantService->getEnchantingTimesLeveled();
-        $totalGoldDust            = $this->massDisenchantService->getTotalGoldDust();
+        $totalEnchantingLevels = $this->massDisenchantService->getEnchantingTimesLeveled();
+        $totalGoldDust = $this->massDisenchantService->getTotalGoldDust();
 
         $this->updateCharacterSkillsService->updateCharacterCraftingSkills($character->refresh());
 
-        $message = 'Disenchanted all items and gained: ' . ($maxedOutGoldDust ? 0 . ' (You are capped ) ' :  number_format($totalGoldDust)) . ' Gold Dust (with gold dust rushes)';
+        $message = 'Disenchanted all items and gained: '.($maxedOutGoldDust ? 0 .' (You are capped ) ' : number_format($totalGoldDust)).' Gold Dust (with gold dust rushes)';
 
         if ($totalDisenchantingLevels > 0) {
-            $message .= ' You also gained: ' . $totalDisenchantingLevels . ' Skill Levels in Disenchanting.';
+            $message .= ' You also gained: '.$totalDisenchantingLevels.' Skill Levels in Disenchanting.';
         }
 
         if ($totalEnchantingLevels > 0) {
-            $message .= ' You also gained: ' . $totalEnchantingLevels . ' Skill Levels in Enchanting.';
+            $message .= ' You also gained: '.$totalEnchantingLevels.' Skill Levels in Enchanting.';
         }
 
         return $this->successResult([
-            'message' => $message
+            'message' => $message,
         ]);
     }
 
     /**
      * Get character inventory sets.
-     *
-     * @return array
      */
-    public function getCharacterInventorySets(): array {
+    public function getCharacterInventorySets(): array
+    {
         $sets = [];
 
         foreach ($this->character->inventorySets as $index => $inventorySet) {
@@ -274,18 +223,18 @@ class CharacterInventoryService {
             $slots = new LeagueCollection($inventorySet->slots, $this->inventoryTransformer);
 
             if (is_null($inventorySet->name)) {
-                $sets['Set ' . $index + 1] = [
-                    'items'      => array_reverse($this->manager->createData($slots)->toArray()),
+                $sets['Set '.$index + 1] = [
+                    'items' => array_reverse($this->manager->createData($slots)->toArray()),
                     'equippable' => $inventorySet->can_be_equipped,
-                    'set_id'     => $inventorySet->id,
-                    'equipped'   => $inventorySet->is_equipped,
+                    'set_id' => $inventorySet->id,
+                    'equipped' => $inventorySet->is_equipped,
                 ];
             } else {
                 $sets[$inventorySet->name] = [
-                    'items'      => array_reverse($this->manager->createData($slots)->toArray()),
+                    'items' => array_reverse($this->manager->createData($slots)->toArray()),
                     'equippable' => $inventorySet->can_be_equipped,
-                    'set_id'     => $inventorySet->id,
-                    'equipped'   => $inventorySet->is_equipped,
+                    'set_id' => $inventorySet->id,
+                    'equipped' => $inventorySet->is_equipped,
                 ];
             }
         }
@@ -299,31 +248,29 @@ class CharacterInventoryService {
      * - Either null if none.
      * - Equipped set name.
      * - Equipped set string id + 1
-     *
-     * @return string|null
      */
-    public function getEquippedInventorySetName(): string|null {
+    public function getEquippedInventorySetName(): ?string
+    {
         $equippedSet = $this->character->inventorySets()->where('is_equipped', true)->first();
 
         if (is_null($equippedSet)) {
             return null;
         }
 
-        if (!is_null($equippedSet->name)) {
+        if (! is_null($equippedSet->name)) {
             return $equippedSet->name;
         }
 
-        return 'Set ' . $this->character->inventorySets->search(function ($set) use ($equippedSet) {
+        return 'Set '.$this->character->inventorySets->search(function ($set) use ($equippedSet) {
             return $set->id === $equippedSet->id;
         }) + 1;
     }
 
     /**
      * Returns the usable items.
-     *
-     * @return array
      */
-    public function getUsableItems(): array {
+    public function getUsableItems(): array
+    {
         $inventory = Inventory::where('character_id', $this->character->id)->first();
 
         $slots = InventorySlot::where('inventory_slots.inventory_id', $inventory->id)->join('items', function ($join) {
@@ -338,10 +285,9 @@ class CharacterInventoryService {
 
     /**
      * Returns the quest items.
-     *
-     * @return array
      */
-    public function getQuestItems(): array {
+    public function getQuestItems(): array
+    {
         $inventory = Inventory::where('character_id', $this->character->id)->first();
 
         $slots = InventorySlot::where('inventory_slots.inventory_id', $inventory->id)->join('items', function ($join) {
@@ -359,11 +305,10 @@ class CharacterInventoryService {
      *
      * We return the index + 1 which refers to the slot number.
      * ie, index of 0, is Slot 1 and so on.
-     *
-     * @return array
      */
-    public function getUsableSets(): array {
-        $ids    = InventorySet::where('is_equipped', false)->where('character_id', $this->character->id)->pluck('id')->toArray();
+    public function getUsableSets(): array
+    {
+        $ids = InventorySet::where('is_equipped', false)->where('character_id', $this->character->id)->pluck('id')->toArray();
         $setIds = InventorySet::where('character_id', $this->character->id)->pluck('id')->toArray();
 
         $indexes = [];
@@ -371,12 +316,12 @@ class CharacterInventoryService {
         foreach ($ids as $id) {
             $inventorySet = InventorySet::find($id);
 
-            if (!$inventorySet->is_equipped) {
+            if (! $inventorySet->is_equipped) {
 
                 $indexes[] = [
-                    'index'    => array_search($id, $setIds) + 1,
-                    'id'       => $id,
-                    'name'     => is_null($inventorySet->name) ? 'Set ' . array_search($id, $setIds) + 1 : $inventorySet->name,
+                    'index' => array_search($id, $setIds) + 1,
+                    'id' => $id,
+                    'name' => is_null($inventorySet->name) ? 'Set '.array_search($id, $setIds) + 1 : $inventorySet->name,
                     'equipped' => $inventorySet->is_equipped,
                 ];
             }
@@ -390,10 +335,9 @@ class CharacterInventoryService {
      *
      *  - Does not include equipped, usable or quest items.
      *  - Only comes from inventory, does not include sets.
-     *
-     * @return Collection
      */
-    public function getInventoryCollection(): Collection {
+    public function getInventoryCollection(): Collection
+    {
 
         return $this->character
             ->inventory
@@ -407,10 +351,9 @@ class CharacterInventoryService {
      *
      * - Does not include equipped, usable or quest items.
      * - Only comes from inventory, does not include sets.
-     *
-     * @return array
      */
-    public function fetchCharacterInventory(): array {
+    public function fetchCharacterInventory(): array
+    {
 
         $slots = $this->getInventoryCollection();
 
@@ -424,10 +367,9 @@ class CharacterInventoryService {
      *
      * - Does not include alchemy or quest items.
      * - Items can also not be equipped.
-     *
-     * @return array
      */
-    public function findCharacterInventorySlotIds(): array {
+    public function findCharacterInventorySlotIds(): array
+    {
 
         return $this->character
             ->inventory
@@ -441,14 +383,13 @@ class CharacterInventoryService {
 
     /**
      * Fetch equipped items.
-     *
-     * @return array
      */
-    public function fetchEquipped(): array {
+    public function fetchEquipped(): array
+    {
 
         $inventory = Inventory::where('character_id', $this->character->id)->first();
 
-        $slots     = InventorySlot::where('inventory_id', $inventory->id)->where('equipped', true)->get();
+        $slots = InventorySlot::where('inventory_id', $inventory->id)->where('equipped', true)->get();
 
         if ($slots->isNotEmpty()) {
             $slots = new LeagueCollection($slots, $this->inventoryTransformer);
@@ -464,7 +405,7 @@ class CharacterInventoryService {
 
         $this->isInventorySetIsEquipped = true;
 
-        if (!is_null($inventorySet->name)) {
+        if (! is_null($inventorySet->name)) {
             $this->inventorySetEquippedName = $inventorySet->name;
         } else {
             $index = $this->character->inventorySets->search(function ($set) use ($inventorySet) {
@@ -472,7 +413,7 @@ class CharacterInventoryService {
             });
 
             if ($index !== false) {
-                $this->inventorySetEquippedName = 'Set ' . $index + 1;
+                $this->inventorySetEquippedName = 'Set '.$index + 1;
             }
         }
 
@@ -485,10 +426,9 @@ class CharacterInventoryService {
 
     /**
      * Set the inventory
-     *
-     * @return CharacterInventoryService
      */
-    public function setInventory(): CharacterInventoryService {
+    public function setInventory(): CharacterInventoryService
+    {
 
         $this->inventory = $this->getInventory();
 
@@ -497,14 +437,13 @@ class CharacterInventoryService {
 
     /**
      * Get inventory
-     *
-     * @return Collection
      */
-    protected function getInventory(): Collection {
+    protected function getInventory(): Collection
+    {
 
         $inventory = $this->character->inventory->slots()->whereIn('position', $this->positions)->get();
 
-        if (!$inventory->isEmpty()) {
+        if (! $inventory->isEmpty()) {
             return $inventory;
         }
 
@@ -522,31 +461,27 @@ class CharacterInventoryService {
 
     /**
      * Return the inventory
-     *
-     * @return Collection
      */
-    public function inventory(): Collection {
+    public function inventory(): Collection
+    {
         return $this->inventory;
     }
 
     /**
      * Fetches the type of the item.
      *
-     * @param Item $item
-     * @return string
      * @throws Exception
      */
-    public function getType(Item $item): string {
+    public function getType(Item $item): string
+    {
         return $this->fetchType($item->type);
     }
 
     /**
      * Delete an item from the inventory.
-     *
-     * @param int $slotId
-     * @return array
      */
-    public function deleteItem(int $slotId): array {
+    public function deleteItem(int $slotId): array
+    {
         $slot = $this->character->inventory->slots->filter(function ($slot) use ($slotId) {
             return $slot->id === $slotId;
         })->first();
@@ -569,7 +504,7 @@ class CharacterInventoryService {
 
         $slot->delete();
 
-        if (!is_null($item)) {
+        if (! is_null($item)) {
             $item->itemSkillProgressions()->delete();
 
             $item->delete();
@@ -578,10 +513,10 @@ class CharacterInventoryService {
         $this->character = $this->character->refresh();
 
         return $this->successResult([
-            'message' => 'Destroyed ' . $name . '.',
+            'message' => 'Destroyed '.$name.'.',
             'inventory' => [
                 'inventory' => $this->getInventoryForType('inventory'),
-            ]
+            ],
         ]);
     }
 
@@ -590,17 +525,16 @@ class CharacterInventoryService {
      *
      * - Will not destroy sets or items in sets.
      * - Will not destroy quest items or usable items.
-     *
-     * @return array
      */
-    public function destroyAllItemsInInventory(): array {
-        $slotIds   = $this->findCharacterInventorySlotIds();
+    public function destroyAllItemsInInventory(): array
+    {
+        $slotIds = $this->findCharacterInventorySlotIds();
 
-        $items     = $this->character->inventory->slots->where('item.type', 'artifact')->whereNotNull('item.itemSkillProgressions')->pluck('item.id')->toArray();
+        $items = $this->character->inventory->slots->where('item.type', 'artifact')->whereNotNull('item.itemSkillProgressions')->pluck('item.id')->toArray();
 
         $this->character->inventory->slots()->whereIn('id', $slotIds)->delete();
 
-        if (!empty($items)) {
+        if (! empty($items)) {
             $items = Item::whereIn('id', $items)->get();
 
             foreach ($items as $item) {
@@ -614,18 +548,17 @@ class CharacterInventoryService {
             'message' => 'Destroyed all items.',
             'inventory' => [
                 'inventory' => $this->getInventoryForType('inventory'),
-            ]
+            ],
         ]);
     }
 
     /**
      * Disenchant all items in the characters inventory.
-     *
-     * @return array
      */
-    public function disenchantAllItemsInInventory(): array {
-        $slots   = $this->getInventoryCollection()->filter(function ($slot) {
-            return (!is_null($slot->item->item_prefix_id) || !is_null($slot->item->item_suffix_id));
+    public function disenchantAllItemsInInventory(): array
+    {
+        $slots = $this->getInventoryCollection()->filter(function ($slot) {
+            return ! is_null($slot->item->item_prefix_id) || ! is_null($slot->item->item_suffix_id);
         })->values();
 
         if ($slots->isNotEmpty()) {
@@ -634,18 +567,17 @@ class CharacterInventoryService {
         }
 
         return $this->successResult([
-          'message' => 'You have nothing to disenchant.'
+            'message' => 'You have nothing to disenchant.',
         ]);
     }
 
     /**
      * Unequip an item from the player.
      *
-     * @param int $inventorySlotId
-     * @return array
      * @throws Exception
      */
-    public function unequipItem(int $inventorySlotId): array {
+    public function unequipItem(int $inventorySlotId): array
+    {
         if ($this->character->isInventoryFull()) {
 
             return $this->errorResult('Your inventory is full. Cannot unequip items. You have no room in your inventory.');
@@ -669,25 +601,25 @@ class CharacterInventoryService {
         event(new UpdateTopBarEvent($character->refresh()));
 
         return $this->successResult([
-            'message' => 'Unequipped item: ' . $foundItem->item->affix_name,
+            'message' => 'Unequipped item: '.$foundItem->item->affix_name,
             'inventory' => [
-                'inventory'         => $this->getInventoryForType('inventory'),
-                'equipped'          => $this->getInventoryForType('equipped'),
-                'sets'              => $this->getInventoryForType('sets')['sets'],
-                'set_is_equipped'   => false,
+                'inventory' => $this->getInventoryForType('inventory'),
+                'equipped' => $this->getInventoryForType('equipped'),
+                'sets' => $this->getInventoryForType('sets')['sets'],
+                'set_is_equipped' => false,
                 'set_name_equipped' => $this->getEquippedInventorySetName(),
-                'usable_sets'       => $this->getUsableSets()
-            ]
+                'usable_sets' => $this->getUsableSets(),
+            ],
         ]);
     }
 
     /**
      * Unequip all items.
      *
-     * @return array
      * @throws Exception
      */
-    public function unequipAllItems(): array {
+    public function unequipAllItems(): array
+    {
         if ($this->character->isInventoryFull()) {
             return $this->errorResult('Your inventory is full. Cannot unequip items. You have no room in your inventory.');
         }
@@ -706,23 +638,21 @@ class CharacterInventoryService {
         return $this->successResult([
             'message' => 'All items have been unequipped.',
             'inventory' => [
-                'inventory'         => $this->getInventoryForType('inventory'),
-                'equipped'          => $this->getInventoryForType('equipped'),
-                'set_is_equipped'   => false,
+                'inventory' => $this->getInventoryForType('inventory'),
+                'equipped' => $this->getInventoryForType('equipped'),
+                'set_is_equipped' => false,
                 'set_name_equipped' => $this->getEquippedInventorySetName(),
-                'sets'              => $this->getInventoryForType('sets')['sets'],
-                'usable_sets'       => $this->getUsableSets()
-            ]
+                'sets' => $this->getInventoryForType('sets')['sets'],
+                'usable_sets' => $this->getUsableSets(),
+            ],
         ]);
     }
 
     /**
      * Destroy Alchemy item.
-     *
-     * @param int $slotId
-     * @return array
      */
-    public function destroyAlchemyItem(int $slotId): array {
+    public function destroyAlchemyItem(int $slotId): array
+    {
         $slot = $this->character->inventory->slots->filter(function ($slot) use ($slotId) {
             return $slot->id === $slotId;
         })->first();
@@ -741,19 +671,18 @@ class CharacterInventoryService {
         event(new UpdateTopBarEvent($character));
 
         return $this->successResult([
-            'message' => 'Destroyed Alchemy Item: ' . $name . '.',
+            'message' => 'Destroyed Alchemy Item: '.$name.'.',
             'inventory' => [
-                'usable_items' => $this->getInventoryForType('usable_items')
-            ]
+                'usable_items' => $this->getInventoryForType('usable_items'),
+            ],
         ]);
     }
 
     /**
      * Destroy all alchemy items.
-     *
-     * @return array
      */
-    public function destroyAllAlchemyItems(): array {
+    public function destroyAllAlchemyItems(): array
+    {
         $slots = $this->character->inventory->slots->filter(function ($slot) {
             return $slot->item->type === 'alchemy';
         });
@@ -769,30 +698,28 @@ class CharacterInventoryService {
         return $this->successResult([
             'message' => 'Destroyed All Alchemy Items.',
             'inventory' => [
-                'usable_items' => $this->getInventoryForType('usable_items')
-            ]
+                'usable_items' => $this->getInventoryForType('usable_items'),
+            ],
         ]);
     }
 
     /**
      * Updates the character stats.
      *
-     * @param Character $character
-     * @return void
      * @throws Exception
      */
-    protected function updateCharacterAttackDataCache(Character $character): void {
+    protected function updateCharacterAttackDataCache(Character $character): void
+    {
         $this->updateCharacterAttackTypesHandler->updateCache($character);
     }
 
     /**
      * Fetch type based on accepted types.
      *
-     * @param string $type
-     * @return string
      * @throws Exception
      */
-    protected function fetchType(string $type): string {
+    protected function fetchType(string $type): string
+    {
 
         if (in_array($type, ArmourTypes::armourTypes())) {
             $type = 'armour';
@@ -808,6 +735,6 @@ class CharacterInventoryService {
             $type = 'spell';
         }
 
-        return !in_array($type, $acceptedTypes) ? throw new Exception('Unknown Item type: ' . $type) : $type;
+        return ! in_array($type, $acceptedTypes) ? throw new Exception('Unknown Item type: '.$type) : $type;
     }
 }

@@ -9,15 +9,15 @@ use Spatie\ShortSchedule\ShortSchedule;
 /**
  * @codeCoverageIgnore
  */
-class Kernel extends ConsoleKernel {
-
+class Kernel extends ConsoleKernel
+{
     /**
      * Define the application's command schedule.
      *
-     * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
      * @return void
      */
-    protected function schedule(Schedule $schedule) {
+    protected function schedule(Schedule $schedule)
+    {
 
         // Delete the flagged users once a month.
         $schedule->command('delete:flagged-users')->monthly()->timezone(config('app.timezone'));
@@ -55,6 +55,12 @@ class Kernel extends ConsoleKernel {
         // Determine if we should alert on new guide quest.
         $schedule->command('check:for-complete-guide-quests')->everySecond();
 
+        // See if we need to start a survey for a player while the feddback event is running.
+        $schedule->command('start:survey')->everyMinute();
+
+        // See if we have inactive sessions that need to be filled out.
+        $schedule->command('check:inactive-sessions')->everyFifteenMinutes();
+
         /**
          * Game Events:
          */
@@ -91,10 +97,9 @@ class Kernel extends ConsoleKernel {
      * Spatties short scheduler
      *
      * This allows commands to run very fast, as opposed to every minute at the least.
-     *
-     * @param ShortSchedule $schedule
      */
-    protected function shortSchedule(ShortSchedule $schedule) {
+    protected function shortSchedule(ShortSchedule $schedule)
+    {
         $schedule->command('update:map-count')->everySeconds(5);
     }
 

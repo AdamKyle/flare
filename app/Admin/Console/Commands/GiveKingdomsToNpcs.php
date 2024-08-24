@@ -3,15 +3,15 @@
 namespace App\Admin\Console\Commands;
 
 use App\Flare\Models\Character;
+use App\Flare\Models\User;
 use App\Game\Kingdoms\Events\UpdateGlobalMap;
 use App\Game\Kingdoms\Events\UpdateNPCKingdoms;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
-use App\Flare\Models\User;
 
-class GiveKingdomsToNpcs extends Command {
-
+class GiveKingdomsToNpcs extends Command
+{
     /**
      * The name and signature of the console command.
      *
@@ -41,11 +41,12 @@ class GiveKingdomsToNpcs extends Command {
      *
      * @return mixed
      */
-    public function handle() {
+    public function handle()
+    {
         $users = User::where('is_banned', true)
-                     ->where('unbanned_at', null)
-                     ->whereDate('updated_at', '<', Carbon::now()->subDays(7)->toDateTimeString())
-                     ->get();
+            ->where('unbanned_at', null)
+            ->whereDate('updated_at', '<', Carbon::now()->subDays(7)->toDateTimeString())
+            ->get();
 
         foreach ($users as $user) {
             $kingdoms = $user->character->kingdoms;
@@ -56,12 +57,13 @@ class GiveKingdomsToNpcs extends Command {
         }
     }
 
-    protected function giveNPCKingdoms(Collection $kingdoms, Character $character) {
+    protected function giveNPCKingdoms(Collection $kingdoms, Character $character)
+    {
         foreach ($kingdoms as $kingdom) {
             $kingdom->update([
-                'character_id'   => null,
-                'npc_owned'      => true,
-                'current_morale' => 0.10
+                'character_id' => null,
+                'npc_owned' => true,
+                'current_morale' => 0.10,
             ]);
 
             broadcast(new UpdateNPCKingdoms($kingdom->gameMap));

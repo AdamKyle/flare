@@ -24,16 +24,17 @@ class ReRollRandomEnchantment extends FormRequest
     public function rules()
     {
         return [
-            'selected_slot_id'     => 'required|integer|exists:inventory_slots,id',
-            'selected_affix'       => 'required|string|in:prefix,suffix,all-enchantments',
+            'selected_slot_id' => 'required|integer|exists:inventory_slots,id',
+            'selected_affix' => 'required|string|in:prefix,suffix,all-enchantments',
             'selected_reroll_type' => 'required|string|in:base,stats,skills,damage,resistance,everything',
         ];
     }
 
-    public function messages() {
+    public function messages()
+    {
         return [
-            'selected_slot_id.required'     => 'Invalid input.',
-            'selected_affix.required'       => 'Invalid input.',
+            'selected_slot_id.required' => 'Invalid input.',
+            'selected_affix.required' => 'Invalid input.',
             'selected_reroll_type.required' => 'Invalid input.',
         ];
     }

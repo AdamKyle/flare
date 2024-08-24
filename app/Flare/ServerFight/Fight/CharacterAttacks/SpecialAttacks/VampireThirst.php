@@ -1,27 +1,27 @@
 <?php
 
-
 namespace App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks;
 
 use App\Flare\Models\Character;
 use App\Flare\ServerFight\BattleBase;
 
-class VampireThirst extends BattleBase {
-
-    public function handleAttack(Character $character, array $attackData, bool $isPvp = false) {
+class VampireThirst extends BattleBase
+{
+    public function handleAttack(Character $character, array $attackData, bool $isPvp = false)
+    {
         $extraActionData = $this->characterCacheData->getCachedCharacterData($character, 'extra_action_chance');
 
-        if (!($extraActionData['chance'] >= 1)) {
-            if (!(rand(1, 100) > (100 - 100 * $extraActionData['chance']))) {
+        if (! ($extraActionData['chance'] >= 1)) {
+            if (! (rand(1, 100) > (100 - 100 * $extraActionData['chance']))) {
                 return;
             }
         }
 
-        $dur    = $this->characterCacheData->getCachedCharacterData($character, 'dur_modded');
+        $dur = $this->characterCacheData->getCachedCharacterData($character, 'dur_modded');
         $damage = $dur + $dur * 0.15;
 
         // If we are fighting celestials only use 50%.
-        if (!$isPvp) {
+        if (! $isPvp) {
             $damage = (int) ceil($damage / 2);
         }
 
@@ -36,8 +36,9 @@ class VampireThirst extends BattleBase {
         $this->doBaseAttack($character, $damage);
     }
 
-    protected function doBaseAttack(Character $character, int $damage, bool $isPvp = false) {
-        $this->monsterHealth   -= $damage;
+    protected function doBaseAttack(Character $character, int $damage, bool $isPvp = false)
+    {
+        $this->monsterHealth -= $damage;
         $this->characterHealth += $damage;
 
         $maxHealth = $this->characterCacheData->getCachedCharacterData($character, 'health');
@@ -46,10 +47,10 @@ class VampireThirst extends BattleBase {
             $this->characterHealth = $maxHealth;
         }
 
-        $this->addMessage('You hit for (thirst!) (and healed for) ' . number_format($damage), 'player-action', $isPvp);
+        $this->addMessage('You hit for (thirst!) (and healed for) '.number_format($damage), 'player-action', $isPvp);
 
         if ($isPvp) {
-            $this->addDefenderMessage('You are besieged from the shadows by the enemy. The blood of your life is being drained away!' . number_format($damage), 'enemy-action');
+            $this->addDefenderMessage('You are besieged from the shadows by the enemy. The blood of your life is being drained away!'.number_format($damage), 'enemy-action');
         }
     }
 }

@@ -32,6 +32,8 @@ jobs:
         rm -rf composer.lock
         composer install
         yarn install
+    - name: Type Check
+      run: yarn type-check
     - name: Generate key
       run: php artisan key:generate
     - name: Link Storage

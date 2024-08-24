@@ -2,49 +2,52 @@
 
 namespace Tests\Unit\Game\Character\Builders\AttackBuilders\Services;
 
-use Cache;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\Models\Character;
 use App\Flare\Values\SpellTypes;
 use App\Flare\Values\WeaponTypes;
 use App\Game\Character\Builders\AttackBuilders\Services\BuildCharacterAttackTypes;
+use Cache;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateItem;
 
-class BuildCharacterAttackTypesTest extends TestCase {
-
-    use RefreshDatabase, CreateItem;
+class BuildCharacterAttackTypesTest extends TestCase
+{
+    use CreateItem, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
     private ?BuildCharacterAttackTypes $buildCharacterAttackTypes;
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
         $this->useMockForAttackDataCache = false;
 
         parent::setUp();
 
-        $this->character = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
+        $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
 
         $this->buildCharacterAttackTypes = resolve(BuildCharacterAttackTypes::class);
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
 
         $this->character = null;
         $this->buildCharacterAttackTypes = null;
     }
 
-    private function setUpCharacterForTests(): Character {
+    private function setUpCharacterForTests(): Character
+    {
         $item = $this->createItem([
-            'type'        => WeaponTypes::STAVE,
+            'type' => WeaponTypes::STAVE,
             'base_damage' => 10,
         ]);
 
         $spellDamage = $this->createItem([
-            'type'        => SpellTypes::DAMAGE,
+            'type' => SpellTypes::DAMAGE,
             'base_damage' => 10,
         ]);
 
@@ -54,15 +57,16 @@ class BuildCharacterAttackTypesTest extends TestCase {
             ->getCharacter();
     }
 
-    public function testBuildCharacterAttackTypesData() {
+    public function testBuildCharacterAttackTypesData()
+    {
         $character = $this->setUpCharacterForTests();
 
-        Cache::delete('character-attack-data-' . $character->id);
+        Cache::delete('character-attack-data-'.$character->id);
 
         $this->buildCharacterAttackTypes->buildCache($character);
 
         $this->assertNotNull(
-            Cache::get('character-attack-data-' . $character->id)
+            Cache::get('character-attack-data-'.$character->id)
         );
     }
 }

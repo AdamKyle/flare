@@ -13,32 +13,16 @@ use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\NpcActions\LabyrinthOracle\Events\LabyrinthOracleUpdate;
 
-class InventorySetService {
-
+class InventorySetService
+{
     use ResponseBuilder;
 
-    /**
-     * @var SetHandsValidation $setHandsValidation
-     */
     private SetHandsValidation $setHandsValidation;
 
-    /**
-     * @var CharacterInventoryService $characterInventoryService
-     */
     private CharacterInventoryService $characterInventoryService;
 
-
-    /**
-     * @var UpdateCharacterAttackTypesHandler  $updateCharacterAttackTypesHandler
-     */
     private UpdateCharacterAttackTypesHandler $updateCharacterAttackTypesHandler;
 
-
-    /**
-     * @param SetHandsValidation $setHandsValidation
-     * @param CharacterInventoryService $characterInventoryService
-     * @param UpdateCharacterAttackTypesHandler $updateCharacterAttackTypesHandler
-     */
     public function __construct(
         SetHandsValidation $setHandsValidation,
         CharacterInventoryService $characterInventoryService,
@@ -51,15 +35,12 @@ class InventorySetService {
 
     /**
      * Allows us to add an item to an inventory set.
-     *
-     * @param InventorySet $inventorySet
-     * @param InventorySlot $slot
      */
     public function assignItemToSet(InventorySet $inventorySet, InventorySlot $slot): void
     {
         $inventorySet->slots()->create([
             'inventory_set_id' => $inventorySet->id,
-            'item_id'          => $slot->item_id,
+            'item_id' => $slot->item_id,
         ]);
 
         $inventorySet = $inventorySet->refresh();
@@ -74,15 +55,12 @@ class InventorySetService {
 
     /**
      * Put an item into the characters inventory set.
-     *
-     * @param InventorySet $set
-     * @param Item $item
      */
     public function putItemIntoSet(InventorySet $set, Item $item): void
     {
         $set->slots()->create([
             'inventory_set_id' => $set->id,
-            'item_id'          => $item->id
+            'item_id' => $item->id,
         ]);
 
         $set = $set->refresh();
@@ -95,15 +73,10 @@ class InventorySetService {
 
     /**
      * Move an item to a set.
-     *
-     * @param Character $character
-     * @param int $slotId
-     * @param int $setId
-     * @param bool $fireEvents
-     * @return array|null
      */
-    public function moveItemToSet(Character $character, int $slotId, int $setId, bool $fireEvents = true, bool $isLast = false): array|null {
-        $slot         = $character->inventory->slots()->find($slotId);
+    public function moveItemToSet(Character $character, int $slotId, int $setId, bool $fireEvents = true, bool $isLast = false): ?array
+    {
+        $slot = $character->inventory->slots()->find($slotId);
         $inventorySet = $character->inventorySets()->find($setId);
 
         if (is_null($slot) || is_null($inventorySet)) {
@@ -125,27 +98,27 @@ class InventorySetService {
             $characterInventoryService = $this->characterInventoryService->setCharacter($character);
 
             if (is_null($inventorySet->name)) {
-                $index     = $character->inventorySets->search(function ($set) use ($setId) {
+                $index = $character->inventorySets->search(function ($set) use ($setId) {
                     return $set->id === $setId;
                 });
 
                 return $this->successResult([
-                    'message'   => $itemName . ' Has been moved to: Set ' . $index + 1,
+                    'message' => $itemName.' Has been moved to: Set '.$index + 1,
                     'moved_to_set_name' => $inventorySet->name,
                     'inventory' => [
                         'inventory' => $characterInventoryService->getInventoryForType('inventory'),
-                        'sets'      => $characterInventoryService->getInventoryForType('sets')['sets']
-                    ]
+                        'sets' => $characterInventoryService->getInventoryForType('sets')['sets'],
+                    ],
                 ]);
             }
 
             return $this->successResult([
-                'message'   => $itemName . ' Has been moved to: ' . $inventorySet->name,
+                'message' => $itemName.' Has been moved to: '.$inventorySet->name,
                 'moved_to_set_name' => $inventorySet->name,
                 'inventory' => [
                     'inventory' => $characterInventoryService->getInventoryForType('inventory'),
-                    'sets'      => $characterInventoryService->getInventoryForType('sets')['sets']
-                ]
+                    'sets' => $characterInventoryService->getInventoryForType('sets')['sets'],
+                ],
             ]);
         }
 
@@ -157,7 +130,7 @@ class InventorySetService {
                     return $set->id === $setId;
                 });
 
-                $setName = 'Set ' + $index;
+                $setName = 'Set ' . $index;
             } else {
                 $setName = $inventorySet->name;
             }
@@ -166,8 +139,8 @@ class InventorySetService {
                 'moved_to_set_name' => $setName,
                 'inventory' => [
                     'inventory' => $characterInventoryService->getInventoryForType('inventory'),
-                    'sets' => $characterInventoryService->getInventoryForType('sets')['sets']
-                ]
+                    'sets' => $characterInventoryService->getInventoryForType('sets')['sets'],
+                ],
             ]);
         }
 
@@ -179,13 +152,9 @@ class InventorySetService {
      *
      * - Must own the inventory set
      * - Inventory set cannot be equipped.
-     *
-     * @param Character $character
-     * @param int $inventorySetId
-     * @param int $slotIdToRemove
-     * @return array
      */
-    public function removeItemFromInventorySet(Character $character, int $inventorySetId, int $slotIdToRemove): array {
+    public function removeItemFromInventorySet(Character $character, int $inventorySetId, int $slotIdToRemove): array
+    {
 
         $inventorySet = $character->inventorySets->find($inventorySetId);
 
@@ -205,19 +174,18 @@ class InventorySetService {
 
         $item = $slot->item;
 
-
-        if (!$this->putItemFromInventorySetBackIntoCharacterInventory($character, $inventorySet, $item)) {
+        if (! $this->putItemFromInventorySetBackIntoCharacterInventory($character, $inventorySet, $item)) {
             return $this->errorResult('Not enough inventory space to put this item back into your inventory.');
         }
 
-        if (!is_null($inventorySet->name)) {
+        if (! is_null($inventorySet->name)) {
             $setName = $inventorySet->name;
         } else {
-            $index     = $character->inventorySets->search(function ($set) use ($inventorySetId) {
+            $index = $character->inventorySets->search(function ($set) use ($inventorySetId) {
                 return $set->id === $inventorySetId;
             });
 
-            $setName = 'Set ' . $index + 1;
+            $setName = 'Set '.$index + 1;
         }
 
         event(new UpdateTopBarEvent($character));
@@ -227,22 +195,19 @@ class InventorySetService {
         $sets = $characterInventoryService->getInventoryForType('sets');
 
         return $this->successResult([
-            'message' => 'Removed ' . $item->affix_name . ' from ' . $setName . ' and placed back into your inventory.',
+            'message' => 'Removed '.$item->affix_name.' from '.$setName.' and placed back into your inventory.',
             'inventory' => [
                 'inventory' => $characterInventoryService->getInventoryForType('inventory'),
-                'sets'      => $sets['sets'],
-            ]
+                'sets' => $sets['sets'],
+            ],
         ]);
     }
 
     /**
      * Empty a characters set.
-     *
-     * @param Character $character
-     * @param InventorySet $inventorySet
-     * @return array
      */
-    public function emptySet(Character $character, InventorySet $inventorySet): array {
+    public function emptySet(Character $character, InventorySet $inventorySet): array
+    {
         if ($character->isInventoryFull()) {
             return $this->errorResult('Your inventory is full. Cannot remove items from set.');
         }
@@ -252,12 +217,12 @@ class InventorySetService {
         }
 
         $originalInventorySetCount = $inventorySet->slots->count();
-        $itemsRemoved              = 0;
+        $itemsRemoved = 0;
 
         // Only grab the amount of items your inventory can hold.
         foreach ($inventorySet->slots as $slot) {
             if ($this->putItemFromInventorySetBackIntoCharacterInventory($character, $inventorySet, $slot->item)) {
-                $itemsRemoved           += 1;
+                $itemsRemoved += 1;
 
                 continue;
             }
@@ -270,7 +235,7 @@ class InventorySetService {
         });
 
         if (is_null($inventorySet->name)) {
-            $setName = 'Set ' . $setIndex + 1;
+            $setName = 'Set '.$setIndex + 1;
         } else {
             $setName = $inventorySet->name;
         }
@@ -282,26 +247,27 @@ class InventorySetService {
         $inventory = $this->characterInventoryService->setCharacter($character);
 
         return $this->successResult([
-            'message' => 'Removed ' . $itemsRemoved . ' of ' . $originalInventorySetCount . ' items from ' . $setName . '. If all items were not moved over, it is because your inventory became full.',
+            'message' => 'Removed '.$itemsRemoved.' of '.$originalInventorySetCount.' items from '.$setName.'. If all items were not moved over, it is because your inventory became full.',
             'inventory' => [
                 'inventory' => $inventory->getInventoryForType('inventory'),
                 'sets' => $inventory->getInventoryForType('sets')['sets'],
-            ]
+            ],
         ]);
     }
 
-    public function putItemFromInventorySetBackIntoCharacterInventory(Character $character, InventorySet $inventorySet, Item $item): bool {
+    public function putItemFromInventorySetBackIntoCharacterInventory(Character $character, InventorySet $inventorySet, Item $item): bool
+    {
         if ($character->isInventoryFull()) {
             return false;
         }
 
-        $slotWithItem = $inventorySet->slots->filter(function($slot) use ($item) {
+        $slotWithItem = $inventorySet->slots->filter(function ($slot) use ($item) {
             return $slot->item_id === $item->id;
         })->first();
 
         $character->inventory->slots()->create([
             'inventory_id' => $character->inventory->id,
-            'item_id'      => $slotWithItem->item_id,
+            'item_id' => $slotWithItem->item_id,
         ]);
 
         $slotWithItem->delete();
@@ -315,22 +281,18 @@ class InventorySetService {
         return true;
     }
 
-
     /**
      * Equips an inventory set.
      *
      * Removes the existing equipped items.
      *
      * Return s a refreshed character.
-     *
-     * @param Character $character
-     * @param InventorySet $inventorySet
-     * @return Character
      */
-    public function equipInventorySet(Character $character, InventorySet $inventorySet): Character {
+    public function equipInventorySet(Character $character, InventorySet $inventorySet): Character
+    {
         $equippedInventorySet = $character->inventorySets()->where('is_equipped', true)->first();
 
-        if (!is_null($equippedInventorySet)) {
+        if (! is_null($equippedInventorySet)) {
             $equippedInventorySet->slots()->update(['equipped' => false]);
             $equippedInventorySet->update(['is_equipped' => false]);
         } else {
@@ -339,7 +301,7 @@ class InventorySetService {
 
         $data = [];
 
-        $armourPositions = ['body','leggings','feet','sleeves','sleeves','helmet','gloves'];
+        $armourPositions = ['body', 'leggings', 'feet', 'sleeves', 'sleeves', 'helmet', 'gloves'];
 
         foreach ($inventorySet->slots as $slot) {
             if ($slot->item->type === 'weapon') {
@@ -386,57 +348,54 @@ class InventorySetService {
 
     /**
      * Can un equip a set.
-     *
-     * @param InventorySet $inventorySet
      */
-    public function unEquipInventorySet(InventorySet $inventorySet): void {
+    public function unEquipInventorySet(InventorySet $inventorySet): void
+    {
         $inventorySet->slots()->update(['equipped' => false]);
         $inventorySet->update(['is_equipped' => false]);
     }
 
     /**
      * Checks to see if the set is equippable.
-     *
-     * @param InventorySet $inventorySet
-     * @return bool
      */
-    public function isSetEquippable(InventorySet $inventorySet): bool {
+    public function isSetEquippable(InventorySet $inventorySet): bool
+    {
 
         if ($inventorySet->slots->isEmpty()) {
             return true;
         }
 
         // Bail early as our hands are invalid.
-        if (!$this->setHandsValidation->isInventorySetHandPositionsValid($inventorySet)) {
+        if (! $this->setHandsValidation->isInventorySetHandPositionsValid($inventorySet)) {
             return false;
         }
 
-        $validArmour = ['body','leggings','feet','sleeves','helmet','gloves'];
+        $validArmour = ['body', 'leggings', 'feet', 'sleeves', 'helmet', 'gloves'];
 
         foreach ($validArmour as $armourType) {
             // If any of the armour we have in the set doesn't match the count of 1.
-            if (!$this->hasArmour($inventorySet, $armourType)) {
+            if (! $this->hasArmour($inventorySet, $armourType)) {
                 return false;
             }
         }
 
         // Bail if we have more than two trinkets
-        if (!$this->hasTrinkets($inventorySet)) {
+        if (! $this->hasTrinkets($inventorySet)) {
             return false;
         }
 
         // Bail if we have more than two rings.
-        if (!$this->hasRings($inventorySet)) {
+        if (! $this->hasRings($inventorySet)) {
             return false;
         }
 
         // Bail if we have more than two spells of either type.
-        if (!$this->hasSpells($inventorySet)) {
+        if (! $this->hasSpells($inventorySet)) {
             return false;
         }
 
         // Bail if we have more than two artifacts.
-        if (!$this->hasArtifacts($inventorySet)) {
+        if (! $this->hasArtifacts($inventorySet)) {
             return false;
         }
 
@@ -445,11 +404,9 @@ class InventorySetService {
 
     /**
      * Unequip a character set.
-     *
-     * @param Character $character
-     * @return array
      */
-    public function unequipSet(Character $character): array {
+    public function unequipSet(Character $character): array
+    {
         $inventorySet = $character->inventorySets()->where('is_equipped', true)->first();
         $inventoryIndex = $character->inventorySets->search(function ($set) {
             return $set->is_equipped;
@@ -459,9 +416,9 @@ class InventorySetService {
 
         $this->updateCharacterAttackDataCache($character);
 
-        $inventoryName = 'Set ' . $inventoryIndex + 1;
+        $inventoryName = 'Set '.$inventoryIndex + 1;
 
-        if (!is_null($inventorySet->name)) {
+        if (! is_null($inventorySet->name)) {
             $inventoryName = $inventorySet->name;
         }
 
@@ -470,27 +427,24 @@ class InventorySetService {
         $inventory = $this->characterInventoryService->setCharacter($character);
 
         return $this->successResult([
-            'message' => 'Unequipped ' . $inventoryName . '.',
+            'message' => 'Unequipped '.$inventoryName.'.',
             'inventory' => [
-                'inventory'         => $inventory->getInventoryForType('inventory'),
-                'equipped'          => $inventory->getInventoryForType('equipped'),
-                'sets'              => $inventory->getInventoryForType('sets')['sets'],
-                'set_is_equipped'   => false,
+                'inventory' => $inventory->getInventoryForType('inventory'),
+                'equipped' => $inventory->getInventoryForType('equipped'),
+                'sets' => $inventory->getInventoryForType('sets')['sets'],
+                'set_is_equipped' => false,
                 'set_name_equipped' => $inventory->getEquippedInventorySetName(),
-                'usable_sets'       => $inventory->getUsableSets()
-            ]
+                'usable_sets' => $inventory->getUsableSets(),
+            ],
         ]);
     }
 
     /**
      * Equip set.
-     *
-     * @param Character $character
-     * @param InventorySet $inventorySet
-     * @return array
      */
-    public function equipSet(Character $character, InventorySet $inventorySet): array {
-        if (!$inventorySet->can_be_equipped) {
+    public function equipSet(Character $character, InventorySet $inventorySet): array
+    {
+        if (! $inventorySet->can_be_equipped) {
             return $this->errorResult('Set cannot be equipped. It violates the set rules.');
         }
 
@@ -512,32 +466,31 @@ class InventorySetService {
 
         $characterInventoryService = $this->characterInventoryService->setCharacter($character);
 
-        $inventoryName = 'Set ' . $setIndex + 1;
+        $inventoryName = 'Set '.$setIndex + 1;
         $set = $inventorySet->refresh();
 
-        if (!is_null($set->name)) {
+        if (! is_null($set->name)) {
             $inventoryName = $set->name;
         }
 
         return $this->successResult([
-            'message' => $inventoryName .  ' is now equipped',
+            'message' => $inventoryName.' is now equipped',
             'inventory' => [
-                'equipped'          => $characterInventoryService->getInventoryForType('equipped'),
-                'sets'              => $characterInventoryService->getInventoryForType('sets')['sets'],
-                'set_is_equipped'   => true,
+                'equipped' => $characterInventoryService->getInventoryForType('equipped'),
+                'sets' => $characterInventoryService->getInventoryForType('sets')['sets'],
+                'set_is_equipped' => true,
                 'set_name_equipped' => $characterInventoryService->getEquippedInventorySetName(),
-            ]
+            ],
         ]);
     }
 
     /**
      * Updates the character stats.
      *
-     * @param Character $character
-     * @return void
      * @throws Exception
      */
-    protected function updateCharacterAttackDataCache(Character $character): void {
+    protected function updateCharacterAttackDataCache(Character $character): void
+    {
         $this->updateCharacterAttackTypesHandler->updateCache($character);
     }
 
@@ -545,13 +498,10 @@ class InventorySetService {
      * Is the type of armour being passed in a count of 1?
      *
      * If you have more than one piece of armour it's a no.
-     *
-     * @param InventorySet $inventorySet
-     * @param string $type
-     * @return bool
      */
-    protected function hasArmour(InventorySet $inventorySet, string $type) : bool {
-        $items = collect($inventorySet->slots->filter(function($slot) use ($type) {
+    protected function hasArmour(InventorySet $inventorySet, string $type): bool
+    {
+        $items = collect($inventorySet->slots->filter(function ($slot) use ($type) {
             return $slot->item->type === $type;
         })->all());
 
@@ -564,12 +514,10 @@ class InventorySetService {
 
     /**
      * Do you only have a max of 2 rings or less?
-     *
-     * @param InventorySet $inventorySet
-     * @return bool
      */
-    protected function hasRings(InventorySet $inventorySet): bool {
-        $rings = collect($inventorySet->slots->filter(function($slot) {
+    protected function hasRings(InventorySet $inventorySet): bool
+    {
+        $rings = collect($inventorySet->slots->filter(function ($slot) {
             return $slot->item->type === 'ring';
         }));
 
@@ -582,12 +530,10 @@ class InventorySetService {
 
     /**
      * Do you only have two trinkets?
-     *
-     * @param InventorySet $inventorySet
-     * @return bool
      */
-    protected function hasTrinkets(InventorySet $inventorySet): bool {
-        $trinkets = collect($inventorySet->slots->filter(function($slot) {
+    protected function hasTrinkets(InventorySet $inventorySet): bool
+    {
+        $trinkets = collect($inventorySet->slots->filter(function ($slot) {
             return $slot->item->type === 'trinket';
         }));
 
@@ -600,12 +546,10 @@ class InventorySetService {
 
     /**
      * Do you only have a max of 2 artifacts.
-     *
-     * @param InventorySet $inventorySet
-     * @return bool
      */
-    public function hasArtifacts(InventorySet $inventorySet): bool {
-        $artifacts = collect($inventorySet->slots->filter(function($slot) {
+    public function hasArtifacts(InventorySet $inventorySet): bool
+    {
+        $artifacts = collect($inventorySet->slots->filter(function ($slot) {
             return $slot->item->type === 'artifact';
         }));
 
@@ -620,13 +564,9 @@ class InventorySetService {
      * Rename inventory set.
      *
      * - name cannot match any other set name.
-     *
-     * @param Character $character
-     * @param $setId
-     * @param string $setName
-     * @return array
      */
-    public function renameInventorySet(Character $character, $setId, string $setName): array {
+    public function renameInventorySet(Character $character, $setId, string $setName): array
+    {
         $inventorySet = $character->inventorySets->firstWhere('id', $setId);
 
         if (is_null($inventorySet)) {
@@ -639,18 +579,18 @@ class InventorySetService {
         }
 
         $inventorySet->update([
-            'name' => $setName
+            'name' => $setName,
         ]);
 
         $inventory = $this->characterInventoryService->setCharacter($character->refresh());
 
         return $this->successResult([
-            'message' => 'Renamed set to: ' . $setName,
+            'message' => 'Renamed set to: '.$setName,
             'inventory' => [
-                'sets'         => $inventory->getInventoryForType('sets')['sets'],
-                'usable_sets'  => $inventory->getInventoryForType('usable_sets'),
+                'sets' => $inventory->getInventoryForType('sets')['sets'],
+                'usable_sets' => $inventory->getInventoryForType('usable_sets'),
                 'savable_sets' => $inventory->getInventoryForType('savable_sets'),
-            ]
+            ],
         ]);
     }
 
@@ -658,12 +598,9 @@ class InventorySetService {
      * Take what ever is equipped and save it to a set. Equip that set.
      *
      * - Set must be empty to save equipped to it.
-     *
-     * @param Character $character
-     * @param int $setId
-     * @return array
      */
-    public function saveEquippedItemsToSet(Character $character, int $setId): array {
+    public function saveEquippedItemsToSet(Character $character, int $setId): array
+    {
         $currentlyEquipped = $character->inventory->slots->filter(function ($slot) {
             return $slot->equipped;
         });
@@ -690,9 +627,9 @@ class InventorySetService {
             return $set->is_equipped;
         });
 
-        $setName = 'Set ' . $setIndex + 1;
+        $setName = 'Set '.$setIndex + 1;
 
-        if (!is_null($inventorySet->name)) {
+        if (! is_null($inventorySet->name)) {
             $setName = $inventorySet->name;
         }
 
@@ -701,13 +638,13 @@ class InventorySetService {
         $inventory = $this->characterInventoryService->setCharacter($character);
 
         return $this->successResult([
-            'message'   => $setName . ' is now equipped (equipment has been moved to the set).',
+            'message' => $setName.' is now equipped (equipment has been moved to the set).',
             'inventory' => [
-                'sets'            => $inventory->getInventoryForType('sets')['sets'],
-                'usable_sets'     => $inventory->getInventoryForType('usable_sets'),
-                'savable_sets'    => $inventory->getInventoryForType('savable_sets'),
+                'sets' => $inventory->getInventoryForType('sets')['sets'],
+                'usable_sets' => $inventory->getInventoryForType('usable_sets'),
+                'savable_sets' => $inventory->getInventoryForType('savable_sets'),
                 'set_is_equipped' => true,
-            ]
+            ],
         ]);
     }
 
@@ -716,15 +653,15 @@ class InventorySetService {
      *
      * Valid: 1 Heal, 1 Damage or 2 Heal no Damage or 2 Damage no Heal.
      *
-     * @param InventorySet $inventorySet
      * @return bool
      */
-    protected function hasSpells(InventorySet $inventorySet) {
-        $healingSpells = collect($inventorySet->slots->filter(function($slot) {
+    protected function hasSpells(InventorySet $inventorySet)
+    {
+        $healingSpells = collect($inventorySet->slots->filter(function ($slot) {
             return $slot->item->type === 'spell-healing';
         }));
 
-        $damageSpells = collect($inventorySet->slots->filter(function($slot) {
+        $damageSpells = collect($inventorySet->slots->filter(function ($slot) {
             return $slot->item->type === 'spell-damage';
         }));
 
@@ -747,19 +684,20 @@ class InventorySetService {
         return true;
     }
 
-    protected function containsValidSpecialTypeAmount(InventorySet $inventorySet): bool {
-        $amountOfUniques = $inventorySet->slots->filter(function($slot) {
-            return !$slot->item->is_mythic;
-        })->filter(function($slot) {
-            return !$slot->item->is_cosmic;
-        })->filter(function($slot) {
-            if (!is_null($slot->item->itemPrefix)) {
+    protected function containsValidSpecialTypeAmount(InventorySet $inventorySet): bool
+    {
+        $amountOfUniques = $inventorySet->slots->filter(function ($slot) {
+            return ! $slot->item->is_mythic;
+        })->filter(function ($slot) {
+            return ! $slot->item->is_cosmic;
+        })->filter(function ($slot) {
+            if (! is_null($slot->item->itemPrefix)) {
                 if ($slot->item->itemPrefix->randomly_generated) {
                     return $slot;
                 }
             }
 
-            if (!is_null($slot->item->itemSuffix)) {
+            if (! is_null($slot->item->itemSuffix)) {
                 if ($slot->item->itemSuffix->randomly_generated) {
                     return $slot;
                 }
@@ -799,27 +737,22 @@ class InventorySetService {
 
     /**
      * Set the position of equipment, except armour.
-     *
-     * @param SetSlot $slot
-     * @param array $data
-     * @param string $defaultPosition
-     * @param string $oppositePosition
-     * @return array
      */
-    protected function setPositionEquipData(SetSlot $slot, array $data, string $defaultPosition, string $oppositePosition): array {
-        $hasHand = collect($data)->search(function($item) use ($defaultPosition) {
+    protected function setPositionEquipData(SetSlot $slot, array $data, string $defaultPosition, string $oppositePosition): array
+    {
+        $hasHand = collect($data)->search(function ($item) use ($defaultPosition) {
             return $item['position'] === $defaultPosition;
         });
 
         if ($hasHand === false) {
             $data[$slot->id] = [
-                'item_id'  => $slot->item->id,
+                'item_id' => $slot->item->id,
                 'equipped' => true,
                 'position' => $defaultPosition,
             ];
         } else {
             $data[$slot->id] = [
-                'item_id'  => $slot->item->id,
+                'item_id' => $slot->item->id,
                 'equipped' => true,
                 'position' => $oppositePosition,
             ];
@@ -830,15 +763,11 @@ class InventorySetService {
 
     /**
      * Set the position of the armour.
-     *
-     * @param SetSlot $slot
-     * @param array $data
-     * @param string $position
-     * @return array
      */
-    protected function setArmourEquipData(SetSlot $slot, array $data, string $position): array {
+    protected function setArmourEquipData(SetSlot $slot, array $data, string $position): array
+    {
         $data[$slot->id] = [
-            'item_id'  => $slot->item->id,
+            'item_id' => $slot->item->id,
             'equipped' => true,
             'position' => $position,
         ];

@@ -9,24 +9,21 @@ use App\Flare\Models\InventorySlot;
 use App\Flare\Models\SetSlot;
 use Illuminate\Database\Eloquent\Collection;
 
-trait FetchEquipped {
-
+trait FetchEquipped
+{
     /**
      * Fetches the equipped items from player.
      *
      * Can return null.
-     *
-     * @param Character $character
-     * @return Collection|null
      */
-    public function fetchEquipped(Character $character): Collection|null
+    public function fetchEquipped(Character $character): ?Collection
     {
         $inventory = Inventory::where('character_id', $character->id)->first();
 
         // Somehow the character has no inventory, instead - lets mark them for deletion.
         // These could be characters who deleted their accounts and the deletion failed.
         if (is_null($inventory)) {
-            if (!$character->user->will_be_deleted) {
+            if (! $character->user->will_be_deleted) {
                 $character->user()->update([
                     'will_be_deleted' => true,
                 ]);
@@ -43,7 +40,7 @@ trait FetchEquipped {
 
         $inventorySet = InventorySet::where('character_id', $character->id)->where('is_equipped', true)->first();
 
-        if (!is_null($inventorySet)) {
+        if (! is_null($inventorySet)) {
             return SetSlot::where('inventory_set_id', $inventorySet->id)->with('item', 'item.itemSuffix', 'item.itemPrefix', 'item.appliedHolyStacks')->get();
         }
 

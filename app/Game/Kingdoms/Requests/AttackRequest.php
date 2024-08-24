@@ -28,12 +28,13 @@ class AttackRequest extends FormRequest
         ];
     }
 
-    public function messages() {
+    public function messages()
+    {
         return [
-            'units_to_move.required'     => 'Units to move are required',
-            'units_to_move.*.unit_id'    => 'At least one unit must be selected',
+            'units_to_move.required' => 'Units to move are required',
+            'units_to_move.*.unit_id' => 'At least one unit must be selected',
             'units_to_move.*.kingdom_id' => 'Missing kingdom this unit is from',
-            'units_to_move.*.amount'     => 'Missing amount of units to move',
+            'units_to_move.*.amount' => 'Missing amount of units to move',
         ];
     }
 }

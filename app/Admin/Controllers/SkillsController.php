@@ -2,64 +2,71 @@
 
 namespace App\Admin\Controllers;
 
+use App\Admin\Exports\Skills\SkillsExport;
+use App\Admin\Import\Skills\SkillsImport as ExcelImportSkills;
+use App\Admin\Requests\SkillsImport;
 use App\Admin\Services\AssignSkillService;
 use App\Flare\Models\GameClass;
+use App\Flare\Models\GameSkill;
 use App\Game\Skills\Values\SkillTypeValue;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
-use App\Http\Controllers\Controller;
-use App\Flare\Models\GameSkill;
-use App\Admin\Exports\Skills\SkillsExport;
-use App\Admin\Requests\SkillsImport;
-use App\Admin\Import\Skills\SkillsImport as ExcelImportSkills;
 
-class SkillsController extends Controller {
-
-    public function index() {
+class SkillsController extends Controller
+{
+    public function index()
+    {
         return view('admin.skills.skills');
     }
 
-    public function show(GameSkill $skill) {
+    public function show(GameSkill $skill)
+    {
         return view('admin.skills.skill', [
             'skill' => $skill,
         ]);
     }
 
-    public function create() {
+    public function create()
+    {
         return view('admin.skills.manage', [
-            'skill'      => null,
+            'skill' => null,
             'skillTypes' => SkillTypeValue::$namedValues,
-            'gameClasses' => GameClass::pluck('name', 'id')
+            'gameClasses' => GameClass::pluck('name', 'id'),
         ]);
     }
 
-    public function edit(GameSkill $skill) {
+    public function edit(GameSkill $skill)
+    {
         return view('admin.skills.manage', [
-            'skill'      => $skill,
+            'skill' => $skill,
             'skillTypes' => SkillTypeValue::$namedValues,
-            'gameClasses' => GameClass::pluck('name', 'id')
+            'gameClasses' => GameClass::pluck('name', 'id'),
         ]);
     }
 
-
-    public function store(Request $request) {
+    public function store(Request $request)
+    {
         $skill = GameSkill::updateOrCreate(['id' => $request->id], $request->all());
 
-        return response()->redirectToRoute('skills.skill', ['skill' => $skill->id])->with('success', $skill->name. ' was saved successfully.');
+        return response()->redirectToRoute('skills.skill', ['skill' => $skill->id])->with('success', $skill->name.' was saved successfully.');
     }
 
-    public function exportSkills() {
+    public function exportSkills()
+    {
         return view('admin.skills.export');
     }
 
-    public function importSkills() {
+    public function importSkills()
+    {
         return view('admin.skills.import');
     }
 
     /**
      * @codeCoverageIgnore
      */
-    public function export() {
+    public function export()
+    {
         $response = Excel::download(new SkillsExport, 'skills.xlsx', \Maatwebsite\Excel\Excel::XLSX);
         ob_end_clean();
 
@@ -69,7 +76,8 @@ class SkillsController extends Controller {
     /**
      * @codeCoverageIgnore
      */
-    public function importData(SkillsImport $request, AssignSkillService $assignSkillService) {
+    public function importData(SkillsImport $request, AssignSkillService $assignSkillService)
+    {
         Excel::import(new ExcelImportSkills, $request->skills_import, null, \Maatwebsite\Excel\Excel::XLSX);
 
         $assignSkillService->assignSkills();

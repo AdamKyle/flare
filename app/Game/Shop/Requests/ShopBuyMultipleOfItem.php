@@ -28,7 +28,8 @@ class ShopBuyMultipleOfItem extends FormRequest
         ];
     }
 
-    public function messages() {
+    public function messages()
+    {
         return [
             'item_name.required' => 'What are you trying to buy multiple of child?',
             'item_name.exists' => 'Item does not exist at all ...Huh?',

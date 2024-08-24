@@ -2,8 +2,8 @@
 
 namespace Database\Factories;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Flare\Models\CharacterInCelestialFight;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 class CharacterInCelestialFightFactory extends Factory
 {
@@ -22,9 +22,9 @@ class CharacterInCelestialFightFactory extends Factory
     public function definition()
     {
         return [
-            'character_id'             => null,
-            'celestial_fight_id'       => null,
-            'character_max_health'     => null,
+            'character_id' => null,
+            'celestial_fight_id' => null,
+            'character_max_health' => null,
             'character_current_health' => null,
         ];
     }

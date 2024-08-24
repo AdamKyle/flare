@@ -62,10 +62,24 @@ return [
             'visibility' => 'public',
         ],
 
+        'suggestions-and-bugs' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/suggestions_bugs_screen_shots'),
+            'url' => env('APP_URL').'/storage/suggestions_bugs_screen_shots',
+            'visibility' => 'public',
+        ],
+
         'info-sections-images' => [
             'driver' => 'local',
             'root' => storage_path('app/public/info-sections-images'),
             'url' => env('APP_URL').'/storage/info-sections-images',
+            'visibility' => 'public',
+        ],
+
+        'generated-monsters-and-bugs' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/generated-monsters-and-bugs'),
+            'url' => env('APP_URL').'/storage/generated-monsters-and-bugs',
             'visibility' => 'public',
         ],
 

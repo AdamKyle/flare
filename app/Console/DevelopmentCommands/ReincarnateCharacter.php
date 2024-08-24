@@ -7,8 +7,8 @@ use App\Game\Reincarnate\Services\CharacterReincarnateService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Artisan;
 
-class ReincarnateCharacter extends Command {
-
+class ReincarnateCharacter extends Command
+{
     /**
      * The name and signature of the console command.
      *
@@ -28,12 +28,13 @@ class ReincarnateCharacter extends Command {
      *
      * @return void
      */
-    public function handle(CharacterReincarnateService $characterReincarnateService) {
-        $name      = $this->argument('characterName');
+    public function handle(CharacterReincarnateService $characterReincarnateService)
+    {
+        $name = $this->argument('characterName');
         $character = Character::where('name', $name)->first();
 
         if (is_null($character)) {
-            $this->error('No Character found for name: ' . $name);
+            $this->error('No Character found for name: '.$name);
 
             return;
         }
@@ -42,19 +43,16 @@ class ReincarnateCharacter extends Command {
 
         $character = $this->reincarnateCharacter($character, $characterReincarnateService);
 
-        Artisan::call('level:character ' . $character->id . ' ' . 4999);
+        Artisan::call('level:character '.$character->id.' '. 4999);
 
         $this->line('reincarnation is done, character max stats are now 9,999,999,999. Character also leveled back to max level.');
     }
 
     /**
      * Reincarnate character.
-     *
-     * @param Character $character
-     * @param CharacterReincarnateService $characterReincarnateService
-     * @return Character
      */
-    protected function reincarnateCharacter(Character $character, CharacterReincarnateService $characterReincarnateService): Character {
+    protected function reincarnateCharacter(Character $character, CharacterReincarnateService $characterReincarnateService): Character
+    {
         $result = $characterReincarnateService->doReincarnation($character);
 
         $character = $character->refresh();

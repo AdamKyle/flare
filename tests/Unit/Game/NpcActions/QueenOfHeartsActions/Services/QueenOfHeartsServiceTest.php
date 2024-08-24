@@ -3,36 +3,38 @@
 namespace Tests\Unit\Game\NpcActions\QueenOfHeartsActions\Services;
 
 use App\Flare\Values\ItemEffectsValue;
-use App\Game\Messages\Events\GlobalMessageEvent;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Event;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
+use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\NpcActions\QueenOfHeartsActions\Events\UpdateQueenOfHeartsPanel;
 use App\Game\NpcActions\QueenOfHeartsActions\Services\QueenOfHeartsService;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Event;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateGameMap;
 use Tests\Traits\CreateItem;
 
-class QueenOfHeartsServiceTest extends TestCase {
-
-    use RefreshDatabase, CreateItem, CreateGameMap;
+class QueenOfHeartsServiceTest extends TestCase
+{
+    use CreateGameMap, CreateItem, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
     private ?QueenOfHeartsService $queenOfHeartsService;
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
 
         parent::setUp();
 
-        $this->character = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
+        $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
         $this->queenOfHeartsService = resolve(QueenOfHeartsService::class);
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
 
         parent::tearDown();
 
@@ -40,7 +42,8 @@ class QueenOfHeartsServiceTest extends TestCase {
         $this->queenOfHeartsService = null;
     }
 
-    public function testNotInHell() {
+    public function testNotInHell()
+    {
         Event::fake();
 
         $character = $this->character->getCharacter();
@@ -53,7 +56,8 @@ class QueenOfHeartsServiceTest extends TestCase {
         $this->assertEquals(422, $result['status']);
     }
 
-    public function testCannotPurchaseWhenInventoryIsFull() {
+    public function testCannotPurchaseWhenInventoryIsFull()
+    {
         $questItem = $this->createItem(['effect' => ItemEffectsValue::QUEEN_OF_HEARTS]);
 
         $character = $this->character->inventoryManagement()->giveItem($questItem)->getCharacter();
@@ -74,7 +78,8 @@ class QueenOfHeartsServiceTest extends TestCase {
         $this->assertEquals(422, $result['status']);
     }
 
-    public function testCannotPurchaseWhenYouHaveNoGold() {
+    public function testCannotPurchaseWhenYouHaveNoGold()
+    {
         $questItem = $this->createItem(['effect' => ItemEffectsValue::QUEEN_OF_HEARTS]);
 
         $character = $this->character->inventoryManagement()->giveItem($questItem)->getCharacter();
@@ -95,7 +100,8 @@ class QueenOfHeartsServiceTest extends TestCase {
         $this->assertEquals(422, $result['status']);
     }
 
-    public function testPurchaseUnique() {
+    public function testPurchaseUnique()
+    {
         Event::fake();
 
         $questItem = $this->createItem(['effect' => ItemEffectsValue::QUEEN_OF_HEARTS]);
@@ -125,7 +131,8 @@ class QueenOfHeartsServiceTest extends TestCase {
         $this->assertLessThan(MaxCurrenciesValue::MAX_GOLD, $character->gold);
     }
 
-    public function testCannotReRollForItemThatDoesntExist() {
+    public function testCannotReRollForItemThatDoesntExist()
+    {
         $character = $this->character->getCharacter();
 
         $result = $this->queenOfHeartsService->reRollUnique($character, 1, 'all-enchantments', 'everything');
@@ -134,7 +141,8 @@ class QueenOfHeartsServiceTest extends TestCase {
         $this->assertEquals(422, $result['status']);
     }
 
-    public function testCannotReRollWhenNotInHell() {
+    public function testCannotReRollWhenNotInHell()
+    {
         Event::fake();
 
         $character = $this->character->inventoryManagement()->giveItem($this->createItem())->getCharacter();
@@ -149,8 +157,9 @@ class QueenOfHeartsServiceTest extends TestCase {
         $this->assertEquals(422, $result['status']);
     }
 
-    public function testCannotReRollWhenCantAfford() {
-        $gameMap   = $this->createGameMap(['name' => 'Hell']);
+    public function testCannotReRollWhenCantAfford()
+    {
+        $gameMap = $this->createGameMap(['name' => 'Hell']);
 
         $character = $this->character->inventoryManagement()
             ->giveItem($this->createItem(['effect' => ItemEffectsValue::QUEEN_OF_HEARTS]))
@@ -176,10 +185,11 @@ class QueenOfHeartsServiceTest extends TestCase {
         $this->assertEquals(422, $result['status']);
     }
 
-    public function testCanReRoll() {
+    public function testCanReRoll()
+    {
         Event::fake();
 
-        $gameMap   = $this->createGameMap(['name' => 'Hell']);
+        $gameMap = $this->createGameMap(['name' => 'Hell']);
 
         $character = $this->character->inventoryManagement()
             ->giveItem($this->createItem(['effect' => ItemEffectsValue::QUEEN_OF_HEARTS]))
@@ -206,7 +216,8 @@ class QueenOfHeartsServiceTest extends TestCase {
         $this->assertEquals(200, $result['status']);
     }
 
-    public function testCannotMoveEnchantmentsWhenNotInHell() {
+    public function testCannotMoveEnchantmentsWhenNotInHell()
+    {
         Event::fake();
 
         $character = $this->character->getCharacter();
@@ -219,7 +230,8 @@ class QueenOfHeartsServiceTest extends TestCase {
         $this->assertEquals(422, $result['status']);
     }
 
-    public function testCannotMoveEnchantmentsWhenItemsDoNotExist() {
+    public function testCannotMoveEnchantmentsWhenItemsDoNotExist()
+    {
         $questItem = $this->createItem(['effect' => ItemEffectsValue::QUEEN_OF_HEARTS]);
 
         $character = $this->character->inventoryManagement()->giveItem($questItem)->getCharacter();
@@ -240,7 +252,8 @@ class QueenOfHeartsServiceTest extends TestCase {
         $this->assertEquals(422, $result['status']);
     }
 
-    public function testCannotMoveEnchantmentsWhenCannotAfford() {
+    public function testCannotMoveEnchantmentsWhenCannotAfford()
+    {
         $questItem = $this->createItem(['effect' => ItemEffectsValue::QUEEN_OF_HEARTS]);
 
         $character = $this->character->inventoryManagement()->giveItem($questItem)->giveItem($this->createItem(['name' => 'Sample', 'type' => 'weapon']))->getCharacter();
@@ -254,7 +267,7 @@ class QueenOfHeartsServiceTest extends TestCase {
         $character->map()->update(['game_map_id' => $gameMap->id]);
 
         $character->update([
-            'gold' => MaxCurrenciesValue::MAX_GOLD
+            'gold' => MaxCurrenciesValue::MAX_GOLD,
         ]);
 
         $character = $character->refresh();
@@ -270,7 +283,7 @@ class QueenOfHeartsServiceTest extends TestCase {
         })->first();
 
         $slotToMoveTo = $character->inventory->slots->filter(function ($slot) {
-            return !$slot->item->is_unique;
+            return ! $slot->item->is_unique;
         })->first();
 
         $result = $this->queenOfHeartsService->moveAffixes($character, $slotWithUnique->id, $slotToMoveTo->id, 'all-enchantments');
@@ -279,7 +292,8 @@ class QueenOfHeartsServiceTest extends TestCase {
         $this->assertEquals(422, $result['status']);
     }
 
-    public function testCannotMoveEnchantmentsWhenInvalidItemTypeForItemToMoveTo() {
+    public function testCannotMoveEnchantmentsWhenInvalidItemTypeForItemToMoveTo()
+    {
         $questItem = $this->createItem(['effect' => ItemEffectsValue::QUEEN_OF_HEARTS]);
 
         $character = $this->character->inventoryManagement()->giveItem($questItem)->giveItem($this->createItem(['name' => 'Sample', 'type' => 'artifact']))->getCharacter();
@@ -289,7 +303,7 @@ class QueenOfHeartsServiceTest extends TestCase {
         $character->map()->update(['game_map_id' => $gameMap->id]);
 
         $character->update([
-            'gold' => MaxCurrenciesValue::MAX_GOLD
+            'gold' => MaxCurrenciesValue::MAX_GOLD,
         ]);
 
         $character = $character->refresh();
@@ -314,7 +328,8 @@ class QueenOfHeartsServiceTest extends TestCase {
         $this->assertEquals(422, $result['status']);
     }
 
-    public function testCannotMoveEnchantmentsWhenInvalidItemTypeForItemToMoveFrom() {
+    public function testCannotMoveEnchantmentsWhenInvalidItemTypeForItemToMoveFrom()
+    {
         $questItem = $this->createItem(['effect' => ItemEffectsValue::QUEEN_OF_HEARTS]);
 
         $character = $this->character->inventoryManagement()->giveItem($questItem)->giveItem($this->createItem(['name' => 'Sample', 'type' => 'spell-damage']))->getCharacter();
@@ -324,7 +339,7 @@ class QueenOfHeartsServiceTest extends TestCase {
         $character->map()->update(['game_map_id' => $gameMap->id]);
 
         $character->update([
-            'gold' => MaxCurrenciesValue::MAX_GOLD
+            'gold' => MaxCurrenciesValue::MAX_GOLD,
         ]);
 
         $character = $character->refresh();
@@ -355,7 +370,8 @@ class QueenOfHeartsServiceTest extends TestCase {
         $this->assertEquals(422, $result['status']);
     }
 
-    public function testCanMoveEnchantments() {
+    public function testCanMoveEnchantments()
+    {
         $questItem = $this->createItem(['effect' => ItemEffectsValue::QUEEN_OF_HEARTS]);
 
         $character = $this->character->inventoryManagement()->giveItem($questItem)->giveItem($this->createItem(['name' => 'Sample', 'type' => 'weapon']))->getCharacter();
@@ -369,9 +385,9 @@ class QueenOfHeartsServiceTest extends TestCase {
         $character->map()->update(['game_map_id' => $gameMap->id]);
 
         $character->update([
-            'gold'      => MaxCurrenciesValue::MAX_GOLD,
+            'gold' => MaxCurrenciesValue::MAX_GOLD,
             'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
-            'shards'    => MaxCurrenciesValue::MAX_SHARDS,
+            'shards' => MaxCurrenciesValue::MAX_SHARDS,
         ]);
 
         $character = $character->refresh();
@@ -385,7 +401,7 @@ class QueenOfHeartsServiceTest extends TestCase {
         })->first();
 
         $slotToMoveTo = $character->inventory->slots->filter(function ($slot) {
-            return !$slot->item->is_unique;
+            return ! $slot->item->is_unique;
         })->first();
 
         $result = $this->queenOfHeartsService->moveAffixes($character, $slotWithUnique->id, $slotToMoveTo->id, 'all-enchantments');

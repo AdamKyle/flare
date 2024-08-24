@@ -1,6 +1,6 @@
 <?php
 
-Route::middleware(['auth', 'is.admin'])->group(function() {
+Route::middleware(['auth', 'is.admin'])->group(function () {
     Route::get('/admin/chat-messages', ['uses' => 'Api\AdminMessagesController@index']);
 
     Route::get('/admin/site-statistics/all-time-sign-in', ['uses' => 'Api\SiteAccessStatisticsController@fetchLoggedInAllTime']);
@@ -22,7 +22,11 @@ Route::middleware(['auth', 'is.admin'])->group(function() {
     Route::post('/admin/delete-event', ['uses' => 'Api\EventScheduleController@deleteEvent']);
     Route::post('/admin/create-multiple-events', ['uses' => 'Api\EventScheduleController@createMultipleEvents']);
 
-
     route::get('admin/map-manager/{gameMap}', ['uses' => 'Api\MapManagerController@getMapData']);
     route::post('admin/map-manager/move-location/{location}', ['uses' => 'Api\MapManagerController@moveLocation']);
+
+    route::get('admin/fetch-survey/{survey}', ['uses' => 'Api\SurveyController@fetchSurvey']);
+    route::post('admin/create-new-survey', ['uses' => 'Api\SurveyController@createSurvey']);
+    route::post('admin/save-survey/{survey}', ['uses' => 'Api\SurveyController@saveSurvey']);
+
 });

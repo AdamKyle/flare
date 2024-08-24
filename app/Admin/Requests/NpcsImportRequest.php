@@ -27,7 +27,7 @@ class NpcsImportRequest extends FormRequest
     public function rules()
     {
         return [
-            'npcs_import' => 'required|mimes:xlsx|max:2048'
+            'npcs_import' => 'required|mimes:xlsx|max:2048',
         ];
     }
 
@@ -36,11 +36,12 @@ class NpcsImportRequest extends FormRequest
      *
      * @return array
      */
-    public function messages() {
+    public function messages()
+    {
         return [
-            'npcs_import.required'   => 'Npcs import file is required.',
-            'npcs_import.mime'       => 'The system only accepts xlsx files.',
-            'npcs_import.max'        => 'File to large, the system only accepts a max size of 2MB.',
+            'npcs_import.required' => 'Npcs import file is required.',
+            'npcs_import.mime' => 'The system only accepts xlsx files.',
+            'npcs_import.max' => 'File to large, the system only accepts a max size of 2MB.',
         ];
     }
 }

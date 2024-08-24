@@ -4,18 +4,17 @@ namespace App\Flare\Cache;
 
 use Cache;
 
-class CoordinatesCache {
-
+class CoordinatesCache
+{
     /**
      * Fetches the coordinates from cache or builds them into cache.
-     *
-     * @return array
      */
-    public function getFromCache(): array {
+    public function getFromCache(): array
+    {
         $coordinates = Cache::get('coordinates');
 
         if (is_null($coordinates)) {
-            return Cache::rememberForever('coordinates', function() {
+            return Cache::rememberForever('coordinates', function () {
                 return [
                     'x' => $this->buildXCoordinates(),
                     'y' => $this->buildYCoordinates(),
@@ -28,13 +27,12 @@ class CoordinatesCache {
 
     /**
      * Builds the x coordinates
-     *
-     * @return array
      */
-    public function buildXCoordinates(): array {
+    public function buildXCoordinates(): array
+    {
 
         $start = 0;
-        $max   = 2496;
+        $max = 2496;
         $coordinates = [$start];
 
         $current = $start;
@@ -43,20 +41,19 @@ class CoordinatesCache {
             $current += 16;
 
             array_push($coordinates, $current);
-        };
+        }
 
         return $coordinates;
     }
 
     /**
      * Builds the y coordinates
-     *
-     * @return array
      */
-    public function buildYCoordinates(): array {
+    public function buildYCoordinates(): array
+    {
 
         $start = 16;
-        $max   = 2496;
+        $max = 2496;
         $coordinates = [$start];
 
         $current = $start;
@@ -67,7 +64,7 @@ class CoordinatesCache {
             if ($current <= $max) {
                 array_push($coordinates, $current);
             }
-        };
+        }
 
         return $coordinates;
     }

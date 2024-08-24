@@ -26,9 +26,10 @@ class AssignNewFactionsToCharacters extends Command
     /**
      * Execute the console command.
      */
-    public function handle() {
+    public function handle()
+    {
 
-        Character::chunkById(250, function($characters) {
+        Character::chunkById(250, function ($characters) {
             foreach ($characters as $character) {
                 foreach (GameMap::all() as $gameMap) {
 
@@ -38,7 +39,7 @@ class AssignNewFactionsToCharacters extends Command
 
                     $faction = $character->factions()->where('game_map_id', $gameMap->id)->first();
 
-                    if (!is_null($faction)) {
+                    if (! is_null($faction)) {
                         continue;
                     }
 

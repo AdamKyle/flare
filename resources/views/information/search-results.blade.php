@@ -74,19 +74,3 @@
         @endif
     </x-core.layout.info-container>
 @endsection
-
-@push('scripts')
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            var form  = document.getElementById('search-form');
-            var input = form.querySelector('input[name="info_search"]');
-
-            input.addEventListener('keypress', function (event) {
-                if (event.key === 'Enter') {
-                    event.preventDefault();
-                    form.submit();
-                }
-            });
-        });
-    </script>
-@endpush

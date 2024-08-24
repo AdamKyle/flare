@@ -3,13 +3,13 @@
 namespace App\Flare\Models;
 
 use App\Game\Events\Values\EventType;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Database\Factories\GuideQuestFactory;
 use App\Game\Skills\Values\SkillTypeValue;
+use Database\Factories\GuideQuestFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
-class GuideQuest extends Model {
-
+class GuideQuest extends Model
+{
     use HasFactory;
 
     /**
@@ -82,54 +82,54 @@ class GuideQuest extends Model {
      * @var array
      */
     protected $casts = [
-        'required_level'                     => 'integer',
-        'required_skill'                     => 'integer',
-        'required_skill_level'               => 'integer',
-        'required_required_skill'            => 'integer',
-        'required_required_skill_level'      => 'integer',
-        'required_faction_id'                => 'integer',
-        'required_faction_level'             => 'integer',
-        'required_game_map_id'               => 'integer',
-        'required_quest_id'                  => 'integer',
-        'required_quest_item_id'             => 'integer',
-        'secondary_quest_item_id'            => 'integer',
-        'required_kingdoms'                  => 'integer',
-        'required_kingdom_level'             => 'integer',
-        'required_kingdom_units'             => 'integer',
-        'required_kingdom_building_id'       => 'integer',
-        'required_kingdom_building_level'    => 'integer',
-        'required_passive_skill'             => 'integer',
-        'required_passive_level'             => 'integer',
-        'required_skill_type'                => 'integer',
-        'required_skill_type_level'          => 'integer',
-        'required_class_specials_equipped'   => 'integer',
-        'required_class_rank_level'          => 'integer',
-        'required_stats'                     => 'integer',
-        'required_str'                       => 'integer',
-        'required_dex'                       => 'integer',
-        'required_int'                       => 'integer',
-        'required_dur'                       => 'integer',
-        'required_chr'                       => 'integer',
-        'required_agi'                       => 'integer',
-        'required_focus'                     => 'integer',
-        'required_gold'                      => 'integer',
-        'required_gold_dust'                 => 'integer',
-        'required_shards'                    => 'integer',
-        'required_gold_bars'                 => 'integer',
-        'required_copper_coins'              => 'integer',
-        'gold_reward'                        => 'integer',
-        'gold_dust_reward'                   => 'integer',
-        'shards_reward'                      => 'integer',
-        'faction_points_per_kill'            => 'integer',
-        'xp_reward'                          => 'integer',
-        'parent_id'                          => 'integer',
-        'unlock_at_level'                    => 'integer',
-        'only_during_event'                  => 'integer',
-        'be_on_game_map'                     => 'integer',
-        'required_event_goal_participation'  => 'integer',
-        'required_holy_stacks'               => 'integer',
-        'required_attached_gems'             => 'integer',
-        'required_fame_level'                => 'integer',
+        'required_level' => 'integer',
+        'required_skill' => 'integer',
+        'required_skill_level' => 'integer',
+        'required_required_skill' => 'integer',
+        'required_required_skill_level' => 'integer',
+        'required_faction_id' => 'integer',
+        'required_faction_level' => 'integer',
+        'required_game_map_id' => 'integer',
+        'required_quest_id' => 'integer',
+        'required_quest_item_id' => 'integer',
+        'secondary_quest_item_id' => 'integer',
+        'required_kingdoms' => 'integer',
+        'required_kingdom_level' => 'integer',
+        'required_kingdom_units' => 'integer',
+        'required_kingdom_building_id' => 'integer',
+        'required_kingdom_building_level' => 'integer',
+        'required_passive_skill' => 'integer',
+        'required_passive_level' => 'integer',
+        'required_skill_type' => 'integer',
+        'required_skill_type_level' => 'integer',
+        'required_class_specials_equipped' => 'integer',
+        'required_class_rank_level' => 'integer',
+        'required_stats' => 'integer',
+        'required_str' => 'integer',
+        'required_dex' => 'integer',
+        'required_int' => 'integer',
+        'required_dur' => 'integer',
+        'required_chr' => 'integer',
+        'required_agi' => 'integer',
+        'required_focus' => 'integer',
+        'required_gold' => 'integer',
+        'required_gold_dust' => 'integer',
+        'required_shards' => 'integer',
+        'required_gold_bars' => 'integer',
+        'required_copper_coins' => 'integer',
+        'gold_reward' => 'integer',
+        'gold_dust_reward' => 'integer',
+        'shards_reward' => 'integer',
+        'faction_points_per_kill' => 'integer',
+        'xp_reward' => 'integer',
+        'parent_id' => 'integer',
+        'unlock_at_level' => 'integer',
+        'only_during_event' => 'integer',
+        'be_on_game_map' => 'integer',
+        'required_event_goal_participation' => 'integer',
+        'required_holy_stacks' => 'integer',
+        'required_attached_gems' => 'integer',
+        'required_fame_level' => 'integer',
     ];
 
     protected $appends = [
@@ -147,17 +147,19 @@ class GuideQuest extends Model {
         'required_to_be_on_game_map_name',
     ];
 
-    public function getSkillNameAttribute() {
+    public function getSkillNameAttribute()
+    {
         $skill = GameSkill::find($this->required_skill);
 
-        if (!is_null($skill)) {
+        if (! is_null($skill)) {
             return $skill->name;
         }
 
         return null;
     }
 
-    public function getSkillTypeNameAttribute() {
+    public function getSkillTypeNameAttribute()
+    {
         if (is_null($this->required_skill_type)) {
             return null;
         }
@@ -165,87 +167,96 @@ class GuideQuest extends Model {
         return SkillTypeValue::$namedValues[$this->required_skill_type];
     }
 
-    public function getSecondarySkillNameAttribute() {
+    public function getSecondarySkillNameAttribute()
+    {
         $skill = GameSkill::find($this->required_secondary_skill);
 
-        if (!is_null($skill)) {
+        if (! is_null($skill)) {
             return $skill->name;
         }
 
         return null;
     }
 
-    public function getQuestNameAttribute() {
+    public function getQuestNameAttribute()
+    {
         $quest = Quest::find($this->required_quest_id);
 
-        if (!is_null($quest)) {
+        if (! is_null($quest)) {
             return $quest->name;
         }
 
         return null;
     }
 
-    public function getPassiveNameAttribute() {
+    public function getPassiveNameAttribute()
+    {
         $passive = PassiveSkill::find($this->required_passive_skill);
 
-        if (!is_null($passive)) {
+        if (! is_null($passive)) {
             return $passive->name;
         }
 
         return null;
     }
 
-    public function getQuestItemNameAttribute() {
+    public function getQuestItemNameAttribute()
+    {
         $questItem = Item::where('type', 'quest')->where('id', $this->required_quest_item_id)->first();
 
-        if (!is_null($questItem)) {
+        if (! is_null($questItem)) {
             return $questItem->affix_name;
         }
 
         return null;
     }
 
-    public function getSecondaryQuestItemNameAttribute() {
+    public function getSecondaryQuestItemNameAttribute()
+    {
         $questItem = Item::where('type', 'quest')->where('id', $this->secondary_quest_item_id)->first();
 
-        if (!is_null($questItem)) {
+        if (! is_null($questItem)) {
             return $questItem->affix_name;
         }
 
         return null;
     }
 
-    public function getFactionNameAttribute() {
+    public function getFactionNameAttribute()
+    {
         $gameMap = GameMap::find($this->required_faction_id);
 
-        if (!is_null($gameMap)) {
+        if (! is_null($gameMap)) {
             return $gameMap->name;
         }
 
         return null;
     }
 
-    public function getGameMapNameAttribute() {
+    public function getGameMapNameAttribute()
+    {
         $gameMap = GameMap::find($this->required_game_map_id);
 
-        if (!is_null($gameMap)) {
+        if (! is_null($gameMap)) {
             return $gameMap->name;
         }
 
         return null;
     }
 
-    public function getKingdomBuildingNameAttribute() {
+    public function getKingdomBuildingNameAttribute()
+    {
         $gameBuilding = GameBuilding::find($this->required_kingdom_building_id);
 
-        if (!is_null($gameBuilding)) {
+        if (! is_null($gameBuilding)) {
             return $gameBuilding->name;
         }
 
         return null;
     }
 
-    public function getParentQuestNameAttribute() {
+    public function getParentQuestNameAttribute()
+    {
         $parentQuest = GuideQuest::find($this->parent_id);
 
         if (is_null($parentQuest)) {
@@ -255,7 +266,8 @@ class GuideQuest extends Model {
         return $parentQuest->name;
     }
 
-    public function getRequiredToBeOnGameMapNameAttribute() {
+    public function getRequiredToBeOnGameMapNameAttribute()
+    {
         if (is_null($this->be_on_game_map)) {
             return null;
         }
@@ -263,7 +275,8 @@ class GuideQuest extends Model {
         return GameMap::find($this->be_on_game_map)->name;
     }
 
-    public function eventType(): EventType | null {
+    public function eventType(): ?EventType
+    {
 
         if (is_null($this->only_during_event)) {
             return null;
@@ -272,7 +285,8 @@ class GuideQuest extends Model {
         return new EventType($this->only_during_event);
     }
 
-    protected static function newFactory() {
+    protected static function newFactory()
+    {
         return GuideQuestFactory::new();
     }
 }

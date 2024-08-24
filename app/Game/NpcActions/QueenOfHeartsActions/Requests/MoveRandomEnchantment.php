@@ -24,17 +24,18 @@ class MoveRandomEnchantment extends FormRequest
     public function rules()
     {
         return [
-            'selected_slot_id'           => 'required|integer|exists:inventory_slots,id',
+            'selected_slot_id' => 'required|integer|exists:inventory_slots,id',
             'selected_secondary_slot_id' => 'required|integer|exists:inventory_slots,id',
-            'selected_affix'             => 'required|string|in:prefix,suffix,all-enchantments',
+            'selected_affix' => 'required|string|in:prefix,suffix,all-enchantments',
         ];
     }
 
-    public function messages() {
+    public function messages()
+    {
         return [
-            'selected_slot_id.required'           => 'Missing selected slot id.',
+            'selected_slot_id.required' => 'Missing selected slot id.',
             'selected_secondary_slot_id.required' => 'Missing secondary inventory slot id.',
-            'selected_affix.required'             => 'Missing selected Affix.',
+            'selected_affix.required' => 'Missing selected Affix.',
         ];
     }
 }

@@ -7,35 +7,21 @@ use App\Flare\Models\ItemAffix;
 use App\Flare\Values\ItemAffixType;
 use App\Flare\Values\RandomAffixDetails;
 
-class RandomAffixGenerator {
-
-    /**
-     * @var AffixAttributeBuilder $affixAttributeBuilder
-     */
+class RandomAffixGenerator
+{
     private AffixAttributeBuilder $affixAttributeBuilder;
 
-    /**
-     * @var Character $character
-     */
     private Character $character;
 
-    /**
-     * @var int $amountPaid
-     */
     private int $amountPaid;
 
-    /**
-     * @param AffixAttributeBuilder $affixAttributeBuilder
-     */
-    public function __construct(AffixAttributeBuilder $affixAttributeBuilder) {
+    public function __construct(AffixAttributeBuilder $affixAttributeBuilder)
+    {
         $this->affixAttributeBuilder = $affixAttributeBuilder;
     }
 
-    /**
-     * @param Character $character
-     * @return RandomAffixGenerator
-     */
-    public function setCharacter(Character $character): RandomAffixGenerator {
+    public function setCharacter(Character $character): RandomAffixGenerator
+    {
         $this->character = $character;
 
         return $this;
@@ -44,13 +30,12 @@ class RandomAffixGenerator {
     /**
      * Sets the paid amount and sets basic details.
      *
-     * @param int $amount
-     * @return RandomAffixGenerator
      * @throws \Exception
      */
-    public function setPaidAmount(int $amount = 0): RandomAffixGenerator {
-        $this->amountPaid            = $amount !== 0 ? $amount : RandomAffixDetails::BASIC;
-        $details                     = (new RandomAffixDetails($this->amountPaid));
+    public function setPaidAmount(int $amount = 0): RandomAffixGenerator
+    {
+        $this->amountPaid = $amount !== 0 ? $amount : RandomAffixDetails::BASIC;
+        $details = (new RandomAffixDetails($this->amountPaid));
 
         $this->affixAttributeBuilder = $this->affixAttributeBuilder->setPercentageRange($details->getPercentageRange())
             ->setCharacterSkills($this->character->skills)
@@ -61,16 +46,14 @@ class RandomAffixGenerator {
 
     /**
      * Generate the Affix.
-     *
-     * @param string $type
-     * @return ItemAffix
      */
-    public function generateAffix(string $type): ItemAffix {
+    public function generateAffix(string $type): ItemAffix
+    {
         $attributes = $this->affixAttributeBuilder->buildAttributes($type, $this->amountPaid);
 
         $foundMatchingPrefix = $this->fetchMatchingAffix($attributes);
 
-        if (!is_null($foundMatchingPrefix)) {
+        if (! is_null($foundMatchingPrefix)) {
             return $foundMatchingPrefix;
         }
 
@@ -83,11 +66,9 @@ class RandomAffixGenerator {
      * find a possible matching affix.
      *
      * Note: This is a wrapper so I can mock this in tests.
-     *
-     * @param array $attributes
-     * @return ItemAffix|null
      */
-    protected function fetchMatchingAffix(array $attributes): ?ItemAffix {
+    protected function fetchMatchingAffix(array $attributes): ?ItemAffix
+    {
         return ItemAffix::where($attributes)->first();
     }
 }

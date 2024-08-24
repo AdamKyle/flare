@@ -13,7 +13,6 @@ use Cache;
 
 class CastType extends BattleBase
 {
-
     private Entrance $entrance;
 
     private CanHit $canHit;
@@ -22,26 +21,28 @@ class CastType extends BattleBase
 
     private bool $allowEntrancing = false;
 
-    public function __construct(CharacterCacheData $characterCacheData, Entrance $entrance, CanHit $canHit, SpecialAttacks $specialAttacks) {
+    public function __construct(CharacterCacheData $characterCacheData, Entrance $entrance, CanHit $canHit, SpecialAttacks $specialAttacks)
+    {
         parent::__construct($characterCacheData);
 
-        $this->entrance           = $entrance;
-        $this->canHit             = $canHit;
-        $this->specialAttacks     = $specialAttacks;
+        $this->entrance = $entrance;
+        $this->canHit = $canHit;
+        $this->specialAttacks = $specialAttacks;
     }
 
-    public function setCharacterAttackData(Character $character, bool $isVoided, string $type): CastType{
+    public function setCharacterAttackData(Character $character, bool $isVoided, string $type): CastType
+    {
 
-        $attackType = $isVoided ? 'voided_' . $type : $type;
+        $attackType = $type;
 
         $this->attackData = $this->characterCacheData->getDataFromAttackCache($character, $attackType);
-        $this->isVoided   = $isVoided;
+        $this->isVoided = $isVoided;
 
         return $this;
     }
 
-
-    public function setCharacterCastAndAttack(Character $character, bool $isVoided): CastType {
+    public function setCharacterCastAndAttack(Character $character, bool $isVoided): CastType
+    {
 
         $this->attackData = $this->characterCacheData->getDataFromAttackCache($character, $isVoided ? 'voided_cast_and_attack' : 'cast_and_attack');
         $this->isVoided = $isVoided;
@@ -49,19 +50,22 @@ class CastType extends BattleBase
         return $this;
     }
 
-    public function setAllowEntrancing(bool $allow): CastType {
+    public function setAllowEntrancing(bool $allow): CastType
+    {
 
         $this->allowEntrancing = $allow;
 
         return $this;
     }
 
-    public function resetMessages() {
+    public function resetMessages()
+    {
         $this->clearMessages();
         $this->entrance->clearMessages();
     }
 
-    public function pvpCastAttack(Character $attacker, Character $defender) {
+    public function pvpCastAttack(Character $attacker, Character $defender)
+    {
 
         $spellDamage = $this->attackData['spell_damage'];
         $healFor = $this->attackData['heal_for'];
@@ -76,7 +80,7 @@ class CastType extends BattleBase
             return;
         }
 
-        if (!$this->isEnemyEntranced) {
+        if (! $this->isEnemyEntranced) {
             $this->doPvpEntrance($attacker, $this->entrance);
 
             if ($this->isEnemyEntranced) {
@@ -92,7 +96,7 @@ class CastType extends BattleBase
 
                 return $this;
             }
-        } else if ($this->isEnemyEntranced) {
+        } elseif ($this->isEnemyEntranced) {
             $this->pvpSpellDamage($attacker, $defender, $spellDamage);
 
             if ($healFor > 0) {
@@ -135,7 +139,8 @@ class CastType extends BattleBase
         return $this;
     }
 
-    public function castAttack(Character $character, ServerMonster $monster) {
+    public function castAttack(Character $character, ServerMonster $monster)
+    {
 
         $spellDamage = $this->attackData['spell_damage'];
         $healFor = $this->attackData['heal_for'];
@@ -149,7 +154,7 @@ class CastType extends BattleBase
             return $this;
         }
 
-        if (!$this->isEnemyEntranced && $this->allowEntrancing) {
+        if (! $this->isEnemyEntranced && $this->allowEntrancing) {
             $this->doEnemyEntrance($character, $monster, $this->entrance);
         }
 
@@ -200,7 +205,8 @@ class CastType extends BattleBase
         return $this;
     }
 
-    public function doPvpSpellDamage(Character $attacker, Character $defender, int $spellDamage) {
+    public function doPvpSpellDamage(Character $attacker, Character $defender, int $spellDamage)
+    {
         $this->pvpSpellDamage($attacker, $defender, $spellDamage);
 
         if ($this->allowSecondaryAttacks) {
@@ -208,10 +214,11 @@ class CastType extends BattleBase
         }
     }
 
-    public function doSpellDamage(Character $character, ServerMonster $monster, int $spellDamage, bool $entranced = false) {
+    public function doSpellDamage(Character $character, ServerMonster $monster, int $spellDamage, bool $entranced = false)
+    {
         $this->spellDamage($character, $monster, $spellDamage, $entranced);
 
-        if (!$entranced) {
+        if (! $entranced) {
             $this->doMonsterCounter($character, $monster);
         }
 
@@ -224,11 +231,12 @@ class CastType extends BattleBase
         $this->doSecondaryAttacks($character, $monster);
     }
 
-    public function pvpSpellDamage(Character $attacker, Character $defender, int $spellDamage, bool $outSideEntrance = false) {
+    public function pvpSpellDamage(Character $attacker, Character $defender, int $spellDamage, bool $outSideEntrance = false)
+    {
         $defenderSpellEvasion = $this->characterCacheData->getCachedCharacterData($defender, 'spell_evasion');
 
-        if (!$outSideEntrance) {
-            if (!$this->isEnemyEntranced) {
+        if (! $outSideEntrance) {
+            if (! $this->isEnemyEntranced) {
                 if ($defenderSpellEvasion > 1) {
                     $this->addAttackerMessage('The enemy evades your magic!', 'enemy-action');
                     $this->addDefenderMessage('Your rings glow and you manage to evade the enemies spells.', 'player-action');
@@ -257,8 +265,8 @@ class CastType extends BattleBase
 
         $this->monsterHealth -= $totalDamage;
 
-        $this->addAttackerMessage('Your damage spell(s) hits ' . $defender->name . ' for: ' . number_format($totalDamage), 'player-action');
-        $this->addDefenderMessage($attacker->name . ' begins to cast their magics, the crackle in the air is electrifying. Their magics fly towards you for: ' . number_format($totalDamage), 'enemy-action');
+        $this->addAttackerMessage('Your damage spell(s) hits '.$defender->name.' for: '.number_format($totalDamage), 'player-action');
+        $this->addDefenderMessage($attacker->name.' begins to cast their magics, the crackle in the air is electrifying. Their magics fly towards you for: '.number_format($totalDamage), 'enemy-action');
 
         $this->pvpCounter($attacker, $defender);
 
@@ -267,19 +275,20 @@ class CastType extends BattleBase
         }
 
         $this->specialAttacks->setCharacterHealth($this->characterHealth)
-                             ->setMonsterHealth($this->monsterHealth)
-                             ->doCastDamageSpecials($attacker, $this->attackData, true);
+            ->setMonsterHealth($this->monsterHealth)
+            ->doCastDamageSpecials($attacker, $this->attackData, true);
 
         $this->mergeAttackerMessages($this->specialAttacks->getAttackerMessages());
         $this->mergeDefenderMessages($this->specialAttacks->getDefenderMessages());
 
         $this->characterHealth = $this->specialAttacks->getCharacterHealth();
-        $this->monsterHealth   = $this->specialAttacks->getMonsterHealth();
+        $this->monsterHealth = $this->specialAttacks->getMonsterHealth();
 
         $this->specialAttacks->clearMessages();
     }
 
-    public function spellDamage(Character $character, ServerMonster $monster, int $spellDamage, bool $entranced = false) {
+    public function spellDamage(Character $character, ServerMonster $monster, int $spellDamage, bool $entranced = false)
+    {
 
         $monsterSpellEvasion = $monster->getMonsterStat('spell_evasion');
 
@@ -287,7 +296,7 @@ class CastType extends BattleBase
 
         $monsterSpellEvasion -= $characterSpellEvasionReduction;
 
-        if (!$entranced) {
+        if (! $entranced) {
 
             if ($monsterSpellEvasion > 0 && $characterSpellEvasionReduction < 1) {
 
@@ -322,21 +331,22 @@ class CastType extends BattleBase
 
         $this->monsterHealth -= $totalDamage;
 
-        $this->addMessage('Your damage spell(s) hits ' . $monster->getName() . ' for: ' . number_format($totalDamage), 'player-action');
+        $this->addMessage('Your damage spell(s) hits '.$monster->getName().' for: '.number_format($totalDamage), 'player-action');
 
         $this->specialAttacks->setCharacterHealth($this->characterHealth)
-                             ->setMonsterHealth($this->monsterHealth)
-                             ->doCastDamageSpecials($character, $this->attackData);
+            ->setMonsterHealth($this->monsterHealth)
+            ->doCastDamageSpecials($character, $this->attackData);
 
         $this->characterHealth = $this->specialAttacks->getCharacterHealth();
-        $this->monsterHealth   = $this->specialAttacks->getMonsterHealth();
+        $this->monsterHealth = $this->specialAttacks->getMonsterHealth();
 
         $this->mergeMessages($this->specialAttacks->getMessages());
 
         $this->specialAttacks->clearMessages();
     }
 
-    public function heal(Character $character, Character $defender = null, bool $isPvp = false) {
+    public function heal(Character $character, ?Character $defender = null, bool $isPvp = false)
+    {
         $cachedHealFor = $this->getCachedHealingAmount($character);
         $maxHealth = floor($this->characterCacheData->getCachedCharacterData($character, 'health'));
 
@@ -379,12 +389,12 @@ class CastType extends BattleBase
             }
 
             if ($healFor > 0) {
-                Cache::put('character-' . $character->id . '-healing-amount', $healFor);
+                Cache::put('character-'.$character->id.'-healing-amount', $healFor);
 
                 if ($isPvp) {
-                    $this->addAttackerMessage('You feel the healing energy wash over you and recede deep inside your body and soul for when you need it. Amount Stored:' . number_format($healFor), 'player-action');
+                    $this->addAttackerMessage('You feel the healing energy wash over you and recede deep inside your body and soul for when you need it. Amount Stored:'.number_format($healFor), 'player-action');
                 } else {
-                    $this->addMessage('Your healing spell(s) heals you for: ' . number_format($healFor), 'player-action');
+                    $this->addMessage('Your healing spell(s) heals you for: '.number_format($healFor), 'player-action');
                 }
             }
 
@@ -392,7 +402,8 @@ class CastType extends BattleBase
         }
     }
 
-    public function healDuringFight(Character $character, bool $isPvp = false) {
+    public function healDuringFight(Character $character, bool $isPvp = false)
+    {
         $cachedHealFor = $this->getCachedHealingAmount($character);
         $maxHealth = $this->characterCacheData->getCachedCharacterData($character, 'health');
 
@@ -404,7 +415,7 @@ class CastType extends BattleBase
                 $healFor = $this->healForAllAmount($needToHealAmount, $cachedHealFor, $maxHealth, $isPvp);
                 $healFor = $this->partialHeal($needToHealAmount, $healFor, $maxHealth, $isPvp);
 
-                Cache::put('character-' . $character->id . '-healing-amount', min($healFor, 0));
+                Cache::put('character-'.$character->id.'-healing-amount', min($healFor, 0));
 
                 if ($isPvp) {
                     $this->addDefenderMessage('You reserved healing bursts forward and you feel life flowing through your veins.', 'player-action');
@@ -415,22 +426,25 @@ class CastType extends BattleBase
         }
     }
 
-    private function getCachedHealingAmount(Character $character): int {
-        return (int) Cache::get('character-' . $character->id . '-healing-amount', 0);
+    private function getCachedHealingAmount(Character $character): int
+    {
+        return (int) Cache::get('character-'.$character->id.'-healing-amount', 0);
     }
 
-    private function doCacheHealing(Character $character, int $maxHealth, int $cachedHealFor, bool $isPvp): int {
+    private function doCacheHealing(Character $character, int $maxHealth, int $cachedHealFor, bool $isPvp): int
+    {
         $needToHealAmount = $maxHealth - $this->characterHealth;
 
         $healFor = $this->healForAllAmount($needToHealAmount, $cachedHealFor, $maxHealth, $isPvp);
         $healFor = $this->partialHeal($needToHealAmount, $healFor, $maxHealth, $isPvp);
 
-        Cache::put('character-' . $character->id . '-healing-amount', $healFor);
+        Cache::put('character-'.$character->id.'-healing-amount', $healFor);
 
         return $healFor;
     }
 
-    private function dealChrDamage(Character $character, bool $isPvp): void {
+    private function dealChrDamage(Character $character, bool $isPvp): void
+    {
         $isValidHealer = ($character->classType()->isProphet() || $character->classType()->isCleric());
 
         $chrDamage = $this->characterCacheData->getCachedCharacterData($character, 'chr_modded') * ($isValidHealer ? 0.25 : 0.05);
@@ -438,17 +452,17 @@ class CastType extends BattleBase
         $this->monsterHealth -= $chrDamage;
 
         if ($isPvp) {
-            $this->addAttackerMessage('Your prayers for health rage at the enemy as you lash out in a fevered holy pitch for: ' . number_format($chrDamage) . '!', 'player-action');
-            $this->addDefenderMessage('The enemy before you starts to pray for health, alas their holy rage flies towards you for: ' . number_format($chrDamage) . '!', 'enemy-action');
+            $this->addAttackerMessage('Your prayers for health rage at the enemy as you lash out in a fevered holy pitch for: '.number_format($chrDamage).'!', 'player-action');
+            $this->addDefenderMessage('The enemy before you starts to pray for health, alas their holy rage flies towards you for: '.number_format($chrDamage).'!', 'enemy-action');
         } else {
-            $this->addMessage('Your prayers for health rage at the enemy as you lash out in a fevered holy pitch for: ' . number_format($chrDamage) . '!', 'player-action');
+            $this->addMessage('Your prayers for health rage at the enemy as you lash out in a fevered holy pitch for: '.number_format($chrDamage).'!', 'player-action');
         }
 
-        return;
     }
 
-    private function getHealingReductionWhenPvp(int $healFor, bool $isPvp, Character $defender = null): int {
-        if (!is_null($defender) && $isPvp) {
+    private function getHealingReductionWhenPvp(int $healFor, bool $isPvp, ?Character $defender = null): int
+    {
+        if (! is_null($defender) && $isPvp) {
             $reduction = $this->characterCacheData->getCachedCharacterData($defender, 'healing_reduction');
 
             if ($reduction > 0.0) {
@@ -462,7 +476,8 @@ class CastType extends BattleBase
         return $healFor;
     }
 
-    private function getPotentialCriticalHealAmount(Character $character, int $healFor, bool $isPvp): int {
+    private function getPotentialCriticalHealAmount(Character $character, int $healFor, bool $isPvp): int
+    {
         $criticality = $this->characterCacheData->getCachedCharacterData($character, 'skills')['criticality'];
 
         if (rand(1, 100) > (100 - 100 * $criticality)) {
@@ -476,15 +491,16 @@ class CastType extends BattleBase
         }
 
         if ($isPvp) {
-            $this->addAttackerMessage('Your healing spell(s) erupt around you for: ' . number_format($healFor), 'player-action');
+            $this->addAttackerMessage('Your healing spell(s) erupt around you for: '.number_format($healFor), 'player-action');
         } else {
-            $this->addMessage('Your healing spell(s) erupt around you for: ' . number_format($healFor), 'player-action');
+            $this->addMessage('Your healing spell(s) erupt around you for: '.number_format($healFor), 'player-action');
         }
 
         return $healFor;
     }
 
-    private function doubleCastHealingAmount(Character $character, bool $isPvp): int {
+    private function doubleCastHealingAmount(Character $character, bool $isPvp): int
+    {
         $healForAmount = $this->specialAttacks->setCharacterHealth($this->characterHealth)
             ->setMonsterHealth($this->monsterHealth)
             ->doCastHealSpecials($character, $this->attackData, $isPvp)
@@ -500,15 +516,16 @@ class CastType extends BattleBase
         return $healForAmount;
     }
 
-    private function healForAllAmount(int $needToHealAmount, int$healFor, int $maxHealth, bool $isPvp): int {
+    private function healForAllAmount(int $needToHealAmount, int $healFor, int $maxHealth, bool $isPvp): int
+    {
         if ($needToHealAmount >= $healFor) {
 
             $this->characterHealth += min($healFor, $maxHealth);
 
             if ($isPvp) {
-                $this->addAttackerMessage('Your healing spell(s) heals you completely for: ' . number_format($healFor), 'player-action');
+                $this->addAttackerMessage('Your healing spell(s) heals you completely for: '.number_format($healFor), 'player-action');
             } else {
-                $this->addMessage('Your healing spell(s) heals you completely for: ' . number_format($healFor), 'player-action');
+                $this->addMessage('Your healing spell(s) heals you completely for: '.number_format($healFor), 'player-action');
             }
 
             return 0;
@@ -517,16 +534,17 @@ class CastType extends BattleBase
         return $healFor;
     }
 
-    private function partialHeal(int $needToHealAmount, int $healFor, int $maxHealth, bool $isPvp): int {
+    private function partialHeal(int $needToHealAmount, int $healFor, int $maxHealth, bool $isPvp): int
+    {
         if ($needToHealAmount > 0 && $healFor > 0) {
             $amountToHeal = min($needToHealAmount, $healFor, $maxHealth - $this->characterHealth);
 
             $this->characterHealth += $amountToHeal;
 
             if ($isPvp) {
-                $this->addAttackerMessage('Your healing spell(s) partially heals you for: ' . number_format($amountToHeal), 'player-action');
+                $this->addAttackerMessage('Your healing spell(s) partially heals you for: '.number_format($amountToHeal), 'player-action');
             } else {
-                $this->addMessage('Your healing spell(s) partially heals you for: ' . number_format($amountToHeal), 'player-action');
+                $this->addMessage('Your healing spell(s) partially heals you for: '.number_format($amountToHeal), 'player-action');
             }
 
             $healFor -= $amountToHeal;
@@ -535,8 +553,9 @@ class CastType extends BattleBase
         return $healFor;
     }
 
-    protected function doSecondaryAttacks($character, $monster) {
-        if ($this->allowSecondaryAttacks && !$this->abortCharacterIsDead) {
+    protected function doSecondaryAttacks($character, $monster)
+    {
+        if ($this->allowSecondaryAttacks && ! $this->abortCharacterIsDead) {
             $this->secondaryAttack($character, $monster);
         }
     }

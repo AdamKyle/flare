@@ -2,40 +2,25 @@
 
 namespace App\Flare\ExponentialCurve\Curve;
 
-class ExponentialAttributeCurve {
-
-    /**
-     * @var integer|float $min
-     */
+class ExponentialAttributeCurve
+{
     private int|float $min;
 
-    /**
-     * @var integer|float $max
-     */
     private int|float $max;
 
-    /**
-     * @var integer|float $range
-     */
     private int|float $range;
 
-    /**
-     * @var integer|float $increase
-     */
     private int|float $increase;
 
-    /**
-     * @var integer|float $previousY
-     */
     private int|float $previousY = 0;
 
     /**
      * Set minimum value
      *
-     * @param integer|float $min
      * @return void
      */
-    public function setMin(int|float $min): ExponentialAttributeCurve {
+    public function setMin(int|float $min): ExponentialAttributeCurve
+    {
         $this->min = $min;
 
         return $this;
@@ -44,10 +29,10 @@ class ExponentialAttributeCurve {
     /**
      * Set maximum value
      *
-     * @param integer|float $max
      * @return void
      */
-    public function setMax(int|float $max): ExponentialAttributeCurve {
+    public function setMax(int|float $max): ExponentialAttributeCurve
+    {
         $this->max = $max;
 
         return $this;
@@ -56,10 +41,10 @@ class ExponentialAttributeCurve {
     /**
      * Set increase amout
      *
-     * @param integer|float $increase
      * @return void
      */
-    public function setIncrease(int|float $increase): ExponentialAttributeCurve {
+    public function setIncrease(int|float $increase): ExponentialAttributeCurve
+    {
         $this->increase = $increase;
 
         return $this;
@@ -68,10 +53,10 @@ class ExponentialAttributeCurve {
     /**
      * Set range amount
      *
-     * @param integer|float $range
      * @return void
      */
-    public function setRange(int|float $range): ExponentialAttributeCurve {
+    public function setRange(int|float $range): ExponentialAttributeCurve
+    {
         $this->range = $range;
 
         return $this;
@@ -84,12 +69,9 @@ class ExponentialAttributeCurve {
      * or less than the previous number generated.
      *
      * Can be generated for integers or floats.
-     *
-     * @param integer $size
-     * @param boolean $integer
-     * @return array
      */
-    public function generateValues(int $size, bool $integer = false): array {
+    public function generateValues(int $size, bool $integer = false): array
+    {
         $this->previousY = 0;
         $numbers = [];
 
@@ -102,7 +84,7 @@ class ExponentialAttributeCurve {
             }
 
             // Handle boundary conditions
-            if (!empty($numbers)) {
+            if (! empty($numbers)) {
                 if ($y > $this->max) {
                     $y = $this->max; // Cap the value at the maximum allowed
                 }
@@ -124,12 +106,9 @@ class ExponentialAttributeCurve {
 
     /**
      * calculate the number.
-     *
-     * @param integer $x
-     * @param integer $size
-     * @return integer|float
      */
-    protected function calculateY(int $x, int $size): int|float {
+    protected function calculateY(int $x, int $size): int|float
+    {
 
         $newSize = $size - 1;
 
@@ -156,8 +135,6 @@ class ExponentialAttributeCurve {
 
             $y = $this->previousY + $this->increase;
         }
-
-
 
         return $y;
     }

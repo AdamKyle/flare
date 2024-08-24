@@ -5,9 +5,9 @@ namespace App\Game\BattleRewardProcessing\Providers;
 use App\Flare\Builders\RandomAffixGenerator;
 use App\Flare\Models\GlobalEventParticipation;
 use App\Flare\Services\CharacterRewardService;
+use App\Game\BattleRewardProcessing\Handlers\BattleGlobalEventParticipationHandler;
 use App\Game\BattleRewardProcessing\Handlers\FactionHandler;
 use App\Game\BattleRewardProcessing\Handlers\FactionLoyaltyBountyHandler;
-use App\Game\BattleRewardProcessing\Handlers\BattleGlobalEventParticipationHandler;
 use App\Game\BattleRewardProcessing\Handlers\GoldMinesRewardHandler;
 use App\Game\BattleRewardProcessing\Handlers\LocationSpecialtyHandler;
 use App\Game\BattleRewardProcessing\Handlers\PurgatorySmithHouseRewardHandler;
@@ -21,53 +21,61 @@ use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
 use App\Game\GuideQuests\Services\GuideQuestService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 
-class ServiceProvider extends ApplicationServiceProvider {
+class ServiceProvider extends ApplicationServiceProvider
+{
     /**
      * Register any application services.
      *
      * @return void
      */
-    public function register() {
+    public function register()
+    {
 
-        $this->app->bind(FactionHandler::class, function($app) {
+        $this->app->bind(FactionHandler::class, function ($app) {
             return new FactionHandler(
                 $app->make(RandomAffixGenerator::class),
                 $app->make(GuideQuestService::class),
             );
         });
 
-        $this->app->bind(FactionLoyaltyBountyHandler::class, function($app) {
+        $this->app->bind(FactionLoyaltyBountyHandler::class, function ($app) {
             return new FactionLoyaltyBountyHandler(
                 $app->make(RandomAffixGenerator::class),
                 $app->make(FactionLoyaltyService::class),
             );
         });
 
-        $this->app->bind(PurgatorySmithHouseRewardHandler::class, function($app) {
+        $this->app->bind(GlobalEventParticipation::class, function ($app) {
+            return new GlobalEventParticipation(
+                $app->make(RandomAffixGenerator::class),
+            );
+        });
+
+        $this->app->bind(PurgatorySmithHouseRewardHandler::class, function ($app) {
             return new PurgatorySmithHouseRewardHandler(
                 $app->make(RandomAffixGenerator::class),
             );
         });
 
-        $this->app->bind(GoldMinesRewardHandler::class, function($app) {
+        $this->app->bind(GoldMinesRewardHandler::class, function ($app) {
             return new GoldMinesRewardHandler(
                 $app->make(RandomAffixGenerator::class),
             );
         });
 
-        $this->app->bind(TheOldChurchRewardHandler::class, function($app) {
+        $this->app->bind(TheOldChurchRewardHandler::class, function ($app) {
             return new TheOldChurchRewardHandler(
                 $app->make(RandomAffixGenerator::class),
             );
         });
 
-        $this->app->bind(LocationSpecialtyHandler::class, function($app) {
+        $this->app->bind(LocationSpecialtyHandler::class, function ($app) {
             return new LocationSpecialtyHandler(
                 $app->make(RandomAffixGenerator::class),
             );
         });
 
-        $this->app->bind(WeeklyBattleService::class, function($app) {
+        $this->app->bind(WeeklyBattleService::class, function ($app) {
             return new WeeklyBattleService(
                 $app->make(LocationSpecialtyHandler::class),
             );
@@ -99,6 +107,5 @@ class ServiceProvider extends ApplicationServiceProvider {
      *
      * @return void
      */
-    public function boot() {
-    }
+    public function boot() {}
 }

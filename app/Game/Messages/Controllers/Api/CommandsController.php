@@ -3,31 +3,22 @@
 namespace App\Game\Messages\Controllers\Api;
 
 use App\Game\Messages\Handlers\ServerMessageHandler;
-use Illuminate\Http\JsonResponse;
-use App\Http\Controllers\Controller;
 use App\Game\Messages\Request\PublicEntityRequest;
 use App\Game\Messages\Services\PublicEntityCommand;
+use App\Http\Controllers\Controller;
+use Illuminate\Http\JsonResponse;
 
-class CommandsController extends Controller {
-
-    /**
-     * @var PublicEntityCommand $publicEntityCommand
-     */
+class CommandsController extends Controller
+{
     private PublicEntityCommand $publicEntityCommand;
 
-    /**
-     * @param PublicEntityCommand $publicEntityCommand
-     */
-    public function __construct(PublicEntityCommand $publicEntityCommand) {
+    public function __construct(PublicEntityCommand $publicEntityCommand)
+    {
         $this->publicEntityCommand = $publicEntityCommand;
     }
 
-
-    /**
-     * @param PublicEntityRequest $request
-     * @return JsonResponse
-     */
-    public function publicEntity(PublicEntityRequest $request): JsonResponse {
+    public function publicEntity(PublicEntityRequest $request): JsonResponse
+    {
 
         $user = auth()->user();
 

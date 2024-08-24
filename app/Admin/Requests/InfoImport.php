@@ -27,7 +27,7 @@ class InfoImport extends FormRequest
     public function rules()
     {
         return [
-            'info_import' => 'required|file|mimetypes:application/json'
+            'info_import' => 'required|file|mimetypes:application/json',
         ];
     }
 
@@ -36,11 +36,12 @@ class InfoImport extends FormRequest
      *
      * @return array
      */
-    public function messages() {
+    public function messages()
+    {
         return [
-            'items_import.required'   => 'Items import file is required.',
-            'items_import.mime'       => 'The system only accepts xlsx files.',
-            'items_import.max'        => 'File to large, the system only accepts a max size of 2MB.',
+            'info_import.required' => 'Items import file is required.',
+            'info_import.mime' => 'The system only accepts json files.',
+            'info_import.max' => 'File to large, the system only accepts a max size of 2MB.',
         ];
     }
 }

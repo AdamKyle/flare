@@ -2,69 +2,68 @@
 
 namespace App\Flare\MapGenerator\Builders;
 
-use ChristianEssl\LandmapGeneration\Settings\MapSettings;
-use ChristianEssl\LandmapGeneration\Generator\LandmapGenerator;
-use ChristianEssl\LandmapGeneration\Struct\Color as StructColor;
-use ChristianEssl\LandmapGeneration\Color\Shader\DetailShader;
-use ChristianEssl\LandmapGeneration\Utility\ImageUtility;
 use App\Flare\MapGenerator\Schemes\MapColorScheme;
+use ChristianEssl\LandmapGeneration\Color\Shader\DetailShader;
+use ChristianEssl\LandmapGeneration\Generator\LandmapGenerator;
+use ChristianEssl\LandmapGeneration\Settings\MapSettings;
+use ChristianEssl\LandmapGeneration\Struct\Color as StructColor;
+use ChristianEssl\LandmapGeneration\Utility\ImageUtility;
 
-class MapBuilder {
-
+class MapBuilder
+{
     /**
-     * @var MapSettings $mapSettings
+     * @var MapSettings
      */
     private $mapSettings;
 
     /**
-     * @var ImageBuilder $imageBuilder
+     * @var ImageBuilder
      */
     private $imageBuilder;
 
     /**
-     * @var StructColor $land | null
+     * @var StructColor | null
      */
     private $land;
 
     /**
-     * @var StructColor $water | null
+     * @var StructColor | null
      */
     private $water;
 
     /**
-     * @var int $height | 500
+     * @var int | 500
      */
     private $width;
 
     /**
-     * @var int $width | 500
+     * @var int | 500
      */
     private $height;
 
     /**
-     * @var string $seed | '123'
+     * @var string | '123'
      */
     private $seed;
 
     /**
      * Constructor
      *
-     * @param MapSettings $mapSettings
-     * @param ImageBuilder $imageBuilder
      * @return void
      */
-    public function __construct(MapSettings $mapSettings, ImageBuilder $imageBuilder) {
-        $this->mapSettings  = $mapSettings;
+    public function __construct(MapSettings $mapSettings, ImageBuilder $imageBuilder)
+    {
+        $this->mapSettings = $mapSettings;
         $this->imageBuilder = $imageBuilder;
     }
 
     /**
      * Sets the land color
      *
-     * @param StructColor $land | null
-     * @return MapBuilder
+     * @param  StructColor  $land  | null
      */
-    public function setLandColor(StructColor $land = null): MapBuilder {
+    public function setLandColor(?StructColor $land = null): MapBuilder
+    {
         $this->land = $land;
 
         return $this;
@@ -73,10 +72,10 @@ class MapBuilder {
     /**
      * Sets the water color
      *
-     * @param StructColor $water | null
-     * @return MapBuilder
+     * @param  StructColor  $water  | null
      */
-    public function setWaterColor(StructColor $water = null): MapBuilder {
+    public function setWaterColor(?StructColor $water = null): MapBuilder
+    {
         $this->water = $water;
 
         return $this;
@@ -85,10 +84,10 @@ class MapBuilder {
     /**
      * Sets the height of the map.
      *
-     * @param int $height | 500
-     * @return MapBuilder
+     * @param  int  $height  | 500
      */
-    public function setMapHeight(int $height = 500): MapBuilder {
+    public function setMapHeight(int $height = 500): MapBuilder
+    {
         $this->height = $height;
 
         return $this;
@@ -97,10 +96,10 @@ class MapBuilder {
     /**
      * Sets the width of the map.
      *
-     * @param int $width | 500
-     * @return MapBuilder
+     * @param  int  $width  | 500
      */
-    public function setMapWidth(int $width = 500): MapBuilder {
+    public function setMapWidth(int $width = 500): MapBuilder
+    {
         $this->width = $width;
 
         return $this;
@@ -109,10 +108,10 @@ class MapBuilder {
     /**
      * Sets the map seed
      *
-     * @param string $seed | '123'
-     * @return MapBuilder
+     * @param  string  $seed  | '123'
      */
-    public function setMapSeed(string $seed = '123'): MapBuilder {
+    public function setMapSeed(string $seed = '123'): MapBuilder
+    {
         $this->seed = $seed;
 
         return $this;
@@ -124,21 +123,17 @@ class MapBuilder {
      * Based on the settings this will build the map using the set colors
      * and dimensions, store it as a jpeg image in the public directory using the $mapName
      * as the file name.
-     *
-     * @param string $mapName
-     * @param int $waterLevel
-     * @return void
      */
-    public function BuildMap(string $mapName, int $waterLevel = 30): void {
+    public function BuildMap(string $mapName, int $waterLevel = 30): void
+    {
         $settings = $this->mapSettings
-            ->setColorScheme(new MapColorScheme(new DetailShader(), $this->land, $this->water))
+            ->setColorScheme(new MapColorScheme(new DetailShader, $this->land, $this->water))
             ->setWidth($this->width)
             ->setHeight($this->height)
             ->setWaterLevel($waterLevel);
 
         $landMapGenerator = new LandmapGenerator($settings, $this->seed);
-        $map              = $landMapGenerator->generateMap();
-
+        $map = $landMapGenerator->generateMap();
 
         $image = ImageUtility::createImage($map);
 

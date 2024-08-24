@@ -8,21 +8,20 @@ use App\Game\Maps\Events\MoveTimeOutEvent;
 use App\Game\Maps\Events\ShowTimeOutEvent;
 use App\Game\Maps\Jobs\MoveTimeOutJob;
 
-class MoveTimeOutListener {
-
+class MoveTimeOutListener
+{
     private CharacterStatBuilder $characterStatBuilder;
 
-    public function __construct(CharacterStatBuilder $characterStatBuilder) {
+    public function __construct(CharacterStatBuilder $characterStatBuilder)
+    {
         $this->characterStatBuilder = $characterStatBuilder;
     }
 
     /**
      * Handle the event.
-     *
-     * @param MoveTimeOutEvent $event
-     * @return void
      */
-    public function handle(MoveTimeOutEvent $event): void {
+    public function handle(MoveTimeOutEvent $event): void
+    {
         $character = $event->character;
 
         $this->characterStatBuilder = $this->characterStatBuilder->setCharacter($character);
@@ -31,7 +30,7 @@ class MoveTimeOutListener {
             $time = $event->timeOut;
 
             MoveTimeOutJob::dispatch($character->id)->delay($time);
-        } else if ($event->timeOut !== 0) {
+        } elseif ($event->timeOut !== 0) {
             $time = $this->disPatchMinuteBasedMovementTimeout($event, $character);
         } else {
             $this->dispatchWalkingTimeOut($event, $character);
@@ -46,22 +45,19 @@ class MoveTimeOutListener {
      * Dispatches the minute based movement timeout.
      *
      * - Applies skill bonus reductions to time.
-     *
-     * @param MoveTimeOutEvent $event
-     * @param Character $character
-     * @return int
      */
-    protected function disPatchMinuteBasedMovementTimeout(MoveTimeOutEvent $event, Character $character): int {
+    protected function disPatchMinuteBasedMovementTimeout(MoveTimeOutEvent $event, Character $character): int
+    {
         $time = (int) round($event->timeOut - ($event->timeOut * $this->characterStatBuilder->buildTimeOutModifier('move_time_out')));
 
         if ($time < 1) {
-            $timeOut    = now()->addMinute();
+            $timeOut = now()->addMinute();
         } else {
-            $timeOut    = now()->addMinutes($time);
+            $timeOut = now()->addMinutes($time);
         }
 
         $character->update([
-            'can_move'          => false,
+            'can_move' => false,
             'can_move_again_at' => $timeOut,
         ]);
 
@@ -74,16 +70,13 @@ class MoveTimeOutListener {
 
     /**
      * Dispatches the walking movement timer.
-     *
-     * @param MoveTimeOutEvent $event
-     * @param Character $character
-     * @return void
      */
-    protected function dispatchWalkingTimeOut(MoveTimeOutEvent $event, Character $character): void {
+    protected function dispatchWalkingTimeOut(MoveTimeOutEvent $event, Character $character): void
+    {
         $timeOut = now()->addSeconds(10);
 
         $character->update([
-            'can_move'          => false,
+            'can_move' => false,
             'can_move_again_at' => $timeOut,
         ]);
 

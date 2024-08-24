@@ -2,14 +2,13 @@
 
 namespace App\Flare\Models;
 
-
+use App\Game\Events\Values\EventType;
 use Database\Factories\ScheduledEventFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use App\Game\Events\Values\EventType;
 use Illuminate\Database\Eloquent\Model;
 
-class ScheduledEvent extends Model {
-
+class ScheduledEvent extends Model
+{
     use HasFactory;
 
     /**
@@ -23,23 +22,25 @@ class ScheduledEvent extends Model {
         'start_date',
         'end_date',
         'description',
-        'currently_running'
+        'currently_running',
     ];
 
     protected $casts = [
-        'event_type'             => 'integer',
-        'raid_id'                => 'integer',
-        'start_date'             => 'datetime',
-        'end_date'               => 'datetime',
-        'currently_running'      => 'boolean',
+        'event_type' => 'integer',
+        'raid_id' => 'integer',
+        'start_date' => 'datetime',
+        'end_date' => 'datetime',
+        'currently_running' => 'boolean',
     ];
 
-    public function raid() {
+    public function raid()
+    {
         return $this->hasOne(Raid::class, 'id', 'raid_id');
     }
 
-    public function getTitleOfEvent(): string {
-        if (!is_null($this->raid)) {
+    public function getTitleOfEvent(): string
+    {
+        if (! is_null($this->raid)) {
             return $this->raid->name;
         }
 
@@ -69,10 +70,15 @@ class ScheduledEvent extends Model {
             return 'Delusional Memories Event';
         }
 
+        if ($type->isFeedbackEvent()) {
+            return 'Tlessa\'s Feedback Event';
+        }
+
         return 'Event Name';
     }
 
-    protected static function newFactory() {
+    protected static function newFactory()
+    {
         return ScheduledEventFactory::new();
     }
 }

@@ -18,9 +18,9 @@ class FixInvalidQuestItemDrop extends Command
     {
 
         // Process items in batches
-        Item::where('type', 'quest')->where(function($query) {
+        Item::where('type', 'quest')->where(function ($query) {
             $query->whereNotNull('item_prefix_id')
-                  ->whereNotNull('item_suffix_id');
+                ->whereNotNull('item_suffix_id');
         })->chunk(100, function ($items) {
             foreach ($items as $item) {
                 $this->processItem($item);
@@ -28,25 +28,25 @@ class FixInvalidQuestItemDrop extends Command
         });
 
         // Delete the items.
-        Item::where('type', 'quest')->where(function($query) {
+        Item::where('type', 'quest')->where(function ($query) {
             $query->whereNotNull('item_prefix_id')
-                  ->whereNotNull('item_suffix_id');
+                ->whereNotNull('item_suffix_id');
         })->delete();
     }
 
     private function processItem($item)
     {
         // Find proper quest item
-        $properQuestItem = Item::where('type', 'quest')->where(function($query) {
+        $properQuestItem = Item::where('type', 'quest')->where(function ($query) {
             $query->whereNull('item_prefix_id')
-                  ->whereNull('item_suffix_id');
+                ->whereNull('item_suffix_id');
         })->first();
 
         if (is_null($properQuestItem)) {
             return;
         }
 
-        InventorySlot::where('item_id', $item->id)->chunkById(100, function($inventorySlots) use ($item, $properQuestItem) {
+        InventorySlot::where('item_id', $item->id)->chunkById(100, function ($inventorySlots) use ($item, $properQuestItem) {
             foreach ($inventorySlots as $slot) {
                 $this->handleCharacter($slot->inventory->character, $item, $properQuestItem);
             }
@@ -58,8 +58,8 @@ class FixInvalidQuestItemDrop extends Command
         // Check if the character has the proper item in inventory or completed quest
         if ($this->characterHasProperItem($character, $properQuestItem)) {
             InventorySlot::where('inventory_id', $character->inventory->id)
-                         ->where('item_id', $item->id)
-                         ->delete();
+                ->where('item_id', $item->id)
+                ->delete();
 
             return;
         }
@@ -73,12 +73,12 @@ class FixInvalidQuestItemDrop extends Command
     private function characterHasProperItem($character, $properQuestItem)
     {
         return InventorySlot::where('inventory_id', $character->inventory->id)
-                ->where('item_id', $properQuestItem->id)
-                ->exists() || QuestsCompleted::where('character_id', $character->id)
-                ->whereHas('quest', function ($query) use ($properQuestItem) {
-                    $query->where('item_id', $properQuestItem->id)
-                        ->orWhere('secondary_required_item', $properQuestItem->id);
-                })
-                ->exists();
+            ->where('item_id', $properQuestItem->id)
+            ->exists() || QuestsCompleted::where('character_id', $character->id)
+            ->whereHas('quest', function ($query) use ($properQuestItem) {
+                $query->where('item_id', $properQuestItem->id)
+                    ->orWhere('secondary_required_item', $properQuestItem->id);
+            })
+            ->exists();
     }
 }

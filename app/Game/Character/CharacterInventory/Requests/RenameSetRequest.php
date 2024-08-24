@@ -24,17 +24,18 @@ class RenameSetRequest extends FormRequest
     public function rules()
     {
         return [
-            'set_id'   => 'required|exists:inventory_sets,id',
+            'set_id' => 'required|exists:inventory_sets,id',
             'set_name' => 'required|string|min:5|max:30',
         ];
     }
 
-    public function messages() {
+    public function messages()
+    {
         return [
-            'set_id.required'   => 'Which set do you want to change the name of?',
+            'set_id.required' => 'Which set do you want to change the name of?',
             'set_name.required' => 'Set name is needed',
-            'set_name.min'      => 'Set Name must be 5 characters minimum',
-            'set_name.max'      => 'Set Name may be 30 characters max',
+            'set_name.min' => 'Set Name must be 5 characters minimum',
+            'set_name.max' => 'Set Name may be 30 characters max',
         ];
     }
 }

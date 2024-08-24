@@ -6,27 +6,20 @@ use App\Flare\Models\Character;
 use App\Flare\Models\GameSkill;
 use App\Game\Skills\Events\UpdateCharacterSkills;
 
-class UpdateCharacterSkillsService {
-
-    /**
-     * @var SkillService $skillService
-     */
+class UpdateCharacterSkillsService
+{
     private SkillService $skillService;
 
-    /**
-     * @param SkillService $skillService
-     */
-    public function __construct(SkillService $skillService) {
+    public function __construct(SkillService $skillService)
+    {
         $this->skillService = $skillService;
     }
 
     /**
      * Fire off an event to update the character training skills.
-     *
-     * @param Character $character
-     * @return void
      */
-    public function updateCharacterSkills(Character $character): void {
+    public function updateCharacterSkills(Character $character): void
+    {
         $trainableSkillIds = GameSkill::where('can_train', true)->pluck('id')->toArray();
 
         $trainingSkills = $this->skillService->getSkills($character, $trainableSkillIds);
@@ -36,11 +29,9 @@ class UpdateCharacterSkillsService {
 
     /**
      * Fire off an event to update the character crafting skills.
-     *
-     * @param Character $character
-     * @return void
      */
-    public function updateCharacterCraftingSkills(Character $character): void {
+    public function updateCharacterCraftingSkills(Character $character): void
+    {
         $trainableSkillIds = GameSkill::where('can_train', false)->pluck('id')->toArray();
 
         $craftingSkills = $this->skillService->getSkills($character, $trainableSkillIds);

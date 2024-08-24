@@ -4,8 +4,8 @@ namespace App\Flare\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class RaidBossParticipation extends Model {
-
+class RaidBossParticipation extends Model
+{
     /**
      * The attributes that are mass assignable.
      *
@@ -22,14 +22,16 @@ class RaidBossParticipation extends Model {
     protected $casts = [
         'attacks_left' => 'integer',
         'damage_dealt' => 'integer',
-        'killed_boss'  => 'boolean',
+        'killed_boss' => 'boolean',
     ];
 
-    public function raid() {
+    public function raid()
+    {
         return $this->hasOne(Raid::class, 'id', 'raid_id');
     }
 
-    public function character() {
+    public function character()
+    {
         return $this->hasOne(Character::class, 'id', 'character_id');
     }
 }

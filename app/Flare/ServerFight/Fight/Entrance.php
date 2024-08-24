@@ -7,42 +7,47 @@ use App\Flare\ServerFight\BattleBase;
 use App\Flare\ServerFight\Monster\ServerMonster;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 
-class Entrance extends BattleBase {
-
+class Entrance extends BattleBase
+{
     private bool $enemyEntranced;
 
     private bool $isCharacterEntranced;
 
-    public function __construct(CharacterCacheData $characterCacheData) {
+    public function __construct(CharacterCacheData $characterCacheData)
+    {
         parent::__construct($characterCacheData);
 
-        $this->enemyEntranced       = false;
+        $this->enemyEntranced = false;
         $this->isCharacterEntranced = false;
     }
 
-    public function isCharacterEntracned() {
+    public function isCharacterEntracned()
+    {
         return $this->isCharacterEntranced;
     }
 
-    public function isEnemyEntranced() {
+    public function isEnemyEntranced()
+    {
         return $this->enemyEntranced;
     }
 
-    public function attackerEntrancesDefender(Character $attacker, array $attackType, bool $isAttackerVoided) {
-        if ($attackType['affixes']['entrancing_chance'] > 0.0 && !$isAttackerVoided) {
+    public function attackerEntrancesDefender(Character $attacker, array $attackType, bool $isAttackerVoided)
+    {
+        if ($attackType['affixes']['entrancing_chance'] > 0.0 && ! $isAttackerVoided) {
             if ($this->canAttackerEntranceDefender($attackType)) {
                 $this->addAttackerMessage('You managed to entrance the enemy in your mesmerizing stare! (Entranced!)', 'player-action');
-                $this->addDefenderMessage($attacker->name . ' has caught you in their web of magics! (Entranced!)', 'enemy-action');
+                $this->addDefenderMessage($attacker->name.' has caught you in their web of magics! (Entranced!)', 'enemy-action');
 
                 $this->enemyEntranced = true;
             } else {
                 $this->addAttackerMessage('The enemy is dazed by your enchantments!', 'enemy-action');
-                $this->addDefenderMessage('You evade ' . $attacker->name . ' entrancing enchantments!', 'player-action');
+                $this->addDefenderMessage('You evade '.$attacker->name.' entrancing enchantments!', 'player-action');
             }
         }
     }
 
-    public function playerEntrance(Character $character, ServerMonster $monster, array $attackType) {
+    public function playerEntrance(Character $character, ServerMonster $monster, array $attackType)
+    {
         if ($attackType['affixes']['entrancing_chance'] > 0.0) {
             if ($this->canPlayerEntranceMonster($character, $monster, $attackType)) {
                 $this->addMessage('The enemy is dazed by your enchantments!', 'player-action');
@@ -54,9 +59,10 @@ class Entrance extends BattleBase {
         }
     }
 
-    public function monsterEntrancesPlayer(Character $character, ServerMonster $monster, bool $isPlayerVoided) {
+    public function monsterEntrancesPlayer(Character $character, ServerMonster $monster, bool $isPlayerVoided)
+    {
         if ($this->canMonsterEntrancePlayer($character, $monster, $isPlayerVoided)) {
-            $this->addMessage($monster->getName() . ' has trapped you in a trance-like state with their enchantments!', 'enemy-action');
+            $this->addMessage($monster->getName().' has trapped you in a trance-like state with their enchantments!', 'enemy-action');
 
             $this->isCharacterEntranced = true;
         } else {
@@ -64,7 +70,8 @@ class Entrance extends BattleBase {
         }
     }
 
-    protected function canAttackerEntranceDefender(array $attackType) {
+    protected function canAttackerEntranceDefender(array $attackType)
+    {
         if ($attackType['affixes']['cant_be_resisted']) {
             return true;
         }
@@ -80,7 +87,8 @@ class Entrance extends BattleBase {
         return ($roll + $roll * $chance) > 50;
     }
 
-    protected function canPlayerEntranceMonster(Character $character, ServerMonster $monster, array $attackType): bool {
+    protected function canPlayerEntranceMonster(Character $character, ServerMonster $monster, array $attackType): bool
+    {
         $chance = $attackType['affixes']['entrancing_chance'] - $monster->getMonsterStat('affix_resistance');
 
         if ($attackType['affixes']['cant_be_resisted']) {
@@ -96,7 +104,8 @@ class Entrance extends BattleBase {
         return ($roll + $roll * $chance) > 50;
     }
 
-    protected function canMonsterEntrancePlayer(Character $character, ServerMonster $monster, bool $isPlayerVoided): bool {
+    protected function canMonsterEntrancePlayer(Character $character, ServerMonster $monster, bool $isPlayerVoided): bool
+    {
 
         $chance = $monster->getMonsterStat('entrance_chance');
 

@@ -1,16 +1,17 @@
 <?php
+
 namespace App\Game\Messages\Providers;
 
-use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
-use App\Flare\Events\SkillLeveledUpServerMessageEvent;
 use App\Flare\Events\KingdomServerMessageEvent;
+use App\Flare\Events\SkillLeveledUpServerMessageEvent;
 use App\Game\Messages\Listeners\KingdomServerMessageListener;
 use App\Game\Messages\Listeners\SkillLeveledUpServerMessageListener;
+use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 
-class EventsProvider extends ServiceProvider {
-
+class EventsProvider extends ServiceProvider
+{
     /**
-     * @var array[] $listen
+     * @var array[]
      */
     protected $listen = [
 
@@ -27,10 +28,9 @@ class EventsProvider extends ServiceProvider {
 
     /**
      * Bootstrap services.
-     *
-     * @return void
      */
-    public function boot(): void {
+    public function boot(): void
+    {
         parent::boot();
     }
 }

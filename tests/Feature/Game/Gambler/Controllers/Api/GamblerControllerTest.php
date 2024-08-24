@@ -9,25 +9,28 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 
-class GamblerControllerTest extends TestCase {
-
+class GamblerControllerTest extends TestCase
+{
     use RefreshDatabase;
 
     private ?Character $character = null;
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
-        $this->character = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
 
         $this->character = null;
     }
 
-    public function testGetSlots() {
+    public function testGetSlots()
+    {
         $response = $this->actingAs($this->character->user)
             ->call('GET', '/api/character/gambler');
 
@@ -38,7 +41,8 @@ class GamblerControllerTest extends TestCase {
         $this->assertEquals($icons, $jsonData['icons']);
     }
 
-    public function testRollSlots() {
+    public function testRollSlots()
+    {
 
         $this->character->update(['gold' => MaxCurrenciesValue::MAX_GOLD]);
 

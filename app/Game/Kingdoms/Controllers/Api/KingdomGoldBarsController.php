@@ -2,55 +2,46 @@
 
 namespace App\Game\Kingdoms\Controllers\Api;
 
-use App\Game\Kingdoms\Service\UpdateKingdom;
-use App\Game\Kingdoms\Values\KingdomMaxValue;
-use Illuminate\Http\JsonResponse;
-use App\Http\Controllers\Controller;
-use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Models\Kingdom;
 use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Kingdoms\Requests\PurchaseGoldBarsRequest;
 use App\Game\Kingdoms\Requests\WithdrawGoldBarsRequest;
+use App\Game\Kingdoms\Service\UpdateKingdom;
+use App\Game\Kingdoms\Values\KingdomMaxValue;
+use App\Http\Controllers\Controller;
+use Illuminate\Http\JsonResponse;
 
-class KingdomGoldBarsController extends Controller {
-
-    /**
-     * @var UpdateKingdom $updateKingdom
-     */
+class KingdomGoldBarsController extends Controller
+{
     private UpdateKingdom $updateKingdom;
 
-    /**
-     * @param UpdateKingdom $updateKingdom
-     */
-    public function __construct(UpdateKingdom $updateKingdom){
+    public function __construct(UpdateKingdom $updateKingdom)
+    {
         $this->updateKingdom = $updateKingdom;
     }
 
-    /**
-     * @param PurchaseGoldBarsRequest $request
-     * @param Kingdom $kingdom
-     * @return JsonResponse
-     */
-    public function purchaseGoldBars(PurchaseGoldBarsRequest $request, Kingdom $kingdom): JsonResponse {
+    public function purchaseGoldBars(PurchaseGoldBarsRequest $request, Kingdom $kingdom): JsonResponse
+    {
         if ($kingdom->character->id !== auth()->user()->character->id) {
             return response()->json([
-                'message' => 'Invalid Input. Not allowed to do that.'
+                'message' => 'Invalid Input. Not allowed to do that.',
             ], 422);
         }
 
         if ($kingdom->buildings->where('name', 'Goblin Coin Bank')->first()->level < 5) {
             return response()->json([
-                'message' => 'Goblin Coin Bank must be level 5 or higher to purchase.'
+                'message' => 'Goblin Coin Bank must be level 5 or higher to purchase.',
             ], 422);
         }
 
         $amountToBuy = $request->amount_to_purchase;
 
-        $newAmount   = $amountToBuy + $kingdom->gold_bars;
+        $newAmount = $amountToBuy + $kingdom->gold_bars;
 
         if ($newAmount > KingdomMaxValue::MAX_GOLD_BARS) {
             return response()->json([
-                'message' => 'Cannot go over the max amount of Gold Bars: 1000'
+                'message' => 'Cannot go over the max amount of Gold Bars: 1000',
             ], 422);
         }
 
@@ -73,7 +64,7 @@ class KingdomGoldBarsController extends Controller {
         }
 
         $character->update([
-            'gold' => $character->gold - $cost
+            'gold' => $character->gold - $cost,
         ]);
 
         $kingdom->update([
@@ -87,28 +78,23 @@ class KingdomGoldBarsController extends Controller {
         event(new UpdateTopBarEvent($character->refresh()));
 
         return response()->json([
-            'message' => 'Purchased: ' . number_format($amountToBuy) . ' Gold bars.'
+            'message' => 'Purchased: '.number_format($amountToBuy).' Gold bars.',
         ], 200);
     }
 
-    /**
-     * @param WithdrawGoldBarsRequest $request
-     * @param Kingdom $kingdom
-     * @return JsonResponse
-     */
-    public function withdrawGoldBars(WithdrawGoldBarsRequest $request, Kingdom $kingdom): JsonResponse {
+    public function withdrawGoldBars(WithdrawGoldBarsRequest $request, Kingdom $kingdom): JsonResponse
+    {
         if ($kingdom->character->id !== auth()->user()->character->id) {
             return response()->json([
-                'message' => 'Invalid Input. Not allowed to do that.'
+                'message' => 'Invalid Input. Not allowed to do that.',
             ], 422);
         }
 
         if ($kingdom->buildings->where('name', 'Goblin Coin Bank')->first()->level < 5) {
             return response()->json([
-                'message' => 'Goblin Coin Bank must be level 5 or higher to withdraw.'
+                'message' => 'Goblin Coin Bank must be level 5 or higher to withdraw.',
             ], 422);
         }
-
 
         $amount = $request->amount_to_withdraw;
 
@@ -123,7 +109,7 @@ class KingdomGoldBarsController extends Controller {
 
         if ($newGold > MaxCurrenciesValue::MAX_GOLD) {
             return response()->json([
-                'message' => 'You would waste gold if you withdrew this amount.'
+                'message' => 'You would waste gold if you withdrew this amount.',
             ], 422);
         }
 
@@ -142,7 +128,7 @@ class KingdomGoldBarsController extends Controller {
         $this->updateKingdom->updateKingdom($kingdom->refresh());
 
         return response()->json([
-            'message' => 'Exchanged: ' . $amount . ' Gold bars for: ' . number_format($totalGold) . ' Gold!',
+            'message' => 'Exchanged: '.$amount.' Gold bars for: '.number_format($totalGold).' Gold!',
         ], 200);
     }
 }

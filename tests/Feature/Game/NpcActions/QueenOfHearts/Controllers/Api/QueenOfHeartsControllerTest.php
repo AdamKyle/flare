@@ -13,25 +13,28 @@ use Tests\Traits\CreateGameMap;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateItemAffix;
 
-class QueenOfHeartsControllerTest extends TestCase {
-
-    use RefreshDatabase, CreateItem, CreateGameMap, CreateItemAffix;
+class QueenOfHeartsControllerTest extends TestCase
+{
+    use CreateGameMap, CreateItem, CreateItemAffix, RefreshDatabase;
 
     private ?CharacterFactory $character = null;
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
-        $this->character = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
+        $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
 
         $this->character = null;
     }
 
-    public function testUniquesOnly() {
+    public function testUniquesOnly()
+    {
         $character = $this->character->inventoryManagement()->giveItem($this->createItem([
             'item_suffix_id' => $this->createItemAffix(['randomly_generated' => true])->id,
         ]))->giveItem($this->createItem([
@@ -47,12 +50,12 @@ class QueenOfHeartsControllerTest extends TestCase {
 
         $jsonData = json_decode($response->getContent(), true);
 
-
         $this->assertCount(2, $jsonData['unique_slots']);
         $this->assertCount(2, $jsonData['non_unique_slots']);
     }
 
-    public function testPurchase() {
+    public function testPurchase()
+    {
         $questItem = $this->createItem(['effect' => ItemEffectsValue::QUEEN_OF_HEARTS]);
 
         $character = $this->character->inventoryManagement()->giveItem($questItem)->getCharacter();
@@ -70,7 +73,7 @@ class QueenOfHeartsControllerTest extends TestCase {
         $this->actingAs($character->user)
             ->call('POST', '/api/character/'.$character->id.'/random-enchant/purchase', [
                 '_token' => csrf_token(),
-                'type'   => 'basic',
+                'type' => 'basic',
             ]);
 
         $character = $character->refresh();
@@ -79,10 +82,11 @@ class QueenOfHeartsControllerTest extends TestCase {
         $this->assertLessThan(MaxCurrenciesValue::MAX_GOLD, $character->gold);
     }
 
-    public function testReRoll() {
+    public function testReRoll()
+    {
         Event::fake();
 
-        $gameMap   = $this->createGameMap(['name' => 'Hell']);
+        $gameMap = $this->createGameMap(['name' => 'Hell']);
 
         $character = $this->character->inventoryManagement()
             ->giveItem($this->createItem(['effect' => ItemEffectsValue::QUEEN_OF_HEARTS]))
@@ -97,8 +101,8 @@ class QueenOfHeartsControllerTest extends TestCase {
         $this->actingAs($character->user)
             ->call('POST', '/api/character/'.$character->id.'/random-enchant/purchase', [
                 '_token' => csrf_token(),
-                'type'   => 'basic',
-        ]);
+                'type' => 'basic',
+            ]);
 
         $character = $character->refresh();
 
@@ -109,7 +113,7 @@ class QueenOfHeartsControllerTest extends TestCase {
         $result = $this->actingAs($character->user)
             ->call('POST', '/api/character/'.$character->id.'/random-enchant/reroll', [
                 '_token' => csrf_token(),
-                'selected_slot_id'   => $slotWithUnique->id,
+                'selected_slot_id' => $slotWithUnique->id,
                 'selected_affix' => 'all-enchantments',
                 'selected_reroll_type' => 'everything',
             ]);
@@ -119,7 +123,8 @@ class QueenOfHeartsControllerTest extends TestCase {
         Event::assertDispatched(ServerMessageEvent::class);
     }
 
-    public function testMoveAffixes() {
+    public function testMoveAffixes()
+    {
         $questItem = $this->createItem(['effect' => ItemEffectsValue::QUEEN_OF_HEARTS, 'type' => 'quest']);
 
         $character = $this->character->inventoryManagement()->giveItem($questItem)->giveItem($this->createItem(['name' => 'Sample', 'type' => 'weapon']))->getCharacter();
@@ -133,9 +138,9 @@ class QueenOfHeartsControllerTest extends TestCase {
         $character->map()->update(['game_map_id' => $gameMap->id]);
 
         $character->update([
-            'gold'      => MaxCurrenciesValue::MAX_GOLD,
+            'gold' => MaxCurrenciesValue::MAX_GOLD,
             'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
-            'shards'    => MaxCurrenciesValue::MAX_SHARDS,
+            'shards' => MaxCurrenciesValue::MAX_SHARDS,
         ]);
 
         $character = $character->refresh();
@@ -143,7 +148,7 @@ class QueenOfHeartsControllerTest extends TestCase {
         $this->actingAs($character->user)
             ->call('POST', '/api/character/'.$character->id.'/random-enchant/purchase', [
                 '_token' => csrf_token(),
-                'type'   => 'legendary',
+                'type' => 'legendary',
             ]);
 
         $character = $character->refresh();
@@ -153,13 +158,13 @@ class QueenOfHeartsControllerTest extends TestCase {
         })->first();
 
         $slotToMoveTo = $character->inventory->slots->filter(function ($slot) {
-            return !$slot->item->is_unique && $slot->item->type !== 'quest';
+            return ! $slot->item->is_unique && $slot->item->type !== 'quest';
         })->first();
 
         $response = $this->actingAs($character->user)
             ->call('POST', '/api/character/'.$character->id.'/random-enchant/move', [
                 '_token' => csrf_token(),
-                'type'   => 'legendary',
+                'type' => 'legendary',
                 'selected_slot_id' => $slotWithUnique->id,
                 'selected_secondary_slot_id' => $slotToMoveTo->id,
                 'selected_affix' => 'all-enchantments',
@@ -167,5 +172,4 @@ class QueenOfHeartsControllerTest extends TestCase {
 
         $this->assertEquals(200, $response->getStatusCode());
     }
-
 }

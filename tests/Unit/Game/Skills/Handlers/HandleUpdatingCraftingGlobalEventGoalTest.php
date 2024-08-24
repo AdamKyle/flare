@@ -18,33 +18,36 @@ use Tests\Traits\CreateGameSkill;
 use Tests\Traits\CreateGlobalEventGoal;
 use Tests\Traits\CreateItem;
 
-class HandleUpdatingCraftingGlobalEventGoalTest extends TestCase {
-
-    use RefreshDatabase, CreateGlobalEventGoal, CreateEvent, CreateItem, CreateGameSkill;
+class HandleUpdatingCraftingGlobalEventGoalTest extends TestCase
+{
+    use CreateEvent, CreateGameSkill, CreateGlobalEventGoal, CreateItem, RefreshDatabase;
 
     private ?HandleUpdatingCraftingGlobalEventGoal $handleUpdatingCraftingGlobalEventGoal;
 
     private ?CharacterFactory $characterFactory;
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
         $this->handleUpdatingCraftingGlobalEventGoal = resolve(HandleUpdatingCraftingGlobalEventGoal::class);
 
-        $this->character = (new CharacterFactory())->createBaseCharacter()->assignSkill(
+        $this->character = (new CharacterFactory)->createBaseCharacter()->assignSkill(
             $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING]),
             400
         );
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
 
         $this->handleUpdatingCraftingGlobalEventGoal = null;
         $this->character = null;
     }
 
-    public function testDoNotParticipateInCraftingGlobalEventWhenEventDoesNotExist() {
+    public function testDoNotParticipateInCraftingGlobalEventWhenEventDoesNotExist()
+    {
         $item = $this->createItem(['type' => WeaponTypes::WEAPON]);
         $character = $this->character->getCharacter();
 
@@ -59,9 +62,10 @@ class HandleUpdatingCraftingGlobalEventGoalTest extends TestCase {
         $this->assertEmpty(GlobalEventCraftingInventory::all());
     }
 
-    public function testDoNotParticipateInCraftingGlobalEventWhenGlobalEventDoesNotExist() {
+    public function testDoNotParticipateInCraftingGlobalEventWhenGlobalEventDoesNotExist()
+    {
         $this->createEvent([
-            'type'                    => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'type' => EventType::DELUSIONAL_MEMORIES_EVENT,
             'current_event_goal_step' => GlobalEventSteps::CRAFT,
         ]);
 
@@ -79,20 +83,21 @@ class HandleUpdatingCraftingGlobalEventGoalTest extends TestCase {
         $this->assertEmpty(GlobalEventCraftingInventory::all());
     }
 
-    public function testParticipateInGlobalCraftingEvent() {
+    public function testParticipateInGlobalCraftingEvent()
+    {
         $this->createEvent([
-            'type'                    => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'type' => EventType::DELUSIONAL_MEMORIES_EVENT,
             'current_event_goal_step' => GlobalEventSteps::CRAFT,
         ]);
 
         $this->createGlobalEventGoal([
-            'event_type'                  => EventType::DELUSIONAL_MEMORIES_EVENT,
-            'max_crafts'                  => 100,
-            'reward_every'                => 10,
-            'next_reward_at'              => 10,
-            'item_specialty_type_reward'  => ItemSpecialtyType::DELUSIONAL_SILVER,
-            'should_be_unique'            => false,
-            'should_be_mythic'            => true,
+            'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'max_crafts' => 100,
+            'reward_every' => 10,
+            'next_reward_at' => 10,
+            'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER,
+            'should_be_unique' => false,
+            'should_be_mythic' => true,
         ]);
 
         $item = $this->createItem(['type' => WeaponTypes::WEAPON]);
@@ -112,36 +117,37 @@ class HandleUpdatingCraftingGlobalEventGoalTest extends TestCase {
         $this->assertCount(1, GlobalEventCraftingInventorySlot::where('item_id', $item->id)->get());
     }
 
-    public function testParticipateInGlobalCraftingEventWhenWeShouldBeRewarded() {
+    public function testParticipateInGlobalCraftingEventWhenWeShouldBeRewarded()
+    {
         $this->createItem(['specialty_type' => ItemSpecialtyType::DELUSIONAL_SILVER]);
 
         $this->createEvent([
-            'type'                    => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'type' => EventType::DELUSIONAL_MEMORIES_EVENT,
             'current_event_goal_step' => GlobalEventSteps::CRAFT,
         ]);
 
         $eventGoal = $this->createGlobalEventGoal([
-            'event_type'                  => EventType::DELUSIONAL_MEMORIES_EVENT,
-            'max_crafts'                  => 100,
-            'reward_every'                => 10,
-            'next_reward_at'              => 10,
-            'item_specialty_type_reward'  => ItemSpecialtyType::DELUSIONAL_SILVER,
-            'should_be_unique'            => false,
-            'should_be_mythic'            => true,
+            'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'max_crafts' => 100,
+            'reward_every' => 10,
+            'next_reward_at' => 10,
+            'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER,
+            'should_be_unique' => false,
+            'should_be_mythic' => true,
         ]);
 
         $character = $this->character->getCharacter();
 
         $this->createGlobalEventParticipation([
-            'global_event_goal_id'  => $eventGoal->id,
-            'character_id'          => $character->id,
-            'current_crafts'        => 99,
+            'global_event_goal_id' => $eventGoal->id,
+            'character_id' => $character->id,
+            'current_crafts' => 99,
         ]);
 
         $character->globalEventCrafts()->create([
             'global_event_goal_id' => $eventGoal->id,
-            'character_id'         => $character->id,
-            'crafts'               => 99,
+            'character_id' => $character->id,
+            'crafts' => 99,
         ]);
 
         $character = $character->refresh();
@@ -161,7 +167,7 @@ class HandleUpdatingCraftingGlobalEventGoalTest extends TestCase {
 
         $this->assertCount(1, GlobalEventCraftingInventorySlot::where('item_id', $item->id)->get());
 
-        $foundMythic = $character->inventory->slots->filter(function($slot) {
+        $foundMythic = $character->inventory->slots->filter(function ($slot) {
             return $slot->item->is_mythic;
         })->first();
 

@@ -2,11 +2,12 @@
 
 namespace Database\Factories;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Flare\Models\ScheduledEvent;
 use App\Game\Events\Values\EventType;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
-class ScheduledEventFactory extends Factory {
+class ScheduledEventFactory extends Factory
+{
     /**
      * The name of the factory's corresponding model.
      *
@@ -19,14 +20,15 @@ class ScheduledEventFactory extends Factory {
      *
      * @return array
      */
-    public function definition() {
+    public function definition()
+    {
         return [
-            'event_type'         => EventType::MONTHLY_PVP,
-            'raid_id'            => null,
-            'start_date'         => now(),
-            'end_date'           => now(),
-            'description'        => 'Test',
-            'currently_running'  => false,
+            'event_type' => EventType::MONTHLY_PVP,
+            'raid_id' => null,
+            'start_date' => now(),
+            'end_date' => now(),
+            'description' => 'Test',
+            'currently_running' => false,
         ];
     }
 }

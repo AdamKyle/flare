@@ -1,4 +1,4 @@
-<?php
+@php
 function calculateGridCols(int $numItems) {
     if ($numItems <= 1) {
         return 'auto'; // No grid, single column
@@ -8,7 +8,7 @@ function calculateGridCols(int $numItems) {
         return '2'; // Use a 3-column grid
     }
 }
-?>
+@endphp
 
 <div class="w-full lg:w-3/4 mx-auto mt-20">
     <div class="text-center">

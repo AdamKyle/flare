@@ -9,12 +9,12 @@ use App\Game\Character\CharacterInventory\Services\MultiInventoryActionService;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 
-class  CharacterInventoryMultiController extends Controller {
+class CharacterInventoryMultiController extends Controller
+{
+    public function __construct(private readonly MultiInventoryActionService $multiInventoryActionService) {}
 
-    public function __construct(private readonly MultiInventoryActionService $multiInventoryActionService) {
-    }
-
-    public function equipSelected(InventoryMultiRequest $request, Character $character) {
+    public function equipSelected(InventoryMultiRequest $request, Character $character)
+    {
         $result = $this->multiInventoryActionService->equipManyItems($character, $request->slot_ids);
 
         $status = $result['status'];
@@ -23,7 +23,8 @@ class  CharacterInventoryMultiController extends Controller {
         return response()->json($result, $status);
     }
 
-    public function moveSelected(MoveSelectedItemsRequest $request, Character $character): JsonResponse {
+    public function moveSelected(MoveSelectedItemsRequest $request, Character $character): JsonResponse
+    {
         $result = $this->multiInventoryActionService->moveManyItemsToSelectedSet($character, $request->set_id, $request->slot_ids);
 
         $status = $result['status'];
@@ -32,7 +33,8 @@ class  CharacterInventoryMultiController extends Controller {
         return response()->json($result, $status);
     }
 
-    public function destroySelected(InventoryMultiRequest $request, Character $character) {
+    public function destroySelected(InventoryMultiRequest $request, Character $character)
+    {
         $result = $this->multiInventoryActionService->destroyManyItems($character, $request->slot_ids);
 
         $status = $result['status'];
@@ -41,7 +43,8 @@ class  CharacterInventoryMultiController extends Controller {
         return response()->json($result, $status);
     }
 
-    public function disenchantSelected(InventoryMultiRequest $request, Character $character) {
+    public function disenchantSelected(InventoryMultiRequest $request, Character $character)
+    {
         $result = $this->multiInventoryActionService->disenchantManyItems($character, $request->slot_ids);
 
         $status = $result['status'];
@@ -50,7 +53,8 @@ class  CharacterInventoryMultiController extends Controller {
         return response()->json($result, $status);
     }
 
-    public function sellSelected(InventoryMultiRequest $request, Character $character) {
+    public function sellSelected(InventoryMultiRequest $request, Character $character)
+    {
         $result = $this->multiInventoryActionService->sellManyItems($character, $request->slot_ids);
 
         $status = $result['status'];

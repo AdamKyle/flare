@@ -9,52 +9,55 @@ use Rappasoft\LaravelLivewireTables\DataTableComponent;
 use Rappasoft\LaravelLivewireTables\Views\Column;
 use Rappasoft\LaravelLivewireTables\Views\Filters\SelectFilter;
 
-class MonstersTable extends DataTableComponent {
-
-    public function configure(): void {
+class MonstersTable extends DataTableComponent
+{
+    public function configure(): void
+    {
         $this->setPrimaryKey('id');
     }
 
-    public function builder(): Builder {
+    public function builder(): Builder
+    {
 
         return Monster::query();
     }
 
-    public function filters(): array {
+    public function filters(): array
+    {
 
         return [
             SelectFilter::make('Maps')
                 ->options([
-                    ''                            => 'Please Select',
-                    'Surface'                     => 'Surface',
-                    'Labyrinth'                   => 'Labyrinth',
-                    'Dungeons'                    => 'Dungeons',
-                    'Shadow Plane'                => 'Shadow Plane',
-                    'Hell'                        => 'Hell',
-                    'Purgatory'                   => 'Purgatory',
-                    'The Ice Plane'               => 'The Ice Plane',
-                    'Twisted Memories'            => 'Twisted Memories',
-                    'Delusional Memories'         => 'Delusional Memories',
-                    'Surface Celestials'          => 'Surface Celestials',
-                    'Labyrinth Celestials'        => 'Labyrinth Celestials',
-                    'Dungeons Celestials'         => 'Dungeons Celestials',
-                    'Shadow Plane Celestials'     => 'Shadow Planes Celestials',
-                    'Purgatory Celestials'        => 'Purgatory Celestials',
+                    '' => 'Please Select',
+                    'Surface' => 'Surface',
+                    'Labyrinth' => 'Labyrinth',
+                    'Dungeons' => 'Dungeons',
+                    'Shadow Plane' => 'Shadow Plane',
+                    'Hell' => 'Hell',
+                    'Purgatory' => 'Purgatory',
+                    'The Ice Plane' => 'The Ice Plane',
+                    'Twisted Memories' => 'Twisted Memories',
+                    'Delusional Memories' => 'Delusional Memories',
+                    'Surface Celestials' => 'Surface Celestials',
+                    'Labyrinth Celestials' => 'Labyrinth Celestials',
+                    'Dungeons Celestials' => 'Dungeons Celestials',
+                    'Shadow Plane Celestials' => 'Shadow Planes Celestials',
+                    'Purgatory Celestials' => 'Purgatory Celestials',
                     'Delusional Memories Celestials' => 'Delusional Memories Celestials',
-                    'Surface Raid Bosses'         => 'Surface Raid Bosses',
-                    'Labyrinth Raid Bosses'       => 'Labyrinth Raid Bosses',
-                    'Dungeons Raid Bosses'        => 'Dungeons Raid Bosses',
-                    'Shadow Plane Raid Bosses'    => 'Shadow Plane Raid Bosses',
-                    'Hell Raid Bosses'            => 'Hell Raid Bosses',
-                    'The Ice Plane Raid Bosses'   => 'The Ice Plane Raid Bosses',
+                    'Surface Raid Bosses' => 'Surface Raid Bosses',
+                    'Labyrinth Raid Bosses' => 'Labyrinth Raid Bosses',
+                    'Dungeons Raid Bosses' => 'Dungeons Raid Bosses',
+                    'Shadow Plane Raid Bosses' => 'Shadow Plane Raid Bosses',
+                    'Hell Raid Bosses' => 'Hell Raid Bosses',
+                    'The Ice Plane Raid Bosses' => 'The Ice Plane Raid Bosses',
                     'Delusional Memories Raid Bosses' => 'Delusional Memories Raid Bosses',
-                    'Purgatory Raid Bosses'       => 'Purgatory Raid Bosses',
-                    'Surface Raid Monsters'       => 'Surface Raid Monsters',
-                    'Labyrinth Raid Monsters'     => 'Labyrinth Raid Monsters',
-                    'Dungeons Raid Monsters'      => 'Dungeons Raid Monsters',
-                    'Shadow Plane Raid Monsters'  => 'Shadow Plane Raid Monsters',
-                    'Hell Raid Monsters'          => 'Hell Raid Monsters',
-                    'Purgatory Raid Monsters'     => 'Purgatory Raid Monsters',
+                    'Purgatory Raid Bosses' => 'Purgatory Raid Bosses',
+                    'Surface Raid Monsters' => 'Surface Raid Monsters',
+                    'Labyrinth Raid Monsters' => 'Labyrinth Raid Monsters',
+                    'Dungeons Raid Monsters' => 'Dungeons Raid Monsters',
+                    'Shadow Plane Raid Monsters' => 'Shadow Plane Raid Monsters',
+                    'Hell Raid Monsters' => 'Hell Raid Monsters',
+                    'Purgatory Raid Monsters' => 'Purgatory Raid Monsters',
                     'The Ice Plane Raid Monsters' => 'The Ice Plane Raid Monsters',
                     'Delusional Memories Raid Monsters' => 'Delusional Memories Raid Monsters',
                 ])->filter(function (Builder $builder, string $value) {
@@ -88,18 +91,19 @@ class MonstersTable extends DataTableComponent {
         ];
     }
 
-    public function columns(): array {
+    public function columns(): array
+    {
         return [
             Column::make('Name')->searchable()->format(function ($value, $row) {
                 $monsterId = Monster::where('name', $value)->first()->id;
 
-                if (!is_null(auth()->user())) {
+                if (! is_null(auth()->user())) {
                     if (auth()->user()->hasRole('Admin')) {
-                        return '<a href="/admin/monsters/' . $monsterId . '">' . $row->name . '</a>';
+                        return '<a href="/admin/monsters/'.$monsterId.'">'.$row->name.'</a>';
                     }
                 }
 
-                return '<a href="/monsters/' . $monsterId . '" >' . $row->name . '</a>';
+                return '<a href="/monsters/'.$monsterId.'" >'.$row->name.'</a>';
             })->html(),
             Column::make('Is Raid Boss', 'is_raid_boss')->searchable()->format(function ($value, $row) {
 

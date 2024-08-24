@@ -3,14 +3,14 @@
 namespace App\Game\Raids\Events;
 
 use Illuminate\Broadcasting\Channel;
-use Illuminate\Broadcasting\PresenceChannel;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\SerializesModels;
 
-class CorruptLocations implements ShouldBroadcastNow {
-
+class CorruptLocations implements ShouldBroadcastNow
+{
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public array $corruptedLocations;
@@ -20,7 +20,8 @@ class CorruptLocations implements ShouldBroadcastNow {
      *
      * @return void
      */
-    public function __construct(array $eventData) {
+    public function __construct(array $eventData)
+    {
         $this->corruptedLocations = $eventData;
     }
 
@@ -29,7 +30,8 @@ class CorruptLocations implements ShouldBroadcastNow {
      *
      * @return Channel|array
      */
-    public function broadcastOn() {
+    public function broadcastOn()
+    {
         return new PresenceChannel('corrupt-locations');
     }
 }

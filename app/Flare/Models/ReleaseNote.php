@@ -3,11 +3,11 @@
 namespace App\Flare\Models;
 
 use Database\Factories\ReleaseNoteFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
-class ReleaseNote extends Model {
-
+class ReleaseNote extends Model
+{
     use HasFactory;
 
     /**
@@ -27,7 +27,8 @@ class ReleaseNote extends Model {
         'release_date' => 'date',
     ];
 
-    protected static function newFactory() {
+    protected static function newFactory()
+    {
         return ReleaseNoteFactory::new();
     }
 }

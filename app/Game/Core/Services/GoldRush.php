@@ -2,23 +2,21 @@
 
 namespace App\Game\Core\Services;
 
-use App\Flare\Models\Monster;
 use App\Flare\Models\Character;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use Facades\App\Flare\Calculators\GoldRushCheckCalculator;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 
-class GoldRush {
-
+class GoldRush
+{
     /**
      * Process a potential gold rush.
      *
-     * @param Character $character
-     * @return void
      * @throws \Exception
      */
-    public function processPotentialGoldRush(Character $character): void {
+    public function processPotentialGoldRush(Character $character): void
+    {
 
         if ($character->gold >= MaxCurrenciesValue::MAX_GOLD) {
             return;
@@ -33,7 +31,7 @@ class GoldRush {
         if (GoldRushCheckCalculator::fetchGoldRushChance($gameMapBonus)) {
             $this->giveGoldRush($character);
 
-            if (!$character->is_auto_battling && $character->isLoggedIn()) {
+            if (! $character->is_auto_battling && $character->isLoggedIn()) {
                 event(new UpdateCharacterCurrenciesEvent($character->refresh()));
             }
         }
@@ -42,12 +40,11 @@ class GoldRush {
     /**
      * Give the player a gold rush.
      *
-     * @param Character $character
-     * @return void
      * @throws \Exception
      */
-    protected function giveGoldRush(Character $character): void {
-        $goldRush      = $character->gold + ($character->gold * 0.05);
+    protected function giveGoldRush(Character $character): void
+    {
+        $goldRush = $character->gold + ($character->gold * 0.05);
 
         $maxCurrencies = new MaxCurrenciesValue($goldRush, MaxCurrenciesValue::GOLD);
 
@@ -70,15 +67,13 @@ class GoldRush {
 
     /**
      * Get the gameMap Bonus.
-     *
-     * @param Character $character
-     * @return float
      */
-    protected function getGameMapBonus(Character $character): float {
-        $gameMap        = $character->map->gameMap;
-        $gameMapBonus   = 0.0;
+    protected function getGameMapBonus(Character $character): float
+    {
+        $gameMap = $character->map->gameMap;
+        $gameMapBonus = 0.0;
 
-        if (!is_null($gameMap->drop_chance_bonus)) {
+        if (! is_null($gameMap->drop_chance_bonus)) {
             $gameMapBonus = $gameMap->drop_chance_bonus;
         }
 

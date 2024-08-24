@@ -30,25 +30,24 @@ class AssignTopEndGearToPlayer extends Command
 
     /**
      * Execute the console command.
-     *
-     * @return void
      */
-    public function handle(): void {
+    public function handle(): void
+    {
         $characterName = $this->argument('characterName');
 
         $character = Character::where('name', $characterName)->first();
 
         if (is_null($character)) {
-            $this->error('No character found for name: ' . $characterName);
+            $this->error('No character found for name: '.$characterName);
 
             return;
         }
 
         $purgatoryGear = Item::doesntHave('appliedHolyStacks')
-                             ->where('item_prefix_id', null)
-                             ->where('item_suffix_id', null)
-                             ->where('specialty_type', ItemSpecialtyType::DELUSIONAL_SILVER)
-                             ->get();
+            ->where('item_prefix_id', null)
+            ->where('item_suffix_id', null)
+            ->where('specialty_type', ItemSpecialtyType::DELUSIONAL_SILVER)
+            ->get();
 
         if (empty($purgatoryGear)) {
             $this->error('There are no purgatory items.');
@@ -57,17 +56,16 @@ class AssignTopEndGearToPlayer extends Command
         }
 
         $prefix = ItemAffix::where('type', 'prefix')
-                           ->where('randomly_generated', false)
-                           ->where($character->damage_stat . '_mod', '>', 0)
-                           ->orderBy('skill_level_required', 'desc')
-                           ->first();
+            ->where('randomly_generated', false)
+            ->where($character->damage_stat.'_mod', '>', 0)
+            ->orderBy('skill_level_required', 'desc')
+            ->first();
 
         $suffix = ItemAffix::where('type', 'suffix')
-                           ->where('randomly_generated', false)
-                           ->where($character->damage_stat . '_mod', '>', 0)
-                           ->orderBy('skill_level_required', 'desc')
-                           ->first();
-
+            ->where('randomly_generated', false)
+            ->where($character->damage_stat.'_mod', '>', 0)
+            ->orderBy('skill_level_required', 'desc')
+            ->first();
 
         $bar = $this->output->createProgressBar(count($purgatoryGear));
 
@@ -76,12 +74,12 @@ class AssignTopEndGearToPlayer extends Command
                 $purgItem->type === WeaponTypes::WEAPON ||
                 $purgItem->type === SpellTypes::DAMAGE ||
                 $purgItem->type === SpellTypes::HEALING ||
-                $purgItem->type === WeaponTypes::RING)  {
+                $purgItem->type === WeaponTypes::RING) {
 
                 for ($i = 1; $i <= 2; $i++) {
                     $character->inventory->slots()->create([
                         'inventory_id' => $character->inventory->id,
-                        'item_id'      => $this->modifyItem($purgItem, $prefix, $suffix)->id,
+                        'item_id' => $this->modifyItem($purgItem, $prefix, $suffix)->id,
                     ]);
 
                     $character = $character->refresh();
@@ -94,7 +92,7 @@ class AssignTopEndGearToPlayer extends Command
 
             $character->inventory->slots()->create([
                 'inventory_id' => $character->inventory->id,
-                'item_id'      => $this->modifyItem($purgItem, $prefix, $suffix)->id,
+                'item_id' => $this->modifyItem($purgItem, $prefix, $suffix)->id,
             ]);
 
             $character = $character->refresh();
@@ -105,31 +103,33 @@ class AssignTopEndGearToPlayer extends Command
         $bar->finish();
     }
 
-    protected function modifyItem(Item $item, ItemAffix $prefix, ItemAffix $suffix): Item {
+    protected function modifyItem(Item $item, ItemAffix $prefix, ItemAffix $suffix): Item
+    {
         $newItem = $item->duplicate();
 
         $newItem->update([
             'market_sellable' => true,
-            'holy_level'      => 20,
-            'item_suffix_id'  => $suffix->id,
-            'item_prefix_id'  => $prefix->id,
+            'holy_level' => 20,
+            'item_suffix_id' => $suffix->id,
+            'item_prefix_id' => $prefix->id,
         ]);
 
         $newItem = $newItem->refresh();
 
-       return $this->applyHolyOilsToItem($newItem);
+        return $this->applyHolyOilsToItem($newItem);
     }
 
-    protected function applyHolyOilsToItem(Item $item): Item {
+    protected function applyHolyOilsToItem(Item $item): Item
+    {
         $topEndOil = Item::where('type', 'alchemy')->where('name', 'like', '%Oil%')->orderBy('id', 'desc')->first();
 
         for ($i = 1; $i <= 20; $i++) {
             $holyItemEffect = new ItemHolyValue($topEndOil->holy_level);
 
             $item->appliedHolyStacks()->create([
-                'item_id'                  => $item->id,
+                'item_id' => $item->id,
                 'devouring_darkness_bonus' => $holyItemEffect->getRandomDevoidanceIncrease(),
-                'stat_increase_bonus'      => $holyItemEffect->getRandomStatIncrease() / 100,
+                'stat_increase_bonus' => $holyItemEffect->getRandomStatIncrease() / 100,
             ]);
 
             $item = $item->refresh();

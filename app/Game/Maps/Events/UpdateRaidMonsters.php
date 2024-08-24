@@ -2,39 +2,34 @@
 
 namespace App\Game\Maps\Events;
 
+use App\Flare\Models\Map;
+use App\Flare\Models\User;
 use App\Game\Core\Traits\KingdomCache;
 use App\Game\Maps\Services\Common\CanPlayerMassEmbezzle;
 use Illuminate\Broadcasting\Channel;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
-Use App\Flare\Models\User;
-use App\Flare\Models\Map;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\SerializesModels;
 
 class UpdateRaidMonsters implements ShouldBroadcastNow
 {
-    use Dispatchable, InteractsWithSockets, SerializesModels, KingdomCache, CanPlayerMassEmbezzle;
+    use CanPlayerMassEmbezzle, Dispatchable, InteractsWithSockets, KingdomCache, SerializesModels;
 
     public array $raidMonsters;
-
-    /**
-     * @var User $user
-     */
 
     private User $user;
 
     /**
      * Create a new event instance.
      *
-     * @param Map $map
-     * @param User $user
+     * @param  Map  $map
      */
     public function __construct(array $raidMonsters, User $user)
     {
         $this->raidMonsters = $raidMonsters;
-        $this->user         = $user;
+        $this->user = $user;
     }
 
     /**
@@ -44,6 +39,6 @@ class UpdateRaidMonsters implements ShouldBroadcastNow
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('update-raid-monsters-list-' . $this->user->id);
+        return new PrivateChannel('update-raid-monsters-list-'.$this->user->id);
     }
 }

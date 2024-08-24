@@ -2,38 +2,38 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Support\Facades\Queue;
+use App\Flare\Jobs\AccountDeletionJob;
+use App\Flare\Models\GameMap;
+use App\Flare\Models\UserSiteAccessStatistics;
+use App\Flare\Values\NpcTypes;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
+use Illuminate\Support\Facades\Queue;
 use Tests\Setup\Character\CharacterFactory;
+use Tests\TestCase;
 use Tests\Traits\CreateGameSkill;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateNpc;
 use Tests\Traits\CreateRole;
 use Tests\Traits\CreateUser;
-use App\Flare\Models\UserSiteAccessStatistics;
-use App\Flare\Models\GameMap;
-use App\Flare\Values\NpcTypes;
-use App\Flare\Jobs\AccountDeletionJob;
 
-
-class AccountDeletionControllerTest extends TestCase {
-
-    use RefreshDatabase,
-        CreateGameSkill,
+class AccountDeletionControllerTest extends TestCase
+{
+    use CreateGameSkill,
+        CreateItem,
         CreateNpc,
-        CreateUser,
         CreateRole,
-        CreateItem;
+        CreateUser,
+        RefreshDatabase;
 
     private $character;
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
         $this->createAdmin($this->createAdminRole());
 
-        $this->character = (new CharacterFactory())->createBaseCharacter()
+        $this->character = (new CharacterFactory)->createBaseCharacter()
             ->givePlayerLocation()
             ->equipStartingEquipment()
             ->createMarketListing()
@@ -50,24 +50,26 @@ class AccountDeletionControllerTest extends TestCase {
 
         $this->createNpc([
             'game_map_id' => GameMap::first()->id,
-            'type'        => NpcTypes::KINGDOM_HOLDER,
+            'type' => NpcTypes::KINGDOM_HOLDER,
         ]);
 
         UserSiteAccessStatistics::create([
-            'amount_signed_in'  => 1,
+            'amount_signed_in' => 1,
             'amount_registered' => 1,
         ]);
 
         Queue::fake();
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
 
         $this->character = null;
     }
 
-    public function testCanDeleteCharacter() {
+    public function testCanDeleteCharacter()
+    {
         $user = $this->character->user;
 
         $this->actingAs($user)->post(route('delete.account', [
@@ -77,7 +79,8 @@ class AccountDeletionControllerTest extends TestCase {
         Queue::assertPushed(AccountDeletionJob::class);
     }
 
-    public function testCannotDeleteCharacter() {
+    public function testCannotDeleteCharacter()
+    {
         $user = $this->character->user;
 
         $anotherUser = $this->createUser();

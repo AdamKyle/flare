@@ -3,19 +3,20 @@
 namespace App\Admin\Import\Raids\Sheets;
 
 use App\Flare\Models\Item;
-use App\Flare\Models\Raid;
-use App\Flare\Models\Monster;
 use App\Flare\Models\Location;
+use App\Flare\Models\Monster;
+use App\Flare\Models\Raid;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToCollection;
 
-class RaidSheet implements ToCollection {
-
-    public function collection(Collection $rows) {
+class RaidSheet implements ToCollection
+{
+    public function collection(Collection $rows)
+    {
         foreach ($rows as $index => $row) {
             if ($index !== 0) {
                 $raidData = array_combine($rows[0]->toArray(), $row->toArray());
-                $raid     = Raid::where('name', $raidData['name'])->first();
+                $raid = Raid::where('name', $raidData['name'])->first();
 
                 $cleanRaidData = $this->cleanRaidData($raidData);
 
@@ -23,7 +24,7 @@ class RaidSheet implements ToCollection {
                     continue;
                 }
 
-                if (!isset($cleanRaidData['artifact_item_id'])) {
+                if (! isset($cleanRaidData['artifact_item_id'])) {
                     continue;
                 }
 
@@ -32,15 +33,16 @@ class RaidSheet implements ToCollection {
         }
     }
 
-    protected function cleanRaidData(array $raidData): array {
+    protected function cleanRaidData(array $raidData): array
+    {
 
-        $raidBoss               = Monster::where('name', $raidData['raid_boss_id'])->first();
-        $raidMonsterIds         = Monster::whereIn('name', explode(',', $raidData['raid_monster_ids']))->pluck('id')->toArray();
-        $raidBossLocationId     = Location::where('name', $raidData['raid_boss_location_id'])->first();
+        $raidBoss = Monster::where('name', $raidData['raid_boss_id'])->first();
+        $raidMonsterIds = Monster::whereIn('name', explode(',', $raidData['raid_monster_ids']))->pluck('id')->toArray();
+        $raidBossLocationId = Location::where('name', $raidData['raid_boss_location_id'])->first();
         $raidCorruptedLocations = Location::whereIn('name', explode(',', $raidData['corrupted_location_ids']))->pluck('id')->toArray();
-        
+
         if (is_null($raidBoss)) {
-            return [];  
+            return [];
         }
 
         if (empty($raidMonsterIds)) {
@@ -48,22 +50,22 @@ class RaidSheet implements ToCollection {
         }
 
         if (is_null($raidBossLocationId)) {
-            return[];
+            return [];
         }
 
         if (empty($raidCorruptedLocations)) {
             return [];
         }
 
-        $raidData['raid_boss_id']           = $raidBoss->id;
-        $raidData['raid_monster_ids']       = $raidMonsterIds;
-        $raidData['raid_boss_location_id']  = $raidBossLocationId->id;
+        $raidData['raid_boss_id'] = $raidBoss->id;
+        $raidData['raid_monster_ids'] = $raidMonsterIds;
+        $raidData['raid_boss_location_id'] = $raidBossLocationId->id;
         $raidData['corrupted_location_ids'] = $raidCorruptedLocations;
 
         if (isset($raidData['artifact_item_id'])) {
             $item = Item::where('name', $raidData['artifact_item_id'])->first();
 
-            if (!is_null($item)) {
+            if (! is_null($item)) {
                 $raidData['artifact_item_id'] = $item->id;
             } else {
                 unset($raidData['artifact_item_id']);
@@ -75,13 +77,10 @@ class RaidSheet implements ToCollection {
 
     /**
      * Handle updateing or creating data.
-     *
-     * @param array $eventData
-     * @param Raid|null $raid
-     * @return void
      */
-    protected function handleEvent(array $eventData, ?Raid $raid = null): void {
-        if (!is_null($raid)) {
+    protected function handleEvent(array $eventData, ?Raid $raid = null): void
+    {
+        if (! is_null($raid)) {
 
             $raid->update($eventData);
         } else {

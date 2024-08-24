@@ -27,7 +27,7 @@ class SkillsImport extends FormRequest
     public function rules()
     {
         return [
-            'skills_import' => 'required|mimes:xlsx|max:2048'
+            'skills_import' => 'required|mimes:xlsx|max:2048',
         ];
     }
 
@@ -36,11 +36,12 @@ class SkillsImport extends FormRequest
      *
      * @return array
      */
-    public function messages() {
+    public function messages()
+    {
         return [
-            'skills_import.required'   => 'Skills import file is required.',
-            'skills_import.mime'       => 'The system only accepts xlsx files.',
-            'skills_import.max'        => 'File to large, the system only accepts a max size of 2MB.',
+            'skills_import.required' => 'Skills import file is required.',
+            'skills_import.mime' => 'The system only accepts xlsx files.',
+            'skills_import.max' => 'File to large, the system only accepts a max size of 2MB.',
         ];
     }
 }

@@ -2,28 +2,25 @@
 
 namespace App\Game\Skills\Services\Traits;
 
+use App\Flare\Models\Character;
+use App\Flare\Models\Item;
 use App\Flare\Values\ArmourTypes;
 use App\Flare\Values\SpellTypes;
 use App\Flare\Values\WeaponTypes;
-use App\Game\Core\Events\UpdateTopBarEvent;
-use App\Flare\Models\Character;
-use App\Flare\Models\Item;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use Exception;
 
-trait UpdateCharacterCurrency {
-
+trait UpdateCharacterCurrency
+{
     /**
      * Update the characters gold when crafting.
      *
      * Subtract cost from gold.
      *
-     * @param Character $character
-     * @param Item $item
-     * @return void
      * @throws Exception
      */
-    public function updateCharacterGold(Character $character, Item $item): void {
+    public function updateCharacterGold(Character $character, Item $item): void
+    {
 
         $cost = $item->cost;
 
@@ -51,24 +48,22 @@ trait UpdateCharacterCurrency {
     /**
      * Update character copper coins and gold dust.
      *
-     * @param Character $character
-     * @param Item $item
-     * @return void
      * @throws Exception
      */
-    public function updateTrinketCost(Character $character, Item $item): void {
+    public function updateTrinketCost(Character $character, Item $item): void
+    {
 
         $copperCoinCost = $item->copper_coin_cost;
-        $goldDustCost   = $item->gold_dust_cost;
+        $goldDustCost = $item->gold_dust_cost;
 
         if ($character->classType()->isMerchant()) {
             $copperCoinCost = floor($copperCoinCost - $copperCoinCost * 0.10);
-            $goldDustCost   = floor($goldDustCost   - $goldDustCost * 0.10);
+            $goldDustCost = floor($goldDustCost - $goldDustCost * 0.10);
         }
 
         $character->update([
-            'copper_coins'  => $character->copper_coins - $copperCoinCost,
-            'gold_dust'     => $character->gold_dust - $goldDustCost,
+            'copper_coins' => $character->copper_coins - $copperCoinCost,
+            'gold_dust' => $character->gold_dust - $goldDustCost,
         ]);
 
         event(new UpdateCharacterCurrenciesEvent($character->refresh()));
@@ -77,27 +72,26 @@ trait UpdateCharacterCurrency {
     /**
      * Update the alchemy currencies
      *
-     * @param Character $character
-     * @param Item $item
      * @throws Exception
      */
-    public function updateAlchemyCost(Character $character, Item $item): void {
+    public function updateAlchemyCost(Character $character, Item $item): void
+    {
         $goldDustCost = $item->gold_dust_cost;
-        $shardsCost   = $item->shards_cost;
+        $shardsCost = $item->shards_cost;
 
         if ($character->classType()->isMerchant()) {
             $goldDustCost = floor($goldDustCost - $goldDustCost * 0.10);
-            $shardsCost   = floor($shardsCost - $shardsCost * 0.10);
+            $shardsCost = floor($shardsCost - $shardsCost * 0.10);
         }
 
         if ($character->classType()->isArcaneAlchemist()) {
             $goldDustCost = floor($goldDustCost - $goldDustCost * 0.15);
-            $shardsCost   = floor($shardsCost - $shardsCost * 0.15);
+            $shardsCost = floor($shardsCost - $shardsCost * 0.15);
         }
 
         $character->update([
-            'gold_dust'  => ($character->gold_dust - $goldDustCost),
-            'shards'     => ($character->shards - $shardsCost),
+            'gold_dust' => ($character->gold_dust - $goldDustCost),
+            'shards' => ($character->shards - $shardsCost),
         ]);
 
         event(new UpdateCharacterCurrenciesEvent($character->refresh()));

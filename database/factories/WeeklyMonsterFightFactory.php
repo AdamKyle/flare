@@ -5,7 +5,8 @@ namespace Database\Factories;
 use App\Flare\Models\WeeklyMonsterFight;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class WeeklyMonsterFightFactory extends Factory {
+class WeeklyMonsterFightFactory extends Factory
+{
     /**
      * The name of the factory's corresponding model.
      *
@@ -18,7 +19,8 @@ class WeeklyMonsterFightFactory extends Factory {
      *
      * @return array
      */
-    public function definition() {
+    public function definition()
+    {
         return [
             'character_id' => null,
             'monster_id' => null,

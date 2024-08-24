@@ -14,6 +14,8 @@ export default class GuideQuestListener
 
     private guideQuestButton?: Channel;
 
+    private openGuideQuestButton?: Channel;
+
     constructor(
         @inject(CoreEventListener) private coreEventListener: CoreEventListener,
     ) {}
@@ -32,6 +34,10 @@ export default class GuideQuestListener
             this.guideQuestButton = echo.private(
                 "guide-quest-button-" + this.userId,
             );
+
+            this.openGuideQuestButton = echo.private(
+                "force-open-guide-quest-modal-" + this.userId,
+            );
         } catch (e: any | unknown) {
             throw new Error(e);
         }
@@ -39,6 +45,7 @@ export default class GuideQuestListener
 
     listen(): void {
         this.listenForGuideQuestUpdates();
+        this.listenForForceOpenGuideQuestModal();
     }
 
     /**
@@ -63,6 +70,38 @@ export default class GuideQuestListener
                         show_button: false,
                     });
                 }
+            },
+        );
+    }
+
+    protected listenForForceOpenGuideQuestModal() {
+        if (!this.openGuideQuestButton) {
+            return;
+        }
+
+        this.openGuideQuestButton.listen(
+            "Game.GuideQuests.Events.OpenGuideQuestModal",
+            (event: any) => {
+                if (!this.component) {
+                    return;
+                }
+
+                setTimeout(
+                    () => {
+                        if (this.component instanceof GuideButton) {
+                            this.component.setState({
+                                is_modal_open: event.openButton,
+                            });
+                        }
+                    },
+                    (
+                        import.meta as unknown as {
+                            env: { VITE_APP_ENV: string };
+                        }
+                    ).env.VITE_APP_ENV === "production"
+                        ? 3500
+                        : 500,
+                );
             },
         );
     }

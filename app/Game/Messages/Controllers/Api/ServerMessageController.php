@@ -2,31 +2,22 @@
 
 namespace App\Game\Messages\Controllers\Api;
 
-use App\Game\Messages\Services\ServerMessage;
-use Illuminate\Http\JsonResponse;
-use App\Http\Controllers\Controller;
 use App\Game\Messages\Request\ServerMessageRequest;
+use App\Game\Messages\Services\ServerMessage;
+use App\Http\Controllers\Controller;
+use Illuminate\Http\JsonResponse;
 
-
-class ServerMessageController extends Controller {
-
-    /**
-     * @var ServerMessage $serverMessage
-     */
+class ServerMessageController extends Controller
+{
     private ServerMessage $serverMessage;
 
-    /**
-     * @param ServerMessage $serverMessage
-     */
-    public function __construct(ServerMessage $serverMessage) {
+    public function __construct(ServerMessage $serverMessage)
+    {
         $this->serverMessage = $serverMessage;
     }
 
-    /**
-     * @param ServerMessageRequest $request
-     * @return JsonResponse
-     */
-    public function generateServerMessage(ServerMessageRequest $request): JsonResponse {
+    public function generateServerMessage(ServerMessageRequest $request): JsonResponse
+    {
 
         if ($request->has('custom_message')) {
             $this->serverMessage->generateServerMessageForCustomMessage($request->custom_message);

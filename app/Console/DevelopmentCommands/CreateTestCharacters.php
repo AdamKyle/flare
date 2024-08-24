@@ -17,8 +17,8 @@ use Illuminate\Support\Str;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\ConsoleOutput;
 
-class CreateTestCharacters extends Command {
-
+class CreateTestCharacters extends Command
+{
     /**
      * The name and signature of the console command.
      *
@@ -36,33 +36,32 @@ class CreateTestCharacters extends Command {
     /**
      * Execute the console command.
      *
-     * @param CharacterBuilderService $characterBuilder
-     * @return void
      * @throws Exception
      */
-    public function handle(CharacterBuilderService $characterBuilder): void {
+    public function handle(CharacterBuilderService $characterBuilder): void
+    {
         ini_set('memory_limit', -1);
 
-        $password  = $this->argument('password');
+        $password = $this->argument('password');
         $className = $this->argument('className');
-        $races     = GameRace::all();
-        $map       = GameMap::where('default', true)->first();
+        $races = GameRace::all();
+        $map = GameMap::where('default', true)->first();
 
-        if (!is_null($className)) {
+        if (! is_null($className)) {
 
-            $this->line('Ceating Maxed out character for class: ' . $className);
+            $this->line('Ceating Maxed out character for class: '.$className);
 
             $class = GameClass::where('name', $className)->first();
 
             if (is_null($class)) {
-                $this->error('No class for name: ' . $className . ' found');
+                $this->error('No class for name: '.$className.' found');
 
                 return;
             }
 
             $character = $this->createCharacter($characterBuilder, $map, $class, $races, $password);
 
-            $this->line('Created Character: ' . $character->name . ' who\'s email is: ' . $character->user->email);
+            $this->line('Created Character: '.$character->name.' who\'s email is: '.$character->user->email);
 
             return;
         }
@@ -73,10 +72,10 @@ class CreateTestCharacters extends Command {
 
         $gameClasses = GameClass::all();
 
-        $progressBar = new ProgressBar(new ConsoleOutput(), $gameClasses->count());
+        $progressBar = new ProgressBar(new ConsoleOutput, $gameClasses->count());
 
         $headers = ['email', 'race', 'class'];
-        $data    = [];
+        $data = [];
 
         $progressBar->start();
 
@@ -107,47 +106,40 @@ class CreateTestCharacters extends Command {
 
     /**
      * Create the user.
-     *
-     * @param string $password
-     * @return User
      */
-    protected function createUser(string $password): User {
+    protected function createUser(string $password): User
+    {
         return User::create([
-            'email'            => Str::random(8) . '@test.com',
-            'password'         => Hash::make($password),
-            'ip_address'       => '0.0.0.' . rand(1, 100),
-            'last_logged_in'   => now(),
-            'guide_enabled'    => false
+            'email' => Str::random(8).'@test.com',
+            'password' => Hash::make($password),
+            'ip_address' => '0.0.0.'.rand(1, 100),
+            'last_logged_in' => now(),
+            'guide_enabled' => false,
         ]);
     }
 
     /**
      * Create the character.
      *
-     * @param CharacterBuilderService $characterBuilder
-     * @param GameMap $map
-     * @param GameClass $class
-     * @param Collection $races
-     * @param string $password
-     * @return Character
      * @throws Exception
      */
-    protected function createCharacter(CharacterBuilderService $characterBuilder, GameMap $map, GameClass $class, Collection $races, string $password): Character {
+    protected function createCharacter(CharacterBuilderService $characterBuilder, GameMap $map, GameClass $class, Collection $races, string $password): Character
+    {
         $user = $this->createUser($password);
         $race = $races[rand(0, count($races) - 1)];
 
         $characterBuilder->setRace($race)
             ->setClass($class)
-            ->createCharacter($user, $map, 'Test' . str_replace(' ', '', $class->name))
+            ->createCharacter($user, $map, 'Test'.str_replace(' ', '', $class->name))
             ->assignSkills()
             ->assignPassiveSkills()
             ->buildCharacterCache();
 
         $character = $characterBuilder->character();
 
-        Artisan::call('reincarnate:character ' . $character->name);
+        Artisan::call('reincarnate:character '.$character->name);
 
-        Artisan::call('max-out:character ' . $character->name);
+        Artisan::call('max-out:character '.$character->name);
 
         return $character;
     }

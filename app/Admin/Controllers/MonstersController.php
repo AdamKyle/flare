@@ -2,9 +2,13 @@
 
 namespace App\Admin\Controllers;
 
+use App\Admin\Exports\Monsters\MonstersExport;
+use App\Admin\Import\Monsters\MonstersImport;
 use App\Admin\Requests\MonsterManagementRequest;
+use App\Admin\Requests\MonstersImport as MonstersImportRequest;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Item;
+use App\Flare\Models\Monster;
 use App\Flare\Services\BuildMonsterCacheService;
 use App\Flare\Traits\Controllers\MonstersShowInformation;
 use App\Flare\Values\CelestialType;
@@ -14,69 +18,73 @@ use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
-use App\Flare\Models\Monster;
-use App\Admin\Import\Monsters\MonstersImport;
-use App\Admin\Exports\Monsters\MonstersExport;
-use App\Admin\Requests\MonstersImport as MonstersImportRequest;
 
-class MonstersController extends Controller {
-
+class MonstersController extends Controller
+{
     use MonstersShowInformation;
 
     private $monsterCache;
 
-    public function __construct(BuildMonsterCacheService $monsterCache) {
+    public function __construct(BuildMonsterCacheService $monsterCache)
+    {
         $this->middleware('is.admin')->except([
-            'show'
+            'show',
         ]);
 
         $this->monsterCache = $monsterCache;
     }
 
-    public function index() {
+    public function index()
+    {
         return view('admin.monsters.monsters', [
             'gameMapNames' => GameMap::all()->pluck('name')->toArray(),
         ]);
     }
 
-    public function show(Monster $monster) {
+    public function show(Monster $monster)
+    {
         return $this->renderMonsterShow($monster);
     }
 
-    public function create() {
+    public function create()
+    {
         return view('admin.monsters.manage', [
-            'monster'        => null,
-            'gameMaps'       => GameMap::all(),
-            'questItems'     => Item::where('type', 'quest')->get(),
+            'monster' => null,
+            'gameMaps' => GameMap::all(),
+            'questItems' => Item::where('type', 'quest')->get(),
             'celestialTypes' => CelestialType::getNamedValues(),
             'specialAttacks' => RaidAttackTypesValue::$attackTypeNames,
-            'locationTypes'  => LocationType::getNamedValues(),
+            'locationTypes' => LocationType::getNamedValues(),
         ]);
     }
 
-    public function edit(Monster $monster) {
+    public function edit(Monster $monster)
+    {
         return view('admin.monsters.manage', [
-            'monster'        => $monster,
-            'gameMaps'       => GameMap::all(),
-            'questItems'     => Item::where('type', 'quest')->get(),
+            'monster' => $monster,
+            'gameMaps' => GameMap::all(),
+            'questItems' => Item::where('type', 'quest')->get(),
             'celestialTypes' => CelestialType::getNamedValues(),
             'specialAttacks' => RaidAttackTypesValue::$attackTypeNames,
-            'locationTypes'  => LocationType::getNamedValues(),
+            'locationTypes' => LocationType::getNamedValues(),
         ]);
     }
 
-    public function exportItems() {
+    public function exportItems()
+    {
         return view('admin.monsters.export');
     }
 
-    public function importItems() {
+    public function importItems()
+    {
         return view('admin.monsters.import');
     }
 
     /**
      * @codeCoverageIgnore
      */
-    public function export(Request $request) {
+    public function export(Request $request)
+    {
 
         $fileName = 'monsters.xlsx';
 
@@ -93,7 +101,8 @@ class MonstersController extends Controller {
     /**
      * @codeCoverageIgnore
      */
-    public function importData(MonstersImportRequest $request) {
+    public function importData(MonstersImportRequest $request)
+    {
         Excel::import(new MonstersImport, $request->monsters_import);
 
         $this->monsterCache->buildCache();
@@ -103,7 +112,8 @@ class MonstersController extends Controller {
         return redirect()->back()->with('success', 'imported monster data.');
     }
 
-    public function store(MonsterManagementRequest $request) {
+    public function store(MonsterManagementRequest $request)
+    {
         $data = $this->cleanRequestData($request->all());
 
         if ($data['is_raid_monster'] && $data['is_raid_boss']) {
@@ -112,26 +122,27 @@ class MonstersController extends Controller {
 
         $monster = Monster::updateOrCreate(['id' => $data['id']], $data);
 
-        $message = 'Created: ' . $monster->name;
+        $message = 'Created: '.$monster->name;
 
         if ($data['id'] !== 0) {
-            $message = 'Updated: ' . $monster->name;
+            $message = 'Updated: '.$monster->name;
         }
 
         return response()->redirectToRoute('monsters.monster', ['monster' => $monster->id])->with('success', $message);
     }
 
-    protected function cleanRequestData(array $params): array {
+    protected function cleanRequestData(array $params): array
+    {
 
-        if (!filter_var($params['is_celestial_entity'], FILTER_VALIDATE_BOOLEAN)) {
+        if (! filter_var($params['is_celestial_entity'], FILTER_VALIDATE_BOOLEAN)) {
             $params['is_celestial_entity'] = false;
-            $params['gold_cost']           = 0;
-            $params['gold_dust_cost']      = 0;
-            $params['shards']              = 0;
+            $params['gold_cost'] = 0;
+            $params['gold_dust_cost'] = 0;
+            $params['shards'] = 0;
         }
 
-        if (!filter_var($params['can_cast'], FILTER_VALIDATE_BOOLEAN)) {
-            $params['can_cast']         = false;
+        if (! filter_var($params['can_cast'], FILTER_VALIDATE_BOOLEAN)) {
+            $params['can_cast'] = false;
             $params['max_spell_damage'] = 0;
         }
 

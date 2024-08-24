@@ -24,11 +24,12 @@ class EventPageRequest extends FormRequest
     public function rules()
     {
         return [
-            'event_type'      => 'required',
+            'event_type' => 'required',
         ];
     }
 
-    public function messages() {
+    public function messages()
+    {
         return [
             'event_type.required' => 'Event type is required.',
         ];

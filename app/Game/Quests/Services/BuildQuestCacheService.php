@@ -2,8 +2,6 @@
 
 namespace App\Game\Quests\Services;
 
-use Illuminate\Support\Facades\Cache;
-use League\Fractal\Manager;
 use App\Flare\Models\Event;
 use App\Flare\Models\Quest;
 use App\Flare\Models\Raid;
@@ -11,17 +9,16 @@ use App\Game\Events\Values\EventType;
 use App\Game\Quests\Events\UpdateQuests;
 use App\Game\Quests\Events\UpdateRaidQuests;
 use App\Game\Quests\Transformers\QuestTransformer;
+use Illuminate\Support\Facades\Cache;
+use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
 
-class BuildQuestCacheService {
+class BuildQuestCacheService
+{
+    public function __construct(private QuestTransformer $questTransformer, private Manager $manager) {}
 
-    /**
-     * @param QuestTransformer $questTransformer
-     * @param Manager $manager
-     */
-    public function __construct(private QuestTransformer $questTransformer, private Manager $manager){}
-
-    public function buildQuestCache(bool $sendOffEvent = false): void {
+    public function buildQuestCache(bool $sendOffEvent = false): void
+    {
         $quests = Quest::where('is_parent', true)
             ->whereNull('only_for_event')
             ->whereNull('raid_id')
@@ -47,8 +44,8 @@ class BuildQuestCacheService {
         }
     }
 
-
-    protected function fetchEventQuests(string $eventType): array {
+    protected function fetchEventQuests(string $eventType): array
+    {
         $event = Event::where('type', $eventType)->first();
 
         if (is_null($event)) {
@@ -66,8 +63,9 @@ class BuildQuestCacheService {
         return $this->manager->createData($quests)->toArray();
     }
 
-    public function buildRaidQuestCache(bool $sendOffEvent = false): void {
-        $raids      = Raid::all();
+    public function buildRaidQuestCache(bool $sendOffEvent = false): void
+    {
+        $raids = Raid::all();
         $raidQuests = [];
 
         foreach ($raids as $raid) {
@@ -86,12 +84,12 @@ class BuildQuestCacheService {
 
         if ($sendOffEvent) {
 
-            $winterEvent      = Event::where('type', EventType::WINTER_EVENT)->first();
-            $delusionalEvent  = Event::where('type', EventType::DELUSIONAL_MEMORIES_EVENT)->first();
+            $winterEvent = Event::where('type', EventType::WINTER_EVENT)->first();
+            $delusionalEvent = Event::where('type', EventType::DELUSIONAL_MEMORIES_EVENT)->first();
 
-            if (!is_null($winterEvent)) {
+            if (! is_null($winterEvent)) {
                 $quests = $this->fetchQuestsForRaid($winterEvent);
-            } else if (!is_null($delusionalEvent)) {
+            } elseif (! is_null($delusionalEvent)) {
                 $quests = $this->fetchQuestsForRaid($delusionalEvent);
             } else {
                 $quests = $this->fetchQuestsForRaid();
@@ -101,21 +99,24 @@ class BuildQuestCacheService {
         }
     }
 
-    public function getRegularQuests(): array|null {
+    public function getRegularQuests(): ?array
+    {
         return Cache::get('game-quests');
     }
 
-    public function getRaidQuests(): array|null {
+    public function getRaidQuests(): ?array
+    {
         return Cache::get('raid-quests');
     }
 
-    public function fetchQuestsForRaid(Event $eventWithRaid = null): array {
-        $eventQuests   = [];
+    public function fetchQuestsForRaid(?Event $eventWithRaid = null): array
+    {
+        $eventQuests = [];
 
-        if (!is_null($eventWithRaid)) {
+        if (! is_null($eventWithRaid)) {
             $raidQuests = $this->getRaidQuests();
 
-            if (!is_null($raidQuests)) {
+            if (! is_null($raidQuests)) {
 
                 if (isset($raidQuests[$eventWithRaid->raid_id])) {
                     $eventQuests = $raidQuests[$eventWithRaid->raid_id];

@@ -14,7 +14,8 @@ class ManageEventRequest extends FormRequest
      *
      * @return bool
      */
-    public function authorize() {
+    public function authorize()
+    {
         return true;
     }
 
@@ -27,10 +28,10 @@ class ManageEventRequest extends FormRequest
     {
         return [
             'selected_event_type' => 'required|integer',
-            'event_description'   => 'required|string',
-            'selected_raid'       => 'nullable|int',
+            'event_description' => 'required|string',
+            'selected_raid' => 'nullable|int',
             'selected_start_date' => 'required',
-            'selected_end_date'   => 'required',
+            'selected_end_date' => 'required',
         ];
     }
 
@@ -39,12 +40,13 @@ class ManageEventRequest extends FormRequest
      *
      * @return array
      */
-    public function messages() {
+    public function messages()
+    {
         return [
             'selected_event_type.required' => 'Missing the schedule event type.',
-            'event_description.required'   => 'Event description is missing.',
+            'event_description.required' => 'Event description is missing.',
             'selected_start_date.required' => 'You must select a date.',
-            'selected_end_date.required'   => 'You must select an end date.',
+            'selected_end_date.required' => 'You must select an end date.',
         ];
     }
 }

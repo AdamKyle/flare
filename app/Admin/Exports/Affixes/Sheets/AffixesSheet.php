@@ -2,26 +2,24 @@
 
 namespace App\Admin\Exports\Affixes\Sheets;
 
-
+use App\Flare\Models\ItemAffix;
+use App\Flare\Values\ItemAffixType;
 use Illuminate\Contracts\View\View;
 use Maatwebsite\Excel\Concerns\FromView;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithTitle;
-use App\Flare\Models\ItemAffix;
-use App\Flare\Values\ItemAffixType;
 
-class AffixesSheet implements FromView, WithTitle, ShouldAutoSize {
-
+class AffixesSheet implements FromView, ShouldAutoSize, WithTitle
+{
     private $type;
 
-    public function __construct(string $type) {
+    public function __construct(string $type)
+    {
         $this->type = $type;
     }
 
-    /**
-     * @return View
-     */
-    public function view(): View {
+    public function view(): View
+    {
         $query = (new ItemAffixType(intval($this->type)))->query(ItemAffix::query());
 
         return view('admin.exports.affixes.sheets.affixes', [
@@ -29,10 +27,8 @@ class AffixesSheet implements FromView, WithTitle, ShouldAutoSize {
         ]);
     }
 
-    /**
-     * @return string
-     */
-    public function title(): string {
+    public function title(): string
+    {
         return 'Affixes';
     }
 }

@@ -2,44 +2,47 @@
 
 namespace Tests\Unit\Game\Character\Builders\AttackBuilders\Jobs;
 
-use App\Game\Character\CharacterAttack\Events\UpdateCharacterAttackEvent;
-use Cache;
-use Event;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\Models\Character;
 use App\Flare\Values\SpellTypes;
 use App\Flare\Values\WeaponTypes;
 use App\Game\Character\Builders\AttackBuilders\Jobs\CharacterAttackTypesCacheBuilderWithDeductions;
+use App\Game\Character\CharacterAttack\Events\UpdateCharacterAttackEvent;
+use Cache;
+use Event;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateItem;
 
-class CharacterAttackTypesCacheBuilderWithDeductionsTest extends TestCase {
-
-    use RefreshDatabase, CreateItem;
+class CharacterAttackTypesCacheBuilderWithDeductionsTest extends TestCase
+{
+    use CreateItem, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
-        $this->character = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
+        $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
 
-        $this->character                         = null;
+        $this->character = null;
     }
 
-    private function setUpCharacterForTests(): Character {
+    private function setUpCharacterForTests(): Character
+    {
         $item = $this->createItem([
-            'type'        => WeaponTypes::STAVE,
+            'type' => WeaponTypes::STAVE,
             'base_damage' => 10,
         ]);
 
         $spellDamage = $this->createItem([
-            'type'        => SpellTypes::DAMAGE,
+            'type' => SpellTypes::DAMAGE,
             'base_damage' => 10,
         ]);
 
@@ -49,7 +52,8 @@ class CharacterAttackTypesCacheBuilderWithDeductionsTest extends TestCase {
             ->getCharacter();
     }
 
-    public function testCharacterAttackTypesCacheBuilderWithDeductionsAndEventIsDispatched() {
+    public function testCharacterAttackTypesCacheBuilderWithDeductionsAndEventIsDispatched()
+    {
         Event::fake();
 
         $character = $this->setUpCharacterForTests();
@@ -59,13 +63,14 @@ class CharacterAttackTypesCacheBuilderWithDeductionsTest extends TestCase {
         Event::assertDispatched(UpdateCharacterAttackEvent::class);
     }
 
-    public function testCharacterAttackTypesCacheBuilderWithDeductions() {
+    public function testCharacterAttackTypesCacheBuilderWithDeductions()
+    {
         $character = $this->setUpCharacterForTests();
 
         CharacterAttackTypesCacheBuilderWithDeductions::dispatch($character);
 
         $this->assertNotNull(
-            Cache::get('character-attack-data-' . $character->id)
+            Cache::get('character-attack-data-'.$character->id)
         );
     }
 }

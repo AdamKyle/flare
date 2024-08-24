@@ -3,23 +3,20 @@
 namespace App\Admin\Controllers\Api;
 
 use App\Admin\Requests\MoveLocationRequest;
+use App\Flare\Models\GameMap;
 use App\Flare\Models\Location;
 use App\Game\Maps\Services\LocationService;
-use Facades\App\Flare\Cache\CoordinatesCache;
-use App\Flare\Models\GameMap;
 use App\Http\Controllers\Controller;
+use Facades\App\Flare\Cache\CoordinatesCache;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
 
-class MapManagerController extends Controller {
+class MapManagerController extends Controller
+{
+    public function __construct(private readonly LocationService $locationService) {}
 
-    public function __construct(private readonly LocationService $locationService){}
-
-    /**
-     * @param GameMap $gameMap
-     * @return JsonResponse
-     */
-    public function getMapData(GameMap $gameMap): JsonResponse {
+    public function getMapData(GameMap $gameMap): JsonResponse
+    {
 
         $coordinates = CoordinatesCache::getFromCache();
 
@@ -27,11 +24,12 @@ class MapManagerController extends Controller {
             'path' => Storage::disk('maps')->url($gameMap->path),
             'x_coordinates' => $coordinates['x'],
             'y_coordinates' => $coordinates['y'],
-            'locations' => $this->locationService->fetchLocationsForMap($gameMap)
+            'locations' => $this->locationService->fetchLocationsForMap($gameMap),
         ]);
     }
 
-    public function moveLocation(MoveLocationRequest $request, Location $location): JsonResponse {
+    public function moveLocation(MoveLocationRequest $request, Location $location): JsonResponse
+    {
         $location->update([
             'x' => $request->x,
             'y' => $request->y,
@@ -40,7 +38,7 @@ class MapManagerController extends Controller {
         $location = $location->refresh();
 
         return response()->json([
-            'locations' => $this->locationService->fetchLocationsForMap($location->map)
+            'locations' => $this->locationService->fetchLocationsForMap($location->map),
         ]);
     }
 }

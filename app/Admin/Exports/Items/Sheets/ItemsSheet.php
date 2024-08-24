@@ -2,25 +2,23 @@
 
 namespace App\Admin\Exports\Items\Sheets;
 
+use App\Flare\Models\Item;
 use Illuminate\Contracts\View\View;
 use Maatwebsite\Excel\Concerns\FromView;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithTitle;
-use App\Flare\Models\Item;
-use phpDocumentor\Reflection\Types\Boolean;
 
-class ItemsSheet implements FromView, WithTitle, ShouldAutoSize {
-
+class ItemsSheet implements FromView, ShouldAutoSize, WithTitle
+{
     private array $itemTypes;
 
-    public function __construct(array $itemTypes = []) {
+    public function __construct(array $itemTypes = [])
+    {
         $this->itemTypes = $itemTypes;
     }
 
-    /**
-     * @return View
-     */
-    public function view(): View {
+    public function view(): View
+    {
         if (empty($this->itemTypes)) {
             $items = Item::whereNull('item_suffix_id')->whereNull('item_prefix_id')->orderBy('type', 'desc')->orderBy('cost', 'asc')->get();
         } else {
@@ -28,14 +26,12 @@ class ItemsSheet implements FromView, WithTitle, ShouldAutoSize {
         }
 
         return view('admin.exports.items.sheets.items', [
-            'items' => $items
+            'items' => $items,
         ]);
     }
 
-    /**
-     * @return string
-     */
-    public function title(): string {
+    public function title(): string
+    {
         return 'Items';
     }
 }

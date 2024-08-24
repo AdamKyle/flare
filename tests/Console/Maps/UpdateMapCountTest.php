@@ -2,18 +2,18 @@
 
 namespace Tests\Console\Maps;
 
+use App\Game\Maps\Events\UpdateGlobalCharacterCountBroadcast;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
-use App\Game\Maps\Events\UpdateGlobalCharacterCountBroadcast;
 use Tests\TestCase;
 use Tests\Traits\CreateGameMap;
 
 class UpdateMapCountTest extends TestCase
 {
+    use CreateGameMap, RefreshDatabase;
 
-    use RefreshDatabase, CreateGameMap;
-
-    public function testUpdateMapCount() {
+    public function testUpdateMapCount()
+    {
 
         $this->createGameMap();
 
@@ -23,5 +23,4 @@ class UpdateMapCountTest extends TestCase
 
         Event::assertDispatched(UpdateGlobalCharacterCountBroadcast::class);
     }
-
 }

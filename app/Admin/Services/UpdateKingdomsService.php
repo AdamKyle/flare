@@ -2,19 +2,18 @@
 
 namespace App\Admin\Services;
 
-use Exception;
 use App\Admin\Jobs\AssignNewKingdomBuildingsJob;
 use App\Admin\Jobs\UpdateKingdomBuildings;
 use App\Flare\Models\GameBuilding;
+use Exception;
 
-class UpdateKingdomsService {
-
+class UpdateKingdomsService
+{
     /**
-     * @param array $data
-     * @return array
      * @throws Exception
      */
-    public function cleanRequestData(array $data) : array{
+    public function cleanRequestData(array $data): array
+    {
 
         $data = $this->checkForIncreaseInResources($data);
         $data = $this->checkForIncreaseInResources($data);
@@ -30,11 +29,9 @@ class UpdateKingdomsService {
 
     /**
      * Clean up the increase resources section.
-     *
-     * @param array $data
-     * @return array
      */
-    protected function checkForIncreaseInResources(array $data): array {
+    protected function checkForIncreaseInResources(array $data): array
+    {
         $resourcesIncreaseAttributes = [
             'increase_wood_amount',
             'increase_clay_amount',
@@ -68,23 +65,22 @@ class UpdateKingdomsService {
     /**
      * Check if we have units to recruit.
      *
-     * @param array $data
-     * @return array
      * @throws Exception
      */
-    protected function checkForUnitRecruitment(array $data): array {
+    protected function checkForUnitRecruitment(array $data): array
+    {
 
         if (filter_var($data['trains_units'], FILTER_VALIDATE_BOOLEAN)) {
-            if (!isset($data['units_to_recruit'])) {
+            if (! isset($data['units_to_recruit'])) {
                 $data['trains_units'] = 0;
                 $data['units_per_level'] = null;
                 $data['only_at_level'] = null;
             } else {
-                $perLevel  = (int) $data['units_per_level'];
-                $maxLevel  = (int) $data['max_level'];
+                $perLevel = (int) $data['units_per_level'];
+                $maxLevel = (int) $data['max_level'];
                 $onlyLevel = (int) $data['only_at_level'];
 
-                if (!is_null($perLevel)) {
+                if (! is_null($perLevel)) {
                     if ((count($data['units_to_recruit']) * $perLevel) > $maxLevel) {
                         throw new Exception('the amount of units x the per level is greator then your max building level.');
                     }
@@ -104,9 +100,7 @@ class UpdateKingdomsService {
      *
      * Called from the livewire admin view to handle giving new buildings to players.
      *
-     * @param GameBuilding $gameBuilding
-     * @param array $selectedUnits
-     * @param int $levels
+     * @param  array  $selectedUnits
      */
     public function updateKingdomKingdomBuildings(GameBuilding $gameBuilding, $selectedUnits = [], int $levels = 0): void
     {
@@ -124,28 +118,23 @@ class UpdateKingdomsService {
      * Assigns the new building to players.
      *
      * Done on import.
-     *
-     * @param GameBuilding $gameBuilding
      */
-    public function assignNewBuildingsToCharacters(GameBuilding $gameBuilding) {
+    public function assignNewBuildingsToCharacters(GameBuilding $gameBuilding)
+    {
         AssignNewKingdomBuildingsJob::dispatch($gameBuilding);
     }
 
     /**
      * Reassigns the game units to a game building.
-     *
-     * @param GameBuilding $gameBuilding
-     * @param array $selectedUnits
-     * @param int $levels
-     * @return GameBuilding
      */
-    protected function reassignUnits(GameBuilding $gameBuilding, array $selectedUnits = [], int $levels = 0): GameBuilding {
+    protected function reassignUnits(GameBuilding $gameBuilding, array $selectedUnits = [], int $levels = 0): GameBuilding
+    {
         if (empty($selectedUnits)) {
             return $gameBuilding;
         }
 
         if ($gameBuilding->units->isNotEmpty()) {
-            foreach($gameBuilding->units as $unit) {
+            foreach ($gameBuilding->units as $unit) {
                 $unit->delete();
             }
         }
@@ -157,17 +146,13 @@ class UpdateKingdomsService {
 
     /**
      * Assigns the units to the building.
-     *
-     * @param GameBuilding $gameBuilding
-     * @param array $selectedUnits
-     * @param int $levels
-     * @return void
      */
-    private function assignUnits(GameBuilding $gameBuilding, array $selectedUnits, int $levels): void {
+    private function assignUnits(GameBuilding $gameBuilding, array $selectedUnits, int $levels): void
+    {
         $gameBuilding->units()->create([
             'game_building_id' => $gameBuilding->id,
-            'game_unit_id'     => $selectedUnits[0],
-            'required_level'   => !is_null($gameBuilding->only_at_level) ? $gameBuilding->only_at_level : 1,
+            'game_unit_id' => $selectedUnits[0],
+            'required_level' => ! is_null($gameBuilding->only_at_level) ? $gameBuilding->only_at_level : 1,
         ]);
 
         unset($selectedUnits[0]);
@@ -178,13 +163,13 @@ class UpdateKingdomsService {
             return;
         }
 
-        foreach($selectedUnits as $unitId) {
+        foreach ($selectedUnits as $unitId) {
             $initialLevel += $levels;
 
             $gameBuilding->units()->create([
                 'game_building_id' => $gameBuilding->id,
-                'game_unit_id'     => $unitId,
-                'required_level'   => $initialLevel,
+                'game_unit_id' => $unitId,
+                'required_level' => $initialLevel,
             ]);
         }
     }

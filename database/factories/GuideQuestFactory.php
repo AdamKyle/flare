@@ -2,11 +2,12 @@
 
 namespace Database\Factories;
 
-use Illuminate\Support\Str;
-use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Flare\Models\GuideQuest;
+use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
-class GuideQuestFactory extends Factory {
+class GuideQuestFactory extends Factory
+{
     /**
      * The name of the factory's corresponding model.
      *
@@ -19,14 +20,15 @@ class GuideQuestFactory extends Factory {
      *
      * @return array
      */
-    public function definition() {
+    public function definition()
+    {
         return [
-            'name'                 => Str::random(10),
-            'intro_text'           => Str::random(100),
-            'instructions'         => Str::random(100),
+            'name' => Str::random(10),
+            'intro_text' => Str::random(100),
+            'instructions' => Str::random(100),
             'desktop_instructions' => Str::random(100),
-            'mobile_instructions'  => Str::random(100),
-            'xp_reward'            => rand(1, 100),
+            'mobile_instructions' => Str::random(100),
+            'xp_reward' => rand(1, 100),
         ];
     }
 }

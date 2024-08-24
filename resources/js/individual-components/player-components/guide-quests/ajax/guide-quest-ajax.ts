@@ -20,8 +20,8 @@ export default class GuideQuestAjax {
     ) {
         let guideQuestId = 0;
 
-        if (component.state.quest_data !== null) {
-            guideQuestId = component.state.quest_data.id;
+        if (component.state.selected_quest_data_to_show !== null) {
+            guideQuestId = component.state.selected_quest_data_to_show.id;
         }
 
         const route = this.getRoute(
@@ -60,15 +60,23 @@ export default class GuideQuestAjax {
             .doAjaxCall(
                 action,
                 (result: AxiosResponse) => {
+                    let selectedGuideQuest = null;
+
+                    if (result.data.quests.length <= 1) {
+                        selectedGuideQuest = result.data.quests[0];
+                    }
+
                     component.setState({
                         loading: false,
-                        quest_data: result.data.quest,
+                        quest_data: result.data.quests,
                         can_hand_in: result.data.can_hand_in,
                         completed_requirements:
                             result.data.completed_requirements,
+                        selected_quest_data_to_show: selectedGuideQuest,
                     });
                 },
                 (error: AxiosError) => {
+                    console.log(error);
                     component.setState({
                         loading: false,
                     });
@@ -98,13 +106,20 @@ export default class GuideQuestAjax {
             .doAjaxCall(
                 action,
                 (result: AxiosResponse) => {
+                    let selectedGuideQuest = null;
+
+                    if (result.data.quests.length <= 1) {
+                        selectedGuideQuest = result.data.quests[0];
+                    }
+
                     component.setState({
                         is_handing_in: false,
-                        quest_data: result.data.quest,
+                        quest_data: result.data.quests,
                         can_hand_in: result.data.can_hand_in,
                         success_message: result.data.message,
                         completed_requirements:
                             result.data.completed_requirements,
+                        selected_quest_data_to_show: selectedGuideQuest,
                     });
                 },
                 (error: AxiosError) => {

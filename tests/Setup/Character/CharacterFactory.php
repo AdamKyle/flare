@@ -34,19 +34,19 @@ use Tests\Traits\CreateRace;
 use Tests\Traits\CreateSkill;
 use Tests\Traits\CreateUser;
 
-class CharacterFactory {
-
-    use CreateRace,
+class CharacterFactory
+{
+    use CreateCharacter,
         CreateClass,
-        CreateCharacter,
-        CreateUser,
-        CreateItem,
-        CreateMap,
         CreateGameMap,
         CreateGameSkill,
-        CreateSkill,
+        CreateItem,
+        CreateMap,
         CreateMarketBoardListing,
-        CreatePassiveSkill;
+        CreatePassiveSkill,
+        CreateRace,
+        CreateSkill,
+        CreateUser;
 
     private Character $character;
 
@@ -59,16 +59,11 @@ class CharacterFactory {
      *
      * - Core inventory - empty.
      * - Base Skills: Accuracy, Looting and Dodge.
-     *
-     * @param array $raceOptions
-     * @param array|GameClass $classOptions
-     * @param bool $assignBaseSkill
-     * @param bool $assignPassiveSkills
-     * @return CharacterFactory
      */
-    public function createBaseCharacter(array $raceOptions = [], array|GameClass $classOptions = [], bool $assignBaseSkill = true, bool $assignPassiveSkills = true): CharacterFactory {
+    public function createBaseCharacter(array $raceOptions = [], array|GameClass $classOptions = [], bool $assignBaseSkill = true, bool $assignPassiveSkills = true): CharacterFactory
+    {
 
-        $race  = $this->createRace($raceOptions);
+        $race = $this->createRace($raceOptions);
 
         if ($classOptions instanceof GameClass) {
             $class = $classOptions;
@@ -76,20 +71,20 @@ class CharacterFactory {
             $class = $this->createClass($classOptions);
         }
 
-        $user  = $this->createUser();
+        $user = $this->createUser();
 
         $this->character = $this->createCharacter([
-            'damage_stat'   => $class->damage_stat,
-            'name'          => Str::random(10),
-            'user_id'       => $user->id,
-            'level'         => 1,
-            'xp'            => 0,
-            'can_attack'    => true,
-            'can_move'      => true,
+            'damage_stat' => $class->damage_stat,
+            'name' => Str::random(10),
+            'user_id' => $user->id,
+            'level' => 1,
+            'xp' => 0,
+            'can_attack' => true,
+            'can_move' => true,
             'inventory_max' => 75,
-            'gold'          => 10,
+            'gold' => 10,
             'game_class_id' => $class->id,
-            'game_race_id'  => $race->id,
+            'game_race_id' => $race->id,
         ]);
 
         $this->createInventory();
@@ -110,12 +105,13 @@ class CharacterFactory {
 
         $character = $this->character->refresh();
 
-        Cache::put('character-attack-data-' . $character->id, (new AttackDataCacheSetUp())->getCacheObject());
+        Cache::put('character-attack-data-'.$character->id, (new AttackDataCacheSetUp)->getCacheObject());
 
         return $this;
     }
 
-    public function assignPassiveSkills(GameBuilding $gameBuilding = null): CharacterFactory {
+    public function assignPassiveSkills(?GameBuilding $gameBuilding = null): CharacterFactory
+    {
 
         $this->createPassiveForCharacter(PassiveSkillTypeValue::KINGDOM_DEFENCE);
         $this->createPassiveForCharacter(PassiveSkillTypeValue::KINGDOM_RESOURCE_GAIN);
@@ -128,31 +124,32 @@ class CharacterFactory {
         $this->character = $this->character->refresh();
 
         $this->createPassiveForCharacter(PassiveSkillTypeValue::UNLOCKS_BUILDING, [
-            'name'                     => is_null($gameBuilding) ? 'Sample Passive Skill 101' : $gameBuilding->name,
-            'is_locked'                => true,
-            'unlocks_at_level'         => 1,
-            'parent_skill_id'          => $this->character->passiveSkills()->first()->passiveSkill->id,
+            'name' => is_null($gameBuilding) ? 'Sample Passive Skill 101' : $gameBuilding->name,
+            'is_locked' => true,
+            'unlocks_at_level' => 1,
+            'parent_skill_id' => $this->character->passiveSkills()->first()->passiveSkill->id,
         ]);
 
         return $this;
     }
 
-    public function createClassRanks(): CharacterFactory {
+    public function createClassRanks(): CharacterFactory
+    {
         $classRank = $this->character->classRanks()->create([
-            'character_id'  => $this->character->id,
+            'character_id' => $this->character->id,
             'game_class_id' => $this->character->game_class_id,
-            'current_xp'    => 0,
-            'required_xp'   => 100,
-            'level'         => 0,
+            'current_xp' => 0,
+            'required_xp' => 100,
+            'level' => 0,
         ]);
 
         foreach (WeaponMasteryValue::getTypes() as $type) {
             $classRank->weaponMasteries()->create([
-                'character_class_rank_id'   => $classRank->id,
-                'weapon_type'               => $type,
-                'current_xp'                => 0,
-                'required_xp'               => 100,
-                'level'                     => 0,
+                'character_class_rank_id' => $classRank->id,
+                'weapon_type' => $type,
+                'current_xp' => 0,
+                'required_xp' => 100,
+                'level' => 0,
             ]);
         }
 
@@ -161,23 +158,24 @@ class CharacterFactory {
         return $this;
     }
 
-    public function addAdditionalClassRanks(array $gameClassIds): CharacterFactory {
+    public function addAdditionalClassRanks(array $gameClassIds): CharacterFactory
+    {
         foreach ($gameClassIds as $gameClassId) {
             $classRank = $this->character->classRanks()->create([
-                'character_id'  => $this->character->id,
+                'character_id' => $this->character->id,
                 'game_class_id' => $gameClassId,
-                'current_xp'    => 0,
-                'required_xp'   => 100,
-                'level'         => 0,
+                'current_xp' => 0,
+                'required_xp' => 100,
+                'level' => 0,
             ]);
 
             foreach (WeaponMasteryValue::getTypes() as $type) {
                 $classRank->weaponMasteries()->create([
-                    'character_class_rank_id'   => $classRank->id,
-                    'weapon_type'               => $type,
-                    'current_xp'                => 0,
-                    'required_xp'               => 100,
-                    'level'                     => 0,
+                    'character_class_rank_id' => $classRank->id,
+                    'weapon_type' => $type,
+                    'current_xp' => 0,
+                    'required_xp' => 100,
+                    'level' => 0,
                 ]);
             }
         }
@@ -187,9 +185,10 @@ class CharacterFactory {
         return $this;
     }
 
-    public function completeQuest(Quest $quest): CharacterFactory {
+    public function completeQuest(Quest $quest): CharacterFactory
+    {
         $this->character->questsCompleted()->create([
-            'quest_id'     => $quest->id,
+            'quest_id' => $quest->id,
             'character_id' => $this->character->id,
         ]);
 
@@ -198,10 +197,11 @@ class CharacterFactory {
         return $this;
     }
 
-    public function createPassiveForCharacter(int $type, array $options = []): CharacterFactory {
+    public function createPassiveForCharacter(int $type, array $options = []): CharacterFactory
+    {
 
-        $isLocked     = false;
-        $parentId     = null;
+        $isLocked = false;
+        $parentId = null;
         $currentLevel = 0;
 
         if (isset($options['is_locked'])) {
@@ -219,29 +219,30 @@ class CharacterFactory {
         }
 
         $this->character->passiveSkills()->create([
-            'character_id'      => $this->character->id,
-            'passive_skill_id'  => $this->createPassiveSkill(array_merge([
+            'character_id' => $this->character->id,
+            'passive_skill_id' => $this->createPassiveSkill(array_merge([
                 'effect_type' => $type,
             ], $options))->id,
-            'parent_skill_id'   => $parentId,
-            'current_level'     => $currentLevel,
-            'hours_to_next'     => 1,
-            'started_at'        => null,
-            'completed_at'      => null,
-            'is_locked'         => $isLocked,
+            'parent_skill_id' => $parentId,
+            'current_level' => $currentLevel,
+            'hours_to_next' => 1,
+            'started_at' => null,
+            'completed_at' => null,
+            'is_locked' => $isLocked,
         ]);
 
         return $this;
     }
 
-    public function assignAutomation(array $options): CharacterFactory {
+    public function assignAutomation(array $options): CharacterFactory
+    {
         $this->character->currentAutomations()->create(array_merge([
-            'character_id'                   => $this->character->id,
-            'monster_id'                     => null,
-            'type'                           => AutomationType::EXPLORING,
-            'started_at'                     => now(),
-            'completed_at'                   => now()->addHours(25),
-            'attack_type'                    => AttackTypeValue::CAST,
+            'character_id' => $this->character->id,
+            'monster_id' => null,
+            'type' => AutomationType::EXPLORING,
+            'started_at' => now(),
+            'completed_at' => now()->addHours(25),
+            'attack_type' => AttackTypeValue::CAST,
         ], $options));
 
         return $this;
@@ -249,10 +250,9 @@ class CharacterFactory {
 
     /**
      * Assign Faction system.
-     *
-     * @return CharacterFactory
      */
-    public function assignFactionSystem(): CharacterFactory {
+    public function assignFactionSystem(): CharacterFactory
+    {
 
         // In case it's called again, we don't want duplicates.
         // If the monster updates its plane or a monster is created
@@ -265,10 +265,10 @@ class CharacterFactory {
         foreach ($gameMaps as $map) {
             $this->character->factions()->create([
                 'current_level' => 1,
-                'character_id'  => $this->character->id,
-                'game_map_id'   => $map->id,
+                'character_id' => $this->character->id,
+                'game_map_id' => $map->id,
                 'points_needed' => FactionLevel::getPointsNeeded(0),
-                'maxed'         => false
+                'maxed' => false,
             ]);
         }
 
@@ -277,14 +277,14 @@ class CharacterFactory {
 
     /**
      * Fetch the inventory management class.
-     *
-     * @return InventoryManagement
      */
-    public function inventoryManagement(): InventoryManagement {
+    public function inventoryManagement(): InventoryManagement
+    {
         return new InventoryManagement($this->character, $this);
     }
 
-    public function gemBagManagement(): GemBagManagement {
+    public function gemBagManagement(): GemBagManagement
+    {
         return new GemBagManagement($this->character, $this);
     }
 
@@ -293,7 +293,8 @@ class CharacterFactory {
      *
      * @return KingdomManagement.
      */
-    public function kingdomManagement(): KingdomManagement {
+    public function kingdomManagement(): KingdomManagement
+    {
         return new KingdomManagement($this->character, $this);
     }
 
@@ -301,10 +302,9 @@ class CharacterFactory {
      * Fetches inventory management.
      *
      * Use existing instantiation if it exists.
-     *
-     * @return InventorySetManagement
      */
-    public function inventorySetManagement(): InventorySetManagement {
+    public function inventorySetManagement(): InventorySetManagement
+    {
 
         if (is_null($this->inventorySetManagement)) {
             $this->inventorySetManagement = new InventorySetManagement($this->character, $this);
@@ -316,10 +316,10 @@ class CharacterFactory {
     /**
      * Lets you update the character
      *
-     * @param array $changes | []
-     * @return CharacterFactory
+     * @param  array  $changes  | []
      */
-    public function updateCharacter(array $changes = []): CharacterFactory {
+    public function updateCharacter(array $changes = []): CharacterFactory
+    {
         $this->character->update($changes);
 
         $this->character = $this->character->refresh();
@@ -330,10 +330,10 @@ class CharacterFactory {
     /**
      * Lets you update the character's user profile.
      *
-     * @param array $changes
      * @return $this
      */
-    public function updateUser(array $changes = []): CharacterFactory {
+    public function updateUser(array $changes = []): CharacterFactory
+    {
         $this->character->user()->update($changes);
 
         $this->character = $this->character->refresh();
@@ -348,16 +348,16 @@ class CharacterFactory {
      *
      * Length should be a carbon date object.
      *
-     * @param string $reason | null
-     * @param string $request | null
-     * @param $forLength | null
-     * @return CharacterFactory
+     * @param  string  $reason  | null
+     * @param  string  $request  | null
+     * @param  $forLength  | null
      */
-    public function banCharacter(string $reason = null, string $request = null, $forLength = null): CharacterFactory {
+    public function banCharacter(?string $reason = null, ?string $request = null, $forLength = null): CharacterFactory
+    {
         $this->character->user->update([
-            'is_banned'      => true,
-            'unbanned_at'    => $forLength,
-            'banned_reason'  => $reason,
+            'is_banned' => true,
+            'unbanned_at' => $forLength,
+            'banned_reason' => $reason,
             'un_ban_request' => $request,
         ]);
 
@@ -368,21 +368,20 @@ class CharacterFactory {
      * Equip the starting equipment.
      *
      * All characters will be equipped with a rusty bloody broken dagger.
-     *
-     * @return CharacterFactory
      */
-    public function equipStartingEquipment(): CharacterFactory {
+    public function equipStartingEquipment(): CharacterFactory
+    {
         $item = $this->createItem([
-            'name'        => 'Rusty Dagger',
-            'type'        => 'weapon',
-            'base_damage' => '6'
+            'name' => 'Rusty Dagger',
+            'type' => 'weapon',
+            'base_damage' => '6',
         ]);
 
         $this->character->inventory->slots()->create([
             'inventory_id' => $this->character->inventory->id,
-            'item_id'      => $item->id,
-            'equipped'     => true,
-            'position'     => 'right-hand'
+            'item_id' => $item->id,
+            'equipped' => true,
+            'position' => 'right-hand',
         ]);
 
         resolve(BuildCharacterAttackTypes::class)->buildCache($this->character->refresh());
@@ -390,31 +389,32 @@ class CharacterFactory {
         return $this;
     }
 
-    public function equipStrongGear() {
+    public function equipStrongGear()
+    {
         $item = $this->createItem([
-            'name'        => 'Rusty Dagger',
-            'type'        => 'weapon',
-            'base_damage' => '1000000'
+            'name' => 'Rusty Dagger',
+            'type' => 'weapon',
+            'base_damage' => '1000000',
         ]);
 
         $itemTwo = $this->createItem([
-            'name'        => 'Rusty Dagger',
-            'type'        => 'weapon',
-            'base_damage' => '1000000'
+            'name' => 'Rusty Dagger',
+            'type' => 'weapon',
+            'base_damage' => '1000000',
         ]);
 
         $this->character->inventory->slots()->create([
             'inventory_id' => $this->character->inventory->id,
-            'item_id'      => $item->id,
-            'equipped'     => true,
-            'position'     => 'right-hand'
+            'item_id' => $item->id,
+            'equipped' => true,
+            'position' => 'right-hand',
         ]);
 
         $this->character->inventory->slots()->create([
             'inventory_id' => $this->character->inventory->id,
-            'item_id'      => $itemTwo->id,
-            'equipped'     => true,
-            'position'     => 'left-hand'
+            'item_id' => $itemTwo->id,
+            'equipped' => true,
+            'position' => 'left-hand',
         ]);
 
         resolve(BuildCharacterAttackTypes::class)->buildCache($this->character->refresh());
@@ -425,29 +425,28 @@ class CharacterFactory {
     /**
      * Creates a location for the player.
      *
-     * @param int $x | 16
-     * @param int $y | 16
-     * @param GameMap|null $gameMap
-     * @return CharacterFactory
+     * @param  int  $x  | 16
+     * @param  int  $y  | 16
      */
-    public function givePlayerLocation(int $x = 16, int $y = 16, GameMap $gameMap = null): CharacterFactory {
-        $gameMap = !is_null($gameMap) ? $gameMap : GameMap::where('default', true)->first();
+    public function givePlayerLocation(int $x = 16, int $y = 16, ?GameMap $gameMap = null): CharacterFactory
+    {
+        $gameMap = ! is_null($gameMap) ? $gameMap : GameMap::where('default', true)->first();
 
         if (is_null($gameMap)) {
             $gameMap = $this->createGameMap([
-                'name'    => 'Surface',
-                'path'    => 'path',
+                'name' => 'Surface',
+                'path' => 'path',
                 'default' => true,
             ]);
         }
 
         $this->createMap([
-            'character_id'         => $this->character->id,
-            'position_x'           => $x,
-            'position_y'           => $y,
+            'character_id' => $this->character->id,
+            'position_x' => $x,
+            'position_y' => $y,
             'character_position_x' => $x,
             'character_position_y' => $y,
-            'game_map_id'          => $gameMap->id,
+            'game_map_id' => $gameMap->id,
         ]);
 
         $this->character = $this->character->refresh();
@@ -458,14 +457,14 @@ class CharacterFactory {
     /**
      * Allows one to update a characters location.
      *
-     * @param int $x | 16
-     * @param int $y | 16
-     * @return CharacterFactory
+     * @param  int  $x  | 16
+     * @param  int  $y  | 16
      */
-    public function updateLocation(int $x = 16, int $y = 16): CharacterFactory {
+    public function updateLocation(int $x = 16, int $y = 16): CharacterFactory
+    {
         $this->character->map()->update([
-            'position_x'           => $x,
-            'position_y'           => $y,
+            'position_x' => $x,
+            'position_y' => $y,
             'character_position_x' => $x,
             'character_position_y' => $y,
         ]);
@@ -480,11 +479,11 @@ class CharacterFactory {
      *
      * Handles leveling the character up.
      *
-     * @param int $levels | 1
-     * @return CharacterFactory
+     * @param  int  $levels  | 1
      */
-    public function levelCharacterUp(int $levels = 1): CharacterFactory {
-        $characterService = new CharacterService();
+    public function levelCharacterUp(int $levels = 1): CharacterFactory
+    {
+        $characterService = new CharacterService;
 
         for ($i = 0; $i <= $levels; $i++) {
             $characterService->levelUpCharacter($this->character, 0);
@@ -500,15 +499,14 @@ class CharacterFactory {
     /**
      * Update a specific skill associated with a character.
      *
-     * @param string $name
-     * @param array $changes | []
-     * @return CharacterFactory
+     * @param  array  $changes  | []
      */
-    public function updateSkill(string $name, array $changes = []): CharacterFactory {
+    public function updateSkill(string $name, array $changes = []): CharacterFactory
+    {
         $skill = $this->character->skills->where('name', $name)->first();
 
         if (is_null($skill)) {
-            throw new Exception($name . ' not found.');
+            throw new Exception($name.' not found.');
         }
 
         $skill->update($changes);
@@ -523,20 +521,17 @@ class CharacterFactory {
     /**
      * Assign a new skill to a character.
      *
-     * @param GameSkill $skill
-     * @param int $level | 1
-     * @param bool $locked
-     * @param array $options
-     * @return characterFactory
+     * @param  int  $level  | 1
      */
-    public function assignSkill(GameSkill $skill, int $level = 1, bool $locked = false, array $options = []): CharacterFactory {
+    public function assignSkill(GameSkill $skill, int $level = 1, bool $locked = false, array $options = []): CharacterFactory
+    {
         $this->character->skills()->create(array_merge([
             'game_skill_id' => $skill->id,
-            'character_id'  => $this->character->id,
-            'level'         => $level,
-            'xp'            => 0,
-            'xp_max'        => 100,
-            'is_locked'     => $locked,
+            'character_id' => $this->character->id,
+            'level' => $level,
+            'xp' => 0,
+            'xp_max' => 100,
+            'is_locked' => $locked,
         ], $options));
 
         resolve(BuildCharacterAttackTypes::class)->buildCache($this->character->refresh());
@@ -549,37 +544,34 @@ class CharacterFactory {
      *
      * Sets a skill to training, assuming no other skill is currently being trained.
      *
-     * @param string $name
-     * @return CharacterFactory
      * @throws Exception
      */
-    public function trainSkill(string $name): CharacterFactory {
+    public function trainSkill(string $name): CharacterFactory
+    {
         $skill = $this->character->skills->filter(function ($skill) {
             return $skill->currently_training;
         })->first();
 
-        if (!is_null($skill)) {
+        if (! is_null($skill)) {
             throw new Exception('Already have a skill in training.');
         }
 
         $this->character->skills->each(function ($skill) use ($name) {
             if ($skill->name === $name) {
                 $skill->update([
-                    'currently_training' => true
+                    'currently_training' => true,
                 ]);
             }
         });
-
 
         return $this;
     }
 
     /**
      * Get the character
-     *
-     * @return Character
      */
-    public function getCharacter(): Character {
+    public function getCharacter(): Character
+    {
 
         return $this->character->refresh();
     }
@@ -587,17 +579,17 @@ class CharacterFactory {
     /**
      * Creates a market board listing.
      *
-     * @param Item|null $item
      * @return $this
      */
-    public function createMarketListing(?Item $item = null): CharacterFactory {
+    public function createMarketListing(?Item $item = null): CharacterFactory
+    {
         if (is_null($item)) {
             $item = $this->createItem();
         }
 
         $this->createMarketBoardListing([
             'character_id' => $this->character->id,
-            'item_id'      => $item->id,
+            'item_id' => $item->id,
             'listed_price' => 10000,
         ]);
 
@@ -607,97 +599,100 @@ class CharacterFactory {
     /**
      * Assign Base Skills
      */
-    protected function assignBaseSkills() {
-        $accuracy        = $this->returnGameSkill('Accuracy', SkillTypeValue::TRAINING);
-        $timeout         = $this->returnGameSkill('Fighters Timeout', SkillTypeValue::EFFECTS_BATTLE_TIMER);
+    protected function assignBaseSkills()
+    {
+        $accuracy = $this->returnGameSkill('Accuracy', SkillTypeValue::TRAINING);
+        $timeout = $this->returnGameSkill('Fighters Timeout', SkillTypeValue::EFFECTS_BATTLE_TIMER);
         $castingAccuracy = $this->returnGameSkill('Casting Accuracy', SkillTypeValue::TRAINING);
-        $criticality     = $this->returnGameSkill('Criticality', SkillTypeValue::TRAINING);
-        $dodge           = $this->returnGameSkill('Dodge', SkillTypeValue::TRAINING);
-        $looting         = $this->returnGameSkill('Looting', SkillTypeValue::TRAINING);
-        $kingmanship     = $this->returnGameSkill('Kingmanship', SkillTypeValue::EFFECTS_KINGDOM);
-        $alchemy         = $this->returnGameSkill('Alchemy', SkillTypeValue::ALCHEMY);
-        $disenchanting   = $this->returnGameSkill('Disenchanting', SkillTypeValue::DISENCHANTING);
-        $enchanting      = $this->returnGameSkill('Enchanting', SkillTypeValue::ENCHANTING);
+        $criticality = $this->returnGameSkill('Criticality', SkillTypeValue::TRAINING);
+        $dodge = $this->returnGameSkill('Dodge', SkillTypeValue::TRAINING);
+        $looting = $this->returnGameSkill('Looting', SkillTypeValue::TRAINING);
+        $kingmanship = $this->returnGameSkill('Kingmanship', SkillTypeValue::EFFECTS_KINGDOM);
+        $alchemy = $this->returnGameSkill('Alchemy', SkillTypeValue::ALCHEMY);
+        $disenchanting = $this->returnGameSkill('Disenchanting', SkillTypeValue::DISENCHANTING);
+        $enchanting = $this->returnGameSkill('Enchanting', SkillTypeValue::ENCHANTING);
 
         $this->createSkill([
-            'character_id'  => $this->character->id,
+            'character_id' => $this->character->id,
             'game_skill_id' => $accuracy->id,
         ]);
 
         $this->createSkill([
-            'character_id'  => $this->character->id,
+            'character_id' => $this->character->id,
             'game_skill_id' => $timeout->id,
         ]);
 
         $this->createSkill([
-            'character_id'  => $this->character->id,
+            'character_id' => $this->character->id,
             'game_skill_id' => $dodge->id,
         ]);
 
         $this->createSkill([
-            'character_id'  => $this->character->id,
+            'character_id' => $this->character->id,
             'game_skill_id' => $looting->id,
         ]);
 
         $this->createSkill([
-            'character_id'  => $this->character->id,
+            'character_id' => $this->character->id,
             'game_skill_id' => $castingAccuracy->id,
         ]);
 
         $this->createSkill([
-            'character_id'  => $this->character->id,
+            'character_id' => $this->character->id,
             'game_skill_id' => $criticality->id,
         ]);
 
         $this->createSkill([
-            'character_id'  => $this->character->id,
+            'character_id' => $this->character->id,
             'game_skill_id' => $kingmanship->id,
         ]);
 
         $this->createSkill([
-            'character_id'  => $this->character->id,
+            'character_id' => $this->character->id,
             'game_skill_id' => $alchemy->id,
         ]);
 
         $this->createSkill([
-            'character_id'  => $this->character->id,
+            'character_id' => $this->character->id,
             'game_skill_id' => $disenchanting->id,
         ]);
 
         $this->createSkill([
-            'character_id'  => $this->character->id,
+            'character_id' => $this->character->id,
             'game_skill_id' => $enchanting->id,
         ]);
     }
 
     /**
      * Get the user.
-     *
-     * @return User
      */
-    public function getUser(): User {
+    public function getUser(): User
+    {
         return $this->character->user;
     }
 
     /**
      * Create the core inventory.
      */
-    protected function createInventory() {
+    protected function createInventory()
+    {
         $this->character->inventory()->create([
             'character_id' => $this->character->id,
         ]);
     }
 
-    protected function createGemBag() {
+    protected function createGemBag()
+    {
         $this->character->gemBag()->create([
             'character_id' => $this->character->id,
         ]);
     }
 
-    protected function returnGameSkill(string $name, int $type = null): GameSkill {
+    protected function returnGameSkill(string $name, ?int $type = null): GameSkill
+    {
         $gameSkill = GameSkill::where('name', $name)->where('type', $type)->first();
 
-        if (!is_null($gameSkill)) {
+        if (! is_null($gameSkill)) {
             return $gameSkill;
         }
 

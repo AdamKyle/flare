@@ -14,9 +14,9 @@ use Tests\Traits\CreateGem;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateItemAffix;
 
-class ElementalAtonementTest extends TestCase {
-
-    use RefreshDatabase, CreateItem, CreateItemAffix, CreateGameMap, CreateClass, CreateGameSkill, CreateGem;
+class ElementalAtonementTest extends TestCase
+{
+    use CreateClass, CreateGameMap, CreateGameSkill, CreateGem, CreateItem, CreateItemAffix, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -24,12 +24,13 @@ class ElementalAtonementTest extends TestCase {
 
     private ?ElementalAtonement $elementalAtonement;
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
-        $this->character            = (new CharacterFactory())->createBaseCharacter()->assignSkill(
+        $this->character = (new CharacterFactory)->createBaseCharacter()->assignSkill(
             $this->createGameSkill([
-                'class_bonus' => 0.01
+                'class_bonus' => 0.01,
             ]),
             5
         )->givePlayerLocation();
@@ -39,15 +40,17 @@ class ElementalAtonementTest extends TestCase {
         $this->elementalAtonement = resolve(ElementalAtonement::class);
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
 
-        $this->character            = null;
+        $this->character = null;
         $this->characterStatBuilder = null;
-        $this->elementalAtonement   = null;
+        $this->elementalAtonement = null;
     }
 
-    public function testCharacterWithMaxedOutElementalAtonement() {
+    public function testCharacterWithMaxedOutElementalAtonement()
+    {
         $item = $this->createItem([
             'type' => 'weapon',
             'socket_count' => 1,
@@ -55,11 +58,11 @@ class ElementalAtonementTest extends TestCase {
 
         $item->sockets()->create([
             'item_id' => $item->id,
-            'gem_id'  => $this->createGem([
-                'primary_atonement_amount'   => 0.75,
+            'gem_id' => $this->createGem([
+                'primary_atonement_amount' => 0.75,
                 'secondary_atonement_amount' => 0.75,
-                'tertiary_atonement_amount'  => 0.75,
-            ])->id
+                'tertiary_atonement_amount' => 0.75,
+            ])->id,
         ]);
 
         $item = $item->refresh();
@@ -76,7 +79,8 @@ class ElementalAtonementTest extends TestCase {
         $this->assertNotEmpty($elementalData['atonements']);
     }
 
-    public function testCharacterGetsNothingBackForElementalAtonement() {
+    public function testCharacterGetsNothingBackForElementalAtonement()
+    {
 
         $character = $this->character->getCharacter();
 

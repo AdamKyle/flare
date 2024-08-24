@@ -7,8 +7,8 @@ use Database\Factories\CharacterAutomationFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class CharacterAutomation extends Model {
-
+class CharacterAutomation extends Model
+{
     use HasFactory;
 
     /**
@@ -34,27 +34,31 @@ class CharacterAutomation extends Model {
      * @var array
      */
     protected $casts = [
-        'type'                         => 'integer',
-        'started_at'                   => 'datetime',
-        'completed_at'                 => 'datetime',
+        'type' => 'integer',
+        'started_at' => 'datetime',
+        'completed_at' => 'datetime',
         'move_down_monster_list_every' => 'integer',
-        'previous_level'               => 'integer',
-        'current_level'                => 'integer',
+        'previous_level' => 'integer',
+        'current_level' => 'integer',
     ];
 
-    public function character() {
+    public function character()
+    {
         return $this->belongsTo(Character::class);
     }
 
-    public function monster() {
+    public function monster()
+    {
         return $this->belongsTo(Monster::class);
     }
 
-    public function type(): AutomationType {
-        return (new AutomationType($this->type));
+    public function type(): AutomationType
+    {
+        return new AutomationType($this->type);
     }
 
-    protected static function newFactory() {
+    protected static function newFactory()
+    {
         return CharacterAutomationFactory::new();
     }
 }

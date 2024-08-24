@@ -6,23 +6,27 @@ use App\Game\Gems\Values\GemTierValue;
 use Exception;
 use Tests\TestCase;
 
-class GemTierValueTest extends TestCase {
-
-    public function setUp(): void {
+class GemTierValueTest extends TestCase
+{
+    public function setUp(): void
+    {
         parent::setUp();
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
     }
 
-    public function testThrowErrorForInvalidGemTierValue() {
+    public function testThrowErrorForInvalidGemTierValue()
+    {
         $this->expectException(Exception::class);
 
         new GemTierValue(105);
     }
 
-    public function testReturnNullForMaxTierOneAmount() {
+    public function testReturnNullForMaxTierOneAmount()
+    {
         $value = (new GemTierValue(GemTierValue::TIER_FOUR))->maxTierOneAmount();
 
         $this->assertNull(
@@ -30,7 +34,8 @@ class GemTierValueTest extends TestCase {
         );
     }
 
-    public function testReturnNullForMaxTierTwoAmount() {
+    public function testReturnNullForMaxTierTwoAmount()
+    {
         $value = (new GemTierValue(GemTierValue::TIER_FOUR))->maxTierTwoAmount();
 
         $this->assertNull(
@@ -38,7 +43,8 @@ class GemTierValueTest extends TestCase {
         );
     }
 
-    public function testReturnNullForMaxTierThreeAmount() {
+    public function testReturnNullForMaxTierThreeAmount()
+    {
         $value = (new GemTierValue(GemTierValue::TIER_FOUR))->maxTierThreeAmount();
 
         $this->assertNull(
@@ -46,7 +52,8 @@ class GemTierValueTest extends TestCase {
         );
     }
 
-    public function testReturnNullForMaxTierFourAmount() {
+    public function testReturnNullForMaxTierFourAmount()
+    {
         $value = (new GemTierValue(GemTierValue::TIER_ONE))->maxTierFourAmount();
 
         $this->assertNull(

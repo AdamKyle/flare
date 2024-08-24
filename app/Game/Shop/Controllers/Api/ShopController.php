@@ -4,10 +4,8 @@ namespace App\Game\Shop\Controllers\Api;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
-use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Character\CharacterInventory\Services\ComparisonService;
-use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Shop\Events\BuyItemEvent;
 use App\Game\Shop\Events\SellItemEvent;
 use App\Game\Shop\Events\UpdateShopEvent;
@@ -20,28 +18,32 @@ use Facades\App\Flare\Calculators\SellItemCalculator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
-class ShopController extends Controller {
-
+class ShopController extends Controller
+{
     private CharacterInventoryService $characterInventoryService;
+
     private ShopService $shopService;
 
-    public function __construct(CharacterInventoryService $characterInventoryService, ShopService $shopService) {
+    public function __construct(CharacterInventoryService $characterInventoryService, ShopService $shopService)
+    {
         $this->characterInventoryService = $characterInventoryService;
         $this->shopService = $shopService;
     }
 
-    public function fetchItemsForShop(Character $character): JsonResponse {
+    public function fetchItemsForShop(Character $character): JsonResponse
+    {
         return response()->json([
-            'items'           => $this->shopService->getItemsForShop(),
-            'gold'            =>  $character->gold,
+            'items' => $this->shopService->getItemsForShop(),
+            'gold' => $character->gold,
             'inventory_count' => $character->getInventoryCount(),
-            'inventory_max'   => $character->inventory_max,
-            'is_merchant'     => $character->classType()->isMerchant(),
+            'inventory_max' => $character->inventory_max,
+            'is_merchant' => $character->classType()->isMerchant(),
         ]);
     }
 
     public function shopCompare(Request $request, Character $character,
-                                ComparisonService $comparisonService) {
+        ComparisonService $comparisonService)
+    {
 
         $viewData = $comparisonService->buildShopData($character, Item::where('name', $request->item_name)->first(), $request->item_type);
 
@@ -50,7 +52,8 @@ class ShopController extends Controller {
         ]);
     }
 
-    public function buy(Request $request, Character $character) {
+    public function buy(Request $request, Character $character)
+    {
 
         if ($character->gold === 0) {
             return redirect()->back()->with('error', 'You do not have enough gold.');
@@ -83,12 +86,13 @@ class ShopController extends Controller {
         event(new UpdateShopEvent($character->user, $character->gold, $character->getInventoryCount()));
 
         return response()->json([
-            'message' => 'Purchased: ' . $item->affix_name . '.'
+            'message' => 'Purchased: '.$item->affix_name.'.',
         ]);
     }
 
-    public function buyMultiple(ShopPurchaseMultipleValidation $request, Character $character) {
-        $item   = Item::find($request->item_id);
+    public function buyMultiple(ShopPurchaseMultipleValidation $request, Character $character)
+    {
+        $item = Item::find($request->item_id);
         $amount = $request->amount;
 
         if ($amount > $character->inventory_max || $character->isInventoryFull()) {
@@ -112,11 +116,12 @@ class ShopController extends Controller {
         event(new UpdateShopEvent($character->user, $character->gold, $character->getInventoryCount()));
 
         return response()->json([
-            'message' => 'You purchased: ' . $amount . ' of ' . $item->name,
+            'message' => 'You purchased: '.$amount.' of '.$item->name,
         ]);
     }
 
-    public function buyAndReplace(ShopReplaceItemValidation $request, Character $character) {
+    public function buyAndReplace(ShopReplaceItemValidation $request, Character $character)
+    {
 
         $item = Item::find($request->item_id_to_buy);
 
@@ -138,7 +143,7 @@ class ShopController extends Controller {
 
         if ($character->isInventoryFull()) {
             return response()->json([
-                'message' => 'Inventory is full. Please make room.'
+                'message' => 'Inventory is full. Please make room.',
             ], 422);
         }
 
@@ -149,21 +154,22 @@ class ShopController extends Controller {
         event(new UpdateShopEvent($character->user, $character->gold, $character->getInventoryCount()));
 
         return response()->json([
-            'message' => 'Purchased and equipped: ' . $item->affix_name . '.'
+            'message' => 'Purchased and equipped: '.$item->affix_name.'.',
         ]);
     }
 
-    public function sellItem(ShopSellValidation $request, Character $character) {
+    public function sellItem(ShopSellValidation $request, Character $character)
+    {
 
         $inventorySlot = $character->inventory->slots->filter(function ($slot) use ($request) {
-            return $slot->id === (int) $request->slot_id && !$slot->equipped;
+            return $slot->id === (int) $request->slot_id && ! $slot->equipped;
         })->first();
 
         if (is_null($inventorySlot)) {
             return response()->json(['message' => 'Item not found.']);
         }
 
-        $item         = $inventorySlot->item;
+        $item = $inventorySlot->item;
 
         if ($item->type === 'trinket' || $item->type === 'artifact') {
             return response()->json(['message' => 'The shop keeper will not accept this item (Trinkets/Artifacts cannot be sold to the shop).']);
@@ -178,14 +184,15 @@ class ShopController extends Controller {
         $inventory = $this->characterInventoryService->setCharacter($character);
 
         return response()->json([
-            'message' => 'Sold: ' . $item->affix_name . ' for: ' . number_format($totalSoldFor) . ' gold.',
+            'message' => 'Sold: '.$item->affix_name.' for: '.number_format($totalSoldFor).' gold.',
             'inventory' => [
                 'inventory' => $inventory->getInventoryForType('inventory'),
-            ]
+            ],
         ]);
     }
 
-    public function sellAll(Character $character) {
+    public function sellAll(Character $character)
+    {
 
         $result = $this->shopService->sellAllItems($character);
 

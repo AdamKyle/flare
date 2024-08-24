@@ -2,28 +2,29 @@
 
 namespace App\Game\Quests\Handlers;
 
-use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;
-use App\Flare\Models\Npc;
 use App\Flare\Models\Quest;
+use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Messages\Builders\NpcServerMessageBuilder;
 use App\Game\Quests\Traits\QuestDetails;
 use Exception;
 
-class NpcQuestsHandler {
-
+class NpcQuestsHandler
+{
     use QuestDetails;
 
     private $npcServerMessageBuilder;
 
     private $npcQuestRewardHandler;
 
-    public function __construct(NpcServerMessageBuilder $npcServerMessageBuilder, NpcQuestRewardHandler $npcQuestRewardHandler) {
+    public function __construct(NpcServerMessageBuilder $npcServerMessageBuilder, NpcQuestRewardHandler $npcQuestRewardHandler)
+    {
         $this->npcServerMessageBuilder = $npcServerMessageBuilder;
-        $this->npcQuestRewardHandler   = $npcQuestRewardHandler;
+        $this->npcQuestRewardHandler = $npcQuestRewardHandler;
     }
 
-    public function handleNpcQuest(Character $character, Quest $quest): void {
+    public function handleNpcQuest(Character $character, Quest $quest): void
+    {
         $npc = $quest->npc;
 
         $giveRewards = false;
@@ -31,7 +32,7 @@ class NpcQuestsHandler {
         if ($this->questRequiresItem($quest)) {
             $foundItem = $this->fetchRequiredItem($quest, $character);
 
-            if (!is_null($foundItem)) {
+            if (! is_null($foundItem)) {
                 $foundItem->delete();
 
                 $giveRewards = true;
@@ -41,7 +42,7 @@ class NpcQuestsHandler {
         if ($this->questRequiresSecondaryItem($quest)) {
             $secondaryItem = $this->fetchSecondaryRequiredItem($quest, $character);
 
-            if (!is_null($secondaryItem)) {
+            if (! is_null($secondaryItem)) {
                 $secondaryItem->delete();
 
                 $giveRewards = true;
@@ -83,14 +84,14 @@ class NpcQuestsHandler {
             return;
         }
 
-        throw new Exception($quest->npc->real_name . ' thinks The Creator forgot to tell them how to handle this quest!');
-
+        throw new Exception($quest->npc->real_name.' thinks The Creator forgot to tell them how to handle this quest!');
     }
 
-    public function payCurrencies(Character $character, Quest $quest) {
-        $newGold        = $character->gold - $quest->gold_cost;
-        $newGoldDust    = $character->gold_dust - $quest->gold_dust_cost;
-        $newShards      = $character->shards - $quest->shard_cost;
+    public function payCurrencies(Character $character, Quest $quest)
+    {
+        $newGold = $character->gold - $quest->gold_cost;
+        $newGoldDust = $character->gold_dust - $quest->gold_dust_cost;
+        $newShards = $character->shards - $quest->shard_cost;
         $newCopperCoins = $character->copper_coins - $quest->copper_coin_cost;
 
         if ($newGold <= 0) {
@@ -110,13 +111,12 @@ class NpcQuestsHandler {
         }
 
         $character->update([
-            'gold' => !is_null($quest->gold_cost) ? $newGold : $character->gold,
-            'gold_dust' => !is_null($quest->gold_dust_cost) ? $newGoldDust : $character->gold_dust,
-            'shards' => !is_null($quest->shard_cost) ? $newShards : $character->shards,
-            'copper_coins' => !is_null($quest->copper_coin_cost) ? $newCopperCoins : $character->copper_coins,
+            'gold' => ! is_null($quest->gold_cost) ? $newGold : $character->gold,
+            'gold_dust' => ! is_null($quest->gold_dust_cost) ? $newGoldDust : $character->gold_dust,
+            'shards' => ! is_null($quest->shard_cost) ? $newShards : $character->shards,
+            'copper_coins' => ! is_null($quest->copper_coin_cost) ? $newCopperCoins : $character->copper_coins,
         ]);
 
         event(new UpdateTopBarEvent($character->refresh()));
     }
-
 }

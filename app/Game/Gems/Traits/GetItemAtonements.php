@@ -3,24 +3,22 @@
 namespace App\Game\Gems\Traits;
 
 use App\Flare\Models\Item;
-use Illuminate\Support\Facades\DB;
-use App\Game\Gems\Values\GemTypeValue;
 use App\Flare\Traits\ElementAttackData;
+use App\Game\Gems\Values\GemTypeValue;
+use Illuminate\Support\Facades\DB;
 
-trait GetItemAtonements {
-
+trait GetItemAtonements
+{
     use ElementAttackData;
 
     /**
      * Get atonement data based on gem array data.
-     *
-     * @param array $gemData
-     * @return array
      */
-    public function getElementAtonementFromArray(array $gemData): array {
+    public function getElementAtonementFromArray(array $gemData): array
+    {
 
         $atonements = [
-            'atonements'       => [],
+            'atonements' => [],
             'elemental_damage' => [],
         ];
 
@@ -37,13 +35,11 @@ trait GetItemAtonements {
 
     /**
      * Get elemental atonement details from gems on item.
-     *
-     * @param Item $item
-     * @return array
      */
-    public function getElementAtonement(Item $item): array {
+    public function getElementAtonement(Item $item): array
+    {
         $atonements = [
-            'atonements'       => [],
+            'atonements' => [],
             'elemental_damage' => [],
         ];
 
@@ -60,18 +56,14 @@ trait GetItemAtonements {
 
     /**
      * Sum the atonement types from an array of gem data.
-     *
-     * @param array $gemData
-     * @param int $type
-     * @param string $name
-     * @return array
      */
-    protected function fetchSummedValueFromArray(array $gemData, int $type, string $name): array {
+    protected function fetchSummedValueFromArray(array $gemData, int $type, string $name): array
+    {
         $result = [];
 
         foreach ($gemData as $gem) {
             $atonementType =
-                $gem["primary_atonement_type"] == $type ? "primary_atonement_amount" : ($gem["secondary_atonement_type"] == $type ? "secondary_atonement_amount" : ($gem["tertiary_atonement_type"] == $type ? "tertiary_atonement_amount" : ""));
+                $gem['primary_atonement_type'] == $type ? 'primary_atonement_amount' : ($gem['secondary_atonement_type'] == $type ? 'secondary_atonement_amount' : ($gem['tertiary_atonement_type'] == $type ? 'tertiary_atonement_amount' : ''));
 
             if ($atonementType) {
                 if (array_key_exists($name, $result)) {
@@ -89,13 +81,9 @@ trait GetItemAtonements {
 
     /**
      * Fetch summed values for type.
-     *
-     * @param Item $item
-     * @param int $type
-     * @param string $name
-     * @return float
      */
-    protected function fetchSummedValue(Item $item, int $type, string $name): float {
+    protected function fetchSummedValue(Item $item, int $type, string $name): float
+    {
         $value = $item->sockets()->join('gems', function ($join) use ($type) {
             $join->on('item_sockets.gem_id', '=', 'gems.id')
                 ->where(function ($query) use ($type) {
@@ -115,21 +103,19 @@ trait GetItemAtonements {
 
     /**
      * Determine highest value.
-     *
-     * @param array $atonements
-     * @return array
      */
-    public function determineHighestValue(array $atonements): array {
+    public function determineHighestValue(array $atonements): array
+    {
 
         $elementData = $atonements['atonements'];
 
         $highestElementalDamage = $this->getHighestElementDamage($elementData);
 
-        $highestElementalName   = $this->getHighestElementName($elementData, $highestElementalDamage);
+        $highestElementalName = $this->getHighestElementName($elementData, $highestElementalDamage);
 
         if ($highestElementalDamage <= 0) {
             $atonements['elemental_damage'] = [
-                'name'   => 'N/A',
+                'name' => 'N/A',
                 'amount' => 0.0,
             ];
 
@@ -137,7 +123,7 @@ trait GetItemAtonements {
         }
 
         $atonements['elemental_damage'] = [
-            'name'   => $highestElementalName,
+            'name' => $highestElementalName,
             'amount' => $highestElementalDamage,
         ];
 

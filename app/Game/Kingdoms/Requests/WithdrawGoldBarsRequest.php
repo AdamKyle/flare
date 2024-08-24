@@ -28,7 +28,8 @@ class WithdrawGoldBarsRequest extends FormRequest
         ];
     }
 
-    public function messages() {
+    public function messages()
+    {
         return [
             'amount_to_withdraw.required' => 'Amount to purchase is required.',
         ];

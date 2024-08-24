@@ -2,24 +2,22 @@
 
 namespace App\Flare\Services;
 
-use Illuminate\Support\Facades\Cache;
-use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;
 use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
+use Illuminate\Support\Facades\Cache;
 
-class DailyGoldDustService {
-
+class DailyGoldDustService
+{
     const LOTTO_MAX = 10000;
 
     /**
      * Handle regular amounts of gold dust.
-     *
-     * @param Character $character
-     * @return void
      */
-    public function handleRegularDailyGoldDust(Character $character): void {
+    public function handleRegularDailyGoldDust(Character $character): void
+    {
         $amount = rand(1, 100);
 
         $newAmount = $character->gold_dust + $amount;
@@ -41,14 +39,12 @@ class DailyGoldDustService {
 
     /**
      * Handle the winner  of daily gold dust.
-     *
-     * @param Character $character
-     * @return void
      */
-    public function handleWonDailyLottery(Character $character): void {
+    public function handleWonDailyLottery(Character $character): void
+    {
 
-        if (!Cache::has('daily-gold-dust-lottery-won')) {
-            event(new GlobalMessageEvent($character->name . ' has won the daily Gold Dust Lottery!
+        if (! Cache::has('daily-gold-dust-lottery-won')) {
+            event(new GlobalMessageEvent($character->name.' has won the daily Gold Dust Lottery!
             (Gold Dust is used in Alchemy and Quests - See Help section -> Click Help I\'m stuck, and see currencies under: Character Information -> Currencies)'
             ));
 

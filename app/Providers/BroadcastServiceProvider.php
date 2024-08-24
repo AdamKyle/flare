@@ -5,13 +5,15 @@ namespace App\Providers;
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\ServiceProvider;
 
-class BroadcastServiceProvider extends ServiceProvider {
+class BroadcastServiceProvider extends ServiceProvider
+{
     /**
      * Bootstrap any application services.
      *
      * @return void
      */
-    public function boot() {
+    public function boot()
+    {
         Broadcast::routes();
 
         require base_path('routes/channels.php');
@@ -35,5 +37,6 @@ class BroadcastServiceProvider extends ServiceProvider {
         require base_path('routes/game/events/channels.php');
         require base_path('routes/game/shop/channels.php');
         require base_path('routes/game/factions/faction-loyalty/channels.php');
+        require base_path('routes/game/survey/channels.php');
     }
 }

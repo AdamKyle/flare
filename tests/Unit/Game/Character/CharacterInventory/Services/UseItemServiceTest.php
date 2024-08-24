@@ -17,23 +17,25 @@ use Tests\TestCase;
 use Tests\Traits\CreateCharacterBoon;
 use Tests\Traits\CreateItem;
 
-class UseItemServiceTest extends TestCase {
-
-    use RefreshDatabase, CreateItem, CreateCharacterBoon;
+class UseItemServiceTest extends TestCase
+{
+    use CreateCharacterBoon, CreateItem, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
     private ?UseItemService $useItemService;
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
-        $this->character = (new CharacterFactory())->createBaseCharacter();
+        $this->character = (new CharacterFactory)->createBaseCharacter();
 
         $this->useItemService = resolve(UseItemService::class);
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
 
         $this->character = null;
@@ -41,7 +43,8 @@ class UseItemServiceTest extends TestCase {
         $this->useItemService = null;
     }
 
-    public function testUseItemOnCharacter() {
+    public function testUseItemOnCharacter()
+    {
         Event::fake();
         Queue::fake();
 
@@ -52,7 +55,7 @@ class UseItemServiceTest extends TestCase {
             'affects_skill_type' => SkillTypeValue::TRAINING,
         ]);
 
-        $character = (new CharacterFactory())->createBaseCharacter()
+        $character = (new CharacterFactory)->createBaseCharacter()
             ->givePlayerLocation()
             ->inventoryManagement()
             ->giveItem($item)
@@ -72,7 +75,8 @@ class UseItemServiceTest extends TestCase {
         $this->assertNull($character->inventory->slots->where('item.type', 'alchemy')->first());
     }
 
-    public function testDoNotGoOverMaxAmount() {
+    public function testDoNotGoOverMaxAmount()
+    {
         Event::fake();
         Queue::fake();
 
@@ -83,19 +87,19 @@ class UseItemServiceTest extends TestCase {
             'affects_skill_type' => SkillTypeValue::TRAINING,
         ]);
 
-        $character = (new CharacterFactory())->createBaseCharacter()
+        $character = (new CharacterFactory)->createBaseCharacter()
             ->givePlayerLocation()
             ->inventoryManagement()
             ->giveItem($item)
             ->getCharacter();
 
         $this->createCharacterBoon([
-            'character_id'             => $character->id,
-            'item_id'                  => $item->id,
-            'started'                  => now(),
-            'complete'                 => now()->addHours(2),
-            'amount_used'              => 10,
-            'last_for_minutes'         => 120,
+            'character_id' => $character->id,
+            'item_id' => $item->id,
+            'started' => now(),
+            'complete' => now()->addHours(2),
+            'amount_used' => 10,
+            'last_for_minutes' => 120,
         ]);
 
         $character = $character->refresh();
@@ -114,7 +118,8 @@ class UseItemServiceTest extends TestCase {
         $this->assertNotNull($character->inventory->slots->where('item.type', 'alchemy')->first());
     }
 
-    public function testDoNotUseItemWhenWouldGoAboveMaxEightHours() {
+    public function testDoNotUseItemWhenWouldGoAboveMaxEightHours()
+    {
         Event::fake();
         Queue::fake();
 
@@ -126,19 +131,19 @@ class UseItemServiceTest extends TestCase {
             'can_stack' => true,
         ]);
 
-        $character = (new CharacterFactory())->createBaseCharacter()
+        $character = (new CharacterFactory)->createBaseCharacter()
             ->givePlayerLocation()
             ->inventoryManagement()
             ->giveItem($item)
             ->getCharacter();
 
         $this->createCharacterBoon([
-            'character_id'             => $character->id,
-            'item_id'                  => $item->id,
-            'started'                  => now(),
-            'complete'                 => now()->addHours(2),
-            'amount_used'              => 1,
-            'last_for_minutes'         => 8 * 60,
+            'character_id' => $character->id,
+            'item_id' => $item->id,
+            'started' => now(),
+            'complete' => now()->addHours(2),
+            'amount_used' => 1,
+            'last_for_minutes' => 8 * 60,
         ]);
 
         $character = $character->refresh();
@@ -157,7 +162,8 @@ class UseItemServiceTest extends TestCase {
         $this->assertNotNull($character->inventory->slots->where('item.type', 'alchemy')->first());
     }
 
-    public function testDoNotUseItemWhenItemDoesNotStack() {
+    public function testDoNotUseItemWhenItemDoesNotStack()
+    {
         Event::fake();
         Queue::fake();
 
@@ -169,19 +175,19 @@ class UseItemServiceTest extends TestCase {
             'can_stack' => false,
         ]);
 
-        $character = (new CharacterFactory())->createBaseCharacter()
+        $character = (new CharacterFactory)->createBaseCharacter()
             ->givePlayerLocation()
             ->inventoryManagement()
             ->giveItem($item)
             ->getCharacter();
 
         $this->createCharacterBoon([
-            'character_id'             => $character->id,
-            'item_id'                  => $item->id,
-            'started'                  => now(),
-            'complete'                 => now()->addHours(2),
-            'amount_used'              => 1,
-            'last_for_minutes'         => 8 * 60,
+            'character_id' => $character->id,
+            'item_id' => $item->id,
+            'started' => now(),
+            'complete' => now()->addHours(2),
+            'amount_used' => 1,
+            'last_for_minutes' => 8 * 60,
         ]);
 
         $character = $character->refresh();
@@ -200,7 +206,8 @@ class UseItemServiceTest extends TestCase {
         $this->assertNotNull($character->inventory->slots->where('item.type', 'alchemy')->first());
     }
 
-    public function testPlayerDoesNotHaveItem() {
+    public function testPlayerDoesNotHaveItem()
+    {
         Event::fake();
         Queue::fake();
 
@@ -211,7 +218,7 @@ class UseItemServiceTest extends TestCase {
             'affects_skill_type' => SkillTypeValue::TRAINING,
         ]);
 
-        $character = (new CharacterFactory())->createBaseCharacter()
+        $character = (new CharacterFactory)->createBaseCharacter()
             ->givePlayerLocation()
             ->inventoryManagement()
             ->getCharacter();
@@ -229,7 +236,8 @@ class UseItemServiceTest extends TestCase {
         $this->assertEmpty($character->boons);
     }
 
-    public function testRemoveBoonFromCharacter() {
+    public function testRemoveBoonFromCharacter()
+    {
         Queue::fake();
 
         $item = $this->createItem([
@@ -239,7 +247,7 @@ class UseItemServiceTest extends TestCase {
             'affects_skill_type' => SkillTypeValue::TRAINING,
         ]);
 
-        $character = (new CharacterFactory())->createBaseCharacter()
+        $character = (new CharacterFactory)->createBaseCharacter()
             ->givePlayerLocation()
             ->inventoryManagement()
             ->giveItem($item)
@@ -249,14 +257,14 @@ class UseItemServiceTest extends TestCase {
 
         $character = $character->refresh();
 
-
         $this->useItemService->removeBoon($character, $character->boons->first());
 
         $this->assertEmpty($character->boons);
         $this->assertNull($character->inventory->slots->where('item.type', 'alchemy')->first());
     }
 
-    public function testUpdateCharacterBasedOnItemUsed() {
+    public function testUpdateCharacterBasedOnItemUsed()
+    {
         Queue::fake();
         Event::fake();
 
@@ -267,7 +275,7 @@ class UseItemServiceTest extends TestCase {
             'affects_skill_type' => SkillTypeValue::TRAINING,
         ]);
 
-        $character = (new CharacterFactory())->createBaseCharacter()
+        $character = (new CharacterFactory)->createBaseCharacter()
             ->givePlayerLocation()
             ->inventoryManagement()
             ->giveItem($item)
@@ -283,7 +291,8 @@ class UseItemServiceTest extends TestCase {
         Event::assertDispatched(CharacterBoonsUpdateBroadcastEvent::class);
     }
 
-    public function testUpdateCharacterBasedOnItemUsedWhenItemDoesNotAffectSkills() {
+    public function testUpdateCharacterBasedOnItemUsedWhenItemDoesNotAffectSkills()
+    {
         Queue::fake();
         Event::fake();
 
@@ -293,7 +302,7 @@ class UseItemServiceTest extends TestCase {
             'type' => 'alchemy',
         ]);
 
-        $character = (new CharacterFactory())->createBaseCharacter()
+        $character = (new CharacterFactory)->createBaseCharacter()
             ->givePlayerLocation()
             ->inventoryManagement()
             ->giveItem($item)
@@ -309,7 +318,8 @@ class UseItemServiceTest extends TestCase {
         Event::assertDispatched(CharacterBoonsUpdateBroadcastEvent::class);
     }
 
-    public function testCharacterBoonsStackWhenTheSameItemIsFoundAndUsed() {
+    public function testCharacterBoonsStackWhenTheSameItemIsFoundAndUsed()
+    {
         Queue::fake();
         Event::fake();
 
@@ -320,7 +330,7 @@ class UseItemServiceTest extends TestCase {
             'can_stack' => true,
         ]);
 
-        $character = (new CharacterFactory())->createBaseCharacter()
+        $character = (new CharacterFactory)->createBaseCharacter()
             ->givePlayerLocation()
             ->inventoryManagement()
             ->giveItem($item)
@@ -341,7 +351,8 @@ class UseItemServiceTest extends TestCase {
         $this->assertEquals(60, $character->boons->first()->last_for_minutes);
     }
 
-    public function testDoNotGoAboveTheMaxTime() {
+    public function testDoNotGoAboveTheMaxTime()
+    {
         Queue::fake();
         Event::fake();
 
@@ -352,7 +363,7 @@ class UseItemServiceTest extends TestCase {
             'can_stack' => true,
         ]);
 
-        $character = (new CharacterFactory())->createBaseCharacter()
+        $character = (new CharacterFactory)->createBaseCharacter()
             ->givePlayerLocation()
             ->inventoryManagement();
 
@@ -382,7 +393,8 @@ class UseItemServiceTest extends TestCase {
         $this->assertEquals(480, $boons[0]->last_for_minutes);
     }
 
-    public function testDoNotGoAboveTheMaxAmount() {
+    public function testDoNotGoAboveTheMaxAmount()
+    {
         Queue::fake();
         Event::fake();
 
@@ -393,7 +405,7 @@ class UseItemServiceTest extends TestCase {
             'can_stack' => true,
         ]);
 
-        $character = (new CharacterFactory())->createBaseCharacter()
+        $character = (new CharacterFactory)->createBaseCharacter()
             ->givePlayerLocation()
             ->inventoryManagement();
 
@@ -423,7 +435,8 @@ class UseItemServiceTest extends TestCase {
         $this->assertEquals(10, $boons[0]->last_for_minutes);
     }
 
-    public function testTakesExistingBoonsIntoConsideration() {
+    public function testTakesExistingBoonsIntoConsideration()
+    {
         Queue::fake();
         Event::fake();
 
@@ -434,7 +447,7 @@ class UseItemServiceTest extends TestCase {
             'can_stack' => true,
         ]);
 
-        $character = (new CharacterFactory())->createBaseCharacter()
+        $character = (new CharacterFactory)->createBaseCharacter()
             ->givePlayerLocation()
             ->inventoryManagement();
 
@@ -445,12 +458,12 @@ class UseItemServiceTest extends TestCase {
         $character = $character->getCharacter();
 
         $this->createCharacterBoon([
-            'character_id'             => $character->id,
-            'item_id'                  => $item->id,
-            'started'                  => now(),
-            'complete'                 => now()->addHours(2),
-            'amount_used'              => 2,
-            'last_for_minutes'         => 120,
+            'character_id' => $character->id,
+            'item_id' => $item->id,
+            'started' => now(),
+            'complete' => now()->addHours(2),
+            'amount_used' => 2,
+            'last_for_minutes' => 120,
         ]);
 
         $slots = $character->inventory->slots->where('item.type', 'alchemy');
@@ -476,8 +489,8 @@ class UseItemServiceTest extends TestCase {
         $this->assertEquals(2, $character->inventory->slots->where('item.type', 'alchemy')->count());
     }
 
-
-    public function testCannotAssignBoonsWhenYouAreMax() {
+    public function testCannotAssignBoonsWhenYouAreMax()
+    {
         Queue::fake();
         Event::fake();
 
@@ -488,7 +501,7 @@ class UseItemServiceTest extends TestCase {
             'can_stack' => true,
         ]);
 
-        $character = (new CharacterFactory())->createBaseCharacter()
+        $character = (new CharacterFactory)->createBaseCharacter()
             ->givePlayerLocation()
             ->inventoryManagement();
 
@@ -499,12 +512,12 @@ class UseItemServiceTest extends TestCase {
         $character = $character->getCharacter();
 
         $this->createCharacterBoon([
-            'character_id'             => $character->id,
-            'item_id'                  => $item->id,
-            'started'                  => now(),
-            'complete'                 => now()->addHours(2),
-            'amount_used'              => 10,
-            'last_for_minutes'         => $item->lasts_for,
+            'character_id' => $character->id,
+            'item_id' => $item->id,
+            'started' => now(),
+            'complete' => now()->addHours(2),
+            'amount_used' => 10,
+            'last_for_minutes' => $item->lasts_for,
         ]);
 
         $slots = $character->inventory->slots->where('item.type', 'alchemy');
@@ -524,13 +537,14 @@ class UseItemServiceTest extends TestCase {
         $this->assertEquals(10, $character->boons->sum('amount_used'));
     }
 
-    public function testCannotApplyBoonsThatDoNotExist() {
+    public function testCannotApplyBoonsThatDoNotExist()
+    {
         Queue::fake();
         Event::fake();
 
         $character = $this->character->getCharacter();
 
-        $result = $this->useItemService->useManyItemsFromInventory($character,  [876876,32343,1231,12312]);
+        $result = $this->useItemService->useManyItemsFromInventory($character, [876876, 32343, 1231, 12312]);
 
         $character = $character->refresh();
 
@@ -543,8 +557,8 @@ class UseItemServiceTest extends TestCase {
         $this->assertEquals(0, $character->boons->sum('amount_used'));
     }
 
-
-    public function testCanApplyMultipleStacks() {
+    public function testCanApplyMultipleStacks()
+    {
         Queue::fake();
         Event::fake();
 
@@ -562,7 +576,7 @@ class UseItemServiceTest extends TestCase {
             'can_stack' => true,
         ]);
 
-        $character = (new CharacterFactory())->createBaseCharacter()
+        $character = (new CharacterFactory)->createBaseCharacter()
             ->givePlayerLocation()
             ->inventoryManagement();
 

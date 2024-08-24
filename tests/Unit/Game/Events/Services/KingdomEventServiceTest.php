@@ -2,7 +2,6 @@
 
 namespace Tests\Unit\Game\Events\Services;
 
-
 use App\Flare\Values\ItemSpecialtyType;
 use App\Flare\Values\MapNameValue;
 use App\Flare\Values\WeaponTypes;
@@ -15,30 +14,33 @@ use Tests\TestCase;
 use Tests\Traits\CreateGameMap;
 use Tests\Traits\CreateItem;
 
-class KingdomEventServiceTest extends TestCase {
-
-    use RefreshDatabase, CreateGameMap, CreateItem;
+class KingdomEventServiceTest extends TestCase
+{
+    use CreateGameMap, CreateItem, RefreshDatabase;
 
     private ?KingdomEventService $kingdomEventService;
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
         $this->kingdomEventService = resolve(KingdomEventService::class);
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
 
         $this->kingdomEventService = null;
     }
 
-    public function testGivesPlayerRewardAndDestroysAllKingdoms() {
+    public function testGivesPlayerRewardAndDestroysAllKingdoms()
+    {
         $icePlane = $this->createGameMap([
             'name' => MapNameValue::ICE_PLANE,
         ]);
 
-        $character = (new CharacterFactory())->createBaseCharacter()
+        $character = (new CharacterFactory)->createBaseCharacter()
             ->givePlayerLocation(16, 16, $icePlane)
             ->kingdomManagement()
             ->assignKingdom()

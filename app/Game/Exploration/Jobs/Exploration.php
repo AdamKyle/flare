@@ -4,8 +4,6 @@ namespace App\Game\Exploration\Jobs;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterAutomation;
-use App\Flare\Models\Faction;
-use App\Flare\Models\GameMap;
 use App\Flare\Models\Monster;
 use App\Flare\ServerFight\MonsterPlayerFight;
 use App\Flare\Values\MaxCurrenciesValue;
@@ -29,50 +27,27 @@ class Exploration implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    /**
-     * @var Character $character
-     */
     public Character $character;
 
-    /**
-     * @var int $automationId
-     */
     private int $automationId;
 
-    /**
-     * @var string $attackType
-     */
     private string $attackType;
 
-    /**
-     * @var int $timeDelay
-     */
     private int $timeDelay;
 
-
-    /**
-     * @param Character $character
-     * @param int $automationId
-     * @param string $attackType
-     * @param int $timeDelay
-     */
-    public function __construct(Character $character, int $automationId, string $attackType, int $timeDelay) {
-        $this->character    = $character;
+    public function __construct(Character $character, int $automationId, string $attackType, int $timeDelay)
+    {
+        $this->character = $character;
         $this->automationId = $automationId;
-        $this->attackType   = $attackType;
-        $this->timeDelay    = $timeDelay;
+        $this->attackType = $attackType;
+        $this->timeDelay = $timeDelay;
     }
 
     /**
-     * @param MonsterPlayerFight $monsterPlayerFight
-     * @param BattleEventHandler $battleEventHandler
-     * @param FactionHandler $factionHandler
-     * @param GuideQuestService $guideQuestService
-     * @param CharacterCacheData $characterCacheData
-     * @return void
      * @throws \Exception
      */
-    public function handle(MonsterPlayerFight $monsterPlayerFight, BattleEventHandler $battleEventHandler, FactionHandler $factionHandler, GuideQuestService $guideQuestService, CharacterCacheData $characterCacheData): void {
+    public function handle(MonsterPlayerFight $monsterPlayerFight, BattleEventHandler $battleEventHandler, FactionHandler $factionHandler, GuideQuestService $guideQuestService, CharacterCacheData $characterCacheData): void
+    {
 
         $automation = CharacterAutomation::where('character_id', $this->character->id)->where('id', $this->automationId)->first();
 
@@ -81,7 +56,7 @@ class Exploration implements ShouldQueue
 
             event(new UpdateDuelAtPosition($this->character->user));
 
-            Cache::delete('can-character-survive-' . $this->character->id);
+            Cache::delete('can-character-survive-'.$this->character->id);
 
             return;
         }
@@ -90,7 +65,7 @@ class Exploration implements ShouldQueue
 
         $params = [
             'selected_monster_id' => $automation->monster_id,
-            'attack_type'         => $this->attackType,
+            'attack_type' => $this->attackType,
         ];
 
         $response = $monsterPlayerFight->setUpFight($this->character, $params);
@@ -128,7 +103,8 @@ class Exploration implements ShouldQueue
         event(new ExplorationTimeOut($this->character->user, 0));
     }
 
-    protected function sendOutEventLogUpdate(string $message, bool $makeItalic = false, bool $isReward = false): void {
+    protected function sendOutEventLogUpdate(string $message, bool $makeItalic = false, bool $isReward = false): void
+    {
         if ($this->character->isLoggedIn()) {
             event(new ExplorationLogUpdate($this->character->user->id, $message, $makeItalic, $isReward));
         }
@@ -137,14 +113,10 @@ class Exploration implements ShouldQueue
     /**
      * Handle the encounter.
      *
-     * @param MonsterPlayerFight $response
-     * @param CharacterAutomation $automation
-     * @param BattleEventHandler $battleEventHandler
-     * @param array $params
-     * @return bool
      * @throws \Exception
      */
-    protected function encounter(MonsterPlayerFight $response, CharacterAutomation $automation, BattleEventHandler $battleEventHandler, array $params, int $timeDelay): bool {
+    protected function encounter(MonsterPlayerFight $response, CharacterAutomation $automation, BattleEventHandler $battleEventHandler, array $params, int $timeDelay): bool
+    {
 
         $canSurviveFights = $this->canSurviveFight($response, $automation, $battleEventHandler, $params);
 
@@ -171,21 +143,22 @@ class Exploration implements ShouldQueue
         return false;
     }
 
-    protected function canSurviveFight(MonsterPlayerFight $response, CharacterAutomation $automation, BattleEventHandler $battleEventHandler, array $params): bool {
+    protected function canSurviveFight(MonsterPlayerFight $response, CharacterAutomation $automation, BattleEventHandler $battleEventHandler, array $params): bool
+    {
 
-        if (Cache::has('can-character-survive-' . $this->character->id)) {
+        if (Cache::has('can-character-survive-'.$this->character->id)) {
             return true;
         }
 
         $this->sendOutEventLogUpdate('"Child, I can see a small group of these creature. If we slaughter them we might learn something." The guide insists. "Theres ten of them. Quick, kill them. We will continue the hunt!"');
 
         for ($i = 1; $i <= 10; $i++) {
-            if (!$this->fightAutomationMonster($response, $automation, $battleEventHandler, $params)) {
+            if (! $this->fightAutomationMonster($response, $automation, $battleEventHandler, $params)) {
                 return false;
             }
         }
 
-        Cache::put('can-character-survive-' . $this->character->id, true);
+        Cache::put('can-character-survive-'.$this->character->id, true);
 
         return true;
     }
@@ -193,17 +166,13 @@ class Exploration implements ShouldQueue
     /**
      * Fight the monster in automation.
      *
-     * @param MonsterPlayerFight $response
-     * @param CharacterAutomation $automation
-     * @param BattleEventHandler $battleEventHandler
-     * @param array $params
-     * @return bool
      * @throws \Exception
      */
-    protected function fightAutomationMonster(MonsterPlayerFight $response, CharacterAutomation $automation, BattleEventHandler $battleEventHandler, array $params): bool {
+    protected function fightAutomationMonster(MonsterPlayerFight $response, CharacterAutomation $automation, BattleEventHandler $battleEventHandler, array $params): bool
+    {
         $fightResponse = $response->fightMonster();
 
-        if (!$fightResponse) {
+        if (! $fightResponse) {
             $automation->delete();
 
             $battleEventHandler->processDeadCharacter($this->character);
@@ -226,11 +195,9 @@ class Exploration implements ShouldQueue
 
     /**
      * Should we bail on the automation?
-     *
-     * @param CharacterAutomation|null $automation
-     * @return bool
      */
-    protected function shouldBail(CharacterAutomation $automation = null): bool {
+    protected function shouldBail(?CharacterAutomation $automation = null): bool
+    {
 
         if (is_null($automation)) {
             return true;
@@ -245,12 +212,10 @@ class Exploration implements ShouldQueue
 
     /**
      * Update the automation.
-     *
-     * @param CharacterAutomation $automation
-     * @return CharacterAutomation
      */
-    protected function updateAutomation(CharacterAutomation $automation): CharacterAutomation {
-        if (!is_null($automation->move_down_monster_list_every)) {
+    protected function updateAutomation(CharacterAutomation $automation): CharacterAutomation
+    {
+        if (! is_null($automation->move_down_monster_list_every)) {
             $characterLevel = $this->character->refresh()->level;
 
             $automation->update([
@@ -259,15 +224,14 @@ class Exploration implements ShouldQueue
 
             $automation = $automation->refresh();
 
-
             if (($automation->current_level - $automation->previous_level) >= $automation->move_down_monster_list_every) {
                 $monster = Monster::find($automation->monster_id);
 
-                $nextMonster = Monster::where('id', '>', $monster->id)->orderBy('id','asc')->first();
+                $nextMonster = Monster::where('id', '>', $monster->id)->orderBy('id', 'asc')->first();
 
-                if (!is_null($nextMonster)) {
+                if (! is_null($nextMonster)) {
                     $automation->update([
-                        'monster_id'     => $nextMonster->id,
+                        'monster_id' => $nextMonster->id,
                         'previous_level' => $characterLevel,
                     ]);
                 }
@@ -279,12 +243,10 @@ class Exploration implements ShouldQueue
 
     /**
      * End the automation.
-     *
-     * @param CharacterAutomation|null $automation
-     * @return void
      */
-    protected function endAutomation(?CharacterAutomation $automation, CharacterCacheData $characterCacheData): void {
-        if (!is_null($automation)) {
+    protected function endAutomation(?CharacterAutomation $automation, CharacterCacheData $characterCacheData): void
+    {
+        if (! is_null($automation)) {
             $automation->delete();
 
             $characterCacheData->deleteCharacterSheet($this->character);
@@ -308,11 +270,9 @@ class Exploration implements ShouldQueue
 
     /**
      * Reward the player.
-     *
-     * @param Character $character
-     * @return void
      */
-    protected function rewardPlayer(Character $character): void {
+    protected function rewardPlayer(Character $character): void
+    {
 
         $gold = $character->gold + 10000;
 

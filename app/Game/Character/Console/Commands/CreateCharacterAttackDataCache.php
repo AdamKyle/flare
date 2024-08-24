@@ -6,8 +6,8 @@ use App\Flare\Models\Character;
 use App\Game\Character\Builders\AttackBuilders\Jobs\CreateCharacterAttackData;
 use Illuminate\Console\Command;
 
-class CreateCharacterAttackDataCache extends Command {
-
+class CreateCharacterAttackDataCache extends Command
+{
     /**
      * The name and signature of the console command.
      *
@@ -27,7 +27,8 @@ class CreateCharacterAttackDataCache extends Command {
      *
      * @return void
      */
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
     }
 
@@ -36,7 +37,8 @@ class CreateCharacterAttackDataCache extends Command {
      *
      * @return mixed
      */
-    public function handle() {
+    public function handle()
+    {
 
         $this->line('Creating Character Attack Data Jobs...');
 

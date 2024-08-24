@@ -5,12 +5,13 @@ namespace Tests\Traits;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Monster;
 
-trait CreateMonster {
-
+trait CreateMonster
+{
     use CreateGameMap;
 
-    public function createMonster(array $options = []): Monster {
-        if (empty($options) || !isset($options['game_map_id'])) {
+    public function createMonster(array $options = []): Monster
+    {
+        if (empty($options) || ! isset($options['game_map_id'])) {
 
             $maps = GameMap::all();
 
@@ -23,12 +24,13 @@ trait CreateMonster {
             $options['game_map_id'] = $map->id;
         }
 
-        $monster     = Monster::factory()->create($options);
+        $monster = Monster::factory()->create($options);
 
         return $monster->refresh();
     }
 
-    public function createMultipleMonsters(array $options = [], int $amount = 1) {
+    public function createMultipleMonsters(array $options = [], int $amount = 1)
+    {
         for ($i = 1; $i <= $amount; $i++) {
             $this->createMonster($options);
         }

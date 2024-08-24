@@ -5,38 +5,25 @@ namespace App\Game\Kingdoms\Handlers;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\KingdomUnit;
 
-class KingdomUnitHandler extends BaseDefenderHandler {
-
-    /**
-     * @var array $defenderUnits
-     */
+class KingdomUnitHandler extends BaseDefenderHandler
+{
     private array $defenderUnits = [];
 
-    /**
-     * @var DefenderSiegeHandler $defenderSiegeHandler
-     */
     private DefenderSiegeHandler $defenderSiegeHandler;
 
-    /**
-     * @var DefenderArcherHandler $defenderArcherHandler
-     */
     private DefenderArcherHandler $defenderArcherHandler;
 
-    /**
-     * @param DefenderSiegeHandler $defenderSiegeHandler
-     * @param DefenderArcherHandler $defenderArcherHandler
-     */
-    public function __construct(DefenderSiegeHandler $defenderSiegeHandler, DefenderArcherHandler $defenderArcherHandler) {
+    public function __construct(DefenderSiegeHandler $defenderSiegeHandler, DefenderArcherHandler $defenderArcherHandler)
+    {
         $this->defenderSiegeHandler = $defenderSiegeHandler;
         $this->defenderArcherHandler = $defenderArcherHandler;
     }
 
     /**
      * Get the defender Units.
-     *
-     * @return array
      */
-    public function getDefenderUnits(): array {
+    public function getDefenderUnits(): array
+    {
         return $this->defenderUnits;
     }
 
@@ -45,12 +32,9 @@ class KingdomUnitHandler extends BaseDefenderHandler {
      *
      * - Defender siege and archers attack first.
      * - Attackers attack next.
-     *
-     * @param Kingdom $kingdom
-     * @param int $attackingKingdomId
-     * @return array
      */
-    public function attackUnits(Kingdom $kingdom, int $attackingKingdomId): array {
+    public function attackUnits(Kingdom $kingdom, int $attackingKingdomId): array
+    {
         $attackingUnits = $this->defenderAttacksAttackerUnits($kingdom);
 
         $this->setAttackingUnits($attackingUnits);
@@ -65,14 +49,11 @@ class KingdomUnitHandler extends BaseDefenderHandler {
      *
      * Damage is done based on the defender defence and the attackers attack.
      * Damages both Defender and attacker.
-     *
-     * @param Kingdom $kingdom
-     * @param int $attackingKingdomId
-     * @return void
      */
-    protected function unitOnUnitAttack(Kingdom $kingdom, int $attackingKingdomId): void {
+    protected function unitOnUnitAttack(Kingdom $kingdom, int $attackingKingdomId): void
+    {
         $defence = $this->getDefenderDefence($kingdom);
-        $attack  = $this->getAttackerAttack($attackingKingdomId);
+        $attack = $this->getAttackerAttack($attackingKingdomId);
 
         if ($defence <= 0 || $attack <= 0) {
             return;
@@ -101,11 +82,9 @@ class KingdomUnitHandler extends BaseDefenderHandler {
 
     /**
      * The defender attacks the attacker.
-     *
-     * @param Kingdom $kingdom
-     * @return array
      */
-    protected function defenderAttacksAttackerUnits(Kingdom $kingdom): array {
+    protected function defenderAttacksAttackerUnits(Kingdom $kingdom): array
+    {
         $defenderSiegeHandler = $this->defenderSiegeHandler->setAttackingUnits($this->attackingUnits);
 
         $defenderSiegeHandler->attackUnitsWithSiegeWeapons($kingdom);
@@ -121,15 +100,13 @@ class KingdomUnitHandler extends BaseDefenderHandler {
 
     /**
      * Get the defender defence.
-     *
-     * @param Kingdom $kingdom
-     * @return int
      */
-    protected function getDefenderDefence(Kingdom $kingdom): int {
+    protected function getDefenderDefence(Kingdom $kingdom): int
+    {
         $defence = 0;
 
         foreach ($kingdom->units as $unit) {
-            if (!$unit->gameUnit->siege_weapon && !$unit->gameUnit->is_settler) {
+            if (! $unit->gameUnit->siege_weapon && ! $unit->gameUnit->is_settler) {
                 $defence += $unit->amount * $unit->gameUnit->defence;
             }
         }
@@ -139,17 +116,15 @@ class KingdomUnitHandler extends BaseDefenderHandler {
 
     /**
      * Get the attackers attack.
-     *
-     * @param int $attackingKingdomId
-     * @return int
      */
-    protected function getAttackerAttack(int $attackingKingdomId): int {
+    protected function getAttackerAttack(int $attackingKingdomId): int
+    {
         $attack = 0;
 
         foreach ($this->attackingUnits as $unitData) {
             $unit = KingdomUnit::where('id', $unitData['unit_id'])
-                               ->where('kingdom_id', $attackingKingdomId)
-                               ->first();
+                ->where('kingdom_id', $attackingKingdomId)
+                ->first();
 
             if ($unit->gameUnit->is_settler) {
                 continue;
@@ -164,11 +139,10 @@ class KingdomUnitHandler extends BaseDefenderHandler {
     /**
      * Update the defender units.
      *
-     * @param Kingdom $kingdom
-     * @param float $damage
      * @return void
      */
-    protected function updateDefenderUnits(Kingdom $kingdom, float $damage) {
+    protected function updateDefenderUnits(Kingdom $kingdom, float $damage)
+    {
         foreach ($kingdom->units as $unit) {
             if ($unit->gameUnit->siege_weapon) {
                 continue;
@@ -177,15 +151,15 @@ class KingdomUnitHandler extends BaseDefenderHandler {
             $newAmount = $unit->amount - ($unit->amount * $damage);
 
             $unit->update([
-                'amount' => $newAmount > 0 ? $newAmount : 0
+                'amount' => $newAmount > 0 ? $newAmount : 0,
             ]);
 
             $unit = $unit->refresh();
 
             $this->defenderUnits[] = [
                 'unit_id' => $unit->id,
-                'name'    => $unit->gameUnit->name,
-                'amount'  => $unit->amount,
+                'name' => $unit->gameUnit->name,
+                'amount' => $unit->amount,
             ];
         }
     }

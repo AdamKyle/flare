@@ -3,10 +3,10 @@
 namespace App\Game\Raids\Console\Commands;
 
 use App\Flare\Models\Event;
-use Illuminate\Console\Command;
 use App\Flare\Models\RaidBossParticipation;
 use App\Game\Battle\Events\UpdateRaidAttacksLeft;
 use App\Game\Messages\Events\GlobalMessageEvent;
+use Illuminate\Console\Command;
 
 class ResetDailyRaidAttackLimits extends Command
 {
@@ -27,7 +27,8 @@ class ResetDailyRaidAttackLimits extends Command
     /**
      * Execute the console command.
      */
-    public function handle() {
+    public function handle()
+    {
 
         $eventRaid = Event::whereNotNull('raid_id')->first();
 
@@ -41,7 +42,7 @@ class ResetDailyRaidAttackLimits extends Command
             return;
         }
 
-        RaidBossParticipation::chunkById(250, function($participationRecords) {
+        RaidBossParticipation::chunkById(250, function ($participationRecords) {
             foreach ($participationRecords as $record) {
                 $record->update([
                     'attacks_left' => 5,

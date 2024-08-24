@@ -2,27 +2,24 @@
 
 namespace App\Admin\Mail;
 
+use App\Flare\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
-use App\Flare\Models\User;
 
-class UnBanRequestMail extends Mailable {
-
+class UnBanRequestMail extends Mailable
+{
     use Queueable, SerializesModels;
 
-    /**
-     * @var User $user
-     */
     public User $user;
 
     /**
      * Create a new message instance.
      *
-     * @param User $user
      * @return void
      */
-    public function __construct(User $user) {
+    public function __construct(User $user)
+    {
         $this->user = $user;
     }
 
@@ -31,9 +28,10 @@ class UnBanRequestMail extends Mailable {
      *
      * @return $this
      */
-    public function build() {
+    public function build()
+    {
         return $this->from(config('mail.username'), 'Planes of Tlessa Admin')
-                    ->subject('UnBan Request from: ' . $this->user->character->name)
-                    ->view('admin.email.user-unban-request');
+            ->subject('UnBan Request from: '.$this->user->character->name)
+            ->view('admin.email.user-unban-request');
     }
 }

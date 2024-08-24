@@ -2,7 +2,6 @@
 
 namespace App\Game\Factions\FactionLoyalty\Services;
 
-
 use App\Flare\Models\Character;
 use App\Flare\Models\Event;
 use App\Flare\Models\Faction;
@@ -19,8 +18,8 @@ use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Events\Values\EventType;
 use Exception;
 
-class FactionLoyaltyService {
-
+class FactionLoyaltyService
+{
     use ResponseBuilder;
 
     const CRAFTING_TYPES = [
@@ -32,14 +31,12 @@ class FactionLoyaltyService {
 
     /**
      * Get either the npc faction loyalty details that we are helping or the first one for the plane.
-     *
-     * @param Character $character
-     * @return array
      */
-    public function getLoyaltyInfoForPlane(Character $character): array {
+    public function getLoyaltyInfoForPlane(Character $character): array
+    {
         $factionLoyalties = $character->factionLoyalties;
 
-        $factionLoyalty   = [];
+        $factionLoyalty = [];
 
         if ($factionLoyalties->isNotEmpty()) {
             $factionLoyalty = $factionLoyalties->where('is_pledged', true)->first();
@@ -49,7 +46,7 @@ class FactionLoyaltyService {
             return $this->errorResult('You have not pledged to a faction.');
         }
 
-        $npcNames = $factionLoyalty->factionLoyaltyNpcs->map(function($factionNpc) {
+        $npcNames = $factionLoyalty->factionLoyaltyNpcs->map(function ($factionNpc) {
             return [
                 'id' => $factionNpc->npc_id,
                 'name' => $factionNpc->npc->real_name,
@@ -57,25 +54,22 @@ class FactionLoyaltyService {
         })->toArray();
 
         return $this->successResult([
-            'npcs'            => $npcNames,
+            'npcs' => $npcNames,
             'faction_loyalty' => $factionLoyalty,
-            'map_name'        => $factionLoyalty->faction->gameMap->name,
-            'must_revive'     => $character->is_dead,
-            'attack_type'     => $character->classType()->isCaster() ? 'Cast and Attack' : 'Attack',
+            'map_name' => $factionLoyalty->faction->gameMap->name,
+            'must_revive' => $character->is_dead,
+            'attack_type' => $character->classType()->isCaster() ? 'Cast and Attack' : 'Attack',
         ]);
     }
 
     /**
      * Remove the pledge.
-     *
-     * @param Character $character
-     * @param Faction $faction
-     * @return array
      */
-    public function removePledge(Character $character, Faction $faction): array {
+    public function removePledge(Character $character, Faction $faction): array
+    {
         $factionLoyalty = $character->factionLoyalties()->where('faction_id', $faction->id)->first();
 
-        if (!is_null($factionLoyalty)) {
+        if (! is_null($factionLoyalty)) {
             $factionLoyalty->update([
                 'is_pledged' => false,
             ]);
@@ -85,13 +79,13 @@ class FactionLoyaltyService {
             ]);
 
             return $this->successResult([
-                'message' => 'No longer pledged to: ' . $faction->gameMap->name . '.',
-                'factions' => $character->refresh()->factions->transform(function($faction) {
-                    $faction->map_name   = $faction->gameMap->name;
+                'message' => 'No longer pledged to: '.$faction->gameMap->name.'.',
+                'factions' => $character->refresh()->factions->transform(function ($faction) {
+                    $faction->map_name = $faction->gameMap->name;
                     $faction->is_pledged = $faction->character->factionLoyalties()->where('is_pledged', true)->exists();
 
                     return $faction;
-                })
+                }),
             ]);
         }
 
@@ -100,12 +94,9 @@ class FactionLoyaltyService {
 
     /**
      * Assist a Npc.
-     *
-     * @param Character $character
-     * @param FactionLoyaltyNpc $factionLoyaltyNpc
-     * @return array
      */
-    public function assistNpc(Character $character, FactionLoyaltyNpc $factionLoyaltyNpc): array {
+    public function assistNpc(Character $character, FactionLoyaltyNpc $factionLoyaltyNpc): array
+    {
         if ($factionLoyaltyNpc->factionLoyalty->character_id !== $character->id) {
             return $this->errorResult('Nope. Not allowed.');
         }
@@ -123,19 +114,16 @@ class FactionLoyaltyService {
         $result = $this->getLoyaltyInfoForPlane($character->refresh());
 
         return $this->successResult([
-            'message' => 'You are now assisting ' . $factionLoyaltyNpc->npc->real_name . ' with their tasks!',
+            'message' => 'You are now assisting '.$factionLoyaltyNpc->npc->real_name.' with their tasks!',
             'faction_loyalty' => $result['faction_loyalty'],
         ]);
     }
 
     /**
      * Stop Assisting NPC.
-     *
-     * @param Character $character
-     * @param FactionLoyaltyNpc $factionLoyaltyNpc
-     * @return array
      */
-    public function stopAssistingNpc(Character $character, FactionLoyaltyNpc $factionLoyaltyNpc): array {
+    public function stopAssistingNpc(Character $character, FactionLoyaltyNpc $factionLoyaltyNpc): array
+    {
         if ($factionLoyaltyNpc->factionLoyalty->character_id !== $character->id) {
             return $this->errorResult('Nope. Not allowed.');
         }
@@ -147,7 +135,7 @@ class FactionLoyaltyService {
         $result = $this->getLoyaltyInfoForPlane($character->refresh());
 
         return $this->successResult([
-            'message' => 'You stopped assisting ' . $factionLoyaltyNpc->npc->real_name . ' with their tasks. They are sad but understand.',
+            'message' => 'You stopped assisting '.$factionLoyaltyNpc->npc->real_name.' with their tasks. They are sad but understand.',
             'faction_loyalty' => $result['faction_loyalty'],
         ]);
     }
@@ -155,24 +143,22 @@ class FactionLoyaltyService {
     /**
      * Pledge to a plain and create the approproate tasks and npc mappings.
      *
-     * @param Character $character
-     * @param Faction $faction
-     * @return array
      * @throws Exception
      */
-    public function pledgeLoyalty(Character $character, Faction $faction): array {
+    public function pledgeLoyalty(Character $character, Faction $faction): array
+    {
 
         if ($faction->character_id !== $character->id) {
             return $this->errorResult('Nope. Not allowed.');
         }
 
-        if (!$faction->maxed) {
+        if (! $faction->maxed) {
             return $this->errorResult('You must level the faction to level 5 before being able to assist the fine people of this plane with their tasks.');
         }
 
         $factionLoyalty = $character->factionLoyalties()->where('faction_id', $faction->id)->first();
 
-        if (!is_null($factionLoyalty)) {
+        if (! is_null($factionLoyalty)) {
             $character->factionLoyalties()->update([
                 'is_pledged' => false,
             ]);
@@ -203,37 +189,35 @@ class FactionLoyaltyService {
 
             $factionLoyalty = FactionLoyalty::create([
                 'character_id' => $character->id,
-                'faction_id'   => $faction->id,
-                'is_pledged'   => true,
+                'faction_id' => $faction->id,
+                'is_pledged' => true,
             ]);
 
             $this->createNpcsForLoyalty($character, $factionLoyalty);
         }
 
         return $this->successResult([
-            'message'  => 'Pledged to: ' . $factionLoyalty->faction->gameMap->name . '.',
-            'factions' => $character->refresh()->factions->transform(function($faction) {
-                $faction->map_name   = $faction->gameMap->name;
+            'message' => 'Pledged to: '.$factionLoyalty->faction->gameMap->name.'.',
+            'factions' => $character->refresh()->factions->transform(function ($faction) {
+                $faction->map_name = $faction->gameMap->name;
                 $faction->is_pledged = $faction->character->factionloyalties()->where('is_pledged', true)->exists();
 
                 return $faction;
-            })
+            }),
         ]);
     }
 
     /**
      * Creates new tasks for the Faction Npc Tasks.
      *
-     * @param FactionLoyaltyNpcTask $factionLoyaltyNpcTask
-     * @param Character $character
-     * @return FactionLoyaltyNpcTask
      * @throws Exception
      */
-    public function createNewTasksForNpc(FactionLoyaltyNpcTask $factionLoyaltyNpcTask, Character $character): FactionLoyaltyNpcTask {
+    public function createNewTasksForNpc(FactionLoyaltyNpcTask $factionLoyaltyNpcTask, Character $character): FactionLoyaltyNpcTask
+    {
         $npc = $factionLoyaltyNpcTask->factionLoyaltyNpc->npc;
 
         $craftingTasks = $this->createCraftingTasks($npc->gameMap->name);
-        $bountyTasks   = $this->createBountyTasks($character, $npc->gameMap);
+        $bountyTasks = $this->createBountyTasks($character, $npc->gameMap);
 
         $tasks = array_merge($craftingTasks, $bountyTasks);
 
@@ -254,9 +238,6 @@ class FactionLoyaltyService {
     /**
      * Create NPC For Loyalty.
      *
-     * @param Character $character
-     * @param FactionLoyalty $factionLoyalty
-     * @return void
      * @throws Exception
      */
     protected function createNpcsForLoyalty(Character $character, FactionLoyalty $factionLoyalty): void
@@ -267,23 +248,23 @@ class FactionLoyaltyService {
 
         foreach ($npcs as $npc) {
             $craftingTasks = $this->createCraftingTasks($npc->gameMap->name);
-            $bountyTasks   = $this->createBountyTasks($character, $npc->gameMap);
+            $bountyTasks = $this->createBountyTasks($character, $npc->gameMap);
 
             $factionLoyaltyNpc = FactionLoyaltyNpc::create([
-                'faction_loyalty_id'         => $factionLoyalty->id,
-                'npc_id'                     => $npc->id,
-                'current_level'              => 0,
-                'max_level'                  => 25,
-                'next_level_fame'            => collect($craftingTasks)->sum('required_amount') +
+                'faction_loyalty_id' => $factionLoyalty->id,
+                'npc_id' => $npc->id,
+                'current_level' => 0,
+                'max_level' => 25,
+                'next_level_fame' => collect($craftingTasks)->sum('required_amount') +
                     collect($bountyTasks)->sum('required_amount'),
                 'kingdom_item_defence_bonus' => $totalNpcFame,
-                'currently_helping'          => false,
+                'currently_helping' => false,
             ]);
 
             FactionLoyaltyNpcTask::create([
-                'faction_loyalty_id'     => $factionLoyalty->id,
+                'faction_loyalty_id' => $factionLoyalty->id,
                 'faction_loyalty_npc_id' => $factionLoyaltyNpc->id,
-                'fame_tasks'             => array_merge($bountyTasks, $craftingTasks)
+                'fame_tasks' => array_merge($bountyTasks, $craftingTasks),
             ]);
         }
     }
@@ -291,12 +272,11 @@ class FactionLoyaltyService {
     /**
      * Create three crafting tasks.
      *
-     * @param string $gameMapName
-     * @return array
      * @throws Exception
      */
-    protected function createCraftingTasks(string $gameMapName): array {
-        $tasks       = [];
+    protected function createCraftingTasks(string $gameMapName): array
+    {
+        $tasks = [];
 
         while (count($tasks) < 3) {
 
@@ -312,7 +292,7 @@ class FactionLoyaltyService {
 
             $event = Event::where('type', EventType::WEEKLY_FACTION_LOYALTY_EVENT)->first();
 
-            if (!is_null($event)) {
+            if (! is_null($event)) {
                 $amount = ceil($amount / 2);
             }
 
@@ -321,11 +301,11 @@ class FactionLoyaltyService {
             }
 
             $tasks[] = [
-                'type'            => $item->type,
-                'item_name'       => $item->affix_name,
-                'item_id'         => $item->id,
+                'type' => $item->type,
+                'item_name' => $item->affix_name,
+                'item_id' => $item->id,
                 'required_amount' => $amount,
-                'current_amount'  => 0,
+                'current_amount' => 0,
             ];
         }
 
@@ -334,20 +314,17 @@ class FactionLoyaltyService {
 
     /**
      * Create three bounty tasks.
-     *
-     * @param Character $character
-     * @param GameMap $gameMap
-     * @return array
      */
-    protected function createBountyTasks(Character $character, GameMap $gameMap): array {
+    protected function createBountyTasks(Character $character, GameMap $gameMap): array
+    {
 
         $tasks = [];
 
         $gameMapId = $gameMap->id;
 
-        if (!is_null($gameMap->only_during_event_type)) {
+        if (! is_null($gameMap->only_during_event_type)) {
 
-            $hasPurgatoryItem = $character->inventory->slots->filter(function($slot) {
+            $hasPurgatoryItem = $character->inventory->slots->filter(function ($slot) {
                 return $slot->item->type === 'quest' && $slot->item->effect === ItemEffectsValue::PURGATORY;
             })->first();
 
@@ -374,7 +351,7 @@ class FactionLoyaltyService {
 
             $event = Event::where('type', EventType::WEEKLY_FACTION_LOYALTY_EVENT)->first();
 
-            if (!is_null($event)) {
+            if (! is_null($event)) {
                 $amount = ceil($amount / 2);
             }
 
@@ -383,18 +360,19 @@ class FactionLoyaltyService {
             }
 
             $tasks[] = [
-                'type'            => 'bounty',
-                'monster_name'    => $monster->name,
-                'monster_id'      => $monster->id,
+                'type' => 'bounty',
+                'monster_name' => $monster->name,
+                'monster_id' => $monster->id,
                 'required_amount' => $amount,
-                'current_amount'  => 0,
+                'current_amount' => 0,
             ];
         }
 
         return $tasks;
     }
 
-    private function hasTaskAlready(array $tasks, string $key, int $id): bool {
+    private function hasTaskAlready(array $tasks, string $key, int $id): bool
+    {
         foreach ($tasks as $task) {
             if ($task[$key] === $id) {
                 return true;
@@ -409,12 +387,10 @@ class FactionLoyaltyService {
      *
      * - Make sure its level appropriate for the plane.
      *
-     * @param string $type
-     * @param string $gamMapName
-     * @return Item
      * @throws Exception
      */
-    private function getItemForCraftingTask(string $type, string $gamMapName): Item {
+    private function getItemForCraftingTask(string $type, string $gamMapName): Item
+    {
 
         $gameMapValue = new MapNameValue($gamMapName);
 

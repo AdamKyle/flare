@@ -24,12 +24,12 @@ class NpcFactory extends Factory
     public function definition()
     {
         return [
-            'name'                        => Str::random(10),
-            'real_name'                   => Str::random(10),
-            'type'                        => NpcTypes::KINGDOM_HOLDER,
-            'game_map_id'                 => null,
-            'x_position'                  => 32,
-            'y_position'                  => 144,
+            'name' => Str::random(10),
+            'real_name' => Str::random(10),
+            'type' => NpcTypes::KINGDOM_HOLDER,
+            'game_map_id' => null,
+            'x_position' => 32,
+            'y_position' => 144,
         ];
     }
 }

@@ -2,14 +2,14 @@
 
 namespace Tests\Unit\Game\Factions\FactionLoyalty\Services;
 
+use App\Flare\Models\Character;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Monster;
 use App\Flare\Values\ItemEffectsValue;
-use App\Game\Events\Values\EventType;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Flare\Models\Character;
 use App\Flare\Values\MapNameValue;
+use App\Game\Events\Values\EventType;
 use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateEvent;
@@ -18,23 +18,24 @@ use Tests\Traits\CreateItem;
 use Tests\Traits\CreateMonster;
 use Tests\Traits\CreateNpc;
 
-class FactionLoyaltyServiceTest extends TestCase {
-
-    use RefreshDatabase, CreateNpc, CreateFactionLoyalty, CreateMonster, CreateItem, CreateEvent;
-
+class FactionLoyaltyServiceTest extends TestCase
+{
+    use CreateEvent, CreateFactionLoyalty, CreateItem, CreateMonster, CreateNpc, RefreshDatabase;
 
     private ?Character $character = null;
 
     private ?FactionLoyaltyService $factionLoyaltyService = null;
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
-        $this->character = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation()->assignFactionSystem()->getCharacter();
+        $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignFactionSystem()->getCharacter();
         $this->factionLoyaltyService = resolve(FactionLoyaltyService::class);
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
 
         $this->character = null;
@@ -42,9 +43,10 @@ class FactionLoyaltyServiceTest extends TestCase {
         $this->factionLoyaltyService = null;
     }
 
-    public function testGetNoFactionLoyaltyForPlane() {
+    public function testGetNoFactionLoyaltyForPlane()
+    {
         $this->createNpc([
-            'game_map_id' => $this->character->map->game_map_id
+            'game_map_id' => $this->character->map->game_map_id,
         ]);
 
         $result = $this->factionLoyaltyService->getLoyaltyInfoForPlane($this->character);
@@ -52,35 +54,34 @@ class FactionLoyaltyServiceTest extends TestCase {
         $this->assertEquals('You have not pledged to a faction.', $result['message']);
     }
 
-    public function testHasPlaneLoyalty() {
+    public function testHasPlaneLoyalty()
+    {
         $npc = $this->createNpc([
-            'game_map_id' => $this->character->map->game_map_id
+            'game_map_id' => $this->character->map->game_map_id,
         ]);
 
-
         $factionLoyalty = $this->createFactionLoyalty([
-            'faction_id'   => $this->character->factions->first()->id,
+            'faction_id' => $this->character->factions->first()->id,
             'character_id' => $this->character->id,
         ]);
 
         $factionNpc = $this->createFactionLoyaltyNpc([
-            'faction_loyalty_id'          => $factionLoyalty->id,
-            'npc_id'                      => $npc->id,
-            'current_level'               => 0,
-            'max_level'                   => 25,
-            'next_level_fame'             => 100,
-            'currently_helping'           => false,
-            'kingdom_item_defence_bonus'  => 0.002,
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'npc_id' => $npc->id,
+            'current_level' => 0,
+            'max_level' => 25,
+            'next_level_fame' => 100,
+            'currently_helping' => false,
+            'kingdom_item_defence_bonus' => 0.002,
         ]);
 
         $this->createFactionLoyaltyNpcTask([
-            'faction_loyalty_id'      => $factionLoyalty->id,
-            'faction_loyalty_npc_id'  => $factionNpc->id,
-            'fame_tasks'              => [],
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'faction_loyalty_npc_id' => $factionNpc->id,
+            'fame_tasks' => [],
         ]);
 
         $character = $this->character->refresh();
-
 
         $result = $this->factionLoyaltyService->getLoyaltyInfoForPlane($character);
 
@@ -89,52 +90,52 @@ class FactionLoyaltyServiceTest extends TestCase {
         $this->assertEquals($this->character->map->gameMap->name, $result['map_name']);
     }
 
-    public function testHasPlaneLoyaltyForNpcCurrentlyHelping() {
+    public function testHasPlaneLoyaltyForNpcCurrentlyHelping()
+    {
         $npc = $this->createNpc([
-            'game_map_id' => $this->character->map->game_map_id
+            'game_map_id' => $this->character->map->game_map_id,
         ]);
 
         $secondNpc = $this->createNpc([
-            'game_map_id' => $this->character->map->game_map_id
+            'game_map_id' => $this->character->map->game_map_id,
         ]);
 
-
         $factionLoyalty = $this->createFactionLoyalty([
-            'faction_id'   => $this->character->factions->first()->id,
+            'faction_id' => $this->character->factions->first()->id,
             'character_id' => $this->character->id,
-            'is_pledged'   => true,
+            'is_pledged' => true,
         ]);
 
         $factionNpc = $this->createFactionLoyaltyNpc([
-            'faction_loyalty_id'          => $factionLoyalty->id,
-            'npc_id'                      => $npc->id,
-            'current_level'               => 0,
-            'max_level'                   => 25,
-            'next_level_fame'             => 100,
-            'currently_helping'           => false,
-            'kingdom_item_defence_bonus'  => 0.002,
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'npc_id' => $npc->id,
+            'current_level' => 0,
+            'max_level' => 25,
+            'next_level_fame' => 100,
+            'currently_helping' => false,
+            'kingdom_item_defence_bonus' => 0.002,
         ]);
 
         $factionSecondNpc = $this->createFactionLoyaltyNpc([
-            'faction_loyalty_id'          => $factionLoyalty->id,
-            'npc_id'                      => $secondNpc->id,
-            'current_level'               => 0,
-            'max_level'                   => 25,
-            'next_level_fame'             => 100,
-            'currently_helping'           => true,
-            'kingdom_item_defence_bonus'  => 0.002,
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'npc_id' => $secondNpc->id,
+            'current_level' => 0,
+            'max_level' => 25,
+            'next_level_fame' => 100,
+            'currently_helping' => true,
+            'kingdom_item_defence_bonus' => 0.002,
         ]);
 
         $this->createFactionLoyaltyNpcTask([
-            'faction_loyalty_id'      => $factionLoyalty->id,
-            'faction_loyalty_npc_id'  => $factionNpc->id,
-            'fame_tasks'              => [],
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'faction_loyalty_npc_id' => $factionNpc->id,
+            'fame_tasks' => [],
         ]);
 
         $this->createFactionLoyaltyNpcTask([
-            'faction_loyalty_id'      => $factionLoyalty->id,
-            'faction_loyalty_npc_id'  => $factionSecondNpc->id,
-            'fame_tasks'              => [],
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'faction_loyalty_npc_id' => $factionSecondNpc->id,
+            'fame_tasks' => [],
         ]);
 
         $character = $this->character->refresh();
@@ -146,33 +147,36 @@ class FactionLoyaltyServiceTest extends TestCase {
         $this->assertEquals($this->character->map->gameMap->name, $result['map_name']);
     }
 
-    public function testCannotPledgeWithAnotherCharactersFaction() {
+    public function testCannotPledgeWithAnotherCharactersFaction()
+    {
 
-        $secondCharacter = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation()->assignFactionSystem()->getCharacter();
+        $secondCharacter = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignFactionSystem()->getCharacter();
 
         $result = $this->factionLoyaltyService->pledgeLoyalty($this->character, $secondCharacter->factions->first());
 
         $this->assertEquals('Nope. Not allowed.', $result['message']);
     }
 
-    public function testCannotPledgeToFactionWhenNotMaxed() {
+    public function testCannotPledgeToFactionWhenNotMaxed()
+    {
         $result = $this->factionLoyaltyService->pledgeLoyalty($this->character, $this->character->factions->first());
 
         $this->assertEquals('You must level the faction to level 5 before being able to assist the fine people of this plane with their tasks.', $result['message']);
     }
 
-    public function testPledgeLoyalty() {
+    public function testPledgeLoyalty()
+    {
 
         $this->character->factions()->update(['maxed' => true]);
 
         $this->character = $this->character->refresh();
 
         $firstNpc = $this->createNpc([
-            'game_map_id' => $this->character->map->game_map_id
+            'game_map_id' => $this->character->map->game_map_id,
         ]);
 
         $secondNpc = $this->createNpc([
-            'game_map_id' => $this->character->map->game_map_id
+            'game_map_id' => $this->character->map->game_map_id,
         ]);
 
         $this->createMultipleMonsters(
@@ -209,7 +213,7 @@ class FactionLoyaltyServiceTest extends TestCase {
 
         $character = $this->character->refresh();
 
-        $this->assertEquals( 'Pledged to: ' . $character->map->gameMap->name . '.', $result['message']);
+        $this->assertEquals('Pledged to: '.$character->map->gameMap->name.'.', $result['message']);
 
         $character = $character->refresh();
 
@@ -221,7 +225,7 @@ class FactionLoyaltyServiceTest extends TestCase {
 
         $resultFactions = collect($result['factions']);
 
-        $this->assertNotEmpty($resultFactions->filter(function($resultFaction) {
+        $this->assertNotEmpty($resultFactions->filter(function ($resultFaction) {
             return $resultFaction['is_pledged'];
         }));
 
@@ -232,7 +236,7 @@ class FactionLoyaltyServiceTest extends TestCase {
             }
 
             $gameMap = $this->createGameMap([
-                'name' => $value
+                'name' => $value,
             ]);
 
             $this->createNpc([
@@ -240,12 +244,12 @@ class FactionLoyaltyServiceTest extends TestCase {
             ]);
 
             $character->map->update([
-                'game_map_id' => $gameMap->id
+                'game_map_id' => $gameMap->id,
             ]);
 
             $faction = $character->factions()->create([
                 'character_id' => $character->id,
-                'game_map_id'  => $gameMap->id,
+                'game_map_id' => $gameMap->id,
                 'current_level' => 0,
                 'current_points' => 0,
                 'points_needed' => 1000,
@@ -265,140 +269,144 @@ class FactionLoyaltyServiceTest extends TestCase {
 
             $character = $this->character->refresh();
 
-            $this->assertEquals( 'Pledged to: ' . $character->map->gameMap->name . '.', $result['message']);
+            $this->assertEquals('Pledged to: '.$character->map->gameMap->name.'.', $result['message']);
         }
     }
 
-    public function testPledgeToExistingLoyalty() {
+    public function testPledgeToExistingLoyalty()
+    {
         $this->character->factions()->first()->update(['maxed' => true]);
 
         $this->character = $this->character->refresh();
 
         $npc = $this->createNpc([
-            'game_map_id' => $this->character->map->game_map_id
+            'game_map_id' => $this->character->map->game_map_id,
         ]);
 
         $secondNpc = $this->createNpc([
-            'game_map_id' => $this->character->map->game_map_id
+            'game_map_id' => $this->character->map->game_map_id,
         ]);
 
         $factionLoyalty = $this->createFactionLoyalty([
-            'faction_id'   => $this->character->factions->first()->id,
+            'faction_id' => $this->character->factions->first()->id,
             'character_id' => $this->character->id,
         ]);
 
         $factionNpc = $this->createFactionLoyaltyNpc([
-            'faction_loyalty_id'          => $factionLoyalty->id,
-            'npc_id'                      => $npc->id,
-            'current_level'               => 0,
-            'max_level'                   => 25,
-            'next_level_fame'             => 100,
-            'currently_helping'           => false,
-            'kingdom_item_defence_bonus'  => 0.002,
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'npc_id' => $npc->id,
+            'current_level' => 0,
+            'max_level' => 25,
+            'next_level_fame' => 100,
+            'currently_helping' => false,
+            'kingdom_item_defence_bonus' => 0.002,
         ]);
 
         $factionSecondNpc = $this->createFactionLoyaltyNpc([
-            'faction_loyalty_id'          => $factionLoyalty->id,
-            'npc_id'                      => $secondNpc->id,
-            'current_level'               => 0,
-            'max_level'                   => 25,
-            'next_level_fame'             => 100,
-            'currently_helping'           => true,
-            'kingdom_item_defence_bonus'  => 0.002,
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'npc_id' => $secondNpc->id,
+            'current_level' => 0,
+            'max_level' => 25,
+            'next_level_fame' => 100,
+            'currently_helping' => true,
+            'kingdom_item_defence_bonus' => 0.002,
         ]);
 
         $this->createFactionLoyaltyNpcTask([
-            'faction_loyalty_id'      => $factionLoyalty->id,
-            'faction_loyalty_npc_id'  => $factionNpc->id,
-            'fame_tasks'              => [],
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'faction_loyalty_npc_id' => $factionNpc->id,
+            'fame_tasks' => [],
         ]);
 
         $this->createFactionLoyaltyNpcTask([
-            'faction_loyalty_id'      => $factionLoyalty->id,
-            'faction_loyalty_npc_id'  => $factionSecondNpc->id,
-            'fame_tasks'              => [],
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'faction_loyalty_npc_id' => $factionSecondNpc->id,
+            'fame_tasks' => [],
         ]);
 
         $character = $this->character->refresh();
 
         $result = $this->factionLoyaltyService->pledgeLoyalty($character, $factionLoyalty->faction);
 
-        $character      = $this->character->refresh();
+        $character = $this->character->refresh();
         $factionLoyalty = $factionLoyalty->refresh();
 
-        $this->assertEquals( 'Pledged to: ' . $character->map->gameMap->name . '.', $result['message']);
+        $this->assertEquals('Pledged to: '.$character->map->gameMap->name.'.', $result['message']);
         $this->assertTrue($factionLoyalty->is_pledged);
     }
 
-    public function testRemovePledge() {
+    public function testRemovePledge()
+    {
         $npc = $this->createNpc([
-            'game_map_id' => $this->character->map->game_map_id
+            'game_map_id' => $this->character->map->game_map_id,
         ]);
 
         $secondNpc = $this->createNpc([
-            'game_map_id' => $this->character->map->game_map_id
+            'game_map_id' => $this->character->map->game_map_id,
         ]);
 
         $factionLoyalty = $this->createFactionLoyalty([
-            'faction_id'   => $this->character->factions->first()->id,
+            'faction_id' => $this->character->factions->first()->id,
             'character_id' => $this->character->id,
-            'is_pledged'   => true,
+            'is_pledged' => true,
         ]);
 
         $factionNpc = $this->createFactionLoyaltyNpc([
-            'faction_loyalty_id'          => $factionLoyalty->id,
-            'npc_id'                      => $npc->id,
-            'current_level'               => 0,
-            'max_level'                   => 25,
-            'next_level_fame'             => 100,
-            'currently_helping'           => false,
-            'kingdom_item_defence_bonus'  => 0.002,
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'npc_id' => $npc->id,
+            'current_level' => 0,
+            'max_level' => 25,
+            'next_level_fame' => 100,
+            'currently_helping' => false,
+            'kingdom_item_defence_bonus' => 0.002,
         ]);
 
         $factionSecondNpc = $this->createFactionLoyaltyNpc([
-            'faction_loyalty_id'          => $factionLoyalty->id,
-            'npc_id'                      => $secondNpc->id,
-            'current_level'               => 0,
-            'max_level'                   => 25,
-            'next_level_fame'             => 100,
-            'currently_helping'           => true,
-            'kingdom_item_defence_bonus'  => 0.002,
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'npc_id' => $secondNpc->id,
+            'current_level' => 0,
+            'max_level' => 25,
+            'next_level_fame' => 100,
+            'currently_helping' => true,
+            'kingdom_item_defence_bonus' => 0.002,
         ]);
 
         $this->createFactionLoyaltyNpcTask([
-            'faction_loyalty_id'      => $factionLoyalty->id,
-            'faction_loyalty_npc_id'  => $factionNpc->id,
-            'fame_tasks'              => [],
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'faction_loyalty_npc_id' => $factionNpc->id,
+            'fame_tasks' => [],
         ]);
 
         $this->createFactionLoyaltyNpcTask([
-            'faction_loyalty_id'      => $factionLoyalty->id,
-            'faction_loyalty_npc_id'  => $factionSecondNpc->id,
-            'fame_tasks'              => [],
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'faction_loyalty_npc_id' => $factionSecondNpc->id,
+            'fame_tasks' => [],
         ]);
 
         $character = $this->character->refresh();
 
         $result = $this->factionLoyaltyService->removePledge($character, $factionLoyalty->faction);
 
-        $character      = $this->character->refresh();
+        $character = $this->character->refresh();
         $factionLoyalty = $factionLoyalty->refresh();
 
-        $this->assertEquals( 'No longer pledged to: ' . $character->map->gameMap->name . '.', $result['message']);
+        $this->assertEquals('No longer pledged to: '.$character->map->gameMap->name.'.', $result['message']);
         $this->assertFalse($factionLoyalty->is_pledged);
     }
 
-    public function testFailToRemovePledged() {
+    public function testFailToRemovePledged()
+    {
         $character = $this->character->refresh();
 
         $result = $this->factionLoyaltyService->removePledge($character, $character->factions->first());
 
-        $this->assertEquals( 'Failed to find the faction you are pledged to.', $result['message']);
+        $this->assertEquals('Failed to find the faction you are pledged to.', $result['message']);
     }
 
-    public function testCreateNewTasksForNpcLoyaltyTasks() {
+    public function testCreateNewTasksForNpcLoyaltyTasks()
+    {
         $npc = $this->createNpc([
-            'game_map_id' => $this->character->map->game_map_id
+            'game_map_id' => $this->character->map->game_map_id,
         ]);
 
         $this->createMonster([
@@ -438,24 +446,24 @@ class FactionLoyaltyServiceTest extends TestCase {
         ]);
 
         $factionLoyalty = $this->createFactionLoyalty([
-            'faction_id'   => $this->character->factions->first()->id,
+            'faction_id' => $this->character->factions->first()->id,
             'character_id' => $this->character->id,
         ]);
 
         $factionNpc = $this->createFactionLoyaltyNpc([
-            'faction_loyalty_id'          => $factionLoyalty->id,
-            'npc_id'                      => $npc->id,
-            'current_level'               => 0,
-            'max_level'                   => 25,
-            'next_level_fame'             => 100,
-            'currently_helping'           => false,
-            'kingdom_item_defence_bonus'  => 0.002,
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'npc_id' => $npc->id,
+            'current_level' => 0,
+            'max_level' => 25,
+            'next_level_fame' => 100,
+            'currently_helping' => false,
+            'kingdom_item_defence_bonus' => 0.002,
         ]);
 
         $npcTask = $this->createFactionLoyaltyNpcTask([
-            'faction_loyalty_id'      => $factionLoyalty->id,
-            'faction_loyalty_npc_id'  => $factionNpc->id,
-            'fame_tasks'              => [],
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'faction_loyalty_npc_id' => $factionNpc->id,
+            'fame_tasks' => [],
         ]);
 
         $oldTasks = $npcTask->fame_tasks;
@@ -465,7 +473,8 @@ class FactionLoyaltyServiceTest extends TestCase {
         $this->assertNotEquals($oldTasks, $newNPCtask->fame_tasks);
     }
 
-    public function testCreateNewTasksForNpcLoyaltyTasksWhenOnEventPlaneWithOutPurgatoryItem() {
+    public function testCreateNewTasksForNpcLoyaltyTasksWhenOnEventPlaneWithOutPurgatoryItem()
+    {
 
         $this->createEvent([
             'type' => EventType::DELUSIONAL_MEMORIES_EVENT,
@@ -475,7 +484,7 @@ class FactionLoyaltyServiceTest extends TestCase {
             'game_map_id' => $this->createGameMap([
                 'only_during_event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
                 'name' => MapNameValue::DELUSIONAL_MEMORIES,
-            ])->id
+            ])->id,
         ]);
 
         $surfaceGameMap = GameMap::where('name', MapNameValue::SURFACE)->first();
@@ -483,7 +492,7 @@ class FactionLoyaltyServiceTest extends TestCase {
         $this->character = $this->character->refresh();
 
         $npc = $this->createNpc([
-            'game_map_id' => $this->character->map->game_map_id
+            'game_map_id' => $this->character->map->game_map_id,
         ]);
 
         $this->createMonster([
@@ -551,24 +560,24 @@ class FactionLoyaltyServiceTest extends TestCase {
         ]);
 
         $factionLoyalty = $this->createFactionLoyalty([
-            'faction_id'   => $this->character->factions->first()->id,
+            'faction_id' => $this->character->factions->first()->id,
             'character_id' => $this->character->id,
         ]);
 
         $factionNpc = $this->createFactionLoyaltyNpc([
-            'faction_loyalty_id'          => $factionLoyalty->id,
-            'npc_id'                      => $npc->id,
-            'current_level'               => 0,
-            'max_level'                   => 25,
-            'next_level_fame'             => 100,
-            'currently_helping'           => false,
-            'kingdom_item_defence_bonus'  => 0.002,
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'npc_id' => $npc->id,
+            'current_level' => 0,
+            'max_level' => 25,
+            'next_level_fame' => 100,
+            'currently_helping' => false,
+            'kingdom_item_defence_bonus' => 0.002,
         ]);
 
         $npcTask = $this->createFactionLoyaltyNpcTask([
-            'faction_loyalty_id'      => $factionLoyalty->id,
-            'faction_loyalty_npc_id'  => $factionNpc->id,
-            'fame_tasks'              => [],
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'faction_loyalty_npc_id' => $factionNpc->id,
+            'fame_tasks' => [],
         ]);
 
         $oldTasks = $npcTask->fame_tasks;
@@ -586,7 +595,8 @@ class FactionLoyaltyServiceTest extends TestCase {
         }
     }
 
-    public function testCreateNewTasksForNpcLoyaltyTasksWhenOnEventPlaneWithPurgatoryItem() {
+    public function testCreateNewTasksForNpcLoyaltyTasksWhenOnEventPlaneWithPurgatoryItem()
+    {
 
         $this->createEvent([
             'type' => EventType::DELUSIONAL_MEMORIES_EVENT,
@@ -596,7 +606,7 @@ class FactionLoyaltyServiceTest extends TestCase {
             'game_map_id' => $this->createGameMap([
                 'only_during_event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
                 'name' => MapNameValue::DELUSIONAL_MEMORIES,
-            ])->id
+            ])->id,
         ]);
 
         $this->character = $this->character->refresh();
@@ -616,7 +626,7 @@ class FactionLoyaltyServiceTest extends TestCase {
         $this->character = $this->character->refresh();
 
         $npc = $this->createNpc([
-            'game_map_id' => $this->character->map->game_map_id
+            'game_map_id' => $this->character->map->game_map_id,
         ]);
 
         $this->createMonster([
@@ -684,24 +694,24 @@ class FactionLoyaltyServiceTest extends TestCase {
         ]);
 
         $factionLoyalty = $this->createFactionLoyalty([
-            'faction_id'   => $this->character->factions->first()->id,
+            'faction_id' => $this->character->factions->first()->id,
             'character_id' => $this->character->id,
         ]);
 
         $factionNpc = $this->createFactionLoyaltyNpc([
-            'faction_loyalty_id'          => $factionLoyalty->id,
-            'npc_id'                      => $npc->id,
-            'current_level'               => 0,
-            'max_level'                   => 25,
-            'next_level_fame'             => 100,
-            'currently_helping'           => false,
-            'kingdom_item_defence_bonus'  => 0.002,
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'npc_id' => $npc->id,
+            'current_level' => 0,
+            'max_level' => 25,
+            'next_level_fame' => 100,
+            'currently_helping' => false,
+            'kingdom_item_defence_bonus' => 0.002,
         ]);
 
         $npcTask = $this->createFactionLoyaltyNpcTask([
-            'faction_loyalty_id'      => $factionLoyalty->id,
-            'faction_loyalty_npc_id'  => $factionNpc->id,
-            'fame_tasks'              => [],
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'faction_loyalty_npc_id' => $factionNpc->id,
+            'fame_tasks' => [],
         ]);
 
         $oldTasks = $npcTask->fame_tasks;
@@ -719,26 +729,27 @@ class FactionLoyaltyServiceTest extends TestCase {
         }
     }
 
-    public function testFailToAssistNpcThatDoesNotBelongToCharacter() {
-        $character = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation()->assignFactionSystem()->getCharacter();
+    public function testFailToAssistNpcThatDoesNotBelongToCharacter()
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignFactionSystem()->getCharacter();
 
         $factionLoyalty = $this->createFactionLoyalty([
-            'faction_id'   => $character->factions->first()->id,
+            'faction_id' => $character->factions->first()->id,
             'character_id' => $character->id,
         ]);
 
         $npc = $this->createNpc([
-            'game_map_id' => $this->character->map->game_map_id
+            'game_map_id' => $this->character->map->game_map_id,
         ]);
 
         $factionNpc = $this->createFactionLoyaltyNpc([
-            'faction_loyalty_id'          => $factionLoyalty->id,
-            'npc_id'                      => $npc->id,
-            'current_level'               => 0,
-            'max_level'                   => 25,
-            'next_level_fame'             => 100,
-            'currently_helping'           => false,
-            'kingdom_item_defence_bonus'  => 0.002,
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'npc_id' => $npc->id,
+            'current_level' => 0,
+            'max_level' => 25,
+            'next_level_fame' => 100,
+            'currently_helping' => false,
+            'kingdom_item_defence_bonus' => 0.002,
         ]);
 
         $result = $this->factionLoyaltyService->assistNpc($this->character, $factionNpc);
@@ -746,25 +757,26 @@ class FactionLoyaltyServiceTest extends TestCase {
         $this->assertEquals('Nope. Not allowed.', $result['message']);
     }
 
-    public function testAssistNpc() {
+    public function testAssistNpc()
+    {
         $npc = $this->createNpc([
-            'game_map_id' => $this->character->map->game_map_id
+            'game_map_id' => $this->character->map->game_map_id,
         ]);
 
         $factionLoyalty = $this->createFactionLoyalty([
-            'faction_id'   => $this->character->factions->first()->id,
+            'faction_id' => $this->character->factions->first()->id,
             'character_id' => $this->character->id,
-            'is_pledged'   => true,
+            'is_pledged' => true,
         ]);
 
         $factionNpc = $this->createFactionLoyaltyNpc([
-            'faction_loyalty_id'          => $factionLoyalty->id,
-            'npc_id'                      => $npc->id,
-            'current_level'               => 0,
-            'max_level'                   => 25,
-            'next_level_fame'             => 100,
-            'currently_helping'           => false,
-            'kingdom_item_defence_bonus'  => 0.002,
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'npc_id' => $npc->id,
+            'current_level' => 0,
+            'max_level' => 25,
+            'next_level_fame' => 100,
+            'currently_helping' => false,
+            'kingdom_item_defence_bonus' => 0.002,
         ]);
 
         $character = $this->character->refresh();
@@ -777,29 +789,30 @@ class FactionLoyaltyServiceTest extends TestCase {
             $character->factionLoyalties->first()->factionLoyaltyNpcs->first()->currently_helping
         );
 
-        $this->assertEquals('You are now assisting ' . $factionNpc->npc->real_name . ' with their tasks!', $result['message']);
+        $this->assertEquals('You are now assisting '.$factionNpc->npc->real_name.' with their tasks!', $result['message']);
     }
 
-    public function testFailToStopAssistingNpcCharacterDoesNotOwn() {
-        $character = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation()->assignFactionSystem()->getCharacter();
+    public function testFailToStopAssistingNpcCharacterDoesNotOwn()
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignFactionSystem()->getCharacter();
 
         $factionLoyalty = $this->createFactionLoyalty([
-            'faction_id'   => $character->factions->first()->id,
+            'faction_id' => $character->factions->first()->id,
             'character_id' => $character->id,
         ]);
 
         $npc = $this->createNpc([
-            'game_map_id' => $this->character->map->game_map_id
+            'game_map_id' => $this->character->map->game_map_id,
         ]);
 
         $factionNpc = $this->createFactionLoyaltyNpc([
-            'faction_loyalty_id'          => $factionLoyalty->id,
-            'npc_id'                      => $npc->id,
-            'current_level'               => 0,
-            'max_level'                   => 25,
-            'next_level_fame'             => 100,
-            'currently_helping'           => true,
-            'kingdom_item_defence_bonus'  => 0.002,
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'npc_id' => $npc->id,
+            'current_level' => 0,
+            'max_level' => 25,
+            'next_level_fame' => 100,
+            'currently_helping' => true,
+            'kingdom_item_defence_bonus' => 0.002,
         ]);
 
         $result = $this->factionLoyaltyService->stopAssistingNpc($this->character, $factionNpc);
@@ -807,25 +820,26 @@ class FactionLoyaltyServiceTest extends TestCase {
         $this->assertEquals('Nope. Not allowed.', $result['message']);
     }
 
-    public function testStopAssistingNpc() {
+    public function testStopAssistingNpc()
+    {
         $npc = $this->createNpc([
-            'game_map_id' => $this->character->map->game_map_id
+            'game_map_id' => $this->character->map->game_map_id,
         ]);
 
         $factionLoyalty = $this->createFactionLoyalty([
-            'faction_id'   => $this->character->factions->first()->id,
+            'faction_id' => $this->character->factions->first()->id,
             'character_id' => $this->character->id,
-            'is_pledged'   => true,
+            'is_pledged' => true,
         ]);
 
         $factionNpc = $this->createFactionLoyaltyNpc([
-            'faction_loyalty_id'          => $factionLoyalty->id,
-            'npc_id'                      => $npc->id,
-            'current_level'               => 0,
-            'max_level'                   => 25,
-            'next_level_fame'             => 100,
-            'currently_helping'           => true,
-            'kingdom_item_defence_bonus'  => 0.002,
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'npc_id' => $npc->id,
+            'current_level' => 0,
+            'max_level' => 25,
+            'next_level_fame' => 100,
+            'currently_helping' => true,
+            'kingdom_item_defence_bonus' => 0.002,
         ]);
 
         $character = $this->character->refresh();
@@ -836,6 +850,6 @@ class FactionLoyaltyServiceTest extends TestCase {
             $character->factionLoyalties->first()->factionLoyaltyNpcs->first()->currently_helping
         );
 
-        $this->assertEquals('You stopped assisting ' . $factionNpc->npc->real_name . ' with their tasks. They are sad but understand.', $result['message']);
+        $this->assertEquals('You stopped assisting '.$factionNpc->npc->real_name.' with their tasks. They are sad but understand.', $result['message']);
     }
 }

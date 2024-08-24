@@ -2,49 +2,38 @@
 
 namespace App\Game\Kingdoms\Events;
 
-use App\Flare\Models\Kingdom;
-use App\Flare\Models\User;
-use Illuminate\Broadcasting\Channel;
-use Illuminate\Broadcasting\PresenceChannel;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Foundation\Events\Dispatchable;
-use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use App\Flare\Models\Character;
+use App\Flare\Models\User;
 use App\Game\Core\Traits\KingdomCache;
+use Illuminate\Broadcasting\Channel;
+use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Broadcasting\PrivateChannel;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\SerializesModels;
 
 class UpdateKingdomLogs implements ShouldBroadcastNow
 {
-    use Dispatchable, InteractsWithSockets, SerializesModels, KingdomCache;
+    use Dispatchable, InteractsWithSockets, KingdomCache, SerializesModels;
 
-    /**
-     * @var User $user
-     */
     private User $user;
 
-    /**
-     * @var array $logs
-     */
     public array $logs;
 
     /**
      * Create a new event instance.
-     *
-     * @param Character $character
-     * @param array $logs
      */
-    public function __construct(Character $character, array $logs) {
+    public function __construct(Character $character, array $logs)
+    {
         $this->user = $character->user;
         $this->logs = $logs;
     }
 
     /**
      * Get the channels the event should broadcast on.
-     *
-     * @return Channel|array
      */
-    public function broadcastOn(): Channel|array {
-        return new PrivateChannel('update-new-kingdom-logs-' . $this->user->id);
+    public function broadcastOn(): Channel|array
+    {
+        return new PrivateChannel('update-new-kingdom-logs-'.$this->user->id);
     }
 }

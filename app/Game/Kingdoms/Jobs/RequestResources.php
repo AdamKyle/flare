@@ -4,62 +4,47 @@ namespace App\Game\Kingdoms\Jobs;
 
 use App\Flare\Models\CapitalCityBuildingQueue;
 use App\Flare\Models\CapitalCityUnitQueue;
+use App\Flare\Models\Kingdom;
+use App\Flare\Models\KingdomLog;
+use App\Flare\Models\UnitMovementQueue;
+use App\Flare\Values\KingdomLogStatusValue;
 use App\Game\Kingdoms\Events\UpdateCapitalCityBuildingQueueTable;
+use App\Game\Kingdoms\Events\UpdateKingdomQueues;
 use App\Game\Kingdoms\Service\CapitalCityBuildingManagement;
 use App\Game\Kingdoms\Service\CapitalCityUnitManagement;
+use App\Game\Kingdoms\Service\UpdateKingdom;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
+use App\Game\Maps\Calculations\DistanceCalculation;
+use App\Game\Messages\Events\ServerMessageEvent;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use App\Game\Kingdoms\Service\UpdateKingdom;
-use App\Flare\Models\Kingdom;
-use App\Flare\Models\KingdomLog;
-use App\Flare\Models\UnitMovementQueue;
-use App\Flare\Values\KingdomLogStatusValue;
-use App\Game\Kingdoms\Events\UpdateKingdomQueues;
-use App\Game\Maps\Calculations\DistanceCalculation;
-use App\Game\Messages\Events\ServerMessageEvent;
 
-class RequestResources implements ShouldQueue {
-
+class RequestResources implements ShouldQueue
+{
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     /**
      * Create a new job instance.
-     *
-     * @param int $characterId
-     * @param int $requestingKingdomId
-     * @param int $requestingFromKingdomId
-     * @param array $resourcesToTransfer
-     * @param array $unitsInMovement
-     * @param array $additionalMessagesForLog
-     * @param int|null $capitalCityQueueId
-     * @param int|null $buildingId
-     * @param int|null $unitId
      */
     public function __construct(private readonly int $characterId,
-                                private readonly int $requestingKingdomId,
-                                private readonly int $requestingFromKingdomId,
-                                private readonly array $resourcesToTransfer,
-                                private readonly array $unitsInMovement,
-                                private readonly array $additionalMessagesForLog,
-                                private readonly int|null $capitalCityQueueId = null,
-                                private readonly int|null $buildingId = null,
-                                private readonly int|null $unitId = null) {}
+        private readonly int $requestingKingdomId,
+        private readonly int $requestingFromKingdomId,
+        private readonly array $resourcesToTransfer,
+        private readonly array $unitsInMovement,
+        private readonly array $additionalMessagesForLog,
+        private readonly ?int $capitalCityQueueId = null,
+        private readonly ?int $buildingId = null,
+        private readonly ?int $unitId = null) {}
 
     /**
      * Execute the job.
-     *
-     * @param UpdateKingdom $updateKingdom
-     * @param DistanceCalculation $distanceCalculation
-     * @param CapitalCityBuildingManagement $capitalCityBuildingManagement
-     * @param CapitalCityUnitManagement $capitalCityUnitManagement
-     * @return void
      */
-    public function handle(UpdateKingdom $updateKingdom, DistanceCalculation $distanceCalculation, CapitalCityBuildingManagement $capitalCityBuildingManagement, CapitalCityUnitManagement $capitalCityUnitManagement): void {
+    public function handle(UpdateKingdom $updateKingdom, DistanceCalculation $distanceCalculation, CapitalCityBuildingManagement $capitalCityBuildingManagement, CapitalCityUnitManagement $capitalCityUnitManagement): void
+    {
 
         $requestedKingdom = Kingdom::find($this->requestingKingdomId);
         $requestingFromKingdom = Kingdom::find($this->requestingFromKingdomId);
@@ -73,21 +58,21 @@ class RequestResources implements ShouldQueue {
                 'additional_details' => [
                     'kingdom_data' => [
                         'reason' => 'You lost the resources because the requesting kingdom is no longer yours.
-                    Your spearmen tried to save the people, but they were cut down.'
-                    ]
+                    Your spearmen tried to save the people, but they were cut down.',
+                    ],
                 ],
                 'status' => KingdomLogStatusValue::RESOURCES_LOST,
             ]);
         }
 
         foreach ($this->resourcesToTransfer as $resource => $amount) {
-            $newAmount = $requestedKingdom->{'current_' . $resource} + $amount;
+            $newAmount = $requestedKingdom->{'current_'.$resource} + $amount;
 
-            if ($newAmount > $requestedKingdom->{'max_' . $resource}) {
-                $newAmount = $requestedKingdom->{'max_' . $resource};
+            if ($newAmount > $requestedKingdom->{'max_'.$resource}) {
+                $newAmount = $requestedKingdom->{'max_'.$resource};
             }
 
-            $requestedKingdom->{'current_' . $resource} = $newAmount;
+            $requestedKingdom->{'current_'.$resource} = $newAmount;
 
             $requestedKingdom->save();
 
@@ -95,7 +80,7 @@ class RequestResources implements ShouldQueue {
         }
 
         $logDetails = [
-            'resource_request_log' => $this->buildRequestLog($requestedKingdom, $requestingFromKingdom)
+            'resource_request_log' => $this->buildRequestLog($requestedKingdom, $requestingFromKingdom),
         ];
 
         KingdomLog::create([
@@ -114,14 +99,14 @@ class RequestResources implements ShouldQueue {
 
         $timeToKingdom = $this->getMinutesForTravel($requestedKingdom, $requestingFromKingdom, $distanceCalculation);
 
-        $unitMovementQueue =  UnitMovementQueue::create(
+        $unitMovementQueue = UnitMovementQueue::create(
             $this->buildUnitMovementQueue($requestedKingdom, $requestingFromKingdom, $timeToKingdom)
         );
 
         $capitalCityBuildingQueue = CapitalCityBuildingQueue::where('id', $this->capitalCityQueueId)->where('kingdom_id', $requestedKingdom->kingdom_id)->first();
         $capitalCityUnitQueue = CapitalCityUnitQueue::where('id', $this->capitalCityQueueId)->where('kingdom_id', $requestingFromKingdom->id)->first();
 
-        if (!is_null($capitalCityBuildingQueue) && !is_null($this->buildingId)) {
+        if (! is_null($capitalCityBuildingQueue) && ! is_null($this->buildingId)) {
 
             $buildingRequestQueue = $capitalCityBuildingQueue->building_request_data;
 
@@ -144,7 +129,7 @@ class RequestResources implements ShouldQueue {
             $capitalCityBuildingManagement->handleBuildingRequest($capitalCityBuildingQueue->refresh(), $building, $requestingFromKingdom->character);
         }
 
-        if (!is_null($capitalCityUnitQueue) && !is_null($this->unitId)) {
+        if (! is_null($capitalCityUnitQueue) && ! is_null($this->unitId)) {
             $buildingRequestQueue = $capitalCityBuildingQueue->building_request_data;
 
             foreach ($buildingRequestQueue as $index => $requestData) {
@@ -163,10 +148,11 @@ class RequestResources implements ShouldQueue {
         $this->sendOffEvents($requestedKingdom, $requestingFromKingdom, $unitMovementQueue);
     }
 
-    private function buildRequestLog(Kingdom $requestedKingdom, Kingdom $requestingFromKingdom): array {
+    private function buildRequestLog(Kingdom $requestedKingdom, Kingdom $requestingFromKingdom): array
+    {
         return [
-            'kingdom_who_requested' => $requestedKingdom->name . ' At (X/Y): ' . $requestedKingdom->x_position . '/' . $requestedKingdom->y_position . ' on plane: ' . $requestedKingdom->gameMap->name,
-            'kingdom_requested_from' => $requestingFromKingdom->name . ' At (X/Y): ' . $requestingFromKingdom->x_position . '/' . $requestingFromKingdom->y_position . ' on plane: ' . $requestingFromKingdom->gameMap->name,
+            'kingdom_who_requested' => $requestedKingdom->name.' At (X/Y): '.$requestedKingdom->x_position.'/'.$requestedKingdom->y_position.' on plane: '.$requestedKingdom->gameMap->name,
+            'kingdom_requested_from' => $requestingFromKingdom->name.' At (X/Y): '.$requestingFromKingdom->x_position.'/'.$requestingFromKingdom->y_position.' on plane: '.$requestingFromKingdom->gameMap->name,
             'resource_details' => $this->resourcesToTransfer,
             'message' => 'Resources have ben delivered.',
             'additional_messages' => $this->additionalMessagesForLog,
@@ -174,7 +160,8 @@ class RequestResources implements ShouldQueue {
 
     }
 
-    private function buildUnitMovementQueue(Kingdom $requestedKingdom, Kingdom $requestFromKingdom, int $completedAtMinutes): array {
+    private function buildUnitMovementQueue(Kingdom $requestedKingdom, Kingdom $requestFromKingdom, int $completedAtMinutes): array
+    {
         return [
             'character_id' => $requestedKingdom->character->id,
             'from_kingdom_id' => $requestedKingdom->id,
@@ -194,14 +181,16 @@ class RequestResources implements ShouldQueue {
         ];
     }
 
-    private function getMinutesForTravel(Kingdom $requestedKingdom, Kingdom $requestFromKingdom, DistanceCalculation $distanceCalculation): int {
+    private function getMinutesForTravel(Kingdom $requestedKingdom, Kingdom $requestFromKingdom, DistanceCalculation $distanceCalculation): int
+    {
         $pixelDistance = $distanceCalculation->calculatePixel($requestFromKingdom->x_position, $requestFromKingdom->y_position,
             $requestedKingdom->x_position, $requestedKingdom->y_position);
 
         return $distanceCalculation->calculateMinutes($pixelDistance);
     }
 
-    private function sendOffEvents(Kingdom $requestingKingdom, Kingdom $requestingFromKingdom, UnitMovementQueue $unitMovementQueue): void {
+    private function sendOffEvents(Kingdom $requestingKingdom, Kingdom $requestingFromKingdom, UnitMovementQueue $unitMovementQueue): void
+    {
 
         $user = $requestingFromKingdom->character->user;
 

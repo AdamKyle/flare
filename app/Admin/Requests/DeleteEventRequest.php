@@ -14,7 +14,8 @@ class DeleteEventRequest extends FormRequest
      *
      * @return bool
      */
-    public function authorize() {
+    public function authorize()
+    {
         return true;
     }
 
@@ -35,7 +36,8 @@ class DeleteEventRequest extends FormRequest
      *
      * @return array
      */
-    public function messages() {
+    public function messages()
+    {
         return [
             'event_id.required' => 'Missing event id.',
         ];

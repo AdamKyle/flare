@@ -2,11 +2,11 @@
 
 namespace App\Flare\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
-class KingdomBuildingExpansion extends Model {
-
+class KingdomBuildingExpansion extends Model
+{
     use HasFactory;
 
     /**
@@ -32,20 +32,22 @@ class KingdomBuildingExpansion extends Model {
      * @var array
      */
     protected $casts = [
-        'expansion_type'               => 'integer',
-        'expansion_count'              => 'integer',
-        'expansions_left'              => 'integer',
+        'expansion_type' => 'integer',
+        'expansion_count' => 'integer',
+        'expansions_left' => 'integer',
         'minutes_until_next_expansion' => 'integer',
-        'resource_costs'               => 'array',
-        'gold_bars_cost'               => 'integer',
-        'resource_increases'           => 'array',
+        'resource_costs' => 'array',
+        'gold_bars_cost' => 'integer',
+        'resource_increases' => 'array',
     ];
 
-    public function kingdomBuilding() {
+    public function kingdomBuilding()
+    {
         return $this->belongsTo(KingdomBuilding::class, 'kingdom_building_id', 'id');
     }
 
-    public function kingdom() {
+    public function kingdom()
+    {
         return $this->belongsTo(Kingdom::class, 'kingdom_id', 'id');
     }
 }

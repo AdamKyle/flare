@@ -2,43 +2,46 @@
 
 namespace App\Game\Events\Console\Commands;
 
+use App\Flare\Events\UpdateScheduledEvents;
+use App\Flare\Models\Announcement;
+use App\Flare\Models\Character;
+use App\Flare\Models\Event;
 use App\Flare\Models\Faction;
+use App\Flare\Models\GameMap;
 use App\Flare\Models\GlobalEventCraft;
 use App\Flare\Models\GlobalEventCraftingInventorySlot;
 use App\Flare\Models\GlobalEventEnchant;
 use App\Flare\Models\GlobalEventGoal;
 use App\Flare\Models\GlobalEventKill;
 use App\Flare\Models\GlobalEventParticipation;
-use App\Flare\Models\Raid;
-use App\Flare\Models\Event;
 use App\Flare\Models\Location;
-use App\Flare\Models\Character;
+use App\Flare\Models\Raid;
+use App\Flare\Models\RaidBoss;
+use App\Flare\Models\RaidBossParticipation;
+use App\Flare\Models\ScheduledEvent;
+use App\Flare\Models\SubmittedSurvey;
+use App\Flare\Services\CreateSurveySnapshot;
+use App\Flare\Services\EventSchedulerService;
+use App\Flare\Values\MapNameValue;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Core\Values\FactionLevel;
+use App\Game\Events\Services\KingdomEventService;
 use App\Game\Events\Values\EventType;
 use App\Game\Exploration\Services\ExplorationAutomationService;
 use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
-use App\Game\Quests\Services\BuildQuestCacheService;
-use Exception;
-use Illuminate\Console\Command;
-use App\Flare\Models\Announcement;
-use App\Flare\Models\ScheduledEvent;
-use App\Flare\Events\UpdateScheduledEvents;
-use App\Flare\Models\GameMap;
-use App\Flare\Models\RaidBoss;
-use App\Flare\Models\RaidBossParticipation;
 use App\Game\Maps\Services\LocationService;
-use App\Game\Raids\Events\CorruptLocations;
-use App\Flare\Services\EventSchedulerService;
-use App\Flare\Values\MapNameValue;
-use App\Game\Events\Services\KingdomEventService;
 use App\Game\Maps\Services\TraverseService;
 use App\Game\Maps\Services\UpdateRaidMonsters;
 use App\Game\Messages\Events\DeleteAnnouncementEvent;
 use App\Game\Messages\Events\GlobalMessageEvent;
+use App\Game\Quests\Services\BuildQuestCacheService;
+use App\Game\Raids\Events\CorruptLocations;
+use App\Game\Survey\Events\ShowSurvey;
+use Exception;
+use Illuminate\Console\Command;
 
-class EndScheduledEvent extends Command {
-
+class EndScheduledEvent extends Command
+{
     /**
      * The name and signature of the console command.
      *
@@ -54,15 +57,9 @@ class EndScheduledEvent extends Command {
     protected $description = 'End all scheduled events';
 
     /**
-     * @param LocationService $locationService
-     * @param UpdateRaidMonsters $updateRaidMonsters
-     * @param EventSchedulerService $eventSchedulerService
-     * @param KingdomEventService $kingdomEventService ,
-     * @param TraverseService $traverseService ,
-     * @param ExplorationAutomationService $explorationAutomationService
-     * @param BuildQuestCacheService $buildQuestCacheService
-     * @param FactionLoyaltyService $factionLoyaltyService
-     * @return void
+     * @param  KingdomEventService  $kingdomEventService  ,
+     * @param  TraverseService  $traverseService  ,
+     *
      * @throws Exception
      */
     public function handle(
@@ -74,8 +71,8 @@ class EndScheduledEvent extends Command {
         ExplorationAutomationService $explorationAutomationService,
         BuildQuestCacheService $buildQuestCacheService,
         FactionLoyaltyService $factionLoyaltyService,
-    ): void
-    {
+        CreateSurveySnapshot $createSurveySnapshot
+    ): void {
         $this->endScheduledEvent(
             $locationService,
             $updateRaidMonsters,
@@ -84,22 +81,14 @@ class EndScheduledEvent extends Command {
             $traverseService,
             $explorationAutomationService,
             $buildQuestCacheService,
-            $factionLoyaltyService
+            $factionLoyaltyService,
+            $createSurveySnapshot,
         );
     }
 
     /**
      * End the scheduled events who are supposed to end.
      *
-     * @param LocationService $locationService
-     * @param UpdateRaidMonsters $updateRaidMonsters
-     * @param EventSchedulerService $eventSchedulerService
-     * @param KingdomEventService $kingdomEventService
-     * @param TraverseService $traverseService
-     * @param ExplorationAutomationService $explorationAutomationService
-     * @param BuildQuestCacheService $buildQuestCacheService
-     * @param FactionLoyaltyService $factionLoyaltyService
-     * @return void
      * @throws Exception
      */
     protected function endScheduledEvent(
@@ -110,10 +99,11 @@ class EndScheduledEvent extends Command {
         TraverseService $traverseService,
         ExplorationAutomationService $explorationAutomationService,
         BuildQuestCacheService $buildQuestCacheService,
-        FactionLoyaltyService $factionLoyaltyService
+        FactionLoyaltyService $factionLoyaltyService,
+        CreateSurveySnapshot $createSurveySnapshot
     ): void {
 
-        $scheduledEvents = ScheduledEvent::where('end_date', '<=', now())->get();
+        $scheduledEvents = ScheduledEvent::where('end_date', '<=', now())->where('currently_running', true)->get();
 
         foreach ($scheduledEvents as $event) {
 
@@ -122,7 +112,7 @@ class EndScheduledEvent extends Command {
             if (is_null($currentEvent)) {
 
                 $event->update([
-                    'currently_running' => false
+                    'currently_running' => false,
                 ]);
 
                 continue;
@@ -207,6 +197,17 @@ class EndScheduledEvent extends Command {
                 event(new UpdateScheduledEvents($eventSchedulerService->fetchEvents()));
             }
 
+            if ($eventType->isFeedbackEvent()) {
+
+                $this->endFeedBackEvent($createSurveySnapshot);
+
+                $event->update([
+                    'currently_running' => false,
+                ]);
+
+                event(new UpdateScheduledEvents($eventSchedulerService->fetchEvents()));
+            }
+
             $announcement = Announcement::where('event_id', $currentEvent->id)->first();
 
             if (is_null($announcement)) {
@@ -229,16 +230,14 @@ class EndScheduledEvent extends Command {
      * - Update monsters for locations, to set them back to normal.
      * - Cleanup other aspects such as announcements.
      *
-     * @param ScheduledEvent $event
-     * @param LocationService $locationService
-     * @param UpdateRaidMonsters $updateRaidMonsters
      * @return void
      */
-    protected function endRaid(ScheduledEvent $event, LocationService $locationService, UpdateRaidMonsters $updateRaidMonsters) {
+    protected function endRaid(ScheduledEvent $event, LocationService $locationService, UpdateRaidMonsters $updateRaidMonsters)
+    {
 
         $raid = $event->raid;
 
-        event(new GlobalMessageEvent('The Raid: ' . $raid->name . ' is now ending! Don\'t worry, the raid will be back soon. Check the event calendar for the next time!'));
+        event(new GlobalMessageEvent('The Raid: '.$raid->name.' is now ending! Don\'t worry, the raid will be back soon. Check the event calendar for the next time!'));
 
         $this->unCorruptLocations($raid, $locationService);
 
@@ -250,10 +249,10 @@ class EndScheduledEvent extends Command {
 
         $this->updateMonstersForCharactersAtRaidLocations($raid, $updateRaidMonsters);
 
-        if (!is_null($event)) {
+        if (! is_null($event)) {
             $announcement = Announcement::where('event_id', $event->id)->first();
 
-            if (!is_null($announcement)) {
+            if (! is_null($announcement)) {
                 event(new DeleteAnnouncementEvent($announcement->id));
 
                 $announcement->delete();
@@ -265,17 +264,15 @@ class EndScheduledEvent extends Command {
 
     /**
      * Ends a weekly currency event
-     *
-     * @param Event $event
-     * @return void
      */
-    protected function endWeeklyCurrencyDrops(Event $event): void {
+    protected function endWeeklyCurrencyDrops(Event $event): void
+    {
 
         event(new GlobalMessageEvent('Weekly currency drops have come to an end! Come back next sunday for another chance!'));
 
         $announcement = Announcement::where('event_id', $event->id)->first();
 
-        if (!is_null($announcement)) {
+        if (! is_null($announcement)) {
             event(new DeleteAnnouncementEvent($announcement->id));
 
             $announcement->delete();
@@ -286,11 +283,9 @@ class EndScheduledEvent extends Command {
 
     /**
      * End Faction Loyalty Event.
-     *
-     * @param Event $event
-     * @return void
      */
-    protected function endWeeklyFactionLoyaltyEvent(Event $event): void {
+    protected function endWeeklyFactionLoyaltyEvent(Event $event): void
+    {
 
         event(new GlobalMessageEvent('Weekly Faction Loyalty Event has come to an end. Next time Npc Tasks refresh from level up, they will be back to normal.'));
 
@@ -305,9 +300,6 @@ class EndScheduledEvent extends Command {
 
     /**
      * End Weekly Celestial Spawn Event
-     *
-     * @param Event $event
-     * @return void
      */
     protected function endWeeklySpawnEvent(Event $event): void
     {
@@ -324,24 +316,18 @@ class EndScheduledEvent extends Command {
 
     /**
      * End the winter event.
-     *
-     * @param KingdomEventService $kingdomEventService
-     * @param TraverseService $traverseService
-     * @param ExplorationAutomationService $explorationAutomationService
-     * @param FactionLoyaltyService $factionLoyaltyService
-     * @param Event $event
-     * @return void
      */
     protected function endWinterEvent(KingdomEventService $kingdomEventService,
-                                      TraverseService $traverseService,
-                                      ExplorationAutomationService $explorationAutomationService,
-                                      FactionLoyaltyService $factionLoyaltyService,
-                                      Event $event): void {
+        TraverseService $traverseService,
+        ExplorationAutomationService $explorationAutomationService,
+        FactionLoyaltyService $factionLoyaltyService,
+        Event $event): void
+    {
 
         $kingdomEventService->handleKingdomRewardsForEvent(MapNameValue::ICE_PLANE);
 
-        $gameMap    = GameMap::where('name', MapNameValue::ICE_PLANE)->first();
-        $faction    = Faction::where('game_map_id', $gameMap->id)->first();
+        $gameMap = GameMap::where('name', MapNameValue::ICE_PLANE)->first();
+        $faction = Faction::where('game_map_id', $gameMap->id)->first();
         $surfaceMap = GameMap::where('name', MapNameValue::SURFACE)->first();
 
         Character::select('characters.*')
@@ -359,11 +345,11 @@ class EndScheduledEvent extends Command {
                     $explorationAutomationService->stopExploration($character);
 
                     $character->factions()->where('game_map_id', $gameMap->id)->update([
-                        'current_level'  => 0,
+                        'current_level' => 0,
                         'current_points' => 0,
-                        'points_needed'  => FactionLevel::getPointsNeeded(0),
-                        'maxed'          => false,
-                        'title'          => null,
+                        'points_needed' => FactionLevel::getPointsNeeded(0),
+                        'maxed' => false,
+                        'title' => null,
                     ]);
 
                     $traverseService->travel($surfaceMap->id, $character);
@@ -389,24 +375,18 @@ class EndScheduledEvent extends Command {
 
     /**
      * End the delusional memories' event.
-     *
-     * @param KingdomEventService $kingdomEventService
-     * @param TraverseService $traverseService
-     * @param ExplorationAutomationService $explorationAutomationService
-     * @param FactionLoyaltyService $factionLoyaltyService
-     * @param Event $event
-     * @return void
      */
     protected function endDelusionalEvent(KingdomEventService $kingdomEventService,
-                                      TraverseService $traverseService,
-                                      ExplorationAutomationService $explorationAutomationService,
-                                      FactionLoyaltyService $factionLoyaltyService,
-                                      Event $event): void {
+        TraverseService $traverseService,
+        ExplorationAutomationService $explorationAutomationService,
+        FactionLoyaltyService $factionLoyaltyService,
+        Event $event): void
+    {
 
         $kingdomEventService->handleKingdomRewardsForEvent(MapNameValue::DELUSIONAL_MEMORIES);
 
-        $gameMap    = GameMap::where('name', MapNameValue::DELUSIONAL_MEMORIES)->first();
-        $faction    = Faction::where('game_map_id', $gameMap->id)->first();
+        $gameMap = GameMap::where('name', MapNameValue::DELUSIONAL_MEMORIES)->first();
+        $faction = Faction::where('game_map_id', $gameMap->id)->first();
         $surfaceMap = GameMap::where('name', MapNameValue::SURFACE)->first();
 
         Character::select('characters.*')
@@ -424,11 +404,11 @@ class EndScheduledEvent extends Command {
                     $explorationAutomationService->stopExploration($character);
 
                     $character->factions()->where('game_map_id', $gameMap->id)->update([
-                        'current_level'  => 0,
+                        'current_level' => 0,
                         'current_points' => 0,
-                        'points_needed'  => FactionLevel::getPointsNeeded(0),
-                        'maxed'          => false,
-                        'title'          => null,
+                        'points_needed' => FactionLevel::getPointsNeeded(0),
+                        'maxed' => false,
+                        'title' => null,
                     ]);
 
                     $traverseService->travel($surfaceMap->id, $character);
@@ -452,8 +432,35 @@ class EndScheduledEvent extends Command {
         $this->updateAllCharacterStatuses();
     }
 
-    private function updateAllCharacterStatuses(): void {
+    protected function endFeedBackEvent(CreateSurveySnapshot $createSurveySnapshot): void {
+        event(new GlobalMessageEvent('The Creator thanks all his players for their valuable feedback. At this time the survey has closed! Feedback is being gathered as we speak'));
+
+        $createSurveySnapshot->createSnapShop();
+
+        SubmittedSurvey::truncate();
+
         Character::chunkById(250, function($characters) {
+            foreach ($characters as $character) {
+                $character->user()->update([
+                    'is_showing_survey' => false,
+                ]);
+
+                $character = $character->refresh();
+
+                event(new ShowSurvey($character->user));
+            }
+        });
+
+        event(new GlobalMessageEvent('Survey stats have been generated. The Creator has yet to leave a response. You can see these stats by
+        refreshing and clicking the left side bar, there will be a new menu option for the survey stats. Once The Creator has a chance to look
+        at them, you will find a button at the bottom called The Creators Response, this will be a detailed post about how the stats impact the
+        direction Tlessa goes in, in order for it be the best PBBG out there!'));
+
+    }
+
+    private function updateAllCharacterStatuses(): void
+    {
+        Character::chunkById(250, function ($characters) {
             foreach ($characters as $character) {
                 event(new UpdateCharacterStatus($character));
             }
@@ -462,14 +469,10 @@ class EndScheduledEvent extends Command {
 
     /**
      * Remove the pledge and helping Npc from the character for the map ending.
-     *
-     * @param Character $character
-     * @param FactionLoyaltyService $factionLoyaltyService
-     * @param Faction|null $faction
-     * @return void
      */
-    private function unpledgeFromTheMapsFaction(Character $character, FactionLoyaltyService $factionLoyaltyService, ?Faction $faction = null): void {
-        if (!is_null($faction)) {
+    private function unpledgeFromTheMapsFaction(Character $character, FactionLoyaltyService $factionLoyaltyService, ?Faction $faction = null): void
+    {
+        if (! is_null($faction)) {
             $factionLoyalty = $character->factionLoyalties()
                 ->where('faction_id', $faction->id)
                 ->first();
@@ -483,7 +486,7 @@ class EndScheduledEvent extends Command {
                 ->where('currently_helping', true)
                 ->first();
 
-            if (!is_null($assistingNpc)) {
+            if (! is_null($assistingNpc)) {
                 $factionLoyaltyService->stopAssistingNpc($character, $assistingNpc);
             }
 
@@ -493,10 +496,9 @@ class EndScheduledEvent extends Command {
 
     /**
      * Clean up Global Event goal stuff.
-     *
-     * @return void
      */
-    private function cleanUpEventGoals(): void {
+    private function cleanUpEventGoals(): void
+    {
         GlobalEventParticipation::truncate();
         GlobalEventGoal::truncate();
         GlobalEventCraftingInventorySlot::truncate();
@@ -509,16 +511,15 @@ class EndScheduledEvent extends Command {
     /**
      * Set locations back to normal
      *
-     * @param Raid $raid
-     * @param LocationService $locationService
      * @return void
      */
-    private function unCorruptLocations(Raid $raid, LocationService $locationService) {
+    private function unCorruptLocations(Raid $raid, LocationService $locationService)
+    {
         $raidLocations = [...$raid->corrupted_location_ids, $raid->raid_boss_location_id];
 
         Location::whereIn('id', $raidLocations)->update([
-            'is_corrupted'  => false,
-            'raid_id'       => null,
+            'is_corrupted' => false,
+            'raid_id' => null,
             'has_raid_boss' => false,
         ]);
 
@@ -527,12 +528,9 @@ class EndScheduledEvent extends Command {
 
     /**
      * Update monsters for the characters at raid locations.
-     *
-     * @param Raid $raid
-     * @param UpdateRaidMonsters $updateRaidMonsters
-     * @return void
      */
-    private function updateMonstersForCharactersAtRaidLocations(Raid $raid, UpdateRaidMonsters $updateRaidMonsters): void {
+    private function updateMonstersForCharactersAtRaidLocations(Raid $raid, UpdateRaidMonsters $updateRaidMonsters): void
+    {
         $corruptedLocationIds = $raid->corrupted_location_ids;
 
         array_unshift($corruptedLocationIds, $raid->raid_boss_location_id);

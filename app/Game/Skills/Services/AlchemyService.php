@@ -15,22 +15,25 @@ use App\Game\Skills\Services\Traits\UpdateCharacterCurrency;
 use App\Game\Skills\Values\SkillTypeValue;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 
-class AlchemyService {
+class AlchemyService
+{
     use ResponseBuilder, UpdateCharacterCurrency;
 
     private SkillCheckService $skillCheckService;
 
     private ItemListCostTransformerService $itemListCostTransformerService;
 
-    public function __construct(SkillCheckService $skillCheckService, ItemListCostTransformerService $itemListCostTransformerService) {
-        $this->skillCheckService              = $skillCheckService;
+    public function __construct(SkillCheckService $skillCheckService, ItemListCostTransformerService $itemListCostTransformerService)
+    {
+        $this->skillCheckService = $skillCheckService;
         $this->itemListCostTransformerService = $itemListCostTransformerService;
     }
 
-    public function fetchAlchemistItems(Character $character, bool $showMerchantMessage = true) {
+    public function fetchAlchemistItems(Character $character, bool $showMerchantMessage = true)
+    {
         $gameSkill = GameSkill::where('type', SkillTypeValue::ALCHEMY)->first();
 
-        $skill     = Skill::where('game_skill_id', $gameSkill->id)->where('character_id', $character->id)->first();
+        $skill = Skill::where('game_skill_id', $gameSkill->id)->where('character_id', $character->id)->first();
 
         $items = Item::where('can_craft', true)
             ->where('crafting_type', 'alchemy')
@@ -44,24 +47,25 @@ class AlchemyService {
         return $this->itemListCostTransformerService->reduceCostOfAlchemyItems($character, $items, $showMerchantMessage);
     }
 
-    public function fetchSkillXP(Character $character): array {
+    public function fetchSkillXP(Character $character): array
+    {
         $gameSkill = GameSkill::where('type', SkillTypeValue::ALCHEMY)->first();
 
-        $skill     = Skill::where('game_skill_id', $gameSkill->id)->where('character_id', $character->id)->first();
+        $skill = Skill::where('game_skill_id', $gameSkill->id)->where('character_id', $character->id)->first();
 
         return [
-            'current_xp'    => $skill->xp,
+            'current_xp' => $skill->xp,
             'next_level_xp' => $skill->xp_max,
-            'skill_name'    => $skill->name,
-            'level'         => $skill->level
+            'skill_name' => $skill->name,
+            'level' => $skill->level,
         ];
     }
 
-
-    public function transmute(Character $character, int $itemId): void {
+    public function transmute(Character $character, int $itemId): void
+    {
         $gameSkill = GameSkill::where('type', SkillTypeValue::ALCHEMY)->first();
-        $skill     = Skill::where('game_skill_id', $gameSkill->id)->where('character_id', $character->id)->first();
-        $item      = Item::find($itemId);
+        $skill = Skill::where('game_skill_id', $gameSkill->id)->where('character_id', $character->id)->first();
+        $item = Item::find($itemId);
 
         if (is_null($item)) {
             event(new ServerMessageEvent($character->user, 'Nope. Item does not exist.'));
@@ -80,16 +84,16 @@ class AlchemyService {
         event(new CraftedItemTimeOutEvent($character, null, $setTime));
 
         $goldDustCost = $item->gold_dust_cost;
-        $shardsCost   = $item->shards_cost;
+        $shardsCost = $item->shards_cost;
 
         if ($character->classType()->isMerchant()) {
             $goldDustCost = floor($goldDustCost - $goldDustCost * 0.10);
-            $shardsCost   = floor($shardsCost - $shardsCost * 0.10);
+            $shardsCost = floor($shardsCost - $shardsCost * 0.10);
         }
 
         if ($character->classType()->isArcaneAlchemist()) {
             $goldDustCost = floor($goldDustCost - $goldDustCost * 0.15);
-            $shardsCost   = floor($shardsCost - $shardsCost * 0.15);
+            $shardsCost = floor($shardsCost - $shardsCost * 0.15);
         }
 
         if ($goldDustCost > $character->gold_dust) {
@@ -107,7 +111,8 @@ class AlchemyService {
         $this->attemptTransmute($character, $skill, $item);
     }
 
-    protected function attemptTransmute(Character $character, Skill $skill, Item $item): void {
+    protected function attemptTransmute(Character $character, Skill $skill, Item $item): void
+    {
         $this->updateAlchemyCost($character, $item);
 
         if ($skill->level < $item->skill_level_required) {
@@ -127,14 +132,13 @@ class AlchemyService {
 
             $this->pickUpItem($character, $item, $skill, true);
 
-
             event(new UpdateCharacterCurrenciesEvent($character->refresh()));
 
             return;
         }
 
         $characterRoll = $this->skillCheckService->characterRoll($skill);
-        $dcCheck       = $this->skillCheckService->getDCCheck($skill);
+        $dcCheck = $this->skillCheckService->getDCCheck($skill);
 
         if ($dcCheck < $characterRoll) {
             $this->pickUpItem($character, $item, $skill);
@@ -149,26 +153,26 @@ class AlchemyService {
         event(new UpdateCharacterCurrenciesEvent($character->refresh()));
     }
 
-
-
-    private function pickUpItem(Character $character, Item $item, Skill $skill, bool $tooEasy = false) {
+    private function pickUpItem(Character $character, Item $item, Skill $skill, bool $tooEasy = false)
+    {
         if ($this->attemptToPickUpItem($character, $item)) {
 
-            if (!$tooEasy) {
+            if (! $tooEasy) {
                 event(new UpdateSkillEvent($skill));
             }
         }
     }
 
-    private function attemptToPickUpItem(Character $character, Item $item): bool {
-        if (!$character->isInventoryFull()) {
+    private function attemptToPickUpItem(Character $character, Item $item): bool
+    {
+        if (! $character->isInventoryFull()) {
 
             $slot = $character->inventory->slots()->create([
-                'item_id'      => $item->id,
+                'item_id' => $item->id,
                 'inventory_id' => $character->inventory->id,
             ]);
 
-            event(new ServerMessageEvent($character->user, 'You manage to create: ' . $item->name . ' from gold dust!', $slot->id, $slot->item->type));
+            event(new ServerMessageEvent($character->user, 'You manage to create: '.$item->name.' from gold dust!', $slot->id, $slot->item->type));
 
             return true;
         }

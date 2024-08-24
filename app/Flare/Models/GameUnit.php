@@ -2,12 +2,12 @@
 
 namespace App\Flare\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Database\Factories\GameUnitFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
-class GameUnit extends Model {
-
+class GameUnit extends Model
+{
     use HasFactory;
 
     /**
@@ -45,29 +45,30 @@ class GameUnit extends Model {
      * @var array
      */
     protected $casts = [
-        'attack'               => 'integer',
-        'defence'              => 'integer',
-        'can_heal'             => 'boolean',
-        'heal_percentage'      => 'float',
-        'unit_can_heal'        => 'boolean',
-        'siege_weapon'         => 'boolean',
-        'is_airship'           => 'boolean',
-        'attacker'             => 'boolean',
-        'defender'             => 'boolean',
-        'can_not_be_healed'    => 'boolean',
-        'is_settler'           => 'boolean',
-        'is_special'           => 'boolean',
-        'reduces_morale_by'    => 'float',
-        'wood_cost'            => 'integer',
-        'clay_cost'            => 'integer',
-        'stone_cost'           => 'integer',
-        'iron_cost'            => 'integer',
-        'steel_cost'           => 'integer',
-        'required_population'  => 'integer',
-        'time_to_recruit'      => 'integer',
+        'attack' => 'integer',
+        'defence' => 'integer',
+        'can_heal' => 'boolean',
+        'heal_percentage' => 'float',
+        'unit_can_heal' => 'boolean',
+        'siege_weapon' => 'boolean',
+        'is_airship' => 'boolean',
+        'attacker' => 'boolean',
+        'defender' => 'boolean',
+        'can_not_be_healed' => 'boolean',
+        'is_settler' => 'boolean',
+        'is_special' => 'boolean',
+        'reduces_morale_by' => 'float',
+        'wood_cost' => 'integer',
+        'clay_cost' => 'integer',
+        'stone_cost' => 'integer',
+        'iron_cost' => 'integer',
+        'steel_cost' => 'integer',
+        'required_population' => 'integer',
+        'time_to_recruit' => 'integer',
     ];
 
-    protected static function newFactory() {
+    protected static function newFactory()
+    {
         return GameUnitFactory::new();
     }
 }

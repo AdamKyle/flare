@@ -27,20 +27,19 @@ class UpdateCharactersForClassRanks extends Command
 
     /**
      * Execute the console command.
-     *
-     * @return void
      */
-    public function handle(): void {
+    public function handle(): void
+    {
         $gameClasses = GameClass::all();
 
         $bar = $this->output->createProgressBar(Character::count());
         $bar->start();
 
-        Character::chunkById(100, function($characters) use($gameClasses, $bar) {
+        Character::chunkById(100, function ($characters) use ($gameClasses, $bar) {
             foreach ($characters as $character) {
                 foreach ($gameClasses as $gameClass) {
-                    $classRank    = $character->classRanks()->where('game_class_id', $gameClass->id)->first();
-                    $hasGameClass = !is_null($classRank);
+                    $classRank = $character->classRanks()->where('game_class_id', $gameClass->id)->first();
+                    $hasGameClass = ! is_null($classRank);
 
                     if ($hasGameClass) {
                         $this->assignWeaponMasteriesToClassRanks($classRank);
@@ -49,11 +48,11 @@ class UpdateCharactersForClassRanks extends Command
                     }
 
                     $classRank = $character->classRanks()->create([
-                        'character_id'   => $character->id,
-                        'game_class_id'  => $gameClass->id,
-                        'current_xp'     => 0,
-                        'required_xp'    => ClassRankValue::XP_PER_LEVEL,
-                        'level'          => 0,
+                        'character_id' => $character->id,
+                        'game_class_id' => $gameClass->id,
+                        'current_xp' => 0,
+                        'required_xp' => ClassRankValue::XP_PER_LEVEL,
+                        'level' => 0,
                     ]);
 
                     $this->assignWeaponMasteriesToClassRanks($classRank);
@@ -66,32 +65,33 @@ class UpdateCharactersForClassRanks extends Command
         $bar->finish();
     }
 
-    protected function assignWeaponMasteriesToClassRanks(CharacterClassRank $classRank): void {
+    protected function assignWeaponMasteriesToClassRanks(CharacterClassRank $classRank): void
+    {
         foreach (WeaponMasteryValue::getTypes() as $type) {
 
             $foundMastery = $classRank->weaponMasteries()->where('weapon_type', $type)->first();
 
-            if (!is_null($foundMastery)) {
+            if (! is_null($foundMastery)) {
                 continue;
             }
 
             $classRank->weaponMasteries()->create([
-                'character_class_rank_id'   => $classRank->id,
-                'weapon_type'               => $type,
-                'current_xp'                => 0,
-                'required_xp'               => WeaponMasteryValue::XP_PER_LEVEL,
-                'level'                     => $this->getDefaultLevel($classRank, $type),
+                'character_class_rank_id' => $classRank->id,
+                'weapon_type' => $type,
+                'current_xp' => 0,
+                'required_xp' => WeaponMasteryValue::XP_PER_LEVEL,
+                'level' => $this->getDefaultLevel($classRank, $type),
             ]);
         }
     }
 
-    protected function getDefaultLevel(CharacterClassRank $classRank, int $type) {
+    protected function getDefaultLevel(CharacterClassRank $classRank, int $type)
+    {
         if (($classRank->gameClass->type()->isFighter() ||
              $classRank->gameClass->type()->isThief() ||
              $classRank->gameClass->type()->isVampire() ||
              $classRank->gameClass->type()->isPrisoner() ||
-             $classRank->gameClass->type()->isBlackSmith()) && (new WeaponMasteryValue($type))->isWeapon())
-        {
+             $classRank->gameClass->type()->isBlackSmith()) && (new WeaponMasteryValue($type))->isWeapon()) {
             return 5;
         }
 

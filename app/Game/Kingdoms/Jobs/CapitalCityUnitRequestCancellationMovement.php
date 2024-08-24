@@ -2,31 +2,25 @@
 
 namespace App\Game\Kingdoms\Jobs;
 
+use App\Flare\Models\CapitalCityUnitCancellation;
+use App\Flare\Models\CapitalCityUnitQueue;
 use App\Flare\Models\GameUnit;
 use App\Flare\Models\UnitInQueue;
+use App\Game\Kingdoms\Events\UpdateCapitalCityUnitQueueTable;
 use App\Game\Kingdoms\Service\CapitalCityUnitManagement;
 use App\Game\Kingdoms\Service\UnitService;
+use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use App\Flare\Models\CapitalCityUnitCancellation;
-use App\Flare\Models\CapitalCityUnitQueue;
-use App\Game\Kingdoms\Events\UpdateCapitalCityUnitQueueTable;
-use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 
 class CapitalCityUnitRequestCancellationMovement implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    /**
-     * @param int $capitalCityCancellationQueueId
-     * @param int $capitalCityQueueId
-     * @param int $characterId
-     * @param array $dataForCancellation
-     */
     public function __construct(
         private readonly int $capitalCityCancellationQueueId,
         private readonly int $capitalCityQueueId,
@@ -37,9 +31,6 @@ class CapitalCityUnitRequestCancellationMovement implements ShouldQueue
     /**
      * Handle the job.
      *
-     * @param CapitalCityUnitManagement $capitalCityUnitManagement
-     * @param UnitService $unitService
-     * @return void
      * @throws Exception
      */
     public function handle(
@@ -87,13 +78,10 @@ class CapitalCityUnitRequestCancellationMovement implements ShouldQueue
 
     /**
      * Determine if the cancellation should be delayed.
-     *
-     * @param CapitalCityUnitQueue $queueData
-     * @return bool
      */
     private function shouldDelayCancellation(CapitalCityUnitQueue $queueData): bool
     {
-        if (!$queueData->completed_at->lessThanOrEqualTo(now())) {
+        if (! $queueData->completed_at->lessThanOrEqualTo(now())) {
             $timeLeft = $queueData->completed_at->diffInMinutes(now());
 
             if ($timeLeft >= 1) {
@@ -115,10 +103,6 @@ class CapitalCityUnitRequestCancellationMovement implements ShouldQueue
 
     /**
      * Process the cancellations for the buildings in the queue.
-     *
-     * @param CapitalCityUnitQueue $queueData
-     * @param UnitService $unitService
-     * @return array
      */
     private function processCancellations(CapitalCityUnitQueue $queueData, UnitService $unitService): array
     {
@@ -137,7 +121,7 @@ class CapitalCityUnitRequestCancellationMovement implements ShouldQueue
 
                 CapitalCityUnitQueue::where('id', $this->capitalCityCancellationQueueId)->update(['status' => CapitalCityQueueStatus::CANCELLATION_REJECTED]);
 
-                $messages[] = 'Failed to cancel unit recruitment. Seems it must already be done for unit: ' . $gameUnit->name;
+                $messages[] = 'Failed to cancel unit recruitment. Seems it must already be done for unit: '.$gameUnit->name;
 
                 $queueData->update(['messages' => $messages]);
 
@@ -157,16 +141,12 @@ class CapitalCityUnitRequestCancellationMovement implements ShouldQueue
 
     /**
      * Update the queue data with the cancellation statuses.
-     *
-     * @param CapitalCityUnitQueue $queueData
-     * @param array $responseData
-     * @return void
      */
     private function updateQueueData(CapitalCityUnitQueue $queueData, array $responseData): void
     {
 
         $responseLookup = collect($responseData)
-            ->reject(fn($response) => $response['status'] === CapitalCityQueueStatus::CANCELLATION_REJECTED)
+            ->reject(fn ($response) => $response['status'] === CapitalCityQueueStatus::CANCELLATION_REJECTED)
             ->pluck('status', 'unit_id')
             ->toArray();
 
@@ -176,15 +156,16 @@ class CapitalCityUnitRequestCancellationMovement implements ShouldQueue
             if (isset($responseLookup[$gameUnit->id])) {
                 $request['secondary_status'] = CapitalCityQueueStatus::CANCELLED;
             }
+
             return $request;
         })->toArray();
 
         $queueData->update(['unit_request_data' => $unitRequestData]);
         $queueData->refresh();
 
-        if (collect($responseData)->contains(fn($response) => $response['status'] === CapitalCityQueueStatus::CANCELLATION_REJECTED)) {
+        if (collect($responseData)->contains(fn ($response) => $response['status'] === CapitalCityQueueStatus::CANCELLATION_REJECTED)) {
             $messages = $queueData->messages ?? [];
-            $messages[] = "Cancellation request for one of your units was rejected (See the unit that states Cancellation Rejected) because it was too close to being done. No need to waste resources child!";
+            $messages[] = 'Cancellation request for one of your units was rejected (See the unit that states Cancellation Rejected) because it was too close to being done. No need to waste resources child!';
 
             $queueData->update(['messages' => $messages]);
         }

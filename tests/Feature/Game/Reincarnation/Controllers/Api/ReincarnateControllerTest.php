@@ -2,12 +2,9 @@
 
 namespace Tests\Feature\Game\Reincarnation\Controllers\Api;
 
-use App\Flare\Models\Character;
 use App\Flare\Models\MaxLevelConfiguration;
 use App\Flare\Values\FeatureTypes;
 use App\Flare\Values\ItemEffectsValue;
-use App\Flare\Values\MaxCurrenciesValue;
-use App\Game\Gambler\Values\CurrencyValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
@@ -15,34 +12,37 @@ use Tests\Traits\CreateItem;
 use Tests\Traits\CreateNpc;
 use Tests\Traits\CreateQuest;
 
-class ReincarnateControllerTest extends TestCase {
-
-    use RefreshDatabase, CreateItem, CreateQuest, CreateNpc;
+class ReincarnateControllerTest extends TestCase
+{
+    use CreateItem, CreateNpc, CreateQuest, RefreshDatabase;
 
     private ?CharacterFactory $character = null;
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
-        $this->character = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
+        $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
 
         $this->character = null;
     }
 
-    public function testReincarnate() {
+    public function testReincarnate()
+    {
 
         MaxLevelConfiguration::create([
-            'max_level'      => 2000,
-            'half_way'       => 1000,
+            'max_level' => 2000,
+            'half_way' => 1000,
             'three_quarters' => 1500,
-            'last_leg'       => 1900,
+            'last_leg' => 1900,
         ]);
 
-        $item      = $this->createItem(['effect' => ItemEffectsValue::CONTINUE_LEVELING]);
+        $item = $this->createItem(['effect' => ItemEffectsValue::CONTINUE_LEVELING]);
 
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
 
@@ -50,24 +50,24 @@ class ReincarnateControllerTest extends TestCase {
 
         $quest = $this->createQuest([
             'unlocks_feature' => FeatureTypes::REINCARNATION,
-            'npc_id'          => $this->createNpc()->id,
+            'npc_id' => $this->createNpc()->id,
         ]);
 
         $character->questsCompleted()->create([
             'character_id' => $character->id,
-            'quest_id'     => $quest->id,
+            'quest_id' => $quest->id,
         ]);
 
         $character = $character->refresh();
 
         $character->update([
             'level' => 4800,
-            'str'   => 4700,
-            'dur'   => 4700,
-            'dex'   => 4700,
-            'chr'   => 4700,
-            'int'   => 4700,
-            'agi'   => 4700,
+            'str' => 4700,
+            'dur' => 4700,
+            'dex' => 4700,
+            'chr' => 4700,
+            'int' => 4700,
+            'agi' => 4700,
             'focus' => 4700,
             'copper_coins' => 100000,
         ]);
@@ -75,7 +75,7 @@ class ReincarnateControllerTest extends TestCase {
         $character = $character->refresh();
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/character/reincarnate/' . $character->id, [
+            ->call('POST', '/api/character/reincarnate/'.$character->id, [
                 '_token' => csrf_token(),
             ]);
 

@@ -53,6 +53,25 @@
             ])
         @endif
 
+        @if (SurveyStats::canShowSurveyMenuOption())
+            <div class="text-center w-full lg:w-2/4 mx-auto mt-20">
+                <h2 class="mb-5 font-thin text-2xl lg:text-5xl dark:text-gray-300 text-gray-800">
+                    <i class="fas fa-poll"></i>
+                    The latest survey has been released!
+                </h2>
+                <p class="mb-10 dark:text-gray-300 text-gray-800">
+                    Tlessa will occasionally hold an event where players can get large amounts of XP to help them progress. After 6 hours of total game play,
+                    does not need to be consecutive, players are promoted with a survey - filling out rhe survey helps Tlessa make the game better and become of the best PBBGS around! Players also get a shiny mythical item for completing them!
+                </p>
+
+                <p class="mb-10 dark:text-gray-300 text-gray-800">
+                    <x-core.buttons.link-buttons.success-button href="{{route('survey.stats')}}">
+                        View the survey results!
+                    </x-core.buttons.link-buttons.success-button>
+                </p>
+            </div>
+        @endif
+
         <div class="text-center w-full lg:w-2/4 mx-auto mt-20">
             <h2 class="mb-5 font-thin text-2xl lg:text-5xl dark:text-gray-300 text-gray-800">
                 <i class="fas fa-globe-americas"></i>

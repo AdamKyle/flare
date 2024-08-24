@@ -34,8 +34,9 @@ class TestExploration extends Command
     /**
      * Execute the console command.
      */
-    public function handle(CharacterBuilderService $characterBuilder, ExplorationAutomationService $explorationAutomationService) {
-        ini_set('memory_limit','3G');
+    public function handle(CharacterBuilderService $characterBuilder, ExplorationAutomationService $explorationAutomationService)
+    {
+        ini_set('memory_limit', '3G');
 
         $numberOfCharacters = $this->argument('numberOfCharacters');
         $characterToIgnore = $this->argument('characterToIgnore');
@@ -46,9 +47,9 @@ class TestExploration extends Command
 
         foreach ($characters as $character) {
             $explorationAutomationService->beginAutomation($character, [
-                'selected_monster_id'      => Monster::where('name', 'Sewer Rat')->first()->id,
-                'auto_attack_length'       => 1,
-                'attack_type'              => 'attack',
+                'selected_monster_id' => Monster::where('name', 'Sewer Rat')->first()->id,
+                'auto_attack_length' => 1,
+                'attack_type' => 'attack',
                 'move_down_the_list_every' => null,
             ]);
         }
@@ -61,23 +62,19 @@ class TestExploration extends Command
      *
      * - Will create a specfic amount to match the number of characters we want to use for exploration.
      * - Will ignore a specfic character from the list to return.
-     *
-     * @param CharacterBuilderService $characterBuilder
-     * @param integer $numberOfCharacters
-     * @param string|null $characterToIgnore
-     * @return Collection
      */
-    protected function getTheCharacters(CharacterBuilderService $characterBuilder, int $numberOfCharacters, ?string $characterToIgnore): Collection {
+    protected function getTheCharacters(CharacterBuilderService $characterBuilder, int $numberOfCharacters, ?string $characterToIgnore): Collection
+    {
         $characters = Character::query();
 
-        if (!is_null($characterToIgnore)) {
+        if (! is_null($characterToIgnore)) {
             $characters = $characters->where('name', '!=', $characterToIgnore);
         }
 
         if ($numberOfCharacters > $characters->count()) {
             $charactersToCreate = $numberOfCharacters - $characters->count();
 
-            $this->line('Creating character amount: ' . $charactersToCreate);
+            $this->line('Creating character amount: '.$charactersToCreate);
 
             $this->createTheCharacters($characterBuilder, $charactersToCreate);
 
@@ -93,17 +90,16 @@ class TestExploration extends Command
     /**
      * Create the characters needed.
      *
-     * @param CharacterBuilderService $characterBuilder
-     * @param integer $charactersToCreate
      * @return void
      */
-    protected function createTheCharacters(CharacterBuilderService $characterBuilder, int $charactersToCreate) {
+    protected function createTheCharacters(CharacterBuilderService $characterBuilder, int $charactersToCreate)
+    {
         for ($i = 0; $i <= $charactersToCreate; $i++) {
             $user = $this->createUser();
 
             $surfaceMap = GameMap::where('name', 'Surface')->first();
-            $gameClass  = GameClass::inRandomOrder()->first();
-            $gameRace   = GameRace::inRandomOrder()->first();
+            $gameClass = GameClass::inRandomOrder()->first();
+            $gameRace = GameRace::inRandomOrder()->first();
 
             $this->createCharacter($characterBuilder, $user, $surfaceMap, $gameClass, $gameRace);
 
@@ -112,35 +108,32 @@ class TestExploration extends Command
 
     /**
      * Create the user.
-     *
-     * @return User
      */
-    protected function createUser(): User {
+    protected function createUser(): User
+    {
         return User::create([
-            'email'            => Str::random(8) . '@test.com',
-            'password'         => Hash::make(Str::random(8)),
-            'ip_address'       => '0.0.0.' . rand(1, 100),
-            'last_logged_in'   => now(),
-            'guide_enabled'    => false
+            'email' => Str::random(8).'@test.com',
+            'password' => Hash::make(Str::random(8)),
+            'ip_address' => '0.0.0.'.rand(1, 100),
+            'last_logged_in' => now(),
+            'guide_enabled' => false,
         ]);
     }
 
     /**
      * Create the character.
      *
-     * @param CharacterBuilderService $characterBuilder
-     * @param GameMap $map
-     * @param GameClass $class
-     * @param Collection $races
-     * @param string $password
-     * @return Character
+     * @param  Collection  $races
+     * @param  string  $password
+     *
      * @throws Exception
      */
-    protected function createCharacter(CharacterBuilderService $characterBuilder, User $user, GameMap $map, GameClass $class, GameRace $race): Character {
+    protected function createCharacter(CharacterBuilderService $characterBuilder, User $user, GameMap $map, GameClass $class, GameRace $race): Character
+    {
 
         $characterBuilder->setRace($race)
             ->setClass($class)
-            ->createCharacter($user, $map, Str::random(4) . str_replace(' ', '', $class->name))
+            ->createCharacter($user, $map, Str::random(4).str_replace(' ', '', $class->name))
             ->assignSkills()
             ->assignPassiveSkills()
             ->buildCharacterCache();

@@ -2,10 +2,11 @@
 
 namespace Database\Factories;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Flare\Models\Event;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
-class EventFactory extends Factory {
+class EventFactory extends Factory
+{
     /**
      * The name of the factory's corresponding model.
      *
@@ -18,12 +19,13 @@ class EventFactory extends Factory {
      *
      * @return array
      */
-    public function definition() {
+    public function definition()
+    {
         return [
-            'type'          => null,
-            'started_at'    => now(),
-            'ends_at'       => now()->subMinutes(5),
-            'raid_id'       => null,
+            'type' => null,
+            'started_at' => now(),
+            'ends_at' => now()->subMinutes(5),
+            'raid_id' => null,
         ];
     }
 }

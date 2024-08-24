@@ -2,28 +2,26 @@
 
 namespace App\Flare\Values;
 
-use App\Flare\Models\GameRace;
 use App\Flare\Models\GameClass;
+use App\Flare\Models\GameRace;
 
-class BaseStatValue {
-
+class BaseStatValue
+{
     /**
-     * @var GameRace $race
+     * @var GameRace
      */
     private $race;
 
     /**
-     * @var GameClass $class
+     * @var GameClass
      */
     private $class;
 
     /**
      * Set the race
-     *
-     * @param GameRace $race
-     * @return BaseStatValue
      */
-    public function setRace(GameRace $race): BaseStatValue {
+    public function setRace(GameRace $race): BaseStatValue
+    {
         $this->race = $race;
 
         return $this;
@@ -31,11 +29,9 @@ class BaseStatValue {
 
     /**
      * Set the class
-     *
-     * @param GameClass $class
-     * @return BaseStatValue
      */
-    public function setClass(GameClass $class): BaseStatValue {
+    public function setClass(GameClass $class): BaseStatValue
+    {
         $this->class = $class;
 
         return $this;
@@ -43,10 +39,9 @@ class BaseStatValue {
 
     /**
      * Get strength based on race and class modifiers.
-     *
-     * @return int
      */
-    public function str(): int {
+    public function str(): int
+    {
         $classMod = $this->class->str_mod > 0 ? $this->class->str_mod : 0;
 
         $modifier = $this->race->str_mod + $classMod;
@@ -56,10 +51,9 @@ class BaseStatValue {
 
     /**
      * Get dexterity based on race and class modifiers.
-     *
-     * @return int
      */
-    public function dex(): int {
+    public function dex(): int
+    {
         $classMod = $this->class->dex_mod > 0 ? $this->class->dex_mod : 0;
 
         $modifier = $this->race->dex_mod + $classMod;
@@ -69,10 +63,9 @@ class BaseStatValue {
 
     /**
      * Get durability based on race and class modifiers.
-     *
-     * @return int
      */
-    public function dur(): int {
+    public function dur(): int
+    {
         $classMod = $this->class->dur_mod > 0 ? $this->class->dur_mod : 0;
 
         $modifier = $this->race->dur_mod + $classMod;
@@ -82,10 +75,9 @@ class BaseStatValue {
 
     /**
      * Get durability based on race and class modifiers.
-     *
-     * @return int
      */
-    public function chr(): int {
+    public function chr(): int
+    {
         $classMod = $this->class->chr_mod > 0 ? $this->class->chr_mod : 0;
 
         $modifier = $this->race->chr_mod + $classMod;
@@ -95,10 +87,9 @@ class BaseStatValue {
 
     /**
      * Get intelligence based on race and class modifiers.
-     *
-     * @return int
      */
-    public function int(): int {
+    public function int(): int
+    {
         $classMod = $this->class->int_mod > 0 ? $this->class->int_mod : 0;
 
         $modifier = $this->race->int_mod + $classMod;
@@ -108,10 +99,9 @@ class BaseStatValue {
 
     /**
      * Get Agility based on race and class modifiers.
-     *
-     * @return int
      */
-    public function agi(): int {
+    public function agi(): int
+    {
         $classMod = $this->class->agi_mod > 0 ? $this->class->agi_mod : 0;
 
         $modifier = $this->race->agi_mod + $classMod;
@@ -121,10 +111,9 @@ class BaseStatValue {
 
     /**
      * Get Focus based on race and class modifiers.
-     *
-     * @return int
      */
-    public function focus(): int {
+    public function focus(): int
+    {
         $classMod = $this->class->focus_mod > 0 ? $this->class->focus_mod : 0;
 
         $modifier = $this->race->focus_mod + $classMod;
@@ -136,14 +125,13 @@ class BaseStatValue {
      * Get ac based on race and class modifiers.
      *
      * This is done by taking 10 * modifier%
-     *
-     * @return int
      */
-    public function ac(): int {
+    public function ac(): int
+    {
         $classMod = $this->class->defense_mod > 0 ? $this->class->defense_mod : 0;
 
         $modifier = $this->race->defense_mod + $classMod;
 
-        return (10 + 10 * $modifier);
+        return 10 + 10 * $modifier;
     }
 }

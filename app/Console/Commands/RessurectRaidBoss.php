@@ -2,16 +2,17 @@
 
 namespace App\Console\Commands;
 
+use App\Flare\Models\Character;
 use App\Flare\Models\Event;
 use App\Flare\Models\Location;
 use App\Flare\Models\RaidBoss;
-use App\Flare\Models\Character;
-use Illuminate\Console\Command;
 use App\Flare\Models\RaidBossParticipation;
 use App\Game\Maps\Services\UpdateRaidMonsters;
 use App\Game\Messages\Events\GlobalMessageEvent;
+use Illuminate\Console\Command;
 
-class RessurectRaidBoss extends Command {
+class RessurectRaidBoss extends Command
+{
     /**
      * The name and signature of the console command.
      *
@@ -29,7 +30,8 @@ class RessurectRaidBoss extends Command {
     /**
      * Execute the console command.
      */
-    public function handle(UpdateRaidMonsters $updateRaidMonsters) {
+    public function handle(UpdateRaidMonsters $updateRaidMonsters)
+    {
 
         $events = Event::whereNotNull('raid_id')->get();
 
@@ -46,8 +48,8 @@ class RessurectRaidBoss extends Command {
 
             event(new GlobalMessageEvent('"Death has come for you child! I shall have my revenge!!"', 'raid-global-message'));
 
-            event(new GlobalMessageEvent('Location: ' . $locationOfRaidBoss->name . ' At (X/Y): ' . $locationOfRaidBoss->x .
-                '/' . $locationOfRaidBoss->y . ' on plane: ' . $locationOfRaidBoss->map->name . ' has become over run! The Raid boss: ' . $event->raid->raidBoss->name .
+            event(new GlobalMessageEvent('Location: '.$locationOfRaidBoss->name.' At (X/Y): '.$locationOfRaidBoss->x.
+                '/'.$locationOfRaidBoss->y.' on plane: '.$locationOfRaidBoss->map->name.' has become over run! The Raid boss: '.$event->raid->raidBoss->name.
                 ' has set up shop!'));
 
             $corruptedLocationIds = $event->raid->corrupted_location_ids;
@@ -56,17 +58,17 @@ class RessurectRaidBoss extends Command {
 
             $corruptedLocations = Location::whereIn('id', $corruptedLocationIds)->get();
 
-             foreach ($corruptedLocations as $location) {
-                 $characters = Character::leftJoin('maps', 'characters.id', '=', 'maps.character_id')
-                                        ->where('maps.character_position_x', $location->x)
-                                        ->where('maps.character_position_y', $location->y)
-                                        ->where('maps.game_map_id', $location->game_map_id)
-                                        ->get();
+            foreach ($corruptedLocations as $location) {
+                $characters = Character::leftJoin('maps', 'characters.id', '=', 'maps.character_id')
+                    ->where('maps.character_position_x', $location->x)
+                    ->where('maps.character_position_y', $location->y)
+                    ->where('maps.game_map_id', $location->game_map_id)
+                    ->get();
 
-                 foreach ($characters as $character) {
-                     $updateRaidMonsters->updateMonstersForRaidLocations($character, $location);
-                 }
-             }
+                foreach ($characters as $character) {
+                    $updateRaidMonsters->updateMonstersForRaidLocations($character, $location);
+                }
+            }
         }
     }
 }

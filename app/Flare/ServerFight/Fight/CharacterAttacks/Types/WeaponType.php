@@ -4,14 +4,16 @@ namespace App\Flare\ServerFight\Fight\CharacterAttacks\Types;
 
 use App\Flare\Models\Character;
 use App\Flare\ServerFight\BattleBase;
+use App\Flare\ServerFight\Fight\Attack;
 use App\Flare\ServerFight\Fight\CanHit;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks;
 use App\Flare\ServerFight\Fight\Entrance;
 use App\Flare\ServerFight\Monster\ServerMonster;
+use App\Flare\Values\AttackTypeValue;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 
-class WeaponType extends BattleBase {
-
+class WeaponType extends BattleBase
+{
     private Entrance $entrance;
 
     private CanHit $canHit;
@@ -20,34 +22,50 @@ class WeaponType extends BattleBase {
 
     private bool $canEntrance = false;
 
-    public function __construct(CharacterCacheData $characterCacheData, Entrance $entrance, CanHit $canHit, SpecialAttacks $specialAttacks) {
+    public function __construct(CharacterCacheData $characterCacheData, Entrance $entrance, CanHit $canHit, SpecialAttacks $specialAttacks)
+    {
         parent::__construct($characterCacheData);
 
-        $this->entrance           = $entrance;
-        $this->canHit             = $canHit;
-        $this->specialAttacks     = $specialAttacks;
+        $this->entrance = $entrance;
+        $this->canHit = $canHit;
+        $this->specialAttacks = $specialAttacks;
     }
 
-    public function setCharacterAttackData(Character $character, bool $isVoided, string $type): WeaponType {
+    public function setCharacterAttackData(Character $character, bool $isVoided, string $type): WeaponType
+    {
 
-        $attackType = $isVoided ? 'voided_' . $type : $type;
+        $voidedTypes = [
+            AttackTypeValue::VOIDED_ATTACK,
+            AttackTypeValue::VOIDED_CAST,
+            AttackTypeValue::VOIDED_ATTACK_AND_CAST,
+            AttackTypeValue::VOIDED_CAST_AND_ATTACK,
+            AttackTypeValue::VOIDED_DEFEND,
+        ];
+
+        if ($isVoided && !in_array($type, $voidedTypes)) {
+            $attackType = 'voided_'.$type;
+        } else {
+            $attackType = $type;
+        }
 
         $this->attackData = $this->characterCacheData->getDataFromAttackCache($character, $attackType);
-        $this->isVoided   = $isVoided;
+        $this->isVoided = $isVoided;
 
         return $this;
     }
 
-    public function setAllowEntrancing(bool $allowEntrance): WeaponType {
+    public function setAllowEntrancing(bool $allowEntrance): WeaponType
+    {
         $this->canEntrance = $allowEntrance;
 
         return $this;
     }
 
-    public function doPvpWeaponAttack(Character $attacker, Character $defender): WeaponType {
+    public function doPvpWeaponAttack(Character $attacker, Character $defender): WeaponType
+    {
         $weaponDamage = $this->attackData['weapon_damage'];
 
-        if (!$this->isEnemyEntranced) {
+        if (! $this->isEnemyEntranced) {
             $this->doPvpEntrance($attacker, $this->entrance);
 
             if ($this->isEnemyEntranced) {
@@ -55,7 +73,7 @@ class WeaponType extends BattleBase {
 
                 return $this;
             }
-        } else if ($this->isEnemyEntranced) {
+        } elseif ($this->isEnemyEntranced) {
             $this->pvpWeaponAttack($attacker, $defender, $weaponDamage);
 
             return $this;
@@ -85,10 +103,11 @@ class WeaponType extends BattleBase {
         return $this;
     }
 
-    public function doWeaponAttack(Character $character, ServerMonster $serverMonster): WeaponType {
+    public function doWeaponAttack(Character $character, ServerMonster $serverMonster): WeaponType
+    {
         $weaponDamage = $this->attackData['weapon_damage'];
 
-        if (!$this->isEnemyEntranced && $this->canEntrance) {
+        if (! $this->isEnemyEntranced && $this->canEntrance) {
             $this->doEnemyEntrance($character, $serverMonster, $this->entrance);
         }
 
@@ -124,29 +143,33 @@ class WeaponType extends BattleBase {
         return $this;
     }
 
-    protected function dealSecondaryAttackDamage(Character $character, ServerMonster $serverMonster = null): void {
-        if ($this->allowSecondaryAttacks  && !$this->abortCharacterIsDead) {
+    protected function dealSecondaryAttackDamage(Character $character, ?ServerMonster $serverMonster = null): void
+    {
+        if ($this->allowSecondaryAttacks && ! $this->abortCharacterIsDead) {
             $this->secondaryAttack($character, $serverMonster);
         }
     }
 
-    public function resetMessages() {
+    public function resetMessages()
+    {
         $this->clearMessages();
         $this->entrance->clearMessages();
     }
 
-    public function pvpWeaponAttack(Character $attacker, Character $defender, int $weaponDamage) {
+    public function pvpWeaponAttack(Character $attacker, Character $defender, int $weaponDamage)
+    {
         $this->pvpWeaponDamage($attacker, $defender, $weaponDamage);
 
-        if ($this->allowSecondaryAttacks && !$this->abortCharacterIsDead) {
+        if ($this->allowSecondaryAttacks && ! $this->abortCharacterIsDead) {
             $this->secondaryAttack($attacker, null, $this->characterCacheData->getCachedCharacterData($defender, 'affix_damage_reduction'), true);
         }
     }
 
-    public function weaponAttack(Character $character, ServerMonster $monster, int $weaponDamage) {
+    public function weaponAttack(Character $character, ServerMonster $monster, int $weaponDamage)
+    {
         $this->weaponDamage($character, $monster->getName(), $weaponDamage);
 
-        if (!$this->isEnemyEntranced) {
+        if (! $this->isEnemyEntranced) {
             $this->doMonsterCounter($character, $monster);
         }
 
@@ -159,15 +182,16 @@ class WeaponType extends BattleBase {
         $this->dealSecondaryAttackDamage($character, $monster);
     }
 
-    public function pvpWeaponDamage(Character $attacker, Character $defender, int $weaponDamage) {
+    public function pvpWeaponDamage(Character $attacker, Character $defender, int $weaponDamage)
+    {
         $weaponDamage = $this->getCriticalityDamage($attacker, $weaponDamage);
 
         $totalDamage = $weaponDamage - $weaponDamage * $this->attackData['damage_deduction'];
 
         $this->monsterHealth -= $totalDamage;
 
-        $this->addAttackerMessage('Your weapon slices at the enemies flesh for: ' . number_format($totalDamage), 'player-action');
-        $this->addDefenderMessage($attacker->name . ' strikes you with their weapon for: ' . number_format($totalDamage), 'enemy-action');
+        $this->addAttackerMessage('Your weapon slices at the enemies flesh for: '.number_format($totalDamage), 'player-action');
+        $this->addDefenderMessage($attacker->name.' strikes you with their weapon for: '.number_format($totalDamage), 'enemy-action');
 
         $this->pvpCounter($attacker, $defender);
 
@@ -181,19 +205,20 @@ class WeaponType extends BattleBase {
         }
 
         $this->specialAttacks->setCharacterHealth($this->characterHealth)
-                             ->setMonsterHealth($this->monsterHealth)
-                             ->doWeaponSpecials($attacker, $this->attackData, true);
+            ->setMonsterHealth($this->monsterHealth)
+            ->doWeaponSpecials($attacker, $this->attackData, true);
 
         $this->mergeAttackerMessages($this->specialAttacks->getAttackerMessages());
         $this->mergeDefenderMessages($this->specialAttacks->getDefenderMessages());
 
         $this->characterHealth = $this->specialAttacks->getCharacterHealth();
-        $this->monsterHealth   = $this->specialAttacks->getMonsterHealth();
+        $this->monsterHealth = $this->specialAttacks->getMonsterHealth();
 
         $this->specialAttacks->clearMessages();
     }
 
-    public function weaponDamage(Character $character, string $monsterName, int $weaponDamage) {
+    public function weaponDamage(Character $character, string $monsterName, int $weaponDamage)
+    {
 
         $weaponDamage = $this->getCriticalityDamage($character, $weaponDamage);
 
@@ -201,21 +226,22 @@ class WeaponType extends BattleBase {
 
         $this->monsterHealth -= $totalDamage;
 
-        $this->addMessage('Your weapon hits ' . $monsterName . ' for: ' . number_format($totalDamage), 'player-action');
+        $this->addMessage('Your weapon hits '.$monsterName.' for: '.number_format($totalDamage), 'player-action');
 
         $this->specialAttacks->setCharacterHealth($this->characterHealth)
-                             ->setMonsterHealth($this->monsterHealth)
-                             ->doWeaponSpecials($character, $this->attackData);
+            ->setMonsterHealth($this->monsterHealth)
+            ->doWeaponSpecials($character, $this->attackData);
 
         $this->mergeMessages($this->specialAttacks->getMessages());
 
         $this->characterHealth = $this->specialAttacks->getCharacterHealth();
-        $this->monsterHealth   = $this->specialAttacks->getMonsterHealth();
+        $this->monsterHealth = $this->specialAttacks->getMonsterHealth();
 
         $this->specialAttacks->clearMessages();
     }
 
-    protected function getCriticalityDamage(Character $character, int $weaponDamage) {
+    protected function getCriticalityDamage(Character $character, int $weaponDamage)
+    {
         $criticality = $this->characterCacheData->getCachedCharacterData($character, 'skills')['criticality'];
 
         if (rand(1, 100) > (100 - 100 * $criticality)) {

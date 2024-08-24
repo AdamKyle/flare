@@ -3,7 +3,7 @@
 <title>{{ $title }}</title>
 
 <!-- PWA Manifest -->
-<link rel="manifest" href="/manifest.json">
+<link rel="manifest" href={{asset("manifest.json")}}>
 
 <!-- Favicon and App Icons -->
 <link rel="icon" type="image/png" sizes="192x192" href="/pwa-images/tlessa-icons/tlessa-icon-192.png">

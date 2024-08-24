@@ -2,15 +2,11 @@
 
 namespace App\Flare\Models;
 
-use App\Game\Events\Values\EventType;
-use App\Flare\Values\ItemSpecialtyType;
-use Database\Factories\GlobalEventGoalFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class GlobalEventCraftingInventorySlot extends Model {
-
+class GlobalEventCraftingInventorySlot extends Model
+{
     use HasFactory;
 
     /**
@@ -29,18 +25,19 @@ class GlobalEventCraftingInventorySlot extends Model {
      * @var array
      */
     protected $casts = [
-        'global_event_id'  => 'integer',
-        'character_id'     => 'integer',
+        'global_event_id' => 'integer',
+        'character_id' => 'integer',
     ];
 
-    public function item() {
+    public function item()
+    {
         return $this->hasOne(Item::class, 'id', 'item_id');
     }
 
-    public function inventory() {
+    public function inventory()
+    {
         return $this->belongsTo(GlobalEventCraftingInventory::class, 'global_event_crafting_inventory_id', 'id');
     }
 
-    protected static function newFactory() {
-    }
+    protected static function newFactory() {}
 }

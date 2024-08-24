@@ -2,8 +2,8 @@
 
 namespace Database\Factories;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Flare\Models\Map;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 class MapFactory extends Factory
 {
@@ -22,9 +22,9 @@ class MapFactory extends Factory
     public function definition()
     {
         return [
-            'character_id'         => 1,
-            'position_x'           => 0,
-            'position_y'           => 0,
+            'character_id' => 1,
+            'position_x' => 0,
+            'position_y' => 0,
             'character_position_x' => 32,
             'character_position_y' => 32,
         ];

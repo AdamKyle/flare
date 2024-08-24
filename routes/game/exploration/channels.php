@@ -1,4 +1,3 @@
-
 <?php
 
 // When the automation attack timer is called upon
@@ -27,6 +26,6 @@ Broadcast::channel('automations-list-{userId}', function ($user, $userId) {
 });
 
 // when the exploration log updates.
-Broadcast::channel('exploration-log-update-{userId}', function($user, $userId) {
+Broadcast::channel('exploration-log-update-{userId}', function ($user, $userId) {
     return $user->id === (int) $userId;
 });

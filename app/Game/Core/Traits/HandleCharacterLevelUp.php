@@ -2,7 +2,6 @@
 
 namespace App\Game\Core\Traits;
 
-
 use App\Flare\Models\Character;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Game\Character\Builders\AttackBuilders\Jobs\CharacterAttackTypesCacheBuilder;
@@ -12,16 +11,13 @@ use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
 
-
-Trait HandleCharacterLevelUp {
-
+trait HandleCharacterLevelUp
+{
     /**
      * Handle possible level up.
-     *
-     * @param Character $character
-     * @return Character
      */
-    public function handlePossibleLevelUp(Character $character): Character {
+    public function handlePossibleLevelUp(Character $character): Character
+    {
         if ($character->xp >= $character->xp_next) {
             $leftOverXP = $character->xp - $character->xp_next;
 
@@ -30,7 +26,7 @@ Trait HandleCharacterLevelUp {
             }
 
             if ($leftOverXP <= 0) {
-                $this->handleCharacterLevelUp($character,0);
+                $this->handleCharacterLevelUp($character, 0);
             }
         }
 
@@ -39,12 +35,9 @@ Trait HandleCharacterLevelUp {
 
     /**
      * Handle instances where we could have multiple level ups.
-     *
-     * @param Character $character
-     * @param int $leftOverXP
-     * @return Character
      */
-    public function handleLevelUps(Character $character, int $leftOverXP): Character {
+    public function handleLevelUps(Character $character, int $leftOverXP): Character
+    {
         $this->handleCharacterLevelUp($character, $leftOverXP);
 
         if ($leftOverXP >= $character->xp_next) {
@@ -55,13 +48,13 @@ Trait HandleCharacterLevelUp {
             }
 
             if ($leftOverXP <= 0) {
-                $this->handleLevelUps($character,0);
+                $this->handleLevelUps($character, 0);
             }
         }
 
         if ($leftOverXP < $character->xp_next) {
             $character->update([
-                'xp' => $leftOverXP
+                'xp' => $leftOverXP,
             ]);
         }
 
@@ -70,12 +63,9 @@ Trait HandleCharacterLevelUp {
 
     /**
      * Handle character level up.
-     *
-     * @param Character $character
-     * @param int $leftOverXP
-     * @return Character
      */
-    protected function handleCharacterLevelUp(Character $character, int $leftOverXP): Character {
+    protected function handleCharacterLevelUp(Character $character, int $leftOverXP): Character
+    {
         resolve(CharacterService::class)->levelUpCharacter($character, $leftOverXP);
 
         $character = $character->refresh();
@@ -84,7 +74,6 @@ Trait HandleCharacterLevelUp {
 
         $this->updateCharacterStats($character);
 
-
         ServerMessageHandler::handleMessage($character->user, 'level_up', $character->level);
 
         return $character;
@@ -92,11 +81,9 @@ Trait HandleCharacterLevelUp {
 
     /**
      * Update the character stats.
-     *
-     * @param Character $character
-     * @return void
      */
-    protected function updateCharacterStats(Character $character): void {
+    protected function updateCharacterStats(Character $character): void
+    {
         $characterData = new Item($character, resolve(CharacterSheetBaseInfoTransformer::class));
         $characterData = resolve(Manager::class)->createData($characterData)->toArray();
 

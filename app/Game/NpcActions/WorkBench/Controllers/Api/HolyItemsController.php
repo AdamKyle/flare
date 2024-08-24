@@ -3,23 +3,26 @@
 namespace App\Game\NpcActions\WorkBench\Controllers\Api;
 
 use App\Flare\Models\Character;
-use App\Http\Controllers\Controller;
-use App\Game\NpcActions\WorkBench\Services\HolyItemService;
 use App\Game\NpcActions\WorkBench\Requests\ApplyHolyOilRequest;
+use App\Game\NpcActions\WorkBench\Services\HolyItemService;
+use App\Http\Controllers\Controller;
 
-class HolyItemsController extends Controller {
-
+class HolyItemsController extends Controller
+{
     private $holyItemService;
 
-    public function __construct(HolyItemService $holyItemService) {
+    public function __construct(HolyItemService $holyItemService)
+    {
         $this->holyItemService = $holyItemService;
     }
 
-    public function index(Character $character) {
+    public function index(Character $character)
+    {
         return response()->json($this->holyItemService->fetchSmithingItems($character));
     }
 
-    public function apply(ApplyHolyOilRequest $request, Character $character) {
+    public function apply(ApplyHolyOilRequest $request, Character $character)
+    {
 
         $response = $this->holyItemService->applyOil($character, $request->all());
 

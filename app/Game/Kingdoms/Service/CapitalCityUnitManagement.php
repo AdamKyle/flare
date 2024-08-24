@@ -19,8 +19,8 @@ use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
 use Carbon\Carbon;
 use Facades\App\Game\Kingdoms\Validation\ResourceValidation;
 
-class CapitalCityUnitManagement {
-
+class CapitalCityUnitManagement
+{
     use ResponseBuilder;
 
     const MAX_DAYS = 7;
@@ -28,24 +28,24 @@ class CapitalCityUnitManagement {
     private array $messages = [];
 
     public function __construct(private readonly UnitService $unitService,
-                                private readonly UnitMovementService $unitMovementService,
-                                private readonly ResourceTransferService $resourceTransferService,
-                                private readonly UpdateKingdom $updateKingdom) {}
+        private readonly UnitMovementService $unitMovementService,
+        private readonly ResourceTransferService $resourceTransferService,
+        private readonly UpdateKingdom $updateKingdom) {}
 
-
-    public function createUnitRequests(Character $character, Kingdom $kingdom, array $requestData): array {
+    public function createUnitRequests(Character $character, Kingdom $kingdom, array $requestData): array
+    {
         foreach ($requestData as $data) {
 
-            $toKingdom     = $character->kingdoms->find($data['kingdom_id']);
+            $toKingdom = $character->kingdoms->find($data['kingdom_id']);
 
-            $time          = $this->unitMovementService->determineTimeRequired($character, $toKingdom, $kingdom->id, PassiveSkillTypeValue::CAPITAL_CITY_REQUEST_UNIT_TRAVEL_TIME_REDUCTION);
+            $time = $this->unitMovementService->determineTimeRequired($character, $toKingdom, $kingdom->id, PassiveSkillTypeValue::CAPITAL_CITY_REQUEST_UNIT_TRAVEL_TIME_REDUCTION);
 
-            $minutes       = now()->addMinutes($time);
+            $minutes = now()->addMinutes($time);
 
             $queueData = [
                 'requested_kingdom' => $kingdom->id,
                 'character_id' => $character->id,
-                'kingdom_id'   => $data['kingdom_id'],
+                'kingdom_id' => $data['kingdom_id'],
                 'status' => CapitalCityQueueStatus::TRAVELING,
                 'messages' => null,
                 'started_at' => now(),
@@ -54,7 +54,7 @@ class CapitalCityUnitManagement {
 
             $unitRequests = [];
 
-            foreach($data['unit_requests'] as $unitRequest) {
+            foreach ($data['unit_requests'] as $unitRequest) {
                 $unit = GameUnit::where('name', $unitRequest['unit_name'])->first();
 
                 $unitRequests[] = [
@@ -79,11 +79,12 @@ class CapitalCityUnitManagement {
         return $this->successResult([
             'message' => 'Units requests have been queued up and sent off. If you close this modal you should now see
             a Unit Queue tab which will show you the progress of your requests. Kingdom logs will be generated
-            foreach kingdom to details what was or was not recruited.'
+            foreach kingdom to details what was or was not recruited.',
         ]);
     }
 
-    public function processUnitRequest(CapitalCityUnitQueue $capitalCityUnitQueue): void {
+    public function processUnitRequest(CapitalCityUnitQueue $capitalCityUnitQueue): void
+    {
         $unitRequests = $capitalCityUnitQueue->unit_request_data;
         $character = $capitalCityUnitQueue->character;
         $kingdom = $capitalCityUnitQueue->kingdom;
@@ -97,7 +98,7 @@ class CapitalCityUnitManagement {
             if ($building->is_locked) {
                 $unitRequests[$index]['secondary_status'] = CapitalCityQueueStatus::REJECTED;
 
-                $this->messages[] = 'Building is locked in ' . $kingdom->name . '. You need to unlock the building: ' . $building->name . ' first by leveling a passive of the same name to level 1.';
+                $this->messages[] = 'Building is locked in '.$kingdom->name.'. You need to unlock the building: '.$building->name.' first by leveling a passive of the same name to level 1.';
 
                 continue;
             }
@@ -105,7 +106,7 @@ class CapitalCityUnitManagement {
             if ($building->level < $gameBuildingRelation->required_level) {
                 $unitRequests[$index]['secondary_status'] = CapitalCityQueueStatus::REJECTED;
 
-                $this->messages[] = 'Building is under level in ' . $kingdom->name . '. You need to level the building: ' . $building->name . ' to level: ' . $gameBuildingRelation->required_level . ' first.';
+                $this->messages[] = 'Building is under level in '.$kingdom->name.'. You need to level the building: '.$building->name.' to level: '.$gameBuildingRelation->required_level.' first.';
 
                 continue;
             }
@@ -114,7 +115,7 @@ class CapitalCityUnitManagement {
 
             $unitRequests[$index]['amount'] = $amount;
 
-            if (!$this->isTimeGreaterThanSevenDays($character, $kingdom, $gameUnit, $amount)) {
+            if (! $this->isTimeGreaterThanSevenDays($character, $kingdom, $gameUnit, $amount)) {
                 $unitRequests[$index]['secondary_status'] = CapitalCityQueueStatus::REJECTED;
 
                 continue;
@@ -122,7 +123,7 @@ class CapitalCityUnitManagement {
 
             if ($this->canAffordPopulationCost($kingdom, $gameUnit, $amount)) {
 
-                $this->messages[] = 'Cannot afford to purchase, through ' . $kingdom->name . ' treasury, the additional amount of population you need to recruit this many units.';
+                $this->messages[] = 'Cannot afford to purchase, through '.$kingdom->name.' treasury, the additional amount of population you need to recruit this many units.';
 
                 $unitRequests[$index]['secondary_status'] = CapitalCityQueueStatus::REJECTED;
 
@@ -145,7 +146,7 @@ class CapitalCityUnitManagement {
 
                         $result = $this->sendOffResourceRequest($character, $kingdom, $resourceName, $amount, $capitalCityUnitQueue->id, $gameUnit->id);
 
-                        if (!$result) {
+                        if (! $result) {
                             $unitRequests[$currentIndex]['secondary_status'] = CapitalCityQueueStatus::REJECTED;
 
                             break;
@@ -179,7 +180,8 @@ class CapitalCityUnitManagement {
 
     }
 
-    public function recruitUnits(CapitalCityUnitQueue $capitalCityUnitQueue): CapitalCityUnitQueue {
+    public function recruitUnits(CapitalCityUnitQueue $capitalCityUnitQueue): CapitalCityUnitQueue
+    {
         $unitRequests = $capitalCityUnitQueue->unit_request_data;
         $kingdom = $capitalCityUnitQueue->kingdom;
 
@@ -191,8 +193,8 @@ class CapitalCityUnitManagement {
 
                 $purchased = $this->purchasePeopleForRecruitment($kingdom, $gameUnit, $unitRequest['amount']);
 
-                if (!$purchased) {
-                    $this->messages[] = 'Cannot recruit: ' . number_format($unitRequest['amount']) . ' units from ' . $kingdom->name . ' as you do not have have enough treasury to purchase the needed population.';
+                if (! $purchased) {
+                    $this->messages[] = 'Cannot recruit: '.number_format($unitRequest['amount']).' units from '.$kingdom->name.' as you do not have have enough treasury to purchase the needed population.';
 
                     $unitRequests[$index]['secondary_status'] = CapitalCityQueueStatus::REJECTED;
 
@@ -213,14 +215,15 @@ class CapitalCityUnitManagement {
         return $capitalCityUnitQueue->refresh();
     }
 
-    public function possiblyCreateKingdomLog(CapitalCityUnitQueue $capitalCityUnitQueue): void {
+    public function possiblyCreateKingdomLog(CapitalCityUnitQueue $capitalCityUnitQueue): void
+    {
         $requestData = $capitalCityUnitQueue->unit_request_data;
         $kingdom = $capitalCityUnitQueue->kingdom;
         $character = $capitalCityUnitQueue->character;
 
         $unitData = [];
 
-        foreach($requestData as $data) {
+        foreach ($requestData as $data) {
             if ($data['secondary_status'] === CapitalCityQueueStatus::REJECTED ||
                 $data['secondary_status'] === CapitalCityQueueStatus::FINISHED ||
                 $data['secondary_status'] === CapitalCityQueueStatus::CANCELLED
@@ -266,7 +269,8 @@ class CapitalCityUnitManagement {
         }
     }
 
-    private function purchasePeopleForRecruitment(Kingdom $kingdom, GameUnit $gameUnit, int $amount): bool {
+    private function purchasePeopleForRecruitment(Kingdom $kingdom, GameUnit $gameUnit, int $amount): bool
+    {
         $populationCost = $amount * (new UnitCosts(UnitCosts::PERSON))->fetchCost();
 
         if ($kingdom->treasury <= 0) {
@@ -282,16 +286,17 @@ class CapitalCityUnitManagement {
         return true;
     }
 
-    private function sendOffResourceRequest(Character $character, Kingdom $kingdom, string $resourceName, int $resourceAmount, int $queueId, int $unitId): bool {
+    private function sendOffResourceRequest(Character $character, Kingdom $kingdom, string $resourceName, int $resourceAmount, int $queueId, int $unitId): bool
+    {
         $kingdom = $character->kingdoms()
             ->where('game_map_id', $kingdom->game_map_id)
             ->where('id', '!=', $kingdom->id)
-            ->where('current_' . $resourceName, '>=', $resourceAmount)
+            ->where('current_'.$resourceName, '>=', $resourceAmount)
             ->first();
 
         if (is_null($kingdom)) {
 
-            $this->messages[] = 'No kingdom found to request the amount '.number_format($resourceAmount). ' of ' . $resourceName . '.';
+            $this->messages[] = 'No kingdom found to request the amount '.number_format($resourceAmount).' of '.$resourceName.'.';
 
             return false;
         }
@@ -314,7 +319,8 @@ class CapitalCityUnitManagement {
         return true;
     }
 
-    private function updateAmount(Kingdom $kingdom, GameUnit $gameUnit, int $amount): int {
+    private function updateAmount(Kingdom $kingdom, GameUnit $gameUnit, int $amount): int
+    {
 
         $unit = $kingdom->units()->where('game_unit_id', $gameUnit)->first();
 
@@ -327,7 +333,7 @@ class CapitalCityUnitManagement {
         if ($newAmount > KingdomMaxValue::MAX_UNIT) {
             $reduceAmount = $newAmount - KingdomMaxValue::MAX_UNIT;
 
-            $this->messages[] = 'The amount of ' . $gameUnit->name . ' ('.number_format($amount).') has been reduced by: ' . number_format($reduceAmount) . ' due to being close to max amount allowed for this unit.';
+            $this->messages[] = 'The amount of '.$gameUnit->name.' ('.number_format($amount).') has been reduced by: '.number_format($reduceAmount).' due to being close to max amount allowed for this unit.';
 
             return $amount - $reduceAmount;
         }
@@ -335,11 +341,12 @@ class CapitalCityUnitManagement {
         return $amount;
     }
 
-    private function isTimeGreaterThanSevenDays(Character $character, Kingdom $kingdom, GameUnit $gameUnit, int $amount): bool {
+    private function isTimeGreaterThanSevenDays(Character $character, Kingdom $kingdom, GameUnit $gameUnit, int $amount): bool
+    {
         $timeTillDone = $this->getTimeForRecruitment($character, $gameUnit, $amount);
 
         if (now()->diffInDays($timeTillDone) > self::MAX_DAYS) {
-            $this->messages[] = $gameUnit->name . ' for kingdom: ' . $kingdom->name . ' would take longer then 7 (Real World) Days. The kingdom has rejected this recruitment order. If you want this amount of units, you must recruit it from the kingdom it\'s self.';
+            $this->messages[] = $gameUnit->name.' for kingdom: '.$kingdom->name.' would take longer then 7 (Real World) Days. The kingdom has rejected this recruitment order. If you want this amount of units, you must recruit it from the kingdom it\'s self.';
 
             return false;
         }
@@ -347,7 +354,8 @@ class CapitalCityUnitManagement {
         return true;
     }
 
-    private function canAffordPopulationCost(Kingdom $kingdom, GameUnit $gameUnit, int $amount): bool {
+    private function canAffordPopulationCost(Kingdom $kingdom, GameUnit $gameUnit, int $amount): bool
+    {
 
         $treasury = $kingdom->treasury;
         $populationRequired = $amount * $gameUnit->required_population;
@@ -362,7 +370,8 @@ class CapitalCityUnitManagement {
         return true;
     }
 
-    private function getPopulationNeededToPurchase(Kingdom $kingdom, int $populationRequired): int {
+    private function getPopulationNeededToPurchase(Kingdom $kingdom, int $populationRequired): int
+    {
         if ($populationRequired > $kingdom->current_population) {
             return $populationRequired - $kingdom->current_population;
         }
@@ -370,9 +379,10 @@ class CapitalCityUnitManagement {
         return 0;
     }
 
-    private function getTimeForRecruitment(Character $character, GameUnit $gameUnit, int $amount): Carbon {
-        $totalTime        = $gameUnit->time_to_recruit * $amount;
-        $totalTime        = $totalTime - $totalTime * $this->unitService->fetchTimeReduction($character)->unit_time_reduction;
+    private function getTimeForRecruitment(Character $character, GameUnit $gameUnit, int $amount): Carbon
+    {
+        $totalTime = $gameUnit->time_to_recruit * $amount;
+        $totalTime = $totalTime - $totalTime * $this->unitService->fetchTimeReduction($character)->unit_time_reduction;
 
         return now()->addSeconds($totalTime);
     }

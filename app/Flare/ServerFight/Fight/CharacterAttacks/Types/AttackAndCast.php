@@ -13,7 +13,6 @@ use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 
 class AttackAndCast extends BattleBase
 {
-
     private Entrance $entrance;
 
     private CanHit $canHit;
@@ -25,36 +24,38 @@ class AttackAndCast extends BattleBase
     private CastType $castType;
 
     public function __construct(CharacterCacheData $characterCacheData,
-                                Entrance $entrance,
-                                CanHit $canHit,
-                                SecondaryAttacks $secondaryAttacks,
-                                WeaponType $weaponType,
-                                CastType $castType)
+        Entrance $entrance,
+        CanHit $canHit,
+        SecondaryAttacks $secondaryAttacks,
+        WeaponType $weaponType,
+        CastType $castType)
     {
         parent::__construct($characterCacheData);
 
-        $this->entrance              = $entrance;
-        $this->canHit                = $canHit;
-        $this->secondaryAttacks      = $secondaryAttacks;
-        $this->weaponType            = $weaponType;
-        $this->castType              = $castType;
+        $this->entrance = $entrance;
+        $this->canHit = $canHit;
+        $this->secondaryAttacks = $secondaryAttacks;
+        $this->weaponType = $weaponType;
+        $this->castType = $castType;
     }
 
-    public function setCharacterAttackData(Character $character, bool $isVoided): AttackAndCast {
+    public function setCharacterAttackData(Character $character, bool $isVoided): AttackAndCast
+    {
 
         $this->attackData = $this->characterCacheData->getDataFromAttackCache($character, $isVoided ? 'voided_attack_and_cast' : 'attack_and_cast');
-        $this->isVoided   = $isVoided;
+        $this->isVoided = $isVoided;
 
         return $this;
     }
 
-
-    public function resetMessages() {
+    public function resetMessages()
+    {
         $this->clearMessages();
         $this->entrance->clearMessages();
     }
 
-    public function handlePvpAttack(Character $attacker, Character $defender) {
+    public function handlePvpAttack(Character $attacker, Character $defender)
+    {
 
         $this->handlePvpWeaponAttack($attacker, $defender);
         $this->handlePvpCastAttack($attacker, $defender);
@@ -64,14 +65,15 @@ class AttackAndCast extends BattleBase
         return $this;
     }
 
-    public function handleAttack(Character $character, ServerMonster $monster) {
+    public function handleAttack(Character $character, ServerMonster $monster)
+    {
         $this->handleWeaponAttack($character, $monster, false);
 
         if ($this->characterHealth <= 0) {
             return $this;
         }
 
-        $this->handleCastAttack($character, $monster,);
+        $this->handleCastAttack($character, $monster);
 
         if ($this->characterHealth <= 0) {
             return $this;
@@ -80,7 +82,8 @@ class AttackAndCast extends BattleBase
         return $this;
     }
 
-    protected function handlePvpWeaponAttack(Character $attacker, Character $defender) {
+    protected function handlePvpWeaponAttack(Character $attacker, Character $defender)
+    {
         $this->doPvpEntrance($attacker, $this->entrance);
 
         $this->weaponType->setMonsterHealth($this->monsterHealth);
@@ -95,7 +98,7 @@ class AttackAndCast extends BattleBase
         $this->weaponType->doPvpWeaponAttack($attacker, $defender);
 
         $this->characterHealth = $this->weaponType->getCharacterHealth();
-        $this->monsterHealth   = $this->weaponType->getMonsterHealth();
+        $this->monsterHealth = $this->weaponType->getMonsterHealth();
 
         $this->mergeAttackerMessages($this->weaponType->getAttackerMessages());
         $this->mergeDefenderMessages($this->weaponType->getDefenderMessages());
@@ -103,8 +106,9 @@ class AttackAndCast extends BattleBase
         $this->weaponType->resetMessages();
     }
 
-    protected function handleWeaponAttack(Character $character, ServerMonster $monster, bool $disableSecondaryAttacks = true) {
-        if (!$this->isEnemyEntranced) {
+    protected function handleWeaponAttack(Character $character, ServerMonster $monster, bool $disableSecondaryAttacks = true)
+    {
+        if (! $this->isEnemyEntranced) {
             $this->doEnemyEntrance($character, $monster, $this->entrance);
         }
 
@@ -125,12 +129,13 @@ class AttackAndCast extends BattleBase
         $this->mergeMessages($this->weaponType->getMessages());
 
         $this->characterHealth = $this->weaponType->getCharacterHealth();
-        $this->monsterHealth   = $this->weaponType->getMonsterHealth();
+        $this->monsterHealth = $this->weaponType->getMonsterHealth();
 
         $this->weaponType->resetMessages();
     }
 
-    protected function handlePvpCastAttack(Character $attacker, Character $defender) {
+    protected function handlePvpCastAttack(Character $attacker, Character $defender)
+    {
         $this->castType->setMonsterHealth($this->monsterHealth);
         $this->castType->setCharacterHealth($this->characterHealth);
         $this->castType->setCharacterAttackData($attacker, $this->isVoided, AttackTypeValue::ATTACK_AND_CAST);
@@ -140,7 +145,7 @@ class AttackAndCast extends BattleBase
         $this->mergeMessages($this->castType->getMessages());
 
         $this->characterHealth = $this->castType->getCharacterHealth();
-        $this->monsterHealth   = $this->castType->getMonsterHealth();
+        $this->monsterHealth = $this->castType->getMonsterHealth();
 
         $this->mergeAttackerMessages($this->castType->getAttackerMessages());
         $this->mergeDefenderMessages($this->castType->getDefenderMessages());
@@ -148,9 +153,10 @@ class AttackAndCast extends BattleBase
         $this->castType->resetMessages();
     }
 
-    protected function handleCastAttack(Character $character, ServerMonster $monster, bool $disableSecondaryAttacks = true) {
+    protected function handleCastAttack(Character $character, ServerMonster $monster, bool $disableSecondaryAttacks = true)
+    {
 
-        if (!$this->isEnemyEntranced) {
+        if (! $this->isEnemyEntranced) {
             $this->doEnemyEntrance($character, $monster, $this->entrance);
         }
 
@@ -171,7 +177,7 @@ class AttackAndCast extends BattleBase
         $this->mergeMessages($this->castType->getMessages());
 
         $this->characterHealth = $this->castType->getCharacterHealth();
-        $this->monsterHealth   = $this->castType->getMonsterHealth();
+        $this->monsterHealth = $this->castType->getMonsterHealth();
 
         $this->castType->resetMessages();
     }

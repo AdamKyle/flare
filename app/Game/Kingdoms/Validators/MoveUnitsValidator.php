@@ -5,19 +5,12 @@ namespace App\Game\Kingdoms\Validators;
 use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
 
-class MoveUnitsValidator {
-
-
-    /**
-     * @var array $unitsToMove
-     */
+class MoveUnitsValidator
+{
     private array $unitsToMove;
 
-    /**
-     * @param array $unitsToMove
-     * @return MoveUnitsValidator
-     */
-    public function setUnitsToMove(array $unitsToMove): MoveUnitsValidator {
+    public function setUnitsToMove(array $unitsToMove): MoveUnitsValidator
+    {
         $this->unitsToMove = $unitsToMove;
 
         return $this;
@@ -30,12 +23,9 @@ class MoveUnitsValidator {
      * - Make sure the two kingdoms, to go to and to go from, are on the same plane.
      * - Make sure those kingdoms own the units.
      * - Make sure the amount of units does not exceed what they have on hand.
-     *
-     * @param Character $character
-     * @param Kingdom $kingdomToMoveTo
-     * @return bool
      */
-    public function isValid(Character $character, Kingdom $kingdomToMoveTo): bool {
+    public function isValid(Character $character, Kingdom $kingdomToMoveTo): bool
+    {
         foreach ($this->unitsToMove as $unitsToMove) {
             $kingdom = $character->kingdoms()->find($unitsToMove['kingdom_id']);
 

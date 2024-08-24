@@ -2,8 +2,8 @@
 
 namespace Database\Factories;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Flare\Models\Notification;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 class NotificationFactory extends Factory
 {
@@ -23,12 +23,12 @@ class NotificationFactory extends Factory
     {
         return [
             'character_id' => null,
-            'title'        => null,
-            'message'      => null,
-            'status'       => null,
-            'type'         => null,
-            'read'         => null,
-            'url'          => null,
+            'title' => null,
+            'message' => null,
+            'status' => null,
+            'type' => null,
+            'read' => null,
+            'url' => null,
             'adventure_id' => null,
         ];
     }

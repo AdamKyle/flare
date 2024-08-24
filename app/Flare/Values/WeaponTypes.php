@@ -4,46 +4,50 @@ namespace App\Flare\Values;
 
 use Exception;
 
-class WeaponTypes {
-
-    /**
-     * @var string $value
-     */
+class WeaponTypes
+{
     private string $value;
 
     const WEAPON = 'weapon';
-    CONST STAVE  = 'stave';
-    const HAMMER = 'hammer';
-    const BOW    = 'bow';
-    const GUN    = 'gun';
-    const MACE   = 'mace';
-    const FAN    = 'fan';
-    const SCRATCH_AWL = 'scratch-awl';
-    const RING   = 'ring';
 
+    const STAVE = 'stave';
+
+    const HAMMER = 'hammer';
+
+    const BOW = 'bow';
+
+    const GUN = 'gun';
+
+    const MACE = 'mace';
+
+    const FAN = 'fan';
+
+    const SCRATCH_AWL = 'scratch-awl';
+
+    const RING = 'ring';
 
     /**
-     * @var string[] $values
+     * @var string[]
      */
     protected static array $values = [
         self::WEAPON => self::WEAPON,
-        self::STAVE  => self::STAVE,
+        self::STAVE => self::STAVE,
         self::HAMMER => self::HAMMER,
-        self::BOW    => self::BOW,
-        self::GUN    => self::GUN,
-        self::FAN    => self::FAN,
-        self::MACE   => self::MACE,
+        self::BOW => self::BOW,
+        self::GUN => self::GUN,
+        self::FAN => self::FAN,
+        self::MACE => self::MACE,
         self::SCRATCH_AWL => self::SCRATCH_AWL,
-        self::RING   => self::RING,
+        self::RING => self::RING,
     ];
 
     /**
-     * @param string $value
      * @throws Exception
      */
-    public function __construct(string $value) {
-        if (!in_array($value, self::$values)) {
-            throw new Exception($value . ' does not exist.');
+    public function __construct(string $value)
+    {
+        if (! in_array($value, self::$values)) {
+            throw new Exception($value.' does not exist.');
         }
 
         $this->value = $value;
@@ -51,11 +55,9 @@ class WeaponTypes {
 
     /**
      * is Valid Weapon?
-     *
-     * @param string $type
-     * @return bool
      */
-    public static function isWeaponType(string $type): bool {
+    public static function isWeaponType(string $type): bool
+    {
         return in_array($type, self::$values);
     }
 }

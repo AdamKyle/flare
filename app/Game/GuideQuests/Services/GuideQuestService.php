@@ -5,8 +5,8 @@ namespace App\Game\GuideQuests\Services;
 use App\Flare\Models\Character;
 use App\Flare\Models\Event;
 use App\Flare\Models\GuideQuest;
-use App\Flare\Values\AutomationType;
 use App\Flare\Models\QuestsCompleted;
+use App\Flare\Values\AutomationType;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\HandleCharacterLevelUp;
@@ -14,43 +14,61 @@ use App\Game\Events\Values\EventType;
 use App\Game\GuideQuests\Events\ShowGuideQuestCompletedToast;
 use App\Game\Messages\Events\ServerMessageEvent;
 
-class GuideQuestService {
-
+class GuideQuestService
+{
     use HandleCharacterLevelUp;
 
     private GuideQuestRequirementsService $guideQuestRequirementsService;
 
     private array $completedAttributes = [];
 
-    public function __construct(GuideQuestRequirementsService $guideQuestRequirementsService) {
+    public function __construct(GuideQuestRequirementsService $guideQuestRequirementsService)
+    {
         $this->guideQuestRequirementsService = $guideQuestRequirementsService;
     }
 
-    public function fetchQuestForCharacter(Character $character): array | null {
+    public function fetchQuestForCharacter(Character $character): ?array
+    {
 
-        $quest = $this->fetchNextGuideQuest($character);
+        $quests = $this->fetchNextGuideQuest($character);
 
-        if (is_null($quest)) {
+        if (is_null($quests)) {
             return null;
         }
 
-        $canHandIn = $this->canHandInQuest($character, $quest, true);
+        $canHandIn = [];
+        $completedAttributes = [];
+
+        foreach ($quests as $quest) {
+            $canHandInQuest = $this->canHandInQuest($character, $quest, true);
+
+            $canHandIn[] = [
+                'quest_id' => $quest->id,
+                'can_hand_in' => $canHandInQuest,
+            ];
+
+            $completedAttributes[] = [
+                'quest_id' => $quest->id,
+                'completed_requirements' => $this->completedAttributes,
+            ];
+        }
 
         return [
-            'quest' => $quest,
-            'completed_requirements' => $this->completedAttributes,
+            'quests' => $quests,
+            'completed_requirements' => $completedAttributes,
             'can_hand_in' => $canHandIn,
         ];
     }
 
-    public function handInQuest(Character $character, GuideQuest $quest): bool {
-        if (!$this->canHandInQuest($character, $quest)) {
+    public function handInQuest(Character $character, GuideQuest $quest): bool
+    {
+        if (! $this->canHandInQuest($character, $quest)) {
             return false;
         }
 
-        $gold      = $character->gold + $quest->gold_reward;
-        $goldDust  = $character->gold_dust + $quest->gold_dust_reward;
-        $shards    = $character->shards + $quest->shards_reward;
+        $gold = $character->gold + $quest->gold_reward;
+        $goldDust = $character->gold_dust + $quest->gold_dust_reward;
+        $shards = $character->shards + $quest->shards_reward;
 
         if ($gold >= MaxCurrenciesValue::MAX_GOLD) {
             $gold = MaxCurrenciesValue::MAX_GOLD;
@@ -65,24 +83,23 @@ class GuideQuestService {
         }
 
         if ($quest->gold_reward > 0) {
-            event(new ServerMessageEvent($character->user, 'Rewarded with: ' . number_format($quest->gold_reward) . ' Gold.'));
+            event(new ServerMessageEvent($character->user, 'Rewarded with: '.number_format($quest->gold_reward).' Gold.'));
         }
 
         if ($quest->gold_dust_reward > 0) {
-            event(new ServerMessageEvent($character->user, 'Rewarded with: ' . number_format($quest->gold_dust_reward) . ' Gold Dust.'));
+            event(new ServerMessageEvent($character->user, 'Rewarded with: '.number_format($quest->gold_dust_reward).' Gold Dust.'));
         }
 
         if ($quest->shards_reward > 0) {
-            event(new ServerMessageEvent($character->user, 'Rewarded with: ' . number_format($quest->shards_reward) . ' Shards.'));
+            event(new ServerMessageEvent($character->user, 'Rewarded with: '.number_format($quest->shards_reward).' Shards.'));
         }
-
 
         $character = $this->giveXP($character, $quest);
 
         $character->update([
-            'gold'      => $gold,
+            'gold' => $gold,
             'gold_dust' => $goldDust,
-            'shards'    => $shards,
+            'shards' => $shards,
         ]);
 
         QuestsCompleted::create([
@@ -99,37 +116,39 @@ class GuideQuestService {
         return true;
     }
 
-    public function giveXP(Character $character, GuideQuest $guideQuest): Character {
+    public function giveXP(Character $character, GuideQuest $guideQuest): Character
+    {
 
         if ($guideQuest->xp_reward <= 0) {
             return $character;
         }
 
         $character->update([
-            'xp' => $character->xp + $guideQuest->xp_reward
+            'xp' => $character->xp + $guideQuest->xp_reward,
         ]);
 
         $character = $character->refresh();
 
         $this->handlePossibleLevelUp($character);
 
-        event(new ServerMessageEvent($character->user, 'Rewarded with: ' . number_format($guideQuest->xp_reward) . ' XP.'));
+        event(new ServerMessageEvent($character->user, 'Rewarded with: '.number_format($guideQuest->xp_reward).' XP.'));
 
         return $character;
     }
 
-    public function canHandInQuest(Character $character, GuideQuest $quest, bool $ignoreAutomation = false): bool {
+    public function canHandInQuest(Character $character, GuideQuest $quest, bool $ignoreAutomation = false): bool
+    {
 
         $this->completedAttributes = [];
 
         $alreadyCompleted = $character->questsCompleted()->where('guide_quest_id', $quest->id)->first();
-        $stats            = ['str', 'dex', 'dur', 'int', 'chr', 'agi', 'focus'];
+        $stats = ['str', 'dex', 'dur', 'int', 'chr', 'agi', 'focus'];
 
-        if (!is_null($alreadyCompleted)) {
+        if (! is_null($alreadyCompleted)) {
             return false;
         }
 
-        if ($character->currentAutomations()->where('type', AutomationType::EXPLORING)->get()->isNotEmpty() && !$ignoreAutomation) {
+        if ($character->currentAutomations()->where('type', AutomationType::EXPLORING)->get()->isNotEmpty() && ! $ignoreAutomation) {
             return false;
         }
 
@@ -163,7 +182,7 @@ class GuideQuestService {
             ->requiredFameLevel($character, $quest)
             ->getFinishedRequirements();
 
-        if (!empty($this->completedAttributes)) {
+        if (! empty($this->completedAttributes)) {
             $requiredAttributes = $this->requiredAttributeNames($quest);
 
             $difference = array_diff($requiredAttributes, $this->completedAttributes);
@@ -178,29 +197,30 @@ class GuideQuestService {
         return false;
     }
 
-    protected function fetchNextGuideQuest(Character $character): GuideQuest | null {
+    protected function fetchNextGuideQuest(Character $character): array
+    {
 
-        $winterEvent          = Event::where('type' , EventType::WINTER_EVENT)->first();
-        $delusionalEvent      = Event::where('type' , EventType::DELUSIONAL_MEMORIES_EVENT)->first();
-        $unlocksAtLevelQuest  = GuideQuest::where('unlock_at_level', '<=', $character->level)->whereNull('only_during_event')->whereNull('parent_id')->orderBy('unlock_at_level', 'asc')->first();
-        $nextGuideQuest       = null;
+        $winterEvent = Event::where('type', EventType::WINTER_EVENT)->first();
+        $delusionalEvent = Event::where('type', EventType::DELUSIONAL_MEMORIES_EVENT)->first();
+        $unlocksAtLevelQuest = GuideQuest::where('unlock_at_level', '<=', $character->level)->whereNull('only_during_event')->whereNull('parent_id')->orderBy('unlock_at_level', 'asc')->first();
+        $nextGuideQuest = null;
 
-        if (!is_null($winterEvent)) {
-            $unlocksAtLevelQuest  = GuideQuest::where('unlock_at_level', '<=', $character->level)->where('only_during_event', EventType::WINTER_EVENT)->whereNull('parent_id')->orderBy('unlock_at_level', 'asc')->first();
+        if (! is_null($winterEvent)) {
+            $unlocksAtLevelQuest = GuideQuest::where('unlock_at_level', '<=', $character->level)->where('only_during_event', EventType::WINTER_EVENT)->whereNull('parent_id')->orderBy('unlock_at_level', 'asc')->first();
         }
 
-        if (!is_null($delusionalEvent)) {
-            $unlocksAtLevelQuest  = GuideQuest::where('unlock_at_level', '<=', $character->level)->where('only_during_event', EventType::DELUSIONAL_MEMORIES_EVENT)->whereNull('parent_id')->orderBy('unlock_at_level', 'asc')->first();
+        if (! is_null($delusionalEvent)) {
+            $unlocksAtLevelQuest = GuideQuest::where('unlock_at_level', '<=', $character->level)->where('only_during_event', EventType::DELUSIONAL_MEMORIES_EVENT)->whereNull('parent_id')->orderBy('unlock_at_level', 'asc')->first();
         }
 
-        if (!is_null($unlocksAtLevelQuest)) {
+        if (! is_null($unlocksAtLevelQuest)) {
             $nextGuideQuest = $this->fetchNextEventQuest($character, $unlocksAtLevelQuest);
         }
 
-        if (!is_null($winterEvent) && is_null($nextGuideQuest)) {
+        if (! is_null($winterEvent) && is_null($nextGuideQuest)) {
             $eventGuideQuest = GuideQuest::where('only_during_event', EventType::WINTER_EVENT)->whereNull('parent_id')->first();
 
-            if (!is_null($eventGuideQuest)) {
+            if (! is_null($eventGuideQuest)) {
                 $nextGuideQuest = $this->fetchNextEventQuest($character, $eventGuideQuest);
             }
         }
@@ -208,23 +228,33 @@ class GuideQuestService {
         if (!is_null($delusionalEvent) && is_null($nextGuideQuest)) {
             $delusionalEventQuest = GuideQuest::where('only_during_event', EventType::DELUSIONAL_MEMORIES_EVENT)->whereNull('parent_id')->first();
 
-            if (!is_null($delusionalEventQuest)) {
+            if (! is_null($delusionalEventQuest)) {
                 $nextGuideQuest = $this->fetchNextEventQuest($character, $delusionalEventQuest);
             }
         }
 
-        if (!is_null($nextGuideQuest)) {
-            return $nextGuideQuest;
+        $regularGuideQuest = $this->fetchNextRegularGuideQuest($character);
+        $newFeatureGuideQuest = $nextGuideQuest;
+
+        $guideQuests = [];
+
+        if (!is_null($regularGuideQuest)) {
+            $guideQuests[] = $regularGuideQuest;
         }
 
-        return $this->fetchNextRegularGuideQuest($character);
+        if (!is_null($newFeatureGuideQuest)) {
+            $guideQuests[] = $newFeatureGuideQuest;
+        }
+
+        return $guideQuests;
     }
 
-    protected function fetchNextRegularGuideQuest(Character $character): GuideQuest | null {
+    protected function fetchNextRegularGuideQuest(Character $character): ?GuideQuest
+    {
         $lastCompletedGuideQuest = $character->questsCompleted()
-            ->whereHas('guideQuest', function($query) {
+            ->whereHas('guideQuest', function ($query) {
                 $query->whereNull('only_during_event')
-                      ->whereNull('unlock_at_level');
+                    ->whereNull('unlock_at_level');
             })
             ->orderByDesc('guide_quest_id')
             ->first();
@@ -241,17 +271,18 @@ class GuideQuestService {
         return GuideQuest::find($questId);
     }
 
-    protected function fetchNextEventQuest(Character $character, GuideQuest $initialEventGuideQuest): GuideQuest | null {
+    protected function fetchNextEventQuest(Character $character, GuideQuest $initialEventGuideQuest): ?GuideQuest
+    {
 
-        if (!is_null($initialEventGuideQuest->unlock_at_level)) {
+        if (! is_null($initialEventGuideQuest->unlock_at_level)) {
             if ($character->level < $initialEventGuideQuest->unlock_at_level) {
                 return null;
             }
         }
 
         $completedFirstEventQuest = $character->questsCompleted()
-                ->where('guide_quest_id', $initialEventGuideQuest->id)
-                ->first();
+            ->where('guide_quest_id', $initialEventGuideQuest->id)
+            ->first();
 
         if (is_null($completedFirstEventQuest)) {
             return $initialEventGuideQuest;
@@ -259,7 +290,7 @@ class GuideQuestService {
 
         $completedIds = $character->questsCompleted()->whereNotNull('guide_quest_id')->pluck('guide_quest_id')->toArray();
 
-        if (!in_array($initialEventGuideQuest->id, $completedIds)) {
+        if (! in_array($initialEventGuideQuest->id, $completedIds)) {
             return GuideQuest::where('parent_id', $initialEventGuideQuest->id)->orderBy('id')->first();
         }
 
@@ -272,7 +303,8 @@ class GuideQuestService {
         return $this->fetchNextEventQuest($character, $nextGuideQuest);
     }
 
-    protected function requiredAttributeNames(GuideQuest $quest): array {
+    protected function requiredAttributeNames(GuideQuest $quest): array
+    {
 
         $requiredAttributes = [];
 
@@ -308,7 +340,7 @@ class GuideQuestService {
             }
 
             if (str_contains($key, 'required') !== false) {
-                if (!is_null($attributes[$key])) {
+                if (! is_null($attributes[$key])) {
                     $requiredAttributes[] = $key;
                 }
             }

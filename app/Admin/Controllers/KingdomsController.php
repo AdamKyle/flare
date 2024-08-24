@@ -2,30 +2,31 @@
 
 namespace App\Admin\Controllers;
 
-
-use App\Admin\Services\UpdateKingdomsService;
-use Maatwebsite\Excel\Facades\Excel;
-use App\Admin\Requests\KingdomImport as KingdomImportRequest;
 use App\Admin\Exports\Kingdoms\KingdomsExport;
 use App\Admin\Import\Kingdoms\KingdomsImport;
+use App\Admin\Requests\KingdomImport as KingdomImportRequest;
+use App\Admin\Services\UpdateKingdomsService;
 use App\Flare\Models\GameBuilding;
 use App\Http\Controllers\Controller;
+use Maatwebsite\Excel\Facades\Excel;
 
-class KingdomsController extends Controller {
-
-    public function index() {
+class KingdomsController extends Controller
+{
+    public function index()
+    {
         return view('admin.kingdoms.export');
     }
 
-
-    public function import() {
+    public function import()
+    {
         return view('admin.kingdoms.import');
     }
 
     /**
      * @codeCoverageIgnore
      */
-    public function export() {
+    public function export()
+    {
         $response = Excel::download(new KingdomsExport, 'kingdoms.xlsx', \Maatwebsite\Excel\Excel::XLSX);
         ob_end_clean();
 
@@ -35,11 +36,12 @@ class KingdomsController extends Controller {
     /**
      * @codeCoverageIgnore
      */
-    public function importData(KingdomImportRequest $request, UpdateKingdomsService $updateKingdomsService) {
+    public function importData(KingdomImportRequest $request, UpdateKingdomsService $updateKingdomsService)
+    {
 
         Excel::import(new KingdomsImport, $request->kingdom_import);
 
-        foreach(GameBuilding::all() as $gameBuilding) {
+        foreach (GameBuilding::all() as $gameBuilding) {
             $updateKingdomsService->assignNewBuildingsToCharacters($gameBuilding);
         }
 

@@ -9,8 +9,6 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use App\Flare\Models\User;
-use App\Game\Kingdoms\Handlers\GiveKingdomsToNpcHandler;
 
 class KingdomSettlementLockout implements ShouldQueue
 {
@@ -18,16 +16,18 @@ class KingdomSettlementLockout implements ShouldQueue
 
     public $character;
 
-    public function __construct(Character $character) {
+    public function __construct(Character $character)
+    {
         $this->character = $character;
     }
 
-    public function handle() {
+    public function handle()
+    {
         if (is_null($this->character->can_settle_again_at)) {
             return;
         }
 
-        if (!$this->character->can_settle_again_at->lessThanOrEqualTo(now())) {
+        if (! $this->character->can_settle_again_at->lessThanOrEqualTo(now())) {
             $timeLeft = $this->character->can_settle_again_at->diffInMinutes(now());
 
             if ($timeLeft <= 15) {

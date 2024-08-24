@@ -11,37 +11,29 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class CharacterInventoryUpdateBroadCastEvent implements ShouldBroadcastNow {
+class CharacterInventoryUpdateBroadCastEvent implements ShouldBroadcastNow
+{
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-
-    /**
-     * @var array $inventory
-     */
     public array $inventory;
 
-    /**
-     * @var string $type
-     */
     public string $type;
 
     /**
-     * @var User $users
+     * @var User
      */
     private $user;
 
     /**
      * Create a new event instance.
-     *
-     * @param User $user
-     * @param string $type
      */
-    public function __construct(User $user, string $type) {
-        $this->user      = $user;
+    public function __construct(User $user, string $type)
+    {
+        $this->user = $user;
         $this->inventory = resolve(CharacterInventoryService::class)
             ->setCharacter($user->character->refresh())
             ->getInventoryForType($type);
-        $this->type      = $type;
+        $this->type = $type;
     }
 
     /**
@@ -49,7 +41,8 @@ class CharacterInventoryUpdateBroadCastEvent implements ShouldBroadcastNow {
      *
      * @return Channel|array
      */
-    public function broadcastOn() {
-        return new PrivateChannel('update-inventory-' . $this->user->id);
+    public function broadcastOn()
+    {
+        return new PrivateChannel('update-inventory-'.$this->user->id);
     }
 }

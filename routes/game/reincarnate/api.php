@@ -7,6 +7,6 @@ Route::group(['middleware' => [
     'is.player.banned',
     'is.character.exploring',
     'is.character.dead',
-]], function() {
+]], function () {
     Route::post('/character/reincarnate/{character}', ['uses' => 'Api\ReincarnateController@reincarnate']);
 });

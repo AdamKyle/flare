@@ -29,7 +29,8 @@ class FactionLoyaltyFight extends FormRequest
         ];
     }
 
-    public function messages() {
+    public function messages()
+    {
         return [
             'monster_id.required' => 'What monster are you fighting?',
             'npc_id.required' => 'What npc are you helping?',

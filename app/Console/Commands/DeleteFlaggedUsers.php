@@ -47,9 +47,9 @@ class DeleteFlaggedUsers extends Command
             return;
         }
 
-        $progressBar = new ProgressBar(new ConsoleOutput(), $users->count());
+        $progressBar = new ProgressBar(new ConsoleOutput, $users->count());
 
-        $users->chunkById(100, function($users) use($progressBar) {
+        $users->chunkById(100, function ($users) use ($progressBar) {
             foreach ($users as $user) {
                 $progressBar->advance();
 

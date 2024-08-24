@@ -23,9 +23,9 @@ use Tests\Traits\CreateClass;
 use Tests\Traits\CreateGameSkill;
 use Tests\Traits\CreateItem;
 
-class TrinketCraftingServiceTest extends TestCase {
-
-    use RefreshDatabase, CreateClass, CreateGameSkill, CreateItem;
+class TrinketCraftingServiceTest extends TestCase
+{
+    use CreateClass, CreateGameSkill, CreateItem, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -45,15 +45,15 @@ class TrinketCraftingServiceTest extends TestCase {
         ]);
 
         $this->trinket = $this->createItem([
-            'type'                 => 'trinket',
-            'can_craft'            => true,
-            'gold_dust_cost'       => 1000,
-            'copper_coin_cost'     => 1000,
+            'type' => 'trinket',
+            'can_craft' => true,
+            'gold_dust_cost' => 1000,
+            'copper_coin_cost' => 1000,
             'skill_level_required' => 1,
-            'skill_level_trivial'  => 10
+            'skill_level_trivial' => 10,
         ]);
 
-        $this->character = (new CharacterFactory())->createBaseCharacter()->assignSkill(
+        $this->character = (new CharacterFactory)->createBaseCharacter()->assignSkill(
             $this->trinketSkill
         )->givePlayerLocation();
 
@@ -64,12 +64,13 @@ class TrinketCraftingServiceTest extends TestCase {
     {
         parent::tearDown();
 
-        $this->character               = null;
-        $this->trinketSkill            = null;
-        $this->trinketCraftingService  = null;
+        $this->character = null;
+        $this->trinketSkill = null;
+        $this->trinketCraftingService = null;
     }
 
-    public function testGetTrinketsToCraft() {
+    public function testGetTrinketsToCraft()
+    {
         $character = $this->character->getCharacter();
 
         $result = $this->trinketCraftingService->fetchItemsToCraft($character);
@@ -77,11 +78,12 @@ class TrinketCraftingServiceTest extends TestCase {
         $this->assertNotEmpty($result);
     }
 
-    public function testGetTrinketsToCraftAsMerchant() {
+    public function testGetTrinketsToCraftAsMerchant()
+    {
         Event::fake();
 
-        $character = (new CharacterFactory())->createBaseCharacter([], $this->createClass([
-            'name' => CharacterClassValue::MERCHANT
+        $character = (new CharacterFactory)->createBaseCharacter([], $this->createClass([
+            'name' => CharacterClassValue::MERCHANT,
         ]))->assignSkill($this->trinketSkill)->getCharacter();
 
         $result = $this->trinketCraftingService->fetchItemsToCraft($character, true);
@@ -95,7 +97,8 @@ class TrinketCraftingServiceTest extends TestCase {
         });
     }
 
-    public function testCannotAffordToCraftTrinket() {
+    public function testCannotAffordToCraftTrinket()
+    {
         Event::fake();
 
         $character = $this->character->getCharacter();
@@ -107,7 +110,8 @@ class TrinketCraftingServiceTest extends TestCase {
         });
     }
 
-    public function testCannotAffordToCraftTrinketNotEnoughnCopperCoins() {
+    public function testCannotAffordToCraftTrinketNotEnoughnCopperCoins()
+    {
         Event::fake();
 
         $character = $this->character->getCharacter();
@@ -123,13 +127,14 @@ class TrinketCraftingServiceTest extends TestCase {
         });
     }
 
-    public function testCannotCraftTrinketWhenTooHard() {
+    public function testCannotCraftTrinketWhenTooHard()
+    {
         Event::fake();
 
         $character = $this->character->getCharacter();
 
         $character->update([
-            'gold_dust'    => MaxCurrenciesValue::MAX_GOLD_DUST,
+            'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
             'copper_coins' => MaxCurrenciesValue::MAX_COPPER,
         ]);
 
@@ -146,13 +151,14 @@ class TrinketCraftingServiceTest extends TestCase {
         });
     }
 
-    public function testCraftTrinketWhenTooEasy() {
+    public function testCraftTrinketWhenTooEasy()
+    {
         Event::fake();
 
         $character = $this->character->getCharacter();
 
         $character->update([
-            'gold_dust'    => MaxCurrenciesValue::MAX_GOLD_DUST,
+            'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
             'copper_coins' => MaxCurrenciesValue::MAX_COPPER,
         ]);
 
@@ -173,13 +179,14 @@ class TrinketCraftingServiceTest extends TestCase {
         $this->assertCount(1, $character->inventory->slots->toArray());
     }
 
-    public function testFailToCraftTheTrinket() {
+    public function testFailToCraftTheTrinket()
+    {
         Event::fake();
 
         $character = $this->character->getCharacter();
 
         $character->update([
-            'gold_dust'    => MaxCurrenciesValue::MAX_GOLD_DUST,
+            'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
             'copper_coins' => MaxCurrenciesValue::MAX_COPPER,
         ]);
 
@@ -207,11 +214,12 @@ class TrinketCraftingServiceTest extends TestCase {
         $this->assertLessThan(MaxCurrenciesValue::MAX_SHARDS, $character->shards);
     }
 
-    public function testCraftTheItem() {
+    public function testCraftTheItem()
+    {
         $character = $this->character->getCharacter();
 
         $character->update([
-            'gold_dust'    => MaxCurrenciesValue::MAX_GOLD_DUST,
+            'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
             'copper_coins' => MaxCurrenciesValue::MAX_COPPER,
         ]);
 
@@ -225,11 +233,12 @@ class TrinketCraftingServiceTest extends TestCase {
         $this->assertLessThan(MaxCurrenciesValue::MAX_SHARDS, $character->shards);
     }
 
-    public function testCraftTheItemAndGiveitem() {
+    public function testCraftTheItemAndGiveitem()
+    {
         $character = $this->character->getCharacter();
 
         $character->update([
-            'gold_dust'    => MaxCurrenciesValue::MAX_GOLD_DUST,
+            'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
             'copper_coins' => MaxCurrenciesValue::MAX_COPPER,
         ]);
 
@@ -254,13 +263,14 @@ class TrinketCraftingServiceTest extends TestCase {
         $this->assertCount(1, $character->inventory->slots->toArray());
     }
 
-    public function testCraftTheItemAsMerchant() {
-        $character = (new CharacterFactory())->createBaseCharacter([], $this->createClass([
-            'name' => CharacterClassValue::MERCHANT
+    public function testCraftTheItemAsMerchant()
+    {
+        $character = (new CharacterFactory)->createBaseCharacter([], $this->createClass([
+            'name' => CharacterClassValue::MERCHANT,
         ]))->assignSkill($this->trinketSkill)->givePlayerLocation()->getCharacter();
 
         $character->update([
-            'gold_dust'    => MaxCurrenciesValue::MAX_GOLD_DUST,
+            'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
             'copper_coins' => MaxCurrenciesValue::MAX_COPPER,
         ]);
 
@@ -280,7 +290,7 @@ class TrinketCraftingServiceTest extends TestCase {
 
         $character = $character->refresh();
 
-        $actualGoldDustCost   = floor($this->trinket->gold_dust_cost - $this->trinket->gold_dust_cost * 0.10);
+        $actualGoldDustCost = floor($this->trinket->gold_dust_cost - $this->trinket->gold_dust_cost * 0.10);
         $actualCopperCoinCost = floor($this->trinket->copper_coin_cost - $this->trinket->copper_coin_cost * 0.10);
 
         $this->assertEquals(MaxCurrenciesValue::MAX_GOLD_DUST - $actualGoldDustCost, $character->gold_dust);
@@ -288,14 +298,15 @@ class TrinketCraftingServiceTest extends TestCase {
         $this->assertCount(1, $character->inventory->slots->toArray());
     }
 
-    public function testCraftTheItemButInventoryIsFull() {
+    public function testCraftTheItemButInventoryIsFull()
+    {
         Event::fake();
 
         $character = $this->character->getCharacter();
 
         $character->update([
-            'gold_dust'     => MaxCurrenciesValue::MAX_GOLD_DUST,
-            'copper_coins'  => MaxCurrenciesValue::MAX_COPPER,
+            'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
+            'copper_coins' => MaxCurrenciesValue::MAX_COPPER,
             'inventory_max' => 0,
         ]);
 
@@ -324,7 +335,8 @@ class TrinketCraftingServiceTest extends TestCase {
         });
     }
 
-    public function testFetchCharacterTrinketCraftingXP() {
+    public function testFetchCharacterTrinketCraftingXP()
+    {
         $character = $this->character->getCharacter();
 
         $trinketCraftingXPData = $this->trinketCraftingService->fetchSkillXP($character);
@@ -340,5 +352,4 @@ class TrinketCraftingServiceTest extends TestCase {
 
         $this->assertEquals($trinketCraftingXPData, $expected);
     }
-
 }

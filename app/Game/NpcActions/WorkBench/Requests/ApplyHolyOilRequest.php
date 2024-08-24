@@ -24,14 +24,15 @@ class ApplyHolyOilRequest extends FormRequest
     public function rules()
     {
         return [
-            'item_id'         => 'required|integer',
+            'item_id' => 'required|integer',
             'alchemy_item_id' => 'required|integer',
         ];
     }
 
-    public function messages() {
+    public function messages()
+    {
         return [
-            'item_id.required'         => 'Error. Invalid Input.',
+            'item_id.required' => 'Error. Invalid Input.',
             'alchemy_item_id.required' => 'Error. Invalid Input.',
         ];
     }

@@ -4,7 +4,6 @@ namespace App\Game\NpcActions\QueenOfHeartsActions\Services;
 
 use App\Flare\Builders\AffixAttributeBuilder;
 use App\Flare\Models\Character;
-use App\Flare\Models\HolyStack;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 use App\Flare\Models\ItemAffix;
@@ -15,8 +14,8 @@ use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
 use Facades\App\Game\Core\Handlers\DuplicateItemHandler;
 
-class ReRollEnchantmentService {
-
+class ReRollEnchantmentService
+{
     private AffixAttributeBuilder $affixAttributeBuilder;
 
     private RandomEnchantmentService $randomEnchantmentService;
@@ -26,18 +25,18 @@ class ReRollEnchantmentService {
     private int $shardCost;
 
     private $functionMap = [
-        'base'       => [
+        'base' => [
             'setCoreModifiers',
         ],
-        'stats'      => [
+        'stats' => [
             'increaseStats',
             'reduceEnemyStats',
         ],
-        'skills'     => [
+        'skills' => [
             'setSkillDetails',
             // 'setSkillBonuses',
         ],
-        'damage'     => [
+        'damage' => [
             'setDamageDetails',
             'setDevouringLight',
             'setLifeStealingAmount',
@@ -48,22 +47,25 @@ class ReRollEnchantmentService {
         ],
     ];
 
-    public function __construct(AffixAttributeBuilder $affixAttributeBuilder, RandomEnchantmentService $randomEnchantmentService) {
-        $this->affixAttributeBuilder    = $affixAttributeBuilder;
+    public function __construct(AffixAttributeBuilder $affixAttributeBuilder, RandomEnchantmentService $randomEnchantmentService)
+    {
+        $this->affixAttributeBuilder = $affixAttributeBuilder;
         $this->randomEnchantmentService = $randomEnchantmentService;
     }
 
-    public function canAfford(Character $character, string $type, string $selectedAffix): bool {
+    public function canAfford(Character $character, string $type, string $selectedAffix): bool
+    {
         $goldDust = $this->getGoldDustCost($character, $type, $selectedAffix);
-        $shards   = $this->getShardsCost($character, $type, $selectedAffix);
+        $shards = $this->getShardsCost($character, $type, $selectedAffix);
 
         return $character->gold_dust > $goldDust && $character->shards > $shards;
     }
 
-    public function reRoll(Character $character, InventorySlot $slot, string $affixType, string $reRollType) {
+    public function reRoll(Character $character, InventorySlot $slot, string $affixType, string $reRollType)
+    {
         $character->update([
             'gold_dust' => $character->gold_dust - $this->goldDust,
-            'shards'    => $character->shards - $this->shardCost,
+            'shards' => $character->shards - $this->shardCost,
         ]);
 
         $duplicateItem = $this->doReRoll($character, $slot->item, $affixType, $reRollType);
@@ -79,8 +81,9 @@ class ReRollEnchantmentService {
         event(new ServerMessageEvent($character->user, 'Ooooh hoo hoo hoo! I have done it, child! I have made the modifications and I think you\'ll be happy! Oh child, I am so happy! Ooh hoo hoo hoo!'));
     }
 
-    public function doReRoll(Character $character, Item $item, string $affixType, string $reRollType) {
-        $duplicateItem   = DuplicateItemHandler::duplicateItem($item);
+    public function doReRoll(Character $character, Item $item, string $affixType, string $reRollType)
+    {
+        $duplicateItem = DuplicateItemHandler::duplicateItem($item);
 
         $affixes = $this->fetchAffixesForReRoll($duplicateItem, $affixType);
 
@@ -92,20 +95,22 @@ class ReRollEnchantmentService {
 
         $duplicateItem->update([
             'market_sellable' => true,
-            'is_mythic'       => $item->is_mythic,
-            'is_cosmic'       => $item->is_cosmic,
+            'is_mythic' => $item->is_mythic,
+            'is_cosmic' => $item->is_cosmic,
         ]);
 
         return $duplicateItem->refresh();
     }
 
-    public function canAffordMovementCost(Character $character, int $selectedItemToMoveId, string $selectedAffix) {
+    public function canAffordMovementCost(Character $character, int $selectedItemToMoveId, string $selectedAffix)
+    {
         $costs = $this->getMovementCosts($selectedItemToMoveId, $selectedAffix);
 
         return $character->gold_dust >= $costs['gold_dust_cost'] && $character->shards >= $costs['shards_cost'];
     }
 
-    public function getMovementCosts(int $selectedItemToMoveId, string $selectedAffix): array {
+    public function getMovementCosts(int $selectedItemToMoveId, string $selectedAffix): array
+    {
         $item = Item::find($selectedItemToMoveId);
 
         if (is_null($item)) {
@@ -115,38 +120,39 @@ class ReRollEnchantmentService {
         $cost = 0;
 
         if ($selectedAffix === 'all-enchantments') {
-            if (!is_null($item->item_prefix_id)) {
+            if (! is_null($item->item_prefix_id)) {
                 $cost += $item->itemPrefix->cost;
             }
 
-            if (!is_null($item->item_suffix_id)) {
+            if (! is_null($item->item_suffix_id)) {
                 $cost += $item->itemSuffix->cost;
             }
         } else {
-            $cost += ItemAffix::find($item->{'item_' . $selectedAffix . '_id'})->cost;
+            $cost += ItemAffix::find($item->{'item_'.$selectedAffix.'_id'})->cost;
         }
 
-        $cost      = $cost / 1000000;
+        $cost = $cost / 1000000;
         $shardCost = $cost * .005;
 
         $shardCost = (int) round($shardCost);
 
         return [
             'gold_dust_cost' => $cost,
-            'shards_cost'    => $shardCost,
+            'shards_cost' => $shardCost,
         ];
     }
 
-    public function moveAffixes(Character $character, InventorySlot $slot, InventorySlot $secondarySlot, string $affixType) {
+    public function moveAffixes(Character $character, InventorySlot $slot, InventorySlot $secondarySlot, string $affixType)
+    {
         $costs = $this->getMovementCosts($slot->item_id, $affixType);
 
         $character->update([
             'gold_dust' => $character->gold_dust - $costs['gold_dust_cost'],
-            'shards'    => $character->shards - $costs['shards_cost'],
+            'shards' => $character->shards - $costs['shards_cost'],
         ]);
 
         $duplicateSecondaryItem = DuplicateItemHandler::duplicateItem($secondarySlot->item);
-        $duplicateUnique        = DuplicateItemHandler::duplicateItem($slot->item);
+        $duplicateUnique = DuplicateItemHandler::duplicateItem($slot->item);
 
         $duplicateUnique->update([
             'market_sellable' => true,
@@ -154,16 +160,15 @@ class ReRollEnchantmentService {
 
         $duplicateUnique = $duplicateUnique->refresh();
 
-        $deletedAll  = false;
+        $deletedAll = false;
         $deletedSome = false;
         $deletedNone = false;
 
         if ($affixType === 'all-enchantments') {
-            $deletedOne  = false;
-            $deletedTwo  = false;
+            $deletedOne = false;
+            $deletedTwo = false;
 
-
-            if (!is_null($slot->item->item_suffix_id)) {
+            if (! is_null($slot->item->item_suffix_id)) {
                 if ($slot->item->itemSuffix->randomly_generated) {
                     $duplicateSecondaryItem->update([
                         'item_suffix_id' => $slot->item->item_suffix_id,
@@ -177,7 +182,7 @@ class ReRollEnchantmentService {
                 }
             }
 
-            if (!is_null($slot->item->item_prefix_id)) {
+            if (! is_null($slot->item->item_prefix_id)) {
                 if ($slot->item->itemPrefix->randomly_generated) {
                     $duplicateSecondaryItem->update([
                         'item_prefix_id' => $slot->item->item_prefix_id,
@@ -215,11 +220,11 @@ class ReRollEnchantmentService {
             }
         } else {
             $duplicateSecondaryItem->update([
-                'item_' . $affixType . '_id' => $slot->item->{'item_' . $affixType . '_id'},
+                'item_'.$affixType.'_id' => $slot->item->{'item_'.$affixType.'_id'},
             ]);
 
             $duplicateUnique->update([
-                'item_' . $affixType . '_id' => null,
+                'item_'.$affixType.'_id' => null,
             ]);
 
             $duplicateUnique = $duplicateUnique->refresh();
@@ -231,7 +236,7 @@ class ReRollEnchantmentService {
                 $deletedSome = true;
             } else {
                 $slot->update([
-                    'item_id' => $duplicateUnique->id
+                    'item_id' => $duplicateUnique->id,
                 ]);
 
                 $deletedNone = true;
@@ -240,8 +245,8 @@ class ReRollEnchantmentService {
 
         $duplicateSecondaryItem->update([
             'is_market_sellable' => true,
-            'is_mythic'          => $slot->item->is_mythic,
-            'is_cosmic'          => $slot->item->is_cosmic,
+            'is_mythic' => $slot->item->is_mythic,
+            'is_cosmic' => $slot->item->is_cosmic,
         ]);
 
         $secondarySlot->update([
@@ -255,23 +260,24 @@ class ReRollEnchantmentService {
         event(new ServerMessageEvent($character->user, 'Ooooh hoo hoo hoo! I have done as thou have requested, my lovely, beautiful, gorgeous child! Oh look at how powerful you are!'));
 
         if ($deletedAll) {
-            event(new GlobalMessageEvent($character->name . ' Makes the Queen of Hearts glow so bright, thousands of demons in Hell are banished by her beauty and power alone!'));
+            event(new GlobalMessageEvent($character->name.' Makes the Queen of Hearts glow so bright, thousands of demons in Hell are banished by her beauty and power alone!'));
         }
 
         if ($deletedSome) {
-            event(new GlobalMessageEvent($character->name . ' Makes the Queen of Hearts laugh! She is falling in love!'));
+            event(new GlobalMessageEvent($character->name.' Makes the Queen of Hearts laugh! She is falling in love!'));
         }
 
         if ($deletedNone) {
-            event(new GlobalMessageEvent($character->name . ' Makes the Queen of Hearts blush! She is attracted to them now.'));
+            event(new GlobalMessageEvent($character->name.' Makes the Queen of Hearts blush! She is attracted to them now.'));
         }
 
         $slot = $secondarySlot->refresh();
 
-        event(new ServerMessageEvent($character->user, 'The Queen has moved the affixes and created the item: ' . $slot->item->affix_name, $slot->id));
+        event(new ServerMessageEvent($character->user, 'The Queen has moved the affixes and created the item: '.$slot->item->affix_name, $slot->id));
     }
 
-    protected function getGoldDustCost(Character $character, string $type, string $selectedAffix): int {
+    protected function getGoldDustCost(Character $character, string $type, string $selectedAffix): int
+    {
         $goldDust = 10000;
 
         if ($selectedAffix === 'all-enchantments') {
@@ -287,7 +293,8 @@ class ReRollEnchantmentService {
         return $this->goldDust = $goldDust;
     }
 
-    protected function getShardsCost(Character $character, string $type, string $selectedAffix): int {
+    protected function getShardsCost(Character $character, string $type, string $selectedAffix): int
+    {
         $shardCost = 100;
 
         if ($selectedAffix === 'all-enchantments') {
@@ -303,39 +310,40 @@ class ReRollEnchantmentService {
         return $this->shardCost = $shardCost;
     }
 
-    protected function fetchAffixesForReRoll(Item $item, string $affixType): array {
+    protected function fetchAffixesForReRoll(Item $item, string $affixType): array
+    {
         $affixes = [];
 
-
         if ($affixType === 'all-enchantments') {
-            if (!is_null($item->item_prefix_id)) {
+            if (! is_null($item->item_prefix_id)) {
                 if ($item->itemPrefix->randomly_generated) {
                     $affixes[] = $item->itemPrefix;
                 }
             }
 
-            if (!is_null($item->item_suffix_id)) {
+            if (! is_null($item->item_suffix_id)) {
                 if ($item->itemSuffix->randomly_generated) {
                     $affixes[] = $item->itemSuffix;
                 }
             }
         } else {
-            $affixes[] = $item->{'item' . ucfirst($affixType)};
+            $affixes[] = $item->{'item'.ucfirst($affixType)};
         }
 
         return $affixes;
     }
 
-    protected function changeAffix(Character $character, Item $item, ItemAffix $itemAffix, string $changeType) {
+    protected function changeAffix(Character $character, Item $item, ItemAffix $itemAffix, string $changeType)
+    {
 
-        $oldCost                = 100000000000; // Old Legendary Cost
-        $updateNewCost          = 0;
+        $oldCost = 100000000000; // Old Legendary Cost
+        $updateNewCost = 0;
 
         if ($oldCost === $itemAffix->cost) {
-            $updateNewCost = RandomAffixDetails::LEGENDARY;;
+            $updateNewCost = RandomAffixDetails::LEGENDARY;
         }
 
-        $amountPaid            = new RandomAffixDetails($updateNewCost > 0 ? $updateNewCost : $itemAffix->cost);
+        $amountPaid = new RandomAffixDetails($updateNewCost > 0 ? $updateNewCost : $itemAffix->cost);
 
         $affixAttributeBuilder = $this->affixAttributeBuilder->setPercentageRange($amountPaid->getPercentageRange())
             ->setDamageRange($amountPaid->getDamageRange())
@@ -362,6 +370,6 @@ class ReRollEnchantmentService {
 
         $duplicateAffix->update($changes);
 
-        $item->update(['item_' . $itemAffix->type . '_id' => $duplicateAffix->id]);
+        $item->update(['item_'.$itemAffix->type.'_id' => $duplicateAffix->id]);
     }
 }

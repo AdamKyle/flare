@@ -3,12 +3,7 @@
 namespace App\Game\NpcActions\LabyrinthOracle\Providers;
 
 use App\Game\NpcActions\LabyrinthOracle\Services\ItemTransferService;
-use App\Game\NpcActions\QueenOfHeartsActions\Services\QueenOfHeartsService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
-use App\Flare\Builders\AffixAttributeBuilder;
-use App\Flare\Builders\RandomAffixGenerator;
-use App\Game\NpcActions\QueenOfHeartsActions\Services\RandomEnchantmentService;
-use App\Game\NpcActions\QueenOfHeartsActions\Services\ReRollEnchantmentService;
 
 class ServiceProvider extends ApplicationServiceProvider
 {
@@ -20,8 +15,8 @@ class ServiceProvider extends ApplicationServiceProvider
     public function register()
     {
 
-        $this->app->bind(ItemTransferService::class, function($app) {
-            return new ItemTransferService();
+        $this->app->bind(ItemTransferService::class, function ($app) {
+            return new ItemTransferService;
         });
 
     }
@@ -31,7 +26,5 @@ class ServiceProvider extends ApplicationServiceProvider
      *
      * @return void
      */
-    public function boot()
-    {
-    }
+    public function boot() {}
 }

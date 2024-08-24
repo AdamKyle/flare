@@ -2,50 +2,46 @@
 
 namespace App\Flare\Mail;
 
+use App\Flare\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
-use App\Flare\Models\User;
 
 class GenericMail extends Mailable
 {
     use Queueable, SerializesModels;
 
     /**
-     * @var User $user
+     * @var User
      */
     public $user;
 
     /**
-     * @var string $genericMessage
+     * @var string
      */
     public $genericMessage;
 
     /**
-     * @var string $genericSubject
+     * @var string
      */
     public $genericSubject;
 
     /**
-     * @var bool $dontShowLogin
+     * @var bool
      */
     public $dontShowLogin = false;
-
 
     /**
      * Create a new message instance.
      *
-     * @param User $user
-     * @param string $genericMessage
-     * @param string $genericSubject
-     * @param bool $dontShowLogin | false
+     * @param  bool  $dontShowLogin  | false
      */
     public function __construct(User $user, string $genericMessage, string $genericSubject, bool $dontShowLogin = false)
     {
-        $this->user             = $user;
-        $this->genericMessage   = $genericMessage;
-        $this->genericSubject   = $genericSubject;
-        $this->dontShowLogin    = $dontShowLogin;
+        $this->user = $user;
+        $this->genericMessage = $genericMessage;
+        $this->genericSubject = $genericSubject;
+        $this->dontShowLogin = $dontShowLogin;
     }
 
     /**
@@ -55,8 +51,8 @@ class GenericMail extends Mailable
      */
     public function build()
     {
-       return $this->from(config('mail.username'), 'Planes of Tlessa')
-                    ->subject($this->genericSubject)
-                    ->view('flare.email.generic-email');
+        return $this->from(config('mail.username'), 'Planes of Tlessa')
+            ->subject($this->genericSubject)
+            ->view('flare.email.generic-email');
     }
 }

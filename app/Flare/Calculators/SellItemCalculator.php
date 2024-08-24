@@ -4,11 +4,10 @@ namespace App\Flare\Calculators;
 
 use App\Flare\Models\Item;
 use App\Flare\Traits\IsItemUnique;
-use App\Flare\Values\MaxCurrenciesValue;
 use App\Flare\Values\RandomAffixDetails;
 
-class SellItemCalculator {
-
+class SellItemCalculator
+{
     use IsItemUnique;
 
     const MAX_AFFIX_COST = 2000000000; // 2 billion gold.
@@ -17,11 +16,9 @@ class SellItemCalculator {
      * Fetches the item total sale price.
      *
      * Minus a 5% tax.
-     *
-     * @param Item $item
-     * @return int
      */
-    public function fetchTotalSalePrice(Item $item): int {
+    public function fetchTotalSalePrice(Item $item): int
+    {
         if ($item->type === 'trinket') {
             $cost = round(($item->gold_dust_cost / 100));
 
@@ -33,11 +30,9 @@ class SellItemCalculator {
 
     /**
      * Fetch the cost of the item with its affixes.
-     *
-     * @param Item $item
-     * @return int
      */
-    public function fetchSalePriceWithAffixes(Item $item): int {
+    public function fetchSalePriceWithAffixes(Item $item): int
+    {
         $cost = $item->cost;
 
         if ($this->isItemUnique($item)) {
@@ -48,7 +43,7 @@ class SellItemCalculator {
             return self::MAX_AFFIX_COST;
         }
 
-        if (!is_null($item->item_suffix_id)) {
+        if (! is_null($item->item_suffix_id)) {
             $suffixCost = $item->itemSuffix->cost;
 
             if ($suffixCost >= self::MAX_AFFIX_COST) {
@@ -59,7 +54,7 @@ class SellItemCalculator {
 
         }
 
-        if (!is_null($item->item_prefix_id)) {
+        if (! is_null($item->item_prefix_id)) {
 
             $prefixCost = $item->itemPrefix->cost;
 
@@ -79,11 +74,9 @@ class SellItemCalculator {
 
     /**
      * Fetch min sale price.
-     *
-     * @param Item $item
-     * @return int
      */
-    public function fetchMinPrice(Item $item): int {
+    public function fetchMinPrice(Item $item): int
+    {
         $minPrice = 0;
 
         if ($this->isItemUnique($item)) {
@@ -111,18 +104,16 @@ class SellItemCalculator {
 
     /**
      * Is the item considered unique?
-     *
-     * @param Item $item
-     * @return bool
      */
-    protected function isItemUnique(Item $item): bool {
-        if (!is_null($item->item_suffix_id)) {
+    protected function isItemUnique(Item $item): bool
+    {
+        if (! is_null($item->item_suffix_id)) {
             if ($item->itemSuffix->randomly_generated) {
                 return true;
             }
         }
 
-        if (!is_null($item->item_prefix_id)) {
+        if (! is_null($item->item_prefix_id)) {
             if ($item->itemPrefix->randomly_generated) {
                 return true;
             }
@@ -133,30 +124,26 @@ class SellItemCalculator {
 
     /**
      * Is the item considered holy?
-     *
-     * @param Item $item
-     * @return bool
      */
-    protected function isItemHoly(Item $item): bool {
+    protected function isItemHoly(Item $item): bool
+    {
         return $item->appliedHolyStacks->count() > 0;
     }
 
     /**
      * Whats the minimum sale price of the unique?
-     *
-     * @param Item $item
-     * @return int
      */
-    protected function fetchMinimumSalePriceOfUnique(Item $item): int {
+    protected function fetchMinimumSalePriceOfUnique(Item $item): int
+    {
         $cost = 0;
 
-        if (!is_null($item->item_suffix_id)) {
+        if (! is_null($item->item_suffix_id)) {
             if ($item->itemSuffix->randomly_generated) {
                 $cost += $item->itemSuffix->cost;
             }
         }
 
-        if (!is_null($item->item_prefix_id)) {
+        if (! is_null($item->item_prefix_id)) {
             if ($item->itemPrefix->randomly_generated) {
                 $cost += $item->itemPrefix->cost;
             }

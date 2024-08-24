@@ -16,40 +16,28 @@ use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
 use App\Game\Messages\Events\ServerMessageEvent;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 
-class FactionLoyaltyBountyHandler {
+class FactionLoyaltyBountyHandler
+{
+    use FactionLoyalty, HandleCharacterLevelUp;
 
-    use HandleCharacterLevelUp, FactionLoyalty;
-
-    /**
-     * @var RandomAffixGenerator $randomAffixGenerator
-     */
     private RandomAffixGenerator $randomAffixGenerator;
 
-    /**
-     * @var FactionLoyaltyService $factionLoyaltyService
-     */
     private FactionLoyaltyService $factionLoyaltyService;
 
-    /**
-     * @param RandomAffixGenerator $randomAffixGenerator
-     * @param FactionLoyaltyService $factionLoyaltyService
-     */
-    public function __construct(RandomAffixGenerator $randomAffixGenerator, FactionLoyaltyService $factionLoyaltyService) {
+    public function __construct(RandomAffixGenerator $randomAffixGenerator, FactionLoyaltyService $factionLoyaltyService)
+    {
         $this->randomAffixGenerator = $randomAffixGenerator;
         $this->factionLoyaltyService = $factionLoyaltyService;
     }
 
     /**
      * Handle the faction loyalty bounty.
-     *
-     * @param Character $character
-     * @param Monster $monster
-     * @return Character
      */
-    public function handleBounty(Character $character, Monster $monster): Character {
+    public function handleBounty(Character $character, Monster $monster): Character
+    {
 
         if ($character->currentAutomations->isNotEmpty()) {
-             return $character;
+            return $character;
         }
 
         $faction = $character->factions->where('game_map_id', $monster->game_map_id)->first();
@@ -67,14 +55,14 @@ class FactionLoyaltyBountyHandler {
         $helpingNpc = $this->getNpcCurrentlyHelping($factionLoyalty);
 
         if (is_null($helpingNpc)) {
-             return $character;
+            return $character;
         }
 
         if ($helpingNpc->npc->gameMap->id !== $character->map->game_map_id) {
             return $character;
         }
 
-        if (!$this->hasMatchingTask($helpingNpc, 'monster_id', $monster->id)) {
+        if (! $this->hasMatchingTask($helpingNpc, 'monster_id', $monster->id)) {
             return $character;
         }
 
@@ -84,8 +72,8 @@ class FactionLoyaltyBountyHandler {
 
             $matchingTask = $this->getMatchingTask($helpingNpc, 'monster_id', $monster->id);
 
-            ServerMessageHandler::sendBasicMessage($character->user, $helpingNpc->npc->real_name .
-                ' is happy that you slaughtered another one of the enemies on their hit list. "Only: ' .
+            ServerMessageHandler::sendBasicMessage($character->user, $helpingNpc->npc->real_name.
+                ' is happy that you slaughtered another one of the enemies on their hit list. "Only: '.
                 ($matchingTask['required_amount'] - $matchingTask['current_amount']).' to go child!"');
         }
 
@@ -96,7 +84,8 @@ class FactionLoyaltyBountyHandler {
         return $character->refresh();
     }
 
-    protected function handleFameLevelUp(Character $character, FactionLoyaltyNpc $helpingNpc): void {
+    protected function handleFameLevelUp(Character $character, FactionLoyaltyNpc $helpingNpc): void
+    {
 
         $this->handOutXp($character, $helpingNpc);
         $this->handOutCurrencies($character, $helpingNpc);
@@ -109,24 +98,25 @@ class FactionLoyaltyBountyHandler {
         }
 
         $helpingNpc->update([
-            'current_level'  => $newLevel,
+            'current_level' => $newLevel,
         ]);
 
         $helpingNpc = $helpingNpc->refresh();
 
         if ($helpingNpc->current_level === $helpingNpc->max_level) {
             $helpingNpc->factionLoyaltyNpcTasks->update([
-                'fame_tasks' => []
+                'fame_tasks' => [],
             ]);
         } else {
             $this->factionLoyaltyService->createNewTasksForNpc($helpingNpc->factionLoyaltyNpcTasks, $character);
         }
     }
 
-    protected function handOutCurrencies(Character $character, FactionLoyaltyNpc $factionLoyaltyNpc): void {
-        $newGold     = (($factionLoyaltyNpc->current_level <= 0 ? 1 : $factionLoyaltyNpc->current_level) * 1000000) + $character->gold;
+    protected function handOutCurrencies(Character $character, FactionLoyaltyNpc $factionLoyaltyNpc): void
+    {
+        $newGold = (($factionLoyaltyNpc->current_level <= 0 ? 1 : $factionLoyaltyNpc->current_level) * 1000000) + $character->gold;
         $newGoldDust = (($factionLoyaltyNpc->current_level <= 0 ? 1 : $factionLoyaltyNpc->current_level) * 1000) + $character->gold_dust;
-        $newShards   = (($factionLoyaltyNpc->current_level <= 0 ? 1 : $factionLoyaltyNpc->current_level) * 100) + $character->shards;
+        $newShards = (($factionLoyaltyNpc->current_level <= 0 ? 1 : $factionLoyaltyNpc->current_level) * 100) + $character->shards;
 
         if ($newGold >= MaxCurrenciesValue::MAX_GOLD) {
             $newGold = MaxCurrenciesValue::MAX_GOLD;
@@ -148,10 +138,11 @@ class FactionLoyaltyBountyHandler {
 
         event(new UpdateTopBarEvent($character->refresh()));
 
-        ServerMessageHandler::sendBasicMessage($character->user, 'Your fame with: ' . $factionLoyaltyNpc->npc->real_name . ' on Plane: ' . $factionLoyaltyNpc->npc->gameMap->name . ' is now level: ' . $factionLoyaltyNpc->current_level . ' out of: ' . $factionLoyaltyNpc->max_level);
+        ServerMessageHandler::sendBasicMessage($character->user, 'Your fame with: '.$factionLoyaltyNpc->npc->real_name.' on Plane: '.$factionLoyaltyNpc->npc->gameMap->name.' is now level: '.$factionLoyaltyNpc->current_level.' out of: '.$factionLoyaltyNpc->max_level);
     }
 
-    protected function handOutXp(Character $character, FactionLoyaltyNpc $factionLoyaltyNpc): void {
+    protected function handOutXp(Character $character, FactionLoyaltyNpc $factionLoyaltyNpc): void
+    {
 
         $newXp = 0;
 
@@ -162,17 +153,18 @@ class FactionLoyaltyBountyHandler {
         }
 
         $character->update([
-            'xp' => $character->xp + $newXp
+            'xp' => $character->xp + $newXp,
         ]);
 
         $character = $character->refresh();
 
         $this->handlePossibleLevelUp($character);
 
-        ServerMessageHandler::sendBasicMessage($character->user, 'Rewarded with: ' . number_format($newXp) . ' XP.');
+        ServerMessageHandler::sendBasicMessage($character->user, 'Rewarded with: '.number_format($newXp).' XP.');
     }
 
-    protected function rewardTheUniqueItem(Character $character) {
+    protected function rewardTheUniqueItem(Character $character)
+    {
         $item = Item::whereNull('specialty_type')
             ->whereNull('item_prefix_id')
             ->whereNull('item_suffix_id')
@@ -193,13 +185,14 @@ class FactionLoyaltyBountyHandler {
 
         $slot = $character->inventory->slots()->create([
             'inventory_id' => $character->inventory->id,
-            'item_id'      => $newItem->id,
+            'item_id' => $newItem->id,
         ]);
 
-        event(new ServerMessageEvent($character->user, 'You found something of MEDIUM value child. A simple reward: ' . $item->affix_name, $slot->id));
+        event(new ServerMessageEvent($character->user, 'You found something of MEDIUM value child. A simple reward: '.$item->affix_name, $slot->id));
     }
 
-    protected function canLevelUpFame(FactionLoyaltyNpc $factionLoyaltyNpc): bool {
+    protected function canLevelUpFame(FactionLoyaltyNpc $factionLoyaltyNpc): bool
+    {
         if ($factionLoyaltyNpc->current_level >= $factionLoyaltyNpc->max_level) {
             return false;
         }

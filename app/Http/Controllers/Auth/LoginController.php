@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Flare\Handlers\CheatingCheck;
 use App\Flare\Jobs\LoginMessage;
 use App\Flare\Services\CanUserEnterSiteService;
 use App\Game\GuideQuests\Services\GuideQuestService;
@@ -54,7 +53,6 @@ class LoginController extends Controller
     /**
      * Handle a login request to the application.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\Http\JsonResponse
      *
      * @throws \Illuminate\Validation\ValidationException
@@ -63,7 +61,7 @@ class LoginController extends Controller
     {
         $this->validateLogin($request);
 
-        if (!$this->canUserEnterSiteService->canUserEnterSite($request->{$this->username()})) {
+        if (! $this->canUserEnterSiteService->canUserEnterSite($request->{$this->username()})) {
             return redirect()->back()->with('error', 'I am sorry, right now the Registration and Login has been disabled while server maintenance and stability testing is taking place. We hope to be back up and running soon!');
         }
 
@@ -82,7 +80,7 @@ class LoginController extends Controller
                 $request->session()->put('auth.password_confirmed_at', time());
             }
 
-            if (!is_null($this->guard()->user()->character)) {
+            if (! is_null($this->guard()->user()->character)) {
 
                 $character = $this->guard()->user()->character;
 
@@ -90,8 +88,8 @@ class LoginController extends Controller
 
                 $guideQuest = $this->guideQuestService->fetchQuestForCharacter($character);
 
-                if (!is_null($guideQuest)) {
-                    Cache::put('user-show-guide-initial-message-' . $character->user->id, 'true');
+                if (! is_null($guideQuest)) {
+                    Cache::put('user-show-guide-initial-message-'.$character->user->id, 'true');
                 }
             }
 

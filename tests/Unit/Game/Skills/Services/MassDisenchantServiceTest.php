@@ -2,14 +2,14 @@
 
 namespace Tests\Unit\Game\Skills\Services;
 
+use App\Flare\Models\GameSkill;
+use App\Flare\Models\Item;
 use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Skills\Services\MassDisenchantService;
 use App\Game\Skills\Services\SkillCheckService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Flare\Models\Item;
-use App\Flare\Models\GameSkill;
 use App\Game\Skills\Values\SkillTypeValue;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Mockery;
 use Mockery\MockInterface;
 use Tests\Setup\Character\CharacterFactory;
@@ -19,9 +19,9 @@ use Tests\Traits\CreateGameSkill;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateItemAffix;
 
-class MassDisenchantServiceTest extends TestCase {
-
-    use RefreshDatabase, CreateItem, CreateClass, CreateGameSkill, CreateItemAffix;
+class MassDisenchantServiceTest extends TestCase
+{
+    use CreateClass, CreateGameSkill, CreateItem, CreateItemAffix, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -33,12 +33,13 @@ class MassDisenchantServiceTest extends TestCase {
 
     private ?GameSkill $disenchantingSkill;
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
-        $this->character = (new CharacterFactory())->createBaseCharacter()->assignSkill(
+        $this->character = (new CharacterFactory)->createBaseCharacter()->assignSkill(
             $this->createGameSkill([
-                'class_bonus' => 0.01
+                'class_bonus' => 0.01,
             ]),
             5
         )->givePlayerLocation();
@@ -46,33 +47,35 @@ class MassDisenchantServiceTest extends TestCase {
         $this->massDisenchantService = resolve(MassDisenchantService::class);
 
         $this->itemToDisenchant = $this->createItem([
-            'cost'                 => 1000,
+            'cost' => 1000,
             'skill_level_required' => 1,
-            'skill_level_trivial'  => 100,
-            'crafting_type'        => 'weapon',
-            'type'                 => 'weapon',
-            'can_craft'            => true,
-            'default_position'     => 'hammer',
-            'item_prefix_id'       => $this->createItemAffix([
+            'skill_level_trivial' => 100,
+            'crafting_type' => 'weapon',
+            'type' => 'weapon',
+            'can_craft' => true,
+            'default_position' => 'hammer',
+            'item_prefix_id' => $this->createItemAffix([
                 'type' => 'prefix',
             ]),
-            'item_suffix_id'       => $this->createItemAffix([
+            'item_suffix_id' => $this->createItemAffix([
                 'type' => 'prefix',
-            ])
+            ]),
         ]);
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
 
-        $this->character                 = null;
-        $this->massDisenchantService     = null;
-        $this->itemToDisenchant          = null;
-        $this->disenchantingSkill        = null;
-        $this->enchantingSkill           = null;
+        $this->character = null;
+        $this->massDisenchantService = null;
+        $this->itemToDisenchant = null;
+        $this->disenchantingSkill = null;
+        $this->enchantingSkill = null;
     }
 
-    public function testDisenchantAllItems() {
+    public function testDisenchantAllItems()
+    {
         $character = $this->character->inventoryManagement()->giveItemMultipleTimes($this->itemToDisenchant, 10)->getCharacter();
 
         $this->massDisenchantService->setUp($character)->disenchantItems($character->inventory->slots);
@@ -82,7 +85,8 @@ class MassDisenchantServiceTest extends TestCase {
         $this->assertEmpty($character->inventory->slots->toArray());
     }
 
-    public function testDisenchantAllItemsWithOverFlowOfXp() {
+    public function testDisenchantAllItemsWithOverFlowOfXp()
+    {
         $character = $this->character->inventoryManagement()->giveItemMultipleTimes($this->itemToDisenchant, 10)->getCharacter();
 
         $massDisenchantmentService = \Mockery::mock(MassDisenchantService::class)->makePartial();
@@ -114,7 +118,8 @@ class MassDisenchantServiceTest extends TestCase {
         $this->assertGreaterThan(1, $enchantingSkill->level);
     }
 
-    public function testGetSkillXpForDisenchantingItems() {
+    public function testGetSkillXpForDisenchantingItems()
+    {
         $character = $this->character->inventoryManagement()->giveItemMultipleTimes($this->itemToDisenchant, 10)->getCharacter();
 
         $this->instance(
@@ -137,7 +142,7 @@ class MassDisenchantServiceTest extends TestCase {
 
         $massDisenchantService->setUp($character)->disenchantItems($character->inventory->slots);
 
-        $character       = $character->refresh();
+        $character = $character->refresh();
 
         $disenchantSkill = $character->skills->where('baseSkill.type', SkillTypeValue::DISENCHANTING)->first();
         $enchantingSkill = $character->skills->where('baseSkill.type', SkillTypeValue::ENCHANTING)->first();
@@ -146,11 +151,12 @@ class MassDisenchantServiceTest extends TestCase {
         $this->assertGreaterThan(1, $enchantingSkill->level);
     }
 
-    public function testGetGoldDustRushDisenchantingItems() {
+    public function testGetGoldDustRushDisenchantingItems()
+    {
         $character = $this->character->inventoryManagement()->giveItem(
             $this->createItem([
-                'name'   => 'sample',
-                'type'   => 'quest',
+                'name' => 'sample',
+                'type' => 'quest',
                 'effect' => ItemEffectsValue::GOLD_DUST_RUSH,
             ])
         )->giveItemMultipleTimes($this->itemToDisenchant, 10)->getCharacter();
@@ -179,7 +185,7 @@ class MassDisenchantServiceTest extends TestCase {
 
         $massDisenchantService->setUp($character)->disenchantItems($character->inventory->slots);
 
-        $character       = $character->refresh();
+        $character = $character->refresh();
 
         $disenchantSkill = $character->skills->where('baseSkill.type', SkillTypeValue::DISENCHANTING)->first();
         $enchantingSkill = $character->skills->where('baseSkill.type', SkillTypeValue::ENCHANTING)->first();
@@ -188,11 +194,12 @@ class MassDisenchantServiceTest extends TestCase {
         $this->assertGreaterThan(1, $enchantingSkill->level);
     }
 
-    public function testGetGoldDustRushDisenchantingItemsDoesNotGoAbovemax() {
+    public function testGetGoldDustRushDisenchantingItemsDoesNotGoAbovemax()
+    {
         $character = $this->character->inventoryManagement()->giveItem(
             $this->createItem([
-                'name'   => 'sample',
-                'type'   => 'quest',
+                'name' => 'sample',
+                'type' => 'quest',
                 'effect' => ItemEffectsValue::GOLD_DUST_RUSH,
             ])
         )->giveItemMultipleTimes($this->itemToDisenchant, 10)->getCharacter();
@@ -225,7 +232,7 @@ class MassDisenchantServiceTest extends TestCase {
 
         $massDisenchantService->setUp($character)->disenchantItems($character->inventory->slots);
 
-        $character       = $character->refresh();
+        $character = $character->refresh();
 
         $disenchantSkill = $character->skills->where('baseSkill.type', SkillTypeValue::DISENCHANTING)->first();
         $enchantingSkill = $character->skills->where('baseSkill.type', SkillTypeValue::ENCHANTING)->first();
@@ -235,11 +242,12 @@ class MassDisenchantServiceTest extends TestCase {
         $this->assertEquals(MaxCurrenciesValue::MAX_GOLD_DUST, $character->gold_dust);
     }
 
-    public function testGetSkillXpForDisenchantingItemsWhenMapBonusApplied() {
+    public function testGetSkillXpForDisenchantingItemsWhenMapBonusApplied()
+    {
         $character = $this->character->inventoryManagement()->giveItemMultipleTimes($this->itemToDisenchant, 25)->getCharacter();
 
         $character->map->gameMap()->update([
-            'skill_training_bonus' => .50
+            'skill_training_bonus' => .50,
         ]);
 
         $character->skills->where('baseSkill.type', SkillTypeValue::DISENCHANTING)->first()->update([
@@ -258,7 +266,7 @@ class MassDisenchantServiceTest extends TestCase {
 
         $massDisenchantService->setUp($character)->disenchantItems($character->inventory->slots);
 
-        $character       = $character->refresh();
+        $character = $character->refresh();
 
         $disenchantSkill = $character->skills->where('baseSkill.type', SkillTypeValue::DISENCHANTING)->first();
         $enchantingSkill = $character->skills->where('baseSkill.type', SkillTypeValue::ENCHANTING)->first();
@@ -267,11 +275,12 @@ class MassDisenchantServiceTest extends TestCase {
         $this->assertGreaterThan(1, $enchantingSkill->level);
     }
 
-    public function testDoNotGoAboveMaxGoldDust() {
+    public function testDoNotGoAboveMaxGoldDust()
+    {
         $character = $this->character->inventoryManagement()->giveItem(
             $this->createItem([
-                'name'   => 'sample',
-                'type'   => 'quest',
+                'name' => 'sample',
+                'type' => 'quest',
                 'effect' => ItemEffectsValue::GOLD_DUST_RUSH,
             ])
         )->giveItemMultipleTimes($this->itemToDisenchant, 10)->getCharacter();
@@ -306,7 +315,7 @@ class MassDisenchantServiceTest extends TestCase {
 
         $massDisenchantService->setUp($character)->disenchantItems($character->inventory->slots);
 
-        $character       = $character->refresh();
+        $character = $character->refresh();
 
         $disenchantSkill = $character->skills->where('baseSkill.type', SkillTypeValue::DISENCHANTING)->first();
         $enchantingSkill = $character->skills->where('baseSkill.type', SkillTypeValue::ENCHANTING)->first();
@@ -320,11 +329,12 @@ class MassDisenchantServiceTest extends TestCase {
         $this->assertGreaterThan(0, $massDisenchantService->getTotalGoldDust());
     }
 
-    public function testAttemptGoldDustRush() {
+    public function testAttemptGoldDustRush()
+    {
         $character = $this->character->inventoryManagement()->giveItem(
             $this->createItem([
-                'name'   => 'sample',
-                'type'   => 'quest',
+                'name' => 'sample',
+                'type' => 'quest',
                 'effect' => ItemEffectsValue::GOLD_DUST_RUSH,
             ])
         )->giveItemMultipleTimes($this->itemToDisenchant, 10)->getCharacter();
@@ -359,7 +369,7 @@ class MassDisenchantServiceTest extends TestCase {
 
         $massDisenchantService->setUp($character)->disenchantItems($character->inventory->slots);
 
-        $character       = $character->refresh();
+        $character = $character->refresh();
 
         $disenchantSkill = $character->skills->where('baseSkill.type', SkillTypeValue::DISENCHANTING)->first();
         $enchantingSkill = $character->skills->where('baseSkill.type', SkillTypeValue::ENCHANTING)->first();

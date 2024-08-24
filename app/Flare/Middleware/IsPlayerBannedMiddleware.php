@@ -11,7 +11,6 @@ class IsPlayerBannedMiddleware
      * Handle an incoming request.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
      * @param  string|null  $guard
      * @return mixed
      */
@@ -27,12 +26,12 @@ class IsPlayerBannedMiddleware
             return $next($request);
         }
 
-        $until = !is_null($user->unbanned_at) ?  $user->unbanned_at->format('l jS \\of F Y h:i:s A') . ' ' . $user->unbanned_at->timezoneName. '.' : 'Forever.';
+        $until = ! is_null($user->unbanned_at) ? $user->unbanned_at->format('l jS \\of F Y h:i:s A').' '.$user->unbanned_at->timezoneName.'.' : 'Forever.';
 
         if ($user->is_banned) {
             Auth::logout();
 
-            return redirect()->to('/')->with('error', 'You have been banned until: ' . $until);
+            return redirect()->to('/')->with('error', 'You have been banned until: '.$until);
         }
 
         return $next($request);

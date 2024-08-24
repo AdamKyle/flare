@@ -9,10 +9,11 @@ use App\Flare\ServerFight\Fight\Entrance;
 use App\Flare\ServerFight\Monster\ServerMonster;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 
-class CastAndAttack extends AttackAndCast {
-
+class CastAndAttack extends AttackAndCast
+{
     public function __construct(CharacterCacheData $characterCacheData, Entrance $entrance, CanHit $canHit,
-                                SecondaryAttacks $secondaryAttacks, WeaponType $weaponType, CastType $castType) {
+        SecondaryAttacks $secondaryAttacks, WeaponType $weaponType, CastType $castType)
+    {
         parent::__construct($characterCacheData, $entrance, $canHit, $secondaryAttacks, $weaponType, $castType);
     }
 
@@ -25,7 +26,8 @@ class CastAndAttack extends AttackAndCast {
         return $this;
     }
 
-    public function handlePvpAttack(Character $attacker, Character $defender) {
+    public function handlePvpAttack(Character $attacker, Character $defender)
+    {
 
         $this->handlePvpCastAttack($attacker, $defender);
         $this->handlePvpWeaponAttack($attacker, $defender);
@@ -35,7 +37,8 @@ class CastAndAttack extends AttackAndCast {
         return $this;
     }
 
-    public function handleAttack(Character $character, ServerMonster $monster) {
+    public function handleAttack(Character $character, ServerMonster $monster)
+    {
 
         $this->handleCastAttack($character, $monster, false);
 

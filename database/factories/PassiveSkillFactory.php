@@ -2,10 +2,7 @@
 
 namespace Database\Factories;
 
-use App\Flare\Models\GameMap;
-use App\Flare\Models\Npc;
 use App\Flare\Models\PassiveSkill;
-use App\Flare\Values\NpcTypes;
 use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -26,16 +23,16 @@ class PassiveSkillFactory extends Factory
     public function definition()
     {
         return [
-            'name'             => 'Kingdom Management',
-            'description'      => 'Sample',
-            'max_level'        => 5,
-            'hours_per_level'  => 1,
-            'bonus_per_level'  => 0.05,
-            'effect_type'      => PassiveSkillTypeValue::KINGDOM_DEFENCE,
-            'parent_skill_id'  => null,
+            'name' => 'Kingdom Management',
+            'description' => 'Sample',
+            'max_level' => 5,
+            'hours_per_level' => 1,
+            'bonus_per_level' => 0.05,
+            'effect_type' => PassiveSkillTypeValue::KINGDOM_DEFENCE,
+            'parent_skill_id' => null,
             'unlocks_at_level' => null,
-            'is_locked'        => false,
-            'is_parent'        => true,
+            'is_locked' => false,
+            'is_parent' => true,
         ];
     }
 }

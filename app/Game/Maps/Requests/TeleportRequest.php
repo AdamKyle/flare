@@ -24,19 +24,20 @@ class TeleportRequest extends FormRequest
     public function rules()
     {
         return [
-            'x'       => 'required',
-            'y'       => 'required',
-            'cost'    => 'required',
+            'x' => 'required',
+            'y' => 'required',
+            'cost' => 'required',
             'timeout' => 'required',
         ];
     }
 
-    public function messages() {
+    public function messages()
+    {
         return [
-            'x.required'       => 'X position is required.',
-            'y.required'       => 'Y position is required.',
-            'cost.required'    => 'Cost is required.',
-            'timeout.required' => 'Timeout is required.'
+            'x.required' => 'X position is required.',
+            'y.required' => 'Y position is required.',
+            'cost.required' => 'Cost is required.',
+            'timeout.required' => 'Timeout is required.',
         ];
     }
 }

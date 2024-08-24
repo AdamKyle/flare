@@ -5,7 +5,8 @@ namespace Database\Factories;
 use App\Flare\Models\FactionLoyaltyNpc;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class FactionLoyaltyNpcFactory extends Factory {
+class FactionLoyaltyNpcFactory extends Factory
+{
     /**
      * The name of the factory's corresponding model.
      *
@@ -18,14 +19,15 @@ class FactionLoyaltyNpcFactory extends Factory {
      *
      * @return array
      */
-    public function definition() {
+    public function definition()
+    {
         return [
-            'faction_loyalty_id'           => null,
-            'npc_id'                       => null,
-            'current_level'                => 1,
-            'max_level'                    => 25,
-            'next_level_fame'              => 1000,
-            'kingdom_item_defence_bonus'   => 0.025,
+            'faction_loyalty_id' => null,
+            'npc_id' => null,
+            'current_level' => 1,
+            'max_level' => 25,
+            'next_level_fame' => 1000,
+            'kingdom_item_defence_bonus' => 0.025,
         ];
     }
 }

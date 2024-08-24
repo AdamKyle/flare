@@ -2,63 +2,69 @@
 
 namespace App\Admin\Controllers;
 
-use App\Flare\Models\Quest;
-use Illuminate\Http\Request;
+use App\Admin\Exports\Locations\LocationsExport;
+use App\Admin\Import\Locations\LocationsImport;
+use App\Admin\Requests\LocationsImportRequest;
+use App\Admin\Services\LocationService;
 use App\Flare\Models\Location;
+use App\Flare\Models\Quest;
+use App\Flare\Values\LocationEffectValue;
 use App\Flare\Values\LocationType;
 use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
-use App\Admin\Services\LocationService;
-use App\Flare\Values\LocationEffectValue;
-use App\Admin\Requests\LocationsImportRequest;
-use App\Admin\Import\Locations\LocationsImport;
-use App\Admin\Exports\Locations\LocationsExport;
 
-class LocationsController extends Controller {
-
+class LocationsController extends Controller
+{
     private LocationService $locationService;
 
-    public function __construct(LocationService $locationService) {
+    public function __construct(LocationService $locationService)
+    {
         $this->locationService = $locationService;
     }
 
-    public function index() {
+    public function index()
+    {
         return view('admin.locations.locations', [
             'locations' => Location::all(),
         ]);
     }
 
-    public function create() {
+    public function create()
+    {
         return view('admin.locations.manage', $this->locationService->getViewVariables());
     }
 
-    public function edit(Location $location) {
+    public function edit(Location $location)
+    {
         return view('admin.locations.manage', $this->locationService->getViewVariables($location));
     }
 
-    public function store(Request $request) {
+    public function store(Request $request)
+    {
         Location::updateOrCreate(['id' => $request->id], $request->all());
 
-        return response()->redirectToRoute('locations.list')->with('success', 'Saved Location Details for: ' . $request->name);
+        return response()->redirectToRoute('locations.list')->with('success', 'Saved Location Details for: '.$request->name);
     }
 
-    public function show(Location $location) {
+    public function show(Location $location)
+    {
 
         $increasesEnemyStrengthBy = null;
-        $locationType             = null;
-        $increasesDropChanceBy    = 0.0;
-        $usedInQuest              = null;
+        $locationType = null;
+        $increasesDropChanceBy = 0.0;
+        $usedInQuest = null;
 
-        if (!is_null($location->enemy_strength_type)) {
+        if (! is_null($location->enemy_strength_type)) {
             $increasesEnemyStrengthBy = LocationEffectValue::getIncreaseName($location->enemy_strength_type);
-            $increasesDropChanceBy    = (new LocationEffectValue($location->enemy_strength_type))->fetchDropRate();
+            $increasesDropChanceBy = (new LocationEffectValue($location->enemy_strength_type))->fetchDropRate();
         }
 
-        if (!is_null($location->type)) {
+        if (! is_null($location->type)) {
             $locationType = (new LocationType($location->type));
         }
 
-        if (!is_null($location->questRewardItem)) {
+        if (! is_null($location->questRewardItem)) {
 
             $usedInQuest = Quest::where('item_id', $location->quest_reward_item_id)->first();
 
@@ -69,26 +75,29 @@ class LocationsController extends Controller {
         }
 
         return view('admin.locations.location', [
-            'location'                 => $location,
+            'location' => $location,
             'increasesEnemyStrengthBy' => $increasesEnemyStrengthBy,
-            'increasesDropChanceBy'    => $increasesDropChanceBy,
-            'locationType'             => $locationType,
-            'usedInQuest'              => $usedInQuest,
+            'increasesDropChanceBy' => $increasesDropChanceBy,
+            'locationType' => $locationType,
+            'usedInQuest' => $usedInQuest,
         ]);
     }
 
-    public function exportLocations() {
+    public function exportLocations()
+    {
         return view('admin.locations.export');
     }
 
-    public function importLocations() {
+    public function importLocations()
+    {
         return view('admin.locations.import');
     }
 
     /**
      * @codeCoverageIgnore
      */
-    public function export() {
+    public function export()
+    {
         $response = Excel::download(new LocationsExport, 'locations.xlsx', \Maatwebsite\Excel\Excel::XLSX);
         ob_end_clean();
 
@@ -98,7 +107,8 @@ class LocationsController extends Controller {
     /**
      * @codeCoverageIgnore
      */
-    public function import(LocationsImportRequest $request) {
+    public function import(LocationsImportRequest $request)
+    {
         Excel::import(new LocationsImport, $request->locations_import);
 
         return redirect()->back()->with('success', 'imported location data.');

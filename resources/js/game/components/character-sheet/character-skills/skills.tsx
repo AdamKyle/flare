@@ -194,6 +194,115 @@ export default class Skills extends React.Component<SkillsProps, any> {
         ];
     }
 
+    renderMobileTrainableSkills(): JSX.Element {
+        const skills = this.props.trainable_skills.map(
+            (trainable_skill: any, index: number) => {
+                return (
+                    <div key={trainable_skill.id}>
+                        <div className="p-4">
+                            <div className="flex justify-between items-center mb-2">
+                                <span className="font-semibold w-24">
+                                    Name:
+                                </span>
+                                <span>
+                                    <button
+                                        className="underline text-orange-600 dark:text-orange-300 cursor-pointer"
+                                        onClick={() =>
+                                            this.manageSkillDetails(
+                                                trainable_skill,
+                                            )
+                                        }
+                                    >
+                                        <i className="ra ra-player-pyromaniac"></i>{" "}
+                                        {trainable_skill.name}
+                                    </button>
+                                </span>
+                            </div>
+
+                            <div className="flex justify-between items-center mb-2">
+                                <span className="font-semibold w-24">
+                                    Level:
+                                </span>
+                                <span>
+                                    {trainable_skill.level}/
+                                    {trainable_skill.max_level}
+                                </span>
+                            </div>
+
+                            <div className="flex justify-between items-center mb-2">
+                                <span className="font-semibold w-24">XP:</span>
+                                <span>
+                                    {trainable_skill.xp}/
+                                    {trainable_skill.xp_max}
+                                </span>
+                            </div>
+
+                            <div className="flex justify-between items-center mb-2">
+                                <span className="font-semibold w-24">
+                                    Training?
+                                </span>
+                                <span>
+                                    {trainable_skill.is_training ? "Yes" : "No"}
+                                </span>
+                            </div>
+
+                            <div className="flex justify-between items-center">
+                                <span className="font-semibold w-24">
+                                    Actions:
+                                </span>
+                                <span>
+                                    {trainable_skill.is_training ? (
+                                        <DangerButton
+                                            button_label={
+                                                this.state.stopping ? (
+                                                    <span>
+                                                        Stopping{" "}
+                                                        <i className="fas fa-spinner fa-pulse"></i>
+                                                    </span>
+                                                ) : (
+                                                    "Stop training"
+                                                )
+                                            }
+                                            on_click={() =>
+                                                this.stopTraining(
+                                                    trainable_skill,
+                                                )
+                                            }
+                                            disabled={
+                                                this.props.is_dead ||
+                                                this.state.stopping ||
+                                                this.props.is_automation_running
+                                            }
+                                        />
+                                    ) : (
+                                        <PrimaryButton
+                                            button_label={"Train"}
+                                            on_click={() =>
+                                                this.manageTrainSkill(
+                                                    trainable_skill,
+                                                )
+                                            }
+                                            disabled={
+                                                this.props.is_dead ||
+                                                this.isAnySkillTraining() ||
+                                                this.props.is_automation_running
+                                            }
+                                        />
+                                    )}
+                                </span>
+                            </div>
+                        </div>
+                        {index < this.props.trainable_skills.length - 1 && (
+                            <div className="border-b-2 border-b-gray-200 dark:border-b-gray-600 my-3"></div>
+                        )}
+                    </div>
+                );
+            },
+        );
+
+        return <div className="space-y-4">{skills}</div>;
+    }
+
     render() {
         return (
             <Fragment>
@@ -212,18 +321,24 @@ export default class Skills extends React.Component<SkillsProps, any> {
                     </InfoAlert>
                 </div>
 
-                <div
-                    className={"max-w-[390px] md:max-w-full overflow-y-hidden"}
-                >
-                    <Table
-                        columns={this.buildColumns()}
-                        data={this.props.trainable_skills}
-                        dark_table={this.props.dark_table}
-                    />
+                <div className={"max-w-full"}>
+                    <div>
+                        <div className={"hidden md:block"}>
+                            <Table
+                                columns={this.buildColumns()}
+                                data={this.props.trainable_skills}
+                                dark_table={this.props.dark_table}
+                            />
+                        </div>
+                        <div className={"block md:hidden"}>
+                            {this.renderMobileTrainableSkills()}
+                        </div>
+                    </div>
                 </div>
 
                 {this.state.show_skill_details && this.state.skill !== null ? (
                     <SkillInformation
+                        is_trainable={true}
                         skill={this.state.skill}
                         manage_modal={this.manageSkillDetails.bind(this)}
                         is_open={this.state.show_skill_details}

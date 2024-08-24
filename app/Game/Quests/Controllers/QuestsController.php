@@ -8,15 +8,17 @@ use App\Flare\Models\QuestsCompleted;
 use App\Flare\Models\User;
 use App\Http\Controllers\Controller;
 
-class QuestsController extends Controller {
-
-    public function index(User $user) {
+class QuestsController extends Controller
+{
+    public function index(User $user)
+    {
         return view('game.quests.completed_quests', [
-            'character' => $user->character
+            'character' => $user->character,
         ]);
     }
 
-    public function show(Character $character, QuestsCompleted $questsCompleted) {
+    public function show(Character $character, QuestsCompleted $questsCompleted)
+    {
         $skill = null;
 
         if ($questsCompleted->quest->unlocks_skill) {
@@ -25,8 +27,8 @@ class QuestsController extends Controller {
         }
 
         return view('admin.quests.show', [
-            'quest'       => $questsCompleted->quest,
-            'character'   => $character,
+            'quest' => $questsCompleted->quest,
+            'character' => $character,
             'lockedSkill' => $skill,
         ]);
     }

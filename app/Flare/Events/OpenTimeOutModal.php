@@ -2,14 +2,13 @@
 
 namespace App\Flare\Events;
 
+use App\Flare\Models\User;
 use Illuminate\Broadcasting\Channel;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Broadcasting\PresenceChannel;
-use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
-Use App\Flare\Models\User;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\SerializesModels;
 
 /**
  * @codeCoverageIgnore
@@ -19,17 +18,17 @@ class OpenTimeOutModal implements ShouldBroadcastNow
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     /**
-     * @var User $user
+     * @var User
      */
     public $user;
 
     /**
      * Create a new event instance.
      *
-     * @param User $user
      * @return void
      */
-    public function __construct(User $user) {
+    public function __construct(User $user)
+    {
         $this->user = $user;
     }
 
@@ -40,6 +39,6 @@ class OpenTimeOutModal implements ShouldBroadcastNow
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('open-timeout-modal-' . $this->user->id);
+        return new PrivateChannel('open-timeout-modal-'.$this->user->id);
     }
 }

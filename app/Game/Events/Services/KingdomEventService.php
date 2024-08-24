@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Game\Events\Services;
 
 use App\Flare\Models\Character;
@@ -15,11 +14,12 @@ use App\Flare\Values\WeaponTypes;
 use App\Game\Kingdoms\Handlers\Traits\DestroyKingdom;
 use App\Game\Messages\Events\GlobalMessageEvent;
 
-class KingdomEventService {
-
+class KingdomEventService
+{
     use DestroyKingdom;
 
-    public function handleKingdomRewardsForEvent(string $gameMapName) {
+    public function handleKingdomRewardsForEvent(string $gameMapName)
+    {
         $gameMap = GameMap::where('name', $gameMapName)->first();
 
         $character = Character::select('characters.*')
@@ -30,8 +30,8 @@ class KingdomEventService {
             ->selectRaw('COUNT(kingdoms.id) as kingdom_count')
             ->first();
 
-        if (!is_null($character)) {
-            event(new GlobalMessageEvent('Congratulations to: ' . $character->name . ' for being the character with the most kingdoms on '.$gameMapName.'! They have been rewarded with something beyond their imagination!'));
+        if (! is_null($character)) {
+            event(new GlobalMessageEvent('Congratulations to: '.$character->name.' for being the character with the most kingdoms on '.$gameMapName.'! They have been rewarded with something beyond their imagination!'));
 
             $this->giveFullSetToWinner($character, $gameMap);
         }
@@ -53,7 +53,8 @@ class KingdomEventService {
         });
     }
 
-    protected function giveFullSetToWinner(Character $character, GameMap $gameMap) {
+    protected function giveFullSetToWinner(Character $character, GameMap $gameMap)
+    {
         $types = [
             WeaponTypes::BOW,
             WeaponTypes::HAMMER,
@@ -71,7 +72,7 @@ class KingdomEventService {
             ArmourTypes::LEGGINGS,
             ArmourTypes::SHIELD,
             ArmourTypes::SHIELD,
-            ArmourTypes::SLEEVES
+            ArmourTypes::SLEEVES,
         ];
 
         foreach ($types as $type) {
@@ -86,14 +87,15 @@ class KingdomEventService {
         }
     }
 
-    private function giveItemsOfType(Character $character, string $itemSpecialtyType, string $type): Character {
+    private function giveItemsOfType(Character $character, string $itemSpecialtyType, string $type): Character
+    {
         $item = Item::whereNull('item_suffix_id')
             ->whereNull('item_prefix_id')
             ->where('specialty_type', $itemSpecialtyType)
             ->where('type', $type)
             ->first();
 
-        if (!is_null($item)) {
+        if (! is_null($item)) {
             $item = $item->duplicate();
 
             $character->inventory->slots()->create([

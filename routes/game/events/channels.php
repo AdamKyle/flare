@@ -9,5 +9,3 @@ Broadcast::channel('player-current-event-goal-progression-{userId}', function ($
 Broadcast::channel('update-event-goal-progress', function ($user) {
     return $user;
 });
-
-

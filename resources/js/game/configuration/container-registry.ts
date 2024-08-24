@@ -5,6 +5,8 @@ import timerEventContainer from "../components/timers/container/timer-event-cont
 import { CoreContainer } from "../lib/containers/core-container";
 import factionLoyaltyContainer from "../components/faction-loyalty/container/faction-loyalty-container";
 import characterSkillsContainer from "../components/character-sheet/character-skills/container/character-skills-container";
+import suggestionsContainer from "../components/suggestions/container/suggestions-container";
+import surveyContainer from "../components/survey/container/survey-container";
 
 function containerRegistry(coreContainer: CoreContainer): void {
     // Item Comparison
@@ -24,6 +26,12 @@ function containerRegistry(coreContainer: CoreContainer): void {
 
     // Character Skills component
     characterSkillsContainer(coreContainer);
+
+    // Suggestions and Bugs component
+    suggestionsContainer(coreContainer);
+
+    // Survey component
+    surveyContainer(coreContainer);
 }
 
 export { containerRegistry };

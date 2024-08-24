@@ -2,25 +2,22 @@
 
 namespace App\Game\Battle\Events;
 
+use App\Flare\Models\Character;
 use Illuminate\Queue\SerializesModels;
 
-use App\Flare\Models\Character;
-
-class AttackTimeOutEvent {
+class AttackTimeOutEvent
+{
     use SerializesModels;
 
-    /**
-     * @var Character $character
-     */
     public Character $character;
 
     /**
      * Create a new event instance.
      *
-     * @param  Character $character
      * @return void
      */
-    public function __construct(Character $character) {
+    public function __construct(Character $character)
+    {
         $this->character = $character;
     }
 }

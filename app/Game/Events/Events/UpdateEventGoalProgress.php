@@ -2,28 +2,24 @@
 
 namespace App\Game\Events\Events;
 
-use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Broadcasting\Channel;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\SerializesModels;
 
-class UpdateEventGoalProgress implements ShouldBroadcastNow {
+class UpdateEventGoalProgress implements ShouldBroadcastNow
+{
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-
-    /**
-     * @var array $eventGoalData
-     */
     public array $eventGoalData;
 
     /**
      * Create a new event instance.
-     *
-     * @param array $eventGoalData
      */
-    public function __construct(array $eventGoalData) {
+    public function __construct(array $eventGoalData)
+    {
         $this->eventGoalData = $eventGoalData;
     }
 
@@ -31,9 +27,11 @@ class UpdateEventGoalProgress implements ShouldBroadcastNow {
      * Get the channels the event should broadcast on.
      *
      * @return Channel|array
+     *
      * @codeCoverageIgnore
      */
-    public function broadcastOn() {
+    public function broadcastOn()
+    {
         return new PresenceChannel('update-event-goal-progress');
     }
 }

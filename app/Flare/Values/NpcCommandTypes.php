@@ -4,9 +4,8 @@ namespace App\Flare\Values;
 
 class NpcCommandTypes
 {
-
     /**
-     * @var string $value
+     * @var string
      */
     private $value;
 
@@ -19,20 +18,20 @@ class NpcCommandTypes
     const RE_ROLL = 3;
 
     /**
-     * @var string[] $values
+     * @var string[]
      */
     protected static $values = [
-        self::QUEST        => 0,
+        self::QUEST => 0,
         self::TAKE_KINGDOM => 1,
-        self::CONJURE      => 2,
-        self::RE_ROLL      => 3
+        self::CONJURE => 2,
+        self::RE_ROLL => 3,
     ];
 
     protected static $namedValues = [
         0 => 'Quest',
         1 => 'Take Kingdom',
         2 => 'Conjure',
-        3 => 'Re-Roll'
+        3 => 'Re-Roll',
     ];
 
     /**
@@ -40,13 +39,14 @@ class NpcCommandTypes
      *
      * Throws if the value does not exist in the array of const values.
      *
-     * @param string $value
+     * @param  string  $value
+     *
      * @throws \Exception
      */
     public function __construct(int $value)
     {
-        if (!in_array($value, self::$values)) {
-            throw new \Exception($value . ' does not exist.');
+        if (! in_array($value, self::$values)) {
+            throw new \Exception($value.' does not exist.');
         }
 
         $this->value = $value;
@@ -54,36 +54,33 @@ class NpcCommandTypes
 
     /**
      * Are we a quest?
-     *
-     * @return bool
      */
-    public function isQuest(): bool {
+    public function isQuest(): bool
+    {
         return $this->value === self::QUEST;
     }
 
     /**
      * Are we a take kingdom?
-     *
-     * @return bool
      */
-    public function isTakeKingdom(): bool {
+    public function isTakeKingdom(): bool
+    {
         return $this->value === self::TAKE_KINGDOM;
     }
 
     /**
      * Are we a conjure?
-     * @return bool
      */
-    public function isConjure(): bool {
+    public function isConjure(): bool
+    {
         return $this->value === self::CONJURE;
     }
 
     /**
      * Is this a re-roll?
-     *
-     * @return bool
      */
-    public function isReRoll(): bool {
+    public function isReRoll(): bool
+    {
         return $this->value === self::RE_ROLL;
     }
 
@@ -92,7 +89,8 @@ class NpcCommandTypes
      *
      * @return string[]
      */
-    public static function getNamedValues(): array {
+    public static function getNamedValues(): array
+    {
         return self::$namedValues;
     }
 
@@ -100,10 +98,9 @@ class NpcCommandTypes
      * See if the name exists in a named value.
      *
      * If it does return it, if not throw an exception.
-     *
-     * @return string
      */
-    public function getNamedValue(): string {
+    public function getNamedValue(): string
+    {
         return self::$namedValues[$this->value];
     }
 }

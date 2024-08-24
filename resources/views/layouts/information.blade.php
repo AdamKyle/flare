@@ -29,7 +29,6 @@
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css" />
 
-    @vite('resources/sass/app.scss')
     @vite('resources/css/tailwind.css')
 
     @livewireStyles
@@ -80,7 +79,7 @@
 @include('layouts.partials.sidebar.informationsidebar')
 
 <!-- Workspace -->
-<main class="workspace scrolling-section">
+<main class="workspace">
 
     @guest
         @include('layouts.partials.alerts')

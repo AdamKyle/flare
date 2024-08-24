@@ -27,7 +27,7 @@ class MonstersImport extends FormRequest
     public function rules()
     {
         return [
-            'monsters_import' => 'required|mimes:xlsx|max:2048'
+            'monsters_import' => 'required|mimes:xlsx|max:2048',
         ];
     }
 
@@ -36,11 +36,12 @@ class MonstersImport extends FormRequest
      *
      * @return array
      */
-    public function messages() {
+    public function messages()
+    {
         return [
-            'monsters_import.required'   => 'Items import file is required.',
-            'monsters_import.mime'       => 'The system only accepts xlsx files.',
-            'monsters_import.max'        => 'File to large, the system only accepts a max size of 2MB.',
+            'monsters_import.required' => 'Items import file is required.',
+            'monsters_import.mime' => 'The system only accepts xlsx files.',
+            'monsters_import.max' => 'File to large, the system only accepts a max size of 2MB.',
         ];
     }
 }

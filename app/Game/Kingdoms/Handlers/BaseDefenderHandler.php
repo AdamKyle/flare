@@ -4,20 +4,20 @@ namespace App\Game\Kingdoms\Handlers;
 
 use App\Game\Kingdoms\Values\UnitNames;
 
-class BaseDefenderHandler {
-
+class BaseDefenderHandler
+{
     /**
-     * @var array $attackingUnits
+     * @var array
      */
     protected $attackingUnits = [];
 
     /**
      * Set attacking units.
      *
-     * @param array $attackingUnits
      * @return $this
      */
-    public function setAttackingUnits(array $attackingUnits) {
+    public function setAttackingUnits(array $attackingUnits)
+    {
         $this->attackingUnits = $attackingUnits;
 
         return $this;
@@ -25,10 +25,9 @@ class BaseDefenderHandler {
 
     /**
      * Get attacking units.
-     *
-     * @return array
      */
-    public function getAttackingUnits(): array {
+    public function getAttackingUnits(): array
+    {
         return $this->attackingUnits;
     }
 
@@ -38,12 +37,9 @@ class BaseDefenderHandler {
      * The damage is a % of amount / the damage to do.
      *
      * We can potentially ignore the siege weapons.
-     *
-     * @param float $attack
-     * @param bool $ignoreSiegeWeapons
-     * @return void
      */
-    protected function updateAttackingUnits(float $attack, bool $ignoreSiegeWeapons = false): void {
+    protected function updateAttackingUnits(float $attack, bool $ignoreSiegeWeapons = false): void
+    {
 
         foreach ($this->attackingUnits as $index => $unitData) {
 
@@ -70,10 +66,9 @@ class BaseDefenderHandler {
 
     /**
      * Get the total amount of attacking units.
-     *
-     * @return int
      */
-    protected function getTotalAmountOfUnits(): int {
+    protected function getTotalAmountOfUnits(): int
+    {
         $amount = 0;
 
         foreach ($this->attackingUnits as $unitData) {

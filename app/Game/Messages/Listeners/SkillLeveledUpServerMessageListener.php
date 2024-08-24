@@ -16,7 +16,7 @@ class SkillLeveledUpServerMessageListener
     public function handle(SkillLeveledUpServerMessageEvent $event)
     {
 
-        $message =  'Skill: ' . $event->skill->name . ' is now level: ' . $event->skill->level . '!';
+        $message = 'Skill: '.$event->skill->name.' is now level: '.$event->skill->level.'!';
 
         return broadcast(new ServerMessage($event->user, $message));
     }

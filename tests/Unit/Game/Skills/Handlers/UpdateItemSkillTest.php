@@ -12,9 +12,9 @@ use Tests\TestCase;
 use Tests\Traits\CreateFactionLoyalty;
 use Tests\Traits\CreateItem;
 
-class UpdateItemSkillTest extends TestCase {
-
-    use RefreshDatabase, CreateFactionLoyalty, CreateItem;
+class UpdateItemSkillTest extends TestCase
+{
+    use CreateFactionLoyalty, CreateItem, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -22,17 +22,19 @@ class UpdateItemSkillTest extends TestCase {
 
     private ?UpdateItemSkill $updateItemSkill;
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
-        $this->character = (new CharacterFactory())->createBaseCharacter();
+        $this->character = (new CharacterFactory)->createBaseCharacter();
 
-        $this->item      = $this->createItem();
+        $this->item = $this->createItem();
 
         $this->updateItemSkill = resolve(UpdateItemSkill::class);
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
 
         $this->character = null;
@@ -42,7 +44,8 @@ class UpdateItemSkillTest extends TestCase {
         $this->updateItemSkill = null;
     }
 
-    public function testDoesNotUpdateItemSkillWhenItDoesNotExist() {
+    public function testDoesNotUpdateItemSkillWhenItDoesNotExist()
+    {
         Event::fake();
 
         $character = $this->character->getCharacter();
@@ -52,7 +55,8 @@ class UpdateItemSkillTest extends TestCase {
         Event::assertNotDispatched(ServerMessageEvent::class);
     }
 
-    public function testDoesNotUpdateItemSkillWhenItIsMaxedLevel() {
+    public function testDoesNotUpdateItemSkillWhenItIsMaxedLevel()
+    {
         Event::fake();
 
         $character = $this->character->getCharacter();
@@ -60,19 +64,19 @@ class UpdateItemSkillTest extends TestCase {
         $item = $this->item;
 
         $itemSkill = $item->itemSkill()->create([
-            'name'                 => 'Sample',
-            'description'          => 'Sample',
-            'base_damage_mod'      => 0.01,
-            'max_level'            => 4,
-            'total_kills_needed'   => 100,
+            'name' => 'Sample',
+            'description' => 'Sample',
+            'base_damage_mod' => 0.01,
+            'max_level' => 4,
+            'total_kills_needed' => 100,
         ]);
 
         $item->itemSkillProgressions()->create([
-            'item_id'        => $item->id,
-            'item_skill_id'  => $itemSkill->id,
-            'current_level'  => 4,
-            'current_kill'   => 100,
-            'is_training'    => true,
+            'item_id' => $item->id,
+            'item_skill_id' => $itemSkill->id,
+            'current_level' => 4,
+            'current_kill' => 100,
+            'is_training' => true,
         ]);
 
         $this->updateItemSkill->updateItemSkill($character, $item->refresh());
@@ -80,7 +84,8 @@ class UpdateItemSkillTest extends TestCase {
         Event::assertNotDispatched(ServerMessageEvent::class);
     }
 
-    public function testDoesUpdateItemSkill() {
+    public function testDoesUpdateItemSkill()
+    {
         Event::fake();
 
         $character = $this->character->getCharacter();
@@ -88,19 +93,19 @@ class UpdateItemSkillTest extends TestCase {
         $item = $this->item;
 
         $itemSkill = $item->itemSkill()->create([
-            'name'                 => 'Sample',
-            'description'          => 'Sample',
-            'base_damage_mod'      => 0.01,
-            'max_level'            => 4,
-            'total_kills_needed'   => 100,
+            'name' => 'Sample',
+            'description' => 'Sample',
+            'base_damage_mod' => 0.01,
+            'max_level' => 4,
+            'total_kills_needed' => 100,
         ]);
 
         $progression = $item->itemSkillProgressions()->create([
-            'item_id'        => $item->id,
-            'item_skill_id'  => $itemSkill->id,
-            'current_level'  => 3,
-            'current_kill'   => 98,
-            'is_training'    => true,
+            'item_id' => $item->id,
+            'item_skill_id' => $itemSkill->id,
+            'current_level' => 3,
+            'current_kill' => 98,
+            'is_training' => true,
         ]);
 
         $this->updateItemSkill->updateItemSkill($character, $item->refresh());
@@ -112,7 +117,8 @@ class UpdateItemSkillTest extends TestCase {
         Event::assertNotDispatched(ServerMessageEvent::class);
     }
 
-    public function testDoesLevelItemSkill() {
+    public function testDoesLevelItemSkill()
+    {
         Event::fake();
 
         $character = $this->character->getCharacter();
@@ -120,19 +126,19 @@ class UpdateItemSkillTest extends TestCase {
         $item = $this->item;
 
         $itemSkill = $item->itemSkill()->create([
-            'name'                 => 'Sample',
-            'description'          => 'Sample',
-            'base_damage_mod'      => 0.01,
-            'max_level'            => 4,
-            'total_kills_needed'   => 100,
+            'name' => 'Sample',
+            'description' => 'Sample',
+            'base_damage_mod' => 0.01,
+            'max_level' => 4,
+            'total_kills_needed' => 100,
         ]);
 
         $progression = $item->itemSkillProgressions()->create([
-            'item_id'        => $item->id,
-            'item_skill_id'  => $itemSkill->id,
-            'current_level'  => 3,
-            'current_kill'   => 99,
-            'is_training'    => true,
+            'item_id' => $item->id,
+            'item_skill_id' => $itemSkill->id,
+            'current_level' => 3,
+            'current_kill' => 99,
+            'is_training' => true,
         ]);
 
         $this->updateItemSkill->updateItemSkill($character, $item->refresh());
@@ -144,6 +150,4 @@ class UpdateItemSkillTest extends TestCase {
 
         Event::assertDispatched(ServerMessageEvent::class);
     }
-
-
 }

@@ -10,8 +10,8 @@ use App\Game\Messages\Events\NPCMessageEvent;
 use App\Game\Messages\Events\PrivateMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
 
-class PrivateMessage {
-
+class PrivateMessage
+{
     /**
      * Send a private message.
      *
@@ -19,67 +19,57 @@ class PrivateMessage {
      * - Can send a message to a NPC.
      *
      * Will get back a server message telling the player they do not exist.
-     *
-     * @param string $userName
-     * @param string $message
-     * @return void
      */
-    public function sendPrivateMessage(string $userName, string $message): void {
+    public function sendPrivateMessage(string $userName, string $message): void
+    {
 
         $character = $this->getCharacterForSendingTo($userName);
 
-        if (!is_null($character)) {
+        if (! is_null($character)) {
             $this->sendMessageToCharacter($character, $message);
 
             return;
         }
 
-        $npc  = $this->getNPCForSendingTo($userName);
+        $npc = $this->getNPCForSendingTo($userName);
         $user = auth()->user();
 
-        if (!is_null($npc)) {
+        if (! is_null($npc)) {
             event(new NPCMessageEvent($user, $this->buildNPCMessage($npc), $npc->name));
 
             return;
         }
 
-        event(new ServerMessageEvent($user, 'No Character or NPC exists for: ' . $userName));
+        event(new ServerMessageEvent($user, 'No Character or NPC exists for: '.$userName));
     }
 
     /**
      * Get character for the message.
-     *
-     * @param string $userName
-     * @return Character|null
      */
-    protected function getCharacterForSendingTo(string $userName): ?Character {
+    protected function getCharacterForSendingTo(string $userName): ?Character
+    {
         return Character::where('name', $userName)->first();
     }
 
     /**
      * Get NPC for the message.
-     *
-     * @param string $userName
-     * @return Npc|null
      */
-    protected function getNPCForSendingTo(string $userName): ?Npc {
+    protected function getNPCForSendingTo(string $userName): ?Npc
+    {
         return Npc::where('name', $userName)->first();
     }
 
     /**
      * Send a message to the character.
-     *
-     * @param Character $character
-     * @param string $message
-     * @return void
      */
-    protected function sendMessageToCharacter(Character $character, string $message): void {
+    protected function sendMessageToCharacter(Character $character, string $message): void
+    {
         $user = auth()->user();
 
         $user->messages()->create([
             'from_user' => $user->id,
-            'to_user'   => $character->user->id,
-            'message'   => $message,
+            'to_user' => $character->user->id,
+            'message' => $message,
         ]);
 
         broadcast(new PrivateMessageEvent($user->refresh(), $character->user, $message));
@@ -89,23 +79,19 @@ class PrivateMessage {
 
     /**
      * Build the NPC Message.
-     *
-     * @param Npc $npc
-     * @return string
      */
-    protected function buildNPCMessage(Npc $npc): string {
-        return 'My name is: ' . $npc->real_name . '. ' . $this->getNPCTypeMessage($npc);
+    protected function buildNPCMessage(Npc $npc): string
+    {
+        return 'My name is: '.$npc->real_name.'. '.$this->getNPCTypeMessage($npc);
     }
 
     /**
      * Build NPC message for type.
      *
      * Returns a default message if the NPC does not exist.
-     *
-     * @param Npc $npc
-     * @return string
      */
-    private function getNPCTypeMessage(Npc $npc): string {
+    private function getNPCTypeMessage(Npc $npc): string
+    {
         if ($npc->type()->isConjurer()) {
             return 'I hold the gates closed over the Celestials. Alas they seem to escape my grasp once a week on Wednesdays at 1pm GMT-6.
             Want to conjure your own? Click conjure under the map. Celestials can drop shards, used in Alchemy, The Queen of Hearts and Quests!
@@ -142,13 +128,12 @@ class PrivateMessage {
 
     /**
      * Get the admin user.
-     *
-     * @return User
      */
-    protected function getAdminUser(): User {
+    protected function getAdminUser(): User
+    {
         return User::with('roles')
-                   ->whereHas('roles', function($q) {
-                       $q->where('name', 'Admin');
-                   })->first();
+            ->whereHas('roles', function ($q) {
+                $q->where('name', 'Admin');
+            })->first();
     }
 }

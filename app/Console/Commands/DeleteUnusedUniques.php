@@ -44,12 +44,13 @@ class DeleteUnusedUniques extends Command
      */
     public function handle()
     {
-        forEach(ItemAffix::where('randomly_generated', true)->get() as $affix) {
+        foreach (ItemAffix::where('randomly_generated', true)->get() as $affix) {
             $this->processUniqueItems($affix);
         }
     }
 
-    public function processUniqueItems(ItemAffix $itemAffix) {
+    public function processUniqueItems(ItemAffix $itemAffix)
+    {
         $suffixes = Item::where('item_suffix_id', $itemAffix->id)->get();
         $prefixes = Item::where('item_prefix_id', $itemAffix->id)->get();
 
@@ -62,16 +63,17 @@ class DeleteUnusedUniques extends Command
         }
     }
 
-    public function deleteItem(Item $item) {
+    public function deleteItem(Item $item)
+    {
         $notInInventory = InventorySlot::where('item_id', $item->id)->get()->isEmpty();
-        $notInSets      = SetSlot::where('item_id', $item->id)->get()->isEmpty();
+        $notInSets = SetSlot::where('item_id', $item->id)->get()->isEmpty();
 
         if ($notInInventory && $notInSets) {
             HolyStack::where('item_id', $item->id)->delete();
             MarketBoard::where('item_id', $item->id)->delete();
             MarketHistory::where('item_id', $item->id)->delete();
 
-            $this->line('Deleted: ' . $item->affix_name);
+            $this->line('Deleted: '.$item->affix_name);
 
             $item->delete();
         } else {

@@ -4,8 +4,8 @@ namespace App\Game\Market\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class HistoryRequest extends FormRequest {
-
+class HistoryRequest extends FormRequest
+{
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -21,7 +21,8 @@ class HistoryRequest extends FormRequest {
      *
      * @return array
      */
-    public function rules() {
+    public function rules()
+    {
         return [
             'type' => 'string|nullable',
             'when' => 'string|nullable',

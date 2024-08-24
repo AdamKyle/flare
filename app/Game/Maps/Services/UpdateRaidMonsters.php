@@ -2,31 +2,22 @@
 
 namespace App\Game\Maps\Services;
 
-use App\Flare\Models\Location;
-use App\Flare\Models\Character;
 use App\Flare\Cache\CoordinatesCache;
-use App\Game\Maps\Values\MapTileValue;
-use App\Game\Maps\Values\MapPositionValue;
+use App\Flare\Models\Character;
+use App\Flare\Models\Location;
 use App\Game\Battle\Services\ConjureService;
-use App\Game\Maps\Services\BaseMovementService;
+use App\Game\Maps\Values\MapPositionValue;
+use App\Game\Maps\Values\MapTileValue;
 
-class UpdateRaidMonsters extends BaseMovementService {
-
-    /**
-     * @param MapTileValue $mapTileValue
-     * @param MapPositionValue $mapPositionValue
-     * @param CoordinatesCache $coordinatesCache
-     * @param ConjureService $conjureService
-     * @param MovementService $movementService
-     * @param TraverseService $traverseService
-     */
+class UpdateRaidMonsters extends BaseMovementService
+{
     public function __construct(
-        MapTileValue     $mapTileValue,
+        MapTileValue $mapTileValue,
         MapPositionValue $mapPositionValue,
         CoordinatesCache $coordinatesCache,
-        ConjureService   $conjureService,
-        MovementService  $movementService,
-        TraverseService  $traverseService,
+        ConjureService $conjureService,
+        MovementService $movementService,
+        TraverseService $traverseService,
     ) {
         parent::__construct(
             $mapTileValue,
@@ -38,7 +29,8 @@ class UpdateRaidMonsters extends BaseMovementService {
         );
     }
 
-    public function updateMonstersForRaidLocations(Character $character, Location $location): void {
+    public function updateMonstersForRaidLocations(Character $character, Location $location): void
+    {
         $this->updateMonstersList($character, $location);
     }
 }

@@ -4,10 +4,7 @@ namespace App\Game\Maps\Services;
 
 use App\Flare\Cache\CoordinatesCache;
 use App\Flare\Models\Character;
-use App\Flare\Models\GameMap;
 use App\Flare\Models\Location;
-use App\Flare\Values\LocationType;
-use App\Flare\Values\MapNameValue;
 use App\Game\Battle\Services\ConjureService;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\ResponseBuilder;
@@ -16,44 +13,34 @@ use App\Game\Maps\Values\MapPositionValue;
 use App\Game\Maps\Values\MapTileValue;
 use Exception;
 
-class TeleportService extends BaseMovementService {
-
+class TeleportService extends BaseMovementService
+{
     use ResponseBuilder;
 
-    /**
-     * @param MapTileValue $mapTileValue
-     * @param MapPositionValue $mapPositionValue
-     * @param CoordinatesCache $coordinatesCache
-     * @param ConjureService $conjureService
-     * @param MovementService $movementService
-     * @param TraverseService $traverseService
-     */
     public function __construct(MapTileValue $mapTileValue,
-                                MapPositionValue $mapPositionValue,
-                                CoordinatesCache $coordinatesCache,
-                                ConjureService $conjureService,
-                                MovementService $movementService,
-                                TraverseService $traverseService,
+        MapPositionValue $mapPositionValue,
+        CoordinatesCache $coordinatesCache,
+        ConjureService $conjureService,
+        MovementService $movementService,
+        TraverseService $traverseService,
     ) {
         parent::__construct($mapTileValue,
-                            $mapPositionValue,
-                            $coordinatesCache,
-                            $conjureService,
-                            $movementService,
-                            $traverseService,
+            $mapPositionValue,
+            $coordinatesCache,
+            $conjureService,
+            $movementService,
+            $traverseService,
         );
     }
 
     /**
      * Teleport the character.
      *
-     * @param Character $character
-     * @param bool $usingPCTCommand
-     * @return array
      * @throws Exception
      */
-    public function teleport(Character $character, bool $usingPCTCommand = false): array {
-        if (!$this->canPlayerMoveToLocation($character)) {
+    public function teleport(Character $character, bool $usingPCTCommand = false): array
+    {
+        if (! $this->canPlayerMoveToLocation($character)) {
             $this->generateCannotWalkServerMessage($character);
 
             return $this->errorResult('Cannot move there. Check server messages for reason.');
@@ -61,8 +48,8 @@ class TeleportService extends BaseMovementService {
 
         $location = $this->getLocationForCoordinates($character);
 
-        if (!is_null($location)) {
-            if (!$this->canPlayerEnterLocation($character, $location)) {
+        if (! is_null($location)) {
+            if (! $this->canPlayerEnterLocation($character, $location)) {
                 return $this->errorResult('Cannot move there. Check server messages for reason.');
             }
         }
@@ -71,7 +58,7 @@ class TeleportService extends BaseMovementService {
             return $this->errorResult('Not enough gold to teleport to desired location.');
         }
 
-        if (!$this->validateCoordinates()) {
+        if (! $this->validateCoordinates()) {
             return $this->errorResult('Invalid coordinates');
         }
 
@@ -95,28 +82,24 @@ class TeleportService extends BaseMovementService {
      * - If they did not use the /pct chat command they are charged and suffer a timeout
      *   in minutes.
      *
-     * @param Character $character
-     * @param Location|null $location
-     * @param bool $pctCommand
-     * @return void
      * @throws Exception
      */
-    protected function teleportCharacter(Character $character, ?Location $location = null, bool $pctCommand = false): void {
+    protected function teleportCharacter(Character $character, ?Location $location = null, bool $pctCommand = false): void
+    {
 
         $timeout = $this->timeout;
-        $cost    = $this->cost;
+        $cost = $this->cost;
 
         if ($pctCommand) {
             $timeout = 0;
-            $cost    = 0;
+            $cost = 0;
         }
 
         $character->update([
-            'can_move'          => $timeout === 0 ? true : false,
-            'gold'              => $character->gold - $cost,
+            'can_move' => $timeout === 0 ? true : false,
+            'gold' => $character->gold - $cost,
             'can_move_again_at' => $timeout === 0 ? null : now()->addMinutes($timeout),
         ]);
-
 
         $character = $character->refresh();
 
@@ -126,7 +109,7 @@ class TeleportService extends BaseMovementService {
 
         event(new UpdateTopBarEvent($character));
 
-        if (!is_null($location)) {
+        if (! is_null($location)) {
 
             if ($this->traversePlayer($location, $character)) {
                 return;

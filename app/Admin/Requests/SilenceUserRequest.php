@@ -24,8 +24,8 @@ class SilenceUserRequest extends FormRequest
     public function rules()
     {
         return [
-            'for'     => 'required|integer',
-            'user_id' => 'required|integer|exists:users,id'
+            'for' => 'required|integer',
+            'user_id' => 'required|integer|exists:users,id',
         ];
     }
 
@@ -34,9 +34,10 @@ class SilenceUserRequest extends FormRequest
      *
      * @return array
      */
-    public function messages() {
+    public function messages()
+    {
         return [
-            'for.required'     => 'Length of time to silence is required.',
+            'for.required' => 'Length of time to silence is required.',
             'user_id.required' => 'User is required',
         ];
     }

@@ -10,25 +10,26 @@ use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateGem;
 
-class GemShopServiceTest extends TestCase {
-
-    use RefreshDatabase, CreateGem;
+class GemShopServiceTest extends TestCase
+{
+    use CreateGem, RefreshDatabase;
 
     private ?Character $character;
 
     private ?GemShopService $shopService;
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
-        $this->character = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
         $this->character->gemBag()->create(['character_id' => $this->character->id]);
 
         $this->character->gemBag->gemSlots()->create([
             'gem_bag_id' => $this->character->gemBag->id,
-            'gem_id'     => $this->createGem()->id,
-            'amount'     => 1,
+            'gem_id' => $this->createGem()->id,
+            'amount' => 1,
         ]);
 
         $this->character = $this->character->refresh();
@@ -36,21 +37,24 @@ class GemShopServiceTest extends TestCase {
         $this->shopService = resolve(GemShopService::class);
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
 
-        $this->character   = null;
+        $this->character = null;
         $this->shopService = null;
     }
 
-    public function testCannotSellGemYouDoNotHave() {
+    public function testCannotSellGemYouDoNotHave()
+    {
         $result = $this->shopService->sellGem($this->character, 10);
 
         $this->assertEquals(422, $result['status']);
         $this->assertEquals('Gem not found. Nothing to sell.', $result['message']);
     }
 
-    public function testSellGem() {
+    public function testSellGem()
+    {
         $gemSlot = $this->character->gemBag->gemSlots->first();
 
         $result = $this->shopService->sellGem($this->character, $gemSlot->id);
@@ -64,12 +68,13 @@ class GemShopServiceTest extends TestCase {
         $this->assertGreaterThan(0, $character->copper_coins);
     }
 
-    public function testSellGemWhenCurrencyCapped() {
+    public function testSellGemWhenCurrencyCapped()
+    {
 
         $this->character->update([
             'copper_coins' => MaxCurrenciesValue::MAX_COPPER,
-            'gold_dust'    => MaxCurrenciesValue::MAX_GOLD_DUST,
-            'shards'       => MaxCurrenciesValue::MAX_SHARDS,
+            'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
+            'shards' => MaxCurrenciesValue::MAX_SHARDS,
         ]);
 
         $this->character = $this->character->refresh();
@@ -87,7 +92,8 @@ class GemShopServiceTest extends TestCase {
         $this->assertEquals(MaxCurrenciesValue::MAX_COPPER, $character->copper_coins);
     }
 
-    public function testSellAllGems() {
+    public function testSellAllGems()
+    {
         $result = $this->shopService->sellAllGems($this->character);
 
         $character = $this->character->refresh();
@@ -99,11 +105,12 @@ class GemShopServiceTest extends TestCase {
         $this->assertGreaterThan(0, $character->copper_coins);
     }
 
-    public function testSellAllGemsWhenCurrencyCapped() {
+    public function testSellAllGemsWhenCurrencyCapped()
+    {
         $this->character->update([
             'copper_coins' => MaxCurrenciesValue::MAX_COPPER,
-            'gold_dust'    => MaxCurrenciesValue::MAX_GOLD_DUST,
-            'shards'       => MaxCurrenciesValue::MAX_SHARDS,
+            'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
+            'shards' => MaxCurrenciesValue::MAX_SHARDS,
         ]);
 
         $this->character = $this->character->refresh();

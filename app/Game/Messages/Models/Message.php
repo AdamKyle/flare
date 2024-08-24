@@ -2,13 +2,13 @@
 
 namespace App\Game\Messages\Models;
 
+use App\Flare\Models\User;
+use Database\Factories\MessageFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Database\Factories\MessageFactory;
-use App\Flare\Models\User;
 
-class Message extends Model {
-
+class Message extends Model
+{
     use HasFactory;
 
     protected $fillable = [
@@ -27,22 +27,26 @@ class Message extends Model {
     ];
 
     protected $hidden = [
-        'user'
+        'user',
     ];
 
-    public function user() {
+    public function user()
+    {
         return $this->belongsTo(User::class);
     }
 
-    public function fromUser() {
+    public function fromUser()
+    {
         return $this->belongsTo(User::class, 'from_user', 'id');
     }
 
-    public function toUser() {
+    public function toUser()
+    {
         return $this->belongsTo(User::class, 'to_user', 'id');
     }
 
-    protected static function newFactory() {
+    protected static function newFactory()
+    {
         return MessageFactory::new();
     }
 }

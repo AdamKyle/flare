@@ -8,30 +8,31 @@ use App\Flare\Models\Kingdom;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\ResponseBuilder;
-use App\Game\Gambler\Values\CurrencyValue;
 use App\Game\Kingdoms\Values\BuildingCosts;
 use Facades\App\Game\Core\Handlers\HandleGoldBarsAsACurrency;
 
-class CapitalCityGoldBarManagementService {
-
+class CapitalCityGoldBarManagementService
+{
     use ResponseBuilder;
 
-    public function __construct( private readonly UpdateKingdom $updateKingdom){}
+    public function __construct(private readonly UpdateKingdom $updateKingdom) {}
 
-    public function fetchGoldBarDetails(Character $character, Kingdom $kingdom, bool $returnResponse = true): array {
+    public function fetchGoldBarDetails(Character $character, Kingdom $kingdom, bool $returnResponse = true): array
+    {
 
         $goblinBank = GameBuilding::where('name', BuildingCosts::GOBLIN_COIN_BANK)->first();
 
         $kingdoms = $character->kingdoms()
             ->where('id', '!=', $kingdom->id)
             ->where('game_map_id', $kingdom->game_map_id)
-            ->whereHas('buildings', function($query) use ($goblinBank) {
+            ->whereHas('buildings', function ($query) use ($goblinBank) {
                 $query->where('game_building_id', $goblinBank->id);
             })
             ->get();
 
         $allBuildingsLevelFive = $kingdoms->every(function ($kingdom) use ($goblinBank) {
             $building = $kingdom->buildings->firstWhere('game_building_id', $goblinBank->id);
+
             return $building && $building->level >= 5;
         });
 
@@ -42,7 +43,7 @@ class CapitalCityGoldBarManagementService {
             'goblin_banks_level_five' => $allBuildingsLevelFive,
         ];
 
-        if (!$returnResponse) {
+        if (! $returnResponse) {
             return $data;
         }
 
@@ -51,7 +52,8 @@ class CapitalCityGoldBarManagementService {
         ]);
     }
 
-    public function convertGoldBars(Character $character, Kingdom $kingdom, int $goldBars): array {
+    public function convertGoldBars(Character $character, Kingdom $kingdom, int $goldBars): array
+    {
         $kingdoms = $character->kingdoms()->where('game_map_id', $kingdom->game_map_id)
             ->where('id', '!=', $kingdom->id)
             ->whereRaw('(SELECT SUM(gold_bars) FROM kingdoms WHERE gold_bars > 0) >= ?', [$goldBars])
@@ -61,7 +63,7 @@ class CapitalCityGoldBarManagementService {
 
         $canAfford = HandleGoldBarsAsACurrency::hasTheGoldBars($kingdoms, $goldBars);
 
-        if (!$canAfford) {
+        if (! $canAfford) {
             return $this->errorResult('Not enough gold bars. Go slay monsters to stalk your treasury.');
         }
 
@@ -90,12 +92,13 @@ class CapitalCityGoldBarManagementService {
         $this->updateKingdom->updateKingdomAllKingdoms($character);
 
         return $this->successResult([
-            'message' => 'Withdrew: ' . number_format($goldBars) . ' Gold Bars.',
+            'message' => 'Withdrew: '.number_format($goldBars).' Gold Bars.',
             'gold_bar_details' => $this->fetchGoldBarDetails($character, $kingdom, false),
         ]);
     }
 
-    public function depositGoldBars(Character $character, Kingdom $kingdom, int $amountToPurchase): array {
+    public function depositGoldBars(Character $character, Kingdom $kingdom, int $amountToPurchase): array
+    {
         $cost = 2000000000 * $amountToPurchase;
 
         if ($cost > $character->gold) {
@@ -108,13 +111,13 @@ class CapitalCityGoldBarManagementService {
         $currentGoldBars = $kingdoms->sum('gold_bars');
 
         if ($amountToPurchase > $allowedGoldBars) {
-            return $this->errorResult('You are only allowed to have: ' . number_format($allowedGoldBars) . ' total Gold Bars. Settle more kingdoms or spend some.');
+            return $this->errorResult('You are only allowed to have: '.number_format($allowedGoldBars).' total Gold Bars. Settle more kingdoms or spend some.');
         }
 
         $newAmount = $currentGoldBars + $amountToPurchase;
 
         if ($newAmount > $allowedGoldBars) {
-            return $this->errorResult('You are only allowed to have: ' . number_format($allowedGoldBars) . ' total Gold Bars. Settle more kingdoms or spend some.');
+            return $this->errorResult('You are only allowed to have: '.number_format($allowedGoldBars).' total Gold Bars. Settle more kingdoms or spend some.');
         }
 
         HandleGoldBarsAsACurrency::addGoldBarsToKingdoms($kingdoms, $amountToPurchase);
@@ -130,7 +133,7 @@ class CapitalCityGoldBarManagementService {
         $this->updateKingdom->updateKingdomAllKingdoms($character);
 
         return $this->successResult([
-            'message' => 'Deposited: ' . number_format($amountToPurchase) . ' Gold Bars.',
+            'message' => 'Deposited: '.number_format($amountToPurchase).' Gold Bars.',
             'gold_bar_details' => $this->fetchGoldBarDetails($character, $kingdom, false),
         ]);
     }

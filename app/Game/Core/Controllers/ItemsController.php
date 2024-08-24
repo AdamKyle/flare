@@ -2,16 +2,16 @@
 
 namespace App\Game\Core\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Flare\Models\Item;
 use App\Flare\Traits\Controllers\ItemsShowInformation;
+use App\Http\Controllers\Controller;
 
-
-class ItemsController extends Controller {
-
+class ItemsController extends Controller
+{
     use ItemsShowInformation;
 
-    public function show(Item $item) {
+    public function show(Item $item)
+    {
         return $this->renderItemShow('game.items.item', $item);
     }
 }

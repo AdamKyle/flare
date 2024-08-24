@@ -28,7 +28,8 @@ class KingdomUnitRecruitmentRequest extends FormRequest
         ];
     }
 
-    public function messages() {
+    public function messages()
+    {
         return [
             'amount.required' => 'Amount is missing',
         ];

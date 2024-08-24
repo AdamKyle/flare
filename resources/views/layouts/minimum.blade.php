@@ -30,7 +30,6 @@
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css" />
 
-    @vite('resources/sass/app.scss')
     @vite('resources/css/tailwind.css')
 
     @vite('resources/vendor/theme/assets/js/dark-mode/dark-mode.js')
@@ -73,7 +72,7 @@
 </header>
 
 <!-- Workspace -->
-<main class="workspace scrolling-section">
+<main class="workspace">
 
     @guest
         @include('layouts.partials.alerts')

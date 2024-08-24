@@ -3,33 +3,28 @@
 namespace App\Game\Kingdoms\Jobs;
 
 use App\Flare\Models\BuildingExpansionQueue;
+use App\Flare\Models\KingdomBuilding;
 use App\Flare\Models\KingdomBuildingExpansion;
+use App\Flare\Models\User;
 use App\Game\Kingdoms\Events\UpdateBuildingExpansion;
+use App\Game\Kingdoms\Service\UpdateKingdom;
 use App\Game\Kingdoms\Values\BuildingExpansionTypes;
 use App\Game\Kingdoms\Values\ResourceBuildingExpansionBaseValue;
-use League\Fractal\Manager;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use App\Flare\Models\User;
-use App\Flare\Models\KingdomBuilding;
-use App\Flare\Transformers\KingdomTransformer;
-use App\Game\Kingdoms\Service\UpdateKingdom;
 
-
-class ExpandResourceBuilding implements ShouldQueue {
+class ExpandResourceBuilding implements ShouldQueue
+{
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     /**
-     * @var User $user
+     * @var User
      */
     protected $user;
 
-    /**
-     * @var KingdomBuilding $building
-     */
     protected KingdomBuilding $building;
 
     /**
@@ -38,7 +33,7 @@ class ExpandResourceBuilding implements ShouldQueue {
     protected $queueId;
 
     /**
-     * @var array $resourceType
+     * @var array
      */
     protected $resourceTypes = [
         'wood', 'clay', 'stone', 'iron',
@@ -47,24 +42,20 @@ class ExpandResourceBuilding implements ShouldQueue {
     /**
      * Create a new job instance.
      *
-     * @param KingdomBuilding $building
-     * @param User $user
-     * @param int $queueId
      * @return void
      */
     public function __construct(KingdomBuilding $building, User $user, int $queueId)
     {
-        $this->user     = $user;
+        $this->user = $user;
 
         $this->building = $building;
 
-        $this->queueId  = $queueId;
+        $this->queueId = $queueId;
     }
 
     /**
      * Execute the job.
      *
-     * @param UpdateKingdom $updateKingdom
      * @return void
      */
     public function handle(UpdateKingdom $updateKingdom)
@@ -76,7 +67,7 @@ class ExpandResourceBuilding implements ShouldQueue {
             return;
         }
 
-        if (!$queue->completed_at->lessThanOrEqualTo(now())) {
+        if (! $queue->completed_at->lessThanOrEqualTo(now())) {
             $timeLeft = $queue->completed_at->diffInMinutes(now());
 
             if ($timeLeft <= 15) {
@@ -116,7 +107,7 @@ class ExpandResourceBuilding implements ShouldQueue {
             $resourceType = $this->getResourceType();
 
             $this->building->kingdom()->update([
-                'max_' . $resourceType => $this->building->kingdom->{'max_' . $resourceType} + $kingdomBuildingExpansion->resource_increases,
+                'max_'.$resourceType => $this->building->kingdom->{'max_'.$resourceType} + $kingdomBuildingExpansion->resource_increases,
             ]);
 
             event(new UpdateBuildingExpansion($this->user->character, $kingdomBuildingExpansion));
@@ -125,7 +116,6 @@ class ExpandResourceBuilding implements ShouldQueue {
 
             return;
         }
-
 
         if ($buildingExpansion->expansion_count < ResourceBuildingExpansionBaseValue::MAX_EXPANSIONS) {
             $expansionCount = $buildingExpansion->expansion_count + 1;
@@ -144,7 +134,7 @@ class ExpandResourceBuilding implements ShouldQueue {
             $resourceType = $this->getResourceType();
 
             $this->building->kingdom()->update([
-                'max_' . $resourceType => $this->building->kingdom->{'max_' . $resourceType} + $buildingExpansion->resource_increases,
+                'max_'.$resourceType => $this->building->kingdom->{'max_'.$resourceType} + $buildingExpansion->resource_increases,
             ]);
 
             event(new UpdateBuildingExpansion($this->user->character, $buildingExpansion));
@@ -153,9 +143,10 @@ class ExpandResourceBuilding implements ShouldQueue {
         }
     }
 
-    protected function getResourceType() {
-        foreach($this->resourceTypes as $type) {
-            if ($this->building->{'increase_in_' . $type} !== 0.0) {
+    protected function getResourceType()
+    {
+        foreach ($this->resourceTypes as $type) {
+            if ($this->building->{'increase_in_'.$type} !== 0.0) {
                 return $type;
             }
         }

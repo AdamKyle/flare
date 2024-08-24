@@ -3,39 +3,35 @@
 namespace App\Game\BattleRewardProcessing\Handlers;
 
 use App\Flare\Builders\RandomAffixGenerator;
-use Facades\App\Flare\Calculators\DropCheckCalculator;
 use App\Flare\Models\Character;
 use App\Flare\Models\Event;
 use App\Flare\Models\Item;
 use App\Flare\Models\Location;
 use App\Flare\Models\Monster;
-use Facades\App\Flare\RandomNumber\RandomNumberGenerator;
 use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\ItemSpecialtyType;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Flare\Values\RandomAffixDetails;
-use Facades\App\Game\Core\Handlers\AnnouncementHandler;
 use App\Game\Events\Values\EventType;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
 use Exception;
+use Facades\App\Flare\Calculators\DropCheckCalculator;
+use Facades\App\Flare\RandomNumber\RandomNumberGenerator;
+use Facades\App\Game\Core\Handlers\AnnouncementHandler;
 use Illuminate\Support\Facades\Cache;
 
-class TheOldChurchRewardHandler {
-
-    /**
-     * @var RandomAffixGenerator $randomAffixGenerator
-     */
+class TheOldChurchRewardHandler
+{
     private RandomAffixGenerator $randomAffixGenerator;
 
-    /**
-     * @param RandomAffixGenerator $randomAffixGenerator
-     */
-    public function __construct(RandomAffixGenerator $randomAffixGenerator) {
+    public function __construct(RandomAffixGenerator $randomAffixGenerator)
+    {
         $this->randomAffixGenerator = $randomAffixGenerator;
     }
 
-    public function handleFightingAtTheOldChurch(Character $character, Monster $monster): Character {
+    public function handleFightingAtTheOldChurch(Character $character, Monster $monster): Character
+    {
 
         if ($character->currentAutomations->isNotEmpty()) {
             return $character;
@@ -50,15 +46,15 @@ class TheOldChurchRewardHandler {
             return $character;
         }
 
-        if (!$location->locationType()->isTheOldChurch()) {
-             return $character;
+        if (! $location->locationType()->isTheOldChurch()) {
+            return $character;
         }
 
-        $hasQuestItem = $character->inventory->slots->filter(function($slot) {
+        $hasQuestItem = $character->inventory->slots->filter(function ($slot) {
             return $slot->item->effect === ItemEffectsValue::THE_OLD_CHURCH;
         })->isNotEmpty();
 
-        if (!$hasQuestItem) {
+        if (! $hasQuestItem) {
             return $character;
         }
 
@@ -75,12 +71,9 @@ class TheOldChurchRewardHandler {
 
     /**
      * is the monster at least halfway down the list?
-     *
-     * @param Location $location
-     * @param Monster $monster
-     * @return bool
      */
-    protected function isMonsterAtLeastHalfWayOrMore(Location $location, Monster $monster): bool {
+    protected function isMonsterAtLeastHalfWayOrMore(Location $location, Monster $monster): bool
+    {
 
         $monsters = Cache::get('monsters')[$location->name];
 
@@ -96,27 +89,24 @@ class TheOldChurchRewardHandler {
      * Reward the character with currencies.
      *
      * - Only gives copper coins if the character has
-     *
-     * @param Character $character
-     * @param Event|null $event
-     * @return Character
      */
-    public function currencyReward(Character $character, Event $event = null): Character {
+    public function currencyReward(Character $character, ?Event $event = null): Character
+    {
         $maximumAmount = 1000;
         $maximumGold = 20000;
 
-        if (!is_null($event)) {
+        if (! is_null($event)) {
             $maximumAmount = 3000;
             $maximumGold = 40000;
         }
 
         $goldDust = RandomNumberGenerator::generateRandomNumber(1, $maximumAmount);
-        $shards   = RandomNumberGenerator::generateRandomNumber(1, $maximumAmount);
-        $gold     = RandomNumberGenerator::generateRandomNumber(1, $maximumGold);
+        $shards = RandomNumberGenerator::generateRandomNumber(1, $maximumAmount);
+        $gold = RandomNumberGenerator::generateRandomNumber(1, $maximumGold);
 
-        $gold        += $character->gold;
-        $goldDust    += $character->gold_dust;
-        $shards      += $character->shards;
+        $gold += $character->gold;
+        $goldDust += $character->gold_dust;
+        $shards += $character->shards;
 
         if ($goldDust > MaxCurrenciesValue::MAX_GOLD_DUST) {
             $goldDust = MaxCurrenciesValue::MAX_GOLD_DUST;
@@ -142,13 +132,12 @@ class TheOldChurchRewardHandler {
     /**
      * Handle item Reward for player.
      *
-     * @param Character $character
-     * @param bool $isMythic
-     * @param Event|null $event
-     * @return Character
+     * @param  bool  $isMythic
+     *
      * @throws Exception
      */
-    protected function handleItemReward(Character $character, Event $event = null): Character {
+    protected function handleItemReward(Character $character, ?Event $event = null): Character
+    {
         $lootingChance = $character->skills->where('baseSkill.name', 'Looting')->first()->skill_bonus;
         $maxRoll = 1000000;
 
@@ -156,13 +145,13 @@ class TheOldChurchRewardHandler {
             $lootingChance = 0.15;
         }
 
-        if (!is_null($event)) {
+        if (! is_null($event)) {
             $lootingChance = .30;
             $maxRoll = $maxRoll / 2;
         }
 
         if (DropCheckCalculator::fetchDifficultItemChance($lootingChance, $maxRoll)) {
-            if (!$character->isInventoryFull()) {
+            if (! $character->isInventoryFull()) {
                 $this->rewardForCharacter($character);
             }
         }
@@ -175,12 +164,12 @@ class TheOldChurchRewardHandler {
     /**
      * Reward player with item.
      *
-     * @param Character $character
-     * @param bool $isMythic
      * @return void
+     *
      * @throws Exception
      */
-    protected function rewardForCharacter(Character $character, bool $isMythic = false) {
+    protected function rewardForCharacter(Character $character, bool $isMythic = false)
+    {
         $item = Item::where('specialty_type', ItemSpecialtyType::CORRUPTED_ICE)
             ->whereNull('item_prefix_id')
             ->whereNull('item_suffix_id')
@@ -193,7 +182,7 @@ class TheOldChurchRewardHandler {
             return;
         }
 
-        if (!$isMythic) {
+        if (! $isMythic) {
             $randomAffixGenerator = $this->randomAffixGenerator->setCharacter($character)->setPaidAmount(RandomAffixDetails::MEDIUM);
 
             $newItem = $item->duplicate();
@@ -205,20 +194,20 @@ class TheOldChurchRewardHandler {
 
             $slot = $character->inventory->slots()->create([
                 'inventory_id' => $character->inventory->id,
-                'item_id'      => $newItem->id,
+                'item_id' => $newItem->id,
             ]);
 
-            event(new ServerMessageEvent($character->user, 'You found something MEDIUM but still unique, in The Old Church child: ' . $item->affix_name, $slot->id));
+            event(new ServerMessageEvent($character->user, 'You found something MEDIUM but still unique, in The Old Church child: '.$item->affix_name, $slot->id));
         }
     }
-
 
     /**
      * 1 out of 1 million chance to create an event.
      *
      * @return void
      */
-    protected function createPossibleEvent() {
+    protected function createPossibleEvent()
+    {
 
         if (Event::where('type', EventType::THE_OLD_CHURCH)->exists()) {
             return;
@@ -226,9 +215,9 @@ class TheOldChurchRewardHandler {
 
         if (RandomNumberGenerator::generateTrueRandomNumber(1000000) >= 1000000) {
             Event::create([
-                'type'        => EventType::THE_OLD_CHURCH,
-                'started_at'  => now(),
-                'ends_at'     => now()->addHour(),
+                'type' => EventType::THE_OLD_CHURCH,
+                'started_at' => now(),
+                'ends_at' => now()->addHour(),
             ]);
 
             AnnouncementHandler::createAnnouncement('the_old_house');

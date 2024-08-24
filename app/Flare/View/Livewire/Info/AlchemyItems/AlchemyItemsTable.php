@@ -9,20 +9,23 @@ use Rappasoft\LaravelLivewireTables\DataTableComponent;
 use Rappasoft\LaravelLivewireTables\Views\Column;
 use Rappasoft\LaravelLivewireTables\Views\Filters\SelectFilter;
 
-class AlchemyItemsTable extends DataTableComponent {
-
-    public function configure(): void {
+class AlchemyItemsTable extends DataTableComponent
+{
+    public function configure(): void
+    {
         $this->setPrimaryKey('id');
     }
 
-    public function builder(): Builder {
+    public function builder(): Builder
+    {
         return Item::whereNull('item_prefix_id')
             ->whereNull('item_suffix_id')
             ->where('type', 'alchemy')
             ->whereNull('gold_bars_cost');
     }
 
-    protected function buildOptions(): array {
+    protected function buildOptions(): array
+    {
         return [
             AlchemyItemType::INCREASE_STATS => 'Increases Stats',
             AlchemyItemType::INCREASE_SKILL_TYPE => 'Increases Training Skills',
@@ -35,7 +38,8 @@ class AlchemyItemsTable extends DataTableComponent {
         ];
     }
 
-    public function filters(): array {
+    public function filters(): array
+    {
         return [
             SelectFilter::make('Types')
                 ->options($this->buildOptions())
@@ -47,12 +51,13 @@ class AlchemyItemsTable extends DataTableComponent {
         ];
     }
 
-    public function columns(): array {
+    public function columns(): array
+    {
         return [
             Column::make('Name')->searchable()->format(function ($value, $row) {
                 $itemId = Item::where('name', $value)->first()->id;
 
-                return '<a href="/items/' . $itemId . '" >' . $row->name . '</a>';
+                return '<a href="/items/'.$itemId.'" >'.$row->name.'</a>';
             })->html(),
             Column::make('Gold Dust Cost')->sortable()->format(function ($value) {
                 return number_format($value);

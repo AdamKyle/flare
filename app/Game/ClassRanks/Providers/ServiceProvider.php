@@ -17,13 +17,13 @@ class ServiceProvider extends ApplicationServiceProvider
      */
     public function register()
     {
-        $this->app->bind(ClassRankService::class, function($app) {
+        $this->app->bind(ClassRankService::class, function ($app) {
             return new ClassRankService(
                 $app->make(UpdateCharacterAttackTypesHandler::class)
             );
         });
 
-        $this->app->bind(ManageClassService::class, function($app) {
+        $this->app->bind(ManageClassService::class, function ($app) {
             return new ManageClassService(
                 $app->make(UpdateCharacterAttackTypesHandler::class),
                 $app->make(UpdateCharacterSkillsService::class),

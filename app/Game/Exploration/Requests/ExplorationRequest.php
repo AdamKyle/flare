@@ -24,18 +24,19 @@ class ExplorationRequest extends FormRequest
     public function rules()
     {
         return [
-            'auto_attack_length'       => 'required|integer',
+            'auto_attack_length' => 'required|integer',
             'move_down_the_list_every' => 'nullable|integer',
-            'selected_monster_id'      => 'required|integer',
-            'attack_type'              => 'required|string',
+            'selected_monster_id' => 'required|integer',
+            'attack_type' => 'required|string',
         ];
     }
 
-    public function messages() {
+    public function messages()
+    {
         return [
-            'auto_attack_length.required'  => 'Invalid input.',
+            'auto_attack_length.required' => 'Invalid input.',
             'selected_monster_id.required' => 'Invalid input.',
-            'attack_type.required'         => 'Invalid input.',
+            'attack_type.required' => 'Invalid input.',
         ];
     }
 }

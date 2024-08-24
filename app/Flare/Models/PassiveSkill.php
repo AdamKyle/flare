@@ -7,8 +7,8 @@ use Database\Factories\PassiveSkillFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class PassiveSkill extends Model {
-
+class PassiveSkill extends Model
+{
     use HasFactory;
 
     /**
@@ -40,14 +40,14 @@ class PassiveSkill extends Model {
      * @var array
      */
     protected $casts = [
-        'max_level'                => 'integer',
-        'bonus_per_level'          => 'float',
-        'effect_type'              => 'integer',
-        'hours_per_level'          => 'integer',
-        'item_find_chance'         => 'float',
-        'unlocks_at_level'         => 'integer',
-        'is_locked'                => 'boolean',
-        'is_parent'                => 'boolean',
+        'max_level' => 'integer',
+        'bonus_per_level' => 'float',
+        'effect_type' => 'integer',
+        'hours_per_level' => 'integer',
+        'item_find_chance' => 'float',
+        'unlocks_at_level' => 'integer',
+        'is_locked' => 'boolean',
+        'is_parent' => 'boolean',
         'unlocks_game_building_id' => 'integer',
         'resource_bonus_per_level' => 'integer',
         'capital_city_building_request_travel_time_reduction' => 'float',
@@ -55,23 +55,28 @@ class PassiveSkill extends Model {
         'resource_request_time_reduction' => 'float',
     ];
 
-    public function passiveType(): PassiveSkillTypeValue {
+    public function passiveType(): PassiveSkillTypeValue
+    {
         return new PassiveSkillTypeValue($this->effect_type);
     }
 
-    public function childSkills() {
+    public function childSkills()
+    {
         return $this->hasMany($this, 'parent_skill_id')->with('childSkills');
     }
 
-    public function parent() {
+    public function parent()
+    {
         return $this->belongsTo($this, 'parent_skill_id');
     }
 
-    public function gameBuilding() {
+    public function gameBuilding()
+    {
         return $this->hasOne(GameBuilding::class, 'unlocks_game_building_id', 'id');
     }
 
-    protected static function newFactory() {
+    protected static function newFactory()
+    {
         return PassiveSkillFactory::new();
     }
 }

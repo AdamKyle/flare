@@ -1,20 +1,20 @@
 <?php
 
-
 namespace App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks;
 
 use App\Flare\Models\Character;
 use App\Flare\ServerFight\BattleBase;
 
-class PrisonerRage extends BattleBase {
-
-    public function handleAttack(Character $character, array $attackData, bool $isPvp = false) {
+class PrisonerRage extends BattleBase
+{
+    public function handleAttack(Character $character, array $attackData, bool $isPvp = false)
+    {
         $extraActionData = $this->characterCacheData->getCachedCharacterData($character, 'extra_action_chance');
 
         if ($extraActionData['has_item']) {
 
-            if (!($extraActionData['chance'] >= 1)) {
-                if (!(rand(1, 100) > (100 - 100 * $extraActionData['chance']))) {
+            if (! ($extraActionData['chance'] >= 1)) {
+                if (! (rand(1, 100) > (100 - 100 * $extraActionData['chance']))) {
                     return;
                 }
             }
@@ -41,13 +41,14 @@ class PrisonerRage extends BattleBase {
         }
     }
 
-    protected function doBaseAttack(int $damage, bool $isPvp = false) {
+    protected function doBaseAttack(int $damage, bool $isPvp = false)
+    {
         $this->monsterHealth -= $damage;
 
         $this->addMessage('You slash, you thrash, you bash and you crash your way through! (You dealt: '.number_format($damage).')', 'player-action', $isPvp);
 
         if ($isPvp) {
-            $this->addDefenderMessage('The enemy has refused to allow you to make them your prisoner. Death is coming! Damage dealt: ' . number_format($damage), 'enemy-action');
+            $this->addDefenderMessage('The enemy has refused to allow you to make them your prisoner. Death is coming! Damage dealt: '.number_format($damage), 'enemy-action');
         }
     }
 }

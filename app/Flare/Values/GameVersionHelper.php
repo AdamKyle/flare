@@ -4,9 +4,10 @@ namespace App\Flare\Values;
 
 use App\Flare\Models\ReleaseNote;
 
-class GameVersionHelper {
-
-    public static function version() {
+class GameVersionHelper
+{
+    public static function version()
+    {
         $releaseNotes = ReleaseNote::orderBy('release_date', 'desc')->first();
 
         if (is_null($releaseNotes)) {

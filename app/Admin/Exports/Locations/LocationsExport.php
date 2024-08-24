@@ -2,19 +2,17 @@
 
 namespace App\Admin\Exports\Locations;
 
+use App\Admin\Exports\Locations\Sheets\LocationsSheet;
 use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
-use App\Admin\Exports\Locations\Sheets\LocationsSheet;
 
-class LocationsExport implements WithMultipleSheets {
-
+class LocationsExport implements WithMultipleSheets
+{
     use Exportable;
 
-    /**
-     * @return array
-     */
-    public function sheets(): array {
-        $sheets   = [];
+    public function sheets(): array
+    {
+        $sheets = [];
 
         $sheets[] = new LocationsSheet;
 

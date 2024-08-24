@@ -25,28 +25,29 @@ use App\Game\Skills\Services\UpdateCharacterSkillsService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use League\Fractal\Manager;
 
-class ServiceProvider extends ApplicationServiceProvider {
-
+class ServiceProvider extends ApplicationServiceProvider
+{
     /**
      * Register any application services.
      *
      * @return void
      */
-    public function register() {
+    public function register()
+    {
 
         // @codeCoverageIgnoreStart
         $this->app->bind(Manager::class, function ($app) {
-            $manager = new Manager();
+            $manager = new Manager;
 
             // Attach the serializer
-            $manager->setSerializer(new CoreSerializer());
+            $manager->setSerializer(new CoreSerializer);
 
             return $manager;
         });
         // @codeCoverageIgnoreEnd
 
         $this->app->bind(SetHandsValidation::class, function () {
-            return new SetHandsValidation();
+            return new SetHandsValidation;
         });
 
         $this->app->bind(InventorySetService::class, function ($app) {
@@ -96,11 +97,11 @@ class ServiceProvider extends ApplicationServiceProvider {
             );
         });
 
-        $this->app->bind(EquipManyBuilder::class, function() {
-            return new EquipManyBuilder();
+        $this->app->bind(EquipManyBuilder::class, function () {
+            return new EquipManyBuilder;
         });
 
-        $this->app->bind(MultiInventoryActionService::class, function($app) {
+        $this->app->bind(MultiInventoryActionService::class, function ($app) {
             return new MultiInventoryActionService(
                 $app->make(InventorySetService::class),
                 $app->make(EquipItemService::class),
@@ -117,6 +118,5 @@ class ServiceProvider extends ApplicationServiceProvider {
      *
      * @return void
      */
-    public function boot() {
-    }
+    public function boot() {}
 }

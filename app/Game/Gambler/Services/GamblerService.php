@@ -16,37 +16,31 @@ use App\Game\Gambler\Jobs\SlotTimeOut;
 use App\Game\Gambler\Values\CurrencyValue;
 use Exception;
 
-class GamblerService {
-
+class GamblerService
+{
     use ResponseBuilder;
 
-    /**
-     * @var SpinHandler $spinHandler
-     */
     private SpinHandler $spinHandler;
 
-    /**
-     * @param SpinHandler $spinHandler
-     */
-    public function __construct(SpinHandler $spinHandler) {
+    public function __construct(SpinHandler $spinHandler)
+    {
         $this->spinHandler = $spinHandler;
     }
 
     /**
      * Spin the wheel.
      *
-     * @param Character $character
-     * @return array
      * @throws Exception
      */
-    public function roll(Character $character): array {
+    public function roll(Character $character): array
+    {
 
         if ($character->gold < 1000000) {
             return $this->errorResult('Not enough gold');
         }
 
         $character->update([
-            'gold' => $character->gold - 1000000
+            'gold' => $character->gold - 1000000,
         ]);
 
         $character = $character->refresh();
@@ -69,23 +63,21 @@ class GamblerService {
 
         return $this->successResult([
             'message' => 'Darn! Better luck next time child! Spin again!',
-            'rolls'   => $rollInfo['roll'],
+            'rolls' => $rollInfo['roll'],
         ]);
     }
 
     /**
      * handle the spin timeout.
-     *
-     * @param Character $character
-     * @return void
      */
-    protected function spinTimeout(Character $character): void {
+    protected function spinTimeout(Character $character): void
+    {
 
         $time = now()->addSeconds(10);
 
         $character->update([
-            'can_spin'            => false,
-            'can_spin_again_at'   => $time,
+            'can_spin' => false,
+            'can_spin_again_at' => $time,
         ]);
 
         $character = $character->refresh();
@@ -100,45 +92,42 @@ class GamblerService {
     /**
      * Give reward for matching.
      *
-     * @param Character $character
-     * @param array $rollInfo
-     * @param int $amountToWin
-     * @return array
      * @throws Exception
      */
-    protected function giveReward(Character $character, array $rollInfo, int $amountToWin): array {
+    protected function giveReward(Character $character, array $rollInfo, int $amountToWin): array
+    {
         $attribute = (new CurrencyValue($rollInfo['matching']))->getAttribute();
 
         if ($attribute === 'copper_coins') {
             $hasItem = $character->inventory->slots->where('item.effect', ItemEffectsValue::GET_COPPER_COINS)->isNotEmpty();
 
-            if (!$hasItem) {
+            if (! $hasItem) {
                 return $this->successResult([
                     'message' => 'Your do not have the quest item to get copper coins. Complete the quest: The Magic of Purgatory in Hell.',
-                    'rolls'   => $rollInfo['roll'],
+                    'rolls' => $rollInfo['roll'],
                 ]);
             }
         }
 
-        $totalBonus  = 0;
+        $totalBonus = 0;
 
         $currencyDayEvent = Event::where('type', EventType::WEEKLY_CURRENCY_DROPS)->first();
 
-        if (!is_null($currencyDayEvent)) {
+        if (! is_null($currencyDayEvent)) {
             $totalBonus += 0.25;
         }
 
-        $foundQuestItem = $character->inventory->slots->filter(function($slot) {
+        $foundQuestItem = $character->inventory->slots->filter(function ($slot) {
             return $slot->item->type === 'quest' && $slot->item->effect === ItemEffectsValue::MERCENARY_SLOT_BONUS;
         })->first();
 
-        if (!is_null($foundQuestItem)) {
+        if (! is_null($foundQuestItem)) {
             $totalBonus += .50;
         }
 
         $amountToWin = $amountToWin + $amountToWin * $totalBonus;
-        $newAmount   = $character->{$attribute} + $amountToWin;
-        $newAmount   = $this->getAmount($attribute, $newAmount);
+        $newAmount = $character->{$attribute} + $amountToWin;
+        $newAmount = $this->getAmount($attribute, $newAmount);
 
         $character->{$attribute} = $newAmount;
         $character->save();
@@ -146,19 +135,16 @@ class GamblerService {
         event(new UpdateCharacterCurrenciesEvent($character->refresh()));
 
         return $this->successResult([
-            'message' => 'You got a ' . number_format($amountToWin) . ' ' . ucfirst(str_replace('_', ' ', $attribute)) . '!',
-            'rolls'   => $rollInfo['roll'],
+            'message' => 'You got a '.number_format($amountToWin).' '.ucfirst(str_replace('_', ' ', $attribute)).'!',
+            'rolls' => $rollInfo['roll'],
         ]);
     }
 
     /**
      * Get new amount of currency for player.
-     *
-     * @param string $attribute
-     * @param int $amount
-     * @return int
      */
-    protected function getAmount(string $attribute, int $amount): int {
+    protected function getAmount(string $attribute, int $amount): int
+    {
 
         if ($attribute === 'gold_dust') {
             if ($amount > MaxCurrenciesValue::MAX_GOLD_DUST) {

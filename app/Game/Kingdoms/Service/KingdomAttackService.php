@@ -12,49 +12,31 @@ use App\Game\Kingdoms\Validators\MoveUnitsValidator;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
 
-class KingdomAttackService {
-
+class KingdomAttackService
+{
     use ResponseBuilder;
 
-    /**
-     * @var UnitMovementService $unitMovementService
-     */
     private UnitMovementService $unitMovementService;
 
-    /**
-     * @var MoveUnitsValidator $moveUnitsValidator;
-     */
     private MoveUnitsValidator $moveUnitsValidator;
 
-    /**
-     * @var UpdateKingdom $updateKingdom
-     */
     private UpdateKingdom $updateKingdom;
 
-    /**
-     * @param UnitMovementService $unitMovementService
-     * @param MoveUnitsValidator $moveUnitsValidator
-     * @param UpdateKingdom $updateKingdom
-     */
     public function __construct(UnitMovementService $unitMovementService,
-                                MoveUnitsValidator $moveUnitsValidator,
-                                UpdateKingdom $updateKingdom
+        MoveUnitsValidator $moveUnitsValidator,
+        UpdateKingdom $updateKingdom
     ) {
         $this->unitMovementService = $unitMovementService;
-        $this->moveUnitsValidator  = $moveUnitsValidator;
-        $this->updateKingdom       = $updateKingdom;
+        $this->moveUnitsValidator = $moveUnitsValidator;
+        $this->updateKingdom = $updateKingdom;
     }
 
     /**
      * Attack the kingdom.
-     *
-     * @param Character $character
-     * @param Kingdom $kingdom
-     * @param array $params
-     * @return array
      */
-    public function attackKingdom(Character $character, Kingdom $kingdom, array $params): array {
-        if (!$this->moveUnitsValidator->setUnitsToMove($params['units_to_move'])->isValid($character, $kingdom)) {
+    public function attackKingdom(Character $character, Kingdom $kingdom, array $params): array
+    {
+        if (! $this->moveUnitsValidator->setUnitsToMove($params['units_to_move'])->isValid($character, $kingdom)) {
             return $this->errorResult('Invalid input.');
         }
 
@@ -66,7 +48,7 @@ class KingdomAttackService {
             return $this->errorResult('Cannot attack across plane.');
         }
 
-        if (!is_null($kingdom->protected_until)) {
+        if (! is_null($kingdom->protected_until)) {
             return $this->errorResult('Cannot do that');
         }
 
@@ -78,7 +60,7 @@ class KingdomAttackService {
 
         $this->updateKingdom->updateKingdomAllKingdoms($character->refresh());
 
-        if (!is_null($kingdom->character_id)) {
+        if (! is_null($kingdom->character_id)) {
             $defender = $kingdom->character;
 
             $this->updateKingdom->updateKingdomAllKingdoms($defender->refresh());
@@ -86,21 +68,17 @@ class KingdomAttackService {
 
         $mapName = $kingdom->gameMap->name;
 
-        event(new GlobalMessageEvent($character->name . ' Has launched an attack against: ' .
-            $kingdom->name . ' on the plane: ' . $mapName . ' At (X/Y): ' . $kingdom->x_position . '/' . $kingdom->y_position));
+        event(new GlobalMessageEvent($character->name.' Has launched an attack against: '.
+            $kingdom->name.' on the plane: '.$mapName.' At (X/Y): '.$kingdom->x_position.'/'.$kingdom->y_position));
 
         return $this->successResult(['message' => 'Units have been sent to attack!']);
     }
 
     /**
      * Create the attack queue for each kingdom attacking.
-     *
-     * @param Character $character
-     * @param Kingdom $kingdom
-     * @param array $unitData
-     * @return void
      */
-    protected function createAttackQueue(Character $character, Kingdom $kingdom, array $unitData): void {
+    protected function createAttackQueue(Character $character, Kingdom $kingdom, array $unitData): void
+    {
         foreach ($unitData as $kingdomId => $units) {
             $this->attackQueueCreation($character, $kingdom, $units, $kingdomId);
         }
@@ -108,35 +86,30 @@ class KingdomAttackService {
 
     /**
      * Create attacking queue.
-     *
-     * @param Character $character
-     * @param Kingdom $kingdom
-     * @param array $unitData
-     * @param int $fromKingdomId
-     * @return void
      */
-    private function attackQueueCreation(Character $character, Kingdom $kingdom, array $unitData, int $fromKingdomId): void {
-        $fromKingdom   = $character->kingdoms()->find($fromKingdomId);
+    private function attackQueueCreation(Character $character, Kingdom $kingdom, array $unitData, int $fromKingdomId): void
+    {
+        $fromKingdom = $character->kingdoms()->find($fromKingdomId);
 
-        $time          = $this->unitMovementService->determineTimeRequired($character, $kingdom, $fromKingdomId);
+        $time = $this->unitMovementService->determineTimeRequired($character, $kingdom, $fromKingdomId);
 
-        $minutes       = now()->addMinutes($time);
+        $minutes = now()->addMinutes($time);
 
         $unitMovementQueue = UnitMovementQueue::create([
-            'character_id'      => $character->id,
-            'from_kingdom_id'   => $fromKingdom->id,
-            'to_kingdom_id'     => $kingdom->id,
-            'units_moving'      => $unitData,
-            'completed_at'      => $minutes,
-            'started_at'        => now(),
-            'moving_to_x'       => $kingdom->x_position,
-            'moving_to_y'       => $kingdom->y_position,
-            'from_x'            => $fromKingdom->x_position,
-            'from_y'            => $fromKingdom->y_position,
-            'is_attacking'      => true,
-            'is_recalled'       => false,
-            'is_returning'      => false,
-            'is_moving'         => false,
+            'character_id' => $character->id,
+            'from_kingdom_id' => $fromKingdom->id,
+            'to_kingdom_id' => $kingdom->id,
+            'units_moving' => $unitData,
+            'completed_at' => $minutes,
+            'started_at' => now(),
+            'moving_to_x' => $kingdom->x_position,
+            'moving_to_y' => $kingdom->y_position,
+            'from_x' => $fromKingdom->x_position,
+            'from_y' => $fromKingdom->y_position,
+            'is_attacking' => true,
+            'is_recalled' => false,
+            'is_returning' => false,
+            'is_moving' => false,
         ]);
 
         event(new UpdateKingdomQueues($kingdom));
@@ -144,14 +117,14 @@ class KingdomAttackService {
 
         MoveUnits::dispatch($unitMovementQueue->id)->delay($minutes);
 
-        if (!is_null($kingdom->character_id)) {
+        if (! is_null($kingdom->character_id)) {
             $defender = $kingdom->character;
 
             $fromMapName = $fromKingdom->gameMap->name;
 
-            event(new ServerMessageEvent($defender->user,$defender->name . ' Your kingdom is under attack! Kingdom: ' .
-                $kingdom->name . ' on the plane: ' . $fromMapName . ' At (X/Y): ' . $kingdom->x_position . '/' . $kingdom->y_position . 'from: ' .
-                $fromKingdom->name . ' At (X/Y): ' . $fromKingdom->x_position . '/' . $fromKingdom->y_position
+            event(new ServerMessageEvent($defender->user, $defender->name.' Your kingdom is under attack! Kingdom: '.
+                $kingdom->name.' on the plane: '.$fromMapName.' At (X/Y): '.$kingdom->x_position.'/'.$kingdom->y_position.'from: '.
+                $fromKingdom->name.' At (X/Y): '.$fromKingdom->x_position.'/'.$fromKingdom->y_position
             ));
         }
     }

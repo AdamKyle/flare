@@ -11,7 +11,8 @@ class CancelUnitRequest extends FormRequest
      *
      * @return bool
      */
-    public function authorize() {
+    public function authorize()
+    {
         return true;
     }
 
@@ -20,13 +21,15 @@ class CancelUnitRequest extends FormRequest
      *
      * @return array
      */
-    public function rules() {
+    public function rules()
+    {
         return [
             'queue_id' => 'required|integer',
         ];
     }
 
-    public function messages() {
+    public function messages()
+    {
         return [
             'queue_id.required' => 'Missing queue information.',
         ];

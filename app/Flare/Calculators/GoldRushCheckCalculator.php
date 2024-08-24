@@ -5,8 +5,8 @@ namespace App\Flare\Calculators;
 use App\Flare\Models\Monster;
 use Facades\App\Flare\RandomNumber\RandomNumberGenerator;
 
-class GoldRushCheckCalculator {
-
+class GoldRushCheckCalculator
+{
     /**
      * Fetches the gold rush check chance.
      *
@@ -16,14 +16,14 @@ class GoldRushCheckCalculator {
      *
      * Players have a 5% chance by default to get a gold rush.
      *
-     * @param Monster $monster
-     * @param float $gameMapBonus
+     * @param  Monster  $monster
      * @return bool
      */
-    public function fetchGoldRushChance(float $gameMapBonus = 0.0) {
+    public function fetchGoldRushChance(float $gameMapBonus = 0.0)
+    {
         $bonus = $gameMapBonus + 0.05;
 
-        $roll  = RandomNumberGenerator::generateTrueRandomNumber(100, $bonus);
+        $roll = RandomNumberGenerator::generateTrueRandomNumber(100, $bonus);
 
         return $roll >= 100;
     }

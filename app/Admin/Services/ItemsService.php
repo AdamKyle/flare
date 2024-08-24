@@ -2,25 +2,26 @@
 
 namespace App\Admin\Services;
 
-use App\Flare\Models\Item;
-use App\Flare\Models\SetSlot;
-use App\Flare\Models\Location;
 use App\Flare\Models\GameClass;
 use App\Flare\Models\GameSkill;
-use App\Flare\Models\ItemSkill;
 use App\Flare\Models\InventorySlot;
+use App\Flare\Models\Item;
+use App\Flare\Models\ItemSkill;
+use App\Flare\Models\Location;
+use App\Flare\Models\SetSlot;
 use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\ItemSpecialtyType;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Skills\Values\SkillTypeValue;
 
-class ItemsService {
-
+class ItemsService
+{
     use ResponseBuilder;
 
-    public function formInputs(): array {
+    public function formInputs(): array
+    {
         return [
-            'types'            => [
+            'types' => [
                 'weapon',
                 'bow',
                 'gun',
@@ -93,71 +94,72 @@ class ItemsService {
                 ItemSpecialtyType::DELUSIONAL_SILVER,
             ],
             'itemSkills' => ItemSkill::whereNull('parent_id')->get(),
-            'locations'  => Location::select('name', 'id')->get(),
-            'skills'     => GameSkill::pluck('name')->toArray(),
-            'classes'    => GameClass::pluck('name', 'id')->toArray(),
+            'locations' => Location::select('name', 'id')->get(),
+            'skills' => GameSkill::pluck('name')->toArray(),
+            'classes' => GameClass::pluck('name', 'id')->toArray(),
         ];
     }
 
-    public function cleanRequestData(array $params): array {
+    public function cleanRequestData(array $params): array
+    {
 
         if ($params['type'] !== 'quest') {
             $params['effect'] = null;
         }
 
-        if (!filter_var($params['can_use_on_other_items'], FILTER_VALIDATE_BOOLEAN)) {
+        if (! filter_var($params['can_use_on_other_items'], FILTER_VALIDATE_BOOLEAN)) {
             $params['can_use_on_other_items'] = false;
             $params['holy_level'] = null;
         }
 
-        if (!filter_var($params['usable'], FILTER_VALIDATE_BOOLEAN)) {
-            $params['usable']             = false;
-            $params['lasts_for']          = null;
-            $params['damages_kingdoms']   = false;
-            $params['stat_increase']      = null;
+        if (! filter_var($params['usable'], FILTER_VALIDATE_BOOLEAN)) {
+            $params['usable'] = false;
+            $params['lasts_for'] = null;
+            $params['damages_kingdoms'] = false;
+            $params['stat_increase'] = null;
             $params['affects_skill_type'] = null;
         }
 
-        if (!filter_var($params['damages_kingdoms'], FILTER_VALIDATE_BOOLEAN)) {
+        if (! filter_var($params['damages_kingdoms'], FILTER_VALIDATE_BOOLEAN)) {
             $params['damages_kingdoms'] = false;
-            $params['kingdom_damage']   = null;
+            $params['kingdom_damage'] = null;
         }
 
         if (filter_var($params['damages_kingdoms'], FILTER_VALIDATE_BOOLEAN)) {
-            $params['damages_kingdoms']   = true;
-            $params['lasts_for']          = null;
-            $params['stat_increase']      = null;
+            $params['damages_kingdoms'] = true;
+            $params['lasts_for'] = null;
+            $params['stat_increase'] = null;
             $params['affects_skill_type'] = null;
         }
 
-        if (!filter_var($params['stat_increase'], FILTER_VALIDATE_BOOLEAN)) {
-            $params['stat_increase']    = false;
+        if (! filter_var($params['stat_increase'], FILTER_VALIDATE_BOOLEAN)) {
+            $params['stat_increase'] = false;
             $params['increase_stat_by'] = 0;
         }
 
         if (is_null($params['affects_skill_type'])) {
-            $params['increase_skill_bonus_by']          = null;
+            $params['increase_skill_bonus_by'] = null;
             $params['increase_skill_training_bonus_by'] = null;
         }
 
-
-        if (!filter_var($params['can_resurrect'], FILTER_VALIDATE_BOOLEAN)) {
-            $params['can_resurrect']       = false;
+        if (! filter_var($params['can_resurrect'], FILTER_VALIDATE_BOOLEAN)) {
+            $params['can_resurrect'] = false;
             $params['resurrection_chance'] = null;
         }
 
-        if (!filter_var($params['can_craft'], FILTER_VALIDATE_BOOLEAN)) {
-            $params['can_craft']            = false;
-            $params['crafting_type']        = null;
-            $params['craft_only']           = false;
+        if (! filter_var($params['can_craft'], FILTER_VALIDATE_BOOLEAN)) {
+            $params['can_craft'] = false;
+            $params['crafting_type'] = null;
+            $params['craft_only'] = false;
             $params['skill_level_required'] = null;
-            $params['skill_level_trivial']  = null;
+            $params['skill_level_trivial'] = null;
         }
 
         return $params;
     }
 
-    public function deleteItem(Item $item) {
+    public function deleteItem(Item $item)
+    {
         $name = $item->name;
 
         InventorySlot::where('item_id', $item->id)->delete();
@@ -174,6 +176,6 @@ class ItemsService {
 
         $item->delete();
 
-        return $this->successResult(['message' => 'success', $name . ' was deleted successfully.']);
+        return $this->successResult(['message' => 'success', $name.' was deleted successfully.']);
     }
 }

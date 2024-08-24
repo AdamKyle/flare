@@ -9,33 +9,36 @@ use Tests\TestCase;
 use Tests\Traits\CreateClass;
 use Tests\Traits\CreateItem;
 
-class BuyItemEventTest extends TestCase {
-
-    use RefreshDatabase, CreateItem, CreateClass;
+class BuyItemEventTest extends TestCase
+{
+    use CreateClass, CreateItem, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
         $gameClass = $this->createClass([
-            'name' => 'Merchant'
+            'name' => 'Merchant',
         ]);
 
-        $this->character = (new CharacterFactory())->createBaseCharacter([], $gameClass)->givePlayerLocation();
+        $this->character = (new CharacterFactory)->createBaseCharacter([], $gameClass)->givePlayerLocation();
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
 
         $this->character = null;
     }
 
-    public function testMerchantShouldGetADiscount() {
+    public function testMerchantShouldGetADiscount()
+    {
         $character = $this->character->getCharacter();
 
         $character->update([
-            'gold' => 10
+            'gold' => 10,
         ]);
 
         $item = $this->createItem([

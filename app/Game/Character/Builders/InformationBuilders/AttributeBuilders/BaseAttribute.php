@@ -9,50 +9,35 @@ use App\Flare\Values\WeaponTypes;
 use App\Game\Character\Builders\StatDetailsBuilder\Concerns\BasicItemDetails;
 use Illuminate\Support\Collection;
 
-class BaseAttribute {
-
+class BaseAttribute
+{
     use BasicItemDetails;
 
-    /**
-     * @var Character $character
-     */
-    protected  Character $character;
+    protected Character $character;
 
-    /**
-     * @var Collection|null $inventory
-     */
     protected ?Collection $inventory;
 
-    /**
-     * @var Collection $skills
-     */
-    protected  Collection $skills;
+    protected Collection $skills;
 
-    /**
-     * @param Character $character
-     * @param Collection $skills
-     * @param Collection|null $inventory
-     * @return void
-     */
-    public function initialize(Character $character, Collection $skills, ?Collection $inventory): void {
+    public function initialize(Character $character, Collection $skills, ?Collection $inventory): void
+    {
 
         $this->character = $character;
         $this->inventory = $inventory;
-        $this->skills    = $skills;
+        $this->skills = $skills;
     }
 
     /**
      * Get attribute bonus from all item affixes.
-     *
-     * @param string $attribute
-     * @return float
      */
-    protected function getAttributeBonusFromAllItemAffixes(string $attribute): float {
+    protected function getAttributeBonusFromAllItemAffixes(string $attribute): float
+    {
         return $this->inventory->sum('item.itemPrefix.'.$attribute.'_mod') +
             $this->inventory->sum('item.itemSuffix.'.$attribute.'_mod');
     }
 
-    protected function getAttributeBonusFromAllItemAffixesDetails(string $attribute, bool $voided = false, string|array $onlyForType = null): array {
+    protected function getAttributeBonusFromAllItemAffixesDetails(string $attribute, bool $voided = false, string|array|null $onlyForType = null): array
+    {
         $details = [];
 
         if (is_null($this->inventory)) {
@@ -61,9 +46,9 @@ class BaseAttribute {
 
         foreach ($this->inventory as $slot) {
 
-            if (!is_null($onlyForType)) {
+            if (! is_null($onlyForType)) {
 
-                if (!is_array($onlyForType)) {
+                if (! is_array($onlyForType)) {
 
                     if ($onlyForType === WeaponTypes::RING && $slot->item->type !== $onlyForType) {
                         continue;
@@ -71,12 +56,12 @@ class BaseAttribute {
 
                     if ($slot->item->type !== $onlyForType) {
 
-                        if (!$this->hasAffixesAffectingStat($slot->item, $attribute)) {
+                        if (! $this->hasAffixesAffectingStat($slot->item, $attribute)) {
                             continue;
                         }
                     }
                 } else {
-                    if (!in_array($slot->item->type, $onlyForType)) {
+                    if (! in_array($slot->item->type, $onlyForType)) {
                         continue;
                     }
                 }
@@ -85,24 +70,24 @@ class BaseAttribute {
 
             $details[] = [
                 'item_details' => $this->getBasicDetailsOfItem($slot->item),
-                $attribute     => number_format($slot->item->{$attribute}),
-                'affixes'      => $voided ? [] : $this->fetchAffixes($slot->item, $attribute),
+                $attribute => number_format($slot->item->{$attribute}),
+                'affixes' => $voided ? [] : $this->fetchAffixes($slot->item, $attribute),
             ];
         }
 
         return $details;
     }
 
-    private function hasAffixesAffectingStat(Item $item, string $attribute): bool {
-        if (!is_null($item->item_prefix_id)) {
-            if ($item->itemPrefix->{$attribute . '_mod'} > 0) {
+    private function hasAffixesAffectingStat(Item $item, string $attribute): bool
+    {
+        if (! is_null($item->item_prefix_id)) {
+            if ($item->itemPrefix->{$attribute.'_mod'} > 0) {
                 return true;
             }
         }
 
-
-        if (!is_null($item->item_suffix_id)) {
-            if ($item->itemSuffix->{$attribute . '_mod'} > 0) {
+        if (! is_null($item->item_suffix_id)) {
+            if ($item->itemSuffix->{$attribute.'_mod'} > 0) {
                 return true;
             }
         }
@@ -110,24 +95,24 @@ class BaseAttribute {
         return false;
     }
 
-    private function fetchAffixes(Item $item, string $attribute): array {
+    private function fetchAffixes(Item $item, string $attribute): array
+    {
         $details = [];
 
-        if (!is_null($item->item_prefix_id)) {
-            if ($item->itemPrefix->{$attribute . '_mod'} > 0) {
+        if (! is_null($item->item_prefix_id)) {
+            if ($item->itemPrefix->{$attribute.'_mod'} > 0) {
                 $details[] = [
                     'name' => $item->itemPrefix->name,
-                    'amount' => $item->itemPrefix->{$attribute . '_mod'},
+                    'amount' => $item->itemPrefix->{$attribute.'_mod'},
                 ];
             }
         }
 
-
-        if (!is_null($item->item_suffix_id)) {
-            if ($item->itemSuffix->{$attribute . '_mod'} > 0) {
+        if (! is_null($item->item_suffix_id)) {
+            if ($item->itemSuffix->{$attribute.'_mod'} > 0) {
                 $details[] = [
                     'name' => $item->itemSuffix->name,
-                    'amount' => $item->itemSuffix->{$attribute . '_mod'},
+                    'amount' => $item->itemSuffix->{$attribute.'_mod'},
                 ];
             }
         }
@@ -137,27 +122,26 @@ class BaseAttribute {
 
     /**
      * Fetch attribute bonus from skills.
-     *
-     * @param string $baseAttribute
-     * @return float
      */
-    public function fetchBaseAttributeFromSkills(string $baseAttribute): float {
+    public function fetchBaseAttributeFromSkills(string $baseAttribute): float
+    {
         $totalPercent = 0;
 
         foreach ($this->skills as $skill) {
-            $totalPercent += ($skill->baseSkill->{$baseAttribute . '_mod_bonus_per_level'} * $skill->level);
+            $totalPercent += ($skill->baseSkill->{$baseAttribute.'_mod_bonus_per_level'} * $skill->level);
         }
 
         return $totalPercent;
     }
 
-    public function fetchBaseAttributeFromSkillsDetails(string $baseAttribute): array {
+    public function fetchBaseAttributeFromSkillsDetails(string $baseAttribute): array
+    {
         $details = [];
 
         foreach ($this->skills as $skill) {
 
             if ($this->character->game_class_id === $skill->baseSkill->game_class_id) {
-                $amount = $skill->baseSkill->{$baseAttribute . '_mod_bonus_per_level'} * $skill->level;
+                $amount = $skill->baseSkill->{$baseAttribute.'_mod_bonus_per_level'} * $skill->level;
 
                 if ($amount > 0) {
                     $details[] = [
@@ -173,13 +157,10 @@ class BaseAttribute {
 
     /**
      * Should we include skill damage?
-     *
-     * @param GameClass $class
-     * @param string $type
-     * @return bool
      */
-    protected function shouldIncludeSkillDamage(GameClass $class, string $type): bool {
-        switch($type) {
+    protected function shouldIncludeSkillDamage(GameClass $class, string $type): bool
+    {
+        switch ($type) {
             case 'weapon':
                 return $class->type()->isNonCaster();
             case 'spell':
@@ -195,11 +176,9 @@ class BaseAttribute {
 
     /**
      * Get damage from items.
-     *
-     * @param string $position
-     * @return int
      */
-    protected function getDamageFromWeapons(string $position): int {
+    protected function getDamageFromWeapons(string $position): int
+    {
 
         if ($position === 'both') {
             return $this->inventory->whereIn('item.type', [
@@ -224,10 +203,11 @@ class BaseAttribute {
             WeaponTypes::MACE,
             WeaponTypes::SCRATCH_AWL,
         ])->where('position', $position)
-          ->sum('item.base_damage');
+            ->sum('item.base_damage');
     }
 
-    protected function getDamageFromItems(string $type, string $position): int {
+    protected function getDamageFromItems(string $type, string $position): int
+    {
 
         if (is_null($this->inventory)) {
             return 0;
@@ -238,18 +218,15 @@ class BaseAttribute {
         }
 
         return $this->inventory->where('item.type', $type)
-                               ->where('position', $position)
-                               ->sum('item.base_damage');
+            ->where('position', $position)
+            ->sum('item.base_damage');
     }
 
     /**
      * Get healing from items.
-     *
-     * @param string $type
-     * @param string $position
-     * @return int
      */
-    protected function getHealingFromItems(string $type, string $position): int {
+    protected function getHealingFromItems(string $type, string $position): int
+    {
 
         if ($position === 'both') {
             return $this->inventory->where('item.type', $type)->sum('item.base_healing');

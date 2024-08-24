@@ -5,7 +5,6 @@ namespace Database\Factories;
 use App\Flare\Models\CharacterAutomation;
 use App\Flare\Values\AutomationType;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use App\Flare\Models\GameBuildingUnit;
 
 class CharacterAutomationFactory extends Factory
 {
@@ -24,15 +23,15 @@ class CharacterAutomationFactory extends Factory
     public function definition()
     {
         return [
-            'character_id'                   => null,
-            'monster_id'                     => null,
-            'type'                           => AutomationType::EXPLORING,
-            'started_at'                     => now(),
-            'completed_at'                   => now()->addSeconds(5),
-            'move_down_monster_list_every'   => null,
-            'previous_level'                 => null,
-            'current_level'                  => null,
-            'attack_type'                    => null,
+            'character_id' => null,
+            'monster_id' => null,
+            'type' => AutomationType::EXPLORING,
+            'started_at' => now(),
+            'completed_at' => now()->addSeconds(5),
+            'move_down_monster_list_every' => null,
+            'previous_level' => null,
+            'current_level' => null,
+            'attack_type' => null,
         ];
     }
 }

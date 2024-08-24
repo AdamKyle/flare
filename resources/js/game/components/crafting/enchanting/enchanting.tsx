@@ -623,30 +623,35 @@ export default class Enchanting extends React.Component<
                     </InfoAlert>
                 ) : null}
                 <div className={"text-center md:ml-[-100px] mt-3 mb-3"}>
-                    <PrimaryButton
-                        button_label={"Enchant"}
-                        on_click={() => this.enchant(false)}
-                        disabled={this.cannotCraft()}
-                    />
-                    {this.state.show_enchanting_for_event ? (
-                        <OrangeButton
-                            button_label={"Enchant for event"}
-                            on_click={() => this.enchant(true)}
+                    <div className="flex flex-col md:flex-row justify-center items-center gap-2">
+                        <PrimaryButton
+                            button_label={"Enchant"}
+                            on_click={() => this.enchant(false)}
                             disabled={this.cannotCraft()}
-                            additional_css={"ml-2"}
+                            additional_css="w-full md:w-auto"
                         />
-                    ) : null}
+                        {this.state.show_enchanting_for_event ? (
+                            <OrangeButton
+                                button_label={"Enchant for event"}
+                                on_click={() => this.enchant(true)}
+                                disabled={this.cannotCraft()}
+                                additional_css={"w-full md:w-auto md:ml-2"}
+                            />
+                        ) : null}
 
-                    <DangerButton
-                        button_label={"Close"}
-                        on_click={this.clearCrafting.bind(this)}
-                        additional_css={"ml-2"}
-                        disabled={this.state.loading || this.props.cannot_craft}
-                    />
+                        <DangerButton
+                            button_label={"Close"}
+                            on_click={this.clearCrafting.bind(this)}
+                            additional_css={"w-full md:w-auto md:ml-2"}
+                            disabled={
+                                this.state.loading || this.props.cannot_craft
+                            }
+                        />
+                    </div>
                     <a
                         href="/information/enchanting"
                         target="_blank"
-                        className="ml-2"
+                        className="block mt-2 md:ml-2"
                     >
                         Help <i className="fas fa-external-link-alt"></i>
                     </a>

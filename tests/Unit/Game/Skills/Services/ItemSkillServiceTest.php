@@ -2,36 +2,32 @@
 
 namespace Tests\Unit\Game\Skills\Services;
 
-use App\Flare\Models\GlobalEventGoal;
-use App\Flare\Models\GlobalEventKill;
-use App\Flare\Models\GlobalEventParticipation;
-use App\Flare\Models\Item;
 use App\Flare\Models\ItemSkill;
-use App\Flare\Models\ItemSkillProgression;
-use Illuminate\Support\Facades\DB;
+use App\Game\Skills\Services\ItemSkillService;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateItem;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Game\Skills\Services\ItemSkillService;
 
-class ItemSkillServiceTest extends TestCase {
-
-    use RefreshDatabase, CreateItem;
+class ItemSkillServiceTest extends TestCase
+{
+    use CreateItem, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
     private ?ItemSkillService $itemSkillService;
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
-        $this->character = (new CharacterFactory())->createBaseCharacter();
+        $this->character = (new CharacterFactory)->createBaseCharacter();
 
         $this->itemSkillService = resolve(ItemSkillService::class);
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
 
         $this->character = null;
@@ -39,7 +35,8 @@ class ItemSkillServiceTest extends TestCase {
         $this->itemSkillService = null;
     }
 
-    public function testCannotFindItemForItemSkillToTrain() {
+    public function testCannotFindItemForItemSkillToTrain()
+    {
 
         $character = $this->character->getCharacter();
 
@@ -49,7 +46,8 @@ class ItemSkillServiceTest extends TestCase {
         $this->assertEquals('No item found. Either it is not equipped, or it does not exist.', $result['message']);
     }
 
-    public function testCannotFindItemForItemSkillToTrainWhenYouHaveEquippedItems() {
+    public function testCannotFindItemForItemSkillToTrainWhenYouHaveEquippedItems()
+    {
 
         $character = $this->character->equipStartingEquipment()->getCharacter();
 
@@ -59,7 +57,8 @@ class ItemSkillServiceTest extends TestCase {
         $this->assertEquals('No item found. Either it is not equipped, or it does not exist.', $result['message']);
     }
 
-    public function testCannotFindItemForItemSkillToStopTrainingWhenYouHaveNoItemEquipped() {
+    public function testCannotFindItemForItemSkillToStopTrainingWhenYouHaveNoItemEquipped()
+    {
 
         $character = $this->character->equipStartingEquipment()->getCharacter();
 
@@ -69,12 +68,13 @@ class ItemSkillServiceTest extends TestCase {
         $this->assertEquals('Item must be equipped to manage the training of a skill.', $result['message']);
     }
 
-    public function testCannotFindItemSkillProgressionWhenYouHaveAnItemThatHasSkills() {
+    public function testCannotFindItemSkillProgressionWhenYouHaveAnItemThatHasSkills()
+    {
         $item = $this->createItem(['type' => 'artifact']);
 
-        $itemSkill  = ItemSkill::create([
-            'name'            => 'parent',
-            'description'     => 'sample',
+        $itemSkill = ItemSkill::create([
+            'name' => 'parent',
+            'description' => 'sample',
             'base_damage_mod' => 0.10,
             'max_level' => 10,
             'total_kills_needed' => 100,
@@ -96,11 +96,12 @@ class ItemSkillServiceTest extends TestCase {
         $this->assertEquals('No skill found on said item.', $result['message']);
     }
 
-    public function testCannotStopTrainingSkillWhenThereIsNoProgressionData() {
+    public function testCannotStopTrainingSkillWhenThereIsNoProgressionData()
+    {
 
-        $itemSkill  = ItemSkill::create([
-            'name'            => 'parent',
-            'description'     => 'sample',
+        $itemSkill = ItemSkill::create([
+            'name' => 'parent',
+            'description' => 'sample',
             'base_damage_mod' => 0.10,
             'max_level' => 10,
             'total_kills_needed' => 100,
@@ -116,12 +117,13 @@ class ItemSkillServiceTest extends TestCase {
         $this->assertEquals('No skill found on said item.', $result['message']);
     }
 
-    public function testCannotFindItemSkillProgressionWhenYouHaveAnItemThatHasSkillsButNoProgression() {
+    public function testCannotFindItemSkillProgressionWhenYouHaveAnItemThatHasSkillsButNoProgression()
+    {
         $item = $this->createItem(['type' => 'artifact']);
 
         ItemSkill::create([
-            'name'            => 'parent',
-            'description'     => 'sample',
+            'name' => 'parent',
+            'description' => 'sample',
             'base_damage_mod' => 0.10,
             'max_level' => 10,
             'total_kills_needed' => 100,
@@ -135,24 +137,25 @@ class ItemSkillServiceTest extends TestCase {
         $this->assertEquals('No skill found on said item.', $result['message']);
     }
 
-    public function testCannotTrainSkillWhenParentIsNotTrained() {
+    public function testCannotTrainSkillWhenParentIsNotTrained()
+    {
 
-        $itemSkill  = ItemSkill::create([
-            'name'            => 'parent 2',
-            'description'     => 'sample',
+        $itemSkill = ItemSkill::create([
+            'name' => 'parent 2',
+            'description' => 'sample',
             'base_damage_mod' => 0.10,
             'max_level' => 10,
             'total_kills_needed' => 100,
         ]);
 
-        $childItemSkill  = ItemSkill::create([
-            'name'                => 'child 2',
-            'description'         => 'sample',
-            'base_damage_mod'     => 0.10,
-            'max_level'           => 10,
-            'total_kills_needed'  => 100,
-            'parent_id'           => $itemSkill->id,
-            'parent_level_needed' => 4
+        $childItemSkill = ItemSkill::create([
+            'name' => 'child 2',
+            'description' => 'sample',
+            'base_damage_mod' => 0.10,
+            'max_level' => 10,
+            'total_kills_needed' => 100,
+            'parent_id' => $itemSkill->id,
+            'parent_level_needed' => 4,
         ]);
 
         $item = $this->createItem(['name' => 'Test Item With Skill', 'type' => 'artifact', 'item_skill_id' => $itemSkill->id]);
@@ -185,24 +188,25 @@ class ItemSkillServiceTest extends TestCase {
         $this->assertEquals('You must train the parent skill first.', $result['message']);
     }
 
-    public function testCanTrainChildSkill() {
+    public function testCanTrainChildSkill()
+    {
 
-        $itemSkill  = ItemSkill::create([
-            'name'               => 'parent',
-            'description'        => 'sample',
-            'base_damage_mod'    => 0.10,
-            'max_level'          => 10,
+        $itemSkill = ItemSkill::create([
+            'name' => 'parent',
+            'description' => 'sample',
+            'base_damage_mod' => 0.10,
+            'max_level' => 10,
             'total_kills_needed' => 100,
         ]);
 
-        $childItemSkill  = ItemSkill::create([
-            'name'                => 'child',
-            'description'         => 'sample',
-            'base_damage_mod'     => 0.10,
-            'max_level'           => 10,
-            'total_kills_needed'  => 100,
-            'parent_id'           => $itemSkill->id,
-            'parent_level_needed' => 4
+        $childItemSkill = ItemSkill::create([
+            'name' => 'child',
+            'description' => 'sample',
+            'base_damage_mod' => 0.10,
+            'max_level' => 10,
+            'total_kills_needed' => 100,
+            'parent_id' => $itemSkill->id,
+            'parent_level_needed' => 4,
         ]);
 
         $item = $this->createItem(['type' => 'artifact', 'item_skill_id' => $itemSkill->id]);
@@ -230,14 +234,15 @@ class ItemSkillServiceTest extends TestCase {
         $result = $this->itemSkillService->trainSkill($character, $item->id, $childItemSkillProgression->id);
 
         $this->assertEquals(200, $result['status']);
-        $this->assertEquals('You are now training: ' . $childItemSkillProgression->itemSkill->name, $result['message']);
+        $this->assertEquals('You are now training: '.$childItemSkillProgression->itemSkill->name, $result['message']);
     }
 
-    public function testStartTrainingTheSkillOnTheItem() {
+    public function testStartTrainingTheSkillOnTheItem()
+    {
 
-        $itemSkill  = ItemSkill::create([
-            'name'            => 'test',
-            'description'     => 'sample',
+        $itemSkill = ItemSkill::create([
+            'name' => 'test',
+            'description' => 'sample',
             'base_damage_mod' => 0.10,
             'max_level' => 10,
             'total_kills_needed' => 100,
@@ -264,15 +269,16 @@ class ItemSkillServiceTest extends TestCase {
         $itemSkillProgression = $itemSkillProgression->refresh();
 
         $this->assertEquals(200, $result['status']);
-        $this->assertEquals('You are now training: ' . $itemSkillProgression->itemSkill->name, $result['message']);
+        $this->assertEquals('You are now training: '.$itemSkillProgression->itemSkill->name, $result['message']);
         $this->assertTrue($itemSkillProgression->is_training);
     }
 
-    public function testStopTrainingTheSkillOnTheItem() {
+    public function testStopTrainingTheSkillOnTheItem()
+    {
 
-        $itemSkill  = ItemSkill::create([
-            'name'            => 'test',
-            'description'     => 'sample',
+        $itemSkill = ItemSkill::create([
+            'name' => 'test',
+            'description' => 'sample',
             'base_damage_mod' => 0.10,
             'max_level' => 10,
             'total_kills_needed' => 100,
@@ -299,28 +305,29 @@ class ItemSkillServiceTest extends TestCase {
         $itemSkillProgression = $itemSkillProgression->refresh();
 
         $this->assertEquals(200, $result['status']);
-        $this->assertEquals('You stopped training: ' . $itemSkillProgression->itemSkill->name, $result['message']);
+        $this->assertEquals('You stopped training: '.$itemSkillProgression->itemSkill->name, $result['message']);
         $this->assertFalse($itemSkillProgression->is_training);
     }
 
-    public function testStartTrainingOfParentSkillWhenTrainingParentSkill() {
+    public function testStartTrainingOfParentSkillWhenTrainingParentSkill()
+    {
 
-        $itemSkill  = ItemSkill::create([
-            'name'               => 'parent',
-            'description'        => 'sample',
-            'base_damage_mod'    => 0.10,
-            'max_level'          => 10,
+        $itemSkill = ItemSkill::create([
+            'name' => 'parent',
+            'description' => 'sample',
+            'base_damage_mod' => 0.10,
+            'max_level' => 10,
             'total_kills_needed' => 100,
         ]);
 
-        $childItemSkill  = ItemSkill::create([
-            'name'                => 'child',
-            'description'         => 'sample',
-            'base_damage_mod'     => 0.10,
-            'max_level'           => 10,
-            'total_kills_needed'  => 100,
-            'parent_id'           => $itemSkill->id,
-            'parent_level_needed' => 4
+        $childItemSkill = ItemSkill::create([
+            'name' => 'child',
+            'description' => 'sample',
+            'base_damage_mod' => 0.10,
+            'max_level' => 10,
+            'total_kills_needed' => 100,
+            'parent_id' => $itemSkill->id,
+            'parent_level_needed' => 4,
         ]);
 
         $item = $this->createItem(['type' => 'artifact', 'item_skill_id' => $itemSkill->id]);
@@ -348,7 +355,7 @@ class ItemSkillServiceTest extends TestCase {
         $result = $this->itemSkillService->trainSkill($character, $item->id, $parentItemSkillProgression->id);
 
         $this->assertEquals(200, $result['status']);
-        $this->assertEquals('You are now training: ' . $parentItemSkillProgression->itemSkill->name, $result['message']);
+        $this->assertEquals('You are now training: '.$parentItemSkillProgression->itemSkill->name, $result['message']);
 
         $childItemSkillProgression = $childItemSkillProgression->refresh();
 

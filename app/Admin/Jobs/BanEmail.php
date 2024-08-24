@@ -2,14 +2,14 @@
 
 namespace App\Admin\Jobs;
 
-use Mail;
+use App\Flare\Mail\GenericMail;
+use App\Flare\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use App\Flare\Mail\GenericMail;
-use App\Flare\Models\User;
+use Mail;
 
 class BanEmail implements ShouldQueue
 {
@@ -21,12 +21,10 @@ class BanEmail implements ShouldQueue
 
     /**
      * AssignSkillsJob constructor.
-     *
-     * @param User $user
-     * @param string $message
      */
-    public function __construct(User $user, string $message) {
-        $this->user    = $user;
+    public function __construct(User $user, string $message)
+    {
+        $this->user = $user;
         $this->message = $message;
     }
 
@@ -35,7 +33,8 @@ class BanEmail implements ShouldQueue
      *
      * @return void
      */
-    public function handle() {
+    public function handle()
+    {
         return Mail::to($this->user->email)->send(new GenericMail($this->user, $this->message, 'You have been banned!', true));
     }
 }

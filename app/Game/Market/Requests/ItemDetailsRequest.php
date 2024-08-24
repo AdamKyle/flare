@@ -4,7 +4,8 @@ namespace App\Game\Market\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class ItemDetailsRequest extends FormRequest {
+class ItemDetailsRequest extends FormRequest
+{
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -20,13 +21,15 @@ class ItemDetailsRequest extends FormRequest {
      *
      * @return array
      */
-    public function rules() {
+    public function rules()
+    {
         return [
             'item_id' => 'integer|required',
         ];
     }
 
-    public function messages() {
+    public function messages()
+    {
         return [
             'item_id.required' => 'Error. Missing item id.',
         ];

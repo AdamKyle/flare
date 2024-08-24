@@ -3,11 +3,11 @@
 namespace App\Flare\Models;
 
 use Database\Factories\GameClassSpecialtiesFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
-class GameClassSpecial extends Model {
-
+class GameClassSpecial extends Model
+{
     use HasFactory;
 
     /**
@@ -38,29 +38,31 @@ class GameClassSpecial extends Model {
     ];
 
     protected $casts = [
-        'game_class_id'                             => 'integer',
-        'requires_class_rank_level'                 => 'integer',
-        'specialty_damage'                          => 'integer',
-        'increase_specialty_damage_per_level'       => 'integer',
-        'specialty_damage_uses_damage_stat_amount'  => 'float',
-        'base_damage_mod'                           => 'float',
-        'base_ac_mod'                               => 'float',
-        'base_healing_mod'                          => 'float',
-        'base_spell_damage_mod'                     => 'float',
-        'health_mod'                                => 'float',
-        'base_damage_stat_increase'                 => 'float',
-        'spell_evasion'                             => 'float',
-        'affix_damage_reduction'                    => 'float',
-        'healing_reduction'                         => 'float',
-        'skill_reduction'                           => 'float',
-        'resistance_reduction'                      => 'float',
+        'game_class_id' => 'integer',
+        'requires_class_rank_level' => 'integer',
+        'specialty_damage' => 'integer',
+        'increase_specialty_damage_per_level' => 'integer',
+        'specialty_damage_uses_damage_stat_amount' => 'float',
+        'base_damage_mod' => 'float',
+        'base_ac_mod' => 'float',
+        'base_healing_mod' => 'float',
+        'base_spell_damage_mod' => 'float',
+        'health_mod' => 'float',
+        'base_damage_stat_increase' => 'float',
+        'spell_evasion' => 'float',
+        'affix_damage_reduction' => 'float',
+        'healing_reduction' => 'float',
+        'skill_reduction' => 'float',
+        'resistance_reduction' => 'float',
     ];
 
-    public function gameClass() {
+    public function gameClass()
+    {
         return $this->belongsTo(GameClass::class);
     }
 
-    protected static function newFactory() {
+    protected static function newFactory()
+    {
         return GameClassSpecialtiesFactory::new();
     }
 }

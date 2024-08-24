@@ -2,9 +2,9 @@
 
 namespace App\Game\Kingdoms\Console\Commands;
 
+use App\Flare\Models\KingdomLog;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
-use App\Flare\Models\KingdomLog;
 
 class DeleteKingdomLogs extends Command
 {
@@ -39,8 +39,8 @@ class DeleteKingdomLogs extends Command
      */
     public function handle()
     {
-        KingdomLog::where('created_at', '<=', Carbon::today()->subDays(7))->chunkById(100, function($logs) {
-            foreach($logs as $log) {
+        KingdomLog::where('created_at', '<=', Carbon::today()->subDays(7))->chunkById(100, function ($logs) {
+            foreach ($logs as $log) {
                 $log->delete();
             }
         });

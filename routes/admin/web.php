@@ -19,7 +19,6 @@ Route::middleware(['auth', 'is.admin'])->group(function () {
     Route::post('/admin/maps/process-upload', ['as' => 'upload.map', 'uses' => 'MapsController@upload']);
     Route::post('/admin/maps/{gameMap}/post-bonuses', ['as' => 'add.map.bonuses', 'uses' => 'MapsController@postBonuses']);
 
-
     Route::get('/admin/locations/export-locations', ['as' => 'locations.export', 'uses' => 'LocationsController@exportLocations']);
     Route::get('/admin/locations/import-locations', ['as' => 'locations.import', 'uses' => 'LocationsController@importLocations']);
     Route::post('/admin/locations/export-data', ['as' => 'locations.export-data', 'uses' => 'LocationsController@export']);
@@ -136,7 +135,6 @@ Route::middleware(['auth', 'is.admin'])->group(function () {
     Route::get('/admin/classes/{class}', ['as' => 'classes.class', 'uses' => 'ClassesController@show']);
     Route::get('/admin/classes/{class}/edit', ['as' => 'classes.edit', 'uses' => 'ClassesController@edit']);
 
-
     Route::get('/admin/kingdoms/buildings/create', ['as' => 'buildings.create', 'uses' => 'BuildingsController@create']);
     Route::get('/admin/kingdoms/buildings', ['as' => 'buildings.list', 'uses' => 'BuildingsController@index']);
     Route::get('/admin/kingdoms/buildings/{building}', ['as' => 'buildings.building', 'uses' => 'BuildingsController@show']);
@@ -225,6 +223,20 @@ Route::middleware(['auth', 'is.admin'])->group(function () {
     Route::get('/admin/statistics/dashboard', ['as' => 'admin.statistics', 'uses' => 'StatisticsController@index']);
     Route::get('/admin/events', ['as' => 'admin.events', 'uses' => 'EventScheduleController@index']);
 
-    Route::get('/admin/events/export-data', ['as' => 'admin.events.export-data', 'uses' => 'EventsController@exportEvents']);
-    Route::get('/admin/events/import-data', ['as' => 'admin.events.import-data', 'uses' => 'EventsController@importEvents']);
+    Route::get('/admin/feedback/bugs', ['as' => 'admin.feedback.bugs', 'uses' => 'FeedbackController@bugs']);
+    Route::get('/admin/feedback/bug/{bug}', ['as' => 'admin.feedback.bug', 'uses' => 'FeedbackController@bug']);
+    Route::get('/admin/feedback/suggestions', ['as' => 'admin.feedback.suggestions', 'uses' => 'FeedbackController@suggestions']);
+    Route::get('/admin/feedback/suggestion/{suggestion}', ['as' => 'admin.feedback.suggestion', 'uses' => 'FeedbackController@suggestion']);
+    Route::post('/admin/feedback/delete/{feedbackId}', ['as' => 'admin.feedback.delete', 'uses' => 'FeedbackController@deleteFeedback']);
+
+    Route::post('/admin/surveys/export', ['as' => 'admin.survey-builder.export', 'uses' => 'SurveyBuilderController@export']);
+    Route::post('/admin/surveys/import', ['as' => 'admin.survey-builder.import', 'uses' => 'SurveyBuilderController@import']);
+
+    Route::get('/admin/survey-builder/create-survey', ['as' => 'admin.survey-builder.create-survey', 'uses' => 'SurveyBuilderController@createSurvey']);
+    Route::get('/admin/surveys', ['as' => 'admin.surveys', 'uses' => 'SurveyBuilderController@listSurveys']);
+    Route::get('/admin/view-survey/{survey}', ['as' => 'admin.single.survey', 'uses' => 'SurveyBuilderController@viewSurvey']);
+    Route::get('/admin/edit-survey/{survey}', ['as' => 'admin.edit.survey', 'uses' => 'SurveyBuilderController@editSurvey']);
+    Route::post('/admin/delete/survey/{survey}', ['as' => 'admin.surveys.delete', 'uses' => 'SurveyBuilderController@deleteSurvey']);
+    Route::get('/admin/surveys/export-data', ['as' => 'admin.survey-builder.export-data', 'uses' => 'SurveyBuilderController@exportInfo']);
+    Route::get('/admin/surveys/import-data', ['as' => 'admin.survey-builder.import-data', 'uses' => 'SurveyBuilderController@importInfo']);
 });

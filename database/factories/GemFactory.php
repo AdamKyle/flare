@@ -23,14 +23,14 @@ class GemFactory extends Factory
     public function definition()
     {
         return [
-            'name'                       => 'Sample',
-            'tier'                       => 1,
-            'primary_atonement_type'     => GemTypeValue::ICE,
-            'secondary_atonement_type'   => GemTypeValue::WATER,
-            'tertiary_atonement_type'    => GemTypeValue::FIRE,
-            'primary_atonement_amount'   => 0.01,
+            'name' => 'Sample',
+            'tier' => 1,
+            'primary_atonement_type' => GemTypeValue::ICE,
+            'secondary_atonement_type' => GemTypeValue::WATER,
+            'tertiary_atonement_type' => GemTypeValue::FIRE,
+            'primary_atonement_amount' => 0.01,
             'secondary_atonement_amount' => 0.20,
-            'tertiary_atonement_amount'  => 0.10,
+            'tertiary_atonement_amount' => 0.10,
         ];
     }
 }

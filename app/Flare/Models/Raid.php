@@ -7,8 +7,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 
-class Raid extends Model {
-
+class Raid extends Model
+{
     use HasFactory;
 
     /**
@@ -28,12 +28,13 @@ class Raid extends Model {
     ];
 
     protected $casts = [
-        'raid_monster_ids'       => 'array',
+        'raid_monster_ids' => 'array',
         'corrupted_location_ids' => 'array',
         'item_specialty_reward_type' => 'string',
     ];
 
-    public function getMonstersForSelection(GameMap $gameMap, array $locationIds): array {
+    public function getMonstersForSelection(GameMap $gameMap, array $locationIds): array
+    {
 
         $raidMonsters = Cache::get('raid-monsters');
 
@@ -41,7 +42,7 @@ class Raid extends Model {
             return [];
         }
 
-        if (!isset($raidMonsters[$gameMap->name])) {
+        if (! isset($raidMonsters[$gameMap->name])) {
             return [];
         }
 
@@ -50,12 +51,12 @@ class Raid extends Model {
         $newRaidMonsters = [];
 
         foreach ($raidMonsters as $monster) {
-            if (!in_array($this->raid_boss_location_id, $locationIds) && $monster['is_raid_boss']) {
+            if (! in_array($this->raid_boss_location_id, $locationIds) && $monster['is_raid_boss']) {
                 continue;
             }
 
             if ($monster['is_raid_boss']) {
-                $monster['name'] = $monster['name'] . ' (RAID BOSS)';
+                $monster['name'] = $monster['name'].' (RAID BOSS)';
             }
 
             $newRaidMonsters[] = $monster;
@@ -65,19 +66,23 @@ class Raid extends Model {
 
     }
 
-    public function raidBoss() {
+    public function raidBoss()
+    {
         return $this->hasOne(Monster::class, 'id', 'raid_boss_id');
     }
 
-    public function raidBossLocation() {
+    public function raidBossLocation()
+    {
         return $this->hasOne(Location::class, 'id', 'raid_boss_location_id');
     }
 
-    public function artifactItem() {
+    public function artifactItem()
+    {
         return $this->hasOne(Item::class, 'id', 'artifact_item_id');
     }
 
-    private function moveRaidBossToTheTopOfTheList(array $raidMonsters, array $locationIds): array {
+    private function moveRaidBossToTheTopOfTheList(array $raidMonsters, array $locationIds): array
+    {
         $raidBossIndex = -1;
 
         foreach ($raidMonsters as $key => $value) {
@@ -93,7 +98,7 @@ class Raid extends Model {
 
             if (in_array($this->raid_boss_location_id, $locationIds)) {
 
-                $raidBoss['name'] = $raidBoss['name'] . ' (RAID BOSS)';
+                $raidBoss['name'] = $raidBoss['name'].' (RAID BOSS)';
 
                 array_unshift($raidMonsters, $raidBoss);
             }
@@ -102,7 +107,8 @@ class Raid extends Model {
         return $raidMonsters;
     }
 
-    protected static function newFactory() {
+    protected static function newFactory()
+    {
         return RaidFactory::new();
     }
 }

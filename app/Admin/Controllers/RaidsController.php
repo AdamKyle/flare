@@ -2,78 +2,85 @@
 
 namespace App\Admin\Controllers;
 
-use App\Flare\Models\Item;
-use App\Flare\Models\Raid;
-use Illuminate\Http\Request;
-use App\Flare\Models\GameMap;
-use App\Flare\Models\Monster;
-use App\Flare\Models\Location;
-use App\Http\Controllers\Controller;
-use Maatwebsite\Excel\Facades\Excel;
 use App\Admin\Exports\Raids\RaidExport;
 use App\Admin\Import\Raids\RaidsImport;
-use App\Flare\Values\ItemSpecialtyType;
 use App\Admin\Requests\RaidImportRequest;
+use App\Flare\Models\GameMap;
+use App\Flare\Models\Item;
+use App\Flare\Models\Location;
+use App\Flare\Models\Monster;
+use App\Flare\Models\Raid;
+use App\Flare\Values\ItemSpecialtyType;
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
-class RaidsController extends Controller {
-
-    public function index() {
+class RaidsController extends Controller
+{
+    public function index()
+    {
         return view('admin.raids.list', [
             'gameMapNames' => GameMap::all()->pluck('name')->toArray(),
         ]);
     }
 
-    public function show(Raid $raid) {
+    public function show(Raid $raid)
+    {
         $monsters = Monster::whereIn('id', $raid->raid_monster_ids)->select('id', 'name')->get()->toArray();
 
         return view('information.raids.raid', [
-            'raid'         => $raid,
-            'raidMonsters' => array_chunk($monsters, ceil(count($monsters) / 2))
+            'raid' => $raid,
+            'raidMonsters' => array_chunk($monsters, ceil(count($monsters) / 2)),
         ]);
     }
 
-    public function create() {
+    public function create()
+    {
         return view('admin.raids.manage', [
-            'raid'        => null,
-            'monsters'    => Monster::where('is_raid_monster', true)->get(),
-            'locations'   => Location::all(),
-            'raidBosses'  => Monster::where('is_raid_boss', true)->get(),
-            'itemTypes'   => [
-                ItemSpecialtyType::PIRATE_LORD_LEATHER,
-                ItemSpecialtyType::CORRUPTED_ICE,
-                ItemSpecialtyType::DELUSIONAL_SILVER,
-            ],
-            'artifacts'   => Item::where('type', 'artifact')->whereDoesntHave('itemSkill')->get(),
-        ]);
-    }
-
-    public function edit(Raid $raid) {
-        return view('admin.raids.manage', [
-            'raid'       => $raid,
-            'monsters'   => Monster::where('is_raid_monster', true)->get(),
-            'locations'  => Location::all(),
+            'raid' => null,
+            'monsters' => Monster::where('is_raid_monster', true)->get(),
+            'locations' => Location::all(),
             'raidBosses' => Monster::where('is_raid_boss', true)->get(),
-            'itemTypes'   => [
+            'itemTypes' => [
                 ItemSpecialtyType::PIRATE_LORD_LEATHER,
                 ItemSpecialtyType::CORRUPTED_ICE,
                 ItemSpecialtyType::DELUSIONAL_SILVER,
             ],
-            'artifacts'   => Item::where('type', 'artifact')->doesntHave('itemSkillProgressions')->get(),
+            'artifacts' => Item::where('type', 'artifact')->whereDoesntHave('itemSkill')->get(),
         ]);
     }
 
-    public function exportRaids() {
+    public function edit(Raid $raid)
+    {
+        return view('admin.raids.manage', [
+            'raid' => $raid,
+            'monsters' => Monster::where('is_raid_monster', true)->get(),
+            'locations' => Location::all(),
+            'raidBosses' => Monster::where('is_raid_boss', true)->get(),
+            'itemTypes' => [
+                ItemSpecialtyType::PIRATE_LORD_LEATHER,
+                ItemSpecialtyType::CORRUPTED_ICE,
+                ItemSpecialtyType::DELUSIONAL_SILVER,
+            ],
+            'artifacts' => Item::where('type', 'artifact')->doesntHave('itemSkillProgressions')->get(),
+        ]);
+    }
+
+    public function exportRaids()
+    {
         return view('admin.raids.export');
     }
 
-    public function importRaids() {
+    public function importRaids()
+    {
         return view('admin.raids.import');
     }
 
     /**
      * @codeCoverageIgnore
      */
-    public function export() {
+    public function export()
+    {
 
         $fileName = 'raids.xlsx';
 
@@ -86,13 +93,15 @@ class RaidsController extends Controller {
     /**
      * @codeCoverageIgnore
      */
-    public function import(RaidImportRequest $request) {
+    public function import(RaidImportRequest $request)
+    {
         Excel::import(new RaidsImport, $request->raids);
 
         return redirect()->back()->with('success', 'imported raid data.');
     }
 
-    public function store(Request $request) {
+    public function store(Request $request)
+    {
 
         $raid = Raid::find($request->id);
 
@@ -104,6 +113,6 @@ class RaidsController extends Controller {
 
         $raid = $raid->refresh();
 
-        return response()->redirectToRoute('admin.raids.show', ['raid' => $raid->id])->with('success', 'Saved raid: ' . $raid->name);
+        return response()->redirectToRoute('admin.raids.show', ['raid' => $raid->id])->with('success', 'Saved raid: '.$raid->name);
     }
 }

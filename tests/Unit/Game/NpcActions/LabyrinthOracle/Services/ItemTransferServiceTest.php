@@ -14,29 +14,32 @@ use Tests\Traits\CreateGem;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateItemAffix;
 
-class ItemTransferServiceTest extends TestCase {
-
-    use RefreshDatabase, CreateItem, CreateGem, CreateGameMap, CreateItemAffix;
+class ItemTransferServiceTest extends TestCase
+{
+    use CreateGameMap, CreateGem, CreateItem, CreateItemAffix, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
     private ?ItemTransferService $itemTransferService;
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
-        $this->character = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
+        $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
         $this->itemTransferService = resolve(ItemTransferService::class);
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
 
         $this->character = null;
         $this->itemTransferService = null;
     }
 
-    public function testCannotAffordToTransfer() {
+    public function testCannotAffordToTransfer()
+    {
         $character = $this->character->getCharacter();
 
         $result = $this->itemTransferService->transferItemEnhancements(
@@ -49,7 +52,8 @@ class ItemTransferServiceTest extends TestCase {
         $this->assertEquals('You cannot afford to do this.', $result['message']);
     }
 
-    public function testItemsDoNotExistForTransfer() {
+    public function testItemsDoNotExistForTransfer()
+    {
         $character = $this->character->getCharacter();
 
         $character->update([
@@ -70,7 +74,8 @@ class ItemTransferServiceTest extends TestCase {
         $this->assertEquals('You do not have one of these items.', $result['message']);
     }
 
-    public function testItemHasNothingToTransfer() {
+    public function testItemHasNothingToTransfer()
+    {
         $itemToTransferFrom = $this->createItem();
         $itemToTransferTo = $this->createItem();
 
@@ -98,7 +103,8 @@ class ItemTransferServiceTest extends TestCase {
         $this->assertEquals('This item has nothing on it to transfer from.', $result['message']);
     }
 
-    public function testNotEnoughInventoryWhenTheItemToMoveTooHasGemsAndYouDoNotHaveTheInventorySpace() {
+    public function testNotEnoughInventoryWhenTheItemToMoveTooHasGemsAndYouDoNotHaveTheInventorySpace()
+    {
         $itemToTransferFrom = $this->createItem();
         $itemToTransferTo = $this->createItem();
 
@@ -108,7 +114,7 @@ class ItemTransferServiceTest extends TestCase {
         ]);
 
         $itemToTransferFrom->update([
-            'socket_count' => 1
+            'socket_count' => 1,
         ]);
 
         $itemToTransferTo->sockets()->create([
@@ -117,7 +123,7 @@ class ItemTransferServiceTest extends TestCase {
         ]);
 
         $itemToTransferTo->update([
-            'socket_count' => 1
+            'socket_count' => 1,
         ]);
 
         $itemToTransferFrom = $itemToTransferFrom->refresh();
@@ -145,26 +151,27 @@ class ItemTransferServiceTest extends TestCase {
         );
 
         $this->assertEquals(422, $result['status']);
-        $this->assertEquals('You do not have the inventory room to move the gems attached to: ' . $itemToTransferTo->affix_name . ' back into your gem bag.', $result['message']);
+        $this->assertEquals('You do not have the inventory room to move the gems attached to: '.$itemToTransferTo->affix_name.' back into your gem bag.', $result['message']);
     }
 
-    public function testTransferItemAttributes() {
+    public function testTransferItemAttributes()
+    {
 
         Event::fake();
 
         $attachedSuffix = $this->createItemAffix([
-            'type' => 'suffix'
+            'type' => 'suffix',
         ]);
 
         $attachedPrefix = $this->createItemAffix([
-            'type' => 'prefix'
+            'type' => 'prefix',
         ]);
 
         $itemToTransferFrom = $this->createItem([
             'item_suffix_id' => $attachedSuffix->id,
             'item_prefix_id' => $attachedPrefix->id,
             'socket_count' => 2,
-            'holy_stacks'  => 1,
+            'holy_stacks' => 1,
         ]);
 
         $itemToTransferFrom->appliedHolyStacks()->create([
@@ -183,7 +190,7 @@ class ItemTransferServiceTest extends TestCase {
         ]);
 
         $itemToTransferFrom = $itemToTransferFrom->refresh();
-        $itemToTransferTo   = $this->createItem([
+        $itemToTransferTo = $this->createItem([
             'holy_stacks' => 1,
         ]);
 
@@ -235,23 +242,24 @@ class ItemTransferServiceTest extends TestCase {
         $this->assertEquals($transferredToItem->sockets->first()->gem_id, $gemToAttach->id);
     }
 
-    public function testTransferItemAttributesWhenOneIsMythic() {
+    public function testTransferItemAttributesWhenOneIsMythic()
+    {
 
         Event::fake();
 
         $attachedSuffix = $this->createItemAffix([
-            'type' => 'suffix'
+            'type' => 'suffix',
         ]);
 
         $attachedPrefix = $this->createItemAffix([
-            'type' => 'prefix'
+            'type' => 'prefix',
         ]);
 
         $itemToTransferFrom = $this->createItem([
             'item_suffix_id' => $attachedSuffix->id,
             'item_prefix_id' => $attachedPrefix->id,
             'socket_count' => 2,
-            'holy_stacks'  => 1,
+            'holy_stacks' => 1,
             'is_mythic' => true,
         ]);
 
@@ -271,7 +279,7 @@ class ItemTransferServiceTest extends TestCase {
         ]);
 
         $itemToTransferFrom = $itemToTransferFrom->refresh();
-        $itemToTransferTo   = $this->createItem([
+        $itemToTransferTo = $this->createItem([
             'holy_stacks' => 1,
         ]);
 
@@ -324,23 +332,24 @@ class ItemTransferServiceTest extends TestCase {
         $this->assertEquals($transferredToItem->sockets->first()->gem_id, $gemToAttach->id);
     }
 
-    public function testTransferItemAttributesWhenOneCosmic() {
+    public function testTransferItemAttributesWhenOneCosmic()
+    {
 
         Event::fake();
 
         $attachedSuffix = $this->createItemAffix([
-            'type' => 'suffix'
+            'type' => 'suffix',
         ]);
 
         $attachedPrefix = $this->createItemAffix([
-            'type' => 'prefix'
+            'type' => 'prefix',
         ]);
 
         $itemToTransferFrom = $this->createItem([
             'item_suffix_id' => $attachedSuffix->id,
             'item_prefix_id' => $attachedPrefix->id,
             'socket_count' => 2,
-            'holy_stacks'  => 1,
+            'holy_stacks' => 1,
             'is_cosmic' => true,
         ]);
 
@@ -360,7 +369,7 @@ class ItemTransferServiceTest extends TestCase {
         ]);
 
         $itemToTransferFrom = $itemToTransferFrom->refresh();
-        $itemToTransferTo   = $this->createItem([
+        $itemToTransferTo = $this->createItem([
             'holy_stacks' => 1,
         ]);
 
@@ -413,16 +422,17 @@ class ItemTransferServiceTest extends TestCase {
         $this->assertEquals($transferredToItem->sockets->first()->gem_id, $gemToAttach->id);
     }
 
-    public function testTransferItemAttributesWithGemsBeingReturned() {
+    public function testTransferItemAttributesWithGemsBeingReturned()
+    {
 
         Event::fake();
 
         $attachedSuffix = $this->createItemAffix([
-            'type' => 'suffix'
+            'type' => 'suffix',
         ]);
 
         $attachedPrefix = $this->createItemAffix([
-            'type' => 'prefix'
+            'type' => 'prefix',
         ]);
 
         $itemToTransferFrom = $this->createItem([
@@ -448,7 +458,7 @@ class ItemTransferServiceTest extends TestCase {
         ]);
 
         $itemToTransferFrom = $itemToTransferFrom->refresh();
-        $itemToTransferTo   = $this->createItem([
+        $itemToTransferTo = $this->createItem([
             'holy_stacks' => 1,
         ]);
 
@@ -516,16 +526,17 @@ class ItemTransferServiceTest extends TestCase {
         $this->assertEquals(2, $character->gemBag->gemSlots()->where('gem_id', $gemToRemove->id)->first()->amount);
     }
 
-    public function testTransferItemAttributesWithGemsBeingReturnedAsNewEntries() {
+    public function testTransferItemAttributesWithGemsBeingReturnedAsNewEntries()
+    {
 
         Event::fake();
 
         $attachedSuffix = $this->createItemAffix([
-            'type' => 'suffix'
+            'type' => 'suffix',
         ]);
 
         $attachedPrefix = $this->createItemAffix([
-            'type' => 'prefix'
+            'type' => 'prefix',
         ]);
 
         $itemToTransferFrom = $this->createItem([
@@ -551,7 +562,7 @@ class ItemTransferServiceTest extends TestCase {
         ]);
 
         $itemToTransferFrom = $itemToTransferFrom->refresh();
-        $itemToTransferTo   = $this->createItem([
+        $itemToTransferTo = $this->createItem([
             'holy_stacks' => 1,
         ]);
 

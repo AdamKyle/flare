@@ -14,9 +14,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use League\Fractal\Manager;
 
-
-class ShopController extends Controller {
-
+class ShopController extends Controller
+{
     private EquipItemService $equipItemService;
 
     private BuildCharacterAttackTypes $buildCharacterAttackTypes;
@@ -37,36 +36,39 @@ class ShopController extends Controller {
         $this->middleware('auth');
         $this->middleware('is.character.dead');
 
-        $this->equipItemService                       = $equipItemService;
-        $this->buildCharacterAttackTypes              = $buildCharacterAttackTypes;
-        $this->characterSheetBaseInfoTransformer      = $characterSheetBaseInfoTransformer;
-        $this->shopService                            = $shopService;
-        $this->manager                                = $manager;
+        $this->equipItemService = $equipItemService;
+        $this->buildCharacterAttackTypes = $buildCharacterAttackTypes;
+        $this->characterSheetBaseInfoTransformer = $characterSheetBaseInfoTransformer;
+        $this->shopService = $shopService;
+        $this->manager = $manager;
     }
 
-    public function shopBuy(Character $character) {
+    public function shopBuy(Character $character)
+    {
 
         $location = Location::where('x', $character->map->character_position_x)->where('y', $character->map->character_position_y)->first();
 
         return view('game.shop.buy', [
-            'isLocation' => !is_null($location),
-            'gold'       => $character->gold,
-            'character'  => $character,
+            'isLocation' => ! is_null($location),
+            'gold' => $character->gold,
+            'character' => $character,
         ]);
     }
 
-    public function shopSell(Character $character) {
+    public function shopSell(Character $character)
+    {
 
         $location = Location::where('x', $character->map->character_position_x)->where('y', $character->map->character_position_y)->first();
 
         return view('game.shop.sell', [
-            'isLocation' => !is_null($location),
-            'gold'       => $character->gold,
-            'character'  => $character,
+            'isLocation' => ! is_null($location),
+            'gold' => $character->gold,
+            'character' => $character,
         ]);
     }
 
-    public function shopSellAll(Character $character) {
+    public function shopSellAll(Character $character)
+    {
 
         $totalSoldFor = $this->shopService->sellAllItemsInInventory($character);
 
@@ -88,26 +90,23 @@ class ShopController extends Controller {
 
         event(new UpdateTopBarEvent($character));
 
-        return redirect()->back()->with('success', 'Sold all your unequipped items for a total of: ' . $totalSoldFor . ' gold.');
+        return redirect()->back()->with('success', 'Sold all your unequipped items for a total of: '.$totalSoldFor.' gold.');
     }
 
-
-
-    public function sell(Request $request, Character $character) {
+    public function sell(Request $request, Character $character)
+    {
 
         $inventorySlot = $character->inventory->slots->filter(function ($slot) use ($request) {
-            return $slot->id === (int) $request->slot_id && !$slot->equipped;
+            return $slot->id === (int) $request->slot_id && ! $slot->equipped;
         })->first();
 
         if (is_null($inventorySlot)) {
             return redirect()->back()->with('error', 'Item not found.');
         }
 
-        $item         = $inventorySlot->item;
+        $item = $inventorySlot->item;
         $totalSoldFor = $this->shopService->sellItem($inventorySlot, $character);
 
-        return redirect()->back()->with('success', 'Sold: ' . $item->affix_name . ' for: ' . $totalSoldFor . ' gold.');
+        return redirect()->back()->with('success', 'Sold: '.$item->affix_name.' for: '.$totalSoldFor.' gold.');
     }
-
-
 }

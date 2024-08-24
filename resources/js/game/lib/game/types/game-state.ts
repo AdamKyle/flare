@@ -68,4 +68,16 @@ export default interface GameState {
     hide_donation_alert: boolean;
 
     show_map: boolean;
+
+    show_suggestions_and_bugs: boolean;
+
+    is_showing_active_boons: boolean;
+
+    show_intro_page: boolean;
+
+    show_survey_button: boolean;
+
+    open_survey_modal: boolean;
+
+    survey_success_message: string | null;
 }

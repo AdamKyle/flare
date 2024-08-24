@@ -4,28 +4,32 @@ namespace App\Flare\Values;
 
 use Exception;
 
-class ItemHolyValue {
-
+class ItemHolyValue
+{
     /**
-     * @var string $value
+     * @var string
      */
     private $value;
 
-    const LEVEL_ONE   = 1;
-    const LEVEL_TWO   = 2;
+    const LEVEL_ONE = 1;
+
+    const LEVEL_TWO = 2;
+
     const LEVEL_THREE = 3;
-    const LEVEL_FOUR  = 4;
-    const LEVEL_FIVE  = 5;
+
+    const LEVEL_FOUR = 4;
+
+    const LEVEL_FIVE = 5;
 
     /**
-     * @var string[] $values
+     * @var string[]
      */
     protected static $values = [
-        self::LEVEL_ONE   => 1,
-        self::LEVEL_TWO   => 2,
+        self::LEVEL_ONE => 1,
+        self::LEVEL_TWO => 2,
         self::LEVEL_THREE => 3,
-        self::LEVEL_FOUR  => 4,
-        self::LEVEL_FIVE  => 5,
+        self::LEVEL_FOUR => 4,
+        self::LEVEL_FIVE => 5,
     ];
 
     /**
@@ -33,13 +37,13 @@ class ItemHolyValue {
      *
      * Throws if the value does not exist in the array of const values.
      *
-     * @param int $value
      * @throws Exception
      */
-    public function __construct(int $value) {
+    public function __construct(int $value)
+    {
 
-        if (!in_array($value, self::$values)) {
-            throw new Exception($value . ' does not exist.');
+        if (! in_array($value, self::$values)) {
+            throw new Exception($value.' does not exist.');
         }
 
         $this->value = $value;
@@ -47,53 +51,51 @@ class ItemHolyValue {
 
     /**
      * Gets random item stat increase.
-     *
-     * @return int
      */
-    public function getRandomStatIncrease(): int {
+    public function getRandomStatIncrease(): int
+    {
         if ($this->value === self::LEVEL_ONE) {
-            return rand (1, 3);
+            return rand(1, 3);
         }
 
         if ($this->value === self::LEVEL_TWO) {
-            return rand (1, 5);
+            return rand(1, 5);
         }
 
         if ($this->value === self::LEVEL_THREE) {
-            return rand (1, 8);
+            return rand(1, 8);
         }
 
         if ($this->value === self::LEVEL_FOUR) {
-            return rand (1, 10);
+            return rand(1, 10);
         }
 
         // Level 5
-        return rand (1, 15);
+        return rand(1, 15);
     }
 
     /**
      * Gets random Devoidance increase based on holy level.
-     *
-     * @return float
      */
-    public function getRandomDevoidanceIncrease(): float {
+    public function getRandomDevoidanceIncrease(): float
+    {
         if ($this->value === self::LEVEL_ONE) {
-            return rand (1, 3) / 1000;
+            return rand(1, 3) / 1000;
         }
 
         if ($this->value === self::LEVEL_TWO) {
-            return rand (1, 5) / 1000;
+            return rand(1, 5) / 1000;
         }
 
         if ($this->value === self::LEVEL_THREE) {
-            return rand (1, 8) / 1000;
+            return rand(1, 8) / 1000;
         }
 
         if ($this->value === self::LEVEL_FOUR) {
-            return rand (1, 10) / 1000;
+            return rand(1, 10) / 1000;
         }
 
         // Level 5
-        return rand (1, 15) / 1000;
+        return rand(1, 15) / 1000;
     }
 }

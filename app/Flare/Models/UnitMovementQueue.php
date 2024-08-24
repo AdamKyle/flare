@@ -2,12 +2,12 @@
 
 namespace App\Flare\Models;
 
+use Database\Factories\UnitMoveQueueFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Database\Factories\UnitMoveQueueFactory;
 
-class UnitMovementQueue extends Model {
-
+class UnitMovementQueue extends Model
+{
     use HasFactory;
 
     protected $table = 'unit_movement_queue';
@@ -43,16 +43,16 @@ class UnitMovementQueue extends Model {
     protected $casts = [
         'units_moving' => 'array',
         'completed_at' => 'datetime',
-        'started_at'   => 'datetime',
-        'is_recalled'  => 'boolean',
+        'started_at' => 'datetime',
+        'is_recalled' => 'boolean',
         'is_returning' => 'boolean',
-        'is_moving'    => 'boolean',
+        'is_moving' => 'boolean',
         'is_attacking' => 'boolean',
         'resources_requested' => 'boolean',
-        'moving_to_x'  => 'integer',
-        'moving_to_y'  => 'integer',
-        'from_x'       => 'integer',
-        'from_y'       => 'integer',
+        'moving_to_x' => 'integer',
+        'moving_to_y' => 'integer',
+        'from_x' => 'integer',
+        'from_y' => 'integer',
     ];
 
     protected $appends = [
@@ -60,23 +60,28 @@ class UnitMovementQueue extends Model {
         'to_kingdom',
     ];
 
-    public function character() {
+    public function character()
+    {
         return $this->belongsTo(Character::class);
     }
 
-    public function getFromKingdomAttribute() {
+    public function getFromKingdomAttribute()
+    {
         return Kingdom::find($this->from_kingdom_id);
     }
 
-    public function getToKingdomAttribute() {
+    public function getToKingdomAttribute()
+    {
         return Kingdom::find($this->to_kingdom_id);
     }
 
-    public function setUnitsMovingAttribute($value) {
+    public function setUnitsMovingAttribute($value)
+    {
         $this->attributes['units_moving'] = json_encode($value);
     }
 
-    protected static function newFactory() {
+    protected static function newFactory()
+    {
         return UnitMoveQueueFactory::new();
     }
 }

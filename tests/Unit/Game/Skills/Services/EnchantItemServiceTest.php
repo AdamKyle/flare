@@ -2,13 +2,13 @@
 
 namespace Tests\Unit\Game\Skills\Services;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Flare\Models\Item;
 use App\Flare\Models\GameSkill;
+use App\Flare\Models\Item;
 use App\Flare\Models\ItemAffix;
-use App\Game\Skills\Values\SkillTypeValue;
 use App\Game\Skills\Services\EnchantItemService;
 use App\Game\Skills\Services\SkillCheckService;
+use App\Game\Skills\Values\SkillTypeValue;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Mockery;
 use Mockery\MockInterface;
 use Tests\Setup\Character\CharacterFactory;
@@ -20,8 +20,7 @@ use Tests\Traits\CreateItemAffix;
 
 class EnchantItemServiceTest extends TestCase
 {
-
-    use RefreshDatabase, CreateItem, CreateClass, CreateGameSkill, CreateItemAffix;
+    use CreateClass, CreateGameSkill, CreateItem, CreateItemAffix, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -42,7 +41,7 @@ class EnchantItemServiceTest extends TestCase
             'type' => SkillTypeValue::ENCHANTING,
         ]);
 
-        $this->character = (new CharacterFactory())->createBaseCharacter()->assignSkill(
+        $this->character = (new CharacterFactory)->createBaseCharacter()->assignSkill(
             $this->enchantingSkill
         )->givePlayerLocation();
 
@@ -67,14 +66,15 @@ class EnchantItemServiceTest extends TestCase
     {
         parent::tearDown();
 
-        $this->character          = null;
-        $this->enchantingSkill    = null;
+        $this->character = null;
+        $this->enchantingSkill = null;
         $this->enchantItemService = null;
-        $this->suffix             = null;
-        $this->itemToEnchant      = null;
+        $this->suffix = null;
+        $this->itemToEnchant = null;
     }
 
-    public function testEnchantTheItemWhenTooEasy() {
+    public function testEnchantTheItemWhenTooEasy()
+    {
 
         $character = $this->character->getCharacter();
 
@@ -87,7 +87,8 @@ class EnchantItemServiceTest extends TestCase
         $this->assertNotNull($item->item_suffix_id);
     }
 
-    public function testEnchantTheItemWithAPrefixWhenTooEasy() {
+    public function testEnchantTheItemWithAPrefixWhenTooEasy()
+    {
 
         $character = $this->character->getCharacter();
 
@@ -95,7 +96,7 @@ class EnchantItemServiceTest extends TestCase
 
         $this->enchantItemService->attachAffix($this->itemToEnchant, $this->suffix, $skill, true);
         $this->enchantItemService->attachAffix($this->itemToEnchant, $this->createItemAffix([
-            'type' => 'prefix'
+            'type' => 'prefix',
         ]), $skill, true);
 
         $item = $this->enchantItemService->getItem();
@@ -104,7 +105,8 @@ class EnchantItemServiceTest extends TestCase
         $this->assertNotNull($item->item_prefix_id);
     }
 
-    public function testEnchantTheItemWithDcCheck() {
+    public function testEnchantTheItemWithDcCheck()
+    {
         $this->instance(
             SkillCheckService::class,
             Mockery::mock(SkillCheckService::class, function (MockInterface $mock) {
@@ -126,7 +128,8 @@ class EnchantItemServiceTest extends TestCase
         $this->assertNotNull($item->item_suffix_id);
     }
 
-    public function testFailToEnchantTheItemWithDcCheck() {
+    public function testFailToEnchantTheItemWithDcCheck()
+    {
         $this->instance(
             SkillCheckService::class,
             Mockery::mock(SkillCheckService::class, function (MockInterface $mock) {
@@ -149,13 +152,14 @@ class EnchantItemServiceTest extends TestCase
         $this->assertFalse($result);
     }
 
-    public function testUpdateTheCharactersInventorySlot() {
+    public function testUpdateTheCharactersInventorySlot()
+    {
 
         $character = $this->character->inventoryManagement()->giveItem($this->itemToEnchant)->getCharacter();
 
-        $slot     = $character->inventory->slots->first();
+        $slot = $character->inventory->slots->first();
 
-        $skill    = $character->skills->where('game_skill_id', $this->enchantingSkill->id)->first();
+        $skill = $character->skills->where('game_skill_id', $this->enchantingSkill->id)->first();
 
         $this->enchantItemService->attachAffix($this->itemToEnchant, $this->suffix, $skill, true);
         $this->enchantItemService->updateSlot($slot, false);
@@ -166,18 +170,19 @@ class EnchantItemServiceTest extends TestCase
         $this->assertEquals($slot->refresh()->item_id, $item->id);
     }
 
-    public function testUpdateTheCharactersInventorySlotWithMatchingItemWhenThereAreDuplicateItems() {
+    public function testUpdateTheCharactersInventorySlotWithMatchingItemWhenThereAreDuplicateItems()
+    {
 
         $character = $this->character->inventoryManagement()->giveItem($this->itemToEnchant)->getCharacter();
 
         $duplicateItem = $this->createItem([
-            'name'           => $this->itemToEnchant->name,
+            'name' => $this->itemToEnchant->name,
             'item_suffix_id' => $this->suffix->id,
         ]);
 
-        $slot     = $character->inventory->slots->first();
+        $slot = $character->inventory->slots->first();
 
-        $skill    = $character->skills->where('game_skill_id', $this->enchantingSkill->id)->first();
+        $skill = $character->skills->where('game_skill_id', $this->enchantingSkill->id)->first();
 
         $this->enchantItemService->attachAffix($this->itemToEnchant, $this->suffix, $skill, true);
         $this->enchantItemService->updateSlot($slot, false);
@@ -191,28 +196,29 @@ class EnchantItemServiceTest extends TestCase
         $this->assertEquals($slot->refresh()->item_id, $duplicateItem->id);
     }
 
-    public function testUpdateCharacterSlotWithNonDuplicateWhenItemToEnchantHasHolyStacks() {
+    public function testUpdateCharacterSlotWithNonDuplicateWhenItemToEnchantHasHolyStacks()
+    {
 
         $character = $this->character->inventoryManagement()->giveItem($this->itemToEnchant)->getCharacter();
 
         $duplicateItem = $this->createItem([
-            'name'           => $this->itemToEnchant->name,
+            'name' => $this->itemToEnchant->name,
             'item_suffix_id' => $this->suffix->id,
         ]);
 
-        $slot          = $character->inventory->slots->first();
+        $slot = $character->inventory->slots->first();
 
         $itemToEnchant = $this->itemToEnchant;
 
         $itemToEnchant->appliedHolyStacks()->create([
-            'item_id'                  => $itemToEnchant,
+            'item_id' => $itemToEnchant,
             'devouring_darkness_bonus' => 0.01,
-            'stat_increase_bonus'      => 0.1,
+            'stat_increase_bonus' => 0.1,
         ]);
 
         $itemToEnchant = $itemToEnchant->refresh();
 
-        $skill         = $character->skills->where('game_skill_id', $this->enchantingSkill->id)->first();
+        $skill = $character->skills->where('game_skill_id', $this->enchantingSkill->id)->first();
 
         $this->enchantItemService->attachAffix($itemToEnchant, $this->suffix, $skill, true);
         $this->enchantItemService->updateSlot($slot, false);
@@ -228,13 +234,14 @@ class EnchantItemServiceTest extends TestCase
         $this->assertEquals($slot->item_id, $item->id);
     }
 
-    public function testDeleteTheSlot() {
+    public function testDeleteTheSlot()
+    {
 
         $character = $this->character->inventoryManagement()->giveItem($this->itemToEnchant)->getCharacter();
 
-        $slot     = $character->inventory->slots->first();
+        $slot = $character->inventory->slots->first();
 
-        $skill    = $character->skills->where('game_skill_id', $this->enchantingSkill->id)->first();
+        $skill = $character->skills->where('game_skill_id', $this->enchantingSkill->id)->first();
 
         $this->enchantItemService->attachAffix($this->itemToEnchant, $this->suffix, $skill, true);
         $this->enchantItemService->deleteSlot($slot);

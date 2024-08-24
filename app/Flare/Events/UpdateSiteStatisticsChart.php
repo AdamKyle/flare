@@ -2,44 +2,35 @@
 
 namespace App\Flare\Events;
 
-use Illuminate\Broadcasting\Channel;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Foundation\Events\Dispatchable;
-use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
-Use App\Flare\Models\User;
+use App\Flare\Models\User;
 use App\Flare\Values\SiteAccessStatisticValue;
+use Illuminate\Broadcasting\Channel;
+use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Broadcasting\PrivateChannel;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\SerializesModels;
 
 class UpdateSiteStatisticsChart implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    /**
-     * @var User $user
-     */
     private User $user;
 
-    /**
-     * @var array $registered
-     */
     public array $registered = [];
 
-    /**
-     * @var array $signedIn
-     */
     public array $signedIn = [];
 
     /**
      * Create a new event instance.
      *
-     * @param User $user
      * @return void
      */
-    public function __construct(User $user) {
-        $this->user       = $user;
+    public function __construct(User $user)
+    {
+        $this->user = $user;
         $this->registered = SiteAccessStatisticValue::getRegistered();
-        $this->signedIn   = SiteAccessStatisticValue::getSignedIn();
+        $this->signedIn = SiteAccessStatisticValue::getSignedIn();
     }
 
     /**
@@ -47,9 +38,8 @@ class UpdateSiteStatisticsChart implements ShouldBroadcastNow
      *
      * @return Channel|array
      */
-    public function broadcastOn() {
-        return new PrivateChannel('update-admin-site-statistics-' . $this->user->id);
+    public function broadcastOn()
+    {
+        return new PrivateChannel('update-admin-site-statistics-'.$this->user->id);
     }
-
-
 }

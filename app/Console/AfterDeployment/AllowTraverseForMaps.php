@@ -25,7 +25,8 @@ class AllowTraverseForMaps extends Command
     /**
      * Execute the console command.
      */
-    public function handle() {
+    public function handle()
+    {
         GameMap::where('name', '!=', MapNameValue::TWISTED_MEMORIES)->update([
             'can_traverse' => true,
         ]);

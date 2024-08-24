@@ -4,10 +4,9 @@ namespace App\Flare\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Database\Factories\UnitInQueueFactory;
 
-class CapitalCityUnitQueue extends Model {
-
+class CapitalCityUnitQueue extends Model
+{
     use HasFactory;
 
     /**
@@ -35,18 +34,21 @@ class CapitalCityUnitQueue extends Model {
         'unit_request_data' => 'array',
         'messages' => 'array',
         'completed_at' => 'datetime',
-        'started_at'   => 'datetime',
+        'started_at' => 'datetime',
     ];
 
-    public function character() {
+    public function character()
+    {
         return $this->belongsTo(Character::class);
     }
 
-    public function kingdom() {
+    public function kingdom()
+    {
         return $this->belongsTo(Kingdom::class);
     }
 
-    public function requestingKingdom() {
+    public function requestingKingdom()
+    {
         return $this->belongsTo(Kingdom::class, 'requested_kingdom', 'id');
     }
 }

@@ -4,8 +4,8 @@ namespace App\Game\Skills\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class GemCraftingValidation extends FormRequest {
-
+class GemCraftingValidation extends FormRequest
+{
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -28,10 +28,11 @@ class GemCraftingValidation extends FormRequest {
         ];
     }
 
-    public function messages() {
+    public function messages()
+    {
         return [
             'tier.required' => 'What tier do you want to craft for?',
-            'tier.integer'  => 'Tier must be an integer',
+            'tier.integer' => 'Tier must be an integer',
         ];
     }
 }

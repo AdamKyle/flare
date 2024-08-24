@@ -4,8 +4,8 @@ namespace App\Flare\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class CharacterClassRankWeaponMastery extends Model {
-
+class CharacterClassRankWeaponMastery extends Model
+{
     protected $table = 'character_class_ranks_weapon_masteries';
 
     /**
@@ -28,13 +28,14 @@ class CharacterClassRankWeaponMastery extends Model {
      */
     protected $casts = [
         'class_rank_id' => 'integer',
-        'weapon_type'   => 'integer',
-        'current_xp'    => 'integer',
-        'required_xp'   => 'integer',
-        'level'         => 'integer',
+        'weapon_type' => 'integer',
+        'current_xp' => 'integer',
+        'required_xp' => 'integer',
+        'level' => 'integer',
     ];
 
-    public function classRank() {
+    public function classRank()
+    {
         return $this->belongsTo(CharacterClassRank::class, 'class_rank_id', 'id');
     }
 }

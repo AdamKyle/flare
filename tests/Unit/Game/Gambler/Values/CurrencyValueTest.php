@@ -7,20 +7,22 @@ use Exception;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-class CurrencyValueTest extends TestCase {
-
+class CurrencyValueTest extends TestCase
+{
     use RefreshDatabase;
 
-
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
     }
 
-    public function testInitializeCurrencyValueWithInProperValue() {
+    public function testInitializeCurrencyValueWithInProperValue()
+    {
         $this->expectException(Exception::class);
 
         new CurrencyValue(13);

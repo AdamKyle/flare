@@ -80,7 +80,6 @@ return [
 
     'disabled_reg_and_login' => env('DISABLE_REG_AND_LOGIN', false),
 
-
     'allowed_email' => env('ALLOWED_CHARACTER_EMAIL', null),
 
     /*
@@ -150,7 +149,6 @@ return [
 
     'providers' => [
 
-
         /*
          * Laravel Framework Service Providers...
          */
@@ -185,7 +183,6 @@ return [
         App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\HorizonServiceProvider::class,
-        App\Providers\RouteServiceProvider::class,
 
         /**
          * Flare Related
@@ -202,6 +199,7 @@ return [
          * Component Related
          */
         App\Flare\Github\Providers\ServiceProvider::class,
+        App\Flare\ImageGeneration\Providers\ServiceProvider::class,
 
         /**
          * Admin Related
@@ -264,6 +262,12 @@ return [
         App\Game\NpcActions\WorkBench\Providers\ServiceProvider::class,
         App\Game\Raids\Providers\ServiceProvider::class,
         App\Game\Factions\FactionLoyalty\Providers\ServiceProvider::class,
+        App\Game\Survey\Providers\ServiceProvider::class,
+
+        // App Main Router Provider
+        //
+        // Moved here in order to allow for middleware in flare and or game to be used at a top level if needed
+        App\Providers\RouteServiceProvider::class,
     ],
 
     /*
@@ -315,16 +319,12 @@ return [
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
 
-
         /**
          * Game Related
          */
-        'KingdomLogStatus' => \App\Flare\Values\Wrappers\KingdomLogStatusHelper::class,
-        'NpcCommandType'   => \App\Flare\Values\Wrappers\NpcCommandTypeHelper::class,
-        'ItemEffects'      => \App\Flare\Values\Wrappers\ItemEffectsHelper::class,
-        'GameVersion'      => \App\Flare\Values\GameVersionHelper::class,
-        'AdventureRewards' => \App\Game\Adventures\View\AdventureCompletedRewards::class,
-        'GuideQuests'      => \App\Flare\Values\Wrappers\HasGuideQuestsCompletedOrEnabled::class,
+        'GameVersion' => \App\Flare\Values\GameVersionHelper::class,
+        'GuideQuests' => \App\Flare\Values\Wrappers\HasGuideQuestsCompletedOrEnabled::class,
+        'SurveyStats' => \App\Flare\Values\Wrappers\ShowSurveySnapshots::class,
     ],
 
 ];

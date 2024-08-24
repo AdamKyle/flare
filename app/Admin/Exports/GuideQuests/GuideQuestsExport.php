@@ -6,17 +6,15 @@ use App\Admin\Exports\GuideQuests\Sheets\GuideQuestSheet;
 use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 
-class GuideQuestsExport implements WithMultipleSheets {
-
+class GuideQuestsExport implements WithMultipleSheets
+{
     use Exportable;
 
-    /**
-     * @return array
-     */
-    public function sheets(): array {
-        $sheets   = [];
+    public function sheets(): array
+    {
+        $sheets = [];
 
-        $sheets[] = new GuideQuestSheet();
+        $sheets[] = new GuideQuestSheet;
 
         return $sheets;
     }

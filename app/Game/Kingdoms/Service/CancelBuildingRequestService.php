@@ -2,33 +2,25 @@
 
 namespace App\Game\Kingdoms\Service;
 
-use App\Game\Core\Traits\ResponseBuilder;
-use Carbon\Carbon;
+use App\Flare\Models\CapitalCityBuildingCancellation;
 use App\Flare\Models\CapitalCityBuildingQueue;
 use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
-use App\Flare\Models\CapitalCityBuildingCancellation;
+use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Kingdoms\Events\UpdateCapitalCityBuildingQueueTable;
 use App\Game\Kingdoms\Jobs\CapitalCityBuildingRequestCancellationMovement;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
+use Carbon\Carbon;
 
-class CancelBuildingRequestService {
-
+class CancelBuildingRequestService
+{
     use ResponseBuilder;
 
-    /**
-     * @param UnitMovementService $unitMovementService
-     */
     public function __construct(private readonly UnitMovementService $unitMovementService) {}
 
     /**
      * Handle the building request cancellation.
-     *
-     * @param Character $character
-     * @param Kingdom $kingdom
-     * @param array $requestData
-     * @return array
      */
     public function handleCancelRequest(Character $character, Kingdom $kingdom, array $requestData): array
     {
@@ -50,7 +42,7 @@ class CancelBuildingRequestService {
             return $this->handleDeleteQueue($queue, $character, $kingdom, $time);
         }
 
-        if (!is_null($buildingToDelete)) {
+        if (! is_null($buildingToDelete)) {
             return $this->handleSingleBuildingCancel($queue, $character, $kingdom, $buildingToDelete, $time);
         }
 
@@ -59,13 +51,9 @@ class CancelBuildingRequestService {
 
     /**
      * Get the building queue.
-     *
-     * @param Character $character
-     * @param Kingdom $kingdom
-     * @param int $queueId
-     * @return CapitalCityBuildingQueue|null
      */
-    private function getBuildingQueue(Character $character, Kingdom $kingdom, int $queueId): ?CapitalCityBuildingQueue {
+    private function getBuildingQueue(Character $character, Kingdom $kingdom, int $queueId): ?CapitalCityBuildingQueue
+    {
         return CapitalCityBuildingQueue::where('id', $queueId)
             ->where('character_id', $character->id)
             ->where('kingdom_id', $kingdom->id)
@@ -74,12 +62,9 @@ class CancelBuildingRequestService {
 
     /**
      * Calculate the time required to travel to the kingdom.
-     *
-     * @param Character $character
-     * @param CapitalCityBuildingQueue $queue
-     * @return Carbon
      */
-    private function calculateTime(Character $character, CapitalCityBuildingQueue $queue): Carbon {
+    private function calculateTime(Character $character, CapitalCityBuildingQueue $queue): Carbon
+    {
         $time = $this->unitMovementService->determineTimeRequired(
             $character,
             $queue->kingdom,
@@ -92,13 +77,6 @@ class CancelBuildingRequestService {
 
     /**
      * Handle deleting a queue or multiple queues.
-     *
-     * @param CapitalCityBuildingQueue $queue
-     * @param bool $deleteQueue
-     * @param int|null $buildingToDelete
-     * @param Character $character
-     * @param Kingdom $kingdom
-     * @return array
      */
     private function handleTravelingQueue(CapitalCityBuildingQueue $queue, bool $deleteQueue, ?int $buildingToDelete, Character $character, Kingdom $kingdom): array
     {
@@ -115,16 +93,13 @@ class CancelBuildingRequestService {
         event(new UpdateCapitalCityBuildingQueueTable($character));
 
         $message = $deleted ? 'The last of your orders has been canceled.' : 'The selected building has been stricken from the request.';
+
         return $this->successResult(['message' => $message]);
     }
 
     /**
      * Handle deleting the queue.
      *
-     * @param CapitalCityBuildingQueue $queue
-     * @param Character $character
-     * @param Kingdom $kingdom
-     * @param Carbon $time
      * @return array|string[]
      */
     private function handleDeleteQueue(CapitalCityBuildingQueue $queue, Character $character, Kingdom $kingdom, Carbon $time): array
@@ -137,19 +112,11 @@ class CancelBuildingRequestService {
 
         $this->storeCancellationData($buildingIds, $kingdom, $character, $queue, $time);
 
-
         return $this->successResult(['message' => 'Request cancellation for all buildings has been sent off. You can see this in the building queue table.']);
     }
 
     /**
      * Handle a single building request.
-     *
-     * @param CapitalCityBuildingQueue $queue
-     * @param Character $character
-     * @param Kingdom $kingdom
-     * @param int $buildingToDelete
-     * @param Carbon $time
-     * @return array
      */
     private function handleSingleBuildingCancel(CapitalCityBuildingQueue $queue, Character $character, Kingdom $kingdom, int $buildingToDelete, Carbon $time): array
     {
@@ -172,12 +139,9 @@ class CancelBuildingRequestService {
 
     /**
      * Update the building queue data.
-     *
-     * @param CapitalCityBuildingQueue $queue
-     * @param int|null $buildingToDelete
-     * @return void
      */
-    private function updateBuildingRequestData(CapitalCityBuildingQueue $queue, ?int $buildingToDelete): void {
+    private function updateBuildingRequestData(CapitalCityBuildingQueue $queue, ?int $buildingToDelete): void
+    {
         $buildingRequestData = $queue->building_request_data;
         foreach ($buildingRequestData as $index => $data) {
             if ($data['building_id'] === $buildingToDelete) {
@@ -190,16 +154,15 @@ class CancelBuildingRequestService {
 
     /**
      * Possibly delete the actual queue if everything is "cancelled"
-     *
-     * @param CapitalCityBuildingQueue $queue
-     * @return bool
      */
-    private function possiblyDeleteBuildingQueue(CapitalCityBuildingQueue $queue): bool {
+    private function possiblyDeleteBuildingQueue(CapitalCityBuildingQueue $queue): bool
+    {
         $buildingRequestData = $queue->building_request_data;
-        $canceledData = array_filter($buildingRequestData, fn($data) => $data['secondary_status'] === CapitalCityQueueStatus::CANCELLED);
+        $canceledData = array_filter($buildingRequestData, fn ($data) => $data['secondary_status'] === CapitalCityQueueStatus::CANCELLED);
 
         if (count($canceledData) === count($buildingRequestData)) {
             $queue->delete();
+
             return true;
         }
 
@@ -208,26 +171,18 @@ class CancelBuildingRequestService {
 
     /**
      * Get the building ids for cancellation.
-     *
-     * @param CapitalCityBuildingQueue $queue
-     * @return array
      */
-    private function getBuildingIdsForCancellation(CapitalCityBuildingQueue $queue): array {
-        return array_column(array_filter($queue->building_request_data, fn($data) => $data['secondary_status'] === CapitalCityQueueStatus::BUILDING || $data['secondary_status'] === CapitalCityQueueStatus::REPAIRING), 'building_id');
+    private function getBuildingIdsForCancellation(CapitalCityBuildingQueue $queue): array
+    {
+        return array_column(array_filter($queue->building_request_data, fn ($data) => $data['secondary_status'] === CapitalCityQueueStatus::BUILDING || $data['secondary_status'] === CapitalCityQueueStatus::REPAIRING), 'building_id');
     }
 
     /**
      * Store cancellation Data.
-     *
-     * @param array $buildingIds
-     * @param Kingdom $kingdom
-     * @param Character $character
-     * @param CapitalCityBuildingQueue $queue
-     * @param Carbon $time
-     * @return void
      */
-    private function storeCancellationData(array $buildingIds, Kingdom $kingdom, Character $character, CapitalCityBuildingQueue $queue, Carbon $time): void {
-        $cancellationData = array_map(fn($id) => [
+    private function storeCancellationData(array $buildingIds, Kingdom $kingdom, Character $character, CapitalCityBuildingQueue $queue, Carbon $time): void
+    {
+        $cancellationData = array_map(fn ($id) => [
             'building_id' => $id,
             'kingdom_id' => $kingdom->id,
             'character_id' => $character->id,

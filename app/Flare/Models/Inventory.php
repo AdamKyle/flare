@@ -2,14 +2,13 @@
 
 namespace App\Flare\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Database\Factories\InventoryFactory;
-use App\Flare\Models\QuestItemSlot;
 use App\Game\Core\Traits\UpdateMarketBoard;
+use Database\Factories\InventoryFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
-class Inventory extends Model {
-
+class Inventory extends Model
+{
     use HasFactory, UpdateMarketBoard;
 
     /**
@@ -28,15 +27,18 @@ class Inventory extends Model {
      */
     protected $casts = [];
 
-    public function slots() {
+    public function slots()
+    {
         return $this->hasMany(InventorySlot::class);
     }
 
-    public function character() {
+    public function character()
+    {
         return $this->belongsTo(Character::class, 'character_id', 'id');
     }
 
-    protected static function newFactory() {
+    protected static function newFactory()
+    {
         return InventoryFactory::new();
     }
 }

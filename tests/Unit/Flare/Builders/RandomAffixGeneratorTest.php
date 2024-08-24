@@ -2,23 +2,24 @@
 
 namespace Tests\Unit\Flare\Builders;
 
-use Mockery;
-use Tests\TestCase;
-use App\Flare\Values\RandomAffixDetails;
-use Tests\Setup\Character\CharacterFactory;
-use App\Flare\Builders\RandomAffixGenerator;
 use App\Flare\Builders\AffixAttributeBuilder;
+use App\Flare\Builders\RandomAffixGenerator;
+use App\Flare\Values\RandomAffixDetails;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Mockery;
+use Tests\Setup\Character\CharacterFactory;
+use Tests\TestCase;
 
-class RandomAffixGeneratorTest extends TestCase {
-
+class RandomAffixGeneratorTest extends TestCase
+{
     use RefreshDatabase;
 
     private ?RandomAffixGenerator $randomAffixGenerator;
 
     private ?CharacterFactory $characterFactory;
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
         $this->randomAffixGenerator = resolve(RandomAffixGenerator::class);
@@ -26,7 +27,8 @@ class RandomAffixGeneratorTest extends TestCase {
         $this->characterFactory = (new CharacterFactory)->createBaseCharacter();
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
 
         $this->randomAffixGenerator = null;
@@ -34,7 +36,8 @@ class RandomAffixGeneratorTest extends TestCase {
         $this->characterFactory = null;
     }
 
-    public function testShouldReturnTheSameAffixAndNotGenerateANewOne() {
+    public function testShouldReturnTheSameAffixAndNotGenerateANewOne()
+    {
         $character = $this->characterFactory->getCharacter();
 
         $itemAffix = $this->randomAffixGenerator->setCharacter($character)

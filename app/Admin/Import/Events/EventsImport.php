@@ -7,11 +7,10 @@ use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 
 class EventsImport implements WithMultipleSheets
 {
-
     public function sheets(): array
     {
         return [
-            0 => new EventsSheet(),
+            0 => new EventsSheet,
         ];
     }
 }

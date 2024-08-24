@@ -6,61 +6,69 @@ use App\Game\Gems\Values\GemTypeValue;
 use Exception;
 use Tests\TestCase;
 
-class GemTypeValueTest extends TestCase {
-
-    public function setUp(): void {
+class GemTypeValueTest extends TestCase
+{
+    public function setUp(): void
+    {
         parent::setUp();
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
     }
 
-    public function testThrowErrorForInvalidGemTypeValue() {
+    public function testThrowErrorForInvalidGemTypeValue()
+    {
         $this->expectException(Exception::class);
 
         new GemTypeValue(105);
     }
 
-    public function testCannotGetOppositeNameForNameThatDoesntExist() {
+    public function testCannotGetOppositeNameForNameThatDoesntExist()
+    {
         $this->expectException(Exception::class);
 
         GemTypeValue::getOppsiteForHalfDamage('apples');
     }
 
-    public function testGetOppositeForHalfDamage() {
+    public function testGetOppositeForHalfDamage()
+    {
         $element = GemTypeValue::getOppsiteForHalfDamage('fire');
 
         $this->assertEquals('Water', $element);
     }
 
-    public function testFailsToGetOppositeForDoubleDamage() {
+    public function testFailsToGetOppositeForDoubleDamage()
+    {
         $this->expectException(Exception::class);
 
         GemTypeValue::getOppsiteForDoubleDamage('apples');
     }
 
-    public function testGetOppositeForDoubleDamage() {
+    public function testGetOppositeForDoubleDamage()
+    {
         $element = GemTypeValue::getOppsiteForDoubleDamage('fire');
 
         $this->assertEquals('Ice', $element);
     }
 
-    public function testIsFire() {
+    public function testIsFire()
+    {
         $gemTypeValue = new GemTypeValue(GemTypeValue::FIRE);
 
         $this->assertTrue($gemTypeValue->isFire());
     }
 
-
-    public function testIsWater() {
+    public function testIsWater()
+    {
         $gemTypeValue = new GemTypeValue(GemTypeValue::WATER);
 
         $this->assertTrue($gemTypeValue->isWater());
     }
 
-
-    public function testIsIce() {
+    public function testIsIce()
+    {
         $gemTypeValue = new GemTypeValue(GemTypeValue::ICE);
 
         $this->assertTrue($gemTypeValue->isIce());

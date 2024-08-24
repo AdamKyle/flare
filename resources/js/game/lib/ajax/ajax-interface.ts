@@ -20,6 +20,13 @@ export default interface AjaxInterface {
     setParameters(params: Object): AjaxInterface;
 
     /**
+     * Allows the setting of custom headers.
+     *
+     * @param headers
+     */
+    setAdditionalHeaders(headers: Object): AjaxInterface;
+
+    /**
      * Do the ajax call.
      *
      * If you stated yes to the setReturnErrorResponse and/or setReturnSuccessResponse

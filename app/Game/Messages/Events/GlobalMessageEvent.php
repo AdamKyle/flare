@@ -3,24 +3,18 @@
 namespace App\Game\Messages\Events;
 
 use Illuminate\Broadcasting\Channel;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Broadcasting\PresenceChannel;
-use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\SerializesModels;
 
-class GlobalMessageEvent implements ShouldBroadcastNow {
-
+class GlobalMessageEvent implements ShouldBroadcastNow
+{
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    /**
-     * @var string $message
-     */
     public string $message;
 
-    /**
-     * @var string|null
-     */
     public ?string $specialColor = null;
 
     /**
@@ -28,21 +22,18 @@ class GlobalMessageEvent implements ShouldBroadcastNow {
      *
      * - specialColor should be a css class that
      * represents the color you want applied to the message.
-     *
-     * @param string $message
-     * @param string $specialColor
      */
-    public function __construct(string $message, string $specialColor = 'global-message') {
-        $this->message      = $message;
+    public function __construct(string $message, string $specialColor = 'global-message')
+    {
+        $this->message = $message;
         $this->specialColor = $specialColor;
     }
 
     /**
      * Get the channels the event should broadcast on.
-     *
-     * @return Channel|array
      */
-    public function broadcastOn(): Channel|array {
+    public function broadcastOn(): Channel|array
+    {
         return new PresenceChannel('global-message');
     }
 }

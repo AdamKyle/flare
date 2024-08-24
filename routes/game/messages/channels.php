@@ -2,17 +2,17 @@
 
 // Public chat:
 Broadcast::channel('chat', function ($user) {
-	return $user;
+    return $user;
 });
 
 // When generating a server message for that player.
 Broadcast::channel('server-message-{userId}', function ($user, $userId) {
-	return $user->id === (int) $userId;
+    return $user->id === (int) $userId;
 });
 
 // When receiving a private message.
 Broadcast::channel('private-message-{userId}', function ($user, $userId) {
-	return $user->id === (int) $userId;
+    return $user->id === (int) $userId;
 });
 
 // When receiving a NPC message.

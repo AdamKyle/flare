@@ -7,7 +7,6 @@ use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 
 class GuideQuests implements WithMultipleSheets
 {
-
     public function sheets(): array
     {
         return [

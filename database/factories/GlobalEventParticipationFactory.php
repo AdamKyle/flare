@@ -5,7 +5,8 @@ namespace Database\Factories;
 use App\Flare\Models\GlobalEventParticipation;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class GlobalEventParticipationFactory extends Factory {
+class GlobalEventParticipationFactory extends Factory
+{
     /**
      * The name of the factory's corresponding model.
      *
@@ -18,7 +19,8 @@ class GlobalEventParticipationFactory extends Factory {
      *
      * @return array
      */
-    public function definition() {
+    public function definition()
+    {
         return [
             'global_event_goal_id' => null,
             'character_id' => null,

@@ -4,10 +4,11 @@
   "scripts": {
     "dev": "vite",
     "cleanup": "prettier --write 'resources/js/**/*.{ts,tsx}'",
-    "build": "yarn run cleanup && NODE_ENV=production  vite build",
+    "build": "NODE_ENV=production vite build",
     "build:dev": "NODE_ENV=development vite build",
     "prepare": "husky",
-    "lint": "yarn eslint 'resources/js/**/*.{ts, tsx}'"
+    "lint": "yarn eslint resources/js/admin/**/*.{ts,tsx} resources/js/game/**/*.{ts,tsx} resources/js/individual-components/**/*.{ts,tsx}",
+    "type-check": "tsc --noEmit --skipLibCheck"
   },
   "devDependencies": {
     "@emotion/react": "11.12.0",
@@ -39,11 +40,10 @@
     "react-dom": "^18.0.*",
     "resolve-url-loader": "^5.0.0",
     "rollup-plugin-concat": "^1.0.3",
-    "sass": "^1.26.10",
-    "sass-loader": "14.2.1",
     "sortablejs": "^1.13.0",
     "tailwindcss": "^3.4.6",
     "tailwindcss-dir": "^4.0.0",
+    "terser": "^5.31.6",
     "tippy.js": "^6.3.1",
     "ts-loader": "9.5.1",
     "typescript": "^5.5.3",
@@ -53,6 +53,7 @@
   "dependencies": {
     "@aldabil/react-scheduler": "^2.9.1",
     "@headlessui/react": "2.1.2",
+    "@mdxeditor/editor": "^3.10.1",
     "@tinymce/tinymce-react": "^5.0.1",
     "@types/lodash": "^4.14.180",
     "@types/node": "^20.12.7",
@@ -73,6 +74,7 @@
     "react-charts": "^3.0.0-beta.30",
     "react-data-table-component": "^7.5.0",
     "react-datetime-picker": "^6.0.1",
+    "react-drag-drop-files": "^2.3.10",
     "react-draggable": "^4.1.0",
     "react-organizational-chart": "^2.1.0",
     "react-resizable": "^3.0.4",

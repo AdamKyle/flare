@@ -3,11 +3,11 @@
 namespace App\Flare\Models;
 
 use Database\Factories\InventorySetFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
-class InventorySet extends Model {
-
+class InventorySet extends Model
+{
     use HasFactory;
 
     /**
@@ -28,19 +28,22 @@ class InventorySet extends Model {
      * @var array
      */
     protected $casts = [
-        'is_equipped'     => 'boolean',
+        'is_equipped' => 'boolean',
         'can_be_equipped' => 'boolean',
     ];
 
-    public function character() {
+    public function character()
+    {
         return $this->belongsTo(Character::class);
     }
 
-    public function slots() {
+    public function slots()
+    {
         return $this->hasMany(SetSlot::class);
     }
 
-    protected static function newFactory() {
+    protected static function newFactory()
+    {
         return InventorySetFactory::new();
     }
 }

@@ -29,54 +29,29 @@ use Exception;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 use Illuminate\Database\Eloquent\Collection;
 
-class EnchantingService {
+class EnchantingService
+{
+    use ResponseBuilder, ShouldShowEnchantingEventButton, UpdateCharacterCurrency;
 
-    use ResponseBuilder, UpdateCharacterCurrency, ShouldShowEnchantingEventButton;
-
-    /**
-     * @var CharacterStatBuilder $characterStatBuilder;
-     */
     private CharacterStatBuilder $characterStatBuilder;
 
-    /**
-     * @var CharacterInventoryService $characterInventoryService
-     */
     private CharacterInventoryService $characterInventoryService;
 
-    /**
-     * @var EnchantItemService $enchantItemService
-     */
     private EnchantItemService $enchantItemService;
 
-    /**
-     * @var RandomEnchantmentService $randomEnchantmentService
-     */
     private RandomEnchantmentService $randomEnchantmentService;
 
-    /**
-     * @var HandleUpdatingEnchantingGlobalEventGoal $handleUpdatingCraftingGlobalEventGoal
-     */
     private HandleUpdatingEnchantingGlobalEventGoal $handleUpdatingCraftingGlobalEventGoal;
 
-    /**
-     * @var bool $sentToEasyMessage
-     */
     private bool $sentToEasyMessage = false;
 
     /**
      * Only set if the affix to be applied was too easy to enchant.
-     *
-     * @var bool $wasTooEasy
      */
     private bool $wasTooEasy = false;
 
     /**
      * Constructor
-     *
-     * @param CharacterStatBuilder $characterStatBuilder
-     * @param CharacterInventoryService $characterInventoryService
-     * @param EnchantItemService $enchantItemService
-     * @param RandomEnchantmentService $randomEnchantmentService
      */
     public function __construct(
         CharacterStatBuilder $characterStatBuilder,
@@ -85,28 +60,24 @@ class EnchantingService {
         RandomEnchantmentService $randomEnchantmentService,
     ) {
 
-        $this->characterStatBuilder        = $characterStatBuilder;
-        $this->characterInventoryService   = $characterInventoryService;
-        $this->enchantItemService          = $enchantItemService;
-        $this->randomEnchantmentService    = $randomEnchantmentService;
+        $this->characterStatBuilder = $characterStatBuilder;
+        $this->characterInventoryService = $characterInventoryService;
+        $this->enchantItemService = $enchantItemService;
+        $this->randomEnchantmentService = $randomEnchantmentService;
     }
 
     /**
      * Fetches the affixes for a character.
      *
      * Only returns that which the player has the skill level and intelligence for.
-     *
-     * @param Character $character
-     * @param bool $ignoreTrinkets
-     * @param bool $showMerchantMessage
-     * @return array
      */
-    public function fetchAffixes(Character $character, bool $ignoreTrinkets = false, bool $showMerchantMessage = true): array {
-        $characterInfo   = $this->characterStatBuilder->setCharacter($character);
+    public function fetchAffixes(Character $character, bool $ignoreTrinkets = false, bool $showMerchantMessage = true): array
+    {
+        $characterInfo = $this->characterStatBuilder->setCharacter($character);
         $enchantingSkill = $this->getEnchantingSkill($character);
 
         $characterInventoryService = $this->characterInventoryService->setCharacter($character);
-        $inventory                 = $characterInventoryService->getInventoryForType('inventory');
+        $inventory = $characterInventoryService->getInventoryForType('inventory');
 
         if ($ignoreTrinkets) {
             $inventory = array_values(array_filter($inventory, function ($item) {
@@ -125,41 +96,36 @@ class EnchantingService {
         }
 
         return [
-            'affixes'                   => $this->getAvailableAffixes($characterInfo, $enchantingSkill, $showMerchantMessage),
-            'character_inventory'       => $newInventory,
+            'affixes' => $this->getAvailableAffixes($characterInfo, $enchantingSkill, $showMerchantMessage),
+            'character_inventory' => $newInventory,
             'show_enchanting_for_event' => $this->shouldShowEnchantingEventButton($character),
-            'items_for_event'           => $this->fetchEventItemsForEnchanting($character),
+            'items_for_event' => $this->fetchEventItemsForEnchanting($character),
         ];
     }
 
     /**
      * Get the current state of the enchanting xp bar.
-     *
-     * @param Character $character
-     * @return array
      */
-    public function getEnchantingXP(Character $character): array {
+    public function getEnchantingXP(Character $character): array
+    {
         $skill = $this->getEnchantingSkill($character);
 
         return [
-            'current_xp'    => $skill->xp,
+            'current_xp' => $skill->xp,
             'next_level_xp' => $skill->xp_max,
-            'skill_name'    => $skill->name,
-            'level'         => $skill->level
+            'skill_name' => $skill->name,
+            'level' => $skill->level,
         ];
     }
 
     /**
      * Does the cost supplied actually match the actual cost?
      *
-     * @param Character $character
-     * @param array $enchantmentIds
-     * @param int $itemId
-     * @return int
      * @throws Exception
      */
-    public function getCostOfEnchantment(Character $character, array $enchantmentIds, int $itemId): int {
-        $itemAffixes   = ItemAffix::findMany($enchantmentIds);
+    public function getCostOfEnchantment(Character $character, array $enchantmentIds, int $itemId): int
+    {
+        $itemAffixes = ItemAffix::findMany($enchantmentIds);
         $itemToEnchant = Item::find($itemId);
 
         if ($itemAffixes->isEmpty()) {
@@ -173,7 +139,7 @@ class EnchantingService {
         $cost = $itemAffixes->sum('cost');
 
         foreach ($itemAffixes as $itemAffix) {
-            if (!is_null($itemToEnchant->{'item_' . $itemAffix->type . '_id'})) {
+            if (! is_null($itemToEnchant->{'item_'.$itemAffix->type.'_id'})) {
                 $cost += 1000;
             }
         }
@@ -200,14 +166,10 @@ class EnchantingService {
      * eg, ['message' => '', 'status' => 422] or
      * ['affixes' => Collection, 'character_inventory' => [...], 'status' => 200]
      *
-     * @param Character $character
-     * @param array $params
-     * @param InventorySlot|GlobalEventCraftingInventorySlot $slot
-     * @param int $cost
-     * @return void
      * @throws Exception
      */
-    public function enchant(Character $character, array $params, InventorySlot|GlobalEventCraftingInventorySlot $slot, int $cost): void {
+    public function enchant(Character $character, array $params, InventorySlot|GlobalEventCraftingInventorySlot $slot, int $cost): void
+    {
         $enchantingSkill = $this->getEnchantingSkill($character);
 
         $character->update([
@@ -221,20 +183,22 @@ class EnchantingService {
         $this->enchantItemService->updateSlot($slot, $params['enchant_for_event']);
     }
 
-    public function timeForEnchanting(Item $item) {
+    public function timeForEnchanting(Item $item)
+    {
 
-        if (!is_null($item->itemPrefix) && !is_null($item->itemSuffix)) {
+        if (! is_null($item->itemPrefix) && ! is_null($item->itemSuffix)) {
             return 'triple';
         }
 
-        if (!is_null($item->itemPrefix) || !is_null($item->itemSuffix)) {
+        if (! is_null($item->itemPrefix) || ! is_null($item->itemSuffix)) {
             return 'double';
         }
 
         return null;
     }
 
-    public function getSlotFromInventory(Character $character, int $slotId) {
+    public function getSlotFromInventory(Character $character, int $slotId)
+    {
         $inventory = Inventory::where('character_id', $character->id)->first();
 
         $foundInInventory = InventorySlot::where('id', $slotId)->where('inventory_id', $inventory->id)->where('equipped', false)->first();
@@ -248,13 +212,15 @@ class EnchantingService {
         return $foundInInventory;
     }
 
-    protected function getEnchantingSkill(Character $character): Skill {
+    protected function getEnchantingSkill(Character $character): Skill
+    {
         $gameSkill = GameSkill::where('type', SkillTypeValue::ENCHANTING)->first();
 
         return Skill::where('character_id', $character->id)->where('game_skill_id', $gameSkill->id)->first();
     }
 
-    protected function getAvailableAffixes(CharacterStatBuilder $builder, Skill $enchantingSkill, bool $showMerchantMessage = true): Collection {
+    protected function getAvailableAffixes(CharacterStatBuilder $builder, Skill $enchantingSkill, bool $showMerchantMessage = true): Collection
+    {
 
         $affixes = ItemAffix::select('name', 'cost', 'id', 'type', 'int_required')
             ->where('skill_level_required', '<=', $enchantingSkill->level)
@@ -272,9 +238,10 @@ class EnchantingService {
         return $affixes;
     }
 
-    protected function attachAffixes(array $affixes, InventorySlot|GlobalEventCraftingInventorySlot $slot, Skill $enchantingSkill, Character $character) {
+    protected function attachAffixes(array $affixes, InventorySlot|GlobalEventCraftingInventorySlot $slot, Skill $enchantingSkill, Character $character)
+    {
         foreach ($affixes as $affixId) {
-            $slot  = $slot->refresh();
+            $slot = $slot->refresh();
 
             $affix = ItemAffix::find($affixId);
 
@@ -298,7 +265,7 @@ class EnchantingService {
             }
 
             if ($enchantingSkill->level > $affix->skill_level_trivial) {
-                if (!$this->sentToEasyMessage) {
+                if (! $this->sentToEasyMessage) {
                     ServerMessageHandler::handleMessage($character->user, 'to_easy_to_craft');
 
                     $this->sentToEasyMessage = true;
@@ -315,15 +282,16 @@ class EnchantingService {
              *
              * If we fail to do this then we return from the loop.
              */
-            if (!$this->wasTooEasy) {
-                if (!$this->processedEnchant($slot, $affix, $character, $enchantingSkill)) {
+            if (! $this->wasTooEasy) {
+                if (! $this->processedEnchant($slot, $affix, $character, $enchantingSkill)) {
                     return;
                 }
             }
         }
     }
 
-    protected function processedEnchant(InventorySlot|GlobalEventCraftingInventorySlot $slot, ItemAffix $affix, Character $character, Skill $enchantingSkill, bool $tooEasy = false) {
+    protected function processedEnchant(InventorySlot|GlobalEventCraftingInventorySlot $slot, ItemAffix $affix, Character $character, Skill $enchantingSkill, bool $tooEasy = false)
+    {
         $enchanted = $this->enchantItemService->attachAffix($slot->item, $affix, $enchantingSkill, $tooEasy);
 
         if ($enchanted) {
@@ -337,29 +305,32 @@ class EnchantingService {
         return true;
     }
 
-    protected function appliedEnchantment(InventorySlot|GlobalEventCraftingInventorySlot $slot, ItemAffix $affix, Character $character, Skill $enchantingSkill, bool $tooEasy = false) {
-        $message = 'Applied enchantment: ' . $affix->name . ' to: ' . $slot->item->refresh()->affix_name;
+    protected function appliedEnchantment(InventorySlot|GlobalEventCraftingInventorySlot $slot, ItemAffix $affix, Character $character, Skill $enchantingSkill, bool $tooEasy = false)
+    {
+        $message = 'Applied enchantment: '.$affix->name.' to: '.$slot->item->refresh()->affix_name;
 
         ServerMessageHandler::handleMessage($character->user, 'enchanted', $message, $slot->id);
 
-        if (!$tooEasy) {
+        if (! $tooEasy) {
             event(new UpdateSkillEvent($enchantingSkill));
         }
     }
 
-    protected function failedToApplyEnchantment(InventorySlot|GlobalEventCraftingInventorySlot $slot, ItemAffix $affix, Character $character) {
-        $message = 'You failed to apply ' . $affix->name . ' to: ' . $slot->item->refresh()->affix_name . '. The item shatters before you. You lost the investment.';
+    protected function failedToApplyEnchantment(InventorySlot|GlobalEventCraftingInventorySlot $slot, ItemAffix $affix, Character $character)
+    {
+        $message = 'You failed to apply '.$affix->name.' to: '.$slot->item->refresh()->affix_name.'. The item shatters before you. You lost the investment.';
 
         ServerMessageHandler::handleMessage($character->user, 'enchantment_failed', $message);
 
         $this->enchantItemService->deleteSlot($slot);
     }
 
-    private function fetchEventItemsForEnchanting(Character $character): array {
+    private function fetchEventItemsForEnchanting(Character $character): array
+    {
         $event = Event::where('current_event_goal_step', GlobalEventSteps::ENCHANT)->first();
         $itemsForEvent = [];
 
-        if (!is_null($event)) {
+        if (! is_null($event)) {
 
             $gameMap = GameMap::where('only_during_event_type', $event->type)->first();
 
@@ -367,16 +338,15 @@ class EnchantingService {
 
                 $eventInventory = GlobalEventCraftingInventory::where('character_id', $character->id)->first();
 
-                if (!is_null($eventInventory)) {
-
+                if (! is_null($eventInventory)) {
 
                     $globalEventGoal = GlobalEventGoal::where('event_type', $event->type)->first();
 
-                    if (!is_null($globalEventGoal)) {
-                        $itemsForEvent = $eventInventory->craftingSlots->map(function($slot) {
+                    if (! is_null($globalEventGoal)) {
+                        $itemsForEvent = $eventInventory->craftingSlots->map(function ($slot) {
                             return [
                                 'slot_id' => $slot->id,
-                                'item_name' => $slot->item->name
+                                'item_name' => $slot->item->name,
                             ];
                         })->toArray();
                     }

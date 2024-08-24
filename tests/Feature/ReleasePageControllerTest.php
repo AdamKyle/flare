@@ -6,11 +6,12 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use Tests\Traits\CreateReleaseNotes;
 
-class ReleasePageControllerTest extends TestCase {
+class ReleasePageControllerTest extends TestCase
+{
+    use CreateReleaseNotes, RefreshDatabase;
 
-    use RefreshDatabase, CreateReleaseNotes;
-
-    public function testViewReleaseNotes() {
+    public function testViewReleaseNotes()
+    {
         $releaseNotes = $this->createReleaseNotes([
             'name' => 'Sample',
             'version' => '1.0.0',

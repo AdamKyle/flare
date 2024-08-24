@@ -6,13 +6,13 @@ use App\Game\Character\Builders\AttackBuilders\Services\BuildCharacterAttackType
 use App\Game\Character\CharacterCreation\Services\CharacterBuilderService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 
-class ServiceProvider extends ApplicationServiceProvider {
+class ServiceProvider extends ApplicationServiceProvider
+{
     /**
      * Register any application services.
-     *
-     * @return void
      */
-    public function register(): void {
+    public function register(): void
+    {
         $this->app->bind(CharacterBuilderService::class, function ($app) {
             return new CharacterBuilderService(
                 $app->make(BuildCharacterAttackTypes::class)
@@ -22,8 +22,6 @@ class ServiceProvider extends ApplicationServiceProvider {
 
     /**
      * Bootstrap any application services.
-     *
-     * @return void
      */
     public function boot(): void {}
 }

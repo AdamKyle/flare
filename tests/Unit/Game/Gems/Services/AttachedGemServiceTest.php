@@ -11,9 +11,9 @@ use Tests\TestCase;
 use Tests\Traits\CreateGem;
 use Tests\Traits\CreateItem;
 
-class AttachedGemServiceTest extends TestCase {
-
-    use CreateItem, CreateGem, RefreshDatabase;
+class AttachedGemServiceTest extends TestCase
+{
+    use CreateGem, CreateItem, RefreshDatabase;
 
     private ?Item $item;
 
@@ -21,27 +21,28 @@ class AttachedGemServiceTest extends TestCase {
 
     private ?AttachedGemService $attachedGemService;
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
         $item = $this->createItem([
-            'socket_count' => 2
+            'socket_count' => 2,
         ]);
 
         $gem = $this->createGem([
-            'name'                       => 'Sample',
-            'tier'                       => 4,
-            'primary_atonement_type'     => GemTypeValue::FIRE,
-            'secondary_atonement_type'   => GemTypeValue::ICE,
-            'tertiary_atonement_type'    => GemTypeValue::WATER,
-            'primary_atonement_amount'   => 0.10,
+            'name' => 'Sample',
+            'tier' => 4,
+            'primary_atonement_type' => GemTypeValue::FIRE,
+            'secondary_atonement_type' => GemTypeValue::ICE,
+            'tertiary_atonement_type' => GemTypeValue::WATER,
+            'primary_atonement_amount' => 0.10,
             'secondary_atonement_amount' => 0.25,
-            'tertiary_atonement_amount'  => 0.45,
+            'tertiary_atonement_amount' => 0.45,
         ]);
 
         $item->sockets()->create([
             'item_id' => $item->id,
-            'gem_id'  => $gem->id,
+            'gem_id' => $gem->id,
         ]);
 
         $this->item = $item->refresh();
@@ -51,7 +52,8 @@ class AttachedGemServiceTest extends TestCase {
         $this->attachedGemService = resolve(AttachedGemService::class);
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
 
         $this->item = null;
@@ -61,7 +63,8 @@ class AttachedGemServiceTest extends TestCase {
         $this->attachedGemService = null;
     }
 
-    public function testGetErrorWhenCharacterDoesNotHaveItem() {
+    public function testGetErrorWhenCharacterDoesNotHaveItem()
+    {
         $character = $this->characterFactory->getCharacter();
 
         $result = $this->attachedGemService->getGemsFromItem($character, $this->item);
@@ -70,7 +73,8 @@ class AttachedGemServiceTest extends TestCase {
         $this->assertEquals($result['status'], 422);
     }
 
-    public function testGetGemDataFromItemWhenCharacterHasItem() {
+    public function testGetGemDataFromItemWhenCharacterHasItem()
+    {
         $character = $this->characterFactory->inventoryManagement()->giveItem($this->item)->getCharacter();
 
         $result = $this->attachedGemService->getGemsFromItem($character, $this->item);

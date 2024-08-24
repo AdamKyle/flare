@@ -2,32 +2,34 @@
 
 namespace App\Admin\Controllers;
 
-use Storage;
-use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
+use App\Admin\Requests\MapUploadValidation;
+use App\Flare\Models\GameMap;
 use App\Flare\Models\Item;
 use App\Flare\Models\Location;
 use App\Flare\Values\ItemEffectsValue;
-use App\Flare\Models\GameMap;
-use App\Admin\Requests\MapUploadValidation;
 use App\Game\Events\Values\EventType;
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use Storage;
 
-class MapsController extends Controller {
-
-    public function index() {
+class MapsController extends Controller
+{
+    public function index()
+    {
         return view('admin.maps.maps', [
-            'maps' => GameMap::all()
+            'maps' => GameMap::all(),
         ]);
     }
 
-    public function show(GameMap $gameMap) {
+    public function show(GameMap $gameMap)
+    {
         $effects = match ($gameMap->name) {
-            'Labyrinth'    => ItemEffectsValue::LABYRINTH,
-            'Dungeons'     => ItemEffectsValue::DUNGEON,
+            'Labyrinth' => ItemEffectsValue::LABYRINTH,
+            'Dungeons' => ItemEffectsValue::DUNGEON,
             'Shadow Plane' => ItemEffectsValue::SHADOW_PLANE,
-            'Hell'         => ItemEffectsValue::HELL,
-            'Purgatory'    => ItemEffectsValue::PURGATORY,
-            default        => '',
+            'Hell' => ItemEffectsValue::HELL,
+            'Purgatory' => ItemEffectsValue::PURGATORY,
+            default => '',
         };
 
         $walkOnWater = null;
@@ -49,46 +51,50 @@ class MapsController extends Controller {
         }
 
         return view('admin.maps.map', [
-            'map'         => $gameMap,
-            'itemNeeded'  => Item::where('effect', $effects)->first(),
+            'map' => $gameMap,
+            'itemNeeded' => Item::where('effect', $effects)->first(),
             'walkOnWater' => $walkOnWater,
-            'mapUrl'      => Storage::disk('maps')->url($gameMap->path),
+            'mapUrl' => Storage::disk('maps')->url($gameMap->path),
         ]);
     }
 
-    public function uploadMap() {
+    public function uploadMap()
+    {
         return view('admin.maps.upload', [
             'mapDetails' => null,
             'eventTypes' => EventType::getOptionsForSelect(),
         ]);
     }
 
-    public function upload(MapUploadValidation $request) {
+    public function upload(MapUploadValidation $request)
+    {
         $path = Storage::disk('maps')->putFile($request->name, $request->map);
 
         GameMap::create([
-            'name'                   => $request->name,
-            'path'                   => $path,
-            'default'                => $request->default,
-            'kingdom_color'          => $request->kingdom_color,
+            'name' => $request->name,
+            'path' => $path,
+            'default' => $request->default,
+            'kingdom_color' => $request->kingdom_color,
             'only_during_event_type' => $request->only_during_event,
         ]);
 
-        return redirect()->route('maps')->with('success', $request->name . ' uploaded successfully.');
+        return redirect()->route('maps')->with('success', $request->name.' uploaded successfully.');
     }
 
-    public function manageBonuses(GameMap $gameMap) {
+    public function manageBonuses(GameMap $gameMap)
+    {
         return view('admin.maps.manage-bonuses', ['gameMap' => $gameMap, 'locations' => Location::all()]);
     }
 
-    public function postBonuses(Request $request, GameMap $gameMap) {
+    public function postBonuses(Request $request, GameMap $gameMap)
+    {
 
         $data = $request->all();
         $map = $data['map'];
 
         unset($data['map']);
 
-        if (!is_null($map)) {
+        if (! is_null($map)) {
             $path = Storage::disk('maps')->putFile($request->name, $map);
 
             $data['path'] = $path;
@@ -96,10 +102,11 @@ class MapsController extends Controller {
 
         $gameMap->update($data);
 
-        return redirect()->route('map', ['gameMap' => $gameMap->id])->with('success', $gameMap->name . ' now has bonuses.');
+        return redirect()->route('map', ['gameMap' => $gameMap->id])->with('success', $gameMap->name.' now has bonuses.');
     }
 
-    public function manageMapLocations(GameMap $gameMap) {
+    public function manageMapLocations(GameMap $gameMap)
+    {
         return view('admin.maps.map-locations', ['map' => $gameMap]);
     }
 }

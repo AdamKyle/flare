@@ -5,8 +5,8 @@ namespace Tests\Setup\Character;
 use App\Flare\Models\Character;
 use Tests\Traits\CreateGem;
 
-class GemBagManagement {
-
+class GemBagManagement
+{
     use CreateGem;
 
     private $character;
@@ -15,46 +15,39 @@ class GemBagManagement {
 
     /**
      * Constructor
-     *
-     * @param Character $character
-     * @param CharacterFactory|null $characterFactory
      */
-    public function __construct(Character $character, CharacterFactory $characterFactory = null) {
-        $this->character        = $character;
+    public function __construct(Character $character, ?CharacterFactory $characterFactory = null)
+    {
+        $this->character = $character;
         $this->characterFactory = $characterFactory;
     }
 
     /**
      * Get the character factory.
-     *
-     * @return CharacterFactory
      */
-    public function getCharacterFactory(): CharacterFactory {
+    public function getCharacterFactory(): CharacterFactory
+    {
         return $this->characterFactory;
     }
 
     /**
      * Get the character back.
-     *
-     * @return Character
      */
-    public function getCharacter(): Character {
+    public function getCharacter(): Character
+    {
         return $this->character->refresh();
     }
 
     /**
      * Give the player a set of gems
-     *
-     * @param integer $amount
-     * @param integer $amountOfGems
-     * @return GemBagManagement
      */
-    public function assignGemsToBag(int $amount = 1, int $amountOfGems = 1): GemBagManagement {
+    public function assignGemsToBag(int $amount = 1, int $amountOfGems = 1): GemBagManagement
+    {
         for ($i = 1; $i <= $amount; $i++) {
             $this->character->gemBag->gemSlots()->create([
                 'gem_bag_id' => $this->character->gemBag->id,
-                'gem_id'     => $this->createGem()->id,
-                'amount'     => $amountOfGems,
+                'gem_id' => $this->createGem()->id,
+                'amount' => $amountOfGems,
             ]);
 
             $this->character = $this->character->refresh();
@@ -66,15 +59,14 @@ class GemBagManagement {
     /**
      * Assign a specific gem to the character.
      *
-     * @param int $gemId
-     * @param int $amount
      * @return $this
      */
-    public function assignGemToBag(int $gemId, int $amount = 1): GemBagManagement {
+    public function assignGemToBag(int $gemId, int $amount = 1): GemBagManagement
+    {
         $this->character->gemBag->gemSlots()->create([
             'gem_bag_id' => $this->character->gemBag->id,
-            'gem_id'     => $gemId,
-            'amount'     => $amount,
+            'gem_id' => $gemId,
+            'amount' => $amount,
         ]);
 
         $this->character = $this->character->refresh();

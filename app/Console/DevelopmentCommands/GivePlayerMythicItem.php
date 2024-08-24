@@ -2,9 +2,9 @@
 
 namespace App\Console\DevelopmentCommands;
 
+use App\Flare\Builders\BuildMythicItem;
 use App\Flare\Models\Character;
 use Illuminate\Console\Command;
-use App\Flare\Builders\BuildMythicItem;
 
 class GivePlayerMythicItem extends Command
 {
@@ -25,7 +25,8 @@ class GivePlayerMythicItem extends Command
     /**
      * Execute the console command.
      */
-    public function handle(BuildMythicItem $buildMythicItem) {
+    public function handle(BuildMythicItem $buildMythicItem)
+    {
         $character = Character::where('name', $this->argument('characterName'))->first();
 
         if (is_null($character)) {
@@ -38,9 +39,9 @@ class GivePlayerMythicItem extends Command
 
         $character->inventory->slots()->create([
             'inventory_id' => $inventory->id,
-            'item_id'      => $mythic->id,
+            'item_id' => $mythic->id,
         ]);
 
-        $this->line('Gave player: ' . $this->argument('characterName') . ' Item: ' . $mythic->affix_name);
+        $this->line('Gave player: '.$this->argument('characterName').' Item: '.$mythic->affix_name);
     }
 }

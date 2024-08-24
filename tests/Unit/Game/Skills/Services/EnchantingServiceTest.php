@@ -2,8 +2,10 @@
 
 namespace Tests\Unit\Game\Skills\Services;
 
-use App\Flare\Models\GlobalEventEnchant;
+use App\Flare\Models\GameSkill;
 use App\Flare\Models\GlobalEventParticipation;
+use App\Flare\Models\Item;
+use App\Flare\Models\ItemAffix;
 use App\Flare\Values\CharacterClassValue;
 use App\Flare\Values\ItemSpecialtyType;
 use App\Game\Events\Values\EventType;
@@ -13,11 +15,8 @@ use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Skills\Services\EnchantingService;
 use App\Game\Skills\Services\EnchantItemService;
 use App\Game\Skills\Services\SkillCheckService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Flare\Models\Item;
-use App\Flare\Models\GameSkill;
-use App\Flare\Models\ItemAffix;
 use App\Game\Skills\Values\SkillTypeValue;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Mockery;
 use Mockery\MockInterface;
@@ -30,9 +29,9 @@ use Tests\Traits\CreateGlobalEventGoal;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateItemAffix;
 
-class EnchantingServiceTest extends TestCase {
-
-    use RefreshDatabase, CreateItem, CreateClass, CreateGameSkill, CreateItemAffix, CreateEvent, CreateGlobalEventGoal;
+class EnchantingServiceTest extends TestCase
+{
+    use CreateClass, CreateEvent, CreateGameSkill, CreateGlobalEventGoal, CreateItem, CreateItemAffix, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -46,7 +45,8 @@ class EnchantingServiceTest extends TestCase {
 
     private ?GameSkill $enchantingSkill;
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
         $this->enchantingSkill = $this->createGameSkill([
@@ -54,7 +54,7 @@ class EnchantingServiceTest extends TestCase {
             'type' => SkillTypeValue::ENCHANTING,
         ]);
 
-        $this->character = (new CharacterFactory())->createBaseCharacter()->assignSkill(
+        $this->character = (new CharacterFactory)->createBaseCharacter()->assignSkill(
             $this->enchantingSkill
         )->givePlayerLocation();
 
@@ -71,33 +71,35 @@ class EnchantingServiceTest extends TestCase {
         ]);
 
         $this->suffix = $this->createItemAffix([
-            'type'                 => 'suffix',
-            'int_required'         => 1,
+            'type' => 'suffix',
+            'int_required' => 1,
             'skill_level_required' => 1,
-            'skill_level_trivial'  => 2,
-            'cost'                 => 1000,
+            'skill_level_trivial' => 2,
+            'cost' => 1000,
         ]);
 
         $this->prefix = $this->createItemAffix([
-            'type'                 => 'prefix',
-            'int_required'         => 1,
+            'type' => 'prefix',
+            'int_required' => 1,
             'skill_level_required' => 1,
-            'skill_level_trivial'  => 2,
-            'cost'                 => 1000,
+            'skill_level_trivial' => 2,
+            'cost' => 1000,
         ]);
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
 
-        $this->character          = null;
-        $this->enchantingSkill    = null;
-        $this->enchantingService  = null;
-        $this->suffix             = null;
-        $this->itemToEnchant      = null;
+        $this->character = null;
+        $this->enchantingSkill = null;
+        $this->enchantingService = null;
+        $this->suffix = null;
+        $this->itemToEnchant = null;
     }
 
-    public function testFetchAffixesAndItemsThatCanBeEnchanted() {
+    public function testFetchAffixesAndItemsThatCanBeEnchanted()
+    {
         $character = $this->character->inventoryManagement()->giveItem($this->itemToEnchant)->getCharacter();
 
         $result = $this->enchantingService->fetchAffixes($character, true);
@@ -106,10 +108,11 @@ class EnchantingServiceTest extends TestCase {
         $this->assertNotEmpty($result['character_inventory']);
     }
 
-    public function testFetchAffixesAsMerhcant() {
+    public function testFetchAffixesAsMerhcant()
+    {
         Event::fake();
 
-        $character = (new CharacterFactory())->createBaseCharacter([], $this->createClass([
+        $character = (new CharacterFactory)->createBaseCharacter([], $this->createClass([
             'name' => CharacterClassValue::MERCHANT,
         ]))
             ->assignSkill($this->enchantingSkill)
@@ -128,7 +131,8 @@ class EnchantingServiceTest extends TestCase {
         });
     }
 
-    public function testFetchAffixesAndItemsThatCanBeEnchantedWithAlreadyEnchantedItemAtTheBottom() {
+    public function testFetchAffixesAndItemsThatCanBeEnchantedWithAlreadyEnchantedItemAtTheBottom()
+    {
         $character = $this->character->inventoryManagement()->giveItem($this->itemToEnchant)->giveItem($this->createItem([
             'item_prefix_id' => $this->prefix->id,
             'item_suffix_id' => $this->suffix->id,
@@ -142,7 +146,8 @@ class EnchantingServiceTest extends TestCase {
         $this->assertArrayHasKey(array_key_last($result['character_inventory']), $result['character_inventory']);
     }
 
-    public function testGetCostOfItemAffixesAsZeroWhenAffixesDoNotExist() {
+    public function testGetCostOfItemAffixesAsZeroWhenAffixesDoNotExist()
+    {
         $character = $this->character->getCharacter();
 
         $result = $this->enchantingService->getCostOfEnchantment($character, [10000, 100001], 560);
@@ -150,7 +155,8 @@ class EnchantingServiceTest extends TestCase {
         $this->assertEquals(0, $result);
     }
 
-    public function testGetCostOfItemAffixesAsZeroWhenItemsDoNotExist() {
+    public function testGetCostOfItemAffixesAsZeroWhenItemsDoNotExist()
+    {
         $character = $this->character->getCharacter();
 
         $result = $this->enchantingService->getCostOfEnchantment($character, [
@@ -161,7 +167,8 @@ class EnchantingServiceTest extends TestCase {
         $this->assertEquals(0, $result);
     }
 
-    public function testGetCostOfAffixesToAttach() {
+    public function testGetCostOfAffixesToAttach()
+    {
         $character = $this->character->getCharacter();
 
         $result = $this->enchantingService->getCostOfEnchantment($character, [
@@ -172,10 +179,11 @@ class EnchantingServiceTest extends TestCase {
         $this->assertEquals(2000, $result);
     }
 
-    public function testGetCostOfAffixesToAttachAsAMerchant() {
+    public function testGetCostOfAffixesToAttachAsAMerchant()
+    {
         Event::fake();
 
-        $character = (new CharacterFactory())->createBaseCharacter([], $this->createClass([
+        $character = (new CharacterFactory)->createBaseCharacter([], $this->createClass([
             'name' => CharacterClassValue::MERCHANT,
         ]))->getCharacter();
 
@@ -191,7 +199,8 @@ class EnchantingServiceTest extends TestCase {
         });
     }
 
-    public function testGetCostWhenItemHasAffixesAttached() {
+    public function testGetCostWhenItemHasAffixesAttached()
+    {
         $character = $this->character->getCharacter();
 
         $result = $this->enchantingService->getCostOfEnchantment($character, [
@@ -205,7 +214,8 @@ class EnchantingServiceTest extends TestCase {
         $this->assertEquals(4000, $result);
     }
 
-    public function testEnchantItemAndTheCostIsDeducted() {
+    public function testEnchantItemAndTheCostIsDeducted()
+    {
         $character = $this->character->inventoryManagement()->giveItem($this->itemToEnchant)->getCharacter();
 
         $character->update(['gold' => 1000]);
@@ -222,7 +232,8 @@ class EnchantingServiceTest extends TestCase {
         $this->assertEquals(0, $character->gold);
     }
 
-    public function testEnchantItemWithNonExistantAffixesButStillReduceTheCharactersGoldAsPunishment() {
+    public function testEnchantItemWithNonExistantAffixesButStillReduceTheCharactersGoldAsPunishment()
+    {
         $character = $this->character->inventoryManagement()->giveItem($this->itemToEnchant)->getCharacter();
 
         $character->update(['gold' => 1000]);
@@ -239,12 +250,13 @@ class EnchantingServiceTest extends TestCase {
         $this->assertEquals(0, $character->gold);
     }
 
-    public function testCannotEnchantItemWhenSkillLevelRequiredIsToHigh() {
+    public function testCannotEnchantItemWhenSkillLevelRequiredIsToHigh()
+    {
 
         Event::fake();
 
         $this->prefix->update([
-            'skill_level_required' => 1800
+            'skill_level_required' => 1800,
         ]);
 
         $character = $this->character->inventoryManagement()->giveItem($this->itemToEnchant)->getCharacter();
@@ -267,13 +279,14 @@ class EnchantingServiceTest extends TestCase {
         });
     }
 
-    public function testEnchantNotEnoughInt() {
+    public function testEnchantNotEnoughInt()
+    {
 
         Event::fake();
 
         $this->prefix->update([
             'skill_level_trivial' => 1,
-            'int_required'        => 10000
+            'int_required' => 10000,
         ]);
 
         $character = $this->character->inventoryManagement()->giveItem($this->itemToEnchant)->getCharacter();
@@ -296,12 +309,13 @@ class EnchantingServiceTest extends TestCase {
         });
     }
 
-    public function testEnchantWhenToEasy() {
+    public function testEnchantWhenToEasy()
+    {
 
         Event::fake();
 
         $this->prefix->update([
-            'skill_level_trivial' => -10
+            'skill_level_trivial' => -10,
         ]);
 
         $character = $this->character->inventoryManagement()->giveItem($this->itemToEnchant)->getCharacter();
@@ -324,7 +338,8 @@ class EnchantingServiceTest extends TestCase {
         });
     }
 
-    public function testEnchantingSucceeds() {
+    public function testEnchantingSucceeds()
+    {
 
         Event::fake();
 
@@ -355,11 +370,12 @@ class EnchantingServiceTest extends TestCase {
         $this->assertEquals(0, $character->gold);
 
         Event::assertDispatched(function (ServerMessageEvent $event) use ($slot) {
-            return $event->message === 'Applied enchantment: ' . $this->prefix->name . ' to: ' . $slot->item->refresh()->affix_name;
+            return $event->message === 'Applied enchantment: '.$this->prefix->name.' to: '.$slot->item->refresh()->affix_name;
         });
     }
 
-    public function testEnchantingSucceedsWhileEnchantingGlobalEventIsRunning() {
+    public function testEnchantingSucceedsWhileEnchantingGlobalEventIsRunning()
+    {
 
         Event::fake();
 
@@ -374,18 +390,18 @@ class EnchantingServiceTest extends TestCase {
         $enchantingService = $this->app->make(EnchantingService::class);
 
         $this->createEvent([
-            'type'                    => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'type' => EventType::DELUSIONAL_MEMORIES_EVENT,
             'current_event_goal_step' => GlobalEventSteps::ENCHANT,
         ]);
 
         $this->createGlobalEventGoal([
-            'event_type'                  => EventType::DELUSIONAL_MEMORIES_EVENT,
-            'max_enchants'                => 100,
-            'reward_every'                => 10,
-            'next_reward_at'              => 10,
-            'item_specialty_type_reward'  => ItemSpecialtyType::DELUSIONAL_SILVER,
-            'should_be_unique'            => false,
-            'should_be_mythic'            => true,
+            'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'max_enchants' => 100,
+            'reward_every' => 10,
+            'next_reward_at' => 10,
+            'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER,
+            'should_be_unique' => false,
+            'should_be_mythic' => true,
         ]);
 
         $character = $this->character->inventoryManagement()->giveItem($this->itemToEnchant)->getCharacter();
@@ -414,7 +430,8 @@ class EnchantingServiceTest extends TestCase {
         $this->assertEmpty($character->inventory->slots);
     }
 
-    public function testEnchantingFails() {
+    public function testEnchantingFails()
+    {
 
         Event::fake();
 
@@ -435,7 +452,7 @@ class EnchantingServiceTest extends TestCase {
 
         $slot = $character->inventory->slots->first();
 
-        $itemName =  $slot->item->affix_name;
+        $itemName = $slot->item->affix_name;
 
         $enchantingService->enchant($character, [
             'affix_ids' => [$this->prefix->id],
@@ -447,11 +464,12 @@ class EnchantingServiceTest extends TestCase {
         $this->assertEquals(0, $character->gold);
 
         Event::assertDispatched(function (ServerMessageEvent $event) use ($itemName) {
-            return $event->message === 'You failed to apply ' . $this->prefix->name . ' to: ' . $itemName . '. The item shatters before you. You lost the investment.';
+            return $event->message === 'You failed to apply '.$this->prefix->name.' to: '.$itemName.'. The item shatters before you. You lost the investment.';
         });
     }
 
-    public function testGetTimeAdditionForEnchantingShouldBeTriple() {
+    public function testGetTimeAdditionForEnchantingShouldBeTriple()
+    {
         $item = $this->createItem([
             'item_prefix_id' => $this->prefix->id,
             'item_suffix_id' => $this->suffix->id,
@@ -462,7 +480,8 @@ class EnchantingServiceTest extends TestCase {
         $this->assertEquals('triple', $time);
     }
 
-    public function testGetTimeAdditionForEnchantingShouldBeDouble() {
+    public function testGetTimeAdditionForEnchantingShouldBeDouble()
+    {
         $item = $this->createItem([
             'item_prefix_id' => $this->prefix->id,
         ]);
@@ -472,24 +491,27 @@ class EnchantingServiceTest extends TestCase {
         $this->assertEquals('double', $time);
     }
 
-    public function testGetTimeAdditionForEnchantingShouldBeNull() {
+    public function testGetTimeAdditionForEnchantingShouldBeNull()
+    {
         $time = $this->enchantingService->timeForEnchanting($this->itemToEnchant);
 
         $this->assertNull($time);
     }
 
-    public function testGetInventorySlotFromSlotId() {
+    public function testGetInventorySlotFromSlotId()
+    {
         $character = $this->character->inventoryManagement()->giveItem($this->itemToEnchant)->getCharacter();
 
-        $slotId    = $character->inventory->slots->first()->id;
+        $slotId = $character->inventory->slots->first()->id;
 
-        $slot      = $this->enchantingService->getSlotFromInventory($character, $slotId);
+        $slot = $this->enchantingService->getSlotFromInventory($character, $slotId);
 
         $this->assertNotNull($slot);
         $this->assertEquals($slotId, $slot->id);
     }
 
-    public function testFetchCharacterEnchantingXP() {
+    public function testFetchCharacterEnchantingXP()
+    {
         $character = $this->character->getCharacter();
 
         $weaponCraftingXpData = $this->enchantingService->getEnchantingXP($character);

@@ -7,11 +7,10 @@ use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 
 class AffixesImport implements WithMultipleSheets
 {
-
     public function sheets(): array
     {
         return [
-            0 => new AffixesSheet(),
+            0 => new AffixesSheet,
         ];
     }
 }

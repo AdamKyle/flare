@@ -2,12 +2,12 @@
 
 namespace App\Flare\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Database\Factories\InventorySlotFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
-class InventorySlot extends Model {
-
+class InventorySlot extends Model
+{
     use HasFactory;
 
     /**
@@ -29,18 +29,21 @@ class InventorySlot extends Model {
      */
     protected $casts = [
         'equipped' => 'boolean',
-        'item_id'  => 'integer',
+        'item_id' => 'integer',
     ];
 
-    public function item() {
+    public function item()
+    {
         return $this->hasOne(Item::class, 'id', 'item_id');
     }
 
-    public function inventory() {
+    public function inventory()
+    {
         return $this->belongsTo(Inventory::class, 'inventory_id', 'id');
     }
 
-    protected static function newFactory() {
+    protected static function newFactory()
+    {
         return InventorySlotFactory::new();
     }
 }

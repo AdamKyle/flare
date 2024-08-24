@@ -3,49 +3,40 @@
 namespace App\Game\Kingdoms\Jobs;
 
 use App\Flare\Models\CapitalCityUnitQueue;
+use App\Flare\Models\GameUnit;
+use App\Flare\Models\Kingdom;
+use App\Flare\Models\UnitInQueue;
 use App\Game\Kingdoms\Service\CapitalCityUnitManagement;
+use App\Game\Kingdoms\Service\UpdateKingdom;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use App\Game\Kingdoms\Values\KingdomMaxValue;
+use Facades\App\Flare\Values\UserOnlineValue;
+use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use App\Flare\Models\GameUnit;
-use App\Flare\Models\Kingdom;
-use App\Flare\Models\UnitInQueue;
-use App\Game\Kingdoms\Service\UpdateKingdom;
-use Facades\App\Flare\Values\UserOnlineValue;
-use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 
-class RecruitUnits implements ShouldQueue {
-
+class RecruitUnits implements ShouldQueue
+{
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     /**
      * Create a new job instance.
-     *
-     * @param GameUnit $unit
-     * @param Kingdom $kingdom
-     * @param int $amount
-     * @param int $queueId
-     * @param int|null $capitalCityQueueId
      */
     public function __construct(private readonly GameUnit $unit,
-                                private readonly Kingdom $kingdom,
-                                private readonly int $amount,
-                                private readonly int $queueId,
-                                private readonly int|null $capitalCityQueueId = null
-    ){ }
+        private readonly Kingdom $kingdom,
+        private readonly int $amount,
+        private readonly int $queueId,
+        private readonly ?int $capitalCityQueueId = null
+    ) {}
 
     /**
      * Execute the job.
-     *
-     * @param UpdateKingdom $updateKingdom
-     * @param CapitalCityUnitManagement $capitalCityUnitManagement
-     * @return void
      */
-    public function handle(UpdateKingdom $updateKingdom, CapitalCityUnitManagement $capitalCityUnitManagement): void {
+    public function handle(UpdateKingdom $updateKingdom, CapitalCityUnitManagement $capitalCityUnitManagement): void
+    {
 
         $queue = UnitInQueue::find($this->queueId);
 
@@ -53,7 +44,7 @@ class RecruitUnits implements ShouldQueue {
             return;
         }
 
-        if (!$queue->completed_at->lessThanOrEqualTo(now())) {
+        if (! $queue->completed_at->lessThanOrEqualTo(now())) {
             $timeLeft = $queue->completed_at->diffInMinutes(now());
 
             if ($timeLeft <= 15) {
@@ -79,18 +70,18 @@ class RecruitUnits implements ShouldQueue {
 
         if ($this->kingdom->units->isEmpty()) {
             $this->kingdom->units()->create([
-                'kingdom_id'   => $this->kingdom->id,
+                'kingdom_id' => $this->kingdom->id,
                 'game_unit_id' => $this->unit->id,
-                'amount'       => $amount,
+                'amount' => $amount,
             ]);
         } else {
             $found = $this->kingdom->units()->where('game_unit_id', $this->unit->id)->first();
 
             if (is_null($found)) {
                 $this->kingdom->units()->create([
-                    'kingdom_id'   => $this->kingdom->id,
+                    'kingdom_id' => $this->kingdom->id,
                     'game_unit_id' => $this->unit->id,
-                    'amount'       => $amount,
+                    'amount' => $amount,
                 ]);
             } else {
                 $amount += $found->amount;
@@ -111,24 +102,23 @@ class RecruitUnits implements ShouldQueue {
 
         $updateKingdom->updateKingdom($kingdom);
 
-        $x       = $kingdom->x_position;
-        $y       = $kingdom->y_position;
-        $user    = $kingdom->character->user;
-        $plane   = $kingdom->gameMap->name;
+        $x = $kingdom->x_position;
+        $y = $kingdom->y_position;
+        $user = $kingdom->character->user;
+        $plane = $kingdom->gameMap->name;
 
         if (UserOnlineValue::isOnline($user)) {
 
             if ($user->show_unit_recruitment_messages) {
-                $message = $this->unit->name . ' finished recruiting for kingdom: ' .
-                    $this->kingdom->name . ' on plane: ' . $plane . ' at: (X/Y) ' . $x . '/' . $y .
-                    '. You have a total of: ' . number_format($amount);
-
+                $message = $this->unit->name.' finished recruiting for kingdom: '.
+                    $this->kingdom->name.' on plane: '.$plane.' at: (X/Y) '.$x.'/'.$y.
+                    '. You have a total of: '.number_format($amount);
 
                 ServerMessageHandler::handleMessage($user, 'unit_recruitment_finished', $message);
             }
         }
 
-        if (!is_null($this->capitalCityQueueId)) {
+        if (! is_null($this->capitalCityQueueId)) {
             $capitalCityQueue = CapitalCityUnitQueue::find($this->capitalCityQueueId);
 
             $unitRequests = $capitalCityQueue->unit_request_data;
@@ -140,7 +130,7 @@ class RecruitUnits implements ShouldQueue {
             }
 
             $capitalCityQueue->update([
-                'unit_request_data' => $unitRequests
+                'unit_request_data' => $unitRequests,
             ]);
 
             $capitalCityQueue = $capitalCityQueue->refresh();

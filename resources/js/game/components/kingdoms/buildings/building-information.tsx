@@ -388,7 +388,12 @@ export default class BuildingInformation extends React.Component<
                             !this.buildingNeedsToBeRepaired() ? (
                                 <p>Building is already max level.</p>
                             ) : this.props.is_in_queue ? (
-                                <p>Building is currently in queue</p>
+                                <p>
+                                    Building is currently in queue. Click the
+                                    red minus at the top to return to the list.
+                                    You will see a timer beside the building
+                                    indicating time left.
+                                </p>
                             ) : (
                                 <Fragment>
                                     {this.renderCosts()}

@@ -2,8 +2,8 @@
 
 namespace Database\Factories;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Flare\Models\Item;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 class ItemFactory extends Factory
 {
@@ -22,13 +22,13 @@ class ItemFactory extends Factory
     public function definition()
     {
         return [
-            'name'                => 'test',
-            'type'                => 'weapon',
-            'base_damage'         => 10,
-            'cost'                => 100,
-            'crafting_type'       => 'weapon',
-            'description'         => 'sample',
-            'can_resurrect'       => false,
+            'name' => 'test',
+            'type' => 'weapon',
+            'base_damage' => 10,
+            'cost' => 100,
+            'crafting_type' => 'weapon',
+            'description' => 'sample',
+            'can_resurrect' => false,
             'resurrection_chance' => 0.0,
             'can_use_on_other_items' => false,
         ];

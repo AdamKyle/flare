@@ -15,35 +15,38 @@ use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateItem;
 
-class CharacterAttackTypesCacheBuilderTest extends TestCase {
-
-    use RefreshDatabase, CreateItem;
+class CharacterAttackTypesCacheBuilderTest extends TestCase
+{
+    use CreateItem, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
     private ?UpdateCharacterAttackTypesHandler $updateCharacterAttackTypesHandler;
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
-        $this->character = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
+        $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
 
-        $this->character                         = null;
+        $this->character = null;
         $this->updateCharacterAttackTypesHandler = null;
     }
 
-    private function setUpCharacterForTests(): Character {
+    private function setUpCharacterForTests(): Character
+    {
         $item = $this->createItem([
-            'type'        => WeaponTypes::STAVE,
+            'type' => WeaponTypes::STAVE,
             'base_damage' => 10,
         ]);
 
         $spellDamage = $this->createItem([
-            'type'        => SpellTypes::DAMAGE,
+            'type' => SpellTypes::DAMAGE,
             'base_damage' => 10,
         ]);
 
@@ -53,7 +56,8 @@ class CharacterAttackTypesCacheBuilderTest extends TestCase {
             ->getCharacter();
     }
 
-    public function testUpdateCharacterAttackTypesHandlerAndExplorationLogUpdateEventIsCalled() {
+    public function testUpdateCharacterAttackTypesHandlerAndExplorationLogUpdateEventIsCalled()
+    {
         Event::fake();
 
         $character = $this->setUpCharacterForTests();
@@ -63,13 +67,14 @@ class CharacterAttackTypesCacheBuilderTest extends TestCase {
         Event::assertDispatched(ExplorationLogUpdate::class);
     }
 
-    public function testUpdateCharacterAttackTypesCache() {
+    public function testUpdateCharacterAttackTypesCache()
+    {
         $character = $this->setUpCharacterForTests();
 
         CharacterAttackTypesCacheBuilder::dispatch($character, true);
 
         $this->assertNotNull(
-            Cache::get('character-attack-data-' . $character->id)
+            Cache::get('character-attack-data-'.$character->id)
         );
     }
 }

@@ -2,33 +2,34 @@
 
 namespace Tests\Feature\Game\NpcActions\Workbench\Controllers\Api;
 
-use App\Flare\AlchemyItemGenerator\Values\AlchemyItemType;
 use App\Flare\Values\MaxCurrenciesValue;
-use App\Game\Gambler\Values\CurrencyValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateItem;
 
-class HolyItemsControllerTest extends TestCase {
-
-    use RefreshDatabase, CreateItem;
+class HolyItemsControllerTest extends TestCase
+{
+    use CreateItem, RefreshDatabase;
 
     private ?CharacterFactory $character = null;
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
-        $this->character = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
+        $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
 
         $this->character = null;
     }
 
-    public function testGetSmithingItems() {
+    public function testGetSmithingItems()
+    {
         $character = $this->character->givePlayerLocation()
             ->inventoryManagement()
             ->giveItem(
@@ -54,10 +55,11 @@ class HolyItemsControllerTest extends TestCase {
         $this->assertCount(1, $jsonData['alchemy_items']);
     }
 
-    public function testApplyOil() {
+    public function testApplyOil()
+    {
 
         $item = $this->createItem([
-            'type'        => 'weapon',
+            'type' => 'weapon',
             'holy_stacks' => 20,
         ]);
 
@@ -89,7 +91,7 @@ class HolyItemsControllerTest extends TestCase {
             ->call('POST', '/api/character/'.$character->id.'/smithy-workbench/apply', [
                 '_token' => csrf_token(),
                 'item_id' => $slot->item->id,
-                'alchemy_item_id' => $alchemy->item->id
+                'alchemy_item_id' => $alchemy->item->id,
             ]);
 
         $jsonData = json_decode($response->getContent(), true);

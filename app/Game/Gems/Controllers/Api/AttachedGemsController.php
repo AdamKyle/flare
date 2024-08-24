@@ -8,26 +8,17 @@ use App\Game\Gems\Services\AttachedGemService;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 
-class AttachedGemsController extends Controller {
-
-    /**
-     * @var AttachedGemService $attachedGemService
-     */
+class AttachedGemsController extends Controller
+{
     private AttachedGemService $attachedGemService;
 
-    /**
-     * @param AttachedGemService $attachedGemService
-     */
-    public function __construct(AttachedGemService $attachedGemService) {
+    public function __construct(AttachedGemService $attachedGemService)
+    {
         $this->attachedGemService = $attachedGemService;
     }
 
-    /**
-     * @param Character $character
-     * @param Item $item
-     * @return JsonResponse
-     */
-    public function getGemsFromItem(Character $character, Item $item): JsonResponse {
+    public function getGemsFromItem(Character $character, Item $item): JsonResponse
+    {
         $result = $this->attachedGemService->getGemsFromItem($character, $item);
 
         $status = $result['status'];

@@ -5,18 +5,18 @@ namespace App\Game\Kingdoms\Handlers;
 use App\Flare\Models\Kingdom;
 use App\Game\Kingdoms\Values\UnitNames;
 
-class DefenderArcherHandler extends BaseDefenderHandler {
-
+class DefenderArcherHandler extends BaseDefenderHandler
+{
     /**
      * The defenders archers will attack the attackers units.
      *
      * - Only Archers and Mounted Archers will attack.
      * - When updating the attacker units, we ignore the siege weapons.
      *
-     * @param Kingdom $kingdom
      * @return void
      */
-    public function attackUnitsWithArcherUnits(Kingdom $kingdom) {
+    public function attackUnitsWithArcherUnits(Kingdom $kingdom)
+    {
         $attack = $this->getArcherAttack($kingdom);
         $amount = $this->getTotalAmountOfUnits();
 
@@ -41,11 +41,9 @@ class DefenderArcherHandler extends BaseDefenderHandler {
      * Get the archer attack.
      *
      * - Only gets the Mounted Archer and Archers.
-     *
-     * @param Kingdom $kingdom
-     * @return int
      */
-    protected function getArcherAttack(Kingdom $kingdom): int {
+    protected function getArcherAttack(Kingdom $kingdom): int
+    {
         $attack = 0;
 
         foreach ($kingdom->units as $unit) {

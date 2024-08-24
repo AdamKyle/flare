@@ -13,30 +13,20 @@ use App\Game\Core\Events\UpdateTopBarEvent;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 use Illuminate\Http\Request;
 
-class MarketBoard {
-
-    /**
-     * @var EquipItemService $equipItemService
-     */
+class MarketBoard
+{
     private EquipItemService $equipItemService;
 
-    /**
-     * @param EquipItemService $equipItemService
-     */
-    public function __construct(EquipItemService $equipItemService) {
+    public function __construct(EquipItemService $equipItemService)
+    {
         $this->equipItemService = $equipItemService;
     }
 
     /**
      * Buy and replace item from market.
-     *
-     * @param Request $request
-     * @param Character $character
-     * @param MarketBoardModel $listing
-     * @param int $price
-     * @return void
      */
-    public function buyAndReplaceItem(Request $request, Character $character, MarketBoardModel $listing, int $price): void {
+    public function buyAndReplaceItem(Request $request, Character $character, MarketBoardModel $listing, int $price): void
+    {
         $slot = $this->buyItem($character, $listing, $price, true);
 
         $request->merge([
@@ -54,20 +44,15 @@ class MarketBoard {
 
     /**
      * Buy item from market.
-     *
-     * @param Character $character
-     * @param MarketBoardModel $listing
-     * @param int $price
-     * @param bool $replacing
-     * @return InventorySlot
      */
-    public function buyItem(Character $character, MarketBoardModel $listing, int $price, bool $replacing = false): InventorySlot {
+    public function buyItem(Character $character, MarketBoardModel $listing, int $price, bool $replacing = false): InventorySlot
+    {
         $character->update([
             'gold' => $character->gold - $price,
         ]);
 
         MarketHistory::create([
-            'item_id'  => $listing->item_id,
+            'item_id' => $listing->item_id,
             'sold_for' => $listing->listed_price,
         ]);
 
@@ -77,10 +62,10 @@ class MarketBoard {
 
         $slot = $character->inventory->slots()->create([
             'inventory_id' => $character->inventory->id,
-            'item_id'      => $listing->item_id,
+            'item_id' => $listing->item_id,
         ]);
 
-        if (!$replacing) {
+        if (! $replacing) {
             $listing->delete();
         }
 
@@ -89,12 +74,9 @@ class MarketBoard {
 
     /**
      * Give gold to the seller.
-     *
-     * @param Character $listingCharacter
-     * @param MarketBoardModel $listing
-     * @return void
      */
-    protected function giveGoldToSeller(Character $listingCharacter, MarketBoardModel $listing): void {
+    protected function giveGoldToSeller(Character $listingCharacter, MarketBoardModel $listing): void
+    {
         $gold = ($listing->listed_price - ($listing->listed_price * 0.05));
 
         $newGold = $gold + $listingCharacter->gold;
@@ -107,7 +89,7 @@ class MarketBoard {
             'gold' => $newGold,
         ]);
 
-        $message = 'Sold market listing: ' . $listing->item->affix_name . ' for: ' . number_format($gold) . ' After fees (5% tax).';
+        $message = 'Sold market listing: '.$listing->item->affix_name.' for: '.number_format($gold).' After fees (5% tax).';
 
         ServerMessageHandler::handleMessage($listingCharacter->user, 'sold_item', $message);
 
@@ -116,11 +98,9 @@ class MarketBoard {
 
     /**
      * Update character attack data.
-     *
-     * @param Character $character
-     * @return void
      */
-    protected function updateCharacterAttackDataCache(Character $character): void {
+    protected function updateCharacterAttackDataCache(Character $character): void
+    {
         CharacterAttackTypesCacheBuilder::dispatch($character)->delay(now()->addSeconds(2));
     }
 }

@@ -2,12 +2,12 @@
 
 namespace App\Flare\MapGenerator\Console\Commands;
 
-use Illuminate\Console\Command;
-use Illuminate\Support\Str;
-use ChristianEssl\LandmapGeneration\Struct\Color;
 use App\Flare\MapGenerator\Builders\MapBuilder;
+use ChristianEssl\LandmapGeneration\Struct\Color;
+use Illuminate\Console\Command;
 
-class CreateMap extends Command {
+class CreateMap extends Command
+{
     /**
      * The name and signature of the console command.
      *
@@ -27,7 +27,8 @@ class CreateMap extends Command {
      *
      * @return void
      */
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
     }
 
@@ -36,7 +37,8 @@ class CreateMap extends Command {
      *
      * @return mixed
      */
-    public function handle() {
+    public function handle()
+    {
 
         // Surface:
         // $land  = new Color(23, 132, 72);

@@ -2,8 +2,8 @@
 
 namespace Database\Factories;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Flare\Models\GameClass;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 class GameClassFactory extends Factory
 {
@@ -22,10 +22,10 @@ class GameClassFactory extends Factory
     public function definition()
     {
         return [
-            'name'        => 'Fighter',
+            'name' => 'Fighter',
             'damage_stat' => 'str',
             'to_hit_stat' => 'dex',
-            'str_mod'     => 0,
+            'str_mod' => 0,
         ];
     }
 }

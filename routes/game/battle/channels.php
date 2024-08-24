@@ -1,19 +1,18 @@
-
 <?php
 
 // When setting the attack timeout bar.
 Broadcast::channel('show-timeout-bar-{userId}', function ($user, $userId) {
-	return $user->id === (int) $userId;
+    return $user->id === (int) $userId;
 });
 
 // When the character is dead
 Broadcast::channel('character-is-dead-{userId}', function ($user, $userId) {
-	return $user->id === (int) $userId;
+    return $user->id === (int) $userId;
 });
 
 // When the map-actions needed to be updated.
 Broadcast::channel('update-map-actions-{userId}', function ($user, $userId) {
-   return $user->id === (int) $userId;
+    return $user->id === (int) $userId;
 });
 
 // When character attack stats are to be updated.
@@ -52,11 +51,11 @@ Broadcast::channel('celestial-fight-changes', function ($user) {
 });
 
 // When a character revives
-Broadcast::channel('character-revive-{userId}', function($user, $userId) {
+Broadcast::channel('character-revive-{userId}', function ($user, $userId) {
     return $user->id === (int) $userId;
 });
 
 // Raid Attacks left
-Broadcast::channel('update-raid-attacks-left-{userId}', function($user, $userId) {
+Broadcast::channel('update-raid-attacks-left-{userId}', function ($user, $userId) {
     return $user->id === (int) $userId;
 });

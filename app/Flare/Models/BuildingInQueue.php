@@ -3,12 +3,12 @@
 namespace App\Flare\Models;
 
 use App\Game\Kingdoms\Values\BuildingQueueType;
+use Database\Factories\BuildingInQueueFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Database\Factories\BuildingInQueueFactory;
 
-class BuildingInQueue extends Model {
-
+class BuildingInQueue extends Model
+{
     use HasFactory;
 
     protected $table = 'buildings_in_queue';
@@ -27,7 +27,7 @@ class BuildingInQueue extends Model {
         'paid_amount',
         'completed_at',
         'started_at',
-        'type'
+        'type',
     ];
 
     /**
@@ -36,12 +36,12 @@ class BuildingInQueue extends Model {
      * @var array
      */
     protected $casts = [
-        'to_level'       => 'integer',
-        'paid_amount'    => 'integer',
-        'completed_at'   => 'datetime',
-        'started_at'     => 'datetime',
+        'to_level' => 'integer',
+        'paid_amount' => 'integer',
+        'completed_at' => 'datetime',
+        'started_at' => 'datetime',
         'paid_with_gold' => 'boolean',
-        'type'           => 'integer'
+        'type' => 'integer',
     ];
 
     /**
@@ -51,27 +51,33 @@ class BuildingInQueue extends Model {
         'type_name',
     ];
 
-    public function character() {
+    public function character()
+    {
         return $this->belongsTo(Character::class);
     }
 
-    public function building() {
+    public function building()
+    {
         return $this->belongsTo(KingdomBuilding::class);
     }
 
-    public function kingdom() {
+    public function kingdom()
+    {
         return $this->belongsTo(Kingdom::class);
     }
 
-    public function getTypeNameAttribute() {
+    public function getTypeNameAttribute()
+    {
         return (new BuildingQueueType($this->type))->getNameOfType();
     }
 
-    public function getType(): BuildingQueueType {
-        return (new BuildingQueueType($this->type));
+    public function getType(): BuildingQueueType
+    {
+        return new BuildingQueueType($this->type);
     }
 
-    protected static function newFactory() {
+    protected static function newFactory()
+    {
         return BuildingInQueueFactory::new();
     }
 }

@@ -37,6 +37,7 @@
         "beyondcode/laravel-dump-server": "^2.0.0",
         "fakerphp/faker": "^1.21.0",
         "laravel/browser-kit-testing": "^7.0",
+        "laravel/pint": "^1.17",
         "mockery/mockery": "^1.6.6",
         "nunomaduro/collision": "^8.1",
         "phpunit/phpunit": "^10.0",
@@ -83,8 +84,7 @@
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
             "@php artisan package:discover --ansi",
-            "@php artisan vendor:publish --force --tag=livewire:assets --ansi",
-            "php artisan horizon:publish"
+            "@php artisan vendor:publish --force --tag=livewire:assets --ansi"
         ],
         "post-root-package-install": [
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""

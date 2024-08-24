@@ -10,7 +10,8 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class UnlockSkillEvent  implements ShouldBroadcastNow {
+class UnlockSkillEvent implements ShouldBroadcastNow
+{
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     private User $user;
@@ -19,11 +20,10 @@ class UnlockSkillEvent  implements ShouldBroadcastNow {
 
     /**
      * Constructor
-     *
-     * @param User $user
      */
-    public function __construct(User $user) {
-        $this->user   = $user;
+    public function __construct(User $user)
+    {
+        $this->user = $user;
         $this->enable = true;
     }
 
@@ -32,7 +32,8 @@ class UnlockSkillEvent  implements ShouldBroadcastNow {
      *
      * @return Channel|array
      */
-    public function broadcastOn() {
-        return new PrivateChannel('unlock-skill-' . $this->user->id);
+    public function broadcastOn()
+    {
+        return new PrivateChannel('unlock-skill-'.$this->user->id);
     }
 }

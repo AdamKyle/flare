@@ -37,12 +37,13 @@ class AssignNewSkillsToPlayers extends Command
      *
      * @return int
      */
-    public function handle() {
+    public function handle()
+    {
 
         $bar = $this->output->createProgressBar(Character::count());
         $bar->start();
 
-        Character::chunkById(100, function($characters) use($bar) {
+        Character::chunkById(100, function ($characters) use ($bar) {
             foreach ($characters as $character) {
                 $this->assignNewSkills($character);
 
@@ -53,7 +54,8 @@ class AssignNewSkillsToPlayers extends Command
         $bar->finish();
     }
 
-    public function assignNewSkills(Character $character) {
+    public function assignNewSkills(Character $character)
+    {
 
         $characterBuilder = resolve(CharacterBuilderService::class);
 

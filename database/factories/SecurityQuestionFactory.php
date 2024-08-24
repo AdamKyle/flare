@@ -2,8 +2,8 @@
 
 namespace Database\Factories;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Flare\Models\SecurityQuestion;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 class SecurityQuestionFactory extends Factory
 {
@@ -22,9 +22,9 @@ class SecurityQuestionFactory extends Factory
     public function definition()
     {
         return [
-            'user_id'  => null,
+            'user_id' => null,
             'question' => null,
-            'answer'   => null,
+            'answer' => null,
         ];
     }
 }

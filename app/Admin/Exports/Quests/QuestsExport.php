@@ -2,18 +2,14 @@
 
 namespace App\Admin\Exports\Quests;
 
-
-use Maatwebsite\Excel\Concerns\Exportable;
-use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 use App\Admin\Exports\Quests\Sheets\QuestsSheet;
+use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 
-class QuestsExport implements WithMultipleSheets {
-
-    /**
-     * @return array
-     */
-    public function sheets(): array {
-        $sheets   = [];
+class QuestsExport implements WithMultipleSheets
+{
+    public function sheets(): array
+    {
+        $sheets = [];
 
         $sheets[] = new QuestsSheet;
 

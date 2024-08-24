@@ -2,16 +2,12 @@
 
 namespace Tests\Unit\Game\Skills\Handlers;
 
-use App\Flare\Models\FactionLoyalty;
-use App\Flare\Models\FactionLoyaltyNpc;
-use App\Flare\Models\FactionLoyaltyNpcTask;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Events\Values\EventType;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Skills\Handlers\UpdateCraftingTasksForFactionLoyalty;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
@@ -21,26 +17,29 @@ use Tests\Traits\CreateItem;
 use Tests\Traits\CreateMonster;
 use Tests\Traits\CreateNpc;
 
-class UpdateCraftingTasksForFactionLoyaltyTest extends TestCase {
-
-    use RefreshDatabase, CreateFactionLoyalty, CreateItem, CreateNpc, CreateMonster, CreateEvent;
+class UpdateCraftingTasksForFactionLoyaltyTest extends TestCase
+{
+    use CreateEvent, CreateFactionLoyalty, CreateItem, CreateMonster, CreateNpc, RefreshDatabase;
 
     private ?UpdateCraftingTasksForFactionLoyalty $updateCraftingTasksForFactionLoyalty;
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
         $this->updateCraftingTasksForFactionLoyalty = resolve(UpdateCraftingTasksForFactionLoyalty::class);
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
 
         $this->updateCraftingTasksForFactionLoyalty = null;
     }
 
-    public function testNothingHappensWhenThePlayerIsNotPledgedToAFaction() {
-        $character = (new CharacterFactory())->createBaseCharacter()
+    public function testNothingHappensWhenThePlayerIsNotPledgedToAFaction()
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()
             ->givePlayerLocation()
             ->assignFactionSystem()
             ->getCharacter();
@@ -49,8 +48,8 @@ class UpdateCraftingTasksForFactionLoyaltyTest extends TestCase {
 
         $this->createFactionLoyalty([
             'character_id' => $character->id,
-            'faction_id'   => $character->factions->first(),
-            'is_pledged'   => false
+            'faction_id' => $character->factions->first(),
+            'is_pledged' => false,
         ]);
 
         $this->updateCraftingTasksForFactionLoyalty->handleCraftingTask($character->refresh(), $this->createItem());
@@ -59,10 +58,11 @@ class UpdateCraftingTasksForFactionLoyaltyTest extends TestCase {
         Event::assertNotDispatched(UpdateTopBarEvent::class);
     }
 
-    public function testDoesNotHandleCraftingFactionLoyaltyWhenCharacterIsNotHelpingAnNpc() {
+    public function testDoesNotHandleCraftingFactionLoyaltyWhenCharacterIsNotHelpingAnNpc()
+    {
         $item = $this->createItem();
 
-        $character = (new CharacterFactory())->createBaseCharacter()
+        $character = (new CharacterFactory)->createBaseCharacter()
             ->givePlayerLocation()
             ->assignFactionSystem()
             ->getCharacter();
@@ -71,20 +71,20 @@ class UpdateCraftingTasksForFactionLoyaltyTest extends TestCase {
 
         $factionLoyalty = $this->createFactionLoyalty([
             'character_id' => $character->id,
-            'faction_id'   => $character->factions->first(),
-            'is_pledged'   => true
+            'faction_id' => $character->factions->first(),
+            'is_pledged' => true,
         ]);
 
         $npc = $this->createNpc();
 
         $this->createFactionLoyaltyNpc([
-            'faction_loyalty_id'            => $factionLoyalty->id,
-            'npc_id'                        => $npc->id,
-            'current_level'                 => 1,
-            'max_level'                     => 25,
-            'next_level_fame'               => 1000,
-            'currently_helping'             => false,
-            'kingdom_item_defence_bonus'    => 0.002,
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'npc_id' => $npc->id,
+            'current_level' => 1,
+            'max_level' => 25,
+            'next_level_fame' => 1000,
+            'currently_helping' => false,
+            'kingdom_item_defence_bonus' => 0.002,
         ]);
 
         $this->updateCraftingTasksForFactionLoyalty->handleCraftingTask($character->refresh(), $item);
@@ -93,10 +93,11 @@ class UpdateCraftingTasksForFactionLoyaltyTest extends TestCase {
         Event::assertNotDispatched(UpdateTopBarEvent::class);
     }
 
-    public function testDoesNotUpdateLoyaltyTasksWhenNoCraftingTaskFound() {
+    public function testDoesNotUpdateLoyaltyTasksWhenNoCraftingTaskFound()
+    {
         $item = $this->createItem();
 
-        $character = (new CharacterFactory())->createBaseCharacter()
+        $character = (new CharacterFactory)->createBaseCharacter()
             ->givePlayerLocation()
             ->assignFactionSystem()
             ->getCharacter();
@@ -105,26 +106,26 @@ class UpdateCraftingTasksForFactionLoyaltyTest extends TestCase {
 
         $factionLoyalty = $this->createFactionLoyalty([
             'character_id' => $character->id,
-            'faction_id'   => $character->factions->first(),
-            'is_pledged'   => true
+            'faction_id' => $character->factions->first(),
+            'is_pledged' => true,
         ]);
 
         $npc = $this->createNpc();
 
         $factionLoyaltyNpc = $this->createFactionLoyaltyNpc([
-            'faction_loyalty_id'            => $factionLoyalty->id,
-            'npc_id'                        => $npc->id,
-            'current_level'                 => 1,
-            'max_level'                     => 25,
-            'next_level_fame'               => 1000,
-            'currently_helping'             => true,
-            'kingdom_item_defence_bonus'    => 0.002,
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'npc_id' => $npc->id,
+            'current_level' => 1,
+            'max_level' => 25,
+            'next_level_fame' => 1000,
+            'currently_helping' => true,
+            'kingdom_item_defence_bonus' => 0.002,
         ]);
 
         $this->createFactionLoyaltyNpcTask([
-            'faction_loyalty_id'         => $factionLoyalty->id,
-            'faction_loyalty_npc_id'     => $factionLoyaltyNpc->id,
-            'fame_tasks'                 => [['sample' => 'key']],
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'faction_loyalty_npc_id' => $factionLoyaltyNpc->id,
+            'fame_tasks' => [['sample' => 'key']],
         ]);
 
         $this->updateCraftingTasksForFactionLoyalty->handleCraftingTask($character->refresh(), $item);
@@ -133,10 +134,11 @@ class UpdateCraftingTasksForFactionLoyaltyTest extends TestCase {
         Event::assertNotDispatched(UpdateTopBarEvent::class);
     }
 
-    public function testDoesNotHandleCraftingFameWhenItemIsNotApartOfTheCraftingList() {
+    public function testDoesNotHandleCraftingFameWhenItemIsNotApartOfTheCraftingList()
+    {
         $item = $this->createItem();
 
-        $character = (new CharacterFactory())->createBaseCharacter()
+        $character = (new CharacterFactory)->createBaseCharacter()
             ->givePlayerLocation()
             ->assignFactionSystem()
             ->getCharacter();
@@ -145,31 +147,31 @@ class UpdateCraftingTasksForFactionLoyaltyTest extends TestCase {
 
         $factionLoyalty = $this->createFactionLoyalty([
             'character_id' => $character->id,
-            'faction_id'   => $character->factions->first(),
-            'is_pledged'   => true
+            'faction_id' => $character->factions->first(),
+            'is_pledged' => true,
         ]);
 
         $npc = $this->createNpc();
 
         $factionLoyaltyNpc = $this->createFactionLoyaltyNpc([
-            'faction_loyalty_id'            => $factionLoyalty->id,
-            'npc_id'                        => $npc->id,
-            'current_level'                 => 1,
-            'max_level'                     => 25,
-            'next_level_fame'               => 1000,
-            'currently_helping'             => true,
-            'kingdom_item_defence_bonus'    => 0.002,
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'npc_id' => $npc->id,
+            'current_level' => 1,
+            'max_level' => 25,
+            'next_level_fame' => 1000,
+            'currently_helping' => true,
+            'kingdom_item_defence_bonus' => 0.002,
         ]);
 
         $this->createFactionLoyaltyNpcTask([
-            'faction_loyalty_id'         => $factionLoyalty->id,
-            'faction_loyalty_npc_id'     => $factionLoyaltyNpc->id,
-            'fame_tasks'                 => [[
-                'type'            => $item->crafting_type,
-                'item_name'       => $item->affix_name,
-                'item_id'         => 8674,
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'faction_loyalty_npc_id' => $factionLoyaltyNpc->id,
+            'fame_tasks' => [[
+                'type' => $item->crafting_type,
+                'item_name' => $item->affix_name,
+                'item_id' => 8674,
                 'required_amount' => rand(10, 50),
-                'current_amount'  => 0,
+                'current_amount' => 0,
             ]],
         ]);
 
@@ -181,10 +183,11 @@ class UpdateCraftingTasksForFactionLoyaltyTest extends TestCase {
         $this->assertEquals(0, $character->factionLoyalties->first()->factionLoyaltyNpcs->first()->factionLoyaltyNpcTasks->fame_tasks[0]['current_amount']);
     }
 
-    public function testUpdatesTheCurrentAmountOnACraftingTaskButDoesNotLevelUpTheFame() {
+    public function testUpdatesTheCurrentAmountOnACraftingTaskButDoesNotLevelUpTheFame()
+    {
         $item = $this->createItem();
 
-        $character = (new CharacterFactory())->createBaseCharacter()
+        $character = (new CharacterFactory)->createBaseCharacter()
             ->givePlayerLocation()
             ->assignFactionSystem()
             ->getCharacter();
@@ -193,31 +196,31 @@ class UpdateCraftingTasksForFactionLoyaltyTest extends TestCase {
 
         $factionLoyalty = $this->createFactionLoyalty([
             'character_id' => $character->id,
-            'faction_id'   => $character->factions->first(),
-            'is_pledged'   => true
+            'faction_id' => $character->factions->first(),
+            'is_pledged' => true,
         ]);
 
         $npc = $this->createNpc();
 
         $factionLoyaltyNpc = $this->createFactionLoyaltyNpc([
-            'faction_loyalty_id'            => $factionLoyalty->id,
-            'npc_id'                        => $npc->id,
-            'current_level'                 => 1,
-            'max_level'                     => 25,
-            'next_level_fame'               => 1000,
-            'currently_helping'             => true,
-            'kingdom_item_defence_bonus'    => 0.002,
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'npc_id' => $npc->id,
+            'current_level' => 1,
+            'max_level' => 25,
+            'next_level_fame' => 1000,
+            'currently_helping' => true,
+            'kingdom_item_defence_bonus' => 0.002,
         ]);
 
         $this->createFactionLoyaltyNpcTask([
-            'faction_loyalty_id'         => $factionLoyalty->id,
-            'faction_loyalty_npc_id'     => $factionLoyaltyNpc->id,
-            'fame_tasks'                 => [[
-                'type'            => $item->crafting_type,
-                'item_name'    => $item->name,
-                'item_id'      => $item->id,
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'faction_loyalty_npc_id' => $factionLoyaltyNpc->id,
+            'fame_tasks' => [[
+                'type' => $item->crafting_type,
+                'item_name' => $item->name,
+                'item_id' => $item->id,
                 'required_amount' => rand(10, 50),
-                'current_amount'  => 0,
+                'current_amount' => 0,
             ]],
         ]);
 
@@ -236,14 +239,15 @@ class UpdateCraftingTasksForFactionLoyaltyTest extends TestCase {
         );
     }
 
-    public function testUpdatesTheCurrentAmountOnACraftingTaskButDoesNotLevelUpTheFameWhenTheWeeklyEventIsRunning() {
+    public function testUpdatesTheCurrentAmountOnACraftingTaskButDoesNotLevelUpTheFameWhenTheWeeklyEventIsRunning()
+    {
         $item = $this->createItem();
 
         $this->createItem([
             'type' => EventType::WEEKLY_FACTION_LOYALTY_EVENT,
         ]);
 
-        $character = (new CharacterFactory())->createBaseCharacter()
+        $character = (new CharacterFactory)->createBaseCharacter()
             ->givePlayerLocation()
             ->assignFactionSystem()
             ->getCharacter();
@@ -252,31 +256,31 @@ class UpdateCraftingTasksForFactionLoyaltyTest extends TestCase {
 
         $factionLoyalty = $this->createFactionLoyalty([
             'character_id' => $character->id,
-            'faction_id'   => $character->factions->first(),
-            'is_pledged'   => true
+            'faction_id' => $character->factions->first(),
+            'is_pledged' => true,
         ]);
 
         $npc = $this->createNpc();
 
         $factionLoyaltyNpc = $this->createFactionLoyaltyNpc([
-            'faction_loyalty_id'            => $factionLoyalty->id,
-            'npc_id'                        => $npc->id,
-            'current_level'                 => 1,
-            'max_level'                     => 25,
-            'next_level_fame'               => 1000,
-            'currently_helping'             => true,
-            'kingdom_item_defence_bonus'    => 0.002,
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'npc_id' => $npc->id,
+            'current_level' => 1,
+            'max_level' => 25,
+            'next_level_fame' => 1000,
+            'currently_helping' => true,
+            'kingdom_item_defence_bonus' => 0.002,
         ]);
 
         $this->createFactionLoyaltyNpcTask([
-            'faction_loyalty_id'         => $factionLoyalty->id,
-            'faction_loyalty_npc_id'     => $factionLoyaltyNpc->id,
-            'fame_tasks'                 => [[
-                'type'            => $item->crafting_type,
-                'item_name'    => $item->name,
-                'item_id'      => $item->id,
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'faction_loyalty_npc_id' => $factionLoyaltyNpc->id,
+            'fame_tasks' => [[
+                'type' => $item->crafting_type,
+                'item_name' => $item->name,
+                'item_id' => $item->id,
                 'required_amount' => rand(10, 50),
-                'current_amount'  => 0,
+                'current_amount' => 0,
             ]],
         ]);
 
@@ -295,11 +299,12 @@ class UpdateCraftingTasksForFactionLoyaltyTest extends TestCase {
         );
     }
 
-    public function testLevelUpFameFromCrafting() {
+    public function testLevelUpFameFromCrafting()
+    {
 
         $item = $this->createItem();
 
-        $character = (new CharacterFactory())->createBaseCharacter()
+        $character = (new CharacterFactory)->createBaseCharacter()
             ->givePlayerLocation()
             ->assignFactionSystem()
             ->getCharacter();
@@ -314,19 +319,19 @@ class UpdateCraftingTasksForFactionLoyaltyTest extends TestCase {
         Event::fake();
 
         $this->createMonster([
-            'game_map_id' => $character->map->game_map_id
+            'game_map_id' => $character->map->game_map_id,
         ]);
         $this->createMonster([
-            'game_map_id' => $character->map->game_map_id
+            'game_map_id' => $character->map->game_map_id,
         ]);
         $this->createMonster([
-            'game_map_id' => $character->map->game_map_id
+            'game_map_id' => $character->map->game_map_id,
         ]);
         $this->createMonster([
-            'game_map_id' => $character->map->game_map_id
+            'game_map_id' => $character->map->game_map_id,
         ]);
         $this->createMonster([
-            'game_map_id' => $character->map->game_map_id
+            'game_map_id' => $character->map->game_map_id,
         ]);
 
         $this->createItem([
@@ -355,31 +360,31 @@ class UpdateCraftingTasksForFactionLoyaltyTest extends TestCase {
 
         $factionLoyalty = $this->createFactionLoyalty([
             'character_id' => $character->id,
-            'faction_id'   => $character->factions->first(),
-            'is_pledged'   => true
+            'faction_id' => $character->factions->first(),
+            'is_pledged' => true,
         ]);
 
         $npc = $this->createNpc();
 
         $factionLoyaltyNpc = $this->createFactionLoyaltyNpc([
-            'faction_loyalty_id'            => $factionLoyalty->id,
-            'npc_id'                        => $npc->id,
-            'current_level'                 => 1,
-            'max_level'                     => 25,
-            'next_level_fame'               => 1,
-            'currently_helping'             => true,
-            'kingdom_item_defence_bonus'    => 0.002,
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'npc_id' => $npc->id,
+            'current_level' => 1,
+            'max_level' => 25,
+            'next_level_fame' => 1,
+            'currently_helping' => true,
+            'kingdom_item_defence_bonus' => 0.002,
         ]);
 
         $this->createFactionLoyaltyNpcTask([
-            'faction_loyalty_id'         => $factionLoyalty->id,
-            'faction_loyalty_npc_id'     => $factionLoyaltyNpc->id,
-            'fame_tasks'                 => [[
-                'type'            => $item->crafting_type,
-                'item_name'       => $item->name,
-                'item_id'         => $item->id,
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'faction_loyalty_npc_id' => $factionLoyaltyNpc->id,
+            'fame_tasks' => [[
+                'type' => $item->crafting_type,
+                'item_name' => $item->name,
+                'item_id' => $item->id,
                 'required_amount' => rand(10, 50),
-                'current_amount'  => 200000,
+                'current_amount' => 200000,
             ]],
         ]);
 
@@ -395,7 +400,8 @@ class UpdateCraftingTasksForFactionLoyaltyTest extends TestCase {
 
     }
 
-    public function testLevelUpFameFromCraftingWhenTheEventIsRunning() {
+    public function testLevelUpFameFromCraftingWhenTheEventIsRunning()
+    {
 
         $item = $this->createItem();
 
@@ -403,7 +409,7 @@ class UpdateCraftingTasksForFactionLoyaltyTest extends TestCase {
             'type' => EventType::WEEKLY_FACTION_LOYALTY_EVENT,
         ]);
 
-        $character = (new CharacterFactory())->createBaseCharacter()
+        $character = (new CharacterFactory)->createBaseCharacter()
             ->givePlayerLocation()
             ->assignFactionSystem()
             ->getCharacter();
@@ -418,19 +424,19 @@ class UpdateCraftingTasksForFactionLoyaltyTest extends TestCase {
         Event::fake();
 
         $this->createMonster([
-            'game_map_id' => $character->map->game_map_id
+            'game_map_id' => $character->map->game_map_id,
         ]);
         $this->createMonster([
-            'game_map_id' => $character->map->game_map_id
+            'game_map_id' => $character->map->game_map_id,
         ]);
         $this->createMonster([
-            'game_map_id' => $character->map->game_map_id
+            'game_map_id' => $character->map->game_map_id,
         ]);
         $this->createMonster([
-            'game_map_id' => $character->map->game_map_id
+            'game_map_id' => $character->map->game_map_id,
         ]);
         $this->createMonster([
-            'game_map_id' => $character->map->game_map_id
+            'game_map_id' => $character->map->game_map_id,
         ]);
 
         $this->createItem([
@@ -459,31 +465,31 @@ class UpdateCraftingTasksForFactionLoyaltyTest extends TestCase {
 
         $factionLoyalty = $this->createFactionLoyalty([
             'character_id' => $character->id,
-            'faction_id'   => $character->factions->first(),
-            'is_pledged'   => true
+            'faction_id' => $character->factions->first(),
+            'is_pledged' => true,
         ]);
 
         $npc = $this->createNpc();
 
         $factionLoyaltyNpc = $this->createFactionLoyaltyNpc([
-            'faction_loyalty_id'            => $factionLoyalty->id,
-            'npc_id'                        => $npc->id,
-            'current_level'                 => 1,
-            'max_level'                     => 25,
-            'next_level_fame'               => 1,
-            'currently_helping'             => true,
-            'kingdom_item_defence_bonus'    => 0.002,
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'npc_id' => $npc->id,
+            'current_level' => 1,
+            'max_level' => 25,
+            'next_level_fame' => 1,
+            'currently_helping' => true,
+            'kingdom_item_defence_bonus' => 0.002,
         ]);
 
         $this->createFactionLoyaltyNpcTask([
-            'faction_loyalty_id'         => $factionLoyalty->id,
-            'faction_loyalty_npc_id'     => $factionLoyaltyNpc->id,
-            'fame_tasks'                 => [[
-                'type'            => $item->crafting_type,
-                'item_name'       => $item->name,
-                'item_id'         => $item->id,
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'faction_loyalty_npc_id' => $factionLoyaltyNpc->id,
+            'fame_tasks' => [[
+                'type' => $item->crafting_type,
+                'item_name' => $item->name,
+                'item_id' => $item->id,
                 'required_amount' => rand(10, 50),
-                'current_amount'  => 200000,
+                'current_amount' => 200000,
             ]],
         ]);
 
@@ -499,10 +505,11 @@ class UpdateCraftingTasksForFactionLoyaltyTest extends TestCase {
 
     }
 
-    public function testDoNotGiveMoreCurrenciesThenMaxAllowedForCraftingTasks() {
+    public function testDoNotGiveMoreCurrenciesThenMaxAllowedForCraftingTasks()
+    {
         $item = $this->createItem();
 
-        $character = (new CharacterFactory())->createBaseCharacter()
+        $character = (new CharacterFactory)->createBaseCharacter()
             ->givePlayerLocation()
             ->assignFactionSystem()
             ->getCharacter();
@@ -519,19 +526,19 @@ class UpdateCraftingTasksForFactionLoyaltyTest extends TestCase {
         Event::fake();
 
         $this->createMonster([
-            'game_map_id' => $character->map->game_map_id
+            'game_map_id' => $character->map->game_map_id,
         ]);
 
         $this->createMonster([
-            'game_map_id' => $character->map->game_map_id
+            'game_map_id' => $character->map->game_map_id,
         ]);
 
         $this->createMonster([
-            'game_map_id' => $character->map->game_map_id
+            'game_map_id' => $character->map->game_map_id,
         ]);
 
         $this->createMonster([
-            'game_map_id' => $character->map->game_map_id
+            'game_map_id' => $character->map->game_map_id,
         ]);
 
         $this->createItem([
@@ -560,31 +567,31 @@ class UpdateCraftingTasksForFactionLoyaltyTest extends TestCase {
 
         $factionLoyalty = $this->createFactionLoyalty([
             'character_id' => $character->id,
-            'faction_id'   => $character->factions->first(),
-            'is_pledged'   => true
+            'faction_id' => $character->factions->first(),
+            'is_pledged' => true,
         ]);
 
         $npc = $this->createNpc();
 
         $factionLoyaltyNpc = $this->createFactionLoyaltyNpc([
-            'faction_loyalty_id'            => $factionLoyalty->id,
-            'npc_id'                        => $npc->id,
-            'current_level'                 => 1,
-            'max_level'                     => 25,
-            'next_level_fame'               => 1,
-            'currently_helping'             => true,
-            'kingdom_item_defence_bonus'    => 0.002,
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'npc_id' => $npc->id,
+            'current_level' => 1,
+            'max_level' => 25,
+            'next_level_fame' => 1,
+            'currently_helping' => true,
+            'kingdom_item_defence_bonus' => 0.002,
         ]);
 
         $this->createFactionLoyaltyNpcTask([
-            'faction_loyalty_id'         => $factionLoyalty->id,
-            'faction_loyalty_npc_id'     => $factionLoyaltyNpc->id,
-            'fame_tasks'                 => [[
-                'type'            => $item->crafting_type,
-                'item_name'    => $item->name,
-                'item_id'      => $item->id,
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'faction_loyalty_npc_id' => $factionLoyaltyNpc->id,
+            'fame_tasks' => [[
+                'type' => $item->crafting_type,
+                'item_name' => $item->name,
+                'item_id' => $item->id,
                 'required_amount' => rand(10, 50),
-                'current_amount'  => 200000,
+                'current_amount' => 200000,
             ]],
         ]);
 
@@ -601,10 +608,11 @@ class UpdateCraftingTasksForFactionLoyaltyTest extends TestCase {
         $this->assertEquals(MaxCurrenciesValue::MAX_SHARDS, $character->shards);
     }
 
-    public function testDoNotAssignTasksForMaxLevelFame() {
+    public function testDoNotAssignTasksForMaxLevelFame()
+    {
         $item = $this->createItem();
 
-        $character = (new CharacterFactory())->createBaseCharacter()
+        $character = (new CharacterFactory)->createBaseCharacter()
             ->givePlayerLocation()
             ->assignFactionSystem()
             ->getCharacter();
@@ -646,31 +654,31 @@ class UpdateCraftingTasksForFactionLoyaltyTest extends TestCase {
 
         $factionLoyalty = $this->createFactionLoyalty([
             'character_id' => $character->id,
-            'faction_id'   => $character->factions->first(),
-            'is_pledged'   => true
+            'faction_id' => $character->factions->first(),
+            'is_pledged' => true,
         ]);
 
         $npc = $this->createNpc();
 
         $factionLoyaltyNpc = $this->createFactionLoyaltyNpc([
-            'faction_loyalty_id'            => $factionLoyalty->id,
-            'npc_id'                        => $npc->id,
-            'current_level'                 => 24,
-            'max_level'                     => 25,
-            'next_level_fame'               => 1,
-            'currently_helping'             => true,
-            'kingdom_item_defence_bonus'    => 0.002,
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'npc_id' => $npc->id,
+            'current_level' => 24,
+            'max_level' => 25,
+            'next_level_fame' => 1,
+            'currently_helping' => true,
+            'kingdom_item_defence_bonus' => 0.002,
         ]);
 
         $this->createFactionLoyaltyNpcTask([
-            'faction_loyalty_id'         => $factionLoyalty->id,
-            'faction_loyalty_npc_id'     => $factionLoyaltyNpc->id,
-            'fame_tasks'                 => [[
-                'type'            => $item->crafting_type,
-                'item_name'       => $item->name,
-                'item_id'         => $item->id,
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'faction_loyalty_npc_id' => $factionLoyaltyNpc->id,
+            'fame_tasks' => [[
+                'type' => $item->crafting_type,
+                'item_name' => $item->name,
+                'item_id' => $item->id,
                 'required_amount' => rand(10, 50),
-                'current_amount'  => 200000,
+                'current_amount' => 200000,
             ]],
         ]);
 
@@ -686,10 +694,11 @@ class UpdateCraftingTasksForFactionLoyaltyTest extends TestCase {
         $this->assertCount(0, $character->factionLoyalties()->first()->factionLoyaltyNpcs->first()->factionLoyaltyNpcTasks->fame_tasks);
     }
 
-    public function testCannotLevelFameAnyMore() {
+    public function testCannotLevelFameAnyMore()
+    {
         $item = $this->createItem();
 
-        $character = (new CharacterFactory())->createBaseCharacter()
+        $character = (new CharacterFactory)->createBaseCharacter()
             ->givePlayerLocation()
             ->assignFactionSystem()
             ->getCharacter();
@@ -730,31 +739,31 @@ class UpdateCraftingTasksForFactionLoyaltyTest extends TestCase {
 
         $factionLoyalty = $this->createFactionLoyalty([
             'character_id' => $character->id,
-            'faction_id'   => $character->factions->first(),
-            'is_pledged'   => true
+            'faction_id' => $character->factions->first(),
+            'is_pledged' => true,
         ]);
 
         $npc = $this->createNpc();
 
         $factionLoyaltyNpc = $this->createFactionLoyaltyNpc([
-            'faction_loyalty_id'            => $factionLoyalty->id,
-            'npc_id'                        => $npc->id,
-            'current_level'                 => 25,
-            'max_level'                     => 25,
-            'next_level_fame'               => 1,
-            'currently_helping'             => true,
-            'kingdom_item_defence_bonus'    => 0.002,
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'npc_id' => $npc->id,
+            'current_level' => 25,
+            'max_level' => 25,
+            'next_level_fame' => 1,
+            'currently_helping' => true,
+            'kingdom_item_defence_bonus' => 0.002,
         ]);
 
         $this->createFactionLoyaltyNpcTask([
-            'faction_loyalty_id'         => $factionLoyalty->id,
-            'faction_loyalty_npc_id'     => $factionLoyaltyNpc->id,
-            'fame_tasks'                 => [[
-                'type'            => $item->crafting_type,
-                'monster_name'    => $item->name,
-                'monster_id'      => $item->id,
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'faction_loyalty_npc_id' => $factionLoyaltyNpc->id,
+            'fame_tasks' => [[
+                'type' => $item->crafting_type,
+                'monster_name' => $item->name,
+                'monster_id' => $item->id,
                 'required_amount' => rand(10, 50),
-                'current_amount'  => 200000,
+                'current_amount' => 200000,
             ]],
         ]);
 

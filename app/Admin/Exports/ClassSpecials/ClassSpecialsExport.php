@@ -6,17 +6,15 @@ use App\Admin\Exports\ClassSpecials\Sheets\ClassSpecialsSheet;
 use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 
-class ClassSpecialsExport implements WithMultipleSheets {
-
+class ClassSpecialsExport implements WithMultipleSheets
+{
     use Exportable;
 
-    /**
-     * @return array
-     */
-    public function sheets(): array {
-        $sheets   = [];
+    public function sheets(): array
+    {
+        $sheets = [];
 
-        $sheets[] = new ClassSpecialsSheet();
+        $sheets[] = new ClassSpecialsSheet;
 
         return $sheets;
     }

@@ -27,7 +27,7 @@ class CharacterClassSpecialtiesEquippedFactory extends Factory
             'level' => 0,
             'current_xp' => 1,
             'required_xp' => 10,
-            'equipped' => false
+            'equipped' => false,
         ];
     }
 }

@@ -8,21 +8,23 @@ use App\Flare\Values\ClassAttackValue;
 use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
 use Illuminate\Support\Str;
 
-class ClassBonusInformation {
-
-    public function buildClassBonusDetailsForInfo(string $className): array {
+class ClassBonusInformation
+{
+    public function buildClassBonusDetailsForInfo(string $className): array
+    {
         $classAttackValue = new CharacterClassValue($className);
 
         $details = [
             'base_chance' => 0.05,
         ];
 
-        $details = array_merge($details,  $this->getClassDetails($classAttackValue, $details));
+        $details = array_merge($details, $this->getClassDetails($classAttackValue, $details));
 
         return $details;
     }
 
-    public function buildClassBonusDetails(Character $character): array {
+    public function buildClassBonusDetails(Character $character): array
+    {
         $classAttackValue = new CharacterClassValue($character->class->name);
 
         $information = resolve(CharacterStatBuilder::class)->setCharacter($character);
@@ -31,14 +33,15 @@ class ClassBonusInformation {
             'base_chance' => 0.05,
         ];
 
-        $details = array_merge($details,  $this->getClassDetails($classAttackValue, $details));
+        $details = array_merge($details, $this->getClassDetails($classAttackValue, $details));
 
         $details['base_chance'] = $details['base_chance'] + $information->classBonus();
 
         return $details;
     }
 
-    protected function getClassDetails(CharacterClassValue $classAttackValue, array $details): array  {
+    protected function getClassDetails(CharacterClassValue $classAttackValue, array $details): array
+    {
         if ($classAttackValue->isFighter()) {
             $details['type'] = Str::ucfirst(ClassAttackValue::FIGHTERS_DOUBLE_DAMAGE);
             $details['requires'] = 'Dual Weapon equipped or Weapon/Shield equipped';

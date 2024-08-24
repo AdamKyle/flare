@@ -28,7 +28,8 @@ class KingdomDepositRequest extends FormRequest
         ];
     }
 
-    public function messages() {
+    public function messages()
+    {
         return [
             'deposit_amount.required' => 'Amount to deposit is required.',
         ];

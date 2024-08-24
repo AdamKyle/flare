@@ -9,54 +9,63 @@ use Rappasoft\LaravelLivewireTables\DataTableComponent;
 use Rappasoft\LaravelLivewireTables\Views\Column;
 use Rappasoft\LaravelLivewireTables\Views\Filters\SelectFilter;
 
-class AffixesTable extends DataTableComponent {
-
-    public function configure(): void {
+class AffixesTable extends DataTableComponent
+{
+    public function configure(): void
+    {
         $this->setPrimaryKey('id');
     }
 
-    public function builder(): Builder {
+    public function builder(): Builder
+    {
         return ItemAffix::where('randomly_generated', false);
     }
 
-    public function filters(): array {
+    public function filters(): array
+    {
         return [
             SelectFilter::make('Types')
                 ->options($this->buildOptions())
-                ->filter(function(Builder $builder, string $value) {
+                ->filter(function (Builder $builder, string $value) {
+                    if ($value === 'Please select') {
+                        return $builder->where('randomly_generated', false);
+                    }
+
                     return (new ItemAffixType(intval($value)))->query($builder);
                 }),
         ];
     }
 
-    protected function buildOptions(): array {
-        return ItemAffixType::$dropDownValues;
+    protected function buildOptions(): array
+    {
+        return array_merge(['Please select' => 'please select'], ItemAffixType::$dropDownValues);
     }
 
-    public function columns(): array {
+    public function columns(): array
+    {
         return [
             Column::make('Name')->searchable()->format(function ($value, $row) {
                 $affixId = ItemAffix::where('name', $value)->first()->id;
 
-                if (!is_null(auth()->user())) {
+                if (! is_null(auth()->user())) {
                     if (auth()->user()->hasRole('Admin')) {
-                        return '<a href="/admin/affixes/'. $affixId.'">'.$row->name . '</a>';
+                        return '<a href="/admin/affixes/'.$affixId.'">'.$row->name.'</a>';
                     }
                 }
 
-                return '<a href="/information/affix/'. $affixId.'" target="_blank">  <i class="fas fa-external-link-alt"></i> '.$row->name . '</a>';
+                return '<a href="/information/affix/'.$affixId.'" target="_blank">  <i class="fas fa-external-link-alt"></i> '.$row->name.'</a>';
             })->html(),
 
             Column::make('Type')->searchable(),
 
             Column::make('Damage Mod', 'base_damage_mod')->sortable()->format(function ($value) {
-                return ($value * 100) . '%';
+                return ($value * 100).'%';
             }),
             Column::make('AC Mod', 'base_ac_mod')->sortable()->format(function ($value) {
-                return ($value * 100) . '%';
+                return ($value * 100).'%';
             }),
             Column::make('Healing Mod', 'base_healing_mod')->sortable()->format(function ($value) {
-                return ($value * 100) . '%';
+                return ($value * 100).'%';
             }),
             Column::make('Int Required', 'int_required')->sortable()->format(function ($value) {
                 return number_format($value);

@@ -2,27 +2,24 @@
 
 namespace App\Admin\Services;
 
-use Carbon\Carbon;
+use App\Admin\Events\RefreshUserScreenEvent;
 use App\Admin\Events\UpdateAdminChatEvent;
 use App\Admin\Jobs\BanEmail;
-use App\Admin\Events\RefreshUserScreenEvent;
 use App\Admin\Jobs\UpdateBannedUserJob;
 use App\Flare\Jobs\UpdateSilencedUserJob;
 use App\Flare\Models\User;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Messages\Events\GlobalMessageEvent;
+use Carbon\Carbon;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 
-class UserService {
-
+class UserService
+{
     /**
      * Ban a user.
-     *
-     * @param User $user
-     * @param array $params
-     * @return bool
      */
-    public function banUser(User $user, array $params): bool {
+    public function banUser(User $user, array $params): bool
+    {
         $unBanAt = null;
 
         if ($params['for'] !== 'perm') {
@@ -36,8 +33,8 @@ class UserService {
         }
 
         $user->update([
-            'is_banned'     => true,
-            'unbanned_at'   => $unBanAt,
+            'is_banned' => true,
+            'unbanned_at' => $unBanAt,
             'banned_reason' => $params['reason'],
         ]);
 
@@ -56,15 +53,12 @@ class UserService {
      * We also schedule a job to unban them at a specific period of time.
      *
      * `$for` can be `one-day` or `one-week`
-     *
-     * @param User $user
-     * @param string $for
-     * @return Carbon|null
      */
-    public function fetchUnBanAt(User $user, string $for): ?Carbon {
+    public function fetchUnBanAt(User $user, string $for): ?Carbon
+    {
         $unBanAt = null;
 
-        switch($for) {
+        switch ($for) {
             case 'one-day':
                 $unBanAt = now()->addDays(1);
                 UpdateBannedUserJob::dispatch($user)->delay($unBanAt);
@@ -80,11 +74,9 @@ class UserService {
 
     /**
      * Silence the user.
-     *
-     * @param User $user
-     * @param int $silenceFor
      */
-    public function silence(User $user, int $silenceFor): void {
+    public function silence(User $user, int $silenceFor): void
+    {
         $canSpeakAgainAt = now()->addMinutes($silenceFor);
 
         $user->update([
@@ -92,9 +84,9 @@ class UserService {
             'can_speak_again_at' => $canSpeakAgainAt,
         ]);
 
-        $user   = $user->refresh();
+        $user = $user->refresh();
 
-        $message = 'The creator has silenced you until: ' . $canSpeakAgainAt->format('Y-m-d H:i:s') . ' ('.(int) $silenceFor.' Minutes server time) Making accounts to get around this is a bannable offense.';
+        $message = 'The creator has silenced you until: '.$canSpeakAgainAt->format('Y-m-d H:i:s').' ('.(int) $silenceFor.' Minutes server time) Making accounts to get around this is a bannable offense.';
 
         ServerMessageHandler::handleMessage($user, 'silenced', $message);
 
@@ -105,9 +97,10 @@ class UserService {
         broadcast(new UpdateAdminChatEvent(auth()->user()));
     }
 
-    public function forceNameChange(User $user): void {
+    public function forceNameChange(User $user): void
+    {
         $user->character->update([
-            'force_name_change' => true
+            'force_name_change' => true,
         ]);
 
         event(new UpdateTopBarEvent($user->character->refresh()));
@@ -117,12 +110,10 @@ class UserService {
 
     /**
      * When a user gets banned perm we broad cast a message for all to see.
-     *
-     * @param User $user
-     * @return void
      */
-    public function broadCastAdminMessage(User $user): void {
-        $message = $user->character->name . ' Sees the sky open and lightening comes hurtling down, striking the earth - cracking the air for miles around! They have been smitten by the hand of The Creator!';
+    public function broadCastAdminMessage(User $user): void
+    {
+        $message = $user->character->name.' Sees the sky open and lightening comes hurtling down, striking the earth - cracking the air for miles around! They have been smitten by the hand of The Creator!';
 
         event(new GlobalMessageEvent($message));
     }
@@ -131,16 +122,13 @@ class UserService {
      * Send the banned mail to the user.
      *
      * This alerts the user they have been banned.
-     *
-     * @param user $user
-     * @param Carbon|null $unBanAt
-     * @return void
      */
-    public function sendUserMail(User $user, ?Carbon $unBanAt = null): void {
+    public function sendUserMail(User $user, ?Carbon $unBanAt = null): void
+    {
         event(new RefreshUserScreenEvent($user));
 
-        $unBannedAt = !is_null($unBanAt) ? $unBanAt->format('l jS \\of F Y h:i:s A') . ' ' . $unBanAt->timezoneName . '.' : 'Forever.';
-        $message    = 'You have been banned until: ' . $unBannedAt . ' For the reason of: ' . $user->banned_reason;
+        $unBannedAt = ! is_null($unBanAt) ? $unBanAt->format('l jS \\of F Y h:i:s A').' '.$unBanAt->timezoneName.'.' : 'Forever.';
+        $message = 'You have been banned until: '.$unBannedAt.' For the reason of: '.$user->banned_reason;
 
         BanEmail::dispatch($user, $message)->delay(now()->addMinutes(1));
     }

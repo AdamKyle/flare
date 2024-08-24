@@ -2,12 +2,18 @@ import { container, InjectionToken } from "tsyringe";
 import mainContainer from "./registrations/main-container";
 import gameEventContainer from "./registrations/game-event-container";
 import { containerRegistry } from "../../configuration/container-registry";
+import gameAjaxContainer from "./registrations/game-ajax-container";
 
 class CoreContainer {
     private static instance: CoreContainer;
 
     public constructor() {
         mainContainer(this);
+
+        // Game Ajax Container.
+        gameAjaxContainer(this);
+
+        // Game Event Container.
         gameEventContainer(this);
 
         // Game Registrations:

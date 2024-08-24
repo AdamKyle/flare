@@ -2,11 +2,11 @@
 
 namespace App\Flare\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
-class MonthlyPvpParticipant extends Model {
-
+class MonthlyPvpParticipant extends Model
+{
     use HasFactory;
 
     /**
@@ -19,11 +19,10 @@ class MonthlyPvpParticipant extends Model {
         'attack_type',
     ];
 
-    public function character() {
+    public function character()
+    {
         return $this->belongsTo(Character::class);
     }
 
-    protected static function newFactory() {
-
-    }
+    protected static function newFactory() {}
 }

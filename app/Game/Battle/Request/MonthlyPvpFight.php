@@ -24,14 +24,15 @@ class MonthlyPvpFight extends FormRequest
     public function rules()
     {
         return [
-            'attack_type' => 'string|required'
+            'attack_type' => 'string|required',
         ];
     }
 
-    public function messages() {
+    public function messages()
+    {
         return [
             'attack_type.required' => 'Error. Invalid Input.',
-            'attack_type.string'   => 'Error. Invalid Input.',
+            'attack_type.string' => 'Error. Invalid Input.',
         ];
     }
 }

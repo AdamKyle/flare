@@ -5,21 +5,18 @@ namespace App\Flare\Calculators;
 use App\Flare\Models\Monster;
 use App\Flare\Models\Skill;
 
-class SkillXPCalculator {
-
+class SkillXPCalculator
+{
     /**
      * Fetches the total skill exp.
      *
      * Applies equipment, quest item, adventure bonuses and percentage of xp towards,
      * to skill exp which starts at a base of 5.
-     *
-     * @param Skill $skill
-     * @param Monster|null $monster
-     * @return float|int
      */
-    public function fetchSkillXP(Skill $skill, Monster $monster = null): float|int {
-        $xpTowards      = $this->getXpTowards($skill, $monster);
-        $totalBonus     = $skill->skill_training_bonus;
+    public function fetchSkillXP(Skill $skill, ?Monster $monster = null): float|int
+    {
+        $xpTowards = $this->getXpTowards($skill, $monster);
+        $totalBonus = $skill->skill_training_bonus;
 
         if ($skill->can_train) {
             $base = 5 + $xpTowards;
@@ -32,21 +29,18 @@ class SkillXPCalculator {
 
     /**
      * Get XP towards.
-     *
-     * @param Skill $skill
-     * @param Monster|null $monster
-     * @return int
      */
-    protected function getXpTowards(Skill $skill, Monster $monster = null): int {
+    protected function getXpTowards(Skill $skill, ?Monster $monster = null): int
+    {
         if (is_null($monster)) {
-             return 0;
+            return 0;
         }
 
         $totalTowards = 0;
 
         $monsterXP = $monster->xp;
 
-        if (!is_null($skill->xp_towards)) {
+        if (! is_null($skill->xp_towards)) {
             $totalTowards = (int) number_format($monsterXP - ($monsterXP * $skill->xp_towards));
 
             if ($totalTowards === 0) {

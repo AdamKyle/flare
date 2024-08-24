@@ -2,61 +2,54 @@
 
 namespace Tests\Unit\Flare\Services;
 
-use App\Flare\Events\ServerMessageEvent;
-use App\Flare\Models\GameMap;
-use App\Flare\Models\Kingdom;
 use App\Flare\Models\MaxLevelConfiguration;
 use App\Flare\Services\CharacterXPService;
 use App\Flare\Values\ItemEffectsValue;
-use App\Flare\Values\NpcTypes;
-use App\Game\Kingdoms\Service\KingdomUpdateService;
-use App\Game\Kingdoms\Values\KingdomMaxValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Event;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
-use Tests\Traits\CreateGameBuilding;
-use Tests\Traits\CreateGameMap;
 use Tests\Traits\CreateItem;
-use Tests\Traits\CreateKingdom;
-use Tests\Traits\CreateNpc;
 
-class CharacterXPServiceTest extends TestCase {
-
-    use RefreshDatabase, CreateItem;
+class CharacterXPServiceTest extends TestCase
+{
+    use CreateItem, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
     private ?CharacterXPService $characterXPService;
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
-        $this->character          = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
-        $this->characterXPService = new CharacterXPService();
+        $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
+        $this->characterXPService = new CharacterXPService;
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
 
-        $this->character          = null;
+        $this->character = null;
         $this->characterXPService = null;
     }
 
-    public function testGetXpValue() {
+    public function testGetXpValue()
+    {
         $xp = $this->characterXPService->determineXPToAward($this->character->getCharacter(), 10);
 
         $this->assertEquals(10, $xp);
     }
 
-    public function testGetNoXpValue() {
+    public function testGetNoXpValue()
+    {
         $xp = $this->characterXPService->determineXPToAward($this->character->getCharacter(), 0);
 
         $this->assertEquals(0, $xp);
     }
 
-    public function testGetHalfWayXpValue() {
+    public function testGetHalfWayXpValue()
+    {
 
         $character = $this->character->getCharacter();
 
@@ -67,7 +60,8 @@ class CharacterXPServiceTest extends TestCase {
         $this->assertEquals(ceil(10 * 0.75), $xp);
     }
 
-    public function testGetThreeQuartersWayXpValue() {
+    public function testGetThreeQuartersWayXpValue()
+    {
 
         $character = $this->character->getCharacter();
 
@@ -78,7 +72,8 @@ class CharacterXPServiceTest extends TestCase {
         $this->assertEquals(ceil(10 * 0.50), $xp);
     }
 
-    public function testGetLastLegXP() {
+    public function testGetLastLegXP()
+    {
 
         $character = $this->character->getCharacter();
 
@@ -89,12 +84,13 @@ class CharacterXPServiceTest extends TestCase {
         $this->assertEquals(ceil(10 * 0.25), $xp);
     }
 
-    public function testGetLastLegXPWithItemThatIgnoresCaps() {
+    public function testGetLastLegXPWithItemThatIgnoresCaps()
+    {
 
         $item = $this->createItem([
-            'type'         => 'quest',
-            'xp_bonus'     => 0.50,
-            'ignores_caps' => true
+            'type' => 'quest',
+            'xp_bonus' => 0.50,
+            'ignores_caps' => true,
         ]);
 
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
@@ -106,12 +102,13 @@ class CharacterXPServiceTest extends TestCase {
         $this->assertEquals(ceil(10 + 10 * 0.50), $xp);
     }
 
-    public function testGetLastLegXPWithItemThatDoesNotIgnoresCaps() {
+    public function testGetLastLegXPWithItemThatDoesNotIgnoresCaps()
+    {
 
         $item = $this->createItem([
-            'type'         => 'quest',
-            'xp_bonus'     => 0.50,
-            'ignores_caps' => false
+            'type' => 'quest',
+            'xp_bonus' => 0.50,
+            'ignores_caps' => false,
         ]);
 
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
@@ -123,18 +120,19 @@ class CharacterXPServiceTest extends TestCase {
         $this->assertGreaterThan(0, $xp);
     }
 
-    public function testGetLastLegXPWithItemsThatDoesAndDoesNotIgnoresCaps() {
+    public function testGetLastLegXPWithItemsThatDoesAndDoesNotIgnoresCaps()
+    {
 
         $itemDoesNotIgnoreCaps = $this->createItem([
-            'type'         => 'quest',
-            'xp_bonus'     => 0.50,
-            'ignores_caps' => false
+            'type' => 'quest',
+            'xp_bonus' => 0.50,
+            'ignores_caps' => false,
         ]);
 
         $itemDoesIgnoreCaps = $this->createItem([
-            'type'         => 'quest',
-            'xp_bonus'     => 0.50,
-            'ignores_caps' => true
+            'type' => 'quest',
+            'xp_bonus' => 0.50,
+            'ignores_caps' => true,
         ]);
 
         $character = $this->character->inventoryManagement()->giveItem($itemDoesNotIgnoreCaps);
@@ -147,7 +145,8 @@ class CharacterXPServiceTest extends TestCase {
         $this->assertGreaterThan(0, $xp);
     }
 
-    public function testGetZeroXPWhenCannotLevelAnyFurther() {
+    public function testGetZeroXPWhenCannotLevelAnyFurther()
+    {
 
         $character = $this->character->getCharacter();
 
@@ -158,17 +157,18 @@ class CharacterXPServiceTest extends TestCase {
         $this->assertEquals(0, $xp);
     }
 
-    public function testCanContinueLeveling() {
+    public function testCanContinueLeveling()
+    {
         $item = $this->createItem([
             'effect' => ItemEffectsValue::CONTINUE_LEVELING,
-            'type'   => 'quest',
+            'type' => 'quest',
         ]);
 
         MaxLevelConfiguration::create([
-            'max_level'      => 3000,
-            'half_way'       => 1500,
+            'max_level' => 3000,
+            'half_way' => 1500,
             'three_quarters' => 2250,
-            'last_leg'       => 2900,
+            'last_leg' => 2900,
         ]);
 
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
@@ -180,23 +180,24 @@ class CharacterXPServiceTest extends TestCase {
         $this->assertEquals(10, $xp);
     }
 
-    public function testCanContinueLevelingWithItemThatIgnoresCaps() {
+    public function testCanContinueLevelingWithItemThatIgnoresCaps()
+    {
         $item = $this->createItem([
             'effect' => ItemEffectsValue::CONTINUE_LEVELING,
-            'type'   => 'quest',
+            'type' => 'quest',
         ]);
 
         $itemIgnoresCaps = $this->createItem([
-            'type'         => 'quest',
-            'xp_bonus'     => 0.50,
-            'ignores_caps' => true
+            'type' => 'quest',
+            'xp_bonus' => 0.50,
+            'ignores_caps' => true,
         ]);
 
         MaxLevelConfiguration::create([
-            'max_level'      => 3000,
-            'half_way'       => 1500,
+            'max_level' => 3000,
+            'half_way' => 1500,
             'three_quarters' => 2250,
-            'last_leg'       => 2900,
+            'last_leg' => 2900,
         ]);
 
         $character = $this->character->inventoryManagement()->giveItem($item);
@@ -209,23 +210,24 @@ class CharacterXPServiceTest extends TestCase {
         $this->assertGreaterThan(0, $xp);
     }
 
-    public function testCanContinueLevelingWithItemThatDoesIgnoresCaps() {
+    public function testCanContinueLevelingWithItemThatDoesIgnoresCaps()
+    {
         $item = $this->createItem([
             'effect' => ItemEffectsValue::CONTINUE_LEVELING,
-            'type'   => 'quest',
+            'type' => 'quest',
         ]);
 
         $itemDoesNotIgnoresCaps = $this->createItem([
-            'type'         => 'quest',
-            'xp_bonus'     => 0.50,
-            'ignores_caps' => false
+            'type' => 'quest',
+            'xp_bonus' => 0.50,
+            'ignores_caps' => false,
         ]);
 
         MaxLevelConfiguration::create([
-            'max_level'      => 3000,
-            'half_way'       => 1500,
+            'max_level' => 3000,
+            'half_way' => 1500,
             'three_quarters' => 2250,
-            'last_leg'       => 2900,
+            'last_leg' => 2900,
         ]);
 
         $character = $this->character->inventoryManagement()->giveItem($item);
@@ -238,29 +240,30 @@ class CharacterXPServiceTest extends TestCase {
         $this->assertGreaterThan(0, $xp);
     }
 
-    public function testCanContinueLevelingWithItemThatDoesAndDoesNotIgnoresCaps() {
+    public function testCanContinueLevelingWithItemThatDoesAndDoesNotIgnoresCaps()
+    {
         $item = $this->createItem([
             'effect' => ItemEffectsValue::CONTINUE_LEVELING,
-            'type'   => 'quest',
+            'type' => 'quest',
         ]);
 
         $itemDoesNotIgnoresCaps = $this->createItem([
-            'type'         => 'quest',
-            'xp_bonus'     => 0.50,
-            'ignores_caps' => false
+            'type' => 'quest',
+            'xp_bonus' => 0.50,
+            'ignores_caps' => false,
         ]);
 
         $itemIgnoresCaps = $this->createItem([
-            'type'         => 'quest',
-            'xp_bonus'     => 0.50,
-            'ignores_caps' => true
+            'type' => 'quest',
+            'xp_bonus' => 0.50,
+            'ignores_caps' => true,
         ]);
 
         MaxLevelConfiguration::create([
-            'max_level'      => 3000,
-            'half_way'       => 1500,
+            'max_level' => 3000,
+            'half_way' => 1500,
             'three_quarters' => 2250,
-            'last_leg'       => 2900,
+            'last_leg' => 2900,
         ]);
 
         $character = $this->character->inventoryManagement()->giveItem($item);
@@ -274,17 +277,18 @@ class CharacterXPServiceTest extends TestCase {
         $this->assertGreaterThan(0, $xp);
     }
 
-    public function testCanContinueLevelingHalfWayMark() {
+    public function testCanContinueLevelingHalfWayMark()
+    {
         $item = $this->createItem([
             'effect' => ItemEffectsValue::CONTINUE_LEVELING,
-            'type'   => 'quest',
+            'type' => 'quest',
         ]);
 
         MaxLevelConfiguration::create([
-            'max_level'      => 3000,
-            'half_way'       => 1500,
+            'max_level' => 3000,
+            'half_way' => 1500,
             'three_quarters' => 2250,
-            'last_leg'       => 2900,
+            'last_leg' => 2900,
         ]);
 
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
@@ -296,17 +300,18 @@ class CharacterXPServiceTest extends TestCase {
         $this->assertEquals(ceil(10 * 0.75), $xp);
     }
 
-    public function testCanContinueLevelingThreeQuartersMark() {
+    public function testCanContinueLevelingThreeQuartersMark()
+    {
         $item = $this->createItem([
             'effect' => ItemEffectsValue::CONTINUE_LEVELING,
-            'type'   => 'quest',
+            'type' => 'quest',
         ]);
 
         MaxLevelConfiguration::create([
-            'max_level'      => 3000,
-            'half_way'       => 1500,
+            'max_level' => 3000,
+            'half_way' => 1500,
             'three_quarters' => 2250,
-            'last_leg'       => 2900,
+            'last_leg' => 2900,
         ]);
 
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
@@ -318,17 +323,18 @@ class CharacterXPServiceTest extends TestCase {
         $this->assertEquals(ceil(10 * 0.50), $xp);
     }
 
-    public function testCanContinueLevelingLastLegMark() {
+    public function testCanContinueLevelingLastLegMark()
+    {
         $item = $this->createItem([
             'effect' => ItemEffectsValue::CONTINUE_LEVELING,
-            'type'   => 'quest',
+            'type' => 'quest',
         ]);
 
         MaxLevelConfiguration::create([
-            'max_level'      => 3000,
-            'half_way'       => 1500,
+            'max_level' => 3000,
+            'half_way' => 1500,
             'three_quarters' => 2250,
-            'last_leg'       => 2900,
+            'last_leg' => 2900,
         ]);
 
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
@@ -340,10 +346,11 @@ class CharacterXPServiceTest extends TestCase {
         $this->assertEquals(ceil(10 * 0.25), $xp);
     }
 
-    public function testContinueLevelingWithNoConfig() {
+    public function testContinueLevelingWithNoConfig()
+    {
         $item = $this->createItem([
             'effect' => ItemEffectsValue::CONTINUE_LEVELING,
-            'type'   => 'quest',
+            'type' => 'quest',
         ]);
 
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
@@ -355,23 +362,25 @@ class CharacterXPServiceTest extends TestCase {
         $this->assertEquals(0, $xp);
     }
 
-    public function testCharacterCanGainXP() {
+    public function testCharacterCanGainXP()
+    {
         $character = $this->character->getCharacter();
 
         $this->assertTrue($this->characterXPService->canCharacterGainXP($character));
     }
 
-    public function testCharacterWhoCanContinueLevelingGainsXP() {
+    public function testCharacterWhoCanContinueLevelingGainsXP()
+    {
         $item = $this->createItem([
             'effect' => ItemEffectsValue::CONTINUE_LEVELING,
-            'type'   => 'quest',
+            'type' => 'quest',
         ]);
 
         MaxLevelConfiguration::create([
-            'max_level'      => 3000,
-            'half_way'       => 1500,
+            'max_level' => 3000,
+            'half_way' => 1500,
             'three_quarters' => 2250,
-            'last_leg'       => 2900,
+            'last_leg' => 2900,
         ]);
 
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
@@ -383,7 +392,8 @@ class CharacterXPServiceTest extends TestCase {
         $this->assertTrue($this->characterXPService->canCharacterGainXP($character));
     }
 
-    public function testCharacterCannotGainXp() {
+    public function testCharacterCannotGainXp()
+    {
         $character = $this->character->getCharacter();
 
         $character->update(['level' => 1000]);
@@ -393,10 +403,11 @@ class CharacterXPServiceTest extends TestCase {
         $this->assertFalse($this->characterXPService->canCharacterGainXP($character));
     }
 
-    public function testCharacterWhoCanContinueLevelingCannotGainXPWhenNoConfig() {
+    public function testCharacterWhoCanContinueLevelingCannotGainXPWhenNoConfig()
+    {
         $item = $this->createItem([
             'effect' => ItemEffectsValue::CONTINUE_LEVELING,
-            'type'   => 'quest',
+            'type' => 'quest',
         ]);
 
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
@@ -408,17 +419,18 @@ class CharacterXPServiceTest extends TestCase {
         $this->assertFalse($this->characterXPService->canCharacterGainXP($character));
     }
 
-    public function testCharacterWhoCanContinueLevelingCannotGainXP() {
+    public function testCharacterWhoCanContinueLevelingCannotGainXP()
+    {
         $item = $this->createItem([
             'effect' => ItemEffectsValue::CONTINUE_LEVELING,
-            'type'   => 'quest',
+            'type' => 'quest',
         ]);
 
         MaxLevelConfiguration::create([
-            'max_level'      => 3000,
-            'half_way'       => 1500,
+            'max_level' => 3000,
+            'half_way' => 1500,
             'three_quarters' => 2250,
-            'last_leg'       => 2900,
+            'last_leg' => 2900,
         ]);
 
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();

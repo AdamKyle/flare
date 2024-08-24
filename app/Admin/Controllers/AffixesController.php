@@ -2,97 +2,107 @@
 
 namespace App\Admin\Controllers;
 
-use App\Admin\Import\Affixes\AffixesImport;
-use App\Admin\Requests\AffixManagementRequest;
-use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
-use Maatwebsite\Excel\Facades\Excel;
 use App\Admin\Exports\Affixes\AffixesExport;
+use App\Admin\Import\Affixes\AffixesImport;
+use App\Admin\Requests\AffixesImport as AffixesImportRequest;
+use App\Admin\Requests\AffixManagementRequest;
 use App\Admin\Services\ItemAffixService;
 use App\Flare\Models\ItemAffix;
-use App\Admin\Requests\AffixesImport as AffixesImportRequest;
 use App\Flare\Values\ItemAffixType;
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
-class AffixesController extends Controller {
-
+class AffixesController extends Controller
+{
     private $itemAffixService;
 
-    public function __construct(ItemAffixService $itemAffixService) {
+    public function __construct(ItemAffixService $itemAffixService)
+    {
         $this->itemAffixService = $itemAffixService;
     }
 
-    public function index() {
+    public function index()
+    {
         return view('admin.affixes.affixes');
     }
 
-    public function create() {
+    public function create()
+    {
 
         return view('admin.affixes.manage', array_merge([
-            'itemAffix'   => null,
-            'affixTypes'  => ItemAffixType::$dropDownValues,
+            'itemAffix' => null,
+            'affixTypes' => ItemAffixType::$dropDownValues,
         ], $this->itemAffixService->getFormData()));
     }
 
-    public function show(ItemAffix $affix) {
+    public function show(ItemAffix $affix)
+    {
 
         return view('admin.affixes.affix', [
             'itemAffix' => $affix,
         ]);
     }
 
-    public function edit(ItemAffix $affix) {
+    public function edit(ItemAffix $affix)
+    {
         return view('admin.affixes.manage', array_merge([
-            'itemAffix'   => $affix,
-            'affixTypes'  => ItemAffixType::$dropDownValues,
+            'itemAffix' => $affix,
+            'affixTypes' => ItemAffixType::$dropDownValues,
         ], $this->itemAffixService->getFormData()));
     }
 
-    public function store(AffixManagementRequest $request) {
+    public function store(AffixManagementRequest $request)
+    {
         $data = $this->itemAffixService->cleanRequestData($request->all());
 
         $affix = ItemAffix::updateOrCreate(['id' => $data['id']], $data);
 
-        $message = 'Created: ' . $affix['name'];
+        $message = 'Created: '.$affix['name'];
 
         if ($affix['id'] !== 0) {
-            $message = 'Updated: ' . $affix['name'];
+            $message = 'Updated: '.$affix['name'];
         }
 
         return response()->redirectToRoute('affixes.affix', ['affix' => $affix->id])->with('success', $message);
     }
 
-    public function delete(Request $request, ItemAffixService $itemAffixService, ItemAffix $affix) {
+    public function delete(Request $request, ItemAffixService $itemAffixService, ItemAffix $affix)
+    {
         $name = $affix->name;
 
         $itemAffixService->deleteAffix($affix);
 
-        return redirect()->back()->with('success', $name . ' was deleted successfully.');
+        return redirect()->back()->with('success', $name.' was deleted successfully.');
     }
 
-    public function exportItems() {
+    public function exportItems()
+    {
         return view('admin.affixes.export', [
             'types' => ItemAffixType::$dropDownValues,
         ]);
     }
 
-    public function importItems() {
+    public function importItems()
+    {
         return view('admin.affixes.import');
     }
 
     /**
      * @codeCoverageIgnore
      */
-    public function export(Request $request) {
+    public function export(Request $request)
+    {
 
-        if (!$request->has('export_type')) {
+        if (! $request->has('export_type')) {
             return redirect()->back()->with('error', 'No export type selected.');
         }
 
-        $type     = $request->export_type;
+        $type = $request->export_type;
 
-        $fileName = ucFirst(ItemAffixType::$dropDownValues[$type]);
+        $fileName = ucfirst(ItemAffixType::$dropDownValues[$type]);
 
-        $response = Excel::download(new AffixesExport($type), $fileName . ' (Affixes).xlsx', \Maatwebsite\Excel\Excel::XLSX);
+        $response = Excel::download(new AffixesExport($type), $fileName.' (Affixes).xlsx', \Maatwebsite\Excel\Excel::XLSX);
         ob_end_clean();
 
         return $response;
@@ -101,7 +111,8 @@ class AffixesController extends Controller {
     /**
      * @codeCoverageIgnore
      */
-    public function importData(AffixesImportRequest $request) {
+    public function importData(AffixesImportRequest $request)
+    {
         Excel::import(new AffixesImport, $request->affixes_import);
 
         return redirect()->back()->with('success', 'imported affix data.');

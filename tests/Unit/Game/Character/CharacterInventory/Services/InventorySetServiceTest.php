@@ -12,23 +12,25 @@ use Tests\TestCase;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateItemAffix;
 
-class InventorySetServiceTest extends TestCase {
-
-    use RefreshDatabase, CreateItem, CreateItemAffix;
+class InventorySetServiceTest extends TestCase
+{
+    use CreateItem, CreateItemAffix, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
     private ?InventorySetService $inventorySetService;
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
-        $this->character = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
+        $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
 
         $this->inventorySetService = resolve(InventorySetService::class);
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
 
         $this->character = null;
@@ -36,13 +38,14 @@ class InventorySetServiceTest extends TestCase {
         $this->inventorySetService = null;
     }
 
-    public function testCanAssignItemToSet() {
+    public function testCanAssignItemToSet()
+    {
         $character = $this->character->inventoryManagement()
-                                     ->giveItem($this->createItem())
-                                     ->getCharacterFactory()
-                                     ->inventorySetManagement()
-                                     ->createInventorySets(10)
-                                     ->getCharacter();
+            ->giveItem($this->createItem())
+            ->getCharacterFactory()
+            ->inventorySetManagement()
+            ->createInventorySets(10)
+            ->getCharacter();
 
         $slot = $character->inventory->slots->first();
 
@@ -54,7 +57,8 @@ class InventorySetServiceTest extends TestCase {
         $this->assertNotEmpty($character->inventorySets->first->slots);
     }
 
-    public function testPutItemIntoSet() {
+    public function testPutItemIntoSet()
+    {
         $character = $this->character
             ->inventorySetManagement()
             ->createInventorySets(10)
@@ -69,7 +73,8 @@ class InventorySetServiceTest extends TestCase {
         $this->assertNotEmpty($character->inventorySets->first->slots);
     }
 
-    public function testCannotRemoveItemFromSetBecauseInventoryIsMaxedOut() {
+    public function testCannotRemoveItemFromSetBecauseInventoryIsMaxedOut()
+    {
         $itemToRemove = $this->createItem();
         $character = $this->character
             ->inventoryManagement()
@@ -85,7 +90,8 @@ class InventorySetServiceTest extends TestCase {
         $this->assertEquals('Not enough inventory space to put this item back into your inventory.', $result['message']);
     }
 
-    public function testCannotRemoveItemFromSetBecauseInventorySetIsNotYours() {
+    public function testCannotRemoveItemFromSetBecauseInventorySetIsNotYours()
+    {
         $itemToRemove = $this->createItem();
         $character = $this->character
             ->inventoryManagement()
@@ -101,7 +107,8 @@ class InventorySetServiceTest extends TestCase {
         $this->assertEquals('Not allowed to do that.', $result['message']);
     }
 
-    public function testCannotRemoveItemFromSetBecauseInventorySetIsEquipped() {
+    public function testCannotRemoveItemFromSetBecauseInventorySetIsEquipped()
+    {
         $itemToRemove = $this->createItem();
         $character = $this->character
             ->inventoryManagement()
@@ -113,7 +120,7 @@ class InventorySetServiceTest extends TestCase {
             ->getCharacter();
 
         $character->inventorySets()->first()->update([
-            'is_equipped' => true
+            'is_equipped' => true,
         ]);
 
         $character = $character->refresh();
@@ -123,7 +130,8 @@ class InventorySetServiceTest extends TestCase {
         $this->assertEquals('You cannot move an equipped item into your inventory from this set. Unequip the set first.', $result['message']);
     }
 
-    public function testCannotRemoveItemFromSetBecauseItemDoesNotExistInInventorySet() {
+    public function testCannotRemoveItemFromSetBecauseItemDoesNotExistInInventorySet()
+    {
         $itemToRemove = $this->createItem();
         $character = $this->character
             ->inventoryManagement()
@@ -141,7 +149,8 @@ class InventorySetServiceTest extends TestCase {
         $this->assertEquals('Item does not exist in this set.', $result['message']);
     }
 
-    public function testCanRemoveItemFromSetBecauseInventoryIsNotMaxedOut() {
+    public function testCanRemoveItemFromSetBecauseInventoryIsNotMaxedOut()
+    {
         $itemToRemove = $this->createItem();
         $character = $this->character
             ->inventoryManagement()
@@ -157,10 +166,11 @@ class InventorySetServiceTest extends TestCase {
 
         $setName = $character->inventorySets->first()->name;
 
-        $this->assertEquals('Removed ' . $itemToRemove->affix_name . ' from ' . $setName . ' and placed back into your inventory.', $result['message']);
+        $this->assertEquals('Removed '.$itemToRemove->affix_name.' from '.$setName.' and placed back into your inventory.', $result['message']);
     }
 
-    public function testCanRemoveItemFromSetBecauseInventoryIsNotMaxedOutAndSetIsNotNamed() {
+    public function testCanRemoveItemFromSetBecauseInventoryIsNotMaxedOutAndSetIsNotNamed()
+    {
         $itemToRemove = $this->createItem();
         $character = $this->character
             ->inventoryManagement()
@@ -176,10 +186,11 @@ class InventorySetServiceTest extends TestCase {
 
         $setName = 'Set 1';
 
-        $this->assertEquals('Removed ' . $itemToRemove->affix_name . ' from ' . $setName . ' and placed back into your inventory.', $result['message']);
+        $this->assertEquals('Removed '.$itemToRemove->affix_name.' from '.$setName.' and placed back into your inventory.', $result['message']);
     }
 
-    public function testEquipFullSet() {
+    public function testEquipFullSet()
+    {
         $itemTypes = [
             WeaponTypes::WEAPON,
             ArmourTypes::BODY,
@@ -194,7 +205,7 @@ class InventorySetServiceTest extends TestCase {
             WeaponTypes::RING,
             WeaponTypes::RING,
             'trinket',
-            'trinket'
+            'trinket',
         ];
 
         $character = $this->character
@@ -222,7 +233,8 @@ class InventorySetServiceTest extends TestCase {
         $this->assertTrue($character->inventorySets->first()->is_equipped);
     }
 
-    public function testEquipFullSetWithTwoHandedWeapon() {
+    public function testEquipFullSetWithTwoHandedWeapon()
+    {
         $itemTypes = [
             WeaponTypes::STAVE,
             ArmourTypes::BODY,
@@ -236,7 +248,7 @@ class InventorySetServiceTest extends TestCase {
             WeaponTypes::RING,
             WeaponTypes::RING,
             'trinket',
-            'trinket'
+            'trinket',
         ];
 
         $character = $this->character
@@ -258,7 +270,8 @@ class InventorySetServiceTest extends TestCase {
         $this->assertTrue($character->inventorySets->first()->is_equipped);
     }
 
-    public function testEquipAnotherSetWhileOneIsEquipped() {
+    public function testEquipAnotherSetWhileOneIsEquipped()
+    {
         $itemTypes = [
             WeaponTypes::STAVE,
             ArmourTypes::BODY,
@@ -272,7 +285,7 @@ class InventorySetServiceTest extends TestCase {
             WeaponTypes::RING,
             WeaponTypes::RING,
             'trinket',
-            'trinket'
+            'trinket',
         ];
 
         $character = $this->character
@@ -299,7 +312,8 @@ class InventorySetServiceTest extends TestCase {
         $this->assertTrue($character->inventorySets[1]->is_equipped);
     }
 
-    public function testUnequipSet() {
+    public function testUnequipSet()
+    {
         $itemTypes = [
             WeaponTypes::STAVE,
             ArmourTypes::BODY,
@@ -313,7 +327,7 @@ class InventorySetServiceTest extends TestCase {
             WeaponTypes::RING,
             WeaponTypes::RING,
             'trinket',
-            'trinket'
+            'trinket',
         ];
 
         $character = $this->character
@@ -341,7 +355,8 @@ class InventorySetServiceTest extends TestCase {
         $this->assertFalse($character->inventorySets->first()->is_equipped);
     }
 
-    public function testSetIsNotEquippableForWeapons() {
+    public function testSetIsNotEquippableForWeapons()
+    {
         $itemTypes = [
             WeaponTypes::WEAPON,
             WeaponTypes::WEAPON,
@@ -363,7 +378,8 @@ class InventorySetServiceTest extends TestCase {
         $this->assertFalse($this->inventorySetService->isSetEquippable($character->inventorySets->first()));
     }
 
-    public function testSetIsNotEquippableForArmour() {
+    public function testSetIsNotEquippableForArmour()
+    {
         $itemTypes = [
             ArmourTypes::BODY,
             ArmourTypes::BODY,
@@ -384,7 +400,8 @@ class InventorySetServiceTest extends TestCase {
         $this->assertFalse($this->inventorySetService->isSetEquippable($character->inventorySets->first()));
     }
 
-    public function testSetIsNotEquippableForTrinkets() {
+    public function testSetIsNotEquippableForTrinkets()
+    {
         $itemTypes = [
             'trinket',
             'trinket',
@@ -406,7 +423,8 @@ class InventorySetServiceTest extends TestCase {
         $this->assertFalse($this->inventorySetService->isSetEquippable($character->inventorySets->first()));
     }
 
-    public function testSetIsNotEquippableForRings() {
+    public function testSetIsNotEquippableForRings()
+    {
         $itemTypes = [
             WeaponTypes::RING,
             WeaponTypes::RING,
@@ -428,11 +446,12 @@ class InventorySetServiceTest extends TestCase {
         $this->assertFalse($this->inventorySetService->isSetEquippable($character->inventorySets->first()));
     }
 
-    public function testSetIsNotEquippableForSpells() {
+    public function testSetIsNotEquippableForSpells()
+    {
         $itemTypes = [
             SpellTypes::DAMAGE,
             SpellTypes::DAMAGE,
-            SpellTypes::HEALING
+            SpellTypes::HEALING,
         ];
 
         $character = $this->character
@@ -450,11 +469,12 @@ class InventorySetServiceTest extends TestCase {
         $this->assertFalse($this->inventorySetService->isSetEquippable($character->inventorySets->first()));
     }
 
-    public function testSetIsNotEquippableForSpellsHealing() {
+    public function testSetIsNotEquippableForSpellsHealing()
+    {
         $itemTypes = [
             SpellTypes::HEALING,
             SpellTypes::HEALING,
-            SpellTypes::HEALING
+            SpellTypes::HEALING,
         ];
 
         $character = $this->character
@@ -472,7 +492,8 @@ class InventorySetServiceTest extends TestCase {
         $this->assertFalse($this->inventorySetService->isSetEquippable($character->inventorySets->first()));
     }
 
-    public function testSetIsNotEquippableForSpellsHealingAndDamage() {
+    public function testSetIsNotEquippableForSpellsHealingAndDamage()
+    {
         $itemTypes = [
             SpellTypes::HEALING,
             SpellTypes::HEALING,
@@ -494,11 +515,12 @@ class InventorySetServiceTest extends TestCase {
         $this->assertFalse($this->inventorySetService->isSetEquippable($character->inventorySets->first()));
     }
 
-    public function testSetIsNotEquippableForSpellsDamage() {
+    public function testSetIsNotEquippableForSpellsDamage()
+    {
         $itemTypes = [
             SpellTypes::DAMAGE,
             SpellTypes::DAMAGE,
-            SpellTypes::DAMAGE
+            SpellTypes::DAMAGE,
         ];
 
         $character = $this->character
@@ -516,7 +538,8 @@ class InventorySetServiceTest extends TestCase {
         $this->assertFalse($this->inventorySetService->isSetEquippable($character->inventorySets->first()));
     }
 
-    public function testSetIsNotEquippableForArtifact() {
+    public function testSetIsNotEquippableForArtifact()
+    {
         $itemTypes = [
             'artifact',
             'artifact',
@@ -537,7 +560,8 @@ class InventorySetServiceTest extends TestCase {
         $this->assertFalse($this->inventorySetService->isSetEquippable($character->inventorySets->first()));
     }
 
-    public function testSetIsNotEquippableForUniquesItemPrefix() {
+    public function testSetIsNotEquippableForUniquesItemPrefix()
+    {
         $itemTypes = [
             WeaponTypes::WEAPON,
             WeaponTypes::RING,
@@ -560,7 +584,8 @@ class InventorySetServiceTest extends TestCase {
         $this->assertFalse($this->inventorySetService->isSetEquippable($character->inventorySets->first()));
     }
 
-    public function testSetIsNotEquippableForUniquesItemSuffix() {
+    public function testSetIsNotEquippableForUniquesItemSuffix()
+    {
         $itemTypes = [
             WeaponTypes::WEAPON,
             WeaponTypes::RING,
@@ -583,7 +608,8 @@ class InventorySetServiceTest extends TestCase {
         $this->assertFalse($this->inventorySetService->isSetEquippable($character->inventorySets->first()));
     }
 
-    public function testSetIsNotEquippableForMythics() {
+    public function testSetIsNotEquippableForMythics()
+    {
         $itemTypes = [
             WeaponTypes::WEAPON,
             WeaponTypes::RING,
@@ -606,7 +632,8 @@ class InventorySetServiceTest extends TestCase {
         $this->assertFalse($this->inventorySetService->isSetEquippable($character->inventorySets->first()));
     }
 
-    public function testSetIsNotEquippableForCosmics() {
+    public function testSetIsNotEquippableForCosmics()
+    {
         $itemTypes = [
             WeaponTypes::WEAPON,
             WeaponTypes::RING,
@@ -629,7 +656,8 @@ class InventorySetServiceTest extends TestCase {
         $this->assertFalse($this->inventorySetService->isSetEquippable($character->inventorySets->first()));
     }
 
-    public function testSetIsNotEquippableForUniquesAndMythics() {
+    public function testSetIsNotEquippableForUniquesAndMythics()
+    {
         $mythics = [
             WeaponTypes::WEAPON,
         ];
@@ -661,7 +689,8 @@ class InventorySetServiceTest extends TestCase {
         $this->assertFalse($this->inventorySetService->isSetEquippable($character->inventorySets->first()));
     }
 
-    public function testSetIsNotEquippableForCosmicAndMythics() {
+    public function testSetIsNotEquippableForCosmicAndMythics()
+    {
         $cosmics = [
             WeaponTypes::WEAPON,
         ];
@@ -693,7 +722,8 @@ class InventorySetServiceTest extends TestCase {
         $this->assertFalse($this->inventorySetService->isSetEquippable($character->inventorySets->first()));
     }
 
-    public function testIsEquippableForCosmic() {
+    public function testIsEquippableForCosmic()
+    {
         $cosmic = [
             WeaponTypes::WEAPON,
         ];
@@ -715,7 +745,8 @@ class InventorySetServiceTest extends TestCase {
         $this->assertTrue($this->inventorySetService->isSetEquippable($character->inventorySets->first()));
     }
 
-    public function testFailToMoveItemToSet() {
+    public function testFailToMoveItemToSet()
+    {
         $character = $this->character->getCharacter();
 
         $result = $this->inventorySetService->moveItemToSet($character, 999, 9999);
@@ -724,17 +755,19 @@ class InventorySetServiceTest extends TestCase {
         $this->assertEquals('Either the slot or the inventory set does not exist.', $result['message']);
     }
 
-    public function testMoveToSetThatDoesNotHaveAName() {
+    public function testMoveToSetThatDoesNotHaveAName()
+    {
         $item = $this->createItem();
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacterFactory()->inventorySetManagement()->createInventorySets()->getCharacter();
 
         $result = $this->inventorySetService->moveItemToSet($character, $character->inventory->slots->first()->id, $character->inventorySets->first()->id);
 
         $this->assertEquals(200, $result['status']);
-        $this->assertEquals($item->affix_name . ' Has been moved to: Set ' . 1, $result['message']);
+        $this->assertEquals($item->affix_name.' Has been moved to: Set '. 1, $result['message']);
     }
 
-    public function testMoveToSetThatDoesHaveAName() {
+    public function testMoveToSetThatDoesHaveAName()
+    {
         $item = $this->createItem();
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacterFactory()->inventorySetManagement()->createInventorySets(2, true)->getCharacter();
 
@@ -745,10 +778,11 @@ class InventorySetServiceTest extends TestCase {
         $setName = $character->inventorySets->first()->name;
 
         $this->assertEquals(200, $result['status']);
-        $this->assertEquals($item->affix_name . ' Has been moved to: ' . $setName, $result['message']);
+        $this->assertEquals($item->affix_name.' Has been moved to: '.$setName, $result['message']);
     }
 
-    public function testCannotRenameSetThatDoesNotExist() {
+    public function testCannotRenameSetThatDoesNotExist()
+    {
         $character = $this->character->inventorySetManagement()->createInventorySets(2)->getCharacter();
 
         $result = $this->inventorySetService->renameInventorySet($character, 9999, 'jdfhjdfh');
@@ -757,7 +791,8 @@ class InventorySetServiceTest extends TestCase {
         $this->assertEquals('Set does not exist.', $result['message']);
     }
 
-    public function testCannotRenameASetWhenAnotherSetHasTheSameName() {
+    public function testCannotRenameASetWhenAnotherSetHasTheSameName()
+    {
         $character = $this->character->inventorySetManagement()->createInventorySets()->getCharacter();
 
         $set = $character->inventorySets()->first();
@@ -773,7 +808,8 @@ class InventorySetServiceTest extends TestCase {
         $this->assertEquals('You already have a set with this name. Pick something else.', $result['message']);
     }
 
-    public function testRenameTheSet() {
+    public function testRenameTheSet()
+    {
         $character = $this->character->inventorySetManagement()->createInventorySets()->getCharacter();
 
         $set = $character->inventorySets()->first();
@@ -789,7 +825,8 @@ class InventorySetServiceTest extends TestCase {
         $this->assertEquals('Renamed set to: Apples', $result['message']);
     }
 
-    public function testCannotSaveEquippedToANonEmptySet() {
+    public function testCannotSaveEquippedToANonEmptySet()
+    {
         $character = $this->character->equipStartingEquipment()->inventorySetManagement()->createInventorySets(1, true)->putItemInSet($this->createItem(), 0)->getCharacter();
 
         $set = $character->inventorySets->first();
@@ -800,7 +837,8 @@ class InventorySetServiceTest extends TestCase {
         $this->assertEquals('Set must be empty.', $result['message']);
     }
 
-    public function testCanSaveEquippedToAEmptySet() {
+    public function testCanSaveEquippedToAEmptySet()
+    {
         $character = $this->character->equipStartingEquipment()->inventorySetManagement()->createInventorySets(1, true)->getCharacter();
 
         $set = $character->inventorySets->first();
@@ -808,10 +846,11 @@ class InventorySetServiceTest extends TestCase {
         $result = $this->inventorySetService->saveEquippedItemsToSet($character, $set->id);
 
         $this->assertEquals(200, $result['status']);
-        $this->assertEquals($set->refresh()->name . ' is now equipped (equipment has been moved to the set).', $result['message']);
+        $this->assertEquals($set->refresh()->name.' is now equipped (equipment has been moved to the set).', $result['message']);
     }
 
-    public function testCannotEmptySetWhenInventoryIsMaxed() {
+    public function testCannotEmptySetWhenInventoryIsMaxed()
+    {
         $character = $this->character
             ->equipStartingEquipment()
             ->inventorySetManagement()
@@ -822,7 +861,7 @@ class InventorySetServiceTest extends TestCase {
         $set = $character->inventorySets->first();
 
         $character->update([
-            'inventory_max' => 0
+            'inventory_max' => 0,
         ]);
 
         $character = $character->refresh();
@@ -833,7 +872,8 @@ class InventorySetServiceTest extends TestCase {
         $this->assertEquals('Your inventory is full. Cannot remove items from set.', $result['message']);
     }
 
-    public function testCannotEmptyInventorySetYouDoNotOwn() {
+    public function testCannotEmptyInventorySetYouDoNotOwn()
+    {
         $character = $this->character
             ->equipStartingEquipment()
             ->inventorySetManagement()
@@ -841,7 +881,7 @@ class InventorySetServiceTest extends TestCase {
             ->putItemInSet($this->createItem(), 0)
             ->getCharacter();
 
-        $secondaryCharacter = (new CharacterFactory())
+        $secondaryCharacter = (new CharacterFactory)
             ->createBaseCharacter()
             ->givePlayerLocation()
             ->equipStartingEquipment()
@@ -858,7 +898,8 @@ class InventorySetServiceTest extends TestCase {
         $this->assertEquals('Cannot do that.', $result['message']);
     }
 
-    public function testCanMoveSomeItemsFromTheSetToInventory() {
+    public function testCanMoveSomeItemsFromTheSetToInventory()
+    {
         $character = $this->character
             ->inventorySetManagement()
             ->createInventorySets(1, true)
@@ -869,7 +910,7 @@ class InventorySetServiceTest extends TestCase {
         $set = $character->inventorySets->first();
 
         $character->update([
-            'inventory_max' => 1
+            'inventory_max' => 1,
         ]);
 
         $character = $character->refresh();
@@ -877,10 +918,11 @@ class InventorySetServiceTest extends TestCase {
         $result = $this->inventorySetService->emptySet($character, $set);
 
         $this->assertEquals(200, $result['status']);
-        $this->assertEquals('Removed ' . 1 . ' of ' . 2 . ' items from ' . $set->name . '. If all items were not moved over, it is because your inventory became full.', $result['message']);
+        $this->assertEquals('Removed '. 1 .' of '. 2 .' items from '.$set->name.'. If all items were not moved over, it is because your inventory became full.', $result['message']);
     }
 
-    public function testCanMoveAllItemsFromSetToInventory() {
+    public function testCanMoveAllItemsFromSetToInventory()
+    {
         $character = $this->character
             ->inventorySetManagement()
             ->createInventorySets(1, true)
@@ -895,10 +937,11 @@ class InventorySetServiceTest extends TestCase {
         $result = $this->inventorySetService->emptySet($character, $set);
 
         $this->assertEquals(200, $result['status']);
-        $this->assertEquals('Removed ' . 2 . ' of ' . 2 . ' items from ' . $set->name . '. If all items were not moved over, it is because your inventory became full.', $result['message']);
+        $this->assertEquals('Removed '. 2 .' of '. 2 .' items from '.$set->name.'. If all items were not moved over, it is because your inventory became full.', $result['message']);
     }
 
-    public function testDoesUnequipSet() {
+    public function testDoesUnequipSet()
+    {
         $character = $this->character
             ->inventorySetManagement()
             ->createInventorySets(1, true)
@@ -913,7 +956,7 @@ class InventorySetServiceTest extends TestCase {
         $result = $this->inventorySetService->unequipSet($character, $set);
 
         $this->assertEquals(200, $result['status']);
-        $this->assertEquals('Unequipped ' . $set->name .'.', $result['message']);
+        $this->assertEquals('Unequipped '.$set->name.'.', $result['message']);
 
         $character = $character->refresh();
 
@@ -922,7 +965,8 @@ class InventorySetServiceTest extends TestCase {
         );
     }
 
-    public function testCannotEquipSetWhenSetIsNotAllowedToBeEquipped() {
+    public function testCannotEquipSetWhenSetIsNotAllowedToBeEquipped()
+    {
         $character = $this->character
             ->inventorySetManagement()
             ->createInventorySets(1, true)
@@ -946,7 +990,8 @@ class InventorySetServiceTest extends TestCase {
         $this->assertEquals('Set cannot be equipped. It violates the set rules.', $result['message']);
     }
 
-    public function testCannotEquipSetWhenYouDoNotOwnTheSet() {
+    public function testCannotEquipSetWhenYouDoNotOwnTheSet()
+    {
         $character = $this->character
             ->inventorySetManagement()
             ->createInventorySets(1, true)
@@ -954,14 +999,13 @@ class InventorySetServiceTest extends TestCase {
             ->putItemInSet($this->createItem(), 0)
             ->getCharacter();
 
-        $secondCharacter = (new CharacterFactory())
+        $secondCharacter = (new CharacterFactory)
             ->createBaseCharacter()
             ->inventorySetManagement()
             ->createInventorySets(1, true)
             ->putItemInSet($this->createItem(), 0)
             ->putItemInSet($this->createItem(), 0)
             ->getCharacter();
-
 
         $set = $secondCharacter->inventorySets->first();
 
@@ -973,7 +1017,8 @@ class InventorySetServiceTest extends TestCase {
         $this->assertEquals('Cannot do that.', $result['message']);
     }
 
-    public function testCanEquipSet() {
+    public function testCanEquipSet()
+    {
         $character = $this->character
             ->inventorySetManagement()
             ->createInventorySets(1, true)
@@ -988,7 +1033,7 @@ class InventorySetServiceTest extends TestCase {
         $result = $this->inventorySetService->equipSet($character, $set);
 
         $this->assertEquals(200, $result['status']);
-        $this->assertEquals($set->name .  ' is now equipped', $result['message']);
+        $this->assertEquals($set->name.' is now equipped', $result['message']);
 
         $character = $character->refresh();
 
@@ -996,5 +1041,4 @@ class InventorySetServiceTest extends TestCase {
             $character->inventorySets()->where('is_equipped', true)->first()
         );
     }
-
 }

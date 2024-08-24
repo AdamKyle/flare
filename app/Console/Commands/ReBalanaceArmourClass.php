@@ -24,8 +24,9 @@ class ReBalanaceArmourClass extends Command
     /**
      * Execute the console command.
      */
-    public function handle() {
-        $type  = $this->argument('type');
+    public function handle()
+    {
+        $type = $this->argument('type');
 
         $validTypes = [
             'sleeves',
@@ -37,25 +38,25 @@ class ReBalanaceArmourClass extends Command
             'body',
         ];
 
-        if (!in_array($type, $validTypes)) {
-            return $this->error('invalid type for armour. Accepted types are: ' . implode(', ', $validTypes));
+        if (! in_array($type, $validTypes)) {
+            return $this->error('invalid type for armour. Accepted types are: '.implode(', ', $validTypes));
         }
 
-        $this->line('Updating for type: ' . $type . ' ...');
+        $this->line('Updating for type: '.$type.' ...');
 
         $items = Item::where('type', $type)
-                     ->whereNull('item_prefix_id')
-                     ->whereNull('item_suffix_id')
-                     ->where('is_mythic', false)
-                     ->where('is_cosmic', false)
-                     ->get();
+            ->whereNull('item_prefix_id')
+            ->whereNull('item_suffix_id')
+            ->where('is_mythic', false)
+            ->where('is_cosmic', false)
+            ->get();
 
-        $curve                    = $this->generateArmourClassCurve(intVal($this->argument('start')), intVal($this->argument('end')), floatVal($this->argument('growth')), $items->count());
-        $curve[0]                 = intVal($this->argument('start'));
-        $curve[count($curve) - 1] = intVal($this->argument('end'));
+        $curve = $this->generateArmourClassCurve(intval($this->argument('start')), intval($this->argument('end')), floatval($this->argument('growth')), $items->count());
+        $curve[0] = intval($this->argument('start'));
+        $curve[count($curve) - 1] = intval($this->argument('end'));
 
         $tableHeaders = ['Item Name', 'New AC'];
-        $tableData    = [];
+        $tableData = [];
 
         foreach ($items as $index => $item) {
             $item->update(['base_ac' => $curve[$index]]);
@@ -68,14 +69,16 @@ class ReBalanaceArmourClass extends Command
         $this->table($tableHeaders, $tableData);
     }
 
-    protected function generateArmourClassCurve(int $start, int $end, float $curveStrength, int $numberOfItems): array {
-        $curve       = $this->buildGeneralCurve($numberOfItems, $curveStrength, $end);
+    protected function generateArmourClassCurve(int $start, int $end, float $curveStrength, int $numberOfItems): array
+    {
+        $curve = $this->buildGeneralCurve($numberOfItems, $curveStrength, $end);
         $scaledCurve = $this->scaleTheCurve($curve, $end, $start);
 
         return $this->resolveRepeatingNumbers($scaledCurve);
     }
 
-    protected function buildGeneralCurve(int $numberOfItems, float $curveStrength, int $maxValue): array {
+    protected function buildGeneralCurve(int $numberOfItems, float $curveStrength, int $maxValue): array
+    {
         $curve = [];
 
         for ($i = 0; $i < $numberOfItems; $i++) {
@@ -85,13 +88,14 @@ class ReBalanaceArmourClass extends Command
 
             $adjustedValue = $value * $value * $value;
 
-            $curve[] = intVal($adjustedValue);
+            $curve[] = intval($adjustedValue);
         }
 
         return $curve;
     }
 
-    protected function scaleTheCurve(array $curve, int $end, int $start): array {
+    protected function scaleTheCurve(array $curve, int $end, int $start): array
+    {
         $minValue = min($curve);
         $maxValue = max($curve);
 
@@ -99,14 +103,15 @@ class ReBalanaceArmourClass extends Command
 
         foreach ($curve as $value) {
             $normalizedValue = ($value - $minValue) / ($maxValue - $minValue);
-            $scaledValue     = $normalizedValue * ($end - $start) + $start;
-            $scaledCurve[]   = intval($scaledValue);
+            $scaledValue = $normalizedValue * ($end - $start) + $start;
+            $scaledCurve[] = intval($scaledValue);
         }
 
         return $scaledCurve;
     }
 
-    protected function resolveRepeatingNumbers(array $curve): array {
+    protected function resolveRepeatingNumbers(array $curve): array
+    {
         $resolvedCurve = [];
 
         $previousValue = null;

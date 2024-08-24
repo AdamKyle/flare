@@ -2,16 +2,15 @@
 
 namespace App\Game\Quests\Events;
 
-use App\Flare\Models\User;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
-use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class UpdateRaidQuests implements ShouldBroadcastNow {
+class UpdateRaidQuests implements ShouldBroadcastNow
+{
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public array $raidQuests;
@@ -19,7 +18,8 @@ class UpdateRaidQuests implements ShouldBroadcastNow {
     /**
      * Constructor
      */
-    public function __construct(array $raidQuests) {
+    public function __construct(array $raidQuests)
+    {
         $this->raidQuests = $raidQuests;
     }
 
@@ -28,7 +28,8 @@ class UpdateRaidQuests implements ShouldBroadcastNow {
      *
      * @return Channel|array
      */
-    public function broadcastOn() {
+    public function broadcastOn()
+    {
         return new PresenceChannel('update-raid-quests');
     }
 }

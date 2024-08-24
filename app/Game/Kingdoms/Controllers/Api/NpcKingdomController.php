@@ -2,50 +2,38 @@
 
 namespace App\Game\Kingdoms\Controllers\Api;
 
-use App\Game\Kingdoms\Events\UpdateGlobalMap;
-use App\Game\Kingdoms\Requests\NPCKingdomPurchaseRequest;
-use Illuminate\Http\JsonResponse;
-use App\Http\Controllers\Controller;
 use App\Flare\Models\Character;
-use App\Game\Kingdoms\Service\KingdomSettleService;
 use App\Game\Core\Events\UpdateTopBarEvent;
-use App\Game\Kingdoms\Requests\KingdomsSettleRequest;
-use Illuminate\Http\Request;
+use App\Game\Kingdoms\Requests\NPCKingdomPurchaseRequest;
+use App\Game\Kingdoms\Service\KingdomSettleService;
+use App\Http\Controllers\Controller;
+use Illuminate\Http\JsonResponse;
 
-class NpcKingdomController extends Controller {
-
-    /**
-     * @var KingdomSettleService $kingdomSettleService
-     */
+class NpcKingdomController extends Controller
+{
     private KingdomSettleService $kingdomSettleService;
 
-    /**
-     * @param KingdomSettleService $kingdomSettleService
-     */
-    public function __construct(KingdomSettleService $kingdomSettleService) {
-        $this->kingdomSettleService    = $kingdomSettleService;
+    public function __construct(KingdomSettleService $kingdomSettleService)
+    {
+        $this->kingdomSettleService = $kingdomSettleService;
     }
 
-    /**
-     * @param NPCKingdomPurchaseRequest $request
-     * @param Character $character
-     * @return JsonResponse
-     */
-    public function purchase(NPCKingdomPurchaseRequest $request, Character $character): JsonResponse {
+    public function purchase(NPCKingdomPurchaseRequest $request, Character $character): JsonResponse
+    {
 
-        if (!$this->kingdomSettleService->canAfford($character)) {
+        if (! $this->kingdomSettleService->canAfford($character)) {
             return response()->json([
                 'message' => 'You don\'t have the gold to purchase this.',
             ], 422);
         }
 
-        if (!is_null($character->can_settle_again_at)) {
+        if (! is_null($character->can_settle_again_at)) {
             $timeDifference = now()->diffInMinutes($character->can_settle_again_at);
 
             return response()->json([
                 'message' => 'You are not allowed to settle or purchase another kingdom at this time.
                 You have selfishly abandoned your people in other kingdoms.
-                You can settle again in: ' . $timeDifference . ' minutes',
+                You can settle again in: '.$timeDifference.' minutes',
             ], 422);
         }
 
@@ -53,7 +41,7 @@ class NpcKingdomController extends Controller {
 
         if (is_null($kingdom)) {
             return response()->json([
-                'message' => 'Cannot purchase this.'
+                'message' => 'Cannot purchase this.',
             ]);
         }
 

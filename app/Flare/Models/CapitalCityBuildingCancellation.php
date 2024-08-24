@@ -24,19 +24,23 @@ class CapitalCityBuildingCancellation extends Model
         'travel_time_completed_at' => 'datetime',
     ];
 
-    public function building(): HasOne {
+    public function building(): HasOne
+    {
         return $this->hasOne(KingdomBuilding::class, 'id', 'building_id');
     }
 
-    public function kingdom(): HasOne {
+    public function kingdom(): HasOne
+    {
         return $this->hasOne(Kingdom::class, 'id', 'kingdom_id');
     }
 
-    public function character(): HasOne {
+    public function character(): HasOne
+    {
         return $this->hasOne(Character::class, 'id', 'character_id');
     }
 
-    public function capitalCityBuildingQueue(): HasOne {
+    public function capitalCityBuildingQueue(): HasOne
+    {
         return $this->hasOne(CapitalCityBuildingQueue::class, 'id', 'capital_city_building_queue_id');
     }
 }

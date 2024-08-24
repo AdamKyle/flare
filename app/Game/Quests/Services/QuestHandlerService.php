@@ -20,40 +20,20 @@ use App\Game\Quests\Traits\QuestDetails;
 use Exception;
 use Illuminate\Support\Facades\Cache;
 
-class QuestHandlerService {
-
+class QuestHandlerService
+{
     use QuestDetails, ResponseBuilder;
 
-    /**
-     * @var string $bailMessage
-     */
     private string $bailMessage = '';
 
-    /**
-     * @var NpcQuestsHandler $npcQuestsHandler
-     */
     private NpcQuestsHandler $npcQuestsHandler;
 
-    /**
-     * @var CanTravelToMap $canTravelToMap
-     */
     private CanTravelToMap $canTravelToMap;
 
-    /**
-     * @var MapTileValue
-     */
     private MapTileValue $mapTileValue;
 
-    /**
-     * @var BuildQuestCacheService
-     */
     private BuildQuestCacheService $buildQuestCacheService;
 
-    /**
-     * @param NpcQuestsHandler $npcQuestsHandler
-     * @param CanTravelToMap $canTravelToMap
-     * @param MapTileValue $mapTileValue
-     */
     public function __construct(
         NpcQuestsHandler $npcQuestsHandler,
         CanTravelToMap $canTravelToMap,
@@ -61,32 +41,28 @@ class QuestHandlerService {
         BuildQuestCacheService $buildQuestCacheService
     ) {
 
-        $this->npcQuestsHandler       = $npcQuestsHandler;
-        $this->canTravelToMap         = $canTravelToMap;
-        $this->mapTileValue           = $mapTileValue;
+        $this->npcQuestsHandler = $npcQuestsHandler;
+        $this->canTravelToMap = $canTravelToMap;
+        $this->mapTileValue = $mapTileValue;
         $this->buildQuestCacheService = $buildQuestCacheService;
     }
 
     /**
      * Fetch the npc quest handler instance.
-     *
-     * @return NpcQuestsHandler
      */
-    public function npcQuestsHandler(): NpcQuestsHandler {
+    public function npcQuestsHandler(): NpcQuestsHandler
+    {
         return $this->npcQuestsHandler;
     }
 
     /**
      * Should we bail on the quest?
-     *
-     * @param Character $character
-     * @param Quest $quest
-     * @return bool
      */
-    public function shouldBailOnQuest(Character $character, Quest $quest): bool {
+    public function shouldBailOnQuest(Character $character, Quest $quest): bool
+    {
         $completedQuests = $character->questsCompleted->pluck('quest_id')->toArray();
 
-        if (!is_null($quest->only_for_event)) {
+        if (! is_null($quest->only_for_event)) {
             $event = Event::where('type', $quest->only_for_event)->first();
 
             if (is_null($event)) {
@@ -96,7 +72,7 @@ class QuestHandlerService {
             }
         }
 
-        if (!$this->validateParentQuest($quest, $completedQuests)) {
+        if (! $this->validateParentQuest($quest, $completedQuests)) {
             $this->bailMessage = 'You must finish the parent quest first ...';
 
             return true;
@@ -123,7 +99,7 @@ class QuestHandlerService {
         }
 
         if ($this->questHasCurrenciesRequirement($quest)) {
-            if (!$this->canPay($character, $quest)) {
+            if (! $this->canPay($character, $quest)) {
                 $this->bailMessage = 'You don\'t have the currencies required. Check the Required To Complete tab.';
 
                 return true;
@@ -131,7 +107,7 @@ class QuestHandlerService {
         }
 
         if ($this->questRequiresPlaneAccess($quest)) {
-            if (!$this->hasPlaneAccess($quest, $character)) {
+            if (! $this->hasPlaneAccess($quest, $character)) {
                 $this->bailMessage = 'You do not have proper plane access to finish this quest. Check the Required To Complete tab.';
 
                 return true;
@@ -139,7 +115,7 @@ class QuestHandlerService {
         }
 
         if ($this->questHasFactionRequirement($quest)) {
-            if (!$this->hasMetFactionRequirement($character, $quest)) {
+            if (! $this->hasMetFactionRequirement($character, $quest)) {
                 $this->bailMessage = 'You are missing the required Faction Level needed to complete this quest. Check the Required To Complete tab.';
 
                 return true;
@@ -147,14 +123,14 @@ class QuestHandlerService {
         }
 
         if ($this->questHasFactionLoyaltyRequirement($quest)) {
-            if (!$this->hasMetFactionLoyaltyRequirements($quest, $character)) {
+            if (! $this->hasMetFactionLoyaltyRequirements($quest, $character)) {
                 $this->bailMessage = 'There is an NPC on this map who requires you to assist them with their tasks to increase their Faction Loyalty. Click the Required To Complete tab.';
 
                 return true;
             }
         }
 
-        if (!$this->hasCompletedRequiredQuest($character, $quest)) {
+        if (! $this->hasCompletedRequiredQuest($character, $quest)) {
             $this->bailMessage = 'You need to complete another quest before handing this one in. Check the Required To Complete tab.';
 
             return true;
@@ -163,14 +139,10 @@ class QuestHandlerService {
         return false;
     }
 
-    /**
-     * @param Character $character
-     * @param Npc $npc
-     * @return array|Character
-     */
-    public function moveCharacter(Character $character, Npc $npc): array|Character {
+    public function moveCharacter(Character $character, Npc $npc): array|Character
+    {
         if ($npc->game_map_id !== $character->map->game_map_id) {
-            if (!$this->canTravelToMap->canTravel($npc->game_map_id, $character)) {
+            if (! $this->canTravelToMap->canTravel($npc->game_map_id, $character)) {
                 return $this->errorResult('You are missing the required quest item to travel to this NPC. Check NPC Access Requirements Section above.');
             }
         }
@@ -181,11 +153,11 @@ class QuestHandlerService {
 
         $character = $character->refresh();
 
-        if (!$this->mapTileValue->canWalk($character, $npc->x_position, $npc->y_position)) {
+        if (! $this->mapTileValue->canWalk($character, $npc->x_position, $npc->y_position)) {
             $character->map->update(['game_map_id' => $oldMapDetails->game_map_id]);
 
-            return $this->errorResult("You can traverse to the NPC, but not move to their location as you are
-            missing a required item. Click the map name under the NPC name above, to see what items you need to travel to this NPC.");
+            return $this->errorResult('You can traverse to the NPC, but not move to their location as you are
+            missing a required item. Click the map name under the NPC name above, to see what items you need to travel to this NPC.');
         }
 
         $character->map()->update([
@@ -197,8 +169,8 @@ class QuestHandlerService {
 
         CharacterAttackTypesCacheBuilder::dispatch($character);
 
-        if ($oldMapDetails->gameMap ->id !== $character->map->gameMap->id) {
-            event(new ServerMessageEvent($character->user, 'You were moved (at no gold cost or time out) from: ' . $oldMapDetails->gameMap->name . ' to: ' . $character->map->gameMap->name . ' in order to hand in the quest.'));
+        if ($oldMapDetails->gameMap->id !== $character->map->gameMap->id) {
+            event(new ServerMessageEvent($character->user, 'You were moved (at no gold cost or time out) from: '.$oldMapDetails->gameMap->name.' to: '.$character->map->gameMap->name.' in order to hand in the quest.'));
         }
 
         $this->updateMapDetails($character);
@@ -206,7 +178,8 @@ class QuestHandlerService {
         return $character;
     }
 
-    protected function updateMapDetails(Character $character): void {
+    protected function updateMapDetails(Character $character): void
+    {
         event(new UpdateMap($character->user));
 
         $monsters = Cache::get('monsters')[$character->map->gameMap->name];
@@ -215,23 +188,24 @@ class QuestHandlerService {
         event(new UpdateRaidMonsters([], $character->user));
     }
 
-    public function handInQuest(Character $character, Quest $quest) {
+    public function handInQuest(Character $character, Quest $quest)
+    {
 
         try {
             $this->npcQuestsHandler()->handleNpcQuest($character, $quest);
 
-            event(new GlobalMessageEvent($character->name . ' Has completed a quest (' . $quest->name . ') for: ' . $quest->npc->real_name . ' and been rewarded with a godly gift!'));
+            event(new GlobalMessageEvent($character->name.' Has completed a quest ('.$quest->name.') for: '.$quest->npc->real_name.' and been rewarded with a godly gift!'));
 
             $character = $character->refresh();
 
-            $quests     = $this->buildQuestCacheService->getRegularQuests();
+            $quests = $this->buildQuestCacheService->getRegularQuests();
             $raidQuests = $this->buildQuestCacheService->fetchQuestsForRaid();
 
             return $this->successResult([
                 'completed_quests' => $character->questsCompleted()->pluck('quest_id'),
-                'player_plane'     => $character->map->gameMap->name,
-                'quests'           => $quests,
-                'raid_quests'      => $raidQuests,
+                'player_plane' => $character->map->gameMap->name,
+                'quests' => $quests,
+                'raid_quests' => $raidQuests,
             ]);
         } catch (Exception $e) {
             return $this->errorResult($e->getMessage());
@@ -240,10 +214,9 @@ class QuestHandlerService {
 
     /**
      * get the bail reason.
-     *
-     * @return string
      */
-    public function getBailMessage(): string {
+    public function getBailMessage(): string
+    {
         return $this->bailMessage;
     }
 }

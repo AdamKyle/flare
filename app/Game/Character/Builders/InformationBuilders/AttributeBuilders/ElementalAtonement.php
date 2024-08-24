@@ -6,19 +6,14 @@ use App\Flare\Models\Item;
 use App\Flare\Traits\ElementAttackData;
 use App\Game\Gems\Services\GemComparison;
 
-class ElementalAtonement extends BaseAttribute {
-
+class ElementalAtonement extends BaseAttribute
+{
     use ElementAttackData;
 
-    /**
-     * @var GemComparison
-     */
     private GemComparison $gemComparison;
 
-    /**
-     * @param GemComparison $gemComparison
-     */
-    public function __construct(GemComparison $gemComparison) {
+    public function __construct(GemComparison $gemComparison)
+    {
         $this->gemComparison = $gemComparison;
     }
 
@@ -27,7 +22,8 @@ class ElementalAtonement extends BaseAttribute {
      *
      * @return array|null An array of average atonement data or null if the inventory is empty.
      */
-    public function calculateAtonement(): ?array {
+    public function calculateAtonement(): ?array
+    {
         $atonements = $this->calculateAtonements();
 
         if (is_null($atonements)) {
@@ -48,7 +44,8 @@ class ElementalAtonement extends BaseAttribute {
      *
      * @return array|null An array of atonement data or null if the inventory is empty.
      */
-    private function calculateAtonements(): ?array {
+    private function calculateAtonements(): ?array
+    {
         if (is_null($this->inventory)) {
             return null;
         }
@@ -58,7 +55,7 @@ class ElementalAtonement extends BaseAttribute {
         foreach ($this->inventory as $slot) {
             $itemAtonements = $this->buildPossibleAtonementDataWithDefaultValuesForItem($slot->item);
 
-            if (!empty($itemAtonements)) {
+            if (! empty($itemAtonements)) {
                 foreach ($itemAtonements as $key => $value) {
                     $value = floatval($value);
 
@@ -79,10 +76,11 @@ class ElementalAtonement extends BaseAttribute {
      *
      * - Caps at 75%.
      *
-     * @param array $atonements The atonement data.
+     * @param  array  $atonements  The atonement data.
      * @return array The array of average values.
      */
-    private function calculateAverages(array $atonements): array {
+    private function calculateAverages(array $atonements): array
+    {
         $averages = [];
 
         foreach ($atonements as $key => $values) {
@@ -97,11 +95,11 @@ class ElementalAtonement extends BaseAttribute {
     /**
      * Calculates the highest element based on the given atonement data.
      *
-     * @param array $atonements The atonement data.
-     *
+     * @param  array  $atonements  The atonement data.
      * @return array The highest element information.
      */
-    private function calculateHighestElement(array $atonements): array {
+    private function calculateHighestElement(array $atonements): array
+    {
         $highestElementDamage = $this->getHighestElementDamage($atonements);
         $highestElementName = ($highestElementDamage <= 0) ? 'N/A' : $this->getHighestElementName($atonements, $highestElementDamage);
 
@@ -113,11 +111,9 @@ class ElementalAtonement extends BaseAttribute {
 
     /**
      * Build possible Data with default values for an item
-     *
-     * @param Item $item
-     * @return array
      */
-    protected function buildPossibleAtonementDataWithDefaultValuesForItem(Item $item): array {
+    protected function buildPossibleAtonementDataWithDefaultValuesForItem(Item $item): array
+    {
         return $this->gemComparison->getElementAtonement($item)['atonements'];
     }
 }

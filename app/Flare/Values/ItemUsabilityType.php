@@ -2,18 +2,22 @@
 
 namespace App\Flare\Values;
 
-class ItemUsabilityType {
-
+class ItemUsabilityType
+{
     /**
-     * @var string $value
+     * @var string
      */
     private $value;
 
-    const STAT_INCREASE  = 0;
-    const EFFECTS_SKILL  = 1;
+    const STAT_INCREASE = 0;
+
+    const EFFECTS_SKILL = 1;
+
     const KINGDOM_DAMAGE = 2;
-    const OTHER          = 3;
-    const USE_ON_ITEMS   = 4;
+
+    const OTHER = 3;
+
+    const USE_ON_ITEMS = 4;
 
     protected static $values = [
         0 => self::STAT_INCREASE,
@@ -24,14 +28,14 @@ class ItemUsabilityType {
     ];
 
     /**
-     * @var string[] $values
+     * @var string[]
      */
     protected static $namedValues = [
-        self::STAT_INCREASE  => 'Stat increase',
-        self::EFFECTS_SKILL  => 'Effects skill',
+        self::STAT_INCREASE => 'Stat increase',
+        self::EFFECTS_SKILL => 'Effects skill',
         self::KINGDOM_DAMAGE => 'Deals damage to a kingdom',
-        self::OTHER          => 'Effects multiple stats',
-        self::USE_ON_ITEMS   => 'Use on items.'
+        self::OTHER => 'Effects multiple stats',
+        self::USE_ON_ITEMS => 'Use on items.',
     ];
 
     /**
@@ -39,14 +43,13 @@ class ItemUsabilityType {
      *
      * Throws if the value does not exist in the array of const values.
      *
-     * @param int $value
      * @throws \Exception
      */
     public function __construct(int $value)
     {
 
-        if (!in_array($value, self::$values)) {
-            throw new \Exception($value . ' does not exist.');
+        if (! in_array($value, self::$values)) {
+            throw new \Exception($value.' does not exist.');
         }
 
         $this->value = $value;
@@ -54,55 +57,49 @@ class ItemUsabilityType {
 
     /**
      * Does the use of this item increase stats?
-     *
-     * @return bool
      */
-    public function isStatIncrease(): bool {
+    public function isStatIncrease(): bool
+    {
         return $this->value === self::STAT_INCREASE;
     }
 
     /**
      * Does the use of this item effect skills?
-     *
-     * @return bool
      */
-    public function effectsSkill(): bool {
+    public function effectsSkill(): bool
+    {
         return $this->value === self::EFFECTS_SKILL;
     }
 
     /**
      * Does the use of this item damage kingdoms?
-     *
-     * @return bool
      */
-    public function damagesKingdom(): bool {
+    public function damagesKingdom(): bool
+    {
         return $this->value === self::KINGDOM_DAMAGE;
     }
 
     /**
      * is Other?
-     *
-     * @return bool
      */
-    public function isOther(): bool {
+    public function isOther(): bool
+    {
         return $this->value === self::OTHER;
     }
 
     /**
      * Can we use this item on other items?
-     *
-     * @return bool
      */
-    public function canUseOnItems(): bool {
+    public function canUseOnItems(): bool
+    {
         return $this->value === self::USE_ON_ITEMS;
     }
 
     /**
      * Get the named value.
-     *
-     * @return string
      */
-    public function getNamedValue(): string {
+    public function getNamedValue(): string
+    {
         return self::$namedValues[$this->value];
     }
 }

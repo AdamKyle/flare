@@ -2,57 +2,34 @@
 
 namespace App\Game\Kingdoms\Service;
 
-use App\Flare\Values\MaxCurrenciesValue;
-use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;
-use App\Flare\Models\Skill;
-use App\Game\Core\Traits\ResponseBuilder;
-use App\Game\Kingdoms\Events\UpdateKingdom;
 use App\Flare\Models\GameUnit;
 use App\Flare\Models\Kingdom;
+use App\Flare\Models\Skill;
 use App\Flare\Models\UnitInQueue;
-use App\Flare\Transformers\KingdomTransformer;
+use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Kingdoms\Events\UpdateKingdomQueues;
 use App\Game\Kingdoms\Handlers\UpdateKingdomHandler;
 use App\Game\Kingdoms\Jobs\RecruitUnits;
-use App\Game\Kingdoms\Jobs\RequestResources;
-use App\Game\Kingdoms\Values\KingdomMaxValue;
-use App\Game\Kingdoms\Values\UnitCosts;
 use App\Game\Skills\Values\SkillTypeValue;
 use Carbon\Carbon;
-use Exception;
 use Facades\App\Game\Kingdoms\Validation\ResourceValidation;
-use League\Fractal\Manager;
-use League\Fractal\Resource\Item;
 
-class UnitService {
-
+class UnitService
+{
     use ResponseBuilder;
 
-    /**
-     * @var float $totalResources
-     */
     private float $totalResources;
 
-    /**
-     * @var UpdateKingdomHandler $updateKingdomHandler
-     */
     private UpdateKingdomHandler $updateKingdomHandler;
 
-    /**
-     * @param UpdateKingdomHandler $updateKingdomHandler
-     */
-    public function __construct(UpdateKingdomHandler $updateKingdomHandler) {
+    public function __construct(UpdateKingdomHandler $updateKingdomHandler)
+    {
         $this->updateKingdomHandler = $updateKingdomHandler;
     }
 
-    /**
-     * @param GameUnit $gameUnit
-     * @param Kingdom $kingdom
-     * @param int $amount
-     * @return array
-     */
-    public function handlePayment(GameUnit $gameUnit, Kingdom $kingdom, int $amount): array {
+    public function handlePayment(GameUnit $gameUnit, Kingdom $kingdom, int $amount): array
+    {
         if (ResourceValidation::shouldRedirectUnits($gameUnit, $kingdom, $amount)) {
             return $this->errorResult("You don't have the resources.");
         }
@@ -66,25 +43,21 @@ class UnitService {
      * Recruit a specific unit for a kingdom
      *
      * Will dispatch a job delayed for an amount of time.
-     *
-     * @param Kingdom $kingdom
-     * @param GameUnit $gameUnit
-     * @param int $amount
-     * @param int|null $capitalCityQueueId
      */
-    public function recruitUnits(Kingdom $kingdom, GameUnit $gameUnit, int $amount, int $capitalCityQueueId = null): void {
-        $character        = $kingdom->character;
-        $totalTime        = $gameUnit->time_to_recruit * $amount;
-        $totalTime        = $totalTime - $totalTime * $this->fetchTimeReduction($character)->unit_time_reduction;
+    public function recruitUnits(Kingdom $kingdom, GameUnit $gameUnit, int $amount, ?int $capitalCityQueueId = null): void
+    {
+        $character = $kingdom->character;
+        $totalTime = $gameUnit->time_to_recruit * $amount;
+        $totalTime = $totalTime - $totalTime * $this->fetchTimeReduction($character)->unit_time_reduction;
         $timeTillFinished = now()->addSeconds($totalTime);
 
         $queue = UnitInQueue::create([
             'character_id' => $character->id,
-            'kingdom_id'   => $kingdom->id,
+            'kingdom_id' => $kingdom->id,
             'game_unit_id' => $gameUnit->id,
-            'amount'       => $amount,
+            'amount' => $amount,
             'completed_at' => $timeTillFinished,
-            'started_at'   => now(),
+            'started_at' => now(),
         ]);
 
         event(new UpdateKingdomQueues($kingdom));
@@ -96,9 +69,10 @@ class UnitService {
         }
     }
 
-    public function getCostsRequired(Kingdom $kingdom, GameUnit $gameUnit, int $amount): array {
+    public function getCostsRequired(Kingdom $kingdom, GameUnit $gameUnit, int $amount): array
+    {
         $kingdomUnitCostReduction = $kingdom->fetchUnitCostReduction();
-        $ironCostReduction        = $kingdom->fetchIronCostReduction();
+        $ironCostReduction = $kingdom->fetchIronCostReduction();
 
         $woodRequired = ($gameUnit->wood_cost * $amount);
         $woodRequired -= $woodRequired * $kingdomUnitCostReduction;
@@ -132,29 +106,25 @@ class UnitService {
      * Update the kingdom resources based on the cost.
      *
      * Subtracts cost from current amount.
-     *
-     * @param Kingdom $kingdom
-     * @param GameUnit $gameUnit
-     * @param int $amount
-     * @return Kingdom
      */
-    public function updateKingdomResources(Kingdom $kingdom, GameUnit $gameUnit, int $amount): Kingdom {
+    public function updateKingdomResources(Kingdom $kingdom, GameUnit $gameUnit, int $amount): Kingdom
+    {
 
         $costs = $this->getCostsRequired($kingdom, $gameUnit, $amount);
 
-        $newWood  = $kingdom->current_wood - $costs['wood'];
-        $newClay  = $kingdom->current_clay - $costs['clay'];
+        $newWood = $kingdom->current_wood - $costs['wood'];
+        $newClay = $kingdom->current_clay - $costs['clay'];
         $newStone = $kingdom->current_stone - $costs['stone'];
-        $newIron  = $kingdom->current_iron - $costs['iron'];
-        $newPop   = $kingdom->current_population - $costs['population'];
+        $newIron = $kingdom->current_iron - $costs['iron'];
+        $newPop = $kingdom->current_population - $costs['population'];
         $newSteel = $kingdom->current_steel - $costs['steel'];
 
         $kingdom->update([
-            'current_wood'       => $newWood > 0 ? $newWood : 0,
-            'current_clay'       => $newClay > 0 ? $newClay : 0,
-            'current_stone'      => $newStone > 0 ? $newStone : 0,
-            'current_iron'       => $newIron > 0 ? $newIron : 0,
-            'current_steel'      => $newSteel > 0 ? $newSteel : 0,
+            'current_wood' => $newWood > 0 ? $newWood : 0,
+            'current_clay' => $newClay > 0 ? $newClay : 0,
+            'current_stone' => $newStone > 0 ? $newStone : 0,
+            'current_iron' => $newIron > 0 ? $newIron : 0,
+            'current_steel' => $newSteel > 0 ? $newSteel : 0,
             'current_population' => $newPop > 0 ? $newPop : 0,
         ]);
 
@@ -165,21 +135,19 @@ class UnitService {
      * Cancel a recruitment order.
      *
      * Can return false if resources gained back are too little.
-     *
-     * @param UnitInQueue $queue
-     * @return Kingdom|null
      */
-    public function cancelRecruit(UnitInQueue $queue): ?Kingdom {
+    public function cancelRecruit(UnitInQueue $queue): ?Kingdom
+    {
 
         $kingdom = $queue->kingdom;
 
         $this->resourceCalculation($queue);
 
-        if (!($this->totalResources >= .10)) {
+        if (! ($this->totalResources >= .10)) {
             return null;
         }
 
-        $unit    = $queue->unit;
+        $unit = $queue->unit;
         $kingdom = $this->updateKingdomAfterCancellation($kingdom, $unit, $queue);
 
         $queue->delete();
@@ -191,13 +159,11 @@ class UnitService {
 
     /**
      * Calculate resources needed.
-     *
-     * @param UnitInQueue $queue
-     * @return void
      */
-    protected function resourceCalculation(UnitInQueue $queue): void {
-        $start   = Carbon::parse($queue->started_at)->timestamp;
-        $end     = Carbon::parse($queue->completed_at)->timestamp;
+    protected function resourceCalculation(UnitInQueue $queue): void
+    {
+        $start = Carbon::parse($queue->started_at)->timestamp;
+        $end = Carbon::parse($queue->completed_at)->timestamp;
         $current = Carbon::parse(now())->timestamp;
 
         $completed = (($current - $start) / ($end - $start));
@@ -207,33 +173,27 @@ class UnitService {
 
     /**
      * Fetch the time reduction for recruitment.
-     *
-     * @param Character $character
-     * @return Skill
      */
-    public function fetchTimeReduction(Character $character): Skill  {
-        return $character->skills->filter(function($skill) {
+    public function fetchTimeReduction(Character $character): Skill
+    {
+        return $character->skills->filter(function ($skill) {
             return $skill->baseSkill->type === SkillTypeValue::EFFECTS_KINGDOM;
         })->first();
     }
 
     /**
      * Give back some resources when we cancel the recruitment.
-     *
-     * @param Kingdom $kingdom
-     * @param GameUnit $unit
-     * @param UnitInQueue $queue
-     * @return Kingdom
      */
-    protected function updateKingdomAfterCancellation(Kingdom $kingdom, GameUnit $unit, UnitInQueue $queue): Kingdom {
+    protected function updateKingdomAfterCancellation(Kingdom $kingdom, GameUnit $unit, UnitInQueue $queue): Kingdom
+    {
 
         $kingdom->update([
-            'current_wood'       => min($kingdom->current_wood + (($unit->wood_cost * $queue->amount) * $this->totalResources), $kingdom->max_wood),
-            'current_clay'       => min($kingdom->current_clay + (($unit->clay_cost * $queue->amount) * $this->totalResources), $kingdom->max_clay),
-            'current_stone'      => min($kingdom->current_stone + (($unit->stone_cost * $queue->amount) * $this->totalResources), $kingdom->max_stone),
-            'current_iron'       => min($kingdom->current_iron + (($unit->iron_cost * $queue->amount) * $this->totalResources), $kingdom->max_iron),
-            'current_steel'      => min($kingdom->current_steel + (($unit->steel_cost * $queue->amount) * $this->totalResources), $kingdom->max_steel),
-            'current_population' => min($kingdom->current_population + (($unit->required_population * $queue->amount) * $this->totalResources), $kingdom->max_population)
+            'current_wood' => min($kingdom->current_wood + (($unit->wood_cost * $queue->amount) * $this->totalResources), $kingdom->max_wood),
+            'current_clay' => min($kingdom->current_clay + (($unit->clay_cost * $queue->amount) * $this->totalResources), $kingdom->max_clay),
+            'current_stone' => min($kingdom->current_stone + (($unit->stone_cost * $queue->amount) * $this->totalResources), $kingdom->max_stone),
+            'current_iron' => min($kingdom->current_iron + (($unit->iron_cost * $queue->amount) * $this->totalResources), $kingdom->max_iron),
+            'current_steel' => min($kingdom->current_steel + (($unit->steel_cost * $queue->amount) * $this->totalResources), $kingdom->max_steel),
+            'current_population' => min($kingdom->current_population + (($unit->required_population * $queue->amount) * $this->totalResources), $kingdom->max_population),
         ]);
 
         return $kingdom->refresh();

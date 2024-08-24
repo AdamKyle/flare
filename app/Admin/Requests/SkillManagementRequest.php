@@ -27,10 +27,10 @@ class SkillManagementRequest extends FormRequest
     public function rules()
     {
         return [
-            'name'                    => 'required',
-            'type'                    => 'required',
-            'description'             => 'required',
-            'max_level'               => 'required',
+            'name' => 'required',
+            'type' => 'required',
+            'description' => 'required',
+            'max_level' => 'required',
         ];
     }
 
@@ -39,12 +39,13 @@ class SkillManagementRequest extends FormRequest
      *
      * @return array
      */
-    public function messages() {
+    public function messages()
+    {
         return [
-            'name.required'        => 'Name required.',
-            'type.required'        => 'Type required.',
+            'name.required' => 'Name required.',
+            'type.required' => 'Type required.',
             'description.required' => 'Description required.',
-            'max_level.required'   => 'Max Level is required.',
+            'max_level.required' => 'Max Level is required.',
         ];
     }
 }

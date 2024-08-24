@@ -14,7 +14,8 @@ class CreateMultipleEventsRequest extends FormRequest
      *
      * @return bool
      */
-    public function authorize() {
+    public function authorize()
+    {
         return true;
     }
 
@@ -26,9 +27,9 @@ class CreateMultipleEventsRequest extends FormRequest
     public function rules()
     {
         return [
-            'generate_every'         => 'required|string',
-            'selected_event_type'    => 'required|integer',
-            'selected_start_date'    => 'required',
+            'generate_every' => 'required|string',
+            'selected_event_type' => 'required|integer',
+            'selected_start_date' => 'required',
         ];
     }
 
@@ -37,11 +38,12 @@ class CreateMultipleEventsRequest extends FormRequest
      *
      * @return array
      */
-    public function messages() {
+    public function messages()
+    {
         return [
-            'generate_every.required'         => 'Missing how often this event runs.',
-            'selected_event_type.required'    => 'Missing selected event type.',
-            'selected_start_date.required'    => 'Missing selected start date of the event.'
+            'generate_every.required' => 'Missing how often this event runs.',
+            'selected_event_type.required' => 'Missing selected event type.',
+            'selected_start_date.required' => 'Missing selected start date of the event.',
         ];
     }
 }

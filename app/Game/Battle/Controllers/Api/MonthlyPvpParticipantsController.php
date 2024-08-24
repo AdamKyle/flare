@@ -2,17 +2,17 @@
 
 namespace App\Game\Battle\Controllers\Api;
 
+use App\Flare\Models\Character;
 use App\Flare\Models\MonthlyPvpParticipant;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Battle\Request\MonthlyPvpFight;
-use App\Http\Controllers\Controller;
-use App\Flare\Models\Character;
 use App\Game\Messages\Events\ServerMessageEvent;
+use App\Http\Controllers\Controller;
 
-class MonthlyPvpParticipantsController extends Controller {
-
-
-    public function join(MonthlyPvpFight $request, Character $character) {
+class MonthlyPvpParticipantsController extends Controller
+{
+    public function join(MonthlyPvpFight $request, Character $character)
+    {
 
         if ($character->level < 301) {
             event(new ServerMessageEvent($character->user, 'You need to be at least level 301 to participate.'));
@@ -22,9 +22,9 @@ class MonthlyPvpParticipantsController extends Controller {
 
         $characterInFight = MonthlyPvpParticipant::where('character_id', $character->id)->first();
 
-        if (!is_null($characterInFight)) {
+        if (! is_null($characterInFight)) {
             $characterInFight->update([
-                'attack_type' => $request->attack_type
+                'attack_type' => $request->attack_type,
             ]);
 
             event(new ServerMessageEvent($character->user, 'Updated your pvp attack type for tonight.'));

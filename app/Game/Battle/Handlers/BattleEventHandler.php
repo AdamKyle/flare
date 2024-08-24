@@ -17,51 +17,35 @@ use Exception;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
-class BattleEventHandler {
-
+class BattleEventHandler
+{
     use FetchEquipped;
 
-    /**
-     * @var BattleRewardService $battleRewardService
-     */
     private BattleRewardService $battleRewardService;
 
-    /**
-     * @var SecondaryRewardService $secondaryRewardService
-     */
     private SecondaryRewardService $secondaryRewardService;
 
-    /**
-     * @var WeeklyBattleService
-     */
     private WeeklyBattleService $weeklyBattleService;
 
-    /**
-     * @param BattleRewardService $battleRewardService
-     * @param SecondaryRewardService $secondaryRewardService
-     * @param WeeklyBattleService $weeklyBattleService
-     */
-    public function __construct(BattleRewardService $battleRewardService, SecondaryRewardService $secondaryRewardService, WeeklyBattleService $weeklyBattleService) {
-        $this->battleRewardService    = $battleRewardService;
+    public function __construct(BattleRewardService $battleRewardService, SecondaryRewardService $secondaryRewardService, WeeklyBattleService $weeklyBattleService)
+    {
+        $this->battleRewardService = $battleRewardService;
         $this->secondaryRewardService = $secondaryRewardService;
-        $this->weeklyBattleService    = $weeklyBattleService;
+        $this->weeklyBattleService = $weeklyBattleService;
     }
 
     /**
      * Process the fact the character has died.
-     *
-     * @param Character $character
-     * @param Monster|null $monster
-     * @return void
      */
-    public function processDeadCharacter(Character $character, ?Monster $monster = null): void {
+    public function processDeadCharacter(Character $character, ?Monster $monster = null): void
+    {
         $character->update(['is_dead' => true]);
 
         $character = $character->refresh();
 
-        if (!is_null($monster)) {
+        if (! is_null($monster)) {
 
-            if (!is_null($monster->only_for_location_type)) {
+            if (! is_null($monster->only_for_location_type)) {
                 $this->weeklyBattleService->handleCharacterDeath($character, $monster);
             }
         }
@@ -75,18 +59,16 @@ class BattleEventHandler {
     /**
      * Process the fact the monster has died.
      *
-     * @param int $characterId
-     * @param int $monsterId
-     * @return void
      * @throws Exception
      */
-    public function processMonsterDeath(int $characterId, int $monsterId): void {
-        $monster   = Monster::find($monsterId);
+    public function processMonsterDeath(int $characterId, int $monsterId): void
+    {
+        $monster = Monster::find($monsterId);
 
         $character = Character::find($characterId);
 
         if (is_null($monster)) {
-            Log::error('Missing Monster for id: ' . $monsterId);
+            Log::error('Missing Monster for id: '.$monsterId);
 
             return;
         }
@@ -98,30 +80,28 @@ class BattleEventHandler {
 
     /**
      * Handle when a character revives.
-     *
-     * @param Character $character
-     * @return Character
      */
-    public function processRevive(Character $character): Character {
+    public function processRevive(Character $character): Character
+    {
         $character->update([
-            'is_dead' => false
+            'is_dead' => false,
         ]);
 
         $characterInCelestialFight = CharacterInCelestialFight::where('character_id', $character->id)->first();
-        $characterHealth           = $character->getInformation()->buildHealth();
+        $characterHealth = $character->getInformation()->buildHealth();
 
-        if (!is_null($characterInCelestialFight)) {
+        if (! is_null($characterInCelestialFight)) {
             $characterInCelestialFight->update([
                 'character_current_health' => $characterHealth,
             ]);
         }
 
-        $monsterFightCache = Cache::get('monster-fight-' . $character->id);
+        $monsterFightCache = Cache::get('monster-fight-'.$character->id);
 
-        if (!is_null($monsterFightCache)) {
+        if (! is_null($monsterFightCache)) {
             $monsterFightCache['health']['current_character_health'] = $characterHealth;
 
-            Cache::put('monster-fight-' . $character->id, $monsterFightCache, 900);
+            Cache::put('monster-fight-'.$character->id, $monsterFightCache, 900);
         }
 
         event(new CharacterRevive($character->user, $characterHealth));

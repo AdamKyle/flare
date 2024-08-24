@@ -6,8 +6,8 @@ use Database\Factories\FactionLoyaltyNpcTaskFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class FactionLoyaltyNpcTask extends Model {
-
+class FactionLoyaltyNpcTask extends Model
+{
     use HasFactory;
 
     /**
@@ -29,19 +29,23 @@ class FactionLoyaltyNpcTask extends Model {
         'current_amount',
     ];
 
-    public function factionLoyalty() {
+    public function factionLoyalty()
+    {
         return $this->belongsTo(FactionLoyalty::class, 'faction_loyalty_id', 'id');
     }
 
-    public function factionLoyaltyNpc() {
+    public function factionLoyaltyNpc()
+    {
         return $this->belongsTo(FactionLoyaltyNpc::class, 'faction_loyalty_npc_id', 'id');
     }
 
-    public function getCurrentAmountAttribute() {
+    public function getCurrentAmountAttribute()
+    {
         return collect($this->fame_tasks)->sum('amount_completed');
     }
 
-    protected static function newFactory() {
+    protected static function newFactory()
+    {
         return FactionLoyaltyNpcTaskFactory::new();
     }
 }

@@ -27,7 +27,7 @@ class ItemsImport extends FormRequest
     public function rules()
     {
         return [
-            'items_import' => 'required|mimes:xlsx|max:2048'
+            'items_import' => 'required|mimes:xlsx|max:2048',
         ];
     }
 
@@ -36,11 +36,12 @@ class ItemsImport extends FormRequest
      *
      * @return array
      */
-    public function messages() {
+    public function messages()
+    {
         return [
-            'items_import.required'   => 'Items import file is required.',
-            'items_import.mime'       => 'The system only accepts xlsx files.',
-            'items_import.max'        => 'File to large, the system only accepts a max size of 2MB.',
+            'items_import.required' => 'Items import file is required.',
+            'items_import.mime' => 'The system only accepts xlsx files.',
+            'items_import.max' => 'File to large, the system only accepts a max size of 2MB.',
         ];
     }
 }

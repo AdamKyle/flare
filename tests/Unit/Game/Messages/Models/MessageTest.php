@@ -7,35 +7,38 @@ use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateMessage;
 
-class MessageTest extends TestCase {
-
-    use RefreshDatabase, CreateMessage;
+class MessageTest extends TestCase
+{
+    use CreateMessage, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
-        $this->character        = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
+        $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
 
-        $this->character        = null;
+        $this->character = null;
     }
 
-    public function testCreateMessage() {
+    public function testCreateMessage()
+    {
         $user = $this->character->getUser();
         $character = $this->character->getCharacter();
 
         $message = $this->createMessage($user, [
-            'message'       => 'Test Message',
-            'from_user'     => null,
-            'to_user'       => null,
-            'x_position'    => $character->map->position_x,
-            'y_position'    => $character->map->position_y,
-            'color'         => '#000',
+            'message' => 'Test Message',
+            'from_user' => null,
+            'to_user' => null,
+            'x_position' => $character->map->position_x,
+            'y_position' => $character->map->position_y,
+            'color' => '#000',
             'hide_location' => false,
         ]);
 
@@ -47,7 +50,8 @@ class MessageTest extends TestCase {
         $this->assertEquals(false, $message->hide_location);
     }
 
-    public function testSendMessageToAnotherUser() {
+    public function testSendMessageToAnotherUser()
+    {
         $user = $this->character->getUser();
         $character = $this->character->getCharacter();
 

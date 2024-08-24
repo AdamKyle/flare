@@ -27,7 +27,7 @@ class PassivesImportRequest extends FormRequest
     public function rules()
     {
         return [
-            'passives_import' => 'required|mimes:xlsx|max:2048'
+            'passives_import' => 'required|mimes:xlsx|max:2048',
         ];
     }
 
@@ -36,11 +36,12 @@ class PassivesImportRequest extends FormRequest
      *
      * @return array
      */
-    public function messages() {
+    public function messages()
+    {
         return [
-            'passives_import.required'   => 'Passive skill import file is required.',
-            'passives_import.mime'       => 'The system only accepts xlsx files.',
-            'passives_import.max'        => 'File to large, the system only accepts a max size of 2MB.',
+            'passives_import.required' => 'Passive skill import file is required.',
+            'passives_import.mime' => 'The system only accepts xlsx files.',
+            'passives_import.max' => 'File to large, the system only accepts a max size of 2MB.',
         ];
     }
 }

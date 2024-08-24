@@ -2,36 +2,33 @@
 
 namespace App\Game\PassiveSkills\Events;
 
-use Illuminate\Broadcasting\Channel;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Foundation\Events\Dispatchable;
-use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
-use Illuminate\Support\Collection;
+use App\Flare\Models\User;
 use App\Game\Core\Traits\KingdomCache;
-Use App\Flare\Models\User;
+use Illuminate\Broadcasting\Channel;
+use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Broadcasting\PrivateChannel;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Collection;
 
 class UpdatePassiveTree implements ShouldBroadcastNow
 {
-    use Dispatchable, InteractsWithSockets, SerializesModels, KingdomCache;
+    use Dispatchable, InteractsWithSockets, KingdomCache, SerializesModels;
 
     /**
-     * @var User $user
+     * @var User
      */
     private $user;
 
     /**
-     * @var Collection $passiveSkills
+     * @var Collection
      */
     public $passiveSkills;
 
-    /**
-     * @param User $user
-     * @param Collection $passiveSkills
-     */
-    public function __construct(User $user, Collection $passiveSkills) {
-        $this->user          = $user;
+    public function __construct(User $user, Collection $passiveSkills)
+    {
+        $this->user = $user;
         $this->passiveSkills = $passiveSkills;
     }
 
@@ -42,6 +39,6 @@ class UpdatePassiveTree implements ShouldBroadcastNow
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('update-passive-skills-' . $this->user->id);
+        return new PrivateChannel('update-passive-skills-'.$this->user->id);
     }
 }

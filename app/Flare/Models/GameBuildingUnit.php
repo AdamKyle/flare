@@ -2,12 +2,12 @@
 
 namespace App\Flare\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Database\Factories\GameBuildingUnitFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
-class GameBuildingUnit extends Model {
-
+class GameBuildingUnit extends Model
+{
     use HasFactory;
 
     /**
@@ -31,22 +31,26 @@ class GameBuildingUnit extends Model {
     ];
 
     protected $appends = [
-        'building_name'
+        'building_name',
     ];
 
-    public function gameBuilding() {
+    public function gameBuilding()
+    {
         return $this->belongsTo(GameBuilding::class);
     }
 
-    public function gameUnit() {
+    public function gameUnit()
+    {
         return $this->hasOne(GameUnit::class, 'id', 'game_unit_id');
     }
 
-    public function getBuildingNameAttribute() {
+    public function getBuildingNameAttribute()
+    {
         return $this->gameBuilding->name;
     }
 
-    protected static function newFactory() {
+    protected static function newFactory()
+    {
         return GameBuildingUnitFactory::new();
     }
 }

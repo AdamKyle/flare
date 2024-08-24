@@ -2,55 +2,55 @@
 
 namespace App\Game\Battle\Values;
 
-class MaxLevel {
+class MaxLevel
+{
+    const MAX_LEVEL = 1000;
 
-    const MAX_LEVEL      = 1000;
-    const HALF           = 500;
+    const HALF = 500;
+
     const THREE_QUARTERS = 750;
-    const LAST_LEG       = 900;
 
-    const HALF_PERCENT           = 0.75;
+    const LAST_LEG = 900;
+
+    const HALF_PERCENT = 0.75;
+
     const THREE_QUARTERS_PERCENT = 0.50;
-    const LAST_LEG_PERCENT       = 0.25;
+
+    const LAST_LEG_PERCENT = 0.25;
 
     /**
-     * @var int $currentLevel
+     * @var int
      */
     private $currentLevel = 0;
 
     /**
-     * @var int $xp
+     * @var int
      */
-    private $xp           = 0;
+    private $xp = 0;
 
     /**
      * MaxLevel constructor.
-     *
-     * @param int $currentLevel
-     * @param int $xp
      */
-    public function __construct(int $currentLevel, int $xp) {
+    public function __construct(int $currentLevel, int $xp)
+    {
         $this->currentLevel = $currentLevel;
-        $this->xp           = $xp;
+        $this->xp = $xp;
     }
 
     /**
      * Returns the new xp amount based off where the character is in their leveling.
-     *
-     * @param bool $ignoreCaps
-     * @param float $xpBonus
-     * @return int
      */
-    public function fetchXP(bool $ignoreCaps = false, float $xpBonus = 0.0): int {
-        if ($this->currentLevel >= self::HALF && $this->currentLevel < self::THREE_QUARTERS && !$ignoreCaps) {
+    public function fetchXP(bool $ignoreCaps = false, float $xpBonus = 0.0): int
+    {
+        if ($this->currentLevel >= self::HALF && $this->currentLevel < self::THREE_QUARTERS && ! $ignoreCaps) {
             return ceil($this->xp * self::HALF_PERCENT);
         }
 
-        if ($this->currentLevel >= self::THREE_QUARTERS && $this->currentLevel < self::LAST_LEG && !$ignoreCaps) {
+        if ($this->currentLevel >= self::THREE_QUARTERS && $this->currentLevel < self::LAST_LEG && ! $ignoreCaps) {
             return ceil($this->xp * self::THREE_QUARTERS_PERCENT);
         }
 
-        if ($this->currentLevel >= self::LAST_LEG && $this->currentLevel < self::MAX_LEVEL && !$ignoreCaps) {
+        if ($this->currentLevel >= self::LAST_LEG && $this->currentLevel < self::MAX_LEVEL && ! $ignoreCaps) {
             return ceil($this->xp * self::LAST_LEG_PERCENT);
         }
 

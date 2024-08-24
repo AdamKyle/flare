@@ -2,34 +2,26 @@
 
 namespace App\Game\Kingdoms\Service;
 
-use App\Flare\Models\GameUnit;
-use App\Game\Core\Traits\ResponseBuilder;
-use Carbon\Carbon;
+use App\Flare\Models\CapitalCityUnitCancellation;
 use App\Flare\Models\CapitalCityUnitQueue;
 use App\Flare\Models\Character;
+use App\Flare\Models\GameUnit;
 use App\Flare\Models\Kingdom;
-use App\Flare\Models\CapitalCityUnitCancellation;
+use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Kingdoms\Events\UpdateCapitalCityUnitQueueTable;
 use App\Game\Kingdoms\Jobs\CapitalCityUnitRequestCancellationMovement;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
+use Carbon\Carbon;
 
-class CancelUnitRequestService {
-
+class CancelUnitRequestService
+{
     use ResponseBuilder;
 
-    /**
-     * @param UnitMovementService $unitMovementService
-     */
     public function __construct(private readonly UnitMovementService $unitMovementService) {}
 
     /**
      * Handle the unit request cancellation.
-     *
-     * @param Character $character
-     * @param Kingdom $kingdom
-     * @param array $requestData
-     * @return array
      */
     public function handleCancelRequest(Character $character, Kingdom $kingdom, array $requestData): array
     {
@@ -51,7 +43,7 @@ class CancelUnitRequestService {
             return $this->handleDeleteQueue($queue, $character, $kingdom, $time);
         }
 
-        if (!is_null($unitToDelete)) {
+        if (! is_null($unitToDelete)) {
             return $this->handleSingleUnitCancel($queue, $character, $kingdom, $unitToDelete, $time);
         }
 
@@ -60,13 +52,9 @@ class CancelUnitRequestService {
 
     /**
      * Get the unit queue.
-     *
-     * @param Character $character
-     * @param Kingdom $kingdom
-     * @param int $queueId
-     * @return CapitalCityUnitQueue|null
      */
-    private function getUnitQueue(Character $character, Kingdom $kingdom, int $queueId): ?CapitalCityUnitQueue {
+    private function getUnitQueue(Character $character, Kingdom $kingdom, int $queueId): ?CapitalCityUnitQueue
+    {
         return CapitalCityUnitQueue::where('id', $queueId)
             ->where('character_id', $character->id)
             ->where('kingdom_id', $kingdom->id)
@@ -75,12 +63,9 @@ class CancelUnitRequestService {
 
     /**
      * Calculate the time required to travel to the kingdom.
-     *
-     * @param Character $character
-     * @param CapitalCityUnitQueue $queue
-     * @return Carbon
      */
-    private function calculateTime(Character $character, CapitalCityUnitQueue $queue): Carbon {
+    private function calculateTime(Character $character, CapitalCityUnitQueue $queue): Carbon
+    {
         $time = $this->unitMovementService->determineTimeRequired(
             $character,
             $queue->kingdom,
@@ -93,13 +78,6 @@ class CancelUnitRequestService {
 
     /**
      * Handle deleting a queue or multiple queues.
-     *
-     * @param CapitalCityUnitQueue $queue
-     * @param bool $deleteQueue
-     * @param int|null $unitToDelete
-     * @param Character $character
-     * @param Kingdom $kingdom
-     * @return array
      */
     private function handleTravelingQueue(CapitalCityUnitQueue $queue, bool $deleteQueue, ?int $unitToDelete, Character $character, Kingdom $kingdom): array
     {
@@ -116,16 +94,13 @@ class CancelUnitRequestService {
         event(new UpdateCapitalCityUnitQueueTable($character));
 
         $message = $deleted ? 'The last of your orders has been canceled.' : 'The selected unit has been stricken from the request.';
+
         return $this->successResult(['message' => $message]);
     }
 
     /**
      * Handle deleting the queue.
      *
-     * @param CapitalCityUnitQueue $queue
-     * @param Character $character
-     * @param Kingdom $kingdom
-     * @param Carbon $time
      * @return array|string[]
      */
     private function handleDeleteQueue(CapitalCityUnitQueue $queue, Character $character, Kingdom $kingdom, Carbon $time): array
@@ -143,13 +118,6 @@ class CancelUnitRequestService {
 
     /**
      * Handle a single unit request.
-     *
-     * @param CapitalCityUnitQueue $queue
-     * @param Character $character
-     * @param Kingdom $kingdom
-     * @param int $unitToDelete
-     * @param Carbon $time
-     * @return array
      */
     private function handleSingleUnitCancel(CapitalCityUnitQueue $queue, Character $character, Kingdom $kingdom, int $unitToDelete, Carbon $time): array
     {
@@ -172,12 +140,9 @@ class CancelUnitRequestService {
 
     /**
      * Update the unit queue data.
-     *
-     * @param CapitalCityUnitQueue $queue
-     * @param int|null $unitToDelete
-     * @return void
      */
-    private function updateUnitRequestData(CapitalCityUnitQueue $queue, ?int $unitToDelete): void {
+    private function updateUnitRequestData(CapitalCityUnitQueue $queue, ?int $unitToDelete): void
+    {
         $unitRequestData = $queue->unit_request_data;
 
         foreach ($unitRequestData as $index => $data) {
@@ -193,16 +158,15 @@ class CancelUnitRequestService {
 
     /**
      * Possibly delete the actual queue if everything is "cancelled"
-     *
-     * @param CapitalCityUnitQueue $queue
-     * @return bool
      */
-    private function possiblyDeleteUnitQueue(CapitalCityUnitQueue $queue): bool {
+    private function possiblyDeleteUnitQueue(CapitalCityUnitQueue $queue): bool
+    {
         $unitRequestData = $queue->unit_request_data;
-        $canceledData = array_filter($unitRequestData, fn($data) => $data['secondary_status'] === CapitalCityQueueStatus::CANCELLED);
+        $canceledData = array_filter($unitRequestData, fn ($data) => $data['secondary_status'] === CapitalCityQueueStatus::CANCELLED);
 
         if (count($canceledData) === count($unitRequestData)) {
             $queue->delete();
+
             return true;
         }
 
@@ -211,12 +175,10 @@ class CancelUnitRequestService {
 
     /**
      * Get the unit ids for cancellation.
-     *
-     * @param CapitalCityUnitQueue $queue
-     * @return array
      */
-    private function getUnitIdsForCancellation(CapitalCityUnitQueue $queue): array {
-        $names = array_column(array_filter($queue->unit_request_data, fn($data) => $data['secondary_status'] === CapitalCityQueueStatus::RECRUITING), 'name');
+    private function getUnitIdsForCancellation(CapitalCityUnitQueue $queue): array
+    {
+        $names = array_column(array_filter($queue->unit_request_data, fn ($data) => $data['secondary_status'] === CapitalCityQueueStatus::RECRUITING), 'name');
 
         $gameUnitIds = GameUnit::whereIn('name', $names)->pluck('id')->toarray();
 
@@ -225,16 +187,10 @@ class CancelUnitRequestService {
 
     /**
      * Store cancellation Data.
-     *
-     * @param array $unitIds
-     * @param Kingdom $kingdom
-     * @param Character $character
-     * @param CapitalCityUnitQueue $queue
-     * @param Carbon $time
-     * @return void
      */
-    private function storeCancellationData(array $unitIds, Kingdom $kingdom, Character $character, CapitalCityUnitQueue $queue, Carbon $time): void {
-        $cancellationData = array_map(fn($id) => [
+    private function storeCancellationData(array $unitIds, Kingdom $kingdom, Character $character, CapitalCityUnitQueue $queue, Carbon $time): void
+    {
+        $cancellationData = array_map(fn ($id) => [
             'unit_id' => $id,
             'kingdom_id' => $kingdom->id,
             'character_id' => $character->id,

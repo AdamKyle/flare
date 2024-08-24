@@ -2,8 +2,8 @@
 
 namespace App\Game\Factions\FactionLoyalty\Providers;
 
-use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
+use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 
 class ServiceProvider extends ApplicationServiceProvider
 {
@@ -12,12 +12,11 @@ class ServiceProvider extends ApplicationServiceProvider
      *
      * @return void
      */
-    public function register() {
+    public function register()
+    {
 
-
-        $this->app->bind(FactionLoyaltyService::class, function($app) {
-            return new FactionLoyaltyService(
-            );
+        $this->app->bind(FactionLoyaltyService::class, function ($app) {
+            return new FactionLoyaltyService;
         });
     }
 
@@ -26,8 +25,5 @@ class ServiceProvider extends ApplicationServiceProvider
      *
      * @return void
      */
-    public function boot()
-    {
-
-    }
+    public function boot() {}
 }

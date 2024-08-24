@@ -2,8 +2,8 @@
 
 namespace Database\Factories;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Flare\Models\MarketHistory;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 class MarketHistoryFactory extends Factory
 {
@@ -22,8 +22,8 @@ class MarketHistoryFactory extends Factory
     public function definition()
     {
         return [
-            'item_id'  => null,
-            'sold_for' => null
+            'item_id' => null,
+            'sold_for' => null,
         ];
     }
 }

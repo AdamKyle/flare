@@ -12,29 +12,32 @@ use Tests\Traits\CreateGameSkill;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateItemAffix;
 
-class ReductionBuilderTest extends TestCase {
-
-    use RefreshDatabase, CreateItem, CreateItemAffix, CreateGameMap, CreateClass, CreateGameSkill;
+class ReductionBuilderTest extends TestCase
+{
+    use CreateClass, CreateGameMap, CreateGameSkill, CreateItem, CreateItemAffix, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
     private ?CharacterStatBuilder $characterStatBuilder;
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
-        $this->character            = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
+        $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
         $this->characterStatBuilder = resolve(CharacterStatBuilder::class);
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
 
         $this->character = null;
         $this->characterStatBuilder = null;
     }
 
-    public function testNoRingReductionWithEmptyInventory() {
+    public function testNoRingReductionWithEmptyInventory()
+    {
 
         $character = $this->character->getCharacter();
 
@@ -43,11 +46,12 @@ class ReductionBuilderTest extends TestCase {
         $this->assertEquals(0, $reduction);
     }
 
-    public function testGetRingReduction() {
+    public function testGetRingReduction()
+    {
 
         $item = $this->createItem([
             'type' => 'ring',
-            'spell_evasion' => 0.10
+            'spell_evasion' => 0.10,
         ]);
 
         $character = $this->character->inventoryManagement()->giveItem($item, true, 'ring-one')->getCharacter();
@@ -57,7 +61,8 @@ class ReductionBuilderTest extends TestCase {
         $this->assertEquals(0.10, $reduction);
     }
 
-    public function testGetAffixReductionNoInventory() {
+    public function testGetAffixReductionNoInventory()
+    {
 
         $character = $this->character->getCharacter();
 
@@ -66,15 +71,16 @@ class ReductionBuilderTest extends TestCase {
         $this->assertEquals(0, $reduction);
     }
 
-    public function testGetAffixReduction() {
+    public function testGetAffixReduction()
+    {
 
         $itemAffix = $this->createItemAffix([
-           'str_reduction' => 0.10
+            'str_reduction' => 0.10,
         ]);
 
         $item = $this->createItem([
-            'type'           => 'ring',
-            'spell_evasion'  => 0.10,
+            'type' => 'ring',
+            'spell_evasion' => 0.10,
             'item_prefix_id' => $itemAffix->id,
         ]);
 

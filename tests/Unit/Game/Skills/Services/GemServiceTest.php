@@ -23,9 +23,9 @@ use Tests\Traits\CreateGem;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateItemAffix;
 
-class GemServiceTest extends TestCase {
-
-    use RefreshDatabase, CreateItem, CreateClass, CreateGameSkill, CreateItemAffix, CreateGem;
+class GemServiceTest extends TestCase
+{
+    use CreateClass, CreateGameSkill, CreateGem, CreateItem, CreateItemAffix, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -33,7 +33,8 @@ class GemServiceTest extends TestCase {
 
     private ?GameSkill $gemSkill;
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
         $this->gemSkill = $this->createGameSkill([
@@ -41,22 +42,24 @@ class GemServiceTest extends TestCase {
             'type' => SkillTypeValue::GEM_CRAFTING,
         ]);
 
-        $this->character = (new CharacterFactory())->createBaseCharacter()->assignSkill(
+        $this->character = (new CharacterFactory)->createBaseCharacter()->assignSkill(
             $this->gemSkill
         )->givePlayerLocation();
 
         $this->gemService = resolve(GemService::class);
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
 
-        $this->character   = null;
-        $this->gemSkill    = null;
-        $this->gemService  = null;
+        $this->character = null;
+        $this->gemSkill = null;
+        $this->gemService = null;
     }
 
-    public function testCannotAffordTier() {
+    public function testCannotAffordTier()
+    {
         $character = $this->character->getCharacter();
 
         $result = $this->gemService->generateGem($character, 1);
@@ -65,13 +68,14 @@ class GemServiceTest extends TestCase {
         $this->assertEquals('You do not have the required currencies to craft this item.', $result['message']);
     }
 
-    public function testCannotCraftWhenInventoryIsFull() {
+    public function testCannotCraftWhenInventoryIsFull()
+    {
         $character = $this->character->getCharacter();
 
         $character->update([
-            'gold_dust'     => MaxCurrenciesValue::MAX_GOLD_DUST,
-            'shards'        => MaxCurrenciesValue::MAX_SHARDS,
-            'copper_coins'  => MaxCurrenciesValue::MAX_COPPER,
+            'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
+            'shards' => MaxCurrenciesValue::MAX_SHARDS,
+            'copper_coins' => MaxCurrenciesValue::MAX_COPPER,
             'inventory_max' => 0,
         ]);
 
@@ -81,14 +85,15 @@ class GemServiceTest extends TestCase {
         $this->assertEquals('You do not have enough space in your inventory.', $result['message']);
     }
 
-    public function testCannotCraftWhenSkillLevelRequiredToHigh() {
+    public function testCannotCraftWhenSkillLevelRequiredToHigh()
+    {
 
         $character = $this->character->getCharacter();
 
         $character->update([
-            'gold_dust'     => MaxCurrenciesValue::MAX_GOLD_DUST,
-            'shards'        => MaxCurrenciesValue::MAX_SHARDS,
-            'copper_coins'  => MaxCurrenciesValue::MAX_COPPER,
+            'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
+            'shards' => MaxCurrenciesValue::MAX_SHARDS,
+            'copper_coins' => MaxCurrenciesValue::MAX_COPPER,
         ]);
 
         $result = $this->gemService->generateGem($character, 4);
@@ -96,7 +101,8 @@ class GemServiceTest extends TestCase {
         $this->assertEquals(200, $result['status']);
     }
 
-    public function testFailToCraftTheGem() {
+    public function testFailToCraftTheGem()
+    {
         Event::fake();
 
         $this->instance(
@@ -109,9 +115,9 @@ class GemServiceTest extends TestCase {
         $character = $this->character->getCharacter();
 
         $character->update([
-            'gold_dust'     => MaxCurrenciesValue::MAX_GOLD_DUST,
-            'shards'        => MaxCurrenciesValue::MAX_SHARDS,
-            'copper_coins'  => MaxCurrenciesValue::MAX_COPPER,
+            'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
+            'shards' => MaxCurrenciesValue::MAX_SHARDS,
+            'copper_coins' => MaxCurrenciesValue::MAX_COPPER,
         ]);
 
         $result = resolve(GemService::class)->generateGem($character, 1);
@@ -123,16 +129,16 @@ class GemServiceTest extends TestCase {
         });
     }
 
-    public function testAttemptToCraftTheGem() {
+    public function testAttemptToCraftTheGem()
+    {
         Event::fake();
-
 
         $character = $this->character->getCharacter();
 
         $character->update([
-            'gold_dust'     => MaxCurrenciesValue::MAX_GOLD_DUST,
-            'shards'        => MaxCurrenciesValue::MAX_SHARDS,
-            'copper_coins'  => MaxCurrenciesValue::MAX_COPPER,
+            'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
+            'shards' => MaxCurrenciesValue::MAX_SHARDS,
+            'copper_coins' => MaxCurrenciesValue::MAX_COPPER,
         ]);
 
         $result = $this->gemService->generateGem($character, 1);
@@ -146,7 +152,8 @@ class GemServiceTest extends TestCase {
         $this->assertEquals(200, $result['status']);
     }
 
-    public function testCraftTheGem() {
+    public function testCraftTheGem()
+    {
         Event::fake();
 
         $mock = Mockery::mock(GemService::class, function (MockInterface $mock) {
@@ -163,9 +170,9 @@ class GemServiceTest extends TestCase {
         $character = $this->character->getCharacter();
 
         $character->update([
-            'gold_dust'     => MaxCurrenciesValue::MAX_GOLD_DUST,
-            'shards'        => MaxCurrenciesValue::MAX_SHARDS,
-            'copper_coins'  => MaxCurrenciesValue::MAX_COPPER,
+            'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
+            'shards' => MaxCurrenciesValue::MAX_SHARDS,
+            'copper_coins' => MaxCurrenciesValue::MAX_COPPER,
         ]);
 
         $result = resolve(GemService::class)->generateGem($character, 1);
@@ -180,7 +187,8 @@ class GemServiceTest extends TestCase {
         Event::assertDispatched(ServerMessageEvent::class);
     }
 
-    public function testCraftTheGemButIncreaseTheAmount() {
+    public function testCraftTheGemButIncreaseTheAmount()
+    {
         Event::fake();
 
         $gemService = Mockery::mock(GemService::class, function (MockInterface $mock) {
@@ -188,14 +196,14 @@ class GemServiceTest extends TestCase {
         });
 
         $gem = $this->createGem([
-            'name'                       => 'Sample',
-            'tier'                       => 1,
-            'primary_atonement_type'     => GemTypeValue::FIRE,
-            'secondary_atonement_type'   => GemTypeValue::WATER,
-            'tertiary_atonement_type'    => GemTypeValue::ICE,
-            'primary_atonement_amount'   => 0.10,
+            'name' => 'Sample',
+            'tier' => 1,
+            'primary_atonement_type' => GemTypeValue::FIRE,
+            'secondary_atonement_type' => GemTypeValue::WATER,
+            'tertiary_atonement_type' => GemTypeValue::ICE,
+            'primary_atonement_amount' => 0.10,
             'secondary_atonement_amount' => 0.10,
-            'tertiary_atonement_amount'  => 0.10,
+            'tertiary_atonement_amount' => 0.10,
         ]);
 
         $gemBuilder = Mockery::mock(GemBuilder::class, function (MockInterface $mock) use ($gem) {
@@ -208,14 +216,14 @@ class GemServiceTest extends TestCase {
 
         $character->gemBag->gemSlots()->create([
             'gem_bag_id' => $character->gemBag->id,
-            'gem_id'     => $gem->id,
-            'amount'     => 1,
+            'gem_id' => $gem->id,
+            'amount' => 1,
         ]);
 
         $character->update([
-            'gold_dust'     => MaxCurrenciesValue::MAX_GOLD_DUST,
-            'shards'        => MaxCurrenciesValue::MAX_SHARDS,
-            'copper_coins'  => MaxCurrenciesValue::MAX_COPPER,
+            'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
+            'shards' => MaxCurrenciesValue::MAX_SHARDS,
+            'copper_coins' => MaxCurrenciesValue::MAX_COPPER,
         ]);
 
         $result = $gemService->generateGem($character, 1);
@@ -230,7 +238,8 @@ class GemServiceTest extends TestCase {
         Event::assertDispatched(ServerMessageEvent::class);
     }
 
-    public function testGetCraftableGemsList() {
+    public function testGetCraftableGemsList()
+    {
         $character = $this->character->getCharacter();
 
         $result = $this->gemService->getCraftableTiers($character);
@@ -238,15 +247,17 @@ class GemServiceTest extends TestCase {
         $this->assertNotEmpty($result);
     }
 
-    public function testThrowExceptionWhenThePlayerDoesNotHaveTheSkill() {
+    public function testThrowExceptionWhenThePlayerDoesNotHaveTheSkill()
+    {
         $this->expectException(Exception::class);
 
-        $character = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
         $this->gemService->getCraftableTiers($character);
     }
 
-    public function testFetchCharacterGemCraftingXP() {
+    public function testFetchCharacterGemCraftingXP()
+    {
         $character = $this->character->getCharacter();
 
         $gemCraftingXPData = $this->gemService->fetchSkillXP($character);

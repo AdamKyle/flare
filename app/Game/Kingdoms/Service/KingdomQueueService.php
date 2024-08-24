@@ -12,20 +12,22 @@ use App\Game\Core\Traits\ResponseBuilder;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
 
-class KingdomQueueService {
-
+class KingdomQueueService
+{
     use ResponseBuilder;
 
     private Manager $manager;
 
     private UnitMovementTransformer $unitMovementTransformer;
 
-    public function __construct(Manager $manager, UnitMovementTransformer $unitMovementTransformer) {
+    public function __construct(Manager $manager, UnitMovementTransformer $unitMovementTransformer)
+    {
         $this->manager = $manager;
         $this->unitMovementTransformer = $unitMovementTransformer;
     }
 
-    public function fetchKingdomQueues(Kingdom $kingdom): array {
+    public function fetchKingdomQueues(Kingdom $kingdom): array
+    {
         return [
             'building_queues' => $this->fetchBuildingQueues($kingdom),
             'unit_recruitment_queues' => $this->fetchUnitRecruitmentQueues($kingdom),
@@ -34,25 +36,26 @@ class KingdomQueueService {
         ];
     }
 
-    protected function fetchBuildingQueues(Kingdom $kingdom): array {
+    protected function fetchBuildingQueues(Kingdom $kingdom): array
+    {
 
         $buildingQueues = BuildingInQueue::where('kingdom_id', $kingdom->id)->get();
 
         return $buildingQueues->map(function ($buildingQueue) {
             return [
                 'name' => $buildingQueue->building->gameBuilding->name,
-                'id'   => $buildingQueue->id,
+                'id' => $buildingQueue->id,
                 'from_level' => $buildingQueue->getType()->isUpgrading() ? $buildingQueue->building->level : null,
                 'to_level' => $buildingQueue->getType()->isUpgrading() ? $buildingQueue->to_level : null,
-                'type'=> $buildingQueue->type_name,
+                'type' => $buildingQueue->type_name,
                 'time_remaining' => now()->diffInSeconds($buildingQueue->completed_at),
             ];
         })->toArray();
     }
 
-    protected function fetchBuildingExpansionQueues(Kingdom $kingdom): array {
+    protected function fetchBuildingExpansionQueues(Kingdom $kingdom): array
+    {
         $buildingExpansionQueues = BuildingExpansionQueue::where('kingdom_id', $kingdom->id)->get();
-
 
         return $buildingExpansionQueues->map(function ($buildingExpansionQueue) {
 
@@ -61,14 +64,14 @@ class KingdomQueueService {
 
             $buildingExpansion = $buildingExpansionQueue->building->buildingExpansion;
 
-            if (!is_null($buildingExpansion)) {
+            if (! is_null($buildingExpansion)) {
                 $fromSlot = $buildingExpansion->expansion_count;
                 $toSlot = $buildingExpansion->expansion_count + 1;
             }
 
             return [
                 'name' => $buildingExpansionQueue->building->name,
-                'id'   => $buildingExpansionQueue->id,
+                'id' => $buildingExpansionQueue->id,
                 'from_slot' => $fromSlot,
                 'to_slot' => $toSlot,
                 'time_remaining' => now()->diffInSeconds($buildingExpansionQueue->completed_at),
@@ -76,20 +79,22 @@ class KingdomQueueService {
         })->toArray();
     }
 
-    protected function fetchUnitRecruitmentQueues(Kingdom $kingdom): array {
+    protected function fetchUnitRecruitmentQueues(Kingdom $kingdom): array
+    {
         $unitsInQueue = UnitInQueue::where('kingdom_id', $kingdom->id)->get();
 
         return $unitsInQueue->map(function ($unitInQueue) {
             return [
                 'name' => $unitInQueue->unit->name,
-                'id'   => $unitInQueue->id,
+                'id' => $unitInQueue->id,
                 'recruit_amount' => $unitInQueue->amount,
                 'time_remaining' => now()->diffInSeconds($unitInQueue->completed_at),
             ];
         })->toArray();
     }
 
-    protected function fetchUnitMovementQueues(Kingdom $kingdom): array {
+    protected function fetchUnitMovementQueues(Kingdom $kingdom): array
+    {
         $unitMovementQueues = UnitMovementQueue::where('to_kingdom_id', $kingdom->id)->orWhere('from_kingdom_id', $kingdom->id)->get();
 
         return $this->manager->createData(

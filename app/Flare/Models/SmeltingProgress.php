@@ -4,8 +4,8 @@ namespace App\Flare\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class SmeltingProgress extends Model {
-
+class SmeltingProgress extends Model
+{
     protected $table = 'smelting_progress';
 
     /**
@@ -27,16 +27,18 @@ class SmeltingProgress extends Model {
      * @var array
      */
     protected $casts = [
-        'started_at'      => 'datetime',
-        'completed_at'    => 'datetime',
+        'started_at' => 'datetime',
+        'completed_at' => 'datetime',
         'amount_to_smelt' => 'integer',
     ];
 
-    public function character() {
+    public function character()
+    {
         return $this->belongsTo(Character::class, 'character_id', 'id');
     }
 
-    public function kingdom() {
+    public function kingdom()
+    {
         return $this->belongsTo(Kingdom::class, 'kingdom_id', 'id');
     }
 }

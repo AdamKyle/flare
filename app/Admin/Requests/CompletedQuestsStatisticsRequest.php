@@ -7,13 +7,15 @@ use Illuminate\Foundation\Http\FormRequest;
 /**
  * @codeCoverageIgnore
  */
-class CompletedQuestsStatisticsRequest extends FormRequest {
+class CompletedQuestsStatisticsRequest extends FormRequest
+{
     /**
      * Determine if the user is authorized to make this request.
      *
      * @return bool
      */
-    public function authorize() {
+    public function authorize()
+    {
         return true;
     }
 
@@ -22,9 +24,10 @@ class CompletedQuestsStatisticsRequest extends FormRequest {
      *
      * @return array
      */
-    public function rules() {
+    public function rules()
+    {
         return [
-            'type'  => 'required|in:quest,guide_quest',
+            'type' => 'required|in:quest,guide_quest',
             'limit' => 'integer|nullable',
             'filter' => 'in:most,some,least|nullable',
         ];
@@ -35,7 +38,8 @@ class CompletedQuestsStatisticsRequest extends FormRequest {
      *
      * @return array
      */
-    public function messages() {
+    public function messages()
+    {
         return [
             'type' => 'Invalid option',
             'limit' => 'Invalid limit',

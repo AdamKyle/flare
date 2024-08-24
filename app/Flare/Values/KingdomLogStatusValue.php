@@ -4,40 +4,52 @@ namespace App\Flare\Values;
 
 use Exception;
 
-class KingdomLogStatusValue {
-
+class KingdomLogStatusValue
+{
     /**
-     * @var string $value
+     * @var string
      */
     private $value;
 
-    const ATTACKED            = 0;
-    const LOST                = 1;
-    const TAKEN               = 2;
-    const LOST_KINGDOM        = 3;
-    const KINGDOM_ATTACKED    = 4;
-    const UNITS_RETURNING     = 5;
-    const BOMBS_DROPPED       = 6;
-    const OVER_POPULATED      = 7;
-    const NOT_WALKED          = 8;
+    const ATTACKED = 0;
+
+    const LOST = 1;
+
+    const TAKEN = 2;
+
+    const LOST_KINGDOM = 3;
+
+    const KINGDOM_ATTACKED = 4;
+
+    const UNITS_RETURNING = 5;
+
+    const BOMBS_DROPPED = 6;
+
+    const OVER_POPULATED = 7;
+
+    const NOT_WALKED = 8;
+
     const RESOURCES_REQUESTED = 9;
-    const RESOURCES_LOST      = 10;
+
+    const RESOURCES_LOST = 10;
+
     const CAPITAL_CITY_BUILDING_REQUEST = 11;
+
     const CAPITAL_CITY_UNIT_REQUEST = 12;
 
     /**
-     * @var string[] $values
+     * @var string[]
      */
     protected static $values = [
-        self::ATTACKED            => 0,
-        self::LOST                => 1,
-        self::TAKEN               => 2,
-        self::LOST_KINGDOM        => 3,
-        self::KINGDOM_ATTACKED    => 4,
-        self::UNITS_RETURNING     => 5,
-        self::BOMBS_DROPPED       => 6,
-        self::OVER_POPULATED      => 7,
-        self::NOT_WALKED          => 8,
+        self::ATTACKED => 0,
+        self::LOST => 1,
+        self::TAKEN => 2,
+        self::LOST_KINGDOM => 3,
+        self::KINGDOM_ATTACKED => 4,
+        self::UNITS_RETURNING => 5,
+        self::BOMBS_DROPPED => 6,
+        self::OVER_POPULATED => 7,
+        self::NOT_WALKED => 8,
         self::RESOURCES_REQUESTED => 9,
         self::CAPITAL_CITY_BUILDING_REQUEST => 11,
         self::CAPITAL_CITY_UNIT_REQUEST => 12,
@@ -48,12 +60,12 @@ class KingdomLogStatusValue {
      *
      * Throws if the value does not exist in the array of const values.
      *
-     * @param int $value
      * @throws Exception
      */
-    public function __construct(int $value) {
-        if (!in_array($value, self::$values)) {
-            throw new Exception($value . ' does not exist.');
+    public function __construct(int $value)
+    {
+        if (! in_array($value, self::$values)) {
+            throw new Exception($value.' does not exist.');
         }
 
         $this->value = $value;
@@ -61,109 +73,97 @@ class KingdomLogStatusValue {
 
     /**
      * Attacked?
-     *
-     * @return bool
      */
-    public function attackedKingdom(): bool {
+    public function attackedKingdom(): bool
+    {
         return $this->value === self::ATTACKED;
     }
 
     /**
      * Lost the attack?
-     *
-     * @return bool
      */
-    public function lostAttack(): bool {
+    public function lostAttack(): bool
+    {
         return $this->value === self::LOST;
     }
 
     /**
      * Took the kingdom?
-     *
-     * @return bool
      */
-    public function tookKingdom(): bool {
+    public function tookKingdom(): bool
+    {
         return $this->value === self::TAKEN;
     }
 
     /**
      * Was defending kingdom attacked?
-     *
-     * @return bool
      */
-    public function kingdomWasAttacked(): bool {
+    public function kingdomWasAttacked(): bool
+    {
         return $this->value === self::KINGDOM_ATTACKED;
     }
 
     /**
      * Was defending kingdom lost?
-     *
-     * @return bool
      */
-    public function lostKingdom(): bool {
+    public function lostKingdom(): bool
+    {
         return $this->value === self::LOST_KINGDOM;
     }
 
     /**
      * Are units returning?
-     *
-     * @return bool
      */
-    public function unitsReturning(): bool {
+    public function unitsReturning(): bool
+    {
         return $this->value === self::UNITS_RETURNING;
     }
 
     /**
      * Were the bombs dropped?
-     *
-     * @return bool
      */
-    public function bombsDropped(): bool {
+    public function bombsDropped(): bool
+    {
         return $this->value === self::BOMBS_DROPPED;
     }
 
     /**
      * Were we overpopulated?
-     *
-     * @return bool
      */
-    public function overPopulated(): bool {
+    public function overPopulated(): bool
+    {
         return $this->value === self::OVER_POPULATED;
     }
 
     /**
      * Has the kingdom not been walked?
-     *
-     * @return bool
      */
-    public function notWalked(): bool {
+    public function notWalked(): bool
+    {
         return $this->value === self::NOT_WALKED;
     }
 
     /**
      * Did we request resources?
-     *
-     * @return bool
      */
-    public function requestedResources(): bool {
+    public function requestedResources(): bool
+    {
         return $this->value === self::RESOURCES_REQUESTED;
     }
 
     /**
      * Did we get a capital city request?
-     *
-     * @return bool
      */
-    public function capitalCityBuildingRequest(): bool {
+    public function capitalCityBuildingRequest(): bool
+    {
         return $this->value === self::CAPITAL_CITY_BUILDING_REQUEST;
     }
 
     /**
      * Did we get a capital city request?
-     *
-     * @return bool
      */
-    public function capitalCityUnitRequest(): bool {
+    public function capitalCityUnitRequest(): bool
+    {
         return $this->value === self::CAPITAL_CITY_UNIT_REQUEST;
     }
 }

@@ -2,19 +2,19 @@
 
 namespace Tests\Unit\Game\Gems\Services;
 
-use Tests\TestCase;
 use App\Flare\Models\Gem;
 use App\Flare\Models\Item;
+use App\Game\Gems\Services\GemComparison;
+use App\Game\Gems\Values\GemTypeValue;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Setup\Character\CharacterFactory;
+use Tests\TestCase;
 use Tests\Traits\CreateGem;
 use Tests\Traits\CreateItem;
-use App\Game\Gems\Values\GemTypeValue;
-use Tests\Setup\Character\CharacterFactory;
-use App\Game\Gems\Services\GemComparison;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 
-class GemComparisonTest extends TestCase {
-
-    use CreateItem, CreateGem, RefreshDatabase;
+class GemComparisonTest extends TestCase
+{
+    use CreateGem, CreateItem, RefreshDatabase;
 
     private ?Item $item;
 
@@ -24,38 +24,39 @@ class GemComparisonTest extends TestCase {
 
     private ?GemComparison $gemComparisonService;
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
         $item = $this->createItem([
-            'socket_count' => 2
+            'socket_count' => 2,
         ]);
 
         $gem = $this->createGem([
-            'name'                       => 'Sample',
-            'tier'                       => 4,
-            'primary_atonement_type'     => GemTypeValue::FIRE,
-            'secondary_atonement_type'   => GemTypeValue::ICE,
-            'tertiary_atonement_type'    => GemTypeValue::WATER,
-            'primary_atonement_amount'   => 0.10,
+            'name' => 'Sample',
+            'tier' => 4,
+            'primary_atonement_type' => GemTypeValue::FIRE,
+            'secondary_atonement_type' => GemTypeValue::ICE,
+            'tertiary_atonement_type' => GemTypeValue::WATER,
+            'primary_atonement_amount' => 0.10,
             'secondary_atonement_amount' => 0.25,
-            'tertiary_atonement_amount'  => 0.45,
+            'tertiary_atonement_amount' => 0.45,
         ]);
 
         $this->gemToAdd = $this->createGem([
-            'name'                       => 'Sample',
-            'tier'                       => 4,
-            'primary_atonement_type'     => GemTypeValue::FIRE,
-            'secondary_atonement_type'   => GemTypeValue::ICE,
-            'tertiary_atonement_type'    => GemTypeValue::WATER,
-            'primary_atonement_amount'   => 0.18,
+            'name' => 'Sample',
+            'tier' => 4,
+            'primary_atonement_type' => GemTypeValue::FIRE,
+            'secondary_atonement_type' => GemTypeValue::ICE,
+            'tertiary_atonement_type' => GemTypeValue::WATER,
+            'primary_atonement_amount' => 0.18,
             'secondary_atonement_amount' => 0.28,
-            'tertiary_atonement_amount'  => 0.25,
+            'tertiary_atonement_amount' => 0.25,
         ]);
 
         $item->sockets()->create([
             'item_id' => $item->id,
-            'gem_id'  => $gem->id,
+            'gem_id' => $gem->id,
         ]);
 
         $this->item = $item->refresh();
@@ -65,7 +66,8 @@ class GemComparisonTest extends TestCase {
         $this->gemComparisonService = resolve(GemComparison::class);
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
 
         $this->item = null;
@@ -75,7 +77,8 @@ class GemComparisonTest extends TestCase {
         $this->gemComparisonService = null;
     }
 
-    public function testReturnsErrorMessageWhenItemDoesNotExist() {
+    public function testReturnsErrorMessageWhenItemDoesNotExist()
+    {
         $character = $this->characterFactory->getCharacter();
 
         $result = $this->gemComparisonService->compareGemForItem($character, rand(1000, 5000), rand(1000, 5000));
@@ -84,7 +87,8 @@ class GemComparisonTest extends TestCase {
         $this->assertEquals($result['status'], 422);
     }
 
-    public function testReturnsErrorMessageWhenGemDoesNotExist() {
+    public function testReturnsErrorMessageWhenGemDoesNotExist()
+    {
         $character = $this->characterFactory->inventoryManagement()->giveItem($this->item)->getCharacter();
 
         $result = $this->gemComparisonService->compareGemForItem($character, $character->inventory->slots->first()->id, rand(1000, 5000));
@@ -93,7 +97,8 @@ class GemComparisonTest extends TestCase {
         $this->assertEquals($result['status'], 422);
     }
 
-    public function testWhenComparingAGemToNoGemsOnItem() {
+    public function testWhenComparingAGemToNoGemsOnItem()
+    {
         $item = $this->createItem();
         $gem = $this->createGem();
 
@@ -101,8 +106,8 @@ class GemComparisonTest extends TestCase {
 
         $character->gemBag->gemSlots()->create([
             'gem_bag_id' => $character->gemBag->id,
-            'gem_id'     => $gem->id,
-            'amount'     => 1,
+            'gem_id' => $gem->id,
+            'amount' => 1,
         ]);
 
         $character = $character->refresh();
@@ -117,18 +122,19 @@ class GemComparisonTest extends TestCase {
         $this->assertEmpty($result['if_replaced']);
     }
 
-    public function testWhenComparingGemsToGemsOnAnItem() {
+    public function testWhenComparingGemsToGemsOnAnItem()
+    {
         $this->item->sockets()->create([
             'item_id' => $this->item->id,
-            'gem_id'  => $this->createGem([
-                'name'                       => 'Sample VR',
-                'tier'                       => 4,
-                'primary_atonement_type'     => GemTypeValue::FIRE,
-                'secondary_atonement_type'   => GemTypeValue::ICE,
-                'tertiary_atonement_type'    => GemTypeValue::WATER,
-                'primary_atonement_amount'   => 0.10,
+            'gem_id' => $this->createGem([
+                'name' => 'Sample VR',
+                'tier' => 4,
+                'primary_atonement_type' => GemTypeValue::FIRE,
+                'secondary_atonement_type' => GemTypeValue::ICE,
+                'tertiary_atonement_type' => GemTypeValue::WATER,
+                'primary_atonement_amount' => 0.10,
                 'secondary_atonement_amount' => 0.26,
-                'tertiary_atonement_amount'  => 0.45,
+                'tertiary_atonement_amount' => 0.45,
             ])->id,
         ]);
 
@@ -138,8 +144,8 @@ class GemComparisonTest extends TestCase {
 
         $character->gemBag->gemSlots()->create([
             'gem_bag_id' => $character->gemBag->id,
-            'gem_id'     => $this->gemToAdd->id,
-            'amount'     => 1,
+            'gem_id' => $this->gemToAdd->id,
+            'amount' => 1,
         ]);
 
         $character = $character->refresh();

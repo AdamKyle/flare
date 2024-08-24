@@ -2,10 +2,10 @@
 
 namespace App\Flare\Values;
 
-class AutomationType {
-
+class AutomationType
+{
     /**
-     * @var string $value
+     * @var string
      */
     private $value;
 
@@ -14,7 +14,7 @@ class AutomationType {
     const PVP_MONTHLY = 1;
 
     /**
-     * @var int[] $values
+     * @var int[]
      */
     protected static $values = [
         0 => self::EXPLORING,
@@ -24,30 +24,26 @@ class AutomationType {
     /**
      * Throws if the value does not exist in the array of const values.
      *
-     * @param string $value
+     * @param  string  $value
+     *
      * @throws \Exception
      */
     public function __construct(int $value)
     {
-        if (!in_array($value, self::$values)) {
-            throw new \Exception($value . ' does not exist.');
+        if (! in_array($value, self::$values)) {
+            throw new \Exception($value.' does not exist.');
         }
 
         $this->value = $value;
     }
 
-    /**
-     * @return bool
-     */
-    public function isExploring(): bool {
+    public function isExploring(): bool
+    {
         return $this->value === self::EXPLORING;
     }
 
-    /**
-     * @return bool
-     */
-    public function isInPvpMonthly(): bool {
+    public function isInPvpMonthly(): bool
+    {
         return $this->value === self::PVP_MONTHLY;
     }
-
 }

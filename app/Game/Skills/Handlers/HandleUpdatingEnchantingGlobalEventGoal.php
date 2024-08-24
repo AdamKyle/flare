@@ -2,46 +2,39 @@
 
 namespace App\Game\Skills\Handlers;
 
-use App\Flare\Models\InventorySlot;
-use App\Game\Events\Events\UpdateEventGoalCurrentProgressForCharacter;
-use Exception;
-use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 use App\Flare\Builders\RandomAffixGenerator;
 use App\Flare\Models\Character;
 use App\Flare\Models\Event;
 use App\Flare\Models\GlobalEventCraftingInventorySlot;
 use App\Flare\Models\GlobalEventGoal;
+use App\Flare\Models\InventorySlot;
 use App\Game\Events\Concerns\UpdateCharacterEventGoalParticipation;
+use App\Game\Events\Events\UpdateEventGoalCurrentProgressForCharacter;
 use App\Game\Events\Events\UpdateEventGoalProgress;
 use App\Game\Events\Handlers\BaseGlobalEventGoalParticipationHandler;
 use App\Game\Events\Services\EventGoalsService;
 use App\Game\Events\Values\GlobalEventSteps;
+use Exception;
+use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 
-
-class HandleUpdatingEnchantingGlobalEventGoal extends BaseGlobalEventGoalParticipationHandler {
-
+class HandleUpdatingEnchantingGlobalEventGoal extends BaseGlobalEventGoalParticipationHandler
+{
     use UpdateCharacterEventGoalParticipation;
 
     private bool $wasItemAccepted = false;
 
-    /**
-     * @param RandomAffixGenerator $randomAffixGenerator
-     * @param EventGoalsService $eventGoalsService
-     */
-    public function __construct(RandomAffixGenerator $randomAffixGenerator, EventGoalsService $eventGoalsService) {
+    public function __construct(RandomAffixGenerator $randomAffixGenerator, EventGoalsService $eventGoalsService)
+    {
         parent::__construct($randomAffixGenerator, $eventGoalsService);
     }
-
 
     /**
      * Handle updating crafting global event goal.
      *
-     * @param Character $character
-     * @param InventorySlot|GlobalEventCraftingInventorySlot $slot
-     * @return void
      * @throws Exception
      */
-    public function handleUpdatingEnchantingGlobalEventGoal(Character $character, InventorySlot|GlobalEventCraftingInventorySlot $slot): void {
+    public function handleUpdatingEnchantingGlobalEventGoal(Character $character, InventorySlot|GlobalEventCraftingInventorySlot $slot): void
+    {
 
         $event = Event::where('current_event_goal_step', GlobalEventSteps::ENCHANT)->first();
 
@@ -60,7 +53,7 @@ class HandleUpdatingEnchantingGlobalEventGoal extends BaseGlobalEventGoalPartici
         $this->handleUpdatingParticipation($character, $globalEventGoal, 'enchants');
 
         $globalEventGoal = $globalEventGoal->refresh();
-        $character       = $character->refresh();
+        $character = $character->refresh();
 
         if ($globalEventGoal->total_enchants >= $globalEventGoal->next_reward_at) {
             $newAmount = $globalEventGoal->next_reward_at + $globalEventGoal->reward_every;
@@ -85,10 +78,9 @@ class HandleUpdatingEnchantingGlobalEventGoal extends BaseGlobalEventGoalPartici
 
     /**
      * Did we hand over the item?
-     *
-     * @return bool
      */
-    public function handedOverItem(): bool {
+    public function handedOverItem(): bool
+    {
         return $this->wasItemAccepted;
     }
 }

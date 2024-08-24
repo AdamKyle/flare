@@ -4,11 +4,10 @@ namespace Tests\Unit\Game\NpcActions\QueenOfHeartsActions\Services;
 
 use App\Flare\Values\RandomAffixDetails;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
-use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Game\NpcActions\QueenOfHeartsActions\Services\ReRollEnchantmentService;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
@@ -17,48 +16,53 @@ use Tests\Traits\CreateGem;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateItemAffix;
 
-class ReRollEnchantmentServiceTest extends TestCase {
-
-    use RefreshDatabase, CreateItem, CreateGameMap, CreateItemAffix, CreateGem;
+class ReRollEnchantmentServiceTest extends TestCase
+{
+    use CreateGameMap, CreateGem, CreateItem, CreateItemAffix, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
     private ?ReRollEnchantmentService $reRollEnchantmentService;
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
 
         parent::setUp();
 
-        $this->character = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
+        $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
         $this->reRollEnchantmentService = resolve(ReRollEnchantmentService::class);
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
 
-        $this->character                = null;
+        $this->character = null;
         $this->reRollEnchantmentService = null;
     }
 
-    public function testCanAffordForAllEnchantments() {
+    public function testCanAffordForAllEnchantments()
+    {
         $character = $this->character->getCharacter();
 
         $this->assertFalse($this->reRollEnchantmentService->canAfford($character, 'everything', 'all-enchantments'));
     }
 
-    public function testCanAffordForRegularReRoll() {
+    public function testCanAffordForRegularReRoll()
+    {
         $character = $this->character->getCharacter();
 
         $this->assertFalse($this->reRollEnchantmentService->canAfford($character, '', ''));
     }
 
-    public function testDoReRoll() {
+    public function testDoReRoll()
+    {
         $character = $this->character->getCharacter();
-        $item      = $this->createItem([
-            'type'           => 'weapon',
+        $item = $this->createItem([
+            'type' => 'weapon',
             'item_prefix_id' => $this->createItemAffix([
                 'randomly_generated' => true,
-                'cost' => RandomAffixDetails::BASIC
+                'cost' => RandomAffixDetails::BASIC,
             ])->id,
             'is_mythic' => false,
         ]);
@@ -72,17 +76,18 @@ class ReRollEnchantmentServiceTest extends TestCase {
         $this->assertNotEquals(json_encode($originalAffix), json_encode($newItemAffix));
     }
 
-    public function testDoReRollForEverything() {
+    public function testDoReRollForEverything()
+    {
         $character = $this->character->getCharacter();
-        $item      = $this->createItem([
-            'type'           => 'weapon',
+        $item = $this->createItem([
+            'type' => 'weapon',
             'item_prefix_id' => $this->createItemAffix([
                 'randomly_generated' => true,
-                'cost' => RandomAffixDetails::BASIC
+                'cost' => RandomAffixDetails::BASIC,
             ])->id,
             'item_suffix_id' => $this->createItemAffix([
                 'randomly_generated' => true,
-                'cost' => RandomAffixDetails::BASIC
+                'cost' => RandomAffixDetails::BASIC,
             ])->id,
             'is_mythic' => false,
         ]);
@@ -96,17 +101,18 @@ class ReRollEnchantmentServiceTest extends TestCase {
         $this->assertNotEquals(json_encode($originalAffix), json_encode($newItemAffix));
     }
 
-    public function testDoReRollForPrefix() {
+    public function testDoReRollForPrefix()
+    {
         $character = $this->character->getCharacter();
-        $item      = $this->createItem([
-            'type'           => 'weapon',
+        $item = $this->createItem([
+            'type' => 'weapon',
             'item_prefix_id' => $this->createItemAffix([
                 'randomly_generated' => true,
-                'cost' => RandomAffixDetails::BASIC
+                'cost' => RandomAffixDetails::BASIC,
             ])->id,
             'item_suffix_id' => $this->createItemAffix([
                 'randomly_generated' => true,
-                'cost' => RandomAffixDetails::BASIC
+                'cost' => RandomAffixDetails::BASIC,
             ])->id,
             'is_mythic' => false,
         ]);
@@ -120,17 +126,18 @@ class ReRollEnchantmentServiceTest extends TestCase {
         $this->assertNotEquals(json_encode($originalAffix), json_encode($newItemAffix));
     }
 
-    public function testDoReRollForPrefixEffectingBaseStats() {
+    public function testDoReRollForPrefixEffectingBaseStats()
+    {
         $character = $this->character->getCharacter();
-        $item      = $this->createItem([
-            'type'           => 'weapon',
+        $item = $this->createItem([
+            'type' => 'weapon',
             'item_prefix_id' => $this->createItemAffix([
                 'randomly_generated' => true,
-                'cost' => RandomAffixDetails::BASIC
+                'cost' => RandomAffixDetails::BASIC,
             ])->id,
             'item_suffix_id' => $this->createItemAffix([
                 'randomly_generated' => true,
-                'cost' => RandomAffixDetails::BASIC
+                'cost' => RandomAffixDetails::BASIC,
             ])->id,
             'is_mythic' => false,
         ]);
@@ -144,37 +151,40 @@ class ReRollEnchantmentServiceTest extends TestCase {
         $this->assertNotEquals(json_encode($originalAffix), json_encode($newItemAffix));
     }
 
-    public function testCanAffordTheMovementCost() {
-        $item      = $this->createItem([
-            'type'           => 'weapon',
+    public function testCanAffordTheMovementCost()
+    {
+        $item = $this->createItem([
+            'type' => 'weapon',
             'item_prefix_id' => $this->createItemAffix([
-                'randomly_generated' => true
+                'randomly_generated' => true,
             ])->id,
         ]);
 
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
 
-        $slot      = $character->inventory->slots->filter(function($slot) {
+        $slot = $character->inventory->slots->filter(function ($slot) {
             return $slot->item->is_unique;
         })->first();
 
         $this->assertFalse($this->reRollEnchantmentService->canAffordMovementCost($character, $slot->item->id, 'all-enchantments'));
     }
 
-    public function testGetMovementCostForNonExistentItem() {
+    public function testGetMovementCostForNonExistentItem()
+    {
         $result = $this->reRollEnchantmentService->getMovementCosts(1, 'all-enchantments');
 
         $this->assertEmpty($result);
     }
 
-    public function testGetMovementFromCostsForAllEnchantments() {
-        $item      = $this->createItem([
-            'type'           => 'weapon',
+    public function testGetMovementFromCostsForAllEnchantments()
+    {
+        $item = $this->createItem([
+            'type' => 'weapon',
             'item_prefix_id' => $this->createItemAffix([
                 'randomly_generated' => true,
-                'cost' => RandomAffixDetails::BASIC
+                'cost' => RandomAffixDetails::BASIC,
             ])->id,
-            'cost' => RandomAffixDetails::BASIC
+            'cost' => RandomAffixDetails::BASIC,
         ]);
 
         $result = $this->reRollEnchantmentService->getMovementCosts($item->id, 'all-enchantments');
@@ -183,14 +193,15 @@ class ReRollEnchantmentServiceTest extends TestCase {
         $this->assertGreaterThan(0, $result['shards_cost']);
     }
 
-    public function testGetMovementFromCostsForPrefix() {
-        $item      = $this->createItem([
-            'type'           => 'weapon',
+    public function testGetMovementFromCostsForPrefix()
+    {
+        $item = $this->createItem([
+            'type' => 'weapon',
             'item_prefix_id' => $this->createItemAffix([
                 'randomly_generated' => true,
-                'cost' => RandomAffixDetails::BASIC
+                'cost' => RandomAffixDetails::BASIC,
             ])->id,
-            'cost' => RandomAffixDetails::BASIC
+            'cost' => RandomAffixDetails::BASIC,
         ]);
 
         $result = $this->reRollEnchantmentService->getMovementCosts($item->id, 'prefix');
@@ -199,41 +210,42 @@ class ReRollEnchantmentServiceTest extends TestCase {
         $this->assertGreaterThan(0, $result['shards_cost']);
     }
 
-    public function testMoveAllAffixes() {
+    public function testMoveAllAffixes()
+    {
         Event::fake();
 
-        $item      = $this->createItem([
-            'type'           => 'weapon',
+        $item = $this->createItem([
+            'type' => 'weapon',
             'item_prefix_id' => $this->createItemAffix([
-                'type'               => 'prefix',
-                'randomly_generated' => true
+                'type' => 'prefix',
+                'randomly_generated' => true,
             ])->id,
             'item_suffix_id' => $this->createItemAffix([
-                'type'               => 'suffix',
-                'randomly_generated' => true
+                'type' => 'suffix',
+                'randomly_generated' => true,
             ])->id,
         ]);
 
         $secondItem = $this->createItem([
             'type' => 'weapon',
             'item_prefix_id' => $this->createItemAffix([
-                'type'               => 'prefix',
-                'randomly_generated' => false
+                'type' => 'prefix',
+                'randomly_generated' => false,
             ])->id,
             'item_suffix_id' => $this->createItemAffix([
-                'type'               => 'suffix',
-                'randomly_generated' => false
+                'type' => 'suffix',
+                'randomly_generated' => false,
             ])->id,
         ]);
 
         $character = $this->character->inventoryManagement()->giveItem($item)->giveItem($secondItem)->getCharacter();
 
-        $slotUnique    = $character->inventory->slots->filter(function($slot) {
+        $slotUnique = $character->inventory->slots->filter(function ($slot) {
             return $slot->item->is_unique;
         })->first();
 
-        $slotNotUnique = $character->inventory->slots->filter(function($slot) {
-            return !$slot->item->is_unique;
+        $slotNotUnique = $character->inventory->slots->filter(function ($slot) {
+            return ! $slot->item->is_unique;
         })->first();
 
         $this->reRollEnchantmentService->moveAffixes($character, $slotUnique, $slotNotUnique, 'all-enchantments');
@@ -243,18 +255,19 @@ class ReRollEnchantmentServiceTest extends TestCase {
         Event::assertDispatched(GlobalMessageEvent::class);
     }
 
-    public function testMoveAllAffixesWhenOneItemHasGems() {
+    public function testMoveAllAffixesWhenOneItemHasGems()
+    {
         Event::fake();
 
-        $item      = $this->createItem([
-            'type'           => 'weapon',
+        $item = $this->createItem([
+            'type' => 'weapon',
             'item_prefix_id' => $this->createItemAffix([
-                'type'               => 'prefix',
-                'randomly_generated' => true
+                'type' => 'prefix',
+                'randomly_generated' => true,
             ])->id,
             'item_suffix_id' => $this->createItemAffix([
-                'type'               => 'suffix',
-                'randomly_generated' => true
+                'type' => 'suffix',
+                'randomly_generated' => true,
             ])->id,
         ]);
 
@@ -272,23 +285,23 @@ class ReRollEnchantmentServiceTest extends TestCase {
         $secondItem = $this->createItem([
             'type' => 'weapon',
             'item_prefix_id' => $this->createItemAffix([
-                'type'               => 'prefix',
-                'randomly_generated' => false
+                'type' => 'prefix',
+                'randomly_generated' => false,
             ])->id,
             'item_suffix_id' => $this->createItemAffix([
-                'type'               => 'suffix',
-                'randomly_generated' => false
+                'type' => 'suffix',
+                'randomly_generated' => false,
             ])->id,
         ]);
 
         $character = $this->character->inventoryManagement()->giveItem($item)->giveItem($secondItem)->getCharacter();
 
-        $slotUnique    = $character->inventory->slots->filter(function($slot) {
+        $slotUnique = $character->inventory->slots->filter(function ($slot) {
             return $slot->item->is_unique;
         })->first();
 
-        $slotNotUnique = $character->inventory->slots->filter(function($slot) {
-            return !$slot->item->is_unique;
+        $slotNotUnique = $character->inventory->slots->filter(function ($slot) {
+            return ! $slot->item->is_unique;
         })->first();
 
         $this->reRollEnchantmentService->moveAffixes($character, $slotUnique, $slotNotUnique, 'all-enchantments');
@@ -298,37 +311,38 @@ class ReRollEnchantmentServiceTest extends TestCase {
         Event::assertDispatched(GlobalMessageEvent::class);
     }
 
-    public function testMoveAllAffixesWhenItemOnlyHasOneAffix() {
+    public function testMoveAllAffixesWhenItemOnlyHasOneAffix()
+    {
         Event::fake();
 
-        $item      = $this->createItem([
-            'type'           => 'weapon',
+        $item = $this->createItem([
+            'type' => 'weapon',
             'item_prefix_id' => $this->createItemAffix([
-                'type'               => 'prefix',
-                'randomly_generated' => true
+                'type' => 'prefix',
+                'randomly_generated' => true,
             ])->id,
         ]);
 
         $secondItem = $this->createItem([
             'type' => 'weapon',
             'item_prefix_id' => $this->createItemAffix([
-                'type'               => 'prefix',
-                'randomly_generated' => false
+                'type' => 'prefix',
+                'randomly_generated' => false,
             ])->id,
             'item_suffix_id' => $this->createItemAffix([
-                'type'               => 'suffix',
-                'randomly_generated' => false
+                'type' => 'suffix',
+                'randomly_generated' => false,
             ])->id,
         ]);
 
         $character = $this->character->inventoryManagement()->giveItem($item)->giveItem($secondItem)->getCharacter();
 
-        $slotUnique    = $character->inventory->slots->filter(function($slot) {
+        $slotUnique = $character->inventory->slots->filter(function ($slot) {
             return $slot->item->is_unique;
         })->first();
 
-        $slotNotUnique = $character->inventory->slots->filter(function($slot) {
-            return !$slot->item->is_unique;
+        $slotNotUnique = $character->inventory->slots->filter(function ($slot) {
+            return ! $slot->item->is_unique;
         })->first();
 
         $this->reRollEnchantmentService->moveAffixes($character, $slotUnique, $slotNotUnique, 'all-enchantments');
@@ -338,41 +352,42 @@ class ReRollEnchantmentServiceTest extends TestCase {
         Event::assertDispatched(GlobalMessageEvent::class);
     }
 
-    public function testMoveSpecificAffix() {
+    public function testMoveSpecificAffix()
+    {
         Event::fake();
 
-        $item      = $this->createItem([
-            'type'           => 'weapon',
+        $item = $this->createItem([
+            'type' => 'weapon',
             'item_prefix_id' => $this->createItemAffix([
-                'type'               => 'prefix',
-                'randomly_generated' => true
+                'type' => 'prefix',
+                'randomly_generated' => true,
             ])->id,
             'item_suffix_id' => $this->createItemAffix([
-                'type'               => 'suffix',
-                'randomly_generated' => true
+                'type' => 'suffix',
+                'randomly_generated' => true,
             ])->id,
         ]);
 
         $secondItem = $this->createItem([
             'type' => 'weapon',
             'item_prefix_id' => $this->createItemAffix([
-                'type'               => 'prefix',
-                'randomly_generated' => false
+                'type' => 'prefix',
+                'randomly_generated' => false,
             ])->id,
             'item_suffix_id' => $this->createItemAffix([
-                'type'               => 'suffix',
-                'randomly_generated' => false
+                'type' => 'suffix',
+                'randomly_generated' => false,
             ])->id,
         ]);
 
         $character = $this->character->inventoryManagement()->giveItem($item)->giveItem($secondItem)->getCharacter();
 
-        $slotUnique    = $character->inventory->slots->filter(function($slot) {
+        $slotUnique = $character->inventory->slots->filter(function ($slot) {
             return $slot->item->is_unique;
         })->first();
 
-        $slotNotUnique = $character->inventory->slots->filter(function($slot) {
-            return !$slot->item->is_unique;
+        $slotNotUnique = $character->inventory->slots->filter(function ($slot) {
+            return ! $slot->item->is_unique;
         })->first();
 
         $this->reRollEnchantmentService->moveAffixes($character, $slotUnique, $slotNotUnique, 'prefix');
@@ -382,38 +397,39 @@ class ReRollEnchantmentServiceTest extends TestCase {
         Event::assertDispatched(GlobalMessageEvent::class);
     }
 
-    public function testMoveSpecificAffixAndDeleteTheSlotWithTheUnique() {
+    public function testMoveSpecificAffixAndDeleteTheSlotWithTheUnique()
+    {
         Event::fake();
 
-        $item      = $this->createItem([
-            'type'           => 'weapon',
+        $item = $this->createItem([
+            'type' => 'weapon',
             'item_prefix_id' => $this->createItemAffix([
-                'type'               => 'prefix',
+                'type' => 'prefix',
                 'randomly_generated' => true,
-                'cost'               => RandomAffixDetails::BASIC,
+                'cost' => RandomAffixDetails::BASIC,
             ])->id,
         ]);
 
         $secondItem = $this->createItem([
             'type' => 'weapon',
             'item_prefix_id' => $this->createItemAffix([
-                'type'               => 'prefix',
-                'randomly_generated' => false
+                'type' => 'prefix',
+                'randomly_generated' => false,
             ])->id,
             'item_suffix_id' => $this->createItemAffix([
-                'type'               => 'suffix',
-                'randomly_generated' => false
+                'type' => 'suffix',
+                'randomly_generated' => false,
             ])->id,
         ]);
 
         $character = $this->character->inventoryManagement()->giveItem($item)->giveItem($secondItem)->getCharacter();
 
-        $slotUnique    = $character->inventory->slots->filter(function($slot) {
+        $slotUnique = $character->inventory->slots->filter(function ($slot) {
             return $slot->item->is_unique;
         })->first();
 
-        $slotNotUnique = $character->inventory->slots->filter(function($slot) {
-            return !$slot->item->is_unique;
+        $slotNotUnique = $character->inventory->slots->filter(function ($slot) {
+            return ! $slot->item->is_unique;
         })->first();
 
         $this->reRollEnchantmentService->moveAffixes($character, $slotUnique, $slotNotUnique, 'prefix');

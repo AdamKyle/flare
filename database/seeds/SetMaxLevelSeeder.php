@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Flare\Models\MaxLevelConfiguration;
 use App\Flare\Models\RankFight;
 use Illuminate\Database\Seeder;
 

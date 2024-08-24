@@ -24,16 +24,17 @@ class ConjureRequest extends FormRequest
     public function rules()
     {
         return [
-            'monster_id'      => 'required|integer',
-            'type'            => 'required|in:public,private',
+            'monster_id' => 'required|integer',
+            'type' => 'required|in:public,private',
         ];
     }
 
-    public function messages() {
+    public function messages()
+    {
         return [
-            'monster_id.required'    => 'What monster are you trying to conjure?',
-            'type.required'          => 'Missing type.',
-            'type.in'                => 'Invalid input.',
+            'monster_id.required' => 'What monster are you trying to conjure?',
+            'type.required' => 'Missing type.',
+            'type.in' => 'Invalid input.',
         ];
     }
 }

@@ -4,8 +4,8 @@ namespace App\Flare\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Faction extends Model {
-
+class Faction extends Model
+{
     /**
      * The attributes that are mass assignable.
      *
@@ -27,17 +27,19 @@ class Faction extends Model {
      * @var array
      */
     protected $casts = [
-        'current_level'  => 'integer',
+        'current_level' => 'integer',
         'current_points' => 'integer',
-        'points_needed'  => 'integer',
-        'maxed'          => 'boolean',
+        'points_needed' => 'integer',
+        'maxed' => 'boolean',
     ];
 
-    public function character() {
+    public function character()
+    {
         return $this->belongsTo(Character::class);
     }
 
-    public function gameMap() {
+    public function gameMap()
+    {
         return $this->belongsTo(GameMap::class, 'game_map_id', 'id');
     }
 }

@@ -29,82 +29,80 @@ use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
 use League\Fractal\Resource\Item;
 
-class CharacterSheetController extends Controller {
-
-    /**
-     * @var Manager $manager
-     */
+class CharacterSheetController extends Controller
+{
     private Manager $manager;
 
-    /**
-     * @var StatModifierDetails
-     */
     private StatModifierDetails $statModifierDetails;
 
-    /**
-     * @param Manager $manager
-     * @param StatModifierDetails $statModifierDetails
-     */
-    public function __construct(Manager $manager, StatModifierDetails $statModifierDetails) {
+    public function __construct(Manager $manager, StatModifierDetails $statModifierDetails)
+    {
         $this->manager = $manager;
         $this->statModifierDetails = $statModifierDetails;
     }
 
-    public function sheet(Character $character, CharacterSheetBaseInfoTransformer $characterSheetBaseInfoTransformer) {
+    public function sheet(Character $character, CharacterSheetBaseInfoTransformer $characterSheetBaseInfoTransformer)
+    {
         $character = new Item($character, $characterSheetBaseInfoTransformer);
-        $sheet     = $this->manager->createData($character)->toArray();
+        $sheet = $this->manager->createData($character)->toArray();
 
         return response()->json([
             'sheet' => $sheet,
         ], 200);
     }
 
-    public function baseCharacterInformation(Character $character, CharacterSheetBaseInfoTransformer $characterBaseInfo) {
+    public function baseCharacterInformation(Character $character, CharacterSheetBaseInfoTransformer $characterBaseInfo)
+    {
         $character = new Item($character, $characterBaseInfo);
-        $details   = $this->manager->createData($character)->toArray();
+        $details = $this->manager->createData($character)->toArray();
 
         return response()->json([
             'base_info' => $details,
         ], 200);
     }
 
-    public function statDetails(Character $character, CharacterStatDetailsTransformer $characterStatDetailsTransformer) {
+    public function statDetails(Character $character, CharacterStatDetailsTransformer $characterStatDetailsTransformer)
+    {
         $character = new Item($character, $characterStatDetailsTransformer);
-        $details   = $this->manager->createData($character)->toArray();
+        $details = $this->manager->createData($character)->toArray();
 
         return response()->json([
             'stat_details' => $details,
         ], 200);
     }
 
-    public function resistanceInfo(Character $character, CharacterResistanceInfoTransformer $characterResistanceInfoTransformer) {
+    public function resistanceInfo(Character $character, CharacterResistanceInfoTransformer $characterResistanceInfoTransformer)
+    {
         $character = new Item($character, $characterResistanceInfoTransformer);
-        $details   = $this->manager->createData($character)->toArray();
+        $details = $this->manager->createData($character)->toArray();
 
         return response()->json([
             'resistance_info' => $details,
         ], 200);
     }
 
-    public function reincarnationInfo(Character $character, CharacterReincarnationInfoTransformer $characterReincarnationInfoTransformer) {
+    public function reincarnationInfo(Character $character, CharacterReincarnationInfoTransformer $characterReincarnationInfoTransformer)
+    {
         $character = new Item($character, $characterReincarnationInfoTransformer);
-        $details   = $this->manager->createData($character)->toArray();
+        $details = $this->manager->createData($character)->toArray();
 
         return response()->json([
             'reincarnation_details' => $details,
         ], 200);
     }
 
-    public function elementalAtonementInfo(Character $character, CharacterElementalAtonementTransformer $characterElementalAtonementTransformer) {
+    public function elementalAtonementInfo(Character $character, CharacterElementalAtonementTransformer $characterElementalAtonementTransformer)
+    {
         $character = new Item($character, $characterElementalAtonementTransformer);
-        $details   = $this->manager->createData($character)->toArray();
+        $details = $this->manager->createData($character)->toArray();
 
         return response()->json([
             'elemental_atonement_details' => $details,
         ], 200);
     }
 
-    public function statBreakDown(StatDetailsRequest $request, Character $character) {
+    public function statBreakDown(StatDetailsRequest $request, Character $character)
+    {
         $breakDownDetails = $this->statModifierDetails->setCharacter($character)->forStat($request->stat_type);
 
         return response()->json([
@@ -112,7 +110,8 @@ class CharacterSheetController extends Controller {
         ]);
     }
 
-    public function specificStatBreakDown(SpecificDetailsRequest $request, Character $character) {
+    public function specificStatBreakDown(SpecificDetailsRequest $request, Character $character)
+    {
         $breakDownDetails = $this->statModifierDetails->setCharacter($character)->buildSpecificBreakDown($request->type, $request->is_voided);
 
         return response()->json([
@@ -120,34 +119,39 @@ class CharacterSheetController extends Controller {
         ]);
     }
 
-    public function basicLocationInformation(Character $character) {
+    public function basicLocationInformation(Character $character)
+    {
         return response()->json([
-            'x_position'    => $character->map->character_position_x,
-            'y_position'    => $character->map->character_position_y,
-            'gold'          => $character->gold,
+            'x_position' => $character->map->character_position_x,
+            'y_position' => $character->map->character_position_y,
+            'gold' => $character->gold,
         ]);
     }
 
-    public function nameChange(Request $request, Character $character) {
+    public function nameChange(Request $request, Character $character)
+    {
         $request->validate([
             'name' => ['required', 'string', 'min:5', 'max:15', 'unique:characters', 'regex:/^[a-z\d]+$/i', 'unique:characters'],
         ]);
 
         $character->update([
-            'name'              => $request->name,
+            'name' => $request->name,
             'force_name_change' => false,
         ]);
 
-        $adminUser = User::with('roles')->whereHas('roles', function($q) { $q->where('name', 'Admin'); })->first();
+        $adminUser = User::with('roles')->whereHas('roles', function ($q) {
+            $q->where('name', 'Admin');
+        })->first();
 
         broadcast(new UpdateAdminChatEvent($adminUser));
 
         return response()->json([], 200);
     }
 
-    public function globalTimeOut() {
+    public function globalTimeOut()
+    {
         $timeout = now()->addMinutes(2);
-        $user    = auth()->user();
+        $user = auth()->user();
 
         $user->update([
             'timeout_until' => $timeout,
@@ -160,14 +164,15 @@ class CharacterSheetController extends Controller {
         return response()->json();
     }
 
-    public function activeBoons(Character $character, UsableItemTransformer $usableItemTransformer,  Manager $manager) {
+    public function activeBoons(Character $character, UsableItemTransformer $usableItemTransformer, Manager $manager)
+    {
         $characterBoons = $character->boons->load('itemUsed');
 
-        $characterBoons = $characterBoons->transform(function($boon) use($usableItemTransformer, $manager) {
+        $characterBoons = $characterBoons->transform(function ($boon) use ($usableItemTransformer) {
             $item = new Item($boon->itemUsed, $usableItemTransformer);
-            $item = (new Manager())->createData($item)->toArray();
+            $item = (new Manager)->createData($item)->toArray();
 
-            $item         = $item['data'];
+            $item = $item['data'];
             $item['name'] = $boon->itemUsed->name;
 
             $boon->boon_applied = $item;
@@ -176,17 +181,19 @@ class CharacterSheetController extends Controller {
         });
 
         return response()->json([
-            'active_boons' => $characterBoons
+            'active_boons' => $characterBoons,
         ]);
     }
 
-    public function automations(Character $character) {
+    public function automations(Character $character)
+    {
         return response()->json([
-            'automations' => $character->currentAutomations
+            'automations' => $character->currentAutomations,
         ], 200);
     }
 
-    public function factions(Character $character) {
+    public function factions(Character $character)
+    {
         $winterEvent = Event::where('type', EventType::WINTER_EVENT)->first();
 
         $delusionalEvent = Event::where('type', EventType::DELUSIONAL_MEMORIES_EVENT)->first();
@@ -209,7 +216,7 @@ class CharacterSheetController extends Controller {
 
         $factions = $character->factions()->whereNotIn('game_map_id', $removeGameMaps)->get();
 
-        $factions = $factions->transform(function($faction) {
+        $factions = $factions->transform(function ($faction) {
             $faction->map_name = $faction->gameMap->name;
 
             return $faction;
@@ -220,33 +227,36 @@ class CharacterSheetController extends Controller {
         ]);
     }
 
-    public function skills(Character $character, CharacterPassiveSkills $characterPassiveSkills, SkillsTransformer $skillsTransformer) {
+    public function skills(Character $character, CharacterPassiveSkills $characterPassiveSkills, SkillsTransformer $skillsTransformer)
+    {
 
         $skills = new Collection($character->skills, $skillsTransformer);
         $skills = $this->manager->createData($skills)->toArray();
 
         return response()->json([
-            'skills'   => $skills,
+            'skills' => $skills,
             'passives' => $characterPassiveSkills->getPassiveSkills($character),
         ], 200);
     }
 
-    public function baseInventoryInfo(Character $character) {
+    public function baseInventoryInfo(Character $character)
+    {
         return response()->json([
             'inventory_info' => [
-                'gold'           => number_format($character->gold),
-                'gold_dust'      => number_format($character->gold_dust),
-                'shards'         => number_format($character->shards),
-                'copper_coins'   => number_format($character->copper_coins),
+                'gold' => number_format($character->gold),
+                'gold_dust' => number_format($character->gold_dust),
+                'shards' => number_format($character->shards),
+                'copper_coins' => number_format($character->copper_coins),
                 'inventory_used' => $character->getInventoryCount(),
-                'inventory_max'  => $character->inventory_max,
-                'damage_stat'    => $character->damage_stat,
-                'to_hit_stat'    => $character->class->to_hit_stat,
+                'inventory_max' => $character->inventory_max,
+                'damage_stat' => $character->damage_stat,
+                'to_hit_stat' => $character->class->to_hit_stat,
             ],
         ], 200);
     }
 
-    public function cancelBoon(Character $character, CharacterBoon $boon, UseItemService $useItemService, UsableItemTransformer $usableItemTransformer,  Manager $manager) {
+    public function cancelBoon(Character $character, CharacterBoon $boon, UseItemService $useItemService, UsableItemTransformer $usableItemTransformer, Manager $manager)
+    {
         if ($character->id !== $boon->character_id) {
             return response()->json(['message' => 'You cannot do that.'], 422);
         }
@@ -257,11 +267,11 @@ class CharacterSheetController extends Controller {
 
         $characterBoons = $character->boons->load('itemUsed');
 
-        $characterBoons = $characterBoons->transform(function($boon) use($usableItemTransformer, $manager) {
+        $characterBoons = $characterBoons->transform(function ($boon) use ($usableItemTransformer) {
             $item = new Item($boon->itemUsed, $usableItemTransformer);
-            $item = (new Manager())->createData($item)->toArray();
+            $item = (new Manager)->createData($item)->toArray();
 
-            $item         = $item['data'];
+            $item = $item['data'];
             $item['name'] = $boon->itemUsed->name;
 
             $boon->boon_applied = $item;

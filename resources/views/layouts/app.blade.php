@@ -28,7 +28,13 @@
     <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
 
-    @vite('resources/sass/app.scss')
+    @auth
+        @if(auth()->user()->hasRole('Admin'))
+            <script src="https://cdn.jsdelivr.net/gh/mcstudios/glightbox/dist/js/glightbox.min.js"></script>
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css" />
+        @endif
+    @endauth
+
     @vite('resources/css/tailwind.css')
 
     @livewireStyles
@@ -141,7 +147,7 @@
             @yield('content')
         @endauth
 
-    @guest;
+    @guest
         </main>
     @endguest
     <!-- Scripts -->
@@ -153,8 +159,18 @@
     @if (!is_null(auth()->user()))
         @if (!auth()->user()->hasRole('Admin'))
             @vite('resources/js/app.ts')
+
+                        <script>
+                            setInterval(() => {
+                                fetch('/api/game-heart-beat', { method: 'POST', headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' } });
+                            }, 30000);
+                        </script>
         @else
             @vite('resources/js/admin-app.ts')
+
+            <script>
+                const lightbox = GLightbox();
+            </script>
         @endif
     @endif
 

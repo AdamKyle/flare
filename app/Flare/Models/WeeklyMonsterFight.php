@@ -2,13 +2,12 @@
 
 namespace App\Flare\Models;
 
-use Database\Factories\AnnouncementFactory;
 use Database\Factories\WeeklyMonsterFightFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class WeeklyMonsterFight extends Model {
-
+class WeeklyMonsterFight extends Model
+{
     use HasFactory;
 
     /**
@@ -25,18 +24,21 @@ class WeeklyMonsterFight extends Model {
 
     protected $casts = [
         'character_deaths' => 'integer',
-        'monster_was_killed' => 'boolean'
+        'monster_was_killed' => 'boolean',
     ];
 
-    public function character() {
+    public function character()
+    {
         return $this->belongsTo(Character::class);
     }
 
-    public function monster() {
+    public function monster()
+    {
         return $this->belongsTo(Monster::class);
     }
 
-    protected static function newFactory() {
+    protected static function newFactory()
+    {
         return WeeklyMonsterFightFactory::new();
     }
 }

@@ -12,20 +12,22 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Cache;
 
-class CharacterBoonJob implements ShouldQueue {
+class CharacterBoonJob implements ShouldQueue
+{
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     /**
-     * @var CharacterBoon $characterBoon
+     * @var CharacterBoon
      */
     protected $characterBoon;
 
     /**
      * Create a new job instance.
      *
-     * @param CharacterBoon $characterBoon
+     * @param  CharacterBoon  $characterBoon
      */
-    public function __construct(int $characterBoonId) {
+    public function __construct(int $characterBoonId)
+    {
         $this->characterBoon = $characterBoonId;
     }
 
@@ -34,7 +36,8 @@ class CharacterBoonJob implements ShouldQueue {
      *
      * @return void
      */
-    public function handle(UseItemService $useItemService) {
+    public function handle(UseItemService $useItemService)
+    {
         $boon = CharacterBoon::find($this->characterBoon);
 
         if (is_null($boon)) {
@@ -42,7 +45,7 @@ class CharacterBoonJob implements ShouldQueue {
         }
 
         // @codeCoverageIgnoreStart
-        if (!$boon->complete->lessThanOrEqualTo(now())) {
+        if (! $boon->complete->lessThanOrEqualTo(now())) {
             $timeLeft = $boon->complete->diffInMinutes(now());
 
             if ($timeLeft <= 15) {
@@ -65,7 +68,7 @@ class CharacterBoonJob implements ShouldQueue {
 
         $useItemService->updateCharacter($character->refresh());
 
-        Cache::delete('can-character-survive-' . $character->id);
+        Cache::delete('can-character-survive-'.$character->id);
 
         event(new ServerMessageEvent($character->user, 'A boon (or set of, if stacked) has worn off, your stats (skills) have been adjusted accordingly.'));
     }

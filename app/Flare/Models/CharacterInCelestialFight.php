@@ -2,12 +2,12 @@
 
 namespace App\Flare\Models;
 
+use Database\Factories\CharacterInCelestialFightFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Database\Factories\CharacterInCelestialFightFactory;
 
-class CharacterInCelestialFight extends Model {
-
+class CharacterInCelestialFight extends Model
+{
     use HasFactory;
 
     /**
@@ -28,11 +28,12 @@ class CharacterInCelestialFight extends Model {
      * @var array
      */
     protected $casts = [
-        'character_max_health'     => 'integer',
+        'character_max_health' => 'integer',
         'character_current_health' => 'integer',
     ];
 
-    protected static function newFactory() {
+    protected static function newFactory()
+    {
         return CharacterInCelestialFightFactory::new();
     }
 }

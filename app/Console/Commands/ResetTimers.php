@@ -2,11 +2,12 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Flare\Models\Character;
 use App\Game\Battle\Events\UpdateCharacterStatus;
+use Illuminate\Console\Command;
 
-class ResetTimers extends Command {
+class ResetTimers extends Command
+{
     /**
      * The name and signature of the console command.
      *
@@ -24,14 +25,16 @@ class ResetTimers extends Command {
     /**
      * Execute the console command.
      */
-    public function handle() {
+    public function handle()
+    {
         $this->resetCraftingTimers();
         $this->resetCharacterMovement();
         $this->resetCharacterAttack();
         $this->resetCharacterSpinTimer();
     }
 
-    protected function resetCraftingTimers() {
+    protected function resetCraftingTimers()
+    {
         $characters = Character::whereNotNull('can_craft_again_at')
             ->where('can_craft_again_at', '<', now())
             ->where('can_craft', false)
@@ -40,14 +43,15 @@ class ResetTimers extends Command {
         foreach ($characters as $character) {
             $character->update([
                 'can_craft_again_at' => null,
-                'can_craft'          => true,
+                'can_craft' => true,
             ]);
 
             event(new UpdateCharacterStatus($character->refresh()));
         }
     }
 
-    protected function resetCharacterAttack() {
+    protected function resetCharacterAttack()
+    {
         $characters = Character::whereNotNull('can_attack_again_at')
             ->where('can_attack_again_at', '<', now())
             ->where('can_attack', false)
@@ -63,7 +67,8 @@ class ResetTimers extends Command {
         }
     }
 
-    protected function resetCharacterMovement() {
+    protected function resetCharacterMovement()
+    {
         $characters = Character::whereNotNull('can_move_again_at')
             ->where('can_move_again_at', '<', now())
             ->where('can_move', false)
@@ -79,7 +84,8 @@ class ResetTimers extends Command {
         }
     }
 
-    protected function resetCharacterSpinTimer() {
+    protected function resetCharacterSpinTimer()
+    {
         $characters = Character::whereNotNull('can_spin_again_at')
             ->where('can_spin_again_at', '<', now())
             ->where('can_spin', false)

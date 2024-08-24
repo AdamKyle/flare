@@ -2,37 +2,39 @@
 
 namespace Tests\Unit\Game\BattleRewardProcessing\Services;
 
-use Mockery;
-use Tests\TestCase;
-use Tests\Traits\CreateGameMap;
-use Tests\Traits\CreateMonster;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Event;
+use App\Game\BattleRewardProcessing\Services\SecondaryRewardService;
 use App\Game\Core\Events\UpdateTopBarEvent;
-use Tests\Setup\Character\CharacterFactory;
 use App\Game\Skills\Handlers\UpdateItemSkill;
 use Facades\App\Game\Skills\Handlers\UpdateItemSkill as UpdateItemSkillFacade;
-use App\Game\BattleRewardProcessing\Services\SecondaryRewardService;
-use Tests\Traits\CreateItem;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
+use Mockery;
+use Tests\Setup\Character\CharacterFactory;
+use Tests\TestCase;
+use Tests\Traits\CreateGameMap;
+use Tests\Traits\CreateItem;
+use Tests\Traits\CreateMonster;
 
-class SecondaryRewardServiceTest extends TestCase {
-
-    use CreateMonster, CreateGameMap, CreateItem, RefreshDatabase;
+class SecondaryRewardServiceTest extends TestCase
+{
+    use CreateGameMap, CreateItem, CreateMonster, RefreshDatabase;
 
     private ?SecondaryRewardService $secondaryRewardService;
 
     private ?CharacterFactory $characterFactory;
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
         $this->secondaryRewardService = resolve(SecondaryRewardService::class);
 
-        $this->characterFactory    = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
+        $this->characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
 
         $this->secondaryRewardService = null;
@@ -40,7 +42,8 @@ class SecondaryRewardServiceTest extends TestCase {
         $this->characterFactory = null;
     }
 
-    public function testUpdateTopBarIsNotCalledWhenNotLoggedIn() {
+    public function testUpdateTopBarIsNotCalledWhenNotLoggedIn()
+    {
         $character = $this->characterFactory->getCharacter();
 
         Event::fake();
@@ -50,17 +53,18 @@ class SecondaryRewardServiceTest extends TestCase {
         Event::assertNotDispatched(UpdateTopBarEvent::class);
     }
 
-    public function testUpdateTopBarIsCalledWhenLoggedIn() {
+    public function testUpdateTopBarIsCalledWhenLoggedIn()
+    {
         $character = $this->characterFactory->getCharacter();
 
         DB::table('sessions')->truncate();
 
         DB::table('sessions')->insert([[
-            'id'           => '1',
-            'user_id'      => $character->user->id,
-            'ip_address'   => '1',
-            'user_agent'   => '1',
-            'payload'      => '1',
+            'id' => '1',
+            'user_id' => $character->user->id,
+            'ip_address' => '1',
+            'user_agent' => '1',
+            'payload' => '1',
             'last_activity' => 1602801731,
         ]]);
 
@@ -71,7 +75,8 @@ class SecondaryRewardServiceTest extends TestCase {
         Event::assertDispatched(UpdateTopBarEvent::class);
     }
 
-    public function testItemSkillDoNotsGetUpdated() {
+    public function testItemSkillDoNotsGetUpdated()
+    {
         $mock = Mockery::mock(UpdateItemSkill::class);
 
         $this->app->instance(UpdateItemSkill::class, $mock);
@@ -87,7 +92,8 @@ class SecondaryRewardServiceTest extends TestCase {
         $mock->shouldNotReceive('updateItemSkill');
     }
 
-    public function testItemSkillsGetUpdated() {
+    public function testItemSkillsGetUpdated()
+    {
         UpdateItemSkillFacade::shouldReceive('updateItemSkill')->once()->andReturn(null);
 
         $item = $this->createItem(['type' => 'artifact']);

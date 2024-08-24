@@ -1,9 +1,9 @@
 import React, { Fragment } from "react";
+import CraftingSkillsProps from "./types/tables/crafting-skills-props";
 import SkillType from "./deffinitions/skill-type";
 import InfoAlert from "../../ui/alerts/simple-alerts/info-alert";
-import Table from "../../ui/data-tables/table";
 import SkillInformation from "./modals/skill-information";
-import CraftingSkillsProps from "./types/tables/crafting-skills-props";
+
 
 export default class CraftingSkills extends React.Component<
     CraftingSkillsProps,
@@ -84,6 +84,60 @@ export default class CraftingSkills extends React.Component<
         ];
     }
 
+    renderCraftingSkills(): JSX.Element {
+        const skills = this.props.crafting_skills.map(
+            (trainable_skill: any, index: number) => {
+                return (
+                    <div key={trainable_skill.id}>
+                        <div className="p-4">
+                            <div className="flex justify-between items-center mb-2">
+                                <span className="font-semibold w-24">
+                                    Name:
+                                </span>
+                                <span>
+                                    <button
+                                        className="underline text-orange-600 dark:text-orange-300 cursor-pointer"
+                                        onClick={() =>
+                                            this.manageSkillDetails(
+                                                trainable_skill,
+                                            )
+                                        }
+                                    >
+                                        <i className="ra  ra-flat-hammer"></i>{" "}
+                                        {trainable_skill.name}
+                                    </button>
+                                </span>
+                            </div>
+
+                            <div className="flex justify-between items-center mb-2">
+                                <span className="font-semibold w-24">
+                                    Level:
+                                </span>
+                                <span>
+                                    {trainable_skill.level}/
+                                    {trainable_skill.max_level}
+                                </span>
+                            </div>
+
+                            <div className="flex justify-between items-center mb-2">
+                                <span className="font-semibold w-24">XP:</span>
+                                <span>
+                                    {trainable_skill.xp}/
+                                    {trainable_skill.xp_max}
+                                </span>
+                            </div>
+                        </div>
+                        {index < this.props.crafting_skills.length - 1 && (
+                            <div className="border-b-2 border-b-gray-200 dark:border-b-gray-600 my-3"></div>
+                        )}
+                    </div>
+                );
+            },
+        );
+
+        return <div className="space-y-4">{skills}</div>;
+    }
+
     render() {
         return (
             <Fragment>
@@ -93,18 +147,13 @@ export default class CraftingSkills extends React.Component<
                     </InfoAlert>
                 </div>
 
-                <div
-                    className={"max-w-[390px] md:max-w-full overflow-y-hidden"}
-                >
-                    <Table
-                        columns={this.buildColumns()}
-                        data={this.props.crafting_skills}
-                        dark_table={this.props.dark_table}
-                    />
+                <div className={"max-w-full"}>
+                    {this.renderCraftingSkills()}
                 </div>
 
                 {this.state.show_skill_details && this.state.skill !== null ? (
                     <SkillInformation
+                        is_trainable={false}
                         skill={this.state.skill}
                         manage_modal={this.manageSkillDetails.bind(this)}
                         is_open={this.state.show_skill_details}

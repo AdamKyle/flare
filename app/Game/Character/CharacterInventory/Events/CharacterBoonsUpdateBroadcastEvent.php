@@ -14,25 +14,22 @@ class CharacterBoonsUpdateBroadcastEvent implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-
     /**
-     * @var array $boons
+     * @var array
      */
     public $boons;
 
     /**
-     * @var User $users
+     * @var User
      */
     public $user;
 
     /**
      * Create a new event instance.
-     *
-     * @param User $user
-     * @param array $boons
      */
-    public function __construct(User $user, array $boons) {
-        $this->user  = $user;
+    public function __construct(User $user, array $boons)
+    {
+        $this->user = $user;
         $this->boons = $boons;
     }
 
@@ -43,6 +40,6 @@ class CharacterBoonsUpdateBroadcastEvent implements ShouldBroadcastNow
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('update-boons-' . $this->user->id);
+        return new PrivateChannel('update-boons-'.$this->user->id);
     }
 }

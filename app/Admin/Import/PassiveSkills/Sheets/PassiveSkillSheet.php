@@ -6,22 +6,24 @@ use App\Flare\Models\PassiveSkill;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToCollection;
 
-class PassiveSkillSheet implements ToCollection {
-
-    public function collection(Collection $rows) {
+class PassiveSkillSheet implements ToCollection
+{
+    public function collection(Collection $rows)
+    {
         foreach ($rows as $index => $row) {
             if ($index !== 0) {
                 $data = array_combine($rows[0]->toArray(), $row->toArray());
                 $data = $this->returnCleanData($data);
 
-                if (!empty($data)) {
+                if (! empty($data)) {
                     PassiveSkill::updateOrCreate(['id' => $data['id']], $data);
                 }
             }
         }
     }
 
-    protected function returnCleanData(array $passiveSkillData): array {
+    protected function returnCleanData(array $passiveSkillData): array
+    {
         $cleanData = [];
 
         foreach ($passiveSkillData as $key => $value) {

@@ -24,11 +24,12 @@ class TrinketCraftingValidation extends FormRequest
     public function rules()
     {
         return [
-            'item_to_craft'   => 'required|integer',
+            'item_to_craft' => 'required|integer',
         ];
     }
 
-    public function messages() {
+    public function messages()
+    {
         return [
             'item_to_craft.required' => 'What item are you trying to craft?',
         ];

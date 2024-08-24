@@ -6,15 +6,13 @@ use App\Flare\Models\GemBagSlot;
 use App\Game\Gems\Values\GemTypeValue;
 use League\Fractal\TransformerAbstract;
 
-class CharacterGemSlotsTransformer extends TransformerAbstract {
-
+class CharacterGemSlotsTransformer extends TransformerAbstract
+{
     /**
      * Gets the response data for the inventory sheet
-     *
-     * @param GemBagSlot $gemBagSlot
-     * @return array
      */
-    public function transform(GemBagSlot $gemBagSlot): array {
+    public function transform(GemBagSlot $gemBagSlot): array
+    {
 
         $gem = $gemBagSlot->gem;
 
@@ -35,14 +33,14 @@ class CharacterGemSlotsTransformer extends TransformerAbstract {
         };
 
         return [
-            'id'                         => $gemBagSlot->id,
-            'name'                       => $gemBagSlot->gem->name,
-            'tier'                       => $gemBagSlot->gem->tier,
-            'amount'                     => $gemBagSlot->amount,
-            'weak_against'               => GemTypeValue::getOppsiteForHalfDamage($highestValueName),
-            'strong_against'             => GemTypeValue::getOppsiteForDoubleDamage($highestValueName),
-            'element_atoned_to'          => $highestValueName,
-            'element_atoned_to_amount'   => $highestValue,
+            'id' => $gemBagSlot->id,
+            'name' => $gemBagSlot->gem->name,
+            'tier' => $gemBagSlot->gem->tier,
+            'amount' => $gemBagSlot->amount,
+            'weak_against' => GemTypeValue::getOppsiteForHalfDamage($highestValueName),
+            'strong_against' => GemTypeValue::getOppsiteForDoubleDamage($highestValueName),
+            'element_atoned_to' => $highestValueName,
+            'element_atoned_to_amount' => $highestValue,
         ];
     }
 }

@@ -3,12 +3,11 @@ import laravel from 'laravel-vite-plugin';
 import react from '@vitejs/plugin-react';
 
 // Determine if we are in development mode
-const isDevelopment = process.env.NODE_ENV === 'development';
+const isDevelopment = process.env.NODE_ENV === 'local';
 
 export default defineConfig({
     plugins: [
         laravel([
-            'resources/sass/app.scss',
             'resources/css/tailwind.css',
             'resources/js/app.ts',
             'resources/js/admin-app.ts',

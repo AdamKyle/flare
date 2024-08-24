@@ -2,33 +2,30 @@
 
 namespace App\Flare\Jobs;
 
+use App\Flare\Models\Kingdom;
+use App\Game\Kingdoms\Service\KingdomUpdateService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use App\Flare\Models\Kingdom;
-use App\Game\Kingdoms\Service\KingdomUpdateService;
 
 class UpdateKingdomJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    /**
-     * @var int $kingdomId
-     */
     public int $kingdomId;
 
     /**
      * Create a new job instance.
-     *
-     * @param int $kingdomId
      */
-    public function __construct(int $kingdomId) {
+    public function __construct(int $kingdomId)
+    {
         $this->kingdomId = $kingdomId;
     }
 
-    public function handle(KingdomUpdateService $kingdomUpdateService) {
+    public function handle(KingdomUpdateService $kingdomUpdateService)
+    {
 
         $kingdom = Kingdom::find($this->kingdomId);
 

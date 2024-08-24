@@ -2,13 +2,13 @@
 
 namespace App\Flare\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Database\Factories\GameClassFactory;
 use App\Flare\Values\CharacterClassValue;
+use Database\Factories\GameClassFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
-class GameClass extends Model {
-
+class GameClass extends Model
+{
     use HasFactory;
 
     /**
@@ -43,41 +43,45 @@ class GameClass extends Model {
      * @var array
      */
     protected $casts = [
-        'str_mod'                        => 'integer',
-        'dur_mod'                        => 'integer',
-        'dex_mod'                        => 'integer',
-        'chr_mod'                        => 'integer',
-        'int_mod'                        => 'integer',
-        'agi_mod'                        => 'integer',
-        'focus_mod'                      => 'integer',
-        'primary_required_class_id'      => 'integer',
-        'secondary_required_class_id'    => 'integer',
-        'primary_required_class_level'   => 'integer',
+        'str_mod' => 'integer',
+        'dur_mod' => 'integer',
+        'dex_mod' => 'integer',
+        'chr_mod' => 'integer',
+        'int_mod' => 'integer',
+        'agi_mod' => 'integer',
+        'focus_mod' => 'integer',
+        'primary_required_class_id' => 'integer',
+        'secondary_required_class_id' => 'integer',
+        'primary_required_class_level' => 'integer',
         'secondary_required_class_level' => 'integer',
-        'accuracy_mod'                   => 'float',
-        'dodge_mod'                      => 'float',
-        'defense_mod'                    => 'float',
-        'looting_mod'                    => 'float',
+        'accuracy_mod' => 'float',
+        'dodge_mod' => 'float',
+        'defense_mod' => 'float',
+        'looting_mod' => 'float',
     ];
 
-    public function gameSkills() {
+    public function gameSkills()
+    {
         return $this->hasMany(GameSkill::class, 'game_class_id', 'id');
     }
 
-    public function primaryClassRequired() {
+    public function primaryClassRequired()
+    {
         return $this->hasOne(GameClass::class, 'id', 'primary_required_class_id');
     }
 
-    public function secondaryClassRequired() {
+    public function secondaryClassRequired()
+    {
         return $this->hasOne(GameClass::class, 'id', 'secondary_required_class_id');
     }
 
-    public function type() {
+    public function type()
+    {
         return new CharacterClassValue($this->name);
     }
 
-
-    protected static function newFactory() {
+    protected static function newFactory()
+    {
         return GameClassFactory::new();
     }
 }

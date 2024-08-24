@@ -27,7 +27,7 @@ class KingdomImport extends FormRequest
     public function rules()
     {
         return [
-            'kingdom_import' => 'required|mimes:xlsx|max:2048'
+            'kingdom_import' => 'required|mimes:xlsx|max:2048',
         ];
     }
 
@@ -36,11 +36,12 @@ class KingdomImport extends FormRequest
      *
      * @return array
      */
-    public function messages() {
+    public function messages()
+    {
         return [
-            'kingdom_import.required'   => 'Kingdom import file is required.',
-            'kingdom_import.mime'       => 'The system only accepts xlsx files.',
-            'kingdom_import.max'        => 'File to large, the system only accepts a max size of 2MB.',
+            'kingdom_import.required' => 'Kingdom import file is required.',
+            'kingdom_import.mime' => 'The system only accepts xlsx files.',
+            'kingdom_import.max' => 'File to large, the system only accepts a max size of 2MB.',
         ];
     }
 }

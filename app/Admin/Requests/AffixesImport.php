@@ -27,7 +27,7 @@ class AffixesImport extends FormRequest
     public function rules()
     {
         return [
-            'affixes_import' => 'required|mimes:xlsx|max:2048'
+            'affixes_import' => 'required|mimes:xlsx|max:2048',
         ];
     }
 
@@ -36,11 +36,12 @@ class AffixesImport extends FormRequest
      *
      * @return array
      */
-    public function messages() {
+    public function messages()
+    {
         return [
-            'affixes_import.required'   => 'Affixes import file is required.',
-            'affixes_import.mime'       => 'The system only accepts xlsx files.',
-            'affixes_import.max'        => 'File to large, the system only accepts a max size of 2MB.',
+            'affixes_import.required' => 'Affixes import file is required.',
+            'affixes_import.mime' => 'The system only accepts xlsx files.',
+            'affixes_import.max' => 'File to large, the system only accepts a max size of 2MB.',
         ];
     }
 }

@@ -2,11 +2,10 @@
 
 namespace App\Flare\Models;
 
-use App\Flare\Models\Item;
 use Illuminate\Database\Eloquent\Model;
 
-class ItemSkillProgression extends Model {
-
+class ItemSkillProgression extends Model
+{
     /**
      * The attributes that are mass assignable.
      *
@@ -27,8 +26,8 @@ class ItemSkillProgression extends Model {
      */
     protected $casts = [
         'current_level' => 'integer',
-        'current_kill'  => 'integer',
-        'is_training'   => 'boolean',
+        'current_kill' => 'integer',
+        'is_training' => 'boolean',
     ];
 
     protected $appends = [
@@ -45,55 +44,68 @@ class ItemSkillProgression extends Model {
 
     ];
 
-    public function getStrModAttribute() {
+    public function getStrModAttribute()
+    {
         return $this->getModifierBonus('str');
     }
 
-    public function getDexModAttribute() {
+    public function getDexModAttribute()
+    {
         return $this->getModifierBonus('dex');
     }
 
-    public function getAgiModAttribute() {
+    public function getAgiModAttribute()
+    {
         return $this->getModifierBonus('agi');
     }
 
-    public function getDurModAttribute() {
+    public function getDurModAttribute()
+    {
         return $this->getModifierBonus('dur');
     }
 
-    public function getIntModAttribute() {
+    public function getIntModAttribute()
+    {
         return $this->getModifierBonus('int');
     }
 
-    public function getFocusModAttribute() {
+    public function getFocusModAttribute()
+    {
         return $this->getModifierBonus('focus');
     }
 
-    public function getChrModAttribute() {
+    public function getChrModAttribute()
+    {
         return $this->getModifierBonus('chr');
     }
 
-    public function getBaseDamageModAttribute() {
+    public function getBaseDamageModAttribute()
+    {
         return $this->getModifierBonus('base_damage');
     }
 
-    public function getBaseAcModAttribute() {
+    public function getBaseAcModAttribute()
+    {
         return $this->getModifierBonus('base_ac');
     }
 
-    public function getBaseHealingModAttribute() {
+    public function getBaseHealingModAttribute()
+    {
         return $this->getModifierBonus('base_healing');
     }
 
-    public function itemSkill() {
+    public function itemSkill()
+    {
         return $this->hasOne(ItemSkill::class, 'id', 'item_skill_id');
     }
 
-    public function item() {
+    public function item()
+    {
         return $this->hasOne(Item::class, 'id', 'item_id');
     }
 
-    protected function getModifierBonus(string $stat): float {
-        return $this->itemSkill->{$stat . '_mod'} * $this->current_level;
+    protected function getModifierBonus(string $stat): float
+    {
+        return $this->itemSkill->{$stat.'_mod'} * $this->current_level;
     }
 }

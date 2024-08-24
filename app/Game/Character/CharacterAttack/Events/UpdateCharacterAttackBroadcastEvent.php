@@ -16,35 +16,27 @@ class UpdateCharacterAttackBroadcastEvent implements ShouldBroadcastNow
 
     /**
      * the character attack
-     *
-     * @var array
      */
     public array $attack;
 
-    /**
-     * @var User $users
-     */
     private User $user;
 
     /**
      * Create a new event instance.
      *
-     * @param array $attack
-     * @param User $user
      * @return void
      */
     public function __construct(array $attack, User $user)
     {
         $this->attack = $attack;
-        $this->user   = $user;
+        $this->user = $user;
     }
 
     /**
      * Get the channels the event should broadcast on.
-     *
-     * @return Channel|array
      */
-    public function broadcastOn(): Channel|array {
-        return new PrivateChannel('update-character-attack-' . $this->user->id);
+    public function broadcastOn(): Channel|array
+    {
+        return new PrivateChannel('update-character-attack-'.$this->user->id);
     }
 }

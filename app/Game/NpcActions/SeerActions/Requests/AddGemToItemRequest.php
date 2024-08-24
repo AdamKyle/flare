@@ -24,14 +24,15 @@ class AddGemToItemRequest extends FormRequest
     public function rules()
     {
         return [
-            'slot_id'     => 'required|integer',
+            'slot_id' => 'required|integer',
             'gem_slot_id' => 'required|integer',
         ];
     }
 
-    public function messages() {
+    public function messages()
+    {
         return [
-            'slot_id.required'     => 'Error. Invalid Input.',
+            'slot_id.required' => 'Error. Invalid Input.',
             'gem_slot_id.required' => 'Error. Invalid Input',
         ];
     }

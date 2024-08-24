@@ -2,12 +2,12 @@
 
 namespace App\Flare\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Database\Factories\MonsterFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
-class Monster extends Model {
-
+class Monster extends Model
+{
     use HasFactory;
 
     /**
@@ -73,59 +73,62 @@ class Monster extends Model {
      * @var array
      */
     protected $casts = [
-        'xp'                        => 'integer',
-        'str'                       => 'integer',
-        'dur'                       => 'integer',
-        'dex'                       => 'integer',
-        'chr'                       => 'integer',
-        'int'                       => 'integer',
-        'ac'                        => 'integer',
-        'gold'                      => 'integer',
-        'celestial_type'            => 'integer',
-        'drop_check'                => 'float',
-        'max_level'                 => 'integer',
-        'quest_item_drop_chance'    => 'float',
-        'is_celestial_entity'       => 'boolean',
-        'gold_cost'                 => 'integer',
-        'gold_dust_cost'            => 'integer',
-        'can_cast'                  => 'boolean',
-        'can_use_artifacts'         => 'boolean',
-        'max_spell_damage'          => 'integer',
-        'max_affix_damage'          => 'integer',
-        'shards'                    => 'integer',
-        'spell_evasion'             => 'float',
-        'affix_resistance'          => 'float',
-        'healing_percentage'        => 'float',
-        'entrancing_chance'         => 'float',
-        'devouring_light_chance'    => 'float',
+        'xp' => 'integer',
+        'str' => 'integer',
+        'dur' => 'integer',
+        'dex' => 'integer',
+        'chr' => 'integer',
+        'int' => 'integer',
+        'ac' => 'integer',
+        'gold' => 'integer',
+        'celestial_type' => 'integer',
+        'drop_check' => 'float',
+        'max_level' => 'integer',
+        'quest_item_drop_chance' => 'float',
+        'is_celestial_entity' => 'boolean',
+        'gold_cost' => 'integer',
+        'gold_dust_cost' => 'integer',
+        'can_cast' => 'boolean',
+        'can_use_artifacts' => 'boolean',
+        'max_spell_damage' => 'integer',
+        'max_affix_damage' => 'integer',
+        'shards' => 'integer',
+        'spell_evasion' => 'float',
+        'affix_resistance' => 'float',
+        'healing_percentage' => 'float',
+        'entrancing_chance' => 'float',
+        'devouring_light_chance' => 'float',
         'devouring_darkness_chance' => 'float',
-        'accuracy'                  => 'float',
-        'casting_accuracy'          => 'float',
-        'dodge'                     => 'float',
-        'criticality'               => 'float',
-        'ambush_chance'             => 'float',
-        'ambush_resistance'         => 'float',
-        'counter_chance'            => 'float',
-        'counter_resistance'        => 'float',
-        'fire_atonement'            => 'float',
-        'ice_atonement'             => 'float',
-        'water_atonement'           => 'float',
-        'is_raid_monster'           => 'boolean',
-        'is_raid_boss'              => 'boolean',
-        'raid_special_attack_type'  => 'integer',
-        'life_stealing_resistance'  => 'float',
-        'only_for_location_type'    => 'integer',
+        'accuracy' => 'float',
+        'casting_accuracy' => 'float',
+        'dodge' => 'float',
+        'criticality' => 'float',
+        'ambush_chance' => 'float',
+        'ambush_resistance' => 'float',
+        'counter_chance' => 'float',
+        'counter_resistance' => 'float',
+        'fire_atonement' => 'float',
+        'ice_atonement' => 'float',
+        'water_atonement' => 'float',
+        'is_raid_monster' => 'boolean',
+        'is_raid_boss' => 'boolean',
+        'raid_special_attack_type' => 'integer',
+        'life_stealing_resistance' => 'float',
+        'only_for_location_type' => 'integer',
     ];
 
-    public function questItem() {
+    public function questItem()
+    {
         return $this->hasOne(Item::class, 'id', 'quest_item_id');
     }
 
-    public function gameMap() {
+    public function gameMap()
+    {
         return $this->belongsTo(GameMap::class, 'game_map_id', 'id');
     }
 
-    protected static function newFactory() {
+    protected static function newFactory()
+    {
         return MonsterFactory::new();
     }
 }

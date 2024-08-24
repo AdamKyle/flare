@@ -109,10 +109,6 @@ export default class GameChat extends React.Component<
         new Ajax().setRoute("last-chats").doAjaxCall(
             "get",
             (result: AxiosResponse) => {
-                this.setState({
-                    announcements: result.data.announcements,
-                });
-
                 const chats = result.data.chat_messages
                     .map((chat: any) => {
                         if (chat.name === "The Creator") {
@@ -147,13 +143,12 @@ export default class GameChat extends React.Component<
                     {
                         chat: [...this.state.chat, ...chats],
                         announcements: result.data.announcements,
-                        updated_tabs:
-                            this.canUpdateTabs("Announcements") &&
-                            result.data.announcements.length > 0
-                                ? [...this.state.updated_tabs, "Announcements"]
-                                : this.state.updated_tabs,
                     },
                     () => {
+                        if (result.data.announcements.length > 0) {
+                            this.setTabToUpdated("announcements-messages");
+                        }
+
                         if (
                             typeof this.props.update_finished_loading !==
                             "undefined"

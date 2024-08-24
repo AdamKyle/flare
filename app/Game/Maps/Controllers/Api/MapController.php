@@ -2,52 +2,33 @@
 
 namespace App\Game\Maps\Controllers\Api;
 
-use Exception;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Cache;
-use App\Http\Controllers\Controller;
-use App\Flare\Models\Quest;
 use App\Flare\Models\Character;
+use App\Flare\Models\Quest;
+use App\Game\Maps\Requests\MoveRequest;
+use App\Game\Maps\Requests\QuestDataRequest;
+use App\Game\Maps\Requests\SetSailValidation;
+use App\Game\Maps\Requests\TeleportRequest;
 use App\Game\Maps\Requests\TraverseRequest;
 use App\Game\Maps\Services\LocationService;
 use App\Game\Maps\Services\MovementService;
-use App\Game\Maps\Requests\MoveRequest;
-use App\Game\Maps\Requests\SetSailValidation;
-use App\Game\Maps\Requests\TeleportRequest;
-use App\Game\Maps\Requests\QuestDataRequest;
 use App\Game\Maps\Services\SetSailService;
 use App\Game\Maps\Services\TeleportService;
 use App\Game\Maps\Services\WalkingService;
+use App\Http\Controllers\Controller;
+use Exception;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Cache;
 
-class MapController extends Controller {
-
-    /**
-     * @var MovementService $movementService
-     */
+class MapController extends Controller
+{
     private MovementService $movementService;
 
-    /**
-     * @var SetSailService $setSail
-     */
     private SetSailService $setSail;
 
-    /**
-     * @var TeleportService $teleportService
-     */
     private TeleportService $teleportService;
 
-    /**
-     * @var WalkingService $walkingService
-     */
     private WalkingService $walkingService;
 
-    /**
-     *
-     * @param MovementService $movementService
-     * @param TeleportService $teleportService
-     * @param WalkingService $walkingService
-     * @param SetSailService $setSail
-     */
     public function __construct(
         MovementService $movementService,
         TeleportService $teleportService,
@@ -56,38 +37,28 @@ class MapController extends Controller {
     ) {
         $this->movementService = $movementService;
         $this->teleportService = $teleportService;
-        $this->walkingService  = $walkingService;
-        $this->setSail         = $setSail;
+        $this->walkingService = $walkingService;
+        $this->setSail = $setSail;
 
         $this->middleware('is.character.dead')->except(['mapInformation', 'fetchQuests']);
     }
 
-    /**
-     * @param Character $character
-     * @param LocationService $locationService
-     * @return JsonResponse
-     */
-    public function mapInformation(Character $character, LocationService $locationService): JsonResponse {
+    public function mapInformation(Character $character, LocationService $locationService): JsonResponse
+    {
         return response()->json($locationService->getLocationData($character));
     }
 
-    /**
-     * @param Character $character
-     * @param LocationService $locationService
-     * @return JsonResponse
-     */
-    public function updateLocationActions(Character $character, LocationService $locationService): JsonResponse {
+    public function updateLocationActions(Character $character, LocationService $locationService): JsonResponse
+    {
         return response()->json($locationService->locationBasedEvents($character));
     }
 
     /**
-     * @param MoveRequest $request
-     * @param Character $character
-     * @return JsonResponse
      * @throws Exception
      */
-    public function move(MoveRequest $request, Character $character): JsonResponse {
-        if (!$character->can_move) {
+    public function move(MoveRequest $request, Character $character): JsonResponse
+    {
+        if (! $character->can_move) {
             return response()->json(['invalid input'], 429);
         }
 
@@ -105,27 +76,20 @@ class MapController extends Controller {
         return response()->json($response, $status);
     }
 
-    /**
-     * @return JsonResponse
-     */
-    public function traverseMaps(): JsonResponse {
+    public function traverseMaps(): JsonResponse
+    {
         return response()->json(array_values($this->movementService->getMapsToTraverse(auth()->user()->character)));
     }
 
-    /**
-     * @param TraverseRequest $request
-     * @param Character $character
-     * @param MovementService $movementService
-     * @return JsonResponse
-     */
-    public function traverse(TraverseRequest $request, Character $character, MovementService $movementService): JsonResponse {
-        if (!$character->can_move) {
+    public function traverse(TraverseRequest $request, Character $character, MovementService $movementService): JsonResponse
+    {
+        if (! $character->can_move) {
             return response()->json(['invalid input'], 429);
         }
 
         $response = $movementService->updateCharacterPlane($request->map_id, $character);
 
-        $status   = $response['status'];
+        $status = $response['status'];
 
         unset($response['status']);
 
@@ -133,13 +97,11 @@ class MapController extends Controller {
     }
 
     /**
-     * @param TeleportRequest $request
-     * @param Character $character
-     * @return JsonResponse
      * @throws Exception
      */
-    public function teleport(TeleportRequest $request, Character $character): JsonResponse {
-        if (!$character->can_move) {
+    public function teleport(TeleportRequest $request, Character $character): JsonResponse
+    {
+        if (! $character->can_move) {
             return response()->json(['invalid input'], 429);
         }
 
@@ -155,13 +117,9 @@ class MapController extends Controller {
         return response()->json($response, $status);
     }
 
-    /**
-     * @param SetSailValidation $request
-     * @param Character $character
-     * @return JsonResponse
-     */
-    public function setSail(SetSailValidation $request, Character $character): JsonResponse {
-        if (!$character->can_move) {
+    public function setSail(SetSailValidation $request, Character $character): JsonResponse
+    {
+        if (! $character->can_move) {
             return response()->json(['invalid input'], 429);
         }
 
@@ -177,28 +135,24 @@ class MapController extends Controller {
         return response()->json($response, $status);
     }
 
-    /**
-     * @param QuestDataRequest $request
-     * @param Character $character
-     * @return JsonResponse
-     */
-    public function fetchQuests(QuestDataRequest $request, Character $character): JsonResponse {
-        if (!Cache::has('all-quests')) {
+    public function fetchQuests(QuestDataRequest $request, Character $character): JsonResponse
+    {
+        if (! Cache::has('all-quests')) {
             Cache::put('all-quests', Quest::where('is_parent', true)->with('childQuests', 'factionMap', 'rewardItem', 'item', 'npc', 'npc.commands', 'npc.gameMap')->get());
         }
 
         $data = [
-            'quests'           => Cache::get('all-quests'),
+            'quests' => Cache::get('all-quests'),
             'completed_quests' => $character->questsCompleted()->pluck('quest_id'),
-            'map_name'         => $character->map->gameMap->name,
+            'map_name' => $character->map->gameMap->name,
         ];
 
         $cacheToReset = Cache::get('character-quest-reset');
         $needsRefresh = false;
 
-        if (!is_null($cacheToReset)) {
+        if (! is_null($cacheToReset)) {
             $needsRefresh = in_array($character->id, $cacheToReset);
-            $index        = array_search($character->id, $cacheToReset);
+            $index = array_search($character->id, $cacheToReset);
 
             if ($index !== false) {
                 unset($cacheToReset[$index]);
@@ -207,11 +161,11 @@ class MapController extends Controller {
             Cache::put('character-quest-reset', $cacheToReset);
         }
 
-        if (!$request->completed_quests_only || $needsRefresh) {
+        if (! $request->completed_quests_only || $needsRefresh) {
             $data['all_quests'] = Cache::get('all-quests');
         }
 
-        $data['was_reset'] = (!$request->completed_quests_only || $needsRefresh);
+        $data['was_reset'] = (! $request->completed_quests_only || $needsRefresh);
 
         return response()->json($data);
     }

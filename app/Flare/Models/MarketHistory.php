@@ -2,15 +2,15 @@
 
 namespace App\Flare\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Database\Factories\MarketHistoryFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
-class MarketHistory extends Model {
-
+class MarketHistory extends Model
+{
     use HasFactory;
 
-    protected $table= 'market_history';
+    protected $table = 'market_history';
 
     /**
      * The attributes that are mass assignable.
@@ -32,12 +32,13 @@ class MarketHistory extends Model {
         'sold_for' => 'integer',
     ];
 
-    public function item() {
+    public function item()
+    {
         return $this->belongsTo(Item::class);
     }
 
-    protected static function newFactory() {
+    protected static function newFactory()
+    {
         return MarketHistoryFactory::new();
     }
-
 }

@@ -34,9 +34,17 @@ import ScreenRefresh from "./sections/screen-refresh/screen-refresh";
 import KingdomLogDetails from "./components/kingdoms/deffinitions/kingdom-log-details";
 import { FameTasks } from "./components/faction-loyalty/deffinitions/faction-loaylaty";
 import IsTabletInPortraitDisplayAlert from "./components/ui/alerts/tablet-portrait-detector/is-tablet-in-portrait-display-alert";
+import OrangeButton from "./components/ui/buttons/orange-button";
+import SuggestionsAndBugs from "./components/suggestions/suggestions-and-bugs";
+import IntroSlides from "./components/intro-section/intro-slides";
+import TurnOffUserIntroFlag from "./lib/game/ajax/turn-off-user-intro-flag";
+import SurveyComponent from "./components/survey/survey-component";
+import PrimaryButton from "./components/ui/buttons/primary-button";
 
 export default class Game extends React.Component<GameProps, GameState> {
     private gameEventListener?: GameEventListeners;
+
+    private turnOffIntroFlagAjax: TurnOffUserIntroFlag;
 
     constructor(props: GameProps) {
         super(props);
@@ -69,6 +77,12 @@ export default class Game extends React.Component<GameProps, GameState> {
             show_guide_quest_completed: false,
             hide_donation_alert: false,
             show_map: true,
+            show_suggestions_and_bugs: false,
+            is_showing_active_boons: false,
+            show_intro_page: false,
+            show_survey_button: false,
+            open_survey_modal: false,
+            survey_success_message: null,
             tabs: [
                 {
                     key: "game",
@@ -89,12 +103,16 @@ export default class Game extends React.Component<GameProps, GameState> {
                 },
             ],
         };
+
+        this.turnOffIntroFlagAjax =
+            serviceContainer().fetch(TurnOffUserIntroFlag);
     }
 
     componentDidMount() {
         this.setState({
             view_port:
                 window.innerWidth || document.documentElement.clientWidth,
+            show_intro_page: this.props.showIntroPage,
         });
 
         window.addEventListener("resize", () => {
@@ -137,6 +155,65 @@ export default class Game extends React.Component<GameProps, GameState> {
         }
     }
 
+    componentDidUpdate() {
+        if (
+            this.state.show_survey_button &&
+            this.state.survey_success_message !== null
+        ) {
+            const character = JSON.parse(JSON.stringify(this.state.character));
+
+            character.is_showing_survey = false;
+            character.survey_id = null;
+
+            this.setState({
+                show_survey_button: false,
+                character: character,
+            });
+        }
+    }
+
+    showSurveyButton(showSurvey: boolean, surveyId: number | null) {
+        if (this.state.character === null) {
+            return;
+        }
+
+        const character = JSON.parse(JSON.stringify(this.state.character));
+
+        character.is_showing_survey = showSurvey;
+        character.survey_id = surveyId;
+
+        this.setState({
+            show_survey_button: showSurvey,
+            character: character,
+        });
+    }
+
+    manageSurveyModal() {
+        this.setState({
+            open_survey_modal: true,
+        });
+    }
+
+    closeSurveyModal() {
+        this.setState({
+            open_survey_modal: false,
+        });
+    }
+
+    resetShowIntroPage() {
+        this.setState(
+            {
+                show_intro_page: false,
+            },
+            () => {
+                this.turnOffIntroFlagAjax.turnOffIntro(
+                    this,
+                    this.props.characterId,
+                );
+            },
+        );
+    }
+
     setStateFromData(data: MapData) {
         const state = MapStateManager.buildChangeState(data, this);
 
@@ -153,11 +230,7 @@ export default class Game extends React.Component<GameProps, GameState> {
                 (log: KingdomLogDetails) => !log.opened,
             );
 
-            if (hasLogs.length > 0) {
-                tabs[tabs.length - 1].has_logs = true;
-            } else {
-                tabs[tabs.length - 1].has_logs = false;
-            }
+            tabs[tabs.length - 1].has_logs = hasLogs.length > 0;
         } else {
             tabs[tabs.length - 1].has_logs = false;
         }
@@ -259,6 +332,12 @@ export default class Game extends React.Component<GameProps, GameState> {
         });
     }
 
+    setSurveySuccessMessage(message: string | null) {
+        this.setState({
+            survey_success_message: message,
+        });
+    }
+
     renderLoading() {
         return (
             <div className="flex h-screen justify-center items-center max-w-md m-auto mt-[-150px]">
@@ -282,7 +361,28 @@ export default class Game extends React.Component<GameProps, GameState> {
         });
     }
 
+    manageBugsAndSuggestions() {
+        this.setState({
+            show_suggestions_and_bugs: !this.state.show_suggestions_and_bugs,
+        });
+    }
+
+    updateIsShowingActiveBoons(isShowing: boolean) {
+        this.setState({
+            is_showing_active_boons: isShowing,
+        });
+    }
+
     render() {
+        if (this.state.show_intro_page) {
+            return (
+                <IntroSlides
+                    view_port={this.state.view_port}
+                    reset_show_intro={this.resetShowIntroPage.bind(this)}
+                />
+            );
+        }
+
         if (this.state.loading) {
             return this.renderLoading();
         }
@@ -303,6 +403,17 @@ export default class Game extends React.Component<GameProps, GameState> {
             return this.renderLoading();
         }
 
+        if (this.state.show_suggestions_and_bugs) {
+            return (
+                <SuggestionsAndBugs
+                    manage_suggestions_and_bugs={this.manageBugsAndSuggestions.bind(
+                        this,
+                    )}
+                    character_id={this.props.characterId}
+                />
+            );
+        }
+
         const gameMap = this.state.map_data;
         let gameMapId = null;
 
@@ -313,6 +424,18 @@ export default class Game extends React.Component<GameProps, GameState> {
         return (
             <div>
                 <ScreenRefresh user_id={this.state.character.user_id} />
+
+                <SurveyComponent
+                    user_id={this.state.character.user_id}
+                    character_id={this.state.character.id}
+                    survey_id={this.state.character.survey_id}
+                    show_survey_button={this.showSurveyButton.bind(this)}
+                    open_survey={this.state.open_survey_modal}
+                    close_survey={this.closeSurveyModal.bind(this)}
+                    set_success_message={this.setSurveySuccessMessage.bind(
+                        this,
+                    )}
+                />
 
                 <IsTabletInPortraitDisplayAlert />
 
@@ -391,14 +514,65 @@ export default class Game extends React.Component<GameProps, GameState> {
                                         your rewards and move on to the next!
                                     </SuccessAlert>
                                 ) : null}
-                                <div
-                                    className={clsx({
-                                        hidden: this.state.view_port > 932,
-                                    })}
-                                >
-                                    <ActiveBoonsActionSection
-                                        character_id={this.props.characterId}
-                                    />
+                                {this.state.survey_success_message !== null ? (
+                                    <SuccessAlert
+                                        additional_css={"mb-4 mt-[15px]"}
+                                        close_alert={() => {
+                                            this.setSurveySuccessMessage(null);
+                                        }}
+                                    >
+                                        {this.state.survey_success_message}
+                                    </SuccessAlert>
+                                ) : null}
+                                <div className="flex justify-center items-center space-x-4">
+                                    <div
+                                        className={clsx({
+                                            hidden: this.state.view_port > 932,
+                                        })}
+                                    >
+                                        <ActiveBoonsActionSection
+                                            character_id={
+                                                this.props.characterId
+                                            }
+                                            update_is_showing_boons={this.updateIsShowingActiveBoons.bind(
+                                                this,
+                                            )}
+                                        />
+                                    </div>
+                                    {!this.state.is_showing_active_boons ? (
+                                        <OrangeButton
+                                            button_label={
+                                                "Submit Bug/Suggestions"
+                                            }
+                                            on_click={this.manageBugsAndSuggestions.bind(
+                                                this,
+                                            )}
+                                            additional_css={clsx({
+                                                "relative top-[10px]":
+                                                    this.state.view_port > 932,
+                                                "mt-[5px]":
+                                                    this.state.view_port <= 932,
+                                            })}
+                                        />
+                                    ) : null}
+                                    {this.state.show_survey_button ||
+                                    (this.state.character.is_showing_survey &&
+                                        this.state.character.survey_id !==
+                                            null &&
+                                        !this.state.is_showing_active_boons) ? (
+                                        <PrimaryButton
+                                            button_label={"Complete survey"}
+                                            on_click={this.manageSurveyModal.bind(
+                                                this,
+                                            )}
+                                            additional_css={clsx({
+                                                "relative top-[10px]":
+                                                    this.state.view_port > 932,
+                                                "mt-[5px]":
+                                                    this.state.view_port <= 932,
+                                            })}
+                                        />
+                                    ) : null}
                                 </div>
                                 <BasicCard additionalClasses="min-h-60 mt-4">
                                     <ActionTabs

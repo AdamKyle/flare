@@ -24,16 +24,17 @@ class PvpFight extends FormRequest
     public function rules()
     {
         return [
-            'attack_type'  => 'string|required',
-            'defender_id'  => 'int|required'
+            'attack_type' => 'string|required',
+            'defender_id' => 'int|required',
         ];
     }
 
-    public function messages() {
+    public function messages()
+    {
         return [
-            'attack_type.required'  => 'Error. Invalid Input.',
-            'attack_type.string'    => 'Error. Invalid Input.',
-            'defender_id.required'  => 'Error. Invalid Input',
+            'attack_type.required' => 'Error. Invalid Input.',
+            'attack_type.string' => 'Error. Invalid Input.',
+            'defender_id.required' => 'Error. Invalid Input',
         ];
     }
 }

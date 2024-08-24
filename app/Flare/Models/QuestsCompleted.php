@@ -6,8 +6,8 @@ use Database\Factories\QuestsCompletedFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class QuestsCompleted extends Model {
-
+class QuestsCompleted extends Model
+{
     use HasFactory;
 
     protected $table = 'quests_completed';
@@ -23,19 +23,23 @@ class QuestsCompleted extends Model {
         'guide_quest_id',
     ];
 
-    public function character() {
+    public function character()
+    {
         return $this->belongsTo(Character::class, 'character_id', 'id');
     }
 
-    public function quest() {
+    public function quest()
+    {
         return $this->belongsTo(Quest::class, 'quest_id', 'id');
     }
 
-    public function guideQuest() {
+    public function guideQuest()
+    {
         return $this->belongsTo(GuideQuest::class, 'guide_quest_id', 'id');
     }
 
-    protected static function newFactory() {
+    protected static function newFactory()
+    {
         return QuestsCompletedFactory::new();
     }
 }

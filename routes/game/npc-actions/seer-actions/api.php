@@ -1,6 +1,6 @@
 <?php
 
-Route::group(['middleware' => ['is.character.who.they.say.they.are', 'is.character.dead', 'is.character.exploring']], function() {
+Route::group(['middleware' => ['is.character.who.they.say.they.are', 'is.character.dead', 'is.character.exploring']], function () {
     Route::get('/visit-seer-camp/{character}', ['uses' => 'Api\SeerCampController@visitCamp']);
     Route::get('/seer-camp/gems-to-remove/{character}', ['uses' => 'Api\SeerCampController@fetchItemsWithGems']);
     Route::post('/seer-camp/add-sockets/{character}', ['uses' => 'Api\SeerCampController@rollSockets']);

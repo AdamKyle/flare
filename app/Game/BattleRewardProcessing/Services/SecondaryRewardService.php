@@ -6,24 +6,17 @@ use App\Flare\Models\Character;
 use App\Game\Character\Concerns\FetchEquipped;
 use App\Game\ClassRanks\Services\ClassRankService;
 use App\Game\Core\Events\UpdateTopBarEvent;
-use App\Game\Mercenaries\Services\MercenaryService;
 use Exception;
 use Facades\App\Game\Skills\Handlers\UpdateItemSkill;
 
-
-class SecondaryRewardService {
-
+class SecondaryRewardService
+{
     use FetchEquipped;
 
-    /**
-     * @var ClassRankService $classRankService
-     */
     private ClassRankService $classRankService;
 
-    /**
-     * @param ClassRankService $classRankService
-     */
-    public function __construct(ClassRankService $classRankService) {
+    public function __construct(ClassRankService $classRankService)
+    {
         $this->classRankService = $classRankService;
     }
 
@@ -34,11 +27,12 @@ class SecondaryRewardService {
      * - Give XP to equipped class specials
      * - Handle character skill progression
      *
-     * @param Character $character
      * @return void
+     *
      * @throws Exception
      */
-    public function handleSecondaryRewards(Character $character) {
+    public function handleSecondaryRewards(Character $character)
+    {
         $this->classRankService->giveXpToClassRank($character);
 
         $this->classRankService->giveXpToMasteries($character);
@@ -48,24 +42,22 @@ class SecondaryRewardService {
         $this->handleItemSkillUpdate($character);
 
         if ($character->isLoggedIn()) {
-            event (new UpdateTopBarEvent($character->refresh()));
+            event(new UpdateTopBarEvent($character->refresh()));
         }
     }
 
     /**
      * Handle item skill updates for artifacts that are equipped with skill trees.
-     *
-     * @param Character $character
-     * @return void
      */
-    protected function handleItemSkillUpdate(Character $character): void {
+    protected function handleItemSkillUpdate(Character $character): void
+    {
         $equippedItems = $this->fetchEquipped($character);
 
         if (is_null($equippedItems)) {
             return;
         }
 
-        $equippedItem = $equippedItems->filter(function($slot) {
+        $equippedItem = $equippedItems->filter(function ($slot) {
             return $slot->item->type === 'artifact';
         })->first();
 

@@ -28,7 +28,8 @@ class ComparisonFromChatValidate extends FormRequest
         ];
     }
 
-    public function messages() {
+    public function messages()
+    {
         return [
             'id.required' => 'Error. Invalid Input.',
         ];

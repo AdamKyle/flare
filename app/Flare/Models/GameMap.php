@@ -2,14 +2,14 @@
 
 namespace App\Flare\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Database\Factories\GameMapFactory;
 use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\MapNameValue;
+use Database\Factories\GameMapFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
-class GameMap extends Model {
-
+class GameMap extends Model
+{
     use HasFactory;
 
     /**
@@ -33,37 +33,41 @@ class GameMap extends Model {
     ];
 
     protected $casts = [
-        'default'                    => 'boolean',
-        'xp_bonus'                   => 'float',
-        'skill_training_bonus'       => 'float',
-        'drop_chance_bonus'          => 'float',
-        'enemy_stat_bonus'           => 'float',
+        'default' => 'boolean',
+        'xp_bonus' => 'float',
+        'skill_training_bonus' => 'float',
+        'drop_chance_bonus' => 'float',
+        'enemy_stat_bonus' => 'float',
         'character_attack_reduction' => 'float',
-        'only_during_event_type'     => 'integer',
-        'can_traverse'               => 'boolean',
+        'only_during_event_type' => 'integer',
+        'can_traverse' => 'boolean',
     ];
 
     protected $appends = [
         'map_required_item',
     ];
 
-    public function maps() {
+    public function maps()
+    {
         return $this->hasMany(Map::class, 'game_map_id', 'id');
     }
 
-    public function requiredLocation() {
+    public function requiredLocation()
+    {
         return $this->hasOne(Location::class, 'id', 'required_location_id');
     }
 
-    public function mapType(): MapNameValue {
+    public function mapType(): MapNameValue
+    {
         return new MapNameValue($this->name);
     }
 
-    public function mapHasBonuses() {
+    public function mapHasBonuses()
+    {
         $hasBonuses = false;
 
-        if (!is_null($this->xp_bonus) || !is_null($this->skill_training_bonus)
-            || !is_null($this->drop_chance_bonus) || !is_null($this->enemy_stat_bonus)
+        if (! is_null($this->xp_bonus) || ! is_null($this->skill_training_bonus)
+            || ! is_null($this->drop_chance_bonus) || ! is_null($this->enemy_stat_bonus)
         ) {
             $hasBonuses = true;
         }
@@ -71,7 +75,8 @@ class GameMap extends Model {
         return $hasBonuses;
     }
 
-    public function getMapRequiredItemAttribute() {
+    public function getMapRequiredItemAttribute()
+    {
         switch ($this->name) {
             case 'Labyrinth':
                 return Item::where('effect', ItemEffectsValue::LABYRINTH)->first();
@@ -91,7 +96,8 @@ class GameMap extends Model {
         }
     }
 
-    protected static function newFactory() {
+    protected static function newFactory()
+    {
         return GameMapFactory::new();
     }
 }

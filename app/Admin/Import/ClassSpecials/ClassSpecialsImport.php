@@ -7,11 +7,10 @@ use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 
 class ClassSpecialsImport implements WithMultipleSheets
 {
-
     public function sheets(): array
     {
         return [
-            0 => new ClassSpecialsSheet(),
+            0 => new ClassSpecialsSheet,
         ];
     }
 }

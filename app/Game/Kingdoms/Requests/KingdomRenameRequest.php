@@ -28,11 +28,12 @@ class KingdomRenameRequest extends FormRequest
         ];
     }
 
-    public function messages() {
+    public function messages()
+    {
         return [
             'name.required' => 'Name is required.',
-            'name.max'      => 'Name can only be 30 characters long.',
-            'name.min'      => 'Name must be 5 characters long at least.',
+            'name.max' => 'Name can only be 30 characters long.',
+            'name.min' => 'Name must be 5 characters long at least.',
         ];
     }
 }

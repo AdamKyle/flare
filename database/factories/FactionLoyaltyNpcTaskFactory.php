@@ -5,7 +5,8 @@ namespace Database\Factories;
 use App\Flare\Models\FactionLoyaltyNpcTask;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class FactionLoyaltyNpcTaskFactory extends Factory {
+class FactionLoyaltyNpcTaskFactory extends Factory
+{
     /**
      * The name of the factory's corresponding model.
      *
@@ -18,11 +19,12 @@ class FactionLoyaltyNpcTaskFactory extends Factory {
      *
      * @return array
      */
-    public function definition() {
+    public function definition()
+    {
         return [
-            'faction_loyalty_id'       => null,
-            'faction_loyalty_npc_id'   => null,
-            'fame_tasks'               => [],
+            'faction_loyalty_id' => null,
+            'faction_loyalty_npc_id' => null,
+            'fame_tasks' => [],
         ];
     }
 }

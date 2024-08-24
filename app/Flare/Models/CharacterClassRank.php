@@ -6,8 +6,8 @@ use Database\Factories\CharacterClassRankFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class CharacterClassRank extends Model {
-
+class CharacterClassRank extends Model
+{
     use HasFactory;
 
     /**
@@ -29,24 +29,28 @@ class CharacterClassRank extends Model {
      * @var array
      */
     protected $casts = [
-        'current_xp'   => 'integer',
-        'required_xp'  => 'integer',
-        'level'        => 'integer',
+        'current_xp' => 'integer',
+        'required_xp' => 'integer',
+        'level' => 'integer',
     ];
 
-    public function character() {
+    public function character()
+    {
         return $this->belongsTo(Character::class, 'character_id', 'id');
     }
 
-    public function gameClass() {
+    public function gameClass()
+    {
         return $this->belongsTo(GameClass::class, 'game_class_id', 'id');
     }
 
-    public function weaponMasteries() {
+    public function weaponMasteries()
+    {
         return $this->hasMany(CharacterClassRankWeaponMastery::class);
     }
 
-    protected static function newFactory() {
+    protected static function newFactory()
+    {
         return CharacterClassRankFactory::new();
     }
 }

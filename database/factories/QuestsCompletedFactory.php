@@ -2,8 +2,8 @@
 
 namespace Database\Factories;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Flare\Models\QuestsCompleted;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 class QuestsCompletedFactory extends Factory
 {
@@ -23,7 +23,7 @@ class QuestsCompletedFactory extends Factory
     {
         return [
             'character_id' => null,
-            'quest_id'     => null,
+            'quest_id' => null,
         ];
     }
 }

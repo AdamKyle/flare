@@ -2,46 +2,37 @@
 
 namespace App\Flare\Services;
 
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Database\Eloquent\Collection as DBCollection;
-use Illuminate\Support\Collection as IlluminateCollection;
-use League\Fractal\Manager;
-use League\Fractal\Resource\Collection;
-use App\Flare\Models\Location;
-use App\Flare\Values\LocationEffectValue;
 use App\Flare\Models\GameMap;
+use App\Flare\Models\Location;
 use App\Flare\Models\Monster;
 use App\Flare\Transformers\MonsterTransformer;
+use App\Flare\Values\LocationEffectValue;
+use Illuminate\Database\Eloquent\Collection as DBCollection;
+use Illuminate\Support\Collection as IlluminateCollection;
+use Illuminate\Support\Facades\Cache;
+use League\Fractal\Manager;
+use League\Fractal\Resource\Collection;
 use Psr\SimpleCache\InvalidArgumentException;
 
-class BuildMonsterCacheService {
-
-    /**
-     * @var Manager $manager
-     */
+class BuildMonsterCacheService
+{
     private Manager $manager;
 
-    /**
-     * @var MonsterTransformer $monster
-     */
     private MonsterTransformer $monster;
 
-    /**
-     * @param Manager $manager
-     * @param MonsterTransformer $monster
-     */
-    public function __construct(Manager $manager, MonsterTransformer $monster) {
-        $this->manager                = $manager;
-        $this->monster                = $monster;
+    public function __construct(Manager $manager, MonsterTransformer $monster)
+    {
+        $this->manager = $manager;
+        $this->monster = $monster;
     }
 
     /**
      * Builds monster cache.
      *
-     * @return void
      * @throws InvalidArgumentException
      */
-    public function buildCache(): void {
+    public function buildCache(): void
+    {
         $monstersCache = [];
 
         Cache::delete('monsters');
@@ -49,7 +40,7 @@ class BuildMonsterCacheService {
         $this->monster = $this->monster->setIsMonsterSpecial(true);
 
         foreach (GameMap::all() as $gameMap) {
-            $monsters =  new Collection(
+            $monsters = new Collection(
                 Monster::where('is_celestial_entity', false)
                     ->where('is_raid_monster', false)
                     ->where('is_raid_boss', false)
@@ -59,7 +50,7 @@ class BuildMonsterCacheService {
                 $this->monster
             );
 
-            if (!is_null($gameMap->only_during_event_type)) {
+            if (! is_null($gameMap->only_during_event_type)) {
                 $monstersCache[$gameMap->name] = $this->createMonstersForEventMaps($monsters);
 
                 continue;
@@ -76,10 +67,10 @@ class BuildMonsterCacheService {
     /**
      * Builds raid monster cache.
      *
-     * @return void
      * @throws InvalidArgumentException
      */
-    public function buildRaidCache(): void {
+    public function buildRaidCache(): void
+    {
         $monstersCache = [];
 
         Cache::delete('raid-monsters');
@@ -100,12 +91,10 @@ class BuildMonsterCacheService {
                 ->whereNull('only_for_location_type')
                 ->get();
 
-
-            $monsters =  new Collection(
+            $monsters = new Collection(
                 $raidBosses->merge($raidCritters),
                 $this->monster
             );
-
 
             $monstersCache[$gameMap->name] = $this->manager->createData($monsters)->toArray();
         }
@@ -117,10 +106,9 @@ class BuildMonsterCacheService {
 
     /**
      * Build special location monsters
-     *
-     * @return void
      */
-    public function buildSpecialLocationMonsterList(): void {
+    public function buildSpecialLocationMonsterList(): void
+    {
         $locations = Location::whereNotNull('type')->get();
 
         $cache = [];
@@ -129,7 +117,7 @@ class BuildMonsterCacheService {
 
             $this->monster = $this->monster->setIsMonsterSpecial(true);
 
-            $monsters =  new Collection(
+            $monsters = new Collection(
                 Monster::where('is_celestial_entity', false)
                     ->where('is_raid_monster', false)
                     ->where('is_raid_boss', false)
@@ -140,8 +128,8 @@ class BuildMonsterCacheService {
 
             $monsters = $this->manager->createData($monsters)->toArray();
 
-            if (!empty($monsters)) {
-                $cache['location-type-' . $location->type] = $monsters;
+            if (! empty($monsters)) {
+                $cache['location-type-'.$location->type] = $monsters;
             }
         }
 
@@ -151,10 +139,10 @@ class BuildMonsterCacheService {
     /**
      * Builds celestial cache.
      *
-     * @return void
      * @throws InvalidArgumentException
      */
-    public function buildCelesetialCache(): void {
+    public function buildCelesetialCache(): void
+    {
         $monstersCache = [];
 
         Cache::delete('celestials');
@@ -162,7 +150,7 @@ class BuildMonsterCacheService {
         $this->monster = $this->monster->setIsMonsterSpecial(true);
 
         foreach (GameMap::all() as $gameMap) {
-            $monsters =  new Collection(
+            $monsters = new Collection(
                 Monster::where('is_celestial_entity', true)
                     ->where('game_map_id', $gameMap->id)
                     ->whereNull('only_for_location_type')
@@ -176,11 +164,12 @@ class BuildMonsterCacheService {
         Cache::put('celestials', $monstersCache);
     }
 
-    protected function createMonstersForEventMaps(Collection $monsters): array {
+    protected function createMonstersForEventMaps(Collection $monsters): array
+    {
 
         $surface = GameMap::where('default', true)->first();
 
-        $easierMonsters =  new Collection(
+        $easierMonsters = new Collection(
             Monster::where('is_celestial_entity', false)
                 ->where('is_raid_monster', false)
                 ->where('is_raid_boss', false)
@@ -191,17 +180,15 @@ class BuildMonsterCacheService {
 
         return [
             'regular' => $this->manager->createData($monsters)->toArray(),
-            'easier'  => $this->manager->createData($easierMonsters)->toArray()
+            'easier' => $this->manager->createData($easierMonsters)->toArray(),
         ];
     }
 
     /**
      * Get monsters for special locations.
-     *
-     * @param array $monstersCache
-     * @return array
      */
-    protected function manageMonsters(array $monstersCache): array {
+    protected function manageMonsters(array $monstersCache): array
+    {
         foreach (Location::whereNotNull('enemy_strength_type')->get() as $location) {
             $monsters = Monster::where('is_celestial_entity', false)
                 ->where('game_map_id', $location->game_map_id)
@@ -227,54 +214,52 @@ class BuildMonsterCacheService {
 
     /**
      * Transform monsters for special location.
-     *
-     * @param DBCollection $monsters
-     * @param int $increaseStatsBy
-     * @param float $increasePercentageBy
-     * @return IlluminateCollection
      */
-    protected function transformMonsterForLocation(DBCollection $monsters, int $increaseStatsBy, float $increasePercentageBy): IlluminateCollection {
+    protected function transformMonsterForLocation(DBCollection $monsters, int $increaseStatsBy, float $increasePercentageBy): IlluminateCollection
+    {
         return $monsters->transform(function ($monster) use ($increaseStatsBy, $increasePercentageBy) {
-            $monster->str                       += $increaseStatsBy;
-            $monster->dex                       += $increaseStatsBy;
-            $monster->agi                       += $increaseStatsBy;
-            $monster->dur                       += $increaseStatsBy;
-            $monster->chr                       += $increaseStatsBy;
-            $monster->int                       += $increaseStatsBy;
-            $monster->ac                        += $increaseStatsBy;
-            $monster->health_range              = $this->createNewHealthRange($monster, $increaseStatsBy);
-            $monster->attack_range              = $this->createNewAttackRange($monster, $increaseStatsBy);
-            $monster->spell_evasion             += $increasePercentageBy;
-            $monster->artifact_annulment        += $increasePercentageBy;
-            $monster->affix_resistance          += $increasePercentageBy;
-            $monster->healing_percentage        += $increasePercentageBy;
-            $monster->entrancing_chance         += $increasePercentageBy;
-            $monster->devouring_light_chance    += $increasePercentageBy;
+            $monster->str += $increaseStatsBy;
+            $monster->dex += $increaseStatsBy;
+            $monster->agi += $increaseStatsBy;
+            $monster->dur += $increaseStatsBy;
+            $monster->chr += $increaseStatsBy;
+            $monster->int += $increaseStatsBy;
+            $monster->ac += $increaseStatsBy;
+            $monster->health_range = $this->createNewHealthRange($monster, $increaseStatsBy);
+            $monster->attack_range = $this->createNewAttackRange($monster, $increaseStatsBy);
+            $monster->spell_evasion += $increasePercentageBy;
+            $monster->artifact_annulment += $increasePercentageBy;
+            $monster->affix_resistance += $increasePercentageBy;
+            $monster->healing_percentage += $increasePercentageBy;
+            $monster->entrancing_chance += $increasePercentageBy;
+            $monster->devouring_light_chance += $increasePercentageBy;
             $monster->devouring_darkness_chance += $increasePercentageBy;
-            $monster->accuracy                  += $increasePercentageBy;
-            $monster->casting_accuracy          += $increasePercentageBy;
-            $monster->dodge                     += $increasePercentageBy;
-            $monster->criticality               += $increasePercentageBy;
+            $monster->accuracy += $increasePercentageBy;
+            $monster->casting_accuracy += $increasePercentageBy;
+            $monster->dodge += $increasePercentageBy;
+            $monster->criticality += $increasePercentageBy;
 
             return $monster;
         });
     }
 
-    protected function createNewHealthRange(Monster $monster, int $increaseStatsBy): string {
+    protected function createNewHealthRange(Monster $monster, int $increaseStatsBy): string
+    {
         $monsterHealthRangeParts = explode('-', $monster->health_range);
 
         $minHealth = intval($monsterHealthRangeParts[0]) + $increaseStatsBy;
         $maxHealth = intval($monsterHealthRangeParts[1]) + $increaseStatsBy;
 
-        return $minHealth . '-' . $maxHealth;
+        return $minHealth.'-'.$maxHealth;
     }
 
-    protected function createNewAttackRange(Monster $monster, int $increaseStatsBy): string {
+    protected function createNewAttackRange(Monster $monster, int $increaseStatsBy): string
+    {
         $monsterAttackParts = explode('-', $monster->attack_range);
 
         $minAttack = intval($monsterAttackParts[0]) + $increaseStatsBy;
         $maxAttack = intval($monsterAttackParts[1]) + $increaseStatsBy;
 
-        return $minAttack . '-' . $maxAttack;
+        return $minAttack.'-'.$maxAttack;
     }
 }

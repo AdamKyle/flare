@@ -29,7 +29,8 @@ class ItemTransferRequest extends FormRequest
         ];
     }
 
-    public function messages() {
+    public function messages()
+    {
         return [
             'item_id_from.required' => 'Missing item to transfer from.',
             'item_id_to.required' => 'Missing item to transfer to.',

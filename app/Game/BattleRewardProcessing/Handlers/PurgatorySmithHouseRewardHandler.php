@@ -3,40 +3,35 @@
 namespace App\Game\BattleRewardProcessing\Handlers;
 
 use App\Flare\Builders\RandomAffixGenerator;
-use Facades\App\Flare\Calculators\DropCheckCalculator;
 use App\Flare\Models\Character;
 use App\Flare\Models\Event;
 use App\Flare\Models\Item;
 use App\Flare\Models\Location;
 use App\Flare\Models\Monster;
-use Facades\App\Flare\RandomNumber\RandomNumberGenerator;
 use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\ItemSpecialtyType;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Flare\Values\RandomAffixDetails;
-use Facades\App\Game\Core\Handlers\AnnouncementHandler;
 use App\Game\Events\Values\EventType;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
 use Exception;
+use Facades\App\Flare\Calculators\DropCheckCalculator;
+use Facades\App\Flare\RandomNumber\RandomNumberGenerator;
+use Facades\App\Game\Core\Handlers\AnnouncementHandler;
 use Illuminate\Support\Facades\Cache;
 
-class PurgatorySmithHouseRewardHandler {
-
-
-    /**
-     * @var RandomAffixGenerator $randomAffixGenerator
-     */
+class PurgatorySmithHouseRewardHandler
+{
     private RandomAffixGenerator $randomAffixGenerator;
 
-    /**
-     * @param RandomAffixGenerator $randomAffixGenerator
-     */
-    public function __construct(RandomAffixGenerator $randomAffixGenerator) {
+    public function __construct(RandomAffixGenerator $randomAffixGenerator)
+    {
         $this->randomAffixGenerator = $randomAffixGenerator;
     }
 
-    public function handleFightingAtPurgatorySmithHouse(Character $character, Monster $monster): Character {
+    public function handleFightingAtPurgatorySmithHouse(Character $character, Monster $monster): Character
+    {
 
         if ($character->currentAutomations->isNotEmpty()) {
             return $character;
@@ -51,8 +46,8 @@ class PurgatorySmithHouseRewardHandler {
             return $character;
         }
 
-        if (!$location->locationType()->isPurgatorySmithHouse()) {
-             return $character;
+        if (! $location->locationType()->isPurgatorySmithHouse()) {
+            return $character;
         }
 
         $event = Event::where('type', EventType::PURGATORY_SMITH_HOUSE)->first();
@@ -72,12 +67,9 @@ class PurgatorySmithHouseRewardHandler {
 
     /**
      * is the monster at least halfway down the list?
-     *
-     * @param Location $location
-     * @param Monster $monster
-     * @return bool
      */
-    protected function isMonsterAtLeastHalfWayOrMore(Location $location, Monster $monster): bool {
+    protected function isMonsterAtLeastHalfWayOrMore(Location $location, Monster $monster): bool
+    {
 
         $monsters = Cache::get('monsters')[$location->name];
 
@@ -91,12 +83,9 @@ class PurgatorySmithHouseRewardHandler {
 
     /**
      * is the monster the final monster?
-     *
-     * @param Location $location
-     * @param Monster $monster
-     * @return bool
      */
-    protected function isMonsterTheFinalMonster(Location $location, Monster $monster): bool {
+    protected function isMonsterTheFinalMonster(Location $location, Monster $monster): bool
+    {
         $monsters = Cache::get('monsters')[$location->name];
 
         return $monsters[count($monsters) - 1]['id'] === $monster->id;
@@ -106,20 +95,17 @@ class PurgatorySmithHouseRewardHandler {
      * Reward the character with currencies.
      *
      * - Only gives copper coins if the character has
-     *
-     * @param Character $character
-     * @param Event|null $event
-     * @return Character
      */
-    public function currencyReward(Character $character, Event $event = null): Character {
+    public function currencyReward(Character $character, ?Event $event = null): Character
+    {
         $maximumAmount = 1000;
 
-        if (!is_null($event)) {
+        if (! is_null($event)) {
             $maximumAmount = 50000;
         }
 
         $goldDust = RandomNumberGenerator::generateRandomNumber(1, $maximumAmount);
-        $shards   = RandomNumberGenerator::generateRandomNumber(1, $maximumAmount);
+        $shards = RandomNumberGenerator::generateRandomNumber(1, $maximumAmount);
 
         $hasItemForCopperCoins = $character->inventory->slots->where('item.effect', ItemEffectsValue::GET_COPPER_COINS)->count() > 0;
         $copperCoins = 0;
@@ -128,8 +114,8 @@ class PurgatorySmithHouseRewardHandler {
             $copperCoins = RandomNumberGenerator::generateRandomNumber(1, $maximumAmount);
         }
 
-        $goldDust    += $character->gold_dust;
-        $shards      += $character->shards;
+        $goldDust += $character->gold_dust;
+        $shards += $character->shards;
         $copperCoins += $character->copper_coins;
 
         if ($goldDust > MaxCurrenciesValue::MAX_GOLD_DUST) {
@@ -147,7 +133,7 @@ class PurgatorySmithHouseRewardHandler {
         $character->update([
             'gold_dust' => $goldDust,
             'shards' => $shards,
-            'copper_coins' => $copperCoins
+            'copper_coins' => $copperCoins,
         ]);
 
         return $character->refresh();
@@ -156,13 +142,10 @@ class PurgatorySmithHouseRewardHandler {
     /**
      * Handle item Reward for player.
      *
-     * @param Character $character
-     * @param bool $isMythic
-     * @param Event|null $event
-     * @return Character
      * @throws Exception
      */
-    protected function handleItemReward(Character $character, bool $isMythic, Event $event = null): Character {
+    protected function handleItemReward(Character $character, bool $isMythic, ?Event $event = null): Character
+    {
         $lootingChance = $character->skills->where('baseSkill.name', 'Looting')->first()->skill_bonus;
         $maxRoll = $isMythic ? 10000000 : 1000000;
 
@@ -170,13 +153,13 @@ class PurgatorySmithHouseRewardHandler {
             $lootingChance = 0.15;
         }
 
-        if (!is_null($event)) {
+        if (! is_null($event)) {
             $lootingChance = .30;
             $maxRoll = $maxRoll / 2;
         }
 
         if (DropCheckCalculator::fetchDifficultItemChance($lootingChance, $maxRoll)) {
-            if (!$character->isInventoryFull()) {
+            if (! $character->isInventoryFull()) {
                 $this->rewardForCharacter($character, $isMythic);
             }
         }
@@ -189,12 +172,12 @@ class PurgatorySmithHouseRewardHandler {
     /**
      * Reward player with item.
      *
-     * @param Character $character
-     * @param bool $isMythic
      * @return void
+     *
      * @throws Exception
      */
-    protected function rewardForCharacter(Character $character, bool $isMythic = false) {
+    protected function rewardForCharacter(Character $character, bool $isMythic = false)
+    {
         $item = Item::where('specialty_type', ItemSpecialtyType::PURGATORY_CHAINS)
             ->whereNull('item_prefix_id')
             ->whereNull('item_suffix_id')
@@ -207,7 +190,7 @@ class PurgatorySmithHouseRewardHandler {
             return;
         }
 
-        if (!$isMythic) {
+        if (! $isMythic) {
             $randomAffixGenerator = $this->randomAffixGenerator->setCharacter($character)
                 ->setPaidAmount(RandomAffixDetails::LEGENDARY);
 
@@ -220,10 +203,10 @@ class PurgatorySmithHouseRewardHandler {
 
             $slot = $character->inventory->slots()->create([
                 'inventory_id' => $character->inventory->id,
-                'item_id'      => $newItem->id,
+                'item_id' => $newItem->id,
             ]);
 
-            event(new ServerMessageEvent($character->user, 'You found something LEGENDARY in the basement child: ' . $item->affix_name, $slot->id));
+            event(new ServerMessageEvent($character->user, 'You found something LEGENDARY in the basement child: '.$item->affix_name, $slot->id));
         }
 
         if ($isMythic) {
@@ -238,10 +221,10 @@ class PurgatorySmithHouseRewardHandler {
 
             $slot = $character->inventory->slots()->create([
                 'inventory_id' => $character->inventory->id,
-                'item_id'      => $newItem->id,
+                'item_id' => $newItem->id,
             ]);
 
-            event(new ServerMessageEvent($character->user, 'You found something MYTHICAL in the basement child: ' . $item->affix_name, $slot->id));
+            event(new ServerMessageEvent($character->user, 'You found something MYTHICAL in the basement child: '.$item->affix_name, $slot->id));
         }
     }
 
@@ -250,7 +233,8 @@ class PurgatorySmithHouseRewardHandler {
      *
      * @return void
      */
-    protected function createPossibleEvent() {
+    protected function createPossibleEvent()
+    {
 
         if (Event::where('type', EventType::PURGATORY_SMITH_HOUSE)->exists()) {
             return;
@@ -258,16 +242,16 @@ class PurgatorySmithHouseRewardHandler {
 
         if (RandomNumberGenerator::generateTrueRandomNumber(1000000) >= 1000000) {
             Event::create([
-                'type'        => EventType::PURGATORY_SMITH_HOUSE,
-                'started_at'  => now(),
-                'ends_at'     => now()->addHour(),
+                'type' => EventType::PURGATORY_SMITH_HOUSE,
+                'started_at' => now(),
+                'ends_at' => now()->addHour(),
             ]);
 
             AnnouncementHandler::createAnnouncement('purgatory_house');
 
             event(new GlobalMessageEvent(
-                'The floor boards creak and the cries of the children trapped in their own misery wale across the lands. ' .
-                '"Children of Tlessa, hear me as I lay bare my treasures for you to find in the depths of my own memories." echoes a familiar voice. ' .
+                'The floor boards creak and the cries of the children trapped in their own misery wale across the lands. '.
+                '"Children of Tlessa, hear me as I lay bare my treasures for you to find in the depths of my own memories." echoes a familiar voice. '.
                 'You recognise it. The Creator ...'
             ));
         }

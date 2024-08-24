@@ -15,10 +15,11 @@ use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Support\Facades\Cache;
 use League\Fractal\TransformerAbstract;
 
-class BaseTransformer extends TransformerAbstract {
-
-    public function fetchAttackTypes(Character $character): array {
-        $cache = Cache::get('character-attack-data-' . $character->id);
+class BaseTransformer extends TransformerAbstract
+{
+    public function fetchAttackTypes(Character $character): array
+    {
+        $cache = Cache::get('character-attack-data-'.$character->id);
 
         if (is_null($cache)) {
             return [];
@@ -27,8 +28,9 @@ class BaseTransformer extends TransformerAbstract {
         return $cache['attack_types'];
     }
 
-    public function fetchStats(Character $character, string $stat): mixed {
-        $cache = Cache::get('character-attack-data-' . $character->id);
+    public function fetchStats(Character $character, string $stat): mixed
+    {
+        $cache = Cache::get('character-attack-data-'.$character->id);
 
         if (is_null($cache)) {
             return 0.0;
@@ -37,8 +39,9 @@ class BaseTransformer extends TransformerAbstract {
         return $cache['character_data'][$stat];
     }
 
-    public function fetchStatAffixes(Character $character): array {
-        $cache = Cache::get('character-attack-data-' . $character->id);
+    public function fetchStatAffixes(Character $character): array
+    {
+        $cache = Cache::get('character-attack-data-'.$character->id);
 
         if (is_null($cache)) {
             return [];
@@ -47,8 +50,9 @@ class BaseTransformer extends TransformerAbstract {
         return $cache['stat_affixes'];
     }
 
-    public function fetchSkills(Character $character): array {
-        $cache = Cache::get('character-attack-data-' . $character->id);
+    public function fetchSkills(Character $character): array
+    {
+        $cache = Cache::get('character-attack-data-'.$character->id);
 
         if (is_null($cache)) {
             return [];
@@ -61,7 +65,8 @@ class BaseTransformer extends TransformerAbstract {
         return $skills;
     }
 
-    public function isAlchemyLocked(Character $character) {
+    public function isAlchemyLocked(Character $character)
+    {
         $alchemy = GameSkill::where('type', SkillTypeValue::ALCHEMY)->first();
 
         if (is_null($alchemy)) {
@@ -70,24 +75,25 @@ class BaseTransformer extends TransformerAbstract {
 
         $skill = Skill::where('game_skill_id', $alchemy->id)->where('character_id', $character->id)->first();
 
-        if (!is_null($skill)) {
+        if (! is_null($skill)) {
             return $skill->is_locked;
         }
 
         return true;
     }
 
-    public function getMaxLevel(Character $character) {
-        $item      = Item::where('effect', ItemEffectsValue::CONTINUE_LEVELING)->first();
+    public function getMaxLevel(Character $character)
+    {
+        $item = Item::where('effect', ItemEffectsValue::CONTINUE_LEVELING)->first();
 
         if (is_null($item)) {
             return MaxLevel::MAX_LEVEL;
         }
 
         $inventory = Inventory::where('character_id', $character->id)->first();
-        $slot      = InventorySlot::where('item_id', $item->id)->where('inventory_id', $inventory->id)->first();
+        $slot = InventorySlot::where('item_id', $item->id)->where('inventory_id', $inventory->id)->first();
 
-        if (!is_null($slot)) {
+        if (! is_null($slot)) {
             return MaxLevelConfiguration::first()->max_level;
         }
 

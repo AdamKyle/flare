@@ -3,16 +3,16 @@
 namespace Tests\Unit\Game\Skills\Services;
 
 use App\Flare\Models\GameSkill;
-use App\Flare\Values\MaxCurrenciesValue;
-use App\Game\Messages\Builders\ServerMessageBuilder;
-use App\Game\Skills\Services\SkillCheckService;
-use Illuminate\Support\Facades\Event;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\Models\Item;
 use App\Flare\Values\CharacterClassValue;
+use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\Messages\Builders\ServerMessageBuilder;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Skills\Services\AlchemyService;
+use App\Game\Skills\Services\SkillCheckService;
 use App\Game\Skills\Values\SkillTypeValue;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Event;
 use Mockery;
 use Mockery\MockInterface;
 use Tests\Setup\Character\CharacterFactory;
@@ -21,9 +21,9 @@ use Tests\Traits\CreateClass;
 use Tests\Traits\CreateGameSkill;
 use Tests\Traits\CreateItem;
 
-class AlchemyServiceTest extends TestCase {
-
-    use RefreshDatabase, CreateItem, CreateClass, CreateGameSkill;
+class AlchemyServiceTest extends TestCase
+{
+    use CreateClass, CreateGameSkill, CreateItem, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -31,25 +31,27 @@ class AlchemyServiceTest extends TestCase {
 
     private ?Item $alchemyItem;
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
-        $this->character = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
+        $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
 
         $this->alchemyService = resolve(AlchemyService::class);
 
         $this->alchemyItem = $this->createItem([
-            'gold_dust_cost'       => 1000,
-            'shards_cost'          => 1000,
+            'gold_dust_cost' => 1000,
+            'shards_cost' => 1000,
             'skill_level_required' => 1,
-            'skill_level_trivial'  => 100,
-            'crafting_type'        => 'alchemy',
-            'can_craft'            => true,
-            'type'                 => 'alchemy'
+            'skill_level_trivial' => 100,
+            'crafting_type' => 'alchemy',
+            'can_craft' => true,
+            'type' => 'alchemy',
         ]);
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
 
         $this->character = null;
@@ -57,7 +59,8 @@ class AlchemyServiceTest extends TestCase {
         $this->alchemyItem = null;
     }
 
-    public function testGetAlchemyItemsForCrafting() {
+    public function testGetAlchemyItemsForCrafting()
+    {
         $character = $this->character->getCharacter();
 
         $result = $this->alchemyService->fetchAlchemistItems($character);
@@ -65,11 +68,12 @@ class AlchemyServiceTest extends TestCase {
         $this->assertNotEmpty($result);
     }
 
-    public function testGetAlchemyItemsAsAlchemistForTheCostReduction() {
+    public function testGetAlchemyItemsAsAlchemistForTheCostReduction()
+    {
         Event::fake();
 
-        $character = (new CharacterFactory())->createBaseCharacter([], $this->createClass([
-            'name' => CharacterClassValue::ARCANE_ALCHEMIST
+        $character = (new CharacterFactory)->createBaseCharacter([], $this->createClass([
+            'name' => CharacterClassValue::ARCANE_ALCHEMIST,
         ]))->assignSkill($this->createGameSkill([
             'type' => SkillTypeValue::ALCHEMY,
         ]), 10)->givePlayerLocation()->getCharacter();
@@ -83,11 +87,12 @@ class AlchemyServiceTest extends TestCase {
         Event::assertDispatched(ServerMessageEvent::class);
     }
 
-    public function testGetAlchemyItemsAsMerchantForTheCostReduction() {
+    public function testGetAlchemyItemsAsMerchantForTheCostReduction()
+    {
         Event::fake();
 
-        $character = (new CharacterFactory())->createBaseCharacter([], $this->createClass([
-            'name' => CharacterClassValue::MERCHANT
+        $character = (new CharacterFactory)->createBaseCharacter([], $this->createClass([
+            'name' => CharacterClassValue::MERCHANT,
         ]))->assignSkill($this->createGameSkill([
             'type' => SkillTypeValue::ALCHEMY,
         ]), 10)->givePlayerLocation()->getCharacter();
@@ -101,7 +106,8 @@ class AlchemyServiceTest extends TestCase {
         Event::assertDispatched(ServerMessageEvent::class);
     }
 
-    public function testCannotTransmuteItemThatDoesntExist() {
+    public function testCannotTransmuteItemThatDoesntExist()
+    {
         Event::fake();
 
         $character = $this->character->getCharacter();
@@ -111,7 +117,8 @@ class AlchemyServiceTest extends TestCase {
         Event::assertDispatched(ServerMessageEvent::class);
     }
 
-    public function testCannotTransmuteItemNotEnoughGoldDust() {
+    public function testCannotTransmuteItemNotEnoughGoldDust()
+    {
         Event::fake();
 
         $character = $this->character->getCharacter();
@@ -123,7 +130,8 @@ class AlchemyServiceTest extends TestCase {
         });
     }
 
-    public function testCannotTransmuteItemNotEnoughShards() {
+    public function testCannotTransmuteItemNotEnoughShards()
+    {
         Event::fake();
 
         $character = $this->character->getCharacter();
@@ -141,14 +149,15 @@ class AlchemyServiceTest extends TestCase {
         });
     }
 
-    public function testCannotTransmuteItemLevelToHigh() {
+    public function testCannotTransmuteItemLevelToHigh()
+    {
         Event::fake();
 
         $character = $this->character->getCharacter();
 
         $character->update([
             'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
-            'shards'    => MaxCurrenciesValue::MAX_SHARDS,
+            'shards' => MaxCurrenciesValue::MAX_SHARDS,
         ]);
 
         $character = $character->refresh();
@@ -164,14 +173,15 @@ class AlchemyServiceTest extends TestCase {
         });
     }
 
-    public function testTransmuteWhenLevelTrivialTooLow() {
+    public function testTransmuteWhenLevelTrivialTooLow()
+    {
         Event::fake();
 
         $character = $this->character->getCharacter();
 
         $character->update([
             'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
-            'shards'    => MaxCurrenciesValue::MAX_SHARDS,
+            'shards' => MaxCurrenciesValue::MAX_SHARDS,
         ]);
 
         $character = $character->refresh();
@@ -191,12 +201,13 @@ class AlchemyServiceTest extends TestCase {
         $this->assertCount(1, $character->inventory->slots);
     }
 
-    public function testTransmute() {
+    public function testTransmute()
+    {
         $character = $this->character->getCharacter();
 
         $character->update([
             'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
-            'shards'    => MaxCurrenciesValue::MAX_SHARDS,
+            'shards' => MaxCurrenciesValue::MAX_SHARDS,
         ]);
 
         $character = $character->refresh();
@@ -209,7 +220,8 @@ class AlchemyServiceTest extends TestCase {
         $this->assertLessThan(MaxCurrenciesValue::MAX_SHARDS, $character->shards);
     }
 
-    public function testTransmuteAndFail() {
+    public function testTransmuteAndFail()
+    {
         Event::fake();
 
         $this->instance(
@@ -224,7 +236,7 @@ class AlchemyServiceTest extends TestCase {
 
         $character->update([
             'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
-            'shards'    => MaxCurrenciesValue::MAX_SHARDS,
+            'shards' => MaxCurrenciesValue::MAX_SHARDS,
         ]);
 
         $character = $character->refresh();
@@ -238,7 +250,8 @@ class AlchemyServiceTest extends TestCase {
         });
     }
 
-    public function testTransmuteAndSucceed() {
+    public function testTransmuteAndSucceed()
+    {
         $this->instance(
             SkillCheckService::class,
             Mockery::mock(SkillCheckService::class, function (MockInterface $mock) {
@@ -251,7 +264,7 @@ class AlchemyServiceTest extends TestCase {
 
         $character->update([
             'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
-            'shards'    => MaxCurrenciesValue::MAX_SHARDS,
+            'shards' => MaxCurrenciesValue::MAX_SHARDS,
         ]);
 
         $character = $character->refresh();
@@ -263,7 +276,8 @@ class AlchemyServiceTest extends TestCase {
         $this->assertCount(1, $character->inventory->slots);
     }
 
-    public function testTransmuteAndSucceedButInventoryIsFull() {
+    public function testTransmuteAndSucceedButInventoryIsFull()
+    {
         Event::fake();
 
         $this->instance(
@@ -277,8 +291,8 @@ class AlchemyServiceTest extends TestCase {
         $character = $this->character->getCharacter();
 
         $character->update([
-            'gold_dust'     => MaxCurrenciesValue::MAX_GOLD_DUST,
-            'shards'        => MaxCurrenciesValue::MAX_SHARDS,
+            'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
+            'shards' => MaxCurrenciesValue::MAX_SHARDS,
             'inventory_max' => 0,
         ]);
 
@@ -295,7 +309,8 @@ class AlchemyServiceTest extends TestCase {
         $this->assertCount(0, $character->inventory->slots);
     }
 
-    public function testTransmuteAsAlchemist() {
+    public function testTransmuteAsAlchemist()
+    {
         $this->instance(
             SkillCheckService::class,
             Mockery::mock(SkillCheckService::class, function (MockInterface $mock) {
@@ -304,17 +319,17 @@ class AlchemyServiceTest extends TestCase {
             })
         );
 
-        $character = (new CharacterFactory())->createBaseCharacter([], $this->createClass([
-            'name' => CharacterClassValue::ARCANE_ALCHEMIST
+        $character = (new CharacterFactory)->createBaseCharacter([], $this->createClass([
+            'name' => CharacterClassValue::ARCANE_ALCHEMIST,
         ]))->givePlayerLocation()->getCharacter();
 
         $character->update([
             'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
-            'shards'    => MaxCurrenciesValue::MAX_SHARDS,
+            'shards' => MaxCurrenciesValue::MAX_SHARDS,
         ]);
 
         $goldDustAfterOriginalCost = MaxCurrenciesValue::MAX_GOLD_DUST - $this->alchemyItem->gold_dust_cost;
-        $shardsAfterOriginalCost   = MaxCurrenciesValue::MAX_SHARDS - $this->alchemyItem->shards_cost;
+        $shardsAfterOriginalCost = MaxCurrenciesValue::MAX_SHARDS - $this->alchemyItem->shards_cost;
 
         $character = $character->refresh();
 
@@ -329,7 +344,8 @@ class AlchemyServiceTest extends TestCase {
         $this->assertGreaterThan($shardsAfterOriginalCost, $character->shards);
     }
 
-    public function testTransmuteAsMerchant() {
+    public function testTransmuteAsMerchant()
+    {
         $this->instance(
             SkillCheckService::class,
             Mockery::mock(SkillCheckService::class, function (MockInterface $mock) {
@@ -338,17 +354,17 @@ class AlchemyServiceTest extends TestCase {
             })
         );
 
-        $character = (new CharacterFactory())->createBaseCharacter([], $this->createClass([
-            'name' => CharacterClassValue::MERCHANT
+        $character = (new CharacterFactory)->createBaseCharacter([], $this->createClass([
+            'name' => CharacterClassValue::MERCHANT,
         ]))->givePlayerLocation()->getCharacter();
 
         $character->update([
             'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
-            'shards'    => MaxCurrenciesValue::MAX_SHARDS,
+            'shards' => MaxCurrenciesValue::MAX_SHARDS,
         ]);
 
         $goldDustAfterOriginalCost = MaxCurrenciesValue::MAX_GOLD_DUST - $this->alchemyItem->gold_dust_cost;
-        $shardsAfterOriginalCost   = MaxCurrenciesValue::MAX_SHARDS - $this->alchemyItem->shards_cost;
+        $shardsAfterOriginalCost = MaxCurrenciesValue::MAX_SHARDS - $this->alchemyItem->shards_cost;
 
         $character = $character->refresh();
 
@@ -363,7 +379,8 @@ class AlchemyServiceTest extends TestCase {
         $this->assertGreaterThan($shardsAfterOriginalCost, $character->shards);
     }
 
-    public function testFetchCharacterAlchemyCraftingXP() {
+    public function testFetchCharacterAlchemyCraftingXP()
+    {
         $character = $this->character->getCharacter();
 
         $alchemyCraftingXpData = $this->alchemyService->fetchSkillXP($character);

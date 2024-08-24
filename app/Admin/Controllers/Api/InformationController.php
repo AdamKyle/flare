@@ -5,21 +5,20 @@ namespace App\Admin\Controllers\Api;
 use App\Admin\Requests\InformationManagementRequest;
 use App\Admin\Services\InfoPageService;
 use App\Flare\Models\InfoPage;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 
-class InformationController extends Controller {
-
-    /**
-     * @var InfoPageService
-     */
+class InformationController extends Controller
+{
     private InfoPageService $infoPageService;
 
-    public function __construct(InfoPageService $infoPageService) {
+    public function __construct(InfoPageService $infoPageService)
+    {
         $this->infoPageService = $infoPageService;
     }
 
-    public function getPage(Request $request) {
+    public function getPage(Request $request)
+    {
         $page = InfoPage::find($request->page_id);
 
         return response()->json([
@@ -28,21 +27,23 @@ class InformationController extends Controller {
         ]);
     }
 
-    public function storePage(InformationManagementRequest $request) {
+    public function storePage(InformationManagementRequest $request)
+    {
         $page = $this->infoPageService->createPage($request->all());
 
         return response()->json([
-           'pageId' => $page->id
+            'pageId' => $page->id,
         ]);
     }
 
-    public function updatePage(InformationManagementRequest $request) {
+    public function updatePage(InformationManagementRequest $request)
+    {
 
         $page = InfoPage::find($request->page_id);
 
         if (is_null($page)) {
             return response()->json([
-                'message' => 'Page does not exist.'
+                'message' => 'Page does not exist.',
             ], 422);
         }
 
@@ -53,7 +54,8 @@ class InformationController extends Controller {
         ]);
     }
 
-    public function deleteSection(Request $request, InfoPage $infoPage) {
+    public function deleteSection(Request $request, InfoPage $infoPage)
+    {
         $page = $this->infoPageService->deleteSectionFromPage($infoPage, $request->order);
 
         return response()->json([
@@ -61,13 +63,14 @@ class InformationController extends Controller {
         ]);
     }
 
-    public function deletePage(Request $request) {
+    public function deletePage(Request $request)
+    {
 
         $page = InfoPage::find($request->page_id);
 
         if (is_null($page)) {
             return response()->json([
-                'message' => 'Page does not exist.'
+                'message' => 'Page does not exist.',
             ], 422);
         }
 
@@ -76,7 +79,7 @@ class InformationController extends Controller {
         $page->delete();
 
         return response()->json([
-            'message' => 'Page deleted.'
+            'message' => 'Page deleted.',
         ]);
     }
 }

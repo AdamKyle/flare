@@ -13,9 +13,9 @@ use Tests\Traits\CreateGameSkill;
 use Tests\Traits\CreateGem;
 use Tests\Traits\CreateItem;
 
-class DamageBuilderTest extends TestCase {
-
-    use RefreshDatabase, CreateItem, CreateClass, CreateGameSkill, CreateGem;
+class DamageBuilderTest extends TestCase
+{
+    use CreateClass, CreateGameSkill, CreateGem, CreateItem, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -23,12 +23,13 @@ class DamageBuilderTest extends TestCase {
 
     private ?DamageBuilder $damageBuilder;
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
-        $this->character            = (new CharacterFactory())->createBaseCharacter()->assignSkill(
+        $this->character = (new CharacterFactory)->createBaseCharacter()->assignSkill(
             $this->createGameSkill([
-                'class_bonus' => 0.01
+                'class_bonus' => 0.01,
             ]),
             5
         )->givePlayerLocation();
@@ -38,21 +39,23 @@ class DamageBuilderTest extends TestCase {
         $this->damageBuilder = resolve(DamageBuilder::class);
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
 
-        $this->character            = null;
+        $this->character = null;
         $this->characterStatBuilder = null;
-        $this->damageBuilder   = null;
+        $this->damageBuilder = null;
     }
 
-    public function testArcaneAlchemistDoesMoreDamageWithStave() {
-        $arcaneAlchemist = (new CharacterFactory())->createBaseCharacter([], $this->createClass([
-            'name'        => CharacterClassValue::ARCANE_ALCHEMIST,
-            'damage_stat' => 'str'
+    public function testArcaneAlchemistDoesMoreDamageWithStave()
+    {
+        $arcaneAlchemist = (new CharacterFactory)->createBaseCharacter([], $this->createClass([
+            'name' => CharacterClassValue::ARCANE_ALCHEMIST,
+            'damage_stat' => 'str',
         ]))->assignSkill(
             $this->createGameSkill([
-                'class_bonus' => 0.01
+                'class_bonus' => 0.01,
             ]),
             5
         )->givePlayerLocation()
@@ -65,12 +68,12 @@ class DamageBuilderTest extends TestCase {
             )
             ->getCharacter();
 
-        $prophet = (new CharacterFactory())->createBaseCharacter([], $this->createClass([
-            'name'        => CharacterClassValue::PROPHET,
-            'damage_stat' => 'str'
+        $prophet = (new CharacterFactory)->createBaseCharacter([], $this->createClass([
+            'name' => CharacterClassValue::PROPHET,
+            'damage_stat' => 'str',
         ]))->assignSkill(
             $this->createGameSkill([
-                'class_bonus' => 0.01
+                'class_bonus' => 0.01,
             ]),
             5
         )->givePlayerLocation()
@@ -82,8 +85,6 @@ class DamageBuilderTest extends TestCase {
                 'left-hand'
             )
             ->getCharacter();
-
-
 
         $prophetEquipped = $this->characterStatBuilder->fetchEquipped($prophet);
 

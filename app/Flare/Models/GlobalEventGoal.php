@@ -2,15 +2,15 @@
 
 namespace App\Flare\Models;
 
-use App\Game\Events\Values\EventType;
 use App\Flare\Values\ItemSpecialtyType;
+use App\Game\Events\Values\EventType;
 use Database\Factories\GlobalEventGoalFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class GlobalEventGoal extends Model {
-
+class GlobalEventGoal extends Model
+{
     use HasFactory;
 
     /**
@@ -37,15 +37,15 @@ class GlobalEventGoal extends Model {
      * @var array
      */
     protected $casts = [
-        'max_kills'                     => 'integer',
-        'max_crafts'                    => 'integer',
-        'max_enchants'                  => 'integer',
-        'reward_every'                  => 'integer',
-        'next_reward_at'                => 'integer',
-        'event_type'                    => 'integer',
-        'should_be_unique'              => 'boolean',
-        'unique_type'                   => 'integer',
-        'should_be_mythic'              => 'boolean',
+        'max_kills' => 'integer',
+        'max_crafts' => 'integer',
+        'max_enchants' => 'integer',
+        'reward_every' => 'integer',
+        'next_reward_at' => 'integer',
+        'event_type' => 'integer',
+        'should_be_unique' => 'boolean',
+        'unique_type' => 'integer',
+        'should_be_mythic' => 'boolean',
     ];
 
     protected $appends = [
@@ -54,43 +54,53 @@ class GlobalEventGoal extends Model {
         'total_enchants',
     ];
 
-    public function globalEventParticipation(): HasMany {
+    public function globalEventParticipation(): HasMany
+    {
         return $this->hasMany(GlobalEventParticipation::class, 'global_event_goal_id', 'id');
     }
 
-    public function globalEventKills(): HasMany {
+    public function globalEventKills(): HasMany
+    {
         return $this->hasMany(GlobalEventKill::class, 'global_event_goal_id', 'id');
     }
 
-    public function globalEventCrafts(): HasMany {
+    public function globalEventCrafts(): HasMany
+    {
         return $this->hasMany(GlobalEventCraft::class, 'global_event_goal_id', 'id');
     }
 
-    public function globalEventEnchants(): HasMany {
+    public function globalEventEnchants(): HasMany
+    {
         return $this->hasMany(GlobalEventEnchant::class, 'global_event_goal_id', 'id');
     }
 
-    public function eventType(): EventType {
+    public function eventType(): EventType
+    {
         return new EventType($this->event_type);
     }
 
-    public function itemSpecialtyType(): itemSpecialtyType {
+    public function itemSpecialtyType(): itemSpecialtyType
+    {
         return new ItemSpecialtyType($this->item_specialty_type_reward);
     }
 
-    public function getTotalKillsAttribute(): int {
+    public function getTotalKillsAttribute(): int
+    {
         return $this->globalEventParticipation->sum('current_kills');
     }
 
-    public function getTotalCraftsAttribute(): int {
+    public function getTotalCraftsAttribute(): int
+    {
         return $this->globalEventParticipation->sum('current_crafts');
     }
 
-    public function getTotalEnchantsAttribute(): int {
+    public function getTotalEnchantsAttribute(): int
+    {
         return $this->globalEventParticipation->sum('current_enchants');
     }
 
-    protected static function newFactory() {
+    protected static function newFactory()
+    {
         return GlobalEventGoalFactory::new();
     }
 }

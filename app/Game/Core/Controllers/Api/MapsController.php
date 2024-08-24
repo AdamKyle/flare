@@ -2,14 +2,15 @@
 
 namespace App\Game\Core\Controllers\Api;
 
-use App\Flare\Models\Location;
-use App\Http\Controllers\Controller;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameMap;
+use App\Flare\Models\Location;
+use App\Http\Controllers\Controller;
 
-class MapsController extends Controller {
-
-    public function index(Character $character) {
+class MapsController extends Controller
+{
+    public function index(Character $character)
+    {
         $maps = GameMap::where('id', '!=', $character->map->game_map_id)->get();
 
         $mapInfo = [];
@@ -19,32 +20,33 @@ class MapsController extends Controller {
             if ($map->mapType()->isPurgatory()) {
                 $location = $this->getLocation($character);
 
-                if (!is_null($location)) {
+                if (! is_null($location)) {
                     if ($map->required_location_id === $location->id) {
                         $mapInfo[] = [
                             'name' => $map->name,
-                            'id'   => $map->id,
+                            'id' => $map->id,
                         ];
                     }
                 }
             } else {
                 $mapInfo[] = [
                     'name' => $map->name,
-                    'id'   => $map->id,
+                    'id' => $map->id,
                 ];
             }
         }
 
         return response()->json([
-            'maps'        => $mapInfo,
+            'maps' => $mapInfo,
             'current_map' => $character->map->gameMap->name,
         ]);
     }
 
-    protected function getLocation($character): ?Location {
+    protected function getLocation($character): ?Location
+    {
         return Location::where('x', $character->map->character_position_x)
-                       ->where('y', $character->map->character_position_y)
-                       ->where('game_map_id', $character->map->gameMap->id)
-                       ->first();
+            ->where('y', $character->map->character_position_y)
+            ->where('game_map_id', $character->map->gameMap->id)
+            ->first();
     }
 }

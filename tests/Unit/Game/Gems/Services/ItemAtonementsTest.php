@@ -11,9 +11,9 @@ use Tests\TestCase;
 use Tests\Traits\CreateGem;
 use Tests\Traits\CreateItem;
 
-class ItemAtonementsTest extends TestCase {
-
-    use CreateItem, CreateGem, RefreshDatabase;
+class ItemAtonementsTest extends TestCase
+{
+    use CreateGem, CreateItem, RefreshDatabase;
 
     private ?Item $item;
 
@@ -21,27 +21,28 @@ class ItemAtonementsTest extends TestCase {
 
     private ?CharacterFactory $characterFactory;
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
         $item = $this->createItem([
-            'socket_count' => 2
+            'socket_count' => 2,
         ]);
 
         $gem = $this->createGem([
-            'name'                       => 'Sample',
-            'tier'                       => 4,
-            'primary_atonement_type'     => GemTypeValue::FIRE,
-            'secondary_atonement_type'   => GemTypeValue::ICE,
-            'tertiary_atonement_type'    => GemTypeValue::WATER,
-            'primary_atonement_amount'   => 0.10,
+            'name' => 'Sample',
+            'tier' => 4,
+            'primary_atonement_type' => GemTypeValue::FIRE,
+            'secondary_atonement_type' => GemTypeValue::ICE,
+            'tertiary_atonement_type' => GemTypeValue::WATER,
+            'primary_atonement_amount' => 0.10,
             'secondary_atonement_amount' => 0.25,
-            'tertiary_atonement_amount'  => 0.45,
+            'tertiary_atonement_amount' => 0.45,
         ]);
 
         $item->sockets()->create([
             'item_id' => $item->id,
-            'gem_id'  => $gem->id,
+            'gem_id' => $gem->id,
         ]);
 
         $this->item = $item->refresh();
@@ -51,7 +52,8 @@ class ItemAtonementsTest extends TestCase {
         $this->characterFactory = (new CharacterFactory)->createBaseCharacter();
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
 
         $this->item = null;
@@ -61,14 +63,16 @@ class ItemAtonementsTest extends TestCase {
         $this->characterFactory = null;
     }
 
-    public function testInventoryComparisonIsEmpty() {
+    public function testInventoryComparisonIsEmpty()
+    {
         $result = $this->itemAtonements->getAtonements($this->item, collect());
 
         $this->assertNotEmpty($result['item_atonement']);
         $this->assertEmpty($result['inventory_atonements']);
     }
 
-    public function testInventoryComparisonIsNotEmpty() {
+    public function testInventoryComparisonIsNotEmpty()
+    {
         $character = $this->characterFactory->inventoryManagement()->giveItem($this->item)->getCharacter();
 
         $inventory = $character->inventory->slots;

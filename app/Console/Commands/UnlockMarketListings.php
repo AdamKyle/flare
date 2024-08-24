@@ -23,10 +23,9 @@ class UnlockMarketListings extends Command
 
     /**
      * Execute the console command.
-     *
-     * @return void
      */
-    public function handle(): void {
+    public function handle(): void
+    {
         MarketBoard::where('is_locked', true)->update(['is_locked' => false]);
     }
 }

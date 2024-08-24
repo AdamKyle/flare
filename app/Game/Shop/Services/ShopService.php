@@ -21,46 +21,33 @@ use Illuminate\Support\Facades\Cache;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
 
-class ShopService {
-
+class ShopService
+{
     use ResponseBuilder;
 
-    /**
-     * @var EquipItemService $equipItemService
-     */
     private EquipItemService $equipItemService;
 
-    /**
-     * @var ItemTransformer $itemTransformer
-     */
     private ItemTransformer $itemTransformer;
 
     private CharacterInventoryService $characterInventoryService;
 
-    /**
-     * @var Manager $manager
-     */
     private Manager $manager;
 
-    /**
-     * @param EquipItemService $equipItemService
-     * @param CharacterInventoryService $characterInventoryService
-     * @param ItemTransformer $itemTransformer
-     * @param Manager $manager
-     */
-    public function __construct(EquipItemService $equipItemService, CharacterInventoryService $characterInventoryService, ItemTransformer $itemTransformer, Manager $manager) {
+    public function __construct(EquipItemService $equipItemService, CharacterInventoryService $characterInventoryService, ItemTransformer $itemTransformer, Manager $manager)
+    {
         $this->equipItemService = $equipItemService;
         $this->itemTransformer = $itemTransformer;
-        $this->manager  = $manager;
+        $this->manager = $manager;
 
         $this->characterInventoryService = $characterInventoryService;
     }
 
-    public function getItemsForShop(): array {
+    public function getItemsForShop(): array
+    {
 
         $cachedItems = Cache::get('items-for-shop');
 
-        if (!is_null($cachedItems)) {
+        if (! is_null($cachedItems)) {
             return $cachedItems;
         }
 
@@ -81,9 +68,10 @@ class ShopService {
         return $items;
     }
 
-    public function sellSpecificItem(Character $character, int $slotId): array {
+    public function sellSpecificItem(Character $character, int $slotId): array
+    {
         $inventorySlot = $character->inventory->slots->filter(function ($slot) use ($slotId) {
-            return $slot->id === $slotId && !$slot->equipped;
+            return $slot->id === $slotId && ! $slot->equipped;
         })->first();
 
         if (is_null($inventorySlot)) {
@@ -107,14 +95,15 @@ class ShopService {
         return $this->successResult([
             'item_name' => $item->affix_name,
             'sold_for' => $totalSoldFor,
-            'message' => 'Sold: ' . $item->affix_name . ' for: ' . number_format($totalSoldFor) . ' gold.',
+            'message' => 'Sold: '.$item->affix_name.' for: '.number_format($totalSoldFor).' gold.',
             'inventory' => [
                 'inventory' => $inventory->getInventoryForType('inventory'),
-            ]
+            ],
         ]);
     }
 
-    public function sellAllItems(Character $character): array {
+    public function sellAllItems(Character $character): array
+    {
 
         $totalSoldFor = $this->sellAllItemsInInventory($character);
 
@@ -138,17 +127,17 @@ class ShopService {
                 'message' => 'Could not sell any items ...',
                 'inventory' => [
                     'inventory' => $inventory->getInventoryForType('inventory'),
-                ]
+                ],
             ]);
         }
 
         event(new UpdateTopBarEvent($character));
 
         return $this->successResult([
-            'message' => 'Sold all your items for a total of: ' . number_format($totalSoldFor) . ' gold.',
+            'message' => 'Sold all your items for a total of: '.number_format($totalSoldFor).' gold.',
             'inventory' => [
                 'inventory' => $inventory->getInventoryForType('inventory'),
-            ]
+            ],
         ]);
     }
 
@@ -156,15 +145,13 @@ class ShopService {
      * Sell all the items in the inventory.
      *
      * Sell all that are not equipped and not a quest item.
-     *
-     * @param Character $character
-     * @return int
      */
-    private function sellAllItemsInInventory(Character $character): int {
+    private function sellAllItemsInInventory(Character $character): int
+    {
         $invalidTypes = ['alchemy', 'quest', 'trinket'];
 
         $itemsToSell = $character->inventory->slots()->with('item')->get()->filter(function ($slot) use ($invalidTypes) {
-            return !$slot->equipped && !in_array($slot->item->type, $invalidTypes);
+            return ! $slot->equipped && ! in_array($slot->item->type, $invalidTypes);
         });
 
         if ($itemsToSell->isEmpty()) {
@@ -187,20 +174,17 @@ class ShopService {
     /**
      * Buy and replace the item in your inventory.
      *
-     * @param Item $item
-     * @param Character $character
-     * @param array $requestData
-     * @return void
      * @throws EquipItemException
      */
-    public function buyAndReplace(Item $item, Character $character, array $requestData): void {
+    public function buyAndReplace(Item $item, Character $character, array $requestData): void
+    {
         event(new BuyItemEvent($item, $character));
 
         $character = $character->refresh();
 
         $inventory = Inventory::where('character_id', $character->id)->first();
 
-        $slot      = InventorySlot::where('equipped', false)->where('item_id', $item->id)->where('inventory_id', $inventory->id)->first();
+        $slot = InventorySlot::where('equipped', false)->where('item_id', $item->id)->where('inventory_id', $inventory->id)->first();
 
         $requestData['slot_id'] = $slot->id;
 
@@ -213,14 +197,9 @@ class ShopService {
 
     /**
      * Buy multiple of the same item.
-     *
-     * @param Character $character
-     * @param Item $item
-     * @param int $cost
-     * @param int $amount
-     * @return void
      */
-    public function buyMultipleItems(Character $character, Item $item, int $cost, int $amount): void {
+    public function buyMultipleItems(Character $character, Item $item, int $cost, int $amount): void
+    {
         $character->update([
             'gold' => $character->gold - $cost,
         ]);
@@ -230,20 +209,17 @@ class ShopService {
         for ($i = 1; $i <= $amount; $i++) {
             $character->inventory->slots()->create([
                 'inventory_id' => $character->inventory->id,
-                'item_id'      => $item->id,
+                'item_id' => $item->id,
             ]);
         }
     }
 
     /**
      * Sell Item.
-     *
-     * @param InventorySlot $inventorySlot
-     * @param Character $character
-     * @return int
      */
-    public function sellItem(InventorySlot $inventorySlot, Character $character): int {
-        $item         = $inventorySlot->item;
+    public function sellItem(InventorySlot $inventorySlot, Character $character): int
+    {
+        $item = $inventorySlot->item;
         $totalSoldFor = SellItemCalculator::fetchSalePriceWithAffixes($item);
 
         event(new SellItemEvent($inventorySlot, $character));

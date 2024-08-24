@@ -2,7 +2,6 @@
 
 namespace App\Game\Kingdoms\Handlers;
 
-use App\Flare\Models\GameBuilding;
 use App\Flare\Models\GameUnit;
 use App\Flare\Models\Kingdom;
 use App\Game\Core\Traits\KingdomCache;
@@ -11,36 +10,28 @@ use App\Game\Kingdoms\Events\UpdateGlobalMap;
 use App\Game\Kingdoms\Traits\UpdateKingdomBuildingsBasedOnPassives;
 use App\Game\Kingdoms\Values\KingdomMaxValue;
 
-class SettlerHandler {
-
+class SettlerHandler
+{
     use KingdomCache, UpdateKingdomBuildingsBasedOnPassives;
 
-    /**
-     * @var array $newAttackingUnits
-     */
     private array $newAttackingUnits = [];
 
     /**
      * Get new attacking units.
      *
      * - Could be an empty array.
-     *
-     * @return array
      */
-    public function getNewAttackingUnits(): array {
+    public function getNewAttackingUnits(): array
+    {
         return $this->newAttackingUnits;
     }
 
     /**
      * Attempt to take the defending character's kingdom.
-     *
-     * @param Kingdom $attackingKingdom
-     * @param Kingdom $defendingKingdom
-     * @param array $attackingUnits
-     * @return Kingdom
      */
-    public function attemptToSettleKingdom(Kingdom $attackingKingdom, Kingdom $defendingKingdom, array $attackingUnits): Kingdom {
-        $settlerData      = $this->findSettler($attackingUnits);
+    public function attemptToSettleKingdom(Kingdom $attackingKingdom, Kingdom $defendingKingdom, array $attackingUnits): Kingdom
+    {
+        $settlerData = $this->findSettler($attackingUnits);
         $otherUnitsAmount = $this->getAmountOfOtherUnits($attackingUnits);
 
         if (is_null($settlerData)) {
@@ -59,21 +50,21 @@ class SettlerHandler {
 
         $reducesMoraleBy = $this->getReducesMoraleBy($attackingKingdom, $settlerData['unit_id']);
 
-        $currentMorale   = $defendingKingdom->current_morale;
+        $currentMorale = $defendingKingdom->current_morale;
 
-        $currentMorale   = $currentMorale - $reducesMoraleBy;
+        $currentMorale = $currentMorale - $reducesMoraleBy;
 
         if ($currentMorale <= 0) {
             $originalOwner = $defendingKingdom->character;
 
             $defendingKingdom->update([
-                'character_id'   => $attackingKingdom->character->id,
-                'current_morale' => 0.10
+                'character_id' => $attackingKingdom->character->id,
+                'current_morale' => 0.10,
             ]);
 
             $defendingKingdom = $defendingKingdom->refresh();
 
-            if (!is_null($originalOwner)) {
+            if (! is_null($originalOwner)) {
                 $this->removeKingdomFromCache($originalOwner, $defendingKingdom);
             }
 
@@ -95,7 +86,8 @@ class SettlerHandler {
         return $defendingKingdom->refresh();
     }
 
-    protected function findSettler(array $attackingUnits): ?array {
+    protected function findSettler(array $attackingUnits): ?array
+    {
         $index = array_search('Settler', array_column($attackingUnits, 'name'));
 
         if ($index !== false) {
@@ -105,15 +97,17 @@ class SettlerHandler {
         return null;
     }
 
-    protected function getReducesMoraleBy(Kingdom $attackingKingdom, int $unitId): float {
+    protected function getReducesMoraleBy(Kingdom $attackingKingdom, int $unitId): float
+    {
         return $attackingKingdom->units()
-                                ->where('id', $unitId)
-                                ->first()
+            ->where('id', $unitId)
+            ->first()
                                 ->gameUnit
                                 ->reduces_morale_by;
     }
 
-    protected function updateAttackingUnits(array $attackingUnits): void {
+    protected function updateAttackingUnits(array $attackingUnits): void
+    {
         $index = array_search('Settler', array_column($attackingUnits, 'name'));
 
         if ($index !== false) {
@@ -123,7 +117,8 @@ class SettlerHandler {
         $this->newAttackingUnits = $attackingUnits;
     }
 
-    protected function getAmountOfOtherUnits(array $attackingUnits): int {
+    protected function getAmountOfOtherUnits(array $attackingUnits): int
+    {
         $amount = 0;
 
         foreach ($attackingUnits as $unitData) {
@@ -137,7 +132,8 @@ class SettlerHandler {
         return $amount;
     }
 
-    protected function updateNewKingdom(Kingdom $defendingKingdom, array $attackingUnits): Kingdom {
+    protected function updateNewKingdom(Kingdom $defendingKingdom, array $attackingUnits): Kingdom
+    {
 
         $kingdomsUnits = $defendingKingdom->units;
 
@@ -147,7 +143,7 @@ class SettlerHandler {
                 continue;
             }
 
-            $foundUnit = $kingdomsUnits->filter(function($kingdomUnit) use ($unitData) {
+            $foundUnit = $kingdomsUnits->filter(function ($kingdomUnit) use ($unitData) {
                 return $kingdomUnit->gameUnit->name === $unitData['name'];
             })->first();
 
@@ -155,9 +151,9 @@ class SettlerHandler {
                 $gameUnitId = GameUnit::where('name', $unitData['name'])->first()->id;
 
                 $defendingKingdom->units()->create([
-                    'kingdom_id'   => $defendingKingdom->id,
+                    'kingdom_id' => $defendingKingdom->id,
                     'game_unit_id' => $gameUnitId,
-                    'amount'       => $unitData['amount']
+                    'amount' => $unitData['amount'],
                 ]);
             } else {
                 $newAmount = $unitData['amount'] + $foundUnit->amount;

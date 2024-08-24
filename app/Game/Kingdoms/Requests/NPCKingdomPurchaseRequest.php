@@ -28,10 +28,11 @@ class NPCKingdomPurchaseRequest extends FormRequest
         ];
     }
 
-    public function messages() {
+    public function messages()
+    {
         return [
-            'kingdom_id.required'     => 'Kingdom ID is required',
-            'kingdom_id.exists'       => 'Kingdom does not exist.',
+            'kingdom_id.required' => 'Kingdom ID is required',
+            'kingdom_id.exists' => 'Kingdom does not exist.',
         ];
     }
 }

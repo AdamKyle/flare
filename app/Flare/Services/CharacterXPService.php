@@ -2,7 +2,6 @@
 
 namespace App\Flare\Services;
 
-
 use App\Flare\Models\Character;
 use App\Flare\Models\Inventory;
 use App\Flare\Models\InventorySlot;
@@ -11,8 +10,8 @@ use App\Flare\Values\ItemEffectsValue;
 use App\Game\Battle\Values\MaxLevel;
 use Illuminate\Database\Eloquent\Collection;
 
-class CharacterXPService {
-
+class CharacterXPService
+{
     /**
      * Determine the XP to reward.
      *
@@ -20,12 +19,9 @@ class CharacterXPService {
      *   - All quest items that ignore the caps
      *   - All quest items that do no ignore caps
      *   - Add both together to get the XP.
-     *
-     * @param Character $character
-     * @param int $xp
-     * @return int
      */
-    public function determineXPToAward(Character $character, int $xp): int {
+    public function determineXPToAward(Character $character, int $xp): int
+    {
 
         if ($xp === 0) {
             return 0;
@@ -33,13 +29,13 @@ class CharacterXPService {
 
         $canContinueLeveling = $this->canContinueLeveling($character);
 
-        $xpBonusQuestSlots   = $this->findAllItemsThatGiveXpBonus($character);
-        $boonBonus           = $character->boons->sum('itemUsed.xp_bonus');
-        $map                 = $character->map->gameMap;
-        $mapBonus            = !is_null($map->xp_bonus) ? $map->xp_bonus : 0;
+        $xpBonusQuestSlots = $this->findAllItemsThatGiveXpBonus($character);
+        $boonBonus = $character->boons->sum('itemUsed.xp_bonus');
+        $map = $character->map->gameMap;
+        $mapBonus = ! is_null($map->xp_bonus) ? $map->xp_bonus : 0;
 
-        $xpBonusIgnoreCaps   = $this->getTotalXpBonus($xpBonusQuestSlots, true) + $boonBonus + $mapBonus;
-        $xpBonusWithCaps     = $this->getTotalXpBonus($xpBonusQuestSlots, false);
+        $xpBonusIgnoreCaps = $this->getTotalXpBonus($xpBonusQuestSlots, true) + $boonBonus + $mapBonus;
+        $xpBonusWithCaps = $this->getTotalXpBonus($xpBonusQuestSlots, false);
 
         if ($canContinueLeveling) {
             return $this->continueLevelingXpWithBonuses($character, $xp, $xpBonusIgnoreCaps, $xpBonusWithCaps);
@@ -50,11 +46,9 @@ class CharacterXPService {
 
     /**
      * Can the character gain XP?
-     *
-     * @param Character $character
-     * @return bool
      */
-    public function canCharacterGainXP(Character $character): bool {
+    public function canCharacterGainXP(Character $character): bool
+    {
 
         $canContinueLeveling = $this->canContinueLeveling($character);
 
@@ -73,12 +67,10 @@ class CharacterXPService {
 
     /**
      * Is the character halfway to max?
-     *
-     * @param int $characterLevel
-     * @return bool
      */
-    public function isCharacterHalfWay(int $characterLevel): bool {
-        $halfWay       = MaxLevelConfiguration::first()->half_way;
+    public function isCharacterHalfWay(int $characterLevel): bool
+    {
+        $halfWay = MaxLevelConfiguration::first()->half_way;
         $threeQuarters = MaxLevelConfiguration::first()->three_quarters;
 
         return $characterLevel >= $halfWay && $characterLevel < $threeQuarters;
@@ -86,25 +78,21 @@ class CharacterXPService {
 
     /**
      * Are we 75% of the way to max?
-     *
-     * @param int $characterLevel
-     * @return bool
      */
-    public function isCharacterThreeQuarters(int $characterLevel): bool {
+    public function isCharacterThreeQuarters(int $characterLevel): bool
+    {
         $threeQuarters = MaxLevelConfiguration::first()->three_quarters;
-        $lastLeg       = MaxLevelConfiguration::first()->last_leg;
+        $lastLeg = MaxLevelConfiguration::first()->last_leg;
 
         return $characterLevel >= $threeQuarters && $characterLevel < $lastLeg;
     }
 
     /**
      * Are we at the last 100 levels?
-     *
-     * @param int $characterLevel
-     * @return bool
      */
-    public function isCharacterAtLastLeg(int $characterLevel): bool {
-        $lastLeg  = MaxLevelConfiguration::first()->last_leg;
+    public function isCharacterAtLastLeg(int $characterLevel): bool
+    {
+        $lastLeg = MaxLevelConfiguration::first()->last_leg;
         $maxLevel = MaxLevelConfiguration::first()->max_level;
 
         return $characterLevel >= $lastLeg && $characterLevel < $maxLevel;
@@ -112,14 +100,9 @@ class CharacterXPService {
 
     /**
      * Get xp when we can continue leveling.
-     *
-     * @param Character $character
-     * @param int $xp
-     * @param float $xpBonusIgnoreCaps
-     * @param float $xpBonusWithCaps
-     * @return int
      */
-    protected function continueLevelingXpWithBonuses(Character $character, int $xp, float $xpBonusIgnoreCaps, float $xpBonusWithCaps): int {
+    protected function continueLevelingXpWithBonuses(Character $character, int $xp, float $xpBonusIgnoreCaps, float $xpBonusWithCaps): int
+    {
         if ($xpBonusIgnoreCaps > 0 && $xpBonusWithCaps === 0.0) {
             return $this->getXP($character, true, $xpBonusIgnoreCaps, $xp);
         }
@@ -139,14 +122,9 @@ class CharacterXPService {
 
     /**
      * Get Xp when regular leveling.
-     *
-     * @param Character $character
-     * @param int $xp
-     * @param float $xpBonusIgnoreCaps
-     * @param float $xpBonusWithCaps
-     * @return int
      */
-    protected function regularLevelingXpWithBonuses(Character $character, int $xp, float $xpBonusIgnoreCaps, float $xpBonusWithCaps): int {
+    protected function regularLevelingXpWithBonuses(Character $character, int $xp, float $xpBonusIgnoreCaps, float $xpBonusWithCaps): int
+    {
         if ($xpBonusIgnoreCaps > 0 && $xpBonusWithCaps === 0.0) {
             return (new MaxLevel($character->level, $xp))->fetchXP(true, $xpBonusIgnoreCaps);
         }
@@ -174,29 +152,24 @@ class CharacterXPService {
      * - Any additional bonus.
      *
      * All of which is added to the xp.
-     *
-     * @param Character $character
-     * @param bool $ignoreCaps
-     * @param float $xpBonus
-     * @param int $xp
-     * @return float
      */
-    protected function getXP(Character $character, bool $ignoreCaps, float $xpBonus, int $xp): float {
+    protected function getXP(Character $character, bool $ignoreCaps, float $xpBonus, int $xp): float
+    {
         $config = MaxLevelConfiguration::first();
 
         if (is_null($config)) {
             return (new MaxLevel($character->level, $xp))->fetchXP($ignoreCaps, $xpBonus);
         }
 
-        if ($this->isCharacterHalfWay($character->level) && !$ignoreCaps) {
+        if ($this->isCharacterHalfWay($character->level) && ! $ignoreCaps) {
             return ceil($xp * MaxLevel::HALF_PERCENT);
         }
 
-        if ($this->isCharacterThreeQuarters($character->level) && !$ignoreCaps) {
+        if ($this->isCharacterThreeQuarters($character->level) && ! $ignoreCaps) {
             return ceil($xp * MaxLevel::THREE_QUARTERS_PERCENT);
         }
 
-        if ($this->isCharacterAtLastLeg($character->level) && !$ignoreCaps) {
+        if ($this->isCharacterAtLastLeg($character->level) && ! $ignoreCaps) {
             return ceil($xp * MaxLevel::LAST_LEG_PERCENT);
         }
 
@@ -205,40 +178,33 @@ class CharacterXPService {
 
     /**
      * Find all quest items that give xp bonus.
-     *
-     * @param Character $character
-     * @return Collection
      */
-    protected function findAllItemsThatGiveXpBonus(Character $character): Collection {
+    protected function findAllItemsThatGiveXpBonus(Character $character): Collection
+    {
         $inventory = Inventory::where('character_id', $character->id)->first();
 
-        return InventorySlot::where('inventory_slots.inventory_id', $inventory->id)->join('items', function($join) {
+        return InventorySlot::where('inventory_slots.inventory_id', $inventory->id)->join('items', function ($join) {
             $join->on('items.id', 'inventory_slots.item_id')->where('items.type', 'quest')->whereNotNull('items.xp_bonus');
         })->select('inventory_slots.*')->get();
     }
 
     /**
      * Do we have the quest item to keep leveling?
-     *
-     * @param Character $character
-     * @return bool
      */
-    protected function canContinueLeveling(Character $character): bool {
+    protected function canContinueLeveling(Character $character): bool
+    {
         $inventory = Inventory::where('character_id', $character->id)->first();
 
-        return $inventory->slots->filter(function($slot) {
+        return $inventory->slots->filter(function ($slot) {
             return $slot->item->effect === ItemEffectsValue::CONTINUE_LEVELING;
         })->isNotEmpty();
     }
 
     /**
      * Get the total xp bonus.
-     *
-     * @param Collection $questItems
-     * @param bool $ignoreCaps
-     * @return float
      */
-    protected function getTotalXpBonus(Collection $questItems, bool $ignoreCaps): float {
+    protected function getTotalXpBonus(Collection $questItems, bool $ignoreCaps): float
+    {
         if ($questItems->isEmpty()) {
             return 0.0;
         }

@@ -30,10 +30,11 @@ class QuestDataRequest extends FormRequest
 
     /**
      * Get messages for the validation failure.
-     * 
+     *
      * @return array
      */
-    public function messages() {
+    public function messages()
+    {
         return [
             'completed_quests_only.required' => 'Missing: Completed Quests Only',
         ];
