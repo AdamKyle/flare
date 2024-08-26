@@ -76,6 +76,11 @@ class GuideQuestServiceTest extends TestCase
 
         $questDetails = $this->guideQuestService->fetchQuestForCharacter($character);
 
-        $this->assertContains('required_quest_item_id', $questDetails['completed_requirements']);
+        dump($questDetails);
+
+        foreach ($questDetails['completed_requirements'] as $completedRequirements) {
+            $this->assertContains('required_quest_item_id', $completedRequirements['completed_requirements']);
+        }
+
     }
 }
