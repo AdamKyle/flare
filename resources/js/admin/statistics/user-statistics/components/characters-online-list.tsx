@@ -35,24 +35,23 @@ export default class CharactersOnlineList extends React.Component<any, any> {
     }
 
     getTimeLoggedInFor(characterOnline: any): string {
-
         if (characterOnline.duration < 60) {
-            return characterOnline.duration + ' Seconds'
+            return characterOnline.duration + " Seconds";
         }
 
         if (characterOnline.duration >= 86400) {
-            return (characterOnline.duration / 86400).toFixed(0) + ' Days'
+            return (characterOnline.duration / 86400).toFixed(0) + " Days";
         }
 
         if (characterOnline.duration >= 3600) {
-            return (characterOnline.duration / 3600).toFixed(0) + ' Seconds'
+            return (characterOnline.duration / 3600).toFixed(0) + " Seconds";
         }
 
         if (characterOnline.duration >= 60) {
-            return (characterOnline.duration / 60).toFixed(0) + ' Minutes'
+            return (characterOnline.duration / 60).toFixed(0) + " Minutes";
         }
 
-        return 'unknown';
+        return "unknown";
     }
 
     render() {
@@ -78,7 +77,8 @@ export default class CharactersOnlineList extends React.Component<any, any> {
                                 {characterOnline.name}
                             </span>
                             <span>
-                                Logged in for {this.getTimeLoggedInFor(characterOnline)}
+                                Logged in for{" "}
+                                {this.getTimeLoggedInFor(characterOnline)}
                             </span>
                         </div>
 
