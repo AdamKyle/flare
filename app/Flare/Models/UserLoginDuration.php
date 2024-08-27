@@ -2,6 +2,7 @@
 
 namespace App\Flare\Models;
 
+use Database\Factories\UserLoginDurationFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -40,4 +41,10 @@ class UserLoginDuration extends Model
     public function user(): BelongsTo {
         return $this->belongsTo(User::class);
     }
+
+    protected static function newFactory()
+    {
+        return UserLoginDurationFactory::new();
+    }
+
 }
