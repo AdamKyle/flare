@@ -22,6 +22,7 @@ yarn-error.log
 .vscode/
 **/.DS_Store
 deploy.yaml
+deploy.yml
 .idea
 .idea/workspace.xml
 .idea/

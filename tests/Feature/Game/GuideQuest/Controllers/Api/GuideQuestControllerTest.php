@@ -60,6 +60,10 @@ class GuideQuestControllerTest extends TestCase
         $jsonData = json_decode($response->getContent(), true);
 
         $this->assertCount(1, $jsonData['completed_requirements']);
-        $this->assertFalse($jsonData['can_hand_in']);
+        $this->assertIsArray($jsonData['can_hand_in']);
+
+        foreach ($jsonData['can_hand_in'] as $canHandIn) {
+            $this->assertFalse($canHandIn['can_hand_in']);
+        }
     }
 }

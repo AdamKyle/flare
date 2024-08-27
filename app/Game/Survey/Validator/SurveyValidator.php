@@ -65,11 +65,13 @@ class SurveyValidator
             }
 
             $label = $inputType['label'];
+
             if (!isset($sectionInput[$label]['value'])) {
                 return false;
             }
 
             $value = $sectionInput[$label]['value'];
+
             if (!$this->validateInputType($inputType, $value)) {
                 return false;
             }
@@ -106,6 +108,7 @@ class SurveyValidator
      */
     private function validateCheckboxOptions(array $options, array $selectedValues): bool
     {
+
         foreach ($selectedValues as $selectedValue) {
             if (!in_array($selectedValue, $options, true)) {
                 return false;

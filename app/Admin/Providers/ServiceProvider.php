@@ -13,6 +13,7 @@ use App\Admin\Services\ItemAffixService;
 use App\Admin\Services\ItemsService;
 use App\Admin\Services\LocationService;
 use App\Admin\Services\QuestService;
+use App\Admin\Services\SiteStatisticsService;
 use App\Admin\Services\SuggestionAndBugsService;
 use App\Admin\Services\SurveyService;
 use App\Admin\Services\UpdateCharacterStatsService;
@@ -73,6 +74,10 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(FeedbackService::class, function() {
             return new FeedbackService;
+        });
+
+        $this->app->bind(SiteStatisticsService::class, function() {
+            return new SiteStatisticsService;
         });
 
         $this->commands([CreateAdminAccount::class, GiveKingdomsToNpcs::class]);

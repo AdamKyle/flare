@@ -4,6 +4,7 @@ namespace App\Flare\Values;
 
 use App\Flare\Models\UserSiteAccessStatistics;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Database\Eloquent\Collection;
 
 class SiteAccessStatisticValue
@@ -49,17 +50,14 @@ class SiteAccessStatisticValue
     protected static function getQuery(string $attribute, int $daysPast = 0): Collection
     {
 
-        $start = Carbon::today();
         $end = Carbon::today()->endOfDay();
 
-        if ($daysPast > 0) {
-            $start = Carbon::today()->subDays($daysPast)->startOfDay();
-        }
-
-        if ($daysPast >= 30) {
-            $start = Carbon::now()->startOfMonth();
-            $end = Carbon::now()->endOfMonth();
-        }
+        $start = match ($daysPast) {
+            0 => Carbon::today()->subDays($daysPast)->startOfDay(),
+            7, 14 => Carbon::now()->subDays($daysPast)->startOfDay(),
+            31 => Carbon::today()->subMonth(),
+            default => Carbon::today(),
+        };
 
         return UserSiteAccessStatistics::whereNotNull($attribute)
             ->whereBetween('created_at', [

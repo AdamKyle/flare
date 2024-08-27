@@ -22,7 +22,7 @@ class RecordUserLogOutTimeListener
 
         $user = $event->user;
 
-        $foundRecord = UserLoginDuration::where('user_id', $user->id)->whereNull('logged_out_at')->first();
+        $foundRecord = UserLoginDuration::where('user_id', $user->id)->latest()->first();
 
         if (is_null($foundRecord)) {
             return;

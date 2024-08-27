@@ -4,17 +4,25 @@ namespace App\Admin\Controllers\Api;
 
 use App\Admin\Requests\CompletedQuestsStatisticsRequest;
 use App\Admin\Requests\SiteAccessStatisticsRequest;
+use App\Admin\Services\SiteStatisticsService;
 use App\Flare\Models\Character;
 use App\Flare\Models\GuideQuest;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\Quest;
 use App\Flare\Models\User;
+use App\Flare\Models\UserLoginDuration;
 use App\Flare\Values\SiteAccessStatisticValue;
 use App\Http\Controllers\Controller;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class SiteAccessStatisticsController extends Controller
 {
+
+    public function __construct(private readonly SiteStatisticsService $siteStatisticsService) {
+    }
+
     public function fetchLoggedInAllTime(SiteAccessStatisticsRequest $request)
     {
         return response()->json(['stats' => SiteAccessStatisticValue::getSignedIn($request->daysPast)], 200);
@@ -31,38 +39,12 @@ class SiteAccessStatisticsController extends Controller
         $limit = $request->limit ?? 10;
         $filter = $request->filter ?? 'most';
 
-        // Dynamically calculate the total count for quests or guide quests
-        $totalCount = $type === 'guide_quest' ? GuideQuest::count() : Quest::count();
-
-        // Initialize the query
-        $query = Character::query()
-            ->whereHas('questsCompleted', function ($query) use ($type) {
-                $query->whereNotNull($type.'_id');
-            })
-            ->withCount(['questsCompleted as quests_count' => function ($query) use ($type) {
-                $query->whereNotNull($type.'_id');
-            }]);
-
-        // Apply filters based on the 'filter' request parameter
-        if ($filter === 'most') {
-            $threshold = $totalCount / 2;
-            $query->having('quests_count', '>=', $threshold);
-        } elseif ($filter === 'some') {
-            $threshold = $type === 'guide_quest' ? 5 : 25;
-            $query->having('quests_count', '>', $threshold);
-        } elseif ($filter === 'least') {
-            $query->having('quests_count', '<', 5);
-        } else {
-            // Default to top characters with the most quests completed if no filter is specified
-            $query->orderByDesc('quests_count');
-        }
-
-        $charactersWithQuests = $query->take($limit)->get();
+        $this->siteStatisticsService->fetchCompletedQuestsStatistics($type, $filter, $limit);
 
         return response()->json([
             'stats' => [
-                'labels' => $charactersWithQuests->pluck('name')->toArray(),
-                'data' => $charactersWithQuests->pluck('quests_count')->toArray(),
+                'labels' => $this->siteStatisticsService->labels(),
+                'data' => $this->siteStatisticsService->data(),
             ],
         ]);
     }
@@ -147,4 +129,45 @@ class SiteAccessStatisticsController extends Controller
             'labels' => $data->pluck('character_name')->toArray(),
         ]);
     }
+
+    public function getLoginDurationDetails(Request $request) {
+        $filter = $request->daysPast ?? 0;
+
+        $this->siteStatisticsService->getLogInDurationStatistics($filter);
+
+        return response()->json([
+            'stats' => [
+                'labels' => $this->siteStatisticsService->labels(),
+                'data' => $this->siteStatisticsService->data(),
+            ],
+        ]);
+    }
+
+    public function getUsersCurrentlyOnline() {
+        $now = Carbon::now();
+
+        $onlineLogins = UserLoginDuration::whereNull('duration_in_seconds')
+            ->whereDate('logged_in_at', Carbon::today())
+            ->get();
+
+        $onlineCharacters = [];
+
+        foreach ($onlineLogins as $login) {
+            $lastActivity = $login->last_activity;
+            $timeLoggedIn = $lastActivity->diffInSeconds($login->logged_in_at);
+            $character = $login->user->character;
+
+            if ($character) {
+                $onlineCharacters[] = [
+                    'name' => $character->name,
+                    'duration' => $timeLoggedIn
+                ];
+            }
+        }
+
+        return [
+            'characters_online' => $onlineCharacters,
+        ];
+    }
+
 }

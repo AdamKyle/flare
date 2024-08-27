@@ -13,25 +13,13 @@ class ResourceValidation
      */
     public function shouldRedirectKingdomBuilding(KingdomBuilding $building, Kingdom $kingdom): bool
     {
+
         return ($kingdom->current_wood < $this->getBuildingCost($kingdom, $building->wood_cost)) ||
                ($kingdom->current_clay < $this->getBuildingCost($kingdom, $building->clay_cost)) ||
                ($kingdom->current_stone < $this->getBuildingCost($kingdom, $building->stone_cost)) ||
                ($kingdom->current_steel < $this->getBuildingCost($kingdom, $building->steel_cost)) ||
                (($kingdom->current_iron < $this->getBuildingCost($kingdom, $building->iron_cost, false, true))) ||
                ($kingdom->current_population < $this->getBuildingCost($kingdom, $building->required_population, true));
-    }
-
-    /**
-     * Can we afford to rebuild?
-     */
-    public function shouldRedirectRebuildKingdomBuilding(KingdomBuilding $building, Kingdom $kingdom): bool
-    {
-        return ($kingdom->current_wood < $this->getBuildingCost($kingdom, $building->base_wood_cost)) ||
-               ($kingdom->current_clay < $this->getBuildingCost($kingdom, $building->base_clay_cost)) ||
-               ($kingdom->current_stone < $this->getBuildingCost($kingdom, $building->base_stone_cost)) ||
-               ($kingdom->current_steel < $this->getBuildingCost($kingdom, $building->steel_cost)) ||
-               ($kingdom->current_iron < $this->getBuildingCost($kingdom, $building->base_iron_cost, false, true)) ||
-               ($kingdom->current_population < $this->getBuildingCost($kingdom, $building->base_population, true));
     }
 
     /**
@@ -110,7 +98,7 @@ class ResourceValidation
     protected function getBuildingCost(Kingdom $kingdom, int $cost, bool $isPopulation = false, bool $isIron = false): int
     {
         if ($isIron) {
-            return $cost - $cost * $kingdom->fetchIronCostReduction();
+            return $cost - $cost * ($kingdom->fetchIronCostReduction() + $kingdom->fetchBuildingCostReduction());
         }
 
         if ($isPopulation) {

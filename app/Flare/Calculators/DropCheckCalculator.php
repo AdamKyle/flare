@@ -3,6 +3,8 @@
 namespace App\Flare\Calculators;
 
 use App\Flare\Models\Monster;
+use App\Flare\Models\ScheduledEvent;
+use App\Game\Events\Values\EventType;
 use Facades\App\Flare\RandomNumber\RandomNumberGenerator;
 
 class DropCheckCalculator
@@ -29,6 +31,14 @@ class DropCheckCalculator
         }
 
         if ($characterLevel < 12 && $lootingChance < .10) {
+            $totalChance = .80;
+
+            return $this->canGetReward(100, $totalChance);
+        }
+
+        $scheduledEvent = ScheduledEvent::where('event_type', EventType::FEEDBACK_EVENT)->where('currently_running', true)->first();
+
+        if (!is_null($scheduledEvent)) {
             $totalChance = .80;
 
             return $this->canGetReward(100, $totalChance);
