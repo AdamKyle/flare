@@ -13,6 +13,7 @@ class ResourceValidation
      */
     public function shouldRedirectKingdomBuilding(KingdomBuilding $building, Kingdom $kingdom): bool
     {
+
         return ($kingdom->current_wood < $this->getBuildingCost($kingdom, $building->wood_cost)) ||
                ($kingdom->current_clay < $this->getBuildingCost($kingdom, $building->clay_cost)) ||
                ($kingdom->current_stone < $this->getBuildingCost($kingdom, $building->stone_cost)) ||
@@ -110,7 +111,7 @@ class ResourceValidation
     protected function getBuildingCost(Kingdom $kingdom, int $cost, bool $isPopulation = false, bool $isIron = false): int
     {
         if ($isIron) {
-            return $cost - $cost * $kingdom->fetchIronCostReduction();
+            return $cost - $cost * ($kingdom->fetchIronCostReduction() + $kingdom->fetchBuildingCostReduction());
         }
 
         if ($isPopulation) {

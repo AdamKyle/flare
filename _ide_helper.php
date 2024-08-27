@@ -21624,10 +21624,20 @@ namespace  {
     }
 
 
+namespace Facades\App\Game\Kingdoms\Validation {
+    /**
+     * @mixin \App\Game\Kingdoms\Validation\ResourceValidation     */
+    class ResourceValidation extends \App\Game\Kingdoms\Validation\ResourceValidation {}
+}
 namespace Facades\Livewire\Features\SupportFileUploads {
     /**
      * @mixin \Livewire\Features\SupportFileUploads\GenerateSignedUploadUrl     */
     class GenerateSignedUploadUrl extends \Livewire\Features\SupportFileUploads\GenerateSignedUploadUrl {}
+}
+namespace Facades\App\Flare\Calculators {
+    /**
+     * @mixin \App\Flare\Calculators\SellItemCalculator     */
+    class SellItemCalculator extends \App\Flare\Calculators\SellItemCalculator {}
 }
 namespace Facades\App\Flare\Transformers\DataSets {
     /**
@@ -21639,10 +21649,45 @@ namespace Facades\App\Game\Character\Builders\InformationBuilders\AttributeBuild
      * @mixin \App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ItemSkillAttribute     */
     class ItemSkillAttribute extends \App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ItemSkillAttribute {}
 }
+namespace Facades\App\Flare\Values {
+    /**
+     * @mixin \App\Flare\Values\UserOnlineValue     */
+    class UserOnlineValue extends \App\Flare\Values\UserOnlineValue {}
+}
+namespace Facades\App\Flare\Calculators {
+    /**
+     * @mixin \App\Flare\Calculators\GoldRushCheckCalculator     */
+    class GoldRushCheckCalculator extends \App\Flare\Calculators\GoldRushCheckCalculator {}
+}
+namespace Facades\App\Admin\Formatters {
+    /**
+     * @mixin \App\Admin\Formatters\MessagesFormatter     */
+    class MessagesFormatter extends \App\Admin\Formatters\MessagesFormatter {}
+}
 namespace Facades\App\Flare\Cache {
     /**
      * @mixin \App\Flare\Cache\CoordinatesCache     */
     class CoordinatesCache extends \App\Flare\Cache\CoordinatesCache {}
+}
+namespace Facades\App\Flare\Calculators {
+    /**
+     * @mixin \App\Flare\Calculators\XPCalculator     */
+    class XPCalculator extends \App\Flare\Calculators\XPCalculator {}
+}
+namespace Facades\App\Game\Skills\Handlers {
+    /**
+     * @mixin \App\Game\Skills\Handlers\UpdateItemSkill     */
+    class UpdateItemSkill extends \App\Game\Skills\Handlers\UpdateItemSkill {}
+}
+namespace Facades\App\Flare\Calculators {
+    /**
+     * @mixin \App\Flare\Calculators\SkillXPCalculator     */
+    class SkillXPCalculator extends \App\Flare\Calculators\SkillXPCalculator {}
+}
+namespace Facades\App\Game\Core\Handlers {
+    /**
+     * @mixin \App\Game\Core\Handlers\DuplicateItemHandler     */
+    class DuplicateItemHandler extends \App\Game\Core\Handlers\DuplicateItemHandler {}
 }
 namespace Facades\App\Game\Core\Handlers {
     /**
@@ -21653,6 +21698,21 @@ namespace Facades\App\Game\Messages\Handlers {
     /**
      * @mixin \App\Game\Messages\Handlers\ServerMessageHandler     */
     class ServerMessageHandler extends \App\Game\Messages\Handlers\ServerMessageHandler {}
+}
+namespace Facades\App\Flare\Calculators {
+    /**
+     * @mixin \App\Flare\Calculators\DropCheckCalculator     */
+    class DropCheckCalculator extends \App\Flare\Calculators\DropCheckCalculator {}
+}
+namespace Facades\App\Game\Core\Handlers {
+    /**
+     * @mixin \App\Game\Core\Handlers\HandleGoldBarsAsACurrency     */
+    class HandleGoldBarsAsACurrency extends \App\Game\Core\Handlers\HandleGoldBarsAsACurrency {}
+}
+namespace Facades\App\Flare\RandomNumber {
+    /**
+     * @mixin \App\Flare\RandomNumber\RandomNumberGenerator     */
+    class RandomNumberGenerator extends \App\Flare\RandomNumber\RandomNumberGenerator {}
 }
 
 
