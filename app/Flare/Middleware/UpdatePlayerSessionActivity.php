@@ -19,7 +19,7 @@ class UpdatePlayerSessionActivity {
 
         if (Auth::check()) {
 
-            $foundLoginDetails = UserLoginDuration::where('user_id', Auth::id())->whereNull('duration_in_seconds')->first();
+            $foundLoginDetails = UserLoginDuration::where('user_id', Auth::id())->whereNull('duration_in_seconds')->latest()->first();
 
             if (is_null($foundLoginDetails)) {
                 return $next($request);

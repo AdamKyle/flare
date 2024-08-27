@@ -153,8 +153,8 @@ class SiteAccessStatisticsController extends Controller
         $onlineCharacters = [];
 
         foreach ($onlineLogins as $login) {
-            $lastActivity = max($login->last_heart_beat, $login->last_activity);
-            $timeLoggedIn = $now->diffInHours($lastActivity);
+            $lastActivity = $login->last_activity;
+            $timeLoggedIn = $lastActivity->diffInSeconds($login->logged_in_at);
             $character = $login->user->character;
 
             if ($character) {

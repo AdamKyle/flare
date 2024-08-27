@@ -110,6 +110,10 @@ class CapitalCityBuildingManagement
             $building = $kingdom->buildings()->where('id', $buildingUpgradeRequest['building_id'])->first();
             $buildingUpgradeRequest = $this->processPotentialResourceRequests($capitalCityBuildingQueue, $kingdom, $building, $character, $buildingUpgradeRequest);
 
+            if (is_null($buildingUpgradeRequest['secondary_status'])) {
+                 dump($buildingUpgradeRequest);
+            }
+
             $capitalCityBuildingQueue = $capitalCityBuildingQueue->refresh();
 
             $requestData[$index] = $buildingUpgradeRequest;

@@ -3,7 +3,6 @@
 namespace App\Flare\Middleware;
 
 use App\Flare\Models\UserLoginDuration;
-use Carbon\Carbon;
 use Closure;
 use Illuminate\Support\Facades\Auth;
 

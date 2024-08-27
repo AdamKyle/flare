@@ -34,6 +34,27 @@ export default class CharactersOnlineList extends React.Component<any, any> {
             );
     }
 
+    getTimeLoggedInFor(characterOnline: any): string {
+
+        if (characterOnline.duration < 60) {
+            return characterOnline.duration + ' Seconds'
+        }
+
+        if (characterOnline.duration >= 86400) {
+            return (characterOnline.duration / 86400).toFixed(0) + ' Days'
+        }
+
+        if (characterOnline.duration >= 3600) {
+            return (characterOnline.duration / 3600).toFixed(0) + ' Seconds'
+        }
+
+        if (characterOnline.duration >= 60) {
+            return (characterOnline.duration / 60).toFixed(0) + ' Minutes'
+        }
+
+        return 'unknown';
+    }
+
     render() {
         if (this.state.loading) {
             return <ComponentLoading />;
@@ -41,7 +62,7 @@ export default class CharactersOnlineList extends React.Component<any, any> {
 
         if (this.state.data.length === 0) {
             return (
-                <p className="text-center p-4 text-red-700 dark:text-red-400">
+                <p className="p-4 text-center text-red-700 dark:text-red-400">
                     No Characters online.
                 </p>
             );
@@ -52,17 +73,17 @@ export default class CharactersOnlineList extends React.Component<any, any> {
                 {this.state.data.map((characterOnline: any, index: number) => (
                     <div key={index}>
                         <div className="flex items-center space-x-2">
-                            <i className="fas fa-circle text-green-500"></i>
+                            <i className="text-green-500 fas fa-circle"></i>
                             <span className="font-bold">
                                 {characterOnline.name}
                             </span>
                             <span>
-                                Logged in for {characterOnline.duration}h
+                                Logged in for {this.getTimeLoggedInFor(characterOnline)}
                             </span>
                         </div>
 
                         {index < this.state.data.length - 1 && (
-                            <div className="border-b-2 block lg:hidden border-b-gray-300 dark:border-b-gray-600 my-3"></div>
+                            <div className="block my-3 border-b-2 lg:hidden border-b-gray-300 dark:border-b-gray-600"></div>
                         )}
                     </div>
                 ))}
