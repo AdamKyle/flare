@@ -23,19 +23,6 @@ class ResourceValidation
     }
 
     /**
-     * Can we afford to rebuild?
-     */
-    public function shouldRedirectRebuildKingdomBuilding(KingdomBuilding $building, Kingdom $kingdom): bool
-    {
-        return ($kingdom->current_wood < $this->getBuildingCost($kingdom, $building->base_wood_cost)) ||
-               ($kingdom->current_clay < $this->getBuildingCost($kingdom, $building->base_clay_cost)) ||
-               ($kingdom->current_stone < $this->getBuildingCost($kingdom, $building->base_stone_cost)) ||
-               ($kingdom->current_steel < $this->getBuildingCost($kingdom, $building->steel_cost)) ||
-               ($kingdom->current_iron < $this->getBuildingCost($kingdom, $building->base_iron_cost, false, true)) ||
-               ($kingdom->current_population < $this->getBuildingCost($kingdom, $building->base_population, true));
-    }
-
-    /**
      * Get the missing costs for the building trying to upgrade.
      */
     public function getMissingCosts(KingdomBuilding $building, Kingdom $kingdom): array

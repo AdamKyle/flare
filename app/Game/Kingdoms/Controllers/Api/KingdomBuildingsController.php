@@ -52,7 +52,7 @@ class KingdomBuildingsController extends Controller
 
     public function rebuildKingdomBuilding(Character $character, KingdomBuilding $building): JsonResponse
     {
-        if (ResourceValidation::shouldRedirectRebuildKingdomBuilding($building, $building->kingdom)) {
+        if (ResourceValidation::shouldRedirectKingdomBuilding($building, $building->kingdom)) {
             return response()->json([
                 'message' => "You don't have the resources.",
             ], 422);

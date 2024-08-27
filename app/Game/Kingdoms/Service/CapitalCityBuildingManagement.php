@@ -305,7 +305,7 @@ class CapitalCityBuildingManagement
      */
     private function processPotentialResourceRequests(CapitalCityBuildingQueue $capitalCityBuildingQueue, Kingdom $kingdom, KingdomBuilding $building, Character $character, array $buildingUpgradeRequest): array
     {
-        if (ResourceValidation::shouldRedirectRebuildKingdomBuilding($building, $kingdom)) {
+        if (ResourceValidation::shouldRedirectKingdomBuilding($building, $kingdom)) {
             $missingResources = ResourceValidation::getMissingCosts($building, $kingdom);
 
             if (empty($missingResources)) {
