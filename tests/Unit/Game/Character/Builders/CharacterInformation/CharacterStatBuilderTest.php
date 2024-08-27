@@ -1102,8 +1102,6 @@ class CharacterStatBuilderTest extends TestCase
             ->equipItem('spell-one', 'weapon')
             ->getCharacter();
 
-        dump($character->class->name);
-
         $resChance = $this->characterStatBuilder->setCharacter($character)->buildResurrectionChance();
 
         $this->assertEquals(.75, $resChance);

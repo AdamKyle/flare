@@ -2,6 +2,7 @@
 
 namespace App\Flare\Models;
 
+use Database\Factories\SubmittedSurveyFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -36,5 +37,9 @@ class SubmittedSurvey extends Model
 
     public function survey(): BelongsTo {
         return $this->belongsTo(Survey::class);
+    }
+
+    protected static function newFactory() {
+        return SubmittedSurveyFactory::new();
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Flare\Models;
 
+use Database\Factories\SurveyFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -28,4 +29,8 @@ class Survey extends Model
     protected $casts = [
         'sections' => 'array'
     ];
+
+    protected static function newFactory() {
+        return SurveyFactory::new();
+    }
 }
