@@ -6,6 +6,7 @@ use App\Flare\Models\Character;
 use App\Flare\Models\Event;
 use App\Flare\Models\Npc;
 use App\Flare\Models\Quest;
+use App\Game\Battle\Jobs\HandInQuest;
 use App\Game\Character\Builders\AttackBuilders\Jobs\CharacterAttackTypesCacheBuilder;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Maps\Events\UpdateMap;
@@ -191,25 +192,21 @@ class QuestHandlerService
     public function handInQuest(Character $character, Quest $quest)
     {
 
-        try {
-            $this->npcQuestsHandler()->handleNpcQuest($character, $quest);
+        HandInQuest::dispatch($character, $quest);
 
-            event(new GlobalMessageEvent($character->name.' Has completed a quest ('.$quest->name.') for: '.$quest->npc->real_name.' and been rewarded with a godly gift!'));
+        event(new GlobalMessageEvent($character->name.' Has completed a quest ('.$quest->name.') for: '.$quest->npc->real_name.' and been rewarded with a godly gift!'));
 
-            $character = $character->refresh();
+        $character = $character->refresh();
 
-            $quests = $this->buildQuestCacheService->getRegularQuests();
-            $raidQuests = $this->buildQuestCacheService->fetchQuestsForRaid();
+        $quests = $this->buildQuestCacheService->getRegularQuests();
+        $raidQuests = $this->buildQuestCacheService->fetchQuestsForRaid();
 
-            return $this->successResult([
-                'completed_quests' => $character->questsCompleted()->pluck('quest_id'),
-                'player_plane' => $character->map->gameMap->name,
-                'quests' => $quests,
-                'raid_quests' => $raidQuests,
-            ]);
-        } catch (Exception $e) {
-            return $this->errorResult($e->getMessage());
-        }
+        return $this->successResult([
+            'completed_quests' => $character->questsCompleted()->pluck('quest_id'),
+            'player_plane' => $character->map->gameMap->name,
+            'quests' => $quests,
+            'raid_quests' => $raidQuests,
+        ]);
     }
 
     /**
