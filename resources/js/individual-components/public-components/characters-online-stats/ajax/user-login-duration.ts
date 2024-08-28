@@ -4,8 +4,9 @@ import AjaxInterface from "../../../../game/lib/ajax/ajax-interface.js";
 import { AxiosError, AxiosResponse } from "axios";
 import CharactersOnlineContainer from "../characters-online-container.js";
 import LoginDurationChart from "../components/login-duration-chart.js";
+import { AllowedFilters } from "../deffinitions/allowed-filter-types.js";
 
-export type AllowedFilters = 0 | 7 | 14 | 31;
+
 
 @injectable()
 export default class UserLoginDuration {

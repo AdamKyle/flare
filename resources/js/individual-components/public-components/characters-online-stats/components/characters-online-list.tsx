@@ -2,14 +2,17 @@ import React from "react";
 import DropDown from "../../../../game/components/ui/drop-down/drop-down";
 import InfoAlert from "../../../../game/components/ui/alerts/simple-alerts/info-alert";
 import LoadingProgressBar from "../../../../game/components/ui/progress-bars/loading-progress-bar";
-import UserLoginDuration, { AllowedFilters } from "../ajax/user-login-duration";
+import UserLoginDuration from "../ajax/user-login-duration";
 import { charactersOnlineContainer } from "../container/characters-online-container";
 import DangerAlert from "../../../../game/components/ui/alerts/simple-alerts/danger-alert";
+import { AllowedFilters } from "../deffinitions/allowed-filter-types";
+import { CharactersOnlineListProps } from "../types/character-online-list-props";
+import { CharactersOnlineListState } from "../types/character-online-list-state";
 
-export default class CharactersOnlineList extends React.Component<any, any> {
+export default class CharactersOnlineList extends React.Component<CharactersOnlineListProps, CharactersOnlineListState> {
     private userLoginAjax: UserLoginDuration;
 
-    constructor(props: any) {
+    constructor(props: CharactersOnlineListProps) {
         super(props);
 
         this.state = {

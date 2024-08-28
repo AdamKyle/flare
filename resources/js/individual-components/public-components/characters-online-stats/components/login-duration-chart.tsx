@@ -1,36 +1,19 @@
 import React from "react";
-import { AxisOptions, Chart } from "react-charts";
 import ResizableBox from "../../../../game/components/ui/resizable-box";
 import DropDown from "../../../../game/components/ui/drop-down/drop-down";
 import InfoAlert from "../../../../game/components/ui/alerts/simple-alerts/info-alert";
 import LoadingProgressBar from "../../../../game/components/ui/progress-bars/loading-progress-bar";
-import SiteStatisticsAjax from "../../../../admin/statistics/user-statistics/helpers/site-statistics-ajax";
 import DangerAlert from "../../../../game/components/ui/alerts/simple-alerts/danger-alert";
-import UserLoginDuration, { AllowedFilters } from "../ajax/user-login-duration";
+import UserLoginDuration from "../ajax/user-login-duration";
 import { charactersOnlineContainer } from "../container/characters-online-container";
+import { AllowedFilters } from "../deffinitions/allowed-filter-types";
+import { LoginDurationChartProps } from "../types/login-duration-chart-props";
+import { LoginDurationChartState } from "../types/login-duration-charts-state";
+import { Series } from "../deffinitions/chart-series";
+import { primaryAxis, secondaryAxes } from "../deffinitions/chart-axis";
+import { Chart } from "react-charts";
 
-type LogInStats = {
-    login_count: number;
-    date: string;
-};
-
-type Series = {
-    label: string;
-    data: LogInStats[];
-};
-
-const primaryAxis: AxisOptions<any> = {
-    getValue: (datum) => datum.date,
-};
-
-const secondaryAxes: AxisOptions<any>[] = [
-    {
-        getValue: (datum) => datum.login_count,
-        elementType: "line",
-    },
-];
-
-export default class LoginDurationChart extends React.Component<any, any> {
+export default class LoginDurationChart extends React.Component<LoginDurationChartProps, LoginDurationChartState> {
     private userLoginDuration: UserLoginDuration;
 
     constructor(props: any) {
