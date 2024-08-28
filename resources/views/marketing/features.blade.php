@@ -6,10 +6,10 @@
 @endpush
 
 @section('content')
-    <div class="container mx-auto px-4 pb-10 mb-5">
-        <div class="text-center mb-10 lg:mt-10">
-            <h1 class="mb-5 font-thin text-7xl dark:text-gray-300 text-gray-800 text-4xl md:text-9xl">Features</h1>
-            <p class="mb-10 dark:text-gray-300 text-gray-800 italic">All the features, none of the cost!</p>
+    <div class="container px-4 pb-10 mx-auto mb-5">
+        <div class="mb-10 text-center lg:mt-10">
+            <h1 class="mb-5 text-4xl font-thin text-gray-800 text-7xl dark:text-gray-300 md:text-9xl">Features</h1>
+            <p class="mb-10 italic text-gray-800 dark:text-gray-300">All the features, none of the cost!</p>
         </div>
 
         <div>
@@ -19,17 +19,17 @@
             </div>
         </div>
 
-        <div class="text-center w-full lg:w-2/4 mx-auto mt-20">
-            <h2 class="mb-5 font-thin text-2xl lg:text-5xl dark:text-gray-300 text-gray-800">
+        <div class="w-full mx-auto mt-20 text-center lg:w-2/4">
+            <h2 class="mb-5 text-2xl font-thin text-gray-800 lg:text-5xl dark:text-gray-300">
                 <i class="ra ra-monster-skull"></i>
                 Character Development
             </h2>
-            <p class="mb-10 dark:text-gray-300 text-gray-800">
+            <p class="mb-10 text-gray-800 dark:text-gray-300">
                 These features help you to develop your character in the world of Tlessa.
             </p>
         </div>
 
-        <div class="grid lg:grid-cols-3 gap-3 w-full md:w-2/3 m-auto">
+        <div class="grid w-full gap-3 m-auto lg:grid-cols-3 md:w-2/3">
             <x-core.cards.feature-card>
                 <x-slot:icon>
                     <i class="ra ra-player text-primary-600 relative top-[10px] right-[10px]"></i>
@@ -127,17 +127,17 @@
                 </div>
             </div>
 
-            <div class="text-center w-full lg:w-2/4 mx-auto mt-20">
-                <h2 class="mb-5 font-thin text-2xl lg:text-5xl dark:text-gray-300 text-gray-800">
+            <div class="w-full mx-auto mt-20 text-center lg:w-2/4">
+                <h2 class="mb-5 text-2xl font-thin text-gray-800 lg:text-5xl dark:text-gray-300">
                     <i class="ra ra-footprint"></i>
                     World of Exploration
                 </h2>
-                <p class="mb-10 dark:text-gray-300 text-gray-800">
+                <p class="mb-10 text-gray-800 dark:text-gray-300">
                     These are the features that help you explore the world
                 </p>
             </div>
 
-            <div class="grid lg:grid-cols-3 gap-3 w-full md:w-2/3 m-auto">
+            <div class="grid w-full gap-3 m-auto lg:grid-cols-3 md:w-2/3">
                 <x-core.cards.feature-card>
                     <x-slot:icon>
                         <i class="fas fa-sign text-primary-600 relative top-[10px] right-[10px]"></i>
@@ -284,17 +284,17 @@
                 </div>
             </div>
 
-            <div class="text-center w-full lg:w-2/4 mx-auto mt-20">
-                <h2 class="mb-5 font-thin text-2xl lg:text-5xl dark:text-gray-300 text-gray-800">
-                    <i class="ra  ra-muscle-up"></i>
+            <div class="w-full mx-auto mt-20 text-center lg:w-2/4">
+                <h2 class="mb-5 text-2xl font-thin text-gray-800 lg:text-5xl dark:text-gray-300">
+                    <i class="ra ra-muscle-up"></i>
                     Character Progression For Days!
                 </h2>
-                <p class="mb-10 dark:text-gray-300 text-gray-800">
+                <p class="mb-10 text-gray-800 dark:text-gray-300">
                     Grow your character through various means!
                 </p>
             </div>
 
-            <div class="grid lg:grid-cols-3 gap-3 w-full md:w-2/3 m-auto">
+            <div class="grid w-full gap-3 m-auto lg:grid-cols-3 md:w-2/3">
                 <x-core.cards.feature-card>
                     <x-slot:icon>
                         <i class="ra ra-anvil text-primary-600 relative top-[10px] right-[10px]"></i>
@@ -439,12 +439,12 @@
                 </div>
             </div>
 
-            <div class="text-center w-full lg:w-2/4 mx-auto mt-20">
-                <h2 class="mb-5 font-thin text-2xl lg:text-5xl dark:text-gray-300 text-gray-800">
+            <div class="w-full mx-auto mt-20 text-center lg:w-2/4">
+                <h2 class="mb-5 text-2xl font-thin text-gray-800 lg:text-5xl dark:text-gray-300">
                     <i class="ra ra-wooden-sign"></i>
                     And more features then you can count!
                 </h2>
-                <p class="mb-10 dark:text-gray-300 text-gray-800">
+                <p class="mb-10 text-gray-800 dark:text-gray-300">
                     Endless possiblilities, hours of fun, nothing but time, not even money can make you better, stronger or more prepared
                     for the stronger challenges ahead.
                 </p>

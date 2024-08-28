@@ -58,7 +58,7 @@
         <h3 class="text-xl md:text-2xl">{{ $eventRunning->getTitleOfEvent() }}</h3>
     </x-slot:title>
 
-    <p class="text-orange-600 dark:text-orange-300 my-2 text-sm md:text-base">
+    <p class="my-2 text-sm text-orange-600 dark:text-orange-300 md:text-base">
         <strong>Runs from</strong>: {{ $eventRunning->start_date->format('l, j \of F, Y \a\t g:iA') }}
         <strong>until</strong>: {{ $eventRunning->end_date->format('l, j \of F, Y \a\t g:iA') }}
     </p>
@@ -108,6 +108,12 @@
             Join the The Ice Queens Reign raid! Head to The Fathers Tomb on The Ice Plane and band together! The player
             who kills him gets a new ancestral item!
         @endif
+
+        @if ($eventRunning->getTitleOfEvent() === 'Tlessa\'s Feedback Event')
+            Tlessa wants your feedback! We offer increased XP, 80% drop rate for everyone! and a Mythical item for taking a survey!
+        @endif
+
+
     </p>
     <div class="text-center">
         <x-core.buttons.link-buttons.primary-button href="{{ $href }}">

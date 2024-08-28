@@ -1,10 +1,13 @@
 import React from "react";
 import { AxisOptions, Chart } from "react-charts";
 import ResizableBox from "../../../../game/components/ui/resizable-box";
-import SiteStatisticsAjax from "../helpers/site-statistics-ajax";
 import DropDown from "../../../../game/components/ui/drop-down/drop-down";
 import InfoAlert from "../../../../game/components/ui/alerts/simple-alerts/info-alert";
 import LoadingProgressBar from "../../../../game/components/ui/progress-bars/loading-progress-bar";
+import SiteStatisticsAjax from "../../../../admin/statistics/user-statistics/helpers/site-statistics-ajax";
+import DangerAlert from "../../../../game/components/ui/alerts/simple-alerts/danger-alert";
+import UserLoginDuration, { AllowedFilters } from "../ajax/user-login-duration";
+import { charactersOnlineContainer } from "../container/characters-online-container";
 
 type LogInStats = {
     login_count: number;
@@ -27,38 +30,53 @@ const secondaryAxes: AxisOptions<any>[] = [
     },
 ];
 
-export default class LoginDurationStatistics extends React.Component<any, any> {
-    private siteStatisticsAjax: SiteStatisticsAjax;
+export default class LoginDurationChart extends React.Component<any, any> {
+    private userLoginDuration: UserLoginDuration;
 
     constructor(props: any) {
         super(props);
 
         this.state = {
-            data: [],
+            error_message: "",
+            chart_data: [],
             loading: true,
         };
 
-        this.siteStatisticsAjax = new SiteStatisticsAjax(this);
+        this.userLoginDuration =
+            charactersOnlineContainer().fetch(UserLoginDuration);
     }
 
     componentDidMount() {
-        this.siteStatisticsAjax.fetchStatisticalData("login-duration", 0);
+        this.userLoginDuration.fetchLoginDurationData(this, 0);
     }
 
-    createDataSet(
-        data: number[] | [],
-        labels: string[] | [],
-    ): { login_count: number; date: string }[] {
-        const chartData: { login_count: number; date: string }[] = [];
+    fetchOnlineChartData(filter: AllowedFilters) {
+        this.userLoginDuration.fetchLoginDurationData(this, filter);
+    }
 
-        data.forEach((data: number, index: number) => {
-            chartData.push({
-                login_count: data,
-                date: labels[index],
-            });
-        });
-
-        return chartData;
+    dropDownOptions() {
+        return [
+            {
+                name: "Today",
+                icon_class: "ra ra-bottle-vapors",
+                on_click: () => this.fetchOnlineChartData(0),
+            },
+            {
+                name: "Last 7 Days",
+                icon_class: "far fa-trash-alt",
+                on_click: () => this.fetchOnlineChartData(7),
+            },
+            {
+                name: "Last 14 Days",
+                icon_class: "far fa-trash-alt",
+                on_click: () => this.fetchOnlineChartData(14),
+            },
+            {
+                name: "Last Month",
+                icon_class: "far fa-trash-alt",
+                on_click: () => this.fetchOnlineChartData(31),
+            },
+        ];
     }
 
     render() {
@@ -66,7 +84,7 @@ export default class LoginDurationStatistics extends React.Component<any, any> {
             return <LoadingProgressBar />;
         }
 
-        if (this.state.data.length === 0) {
+        if (this.state.chart_data.length === 0) {
             return (
                 <p className="p-4 text-center text-red-700 dark:text-red-400">
                     No Login Duration Data
@@ -77,7 +95,7 @@ export default class LoginDurationStatistics extends React.Component<any, any> {
         const dataForChart: Series[] = [
             {
                 label: "Login Duration",
-                data: this.state.data,
+                data: this.state.chart_data,
             },
         ];
 
@@ -85,9 +103,7 @@ export default class LoginDurationStatistics extends React.Component<any, any> {
             <ResizableBox height={550}>
                 <div>
                     <DropDown
-                        menu_items={this.siteStatisticsAjax.createActionsDropDown(
-                            "login-duration",
-                        )}
+                        menu_items={this.dropDownOptions()}
                         button_title={"Date Filter"}
                     />
                     <InfoAlert additional_css="my-3">
@@ -101,6 +117,11 @@ export default class LoginDurationStatistics extends React.Component<any, any> {
                             know who is online, see the list to the right.
                         </p>
                     </InfoAlert>
+                    {this.state.error_message !== "" ? (
+                        <DangerAlert additional_css="my-2">
+                            {this.state.error_message}
+                        </DangerAlert>
+                    ) : null}
                     <ResizableBox height={350}>
                         <Chart
                             options={{

@@ -15,6 +15,7 @@ export default defineConfig({
             'resources/js/player-event-calendar-component.ts',
             'resources/js/guide-quests-init.tsx',
             'resources/js/items-table-component.ts',
+            'resources/js/online-character-stats-component.ts',
             'resources/js/vendor/theme-script.js',
             'resources/vendor/theme/assets/js/dark-mode/dark-mode.js',
             'resources/js/vendor/livewire-data-tables.js',

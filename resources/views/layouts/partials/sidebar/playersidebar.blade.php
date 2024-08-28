@@ -42,6 +42,11 @@
             <span class="icon fas fa-hand-holding-usd"></span>
             <span class="title">Donate</span>
         </a>
+        <a href="{{ route('game.whos-playing') }}" class="link" data-toggle="tooltip-menu"
+        data-tippy-content="Events">
+         <span class="icon fas fa-plug"></span>
+         <span class="title">Who's Online?</span>
+     </a>
     </div>
 
     <!-- Character -->

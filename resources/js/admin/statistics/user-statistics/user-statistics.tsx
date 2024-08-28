@@ -9,6 +9,7 @@ import CharacterTotalGold from "./components/character-total-gold";
 import CharacterQuestCompletion from "./components/character-quest-completion";
 import LoginDurationStatistics from "./components/login-duration-statistics";
 import CharactersOnlineList from "./components/characters-online-list";
+import CharactersOnlineContainer from "../../../individual-components/public-components/characters-online-stats/characters-online-container";
 
 export default class UserStatistics extends React.Component<any, any> {
     constructor(props: any) {
@@ -18,7 +19,7 @@ export default class UserStatistics extends React.Component<any, any> {
     render() {
         return (
             <div className="pb-10">
-                <div className="grid lg:grid-cols-2 gap-3 mb-5">
+                <div className="grid gap-3 mb-5 lg:grid-cols-2">
                     <BasicCard>
                         <h3 className="mb-4">Logins</h3>
                         <LoginStatistics />
@@ -28,16 +29,7 @@ export default class UserStatistics extends React.Component<any, any> {
                         <RegistrationStatistics />
                     </BasicCard>
                 </div>
-                <div className="grid lg:grid-cols-2 gap-3 mb-5">
-                    <BasicCard additionalClasses={"mb-5"}>
-                        <h3 className="mb-4">Login Duration Info</h3>
-                        <LoginDurationStatistics />
-                    </BasicCard>
-                    <BasicCard>
-                        <h3 className="mb-4">Who's online?</h3>
-                        <CharactersOnlineList />
-                    </BasicCard>
-                </div>
+                <CharactersOnlineContainer />
                 <BasicCard additionalClasses={"mb-5"}>
                     <h3 className="mb-4">
                         Characters Who Reincarnated Once (or more)

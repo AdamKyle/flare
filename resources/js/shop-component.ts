@@ -4,6 +4,6 @@
 import "./bootstrap";
 
 /**
- * When the administrator is logged in, load their chat.
+ * Shows the shop component
  */
 import "./individual-components/player-components/shop/shop-component";
