@@ -4,6 +4,7 @@ import ComponentLoading from "../../../../game/components/ui/loading/component-l
 import ResizableBox from "../../../../game/components/ui/resizable-box";
 import SiteStatisticsAjax from "../helpers/site-statistics-ajax";
 import DropDown from "../../../../game/components/ui/drop-down/drop-down";
+import InfoAlert from "../../../../game/components/ui/alerts/simple-alerts/info-alert";
 
 type LogInStats = {
     login_count: number;
@@ -67,7 +68,7 @@ export default class LoginDurationStatistics extends React.Component<any, any> {
 
         if (this.state.data.length === 0) {
             return (
-                <p className="text-center p-4 text-red-700 dark:text-red-400">
+                <p className="p-4 text-center text-red-700 dark:text-red-400">
                     No Login Duration Data
                 </p>
             );
@@ -81,7 +82,7 @@ export default class LoginDurationStatistics extends React.Component<any, any> {
         ];
 
         return (
-            <ResizableBox height={450}>
+            <ResizableBox height={550}>
                 <div>
                     <DropDown
                         menu_items={this.siteStatisticsAjax.createActionsDropDown(
@@ -89,6 +90,9 @@ export default class LoginDurationStatistics extends React.Component<any, any> {
                         )}
                         button_title={"Date Filter"}
                     />
+                    <InfoAlert additional_css="my-3">
+                        <strong>Please note:</strong> This is an average of playrs login time in minutes over the period of a day, a week, two weeks or a month based on the drop down.
+                    </InfoAlert>
                     <ResizableBox height={350}>
                         <Chart
                             options={{
