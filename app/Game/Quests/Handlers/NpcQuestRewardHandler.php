@@ -102,8 +102,6 @@ class NpcQuestRewardHandler
                 event(new GlobalMessageEvent($character->name.' Has unlocked an epic gift! 10 additional sets! Their deeds have not gone unnoticed in the land of Tlessa!'));
             }
         }
-
-        $this->createQuestLog($character, $quest);
     }
 
     public function questHasRewardItem(Quest $quest): bool
@@ -266,7 +264,7 @@ class NpcQuestRewardHandler
         CharacterAttackTypesCacheBuilder::dispatch($character);
     }
 
-    public function createQuestLog(Character $character, Quest $quest): void
+    public function createquestQuestLog(Character $character, Quest $quest): void
     {
         $character->questsCompleted()->create([
             'character_id' => $character->id,

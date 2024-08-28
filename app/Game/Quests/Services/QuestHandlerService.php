@@ -6,7 +6,7 @@ use App\Flare\Models\Character;
 use App\Flare\Models\Event;
 use App\Flare\Models\Npc;
 use App\Flare\Models\Quest;
-use App\Game\Battle\Jobs\HandInQuest;
+use App\Game\Quests\Jobs\HandInQuest;
 use App\Game\Character\Builders\AttackBuilders\Jobs\CharacterAttackTypesCacheBuilder;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Maps\Events\UpdateMap;
@@ -18,7 +18,6 @@ use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Quests\Handlers\NpcQuestsHandler;
 use App\Game\Quests\Traits\QuestDetails;
-use Exception;
 use Illuminate\Support\Facades\Cache;
 
 class QuestHandlerService
@@ -195,6 +194,8 @@ class QuestHandlerService
         HandInQuest::dispatch($character, $quest);
 
         event(new GlobalMessageEvent($character->name.' Has completed a quest ('.$quest->name.') for: '.$quest->npc->real_name.' and been rewarded with a godly gift!'));
+
+        $this->npcQuestsHandler()->questRewardHandler()->createquestQuestLog($character, $quest);
 
         $character = $character->refresh();
 

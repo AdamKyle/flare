@@ -1,12 +1,8 @@
 import { Channel } from "laravel-echo";
 import { inject, injectable } from "tsyringe";
 import CoreEventListener from "../../../lib/game/event-listeners/core-event-listener";
-import BuildingQueuesTable from "../capital-city/building-queues-table";
-import CapitalCityBuildingQueueTableEventDefinition from "./capital-city-building-queue-table-event-definition";
 import UnitQueuesTable from "../capital-city/unit-queues-table";
-import UnitRecruitment from "../capital-city/unit-recruitment";
 import CapitalCityUnitQueueTableEventDefinition from "./capital-city-unit-queue-table-event-definition";
-import { Unit } from "chart.js/dist/scales/scale.time";
 
 @injectable()
 export default class CapitalCityUnitQueuesTableEvent

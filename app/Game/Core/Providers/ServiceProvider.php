@@ -7,6 +7,7 @@ use App\Flare\Transformers\Serializers\CoreSerializer;
 use App\Game\Battle\Services\BattleDrop;
 use App\Game\Core\Comparison\ItemComparison;
 use App\Game\Core\Services\CharacterPassiveSkills;
+use App\Game\Core\Services\CharactersOnline;
 use App\Game\Core\Services\DropCheckService;
 use App\Game\Core\Services\GoldRush;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
@@ -47,6 +48,10 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(ItemComparison::class, function ($app) {
             return new ItemComparison;
+        });
+
+        $this->app->bind(CharactersOnline::class, function($app) {
+            return new CharactersOnline;
         });
     }
 

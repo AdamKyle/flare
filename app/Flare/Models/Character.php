@@ -153,11 +153,6 @@ class Character extends Model
         return $this->hasMany(Faction::class, 'character_id', 'id');
     }
 
-    public function rankTop()
-    {
-        return $this->hasOne(RankFightTop::class, 'character_id', 'id');
-    }
-
     public function factionLoyalties()
     {
         return $this->hasMany(FactionLoyalty::class, 'character_id', 'id');

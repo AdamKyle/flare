@@ -6,11 +6,11 @@
 @endpush
 
 @section('content')
-    <div class="container mx-auto lg:px-4 mb-5">
-        <div class="text-center mb-10 lg:mt-10">
-            <h1 class="mb-5 font-thin text-7xl dark:text-gray-300 text-gray-800 text-4xl md:text-9xl">Planes of Tlessa</h1>
-            <p class="mb-10 dark:text-gray-300 text-gray-800 italic">A world full of mystery and exploration.</p>
-            <div class="grid md:grid-cols-3 gap-2 md:w-1/3 w-full mr-auto ml-auto">
+    <div class="container mx-auto mb-5 lg:px-4">
+        <div class="mb-10 text-center lg:mt-10">
+            <h1 class="mb-5 text-4xl font-thin text-gray-800 text-7xl dark:text-gray-300 md:text-9xl">Planes of Tlessa</h1>
+            <p class="mb-10 italic text-gray-800 dark:text-gray-300">A world full of mystery and exploration.</p>
+            <div class="flex justify-center w-full gap-2 ml-auto mr-auto">
                 <x-core.buttons.link-buttons.primary-button css="mr-2" href="{{ route('register') }}">
                     Join Today!
                 </x-core.buttons.link-buttons.primary-button>
@@ -21,11 +21,14 @@
                 <x-core.buttons.link-buttons.orange-button css="mr-2" href="{{ route('releases.list') }}">
                     Release Notes
                 </x-core.buttons.link-buttons.orange-button>
+                <x-core.buttons.link-buttons.orange-button css="mr-2" href="{{ route('game.whos-playing') }}">
+                    Who's Playing?
+                </x-core.buttons.link-buttons.orange-button>
             </div>
         </div>
-        <div class="grid gap-2 mb-5 w-2/3 md:hidden mr-auto ml-auto">
+        <div class="grid w-2/3 gap-2 mb-5 ml-auto mr-auto md:hidden">
             @guest
-                <div class="flex items-center mr-2 justify-center mb-4">
+                <div class="flex items-center justify-center mb-4 mr-2">
                     <label class="switch switch_outlined" data-toggle="tooltip" data-tippy-content="Toggle Dark Mode">
                         <input id="darkModeToggler" type="checkbox">
                         <span></span>
@@ -54,17 +57,17 @@
         @endif
 
         @if (SurveyStats::canShowSurveyMenuOption())
-            <div class="text-center w-full lg:w-2/4 mx-auto mt-20">
-                <h2 class="mb-5 font-thin text-2xl lg:text-5xl dark:text-gray-300 text-gray-800">
+            <div class="w-full mx-auto mt-20 text-center lg:w-2/4">
+                <h2 class="mb-5 text-2xl font-thin text-gray-800 lg:text-5xl dark:text-gray-300">
                     <i class="fas fa-poll"></i>
                     The latest survey has been released!
                 </h2>
-                <p class="mb-10 dark:text-gray-300 text-gray-800">
+                <p class="mb-10 text-gray-800 dark:text-gray-300">
                     Tlessa will occasionally hold an event where players can get large amounts of XP to help them progress. After 6 hours of total game play,
                     does not need to be consecutive, players are promoted with a survey - filling out rhe survey helps Tlessa make the game better and become of the best PBBGS around! Players also get a shiny mythical item for completing them!
                 </p>
 
-                <p class="mb-10 dark:text-gray-300 text-gray-800">
+                <p class="mb-10 text-gray-800 dark:text-gray-300">
                     <x-core.buttons.link-buttons.success-button href="{{route('survey.stats')}}">
                         View the survey results!
                     </x-core.buttons.link-buttons.success-button>
@@ -72,24 +75,24 @@
             </div>
         @endif
 
-        <div class="text-center w-full lg:w-2/4 mx-auto mt-20">
-            <h2 class="mb-5 font-thin text-2xl lg:text-5xl dark:text-gray-300 text-gray-800">
+        <div class="w-full mx-auto mt-20 text-center lg:w-2/4">
+            <h2 class="mb-5 text-2xl font-thin text-gray-800 lg:text-5xl dark:text-gray-300">
                 <i class="fas fa-globe-americas"></i>
                 A World of Possibilities
             </h2>
-            <p class="mb-10 dark:text-gray-300 text-gray-800">
+            <p class="mb-10 text-gray-800 dark:text-gray-300">
                 Tlessa offers a lot for the average player to do, from crafting, enchanting, gear progression, quests,
                 monsters, kingdoms to manage and to take. There is more to do here
                 including but not limited to: Reach level 4000+, Fight epic Celestials, Get Faction Points for Uniques,
                 Complete over 60 quests and so much more.
             </p>
 
-            <p class="mb-10 dark:text-gray-300 text-gray-800">
+            <p class="mb-10 text-gray-800 dark:text-gray-300">
                 <strong>Best part?</strong> it's all free! Just requires time investment, as little or as much as you want!
             </p>
         </div>
 
-        <div class="grid lg:grid-cols-3 gap-3 w-full md:w-2/3 m-auto">
+        <div class="grid w-full gap-3 m-auto lg:grid-cols-3 md:w-2/3">
             <x-core.cards.feature-card>
                 <x-slot:icon>
                     <i class="ra ra-player text-primary-600 relative top-[10px] right-[10px]"></i>
@@ -144,19 +147,19 @@
             </x-core.cards.feature-card>
         </div>
 
-        <div class="grid md:grid-cols-2 gap-6 mt-5 w-full mt-10 mx-auto lg:w-3/4 md:mt-20">
+        <div class="grid w-full gap-6 mx-auto mt-5 mt-10 md:grid-cols-2 lg:w-3/4 md:mt-20">
             <div class="mt-4 lg:mt-0">
                 <img src="{{ asset('promotion/map.png') }}"
-                    class="shadow rounded max-w-full h-auto align-middle border-none img-fluid glightbox w-100 mb-5 cursor-pointer" />
-                <div class="text-center text-sm">
+                    class="h-auto max-w-full mb-5 align-middle border-none rounded shadow cursor-pointer img-fluid glightbox w-100" />
+                <div class="text-sm text-center">
                     Click to make larger.
                 </div>
             </div>
-            <div class="md:flex md:items-center text-center md:text-left">
+            <div class="text-center md:flex md:items-center md:text-left">
                 <div>
-                    <h2 class="mb-5 font-thin text-2xl lg:text-5xl dark:text-gray-300 text-gray-800">See where you're going!
+                    <h2 class="mb-5 text-2xl font-thin text-gray-800 lg:text-5xl dark:text-gray-300">See where you're going!
                     </h2>
-                    <p class="mb-10 dark:text-gray-300 text-gray-800">Adventure on a map by clicking the action buttons. Set
+                    <p class="mb-10 text-gray-800 dark:text-gray-300">Adventure on a map by clicking the action buttons. Set
                         sail from one port to the other, traverse to other planes of existence!</p>
 
                     <x-core.buttons.link-buttons.primary-button
@@ -169,39 +172,39 @@
             </div>
         </div>
 
-        <div class="text-center w-full lg:w-2/4 mx-auto mt-20">
-            <h2 class="mb-5 font-thin text-2xl lg:text-5xl dark:text-gray-300 text-gray-800">
+        <div class="w-full mx-auto mt-20 text-center lg:w-2/4">
+            <h2 class="mb-5 text-2xl font-thin text-gray-800 lg:text-5xl dark:text-gray-300">
                 <span class="fa-stack">
                     <i class="far fa-credit-card fa-stack-1x"></i>
-                    <i class="fas fa-ban fa-stack-2x text-red-500"></i>
+                    <i class="text-red-500 fas fa-ban fa-stack-2x"></i>
                 </span>
                 No Cash Shops!
             </h2>
-            <p class="mb-10 dark:text-gray-300 text-gray-800">
+            <p class="mb-10 text-gray-800 dark:text-gray-300">
                 This game is free. This game has one philosophy: You want it? Earn it! Every thing from the best gear,
                 to the strongest kingdoms to ability to travel from one plane to the next is all only attainable by playing
                 the game.
             </p>
         </div>
 
-        <div class="grid md:grid-cols-2 gap-6 mt-5 w-full mt-10 mx-auto lg:w-3/4 md:mt-20">
+        <div class="grid w-full gap-6 mx-auto mt-5 mt-10 md:grid-cols-2 lg:w-3/4 md:mt-20">
             <div class="mt-4 lg:mt-0">
                 <img src="{{ asset('promotion/corrupted-locations.png') }}"
-                    class="shadow rounded max-w-full h-auto align-middle border-none img-fluid glightbox w-100 mb-5 cursor-pointer" />
-                <div class="text-center text-sm">
+                    class="h-auto max-w-full mb-5 align-middle border-none rounded shadow cursor-pointer img-fluid glightbox w-100" />
+                <div class="text-sm text-center">
                     Click to make larger.
                 </div>
             </div>
 
-            <div class="md:flex md:items-center text-center md:text-left">
+            <div class="text-center md:flex md:items-center md:text-left">
                 <div>
-                    <h2 class="mb-5 font-thin md:text-4xl lg:text-5xl dark:text-gray-300 text-gray-800">Raids</h2>
-                    <p class="mb-10 dark:text-gray-300 text-gray-800">
+                    <h2 class="mb-5 font-thin text-gray-800 md:text-4xl lg:text-5xl dark:text-gray-300">Raids</h2>
+                    <p class="mb-10 text-gray-800 dark:text-gray-300">
                         Join together with other players to take down fearsom creatures that corrupte locations
                         on the map and win epic rewards for being the first to slay the beast!
                     </p>
 
-                    <p class="mb-10 dark:text-gray-300 text-gray-800">
+                    <p class="mb-10 text-gray-800 dark:text-gray-300">
                         Raids are <a href="/information/events">scheduled</a> events that last for over a month and give
                         players
                         a chance to be the one who wins the <a href="/information/ancestral-items">Ancestral Item</a> the
@@ -218,12 +221,12 @@
             </div>
         </div>
 
-        <div class="text-center w-full lg:w-2/4 mx-auto mt-20">
-            <h2 class="mb-5 font-thin text-2xl lg:text-5xl dark:text-gray-300 text-gray-800">
-                <i class="fas fa-mouse-pointer mr-2"></i>
+        <div class="w-full mx-auto mt-20 text-center lg:w-2/4">
+            <h2 class="mb-5 text-2xl font-thin text-gray-800 lg:text-5xl dark:text-gray-300">
+                <i class="mr-2 fas fa-mouse-pointer"></i>
                 Some Clicking Required!
             </h2>
-            <p class="mb-10 dark:text-gray-300 text-gray-800">
+            <p class="mb-10 text-gray-800 dark:text-gray-300">
                 Tlessa is not an idle game. We do offer <a href="/information/exploration">Exploration</a> to make the
                 progression a bit easier,
                 however, players should be prepared to not put the game on autopilot and walk away. <a
@@ -231,7 +234,7 @@
             </p>
         </div>
 
-        <div class="grid lg:grid-cols-3 gap-3 mt-20 w-full md:w-2/3 m-auto">
+        <div class="grid w-full gap-3 m-auto mt-20 lg:grid-cols-3 md:w-2/3">
             <x-core.cards.feature-card>
                 <x-slot:icon>
                     <i class="ra ra-anvil text-primary-600 relative top-[10px] right-[10px]"></i>
@@ -278,7 +281,7 @@
             </x-core.cards.feature-card>
         </div>
 
-        <div class="grid lg:grid-cols-3 gap-3 mt-2 w-full md:w-2/3 m-auto">
+        <div class="grid w-full gap-3 m-auto mt-2 lg:grid-cols-3 md:w-2/3">
             <x-core.cards.feature-card>
                 <x-slot:icon>
                     <i class="ra ra-bone-bite text-primary-600 relative top-[10px] right-[10px]"></i>
@@ -304,7 +307,7 @@
                         Guide</a>
                 </x-slot:title>
 
-                <p>New Player? Enable the guide during registration to help you out and learn about the game!</p>
+                <p>New Player? The Guide will be auto enabled for you to help you navigate the world of Tlessa!</p>
             </x-core.cards.feature-card>
             <x-core.cards.feature-card>
                 <x-slot:icon>
@@ -321,19 +324,22 @@
             </x-core.cards.feature-card>
         </div>
 
-        <div class="text-center mt-4 w-full md:w-2/3 m-auto mb-8">
-            <h4 class="mb-5 font-thin text-3xl dark:text-gray-300 text-gray-800">And so many more!</h1>
-                <p class="mb-10 dark:text-gray-300 text-gray-800 italic">Planes of tlessa has so many rich and diverse
+        <div class="w-full m-auto mt-4 mb-8 text-center md:w-2/3">
+            <h4 class="mb-5 text-3xl font-thin text-gray-800 dark:text-gray-300">And so many more!</h1>
+                <p class="mb-10 italic text-gray-800 dark:text-gray-300">Planes of tlessa has so many rich and diverse
                     features its hard to showcase them all!</p>
-                <div class="text-center w-full lg:w-1/3 mr-auto ml-auto">
+                <div class="flex justify-center w-full ml-auto mr-auto text-center lg:w-1/3">
                     <x-core.buttons.link-buttons.success-button css="mr-2 mb-4" href="{{ route('game.features') }}">
                         See all the features
                     </x-core.buttons.link-buttons.success-button>
+                    <x-core.buttons.link-buttons.orange-button css="mr-2 mb-4" href="{{ route('game.whos-playing') }}">
+                        See who's playing Tlessa!
+                    </x-core.buttons.link-buttons.orange-button>
                 </div>
         </div>
 
-        <div class="w-full lg:w-2/4 mx-auto mt-10 lg:mt-20 mb-10 mt-4 lg:mt-0">
-            <h2 class="mb-5 font-thin text-center text-5xl dark:text-gray-300 text-gray-800">
+        <div class="w-full mx-auto mt-4 mt-10 mb-10 lg:w-2/4 lg:mt-20 lg:mt-0">
+            <h2 class="mb-5 text-5xl font-thin text-center text-gray-800 dark:text-gray-300">
                 <i class="far fa-question-circle"></i>
                 FAQ
             </h2>

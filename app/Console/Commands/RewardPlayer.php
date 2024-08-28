@@ -57,6 +57,7 @@ class RewardPlayer extends Command
 
         $factionLoyalties = $character->factionLoyalties;
 
+
         foreach ($factionLoyalties as $factionLoyalty) {
 
             $factionLoyaltyNpcs = $factionLoyalty->factionLoyaltyNpcs;
@@ -64,6 +65,17 @@ class RewardPlayer extends Command
             foreach ($factionLoyaltyNpcs as $factionLoyaltyNpc) {
 
                 $fameTasks = $factionLoyaltyNpc->factionLoyaltyNpcTasks->fame_tasks;
+
+                if (empty($fameTasks)) {
+
+                    if ($factionLoyaltyNpc->current_level < $factionLoyaltyNpc->max_level) {
+                        $factionLoyaltyNpc->update([
+                            'current_level' => $factionLoyaltyNpc->max_level,
+                        ]);
+                    }
+
+                    continue;
+                }
 
                 foreach ($fameTasks as $index => $fameTask) {
                     $fameTasks[$index]['current_amount'] = $fameTask['required_amount'] - 1;

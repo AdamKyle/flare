@@ -4,6 +4,6 @@
 import "./bootstrap";
 
 /**
- * When the administrator is logged in, load their chat.
+ * shows the items table
  */
 import "./individual-components/public-components/items-table/items-component";

@@ -91,10 +91,10 @@ class SiteStatisticsService {
 
             if ($loggedOutHour !== null) {
                 for ($i = $loggedInHour; $i <= $loggedOutHour; $i++) {
-                    $totalDurationsInHours[$i] += $duration->duration_in_seconds / 3600;
+                    $totalDurationsInHours[$i] += $duration->duration_in_seconds / 60;
                 }
             } else {
-                $totalDurationsInHours[$loggedInHour] += $duration->duration_in_seconds / 3600;
+                $totalDurationsInHours[$loggedInHour] += $duration->duration_in_seconds / 60;
             }
         }
 
@@ -126,7 +126,7 @@ class SiteStatisticsService {
         }
 
         foreach ($durations as $duration) {
-            $dailyDurations[] += $duration->duration_in_seconds / 3600;
+            $dailyDurations[] += $duration->duration_in_seconds / 60;
         }
 
         $this->labels = $daysLabels;
