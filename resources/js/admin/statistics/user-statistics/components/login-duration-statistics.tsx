@@ -91,7 +91,9 @@ export default class LoginDurationStatistics extends React.Component<any, any> {
                         button_title={"Date Filter"}
                     />
                     <InfoAlert additional_css="my-3">
-                        <strong>Please note:</strong> This is an average of playrs login time in minutes over the period of a day, a week, two weeks or a month based on the drop down.
+                        <strong>Please note:</strong> This is an average of
+                        playrs login time in minutes over the period of a day, a
+                        week, two weeks or a month based on the drop down.
                     </InfoAlert>
                     <ResizableBox height={350}>
                         <Chart
