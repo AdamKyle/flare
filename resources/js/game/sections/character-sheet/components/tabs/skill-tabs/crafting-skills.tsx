@@ -85,24 +85,24 @@ export default class CraftingSkills extends React.Component<
 
     renderIcon(name: string): JSX.Element {
         switch (name) {
-            case 'Gem Crafting':
-                return <i className="ra ra-diamond"></i>
-            case 'Trinketry':
-                return <i className="ra ra-gem-pendant"></i>
-            case 'Alchemy':
-                return <i className="ra ra-bubbling-potion"></i>
-            case 'Disenchanting':
-                return <i className="ra ra-ball"></i>
-            case 'Enchanting':
-                return <i className="ra ra-frostfire"></i>
-            case 'Spell Crafting':
-                return <i className="ra ra-burning-book"></i>
-            case 'Ring Crafting':
-            case 'Armour Crafting':
-                return <i className="ra ra-anvil"></i>
-            case 'Weapon Crafting':
+            case "Gem Crafting":
+                return <i className="ra ra-diamond"></i>;
+            case "Trinketry":
+                return <i className="ra ra-gem-pendant"></i>;
+            case "Alchemy":
+                return <i className="ra ra-bubbling-potion"></i>;
+            case "Disenchanting":
+                return <i className="ra ra-ball"></i>;
+            case "Enchanting":
+                return <i className="ra ra-frostfire"></i>;
+            case "Spell Crafting":
+                return <i className="ra ra-burning-book"></i>;
+            case "Ring Crafting":
+            case "Armour Crafting":
+                return <i className="ra ra-anvil"></i>;
+            case "Weapon Crafting":
             default:
-                return <i className="ra ra-flat-hammer"></i>
+                return <i className="ra ra-flat-hammer"></i>;
         }
     }
 
