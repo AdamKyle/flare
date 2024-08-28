@@ -13,7 +13,10 @@ import { Series } from "../deffinitions/chart-series";
 import { primaryAxis, secondaryAxes } from "../deffinitions/chart-axis";
 import { Chart } from "react-charts";
 
-export default class LoginDurationChart extends React.Component<LoginDurationChartProps, LoginDurationChartState> {
+export default class LoginDurationChart extends React.Component<
+    LoginDurationChartProps,
+    LoginDurationChartState
+> {
     private userLoginDuration: UserLoginDuration;
 
     constructor(props: any) {

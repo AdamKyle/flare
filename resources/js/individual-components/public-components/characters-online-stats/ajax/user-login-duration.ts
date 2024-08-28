@@ -6,8 +6,6 @@ import CharactersOnlineContainer from "../characters-online-container.js";
 import LoginDurationChart from "../components/login-duration-chart.js";
 import { AllowedFilters } from "../deffinitions/allowed-filter-types.js";
 
-
-
 @injectable()
 export default class UserLoginDuration {
     constructor(@inject(Ajax) private ajax: AjaxInterface) {}

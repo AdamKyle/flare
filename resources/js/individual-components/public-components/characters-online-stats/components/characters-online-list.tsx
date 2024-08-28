@@ -9,7 +9,10 @@ import { AllowedFilters } from "../deffinitions/allowed-filter-types";
 import { CharactersOnlineListProps } from "../types/character-online-list-props";
 import { CharactersOnlineListState } from "../types/character-online-list-state";
 
-export default class CharactersOnlineList extends React.Component<CharactersOnlineListProps, CharactersOnlineListState> {
+export default class CharactersOnlineList extends React.Component<
+    CharactersOnlineListProps,
+    CharactersOnlineListState
+> {
     private userLoginAjax: UserLoginDuration;
 
     constructor(props: CharactersOnlineListProps) {

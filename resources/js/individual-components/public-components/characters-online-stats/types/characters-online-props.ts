@@ -1,1 +1,1 @@
-export default interface CharactersOnlineProps {};
+export default interface CharactersOnlineProps {}

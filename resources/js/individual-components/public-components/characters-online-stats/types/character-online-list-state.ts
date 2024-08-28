@@ -6,4 +6,4 @@ export interface CharactersOnlineListState {
     loading: boolean;
     filter_type: AllowedFilters;
     error_message: string;
-  }
+}
