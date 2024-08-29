@@ -83,8 +83,10 @@ export default class ManageKingdomBuildings extends React.Component<any, any> {
         return (
             <div>
                 <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-4"></div>
-                <div className="flex items-center relative">
-                    <h3>Oversee your kingdoms buildings</h3>
+                <div className="relative flex flex-col md:flex-row items-start md:items-center">
+                    <h3 className="mb-2 sm:mb-0 sm:mr-4">
+                        Oversee your kingdoms buildings
+                    </h3>
                     <SuccessOutlineButton
                         button_label={
                             this.state.show_upgrade_buildings_list ||
@@ -93,9 +95,10 @@ export default class ManageKingdomBuildings extends React.Component<any, any> {
                                 : "Back to council"
                         }
                         on_click={this.manageView.bind(this)}
-                        additional_css={"absolute right-0"}
+                        additional_css="w-full sm:w-auto"
                     />
                 </div>
+
                 <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-4"></div>
 
                 {this.state.show_upgrade_buildings_list ? (
