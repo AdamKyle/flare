@@ -15,6 +15,6 @@ export default class DangerButton extends React.Component<DangerButtonProps> {
             >
                 {this.props.label}
             </button>
-        )
+        );
     }
 }

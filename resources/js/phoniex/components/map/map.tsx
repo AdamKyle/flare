@@ -8,8 +8,6 @@ export default class Map extends React.Component<MapProps> {
     }
 
     render() {
-        return (
-            'Map Content ...'
-        )
+        return "Map Content ...";
     }
 }

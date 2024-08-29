@@ -1,7 +1,6 @@
 import React from "react";
 import BaseMonsterSectionProps from "./types/baee-monster-section-props";
 export default class BaseMonsterSection extends React.Component<BaseMonsterSectionProps> {
-
     constructor(props: BaseMonsterSectionProps) {
         super(props);
     }
@@ -25,8 +24,7 @@ export default class BaseMonsterSection extends React.Component<BaseMonsterSecti
                 <h3 className="text-2xl text-center font-semibold text-gray-800 dark:text-gray-200 mt-4">
                     Goblin
                 </h3>
-                <div
-                    className="flex md:justify-between flex-col md:flex-row md:gap-4 mt-6 text-gray-700 dark:text-gray-300">
+                <div className="flex md:justify-between flex-col md:flex-row md:gap-4 mt-6 text-gray-700 dark:text-gray-300">
                     {/* Stats Column 1 */}
                     <div className="flex flex-col space-y-1 w-full md:w-1/2">
                         <div className="flex items-center justify-between text-sm">
@@ -99,6 +97,6 @@ export default class BaseMonsterSection extends React.Component<BaseMonsterSecti
                     </div>
                 </div>
             </>
-        )
+        );
     }
 }

@@ -27,12 +27,11 @@ export default class AttackLog extends React.Component<AttackLogProps> {
                     </p>
                 </div>
                 <div className="flex justify-center mt-6">
-                    <button
-                        className="px-4 py-2 bg-emerald-600 text-white rounded-lg shadow hover:bg-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-400 dark:focus:ring-emerald-600 focus:ring-offset-2 dark:focus:ring-offset-gray-800">
+                    <button className="px-4 py-2 bg-emerald-600 text-white rounded-lg shadow hover:bg-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-400 dark:focus:ring-emerald-600 focus:ring-offset-2 dark:focus:ring-offset-gray-800">
                         Revive
                     </button>
                 </div>
             </div>
-        )
+        );
     }
 }

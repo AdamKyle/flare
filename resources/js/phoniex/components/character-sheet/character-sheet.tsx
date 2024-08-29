@@ -8,8 +8,6 @@ export default class CharacterSheet extends React.Component<CharacterSheetProps>
     }
 
     render() {
-        return (
-            'Character Sheet Content ...'
-        )
+        return "Character Sheet Content ...";
     }
 }

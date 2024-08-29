@@ -28,12 +28,14 @@ export default class Fight extends React.Component<{}, FightState> {
                     <AttackButtons />
                 ) : (
                     <div className="flex justify-center mt-6">
-                        <DangerButton on_click={this.initiateFight.bind(this)} label={'Initiate Fight'} />
+                        <DangerButton
+                            on_click={this.initiateFight.bind(this)}
+                            label={"Initiate Fight"}
+                        />
                     </div>
                 )}
 
                 <AttackLog />
-
             </div>
         );
     }
