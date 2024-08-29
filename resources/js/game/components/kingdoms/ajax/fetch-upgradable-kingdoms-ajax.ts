@@ -43,8 +43,6 @@ export default class FetchUpgradableKingdomsAjax {
                         );
                     }
 
-                    component.compressArray(data, false);
-
                     component.setState({
                         loading: false,
                         building_data: data,

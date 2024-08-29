@@ -10,6 +10,7 @@ export interface Building {
 export interface Kingdom {
     kingdom_id: number;
     kingdom_name: string;
+    map_name: string;
     buildings: Building[];
 }
 
