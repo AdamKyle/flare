@@ -73,12 +73,12 @@ export default class CharactersOnlineList extends React.Component<
         return [
             {
                 name: "Today",
-                icon_class: "ra ra-bottle-vapors",
+                icon_class: "fas fa-calendar-day",
                 on_click: () => this.fetchCharactersOnline(0),
             },
             {
                 name: "Last 7 Days",
-                icon_class: "far fa-trash-alt",
+                icon_class: "fas fa-calendar",
                 on_click: () => this.fetchCharactersOnline(7),
             },
             {

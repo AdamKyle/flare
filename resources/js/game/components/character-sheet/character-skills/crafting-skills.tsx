@@ -83,33 +83,56 @@ export default class CraftingSkills extends React.Component<
         ];
     }
 
+    renderIcon(name: string): JSX.Element {
+        switch (name) {
+            case "Gem Crafting":
+                return <i className="ra ra-diamond"></i>;
+            case "Trinketry":
+                return <i className="ra ra-gem-pendant"></i>;
+            case "Alchemy":
+                return <i className="ra ra-bubbling-potion"></i>;
+            case "Disenchanting":
+                return <i className="ra ra-ball"></i>;
+            case "Enchanting":
+                return <i className="ra ra-frostfire"></i>;
+            case "Spell Crafting":
+                return <i className="ra ra-burning-book"></i>;
+            case "Ring Crafting":
+            case "Armour Crafting":
+                return <i className="ra ra-anvil"></i>;
+            case "Weapon Crafting":
+            default:
+                return <i className="ra ra-flat-hammer"></i>;
+        }
+    }
+
     renderCraftingSkills(): JSX.Element {
         const skills = this.props.crafting_skills.map(
             (trainable_skill: any, index: number) => {
                 return (
                     <div key={trainable_skill.id}>
                         <div className="p-4">
-                            <div className="flex justify-between items-center mb-2">
-                                <span className="font-semibold w-24">
+                            <div className="flex items-center justify-between mb-2">
+                                <span className="w-24 font-semibold">
                                     Name:
                                 </span>
                                 <span>
                                     <button
-                                        className="underline text-orange-600 dark:text-orange-300 cursor-pointer"
+                                        className="text-orange-600 underline cursor-pointer dark:text-orange-300"
                                         onClick={() =>
                                             this.manageSkillDetails(
                                                 trainable_skill,
                                             )
                                         }
                                     >
-                                        <i className="ra  ra-flat-hammer"></i>{" "}
+                                        {this.renderIcon(trainable_skill.name)}{" "}
                                         {trainable_skill.name}
                                     </button>
                                 </span>
                             </div>
 
-                            <div className="flex justify-between items-center mb-2">
-                                <span className="font-semibold w-24">
+                            <div className="flex items-center justify-between mb-2">
+                                <span className="w-24 font-semibold">
                                     Level:
                                 </span>
                                 <span>
@@ -118,8 +141,8 @@ export default class CraftingSkills extends React.Component<
                                 </span>
                             </div>
 
-                            <div className="flex justify-between items-center mb-2">
-                                <span className="font-semibold w-24">XP:</span>
+                            <div className="flex items-center justify-between mb-2">
+                                <span className="w-24 font-semibold">XP:</span>
                                 <span>
                                     {trainable_skill.xp}/
                                     {trainable_skill.xp_max}
@@ -127,7 +150,7 @@ export default class CraftingSkills extends React.Component<
                             </div>
                         </div>
                         {index < this.props.crafting_skills.length - 1 && (
-                            <div className="border-b-2 border-b-gray-200 dark:border-b-gray-600 my-3"></div>
+                            <div className="my-3 border-b-2 border-b-gray-200 dark:border-b-gray-600"></div>
                         )}
                     </div>
                 );

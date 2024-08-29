@@ -44,22 +44,22 @@ export default class LoginDurationChart extends React.Component<
         return [
             {
                 name: "Today",
-                icon_class: "ra ra-bottle-vapors",
+                icon_class: "fas fa-calendar-day",
                 on_click: () => this.fetchOnlineChartData(0),
             },
             {
                 name: "Last 7 Days",
-                icon_class: "far fa-trash-alt",
+                icon_class: "fas fa-calendar",
                 on_click: () => this.fetchOnlineChartData(7),
             },
             {
                 name: "Last 14 Days",
-                icon_class: "far fa-trash-alt",
+                icon_class: "fas fa-calendar-alt",
                 on_click: () => this.fetchOnlineChartData(14),
             },
             {
                 name: "Last Month",
-                icon_class: "far fa-trash-alt",
+                icon_class: "fas fa-calendar-alt",
                 on_click: () => this.fetchOnlineChartData(31),
             },
         ];
