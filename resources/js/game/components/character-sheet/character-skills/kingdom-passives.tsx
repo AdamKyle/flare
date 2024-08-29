@@ -41,12 +41,18 @@ export default class KingdomPassives extends React.Component<any, any> {
     }
 
     componentDidMount() {
+        this.props.manage_inventory_visibility();
+
         this.kingdomPassiveTreeAjax.fetchPassiveTree(
             this,
             this.props.character_id,
         );
 
         this.kingdomPassiveSkillEvent.listen();
+    }
+
+    componentWillUnmount() {
+        this.props.manage_inventory_visibility();
     }
 
     manageSuccessMessage(message: string) {
@@ -97,7 +103,7 @@ export default class KingdomPassives extends React.Component<any, any> {
                         <ComponentLoading />
                     </div>
                 ) : (
-                    <div>
+                    <div className="max-w-[75%] mr-auto ml-auto">
                         {this.state.success_message !== null ? (
                             <div className="mb-4">
                                 <SuccessAlert

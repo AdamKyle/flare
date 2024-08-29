@@ -735,6 +735,6 @@ class CharacterInventoryService
             $type = 'spell';
         }
 
-        return ! in_array($type, $acceptedTypes) ? throw new Exception('Unknown Item type: '.$type) : $type;
+        return !in_array($type, $acceptedTypes) ? throw new Exception('Unknown Item type: '. $type) : $type;
     }
 }

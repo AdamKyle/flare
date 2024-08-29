@@ -14,15 +14,17 @@ import CharacterSheetProps from "../../lib/game/character-sheet/types/character-
 import CharacterInventoryTabs from "./components/character-inventory-tabs";
 import CharacterTabs from "./components/character-tabs";
 import ReincarnationCheckModal from "./components/modals/reincarnation-check-modal";
+import CharacterSheetState from "../../lib/game/character-sheet/types/character-sheet-state";
 
 export default class CharacterSheet extends React.Component<
     CharacterSheetProps,
-    any
+    CharacterSheetState
 > {
     constructor(props: CharacterSheetProps) {
         super(props);
 
         this.state = {
+            is_showing_kingdom_tree: false,
             show_inventory_section: false,
             show_skills_section: false,
             show_top_section: false,
@@ -77,6 +79,12 @@ export default class CharacterSheet extends React.Component<
         this.setState({
             show_additional_character_data:
                 !this.state.show_additional_character_data,
+        });
+    }
+
+    manageIsKingdomTreeShowing() {
+        this.setState({
+            is_showing_kingdom_tree: !this.state.is_showing_kingdom_tree,
         });
     }
 
@@ -380,70 +388,88 @@ export default class CharacterSheet extends React.Component<
                         </Fragment>
                     )}
                 </div>
-                <div className="flex flex-col lg:flex-row gap-2 w-full mt-2">
-                    {this.showSection() || this.state.show_skills_section ? (
-                        <BasicCard
-                            additionalClasses={
-                                "overflow-y-auto lg:w-1/2 lg:h-fit"
-                            }
-                        >
-                            {this.showCloseButton() ? (
-                                <div className="text-right cursor-pointer text-red-500 relative top-[10px]">
-                                    <button
-                                        onClick={this.manageSkillsManagement.bind(
-                                            this,
-                                        )}
-                                    >
-                                        <i className="fas fa-minus-circle"></i>
-                                    </button>
-                                </div>
-                            ) : null}
-                            <CharacterSkillsTabs
-                                character_id={this.props.character.id}
-                                user_id={this.props.character.user_id}
-                                is_dead={this.props.character.is_dead}
-                                is_automation_running={
-                                    this.props.character.is_automation_running
+                <div className="flex flex-col gap-2 w-full mt-2">
+                    {/* Container for the skills and inventory sections */}
+                    <div className="flex flex-row gap-2 w-full">
+                        {/* Skills section */}
+                        {this.showSection() ||
+                        this.state.show_skills_section ? (
+                            <BasicCard
+                                additionalClasses={
+                                    "overflow-y-auto flex-1 lg:w-1/2 lg:h-fit"
                                 }
-                                finished_loading={this.props.finished_loading}
-                            />
-                        </BasicCard>
-                    ) : null}
+                            >
+                                {this.showCloseButton() ? (
+                                    <div className="text-right cursor-pointer text-red-500 relative top-[10px]">
+                                        <button
+                                            onClick={this.manageSkillsManagement.bind(
+                                                this,
+                                            )}
+                                        >
+                                            <i className="fas fa-minus-circle"></i>
+                                        </button>
+                                    </div>
+                                ) : null}
+                                <CharacterSkillsTabs
+                                    character_id={this.props.character.id}
+                                    user_id={this.props.character.user_id}
+                                    is_dead={this.props.character.is_dead}
+                                    manage_inventory_visibility={this.manageIsKingdomTreeShowing.bind(
+                                        this,
+                                    )}
+                                    is_automation_running={
+                                        this.props.character
+                                            .is_automation_running
+                                    }
+                                    finished_loading={
+                                        this.props.finished_loading
+                                    }
+                                />
+                            </BasicCard>
+                        ) : null}
 
-                    {this.showSection() || this.state.show_inventory_section ? (
-                        <BasicCard
-                            additionalClasses={
-                                "overflow-y-auto lg:w-1/2 lg:h-fit"
-                            }
-                        >
-                            {this.showCloseButton() ? (
-                                <div className="text-right cursor-pointer text-red-500 relative top-[10px]">
-                                    <button
-                                        onClick={this.manageInventoryManagement.bind(
-                                            this,
-                                        )}
-                                    >
-                                        <i className="fas fa-minus-circle"></i>
-                                    </button>
-                                </div>
-                            ) : null}
-
-                            <CharacterInventoryTabs
-                                character_id={this.props.character.id}
-                                is_dead={this.props.character.is_dead}
-                                user_id={this.props.character.user_id}
-                                is_automation_running={
-                                    this.props.character.is_automation_running
+                        {/* Inventory section */}
+                        {(this.showSection() ||
+                            this.state.show_inventory_section) &&
+                        !this.state.is_showing_kingdom_tree ? (
+                            <BasicCard
+                                additionalClasses={
+                                    "overflow-y-auto flex-1 lg:w-1/2 lg:h-fit"
                                 }
-                                finished_loading={this.props.finished_loading}
-                                update_disable_tabs={
-                                    this.props.update_disable_tabs
-                                }
-                                view_port={this.props.view_port}
-                            />
-                        </BasicCard>
-                    ) : null}
+                            >
+                                {this.showCloseButton() ? (
+                                    <div className="text-right cursor-pointer text-red-500 relative top-[10px]">
+                                        <button
+                                            onClick={this.manageInventoryManagement.bind(
+                                                this,
+                                            )}
+                                        >
+                                            <i className="fas fa-minus-circle"></i>
+                                        </button>
+                                    </div>
+                                ) : null}
 
+                                <CharacterInventoryTabs
+                                    character_id={this.props.character.id}
+                                    is_dead={this.props.character.is_dead}
+                                    user_id={this.props.character.user_id}
+                                    is_automation_running={
+                                        this.props.character
+                                            .is_automation_running
+                                    }
+                                    finished_loading={
+                                        this.props.finished_loading
+                                    }
+                                    update_disable_tabs={
+                                        this.props.update_disable_tabs
+                                    }
+                                    view_port={this.props.view_port}
+                                />
+                            </BasicCard>
+                        ) : null}
+                    </div>
+
+                    {/* Dropdown to select between sections */}
                     {!this.showSection() &&
                     !this.state.show_inventory_section &&
                     !this.state.show_skills_section ? (

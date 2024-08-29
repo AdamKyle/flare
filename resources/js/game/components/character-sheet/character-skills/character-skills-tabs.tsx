@@ -137,6 +137,9 @@ export default class CharacterSkillsTabs extends React.Component<
                         user_id={this.props.user_id}
                         character_id={this.props.character_id}
                         is_automation_running={this.props.is_automation_running}
+                        manage_inventory_visibility={
+                            this.props.manage_inventory_visibility
+                        }
                     />
                 </TabPanel>
             </Tabs>

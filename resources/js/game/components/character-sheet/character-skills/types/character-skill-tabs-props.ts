@@ -8,4 +8,6 @@ export default interface CharacterSkillTabsProps {
     is_automation_running: boolean;
 
     finished_loading: boolean;
+
+    manage_inventory_visibility: () => void;
 }
