@@ -362,6 +362,7 @@ export default class Actions extends React.Component<
                             <PrimaryOutlineButton
                                 button_label={"Try new UI"}
                                 on_click={this.props.manage_show_new_ui}
+                                additional_css={'w-full'}
                             />
                         </div>
 
