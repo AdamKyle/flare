@@ -40,6 +40,10 @@ class MassImportCustomData extends Command
         $this->importInformationSection();
         $this->importSurveys();
 
+        if (config('app.env') !== 'production') {
+            $this->importGameMaps();
+        }
+
         Artisan::call('assign:new-skills');
         Artisan::call('create:quest-cache');
         Artisan::call('create:character-attack-data');
