@@ -6,10 +6,7 @@ import CapitalCityBuildingUpgradeRepairTableEventDefinition from "../event-liste
 import CapitalCityBuildingUpgradeRepairTableEvent from "../event-listeners/capital-city-building-upgrade-repair-table-event";
 import debounce from "lodash/debounce";
 
-export default class BuildingsToUpgradeSection extends React.Component<
-    any,
-    any
-> {
+export default class BuildingsToUpgradeSection extends React.Component<any, any> {
     private fetchUpgradableKingdomsAjax: FetchUpgradableKingdomsAjax;
     private updateBuildingTable: CapitalCityBuildingUpgradeRepairTableEventDefinition;
 
@@ -25,27 +22,17 @@ export default class BuildingsToUpgradeSection extends React.Component<
             open_kingdom_ids: new Set(),
             sort_direction: "asc",
             search_query: "",
+            building_queue: [],
         };
 
-        this.fetchUpgradableKingdomsAjax = serviceContainer().fetch(
-            FetchUpgradableKingdomsAjax,
-        );
-
-        this.updateBuildingTable =
-            serviceContainer().fetch<CapitalCityBuildingUpgradeRepairTableEventDefinition>(
-                CapitalCityBuildingUpgradeRepairTableEvent,
-            );
-
+        this.fetchUpgradableKingdomsAjax = serviceContainer().fetch(FetchUpgradableKingdomsAjax);
+        this.updateBuildingTable = serviceContainer().fetch<CapitalCityBuildingUpgradeRepairTableEventDefinition>(CapitalCityBuildingUpgradeRepairTableEvent);
         this.updateBuildingTable.initialize(this, this.props.user_id);
         this.updateBuildingTable.register();
     }
 
     componentDidMount() {
-        this.fetchUpgradableKingdomsAjax.fetchDetails(
-            this,
-            this.props.kingdom.character_id,
-            this.props.kingdom.id,
-        );
+        this.fetchUpgradableKingdomsAjax.fetchDetails(this, this.props.kingdom.character_id, this.props.kingdom.id);
         this.updateBuildingTable.listen();
     }
 
@@ -90,25 +77,14 @@ export default class BuildingsToUpgradeSection extends React.Component<
 
         const filteredBuildingData = this.state.building_data
             .map((kingdom: any) => {
-                const kingdomNameMatches =
-                    kingdom.kingdom_name.toLowerCase() === searchTerm;
-                const mapNameMatches = kingdom.map_name
-                    .toLowerCase()
-                    .includes(searchTerm);
-                const matchingBuildings = kingdom.buildings.filter(
-                    (building: any) => {
-                        const buildingName = building.name
-                            ? building.name.toLowerCase()
-                            : "";
-                        return buildingName.includes(searchTerm);
-                    },
-                );
+                const kingdomNameMatches = kingdom.kingdom_name.toLowerCase() === searchTerm;
+                const mapNameMatches = kingdom.map_name.toLowerCase().includes(searchTerm);
+                const matchingBuildings = kingdom.buildings.filter((building: any) => {
+                    const buildingName = building.name ? building.name.toLowerCase() : "";
+                    return buildingName.includes(searchTerm);
+                });
 
-                if (
-                    matchingBuildings.length > 0 ||
-                    kingdomNameMatches ||
-                    mapNameMatches
-                ) {
+                if (matchingBuildings.length > 0 || kingdomNameMatches || mapNameMatches) {
                     this.state.open_kingdom_ids.add(kingdom.kingdom_id);
                 } else {
                     this.state.open_kingdom_ids.delete(kingdom.kingdom_id);
@@ -116,10 +92,7 @@ export default class BuildingsToUpgradeSection extends React.Component<
 
                 return {
                     ...kingdom,
-                    buildings:
-                        kingdomNameMatches || mapNameMatches
-                            ? kingdom.buildings
-                            : matchingBuildings,
+                    buildings: kingdomNameMatches || mapNameMatches ? kingdom.buildings : matchingBuildings,
                     matchingBuildings,
                 };
             })
@@ -138,9 +111,7 @@ export default class BuildingsToUpgradeSection extends React.Component<
         const sortedData = filteredBuildingData.map((kingdom: any) => ({
             ...kingdom,
             buildings: kingdom.buildings.sort((a: any, b: any) =>
-                this.state.sort_direction === "asc"
-                    ? a.level - b.level
-                    : b.level - a.level,
+                this.state.sort_direction === "asc" ? a.level - b.level : b.level - a.level,
             ),
         }));
 
@@ -150,7 +121,6 @@ export default class BuildingsToUpgradeSection extends React.Component<
     handleSearchChange(event: React.ChangeEvent<HTMLInputElement>) {
         const searchTerm = event.target.value;
         this.setState({ search_query: searchTerm });
-
         this.debouncedUpdateFilteredData();
     }
 
@@ -169,6 +139,64 @@ export default class BuildingsToUpgradeSection extends React.Component<
             },
         );
     };
+
+    resetQueue = () => {
+        this.setState({ building_queue: [] });
+    };
+
+    showQueue = () => {
+        console.log(this.state.building_queue);
+    };
+
+    toggleBuildingQueue(kingdomId: number, buildingId: number) {
+        this.setState((prevState: any) => {
+            const queue = [...prevState.building_queue];
+            const kingdomQueue = queue.find((item: any) => item.kingdomId === kingdomId);
+
+            if (kingdomQueue) {
+                const buildingIndex = kingdomQueue.buildingIds.indexOf(buildingId);
+
+                if (buildingIndex > -1) {
+                    kingdomQueue.buildingIds.splice(buildingIndex, 1);
+                    if (kingdomQueue.buildingIds.length === 0) {
+                        queue.splice(queue.indexOf(kingdomQueue), 1);
+                    }
+                } else {
+                    kingdomQueue.buildingIds.push(buildingId);
+                }
+            } else {
+                queue.push({
+                    kingdomId,
+                    buildingIds: [buildingId],
+                });
+            }
+
+            return { building_queue: queue };
+        });
+    }
+
+    toggleQueueAllBuildings(kingdomId: number) {
+        this.setState((prevState: any) => {
+            const queue = [...prevState.building_queue];
+            const kingdomQueue = queue.find((item: any) => item.kingdomId === kingdomId);
+            const buildings = (this.state.building_data.find((k: any) => k.kingdom_id === kingdomId) || {}).buildings || [];
+
+            if (kingdomQueue) {
+                if (kingdomQueue.buildingIds.length === buildings.length) {
+                    queue.splice(queue.indexOf(kingdomQueue), 1);
+                } else {
+                    kingdomQueue.buildingIds = buildings.map((b: any) => b.id);
+                }
+            } else {
+                queue.push({
+                    kingdomId,
+                    buildingIds: buildings.map((b: any) => b.id),
+                });
+            }
+
+            return { building_queue: queue };
+        });
+    }
 
     render() {
         if (this.state.loading) {
@@ -203,6 +231,23 @@ export default class BuildingsToUpgradeSection extends React.Component<
                     >
                         Reset Form
                     </button>
+
+                    {this.state.building_queue.length > 0 && (
+                        <>
+                            <button
+                                onClick={this.resetQueue}
+                                className="w-1/2 px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-opacity-50"
+                            >
+                                Reset Queue
+                            </button>
+                            <button
+                                onClick={this.showQueue}
+                                className="w-1/2 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
+                            >
+                                Show Queue
+                            </button>
+                        </>
+                    )}
                 </div>
 
                 <div className="mb-4 text-gray-700 dark:text-gray-300">
@@ -213,7 +258,7 @@ export default class BuildingsToUpgradeSection extends React.Component<
                 {this.state.filtered_building_data.map((kingdom: any) => (
                     <div
                         key={kingdom.kingdom_id}
-                        className="bg-white dark:bg-gray-700 shadow-md rounded-lg overflow-hidden mb-4"
+                        className="bg-gray-100 dark:bg-gray-700 shadow-md rounded-lg overflow-hidden mb-4"
                     >
                         <div
                             className="p-4 flex justify-between items-center cursor-pointer"
@@ -237,7 +282,24 @@ export default class BuildingsToUpgradeSection extends React.Component<
                         {this.state.open_kingdom_ids.has(
                             kingdom.kingdom_id,
                         ) && (
-                            <div className="bg-gray-100 dark:bg-gray-600 p-4">
+                            <div className="bg-gray-300 dark:bg-gray-600 p-4">
+                                <button
+                                    onClick={() =>
+                                        this.toggleQueueAllBuildings(
+                                            kingdom.kingdom_id,
+                                        )
+                                    }
+                                    className="w-full my-2 px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-opacity-50"
+                                >
+                                    {this.state.building_queue.find(
+                                        (item: any) =>
+                                            item.kingdomId ===
+                                            kingdom.kingdom_id,
+                                    )?.buildingIds.length ===
+                                    kingdom.buildings.length
+                                        ? "Remove All from Queue"
+                                        : "Add All to Queue"}
+                                </button>
                                 {kingdom.buildings.map((building: any) => (
                                     <div
                                         key={building.id}
@@ -295,6 +357,26 @@ export default class BuildingsToUpgradeSection extends React.Component<
                                                 </span>
                                             </p>
                                         </div>
+                                        <button
+                                            onClick={() =>
+                                                this.toggleBuildingQueue(
+                                                    kingdom.kingdom_id,
+                                                    building.id,
+                                                )
+                                            }
+                                            className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                                        >
+                                            {this.state.building_queue.some(
+                                                (item: any) =>
+                                                    item.kingdomId ===
+                                                        kingdom.kingdom_id &&
+                                                    item.buildingIds.includes(
+                                                        building.id,
+                                                    ),
+                                            )
+                                                ? "Remove from Queue"
+                                                : "Add to Queue"}
+                                        </button>
                                     </div>
                                 ))}
                             </div>
