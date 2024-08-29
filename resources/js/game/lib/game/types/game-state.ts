@@ -80,4 +80,6 @@ export default interface GameState {
     open_survey_modal: boolean;
 
     survey_success_message: string | null;
+
+    show_new_ui: boolean;
 }

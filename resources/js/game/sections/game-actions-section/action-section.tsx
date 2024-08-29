@@ -38,6 +38,7 @@ export default class ActionSection extends React.Component<
                         update_show_map_mobile={
                             this.props.update_show_map_mobile
                         }
+                        manage_show_new_ui={this.props.manage_show_new_ui}
                     />
                 ) : (
                     <Actions
@@ -55,6 +56,7 @@ export default class ActionSection extends React.Component<
                         update_show_map_mobile={
                             this.props.update_show_map_mobile
                         }
+                        manage_show_new_ui={this.props.manage_show_new_ui}
                     />
                 )}
             </Fragment>

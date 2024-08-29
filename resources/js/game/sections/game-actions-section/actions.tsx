@@ -20,6 +20,7 @@ import MonsterActions from "./components/small-actions/monster-actions";
 import Shop from "./components/specialty-shops/shop";
 import ActionsProps from "./types/actions-props";
 import ActionsState from "./types/actions-state";
+import PrimaryOutlineButton from "../../components/ui/buttons/primary-outline-button";
 
 export default class Actions extends React.Component<
     ActionsProps,
@@ -357,6 +358,12 @@ export default class Actions extends React.Component<
                                     />
                                 </div>
                             )}
+                        <div className="w-full">
+                            <PrimaryOutlineButton
+                                button_label={"Try new UI"}
+                                on_click={this.props.manage_show_new_ui}
+                            />
+                        </div>
 
                         {!this.state.show_duel_fight &&
                             !this.state.show_join_pvp &&

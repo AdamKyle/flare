@@ -24,4 +24,6 @@ export default interface ActionsProps {
     fame_tasks: FameTasks[] | null;
 
     update_show_map_mobile: (showMap: boolean) => void;
+
+    manage_show_new_ui: () => void;
 }

@@ -40,6 +40,7 @@ import IntroSlides from "./components/intro-section/intro-slides";
 import TurnOffUserIntroFlag from "./lib/game/ajax/turn-off-user-intro-flag";
 import SurveyComponent from "./components/survey/survey-component";
 import PrimaryButton from "./components/ui/buttons/primary-button";
+import GameCard from "../phoniex/components/game-card";
 
 export default class Game extends React.Component<GameProps, GameState> {
     private gameEventListener?: GameEventListeners;
@@ -83,6 +84,7 @@ export default class Game extends React.Component<GameProps, GameState> {
             show_survey_button: false,
             open_survey_modal: false,
             survey_success_message: null,
+            show_new_ui: false,
             tabs: [
                 {
                     key: "game",
@@ -373,6 +375,12 @@ export default class Game extends React.Component<GameProps, GameState> {
         });
     }
 
+    manageShowingNewUi() {
+        this.setState({
+            show_new_ui: !this.state.show_new_ui,
+        });
+    }
+
     render() {
         if (this.state.show_intro_page) {
             return (
@@ -419,6 +427,10 @@ export default class Game extends React.Component<GameProps, GameState> {
 
         if (gameMap !== null) {
             gameMapId = gameMap.game_map_id;
+        }
+
+        if (this.state.show_new_ui) {
+            return <GameCard />;
         }
 
         return (
@@ -633,6 +645,9 @@ export default class Game extends React.Component<GameProps, GameState> {
                                                 this.state.fame_action_tasks
                                             }
                                             update_show_map_mobile={this.updateMapVisibility.bind(
+                                                this,
+                                            )}
+                                            manage_show_new_ui={this.manageShowingNewUi.bind(
                                                 this,
                                             )}
                                         />
