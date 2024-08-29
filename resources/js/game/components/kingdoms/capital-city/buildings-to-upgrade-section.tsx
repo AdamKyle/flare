@@ -6,7 +6,10 @@ import CapitalCityBuildingUpgradeRepairTableEventDefinition from "../event-liste
 import CapitalCityBuildingUpgradeRepairTableEvent from "../event-listeners/capital-city-building-upgrade-repair-table-event";
 import debounce from "lodash/debounce";
 
-export default class BuildingsToUpgradeSection extends React.Component<any, any> {
+export default class BuildingsToUpgradeSection extends React.Component<
+    any,
+    any
+> {
     private fetchUpgradableKingdomsAjax: FetchUpgradableKingdomsAjax;
     private updateBuildingTable: CapitalCityBuildingUpgradeRepairTableEventDefinition;
 
@@ -25,14 +28,23 @@ export default class BuildingsToUpgradeSection extends React.Component<any, any>
             building_queue: [],
         };
 
-        this.fetchUpgradableKingdomsAjax = serviceContainer().fetch(FetchUpgradableKingdomsAjax);
-        this.updateBuildingTable = serviceContainer().fetch<CapitalCityBuildingUpgradeRepairTableEventDefinition>(CapitalCityBuildingUpgradeRepairTableEvent);
+        this.fetchUpgradableKingdomsAjax = serviceContainer().fetch(
+            FetchUpgradableKingdomsAjax,
+        );
+        this.updateBuildingTable =
+            serviceContainer().fetch<CapitalCityBuildingUpgradeRepairTableEventDefinition>(
+                CapitalCityBuildingUpgradeRepairTableEvent,
+            );
         this.updateBuildingTable.initialize(this, this.props.user_id);
         this.updateBuildingTable.register();
     }
 
     componentDidMount() {
-        this.fetchUpgradableKingdomsAjax.fetchDetails(this, this.props.kingdom.character_id, this.props.kingdom.id);
+        this.fetchUpgradableKingdomsAjax.fetchDetails(
+            this,
+            this.props.kingdom.character_id,
+            this.props.kingdom.id,
+        );
         this.updateBuildingTable.listen();
     }
 
@@ -77,14 +89,25 @@ export default class BuildingsToUpgradeSection extends React.Component<any, any>
 
         const filteredBuildingData = this.state.building_data
             .map((kingdom: any) => {
-                const kingdomNameMatches = kingdom.kingdom_name.toLowerCase() === searchTerm;
-                const mapNameMatches = kingdom.map_name.toLowerCase().includes(searchTerm);
-                const matchingBuildings = kingdom.buildings.filter((building: any) => {
-                    const buildingName = building.name ? building.name.toLowerCase() : "";
-                    return buildingName.includes(searchTerm);
-                });
+                const kingdomNameMatches =
+                    kingdom.kingdom_name.toLowerCase() === searchTerm;
+                const mapNameMatches = kingdom.map_name
+                    .toLowerCase()
+                    .includes(searchTerm);
+                const matchingBuildings = kingdom.buildings.filter(
+                    (building: any) => {
+                        const buildingName = building.name
+                            ? building.name.toLowerCase()
+                            : "";
+                        return buildingName.includes(searchTerm);
+                    },
+                );
 
-                if (matchingBuildings.length > 0 || kingdomNameMatches || mapNameMatches) {
+                if (
+                    matchingBuildings.length > 0 ||
+                    kingdomNameMatches ||
+                    mapNameMatches
+                ) {
                     this.state.open_kingdom_ids.add(kingdom.kingdom_id);
                 } else {
                     this.state.open_kingdom_ids.delete(kingdom.kingdom_id);
@@ -92,7 +115,10 @@ export default class BuildingsToUpgradeSection extends React.Component<any, any>
 
                 return {
                     ...kingdom,
-                    buildings: kingdomNameMatches || mapNameMatches ? kingdom.buildings : matchingBuildings,
+                    buildings:
+                        kingdomNameMatches || mapNameMatches
+                            ? kingdom.buildings
+                            : matchingBuildings,
                     matchingBuildings,
                 };
             })
@@ -111,7 +137,9 @@ export default class BuildingsToUpgradeSection extends React.Component<any, any>
         const sortedData = filteredBuildingData.map((kingdom: any) => ({
             ...kingdom,
             buildings: kingdom.buildings.sort((a: any, b: any) =>
-                this.state.sort_direction === "asc" ? a.level - b.level : b.level - a.level,
+                this.state.sort_direction === "asc"
+                    ? a.level - b.level
+                    : b.level - a.level,
             ),
         }));
 
@@ -151,10 +179,13 @@ export default class BuildingsToUpgradeSection extends React.Component<any, any>
     toggleBuildingQueue(kingdomId: number, buildingId: number) {
         this.setState((prevState: any) => {
             const queue = [...prevState.building_queue];
-            const kingdomQueue = queue.find((item: any) => item.kingdomId === kingdomId);
+            const kingdomQueue = queue.find(
+                (item: any) => item.kingdomId === kingdomId,
+            );
 
             if (kingdomQueue) {
-                const buildingIndex = kingdomQueue.buildingIds.indexOf(buildingId);
+                const buildingIndex =
+                    kingdomQueue.buildingIds.indexOf(buildingId);
 
                 if (buildingIndex > -1) {
                     kingdomQueue.buildingIds.splice(buildingIndex, 1);
@@ -178,8 +209,15 @@ export default class BuildingsToUpgradeSection extends React.Component<any, any>
     toggleQueueAllBuildings(kingdomId: number) {
         this.setState((prevState: any) => {
             const queue = [...prevState.building_queue];
-            const kingdomQueue = queue.find((item: any) => item.kingdomId === kingdomId);
-            const buildings = (this.state.building_data.find((k: any) => k.kingdom_id === kingdomId) || {}).buildings || [];
+            const kingdomQueue = queue.find(
+                (item: any) => item.kingdomId === kingdomId,
+            );
+            const buildings =
+                (
+                    this.state.building_data.find(
+                        (k: any) => k.kingdom_id === kingdomId,
+                    ) || {}
+                ).buildings || [];
 
             if (kingdomQueue) {
                 if (kingdomQueue.buildingIds.length === buildings.length) {
