@@ -70,26 +70,13 @@ export default class UnitRecruitment extends React.Component<any, any> {
             v.toLowerCase(),
         );
 
-        console.log(
-            unitTypes,
-            searchTerm,
-            unitTypes.includes(searchTerm),
-            filteredData,
-            filteredData.length,
-            unitTypes.includes(searchTerm) && filteredData.length === 0, // Fixed typo here
-        );
-
         if (unitTypes.includes(searchTerm) && filteredData.length === 0) {
-            // Fixed typo here
-            console.log("Here?");
             filteredData = this.state.kingdoms_for_selection;
 
             this.state.kingdoms_for_selection.forEach((kingdom: any) => {
                 openKingdomIds.add(kingdom.id);
             });
         }
-
-        console.log(filteredData, openKingdomIds);
 
         this.setState({
             filtered_unit_recruitment_data: filteredData,
@@ -134,13 +121,14 @@ export default class UnitRecruitment extends React.Component<any, any> {
         unitName: string,
         amount: number | string,
     ) {
-        const updatedQueue = [...this.state.unit_queue];
+        let updatedQueue = [...this.state.unit_queue];
 
         let kingdomQueue = updatedQueue.find(
             (item) => item.kingdom_id === kingdomId,
         );
 
         if (!kingdomQueue) {
+            // Add the kingdom queue if it doesn't exist
             kingdomQueue = {
                 kingdom_id: kingdomId,
                 unit_requests: [],
@@ -152,17 +140,36 @@ export default class UnitRecruitment extends React.Component<any, any> {
             (request: any) => request.unit_name === unitName,
         );
 
-        if (unitRequest) {
-            unitRequest.unit_amount = amount;
+        if (amount === 0 || amount === "") {
+            // Remove the unit request if the amount is 0 or ""
+            if (unitRequest) {
+                kingdomQueue.unit_requests = kingdomQueue.unit_requests.filter(
+                    (request: any) => request.unit_name !== unitName
+                );
+            }
+
+            // Remove the kingdom queue if it has no units left
+            if (kingdomQueue.unit_requests.length === 0) {
+                updatedQueue = updatedQueue.filter(
+                    (item) => item.kingdom_id !== kingdomId
+                );
+            }
         } else {
-            kingdomQueue.unit_requests.push({
-                unit_name: unitName,
-                unit_amount: amount,
-            });
+            // Update or add the unit request if the amount is above 0
+            if (unitRequest) {
+                unitRequest.unit_amount = amount;
+            } else {
+                kingdomQueue.unit_requests.push({
+                    unit_name: unitName,
+                    unit_amount: amount,
+                });
+            }
         }
 
         this.setState({ unit_queue: updatedQueue });
     }
+
+
 
     handleBulkAmountChange = (
         event: React.ChangeEvent<HTMLInputElement>,
@@ -241,6 +248,10 @@ export default class UnitRecruitment extends React.Component<any, any> {
         return Object.values(UnitTypes);
     }
 
+    isBulkQueueDisabled() {
+        return Object.values(UnitTypes).includes(this.state.search_term);
+    }
+
     render() {
         if (this.state.loading) {
             return <LoadingProgressBar />;
@@ -248,6 +259,10 @@ export default class UnitRecruitment extends React.Component<any, any> {
 
         return (
             <div className="md:p-4">
+                <h3>
+                    Recruit Units to your cause
+                </h3>
+                <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-4"></div>
                 <input
                     type="text"
                     value={this.state.search_term}
@@ -257,7 +272,7 @@ export default class UnitRecruitment extends React.Component<any, any> {
                     aria-label="Search by kingdom name, unit name, or map name"
                 />
 
-                <div className="flex space-x-2 mt-4">
+                <div className="flex space-x-2 my-4">
                     <button
                         className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
                         onClick={this.sendOrders}
@@ -307,7 +322,7 @@ export default class UnitRecruitment extends React.Component<any, any> {
                                             }
                                             return {
                                                 open_kingdom_ids:
-                                                    newOpenKingdomIds,
+                                                newOpenKingdomIds,
                                             };
                                         })
                                     }
@@ -336,54 +351,61 @@ export default class UnitRecruitment extends React.Component<any, any> {
                                     kingdom.id,
                                 ) && (
                                     <div className="p-4">
-                                        <div className="mb-4 text-gray-700 dark:text-gray-300">
-                                            Units in Queue:{" "}
-                                            {this.getKingdomQueueSummary(
-                                                kingdom.id,
-                                            )}
-                                        </div>
-                                        <input
-                                            type="number"
-                                            value={
-                                                this.state.bulk_input_values[
-                                                    kingdom.id
-                                                ] || ""
-                                            }
-                                            onChange={(e) =>
-                                                this.handleBulkAmountChange(
-                                                    e,
+                                        <div className="mb-4 p-4 bg-white dark:bg-gray-800 shadow-sm rounded-lg">
+                                            <div className="mb-4 text-gray-700 dark:text-gray-300">
+                                                Units in Queue:{" "}
+                                                {this.getKingdomQueueSummary(
                                                     kingdom.id,
-                                                )
-                                            }
-                                            placeholder="Bulk amount"
-                                            className="w-full mb-4 px-4 py-2 border rounded text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                        />
+                                                )}
+                                            </div>
+                                            <input
+                                                type="number"
+                                                value={
+                                                    this.state
+                                                        .bulk_input_values[
+                                                        kingdom.id
+                                                        ] || ""
+                                                }
+                                                onChange={(e) =>
+                                                    this.handleBulkAmountChange(
+                                                        e,
+                                                        kingdom.id,
+                                                    )
+                                                }
+                                                disabled={this.isBulkQueueDisabled()}
+                                                placeholder="Bulk amount"
+                                                className={`w-full mb-4 px-4 py-2 border rounded text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-200 disabled:text-gray-500 disabled:border-gray-300 disabled:cursor-not-allowed`}
+                                            />
+                                        </div>
 
                                         {this.fetchUnitsToShow().map(
                                             (unitType: string) => (
                                                 <div
                                                     key={unitType}
-                                                    className="flex items-center mb-2"
+                                                    className="mb-4 p-4 bg-white dark:bg-gray-800 shadow-sm rounded-lg"
                                                 >
-                                                    <span className="w-1/3 text-gray-700 dark:text-gray-300">
-                                                        {unitType}
-                                                    </span>
-                                                    <input
-                                                        type="number"
-                                                        value={this.getUnitAmount(
-                                                            kingdom.id,
-                                                            unitType,
-                                                        )}
-                                                        onChange={(e) =>
-                                                            this.handleUnitAmountChange(
+                                                    <div className="flex items-center mb-2">
+                                                        <span className="w-1/3 text-gray-700 dark:text-gray-300">
+                                                            {unitType}
+                                                        </span>
+                                                        <input
+                                                            type="number"
+                                                            value={this.getUnitAmount(
                                                                 kingdom.id,
                                                                 unitType,
-                                                                e.target.value,
-                                                            )
-                                                        }
-                                                        placeholder="Amount"
-                                                        className="w-2/3 px-4 py-2 border rounded text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                                    />
+                                                            )}
+                                                            onChange={(e) =>
+                                                                this.handleUnitAmountChange(
+                                                                    kingdom.id,
+                                                                    unitType,
+                                                                    e.target
+                                                                        .value,
+                                                                )
+                                                            }
+                                                            placeholder="Amount"
+                                                            className="w-2/3 px-4 py-2 border rounded text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                        />
+                                                    </div>
                                                 </div>
                                             ),
                                         )}
