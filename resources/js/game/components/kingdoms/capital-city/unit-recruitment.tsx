@@ -1,374 +1,244 @@
-import React, { ReactNode } from "react";
-import Select from "react-select";
-import SuccessOutlineButton from "../../ui/buttons/success-outline-button";
-import { UnitTypes } from "../deffinitions/unit-types";
-import DangerAlert from "../../ui/alerts/simple-alerts/danger-alert";
-import LoadingProgressBar from "../../ui/progress-bars/loading-progress-bar";
+import React from "react";
 import FetchKingdomsForSelectionAjax from "../ajax/fetch-kingdoms-for-selection-ajax";
 import { serviceContainer } from "../../../lib/containers/core-container";
-import PrimaryOutlineButton from "../../ui/buttons/primary-outline-button";
-import DangerOutlineButton from "../../ui/buttons/danger-outline-button";
-import SendUnitRecruitmentRequestModal from "./modals/send-unit-recruitment-request-modal";
-import UnitQueuesTable from "./unit-queues-table";
-import OrangeOutlineButton from "../../ui/buttons/orange-outline-button";
+import LoadingProgressBar from "../../ui/progress-bars/loading-progress-bar";
+import debounce from "lodash/debounce";
+import { UnitTypes } from "../deffinitions/unit-types";
 
 export default class UnitRecruitment extends React.Component<any, any> {
-    private fetchKingdomsForSelection: FetchKingdomsForSelectionAjax;
+    private fetchKingdomsForSelectionAjax: FetchKingdomsForSelectionAjax;
 
     constructor(props: any) {
         super(props);
 
         this.state = {
-            processing_request: false,
             loading: true,
-            show_unit_recruitment_confirmation: false,
-            show_unit_queue_table: false,
-            error_message: null,
             success_message: null,
+            error_message: null,
             unit_recruitment_data: [],
-            kingdoms_for_selection: [],
-            unit_queues: [],
+            filtered_unit_recruitment_data: [],
+            open_kingdom_ids: new Set(),
+            search_term: "",
+            unit_queue: [],
+            bulk_input_values: {}, // New state to track bulk input values per kingdom
         };
 
-        this.fetchKingdomsForSelection = serviceContainer().fetch(
+        this.fetchKingdomsForSelectionAjax = serviceContainer().fetch(
             FetchKingdomsForSelectionAjax,
         );
     }
 
     componentDidMount() {
-        this.fetchKingdomsForSelection.fetchDetails(
+        this.fetchKingdomsForSelectionAjax.fetchDetails(
             this,
             this.props.kingdom.character_id,
             this.props.kingdom.id,
         );
     }
 
-    manageUnitRecruitment() {
-        this.setState({
-            show_unit_recruitment_confirmation:
-                !this.state.show_unit_recruitment_confirmation,
-        });
+    componentDidUpdate(prevProps: any, prevState: any) {
+        if (
+            prevState.unit_recruitment_data !== this.state.unit_recruitment_data
+        ) {
+            this.updateFilteredUnitData();
+        }
     }
 
-    kingdomSelectOptions() {
-        return this.state.kingdoms_for_selection.map(
-            (kingdom: { name: string; id: number }) => {
-                return {
-                    value: kingdom.id,
-                    label: kingdom.name,
-                };
-            },
+    updateFilteredUnitData() {
+        const searchTerm = this.state.search_term.toLowerCase();
+
+        const openKingdomIds = new Set<number>();
+
+        let filteredData = this.state.kingdoms_for_selection
+            .map((kingdom: any) => {
+                const kingdomNameMatches =
+                    kingdom.name.toLowerCase() === searchTerm;
+                const mapNameMatches = kingdom.game_map_name
+                    .toLowerCase()
+                    .includes(searchTerm);
+
+                return kingdom;
+            })
+            .filter((kingdom: any) => {
+                return (
+                    kingdom.name.toLowerCase() === searchTerm ||
+                    kingdom.game_map_name.toLowerCase().includes(searchTerm)
+                );
+            });
+
+        const unitTypes = Object.values(UnitTypes).map((v: string) =>
+            v.toLowerCase(),
         );
-    }
 
-    updateUnitRecruitmentOrders = (
-        event: React.ChangeEvent<HTMLInputElement>,
-        unitName: string,
-    ) => {
-        let value = Math.min(parseInt(event.target.value, 10) || 0, 1000000);
+        console.log(
+            unitTypes,
+            searchTerm,
+            unitTypes.includes(searchTerm),
+            filteredData,
+            filteredData.length,
+            unitTypes.includes(searchTerm) && filteredData.length === 0, // Fixed typo here
+        );
 
-        if (value < 0) {
-            return;
+        if (unitTypes.includes(searchTerm) && filteredData.length === 0) {
+            // Fixed typo here
+            console.log("Here?");
+            filteredData = this.state.kingdoms_for_selection;
+
+            this.state.kingdoms_for_selection.forEach((kingdom: any) => {
+                openKingdomIds.add(kingdom.id);
+            });
         }
 
-        this.setState((prevState: any) => {
-            let updatedData = prevState.unit_recruitment_data.map(
-                (unit: { name: string; kingdom_ids: number[] }) => {
-                    if (unit.name === unitName) {
-                        return { ...unit, amount: value };
-                    }
-                    return unit;
-                },
-            );
+        console.log(filteredData, openKingdomIds);
 
-            if (
-                !updatedData.some(
-                    (unit: { name: string }) => unit.name === unitName,
-                )
-            ) {
-                updatedData.push({
-                    name: unitName,
-                    amount: value,
-                    kingdom_ids: [],
+        this.setState({
+            filtered_unit_recruitment_data: filteredData,
+            open_kingdom_ids: openKingdomIds,
+        });
+    }
+
+    handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        this.setState({ search_term: event.target.value }, () => {
+            this.debouncedUpdateFilteredData();
+        });
+    };
+
+    debouncedUpdateFilteredData = debounce(() => {
+        this.updateFilteredUnitData();
+    }, 300);
+
+    resetFilters = () => {
+        this.setState(
+            {
+                search_term: "",
+            },
+            () => {
+                this.updateFilteredUnitData();
+            },
+        );
+    };
+
+    resetQueue = () => {
+        this.setState({
+            unit_queue: [],
+            bulk_input_values: {}, // Clear bulk input values
+        });
+    };
+
+    sendOrders = () => {
+        console.log("Sending orders:", this.state.unit_queue);
+    };
+
+    handleUnitAmountChange(
+        kingdomId: number,
+        unitName: string,
+        amount: number | string,
+    ) {
+        const updatedQueue = [...this.state.unit_queue];
+
+        let kingdomQueue = updatedQueue.find(
+            (item) => item.kingdom_id === kingdomId,
+        );
+
+        if (!kingdomQueue) {
+            kingdomQueue = {
+                kingdom_id: kingdomId,
+                unit_requests: [],
+            };
+            updatedQueue.push(kingdomQueue);
+        }
+
+        const unitRequest = kingdomQueue.unit_requests.find(
+            (request: any) => request.unit_name === unitName,
+        );
+
+        if (unitRequest) {
+            unitRequest.unit_amount = amount;
+        } else {
+            kingdomQueue.unit_requests.push({
+                unit_name: unitName,
+                unit_amount: amount,
+            });
+        }
+
+        this.setState({ unit_queue: updatedQueue });
+    }
+
+    handleBulkAmountChange = (
+        event: React.ChangeEvent<HTMLInputElement>,
+        kingdomId: number,
+    ) => {
+        const amount = parseInt(event.target.value, 10) || "";
+        this.setState(
+            (prevState: any) => ({
+                bulk_input_values: {
+                    ...prevState.bulk_input_values,
+                    [kingdomId]: amount,
+                },
+            }),
+            () => {
+                this.updateBulkAmounts(kingdomId, amount);
+            },
+        );
+    };
+
+    updateBulkAmounts(kingdomId: number, bulkAmount: number | string) {
+        const { filtered_unit_recruitment_data } = this.state;
+
+        filtered_unit_recruitment_data.forEach((kingdom: any) => {
+            if (kingdom.id === kingdomId) {
+                Object.values(UnitTypes).forEach((unitType: string) => {
+                    this.handleUnitAmountChange(
+                        kingdom.id,
+                        unitType,
+                        bulkAmount,
+                    );
                 });
             }
-
-            if (value === 0) {
-                updatedData = updatedData.filter(
-                    (unit: { name: string }) => unit.name !== unitName,
-                );
-            }
-
-            return { unit_recruitment_data: updatedData };
-        });
-    };
-
-    updateUnitKingdomSelection = (unitName: string, selectedOptions: any) => {
-        const selectedKingdomIds = selectedOptions.map(
-            (option: { value: number }) => option.value,
-        );
-        this.setState((prevState: any) => {
-            let updatedData = prevState.unit_recruitment_data.map(
-                (unit: { name: string }) => {
-                    if (unit.name === unitName) {
-                        return { ...unit, kingdom_ids: selectedKingdomIds };
-                    }
-                    return unit;
-                },
-            );
-
-            return { unit_recruitment_data: updatedData };
-        });
-    };
-
-    selectAllKingdoms = (unitName: string) => {
-        const allKingdomIds = this.state.kingdoms_for_selection.map(
-            (kingdom: { id: number }) => kingdom.id,
-        );
-        this.setState((prevState: any) => {
-            let updatedData = prevState.unit_recruitment_data.map(
-                (unit: { name: string }) => {
-                    if (unit.name === unitName) {
-                        return { ...unit, kingdom_ids: allKingdomIds };
-                    }
-                    return unit;
-                },
-            );
-
-            return { unit_recruitment_data: updatedData };
-        });
-    };
-
-    resetKingdomSelection = (unitName: string) => {
-        this.setState((prevState: any) => {
-            let updatedData = prevState.unit_recruitment_data.map(
-                (unit: { name: string }) => {
-                    if (unit.name === unitName) {
-                        return { ...unit, kingdom_ids: [] };
-                    }
-                    return unit;
-                },
-            );
-
-            return { unit_recruitment_data: updatedData };
-        });
-    };
-
-    renderUnitRecruitmentSection(unitName: string): ReactNode {
-        const unitData = this.state.unit_recruitment_data.find(
-            (unit: { name: string }) => unit.name === unitName,
-        );
-        const inputValue = unitData ? unitData.amount : "";
-        const selectedKingdoms = unitData
-            ? this.state.kingdoms_for_selection
-                  .filter((kingdom: { id: number }) =>
-                      unitData.kingdom_ids.includes(kingdom.id),
-                  )
-                  .map((kingdom: { id: number; name: string }) => ({
-                      value: kingdom.id,
-                      label: kingdom.name,
-                  }))
-            : [];
-
-        const allKingdomsSelected =
-            selectedKingdoms.length ===
-            this.state.kingdoms_for_selection.length;
-
-        return (
-            <div className="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-4 my-4">
-                <label className="block text-gray-700 w-32 md:w-40">
-                    {unitName}
-                </label>
-                <input
-                    type="number"
-                    value={inputValue}
-                    className="block border rounded p-2 w-full md:w-40"
-                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                        this.updateUnitRecruitmentOrders(event, unitName);
-                    }}
-                />
-                {allKingdomsSelected ? (
-                    <DangerOutlineButton
-                        button_label={"Reset Kingdom Selection"}
-                        on_click={() => this.resetKingdomSelection(unitName)}
-                        additional_css={"w-full md:w-auto"}
-                    />
-                ) : (
-                    <>
-                        <div className="w-full md:w-80">
-                            <Select
-                                options={this.kingdomSelectOptions()}
-                                placeholder="Please select"
-                                className="block w-full"
-                                isMulti={true}
-                                value={selectedKingdoms}
-                                onChange={(selectedOptions) =>
-                                    this.updateUnitKingdomSelection(
-                                        unitName,
-                                        selectedOptions,
-                                    )
-                                }
-                            />
-                        </div>
-                        <span className="text-xl md:text-base">Or</span>
-                        <PrimaryOutlineButton
-                            button_label={"Select all Kingdoms"}
-                            on_click={() => this.selectAllKingdoms(unitName)}
-                            disabled={inputValue === ""}
-                        />
-                    </>
-                )}
-            </div>
-        );
-    }
-
-    manageUnitQueueTable() {
-        this.setState({
-            show_unit_queue_table: !this.state.show_unit_queue_table,
         });
     }
 
-    renderUnitSections(): ReactNode[] {
-        return Object.values(UnitTypes).map((unit) =>
-            this.renderUnitRecruitmentSection(unit),
+    getKingdomQueueSummary(kingdomId: number) {
+        const kingdomQueue = this.state.unit_queue.find(
+            (item: any) => item.kingdom_id === kingdomId,
         );
-    }
 
-    isSendButtonDisabled() {
-        const { unit_recruitment_data } = this.state;
-        return (
-            unit_recruitment_data.length === 0 ||
-            unit_recruitment_data.some(
-                (unit: { kingdom_ids: number[] }) =>
-                    unit.kingdom_ids.length === 0,
+        if (!kingdomQueue) {
+            return null;
+        }
+
+        return kingdomQueue.unit_requests
+            .map(
+                (request: any) =>
+                    `${request.unit_name} - ${request.unit_amount}`,
             )
-        );
+            .join(", ");
     }
 
-    renderRecruitmentAndQueueTabs() {
-        return (
-            <div>
-                <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-4"></div>
-                <div className="flex items-center relative">
-                    <h3>Capital City Unit Request Queue</h3>
-                    <SuccessOutlineButton
-                        button_label={"Back to manage units"}
-                        on_click={this.manageUnitQueueTable.bind(this)}
-                        additional_css={"absolute right-0"}
-                    />
-                </div>
-                <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-4"></div>
-                <UnitQueuesTable
-                    unit_queues={this.state.unit_queues}
-                    kingdom_id={this.props.kingdom.id}
-                    character_id={this.props.kingdom.character_id}
-                    user_id={this.props.user_id}
-                />
-            </div>
+    getUnitAmount(kingdomId: number, unitName: string) {
+        const kingdomQueue = this.state.unit_queue.find(
+            (item: any) => item.kingdom_id === kingdomId,
         );
+
+        if (!kingdomQueue) {
+            return "";
+        }
+
+        const unitRequest = kingdomQueue.unit_requests.find(
+            (request: any) => request.unit_name === unitName,
+        );
+
+        return unitRequest ? unitRequest.unit_amount : "";
     }
 
-    renderRecruitmentSection() {
-        return (
-            <div>
-                <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-4"></div>
-                <div className="flex items-center relative">
-                    <h3>Oversee your kingdoms units</h3>
-                    <SuccessOutlineButton
-                        button_label={"Back to council"}
-                        on_click={this.props.manage_unit_section}
-                        additional_css={"absolute right-0"}
-                    />
-                </div>
-                {this.state.processing_request ? <LoadingProgressBar /> : null}
-                {this.state.error_message !== null ? (
-                    <DangerAlert additional_css={"my-2"}>
-                        {this.state.error_message}
-                    </DangerAlert>
-                ) : null}
-                {this.state.success_message !== null ? (
-                    <DangerAlert additional_css={"my-2"}>
-                        {this.state.success_message}
-                    </DangerAlert>
-                ) : null}
-                <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-4"></div>
-                <p className="my-2">
-                    Below, for each unit type, you may enter a number between 1
-                    and 1,000,000. It is vital you train{" "}
-                    <a
-                        href="/information/kingdom-passive-skills"
-                        target="_blank"
-                    >
-                        Kingdom Passives{" "}
-                        <i className="fas fa-external-link-alt"></i>
-                    </a>{" "}
-                    such as: <strong>Unit Management</strong>, and your own{" "}
-                    <a href="/information/skill-information" target="_blank">
-                        Character Skill{" "}
-                        <i className="fas fa-external-link-alt"></i>
-                    </a>
-                    : <strong>Kinggmanship</strong> which helps reduce the time
-                    it takes to recruit large amounts of units.
-                </p>
-                <p className="my-2">
-                    Should you not have the people to purchase that amount you
-                    enter, we will buy people for you - from your own gold.
-                    Should you not have the resources to request the amount, we
-                    will send out resource requests for you.
-                </p>
-                <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-4"></div>
+    fetchUnitsToShow() {
+        if (Object.values(UnitTypes).includes(this.state.search_term)) {
+            return Object.values(UnitTypes).filter((type: string) => {
+                return type === this.state.search_term;
+            });
+        }
 
-                <div className="flex space-x-2 items-center">
-                    <PrimaryOutlineButton
-                        button_label={"Send Recruitment Orders"}
-                        on_click={this.manageUnitRecruitment.bind(this)}
-                        additional_css={"py-2 px-3 flex-shrink-0"}
-                        disabled={this.isSendButtonDisabled()}
-                    />
-                    <OrangeOutlineButton
-                        button_label={"View Queue"}
-                        on_click={this.manageUnitQueueTable.bind(this)}
-                        additional_css={"py-2 px-3 flex-shrink-0"}
-                    />
-                    <DangerOutlineButton
-                        button_label={"Reset Form"}
-                        on_click={() =>
-                            this.setState({ unit_recruitment_data: [] })
-                        }
-                        additional_css={"py-2 px-3 flex-shrink-0"}
-                    />
-                </div>
-
-                <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-4"></div>
-                {this.state.kingdoms_for_selection.length <= 0 ? (
-                    <p className="text-center italic">
-                        All your kingdoms seem to be busy in this regard. Check:
-                        View Queues to see whats going on.
-                    </p>
-                ) : (
-                    <>
-                        <p className="text-blue-700 dark:text-blue-500">
-                            You must select at least one kingdom for each type
-                            of unit you want to request.
-                        </p>
-                        <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-4"></div>
-                        {this.renderUnitSections()}
-                    </>
-                )}
-                {this.state.show_unit_recruitment_confirmation ? (
-                    <SendUnitRecruitmentRequestModal
-                        is_open={this.state.show_unit_recruitment_confirmation}
-                        manage_modal={this.manageUnitRecruitment.bind(this)}
-                        character_id={this.props.kingdom.character_id}
-                        kingdom_id={this.props.kingdom.id}
-                        params={this.state.unit_recruitment_data}
-                        reset_request_form={() => {
-                            this.setState({ unit_recruitment_data: [] });
-                        }}
-                    />
-                ) : null}
-            </div>
-        );
+        return Object.values(UnitTypes);
     }
 
     render() {
@@ -376,10 +246,154 @@ export default class UnitRecruitment extends React.Component<any, any> {
             return <LoadingProgressBar />;
         }
 
-        if (this.state.show_unit_queue_table) {
-            return this.renderRecruitmentAndQueueTabs();
-        }
+        return (
+            <div className="md:p-4">
+                <input
+                    type="text"
+                    value={this.state.search_term}
+                    onChange={this.handleSearchChange}
+                    placeholder="Search by kingdom name, unit name, or map name"
+                    className="w-full mb-4 px-4 py-2 border rounded text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    aria-label="Search by kingdom name, unit name, or map name"
+                />
 
-        return this.renderRecruitmentSection();
+                <div className="flex space-x-2 mt-4">
+                    <button
+                        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                        onClick={this.sendOrders}
+                    >
+                        Send Orders
+                    </button>
+                    <button
+                        className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                        onClick={this.resetQueue}
+                    >
+                        Reset Queue
+                    </button>
+                    <button
+                        className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+                        onClick={this.resetFilters}
+                    >
+                        Reset Filters
+                    </button>
+                </div>
+
+                <div className="mb-4">
+                    {this.state.filtered_unit_recruitment_data.map(
+                        (kingdom: any) => (
+                            <div
+                                key={kingdom.id}
+                                className="bg-gray-100 dark:bg-gray-700 shadow-md rounded-lg overflow-hidden mb-4"
+                            >
+                                <div
+                                    className="p-4 flex justify-between items-center cursor-pointer"
+                                    onClick={() =>
+                                        this.setState((prevState: any) => {
+                                            const newOpenKingdomIds = new Set(
+                                                prevState.open_kingdom_ids,
+                                            );
+                                            if (
+                                                newOpenKingdomIds.has(
+                                                    kingdom.id,
+                                                )
+                                            ) {
+                                                newOpenKingdomIds.delete(
+                                                    kingdom.id,
+                                                );
+                                            } else {
+                                                newOpenKingdomIds.add(
+                                                    kingdom.id,
+                                                );
+                                            }
+                                            return {
+                                                open_kingdom_ids:
+                                                    newOpenKingdomIds,
+                                            };
+                                        })
+                                    }
+                                >
+                                    <div>
+                                        <div className="text-xl font-semibold">
+                                            {kingdom.name}
+                                        </div>
+                                        <div className="text-sm text-gray-600 dark:text-gray-400">
+                                            {kingdom.game_map_name}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <i
+                                            className={`fas ${
+                                                this.state.open_kingdom_ids.has(
+                                                    kingdom.id,
+                                                )
+                                                    ? "fa-chevron-up"
+                                                    : "fa-chevron-down"
+                                            }`}
+                                        ></i>
+                                    </div>
+                                </div>
+                                {this.state.open_kingdom_ids.has(
+                                    kingdom.id,
+                                ) && (
+                                    <div className="p-4">
+                                        <div className="mb-4 text-gray-700 dark:text-gray-300">
+                                            Units in Queue:{" "}
+                                            {this.getKingdomQueueSummary(
+                                                kingdom.id,
+                                            )}
+                                        </div>
+                                        <input
+                                            type="number"
+                                            value={
+                                                this.state.bulk_input_values[
+                                                    kingdom.id
+                                                ] || ""
+                                            }
+                                            onChange={(e) =>
+                                                this.handleBulkAmountChange(
+                                                    e,
+                                                    kingdom.id,
+                                                )
+                                            }
+                                            placeholder="Bulk amount"
+                                            className="w-full mb-4 px-4 py-2 border rounded text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        />
+
+                                        {this.fetchUnitsToShow().map(
+                                            (unitType: string) => (
+                                                <div
+                                                    key={unitType}
+                                                    className="flex items-center mb-2"
+                                                >
+                                                    <span className="w-1/3 text-gray-700 dark:text-gray-300">
+                                                        {unitType}
+                                                    </span>
+                                                    <input
+                                                        type="number"
+                                                        value={this.getUnitAmount(
+                                                            kingdom.id,
+                                                            unitType,
+                                                        )}
+                                                        onChange={(e) =>
+                                                            this.handleUnitAmountChange(
+                                                                kingdom.id,
+                                                                unitType,
+                                                                e.target.value,
+                                                            )
+                                                        }
+                                                        placeholder="Amount"
+                                                        className="w-2/3 px-4 py-2 border rounded text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                    />
+                                                </div>
+                                            ),
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+                        ),
+                    )}
+                </div>
+            </div>
+        );
     }
 }

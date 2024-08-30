@@ -429,8 +429,13 @@ class CapitalCityManagementService
             ->where('character_id', $kingdom->character_id)
             ->where('game_map_id', $kingdom->game_map_id)
             ->whereDoesntHave('unitsQueue')
-            ->select('name', 'id')
-            ->get();
+            ->with('gameMap:id,name') // Eager load only id and name
+            ->select('name', 'id', 'game_map_id')
+            ->get()
+            ->each(function ($kingdom) {
+                $kingdom->game_map_name = $kingdom->gameMap->name;
+                $kingdom->makeHidden(['gameMap']); // Hide the gameMap relationship
+            });
 
         return $this->filterOutCapitalCityUnitsInQueue($kingdoms)->toArray();
     }
