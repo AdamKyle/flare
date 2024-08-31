@@ -110,10 +110,6 @@ class CapitalCityBuildingManagement
             $building = $kingdom->buildings()->where('id', $buildingUpgradeRequest['building_id'])->first();
             $buildingUpgradeRequest = $this->processPotentialResourceRequests($capitalCityBuildingQueue, $kingdom, $building, $character, $buildingUpgradeRequest);
 
-            if (is_null($buildingUpgradeRequest['secondary_status'])) {
-                 dump($buildingUpgradeRequest);
-            }
-
             $capitalCityBuildingQueue = $capitalCityBuildingQueue->refresh();
 
             $requestData[$index] = $buildingUpgradeRequest;
@@ -135,24 +131,26 @@ class CapitalCityBuildingManagement
             // If the request is ready for building, handle it immediately
             if ($buildingUpgradeRequest['secondary_status'] === CapitalCityQueueStatus::BUILDING ||
                 $buildingUpgradeRequest['secondary_status'] === CapitalCityQueueStatus::REPAIRING) {
-                $result = $this->handleBuildingRequest($capitalCityBuildingQueue, $building, $character);
-
-                if (! $result) {
-                    $requestData[$index]['secondary_status'] = CapitalCityQueueStatus::REJECTED;
-                }
+//                $result = $this->handleBuildingRequest($capitalCityBuildingQueue, $building, $character);
+//
+//                if (! $result) {
+//                    $requestData[$index]['secondary_status'] = CapitalCityQueueStatus::REJECTED;
+//                }
             }
         }
 
-        $capitalCityBuildingQueue->update([
-            'building_request_data' => $requestData,
-            'messages' => $this->messages,
-        ]);
+        dump($requestData);
 
-        $capitalCityBuildingQueue = $capitalCityBuildingQueue->refresh();
-
-        event(new UpdateCapitalCityBuildingQueueTable($capitalCityBuildingQueue->character));
-
-        $this->possiblyCreateLogForQueue($capitalCityBuildingQueue);
+//        $capitalCityBuildingQueue->update([
+//            'building_request_data' => $requestData,
+//            'messages' => $this->messages,
+//        ]);
+//
+//        $capitalCityBuildingQueue = $capitalCityBuildingQueue->refresh();
+//
+//        event(new UpdateCapitalCityBuildingQueueTable($capitalCityBuildingQueue->character));
+//
+//        $this->possiblyCreateLogForQueue($capitalCityBuildingQueue);
     }
 
     /**
@@ -336,7 +334,7 @@ class CapitalCityBuildingManagement
 
             $buildingUpgradeRequest['missing_costs'] = $missingResources;
 
-            $processResult = $this->processResourceRequests($capitalCityBuildingQueue, $kingdom, $character, $building, $missingResources);
+            $processResult = true; // $this->processResourceRequests($capitalCityBuildingQueue, $kingdom, $character, $building, $missingResources);
 
             $buildingUpgradeRequest['secondary_status'] = ($processResult ? CapitalCityQueueStatus::REQUESTING : CapitalCityQueueStatus::REJECTED);
 

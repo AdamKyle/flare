@@ -5,12 +5,16 @@ import LoadingProgressBar from "../../ui/progress-bars/loading-progress-bar";
 import CapitalCityBuildingUpgradeRepairTableEventDefinition from "../event-listeners/capital-city-building-upgrade-repair-table-event-definition";
 import CapitalCityBuildingUpgradeRepairTableEvent from "../event-listeners/capital-city-building-upgrade-repair-table-event";
 import debounce from "lodash/debounce";
+import ProcessUpgradeBuildingsAjax from "../ajax/process-upgrade-buildings-ajax";
+import SuccessAlert from "../../ui/alerts/simple-alerts/success-alert";
+import DangerAlert from "../../ui/alerts/simple-alerts/danger-alert";
 
 export default class BuildingsToUpgradeSection extends React.Component<
     any,
     any
 > {
     private fetchUpgradableKingdomsAjax: FetchUpgradableKingdomsAjax;
+    private processBuildingRequest: ProcessUpgradeBuildingsAjax;
     private updateBuildingTable: CapitalCityBuildingUpgradeRepairTableEventDefinition;
 
     constructor(props: any) {
@@ -18,6 +22,7 @@ export default class BuildingsToUpgradeSection extends React.Component<
 
         this.state = {
             loading: true,
+            processing_request: false,
             success_message: null,
             error_message: null,
             building_data: [],
@@ -30,6 +35,9 @@ export default class BuildingsToUpgradeSection extends React.Component<
 
         this.fetchUpgradableKingdomsAjax = serviceContainer().fetch(
             FetchUpgradableKingdomsAjax,
+        );
+        this.processBuildingRequest = serviceContainer().fetch(
+            ProcessUpgradeBuildingsAjax,
         );
         this.updateBuildingTable =
             serviceContainer().fetch<CapitalCityBuildingUpgradeRepairTableEventDefinition>(
@@ -172,9 +180,23 @@ export default class BuildingsToUpgradeSection extends React.Component<
         this.setState({ building_queue: [] });
     };
 
-    showQueue = () => {
-        console.log(this.state.building_queue);
-    };
+    sendOrders() {
+        this.setState(
+            {
+                processing_request: true,
+                success_message: null,
+                error_message: null,
+            },
+            () => {
+                this.processBuildingRequest.sendBuildingRequests(
+                    this,
+                    this.props.kingdom.character_id,
+                    this.props.kingdom.id,
+                    this.state.building_queue,
+                );
+            },
+        );
+    }
 
     toggleBuildingQueue(kingdomId: number, buildingId: number) {
         this.setState((prevState: any) => {
@@ -243,12 +265,22 @@ export default class BuildingsToUpgradeSection extends React.Component<
 
         return (
             <div className="md:p-4">
+                {this.state.processing_request ? <LoadingProgressBar /> : null}
+
+                {this.state.success_message !== null ? (
+                    <SuccessAlert>{this.state.success_message}</SuccessAlert>
+                ) : null}
+
+                {this.state.error_message !== null ? (
+                    <DangerAlert>{this.state.error_message}</DangerAlert>
+                ) : null}
+
                 <input
                     type="text"
                     value={this.state.search_query}
                     onChange={(e) => this.handleSearchChange(e)}
                     placeholder="Search by kingdom name, map name, or building name"
-                    className="w-full mb-4 px-4 py-2 border rounded text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full my-4 px-4 py-2 border rounded text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     aria-label="Search by kingdom name, map name, or building name"
                 />
 
@@ -279,10 +311,10 @@ export default class BuildingsToUpgradeSection extends React.Component<
                                 Reset Queue
                             </button>
                             <button
-                                onClick={this.showQueue}
+                                onClick={this.sendOrders.bind(this)}
                                 className="w-1/2 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
                             >
-                                Show Queue
+                                Send Orders
                             </button>
                         </>
                     )}

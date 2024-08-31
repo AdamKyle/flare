@@ -144,14 +144,14 @@ export default class UnitRecruitment extends React.Component<any, any> {
             // Remove the unit request if the amount is 0 or ""
             if (unitRequest) {
                 kingdomQueue.unit_requests = kingdomQueue.unit_requests.filter(
-                    (request: any) => request.unit_name !== unitName
+                    (request: any) => request.unit_name !== unitName,
                 );
             }
 
             // Remove the kingdom queue if it has no units left
             if (kingdomQueue.unit_requests.length === 0) {
                 updatedQueue = updatedQueue.filter(
-                    (item) => item.kingdom_id !== kingdomId
+                    (item) => item.kingdom_id !== kingdomId,
                 );
             }
         } else {
@@ -168,8 +168,6 @@ export default class UnitRecruitment extends React.Component<any, any> {
 
         this.setState({ unit_queue: updatedQueue });
     }
-
-
 
     handleBulkAmountChange = (
         event: React.ChangeEvent<HTMLInputElement>,
@@ -259,9 +257,7 @@ export default class UnitRecruitment extends React.Component<any, any> {
 
         return (
             <div className="md:p-4">
-                <h3>
-                    Recruit Units to your cause
-                </h3>
+                <h3>Recruit Units to your cause</h3>
                 <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-4"></div>
                 <input
                     type="text"
@@ -322,7 +318,7 @@ export default class UnitRecruitment extends React.Component<any, any> {
                                             }
                                             return {
                                                 open_kingdom_ids:
-                                                newOpenKingdomIds,
+                                                    newOpenKingdomIds,
                                             };
                                         })
                                     }
@@ -364,7 +360,7 @@ export default class UnitRecruitment extends React.Component<any, any> {
                                                     this.state
                                                         .bulk_input_values[
                                                         kingdom.id
-                                                        ] || ""
+                                                    ] || ""
                                                 }
                                                 onChange={(e) =>
                                                     this.handleBulkAmountChange(

@@ -3,13 +3,14 @@ import Ajax from "../../../lib/ajax/ajax";
 import AjaxInterface from "../../../lib/ajax/ajax-interface";
 import { AxiosError, AxiosResponse } from "axios";
 import SendRequestConfirmationModal from "../capital-city/modals/send-request-confirmation-modal";
+import BuildingsToUpgradeSection from "../capital-city/buildings-to-upgrade-section";
 
 @injectable()
 export default class ProcessUpgradeBuildingsAjax {
     constructor(@inject(Ajax) private ajax: AjaxInterface) {}
 
     public sendBuildingRequests(
-        component: SendRequestConfirmationModal,
+        component: BuildingsToUpgradeSection,
         characterId: number,
         kingdomId: number,
         params: any,
@@ -36,17 +37,18 @@ export default class ProcessUpgradeBuildingsAjax {
                 (result: AxiosResponse) => {
                     component.setState(
                         {
-                            loading: false,
+                            processing_request: false,
                             success_message: result.data.message,
                         },
                         () => {
-                            component.props.reset_table_forms();
+                            component.resetFilters();
+                            component.resetQueue();
                         },
                     );
                 },
                 (error: AxiosError) => {
                     component.setState({
-                        loading: false,
+                        processing_request: false,
                     });
 
                     if (typeof error.response !== "undefined") {
