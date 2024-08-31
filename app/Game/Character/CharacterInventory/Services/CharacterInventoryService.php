@@ -19,6 +19,7 @@ use App\Game\Skills\Services\MassDisenchantService;
 use App\Game\Skills\Services\UpdateCharacterSkillsService;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Cache;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection as LeagueCollection;
 
@@ -335,14 +336,22 @@ class CharacterInventoryService
      *
      *  - Does not include equipped, usable or quest items.
      *  - Only comes from inventory, does not include sets.
+     *  - If the character is currently disenchanting selected items, do not get those items.
      */
     public function getInventoryCollection(): Collection
     {
+
+        $slotsToIgnore = Cache::get('character-slots-to-disenchant-' . $this->character->id);
+
+        if (is_null($slotsToIgnore)) {
+            $slotsToIgnore = [];
+        }
 
         return $this->character
             ->inventory
             ->slots
             ->whereNotIn('item.type', ['quest', 'alchemy'])
+            ->whereNotIn('id', $slotsToIgnore)
             ->where('equipped', false);
     }
 

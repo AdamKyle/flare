@@ -98,6 +98,7 @@ export default class InventoryTable extends React.Component<
                             this.props.manage_skills,
                             undefined,
                             this.manageSelectedItems.bind(this),
+                            this.state.selected_slots
                         )}
                         dark_table={this.props.dark_table}
                     />

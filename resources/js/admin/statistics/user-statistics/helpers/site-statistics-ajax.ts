@@ -2,19 +2,15 @@ import { AxiosError, AxiosResponse } from "axios";
 import Ajax from "../../../../game/lib/ajax/ajax";
 import LoginStatistics from "../components/login-statistics";
 import RegistrationStatistics from "../components/registration-statistics";
-import LoginDurationStatistics from "../components/login-duration-statistics";
-
 export default class SiteStatisticsAjax {
     private component:
         | LoginStatistics
-        | RegistrationStatistics
-        | LoginDurationStatistics;
+        | RegistrationStatistics;
 
     constructor(
         component:
             | LoginStatistics
             | RegistrationStatistics
-            | LoginDurationStatistics,
     ) {
         this.component = component;
     }

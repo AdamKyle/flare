@@ -8,7 +8,6 @@ use App\Flare\Models\Survey;
 use App\Flare\Values\MapNameValue;
 use Illuminate\Console\Command;
 use Illuminate\Http\File;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Storage;
 
 class MassImportCustomData extends Command
@@ -34,7 +33,11 @@ class MassImportCustomData extends Command
     {
 
         $this->importInformationSection();
-        $this->importGameMaps();
+
+        if (config('app.env') !== 'production') {
+            $this->importGameMaps();
+        }
+
         $this->importSurveys();
     }
 
