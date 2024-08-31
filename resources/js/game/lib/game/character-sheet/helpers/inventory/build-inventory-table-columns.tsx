@@ -30,7 +30,7 @@ export const BuildInventoryTableColumns = (
     ) => void,
     componentName?: string,
     selectMultipleItems?: (e: React.ChangeEvent<HTMLInputElement>) => void,
-    selectedSlots?: number[]|[]
+    selectedSlots?: number[] | [],
 ) => {
     if (viewPort <= 639) {
         const smallerColumns = [
@@ -76,7 +76,8 @@ export const BuildInventoryTableColumns = (
                             className="form-checkbox"
                             data-slot-id={row.slot_id}
                             checked={
-                                selectedSlots?.includes(row.slot_id as never) ?? false
+                                selectedSlots?.includes(row.slot_id as never) ??
+                                false
                             }
                         />
                     </span>
@@ -189,7 +190,8 @@ export const BuildInventoryTableColumns = (
                         aria-describedby="allows you to select one or more items to then do additional actions with."
                         data-slot-id={row.slot_id}
                         checked={
-                            selectedSlots?.includes(row.slot_id as never) ?? false
+                            selectedSlots?.includes(row.slot_id as never) ??
+                            false
                         }
                     />
                 </span>

@@ -3,15 +3,9 @@ import Ajax from "../../../../game/lib/ajax/ajax";
 import LoginStatistics from "../components/login-statistics";
 import RegistrationStatistics from "../components/registration-statistics";
 export default class SiteStatisticsAjax {
-    private component:
-        | LoginStatistics
-        | RegistrationStatistics;
+    private component: LoginStatistics | RegistrationStatistics;
 
-    constructor(
-        component:
-            | LoginStatistics
-            | RegistrationStatistics
-    ) {
+    constructor(component: LoginStatistics | RegistrationStatistics) {
         this.component = component;
     }
 

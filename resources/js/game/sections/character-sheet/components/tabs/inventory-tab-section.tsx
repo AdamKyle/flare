@@ -42,7 +42,7 @@ export default class InventoryTabSection extends React.Component<
             show_equip_best: false,
             success_message: null,
             search_string: "",
-            selected_items: []
+            selected_items: [],
         };
 
         this.modalPropsBuilder = serviceContainer().fetch(ModalPropsBuilder);
@@ -51,7 +51,8 @@ export default class InventoryTabSection extends React.Component<
     componentDidUpdate() {
         if (
             !isEqual(this.state.data, this.props.inventory) &&
-            this.state.search_string.length === 0 && this.state.selected_items.length <= 0
+            this.state.search_string.length === 0 &&
+            this.state.selected_items.length <= 0
         ) {
             this.setState({
                 data: this.props.inventory,
@@ -125,10 +126,18 @@ export default class InventoryTabSection extends React.Component<
 
         let currentInventory = this.state.data;
 
-        if (actionConfirmationType === InventoryActionConfirmationType.DISENCHANT_SELECTED) {
-            currentInventory = currentInventory.filter((inventory: InventoryDetails) => {
-                return !this.state.selected_items.some((selectedItem: SelectItems) => selectedItem.slot_id === inventory.slot_id);
-            });
+        if (
+            actionConfirmationType ===
+            InventoryActionConfirmationType.DISENCHANT_SELECTED
+        ) {
+            currentInventory = currentInventory.filter(
+                (inventory: InventoryDetails) => {
+                    return !this.state.selected_items.some(
+                        (selectedItem: SelectItems) =>
+                            selectedItem.slot_id === inventory.slot_id,
+                    );
+                },
+            );
         }
 
         this.setState({
