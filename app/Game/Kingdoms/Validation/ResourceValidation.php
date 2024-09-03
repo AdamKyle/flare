@@ -27,14 +27,13 @@ class ResourceValidation
      */
     public function getMissingCosts(KingdomBuilding $building, Kingdom $kingdom): array
     {
-
         $result = [
-            'wood' => max($kingdom->current_wood - $this->getBuildingCost($kingdom, $building->base_wood_cost), 0),
-            'clay' => max($kingdom->current_clay - $this->getBuildingCost($kingdom, $building->base_clay_cost), 0),
-            'stone' => max($kingdom->current_stone - $this->getBuildingCost($kingdom, $building->base_stone_cost), 0),
-            'steel' => max($kingdom->current_steel - $this->getBuildingCost($kingdom, $building->steel_cost), 0),
-            'iron' => max($kingdom->current_iron - $this->getBuildingCost($kingdom, $building->base_iron_cost, false, true), 0),
-            'population' => max($kingdom->current_population - $this->getBuildingCost($kingdom, $building->base_population, true), 0),
+            'wood' => $this->calculateResourceDifference($kingdom->current_wood, $this->getBuildingCost($kingdom, $building->base_wood_cost)),
+            'clay' => $this->calculateResourceDifference($kingdom->current_clay, $this->getBuildingCost($kingdom, $building->base_clay_cost)),
+            'stone' => $this->calculateResourceDifference($kingdom->current_stone, $this->getBuildingCost($kingdom, $building->base_stone_cost)),
+            'steel' => $this->calculateResourceDifference($kingdom->current_steel, $this->getBuildingCost($kingdom, $building->steel_cost)),
+            'iron' => $this->calculateResourceDifference($kingdom->current_iron, $this->getBuildingCost($kingdom, $building->base_iron_cost, false, true)),
+            'population' => $this->calculateResourceDifference($kingdom->current_population, $this->getBuildingCost($kingdom, $building->base_population, true)),
         ];
 
         $filteredResult = array_filter($result, function ($value) {
@@ -44,6 +43,12 @@ class ResourceValidation
         return $filteredResult;
 
     }
+
+    private function calculateResourceDifference($current, $cost) {
+        $difference = $current - $cost;
+        return $difference < 0 ? abs($difference) : 0;
+    }
+
 
     /**
      * Do we have enough resources to recruit the units?

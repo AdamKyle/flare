@@ -12,6 +12,7 @@ use App\Game\Kingdoms\Console\Commands\ResetCapitalCityWalkingStatus;
 use App\Game\Kingdoms\Console\Commands\UpdateKingdoms;
 use App\Game\Kingdoms\Handlers\AttackKingdomWithUnitsHandler;
 use App\Game\Kingdoms\Handlers\AttackLogHandler;
+use App\Game\Kingdoms\Handlers\CapitalCityBuildingManagementRequestHandler;
 use App\Game\Kingdoms\Handlers\DefenderArcherHandler;
 use App\Game\Kingdoms\Handlers\DefenderSiegeHandler;
 use App\Game\Kingdoms\Handlers\GiveKingdomsToNpcHandler;
@@ -77,11 +78,18 @@ class ServiceProvider extends ApplicationServiceProvider
             );
         });
 
+        $this->app->bind(CapitalCityBuildingManagementRequestHandler::class, function($app) {
+            return new CapitalCityBuildingManagementRequestHandler(
+                $app->make(KingdomBuildingService::class),
+                $app->make(UnitMovementService::class)
+            );
+        });
+
         $this->app->bind(CapitalCityBuildingManagement::class, function ($app) {
             return new CapitalCityBuildingManagement(
-                $app->make(KingdomBuildingService::class),
+                $app->make(CapitalCityBuildingManagementRequestHandler::class),
                 $app->make(UnitMovementService::class),
-                $app->make(ResourceTransferService::class),
+                $app->make(DistanceCalculation::class),
                 $app->make(UpdateKingdom::class),
             );
         });

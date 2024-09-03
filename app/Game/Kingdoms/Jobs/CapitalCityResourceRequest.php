@@ -12,11 +12,11 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
-class CapitalCityBuildingRequestMovement implements ShouldQueue
+class CapitalCityResourceRequest implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public function __construct(private readonly int $capitalCityQueueId) {}
+    public function __construct(private readonly int $capitalCityQueueId, private readonly int $characterId) {}
 
     public function handle(CapitalCityBuildingManagement $capitalCityBuildingManagement): void
     {
@@ -39,6 +39,7 @@ class CapitalCityBuildingRequestMovement implements ShouldQueue
                 // @codeCoverageIgnoreStart
                 CapitalCityBuildingRequestMovement::dispatch(
                     $this->capitalCityQueueId,
+                    $this->characterId,
                 )->delay($time);
 
                 return;
@@ -46,17 +47,7 @@ class CapitalCityBuildingRequestMovement implements ShouldQueue
             }
         }
 
-        $queueData->update([
-            'status' => CapitalCityQueueStatus::PROCESSING,
-        ]);
-
-        $queueData = $queueData->refresh();
-
-        event(new UpdateCapitalCityBuildingQueueTable($queueData->character));
-
-        $capitalCityBuildingManagement->processBuildingRequest(
-            $queueData
-        );
-
+        dump('CapitalCityResourceRequest');
+        dump($queueData);
     }
 }
