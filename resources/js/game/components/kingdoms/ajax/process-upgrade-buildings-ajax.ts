@@ -2,7 +2,6 @@ import { inject, injectable } from "tsyringe";
 import Ajax from "../../../lib/ajax/ajax";
 import AjaxInterface from "../../../lib/ajax/ajax-interface";
 import { AxiosError, AxiosResponse } from "axios";
-import SendRequestConfirmationModal from "../capital-city/modals/send-request-confirmation-modal";
 import BuildingsToUpgradeSection from "../capital-city/buildings-to-upgrade-section";
 
 @injectable()

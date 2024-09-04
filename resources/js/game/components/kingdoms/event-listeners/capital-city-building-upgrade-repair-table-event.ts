@@ -81,8 +81,6 @@ export default class CapitalCityBuildingUpgradeRepairTableEvent
                     );
                 }
 
-                this.component.compressArray(data, false);
-
                 this.component.setState({
                     loading: false,
                     building_data: data,
