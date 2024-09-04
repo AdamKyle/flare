@@ -38,6 +38,9 @@ class CharacterPassiveSkill extends Model
 
     protected $appends = [
         'name',
+        'is_max_level',
+        'current_bonus',
+        'resource_request_time_reduction',
     ];
 
     public function character()
@@ -68,5 +71,9 @@ class CharacterPassiveSkill extends Model
     public function getNameAttribute()
     {
         return $this->passiveSkill->name;
+    }
+
+    public function getResourceRequestTimeReductionAttribute() {
+        return $this->current_level * $this->passiveSkill->resource_request_time_reduction;
     }
 }

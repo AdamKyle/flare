@@ -8,11 +8,14 @@ use App\Flare\Models\CapitalCityResourceRequest;
 use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\KingdomBuilding;
+use App\Game\Kingdoms\Events\UpdateCapitalCityBuildingQueueTable;
 use App\Game\Kingdoms\Jobs\CapitalCityBuildingRequest;
 use App\Game\Kingdoms\Jobs\CapitalCityResourceRequest as CapitalCityResourceRequestJob;
 use App\Game\Kingdoms\Values\BuildingQueueType;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use App\Game\Kingdoms\Values\UnitCosts;
+use App\Game\Maps\Calculations\DistanceCalculation;
+use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
 use Facades\App\Game\Kingdoms\Validation\ResourceValidation;
 
 class CapitalCityProcessBuildingRequestHandler {
@@ -22,26 +25,28 @@ class CapitalCityProcessBuildingRequestHandler {
      */
     private array $messages = [];
 
-    public function __construct(private readonly CapitalCityKingdomLogHandler $capitalCityKingdomLogHandler) {}
+    /**
+     * @param CapitalCityKingdomLogHandler $capitalCityKingdomLogHandler
+     * @param DistanceCalculation $distanceCalculation
+     */
+    public function __construct(
+        private readonly CapitalCityKingdomLogHandler $capitalCityKingdomLogHandler,
+        private readonly DistanceCalculation $distanceCalculation
+    ) {}
 
     /**
      * Handle the building requests.
-     *
-     * - Either request resources or create building queues.
-     * - Process both of these as separate jobs, one or the other. If we must request resources,
-     *    we do that before upgrading any buildings even if we have some that can just update.
      *
      * @param CapitalCityBuildingQueue $capitalCityBuildingQueue
      * @return void
      */
     public function handleBuildingRequests(CapitalCityBuildingQueue $capitalCityBuildingQueue): void
     {
-
         $requestData = $capitalCityBuildingQueue->building_request_data;
         $kingdom = $capitalCityBuildingQueue->kingdom;
         $character = $capitalCityBuildingQueue->character;
 
-        $requestData = $this->processBuildingRequests($capitalCityBuildingQueue, $kingdom, $character, $requestData);
+        $requestData = $this->processBuildingRequests($kingdom, $requestData);
 
         $summedMissingCosts = $this->calculateSummedMissingCosts($requestData);
 
@@ -55,17 +60,13 @@ class CapitalCityProcessBuildingRequestHandler {
     /**
      * Process each building request.
      *
-     * @param CapitalCityBuildingQueue $capitalCityBuildingQueue
      * @param Kingdom $kingdom
-     * @param Character $character
      * @param array $requestData
      * @return array
      */
     private function processBuildingRequests(
-        CapitalCityBuildingQueue $capitalCityBuildingQueue,
-        Kingdom                  $kingdom,
-        Character                $character,
-        array                    $requestData
+        Kingdom $kingdom,
+        array $requestData
     ): array
     {
         foreach ($requestData as $index => $buildingUpgradeRequest) {
@@ -74,27 +75,31 @@ class CapitalCityProcessBuildingRequestHandler {
                 $kingdom, $building, $buildingUpgradeRequest
             );
 
-            $capitalCityBuildingQueue->update(['building_request_data' => $requestData]);
-
-            if ($buildingUpgradeRequest['secondary_status'] === CapitalCityQueueStatus::REQUESTING ||
-                $buildingUpgradeRequest['secondary_status'] === CapitalCityQueueStatus::CANCELLED) {
-                continue;
-            }
-
             $requestData[$index] = $buildingUpgradeRequest;
         }
 
         return $requestData;
     }
 
-    private function processPotentialResourceRequests(Kingdom $kingdom, KingdomBuilding $building, array $buildingUpgradeRequest): array
+    /**
+     * Process potential resource requests for building upgrades.
+     *
+     * @param Kingdom $kingdom
+     * @param KingdomBuilding $building
+     * @param array $buildingUpgradeRequest
+     * @return array
+     */
+    private function processPotentialResourceRequests(
+        Kingdom $kingdom,
+        KingdomBuilding $building,
+        array $buildingUpgradeRequest
+    ): array
     {
         if (ResourceValidation::shouldRedirectKingdomBuilding($building, $kingdom)) {
             $missingResources = ResourceValidation::getMissingCosts($building, $kingdom);
 
             if (empty($missingResources)) {
                 $buildingUpgradeRequest['secondary_status'] = CapitalCityQueueStatus::BUILDING;
-
                 return $buildingUpgradeRequest;
             }
 
@@ -104,18 +109,16 @@ class CapitalCityProcessBuildingRequestHandler {
                 $canAffordPopulation = $this->canAffordPopulationCost($kingdom, $missingResources['population']);
             }
 
-            if (! $canAffordPopulation) {
-                $this->messages[] = $building->name.' has been rejected for reason of: Cannot afford to use: '.
-                    $kingdom->name.'\'s treasury to purchase an extra: '.
-                    $missingResources['population'].' population.';
+            if (!$canAffordPopulation) {
+                $this->messages[] = $building->name . ' has been rejected for reason of: Cannot afford to use: ' .
+                    $kingdom->name . '\'s treasury to purchase an extra: ' .
+                    $missingResources['population'] . ' population.';
 
                 $buildingUpgradeRequest['secondary_status'] = CapitalCityQueueStatus::REJECTED;
-
                 return $buildingUpgradeRequest;
             }
 
             $buildingUpgradeRequest['missing_costs'] = $missingResources;
-
             $buildingUpgradeRequest['secondary_status'] = CapitalCityQueueStatus::REQUESTING;
 
             return $buildingUpgradeRequest;
@@ -127,7 +130,7 @@ class CapitalCityProcessBuildingRequestHandler {
     }
 
     /**
-     * Can we afford the population cost?
+     * Determine if the kingdom can afford the population cost.
      *
      * @param Kingdom $kingdom
      * @param int $populationAmount
@@ -141,32 +144,26 @@ class CapitalCityProcessBuildingRequestHandler {
 
         $cost = (new UnitCosts(UnitCosts::PERSON))->fetchCost() * $populationAmount;
 
-        if ($kingdom->treasury < $cost) {
-            return false;
-        }
-
-        return true;
+        return $kingdom->treasury >= $cost;
     }
 
     /**
-     * Calculate the summed missing costs.
+     * Calculate the total missing costs.
      *
      * @param array $requestData
      * @return array
      */
     private function calculateSummedMissingCosts(array $requestData): array
     {
-        $requestDataCollection = collect($requestData);
-
-        return $requestDataCollection->pluck('missing_costs')->map(function ($costs) {
-            return collect($costs)->except('population');
-        })->reduce(function ($carry, $costs) {
-            return $carry->merge($costs)->map(fn($value, $key) => ($carry->get($key, 0) + $value));
-        }, collect())->toArray();
+        return collect($requestData)
+            ->pluck('missing_costs')
+            ->map(fn($costs) => collect($costs)->except('population'))
+            ->reduce(fn($carry, $costs) => $carry->merge($costs)->map(fn($value, $key) => $carry->get($key, 0) + $value), collect())
+            ->toArray();
     }
 
     /**
-     * Handle the case where resource requests are needed.
+     * Handle resource requests if needed.
      *
      * @param CapitalCityBuildingQueue $capitalCityBuildingQueue
      * @param Character $character
@@ -181,12 +178,12 @@ class CapitalCityProcessBuildingRequestHandler {
         array $summedMissingCosts,
         array $requestData,
         Kingdom $kingdom
-    ): void {
+    ): void
+    {
         $kingdomWhoCanAfford = $this->getKingdomWhoCanAffordCosts($character, $summedMissingCosts);
 
         if (is_null($kingdomWhoCanAfford)) {
             $requestData = $this->markRequestsAsRejected($requestData);
-
             $this->messages[] = 'No kingdom could be found to request the resources for these buildings.';
         }
 
@@ -198,7 +195,7 @@ class CapitalCityProcessBuildingRequestHandler {
         $capitalCityBuildingQueue = $capitalCityBuildingQueue->refresh();
 
         if (empty($this->messages)) {
-            $this->createResourceRequest($capitalCityBuildingQueue, $kingdomWhoCanAfford, $kingdom, $summedMissingCosts);
+            $this->createResourceRequest($character, $capitalCityBuildingQueue, $kingdomWhoCanAfford, $kingdom, $summedMissingCosts);
         }
 
         $this->sendOffEvents($capitalCityBuildingQueue);
@@ -212,11 +209,9 @@ class CapitalCityProcessBuildingRequestHandler {
      */
     private function markRequestsAsRejected(array $requestData): array
     {
-        return collect($requestData)->map(function ($item) {
-            $item['secondary_status'] = CapitalCityQueueStatus::REJECTED;
-
-            return $item;
-        })->toArray();
+        return collect($requestData)
+            ->map(fn($item) => array_merge($item, ['secondary_status' => CapitalCityQueueStatus::REJECTED]))
+            ->toArray();
     }
 
     /**
@@ -228,16 +223,19 @@ class CapitalCityProcessBuildingRequestHandler {
      */
     private function handleNoResourceRequests(CapitalCityBuildingQueue $capitalCityBuildingQueue, array $requestData): void
     {
-        $hasBuildingOrRepairing = collect($requestData)->contains(function ($item) {
-            return in_array($item['secondary_status'], [CapitalCityQueueStatus::BUILDING, CapitalCityQueueStatus::REPAIRING, CapitalCityQueueStatus::REQUESTING]);
-        });
+        $hasBuildingOrRepairing = collect($requestData)->contains(fn($item) => in_array($item['secondary_status'], [
+            CapitalCityQueueStatus::BUILDING,
+            CapitalCityQueueStatus::REPAIRING,
+            CapitalCityQueueStatus::REQUESTING
+        ]));
 
         if (!$hasBuildingOrRepairing) {
             $this->createLogAndTriggerEvents($capitalCityBuildingQueue);
         } else {
-            $filteredRequestData = collect($requestData)->filter(function ($item) {
-                return in_array($item['secondary_status'], [CapitalCityQueueStatus::BUILDING, CapitalCityQueueStatus::REPAIRING]);
-            })->values()->toArray();
+            $filteredRequestData = collect($requestData)->filter(fn($item) => in_array($item['secondary_status'], [
+                CapitalCityQueueStatus::BUILDING,
+                CapitalCityQueueStatus::REPAIRING
+            ]))->values()->toArray();
 
             $this->createUpgradeRequest($capitalCityBuildingQueue->character, $capitalCityBuildingQueue, $capitalCityBuildingQueue->kingdom, $filteredRequestData);
             $this->sendOffEvents($capitalCityBuildingQueue);
@@ -245,7 +243,7 @@ class CapitalCityProcessBuildingRequestHandler {
     }
 
     /**
-     * Create log and trigger events if no building or repairing requests are present.
+     * Create a log and trigger events if no building or repairing requests are present.
      *
      * @param CapitalCityBuildingQueue $capitalCityBuildingQueue
      * @return void
@@ -274,28 +272,36 @@ class CapitalCityProcessBuildingRequestHandler {
         event(new UpdateCapitalCityBuildingQueueTable($capitalCityBuildingQueue->character));
     }
 
-    private function createUpgradeRequest(Character $character, CapitalCityBuildingQueue $capitalCityBuildingQueue, Kingdom $kingdom, array $buildingsToUpgradeOrRepair) {
+    /**
+     * Create upgrade requests for buildings.
+     *
+     * @param Character $character
+     * @param CapitalCityBuildingQueue $capitalCityBuildingQueue
+     * @param Kingdom $kingdom
+     * @param array $buildingsToUpgradeOrRepair
+     * @return void
+     */
+    private function createUpgradeRequest(
+        Character $character,
+        CapitalCityBuildingQueue $capitalCityBuildingQueue,
+        Kingdom $kingdom,
+        array $buildingsToUpgradeOrRepair
+    ): void
+    {
         $timeTillFinished = 0;
         $timeToStart = now();
 
         foreach ($buildingsToUpgradeOrRepair as $buildingRequest) {
-
             $building = $kingdom->buildings()->find($buildingRequest['building_id']);
-
-            $timeReduction = $building->kingdom->fetchKingBasedSkillValue('building_time_reduction');
             $minutesToRebuild = $building->rebuild_time;
-
-            $minutesToRebuild = $minutesToRebuild - ($minutesToRebuild * $timeReduction);
+            $timeReduction = $building->kingdom->fetchKingBasedSkillValue('building_time_reduction');
+            $minutesToRebuild -= $minutesToRebuild * $timeReduction;
 
             $timeToComplete = $timeToStart->clone()->addMinutes($minutesToRebuild);
-
             $timeTillFinished += $minutesToRebuild;
-
-            $type = BuildingQueueType::UPGRADE;
-
-            if ($buildingRequest['secondary_status'] === CapitalCityQueueStatus::REPAIRING) {
-                $type = BuildingQueueType::REPAIR;
-            }
+            $type = $buildingRequest['secondary_status'] === CapitalCityQueueStatus::REPAIRING
+                ? BuildingQueueType::REPAIR
+                : BuildingQueueType::UPGRADE;
 
             BuildingInQueue::create([
                 'character_id' => $character->id,
@@ -305,7 +311,7 @@ class CapitalCityProcessBuildingRequestHandler {
                 'paid_with_gold' => false,
                 'paid_amount' => 0,
                 'completed_at' => $timeToComplete,
-                'started_at' => now(),
+                'started_at' => $timeToStart,
                 'type' => $type,
             ]);
         }
@@ -318,16 +324,29 @@ class CapitalCityProcessBuildingRequestHandler {
         ]);
 
         CapitalCityBuildingRequest::dispatch($capitalCityBuildingQueue->id)->delay(
-            $timeTillFinished >= 15 ? $timeToStart->clone->addMinutes(15) : $totalDelayTime
+            $timeTillFinished >= 15 ? $timeToStart->clone()->addMinutes(15) : $totalDelayTime
         );
     }
 
-    private function createResourceRequest(CapitalCityBuildingQueue $capitalCityBuildingQueue, Kingdom $requestingFromKingdom, Kingdom $kingdomAskingForResources, array $resources): void {
-
-        $pixelDistance = $this->distanceCalculation->calculatePixel($kingdomAskingForResources->x_position, $kingdomAskingForResources->y_position,
-            $requestingFromKingdom->x_position, $requestingFromKingdom->y_position);
-
-        $timeToKingdom = $this->distanceCalculation->calculateMinutes($pixelDistance);
+    /**
+     * Create a resource request.
+     *
+     * @param Character $character
+     * @param CapitalCityBuildingQueue $capitalCityBuildingQueue
+     * @param Kingdom $requestingFromKingdom
+     * @param Kingdom $kingdomAskingForResources
+     * @param array $resources
+     * @return void
+     */
+    private function createResourceRequest(
+        Character $character,
+        CapitalCityBuildingQueue $capitalCityBuildingQueue,
+        Kingdom $requestingFromKingdom,
+        Kingdom $kingdomAskingForResources,
+        array $resources
+    ): void
+    {
+        $timeToKingdom = $this->getTimeToKingdom($character, $kingdomAskingForResources, $requestingFromKingdom);
 
         $timeTillFinished = now()->addMinutes($timeToKingdom);
         $startTime = now();
@@ -347,9 +366,47 @@ class CapitalCityProcessBuildingRequestHandler {
 
         $capitalCityBuildingQueue = $capitalCityBuildingQueue->refresh();
 
-        $delayJobTime = $timeToKingdom >= 15 ? 15 : $timeTillFinished;
+        $delayJobTime = $timeToKingdom >= 15 ? $startTime->clone()->addMinutes(15) : $timeTillFinished;
 
         CapitalCityResourceRequestJob::dispatch($capitalCityBuildingQueue->id, $resourceRequest->id)->delay($delayJobTime);
+    }
+
+    /**
+     * Find the first kingdom who can afford the costs.
+     *
+     * @param Character $character
+     * @param array $missingCosts
+     * @return Kingdom|null
+     */
+    private function getKingdomWhoCanAffordCosts(Character $character, array $missingCosts): ?Kingdom {
+        return $character->kingdoms()->where(function ($q) use ($missingCosts) {
+            foreach ($missingCosts as $resource => $amount) {
+                if ($resource !== 'population') {
+                    $q->where('current_' . $resource, '>=', $amount);
+                }
+            }
+        })->first();
+    }
+
+    private function getTimeToKingdom(Character $character, Kingdom $kingdomAskingForResources, Kingdom $requestingFromKingdom):int {
+        $pixelDistance = $this->distanceCalculation->calculatePixel(
+            $kingdomAskingForResources->x_position,
+            $kingdomAskingForResources->y_position,
+            $requestingFromKingdom->x_position,
+            $requestingFromKingdom->y_position
+        );
+
+        $timeToKingdom = $this->distanceCalculation->calculateMinutes($pixelDistance);
+
+        $skill = $character->passiveSkills->where('passiveSkill.effect_type', PassiveSkillTypeValue::RESOURCE_REQUEST_TIME_REDUCTION)->first();
+
+        $timeToKingdom -= ($timeToKingdom * $skill->resource_request_time_reduction);
+
+        if ($timeToKingdom <= 0) {
+            $timeToKingdom = 1;
+        }
+
+        return $timeToKingdom;
     }
 
 }

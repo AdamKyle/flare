@@ -88,7 +88,8 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(CapitalCityProcessBuildingRequestHandler::class, function($app) {
             return new CapitalCityProcessBuildingRequestHandler(
-                $app->make(CapitalCityKingdomLogHandler::class)
+                $app->make(CapitalCityKingdomLogHandler::class),
+                $app->make(DistanceCalculation::class)
             );
         });
 
@@ -103,9 +104,6 @@ class ServiceProvider extends ApplicationServiceProvider
             return new CapitalCityBuildingManagement(
                 $app->make(CapitalCityBuildingManagementRequestHandler::class),
                 $app->make(CapitalCityProcessBuildingRequestHandler::class),
-                $app->make(UnitMovementService::class),
-                $app->make(DistanceCalculation::class),
-                $app->make(UpdateKingdom::class),
             );
         });
 
