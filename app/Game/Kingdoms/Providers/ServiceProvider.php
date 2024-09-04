@@ -15,6 +15,7 @@ use App\Game\Kingdoms\Handlers\AttackLogHandler;
 use App\Game\Kingdoms\Handlers\CapitalCityBuildingManagementRequestHandler;
 use App\Game\Kingdoms\Handlers\CapitalCityKingdomLogHandler;
 use App\Game\Kingdoms\Handlers\CapitalCityProcessBuildingRequestHandler;
+use App\Game\Kingdoms\Handlers\CapitalCityUnitManagementRequestHandler;
 use App\Game\Kingdoms\Handlers\DefenderArcherHandler;
 use App\Game\Kingdoms\Handlers\DefenderSiegeHandler;
 use App\Game\Kingdoms\Handlers\GiveKingdomsToNpcHandler;
@@ -107,8 +108,17 @@ class ServiceProvider extends ApplicationServiceProvider
             );
         });
 
+        $this->app->bind(CapitalCityUnitManagementRequestHandler::class, function($app) {
+            return new CapitalCityUnitManagementRequestHandler(
+                $app->make(UnitMovementService::class),
+                $app->make(UnitService::class),
+                $app->make(UpdateKingdom::class),
+            );
+        });
+
         $this->app->bind(CapitalCityUnitManagement::class, function ($app) {
             return new CapitalCityUnitManagement(
+                $app->make(CapitalCityUnitManagementRequestHandler::class),
                 $app->make(UnitService::class),
                 $app->make(UnitMovementService::class),
                 $app->make(ResourceTransferService::class),

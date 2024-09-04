@@ -11,6 +11,7 @@ use App\Flare\Models\KingdomLog;
 use App\Flare\Values\KingdomLogStatusValue;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Kingdoms\Events\UpdateCapitalCityUnitQueueTable;
+use App\Game\Kingdoms\Handlers\CapitalCityUnitManagementRequestHandler;
 use App\Game\Kingdoms\Jobs\CapitalCityUnitRequestMovement;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use App\Game\Kingdoms\Values\KingdomMaxValue;
@@ -27,60 +28,16 @@ class CapitalCityUnitManagement
 
     private array $messages = [];
 
-    public function __construct(private readonly UnitService $unitService,
+    public function __construct(
+        private readonly CapitalCityUnitManagementRequestHandler $capitalCityUnitManagementRequestHandler,
+        private readonly UnitService $unitService,
         private readonly UnitMovementService $unitMovementService,
         private readonly ResourceTransferService $resourceTransferService,
         private readonly UpdateKingdom $updateKingdom) {}
 
     public function createUnitRequests(Character $character, Kingdom $kingdom, array $requestData): array
     {
-        foreach ($requestData as $data) {
-
-            $toKingdom = $character->kingdoms->find($data['kingdom_id']);
-
-            $time = $this->unitMovementService->determineTimeRequired($character, $toKingdom, $kingdom->id, PassiveSkillTypeValue::CAPITAL_CITY_REQUEST_UNIT_TRAVEL_TIME_REDUCTION);
-
-            $minutes = now()->addMinutes($time);
-
-            $queueData = [
-                'requested_kingdom' => $kingdom->id,
-                'character_id' => $character->id,
-                'kingdom_id' => $data['kingdom_id'],
-                'status' => CapitalCityQueueStatus::TRAVELING,
-                'messages' => null,
-                'started_at' => now(),
-                'completed_at' => $minutes,
-            ];
-
-            $unitRequests = [];
-
-            foreach ($data['unit_requests'] as $unitRequest) {
-                $unit = GameUnit::where('name', $unitRequest['unit_name'])->first();
-
-                $unitRequests[] = [
-                    'name' => $unitRequest['unit_name'],
-                    'amount' => $unitRequest['unit_amount'],
-                    'secondary_status' => null,
-                    'costs' => $this->unitService->getCostsRequired($toKingdom, $unit, $unitRequest['unit_amount']),
-                ];
-            }
-
-            $queueData['unit_request_data'] = $unitRequests;
-
-            $queue = CapitalCityUnitQueue::create($queueData);
-
-            event(new UpdateCapitalCityUnitQueueTable($character, $kingdom));
-
-            CapitalCityUnitRequestMovement::dispatch($queue->id, $character->id)->delay($minutes);
-
-            $this->updateKingdom->updateKingdom($kingdom);
-        }
-
-        return $this->successResult([
-            'message' => 'Units requests have been queued up and sent off. If you close this modal you should now see
-            a Unit Queue tab which will show you the progress of your requests. Kingdom logs will be generated
-            foreach kingdom to details what was or was not recruited.',
-        ]);
+        return $this->capitalCityUnitManagementRequestHandler->createUnitRequests($character, $kingdom, $requestData);
     }
 
     public function processUnitRequest(CapitalCityUnitQueue $capitalCityUnitQueue): void
