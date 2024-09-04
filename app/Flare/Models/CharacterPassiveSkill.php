@@ -58,7 +58,7 @@ class CharacterPassiveSkill extends Model
         return $this->hasMany($this, 'parent_skill_id')->with('children');
     }
 
-    public function getIsMaxedLevelAttribute()
+    public function getIsMaxLevelAttribute()
     {
         return $this->current_level === $this->passiveSkill->max_level;
     }
