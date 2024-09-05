@@ -20,6 +20,7 @@ class CapitalCityBuildingRequest implements ShouldQueue
 
     public function handle(CapitalCityBuildingManagement $capitalCityBuildingManagement): void
     {
+
         $queueData = CapitalCityBuildingQueue::find($this->capitalCityQueueId);
 
         if (is_null($queueData)) {

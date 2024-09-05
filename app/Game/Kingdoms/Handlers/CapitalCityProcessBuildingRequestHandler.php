@@ -181,7 +181,7 @@ class CapitalCityProcessBuildingRequestHandler {
         Kingdom $kingdom
     ): void
     {
-        $kingdomWhoCanAfford = $this->getKingdomWhoCanAffordCosts($character, $summedMissingCosts);
+        $kingdomWhoCanAfford = $this->getKingdomWhoCanAffordCosts($character, $kingdom, $summedMissingCosts);
 
         if (is_null($kingdomWhoCanAfford)) {
             $requestData = $this->markRequestsAsRejected($requestData);
@@ -376,17 +376,18 @@ class CapitalCityProcessBuildingRequestHandler {
      * Find the first kingdom who can afford the costs.
      *
      * @param Character $character
+     * @param Kingdom $kingdom
      * @param array $missingCosts
      * @return Kingdom|null
      */
-    private function getKingdomWhoCanAffordCosts(Character $character, array $missingCosts): ?Kingdom {
+    private function getKingdomWhoCanAffordCosts(Character $character, Kingdom $kingdom, array $missingCosts): ?Kingdom {
         return $character->kingdoms()->where(function ($q) use ($missingCosts) {
             foreach ($missingCosts as $resource => $amount) {
                 if ($resource !== 'population') {
                     $q->where('current_' . $resource, '>=', $amount);
                 }
             }
-        })->first();
+        })->where('game_map_id', $kingdom->game_map_id)->first();
     }
 
     private function getTimeToKingdom(Character $character, Kingdom $kingdomAskingForResources, Kingdom $requestingFromKingdom):int {

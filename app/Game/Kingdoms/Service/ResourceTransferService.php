@@ -168,7 +168,7 @@ class ResourceTransferService
         return $amount <= $currentAmountFromKingdom;
     }
 
-    private function canAffordPopulationCost(Kingdom $requestFromKingdom): bool
+    public function canAffordPopulationCost(Kingdom $requestFromKingdom): bool
     {
         return $requestFromKingdom->current_population >= self::POPULATION_COST;
     }
@@ -178,7 +178,7 @@ class ResourceTransferService
         return $requestFromKingdom->units->where('gameUnit.name', '=', UnitNames::AIRSHIP)->count() > 0;
     }
 
-    private function hasRequiredSpearmen(Kingdom $requestFromKingdom): bool
+    public function hasRequiredSpearmen(Kingdom $requestFromKingdom): bool
     {
 
         $spearmen = $requestFromKingdom->units->where('gameUnit.name', '=', UnitNames::SPEARMEN)->first();
@@ -190,7 +190,7 @@ class ResourceTransferService
         return $spearmen->amount >= self::SPEARMEN_COST;
     }
 
-    private function bothKingdomsHaveAMarketPlace(Kingdom $requestingKingdom, Kingdom $requestingFromKingdom): bool
+    public function bothKingdomsHaveAMarketPlace(Kingdom $requestingKingdom, Kingdom $requestingFromKingdom): bool
     {
 
         $requestingMarketPlace = $requestingKingdom->buildings->where('gameBuilding.name', '=', BuildingCosts::MARKET_PLACE)->where('level', '>=', 5)->first();
