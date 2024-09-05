@@ -127,7 +127,8 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(CapitalCityProcessUnitRequestHandler::class, function($app) {
             return new CapitalCityProcessUnitRequestHandler(
                 $app->make(CapitalCityKingdomLogHandler::class),
-                $app->make(DistanceCalculation::class)
+                $app->make(DistanceCalculation::class),
+                $app->make(UnitService::class)
             );
         });
 

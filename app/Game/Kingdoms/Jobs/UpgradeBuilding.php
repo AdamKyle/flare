@@ -183,7 +183,7 @@ class UpgradeBuilding implements ShouldQueue
 
             event(new UpdateCapitalCityBuildingQueueTable($capitalCityQueue->character));
 
-            $capitalCityBuildingManagement->possiblyCreateLogForQueue($capitalCityQueue);
+            $capitalCityBuildingManagement->possiblyCreateLogForBuildingQueue($capitalCityQueue);
         }
     }
 

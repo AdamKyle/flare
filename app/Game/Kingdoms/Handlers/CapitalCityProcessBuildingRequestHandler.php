@@ -258,7 +258,7 @@ class CapitalCityProcessBuildingRequestHandler {
 
         $capitalCityBuildingQueue = $capitalCityBuildingQueue->refresh();
 
-        $this->capitalCityKingdomLogHandler->possiblyCreateLogForQueue($capitalCityBuildingQueue);
+        $this->capitalCityKingdomLogHandler->possiblyCreateLogForBuildingQueue($capitalCityBuildingQueue);
         $this->sendOffEvents($capitalCityBuildingQueue);
     }
 

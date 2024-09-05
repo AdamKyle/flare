@@ -4,15 +4,22 @@ import { serviceContainer } from "../../../lib/containers/core-container";
 import LoadingProgressBar from "../../ui/progress-bars/loading-progress-bar";
 import debounce from "lodash/debounce";
 import { UnitTypes } from "../deffinitions/unit-types";
+import ProcessUnitRequestAjax from "../ajax/process-unit-request-ajax";
+import SuccessAlert from "../../ui/alerts/simple-alerts/success-alert";
+import DangerAlert from "../../ui/alerts/simple-alerts/danger-alert";
 
 export default class UnitRecruitment extends React.Component<any, any> {
+
     private fetchKingdomsForSelectionAjax: FetchKingdomsForSelectionAjax;
+
+    private processUnitRequest: ProcessUnitRequestAjax;
 
     constructor(props: any) {
         super(props);
 
         this.state = {
             loading: true,
+            processing_request: false,
             success_message: null,
             error_message: null,
             unit_recruitment_data: [],
@@ -25,6 +32,10 @@ export default class UnitRecruitment extends React.Component<any, any> {
 
         this.fetchKingdomsForSelectionAjax = serviceContainer().fetch(
             FetchKingdomsForSelectionAjax,
+        );
+
+        this.processUnitRequest = serviceContainer().fetch(
+            ProcessUnitRequestAjax,
         );
     }
 
@@ -113,7 +124,15 @@ export default class UnitRecruitment extends React.Component<any, any> {
     };
 
     sendOrders = () => {
-        console.log("Sending orders:", this.state.unit_queue);
+
+        this.setState({
+            processing_request: true,
+            success_message: null,
+            error_message: null,
+        }, () => {
+            this.processUnitRequest.processRequest(this, this.props.kingdom.character_id, this.props.kingdom.id, this.state.unit_queue);
+        })
+
     };
 
     handleUnitAmountChange(
@@ -259,6 +278,25 @@ export default class UnitRecruitment extends React.Component<any, any> {
             <div className="md:p-4">
                 <h3>Recruit Units to your cause</h3>
                 <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-4"></div>
+                {
+                    this.state.processing_request ?
+                        <LoadingProgressBar />
+                    : null
+                }
+                {
+                    this.state.success_message !== null ?
+                        <SuccessAlert additional_css={'my-2'}>
+                            {this.state.success_message}
+                        </SuccessAlert>
+                    : null
+                }
+                {
+                    this.state.error_message !== null ?
+                        <DangerAlert additional_css={'my-2'}>
+                            {this.state.error_message}
+                        </DangerAlert>
+                        : null
+                }
                 <input
                     type="text"
                     value={this.state.search_term}

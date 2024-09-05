@@ -63,7 +63,7 @@ class CapitalCityBuildingRequestCancellationMovement implements ShouldQueue
         $this->updateQueueData($queueData, $responseData);
 
         event(new UpdateCapitalCityBuildingQueueTable($queueData->character));
-        $capitalCityBuildingManagement->possiblyCreateLogForQueue($queueData);
+        $capitalCityBuildingManagement->possiblyCreateLogForBuildingQueue($queueData);
 
         $this->cleanupCancellationRecords();
     }

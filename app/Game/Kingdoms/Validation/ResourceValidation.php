@@ -63,14 +63,15 @@ class ResourceValidation
                ($kingdom->current_population < $this->getUnitCost($kingdom, ($unit->required_population * $amount), true));
     }
 
-    public function getMissingResources(GameUnit $unit, Kingdom $kingdom, int $amount): array
+    public function getMissingUnitResources(GameUnit $unit, Kingdom $kingdom, int $amount): array
     {
         $result = [
-            'wood' => abs($kingdom->current_wood - $this->getUnitCost($kingdom, ($unit->wood_cost * $amount))),
-            'clay' => abs($kingdom->current_clay - $this->getUnitCost($kingdom, ($unit->clay_cost * $amount))),
-            'stone' => abs($kingdom->current_stone - $this->getUnitCost($kingdom, ($unit->stone_cost * $amount))),
-            'steel' => abs($kingdom->current_steel - $this->getUnitCost($kingdom, ($unit->steel_cost * $amount))),
-            'iron' => abs($kingdom->current_iron - $this->getUnitCost($kingdom, ($unit->iron_cost * $amount))),
+            'wood' => $this->calculateResourceDifference($kingdom->current_wood, $this->getUnitCost($kingdom, ($unit->wood_cost * $amount))),
+            'clay' => $this->calculateResourceDifference($kingdom->current_clay, $this->getUnitCost($kingdom, ($unit->clay_cost * $amount))),
+            'stone' => $this->calculateResourceDifference($kingdom->current_stone, $this->getUnitCost($kingdom, ($unit->stone_cost * $amount))),
+            'steel' => $this->calculateResourceDifference($kingdom->current_steel, $this->getUnitCost($kingdom, ($unit->steel_cost * $amount))),
+            'iron' => $this->calculateResourceDifference($kingdom->current_iron, $this->getUnitCost($kingdom, ($unit->iron_cost * $amount))),
+            'population' => $this->calculateResourceDifference($kingdom->current_population, $this->getUnitCost($kingdom, ($unit->population_cost * $amount), true))
         ];
 
         $filteredResult = array_filter($result, function ($value) {

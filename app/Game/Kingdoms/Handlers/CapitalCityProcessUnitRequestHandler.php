@@ -3,7 +3,9 @@
 namespace App\Game\Kingdoms\Handlers;
 
 use App\Flare\Models\CapitalCityResourceRequest;
-use App\Flare\Models\UnitInQueue;
+use App\Flare\Models\GameBuildingUnit;
+use App\Flare\Models\GameUnit;
+use App\Flare\Models\KingdomBuilding;
 use App\Flare\Models\CapitalCityUnitQueue;
 use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
@@ -11,6 +13,7 @@ use App\Flare\Models\KingdomUnit;
 use App\Game\Kingdoms\Events\UpdateCapitalCityUnitQueueTable;
 use App\Game\Kingdoms\Jobs\CapitalCityResourceRequest as CapitalCityResourceRequestJob;
 use App\Game\Kingdoms\Jobs\CapitalCityUnitRequest;
+use App\Game\Kingdoms\Service\UnitService;
 use App\Game\Kingdoms\Values\CapitalCityResourceRequestType;
 use App\Game\Kingdoms\Values\UnitCosts;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
@@ -18,7 +21,10 @@ use App\Game\Maps\Calculations\DistanceCalculation;
 use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
 use Facades\App\Game\Kingdoms\Validation\ResourceValidation;
 
+
 class CapitalCityProcessUnitRequestHandler {
+
+    const MAX_DAYS = 7;
 
     /**
      * @var array $messages
@@ -28,10 +34,12 @@ class CapitalCityProcessUnitRequestHandler {
     /**
      * @param CapitalCityKingdomLogHandler $capitalCityKingdomLogHandler
      * @param DistanceCalculation $distanceCalculation
+     * @param UnitService $unitService
      */
     public function __construct(
         private readonly CapitalCityKingdomLogHandler $capitalCityKingdomLogHandler,
-        private readonly DistanceCalculation $distanceCalculation
+        private readonly DistanceCalculation $distanceCalculation,
+        private readonly UnitService $unitService
     ) {}
 
     /**
@@ -48,7 +56,9 @@ class CapitalCityProcessUnitRequestHandler {
 
         $requestData = $this->processUnitRequests($kingdom, $requestData);
         $missingResources = $this->calculateMissingResources($requestData);
-
+        dump('missing resources');
+        dump($missingResources);
+        dump($this->messages);
         if (!empty($missingResources)) {
             $this->handleResourceRequests($capitalCityUnitQueue, $character, $missingResources, $requestData, $kingdom);
         } else {
@@ -65,13 +75,65 @@ class CapitalCityProcessUnitRequestHandler {
      */
     private function processUnitRequests(Kingdom $kingdom, array $requestData): array
     {
+        dump($requestData);
         foreach ($requestData as $index => $unitRequest) {
-            $unit = $kingdom->units()->where('id', $unitRequest['unit_id'])->first();
-            $unitRequest = $this->processPotentialResourceRequests($kingdom, $unit, $unitRequest);
+            $gameUnit = GameUnit::where('name', $unitRequest['name'])->first();
+            $gameBuildingRelation = GameBuildingUnit::where('game_unit_id', $gameUnit->id)->first();
+            $building = $kingdom->buildings()->where('game_building_id', $gameBuildingRelation->game_building_id)->first();
+
+            dump($unitRequest);
+
+            if ($this->isBuildingLocked($building, $kingdom)) {
+                dump('isBuildingLocked');
+                $requestData[$index]['secondary_status'] = CapitalCityQueueStatus::REJECTED;
+
+                continue;
+            }
+
+            if ($this->isBuildingUnderLeveled($building, $gameBuildingRelation, $kingdom)) {
+                dump('isBuildingUnderLeveled');
+                $requestData[$index]['secondary_status'] = CapitalCityQueueStatus::REJECTED;
+
+                continue;
+            }
+
+            if ($this->isTimeGreaterThanSevenDays($kingdom->character, $kingdom, $gameUnit, $unitRequest['amount'])) {
+                dump('isTimeGreaterThanSevenDays');
+                $requestData[$index]['secondary_status'] = CapitalCityQueueStatus::REJECTED;
+
+                continue;
+            }
+
+            dump('Do we ever get here?');
+
+            $unitRequest = $this->processPotentialResourceRequests($kingdom, $gameUnit, $unitRequest);
+
             $requestData[$index] = $unitRequest;
         }
 
         return $requestData;
+    }
+
+    private function isBuildingLocked(KingdomBuilding $building, Kingdom $kingdom): bool {
+        if ($building->is_locked) {
+
+            $this->messages[] = 'Building is locked in '.$kingdom->name.'. You need to unlock the building: '.$building->name.' first by leveling a passive of the same name to level 1.';
+
+            return true;
+        }
+
+        return false;
+    }
+
+    private function isBuildingUnderLeveled(KingdomBuilding $building, GameBuildingUnit $gameBuildingRelation, Kingdom $kingdom): bool {
+        if ($building->level < $gameBuildingRelation->required_level) {
+
+            $this->messages[] = 'Building is under level in '.$kingdom->name.'. You need to level the building: '.$building->name.' to level: '.$gameBuildingRelation->required_level.' first.';
+
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -82,14 +144,16 @@ class CapitalCityProcessUnitRequestHandler {
      * @param array $unitRequest
      * @return array
      */
-    private function processPotentialResourceRequests(Kingdom $kingdom, KingdomUnit $unit, array $unitRequest): array
+    private function processPotentialResourceRequests(Kingdom $kingdom, GameUnit $unit, array $unitRequest): array
     {
-        $missingResources = ResourceValidation::getMissingCosts($unit, $kingdom);
-
+        $missingResources = ResourceValidation::getMissingUnitResources($unit, $kingdom, $unitRequest['amount']);
+        dump('processPotentialResourceRequests', $missingResources);
         if (!empty($missingResources)) {
             if (!$this->canAffordPopulationCost($kingdom, $missingResources['population'] ?? 0)) {
                 $this->messages[] = "Unit recruitment for {$unit->name} rejected due to insufficient population.";
+
                 $unitRequest['secondary_status'] = CapitalCityQueueStatus::REJECTED;
+
                 return $unitRequest;
             }
 
@@ -98,7 +162,7 @@ class CapitalCityProcessUnitRequestHandler {
         } else {
             $unitRequest['secondary_status'] = CapitalCityQueueStatus::RECRUITING;
         }
-
+        dump($unitRequest);
         return $unitRequest;
     }
 
@@ -152,19 +216,23 @@ class CapitalCityProcessUnitRequestHandler {
         Kingdom $kingdom
     ): void {
         $resourceProvidingKingdom = $this->findKingdomToProvideResources($character, $missingResources);
+        $sendResourceRequests     = true;
 
         if (is_null($resourceProvidingKingdom)) {
             $requestData = $this->markRequestsAsRejected($requestData);
+
             $this->messages[] = 'No kingdom could provide the resources for unit recruitment.';
+
+            $sendResourceRequests = false;
         }
 
         $this->updateQueue($capitalCityUnitQueue, $requestData);
 
-        if (empty($this->messages)) {
+        if ($sendResourceRequests) {
             $this->createResourceRequest($character, $capitalCityUnitQueue, $resourceProvidingKingdom, $kingdom, $missingResources);
         }
 
-        $this->triggerEvents($capitalCityUnitQueue);
+        $this->logAndTriggerEvents($capitalCityUnitQueue);
     }
 
     /**
@@ -179,6 +247,8 @@ class CapitalCityProcessUnitRequestHandler {
         if ($this->hasRecruitingUnits($requestData)) {
             $this->createUnitRecruitmentRequest($capitalCityUnitQueue->character, $capitalCityUnitQueue, $capitalCityUnitQueue->kingdom, $requestData);
         } else {
+            dump('handleNoResourceRequests');
+            dump($requestData);
             $this->logAndTriggerEvents($capitalCityUnitQueue);
         }
     }
@@ -236,7 +306,7 @@ class CapitalCityProcessUnitRequestHandler {
      */
     private function logAndTriggerEvents(CapitalCityUnitQueue $capitalCityUnitQueue): void
     {
-        $this->capitalCityKingdomLogHandler->possiblyCreateLogForQueue($capitalCityUnitQueue);
+        $this->capitalCityKingdomLogHandler->possiblyCreateLogForUnitQueue($capitalCityUnitQueue);
         $this->triggerEvents($capitalCityUnitQueue);
     }
 
@@ -255,24 +325,17 @@ class CapitalCityProcessUnitRequestHandler {
      * Create a unit recruitment request.
      *
      * @param Character $character
-     * @param CapitalCityUnitQueue $capitalCityUnitQueue
-     * @param Kingdom $kingdom
-     * @param array $requestData
+     * @param GameUnit $gameUnit
+     * @param int $amount
      * @return void
      */
     private function createUnitRecruitmentRequest(
         Character $character,
-        CapitalCityUnitQueue $capitalCityUnitQueue,
-        Kingdom $kingdom,
-        array $requestData
+        GameUnit $gameUnit,
+        int $amount
     ): void {
-        $unitQueue = UnitInQueue::create([
-            'character_id' => $character->id,
-            'kingdom_id' => $kingdom->id,
-            'units_in_queue' => $this->prepareUnitsInQueue($requestData),
-        ]);
 
-        CapitalCityUnitRequest::dispatch($unitQueue)->onQueue('capital_city_unit');
+       $timeInSecondsToRecruit = $this->getTimeForRecruitment($character, $gameUnit, $amount);
     }
 
     /**
@@ -366,5 +429,27 @@ class CapitalCityProcessUnitRequestHandler {
         }
 
         return $timeToKingdom;
+    }
+
+    private function getTimeForRecruitment(Character $character, GameUnit $gameUnit, int $amount): int
+    {
+        $totalTime = $gameUnit->time_to_recruit * $amount;
+
+        return $totalTime - $totalTime * $this->unitService->fetchTimeReduction($character)->unit_time_reduction;
+    }
+
+    private function isTimeGreaterThanSevenDays(Character $character, Kingdom $kingdom, GameUnit $gameUnit, int $amount): bool
+    {
+        $timeTillDone = $this->getTimeForRecruitment($character, $gameUnit, $amount);
+
+        $timeTillDone = now()->addSeconds($timeTillDone);
+
+        if (now()->diffInDays($timeTillDone) > self::MAX_DAYS) {
+            $this->messages[] = $gameUnit->name.' for kingdom: '.$kingdom->name.' would take longer then 7 (Real World) Days. The kingdom has rejected this recruitment order. If you want this amount of units, you must recruit it from the kingdom it\'s self.';
+
+            return true;
+        }
+
+        return false;
     }
 }

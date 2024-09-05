@@ -117,7 +117,7 @@ class RebuildBuilding implements ShouldQueue
 
             $capitalCityQueue = $capitalCityQueue->refresh();
 
-            $capitalCityBuildingManagement->possiblyCreateLogForQueue($capitalCityQueue);
+            $capitalCityBuildingManagement->possiblyCreateLogForBuildingQueue($capitalCityQueue);
         }
     }
 }
