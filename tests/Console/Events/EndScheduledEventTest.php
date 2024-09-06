@@ -5,6 +5,7 @@ namespace Tests\Console\Events;
 use App\Flare\Models\Announcement;
 use App\Flare\Models\Event;
 use App\Flare\Models\GameMap;
+use App\Flare\Models\SurveySnapshot;
 use App\Flare\Values\ItemSpecialtyType;
 use App\Flare\Values\MapNameValue;
 use App\Flare\Values\WeaponTypes;
@@ -26,6 +27,8 @@ use Tests\Traits\CreateMonster;
 use Tests\Traits\CreateNpc;
 use Tests\Traits\CreateRaid;
 use Tests\Traits\CreateScheduledEvent;
+use Tests\Traits\CreateSubmittedSurvey;
+use Tests\Traits\CreateSurvey;
 
 class EndScheduledEventTest extends TestCase
 {
@@ -39,6 +42,8 @@ class EndScheduledEventTest extends TestCase
         CreateNpc,
         CreateRaid,
         CreateScheduledEvent,
+        CreateSurvey,
+        CreateSubmittedSurvey,
         RefreshDatabase;
 
     public function setUp(): void
@@ -156,6 +161,72 @@ class EndScheduledEventTest extends TestCase
         $this->assertEquals(0, Event::count());
         $this->assertEquals(0, Announcement::count());
         $this->assertFalse($scheduledEvent->refresh()->currently_running);
+    }
+
+    public function testEndWeeklyFactionLoyaltyEvent()
+    {
+        $this->deleteOtherGameMaps();
+
+        $scheduledEvent = $this->createScheduledEvent([
+            'event_type' => EventType::WEEKLY_FACTION_LOYALTY_EVENT,
+            'start_date' => now()->addMinutes(5),
+            'currently_running' => true,
+        ]);
+
+        $event = $this->createEvent([
+            'type' => EventType::WEEKLY_FACTION_LOYALTY_EVENT,
+            'started_at' => now(),
+            'ends_at' => now()->subMinutes(10),
+        ]);
+
+        $this->createAnnouncement([
+            'event_id' => $event->id,
+        ]);
+
+        $this->artisan('end:scheduled-event');
+
+        $this->assertEquals(0, Event::count());
+        $this->assertEquals(0, Announcement::count());
+        $this->assertFalse($scheduledEvent->refresh()->currently_running);
+    }
+
+    public function testEndFeedbackEventWithSubmittedSurveys() {
+        $this->deleteOtherGameMaps();
+
+        $scheduledEvent = $this->createScheduledEvent([
+            'event_type' => EventType::FEEDBACK_EVENT,
+            'start_date' => now()->addMinutes(5),
+            'currently_running' => true,
+        ]);
+
+        $event = $this->createEvent([
+            'type' => EventType::FEEDBACK_EVENT,
+            'started_at' => now(),
+            'ends_at' => now()->subMinutes(10),
+        ]);
+
+        $this->createAnnouncement([
+            'event_id' => $event->id,
+        ]);
+
+        $survey = $this->createSurvey();
+
+        $character = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation()->getCharacter();
+
+        $this->createSubmittedSurvey([
+            'character_id' => $character->id,
+            'survey_id' => $survey->id,
+        ]);
+
+        $this->artisan('end:scheduled-event');
+
+        $this->assertEquals(0, Event::count());
+        $this->assertEquals(0, Announcement::count());
+        $this->assertFalse($scheduledEvent->refresh()->currently_running);
+
+        $surveyResponse = SurveySnapshot::first();
+
+        $this->assertNotNull($surveyResponse);
     }
 
     public function testEndIsMonthlyPvpEvent()
