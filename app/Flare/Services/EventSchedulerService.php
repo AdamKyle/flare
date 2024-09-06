@@ -3,8 +3,12 @@
 namespace App\Flare\Services;
 
 use App\Flare\Events\UpdateScheduledEvents;
+use App\Flare\Models\Announcement;
+use App\Flare\Models\Event;
 use App\Flare\Models\ScheduledEvent;
 use App\Flare\Models\ScheduledEventConfiguration;
+use App\Game\Messages\Events\DeleteAnnouncementEvent;
+use Facades\App\Game\Core\Handlers\AnnouncementHandler;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Events\Values\EventType;
 use Carbon\Carbon;
@@ -57,6 +61,28 @@ class EventSchedulerService
             'end_date' => $params['selected_end_date'],
             'description' => $params['event_description'],
         ]);
+
+        $scheduledEvent = $scheduledEvent->refresh();
+
+        if ($scheduledEvent->currently_running) {
+            $event = Event::where('type', $params['selected_event_type'])->first();
+
+            if (!is_null($event)) {
+                $event->update([
+                    'ends_at' => $params['selected_end_date']
+                ]);
+
+                $announcement = Announcement::where('event_id', $event->id)->first();
+
+                event(new DeleteAnnouncementEvent($announcement->id));
+
+                $announcement->delete();
+
+                $name = AnnouncementHandler::getNameForType($params['selected_event_type']);
+
+                AnnouncementHandler::createAnnouncement($name);
+            }
+        }
 
         event(new UpdateScheduledEvents($this->fetchEvents()));
 

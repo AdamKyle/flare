@@ -44,10 +44,12 @@ class InitiateMonthlyPVPEvent implements ShouldQueue
             'currently_running' => true,
         ]);
 
-        $event = Event::create([
+        $event = $event->refresh();
+
+        Event::create([
             'type' => EventType::MONTHLY_PVP,
-            'started_at' => now(),
-            'ends_at' => now()->addHours(10)->addMinutes(30),
+            'started_at' => $event->start_date,
+            'ends_at' => $event->end_date,
         ]);
 
         event(new GlobalMessageEvent('Monthly pvp will begin tonight shortly after 6:30 GMT-6. Actions area has been updated to show a new button: Join PVP. Click this and follow the steps to be registered to participate. Registration will be open till 6:30pm GMT-6.'));

@@ -41,10 +41,12 @@ class InitiateWeeklyFactionLoyaltyEvent implements ShouldQueue
             'currently_running' => true,
         ]);
 
+        $event = $event->refresh();
+
         Event::create([
             'type' => EventType::WEEKLY_FACTION_LOYALTY_EVENT,
-            'started_at' => now(),
-            'ends_at' => now()->addDay(),
+            'started_at' => $event->start_date,
+            'ends_at' => $event->end_date,
         ]);
 
         event(new GlobalMessageEvent('Weekly Faction Loyalty Event has started. Players, for the next 24 hours, can gain 2 points in any task
