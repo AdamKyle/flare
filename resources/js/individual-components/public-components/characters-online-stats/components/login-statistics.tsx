@@ -2,7 +2,7 @@ import React from "react";
 import { AxisOptions, Chart } from "react-charts";
 import ComponentLoading from "../../../../game/components/ui/loading/component-loading";
 import ResizableBox from "../../../../game/components/ui/resizable-box";
-import SiteStatisticsAjax from "../helpers/site-statistics-ajax";
+import SiteStatisticsAjax from "../ajax/site-statistics-ajax";
 import DropDown from "../../../../game/components/ui/drop-down/drop-down";
 import InfoAlert from "../../../../game/components/ui/alerts/simple-alerts/info-alert";
 
@@ -42,7 +42,7 @@ export default class LoginStatistics extends React.Component<any, any> {
     }
 
     componentDidMount() {
-        this.siteStatisticsAjax.fetchStatisticalData("all-time-sign-in", 0);
+        this.siteStatisticsAjax.fetchStatisticalData("character-logins", 0);
     }
 
     createDataSet(
@@ -93,7 +93,7 @@ export default class LoginStatistics extends React.Component<any, any> {
                     </InfoAlert>
                     <DropDown
                         menu_items={this.siteStatisticsAjax.createActionsDropDown(
-                            "all-time-sign-in",
+                            "character-logins",
                         )}
                         button_title={"Date Filter"}
                     />

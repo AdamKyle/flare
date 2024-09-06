@@ -11,7 +11,7 @@ export default class SiteStatisticsAjax {
 
     fetchStatisticalData(routeName: string, daysPast: number) {
         new Ajax()
-            .setRoute("admin/site-statistics/" + routeName)
+            .setRoute(routeName)
             .setParameters({
                 daysPast: daysPast,
             })

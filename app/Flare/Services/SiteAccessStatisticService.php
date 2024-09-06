@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Flare\Values;
+namespace App\Flare\Services;
 
 use App\Flare\Models\UserSiteAccessStatistics;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
 
-class SiteAccessStatisticValue
+class SiteAccessStatisticService
 {
     /**
      * @var int $daysPast

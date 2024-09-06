@@ -3,7 +3,7 @@ import { AxisOptions, Chart } from "react-charts";
 import ComponentLoading from "../../../../game/components/ui/loading/component-loading";
 import ResizableBox from "../../../../game/components/ui/resizable-box";
 import DropDown from "../../../../game/components/ui/drop-down/drop-down";
-import SiteStatisticsAjax from "../helpers/site-statistics-ajax";
+import SiteStatisticsAjax from "../ajax/site-statistics-ajax";
 import InfoAlert from "../../../../game/components/ui/alerts/simple-alerts/info-alert";
 
 type RegistrationInStats = {
@@ -43,7 +43,10 @@ export default class RegistrationStatistics extends React.Component<any, any> {
     }
 
     componentDidMount() {
-        this.siteStatisticsAjax.fetchStatisticalData("all-time-register", 0);
+        this.siteStatisticsAjax.fetchStatisticalData(
+            "character-registrations",
+            0,
+        );
     }
 
     createDataSet(
@@ -92,7 +95,7 @@ export default class RegistrationStatistics extends React.Component<any, any> {
                 <div>
                     <DropDown
                         menu_items={this.siteStatisticsAjax.createActionsDropDown(
-                            "all-time-register",
+                            "character-registrations",
                         )}
                         button_title={"Date Filter"}
                     />

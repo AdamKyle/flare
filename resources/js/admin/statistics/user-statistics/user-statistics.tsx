@@ -1,7 +1,5 @@
 import React from "react";
-import LoginStatistics from "./components/login-statistics";
 import BasicCard from "../../../game/components/ui/cards/basic-card";
-import RegistrationStatistics from "./components/registration-statistics";
 import OtherStatistics from "./components/other-statistics";
 import CharacterReincarnationStatistics from "./components/character-reincarnation-statistics";
 import CharacterTotalGold from "./components/character-total-gold";
@@ -16,16 +14,6 @@ export default class UserStatistics extends React.Component<any, any> {
     render() {
         return (
             <div className="pb-10">
-                <div className="grid gap-3 mb-5 lg:grid-cols-2">
-                    <BasicCard>
-                        <h3 className="mb-4">Logins</h3>
-                        <LoginStatistics />
-                    </BasicCard>
-                    <BasicCard>
-                        <h3 className="mb-4">Registrations</h3>
-                        <RegistrationStatistics />
-                    </BasicCard>
-                </div>
                 <CharactersOnlineContainer />
                 <BasicCard additionalClasses={"mb-5"}>
                     <h3 className="mb-4">

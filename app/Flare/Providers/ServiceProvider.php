@@ -2,6 +2,7 @@
 
 namespace App\Flare\Providers;
 
+use App\Admin\Services\SiteStatisticsService;
 use App\Flare\Builders\AffixAttributeBuilder;
 use App\Flare\Builders\BuildMythicItem;
 use App\Flare\Builders\RandomAffixGenerator;
@@ -61,6 +62,7 @@ use App\Flare\Services\CharacterXPService;
 use App\Flare\Services\CreateSurveySnapshot;
 use App\Flare\Services\DailyGoldDustService;
 use App\Flare\Services\EventSchedulerService;
+use App\Flare\Services\SiteAccessStatisticService;
 use App\Flare\Transformers\BasicKingdomTransformer;
 use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
@@ -464,6 +466,10 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(QuestTransformer::class),
                 $app->make(Manager::class),
             );
+        });
+
+        $this->app->bind(SiteAccessStatisticService::class, function() {
+            return new SiteAccessStatisticService();
         });
     }
 

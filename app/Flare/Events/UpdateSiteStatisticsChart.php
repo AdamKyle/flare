@@ -3,7 +3,7 @@
 namespace App\Flare\Events;
 
 use App\Flare\Models\User;
-use App\Flare\Values\SiteAccessStatisticValue;
+use App\Flare\Services\SiteAccessStatisticService;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PrivateChannel;
@@ -30,7 +30,7 @@ class UpdateSiteStatisticsChart implements ShouldBroadcastNow
     {
         $this->user = $user;
 
-        $siteAccessStatistics = resolve(SiteAccessStatisticValue::class);
+        $siteAccessStatistics = resolve(SiteAccessStatisticService::class);
 
         $loginDetails = $siteAccessStatistics->setAttribute('amount_signed_in')->setDaysPast(0);
         $registrationDetails = $siteAccessStatistics->setAttribute('amount_registered')->setDaysPast(0);
