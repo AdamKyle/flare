@@ -84,9 +84,10 @@ export default class RegistrationStatistics extends React.Component<any, any> {
 
         return (
             <ResizableBox height={550}>
-                <InfoAlert additional_css={'my-4'}>
-                    This chart is not real time and shows the amount of players who registered
-                    over the course of a day or set of days depending on the dropdown selection.
+                <InfoAlert additional_css={"my-4"}>
+                    This chart is not real time and shows the amount of players
+                    who registered over the course of a day or set of days
+                    depending on the dropdown selection.
                 </InfoAlert>
                 <div>
                     <DropDown
