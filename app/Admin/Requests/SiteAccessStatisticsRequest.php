@@ -27,7 +27,7 @@ class SiteAccessStatisticsRequest extends FormRequest
     public function rules()
     {
         return [
-            'daysPast' => 'required|in:0,6,13,30',
+            'daysPast' => 'required|in:0,7,14,31',
         ];
     }
 

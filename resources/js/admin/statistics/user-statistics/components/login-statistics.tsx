@@ -4,6 +4,7 @@ import ComponentLoading from "../../../../game/components/ui/loading/component-l
 import ResizableBox from "../../../../game/components/ui/resizable-box";
 import SiteStatisticsAjax from "../helpers/site-statistics-ajax";
 import DropDown from "../../../../game/components/ui/drop-down/drop-down";
+import InfoAlert from "../../../../game/components/ui/alerts/simple-alerts/info-alert";
 
 type LogInStats = {
     login_count: number;
@@ -81,8 +82,13 @@ export default class LoginStatistics extends React.Component<any, any> {
         ];
 
         return (
-            <ResizableBox height={350}>
+            <ResizableBox height={550}>
                 <div>
+                    <InfoAlert additional_css={'my-4'}>
+                        This chart is not real time and shows the amount of logins over
+                        the course of a day or days depending on the dropdown selection. Each players login is only counted once,
+                        even if they login twenty times over the course of a day.
+                    </InfoAlert>
                     <DropDown
                         menu_items={this.siteStatisticsAjax.createActionsDropDown(
                             "all-time-sign-in",

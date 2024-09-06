@@ -4,6 +4,7 @@ import ComponentLoading from "../../../../game/components/ui/loading/component-l
 import ResizableBox from "../../../../game/components/ui/resizable-box";
 import DropDown from "../../../../game/components/ui/drop-down/drop-down";
 import SiteStatisticsAjax from "../helpers/site-statistics-ajax";
+import InfoAlert from "../../../../game/components/ui/alerts/simple-alerts/info-alert";
 
 type RegistrationInStats = {
     registration_count: number;
@@ -82,24 +83,30 @@ export default class RegistrationStatistics extends React.Component<any, any> {
         ];
 
         return (
-            <div>
-                <DropDown
-                    menu_items={this.siteStatisticsAjax.createActionsDropDown(
-                        "all-time-register",
-                    )}
-                    button_title={"Date Filter"}
-                />
-
-                <ResizableBox height={350}>
-                    <Chart
-                        options={{
-                            data: dataForChart,
-                            primaryAxis: primaryAxis,
-                            secondaryAxes: secondaryAxes,
-                        }}
+            <ResizableBox height={550}>
+                <InfoAlert additional_css={'my-4'}>
+                    This chart is not real time and shows the amount of players who registered
+                    over the course of a day or set of days depending on the dropdown selection.
+                </InfoAlert>
+                <div>
+                    <DropDown
+                        menu_items={this.siteStatisticsAjax.createActionsDropDown(
+                            "all-time-register",
+                        )}
+                        button_title={"Date Filter"}
                     />
-                </ResizableBox>
-            </div>
+
+                    <ResizableBox height={350}>
+                        <Chart
+                            options={{
+                                data: dataForChart,
+                                primaryAxis: primaryAxis,
+                                secondaryAxes: secondaryAxes,
+                            }}
+                        />
+                    </ResizableBox>
+                </div>
+            </ResizableBox>
         );
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use Exception;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Admin\Services\SiteStatisticsService;
@@ -16,6 +17,7 @@ class OnlineUsersController extends Controller {
     /**
      * @param Request $request
      * @return JsonResponse
+     * @throws Exception
      */
     public function getLoginDurationDetails(Request $request): JsonResponse {
         $filter = $request->daysPast ?? 0;
@@ -30,7 +32,11 @@ class OnlineUsersController extends Controller {
         ]);
     }
 
-    public function getCharactersOnline(Request $request) {
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function getCharactersOnline(Request $request): JsonResponse {
         $filter = $request->day_filter ?? 0;
 
         $result = $this->charactersOnline->setFilterType($filter)->getCharacterOnlineData();
