@@ -58,7 +58,7 @@ class OnlineUsersController extends Controller {
      * @return JsonResponse
      */
     public function getLoginStats(SiteAccessStatisticsRequest $siteAccessStatisticsRequest): JsonResponse {
-        $loginDetails = $this->siteAccessStatisticService->setAttribute('amount_signed_in')->setDaysPast($request->daysPast ?? 0);
+        $loginDetails = $this->siteAccessStatisticService->setAttribute('amount_signed_in')->setDaysPast($siteAccessStatisticsRequest->daysPast ?? 0);
 
         return response()->json(['stats' => $loginDetails->getSignedIn()], 200);
     }
@@ -68,7 +68,7 @@ class OnlineUsersController extends Controller {
      * @return JsonResponse
      */
     public function getRegistrationStats(SiteAccessStatisticsRequest $siteAccessStatisticsRequest): JsonResponse {
-        $registrationDetails = $this->siteAccessStatisticService->setAttribute('amount_registered')->setDaysPast($request->daysPast ?? 0);
+        $registrationDetails = $this->siteAccessStatisticService->setAttribute('amount_registered')->setDaysPast($siteAccessStatisticsRequest->daysPast ?? 0);
 
         return response()->json(['stats' => $registrationDetails->getRegistered()], 200);
     }
