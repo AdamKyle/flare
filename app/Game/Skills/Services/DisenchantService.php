@@ -87,7 +87,7 @@ class DisenchantService
         return $this->successResult([
             'message' => 'Disenchanted item '.$item->affix_name.' Check server message tab for Gold Dust output.',
             'inventory' => [
-                'inventory' => $inventory->getInventoryForType('inventory'),
+                'inventory' => $this->characterInventoryService->setCharacter($character)->getInventoryForType('inventory'),
             ],
         ]);
     }
