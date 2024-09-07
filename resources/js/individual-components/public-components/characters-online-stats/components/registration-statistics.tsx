@@ -86,7 +86,7 @@ export default class RegistrationStatistics extends React.Component<any, any> {
         ];
 
         return (
-            <ResizableBox height={550}>
+            <ResizableBox height={550} small_height={850}>
                 <InfoAlert additional_css={"my-4"}>
                     This chart is not real time and shows the amount of players
                     who registered over the course of a day or set of days
@@ -100,7 +100,7 @@ export default class RegistrationStatistics extends React.Component<any, any> {
                         button_title={"Date Filter"}
                     />
 
-                    <ResizableBox height={350}>
+                    <ResizableBox height={350} small_height={550}>
                         <Chart
                             options={{
                                 data: dataForChart,
