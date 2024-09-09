@@ -53,8 +53,8 @@ export default class CharacterTopSection extends React.Component<
         this.setState({
             show_help_modal: false,
             help_modal_type: null,
-        })
-    };
+        });
+    }
 
     getXpPercentage(): number {
         const xpNext = this.props.character.xp_next;
@@ -198,26 +198,37 @@ export default class CharacterTopSection extends React.Component<
                         </div>
                         <div className="py-1">
                             <strong>
-                                <PrimaryLinkButton button_label={'AC'} on_click={() => {
-                                    this.manageHelpModal('ac');
-                                }} />
-                            </strong>:{" "}
-                            {this.abbreviateNumber(this.props.character.ac)}
+                                <PrimaryLinkButton
+                                    button_label={"AC"}
+                                    on_click={() => {
+                                        this.manageHelpModal("ac");
+                                    }}
+                                />
+                            </strong>
+                            : {this.abbreviateNumber(this.props.character.ac)}
                         </div>
                         <div className="py-1">
                             <strong>
-                                <PrimaryLinkButton button_label={'Attack'} on_click={() => {
-                                    this.manageHelpModal('attack');
-                                }} />
-                            </strong>:{" "}
+                                <PrimaryLinkButton
+                                    button_label={"Attack"}
+                                    on_click={() => {
+                                        this.manageHelpModal("attack");
+                                    }}
+                                />
+                            </strong>
+                            :{" "}
                             {this.abbreviateNumber(this.props.character.attack)}
                         </div>
                         <div className="py-1">
                             <strong>
-                                <PrimaryLinkButton button_label={'Health'} on_click={() => {
-                                    this.manageHelpModal('health');
-                                }} />
-                            </strong>:{" "}
+                                <PrimaryLinkButton
+                                    button_label={"Health"}
+                                    on_click={() => {
+                                        this.manageHelpModal("health");
+                                    }}
+                                />
+                            </strong>
+                            :{" "}
                             {this.props.character.is_dead ? (
                                 <Fragment>
                                     <span className="text-red-600 dark:text-red-400">
@@ -281,13 +292,12 @@ export default class CharacterTopSection extends React.Component<
                     </div>
                 </div>
 
-                {
-                    this.state.show_help_modal ?
-                        <CharacterTopSectionHelpModal type={this.state.help_modal_type} manage_modal={
-                            this.manageHelpModal.bind(this)
-                        } />
-                        : null
-                }
+                {this.state.show_help_modal ? (
+                    <CharacterTopSectionHelpModal
+                        type={this.state.help_modal_type}
+                        manage_modal={this.manageHelpModal.bind(this)}
+                    />
+                ) : null}
 
                 <OrangeProgressBar
                     primary_label="XP"

@@ -305,9 +305,12 @@ export default class FightSection extends React.Component<
                             <span className="w-full text-center">Defend</span>
                         </div>
                     </div>
-                    <a href="/information/combat" target="_blank" className={'relative top-[5px]'}>
-                        Help{" "}
-                        <i className="fas fa-external-link-alt"></i>
+                    <a
+                        href="/information/combat"
+                        target="_blank"
+                        className={"relative top-[5px]"}
+                    >
+                        Help <i className="fas fa-external-link-alt"></i>
                     </a>
                 </div>
 
