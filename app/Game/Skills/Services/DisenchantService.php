@@ -8,6 +8,7 @@ use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 use App\Flare\Models\Skill;
 use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\Character\CharacterInventory\Events\CharacterInventoryUpdateBroadCastEvent;
 use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\ResponseBuilder;
@@ -51,7 +52,7 @@ class DisenchantService
         return $this;
     }
 
-    public function disenchantItem(Character $character, Item $item): array
+    public function disenchantItem(Character $character, Item $item, bool $doNotSendResponse = false): array
     {
 
         $inventory = Inventory::where('character_id', $character->id)->first();
@@ -79,12 +80,14 @@ class DisenchantService
             event(new UpdateTopBarEvent($character->refresh()));
         }
 
-        $inventory = $this->characterInventoryService->setCharacter($character->refresh());
+        if ($doNotSendResponse) {
+            return $this->successResult();
+        }
 
         return $this->successResult([
             'message' => 'Disenchanted item '.$item->affix_name.' Check server message tab for Gold Dust output.',
             'inventory' => [
-                'inventory' => $inventory->getInventoryForType('inventory'),
+                'inventory' => $this->characterInventoryService->setCharacter($character)->getInventoryForType('inventory'),
             ],
         ]);
     }

@@ -46,9 +46,11 @@ class InitiateDelusionalMemoriesEvent implements ShouldQueue
             'currently_running' => true,
         ]);
 
+        $event = $event->refresh();
+
         Event::create([
             'type' => EventType::DELUSIONAL_MEMORIES_EVENT,
-            'started_at' => now(),
+            'started_at' => $event->start_date,
             'ends_at' => $event->end_date,
             'event_goal_steps' => [
                 GlobalEventSteps::BATTLE,

@@ -41,9 +41,11 @@ class InitiateFeedbackEvent implements ShouldQueue
             'currently_running' => true,
         ]);
 
+        $event = $event->refresh();
+
         Event::create([
             'type' => EventType::FEEDBACK_EVENT,
-            'started_at' => now(),
+            'started_at' => $event->start_date,
             'ends_at' => $event->end_date,
         ]);
 

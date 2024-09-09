@@ -3,6 +3,8 @@ import CharacterTopSectionProps from "../../lib/game/character-top-section/chara
 import CharacterTopSectionState from "../../lib/game/character-top-section/character-top-section-state";
 import { formatNumber } from "../../lib/game/format-number";
 import OrangeProgressBar from "../../components/ui/progress-bars/orange-progress-bar";
+import PrimaryLinkButton from "../../components/ui/buttons/primary-link-button";
+import CharacterTopSectionHelpModal from "./help-modals/character-top-section-help-modal";
 
 export default class CharacterTopSection extends React.Component<
     CharacterTopSectionProps,
@@ -13,6 +15,8 @@ export default class CharacterTopSection extends React.Component<
 
         this.state = {
             hide_top_bar: true,
+            show_help_modal: false,
+            help_modal_type: null,
         };
     }
 
@@ -36,7 +40,21 @@ export default class CharacterTopSection extends React.Component<
         }
     }
 
-    componentDidUpdate() {}
+    manageHelpModal(type?: string) {
+        if (type) {
+            this.setState({
+                help_modal_type: type,
+                show_help_modal: true,
+            });
+
+            return;
+        }
+
+        this.setState({
+            show_help_modal: false,
+            help_modal_type: null,
+        });
+    }
 
     getXpPercentage(): number {
         const xpNext = this.props.character.xp_next;
@@ -179,15 +197,38 @@ export default class CharacterTopSection extends React.Component<
                             /{this.props.character.max_level}
                         </div>
                         <div className="py-1">
-                            <strong>AC</strong>:{" "}
-                            {this.abbreviateNumber(this.props.character.ac)}
+                            <strong>
+                                <PrimaryLinkButton
+                                    button_label={"AC"}
+                                    on_click={() => {
+                                        this.manageHelpModal("ac");
+                                    }}
+                                />
+                            </strong>
+                            : {this.abbreviateNumber(this.props.character.ac)}
                         </div>
                         <div className="py-1">
-                            <strong>Attack</strong>:{" "}
+                            <strong>
+                                <PrimaryLinkButton
+                                    button_label={"Attack"}
+                                    on_click={() => {
+                                        this.manageHelpModal("attack");
+                                    }}
+                                />
+                            </strong>
+                            :{" "}
                             {this.abbreviateNumber(this.props.character.attack)}
                         </div>
                         <div className="py-1">
-                            <strong>Health</strong>:{" "}
+                            <strong>
+                                <PrimaryLinkButton
+                                    button_label={"Health"}
+                                    on_click={() => {
+                                        this.manageHelpModal("health");
+                                    }}
+                                />
+                            </strong>
+                            :{" "}
                             {this.props.character.is_dead ? (
                                 <Fragment>
                                     <span className="text-red-600 dark:text-red-400">
@@ -250,6 +291,14 @@ export default class CharacterTopSection extends React.Component<
                         </div>
                     </div>
                 </div>
+
+                {this.state.show_help_modal ? (
+                    <CharacterTopSectionHelpModal
+                        type={this.state.help_modal_type}
+                        manage_modal={this.manageHelpModal.bind(this)}
+                    />
+                ) : null}
+
                 <OrangeProgressBar
                     primary_label="XP"
                     secondary_label={

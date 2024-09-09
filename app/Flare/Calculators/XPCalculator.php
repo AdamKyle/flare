@@ -24,7 +24,7 @@ class XPCalculator
             $xp = ($xpReduction !== 0.0 ? ($monster->xp - ($monster->xp * $xpReduction)) : $monster->xp);
         } elseif ($characterLevel >= $monster->max_level) {
             // The monster has a max exp level and the character is above it or equal to it, so they get 1/3rd xp.
-            $xp = ($xpReduction !== 0.0 ? (3.3333 - (3.3333 * $xpReduction)) : 3.3333);
+            $xp = ($xpReduction !== 0.0 ? $monster->xp * 0.333 : ($monster->xp - $monster->xp * $xpReduction) * 0.33);
         }
 
         return ceil($xp);

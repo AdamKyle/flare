@@ -33,8 +33,15 @@ class MassImportCustomData extends Command
     public function handle()
     {
 
+        Artisan::call('import:game-data Items');
+        Artisan::call('add:holy-stacks-to-items');
+
         $this->importInformationSection();
-        $this->importGameMaps();
+
+        if (config('app.env') !== 'production') {
+            $this->importGameMaps();
+        }
+
         $this->importSurveys();
     }
 

@@ -52,7 +52,7 @@ export default class EventSchedule extends React.Component<
                             .toJSDate();
                         event.color = event.currently_running
                             ? "#16a34a"
-                            : this.color(event.title);
+                            : this.color(event.title as string);
 
                         return event;
                     }),
@@ -82,7 +82,7 @@ export default class EventSchedule extends React.Component<
                                     event.end = new Date(event.end);
                                     event.color = event.currently_running
                                         ? "#16a34a"
-                                        : this.color(event.title);
+                                        : this.color(event.title as string);
 
                                     return event;
                                 },

@@ -18,6 +18,23 @@ class AnnouncementHandler
         $this->buildAnnouncementForType($type);
     }
 
+    public function getNameForType(int $type): ?string {
+        return match ($type) {
+            EventType::RAID_EVENT => 'raid_announcement',
+            EventType::MONTHLY_PVP => 'monthly_pvp',
+            EventType::WEEKLY_CELESTIALS => 'weekly_celestial_spawn',
+            EventType::WEEKLY_CURRENCY_DROPS => 'weekly_currency_drop',
+            EventType::WINTER_EVENT => 'winter_event',
+            EventType::PURGATORY_SMITH_HOUSE => 'purgatory_house',
+            EventType::GOLD_MINES => 'gold_mines',
+            EventType::THE_OLD_CHURCH => 'the_old_chur',
+            EventType::DELUSIONAL_MEMORIES_EVENT => 'delusional_memory',
+            EventType::WEEKLY_FACTION_LOYALTY_EVENT => 'weekly_faction_loyalty_event',
+            EventType::FEEDBACK_EVENT => 'tlessas_feedback_event',
+            default => null,
+        };
+    }
+
     protected function buildAnnouncementForType(string $type): void
     {
         match ($type) {

@@ -122,15 +122,19 @@ class SiteStatisticsService {
         for ($i = 0; $i <= $days; $i++) {
             $date = $startDate->copy()->addDays($i)->format('Y-m-d');
             $daysLabels[] = $date;
-            $dailyDurations[] = 0;
+            $dailyDurations[$date] = 0;
         }
 
         foreach ($durations as $duration) {
-            $dailyDurations[] += $duration->duration_in_seconds / 60;
+            $dateKey = Carbon::parse($duration->logged_in_at)->format('Y-m-d');
+            if (isset($dailyDurations[$dateKey])) {
+                $dailyDurations[$dateKey] += $duration->duration_in_seconds / 60;
+            }
         }
 
         $this->labels = $daysLabels;
         $this->data = array_values($dailyDurations);
     }
+
 
 }
