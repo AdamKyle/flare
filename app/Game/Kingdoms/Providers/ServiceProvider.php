@@ -12,11 +12,12 @@ use App\Game\Kingdoms\Console\Commands\ResetCapitalCityWalkingStatus;
 use App\Game\Kingdoms\Console\Commands\UpdateKingdoms;
 use App\Game\Kingdoms\Handlers\AttackKingdomWithUnitsHandler;
 use App\Game\Kingdoms\Handlers\AttackLogHandler;
-use App\Game\Kingdoms\Handlers\CapitalCityBuildingManagementRequestHandler;
-use App\Game\Kingdoms\Handlers\CapitalCityKingdomLogHandler;
-use App\Game\Kingdoms\Handlers\CapitalCityProcessBuildingRequestHandler;
-use App\Game\Kingdoms\Handlers\CapitalCityProcessUnitRequestHandler;
-use App\Game\Kingdoms\Handlers\CapitalCityUnitManagementRequestHandler;
+use App\Game\Kingdoms\Handlers\CapitalCityHandlers\CapitalCityBuildingManagementRequestHandler;
+use App\Game\Kingdoms\Handlers\CapitalCityHandlers\CapitalCityKingdomLogHandler;
+use App\Game\Kingdoms\Handlers\CapitalCityHandlers\CapitalCityProcessBuildingRequestHandler;
+use App\Game\Kingdoms\Handlers\CapitalCityHandlers\CapitalCityProcessUnitRequestHandler;
+use App\Game\Kingdoms\Handlers\CapitalCityHandlers\CapitalCityRequestResourcesHandler;
+use App\Game\Kingdoms\Handlers\CapitalCityHandlers\CapitalCityUnitManagementRequestHandler;
 use App\Game\Kingdoms\Handlers\DefenderArcherHandler;
 use App\Game\Kingdoms\Handlers\DefenderSiegeHandler;
 use App\Game\Kingdoms\Handlers\GiveKingdomsToNpcHandler;
@@ -37,6 +38,7 @@ use App\Game\Kingdoms\Service\CapitalCityUnitManagement;
 use App\Game\Kingdoms\Service\ExpandResourceBuildingService;
 use App\Game\Kingdoms\Service\KingdomAttackService;
 use App\Game\Kingdoms\Service\KingdomBuildingService;
+use App\Game\Kingdoms\Service\KingdomMovementTimeCalculationService;
 use App\Game\Kingdoms\Service\KingdomQueueService;
 use App\Game\Kingdoms\Service\KingdomService;
 use App\Game\Kingdoms\Service\KingdomSettleService;
@@ -71,6 +73,12 @@ class ServiceProvider extends ApplicationServiceProvider
             );
         });
 
+        $this->app->bind(KingdomMovementTimeCalculationService::class, function ($app) {
+            return new KingdomMovementTimeCalculationService(
+                $app->make(DistanceCalculation::class),
+            );
+        });
+
         $this->app->bind(CapitalCityManagementService::class, function ($app) {
             return new CapitalCityManagementService(
                 $app->make(UpdateKingdom::class),
@@ -91,7 +99,8 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(CapitalCityProcessBuildingRequestHandler::class, function($app) {
             return new CapitalCityProcessBuildingRequestHandler(
                 $app->make(CapitalCityKingdomLogHandler::class),
-                $app->make(DistanceCalculation::class)
+                $app->make(DistanceCalculation::class),
+                $app->make(CapitalCityRequestResourcesHandler::class)
             );
         });
 
@@ -127,6 +136,7 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(CapitalCityProcessUnitRequestHandler::class, function($app) {
             return new CapitalCityProcessUnitRequestHandler(
                 $app->make(CapitalCityKingdomLogHandler::class),
+                $app->make(CapitalCityRequestResourcesHandler::class),
                 $app->make(DistanceCalculation::class),
                 $app->make(UnitService::class)
             );
@@ -137,6 +147,15 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(UnitMovementService::class)
             );
         });
+
+        $this->app->bind(CapitalCityRequestResourcesHandler::class, function($app) {
+            return new CapitalCityRequestResourcesHandler(
+                $app->make(ResourceTransferService::class),
+                $app->make(KingdomMovementTimeCalculationService::class),
+                $app->make(CapitalCityKingdomLogHandler::class),
+            );
+        });
+
 
         $this->app->bind(KingdomBuilder::class, function () {
             return new KingdomBuilder;

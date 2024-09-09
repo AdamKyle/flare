@@ -1,9 +1,12 @@
 <?php
 
-namespace App\Game\Kingdoms\Handlers;
+namespace App\Game\Kingdoms\Handlers\CapitalCityHandlers;
 
 use App\Flare\Models\CapitalCityUnitQueue;
+use App\Flare\Models\Character;
 use App\Flare\Models\GameUnit;
+use App\Flare\Models\Kingdom;
+use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Kingdoms\Events\UpdateCapitalCityUnitQueueTable;
 use App\Game\Kingdoms\Jobs\CapitalCityUnitRequestMovement;
 use App\Game\Kingdoms\Service\UnitMovementService;
@@ -12,9 +15,6 @@ use App\Game\Kingdoms\Service\UpdateKingdom;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
 use Exception;
-use App\Flare\Models\Character;
-use App\Flare\Models\Kingdom;
-use App\Game\Core\Traits\ResponseBuilder;
 
 
 class CapitalCityUnitManagementRequestHandler {

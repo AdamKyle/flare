@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Game\Kingdoms\Handlers;
+namespace App\Game\Kingdoms\Handlers\CapitalCityHandlers;
 
 use App\Flare\Models\CapitalCityBuildingQueue;
 use App\Flare\Models\CapitalCityUnitQueue;
+use App\Flare\Models\Kingdom;
 use App\Flare\Models\KingdomBuilding;
 use App\Flare\Models\KingdomLog;
 use App\Flare\Values\KingdomLogStatusValue;
@@ -61,8 +62,7 @@ class CapitalCityKingdomLogHandler {
         $character = $capitalCityUnitQueue->character;
 
         $unitData = $this->createUnitDataForLog($requestData);
-        dump('possiblyCreateLogForUnitQueue');
-        dump($unitData, $requestData);
+
         if (count($unitData) === 0 && count($requestData) === 0) {
 
             $capitalCityUnitQueue->delete();

@@ -173,7 +173,7 @@ class ResourceTransferService
         return $requestFromKingdom->current_population >= self::POPULATION_COST;
     }
 
-    private function hasAirShip(Kingdom $requestFromKingdom): bool
+    public function hasAirShip(Kingdom $requestFromKingdom): bool
     {
         return $requestFromKingdom->units->where('gameUnit.name', '=', UnitNames::AIRSHIP)->count() > 0;
     }
@@ -197,6 +197,19 @@ class ResourceTransferService
         $requestingFromMarketPlace = $requestingFromKingdom->buildings->where('gameBuilding.name', '=', BuildingCosts::MARKET_PLACE)->where('level', '>=', 5)->first();
 
         return ! is_null($requestingMarketPlace) && ! is_null($requestingFromMarketPlace);
+    }
+
+    public function sendOffBasicUnitMovement(Kingdom $requestingKingdom, Kingdom $requestingFromKingdom) {
+        $pixelDistance = $this->distanceCalculation->calculatePixel($requestingKingdom->x_position, $requestingKingdom->y_position,
+            $requestingFromKingdom->x_position, $requestingFromKingdom->y_position);
+
+        $timeToKingdom = $this->distanceCalculation->calculateMinutes($pixelDistance);
+
+        $unitMovementQueue = UnitMovementQueue::create(
+            $this->buildUnitDataForMovement($requestingKingdom, $requestingFromKingdom, $timeToKingdom)
+        );
+
+        $this->sendOffEvents($requestingKingdom, $requestingFromKingdom, $unitMovementQueue);
     }
 
     private function sendOffRequestForResources(Kingdom $requestingKingdom, Kingdom $requestingFromKingdom, int $amount, string $type, bool $useAirShip, ?int $capitalCityQueueId = null, ?int $buildingId = null, ?int $unitId = null): void

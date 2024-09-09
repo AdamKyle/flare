@@ -6,8 +6,8 @@ use App\Flare\Models\CapitalCityBuildingQueue;
 use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
 use App\Game\Core\Traits\ResponseBuilder;
-use App\Game\Kingdoms\Handlers\CapitalCityBuildingManagementRequestHandler;
-use App\Game\Kingdoms\Handlers\CapitalCityProcessBuildingRequestHandler;
+use App\Game\Kingdoms\Handlers\CapitalCityHandlers\CapitalCityBuildingManagementRequestHandler;
+use App\Game\Kingdoms\Handlers\CapitalCityHandlers\CapitalCityProcessBuildingRequestHandler;
 
 class CapitalCityBuildingManagement
 {

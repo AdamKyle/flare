@@ -1,22 +1,22 @@
 <?php
 
-namespace App\Game\Kingdoms\Handlers;
+namespace App\Game\Kingdoms\Handlers\CapitalCityHandlers;
 
 use App\Flare\Models\CapitalCityResourceRequest;
-use App\Flare\Models\GameBuildingUnit;
-use App\Flare\Models\GameUnit;
-use App\Flare\Models\KingdomBuilding;
 use App\Flare\Models\CapitalCityUnitQueue;
 use App\Flare\Models\Character;
+use App\Flare\Models\GameBuildingUnit;
+use App\Flare\Models\GameUnit;
 use App\Flare\Models\Kingdom;
+use App\Flare\Models\KingdomBuilding;
 use App\Flare\Models\KingdomUnit;
 use App\Game\Kingdoms\Events\UpdateCapitalCityUnitQueueTable;
 use App\Game\Kingdoms\Jobs\CapitalCityResourceRequest as CapitalCityResourceRequestJob;
 use App\Game\Kingdoms\Jobs\CapitalCityUnitRequest;
 use App\Game\Kingdoms\Service\UnitService;
+use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use App\Game\Kingdoms\Values\CapitalCityResourceRequestType;
 use App\Game\Kingdoms\Values\UnitCosts;
-use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use App\Game\Maps\Calculations\DistanceCalculation;
 use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
 use Facades\App\Game\Kingdoms\Validation\ResourceValidation;
@@ -33,11 +33,13 @@ class CapitalCityProcessUnitRequestHandler {
 
     /**
      * @param CapitalCityKingdomLogHandler $capitalCityKingdomLogHandler
+     * @param CapitalCityRequestResourcesHandler $capitalCityRequestResourcesHandler
      * @param DistanceCalculation $distanceCalculation
      * @param UnitService $unitService
      */
     public function __construct(
         private readonly CapitalCityKingdomLogHandler $capitalCityKingdomLogHandler,
+        private readonly CapitalCityRequestResourcesHandler $capitalCityRequestResourcesHandler,
         private readonly DistanceCalculation $distanceCalculation,
         private readonly UnitService $unitService
     ) {}
@@ -56,9 +58,7 @@ class CapitalCityProcessUnitRequestHandler {
 
         $requestData = $this->processUnitRequests($kingdom, $requestData);
         $missingResources = $this->calculateMissingResources($requestData);
-        dump('missing resources');
-        dump($missingResources);
-        dump($this->messages);
+
         if (!empty($missingResources)) {
             $this->handleResourceRequests($capitalCityUnitQueue, $character, $missingResources, $requestData, $kingdom);
         } else {
@@ -75,36 +75,29 @@ class CapitalCityProcessUnitRequestHandler {
      */
     private function processUnitRequests(Kingdom $kingdom, array $requestData): array
     {
-        dump($requestData);
+
         foreach ($requestData as $index => $unitRequest) {
             $gameUnit = GameUnit::where('name', $unitRequest['name'])->first();
             $gameBuildingRelation = GameBuildingUnit::where('game_unit_id', $gameUnit->id)->first();
             $building = $kingdom->buildings()->where('game_building_id', $gameBuildingRelation->game_building_id)->first();
 
-            dump($unitRequest);
-
             if ($this->isBuildingLocked($building, $kingdom)) {
-                dump('isBuildingLocked');
                 $requestData[$index]['secondary_status'] = CapitalCityQueueStatus::REJECTED;
 
                 continue;
             }
 
             if ($this->isBuildingUnderLeveled($building, $gameBuildingRelation, $kingdom)) {
-                dump('isBuildingUnderLeveled');
                 $requestData[$index]['secondary_status'] = CapitalCityQueueStatus::REJECTED;
 
                 continue;
             }
 
             if ($this->isTimeGreaterThanSevenDays($kingdom->character, $kingdom, $gameUnit, $unitRequest['amount'])) {
-                dump('isTimeGreaterThanSevenDays');
                 $requestData[$index]['secondary_status'] = CapitalCityQueueStatus::REJECTED;
 
                 continue;
             }
-
-            dump('Do we ever get here?');
 
             $unitRequest = $this->processPotentialResourceRequests($kingdom, $gameUnit, $unitRequest);
 
@@ -147,7 +140,7 @@ class CapitalCityProcessUnitRequestHandler {
     private function processPotentialResourceRequests(Kingdom $kingdom, GameUnit $unit, array $unitRequest): array
     {
         $missingResources = ResourceValidation::getMissingUnitResources($unit, $kingdom, $unitRequest['amount']);
-        dump('processPotentialResourceRequests', $missingResources);
+
         if (!empty($missingResources)) {
             if (!$this->canAffordPopulationCost($kingdom, $missingResources['population'] ?? 0)) {
                 $this->messages[] = "Unit recruitment for {$unit->name} rejected due to insufficient population.";
@@ -162,7 +155,7 @@ class CapitalCityProcessUnitRequestHandler {
         } else {
             $unitRequest['secondary_status'] = CapitalCityQueueStatus::RECRUITING;
         }
-        dump($unitRequest);
+
         return $unitRequest;
     }
 
@@ -215,24 +208,13 @@ class CapitalCityProcessUnitRequestHandler {
         array $requestData,
         Kingdom $kingdom
     ): void {
-        $resourceProvidingKingdom = $this->findKingdomToProvideResources($character, $missingResources);
-        $sendResourceRequests     = true;
-
-        if (is_null($resourceProvidingKingdom)) {
-            $requestData = $this->markRequestsAsRejected($requestData);
-
-            $this->messages[] = 'No kingdom could provide the resources for unit recruitment.';
-
-            $sendResourceRequests = false;
-        }
-
-        $this->updateQueue($capitalCityUnitQueue, $requestData);
-
-        if ($sendResourceRequests) {
-            $this->createResourceRequest($character, $capitalCityUnitQueue, $resourceProvidingKingdom, $kingdom, $missingResources);
-        }
-
-        $this->logAndTriggerEvents($capitalCityUnitQueue);
+        $this->capitalCityRequestResourcesHandler->handleResourceRequests(
+            $capitalCityUnitQueue,
+            $character,
+            $missingResources,
+            $requestData,
+            $kingdom
+        );
     }
 
     /**
@@ -247,8 +229,6 @@ class CapitalCityProcessUnitRequestHandler {
         if ($this->hasRecruitingUnits($requestData)) {
             $this->createUnitRecruitmentRequest($capitalCityUnitQueue->character, $capitalCityUnitQueue, $capitalCityUnitQueue->kingdom, $requestData);
         } else {
-            dump('handleNoResourceRequests');
-            dump($requestData);
             $this->logAndTriggerEvents($capitalCityUnitQueue);
         }
     }
@@ -263,39 +243,6 @@ class CapitalCityProcessUnitRequestHandler {
     {
         return collect($requestData)
             ->contains(fn($item) => $item['secondary_status'] === CapitalCityQueueStatus::RECRUITING);
-    }
-
-    /**
-     * Update the unit queue.
-     *
-     * @param CapitalCityUnitQueue $capitalCityUnitQueue
-     * @param array $requestData
-     * @return void
-     */
-    private function updateQueue(CapitalCityUnitQueue $capitalCityUnitQueue, array $requestData): void
-    {
-        $capitalCityUnitQueue->update([
-            'unit_request_data' => $requestData,
-            'messages' => $this->messages,
-        ]);
-    }
-
-    /**
-     * Find a kingdom that can provide the necessary resources.
-     *
-     * @param Character $character
-     * @param array $missingResources
-     * @return Kingdom|null
-     */
-    private function findKingdomToProvideResources(Character $character, array $missingResources): ?Kingdom
-    {
-        return $character->kingdoms()
-            ->where(function ($query) use ($missingResources) {
-                foreach ($missingResources as $resource => $amount) {
-                    $query->where('current_' . $resource, '>=', $amount);
-                }
-            })
-            ->first();
     }
 
     /**
@@ -325,17 +272,33 @@ class CapitalCityProcessUnitRequestHandler {
      * Create a unit recruitment request.
      *
      * @param Character $character
-     * @param GameUnit $gameUnit
-     * @param int $amount
+     * @param CapitalCityUnitQueue $capitalCityUnitQueue
+     * @param array $requestData
      * @return void
      */
     private function createUnitRecruitmentRequest(
         Character $character,
-        GameUnit $gameUnit,
-        int $amount
+        CapitalCityUnitQueue $capitalCityUnitQueue,
+        array $requestData
     ): void {
 
-       $timeInSecondsToRecruit = $this->getTimeForRecruitment($character, $gameUnit, $amount);
+        $hasBuildingOrRepairing = collect($requestData)->contains(fn($item) => in_array($item['secondary_status'], [
+            CapitalCityQueueStatus::RECRUITING,
+            CapitalCityQueueStatus::REQUESTING
+        ]));
+
+        if (!$hasBuildingOrRepairing) {
+            $this->createLogAndTriggerEvents($capitalCityUnitQueue);
+        } else {
+            $filteredRequestData = collect($requestData)->filter(fn($item) => in_array($item['secondary_status'], [
+                CapitalCityQueueStatus::RECRUITING,
+            ]))->values()->toArray();
+
+            dump($filteredRequestData);
+
+//            $this->createUpgradeRequest($character, $capitalCityUnitQueue, $capitalCityUnitQueue->kingdom, $filteredRequestData);
+//            $this->sendOffEvents($capitalCityUnitQueue);
+        }
     }
 
     /**

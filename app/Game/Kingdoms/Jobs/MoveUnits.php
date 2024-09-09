@@ -8,6 +8,7 @@ use App\Flare\Models\KingdomUnit;
 use App\Flare\Models\UnitMovementQueue;
 use App\Game\Kingdoms\Events\UpdateKingdomQueues;
 use App\Game\Kingdoms\Handlers\AttackKingdomWithUnitsHandler;
+use App\Game\Kingdoms\Service\KingdomMovementTimeCalculationService;
 use App\Game\Kingdoms\Service\UpdateKingdom;
 use App\Game\Kingdoms\Values\KingdomMaxValue;
 use App\Game\Messages\Events\ServerMessageEvent;
@@ -24,8 +25,10 @@ class MoveUnits implements ShouldQueue
 
     public function __construct(private readonly int $movementId, private readonly array $additionalParams = []) {}
 
-    public function handle(AttackKingdomWithUnitsHandler $attackKingdomWithUnitsHandler,
-        UpdateKingdom $updateKingdom
+    public function handle(
+        AttackKingdomWithUnitsHandler $attackKingdomWithUnitsHandler,
+        UpdateKingdom $updateKingdom,
+        KingdomMovementTimeCalculationService $kingdomMovementTimeCalculationService,
     ): void {
         $unitMovement = UnitMovementQueue::find($this->movementId);
 
@@ -71,7 +74,7 @@ class MoveUnits implements ShouldQueue
         }
 
         if ($unitMovement->resources_requested) {
-            $this->handleWhenResourceRequested($unitMovement, $updateKingdom);
+            $this->handleWhenResourceRequested($unitMovement, $updateKingdom, $kingdomMovementTimeCalculationService);
         }
     }
 
@@ -227,28 +230,25 @@ class MoveUnits implements ShouldQueue
         return false;
     }
 
-    private function handleWhenResourceRequested(UnitMovementQueue $unitMovementQueue, UpdateKingdom $updateKingdom): void
+    private function handleWhenResourceRequested(UnitMovementQueue $unitMovementQueue, UpdateKingdom $updateKingdom, KingdomMovementTimeCalculationService $kingdomMovementTimeCalculationService): void
     {
 
-        if (empty($this->additionalParams)) {
-            $unitMovementQueue->delekingdomte();
+        $character = $unitMovementQueue->character;
 
-            return;
-        }
+        $timeTillArrival = $kingdomMovementTimeCalculationService->getTimeToKingdom($character, $unitMovementQueue->from_kingdom, $unitMovementQueue->to_kingdom);
+        $timeToComplete = now()->addMinutes($timeTillArrival);
 
-        if (! isset($this->additionalParams['amount_of_resources'])) {
-            $unitMovementQueue->delete();
+        $attributes = $unitMovementQueue->getAttributes();
+        $attributes['from_kingdom_id'] = $unitMovementQueue->to_kingdom_id;
+        $attributes['to_kingdom_id'] = $unitMovementQueue->from_kingdom_id;
+        $attributes['is_moving'] = false;
+        $attributes['is_returning'] = true;
+        $attributes['started_at'] = now();
+        $attributes['completed_at'] = $timeToComplete;
 
-            return;
-        }
+        $unitMovementQueue = UnitMovementQueue::create($attributes);
 
-        if (! isset($this->additionalParams['additional_log_messages'])) {
-            $unitMovementQueue->delete();
-
-            return;
-        }
-
-        RequestResources::dispatch($unitMovementQueue->character_id, $unitMovementQueue->to_kingdom_id, $unitMovementQueue->from_kingdom_id, $this->additionalParams['amount_of_resources'], $unitMovementQueue->units_moving, $this->additionalParams['additional_log_messages'], $this->additionalParams['capital_city_queue_id'], $this->additionalParams['building_id'], $this->additionalParams['unit_id']);
+        MoveUnits::dispatch($unitMovementQueue->id)->delay($timeToComplete);
 
         $this->cleanUpMovementQueue($unitMovementQueue, $updateKingdom);
     }

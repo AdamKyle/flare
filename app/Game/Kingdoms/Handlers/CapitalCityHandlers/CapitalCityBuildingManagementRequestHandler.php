@@ -1,21 +1,21 @@
 <?php
 
-namespace App\Game\Kingdoms\Handlers;
+namespace App\Game\Kingdoms\Handlers\CapitalCityHandlers;
 
-use Carbon\Carbon;
-use Illuminate\Support\Collection;
+use App\Flare\Models\CapitalCityBuildingQueue;
 use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
-use App\Flare\Models\CapitalCityBuildingQueue;
 use App\Flare\Models\KingdomBuilding;
+use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Kingdoms\Events\UpdateCapitalCityBuildingQueueTable;
 use App\Game\Kingdoms\Events\UpdateCapitalCityBuildingUpgrades;
 use App\Game\Kingdoms\Jobs\CapitalCityBuildingRequestMovement;
+use App\Game\Kingdoms\Service\KingdomBuildingService;
 use App\Game\Kingdoms\Service\UnitMovementService;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
-use App\Game\Core\Traits\ResponseBuilder;
-use App\Game\Kingdoms\Service\KingdomBuildingService;
+use Carbon\Carbon;
+use Illuminate\Support\Collection;
 
 class CapitalCityBuildingManagementRequestHandler {
 
