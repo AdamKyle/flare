@@ -8,6 +8,7 @@ use App\Flare\Models\Survey;
 use App\Flare\Values\MapNameValue;
 use Illuminate\Console\Command;
 use Illuminate\Http\File;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Storage;
 
 class MassImportCustomData extends Command
@@ -31,6 +32,9 @@ class MassImportCustomData extends Command
      */
     public function handle()
     {
+
+        Artisan::call('import:game-data Items');
+        Artisan::call('add:holy-stacks-to-items');
 
         $this->importInformationSection();
 
