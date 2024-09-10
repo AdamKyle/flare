@@ -54,35 +54,61 @@ class CapitalCityRequestResourcesHandler {
         if (is_null($kingdomWhoCanAfford)) {
             $requestData = $this->markRequestsAsRejected($requestData);
             $this->messages[] = 'No kingdom could be found to request the resources for these buildings.';
+
+            $queue = $this->updateQueueData($queue, $requestData);
+
+            $this->logAndTriggerEvents($queue);
+
+            return;
         }
 
         if (!$this->resourceTransferService->bothKingdomsHaveAMarketPlace($kingdom, $kingdomWhoCanAfford)) {
             $requestData = $this->markRequestsAsRejected($requestData);
             $this->messages[] = 'Your kingdoms: ' . $kingdom->name . ' and ' . $kingdomWhoCanAfford->name . ' both must have a Market Place at level 5 or higher.';
+
+            $queue = $this->updateQueueData($queue, $requestData);
+
+            $this->logAndTriggerEvents($queue);
+
+            return;
         }
 
         if (!$this->resourceTransferService->canAffordPopulationCost($kingdomWhoCanAfford)) {
             $requestData = $this->markRequestsAsRejected($requestData);
             $this->messages[] = 'When asking '. $kingdomWhoCanAfford->name . ' For the resources to fulfill each request, the kingdom told us they do not have the population (need 50) to send a caravan of resources.';
+
+            $queue = $this->updateQueueData($queue, $requestData);
+
+            $this->logAndTriggerEvents($queue);
+
+            return;
         }
 
         if (!$this->resourceTransferService->hasRequiredSpearmen($kingdomWhoCanAfford)) {
             $requestData = $this->markRequestsAsRejected($requestData);
             $this->messages[] = 'When asking '. $kingdomWhoCanAfford->name . ' For the resources to fulfill each request, the kingdom told us they do not have enough spearmen (need 75) to go with the caravan and guard them.';
+
+            $queue = $this->updateQueueData($queue, $requestData);
+
+            $this->logAndTriggerEvents($queue);
+
+            return;
         }
 
+        $queue = $this->updateQueueData($queue, $requestData);
+
+        $this->createResourceRequest($queue, $kingdom, $kingdomWhoCanAfford, $summedMissingCosts);
+
+        $this->logAndTriggerEvents($queue);
+    }
+
+    private function updateQueueData(CapitalCityBuildingQueue | CapitalCityUnitQueue $queue, array $requestData): CapitalCityBuildingQueue | CapitalCityUnitQueue {
         $queue->update([
             'building_request_data' => $requestData,
             'messages' => $this->messages,
         ]);
 
-        $queue = $queue->refresh();
-
-        if (empty($this->messages)) {
-            $this->createResourceRequest($queue, $kingdom, $kingdomWhoCanAfford, $summedMissingCosts);
-        }
-
-        $this->logAndTriggerEvents($queue);
+        return $queue->refresh();
     }
 
     /**
@@ -165,11 +191,11 @@ class CapitalCityRequestResourcesHandler {
      */
     private function logAndTriggerEvents(CapitalCityUnitQueue | CapitalCityBuildingQueue $queue): void {
 
-        if ($queue instanceof  CapitalCityUnitQueue) {
+        if ($queue instanceof CapitalCityUnitQueue) {
             $this->capitalCityKingdomLogHandler->possiblyCreateLogForUnitQueue($queue);
         }
 
-        if ($queue instanceof  CapitalCityBuildingQueue) {
+        if ($queue instanceof CapitalCityBuildingQueue) {
             $this->capitalCityKingdomLogHandler->possiblyCreateLogForBuildingQueue($queue);
         }
 
