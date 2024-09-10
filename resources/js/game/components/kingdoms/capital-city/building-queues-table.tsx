@@ -34,11 +34,14 @@ export default class BuildingQueuesTable extends React.Component<any, any> {
             building_data_for_cancellation: null,
         };
 
-        this.fetchBuildingQueueAjax = serviceContainer().fetch(FetchBuildingQueuesAjax);
-
-        this.queueListener = serviceContainer().fetch<CapitalCityBuildingQueueTableEventDefinition>(
-            CapitalCityBuildingQueuesTableEvent
+        this.fetchBuildingQueueAjax = serviceContainer().fetch(
+            FetchBuildingQueuesAjax,
         );
+
+        this.queueListener =
+            serviceContainer().fetch<CapitalCityBuildingQueueTableEventDefinition>(
+                CapitalCityBuildingQueuesTableEvent,
+            );
 
         this.queueListener.initialize(this, this.props.user_id);
         this.queueListener.register();
@@ -51,7 +54,7 @@ export default class BuildingQueuesTable extends React.Component<any, any> {
         this.fetchBuildingQueueAjax.fetchQueueData(
             this,
             this.props.character_id,
-            this.props.kingdom_id
+            this.props.kingdom_id,
         );
 
         this.queueListener.listen();
@@ -78,22 +81,24 @@ export default class BuildingQueuesTable extends React.Component<any, any> {
     updateFilteredBuildingData() {
         const searchTerm = this.state.search_query.toLowerCase() || "";
 
-        const filteredQueues = this.state.building_queues.flatMap((queueGroup: any) =>
-            queueGroup.building_queue.filter((queue: any) => {
-                // Ensure properties are defined before calling `toLowerCase()`
-                const kingdomName = queue.kingdom_name?.toLowerCase() || "";
-                const buildingName = queue.building_name?.toLowerCase() || "";
+        const filteredQueues = this.state.building_queues.flatMap(
+            (queueGroup: any) =>
+                queueGroup.building_queue.filter((queue: any) => {
+                    // Ensure properties are defined before calling `toLowerCase()`
+                    const kingdomName = queue.kingdom_name?.toLowerCase() || "";
+                    const buildingName =
+                        queue.building_name?.toLowerCase() || "";
 
-                const kingdomNameMatches = kingdomName.includes(searchTerm);
-                const buildingNameMatches = buildingName.includes(searchTerm);
+                    const kingdomNameMatches = kingdomName.includes(searchTerm);
+                    const buildingNameMatches =
+                        buildingName.includes(searchTerm);
 
-                return kingdomNameMatches || buildingNameMatches;
-            })
+                    return kingdomNameMatches || buildingNameMatches;
+                }),
         );
 
         this.setState({ filtered_building_queues: filteredQueues });
     }
-
 
     handleSearchChange(event: React.ChangeEvent<HTMLInputElement>) {
         const searchTerm = event.target.value;
@@ -109,8 +114,11 @@ export default class BuildingQueuesTable extends React.Component<any, any> {
         let buildingData: any = null;
 
         if (buildingId) {
-            const foundData = this.state.building_queues.flatMap((queueGroup: any) =>
-                queueGroup.building_queue.filter((queue: any) => queue.building_id === buildingId)
+            const foundData = this.state.building_queues.flatMap(
+                (queueGroup: any) =>
+                    queueGroup.building_queue.filter(
+                        (queue: any) => queue.building_id === buildingId,
+                    ),
             );
 
             if (foundData.length > 0) {
