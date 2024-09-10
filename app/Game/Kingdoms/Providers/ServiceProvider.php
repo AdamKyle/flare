@@ -13,6 +13,7 @@ use App\Game\Kingdoms\Console\Commands\UpdateKingdoms;
 use App\Game\Kingdoms\Handlers\AttackKingdomWithUnitsHandler;
 use App\Game\Kingdoms\Handlers\AttackLogHandler;
 use App\Game\Kingdoms\Handlers\CapitalCityHandlers\CapitalCityBuildingManagementRequestHandler;
+use App\Game\Kingdoms\Handlers\CapitalCityHandlers\CapitalCityBuildingRequestHandler;
 use App\Game\Kingdoms\Handlers\CapitalCityHandlers\CapitalCityKingdomLogHandler;
 use App\Game\Kingdoms\Handlers\CapitalCityHandlers\CapitalCityProcessBuildingRequestHandler;
 use App\Game\Kingdoms\Handlers\CapitalCityHandlers\CapitalCityProcessUnitRequestHandler;
@@ -100,7 +101,8 @@ class ServiceProvider extends ApplicationServiceProvider
             return new CapitalCityProcessBuildingRequestHandler(
                 $app->make(CapitalCityKingdomLogHandler::class),
                 $app->make(DistanceCalculation::class),
-                $app->make(CapitalCityRequestResourcesHandler::class)
+                $app->make(CapitalCityRequestResourcesHandler::class),
+                $app->make(CapitalCityBuildingRequestHandler::class)
             );
         });
 
@@ -139,6 +141,15 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(CapitalCityRequestResourcesHandler::class),
                 $app->make(DistanceCalculation::class),
                 $app->make(UnitService::class)
+            );
+        });
+
+        $this->app->bind(CapitalCityBuildingRequestHandler::class, function($app) {
+            return new CapitalCityBuildingRequestHandler(
+                $app->make(CapitalCityKingdomLogHandler::class),
+                $app->make(KingdomBuildingService::class),
+                $app->make(PurchasePeopleService::class),
+                $app->make(UpdateKingdom::class),
             );
         });
 

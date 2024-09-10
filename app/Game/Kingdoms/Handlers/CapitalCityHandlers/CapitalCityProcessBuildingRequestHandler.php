@@ -8,14 +8,16 @@ use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\KingdomBuilding;
 use App\Game\Kingdoms\Events\UpdateCapitalCityBuildingQueueTable;
+use App\Game\Kingdoms\Handlers\Traits\CanAffordPopulationCost;
 use App\Game\Kingdoms\Jobs\CapitalCityBuildingRequest;
 use App\Game\Kingdoms\Values\BuildingQueueType;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
-use App\Game\Kingdoms\Values\UnitCosts;
 use App\Game\Maps\Calculations\DistanceCalculation;
 use Facades\App\Game\Kingdoms\Validation\ResourceValidation;
 
 class CapitalCityProcessBuildingRequestHandler {
+
+    use CanAffordPopulationCost;
 
     /**
      * @var array $messages
@@ -26,11 +28,13 @@ class CapitalCityProcessBuildingRequestHandler {
      * @param CapitalCityKingdomLogHandler $capitalCityKingdomLogHandler
      * @param DistanceCalculation $distanceCalculation
      * @param CapitalCityRequestResourcesHandler $capitalCityRequestResourcesHandler
+     * @param CapitalCityBuildingRequestHandler $capitalCityBuildingRequestHandler
      */
     public function __construct(
         private readonly CapitalCityKingdomLogHandler $capitalCityKingdomLogHandler,
         private readonly DistanceCalculation $distanceCalculation,
         private readonly CapitalCityRequestResourcesHandler $capitalCityRequestResourcesHandler,
+        private readonly CapitalCityBuildingRequestHandler $capitalCityBuildingRequestHandler,
     ) {}
 
     /**
@@ -129,24 +133,6 @@ class CapitalCityProcessBuildingRequestHandler {
     }
 
     /**
-     * Determine if the kingdom can afford the population cost.
-     *
-     * @param Kingdom $kingdom
-     * @param int $populationAmount
-     * @return bool
-     */
-    private function canAffordPopulationCost(Kingdom $kingdom, int $populationAmount): bool
-    {
-        if ($kingdom->treasury <= 0) {
-            return false;
-        }
-
-        $cost = (new UnitCosts(UnitCosts::PERSON))->fetchCost() * $populationAmount;
-
-        return $kingdom->treasury >= $cost;
-    }
-
-    /**
      * Calculate the total missing costs.
      *
      * @param array $requestData
@@ -206,12 +192,7 @@ class CapitalCityProcessBuildingRequestHandler {
         if (!$hasBuildingOrRepairing) {
             $this->createLogAndTriggerEvents($capitalCityBuildingQueue);
         } else {
-            $filteredRequestData = collect($requestData)->filter(fn($item) => in_array($item['secondary_status'], [
-                CapitalCityQueueStatus::BUILDING,
-                CapitalCityQueueStatus::REPAIRING
-            ]))->values()->toArray();
-
-            $this->createUpgradeRequest($capitalCityBuildingQueue->character, $capitalCityBuildingQueue, $capitalCityBuildingQueue->kingdom, $filteredRequestData);
+            $this->createUpgradeOrRepairRequest($capitalCityBuildingQueue->character, $capitalCityBuildingQueue, $capitalCityBuildingQueue->kingdom, $requestData);
             $this->sendOffEvents($capitalCityBuildingQueue);
         }
     }
@@ -255,50 +236,18 @@ class CapitalCityProcessBuildingRequestHandler {
      * @param array $buildingsToUpgradeOrRepair
      * @return void
      */
-    private function createUpgradeRequest(
+    private function createUpgradeOrRepairRequest(
         Character $character,
         CapitalCityBuildingQueue $capitalCityBuildingQueue,
         Kingdom $kingdom,
         array $buildingsToUpgradeOrRepair
     ): void
     {
-        $timeTillFinished = 0;
-        $timeToStart = now();
-
-        foreach ($buildingsToUpgradeOrRepair as $buildingRequest) {
-            $building = $kingdom->buildings()->find($buildingRequest['building_id']);
-            $minutesToRebuild = $building->rebuild_time;
-            $timeReduction = $building->kingdom->fetchKingBasedSkillValue('building_time_reduction');
-            $minutesToRebuild -= $minutesToRebuild * $timeReduction;
-
-            $timeToComplete = $timeToStart->clone()->addMinutes($minutesToRebuild);
-            $timeTillFinished += $minutesToRebuild;
-            $type = $buildingRequest['secondary_status'] === CapitalCityQueueStatus::REPAIRING
-                ? BuildingQueueType::REPAIR
-                : BuildingQueueType::UPGRADE;
-
-            BuildingInQueue::create([
-                'character_id' => $character->id,
-                'kingdom_id' => $kingdom->id,
-                'building_id' => $building->id,
-                'to_level' => $buildingRequest['to_level'],
-                'paid_with_gold' => false,
-                'paid_amount' => 0,
-                'completed_at' => $timeToComplete,
-                'started_at' => $timeToStart,
-                'type' => $type,
-            ]);
-        }
-
-        $totalDelayTime = $timeToStart->clone()->addMinutes($timeTillFinished);
-
-        $capitalCityBuildingQueue->update([
-            'start' => $timeToStart,
-            'completed_at' => $totalDelayTime,
-        ]);
-
-        CapitalCityBuildingRequest::dispatch($capitalCityBuildingQueue->id)->delay(
-            $timeTillFinished >= 15 ? $timeToStart->clone()->addMinutes(15) : $totalDelayTime
+        $this->capitalCityBuildingRequestHandler->createUpgradeOrRepairRequest(
+            $character,
+            $capitalCityBuildingQueue,
+            $kingdom,
+            $buildingsToUpgradeOrRepair,
         );
     }
 }

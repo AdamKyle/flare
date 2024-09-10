@@ -7,6 +7,7 @@ use App\Flare\Models\CapitalCityResourceRequest;
 use App\Flare\Models\CapitalCityUnitQueue;
 use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
+use App\Game\Kingdoms\Events\UpdateCapitalCityBuildingQueueTable;
 use App\Game\Kingdoms\Events\UpdateCapitalCityUnitQueueTable;
 use App\Game\Kingdoms\Jobs\CapitalCityResourceRequest as CapitalCityResourceRequestJob;
 use App\Game\Kingdoms\Service\KingdomMovementTimeCalculationService;
@@ -193,12 +194,14 @@ class CapitalCityRequestResourcesHandler {
 
         if ($queue instanceof CapitalCityUnitQueue) {
             $this->capitalCityKingdomLogHandler->possiblyCreateLogForUnitQueue($queue);
+
+            event(new UpdateCapitalCityUnitQueueTable($queue->character->refresh()));
         }
 
         if ($queue instanceof CapitalCityBuildingQueue) {
             $this->capitalCityKingdomLogHandler->possiblyCreateLogForBuildingQueue($queue);
-        }
 
-        event(new UpdateCapitalCityUnitQueueTable($queue->character->refresh()));
+            event(new UpdateCapitalCityBuildingQueueTable($queue->character->refresh()));
+        }
     }
 }

@@ -11,6 +11,7 @@ use App\Flare\Models\Kingdom;
 use App\Flare\Models\KingdomBuilding;
 use App\Flare\Models\KingdomUnit;
 use App\Game\Kingdoms\Events\UpdateCapitalCityUnitQueueTable;
+use App\Game\Kingdoms\Handlers\Traits\CanAffordPopulationCost;
 use App\Game\Kingdoms\Jobs\CapitalCityResourceRequest as CapitalCityResourceRequestJob;
 use App\Game\Kingdoms\Jobs\CapitalCityUnitRequest;
 use App\Game\Kingdoms\Service\UnitService;
@@ -23,6 +24,8 @@ use Facades\App\Game\Kingdoms\Validation\ResourceValidation;
 
 
 class CapitalCityProcessUnitRequestHandler {
+
+    use CanAffordPopulationCost;
 
     const MAX_DAYS = 7;
 
@@ -157,24 +160,6 @@ class CapitalCityProcessUnitRequestHandler {
         }
 
         return $unitRequest;
-    }
-
-    /**
-     * Check if kingdom can afford the population cost.
-     *
-     * @param Kingdom $kingdom
-     * @param int $populationAmount
-     * @return bool
-     */
-    private function canAffordPopulationCost(Kingdom $kingdom, int $populationAmount): bool
-    {
-        if ($populationAmount <= 0) {
-            return true;
-        }
-
-        $cost = (new UnitCosts(UnitCosts::PERSON))->fetchCost() * $populationAmount;
-
-        return $kingdom->treasury >= $cost;
     }
 
     /**

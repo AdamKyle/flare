@@ -94,72 +94,67 @@ class CapitalCityManagementService
         return $this->capitalCityUnitManagement->createUnitRequests($character, $kingdom, $requestData);
     }
 
-    /**
-     * Fetch the building queue data.
-     */
     public function fetchBuildingQueueData(Character $character, ?Kingdom $kingdom = null): array
     {
+        $queues = CapitalCityBuildingQueue::where('character_id', $character->id)
+            ->when($kingdom, function ($query) use ($kingdom) {
+                return $query->whereHas('kingdom', function ($query) use ($kingdom) {
+                    $query->where('game_map_id', $kingdom->game_map_id);
+                })->where('kingdom_id', '!=', $kingdom->id);
+            })
+            ->get();
 
-        $queues = CapitalCityBuildingQueue::where('character_id', $character->id);
-
-        if (! is_null($kingdom)) {
-            $queues = $queues->whereHas('kingdom', function ($query) use ($kingdom) {
-                $query->where('game_map_id', $kingdom->game_map_id);
-            })->where('kingdom_id', '!=', $kingdom->id);
-        }
-
-        $queues = $queues->get();
-
-        $data = [];
-
-        foreach ($queues as $queue) {
+        $buildingQueueData = $queues->map(function ($queue)  {
             $kingdom = $queue->kingdom;
+            $queueTimeLeftInSeconds = $queue->started_at->diffInSeconds($queue->completed_at);
 
-            $end = Carbon::parse($queue->completed_at)->timestamp;
-            $current = Carbon::now()->timestamp;
+            $buildingRequests = collect($queue->building_request_data)->map(function ($request) use ($kingdom, $queue) {
 
-            $timeLeftInSeconds = 0;
+                $building = KingdomBuilding::where('kingdom_id', $kingdom->id)
+                    ->where('id', $request['building_id'])
+                    ->first();
 
-            if (! now()->gt($queue->completed_at)) {
-                $timeLeftInSeconds = $end - $current;
-            }
+                $timeLeftInSeconds = 0;
 
-            $buildingRequestData = $queue->building_request_data;
+                if ($request['secondary_status'] === CapitalCityQueueStatus::BUILDING || $request['secondary_status'] === CapitalCityQueueStatus::REPAIRING) {
+                    $buildingQueue = BuildingInQueue::where('building_id', $request['building_id'])
+                        ->where('kingdom_id', $kingdom->id)
+                        ->first();
 
-            foreach ($buildingRequestData as $buildingRequest) {
-
-                $building = KingdomBuilding::where('kingdom_id', $kingdom->id)->where('id', $buildingRequest['building_id'])->first();
-
-                if ($buildingRequest['secondary_status'] === CapitalCityQueueStatus::BUILDING || $buildingRequest['secondary_status'] === CapitalCityQueueStatus::REPAIRING) {
-                    $buildingQueue = BuildingInQueue::where('building_id', $buildingRequest['building_id'])->where('kingdom_id', $kingdom->id)->first();
-
-                    if (! is_null($buildingQueue)) {
-                        $end = Carbon::parse($buildingQueue->completed_at)->timestamp;
-                        $current = Carbon::now()->timestamp;
-
-                        $timeLeftInSeconds = $end - $current;
-                    }
+                    $timeLeftInSeconds = $buildingQueue->started_at->diffInSeconds($buildingQueue->completed_at);
                 }
 
-                $queueData = [
-                    'kingdom_name' => $kingdom->name.'(X/Y: '.$kingdom->x_position.'/'.$kingdom->y_position.')',
-                    'status' => $queue->status,
-                    'messages' => $queue->messages,
-                    'time_left_seconds' => $timeLeftInSeconds > 0 ? $timeLeftInSeconds : 0,
+                return [
                     'building_name' => $building->name,
-                    'secondary_status' => $buildingRequest['secondary_status'],
+                    'time_left_seconds' => $timeLeftInSeconds,
+                    'secondary_status' => $request['secondary_status'],
                     'kingdom_id' => $kingdom->id,
                     'building_id' => $building->id,
                     'queue_id' => $queue->id,
                     'is_cancel_request' => false,
                 ];
+            });
 
-                $data[] = $queueData;
-            }
-        }
+            return [
+                'kingdom_name' => $kingdom->name,
+                'status' => $queue->status,
+                'building_queue' => $buildingRequests->sortByDesc('time_left_seconds')->values()->all(),
+                'total_time' => $queueTimeLeftInSeconds,
+            ];
+        });
 
-        return array_values(collect(array_merge($this->fetchBuildingCancellationQueueData($character), $data))->sortByDesc('time_left_seconds')->sortByDesc('is_cancel_request')->toArray());
+        $cancellationQueueData = $this->fetchBuildingCancellationQueueData($character);
+
+        return collect(array_merge($buildingQueueData->toArray(), $cancellationQueueData))
+            ->sortByDesc('total_time')
+            ->values()
+            ->all();
     }
+
+
+
+
+
 
     /**
      * Fetch Unit Queue Data.
@@ -274,42 +269,50 @@ class CapitalCityManagementService
         return $data;
     }
 
-    /**
-     * Fetch building cancellation queue data.
-     */
     private function fetchBuildingCancellationQueueData(Character $character): array
     {
-        $queues = CapitalCityBuildingCancellation::where('character_id', $character->id)->whereNotNull('travel_time_completed_at')->get();
+        $queues = CapitalCityBuildingCancellation::where('character_id', $character->id)
+            ->whereNotNull('travel_time_completed_at')
+            ->get();
 
-        $data = [];
+        $currentTimestamp = Carbon::now()->timestamp;
 
-        foreach ($queues as $queue) {
-            $building = KingdomBuilding::where('kingdom_id', $queue->kingdom_id)->where('id', $queue->building_id)->first();
+        return $queues->map(function ($queue) use ($currentTimestamp) {
+            $building = KingdomBuilding::where('kingdom_id', $queue->kingdom_id)
+                ->where('id', $queue->building_id)
+                ->first();
 
-            $end = Carbon::parse($queue->travel_time_completed_at)->timestamp;
-            $current = Carbon::now()->timestamp;
+            $timeLeftInSeconds = $queue->travel_time_completed_at
+                ? max(Carbon::parse($queue->travel_time_completed_at)->timestamp - $currentTimestamp, 0)
+                : 0;
 
-            $timeLeftInSeconds = 0;
-
-            if (! now()->gt($queue->completed_at)) {
-                $timeLeftInSeconds = $end - $current;
-            }
-
-            $data[] = [
-                'kingdom_name' => $queue->kingdom->name.'(X/Y: '.$queue->kingdom->x_position.'/'.$queue->kingdom->y_position.')',
+            return [
+                'kingdom_name' => $queue->kingdom->name . '(X/Y: ' . $queue->kingdom->x_position . '/' . $queue->kingdom->y_position . ')',
                 'status' => $queue->status,
                 'building_name' => $building->name,
-                'secondary_status' => $queue->status === CapitalCityQueueStatus::CANCELLATION_REJECTED ? 'Cancellation was rejected. Building is either close to or has already finished.' : 'Cancellation request',
+                'secondary_status' => $queue->status === CapitalCityQueueStatus::CANCELLATION_REJECTED
+                    ? 'Cancellation was rejected. Building is either close to or has already finished.'
+                    : 'Cancellation request',
                 'kingdom_id' => $queue->kingdom_id,
                 'building_id' => $building->id,
                 'queue_id' => $queue->id,
                 'time_left_seconds' => max($timeLeftInSeconds, 0),
                 'is_cancel_request' => true,
             ];
-        }
-
-        return $data;
+        })->sortByDesc('time_left_seconds')
+            ->groupBy('kingdom_name')
+            ->map(function ($items) {
+                return [
+                    'kingdom_name' => $items->first()['kingdom_name'],
+                    'building_queue' => $items->values()->all(),
+                    'total_time' => $items->sum('time_left_seconds'),
+                ];
+            })
+            ->sortByDesc('total_time')
+            ->values()
+            ->all();
     }
+
 
     /**
      * Ensure only one capital city exists per game plane.

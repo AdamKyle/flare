@@ -7,6 +7,7 @@ use App\Flare\Models\Kingdom;
 use App\Flare\Models\UnitMovementQueue;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Kingdoms\Events\UpdateKingdomQueues;
+use App\Game\Kingdoms\Handlers\Traits\CanAffordPopulationCost;
 use App\Game\Kingdoms\Jobs\MoveUnits;
 use App\Game\Kingdoms\Values\BuildingCosts;
 use App\Game\Kingdoms\Values\UnitNames;

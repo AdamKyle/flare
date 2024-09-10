@@ -16,9 +16,9 @@ class CapitalCityBuildingRequest implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public function __construct(private readonly int $capitalCityQueueId, private readonly int $characterId) {}
+    public function __construct(private readonly int $capitalCityQueueId) {}
 
-    public function handle(CapitalCityBuildingManagement $capitalCityBuildingManagement): void
+    public function handle(): void
     {
 
         $queueData = CapitalCityBuildingQueue::find($this->capitalCityQueueId);
@@ -40,7 +40,6 @@ class CapitalCityBuildingRequest implements ShouldQueue
                 // @codeCoverageIgnoreStart
                 CapitalCityBuildingRequestMovement::dispatch(
                     $this->capitalCityQueueId,
-                    $this->characterId,
                 )->delay($time);
 
                 return;
