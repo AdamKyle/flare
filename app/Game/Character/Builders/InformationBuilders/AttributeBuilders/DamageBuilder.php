@@ -299,7 +299,7 @@ class DamageBuilder extends BaseAttribute
             return 0;
         }
 
-        $lifeStealAmounts = $lifeStealAmounts >= 1 ? .99 : $lifeStealAmounts;
+        $lifeStealAmounts = min($lifeStealAmounts, .50);
 
         $lifeStealAmount = $this->getLifeStealAfterPlaneReductions($gameMap, $lifeStealAmounts);
 
