@@ -1,4 +1,6 @@
 import Kingdom from "../deffinitions/kingdom";
+import { BuildingQueue } from "../../deffinitions/building-queue";
+
 
 export default interface BuildingsToUpgradeSectionState {
     loading: boolean;
@@ -10,7 +12,7 @@ export default interface BuildingsToUpgradeSectionState {
     open_kingdom_ids: Set<number>;
     sort_direction: "asc" | "desc";
     search_query: string;
-    building_queue: { kingdomId: number; buildingIds: number[] }[];
+    building_queue: BuildingQueue[];
     currentPage: number;
     itemsPerPage: number;
 }
