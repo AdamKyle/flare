@@ -1,15 +1,7 @@
 import React, { Fragment } from "react";
-import BuildingsToUpgradeSection from "../capital-city/buildings-to-upgrade-section";
-import PrimaryOutlineButton from "../../ui/buttons/primary-outline-button";
-import DangerOutlineButton from "../../ui/buttons/danger-outline-button";
-import {
-    addToQueue,
-    removeFromQueue,
-} from "../capital-city/helpers/queue_management";
+
 import BuildingQueuesTable from "../capital-city/building-queues-table";
-import BuildingDetails from "../buildings/deffinitions/building-details";
 import TimerProgressBar from "../../ui/progress-bars/timer-progress-bar";
-import DangerButton from "../../ui/buttons/danger-button";
 import { capitalize } from "lodash";
 
 /**

@@ -16,7 +16,7 @@ import OrangeButton from "../../ui/buttons/orange-button";
 import Kingdom from "./deffinitions/kingdom";
 import Building from "./deffinitions/building";
 import BuildingDetails from "./types/partials/building-details";
-import BuildingToUpgradeService from "./helpers/building-to-upgrade-service";
+import BuildingToUpgradeService from "./services/building-to-upgrade-service";
 
 const MAX_ITEMS_PER_PAGE = 10;
 
