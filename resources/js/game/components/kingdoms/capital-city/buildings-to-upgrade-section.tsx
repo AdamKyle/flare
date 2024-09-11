@@ -103,20 +103,22 @@ export default class BuildingsToUpgradeSection extends React.Component<
 
         const openKingdomIds = new Set<number>();
 
-        let filteredBuildingData = this.state.building_data
-            .filter((kingdom: any) => {
+        let filteredBuildingData = this.state.building_data.filter(
+            (kingdom: any) => {
                 return (
                     (kingdom.kingdom_name.toLowerCase() === searchTerm ||
-                    kingdom.map_name.toLowerCase().includes(searchTerm)) &&
+                        kingdom.map_name.toLowerCase().includes(searchTerm)) &&
                     kingdom.buildings.length > 0
                 );
-            });
+            },
+        );
 
         if (filteredBuildingData.length <= 0 && searchTerm.length > 0) {
             filteredBuildingData = this.state.building_data
                 .map((kingdom: any) => {
-                    const matchingBuildings = kingdom.buildings.filter((building: any) =>
-                        building.name.toLowerCase().includes(searchTerm)
+                    const matchingBuildings = kingdom.buildings.filter(
+                        (building: any) =>
+                            building.name.toLowerCase().includes(searchTerm),
                     );
 
                     if (matchingBuildings.length > 0) {
@@ -124,7 +126,7 @@ export default class BuildingsToUpgradeSection extends React.Component<
 
                         return {
                             ...kingdom,
-                            buildings: matchingBuildings
+                            buildings: matchingBuildings,
                         };
                     }
 
@@ -137,13 +139,17 @@ export default class BuildingsToUpgradeSection extends React.Component<
         const sortedData = filteredBuildingData.map((kingdom: any) => ({
             ...kingdom,
             buildings: kingdom.buildings.sort((a: any, b: any) =>
-                this.state.sort_direction === "asc" ? a.level - b.level : b.level - a.level,
+                this.state.sort_direction === "asc"
+                    ? a.level - b.level
+                    : b.level - a.level,
             ),
         }));
 
-        this.setState({ filtered_building_data: sortedData, open_kingdom_ids: openKingdomIds });
+        this.setState({
+            filtered_building_data: sortedData,
+            open_kingdom_ids: openKingdomIds,
+        });
     }
-
 
     handleSearchChange(event: React.ChangeEvent<HTMLInputElement>) {
         const searchTerm = event.target.value;
@@ -254,8 +260,11 @@ export default class BuildingsToUpgradeSection extends React.Component<
     }
 
     renderPagination() {
-        const { currentPage, itemsPerPage, filtered_building_data } = this.state;
-        const totalPages = Math.ceil(filtered_building_data.length / itemsPerPage);
+        const { currentPage, itemsPerPage, filtered_building_data } =
+            this.state;
+        const totalPages = Math.ceil(
+            filtered_building_data.length / itemsPerPage,
+        );
 
         const pages = [];
         for (let i = 1; i <= totalPages; i++) {
@@ -263,22 +272,19 @@ export default class BuildingsToUpgradeSection extends React.Component<
                 <button
                     key={i}
                     onClick={() => this.handlePageChange(i)}
-                    className={`px-4 py-2 mx-1 rounded ${i === currentPage ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'} hover:bg-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                    className={`px-4 py-2 mx-1 rounded ${i === currentPage ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-700"} hover:bg-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500`}
                 >
                     {i}
-                </button>
+                </button>,
             );
         }
 
-        return (
-            <div className="flex justify-center mt-4">
-                {pages}
-            </div>
-        );
+        return <div className="flex justify-center mt-4">{pages}</div>;
     }
 
     getPaginatedData() {
-        const { currentPage, itemsPerPage, filtered_building_data } = this.state;
+        const { currentPage, itemsPerPage, filtered_building_data } =
+            this.state;
         const startIndex = (currentPage - 1) * itemsPerPage;
         const endIndex = startIndex + itemsPerPage;
 
