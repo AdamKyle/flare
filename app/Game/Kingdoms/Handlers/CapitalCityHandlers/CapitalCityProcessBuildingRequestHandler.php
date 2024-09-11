@@ -192,7 +192,7 @@ class CapitalCityProcessBuildingRequestHandler {
         if (!$hasBuildingOrRepairing) {
             $this->createLogAndTriggerEvents($capitalCityBuildingQueue);
         } else {
-            $this->createUpgradeOrRepairRequest($capitalCityBuildingQueue->character, $capitalCityBuildingQueue, $capitalCityBuildingQueue->kingdom, $requestData);
+            $this->createUpgradeOrRepairRequest($capitalCityBuildingQueue, $capitalCityBuildingQueue->kingdom, $requestData);
             $this->sendOffEvents($capitalCityBuildingQueue);
         }
     }
@@ -230,21 +230,18 @@ class CapitalCityProcessBuildingRequestHandler {
     /**
      * Create upgrade requests for buildings.
      *
-     * @param Character $character
      * @param CapitalCityBuildingQueue $capitalCityBuildingQueue
      * @param Kingdom $kingdom
      * @param array $buildingsToUpgradeOrRepair
      * @return void
      */
     private function createUpgradeOrRepairRequest(
-        Character $character,
         CapitalCityBuildingQueue $capitalCityBuildingQueue,
         Kingdom $kingdom,
         array $buildingsToUpgradeOrRepair
     ): void
     {
         $this->capitalCityBuildingRequestHandler->createUpgradeOrRepairRequest(
-            $character,
             $capitalCityBuildingQueue,
             $kingdom,
             $buildingsToUpgradeOrRepair,

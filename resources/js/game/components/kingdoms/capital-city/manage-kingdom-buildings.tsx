@@ -53,11 +53,11 @@ export default class ManageKingdomBuildings extends React.Component<any, any> {
                     on_click={this.manageShowRepairList.bind(this)}
                 >
                     Clicking this card will let you repair broken buildings
-                    across your kingdoms on this plane.Resources will auto be
+                    across your kingdoms on this plane. Resources will auto be
                     requested, population is purchased from the kingdom
                     treasury. All automatically. Below will be a table of the
                     request queues. Each kingdom will get a log stating what was
-                    or wasn't upgraded.
+                    or wasn't repaired.
                 </ClickableIconCard>
             </div>
         );

@@ -2,7 +2,6 @@
 
 namespace App\Game\Kingdoms\Handlers\CapitalCityHandlers;
 
-use App\Flare\Models\BuildingInQueue;
 use App\Flare\Models\CapitalCityBuildingQueue;
 use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
@@ -13,9 +12,7 @@ use App\Game\Kingdoms\Jobs\CapitalCityBuildingRequest;
 use App\Game\Kingdoms\Service\KingdomBuildingService;
 use App\Game\Kingdoms\Service\PurchasePeopleService;
 use App\Game\Kingdoms\Service\UpdateKingdom;
-use App\Game\Kingdoms\Values\BuildingQueueType;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
-use App\Game\Skills\Values\SkillTypeValue;
 use Facades\App\Game\Kingdoms\Validation\ResourceValidation;
 use Carbon\Carbon;
 
@@ -35,7 +32,6 @@ class CapitalCityBuildingRequestHandler {
     /**
      * Create an upgrade or repair request for a character.
      *
-     * @param Character $character
      * @param CapitalCityBuildingQueue $capitalCityBuildingQueue
      * @param Kingdom $kingdom
      * @param array $buildingsToUpgradeOrRepair
@@ -43,7 +39,6 @@ class CapitalCityBuildingRequestHandler {
      * @return void
      */
     public function createUpgradeOrRepairRequest(
-        Character $character,
         CapitalCityBuildingQueue $capitalCityBuildingQueue,
         Kingdom $kingdom,
         array $buildingsToUpgradeOrRepair
@@ -59,7 +54,6 @@ class CapitalCityBuildingRequestHandler {
             $building = $kingdom->buildings()->find($buildingRequest['building_id']);
             $minutesToRebuild = $this->calculateRebuildTime($building, $buildingRequest['secondary_status']);
 
-            $timeToComplete = $timeToStart->clone()->addMinutes($minutesToRebuild);
             $timeTillFinished += $minutesToRebuild;
 
             if ($buildingRequest['secondary_status'] === CapitalCityQueueStatus::REPAIRING) {
@@ -67,8 +61,6 @@ class CapitalCityBuildingRequestHandler {
             } else {
                 $this->kingdomBuildingService->updateKingdomResourcesForKingdomBuildingUpgrade($building);
             }
-
-            $this->queueBuildingRequest($character, $kingdom, $building, $buildingRequest, $timeToStart, $timeToComplete);
         }
 
         dump('createUpgradeOrRepairRequest - time till finished for $capitalCityBuildingQueue');
@@ -145,64 +137,6 @@ class CapitalCityBuildingRequestHandler {
     }
 
     /**
-     * Queue a building upgrade or repair request.
-     *
-     * @param Character $character
-     * @param Kingdom $kingdom
-     * @param KingdomBuilding $building
-     * @param array $buildingRequest
-     * @param Carbon $timeToStart
-     * @param Carbon $timeToComplete
-     *
-     * @return void
-     */
-    private function queueBuildingRequest(
-        Character $character,
-        Kingdom $kingdom,
-        KingdomBuilding $building,
-        array $buildingRequest,
-        Carbon $timeToStart,
-        Carbon $timeToComplete
-    ): void {
-        $type = $buildingRequest['secondary_status'] === CapitalCityQueueStatus::REPAIRING
-            ? BuildingQueueType::REPAIR
-            : BuildingQueueType::UPGRADE;
-
-        BuildingInQueue::create([
-            'character_id' => $character->id,
-            'kingdom_id' => $kingdom->id,
-            'building_id' => $building->id,
-            'to_level' => $buildingRequest['to_level'],
-            'paid_with_gold' => false,
-            'paid_amount' => 0,
-            'completed_at' => $timeToComplete,
-            'started_at' => $timeToStart,
-            'type' => $type,
-        ]);
-    }
-
-    /**
-     * Update the capital city building queue.
-     *
-     * @param CapitalCityBuildingQueue $capitalCityBuildingQueue
-     * @param Carbon $timeToStart
-     * @param int $timeTillFinished
-     *
-     * @return void
-     */
-    private function updateBuildingQueue(CapitalCityBuildingQueue $capitalCityBuildingQueue, Carbon $timeToStart, int $timeTillFinished): void
-    {
-        $totalDelayTime = $timeToStart->clone()->addMinutes($timeTillFinished);
-
-        $capitalCityBuildingQueue->update([
-            'start' => $timeToStart,
-            'completed_at' => $totalDelayTime,
-        ]);
-
-        $capitalCityBuildingQueue->refresh();
-    }
-
-    /**
      * Dispatch or log the building request.
      *
      * @param CapitalCityBuildingQueue $capitalCityBuildingQueue
@@ -225,7 +159,7 @@ class CapitalCityBuildingRequestHandler {
 
         if (!empty($filteredRequestData)) {
             CapitalCityBuildingRequest::dispatch($capitalCityBuildingQueue->id)->delay(
-                $timeTillFinished >= 15 ? $timeToStart->clone()->addMinutes(15) : $timeTillFinished
+                ($timeTillFinished >= 15 ? $timeToStart->clone()->addMinutes(15) : $timeTillFinished)
             );
 
             $this->updateKingdom->updateKingdom($capitalCityBuildingQueue->kingdom);

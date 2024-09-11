@@ -27,7 +27,7 @@ class CapitalCityBuildingRequest implements ShouldQueue
             return;
         }
 
-        if (! $queueData->completed_at->lessThanOrEqualTo(now())) {
+        if (!$queueData->completed_at->lessThanOrEqualTo(now())) {
             $timeLeft = $queueData->completed_at->diffInMinutes(now());
 
             if ($timeLeft >= 1) {
@@ -46,8 +46,5 @@ class CapitalCityBuildingRequest implements ShouldQueue
                 // @codeCoverageIgnoreEnd
             }
         }
-
-        dump('CapitalCityBuildingRequest');
-        dump($queueData);
     }
 }

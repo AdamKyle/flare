@@ -8,10 +8,14 @@ import debounce from "lodash/debounce";
 import ProcessUpgradeBuildingsAjax from "../ajax/process-upgrade-buildings-ajax";
 import SuccessAlert from "../../ui/alerts/simple-alerts/success-alert";
 import DangerAlert from "../../ui/alerts/simple-alerts/danger-alert";
+import BuildingsToUpgradeSectionProps from "./types/buildings-to-upgrade-section-props";
+import BuildingsToUpgradeSectionState from "./types/buildings-to-upgrade-section-state";
+
+const MAX_ITEMS_PER_PAGE = 10;
 
 export default class BuildingsToUpgradeSection extends React.Component<
-    any,
-    any
+    BuildingsToUpgradeSectionProps,
+    BuildingsToUpgradeSectionState
 > {
     private fetchUpgradableKingdomsAjax: FetchUpgradableKingdomsAjax;
     private processBuildingRequest: ProcessUpgradeBuildingsAjax;
@@ -31,6 +35,8 @@ export default class BuildingsToUpgradeSection extends React.Component<
             sort_direction: "asc",
             search_query: "",
             building_queue: [],
+            currentPage: 1,
+            itemsPerPage: MAX_ITEMS_PER_PAGE,
         };
 
         this.fetchUpgradableKingdomsAjax = serviceContainer().fetch(
@@ -63,7 +69,7 @@ export default class BuildingsToUpgradeSection extends React.Component<
     }
 
     toggleDetails(kingdomId: number) {
-        this.setState((prevState: any) => {
+        this.setState((prevState: BuildingsToUpgradeSectionState) => {
             const newOpenKingdomIds = new Set(prevState.open_kingdom_ids);
             if (newOpenKingdomIds.has(kingdomId)) {
                 newOpenKingdomIds.delete(kingdomId);
@@ -93,66 +99,51 @@ export default class BuildingsToUpgradeSection extends React.Component<
     }
 
     updateFilteredBuildingData() {
-        const searchTerm = this.state.search_query?.toLowerCase() || "";
+        const searchTerm = this.state.search_query.toLowerCase().trim();
 
-        const filteredBuildingData = this.state.building_data
-            .map((kingdom: any) => {
-                const kingdomNameMatches =
-                    kingdom.kingdom_name.toLowerCase() === searchTerm;
-                const mapNameMatches = kingdom.map_name
-                    .toLowerCase()
-                    .includes(searchTerm);
-                const matchingBuildings = kingdom.buildings.filter(
-                    (building: any) => {
-                        const buildingName = building.name
-                            ? building.name.toLowerCase()
-                            : "";
-                        return buildingName.includes(searchTerm);
-                    },
-                );
+        const openKingdomIds = new Set<number>();
 
-                if (
-                    matchingBuildings.length > 0 ||
-                    kingdomNameMatches ||
-                    mapNameMatches
-                ) {
-                    this.state.open_kingdom_ids.add(kingdom.kingdom_id);
-                } else {
-                    this.state.open_kingdom_ids.delete(kingdom.kingdom_id);
-                }
-
-                return {
-                    ...kingdom,
-                    buildings:
-                        kingdomNameMatches || mapNameMatches
-                            ? kingdom.buildings
-                            : matchingBuildings,
-                    matchingBuildings,
-                };
-            })
+        let filteredBuildingData = this.state.building_data
             .filter((kingdom: any) => {
-                if (searchTerm !== "") {
-                    return (
-                        kingdom.kingdom_name.toLowerCase() === searchTerm ||
-                        kingdom.map_name.toLowerCase().includes(searchTerm) ||
-                        kingdom.matchingBuildings.length > 0
-                    );
-                }
-                return true;
+                return (
+                    (kingdom.kingdom_name.toLowerCase() === searchTerm ||
+                    kingdom.map_name.toLowerCase().includes(searchTerm)) &&
+                    kingdom.buildings.length > 0
+                );
             });
+
+        if (filteredBuildingData.length <= 0 && searchTerm.length > 0) {
+            filteredBuildingData = this.state.building_data
+                .map((kingdom: any) => {
+                    const matchingBuildings = kingdom.buildings.filter((building: any) =>
+                        building.name.toLowerCase().includes(searchTerm)
+                    );
+
+                    if (matchingBuildings.length > 0) {
+                        openKingdomIds.add(kingdom.kingdom_id);
+
+                        return {
+                            ...kingdom,
+                            buildings: matchingBuildings
+                        };
+                    }
+
+                    return null;
+                })
+                .filter((kingdom: any) => kingdom !== null);
+        }
 
         // Apply sorting after filtering
         const sortedData = filteredBuildingData.map((kingdom: any) => ({
             ...kingdom,
             buildings: kingdom.buildings.sort((a: any, b: any) =>
-                this.state.sort_direction === "asc"
-                    ? a.level - b.level
-                    : b.level - a.level,
+                this.state.sort_direction === "asc" ? a.level - b.level : b.level - a.level,
             ),
         }));
 
-        this.setState({ filtered_building_data: sortedData });
+        this.setState({ filtered_building_data: sortedData, open_kingdom_ids: openKingdomIds });
     }
+
 
     handleSearchChange(event: React.ChangeEvent<HTMLInputElement>) {
         const searchTerm = event.target.value;
@@ -258,6 +249,42 @@ export default class BuildingsToUpgradeSection extends React.Component<
         });
     }
 
+    handlePageChange(pageNumber: number) {
+        this.setState({ currentPage: pageNumber });
+    }
+
+    renderPagination() {
+        const { currentPage, itemsPerPage, filtered_building_data } = this.state;
+        const totalPages = Math.ceil(filtered_building_data.length / itemsPerPage);
+
+        const pages = [];
+        for (let i = 1; i <= totalPages; i++) {
+            pages.push(
+                <button
+                    key={i}
+                    onClick={() => this.handlePageChange(i)}
+                    className={`px-4 py-2 mx-1 rounded ${i === currentPage ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'} hover:bg-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                >
+                    {i}
+                </button>
+            );
+        }
+
+        return (
+            <div className="flex justify-center mt-4">
+                {pages}
+            </div>
+        );
+    }
+
+    getPaginatedData() {
+        const { currentPage, itemsPerPage, filtered_building_data } = this.state;
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        const endIndex = startIndex + itemsPerPage;
+
+        return filtered_building_data.slice(startIndex, endIndex);
+    }
+
     render() {
         if (this.state.loading) {
             return <LoadingProgressBar />;
@@ -325,7 +352,7 @@ export default class BuildingsToUpgradeSection extends React.Component<
                     {this.state.building_data.length}
                 </div>
 
-                {this.state.filtered_building_data.map((kingdom: any) => (
+                {this.getPaginatedData().map((kingdom: any) => (
                     <div
                         key={kingdom.kingdom_id}
                         className="bg-gray-100 dark:bg-gray-700 shadow-md rounded-lg overflow-hidden mb-4"
@@ -453,6 +480,7 @@ export default class BuildingsToUpgradeSection extends React.Component<
                         )}
                     </div>
                 ))}
+                {this.renderPagination()}
             </div>
         );
     }

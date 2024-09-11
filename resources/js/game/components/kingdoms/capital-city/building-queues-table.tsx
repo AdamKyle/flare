@@ -224,12 +224,6 @@ export default class BuildingQueuesTable extends React.Component<any, any> {
                                         >
                                             Cancel Upgrade
                                         </button>
-                                        <TimerProgressBar
-                                            time_remaining={
-                                                queue.time_left_seconds
-                                            }
-                                            time_out_label={"Time left ...."}
-                                        />
                                     </div>
                                 ))}
                             </div>
