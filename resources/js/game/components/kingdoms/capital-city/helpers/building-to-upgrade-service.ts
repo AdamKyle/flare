@@ -9,18 +9,18 @@ import { inject, injectable } from "tsyringe";
 
 @injectable()
 export default class BuildingToUpgradeService {
-
     private component?: BuildingsToUpgradeSection;
 
-    constructor(@inject(ProcessUpgradeBuildingsAjax) private processBuildingRequest: ProcessUpgradeBuildingsAjax) {
-    }
+    constructor(
+        @inject(ProcessUpgradeBuildingsAjax)
+        private processBuildingRequest: ProcessUpgradeBuildingsAjax,
+    ) {}
 
     public setComponent(component: BuildingsToUpgradeSection) {
         this.component = component;
     }
 
     toggleDetails(kingdomId: number) {
-
         if (!this.component) {
             return;
         }
@@ -37,12 +37,12 @@ export default class BuildingToUpgradeService {
     }
 
     sortBuildings() {
-
         if (!this.component) {
             return;
         }
 
-        const filteredBuildingData = this.component.state.filtered_building_data;
+        const filteredBuildingData =
+            this.component.state.filtered_building_data;
         const sortDirection = this.component.state.sort_direction;
         const newDirection = sortDirection === "asc" ? "desc" : "asc";
 
@@ -60,12 +60,13 @@ export default class BuildingToUpgradeService {
     }
 
     updateFilteredBuildingData() {
-
         if (!this.component) {
             return;
         }
 
-        const searchTerm = this.component.state.search_query.toLowerCase().trim();
+        const searchTerm = this.component.state.search_query
+            .toLowerCase()
+            .trim();
 
         const openKingdomIds = new Set<number>();
 
@@ -82,7 +83,6 @@ export default class BuildingToUpgradeService {
         if (filteredBuildingData.length <= 0 && searchTerm.length > 0) {
             filteredBuildingData = this.component.state.building_data
                 .map((kingdom: Kingdom | null) => {
-
                     if (kingdom === null) {
                         return null;
                     }
@@ -109,14 +109,13 @@ export default class BuildingToUpgradeService {
         const sortedData = filteredBuildingData.map((kingdom: Kingdom) => ({
             ...kingdom,
             buildings: kingdom.buildings.sort((a: Building, b: Building) => {
-
                 if (!this.component) {
                     return a.level;
                 }
 
                 return this.component.state.sort_direction === "asc"
                     ? a.level - b.level
-                    : b.level - a.level
+                    : b.level - a.level;
             }),
         }));
 
@@ -127,7 +126,6 @@ export default class BuildingToUpgradeService {
     }
 
     handleSearchChange(event: React.ChangeEvent<HTMLInputElement>) {
-
         if (!this.component) {
             return;
         }
@@ -142,7 +140,6 @@ export default class BuildingToUpgradeService {
     }, 300);
 
     sendOrders() {
-
         if (!this.component) {
             return;
         }
@@ -154,7 +151,6 @@ export default class BuildingToUpgradeService {
                 error_message: null,
             },
             () => {
-
                 if (!this.component) {
                     return;
                 }
@@ -170,13 +166,11 @@ export default class BuildingToUpgradeService {
     }
 
     toggleBuildingQueue(kingdomId: number, buildingId: number) {
-
         if (!this.component) {
             return;
         }
 
         this.component.setState((prevState: BuildingsToUpgradeSectionState) => {
-
             const queue = [...prevState.building_queue];
             const kingdomQueue = queue.find(
                 (item: BuildingQueue) => item.kingdomId === kingdomId,
@@ -206,13 +200,11 @@ export default class BuildingToUpgradeService {
     }
 
     toggleQueueAllBuildings(kingdomId: number) {
-
         if (!this.component) {
             return;
         }
 
         this.component.setState((prevState: BuildingsToUpgradeSectionState) => {
-
             if (!this.component) {
                 return prevState;
             }
@@ -232,7 +224,9 @@ export default class BuildingToUpgradeService {
                 if (kingdomQueue.buildingIds.length === buildings.length) {
                     queue.splice(queue.indexOf(kingdomQueue), 1);
                 } else {
-                    kingdomQueue.buildingIds = buildings.map((b: Building) => b.id);
+                    kingdomQueue.buildingIds = buildings.map(
+                        (b: Building) => b.id,
+                    );
                 }
             } else {
                 queue.push({
@@ -246,7 +240,6 @@ export default class BuildingToUpgradeService {
     }
 
     handlePageChange(pageNumber: number) {
-
         if (!this.component) {
             return;
         }
@@ -255,7 +248,6 @@ export default class BuildingToUpgradeService {
     }
 
     getPaginatedData() {
-
         if (!this.component) {
             return [];
         }
@@ -269,18 +261,14 @@ export default class BuildingToUpgradeService {
     }
 
     hasBuildingInQueue(kingdom: Kingdom, building: Building): boolean {
-
         if (!this.component) {
             return false;
         }
 
         return this.component.state.building_queue.some(
             (item: BuildingQueue) =>
-                item.kingdomId ===
-                kingdom.kingdom_id &&
-                item.buildingIds.includes(
-                    building.id,
-                ),
+                item.kingdomId === kingdom.kingdom_id &&
+                item.buildingIds.includes(building.id),
         );
     }
 }

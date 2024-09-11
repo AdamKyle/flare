@@ -1,7 +1,6 @@
 import Kingdom from "../deffinitions/kingdom";
 import { BuildingQueue } from "../../deffinitions/building-queue";
 
-
 export default interface BuildingsToUpgradeSectionState {
     loading: boolean;
     processing_request: boolean;

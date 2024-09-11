@@ -54,7 +54,7 @@ export default class BuildingsToUpgradeSection extends React.Component<
                 CapitalCityBuildingUpgradeRepairTableEvent,
             );
         this.buildingToUpgradeService = serviceContainer().fetch(
-            BuildingToUpgradeService
+            BuildingToUpgradeService,
         );
 
         this.buildingToUpgradeService.setComponent(this);
@@ -79,7 +79,6 @@ export default class BuildingsToUpgradeSection extends React.Component<
     }
 
     resetFilters() {
-
         this.setState(
             {
                 search_query: "",
@@ -89,13 +88,11 @@ export default class BuildingsToUpgradeSection extends React.Component<
                 this.buildingToUpgradeService.updateFilteredBuildingData(); // apply the reset
             },
         );
-    };
+    }
 
     resetQueue() {
-
         this.setState({ building_queue: [] });
-    };
-
+    }
 
     render() {
         if (this.state.loading) {
@@ -117,7 +114,9 @@ export default class BuildingsToUpgradeSection extends React.Component<
                 <input
                     type="text"
                     value={this.state.search_query}
-                    onChange={(e: ChangeEvent<HTMLInputElement>) => this.buildingToUpgradeService.handleSearchChange(e)}
+                    onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                        this.buildingToUpgradeService.handleSearchChange(e)
+                    }
                     placeholder="Search by kingdom name, map name, or building name"
                     className="w-full my-4 px-4 py-2 border rounded text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-700 dark:placeholder-gray-300"
                     aria-label="Search by kingdom name, map name, or building name"
@@ -125,7 +124,9 @@ export default class BuildingsToUpgradeSection extends React.Component<
 
                 <div className="flex space-x-4 mb-4">
                     <PrimaryOutlineButton
-                        on_click={() => this.buildingToUpgradeService.sortBuildings()}
+                        on_click={() =>
+                            this.buildingToUpgradeService.sortBuildings()
+                        }
                         button_label={
                             <>
                                 Sort by Building Level
@@ -145,10 +146,12 @@ export default class BuildingsToUpgradeSection extends React.Component<
                         <>
                             <DangerOutlineButton
                                 on_click={() => this.resetQueue()}
-                                button_label={'Reset Queue'}
+                                button_label={"Reset Queue"}
                             />
                             <SuccessOutlineButton
-                                on_click={() => this.buildingToUpgradeService.sendOrders()}
+                                on_click={() =>
+                                    this.buildingToUpgradeService.sendOrders()
+                                }
                                 button_label="Send Orders"
                             />
                         </>
@@ -160,64 +163,84 @@ export default class BuildingsToUpgradeSection extends React.Component<
                     {this.state.building_data.length}
                 </div>
 
-                {this.buildingToUpgradeService.getPaginatedData().map((kingdom: Kingdom) => (
-                    <div
-                        key={kingdom.kingdom_id}
-                        className="bg-gray-100 dark:bg-gray-700 shadow-md rounded-lg overflow-hidden mb-4"
-                    >
+                {this.buildingToUpgradeService
+                    .getPaginatedData()
+                    .map((kingdom: Kingdom) => (
                         <div
-                            className="p-4 flex justify-between items-center cursor-pointer"
-                            onClick={() =>
-                                this.buildingToUpgradeService.toggleDetails(kingdom.kingdom_id)
-                            }
+                            key={kingdom.kingdom_id}
+                            className="bg-gray-100 dark:bg-gray-700 shadow-md rounded-lg overflow-hidden mb-4"
                         >
-                            <div>
-                                <h2 className="text-xl font-bold dark:text-white">
-                                    {kingdom.kingdom_name}
-                                </h2>
-                                <p className="text-gray-500 dark:text-gray-400">
-                                    {kingdom.map_name}
-                                </p>
+                            <div
+                                className="p-4 flex justify-between items-center cursor-pointer"
+                                onClick={() =>
+                                    this.buildingToUpgradeService.toggleDetails(
+                                        kingdom.kingdom_id,
+                                    )
+                                }
+                            >
+                                <div>
+                                    <h2 className="text-xl font-bold dark:text-white">
+                                        {kingdom.kingdom_name}
+                                    </h2>
+                                    <p className="text-gray-500 dark:text-gray-400">
+                                        {kingdom.map_name}
+                                    </p>
+                                </div>
+                                <i
+                                    className={`fas fa-chevron-${this.state.open_kingdom_ids.has(kingdom.kingdom_id) ? "down" : "up"} text-gray-500 dark:text-gray-400`}
+                                ></i>
                             </div>
-                            <i
-                                className={`fas fa-chevron-${this.state.open_kingdom_ids.has(kingdom.kingdom_id) ? "down" : "up"} text-gray-500 dark:text-gray-400`}
-                            ></i>
-                        </div>
 
-                        {this.state.open_kingdom_ids.has(
-                            kingdom.kingdom_id,
-                        ) && (
-                            <div className="bg-gray-300 dark:bg-gray-600 p-4">
-                                <OrangeButton
-                                    on_click={() =>
-                                        this.buildingToUpgradeService.toggleQueueAllBuildings(
-                                            kingdom.kingdom_id,
-                                        )
-                                    }
-                                    button_label={
-                                        this.state.building_queue.find(
-                                            (item: any) =>
-                                                item.kingdomId ===
+                            {this.state.open_kingdom_ids.has(
+                                kingdom.kingdom_id,
+                            ) && (
+                                <div className="bg-gray-300 dark:bg-gray-600 p-4">
+                                    <OrangeButton
+                                        on_click={() =>
+                                            this.buildingToUpgradeService.toggleQueueAllBuildings(
                                                 kingdom.kingdom_id,
-                                        )?.buildingIds.length ===
-                                        kingdom.buildings.length
-                                            ? "Remove All from Queue"
-                                            : "Add All to Queue"
-                                    }
-                                    additional_css="w-full mb-4"
-                                />
-                                {kingdom.buildings.map((building: Building) => (
-                                    <BuildingDetails building={building}
-                                                     kingdom={kingdom}
-                                                     toggle_building_queue={this.buildingToUpgradeService.toggleBuildingQueue.bind(this.buildingToUpgradeService)}
-                                                     has_building_in_queue={this.buildingToUpgradeService.hasBuildingInQueue.bind(this.buildingToUpgradeService)}
+                                            )
+                                        }
+                                        button_label={
+                                            this.state.building_queue.find(
+                                                (item: any) =>
+                                                    item.kingdomId ===
+                                                    kingdom.kingdom_id,
+                                            )?.buildingIds.length ===
+                                            kingdom.buildings.length
+                                                ? "Remove All from Queue"
+                                                : "Add All to Queue"
+                                        }
+                                        additional_css="w-full mb-4"
                                     />
-                                ))}
-                            </div>
-                        )}
-                    </div>
-                ))}
-                <Pagination on_page_change={this.buildingToUpgradeService.handlePageChange.bind(this.buildingToUpgradeService)} current_page={this.state.currentPage} items_per_page={MAX_ITEMS_PER_PAGE} total_items={this.state.filtered_building_data.length} />
+                                    {kingdom.buildings.map(
+                                        (building: Building) => (
+                                            <BuildingDetails
+                                                building={building}
+                                                kingdom={kingdom}
+                                                toggle_building_queue={this.buildingToUpgradeService.toggleBuildingQueue.bind(
+                                                    this
+                                                        .buildingToUpgradeService,
+                                                )}
+                                                has_building_in_queue={this.buildingToUpgradeService.hasBuildingInQueue.bind(
+                                                    this
+                                                        .buildingToUpgradeService,
+                                                )}
+                                            />
+                                        ),
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                    ))}
+                <Pagination
+                    on_page_change={this.buildingToUpgradeService.handlePageChange.bind(
+                        this.buildingToUpgradeService,
+                    )}
+                    current_page={this.state.currentPage}
+                    items_per_page={MAX_ITEMS_PER_PAGE}
+                    total_items={this.state.filtered_building_data.length}
+                />
             </div>
         );
     }

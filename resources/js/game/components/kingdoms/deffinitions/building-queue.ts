@@ -1,1 +1,1 @@
-export type BuildingQueue = { kingdomId: number; buildingIds: number[] }
+export type BuildingQueue = { kingdomId: number; buildingIds: number[] };

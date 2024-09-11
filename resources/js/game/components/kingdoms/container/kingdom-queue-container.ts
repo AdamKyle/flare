@@ -98,7 +98,7 @@ function kingdomContainer(container: CoreContainer) {
         useClass: CapitalCityManageGoldBarsAjax,
     });
 
-    container.register('building-to-upgrade-service', {
+    container.register("building-to-upgrade-service", {
         useClass: BuildingToUpgradeService,
     });
 }

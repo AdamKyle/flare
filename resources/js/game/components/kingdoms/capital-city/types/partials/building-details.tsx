@@ -5,16 +5,18 @@ import Building from "../../deffinitions/building";
 import Kingdom from "../../deffinitions/kingdom";
 
 interface BuildingDetailsProps {
-    building: Building
-    kingdom: Kingdom,
-    toggle_building_queue: (kingdomId: number, buildingId: number) => void,
-    has_building_in_queue: (kingdom: Kingdom, buildingId: Building) => boolean,
+    building: Building;
+    kingdom: Kingdom;
+    toggle_building_queue: (kingdomId: number, buildingId: number) => void;
+    has_building_in_queue: (kingdom: Kingdom, buildingId: Building) => boolean;
 }
 
 interface BuildingDetailsState {}
 
-export default class BuildingDetails extends React.Component<BuildingDetailsProps, BuildingDetailsState> {
-
+export default class BuildingDetails extends React.Component<
+    BuildingDetailsProps,
+    BuildingDetailsState
+> {
     constructor(props: BuildingDetailsProps) {
         super(props);
     }
@@ -37,36 +39,34 @@ export default class BuildingDetails extends React.Component<BuildingDetailsProp
                             Level:
                         </strong>
                         <span>
-                                                    {this.props.building.level} /{" "}
+                            {this.props.building.level} /{" "}
                             {this.props.building.max_level}
-                                                </span>
+                        </span>
                     </p>
                     <p className="flex justify-between">
                         <strong className="text-gray-800 dark:text-gray-200">
                             Defense:
                         </strong>
                         <span>
-                                                    {this.props.building.current_defence} /{" "}
+                            {this.props.building.current_defence} /{" "}
                             {this.props.building.max_defence}
-                                                </span>
+                        </span>
                     </p>
                     <p className="flex justify-between">
                         <strong className="text-gray-800 dark:text-gray-200">
                             Durability:
                         </strong>
                         <span>
-                                                    {
-                                                        this.props.building.current_durability
-                                                    }{" "}
-                            / {this.props.building.max_durability}
-                                                </span>
+                            {this.props.building.current_durability} /{" "}
+                            {this.props.building.max_durability}
+                        </span>
                     </p>
                     <p className="flex justify-between">
                         <strong className="text-gray-800 dark:text-gray-200">
                             Cost:
                         </strong>
                         <span>
-                                                    <strong>Wood</strong>:{" "}
+                            <strong>Wood</strong>:{" "}
                             {this.props.building.wood_cost},{" "}
                             <strong>Stone</strong>:{" "}
                             {this.props.building.stone_cost},{" "}
@@ -74,28 +74,37 @@ export default class BuildingDetails extends React.Component<BuildingDetailsProp
                             {this.props.building.clay_cost},{" "}
                             <strong>Iron</strong>:{" "}
                             {this.props.building.iron_cost}
-                                                </span>
+                        </span>
                     </p>
                 </div>
 
-                {
-                    this.props.has_building_in_queue(this.props.kingdom, this.props.building) ?
-                        <DangerOutlineButton button_label={'Remove from Queue'} on_click={() => {
+                {this.props.has_building_in_queue(
+                    this.props.kingdom,
+                    this.props.building,
+                ) ? (
+                    <DangerOutlineButton
+                        button_label={"Remove from Queue"}
+                        on_click={() => {
                             this.props.toggle_building_queue(
                                 this.props.kingdom.kingdom_id,
                                 this.props.building.id,
-                            )
-                        }} additional_css={'my-2'} />
-                        :
-                        <PrimaryOutlineButton button_label={'Add to queue'} on_click={() => {
+                            );
+                        }}
+                        additional_css={"my-2"}
+                    />
+                ) : (
+                    <PrimaryOutlineButton
+                        button_label={"Add to queue"}
+                        on_click={() => {
                             this.props.toggle_building_queue(
                                 this.props.kingdom.kingdom_id,
                                 this.props.building.id,
-                            )
-                        }} additional_css={'my-2'} />
-                }
+                            );
+                        }}
+                        additional_css={"my-2"}
+                    />
+                )}
             </div>
-        )
+        );
     }
-
 }
