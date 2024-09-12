@@ -141,6 +141,8 @@ export default class BuildingsInQueue extends React.Component<any, any> {
     manageCancelModal(buildingId?: number): void {
         let buildingData: any = null;
 
+        console.log(this.state.building_queues);
+
         if (buildingId) {
             const foundData = this.state.building_queues.flatMap(
                 (queueGroup: any) =>
@@ -150,9 +152,24 @@ export default class BuildingsInQueue extends React.Component<any, any> {
             );
 
             if (foundData.length > 0) {
-                buildingData = foundData[0];
+                const queueGroup = this.state.building_queues.find(
+                    (queueGroup: any) =>
+                        queueGroup.building_queue.some(
+                            (queue: any) => queue.building_id === buildingId,
+                        ),
+                );
+
+                if (queueGroup) {
+                    buildingData = {
+                        ...foundData[0],
+                        kingdom_id: queueGroup.kingdom_id,
+                        kingdom_name: queueGroup.kingdom_name,
+                    };
+                }
             }
         }
+
+        console.log(buildingData);
 
         this.setState({
             show_cancellation_modal: !this.state.show_cancellation_modal,

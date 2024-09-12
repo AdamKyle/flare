@@ -45,6 +45,8 @@ class CapitalCityBuildingRequest implements ShouldQueue
                 return;
                 // @codeCoverageIgnoreEnd
             }
+
+            dump($queueData);
         }
     }
 }

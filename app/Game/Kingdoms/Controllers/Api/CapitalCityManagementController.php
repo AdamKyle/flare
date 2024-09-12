@@ -115,12 +115,9 @@ class CapitalCityManagementController extends Controller
 
     public function cancelBuildingOrdersOrders(CancelUnitRequestRequest $request, Character $character, Kingdom $kingdom)
     {
-        $result = $this->cancelBuildingRequestService->handleCancelRequest($character, $kingdom, $request->all()['request_data']);
+        dump($request);
 
-        $status = $result['status'];
-        unset($result['status']);
-
-        return response()->json($result, $status);
+        return response()->json(['message' => 'see dump message']);
     }
 
     public function fetchGoldBarData(Character $character, Kingdom $kingdom)

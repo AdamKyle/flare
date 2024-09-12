@@ -131,6 +131,7 @@ class CapitalCityResourceRequest implements ShouldQueue
 
             dump('Process the building or repairing of the buildings.');
 
+
             return;
         }
 

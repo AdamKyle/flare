@@ -63,9 +63,6 @@ class CapitalCityBuildingRequestHandler {
             }
         }
 
-        dump('createUpgradeOrRepairRequest - time till finished for $capitalCityBuildingQueue');
-        dump($timeTillFinished);
-
         $capitalCityBuildingQueue->update([
             'building_request_data' => $buildingsToUpgradeOrRepair,
             'messages' => $this->messages,

@@ -45,9 +45,6 @@ class CapitalCityBuildingManagementRequestHandler {
 
         $currentTime = now();
 
-        dump('createRequestQueue');
-        dump($requests);
-
         collect($requests)->each(function (array $request) use ($character, $kingdom, $type, $currentTime) {
             $kingdomId = $request['kingdomId'];
             $buildingIds = $request['buildingIds'];
