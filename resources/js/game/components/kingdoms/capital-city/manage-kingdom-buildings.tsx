@@ -2,7 +2,7 @@ import React from "react";
 import PrimaryOutlineButton from "../../ui/buttons/primary-outline-button";
 import SuccessOutlineButton from "../../ui/buttons/success-outline-button";
 import BuildingsToUpgradeSection from "./buildings-to-upgrade-section";
-import BuildingQueuesTable from "./building-queues-table";
+import BuildingsInQueue from "./buildings-in-queue";
 import ClickableIconCard from "../../ui/cards/clickable-icon-card";
 import LoadingProgressBar from "../../ui/progress-bars/loading-progress-bar";
 
@@ -118,7 +118,7 @@ export default class ManageKingdomBuildings extends React.Component<any, any> {
                         {this.renderActionButtons()}
                         <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-4"></div>
                         <h3 className={"my-2"}>Queue Info</h3>
-                        <BuildingQueuesTable
+                        <BuildingsInQueue
                             user_id={this.props.user_id}
                             kingdom_id={this.props.kingdom.id}
                             character_id={this.props.kingdom.character_id}

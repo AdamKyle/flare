@@ -12,8 +12,10 @@ import { viewPortWatcher } from "../../../lib/view-port-watcher";
 import { watchForDarkMode } from "../../ui/helpers/watch-for-dark-mode";
 import clsx from "clsx";
 import TimerProgressBar from "../../ui/progress-bars/timer-progress-bar";
+import BuildingsToUpgradeSectionState from "./types/buildings-to-upgrade-section-state";
+import Kingdom from "./deffinitions/kingdom";
 
-export default class BuildingQueuesTable extends React.Component<any, any> {
+export default class BuildingsInQueue extends React.Component<any, any> {
     private fetchBuildingQueueAjax: FetchBuildingQueuesAjax;
     private queueListener: CapitalCityBuildingQueueTableEventDefinition;
 
@@ -27,7 +29,7 @@ export default class BuildingQueuesTable extends React.Component<any, any> {
             building_queues: [],
             filtered_building_queues: [],
             search_query: "",
-            open_kingdom_ids: new Set(),
+            open_kingdom_ids: new Set<number>(), // Use Map for tracking expanded state
             view_port: 0,
             dark_tables: false,
             show_cancellation_modal: false,
@@ -79,25 +81,51 @@ export default class BuildingQueuesTable extends React.Component<any, any> {
     }
 
     updateFilteredBuildingData() {
-        const searchTerm = this.state.search_query.toLowerCase() || "";
+        const searchTerm = this.state.search_query.toLowerCase().trim();
 
-        const filteredQueues = this.state.building_queues.flatMap(
-            (queueGroup: any) =>
-                queueGroup.building_queue.filter((queue: any) => {
-                    // Ensure properties are defined before calling `toLowerCase()`
-                    const kingdomName = queue.kingdom_name?.toLowerCase() || "";
-                    const buildingName =
-                        queue.building_name?.toLowerCase() || "";
+        const openKingdomIds = new Set<number>();
 
-                    const kingdomNameMatches = kingdomName.includes(searchTerm);
-                    const buildingNameMatches =
-                        buildingName.includes(searchTerm);
-
-                    return kingdomNameMatches || buildingNameMatches;
-                }),
+        let filteredBuildingData = this.state.building_queues.filter(
+            (kingdom: any) => {
+                return (
+                    (kingdom.kingdom_name.toLowerCase() === searchTerm ||
+                        kingdom.map_name.toLowerCase().includes(searchTerm)) &&
+                    kingdom.building_queue.length > 0
+                );
+            },
         );
 
-        this.setState({ filtered_building_queues: filteredQueues });
+        if (filteredBuildingData.length <= 0 && searchTerm.length > 0) {
+            filteredBuildingData = this.state.building_queues
+                .map((kingdom: any) => {
+                    if (kingdom === null) {
+                        return null;
+                    }
+
+                    const matchingBuildings = kingdom.building_queue.filter(
+                        (buildingQueue: any) => {
+                            return buildingQueue.building_name
+                                .toLowerCase()
+                                .includes(searchTerm);
+                        },
+                    );
+
+                    if (matchingBuildings.length > 0) {
+                        openKingdomIds.add(kingdom.kingdom_id);
+
+                        return {
+                            ...kingdom,
+                            building_queue: matchingBuildings,
+                        };
+                    }
+                })
+                .filter((kingdom: any) => kingdom !== null);
+        }
+
+        this.setState({
+            filtered_building_queues: filteredBuildingData,
+            open_kingdom_ids: openKingdomIds,
+        });
     }
 
     handleSearchChange(event: React.ChangeEvent<HTMLInputElement>) {
@@ -155,8 +183,8 @@ export default class BuildingQueuesTable extends React.Component<any, any> {
                     aria-label="Search by kingdom or building name"
                 />
 
-                {this.state.building_queues.map((queueGroup: any) => (
-                    <div key={queueGroup.kingdom_name} className="mb-4">
+                {this.state.filtered_building_queues.map((queueGroup: any) => (
+                    <div key={queueGroup.kingdom_id} className="mb-4">
                         <div
                             className={clsx(
                                 "p-4 bg-gray-100 dark:bg-gray-700 shadow-md cursor-pointer",

@@ -1,6 +1,6 @@
 import React, { Fragment } from "react";
 
-import BuildingQueuesTable from "../capital-city/building-queues-table";
+import BuildingsInQueue from "../capital-city/buildings-in-queue";
 import TimerProgressBar from "../../ui/progress-bars/timer-progress-bar";
 import { capitalize } from "lodash";
 
@@ -9,7 +9,7 @@ import { capitalize } from "lodash";
  * @param component
  */
 export const buildSmallCouncilBuildingsQueuesTableColumns = (
-    component: BuildingQueuesTable,
+    component: BuildingsInQueue,
 ) => {
     return [
         {

@@ -88,7 +88,7 @@ export default class BuildingToUpgradeService {
                     }
 
                     const matchingBuildings = kingdom.buildings.filter(
-                        (building: any) =>
+                        (building: Building) =>
                             building.name.toLowerCase().includes(searchTerm),
                     );
 

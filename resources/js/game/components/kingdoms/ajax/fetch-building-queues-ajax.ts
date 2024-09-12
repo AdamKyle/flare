@@ -3,14 +3,14 @@ import Ajax from "../../../lib/ajax/ajax";
 import AjaxInterface from "../../../lib/ajax/ajax-interface";
 import { AxiosError, AxiosResponse } from "axios";
 import BuildingsToUpgradeSection from "../capital-city/buildings-to-upgrade-section";
-import BuildingQueuesTable from "../capital-city/building-queues-table";
+import BuildingsInQueue from "../capital-city/buildings-in-queue";
 
 @injectable()
 export default class FetchBuildingQueuesAjax {
     constructor(@inject(Ajax) private ajax: AjaxInterface) {}
 
     public fetchQueueData(
-        component: BuildingQueuesTable,
+        component: BuildingsInQueue,
         characterId: number,
         kingdomId: number,
     ): void {

@@ -102,7 +102,6 @@ class CapitalCityManagementService
                 return [
                     'building_name' => $building->name,
                     'secondary_status' => $request['secondary_status'],
-                    'kingdom_id' => $kingdom->id,
                     'building_id' => $building->id,
                     'queue_id' => $queue->id,
                     'is_cancel_request' => false,
@@ -110,7 +109,9 @@ class CapitalCityManagementService
             });
 
             return [
+                'kingdom_id' => $kingdom->id,
                 'kingdom_name' => $kingdom->name,
+                'map_name' => $kingdom->gameMap->name,
                 'status' => $queue->status,
                 'building_queue' => $buildingRequests->sortByDesc('time_left_seconds')->values()->all(),
                 'total_time' => $queueTimeLeftInSeconds,
