@@ -12,11 +12,9 @@ import Pagination from "./components/pagination";
 import PrimaryOutlineButton from "../../ui/buttons/primary-outline-button";
 import DangerOutlineButton from "../../ui/buttons/danger-outline-button";
 import SuccessOutlineButton from "../../ui/buttons/success-outline-button";
-import OrangeButton from "../../ui/buttons/orange-button";
 import Kingdom from "./deffinitions/kingdom";
-import Building from "./deffinitions/building";
-import BuildingDetails from "./types/partials/building-details";
 import BuildingToUpgradeService from "./services/building-to-upgrade-service";
+import OpenKingdomCardForBuildingManagement from "./partials/open-kingdom-card-for-building-management";
 
 const MAX_ITEMS_PER_PAGE = 10;
 
@@ -185,6 +183,30 @@ export default class BuildingsToUpgradeSection extends React.Component<
                                     <p className="text-gray-500 dark:text-gray-400">
                                         {kingdom.map_name}
                                     </p>
+
+                                    {kingdom.buildings.some((building) =>
+                                        this.buildingToUpgradeService.hasBuildingInQueue(
+                                            kingdom,
+                                            building,
+                                        ),
+                                    ) && (
+                                        <p className="text-gray-600 dark:text-gray-500 mt-2">
+                                            <strong>Buildings in Queue</strong>:{" "}
+                                            {kingdom.buildings
+                                                .filter((building) =>
+                                                    this.buildingToUpgradeService.hasBuildingInQueue(
+                                                        kingdom,
+                                                        building,
+                                                    ),
+                                                )
+                                                .map((building) =>
+                                                    this.props.repair
+                                                        ? `${building.name} (to be repaired)`
+                                                        : `${building.name} (to level: ${building.level + 1})`,
+                                                )
+                                                .join(", ")}
+                                        </p>
+                                    )}
                                 </div>
                                 <i
                                     className={`fas fa-chevron-${this.state.open_kingdom_ids.has(kingdom.kingdom_id) ? "down" : "up"} text-gray-500 dark:text-gray-400`}
@@ -194,42 +216,19 @@ export default class BuildingsToUpgradeSection extends React.Component<
                             {this.state.open_kingdom_ids.has(
                                 kingdom.kingdom_id,
                             ) && (
-                                <div className="bg-gray-300 dark:bg-gray-600 p-4">
-                                    <OrangeButton
-                                        on_click={() =>
-                                            this.buildingToUpgradeService.toggleQueueAllBuildings(
-                                                kingdom.kingdom_id,
-                                            )
-                                        }
-                                        button_label={
-                                            this.state.building_queue.find(
-                                                (item: any) =>
-                                                    item.kingdomId ===
-                                                    kingdom.kingdom_id,
-                                            )?.buildingIds.length ===
-                                            kingdom.buildings.length
-                                                ? "Remove All from Queue"
-                                                : "Add All to Queue"
-                                        }
-                                        additional_css="w-full mb-4"
-                                    />
-                                    {kingdom.buildings.map(
-                                        (building: Building) => (
-                                            <BuildingDetails
-                                                building={building}
-                                                kingdom={kingdom}
-                                                toggle_building_queue={this.buildingToUpgradeService.toggleBuildingQueue.bind(
-                                                    this
-                                                        .buildingToUpgradeService,
-                                                )}
-                                                has_building_in_queue={this.buildingToUpgradeService.hasBuildingInQueue.bind(
-                                                    this
-                                                        .buildingToUpgradeService,
-                                                )}
-                                            />
-                                        ),
+                                <OpenKingdomCardForBuildingManagement
+                                    building_queue={this.state.building_queue}
+                                    has_building_in_queue={this.buildingToUpgradeService.hasBuildingInQueue.bind(
+                                        this.buildingToUpgradeService,
                                     )}
-                                </div>
+                                    kingdom={kingdom}
+                                    toggle_queue_all_buildings={this.buildingToUpgradeService.toggleQueueAllBuildings.bind(
+                                        this.buildingToUpgradeService,
+                                    )}
+                                    toggle_building_queue={this.buildingToUpgradeService.toggleBuildingQueue.bind(
+                                        this.buildingToUpgradeService,
+                                    )}
+                                />
                             )}
                         </div>
                     ))}
