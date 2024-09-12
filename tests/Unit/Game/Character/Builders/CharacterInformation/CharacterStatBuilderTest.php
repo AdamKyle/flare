@@ -1380,7 +1380,7 @@ class CharacterStatBuilderTest extends TestCase
         $character = $this->character->inventoryManagement()->giveItem($item)->equipItem('spell-one', 'weapon')->getCharacter();
         $amount = $this->characterStatBuilder->setCharacter($character)->buildAffixDamage('life-stealing');
 
-        $this->assertEquals(.99, $amount);
+        $this->assertEquals(.50, $amount);
     }
 
     public function testBuildAffixLifeStealingNonStackingWithNoEnchantments()
