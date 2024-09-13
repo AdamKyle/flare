@@ -63,20 +63,49 @@ export default class CapitalCityBuildingUpgradeRepairTableEvent
 
                 let data = event.kingdomBuildingData;
 
+                // Filter based on repair status
                 if (this.component.props.repair) {
+                    data = data
+                        .map(
+                            (kingdom: {
+                                map_name: any;
+                                kingdom_name: any;
+                                kingdom_id: number;
+                                buildings: any[];
+                            }) => ({
+                                kingdom_name: kingdom.kingdom_name,
+                                kingdom_id: kingdom.kingdom_id,
+                                map_name: kingdom.map_name,
+                                buildings: kingdom.buildings
+                                    .filter(
+                                        (building) =>
+                                            building.current_durability <
+                                            building.max_durability,
+                                    )
+                                    .sort((a, b) => a.level - b.level), // Sort buildings by level (lowest to highest)
+                            }),
+                        )
+                        .filter(
+                            (kingdom: any) => kingdom.buildings.length > 0, // Keep only kingdoms with buildings needing repair
+                        );
+                } else {
                     data = data.map(
                         (kingdom: {
+                            map_name: any;
                             kingdom_name: any;
                             kingdom_id: number;
                             buildings: any[];
                         }) => ({
                             kingdom_name: kingdom.kingdom_name,
+                            map_name: kingdom.map_name,
                             kingdom_id: kingdom.kingdom_id,
-                            buildings: kingdom.buildings.filter(
-                                (building) =>
-                                    building.current_durability <
-                                    building.max_durability,
-                            ),
+                            buildings: kingdom.buildings
+                                .filter(
+                                    (building) =>
+                                        building.current_durability >=
+                                        building.max_durability,
+                                )
+                                .sort((a, b) => a.level - b.level), // Sort buildings by level (lowest to highest)
                         }),
                     );
                 }
