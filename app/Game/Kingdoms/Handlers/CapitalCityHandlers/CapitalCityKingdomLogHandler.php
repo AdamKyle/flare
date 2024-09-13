@@ -34,6 +34,7 @@ class CapitalCityKingdomLogHandler {
         $buildingData = $this->createBuildingDataForLog($kingdom, $requestData);
 
         if (count($buildingData) === count($requestData)) {
+
             KingdomLog::create([
                 'character_id' => $character->id,
                 'from_kingdom_id' => $capitalCityBuildingQueue->requested_kingdom,

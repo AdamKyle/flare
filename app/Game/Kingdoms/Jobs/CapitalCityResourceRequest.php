@@ -7,6 +7,7 @@ use App\Flare\Models\CapitalCityResourceRequest as CapitalCityResourceRequestMod
 use App\Flare\Models\CapitalCityUnitQueue;
 use App\Game\Kingdoms\Events\UpdateCapitalCityBuildingQueueTable;
 use App\Game\Kingdoms\Events\UpdateCapitalCityUnitQueueTable;
+use App\Game\Kingdoms\Handlers\CapitalCityHandlers\CapitalCityProcessBuildingRequestHandler;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use App\Game\Kingdoms\Values\CapitalCityResourceRequestType;
 use Exception;
@@ -22,7 +23,7 @@ class CapitalCityResourceRequest implements ShouldQueue
 
     public function __construct(protected readonly int $capitalCityQueueId, protected readonly int $characterId, protected string $type ) {}
 
-    public function handle(): void
+    public function handle(CapitalCityProcessBuildingRequestHandler $capitalCityProcessBuildingRequestHandler): void
     {
 
         $queueData = null;
@@ -129,8 +130,7 @@ class CapitalCityResourceRequest implements ShouldQueue
 
             event(new UpdateCapitalCityBuildingQueueTable($queueData->character->refresh()));
 
-            dump('Process the building or repairing of the buildings.');
-
+            $capitalCityProcessBuildingRequestHandler->handleBuildingRequests($queueData, true);
 
             return;
         }

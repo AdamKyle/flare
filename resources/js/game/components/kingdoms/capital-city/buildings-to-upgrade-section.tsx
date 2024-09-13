@@ -15,6 +15,7 @@ import SuccessOutlineButton from "../../ui/buttons/success-outline-button";
 import Kingdom from "./deffinitions/kingdom";
 import BuildingToUpgradeService from "./services/building-to-upgrade-service";
 import OpenKingdomCardForBuildingManagement from "./partials/open-kingdom-card-for-building-management";
+import PrimaryButton from "../../ui/buttons/primary-button";
 
 const MAX_ITEMS_PER_PAGE = 10;
 
@@ -159,6 +160,20 @@ export default class BuildingsToUpgradeSection extends React.Component<
                 <div className="mb-4 text-gray-700 dark:text-gray-300">
                     Kingdom Count: {this.state.filtered_building_data.length} /{" "}
                     {this.state.building_data.length}
+                </div>
+
+                <div className="mb-4 text-center">
+                    <PrimaryButton
+                        button_label={
+                            this.state.building_queue.length > 0
+                                ? "Remove all from queue"
+                                : "Queue All"
+                        }
+                        on_click={this.buildingToUpgradeService.toggleQueueAllBuildingsForAllKingdoms.bind(
+                            this.buildingToUpgradeService,
+                        )}
+                        additional_css={"w-full"}
+                    />
                 </div>
 
                 {this.buildingToUpgradeService

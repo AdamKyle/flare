@@ -54,7 +54,7 @@ class CapitalCityRequestResourcesHandler {
 
         if (is_null($kingdomWhoCanAfford)) {
             $requestData = $this->markRequestsAsRejected($requestData);
-            $this->messages[] = 'No kingdom could be found to request the resources for these buildings.';
+            $this->messages[] = 'Resource Request Rejected: No kingdom could be found to request the resources for these buildings.';
 
             $queue = $this->updateQueueData($queue, $requestData);
 
@@ -65,7 +65,7 @@ class CapitalCityRequestResourcesHandler {
 
         if (!$this->resourceTransferService->bothKingdomsHaveAMarketPlace($kingdom, $kingdomWhoCanAfford)) {
             $requestData = $this->markRequestsAsRejected($requestData);
-            $this->messages[] = 'Your kingdoms: ' . $kingdom->name . ' and ' . $kingdomWhoCanAfford->name . ' both must have a Market Place at level 5 or higher.';
+            $this->messages[] = 'Resource Request Rejected: Your kingdoms: ' . $kingdom->name . ' and ' . $kingdomWhoCanAfford->name . ' both must have a Market Place at level 5 or higher.';
 
             $queue = $this->updateQueueData($queue, $requestData);
 
@@ -76,7 +76,7 @@ class CapitalCityRequestResourcesHandler {
 
         if (!$this->resourceTransferService->canAffordPopulationCost($kingdomWhoCanAfford)) {
             $requestData = $this->markRequestsAsRejected($requestData);
-            $this->messages[] = 'When asking '. $kingdomWhoCanAfford->name . ' For the resources to fulfill each request, the kingdom told us they do not have the population (need 50) to send a caravan of resources.';
+            $this->messages[] = 'Resource Request Rejected: When asking '. $kingdomWhoCanAfford->name . ' For the resources to fulfill each request, the kingdom told us they do not have the population (need 50) to send a caravan of resources.';
 
             $queue = $this->updateQueueData($queue, $requestData);
 
@@ -87,7 +87,7 @@ class CapitalCityRequestResourcesHandler {
 
         if (!$this->resourceTransferService->hasRequiredSpearmen($kingdomWhoCanAfford)) {
             $requestData = $this->markRequestsAsRejected($requestData);
-            $this->messages[] = 'When asking '. $kingdomWhoCanAfford->name . ' For the resources to fulfill each request, the kingdom told us they do not have enough spearmen (need 75) to go with the caravan and guard them.';
+            $this->messages[] = 'Resource Request Rejected: When asking '. $kingdomWhoCanAfford->name . ' For the resources to fulfill each request, the kingdom told us they do not have enough spearmen (need 75) to go with the caravan and guard them.';
 
             $queue = $this->updateQueueData($queue, $requestData);
 

@@ -63,6 +63,10 @@ class CapitalCityBuildingRequestHandler {
             }
         }
 
+        if (config('app.env') !== 'production') {
+            $timeTillFinished = 1;
+        }
+
         $capitalCityBuildingQueue->update([
             'building_request_data' => $buildingsToUpgradeOrRepair,
             'messages' => $this->messages,
@@ -92,7 +96,7 @@ class CapitalCityBuildingRequestHandler {
         if (ResourceValidation::shouldRedirectKingdomBuilding($building, $kingdom)) {
             $missingResources = ResourceValidation::getMissingCosts($building, $kingdom);
 
-            if (!array_key_exists('population', $missingResources)) {
+            if (array_key_exists('population', $missingResources)) {
                 if (!$this->canAffordPopulationCost($kingdom, $missingResources['population'])) {
                     $this->messages[] = $building->name . ' has been rejected: Cannot afford ' . $missingResources['population'] . ' population.';
                     $buildingsToUpgradeOrRepair[$index]['secondary_status'] = CapitalCityQueueStatus::REJECTED;
@@ -155,8 +159,13 @@ class CapitalCityBuildingRequestHandler {
         ]))->values()->toArray();
 
         if (!empty($filteredRequestData)) {
+
+            if (config('app.env') !== 'production') {
+                $timeTillFinished = 1;
+            }
+
             CapitalCityBuildingRequest::dispatch($capitalCityBuildingQueue->id)->delay(
-                ($timeTillFinished >= 15 ? $timeToStart->clone()->addMinutes(15) : $timeTillFinished)
+                ($timeTillFinished >= 15 ? $timeToStart->clone()->addMinutes(15) : $timeToStart->clone()->addMinutes($timeTillFinished))
             );
 
             $this->updateKingdom->updateKingdom($capitalCityBuildingQueue->kingdom);

@@ -2,8 +2,12 @@
 
 namespace App\Game\Kingdoms\Service;
 
-use App\Flare\Models\BuildingInQueue;
-use App\Flare\Models\CapitalCityBuildingCancellation;
+use DB;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Support\Collection as SupportCollection;
+use Carbon\Carbon;
+use League\Fractal\Manager;
+use League\Fractal\Resource\Collection;
 use App\Flare\Models\CapitalCityBuildingQueue;
 use App\Flare\Models\CapitalCityUnitCancellation;
 use App\Flare\Models\CapitalCityUnitQueue;
@@ -15,11 +19,6 @@ use App\Flare\Models\UnitInQueue;
 use App\Flare\Transformers\KingdomBuildingTransformer;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
-use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Collection as EloquentCollection;
-use Illuminate\Support\Collection as SupportCollection;
-use League\Fractal\Manager;
-use League\Fractal\Resource\Collection;
 
 class CapitalCityManagementService
 {
@@ -92,6 +91,10 @@ class CapitalCityManagementService
         $buildingQueueData = $queues->map(function ($queue)  {
             $kingdom = $queue->kingdom;
             $queueTimeLeftInSeconds = now()->diffInSeconds($queue->completed_at);
+
+            if ($queue->completed_at->lte(now())) {
+                $queueTimeLeftInSeconds = 0;
+            }
 
             $buildingRequests = collect($queue->building_request_data)->map(function ($request) use ($kingdom, $queue) {
 
@@ -283,7 +286,16 @@ class CapitalCityManagementService
     }
 
     /**
-     * Fetch buildings from a specific kingdom for upgrades or repairs.
+     * Fetch valid buildings.
+     *
+     * Fetch buildings who are:
+     *
+     * - Not locked
+     * - Not currently in queue from manual upgrade
+     * - Not currently i the capital city queue.
+     *
+     * @param Kingdom $kingdom
+     * @return SupportCollection
      */
     private function fetchBuildings(Kingdom $kingdom): SupportCollection
     {
@@ -295,13 +307,18 @@ class CapitalCityManagementService
                     ->from('buildings_in_queue')
                     ->where('kingdom_id', $kingdom->id);
             })
+            ->whereNotIn('kingdom_buildings.id', function ($query) use ($kingdom) {
+                $query->select(DB::raw('JSON_UNQUOTE(JSON_EXTRACT(building_request_data, "$[0].building_id"))'))
+                    ->from('capital_city_building_queues')
+                    ->where('kingdom_id', $kingdom->id);
+            })
             ->whereColumn('game_buildings.max_level', '>', 'kingdom_buildings.level')
             ->select('kingdom_buildings.*')
             ->get();
 
         return $this->filterOutCapitalCityBuildingsInQueue($buildings);
-
     }
+
 
     /**
      * Filters out buildings who are currently in the Capital City Building Queue.

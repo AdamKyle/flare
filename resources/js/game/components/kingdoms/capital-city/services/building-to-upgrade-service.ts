@@ -131,7 +131,7 @@ export default class BuildingToUpgradeService {
         }
 
         const searchTerm = event.target.value;
-        this.component.setState({ search_query: searchTerm });
+        this.component.setState({ search_query: searchTerm, currentPage: 1 });
         this.debouncedUpdateFilteredData();
     }
 
@@ -196,6 +196,18 @@ export default class BuildingToUpgradeService {
             }
 
             return { building_queue: queue };
+        });
+    }
+
+    toggleQueueAllBuildingsForAllKingdoms() {
+        if (!this.component) {
+            return;
+        }
+
+        const allKingdoms = this.component.state.building_data || [];
+
+        allKingdoms.forEach((kingdom: Kingdom) => {
+            this.toggleQueueAllBuildings(kingdom.kingdom_id);
         });
     }
 

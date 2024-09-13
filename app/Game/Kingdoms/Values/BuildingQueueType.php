@@ -15,7 +15,7 @@ class BuildingQueueType
 
     private int $type;
 
-    public function __construct(string $type)
+    public function __construct(int $type)
     {
         if (! in_array($type, self::$values)) {
             throw new \Exception($type.' does not exist.');

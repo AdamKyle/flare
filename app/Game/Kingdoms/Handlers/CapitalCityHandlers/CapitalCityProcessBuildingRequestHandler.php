@@ -41,9 +41,10 @@ class CapitalCityProcessBuildingRequestHandler {
      * Handle the building requests.
      *
      * @param CapitalCityBuildingQueue $capitalCityBuildingQueue
+     * @param bool $shouldFailForMissingCosts
      * @return void
      */
-    public function handleBuildingRequests(CapitalCityBuildingQueue $capitalCityBuildingQueue): void
+    public function handleBuildingRequests(CapitalCityBuildingQueue $capitalCityBuildingQueue, bool $shouldFailForMissingCosts = false): void
     {
         $requestData = $capitalCityBuildingQueue->building_request_data;
         $kingdom = $capitalCityBuildingQueue->kingdom;
@@ -52,6 +53,24 @@ class CapitalCityProcessBuildingRequestHandler {
         $requestData = $this->processBuildingRequests($kingdom, $requestData);
 
         $summedMissingCosts = $this->calculateSummedMissingCosts($requestData);
+
+        if (!empty($summedMissingCosts) && $shouldFailForMissingCosts) {
+            $requestData = collect($requestData)
+                ->map(fn($item) => array_merge($item, ['secondary_status' => CapitalCityQueueStatus::REJECTED]))
+                ->toArray();
+
+
+            $capitalCityBuildingQueue->update([
+                'building_request_data' => $requestData,
+                'messages' => array_merge($capitalCityBuildingQueue->messages, [
+                    'Buildings were rejected because even after requesting resources, you still do not have enough resources for one or more buildings so the entire request was canceled out of frustration.'
+                ])
+            ]);
+
+            $capitalCityBuildingQueue = $capitalCityBuildingQueue->refresh();
+
+            $this->capitalCityKingdomLogHandler->possiblyCreateLogForBuildingQueue($capitalCityBuildingQueue);
+        }
 
         if (!empty($summedMissingCosts)) {
             $this->handleResourceRequests($capitalCityBuildingQueue, $character, $summedMissingCosts, $requestData, $kingdom);
@@ -241,6 +260,7 @@ class CapitalCityProcessBuildingRequestHandler {
         array $buildingsToUpgradeOrRepair
     ): void
     {
+
         $this->capitalCityBuildingRequestHandler->createUpgradeOrRepairRequest(
             $capitalCityBuildingQueue,
             $kingdom,
