@@ -82,12 +82,10 @@ export default class CapitalCityBuildingUpgradeRepairTableEvent
                                             building.current_durability <
                                             building.max_durability,
                                     )
-                                    .sort((a, b) => a.level - b.level), // Sort buildings by level (lowest to highest)
+                                    .sort((a, b) => a.level - b.level),
                             }),
                         )
-                        .filter(
-                            (kingdom: any) => kingdom.buildings.length > 0, // Keep only kingdoms with buildings needing repair
-                        );
+                        .filter((kingdom: any) => kingdom.buildings.length > 0);
                 } else {
                     data = data.map(
                         (kingdom: {
@@ -105,7 +103,7 @@ export default class CapitalCityBuildingUpgradeRepairTableEvent
                                         building.current_durability >=
                                         building.max_durability,
                                 )
-                                .sort((a, b) => a.level - b.level), // Sort buildings by level (lowest to highest)
+                                .sort((a, b) => a.level - b.level),
                         }),
                     );
                 }
