@@ -144,6 +144,7 @@ export default class UnitRecruitment extends React.Component<any, any> {
         kingdomId: number,
         unitName: string,
         amount: number | string,
+        returnArray: boolean,
     ) {
         let updatedQueue = [...this.state.unit_queue];
 
@@ -190,41 +191,11 @@ export default class UnitRecruitment extends React.Component<any, any> {
             }
         }
 
+        if (returnArray) {
+            return updatedQueue;
+        }
+
         this.setState({ unit_queue: updatedQueue });
-    }
-
-    handleBulkAmountChange = (
-        event: React.ChangeEvent<HTMLInputElement>,
-        kingdomId: number,
-    ) => {
-        const amount = parseInt(event.target.value, 10) || "";
-        this.setState(
-            (prevState: any) => ({
-                bulk_input_values: {
-                    ...prevState.bulk_input_values,
-                    [kingdomId]: amount,
-                },
-            }),
-            () => {
-                this.updateBulkAmounts(kingdomId, amount);
-            },
-        );
-    };
-
-    updateBulkAmounts(kingdomId: number, bulkAmount: number | string) {
-        const { filtered_unit_recruitment_data } = this.state;
-
-        filtered_unit_recruitment_data.forEach((kingdom: any) => {
-            if (kingdom.id === kingdomId) {
-                Object.values(UnitTypes).forEach((unitType: string) => {
-                    this.handleUnitAmountChange(
-                        kingdom.id,
-                        unitType,
-                        bulkAmount,
-                    );
-                });
-            }
-        });
     }
 
     getKingdomQueueSummary(kingdomId: number) {
@@ -274,10 +245,86 @@ export default class UnitRecruitment extends React.Component<any, any> {
         return Object.values(UnitTypes).includes(this.state.search_term);
     }
 
+    handleBulkAmountChange = (
+        event: React.ChangeEvent<HTMLInputElement>,
+        kingdomId: number,
+    ) => {
+        const amount = parseInt(event.target.value, 10) || "";
+        this.setState(
+            (prevState: any) => ({
+                bulk_input_values: {
+                    ...prevState.bulk_input_values,
+                    [kingdomId]: amount,
+                },
+            }),
+            () => {
+                this.updateBulkAmounts(kingdomId, amount);
+            },
+        );
+    };
+
+    updateBulkAmounts(kingdomId: number, bulkAmount: number | string) {
+        const kingdom = this.state.filtered_unit_recruitment_data.find(
+            (kingdom: any) => kingdom.id === kingdomId,
+        );
+
+        if (kingdom) {
+            Object.values(UnitTypes).forEach((unitType: string) => {
+                this.handleUnitAmountChange(
+                    kingdom.id,
+                    unitType,
+                    bulkAmount,
+                    false,
+                );
+            });
+        }
+    }
+
+    handleGlobalBulkAmountChang(event: React.ChangeEvent<HTMLInputElement>) {
+        const bulkAmount = parseInt(event.target.value, 10) || "";
+        this.applyGlobalBulkAmount(bulkAmount);
+    }
+
+    applyGlobalBulkAmount(bulkAmount: number | string) {
+        const { filtered_unit_recruitment_data } = this.state;
+
+        let updatedQueue: any = [];
+
+        if (bulkAmount === 0 || bulkAmount === "") {
+            this.setState({
+                unit_queue: updatedQueue,
+            });
+
+            return;
+        }
+
+        filtered_unit_recruitment_data.forEach((kingdom: any) => {
+            const queueData: any = {
+                kingdom_id: kingdom.id,
+                unit_requests: [],
+            };
+
+            this.fetchUnitsToShow().forEach((unitType: string) => {
+                queueData.unit_requests.push({
+                    unit_name: unitType,
+                    unit_amount: bulkAmount,
+                });
+            });
+
+            updatedQueue.push(queueData);
+        });
+
+        this.setState({
+            unit_queue: updatedQueue,
+        });
+    }
+
     render() {
         if (this.state.loading) {
             return <LoadingProgressBar />;
         }
+
+        console.log(this.state.unit_queue);
 
         return (
             <div className="md:p-4">
@@ -324,6 +371,23 @@ export default class UnitRecruitment extends React.Component<any, any> {
                     </button>
                 </div>
 
+                <div className="my-4">
+                    <label
+                        htmlFor="global-bulk-recruitment"
+                        className="block text-gray-700 dark:text-gray-300 font-bold"
+                    >
+                        Global Bulk Recruitment for All Kingdoms:
+                    </label>
+                    <input
+                        type="number"
+                        id="global-bulk-recruitment"
+                        value={this.state.global_bulk_value}
+                        onChange={this.handleGlobalBulkAmountChang.bind(this)}
+                        className="w-full mt-2 px-4 py-2 border rounded text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        aria-label="Global bulk recruitment for all kingdoms"
+                    />
+                </div>
+
                 <div className="mb-4">
                     {this.state.filtered_unit_recruitment_data.map(
                         (kingdom: any) => (
@@ -365,6 +429,21 @@ export default class UnitRecruitment extends React.Component<any, any> {
                                         <div className="text-sm text-gray-600 dark:text-gray-400">
                                             {kingdom.game_map_name}
                                         </div>
+                                        {this.state.unit_queue.filter(
+                                            (queue: any) => {
+                                                return (
+                                                    queue.kingdom_id ===
+                                                    kingdom.id
+                                                );
+                                            },
+                                        ).length > 0 ? (
+                                            <div className="mb-4 text-gray-700 dark:text-gray-300">
+                                                Units in Queue:{" "}
+                                                {this.getKingdomQueueSummary(
+                                                    kingdom.id,
+                                                )}
+                                            </div>
+                                        ) : null}
                                     </div>
                                     <div>
                                         <i
@@ -383,12 +462,6 @@ export default class UnitRecruitment extends React.Component<any, any> {
                                 ) && (
                                     <div className="p-4">
                                         <div className="mb-4 p-4 bg-white dark:bg-gray-800 shadow-sm rounded-lg">
-                                            <div className="mb-4 text-gray-700 dark:text-gray-300">
-                                                Units in Queue:{" "}
-                                                {this.getKingdomQueueSummary(
-                                                    kingdom.id,
-                                                )}
-                                            </div>
                                             <input
                                                 type="number"
                                                 value={
@@ -431,6 +504,7 @@ export default class UnitRecruitment extends React.Component<any, any> {
                                                                     unitType,
                                                                     e.target
                                                                         .value,
+                                                                    false,
                                                                 )
                                                             }
                                                             placeholder="Amount"
