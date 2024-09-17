@@ -289,7 +289,7 @@ export default class AlchemyItemUsable extends React.Component<
         }
 
         return (
-            <>
+            <div>
                 <p className="mb-4 text-sky-700 dark:text-sky-500">
                     <strong>Lasts For: </strong> {lastsFor} {lastForLabel}.
                 </p>
@@ -308,7 +308,7 @@ export default class AlchemyItemUsable extends React.Component<
                 {this.shouldRenderColumns()
                     ? this.renderUsableColumns()
                     : this.renderSingleColumnDetails()}
-            </>
+            </div>
         );
     }
 
@@ -322,7 +322,7 @@ export default class AlchemyItemUsable extends React.Component<
 
     render() {
         return (
-            <div className="mr-auto ml-auto w-3/5">
+            <div className="mr-auto ml-auto w-3/5 overflow-y-auto max-h-[350px] md:overflow-y-hidden md:max-h-full">
                 <p className="mt-4 mb-4">{this.props.item.description}</p>
                 <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3"></div>
                 {this.renderCoreView()}
