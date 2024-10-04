@@ -326,6 +326,10 @@
                 <span class="fas fa-campground"></span>
                 Seer Camp
             </a>
+            <a href="{{ route('info.page', ['pageName' => 'labyrinth-oracle']) }}">
+                <span class="ra ra-eye-monster"></span>
+                Labyrinth Oracle
+            </a>
             <hr />
             <h6>Misc. Lists</h6>
             <a href="{{ route('info.page', ['pageName' => 'monsters']) }}">
