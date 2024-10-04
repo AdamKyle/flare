@@ -5,9 +5,7 @@ namespace App\Game\Skills\Controllers\Api;
 use App\Flare\Models\Inventory;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
-use App\Game\Character\CharacterInventory\Events\CharacterInventoryDetailsUpdate;
 use App\Game\Character\CharacterInventory\Events\CharacterInventoryUpdateBroadCastEvent;
-use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Skills\Services\DisenchantService;
@@ -17,15 +15,11 @@ class DisenchantingController extends Controller
 {
     private DisenchantService $disenchantingService;
 
-    private CharacterInventoryService $characterInventoryService;
-
     /**
      * Constructor
      */
-    public function __construct(DisenchantService $disenchantService, CharacterInventoryService $characterInventoryService)
-    {
+    public function __construct(DisenchantService $disenchantService) {
         $this->disenchantingService = $disenchantService;
-        $this->characterInventoryService = $characterInventoryService;
     }
 
     public function disenchant(Item $item)
@@ -60,8 +54,6 @@ class DisenchantingController extends Controller
             event(new ServerMessageEvent($character->user, 'Destroyed: '.$name));
 
             event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'inventory'));
-
-            event(new CharacterInventoryDetailsUpdate($character->user));
 
             event(new UpdateTopBarEvent($character->refresh()));
         }
