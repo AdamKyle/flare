@@ -163,6 +163,16 @@ class NpcQuestRewardHandler
             }
         }
 
+        $foundQuestitem = $character->inventory->slots->filter(function($slot) use ($quest) {
+            return $slot->item_id === $quest->reward_item;
+        })->first();
+
+        if (!is_null($foundQuestitem)) {
+            broadcast(new ServerMessageEvent($character->user, 'You already own the: '.$quest->rewardItem->name . ' You shall not recieve another.'));
+
+            return;
+        }
+
         $slot = $character->inventory->slots()->create([
             'inventory_id' => $character->inventory->id,
             'item_id' => $quest->reward_item,

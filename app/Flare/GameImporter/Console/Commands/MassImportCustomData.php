@@ -33,6 +33,10 @@ class MassImportCustomData extends Command
     public function handle()
     {
 
+        Artisan::call('import:game-data Items');
+        Artisan::call('import:game-data Monsters');
+        Artisan::call('import:game-data Quests');
+
         $this->importInformationSection();
 
         if (config('app.env') !== 'production') {
@@ -40,6 +44,8 @@ class MassImportCustomData extends Command
         }
 
         $this->importSurveys();
+
+        Artisan::call('create:quest-cache');
     }
 
     protected function importInformationSection(): void
