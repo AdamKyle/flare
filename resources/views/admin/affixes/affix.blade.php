@@ -19,7 +19,7 @@
             editUrl="{{route('affixes.edit', ['affix' => $itemAffix->id])}}"
         >
             <p class="mt-4 mb-4">{{$itemAffix->description}}</p>
-            <div class='my-3 border-b-2 border-b-gray-300 dark:border-b-gray-600'></div>
+
             <div class='grid gap-2 md:grid-cols-3'>
 
                 @if ($itemAffix->str_mod > 0 || $itemAffix->dex_mod > 0 || $itemAffix->dur_mod > 0 ||
@@ -84,15 +84,6 @@
             @endif
         </x-core.cards.card-with-title>
 
-        <x-core.cards.card-with-title title="Enchanting Info" buttons="false">
-            <dl>
-                <dt>Base Cost:</dt><dd>{{number_format($itemAffix->cost)}} Gold</dd>
-                <dt>Intelligence Required:</dt><dd>{{number_format($itemAffix->int_required)}}</dd>
-                <dt>Level Required:</dt><dd>{{$itemAffix->skill_level_required}}</dd>
-                <dt>Level Trivial:</dt><dd>{{$itemAffix->skill_level_trivial}}</dd>
-            </dl>
-        </x-core.cards.card-with-title>
-
         @if ($itemAffix->damage_amount > 0)
             <x-core.cards.card-with-title title="Damage Info" buttons="false">
                 <x-core.alerts.warning-alert title="ATTN!">
@@ -154,6 +145,17 @@
                 <dl><dt>Resistance Reduction:</dt><dd>{{$itemAffix->resistance_reduction * 100}}%</dd></dl>
             </x-core.cards.card-with-title>
         @endif
+
+        <x-core.cards.card-with-title title="Enchanting Info" buttons="false">
+            <dl>
+                <dt>Base Cost:</dt><dd>{{number_format($itemAffix->cost)}} Gold</dd>
+                <dt>Intelligence Required:</dt><dd>{{number_format($itemAffix->int_required)}}</dd>
+                <dt>Level Required:</dt><dd>{{$itemAffix->skill_level_required}}</dd>
+                <dt>Level Trivial:</dt><dd>{{$itemAffix->skill_level_trivial}}</dd>
+            </dl>
+        </x-core.cards.card-with-title>
+
+
 
     </x-core.layout.info-container>
 @endsection
