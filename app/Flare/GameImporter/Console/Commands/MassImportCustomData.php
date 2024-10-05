@@ -39,15 +39,16 @@ class MassImportCustomData extends Command
         Artisan::call('import:game-data Quests');
         Artisan::call('import:game-data "Admin Section"');
 
+        Artisan::call('balance:monsters');
+        Artisan::call('create:quest-cache');
+        Artisan::call('add:holy-stacks-to-items');
+        Artisan::call('generate:monster-cache');
+
         $this->importInformationSection();
 
         if (config('app.env') !== 'production') {
             $this->importGameMaps();
         }
-
-        Artisan::call('balance:monsters');
-        Artisan::call('create:quest-cache');
-        Artisan::call('add:holy-stacks-to-items');
 
         $this->importSurveys();
     }
