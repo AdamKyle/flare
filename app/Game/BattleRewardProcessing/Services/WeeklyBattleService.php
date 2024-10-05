@@ -111,7 +111,7 @@ class WeeklyBattleService
             $this->locationSpecialtyHandler->handleMonsterFromSpecialLocation($character, $weeklyMonsterFight);
         }
 
-        if ($locationType->isLordsStrongHold() || $locationType->isHellsBrokenAnvil()) {
+        if ($locationType->isLordsStrongHold() || $locationType->isHellsBrokenAnvil() || $locationType->isTwistedMaidensDungeons()) {
             $this->locationSpecialtyHandler->handleMonsterFromSpecialLocation($character, $weeklyMonsterFight, false);
         }
 

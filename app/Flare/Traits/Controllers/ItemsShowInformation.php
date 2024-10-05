@@ -129,6 +129,10 @@ trait ItemsShowInformation
             if ($effect->accessTwistedMemories()) {
                 $effects = 'Allows entrance into the Twisted Dimensional Gate in Hell, to be automatically traversed to Twisted Memories!';
             }
+
+            if ($effect->accessTwistedDungeons()) {
+                $effects = 'Allows the player to access the Dungeons of twisted maidens in Twisted Memories';
+            }
         }
 
         if ($item->usable && ! is_null($item->affects_skill_type)) {

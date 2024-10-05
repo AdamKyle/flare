@@ -114,6 +114,17 @@ class ReBalanceMonsters extends Command
 
         $this->manageMonsters($monsters, $exponentialAttributeCurve, 10000000, 16000000000, 1000000, 5000, MapNameValue::TWISTED_MEMORIES);
 
+        // Twisted Memories Weekly Fights:
+        $gameMap = GameMap::where('name', MapNameValue::TWISTED_MEMORIES)->first();
+        $monsters = Monster::where('game_map_id', $gameMap->id)
+            ->where('is_raid_monster', false)
+            ->where('is_raid_boss', false)
+            ->where('is_celestial_entity', false)
+            ->whereNotNull('only_for_location_type')
+            ->get();
+
+        $this->manageMonsters($monsters, $exponentialAttributeCurve, 500000000000, 3000000000000, 150000000000, 1000000000, MapNameValue::TWISTED_MEMORIES);
+
         // Delusional Memories Monsters:
         $gameMap = GameMap::where('name', MapNameValue::DELUSIONAL_MEMORIES)->first();
         $monsters = Monster::where('game_map_id', $gameMap->id)
@@ -145,7 +156,7 @@ class ReBalanceMonsters extends Command
             ->whereNotNull('only_for_location_type')
             ->get();
 
-        $this->manageMonsters($monsters, $exponentialAttributeCurve, 500000000000, 2000000000000, 150000000000, 1000000000, MapNameValue::DELUSIONAL_MEMORIES);
+        $this->manageMonsters($monsters, $exponentialAttributeCurve, 500000000000, 4000000000000, 150000000000, 1000000000, MapNameValue::DELUSIONAL_MEMORIES);
 
         // Shadow Planes Weekly Fights:
         $gameMap = GameMap::where('name', MapNameValue::SHADOW_PLANE)->first();

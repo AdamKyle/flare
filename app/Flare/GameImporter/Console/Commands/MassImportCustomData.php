@@ -34,6 +34,7 @@ class MassImportCustomData extends Command
     {
 
         Artisan::call('import:game-data Items');
+        Artisan::call('import:game-data Locations');
         Artisan::call('import:game-data Monsters');
         Artisan::call('import:game-data Quests');
         Artisan::call('import:game-data "Admin Section"');
@@ -44,9 +45,11 @@ class MassImportCustomData extends Command
             $this->importGameMaps();
         }
 
-        $this->importSurveys();
-
+        Artisan::call('balance:monsters');
         Artisan::call('create:quest-cache');
+        Artisan::call('add:holy-stacks-to-items');
+
+        $this->importSurveys();
     }
 
     protected function importInformationSection(): void

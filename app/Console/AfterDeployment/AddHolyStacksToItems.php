@@ -49,7 +49,14 @@ class AddHolyStacksToItems extends Command
                     if (! is_null($item->specialty_type)) {
                         $type = new ItemSpecialtyType($item->specialty_type);
 
-                        if ($type->isHellForged() || $type->isPurgatoryChains() || $type->isPirateLordLeather() || $type->isCorruptedIce() || $type->isDelusionalSilver() || $type->isTwistedEarth()) {
+                        if ($type->isHellForged() ||
+                            $type->isPurgatoryChains() ||
+                            $type->isPirateLordLeather() ||
+                            $type->isCorruptedIce() ||
+                            $type->isDelusionalSilver() ||
+                            $type->isTwistedEarth() ||
+                            $type->isFaithlessPlate()) {
+
                             $maxStacks = 20;
                         }
                     } else {
