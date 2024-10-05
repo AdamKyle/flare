@@ -123,7 +123,7 @@ class ReBalanceMonsters extends Command
             ->whereNotNull('only_for_location_type')
             ->get();
 
-        $this->manageMonsters($monsters, $exponentialAttributeCurve, 500000000000, 3000000000000, 150000000000, 1000000000, MapNameValue::TWISTED_MEMORIES);
+        $this->manageMonsters($monsters, $exponentialAttributeCurve, 500000000000, 2000000000000, 150000000000, 1000000000, MapNameValue::TWISTED_MEMORIES);
 
         // Delusional Memories Monsters:
         $gameMap = GameMap::where('name', MapNameValue::DELUSIONAL_MEMORIES)->first();
