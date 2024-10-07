@@ -288,6 +288,7 @@ class CraftingService
             ->whereNull('item_prefix_id')
             ->whereNull('item_suffix_id')
             ->doesntHave('appliedHolyStacks')
+            ->doesnthave('sockets')
             ->orderBy('skill_level_required', 'asc');
 
         if (in_array($craftingType, $twoHandedWeapons)) {

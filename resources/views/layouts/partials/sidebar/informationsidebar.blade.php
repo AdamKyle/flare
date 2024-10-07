@@ -383,6 +383,10 @@
                 <span class="ra ra-kaleidoscope"></span>
                 Delusional Silver
             </a>
+            <a href="{{ route('info.page', ['pageName' => 'faithless-plate']) }}">
+                <span class="ra ra-kaleidoscope"></span>
+                Faithless Plate
+            </a>
             <a href="{{ route('info.page', ['pageName' => 'ancestral-items']) }}">
                 <span class="ra ra-crowned-heart"></span>
                 Ancestral Items

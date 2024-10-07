@@ -170,6 +170,10 @@ export default class InfoSection extends React.Component<any, any> {
                 value: "info.items.delusional-silver",
             },
             {
+                label: "Faithless Plate",
+                value: "info.items.faithless-plate",
+            },
+            {
                 label: "Ancestral Items",
                 value: "info.items.ancestral-items",
             },
@@ -274,6 +278,10 @@ export default class InfoSection extends React.Component<any, any> {
                 label: "Delusional Silver",
                 value: "delusional-silver",
             },
+            {
+                label: "Faithless Plate",
+                value: "faithless-plate",
+            },
         ];
     }
 
@@ -356,7 +364,7 @@ export default class InfoSection extends React.Component<any, any> {
                 />
 
                 <div className="my-5">
-                    <label className="label block mb-2">Order</label>
+                    <label className="block mb-2 label">Order</label>
                     <input
                         type="number"
                         className="form-control"
@@ -407,7 +415,7 @@ export default class InfoSection extends React.Component<any, any> {
                     />
                 </div>
 
-                <div className="flex mt-4 justify-end">
+                <div className="flex justify-end mt-4">
                     {this.props.sections_length !== 1 &&
                     this.props.add_section === null ? (
                         <div className="float-right">

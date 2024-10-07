@@ -47,6 +47,12 @@ class PvpBattleController extends Controller
             ], 422);
         }
 
+        if ($defender->is_auto_battling) {
+            return response()->json([
+                'message' => 'The player is to busy to want to engage with you. Move on child!'
+            ], 422);
+        }
+
         $this->pvpService->attack($character, $defender, $request->attack_type);
 
         return response()->json();

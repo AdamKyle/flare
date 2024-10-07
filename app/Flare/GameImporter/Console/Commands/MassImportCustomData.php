@@ -9,6 +9,7 @@ use App\Flare\Values\MapNameValue;
 use Illuminate\Console\Command;
 use Illuminate\Http\File;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 
 class MassImportCustomData extends Command
@@ -33,16 +34,8 @@ class MassImportCustomData extends Command
     public function handle()
     {
 
-        Artisan::call('import:game-data Items');
-        Artisan::call('import:game-data Locations');
-        Artisan::call('import:game-data Monsters');
-        Artisan::call('import:game-data Quests');
-        Artisan::call('import:game-data "Admin Section"');
-
-        Artisan::call('balance:monsters');
-        Artisan::call('create:quest-cache');
-        Artisan::call('add:holy-stacks-to-items');
-        Artisan::call('generate:monster-cache');
+        Artisan::call('remove:duplicate-items');
+        Cache::delete('crafting-table-data');
 
         $this->importInformationSection();
 

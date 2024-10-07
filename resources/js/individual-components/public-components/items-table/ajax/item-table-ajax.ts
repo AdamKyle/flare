@@ -107,6 +107,8 @@ export default class ItemTableAjax {
                 return "Twisted Earth";
             case TableType.DELUSIONAL_SILVER:
                 return "Delusional Silver";
+            case TableType.FAITHLESS_PLATE:
+                return "Faithless Plate";
             default:
                 throw new Error("Unknown type of table to render.");
         }
