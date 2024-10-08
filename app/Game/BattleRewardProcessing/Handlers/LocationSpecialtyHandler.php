@@ -133,7 +133,7 @@ class LocationSpecialtyHandler
 
         $typeOfItem = null;
 
-        $chance = $isCosmicItem ? 100 : rand(1, 100);
+        $chance = $isCosmicItem ? 100 : $this->getChance();
 
         $equippedItems = $this->fetchEquipped($character) ?? collect();
         $equippedChance = 0.01;
@@ -155,5 +155,9 @@ class LocationSpecialtyHandler
         }
 
         return $typeOfItem;
+    }
+
+    protected function getChance(): int {
+        return rand(1, 100);
     }
 }
