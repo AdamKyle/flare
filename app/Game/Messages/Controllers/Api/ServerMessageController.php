@@ -9,13 +9,16 @@ use Illuminate\Http\JsonResponse;
 
 class ServerMessageController extends Controller
 {
-    private ServerMessage $serverMessage;
 
-    public function __construct(ServerMessage $serverMessage)
+    public function __construct(private ServerMessage $serverMessage)
     {
         $this->serverMessage = $serverMessage;
     }
 
+    /**
+     * @param ServerMessageRequest $request
+     * @return JsonResponse
+     */
     public function generateServerMessage(ServerMessageRequest $request): JsonResponse
     {
 

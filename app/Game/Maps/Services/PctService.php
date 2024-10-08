@@ -95,7 +95,7 @@ class PctService
 
         event(new UpdateMap($character->user));
 
-        event(new ServerMessageEvent($character->user, 'Child! I have done it. I have used the magics to move you to: (X/Y) '.$celestialFight->x_position.'/'.$celestialFight->y_position.' on the plane: '.$celestialFight->monster->gameMap->name));
+        event(new ServerMessageEvent($character->user, 'Child! I have done it. I have used the magics to move you to: (X/Y) ' . $celestialFight->x_position . '/' . $celestialFight->y_position . ' on the plane: ' . $celestialFight->monster->gameMap->name));
     }
 
     /**
@@ -138,7 +138,7 @@ class PctService
 
         event(new UpdateMap($character->user, true));
 
-        event(new ServerMessageEvent($character->user, 'Child! I have done it. I have used the magics to move you to: (X/Y) '.$celestialFight->x_position.'/'.$celestialFight->y_position));
+        event(new ServerMessageEvent($character->user, 'Child! I have done it. I have used the magics to move you to: (X/Y) ' . $celestialFight->x_position . '/' . $celestialFight->y_position));
     }
 
     /**
@@ -178,7 +178,7 @@ class PctService
 
         if (! $teleport) {
 
-            $message = 'Child! '.$celestialFight->monster->name.' is at (X/Y): '.$x.'/'.$y.' on the: '.$map->name.'Plane.';
+            $message = 'Child! ' . $celestialFight->monster->name . ' is at (X/Y): ' . $x . '/' . $y . ' on the: ' . $map->name . 'Plane.';
 
             broadcast(new ServerMessageEvent($character->user, $message));
 
