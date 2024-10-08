@@ -312,13 +312,13 @@ class GuideQuestRequirementsService
      */
     public function requiredKingdomUnitCount(Character $character, GuideQuest $quest): GuideQuestRequirementsService
     {
-        if (! is_null($quest->required_kingdom_units)) {
-            foreach ($character->kingdoms as $kingdom) {
-                if ($kingdom->units->sum('amount') >= $quest->required_kingdom_units) {
-                    $this->finishedRequirements[] = 'required_kingdom_units';
+        if (!is_null($quest->required_kingdom_units)) {
+            $totalUnits = $character->kingdoms->sum(function ($kingdom) {
+                return $kingdom->units->sum('amount');
+            });
 
-                    break;
-                }
+            if ($totalUnits >= $quest->required_kingdom_units) {
+                $this->finishedRequirements[] = 'required_kingdom_units';
             }
         }
 

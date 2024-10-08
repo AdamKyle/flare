@@ -27,7 +27,32 @@ class WeeklyBattleServiceTest extends TestCase
 
         $this->weeklyBattleService = resolve(WeeklyBattleService::class);
 
-        $this->characterFactory = (new CharacterFactory)->createBaseCharacter();
+        $this->characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
+
+        $this->createItem([
+            'type' => 'weapon',
+            'specialty_type' => ItemSpecialtyType::HELL_FORGED,
+        ]);
+
+        $this->createItem([
+            'type' => 'weapon',
+            'specialty_type' => ItemSpecialtyType::TWISTED_EARTH,
+        ]);
+
+        $this->createItem([
+            'type' => 'weapon',
+            'specialty_type' => ItemSpecialtyType::DELUSIONAL_SILVER,
+        ]);
+
+        $this->createItem([
+            'type' => 'weapon',
+            'specialty_type' => ItemSpecialtyType::FAITHLESS_PLATE,
+        ]);
+
+        $this->createItem([
+            'type' => 'weapon',
+            'specialty_type' => null,
+        ]);
     }
 
     public function tearDown(): void
@@ -121,12 +146,11 @@ class WeeklyBattleServiceTest extends TestCase
     public function testMarkMonsterAsKilled()
     {
 
+
+
         $character = $this->characterFactory->getCharacter();
 
-        $this->createItem([
-            'type' => 'weapon',
-            'specialty_type' => ItemSpecialtyType::DELUSIONAL_SILVER,
-        ]);
+
 
         $monster = $this->createMonster([
             'only_for_location_type' => LocationType::ALCHEMY_CHURCH,

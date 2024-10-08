@@ -31,6 +31,8 @@ class LocationType
 
     const BROKEN_ANVIL = 9;
 
+    const TWSITED_MAIDENS_DUNGEONS = 10;
+
     protected static $values = [
         0 => self::PURGATORY_SMITH_HOUSE,
         1 => self::GOLD_MINES,
@@ -42,6 +44,7 @@ class LocationType
         7 => self::ALCHEMY_CHURCH,
         8 => self::LORDS_STRONG_HOLD,
         9 => self::BROKEN_ANVIL,
+        10 => self::TWSITED_MAIDENS_DUNGEONS,
     ];
 
     /**
@@ -58,6 +61,7 @@ class LocationType
         self::ALCHEMY_CHURCH => 'Alchemy Church',
         self::LORDS_STRONG_HOLD => 'Lords Strong Hold',
         self::BROKEN_ANVIL => 'Hells Broken Anvil',
+        self::TWSITED_MAIDENS_DUNGEONS => 'Twisted Maidens Dungeons',
     ];
 
     /**
@@ -146,5 +150,9 @@ class LocationType
     public function isHellsBrokenAnvil(): bool
     {
         return $this->value === self::BROKEN_ANVIL;
+    }
+
+    public function isTwistedMaidensDungeons(): bool {
+        return $this->value === self::TWSITED_MAIDENS_DUNGEONS;
     }
 }

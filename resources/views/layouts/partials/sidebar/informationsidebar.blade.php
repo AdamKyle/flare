@@ -326,6 +326,10 @@
                 <span class="fas fa-campground"></span>
                 Seer Camp
             </a>
+            <a href="{{ route('info.page', ['pageName' => 'labyrinth-oracle']) }}">
+                <span class="ra ra-eye-monster"></span>
+                Labyrinth Oracle
+            </a>
             <hr />
             <h6>Misc. Lists</h6>
             <a href="{{ route('info.page', ['pageName' => 'monsters']) }}">
@@ -378,6 +382,10 @@
             <a href="{{ route('info.page', ['pageName' => 'delusional-silver']) }}">
                 <span class="ra ra-kaleidoscope"></span>
                 Delusional Silver
+            </a>
+            <a href="{{ route('info.page', ['pageName' => 'faithless-plate']) }}">
+                <span class="ra ra-kaleidoscope"></span>
+                Faithless Plate
             </a>
             <a href="{{ route('info.page', ['pageName' => 'ancestral-items']) }}">
                 <span class="ra ra-crowned-heart"></span>

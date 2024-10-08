@@ -20,6 +20,8 @@ class ItemSpecialtyType
 
     const TWISTED_EARTH = 'Twisted Earth';
 
+    const FAITHLESS_PLATE = 'Faithless Plate';
+
     /**
      * @var string[]
      */
@@ -30,6 +32,7 @@ class ItemSpecialtyType
         self::CORRUPTED_ICE => 'Corrupted Ice',
         self::DELUSIONAL_SILVER => 'Delusional Silver',
         self::TWISTED_EARTH => 'Twisted Earth',
+        self::FAITHLESS_PLATE => 'Faithless Plate',
     ];
 
     /**
@@ -113,5 +116,15 @@ class ItemSpecialtyType
     public function isDelusionalSilver(): bool
     {
         return $this->value === self::DELUSIONAL_SILVER;
+    }
+
+    /**
+     * Is Faithless Plate
+     *
+     * @return boolean
+     */
+    public function isFaithlessPlate(): bool
+    {
+        return $this->value === self::FAITHLESS_PLATE;
     }
 }

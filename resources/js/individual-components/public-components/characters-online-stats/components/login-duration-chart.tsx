@@ -95,7 +95,7 @@ export default class LoginDurationChart extends React.Component<
                     <InfoAlert additional_css="my-3">
                         <p>
                             <strong>Please note:</strong> This is an average of
-                            playrs login time in <strong>minutes</strong> over
+                            players login time in <strong>minutes</strong> over
                             the period of a day, a week, two weeks or a month
                             based on the drop down. This is not real time and
                             only counts those who did log in at one time and

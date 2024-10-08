@@ -9,6 +9,7 @@ use App\Flare\Values\MapNameValue;
 use Illuminate\Console\Command;
 use Illuminate\Http\File;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 
 class MassImportCustomData extends Command
@@ -32,7 +33,6 @@ class MassImportCustomData extends Command
      */
     public function handle()
     {
-        
         $this->importInformationSection();
 
         if (config('app.env') !== 'production') {

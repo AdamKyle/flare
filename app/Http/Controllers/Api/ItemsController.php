@@ -37,6 +37,9 @@ class ItemsController extends Controller
             ->whereNull('item_suffix_id')
             ->whereNull('item_prefix_id')
             ->whereNull('specialty_type')
+            ->doesntHave('appliedHolyStacks')
+            ->doesnthave('sockets')
+            ->where('can_craft', true)
             ->inRandomOrder()
             ->get();
 

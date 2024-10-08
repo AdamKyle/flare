@@ -1380,7 +1380,44 @@ class CharacterStatBuilderTest extends TestCase
         $character = $this->character->inventoryManagement()->giveItem($item)->equipItem('spell-one', 'weapon')->getCharacter();
         $amount = $this->characterStatBuilder->setCharacter($character)->buildAffixDamage('life-stealing');
 
-        $this->assertEquals(.50, $amount);
+        $this->assertEquals(.1, $amount);
+    }
+
+    public function testBuildAffixLifeStealingNonStackingForVampire()
+    {
+        $itemPrefixAffix = $this->createItemAffix([
+            'name' => 'Sample',
+            'chr_mod' => 0.15,
+            'damage_amount' => 1.0,
+            'steal_life_amount' => 1.0,
+        ]);
+
+        $itemSuffixAffix = $this->createItemAffix([
+            'name' => 'Sample',
+            'chr_mod' => 0.15,
+            'damage_amount' => 1.50,
+            'steal_life_amount' => .10,
+        ]);
+
+        $item = $this->createItem([
+            'name' => 'weapon',
+            'type' => 'spell-healing',
+            'item_suffix_id' => $itemSuffixAffix->id,
+            'item_prefix_id' => $itemPrefixAffix->id,
+            'base_healing' => 100,
+        ]);
+
+        $character = $this->character->inventoryManagement()->giveItem($item)->equipItem('spell-one', 'weapon')->getCharacter();
+
+        $class = $this->createClass(['name' => 'Vampire']);
+
+        $character->update(['game_class_id' => $class->id]);
+
+        $character = $character->refresh();
+
+        $amount = $this->characterStatBuilder->setCharacter($character)->buildAffixDamage('life-stealing');
+
+        $this->assertEquals(.99, $amount);
     }
 
     public function testBuildAffixLifeStealingNonStackingWithNoEnchantments()
@@ -1422,6 +1459,7 @@ class CharacterStatBuilderTest extends TestCase
         ]);
 
         $character = $this->character->inventoryManagement()->giveItem($item)->equipItem('spell-one', 'weapon')->getCharacter();
+
         $amount = $this->characterStatBuilder->setCharacter($character)->buildAffixDamage('life-stealing', true);
 
         $this->assertEquals(0, $amount);

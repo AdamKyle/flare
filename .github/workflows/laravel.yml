@@ -19,42 +19,42 @@ jobs:
           --health-timeout=5s
           --health-retries=3
     steps:
-    - uses: actions/checkout@v1
-    - name: Setup PHP
-      uses: shivammathur/setup-php@v2
-      with:
-        php-version: 8.3
-    - name: Copy .env
-      run: php -r "file_exists('.env') || copy('.env.example', '.env');"
-    - name: Install Dependencies
-      run: |
-        rm -rf vendor
-        rm -rf composer.lock
-        composer install
-        yarn install
-    - name: Type Check
-      run: yarn type-check
-    - name: Generate key
-      run: php artisan key:generate
-    - name: Link Storage
-      run: php artisan storage:link
-    - name: Install dependencies (Laravel Vite)
-      run: yarn build
-    - name: Execute tests (Unit and Feature tests) via PHPUnit
-      env:
-        DB_CONNECTION: mysql
-        DB_HOST: 127.0.0.1
-        DB_DATABASE: flare_test
-        DB_PORT: 33306
-        DB_USER: root
-        DB_PASSWORD: password
-        TIME_ZONE: America/Edmonton
-      run: |
-        php artisan migrate
-        mkdir test-coverage
-        vendor/bin/phpunit --stop-on-error --stop-on-failure --coverage-html=./test-coverage
-    - name: Upload HTML coverage report
-      uses: actions/upload-artifact@v4
-      with:
-        name: coverage-report
-        path: test-coverage
+      - uses: actions/checkout@v1
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.3
+      - name: Copy .env
+        run: php -r "file_exists('.env') || copy('.env.example', '.env');"
+      - name: Install Dependencies
+        run: |
+          rm -rf vendor
+          rm -rf composer.lock
+          composer install
+          yarn install
+      - name: Type Check
+        run: yarn type-check
+      - name: Generate key
+        run: php artisan key:generate
+      - name: Link Storage
+        run: php artisan storage:link
+      - name: Install dependencies (Laravel Vite)
+        run: yarn build
+      - name: Execute tests (Unit and Feature tests) via PHPUnit
+        env:
+          DB_CONNECTION: mysql
+          DB_HOST: 127.0.0.1
+          DB_DATABASE: flare_test
+          DB_PORT: 33306
+          DB_USER: root
+          DB_PASSWORD: password
+          TIME_ZONE: America/Edmonton
+        run: |
+          php artisan migrate
+          mkdir test-coverage
+          vendor/bin/phpunit --stop-on-error --stop-on-failure --coverage-html=./test-coverage
+      - name: Upload HTML coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: test-coverage

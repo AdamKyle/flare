@@ -37,7 +37,7 @@ export default class AddGemsToItemActions extends React.Component<
                 />
                 {this.props.children}
                 <a
-                    href="/information/seer"
+                    href="/information/seer-camp"
                     target="_blank"
                     className="relative top-[20px] md:top-[0px] ml-2"
                 >

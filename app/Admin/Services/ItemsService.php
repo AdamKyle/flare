@@ -84,6 +84,7 @@ class ItemsService
                 ItemeffectsValue::SETTLE_IN_ICE_PLANE,
                 ItemEffectsValue::MERCENARY_SLOT_BONUS,
                 ItemEffectsValue::TWISTED_TREE_BRANCH,
+                ItemEffectsValue::TWISTED_DUNGEONS,
             ],
             'specialtyTypes' => [
                 ItemSpecialtyType::HELL_FORGED,

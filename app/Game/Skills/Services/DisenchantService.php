@@ -102,6 +102,8 @@ class DisenchantService
 
             $affixData = resolve(EnchantingService::class)->fetchAffixes($this->character->refresh());
 
+            event(new UpdateSkillEvent($this->disenchantingSkill));
+
             event(new UpdateCharacterEnchantingList(
                 $this->character->user,
                 $affixData['affixes'],

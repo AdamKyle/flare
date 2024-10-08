@@ -7,13 +7,18 @@ use App\Flare\Models\Character;
 use App\Flare\Models\Item;
 use App\Flare\Models\WeeklyMonsterFight;
 use App\Flare\Values\ItemSpecialtyType;
+use App\Flare\Values\MapNameValue;
 use App\Flare\Values\RandomAffixDetails;
+use App\Game\Character\Concerns\FetchEquipped;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
 use Facades\App\Flare\Calculators\DropCheckCalculator;
 
 class LocationSpecialtyHandler
 {
+
+    use FetchEquipped;
+
     private RandomAffixGenerator $randomAffixGenerator;
 
     public function __construct(RandomAffixGenerator $randomAffixGenerator)
@@ -41,7 +46,7 @@ class LocationSpecialtyHandler
         }
 
         for ($i = 1; $i <= 3; $i++) {
-            $character = $this->handOverAward($character, false, ! $mainItemIsCosmic);
+            $character = $this->handOverAward($character, false, !$mainItemIsCosmic);
         }
     }
 
@@ -61,6 +66,8 @@ class LocationSpecialtyHandler
             'item_id' => $item->id,
         ]);
 
+        $character = $character->refresh();
+
         $slot = $character->inventory->slots->where('item_id', '=', $item->id)->first();
 
         if ($secondaryIsLegendary) {
@@ -76,7 +83,10 @@ class LocationSpecialtyHandler
 
     private function giveCharacterRandomItem(Character $character, bool $isCosmic = true, bool $secondaryIsLegendary = false): Item
     {
-        $item = Item::where('specialty_type', ItemSpecialtyType::DELUSIONAL_SILVER)
+
+        $typeOfItem = $this->getType($character, $isCosmic);
+
+        $item = Item::where('specialty_type', $typeOfItem)
             ->whereNull('item_prefix_id')
             ->whereNull('item_suffix_id')
             ->whereNotIn('type', ['alchemy', 'quest', 'trinket', 'artifact'])
@@ -117,5 +127,37 @@ class LocationSpecialtyHandler
         }
 
         return $duplicateItem->refresh();
+    }
+
+    private function getType(Character $character, bool $isCosmicItem): ?string {
+
+        $typeOfItem = null;
+
+        $chance = $isCosmicItem ? 100 : $this->getChance();
+
+        $equippedItems = $this->fetchEquipped($character) ?? collect();
+        $equippedChance = 0.01;
+
+        $chance += match($character->map->gameMap->mapType()) {
+            MapNameValue::HELL => $equippedChance * $equippedItems->whereNull('item.specialty_type')->where('item.skill_level_required', 400)->sum(),
+            MapNameValue::DELUSIONAL_MEMORIES => $equippedChance * $equippedItems->where('item.specialty_type', ItemSpecialtyType::PURGATORY_CHAINS)->sum(),
+            MapNameValue::TWISTED_MEMORIES => $equippedChance * $equippedItems->where('item.specialty_type', ItemSpecialtyType::TWISTED_EARTH)->sum(),
+            default => 0.0
+        };
+
+        if ($chance >= 80) {
+            $typeOfItem = match($character->map->gameMap->mapType()) {
+                MapNameValue::HELL => ItemSpecialtyType::HELL_FORGED,
+                MapNameValue::DELUSIONAL_MEMORIES => ItemSpecialtyType::DELUSIONAL_SILVER,
+                MapNameValue::TWISTED_MEMORIES => ItemSpecialtyType::FAITHLESS_PLATE,
+                default => null
+            };
+        }
+
+        return $typeOfItem;
+    }
+
+    protected function getChance(): int {
+        return rand(1, 100);
     }
 }
