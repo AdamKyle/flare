@@ -33,10 +33,6 @@ class MassImportCustomData extends Command
      */
     public function handle()
     {
-
-        Artisan::call('remove:duplicate-items');
-        Cache::delete('crafting-table-data');
-
         $this->importInformationSection();
 
         if (config('app.env') !== 'production') {
