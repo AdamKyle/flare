@@ -95,7 +95,8 @@ class CraftingService
      */
     public function getCraftingXP(Character $character, string $type): array
     {
-        if ($type == 'hammer' ||
+        if (
+            $type == 'hammer' ||
             $type == 'bow' ||
             $type == 'stave' ||
             $type === 'gun' ||
@@ -255,7 +256,8 @@ class CraftingService
     protected function fetchCraftingSkill(Character $character, string $craftingType): Skill
     {
 
-        if ($craftingType === 'hammer' ||
+        if (
+            $craftingType === 'hammer' ||
             $craftingType === 'bow' ||
             $craftingType === 'stave' ||
             $craftingType === 'gun' ||
@@ -266,7 +268,7 @@ class CraftingService
             $craftingType = 'weapon';
         }
 
-        $gameSkill = GameSkill::where('name', ucfirst($craftingType).' Crafting')->first();
+        $gameSkill = GameSkill::where('name', ucfirst($craftingType) . ' Crafting')->first();
 
         return Skill::where('game_skill_id', $gameSkill->id)->where('character_id', $character->id)->first();
     }
@@ -397,7 +399,6 @@ class CraftingService
     {
 
         if ($this->craftForNpc) {
-
         }
 
         if (! $character->isInventoryFull()) {

@@ -4,6 +4,7 @@ namespace Tests\Unit\Game\Skills\Services;
 
 use App\Flare\Events\SkillLeveledUpServerMessageEvent;
 use App\Flare\Models\GameSkill;
+use App\Game\Events\Values\EventType;
 use App\Game\Skills\Services\SkillService;
 use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -11,11 +12,13 @@ use Illuminate\Support\Facades\Event;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateClass;
+use Tests\Traits\CreateEvent;
 use Tests\Traits\CreateGameSkill;
+use Tests\Traits\CreateScheduledEvent;
 
 class SkillServiceTest extends TestCase
 {
-    use CreateClass, CreateGameSkill, RefreshDatabase;
+    use CreateClass, CreateGameSkill, CreateEvent, CreateScheduledEvent, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -84,7 +87,7 @@ class SkillServiceTest extends TestCase
         $this->assertTrue($skillToTrain->currently_training);
 
         $this->assertEquals(200, $result['status']);
-        $this->assertEquals('You are now training '.$skillToTrain->name, $result['message']);
+        $this->assertEquals('You are now training ' . $skillToTrain->name, $result['message']);
     }
 
     public function testSwitchTrainingSkills()
@@ -115,7 +118,7 @@ class SkillServiceTest extends TestCase
         $this->assertFalse($secondarySkillTraining->currently_training);
 
         $this->assertEquals(200, $result['status']);
-        $this->assertEquals('You are now training '.$skillToTrain->name, $result['message']);
+        $this->assertEquals('You are now training ' . $skillToTrain->name, $result['message']);
     }
 
     public function testDoNotAssignXpToASkillThatDoesntExist()
@@ -149,6 +152,32 @@ class SkillServiceTest extends TestCase
 
     public function testAssignXpToSkill()
     {
+        $character = $this->character->getCharacter();
+
+        $skill = $character->skills->first();
+
+        $skill->update([
+            'currently_training' => true,
+            'xp_towards' => 0.10,
+        ]);
+
+        $character = $character->refresh();
+
+        $this->skillService->assignXPToTrainingSkill($character, 10);
+
+        $skill = $character->refresh()->skills->where('currently_training', true)->first();
+
+        $this->assertGreaterThan(10, $skill->xp);
+    }
+
+    public function testAssignXpToSkillWhenEventIsRunning()
+    {
+        $this->createScheduledEvent([
+            'event_type' => EventType::FEEDBACK_EVENT,
+            'start_date' => now()->addMinutes(5),
+            'currently_running' => true,
+        ]);
+
         $character = $this->character->getCharacter();
 
         $skill = $character->skills->first();
@@ -228,6 +257,101 @@ class SkillServiceTest extends TestCase
 
         $this->skillService->assignXpToCraftingSkill($character->map->gameMap, $skill);
 
+        $this->assertEquals(0, $skill->refresh()->xp);
+    }
+
+    public function testAssignXpToCraftingSkillWhenFeedBackEventIsRunning()
+    {
+        $this->createScheduledEvent([
+            'event_type' => EventType::FEEDBACK_EVENT,
+            'start_date' => now()->addMinutes(5),
+            'currently_running' => true,
+        ]);
+
+        $craftingSkill = $this->createGameSkill([
+            'type' => SkillTypeValue::CRAFTING,
+            'name' => 'Weapon Crafting',
+        ]);
+
+        $character = $this->character->assignSkill($craftingSkill, 1)->getCharacter();
+        $skill = $character->skills->where('game_skill_id', $craftingSkill->id)->first();
+
+        $this->skillService->assignXpToCraftingSkill($character->map->gameMap, $skill);
+
+        $this->assertGreaterThan(0, $skill->refresh()->xp);
+    }
+
+    public function testAssignXpToRegularSkillWhenFeedBackEventIsRunning()
+    {
+        $this->createScheduledEvent([
+            'event_type' => EventType::FEEDBACK_EVENT,
+            'start_date' => now()->addMinutes(5),
+            'currently_running' => true,
+        ]);
+
+        $regularSkill = $this->createGameSkill([
+            'type' => SkillTypeValue::TRAINING,
+            'name' => 'Accuracy',
+        ]);
+
+        $character = $this->character->assignSkill($regularSkill, 1)->getCharacter();
+        $skill = $character->skills->where('game_skill_id', $regularSkill->id)->first();
+
+        $this->skillService->assignXpToCraftingSkill($character->map->gameMap, $skill);
+
+        $this->assertGreaterThan(0, $skill->refresh()->xp);
+    }
+
+    public function testAssignXpToRegularSkillAndLevelItUp()
+    {
+        $craftingSkill = $this->createGameSkill([
+            'type' => SkillTypeValue::TRAINING,
+            'name' => 'Accuracy',
+        ]);
+
+        $character = $this->character->assignSkill($craftingSkill, 1, false, [
+            'xp' => 999,
+        ])->getCharacter();
+        $skill = $character->skills->where('game_skill_id', $craftingSkill->id)->first();
+
+        $this->skillService->assignXpToCraftingSkill($character->map->gameMap, $skill);
+
+        $this->assertGreaterThan(1, $skill->refresh()->level);
+    }
+
+    public function testAssignXpToRegularSkillAndDoNotLevelItUpWhenMaxed()
+    {
+        $craftingSkill = $this->createGameSkill([
+            'type' => SkillTypeValue::TRAINING,
+            'name' => 'Accuracy',
+        ]);
+
+        $character = $this->character->assignSkill($craftingSkill, 400, false, [
+            'xp' => 999,
+        ])->getCharacter();
+        $skill = $character->skills->where('game_skill_id', $craftingSkill->id)->first();
+
+        $this->skillService->assignXpToCraftingSkill($character->map->gameMap, $skill);
+
+        $this->assertEquals(400, $skill->refresh()->level);
+        $this->assertEquals(0, $skill->refresh()->xp);
+    }
+
+    public function testAssignXpToRegularSkillAndDoNotLevelItBeyondLevel400()
+    {
+        $craftingSkill = $this->createGameSkill([
+            'type' => SkillTypeValue::TRAINING,
+            'name' => 'Accuracy',
+        ]);
+
+        $character = $this->character->assignSkill($craftingSkill, 399, false, [
+            'xp' => 999,
+        ])->getCharacter();
+        $skill = $character->skills->where('game_skill_id', $craftingSkill->id)->first();
+
+        $this->skillService->assignXpToCraftingSkill($character->map->gameMap, $skill);
+
+        $this->assertEquals(400, $skill->refresh()->level);
         $this->assertEquals(0, $skill->refresh()->xp);
     }
 }

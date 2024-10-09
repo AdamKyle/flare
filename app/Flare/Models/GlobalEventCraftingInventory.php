@@ -2,7 +2,7 @@
 
 namespace App\Flare\Models;
 
-use Database\Factories\GlobalEventGoalFactory;
+use Database\Factories\GlobalEventCraftingInventoryFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -51,6 +51,6 @@ class GlobalEventCraftingInventory extends Model
 
     protected static function newFactory()
     {
-        return GlobalEventGoalFactory::new();
+        return GlobalEventCraftingInventoryFactory::new();
     }
 }

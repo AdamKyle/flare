@@ -2,6 +2,7 @@
 
 namespace App\Flare\Models;
 
+use Database\Factories\GlobalEventCraftingInventorySlotFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -39,5 +40,8 @@ class GlobalEventCraftingInventorySlot extends Model
         return $this->belongsTo(GlobalEventCraftingInventory::class, 'global_event_crafting_inventory_id', 'id');
     }
 
-    protected static function newFactory() {}
+    protected static function newFactory()
+    {
+        return GlobalEventCraftingInventorySlotFactory::new();
+    }
 }

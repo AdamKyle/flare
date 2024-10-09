@@ -187,6 +187,34 @@ class GemServiceTest extends TestCase
         Event::assertDispatched(ServerMessageEvent::class);
     }
 
+    public function testCraftTheGemWhenSkillLevelIsMaxed()
+    {
+        Event::fake();
+
+        $character = $this->character->getCharacter();
+
+        $character->skills()->where('game_skill_id', GameSkill::where('name', 'Gem Crafting')->first()->id)->update([
+            'level' => 400
+        ]);
+
+        $character->update([
+            'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
+            'shards' => MaxCurrenciesValue::MAX_SHARDS,
+            'copper_coins' => MaxCurrenciesValue::MAX_COPPER,
+        ]);
+
+        $result = resolve(GemService::class)->generateGem($character, 1);
+
+        $character = $character->refresh();
+
+        $this->assertEquals(1, $character->gemBag->gemSlots->first()->amount);
+
+        $this->assertEquals(200, $result['status']);
+
+        Event::assertDispatched(UpdateSkillEvent::class);
+        Event::assertDispatched(ServerMessageEvent::class);
+    }
+
     public function testCraftTheGemButIncreaseTheAmount()
     {
         Event::fake();

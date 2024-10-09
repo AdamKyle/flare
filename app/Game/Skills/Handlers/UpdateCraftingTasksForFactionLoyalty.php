@@ -77,9 +77,9 @@ class UpdateCraftingTasksForFactionLoyalty
         $amountLeft = $task['required_amount'] - $task['current_amount'];
 
         if ($amountLeft === 0) {
-            ServerMessageHandler::sendBasicMessage($character->user, $helpingNpc->npc->real_name.' does not want anymore of this item anymore. "We\'re done with this child. Move on. I got other tasks for you to do! But you since you crafted it ..."');
+            ServerMessageHandler::sendBasicMessage($character->user, $helpingNpc->npc->real_name . ' does not want anymore of this item anymore. "We\'re done with this child. Move on. I got other tasks for you to do! But you since you crafted it ..."');
         } else {
-            ServerMessageHandler::sendBasicMessage($character->user, $helpingNpc->npc->real_name.' is elated at your ability to craft: '.$item->affix_name.'. "Thank you child! Only: '.$amountLeft.' Left to go!"');
+            ServerMessageHandler::sendBasicMessage($character->user, $helpingNpc->npc->real_name . ' is elated at your ability to craft: ' . $item->affix_name . '. "Thank you child! Only: ' . $amountLeft . ' Left to go!"');
         }
 
         if ($this->canLevelUpFame($helpingNpc) && $helpingNpc->current_level !== $helpingNpc->max_level) {
@@ -151,7 +151,7 @@ class UpdateCraftingTasksForFactionLoyalty
 
         event(new UpdateTopBarEvent($character->refresh()));
 
-        ServerMessageHandler::sendBasicMessage($character->user, 'Your fame with: '.$factionLoyaltyNpc->npc->real_name.' on Plane: '.$factionLoyaltyNpc->npc->gameMap->name);
+        ServerMessageHandler::sendBasicMessage($character->user, 'Your fame with: ' . $factionLoyaltyNpc->npc->real_name . ' on Plane: ' . $factionLoyaltyNpc->npc->gameMap->name);
     }
 
     /**
@@ -170,7 +170,7 @@ class UpdateCraftingTasksForFactionLoyalty
 
         $this->handlePossibleLevelUp($character);
 
-        ServerMessageHandler::sendBasicMessage($character->user, 'Rewarded with: '.number_format($factionLoyaltyNpc->current_level * 1000).' XP.');
+        ServerMessageHandler::sendBasicMessage($character->user, 'Rewarded with: ' . number_format($factionLoyaltyNpc->current_level * 1000) . ' XP.');
     }
 
     /**
@@ -205,7 +205,7 @@ class UpdateCraftingTasksForFactionLoyalty
             'item_id' => $newItem->id,
         ]);
 
-        event(new ServerMessageEvent($character->user, 'You found something of MEDIUM value child. A simple reward: '.$item->affix_name, $slot->id));
+        event(new ServerMessageEvent($character->user, 'You found something of MEDIUM value child. A simple reward: ' . $item->affix_name, $slot->id));
     }
 
     /**

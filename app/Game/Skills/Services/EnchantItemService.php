@@ -128,26 +128,13 @@ class EnchantItemService
     {
         $clonedItem = DuplicateItemHandler::duplicateItem($item);
 
-        $clonedItem->{'item_'.$affix->type.'_id'} = $affix->id;
+        $clonedItem->{'item_' . $affix->type . '_id'} = $affix->id;
         $clonedItem->market_sellable = true;
         $clonedItem->parent_id = $item->id;
         $clonedItem->is_mythic = false;
         $clonedItem->is_cosmic = false;
 
         if ($affix->type === 'suffix') {
-
-            if (! is_null($clonedItem->itemPrefix)) {
-                if ($clonedItem->itemPrefix->cost === RandomAffixDetails::MYTHIC) {
-                    $clonedItem->item_prefix_id = null;
-                }
-
-                if ($clonedItem->itemPrefix->cost === RandomAffixDetails::COSMIC) {
-                    $clonedItem->item_prefix_id = null;
-                }
-            }
-        }
-
-        if ($affix->type === 'prefix') {
 
             if (! is_null($clonedItem->itemSuffix)) {
                 if ($clonedItem->itemSuffix->cost === RandomAffixDetails::MYTHIC) {
@@ -156,6 +143,19 @@ class EnchantItemService
 
                 if ($clonedItem->itemSuffix->cost === RandomAffixDetails::COSMIC) {
                     $clonedItem->item_suffix_id = null;
+                }
+            }
+        }
+
+        if ($affix->type === 'prefix') {
+
+            if (! is_null($clonedItem->itemPrefix)) {
+                if ($clonedItem->itemPrefix->cost === RandomAffixDetails::MYTHIC) {
+                    $clonedItem->item_prefix_id = null;
+                }
+
+                if ($clonedItem->itemPrefix->cost === RandomAffixDetails::COSMIC) {
+                    $clonedItem->item_prefix_id = null;
                 }
             }
         }
@@ -170,18 +170,12 @@ class EnchantItemService
      */
     protected function getCountOfMatchingItems(): int
     {
-        // Holy stacks are random, so we want a matching
-        // item only if this item has no stacks on it.
-        if ($this->item->appliedHolyStacks()->count() === 0) {
-            return Item::where('name', $this->item->name)
-                ->where('item_prefix_id', $this->item->item_prefix_id)
-                ->where('item_suffix_id', $this->item->item_suffix_id)
-                ->whereDoesntHave('appliedHolyStacks')
-                ->whereDoesntHave('sockets')
-                ->count();
-        }
-
-        return 0;
+        return Item::where('name', $this->item->name)
+            ->where('item_prefix_id', $this->item->item_prefix_id)
+            ->where('item_suffix_id', $this->item->item_suffix_id)
+            ->whereDoesntHave('appliedHolyStacks')
+            ->whereDoesntHave('sockets')
+            ->count();
     }
 
     /**
@@ -200,6 +194,6 @@ class EnchantItemService
             ->whereDoesntHave('appliedHolyStacks')
             ->whereDoesntHave('sockets')
             ->first()
-                   ->id;
+            ->id;
     }
 }
