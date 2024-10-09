@@ -8,17 +8,18 @@ use App\Game\Core\Events\CraftedItemTimeOutEvent;
 use App\Game\Skills\Requests\TrinketCraftingValidation;
 use App\Game\Skills\Services\TrinketCraftingService;
 use App\Http\Controllers\Controller;
+use Illuminate\Http\JsonResponse;
 
 class TrinketCraftingController extends Controller
 {
-    private $trinketCraftingService;
 
-    public function __construct(TrinketCraftingService $trinketCraftingService)
-    {
-        $this->trinketCraftingService = $trinketCraftingService;
-    }
+    public function __construct(private TrinketCraftingService $trinketCraftingService) {}
 
-    public function fetchItemsToCraft(Character $character)
+    /**
+     * @param Character $character
+     * @return JsonResponse
+     */
+    public function fetchItemsToCraft(Character $character): JsonResponse
     {
 
         return response()->json([
@@ -27,7 +28,12 @@ class TrinketCraftingController extends Controller
         ]);
     }
 
-    public function craftTrinket(TrinketCraftingValidation $request, Character $character)
+    /**
+     * @param TrinketCraftingValidation $request
+     * @param Character $character
+     * @return JsonResponse
+     */
+    public function craftTrinket(TrinketCraftingValidation $request, Character $character): JsonResponse
     {
         event(new CraftedItemTimeOutEvent($character));
 

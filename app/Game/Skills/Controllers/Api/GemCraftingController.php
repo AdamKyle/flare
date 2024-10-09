@@ -6,20 +6,16 @@ use App\Flare\Models\Character;
 use App\Game\Skills\Requests\GemCraftingValidation;
 use App\Game\Skills\Services\GemService;
 use App\Http\Controllers\Controller;
-use Exception;
 use Illuminate\Http\JsonResponse;
 
 class GemCraftingController extends Controller
 {
-    private GemService $gemService;
 
-    public function __construct(GemService $gemService)
-    {
-        $this->gemService = $gemService;
-    }
+    public function __construct(private GemService $gemService) {}
 
     /**
-     * @throws Exception
+     * @param Character $character
+     * @return JsonResponse
      */
     public function getCraftableItems(Character $character): JsonResponse
     {
@@ -30,7 +26,9 @@ class GemCraftingController extends Controller
     }
 
     /**
-     * @throws Exception
+     * @param Character $character
+     * @param GemCraftingValidation $request
+     * @return JsonResponse
      */
     public function craftGem(Character $character, GemCraftingValidation $request): JsonResponse
     {

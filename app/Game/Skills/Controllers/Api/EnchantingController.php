@@ -12,20 +12,16 @@ use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 class EnchantingController extends Controller
 {
     /**
-     * @var EnchantingService
-     */
-    private $enchantingService;
-
-    /**
      * Constructor
      *
      * @return void
      */
-    public function __construct(EnchantingService $enchantingService)
-    {
-        $this->enchantingService = $enchantingService;
-    }
+    public function __construct(private EnchantingService $enchantingService) {}
 
+    /**
+     * @param Character $character
+     * @return void
+     */
     public function fetchAffixes(Character $character)
     {
         return response()->json([
@@ -34,6 +30,11 @@ class EnchantingController extends Controller
         ]);
     }
 
+    /**
+     * @param EnchantingValidation $request
+     * @param Character $character
+     * @return void
+     */
     public function enchant(EnchantingValidation $request, Character $character)
     {
         if (! $character->can_craft) {

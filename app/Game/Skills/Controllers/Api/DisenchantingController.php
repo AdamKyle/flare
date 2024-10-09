@@ -10,21 +10,19 @@ use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Skills\Services\DisenchantService;
 use App\Http\Controllers\Controller;
+use Illuminate\Http\JsonResponse;
 
 class DisenchantingController extends Controller
 {
-    private DisenchantService $disenchantingService;
+    public function __construct(private DisenchantService $disenchantService) {}
 
     /**
-     * Constructor
+     * @param Item $item
+     * @return JsonResponse
      */
-    public function __construct(DisenchantService $disenchantService) {
-        $this->disenchantingService = $disenchantService;
-    }
-
-    public function disenchant(Item $item)
+    public function disenchant(Item $item): JsonResponse
     {
-        $result = $this->disenchantingService->disenchantItem(auth()->user()->character, $item);
+        $result = $this->disenchantService->disenchantItem(auth()->user()->character, $item);
 
         $status = $result['status'];
         unset($result['status']);
@@ -32,7 +30,11 @@ class DisenchantingController extends Controller
         return response()->json($result, $status);
     }
 
-    public function destroy(Item $item)
+    /**
+     * @param Item $item
+     * @return JsonResponse
+     */
+    public function destroy(Item $item): JsonResponse
     {
         $character = auth()->user()->character;
 
@@ -51,7 +53,7 @@ class DisenchantingController extends Controller
 
             $foundSlot->delete();
 
-            event(new ServerMessageEvent($character->user, 'Destroyed: '.$name));
+            event(new ServerMessageEvent($character->user, 'Destroyed: ' . $name));
 
             event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'inventory'));
 

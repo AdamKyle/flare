@@ -8,28 +8,21 @@ use App\Game\Factions\FactionLoyalty\Concerns\FactionLoyalty;
 use App\Game\Skills\Requests\CraftingValidation;
 use App\Game\Skills\Services\CraftingService;
 use App\Http\Controllers\Controller;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class CraftingController extends Controller
 {
     use FactionLoyalty, ShouldShowCraftingEventButton;
 
-    /**
-     * @var CraftingService
-     */
-    private $craftingService;
+    public function __construct(private CraftingService $craftingService) {}
 
     /**
-     * Constructor
-     *
-     * @return void
+     * @param Request $request
+     * @param Character $character
+     * @return JsonResponse
      */
-    public function __construct(CraftingService $craftingService)
-    {
-        $this->craftingService = $craftingService;
-    }
-
-    public function fetchItemsToCraft(Request $request, Character $character)
+    public function fetchItemsToCraft(Request $request, Character $character): JsonResponse
     {
         return response()->json([
             'items' => $this->craftingService->fetchCraftableItems($character, $request->all()),
@@ -39,7 +32,13 @@ class CraftingController extends Controller
         ]);
     }
 
-    public function craft(CraftingValidation $request, Character $character, CraftingService $craftingService)
+    /**
+     * @param CraftingValidation $request
+     * @param Character $character
+     * @param CraftingService $craftingService
+     * @return JsonResponse
+     */
+    public function craft(CraftingValidation $request, Character $character, CraftingService $craftingService): JsonResponse
     {
         if (! $character->can_craft) {
             return response()->json(['message' => 'invalid input.'], 429);

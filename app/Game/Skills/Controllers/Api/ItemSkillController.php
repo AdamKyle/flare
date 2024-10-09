@@ -7,19 +7,21 @@ use App\Game\Character\Concerns\FetchEquipped;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Skills\Services\ItemSkillService;
 use App\Http\Controllers\Controller;
+use Illuminate\Http\JsonResponse;
 
 class ItemSkillController extends Controller
 {
     use FetchEquipped, ResponseBuilder;
 
-    private ItemSkillService $itemSkillService;
+    public function __construct(private ItemSkillService $itemSkillService) {}
 
-    public function __construct(ItemSkillService $itemSkillService)
-    {
-        $this->itemSkillService = $itemSkillService;
-    }
-
-    public function trainSkill(Character $character, int $itemId, int $itemSkillProgressionId)
+    /**
+     * @param Character $character
+     * @param integer $itemId
+     * @param integer $itemSkillProgressionId
+     * @return JsonResponse
+     */
+    public function trainSkill(Character $character, int $itemId, int $itemSkillProgressionId): JsonResponse
     {
 
         $result = $this->itemSkillService->trainSkill($character, $itemId, $itemSkillProgressionId);
@@ -30,7 +32,13 @@ class ItemSkillController extends Controller
         return response()->json($result, $status);
     }
 
-    public function stopTrainingSkill(Character $character, int $itemId, int $itemSkillProgressionId)
+    /**
+     * @param Character $character
+     * @param integer $itemId
+     * @param integer $itemSkillProgressionId
+     * @return JsonResponse
+     */
+    public function stopTrainingSkill(Character $character, int $itemId, int $itemSkillProgressionId): JsonResponse
     {
         $result = $this->itemSkillService->stopTrainingSkill($character, $itemId, $itemSkillProgressionId);
         $status = $result['status'];
