@@ -4,6 +4,7 @@ namespace App\Flare\GameImporter\Console\Commands;
 
 use App\Flare\Models\GameMap;
 use App\Flare\Models\InfoPage;
+use App\Flare\Models\Item;
 use App\Flare\Models\Survey;
 use App\Flare\Values\MapNameValue;
 use Illuminate\Console\Command;
@@ -33,6 +34,13 @@ class MassImportCustomData extends Command
      */
     public function handle()
     {
+
+        Artisan::call('import:game-data Items');
+
+        Item::where('name', 'Musty Childs Teddy bare')->first()->update([
+            'name' => 'Musty Childs Teddy Bear',
+        ]);
+
         $this->importInformationSection();
 
         if (config('app.env') !== 'production') {
@@ -55,7 +63,7 @@ class MassImportCustomData extends Command
         $sourceDirectory = resource_path('backup/info-sections-images');
         $destinationDirectory = storage_path('app/public');
 
-        $command = 'cp -R '.escapeshellarg($sourceDirectory).' '.escapeshellarg($destinationDirectory);
+        $command = 'cp -R ' . escapeshellarg($sourceDirectory) . ' ' . escapeshellarg($destinationDirectory);
         exec($command, $output, $exitCode);
 
         if ($exitCode === 0) {
@@ -63,7 +71,6 @@ class MassImportCustomData extends Command
         } else {
             $this->line('Failed to copy the information images directory over. You can do this manually from the resources/backup/information-sections-images. Copy the entire directory to app/public');
         }
-
     }
 
     /**
@@ -111,7 +118,7 @@ class MassImportCustomData extends Command
         foreach ($files as $file) {
             $fileName = pathinfo($file, PATHINFO_FILENAME);
 
-            $path = Storage::disk('maps')->putFile($fileName, new File(resource_path('maps').'/'.$file));
+            $path = Storage::disk('maps')->putFile($fileName, new File(resource_path('maps') . '/' . $file));
 
             $mapValue = new MapNameValue($fileName);
 
