@@ -9,8 +9,8 @@ use App\Flare\Models\Skill;
 use App\Game\Core\Events\CraftedItemTimeOutEvent;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\ResponseBuilder;
+use App\Game\Gems\Builders\GemBuilder;
 use App\Game\Gems\Values\GemTierValue;
-use App\Game\Skills\Builders\GemBuilder;
 use App\Game\Skills\Events\UpdateSkillEvent;
 use App\Game\Skills\Values\SkillTypeValue;
 use Exception;
@@ -20,12 +20,7 @@ class GemService
 {
     use ResponseBuilder;
 
-    private GemBuilder $gemBuilder;
-
-    public function __construct(GemBuilder $gemBuilder)
-    {
-        $this->gemBuilder = $gemBuilder;
-    }
+    public function __construct(private GemBuilder $gemBuilder) {}
 
     /**
      * Generate the gem.
@@ -232,7 +227,7 @@ class GemService
         $skill = $character->skills()->where('game_skill_id', $gameSkill->id)->first();
 
         if (is_null($skill)) {
-            throw new Exception('Character is missing required game skill: '.$name);
+            throw new Exception('Character is missing required game skill: ' . $name);
         }
 
         return $skill;

@@ -4,9 +4,9 @@ namespace Tests\Unit\Game\Skills\Services;
 
 use App\Flare\Models\GameSkill;
 use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\Gems\Builders\GemBuilder;
 use App\Game\Gems\Values\GemTypeValue;
 use App\Game\Messages\Events\ServerMessageEvent;
-use App\Game\Skills\Builders\GemBuilder;
 use App\Game\Skills\Events\UpdateSkillEvent;
 use App\Game\Skills\Services\GemService;
 use App\Game\Skills\Values\SkillTypeValue;

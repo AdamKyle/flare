@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Game\Skills\Builders;
+namespace App\Game\Gems\Builders;
 
 use App\Flare\Models\Gem;
 use App\Game\Gems\Values\GemTierValue;
@@ -35,9 +35,10 @@ class GemBuilder
     ];
 
     /**
-     * Build the gem.
+     * Build or return the found gem.
      *
-     * @throws \Exception
+     * @param integer $tier
+     * @return Gem
      */
     public function buildGem(int $tier): Gem
     {
@@ -53,16 +54,7 @@ class GemBuilder
             }
         }
 
-        $dataForGem = [
-            'name' => $this->names[rand(0, count($this->names) - 1)],
-            'tier' => $tier,
-            'primary_atonement_type' => GemTypeValue::FIRE,
-            'secondary_atonement_type' => GemTypeValue::WATER,
-            'tertiary_atonement_type' => GemTypeValue::ICE,
-            'primary_atonement_amount' => $rolls[0],
-            'secondary_atonement_amount' => $rolls[1],
-            'tertiary_atonement_amount' => $rolls[2],
-        ];
+        $dataForGem = $this->buildDataForGem($rolls, $tier);
 
         $gem = $this->findExistingGem($dataForGem);
 
@@ -74,7 +66,10 @@ class GemBuilder
     }
 
     /**
-     * Find an existing gem.
+     * Find an existing gem based on data
+     *
+     * @param array $data
+     * @return Gem|null
      */
     protected function findExistingGem(array $data): ?Gem
     {
@@ -86,5 +81,26 @@ class GemBuilder
             ->where('secondary_atonement_amount', $data['secondary_atonement_amount'])
             ->where('tertiary_atonement_amount', $data['tertiary_atonement_amount'])
             ->first();
+    }
+
+    /**
+     * Build the data for either finding or building a gem.
+     *
+     * @param array $rolls
+     * @param integer $tier
+     * @return array
+     */
+    protected function buildDataForGem(array $rolls, int $tier): array
+    {
+        return [
+            'name' => $this->names[rand(0, count($this->names) - 1)],
+            'tier' => $tier,
+            'primary_atonement_type' => GemTypeValue::FIRE,
+            'secondary_atonement_type' => GemTypeValue::WATER,
+            'tertiary_atonement_type' => GemTypeValue::ICE,
+            'primary_atonement_amount' => $rolls[0],
+            'secondary_atonement_amount' => $rolls[1],
+            'tertiary_atonement_amount' => $rolls[2],
+        ];
     }
 }
