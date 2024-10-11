@@ -56,7 +56,10 @@ class EnchantingController extends Controller
         if ($cost > $character->gold) {
             ServerMessageHandler::handleMessage($character->user, 'enchantment_failed', 'Not enough gold to enchant that.');
 
-            return response()->json($this->enchantingService->fetchAffixes($character->refresh()));
+            return response()->json([
+                'affixes' => $this->enchantingService->fetchAffixes($character->refresh(), true, false),
+                'skill_xp' => $this->enchantingService->getEnchantingXP($character),
+            ]);
         }
 
         $timeOut = $this->enchantingService->timeForEnchanting($slot->item);

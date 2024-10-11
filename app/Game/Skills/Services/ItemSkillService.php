@@ -51,7 +51,7 @@ class ItemSkillService
         $foundSkill = $foundSkill->refresh();
 
         return $this->successResult([
-            'message' => 'You are now training: '.$foundSkill->itemSkill->name,
+            'message' => 'You are now training: ' . $foundSkill->itemSkill->name,
         ]);
     }
 
@@ -76,16 +76,17 @@ class ItemSkillService
             'is_training' => false,
         ]);
 
+
         event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'equipped'));
 
         return $this->successResult([
-            'message' => 'You stopped training: '.$foundSkill->itemSkill->name,
+            'message' => 'You stopped training: ' . $foundSkill->itemSkill->name,
         ]);
     }
 
     /**
      * Can we train the skill?
-     *
+     *testTrainItemSkill
      * - Check to make sure the parent skill is trained if needed.
      */
     protected function canTrainSkill(ItemSkillProgression $itemSkillProgression): bool

@@ -60,7 +60,7 @@ class GemService
 
         $gemBagEntry = $this->giveGem($character, $tier);
 
-        if (! $characterSkill->level <= (new GemTierValue($tier))->maxForTier()['max_level']) {
+        if ($characterSkill->level <= (new GemTierValue($tier))->maxForTier()['max_level']) {
             event(new UpdateSkillEvent($characterSkill));
         }
 

@@ -4,22 +4,22 @@ namespace Tests\Feature\Game\Skills\Controllers\Api;
 
 use App\Flare\Models\Character;
 use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Skills\Services\SkillCheckService;
 use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Event;
 use Mockery;
 use Mockery\MockInterface;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
-use Tests\Traits\CreateFactionLoyalty;
 use Tests\Traits\CreateGameSkill;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateItemAffix;
-use Tests\Traits\CreateNpc;
 
 class EnchantingControllerTest extends TestCase
 {
-    use CreateFactionLoyalty, CreateGameSkill, CreateItem, CreateItemAffix, CreateNpc, RefreshDatabase;
+    use CreateGameSkill, CreateItem, CreateItemAffix, RefreshDatabase;
 
     private ?Character $character = null;
 
@@ -136,8 +136,53 @@ class EnchantingControllerTest extends TestCase
         $this->assertEquals('You cannot enchant quest items.', $jsonData['message']);
     }
 
+    public function testCannotEnchantItemNotEnoughGold()
+    {
+        Event::fake();
+
+        $item = $this->createItem([
+            'type' => 'body',
+        ]);
+
+        $enchantment = $this->createItemAffix([
+            'type' => 'suffix',
+        ]);
+
+        $this->character->inventory->slots()->create([
+            'inventory_id' => $this->character->inventory->id,
+            'item_id' => $item->id,
+        ]);
+
+        $character = $this->character->refresh();
+
+        $slot = $character->inventory->slots()->where('item_id', $item->id)->first();
+
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/enchant/' . $character->id, [
+                'slot_id' => $slot->id,
+                'affix_ids' => [$enchantment->id],
+                'enchant_for_event' => false,
+            ]);
+
+        Event::assertDispatched(ServerMessageEvent::class, function ($event) {
+            return $event->message === 'Not enough gold to enchant that.';
+        });
+
+        $jsonData = json_decode($response->getContent(), true);
+
+        $this->assertEquals($jsonData['affixes']['affixes'][0]['id'], $enchantment->id);
+        $this->assertEquals(0, $jsonData['skill_xp']['current_xp']);
+    }
+
     public function testEnchantItem()
     {
+        $this->instance(
+            SkillCheckService::class,
+            Mockery::mock(SkillCheckService::class, function (MockInterface $mock) {
+                $mock->shouldReceive('getDCCheck')->once()->andReturn(1);
+                $mock->shouldReceive('characterRoll')->once()->andReturn(100);
+            })
+        );
         $item = $this->createItem([
             'type' => 'body',
         ]);

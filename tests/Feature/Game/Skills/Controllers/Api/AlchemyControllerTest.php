@@ -11,14 +11,12 @@ use Mockery;
 use Mockery\MockInterface;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
-use Tests\Traits\CreateFactionLoyalty;
 use Tests\Traits\CreateGameSkill;
 use Tests\Traits\CreateItem;
-use Tests\Traits\CreateNpc;
 
 class AlchemyControllerTest extends TestCase
 {
-    use CreateFactionLoyalty, CreateGameSkill, CreateItem, CreateNpc, RefreshDatabase;
+    use CreateGameSkill, CreateItem, RefreshDatabase;
 
     private ?Character $character = null;
 
