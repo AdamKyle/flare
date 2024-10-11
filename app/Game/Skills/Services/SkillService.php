@@ -98,14 +98,14 @@ class SkillService
         ]);
 
         return $this->successResult([
-            'message' => 'You are now training ' . $skill->name,
+            'message' => 'You are now training: ' . $skill->name,
         ]);
     }
 
     /**
-     * Assign XP to a training skill.
+     * Assign XP to a training skill.trainSkill
      *
-     * @param Character $character
+     * @param Character $charactertrainSkill
      * @param int $xp
      * @return void
      * @throws Exception

@@ -87,7 +87,7 @@ class SkillServiceTest extends TestCase
         $this->assertTrue($skillToTrain->currently_training);
 
         $this->assertEquals(200, $result['status']);
-        $this->assertEquals('You are now training ' . $skillToTrain->name, $result['message']);
+        $this->assertEquals('You are now training: ' . $skillToTrain->name, $result['message']);
     }
 
     public function testSwitchTrainingSkills()
@@ -118,7 +118,7 @@ class SkillServiceTest extends TestCase
         $this->assertFalse($secondarySkillTraining->currently_training);
 
         $this->assertEquals(200, $result['status']);
-        $this->assertEquals('You are now training ' . $skillToTrain->name, $result['message']);
+        $this->assertEquals('You are now training: ' . $skillToTrain->name, $result['message']);
     }
 
     public function testDoNotAssignXpToASkillThatDoesntExist()
