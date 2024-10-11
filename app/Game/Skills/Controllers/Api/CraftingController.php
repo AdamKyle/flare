@@ -41,7 +41,7 @@ class CraftingController extends Controller
     public function craft(CraftingValidation $request, Character $character, CraftingService $craftingService): JsonResponse
     {
         if (! $character->can_craft) {
-            return response()->json(['message' => 'invalid input.'], 429);
+            return response()->json(['message' => 'You must wait to craft again.'], 422);
         }
 
         $crafted = $craftingService->craft($character, $request->all());
@@ -50,6 +50,7 @@ class CraftingController extends Controller
             'items' => $this->craftingService->fetchCraftableItems($character->refresh(), ['crafting_type' => $request->type], false),
             'xp' => $this->craftingService->getCraftingXP($character, $request->type),
             'show_craft_for_event' => $this->shouldShowCraftingEventButton($character),
+            'show_craft_for_npc' => $this->showCraftForNpcButton($character, $request->type),
             'crafted_item' => $crafted,
         ], 200);
     }

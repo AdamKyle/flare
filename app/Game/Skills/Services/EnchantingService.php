@@ -139,7 +139,7 @@ class EnchantingService
         $cost = $itemAffixes->sum('cost');
 
         foreach ($itemAffixes as $itemAffix) {
-            if (! is_null($itemToEnchant->{'item_'.$itemAffix->type.'_id'})) {
+            if (! is_null($itemToEnchant->{'item_' . $itemAffix->type . '_id'})) {
                 $cost += 1000;
             }
         }
@@ -197,7 +197,7 @@ class EnchantingService
         return null;
     }
 
-    public function getSlotFromInventory(Character $character, int $slotId)
+    public function getSlotFromInventory(Character $character, int $slotId): InventorySlot|GlobalEventCraftingInventorySlot|null
     {
         $inventory = Inventory::where('character_id', $character->id)->first();
 
@@ -205,6 +205,10 @@ class EnchantingService
 
         if (is_null($foundInInventory)) {
             $inventory = GlobalEventCraftingInventory::where('character_id', $character->id)->first();
+
+            if (is_null($inventory)) {
+                return null;
+            }
 
             $foundInInventory = GlobalEventCraftingInventorySlot::where('id', $slotId)->where('global_event_crafting_inventory_id', $inventory->id)->first();
         }
@@ -307,7 +311,7 @@ class EnchantingService
 
     protected function appliedEnchantment(InventorySlot|GlobalEventCraftingInventorySlot $slot, ItemAffix $affix, Character $character, Skill $enchantingSkill, bool $tooEasy = false)
     {
-        $message = 'Applied enchantment: '.$affix->name.' to: '.$slot->item->refresh()->affix_name;
+        $message = 'Applied enchantment: ' . $affix->name . ' to: ' . $slot->item->refresh()->affix_name;
 
         ServerMessageHandler::handleMessage($character->user, 'enchanted', $message, $slot->id);
 
@@ -318,7 +322,7 @@ class EnchantingService
 
     protected function failedToApplyEnchantment(InventorySlot|GlobalEventCraftingInventorySlot $slot, ItemAffix $affix, Character $character)
     {
-        $message = 'You failed to apply '.$affix->name.' to: '.$slot->item->refresh()->affix_name.'. The item shatters before you. You lost the investment.';
+        $message = 'You failed to apply ' . $affix->name . ' to: ' . $slot->item->refresh()->affix_name . '. The item shatters before you. You lost the investment.';
 
         ServerMessageHandler::handleMessage($character->user, 'enchantment_failed', $message);
 
