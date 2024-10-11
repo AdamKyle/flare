@@ -183,6 +183,7 @@ class EnchantingControllerTest extends TestCase
                 $mock->shouldReceive('characterRoll')->once()->andReturn(100);
             })
         );
+
         $item = $this->createItem([
             'type' => 'body',
         ]);
@@ -203,14 +204,6 @@ class EnchantingControllerTest extends TestCase
         $character = $this->character->refresh();
 
         $slot = $character->inventory->slots()->where('item_id', $item->id)->first();
-
-        $this->instance(
-            SkillCheckService::class,
-            Mockery::mock(SkillCheckService::class, function (MockInterface $mock) {
-                $mock->shouldReceive('getDCCheck')->once()->andReturn(1);
-                $mock->shouldReceive('characterRoll')->once()->andReturn(100);
-            })
-        );
 
         $response = $this->actingAs($character->user)
             ->call('POST', '/api/enchant/' . $character->id, [

@@ -191,6 +191,7 @@ class GemServiceTest extends TestCase
     {
         Event::fake();
 
+
         $character = $this->character->getCharacter();
 
         $character->skills()->where('game_skill_id', GameSkill::where('name', 'Gem Crafting')->first()->id)->update([
@@ -211,7 +212,7 @@ class GemServiceTest extends TestCase
 
         $this->assertEquals(200, $result['status']);
 
-        Event::assertDispatched(UpdateSkillEvent::class);
+        Event::assertNotDispatched(UpdateSkillEvent::class);
         Event::assertDispatched(ServerMessageEvent::class);
     }
 

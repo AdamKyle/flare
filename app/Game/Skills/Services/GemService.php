@@ -52,7 +52,6 @@ class GemService
         }
 
         if (!$this->canCraft($characterSkill, (new GemTierValue($tier))->maxForTier()['chance'])) {
-
             ServerMessageHandler::sendBasicMessage($character->user, 'You failed to craft the gem, the item explodes before you into a pile of wasted effort and time.');
 
             return $this->successResult();

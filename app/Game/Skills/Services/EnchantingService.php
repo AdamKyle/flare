@@ -269,12 +269,11 @@ class EnchantingService
             }
 
             if ($enchantingSkill->level > $affix->skill_level_trivial) {
-                if (! $this->sentToEasyMessage) {
+                if (!$this->sentToEasyMessage) {
                     ServerMessageHandler::handleMessage($character->user, 'to_easy_to_craft');
 
                     $this->sentToEasyMessage = true;
                 }
-
                 $this->processedEnchant($slot, $affix, $character, $enchantingSkill, true);
 
                 $this->wasTooEasy = true;
@@ -286,8 +285,8 @@ class EnchantingService
              *
              * If we fail to do this then we return from the loop.
              */
-            if (! $this->wasTooEasy) {
-                if (! $this->processedEnchant($slot, $affix, $character, $enchantingSkill)) {
+            if (!$this->wasTooEasy) {
+                if (!$this->processedEnchant($slot, $affix, $character, $enchantingSkill)) {
                     return;
                 }
             }
