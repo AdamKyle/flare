@@ -105,9 +105,11 @@ class MapController extends Controller
             return response()->json(['invalid input'], 429);
         }
 
-        $response = $this->teleportService->setCoordinatesToTravelTo($request->x, $request->y)
+        $this->teleportService->setCoordinatesToTravelTo($request->x, $request->y)
             ->setCost($request->cost)
-            ->setTimeOutValue($request->timeout)
+            ->setTimeOutValue($request->timeout);
+
+        $response = $this->teleportService
             ->teleport($character);
 
         $status = $response['status'];
@@ -123,9 +125,11 @@ class MapController extends Controller
             return response()->json(['invalid input'], 429);
         }
 
-        $response = $this->setSail->setCoordinatesToTravelTo($request->x, $request->y)
+        $this->setSail->setCoordinatesToTravelTo($request->x, $request->y)
             ->setCost($request->cost)
-            ->setTimeOutValue($request->timeout)
+            ->setTimeOutValue($request->timeout);
+
+        $response = $this->setSail
             ->setSail($character);
 
         $status = $response['status'];

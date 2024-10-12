@@ -103,7 +103,7 @@ class BaseMovementService
             $gameMap = GameMap::where('name', MapNameValue::TWISTED_MEMORIES)->first();
 
             if (is_null($gameMap)) {
-                throw new Exception('Could not teleport to Twisted Gate.');
+                throw new Exception('Could not traverse to Twisted Gate.');
             }
 
             $this->traverseService->travel($gameMap->id, $character);
@@ -223,7 +223,7 @@ class BaseMovementService
             $slot = $character->inventory->slots()->where('item_id', $item->id)->first();
 
             if (is_null($slot)) {
-                event(new ServerMessageEvent($character->user, 'Cannot enter this location without a '.$item->name));
+                event(new ServerMessageEvent($character->user, 'Cannot enter this location without a ' . $item->name));
 
                 return false;
             }
@@ -258,7 +258,6 @@ class BaseMovementService
         }
 
         if ($gameMap->mapType()->isTheIcePlane()) {
-
         }
 
         if ($gameMap->mapType()->isPurgatory()) {

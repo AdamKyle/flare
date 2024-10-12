@@ -4,7 +4,6 @@ namespace App\Game\Character\Builders\AttackBuilders\Jobs;
 
 use App\Flare\Models\Character;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
-use App\Game\Core\Traits\UpdateMarketBoard;
 use App\Game\Exploration\Events\ExplorationLogUpdate;
 use Exception;
 use Illuminate\Bus\Queueable;
@@ -15,7 +14,7 @@ use Illuminate\Queue\SerializesModels;
 
 class CharacterAttackTypesCacheBuilder implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, UpdateMarketBoard;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public Character $character;
 

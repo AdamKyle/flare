@@ -15,6 +15,10 @@
         By selecting any of these options your character will be re-rolled with them. You can reset your account as many times as you want, however, realise you <strong>lose a lot
             of progression when you do that</strong>.
     </p>
+    <x-core.alerts.info-alert title="ATTN!">
+        Please be aware that the Guide quest will be enabled for all characters and there no way to disabled them.
+        You will restart your progress in sdaid guide quests when you re-roll your character.
+    </x-core.alerts.info-alert>
     <p class="mb-4">
         By selecting Enable Guide, we will not show you the initial popup, instead: Click the Guide Quest in  the top navigation after resetting the account.
     </p>
@@ -53,13 +57,6 @@
                 <strong>{{$message}}</strong>
             </div>
             @enderror
-        </div>
-        <div class="mt-5">
-            <label class="custom-checkbox" for="enable_guide">
-                <input type="checkbox" name="guide_enabled" id="enable_guide">
-                <span></span>
-                <span>Enable Guide? <a href="#no-link" data-toggle="modal" data-target="#guide-explanation">(Help)</a></span>
-            </label>
         </div>
     </form>
 </x-core.modals.modal>

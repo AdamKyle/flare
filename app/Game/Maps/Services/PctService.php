@@ -136,8 +136,6 @@ class PctService
 
         $character = $character->refresh();
 
-        event(new UpdateMap($character->user, true));
-
         event(new ServerMessageEvent($character->user, 'Child! I have done it. I have used the magics to move you to: (X/Y) ' . $celestialFight->x_position . '/' . $celestialFight->y_position));
     }
 

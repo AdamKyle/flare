@@ -17,14 +17,16 @@ class TeleportService extends BaseMovementService
 {
     use ResponseBuilder;
 
-    public function __construct(MapTileValue $mapTileValue,
+    public function __construct(
+        MapTileValue $mapTileValue,
         MapPositionValue $mapPositionValue,
         CoordinatesCache $coordinatesCache,
         ConjureService $conjureService,
         MovementService $movementService,
         TraverseService $traverseService,
     ) {
-        parent::__construct($mapTileValue,
+        parent::__construct(
+            $mapTileValue,
             $mapPositionValue,
             $coordinatesCache,
             $conjureService,
@@ -119,7 +121,5 @@ class TeleportService extends BaseMovementService
         }
 
         $this->updateMonstersList($character, $location);
-
-        $this->updateKingdomOwnedKingdom($character);
     }
 }
