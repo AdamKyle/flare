@@ -81,10 +81,8 @@ class QuestsController extends Controller
             ->where('game_map_id', $quest->npc->game_map_id);
 
         if (! is_null($characterIsAtLocation)) {
-            Log::info('Moving Character: ' . $character->name);
             $response = $this->questHandler->moveCharacter($character, $quest->npc);
-            Log::info('Moved Character: ' . $character->name);
-            Log::info($response);
+
             if ($response instanceof Character) {
                 $response = $this->questHandler->handInQuest($character, $quest);
             }

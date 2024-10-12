@@ -142,32 +142,22 @@ class QuestHandlerService
 
     public function moveCharacter(Character $character, Npc $npc): array|Character
     {
-        Log::info('Moving character ...');
 
         $oldMapDetails = $character->map;
-
-        Log::info('Stored the old map details ....');
 
         if ($npc->game_map_id !== $character->map->game_map_id) {
             if (! $this->canTravelToMap->canTravel($npc->game_map_id, $character)) {
                 return $this->errorResult('You are missing the required quest item to travel to this NPC. Check NPC Access Requirements Section above.');
             }
 
-            Log::info('Moving character to the new map ...');
-
             $character->map()->update(['game_map_id' => $npc->game_map_id]);
 
             $character = $character->refresh();
 
-            Log::info('Updating map ...');
             event(new UpdateMap($character->user));
 
             CharacterAttackTypesCacheBuilder::dispatch($character);
-
-            Log::info('CharacterAttackTypesCacheBuilder called ...');
         }
-
-        Log::info('Checking to make sure we can move to the location.');
 
         if (! $this->mapTileValue->canWalk($character, $npc->x_position, $npc->y_position)) {
             $character->map->update(['game_map_id' => $oldMapDetails->game_map_id]);
@@ -176,8 +166,6 @@ class QuestHandlerService
             missing a required item. Click the map name under the NPC name above, to see what items you need to travel to this NPC.');
         }
 
-        Log::info('Character be at the same location as the NPC.');
-
         $character->map()->update([
             'character_position_x' => $npc->x_position,
             'character_position_y' => $npc->y_position,
@@ -185,16 +173,12 @@ class QuestHandlerService
 
         $character = $character->refresh();
 
-        Log::info('Character position has been updated ...');
-
         if ($oldMapDetails->gameMap->id !== $character->map->gameMap->id) {
             event(new ServerMessageEvent($character->user, 'You were moved (at no gold cost or time out) from: ' . $oldMapDetails->gameMap->name . ' to: ' . $character->map->gameMap->name . ' in order to hand in the quest.'));
         }
 
-        Log::info('Updating map details ...');
         $this->updateMapDetails($character);
 
-        Log::info('Returning character ...');
         return $character;
     }
 
@@ -202,10 +186,8 @@ class QuestHandlerService
     {
         $monsters = Cache::get('monsters')[$character->map->gameMap->name];
 
-        Log::info('Updating monster list ...');
         event(new UpdateMonsterList($monsters, $character->user));
 
-        Log::info('Updating raid monsters ...');
         event(new UpdateRaidMonsters([], $character->user));
     }
 
