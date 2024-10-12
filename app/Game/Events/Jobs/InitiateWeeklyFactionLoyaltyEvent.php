@@ -29,7 +29,6 @@ class InitiateWeeklyFactionLoyaltyEvent implements ShouldQueue
 
     public function handle(): void
     {
-
         $event = ScheduledEvent::find($this->eventId);
 
         if (is_null($event)) {

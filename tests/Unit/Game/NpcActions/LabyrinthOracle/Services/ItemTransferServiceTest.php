@@ -74,6 +74,68 @@ class ItemTransferServiceTest extends TestCase
         $this->assertEquals('You do not have one of these items.', $result['message']);
     }
 
+    public function testQuestItemCannotBeTransferedFrom()
+    {
+        $itemToTransferFrom = $this->createItem([
+            'type' => 'quest',
+        ]);
+        $itemToTransferTo = $this->createItem();
+
+        $character = $this->character
+            ->inventoryManagement()
+            ->giveItem($itemToTransferFrom)
+            ->giveItem($itemToTransferTo)
+            ->getCharacter();
+
+        $character->update([
+            'gold' => MaxCurrenciesValue::MAX_GOLD,
+            'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
+            'shards' => MaxCurrenciesValue::MAX_SHARDS,
+        ]);
+
+        $character = $character->refresh();
+
+        $result = $this->itemTransferService->transferItemEnhancements(
+            $character,
+            $itemToTransferFrom->id,
+            $itemToTransferTo->id,
+        );
+
+        $this->assertEquals(422, $result['status']);
+        $this->assertEquals('Not allowed to do this for this item type.', $result['message']);
+    }
+
+    public function testQuestItemCannotBeTransferedTo()
+    {
+        $itemToTransferFrom = $this->createItem();
+        $itemToTransferTo = $this->createItem([
+            'type' => 'quest'
+        ]);
+
+        $character = $this->character
+            ->inventoryManagement()
+            ->giveItem($itemToTransferFrom)
+            ->giveItem($itemToTransferTo)
+            ->getCharacter();
+
+        $character->update([
+            'gold' => MaxCurrenciesValue::MAX_GOLD,
+            'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
+            'shards' => MaxCurrenciesValue::MAX_SHARDS,
+        ]);
+
+        $character = $character->refresh();
+
+        $result = $this->itemTransferService->transferItemEnhancements(
+            $character,
+            $itemToTransferFrom->id,
+            $itemToTransferTo->id,
+        );
+
+        $this->assertEquals(422, $result['status']);
+        $this->assertEquals('Not allowed to do this for this item type.', $result['message']);
+    }
+
     public function testItemHasNothingToTransfer()
     {
         $itemToTransferFrom = $this->createItem();
@@ -102,6 +164,7 @@ class ItemTransferServiceTest extends TestCase
         $this->assertEquals(422, $result['status']);
         $this->assertEquals('This item has nothing on it to transfer from.', $result['message']);
     }
+
 
     public function testNotEnoughInventoryWhenTheItemToMoveTooHasGemsAndYouDoNotHaveTheInventorySpace()
     {
@@ -151,7 +214,7 @@ class ItemTransferServiceTest extends TestCase
         );
 
         $this->assertEquals(422, $result['status']);
-        $this->assertEquals('You do not have the inventory room to move the gems attached to: '.$itemToTransferTo->affix_name.' back into your gem bag.', $result['message']);
+        $this->assertEquals('You do not have the inventory room to move the gems attached to: ' . $itemToTransferTo->affix_name . ' back into your gem bag.', $result['message']);
     }
 
     public function testTransferItemAttributes()

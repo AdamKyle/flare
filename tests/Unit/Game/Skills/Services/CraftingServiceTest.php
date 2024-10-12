@@ -873,8 +873,16 @@ class CraftingServiceTest extends TestCase
 
         $character = $this->character->getCharacter();
 
+        $gameMap = $this->createGameMap([
+            'only_during_event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+        ]);
+
         $character->update([
             'gold' => MaxCurrenciesValue::MAX_GOLD,
+        ]);
+
+        $character->map()->update([
+            'game_map_id' => $gameMap->id,
         ]);
 
         $character = $character->refresh();

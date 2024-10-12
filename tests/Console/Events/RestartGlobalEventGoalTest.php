@@ -31,7 +31,6 @@ class RestartGlobalEventGoalTest extends TestCase
         parent::setUp();
 
         $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
-
     }
 
     public function tearDown(): void
@@ -85,6 +84,63 @@ class RestartGlobalEventGoalTest extends TestCase
 
         $this->assertEmpty($eventGoal->globalEventParticipation);
         $this->assertEmpty($eventGoal->globalEventKills);
+    }
+
+    public function testDoNotResetEventGoalWhenMaxKillsDoMatchCurrentKills()
+    {
+
+        $event = $this->createEvent([
+            'type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+        ]);
+
+        $map = $this->createGameMap([
+            'name' => MapNameValue::DELUSIONAL_MEMORIES,
+            'only_during_event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+        ]);
+
+        (new CharacterFactory)->createBaseCharacter()->givePlayerLocation(16, 16, $map);
+
+        $eventGoal = $this->createGlobalEventGoal([
+            'max_kills' => 1000,
+            'reward_every' => 100,
+            'next_reward_at' => 100,
+            'event_type' => $event->type,
+            'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER,
+            'should_be_unique' => true,
+            'unique_type' => RandomAffixDetails::LEGENDARY,
+            'should_be_mythic' => false,
+        ]);
+
+        $this->createGlobalEventKill([
+            'global_event_goal_id' => $eventGoal->id,
+            'character_id' => $this->character->id,
+            'kills' => 1000,
+        ]);
+
+        $this->createGlobalEventParticipation([
+            'global_event_goal_id' => $eventGoal->id,
+            'character_id' => $this->character->id,
+            'current_kills' => 999,
+        ]);
+
+        $this->artisan('restart:global-event-goal');
+
+        $eventGoal = $eventGoal->refresh();
+
+        $this->assertNotEmpty($eventGoal->globalEventParticipation);
+        $this->assertNotEmpty($eventGoal->globalEventKills);
+    }
+
+    public function testDoNotRestEventGoalWhenNoGlobalEventGoalExists()
+    {
+
+        $this->createEvent([
+            'type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+        ]);
+
+        $this->artisan('restart:global-event-goal');
+
+        $this->assertNull(GlobalEventGoal::first());
     }
 
     public function testDoNotRestEventGoal()

@@ -76,6 +76,27 @@ class ReRollEnchantmentServiceTest extends TestCase
         $this->assertNotEquals(json_encode($originalAffix), json_encode($newItemAffix));
     }
 
+    public function testDoReRollWithOldCost()
+    {
+        $character = $this->character->getCharacter();
+        $item = $this->createItem([
+            'type' => 'weapon',
+            'item_prefix_id' => $this->createItemAffix([
+                'randomly_generated' => true,
+                'cost' => 100000000000, // This is the old cost of what used to be Legendary Uniques.
+            ])->id,
+            'is_mythic' => false,
+        ]);
+
+        $originalAffix = $item->itemPrefix->getAttributes();
+
+        $newItem = $this->reRollEnchantmentService->doReRoll($character, $item, 'all-enchantments', 'everything');
+
+        $newItemAffix = $newItem->itemPrefix->getAttributes();
+
+        $this->assertNotEquals(json_encode($originalAffix), json_encode($newItemAffix));
+    }
+
     public function testDoReRollForEverything()
     {
         $character = $this->character->getCharacter();

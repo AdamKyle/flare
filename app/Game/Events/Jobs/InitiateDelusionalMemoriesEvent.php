@@ -81,13 +81,13 @@ class InitiateDelusionalMemoriesEvent implements ShouldQueue
 
         event(new GlobalMessageEvent('"Child! We need you!" The Red Hawk Soldier looks at you. There is a fear in his eyes. "Please child. Fight with us!"', 'raid-global-message'));
 
-        event(new GlobalMessageEvent('While on the Delusional Memories Plane, characters who kill: ANY CREATURE in either manual or exploration, will increase the new: Global Event Goal. '.
-            'Players will be rewarded with random Corrupted Ice Gear when specific milestones are reached. '.
+        event(new GlobalMessageEvent('While on the Delusional Memories Plane, characters who kill: ANY CREATURE in either manual or exploration, will increase the new: Global Event Goal. ' .
+            'Players will be rewarded with random Corrupted Ice Gear when specific milestones are reached. ' .
             'Players who participate and help the battle progress, will move the event forward to a crafting and then enchanting and then back to fighting - and around we go again.'));
 
-        event(new GlobalMessageEvent('Players can participate by going to the map: '.$gameMap->name.
-            ' via Traverse (under the map for desktop, under the map inside Map Movement action drop down for mobile)'.' '.
-            'And completing either Fighting monsters, Crafting: Weapons, Spells, Armour and Rings or enchanting the already crafted items.'.
+        event(new GlobalMessageEvent('Players can participate by going to the map: ' . $gameMap->name .
+            ' via Traverse (under the map for desktop, under the map inside Map Movement action drop down for mobile)' . ' ' .
+            'And completing either Fighting monsters, Crafting: Weapons, Spells, Armour and Rings or enchanting the already crafted items.' .
             ' You can see the event goal for the map specified by being on the map and clicking the Event Goal tab from the map.'));
     }
 }

@@ -190,7 +190,8 @@ class EndScheduledEventTest extends TestCase
         $this->assertFalse($scheduledEvent->refresh()->currently_running);
     }
 
-    public function testEndFeedbackEventWithSubmittedSurveys() {
+    public function testEndFeedbackEventWithSubmittedSurveys()
+    {
         $this->deleteOtherGameMaps();
 
         $scheduledEvent = $this->createScheduledEvent([
@@ -534,7 +535,84 @@ class EndScheduledEventTest extends TestCase
         $this->assertFalse($scheduledEvent->refresh()->currently_running);
         $this->assertEmpty(Event::all());
         $this->assertEmpty(Announcement::all());
+    }
 
+    public function testEndWinterEventWhileNFactionLoayltyExists()
+    {
+        $this->deleteOtherGameMaps();
+
+        // We go back to this map when the event ends.
+        $this->createGameMap([
+            'name' => MapNameValue::SURFACE,
+        ]);
+
+        $icePlane = $this->createGameMap([
+            'name' => MapNameValue::ICE_PLANE,
+        ]);
+
+        $character = (new CharacterFactory)->createBaseCharacter()
+            ->assignFactionSystem()
+            ->givePlayerLocation(16, 16, $icePlane)
+            ->kingdomManagement()
+            ->assignKingdom([
+                'game_map_id' => $icePlane->id,
+            ])
+            ->assignBuilding()
+            ->assignUnits()
+            ->getCharacter();
+
+        $monsterCache = [
+            MapNameValue::SURFACE => [$this->createMonster()],
+        ];
+
+        Cache::put('monsters', $monsterCache);
+
+        $this->instance(
+            MapTileValue::class,
+            Mockery::mock(MapTileValue::class, function (MockInterface $mock) {
+                $mock->shouldReceive('canWalkOnWater')->andReturn(true);
+                $mock->shouldReceive('canWalkOnDeathWater')->andReturn(true);
+                $mock->shouldReceive('canWalkOnMagma')->andReturn(true);
+                $mock->shouldReceive('isPurgatoryWater')->andReturn(false);
+                $mock->shouldReceive('isTwistedMemoriesWater')->andReturn(false);
+                $mock->shouldReceive('isDelusionalMemoriesWater')->andReturn(false);
+                $mock->shouldReceive('getTileColor')->andReturn('000');
+            })
+        );
+
+        $scheduledEvent = $this->createScheduledEvent([
+            'event_type' => EventType::WINTER_EVENT,
+            'start_date' => now()->addMinutes(5),
+            'currently_running' => true,
+        ]);
+
+        $event = $this->createEvent([
+            'type' => EventType::WINTER_EVENT,
+            'started_at' => now(),
+            'ends_at' => now()->subMinute(10),
+        ]);
+
+        $this->createAnnouncement([
+            'event_id' => $event->id,
+        ]);
+
+        $this->createItem(['specialty_type' => ItemSpecialtyType::CORRUPTED_ICE, 'type' => WeaponTypes::HAMMER]);
+
+        $character = $character->refresh();
+
+        $this->artisan('end:scheduled-event');
+
+        $character = $character->refresh();
+
+        $this->assertNotEmpty($character->inventory->slots->where('item.specialty_type', ItemSpecialtyType::CORRUPTED_ICE)->all());
+        $this->assertEmpty($character->kingdoms);
+        $this->assertEquals(GameMap::where('name', MapNameValue::SURFACE)->first()->id, $character->map->game_map_id);
+
+        $this->assertEmpty($character->factionLoyalties()->where('is_pledged', true)->get());
+
+        $this->assertFalse($scheduledEvent->refresh()->currently_running);
+        $this->assertEmpty(Event::all());
+        $this->assertEmpty(Announcement::all());
     }
 
     protected function deleteOtherGameMaps(): void

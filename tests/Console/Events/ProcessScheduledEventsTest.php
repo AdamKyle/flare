@@ -138,4 +138,32 @@ class ProcessScheduledEventsTest extends TestCase
         $this->assertGreaterThan(0, Announcement::count());
         $this->assertGreaterThan(0, GlobalEventGoal::count());
     }
+
+    public function testWeeklyFactionEvent()
+    {
+
+        $this->createScheduledEvent([
+            'event_type' => EventType::WEEKLY_FACTION_LOYALTY_EVENT,
+            'start_date' => now()->addMinutes(5),
+        ]);
+
+        $this->artisan('process:scheduled-events');
+
+        $this->assertGreaterThan(0, Event::count());
+        $this->assertGreaterThan(0, Announcement::count());
+    }
+
+    public function testWeeklyFeedBackEventEvent()
+    {
+
+        $this->createScheduledEvent([
+            'event_type' => EventType::FEEDBACK_EVENT,
+            'start_date' => now()->addMinutes(5),
+        ]);
+
+        $this->artisan('process:scheduled-events');
+
+        $this->assertGreaterThan(0, Event::count());
+        $this->assertGreaterThan(0, Announcement::count());
+    }
 }

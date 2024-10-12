@@ -101,6 +101,59 @@ class CraftingControllerTest extends TestCase
         $this->assertTrue($jsonData['show_craft_for_npc']);
     }
 
+    public function testFetchItemsToCraftWhileNotShowingCraftForNPCDueToNotHelpingThatNPC()
+    {
+        $npc = $this->createNpc([
+            'game_map_id' => $this->character->map->game_map_id,
+        ]);
+
+        $item = $this->createItem([
+            'crafting_type' => 'weapon',
+            'can_craft' => true,
+            'skill_level_required' => 1,
+            'skill_level_trivial' => 25,
+        ]);
+
+        $factionLoyalty = $this->createFactionLoyalty([
+            'faction_id' => $this->character->factions->first()->id,
+            'character_id' => $this->character->id,
+            'is_pledged' => true,
+        ]);
+
+        $factionNpc = $this->createFactionLoyaltyNpc([
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'npc_id' => $npc->id,
+            'current_level' => 0,
+            'max_level' => 25,
+            'next_level_fame' => 100,
+            'currently_helping' => false,
+            'kingdom_item_defence_bonus' => 0.002,
+        ]);
+
+        $this->createFactionLoyaltyNpcTask([
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'faction_loyalty_npc_id' => $factionNpc->id,
+            'fame_tasks' => [[
+                'type' => $item->crafting_type,
+                'item_name' => $item->affix_name,
+                'item_id' => $item->id,
+                'required_amount' => rand(10, 50),
+                'current_amount' => 0,
+            ]],
+        ]);
+
+        $response = $this->actingAs($this->character->user)
+            ->call('GET', '/api/crafting/' . $this->character->id, [
+                'crafting_type' => $item->crafting_type,
+            ]);
+
+        $jsonData = json_decode($response->getContent(), true);
+
+        $this->assertEquals($jsonData['items'][0]['id'], $item->id);
+        $this->assertEquals(0, $jsonData['xp']['current_xp']);
+        $this->assertFalse($jsonData['show_craft_for_npc']);
+    }
+
     public function testGetCraftingItems()
     {
         $item = $this->createItem([
