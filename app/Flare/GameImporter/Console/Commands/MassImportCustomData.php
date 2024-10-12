@@ -35,12 +35,6 @@ class MassImportCustomData extends Command
     public function handle()
     {
 
-        Artisan::call('import:game-data Items');
-
-        Item::where('name', 'Musty Childs Teddy bare')->first()->update([
-            'name' => 'Musty Childs Teddy Bear',
-        ]);
-
         $this->importInformationSection();
 
         if (config('app.env') !== 'production') {

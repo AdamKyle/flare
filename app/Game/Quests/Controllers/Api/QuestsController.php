@@ -11,6 +11,7 @@ use App\Game\Quests\Services\BuildQuestCacheService;
 use App\Game\Quests\Services\QuestHandlerService;
 use App\Game\Skills\Values\SkillTypeValue;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Log;
 
 class QuestsController extends Controller
 {
@@ -80,9 +81,10 @@ class QuestsController extends Controller
             ->where('game_map_id', $quest->npc->game_map_id);
 
         if (! is_null($characterIsAtLocation)) {
-
+            Log::info('Moving Character: ' . $character->name);
             $response = $this->questHandler->moveCharacter($character, $quest->npc);
-
+            Log::info('Moved Character: ' . $character->name);
+            Log::info($response);
             if ($response instanceof Character) {
                 $response = $this->questHandler->handInQuest($character, $quest);
             }
@@ -98,9 +100,8 @@ class QuestsController extends Controller
 
         unset($response['status']);
 
-        $response['message'] = 'You completed the quest: '.$quest->name.'. Above is the updated story for the quest.';
+        $response['message'] = 'You completed the quest: ' . $quest->name . '. Above is the updated story for the quest.';
 
         return response()->json($response);
-
     }
 }
