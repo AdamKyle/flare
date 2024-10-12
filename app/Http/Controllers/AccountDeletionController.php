@@ -41,7 +41,7 @@ class AccountDeletionController extends Controller
             $data['race_id'] = ! is_null($request->race) ? $request->race : $character->race->id;
         }
 
-        $data['guide'] = $request->has('guide_enabled');
+        $data['guide'] = true;
 
         $characterDeletion->deleteCharacterFromUser($character, $data);
 
