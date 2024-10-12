@@ -18,7 +18,8 @@ class SetSailService extends BaseMovementService
 
     private PortService $portService;
 
-    public function __construct(MapTileValue $mapTileValue,
+    public function __construct(
+        MapTileValue $mapTileValue,
         MapPositionValue $mapPositionValue,
         CoordinatesCache $coordinatesCache,
         ConjureService $conjureService,
@@ -26,7 +27,8 @@ class SetSailService extends BaseMovementService
         PortService $portService,
         TraverseService $traverseService,
     ) {
-        parent::__construct($mapTileValue,
+        parent::__construct(
+            $mapTileValue,
             $mapPositionValue,
             $coordinatesCache,
             $conjureService,
@@ -70,8 +72,6 @@ class SetSailService extends BaseMovementService
         }
 
         $this->updateMonstersList($character, $toPort);
-
-        $this->updateKingdomOwnedKingdom($character);
 
         return $this->successResult($this->movementService->accessLocationService()->getLocationData($character));
     }

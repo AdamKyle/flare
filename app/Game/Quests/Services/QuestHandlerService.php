@@ -159,6 +159,9 @@ class QuestHandlerService
 
             $character = $character->refresh();
 
+            Log::info('Updating map ...');
+            event(new UpdateMap($character->user));
+
             CharacterAttackTypesCacheBuilder::dispatch($character);
 
             Log::info('CharacterAttackTypesCacheBuilder called ...');
@@ -197,9 +200,6 @@ class QuestHandlerService
 
     protected function updateMapDetails(Character $character): void
     {
-        Log::info('Updating map ...');
-        event(new UpdateMap($character->user));
-
         $monsters = Cache::get('monsters')[$character->map->gameMap->name];
 
         Log::info('Updating monster list ...');
