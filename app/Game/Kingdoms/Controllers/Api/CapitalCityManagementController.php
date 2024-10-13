@@ -19,7 +19,8 @@ use Illuminate\Http\JsonResponse;
 
 class CapitalCityManagementController extends Controller
 {
-    public function __construct(private readonly CapitalCityManagementService $capitalCityManagementService,
+    public function __construct(
+        private readonly CapitalCityManagementService $capitalCityManagementService,
         private readonly CancelBuildingRequestService $cancelBuildingRequestService,
         private readonly CancelUnitRequestService $cancelUnitRequestService,
         private readonly CapitalCityGoldBarManagementService $capitalCityGoldBarManagementService,

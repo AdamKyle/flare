@@ -13,7 +13,8 @@ use App\Game\Kingdoms\Events\UpdateCapitalCityUnitQueueTable;
 use App\Game\Kingdoms\Service\UpdateKingdom;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 
-class CapitalCityKingdomLogHandler {
+class CapitalCityKingdomLogHandler
+{
 
     public function __construct(private readonly UpdateKingdom $updateKingdom) {}
 
@@ -103,11 +104,13 @@ class CapitalCityKingdomLogHandler {
      * @param array $requestData
      * @return array
      */
-    private function createBuildingDataForLog(Kingdom $kingdom, array $requestData): array {
+    private function createBuildingDataForLog(Kingdom $kingdom, array $requestData): array
+    {
         $buildingData = [];
 
         foreach ($requestData as $data) {
-            if ($data['secondary_status'] === CapitalCityQueueStatus::REJECTED ||
+            if (
+                $data['secondary_status'] === CapitalCityQueueStatus::REJECTED ||
                 $data['secondary_status'] === CapitalCityQueueStatus::FINISHED ||
                 $data['secondary_status'] === CapitalCityQueueStatus::CANCELLED
             ) {
@@ -127,11 +130,13 @@ class CapitalCityKingdomLogHandler {
         return $buildingData;
     }
 
-    private function createUnitDataForLog(array $requestData): array {
+    private function createUnitDataForLog(array $requestData): array
+    {
         $unitData = [];
 
         foreach ($requestData as $data) {
-            if ($data['secondary_status'] === CapitalCityQueueStatus::REJECTED ||
+            if (
+                $data['secondary_status'] === CapitalCityQueueStatus::REJECTED ||
                 $data['secondary_status'] === CapitalCityQueueStatus::FINISHED ||
                 $data['secondary_status'] === CapitalCityQueueStatus::CANCELLED
             ) {

@@ -17,7 +17,8 @@ use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 
-class CapitalCityBuildingManagementRequestHandler {
+class CapitalCityBuildingManagementRequestHandler
+{
 
     use ResponseBuilder;
 
@@ -41,7 +42,8 @@ class CapitalCityBuildingManagementRequestHandler {
      * @param string $type
      * @return array
      */
-    public function createRequestQueue(Character $character, Kingdom $kingdom, array $requests, string $type): array {
+    public function createRequestQueue(Character $character, Kingdom $kingdom, array $requests, string $type): array
+    {
 
         $currentTime = now();
 
@@ -75,7 +77,6 @@ class CapitalCityBuildingManagementRequestHandler {
 
             $this->dispatchQueueMovement($capitalCityBuildingQueue, $dispatchTime);
             $this->sendOffEvents($character, $kingdom);
-
         });
 
         return $this->successResult([
@@ -93,7 +94,8 @@ class CapitalCityBuildingManagementRequestHandler {
      * @param array $buildingIds
      * @return Collection
      */
-    private function getBuildingsForRequest(int $kingdomId, array $buildingIds): Collection {
+    private function getBuildingsForRequest(int $kingdomId, array $buildingIds): Collection
+    {
         return KingdomBuilding::where('kingdom_id', $kingdomId)->whereIn('id', $buildingIds)->get();
     }
 
@@ -109,7 +111,10 @@ class CapitalCityBuildingManagementRequestHandler {
     private function calculateTravelTime(Character $character, Kingdom $toKingdom, int $kingdomId): int
     {
         return $this->unitMovementService->determineTimeRequired(
-            $character, $toKingdom, $kingdomId, PassiveSkillTypeValue::CAPITAL_CITY_REQUEST_BUILD_TRAVEL_TIME_REDUCTION
+            $character,
+            $toKingdom,
+            $kingdomId,
+            PassiveSkillTypeValue::CAPITAL_CITY_REQUEST_BUILD_TRAVEL_TIME_REDUCTION
         );
     }
 
@@ -164,5 +169,4 @@ class CapitalCityBuildingManagementRequestHandler {
         event(new UpdateCapitalCityBuildingUpgrades($character, $kingdom));
         event(new UpdateCapitalCityBuildingQueueTable($character, $kingdom));
     }
-
 }

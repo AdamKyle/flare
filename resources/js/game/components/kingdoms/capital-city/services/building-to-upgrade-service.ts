@@ -232,6 +232,10 @@ export default class BuildingToUpgradeService {
                     ) || {}
                 ).buildings || [];
 
+            if (buildings.length <= 0) {
+                return prevState;
+            }
+
             if (kingdomQueue) {
                 if (kingdomQueue.buildingIds.length === buildings.length) {
                     queue.splice(queue.indexOf(kingdomQueue), 1);

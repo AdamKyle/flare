@@ -16,7 +16,8 @@ use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use Facades\App\Game\Kingdoms\Validation\ResourceValidation;
 use Carbon\Carbon;
 
-class CapitalCityBuildingRequestHandler {
+class CapitalCityBuildingRequestHandler
+{
 
     use CanAffordPopulationCost;
 
@@ -27,7 +28,7 @@ class CapitalCityBuildingRequestHandler {
         private readonly KingdomBuildingService $kingdomBuildingService,
         private readonly PurchasePeopleService $purchasePeopleService,
         private readonly UpdateKingdom $updateKingdom,
-    ){}
+    ) {}
 
     /**
      * Create an upgrade or repair request for a character.
@@ -102,6 +103,10 @@ class CapitalCityBuildingRequestHandler {
                     $buildingsToUpgradeOrRepair[$index]['secondary_status'] = CapitalCityQueueStatus::REJECTED;
                     return true;
                 }
+
+                $this->purchasePeopleService->setKingdom($kingdom)->purchasePeople($missingResources['population']);
+
+                return false;
             }
 
             if (count($missingResources) > 0) {
@@ -109,8 +114,6 @@ class CapitalCityBuildingRequestHandler {
                 $buildingsToUpgradeOrRepair[$index]['secondary_status'] = CapitalCityQueueStatus::REJECTED;
                 return true;
             }
-
-            $this->purchasePeopleService->setKingdom($kingdom)->purchasePeople($missingResources['population']);
         }
 
         return false;

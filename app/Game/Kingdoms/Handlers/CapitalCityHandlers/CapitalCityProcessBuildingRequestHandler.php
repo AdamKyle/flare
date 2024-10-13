@@ -15,7 +15,8 @@ use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use App\Game\Maps\Calculations\DistanceCalculation;
 use Facades\App\Game\Kingdoms\Validation\ResourceValidation;
 
-class CapitalCityProcessBuildingRequestHandler {
+class CapitalCityProcessBuildingRequestHandler
+{
 
     use CanAffordPopulationCost;
 
@@ -51,7 +52,7 @@ class CapitalCityProcessBuildingRequestHandler {
         $character = $capitalCityBuildingQueue->character;
 
         $requestData = $this->processBuildingRequests($kingdom, $requestData);
-
+        dump('handleBuildingRequests', $requestData);
         $summedMissingCosts = $this->calculateSummedMissingCosts($requestData);
 
         if (!empty($summedMissingCosts) && $shouldFailForMissingCosts) {
@@ -89,12 +90,13 @@ class CapitalCityProcessBuildingRequestHandler {
     private function processBuildingRequests(
         Kingdom $kingdom,
         array $requestData
-    ): array
-    {
+    ): array {
         foreach ($requestData as $index => $buildingUpgradeRequest) {
             $building = $kingdom->buildings()->where('id', $buildingUpgradeRequest['building_id'])->first();
             $buildingUpgradeRequest = $this->processPotentialResourceRequests(
-                $kingdom, $building, $buildingUpgradeRequest
+                $kingdom,
+                $building,
+                $buildingUpgradeRequest
             );
 
             $requestData[$index] = $buildingUpgradeRequest;
@@ -115,8 +117,7 @@ class CapitalCityProcessBuildingRequestHandler {
         Kingdom $kingdom,
         KingdomBuilding $building,
         array $buildingUpgradeRequest
-    ): array
-    {
+    ): array {
         if (ResourceValidation::shouldRedirectKingdomBuilding($building, $kingdom)) {
             $missingResources = ResourceValidation::getMissingCosts($building, $kingdom);
 
@@ -140,10 +141,13 @@ class CapitalCityProcessBuildingRequestHandler {
                 return $buildingUpgradeRequest;
             }
 
-            $buildingUpgradeRequest['missing_costs'] = $missingResources;
-            $buildingUpgradeRequest['secondary_status'] = CapitalCityQueueStatus::REQUESTING;
+            // We do not careabout population key, we care if there are other keys in the array such as iron cost and such.
+            if (count($missingResources) > 1) {
+                $buildingUpgradeRequest['missing_costs'] = $missingResources;
+                $buildingUpgradeRequest['secondary_status'] = CapitalCityQueueStatus::REQUESTING;
 
-            return $buildingUpgradeRequest;
+                return $buildingUpgradeRequest;
+            }
         }
 
         $buildingUpgradeRequest['secondary_status'] = ($buildingUpgradeRequest['type'] === 'repair' ? CapitalCityQueueStatus::REPAIRING : CapitalCityQueueStatus::BUILDING);
@@ -182,8 +186,7 @@ class CapitalCityProcessBuildingRequestHandler {
         array $summedMissingCosts,
         array $requestData,
         Kingdom $kingdom
-    ): void
-    {
+    ): void {
         $this->capitalCityRequestResourcesHandler->handleResourceRequests(
             $capitalCityBuildingQueue,
             $character,
@@ -258,8 +261,7 @@ class CapitalCityProcessBuildingRequestHandler {
         CapitalCityBuildingQueue $capitalCityBuildingQueue,
         Kingdom $kingdom,
         array $buildingsToUpgradeOrRepair
-    ): void
-    {
+    ): void {
 
         $this->capitalCityBuildingRequestHandler->createUpgradeOrRepairRequest(
             $capitalCityBuildingQueue,
