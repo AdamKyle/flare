@@ -134,11 +134,13 @@ export default class BuildingsToUpgradeSection extends React.Component<
                                 />
                             </>
                         }
+                        disabled={this.state.processing_request}
                     />
 
                     <DangerOutlineButton
                         on_click={() => this.resetFilters()}
                         button_label="Reset Form"
+                        disabled={this.state.processing_request}
                     />
 
                     {this.state.building_queue.length > 0 && (
@@ -146,12 +148,14 @@ export default class BuildingsToUpgradeSection extends React.Component<
                             <DangerOutlineButton
                                 on_click={() => this.resetQueue()}
                                 button_label={"Reset Queue"}
+                                disabled={this.state.processing_request}
                             />
                             <SuccessOutlineButton
                                 on_click={() =>
                                     this.buildingToUpgradeService.sendOrders()
                                 }
                                 button_label="Send Orders"
+                                disabled={this.state.processing_request}
                             />
                         </>
                     )}
@@ -173,6 +177,7 @@ export default class BuildingsToUpgradeSection extends React.Component<
                             this.buildingToUpgradeService,
                         )}
                         additional_css={"w-full"}
+                        disabled={this.state.processing_request}
                     />
                 </div>
 
@@ -205,23 +210,23 @@ export default class BuildingsToUpgradeSection extends React.Component<
                                             building,
                                         ),
                                     ) && (
-                                        <p className="text-gray-600 dark:text-gray-500 mt-2">
-                                            <strong>Buildings in Queue</strong>:{" "}
-                                            {kingdom.buildings
-                                                .filter((building) =>
-                                                    this.buildingToUpgradeService.hasBuildingInQueue(
-                                                        kingdom,
-                                                        building,
-                                                    ),
-                                                )
-                                                .map((building) =>
-                                                    this.props.repair
-                                                        ? `${building.name} (to be repaired)`
-                                                        : `${building.name} (to level: ${building.level + 1})`,
-                                                )
-                                                .join(", ")}
-                                        </p>
-                                    )}
+                                            <p className="text-gray-600 dark:text-gray-500 mt-2">
+                                                <strong>Buildings in Queue</strong>:{" "}
+                                                {kingdom.buildings
+                                                    .filter((building) =>
+                                                        this.buildingToUpgradeService.hasBuildingInQueue(
+                                                            kingdom,
+                                                            building,
+                                                        ),
+                                                    )
+                                                    .map((building) =>
+                                                        this.props.repair
+                                                            ? `${building.name} (to be repaired)`
+                                                            : `${building.name} (to level: ${building.level + 1})`,
+                                                    )
+                                                    .join(", ")}
+                                            </p>
+                                        )}
                                 </div>
                                 <i
                                     className={`fas fa-chevron-${this.state.open_kingdom_ids.has(kingdom.kingdom_id) ? "down" : "up"} text-gray-500 dark:text-gray-400`}
@@ -231,20 +236,20 @@ export default class BuildingsToUpgradeSection extends React.Component<
                             {this.state.open_kingdom_ids.has(
                                 kingdom.kingdom_id,
                             ) && (
-                                <OpenKingdomCardForBuildingManagement
-                                    building_queue={this.state.building_queue}
-                                    has_building_in_queue={this.buildingToUpgradeService.hasBuildingInQueue.bind(
-                                        this.buildingToUpgradeService,
-                                    )}
-                                    kingdom={kingdom}
-                                    toggle_queue_all_buildings={this.buildingToUpgradeService.toggleQueueAllBuildings.bind(
-                                        this.buildingToUpgradeService,
-                                    )}
-                                    toggle_building_queue={this.buildingToUpgradeService.toggleBuildingQueue.bind(
-                                        this.buildingToUpgradeService,
-                                    )}
-                                />
-                            )}
+                                    <OpenKingdomCardForBuildingManagement
+                                        building_queue={this.state.building_queue}
+                                        has_building_in_queue={this.buildingToUpgradeService.hasBuildingInQueue.bind(
+                                            this.buildingToUpgradeService,
+                                        )}
+                                        kingdom={kingdom}
+                                        toggle_queue_all_buildings={this.buildingToUpgradeService.toggleQueueAllBuildings.bind(
+                                            this.buildingToUpgradeService,
+                                        )}
+                                        toggle_building_queue={this.buildingToUpgradeService.toggleBuildingQueue.bind(
+                                            this.buildingToUpgradeService,
+                                        )}
+                                    />
+                                )}
                         </div>
                     ))}
                 <Pagination

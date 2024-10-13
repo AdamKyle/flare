@@ -22,7 +22,8 @@ class SurveyValidator
      * @param Survey $survey
      * @return $this
      */
-    public function setSurveySections(Survey $survey): SurveyValidator {
+    public function setSurveySections(Survey $survey): SurveyValidator
+    {
         $this->sections = collect($survey->sections);
 
         return $this;
@@ -42,6 +43,7 @@ class SurveyValidator
             }
 
             $sectionInput = $input[$index];
+
             if (!$this->validateSection($section, $sectionInput)) {
                 return false;
             }
