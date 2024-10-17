@@ -57,8 +57,6 @@ export default class CapitalCityBuildingQueuesTableEvent
                     return;
                 }
 
-                console.log('CapitalCityBuildingQueuesTableEvent@listenForTableUpdate', event);
-
                 let data = event.buildingQueueData;
 
                 this.component.setState({
