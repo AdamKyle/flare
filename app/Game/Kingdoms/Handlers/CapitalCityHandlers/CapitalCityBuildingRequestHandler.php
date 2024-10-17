@@ -2,8 +2,8 @@
 
 namespace App\Game\Kingdoms\Handlers\CapitalCityHandlers;
 
+use Carbon\Carbon;
 use App\Flare\Models\CapitalCityBuildingQueue;
-use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\KingdomBuilding;
 use App\Game\Kingdoms\Events\UpdateCapitalCityBuildingQueueTable;
@@ -12,9 +12,9 @@ use App\Game\Kingdoms\Jobs\CapitalCityBuildingRequest;
 use App\Game\Kingdoms\Service\KingdomBuildingService;
 use App\Game\Kingdoms\Service\PurchasePeopleService;
 use App\Game\Kingdoms\Service\UpdateKingdom;
+use App\Game\Kingdoms\Validation\KingdomBuildingResourceValidation;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use Facades\App\Game\Kingdoms\Validation\ResourceValidation;
-use Carbon\Carbon;
 
 class CapitalCityBuildingRequestHandler
 {
@@ -26,6 +26,7 @@ class CapitalCityBuildingRequestHandler
     public function __construct(
         private readonly CapitalCityKingdomLogHandler $capitalCityKingdomLogHandler,
         private readonly KingdomBuildingService $kingdomBuildingService,
+        private readonly KingdomBuildingResourceValidation $kingdomBuildingResourceValidation,
         private readonly PurchasePeopleService $purchasePeopleService,
         private readonly UpdateKingdom $updateKingdom,
     ) {}
@@ -58,7 +59,7 @@ class CapitalCityBuildingRequestHandler
             $timeTillFinished += $minutesToRebuild;
 
             if ($buildingRequest['secondary_status'] === CapitalCityQueueStatus::REPAIRING) {
-                $this->kingdomBuildingService->updateKingdomResourcesForRebuildKingdomBuilding($building);
+                $this->kingdomBuildingService->updateKingdomResourcesForKingdomBuildingUpgrade($building);
             } else {
                 $this->kingdomBuildingService->updateKingdomResourcesForKingdomBuildingUpgrade($building);
             }
@@ -94,8 +95,9 @@ class CapitalCityBuildingRequestHandler
     {
         $building = $kingdom->buildings()->where('id', $buildingRequest['building_id'])->first();
 
-        if (ResourceValidation::shouldRedirectKingdomBuilding($building, $kingdom)) {
-            $missingResources = ResourceValidation::getMissingCosts($building, $kingdom);
+        if ($this->kingdomBuildingResourceValidation->isMissingResources($building)) {
+            $buildingCosts = $this->kingdomBuildingResourceValidation->getCostsForBuilding($building);
+            $missingResources = $this->kingdomBuildingResourceValidation->getMissingCosts($kingdom, $buildingCosts);
 
             if (array_key_exists('population', $missingResources)) {
                 if (!$this->canAffordPopulationCost($kingdom, $missingResources['population'])) {

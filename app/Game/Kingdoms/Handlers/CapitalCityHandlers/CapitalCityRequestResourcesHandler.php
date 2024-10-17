@@ -15,7 +15,8 @@ use App\Game\Kingdoms\Service\ResourceTransferService;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use App\Game\Kingdoms\Values\CapitalCityResourceRequestType;
 
-class CapitalCityRequestResourcesHandler {
+class CapitalCityRequestResourcesHandler
+{
 
     /**
      * @var array $messages
@@ -48,7 +49,8 @@ class CapitalCityRequestResourcesHandler {
         Character $character,
         array $summedMissingCosts,
         array $requestData,
-        Kingdom $kingdom
+        Kingdom $kingdom,
+        string $type,
     ): void {
         $kingdomWhoCanAfford = $this->getKingdomWhoCanAffordCosts($character, $kingdom, $summedMissingCosts);
 
@@ -76,7 +78,7 @@ class CapitalCityRequestResourcesHandler {
 
         if (!$this->resourceTransferService->canAffordPopulationCost($kingdomWhoCanAfford)) {
             $requestData = $this->markRequestsAsRejected($requestData);
-            $this->messages[] = 'Resource Request Rejected: When asking '. $kingdomWhoCanAfford->name . ' For the resources to fulfill each request, the kingdom told us they do not have the population (need 50) to send a caravan of resources.';
+            $this->messages[] = 'Resource Request Rejected: When asking ' . $kingdomWhoCanAfford->name . ' For the resources to fulfill each request, the kingdom told us they do not have the population (need 50) to send a caravan of resources.';
 
             $queue = $this->updateQueueData($queue, $requestData);
 
@@ -87,7 +89,7 @@ class CapitalCityRequestResourcesHandler {
 
         if (!$this->resourceTransferService->hasRequiredSpearmen($kingdomWhoCanAfford)) {
             $requestData = $this->markRequestsAsRejected($requestData);
-            $this->messages[] = 'Resource Request Rejected: When asking '. $kingdomWhoCanAfford->name . ' For the resources to fulfill each request, the kingdom told us they do not have enough spearmen (need 75) to go with the caravan and guard them.';
+            $this->messages[] = 'Resource Request Rejected: When asking ' . $kingdomWhoCanAfford->name . ' For the resources to fulfill each request, the kingdom told us they do not have enough spearmen (need 75) to go with the caravan and guard them.';
 
             $queue = $this->updateQueueData($queue, $requestData);
 
@@ -98,12 +100,13 @@ class CapitalCityRequestResourcesHandler {
 
         $queue = $this->updateQueueData($queue, $requestData);
 
-        $this->createResourceRequest($queue, $kingdom, $kingdomWhoCanAfford, $summedMissingCosts);
+        $this->createResourceRequest($queue, $kingdom, $kingdomWhoCanAfford, $summedMissingCosts, $type);
 
         $this->logAndTriggerEvents($queue);
     }
 
-    private function updateQueueData(CapitalCityBuildingQueue | CapitalCityUnitQueue $queue, array $requestData): CapitalCityBuildingQueue | CapitalCityUnitQueue {
+    private function updateQueueData(CapitalCityBuildingQueue | CapitalCityUnitQueue $queue, array $requestData): CapitalCityBuildingQueue | CapitalCityUnitQueue
+    {
         $queue->update([
             'building_request_data' => $requestData,
             'messages' => $this->messages,
@@ -125,7 +128,8 @@ class CapitalCityRequestResourcesHandler {
         CapitalCityUnitQueue | CapitalCityBuildingQueue $queue,
         Kingdom $requestingKingdom,
         Kingdom $requestingFromKingdom,
-        array $missingResources
+        array $missingResources,
+        string $type
     ) {
         $character = $requestingKingdom->character;
 
@@ -145,15 +149,16 @@ class CapitalCityRequestResourcesHandler {
         $queue->update([
             'started_at' => $startTime,
             'completed_at' => $timeTillFinished,
+            'status' => CapitalCityQueueStatus::REQUESTING,
         ]);
 
         $queue = $queue->refresh();
 
         $delayJobTime = $timeToKingdom >= 15 ? $startTime->clone()->addMinutes(15) : $timeTillFinished;
 
-        CapitalCityResourceRequestJob::dispatch($queue->id, $resourceRequest->id, CapitalCityResourceRequestType::UNIT_QUEUE)->delay($delayJobTime);
+        CapitalCityResourceRequestJob::dispatch($queue->id, $resourceRequest->id, $type)->delay($delayJobTime);
 
-        $this->resourceTransferService->sendOffBasicUnitMovement($requestingKingdom, $requestingFromKingdom);
+        $this->resourceTransferService->sendOffBasicUnitMovement($requestingKingdom, $requestingFromKingdom, $missingResources);
     }
 
     /**
@@ -164,8 +169,9 @@ class CapitalCityRequestResourcesHandler {
      * @param array $missingCosts
      * @return Kingdom|null
      */
-    private function getKingdomWhoCanAffordCosts(Character $character, Kingdom $kingdom, array $missingCosts): ?Kingdom {
-        return $character->kingdoms()->where(function ($q) use ($missingCosts) {
+    private function getKingdomWhoCanAffordCosts(Character $character, Kingdom $kingdom, array $missingCosts): ?Kingdom
+    {
+        return $character->kingdoms()->where('id', '!=', $kingdom->id)->where(function ($q) use ($missingCosts) {
             foreach ($missingCosts as $resource => $amount) {
                 if ($resource !== 'population') {
                     $q->where('current_' . $resource, '>=', $amount);
@@ -180,7 +186,8 @@ class CapitalCityRequestResourcesHandler {
      * @param array $requestData
      * @return array
      */
-    private function markRequestsAsRejected(array $requestData): array {
+    private function markRequestsAsRejected(array $requestData): array
+    {
         return collect($requestData)
             ->map(fn($item) => array_merge($item, ['secondary_status' => CapitalCityQueueStatus::REJECTED]))
             ->toArray();
@@ -190,7 +197,8 @@ class CapitalCityRequestResourcesHandler {
      * @param CapitalCityUnitQueue|CapitalCityBuildingQueue $queue
      * @return void
      */
-    private function logAndTriggerEvents(CapitalCityUnitQueue | CapitalCityBuildingQueue $queue): void {
+    private function logAndTriggerEvents(CapitalCityUnitQueue | CapitalCityBuildingQueue $queue): void
+    {
 
         if ($queue instanceof CapitalCityUnitQueue) {
             $this->capitalCityKingdomLogHandler->possiblyCreateLogForUnitQueue($queue);

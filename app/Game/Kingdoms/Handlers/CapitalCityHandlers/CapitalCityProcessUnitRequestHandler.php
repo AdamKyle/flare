@@ -13,17 +13,16 @@ use App\Flare\Models\KingdomUnit;
 use App\Game\Kingdoms\Events\UpdateCapitalCityUnitQueueTable;
 use App\Game\Kingdoms\Handlers\Traits\CanAffordPopulationCost;
 use App\Game\Kingdoms\Jobs\CapitalCityResourceRequest as CapitalCityResourceRequestJob;
-use App\Game\Kingdoms\Jobs\CapitalCityUnitRequest;
 use App\Game\Kingdoms\Service\UnitService;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use App\Game\Kingdoms\Values\CapitalCityResourceRequestType;
-use App\Game\Kingdoms\Values\UnitCosts;
 use App\Game\Maps\Calculations\DistanceCalculation;
 use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
 use Facades\App\Game\Kingdoms\Validation\ResourceValidation;
 
 
-class CapitalCityProcessUnitRequestHandler {
+class CapitalCityProcessUnitRequestHandler
+{
 
     use CanAffordPopulationCost;
 
@@ -110,10 +109,11 @@ class CapitalCityProcessUnitRequestHandler {
         return $requestData;
     }
 
-    private function isBuildingLocked(KingdomBuilding $building, Kingdom $kingdom): bool {
+    private function isBuildingLocked(KingdomBuilding $building, Kingdom $kingdom): bool
+    {
         if ($building->is_locked) {
 
-            $this->messages[] = 'Building is locked in '.$kingdom->name.'. You need to unlock the building: '.$building->name.' first by leveling a passive of the same name to level 1.';
+            $this->messages[] = 'Building is locked in ' . $kingdom->name . '. You need to unlock the building: ' . $building->name . ' first by leveling a passive of the same name to level 1.';
 
             return true;
         }
@@ -121,10 +121,11 @@ class CapitalCityProcessUnitRequestHandler {
         return false;
     }
 
-    private function isBuildingUnderLeveled(KingdomBuilding $building, GameBuildingUnit $gameBuildingRelation, Kingdom $kingdom): bool {
+    private function isBuildingUnderLeveled(KingdomBuilding $building, GameBuildingUnit $gameBuildingRelation, Kingdom $kingdom): bool
+    {
         if ($building->level < $gameBuildingRelation->required_level) {
 
-            $this->messages[] = 'Building is under level in '.$kingdom->name.'. You need to level the building: '.$building->name.' to level: '.$gameBuildingRelation->required_level.' first.';
+            $this->messages[] = 'Building is under level in ' . $kingdom->name . '. You need to level the building: ' . $building->name . ' to level: ' . $gameBuildingRelation->required_level . ' first.';
 
             return true;
         }
@@ -142,7 +143,8 @@ class CapitalCityProcessUnitRequestHandler {
      */
     private function processPotentialResourceRequests(Kingdom $kingdom, GameUnit $unit, array $unitRequest): array
     {
-        $missingResources = ResourceValidation::getMissingUnitResources($unit, $kingdom, $unitRequest['amount']);
+        $amount = $unitRequest['amount'];
+        $missingResources = ResourceValidation::getMissingUnitResources($unit, $kingdom, $amount);
 
         if (!empty($missingResources)) {
             if (!$this->canAffordPopulationCost($kingdom, $missingResources['population'] ?? 0)) {
@@ -198,7 +200,8 @@ class CapitalCityProcessUnitRequestHandler {
             $character,
             $missingResources,
             $requestData,
-            $kingdom
+            $kingdom,
+            CapitalCityResourceRequestType::BUILDING_QUEUE
         );
     }
 
@@ -281,8 +284,8 @@ class CapitalCityProcessUnitRequestHandler {
 
             dump($filteredRequestData);
 
-//            $this->createUpgradeRequest($character, $capitalCityUnitQueue, $capitalCityUnitQueue->kingdom, $filteredRequestData);
-//            $this->sendOffEvents($capitalCityUnitQueue);
+            //            $this->createUpgradeRequest($character, $capitalCityUnitQueue, $capitalCityUnitQueue->kingdom, $filteredRequestData);
+            //            $this->sendOffEvents($capitalCityUnitQueue);
         }
     }
 
@@ -358,7 +361,8 @@ class CapitalCityProcessUnitRequestHandler {
         CapitalCityResourceRequestJob::dispatch($capitalCityUnitQueue->id, $resourceRequest->id, CapitalCityResourceRequestType::UNIT_QUEUE)->delay($delayJobTime);
     }
 
-    private function getTimeToKingdom(Character $character, Kingdom $kingdomAskingForResources, Kingdom $requestingFromKingdom):int {
+    private function getTimeToKingdom(Character $character, Kingdom $kingdomAskingForResources, Kingdom $requestingFromKingdom): int
+    {
         $pixelDistance = $this->distanceCalculation->calculatePixel(
             $kingdomAskingForResources->x_position,
             $kingdomAskingForResources->y_position,
@@ -393,7 +397,7 @@ class CapitalCityProcessUnitRequestHandler {
         $timeTillDone = now()->addSeconds($timeTillDone);
 
         if (now()->diffInDays($timeTillDone) > self::MAX_DAYS) {
-            $this->messages[] = $gameUnit->name.' for kingdom: '.$kingdom->name.' would take longer then 7 (Real World) Days. The kingdom has rejected this recruitment order. If you want this amount of units, you must recruit it from the kingdom it\'s self.';
+            $this->messages[] = $gameUnit->name . ' for kingdom: ' . $kingdom->name . ' would take longer then 7 (Real World) Days. The kingdom has rejected this recruitment order. If you want this amount of units, you must recruit it from the kingdom it\'s self.';
 
             return true;
         }

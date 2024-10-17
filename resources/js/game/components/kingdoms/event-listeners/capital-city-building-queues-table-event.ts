@@ -6,8 +6,7 @@ import CapitalCityBuildingQueueTableEventDefinition from "./capital-city-buildin
 
 @injectable()
 export default class CapitalCityBuildingQueuesTableEvent
-    implements CapitalCityBuildingQueueTableEventDefinition
-{
+    implements CapitalCityBuildingQueueTableEventDefinition {
     private component?: BuildingsInQueue;
 
     private userId?: number;
@@ -16,7 +15,7 @@ export default class CapitalCityBuildingQueuesTableEvent
 
     constructor(
         @inject(CoreEventListener) private coreEventListener: CoreEventListener,
-    ) {}
+    ) { }
 
     public initialize(component: BuildingsInQueue, userId: number): void {
         this.component = component;
@@ -57,6 +56,8 @@ export default class CapitalCityBuildingQueuesTableEvent
                 if (!this.component) {
                     return;
                 }
+
+                console.log('CapitalCityBuildingQueuesTableEvent@listenForTableUpdate', event);
 
                 let data = event.buildingQueueData;
 

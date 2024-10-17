@@ -2,18 +2,16 @@
 
 namespace App\Game\Kingdoms\Handlers\CapitalCityHandlers;
 
-use App\Flare\Models\BuildingInQueue;
 use App\Flare\Models\CapitalCityBuildingQueue;
 use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\KingdomBuilding;
 use App\Game\Kingdoms\Events\UpdateCapitalCityBuildingQueueTable;
 use App\Game\Kingdoms\Handlers\Traits\CanAffordPopulationCost;
-use App\Game\Kingdoms\Jobs\CapitalCityBuildingRequest;
-use App\Game\Kingdoms\Values\BuildingQueueType;
+use App\Game\Kingdoms\Validation\KingdomBuildingResourceValidation;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
+use App\Game\Kingdoms\Values\CapitalCityResourceRequestType;
 use App\Game\Maps\Calculations\DistanceCalculation;
-use Facades\App\Game\Kingdoms\Validation\ResourceValidation;
 
 class CapitalCityProcessBuildingRequestHandler
 {
@@ -30,12 +28,14 @@ class CapitalCityProcessBuildingRequestHandler
      * @param DistanceCalculation $distanceCalculation
      * @param CapitalCityRequestResourcesHandler $capitalCityRequestResourcesHandler
      * @param CapitalCityBuildingRequestHandler $capitalCityBuildingRequestHandler
+     * @param KingdomBuildingResourceValidation $kingdomBuildingResourceValidation
      */
     public function __construct(
         private readonly CapitalCityKingdomLogHandler $capitalCityKingdomLogHandler,
         private readonly DistanceCalculation $distanceCalculation,
         private readonly CapitalCityRequestResourcesHandler $capitalCityRequestResourcesHandler,
         private readonly CapitalCityBuildingRequestHandler $capitalCityBuildingRequestHandler,
+        private readonly KingdomBuildingResourceValidation $kingdomBuildingResourceValidation,
     ) {}
 
     /**
@@ -52,7 +52,7 @@ class CapitalCityProcessBuildingRequestHandler
         $character = $capitalCityBuildingQueue->character;
 
         $requestData = $this->processBuildingRequests($kingdom, $requestData);
-        dump('handleBuildingRequests', $requestData);
+
         $summedMissingCosts = $this->calculateSummedMissingCosts($requestData);
 
         if (!empty($summedMissingCosts) && $shouldFailForMissingCosts) {
@@ -71,6 +71,8 @@ class CapitalCityProcessBuildingRequestHandler
             $capitalCityBuildingQueue = $capitalCityBuildingQueue->refresh();
 
             $this->capitalCityKingdomLogHandler->possiblyCreateLogForBuildingQueue($capitalCityBuildingQueue);
+
+            return;
         }
 
         if (!empty($summedMissingCosts)) {
@@ -118,8 +120,9 @@ class CapitalCityProcessBuildingRequestHandler
         KingdomBuilding $building,
         array $buildingUpgradeRequest
     ): array {
-        if (ResourceValidation::shouldRedirectKingdomBuilding($building, $kingdom)) {
-            $missingResources = ResourceValidation::getMissingCosts($building, $kingdom);
+        if ($this->kingdomBuildingResourceValidation->isMissingResources($building)) {
+            $requiredResources = $this->kingdomBuildingResourceValidation->getCostsForBuilding($building);
+            $missingResources = $this->kingdomBuildingResourceValidation->getMissingCosts($kingdom, $requiredResources);
 
             if (empty($missingResources)) {
                 $buildingUpgradeRequest['secondary_status'] = CapitalCityQueueStatus::BUILDING;
@@ -148,6 +151,8 @@ class CapitalCityProcessBuildingRequestHandler
 
                 return $buildingUpgradeRequest;
             }
+        } else {
+            $buildingUpgradeRequest['missing_costs'] = [];
         }
 
         $buildingUpgradeRequest['secondary_status'] = ($buildingUpgradeRequest['type'] === 'repair' ? CapitalCityQueueStatus::REPAIRING : CapitalCityQueueStatus::BUILDING);
@@ -164,14 +169,13 @@ class CapitalCityProcessBuildingRequestHandler
     private function calculateSummedMissingCosts(array $requestData): array
     {
         return collect($requestData)
-            ->pluck('missing_costs')
-            ->map(fn($costs) => collect($costs)->except('population'))
+            ->map(fn($costs) => collect($costs['missing_costs'])->except('population'))
             ->reduce(fn($carry, $costs) => $carry->merge($costs)->map(fn($value, $key) => $carry->get($key, 0) + $value), collect())
             ->toArray();
     }
 
     /**
-     * Handle resource requests if needed.
+     * Handle resource requests if needed.processPotentialResourceRequests
      *
      * @param CapitalCityBuildingQueue $capitalCityBuildingQueue
      * @param Character $character
@@ -192,7 +196,8 @@ class CapitalCityProcessBuildingRequestHandler
             $character,
             $summedMissingCosts,
             $requestData,
-            $kingdom
+            $kingdom,
+            CapitalCityResourceRequestType::BUILDING_QUEUE,
         );
     }
 

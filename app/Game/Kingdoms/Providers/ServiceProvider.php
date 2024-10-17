@@ -2,6 +2,7 @@
 
 namespace App\Game\Kingdoms\Providers;
 
+use App\Flare\Models\Kingdom;
 use App\Flare\Transformers\KingdomAttackLogsTransformer;
 use App\Flare\Transformers\KingdomBuildingTransformer;
 use App\Flare\Transformers\KingdomTransformer;
@@ -54,6 +55,7 @@ use App\Game\Kingdoms\Service\UnitService;
 use App\Game\Kingdoms\Service\UpdateKingdom;
 use App\Game\Kingdoms\Transformers\KingdomTableTransformer;
 use App\Game\Kingdoms\Transformers\SelectedKingdom;
+use App\Game\Kingdoms\Validation\KingdomBuildingResourceValidation;
 use App\Game\Kingdoms\Validators\MoveUnitsValidator;
 use App\Game\Maps\Calculations\DistanceCalculation;
 use App\Game\Maps\Services\LocationService;
@@ -80,6 +82,12 @@ class ServiceProvider extends ApplicationServiceProvider
             );
         });
 
+        $this->app->bind(KingdomBuildingResourceValidation::class, function ($app) {
+            return new KingdomBuildingResourceValidation(
+                $app->make(KingdomBuildingService::class)
+            );
+        });
+
         $this->app->bind(CapitalCityManagementService::class, function ($app) {
             return new CapitalCityManagementService(
                 $app->make(UpdateKingdom::class),
@@ -91,22 +99,23 @@ class ServiceProvider extends ApplicationServiceProvider
             );
         });
 
-        $this->app->bind(CapitalCityKingdomLogHandler::class, function($app) {
+        $this->app->bind(CapitalCityKingdomLogHandler::class, function ($app) {
             return new CapitalCityKingdomLogHandler(
                 $app->make(UpdateKingdom::class),
             );
         });
 
-        $this->app->bind(CapitalCityProcessBuildingRequestHandler::class, function($app) {
+        $this->app->bind(CapitalCityProcessBuildingRequestHandler::class, function ($app) {
             return new CapitalCityProcessBuildingRequestHandler(
                 $app->make(CapitalCityKingdomLogHandler::class),
                 $app->make(DistanceCalculation::class),
                 $app->make(CapitalCityRequestResourcesHandler::class),
-                $app->make(CapitalCityBuildingRequestHandler::class)
+                $app->make(CapitalCityBuildingRequestHandler::class),
+                $app->make(KingdomBuildingResourceValidation::class)
             );
         });
 
-        $this->app->bind(CapitalCityBuildingManagementRequestHandler::class, function($app) {
+        $this->app->bind(CapitalCityBuildingManagementRequestHandler::class, function ($app) {
             return new CapitalCityBuildingManagementRequestHandler(
                 $app->make(KingdomBuildingService::class),
                 $app->make(UnitMovementService::class)
@@ -120,7 +129,7 @@ class ServiceProvider extends ApplicationServiceProvider
             );
         });
 
-        $this->app->bind(CapitalCityUnitManagementRequestHandler::class, function($app) {
+        $this->app->bind(CapitalCityUnitManagementRequestHandler::class, function ($app) {
             return new CapitalCityUnitManagementRequestHandler(
                 $app->make(UnitMovementService::class),
                 $app->make(UnitService::class),
@@ -135,7 +144,7 @@ class ServiceProvider extends ApplicationServiceProvider
             );
         });
 
-        $this->app->bind(CapitalCityProcessUnitRequestHandler::class, function($app) {
+        $this->app->bind(CapitalCityProcessUnitRequestHandler::class, function ($app) {
             return new CapitalCityProcessUnitRequestHandler(
                 $app->make(CapitalCityKingdomLogHandler::class),
                 $app->make(CapitalCityRequestResourcesHandler::class),
@@ -144,10 +153,11 @@ class ServiceProvider extends ApplicationServiceProvider
             );
         });
 
-        $this->app->bind(CapitalCityBuildingRequestHandler::class, function($app) {
+        $this->app->bind(CapitalCityBuildingRequestHandler::class, function ($app) {
             return new CapitalCityBuildingRequestHandler(
                 $app->make(CapitalCityKingdomLogHandler::class),
                 $app->make(KingdomBuildingService::class),
+                $app->make(KingdomBuildingResourceValidation::class),
                 $app->make(PurchasePeopleService::class),
                 $app->make(UpdateKingdom::class),
             );
@@ -159,7 +169,7 @@ class ServiceProvider extends ApplicationServiceProvider
             );
         });
 
-        $this->app->bind(CapitalCityRequestResourcesHandler::class, function($app) {
+        $this->app->bind(CapitalCityRequestResourcesHandler::class, function ($app) {
             return new CapitalCityRequestResourcesHandler(
                 $app->make(ResourceTransferService::class),
                 $app->make(KingdomMovementTimeCalculationService::class),

@@ -57,6 +57,5 @@ class CapitalCityBuildingRequestMovement implements ShouldQueue
         $capitalCityBuildingManagement->processBuildingRequest(
             $queueData
         );
-
     }
 }

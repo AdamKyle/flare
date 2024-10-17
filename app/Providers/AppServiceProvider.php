@@ -18,6 +18,7 @@ use App\Console\DevelopmentCommands\GivePlayerAncenstorItem;
 use App\Console\DevelopmentCommands\GivePlayerMythicItem;
 use App\Console\DevelopmentCommands\GivePlayerUniqueItem;
 use App\Console\DevelopmentCommands\LevelCharacter;
+use App\Console\DevelopmentCommands\ManageKingdomResources;
 use App\Console\DevelopmentCommands\MaxOutCharacter;
 use App\Console\DevelopmentCommands\MaxOutCharactersPassiveSkills;
 use App\Console\DevelopmentCommands\ReincarnateCharacter;
@@ -46,6 +47,7 @@ class AppServiceProvider extends ServiceProvider
             AllowTraverseForMaps::class,
             AssignNewBuildingsToExistingKingdoms::class,
             AssignNewNpcsToFactionLoyalty::class,
+            ManageKingdomResources::class,
 
             // Development Commands:
             CreateCharacter::class,
@@ -80,7 +82,7 @@ class AppServiceProvider extends ServiceProvider
 
             $headers = [
                 'Content-type' => 'text/json',
-                'Content-Disposition' => 'attachment; filename='.$fileName.'.json',
+                'Content-Disposition' => 'attachment; filename=' . $fileName . '.json',
             ];
 
             return \Response::make($content, 200, $headers);

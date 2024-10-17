@@ -116,8 +116,6 @@ class CapitalCityManagementController extends Controller
 
     public function cancelBuildingOrdersOrders(CancelUnitRequestRequest $request, Character $character, Kingdom $kingdom)
     {
-        dump($request);
-
         return response()->json(['message' => 'see dump message']);
     }
 

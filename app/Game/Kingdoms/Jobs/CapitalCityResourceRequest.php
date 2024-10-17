@@ -2,6 +2,12 @@
 
 namespace App\Game\Kingdoms\Jobs;
 
+use Exception;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 use App\Flare\Models\CapitalCityBuildingQueue;
 use App\Flare\Models\CapitalCityResourceRequest as CapitalCityResourceRequestModel;
 use App\Flare\Models\CapitalCityUnitQueue;
@@ -10,18 +16,12 @@ use App\Game\Kingdoms\Events\UpdateCapitalCityUnitQueueTable;
 use App\Game\Kingdoms\Handlers\CapitalCityHandlers\CapitalCityProcessBuildingRequestHandler;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use App\Game\Kingdoms\Values\CapitalCityResourceRequestType;
-use Exception;
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
 
 class CapitalCityResourceRequest implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public function __construct(protected readonly int $capitalCityQueueId, protected readonly int $characterId, protected string $type ) {}
+    public function __construct(protected readonly int $capitalCityQueueId, protected readonly int $characterId, protected string $type) {}
 
     public function handle(CapitalCityProcessBuildingRequestHandler $capitalCityProcessBuildingRequestHandler): void
     {
@@ -63,7 +63,8 @@ class CapitalCityResourceRequest implements ShouldQueue
         }
 
         $capitalCityResourceRequestData = CapitalCityResourceRequestModel::where(
-            'kingdom_requesting_id', $queueData->requested_kingdom,
+            'kingdom_requesting_id',
+            $queueData->kingdom_id,
         )->first();
 
         $resourcesForKingdom = $capitalCityResourceRequestData->resources;
@@ -71,18 +72,18 @@ class CapitalCityResourceRequest implements ShouldQueue
         $requestingKingdom = $capitalCityResourceRequestData->requestingKingdom;
 
         foreach ($resourcesForKingdom as $resourceName => $resourceAmount) {
-            $newAmount = $requestingKingdom->{'current_'.$resourceName} + $resourceAmount;
+            $newAmount = $requestingKingdom->{'current_' . $resourceName} + $resourceAmount;
 
-            if ($newAmount > $requestedKingdom->{'max_'.$resourceName}) {
-                $newAmount = $requestedKingdom->{'max_'.$resourceName};
+            if ($newAmount > $requestingKingdom->{'max_' . $resourceName}) {
+                $newAmount = $requestingKingdom->{'max_' . $resourceName};
             }
 
-            $requestedKingdom->{'current_'.$resourceName} = $newAmount;
-
-            $requestedKingdom->save();
-
-            $requestedKingdom = $requestedKingdom->refresh();
+            $requestingKingdom->{'current_' . $resourceName} = $newAmount;
         }
+
+        $requestingKingdom->save();
+
+        $requestingKingdom = $requestingKingdom->refresh();
 
         if ($this->type === CapitalCityResourceRequestType::UNIT_QUEUE) {
             $unitRequestData = $queueData->unit_request_data;
@@ -99,9 +100,9 @@ class CapitalCityResourceRequest implements ShouldQueue
 
             $queueData = $queueData->refresh();
 
-            event(new UpdateCapitalCityUnitQueueTable($queueData->character->refresh()));
+            $capitalCityResourceRequestData->delete();
 
-            dump('Process the recruiting of the units.');
+            event(new UpdateCapitalCityUnitQueueTable($queueData->character->refresh()));
 
             return;
         }
@@ -124,9 +125,12 @@ class CapitalCityResourceRequest implements ShouldQueue
 
             $queueData->update([
                 'building_request_data' => $updatedBuildingRequestData,
+                'status' => CapitalCityQueueStatus::PROCESSING,
             ]);
 
             $queueData = $queueData->refresh();
+
+            $capitalCityResourceRequestData->delete();
 
             event(new UpdateCapitalCityBuildingQueueTable($queueData->character->refresh()));
 
@@ -138,5 +142,32 @@ class CapitalCityResourceRequest implements ShouldQueue
         throw new Exception(
             'Could not determine what to do with the resources.'
         );
+    }
+
+    protected function cleanUpMissingCostsForQueue(CapitalCityUnitQueue|CapitalCityBuildingQueue $queue): CapitalCityUnitQueue|CapitalCityBuildingQueue
+    {
+
+        $requestData = [];
+        $columToUpdate = null;
+
+        if ($queue instanceof CapitalCityBuildingQueue) {
+            $requestData = $queue->building_request_data;
+            $columnToUpdate = 'building_request_data';
+        }
+
+        if ($queue instanceof CapitalCityUnitQueue) {
+            $requestData = $queue->unit_request_data;
+            $columnToUpdate = 'unit_request_data';
+        }
+
+        foreach ($requestData as $index => $data) {
+            $requestData[$index]['missing_costs'] = [];
+        }
+
+        $queue->update([
+            $columnToUpdate => $requestData,
+        ]);
+
+        return $queue->refresh();
     }
 }
