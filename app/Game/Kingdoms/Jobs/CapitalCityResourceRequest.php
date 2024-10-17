@@ -14,6 +14,7 @@ use App\Flare\Models\CapitalCityUnitQueue;
 use App\Game\Kingdoms\Events\UpdateCapitalCityBuildingQueueTable;
 use App\Game\Kingdoms\Events\UpdateCapitalCityUnitQueueTable;
 use App\Game\Kingdoms\Handlers\CapitalCityHandlers\CapitalCityProcessBuildingRequestHandler;
+use App\Game\Kingdoms\Handlers\CapitalCityHandlers\CapitalCityProcessUnitRequestHandler;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use App\Game\Kingdoms\Values\CapitalCityResourceRequestType;
 
@@ -23,8 +24,10 @@ class CapitalCityResourceRequest implements ShouldQueue
 
     public function __construct(protected readonly int $capitalCityQueueId, protected readonly int $characterId, protected string $type) {}
 
-    public function handle(CapitalCityProcessBuildingRequestHandler $capitalCityProcessBuildingRequestHandler): void
-    {
+    public function handle(
+        CapitalCityProcessBuildingRequestHandler $capitalCityProcessBuildingRequestHandler,
+        CapitalCityProcessUnitRequestHandler $capitalCityProcessUnitRequestHandler
+    ): void {
 
         $queueData = null;
 
@@ -96,6 +99,7 @@ class CapitalCityResourceRequest implements ShouldQueue
 
             $queueData->update([
                 'unit_request_data' => $updatedUnits,
+                'status' => CapitalCityQueueStatus::RECRUITING,
             ]);
 
             $queueData = $queueData->refresh();
@@ -103,6 +107,8 @@ class CapitalCityResourceRequest implements ShouldQueue
             $capitalCityResourceRequestData->delete();
 
             event(new UpdateCapitalCityUnitQueueTable($queueData->character->refresh()));
+
+            $capitalCityProcessUnitRequestHandler->handleUnitRequests($queueData, true);
 
             return;
         }
@@ -125,7 +131,7 @@ class CapitalCityResourceRequest implements ShouldQueue
 
             $queueData->update([
                 'building_request_data' => $updatedBuildingRequestData,
-                'status' => CapitalCityQueueStatus::PROCESSING,
+                'status' => CapitalCityQueueStatus::BUILDING,
             ]);
 
             $queueData = $queueData->refresh();

@@ -12,21 +12,23 @@ use App\Game\Kingdoms\Jobs\CapitalCityUnitRequestMovement;
 use App\Game\Kingdoms\Service\UnitMovementService;
 use App\Game\Kingdoms\Service\UnitService;
 use App\Game\Kingdoms\Service\UpdateKingdom;
+use App\Game\Kingdoms\Validation\KingdomUnitResourceValidation;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
 use Exception;
 
 
-class CapitalCityUnitManagementRequestHandler {
+class CapitalCityUnitManagementRequestHandler
+{
 
     use ResponseBuilder;
 
     public function __construct(
         private readonly UnitMovementService $unitMovementService,
         private readonly UnitService $unitService,
+        private readonly KingdomUnitResourceValidation $kingdomUnitResourceValidation,
         private readonly UpdateKingdom $updateKingdom,
-    ) {
-    }
+    ) {}
 
     /**
      * Create unit requests for a character in a kingdom.
@@ -129,7 +131,7 @@ class CapitalCityUnitManagementRequestHandler {
                 'name' => $unitRequest['unit_name'],
                 'amount' => $unitRequest['unit_amount'],
                 'secondary_status' => null,
-                'costs' => $this->unitService->getCostsRequired($toKingdom, $unit, $unitRequest['unit_amount']),
+                'costs' => $this->kingdomUnitResourceValidation->getCostsRequired($toKingdom, $unit, $unitRequest['unit_amount']),
             ];
         })->toArray();
     }
@@ -160,5 +162,4 @@ class CapitalCityUnitManagementRequestHandler {
     {
         $this->updateKingdom->updateKingdom($kingdom);
     }
-
 }

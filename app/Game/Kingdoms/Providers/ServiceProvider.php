@@ -2,7 +2,6 @@
 
 namespace App\Game\Kingdoms\Providers;
 
-use App\Flare\Models\Kingdom;
 use App\Flare\Transformers\KingdomAttackLogsTransformer;
 use App\Flare\Transformers\KingdomBuildingTransformer;
 use App\Flare\Transformers\KingdomTransformer;
@@ -56,6 +55,7 @@ use App\Game\Kingdoms\Service\UpdateKingdom;
 use App\Game\Kingdoms\Transformers\KingdomTableTransformer;
 use App\Game\Kingdoms\Transformers\SelectedKingdom;
 use App\Game\Kingdoms\Validation\KingdomBuildingResourceValidation;
+use App\Game\Kingdoms\Validation\KingdomUnitResourceValidation;
 use App\Game\Kingdoms\Validators\MoveUnitsValidator;
 use App\Game\Maps\Calculations\DistanceCalculation;
 use App\Game\Maps\Services\LocationService;
@@ -86,6 +86,10 @@ class ServiceProvider extends ApplicationServiceProvider
             return new KingdomBuildingResourceValidation(
                 $app->make(KingdomBuildingService::class)
             );
+        });
+
+        $this->app->bind(KingdomUnitResourceValidation::class, function () {
+            return new KingdomUnitResourceValidation();
         });
 
         $this->app->bind(CapitalCityManagementService::class, function ($app) {
@@ -133,6 +137,7 @@ class ServiceProvider extends ApplicationServiceProvider
             return new CapitalCityUnitManagementRequestHandler(
                 $app->make(UnitMovementService::class),
                 $app->make(UnitService::class),
+                $app->make(KingdomUnitResourceValidation::class),
                 $app->make(UpdateKingdom::class),
             );
         });
@@ -149,7 +154,8 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(CapitalCityKingdomLogHandler::class),
                 $app->make(CapitalCityRequestResourcesHandler::class),
                 $app->make(DistanceCalculation::class),
-                $app->make(UnitService::class)
+                $app->make(UnitService::class),
+                $app->make(KingdomUnitResourceValidation::class)
             );
         });
 
@@ -219,7 +225,10 @@ class ServiceProvider extends ApplicationServiceProvider
         });
 
         $this->app->bind(UnitService::class, function ($app) {
-            return new UnitService($app->make(UpdateKingdomHandler::class));
+            return new UnitService(
+                $app->make(UpdateKingdomHandler::class),
+                $app->make(KingdomUnitResourceValidation::class)
+            );
         });
 
         $this->app->bind(KingdomService::class, function ($app) {

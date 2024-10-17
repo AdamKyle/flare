@@ -14,6 +14,7 @@ use App\Game\Kingdoms\Events\UpdateCapitalCityUnitQueueTable;
 use App\Game\Kingdoms\Handlers\Traits\CanAffordPopulationCost;
 use App\Game\Kingdoms\Jobs\CapitalCityResourceRequest as CapitalCityResourceRequestJob;
 use App\Game\Kingdoms\Service\UnitService;
+use App\Game\Kingdoms\Validation\KingdomUnitResourceValidation;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use App\Game\Kingdoms\Values\CapitalCityResourceRequestType;
 use App\Game\Maps\Calculations\DistanceCalculation;
@@ -38,12 +39,14 @@ class CapitalCityProcessUnitRequestHandler
      * @param CapitalCityRequestResourcesHandler $capitalCityRequestResourcesHandler
      * @param DistanceCalculation $distanceCalculation
      * @param UnitService $unitService
+     * @param KingdomUnitResourceValidation $kingdomUnitResourceValidation
      */
     public function __construct(
         private readonly CapitalCityKingdomLogHandler $capitalCityKingdomLogHandler,
         private readonly CapitalCityRequestResourcesHandler $capitalCityRequestResourcesHandler,
         private readonly DistanceCalculation $distanceCalculation,
-        private readonly UnitService $unitService
+        private readonly UnitService $unitService,
+        private readonly KingdomUnitResourceValidation $kingdomUnitResourceValidation
     ) {}
 
     /**
@@ -52,7 +55,7 @@ class CapitalCityProcessUnitRequestHandler
      * @param CapitalCityUnitQueue $capitalCityUnitQueue
      * @return void
      */
-    public function handleUnitRequests(CapitalCityUnitQueue $capitalCityUnitQueue): void
+    public function handleUnitRequests(CapitalCityUnitQueue $capitalCityUnitQueue, $shouldFailForMissingCosts = false): void
     {
         $requestData = $capitalCityUnitQueue->unit_request_data;
         $kingdom = $capitalCityUnitQueue->kingdom;
@@ -60,6 +63,26 @@ class CapitalCityProcessUnitRequestHandler
 
         $requestData = $this->processUnitRequests($kingdom, $requestData);
         $missingResources = $this->calculateMissingResources($requestData);
+
+        if (!empty($missingResources) && $shouldFailForMissingCosts) {
+            $requestData = collect($requestData)
+                ->map(fn($item) => array_merge($item, ['secondary_status' => CapitalCityQueueStatus::REJECTED]))
+                ->toArray();
+
+
+            $capitalCityUnitQueue->update([
+                'building_request_data' => $requestData,
+                'messages' => array_merge($capitalCityUnitQueue->messages, [
+                    'Units were rejected because even after requesting resources, you still do not have enough resources for one or more units so the entire request was canceled out of frustration.'
+                ])
+            ]);
+
+            $capitalCityUnitQueue = $capitalCityUnitQueue->refresh();
+
+            $this->capitalCityKingdomLogHandler->possiblyCreateLogForUnitQueue($capitalCityUnitQueue);
+
+            return;
+        }
 
         if (!empty($missingResources)) {
             $this->handleResourceRequests($capitalCityUnitQueue, $character, $missingResources, $requestData, $kingdom);
@@ -137,14 +160,15 @@ class CapitalCityProcessUnitRequestHandler
      * Process potential resource requests for unit recruitment.
      *
      * @param Kingdom $kingdom
-     * @param KingdomUnit $unit
+     * @param GameUnit $unit
      * @param array $unitRequest
      * @return array
      */
     private function processPotentialResourceRequests(Kingdom $kingdom, GameUnit $unit, array $unitRequest): array
     {
         $amount = $unitRequest['amount'];
-        $missingResources = ResourceValidation::getMissingUnitResources($unit, $kingdom, $amount);
+        $requiredCosts = $this->kingdomUnitResourceValidation->getCostsRequired($kingdom, $unit, $amount);
+        $missingResources = $this->kingdomUnitResourceValidation->getMissingCosts($kingdom, $requiredCosts);
 
         if (!empty($missingResources)) {
             if (!$this->canAffordPopulationCost($kingdom, $missingResources['population'] ?? 0)) {
@@ -201,7 +225,7 @@ class CapitalCityProcessUnitRequestHandler
             $missingResources,
             $requestData,
             $kingdom,
-            CapitalCityResourceRequestType::BUILDING_QUEUE
+            CapitalCityResourceRequestType::UNIT_QUEUE
         );
     }
 
@@ -215,7 +239,7 @@ class CapitalCityProcessUnitRequestHandler
     private function handleNoResourceRequests(CapitalCityUnitQueue $capitalCityUnitQueue, array $requestData): void
     {
         if ($this->hasRecruitingUnits($requestData)) {
-            $this->createUnitRecruitmentRequest($capitalCityUnitQueue->character, $capitalCityUnitQueue, $capitalCityUnitQueue->kingdom, $requestData);
+            $this->createUnitRecruitmentRequest($capitalCityUnitQueue->character, $capitalCityUnitQueue, $requestData);
         } else {
             $this->logAndTriggerEvents($capitalCityUnitQueue);
         }
@@ -283,10 +307,37 @@ class CapitalCityProcessUnitRequestHandler
             ]))->values()->toArray();
 
             dump($filteredRequestData);
-
-            //            $this->createUpgradeRequest($character, $capitalCityUnitQueue, $capitalCityUnitQueue->kingdom, $filteredRequestData);
-            //            $this->sendOffEvents($capitalCityUnitQueue);
         }
+    }
+
+    /**
+     * Create the log and trigger related events.
+     *
+     * @param CapitalCityUnitQueue $capitalCityUnitQueue
+     * @return void
+     */
+    private function createLogAndTriggerEvents(CapitalCityUnitQueue $capitalCityUnitQueue): void
+    {
+        $capitalCityUnitQueue->update([
+            'building_request_data' => $capitalCityUnitQueue->building_request_data,
+            'messages' => $this->messages,
+        ]);
+
+        $capitalCityBuildingQueue = $capitalCityUnitQueue->refresh();
+
+        $this->capitalCityKingdomLogHandler->possiblyCreateLogForUnitQueue($capitalCityUnitQueue);
+        $this->sendOffEvents($capitalCityBuildingQueue);
+    }
+
+    /**
+     * Send off the update events.
+     *
+     * @param CapitalCityUnitQueue $capitalCityUnitQueue
+     * @return void
+     */
+    private function sendOffEvents(CapitalCityUnitQueue $capitalCityUnitQueue): void
+    {
+        event(new UpdateCapitalCityUnitQueueTable($capitalCityUnitQueue->character));
     }
 
     /**
