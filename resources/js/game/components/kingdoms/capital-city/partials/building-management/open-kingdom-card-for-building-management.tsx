@@ -1,9 +1,9 @@
 import React from "react";
-import OrangeButton from "../../../ui/buttons/orange-button";
-import Building from "../deffinitions/building";
+import OrangeButton from "../../../../ui/buttons/orange-button";
+import Building from "../../deffinitions/building";
 import BuildingDetails from "./building-details";
-import OpenKingdomCardForBuildingManagementProps from "../types/partials/open-kingdom-card-for-building-management-props";
-import OpenKingdomCardForBuildingManagementState from "../types/partials/open-kingdom-card-for-building-management-state";
+import OpenKingdomCardForBuildingManagementProps from "../../types/partials/building-management/open-kingdom-card-for-building-management-props";
+import OpenKingdomCardForBuildingManagementState from "../../types/partials/building-management/open-kingdom-card-for-building-management-state";
 
 export default class OpenKingdomCardForBuildingManagement extends React.Component<
     OpenKingdomCardForBuildingManagementProps,

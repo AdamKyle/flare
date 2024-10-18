@@ -7,6 +7,8 @@ import { UnitTypes } from "../deffinitions/unit-types";
 import ProcessUnitRequestAjax from "../ajax/process-unit-request-ajax";
 import SuccessAlert from "../../ui/alerts/simple-alerts/success-alert";
 import DangerAlert from "../../ui/alerts/simple-alerts/danger-alert";
+import UnitTopLevelActions from "./partials/unit-management/unit-top-level-actions";
+import KingdomCard from "./partials/unit-management/kingdom-card";
 
 export default class UnitRecruitment extends React.Component<any, any> {
     private fetchKingdomsForSelectionAjax: FetchKingdomsForSelectionAjax;
@@ -26,7 +28,7 @@ export default class UnitRecruitment extends React.Component<any, any> {
             open_kingdom_ids: new Set(),
             search_term: "",
             unit_queue: [],
-            bulk_input_values: {}, // New state to track bulk input values per kingdom
+            bulk_input_values: {},
         };
 
         this.fetchKingdomsForSelectionAjax = serviceContainer().fetch(
@@ -118,7 +120,7 @@ export default class UnitRecruitment extends React.Component<any, any> {
     resetQueue = () => {
         this.setState({
             unit_queue: [],
-            bulk_input_values: {}, // Clear bulk input values
+            bulk_input_values: {},
         });
     };
 
@@ -153,7 +155,6 @@ export default class UnitRecruitment extends React.Component<any, any> {
         );
 
         if (!kingdomQueue) {
-            // Add the kingdom queue if it doesn't exist
             kingdomQueue = {
                 kingdom_id: kingdomId,
                 unit_requests: [],
@@ -166,21 +167,18 @@ export default class UnitRecruitment extends React.Component<any, any> {
         );
 
         if (amount === 0 || amount === "") {
-            // Remove the unit request if the amount is 0 or ""
             if (unitRequest) {
                 kingdomQueue.unit_requests = kingdomQueue.unit_requests.filter(
                     (request: any) => request.unit_name !== unitName,
                 );
             }
 
-            // Remove the kingdom queue if it has no units left
             if (kingdomQueue.unit_requests.length === 0) {
                 updatedQueue = updatedQueue.filter(
                     (item) => item.kingdom_id !== kingdomId,
                 );
             }
         } else {
-            // Update or add the unit request if the amount is above 0
             if (unitRequest) {
                 unitRequest.unit_amount = amount;
             } else {
@@ -198,7 +196,7 @@ export default class UnitRecruitment extends React.Component<any, any> {
         this.setState({ unit_queue: updatedQueue });
     }
 
-    getKingdomQueueSummary(kingdomId: number) {
+    getKingdomQueueSummary(kingdomId: number): string | null {
         const kingdomQueue = this.state.unit_queue.find(
             (item: any) => item.kingdom_id === kingdomId,
         );
@@ -215,7 +213,7 @@ export default class UnitRecruitment extends React.Component<any, any> {
             .join(", ");
     }
 
-    getUnitAmount(kingdomId: number, unitName: string) {
+    getUnitAmount(kingdomId: number, unitName: string): number | string {
         const kingdomQueue = this.state.unit_queue.find(
             (item: any) => item.kingdom_id === kingdomId,
         );
@@ -319,12 +317,29 @@ export default class UnitRecruitment extends React.Component<any, any> {
         });
     }
 
+    manageCardState(kingdomId: number): void {
+        this.setState((prevState: any) => {
+            const newOpenKingdomIds = new Set(prevState.open_kingdom_ids);
+            if (newOpenKingdomIds.has(kingdomId)) {
+                newOpenKingdomIds.delete(kingdomId);
+            } else {
+                newOpenKingdomIds.add(kingdomId);
+            }
+
+            return {
+                open_kingdom_ids: newOpenKingdomIds,
+            };
+        });
+    }
+
+    getBulkInputValue(kingdomId: number): number | string {
+        return this.state.bulk_input_values[kingdomId] || "";
+    }
+
     render() {
         if (this.state.loading) {
             return <LoadingProgressBar />;
         }
-
-        console.log(this.state.unit_queue);
 
         return (
             <div className="md:p-4">
@@ -341,35 +356,13 @@ export default class UnitRecruitment extends React.Component<any, any> {
                         {this.state.error_message}
                     </DangerAlert>
                 ) : null}
-                <input
-                    type="text"
-                    value={this.state.search_term}
-                    onChange={this.handleSearchChange}
-                    placeholder="Search by kingdom name, unit name, or map name"
-                    className="w-full mb-4 px-4 py-2 border rounded text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    aria-label="Search by kingdom name, unit name, or map name"
+                <UnitTopLevelActions
+                    search_term={this.state.seaech_term}
+                    send_orders={this.sendOrders.bind(this)}
+                    reset_queue={this.resetQueue.bind(this)}
+                    reset_filters={this.resetFilters.bind(this)}
+                    handle_search_change={this.handleSearchChange.bind(this)}
                 />
-
-                <div className="flex space-x-2 my-4">
-                    <button
-                        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                        onClick={this.sendOrders}
-                    >
-                        Send Orders
-                    </button>
-                    <button
-                        className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-                        onClick={this.resetQueue}
-                    >
-                        Reset Queue
-                    </button>
-                    <button
-                        className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
-                        onClick={this.resetFilters}
-                    >
-                        Reset Filters
-                    </button>
-                </div>
 
                 <div className="my-4">
                     <label
@@ -391,132 +384,33 @@ export default class UnitRecruitment extends React.Component<any, any> {
                 <div className="mb-4">
                     {this.state.filtered_unit_recruitment_data.map(
                         (kingdom: any) => (
-                            <div
-                                key={kingdom.id}
-                                className="bg-gray-100 dark:bg-gray-700 shadow-md rounded-lg overflow-hidden mb-4"
-                            >
-                                <div
-                                    className="p-4 flex justify-between items-center cursor-pointer"
-                                    onClick={() =>
-                                        this.setState((prevState: any) => {
-                                            const newOpenKingdomIds = new Set(
-                                                prevState.open_kingdom_ids,
-                                            );
-                                            if (
-                                                newOpenKingdomIds.has(
-                                                    kingdom.id,
-                                                )
-                                            ) {
-                                                newOpenKingdomIds.delete(
-                                                    kingdom.id,
-                                                );
-                                            } else {
-                                                newOpenKingdomIds.add(
-                                                    kingdom.id,
-                                                );
-                                            }
-                                            return {
-                                                open_kingdom_ids:
-                                                    newOpenKingdomIds,
-                                            };
-                                        })
-                                    }
-                                >
-                                    <div>
-                                        <div className="text-xl font-semibold">
-                                            {kingdom.name}
-                                        </div>
-                                        <div className="text-sm text-gray-600 dark:text-gray-400">
-                                            {kingdom.game_map_name}
-                                        </div>
-                                        {this.state.unit_queue.filter(
-                                            (queue: any) => {
-                                                return (
-                                                    queue.kingdom_id ===
-                                                    kingdom.id
-                                                );
-                                            },
-                                        ).length > 0 ? (
-                                            <div className="mb-4 text-gray-700 dark:text-gray-300">
-                                                Units in Queue:{" "}
-                                                {this.getKingdomQueueSummary(
-                                                    kingdom.id,
-                                                )}
-                                            </div>
-                                        ) : null}
-                                    </div>
-                                    <div>
-                                        <i
-                                            className={`fas ${
-                                                this.state.open_kingdom_ids.has(
-                                                    kingdom.id,
-                                                )
-                                                    ? "fa-chevron-up"
-                                                    : "fa-chevron-down"
-                                            }`}
-                                        ></i>
-                                    </div>
-                                </div>
-                                {this.state.open_kingdom_ids.has(
-                                    kingdom.id,
-                                ) && (
-                                    <div className="p-4">
-                                        <div className="mb-4 p-4 bg-white dark:bg-gray-800 shadow-sm rounded-lg">
-                                            <input
-                                                type="number"
-                                                value={
-                                                    this.state
-                                                        .bulk_input_values[
-                                                        kingdom.id
-                                                    ] || ""
-                                                }
-                                                onChange={(e) =>
-                                                    this.handleBulkAmountChange(
-                                                        e,
-                                                        kingdom.id,
-                                                    )
-                                                }
-                                                disabled={this.isBulkQueueDisabled()}
-                                                placeholder="Bulk amount"
-                                                className={`w-full mb-4 px-4 py-2 border rounded text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-200 disabled:text-gray-500 disabled:border-gray-300 disabled:cursor-not-allowed`}
-                                            />
-                                        </div>
-
-                                        {this.fetchUnitsToShow().map(
-                                            (unitType: string) => (
-                                                <div
-                                                    key={unitType}
-                                                    className="mb-4 p-4 bg-white dark:bg-gray-800 shadow-sm rounded-lg"
-                                                >
-                                                    <div className="flex items-center mb-2">
-                                                        <span className="w-1/3 text-gray-700 dark:text-gray-300">
-                                                            {unitType}
-                                                        </span>
-                                                        <input
-                                                            type="number"
-                                                            value={this.getUnitAmount(
-                                                                kingdom.id,
-                                                                unitType,
-                                                            )}
-                                                            onChange={(e) =>
-                                                                this.handleUnitAmountChange(
-                                                                    kingdom.id,
-                                                                    unitType,
-                                                                    e.target
-                                                                        .value,
-                                                                    false,
-                                                                )
-                                                            }
-                                                            placeholder="Amount"
-                                                            className="w-2/3 px-4 py-2 border rounded text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                                        />
-                                                    </div>
-                                                </div>
-                                            ),
-                                        )}
-                                    </div>
+                            <KingdomCard
+                                kingdom={kingdom}
+                                manage_card_state={this.manageCardState.bind(
+                                    this,
                                 )}
-                            </div>
+                                unit_queue={this.state.unit_queue}
+                                open_kingdom_ids={this.state.open_kingdom_ids}
+                                get_bulk_input_value={this.getBulkInputValue.bind(
+                                    this,
+                                )}
+                                handle_bulk_manage_card_stateamount_change={this.handleBulkAmountChange.bind(
+                                    this,
+                                )}
+                                is_bulk_queue_disabled={this.isBulkQueueDisabled.bind(
+                                    this,
+                                )}
+                                fetch_units_to_show={this.fetchUnitsToShow.bind(
+                                    this,
+                                )}
+                                get_unit_amount={this.getUnitAmount.bind(this)}
+                                handle_unit_amount_change={this.handleUnitAmountChange.bind(
+                                    this,
+                                )}
+                                get_kingdom_queue_summary={this.getKingdomQueueSummary.bind(
+                                    this,
+                                )}
+                            />
                         ),
                     )}
                 </div>

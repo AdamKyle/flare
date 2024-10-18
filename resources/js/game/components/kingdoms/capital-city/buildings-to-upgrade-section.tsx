@@ -14,7 +14,7 @@ import DangerOutlineButton from "../../ui/buttons/danger-outline-button";
 import SuccessOutlineButton from "../../ui/buttons/success-outline-button";
 import Kingdom from "./deffinitions/kingdom";
 import BuildingToUpgradeService from "./services/building-to-upgrade-service";
-import OpenKingdomCardForBuildingManagement from "./partials/open-kingdom-card-for-building-management";
+import OpenKingdomCardForBuildingManagement from "./partials/building-management/open-kingdom-card-for-building-management";
 import PrimaryButton from "../../ui/buttons/primary-button";
 
 const MAX_ITEMS_PER_PAGE = 10;

@@ -1,8 +1,8 @@
 import React from "react";
-import DangerOutlineButton from "../../../ui/buttons/danger-outline-button";
-import PrimaryOutlineButton from "../../../ui/buttons/primary-outline-button";
-import Building from "../deffinitions/building";
-import Kingdom from "../deffinitions/kingdom";
+import DangerOutlineButton from "../../../../ui/buttons/danger-outline-button";
+import PrimaryOutlineButton from "../../../../ui/buttons/primary-outline-button";
+import Building from "../../deffinitions/building";
+import Kingdom from "../../deffinitions/kingdom";
 
 interface BuildingDetailsProps {
     building: Building;

@@ -1,6 +1,6 @@
-import Kingdom from "../../deffinitions/kingdom";
-import { BuildingQueue } from "../../../deffinitions/building-queue";
-import Building from "../../deffinitions/building";
+import Kingdom from "../../../deffinitions/kingdom";
+import { BuildingQueue } from "../../../../deffinitions/building-queue";
+import Building from "../../../deffinitions/building";
 
 export default interface OpenKingdomCardForBuildingManagementProps {
     kingdom: Kingdom;
