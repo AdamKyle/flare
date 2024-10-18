@@ -112,7 +112,7 @@ class KingdomBuildingService
 
 
         foreach ($costs as $type => $cost) {
-            if ($type === KingdomResources::POPULATION) {
+            if ($type === KingdomResources::POPULATION->value) {
                 if (!$ignorePop) {
                     $populationCost = $building->required_population - $building->required_population * $building->kingdom->fetchPopulationCostReduction();
                     $newResources['current_population'] -= $populationCost;
@@ -142,13 +142,13 @@ class KingdomBuildingService
 
         foreach (KingdomResources::kingdomResources() as $type) {
 
-            if ($type === KingdomResources::IRON) {
+            if ($type === KingdomResources::IRON->value) {
                 $buildingCosts[$type] =  intVal($building->{$type . '_cost'} * ($buildingCostReduction + $ironCostReduction));
 
                 continue;
             }
 
-            if ($type === KingdomResources::POPULATION) {
+            if ($type === KingdomResources::POPULATION->value) {
                 $buildingCosts[$type] =  intVal($building->{$type . '_cost'} * ($buildingCostReduction + $populationCostReduction));
 
                 continue;

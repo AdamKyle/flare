@@ -68,9 +68,21 @@ class KingdomUnitResourceValidation
         $costRequired = [];
 
         foreach (KingdomResources::kingdomResources() as $resourceType) {
+
+            if ($resourceType === KingdomResources::POPULATION->value) {
+
+                $resourceAmountRequired = $gameUnit->{'required_' . $resourceType} * $amount;
+
+                $resourceAmountRequired -= $resourceAmountRequired * $kingdomUnitCostReduction;
+
+                $costRequired[$resourceType] = $resourceAmountRequired;
+
+                continue;
+            }
+
             $resourceAmountRequired = $gameUnit->{$resourceType . '_cost'} * $amount;
 
-            if ($resourceType === KingdomResources::IRON) {
+            if ($resourceType === KingdomResources::IRON->value) {
                 $resourceAmountRequired -= $resourceAmountRequired * ($kingdomUnitCostReduction + $ironCostReduction);
 
                 $costRequired[$resourceType] = $resourceAmountRequired;

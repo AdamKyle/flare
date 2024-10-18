@@ -324,6 +324,7 @@ class CapitalCityProcessUnitRequestHandler
         if (empty($requestData)) {
             $this->createLogAndTriggerEvents($capitalCityUnitQueue);
         } else {
+
             $totalCosts = $this->sumTotalCostsForUnits($requestData);
 
             $capitalCityUnitQueue->update([
