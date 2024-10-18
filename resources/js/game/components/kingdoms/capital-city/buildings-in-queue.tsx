@@ -140,8 +140,6 @@ export default class BuildingsInQueue extends React.Component<any, any> {
     manageCancelModal(buildingId?: number): void {
         let buildingData: any = null;
 
-        console.log(this.state.building_queues);
-
         if (buildingId) {
             const foundData = this.state.building_queues.flatMap(
                 (queueGroup: any) =>
@@ -167,8 +165,6 @@ export default class BuildingsInQueue extends React.Component<any, any> {
                 }
             }
         }
-
-        console.log(buildingData);
 
         this.setState({
             show_cancellation_modal: !this.state.show_cancellation_modal,
@@ -229,13 +225,12 @@ export default class BuildingsInQueue extends React.Component<any, any> {
                                     </p>
                                 </div>
                                 <i
-                                    className={`fas fa-chevron-${
-                                        this.state.open_kingdom_ids.has(
-                                            queueGroup.kingdom_id,
-                                        )
-                                            ? "down"
-                                            : "up"
-                                    } text-gray-500 dark:text-gray-400`}
+                                    className={`fas fa-chevron-${this.state.open_kingdom_ids.has(
+                                        queueGroup.kingdom_id,
+                                    )
+                                        ? "down"
+                                        : "up"
+                                        } text-gray-500 dark:text-gray-400`}
                                 />
                             </div>
                             <TimerProgressBar
@@ -246,36 +241,36 @@ export default class BuildingsInQueue extends React.Component<any, any> {
                         {this.state.open_kingdom_ids.has(
                             queueGroup.kingdom_id,
                         ) && (
-                            <div className="bg-gray-300 dark:bg-gray-600 p-4">
-                                {queueGroup.building_queue.map((queue: any) => (
-                                    <div
-                                        key={queue.queue_id}
-                                        className="mb-4 p-4 bg-white dark:bg-gray-800 shadow-sm rounded-lg"
-                                    >
-                                        <h3 className="text-lg font-semibold dark:text-white">
-                                            {queue.building_name}
-                                        </h3>
-                                        <p className="text-gray-700 dark:text-gray-300">
-                                            Status:{" "}
-                                            {capitalize(queue.secondary_status)}
-                                        </p>
-                                        <button
-                                            onClick={() =>
-                                                this.manageCancelModal(
-                                                    queue.building_id,
-                                                )
-                                            }
-                                            className="mt-2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50"
-                                            disabled={
-                                                queueGroup.total_time < 60
-                                            }
+                                <div className="bg-gray-300 dark:bg-gray-600 p-4">
+                                    {queueGroup.building_queue.map((queue: any) => (
+                                        <div
+                                            key={queue.queue_id}
+                                            className="mb-4 p-4 bg-white dark:bg-gray-800 shadow-sm rounded-lg"
                                         >
-                                            Cancel Upgrade
-                                        </button>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
+                                            <h3 className="text-lg font-semibold dark:text-white">
+                                                {queue.building_name}
+                                            </h3>
+                                            <p className="text-gray-700 dark:text-gray-300">
+                                                Status:{" "}
+                                                {capitalize(queue.secondary_status)}
+                                            </p>
+                                            <button
+                                                onClick={() =>
+                                                    this.manageCancelModal(
+                                                        queue.building_id,
+                                                    )
+                                                }
+                                                className="mt-2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50"
+                                                disabled={
+                                                    queueGroup.total_time < 60
+                                                }
+                                            >
+                                                Cancel Upgrade
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
                     </div>
                 ))}
 
