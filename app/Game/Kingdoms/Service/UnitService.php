@@ -56,8 +56,8 @@ class UnitService
     public function recruitUnits(Kingdom $kingdom, GameUnit $gameUnit, int $amount, ?int $capitalCityQueueId = null): void
     {
         $character = $kingdom->character;
-        $totalTime = $gameUnit->time_to_recruit * $amount;
-        $totalTime = $totalTime - $totalTime * $this->fetchTimeReduction($character)->unit_time_reduction;
+        $totalTime = $this->getTotalTimeForUnitRecruitment($character, $gameUnit, $amount);
+
         $timeTillFinished = now()->addSeconds($totalTime);
 
         $queue = UnitInQueue::create([
@@ -76,6 +76,21 @@ class UnitService
         } else {
             RecruitUnits::dispatch($gameUnit, $kingdom, $amount, $queue->id, $capitalCityQueueId)->delay($timeTillFinished);
         }
+    }
+
+    /**
+     * Get the total time for the unit recruitment
+     *
+     * @param Character $character
+     * @param GameUnit $gameUnit
+     * @param integer $amount
+     * @return integer|float
+     */
+    public function getTotalTimeForUnitRecruitment(Character $character, GameUnit $gameUnit, int $amount): int|float
+    {
+        $totalTime = $gameUnit->time_to_recruit * $amount;
+
+        return $totalTime - $totalTime * $this->fetchTimeReduction($character)->unit_time_reduction;
     }
 
     /**
@@ -102,6 +117,33 @@ class UnitService
 
 
         foreach ($costs as $type => $cost) {
+            $newResources['current_' . strtolower($type)] -= $cost;
+        }
+
+        $kingdom->update(array_map(fn($value) => max($value, 0), $newResources));
+
+        return $kingdom->refresh();
+    }
+
+    /**
+     * Update the kingdoms resources based off the total costs for a set of units.
+     *
+     * @param Kingdom $kingdom
+     * @param array $totalCosts
+     * @return Kingdom
+     */
+    public function updateKingdomResourcesForTotalCost(Kingdom $kingdom, array $totalCosts): Kingdom
+    {
+        $newResources = [
+            'current_wood' => $kingdom->current_wood,
+            'current_clay' => $kingdom->current_clay,
+            'current_stone' => $kingdom->current_stone,
+            'current_iron' => $kingdom->current_iron,
+            'current_steel' => $kingdom->current_steel,
+            'current_population' => $kingdom->current_population,
+        ];
+
+        foreach ($totalCosts as $type => $cost) {
             $newResources['current_' . strtolower($type)] -= $cost;
         }
 

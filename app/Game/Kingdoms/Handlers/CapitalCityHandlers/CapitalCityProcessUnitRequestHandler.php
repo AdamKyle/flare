@@ -9,17 +9,16 @@ use App\Flare\Models\GameBuildingUnit;
 use App\Flare\Models\GameUnit;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\KingdomBuilding;
-use App\Flare\Models\KingdomUnit;
 use App\Game\Kingdoms\Events\UpdateCapitalCityUnitQueueTable;
 use App\Game\Kingdoms\Handlers\Traits\CanAffordPopulationCost;
 use App\Game\Kingdoms\Jobs\CapitalCityResourceRequest as CapitalCityResourceRequestJob;
+use App\Game\Kingdoms\Jobs\CapitalCityUnitRequest;
 use App\Game\Kingdoms\Service\UnitService;
 use App\Game\Kingdoms\Validation\KingdomUnitResourceValidation;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use App\Game\Kingdoms\Values\CapitalCityResourceRequestType;
 use App\Game\Maps\Calculations\DistanceCalculation;
 use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
-use Facades\App\Game\Kingdoms\Validation\ResourceValidation;
 
 
 class CapitalCityProcessUnitRequestHandler
@@ -87,7 +86,7 @@ class CapitalCityProcessUnitRequestHandler
         if (!empty($missingResources)) {
             $this->handleResourceRequests($capitalCityUnitQueue, $character, $missingResources, $requestData, $kingdom);
         } else {
-            $this->handleNoResourceRequests($capitalCityUnitQueue, $requestData);
+            $this->handleNoResourceRequests($character, $capitalCityUnitQueue, $requestData);
         }
     }
 
@@ -132,6 +131,13 @@ class CapitalCityProcessUnitRequestHandler
         return $requestData;
     }
 
+    /**
+     * Is the building the unit belongs to locked?
+     *
+     * @param KingdomBuilding $building
+     * @param Kingdom $kingdom
+     * @return boolean
+     */
     private function isBuildingLocked(KingdomBuilding $building, Kingdom $kingdom): bool
     {
         if ($building->is_locked) {
@@ -144,6 +150,14 @@ class CapitalCityProcessUnitRequestHandler
         return false;
     }
 
+    /**
+     * Is the building that the unit belongs to underleveled?
+     *
+     * @param KingdomBuilding $building
+     * @param GameBuildingUnit $gameBuildingRelation
+     * @param Kingdom $kingdom
+     * @return boolean
+     */
     private function isBuildingUnderLeveled(KingdomBuilding $building, GameBuildingUnit $gameBuildingRelation, Kingdom $kingdom): bool
     {
         if ($building->level < $gameBuildingRelation->required_level) {
@@ -232,14 +246,28 @@ class CapitalCityProcessUnitRequestHandler
     /**
      * Handle the case where no resource requests are needed.
      *
+     * @param Character $character
      * @param CapitalCityUnitQueue $capitalCityUnitQueue
      * @param array $requestData
      * @return void
      */
-    private function handleNoResourceRequests(CapitalCityUnitQueue $capitalCityUnitQueue, array $requestData): void
+    private function handleNoResourceRequests(Character $character, CapitalCityUnitQueue $capitalCityUnitQueue, array $requestData): void
     {
         if ($this->hasRecruitingUnits($requestData)) {
-            $this->createUnitRecruitmentRequest($capitalCityUnitQueue->character, $capitalCityUnitQueue, $requestData);
+
+            $totalTimeInSeconds = 0;
+
+            $filteredRequestData = collect($requestData)->filter(fn($item) => in_array($item['secondary_status'], [
+                CapitalCityQueueStatus::RECRUITING,
+            ]))->toArray();
+
+            foreach ($filteredRequestData as $data) {
+                $gameUnit = GameUnit::where('name', $data['name'])->first();
+
+                $totalTimeInSeconds += $this->unitService->getTotalTimeForUnitRecruitment($character, $gameUnit, $data['amount']);
+            }
+
+            $this->createUnitRecruitmentRequest($capitalCityUnitQueue, $filteredRequestData, $totalTimeInSeconds);
         } else {
             $this->logAndTriggerEvents($capitalCityUnitQueue);
         }
@@ -283,31 +311,63 @@ class CapitalCityProcessUnitRequestHandler
     /**
      * Create a unit recruitment request.
      *
-     * @param Character $character
      * @param CapitalCityUnitQueue $capitalCityUnitQueue
      * @param array $requestData
      * @return void
      */
     private function createUnitRecruitmentRequest(
-        Character $character,
         CapitalCityUnitQueue $capitalCityUnitQueue,
-        array $requestData
+        array $requestData,
+        int $totalTimeInSeconds
     ): void {
 
-        $hasBuildingOrRepairing = collect($requestData)->contains(fn($item) => in_array($item['secondary_status'], [
-            CapitalCityQueueStatus::RECRUITING,
-            CapitalCityQueueStatus::REQUESTING
-        ]));
-
-        if (!$hasBuildingOrRepairing) {
+        if (empty($requestData)) {
             $this->createLogAndTriggerEvents($capitalCityUnitQueue);
         } else {
-            $filteredRequestData = collect($requestData)->filter(fn($item) => in_array($item['secondary_status'], [
-                CapitalCityQueueStatus::RECRUITING,
-            ]))->values()->toArray();
+            $totalCosts = $this->sumTotalCostsForUnits($requestData);
 
-            dump($filteredRequestData);
+            $capitalCityUnitQueue->update([
+                'status' => CapitalCityQueueStatus::RECRUITING,
+            ]);
+
+            $capitalCityUnitQueue = $capitalCityUnitQueue->refresh();
+
+            if (config('app.env') !== 'production') {
+                $totalTimeInSeconds = 60;
+            }
+
+            if ($totalTimeInSeconds >= 900) {
+                CapitalCityUnitRequest::dispatch($capitalCityUnitQueue->id, $totalCosts)->delay(
+                    now()->addSeconds($totalTimeInSeconds)
+                );
+
+                event(new UpdateCapitalCityUnitQueueTable($capitalCityUnitQueue->character));
+
+                return;
+            }
+
+            CapitalCityUnitRequest::dispatch($capitalCityUnitQueue->id, $totalCosts)->delay(
+                now()->addSeconds($totalTimeInSeconds)
+            );
+
+            event(new UpdateCapitalCityUnitQueueTable($capitalCityUnitQueue->character));
+
+            return;
         }
+    }
+
+    /**
+     * Sum total costs for the recruitment process
+     *
+     * @param array $requestData
+     * @return array
+     */
+    private function sumTotalCostsForUnits(array $requestData): array
+    {
+        return collect($requestData)
+            ->map(fn($costs) => collect($costs['costs']))
+            ->reduce(fn($carry, $costs) => $carry->merge($costs)->map(fn($value, $key) => $carry->get($key, 0) + $value), collect())
+            ->toArray();
     }
 
     /**
@@ -412,6 +472,14 @@ class CapitalCityProcessUnitRequestHandler
         CapitalCityResourceRequestJob::dispatch($capitalCityUnitQueue->id, $resourceRequest->id, CapitalCityResourceRequestType::UNIT_QUEUE)->delay($delayJobTime);
     }
 
+    /**
+     * Get the time from kingdom to another.
+     *
+     * @param Character $character
+     * @param Kingdom $kingdomAskingForResources
+     * @param Kingdom $requestingFromKingdom
+     * @return integer
+     */
     private function getTimeToKingdom(Character $character, Kingdom $kingdomAskingForResources, Kingdom $requestingFromKingdom): int
     {
         $pixelDistance = $this->distanceCalculation->calculatePixel(
@@ -434,6 +502,14 @@ class CapitalCityProcessUnitRequestHandler
         return $timeToKingdom;
     }
 
+    /**
+     * Get the titme it would require to recruit the amount of units.
+     *
+     * @param Character $character
+     * @param GameUnit $gameUnit
+     * @param integer $amount
+     * @return integer
+     */
     private function getTimeForRecruitment(Character $character, GameUnit $gameUnit, int $amount): int
     {
         $totalTime = $gameUnit->time_to_recruit * $amount;
@@ -441,6 +517,15 @@ class CapitalCityProcessUnitRequestHandler
         return $totalTime - $totalTime * $this->unitService->fetchTimeReduction($character)->unit_time_reduction;
     }
 
+    /**
+     * Is the time greator then 7 days?
+     *
+     * @param Character $character
+     * @param Kingdom $kingdom
+     * @param GameUnit $gameUnit
+     * @param integer $amount
+     * @return boolean
+     */
     private function isTimeGreaterThanSevenDays(Character $character, Kingdom $kingdom, GameUnit $gameUnit, int $amount): bool
     {
         $timeTillDone = $this->getTimeForRecruitment($character, $gameUnit, $amount);

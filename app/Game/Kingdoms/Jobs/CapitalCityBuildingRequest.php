@@ -21,7 +21,10 @@ class CapitalCityBuildingRequest implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     protected array $resourceTypes = [
-        'wood', 'clay', 'stone', 'iron',
+        'wood',
+        'clay',
+        'stone',
+        'iron',
     ];
 
     public function __construct(protected readonly int $capitalCityQueueId) {}
@@ -100,12 +103,13 @@ class CapitalCityBuildingRequest implements ShouldQueue
         $capitalCityKingdomLogHandler->possiblyCreateLogForBuildingQueue($queueData);
     }
 
-    private function handleUpgradingBuilding(KingdomBuilding $building, int $toLevel): void {
+    private function handleUpgradingBuilding(KingdomBuilding $building, int $toLevel): void
+    {
 
         if ($building->gives_resources) {
             $type = $this->getResourceType($building);
 
-            $building->kingdom->{'max_'.$type} += 1000;
+            $building->kingdom->{'max_' . $type} += 1000;
             $building->kingdom->save();
         }
 
@@ -114,7 +118,7 @@ class CapitalCityBuildingRequest implements ShouldQueue
         $building = $building->refresh();
 
         $building->update([
-            'current_defence'   => $building->defence,
+            'current_defence'    => $building->defence,
             'current_durability' => $building->durability,
             'max_defence'        => $building->defence,
             'max_durability'     => $building->durability,
@@ -125,7 +129,8 @@ class CapitalCityBuildingRequest implements ShouldQueue
         }
     }
 
-    private function handleRebuildingBuilding(KingdomBuilding $building): void {
+    private function handleRebuildingBuilding(KingdomBuilding $building): void
+    {
         $building->update([
             'current_durability' => $this->building->max_durability,
         ]);
@@ -148,7 +153,8 @@ class CapitalCityBuildingRequest implements ShouldQueue
     }
 
 
-    private function getResourceType(KingdomBuilding $building) {
+    private function getResourceType(KingdomBuilding $building)
+    {
         return collect($this->resourceTypes)->first(fn($type) => $building->{'increase_in_' . $type} !== 0.0);
     }
 }
