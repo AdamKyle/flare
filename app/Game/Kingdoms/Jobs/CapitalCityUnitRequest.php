@@ -45,6 +45,7 @@ class CapitalCityUnitRequest implements ShouldQueue
                 // @codeCoverageIgnoreStart
                 CapitalCityUnitRequest::dispatch(
                     $this->capitalCityQueueId,
+                    $this->totalCosts
                 )->delay($time);
 
                 return;
@@ -56,10 +57,13 @@ class CapitalCityUnitRequest implements ShouldQueue
 
         $requestData = $queueData->unit_request_data;
 
+        dump('inside the job');
+        dump($requestData);
+
         $updatedRequestData = $this->handleRecruitment($kingdom, $requestData);
 
         $queueData->update([
-            'unit_request_Data' => $updatedRequestData,
+            'unit_request_data' => $updatedRequestData,
             'status' => CapitalCityQueueStatus::FINISHED,
         ]);
 
@@ -74,6 +78,11 @@ class CapitalCityUnitRequest implements ShouldQueue
     {
 
         foreach ($requestData as $index => $data) {
+
+            if ($data['secondary_status'] === CapitalCityQueueStatus::REJECTED) {
+                continue;
+            }
+
             $gameUnit = GameUnit::where('name', $data['name'])->first();
 
             $unit = $kingdom->units()->where('game_unit_id', $gameUnit->id)->first();

@@ -124,7 +124,7 @@ class CapitalCityBuildingManagementRequestHandler
      * @param Collection $buildings The collection of buildings to be upgraded.
      * @param string $type The type of request ('upgrade' or otherwise).
      *
-     * @return array The queue data for the building upgrade request.
+     * @return array The queue data for the bbuildQueueDatauilding upgrade request.
      */
     private function buildQueueData(Collection $buildings, string $type): array
     {

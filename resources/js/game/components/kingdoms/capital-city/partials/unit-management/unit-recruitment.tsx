@@ -1,14 +1,17 @@
 import React from "react";
-import FetchKingdomsForSelectionAjax from "../ajax/fetch-kingdoms-for-selection-ajax";
-import { serviceContainer } from "../../../lib/containers/core-container";
-import LoadingProgressBar from "../../ui/progress-bars/loading-progress-bar";
+import FetchKingdomsForSelectionAjax from "../../../ajax/fetch-kingdoms-for-selection-ajax";
+import { serviceContainer } from "../../../../../lib/containers/core-container";
+import LoadingProgressBar from "../../../../ui/progress-bars/loading-progress-bar";
 import debounce from "lodash/debounce";
-import { UnitTypes } from "../deffinitions/unit-types";
-import ProcessUnitRequestAjax from "../ajax/process-unit-request-ajax";
-import SuccessAlert from "../../ui/alerts/simple-alerts/success-alert";
-import DangerAlert from "../../ui/alerts/simple-alerts/danger-alert";
-import UnitTopLevelActions from "./partials/unit-management/unit-top-level-actions";
-import KingdomCard from "./partials/unit-management/kingdom-card";
+import { UnitTypes } from "../../../deffinitions/unit-types";
+import ProcessUnitRequestAjax from "../../../ajax/process-unit-request-ajax";
+import SuccessAlert from "../../../../ui/alerts/simple-alerts/success-alert";
+import DangerAlert from "../../../../ui/alerts/simple-alerts/danger-alert";
+import UnitTopLevelActions from "./unit-top-level-actions";
+import KingdomCard from "./kingdom-card";
+import Pagination from "../../components/pagination";
+
+const MAX_ITEMS_PER_PAGE = 10;
 
 export default class UnitRecruitment extends React.Component<any, any> {
     private fetchKingdomsForSelectionAjax: FetchKingdomsForSelectionAjax;
@@ -27,8 +30,11 @@ export default class UnitRecruitment extends React.Component<any, any> {
             filtered_unit_recruitment_data: [],
             open_kingdom_ids: new Set(),
             search_term: "",
+            global_bulk_value: "",
             unit_queue: [],
             bulk_input_values: {},
+            items_per_page: MAX_ITEMS_PER_PAGE,
+            current_page: 1,
         };
 
         this.fetchKingdomsForSelectionAjax = serviceContainer().fetch(
@@ -62,18 +68,9 @@ export default class UnitRecruitment extends React.Component<any, any> {
         const openKingdomIds = new Set<number>();
 
         let filteredData = this.state.kingdoms_for_selection
-            .map((kingdom: any) => {
-                const kingdomNameMatches =
-                    kingdom.name.toLowerCase() === searchTerm;
-                const mapNameMatches = kingdom.game_map_name
-                    .toLowerCase()
-                    .includes(searchTerm);
-
-                return kingdom;
-            })
             .filter((kingdom: any) => {
                 return (
-                    kingdom.name.toLowerCase() === searchTerm ||
+                    kingdom.name.toLowerCase().includes(searchTerm) ||
                     kingdom.game_map_name.toLowerCase().includes(searchTerm)
                 );
             });
@@ -106,23 +103,16 @@ export default class UnitRecruitment extends React.Component<any, any> {
         this.updateFilteredUnitData();
     }, 300);
 
-    resetFilters = () => {
-        this.setState(
-            {
-                search_term: "",
-            },
-            () => {
-                this.updateFilteredUnitData();
-            },
-        );
-    };
-
-    resetQueue = () => {
+    reset() {
         this.setState({
+            search_term: "",
             unit_queue: [],
             bulk_input_values: {},
-        });
-    };
+            global_bulk_value: "",
+        }, () => {
+            this.updateFilteredUnitData();
+        })
+    }
 
     sendOrders = () => {
         this.setState(
@@ -280,7 +270,11 @@ export default class UnitRecruitment extends React.Component<any, any> {
 
     handleGlobalBulkAmountChang(event: React.ChangeEvent<HTMLInputElement>) {
         const bulkAmount = parseInt(event.target.value, 10) || "";
-        this.applyGlobalBulkAmount(bulkAmount);
+        this.setState({
+            global_bulk_value: bulkAmount,
+        }, () => {
+            this.applyGlobalBulkAmount(bulkAmount);
+        })
     }
 
     applyGlobalBulkAmount(bulkAmount: number | string) {
@@ -336,6 +330,18 @@ export default class UnitRecruitment extends React.Component<any, any> {
         return this.state.bulk_input_values[kingdomId] || "";
     }
 
+    handlePageChange(pageNumber: number) {
+        this.setState({ current_page: pageNumber });
+    }
+
+    getPaginatedData() {
+        const { current_page, items_per_page, filtered_unit_recruitment_data } = this.state;
+        const startIndex = (current_page - 1) * items_per_page;
+        const endIndex = startIndex + items_per_page;
+
+        return filtered_unit_recruitment_data.slice(startIndex, endIndex);
+    }
+
     render() {
         if (this.state.loading) {
             return <LoadingProgressBar />;
@@ -357,11 +363,11 @@ export default class UnitRecruitment extends React.Component<any, any> {
                     </DangerAlert>
                 ) : null}
                 <UnitTopLevelActions
-                    search_term={this.state.seaech_term}
+                    search_term={this.state.search_term}
                     send_orders={this.sendOrders.bind(this)}
-                    reset_queue={this.resetQueue.bind(this)}
-                    reset_filters={this.resetFilters.bind(this)}
+                    reset={this.reset.bind(this)}
                     handle_search_change={this.handleSearchChange.bind(this)}
+                    actions_disabled={this.state.processing_request}
                 />
 
                 <div className="my-4">
@@ -378,11 +384,12 @@ export default class UnitRecruitment extends React.Component<any, any> {
                         onChange={this.handleGlobalBulkAmountChang.bind(this)}
                         className="w-full mt-2 px-4 py-2 border rounded text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         aria-label="Global bulk recruitment for all kingdoms"
+                        disabled={this.state.processing_request}
                     />
                 </div>
 
                 <div className="mb-4">
-                    {this.state.filtered_unit_recruitment_data.map(
+                    {this.getPaginatedData().map(
                         (kingdom: any) => (
                             <KingdomCard
                                 kingdom={kingdom}
@@ -414,6 +421,12 @@ export default class UnitRecruitment extends React.Component<any, any> {
                         ),
                     )}
                 </div>
+                <Pagination
+                    on_page_change={this.handlePageChange.bind(this)}
+                    current_page={this.state.currentPage}
+                    items_per_page={MAX_ITEMS_PER_PAGE}
+                    total_items={this.state.filtered_unit_recruitment_data.length}
+                />
             </div>
         );
     }

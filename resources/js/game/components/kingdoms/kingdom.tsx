@@ -49,9 +49,9 @@ export default class Kingdom extends React.Component<KingdomProps, any> {
         new Ajax()
             .setRoute(
                 "player-kingdom/" +
-                    this.props.kingdom.character_id +
-                    "/" +
-                    this.props.kingdom.id,
+                this.props.kingdom.character_id +
+                "/" +
+                this.props.kingdom.id,
             )
             .doAjaxCall(
                 "GET",
@@ -217,7 +217,7 @@ export default class Kingdom extends React.Component<KingdomProps, any> {
 
                     <div>
                         {this.state.building_to_view !== null ||
-                        this.state.unit_to_view !== null ? (
+                            this.state.unit_to_view !== null ? (
                             <InformationSection
                                 sections={{
                                     unit_to_view: this.state.unit_to_view,

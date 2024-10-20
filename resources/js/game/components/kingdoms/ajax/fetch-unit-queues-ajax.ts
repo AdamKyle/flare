@@ -2,26 +2,23 @@ import { inject, injectable } from "tsyringe";
 import Ajax from "../../../lib/ajax/ajax";
 import AjaxInterface from "../../../lib/ajax/ajax-interface";
 import { AxiosError, AxiosResponse } from "axios";
-import BuildingsToUpgradeSection from "../capital-city/buildings-to-upgrade-section";
-import BuildingsInQueue from "../capital-city/buildings-in-queue";
-import UnitRecruitment from "../capital-city/unit-recruitment";
-import UnitQueuesTable from "../capital-city/unit-queues-table";
+import UnitQueue from "../capital-city/partials/unit-management/unit-queue";
 
 @injectable()
 export default class FetchUnitQueuesAjax {
-    constructor(@inject(Ajax) private ajax: AjaxInterface) {}
+    constructor(@inject(Ajax) private ajax: AjaxInterface) { }
 
     public fetchUnitQueueData(
-        component: UnitQueuesTable,
+        component: UnitQueue,
         characterId: number,
         kingdomId: number,
     ): void {
         this.ajax
             .setRoute(
                 "kingdom/capital-city/unit-queues/" +
-                    characterId +
-                    "/" +
-                    kingdomId,
+                characterId +
+                "/" +
+                kingdomId,
             )
             .doAjaxCall(
                 "get",

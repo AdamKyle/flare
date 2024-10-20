@@ -46,6 +46,9 @@ class CapitalCityUnitManagementRequestHandler
             $time = $this->determineTime($character, $toKingdom, $kingdom);
             $queueData = $this->prepareQueueData($character, $kingdom, $data, $time);
             $unitRequests = $this->prepareUnitRequests($data['unit_requests'], $toKingdom);
+
+            dump('createUnitRequests', $unitRequests);
+
             $queueData['unit_request_data'] = $unitRequests;
 
             $queue = CapitalCityUnitQueue::create($queueData);

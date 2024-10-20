@@ -71,7 +71,7 @@ export default class BuildingsToUpgradeSection extends React.Component<
         this.updateBuildingTable.listen();
     }
 
-    componentDidUpdate(prevProps: any, prevState: any) {
+    componentDidUpdate(prevProps: BuildingsToUpgradeSectionProps, prevState: BuildingsToUpgradeSectionState) {
         if (prevState.building_data !== this.state.building_data) {
             this.buildingToUpgradeService.updateFilteredBuildingData();
         }
@@ -81,10 +81,10 @@ export default class BuildingsToUpgradeSection extends React.Component<
         this.setState(
             {
                 search_query: "",
-                sort_direction: "asc", // reset to default sorting
+                sort_direction: "asc",
             },
             () => {
-                this.buildingToUpgradeService.updateFilteredBuildingData(); // apply the reset
+                this.buildingToUpgradeService.updateFilteredBuildingData();
             },
         );
     }
@@ -210,23 +210,23 @@ export default class BuildingsToUpgradeSection extends React.Component<
                                             building,
                                         ),
                                     ) && (
-                                        <p className="text-gray-600 dark:text-gray-500 mt-2">
-                                            <strong>Buildings in Queue</strong>:{" "}
-                                            {kingdom.buildings
-                                                .filter((building) =>
-                                                    this.buildingToUpgradeService.hasBuildingInQueue(
-                                                        kingdom,
-                                                        building,
-                                                    ),
-                                                )
-                                                .map((building) =>
-                                                    this.props.repair
-                                                        ? `${building.name} (to be repaired)`
-                                                        : `${building.name} (to level: ${building.level + 1})`,
-                                                )
-                                                .join(", ")}
-                                        </p>
-                                    )}
+                                            <p className="text-gray-600 dark:text-gray-500 mt-2">
+                                                <strong>Buildings in Queue</strong>:{" "}
+                                                {kingdom.buildings
+                                                    .filter((building) =>
+                                                        this.buildingToUpgradeService.hasBuildingInQueue(
+                                                            kingdom,
+                                                            building,
+                                                        ),
+                                                    )
+                                                    .map((building) =>
+                                                        this.props.repair
+                                                            ? `${building.name} (to be repaired)`
+                                                            : `${building.name} (to level: ${building.level + 1})`,
+                                                    )
+                                                    .join(", ")}
+                                            </p>
+                                        )}
                                 </div>
                                 <i
                                     className={`fas fa-chevron-${this.state.open_kingdom_ids.has(kingdom.kingdom_id) ? "down" : "up"} text-gray-500 dark:text-gray-400`}
@@ -236,20 +236,20 @@ export default class BuildingsToUpgradeSection extends React.Component<
                             {this.state.open_kingdom_ids.has(
                                 kingdom.kingdom_id,
                             ) && (
-                                <OpenKingdomCardForBuildingManagement
-                                    building_queue={this.state.building_queue}
-                                    has_building_in_queue={this.buildingToUpgradeService.hasBuildingInQueue.bind(
-                                        this.buildingToUpgradeService,
-                                    )}
-                                    kingdom={kingdom}
-                                    toggle_queue_all_buildings={this.buildingToUpgradeService.toggleQueueAllBuildings.bind(
-                                        this.buildingToUpgradeService,
-                                    )}
-                                    toggle_building_queue={this.buildingToUpgradeService.toggleBuildingQueue.bind(
-                                        this.buildingToUpgradeService,
-                                    )}
-                                />
-                            )}
+                                    <OpenKingdomCardForBuildingManagement
+                                        building_queue={this.state.building_queue}
+                                        has_building_in_queue={this.buildingToUpgradeService.hasBuildingInQueue.bind(
+                                            this.buildingToUpgradeService,
+                                        )}
+                                        kingdom={kingdom}
+                                        toggle_queue_all_buildings={this.buildingToUpgradeService.toggleQueueAllBuildings.bind(
+                                            this.buildingToUpgradeService,
+                                        )}
+                                        toggle_building_queue={this.buildingToUpgradeService.toggleBuildingQueue.bind(
+                                            this.buildingToUpgradeService,
+                                        )}
+                                    />
+                                )}
                         </div>
                     ))}
                 <Pagination

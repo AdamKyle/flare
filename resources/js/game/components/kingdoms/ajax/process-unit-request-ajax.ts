@@ -2,11 +2,11 @@ import { inject, injectable } from "tsyringe";
 import Ajax from "../../../lib/ajax/ajax";
 import AjaxInterface from "../../../lib/ajax/ajax-interface";
 import { AxiosError, AxiosResponse } from "axios";
-import UnitRecruitment from "../capital-city/unit-recruitment";
+import UnitRecruitment from "../capital-city/partials/unit-management/unit-recruitment";
 
 @injectable()
 export default class ProcessUnitRequestAjax {
-    constructor(@inject(Ajax) private ajax: AjaxInterface) {}
+    constructor(@inject(Ajax) private ajax: AjaxInterface) { }
 
     public processRequest(
         component: UnitRecruitment,
@@ -17,9 +17,9 @@ export default class ProcessUnitRequestAjax {
         this.ajax
             .setRoute(
                 "kingdom/capital-city/recruit-unit-requests/" +
-                    characterId +
-                    "/" +
-                    kingdomId,
+                characterId +
+                "/" +
+                kingdomId,
             )
             .setParameters({
                 request_data: params,

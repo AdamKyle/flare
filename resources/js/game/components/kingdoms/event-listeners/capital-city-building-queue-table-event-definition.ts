@@ -1,5 +1,5 @@
 import Listener from "../../../lib/game/event-listeners/listener";
-import UnitRecruitment from "../capital-city/unit-recruitment";
+import UnitRecruitment from "../capital-city/partials/unit-management/unit-recruitment";
 import BuildingsInQueue from "../capital-city/buildings-in-queue";
 
 export default interface CapitalCityBuildingQueueTableEventDefinition

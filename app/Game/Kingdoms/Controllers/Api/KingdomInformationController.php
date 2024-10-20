@@ -33,14 +33,15 @@ class KingdomInformationController extends Controller
 
     private UpdateKingdom $updateKingdom;
 
-    public function __construct(Manager $manager,
+    public function __construct(
+        Manager $manager,
         KingdomTransformer $kingdomTransformer,
         KingdomAttackLogsTransformer $kingdomAttackLogsTransformer,
         BasicKingdomTransformer $basicKingdomTransformer,
         KingdomTableTransformer $kingdomTableTransformer,
         OtherKingdomTransformer $otherKingdomTransformer,
-        UpdateKingdom $updateKingdom)
-    {
+        UpdateKingdom $updateKingdom
+    ) {
         $this->manager = $manager;
         $this->kingdomTransformer = $kingdomTransformer;
         $this->kingdomAttackLogsTransformer = $kingdomAttackLogsTransformer;

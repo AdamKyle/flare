@@ -14,7 +14,7 @@ export default class BuildingToUpgradeService {
     constructor(
         @inject(ProcessUpgradeBuildingsAjax)
         private processBuildingRequest: ProcessUpgradeBuildingsAjax,
-    ) {}
+    ) { }
 
     public setComponent(component: BuildingsToUpgradeSection) {
         this.component = component;
@@ -73,7 +73,7 @@ export default class BuildingToUpgradeService {
         let filteredBuildingData = this.component.state.building_data.filter(
             (kingdom: Kingdom) => {
                 return (
-                    (kingdom.kingdom_name.toLowerCase() === searchTerm ||
+                    (kingdom.kingdom_name.toLowerCase().includes(searchTerm) ||
                         kingdom.map_name.toLowerCase().includes(searchTerm)) &&
                     kingdom.buildings.length > 0
                 );

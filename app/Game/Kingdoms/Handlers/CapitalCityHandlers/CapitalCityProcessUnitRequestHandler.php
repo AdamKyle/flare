@@ -70,7 +70,7 @@ class CapitalCityProcessUnitRequestHandler
 
 
             $capitalCityUnitQueue->update([
-                'building_request_data' => $requestData,
+                'unit_request_data' => $requestData,
                 'messages' => array_merge($capitalCityUnitQueue->messages, [
                     'Units were rejected because even after requesting resources, you still do not have enough resources for one or more units so the entire request was canceled out of frustration.'
                 ])
@@ -82,6 +82,12 @@ class CapitalCityProcessUnitRequestHandler
 
             return;
         }
+
+        $capitalCityUnitQueue->update([
+            'unit_request_data' => $requestData,
+        ]);
+
+        $capitalCityUnitQueue = $capitalCityUnitQueue->refresh();
 
         if (!empty($missingResources)) {
             $this->handleResourceRequests($capitalCityUnitQueue, $character, $missingResources, $requestData, $kingdom);
@@ -257,9 +263,16 @@ class CapitalCityProcessUnitRequestHandler
 
             $totalTimeInSeconds = 0;
 
+
+            dump('Before we filter for recruiting:');
+            dump($requestData);
+
             $filteredRequestData = collect($requestData)->filter(fn($item) => in_array($item['secondary_status'], [
                 CapitalCityQueueStatus::RECRUITING,
             ]))->toArray();
+
+            dump('Filtered data for recruitment');
+            dump($filteredRequestData);
 
             foreach ($filteredRequestData as $data) {
                 $gameUnit = GameUnit::where('name', $data['name'])->first();
@@ -327,15 +340,29 @@ class CapitalCityProcessUnitRequestHandler
 
             $totalCosts = $this->sumTotalCostsForUnits($requestData);
 
+            if (config('app.env') !== 'production') {
+                $totalTimeInSeconds = 60;
+            }
+
+            dump('Before we merge');
+            dump($capitalCityUnitQueue->unit_request_data);
+            dump($requestData);
+
             $capitalCityUnitQueue->update([
                 'status' => CapitalCityQueueStatus::RECRUITING,
+                'started_at' => now(),
+                'completed_at' => now()->addSeconds($totalTimeInSeconds),
+                'messages' => $this->messages,
+                'unit_request_data' => array_merge(
+                    $capitalCityUnitQueue->unit_request_data,
+                    $requestData
+                )
             ]);
 
             $capitalCityUnitQueue = $capitalCityUnitQueue->refresh();
 
-            if (config('app.env') !== 'production') {
-                $totalTimeInSeconds = 60;
-            }
+            dump('What is the recruitment queue now?');
+            dump($capitalCityUnitQueue->unit_request_data);
 
             if ($totalTimeInSeconds >= 900) {
                 CapitalCityUnitRequest::dispatch($capitalCityUnitQueue->id, $totalCosts)->delay(
