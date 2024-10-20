@@ -7,7 +7,7 @@ import UnitRecruitment from "../capital-city/partials/unit-management/unit-recru
 
 @injectable()
 export default class FetchKingdomsForSelectionAjax {
-    constructor(@inject(Ajax) private ajax: AjaxInterface) { }
+    constructor(@inject(Ajax) private ajax: AjaxInterface) {}
 
     public fetchDetails(
         component: UnitRecruitment,
@@ -17,9 +17,9 @@ export default class FetchKingdomsForSelectionAjax {
         this.ajax
             .setRoute(
                 "kingdom/capital-city/manage-units/" +
-                characterId +
-                "/" +
-                kingdomId,
+                    characterId +
+                    "/" +
+                    kingdomId,
             )
             .doAjaxCall(
                 "get",

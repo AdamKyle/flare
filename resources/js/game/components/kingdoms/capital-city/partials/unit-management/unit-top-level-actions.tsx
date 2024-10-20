@@ -23,12 +23,12 @@ export default class UnitTopLevelActions extends React.Component<UnitTopLevelAct
 
                 <div className="flex space-x-2 my-4">
                     <SuccessOutlineButton
-                        button_label={'Send Orders'}
+                        button_label={"Send Orders"}
                         on_click={this.props.send_orders}
                         disabled={this.props.actions_disabled}
                     />
                     <DangerOutlineButton
-                        button_label={'Reset'}
+                        button_label={"Reset"}
                         on_click={this.props.reset}
                         disabled={this.props.actions_disabled}
                     />

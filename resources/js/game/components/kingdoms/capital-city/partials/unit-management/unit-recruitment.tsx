@@ -67,13 +67,14 @@ export default class UnitRecruitment extends React.Component<any, any> {
 
         const openKingdomIds = new Set<number>();
 
-        let filteredData = this.state.kingdoms_for_selection
-            .filter((kingdom: any) => {
+        let filteredData = this.state.kingdoms_for_selection.filter(
+            (kingdom: any) => {
                 return (
                     kingdom.name.toLowerCase().includes(searchTerm) ||
                     kingdom.game_map_name.toLowerCase().includes(searchTerm)
                 );
-            });
+            },
+        );
 
         const unitTypes = Object.values(UnitTypes).map((v: string) =>
             v.toLowerCase(),
@@ -104,14 +105,17 @@ export default class UnitRecruitment extends React.Component<any, any> {
     }, 300);
 
     reset() {
-        this.setState({
-            search_term: "",
-            unit_queue: [],
-            bulk_input_values: {},
-            global_bulk_value: "",
-        }, () => {
-            this.updateFilteredUnitData();
-        })
+        this.setState(
+            {
+                search_term: "",
+                unit_queue: [],
+                bulk_input_values: {},
+                global_bulk_value: "",
+            },
+            () => {
+                this.updateFilteredUnitData();
+            },
+        );
     }
 
     sendOrders = () => {
@@ -270,11 +274,14 @@ export default class UnitRecruitment extends React.Component<any, any> {
 
     handleGlobalBulkAmountChang(event: React.ChangeEvent<HTMLInputElement>) {
         const bulkAmount = parseInt(event.target.value, 10) || "";
-        this.setState({
-            global_bulk_value: bulkAmount,
-        }, () => {
-            this.applyGlobalBulkAmount(bulkAmount);
-        })
+        this.setState(
+            {
+                global_bulk_value: bulkAmount,
+            },
+            () => {
+                this.applyGlobalBulkAmount(bulkAmount);
+            },
+        );
     }
 
     applyGlobalBulkAmount(bulkAmount: number | string) {
@@ -335,7 +342,8 @@ export default class UnitRecruitment extends React.Component<any, any> {
     }
 
     getPaginatedData() {
-        const { current_page, items_per_page, filtered_unit_recruitment_data } = this.state;
+        const { current_page, items_per_page, filtered_unit_recruitment_data } =
+            this.state;
         const startIndex = (current_page - 1) * items_per_page;
         const endIndex = startIndex + items_per_page;
 
@@ -389,43 +397,41 @@ export default class UnitRecruitment extends React.Component<any, any> {
                 </div>
 
                 <div className="mb-4">
-                    {this.getPaginatedData().map(
-                        (kingdom: any) => (
-                            <KingdomCard
-                                kingdom={kingdom}
-                                manage_card_state={this.manageCardState.bind(
-                                    this,
-                                )}
-                                unit_queue={this.state.unit_queue}
-                                open_kingdom_ids={this.state.open_kingdom_ids}
-                                get_bulk_input_value={this.getBulkInputValue.bind(
-                                    this,
-                                )}
-                                handle_bulk_manage_card_stateamount_change={this.handleBulkAmountChange.bind(
-                                    this,
-                                )}
-                                is_bulk_queue_disabled={this.isBulkQueueDisabled.bind(
-                                    this,
-                                )}
-                                fetch_units_to_show={this.fetchUnitsToShow.bind(
-                                    this,
-                                )}
-                                get_unit_amount={this.getUnitAmount.bind(this)}
-                                handle_unit_amount_change={this.handleUnitAmountChange.bind(
-                                    this,
-                                )}
-                                get_kingdom_queue_summary={this.getKingdomQueueSummary.bind(
-                                    this,
-                                )}
-                            />
-                        ),
-                    )}
+                    {this.getPaginatedData().map((kingdom: any) => (
+                        <KingdomCard
+                            kingdom={kingdom}
+                            manage_card_state={this.manageCardState.bind(this)}
+                            unit_queue={this.state.unit_queue}
+                            open_kingdom_ids={this.state.open_kingdom_ids}
+                            get_bulk_input_value={this.getBulkInputValue.bind(
+                                this,
+                            )}
+                            handle_bulk_manage_card_stateamount_change={this.handleBulkAmountChange.bind(
+                                this,
+                            )}
+                            is_bulk_queue_disabled={this.isBulkQueueDisabled.bind(
+                                this,
+                            )}
+                            fetch_units_to_show={this.fetchUnitsToShow.bind(
+                                this,
+                            )}
+                            get_unit_amount={this.getUnitAmount.bind(this)}
+                            handle_unit_amount_change={this.handleUnitAmountChange.bind(
+                                this,
+                            )}
+                            get_kingdom_queue_summary={this.getKingdomQueueSummary.bind(
+                                this,
+                            )}
+                        />
+                    ))}
                 </div>
                 <Pagination
                     on_page_change={this.handlePageChange.bind(this)}
                     current_page={this.state.currentPage}
                     items_per_page={MAX_ITEMS_PER_PAGE}
-                    total_items={this.state.filtered_unit_recruitment_data.length}
+                    total_items={
+                        this.state.filtered_unit_recruitment_data.length
+                    }
                 />
             </div>
         );

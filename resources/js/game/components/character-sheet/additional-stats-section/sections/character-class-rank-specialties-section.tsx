@@ -275,9 +275,9 @@ export default class CharacterClassRankSpecialtiesSection extends React.Componen
                 new Ajax()
                     .setRoute(
                         "unequip-specialty/" +
-                        this.props.character.id +
-                        "/" +
-                        specialId,
+                            this.props.character.id +
+                            "/" +
+                            specialId,
                     )
                     .doAjaxCall(
                         "post",
@@ -337,9 +337,9 @@ export default class CharacterClassRankSpecialtiesSection extends React.Componen
                 new Ajax()
                     .setRoute(
                         "equip-specialty/" +
-                        this.props.character.id +
-                        "/" +
-                        specialId,
+                            this.props.character.id +
+                            "/" +
+                            specialId,
                     )
                     .doAjaxCall(
                         "post",
@@ -436,7 +436,7 @@ export default class CharacterClassRankSpecialtiesSection extends React.Componen
                             <PrimaryButton
                                 button_label={
                                     this.state.equipping &&
-                                        this.state.equipping_special_id ===
+                                    this.state.equipping_special_id ===
                                         row.id ? (
                                         <Fragment>
                                             <i className="fas fa-spinner fa-spin"></i>{" "}
@@ -533,7 +533,7 @@ export default class CharacterClassRankSpecialtiesSection extends React.Componen
                                 <PrimaryButton
                                     button_label={
                                         this.state.equipping &&
-                                            this.state.equipping_special_id ===
+                                        this.state.equipping_special_id ===
                                             row.game_class_special_id ? (
                                             <Fragment>
                                                 <i className="fas fa-spinner fa-spin"></i>{" "}
@@ -559,7 +559,7 @@ export default class CharacterClassRankSpecialtiesSection extends React.Componen
                             <PrimaryButton
                                 button_label={
                                     this.state.equipping &&
-                                        this.state.equipping_special_id ===
+                                    this.state.equipping_special_id ===
                                         row.id ? (
                                         <Fragment>
                                             <i className="fas fa-spinner fa-spin"></i>{" "}
@@ -813,16 +813,16 @@ export default class CharacterClassRankSpecialtiesSection extends React.Componen
                         {this.state.show_equipped
                             ? appendToTitle !== null
                                 ? "(" +
-                                appendToTitle +
-                                " Level: " +
-                                this.state.equipped_special.level +
-                                ")"
+                                  appendToTitle +
+                                  " Level: " +
+                                  this.state.equipped_special.level +
+                                  ")"
                                 : "(Level: " +
-                                this.state.equipped_special.level +
-                                ")"
+                                  this.state.equipped_special.level +
+                                  ")"
                             : "(Level: " +
-                            this.state.equipped_special.level +
-                            ")"}
+                              this.state.equipped_special.level +
+                              ")"}
                     </h3>
                     <p className="my-4">
                         {
@@ -1015,12 +1015,12 @@ export default class CharacterClassRankSpecialtiesSection extends React.Componen
                                 {
                                     label:
                                         this.state.other_selected_filter !==
-                                            null
+                                        null
                                             ? this.state.other_selected_filter
                                             : "Please Select",
                                     value:
                                         this.state.other_selected_filter !==
-                                            null
+                                        null
                                             ? this.state.other_selected_filter
                                             : "Please Select",
                                 },

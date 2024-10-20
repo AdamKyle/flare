@@ -6,7 +6,7 @@ import UnitQueue from "../capital-city/partials/unit-management/unit-queue";
 
 @injectable()
 export default class FetchUnitQueuesAjax {
-    constructor(@inject(Ajax) private ajax: AjaxInterface) { }
+    constructor(@inject(Ajax) private ajax: AjaxInterface) {}
 
     public fetchUnitQueueData(
         component: UnitQueue,
@@ -16,9 +16,9 @@ export default class FetchUnitQueuesAjax {
         this.ajax
             .setRoute(
                 "kingdom/capital-city/unit-queues/" +
-                characterId +
-                "/" +
-                kingdomId,
+                    characterId +
+                    "/" +
+                    kingdomId,
             )
             .doAjaxCall(
                 "get",

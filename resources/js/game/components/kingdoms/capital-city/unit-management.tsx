@@ -1,4 +1,3 @@
-
 import React from "react";
 import Tabs from "../../ui/tabs/tabs";
 import TabPanel from "../../ui/tabs/tab-panel";
@@ -7,7 +6,6 @@ import UnitManagementProps from "./types/unit-management-props";
 import UnitQueue from "./partials/unit-management/unit-queue";
 
 export default class UnitManagement extends React.Component<UnitManagementProps> {
-
     private tabs: { key: string; name: string }[];
 
     constructor(props: UnitManagementProps) {
@@ -15,26 +13,26 @@ export default class UnitManagement extends React.Component<UnitManagementProps>
 
         this.tabs = [
             {
-                key: 'unit-recruitment',
-                name: 'Unit Recruitment',
+                key: "unit-recruitment",
+                name: "Unit Recruitment",
             },
             {
-                key: 'unit-queues',
-                name: 'Unit Queue',
-            }
+                key: "unit-queues",
+                name: "Unit Queue",
+            },
         ];
     }
 
     render() {
         return (
-            <Tabs
-                tabs={this.tabs}
-            >
+            <Tabs tabs={this.tabs}>
                 <TabPanel key={"unit-recruitment"}>
                     <UnitRecruitment
                         user_id={this.props.user_id}
                         kingdom={this.props.kingdom}
-                        manage_unit_section={this.props.manage_show_unit_recruitment}
+                        manage_unit_section={
+                            this.props.manage_show_unit_recruitment
+                        }
                     />
                 </TabPanel>
                 <TabPanel key={"unit-queue"}>
@@ -45,6 +43,6 @@ export default class UnitManagement extends React.Component<UnitManagementProps>
                     />
                 </TabPanel>
             </Tabs>
-        )
+        );
     }
 }

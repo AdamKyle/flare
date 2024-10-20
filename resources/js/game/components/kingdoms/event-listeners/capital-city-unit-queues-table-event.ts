@@ -6,7 +6,8 @@ import UnitQueue from "../capital-city/partials/unit-management/unit-queue";
 
 @injectable()
 export default class CapitalCityUnitQueuesTableEvent
-    implements CapitalCityUnitQueueTableEventDefinition {
+    implements CapitalCityUnitQueueTableEventDefinition
+{
     private component?: UnitQueue;
 
     private userId?: number;
@@ -15,7 +16,7 @@ export default class CapitalCityUnitQueuesTableEvent
 
     constructor(
         @inject(CoreEventListener) private coreEventListener: CoreEventListener,
-    ) { }
+    ) {}
 
     public initialize(component: UnitQueue, userId: number): void {
         this.component = component;

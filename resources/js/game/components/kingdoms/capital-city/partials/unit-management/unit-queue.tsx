@@ -5,14 +5,13 @@ import SuccessAlert from "../../../../ui/alerts/simple-alerts/success-alert";
 import DangerAlert from "../../../../ui/alerts/simple-alerts/danger-alert";
 import LoadingProgressBar from "../../../../ui/progress-bars/loading-progress-bar";
 import CapitalCityUnitQueueTableEventDefinition from "../../../event-listeners/capital-city-unit-queue-table-event-definition";
-import CapitalCityUnitQueuesTableEvent from '../../../event-listeners/capital-city-unit-queues-table-event';
+import CapitalCityUnitQueuesTableEvent from "../../../event-listeners/capital-city-unit-queues-table-event";
 import debounce from "lodash/debounce";
 import clsx from "clsx";
 import { capitalize } from "lodash";
 import TimerProgressBar from "../../../../ui/progress-bars/timer-progress-bar";
 
 export default class UnitQueue extends React.Component<any, any> {
-
     private fetchUnitQueueAjax: FetchUnitQueuesAjax;
     private unitQueueListener: CapitalCityUnitQueueTableEventDefinition;
 
@@ -21,9 +20,10 @@ export default class UnitQueue extends React.Component<any, any> {
 
         this.fetchUnitQueueAjax = serviceContainer().fetch(FetchUnitQueuesAjax);
 
-        this.unitQueueListener = serviceContainer().fetch<CapitalCityUnitQueueTableEventDefinition>(
-            CapitalCityUnitQueuesTableEvent
-        );
+        this.unitQueueListener =
+            serviceContainer().fetch<CapitalCityUnitQueueTableEventDefinition>(
+                CapitalCityUnitQueuesTableEvent,
+            );
 
         this.unitQueueListener.initialize(this, this.props.user_id);
         this.unitQueueListener.register();
@@ -32,9 +32,9 @@ export default class UnitQueue extends React.Component<any, any> {
             loading: true,
             unit_queues: [],
             filtered_unit_queues: [],
-            search_query: '',
-            error_message: '',
-            success_message: '',
+            search_query: "",
+            error_message: "",
+            success_message: "",
             open_kingdom_ids: new Set<number>(),
         };
     }
@@ -88,7 +88,9 @@ export default class UnitQueue extends React.Component<any, any> {
                 .map((kingdom: any) => {
                     const matchingUnits = kingdom.unit_requests.filter(
                         (unit: any) =>
-                            unit.building_name.toLowerCase().includes(searchTerm)
+                            unit.building_name
+                                .toLowerCase()
+                                .includes(searchTerm),
                     );
 
                     if (matchingUnits.length > 0) {
@@ -148,11 +150,19 @@ export default class UnitQueue extends React.Component<any, any> {
                             className={clsx(
                                 "p-4 bg-gray-100 dark:bg-gray-700 shadow-md cursor-pointer",
                                 {
-                                    "rounded-lg": !this.state.open_kingdom_ids.has(kingdom.kingdom_id),
-                                    "rounded-t-lg": this.state.open_kingdom_ids.has(kingdom.kingdom_id),
-                                }
+                                    "rounded-lg":
+                                        !this.state.open_kingdom_ids.has(
+                                            kingdom.kingdom_id,
+                                        ),
+                                    "rounded-t-lg":
+                                        this.state.open_kingdom_ids.has(
+                                            kingdom.kingdom_id,
+                                        ),
+                                },
                             )}
-                            onClick={() => this.toggleDetails(kingdom.kingdom_id)}
+                            onClick={() =>
+                                this.toggleDetails(kingdom.kingdom_id)
+                            }
                         >
                             <div className="flex justify-between items-center">
                                 <div>
@@ -164,7 +174,7 @@ export default class UnitQueue extends React.Component<any, any> {
                                     </p>
                                 </div>
                                 <i
-                                    className={`fas fa-chevron-${this.state.open_kingdom_ids.has(kingdom.kingdom_id) ? 'down' : 'up'} text-gray-500 dark:text-gray-400`}
+                                    className={`fas fa-chevron-${this.state.open_kingdom_ids.has(kingdom.kingdom_id) ? "down" : "up"} text-gray-500 dark:text-gray-400`}
                                 />
                             </div>
                             <TimerProgressBar
@@ -173,7 +183,9 @@ export default class UnitQueue extends React.Component<any, any> {
                             />
                         </div>
 
-                        {this.state.open_kingdom_ids.has(kingdom.kingdom_id) && (
+                        {this.state.open_kingdom_ids.has(
+                            kingdom.kingdom_id,
+                        ) && (
                             <div className="bg-gray-300 dark:bg-gray-600 p-4">
                                 {kingdom.unit_requests.map((unit: any) => (
                                     <div
@@ -184,7 +196,8 @@ export default class UnitQueue extends React.Component<any, any> {
                                             {unit.building_name}
                                         </h3>
                                         <p className="text-gray-700 dark:text-gray-300">
-                                            Amount to Recruit: {unit.amount_to_recruit}
+                                            Amount to Recruit:{" "}
+                                            {unit.amount_to_recruit}
                                         </p>
                                     </div>
                                 ))}

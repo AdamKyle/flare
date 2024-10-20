@@ -6,7 +6,7 @@ import UnitRecruitment from "../capital-city/partials/unit-management/unit-recru
 
 @injectable()
 export default class ProcessUnitRequestAjax {
-    constructor(@inject(Ajax) private ajax: AjaxInterface) { }
+    constructor(@inject(Ajax) private ajax: AjaxInterface) {}
 
     public processRequest(
         component: UnitRecruitment,
@@ -17,9 +17,9 @@ export default class ProcessUnitRequestAjax {
         this.ajax
             .setRoute(
                 "kingdom/capital-city/recruit-unit-requests/" +
-                characterId +
-                "/" +
-                kingdomId,
+                    characterId +
+                    "/" +
+                    kingdomId,
             )
             .setParameters({
                 request_data: params,

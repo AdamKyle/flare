@@ -14,7 +14,7 @@ export default class BuildingToUpgradeService {
     constructor(
         @inject(ProcessUpgradeBuildingsAjax)
         private processBuildingRequest: ProcessUpgradeBuildingsAjax,
-    ) { }
+    ) {}
 
     public setComponent(component: BuildingsToUpgradeSection) {
         this.component = component;
