@@ -10,6 +10,8 @@ import DangerAlert from "../../../../ui/alerts/simple-alerts/danger-alert";
 import UnitTopLevelActions from "./unit-top-level-actions";
 import KingdomCard from "./kingdom-card";
 import Pagination from "../../components/pagination";
+import CapitalCityUnitRecruitmentEvent from "../../../event-listeners/capital-city-unit-recruitment-event ";
+import CapitalCityUnitRecruitmentEventDefinition from "../../../event-listeners/capital-city-unit-recruitment-event-definition";
 
 const MAX_ITEMS_PER_PAGE = 10;
 
@@ -17,6 +19,8 @@ export default class UnitRecruitment extends React.Component<any, any> {
     private fetchKingdomsForSelectionAjax: FetchKingdomsForSelectionAjax;
 
     private processUnitRequest: ProcessUnitRequestAjax;
+
+    private unitRecruitmentEvent: CapitalCityUnitRecruitmentEventDefinition;
 
     constructor(props: any) {
         super(props);
@@ -44,6 +48,14 @@ export default class UnitRecruitment extends React.Component<any, any> {
         this.processUnitRequest = serviceContainer().fetch(
             ProcessUnitRequestAjax,
         );
+
+        this.unitRecruitmentEvent =
+            serviceContainer().fetch<CapitalCityUnitRecruitmentEventDefinition>(
+                CapitalCityUnitRecruitmentEvent,
+            );
+
+        this.unitRecruitmentEvent.initialize(this, this.props.user_id);
+        this.unitRecruitmentEvent.register();
     }
 
     componentDidMount() {
@@ -52,6 +64,8 @@ export default class UnitRecruitment extends React.Component<any, any> {
             this.props.kingdom.character_id,
             this.props.kingdom.id,
         );
+
+        this.unitRecruitmentEvent.listen();
     }
 
     componentDidUpdate(prevProps: any, prevState: any) {
@@ -67,7 +81,7 @@ export default class UnitRecruitment extends React.Component<any, any> {
 
         const openKingdomIds = new Set<number>();
 
-        let filteredData = this.state.kingdoms_for_selection.filter(
+        let filteredData = this.state.unit_recruitment_data.filter(
             (kingdom: any) => {
                 return (
                     kingdom.name.toLowerCase().includes(searchTerm) ||
@@ -81,9 +95,9 @@ export default class UnitRecruitment extends React.Component<any, any> {
         );
 
         if (unitTypes.includes(searchTerm) && filteredData.length === 0) {
-            filteredData = this.state.kingdoms_for_selection;
+            filteredData = this.state.unit_recruitment_data;
 
-            this.state.kingdoms_for_selection.forEach((kingdom: any) => {
+            this.state.unit_recruitment_data.forEach((kingdom: any) => {
                 openKingdomIds.add(kingdom.id);
             });
         }
@@ -376,6 +390,7 @@ export default class UnitRecruitment extends React.Component<any, any> {
                     reset={this.reset.bind(this)}
                     handle_search_change={this.handleSearchChange.bind(this)}
                     actions_disabled={this.state.processing_request}
+                    unit_queue={this.state.unit_queue}
                 />
 
                 <div className="my-4">

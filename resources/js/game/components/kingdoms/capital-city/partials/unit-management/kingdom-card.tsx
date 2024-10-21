@@ -2,6 +2,8 @@ import clsx from "clsx";
 import React, { ReactNode } from "react";
 import KingdomCardProps from "../../types/partials/unit-management/kingdom-card-props";
 import UnitQueue from "../../deffinitions/unit-queue";
+import WarningAlert from "../../../../ui/alerts/simple-alerts/warning-alert";
+import InfoAlert from "../../../../ui/alerts/simple-alerts/info-alert";
 
 export default class KingdomCard extends React.Component<KingdomCardProps> {
     constructor(props: KingdomCardProps) {
@@ -46,6 +48,10 @@ export default class KingdomCard extends React.Component<KingdomCardProps> {
                         <div className="text-sm text-gray-600 dark:text-gray-400">
                             {kingdom.game_map_name}
                         </div>
+                        <div className="text-sm text-gray-600 dark:text-gray-400">
+                            Time from Capital City: {kingdom.time_to_kingdom}{" "}
+                            (Minutes)
+                        </div>
                         {this.showUnitsInQueue(kingdom.id)}
                     </div>
                     <div>
@@ -63,6 +69,26 @@ export default class KingdomCard extends React.Component<KingdomCardProps> {
                 </div>
                 {this.props.open_kingdom_ids.has(kingdom.id) && (
                     <div className="p-4">
+                        <InfoAlert additional_css="mb-2">
+                            You may only cancel unit requests when the order is
+                            traveling. When you send the request we travel to
+                            this kingdom and deliever the orders, you can see
+                            this in your unit queue (above tab). If the kingdom
+                            is requesting resources for those units or
+                            recruiting those units, you cannot cancel the unit
+                            or the entire request because it would throw the
+                            kingdom into chaos.
+                        </InfoAlert>
+                        {kingdom.time_to_kingdom <= 1 ? (
+                            <WarningAlert additional_css="mb-2">
+                                <p>
+                                    This kingdom is a minute away from your
+                                    capital city. You wont be able to cancel any
+                                    of the unit requests when you send orders to
+                                    this kingdom.
+                                </p>
+                            </WarningAlert>
+                        ) : null}
                         <div className="mb-4 p-4 bg-white dark:bg-gray-800 shadow-sm rounded-lg">
                             <input
                                 type="number"

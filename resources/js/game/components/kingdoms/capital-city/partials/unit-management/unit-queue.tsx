@@ -193,8 +193,6 @@ export default class UnitQueue extends React.Component<
             return <LoadingProgressBar />;
         }
 
-        console.log(this.state.cancellation_modal);
-
         return (
             <div className="md:p-4">
                 {this.state.success_message && (

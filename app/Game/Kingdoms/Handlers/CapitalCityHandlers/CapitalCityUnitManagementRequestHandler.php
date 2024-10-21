@@ -8,6 +8,7 @@ use App\Flare\Models\GameUnit;
 use App\Flare\Models\Kingdom;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Kingdoms\Events\UpdateCapitalCityUnitQueueTable;
+use App\Game\Kingdoms\Events\UpdateCapitalCityUnitRecruitments;
 use App\Game\Kingdoms\Jobs\CapitalCityUnitRequestMovement;
 use App\Game\Kingdoms\Service\UnitMovementService;
 use App\Game\Kingdoms\Service\UnitService;
@@ -148,6 +149,7 @@ class CapitalCityUnitManagementRequestHandler
      */
     private function triggerEvents(CapitalCityUnitQueue $queue, Character $character, Kingdom $kingdom, int $time): void
     {
+        event(new UpdateCapitalCityUnitRecruitments($character, $kingdom));
         event(new UpdateCapitalCityUnitQueueTable($character, $kingdom));
 
         CapitalCityUnitRequestMovement::dispatch($queue->id, $character->id)->delay(now()->addMinutes($time));

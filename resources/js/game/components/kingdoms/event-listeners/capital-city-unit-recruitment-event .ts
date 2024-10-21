@@ -1,24 +1,24 @@
 import { Channel } from "laravel-echo";
 import { inject, injectable } from "tsyringe";
 import CoreEventListener from "../../../lib/game/event-listeners/core-event-listener";
-import CapitalCityUnitQueueTableEventDefinition from "./capital-city-unit-queue-table-event-definition";
-import UnitQueue from "../capital-city/partials/unit-management/unit-queue";
+import CapitalCityUnitRecruitmentEventDefinition from "./capital-city-unit-recruitment-event-definition";
+import UnitRecruitment from "../capital-city/partials/unit-management/unit-recruitment";
 
 @injectable()
-export default class CapitalCityUnitQueuesTableEvent
-    implements CapitalCityUnitQueueTableEventDefinition
+export default class CapitalCityUnitRecruitmentEvent
+    implements CapitalCityUnitRecruitmentEventDefinition
 {
-    private component?: UnitQueue;
+    private component?: UnitRecruitment;
 
     private userId?: number;
 
-    private capitalCityUnitUpgradeRepairTableEvent?: Channel;
+    private capitalCityUnitRecruitmentEvent?: Channel;
 
     constructor(
         @inject(CoreEventListener) private coreEventListener: CoreEventListener,
     ) {}
 
-    public initialize(component: UnitQueue, userId: number): void {
+    public initialize(component: UnitRecruitment, userId: number): void {
         this.component = component;
         this.userId = userId;
     }
@@ -29,8 +29,8 @@ export default class CapitalCityUnitQueuesTableEvent
         try {
             const echo = this.coreEventListener.getEcho();
 
-            this.capitalCityUnitUpgradeRepairTableEvent = echo.private(
-                "capital-city-unit-queue-data-" + this.userId,
+            this.capitalCityUnitRecruitmentEvent = echo.private(
+                "capital-city-update-kingdom-unit-data-" + this.userId,
             );
         } catch (e: any | unknown) {
             throw new Error(e);
@@ -38,7 +38,7 @@ export default class CapitalCityUnitQueuesTableEvent
     }
 
     public listen(): void {
-        this.listenForUnitTableUpdate();
+        this.listenForTableUpdate();
     }
 
     /**
@@ -46,22 +46,22 @@ export default class CapitalCityUnitQueuesTableEvent
      *
      * @protected
      */
-    protected listenForUnitTableUpdate() {
-        if (!this.capitalCityUnitUpgradeRepairTableEvent) {
+    protected listenForTableUpdate() {
+        if (!this.capitalCityUnitRecruitmentEvent) {
             return;
         }
 
-        this.capitalCityUnitUpgradeRepairTableEvent.listen(
-            "Game.Kingdoms.Events.UpdateCapitalCityUnitQueueTable",
+        this.capitalCityUnitRecruitmentEvent.listen(
+            "Game.Kingdoms.Events.UpdateCapitalCityUnitRecruitments",
             (event: any) => {
                 if (!this.component) {
                     return;
                 }
 
-                let data = event.unitQueueData;
+                let data = event.kingdomUnitRecruitment;
 
                 this.component.setState({
-                    unit_queues: data,
+                    unit_recruitment_data: data,
                 });
             },
         );

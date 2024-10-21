@@ -7,6 +7,7 @@ use App\Flare\Models\CapitalCityUnitQueue;
 use App\Flare\Models\GameUnit;
 use App\Flare\Models\Kingdom;
 use App\Game\Kingdoms\Events\UpdateCapitalCityUnitQueueTable;
+use App\Game\Kingdoms\Events\UpdateCapitalCityUnitRecruitments;
 use App\Game\Kingdoms\Handlers\CapitalCityHandlers\CapitalCityKingdomLogHandler;
 use App\Game\Kingdoms\Service\UnitService;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
@@ -66,6 +67,7 @@ class CapitalCityUnitRequest implements ShouldQueue
 
         $queueData = $queueData->refresh();
 
+        event(new UpdateCapitalCityUnitRecruitments($queueData->character, $queueData->requestingKingdom));
         event(new UpdateCapitalCityUnitQueueTable($queueData->character));
 
         $capitalCityKingdomLogHandler->possiblyCreateLogForUnitQueue($queueData);

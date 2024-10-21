@@ -25,7 +25,10 @@ export default class UnitTopLevelActions extends React.Component<UnitTopLevelAct
                     <SuccessOutlineButton
                         button_label={"Send Orders"}
                         on_click={this.props.send_orders}
-                        disabled={this.props.actions_disabled}
+                        disabled={
+                            this.props.actions_disabled ||
+                            this.props.unit_queue.length <= 0
+                        }
                     />
                     <DangerOutlineButton
                         button_label={"Reset"}

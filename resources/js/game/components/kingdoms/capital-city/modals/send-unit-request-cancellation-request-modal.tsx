@@ -57,7 +57,6 @@ export default class SendUnitRequestCancellationRequestModal extends React.Compo
     }
 
     render() {
-        console.log(this.props);
         return (
             <Dialogue
                 is_open={this.props.is_open}

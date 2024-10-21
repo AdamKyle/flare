@@ -1,4 +1,5 @@
 import React from "react";
+import UnitQueue from "../../../deffinitions/unit-queue";
 
 export default interface UnitTopLevelActionsProps {
     search_term: string;
@@ -6,4 +7,5 @@ export default interface UnitTopLevelActionsProps {
     handle_search_change: (event: React.ChangeEvent<HTMLInputElement>) => void;
     send_orders: () => void;
     reset: () => void;
+    unit_queue: UnitQueue[] | [];
 }

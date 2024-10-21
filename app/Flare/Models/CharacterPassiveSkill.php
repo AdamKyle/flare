@@ -41,6 +41,8 @@ class CharacterPassiveSkill extends Model
         'is_max_level',
         'current_bonus',
         'resource_request_time_reduction',
+        'capital_city_building_request_travel_time_reduction',
+        'capital_city_unit_request_travel_time_reduction'
     ];
 
     public function character()
@@ -73,7 +75,18 @@ class CharacterPassiveSkill extends Model
         return $this->passiveSkill->name;
     }
 
-    public function getResourceRequestTimeReductionAttribute() {
+    public function getResourceRequestTimeReductionAttribute()
+    {
         return $this->current_level * $this->passiveSkill->resource_request_time_reduction;
+    }
+
+    public function getCapitalCityBuildingRequestTravelTimeReductionAttribute()
+    {
+        return $this->current_level * $this->passiveSkill->capital_city_building_request_travel_time_reduction;
+    }
+
+    public function getCapitalCityUnitRequestTravelTimeReductionAttribute()
+    {
+        return $this->level * $this->passiveSkill->capital_city_unit_request_travel_time_reduction;
     }
 }

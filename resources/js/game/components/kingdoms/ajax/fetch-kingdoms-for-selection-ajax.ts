@@ -28,7 +28,7 @@ export default class FetchKingdomsForSelectionAjax {
 
                     component.setState({
                         loading: false,
-                        kingdoms_for_selection: data.kingdoms,
+                        unit_recruitment_data: data.kingdoms,
                         filtered_unit_recruitment_data: data.kingdoms,
                     });
                 },

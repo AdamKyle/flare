@@ -18,6 +18,7 @@ use App\Flare\Models\KingdomBuilding;
 use App\Flare\Transformers\KingdomBuildingTransformer;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
+use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
 
 class CapitalCityManagementService
 {
@@ -52,9 +53,13 @@ class CapitalCityManagementService
         return $returnArray ? $kingdomBuildingData : $this->successResult($kingdomBuildingData);
     }
 
-    public function fetchKingdomsForSelection(Kingdom $kingdom): array
+    public function fetchKingdomsForSelection(Kingdom $kingdom, bool $returnArray = false): array
     {
         $kingdoms = $this->getSelectableKingdoms($kingdom);
+
+        if ($returnArray) {
+            return $kingdoms;
+        }
 
         return $this->successResult(['kingdoms' => $kingdoms]);
     }
@@ -355,16 +360,19 @@ class CapitalCityManagementService
      */
     private function getSelectableKingdoms(Kingdom $kingdom): array
     {
+        $character = $kingdom->character;
+
         $kingdoms = Kingdom::where('id', '!=', $kingdom->id)
             ->where('character_id', $kingdom->character_id)
             ->where('game_map_id', $kingdom->game_map_id)
             ->whereDoesntHave('unitsQueue')
-            ->with('gameMap:id,name') // Eager load only id and name
-            ->select('name', 'id', 'game_map_id')
+            ->with('gameMap:id,name')
+            ->select('name', 'id', 'game_map_id', 'x_position', 'y_position')
             ->get()
-            ->each(function ($kingdom) {
-                $kingdom->game_map_name = $kingdom->gameMap->name;
-                $kingdom->makeHidden(['gameMap']); // Hide the gameMap relationship
+            ->each(function ($selectableKingdom) use ($character, $kingdom) {
+                $selectableKingdom->game_map_name = $kingdom->gameMap->name;
+                $selectableKingdom->time_to_kingdom = $this->unitMovementService->getDistanceTime($character, $selectableKingdom, $kingdom, PassiveSkillTypeValue::CAPITAL_CITY_REQUEST_UNIT_TRAVEL_TIME_REDUCTION);
+                $selectableKingdom->makeHidden(['gameMap', 'x_position', 'y_position']);
             });
 
         return $this->filterOutCapitalCityUnitsInQueue($kingdoms)->toArray();
